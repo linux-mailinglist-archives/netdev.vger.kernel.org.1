@@ -1,116 +1,205 @@
-Return-Path: <netdev+bounces-102822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3B3E904F00
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 11:19:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 338EE904F34
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 11:25:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93AC01F249F1
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 09:19:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A58BD1F25CE7
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 09:25:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3189E16D9CA;
-	Wed, 12 Jun 2024 09:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3121216D9DD;
+	Wed, 12 Jun 2024 09:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JE0+tbvW"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="RK7Px/5z";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="5ZviqxXM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044832AEE3;
-	Wed, 12 Jun 2024 09:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5722D16DEB2
+	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 09:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718183975; cv=none; b=gf3dTN+vTKR6ZdnTPf3Bp9OeldBPlpoB+H6XzFKt6/+T0LE/djLa2s0Jvl29w4RgPS8IsE3gZ3ImtwkZKHMHDBwJ9004yB9elzGcFVMO4D3P8gyWriwyDrpdbRdxK6WEabHBkUhmDucQrC+HGM5pxsfJp5NocJpfxJljCXhzGLM=
+	t=1718184300; cv=none; b=riBBlcSMOpZ82tktd4HoaL0pfjfUuPCej7+f0cIVOcsPZeBV2ITOWW0LatCvEXdpMcJ4lHueqwjfYHFLXlNRyrO+gR3jTqYp/VIZJ2PuvH+4p4bhovldq76QcjFLhyshG3R9/jOmwqBpGepUVooQwQ0oHZRk0XQvRbv6xRiaiZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718183975; c=relaxed/simple;
-	bh=VWF2BN3M74sWgL4r0nHVKCmPDvs57NQeQDcbDpP5OYs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XUERAZY0Kp7nBi5HoJ3Djtvb1+w2ALGhQMPLg3W757wgprRSz8rzqmKa7ryeckk5iUxKf13yk2UYPeFnrk1pbRKIbzzPbIC1bD4DQil8hubYM67mC2xxTyFkdpNTNJKZUJW/x88LsykxBfI82st5JhGHd6HJ53gQm0IV6azwoww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JE0+tbvW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 235B7C4AF48;
-	Wed, 12 Jun 2024 09:19:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718183974;
-	bh=VWF2BN3M74sWgL4r0nHVKCmPDvs57NQeQDcbDpP5OYs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JE0+tbvW0j09JGIOaGiJqVIXDw22trEwQWoQp1DZrucwJbpk9i3ecI1z6nknrbee7
-	 Snc9xO/vHP9RIGSZKy/T3ycP1ENXlaPr9+lr4VcdLwLP3D2mYQpGOV4ejo9ocqBb+w
-	 A5RdWYF0w498tf+elYvXPPVzfAUjppUfPacpCqZEfUCASLfl8I+WC4iIysj+MykTO9
-	 MtOpZO+ChidNQXfTmUPebdpYoXW9w/XLjw63rn/PyoatC5/p96DrW3D/kzsnu8ZyEW
-	 g+HFiqTBcJM6S5xdd+iZOASF7xaZNyAMCdGD0ncGMkFWWsqp+5IpI6QNLGK+l5qB/6
-	 n/fd56Dy9dQig==
-From: Geliang Tang <geliang@kernel.org>
-To: Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Boris Pismenny <borisp@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>
-Cc: Geliang Tang <tanggeliang@kylinos.cn>,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v7 2/2] selftests/bpf: Add F_SETFL for fcntl in test_sockmap
-Date: Wed, 12 Jun 2024 17:19:04 +0800
-Message-ID: <783f589f00b91ae3f8812a736fd64b4eb4251364.1718182183.git.tanggeliang@kylinos.cn>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1718182183.git.tanggeliang@kylinos.cn>
-References: <cover.1718182183.git.tanggeliang@kylinos.cn>
+	s=arc-20240116; t=1718184300; c=relaxed/simple;
+	bh=FGEm2thiLlo0TWFViCdkuo/ybAO1t9yroJGymBnCRRo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Zy+WWZlGJm1C6Jcaev8baiTY2nqMJV+J1OCMUJ/aeuHTR1D6rD7GGuaGACl+mylzqdHR+PI7/TLRsSFNe9/uy2JWKJUajEXahus0StB96ehirVHTDwUZA9yFuw5dv35YmaQNLToyXU2UpHNnds7hwKptShQWltdMKeOR8GPyRWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=RK7Px/5z; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=5ZviqxXM; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1718184296;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=D73eoZ+ww6rBa72YElmXEJrsMwkJILvJ3E1tcTzlOPg=;
+	b=RK7Px/5zEa+QIfqukF4cznz3qk+5c7lVMS9zdsSZ0pqf2sFZWsgfuDnHFo0TKsibA4Z9Y7
+	+fjcNwNxvk1eZQxBs5XfyoXMesAJeObINYYIDsmJxgaGJPfPb85xwg8BHBJK/BMHAF5N4g
+	jpkoZQrsOrfs8sm86gw5Uf0t/ZrxLiP6AGC50XauA1GzBW2HVg60259rlKodu9iJrWq9Gb
+	SjpbT30xRIFSRkSnk+KniT2FmaiLHhEoEY5rMXjK9Y1fMTEBs3ghEFhC9uuWhnzZPcKATm
+	n6RfdxlIM9Da+kWW6NU3e2j2UphfhRFYSXXVKd6ZEh1YFSNYLGzO6NxB6DyKdg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1718184296;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=D73eoZ+ww6rBa72YElmXEJrsMwkJILvJ3E1tcTzlOPg=;
+	b=5ZviqxXM6cwlRUAog+MIbJm463ZHrTr/HS0phchzqQJVZW2/3I0ul5ppJkRUOoRYQtV4Rp
+	SatC8K0n4KOrvwBw==
+Date: Wed, 12 Jun 2024 11:24:53 +0200
+Subject: [PATCH iwl-next] igc: Get rid of spurious interrupts
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240611-igc_irq-v1-1-49763284cb57@linutronix.de>
+X-B4-Tracking: v=1; b=H4sIAGRpaWYC/x2N0QqDMAwAf0XyvEArQ9RfkTHaLGpAq0tkE8R/X
+ 93jcQd3gLEKG7TFAcofMVlSBn8rgMaQBkZ5ZYbSlXdXeY8y0FP0jUTkqY5U1Y2DXMdgjFFDovH
+ q52Ab6yVW5V72/6ID+U6YeN/gcZ4/S5Ca0nwAAAA=
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>, 
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ Kurt Kanzenbach <kurt@linutronix.de>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4064; i=kurt@linutronix.de;
+ h=from:subject:message-id; bh=FGEm2thiLlo0TWFViCdkuo/ybAO1t9yroJGymBnCRRo=;
+ b=owEBbQKS/ZANAwAKAcGT0fKqRnOCAcsmYgBmaWln1kS9mMTjJHV3UcJf5d5++VGC6yETktOu0
+ +6QUV50QDOJAjMEAAEKAB0WIQS8ub+yyMN909/bWZLBk9HyqkZzggUCZmlpZwAKCRDBk9HyqkZz
+ ginIEACwTVTymBjwo6guYrWNwhcNf+Yfg2EnHaCxBIbg7u76sv4oll2YI0ocaRoydt58ElH5Mrg
+ r+wLAXqHY7tR+50HgNai1M0yIMzB6MWwyoiTCzzDcCpKkdxT5OVzPaBmoTUEhJB9WNVBh8Pk6PI
+ pERIha+QoNIAc2lKk0VO5nYZ1I4IU7vl0QBiezRhNuW6gnkkxIqp3ebjeVF8T3s44F+SjHsWuru
+ CuiLRI/1pLqWzrTJhszWbiB9Rmg+5+D2rzC2LQqGJh38crSmXd2w4PC5C9gUss07vlXeNUbR4Ng
+ 2bK+esUyOH89OVl7st5SnPBJW+SmIl4RgZvpx6BAzBmlOcjSes+9Nh86qyFxbvu3s+enQObfbX5
+ 4VsuJjfsu9tC3hobWJ0MuUO77aBrV+15+4SgIzCtuenWiEXNDkjEuFRGoVy8+2zPVeWDRErHPL/
+ /zoLIZvYhchYXi07wamEqOSvEg/PA3eprQ25wLpz0q0OBs4t7Xlz3SbXB/qdFwR+/1Khmaqsp4U
+ vhKN67oyTWsZ2kQDKCCYNau/V0b3+//AUMovYHl5nH2evUJixXwRIXqFuCN2CKSLOzBytDeAwzV
+ wh1Bro/4CdnWX/rkP0jjhliZ+bUYoRnCKe/yc3Dv9ce3p6KI+QZPqkgCoL6mDB9WA9C5SDMu5Ej
+ 4qszEWMPj1dMiZQ==
+X-Developer-Key: i=kurt@linutronix.de; a=openpgp;
+ fpr=BCB9BFB2C8C37DD3DFDB5992C193D1F2AA467382
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+When running the igc with XDP/ZC in busy polling mode with deferral of hard
+interrupts, interrupts still happen from time to time. That is caused by
+the igc task watchdog which triggers Rx interrupts periodically.
 
-Incorrect arguments are passed to fcntl() in test_sockmap.c when invoking
-it to set file status flags. If O_NONBLOCK is used as 2nd argument and
-passed into fcntl, -EINVAL will be returned (See do_fcntl() in fs/fcntl.c).
-The correct approach is to use F_SETFL as 2nd argument, and O_NONBLOCK as
-3rd one.
+That mechanism has been introduced to overcome skb/memory allocation
+failures [1]. So the Rx clean functions stop processing the Rx ring in case
+of such failure. The task watchdog triggers Rx interrupts periodically in
+the hope that memory became available in the mean time.
 
-Fixes: 16962b2404ac ("bpf: sockmap, add selftests")
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Acked-by: Yonghong Song <yonghong.song@linux.dev>
+The current behavior is undesirable for real time applications, because the
+driver induced Rx interrupts trigger also the softirq processing. However,
+all real time packets should be processed by the application which uses the
+busy polling method.
+
+Therefore, only trigger the Rx interrupts in case of real allocation
+failures. Introduce a new flag for signaling that condition.
+
+[1] - https://git.kernel.org/pub/scm/linux/kernel/git/tglx/history.git/commit/?id=3be507547e6177e5c808544bd6a2efa2c7f1d436
+
+Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
 ---
- tools/testing/selftests/bpf/test_sockmap.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/intel/igc/igc.h      |  1 +
+ drivers/net/ethernet/intel/igc/igc_main.c | 24 ++++++++++++++++++++----
+ 2 files changed, 21 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/test_sockmap.c b/tools/testing/selftests/bpf/test_sockmap.c
-index 9cba4ec844a5..99d3ca8e44bb 100644
---- a/tools/testing/selftests/bpf/test_sockmap.c
-+++ b/tools/testing/selftests/bpf/test_sockmap.c
-@@ -604,7 +604,9 @@ static int msg_loop(int fd, int iov_count, int iov_length, int cnt,
- 		struct timeval timeout;
- 		fd_set w;
+diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+index 8b14c029eda1..7bfe5030e2c0 100644
+--- a/drivers/net/ethernet/intel/igc/igc.h
++++ b/drivers/net/ethernet/intel/igc/igc.h
+@@ -682,6 +682,7 @@ enum igc_ring_flags_t {
+ 	IGC_RING_FLAG_TX_DETECT_HANG,
+ 	IGC_RING_FLAG_AF_XDP_ZC,
+ 	IGC_RING_FLAG_TX_HWTSTAMP,
++	IGC_RING_FLAG_RX_ALLOC_FAILED,
+ };
  
--		fcntl(fd, fd_flags);
-+		if (fcntl(fd, F_SETFL, fd_flags))
-+			goto out_errno;
+ #define ring_uses_large_buffer(ring) \
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 305e05294a26..e666739dfac7 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -2192,6 +2192,7 @@ static bool igc_alloc_mapped_page(struct igc_ring *rx_ring,
+ 	page = dev_alloc_pages(igc_rx_pg_order(rx_ring));
+ 	if (unlikely(!page)) {
+ 		rx_ring->rx_stats.alloc_failed++;
++		set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
+ 		return false;
+ 	}
+ 
+@@ -2208,6 +2209,7 @@ static bool igc_alloc_mapped_page(struct igc_ring *rx_ring,
+ 		__free_page(page);
+ 
+ 		rx_ring->rx_stats.alloc_failed++;
++		set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
+ 		return false;
+ 	}
+ 
+@@ -2659,6 +2661,7 @@ static int igc_clean_rx_irq(struct igc_q_vector *q_vector, const int budget)
+ 		if (!skb) {
+ 			rx_ring->rx_stats.alloc_failed++;
+ 			rx_buffer->pagecnt_bias++;
++			set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
+ 			break;
+ 		}
+ 
+@@ -2739,6 +2742,7 @@ static void igc_dispatch_skb_zc(struct igc_q_vector *q_vector,
+ 	skb = igc_construct_skb_zc(ring, xdp);
+ 	if (!skb) {
+ 		ring->rx_stats.alloc_failed++;
++		set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &ring->flags);
+ 		return;
+ 	}
+ 
+@@ -5811,11 +5815,23 @@ static void igc_watchdog_task(struct work_struct *work)
+ 	if (adapter->flags & IGC_FLAG_HAS_MSIX) {
+ 		u32 eics = 0;
+ 
+-		for (i = 0; i < adapter->num_q_vectors; i++)
+-			eics |= adapter->q_vector[i]->eims_value;
+-		wr32(IGC_EICS, eics);
++		for (i = 0; i < adapter->num_q_vectors; i++) {
++			struct igc_ring *rx_ring = adapter->rx_ring[i];
 +
- 		/* Account for pop bytes noting each iteration of apply will
- 		 * call msg_pop_data helper so we need to account for this
- 		 * by calculating the number of apply iterations. Note user
++			if (test_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags)) {
++				eics |= adapter->q_vector[i]->eims_value;
++				clear_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
++			}
++		}
++		if (eics)
++			wr32(IGC_EICS, eics);
+ 	} else {
+-		wr32(IGC_ICS, IGC_ICS_RXDMT0);
++		struct igc_ring *rx_ring = adapter->rx_ring[0];
++
++		if (test_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags)) {
++			clear_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
++			wr32(IGC_ICS, IGC_ICS_RXDMT0);
++		}
+ 	}
+ 
+ 	igc_ptp_tx_hang(adapter);
+
+---
+base-commit: bb678f01804ccaa861b012b2b9426d69673d8a84
+change-id: 20240611-igc_irq-ccc1c8bc6890
+
+Best regards,
 -- 
-2.43.0
+Kurt Kanzenbach <kurt@linutronix.de>
 
 
