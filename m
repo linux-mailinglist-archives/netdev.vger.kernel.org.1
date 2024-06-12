@@ -1,84 +1,117 @@
-Return-Path: <netdev+bounces-103009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB4F4905F2B
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 01:25:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A0BF905F3C
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 01:32:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 624E4B22BBA
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 23:25:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2AC81C211A0
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 23:32:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49CF912C80F;
-	Wed, 12 Jun 2024 23:25:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A586912D742;
+	Wed, 12 Jun 2024 23:32:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WMpHDAwS"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KuRtSsoX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB1E84A36;
-	Wed, 12 Jun 2024 23:25:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3344022092;
+	Wed, 12 Jun 2024 23:32:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718234707; cv=none; b=W+DCF0RwSxD8d937XrWD2Df9TMqQRxoA4acTENKLILkkcJaW7f6MHkjg36Sn5B/I12BCEx3sW2aSgd5Bspxqz84OiHxyj3fO3UTUnyr4ukQCGUg9GiBCoewPyoywC+ZxnMnthAyyai5YndMLC0pDxAoTLN2ZJNEiZr5eMJmUGqk=
+	t=1718235128; cv=none; b=qNMAxb0SjeLRMjfxtNNj1iZIZjrMPrpLEcM4NkT5CNG8kBNZbIuOqWLZMpUNUuFDO10GkFu+j2a2C6ORg3Bp+kY8qE72n4WkUKM3aRLb5QzSRrTpUVUdgvxEPn427RRStRRzO3g/ZSmFuEb2Mchz3O39cFh1T4kX85sIhmHrKhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718234707; c=relaxed/simple;
-	bh=KQQBwVY9dUE4v5HKz38PsHHh/YJZvL3OxMZwpYAw18U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oC7t63il0AbEau4/GKGOZOJo4mKMZ1BZO8uX9kIadX624eqTUidfHZWEBlH8WeAS4Iz/cnqksqbob5DgnBPLihqjiomsjlwAUbdk3A++8D3jFI+IbM7j4Z945DbGpTQS1zX+uZOZfn0L/Vre2Z9JYQh4P0bhoj4L5/1k0iNOQ9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WMpHDAwS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28C13C116B1;
-	Wed, 12 Jun 2024 23:25:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718234706;
-	bh=KQQBwVY9dUE4v5HKz38PsHHh/YJZvL3OxMZwpYAw18U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WMpHDAwSFVWCfTcdxXsC4azq17TyHlNZ80ROrQrZwFuAahFMHNqN4tmThkape+NuY
-	 +wxeUJQYKD6FmkJXc9CRB4j5mM0FOrFlSfAUAfisw0MowoGWCQPwuXgBFjDWF/kzz0
-	 jJzMJilCxB3+yHJ6gLCVthfqB3uiPY/hrs+DNebyGd9U87H+YqD/Jh/g67OGLcr+u1
-	 sKuubnNYrWGRLT1fuDXLYJbM78Pg0IP4LWxkmzlcfrZjpZ71j86C/SK/KR4b2qNwhy
-	 SLsiCux6THwdA8JNazHdon4MuNkskRV+0YA9zt2U6nmEwqSJqnIg7fRyINK5gR5D78
-	 02aRPYYHuE9Sw==
-Date: Wed, 12 Jun 2024 16:25:05 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason
- Wang <jasowang@redhat.com>, Eugenio =?UTF-8?B?UMOpcmV6?=
- <eperezma@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v4 11/15] virtio_net: xsk: tx: support xmit xsk
- buffer
-Message-ID: <20240612162505.2fa3e645@kernel.org>
-In-Reply-To: <20240611114147.31320-12-xuanzhuo@linux.alibaba.com>
-References: <20240611114147.31320-1-xuanzhuo@linux.alibaba.com>
-	<20240611114147.31320-12-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1718235128; c=relaxed/simple;
+	bh=vXTin2RE5LVdNvEj9vXYTNfzeL/DBSh7hlukwrm3jM8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KZWP7+Ef1VbQgeAFP9ulJCdFEyHoYp6q4EIpy4GZcbTEzkWkW4TbgPdIiF64VadtQFT8WnEsSJIQ+vdUKSoua9Xyc038ups93MZreOhMgQWD5ktikCEQDK+ox2Fr9LVMJMcy0p9iFX1nzwWK65SwhTWtnyZ4VmDkY5U7tcLQhzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=KuRtSsoX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79393C116B1;
+	Wed, 12 Jun 2024 23:32:05 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KuRtSsoX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1718235123;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qSAYPgRWQjgO94CvH8azZnzUEXB1002L22u56bSmdYM=;
+	b=KuRtSsoXnhoWtj8ILW+HbvJl66iT9qTq9bSBLEsqlgbz+NueejOfai90fuwt9YC44f1xei
+	hmuw3gt1QJJwUC0wpdH+Cc3bGwXliu0JUoPBoQ3fEIPyMnLEjglwvNilIrEYYHTX8Rku8B
+	FH2QYFekE0pqYf5XHoYxT03jyvV2YLs=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7c292bc0 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Wed, 12 Jun 2024 23:32:03 +0000 (UTC)
+Date: Thu, 13 Jun 2024 01:31:57 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <Zmov7ZaL-54T9GiM@zx2c4.com>
+References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+ <20240612143305.451abf58@kernel.org>
+ <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
 
-On Tue, 11 Jun 2024 19:41:43 +0800 Xuan Zhuo wrote:
-> @@ -534,10 +534,13 @@ enum virtnet_xmit_type {
->  	VIRTNET_XMIT_TYPE_SKB,
->  	VIRTNET_XMIT_TYPE_XDP,
->  	VIRTNET_XMIT_TYPE_DMA,
-> +	VIRTNET_XMIT_TYPE_XSK,
+On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
+> On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
+> > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
+> > > Since SLOB was removed, it is not necessary to use call_rcu
+> > > when the callback only performs kmem_cache_free. Use
+> > > kfree_rcu() directly.
+> > > 
+> > > The changes were done using the following Coccinelle semantic patch.
+> > > This semantic patch is designed to ignore cases where the callback
+> > > function is used in another way.
+> > 
+> > How does the discussion on:
+> >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
+> >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
+> > reflect on this series? IIUC we should hold off..
+> 
+> We do need to hold off for the ones in kernel modules (such as 07/14)
+> where the kmem_cache is destroyed during module unload.
+> 
+> OK, I might as well go through them...
+> 
+> [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+> 	Needs to wait, see wg_allowedips_slab_uninit().
 
-Again, would be great to avoid the transient warning (if it can be done
-cleanly):
+Right, this has exactly the same pattern as the batman-adv issue:
 
-drivers/net/virtio_net.c:5806:9: warning: enumeration value =E2=80=98VIRTNE=
-T_XMIT_TYPE_XSK=E2=80=99 not handled in switch [-Wswitch]
- 5806 |         switch (virtnet_xmit_ptr_strip(&buf)) {
-      |         ^~~~~~
+    void wg_allowedips_slab_uninit(void)
+    {
+            rcu_barrier();
+            kmem_cache_destroy(node_cache);
+    }
+
+I'll hold off on sending that up until this matter is resolved.
+
+Jason
 
