@@ -1,143 +1,85 @@
-Return-Path: <netdev+bounces-102895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E7D5905581
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 16:45:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F62B9055AB
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 16:48:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 408CC1F224B4
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 14:45:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 737A51C2214B
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 14:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B542917E90E;
-	Wed, 12 Jun 2024 14:45:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B317717F365;
+	Wed, 12 Jun 2024 14:48:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="BFkNjERn"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="AUhSppyo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9DD71E504
-	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 14:45:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793101E504;
+	Wed, 12 Jun 2024 14:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718203519; cv=none; b=KSq4i/PIMGfMZ8rqKxvhtiJM3LNX442B3BFC+wzPfG5KV/RBTVYgRJCBb0N42+pdSLxaEmrppeUOJl+JLm8tvxJmViFXeyJYz1qf7mJWpgLS7Yv+Jf6ikvDnMs1GyZjZqGrjb3tDOgUt2Eyft4RIbOZuGbo/lqExYT/rkFGO/3U=
+	t=1718203687; cv=none; b=bN1HT8lVYZKdr/WqQqB1+JLy/g19kASDxmEcCoJubDHA7V+APbVB96xWFDBQjzRoGxmbpWfMxvfn6mPWi+dZMD6LWVUsaw/5JN+Rl7xl2iqq5iFwETM5JhKXzl32qy0GMYdxYoemio/Xpxo9FSWFa8RWzLcM+6P70oDyDiJeM28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718203519; c=relaxed/simple;
-	bh=qVdlFFQS2BaD19Ey3z5GzCfufx3y6Uc5zexcAynm7dI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AqY/hRq57/4pHeQ37cZxSBm456cyeq3P60gQpc6mQWwhrwDOjM5itQP7UVRNZOW/hCcLwB9xx8ahSClZjfDD0khKoVysFiq4np0rpDyib8eLrgAr9oF/BxHLhA7F2BS6QsJO2oUH3polyKt0IbtkrtU/Y/627UNf25Qg4yGvyEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=BFkNjERn; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52c94cf4c9bso2404959e87.2
-        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 07:45:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1718203516; x=1718808316; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6ZGiVxEk9JL6HUStWFO8Kiy7Xb2NHM+BULfQDsP8xQM=;
-        b=BFkNjERnFutPWo95JDBzibOaDPA4rQBvA07M9oAaVmjN14s4hiTaROU4q6/rXR4FH+
-         vlokAOBRGx5HeM+pA5WI58w164PUlaQ1TBb1OAOpVsBBSpdqLnyRm81pIJu/kr1QpwZ3
-         /Nm++lpSuD/O1wJu5WMQJ3JSodVU5RJCIn94KFe1tKME168zdPfFyTe6GXHaki8ViLwT
-         aAZTSpnxQkG76oMK/Fy9hznPxv9yJ/hkRAvui3n/L95yh1HUV31Vg2crTDJ/pMQ8C8lX
-         Usm5jaKKvK3FD3FAelTtzHjlMEqrcjFmqUBDHu0wyy/UDfZRU+zCIIH9bwiDoxyL/I/e
-         ug+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718203516; x=1718808316;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6ZGiVxEk9JL6HUStWFO8Kiy7Xb2NHM+BULfQDsP8xQM=;
-        b=aMdwBGoQWQYWuPhrvj96IyQahY1NjzOHHVg6paINtN5BG1yb8dhT1SsyYGDa/LoFsf
-         cZanJnjcrt6L+13pNMZfhf+o2Q2GpTwUsaEsZkYqxaSa4kfhd+CIUNQxZRdOB0BmfFZU
-         i4jBAEdtLpITSS07B19XwJru71mLfpHKwAS0X/Nxz9RfBghXGQTVaNziTMtQiO/E4h4m
-         mTkas+hFP+/kQxmQRhdogvxZ2TbE+6TQZ0HcHjEjDkIWQFDfgE0flXq6+ui+3V0IJQtU
-         Og1ZNrpQAzSDIaJ9GG76vxHEeNItZCtmlDqSfvarBZ8SeT86dnq8kHTaOtpDIkY779/T
-         miGA==
-X-Forwarded-Encrypted: i=1; AJvYcCXoW/13/GLHFcnFustohZ6NxzCV797arMVqt9rSGNU/tuvgbfCNKt9ADn5pyPqntGyxKSw1FH/5HKyq+nmsaEkcfJ1/gaFG
-X-Gm-Message-State: AOJu0YxlDsE2LbIDHWd/XjrNVf9+mggCwjB87pkZ2O1jMAuTChT94nSy
-	z4Z2Z5Q1F9Az/J0RuyXNxidKPzmoSJkevDHRG2ZU4rPBaPkBaZbAU1D/vLkbr0/z0VNod60tnAy
-	Ygc6Oe5g4G4efr34KXl6ZRmPphErQBsTr3E14OQ==
-X-Google-Smtp-Source: AGHT+IGLoD4ZK6Ea3OM+RvbI9JUOdTSphxAsJQxHWBLFOiret5zmrEpZ3CodzZyt+vtlk7/Vth56ExSTCgGhWUVeXHA=
-X-Received: by 2002:a05:6512:3ba6:b0:52c:82bd:bc6f with SMTP id
- 2adb3069b0e04-52c9a3b8e5amr1852584e87.11.1718203515861; Wed, 12 Jun 2024
- 07:45:15 -0700 (PDT)
+	s=arc-20240116; t=1718203687; c=relaxed/simple;
+	bh=gIuOYfz93n8dSbxaF6xUILMdMtwvKuPRkUX+zeecAKU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l1LFb52wmKrMpqKM2PGaBWUkp/mnk2UOCOmadpbw+YG0eRvxkioetw0d19ZSSK3oIgBLGFW1loNnAu3WM0XHV1ZMXmm1KaAgQVoi9QYbxT/SpHInRJQHqYfenJZlGjUHB981uahcu8E8gQdZBOZSD3dK+4JqACiSSa6/w5WOHnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=AUhSppyo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 695EEC116B1;
+	Wed, 12 Jun 2024 14:48:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1718203687;
+	bh=gIuOYfz93n8dSbxaF6xUILMdMtwvKuPRkUX+zeecAKU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AUhSppyowsRAhKMbeg3vEuP/5Y45fwXYI0mxxW89h4nOx5NS7rF4pWv/SYGu/CW21
+	 AC7eO/BbZKnj+y2vlp7UDvV+yOKgzjVqTWHQYnpKnpCgP+cDbS7KEFG8p1Dmw9DcAV
+	 /U9rCCoifJGVK1kWKk24zcNge8Hqn/D3TIZO32uo=
+Date: Wed, 12 Jun 2024 16:48:04 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Kuntal Nayak <kuntal.nayak@broadcom.com>
+Cc: stable@vger.kernel.org, pablo@netfilter.org, kadlec@netfilter.org,
+	fw@strlen.de, davem@davemloft.net, kuba@kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com,
+	vasavi.sirnapalli@broadcom.com
+Subject: Re: [PATCH 1/2 v5.10] netfilter: nf_tables: restrict tunnel object
+ to NFPROTO_NETDEV
+Message-ID: <2024061254-crayfish-gory-e4b8@gregkh>
+References: <20240607213735.46127-1-kuntal.nayak@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240612075829.18241-1-brgl@bgdev.pl> <CABBYNZLrwgj848w97GP+ijybt-yU8yMNnW5UWhb2y5Zq6b5H9A@mail.gmail.com>
-In-Reply-To: <CABBYNZLrwgj848w97GP+ijybt-yU8yMNnW5UWhb2y5Zq6b5H9A@mail.gmail.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Wed, 12 Jun 2024 16:45:04 +0200
-Message-ID: <CAMRc=Mdb31YGUUXRWACnx55JawayFaRjEPYSdjOCMrYr5xDYag@mail.gmail.com>
-Subject: Re: [GIT PULL] Immutable tag between the Bluetooth and pwrseq
- branches for v6.11-rc1
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240607213735.46127-1-kuntal.nayak@broadcom.com>
 
-On Wed, Jun 12, 2024 at 4:43=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Bartosz,
->
-> On Wed, Jun 12, 2024 at 3:59=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.p=
-l> wrote:
-> >
-> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >
-> > Hi Marcel, Luiz,
-> >
-> > Please pull the following power sequencing changes into the Bluetooth t=
-ree
-> > before applying the hci_qca patches I sent separately.
-> >
-> > Link: https://lore.kernel.org/linux-kernel/20240605174713.GA767261@bhel=
-gaas/T/
-> >
-> > The following changes since commit 83a7eefedc9b56fe7bfeff13b6c7356688ff=
-a670:
-> >
-> >   Linux 6.10-rc3 (2024-06-09 14:19:43 -0700)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/linux/kernel/git/brgl/linux.git tags/pwr=
-seq-initial-for-v6.11
-> >
-> > for you to fetch changes up to 2f1630f437dff20d02e4b3f07e836f42869128dd=
-:
-> >
-> >   power: pwrseq: add a driver for the PMU module on the QCom WCN chipse=
-ts (2024-06-12 09:20:13 +0200)
-> >
-> > ----------------------------------------------------------------
-> > Initial implementation of the power sequencing subsystem for linux v6.1=
-1
-> >
-> > ----------------------------------------------------------------
-> > Bartosz Golaszewski (2):
-> >       power: sequencing: implement the pwrseq core
-> >       power: pwrseq: add a driver for the PMU module on the QCom WCN ch=
-ipsets
->
-> Is this intended to go via bluetooth-next or it is just because it is
-> a dependency of another set? You could perhaps send another set
-> including these changes to avoid having CI failing to compile.
->
+On Fri, Jun 07, 2024 at 02:37:34PM -0700, Kuntal Nayak wrote:
+> From: Pablo Neira Ayuso <pablo@netfilter.org>
+> 
+> [ upstream commit 776d451648443f9884be4a1b4e38e8faf1c621f9 ]
+> 
+> Bail out on using the tunnel dst template from other than netdev family.
+> Add the infrastructure to check for the family in objects.
+> 
+> Fixes: af308b94a2a4 ("netfilter: nf_tables: add tunnel support")
+> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> [KN: Backport patch according to v5.10.x source]
+> Signed-off-by: Kuntal Nayak <kuntal.nayak@broadcom.com>
+> ---
+>  include/net/netfilter/nf_tables.h |  2 ++
+>  net/netfilter/nf_tables_api.c     | 14 +++++++++-----
+>  net/netfilter/nft_tunnel.c        |  1 +
+>  3 files changed, 12 insertions(+), 5 deletions(-)
 
-No, the pwrseq stuff is intended to go through its own pwrseq tree
-hence the PR. We cannot have these commits in next twice.
+Both now queued up, thanks.
 
-Bart
+greg k-h
 
