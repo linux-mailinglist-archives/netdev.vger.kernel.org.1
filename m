@@ -1,72 +1,67 @@
-Return-Path: <netdev+bounces-102996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C058D905E98
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 00:38:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27EA6905EA2
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 00:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55E0628298B
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 22:38:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C28BB1F221D1
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 22:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6CA12BF2B;
-	Wed, 12 Jun 2024 22:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 405EE12BEBB;
+	Wed, 12 Jun 2024 22:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gP+b8oI2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0dbDj2M2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B433C28385;
-	Wed, 12 Jun 2024 22:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF44321360;
+	Wed, 12 Jun 2024 22:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718231876; cv=none; b=tLCf+n2Rg62o9iaq+cKVkksQlZgQionrgULmfVF+NYoiRx7rRK9yDBhSkmYPj9acnre97xZ3AsdqXF/CYJp+iJdoOWBa6V9hDUgcGQgcEKmGOP3P+vfGPiTfYHgDt3iGh5ETHrswC9nVTdwttuggy4UNWx6mVyev1w1rl9KzNQo=
+	t=1718232021; cv=none; b=cjDkcaVes8ikDowcMxM47oV+Ie7LA7P4/NcXYSwo79geqWQpBlmgzCtezkjFf0yVmqS3U5oSIS8ihTifAHftySL4xr7xkhL+supQW8E6CNLmPI+fVkWNXUclqm++gdLNidgZgoppY9Kf9oI96cGwpSzon0r9DucmgBfNZmgHRPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718231876; c=relaxed/simple;
-	bh=oIsohZ+9uDXt1/szfbZNu9uZ6WH4ExPZbv0MeSABAuw=;
+	s=arc-20240116; t=1718232021; c=relaxed/simple;
+	bh=rYC+czHxcKQYzM+1xUOS8jIq0Bj1p1M06sPe50hUMaw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VP11zNL1BHneE8u7HEMfsUdH+TTt58BXmUt97y5tCQSOCfZ+c7VbB8FRiO14JUZEt4dtU1L31WsStNJEZK8JyiIlGBhxjNfO/k28/iXk3q17jZ/hThZ4W31jnG/kIeDhC0V7w9PaloX3DW5SH85++t8gAu7XIcQivgAjyLov8LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gP+b8oI2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29078C116B1;
-	Wed, 12 Jun 2024 22:37:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718231876;
-	bh=oIsohZ+9uDXt1/szfbZNu9uZ6WH4ExPZbv0MeSABAuw=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=gP+b8oI23RaN2auavn9kdJs6IaFxGfpTRers71TYsRO81EBkAJS1TEEGF9PeM+7wx
-	 JfjAorGHi0StC2tbEFL0bYR8ahwDNRtKXd/jEciawD5flFj7OxObqgTN+5TakbhJo9
-	 MYUohzqZDX+JJBX7UwG3NUQCOUrxFlzf999/p9+XDhMFm6el3kPv2V63iZvZ5wUcv5
-	 lQ5MrBltINH+5KZS/28WiZf4A+9rRX+iNrE09oOnoadekn/S8rZO8cAVOXqThDgSq8
-	 GX1/wlDqJccdnaongSnTXVexdmEnFHpo7BzVqTOxZtg9rbL/bdSMDg4px5jWTRJf+V
-	 LGtEBztw5cOtQ==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id BC95ACE0DEA; Wed, 12 Jun 2024 15:37:55 -0700 (PDT)
-Date: Wed, 12 Jun 2024 15:37:55 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DhsjxSlxpQIYUMs0rAu2mr1k9/s6flL8rIODDmaHxk6FMVR+XzjWyuW5Gfrv3tKv9gbMbyINESxVNQg3yZDxC+xznioYPrdiH3mYetrcbw7SzcpfdCIiA5qzjcfOowKUsCxGi0cQC1pgCJFV10xFwPUOqdr+ABniNMRlQpSGyHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0dbDj2M2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MsPOlnETfMLsWfJG4LxUIQ4Q97ttuBHiEzDMtNO+4XY=; b=0dbDj2M2GnzRqlZohCLFCXyshs
+	kz6a08uiUUtFwsKJ4S2VRwr9OPhKpDPxdNxpKu0COUfbC6HjPduXU3Goo3+kZiPcnNdQMdWB7BLlE
+	EAxKVaItgAYvOeTYb8i+SDEJVqxHe+Mw8S1cz5I4tSlQ3jUSgEeEK9rAcHztCh/FLPGc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sHWdQ-00HVWQ-4G; Thu, 13 Jun 2024 00:40:04 +0200
+Date: Thu, 13 Jun 2024 00:40:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, corbet@lwn.net, rogerq@kernel.org,
+	danishanwar@ti.com, vladimir.oltean@nxp.com, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, vigneshr@ti.com,
+	misael.lopez@ti.com, srk@ti.com
+Subject: Re: [RFC PATCH net-next 01/28] docs: networking: ti: add driver doc
+ for CPSW Proxy Client
+Message-ID: <1a966d5f-9eca-4d6d-812b-98ac17579cd7@lunn.ch>
+References: <20240518124234.2671651-1-s-vadapalli@ti.com>
+ <20240518124234.2671651-2-s-vadapalli@ti.com>
+ <642c8217-49fe-4c54-8d62-9550202c02c9@lunn.ch>
+ <6e520ad0-0f9b-4fee-87fe-44477b01912b@ti.com>
+ <287322d3-d3ee-4de6-9189-97067bc4835c@lunn.ch>
+ <3586d2d1-1f03-47b0-94c0-258e48525a9d@ti.com>
+ <b5d9f1ff-0b0f-4c97-9d1c-4ba4468ce6e3@lunn.ch>
+ <77267e15-b986-4b54-9e12-fb9536432ac2@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,89 +70,108 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240612143305.451abf58@kernel.org>
+In-Reply-To: <77267e15-b986-4b54-9e12-fb9536432ac2@ti.com>
 
-On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
-> On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
-> > Since SLOB was removed, it is not necessary to use call_rcu
-> > when the callback only performs kmem_cache_free. Use
-> > kfree_rcu() directly.
-> > 
-> > The changes were done using the following Coccinelle semantic patch.
-> > This semantic patch is designed to ignore cases where the callback
-> > function is used in another way.
+> The DMA Channels provide a path to/from CPSW's Host Port for each Host.
 > 
-> How does the discussion on:
->   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
->   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
-> reflect on this series? IIUC we should hold off..
+> Please refer to the following illustration corresponding to the data
+> movement from each of the Hosts to the CPSW's Host Port via the ALE and
+> then out of the MAC Ports:
+> 
+>            -------      ---------            ---------   CONTROL-PATH
+>            |Linux|      |AUTOSAR|            | EthFW | -------------
+>            -------      ---------            ---------             |
+>             |   |         |   |               |    |               |
+> DATA       TX   RX       TX   RX              TX   RX              |
+> PATH =>     |   |         |   |               |    |               |
+> (DMA)       |   |         |   |               |    |               |
+> 	    |   |         |   |               |    |               |
+> 	    \   \         \   \               /    /               |
+> 	     \   \         \   \             /    /                |
+> 	      \   \         \   \           /    /                 |
+> 	       \   \         \   \         /    /                  |
+> 	        \   \         \   \       /    /                   |
+>                 ===============================                    |
+>                ||        CPSW HOST PORT       ||                   V
+>                 ===============================             -----------
+> 			     	|                           |CPSW     |
+> 			     TX + RX                        |CONTROL  |
+> 			     	|                           |REGISTERS|
+> 			     	|                           -----------
+> 			     	|
+>                        ===================
+> 		      ||ALE & SWITCH CORE||
+>                        ===================
+>                         /  |      |    \
+> 		       /   |      |     \
+> 		      /    |      |      \
+> 		    TX+RX  |       \      -------
+> 		    /      |        \            \
+> 		   /     TX+RX     TX+RX        TX+RX
+>                   /        |          \            \
+>         ==========    ==========    ==========    ==========
+>        |MAC Port 1|  |MAC Port 2|  |MAC Port 3|  |MAC Port 4|
+>         ==========    ==========    ==========    ==========
 
-We do need to hold off for the ones in kernel modules (such as 07/14)
-where the kmem_cache is destroyed during module unload.
 
-OK, I might as well go through them...
+So, in summary, you have one host port, and on top of that a number of
+virtual ports. Because of limitations in the ALE, those virtual ports
+don't work in the same way as real ports, replication is not possible,
+nor learning for individual virtual ports. The typical 1990 solution
+to that would be to flood packets to all hosts, and let them filter
+out the packets they are not interested in. 1990 Ethernet was a shared
+medium, you expect to see packets for other hosts. But the hardware
+also cannot do that.
 
-[PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-	Needs to wait, see wg_allowedips_slab_uninit().
+So you have to program the classify to augment the ALE, and the
+classifier is the one that decides which virtual port a packet goes
+out. But the classifier does not perform learning. You need additional
+mechanisms to program that classifier.
 
-[PATCH 02/14] net: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-	I don't immediately see the rcu_barrier(), but if there isn't
-	one in there somewhere there probably should be.  Caution
-	suggests a need to wait.
+> Host which has registered with that MAC Address "M". This is handled by
+> EthFw. EthFw doesn't/cannot snoop on all traffic on the Host Port, since
+> it doesn't lie in between the Host Port and the other Hosts. Rather, it
+> is quite similar to a Host itself since it also has dedicated TX/RX DMA
+> Channels to exchange traffic with CPSW.
 
-[PATCH 03/14] KVM: PPC: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-	I don't immediately see the rcu_barrier(), but if there isn't
-	one in there somewhere there probably should be.  Caution
-	suggests a need to wait.
+I did not say snoop. I said trap. There is a difference. Snoop would
+be it sees the packet, as it going by. Trap means it actually gets
+passed the packet, and it needs to deal with it, decide the outgoing
+port.
 
-[PATCH 04/14] xfrm6_tunnel: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-	Needs to wait, see xfrm6_tunnel_fini().
+So i would trap all broadcast and multicast from the virtual ports to
+the EthFW. Let the EthFw deal with that traffic, perform learning, and
+programming the classifier, and flood it out user ports for broadcast,
+or unicast out specific ports for multicast where IGMP snooping
+indicates it should go.
 
-[PATCH 05/14] tracefs: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-	This one is fine because the tracefs_inode_cachep kmem_cache
-	is created at boot and never destroyed.
+> Since that is not supported, all
+> Broadcast/Multicast traffic directed to the Host Port from the Switch Core
+> is by default placed on the RX DMA Flow corresponding to EthFw. EthFw then
+> creates copies of these in software and shares them with each Host via
+> Shared Memory for example.
 
-[PATCH 06/14] eCryptfs: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-	I don't see a kmem_cache_destroy(), but then again, I also don't
-	see the kmem_cache_create().  Unless someone can see what I am
-	not seeing, let's wait.
+Why shared memory? EthFw needs to be able to direct packets out
+specific virtual ports otherwise it cannot do {R}STP, PTP, IGMP
+snooping etc. So it should just pass the packet back to the CPSW,
+which will hairpin the packet, hit the classifier, and then send it
+out the correct virtual port to the correct host.
 
-[PATCH 07/14] net: bridge: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-	Needs to wait, see br_fdb_fini() and br_deinit().
+> Yes, the Shared Memory path is intended for the low-bandwidth
+> Broadcast/Multicast traffic from EthFw while the DMA path is dedicated
+> for high-bandwidth Unicast traffic. The current series implements the
+> DMA path while the other series you have referred to implements the
+> Shared Memory path. Both of them together enable the desired functionality.
 
-[PATCH 08/14] nfsd: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-	I don't immediately see the rcu_barrier(), but if there isn't
-	one in there somewhere there probably should be.  Caution
-	suggests a need to wait.
+So i think we are agreed a new model is not needed. Linux is just a
+host connected to a managed switch. Linux has no roll in managing that
+switch, and has no idea about the ports of that switch. It is just an
+end system, running end system software.
 
-[PATCH 09/14] block: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-	I don't see a kmem_cache_destroy(), but then again, I also don't
-	see the kmem_cache_create().  Unless someone can see what I am
-	not seeing, let's wait.
+You need a 'MAC' driver in Linux, so Linux sees just a normal network
+interface. And it must see a single MAC driver, so if you really do
+need to use shared memory in parallel to DMA, you will need to combine
+that into one driver.
 
-[PATCH 10/14] can: gw: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-	Needs to wait, see cgw_module_exit().
-
-[PATCH 11/14] posix-timers: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-	This one is fine because the posix_timers_cache kmem_cache is
-	created at boot and never destroyed.
-
-[PATCH 12/14] workqueue: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-	This one is fine because the pwq_cache kmem_cache is created at
-	boot and never destroyed.
-
-[PATCH 13/14] kcm: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-	I don't immediately see the rcu_barrier(), but if there isn't
-	one in there somewhere there probably should be.  Caution
-	suggests a need to wait.
-
-[PATCH 14/14] netfilter: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-	Needs to wait, see hashlimit_mt_exit().
-
-So 05/14, 11/14 and 12/14 are OK and can go ahead.  The rest need some
-help.
-
-Apologies for my having gotten overly enthusiastic about this change!
-
-							Thanx, Paul
+     Andrew
 
