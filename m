@@ -1,156 +1,122 @@
-Return-Path: <netdev+bounces-102989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6051F905E03
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 23:53:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 961ED905E0B
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 23:55:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63ED71C21396
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 21:53:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34B31285E81
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 21:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AE186252;
-	Wed, 12 Jun 2024 21:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F5A412B177;
+	Wed, 12 Jun 2024 21:54:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kofaZ7Hh"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="PW6xWJuA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF4E129E94;
-	Wed, 12 Jun 2024 21:53:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43FB12C486
+	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 21:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718229213; cv=none; b=KFwssRwTGRfoh+3AcMvIiEASqr0QHZWa/dPMKhxn6DxMnK5V09ILmir7sTfGwyQ2Wpfzpr4wpUKanrv8enulg0ngOXsihZHeaBsAtw7vPoq7nKg2AOErrSXgSuB4BHDXvNb4LoiGklqaH691RoXcysB/sTULfUIRrAeSy28ujq8=
+	t=1718229276; cv=none; b=lNYmtbnaslhI5gsUXHMm6boNd01cg4k4t+74j1NPfkY/7Ugympvnp1lKo0nHHdd8w4eM/oO1fon0P2aUEZHm5JiBrOHmmMJekzJzgkI+sayFT13ZcOADzVPdLd35fapTQwv82706uEKc2axGClPk8CFKjAKQGavubinY61IDHlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718229213; c=relaxed/simple;
-	bh=mcJjYHjV++hIvIdWkHyHOgdpiusnN+4IJjaQnk6MVdI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PKt0/pcFoc7C9k1hqk3fvi0bAvHQt25PImI3YjNpcCcCVkNmiUPG8XdBrPX8BfSCZW/eQfvdFlcR/LPkoIsaBgwndbD8gEfNSw0TvX5ysrNFLvo5YnUXP5NSVnRZiFEF68saPxFvFDERJXzWXSqw3hfzCCrDVNp4xjDALUfQpso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kofaZ7Hh; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4217926991fso3908165e9.3;
-        Wed, 12 Jun 2024 14:53:31 -0700 (PDT)
+	s=arc-20240116; t=1718229276; c=relaxed/simple;
+	bh=oyaC/o4K7A3entjcxoiTMTPSvxC71DyJhBkCJpFfOiA=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mW+4t1r7lbG3tc5LhLC3GO/df7cSOU1STpU5W40rs/IgfdYN/JXxOLlQJmvO8DefLZayV3ajkz27jA5TOSmX+K3EVjyu+tc9DmSeyL2wsE0sWZyvwHxcxD6QDoWa+g4z1Az0pSslPBtf7g3GxignB25wCGbZDad91Cb7GJImBAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=PW6xWJuA; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6b0825b8421so1994316d6.1
+        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 14:54:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718229210; x=1718834010; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9pxDQ2xml58KGU++S3MziyUsd0pYxlkTij9Nt+5fCkQ=;
-        b=kofaZ7Hh3eDkmlr2KpMuNhnS+PA02UIOOXea7GEar+k1UZeq22MPbgQNSJVRqqcx2I
-         cLkbJbCFNL18XVWtoCSS/GzQZU/QRlE1qU0i5XwcC9fKZhdB9tUeyF5SkLgziKsFcm5W
-         NJTVjYEplT8ZNTr+0oYqX+Ej/gVAqz5n4xX2ETwWOXC+Qd3hX/lKRL9efoeyCNVltn+s
-         ZWj3J1J2uJrCJpAFz6hzYGJS0iUMoVUzUvFtLbNGLExTlon3LFCanRNzucdB61SxLw+9
-         UX43ERM7HuCRS9TgMbZQ4OxlCe48foVoPAg8bMFi+KhRZVXVJFBMRtcxWHDDvxWotDfz
-         qwJA==
+        d=broadcom.com; s=google; t=1718229274; x=1718834074; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BifripJQYUZpHCC77b7pwMa5qfHAptD7uFiM4T24Muo=;
+        b=PW6xWJuAXKJHYyPgsrntgzSoFxBiokfsC9ukNvBsEMI5DCd9DqYJWJoekxkKho2VVF
+         tmfD3c1cfeLSM9TGtRnIdHloupjog+pYX3m6Nh2dLZSlf13Xq64q71s0y5Qy9E2xv5gd
+         V4nLBK6TFYTmY4WuAFLTPL7Bod+fXbbj9Ku+k=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718229210; x=1718834010;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9pxDQ2xml58KGU++S3MziyUsd0pYxlkTij9Nt+5fCkQ=;
-        b=UyciX6bT6joU/ap3tWyTZFNkbi0/lPXjRTN+GH2gTsXr3Hv6cBgIc6skvOO84JEFkt
-         Qgaqqo/CsZk62wSCE9XKgEMIQsSIk2uSEhb1kMdu62GeeJaoDP5fLRccOk+gzndaJUwd
-         oVHRHVvDGqynw8evOAOgVU2jRsk1GCN8Hry2vtzb34vUX3PsjZ9MFTSG0P2v2IVfrus2
-         tt5O5gTRLbT2EQwCSkAtfylavPnJrB8eea52JgLTP/ONTQr8OPld/8W45XRbXf8AjFEW
-         4TIg+pw9PGlZU1Dw6HIL3bgpEtELlSeOdGZFmuY/5jCWt4CAHYst2KPWpFDnuOPKIGi5
-         bWdw==
-X-Forwarded-Encrypted: i=1; AJvYcCVvnBxM5QwdkCqTac45gynk5iaOhx7LZ6StHgbXIR9W4dyffTyU5s5P9kMT12ey8VCWe4/Fm+oSxanLc4Ps50kOVytOO2vIT2kfjzkHIBtHb1W/L6zg5+1nr6j4vAeyCxBhX6LEhg5/zdcjK0ZXHy9D83vNAqVJ6ggYoH2MvBk+XOjYoA==
-X-Gm-Message-State: AOJu0YxhMk9FW8TGnJGITK7y1iqWQU9VJoQnJvUBSK5mbXoXvVL8P8B6
-	FuxCYH4S1bjOeRCPamyXduk6/kIJYdTENMGa6Hiph8E1YApyqBKEY2Ytkg==
-X-Google-Smtp-Source: AGHT+IFqIoOKC1lqkvIoSrutwet1tzBSEOu4Q+/c77rzZJZWz+OjyJm4fZX/gA7it5X1tJrM35WvNQ==
-X-Received: by 2002:a05:600c:358b:b0:422:6765:2726 with SMTP id 5b1f17b1804b1-422865ad68fmr27777105e9.30.1718229209883;
-        Wed, 12 Jun 2024 14:53:29 -0700 (PDT)
-Received: from [192.168.0.5] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35ef5d2e73dsm17831029f8f.16.2024.06.12.14.53.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Jun 2024 14:53:29 -0700 (PDT)
-Message-ID: <0b24c10f-1c20-4bd1-958b-dbf89cb28792@gmail.com>
-Date: Thu, 13 Jun 2024 00:54:03 +0300
+        d=1e100.net; s=20230601; t=1718229274; x=1718834074;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BifripJQYUZpHCC77b7pwMa5qfHAptD7uFiM4T24Muo=;
+        b=Ws0hMipKDIBqEgSNkFG2SSafQr5SJ5BlsYH1U6hqMfE4vFqF+x4hshb/5bh2BVX2/o
+         qsI1UhpL6qi3t96uCVNA40cPUenINjkaiwp+Txf9MTTqfHCsmVAweDdGThS7YvIc6Srv
+         H6Oc20nR/2CE54VSrW/zk8QCpoVfhejkxGTwwvtgFu4kCxgs4icYou4OXPafSEgQ7Arj
+         7j1PDo0+8oZgD65wIViOiOuGeuaQ7X7M+7jlLMB4RBt/2Z27HloqzGPbA91kQHS7uS9p
+         nIIHYeIDw6zdLVITsBIP+xXvogXYzesGP5vgMj5Jtif9jfvAOLo2GueqUMNnn7pazIKg
+         SlLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvyaWJmq9E230cKqBEDQGhwn29+k8VYp1aqWaLqZx3SUNymn7SKaayXq9GQQkdAJdppbUnEZR1JbfTJgcwg6xffzIn7+bN
+X-Gm-Message-State: AOJu0Yw5MFZoYUlBEkPw3csHaQmwYXu1zltaPjU0oWQM87KvpxuBFObe
+	gqNtiKokCUSUNVwdtjvtBn1rxns/x7Zc0u4nKm4qlu7XPj7dNmTr/YvJMvCSpw==
+X-Google-Smtp-Source: AGHT+IHiq29nqrY+z9M8CZnqCgmDtySpFhozvWomQ+8danyaiW4wzAhxiL+v1IFX3VzNdWcOmSSCkA==
+X-Received: by 2002:a05:6214:5b82:b0:6b0:7f36:8af4 with SMTP id 6a1803df08f44-6b191498f09mr35147556d6.9.1718229273750;
+        Wed, 12 Jun 2024 14:54:33 -0700 (PDT)
+Received: from C02YVCJELVCG.dhcp.broadcom.net ([192.19.144.250])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b2a5bf232csm212376d6.27.2024.06.12.14.54.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jun 2024 14:54:33 -0700 (PDT)
+From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+X-Google-Original-From: Andy Gospodarek <gospo@broadcom.com>
+Date: Wed, 12 Jun 2024 17:54:20 -0400
+To: David Wei <dw@davidwei.uk>
+Cc: David Ahern <dsahern@kernel.org>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Adrian Alvarado <adrian.alvarado@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>, netdev@vger.kernel.org,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1 0/3] bnxt_en: implement netdev_queue_mgmt_ops
+Message-ID: <ZmoZDBPrrLY8l6nM@C02YVCJELVCG.dhcp.broadcom.net>
+References: <20240611023324.1485426-1-dw@davidwei.uk>
+ <e6617dc1-6b34-49f7-8637-f3b150318ae3@kernel.org>
+ <b2dadafd-48c3-4598-bee5-a088ae5a4bc7@davidwei.uk>
+ <1b26debd-8f18-46de-ac6e-05bff44a9c52@kernel.org>
+ <80a1ea79-738d-404d-8b50-cc5eb432153e@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] net: wwan: mhi: make default data link id
- configurable
-To: Slark Xiao <slark_xiao@163.com>, manivannan.sadhasivam@linaro.org
-Cc: loic.poulain@linaro.org, johannes@sipsolutions.net,
- quic_jhugo@quicinc.com, netdev@vger.kernel.org, mhi@lists.linux.dev,
- linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240612093941.359904-1-slark_xiao@163.com>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <20240612093941.359904-1-slark_xiao@163.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <80a1ea79-738d-404d-8b50-cc5eb432153e@davidwei.uk>
 
-Hello Slark, Manivannan,
-
-On 12.06.2024 12:39, Slark Xiao wrote:
-> For SDX72 MBIM device, it starts data mux id from 112 instead of 0.
-> This would lead to device can't ping outside successfully.
-> Also MBIM side would report "bad packet session (112)".
-> So we add a link id default value for these SDX72 products which
-> works in MBIM mode.
-
-The patch itself looks good to me except a tiny nitpick (see below). 
-Meanwhile, I can not understand when we should merge it. During the V1 
-discussion, It was mentioned that we need this change specifically for 
-Foxconn SDX72 modem. Without any actual users the configurable default 
-data link id is a dead code.
-
-According to the ARM MSM patchwork [1], the main Foxconn SDX72 
-introducing patch is (a) not yet merged, (b) no more applicable. So, as 
-far as I understand, it should be resend. In this context, a best way to 
-merge the modem support is to prepend the modem introduction patch with 
-these changes forming a series:
-1/3: bus: mhi: host: Import mux_id item
-2/3: net: wwan: mhi: make default data link id configurable
-3/3: bus: mhi: host: Add Foxconn SDX72 related support
-
-And merge the series as whole, when everything will be ready. This will 
-help us to avoid partially merged work and will keep the modem support 
-introduction clear.
-
-Manivannan, could you share the main [1] Foxconn SDX72 introduction 
-patch status, and your thoughts regarding the merging process?
-
-
-1. 
-https://patchwork.kernel.org/project/linux-arm-msm/patch/20240520070633.308913-1-slark_xiao@163.com/
-
-> Signed-off-by: Slark Xiao <slark_xiao@163.com>
-> ---
->   drivers/net/wwan/mhi_wwan_mbim.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+On Wed, Jun 12, 2024 at 11:19:47AM -0700, David Wei wrote:
+> On 2024-06-12 08:52, David Ahern wrote:
+> > On 6/10/24 9:41 PM, David Wei wrote:
+> >>
+> >> This patchset is orthogonal to header split and page pool memory
+> >> providers. It implements netdev_queue_mgmt_ops which enables dynamically
+> > 
+> > Ok, where is the validation that these queues must be configured for
+> > header-data split to use non-kernel memory?
 > 
-> diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
-> index 3f72ae943b29..c731fe20814f 100644
-> --- a/drivers/net/wwan/mhi_wwan_mbim.c
-> +++ b/drivers/net/wwan/mhi_wwan_mbim.c
-> @@ -618,7 +618,8 @@ static int mhi_mbim_probe(struct mhi_device *mhi_dev, const struct mhi_device_id
->   	mbim->rx_queue_sz = mhi_get_free_desc_count(mhi_dev, DMA_FROM_DEVICE);
->   
->   	/* Register wwan link ops with MHI controller representing WWAN instance */
-> -	return wwan_register_ops(&cntrl->mhi_dev->dev, &mhi_mbim_wwan_ops, mbim, 0);
-> +	return wwan_register_ops(&cntrl->mhi_dev->dev, &mhi_mbim_wwan_ops, mbim,
-> +		mhi_dev->mhi_cntrl->link_id);
+> Any validation would be done outside of this patchset, which only
+> focuses on resetting an Rx queue. Reconfiguring page pools and HDS is
+> orthogonal and unrelated to this patchset.
 
-Just a nitpick. The second line had better be aligned with the opening 
-bracket:
+I can confirm this.  These changes are just to keep the allocation
+schemes the same as they are today, but add support for stopping/freeing
+and starting/allocating rings individually and via the new API.
 
-return wwan_register_ops(&cntrl->...
-                          mhi_dev->...
-
->   }
->   
->   static void mhi_mbim_remove(struct mhi_device *mhi_dev)
-
---
-Sergey
+> The netdev core API consuming netdev_queue_mgmt_ops would be
+> netdev_rx_queue_restart() added in [1].
+> 
+> [1]: https://lore.kernel.org/lkml/20240607005127.3078656-2-almasrymina@google.com/
+> 
+> Validation would be done at a layer above, i.e. whatever that calls
+> netdev_rx_queue_restart(), as opposed to netdev_rx_queue_restart() or
+> netdev_queue_mgmt_ops itself.
 
