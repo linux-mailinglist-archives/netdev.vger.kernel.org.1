@@ -1,229 +1,261 @@
-Return-Path: <netdev+bounces-102937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 419BE905911
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 18:44:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D44E5905978
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 19:05:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACA05B2428F
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 16:44:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96D4CB27CA5
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 17:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B0C181B90;
-	Wed, 12 Jun 2024 16:44:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46B69181D1E;
+	Wed, 12 Jun 2024 17:03:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JXytlCIs"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fWwvGgIS";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="5TlFcfmj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F779181332
-	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 16:44:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446AB16F0F9;
+	Wed, 12 Jun 2024 17:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718210668; cv=none; b=ujtODUpWlehoTx0cbNzi0KIy09YyxvVE+VOPu9op0476MaQbR9eZ8pIe7NMVAR9le+BQhnazWzdYJj28HcfpjZOhrVMdhcF1DlpNvaPcsPs8kc5Hln1ZaeEXbBacr+Sk/h9xUHw5efv/wvX/StH8b+Kmv6KTWRQe7gmFpYM1Czk=
+	t=1718211803; cv=none; b=W3b9E1rHl1WE87xe7voIx6l7zh8F3LDmECVkr6Tuu1gHTQMb+yWdf3x7qyyTzN8Z19f1ASJNPr6REDCmORLFFCi15CF/8Qj7oqPDuqdxXmeJ7LwW6WrkrzSYBGgfGU3cIqcOuW7OrrBAzen5E7EFlNMYC1TY17JQgIawjB+F/5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718210668; c=relaxed/simple;
-	bh=SlEU1MuDMJHVwT8PA1nP1/rWP1O3aL+JyNeJd2Iu3m8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RtDAHSBo0rGOt9rIyN1Y6RNHQROMzX1r5mlMjPowMDR2DuWLpflZekG9OcKFfqI0HyjBcth4YUiz6aEjuPJSXSV5SlkKuMYcGekgcNI4tYhze1FkL2sSv/XBPpLNCr5Xp1wOieeBIsD8EXG501MCgSBuWbdDJCy1g2ZdqbixSNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JXytlCIs; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a6f1dc06298so14366866b.1
-        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 09:44:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718210665; x=1718815465; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xIwSzPnNx2QwRA39p1mbrr9oOi6iv8ouljnrVionuME=;
-        b=JXytlCIsA24eGMPUb+xStJDbviFGeL4GkPe455OgWaSIlt/MfvYXYO0AUBthNnsGlq
-         bK0SajQaFoTJF9lBbPm3mVVPthWD5dV9gtQs35qWJ6ZmNSlx9mRwDyHHKpybKouAnv0b
-         P5L1na56DsGJjXPXX9cuECGgVkFRBQhi66PeNZ76/aDlwchgwejai3momE2IZICCU25r
-         yVKjH/An2nPQvN5lpB+01Hs44NCZG3ZJUnD0KryQcAIV3mw0AoubFr8xOvqdrTJ2rbje
-         Etyp2y+JVnGIRc609nvNy5rYxsGMMvfw6zWCZSZ8/nJ2w661qdG5bmM756ASnFIBFbIx
-         dgJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718210665; x=1718815465;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xIwSzPnNx2QwRA39p1mbrr9oOi6iv8ouljnrVionuME=;
-        b=XCBy8nJNQELzLxWkxLs2fN6g5Zu3vsvRbAJBWHrWhgABFbZFF8KsCvk9CJn+SNfoZZ
-         uXWJhvylS7vCzeeGRrP9TD7pOv1iOFuQBzSh8Q9gkUsiYFbzxbHwmIQqbdxlKTecGZ6L
-         ZVJ/fGFN/5yMrn99DZa1xCPSg5jw+m5EJPq6IJxsn3McFaujtwdGJ37jAHf87HpFIEPl
-         TdtRJgqM2+G9tsSAKIqvJJUlYRg1bcnrLvSU8MsmHcynVcFECFoBSyAssnoHmHqUz6z3
-         1FEL1z4n1SDzrYPWDd76asHByElt8P/0vAN9FZLP7ida2Ckb5/PkiwkARK3KEkZEzfX3
-         hcPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXLCbsrYzOVamZkz2M2Rk6nj9ABRPkEMQaC8+Q02EhV0RGp84IJFFuiGEVkW7GRMXP0O79Wwrofw9+w0E3SmSB+H2kJee5n
-X-Gm-Message-State: AOJu0YxJf98J8+H027Yy4YzxMICDpDqWAHt0bN3x2oR+IfNNjbceK86U
-	+E9RJblVqJiDxkMZ3Y74SHEsTcj5k2TqhhklpAP1m8Vw2K1UxzVlp9m0RyCPU3Puytlpyq/UUDu
-	5UKUM9VEhtd5wdthIex4895siTretT5g0WLK3UyaCCPJRl90CqEEjdGk=
-X-Google-Smtp-Source: AGHT+IE8KQdHxzENtMyeC2g3JNfrIzF38jPfhjhgCVHHrYlv3oCgd76fDNDcEJmVqK5YXil3DhDcAu1Qbz7awwf9zFE=
-X-Received: by 2002:a17:907:72c5:b0:a69:13a2:4f6e with SMTP id
- a640c23a62f3a-a6f47d61fe0mr191429066b.74.1718210664983; Wed, 12 Jun 2024
- 09:44:24 -0700 (PDT)
+	s=arc-20240116; t=1718211803; c=relaxed/simple;
+	bh=2dmAGsyBXD0eVD62ZoARXjAxgJbFQnUTrn3wzIQaGak=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AeHbNsnsqB5Gi52FR4rhyP1KskONPnId8ThH80GE4UnNWIDOjJWr/92GKaYV3DlOleSTH9LPwqorrJIcviP7U6VtvhJkun3vZlDNLh7lR46/AyHqz5JA5aSu2u8lARlEHSJYyVEhxYu2N5dUTFue07f9ir/IqtTwgwXVO8hKIXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fWwvGgIS; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=5TlFcfmj; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1718211792;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=m3Q/hEAxdO00We4L3Frzaoq1g+WyrSFqdQ7C84TeAKg=;
+	b=fWwvGgIS6hTf3Ik8bgn++Rst9lhzHK9/bbHm2BDD1pZJEd08N+A40G6ZNzznlLFFXoS5sf
+	vKTPvrJeeKW8qamolr3QIObKd+RB4O5ijpR/XpkAR3brH9WU66hPf6EXzpWLluzt0aO7El
+	+vmjzYxqMkAkxSEryCH4Xp2lW80FOxEy0Fj8X0EoWJ/zorfTIgrwVcxC4BIz6s3oTr/0YB
+	W4RYi+2mg4XhsNvdKQ1i8WRn52HwtRKDWT16stHH6nSYdwb7xuXaRinNpyZ1knKh6nFCc9
+	yaOfoq5Ksg4sPQumNe8/aYTWvVuu3ZWIj/5224Fq2PePdquZ4kSJtZCxWmDCPg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1718211792;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=m3Q/hEAxdO00We4L3Frzaoq1g+WyrSFqdQ7C84TeAKg=;
+	b=5TlFcfmj//3RGv9oJPiT6skhNwGzAnc2Ari90SWrSL0jHaXG0NJWhJZwS/4o2i6xTPIpAb
+	AF+WObplFnE0LCAA==
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Daniel Bristot de Oliveira <bristot@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH v6 net-next 00/15] locking: Introduce nested-BH locking.
+Date: Wed, 12 Jun 2024 18:44:26 +0200
+Message-ID: <20240612170303.3896084-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1718138187.git.zhuyifei@google.com> <CAJ8uoz2-Kt2o-v3CuLpf2VDv2VtUJL2T307rp04di5hY2ihYHg@mail.gmail.com>
- <ZmmZY3zim4wG7pHR@boxer>
-In-Reply-To: <ZmmZY3zim4wG7pHR@boxer>
-From: YiFei Zhu <zhuyifei@google.com>
-Date: Wed, 12 Jun 2024 09:44:13 -0700
-Message-ID: <CAA-VZP=zpMeDamaKD60A3761N0CRUynWr54W3bzN5AK2CV4fOg@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next 0/3] selftests: Add AF_XDP functionality test
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Magnus Karlsson <magnus.karlsson@gmail.com>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	Magnus Karlsson <magnus.karlsson@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Andrii Nakryiko <andrii@kernel.org>, Stanislav Fomichev <sdf@google.com>, 
-	Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 12, 2024 at 5:50=E2=80=AFAM Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> On Wed, Jun 12, 2024 at 01:47:06PM +0200, Magnus Karlsson wrote:
-> > On Tue, 11 Jun 2024 at 22:43, YiFei Zhu <zhuyifei@google.com> wrote:
-> > >
-> > > We have observed that hardware NIC drivers may have faulty AF_XDP
-> > > implementations, and there seem to be a lack of a test of various mod=
-es
-> > > in which AF_XDP could run. This series adds a test to verify that NIC
-> > > drivers implements many AF_XDP features by performing a send / receiv=
-e
-> > > of a single UDP packet.
-> > >
-> > > I put the C code of the test under selftests/bpf because I'm not real=
-ly
-> > > sure how I'd build the BPF-related code without the selftests/bpf
-> > > build infrastructure.
-> >
-> > Happy to see that you are contributing a number of new tests. Would it
-> > be possible for you to integrate this into the xskxceiver framework?
-> > You can find that in selftests/bpf too. By default, it will run its
-> > tests using veth, but if you provide an interface name after the -i
-> > option, it will run the tests over a real interface. I put the NIC in
-> > loopback mode to use this feature, but feel free to add a new mode if
-> > necessary. A lot of the setup and data plane code that you add already
-> > exists in xskxceiver, so I would prefer if you could reuse it. Your
-> > tests are new though and they would be valuable to have.
->
-> +1
->
-> I just don't believe that you guys were not aware that xskxceiver exist.
-> Please provide us a proper explanation/justification why this was not
-> fulfilling your needs and you decided to go with another test suite.
+Disabling bottoms halves acts as per-CPU BKL. On PREEMPT_RT code within
+local_bh_disable() section remains preemtible. As a result high prior
+tasks (or threaded interrupts) will be blocked by lower-prio task (or
+threaded interrupts) which are long running which includes softirq
+sections.
 
-To answer this question, I can't speak for others, but I personally
-was not fully aware.
+The proposed way out is to introduce explicit per-CPU locks for
+resources which are protected by local_bh_disable() and use those only
+on PREEMPT_RT so there is no additional overhead for !PREEMPT_RT builds.
 
-Over a year ago when we were testing AF_XDP latency on internal NIC
-drivers, we extended our internal latency test tool to support AF_XDP.
-And that was when we observed the NICs we were testing had faulty
-implementations - panics, packet corruptions, random drops; and we
-decided to simplify the latency suite to add a simple pass/fail test
-to our testing infrastructure, and we named it xsk_hw. The test was
-specifically designed to test hardware NICs (rather than veth), and
-there was a bunch of code around the test, to reserve & setup
-machines, and to obtain information such as the IP addresses and the
-host and next hop MACs addresses. At the time, the code was deemed too
-dependent on our internal multi-machine-testing infrastructure to
-upstream, but it has been running as part of our test suite since.
+The series introduces the infrastructure and converts large parts of
+networking which is largest stake holder here. Once this done the
+per-CPU lock from local_bh_disable() on PREEMPT_RT can be lifted.
 
-This brings us to recently. I was informed that upstream now have
-drv-net, and now that upstream also has multi-machine testing, it's
-time to upstream it. Hence this patch series, which I made after
-adapting the code to use drv-net and network_helpers.
+Performance testing. Baseline is net-next as of commit 93bda33046e7a
+("Merge branch'net-constify-ctl_table-arguments-of-utility-functions'")
+plus v6.10-rc1. A 10GiG link is used between two hosts. The command
+   xdp-bench redirect-cpu --cpu 3 --remote-action drop eth1 -e
 
-As for xskxceiver, for me personally, I discarded the idea after
-reading the initial block comment of xskxceiver saying it spawns two
-threads in a veth pair to test AF_XDP, which in my mind was like "okay
-this doesn't test hardware NICs, and to extend that test to hardware
-is probably a major rewrite that is probably not worth", so I did not
-look too deeply into its code. I personally was unaware that it can
-test a real interface, and that's partially my fault.
+was invoked on the receiving side with a ixgbe. The sending side uses
+pktgen_sample03_burst_single_flow.sh on i40e.
 
-I'll take a look at xskxceiver and see how feasible it is to integrate
-this into xskxceiver.
+Baseline:
+| eth1->?                 9,018,604 rx/s                  0 err,drop/s
+|   receive total         9,018,604 pkt/s                 0 drop/s         =
+       0 error/s
+|     cpu:7               9,018,604 pkt/s                 0 drop/s         =
+       0 error/s
+|   enqueue to cpu 3      9,018,602 pkt/s                 0 drop/s         =
+    7.00 bulk-avg
+|     cpu:7->3            9,018,602 pkt/s                 0 drop/s         =
+    7.00 bulk-avg
+|   kthread total         9,018,606 pkt/s                 0 drop/s         =
+ 214,698 sched
+|     cpu:3               9,018,606 pkt/s                 0 drop/s         =
+ 214,698 sched
+|     xdp_stats                   0 pass/s        9,018,606 drop/s         =
+       0 redir/s
+|       cpu:3                     0 pass/s        9,018,606 drop/s         =
+       0 redir/s
+|   redirect_err                  0 error/s
+|   xdp_exception                 0 hit/s
 
-> >
-> > You could make the default packet that is sent in xskxceiver be the
-> > UDP packet that you want and then add all the other logic that you
-> > have to a number of new tests that you introduce.
-> >
-> > > Tested on Google Cloud, with GVE:
-> > >
-> > >   $ sudo NETIF=3Dens4 REMOTE_TYPE=3Dssh \
-> > >     REMOTE_ARGS=3D"root@10.138.15.235" \
-> > >     LOCAL_V4=3D"10.138.15.234" \
-> > >     REMOTE_V4=3D"10.138.15.235" \
-> > >     LOCAL_NEXTHOP_MAC=3D"42:01:0a:8a:00:01" \
-> > >     REMOTE_NEXTHOP_MAC=3D"42:01:0a:8a:00:01" \
-> > >     python3 xsk_hw.py
-> > >
-> > >   KTAP version 1
-> > >   1..22
-> > >   ok 1 xsk_hw.ipv4_basic
-> > >   ok 2 xsk_hw.ipv4_tx_skb_copy
-> > >   ok 3 xsk_hw.ipv4_tx_skb_copy_force_attach
-> > >   ok 4 xsk_hw.ipv4_rx_skb_copy
-> > >   ok 5 xsk_hw.ipv4_tx_drv_copy
-> > >   ok 6 xsk_hw.ipv4_tx_drv_copy_force_attach
-> > >   ok 7 xsk_hw.ipv4_rx_drv_copy
-> > >   [...]
-> > >   # Exception| STDERR: b'/tmp/zzfhcqkg/pbgodkgjxsk_hw: recv_pfpacket:=
- Timeout\n'
-> > >   not ok 8 xsk_hw.ipv4_tx_drv_zerocopy
-> > >   ok 9 xsk_hw.ipv4_tx_drv_zerocopy_force_attach
-> > >   ok 10 xsk_hw.ipv4_rx_drv_zerocopy
-> > >   [...]
-> > >   # Exception| STDERR: b'/tmp/zzfhcqkg/pbgodkgjxsk_hw: connect sync c=
-lient: max_retries\n'
-> > >   [...]
-> > >   # Exception| STDERR: b'/linux/tools/testing/selftests/bpf/xsk_hw: o=
-pen_xsk: Device or resource busy\n'
-> > >   not ok 11 xsk_hw.ipv4_rx_drv_zerocopy_fill_after_bind
-> > >   ok 12 xsk_hw.ipv6_basic # SKIP Test requires IPv6 connectivity
-> > >   [...]
-> > >   ok 22 xsk_hw.ipv6_rx_drv_zerocopy_fill_after_bind # SKIP Test requi=
-res IPv6 connectivity
-> > >   # Totals: pass:9 fail:2 xfail:0 xpass:0 skip:11 error:0
-> > >
-> > > YiFei Zhu (3):
-> > >   selftests/bpf: Move rxq_num helper from xdp_hw_metadata to
-> > >     network_helpers
-> > >   selftests/bpf: Add xsk_hw AF_XDP functionality test
-> > >   selftests: drv-net: Add xsk_hw AF_XDP functionality test
-> > >
-> > >  tools/testing/selftests/bpf/.gitignore        |   1 +
-> > >  tools/testing/selftests/bpf/Makefile          |   7 +-
-> > >  tools/testing/selftests/bpf/network_helpers.c |  27 +
-> > >  tools/testing/selftests/bpf/network_helpers.h |  16 +
-> > >  tools/testing/selftests/bpf/progs/xsk_hw.c    |  72 ++
-> > >  tools/testing/selftests/bpf/xdp_hw_metadata.c |  27 +-
-> > >  tools/testing/selftests/bpf/xsk_hw.c          | 844 ++++++++++++++++=
-++
-> > >  .../testing/selftests/drivers/net/hw/Makefile |   1 +
-> > >  .../selftests/drivers/net/hw/xsk_hw.py        | 133 +++
-> > >  9 files changed, 1102 insertions(+), 26 deletions(-)
-> > >  create mode 100644 tools/testing/selftests/bpf/progs/xsk_hw.c
-> > >  create mode 100644 tools/testing/selftests/bpf/xsk_hw.c
-> > >  create mode 100755 tools/testing/selftests/drivers/net/hw/xsk_hw.py
-> > >
-> > > --
-> > > 2.45.2.505.gda0bf45e8d-goog
-> > >
-> > >
-> >
+perf top --sort cpu,symbol --no-children:
+|   18.14%  007  [k] bpf_prog_4f0ffbb35139c187_cpumap_l4_hash
+|   13.29%  007  [k] ixgbe_poll
+|   12.66%  003  [k] cpu_map_kthread_run
+|    7.23%  003  [k] page_frag_free
+|    6.76%  007  [k] xdp_do_redirect
+|    3.76%  007  [k] cpu_map_redirect
+|    3.13%  007  [k] bq_flush_to_queue
+|    2.51%  003  [k] xdp_return_frame
+|    1.93%  007  [k] try_to_wake_up
+|    1.78%  007  [k] _raw_spin_lock
+|    1.74%  007  [k] cpu_map_enqueue
+|    1.56%  003  [k] bpf_prog_57cd311f2e27366b_cpumap_drop
+
+With this series applied:
+| eth1->?                10,329,340 rx/s                  0 err,drop/s
+|   receive total        10,329,340 pkt/s                 0 drop/s         =
+       0 error/s
+|     cpu:6              10,329,340 pkt/s                 0 drop/s         =
+       0 error/s
+|   enqueue to cpu 3     10,329,338 pkt/s                 0 drop/s         =
+    8.00 bulk-avg
+|     cpu:6->3           10,329,338 pkt/s                 0 drop/s         =
+    8.00 bulk-avg
+|   kthread total        10,329,321 pkt/s                 0 drop/s         =
+  96,297 sched
+|     cpu:3              10,329,321 pkt/s                 0 drop/s         =
+  96,297 sched
+|     xdp_stats                   0 pass/s       10,329,321 drop/s         =
+       0 redir/s
+|       cpu:3                     0 pass/s       10,329,321 drop/s         =
+       0 redir/s
+|   redirect_err                  0 error/s
+|   xdp_exception                 0 hit/s
+
+perf top --sort cpu,symbol --no-children:
+|   20.90%  006  [k] bpf_prog_4f0ffbb35139c187_cpumap_l4_hash
+|   12.62%  006  [k] ixgbe_poll
+|    9.82%  003  [k] page_frag_free
+|    8.73%  003  [k] cpu_map_bpf_prog_run_xdp
+|    6.63%  006  [k] xdp_do_redirect
+|    4.94%  003  [k] cpu_map_kthread_run
+|    4.28%  006  [k] cpu_map_redirect
+|    4.03%  006  [k] bq_flush_to_queue
+|    3.01%  003  [k] xdp_return_frame
+|    1.95%  006  [k] _raw_spin_lock
+|    1.94%  003  [k] bpf_prog_57cd311f2e27366b_cpumap_drop
+
+This diff appears to be noise.
+
+v5=E2=80=A6v6 https://lore.kernel.org/all/20240607070427.1379327-1-bigeasy@=
+linutronix.de/:
+- bpf_redirect_info and the lists (cpu, dev, xsk map_flush_list) is now
+  initialized on first usage instead during setup time
+  (bpf_net_ctx_set()). bpf_redirect_info::kern_flags is used as
+  status to note which member require an init.
+  The bpf_redirect_info::kern_flags is moved to the end of the struct
+  (after nh) in order to be excluded from the memset() which clears
+  everything upto the the nh member.
+  This whole lazy init performed to save cycles and not to waste them to
+  memset bpf_redirect_info and init the three lists on each
+  net_rx_action()/ NAPI invocation even if BPF/redirect is not used.
+  Suggested by Jesper Dangaard Brouer.
+
+- Collect Acked-by/Review-by from PeterZ/ tglx
+
+v4=E2=80=A6v5 https://lore.kernel.org/all/20240604154425.878636-1-bigeasy@l=
+inutronix.de/:
+- Remove the guard() notation as well as __free() within the patches.
+  Patch #1 and #2 add the guard definition for local_lock_nested_bh()
+  but it remains unused with the series.
+  The __free() notation for bpf_net_ctx_clear has been removed entirely.
+
+- Collect Toke's Reviewed-by.
+
+v3=E2=80=A6v4 https://lore.kernel.org/all/20240529162927.403425-1-bigeasy@l=
+inutronix.de/:
+- Removed bpf_clear_redirect_map(), moved the comment to the caller.
+  Suggested by Toke.
+
+- The bpf_redirect_info structure is memset() each time it is assigned.
+  Suggested by Toke.
+
+- The bpf_net_ctx_set() in __napi_busy_loop() has been moved from the
+  top of the function to begin/ end of the BH-disabled section. This has
+  been done to remain in sync with other call sites.
+  After adding the memset() I've been looking at the perf-numbers in my
+  test-case and I haven't noticed an impact, the numbers are in the same
+  range with and without the change. Therefore I kept the numbers from
+  previous posting.
+
+- Collected Alexei's Acked-by.
+
+v2=E2=80=A6v3 https://lore.kernel.org/all/20240503182957.1042122-1-bigeasy@=
+linutronix.de/:
+- WARN checks checks for bpf_net_ctx_get() have been dropped and all
+  NULL checks around it. This means bpf_net_ctx_get_ri() assumes the
+  context has been set and will segfault if it is not the case.
+  Suggested by Alexei and Jesper. This should always work or always
+  segfault.
+
+- It has been suggested by Toke to embed struct bpf_net_context into
+  task_struct instead just a pointer to it. This would increase the size
+  of task_struct by 112 bytes instead just eight and Alexei didn't like
+  it due to the size impact with 1m threads. It is a pointer again.
+
+v1=E2=80=A6v2 https://lore.kernel.org/all/20231215171020.687342-1-bigeasy@l=
+inutronix.de/:
+- Jakub complained about touching networking drivers to make the
+  additional locking work. Alexei complained about the additional
+  locking within the XDP/eBFP case.
+  This led to a change in how the per-CPU variables are accessed for the
+  XDP/eBPF case. On PREEMPT_RT the variables are now stored on stack and
+  the task pointer to the structure is saved in the task_struct while
+  keeping every for !RT unchanged. This was proposed as a RFC in
+  	v1: https://lore.kernel.org/all/20240213145923.2552753-1-bigeasy@linutro=
+nix.de/
+
+  and then updated
+
+        v2: https://lore.kernel.org/all/20240229183109.646865-1-bigeasy@lin=
+utronix.de/
+	  - Renamed the container struct from xdp_storage to bpf_net_context.
+            Suggested by Toke H=C3=B8iland-J=C3=B8rgensen.
+	  - Use the container struct also on !PREEMPT_RT builds. Store the
+	    pointer to the on-stack struct in a per-CPU variable. Suggested by
+            Toke H=C3=B8iland-J=C3=B8rgensen.
+
+  This reduces the initial queue from 24 to 15 patches.
+
+- There were complains about the scoped_guard() which shifts the whole
+  block and makes it harder to review because the whole gets removed and
+  added again. The usage has been replaced with local_lock_nested_bh()+
+  its unlock counterpart.
+
+Sebastian
+
 
