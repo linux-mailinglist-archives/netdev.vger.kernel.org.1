@@ -1,154 +1,165 @@
-Return-Path: <netdev+bounces-102901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC089905603
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 16:59:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BA41905615
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 17:00:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E19B21C2136E
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 14:59:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F4511C23DE0
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 15:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B8E017F396;
-	Wed, 12 Jun 2024 14:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E28D917F4FE;
+	Wed, 12 Jun 2024 15:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AZS2wXkk"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="oz43gLUA"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A4117A931;
-	Wed, 12 Jun 2024 14:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E3F17F4EF
+	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 15:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718204373; cv=none; b=ntbQkI8s+m4PDMae7b/omRaoFx2/kMEz1mm4zxa3oPoN2IG474dIlgnXZMCcHvG83naEI0Icxgx7dcZDN6IlUdpPXY/YJ4Jx/kxOtKGRsp1rw4dgWK65C2K2MHq9cbXJ+B1aheJB8REHlbzVjtf+0PIG8bU7O+8t/yV8Zsh7csg=
+	t=1718204425; cv=none; b=K15P4rqc4wqGp6eRhgTmOwL5Yd48sFY7n2JRXzCCcQNNuaEMhchLjkdXuwyDdUVh5QCIBPeJPMLDYOs/wU4v79Km3TEOYSargbiNNoknQcNVC2gAA/olksjanLv0mtXwgwaeC0bIzeMFcC+93sQJq+HaqWw6XjZaoy/Czybz9DA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718204373; c=relaxed/simple;
-	bh=hZe66tmBruqItE6Qo0fdsbLpkz7kntMz0MEsPGhcTs4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iQVjtECgY4O/3EgKPNcopOhhfu7qy12eCvL62DyqiStBYHNBb+wZI9a0NaW5FpP8LM8emeyiYIqzxewzlw4lO95Mk3BO0O8LP05hJ9zWV/YkU6YIYlTVa1/XSJMOdsTqIpXgz1RQ16CLgg5e40DVvEHB9fkDxRfmt9E+GS4efU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AZS2wXkk; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KJPyWglk6TTgeC4SYtEN5iGBVrUcdT9kbqfPN/0Fs6s=; b=AZS2wXkk7HtR1yaV5seNb7ikdk
-	y5I08xmnO15BmJnALxV+nd7MNFmLAPJAY/kVDs3plt9aQNCxmj9wbKBPJ8UH187zpeoepQYPA7DVc
-	G4kG8rqaOjNiQ+BoOmfzUirUfKfJxI1QFQ0MhMmRN4y7wFmQyuYaWRWmZ05A+r0rTkEI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sHPRR-00HTtj-VE; Wed, 12 Jun 2024 16:59:13 +0200
-Date: Wed, 12 Jun 2024 16:59:13 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yojana Mallik <y-mallik@ti.com>
-Cc: schnelle@linux.ibm.com, wsa+renesas@sang-engineering.com,
-	diogo.ivo@siemens.com, rdunlap@infradead.org, horms@kernel.org,
-	vigneshr@ti.com, rogerq@ti.com, danishanwar@ti.com,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, srk@ti.com, rogerq@kernel.org,
-	Siddharth Vadapalli <s-vadapalli@ti.com>
-Subject: Re: [PATCH net-next v2 2/3] net: ethernet: ti: Register the RPMsg
- driver as network device
-Message-ID: <8b4dc94a-0d59-499f-8f28-d503e91f2b27@lunn.ch>
-References: <20240531064006.1223417-1-y-mallik@ti.com>
- <20240531064006.1223417-3-y-mallik@ti.com>
- <4416ada7-399b-4ea0-88b0-32ca432d777b@lunn.ch>
- <2d65aa06-cadd-4462-b8b9-50c9127e6a30@ti.com>
- <f14a554c-555f-4830-8be5-13988ddbf0ba@lunn.ch>
- <b07cfdfe-dce4-484b-b8a8-9d0e49985c60@ti.com>
+	s=arc-20240116; t=1718204425; c=relaxed/simple;
+	bh=C4UELV9HUoTObjhE2z/Y+N/eSyCnSY+vNYVC8euckgc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Te9rC1yioYSdPoXp/e8in0uz/4q5M9RmqqviYVel09wAY5hkMt9g4kAQ3+AiB7BeDxOMgpME+PK6aK69debSMf7aH+ZO8MTOSAw+gdiMznxKyrXR6KDrlxxc39IKmizajOEowl/jnSQ1hccp7vkGmZvUzTsxBlSOqzGLEJFsNkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=oz43gLUA; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52c4b92c09bso3265083e87.1
+        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 08:00:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1718204422; x=1718809222; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F6rL/BDIQftoREsF4MukuWgtFD7Xz/O/PdkqT1JwzBs=;
+        b=oz43gLUA7clGp8IShwOmyPkd2VsJBMVuCFpBNLAkbZCXpNoEeHepsatlnrrCx249Lu
+         vku0O+xdOEbUuJGgyy82WGi5DG/O8MhhyqllcfxvgKgzFKOwHJQs/DCYXRElNIaoCiIU
+         RaaOpGyaH2O+qPcAhLBbZT4RdVJohrhhw50VktNZOn3h96cm9Bat9Bhve67p435ZKe6k
+         74VmPxJWSPVW5KzoUi5HRm9ecHvBvIJne9f3nl4z+8izhNMqDr32O8KpGBoJ4/kLOCnL
+         B7gQb1G8cKTNZ00vDdHGxbP21Zy7Br8BTTSldmaMuSuZODzmAskFqG1Eid9GGN2oKIwv
+         phAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718204422; x=1718809222;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=F6rL/BDIQftoREsF4MukuWgtFD7Xz/O/PdkqT1JwzBs=;
+        b=unNyl6NOAEe+AuAbGUoa3LnaBLG/ClDVHxJC6rZp928W52f6V9vwxGVlzFyQemGRDg
+         0zqaj5LHWcIPFREJgP4WatuGoHhtKk7zwBFLmN9Og3M0/TD1/vx80EzEyDAvojb2pLkc
+         n3XLBnXPOVkPzOiKpdS736tFd2s8mHb+0UfjVpUGBaArrBSa9t5boMfLoxbfl3HnfEkW
+         AClJaWuop5ox+Or9jNTrg+e/0HugAo7LoiXnKG1jWp1eDQ9Jn7zRtLGmg76yrkOacXH9
+         DEhWkX+g26huYjbGzBsghT5yDn+0pJo/FRPbvglhgp5CZ/CFlyw8B2szG1y3ZMqBtfsM
+         j5HA==
+X-Forwarded-Encrypted: i=1; AJvYcCUzJ8uUv1rh577sASOPNicjGRF0r1NHkPYmkE0liN0Hcq8XlIkFSDR9/Z1drbilroqwGXN9/5dY9HJUFC1qz+dj6UNTfwp6
+X-Gm-Message-State: AOJu0YxtsAw2dUT7+5MXrvNcvMvcHSWtGpKKFvcN2nRh/mKzmF290uUM
+	cAZ1laB+hD14aMioBGis4XfaVk156t2ciF4VazdNIec1ZFsWYceW6V67dLEz2q3ln2xKTbBjK8r
+	ydfXuIvpOOqXXLoIBay9NYngW15rSrvK/s3az3w==
+X-Google-Smtp-Source: AGHT+IGTgh1dIQ9+D2m/9bJRIpMZfry0OF0lmud8oD8sCLp6CWzI5quV6C91M4FXuD+64Vh450FwuHsfhkL2cCm4O1s=
+X-Received: by 2002:ac2:4e0d:0:b0:52c:9725:b334 with SMTP id
+ 2adb3069b0e04-52c9a3fcc59mr1743084e87.54.1718204422361; Wed, 12 Jun 2024
+ 08:00:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b07cfdfe-dce4-484b-b8a8-9d0e49985c60@ti.com>
+References: <20240612075829.18241-1-brgl@bgdev.pl> <CABBYNZLrwgj848w97GP+ijybt-yU8yMNnW5UWhb2y5Zq6b5H9A@mail.gmail.com>
+ <CAMRc=Mdb31YGUUXRWACnx55JawayFaRjEPYSdjOCMrYr5xDYag@mail.gmail.com> <CABBYNZLPv3zk_UX67yPetQKWiQ-g+Dv9ZjZydhwG3jfaeV+48w@mail.gmail.com>
+In-Reply-To: <CABBYNZLPv3zk_UX67yPetQKWiQ-g+Dv9ZjZydhwG3jfaeV+48w@mail.gmail.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Wed, 12 Jun 2024 17:00:11 +0200
+Message-ID: <CAMRc=Mdsw5c_BDwUwP2Ss4Bogz-d+waZVd8LLaZ5oyc9dWS2Qg@mail.gmail.com>
+Subject: Re: [GIT PULL] Immutable tag between the Bluetooth and pwrseq
+ branches for v6.11-rc1
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> The shared memory address space in AM64x board is 2G and u32 data type for
-> address works to use this address space. In order to make the driver generic,to
-> work with systems that have more than 4G address space, we can change the base
-> addr data type to u64 in the virtual driver code and the corresponding
-> necessary changes have to be made in the firmware.
+On Wed, Jun 12, 2024 at 4:54=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Bartosz,
+>
+> On Wed, Jun 12, 2024 at 10:45=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.=
+pl> wrote:
+> >
+> > On Wed, Jun 12, 2024 at 4:43=E2=80=AFPM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Bartosz,
+> > >
+> > > On Wed, Jun 12, 2024 at 3:59=E2=80=AFAM Bartosz Golaszewski <brgl@bgd=
+ev.pl> wrote:
+> > > >
+> > > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > > >
+> > > > Hi Marcel, Luiz,
+> > > >
+> > > > Please pull the following power sequencing changes into the Bluetoo=
+th tree
+> > > > before applying the hci_qca patches I sent separately.
+> > > >
+> > > > Link: https://lore.kernel.org/linux-kernel/20240605174713.GA767261@=
+bhelgaas/T/
+> > > >
+> > > > The following changes since commit 83a7eefedc9b56fe7bfeff13b6c73566=
+88ffa670:
+> > > >
+> > > >   Linux 6.10-rc3 (2024-06-09 14:19:43 -0700)
+> > > >
+> > > > are available in the Git repository at:
+> > > >
+> > > >   git://git.kernel.org/pub/scm/linux/kernel/git/brgl/linux.git tags=
+/pwrseq-initial-for-v6.11
+> > > >
+> > > > for you to fetch changes up to 2f1630f437dff20d02e4b3f07e836f428691=
+28dd:
+> > > >
+> > > >   power: pwrseq: add a driver for the PMU module on the QCom WCN ch=
+ipsets (2024-06-12 09:20:13 +0200)
+> > > >
+> > > > ----------------------------------------------------------------
+> > > > Initial implementation of the power sequencing subsystem for linux =
+v6.11
+> > > >
+> > > > ----------------------------------------------------------------
+> > > > Bartosz Golaszewski (2):
+> > > >       power: sequencing: implement the pwrseq core
+> > > >       power: pwrseq: add a driver for the PMU module on the QCom WC=
+N chipsets
+> > >
+> > > Is this intended to go via bluetooth-next or it is just because it is
+> > > a dependency of another set? You could perhaps send another set
+> > > including these changes to avoid having CI failing to compile.
+> > >
+> >
+> > No, the pwrseq stuff is intended to go through its own pwrseq tree
+> > hence the PR. We cannot have these commits in next twice.
+>
+> Not following you here, why can't we have these commits on different
+> next trees? If that is the case how can we apply the bluetooth
+> specific ones without causing build regressions?
+>
 
-You probably need to think about this concept in a more generic
-way. You have a block of memory which is physically shared between two
-CPUs. Does each have its own MMU involved in accesses this memory? Why
-would each see the memory at the same physical address? Why does one
-CPU actually know anything about the memory layout of another CPU, and
-can tell it how to use its own memory? Do not think about your AM64x
-board when answering these questions. Think about an abstract system,
-two CPUs with a block of shared memory. Maybe it is even a CPU and a
-GPU with shared memory, etc. 
+We can't have the same commits twice with different hashes in next
+because Stephen Rothwell will yell at us both.
 
-> The shared memory layout is modeled as circular buffer.
-> /*      Shared Memory Layout
->  *
->  *	---------------------------	*****************
->  *	|        MAGIC_NUM        |	 icve_shm_head
->  *	|          HEAD           |
->  *	---------------------------	*****************
->  *	|        MAGIC_NUM        |
->  *	|        PKT_1_LEN        |
->  *	|          PKT_1          |
->  *	---------------------------
->  *	|        MAGIC_NUM        |
->  *	|        PKT_2_LEN        |	 icve_shm_buf
->  *	|          PKT_2          |
->  *	---------------------------
->  *	|           .             |
->  *	|           .             |
->  *	---------------------------
->  *	|        MAGIC_NUM        |
->  *	|        PKT_N_LEN        |
->  *	|          PKT_N          |
->  *	---------------------------	****************
->  *	|        MAGIC_NUM        |      icve_shm_tail
->  *	|          TAIL           |
->  *	---------------------------	****************
->  */
-> 
-> Linux retrieves the following info provided in response by R5 core:
-> 
-> Tx buffer head address which is stored in port->tx_buffer->head
-> 
-> Tx buffer buffer's base address which is stored in port->tx_buffer->buf->base_addr
-> 
-> Tx buffer tail address which is stored in port->tx_buffer->tail
-> 
-> The number of packets that can be put into Tx buffer which is stored in
-> port->icve_tx_max_buffers
-> 
-> Rx buffer head address which is stored in port->rx_buffer->head
-> 
-> Rx buffer buffer's base address which is stored in port->rx_buffer->buf->base_addr
-> 
-> Rx buffer tail address which is stored in port->rx_buffer->tail
-> 
-> The number of packets that are put into Rx buffer which is stored in
-> port->icve_rx_max_buffers
+Just pull the tag I provided and then apply the Bluetooth specific
+changes I sent on top of it. When sending to Linus Torvalds/David
+Miller (not sure how your tree gets upstream) mention that you pulled
+in the pwrseq changes in your PR cover letter.
 
-I think most of these should not be pointers, but offsets from the
-base of the shared memory. It then does not matter if they are mapped
-at different physical addresses on each CPU.
-
-> Linux trusts these addresses sent by the R5 core to send or receive ethernet
-> packets. By this way both the CPUs map to the same physical address.
-
-I'm not sure Linux should trust the R5. For a generic implementation,
-the trust should be held to a minimum. There needs to be an agreement
-about how the shared memory is partitioned, but each end needs to
-verify that the memory is in fact valid, that none of the data
-structures point outside of the shared memory etc. Otherwise one
-system can cause memory corruption on the other, and that sort of bug
-is going to be very hard to debug.
-
-	Andrew
-
+Bart
 
