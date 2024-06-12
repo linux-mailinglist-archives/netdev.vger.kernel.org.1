@@ -1,118 +1,95 @@
-Return-Path: <netdev+bounces-102969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69BA4905AC2
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 20:23:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA0D2905AD8
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 20:28:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06DB0B23FE3
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 18:23:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76F64B21471
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 18:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F02D3B2A1;
-	Wed, 12 Jun 2024 18:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E3E4085D;
+	Wed, 12 Jun 2024 18:28:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="iX4SAKjS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ddpy3LFX"
 X-Original-To: netdev@vger.kernel.org
-Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958883A1BB;
-	Wed, 12 Jun 2024 18:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DCF3FE2A;
+	Wed, 12 Jun 2024 18:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718216583; cv=none; b=gsRuEKmiHutLoOc4dQ4kSnx00T1Kn+usgn2U8dV8LuKkhx4GFObw6zS1K8YLLSjk+rV90j6ZpcOjdlnw6rrnhlR/vL/UaC5w3LfujfhbdUoadE6OLfu7JXJhI0v+SbTLn0av/0xML3yvPsPqfyR/UiwEGEApfTd01W/ZCUZnbuU=
+	t=1718216915; cv=none; b=ewaREUR7EFS7AaqVNAr+Dx3HJfMfcdoma53Rj479OlcocDfnWWpd0LzL1QfbRzC8U0qcconbuXA6HZMHW04cruOu9Zp9my7kUdR97Gn+XUIKLKjbm7Cw3jFyiKgXcgRJ64dwwy1Y1fK/l+o9TChxnVGyJ9/FdhrfShhxREWZiGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718216583; c=relaxed/simple;
-	bh=S/fn4KpsKyYIb7wyOqQFmHywMa1Mz95vU/XpulFss3s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RS2ooC/e0SAmuiOAzlAyXVdq4FCcXRXp0LO0UqPiBw51GreX+UiyS1hgZUOJAkVEdu+s4Wsk1KKcrxlBinJit1voScVUtjQt4tHRvVxH2G+YqDLDy3tk67PQfxYpdvQMTTUvTeAuS2gXx6BA/p/6jOWOnYe6RrvwHPW9ujKhI4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=iX4SAKjS; arc=none smtp.client-ip=213.160.73.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1718216572;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r2DIMPyxXsUsx3z3UHNDfQvmHitGXJiStJK05XL6M2Q=;
-	b=iX4SAKjS85UNGwt2lkaEQqSxCKTvFY5YqaV5lR5uo6cmb3yqiPqSy0QTNp06jX/47CgtUt
-	gAs50cZL2EXRva9Xf0iAnCBIhRpgC+JEqUqNnjqVVm/4Kb3sCo4e2qiroY/jdGH1zwk4e7
-	fzTxXeRhTjT6C0prhAE+4lu0OZ+Sxu0=
-From: Sven Eckelmann <sven@narfation.org>
-To: "Paul E. McKenney" <paulmck@kernel.org>, b.a.t.m.a.n@lists.open-mesh.org
-Cc: b.a.t.m.a.n@lists.open-mesh.org, Dmitry Antipov <dmantipov@yandex.ru>,
- netdev@vger.kernel.org, rcu@vger.kernel.org,
- Linus =?ISO-8859-1?Q?L=FCssing?= <linus.luessing@c0d3.blue>
-Subject:
- Re: [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with
- free-only callbacks"
-Date: Wed, 12 Jun 2024 20:22:49 +0200
-Message-ID: <2328482.ElGaqSPkdT@sven-l14>
-In-Reply-To: <ZmnNfU44NekafjA_@sellars>
-References:
- <20240612133357.2596-1-linus.luessing@c0d3.blue>
- <020489fa-26a3-422c-8924-7dc71f23422c@paulmck-laptop>
- <ZmnNfU44NekafjA_@sellars>
+	s=arc-20240116; t=1718216915; c=relaxed/simple;
+	bh=NJeqqnsIfUMhlSi06vIIKPHNE2ykrkcvFQ48tdRGhsA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fq4iZ7hCt99U5OfAl4lLxoSCTS9LnIFIZItFEYCZ0Q5Ypv2Ae+JESr7AB34S7J0xof3bu/cBRRd2fcOl3P6ra0b7zfzcHF3iseReWINIt2hT9fPF1hUDhrs+hYTfFv7gWpm4sptyvKQJDkWEZ5QxpPWHEupr4GhEX1hyl+LjjVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ddpy3LFX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CE7CC116B1;
+	Wed, 12 Jun 2024 18:28:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718216914;
+	bh=NJeqqnsIfUMhlSi06vIIKPHNE2ykrkcvFQ48tdRGhsA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ddpy3LFXn9c98MKv3p1z9yzC/k7fp2NoQZCwQ1Bp3h+rc35Aj+5XYZpEUKKZ724ju
+	 y9ZVcyK1HprCeVdIqNoKJZA4N3pV2QBPcSSYx5JVzTca/Va89RiIqfN0iHQoRB5v22
+	 4P3VgoYjRQ0YRiOTFBQRUENT3jTcTYpRVcLHbZDkmjvl5fr0ovC4LYgtA8l9Bo4qNi
+	 sj6e2NiHBaBOFoXtpyO9MS/O51xFBlLGWQtlXXkxqasrMderNVfzK0R8HW3Fi9nd5v
+	 VqL2s2J+83NWAWDiaNO7RZLtHBTbLgANwd7LPwPmWBvnlcaNkfDGkoiSy+OXB4oGcu
+	 z4C8Bg0Ko80zg==
+Date: Wed, 12 Jun 2024 11:28:33 -0700
+From: Kees Cook <kees@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Kenton Groombridge <concord@gentoo.org>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v3] wifi: mac80211: Avoid address calculations via out of
+ bounds array indexing
+Message-ID: <202406121127.FB2E58C2@keescook>
+References: <20240605152218.236061-1-concord@gentoo.org>
+ <fd1acc0f69ef9573ff0dced35863949c80c6d5e7.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart4898629.GXAFRqVoOG";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fd1acc0f69ef9573ff0dced35863949c80c6d5e7.camel@sipsolutions.net>
 
---nextPart4898629.GXAFRqVoOG
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"; protected-headers="v1"
-From: Sven Eckelmann <sven@narfation.org>
-Date: Wed, 12 Jun 2024 20:22:49 +0200
-Message-ID: <2328482.ElGaqSPkdT@sven-l14>
-In-Reply-To: <ZmnNfU44NekafjA_@sellars>
-MIME-Version: 1.0
+On Wed, Jun 12, 2024 at 10:20:41AM +0200, Johannes Berg wrote:
+> On Wed, 2024-06-05 at 11:22 -0400, Kenton Groombridge wrote:
+> 
+> 
+> > Co-authored-by: Kees Cook <keescook@chromium.org>
+> > Signed-off-by: Kenton Groombridge <concord@gentoo.org>
+> > 
+> 
+> Wait ... I don't know what Kees did here, but seems then he should sign-
+> off too.
+> 
+> Kees?
 
-On Wednesday, 12 June 2024 18:31:57 CEST Linus L=FCssing wrote:
-> On Wed, Jun 12, 2024 at 09:06:25AM -0700, Paul E. McKenney wrote:
-> > We are looking into nice ways of solving this, but in the meantime,
-> > yes, if you are RCU-freeing slab objects into a slab that is destroyed
-> > at module-unload time, you currently need to stick with call_rcu()
-> > and rcu_barrier().
-> >
-> > We do have some potential solutions to allow use of kfree_rcu() with
-> > this sort of slab, but they are still strictly potential.
-> >
-> > Apologies for my having failed to foresee this particular trap!
->=20
-> No worries, thanks for the help and clarification! This at least
-> restored my sanity, was starting to doubt my understanding of RCU
-> and the batman-adv code the longer I tried to find the issue in
-> batman-adv :D.
+I had helped mainly in private emails with Kenton. I'm fine with
+whatever tags people want. :)
 
-Thanks Linus and Paul. I've queued up the revert. But feel free to submit a=
-=20
-version with updated text in case you want to incorporate information from=
-=20
-this thread.
+Signed-off-by: Kees Cook <kees@kernel.org>
 
-Kind regards,
-	Sven
---nextPart4898629.GXAFRqVoOG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
+and/or
 
------BEGIN PGP SIGNATURE-----
+Reviewed-by: Kees Cook <kees@kernel.org>
 
-iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCZmnnegAKCRBND3cr0xT1
-y/2ZAQCJLtdWIbCPUrkTqkI9mv1ThzM/ZcLceVmbFSKhVCSe8AEAtVQx2GE9aUCk
-S1OPFkU0m5zCxxMHHIygDnw3SwaMvAA=
-=mD28
------END PGP SIGNATURE-----
+(Though note the email address change just to keep checkpatch happy
+about Co-authored-by vs S-o-b mismatches.)
 
---nextPart4898629.GXAFRqVoOG--
+Thanks!
 
-
-
+-- 
+Kees Cook
 
