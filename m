@@ -1,76 +1,94 @@
-Return-Path: <netdev+bounces-102776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1466690491A
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 04:38:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C62A904920
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 04:40:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC2A61C21750
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 02:38:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC644B23240
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 02:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3F33BE48;
-	Wed, 12 Jun 2024 02:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1568CB663;
+	Wed, 12 Jun 2024 02:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q4Dbs5Rh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bujLiAns"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7486BB663;
-	Wed, 12 Jun 2024 02:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E181BEAC2;
+	Wed, 12 Jun 2024 02:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718159919; cv=none; b=SKmYkVSMGU7HlkpUVY+qOqlxJDiAbxfxxVO7iVWf/JCyDsugtWbq6cvQ2b6reb46PAdnexAkzIkIRVM5kNxGNV73clZ+DsxkKPkV5RlslBqdiS0JMqOxtebYkL9fUyay7ZYv51jcj5tvooQU6VeNBOPVimc/x+0zG8iabXkaPHE=
+	t=1718160030; cv=none; b=aAKbEmV9Nwe4MTVReDBM7TSjHfyCp1cB204rQ4tgQ7jqHpYLdraVRoimQfK5pUyameqb0KYBQ8zbuGxNgJ0x45R6TZTzwLBcQfEIZesmHCIQ4yVoSAkvNDpaZYOm3puFF9tf5AQKFA/CRIaZp8oy8PdSm9fXbknDIhoLsCVTDnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718159919; c=relaxed/simple;
-	bh=vmyR4QR4O0qDRG2Tdpec3h1CFmxBVl5p9LVA9RJcQdI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i0V/WzMQJ/N49U3gvxRE/Z4gftEc2DfoyXagDaugPnTaRn9s3zCf1KVDKFZDD5oGe2VocZLly9hB4vc6ICdfFzOiVPUQ6Pdoz+1YnuqH/Y11XU5OuFbwBPNxW7YUQaZB0N48wAmEGcAfC6xNd2RmVI9zJTjoX2NB0Z0DZL3/JHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q4Dbs5Rh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 470C9C2BD10;
-	Wed, 12 Jun 2024 02:38:38 +0000 (UTC)
+	s=arc-20240116; t=1718160030; c=relaxed/simple;
+	bh=aswzwmVE7WSzfqb1OHgJAxTYBO7HmwFUThA200YzYiQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Bi4VPIYuF4UsGwOcn3E70Et+JpaWt7Q46da2Zq4Y3fdIk0TB7u3gDzr/XS91oZsw9hVFzFWKZXUfNrfPjROh1utQBdD9FKXHmHRNvT2QlfCf8SfYxuBlqjAbuj28jFrHHRLq+JU7aeylxqKMEOlGzJiLcdFgfuzBXOdWm1xiG5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bujLiAns; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6E2DFC4AF1C;
+	Wed, 12 Jun 2024 02:40:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718159919;
-	bh=vmyR4QR4O0qDRG2Tdpec3h1CFmxBVl5p9LVA9RJcQdI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q4Dbs5RhFMxmCf4wPg98NTH3+/I9L9tA8L1Dd26Ree+az3alISPp++DLwEbTkooeH
-	 7mpqTsp9L/TwFgkAjzxpaT0/Kk5w8gOnfgtgtRZrgfj5Wlx9NUmcIhNSlVmo0dTFMF
-	 dORbD3frvAt4dw59LOqQwFNcU84Dvn+HPYmyx85C34rQWHw1Gl/zaoUdVXXZSos7is
-	 FsrbDHVYi2UP7BDpb3xsrZRI9MXvDIIr/vK1VbICxBgo3ltEOvpfAWLxJ9GU2Q1OWd
-	 L3lLtlPtaxHjWkW35y1KupSpchPvTxCOLmHTCmQXklypyRGgJ5lIrdueFfSSrUpnQo
-	 7MMRvmyt2cQxw==
-Date: Tue, 11 Jun 2024 19:38:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
- Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- magnus.karlsson@intel.com, Michal Kubiak <michal.kubiak@intel.com>
-Subject: Re: [PATCH iwl-net 0/3] ice: fix synchronization between .ndo_bpf()
- and reset
-Message-ID: <20240611193837.4ffb2401@kernel.org>
-In-Reply-To: <20240610153716.31493-1-larysa.zaremba@intel.com>
-References: <20240610153716.31493-1-larysa.zaremba@intel.com>
+	s=k20201202; t=1718160029;
+	bh=aswzwmVE7WSzfqb1OHgJAxTYBO7HmwFUThA200YzYiQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bujLiAnsNHQbYp/Nf7SKx14PMNpi9Kmf3IWzQC3SAX1SCXY7aGGZqr8egxjyp9cjE
+	 dUFnhq8AyjZ1FVGUzFOCN/oxOG3/8v9HCPU1gr0ZVN1dYcxsOrqFHxiv0JHMSE6UTu
+	 BOIV/tbBnY2TO+7/tztomTEwTI/yC/4Qj3nyn9dPrlFryyZTdlY5YVVliWHFgwJhHg
+	 SddQ6p54k8GKTY0jSopdS2V+Ujn3Djjxsbe8hST/9PlmbGFklWeZAnXU+ArHH73204
+	 35K/2k+Z8ZusB+cscwfsO0KJBS2kxkzXopnbiFqRlD8Zkufp2s9Lt9+0smfjEOHdQX
+	 EjLhxHOImYXKw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5CBD1C43614;
+	Wed, 12 Jun 2024 02:40:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: pse-pd: Use EOPNOTSUPP error code instead of
+ ENOTSUPP
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171816002937.1102.11231449667986655694.git-patchwork-notify@kernel.org>
+Date: Wed, 12 Jun 2024 02:40:29 +0000
+References: <20240610083426.740660-1-kory.maincent@bootlin.com>
+In-Reply-To: <20240610083426.740660-1-kory.maincent@bootlin.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: netdev@vger.kernel.org, o.rempel@pengutronix.de, bagasdotme@gmail.com,
+ kuba@kernel.org, andrew@lunn.ch, lkp@intel.com, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com
 
-On Mon, 10 Jun 2024 17:37:12 +0200 Larysa Zaremba wrote:
-> Fix the problems that are triggered by tx_timeout and ice_xdp() calls,
-> including both pool and program operations.
+Hello:
 
-Is there really no way for ice to fix the locking? :(
-The busy loops and trylocks() are not great, and seem like duct tape.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 10 Jun 2024 10:34:26 +0200 you wrote:
+> ENOTSUPP is not a SUSV4 error code, prefer EOPNOTSUPP as reported by
+> checkpatch script.
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> Fixes: 18ff0bcda6d1 ("ethtool: add interface to interact with Ethernet Power Equipment")
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: pse-pd: Use EOPNOTSUPP error code instead of ENOTSUPP
+    https://git.kernel.org/netdev/net/c/144ba8580bcb
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
