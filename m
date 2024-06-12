@@ -1,110 +1,77 @@
-Return-Path: <netdev+bounces-102926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF9A4905772
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 17:52:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23DC9905774
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 17:53:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94E2928BFA8
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 15:52:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3AC2B21BC2
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 15:52:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 152F8180A63;
-	Wed, 12 Jun 2024 15:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 251BF180A63;
+	Wed, 12 Jun 2024 15:52:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pc6tKd7M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H+Y0NTe3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E164017FAB7;
-	Wed, 12 Jun 2024 15:52:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0188917F505
+	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 15:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718207561; cv=none; b=sx+Orf5KYm5sEmlPpLZy3Arpjleki+6qIQTbSAjTvWZauDIkxJDbtpVHtNzSzbi5uTlzXfO5cHObMFOpjo7DoBP2VJ81QHjC1VN9TJeD6Lx1tPPDDGNT2vF60i65zls6CYIVvqfIt+OXShMeKbKrar9fENPWQBq0BHfRCvwh0nM=
+	t=1718207575; cv=none; b=tcObx/JYZE4wK8Vv1yV8dhRM2fQppdetUW3k9RojHGVJ0vUp79ZikEXngI6zVJQKxWksO0+BAtEpCWtUtznWSRKVz2+f2MzE6Q2TPl6ThCWke4Txt6H838JVkIm/SbHd9nbkQ29kC50bce0bFRWcXuQ4aTVMmyrKv1EsTIu3tvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718207561; c=relaxed/simple;
-	bh=/deBkPwJYb65DIJMxq1egvJvkHcQ3PDFiBPLscR5X4Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jRlNG+VsBaqVmHWyuXxqgZqMjVDFEWEWPe0pvF94XW1aY3t0ykezkLlPgntezy7wvJy+xt/dCqyLCKenk/YPH4B5wlIvSjrxCp6pwKnHKQqAo0QLMDUE5/mK31MXnyZhtPz9l7q9rcIrYPVYubOw+Ks7N0VWnRHPOiX1mPGV7J8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pc6tKd7M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E38AC32786;
-	Wed, 12 Jun 2024 15:52:38 +0000 (UTC)
+	s=arc-20240116; t=1718207575; c=relaxed/simple;
+	bh=rkhvsS6jkLIz0UqbXprv+wPxQe5g8UnrNYfvoW9Db4Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S74psl3daA5Sfh318Fcq5jErVsN6awQSbXjRQzlKiD4yoNu4oh28KSId31z6hJY760PH8q9qCZyHfR8PS8K3QsWfb2iy7hvKK0Gqhr105FLNLhFOn+xBRfKI9sML8dIYSAFxIy2v1KrcaPM2BHSwI7gmaVBh9dbuEOHim7Il6v8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H+Y0NTe3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F4132C116B1;
+	Wed, 12 Jun 2024 15:52:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718207560;
-	bh=/deBkPwJYb65DIJMxq1egvJvkHcQ3PDFiBPLscR5X4Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pc6tKd7MxW1MHd6RyZ3XP8PFXaNvjELNwVTB9hrWamHvObjoIrLfDStYc3RJA2+na
-	 XU17qhrkYaYkUDCDjLuYeXIxKRPN4yyvQNamlB0sQnoF6vFiILi7nqrf/Z1iy0JM5N
-	 6nEyhpVDQtwDU5S+8PP3hC/G20cTwqZbvsykWctm1p/QFCMBYoJsNNDzf9nCN8zMCU
-	 UUP9bG/cbnLj6+puNR9P3MyeYPomyw9NBcKVYadFIG3UqGjKfSCbFOmGOiZqwMbReR
-	 sXE+DR5m1lj+Q9Yea8W5xa48rRJOCIuwibSIDtFWXkiCPDZUhW5037iVuSTdJ2gWaZ
-	 47BsewNOQDfqg==
-Date: Wed, 12 Jun 2024 16:52:35 +0100
-From: Lee Jones <lee@kernel.org>
-To: Eric Dumazet <edumazet@google.com>, stable@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Clement Lecigne <clecigne@google.com>,
-	Tom Herbert <tom@herbertland.com>
-Subject: Re: [PATCH net] net: fix __dst_negative_advice() race
-Message-ID: <20240612155235.GA2187093@google.com>
-References: <20240528114353.1794151-1-edumazet@google.com>
+	s=k20201202; t=1718207574;
+	bh=rkhvsS6jkLIz0UqbXprv+wPxQe5g8UnrNYfvoW9Db4Y=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=H+Y0NTe3yU2BsQWK3HC2HoTV7/8meYvxVgoCVwIGYBLVayKIVridvPCPse8vyVoVu
+	 HxVrAfkKbQOvhFI+6dOxD7YsZFAb3qd7EJN/q2f30/h+em8CeaA9e1/unsP+Q4RkVL
+	 O1/QrfaDoMfX9lxDNrmvMn2yn+2/dUo3l/Xt/uNWW8G27v+Mvq2xWN8UN6fwn/TNM8
+	 7E6wGTJl6tqpmv7JRgLvxYvZSnEgXhqvgIR9UPDBelkKt7Xptjj0QCAbDW+I+f0xNq
+	 y8kZu9w/0PbAC57B4uBl2taEI9yYYdwIN/xqFDrwD3aH0MEFsJCPEiB2Mz/vswZ+1b
+	 y4FEPfd2Fzorw==
+Message-ID: <1b26debd-8f18-46de-ac6e-05bff44a9c52@kernel.org>
+Date: Wed, 12 Jun 2024 09:52:53 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240528114353.1794151-1-edumazet@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 0/3] bnxt_en: implement netdev_queue_mgmt_ops
+Content-Language: en-US
+To: David Wei <dw@davidwei.uk>, Michael Chan <michael.chan@broadcom.com>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Adrian Alvarado <adrian.alvarado@broadcom.com>,
+ Somnath Kotur <somnath.kotur@broadcom.com>, netdev@vger.kernel.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+References: <20240611023324.1485426-1-dw@davidwei.uk>
+ <e6617dc1-6b34-49f7-8637-f3b150318ae3@kernel.org>
+ <b2dadafd-48c3-4598-bee5-a088ae5a4bc7@davidwei.uk>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <b2dadafd-48c3-4598-bee5-a088ae5a4bc7@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 28 May 2024, Eric Dumazet wrote:
+On 6/10/24 9:41 PM, David Wei wrote:
+> 
+> This patchset is orthogonal to header split and page pool memory
+> providers. It implements netdev_queue_mgmt_ops which enables dynamically
 
-> __dst_negative_advice() does not enforce proper RCU rules when
-> sk->dst_cache must be cleared, leading to possible UAF.
-> 
-> RCU rules are that we must first clear sk->sk_dst_cache,
-> then call dst_release(old_dst).
-> 
-> Note that sk_dst_reset(sk) is implementing this protocol correctly,
-> while __dst_negative_advice() uses the wrong order.
-> 
-> Given that ip6_negative_advice() has special logic
-> against RTF_CACHE, this means each of the three ->negative_advice()
-> existing methods must perform the sk_dst_reset() themselves.
-> 
-> Note the check against NULL dst is centralized in
-> __dst_negative_advice(), there is no need to duplicate
-> it in various callbacks.
-> 
-> Many thanks to Clement Lecigne for tracking this issue.
-> 
-> This old bug became visible after the blamed commit, using UDP sockets.
-> 
-> Fixes: a87cb3e48ee8 ("net: Facility to report route quality of connected sockets")
-> Reported-by: Clement Lecigne <clecigne@google.com>
-> Diagnosed-by: Clement Lecigne <clecigne@google.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Tom Herbert <tom@herbertland.com>
-> ---
->  include/net/dst_ops.h  |  2 +-
->  include/net/sock.h     | 13 +++----------
->  net/ipv4/route.c       | 22 ++++++++--------------
->  net/ipv6/route.c       | 29 +++++++++++++++--------------
->  net/xfrm/xfrm_policy.c | 11 +++--------
->  5 files changed, 30 insertions(+), 47 deletions(-)
-
-Could we have this patch in all Stable branches please?
-
-Upstream commit:
-
-  Fixes: 92f1655aa2b2 ("net: fix __dst_negative_advice() race")
-
--- 
-Lee Jones [李琼斯]
+Ok, where is the validation that these queues must be configured for
+header-data split to use non-kernel memory?
 
