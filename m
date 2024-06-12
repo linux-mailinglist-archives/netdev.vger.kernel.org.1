@@ -1,107 +1,119 @@
-Return-Path: <netdev+bounces-102786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E7759049B9
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 05:49:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 984129049ED
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 06:21:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF2D9B233FE
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 03:49:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 472C71F2362E
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 04:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E2A17554;
-	Wed, 12 Jun 2024 03:49:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a0D3xBfI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94B8D208A4;
+	Wed, 12 Jun 2024 04:21:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CCB164A;
-	Wed, 12 Jun 2024 03:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58328179B7;
+	Wed, 12 Jun 2024 04:21:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718164141; cv=none; b=bDhL1OLq+MQYt2vOCNrAxg1gYSRA7zX5+GcrqhYbt4su0MI6A/wzbhBYuvuiiaUF81EekyMeB1EPWZx6ciaeI/FUfQDfddBa4OXOYlfgsXxCYOGnW3nWaC0f8cU4D0IV36mWT2qNfVGa9z5oxKi1G/j6q5twBI+ByfLSFcV6syU=
+	t=1718166085; cv=none; b=FGNqi/TXQc/CrnUVwlrZ68Ko3/UOZSXjCvxAod4sy1xyD09yAUwbGMJ3Sdip3wlG3OWTZt2GfU4LdkRfR3wZD9yOXuJmoOo4DTCjNhLyw02GZbmDHI811dcw3GXm92qg/nXEmxcoiaii05jw+/ydtjmg62zJ/Z/nEbgHeljiJJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718164141; c=relaxed/simple;
-	bh=2bGFqyYWgIFafnW6kCWkCegqO3LxE+Mz/mpKZMHMASI=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=HwKOyj+l2ZKYPzBgMxswXwOcW+ZMT19k2NEfnxIFBuD0Axdnb2qJvuWBXeiM8zi+nv5j1vMDmmVl+O/UCg7v4i5myX6jSUMxJvE+gstZGE4JLG/GUIL6eBkoHnb1WQYOTJ651md529t07nRH9gZL2x757xjOh82UuQb6E7xxLRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a0D3xBfI; arc=none smtp.client-ip=209.85.161.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-5b3364995b4so1117260eaf.0;
-        Tue, 11 Jun 2024 20:48:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718164139; x=1718768939; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gxHZ3G7e4eNkBw3CVTCI8BN8ws2ri/rJinLTe7rU6BY=;
-        b=a0D3xBfIAmxWIKQ5BI2ktMVGHmUgYQyQRlfElJWR5rp9/6EtP2Mrs1yrw+ipn7KRI+
-         q+PQrECuF0A61trgjaQIQamWJagZaSNQ4qzpmHRIV4sLgs64IHvNSJOYzytXBWCGIhF+
-         IMu1zScKT/O0NiTxWPwtsoc2ilySYpOtWW1YAxKff3RfQfaqh6+qoV2oKgR6vTz2L/4p
-         SUCinm9QU45veVXHvMCVXd0m2nMgFYhh3CrigVoA+I4ZVbxEvX6nmuoK/fny2uDYNlYA
-         jOrbhidYsqF7/K/Pr1H2575EF59qRwFaW5AjwBdCEPpI556SLblwh+iiZeOSTJvkb1Pf
-         xc6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718164139; x=1718768939;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=gxHZ3G7e4eNkBw3CVTCI8BN8ws2ri/rJinLTe7rU6BY=;
-        b=n6a8/t19wAuVwJcNTBqoC0W3FetHPJj9UhcGZ3kZfyiEmMbwUMIwcNNBjF4dAH4ydZ
-         DLhyuJbn/HGiT1W1hOjINklZ5mLsrByFF6N+STqzjJW4fasjhQgJCYGOeCQ6CK35JsHo
-         kIBOwsi5EqaYOLMMvtke7i3S9z0qByiGRwkzpHeCTAXuDb6ZjwP5HyxJxS1vhDu276mq
-         yvshl7O4neG8lPE/x5C6RF7emBx+bsfwN1xuEp+U2S+zF13yaX2OcBnwBamYD6C6Uk8m
-         MMDVMLYnC4OEsFdPelpNNXHoeD94FKIVhC5UIbWvKOoI2JJqTXHMevezYTN873AFbnVE
-         clcg==
-X-Forwarded-Encrypted: i=1; AJvYcCViED4SWKSlnDI9CBkdL6rcXxs/VoVcF0hdcIkIG7yyZuhWep+2G13ZX+dCym+oAzuZJfas3+YQ@vger.kernel.org, AJvYcCWqhVlkq2lSB6ldn5/NTRWQhOEcQQMJKuQd7HbDJEIVTW4WFjJDB+PYhpDUJKkwuPjl5uRL53ZffTE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUXjsKa/rGrySyqau0JDHmvDgc0sYrWPvGefgcmOZfD0O6SiP6
-	wCJ4KKejjPjxLHJXt8GnSL72p1fMWZW0rT32EeXV4sBtkUiuBTiE
-X-Google-Smtp-Source: AGHT+IG+AWbPhKhCFdnv1wIqiv2DmkrXKaYR4UzYcncsb0LZndSCa0sz+IBMu5fWTwJgG4z+y2DeLg==
-X-Received: by 2002:a05:6808:23cd:b0:3d1:df68:4fa with SMTP id 5614622812f47-3d23de930damr733482b6e.0.1718164138476;
-        Tue, 11 Jun 2024 20:48:58 -0700 (PDT)
-Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6de225006bbsm9204357a12.49.2024.06.11.20.48.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jun 2024 20:48:58 -0700 (PDT)
-Date: Wed, 12 Jun 2024 12:48:51 +0900 (JST)
-Message-Id: <20240612.124851.944860878036469042.fujita.tomonori@gmail.com>
-To: helgaas@kernel.org
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
- horms@kernel.org, kuba@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
- linux@armlinux.org.uk, hfdevel@gmx.net, naveenm@marvell.com,
- jdamato@fastly.com, bhelgaas@google.com, linux-pci@vger.kernel.org
-Subject: Re: [PATCH net-next v10 1/7] PCI: add Edimax Vendor ID to pci_ids.h
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <20240611150134.GA981546@bhelgaas>
-References: <20240611045217.78529-2-fujita.tomonori@gmail.com>
-	<20240611150134.GA981546@bhelgaas>
+	s=arc-20240116; t=1718166085; c=relaxed/simple;
+	bh=SO2mP7JAos8SHqZ+Wh9MxKGiIDIdaOKMZcDcbVhjwNw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=VUPoaI7yAFFD1nh3SnJ38RmwojDBJ7lPDNAjRWAvegzWafZjkScsQGqobmWN6fHIYO0+2lIUqSdUagF43MP3X0Y8FN18saf7cXp0DFh6TMDYXum73VpY8F2Q0KuvD1FFUGR0vw89CQ5N9uPltBT8tu06JJIq7ie1ObkJwArYIZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 45C4KUPj8881504, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 45C4KUPj8881504
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 12 Jun 2024 12:20:30 +0800
+Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 12 Jun 2024 12:20:30 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 12 Jun 2024 12:20:29 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Wed, 12 Jun 2024 12:20:29 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "andrew@lunn.ch" <andrew@lunn.ch>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org" <horms@kernel.org>,
+        Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v20 06/13] rtase: Implement .ndo_start_xmit function
+Thread-Topic: [PATCH net-next v20 06/13] rtase: Implement .ndo_start_xmit
+ function
+Thread-Index: AQHauLdmYuDGRjyaP0maBwRhxExTNLG77l8AgAefqjA=
+Date: Wed, 12 Jun 2024 04:20:29 +0000
+Message-ID: <4a894465ea0747d08c96282602bcdf6b@realtek.com>
+References: <20240607084321.7254-1-justinlai0215@realtek.com>
+ <20240607084321.7254-7-justinlai0215@realtek.com>
+ <20240607155420.GA3743392@maili.marvell.com>
+In-Reply-To: <20240607155420.GA3743392@maili.marvell.com>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Tue, 11 Jun 2024 10:01:34 -0500
-Bjorn Helgaas <helgaas@kernel.org> wrote:
-
-> On Tue, Jun 11, 2024 at 01:52:11PM +0900, FUJITA Tomonori wrote:
->> Add the Edimax Vendor ID (0x1432) for an ethernet driver for Tehuti
->> Networks TN40xx chips. This ID can be used for Realtek 8180 and Ralink
->> rt28xx wireless drivers.
->> 
->> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> 
-> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-> 
-> If you have a chance, update the subject line with s/add/Add/ to match
-> history of this file.
-
-Got it, thanks a lot!
+> On 2024-06-07 at 14:13:14, Justin Lai (justinlai0215@realtek.com) wrote:
+> > Implement .ndo_start_xmit function to fill the information of the
+> > packet to be transmitted into the tx descriptor, and then the hardware
+> > will transmit the packet using the information in the tx descriptor.
+> > In addition, we also implemented the tx_handler function to enable the
+> > tx descriptor to be reused.
+> >
+> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> > ---
+> >  .../net/ethernet/realtek/rtase/rtase_main.c   | 285 ++++++++++++++++++
+> >  1 file changed, 285 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > index 23406c195cff..6bdb4edbfbc1 100644
+> > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > @@ -256,6 +256,68 @@ static void rtase_mark_to_asic(union rtase_rx_desc
+> *desc, u32 rx_buf_sz)
+> >                  cpu_to_le32(RTASE_DESC_OWN | eor | rx_buf_sz));  }
+> >
+> > +static u32 rtase_tx_avail(struct rtase_ring *ring) {
+> > +     return READ_ONCE(ring->dirty_idx) + RTASE_NUM_DESC -
+> > +            READ_ONCE(ring->cur_idx); }
+> dirty_idx and cur_idx wont wrap ? its 32bit in size.
+>=20
+> >
+cur_idx and dirty_idx may wrap, but all we want is the difference between
+them, so this won't have any effect. In addition, the difference between
+the two will not exceed RTASE_NUM_DESC, and dirty_idx will not exceed
+cur_idx, so the calculation won't go wrong.
 
