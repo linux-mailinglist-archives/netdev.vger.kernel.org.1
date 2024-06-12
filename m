@@ -1,102 +1,94 @@
-Return-Path: <netdev+bounces-103003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B21F905EE6
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 01:04:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 644E2905EF7
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 01:10:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42F121C2147C
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 23:04:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC110B22401
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 23:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A588312C80F;
-	Wed, 12 Jun 2024 23:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD67112C819;
+	Wed, 12 Jun 2024 23:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ajo5INMF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eRnCU4cj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4617FA93B;
-	Wed, 12 Jun 2024 23:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961A74597A;
+	Wed, 12 Jun 2024 23:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718233460; cv=none; b=O0Lp+3MhnHfS4pZvAgtd2RW+nnErWNDxRsLGjn0+UTJyHlOfMD65FT2fwnlQRhxfuIDx7prdW/Mv+/DodgX1QmWuDkAFwf1E4RIySenQIt+jqNJ4FPNpK0hKTYxXaj29JYYkf35QoP8MV7y/zaC0U9WoSRJWgA6NV44mf6kCJ0A=
+	t=1718233844; cv=none; b=oPK/JwZaMt61ts4qVUrleCHs94aBG275MCvREMU52GYGz6VoagKPcOZODPzV8fFSNarB54fqQM9GeNEjcXAZ+nlOfGwVdF5pVhxbWW+2cRL0rY1ShmB6reMED/grUbfrv/ZIf1lm+Az96lBl5zmU7NUHZ0CL8y+X8gY7V9v/oJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718233460; c=relaxed/simple;
-	bh=r4XcvG9Zjydzkd1AmkZAP2xPiok2w/W0tDdIGWsKLlE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dIeR1GSy8Hdu2O2r9D2Qkh/7U02FoBliN9vHB8NdfTCpXVcWbPD3xDXIcj59XWqHJ3YOZF4wG5M6au2U7Sz7tZsIwjre9rENy8ytC+PzmNln1iQoCO7UgfkQnseVFajLZIMluhZDy7b/hf622ykfjKlK0dngkWPeCA4AmuDS6As=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ajo5INMF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C77F8C116B1;
-	Wed, 12 Jun 2024 23:04:19 +0000 (UTC)
+	s=arc-20240116; t=1718233844; c=relaxed/simple;
+	bh=7O9hS8SZ1m9W6Ge9OVT1ZjAtj4M7EvpT4X35ACqANtM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=el63i7MBa/jM4xqxEoX/bndPtGLa4aPHXCoKvfBMW+HL8sGhCvnpFYuPdMSmF3OQuuUCfiXZbY+i7jbXVIgjQJKC6vvayEaw4kej/jfXZMhebEuHMrXKs9AkmazMHKDS58PW+60nw0fzLdzMEbGihPpmBl9+//kbr9bmdKsAxro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eRnCU4cj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 35E22C4AF1C;
+	Wed, 12 Jun 2024 23:10:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718233459;
-	bh=r4XcvG9Zjydzkd1AmkZAP2xPiok2w/W0tDdIGWsKLlE=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=ajo5INMFOIdUK8bTKJSOMTORqSBUVoTQMoTueScDlw6P7fEKN6L6KudGm8A/f9DV2
-	 vac6aDF6zFHvqVhLnecDeXpTWqKjsgyaGlyYA4jn+sYSI8iPlTZA780P5FZZ2QLokd
-	 TW2/efoa0ILfQDom5zYPZYttH0Zay//A6W3sEm47ScK9OEZvoBo/K4BvF3RIs/Le4w
-	 ckCQrAXr3PM4+Pd067rXKPEm+1PxdYqAXhlaQm4dv5OxvWFhB3hvQnXvNmk7dvAr7L
-	 /vanj8BKtPfnTrKefLFEyaIqF22+2EqJuMoTh97FTwq7ijzvQEu32ydoZbQcPLyXRl
-	 tC6o2QGNB+peQ==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 6C26FCE0DEA; Wed, 12 Jun 2024 16:04:19 -0700 (PDT)
-Date: Wed, 12 Jun 2024 16:04:19 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
-	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <fc3fb837-6f3c-4955-899d-1be002d17d70@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <7e58e73d-4173-49fe-8f05-38a3699bc2c1@kernel.dk>
+	s=k20201202; t=1718233844;
+	bh=7O9hS8SZ1m9W6Ge9OVT1ZjAtj4M7EvpT4X35ACqANtM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eRnCU4cjcN2eURWVIPVaZji/UPFo1ZkR4lh5zfitUWAjiYFr+gbGPPOL/bTGn5dO1
+	 VxGmTxiBzcAvz2Lwpvt0kGvf2ONpWibWkQ12prroX5YpqM3nMZ2iC2vHYX7GzEuu50
+	 +QG59xun/F3PFA1jkDYaaZ7OvdUX3kVp6hknKeh+ZSLes5O6FLDBl3o90Eto7vWZTr
+	 rxWDY2YSWE09AXcEc9fYMi58KzCBZq73QO+rkzP6yyoyWEv3ez5pNGOcMS00CTwYJn
+	 PIwh5Ivg5WpRiQZA01db0+T8OCyMsIeR/FV3c/anbhdQrOacCNahuRcqDsPb8OzsG2
+	 r4QCZr7nhLRZQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1E28EC43619;
+	Wed, 12 Jun 2024 23:10:44 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7e58e73d-4173-49fe-8f05-38a3699bc2c1@kernel.dk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] net: xilinx: axienet: Use NL_SET_ERR_MSG instead
+ of netdev_err
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171823384411.4751.4325990307048449401.git-patchwork-notify@kernel.org>
+Date: Wed, 12 Jun 2024 23:10:44 +0000
+References: <20240611154116.2643662-1-sean.anderson@linux.dev>
+In-Reply-To: <20240611154116.2643662-1-sean.anderson@linux.dev>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: radhey.shyam.pandey@amd.com, andrew@lunn.ch, netdev@vger.kernel.org,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, linux@armlinux.org.uk,
+ michal.simek@amd.com, pabeni@redhat.com, edumazet@google.com,
+ davem@davemloft.net, linux-arm-kernel@lists.infradead.org
 
-On Wed, Jun 12, 2024 at 04:52:57PM -0600, Jens Axboe wrote:
-> On 6/12/24 4:37 PM, Paul E. McKenney wrote:
-> > [PATCH 09/14] block: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-> > 	I don't see a kmem_cache_destroy(), but then again, I also don't
-> > 	see the kmem_cache_create().  Unless someone can see what I am
-> > 	not seeing, let's wait.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 11 Jun 2024 11:41:16 -0400 you wrote:
+> This error message can be triggered by userspace. Use NL_SET_ERR_MSG so
+> the message is returned to the user and to avoid polluting the kernel
+> logs. Additionally, change the return value from EFAULT to EBUSY to
+> better reflect the error (which has nothing to do with addressing).
 > 
-> It's in that same file:
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 > 
-> blk_ioc_init()
-> 
-> the cache itself never goes away, as the ioc code is not unloadable. So
-> I think the change there should be fine.
+> [...]
 
-Thank you, Jens!  (And to Jakub for motivating me to go look.)
+Here is the summary with links:
+  - [net-next,v2] net: xilinx: axienet: Use NL_SET_ERR_MSG instead of netdev_err
+    https://git.kernel.org/netdev/net-next/c/32b06603f879
 
-So to update the scorecared, 05/14, 09/14, 11/14 and 12/14 are OK and
-can go ahead.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-							Thanx, Paul
+
 
