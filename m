@@ -1,122 +1,141 @@
-Return-Path: <netdev+bounces-102831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDD3B904F7F
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 11:44:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CFF3904F8E
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 11:46:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 298B2B25434
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 09:44:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CC191C21018
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 09:46:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F2316E86F;
-	Wed, 12 Jun 2024 09:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D3C16E867;
+	Wed, 12 Jun 2024 09:46:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="J5Xpwh2F"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mgHvjpG/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BD116DEDE;
-	Wed, 12 Jun 2024 09:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BBF16D9D7
+	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 09:46:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718185443; cv=none; b=EDo4PaezyMwIgrqlqlxcB8N5CO57bHFuOSmK9bTKIeCF5GRK9dIyH4X7TRvVJ+9IYhh1ju/nALIMV/YdwHIQygEK+3y2V/M91cHR9tS7qFJm56Px8+khwUXavvmZRjg5McSVWWRuHaYtsk0gqodKBzm9xa1Qos7gTCTcZ7a8a6s=
+	t=1718185588; cv=none; b=Mx9uv8VTCG2PNeaQhbve0IReuFLTFajYvGoXrQ7xvQ48s17RkgPYMtGfPuRfAbKiz9E8HTkbWKPkCmlvsrz05k/yc9xfO6C3odzrgZGfMzTd8+J+EHqQSTkLbsmx18Wheud6zlqd3irIqdWrd9vpfGvzwONzd29RFHDt1sKHr4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718185443; c=relaxed/simple;
-	bh=HOEWpTbG2NqRO+k/zEHzp4vNTYwtb8eZrF3t6LNNOjY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=DsJHqRNWFPF+tNcnGdiAbJh525/M8GX97o8XV3SEvN0W2z7OBhlJtDTx/9ml/UdE0TF8D1gFTy0W14CsrcaIeVtUZKzLIlLHVFtWZ/+b54HZVU6vaIiT88AziszOHEKDXmjg1nTpOSSg+mwh+7rps+cG3T92Dt3V2ZTnWTtzacw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=J5Xpwh2F; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45C0eo2j001183;
-	Wed, 12 Jun 2024 09:43:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	amN2dOS0M+PtUNmJnl74lKoGPzhfXh6/HhqRWs0tLvA=; b=J5Xpwh2FUwBgOpWt
-	/3B+a56EZSzK4smnkOSxKHKHCjJKEUKfLZSTr4H6ztMuiEcZQaUJdYMBpQmomweq
-	4GRqXb+6uE1L+0+zZhywjDoLeaa43f/H5wj+aQ40Wgcfp87wxh6sTmZF/0iDl67I
-	BMJBYewmvsd4ON3bbNlYb8q00NghacKBs9fhBmjCx85C5Kh/g2W/YveM/eQb7DJu
-	0Ajx1lBHaaNUBx/jp6PqQbllurtPKQrF78DAJqzGfceTMJtxMWzKktG8/sVy0kr9
-	ble0HL6JaPRH2w05qNVwwzo61fIlP3frbcTT6kDILrfbezbpYC5YqKdFmi8ERqLi
-	25fwkw==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ypp87tr6g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Jun 2024 09:43:38 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45C9hbIj010792
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Jun 2024 09:43:37 GMT
-Received: from [10.253.72.168] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 12 Jun
- 2024 02:43:35 -0700
-Message-ID: <b8610296-f8cf-4b61-9b64-ffb52b7ab251@quicinc.com>
-Date: Wed, 12 Jun 2024 17:43:33 +0800
+	s=arc-20240116; t=1718185588; c=relaxed/simple;
+	bh=W9ndXkFGN+0mJvooAoPTWczE53d1nQ0rmrqRu/keLPo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ExouU8yp0LYXUaSSSIIOXsZykaQc+l2Npt/XErxy8j0x1VLg9Hp8dZOWPFTA9Q2uM5cmWy/TXVT4K93qjkD7hkkXnFFPb5A2ahiqiEnOvo4V8DxumKrLoF2QoHNOWN6s4g31AKYBEYBFNlR775ZuRTtLMNJ7Ekm4B7T34EUQL/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mgHvjpG/; arc=none smtp.client-ip=209.85.161.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5bb36de2171so448314eaf.2
+        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 02:46:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1718185584; x=1718790384; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=7o5lyLDpCnCOWAKSNy5bFFrbCTaImlxo26NRKCBcB40=;
+        b=mgHvjpG//vBx3LRfzTNfIpoPV3IMScA6Qy2kCT2yyLBX2Ivm6isQLJotFrHcg6kRBN
+         kXzsyraKDq/Y3mTFSLzIsf6/1pyXzJtpSJJphVh0PgnEEHQH5PIu6AUQ64dveFqXldDk
+         bD+m2wHRpDk5v4qCCz2VsmUNS2xPj/UqXjBLmUzgl02GnyN6SOtJNkh/yok2s2MTNNZX
+         xL+I2Idfvbtl4SwqiY+Q0AjoEVMDE7nJOZ4XS4knvaxptrt5h6TAHZZ+9IBVrF7EQfUR
+         jbKRgy6uskUv/B5zJZXsUMDzkmxJatwd5hNFhqrcpvQPiN8rqa59gPLOPbfXWdIChNaR
+         Lsmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718185584; x=1718790384;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7o5lyLDpCnCOWAKSNy5bFFrbCTaImlxo26NRKCBcB40=;
+        b=R+vKNaZoghOMxwnxQcmuKAk4DXOLbii+phl/PVsGc0WOM/l+Ta70bUI8j3wAJLISl3
+         It3/Lfl52l3E1z1mfm75IFrV6hb8EwbHTaA5kv4VSOaQWOIL2/l099Z2V5GPiClhiBVj
+         ryk3hJC72L6osf3d+9vGUBH9B6xPDakHisPpVGRilMcxz6Ck56GssaWxV4Fwluy0wd/2
+         5oOR/L0nsjQzD/gEatfon9kFT5Ws+KOSSz3R2MtFusEhrRn/EuqwjqJkPT9dLMOqfwvC
+         /fglAEVvZlXBA0jNlsJKmN5HAPCnXOYx2uLBZ+GlH+/g700Xd44XHwofPl6ItB2Y3/KT
+         ACSg==
+X-Forwarded-Encrypted: i=1; AJvYcCX/2fdnhmGcC/VFiMQ5GIH1ueen1EXNVGmvlDK17I0AQ8zvW063yyA+uy1EbrUkWB4b4RCka69ppP56/qBZAk2HinbXuwRy
+X-Gm-Message-State: AOJu0Yy8e61uugD1GRNlPsUAy4NtGIRqM28LTMjxESsN8M0W6DU5Z4MU
+	SKU/lVi00VXbKMdAbGAfEE1lQ2Yeyo0yd6KoqJ+VxKxUYZEhY+SUnkbr9fGv5w==
+X-Google-Smtp-Source: AGHT+IGmU2eeEDxojuHCD3Q7xWva5vETr3bu38Y0Bbw7SVri6LNH1NAs8U8qZoVnVXKsiVvHtXFhGw==
+X-Received: by 2002:a05:6359:4c9d:b0:19f:48e8:2d with SMTP id e5c5f4694b2df-19f69cf6bbbmr142440955d.5.1718185584205;
+        Wed, 12 Jun 2024 02:46:24 -0700 (PDT)
+Received: from thinkpad ([120.60.129.29])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6de200849b7sm8803874a12.18.2024.06.12.02.46.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jun 2024 02:46:23 -0700 (PDT)
+Date: Wed, 12 Jun 2024 15:16:09 +0530
+From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+To: Slark Xiao <slark_xiao@163.com>
+Cc: loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net, quic_jhugo@quicinc.com,
+	netdev@vger.kernel.org, mhi@lists.linux.dev,
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] bus: mhi: host: Import mux_id item
+Message-ID: <20240612094609.GA58302@thinkpad>
+References: <20240612093842.359805-1-slark_xiao@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/2] net: rfkill: Fix a logic error within
- rfkill_set_hw_state_reason()
-To: Johannes Berg <johannes@sipsolutions.net>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <emmanuel.grumbach@intel.com>
-CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>
-References: <1717771212-30723-1-git-send-email-quic_zijuhu@quicinc.com>
- <1717771212-30723-3-git-send-email-quic_zijuhu@quicinc.com>
- <b3e0a55f0680b590537133bfb02cd1bbfd61a56e.camel@sipsolutions.net>
-Content-Language: en-US
-From: quic_zijuhu <quic_zijuhu@quicinc.com>
-In-Reply-To: <b3e0a55f0680b590537133bfb02cd1bbfd61a56e.camel@sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 2AHeGtSqfRrq-5CdNCgtPP9EBLBkpQpv
-X-Proofpoint-ORIG-GUID: 2AHeGtSqfRrq-5CdNCgtPP9EBLBkpQpv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-12_06,2024-06-11_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- spamscore=0 suspectscore=0 mlxlogscore=959 priorityscore=1501 adultscore=0
- bulkscore=0 mlxscore=0 clxscore=1015 impostorscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2405170001
- definitions=main-2406120070
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240612093842.359805-1-slark_xiao@163.com>
 
-On 6/12/2024 4:18 PM, Johannes Berg wrote:
-> On Fri, 2024-06-07 at 22:40 +0800, Zijun Hu wrote:
->> Kernel API rfkill_set_hw_state_reason() wrongly gets previous block state
->> by using its parameter @reason as reason mask.
-> 
-> Using reason as a mask is perfectly valid.
-> 
-> And checking that the bit changed also seems valid.
-> 
-i don't think so as explained below.
-let us assume @rfkill->hard_block_reasons has value
-RFKILL_HARD_BLOCK_SIGNAL which means block state before
-__rfkill_set_sw_state(..., true, RFKILL_HARD_BLOCK_NOT_OWNER) is invoked.
+On Wed, Jun 12, 2024 at 05:38:42PM +0800, Slark Xiao wrote:
 
-@prev should mean previous block state, @prev will have false based on
-current logic, it is wrong since rfkill have block state before the call.
+Subject could be improved:
 
-> We might want to not schedule the worker if it's not needed, but that's
-> a different issue, I don't see a real bug here?
-> 
-the worker will be unneccessarily scheduled for above example based on
-current logic even if the rfkill always stay in block state.
-> johannes
-> 
+bus: mhi: host: Add configurable mux_id for MBIM mode
 
+> For SDX72 MBIM mode, it starts data mux id from 112 instead of 0.
+> This would lead to device can't ping outside successfully.
+> Also MBIM side would report "bad packet session (112)".
+> So we add a default mux_id value for SDX72. And this value
+> would be transferred to wwan mbim side.
+> 
+> Signed-off-by: Slark Xiao <slark_xiao@163.com>
+> ---
+>  drivers/bus/mhi/host/pci_generic.c | 3 +++
+>  include/linux/mhi.h                | 2 ++
+>  2 files changed, 5 insertions(+)
+> 
+> diff --git a/drivers/bus/mhi/host/pci_generic.c b/drivers/bus/mhi/host/pci_generic.c
+> index 0b483c7c76a1..9e9adf8320d2 100644
+> --- a/drivers/bus/mhi/host/pci_generic.c
+> +++ b/drivers/bus/mhi/host/pci_generic.c
+> @@ -53,6 +53,7 @@ struct mhi_pci_dev_info {
+>  	unsigned int dma_data_width;
+>  	unsigned int mru_default;
+>  	bool sideband_wake;
+> +	unsigned int mux_id;
+>  };
+>  
+>  #define MHI_CHANNEL_CONFIG_UL(ch_num, ch_name, el_count, ev_ring) \
+> @@ -469,6 +470,7 @@ static const struct mhi_pci_dev_info mhi_foxconn_sdx72_info = {
+>  	.dma_data_width = 32,
+>  	.mru_default = 32768,
+>  	.sideband_wake = false,
+> +	.mux_id = 112,
+>  };
+>  
+>  static const struct mhi_channel_config mhi_mv3x_channels[] = {
+> @@ -1035,6 +1037,7 @@ static int mhi_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  	mhi_cntrl->runtime_get = mhi_pci_runtime_get;
+>  	mhi_cntrl->runtime_put = mhi_pci_runtime_put;
+>  	mhi_cntrl->mru = info->mru_default;
+> +	mhi_cntrl->link_id = info->mux_id;
+
+Again, 'link_id' is just a WWAN term. Use 'mux_id' here also.
+
+- Mani
+
+-- 
+மணிவண்ணன் சதாசிவம்
 
