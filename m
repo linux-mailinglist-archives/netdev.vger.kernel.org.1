@@ -1,177 +1,164 @@
-Return-Path: <netdev+bounces-102791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5B2F904B4C
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 08:05:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BC2B904B5E
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 08:09:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 525AD1F230C1
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 06:05:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFB0E2845AD
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 06:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D4B132127;
-	Wed, 12 Jun 2024 06:05:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A87A13CF84;
+	Wed, 12 Jun 2024 06:09:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LYd8gzD4"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="4YEtz0TZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCEA56458
-	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 06:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8169E12D1FE;
+	Wed, 12 Jun 2024 06:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718172303; cv=none; b=bnE/qMyorWnU2qmSMAFVmX3fw4pG4ZUmbbH4OX0S/mL0xJyRSYbuMwLFuNETOWbYrKLF0mrT0O9rr1IkyP61JYdvKtjHKFWDrqVYjxwo5ZpnyQQERLg9iMRomHi4/XrZWZ6+ZJRMhNRUaKirxMK8YrS+g0lyESHbUXrmfhWBsR8=
+	t=1718172547; cv=none; b=LsxKX8ZnveJ1JXsmhhAVK8DBeccVTGFBCCkLig3jVeVjI0soLatujcZNSIiSHJJ1xUX92mkfP7+zyMwv7VQgOYrE3h2B4kHgDZu/pVG59OW+rjh01OpO4hU690ye15hVRmhUX8+kQcaccbMh23PuzLWN43JjFAEo4Cf0D0SnkFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718172303; c=relaxed/simple;
-	bh=HmqYsLtEUXj2qybOXyBAF0G3jHgtgasQ0IDl083A9wU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Emr7LZkElJCkW6lFhJUccb8uhZuQmkMAK8mh4msKd6W1hEkYx31UvIvnhtsMsULtdoXers151RHBH0Qlpt71OF+gqKsbUemIsFfIYPUz2Khs0tSV66pLdVHr2nR/03GaAkvmQKtLL7luUWG+aigC9EhAlqYzhydLmvnXZL4bfdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LYd8gzD4; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1f70c457823so21919475ad.3
-        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 23:05:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718172301; x=1718777101; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HnhYMF/qfzt39DUGTzbb4nRd15Wmw09z1LJEukUGhF0=;
-        b=LYd8gzD49Rk/ef6fCiRBY9Vdptxw+sStX6zg10/LFSWhas2l0bV3zqcIiK3Zh/M3GO
-         rIj8poRrv46Zc3T7veTcb0TP2Rw2VyW+jwp3tXxSi89xYvHnfNy8F0Uq1dUqD6o9PaQh
-         r4tbELg5W1PuBCImwwPlGJub3O9pnKXrVUhuVdI7PQk0BqPKI0itGNGBTIrczmW6A8H5
-         00n+jeV3fH9dek1R4EKWHbzQe1G4xlIYtDOeV3aOKPjcm7PbtuAPVZLcVKpfowfm+M7h
-         if+7XaPcmhaZ6E7jbm8ow9h+ic1YCYPTkRNqE8UZvuL5bcyfFfpl0OB/k3vIvsr43KSs
-         fz8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718172301; x=1718777101;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HnhYMF/qfzt39DUGTzbb4nRd15Wmw09z1LJEukUGhF0=;
-        b=KYrvxxolf9OgLkC+70JqiGWxCqEdvYCWk9a7mzDrcWlRvQ2lNnvlaiolgrFl5Q25Sf
-         4j1VYRYTsP4uFoQeDqjg2/oxzpaFDrNQg1R001Y5avds1/cyGchYgNAdkW3TKRjEVXxr
-         zxl/pUYIJa7sgufSqFYbisU4J65qPkZAQ63ymLYb4sqxfFTi/d78YNfs5iG/ZlqRhJs5
-         SsVoPegglGZzsR9AHCS1Mq4lnXi97Jitpee4aOE847nkG+3hGolDeCxiZ0JJxgvxS/oa
-         vt38u6E6UaLFLt6aonX743fkt0YondcRR23IHv0zXX7G1VhXxFdXodVuY3GBNTmLkMmW
-         vhUw==
-X-Forwarded-Encrypted: i=1; AJvYcCWP1gWOzkxNwfe65nUgyM0iPdgztSns7Dllg+UIH0BKf3JppBC10HIH/zbLMDN3eTpz7UzE8RCRFpzr6e0DpNCW2/UirX5t
-X-Gm-Message-State: AOJu0YyU1tlIu0O++Si+DYb9z1jT/Kg3h484ylcbyd9WRWM/A+bJ+dU5
-	FWoJxP7fmgcG0rPQeTLIMcqRy7ZFhNj8/2MLuV2z8vJWcD1f5th4
-X-Google-Smtp-Source: AGHT+IF6jHTuSJGgX2oENnrzif9oOIVwc+WC0Waik/9dbY7HQ5yIYtFhDHLb8lkGH3THXi7NObx1Tw==
-X-Received: by 2002:a17:902:da92:b0:1f4:7713:8f6 with SMTP id d9443c01a7336-1f83b7164b3mr10986765ad.52.1718172296644;
-        Tue, 11 Jun 2024 23:04:56 -0700 (PDT)
-Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd75ef35sm114036175ad.56.2024.06.11.23.04.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jun 2024 23:04:55 -0700 (PDT)
-From: Taehee Yoo <ap420073@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	shannon.nelson@amd.com,
-	brett.creeley@amd.com,
-	drivers@pensando.io,
-	netdev@vger.kernel.org
-Cc: ap420073@gmail.com,
-	jacob.e.keller@intel.com
-Subject: [PATCH net v2] ionic: fix use after netif_napi_del()
-Date: Wed, 12 Jun 2024 06:04:46 +0000
-Message-Id: <20240612060446.1754392-1-ap420073@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1718172547; c=relaxed/simple;
+	bh=aFKK6Fmj0B8bfmIey09h/A+tBxReA/yVx5zmhonz0PU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=bG2pfHONzzKFlcbCCgushH6EzsTUBTJE2eQxnViuTR43qfjQcFLC/fs5bwGfjqDVRZCD2QqfqPj3X1t2/5URZnPRHw6heFDyttvZ+soniKFPVQ5uYdGUuNm4vFnR1Mhb7MyTzpNrLtiMl1ByKlhtZyLU692mbR4+MucDzdRFIBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=4YEtz0TZ; arc=none smtp.client-ip=91.207.212.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45C66ALM015571;
+	Wed, 12 Jun 2024 08:08:28 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	4BuUrXtJ8nfNNbqSYjYdRBD5SKv01tJO1QN5QZpZwhI=; b=4YEtz0TZAySLCvkt
+	xsYGrK2KlgXBA3ZTzl8DpJTicjrfPqgOYmBaMOUedIFtNJf3CAacwbg32SjpFPj5
+	FjFU2V6dc5LjbUibIwq2t7clfaqY19tzoAPYAbN2+coabAB2BslmoUzPJ7ZOUKlf
+	E8XUu1aUAOl6fCU1PnSs6BWA/VigR0sHEUybaUD5GmcK0lFFafQwPHYIXutQr+hh
+	93VQ4jZxw9uC0LV+7orKpX1I99B8vNmYaBO3+DRsGCs7iJxo1Mt0K+iFn1+ycRfM
+	G7Z9HeUp0dZHOFLInm8yH6MvG3mF5keqLLi1QpdCjTR3v9d3lriOJS9FK8o18gwr
+	aoD9CA==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ypub39r2u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Jun 2024 08:08:28 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id B2BCA40044;
+	Wed, 12 Jun 2024 08:08:23 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 90E0420D41D;
+	Wed, 12 Jun 2024 08:07:10 +0200 (CEST)
+Received: from [10.48.86.164] (10.48.86.164) by SHFDAG1NODE2.st.com
+ (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 12 Jun
+ 2024 08:07:09 +0200
+Message-ID: <1f5000c4-30cd-40fd-b610-24366a15fd6c@foss.st.com>
+Date: Wed, 12 Jun 2024 08:07:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next,PATCH v7 7/8] net: stmmac: dwmac-stm32: Mask support
+ for PMCR configuration
+To: Marek Vasut <marex@denx.de>, "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre
+ Torgue <alexandre.torgue@foss.st.com>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        Liam Girdwood
+	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20240611083606.733453-1-christophe.roullier@foss.st.com>
+ <20240611083606.733453-8-christophe.roullier@foss.st.com>
+ <ee101ca5-4444-4610-9473-1a725a542c91@denx.de>
+ <7999f3df-da1e-4902-b58a-6bb58546a634@foss.st.com>
+ <e0b9b074-3aad-4b2d-9f4e-99ad2eebbb6b@denx.de>
+Content-Language: en-US
+From: Christophe ROULLIER <christophe.roullier@foss.st.com>
+In-Reply-To: <e0b9b074-3aad-4b2d-9f4e-99ad2eebbb6b@denx.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
+ (10.75.129.70)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-12_02,2024-06-11_01,2024-05-17_01
 
-When queues are started, netif_napi_add() and napi_enable() are called.
-If there are 4 queues and only 3 queues are used for the current
-configuration, only 3 queues' napi should be registered and enabled.
-The ionic_qcq_enable() checks whether the .poll pointer is not NULL for
-enabling only the using queue' napi. Unused queues' napi will not be
-registered by netif_napi_add(), so the .poll pointer indicates NULL.
-But it couldn't distinguish whether the napi was unregistered or not
-because netif_napi_del() doesn't reset the .poll pointer to NULL.
-So, ionic_qcq_enable() calls napi_enable() for the queue, which was
-unregistered by netif_napi_del().
+Hi Marek,
 
-Reproducer:
-   ethtool -L <interface name> rx 1 tx 1 combined 0
-   ethtool -L <interface name> rx 0 tx 0 combined 1
-   ethtool -L <interface name> rx 0 tx 0 combined 4
+On 6/11/24 18:16, Marek Vasut wrote:
+> On 6/11/24 3:32 PM, Christophe ROULLIER wrote:
+>>
+>> On 6/11/24 15:07, Marek Vasut wrote:
+>>> On 6/11/24 10:36 AM, Christophe Roullier wrote:
+>>>
+>>> [...]
+>>>
+>>>>   static void stm32_dwmac_clk_disable(struct stm32_dwmac *dwmac, 
+>>>> bool suspend)
+>>>> @@ -348,8 +352,15 @@ static int stm32_dwmac_parse_data(struct 
+>>>> stm32_dwmac *dwmac,
+>>>>           return PTR_ERR(dwmac->regmap);
+>>>>         err = of_property_read_u32_index(np, "st,syscon", 1, 
+>>>> &dwmac->mode_reg);
+>>>> -    if (err)
+>>>> +    if (err) {
+>>>>           dev_err(dev, "Can't get sysconfig mode offset (%d)\n", err);
+>>>> +        return err;
+>>>> +    }
+>>>> +
+>>>> +    dwmac->mode_mask = SYSCFG_MP1_ETH_MASK;
+>>>> +    err = of_property_read_u32_index(np, "st,syscon", 2, 
+>>>> &dwmac->mode_mask);
+>>>> +    if (err)
+>>>> +        dev_dbg(dev, "Warning sysconfig register mask not set\n");
+>>>
+>>> My comment on V6 was not addressed I think ?
+>>
+>> Hi Marek,
+>>
+>> I put the modification in patch which introduce MP13 (V7 8/8) ;-)
+>>
+>>       err = of_property_read_u32_index(np, "st,syscon", 2, 
+>> &dwmac->mode_mask);
+>> -    if (err)
+>> -        dev_dbg(dev, "Warning sysconfig register mask not set\n");
+>> +    if (err) {
+>> +        if (dwmac->ops->is_mp13)
+>> +            dev_err(dev, "Sysconfig register mask must be set 
+>> (%d)\n", err);
+>> +        else
+>> +            dev_dbg(dev, "Warning sysconfig register mask not set\n");
+>> +    }
+>
+> That isn't right, is it ?
+>
+> For MP2 , this still checks the presence of syscon , which shouldn't 
+> be checked at all for MP2 as far as I understand it ?
 
-Splat looks like:
-kernel BUG at net/core/dev.c:6666!
-Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
-CPU: 3 PID: 1057 Comm: kworker/3:3 Not tainted 6.10.0-rc2+ #16
-Workqueue: events ionic_lif_deferred_work [ionic]
-RIP: 0010:napi_enable+0x3b/0x40
-Code: 48 89 c2 48 83 e2 f6 80 b9 61 09 00 00 00 74 0d 48 83 bf 60 01 00 00 00 74 03 80 ce 01 f0 4f
-RSP: 0018:ffffb6ed83227d48 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffff97560cda0828 RCX: 0000000000000029
-RDX: 0000000000000001 RSI: 0000000000000000 RDI: ffff97560cda0a28
-RBP: ffffb6ed83227d50 R08: 0000000000000400 R09: 0000000000000001
-R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000000
-R13: ffff97560ce3c1a0 R14: 0000000000000000 R15: ffff975613ba0a20
-FS:  0000000000000000(0000) GS:ffff975d5f780000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f8f734ee200 CR3: 0000000103e50000 CR4: 00000000007506f0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? die+0x33/0x90
- ? do_trap+0xd9/0x100
- ? napi_enable+0x3b/0x40
- ? do_error_trap+0x83/0xb0
- ? napi_enable+0x3b/0x40
- ? napi_enable+0x3b/0x40
- ? exc_invalid_op+0x4e/0x70
- ? napi_enable+0x3b/0x40
- ? asm_exc_invalid_op+0x16/0x20
- ? napi_enable+0x3b/0x40
- ionic_qcq_enable+0xb7/0x180 [ionic 59bdfc8a035436e1c4224ff7d10789e3f14643f8]
- ionic_start_queues+0xc4/0x290 [ionic 59bdfc8a035436e1c4224ff7d10789e3f14643f8]
- ionic_link_status_check+0x11c/0x170 [ionic 59bdfc8a035436e1c4224ff7d10789e3f14643f8]
- ionic_lif_deferred_work+0x129/0x280 [ionic 59bdfc8a035436e1c4224ff7d10789e3f14643f8]
- process_one_work+0x145/0x360
- worker_thread+0x2bb/0x3d0
- ? __pfx_worker_thread+0x10/0x10
- kthread+0xcc/0x100
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x2d/0x50
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1a/0x30
+When I will push MP2 serie, I will bypass the check of mask syscfg. I 
+will push MP2 after MP13 ack.
 
-Fixes: 0f3154e6bcb3 ("ionic: Add Tx and Rx handling")
-Signed-off-by: Taehee Yoo <ap420073@gmail.com>
----
- v2:
-  - Use ionic flag instead of napi flag.
-
- drivers/net/ethernet/pensando/ionic/ionic_lif.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-index 24870da3f484..1934e9d6d9e4 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-@@ -304,10 +304,8 @@ static int ionic_qcq_enable(struct ionic_qcq *qcq)
- 	if (ret)
- 		return ret;
- 
--	if (qcq->napi.poll)
--		napi_enable(&qcq->napi);
--
- 	if (qcq->flags & IONIC_QCQ_F_INTR) {
-+		napi_enable(&qcq->napi);
- 		irq_set_affinity_hint(qcq->intr.vector,
- 				      &qcq->intr.affinity_mask);
- 		ionic_intr_mask(idev->intr_ctrl, qcq->intr.index,
--- 
-2.34.1
+Thanks
 
 
