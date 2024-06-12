@@ -1,154 +1,81 @@
-Return-Path: <netdev+bounces-102899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B8A99055DD
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 16:54:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A31B9055E1
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 16:55:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93BF7285862
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 14:54:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E10B1F26EDE
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 14:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA0117F392;
-	Wed, 12 Jun 2024 14:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZqGE9Z35"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B11017F395;
+	Wed, 12 Jun 2024 14:54:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.aperture-lab.de (mail.aperture-lab.de [116.203.183.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096BA17F374;
-	Wed, 12 Jun 2024 14:54:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BC517F37B;
+	Wed, 12 Jun 2024 14:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.183.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718204088; cv=none; b=p4uNGbL0WBB6fvrheG4bcnOOP7zY7f2rCGhFioCJEsjC7s3nhPyUyt6gGah98/0GIbBeGkMrh4afOUlgrFlz8KK1CqoTjU7KrdZJYAGxmKxYD638aCpvwyBgpHfYCoPLq+KKlBsmVvRNWUyBbdNpjuz0jbuz0Ai/S6Kg2LiaTJg=
+	t=1718204095; cv=none; b=NI9CaB68Sc/Ijm87Yibe5mG7tYTNeUoCHTgPDB+WpMQNLHH1MdsVEiOjjJHzMTruk6FnGGhtd1jCh62f1Y1IIBd7exram6wywlyFbSA2jE5tsbrDhAT+4a+6+RXc6Is5u51Poxl8VhL0eTIXUlrlUDp90fKmr/JcJ2vgd2vEFsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718204088; c=relaxed/simple;
-	bh=OHIuj+cu4kdvIF7ubfsWz5g8ux/ANr5PX5Lbo01ZnRs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=phO3TYZkEGc7Te/qUHlGEiKDV03t4pbXBiXSBFPTL0Oz8+7oKDQlWKLbfI1n2OBflAw3QFuoFVgejHjbtEuHdpYZ5RITayov89dli6s76iMg0RELVUf8YR5TxCGsmaCgcyoYJQWM3goAHZLs4Uod4Wj6GZJvGDGXGZ39onQZmXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZqGE9Z35; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2ebe785b234so33448241fa.1;
-        Wed, 12 Jun 2024 07:54:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718204085; x=1718808885; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eFvoluEX8O1ZuVrZ4TkWpRmCK6s/5ISbLklS0xYIk/Q=;
-        b=ZqGE9Z35hfWlSEBRa29VsoKWUEH0VxNtUmpWcb6+e+nMSEAa/qFDdTC6lTKVsm60QB
-         e6/NWNHVOnUK+jcm2X5fHdnmgzAx7/wudfNyFjZ1cDgaYX9jRgrqzkDeGS69xm+klIJd
-         EFsc0LcTntbZKmmBOIMeY34K6W7ELpn9efpqHfQP9NXwIlxsLaWvJ0aW6jMDlCogEcTE
-         VPcDUGqavuZFW+Xix7PlzVhdinmuPR8/Sns0CWf7tkMd4aLZgqoS5edIekQa/i9Q+yFr
-         Ck5FfN5Qp1YzZHcSj8MFrRfZnZnfmWN4NUIem/eZyfnPCyV9locpqSWnGJQSaMhxva1d
-         WPgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718204085; x=1718808885;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eFvoluEX8O1ZuVrZ4TkWpRmCK6s/5ISbLklS0xYIk/Q=;
-        b=hyZXht01v/sfLDwLr4yf5/nlZuRNtQpwbIGPFPJkQKh0VNDkCkCb4HrM2naOXOEk9Y
-         3dS+6iv0MVL/g/R/98/vIJ2pJ8v/9SliTqFbmRkZ0lpVfYbb1CQSBDmn86KmpQqsWfWY
-         /qYsVoJcNENzCoDPZHOk7/6x1xB5BC2hHZSQk6nAJGEtUMuDM2uI4Pv0wA2RMnVVIXwY
-         4fN6owqrZn8Dofu+FeSbrrYBBjAPil03+Gnx7iTfejRspK/LWsSrGy4ruKzYJZV/FWRc
-         o6SH8AOvpWwhbMbEI+/PtgnkE/O78Z5SegjQk0HMdJ+ZgWJwO4KAFf6VL+N3mg/ooF2/
-         /HbA==
-X-Forwarded-Encrypted: i=1; AJvYcCVWENKjSZXzw1UkqqHoCSgzO1rpi/bme6VTMutCNpy6BjL9aGlSj17te+OV4IhKxWvui7MOEcphSUowqMaqKY+ECU1vIXD0IWbKbMOJDFvxbpfl79u4HhBBgrTn+CPUTW1IxxPyOWBw1cEC8dUBjSC8oxYx/KckFUgHizVFbTzFDgR254BWJlptfntLz++Fr+6nTkfJYGImIjosz+NH4da8Tg==
-X-Gm-Message-State: AOJu0YwWTqYwb4p1ZpgYng89rwKo4ngYMRbWxda8nEB3HXe/Cdn/Qc+U
-	5t823Ay5IXiNi+dZZGHYgCEkPvvApGrCWDfd4LYEpjpi0gLPunL2XGxVllRYLSytDQeAUnTBB6/
-	49dkxyMDf05vG8RZFvSQteH+uE41UNg==
-X-Google-Smtp-Source: AGHT+IEdMHZiLDsGBMrK9SAia7MmzWrOkgMko6njHoqmapJDPT6oys75Nm5/b67yHbBOs+Nsqvk1c8udWrC6CRDgao0=
-X-Received: by 2002:a2e:9290:0:b0:2ea:df2e:428c with SMTP id
- 38308e7fff4ca-2ebfca5dd9amr13446111fa.49.1718204084938; Wed, 12 Jun 2024
- 07:54:44 -0700 (PDT)
+	s=arc-20240116; t=1718204095; c=relaxed/simple;
+	bh=abvfzkYnK5q5eDVAAFXS5olkGiZ15PozttMlbU2dBMs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gfK7rqYLWtu+5fkaFRmB7OqYQ9zgrcw4kSiglKFrCmM6cyi9veS6hQgDKCweYGYmWGozIL/oYLrwIGa6/vDU92hDU9hD+7YseCFWYt04KVXjW97JOa/DucQBsMxdmUiIHKOxkUoXhQd2bTTlOq+PUCjjNlx6/h/Dsdrzly8xXbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue; spf=pass smtp.mailfrom=c0d3.blue; arc=none smtp.client-ip=116.203.183.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=c0d3.blue
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 13C193EDE0;
+	Wed, 12 Jun 2024 16:54:44 +0200 (CEST)
+Date: Wed, 12 Jun 2024 16:54:49 +0200
+From: Linus =?utf-8?Q?L=C3=BCssing?= <linus.luessing@c0d3.blue>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: b.a.t.m.a.n@lists.open-mesh.org, Dmitry Antipov <dmantipov@yandex.ru>,
+	netdev@vger.kernel.org, rcu@vger.kernel.org
+Subject: Re: [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu()
+ with free-only callbacks"
+Message-ID: <Zmm2uTHTge-i3eCM@sellars>
+References: <20240612133357.2596-1-linus.luessing@c0d3.blue>
+ <e36490a1-32af-4090-83a7-47563bce88bc@paulmck-laptop>
+ <ZmmzE6Przj0pCHek@sellars>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240612075829.18241-1-brgl@bgdev.pl> <CABBYNZLrwgj848w97GP+ijybt-yU8yMNnW5UWhb2y5Zq6b5H9A@mail.gmail.com>
- <CAMRc=Mdb31YGUUXRWACnx55JawayFaRjEPYSdjOCMrYr5xDYag@mail.gmail.com>
-In-Reply-To: <CAMRc=Mdb31YGUUXRWACnx55JawayFaRjEPYSdjOCMrYr5xDYag@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 12 Jun 2024 10:54:32 -0400
-Message-ID: <CABBYNZLPv3zk_UX67yPetQKWiQ-g+Dv9ZjZydhwG3jfaeV+48w@mail.gmail.com>
-Subject: Re: [GIT PULL] Immutable tag between the Bluetooth and pwrseq
- branches for v6.11-rc1
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZmmzE6Przj0pCHek@sellars>
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Bartosz,
+On Wed, Jun 12, 2024 at 04:39:15PM +0200, Linus Lüssing wrote:
+> On Wed, Jun 12, 2024 at 07:06:04AM -0700, Paul E. McKenney wrote:
+> > Let me make sure that I understand...
+> > 
+> > You need rcu_barrier() to wait for any memory passed to kfree_rcu()
+> > to actually be freed?  If so, please explain why you need this, as
+> > in what bad thing happens if the actual kfree() happens later.
+> > 
+> > (I could imagine something involving OOM avoidance, but I need to
+> > hear your code's needs rather than my imaginations.)
+> > 
+> > 							Thanx, Paul
+> [...]
+> As far as I understand before calling kmem_cache_destroy()
+> we need to ensure that all previously allocated objects on this
+> kmem-cache were free'd. At least we get this kernel splat
+> (from Slub?) otherwise. I'm not quite sure if any other bad things
+> other than this noise in dmesg would occur though. Other than a
+> [...]
 
-On Wed, Jun 12, 2024 at 10:45=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.pl=
-> wrote:
->
-> On Wed, Jun 12, 2024 at 4:43=E2=80=AFPM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Bartosz,
-> >
-> > On Wed, Jun 12, 2024 at 3:59=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev=
-.pl> wrote:
-> > >
-> > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > >
-> > > Hi Marcel, Luiz,
-> > >
-> > > Please pull the following power sequencing changes into the Bluetooth=
- tree
-> > > before applying the hci_qca patches I sent separately.
-> > >
-> > > Link: https://lore.kernel.org/linux-kernel/20240605174713.GA767261@bh=
-elgaas/T/
-> > >
-> > > The following changes since commit 83a7eefedc9b56fe7bfeff13b6c7356688=
-ffa670:
-> > >
-> > >   Linux 6.10-rc3 (2024-06-09 14:19:43 -0700)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   git://git.kernel.org/pub/scm/linux/kernel/git/brgl/linux.git tags/p=
-wrseq-initial-for-v6.11
-> > >
-> > > for you to fetch changes up to 2f1630f437dff20d02e4b3f07e836f42869128=
-dd:
-> > >
-> > >   power: pwrseq: add a driver for the PMU module on the QCom WCN chip=
-sets (2024-06-12 09:20:13 +0200)
-> > >
-> > > ----------------------------------------------------------------
-> > > Initial implementation of the power sequencing subsystem for linux v6=
-.11
-> > >
-> > > ----------------------------------------------------------------
-> > > Bartosz Golaszewski (2):
-> > >       power: sequencing: implement the pwrseq core
-> > >       power: pwrseq: add a driver for the PMU module on the QCom WCN =
-chipsets
-> >
-> > Is this intended to go via bluetooth-next or it is just because it is
-> > a dependency of another set? You could perhaps send another set
-> > including these changes to avoid having CI failing to compile.
-> >
->
-> No, the pwrseq stuff is intended to go through its own pwrseq tree
-> hence the PR. We cannot have these commits in next twice.
-
-Not following you here, why can't we have these commits on different
-next trees? If that is the case how can we apply the bluetooth
-specific ones without causing build regressions?
-
---=20
-Luiz Augusto von Dentz
+I guess, without knowing the details of RCU and Slub, that at
+least nothing super serious, like a segfault, can happen when
+the remaining execution is just a kfree(), which won't need
+access to batman-adv internal functions anymore.
 
