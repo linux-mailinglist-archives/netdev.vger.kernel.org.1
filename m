@@ -1,123 +1,150 @@
-Return-Path: <netdev+bounces-102847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ECEA90510A
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 13:04:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B6FA90518A
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 13:45:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A036EB21222
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 11:04:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B828B1F23505
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 11:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBFDF16F0D1;
-	Wed, 12 Jun 2024 11:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB87616D4D3;
+	Wed, 12 Jun 2024 11:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UszO4po+"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="Aq7Y21kW";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FH+cfj8N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from fout7-smtp.messagingengine.com (fout7-smtp.messagingengine.com [103.168.172.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0909016F0F0
-	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 11:04:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A1CA1420B8;
+	Wed, 12 Jun 2024 11:45:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718190248; cv=none; b=og0AwjBm3tQfu4VJAkdhWtxErqk2THL3p+gOUsr1LvZGjhqNYVfYaKvXxY9K5hSW9ni2GFgIpMcW8xJZlXTPjduHs9ZpBYtQjS+vck9xdMESeBK5KVMQTofCTu6d5EG8jbzpbeCxCFjFDzVGvqF0WAsnQ5dbV/nLXXd6NQqpIPY=
+	t=1718192736; cv=none; b=VHlLTch4L2IISHAAIn5KrS0yZvjnwS1BaqvPmDZ5CZq1cjG1bjQsysBnn9fSzSUXz+QTB19pByRIsKVXPXml1/gEE0mqZDIeHKuKx5i6VRE6aJkERUYFhlCSWsBBlFyWTcJk/kgDp6qs/c6xfK2MTXYCvs7FOjCoVyB5Ip2xfFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718190248; c=relaxed/simple;
-	bh=pw+RJOP5tBxwzihRkSI6e94yGizrIsoHviIc8xOIVv8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HZGbIbdy44LjJpjs2k41UNebld1mJAmOhLU/24dNinRBbV9DCDsc89lqUkA8F1Y/wHqmTI9ELgJ/qgPCBxt4wMzApZfTQbgtJoGllMfmlxNdzvJTuzxjfIHZuAFtbEvFUQgGt0dOtCL+2kZM73QpwFajPM8yamikgKKpDApFE3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UszO4po+; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718190246; x=1749726246;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=pw+RJOP5tBxwzihRkSI6e94yGizrIsoHviIc8xOIVv8=;
-  b=UszO4po+mmM0972Ekn3K0Ajmegl7GtKbAIWW8vLzvID0u6S+cwhR53+m
-   RFfC1CMv1O7kgnk3tSL2/9AB+iJbYj2SHB7RpBK/4gJLoZjmFdalx/+jB
-   ttjU0NyBNqfzZbx6iqTjmhd0w356J2CkDtRyC6YRmACJxCHCL2DletKfZ
-   BeDt84hpCXzr4susTj1MrKbuZY0nti92IJeiPWYnxKwguYKAr8HRj6Zxg
-   Yj9A9Qy4hBA/zxZ/aiH5Vvt+ICbJtJ3KGX+aJgOG7uf2q2vJPAZN5lQkK
-   bljQiQNDpV2szjKS9XbB3F5alOzIx4wkPBVxXy/T71GLqkP8wTXKDJkNM
-   w==;
-X-CSE-ConnectionGUID: jGtjltniTQyCCa0oYy4h+w==
-X-CSE-MsgGUID: litA2gQOTky7Eh7ClnQBSA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11100"; a="37467999"
-X-IronPort-AV: E=Sophos;i="6.08,233,1712646000"; 
-   d="scan'208";a="37467999"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 04:04:05 -0700
-X-CSE-ConnectionGUID: YhHQvWt6T5yOp7WqOVD85A==
-X-CSE-MsgGUID: yOaMtA6vRryqRzSsyA938A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,233,1712646000"; 
-   d="scan'208";a="44151451"
-Received: from unknown (HELO amlin-019-225.igk.intel.com) ([10.102.19.225])
-  by fmviesa003.fm.intel.com with ESMTP; 12 Jun 2024 04:04:04 -0700
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org,
-	Kelvin Kang <kelvin.kang@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH iwl-net v3] i40e: fix hot issue NVM content is corrupted after nvmupdate
-Date: Wed, 12 Jun 2024 13:04:02 +0200
-Message-Id: <20240612110402.3356700-1-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1718192736; c=relaxed/simple;
+	bh=oG2S4Kzid14rixJgh3ulnQ1e6vm+VNLJ3m0/vYw/4nM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V36r6qUWJA/N+CSzbP3JSmYR1WX1wNRF2Y5UAQ4ehbqQk0AwPQ4kcWK3knwiFeqvTxhgN30LlkXmKw2GlnikEYwwdvfEIJ/0SEwAwnAILUdw06Kc3vHM3ek8YLVOgGNnfLTh0Og1LXxWf2bo4+cowjK2IvKi7j9q6PHIQaN9rAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=Aq7Y21kW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FH+cfj8N; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailfout.nyi.internal (Postfix) with ESMTP id BFC981380117;
+	Wed, 12 Jun 2024 07:45:31 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute1.internal (MEProxy); Wed, 12 Jun 2024 07:45:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1718192731;
+	 x=1718279131; bh=sdail6Zp5HKLGsJ5PziERQkRfftw3aOCCiinAKseHl8=; b=
+	Aq7Y21kWKNnSOkUDgsQ5DneuWjxJMnBPsB1/giEfaYMRjBL05k9Ax9AW+gVHMht6
+	JlpfwgL8J3J+FEc4V6fffavcGueohzXFn0CyS+qRqx5OEQYjNGiF5vmNu0O5rxcm
+	jmJp7RCFGkMqUhMnPtFHgjonUpHQl6aX3ATkPaLlENbUtlNKvV+2AUl2M1hqYN7x
+	4Fd9le9zpS3yYTP4t8TgU6Ywlc7vtAqB3bFLmo7XXFDdIPPfaPsuqXRsQpux2PUa
+	GF7wC175ETjL5qx+U0NBYHlEwl0s3B9rA8zJUwt3laaCCS5sO0pWhi5o84XVcRiB
+	3d5l5IoUvMYukeOBzSKRuQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1718192731; x=
+	1718279131; bh=sdail6Zp5HKLGsJ5PziERQkRfftw3aOCCiinAKseHl8=; b=F
+	H+cfj8N/ewRh08AyNpxcyoi2D5PCLZnbOda9ZEONzZTUlc7QCiIJdwapKs94Oq0s
+	7GiMcFd/uRIN3b6c3ScY6ov+OLiOrEUNCtFIT1PLlvM9L+E2Em8jUpmjWiLwP5p2
+	9kTzU34WDR9ogw2sE3ARDRWnVl9rGQX76AX+idQAOykujkJqnD4IcePKljA8PjqW
+	0tOfeRygkZUigunqQcVY9o8dh1YreBLFgzNMwtMyMR6/xgJJamvea709PEHX8n0K
+	OD91kHihwwfBObs250FGfrHstOEvgLqq9dP0dHLAP3tV05mQBTCqDbEc6om0nE8n
+	qcXmjT9XI+qFBEAxK1iCg==
+X-ME-Sender: <xms:W4ppZrcGuLab4PUpzi-zS8i7QOpj6lSzee7zQ6DNC173B1wQSh7fSg>
+    <xme:W4ppZhNiDU2f_18egBX5iuDcbfCtdgPAjhfcHVgLzgVeQWjvaWY2NKg_cyypBPkUp
+    HrtuAF48P-lY3RiRTA>
+X-ME-Received: <xmr:W4ppZkgstK-vaPA0dtplNc3TNkZq1M0nLPlcLlprqz1kzopKIrVkRPKL8pM54Om89cMfp_iDjp0mveyHSPVuFdudup9lTrs>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrfedugedggedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhk
+    lhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnh
+    gvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeefhfellefh
+    ffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvdelieenucevlhhushhtvg
+    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggv
+    rhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgv
+X-ME-Proxy: <xmx:W4ppZs_2wjYnMVJJCRQEr5txDC-2IxWo5q0Fb97JBpgxUBQbkrVbgQ>
+    <xmx:W4ppZnvU2L_bDuWN3RrHzxr5UvpS1Qc-jXbzndBATUknOSn58be-SQ>
+    <xmx:W4ppZrGWg4p5MPJU5EK3MIVeDNPA5C73F2w6fA4ywx6-3HgoXKKfVg>
+    <xmx:W4ppZuPAMw-hSDitqXEj5mAbAz1IfqBOQ40qRsMPoGgRhQakME8gbA>
+    <xmx:W4ppZtC2Zk0D9qDqfxgdL2ImhFoYBLBYznwPZLflk_eNslDVqsN3g7ZV>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 12 Jun 2024 07:45:30 -0400 (EDT)
+Date: Wed, 12 Jun 2024 13:45:26 +0200
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next,v6] net: ethernet: rtsn: Add support for Renesas
+ Ethernet-TSN
+Message-ID: <20240612114526.GF382677@ragnatech.se>
+References: <20240610135935.2519155-1-niklas.soderlund+renesas@ragnatech.se>
+ <20240611195616.2e71c334@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240611195616.2e71c334@kernel.org>
 
-The bug affects users only at the time when they try to update NVM, and
-only F/W versions that generate errors while nvmupdate. For example X710DA2
-with 0x8000ECB7 F/W is affected, but there are probably more...
+Hi Jakub,
 
-After 230f3d53a547 patch, which should only replace F/W specific error codes
-with Linux kernel generic, all EIO errors started to be converted into EAGAIN
-which leads nvmupdate to retry until it timeouts and sometimes fails after
-more than 20 minutes in the middle of NVM update, so NVM becomes corrupted.
+Thanks for your review.
 
-Remove wrong EIO to EGAIN conversion and pass all errors as is.
+I will address all comments. I had already posted a v7 of this prior to 
+your comments addressing a silly build issue I failed to catch. I have 
+mark v7 as change requested in patchwork.
 
-Fixes: 230f3d53a547 ("i40e: remove i40e_status")
-Co-developed-by: Kelvin Kang <kelvin.kang@intel.com>
-Signed-off-by: Kelvin Kang <kelvin.kang@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
-reproduction:
-./nvmupdate64
+I do have one question.
 
-v2->v3 commit messege typos
-v1->v2 commit message update
----
- drivers/net/ethernet/intel/i40e/i40e_adminq.h | 4 ----
- 1 file changed, 4 deletions(-)
+On 2024-06-11 19:56:16 -0700, Jakub Kicinski wrote:
+> > +	netdev_info(ndev, "MAC address %pM\n", ndev->dev_addr);
+> 
+> That's fairly unusual, why print the MAC address to logs?
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.h b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-index ee86d2c..55b5bb8 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-@@ -109,10 +109,6 @@ static inline int i40e_aq_rc_to_posix(int aq_ret, int aq_rc)
- 		-EFBIG,      /* I40E_AQ_RC_EFBIG */
- 	};
- 
--	/* aq_rc is invalid if AQ timed out */
--	if (aq_ret == -EIO)
--		return -EAGAIN;
--
- 	if (!((u32)aq_rc < (sizeof(aq_to_posix) / sizeof((aq_to_posix)[0]))))
- 		return -ERANGE;
- 
+Renesas net drivers print the MAC address in probe,
+
+* RAVB
+
+    netdev_info(ndev, "Base address at %#x, %pM, IRQ %d.\n",
+            (u32)ndev->base_addr, ndev->dev_addr, ndev->irq);
+
+* SH_ETH
+
+    netdev_info(ndev, "Base address at 0x%x, %pM, IRQ %d.\n",
+            (u32)ndev->base_addr, ndev->dev_addr, ndev->irq);
+
+* RENESAS_ETHER_SWITCH
+
+    rswitch_for_each_enabled_port(priv, i) 
+    	netdev_info(priv->rdev[i]->ndev, "MAC address %pM\n",
+		priv->rdev[i]->ndev->dev_addr);
+
+I have no strong opinion on if this is good or bad, but I do think they 
+all shall behave the same. What do you think is the best way forward, 
+keep this behavior in this new RTSN driver or remove the print from the 
+old drivers?
+
 -- 
-2.25.1
-
+Kind Regards,
+Niklas Söderlund
 
