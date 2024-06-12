@@ -1,177 +1,107 @@
-Return-Path: <netdev+bounces-102933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D742A905809
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 18:04:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 10A81905831
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 18:10:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59D70B264AF
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 16:02:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B439B26D86
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 16:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7BE9186E45;
-	Wed, 12 Jun 2024 15:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 196BB181313;
+	Wed, 12 Jun 2024 16:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="ng4Q4JRj";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Jpj6nsGs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ji18+OB0"
 X-Original-To: netdev@vger.kernel.org
-Received: from wflow4-smtp.messagingengine.com (wflow4-smtp.messagingengine.com [64.147.123.139])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2963C186E24;
-	Wed, 12 Jun 2024 15:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6ACD18130D;
+	Wed, 12 Jun 2024 16:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718207975; cv=none; b=c4BdOtblawXLcBAhT85UJTtkevhnU5SZb8cmupx/I9lC/U6L8v8pnV6BfEXrsLYi9kPA5hANyDmeCU9VGZLAQ+Zzt/KbaGt2xXYT9EDRbeAiSpjai7rp7By/iiZ+1czcBz/MtdhhRuYY4USEAJHxH9daNbK45Rna5KPup1sOThI=
+	t=1718208387; cv=none; b=B7uhb8YJXsj2tjfrdYtBfRnz8wvQ5HF+VMuVpgqxYNom5ynbU94P5VKAh0RcxNG5+wA9xhJqbQRqxBsFNTFCz/3AxwrzfBZACMsHYRHnGHtSZdrcj6PKFkDPixJtJ4OzNiPLY3/zLvQ2Xn/avfzIxggTwpD2VU/IjqBpBEsak1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718207975; c=relaxed/simple;
-	bh=8wcWIDJV9i7uVZzCddioETI3Y4rYvL9XxaTQ0tokYQU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TxifyPIIra/W4NNHDUuFkRjxLKTGBcY1W3F4ANuaZYp9kY2POIyI8DQZnbDXoDcrA/6UzFoFHl2MtQ4cZ383kLqS0wbYfnfYvgrx94+iAaPLRU/gCUsMAtVj5m8d3pQ7QER9BTuFx70REaY+wuDKFpk/Au2sBNIsfB4xV7h40ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=ng4Q4JRj; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Jpj6nsGs; arc=none smtp.client-ip=64.147.123.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.48])
-	by mailflow.west.internal (Postfix) with ESMTP id B1B932CC0180;
-	Wed, 12 Jun 2024 11:59:31 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute7.internal (MEProxy); Wed, 12 Jun 2024 11:59:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1718207971; x=
-	1718215171; bh=rw3uf/fg2XLXP7lcRjaOwMtzCT7fUDyYAtYnSUPZFmc=; b=n
-	g4Q4JRjdnkfym/+aSZjd1RGZZ+vskkDnBVseuLOR1cXoX+3no3n9b2HUUYhVtCZm
-	+nKpkXHgOR2ywogfI0idg+nln8cYcsvDAFJLzfWBqrCS0EvtK8rGjJKeZ+3IdUoJ
-	v1vMZ/1puKsfL0CBx65gpz1a7pn5370VmAAGNL1nxcBAxKpBCFrhlH9KE3sPqB7F
-	ENnpVFHUMDJL3mK4PKck1vIRaVnBQLD3QMZjZnlTL16PnEbo+dC8eVi6NAe8WdFa
-	G79NODnlATgtjUrC1ss5aFWbPg0aH830yzWp2mtp284BhER/xvI+gU6F+izrkxFQ
-	C9JO13KMv7AAQcvxlP5RA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1718207971; x=
-	1718215171; bh=rw3uf/fg2XLXP7lcRjaOwMtzCT7fUDyYAtYnSUPZFmc=; b=J
-	pj6nsGsQcNpmpQA0zkMMQYHx6oebVCFRlhFOwXwbExRmBEHAhjoJuWdWr1/Ekk+p
-	lSiscmKz8PDuyjfPRlEDAicBFFEhrl9SnFwFd2nhgwRCdGyiiiyaSYiQfREGbja7
-	cWfq+XbdfzNppQhVfLjDiPFNDFuPwMI2zeg4T/GjJoVAyTyBpDB0w2TbYjT+lrKH
-	ghjdNxh/lLidJ0XlP2A2KOo9MjjpOD+x5ghU28K1qkQTF7gxyJrgsegt6Ydblfvd
-	uM6baI47SzUaM1tAk56NcinAiHRpeY6+6nLvGSCoyPuTCOQn9tjFOpizlfuPwSkJ
-	zUrwO17Dvp/w+SL3rO/1g==
-X-ME-Sender: <xms:48VpZp90qK2HiLXGUU8TzUWSXCif5jETKX0ExDck2z06MebNpIk6uQ>
-    <xme:48VpZtudCvbt0wdslFhG4o8wqAmetr8BLaXtV9FE_4PmoPaNT_BbEkUiA7g9NxMUh
-    WEsf9QprfePE4QAYw>
-X-ME-Received: <xmr:48VpZnBQnLMatkbH4vi5eEItW2gS4Zu9qWePXK4Y0nwBtcq0i_WIrfoOl9hahSTIbZTu2RHT7gdhRC75zx4FkwxRwHORU2e0HjKVQVNj>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrfedugedgleefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdljedtmdenucfjughrpefhvf
-    evufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeffrghnihgvlhcuighuuceo
-    ugiguhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepgfefgfegjefhudeike
-    dvueetffelieefuedvhfehjeeljeejkefgffeghfdttdetnecuvehluhhsthgvrhfuihii
-    vgepudenucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihii
-X-ME-Proxy: <xmx:48VpZtdL9nWYf3Kea2zVhBvSZNatkbkdDikK_OB6N7dWj_p8MgAygg>
-    <xmx:48VpZuM4eRqD3nLkaqbt5JkGfef715TyEXLbrGNCapQPXeODGlTtTg>
-    <xmx:48VpZvnG4_ohNxEfmb75BB2kCfkLJ5D2r7UTUdi8JyPcF540NBYxlw>
-    <xmx:48VpZov_6EXmjpPsH2R1QFPNj2r8efaKAowazSyqsn-2DDs47y2wEg>
-    <xmx:48VpZlOXMsYj-IKMO46XIxccub8zJZd6I_6OzSlZNpMV64EEZR__-yKl>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 12 Jun 2024 11:59:29 -0400 (EDT)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: kuba@kernel.org,
-	andrii@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	davem@davemloft.net,
-	john.fastabend@gmail.com,
-	shuah@kernel.org,
-	eddyz87@gmail.com,
-	olsajiri@gmail.com,
-	quentin@isovalent.com,
-	alan.maguire@oracle.com,
-	acme@kernel.org
-Cc: mykolal@fb.com,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next v5 10/12] bpf: selftests: nf: Opt out of using generated kfunc prototypes
-Date: Wed, 12 Jun 2024 09:58:34 -0600
-Message-ID: <044a5b10cb3abd0d71cb1c818ee0bfc4a2239332.1718207789.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <cover.1718207789.git.dxu@dxuuu.xyz>
-References: <cover.1718207789.git.dxu@dxuuu.xyz>
+	s=arc-20240116; t=1718208387; c=relaxed/simple;
+	bh=KfoVhQGh1ffGN+Vv/trt9qEbjqFsRTAgAAT6pA2n4y8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cZwC4k0IJ+1pJb09m2Zhvl1MO0sWfvTQdjUU+IvUJwwhCD9/eDTuDQ0lL5mYr9SLkkNHOOsALnVYFPICipKnlL0LPtXqk3B98RZBcUrum7qxv3RJytEgP+f1THczJ74h6ueb/OExxw01U8gOGnwG4BWtGpkGrFfYkRy73q5e3bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ji18+OB0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 658AAC32786;
+	Wed, 12 Jun 2024 16:06:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718208386;
+	bh=KfoVhQGh1ffGN+Vv/trt9qEbjqFsRTAgAAT6pA2n4y8=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=ji18+OB0ffeaYYoh2I/BYqePx0vozflXX5LIjRAzhqTtR0WDQyoQBTeQPkQSbIIsi
+	 IWrMtYhs8EMKIJHLxyb4pB8O4MOYJukaZZtLizdNvzEFaM4M47VMSiV4eZaGRFNPkL
+	 fFZuYzvxgF5Ah0OeZyTMue88PLY1QUyiZM3aNn60YjOp9YllKbTMBjmjlaaGLXJ87N
+	 SA/P15Dz1Ofy9c494GHGSXsSoqHe+8nMu8sl5DZve0wDKNngbjO3ZjhgE1PyM/WJUc
+	 gTa6k30o/w+z4CI59g9ixPbvXR/0miPVhP7TsfqAho4NfDJyC7ULNptufK8GruQqXz
+	 xJt+qsOLEELAw==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 027C1CE0DEA; Wed, 12 Jun 2024 09:06:25 -0700 (PDT)
+Date: Wed, 12 Jun 2024 09:06:25 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Linus =?iso-8859-1?Q?L=FCssing?= <linus.luessing@c0d3.blue>
+Cc: b.a.t.m.a.n@lists.open-mesh.org, Dmitry Antipov <dmantipov@yandex.ru>,
+	netdev@vger.kernel.org, rcu@vger.kernel.org
+Subject: Re: [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu()
+ with free-only callbacks"
+Message-ID: <020489fa-26a3-422c-8924-7dc71f23422c@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <20240612133357.2596-1-linus.luessing@c0d3.blue>
+ <e36490a1-32af-4090-83a7-47563bce88bc@paulmck-laptop>
+ <ZmmzE6Przj0pCHek@sellars>
+ <Zmm2uTHTge-i3eCM@sellars>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zmm2uTHTge-i3eCM@sellars>
 
-The bpf-nf selftests play various games with aliased types such that
-folks with CONFIG_NF_CONNTRACK=m/n configs can still build the
-selftests. See commits:
+On Wed, Jun 12, 2024 at 04:54:49PM +0200, Linus Lüssing wrote:
+> On Wed, Jun 12, 2024 at 04:39:15PM +0200, Linus Lüssing wrote:
+> > On Wed, Jun 12, 2024 at 07:06:04AM -0700, Paul E. McKenney wrote:
+> > > Let me make sure that I understand...
+> > > 
+> > > You need rcu_barrier() to wait for any memory passed to kfree_rcu()
+> > > to actually be freed?  If so, please explain why you need this, as
+> > > in what bad thing happens if the actual kfree() happens later.
+> > > 
+> > > (I could imagine something involving OOM avoidance, but I need to
+> > > hear your code's needs rather than my imaginations.)
+> > > 
+> > > 							Thanx, Paul
+> > [...]
+> > As far as I understand before calling kmem_cache_destroy()
+> > we need to ensure that all previously allocated objects on this
+> > kmem-cache were free'd. At least we get this kernel splat
+> > (from Slub?) otherwise. I'm not quite sure if any other bad things
+> > other than this noise in dmesg would occur though. Other than a
+> > [...]
+> 
+> I guess, without knowing the details of RCU and Slub, that at
+> least nothing super serious, like a segfault, can happen when
+> the remaining execution is just a kfree(), which won't need
+> access to batman-adv internal functions anymore.
 
-1058b6a78db2 ("selftests/bpf: Do not fail build if CONFIG_NF_CONNTRACK=m/n")
-92afc5329a5b ("selftests/bpf: Fix build errors if CONFIG_NF_CONNTRACK=m")
+We are looking into nice ways of solving this, but in the meantime,
+yes, if you are RCU-freeing slab objects into a slab that is destroyed
+at module-unload time, you currently need to stick with call_rcu()
+and rcu_barrier().
 
-Thus, it is simpler if these selftests opt out of using generated kfunc
-prototypes. The preprocessor macro this commit uses will be introduced
-in the final commit.
+We do have some potential solutions to allow use of kfree_rcu() with
+this sort of slab, but they are still strictly potential.
 
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- tools/testing/selftests/bpf/progs/test_bpf_nf.c       | 1 +
- tools/testing/selftests/bpf/progs/test_bpf_nf_fail.c  | 1 +
- tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c | 1 +
- 3 files changed, 3 insertions(+)
+Apologies for my having failed to foresee this particular trap!
 
-diff --git a/tools/testing/selftests/bpf/progs/test_bpf_nf.c b/tools/testing/selftests/bpf/progs/test_bpf_nf.c
-index 0289d8ce2b80..f7b330ddd007 100644
---- a/tools/testing/selftests/bpf/progs/test_bpf_nf.c
-+++ b/tools/testing/selftests/bpf/progs/test_bpf_nf.c
-@@ -1,4 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0
-+#define BPF_NO_KFUNC_PROTOTYPES
- #include <vmlinux.h>
- #include <bpf/bpf_helpers.h>
- #include <bpf/bpf_endian.h>
-diff --git a/tools/testing/selftests/bpf/progs/test_bpf_nf_fail.c b/tools/testing/selftests/bpf/progs/test_bpf_nf_fail.c
-index 0e4759ab38ff..a586f087ffeb 100644
---- a/tools/testing/selftests/bpf/progs/test_bpf_nf_fail.c
-+++ b/tools/testing/selftests/bpf/progs/test_bpf_nf_fail.c
-@@ -1,4 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0
-+#define BPF_NO_KFUNC_PROTOTYPES
- #include <vmlinux.h>
- #include <bpf/bpf_tracing.h>
- #include <bpf/bpf_helpers.h>
-diff --git a/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c b/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c
-index 7ea9785738b5..f8f5dc9f72b8 100644
---- a/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c
-+++ b/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: LGPL-2.1 OR BSD-2-Clause
- /* Copyright (c) 2022, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
- 
-+#define BPF_NO_KFUNC_PROTOTYPES
- #include "vmlinux.h"
- 
- #include <bpf/bpf_helpers.h>
--- 
-2.44.0
-
+							Thanx, Paul
 
