@@ -1,85 +1,152 @@
-Return-Path: <netdev+bounces-102810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 667A5904DF0
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 10:18:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDD4E904DF6
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 10:20:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05FC32870DA
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 08:18:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58F152870F9
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 08:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1E216C852;
-	Wed, 12 Jun 2024 08:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC75016D30D;
+	Wed, 12 Jun 2024 08:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="dyC52WCs"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="LninAheT"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A6E152500;
-	Wed, 12 Jun 2024 08:18:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96BA816C86C;
+	Wed, 12 Jun 2024 08:20:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718180303; cv=none; b=WSKZSVV5wLomx8HaO6x0jBEc6ZPP9lnK7q6T2vOnrTgc5vEII48UqsF58cDusuAKWxBGCpUsrlu1KDCl+0zhQzcNqSJHIera5KP/e5tIZC6Ibmt2xmYUGAwa3jZzZ4f22k0EjwLqIkLkfqCm5XGJC9G4Ka9m01Pg9kVvW8xPMsk=
+	t=1718180436; cv=none; b=Kx9ZRdxaHZJA+pdk8Y1Uem/aRQhAtMX7mbZRWEp12W3AECaiKhh7TEcaJbwmUYQtGKjAgRmU7lEJ0GMuHdnaEySJUyYY+5ZauIuUht18usD12psufjqHJ9oKjBfLnI5CjkYIN9f0Vopl7lfg1O+tNpklmaov4LaR1DeBeX7rfHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718180303; c=relaxed/simple;
-	bh=/Ook7rkBngmqtrGjbgaIrN61G62Ik1BkmitSf6tEuuM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sc7lVoYxQcQhs6Ey/ss3YoBrQG578lqcyaT7PeuGD3TBWFsL/6fEnYu4nIpkLQhN9DkQo21HDjgxdH83nD+TLbnSQ3BLVQDm8PT3w7fhOeTm8X6Qkbl2qb7YQnU+JR3IZ5pj2uAjmJpUtYnPiwv1dvewlEc8szwkosFm/zgV1+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=dyC52WCs; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=/Ook7rkBngmqtrGjbgaIrN61G62Ik1BkmitSf6tEuuM=;
-	t=1718180302; x=1719389902; b=dyC52WCstwvIAcPUL/G+x3j9Cvqk4kNf2lYoXWuYAje1AIg
-	IyRi4zVNDG3raH36rgi9gGfpMGhsXVBwWDJjEi4szPeM1k8+bGAtDBVRMLlkpP9uD4hbRLvOhFus+
-	CQeDvwT46Osm8OrRyHMGzER8a16YsLF4tjeBwXDA4QV7Witi9B+SdFfSAxFBTqYVSJXvfiQWTNn5J
-	CQcJh0QVbEMZ3rym0pKLmbo+xZ5/Fkkxl2bQ14rank7yJ2YXhZIfHqzq4+SwBFEY7B4kaAvcEaq8N
-	YNOq64CY3s9sQhZ9YrOyLB9W5BX6RFTVw25scHypndwufgiGryxCbknYxrusdVVA==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1sHJBP-0000000A3AR-0g75;
-	Wed, 12 Jun 2024 10:18:15 +0200
-Message-ID: <b3e0a55f0680b590537133bfb02cd1bbfd61a56e.camel@sipsolutions.net>
-Subject: Re: [PATCH v1 2/2] net: rfkill: Fix a logic error within
- rfkill_set_hw_state_reason()
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Zijun Hu <quic_zijuhu@quicinc.com>, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	emmanuel.grumbach@intel.com
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-Date: Wed, 12 Jun 2024 10:18:13 +0200
-In-Reply-To: <1717771212-30723-3-git-send-email-quic_zijuhu@quicinc.com>
-References: <1717771212-30723-1-git-send-email-quic_zijuhu@quicinc.com>
-	 <1717771212-30723-3-git-send-email-quic_zijuhu@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
+	s=arc-20240116; t=1718180436; c=relaxed/simple;
+	bh=nqkRr3hEqhXfpawRBXQoqriQ7Yorslv65k57UzVvhMU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ndhDGwryhcP6JskcsjzQKqxB4UzN3KBnwZfiTLn2FMXyDLf+RSYzYGue5q7rRO1EEMu+v5AUp/vgUEFxkbA+geOPj3OuhAj39Gyp96w69eJ4TrdxoeBfemEwt6AHAiW2MDtgTkfnAEQ2aOWsU0I0JYppyX+sQYjlJ/6yg6UKc+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=LninAheT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88FD2C3277B;
+	Wed, 12 Jun 2024 08:20:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1718180436;
+	bh=nqkRr3hEqhXfpawRBXQoqriQ7Yorslv65k57UzVvhMU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LninAheT/igtgi3vHkFPND6tsxz+KJap4+LsnQLQqKJfSEAGbdKfNRrZfPkYGZsCQ
+	 eOoauin7ReKXi46V47zU/pkO03GoeBhl8VvbU5Qni1cpAIgOGKDcqzaml2fAY6oYFa
+	 WZ0eDzahLSSVyRCI998EnVMZuu99SvU6wkuju9z8=
+Date: Wed, 12 Jun 2024 10:20:33 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: linux-kernel@vger.kernel.org, Dave Ertman <david.m.ertman@intel.com>,
+	Ira Weiny <ira.weiny@intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Bingbu Cao <bingbu.cao@intel.com>,
+	Tianshu Qiu <tian.shu.qiu@intel.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Michael Chan <michael.chan@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
+	Bard Liao <yung-chuan.liao@linux.intel.com>,
+	Ranjani Sridharan <ranjani.sridharan@linux.intel.com>,
+	Daniel Baluta <daniel.baluta@nxp.com>,
+	Kai Vehmanen <kai.vehmanen@linux.intel.com>,
+	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	linux-media@vger.kernel.org, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
+	sound-open-firmware@alsa-project.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 1/6] auxbus: make to_auxiliary_drv accept and return a
+ constant pointer
+Message-ID: <2024061212-excusable-dissuade-379b@gregkh>
+References: <20240611130103.3262749-7-gregkh@linuxfoundation.org>
+ <d2ffbc2d-0966-4210-a5d0-719c27d9adb1@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d2ffbc2d-0966-4210-a5d0-719c27d9adb1@intel.com>
 
-On Fri, 2024-06-07 at 22:40 +0800, Zijun Hu wrote:
-> Kernel API rfkill_set_hw_state_reason() wrongly gets previous block state
-> by using its parameter @reason as reason mask.
+On Tue, Jun 11, 2024 at 03:50:47PM +0200, Przemek Kitszel wrote:
+> On 6/11/24 15:01, Greg Kroah-Hartman wrote:
+> > In the quest to make struct device constant, start by making
+> 
+> just curious, how far it will go? eg. do you plan to convert
+> get/put_device() to accept const?
 
-Using reason as a mask is perfectly valid.
+Ugh, that should have said "in the quest to make struct device_driver
+const", not device.  devices obviously can't be constant everywhere as
+they are dynamically created.
 
-And checking that the bit changed also seems valid.
+> or convert devlink API to accept
+> consts?
 
-We might want to not schedule the worker if it's not needed, but that's
-a different issue, I don't see a real bug here?
+Again, sorry, no, typo on my part.
 
-johannes
+> 
+> > to_auziliary_drv() return a constant pointer so that drivers that call
+> 
+> typo: s/auz/aux/
 
+I'll fix this typo up, and the one above, when I commit it.
+
+> 
+> > this can be fixed up before the driver core changes.
+> > 
+> > As the return type previously was not constant, also fix up all callers
+> > that were assuming that the pointer was not going to be a constant one
+> > in order to not break the build.
+> > 
+> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> 
+> 
+> [...]
+> 
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> > index 0f17fc1181d2..7341e7c4ef24 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> > @@ -2784,7 +2784,7 @@ static struct ice_pf *
+> >   ice_ptp_aux_dev_to_owner_pf(struct auxiliary_device *aux_dev)
+> >   {
+> >   	struct ice_ptp_port_owner *ports_owner;
+> > -	struct auxiliary_driver *aux_drv;
+> > +	const struct auxiliary_driver *aux_drv;
+> >   	struct ice_ptp *owner_ptp;
+> >   	if (!aux_dev->dev.driver)
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/dev.c b/drivers/net/ethernet/mellanox/mlx5/core/dev.c
+> > index 47e7c2639774..9a79674d27f1 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/dev.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/dev.c
+> > @@ -349,7 +349,7 @@ int mlx5_attach_device(struct mlx5_core_dev *dev)
+> >   {
+> >   	struct mlx5_priv *priv = &dev->priv;
+> >   	struct auxiliary_device *adev;
+> > -	struct auxiliary_driver *adrv;
+> > +	const struct auxiliary_driver *adrv;
+> 
+> nit: in netdev we do maintain RCT order of initialization
+
+what does that mean?  Nothing is being initialized here.
+
+thanks,
+
+greg k-h
 
