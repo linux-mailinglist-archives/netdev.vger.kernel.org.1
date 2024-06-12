@@ -1,546 +1,394 @@
-Return-Path: <netdev+bounces-102993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3988905E44
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 00:12:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4250A905E7E
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 00:27:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A7E61F23A68
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 22:12:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADDB11F26B29
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 22:27:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A49312B170;
-	Wed, 12 Jun 2024 22:12:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="YWctxtXy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4469C12C48F;
+	Wed, 12 Jun 2024 22:26:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C4D8391
-	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 22:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C78455C08
+	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 22:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718230323; cv=none; b=HpPQHaX5ASXLz1wwq/3wgxZIDBjpnrhs5/pRiZn2nk7IOR8NBo1gbjvQ+FsUiDygzN+bNykZxXNEABKaOrzM7uMqsZkmKVw9cuCLK2w4u359Ck59rGanrc7TXhbUCgeqmZwJ8/pqVAos3hnq/ErxGnvbPJqbSYPFsFaz0FSiFyI=
+	t=1718231187; cv=none; b=hWLzAqx1y7yVT9yV7GcqLpVfvYSAFZ0xy3smzsdTx33hgzdYLRgujKuJz2lXPl3pW+7zKM4F/AAqvhJN5+sn6InnYAE9+VWWaXsoX+6lBr+dL1x+czb8qb4E/XbaPf9nQU8UQg+SKljCGFbNGUctjgKp7DY4cvvrLFlMndI451k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718230323; c=relaxed/simple;
-	bh=TiHhlZo7HZR1yfnnJSa1w/GEHdI4xtxB224R88h4Vnk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pJXsDCbJZaOuWxWCHZKX7MCcbcI6mZ9IwyMAcKxEj4rLRhS9lG64l/pYwnF0lbsQsHj2HG+OweHLUJf2YytCTPfOJNexFGcuJv21soLt5Z3q010NUl88dU+EcSWXO19ZA8dXb7xKGcAQdDyFu5qZb7FJyFeZScv8Rt0xgXSbfxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=YWctxtXy; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-627e3368394so4187957b3.2
-        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 15:12:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1718230320; x=1718835120; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ppMASZ0eIvj/5FKG8wqGN0hZDHJf87zO9TYcK304HR8=;
-        b=YWctxtXy/hP6KtX0NkoDimSBPyoGypgZxFYLuv9hZhJkZ1NUqe+XoRQXANgpzhd0nP
-         V+zYY5Oa6R7uLD3Y7UFRoTKdRlHoyoZY8qZo2B1F69NQBgRKK/pPf93DltBbamDmy/Jt
-         jG9EG8uKS7IRHezQXxLEvDE+UwFqjTphC7Ez8=
+	s=arc-20240116; t=1718231187; c=relaxed/simple;
+	bh=MiLr00zhU0Wv8XTksF8fvjDWlEFM2UP6UIcPayn6NtI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=mY8FotA3Q1xSL5ZGXGW5wScFwdgOnIbr/aFlH3kzM5UBWRnKMWUMq2kOLQxBuOwvEmM4efYfrtN+aoo78JaNlfzTdGYcfDbpo7tY12VDhPSs9Mg8etYj6/nPZCcZuv1hHmMAu6Fv81jMIAAPngpqjq3NhZHgWGBMfJYWPPm0esE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3745fb76682so3541165ab.2
+        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 15:26:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718230320; x=1718835120;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ppMASZ0eIvj/5FKG8wqGN0hZDHJf87zO9TYcK304HR8=;
-        b=ifeBYtiMu06eNe2ifaO6k62PL5uRfPwzgGJ8MZ4pAGv1NDnvm6OscCbp7npVhjIgts
-         GUHahYDtV8wwF8Alv2BrWhOdrpzsT1i8s7kBeeAFUbneNvCTU+X9l3tuinGOlcgIr73V
-         +7oysS99glJnNiuKpsj2e+gco7mLvikty/u9x5GbJdlqgjFgKyq6LhEMjAp6SGEJ9rf3
-         WzynxS1IOubhPZQzJq8yoS50L7lb/qfbdlvS15OFJ4akLa6xTc8f3k5PVXU/tzedEX8A
-         CVJQSg/F61+VejnTRYuzu7YwM8WvfnHmUpyy53hgShk7EGb0EYKLEmlzFJIJU1lgd5Uk
-         uecg==
-X-Forwarded-Encrypted: i=1; AJvYcCVIMoy1GFpjWoTb2taY4U8JURSTYcPXGo7glawPk9czud11Fd23+ccRioB0tevajR4gOJi+0bJtXQgTufrJuwP7IB8hxBeV
-X-Gm-Message-State: AOJu0YyLQrdU1XfRFR+KgtRcowzzZthNIdWPnNdU8wwcPtrJp7UkUl5F
-	5j0vFE9XBXxJ8+Iy+ihe7xzddoNlyDETYeyPBYhjCtz7gN9EgXZe/K0M5d/6Og==
-X-Google-Smtp-Source: AGHT+IHxzFYt0pq6Y+fA/dKuwJmOWcF4JS7vsNenIyDqRHigG6xvvdGFEw4nNPdEDBg7cQUt9d+mQg==
-X-Received: by 2002:a0d:ee45:0:b0:627:c0ab:22b9 with SMTP id 00721157ae682-62fb847de6emr29993107b3.21.1718230319867;
-        Wed, 12 Jun 2024 15:11:59 -0700 (PDT)
-Received: from [192.168.0.212] ([50.35.46.55])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b2a5c20435sm309356d6.49.2024.06.12.15.11.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Jun 2024 15:11:59 -0700 (PDT)
-Message-ID: <d366491d-2f5b-478c-8968-b0a3a298827c@broadcom.com>
-Date: Wed, 12 Jun 2024 15:11:54 -0700
+        d=1e100.net; s=20230601; t=1718231183; x=1718835983;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HzDJ/pTkToTnRpqPEuUW7Jp9VAOWrTxioldGxcPNyg4=;
+        b=VXGqU+hhtRN7rwAMYVxYMyz6aRuNCWu14U6jvPb1RM69nn3vtWlX5E2AFOnq1oFlgZ
+         bZwZTYLvbP4cSP55wZYVjO4/2aiWhnKuM62WDH+L7JLLgYveQlgD0+O6xUuuRUb/AWye
+         /ZLCg+yI1i7PHOliRIQRh2SQkpBMsgvxWOprD9jQM8ngwRlWl504KQ080/zcM0ltYJOp
+         jeTlZ/yronvuYNvSuJp6fnwkZjuIrOimEzTNckRfbUPxE1uXsEjAUNlj9Xz5kP0L/bBh
+         iOVjG2BbL2F+IHyu+9+YnS+UzYhDruzvXIWcZ37yhscCYBhJDlKaOpHkDhs11eyqgnum
+         wLCA==
+X-Forwarded-Encrypted: i=1; AJvYcCWOjwSn1z8Nm2B7btzix3qGEDdMafmVKpsno9/X96XaykqfCD/M1Pm5g+EOWiUlwJSix/h9avso5YgAsXU2HI441ue2APWQ
+X-Gm-Message-State: AOJu0YzLjZuAHYRSJQaIlfdQGLCwMn334ec81XPkOgGXEWUjZGDSpSGx
+	NiwFdckalXvUfyagJyxLfSe5G3yru8b0dPwudmdfVKOcY6Su1qQlnrm15N3Csin/8JTObh5dooU
+	+xLk7TKdFrUlElobVGIYhpHhrcf2mypfPP3qkKkWV3/jYK9WykP1KC2c=
+X-Google-Smtp-Source: AGHT+IH+kEMJLYWmZGmbCTeN/zoiW1C2uduTaxDf3bHE954pQ8myzEZMkwL7fFxnPLQGPlUjpdsjUp1kargJT7s6T8efHkwYmmI+
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 1/8] x86/vmware: Introduce VMware hypercall API
-To: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
- bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com,
- tglx@linutronix.de
-Cc: x86@kernel.org, netdev@vger.kernel.org, richardcochran@gmail.com,
- linux-input@vger.kernel.org, dmitry.torokhov@gmail.com, zackr@vmware.com,
- linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
- timothym@vmware.com, akaher@vmware.com, dri-devel@lists.freedesktop.org,
- daniel@ffwll.ch, airlied@gmail.com, tzimmermann@suse.de, mripard@kernel.org,
- maarten.lankhorst@linux.intel.com, horms@kernel.org,
- kirill.shutemov@linux.intel.com
-References: <3d6ec46c-53c2-4a13-90ff-eb419863c1d5@broadcom.com>
- <20240606232334.41384-1-alexey.makhalov@broadcom.com>
-Content-Language: en-US
-From: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Autocrypt: addr=alexey.makhalov@broadcom.com; keydata=
- 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 EuY0
-In-Reply-To: <20240606232334.41384-1-alexey.makhalov@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:2145:b0:375:ac5d:d5df with SMTP id
+ e9e14a558f8ab-375cd03a724mr2212795ab.0.1718231183340; Wed, 12 Jun 2024
+ 15:26:23 -0700 (PDT)
+Date: Wed, 12 Jun 2024 15:26:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000005348f9061ab8df82@google.com>
+Subject: [syzbot] [net?] INFO: rcu detected stall in neigh_timer_handler (8)
+From: syzbot <syzbot+5127feb52165f8ab165b@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, gregkh@linuxfoundation.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, marcello.bauer@9elements.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, stern@rowland.harvard.edu, 
+	sylv@sylv.io, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Borislav, please review v11 implementation of 1/8 based on your proposal.
-I'm waiting for your feedback before sending full v11 patchset.
-Thanks,
---Alexey
+Hello,
 
-On 6/6/24 4:23 PM, Alexey Makhalov wrote:
-> Introduce vmware_hypercall family of functions. It is a common
-> implementation to be used by the VMware guest code and virtual
-> device drivers in architecture independent manner.
-> 
-> The API consists of vmware_hypercallX and vmware_hypercall_hb_{out,in}
-> set of functions by analogy with KVM hypercall API. Architecture
-> specific implementation is hidden inside.
-> 
-> It will simplify future enhancements in VMware hypercalls such
-> as SEV-ES and TDX related changes without needs to modify a
-> caller in device drivers code.
-> 
-> Current implementation extends an idea from commit bac7b4e84323
-> ("x86/vmware: Update platform detection code for VMCALL/VMMCALL
-> hypercalls") to have a slow, but safe path vmware_hypercall_slow()
-> earlier during the boot when alternatives are not yet applied.
-> The code inherits VMWARE_CMD logic from the commit mentioned above.
-> 
-> Move common macros from vmware.c to vmware.h.
-> 
-> Signed-off-by: Alexey Makhalov <alexey.makhalov@broadcom.com>
-> ---
->   arch/x86/include/asm/vmware.h | 279 ++++++++++++++++++++++++++++++++--
->   arch/x86/kernel/cpu/vmware.c  |  58 ++++++-
->   2 files changed, 315 insertions(+), 22 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/vmware.h b/arch/x86/include/asm/vmware.h
-> index ac9fc51e2b18..724c8b9b4b8d 100644
-> --- a/arch/x86/include/asm/vmware.h
-> +++ b/arch/x86/include/asm/vmware.h
-> @@ -7,26 +7,277 @@
->   #include <linux/stringify.h>
->   
->   /*
-> - * The hypercall definitions differ in the low word of the %edx argument
-> - * in the following way: the old port base interface uses the port
-> - * number to distinguish between high- and low bandwidth versions.
-> + * VMware hypercall ABI.
-> + *
-> + * - Low bandwidth (LB) hypercalls (I/O port based, vmcall and vmmcall)
-> + * have up to 6 input and 6 output arguments passed and returned using
-> + * registers: %eax (arg0), %ebx (arg1), %ecx (arg2), %edx (arg3),
-> + * %esi (arg4), %edi (arg5).
-> + * The following input arguments must be initialized by the caller:
-> + * arg0 - VMWARE_HYPERVISOR_MAGIC
-> + * arg2 - Hypercall command
-> + * arg3 bits [15:0] - Port number, LB and direction flags
-> + *
-> + * - High bandwidth (HB) hypercalls are I/O port based only. They have
-> + * up to 7 input and 7 output arguments passed and returned using
-> + * registers: %eax (arg0), %ebx (arg1), %ecx (arg2), %edx (arg3),
-> + * %esi (arg4), %edi (arg5), %ebp (arg6).
-> + * The following input arguments must be initialized by the caller:
-> + * arg0 - VMWARE_HYPERVISOR_MAGIC
-> + * arg1 - Hypercall command
-> + * arg3 bits [15:0] - Port number, HB and direction flags
-> + *
-> + * For compatibility purposes, x86_64 systems use only lower 32 bits
-> + * for input and output arguments.
-> + *
-> + * The hypercall definitions differ in the low word of the %edx (arg3)
-> + * in the following way: the old I/O port based interface uses the port
-> + * number to distinguish between high- and low bandwidth versions, and
-> + * uses IN/OUT instructions to define transfer direction.
->    *
->    * The new vmcall interface instead uses a set of flags to select
->    * bandwidth mode and transfer direction. The flags should be loaded
-> - * into %dx by any user and are automatically replaced by the port
-> - * number if the VMWARE_HYPERVISOR_PORT method is used.
-> - *
-> - * In short, new driver code should strictly use the new definition of
-> - * %dx content.
-> + * into arg3 by any user and are automatically replaced by the port
-> + * number if the I/O port method is used.
-> + */
-> +
-> +#define VMWARE_HYPERVISOR_HB		BIT(0)
-> +#define VMWARE_HYPERVISOR_OUT		BIT(1)
-> +
-> +#define VMWARE_HYPERVISOR_PORT		0x5658
-> +#define VMWARE_HYPERVISOR_PORT_HB	(VMWARE_HYPERVISOR_PORT | \
-> +					 VMWARE_HYPERVISOR_HB)
-> +
-> +#define VMWARE_HYPERVISOR_MAGIC		0x564d5868U
-> +
-> +#define VMWARE_CMD_GETVERSION		10
-> +#define VMWARE_CMD_GETHZ		45
-> +#define VMWARE_CMD_GETVCPU_INFO		68
-> +#define VMWARE_CMD_STEALCLOCK		91
-> +
-> +#define CPUID_VMWARE_FEATURES_ECX_VMMCALL	BIT(0)
-> +#define CPUID_VMWARE_FEATURES_ECX_VMCALL	BIT(1)
-> +
-> +extern unsigned long vmware_hypercall_slow(unsigned long cmd,
-> +					   unsigned long in1, unsigned long in3,
-> +					   unsigned long in4, unsigned long in5,
-> +					   u32 *out1, u32 *out2, u32 *out3,
-> +					   u32 *out4, u32 *out5);
-> +
-> +/*
-> + * The low bandwidth call. The low word of %edx is presumed to have OUT bit
-> + * set. The high word of %edx may contain input data from the caller.
->    */
-> +#define VMWARE_HYPERCALL					\
-> +	ALTERNATIVE_2("movw %[port], %%dx\n\t"			\
-> +		      "inl (%%dx), %%eax",			\
-> +		      "vmcall", X86_FEATURE_VMCALL,		\
-> +		      "vmmcall", X86_FEATURE_VMW_VMMCALL)
-> +
-> +static inline
-> +unsigned long vmware_hypercall1(unsigned long cmd, unsigned long in1)
-> +{
-> +	unsigned long out0;
-> +
-> +	if (unlikely(!alternatives_patched) && !__is_defined(MODULE))
-> +		return vmware_hypercall_slow(cmd, in1, 0, 0, 0,
-> +					     NULL, NULL, NULL, NULL, NULL);
-> +
-> +	asm_inline volatile (VMWARE_HYPERCALL
-> +		: "=a" (out0)
-> +		: [port] "i" (VMWARE_HYPERVISOR_PORT),
-> +		  "a" (VMWARE_HYPERVISOR_MAGIC),
-> +		  "b" (in1),
-> +		  "c" (cmd),
-> +		  "d" (0)
-> +		: "cc", "memory");
-> +	return out0;
-> +}
-> +
-> +static inline
-> +unsigned long vmware_hypercall3(unsigned long cmd, unsigned long in1,
-> +				u32 *out1, u32 *out2)
-> +{
-> +	unsigned long out0;
-> +
-> +	if (unlikely(!alternatives_patched) && !__is_defined(MODULE))
-> +		return vmware_hypercall_slow(cmd, in1, 0, 0, 0,
-> +					     out1, out2, NULL, NULL, NULL);
-> +
-> +	asm_inline volatile (VMWARE_HYPERCALL
-> +		: "=a" (out0), "=b" (*out1), "=c" (*out2)
-> +		: [port] "i" (VMWARE_HYPERVISOR_PORT),
-> +		  "a" (VMWARE_HYPERVISOR_MAGIC),
-> +		  "b" (in1),
-> +		  "c" (cmd),
-> +		  "d" (0)
-> +		: "cc", "memory");
-> +	return out0;
-> +}
-> +
-> +static inline
-> +unsigned long vmware_hypercall4(unsigned long cmd, unsigned long in1,
-> +				u32 *out1, u32 *out2, u32 *out3)
-> +{
-> +	unsigned long out0;
-> +
-> +	if (unlikely(!alternatives_patched) && !__is_defined(MODULE))
-> +		return vmware_hypercall_slow(cmd, in1, 0, 0, 0,
-> +					     out1, out2, out3, NULL, NULL);
-> +
-> +	asm_inline volatile (VMWARE_HYPERCALL
-> +		: "=a" (out0), "=b" (*out1), "=c" (*out2), "=d" (*out3)
-> +		: [port] "i" (VMWARE_HYPERVISOR_PORT),
-> +		  "a" (VMWARE_HYPERVISOR_MAGIC),
-> +		  "b" (in1),
-> +		  "c" (cmd),
-> +		  "d" (0)
-> +		: "cc", "memory");
-> +	return out0;
-> +}
-> +
-> +static inline
-> +unsigned long vmware_hypercall5(unsigned long cmd, unsigned long in1,
-> +				unsigned long in3, unsigned long in4,
-> +				unsigned long in5, u32 *out2)
-> +{
-> +	unsigned long out0;
-> +
-> +	if (unlikely(!alternatives_patched) && !__is_defined(MODULE))
-> +		return vmware_hypercall_slow(cmd, in1, in3, in4, in5,
-> +					     NULL, out2, NULL, NULL, NULL);
-> +
-> +	asm_inline volatile (VMWARE_HYPERCALL
-> +		: "=a" (out0), "=c" (*out2)
-> +		: [port] "i" (VMWARE_HYPERVISOR_PORT),
-> +		  "a" (VMWARE_HYPERVISOR_MAGIC),
-> +		  "b" (in1),
-> +		  "c" (cmd),
-> +		  "d" (in3),
-> +		  "S" (in4),
-> +		  "D" (in5)
-> +		: "cc", "memory");
-> +	return out0;
-> +}
-> +
-> +static inline
-> +unsigned long vmware_hypercall6(unsigned long cmd, unsigned long in1,
-> +				unsigned long in3, u32 *out2,
-> +				u32 *out3, u32 *out4, u32 *out5)
-> +{
-> +	unsigned long out0;
-> +
-> +	if (unlikely(!alternatives_patched) && !__is_defined(MODULE))
-> +		return vmware_hypercall_slow(cmd, in1, in3, 0, 0,
-> +					     NULL, out2, out3, out4, out5);
-> +
-> +	asm_inline volatile (VMWARE_HYPERCALL
-> +		: "=a" (out0), "=c" (*out2), "=d" (*out3), "=S" (*out4),
-> +		  "=D" (*out5)
-> +		: [port] "i" (VMWARE_HYPERVISOR_PORT),
-> +		  "a" (VMWARE_HYPERVISOR_MAGIC),
-> +		  "b" (in1),
-> +		  "c" (cmd),
-> +		  "d" (in3)
-> +		: "cc", "memory");
-> +	return out0;
-> +}
-> +
-> +static inline
-> +unsigned long vmware_hypercall7(unsigned long cmd, unsigned long in1,
-> +				unsigned long in3, unsigned long in4,
-> +				unsigned long in5, u32 *out1,
-> +				u32 *out2, u32 *out3)
-> +{
-> +	unsigned long out0;
-> +
-> +	if (unlikely(!alternatives_patched) && !__is_defined(MODULE))
-> +		return vmware_hypercall_slow(cmd, in1, in3, in4, in5,
-> +					     out1, out2, out3, NULL, NULL);
-> +
-> +	asm_inline volatile (VMWARE_HYPERCALL
-> +		: "=a" (out0), "=b" (*out1), "=c" (*out2), "=d" (*out3)
-> +		: [port] "i" (VMWARE_HYPERVISOR_PORT),
-> +		  "a" (VMWARE_HYPERVISOR_MAGIC),
-> +		  "b" (in1),
-> +		  "c" (cmd),
-> +		  "d" (in3),
-> +		  "S" (in4),
-> +		  "D" (in5)
-> +		: "cc", "memory");
-> +	return out0;
-> +}
-> +
-> +#ifdef CONFIG_X86_64
-> +#define VMW_BP_CONSTRAINT "r"
-> +#else
-> +#define VMW_BP_CONSTRAINT "m"
-> +#endif
-> +
-> +/*
-> + * High bandwidth calls are not supported on encrypted memory guests.
-> + * The caller should check cc_platform_has(CC_ATTR_MEM_ENCRYPT) and use
-> + * low bandwidth hypercall if memory encryption is set.
-> + * This assumption simplifies HB hypercall implementation to just I/O port
-> + * based approach without alternative patching.
-> + */
-> +static inline
-> +unsigned long vmware_hypercall_hb_out(unsigned long cmd, unsigned long in2,
-> +				      unsigned long in3, unsigned long in4,
-> +				      unsigned long in5, unsigned long in6,
-> +				      u32 *out1)
-> +{
-> +	unsigned long out0;
-> +
-> +	asm_inline volatile (
-> +		UNWIND_HINT_SAVE
-> +		"push %%" _ASM_BP "\n\t"
-> +		UNWIND_HINT_UNDEFINED
-> +		"mov %[in6], %%" _ASM_BP "\n\t"
-> +		"rep outsb\n\t"
-> +		"pop %%" _ASM_BP "\n\t"
-> +		UNWIND_HINT_RESTORE
-> +		: "=a" (out0), "=b" (*out1)
-> +		: "a" (VMWARE_HYPERVISOR_MAGIC),
-> +		  "b" (cmd),
-> +		  "c" (in2),
-> +		  "d" (in3 | VMWARE_HYPERVISOR_PORT_HB),
-> +		  "S" (in4),
-> +		  "D" (in5),
-> +		  [in6] VMW_BP_CONSTRAINT (in6)
-> +		: "cc", "memory");
-> +	return out0;
-> +}
->   
-> -/* Old port-based version */
-> -#define VMWARE_HYPERVISOR_PORT    0x5658
-> -#define VMWARE_HYPERVISOR_PORT_HB 0x5659
-> +static inline
-> +unsigned long vmware_hypercall_hb_in(unsigned long cmd, unsigned long in2,
-> +				     unsigned long in3, unsigned long in4,
-> +				     unsigned long in5, unsigned long in6,
-> +				     u32 *out1)
-> +{
-> +	unsigned long out0;
->   
-> -/* Current vmcall / vmmcall version */
-> -#define VMWARE_HYPERVISOR_HB   BIT(0)
-> -#define VMWARE_HYPERVISOR_OUT  BIT(1)
-> +	asm_inline volatile (
-> +		UNWIND_HINT_SAVE
-> +		"push %%" _ASM_BP "\n\t"
-> +		UNWIND_HINT_UNDEFINED
-> +		"mov %[in6], %%" _ASM_BP "\n\t"
-> +		"rep insb\n\t"
-> +		"pop %%" _ASM_BP "\n\t"
-> +		UNWIND_HINT_RESTORE
-> +		: "=a" (out0), "=b" (*out1)
-> +		: "a" (VMWARE_HYPERVISOR_MAGIC),
-> +		  "b" (cmd),
-> +		  "c" (in2),
-> +		  "d" (in3 | VMWARE_HYPERVISOR_PORT_HB),
-> +		  "S" (in4),
-> +		  "D" (in5),
-> +		  [in6] VMW_BP_CONSTRAINT (in6)
-> +		: "cc", "memory");
-> +	return out0;
-> +}
-> +#undef VMW_BP_CONSTRAINT
-> +#undef VMWARE_HYPERCALL
->   
->   /* The low bandwidth call. The low word of edx is presumed clear. */
->   #define VMWARE_HYPERCALL						\
-> diff --git a/arch/x86/kernel/cpu/vmware.c b/arch/x86/kernel/cpu/vmware.c
-> index 11f83d07925e..533ac2d1de88 100644
-> --- a/arch/x86/kernel/cpu/vmware.c
-> +++ b/arch/x86/kernel/cpu/vmware.c
-> @@ -41,17 +41,9 @@
->   
->   #define CPUID_VMWARE_INFO_LEAF               0x40000000
->   #define CPUID_VMWARE_FEATURES_LEAF           0x40000010
-> -#define CPUID_VMWARE_FEATURES_ECX_VMMCALL    BIT(0)
-> -#define CPUID_VMWARE_FEATURES_ECX_VMCALL     BIT(1)
->   
-> -#define VMWARE_HYPERVISOR_MAGIC	0x564D5868
-> -
-> -#define VMWARE_CMD_GETVERSION    10
-> -#define VMWARE_CMD_GETHZ         45
-> -#define VMWARE_CMD_GETVCPU_INFO  68
->   #define VMWARE_CMD_LEGACY_X2APIC  3
->   #define VMWARE_CMD_VCPU_RESERVED 31
-> -#define VMWARE_CMD_STEALCLOCK    91
->   
->   #define STEALCLOCK_NOT_AVAILABLE (-1)
->   #define STEALCLOCK_DISABLED        0
-> @@ -110,6 +102,56 @@ struct vmware_steal_time {
->   static unsigned long vmware_tsc_khz __ro_after_init;
->   static u8 vmware_hypercall_mode     __ro_after_init;
->   
-> +unsigned long vmware_hypercall_slow(unsigned long cmd,
-> +				    unsigned long in1, unsigned long in3,
-> +				    unsigned long in4, unsigned long in5,
-> +				    u32 *out1, u32 *out2, u32 *out3,
-> +				    u32 *out4, u32 *out5)
-> +{
-> +	unsigned long out0;
-> +
-> +	switch (vmware_hypercall_mode) {
-> +	case CPUID_VMWARE_FEATURES_ECX_VMCALL:
-> +		asm_inline volatile ("vmcall"
-> +				: "=a" (out0), "=b" (*out1), "=c" (*out2),
-> +				"=d" (*out3), "=S" (*out4), "=D" (*out5)
-> +				: "a" (VMWARE_HYPERVISOR_MAGIC),
-> +				"b" (in1),
-> +				"c" (cmd),
-> +				"d" (in3),
-> +				"S" (in4),
-> +				"D" (in5)
-> +				: "cc", "memory");
-> +		break;
-> +	case CPUID_VMWARE_FEATURES_ECX_VMMCALL:
-> +		asm_inline volatile ("vmmcall"
-> +				: "=a" (out0), "=b" (*out1), "=c" (*out2),
-> +				"=d" (*out3), "=S" (*out4), "=D" (*out5)
-> +				: "a" (VMWARE_HYPERVISOR_MAGIC),
-> +				"b" (in1),
-> +				"c" (cmd),
-> +				"d" (in3),
-> +				"S" (in4),
-> +				"D" (in5)
-> +				: "cc", "memory");
-> +		break;
-> +	default:
-> +		asm_inline volatile ("movw %[port], %%dx; inl (%%dx), %%eax"
-> +				: "=a" (out0), "=b" (*out1), "=c" (*out2),
-> +				"=d" (*out3), "=S" (*out4), "=D" (*out5)
-> +				: [port] "i" (VMWARE_HYPERVISOR_PORT),
-> +				"a" (VMWARE_HYPERVISOR_MAGIC),
-> +				"b" (in1),
-> +				"c" (cmd),
-> +				"d" (in3),
-> +				"S" (in4),
-> +				"D" (in5)
-> +				: "cc", "memory");
-> +		break;
-> +	}
-> +	return out0;
-> +}
-> +
->   static inline int __vmware_platform(void)
->   {
->   	uint32_t eax, ebx, ecx, edx;
+syzbot found the following issue on:
+
+HEAD commit:    dc772f8237f9 Merge tag 'mm-hotfixes-stable-2024-06-07-15-2..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=106a891c980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=333ebe38d43c42e2
+dashboard link: https://syzkaller.appspot.com/bug?extid=5127feb52165f8ab165b
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17398dce980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=112fa5ac980000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/8c3aeafbce8e/disk-dc772f82.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/484bb26b914c/vmlinux-dc772f82.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d86a6cb060e3/bzImage-dc772f82.xz
+
+The issue was bisected to:
+
+commit a7f3813e589fd8e2834720829a47b5eb914a9afe
+Author: Marcello Sylvester Bauer <sylv@sylv.io>
+Date:   Thu Apr 11 14:51:28 2024 +0000
+
+    usb: gadget: dummy_hcd: Switch to hrtimer transfer scheduler
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1327637e980000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=10a7637e980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1727637e980000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5127feb52165f8ab165b@syzkaller.appspotmail.com
+Fixes: a7f3813e589f ("usb: gadget: dummy_hcd: Switch to hrtimer transfer scheduler")
+
+rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: {
+ 0-.... } 2647 jiffies s: 2905 root: 0x1/.
+rcu: blocking rcu_node structures (internal RCU debug):
+
+Sending NMI from CPU 1 to CPUs 0:
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+NMI backtrace for cpu 0
+CPU: 0 PID: 785 Comm: kworker/0:2 Not tainted 6.10.0-rc2-syzkaller-00315-gdc772f8237f9 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+Workqueue: usb_hub_wq hub_event
+RIP: 0010:io_serial_out+0x7e/0xc0 drivers/tty/serial/8250/8250_port.c:413
+Code: fc 89 e9 41 d3 e7 48 83 c3 40 48 89 d8 48 c1 e8 03 42 80 3c 20 00 74 08 48 89 df e8 4c 8b bf fc 44 03 3b 44 89 f0 44 89 fa ee <5b> 41 5c 41 5e 41 5f 5d c3 cc cc cc cc 89 e9 80 e1 07 38 c1 7c a7
+RSP: 0018:ffffc90000006ab0 EFLAGS: 00000002
+RAX: 0000000000000030 RBX: ffffffff94ad1200 RCX: 0000000000000000
+RDX: 00000000000003f8 RSI: 0000000000000000 RDI: 0000000000000020
+RBP: 0000000000000000 R08: ffffffff853c5efb R09: 1ffff11003f54046
+R10: dffffc0000000000 R11: ffffffff853c5eb0 R12: dffffc0000000000
+R13: 0000000000000030 R14: 0000000000000030 R15: 00000000000003f8
+FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fa2f6c67850 CR3: 00000000202f6000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <NMI>
+ </NMI>
+ <IRQ>
+ serial8250_console_write+0x1212/0x1770 drivers/tty/serial/8250/8250_port.c:3393
+ console_emit_next_record kernel/printk/printk.c:2928 [inline]
+ console_flush_all+0x865/0xfd0 kernel/printk/printk.c:2994
+ console_unlock+0x13b/0x4d0 kernel/printk/printk.c:3063
+ vprintk_emit+0x5a6/0x770 kernel/printk/printk.c:2345
+ dev_vprintk_emit+0x2ae/0x330 drivers/base/core.c:4951
+ dev_printk_emit+0xdd/0x120 drivers/base/core.c:4962
+ _dev_err+0x122/0x170 drivers/base/core.c:5017
+ wdm_int_callback+0x41f/0xac0 drivers/usb/class/cdc-wdm.c:269
+ __usb_hcd_giveback_urb+0x373/0x530 drivers/usb/core/hcd.c:1648
+ dummy_timer+0x830/0x45d0 drivers/usb/gadget/udc/dummy_hcd.c:1987
+ __run_hrtimer kernel/time/hrtimer.c:1687 [inline]
+ __hrtimer_run_queues+0x59b/0xd50 kernel/time/hrtimer.c:1751
+ hrtimer_interrupt+0x396/0x990 kernel/time/hrtimer.c:1813
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
+ __sysvec_apic_timer_interrupt+0x110/0x3f0 arch/x86/kernel/apic/apic.c:1049
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+ sysvec_apic_timer_interrupt+0x52/0xc0 arch/x86/kernel/apic/apic.c:1043
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:rtnl_notify+0x4f/0xc0 net/core/rtnetlink.c:755
+Code: 00 00 00 00 00 fc ff df e8 9e 16 38 f8 48 81 c5 f0 02 00 00 48 89 e8 48 c1 e8 03 42 80 3c 30 00 74 08 48 89 ef e8 71 da 9d f8 <48> 8b 6d 00 48 85 db 74 27 e8 73 16 38 f8 48 83 c3 06 48 89 d8 48
+RSP: 0018:ffffc90000007b10 EFLAGS: 00010246
+RAX: 1ffffffff296c6be RBX: 0000000000000000 RCX: ffff88801fd83c00
+RDX: 0000000000000101 RSI: ffffffff94b63300 RDI: ffff88802e1de8c0
+RBP: ffffffff94b635f0 R08: 0000000000000000 R09: 0000000000000820
+R10: 00004de500001511 R11: 0000000100000001 R12: 0000000000000003
+R13: ffff88802e1de8c0 R14: dffffc0000000000 R15: 0000000000000000
+ neigh_update_notify net/core/neighbour.c:2675 [inline]
+ neigh_timer_handler+0xaae/0xfd0 net/core/neighbour.c:1166
+ call_timer_fn+0x18e/0x650 kernel/time/timer.c:1792
+ expire_timers kernel/time/timer.c:1843 [inline]
+ __run_timers kernel/time/timer.c:2417 [inline]
+ __run_timer_base+0x66a/0x8e0 kernel/time/timer.c:2428
+ run_timer_base kernel/time/timer.c:2437 [inline]
+ run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2447
+ handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
+ __do_softirq kernel/softirq.c:588 [inline]
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1043
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:console_flush_all+0xaad/0xfd0 kernel/printk/printk.c:3000
+Code: ff ff e8 16 d0 1f 00 90 0f 0b 90 e9 d8 f8 ff ff e8 08 d0 1f 00 e8 83 31 10 0a 4d 85 f6 74 b6 e8 f9 cf 1f 00 fb 48 8b 44 24 70 <42> 0f b6 04 38 84 c0 48 8b 7c 24 30 0f 85 22 02 00 00 0f b6 1f 31
+RSP: 0018:ffffc9000333f040 EFLAGS: 00000293
+RAX: 1ffff92000667e54 RBX: 0000000000000000 RCX: ffff88801fd83c00
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc9000333f1f0 R08: ffffffff81765624 R09: 1ffffffff25f56ca
+R10: dffffc0000000000 R11: fffffbfff25f56cb R12: ffffffff8eb225f8
+R13: ffffffff8eb225a0 R14: 0000000000000200 R15: dffffc0000000000
+ console_unlock+0x13b/0x4d0 kernel/printk/printk.c:3063
+ vprintk_emit+0x5a6/0x770 kernel/printk/printk.c:2345
+ dev_vprintk_emit+0x2ae/0x330 drivers/base/core.c:4951
+ dev_printk_emit+0xdd/0x120 drivers/base/core.c:4962
+ _dev_info+0x122/0x170 drivers/base/core.c:5020
+ hub_port_init+0x7bf/0x2670 drivers/usb/core/hub.c:4950
+ hub_port_connect drivers/usb/core/hub.c:5450 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5661 [inline]
+ port_event drivers/usb/core/hub.c:5821 [inline]
+ hub_event+0x295f/0x5150 drivers/usb/core/hub.c:5903
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3393
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 4.241 msecs
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 5-1:1.0: nonzero urb status received: -71
+cdc_wdm 5-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 5-1:1.0: nonzero urb status received: -71
+cdc_wdm 5-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 5-1:1.0: nonzero urb status received: -71
+cdc_wdm 5-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 5-1:1.0: nonzero urb status received: -71
+cdc_wdm 5-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 5-1:1.0: nonzero urb status received: -71
+cdc_wdm 5-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 5-1:1.0: nonzero urb status received: -71
+cdc_wdm 5-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 5-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 5-1:1.0: nonzero urb status received: -71
+cdc_wdm 5-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 5-1:1.0: nonzero urb status received: -71
+cdc_wdm 5-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 5-1:1.0: nonzero urb status received: -71
+cdc_wdm 5-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 5-1:1.0: nonzero urb status received: -71
+cdc_wdm 5-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 5-1:1.0: nonzero urb status received: -71
+cdc_wdm 5-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 5-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: nonzero urb status received: -71
+cdc_wdm 2-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 2-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 1-1:1.0: nonzero urb status received: -71
+cdc_wdm 1-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 1-1:1.0: nonzero urb status received: -71
+cdc_wdm 1-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 1-1:1.0: nonzero urb status received: -71
+cdc_wdm 1-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 1-1:1.0: nonzero urb status received: -71
+cdc_wdm 1-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 1-1:1.0: nonzero urb status received: -71
+cdc_wdm 1-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 1-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 3-1:1.0: nonzero urb status received: -71
+cdc_wdm 3-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 3-1:1.0: nonzero urb status received: -71
+cdc_wdm 3-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 3-1:1.0: nonzero urb status received: -71
+cdc_wdm 3-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 3-1:1.0: nonzero urb status received: -71
+cdc_wdm 3-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 3-1:1.0: nonzero urb status received: -71
+cdc_wdm 3-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 3-1:1.0: nonzero urb status received: -71
+cdc_wdm 3-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 3-1:1.0: nonzero urb status received: -71
+cdc_wdm 3-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 3-1:1.0: nonzero urb status received: -71
+cdc_wdm 3-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 3-1:1.0: nonzero urb status received: -71
+cdc_wdm 3-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 3-1:1.0: nonzero urb status received: -71
+cdc_wdm 3-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 3-1:1.0: nonzero urb status received: -71
+cdc_wdm 3-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 3-1:1.0: nonzero urb status received: -71
+cdc_wdm 3-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 3-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: nonzero urb status received: -71
+cdc_wdm 4-1:1.0: wdm_int_callback - 0 bytes
+cdc_wdm 4-1:1.0: wdm_int_callback - usb_submit_urb failed with result -19
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
