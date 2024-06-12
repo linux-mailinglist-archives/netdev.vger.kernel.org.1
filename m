@@ -1,73 +1,86 @@
-Return-Path: <netdev+bounces-102879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01D9290541E
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 15:48:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5240F90549E
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 16:01:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFEA7287090
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 13:48:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98068B24807
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 14:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF94317E913;
-	Wed, 12 Jun 2024 13:47:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E204D17E458;
+	Wed, 12 Jun 2024 13:57:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="jDWVnBWP"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="gNdFbF4g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52AC017DE21;
-	Wed, 12 Jun 2024 13:47:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721D517E8E1
+	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 13:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718200042; cv=none; b=MWax3ITeAd9fgSpFyLZkCeXym+WbtdAqbijFLl5QfewdqbCbRrtQsVtHrBsR6lyzK6ZHe0LDEF5ww6iH1w9UqnhKxEJ9h9gJzM7YNR1KU/kE3ojwlKWDRRXvqnCVWycM5V2hUjq1wS3qofQvh44jLDpiD602L9W/MnU4jaPtyNI=
+	t=1718200663; cv=none; b=ejhaaey9mVkbidOWHWpceMoKndQXQeCD/Q5T5n77jK6OZQjUsQx/h7+vwrt7nhlYCiIOLM9HyJOkWCt8KsWoKNz28Y8u2fGcqUQH4u60sSOczTNpw9hJ6Ffp1L7gUJKrf99z6xVZ7P5vpkxKzZsz5ZWNE55Z8cBKlVcHFpe0B5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718200042; c=relaxed/simple;
-	bh=ssO7AKWWivH47PjBUEnD2sxOQ+qNcu2ycHUxzLGTkG8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qIGhbJOsZPq/5KZgC21nrXDSw1HPsl+wIVHHejFZUMpgKXWIe9XEhBUulk2Y7/aMetQ7ea7ErO0KUfowniK/V21aIj3MNWIKyRiauBwg4ND/fuFz6GaXgdOWWe/q5ak31HwRBhQP/fKGQ4IPgQy/9nVRZhtMJLfJ72C+pG2MV+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=jDWVnBWP; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45CAbXfl016569;
-	Wed, 12 Jun 2024 06:47:15 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=z
-	oGMLhEyENm8ED2Ued36MhzDnQs894Cs5YQDHOvSeys=; b=jDWVnBWPh4DyKHkXz
-	MWi1lYptmIuLHMCUNS1GgORk7OLZjMp500lGxtZW3fh60XEarAflPGzVoqyxNKEl
-	ycuQTBOPLqwcXz2A6ai9CaAd3N/BVd299pRrzv2fk/g3JCSU7pKCs4wdTGfU1jMO
-	9ODjv3wZXtWAX+D6r7/RfEihNmuUIAIyYcgUnfnr3Ij8d1L9aHAIgsivfZCRh7VP
-	LYYded9gd22NX4ub9XZpkecpU3YDPXr90rmmB2YavItUMZwt5SLIiZRjF7RlVCj7
-	2ebyJ5MdNlIw3uYVVZjtHPsHHxPRyn0VB0EF7vz1pBgsabRPOFbjiULuqlk9a4Q2
-	iWhew==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3yq8qx0u6d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Jun 2024 06:47:15 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 12 Jun 2024 06:47:13 -0700
-Received: from bharat-OptiPlex-3070.marvell.com (10.69.176.80) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server id
- 15.2.1544.4 via Frontend Transport; Wed, 12 Jun 2024 06:47:09 -0700
-From: Bharat Bhushan <bbhushan2@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <jerinj@marvell.com>,
-        <lcherian@marvell.com>, <richardcochran@gmail.com>
-CC: <bbhushan2@marvell.com>
-Subject: [net-next,v4 8/8] cn10k-ipsec: Enable outbound inline ipsec offload
-Date: Wed, 12 Jun 2024 19:16:22 +0530
-Message-ID: <20240612134622.2157086-9-bbhushan2@marvell.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240612134622.2157086-1-bbhushan2@marvell.com>
-References: <20240612134622.2157086-1-bbhushan2@marvell.com>
+	s=arc-20240116; t=1718200663; c=relaxed/simple;
+	bh=B/tz6F/uDM43AEh9FiNHITpH2lzDrglyTdjEEE9P03A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eAb0xxajWzkWnTVOgGCwmZxeR0qvSdqkum1Nk/njH/DeiOS4amAZ1JRHhkjOKVmRNgj3nrumBefE/HPewhkG7/zTlIOiw93nRLE4cZRRDkQoNcqxERWWBDpky1RxSeNEmkb1Tc4rWJSAN0xKxOo3pFpxbfNDN0kw6j4bYcQhAB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=gNdFbF4g; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 0B8633F187
+	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 13:57:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1718200659;
+	bh=450QJdaFOD/ZEOKdhYp3ewa6MAAZ+MnyJ5yZ14liXb8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=gNdFbF4gQjQCUlH30PhHGBXkQ9GNxXsnYO/7A/fwmUu65uSOx7QgxemAnh9259IzA
+	 f+b+H+uK0p/Yia3mnXQ9WaHbkQ61cfADyCCourSMQwiISud12vlifjbFsCIYm25kXz
+	 nwovh7ncrhBH1iSckKMn7RBlB1NQwypLM3rG8hpsf6Xq4FZwN7D7HsINcYWBzbYmsp
+	 Ut4dSbRJtK0L5qQhdVUn5jh79RfU3jOj1BrlUvKIazBXlVwXXd+idZGD2+U7xVdo57
+	 LpJcwUSlJcAWqIKhytzOJXDnYAOCjd7HeX1uG9kIxvcFZQ1K3aT/Gqz8LOPn+HJplu
+	 OaU+VeWPrXSbg==
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-35f2030f868so2658998f8f.2
+        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 06:57:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718200657; x=1718805457;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=450QJdaFOD/ZEOKdhYp3ewa6MAAZ+MnyJ5yZ14liXb8=;
+        b=a+6HtfY1+B4ZTTlt1KaImY2n7PZIT1/t5TvSjtTE2N1uZTlTmhhFwWBdLE6Uw5xWLg
+         f+jghForWM6eH47pi/n+90uM3Ttp9cyBSwtaStd5sgHklL1j/apx6oODJD1v/VCit0Ow
+         ZYTY1K9iZdb6EZbDgswJJRddcFYJCksYUJeswpYdF6pp3khRw3EeWK813ORDPd5RcFMs
+         b+80PsQeulkWpwFyo1t4+0ZUdRCDwEzOxJylF6hpM/LLpwGyM2Plkqhs1NhFx1nwyypM
+         LzWbGD5FZ6q9HQgdyJronpnFefAmcIyanAKRfr8ohVSp0aEANz1Qzaw75WOLft7bcPUW
+         pqLQ==
+X-Gm-Message-State: AOJu0YznhanwKGJLAndEvE+kiiUhibsFGlPMQ8BTfWfibsyAiYfCt6hG
+	Qvn0mV2nb8+2NJEXQgI/LVAH1cK4Olg4SoDIxGKIJybfjmS58VHwgI2/8RdbsHsOPKR0KEl5Gb5
+	jMz3QIl+vMO+pkuv3rdgzCbvTRan4IMnpCh8TCorqCzMlXahCw8tUdHalNZ5g29/j0gxxtw7eiJ
+	DhyZG8
+X-Received: by 2002:a05:600c:35cd:b0:422:683b:df31 with SMTP id 5b1f17b1804b1-422862b3c90mr21262015e9.7.1718200656765;
+        Wed, 12 Jun 2024 06:57:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHdpfOWSfB1/u6rk/gPaDhbIg4bOKTjwkTGoxK3fdoQ1JSH8FcOfwqkcf8jTDGOFJ8flsx6HQ==
+X-Received: by 2002:a05:600c:35cd:b0:422:683b:df31 with SMTP id 5b1f17b1804b1-422862b3c90mr21261785e9.7.1718200656350;
+        Wed, 12 Jun 2024 06:57:36 -0700 (PDT)
+Received: from XPS-17-9720.han-hoki.ts.net ([213.204.117.183])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42286eef970sm26985235e9.10.2024.06.12.06.57.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jun 2024 06:57:35 -0700 (PDT)
+From: Ghadi Elie Rahme <ghadi.rahme@canonical.com>
+To: netdev@vger.kernel.org
+Cc: stable@vger.kernel.org,
+	Ghadi Elie Rahme <ghadi.rahme@canonical.com>
+Subject: [PATCH net] bnx2x: Fix multiple UBSAN array-index-out-of-bounds
+Date: Wed, 12 Jun 2024 16:56:57 +0300
+Message-ID: <20240612135657.153658-1-ghadi.rahme@canonical.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,45 +88,182 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: 3Q-rvt5VIOhAQJC59E0TuUqujtnqJAOl
-X-Proofpoint-ORIG-GUID: 3Q-rvt5VIOhAQJC59E0TuUqujtnqJAOl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-12_07,2024-06-12_02,2024-05-17_01
 
-Hardware is initialized and netdev transmit flow is
-hooked up for outbound inline ipsec, so finally enable
-ipsec offload.
+Fix UBSAN warnings that occur when using a system with 32 physical
+cpu cores or more, or when the user defines a number of ethernet
+queues greater than or equal to FP_SB_MAX_E1x.
 
-Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+The value of the maximum number of Ethernet queues should be limited
+to FP_SB_MAX_E1x in case FCOE is disabled or to [FP_SB_MAX_E1x-1] if
+enabled to avoid out of bounds reads and writes.
+
+Stack trace:
+
+UBSAN: array-index-out-of-bounds in /home/kernel/COD/linux/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c:1529:11
+index 20 is out of range for type 'stats_query_entry [19]'
+CPU: 12 PID: 858 Comm: systemd-network Not tainted 6.9.0-060900rc7-generic #202405052133
+Hardware name: HP ProLiant DL360 Gen9/ProLiant DL360 Gen9, BIOS P89 10/21/2019
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x76/0xa0
+ dump_stack+0x10/0x20
+ __ubsan_handle_out_of_bounds+0xcb/0x110
+ bnx2x_prep_fw_stats_req+0x2e1/0x310 [bnx2x]
+ bnx2x_stats_init+0x156/0x320 [bnx2x]
+ bnx2x_post_irq_nic_init+0x81/0x1a0 [bnx2x]
+ bnx2x_nic_load+0x8e8/0x19e0 [bnx2x]
+ bnx2x_open+0x16b/0x290 [bnx2x]
+ __dev_open+0x10e/0x1d0
+ __dev_change_flags+0x1bb/0x240
+ ? sock_def_readable+0x52/0xf0
+ dev_change_flags+0x27/0x80
+ do_setlink+0xab7/0xe50
+ ? rtnl_getlink+0x3c7/0x470
+ ? __nla_validate_parse+0x49/0x1d0
+ rtnl_setlink+0x12f/0x1f0
+ ? security_capable+0x47/0x80
+ rtnetlink_rcv_msg+0x170/0x440
+ ? ep_done_scan+0xe4/0x100
+ ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+ netlink_rcv_skb+0x5d/0x110
+ rtnetlink_rcv+0x15/0x30
+ netlink_unicast+0x243/0x380
+ netlink_sendmsg+0x213/0x460
+ __sys_sendto+0x21e/0x230
+ __x64_sys_sendto+0x24/0x40
+ x64_sys_call+0x1c33/0x25c0
+ do_syscall_64+0x7e/0x180
+ ? __task_pid_nr_ns+0x6c/0xc0
+ ? syscall_exit_to_user_mode+0x81/0x270
+ ? do_syscall_64+0x8b/0x180
+ ? do_syscall_64+0x8b/0x180
+ ? __task_pid_nr_ns+0x6c/0xc0
+ ? syscall_exit_to_user_mode+0x81/0x270
+ ? do_syscall_64+0x8b/0x180
+ ? do_syscall_64+0x8b/0x180
+ ? exc_page_fault+0x93/0x1b0
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x736223927a0a
+Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 7e c3 0f 1f 44 00 00 41 54 48 83 ec 30 44 89
+RSP: 002b:00007ffc0bb2ada8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 0000583df50f9c78 RCX: 0000736223927a0a
+RDX: 0000000000000020 RSI: 0000583df50ee510 RDI: 0000000000000003
+RBP: 0000583df50d4940 R08: 00007ffc0bb2adb0 R09: 0000000000000080
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000583df5103ae0
+R13: 000000000000035a R14: 0000583df50f9c30 R15: 0000583ddddddf00
+</TASK>
+---[ end trace ]---
+------------[ cut here ]------------
+UBSAN: array-index-out-of-bounds in /home/kernel/COD/linux/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c:1546:11
+index 28 is out of range for type 'stats_query_entry [19]'
+CPU: 12 PID: 858 Comm: systemd-network Not tainted 6.9.0-060900rc7-generic #202405052133
+Hardware name: HP ProLiant DL360 Gen9/ProLiant DL360 Gen9, BIOS P89 10/21/2019
+Call Trace:
+<TASK>
+dump_stack_lvl+0x76/0xa0
+dump_stack+0x10/0x20
+__ubsan_handle_out_of_bounds+0xcb/0x110
+bnx2x_prep_fw_stats_req+0x2fd/0x310 [bnx2x]
+bnx2x_stats_init+0x156/0x320 [bnx2x]
+bnx2x_post_irq_nic_init+0x81/0x1a0 [bnx2x]
+bnx2x_nic_load+0x8e8/0x19e0 [bnx2x]
+bnx2x_open+0x16b/0x290 [bnx2x]
+__dev_open+0x10e/0x1d0
+__dev_change_flags+0x1bb/0x240
+? sock_def_readable+0x52/0xf0
+dev_change_flags+0x27/0x80
+do_setlink+0xab7/0xe50
+? rtnl_getlink+0x3c7/0x470
+? __nla_validate_parse+0x49/0x1d0
+rtnl_setlink+0x12f/0x1f0
+? security_capable+0x47/0x80
+rtnetlink_rcv_msg+0x170/0x440
+? ep_done_scan+0xe4/0x100
+? __pfx_rtnetlink_rcv_msg+0x10/0x10
+netlink_rcv_skb+0x5d/0x110
+rtnetlink_rcv+0x15/0x30
+netlink_unicast+0x243/0x380
+netlink_sendmsg+0x213/0x460
+__sys_sendto+0x21e/0x230
+__x64_sys_sendto+0x24/0x40
+x64_sys_call+0x1c33/0x25c0
+do_syscall_64+0x7e/0x180
+? __task_pid_nr_ns+0x6c/0xc0
+? syscall_exit_to_user_mode+0x81/0x270
+? do_syscall_64+0x8b/0x180
+? do_syscall_64+0x8b/0x180
+? __task_pid_nr_ns+0x6c/0xc0
+? syscall_exit_to_user_mode+0x81/0x270
+? do_syscall_64+0x8b/0x180
+? do_syscall_64+0x8b/0x180
+? exc_page_fault+0x93/0x1b0
+entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x736223927a0a
+Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 7e c3 0f 1f 44 00 00 41 54 48 83 ec 30 44 89
+RSP: 002b:00007ffc0bb2ada8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 0000583df50f9c78 RCX: 0000736223927a0a
+RDX: 0000000000000020 RSI: 0000583df50ee510 RDI: 0000000000000003
+RBP: 0000583df50d4940 R08: 00007ffc0bb2adb0 R09: 0000000000000080
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000583df5103ae0
+R13: 000000000000035a R14: 0000583df50f9c30 R15: 0000583ddddddf00
+ </TASK>
+---[ end trace ]---
+bnx2x 0000:04:00.1: 32.000 Gb/s available PCIe bandwidth (5.0 GT/s PCIe x8 link)
+bnx2x 0000:04:00.1 eno50: renamed from eth0
+------------[ cut here ]------------
+UBSAN: array-index-out-of-bounds in /home/kernel/COD/linux/drivers/net/ethernet/broadcom/bnx2x/bnx2x_sriov.c:1895:8
+index 29 is out of range for type 'stats_query_entry [19]'
+CPU: 13 PID: 163 Comm: kworker/u96:1 Not tainted 6.9.0-060900rc7-generic #202405052133
+Hardware name: HP ProLiant DL360 Gen9/ProLiant DL360 Gen9, BIOS P89 10/21/2019
+Workqueue: bnx2x bnx2x_sp_task [bnx2x]
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x76/0xa0
+ dump_stack+0x10/0x20
+ __ubsan_handle_out_of_bounds+0xcb/0x110
+ bnx2x_iov_adjust_stats_req+0x3c4/0x3d0 [bnx2x]
+ bnx2x_storm_stats_post.part.0+0x4a/0x330 [bnx2x]
+ ? bnx2x_hw_stats_post+0x231/0x250 [bnx2x]
+ bnx2x_stats_start+0x44/0x70 [bnx2x]
+ bnx2x_stats_handle+0x149/0x350 [bnx2x]
+ bnx2x_attn_int_asserted+0x998/0x9b0 [bnx2x]
+ bnx2x_sp_task+0x491/0x5c0 [bnx2x]
+ process_one_work+0x18d/0x3f0
+ worker_thread+0x304/0x440
+ ? __pfx_worker_thread+0x10/0x10
+ kthread+0xe4/0x110
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork+0x47/0x70
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork_asm+0x1a/0x30
+ </TASK>
+---[ end trace ]---
+
+Fixes: 7d0445d66a76 ("bnx2x: clamp num_queues to prevent passing a negative value")
+Signed-off-by: Ghadi Elie Rahme <ghadi.rahme@canonical.com>
 ---
-v2->v3: 
- - Moved "netdev->xfrmdev_ops = &cn10k_ipsec_xfrmdev_ops;" to previous patch
-   This fix build error with W=1
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
- drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-index 2f63d91db9ad..4a8bbb6b2b91 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-@@ -845,10 +845,10 @@ int cn10k_ipsec_init(struct net_device *netdev)
- 	memset(pf->ipsec.outb_sa->base, 0, sa_size * CN10K_IPSEC_OUTB_MAX_SA);
- 	bitmap_zero(pf->ipsec.sa_bitmap, CN10K_IPSEC_OUTB_MAX_SA);
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
+index a8e07e51418f..837617b99089 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
+@@ -66,7 +66,12 @@ static int bnx2x_calc_num_queues(struct bnx2x *bp)
+ 	if (is_kdump_kernel())
+ 		nq = 1;
  
--	/* Set xfrm device ops
--	 * NETIF_F_HW_ESP is not set as ipsec setup is not yet complete.
--	 */
-+	/* Set xfrm device ops */
- 	netdev->xfrmdev_ops = &cn10k_ipsec_xfrmdev_ops;
-+	netdev->hw_features |= NETIF_F_HW_ESP;
-+	netdev->hw_enc_features |= NETIF_F_HW_ESP;
+-	nq = clamp(nq, 1, BNX2X_MAX_QUEUES(bp));
++	int max_nq = FP_SB_MAX_E1x - 1;
++
++	if(NO_FCOE(bp))
++		max_nq = FP_SB_MAX_E1x;
++
++	nq = clamp(nq, 1, max_nq);
+ 	return nq;
+ }
  
- 	mutex_init(&pf->ipsec.lock);
- 	return 0;
 -- 
-2.34.1
+2.43.0
 
 
