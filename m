@@ -1,102 +1,183 @@
-Return-Path: <netdev+bounces-102793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08B9B904B9C
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 08:30:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F299904BB2
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 08:32:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2ACA1F21543
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 06:30:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF8971F24D3F
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 06:32:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6FDA13B797;
-	Wed, 12 Jun 2024 06:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8DD116939F;
+	Wed, 12 Jun 2024 06:32:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="0hYGDPhT"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="cA48Z/87"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4DDD13A3E3
-	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 06:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6A24F1E2;
+	Wed, 12 Jun 2024 06:32:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718173801; cv=none; b=l8GPYi3vsFVOiqTMaKKZNWONqqF1OPm4ZBFwv6Tqet66Gj8Fbb/xwo2b9YI9snAdDm8OO7SCL5GvnLiuVcEVZcL/3gn2tJZW0dqEs4Zg3keWm0TaN4bH5MBr9FKCGDfQp8tolwM4rNPF4Lr1bbtfiDocISWSnZmZ7QNpO+x3Vso=
+	t=1718173948; cv=none; b=LsCMY42xUyeWQexAevjb2ogX4S23c+xQMr3BdGT9zqBZfhDxNTVhG1iyL1sUnrN9dPj6v0uXeFnzL6RjsDxuUDC08uoxEF4QdxJ0FJPRlNbmN0cijSIGnncr/hDDVIwIunv6WiB+ZAMqG8ldeOPeFlkoBXETBJ2SbAQJHIW+3Jc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718173801; c=relaxed/simple;
-	bh=Dw8KIMMn+F28OFpTAhQjzDCM2P9ytOTncCAHmd6nIHc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PO3tWgsvI1eEKhdYDC/9EbT4UPn6aKTxhkKzv1yB93vFcBjXxvcMRxNRGoeiLavGLJ62JdFrA9tKsBf5nzNcdYrxiV4PB/UPluJyh2T/4izf/wZ1jpJhGihezfSs4xZTWwouCGYjHr5bXwPWNAFKsVSL88hjz8kmFGeZQQ2jjRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=0hYGDPhT; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-52bc1261f45so5010845e87.0
-        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 23:29:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718173798; x=1718778598; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5LH8e3qpcjluJss2hNPudK/MPhEV4gW+gLGQ/ZThC0k=;
-        b=0hYGDPhTrP5DabeRqTvEnFuUoZWnORKBU8CLTKH0A0qO0Ih0BcoPlOczkFx2/EGhLk
-         iO6lpFy/tSpQ/FuiRlomrdjp84kvZbiEiMVifwfvCwNjKCZesboHLSNzJcZXdietSsiO
-         8sHKS/1DkGxaIr3F4fAu2pmNrgUd5t6bDHPC/itLJ66ic43hvsgu8HsEuJGsS9RYLN+R
-         +1d67dHVs/HdTq2EODGcogUJK5j/i9EqCVWcsjbXwvMO4hbuwBOsnokLIZXVHNjk5BJD
-         oX5xppbcuN6Dw7RWcryH3SPhqk4hMTz7+Pz4l2pJdYRlhYL24xx14pSpQnt/ZqOUAvIT
-         IkZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718173798; x=1718778598;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5LH8e3qpcjluJss2hNPudK/MPhEV4gW+gLGQ/ZThC0k=;
-        b=OjWcThlm3L+weIB+tN4u9EFAT/xDqrn6xA06ymC7RUjtWFxB9w1oL/Tv0IYVOIXy5Q
-         m+hSRguCLFPWxhKhVM2iui02IMjjaF51pyFZSDq5fxTGCJcY99KPuOwZAOYM81CZp0U7
-         NRA2OdUA0rCJRQnC9QRKQkCOAaOnq5wpJFOeBD7N9HgxAbtKQxGsAepN47LDqCoNj1aK
-         1N/PBSfiHbQ0pYzw7DmqIm5Zu+vTEi+AXD8WIW2NFicm4WguX5WrFFkVfeuAznFzOr8o
-         PWR8l74UjDcSFuFh2f6m/ZDo+rOcUoY0UlZJMTiWBJt9VqK+BXbomT1g1u7224lOD8tl
-         XPoA==
-X-Forwarded-Encrypted: i=1; AJvYcCVvoAuqH68b1wsNcv6AzaYmj2vrbobLGV6jN0uiO2kzphgA7dLCYo3NncCunm/XGSTFHRSUedDxJbNdEorXu8Yudi4LxmDA
-X-Gm-Message-State: AOJu0YxzKDiqlgsrDIfFcp4lxzgBaT1esuaKJjk0EQISN3u4Wk9t2NqE
-	JDq0fL3zL5g24g/3MPKfKe/na/vUU4N1X2YYk3NfAur151+x8kvV9S/5fVmvijs=
-X-Google-Smtp-Source: AGHT+IFp/68HMGdtt+tnnGcItdNkBhSFo46K5V4Iw0bDMZtwLsT4wVHxdkIyBopwMlohpTWvO6o3cQ==
-X-Received: by 2002:a05:6512:1313:b0:52c:8abe:5204 with SMTP id 2adb3069b0e04-52c9a3dbeffmr624591e87.32.1718173797669;
-        Tue, 11 Jun 2024 23:29:57 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42286fe75ebsm12495135e9.9.2024.06.11.23.29.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jun 2024 23:29:56 -0700 (PDT)
-Date: Wed, 12 Jun 2024 08:29:53 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Cindy Lu <lulu@redhat.com>, dtatulea@nvidia.com, mst@redhat.com,
-	jasowang@redhat.com, virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
-Message-ID: <ZmlAYcRHMqCgYBJD@nanopsycho.orion>
-References: <20240611053239.516996-1-lulu@redhat.com>
- <20240611185810.14b63d7d@kernel.org>
+	s=arc-20240116; t=1718173948; c=relaxed/simple;
+	bh=4dHdii8akR9lrOzn8jGfbgMZstQ2GSwLDFVNPrcaCDg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=I0g6rNoHDuGpsWnAWjEiz8Md/eYIPYvRbuESGIA4y5HH/Qh652hj7dUSixgi9rxH6fKUOEAlf15MaM2O3ryA60a8uLaGRxXMtgjeZP3dwkdMy8lnrB8Q6TZb+BjEMUX47VIVqyGnPeBqIC0t4UXCDVVGtVWSy1gJcSXuHsuORQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=cA48Z/87; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45C4ZRa0018918;
+	Wed, 12 Jun 2024 06:32:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=4Eu/NjVNDUuNgiyJfnDnh4
+	fuQyxxYidx16la+oXTQLE=; b=cA48Z/87XPehjLgN6OjkjwfK7NcBKrUMNOzCPB
+	MyhUTziVvF56aDMbk57oli7XgZiKq+vYq8FA82e+Oxs+ROwwSwlsfLnutExIx9Ao
+	DLirI/bs+Qi5zatUqunv0NzO87c6dGM6budwexTPvDWJygIj/qrP8iJbJ/uTYzPU
+	cC8aTGu2TfxdOrekvC/knzb8U7AONGiKamAQeSj18YCVsOKnhky+0WIzr2Rhifc6
+	dtvYplH0c1Qr9cboyyoQw8yDx3D2k9zRGmsanpLC+4OPNhAtG/jIO9dVM1zF+RIJ
+	flYWcJywb1OPnt1wlCPGD+2e40AYA5Y6+ELmddfVOFDgyzeA==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yq4s8g782-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Jun 2024 06:32:19 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA04.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45C6WJUS004791
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Jun 2024 06:32:19 GMT
+Received: from hu-sarannya-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Tue, 11 Jun 2024 23:32:14 -0700
+From: Sarannya S <quic_sarannya@quicinc.com>
+To: <quic_bjorande@quicinc.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-remoteproc@vger.kernel.org>, Chris Lew <quic_clew@quicinc.com>,
+        Sarannya Sasikumar <quic_sarannya@quicinc.com>,
+        Simon Horman
+	<horms@kernel.org>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "open
+ list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: [PATCH V2] net: qrtr: ns: Ignore ENODEV failures in ns
+Date: Wed, 12 Jun 2024 12:01:56 +0530
+Message-ID: <20240612063156.1377210-1-quic_sarannya@quicinc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240611185810.14b63d7d@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: zECIYlj_08IzxJvPe3yczXMuPV2bwC8h
+X-Proofpoint-ORIG-GUID: zECIYlj_08IzxJvPe3yczXMuPV2bwC8h
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-12_02,2024-06-11_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
+ spamscore=0 mlxscore=0 malwarescore=0 phishscore=0 lowpriorityscore=0
+ priorityscore=1501 clxscore=1015 mlxlogscore=787 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406120044
 
-Wed, Jun 12, 2024 at 03:58:10AM CEST, kuba@kernel.org wrote:
->On Tue, 11 Jun 2024 13:32:32 +0800 Cindy Lu wrote:
->> Add new UAPI to support the mac address from vdpa tool
->> Function vdpa_nl_cmd_dev_config_set_doit() will get the
->> MAC address from the vdpa tool and then set it to the device.
->> 
->> The usage is: vdpa dev set name vdpa_name mac **:**:**:**:**:**
->
->Why don't you use devlink?
+From: Chris Lew <quic_clew@quicinc.com>
 
-Fair question. Why does vdpa-specific uapi even exist? To have
-driver-specific uapi Does not make any sense to me :/
+Ignore the ENODEV failures returned by kernel_sendmsg(). These errors
+indicate that either the local port has been closed or the remote has
+gone down. Neither of these scenarios are fatal and will eventually be
+handled through packets that are later queued on the control port.
+
+Signed-off-by: Chris Lew <quic_clew@quicinc.com>
+Signed-off-by: Sarannya Sasikumar <quic_sarannya@quicinc.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+Changes from previous revision:
+Changed return type of service_announce_del from int to void.
+Fixed alignment issues.
+
+ net/qrtr/ns.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
+index 654a3cc0d347..3de9350cbf30 100644
+--- a/net/qrtr/ns.c
++++ b/net/qrtr/ns.c
+@@ -132,8 +132,8 @@ static int service_announce_new(struct sockaddr_qrtr *dest,
+ 	return kernel_sendmsg(qrtr_ns.sock, &msg, &iv, 1, sizeof(pkt));
+ }
+ 
+-static int service_announce_del(struct sockaddr_qrtr *dest,
+-				struct qrtr_server *srv)
++static void service_announce_del(struct sockaddr_qrtr *dest,
++				 struct qrtr_server *srv)
+ {
+ 	struct qrtr_ctrl_pkt pkt;
+ 	struct msghdr msg = { };
+@@ -157,10 +157,10 @@ static int service_announce_del(struct sockaddr_qrtr *dest,
+ 	msg.msg_namelen = sizeof(*dest);
+ 
+ 	ret = kernel_sendmsg(qrtr_ns.sock, &msg, &iv, 1, sizeof(pkt));
+-	if (ret < 0)
++	if (ret < 0 && ret != -ENODEV)
+ 		pr_err("failed to announce del service\n");
+ 
+-	return ret;
++	return;
+ }
+ 
+ static void lookup_notify(struct sockaddr_qrtr *to, struct qrtr_server *srv,
+@@ -188,7 +188,7 @@ static void lookup_notify(struct sockaddr_qrtr *to, struct qrtr_server *srv,
+ 	msg.msg_namelen = sizeof(*to);
+ 
+ 	ret = kernel_sendmsg(qrtr_ns.sock, &msg, &iv, 1, sizeof(pkt));
+-	if (ret < 0)
++	if (ret < 0 && ret != -ENODEV)
+ 		pr_err("failed to send lookup notification\n");
+ }
+ 
+@@ -207,6 +207,9 @@ static int announce_servers(struct sockaddr_qrtr *sq)
+ 	xa_for_each(&node->servers, index, srv) {
+ 		ret = service_announce_new(sq, srv);
+ 		if (ret < 0) {
++			if (ret == -ENODEV)
++				continue;
++
+ 			pr_err("failed to announce new service\n");
+ 			return ret;
+ 		}
+@@ -369,7 +372,7 @@ static int ctrl_cmd_bye(struct sockaddr_qrtr *from)
+ 		msg.msg_namelen = sizeof(sq);
+ 
+ 		ret = kernel_sendmsg(qrtr_ns.sock, &msg, &iv, 1, sizeof(pkt));
+-		if (ret < 0) {
++		if (ret < 0 && ret != -ENODEV) {
+ 			pr_err("failed to send bye cmd\n");
+ 			return ret;
+ 		}
+@@ -443,7 +446,7 @@ static int ctrl_cmd_del_client(struct sockaddr_qrtr *from,
+ 		msg.msg_namelen = sizeof(sq);
+ 
+ 		ret = kernel_sendmsg(qrtr_ns.sock, &msg, &iv, 1, sizeof(pkt));
+-		if (ret < 0) {
++		if (ret < 0 && ret != -ENODEV) {
+ 			pr_err("failed to send del client cmd\n");
+ 			return ret;
+ 		}
+-- 
+2.25.1
+
 
