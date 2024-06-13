@@ -1,113 +1,136 @@
-Return-Path: <netdev+bounces-103327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6656A9079E8
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 19:32:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62389907A01
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 19:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FE4F1F2227F
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 17:32:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CFCEEB23FA9
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 17:38:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E51CE149C79;
-	Thu, 13 Jun 2024 17:31:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554FD14A098;
+	Thu, 13 Jun 2024 17:38:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f36hYXdC"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="NtzwmtRz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C08B1474AF
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 17:31:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADED433A4;
+	Thu, 13 Jun 2024 17:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718299919; cv=none; b=kKXDWUg6HbAqRNMnipkBH3P1RoVtonOTAYPHMA2KqpCoXq+B9WTnMkLBej5vTssfXw8U/N/zdKH5EZ2lEBDCqoOmZbi66Qk3QqNcsG5gvjcapCdQ0ha2TWDwzA/GtJVBnCM9XM2ypx8fF+va7Lff6KL1UagUN+4l/5CMPKp2pd0=
+	t=1718300321; cv=none; b=eAIycD8BhKfBRQF2R5yTkUjEMHhVLHoqxCZKYla3rZ9gUVYkH2floR+uRSoeDZ1S5GPjEsik8rppY4WrEOHBz1AgT8F0XcVJVY5j0uJycBTmEfghgB+DS0E16CZgK9HY21b4D2EA7yWIkYa887Sn8+Yi36o5fIeCqwy8mhSJ/GQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718299919; c=relaxed/simple;
-	bh=xbE+/ETFeEQlT4vgIYucCFchmJYHLBJk8LKXtJ10G6I=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=J7cSuUGND6yoo56RL4ioe+2+Zy5H+SpU6Hglg7IorXiL4eB+oRAh48RaV5oBedCK8FFknK8DB2XY4s2rDaaHwmBxwzc9NLZFq/ObEvEf3B3sTOiR7Otr5lygjYQ494FnbPFBNJsQpSZn7kUI0wKGx0TkRRATJc6AoHEhkoZ2rcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--maze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f36hYXdC; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--maze.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-631d53af5e1so7363917b3.2
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 10:31:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718299917; x=1718904717; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xcnrVmBX5qHwP9gdhcfAMKGSVU0cmZnsSa23d9Ql3w0=;
-        b=f36hYXdCoURs7v2OpnN7QnGwpF/vmkr62VaKj48QClWCxAxzUxPkL/N/mvAwOAHh4s
-         dSp/lNzvoVdQprX6AQWr79LlvCnxPDvgi14V9u1qkgAOZVo3rRBSQe/ftMQlMiITgIac
-         K7PyvJ90kAODn1DdwlSl9rpkBQOgDGfP5ccyG8LstDPa9gUmVbL5a350Bc8Ip51Ryta7
-         2GSSF+bQMppn5wwgSn6+WwGYQINGqYyj3laqoXEDrhPA/kXawHgyJXAffigBVN1JGsvO
-         k6M0QfSM3YXHbAHWEBcG9rU7Mb0nYAtDY8ZTYwLrSj849ohmFQBJkP6F3FlQDLaF4i5o
-         acwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718299917; x=1718904717;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xcnrVmBX5qHwP9gdhcfAMKGSVU0cmZnsSa23d9Ql3w0=;
-        b=Q+4XluSA6hyc77QpvBv+Gswp096Xl1PmLTKlOxo0z9yJzHq/hvCTGfS7dPO5xZhFMN
-         0OkGJLNM9mspMtWWT3UqLHqPNxRubbsW9LJBGAPa15goBdACAnTLz7PFor9iH5HLi4sf
-         kifrN9YmQxtipGRC3K4qw0s2SyMBCb4cs4UXO7IiccesMOy1UngCOCpH6tnH5IOaoknR
-         TCFtWyu2X4uERSM6q8wHSDB1UMgilXYKUBkRNn+EIscHW61jCpENnJ6j+rdWwu/L/AWo
-         HoG8wQSWS0HHiSkGu0S5DbhwH1e8YIbpIg0/uTWSrHwMhp14e0cWPuKWWmv5vFGyOI4f
-         HlFg==
-X-Gm-Message-State: AOJu0YznQ6qu37L15nQKMGW/lwkkK4Pd73VrLss28lfY5CKK6RCbMoNv
-	ZXGfyCQYl+QhgBT+vOzqAgZMRgz56jjkykRvNN/L1FakmHqbgfomk/WqErJr5AYKYmVgsQ==
-X-Google-Smtp-Source: AGHT+IF/EDbDOw9PfT/Z0FCcjwucpuLWvcOdvkfWpSLtmSbYw8wjEr28MzGUsEM1/rBoZK/ZAPLnjeS5
-X-Received: from varda.mtv.corp.google.com ([2620:15c:211:200:31e9:ec1a:5b87:e9f8])
- (user=maze job=sendgmr) by 2002:a05:690c:9d:b0:62d:42d:5f63 with SMTP id
- 00721157ae682-63223c4070fmr277607b3.5.1718299917421; Thu, 13 Jun 2024
- 10:31:57 -0700 (PDT)
-Date: Thu, 13 Jun 2024 10:31:46 -0700
+	s=arc-20240116; t=1718300321; c=relaxed/simple;
+	bh=iHrGBdCbZI2bStSbB8zQUHcxeTKog1kQOycxa6OEd14=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QTzV9AZlwSvpdaOoLJ0XRBj0QBbo8QT20BsYluuI/0GMPYhu5Le18kBAS6nVzkAblA9O/46x88jZbLagabzCEYw62NBUJEMVW4OyopD8w2MTlINHZdbHPHrZvd12Xn5Lxz5h4u52pkwl7aWL2K1ZGM7rPsnuT4zJApGjE50DxC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=NtzwmtRz; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1718300308;
+	bh=iHrGBdCbZI2bStSbB8zQUHcxeTKog1kQOycxa6OEd14=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NtzwmtRzXbCIGztjkGdDShXjrZTC/Ly0c8lotFu2MjMLQqolth5maGlsYhHgYY6Cm
+	 i/xFL1Dx5aUezuTk7dASqlDjEf+QuLx8RHz1DGU3LzqAkmtctrSmkPBJrxr41jzKKp
+	 lbX3DaolNUJ/+koLsSqUKYFZA5IQftzXkTt6KJWrkirXqQezSnRdocS846urwocawl
+	 9ogJKPsL20k6HxWW6QLZUOEbfjkAOhsLctQWpcxozb3B/ymKIz/pXu8j3ta+wUCJNg
+	 MtlYOpvnRPM8Wi+lPcdl7SYcbN2EEvYpjTzWIGe4UPjjQRLx33lmAkB0kfN3KeQa19
+	 MCodr9xvFjGiw==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 9FD2060079;
+	Thu, 13 Jun 2024 17:38:21 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id 2C001201EC1;
+	Thu, 13 Jun 2024 17:38:18 +0000 (UTC)
+Message-ID: <711d788e-14e4-41fe-99ea-4c50be008018@fiberby.net>
+Date: Thu, 13 Jun 2024 17:38:17 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.2.627.g7a2c4fd464-goog
-Message-ID: <20240613173146.2524647-1-maze@google.com>
-Subject: [PATCH bpf v2] bpf: fix UML x86_64 compile failure
-From: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>
-To: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <zenczykowski@gmail.com>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, BPF Mailing List <bpf@vger.kernel.org>, 
-	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Andrii Nakryiko <andrii@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Alexei Starovoitov <ast@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/5] net: flower: validate encapsulation control
+ flags
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Edward Cree <ecree.xilinx@gmail.com>,
+ Martin Habets <habetsm.xilinx@gmail.com>, linux-net-drivers@amd.com,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, linux-rdma@vger.kernel.org,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org,
+ Louis Peens <louis.peens@corigine.com>, oss-drivers@corigine.com,
+ linux-kernel@vger.kernel.org, Davide Caratti <dcaratti@redhat.com>,
+ i.maximets@ovn.org
+References: <20240609173358.193178-1-ast@fiberby.net>
+ <20240612180419.391f584d@kernel.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <20240612180419.391f584d@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-pcpu_hot (defined in arch/x86) is not available on user mode linux (ARCH=3D=
-um)
+Hi Jakub,
 
-Cc: Andrii Nakryiko <andrii@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>
-Fixes: 1ae6921009e5 ("bpf: inline bpf_get_smp_processor_id() helper")
-Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
----
- kernel/bpf/verifier.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 6/13/24 1:04 AM, Jakub Kicinski wrote:
+> On Sun,  9 Jun 2024 17:33:50 +0000 Asbjørn Sloth Tønnesen wrote:
+>> Now that all drivers properly rejects unsupported flower control flags
+>> used with FLOW_DISSECTOR_KEY_CONTROL, then time has come to add similar
+>> checks to the drivers supporting FLOW_DISSECTOR_KEY_ENC_CONTROL.
+> 
+> Thanks for doing this work!
 
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index 36ef8e96787e..7a354b1e6197 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -20313,7 +20313,7 @@ static int do_misc_fixups(struct bpf_verifier_env *=
-env)
- 			goto next_insn;
- 		}
-=20
--#ifdef CONFIG_X86_64
-+#if defined(CONFIG_X86_64) && !defined(CONFIG_UML)
- 		/* Implement bpf_get_smp_processor_id() inline. */
- 		if (insn->imm =3D=3D BPF_FUNC_get_smp_processor_id &&
- 		    prog->jit_requested && bpf_jit_supports_percpu_insn()) {
---=20
-2.45.2.627.g7a2c4fd464-goog
+Thank you, for maintaining the tree!
 
+> Do you have any more of such series left?
+
+Not at the moment, I only stumbled upon this, because I read the code
+with an eye on adding a new IS_JUMBO_FRAME flag (patches for which are
+almost ready).
+
+Once this[1] currently RFC patch goes in, I might try to move all
+control flags in under FLOW_DIS_F_*, to get rid of the then
+FLOW_DIS_(IS_FRAGMENT|FIRST_FRAG|ENCAPSULATION|F_*).
+
+[1] [RFC PATCH net-next 1/9] net/sched: flower: define new tunnel flags
+https://lore.kernel.org/netdev/20240611235355.177667-2-ast@fiberby.net/
+
+> Could we perhaps consider
+> recording the driver support somewhere in struct net_device and do
+> the rejecting in the core?
+
+Sure, it could work for the control flags, and used_keys validation,
+but I am not sure if it is worth it, as most of the validation is
+very specific to the limitations of the different hardware. An easy
+first step in that direction would be to move the used_keys checks
+behind a helper, and possibly storing used_keys in struct net_device.
+
+> That's much easier to extend when adding
+> new flags than updating all the drivers.
+
+That's how it is now, with the new helpers, as all flags are
+unsupported, unless the driver specifically supports it.
+
+Any new flag only needs to be added to the core, and drivers only needs
+to be updated when they implement offloading support for a flag.
+
+> This series I think may not be a great first candidate as IIUC all
+> drivers would reject so the flag would be half-dead...
+
+Correct. I don't know if there is any hardware support planned for the
+tunnel-related encapsulation control flags.
+
+-- 
+Best regards
+Asbjørn Sloth Tønnesen
+Network Engineer
+Fiberby - AS42541
 
