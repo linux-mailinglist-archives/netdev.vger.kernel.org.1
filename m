@@ -1,100 +1,119 @@
-Return-Path: <netdev+bounces-103347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C328D907AF3
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 20:18:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA0DE907B27
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 20:22:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA95C1C22DA8
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 18:18:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 462C7B23B85
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 18:22:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CE4814A623;
-	Thu, 13 Jun 2024 18:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE90814B940;
+	Thu, 13 Jun 2024 18:21:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="N+ZqosIY"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lUK9ZmP+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2658D1304AB
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 18:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD5214A624
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 18:21:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718302695; cv=none; b=oieyM0FE7Rva5EhRdcaQ5QXjhdmXehr5AkVw2QeIvp7dQP/WirCJjTMSRnqs6wHcyDQa2Lh2DYtlzPlJQCEoLfcjtg1+c9cvnK5d8Xr7hVAoh307WvTB2t+wiB6fEldhdDy5lAFf8To3tqAofZnXuqUt64MXji6YFZC4Is3blGY=
+	t=1718302910; cv=none; b=S8RMP1C7AepcdMdLPSR3MMBUwsmxRDkgra8VdVfXsj6fv7X5E3uQRieSKSyRq59lxtUoQMqO6uE223hXfl6RRhpjZ+632wx4N9yKnBJifacamDflamRhS8EG5X/L5ASmx9K+xk5wCB1jrYq2QcUKuekrJw6LFsNUCm3QGO0DPEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718302695; c=relaxed/simple;
-	bh=VmpvWSzugIB9sHC+Poxu1Uf7slG8yypxWRCwzH/6k54=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=moor+z6VwYQKHZJ7wIX43BuzfGL6XhWgphhMW+tD64n3PsuQdk9lvt56xg8S7ZD+4ZTAaHOXfgBwKSs8EkM5UeJhdO0mvLgGrEfTOpwGKKDYrA2O5IppZw15jxFvZcHU/pBO0co4yqVRbSXXjuV6raK1dllhPP793Bk102nTqgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=N+ZqosIY; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2ebe0a81dc8so14560801fa.2
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 11:18:12 -0700 (PDT)
+	s=arc-20240116; t=1718302910; c=relaxed/simple;
+	bh=Eg3PsnHVSYuLn+uKCQz7YExSHrr2gIhjUaFUT+0OM7g=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=LmBuqBsFRZsuJupvStI1W/I7XEcE9MrRL5ebjq3KGmzqlOjiDhtCrBr+HNQM7aEyKjbGY5qHst7XWSV6R6Kv4+OU8JtJ6lTdBS/30MLfvhmdLQ0wuupv/2qr0NiZPFqskcGU2DLZhvZ1PG194gu9C4YdcGCQC8yhQlBPc+hereo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lUK9ZmP+; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-42122ac2f38so8760115e9.1
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 11:21:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1718302691; x=1718907491; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=U32F52trfP/t5Glv8Me8l9/yxhLD4fCfQobPR+5mCxw=;
-        b=N+ZqosIYQRBpwNBvO0WpKhEwRUO2RzwvI9d4SFdLeUeA907dPngkkJpBI30yODrlqQ
-         BQTSK7fsOBab42H3DOFes00qdUdrMevsCAYATRLqjF5rAWtHRQfeVBY00t0iyuQIaS0S
-         Vf2s6MS+t7szcUY5VBLByvPO/O4bfhJewfZdw=
+        d=linaro.org; s=google; t=1718302907; x=1718907707; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QUxyMjU71ZE+fUPetZ6OJeVBxDmLzc8mtYCL3gsGt3s=;
+        b=lUK9ZmP+mAfBhy+5w0FZ/fWbkMITJqtWW0NAaRfyZPeTfXL5jMAr7mYStE/wl5KrVU
+         hy0a6wTwzMN+vD1BTuIx8U7aejrTiiqIFNDNkIEIugTpPXNmolkslgBoicXnEOtmI110
+         uN0iBiNNX1tHzgPjJREin7VYCd2i0iEfM2BoPZKeoQb4RrtP1FW0vS88pKKzIrufyO46
+         Coi6hOXVptR4SYI0eEDQ0AEJckgs57x7cYEDWe5YpQ+HpEnIOkgGzvv83XMHkh9iJvB5
+         XU4AbAwdPBXHRFa526OTRiRga5uafHCkgJX4gsS90DWKDvA0Vrk01n1bUjEahNtDfVwv
+         1YpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718302691; x=1718907491;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=U32F52trfP/t5Glv8Me8l9/yxhLD4fCfQobPR+5mCxw=;
-        b=eITdPKM0xbRznua0PCPxLBeJT844FQiTztScNS98wcj1bzr+McDrU1YNSXPpRgOeCw
-         Uqifhdl+Kqja+vL4mFfSEo4mx5EjwcwoSKTFIALYZ5w+oOOSrGSfMEKqTevrsDGxaflL
-         7CSv+Ph33zd/wRomtRH43Ml7CKQaLPrCI7tcbzvxyw/EZd8UnlicmjsO2OMNLDmmu1Dw
-         QPRDRA4M0NTXCqMVOpL2mqxK0ef6KTGg7yaFR4HCOQU/HMgnAchNHLkq0LiPtvUIhzHd
-         5KjtnmHVAtsazvJV9xLKOLVE+JHDU4+SaRWVPqoluldhfhXy7l4Xjsne6XgGzoZzJxK+
-         /m9g==
-X-Gm-Message-State: AOJu0YyKwRC1gckkhZBLQVqf4YcTFz6fxG3PMqz1aQOwP8Xfwk8u1GLy
-	02xuqGVv51yWIObpGhXHCGmisEVmJUwkooRVZoA3jDla5J9BAiitCTFFhVOVFMBIUOqOcIoSa3b
-	Xq+reHQ==
-X-Google-Smtp-Source: AGHT+IEMJYduikU4h5BJzIpBZTCSOWskp7z0kOPAXC/MaTzO7tKT1Twb8i/8+OIFCbZRDWGtJKlVnA==
-X-Received: by 2002:a2e:3505:0:b0:2e9:4c17:9c83 with SMTP id 38308e7fff4ca-2ec0e60e9a8mr4277281fa.47.1718302691058;
-        Thu, 13 Jun 2024 11:18:11 -0700 (PDT)
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com. [209.85.208.44])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb741e79asm1187994a12.74.2024.06.13.11.18.09
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jun 2024 11:18:09 -0700 (PDT)
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-579fa270e53so1961102a12.3
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 11:18:09 -0700 (PDT)
-X-Received: by 2002:a50:96c3:0:b0:57c:9c5d:d18e with SMTP id
- 4fb4d7f45d1cf-57cbd6a85e1mr446474a12.36.1718302689163; Thu, 13 Jun 2024
- 11:18:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718302907; x=1718907707;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QUxyMjU71ZE+fUPetZ6OJeVBxDmLzc8mtYCL3gsGt3s=;
+        b=OaUrC0VnjODkEb0/bzKGClMIpL9WASbRewoJD1hhiKTX5hGoCLxzjdWJ9eukZGCXMY
+         kPxeLR1f1glEtY14dBV5eqlCrExmhnUj8uesgVGrU3Mozsmb05VeGFe6XgdWVUGlJ0X0
+         9cFMeFnvP8vMjpelPvalKNtNO3mOasoi61zlrRAtO6KeKD6n4HXqAeX+9421JqZvpk+N
+         AX5tgQ4SHL5NRcAPe+Jg0Rh219J8jWBtfM6Tka16GHt6H+7ggymTVRQd3gpKqwUycBeh
+         T067HV/jTzcaQm9ZPlNFxJGBqtYV4uRt35bMUbwCUz5KwLiXfJSLl9KioSrydZgQvPZH
+         tCtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWzk8Zz1K8D7OBQ3zCdsu8CiQfVbW8ruTZWZSMC6hjw3peGNPGurJF0rK7HuhzUmYzaoCRubAiDPXvb2sj+y78VNbgVn7C9
+X-Gm-Message-State: AOJu0Yxr0I7HKozU3nx/kZXK2KifLzRd1a2gKbWy0ripBTqMl4D5k7x/
+	AapcTnDlC83835v1DCHl/wQjFusGegzQV2GYQuvLqeN+LSS70gxanqcze5tQUeo=
+X-Google-Smtp-Source: AGHT+IHE8xPRTkTbm1KPshLdZzNhvmcmIrYIfPgMiJtdCnz+qehS2fJwkgES/YPzH7zgsVHVrvOTGQ==
+X-Received: by 2002:a05:600c:4506:b0:421:392b:7e13 with SMTP id 5b1f17b1804b1-422b6dc80c2mr39801835e9.4.1718302907122;
+        Thu, 13 Jun 2024 11:21:47 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422f641a5b4sm33163135e9.41.2024.06.13.11.21.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jun 2024 11:21:46 -0700 (PDT)
+Date: Thu, 13 Jun 2024 21:21:42 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Hyunwoo Kim <v4bel@theori.io>,
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH net-next] atm: clean up a put_user() calls
+Message-ID: <04a018e8-7433-4f67-8ddd-9357a0114f87@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240613163542.130374-1-kuba@kernel.org>
-In-Reply-To: <20240613163542.130374-1-kuba@kernel.org>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 13 Jun 2024 11:17:52 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiNgwEpfTpz0c9NXvZvLFPVs15LeFfmhAUO_XhQTXfahQ@mail.gmail.com>
-Message-ID: <CAHk-=wiNgwEpfTpz0c9NXvZvLFPVs15LeFfmhAUO_XhQTXfahQ@mail.gmail.com>
-Subject: Re: [GIT PULL] Networking for v6.10-rc4
-To: Jakub Kicinski <kuba@kernel.org>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-On Thu, 13 Jun 2024 at 09:35, Jakub Kicinski <kuba@kernel.org> wrote:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.10-rc4
+Unlike copy_from_user(), put_user() and get_user() return -EFAULT on
+error.  Use the error code directly instead of setting it.
 
-Your key had expired, and the kernel.org repo doesn't have the updated key.
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ net/atm/ioctl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-But for once, the key servers actually did update and a refresh fixed
-it for me.  Whee! Is the pgp key infrastructure starting to work
-again?
+diff --git a/net/atm/ioctl.c b/net/atm/ioctl.c
+index f81f8d56f5c0..0f7a39aeccc8 100644
+--- a/net/atm/ioctl.c
++++ b/net/atm/ioctl.c
+@@ -68,7 +68,7 @@ static int do_vcc_ioctl(struct socket *sock, unsigned int cmd,
+ 			goto done;
+ 		}
+ 		error = put_user(sk->sk_sndbuf - sk_wmem_alloc_get(sk),
+-				 (int __user *)argp) ? -EFAULT : 0;
++				 (int __user *)argp);
+ 		goto done;
+ 	case SIOCINQ:
+ 	{
+@@ -83,7 +83,7 @@ static int do_vcc_ioctl(struct socket *sock, unsigned int cmd,
+ 		skb = skb_peek(&sk->sk_receive_queue);
+ 		amount = skb ? skb->len : 0;
+ 		spin_unlock_irq(&sk->sk_receive_queue.lock);
+-		error = put_user(amount, (int __user *)argp) ? -EFAULT : 0;
++		error = put_user(amount, (int __user *)argp);
+ 		goto done;
+ 	}
+ 	case ATM_SETSC:
+-- 
+2.43.0
 
-                            Linus
 
