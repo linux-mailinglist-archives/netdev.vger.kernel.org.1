@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-103275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBCC39075B5
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:51:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17E829075B7
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:52:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC57A1C23F60
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:51:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E88A1C20491
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76AAE2AEFE;
-	Thu, 13 Jun 2024 14:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E7E1465B4;
+	Thu, 13 Jun 2024 14:51:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ubimet.com header.i=@ubimet.com header.b="mJj2Amng"
+	dkim=pass (2048-bit key) header.d=ubimet.com header.i=@ubimet.com header.b="iwtSTx9J"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx2-at.ubimet.com (mx2-at.ubimet.com [141.98.226.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3EC5B646;
-	Thu, 13 Jun 2024 14:51:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2565145FFC;
+	Thu, 13 Jun 2024 14:51:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.98.226.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718290311; cv=none; b=GEupB5vRTXf+LOTkKGmELNsbl00VcXbIOXfgKAfvIju7H6FT4+88DYPiSGvC6Ep/mZE2x4UPwCuPCKI8DtJImPGfMe4eKCt1M2KuZEA1Fx7cE4hNL7SIJrsbFcWHshw0OvFWsB3+aRFtj2kcXfvM2HCDDD2o1bG+O6RNgjJGZQg=
+	t=1718290313; cv=none; b=rN6s/2qeBGkYzvQGA9W8N/Dre51gaok4fjXSyajZjv8VhmRxaLFtF8UGkDq4HJx3sIPRT6AiziEyNPLvrfSjMZrGpKSC7pcBy5G73uzBSk+HZ9c+tbhPoEh62hAWrxKi5iHhoj6k5CC4NpqKsWzuNZygsiz7AnWn1DlMkV2dFW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718290311; c=relaxed/simple;
-	bh=7rakcWxS0PcSIHVBs6vd5F2lWfJa0cr5Bx4OndF8dMM=;
+	s=arc-20240116; t=1718290313; c=relaxed/simple;
+	bh=dCOgK4sfEtIQpb4RENghRtBqFmwAJPeeYxG6sUQTPdI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mGBBDB5tT2uGZgdV8efNP6A83eJfwi7t24eg+XbmmEMpP4JSs0Nq170kcKmL8erdYDPkpgtLhOYZHEBAb4+YJtYcOAU7LPIz55CEJqsCvezxudjynaJY1g8U9JDBal2/3iY/RliBgwG8PDJ1GD0f4gi+ZOkH0sLfwgRTfz62OsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ubimet.com; spf=pass smtp.mailfrom=ubimet.com; dkim=pass (2048-bit key) header.d=ubimet.com header.i=@ubimet.com header.b=mJj2Amng; arc=none smtp.client-ip=141.98.226.72
+	 MIME-Version:Content-Type; b=JHpiySHHh9T88NVRa8krp2uDDGMdyd3IUoAShBnffoPDx8ielaMypvACcZ5KXS7baHq4tuLhc+PJQ8nHMxJUzwahqKkRRc4iuIOqjgavb4CRorJRBpTtgTTdjqLO91S0k/etPU9Ofdkry+o3F9lf2N6s+4X5i8FOiP3v6I0yVhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ubimet.com; spf=pass smtp.mailfrom=ubimet.com; dkim=pass (2048-bit key) header.d=ubimet.com header.i=@ubimet.com header.b=iwtSTx9J; arc=none smtp.client-ip=141.98.226.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ubimet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ubimet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx2-at.ubimet.com (Postfix) with ESMTP id DFC5A81188;
-	Thu, 13 Jun 2024 14:51:47 +0000 (UTC)
+	by mx2-at.ubimet.com (Postfix) with ESMTP id 44CA281189;
+	Thu, 13 Jun 2024 14:51:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ubimet.com;
-	s=20200131mdel; t=1718290307;
-	bh=7rakcWxS0PcSIHVBs6vd5F2lWfJa0cr5Bx4OndF8dMM=;
+	s=20200131mdel; t=1718290310;
+	bh=dCOgK4sfEtIQpb4RENghRtBqFmwAJPeeYxG6sUQTPdI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mJj2AmngiAJMOmGOSMOSevprFaHji/y/A0K2lLtFNu8HX1l42DsPM3cYojdznjkzt
-	 v/8GKawjZYoiEf1bZRmtQsNNX/iTi4RBX1p4OlSaWxybhzIZIQlEWtjaNjpYRM3V00
-	 bim2SULXwyZtYN30PKRJHWQIt1GbnrmCBErKSrBUgK1TBvBsS/xJDoxw6tdEZcwfS1
-	 CYyBuizqeWw+ymvQJtNxMQ6j9SlyIDCynv/hClNMjO6j3NVfALn0OJlDYYEsp1V4nT
-	 mlQvgIClztJc0/cLJERcPwhnkEuNEqNmgF97T+R8uMDGgBqmpk+CaYC+S4NlJ9f2fw
-	 3dh6wT9M+LLqw==
+	b=iwtSTx9J3xUieRImFoua/WutLs3bBXAdgbVLLpi/pAuptT2kucUA+E6nBXD/O21ar
+	 VBsLUeZd5hQ2Q/uAgaPZ9fMb4xqJjjE8ygOgFwSkf6TCkD/oPCikFc4RDX4K8Jn5pU
+	 SVawoKoygB+vCQdegHov37G9vdRB/UwqBRIXwP66R0OgsM2s5DTCdtQ0ozTJDRH519
+	 BKYzvYz38xX+RedqC09Ey5AmHDHEpSkw2EYfRu9YtFE0bylntA6nJpXmciu4f0qjPT
+	 bDpXdCq0G4RLxCo0zPciB1b06dlVvE4oyVRBmgPPeoDu2iz/CBq/gvbCJCnPW+cu/x
+	 9QqSV6+h7Imfw==
 Received: from mx2-at.ubimet.com ([127.0.0.1])
 	by localhost (mx02.dmz.dc.at.ubimet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mbnHciML1L9Y; Thu, 13 Jun 2024 14:51:47 +0000 (UTC)
+	with ESMTP id c2BAvqS2Cf8P; Thu, 13 Jun 2024 14:51:50 +0000 (UTC)
 Received: from zimbra-mta01.ext.dc.at.ubimet.com (webmail-dc.at.ubimet.com [10.1.18.22])
-	by mx2-at.ubimet.com (Postfix) with ESMTPS id C845181187;
-	Thu, 13 Jun 2024 14:51:47 +0000 (UTC)
+	by mx2-at.ubimet.com (Postfix) with ESMTPS id 35C6481187;
+	Thu, 13 Jun 2024 14:51:50 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTP id A7CAE80771;
-	Thu, 13 Jun 2024 14:51:47 +0000 (UTC)
+	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTP id 1EB3D8079E;
+	Thu, 13 Jun 2024 14:51:50 +0000 (UTC)
 Received: from zimbra-mta01.ext.dc.at.ubimet.com ([127.0.0.1])
  by localhost (zimbra-mta01.ext.dc.at.ubimet.com [127.0.0.1]) (amavis, port 10032)
- with ESMTP id EdOjm3CKKUYW; Thu, 13 Jun 2024 14:51:46 +0000 (UTC)
+ with ESMTP id 8a9BZDVDmpnA; Thu, 13 Jun 2024 14:51:48 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTP id AF61880782;
-	Thu, 13 Jun 2024 14:51:46 +0000 (UTC)
+	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTP id A8AC680782;
+	Thu, 13 Jun 2024 14:51:48 +0000 (UTC)
 X-Virus-Scanned: amavis at zimbra-mta01.ext.dc.at.ubimet.com
 Received: from zimbra-mta01.ext.dc.at.ubimet.com ([127.0.0.1])
  by localhost (zimbra-mta01.ext.dc.at.ubimet.com [127.0.0.1]) (amavis, port 10026)
- with ESMTP id NUGmfzTkUpOF; Thu, 13 Jun 2024 14:51:46 +0000 (UTC)
+ with ESMTP id 2WRalMuHULtR; Thu, 13 Jun 2024 14:51:48 +0000 (UTC)
 Received: from pcn112.wl97.hub.at.ubimet.com (pcn112.it.hub.at.ubimet.com [10.15.66.143])
-	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTPSA id 6C1A080771;
-	Thu, 13 Jun 2024 14:51:46 +0000 (UTC)
+	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTPSA id 69B0580771;
+	Thu, 13 Jun 2024 14:51:48 +0000 (UTC)
 From: =?UTF-8?q?Jo=C3=A3o=20Rodrigues?= <jrodrigues@ubimet.com>
 To: 
 Cc: jrodrigues@ubimet.com,
@@ -78,9 +78,9 @@ Cc: jrodrigues@ubimet.com,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org (open list:ETHERNET PHY LIBRARY),
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 1/3] net: phy: dp83867: Add SQI support
-Date: Thu, 13 Jun 2024 16:51:51 +0200
-Message-Id: <20240613145153.2345826-2-jrodrigues@ubimet.com>
+Subject: [PATCH net-next 2/3] net: phy: dp83867: add cable test support
+Date: Thu, 13 Jun 2024 16:51:52 +0200
+Message-Id: <20240613145153.2345826-3-jrodrigues@ubimet.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240613145153.2345826-1-jrodrigues@ubimet.com>
 References: <20240613145153.2345826-1-jrodrigues@ubimet.com>
@@ -93,106 +93,294 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Don't report SQI values for 10 ethernet, since the datasheet
-says MSE values are only valid for 100/1000 ethernet
+TI DP83867 returns TDR information into 5 segments
+for each of the cable.
+Implement the testing based on "Time Domain Reflectometry with DP83867
+and DP83869"
 
 Signed-off-by: Jo=C3=A3o Rodrigues <jrodrigues@ubimet.com>
 ---
- drivers/net/phy/dp83867.c | 51 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+ drivers/net/phy/dp83867.c | 228 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 228 insertions(+)
 
 diff --git a/drivers/net/phy/dp83867.c b/drivers/net/phy/dp83867.c
-index 4120385c5a79..5741f09e29cb 100644
+index 5741f09e29cb..ff8c97a29195 100644
 --- a/drivers/net/phy/dp83867.c
 +++ b/drivers/net/phy/dp83867.c
-@@ -53,6 +53,7 @@
+@@ -5,6 +5,7 @@
+  */
+=20
+ #include <linux/ethtool.h>
++#include <linux/ethtool_netlink.h>
+ #include <linux/kernel.h>
+ #include <linux/mii.h>
+ #include <linux/module.h>
+@@ -53,6 +54,14 @@
  #define DP83867_RXFSOP2	0x013A
  #define DP83867_RXFSOP3	0x013B
  #define DP83867_IO_MUX_CFG	0x0170
-+#define DP83867_MSE_REG_1	0x0225
++#define DP83867_TDR_GEN_CFG5	0x0186
++#define DP83867_TDR_GEN_CFG6	0x0187
++#define DP83867_TDR_GEN_CFG7	0x0189
++#define DP83867_TDR_PEAKS_LOC_1	0x0190
++#define DP83867_TDR_PEAKS_AMP_1	0x019A
++#define DP83867_TDR_GEN_STATUS	0x01A4
++#define DP83867_TDR_PEAKS_SIGN_1	0x01A5
++#define DP83867_TDR_PEAKS_SIGN_2	0x01A6
+ #define DP83867_MSE_REG_1	0x0225
  #define DP83867_SGMIICTL	0x00D3
  #define DP83867_10M_SGMII_CFG   0x016F
- #define DP83867_10M_SGMII_RATE_ADAPT_MASK BIT(7)
-@@ -153,6 +154,9 @@
- /* FLD_THR_CFG */
- #define DP83867_FLD_THR_CFG_ENERGY_LOST_THR_MASK	0x7
+@@ -157,6 +166,22 @@
+ /* SQI */
+ #define DP83867_MAX_SQI	0x07
 =20
-+/* SQI */
-+#define DP83867_MAX_SQI	0x07
++/* TDR bits */
++#define DP83867_TDR_GEN_CFG5_FLAGS	0x294A
++#define DP83867_TDR_GEN_CFG6_FLAGS	0x0A9B
++#define DP83867_TDR_GEN_CFG7_FLAGS	0x0000
++#define DP83867_TDR_START	BIT(0)
++#define DP83867_TDR_DONE	BIT(1)
++#define DP83867_TDR_FAIL	BIT(2)
++#define DP83867_TDR_PEAKS_LOC_LOW	GENMASK(7, 0)
++#define DP83867_TDR_PEAKS_LOC_HIGH	GENMASK(15, 8)
++#define DP83867_TDR_PEAKS_AMP_LOW	GENMASK(6, 0)
++#define DP83867_TDR_PEAKS_AMP_HIGH	GENMASK(14, 8)
++#define DP83867_TDR_INITIAL_THRESHOLD 10
++#define DP83867_TDR_FINAL_THRESHOLD 24
++#define DP83867_TDR_OFFSET	16
++#define DP83867_TDR_P_LOC_CROSS_MODE_SHIFT	8
 +
  #define DP83867_LED_COUNT	4
 =20
  /* LED_DRV bits */
-@@ -196,6 +200,24 @@ struct dp83867_private {
- 	bool sgmii_ref_clk_en;
- };
-=20
-+/* Register values are converted to SNR(dB) as suggested by
-+ * "How to utilize diagnostic test suite of Ethernet PHY":
-+ * SNR(dB) =3D -10 * log10 (VAL/2^17) - 3 dB.
-+ * SQI ranges are implemented according to "OPEN ALLIANCE - Advanced dia=
-gnostic
-+ * features for 100BASE-T1 automotive Ethernet PHYs"
-+ */
-+
-+static const u16 dp83867_mse_sqi_map[] =3D {
-+	0x0411, /* < 18dB */
-+	0x033b, /* 18dB =3D< SNR < 19dB */
-+	0x0290, /* 19dB =3D< SNR < 20dB */
-+	0x0209, /* 20dB =3D< SNR < 21dB */
-+	0x019e, /* 21dB =3D< SNR < 22dB */
-+	0x0149, /* 22dB =3D< SNR < 23dB */
-+	0x0105, /* 23dB =3D< SNR < 24dB */
-+	0x0000  /* 24dB =3D< SNR */
-+};
-+
- static int dp83867_ack_interrupt(struct phy_device *phydev)
- {
- 	int err =3D phy_read(phydev, MII_DP83867_ISR);
-@@ -1015,6 +1037,32 @@ static int dp83867_loopback(struct phy_device *phy=
-dev, bool enable)
+@@ -1037,6 +1062,205 @@ static int dp83867_loopback(struct phy_device *ph=
+ydev, bool enable)
  			  enable ? BMCR_LOOPBACK : 0);
  }
 =20
-+static int dp83867_get_sqi(struct phy_device *phydev)
++static u32 dp83867_cycles2cm(u32 cycles)
 +{
-+	u16 mse_val;
-+	int sqi;
++	/* for cat. 6 cable, signals travel at 5 ns / m */
++	return cycles * 8 * 20;
++}
++
++static int dp83867_cable_test_start(struct phy_device *phydev)
++{
 +	int ret;
 +
-+	if (phydev->speed =3D=3D SPEED_10)
-+		return -EOPNOTSUPP;
-+
-+	ret =3D phy_read_mmd(phydev, DP83867_DEVADDR, DP83867_MSE_REG_1);
++	ret =3D phy_write_mmd(phydev, DP83867_DEVADDR, DP83867_TDR_GEN_CFG7,
++			    DP83867_TDR_GEN_CFG7_FLAGS);
 +	if (ret < 0)
 +		return ret;
 +
-+	mse_val =3D 0xFFFF & ret;
-+	for (sqi =3D 0; sqi < ARRAY_SIZE(dp83867_mse_sqi_map); sqi++) {
-+		if (mse_val >=3D dp83867_mse_sqi_map[sqi])
-+			return sqi;
-+	}
-+	return -EINVAL;
++	ret =3D phy_write_mmd(phydev, DP83867_DEVADDR, DP83867_TDR_GEN_CFG6,
++			    DP83867_TDR_GEN_CFG6_FLAGS);
++	if (ret < 0)
++		return ret;
++
++	ret =3D phy_write_mmd(phydev, DP83867_DEVADDR, DP83867_TDR_GEN_CFG5,
++			    DP83867_TDR_GEN_CFG5_FLAGS);
++	if (ret < 0)
++		return ret;
++
++	return phy_write_mmd(phydev, DP83867_DEVADDR, DP83867_CFG3,
++			     DP83867_TDR_START);
 +}
 +
-+static int dp83867_get_sqi_max(struct phy_device *phydev)
++static int dp83867_cable_test_report_trans(struct phy_device *phydev, s8=
+ pair,
++					   int *peak_location, int *peak_value,
++					   int *peak_sign,
++					   unsigned int number_peaks)
 +{
-+	return DP83867_MAX_SQI;
++	int fault_rslt =3D ETHTOOL_A_CABLE_RESULT_CODE_OK;
++	int threshold =3D DP83867_TDR_INITIAL_THRESHOLD;
++	unsigned long cross_result;
++	u32 fault_location =3D 0;
++	int i;
++	int ret;
++
++	for (i =3D number_peaks; i >=3D 0; --i) {
++		if (peak_value[i] > threshold) {
++			fault_location =3D
++				dp83867_cycles2cm(peak_location[i] -
++					DP83867_TDR_OFFSET) / 2;
++			if (peak_sign[i] =3D=3D 1) {
++				fault_rslt =3D
++					ETHTOOL_A_CABLE_RESULT_CODE_SAME_SHORT;
++			} else {
++				fault_rslt =3D ETHTOOL_A_CABLE_RESULT_CODE_OPEN;
++			}
++			break;
++		}
++		if (i =3D=3D 1)
++			threshold =3D DP83867_TDR_FINAL_THRESHOLD;
++	}
++
++	ret =3D phy_read_mmd(phydev, DP83867_DEVADDR, DP83867_TDR_GEN_STATUS);
++	if (ret < 0)
++		return ret;
++
++	cross_result =3D ret;
++
++	if (test_bit(DP83867_TDR_P_LOC_CROSS_MODE_SHIFT + pair -
++		     ETHTOOL_A_CABLE_PAIR_A, &cross_result))
++		fault_rslt =3D ETHTOOL_A_CABLE_RESULT_CODE_CROSS_SHORT;
++
++	ret =3D ethnl_cable_test_result(phydev, pair, fault_rslt);
++	if (ret < 0)
++		return ret;
++
++	if (fault_rslt !=3D ETHTOOL_A_CABLE_RESULT_CODE_OK) {
++		return ethnl_cable_test_fault_length(phydev, pair,
++						     fault_location);
++	}
++	return 0;
 +}
 +
- static int
- dp83867_led_brightness_set(struct phy_device *phydev,
- 			   u8 index, enum led_brightness brightness)
-@@ -1195,6 +1243,9 @@ static struct phy_driver dp83867_driver[] =3D {
- 		.config_intr	=3D dp83867_config_intr,
- 		.handle_interrupt =3D dp83867_handle_interrupt,
-=20
-+		.get_sqi	=3D dp83867_get_sqi,
-+		.get_sqi_max	=3D dp83867_get_sqi_max,
++static int dp83867_read_tdr_registers(struct phy_device *phydev, s8 pair=
+,
++				      int *peak_loc, int *peak_val,
++				      int *peak_sign,
++				      unsigned int number_peaks)
++{
++	u32 segment_dist, register_dist;
++	unsigned long peak_sign_result;
++	int ret;
++	int i;
 +
- 		.suspend	=3D dp83867_suspend,
- 		.resume		=3D dp83867_resume,
++	segment_dist =3D (pair - ETHTOOL_A_CABLE_PAIR_A) * 5;
++	for (i =3D 0; i < number_peaks; ++i) {
++		register_dist =3D (segment_dist + i) / 2;
++		ret =3D phy_read_mmd(phydev, DP83867_DEVADDR,
++				   DP83867_TDR_PEAKS_LOC_1 + register_dist);
++		if (ret < 0)
++			return ret;
++		if (((register_dist + i) % 2) =3D=3D 0)
++			peak_loc[i] =3D FIELD_GET(DP83867_TDR_PEAKS_LOC_LOW, ret);
++		else
++			peak_loc[i] =3D FIELD_GET(DP83867_TDR_PEAKS_LOC_HIGH, ret);
++
++		ret =3D phy_read_mmd(phydev, DP83867_DEVADDR,
++				   DP83867_TDR_PEAKS_AMP_1 + register_dist);
++		if (ret < 0)
++			return ret;
++		if (((register_dist + i) % 2) =3D=3D 0)
++			peak_val[i] =3D FIELD_GET(DP83867_TDR_PEAKS_AMP_LOW, ret);
++		else
++			peak_val[i] =3D FIELD_GET(DP83867_TDR_PEAKS_AMP_HIGH, ret);
++	}
++
++	switch (pair) {
++	case ETHTOOL_A_CABLE_PAIR_A:
++	case ETHTOOL_A_CABLE_PAIR_B:
++		ret =3D phy_read_mmd(phydev, DP83867_DEVADDR,
++				   DP83867_TDR_PEAKS_SIGN_1);
++		break;
++	case ETHTOOL_A_CABLE_PAIR_C:
++	case ETHTOOL_A_CABLE_PAIR_D:
++		ret =3D phy_read_mmd(phydev, DP83867_DEVADDR,
++				   DP83867_TDR_PEAKS_SIGN_2);
++		break;
++	default:
++		return -EOPNOTSUPP;
++	}
++	if (ret < 0)
++		return ret;
++
++	peak_sign_result =3D ret;
++
++	switch (pair) {
++	case ETHTOOL_A_CABLE_PAIR_A:
++	case ETHTOOL_A_CABLE_PAIR_C:
++		for (i =3D 0; i < number_peaks; i++)
++			peak_sign[i] =3D test_bit(i, &peak_sign_result);
++		break;
++	case ETHTOOL_A_CABLE_PAIR_B:
++	case ETHTOOL_A_CABLE_PAIR_D:
++		for (i =3D 0; i < number_peaks; i++)
++			peak_sign[i] =3D test_bit(i + 5, &peak_sign_result);
++		break;
++	}
++
++	return 0;
++}
++
++static int dp83867_cable_test_report_pair(struct phy_device *phydev, s8 =
+pair)
++{
++	int peak_sign[5];
++	int peak_loc[ARRAY_SIZE(peak_sign)];
++	int peak_val[ARRAY_SIZE(peak_sign)];
++	int ret;
++
++	ret =3D dp83867_read_tdr_registers(phydev, pair, peak_loc, peak_val,
++					 peak_sign, ARRAY_SIZE(peak_sign));
++	if (ret < 0)
++		return ret;
++	return dp83867_cable_test_report_trans(phydev, pair, peak_loc,
++					       peak_val, peak_sign,
++					       ARRAY_SIZE(peak_sign));
++}
++
++static int dp83867_cable_test_report(struct phy_device *phydev)
++{
++	s8 pair;
++	int ret;
++
++	for (pair =3D ETHTOOL_A_CABLE_PAIR_A; pair <=3D ETHTOOL_A_CABLE_PAIR_D;
++	     ++pair) {
++		ret =3D dp83867_cable_test_report_pair(phydev, pair);
++		if (ret < 0)
++			return ret;
++	}
++
++	return 0;
++}
++
++static int dp83867_cable_test_get_status(struct phy_device *phydev,
++					 bool *finished)
++{
++	int ret;
++
++	*finished =3D false;
++
++	ret =3D phy_read_mmd(phydev, DP83867_DEVADDR, DP83867_CFG3);
++	if (ret < 0)
++		return ret;
++
++	if (!(ret & DP83867_TDR_DONE))
++		return 0;
++
++	*finished =3D true;
++
++	if (ret & DP83867_TDR_FAIL)
++		return -EBUSY;
++
++	return dp83867_cable_test_report(phydev);
++}
++
+ static int dp83867_get_sqi(struct phy_device *phydev)
+ {
+ 	u16 mse_val;
+@@ -1226,6 +1450,7 @@ static struct phy_driver dp83867_driver[] =3D {
+ 		.phy_id		=3D DP83867_PHY_ID,
+ 		.phy_id_mask	=3D 0xfffffff0,
+ 		.name		=3D "TI DP83867",
++		.flags		=3D PHY_POLL_CABLE_TEST,
+ 		/* PHY_GBIT_FEATURES */
 =20
+ 		.probe          =3D dp83867_probe,
+@@ -1252,6 +1477,9 @@ static struct phy_driver dp83867_driver[] =3D {
+ 		.link_change_notify =3D dp83867_link_change_notify,
+ 		.set_loopback	=3D dp83867_loopback,
+=20
++		.cable_test_start	=3D dp83867_cable_test_start,
++		.cable_test_get_status	=3D dp83867_cable_test_get_status,
++
+ 		.led_brightness_set =3D dp83867_led_brightness_set,
+ 		.led_hw_is_supported =3D dp83867_led_hw_is_supported,
+ 		.led_hw_control_set =3D dp83867_led_hw_control_set,
 --=20
 2.25.1
 
