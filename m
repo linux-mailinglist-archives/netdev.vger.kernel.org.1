@@ -1,106 +1,149 @@
-Return-Path: <netdev+bounces-103319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09DFD907868
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 18:37:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 909E69078CC
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 18:54:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AD4FB21C8C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:37:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FFB61F2142B
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:54:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 979C3130E40;
-	Thu, 13 Jun 2024 16:36:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06DDF13C3EE;
+	Thu, 13 Jun 2024 16:54:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="GvIQla0k"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="lTsxvmiz";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IpY+OqHQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow2-smtp.messagingengine.com (flow2-smtp.messagingengine.com [103.168.172.137])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA81912D757
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 16:36:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DBC612F386;
+	Thu, 13 Jun 2024 16:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718296619; cv=none; b=dVuEZupqBkY7lr0OeA34XFq/LLXvc291+IWxVQlk4c4HfQ8172/LOJEa7/2NDcxnoDMs54ed+BgWcEEBrXmJ+o2xY0+TytEa9Nzx9xcZB9y5H+xVwllWnS/n3fqT6US9ZX1wuY5qLoDA4Va9+EHWTH/JhKZlUbUUMBTCm7O6mYs=
+	t=1718297653; cv=none; b=mjuj+Oljs9w43mZij5/DYvltGT09RzLgqvgMhgLKezCUKik1bz4ElMAqFyWTYCldlxOz33+Bgr+HOEB84TgRm4BcN2V7ivKtFfY3eaHPh4oE4kKRAXtOFa4IujnTV5L+k1RBdOcfEaKIxVQr0/mvF2Xtm5kW6jEXjczcNllkIe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718296619; c=relaxed/simple;
-	bh=iWQAr8GIVC+/koyE7vLOgoBtDqMCweHhX9Rpm5M53uQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o1STzSmjqKGydfWy+LsX9hCnvUhBNdLw9RtAUu5ZtNudOQYSPHCS+ewY0ecvurj3V3u/t7Y1+MjkMO85OGSI9XQ5fbMVPkLtiLmgSztM4DZUxGyPCGRJUm2YFjDtfh/i0H9PVRJEzI56cgWygSt2zSkTDGD+d52CqDGvGN7wFFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=GvIQla0k; arc=none smtp.client-ip=209.85.161.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5ba70a0ed75so656728eaf.1
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 09:36:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1718296617; x=1718901417; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FpopBpL2xp2sAwF+psNFO7h0dsigzcYNgTusCPI4K8I=;
-        b=GvIQla0kMbhcuvO/ceXrlKhn6Ee6l0L3szwEhisWrHaHjwEYtOxhySTe3wPQc7igkT
-         AzmEhnQiYmiyJMb9V1s/7OlnV0vqRcryG3AmCmCx30+5l3oTchzqOlJadWP04CbhnkPo
-         j/dnAbyNrKloFFBff+LDsJvqew5Ii5JsETQ3ESj2wrhJ7yNzhHq4F0oKYfjVepsBwM1B
-         lpra6VJLpWIkK1FSLJVpggfUNgpPzEc+lGLfko46EQHJbNd82phzC5B9FPdWu3DFFlfu
-         MKL66q9NtMiaUNBQ09An8qZnRbNhugDGDtDhGCE+WMuo2hV8Yuh9DAYz0JUrCr0iKLvt
-         mHAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718296617; x=1718901417;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FpopBpL2xp2sAwF+psNFO7h0dsigzcYNgTusCPI4K8I=;
-        b=R5oTF5dv0xoVj6YMU5yIvp5wxzCcRk+ly8x0dJ+AObc8jXY7IHMMGQMC50SLnsbqNw
-         QA11uuBFVPLE8VUpG1HlxJhe3+XU3+H0gWlXSZrPLUDJ7lDSAxa6C2XWwS06XbpZoasz
-         bGv4BbCTvLC8Rom0V+aUgV26GOaBNmjzBABrIyfSPledl/FOC1JnliEhPeo1SBvgCzQX
-         u7gnm6LsV5Hx42L2HXgZZ5YjJVKqWUOxYRskc3C4zPJWag2zyJnagGSVVhe0elhDPlAl
-         f4DYi6czxPO3ts6+rqqKUVb0KEUhbJBZK0L2idl8Kq9GbNeW/t0CLuce+a1FA8UHXDKe
-         2rSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWu3VsqPtClsd4MOmRbBUnTuLE3GF2Gk5md+lus8hefnPjW7wpghPwA7XaM8pHwrmwAYQnUdpjweEydwOWMnKAWdYKsObHq
-X-Gm-Message-State: AOJu0Yy9ofy0OSQFisQ81WRU5jWqUr7pQ56Kd+G6KfNt9cvrkvop8eQ4
-	Ksgtuif/0UKLETyATQbbesZavnM5R87B82fUWwfoo+4L3wC+UBO6Sqdzy2MmrNbgv6Ye0tzEqjE
-	q
-X-Google-Smtp-Source: AGHT+IGFmDaToW4kSBVn6LzoXjVybycghwCxAmQAPnypCmydtyTEpJFgM6MIuiRkni4k0+d6jovTkQ==
-X-Received: by 2002:a05:6358:786:b0:19f:4d27:fb77 with SMTP id e5c5f4694b2df-19fa9df7258mr34938255d.5.1718296616656;
-        Thu, 13 Jun 2024 09:36:56 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6fedcf35688sm1106887a12.13.2024.06.13.09.36.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jun 2024 09:36:56 -0700 (PDT)
-Date: Thu, 13 Jun 2024 09:36:54 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: David Ahern <dsahern@kernel.org>, Networking <netdev@vger.kernel.org>,
- Tobias Waldekranz <tobias@waldekranz.com>
-Subject: Re: [iproute2] No mst support for bridge?
-Message-ID: <20240613093654.2d33d800@hermes.local>
-In-Reply-To: <Zmsc54cVKF1wpzj7@Laptop-X1>
-References: <Zmsc54cVKF1wpzj7@Laptop-X1>
+	s=arc-20240116; t=1718297653; c=relaxed/simple;
+	bh=feHgD4FXC0XFfMqq5BOhmdqi9oHY+Zs0DNRW46P786A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I0VZf4AMuwWPKxdUktAYYQ8+IKRbSTN7X5ukuK93z6+WvV0Wd6vUNXMEqIoMPzz9x++YdDsIsgPzLkIEpx7qmJbobyAypMnCqQUSPZ8rotqiZAoZsE2TuaFJT1bSX3tbXtGiVTVrmvZsRBMdAh2c4M1QRVmUpXNetUwuawKC7xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=lTsxvmiz; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IpY+OqHQ; arc=none smtp.client-ip=103.168.172.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from compute7.internal (compute7.nyi.internal [10.202.2.48])
+	by mailflow.nyi.internal (Postfix) with ESMTP id 05EBC2001AF;
+	Thu, 13 Jun 2024 12:54:11 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute7.internal (MEProxy); Thu, 13 Jun 2024 12:54:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1718297650; x=1718304850; bh=fGEXUP5WR/
+	qD1NGLHUvT64tThGjebLT8VP2XMiyvIUc=; b=lTsxvmizx4PE/wTa2kUa9KiE9H
+	k21pHfPE26N4HnW6RD/mtZqLxqi1OciquLYmotYXy2sjhvrmiFurv/55fYVe0Okf
+	ugjukoUUjydPb3TK2SLgH/IzfSJFF99l1kMJDKmZwsFvjnXvAovtALJi71Hk9iby
+	lWMWt+xvwwqH8zJhI34I3u5o67DFJOejhqcJLkD8Q995Bg/P+vr1wwsmg+BSTkDI
+	bErtTkndoiYnWjVHHjVj9BtjfeSK+RF28HlqO+WkBIB8EUlk7SzdSqJqIlAfMl1i
+	uVTGane4n5w+MY8Cu0sTAvdFg+MfnwUhE7dIUzf7Ftg5uMUxZsSGUpyv5sXw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1718297650; x=1718304850; bh=fGEXUP5WR/qD1NGLHUvT64tThGje
+	bLT8VP2XMiyvIUc=; b=IpY+OqHQJvkNevwh/hoAdHQmHvQo/j65mLMjxNU6dK3F
+	rLG0R6KKUdnQT8I6tw+lArnTH6QDJlhnhTeJ7NuFPPlu3bh/0bWiTXcxod1y/FCm
+	0E5j9EjUIdpxz5Qp2MKN5didpGjeHS4QthqCDwBDsQRHFR7thC9WUggWdtafz5g7
+	3s155qU5vW9yxL6AGFG77uVUDqnpo9WekMyhdV5DkLq1Q1KvP616tSnaS2WlJFXr
+	454vGqOocOMmxkKgvW3x/v0hH9CpXEW/X1TX88mHNH5dDJ0hdfjrnPNLYVkeXZR2
+	GhF4uJVbmPKDeBfDbOej8sTHOBSxsDeCv+pX59dCow==
+X-ME-Sender: <xms:MiRrZgIfTRkRzYeJ-vpaIOZRoy0HRjE1Z9JTnlNVCRyA3MySIy7tcg>
+    <xme:MiRrZgIcgKkcWvMv9BWu7NLShucJt7Vr9ejIMpGdmDI8uhfvbQUBf9eY9eadbSH5R
+    HCg7yL5AEBEoMol0A>
+X-ME-Received: <xmr:MiRrZgsR7sl3mzwuzxaHSZcWi6LghoQVHXl7lTUKeCTdqHNhThhbDG07pNLzTMtRaySTYvaQXsHv-FWRTJfei3o2YbqIaMOOyA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrfedujedguddtfecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enfghrlhcuvffnffculddvfedmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdt
+    tddtvdenucfhrhhomhepffgrnhhivghlucgiuhcuoegugihusegugihuuhhurdighiiiqe
+    enucggtffrrghtthgvrhhnpedtjeekudelieetvdefgedvgeejhefhvdfggfejudeutdeg
+    veeivedthfehfeelkeenucffohhmrghinhepghhithhhuhgsrdgtohhmnecuvehluhhsth
+    gvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdr
+    giihii
+X-ME-Proxy: <xmx:MiRrZtaPtGLn3jqO_OclomnP4auuTGGUw8wyGKAjpiUEAUZR8oCzxg>
+    <xmx:MiRrZnZGp6lLALmdMc0-yhs_BED91frK7K0aSuKXyuxJpV-Ykb6TLQ>
+    <xmx:MiRrZpCgNU8NiSYmms4KbawpQznYsm9eG9LxXKaZmbB5DYseRHuiog>
+    <xmx:MiRrZtZOdD8YqeIL5566qA3aAYD92oCh0Y6IYI4sEFh2wFY8EAkA9Q>
+    <xmx:MiRrZrNi12GFpf7t29CQuwFG4mpEPtBhauaQ07lWuc9RsJBtBtjP60-9>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 13 Jun 2024 12:54:08 -0400 (EDT)
+Date: Thu, 13 Jun 2024 10:54:07 -0600
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>, bpf@vger.kernel.org, 
+	pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netfilter-devel@vger.kernel.org, 
+	netdev@vger.kernel.org, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, lorenzo.bianconi@redhat.com, toke@redhat.com, fw@strlen.de, 
+	hawk@kernel.org, horms@kernel.org, donhunte@redhat.com, memxor@gmail.com
+Subject: Re: [PATCH v4 bpf-next 3/3] selftests/bpf: Add selftest for
+ bpf_xdp_flow_lookup kfunc
+Message-ID: <hwdaubyz7kjei5pmp72c4opxz3pk3syso22kafm2j7m3t3ffgl@g6ncqcqfe6bi>
+References: <cover.1716987534.git.lorenzo@kernel.org>
+ <21f41edcad0897e3a849b17392796b32215ae8ca.1716987535.git.lorenzo@kernel.org>
+ <95f8897c-a20b-fa5f-84ab-8204e2654a9e@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <95f8897c-a20b-fa5f-84ab-8204e2654a9e@iogearbox.net>
 
-On Thu, 13 Jun 2024 18:23:03 +0200
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+On Thu, Jun 13, 2024 at 06:06:29PM GMT, Daniel Borkmann wrote:
+> On 5/29/24 3:04 PM, Lorenzo Bianconi wrote:
+> > Introduce e2e selftest for bpf_xdp_flow_lookup kfunc through
+> > xdp_flowtable utility.
+> > 
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> [...]
+> > +struct flow_offload_tuple_rhash *
+> > +bpf_xdp_flow_lookup(struct xdp_md *, struct bpf_fib_lookup *,
+> > +		    struct bpf_flowtable_opts___local *, u32) __ksym;
+> 
+> Btw, this fails CI build :
+> 
+> https://github.com/kernel-patches/bpf/actions/runs/9499749947/job/26190382116
+> 
+>   [...]
+>   progs/xdp_flowtable.c:20:1: error: conflicting types for 'bpf_xdp_flow_lookup'
+>      20 | bpf_xdp_flow_lookup(struct xdp_md *, struct bpf_fib_lookup *,
+>         | ^
+>   /tmp/work/bpf/bpf/tools/testing/selftests/bpf/tools/include/vmlinux.h:106755:41: note: previous declaration is here
+>    106755 | extern struct flow_offload_tuple_rhash *bpf_xdp_flow_lookup(struct xdp_md *ctx, struct bpf_fib_lookup *fib_tuple, struct bpf_flowtable_opts *opts, u32 opts_len) __weak __ksym;
+>           |                                         ^
+>   progs/xdp_flowtable.c:134:47: error: incompatible pointer types passing 'struct bpf_flowtable_opts___local *' to parameter of type 'struct bpf_flowtable_opts *' [-Werror,-Wincompatible-pointer-types]
+>     134 |         tuplehash = bpf_xdp_flow_lookup(ctx, &tuple, &opts, sizeof(opts));
+>         |                                                      ^~~~~
+>   /tmp/work/bpf/bpf/tools/testing/selftests/bpf/tools/include/vmlinux.h:106755:142: note: passing argument to parameter 'opts' here
+>    106755 | extern struct flow_offload_tuple_rhash *bpf_xdp_flow_lookup(struct xdp_md *ctx, struct bpf_fib_lookup *fib_tuple, struct bpf_flowtable_opts *opts, u32 opts_len) __weak __ksym;
+>           |                                                                                                                                              ^
+>   2 errors generated.
+>     CLNG-BPF [test_maps] kprobe_multi_override.bpf.o
+>     CLNG-BPF [test_maps] tailcall_bpf2bpf1.bpf.o
+>   make: *** [Makefile:654: /tmp/work/bpf/bpf/tools/testing/selftests/bpf/xdp_flowtable.bpf.o] Error 1
+>   make: *** Waiting for unfinished jobs....
+>   make: Leaving directory '/tmp/work/bpf/bpf/tools/testing/selftests/bpf'
+>   Error: Process completed with exit code 2.
+> 
 
-> Hi David,
-> 
-> I can't recall why iproute2 doesn't have bridge mst support after
-> ec7328b59176 ("net: bridge: mst: Multiple Spanning Tree (MST) mode") and
-> 122c29486e1f ("net: bridge: mst: Support setting and reporting MST port states")
-> 
-> Is there a reason that we rejected the iproute2 patch? Or Tobias didn't submit
-> the patch?
-> 
-> Thanks
-> Hangbin
+We'll probably want to do the same thing as in f709124dd72f ("bpf:
+selftests: nf: Opt out of using generated kfunc prototypes").
 
-I never saw a patch, and searching the archives does not show it either.
-Maybe never submitted or blocked by spam filter.
+Daniel
 
