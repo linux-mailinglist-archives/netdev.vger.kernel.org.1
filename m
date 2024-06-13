@@ -1,110 +1,194 @@
-Return-Path: <netdev+bounces-103188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A66CC906C2B
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 13:47:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 10F2C906C47
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 13:49:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23765B253FA
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:47:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74019B24121
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:49:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D75531459E7;
-	Thu, 13 Jun 2024 11:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72307145B1F;
+	Thu, 13 Jun 2024 11:47:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RuKQCQsR"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hjeVHFqO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD5D13D512;
-	Thu, 13 Jun 2024 11:46:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8020A144D21
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 11:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718279189; cv=none; b=M3ep9ftr6F7sS/RQWQDyn4p7uapKZxTIqGY3LGobpH2r6Jk+buF/uk9wKUXLCiVEsiFknlaaeLQxap2NlQ8GlFdP/xcT4tW6KWh4/reSBkCoXLkQb3ObUlAxa0H0goSgJhoRSK4DjM6uifvLv/t9BJ6yz6Pb3sq1so2IjPhhVvM=
+	t=1718279233; cv=none; b=BkJu06p6mYyCgamV1Er11tNakKqyL/UqBVt3w8vfKbW/9iAGVIPgt3qBkFlZWAmKcFLXmGwUIvK3v4TNplJlg+JCv3CUgmJGSV4UgLFe1tXzZ0sKE4XA6N00QL715jpzNi5dL+P+INdpbjw1H590C82mLzhKcJ+hpLB6YXb7z3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718279189; c=relaxed/simple;
-	bh=IDbexf2eZfmUwoSFLiwp25cs6cJ31ZbydyJsNFer6vM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=apEyVAgbCLrdS1uqtCLytY2GSRISLmgLA8qojxsSkay6rAE4mVwzlNIofz+nuJbbN1D4ueqUKjde/WQj7nl59IoiHqPBtawvTrs55qEdWOU3f2FCsJKrBDm89Pz+iAorWb0l7hnwECW0rqTMmM+i5pTPTzX9M2V2ohUHuUVI8FY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RuKQCQsR; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a6e43dad8ecso167259366b.1;
-        Thu, 13 Jun 2024 04:46:27 -0700 (PDT)
+	s=arc-20240116; t=1718279233; c=relaxed/simple;
+	bh=u8uqNXfneUxeojJqX6uW43gawvkWd/SVV0l8sqbDYiQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ojwzKrrf+BYn06Ce13Fp+h94KZBNEOPRWtloVCo/ee8ACGnI5BH4XZl1f64SOrIKYb+2Mg1ZjIAwjvPZ4F2+tNNMJcnLBSMHwEqYGcto6f77rRVoU+GglkE83N0MjS/hF12DqNELeeFSkGVumvllENoqtQQW8iDNAXd9H8pwqBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hjeVHFqO; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dfef552d425so1164891276.0
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 04:47:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718279186; x=1718883986; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dyyJwIzTGdI7/cKBl1ZpQe515OjfKK1XStdbGSx2zjg=;
-        b=RuKQCQsR5AReDVCdbLjgkHCUKscLQ+rh+DnQkGLsSJyx0ePRScIq4QJat7GO6aflum
-         znJ9jThvvy6GZH0o+bNLPe/9zBvdaUwzRsDfaWSdvrR8czmUdNHI7fXqL5L742y1phbs
-         p1Q1f9UuKicpwJb3kShh86gGvuYA77y7tHT+cDhiD0V837GKpWvV/jmRrzGW8F97e6lw
-         4IXVuFJNXPADvE5I2wiCC0XUNG8Wt00S4KZb9uk33exEEo/mzJfri9aBHc7F05FTvavb
-         alpSKzDE3B8Sc4x/j4q4a0S91I0InoJ7q4p8q2uSFj1bBJF9tj+2nj/f8yPhdh7qlZw5
-         8NeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718279186; x=1718883986;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=linaro.org; s=google; t=1718279229; x=1718884029; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dyyJwIzTGdI7/cKBl1ZpQe515OjfKK1XStdbGSx2zjg=;
-        b=mXtwp4GaWSv/dAhNFF3No4bm0DUkk8dGXUmNAeiZvyCjl0jCk6KxsDe1cFWH/gZiR6
-         r6NhjdwYvuv4IApXxLYDAJt0A/OPfBosu75qeQQYIDvrx8o4vFiXIOdugcS5+yOZ+Pbn
-         9RUy28lvVcXbRz3P0TLTQYE3CRQRX+v8i33XdBJfp/8895ajIhiTxCh8AeB7p+Xj/USv
-         6B8Gn8aZswAiEH4+f0ohywB7A8hjbFHdxmt+ElgJKKfkwdRfpkthLtUt0PmqxfPJutRI
-         E0vMkY0AiqRCPD/+ztiZmKVCK6KXK9MOiIuBPKzh7jMHxYu492Pi+1CQa41gaEVFK9dI
-         XPFA==
-X-Forwarded-Encrypted: i=1; AJvYcCXrXlWytVTRWGvs6EX2Fqg03TfugV79HBK8tMDjTEC57kXCIwHQdY0J8/wJF4wFBiWymRzTeY3ilfaBORtdWYWzw0tfsy8obXDGEpKpwkxHGhuu+i3Slu70w4W06jd1Hy2U0l9v+K72Wv3xydpgrhtXhtmjWOxssttQiUERpVvRhA==
-X-Gm-Message-State: AOJu0YyXaWzwYN8O5MahthgKvBGjUBmL/Hn031vm69jOQbH8MFqBizJV
-	+Tg63oe8+AWMmFMGiugzh+C8UzXJlwMMOet922Xfh310OKoo0fGt
-X-Google-Smtp-Source: AGHT+IGTrcMO1Z2soAspslbJyyJxA7M8r8c8TUltY/hfEEHSRlZqeuP8QinLuR7qrTKZJfOegaHRCA==
-X-Received: by 2002:a17:907:6d11:b0:a6f:3b3b:b7cb with SMTP id a640c23a62f3a-a6f523eae18mr224121666b.7.1718279185893;
-        Thu, 13 Jun 2024 04:46:25 -0700 (PDT)
-Received: from skbuf ([188.25.55.166])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cbbb5576csm165439a12.89.2024.06.13.04.46.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jun 2024 04:46:25 -0700 (PDT)
-Date: Thu, 13 Jun 2024 14:46:22 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Martin Schiller <ms@dev.tdt.de>
-Cc: martin.blumenstingl@googlemail.com, hauke@hauke-m.de, andrew@lunn.ch,
-	f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 01/12] dt-bindings: net: dsa: lantiq,gswip:
- convert to YAML schema
-Message-ID: <20240613114622.hajwrbcrzm3mtg6f@skbuf>
-References: <20240611135434.3180973-1-ms@dev.tdt.de>
- <20240611135434.3180973-1-ms@dev.tdt.de>
- <20240611135434.3180973-2-ms@dev.tdt.de>
- <20240611135434.3180973-2-ms@dev.tdt.de>
+        bh=+LOKAxIeKteFuhp7/Gqn9TPI7GSn3AjIAgrQwVRNEFU=;
+        b=hjeVHFqOks17mJr5ZOK3MfW+jrYXcZYEDqkvr5Cp+D6iEZmVOwIjLMVwcCJhE434Im
+         myUPaK2lB7bPK14p+MVgCMvoZMQEpJ+aRuO3SNDE729WXwxjQ/jk33RPjeuS8k8jcZq2
+         xufjyQeOl/dTSN5mjnJJoyo9cjJHu06XHIDJ0lYtOx9584059S1sYeDvV1F5m90PcZnW
+         9oQNfwtYojMh2ubIVFrehDoErOZlXKoHG6CsNKmsL7a7iRDcGFJjnR3OGnhor5BqV3Ab
+         c/mwm7AKeDXITNkjX8cjSV8p3H2MctJZSyapjdXWxxLI+sdOwzFJbrKmluJpjJlmb1+A
+         sJpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718279229; x=1718884029;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+LOKAxIeKteFuhp7/Gqn9TPI7GSn3AjIAgrQwVRNEFU=;
+        b=SInkt3JOh5kQMcOeqjEY7/twoCImEOkkGrY7u/l0Ng93cJP/V5iVjkkOtqXL10gD6D
+         Qp+H+CjYWxi7VBI6c25wnGIR300G3umNrYCh/UNeXtDUWc8epzcqq4zXk+csZQq8ZRve
+         SEvqKtR3Z7kvazvr9m4EFgMHx5T49Z8KU1WCoDXH6LpyygW5AouD4SREEBK3i87tiBcF
+         /ZiMBcYm03wH2iCeKqZL4H2b5c8s2FHDj5aJEWjR5TIhHL+wzuGLS5a9aDMZWeLmYuHa
+         92NgZ3lAWgT7WJUe6GmGhX4Xnmu35a29N0m8ozzMUJv2CchTLwzpZETU3Y8VveqTl0jc
+         jBYw==
+X-Forwarded-Encrypted: i=1; AJvYcCVxttECYfzaAx+2JL3RwvP7cc6NZEtu7+/xfgDF0uNWWOVEHuzoLMHWefwTnPWQQ6Usgk+96+PvWKxiddCm2gna3HqIIN46
+X-Gm-Message-State: AOJu0YwMmv1QKFw1lPzVkpzzYElvmneUBhfeTazWEhhSUZwo83ZXRobZ
+	JqxC4lAiuN8wlyUxvQU8EP2AA0NBGAXBeyXRJOtwxKahKmGlA6HlbYL0k5eWZFFlvR1MISy9YXV
+	jHUI1W6xc5iKjuOEPMsy09rlOVCXnYLeBXtG0rg==
+X-Google-Smtp-Source: AGHT+IHFpink+Q293EhYr5U3tq2VDPbFBHBjghBbhVxgaG4IqWejDV0X1BOwqLDyC7goxOFASWf1sJs6gdyGUmv2tSI=
+X-Received: by 2002:a25:aca8:0:b0:dfb:25ba:4390 with SMTP id
+ 3f1490d57ef6-dfe66d5a5e0mr4339265276.36.1718279229482; Thu, 13 Jun 2024
+ 04:47:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240611135434.3180973-2-ms@dev.tdt.de>
- <20240611135434.3180973-2-ms@dev.tdt.de>
+References: <CAMSo37U3Pree8XbHNBOzNXhFAiPss+8FQms1bLy06xeMeWfTcg@mail.gmail.com>
+ <20240613095901.508753-1-jtornosm@redhat.com>
+In-Reply-To: <20240613095901.508753-1-jtornosm@redhat.com>
+From: Yongqin Liu <yongqin.liu@linaro.org>
+Date: Thu, 13 Jun 2024 19:46:57 +0800
+Message-ID: <CAMSo37UzU9WrQOQVo=Bb-LfOwS=GJrsSLMgGAwLY7JoGQ9ap7g@mail.gmail.com>
+Subject: Re: [PATCH] net: usb: ax88179_178a: fix link status when link is set
+ to down/up
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Cc: amit.pundir@linaro.org, davem@davemloft.net, edumazet@google.com, 
+	inventor500@vivaldi.net, jstultz@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org, 
+	sumit.semwal@linaro.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 11, 2024 at 03:54:23PM +0200, Martin Schiller wrote:
-> Convert the lantiq,gswip bindings to YAML format.
-> 
-> Also add this new file to the MAINTAINERS file.
-> 
-> Furthermore, the CPU port has to specify a phy-mode and either a phy or
-> a fixed-link. Since GSWIP is connected using a SoC internal protocol
-> there's no PHY involved. Add phy-mode = "internal" and a fixed-link to
-> the example code to describe the communication between the PMAC
-> (Ethernet controller) and GSWIP switch.
-> 
-> Signed-off-by: Martin Schiller <ms@dev.tdt.de>
-> ---
+Hi, Jose
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+On Thu, 13 Jun 2024 at 17:59, Jose Ignacio Tornos Martinez
+<jtornosm@redhat.com> wrote:
+>
+> Hello again,
+>
+> There was a problem copying the patch, sorry, here the good one:
+
+Thanks very much for the work!
+
+I will test it tomorrow, and let you know the result then.
+
+Best regards,
+Yongqin Liu
+>
+> $ git diff drivers/net/usb/ax88179_178a.c
+> diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178=
+a.c
+> index 51c295e1e823..60357796be99 100644
+> --- a/drivers/net/usb/ax88179_178a.c
+> +++ b/drivers/net/usb/ax88179_178a.c
+> @@ -174,7 +174,6 @@ struct ax88179_data {
+>         u32 wol_supported;
+>         u32 wolopts;
+>         u8 disconnecting;
+> -       u8 initialized;
+>  };
+>
+>  struct ax88179_int_data {
+> @@ -327,7 +326,8 @@ static void ax88179_status(struct usbnet *dev, struct=
+ urb *urb)
+>
+>         if (netif_carrier_ok(dev->net) !=3D link) {
+>                 usbnet_link_change(dev, link, 1);
+> -               netdev_info(dev->net, "ax88179 - Link status is: %d\n", l=
+ink);
+> +               if (!link)
+> +                       netdev_info(dev->net, "ax88179 - Link status is: =
+%d\n", link);
+>         }
+>  }
+>
+> @@ -1543,6 +1543,7 @@ static int ax88179_link_reset(struct usbnet *dev)
+>                          GMII_PHY_PHYSR, 2, &tmp16);
+>
+>         if (!(tmp16 & GMII_PHY_PHYSR_LINK)) {
+> +               netdev_info(dev->net, "ax88179 - Link status is: 0\n");
+>                 return 0;
+>         } else if (GMII_PHY_PHYSR_GIGA =3D=3D (tmp16 & GMII_PHY_PHYSR_SMA=
+SK)) {
+>                 mode |=3D AX_MEDIUM_GIGAMODE | AX_MEDIUM_EN_125MHZ;
+> @@ -1580,6 +1581,8 @@ static int ax88179_link_reset(struct usbnet *dev)
+>
+>         netif_carrier_on(dev->net);
+>
+> +       netdev_info(dev->net, "ax88179 - Link status is: 1\n");
+> +
+>         return 0;
+>  }
+>
+> @@ -1678,12 +1681,21 @@ static int ax88179_reset(struct usbnet *dev)
+>
+>  static int ax88179_net_reset(struct usbnet *dev)
+>  {
+> -       struct ax88179_data *ax179_data =3D dev->driver_priv;
+> +       u16 tmp16;
+>
+> -       if (ax179_data->initialized)
+> +       ax88179_read_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID, GMII_PHY_PHY=
+SR,
+> +                        2, &tmp16);
+> +       if (tmp16) {
+> +               ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MOD=
+E,
+> +                                2, 2, &tmp16);
+> +               if (!(tmp16 & AX_MEDIUM_RECEIVE_EN)) {
+> +                       tmp16 |=3D AX_MEDIUM_RECEIVE_EN;
+> +                       ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_S=
+TATUS_MODE,
+> +                                         2, 2, &tmp16);
+> +               }
+> +       } else {
+>                 ax88179_reset(dev);
+> -       else
+> -               ax179_data->initialized =3D 1;
+> +       }
+>
+>         return 0;
+>  }
+>
+> Best regards
+> Jos=C3=A9 Ignacio
+>
+
+
+--=20
+Best Regards,
+Yongqin Liu
+---------------------------------------------------------------
+#mailing list
+linaro-android@lists.linaro.org
+http://lists.linaro.org/mailman/listinfo/linaro-android
 
