@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-103248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34A139074BB
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:12:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FF5D9074BC
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:12:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEA841F22BF0
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:12:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10B7A1C22E14
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:12:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95D92145FF1;
-	Thu, 13 Jun 2024 14:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4256F146010;
+	Thu, 13 Jun 2024 14:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lpH/zh0l"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NC8OD2El"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2079.outbound.protection.outlook.com [40.107.237.79])
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2050.outbound.protection.outlook.com [40.107.212.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0206B145B3F
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 14:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D313145FE0
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 14:11:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.50
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718287868; cv=fail; b=bDGB94iwIjPYQ93shGK8KAN2/pS22PtW3bgE0Tunt620O9LJpjq0Wjq3UB9xGzDZTd5IspSedIldirfCODOdbLiYhUtJUhY74DVTCqj1dszdIvvhkakBOh/S+sF2I+h2mkfjJpWp6Fu1I+hQlWpqlgajbRwLCCL5F2zWfewywV0=
+	t=1718287873; cv=fail; b=YbFZOj7QgBKRUfBHScJw20fh8e10BfcrikBwR7w0AQPiHt3zqj1hh1P9EEpkrEaIs8qIYPCtE0DUaBILOtm9wkkiluxRXhrmUWIJxthfIiYo3LI4RY1zuPjgchwarx7mPDVZfnaoEpFSOGL6jvMlZUfmj2/gnmKVdJheSAN9Uv4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718287868; c=relaxed/simple;
-	bh=FCo6FeKxllqqh4TMyUN01laSzWwnEN5Comu22lgl7lE=;
+	s=arc-20240116; t=1718287873; c=relaxed/simple;
+	bh=LiCIDa9N8NDL0LHjcj4p3dKDPG7IAl31nctTn6gval0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PEqR60/2QzQG7Q1qacsssd6gBRtreb9FmbogC6UqYf9gN33HIQmFomkgUZlDSlGEkRtfYo1fNogsEm5cGVP3uuipE/BojzjlYjaHRBUdbVX/Ws5nmg8924pWiJEkrUbH9Wlt7SnjMA2cARKNxk1PjTaqUZW5n5odhswERSPZO+w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lpH/zh0l; arc=fail smtp.client-ip=40.107.237.79
+	 MIME-Version:Content-Type; b=Y6E+kfdss3lDOjND72C/tbCeJibZhMKP0IOmrllHWhkVY5kNnEiLX6D4V+5fgZmd3uwI/6kxh51wPtbrR57K3hDS2W75JF3cXnq2AMwVRALMjpDFEPVomCuRnQAZ8EMSKmfyFJpdzoy9wgDHcKBukHfSFl3OX8i5h0DLgw+seqc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NC8OD2El; arc=fail smtp.client-ip=40.107.212.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aUe5DHSPZZoFUh4YeugYA+wTJHzqd28NSvKE162GE1UqpRfLyMnipkvq8Bh2dke7SpkY2ItLJHw3rQF34o8ZqmAemQCMNmvbq4LrZ+1mj0M5Dy7Bg8U+xgJ721CFzKrJSeb0lA2/IsqiX4AuMXWemV2XxNS73/CjyyDCD0PmFgHs8hbBS2GXNpybT3yU0KNjm48hIv+SCVc5Bnf/WrV9YFBUOwqVqMbHLWAfE3YgXtLmtLPucuiu2aJxOexW8OKL268l1E4pt1oV5CVhSQXBAtsZsId5VPQ6crPurwpIW/uSTrTo9uhFa8VXAZ38furLEn6yBIdOMgcgxX65V84luA==
+ b=adJevBcRWjSSxfEIBuGpX8k6bEnIVfT0fRXzMcocfOaXq+0Gh2mrggHAyxf9sAQWBEH4L6nnX1dDLNWqx+gnrymt0M81FCYW4vR7n7LoT0VsLOCXxOT2D3axmf9NbaaMx86neuI1AhTzICl6+uduSRk2uD2yIyYlxkiF1DkbwHmc3cLpCBlHiWfuTDRN+DVAA7EPPVPZLtPzIZBGTTQeWYQSuczrVYZoOP/5P1o71Z0/zN8h10HDqeZ68lcj4MUqK5K3FFxH5qciU3Ds8saEgAQnssenLJxz0yZ37qPMamrP8bjOAl6M3HW95jiNemWzbYiIPBcGZ52HU1DLBcSJNw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2tYSlXRPFsDAcLjUod9C6N9ofZCX+wOLCveq/Xze94M=;
- b=MBKSun9jEGGDZyhB2mjS2SlrGjvA6v2jQsD6s0vfxD26oTJfKe51ReQqvAp4XHcxN6RDab+qN7Bg5ioUUjc2AaanCui6tBRA5tsXFCyY4orhKKdnDFnz6/MKCD2DwS/Q4fMA7uxAmAN6FY6nzDUgUMCELWZ3OLDu+SeibbSVILRWKu9ZEP9mvJQ3E1HOPcTSvQSeGuaPT/nVFB8qpkYRWKzfu4bH1Is1pyPAFRHgq3lSf7nMOjXvS38EVMXZxr7zadKoeEKW4d+HzSdZYgLiViQPn9+R8W3zjKut8Ch/DdMNVP6km0AhjYDgPUFk+lIYMv7uL5XGIBK7XiLxk0Rpag==
+ bh=X//eGTqPR6GX6clhYfoJGDd2v7be7vmMt7zU69UYhG8=;
+ b=dc8fLzvlN59BUi7oBJtUT0o7CcNKSGhK7JqzPYsO5z62HnFqtc/leOIhFLwm7qQZk4AsnE2kfVj+PxNFBQlFYzVm9Ewxf6Ur3wH4XwlRLunvWy7J/5VC2h0ckwHirScPKUTt0ZtaMRHaOsIJ2f8/wMw7/Z68p9qp3okcoyeZwrYRr6y4KRdgGQg6eY92U6mOmwLn26W4D0xJaL4QgBouSSwRrj55kzTzSLvsTmTb/Yv/WZLuZmugDOlU4G6yTcc9cwFynNReO7XPAO9K91AzwesyHBWWcDEwIu+zGWVfCer5WOG5FPF8lCxiwJMbqDRA7Kc4sF/YnIfsHWfX4DvOeQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2tYSlXRPFsDAcLjUod9C6N9ofZCX+wOLCveq/Xze94M=;
- b=lpH/zh0lf9OJNlYm0RxBIySKSfbHZbUQSv8b75Yxbax6rot7yp3lpe6IuhxOrc3SzMluhWrNmVHtXAMhMX8uOHMWZRA6bOYqodshZFbswOfLYPPBsIDyjQ1/lwf7xJctubHNQnBgbK8Fbe922UCYzCbcqR2d1FODMxYY5a75GjHhBBSVMLRwgqzkjmQ6PTYpfrdY5HyZvSdzyptyel4Nk7ulqPsXLobliFkuUNHBe++1rY9PF9iFMlyWYKd1A5VG93/iIYRDF5bTFeTT5GxQ9l3jDVQcmg+nOVxKnmH1EVXlYXQgUoIJ3jsTuz7mnVtZAmCZ5gjaHWxRdgizaTqs1Q==
-Received: from MN2PR07CA0018.namprd07.prod.outlook.com (2603:10b6:208:1a0::28)
- by DM4PR12MB6254.namprd12.prod.outlook.com (2603:10b6:8:a5::17) with
+ bh=X//eGTqPR6GX6clhYfoJGDd2v7be7vmMt7zU69UYhG8=;
+ b=NC8OD2ElO5p1t4ass64+hTK9lDOA8R9J1yPPig0a67XrbaevCALfkZ01qDnMXBik2Q2hEqNoN79BnPHsuk0ej5r52pFy6D5uI3OIoCUSJfip0t9Ab2liIv0PopNT5nKwlziPO/0rg27rbVJoJlQdLjgWInb06Vf+Zrj26St5p9PFfe6SKFxdulF0ldQtcDoVKq2nKy/e+KC8I14n0lpKXrsKo3T/FsrtA19faRAUYyk/4OGSl40zRU98NjXwykzMWNfA76YcujpdABZip0y1g5eYAcw8kBuI6ER8kBw/sPcQcW64oNwLXCTqGCofqjAfe/Wj/ZaaWn/EsZxpcU0R5w==
+Received: from BY3PR05CA0046.namprd05.prod.outlook.com (2603:10b6:a03:39b::21)
+ by DM6PR12MB4201.namprd12.prod.outlook.com (2603:10b6:5:216::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.37; Thu, 13 Jun
- 2024 14:11:02 +0000
-Received: from MN1PEPF0000ECDA.namprd02.prod.outlook.com
- (2603:10b6:208:1a0:cafe::1c) by MN2PR07CA0018.outlook.office365.com
- (2603:10b6:208:1a0::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.24 via Frontend
- Transport; Thu, 13 Jun 2024 14:11:01 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.20; Thu, 13 Jun
+ 2024 14:11:06 +0000
+Received: from CY4PEPF0000EE32.namprd05.prod.outlook.com
+ (2603:10b6:a03:39b:cafe::f7) by BY3PR05CA0046.outlook.office365.com
+ (2603:10b6:a03:39b::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.19 via Frontend
+ Transport; Thu, 13 Jun 2024 14:11:06 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- MN1PEPF0000ECDA.mail.protection.outlook.com (10.167.242.134) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CY4PEPF0000EE32.mail.protection.outlook.com (10.167.242.38) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7677.15 via Frontend Transport; Thu, 13 Jun 2024 14:11:01 +0000
+ 15.20.7677.15 via Frontend Transport; Thu, 13 Jun 2024 14:11:05 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 13 Jun
- 2024 07:10:39 -0700
+ 2024 07:10:43 -0700
 Received: from localhost.localdomain (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 13 Jun
- 2024 07:10:34 -0700
+ 2024 07:10:39 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Amit
  Cohen" <amcohen@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next 2/5] mlxsw: Adjust MTU value to hardware check
-Date: Thu, 13 Jun 2024 16:07:55 +0200
-Message-ID: <f3203c2477bb8ed18b1e79642fa3e3713e1e55bb.1718275854.git.petrm@nvidia.com>
+Subject: [PATCH net-next 3/5] mlxsw: spectrum: Set more accurate values for netdevice min/max MTU
+Date: Thu, 13 Jun 2024 16:07:56 +0200
+Message-ID: <be8232e38c196ecb607f82c5e000ea427ce22abb.1718275854.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <cover.1718275854.git.petrm@nvidia.com>
 References: <cover.1718275854.git.petrm@nvidia.com>
@@ -99,97 +99,106 @@ X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECDA:EE_|DM4PR12MB6254:EE_
-X-MS-Office365-Filtering-Correlation-Id: d491395e-f247-48a0-af84-08dc8bb2a7d0
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE32:EE_|DM6PR12MB4201:EE_
+X-MS-Office365-Filtering-Correlation-Id: 982f2a46-c612-4696-5b3a-08dc8bb2aa67
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230035|36860700008|82310400021|1800799019|376009;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?WrYsNJ1tUzbEISMkTQ0YhTHAGutC9lA+UP6icLMLPz+iKnBAZrvSMQAS02gZ?=
- =?us-ascii?Q?8Xjw93wws8b2c0Lcq6vuWYCKom0wZMlsjdDZigfqFESM1HbCxOy0vWpvmPvE?=
- =?us-ascii?Q?okF2vdqFgJTWfX0g/62Dr/Gu0eatmmvqQoFV2qJi3gp23dbwq2o6Swf9Q7kj?=
- =?us-ascii?Q?JorxtEoFyth5LshkcOH/ocWeh/uusc9Fk4UvJqffbJCaefVKubSyx5msmObM?=
- =?us-ascii?Q?z226t9QcQl/VcM+nMrOeeLpAhIDoT/Y766yd7HUrbiRMoNvNPU7iCukJrMEa?=
- =?us-ascii?Q?jdiXVJ90tE+RrWqqcsbnqhTzQYeYJ5M1VErOWZhLdpwqbQ8LvvFBbBWaFzAZ?=
- =?us-ascii?Q?UF/3Mz+PRZEYMQh1+Wnasb1iOigCXeHQ3/2sY1M2e7zXX+qCWMruSIyOaLaz?=
- =?us-ascii?Q?H41mR4axDRba6rj3w/zTMZNL34mpe9Rxd6hUJ+UU6kWPMJJPXffg6fXWm6RT?=
- =?us-ascii?Q?4AVie8gANC1/cSvKqR/+pxxbOhacsweFo1xZ9x2wPSw8K9mxtn9MU94SwPir?=
- =?us-ascii?Q?b9jkgH5BE9oZC8jfSSCDLl1KVC1hjdYd3WhjMVcx1KfJ7O8U3ssMXeDAseWw?=
- =?us-ascii?Q?1sNNH8U+hzsni9oRTWhoTzPEF00jv6J3bA1BmMgjWCxsOFClNJP9YUMGf9cb?=
- =?us-ascii?Q?0uY6jn/FKsEe048hwPFxJs4qZsV+bW07YlUk94mMJZsxAsKnDgJoa4QOah9V?=
- =?us-ascii?Q?XTgq/KKc91YISomI3dH+rNaZ48Ctb/lPAr2OPp0CY0w/dutQy/lbA83UgQ8/?=
- =?us-ascii?Q?RFDmm1QHjd6PUFlmPLcEWnsQgoCUCxC+ysgFOQCSfPfGQEOB5Hcza7zB5T74?=
- =?us-ascii?Q?EYbKVq2aO+c2XrYrT0xwLosRkcJ/KSwrUWLowpoqXMDe5F55cZKeK5KWc4qm?=
- =?us-ascii?Q?XFWCFZrnR35NyIQyNx0M2UkMLbmdaIKTot8QO5P4xeSOwi2FlXbc18xMa8Cb?=
- =?us-ascii?Q?nQii7KG3KOjY75Gx1PxltLZd7Zp3P4T1NTFAFv39WifejNqNE9vV+wj9/crn?=
- =?us-ascii?Q?drcjUP+KnwG+6QMpK7PHO28sW0WG8tQTtohgmFnrHEfTMTrNAPWl1eqbWj0s?=
- =?us-ascii?Q?FpQfNfisF341Mwu8sITdHdkqsNQK6klBpTx5UjCYhbPeaGVVH5MlfqoKR1Rk?=
- =?us-ascii?Q?+rBR6lk1Seq6sQXgZl9c+/Af+VzDcLWdUeK4p81Wc/NvBSwSHupYp15nOiSq?=
- =?us-ascii?Q?8Kpmsy21LUKZKVyzKoy7OjWufNjq2toRf5A0WSMYYy5ObO7j5Qo0r9MiqVrB?=
- =?us-ascii?Q?+2OrIVzT373T/ZRK86kUwd8c17N7d21yUGedy9DBkyy6AB8pAZyx2tHMwpZC?=
- =?us-ascii?Q?d2L+XvI2C5rZ1dmD/SZ7bK4HjfK4b97WsNG0kl+zBpM23DCCF1uAIObgB+ti?=
- =?us-ascii?Q?rWhiTyKj+cG/8XvY1LFgt3CdksRv8wSzFONaC5OA4DTFdSwjog=3D=3D?=
+	=?us-ascii?Q?Gavgs3Vl0SyZ0hNDwm+4X9UKgsXlE1a+Gd3WuUZrEFE4/xbsvdUPl8kt5dnk?=
+ =?us-ascii?Q?a8+D0uKM118nPbxgm5CNpCqI6g2h54vlbK48N7rw5Nvgw40yW9cio6+zGgWk?=
+ =?us-ascii?Q?p91PVOXeynkXb7GoMiBnqdq6YWpeOwRCw8dEI1z8P0gCDQbFGCZ394sX42vi?=
+ =?us-ascii?Q?QCN0zAJmz+TvUDfN4NwV7rp+xlfsBHGyVcN2LuOiTvzdTyDLHkOz09U1sjdG?=
+ =?us-ascii?Q?1KYyb61PNPVFiKeEJdNs+o9usuMt5+IUrKrqWLlZ0A9vRdyvNB6yWgyU7IgU?=
+ =?us-ascii?Q?exEpYXqYycq8+/amv/cBY0oo2UJ8KzUxwZ6TgnwsQVIfoSRwDa6Q+1hJl2ie?=
+ =?us-ascii?Q?QFzSAYpoN2CWpfPdWb5tL6k7i4ulLAI5M368MWPvV0hLanaflzcCYbYwbfDL?=
+ =?us-ascii?Q?jiVCCcqpkHCWcY/ALGrh81Z1c1PcKByJ1CPxEsiTAjpaq7dWzd/ksYKLjIR+?=
+ =?us-ascii?Q?OGGxv3Uf8eu6KcJOmTiycuTi1K8M45zVSnKHXfCsPv0fC6MUQJ0CT9Zuq+yo?=
+ =?us-ascii?Q?+2iIxwgieuhTl0k0GkRR5W7bxORpncFdCtn4KWV+aVxPCFo6y00C69zMS5kz?=
+ =?us-ascii?Q?3Vf8j6bCaH8wJobaXEgWUZpOqCVCPXspxjDG7UqbcmWrMMP2zz5Kgul4wlQx?=
+ =?us-ascii?Q?rZmfZOqUdKJj07odDOANtT+dv2FJ/XF1Og6iQm1FcjiifbPykz0mA4D1dRp3?=
+ =?us-ascii?Q?5sx9W6A3uoDywr3PIfP9ClcXhqmr2v1MnSilRlwALj/V3Ds675r6XV/zr913?=
+ =?us-ascii?Q?be2mEmsO0dAVLA7kSjw12dKr4HS1QXtrHaTbf90TtKQpsGRU7VBJ6Zs1dbl6?=
+ =?us-ascii?Q?uejYddmQfFJCgS8MESaYa3F5De3bwE/VLE+KudiXqU3EZQ4oUgjDouhQHPAo?=
+ =?us-ascii?Q?TMqa+GrU7o9bWlc7zARv4JML/qroVHEe92uxqfUZyFX7kiy6dv/MCrzOtUsQ?=
+ =?us-ascii?Q?dZMaZ0YAPzNpLg2kJxG6fNmOybeV9xbkdiIz9qcJfmPAglT92GSbfBzZ0ljo?=
+ =?us-ascii?Q?nUS2pYpHGhiwDVQhkgnHvcltxMDrX8FE4fOk+WEcxvC4y5OzUJDhqGrGtegk?=
+ =?us-ascii?Q?hUscAmxsPmQZcpJVnHlHDyt9fBOoS+XK9ZrJ1nIT2v8vbLyTwIYyqnKSO6O2?=
+ =?us-ascii?Q?njELCsip5CBNUvbb5Dq6tCrjje4jjbFQQOUaxsat7gPSbk6z0jvsf+2KnNiG?=
+ =?us-ascii?Q?uB+1UM+I0nrQ8By/CSe1M9C9990JRpnVGEFQc5AuiT3qRMT7qZGyjW3smrso?=
+ =?us-ascii?Q?nb68ZXtMGWWCHU66yTKBFax5FJMPPTUmqf2F/MeUAxKALkFzkvKZtg1vlPMT?=
+ =?us-ascii?Q?kVFbPq9nE5LPi/dzakgh/sCQV/1u+r3YIKQ9KLc+fnYhcAgvcwfQMay621G+?=
+ =?us-ascii?Q?ukkpnnNZ7bABme5JMrQZcNXcuXy3XI4dMJmR7CsDqMEHOLyCvQ=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230035)(36860700008)(82310400021)(1800799019)(376009);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230035)(36860700008)(82310400021)(1800799019)(376009);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2024 14:11:01.3647
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2024 14:11:05.7076
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d491395e-f247-48a0-af84-08dc8bb2a7d0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 982f2a46-c612-4696-5b3a-08dc8bb2aa67
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000ECDA.namprd02.prod.outlook.com
+	CY4PEPF0000EE32.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6254
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4201
 
 From: Amit Cohen <amcohen@nvidia.com>
 
-Ethernet frame consists of - Ethernet header, payload, FCS. The MTU value
-which is used by user is the size of the payload, which means that when
-user sets MTU to X, the total frame size will be larger due to the addition
-of the Ethernet header and FCS.
+Currently, the driver uses ETH_MAX_MTU as maximum MTU of netdevices,
+instead, use the accurate value which is supported by the driver.
+Subtract Ethernet headers which are taken into account by hardware for
+MTU checking, as described in the previous patch.
 
-Spectrum ASICs take into account Ethernet header and FCS as part of packet
-size for MTU check. Adjust MTU value when user sets MTU, to configure the
-MTU size which is required by hardware. The Tx header length which was used
-by the driver is not relevant for such calculation, take into account
-Ethernet header (with VLAN extension) and FCS.
+Set minimum MTU to ETH_MIN_MTU, as zero MTU is not really supported.
+
+With this change:
+a. The stack will do the MTU checking, so we can remove it from the driver.
+b. User space will be able to query the actual MTU limits.
+   Before this patch:
+   $ ip -j -d link show dev swp1 | jq | grep mtu
+    "mtu": 1500,
+    "min_mtu": 0,
+    "max_mtu": 65535,
+
+   With this patch:
+   $ ip -j -d link show dev swp1 | jq | grep mtu
+    "mtu": 1500,
+    "min_mtu": 68,
+    "max_mtu": 10218,
 
 Signed-off-by: Amit Cohen <amcohen@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlxsw/port.h     | 1 +
- drivers/net/ethernet/mellanox/mlxsw/spectrum.c | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlxsw/spectrum.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/port.h b/drivers/net/ethernet/mellanox/mlxsw/port.h
-index aa309615eff3..0a73b1a4526e 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/port.h
-+++ b/drivers/net/ethernet/mellanox/mlxsw/port.h
-@@ -7,6 +7,7 @@
- #include <linux/types.h>
- 
- #define MLXSW_PORT_MAX_MTU		(10 * 1024)
-+#define MLXSW_PORT_ETH_FRAME_HDR	(ETH_HLEN + VLAN_HLEN + ETH_FCS_LEN)
- 
- #define MLXSW_PORT_DEFAULT_VID		1
- 
 diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-index 030ed71f945d..879daa18ccca 100644
+index 879daa18ccca..c5856f4d6b8b 100644
 --- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
 +++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-@@ -425,7 +425,7 @@ static int mlxsw_sp_port_mtu_set(struct mlxsw_sp_port *mlxsw_sp_port, u16 mtu)
- 	struct mlxsw_sp *mlxsw_sp = mlxsw_sp_port->mlxsw_sp;
+@@ -426,8 +426,6 @@ static int mlxsw_sp_port_mtu_set(struct mlxsw_sp_port *mlxsw_sp_port, u16 mtu)
  	char pmtu_pl[MLXSW_REG_PMTU_LEN];
  
--	mtu += MLXSW_TXHDR_LEN + ETH_HLEN;
-+	mtu += MLXSW_PORT_ETH_FRAME_HDR;
- 	if (mtu > mlxsw_sp_port->max_mtu)
- 		return -EINVAL;
+ 	mtu += MLXSW_PORT_ETH_FRAME_HDR;
+-	if (mtu > mlxsw_sp_port->max_mtu)
+-		return -EINVAL;
  
+ 	mlxsw_reg_pmtu_pack(pmtu_pl, mlxsw_sp_port->local_port, mtu);
+ 	return mlxsw_reg_write(mlxsw_sp->core, MLXSW_REG(pmtu), pmtu_pl);
+@@ -1697,8 +1695,8 @@ static int mlxsw_sp_port_create(struct mlxsw_sp *mlxsw_sp, u16 local_port,
+ 			 NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_HW_TC;
+ 	dev->hw_features |= NETIF_F_HW_TC | NETIF_F_LOOPBACK;
+ 
+-	dev->min_mtu = 0;
+-	dev->max_mtu = ETH_MAX_MTU;
++	dev->min_mtu = ETH_MIN_MTU;
++	dev->max_mtu = MLXSW_PORT_MAX_MTU - MLXSW_PORT_ETH_FRAME_HDR;
+ 
+ 	/* Each packet needs to have a Tx header (metadata) on top all other
+ 	 * headers.
 -- 
 2.45.0
 
