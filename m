@@ -1,361 +1,276 @@
-Return-Path: <netdev+bounces-103423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 683B8907F6D
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 01:32:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 66B50907F84
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 01:35:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E01992820C8
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 23:32:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D68A6285CC8
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 23:35:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C1F4156F27;
-	Thu, 13 Jun 2024 23:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4030A156257;
+	Thu, 13 Jun 2024 23:32:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Nbxk1FHj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Etfs7nim"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234E1156668
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 23:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2F9155CBE;
+	Thu, 13 Jun 2024 23:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718321507; cv=none; b=uMdKQwFjo5/VfI2RDcYmyiWnl2IIepp1cYx+GbzYyFCz6pFAYyZ3tKA+BPnSoz7XZDSdNMLaLkDN2acYMSi3zUxNKNBJ45byE/MkNXC8R0yrRCoEVTZ2pvm5ECv6oGfILr/odIaN3htbXeefG5w9Y3pNF6r6ihCGRQdD6QDrfjw=
+	t=1718321571; cv=none; b=JfW6bK/6rtEg0cM/NWpXnshrHj87sKyC1lW4AOMkxFnjEpjMmBU2IbWI4jIBTttMngZaPeHsBg4N3WUWT5EUuxL+0X1YoPet2kLxOS6e5czKKNXFFxCCA++R6JnMZsrT+B/jdfH4CSVPegDskhS0BPfcXQi0hmcRNKnHLe4LEeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718321507; c=relaxed/simple;
-	bh=l759AUoZn+Lkd8NE19BHlW8jwuV/0b0Hmv2kt2g0v6E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AuEDQ4jMgCQMPtVvb1mMvX6DL1cSttdzdwPoWUIMF19eCGaHr8RAnhWZ56OtN+3UFYSPYTL40kXmb9mgJ9/X+184yGSv2i3k1i4ztpTdimrJjr//pZesJ9nE85Zl2udgInS3HutnTlh7uqL8hgVe5dvwsT31hXm8KZuIaMFO+/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Nbxk1FHj; arc=none smtp.client-ip=209.85.167.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3c9cc681e4fso742630b6e.0
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 16:31:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1718321503; x=1718926303; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0xJmOuJxFnxzNhLDPuw3aSaK2S5jGXnhr5CJos9rvB4=;
-        b=Nbxk1FHjX83xK3y9hBcq6UjzpuBUDFglMwBlkDdRiOYP1SDaKMDgGM1NA8suzIkzro
-         gO0EFPPgHXRaXSKUWBtewCAmTrht1Oym2ybR8ImlqjoVoxfA3b0aqaeOkwRjQHx5zf9o
-         ci9Nzr/OlaV86H0mzP4+eBIK/FWOYkF7THexZQZ6Krg0x6vBU/UKTiN6N+3Q/U56FIbI
-         2srczLZZTdH5Y3yYiyTjnOztlKKRUNa2kfK0GXepkXaEaxNVn4jZ4/1RftvNrLzZezS4
-         eFXn3l2e9ZBfhPAtdMXXrS3dUSPJ8IK19x4W5+ExgPGpQ8ZRkEs48n3Rosts7ckuWSLp
-         PPSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718321503; x=1718926303;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0xJmOuJxFnxzNhLDPuw3aSaK2S5jGXnhr5CJos9rvB4=;
-        b=LQGkm65G7E7uyBstCxlQ9ioB0GIJRqMFRX4jUeWTQwINSRgLMtcJG3oLJ2H4AcvnNV
-         9T/b9NpELKJPJ7yyrGx1+LB5NqtkLlLW8mFxDdyixjHV69HBp8UhhvDFdZxIlGzQS/ac
-         s9Ch8vbvgwLaR+QEmO80T3i7v5EkpesdXB6WXz6gId1LYWMZS5Elh09g8pL1nvCUV5nF
-         iCGKF8JJ1dXlrVQmzI28u45oEbvMSUYQ7k8PNSXaYcF8hEgv9usW2gK6N8NPwU9oM6Tv
-         H7vHHcbvHxPbl6QEA5PPPQNpauxALuxTtqjgAROjgBRH0FFrS7nRoNJ8ItJ0R8EZYRyt
-         zZyQ==
-X-Gm-Message-State: AOJu0YzDt9ogSd004DwrXMrArUCyFAvcbUgoCVJpqK5yshupt6lEnWRI
-	OM8ufIMzd8fIt3bdr9FZYwF+Nj6A++6r8Ovtlmzjwm2NwSEw/8CFSeaLAm816f66/LxvcKQKxLY
-	47Ms=
-X-Google-Smtp-Source: AGHT+IETgikJHQVfvmW3cFSO8NWheg/2pj6QojSAq7ARV/z9a3BESLBWb9SHAYdIKxCJYnno1RavJg==
-X-Received: by 2002:a05:6808:1884:b0:3d2:1b8a:be4b with SMTP id 5614622812f47-3d24e980c71mr1275046b6e.46.1718321503274;
-        Thu, 13 Jun 2024 16:31:43 -0700 (PDT)
-Received: from n191-036-066.byted.org ([139.177.233.173])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-441ef3d8b62sm10586731cf.11.2024.06.13.16.31.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jun 2024 16:31:42 -0700 (PDT)
-From: zijianzhang@bytedance.com
-To: netdev@vger.kernel.org
-Cc: edumazet@google.com,
-	willemdebruijn.kernel@gmail.com,
-	cong.wang@bytedance.com,
-	xiaochun.lu@bytedance.com,
-	Zijian Zhang <zijianzhang@bytedance.com>
-Subject: [PATCH net-next v5 4/4] selftests: add MSG_ZEROCOPY msg_control notification test
-Date: Thu, 13 Jun 2024 23:31:33 +0000
-Message-Id: <20240613233133.2463193-5-zijianzhang@bytedance.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20240613233133.2463193-1-zijianzhang@bytedance.com>
-References: <20240613233133.2463193-1-zijianzhang@bytedance.com>
+	s=arc-20240116; t=1718321571; c=relaxed/simple;
+	bh=M8o41hq2y/cLCRJOH2p4sk/4nnWqpAlctqY1GvPsGqQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Fd0LfhURlDfZja/ljsIhBiqBcItZ9M1xonSsuvdW4L8aJVgDMYzzAVv76Np7ptM7Clq5a5WN+26E4st+cf7xJ09lsUXSEtnppOaPIt0pSY/fYGaKdU9UFHeiW7wt/nRgi+5n5onaPXv7KlQQpBuscpALCzZwD5WfwM4VwlgV3Rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Etfs7nim; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718321568; x=1749857568;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=M8o41hq2y/cLCRJOH2p4sk/4nnWqpAlctqY1GvPsGqQ=;
+  b=Etfs7nimWfOGysal62eGhEH0YtXUotXHp+gUX+L7ICKiUsyACEQ/1EnO
+   kOwixTLEQ6P4tkffa/XrD0PgukV7yiMeWSVfzC4e4CeWVmo1B0znJHSGi
+   juqjU2DCokNSUB00AfMU/RSQIgRZgCVHqi8F5hb1pgofFZch/RKs7LvPr
+   pnr7/Ca7AejvWMITNaYZARNQpmm2KVL41M4kJfmizeY7X6Dn8bHwFjVdY
+   OXkDFEEmm9hh6iLKuAasIaC151VqH5pAk4tLTu5fC6QPjxb5W1/2ucMJb
+   pIEJ+jFEAp+46G/tGdTvbbtUO/qcN4stsw8HdFNkUwewogI5v5gmVRMXH
+   A==;
+X-CSE-ConnectionGUID: iBSSWmzHQTKXbrJd7/6I3w==
+X-CSE-MsgGUID: 3FCla71jQRaNzMQpQ5s+Cg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11102"; a="40600287"
+X-IronPort-AV: E=Sophos;i="6.08,236,1712646000"; 
+   d="scan'208";a="40600287"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2024 16:32:47 -0700
+X-CSE-ConnectionGUID: 6CCGTarnRZGv3VPNn1kTfg==
+X-CSE-MsgGUID: euhTvjf/Q9iUmBVZzwfelg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,236,1712646000"; 
+   d="scan'208";a="40272567"
+Received: from djiang5-mobl3.amr.corp.intel.com (HELO [10.125.111.43]) ([10.125.111.43])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2024 16:32:45 -0700
+Message-ID: <358d2e11-59e2-46eb-a7f4-3c69e6befe02@intel.com>
+Date: Thu, 13 Jun 2024 16:32:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/8] fwctl: FWCTL_INFO to return basic information about
+ the device
+To: Jason Gunthorpe <jgg@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
+ Itay Avraham <itayavr@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+ Leon Romanovsky <leon@kernel.org>, linux-doc@vger.kernel.org,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Tariq Toukan <tariqt@nvidia.com>
+Cc: Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Aron Silverton <aron.silverton@oracle.com>,
+ Dan Williams <dan.j.williams@intel.com>, David Ahern <dsahern@kernel.org>,
+ Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
+ Leonid Bloch <lbloch@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+ linux-cxl@vger.kernel.org, patches@lists.linux.dev
+References: <3-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <3-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Zijian Zhang <zijianzhang@bytedance.com>
 
-We update selftests/net/msg_zerocopy.c to accommodate the new mechanism.
 
-Test result from selftests/net/msg_zerocopy.c,
-cfg_notification_limit = 1, in this case the original method approximately
-aligns with the semantics of new one. In this case, the new flag has
-around 13% cpu savings in TCP and 18% cpu savings in UDP.
-+---------------------+---------+---------+---------+---------+
-| Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
-+---------------------+---------+---------+---------+---------+
-| ZCopy (MB)          | 5147    | 4885    | 7489    | 7854    |
-+---------------------+---------+---------+---------+---------+
-| New ZCopy (MB)      | 5859    | 5505    | 9053    | 9236    |
-+---------------------+---------+---------+---------+---------+
-| New ZCopy / ZCopy   | 113.83% | 112.69% | 120.88% | 117.59% |
-+---------------------+---------+---------+---------+---------+
+On 6/3/24 8:53 AM, Jason Gunthorpe wrote:
+> Userspace will need to know some details about the fwctl interface being
+> used to locate the correct userspace code to communicate with the
+> kernel. Provide a simple device_type enum indicating what the kernel
+> driver is.
+> 
+> Allow the device to provide a device specific info struct that contains
+> any additional information that the driver may need to provide to
+> userspace.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/fwctl/main.c       | 54 ++++++++++++++++++++++++++++++++++++++
+>  include/linux/fwctl.h      |  8 ++++++
+>  include/uapi/fwctl/fwctl.h | 29 ++++++++++++++++++++
+>  3 files changed, 91 insertions(+)
+> 
+> diff --git a/drivers/fwctl/main.c b/drivers/fwctl/main.c
+> index 7ecdabdd9dcb1e..10e3f504893892 100644
+> --- a/drivers/fwctl/main.c
+> +++ b/drivers/fwctl/main.c
+> @@ -17,6 +17,8 @@ enum {
+>  static dev_t fwctl_dev;
+>  static DEFINE_IDA(fwctl_ida);
+>  
+> +DEFINE_FREE(kfree_errptr, void *, if (!IS_ERR_OR_NULL(_T)) kfree(_T));
+> +
+>  struct fwctl_ucmd {
+>  	struct fwctl_uctx *uctx;
+>  	void __user *ubuffer;
+> @@ -24,8 +26,59 @@ struct fwctl_ucmd {
+>  	u32 user_size;
+>  };
+>  
+> +static int ucmd_respond(struct fwctl_ucmd *ucmd, size_t cmd_len)
+> +{
+> +	if (copy_to_user(ucmd->ubuffer, ucmd->cmd,
+> +			 min_t(size_t, ucmd->user_size, cmd_len)))
+> +		return -EFAULT;
+> +	return 0;
+> +}
+> +
+> +static int copy_to_user_zero_pad(void __user *to, const void *from,
+> +				 size_t from_len, size_t user_len)
+> +{
+> +	size_t copy_len;
+> +
+> +	copy_len = min(from_len, user_len);
+> +	if (copy_to_user(to, from, copy_len))
+> +		return -EFAULT;
+> +	if (copy_len < user_len) {
+> +		if (clear_user(to + copy_len, user_len - copy_len))
+> +			return -EFAULT;
+> +	}
+> +	return 0;
+> +}
+> +
+> +static int fwctl_cmd_info(struct fwctl_ucmd *ucmd)
+> +{
+> +	struct fwctl_device *fwctl = ucmd->uctx->fwctl;
+> +	struct fwctl_info *cmd = ucmd->cmd;
+> +	size_t driver_info_len = 0;
+> +
+> +	if (cmd->flags)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (cmd->device_data_len) {
+> +		void *driver_info __free(kfree_errptr) = NULL;
+> +
+> +		driver_info = fwctl->ops->info(ucmd->uctx, &driver_info_len);
 
-cfg_notification_limit = 32, it means less poll + recvmsg overhead,
-the new mechanism performs 8% better in TCP. For UDP, no obvious
-performance gain is observed and sometimes may lead to degradation.
-Thus, if users don't need to retrieve the notification ASAP in UDP,
-the original mechanism is preferred.
-+---------------------+---------+---------+---------+---------+
-| Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
-+---------------------+---------+---------+---------+---------+
-| ZCopy (MB)          | 6272    | 6138    | 12138   | 10055   |
-+---------------------+---------+---------+---------+---------+
-| New ZCopy (MB)      | 6774    | 6620    | 11504   | 10355   |
-+---------------------+---------+---------+---------+---------+
-| New ZCopy / ZCopy   | 108.00% | 107.85% | 94.78%  | 102.98% |
-+---------------------+---------+---------+---------+---------+
+Hi Jason,
+Are you open to pass in potential user input for the info query? I'm working on plumbing fwctl for CXL. The current CXL query command [1] takes a number of commands as input for its ioctl. For fwctl_cmd_info(), the current implementation is when ->info() is called no information about the user buffer length or an input buffer is provided. To make things work I can just return everything each ioctl call and user can sort it out by calling the ioctl twice and provide a u32 size buffer first to figure out the total number of commands and then provide a larger buffer for all the command info. Just trying to see if you are open to something a bit more cleaner than depending on a side effect of the ioctl to retrieve all the information.  
 
-Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
-Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
----
- tools/testing/selftests/net/msg_zerocopy.c  | 109 ++++++++++++++++++--
- tools/testing/selftests/net/msg_zerocopy.sh |   1 +
- 2 files changed, 102 insertions(+), 8 deletions(-)
+[1] https://elixir.bootlin.com/linux/v6.10-rc3/source/drivers/cxl/core/mbox.c#L526
 
-diff --git a/tools/testing/selftests/net/msg_zerocopy.c b/tools/testing/selftests/net/msg_zerocopy.c
-index 7ea5fb28c93d..b8a1002aa6ae 100644
---- a/tools/testing/selftests/net/msg_zerocopy.c
-+++ b/tools/testing/selftests/net/msg_zerocopy.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /* Evaluate MSG_ZEROCOPY
-  *
-  * Send traffic between two processes over one of the supported
-@@ -66,6 +67,10 @@
- #define SO_ZEROCOPY	60
- #endif
- 
-+#ifndef SCM_ZC_NOTIFICATION
-+#define SCM_ZC_NOTIFICATION	78
-+#endif
-+
- #ifndef SO_EE_CODE_ZEROCOPY_COPIED
- #define SO_EE_CODE_ZEROCOPY_COPIED	1
- #endif
-@@ -74,6 +79,15 @@
- #define MSG_ZEROCOPY	0x4000000
- #endif
- 
-+enum notification_type {
-+	MSG_ZEROCOPY_NOTIFY_ERRQUEUE = 1,
-+	MSG_ZEROCOPY_NOTIFY_SENDMSG = 2,
-+};
-+
-+#define INVALID_ZEROCOPY_VAL 2
-+
-+#define ZC_NOTIF_ARR_SZ (sizeof(struct zc_info_elem) * SOCK_ZC_INFO_MAX)
-+
- static int  cfg_cork;
- static bool cfg_cork_mixed;
- static int  cfg_cpu		= -1;		/* default: pin to last cpu */
-@@ -85,14 +99,16 @@ static bool cfg_rx;
- static int  cfg_runtime_ms	= 4200;
- static int  cfg_verbose;
- static int  cfg_waittime_ms	= 500;
--static int  cfg_notification_limit = 32;
--static bool cfg_zerocopy;
-+static int  cfg_notification_limit = 16;
-+static enum notification_type cfg_zerocopy;
- 
- static socklen_t cfg_alen;
- static struct sockaddr_storage cfg_dst_addr;
- static struct sockaddr_storage cfg_src_addr;
- 
- static char payload[IP_MAXPACKET];
-+static char zc_ckbuf[CMSG_SPACE(ZC_NOTIF_ARR_SZ)];
-+static bool added_zcopy_info;
- static long packets, bytes, completions, expected_completions;
- static int  zerocopied = -1;
- static uint32_t next_completion;
-@@ -169,6 +185,25 @@ static int do_accept(int fd)
- 	return fd;
- }
- 
-+static void add_zcopy_info(struct msghdr *msg)
-+{
-+	int i;
-+	struct cmsghdr *cm;
-+	struct zc_info_elem *zc_info;
-+
-+	if (!msg->msg_control)
-+		error(1, errno, "NULL user arg");
-+	cm = (struct cmsghdr *)msg->msg_control;
-+	zc_info = (struct zc_info_elem *)CMSG_DATA(cm);
-+
-+	cm->cmsg_len = CMSG_LEN(ZC_NOTIF_ARR_SZ);
-+	cm->cmsg_level = SOL_SOCKET;
-+	cm->cmsg_type = SCM_ZC_NOTIFICATION;
-+	for (i = 0; i < SOCK_ZC_INFO_MAX; i++)
-+		zc_info[i].zerocopy = INVALID_ZEROCOPY_VAL;
-+	added_zcopy_info = true;
-+}
-+
- static void add_zcopy_cookie(struct msghdr *msg, uint32_t cookie)
- {
- 	struct cmsghdr *cm;
-@@ -182,7 +217,8 @@ static void add_zcopy_cookie(struct msghdr *msg, uint32_t cookie)
- 	memcpy(CMSG_DATA(cm), &cookie, sizeof(cookie));
- }
- 
--static bool do_sendmsg(int fd, struct msghdr *msg, bool do_zerocopy, int domain)
-+static bool do_sendmsg(int fd, struct msghdr *msg,
-+			   enum notification_type do_zerocopy, int domain)
- {
- 	int ret, len, i, flags;
- 	static uint32_t cookie;
-@@ -200,6 +236,12 @@ static bool do_sendmsg(int fd, struct msghdr *msg, bool do_zerocopy, int domain)
- 			msg->msg_controllen = CMSG_SPACE(sizeof(cookie));
- 			msg->msg_control = (struct cmsghdr *)ckbuf;
- 			add_zcopy_cookie(msg, ++cookie);
-+		} else if (do_zerocopy == MSG_ZEROCOPY_NOTIFY_SENDMSG &&
-+			   sends_since_notify >= cfg_notification_limit) {
-+			memset(&msg->msg_control, 0, sizeof(msg->msg_control));
-+			msg->msg_controllen = sizeof(zc_ckbuf);
-+			msg->msg_control = (struct cmsghdr *)zc_ckbuf;
-+			add_zcopy_info(msg);
- 		}
- 	}
- 
-@@ -218,7 +260,7 @@ static bool do_sendmsg(int fd, struct msghdr *msg, bool do_zerocopy, int domain)
- 		if (do_zerocopy && ret)
- 			expected_completions++;
- 	}
--	if (do_zerocopy && domain == PF_RDS) {
-+	if (msg->msg_control) {
- 		msg->msg_control = NULL;
- 		msg->msg_controllen = 0;
- 	}
-@@ -392,6 +434,48 @@ static bool do_recvmsg_completion(int fd)
- 	return ret;
- }
- 
-+static void do_recv_completions2(void)
-+{
-+	int i;
-+	__u32 hi, lo, range;
-+	__u8 zerocopy;
-+	struct cmsghdr *cm = (struct cmsghdr *)zc_ckbuf;
-+	struct zc_info_elem *zc_info = (struct zc_info_elem *)CMSG_DATA(cm);
-+
-+	if (!added_zcopy_info)
-+		return;
-+
-+	added_zcopy_info = false;
-+	for (i = 0; i < SOCK_ZC_INFO_MAX && zc_info[i].zerocopy != INVALID_ZEROCOPY_VAL; i++) {
-+		struct zc_info_elem elem = zc_info[i];
-+
-+		hi = elem.hi;
-+		lo = elem.lo;
-+		zerocopy = elem.zerocopy;
-+		range = hi - lo + 1;
-+
-+		if (cfg_verbose && lo != next_completion)
-+			fprintf(stderr, "gap: %u..%u does not append to %u\n",
-+				lo, hi, next_completion);
-+		next_completion = hi + 1;
-+
-+		if (zerocopied == -1)
-+			zerocopied = zerocopy;
-+		else if (zerocopied != zerocopy) {
-+			fprintf(stderr, "serr: inconsistent\n");
-+			zerocopied = zerocopy;
-+		}
-+
-+		completions += range;
-+
-+		if (cfg_verbose >= 2)
-+			fprintf(stderr, "completed: %u (h=%u l=%u)\n",
-+				range, hi, lo);
-+	}
-+
-+	sends_since_notify -= i;
-+}
-+
- static bool do_recv_completion(int fd, int domain)
- {
- 	struct sock_extended_err *serr;
-@@ -553,11 +637,15 @@ static void do_tx(int domain, int type, int protocol)
- 		else
- 			do_sendmsg(fd, &msg, cfg_zerocopy, domain);
- 
--		if (cfg_zerocopy && sends_since_notify >= cfg_notification_limit)
-+		if (cfg_zerocopy == MSG_ZEROCOPY_NOTIFY_ERRQUEUE &&
-+			sends_since_notify >= cfg_notification_limit)
- 			do_recv_completions(fd, domain);
- 
-+		if (cfg_zerocopy == MSG_ZEROCOPY_NOTIFY_SENDMSG)
-+			do_recv_completions2();
-+
- 		while (!do_poll(fd, POLLOUT)) {
--			if (cfg_zerocopy)
-+			if (cfg_zerocopy == MSG_ZEROCOPY_NOTIFY_ERRQUEUE)
- 				do_recv_completions(fd, domain);
- 		}
- 
-@@ -715,7 +803,7 @@ static void parse_opts(int argc, char **argv)
- 
- 	cfg_payload_len = max_payload_len;
- 
--	while ((c = getopt(argc, argv, "46c:C:D:i:l:mp:rs:S:t:vz")) != -1) {
-+	while ((c = getopt(argc, argv, "46c:C:D:i:l:mnp:rs:S:t:vz")) != -1) {
- 		switch (c) {
- 		case '4':
- 			if (cfg_family != PF_UNSPEC)
-@@ -749,6 +837,9 @@ static void parse_opts(int argc, char **argv)
- 		case 'm':
- 			cfg_cork_mixed = true;
- 			break;
-+		case 'n':
-+			cfg_zerocopy = MSG_ZEROCOPY_NOTIFY_SENDMSG;
-+			break;
- 		case 'p':
- 			cfg_port = strtoul(optarg, NULL, 0);
- 			break;
-@@ -768,7 +859,7 @@ static void parse_opts(int argc, char **argv)
- 			cfg_verbose++;
- 			break;
- 		case 'z':
--			cfg_zerocopy = true;
-+			cfg_zerocopy = MSG_ZEROCOPY_NOTIFY_ERRQUEUE;
- 			break;
- 		}
- 	}
-@@ -779,6 +870,8 @@ static void parse_opts(int argc, char **argv)
- 			error(1, 0, "-D <server addr> required for PF_RDS\n");
- 		if (!cfg_rx && !saddr)
- 			error(1, 0, "-S <client addr> required for PF_RDS\n");
-+		if (cfg_zerocopy == MSG_ZEROCOPY_NOTIFY_SENDMSG)
-+			error(1, 0, "PF_RDS does not support MSG_ZEROCOPY_NOTIFY_SENDMSG");
- 	}
- 	setup_sockaddr(cfg_family, daddr, &cfg_dst_addr);
- 	setup_sockaddr(cfg_family, saddr, &cfg_src_addr);
-diff --git a/tools/testing/selftests/net/msg_zerocopy.sh b/tools/testing/selftests/net/msg_zerocopy.sh
-index 89c22f5320e0..022a6936d86f 100755
---- a/tools/testing/selftests/net/msg_zerocopy.sh
-+++ b/tools/testing/selftests/net/msg_zerocopy.sh
-@@ -118,4 +118,5 @@ do_test() {
- 
- do_test "${EXTRA_ARGS}"
- do_test "-z ${EXTRA_ARGS}"
-+do_test "-n ${EXTRA_ARGS}"
- echo ok
--- 
-2.20.1
+DJ
 
+> +		if (IS_ERR(driver_info))
+> +			return PTR_ERR(driver_info);
+> +
+> +		if (copy_to_user_zero_pad(u64_to_user_ptr(cmd->out_device_data),
+> +					  driver_info, driver_info_len,
+> +					  cmd->device_data_len))
+> +			return -EFAULT;
+> +	}
+> +
+> +	cmd->out_device_type = fwctl->ops->device_type;
+> +	cmd->device_data_len = driver_info_len;
+> +	return ucmd_respond(ucmd, sizeof(*cmd));
+> +}
+> +
+>  /* On stack memory for the ioctl structs */
+>  union ucmd_buffer {
+> +	struct fwctl_info info;
+>  };
+>  
+>  struct fwctl_ioctl_op {
+> @@ -45,6 +98,7 @@ struct fwctl_ioctl_op {
+>  		.execute = _fn,                                       \
+>  	}
+>  static const struct fwctl_ioctl_op fwctl_ioctl_ops[] = {
+> +	IOCTL_OP(FWCTL_INFO, fwctl_cmd_info, struct fwctl_info, out_device_data),
+>  };
+>  
+>  static long fwctl_fops_ioctl(struct file *filp, unsigned int cmd,
+> diff --git a/include/linux/fwctl.h b/include/linux/fwctl.h
+> index 1d9651de92fc19..9a906b861acf3a 100644
+> --- a/include/linux/fwctl.h
+> +++ b/include/linux/fwctl.h
+> @@ -7,12 +7,14 @@
+>  #include <linux/device.h>
+>  #include <linux/cdev.h>
+>  #include <linux/cleanup.h>
+> +#include <uapi/fwctl/fwctl.h>
+>  
+>  struct fwctl_device;
+>  struct fwctl_uctx;
+>  
+>  /**
+>   * struct fwctl_ops - Driver provided operations
+> + * @device_type: The drivers assigned device_type number. This is uABI
+>   * @uctx_size: The size of the fwctl_uctx struct to allocate. The first
+>   *	bytes of this memory will be a fwctl_uctx. The driver can use the
+>   *	remaining bytes as its private memory.
+> @@ -20,11 +22,17 @@ struct fwctl_uctx;
+>   *	used.
+>   * @close_uctx: Called when the uctx is destroyed, usually when the FD is
+>   *	closed.
+> + * @info: Implement FWCTL_INFO. Return a kmalloc() memory that is copied to
+> + *	out_device_data. On input length indicates the size of the user buffer
+> + *	on output it indicates the size of the memory. The driver can ignore
+> + *	length on input, the core code will handle everything.
+>   */
+>  struct fwctl_ops {
+> +	enum fwctl_device_type device_type;
+>  	size_t uctx_size;
+>  	int (*open_uctx)(struct fwctl_uctx *uctx);
+>  	void (*close_uctx)(struct fwctl_uctx *uctx);
+> +	void *(*info)(struct fwctl_uctx *uctx, size_t *length);
+>  };
+>  
+>  /**
+> diff --git a/include/uapi/fwctl/fwctl.h b/include/uapi/fwctl/fwctl.h
+> index 0bdce95b6d69d9..39db9f09f8068e 100644
+> --- a/include/uapi/fwctl/fwctl.h
+> +++ b/include/uapi/fwctl/fwctl.h
+> @@ -36,6 +36,35 @@
+>   */
+>  enum {
+>  	FWCTL_CMD_BASE = 0,
+> +	FWCTL_CMD_INFO = 0,
+> +	FWCTL_CMD_RPC = 1,
+>  };
+>  
+> +enum fwctl_device_type {
+> +	FWCTL_DEVICE_TYPE_ERROR = 0,
+> +};
+> +
+> +/**
+> + * struct fwctl_info - ioctl(FWCTL_INFO)
+> + * @size: sizeof(struct fwctl_info)
+> + * @flags: Must be 0
+> + * @out_device_type: Returns the type of the device from enum fwctl_device_type
+> + * @device_data_len: On input the length of the out_device_data memory. On
+> + *	output the size of the kernel's device_data which may be larger or
+> + *	smaller than the input. Maybe 0 on input.
+> + * @out_device_data: Pointer to a memory of device_data_len bytes. Kernel will
+> + *	fill the entire memory, zeroing as required.
+> + *
+> + * Returns basic information about this fwctl instance, particularly what driver
+> + * is being used to define the device_data format.
+> + */
+> +struct fwctl_info {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 out_device_type;
+> +	__u32 device_data_len;
+> +	__aligned_u64 out_device_data;
+> +};
+> +#define FWCTL_INFO _IO(FWCTL_TYPE, FWCTL_CMD_INFO)
+> +
+>  #endif
 
