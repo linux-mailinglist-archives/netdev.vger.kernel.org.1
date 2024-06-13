@@ -1,126 +1,142 @@
-Return-Path: <netdev+bounces-103244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AA6E90748F
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:05:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CFF39074A2
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:07:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F9BD1F21418
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:05:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51BA41C23ADF
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:07:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59171448D7;
-	Thu, 13 Jun 2024 14:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C4EE143C7E;
+	Thu, 13 Jun 2024 14:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="P7EAkGre"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Y0ObKpEv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090EC9476;
-	Thu, 13 Jun 2024 14:04:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7263014265A
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 14:07:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718287496; cv=none; b=Q75EcCHIycquvIMfIIxk5L1DQdM3XCxo0p3OrPM9znnOW/gz+mbunWsryJgE0F0OdZ+8z/YZccd/9ZJHKvjwkrkl+NKY4YG7bxcAkZEXKMn1veA1yBX5laT41Tg7XTHy5YDs8P+KNFnc/zznDMVA0AyeM/Io7huOPVI8446c8FE=
+	t=1718287632; cv=none; b=jWwVNlV+x6LDz26lGcjBJI6gKFWi4npPq1/zV5iIf5yIW9mlyJ68dQJfoee/7/lScDIEjRCW3w+GDgu9JkSaND040SihDbeRKm2d2BbYuBdjxSmibKe4rfHA8lKwDV2x6noW8photpvcpnjLU7fq9Axg1MQaVhkMdSViBNSZWJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718287496; c=relaxed/simple;
-	bh=aTwXz6cd+7O5ns/VoXjB2wvZF89KQ+cESZglgSOTSog=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Fr1NlLIkGq2e0TIE/FuPq+ZTL6bJgexvkpPU9LYv//kmdzjuNY6NuqJkXXIE7Fjd99NTLVHQ/4iggljot2DglxSW5hs5eIKEMc2ukY7xuxxyPu2amhgs3+d8sA8LcB1dxeg4V9Sefi/k5aFIhJCFUW8lTpsxrJ/yUrA8yearK7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=P7EAkGre; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45D9WHve013814;
-	Thu, 13 Jun 2024 14:04:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	qcppdkim1; bh=YuoXR8+jBUjy6aij2PyZEfjZb9KTyQz84PKl9zDk6L0=; b=P7
-	EAkGrecHdEk0LUqVwnTAFHOZFjdsb8sUt/4e+q8QAiJKEVn2Sj4eLsKjjov4xlCJ
-	Sl4+1TCGWJwgEtOfyJpdHLCYzscpp7JP+zvSJrLWL0K0w82n2Ctp1DMY+fhWUPw+
-	r7SxX0vaLdZuBsqBJ0ITNSV4Ls4SwL/mmMLPQ5nQpx8+ikKN5AIAcTM1WLrBXu3M
-	Ds555pvzpjXAo5fwO54E0ju3H66MYm9Xw0tWa/DJB8eIWNvFO6wy4mqxSJeReKTZ
-	e9i0Lf+oG0Bt9/CE6jlrVQ9OEGG1KfMsAXwQ8aF+Ki/aYxLSQl3UpCOqFFY4U4bU
-	krBb7G8lTNsUJ2zbJFeg==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yqx7k0s24-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Jun 2024 14:04:43 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45DE4gPm027796
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Jun 2024 14:04:42 GMT
-Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 13 Jun 2024 07:04:40 -0700
-From: Zijun Hu <quic_zijuhu@quicinc.com>
-To: <johannes@sipsolutions.net>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <quic_zijuhu@quicinc.com>
-Subject: [PATCH v1] net: rfkill: Correct value returned for invalid parameter
-Date: Thu, 13 Jun 2024 22:04:36 +0800
-Message-ID: <1718287476-28227-1-git-send-email-quic_zijuhu@quicinc.com>
-X-Mailer: git-send-email 2.7.4
+	s=arc-20240116; t=1718287632; c=relaxed/simple;
+	bh=iZ8m1EfBOd1SnoGwLiPYUfu4Y6EqxSI1bQ18J2uWDsQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=igtCXD5+epmYNe5MP//oFummz6HvG1h9Yfd4eldb0HRBvOZ/Can2ILvXCFn9D3wqL1N8tZ1J5sdhbL3rL4IxLZzWHAXYDHi+sFBet+mAROANufplccsLW8U52blSY1PD0LZH2TKvRCCj5MNps2n0LpN1go5tlmI7gpGu9lfFULE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Y0ObKpEv; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1718287629; x=1749823629;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=iZ8m1EfBOd1SnoGwLiPYUfu4Y6EqxSI1bQ18J2uWDsQ=;
+  b=Y0ObKpEvX8/Xh7GGaGnHORjAP6C1AjP19LMeXzAhkoguDSfuVxD3dk7I
+   Lw/5g83HnpAe7cey1Gh908ayIglIPqRtK82MMBj57P7cmOd/fVGeDnR9h
+   D4X7M2X3eO1INGeuyrwzKTc2W0BOWkJrMEVGQ5iVbK48sjh7jLRy9kPPx
+   Md55Y0FsoNqV/dlA/8Tosbm405FYBeOTTl0rkAu1ykQmbWSDUDmrE315m
+   xhYCaI0wJNs8N3gyhFx+1BK7kksqVQnWtgPVgKRgn8HGJfDYJZYe9Cd6L
+   p4O/7PG5pTPlUxkaFPaX6QK94y5gIpO8TUB/cXBLzYvo1j1N1IrWVt3Pb
+   w==;
+X-CSE-ConnectionGUID: jOv7ZpKbTC6+JoTCNFFumg==
+X-CSE-MsgGUID: uXhU0UtkQ9Gfkc9kNruTbQ==
+X-IronPort-AV: E=Sophos;i="6.08,235,1712646000"; 
+   d="scan'208";a="29854906"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Jun 2024 07:07:07 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 13 Jun 2024 07:06:56 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Thu, 13 Jun 2024 07:06:55 -0700
+Date: Thu, 13 Jun 2024 16:06:54 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>
+Subject: Re: [PATCH net-next] eth: lan966x: don't clear unsupported stats
+Message-ID: <20240613140654.me6zzng4v5uerwbr@DEN-DL-M31836.microchip.com>
+References: <20240613003222.3327368-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 2Pefc01LrsNixgR4SifjjoAmaZjaWG3T
-X-Proofpoint-GUID: 2Pefc01LrsNixgR4SifjjoAmaZjaWG3T
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-13_07,2024-06-13_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- priorityscore=1501 suspectscore=0 spamscore=0 mlxlogscore=925 mlxscore=0
- lowpriorityscore=0 adultscore=0 impostorscore=0 clxscore=1015 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406130101
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20240613003222.3327368-1-kuba@kernel.org>
 
-Kernel API rfkill_set_hw_state_reason() does not return current combined
-block state when its parameter @reason is invalid, that is wrong according
-to its comments, fixed by correcting value returned.
+The 06/12/2024 17:32, Jakub Kicinski wrote:
+> Commit 12c2d0a5b8e2 ("net: lan966x: add ethtool configuration and statistics")
+> added support for various standard stats. We should not clear the stats
+> which are not collected by the device. Core code uses a special
+> initializer to detect when device does not report given stat.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
----
-previous discussion link:
-https://lore.kernel.org/all/1717771212-30723-2-git-send-email-quic_zijuhu@quicinc.com/
+Acked-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 
- net/rfkill/core.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+> ---
+> CC: horatiu.vultur@microchip.com
+> CC: UNGLinuxDriver@microchip.com
+> ---
+>  drivers/net/ethernet/microchip/lan966x/lan966x_ethtool.c | 8 --------
+>  1 file changed, 8 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_ethtool.c b/drivers/net/ethernet/microchip/lan966x/lan966x_ethtool.c
+> index 06811c60d598..c0fc85ac5db3 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_ethtool.c
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_ethtool.c
+> @@ -376,7 +376,6 @@ static void lan966x_get_eth_mac_stats(struct net_device *dev,
+>                 lan966x->stats[idx + SYS_COUNT_TX_PMAC_BC];
+>         mac_stats->SingleCollisionFrames =
+>                 lan966x->stats[idx + SYS_COUNT_TX_COL];
+> -       mac_stats->MultipleCollisionFrames = 0;
+>         mac_stats->FramesReceivedOK =
+>                 lan966x->stats[idx + SYS_COUNT_RX_UC] +
+>                 lan966x->stats[idx + SYS_COUNT_RX_MC] +
+> @@ -384,26 +383,19 @@ static void lan966x_get_eth_mac_stats(struct net_device *dev,
+>         mac_stats->FrameCheckSequenceErrors =
+>                 lan966x->stats[idx + SYS_COUNT_RX_CRC] +
+>                 lan966x->stats[idx + SYS_COUNT_RX_CRC];
+> -       mac_stats->AlignmentErrors = 0;
+>         mac_stats->OctetsTransmittedOK =
+>                 lan966x->stats[idx + SYS_COUNT_TX_OCT] +
+>                 lan966x->stats[idx + SYS_COUNT_TX_PMAC_OCT];
+>         mac_stats->FramesWithDeferredXmissions =
+>                 lan966x->stats[idx + SYS_COUNT_TX_MM_HOLD];
+> -       mac_stats->LateCollisions = 0;
+> -       mac_stats->FramesAbortedDueToXSColls = 0;
+> -       mac_stats->FramesLostDueToIntMACXmitError = 0;
+> -       mac_stats->CarrierSenseErrors = 0;
+>         mac_stats->OctetsReceivedOK =
+>                 lan966x->stats[idx + SYS_COUNT_RX_OCT];
+> -       mac_stats->FramesLostDueToIntMACRcvError = 0;
+>         mac_stats->MulticastFramesXmittedOK =
+>                 lan966x->stats[idx + SYS_COUNT_TX_MC] +
+>                 lan966x->stats[idx + SYS_COUNT_TX_PMAC_MC];
+>         mac_stats->BroadcastFramesXmittedOK =
+>                 lan966x->stats[idx + SYS_COUNT_TX_BC] +
+>                 lan966x->stats[idx + SYS_COUNT_TX_PMAC_BC];
+> -       mac_stats->FramesWithExcessiveDeferral = 0;
+>         mac_stats->MulticastFramesReceivedOK =
+>                 lan966x->stats[idx + SYS_COUNT_RX_MC];
+>         mac_stats->BroadcastFramesReceivedOK =
+> --
+> 2.45.2
+> 
+> 
 
-diff --git a/net/rfkill/core.c b/net/rfkill/core.c
-index c3feb4f49d09..1f3082526658 100644
---- a/net/rfkill/core.c
-+++ b/net/rfkill/core.c
-@@ -543,13 +543,14 @@ bool rfkill_set_hw_state_reason(struct rfkill *rfkill,
- {
- 	unsigned long flags;
- 	bool ret, prev;
-+	const unsigned long reason_mask = RFKILL_HARD_BLOCK_SIGNAL |
-+		RFKILL_HARD_BLOCK_NOT_OWNER;
- 
- 	BUG_ON(!rfkill);
- 
--	if (WARN(reason &
--	    ~(RFKILL_HARD_BLOCK_SIGNAL | RFKILL_HARD_BLOCK_NOT_OWNER),
--	    "hw_state reason not supported: 0x%lx", reason))
--		return blocked;
-+	if (WARN(reason & ~reason_mask,
-+		 "hw_state reason not supported: 0x%lx", reason))
-+		return rfkill_blocked(rfkill);
- 
- 	spin_lock_irqsave(&rfkill->lock, flags);
- 	prev = !!(rfkill->hard_block_reasons & reason);
 -- 
-2.7.4
-
+/Horatiu
 
