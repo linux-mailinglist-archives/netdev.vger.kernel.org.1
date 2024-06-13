@@ -1,120 +1,132 @@
-Return-Path: <netdev+bounces-103087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4053190637C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 07:38:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 730129063C2
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 08:09:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBAB41F227F2
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 05:38:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D0331C20402
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 06:09:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F11AA136643;
-	Thu, 13 Jun 2024 05:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E13135A4B;
+	Thu, 13 Jun 2024 06:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="HUsK3+Qk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NiWDty4P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f65.google.com (mail-ed1-f65.google.com [209.85.208.65])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E53135A53
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 05:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9925937C
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 06:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718257107; cv=none; b=c5EnBlhcKvdSYqPWGAeFVVdtsq8aKZh1YK/XBTYMDl2HOhE0ahlm7M/Xb+yMjjlkT8JBHedgFSeg5K0ndYH5wwJja/gOqd+sts24kSfYW7RPHcrqKlHXJeUWjHo23vdXcJHPdHqn/pTF1hBwvEG0+g+Fx5+7G+qJwWNZaLDKr7o=
+	t=1718258958; cv=none; b=DOBKrgJMe4wc3GB51ROG7d8PtF1GioQnWr1rbDGNTMw7KAt/b1yhCkLEfS8ole3mLk1A/1jK0ZZ4GZPbN/P6YB3npohDAZ4NA1Gi9zJhgStajZhfh1skLLEjWVcyzphgVjGSBJpMB0xlCK5ra/reqfZpM+KR0IHmeJaHoYNah7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718257107; c=relaxed/simple;
-	bh=GgQ20cHpk+tAp0Fm34ztqoPZ0U/eOHRU+4zAOtD3Dlc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N7+T0wMl56sDxnyaOig6lGLR/2fYX7ik2k9ozivraiAkfaJ6sr9omZy4PJ2Qg1JA1eaVJUmiodnZSanZzdN70KGbS8R6G/VTfhmbS14JXxEVlVdbHxH9B3aG5t+p34CvgiIAJsb7L5E4wBcvAHi8e+MsypcjWmKVSOS5T3zaAGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=HUsK3+Qk; arc=none smtp.client-ip=209.85.208.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f65.google.com with SMTP id 4fb4d7f45d1cf-57cb9efd8d1so113037a12.0
-        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 22:38:25 -0700 (PDT)
+	s=arc-20240116; t=1718258958; c=relaxed/simple;
+	bh=nXP6x59o/QNZ4r9qxDqq8GkcNNM5e+hJhAIhAS57ld8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MuXIkognf07jiP/WtGK4yVWLIfHEYMO7GE+b52g6iRkTKtiCjNRRzoDtmpW3xBnFU3Lp30nIJyUyqJSzkHaIL769cscM8fMXlq0wh3rVj0BnAULKhEgFJtR0h6hz/7rxi9Bw3Hwt7YLxO48oA6t3k9XRmOTXqQFTXo5ek4yHLUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NiWDty4P; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52bc27cfb14so851463e87.0
+        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 23:09:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718257104; x=1718861904; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GgQ20cHpk+tAp0Fm34ztqoPZ0U/eOHRU+4zAOtD3Dlc=;
-        b=HUsK3+QkOSkpuPcri636lMgplglksxc4UufXjH/ItsBq8+N+VdElR40PxVXKHSUhqK
-         E4NGm+nniQGHeEYDmR/GKElhrusg8VIRDsnHfUMrBA+QOdORLhYmgYe15Z/bU9/qWUpD
-         AxO4DI+rvDbnIuU99OzmdIWy4JC+IwM/uPDWS+lEEvetYzAhdFne9V70uywc+VTqbfOw
-         yy6zMTWUFKLcz09edHPenhreqVsvCVpNaqvsrDn0f8IVJ9BlQ+779//KubebCKgNlJQ0
-         1j3swksmqWIuQ3jIaylVzH3FTv/3bxfPD/kyqNfTEYtBZTHIc18XKFZ+nG7aW7cxeyeI
-         9qgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718257104; x=1718861904;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1718258955; x=1718863755; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GgQ20cHpk+tAp0Fm34ztqoPZ0U/eOHRU+4zAOtD3Dlc=;
-        b=DfSSuAjt/FkBpswC3Bm3UNXil+WaLOgROlxiOtxZK7TZrhGg+9SSME2HMeXpR0TxDF
-         2PqqiNHdXQjhj6ZLH5mln6JM3TMcZkNhhrPGR51wRTFIQlp76Z+RXfReu2Ryi9K1IZgF
-         ms3SiC6GzpTVzQG6LMrQ4veCLVNbzkk1J0XS4SL0e/HNM66wWM8lqgZ8/0gZcdqvWh3b
-         +kUNVRjbPSGjp4S7NvLWQCRRz0IdWK/w8/7KWfuriyRmqZEMtt6ExYkCDTpOiCWmjeBD
-         53l4I5EL4nMN77viuxx7my5v269YXraA9LPEnhTb2URvhjNSZ+EVKtpmO4Vre/QjOB4U
-         8yeA==
-X-Forwarded-Encrypted: i=1; AJvYcCVRZODUPx9mfiObygLu0e7WIjU3FpDwJHCydzVnIaTXEOuVXjT/RRVbL2iS7BSNCTbtKye+hwBt5x8K81ieJu4uzNGTdLgv
-X-Gm-Message-State: AOJu0YzKLkcHS0hs2aNMiB/05/tC6eqYQgRT8QF+/wl1OBVGkKr41Uye
-	PS9acX1FRWxIcNqe8nQBSxhFWznR5Q14Zn6nRMoNSdVM6z1KmcmRMYp8l6AZDno=
-X-Google-Smtp-Source: AGHT+IFY05lLpoksusFINswslkm8+fMavMNTXJXC5h9004mF4RNBcjGiZ7dFzQUGN1oGx1I8tbtczQ==
-X-Received: by 2002:a17:907:b9d5:b0:a68:b159:11ee with SMTP id a640c23a62f3a-a6f52403808mr115597666b.12.1718257104198;
-        Wed, 12 Jun 2024 22:38:24 -0700 (PDT)
-Received: from localhost (78-80-19-19.customers.tmcz.cz. [78.80.19.19])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56f42d25sm32721566b.174.2024.06.12.22.38.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jun 2024 22:38:23 -0700 (PDT)
-Date: Thu, 13 Jun 2024 07:38:22 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, dsahern@kernel.org, mst@redhat.com,
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, leitao@debian.org, netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v3] net: dqs: introduce IFF_NO_BQL private flag
- for non-BQL drivers
-Message-ID: <ZmqFzpQOaQfp7Wjr@nanopsycho.orion>
-References: <20240613023549.15213-1-kerneljasonxing@gmail.com>
+        bh=nXP6x59o/QNZ4r9qxDqq8GkcNNM5e+hJhAIhAS57ld8=;
+        b=NiWDty4PmH9AsNnaMhG1Kae7BltV/U/rSzTDwgnguf4asRnqRzQaQ4gHqX06ji5Vdz
+         Dt17xf9Ra+I63sCC0VSN3OlNPIiqrpCIaMjbZ07MWR/5StQUEkUg0vIv6HvJiFAopK2r
+         NH5v8lB1o2cJYxdpZPiaReHVqdu3JWfjLdVyLoLN/1iakewjX9zxRafa4AXKT4OzfDM4
+         NikSWGDXF2QA/dMHkT8kBkcTE56VFZaWOleO86Rk6/jGJxpGbnm1ym6WFO1rc/yxvud3
+         XVlW7Ov19MaPEALjTzEfa/8wJw/yINRYg1Jfqof5f4imtWl8Ol1ATy2Yhot9ar4djYlY
+         RqVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718258955; x=1718863755;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nXP6x59o/QNZ4r9qxDqq8GkcNNM5e+hJhAIhAS57ld8=;
+        b=o4gEdoPkhKBG/M7y0hsWmBxUQqG9wzsoYjJNLf45v9lNIz/qs54V+P1lBU53IQ+arZ
+         5ieMUSEXMM/RKwv7nGaaf3i1KGO17fesRpy71fDOg6xfcdI0Hf8VbCO+VujT7DBfryCa
+         5a+wPu2dPsk2YUscR3fFSc4qWr9ownfNbL79hZwx9ZR6XIxE6ZwRGv1RRRePEwacVcoU
+         qN5MQfqG+UIxdcKWOlQnAKE7ZliGBJMZMbYb+DcqvRYF5ODUlp9jHvs6uV/3UELBKzot
+         kiml/W77TdYdUNMmJ8zvuI+vqLOOMvfHZuDfmYxKXsU0CfoeJpz1Ra2ukgDOiAggqF/E
+         w5YQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWccWft3RnrXTpWryMtnjT3B3KJtfxEBb3GLcoFiqJfMyHitR6W8HeHqsClZgH7Kh6lQ+4xK07tRWyC8jdiqmJJqp0vKItd
+X-Gm-Message-State: AOJu0YznBENjV8mBN3slcuTv3nsZpCDjQpU8TEyygqM3dd/AZspnTtl4
+	IWm8ypESGxD5zsGyPovt+pD+naSahAyLVIGNYe4JABxZd8062L9YD91YF7Te/ftFdGLuF8m4qVZ
+	uWg74j+BwUC5x8Luk8qh+4oMjGmg=
+X-Google-Smtp-Source: AGHT+IF6r0ftz6+EysGMEi/2Jsw1545qR1NrhsvTWVUNCgHiLnJUnMcXubdtbhA0SjaAr9x7L4KsrJ2Zn8TJbuI6UUU=
+X-Received: by 2002:a05:6512:3045:b0:52c:8909:bd35 with SMTP id
+ 2adb3069b0e04-52c9a3bfb2amr3775742e87.10.1718258954601; Wed, 12 Jun 2024
+ 23:09:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240613023549.15213-1-kerneljasonxing@gmail.com>
+References: <20240613023549.15213-1-kerneljasonxing@gmail.com> <ZmqFzpQOaQfp7Wjr@nanopsycho.orion>
+In-Reply-To: <ZmqFzpQOaQfp7Wjr@nanopsycho.orion>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 13 Jun 2024 14:08:36 +0800
+Message-ID: <CAL+tcoAir0u0HTYQCMgVNTkb8RpAMzD1eH-EevL576kt5u7DPw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] net: dqs: introduce IFF_NO_BQL private flag
+ for non-BQL drivers
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, dsahern@kernel.org, mst@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, leitao@debian.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thu, Jun 13, 2024 at 04:35:49AM CEST, kerneljasonxing@gmail.com wrote:
->From: Jason Xing <kernelxing@tencent.com>
+On Thu, Jun 13, 2024 at 1:38=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote=
+:
 >
->Since commit 74293ea1c4db6 ("net: sysfs: Do not create sysfs for non
->BQL device") limits the non-BQL driver not creating byte_queue_limits
->directory, I found there is one exception, namely, virtio-net driver,
->which should also be limited in netdev_uses_bql(). Let me give it a
->try first.
+> Thu, Jun 13, 2024 at 04:35:49AM CEST, kerneljasonxing@gmail.com wrote:
+> >From: Jason Xing <kernelxing@tencent.com>
+> >
+> >Since commit 74293ea1c4db6 ("net: sysfs: Do not create sysfs for non
+> >BQL device") limits the non-BQL driver not creating byte_queue_limits
+> >directory, I found there is one exception, namely, virtio-net driver,
+> >which should also be limited in netdev_uses_bql(). Let me give it a
+> >try first.
+> >
+> >I decided to introduce a NO_BQL bit because:
+> >1) it can help us limit virtio-net driver for now.
+> >2) if we found another non-BQL driver, we can take it into account.
+> >3) we can replace all the driver meeting those two statements in
+> >netdev_uses_bql() in future.
+> >
+> >For now, I would like to make the first step to use this new bit for dqs
+> >use instead of replacing/applying all the non-BQL drivers in one go.
+> >
+> >As Jakub said, "netdev_uses_bql() is best effort", I think, we can add
+> >new non-BQL drivers as soon as we find one.
+> >
+> >After this patch, there is no byte_queue_limits directory in virtio-net
+> >driver.
 >
->I decided to introduce a NO_BQL bit because:
->1) it can help us limit virtio-net driver for now.
->2) if we found another non-BQL driver, we can take it into account.
->3) we can replace all the driver meeting those two statements in
->netdev_uses_bql() in future.
->
->For now, I would like to make the first step to use this new bit for dqs
->use instead of replacing/applying all the non-BQL drivers in one go.
->
->As Jakub said, "netdev_uses_bql() is best effort", I think, we can add
->new non-BQL drivers as soon as we find one.
->
->After this patch, there is no byte_queue_limits directory in virtio-net
->driver.
+> Please note following patch is currently trying to push bql support for
+> virtio_net:
+> https://lore.kernel.org/netdev/20240612170851.1004604-1-jiri@resnulli.us/
 
-Please note following patch is currently trying to push bql support for
-virtio_net:
-https://lore.kernel.org/netdev/20240612170851.1004604-1-jiri@resnulli.us/
+I saw this one this morning and I'm reviewing/testing it.
 
-When that is merged, this patch is not needed. Could we wait?
+>
+> When that is merged, this patch is not needed. Could we wait?
+
+Please note this patch is not only written for virtio_net driver.
+Virtio_net driver is one of possible cases.
+
+After your patch gets merged (I think it will take some time), you
+could simply remove that one line in virtio_net.c.
+
+Thanks.
 
