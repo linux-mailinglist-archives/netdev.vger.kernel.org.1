@@ -1,209 +1,100 @@
-Return-Path: <netdev+bounces-103341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 929AB907ABA
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 20:14:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C328D907AF3
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 20:18:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1221F28353A
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 18:14:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA95C1C22DA8
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 18:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD6014C586;
-	Thu, 13 Jun 2024 18:13:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CE4814A623;
+	Thu, 13 Jun 2024 18:18:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jR/4hRHI"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="N+ZqosIY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4001614B96D;
-	Thu, 13 Jun 2024 18:13:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2658D1304AB
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 18:18:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718302433; cv=none; b=nXpBOBzOpX6pscU6B7TWZtTAEzKr5ITJyR2hw0NEofAnjqfI2n5zMQHfwX8s7QthcOMz9u1TD+9JKzBO7y4Eb7T++vIIfzrVKnoUxf4qLhrtCckUA2stxmsS9HkqDIaNqfa9KHuQT55U6+gvYusG7BZVVfxZk3hPXq5wgHT2gFE=
+	t=1718302695; cv=none; b=oieyM0FE7Rva5EhRdcaQ5QXjhdmXehr5AkVw2QeIvp7dQP/WirCJjTMSRnqs6wHcyDQa2Lh2DYtlzPlJQCEoLfcjtg1+c9cvnK5d8Xr7hVAoh307WvTB2t+wiB6fEldhdDy5lAFf8To3tqAofZnXuqUt64MXji6YFZC4Is3blGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718302433; c=relaxed/simple;
-	bh=fTIU120VbeRegu4fENGIN2pJl0vJUhORQvgqaO97OJA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K8tjbkIM7wbcaaSTT780vXxwFmpPD9v8z8a4DgcXxFt+BXHyMpipXSynG5ZC2sZ+69DzalOYQmA3DuDy3+dvN7cwUzAgeDI4nSrAzo6o+WnPmVCwTxM/5e8g/eYG1MnyjjgAJtpkDqsWl/cTJ5GcOzHGsl+gVXoSqTqsJUCaQUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jR/4hRHI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8EEBC32786;
-	Thu, 13 Jun 2024 18:13:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718302432;
-	bh=fTIU120VbeRegu4fENGIN2pJl0vJUhORQvgqaO97OJA=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=jR/4hRHIvjnr0HuKMd6n8Jn2KplP88ALqz/jBpAKC7iDEoEz5yTd6fMxpCs6goNdu
-	 n8elfLSow/niMrJmWbjyCFHbgDgF7GshXU3IoT7xdE5GNXUmv9oEGHq2mjc20rGLwp
-	 q0fYO1vllub6LyzhOYauiWoAoj8VOrLrRS7uM4A5UortmkOXNr3XN6j9g1Q0nw5rZI
-	 B++vgmEbZiZmvCkQbcm552PFvnT2ReJyoa6yOeebtcW7WCh7SbYjGbpp0bBNshQbGt
-	 UgwL7TFo2YOcNsL7tdoefLVWkIgw8OEUPXV25zDiL5YxSslrNLs6bwA797sM/3Spyz
-	 ebnTt6JASQjTg==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 56F78CE0760; Thu, 13 Jun 2024 11:13:52 -0700 (PDT)
-Date: Thu, 13 Jun 2024 11:13:52 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <ZmrfA1p2zSVIaYam@zx2c4.com>
- <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
- <Zmru7hhz8kPDPsyz@pc636>
- <7efde25f-6af5-4a67-abea-b26732a8aca1@paulmck-laptop>
- <Zmsuswo8OPIhY5KJ@pc636>
- <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
- <ZmszOd5idhf2Cb-v@pc636>
+	s=arc-20240116; t=1718302695; c=relaxed/simple;
+	bh=VmpvWSzugIB9sHC+Poxu1Uf7slG8yypxWRCwzH/6k54=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=moor+z6VwYQKHZJ7wIX43BuzfGL6XhWgphhMW+tD64n3PsuQdk9lvt56xg8S7ZD+4ZTAaHOXfgBwKSs8EkM5UeJhdO0mvLgGrEfTOpwGKKDYrA2O5IppZw15jxFvZcHU/pBO0co4yqVRbSXXjuV6raK1dllhPP793Bk102nTqgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=N+ZqosIY; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2ebe0a81dc8so14560801fa.2
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 11:18:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1718302691; x=1718907491; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=U32F52trfP/t5Glv8Me8l9/yxhLD4fCfQobPR+5mCxw=;
+        b=N+ZqosIYQRBpwNBvO0WpKhEwRUO2RzwvI9d4SFdLeUeA907dPngkkJpBI30yODrlqQ
+         BQTSK7fsOBab42H3DOFes00qdUdrMevsCAYATRLqjF5rAWtHRQfeVBY00t0iyuQIaS0S
+         Vf2s6MS+t7szcUY5VBLByvPO/O4bfhJewfZdw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718302691; x=1718907491;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=U32F52trfP/t5Glv8Me8l9/yxhLD4fCfQobPR+5mCxw=;
+        b=eITdPKM0xbRznua0PCPxLBeJT844FQiTztScNS98wcj1bzr+McDrU1YNSXPpRgOeCw
+         Uqifhdl+Kqja+vL4mFfSEo4mx5EjwcwoSKTFIALYZ5w+oOOSrGSfMEKqTevrsDGxaflL
+         7CSv+Ph33zd/wRomtRH43Ml7CKQaLPrCI7tcbzvxyw/EZd8UnlicmjsO2OMNLDmmu1Dw
+         QPRDRA4M0NTXCqMVOpL2mqxK0ef6KTGg7yaFR4HCOQU/HMgnAchNHLkq0LiPtvUIhzHd
+         5KjtnmHVAtsazvJV9xLKOLVE+JHDU4+SaRWVPqoluldhfhXy7l4Xjsne6XgGzoZzJxK+
+         /m9g==
+X-Gm-Message-State: AOJu0YyKwRC1gckkhZBLQVqf4YcTFz6fxG3PMqz1aQOwP8Xfwk8u1GLy
+	02xuqGVv51yWIObpGhXHCGmisEVmJUwkooRVZoA3jDla5J9BAiitCTFFhVOVFMBIUOqOcIoSa3b
+	Xq+reHQ==
+X-Google-Smtp-Source: AGHT+IEMJYduikU4h5BJzIpBZTCSOWskp7z0kOPAXC/MaTzO7tKT1Twb8i/8+OIFCbZRDWGtJKlVnA==
+X-Received: by 2002:a2e:3505:0:b0:2e9:4c17:9c83 with SMTP id 38308e7fff4ca-2ec0e60e9a8mr4277281fa.47.1718302691058;
+        Thu, 13 Jun 2024 11:18:11 -0700 (PDT)
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com. [209.85.208.44])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb741e79asm1187994a12.74.2024.06.13.11.18.09
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jun 2024 11:18:09 -0700 (PDT)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-579fa270e53so1961102a12.3
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 11:18:09 -0700 (PDT)
+X-Received: by 2002:a50:96c3:0:b0:57c:9c5d:d18e with SMTP id
+ 4fb4d7f45d1cf-57cbd6a85e1mr446474a12.36.1718302689163; Thu, 13 Jun 2024
+ 11:18:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZmszOd5idhf2Cb-v@pc636>
+References: <20240613163542.130374-1-kuba@kernel.org>
+In-Reply-To: <20240613163542.130374-1-kuba@kernel.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 13 Jun 2024 11:17:52 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wiNgwEpfTpz0c9NXvZvLFPVs15LeFfmhAUO_XhQTXfahQ@mail.gmail.com>
+Message-ID: <CAHk-=wiNgwEpfTpz0c9NXvZvLFPVs15LeFfmhAUO_XhQTXfahQ@mail.gmail.com>
+Subject: Re: [GIT PULL] Networking for v6.10-rc4
+To: Jakub Kicinski <kuba@kernel.org>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jun 13, 2024 at 07:58:17PM +0200, Uladzislau Rezki wrote:
-> On Thu, Jun 13, 2024 at 10:45:59AM -0700, Paul E. McKenney wrote:
-> > On Thu, Jun 13, 2024 at 07:38:59PM +0200, Uladzislau Rezki wrote:
-> > > On Thu, Jun 13, 2024 at 08:06:30AM -0700, Paul E. McKenney wrote:
-> > > > On Thu, Jun 13, 2024 at 03:06:54PM +0200, Uladzislau Rezki wrote:
-> > > > > On Thu, Jun 13, 2024 at 05:47:08AM -0700, Paul E. McKenney wrote:
-> > > > > > On Thu, Jun 13, 2024 at 01:58:59PM +0200, Jason A. Donenfeld wrote:
-> > > > > > > On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
-> > > > > > > > On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
-> > > > > > > > > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
-> > > > > > > > > > Since SLOB was removed, it is not necessary to use call_rcu
-> > > > > > > > > > when the callback only performs kmem_cache_free. Use
-> > > > > > > > > > kfree_rcu() directly.
-> > > > > > > > > > 
-> > > > > > > > > > The changes were done using the following Coccinelle semantic patch.
-> > > > > > > > > > This semantic patch is designed to ignore cases where the callback
-> > > > > > > > > > function is used in another way.
-> > > > > > > > > 
-> > > > > > > > > How does the discussion on:
-> > > > > > > > >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-> > > > > > > > >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
-> > > > > > > > > reflect on this series? IIUC we should hold off..
-> > > > > > > > 
-> > > > > > > > We do need to hold off for the ones in kernel modules (such as 07/14)
-> > > > > > > > where the kmem_cache is destroyed during module unload.
-> > > > > > > > 
-> > > > > > > > OK, I might as well go through them...
-> > > > > > > > 
-> > > > > > > > [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-> > > > > > > > 	Needs to wait, see wg_allowedips_slab_uninit().
-> > > > > > > 
-> > > > > > > Also, notably, this patch needs additionally:
-> > > > > > > 
-> > > > > > > diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
-> > > > > > > index e4e1638fce1b..c95f6937c3f1 100644
-> > > > > > > --- a/drivers/net/wireguard/allowedips.c
-> > > > > > > +++ b/drivers/net/wireguard/allowedips.c
-> > > > > > > @@ -377,7 +377,6 @@ int __init wg_allowedips_slab_init(void)
-> > > > > > > 
-> > > > > > >  void wg_allowedips_slab_uninit(void)
-> > > > > > >  {
-> > > > > > > -	rcu_barrier();
-> > > > > > >  	kmem_cache_destroy(node_cache);
-> > > > > > >  }
-> > > > > > > 
-> > > > > > > Once kmem_cache_destroy has been fixed to be deferrable.
-> > > > > > > 
-> > > > > > > I assume the other patches are similar -- an rcu_barrier() can be
-> > > > > > > removed. So some manual meddling of these might be in order.
-> > > > > > 
-> > > > > > Assuming that the deferrable kmem_cache_destroy() is the option chosen,
-> > > > > > agreed.
-> > > > > >
-> > > > > <snip>
-> > > > > void kmem_cache_destroy(struct kmem_cache *s)
-> > > > > {
-> > > > > 	int err = -EBUSY;
-> > > > > 	bool rcu_set;
-> > > > > 
-> > > > > 	if (unlikely(!s) || !kasan_check_byte(s))
-> > > > > 		return;
-> > > > > 
-> > > > > 	cpus_read_lock();
-> > > > > 	mutex_lock(&slab_mutex);
-> > > > > 
-> > > > > 	rcu_set = s->flags & SLAB_TYPESAFE_BY_RCU;
-> > > > > 
-> > > > > 	s->refcount--;
-> > > > > 	if (s->refcount)
-> > > > > 		goto out_unlock;
-> > > > > 
-> > > > > 	err = shutdown_cache(s);
-> > > > > 	WARN(err, "%s %s: Slab cache still has objects when called from %pS",
-> > > > > 	     __func__, s->name, (void *)_RET_IP_);
-> > > > > ...
-> > > > > 	cpus_read_unlock();
-> > > > > 	if (!err && !rcu_set)
-> > > > > 		kmem_cache_release(s);
-> > > > > }
-> > > > > <snip>
-> > > > > 
-> > > > > so we have SLAB_TYPESAFE_BY_RCU flag that defers freeing slab-pages
-> > > > > and a cache by a grace period. Similar flag can be added, like
-> > > > > SLAB_DESTROY_ONCE_FULLY_FREED, in this case a worker rearm itself
-> > > > > if there are still objects which should be freed.
-> > > > > 
-> > > > > Any thoughts here?
-> > > > 
-> > > > Wouldn't we also need some additional code to later check for all objects
-> > > > being freed to the slab, whether or not that code is  initiated from
-> > > > kmem_cache_destroy()?
-> > > >
-> > > Same away as SLAB_TYPESAFE_BY_RCU is handled from the kmem_cache_destroy() function.
-> > > It checks that flag and if it is true and extra worker is scheduled to perform a
-> > > deferred(instead of right away) destroy after rcu_barrier() finishes.
-> > 
-> > Like this?
-> > 
-> > 	SLAB_DESTROY_ONCE_FULLY_FREED
-> > 
-> > 	Instead of adding a new kmem_cache_destroy_rcu()
-> > 	or kmem_cache_destroy_wait() API member, instead add a
-> > 	SLAB_DESTROY_ONCE_FULLY_FREED flag that can be passed to the
-> > 	existing kmem_cache_destroy() function.  Use of this flag would
-> > 	suppress any warnings that would otherwise be issued if there
-> > 	was still slab memory yet to be freed, and it would also spawn
-> > 	workqueues (or timers or whatever) to do any needed cleanup work.
-> > 
-> >
-> The flag is passed as all others during creating a cache:
-> 
->   slab = kmem_cache_create(name, size, ..., SLAB_DESTROY_ONCE_FULLY_FREED | OTHER_FLAGS, NULL);
-> 
-> the rest description is correct to me.
+On Thu, 13 Jun 2024 at 09:35, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.10-rc4
 
-Good catch, fixed, thank you!
+Your key had expired, and the kernel.org repo doesn't have the updated key.
 
-							Thanx, Paul
+But for once, the key servers actually did update and a refresh fixed
+it for me.  Whee! Is the pgp key infrastructure starting to work
+again?
+
+                            Linus
 
