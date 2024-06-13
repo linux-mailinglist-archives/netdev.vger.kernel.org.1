@@ -1,135 +1,119 @@
-Return-Path: <netdev+bounces-103253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7D689074CA
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:13:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FEB89074CF
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:13:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B9DB286567
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:13:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8CEE287313
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:13:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69350146D63;
-	Thu, 13 Jun 2024 14:12:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 457EF145A00;
+	Thu, 13 Jun 2024 14:12:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="L2OdeEdD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3uRsaEib"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13BD1448D7;
-	Thu, 13 Jun 2024 14:12:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B382D143C75
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 14:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718287925; cv=none; b=I86ts514cHJIs+9lfKtf0TiX1JFvuCbNzdhoMBmZpePOi72wKEesCNrYrcItQD0zAQUTDBC1oxFj8usSmCQKL9FJiL/4axH8zUfdaNhesFmQHxg2y8FAIV12pzirFCKwSLT3jMHbESn7cxIiW4rXyX00xROF58WTRgI7B7hTGl0=
+	t=1718287949; cv=none; b=FIKHWozMmd2xb5SuvwR3ec+JHLTcTBLLa3cObNI+CKZ1BWL91rLlgyKP8uGE6i3/4/oQ1VX6PYT1IpqJPn3peeFy67QQETc9rZ7EUbs4IXP3EZCPi8akAu6ANx8L+Ooiyv068KbTglexuL8BNcyD0WraLcrR74KxRStxhddlChI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718287925; c=relaxed/simple;
-	bh=BP0dHPKrPu1s5lsp6b2VSCZAPBtD2LfDAGF3nZJ/aYg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mKPeoTew5K7KAhRH1tBMnRVXgyjWyWh8QRVrrsIeQtRZ5JzmVeU8MNxFkM/EKHGRThz5ddhQJxJ46GWPMv5MapSB6JlctJ1QuHs6FQDDbXY9qGuqfNT7ayWoXVK4CjJc/tHJI5cF2HLNlkJvHMJ3crwShyiQ0r9TgzScHbuP/5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=L2OdeEdD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 414C2C2BBFC;
-	Thu, 13 Jun 2024 14:12:02 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="L2OdeEdD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1718287920;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Fjz4ZCmXLkYKy1WwR1BKUB9SOdktn0OQ80YKkl5C07A=;
-	b=L2OdeEdDbAYwCCQIo0q3Y5svBHl6HUoVii7Ipx/YqW9msnW5nLiQCcmVhvT3d2aYbXekmX
-	6vGp/7RezmQfWwaVJxWqE0MwVUi9dk5ylrevWbLPzxAvc9yHIJFCNMr0XP5ij6Ppv2K3la
-	u18h46ekO5C4iutUHhucdp/z23ziWUY=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9cf22b43 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Thu, 13 Jun 2024 14:11:58 +0000 (UTC)
-Date: Thu, 13 Jun 2024 16:11:52 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: "Paul E. McKenney" <paulmck@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
-	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <Zmr-KPG9F6w-uzys@zx2c4.com>
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <Zmov7ZaL-54T9GiM@zx2c4.com>
- <Zmo9-YGraiCj5-MI@zx2c4.com>
- <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
- <Zmrkkel0Fo4_g75a@zx2c4.com>
- <e06440e2-9121-4c92-8bf2-945977987052@paulmck-laptop>
+	s=arc-20240116; t=1718287949; c=relaxed/simple;
+	bh=GeOGbq3v86Jc7ISOy46ykJNRjbGIpr55PK9MA4z5Jag=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lRmPC5f1eFfKsY7/izOTrC37/8CCSBSzvdjmrthUU+38QRm9fdGnAvLOZFjupX4E923Qr8GIU1268DV2WeEfk2IYMQNEaJ8tKTwFPPlW8lhty6gEl4d3vKa97uHDsnz8MNIJpz9H0+GwU+6SHlRrV+YCFVMplGBzziLkgLNyhQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--maze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3uRsaEib; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--maze.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dfab38b7f6bso1609132276.0
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 07:12:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718287946; x=1718892746; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=86PihGtHJDuNcrfp9OX8tE5hfkdUir73Q4eXbfslXlg=;
+        b=3uRsaEibDNoa/RSXrQgUOz0Wfjf6hLrUXmYcchOJ0na48CKrWJdt8mXWgghGVFBnk+
+         RKB6oCxunENmKXvg3pSIs+MF0z4pRdF1xHcTtPKMCObkkxfNMTF6FMaxkW9fTQ6aQXqY
+         m6EPwEUTTTTPHyYpu/qk0yw4aE+cn3Z72iLtETNG/gU0J+//eXeZlFIZvhVhWipLNYaD
+         q4kIqnXdJkbwUONGjSDIJVjPuLLmx+WV6zF8RECjm702vFxdAjzLSl7VESEqukDv8640
+         uwankkw1o5JLyRb0t8j1cuUgMM1PY4CtjdQ9pJnfo38hLh+JGJLuKNK1Yr63s0GYiXgs
+         5o+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718287946; x=1718892746;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=86PihGtHJDuNcrfp9OX8tE5hfkdUir73Q4eXbfslXlg=;
+        b=WyrpRSBl9PEDhh2Ua9vDmaEeTSeulgpmjm8ZiZ8tcVbl4m4zSXBSl0pZ5CWk0oUhhd
+         zOPeMgrjHJ702xiHDW+MC27GKgk24Gbz8j7J+rYZWuUp/5niujm1GC1uGlau3D2bwNt0
+         mi1dBEfRrn8COvg3G3SXn38JDBAxF5/r5l4aIJpLC6H9JcDeqVhW3fySHyTdsSCdfQQk
+         JzfRGbMj2eE67wdaqagUT8jttx6eIvAqvzPVCBPZqIZSM2ugKCC7ALc8v6bL3Gr4MRh4
+         NCrtmd6JTPqttlrZiMz4lLectZjAuqorGZ30VFFvLIHTme3BAYMF8T4DHMST6cz9h+JI
+         fmbQ==
+X-Gm-Message-State: AOJu0YzWDSCmOO3rX38W7b6epJgWbxRHrneuLrqvHo3oGSavPCQCElA9
+	9L0+JJ5Vh6RMAx63QYcQS8swnWEu/0f1mRFi1bpW6SnYKI5r8GYCizPBF2XajpS/s2rIsQ==
+X-Google-Smtp-Source: AGHT+IGRA9G+zdZsw6nNiJsUVC0TCc8AMDfYozH5CJc139YMJSax0Sw4HDZ2/VrA47n+Jogrngu59yZR
+X-Received: from varda.mtv.corp.google.com ([2620:15c:211:200:39d0:ab84:9864:b0c6])
+ (user=maze job=sendgmr) by 2002:a05:6902:100f:b0:df7:8c1b:430a with SMTP id
+ 3f1490d57ef6-dfe65e7eb4dmr1387455276.3.1718287946593; Thu, 13 Jun 2024
+ 07:12:26 -0700 (PDT)
+Date: Thu, 13 Jun 2024 07:12:15 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e06440e2-9121-4c92-8bf2-945977987052@paulmck-laptop>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
+Message-ID: <20240613141215.2122412-1-maze@google.com>
+Subject: [PATCH net] neighbour: add RTNL_FLAG_DUMP_SPLIT_NLM_DONE to RTM_GETNEIGH
+From: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>
+To: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <zenczykowski@gmail.com>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 13, 2024 at 05:46:11AM -0700, Paul E. McKenney wrote:
-> How about a kmem_cache_destroy_rcu() that marks that specified cache
-> for destruction, and then a kmem_cache_destroy_barrier() that waits?
-> 
-> I took the liberty of adding your name to the Google document [1] and
-> adding this section:
+without this Android's net test, available at:
+  https://cs.android.com/android/platform/superproject/main/+/main:kernel/t=
+ests/net/test/
+run via:
+  /...aosp-tests.../net/test/run_net_test.sh --builder neighbour_test.py
+fails with:
+  TypeError: NLMsgHdr requires a bytes object of length 16, got 4
 
-Cool, though no need to make me yellow!
+Fixes: 3e41af90767d ("rtnetlink: use xarray iterator to implement rtnl_dump=
+_ifinfo()")
+Fixes: cdb2f80f1c10 ("inet: use xa_array iterator to implement inet_dump_if=
+addr()")
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: David S. Miller <davem@davemloft.net>
+Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
+---
+ net/core/neighbour.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > But then, if that mechanism generally works, we don't really need a new
-> > function and we can just go with the first option of making
-> > kmem_cache_destroy() asynchronously wait. It'll wait, as you described,
-> > but then we adjust the tail of every kfree_rcu batch freeing cycle to
-> > check if there are _still_ any old outstanding kmem_cache_destroy()
-> > requests. If so, then we can splat and keep the old debugging info we
-> > currently have for finding memleaks.
-> 
-> The mechanism can always be sabotaged by memory-leak bugs on the part
-> of the user of the kmem_cache structure in play, right?
-> 
-> OK, but I see your point.  I added this to the existing
-> "kmem_cache_destroy() Lingers for kfree_rcu()" section:
-> 
-> 	One way of preserving this debugging information is to splat if
-> 	all of the slab’s memory has not been freed within a reasonable
-> 	timeframe, perhaps the same 21 seconds that causes an RCU CPU
-> 	stall warning.
-> 
-> Does that capture it?
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index 45fd88405b6b..e1d12c6ac5b6 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -3892,7 +3892,7 @@ static int __init neigh_init(void)
+ 	rtnl_register(PF_UNSPEC, RTM_NEWNEIGH, neigh_add, NULL, 0);
+ 	rtnl_register(PF_UNSPEC, RTM_DELNEIGH, neigh_delete, NULL, 0);
+ 	rtnl_register(PF_UNSPEC, RTM_GETNEIGH, neigh_get, neigh_dump_info,
+-		      RTNL_FLAG_DUMP_UNLOCKED);
++		      RTNL_FLAG_DUMP_UNLOCKED | RTNL_FLAG_DUMP_SPLIT_NLM_DONE);
+=20
+ 	rtnl_register(PF_UNSPEC, RTM_GETNEIGHTBL, NULL, neightbl_dump_info,
+ 		      0);
+--=20
+2.45.2.505.gda0bf45e8d-goog
 
-Not quite what I was thinking. Your 21 seconds as a time-based thing I
-guess could be fine. But I was mostly thinking:
-
-1) kmem_cache_destroy() is called, but there are outstanding objects, so
-   it defers.
-
-2) Sometime later, a kfree_rcu_work batch freeing operation runs.
-
-3) At the end of this batch freeing, the kernel notices that the
-   kmem_cache whose destruction was previously deferred still has
-   outstanding objects and has not been destroyed. It can conclude that
-   there's thus been a memory leak.
-
-In other words, instead of having to do this based on timers, you can
-just have the batch freeing code ask, "did those pending kmem_cache
-destructions get completed as a result of this last operation?"
 
