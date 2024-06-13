@@ -1,104 +1,114 @@
-Return-Path: <netdev+bounces-103214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 633C3907103
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:33:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B53F7907111
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:33:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3DCEB22AAA
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 12:33:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE3811C249EE
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 12:33:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D861EB5E;
-	Thu, 13 Jun 2024 12:32:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3AD1EB30;
+	Thu, 13 Jun 2024 12:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="geT5djGt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 076A31E49B;
-	Thu, 13 Jun 2024 12:32:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F1D161;
+	Thu, 13 Jun 2024 12:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718281967; cv=none; b=XMn0CD+AnsMnQ2YtYJ09neAq/PWd/Av1i4MYk1rjytW0S7z2vT5FHAf7tRM9zOmHQn0672+XqcuEWktB7dqyrA0qzkbCutANubUPHunM0hTtmOMhivER1Qs5okYZRgT38Ll5tWelwtkoMlAziJ0zPhc6GhGGj233opdYtyUpqeY=
+	t=1718281995; cv=none; b=TmuSs1TDMPK69SvJGgDjRXiXdVP8ppYYZ81LlfGaHHFzZJyGBlqqfs3qa/Sc6h8LPdIxGaJYVzbxlOO3qeAC+AdarWBiFPWsPfCldLrYJEeb9zcbukm9XFkuT2LU/JnIxuS6Qkz2/hAE9RpRBbQjpSph1PKut5w2Vmb8BXZzivA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718281967; c=relaxed/simple;
-	bh=8z8mryihkPsMHrmTcB0xChWOv0muhpjdmBAMz3ALaUg=;
-	h=MIME-Version:Content-Type:Date:From:To:Cc:Subject:In-Reply-To:
-	 References:Message-ID; b=KBUoHG3A7FjQ7evkpLXVtHuqYcRFPlyskTpxzuhtCtdi0xEEhrh4VEhXngdb2/3iKPsJwRzVleGgKfve53gWFpIyYn9BKFWlAu4VeUAuzeQEhl4lM/7785iXVl1ZB1MGJRCjRibat8+ymOJVflF8Q9+pXutezSrHPTuh58rT2h4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=194.37.255.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
-Received: from [127.0.0.1] (helo=localhost)
-	by relay.expurgate.net with smtp (Exim 4.92)
-	(envelope-from <prvs=99085fba10=ms@dev.tdt.de>)
-	id 1sHjdD-000Vos-Tw; Thu, 13 Jun 2024 14:32:43 +0200
-Received: from [195.243.126.94] (helo=securemail.tdt.de)
-	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ms@dev.tdt.de>)
-	id 1sHjdD-00FNJt-Bx; Thu, 13 Jun 2024 14:32:43 +0200
-Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id 1A0F2240053;
-	Thu, 13 Jun 2024 14:32:43 +0200 (CEST)
-Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id 9F606240050;
-	Thu, 13 Jun 2024 14:32:42 +0200 (CEST)
-Received: from mail.dev.tdt.de (localhost [IPv6:::1])
-	by mail.dev.tdt.de (Postfix) with ESMTP id 062B73852A;
-	Thu, 13 Jun 2024 14:32:42 +0200 (CEST)
+	s=arc-20240116; t=1718281995; c=relaxed/simple;
+	bh=6++V+QFxgN/JaMMIMKIsQMM+MoRIat1NOsVf99RZsjE=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=FrCCQXZp9hFq2IqVJZDuZ1wyHoDlmcQYNMCg8hqWxK1DVU7dGOKvrtL7yCt1zyrZVBju0dvTCnjVuUxv++TLxpjfoIDF6IZm6B97Sx1idMl7vPkxnHTBAr6vzI/AYHBNLyH3reaGefWiO8D3a6Hb9Zw8/jPddZdSQwk5W5EoEbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=geT5djGt; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=Jvvsf3m+9ME+H97kyk5aPz8rec70QkK6h+jT1QfCsyI=; b=geT5djGtGvu7+XcfZg9dUY8+qW
+	2+AxTFcXxolHY6MaA5FhnPa6fsGX2mUJXA5nlsc2c8yg3SkpZj6hS7TjAunR3AYDGJ95AK86CMK/N
+	PhrZFIlS4GJMn9ujv3R5jKP4arJN+twubvNEbN9x7SN45DnYs62YNAXF1q8cvD0OsgVT4TwQJpP65
+	Tejl4/X9+Rvt9OamcZ12HZ2fEvFaX1q1j0G/Lgc3NGRPGIIrC+IU2uaSYIV+zo8kX8JQ0NBcrU21W
+	RC0sRybkPpLzNO1u/n7VuB8Op28QZRA1K9yTw0R1yU2kjQKZ/lwvc6Iq2StFZY6GSxM6O4NIdV/+d
+	9CWeO3zw==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sHjdV-000KcC-L1; Thu, 13 Jun 2024 14:33:01 +0200
+Received: from [178.197.249.34] (helo=linux.home)
+	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sHjdU-000HnC-2t;
+	Thu, 13 Jun 2024 14:33:01 +0200
+Subject: Re: [PATCH bpf-next v4 1/2] bpf: add CHECKSUM_COMPLETE to bpf test
+ progs
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Mykola Lysenko <mykolal@fb.com>, Jakub Kicinski <kuba@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240606145851.229116-1-vadfed@meta.com>
+ <20240612074917.1afacc42@kernel.org>
+ <895c8713-85a7-48a6-a42c-2c1ac4fe2274@linux.dev>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <9a08dbc8-3423-99b5-3840-feab6703f84c@iogearbox.net>
+Date: Thu, 13 Jun 2024 14:32:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Thu, 13 Jun 2024 14:32:42 +0200
-From: Martin Schiller <ms@dev.tdt.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: martin.blumenstingl@googlemail.com, hauke@hauke-m.de, andrew@lunn.ch,
- f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 04/12] net: dsa: lantiq_gswip: Use
- dev_err_probe where appropriate
-Organization: TDT AG
-In-Reply-To: <20240613115137.ignzu35jxmmorxys@skbuf>
-References: <20240611135434.3180973-1-ms@dev.tdt.de>
- <20240611135434.3180973-1-ms@dev.tdt.de>
- <20240611135434.3180973-5-ms@dev.tdt.de>
- <20240611135434.3180973-5-ms@dev.tdt.de>
- <20240613115137.ignzu35jxmmorxys@skbuf>
-Message-ID: <8592951129cec26ef55b43a99c5aa913@dev.tdt.de>
-X-Sender: ms@dev.tdt.de
-User-Agent: Roundcube Webmail/1.3.17
-X-purgate: clean
-X-purgate-type: clean
-X-purgate-ID: 151534::1718281963-36936522-5FB1A390/0/0
+In-Reply-To: <895c8713-85a7-48a6-a42c-2c1ac4fe2274@linux.dev>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27305/Thu Jun 13 10:33:25 2024)
 
-On 2024-06-13 13:51, Vladimir Oltean wrote:
-> On Tue, Jun 11, 2024 at 03:54:26PM +0200, Martin Schiller wrote:
->> From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
->> 
->> dev_err_probe() can be used to simplify the existing code. Also it 
->> means
->> we get rid of the following warning which is seen whenever the PMAC
->> (Ethernet controller which connects to GSWIP's CPU port) has not been
->> probed yet:
->>   gswip 1e108000.switch: dsa switch register failed: -517
->> 
->> Signed-off-by: Martin Blumenstingl 
->> <martin.blumenstingl@googlemail.com>
->> Acked-by: Hauke Mehrtens <hauke@hauke-m.de>
->> ---
+On 6/13/24 1:18 PM, Vadim Fedorenko wrote:
+> On 12/06/2024 15:49, Jakub Kicinski wrote:
+>> On Thu, 6 Jun 2024 07:58:50 -0700 Vadim Fedorenko wrote:
+>>> @@ -1060,9 +1062,19 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
+>>>           __skb_push(skb, hh_len);
+>>>       if (is_direct_pkt_access)
+>>>           bpf_compute_data_pointers(skb);
+>>> +
+>>>       ret = convert___skb_to_skb(skb, ctx);
+>>>       if (ret)
+>>>           goto out;
+>>> +
+>>> +    if (kattr->test.flags & BPF_F_TEST_SKB_CHECKSUM_COMPLETE) {
+>>> +        const int off = skb_network_offset(skb);
+>>> +        int len = skb->len - off;
+>>> +
+>>> +        skb->csum = skb_checksum(skb, off, len, 0);
+>>> +        skb->ip_summed = CHECKSUM_COMPLETE;
+>>> +    }
+>>
+>> Looks good, overall, although I'd be tempted to place this before
+>> the L2 is pushed, a few lines up, so that we don't need to worry
+>> about network offset. Then again, with you approach there is a nice
+>> symmetry between the pre- and post- if blocks so either way is fine:
+>>
+>> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 > 
-> Needs your sign off.
-> 
-> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+> Could you please take a look and merge the series?
 
-Signed-off-by: Martin Schiller <ms@dev.tdt.de>
+Looks good, done now, thanks Vadim!
 
