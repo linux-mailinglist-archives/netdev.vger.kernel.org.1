@@ -1,117 +1,103 @@
-Return-Path: <netdev+bounces-103078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF74F90629C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 05:17:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EC989062AE
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 05:34:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 595B328420C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 03:17:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25589284198
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 03:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1393D12FF7B;
-	Thu, 13 Jun 2024 03:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7152A12F382;
+	Thu, 13 Jun 2024 03:34:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OS/UsQ6C"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6A812EBE6;
-	Thu, 13 Jun 2024 03:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A1C2F34;
+	Thu, 13 Jun 2024 03:34:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718248666; cv=none; b=Zc3Z25W58UWD8qTn8+4befa83iPnQX2d4SsOGvTGqCgTjy1f1m8POFmdPn7i4H4lgw/ICKuls6IochyiK7iJQ/llf8ZFF7LjPl6rSBAw0o11Ks8mVU/vusKvGQDhANDl2XGXiXKrLBJAtCOvv2FO2U69Aww7DKi2pxhoBNlR2Ks=
+	t=1718249676; cv=none; b=iJnacogH5mtKc6N53rftRpdQjLFUU9rr29GcNTnuOipkqXKkaf050Kgjl2XgT7GrbR5g+fa6U1I1Vic/muII/l39sSMZzE2zhKz5pkGPXo5rsVuLVwTj1sGJQWLruiN/0a+eNFaFFDftrPkNfMKPSv+BoJ2ZpZfQaUvFXq+MgzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718248666; c=relaxed/simple;
-	bh=CyteLJH+68fyXpdPXq9xYXyRtYjEX4sE6Z58tEnCb8A=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=DX6swwTNBCHxDunvPIKkLP4wDW4J+dZps4qlUSe3VpDFGAsWZu1Eyca4uHWEkSt/GFGFIAupYkHJMl3/IS+KSRBZDIS/Hxmf+j06uAC4vsBNLZsWkzT55KyuqdzmKDMbSNNrdY8mB57/PcWBJVutKO7jDsF7msny8M7lhv4kq6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 45D3GXEV02037793, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 45D3GXEV02037793
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 13 Jun 2024 11:16:33 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 13 Jun 2024 11:16:28 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 13 Jun 2024 11:16:27 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
- RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
- 15.01.2507.035; Thu, 13 Jun 2024 11:16:27 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "andrew@lunn.ch"
-	<andrew@lunn.ch>,
-        "jiri@resnulli.us" <jiri@resnulli.us>,
-        "horms@kernel.org"
-	<horms@kernel.org>,
-        "rkannoth@marvell.com" <rkannoth@marvell.com>,
-        "Ping-Ke
- Shih" <pkshih@realtek.com>,
-        Larry Chiu <larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v20 08/13] rtase: Implement net_device_ops
-Thread-Topic: [PATCH net-next v20 08/13] rtase: Implement net_device_ops
-Thread-Index: AQHauLeU3KHUR0FCCkajORloGcGgcbHEXNMAgACmHxA=
-Date: Thu, 13 Jun 2024 03:16:27 +0000
-Message-ID: <2f6dfc4920694035bf630fccc4f3a943@realtek.com>
-References: <20240607084321.7254-1-justinlai0215@realtek.com>
-	<20240607084321.7254-9-justinlai0215@realtek.com>
- <20240612173944.05121bf0@kernel.org>
-In-Reply-To: <20240612173944.05121bf0@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1718249676; c=relaxed/simple;
+	bh=4Ve5J8xmQC5rrlMwUon1nb6lBnwrnLCTLGyBEta2HrU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HWFreRzTAVHvWnLNJF3wCWydjP9X6Q379uS1dfuCOrkmF4Q94UF8VphFdlUP6kQx8EWQbzG23znWpdGw7OcKmorqfwb9piY9VkXRPuhRNZZQOnLiwCYLffu05mwcJMBxJ0ZF//9p6bmDR0MtNWU1wubV2Q1lOhF6PWLtYVWpH8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OS/UsQ6C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A87C2C2BBFC;
+	Thu, 13 Jun 2024 03:34:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718249675;
+	bh=4Ve5J8xmQC5rrlMwUon1nb6lBnwrnLCTLGyBEta2HrU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OS/UsQ6CToml9KriUhf1wtmHOJUAlk7nphjjLHfTqvovoprnYjd67way2oo8VpsqM
+	 mi84M2yATcZoEK1BGYnU+WO1U1j7KVTuuIRZZRhaoMAfsnH5srrjyz8BXIHtcNgTP+
+	 OwJSb89JdaS0OznfrMUQShXYSwePTwngGlyz084onrco6P6T8BmaSSYiK3D3e4q8rI
+	 MZITkkA/qT9g2KTFql6jVwOYUyKIabtvW8tAggHatS8kwqjHemOL05yV6txKHbPQxg
+	 xMH1Z+wXmD7ba/VUJg/ejzum6pBQFl6J2mMysiCtENFT6Yxx6mLvH0WC/HHGzP7UN5
+	 tXEUMNZvyn0ZA==
+Date: Wed, 12 Jun 2024 20:34:35 -0700
+From: Kees Cook <kees@kernel.org>
+To: Aryan Srivastava <Aryan.Srivastava@alliedtelesis.co.nz>
+Cc: "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"mw@semihalf.com" <mw@semihalf.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>
+Subject: Re: [PATCH v1] net: mvpp2: use slab_build_skb for oversized frames
+Message-ID: <202406122033.69D9ABFC24@keescook>
+References: <20240611193318.5ed8003a@kernel.org>
+ <20240613024900.3842238-1-aryan.srivastava@alliedtelesis.co.nz>
+ <202406122003.E02C37ADD1@keescook>
+ <6c2592c517878a69d37e1957d9624d83dbc982ab.camel@alliedtelesis.co.nz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6c2592c517878a69d37e1957d9624d83dbc982ab.camel@alliedtelesis.co.nz>
 
-> On Fri, 7 Jun 2024 16:43:16 +0800 Justin Lai wrote:
-> > +static void rtase_get_stats64(struct net_device *dev,
-> > +                           struct rtnl_link_stats64 *stats) {
-> > +     const struct rtase_private *tp =3D netdev_priv(dev);
-> > +     const struct rtase_counters *counters;
-> > +
-> > +     counters =3D tp->tally_vaddr;
-> > +
-> > +     if (!counters)
-> > +             return;
->=20
-> Same question about how this can be null as in the ethtool patch..
+On Thu, Jun 13, 2024 at 03:13:34AM +0000, Aryan Srivastava wrote:
+> On Wed, 2024-06-12 at 20:05 -0700, Kees Cook wrote:
+> > On Thu, Jun 13, 2024 at 02:49:00PM +1200, Aryan Srivastava wrote:
+> > > Setting frag_size to 0 to indicate kmalloc has been deprecated,
+> > > use slab_build_skb directly.
+> > > 
+> > > Fixes: ce098da1497c ("skbuff: Introduce slab_build_skb()")
+> > > Signed-off-by: Aryan Srivastava
+> > > <aryan.srivastava@alliedtelesis.co.nz>
+> > > ---
+> > > Changes in v1:
+> > > - Added Fixes tag
+> > 
+> > This looks like similar updates like commit 99b415fe8986 ("tg3: Use
+> > slab_build_skb() when needed")
+> Yeah, I noticed that when I was looking for examples of other "Fixes"
+> tags for the "skbuff: Introduce slab_build_skb()" commit. I suspect
+> there are many drivers that will need this "fix".
 
-This check seems unnecessary, I will remove it.
+Yeah, at the time the API changes was made it was clear it wasn't easy
+to identify which needed it, so the WARN was added along with supporting
+the old style via internal fall-back.
 
->=20
-> > +     netdev_stats_to_stats64(stats, &dev->stats);
->=20
-> Please dont use this field, there is a comment on it:
->=20
->         struct net_device_stats stats; /* not used by modern drivers */
->=20
-> You can store the fields you need for counters in struct rtase_private
+-Kees
 
-Ok, I will remove all parts that use struct net_device_stats stats.
+> > 
+> > Reviewed-by: Kees Cook <kees@kernel.org>
+> > 
+> 
 
->=20
-> > +     dev_fetch_sw_netstats(stats, dev->tstats);
+-- 
+Kees Cook
 
