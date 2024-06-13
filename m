@@ -1,194 +1,107 @@
-Return-Path: <netdev+bounces-103189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10F2C906C47
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 13:49:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29849906C82
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 13:51:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74019B24121
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:49:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F2161C21821
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:51:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72307145B1F;
-	Thu, 13 Jun 2024 11:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF651448E4;
+	Thu, 13 Jun 2024 11:48:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hjeVHFqO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NizoJd68"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8020A144D21
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 11:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17DC143C7B;
+	Thu, 13 Jun 2024 11:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718279233; cv=none; b=BkJu06p6mYyCgamV1Er11tNakKqyL/UqBVt3w8vfKbW/9iAGVIPgt3qBkFlZWAmKcFLXmGwUIvK3v4TNplJlg+JCv3CUgmJGSV4UgLFe1tXzZ0sKE4XA6N00QL715jpzNi5dL+P+INdpbjw1H590C82mLzhKcJ+hpLB6YXb7z3U=
+	t=1718279318; cv=none; b=MYhD088AhlpW0AEDGSdRvYza3CxNxZgbDtjruayUGvS3F0C2MHSDK242z7YOGT2BfGyati9vMJeAGciM1FPanbwSl1H2ourPsp2xWsPC46SbBidm+VEVl7lqVgn5ZvVLormWX3eUNLc+YSKUsHr8vkODqcvn5PRGzy5vrdzWY+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718279233; c=relaxed/simple;
-	bh=u8uqNXfneUxeojJqX6uW43gawvkWd/SVV0l8sqbDYiQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ojwzKrrf+BYn06Ce13Fp+h94KZBNEOPRWtloVCo/ee8ACGnI5BH4XZl1f64SOrIKYb+2Mg1ZjIAwjvPZ4F2+tNNMJcnLBSMHwEqYGcto6f77rRVoU+GglkE83N0MjS/hF12DqNELeeFSkGVumvllENoqtQQW8iDNAXd9H8pwqBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hjeVHFqO; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dfef552d425so1164891276.0
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 04:47:10 -0700 (PDT)
+	s=arc-20240116; t=1718279318; c=relaxed/simple;
+	bh=Xvnfi2/UG9VRYAOcBoINScUhd6jaTRoOR9x6O3p1U70=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q4cxG/XbC4TtxM+3dWEZpaLCLyT5wmj2oJYvlpZW7rpAYDfxwp6S/vlGDk9zTNvDH+5H3owb0wB91IFr7Hz+bK3YnomVjzLaKV2x7xbZQnOGK2n8Ze+1zrKWYXs0CFCtQSzKhyx5KIYt+oQwb6e+XYqbaVgzCSB5qJnKLyi2kKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NizoJd68; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-579fa270e53so1169158a12.3;
+        Thu, 13 Jun 2024 04:48:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718279229; x=1718884029; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+LOKAxIeKteFuhp7/Gqn9TPI7GSn3AjIAgrQwVRNEFU=;
-        b=hjeVHFqOks17mJr5ZOK3MfW+jrYXcZYEDqkvr5Cp+D6iEZmVOwIjLMVwcCJhE434Im
-         myUPaK2lB7bPK14p+MVgCMvoZMQEpJ+aRuO3SNDE729WXwxjQ/jk33RPjeuS8k8jcZq2
-         xufjyQeOl/dTSN5mjnJJoyo9cjJHu06XHIDJ0lYtOx9584059S1sYeDvV1F5m90PcZnW
-         9oQNfwtYojMh2ubIVFrehDoErOZlXKoHG6CsNKmsL7a7iRDcGFJjnR3OGnhor5BqV3Ab
-         c/mwm7AKeDXITNkjX8cjSV8p3H2MctJZSyapjdXWxxLI+sdOwzFJbrKmluJpjJlmb1+A
-         sJpA==
+        d=gmail.com; s=20230601; t=1718279315; x=1718884115; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hcakns7F7/iGFpeQizqpWzcHlOatf4TUkVmNTN3Ld14=;
+        b=NizoJd68wnJikzSI/000+VUBeRDqOAIw8VzdFui4qFsTOXbQk/WC/NwIh9a7aeBjZl
+         OKzJhcEuCt4whkPGbINC1kRwF9C5JTOgm7q9lTaz6PPDAWREVVmcvcV5dwRvGmNPO0BP
+         rkcp9WC8RPzDrwD8bt+fIhv0rdalVkaqyx/rwAGPcjZloVV0/GnP1N3RXjMt77RKdsG1
+         Eyg9O+SuWZAQo0JKAaWFtLxueSJn972c8fcRQJj5YmH1JG7dDQ6RSJA4M/Z+eARffOA6
+         Fm1n2A7cInxPvXc935sL8rNm2aaFMNy/tctL1S30WYGvlOj6TxI9dVMCCkJQ19+lMDfq
+         JypA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718279229; x=1718884029;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+LOKAxIeKteFuhp7/Gqn9TPI7GSn3AjIAgrQwVRNEFU=;
-        b=SInkt3JOh5kQMcOeqjEY7/twoCImEOkkGrY7u/l0Ng93cJP/V5iVjkkOtqXL10gD6D
-         Qp+H+CjYWxi7VBI6c25wnGIR300G3umNrYCh/UNeXtDUWc8epzcqq4zXk+csZQq8ZRve
-         SEvqKtR3Z7kvazvr9m4EFgMHx5T49Z8KU1WCoDXH6LpyygW5AouD4SREEBK3i87tiBcF
-         /ZiMBcYm03wH2iCeKqZL4H2b5c8s2FHDj5aJEWjR5TIhHL+wzuGLS5a9aDMZWeLmYuHa
-         92NgZ3lAWgT7WJUe6GmGhX4Xnmu35a29N0m8ozzMUJv2CchTLwzpZETU3Y8VveqTl0jc
-         jBYw==
-X-Forwarded-Encrypted: i=1; AJvYcCVxttECYfzaAx+2JL3RwvP7cc6NZEtu7+/xfgDF0uNWWOVEHuzoLMHWefwTnPWQQ6Usgk+96+PvWKxiddCm2gna3HqIIN46
-X-Gm-Message-State: AOJu0YwMmv1QKFw1lPzVkpzzYElvmneUBhfeTazWEhhSUZwo83ZXRobZ
-	JqxC4lAiuN8wlyUxvQU8EP2AA0NBGAXBeyXRJOtwxKahKmGlA6HlbYL0k5eWZFFlvR1MISy9YXV
-	jHUI1W6xc5iKjuOEPMsy09rlOVCXnYLeBXtG0rg==
-X-Google-Smtp-Source: AGHT+IHFpink+Q293EhYr5U3tq2VDPbFBHBjghBbhVxgaG4IqWejDV0X1BOwqLDyC7goxOFASWf1sJs6gdyGUmv2tSI=
-X-Received: by 2002:a25:aca8:0:b0:dfb:25ba:4390 with SMTP id
- 3f1490d57ef6-dfe66d5a5e0mr4339265276.36.1718279229482; Thu, 13 Jun 2024
- 04:47:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718279315; x=1718884115;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hcakns7F7/iGFpeQizqpWzcHlOatf4TUkVmNTN3Ld14=;
+        b=NWvKmDBLEN5fBX0x0ERuMzmlTS3azwhEbc0oe15wYwWKkK4GOUu70fxWxPxfDIWyUZ
+         Klqnwfb743jHVHHh/RrUU+zGZZvrJQENIDVI+8l2Tu0mSYfgumnSjLbpzmwpXtYZX0dZ
+         Yed98bQgXUjD9vCThf9/P0rilMuQZ34jw6iQQXvSvf7QIUf4if+pAZi9BlprIB+NF9a9
+         UH/z6Lt+YT1a4vhkODAj1cD2vE4wpSSDoutVprGkBSotjYd7/zq7HoXyxXKz90yQSFM1
+         UsnOA1PLqxuisYyxZKD6XphWmKFidko4P9crfSM0VuP2IuFkhRzRo9Qbdyyenv2rRzyk
+         Kaow==
+X-Forwarded-Encrypted: i=1; AJvYcCWGOq1GOmFojPWM3fshtFsa4fKNw4a5jMA2+vZ7lGtTCBln5kIjqz9ulLWNo3e3s8WT9yVFY0NBgeJLsliHHeRoKNXfKmWrNK7Ewc+osalLATbrGu7HUeEsYZbAadZT0VmMt1hH0OCNncCbDXb9Q1qlBteUC5lIsV768nngvxieVQ==
+X-Gm-Message-State: AOJu0YwV8UzEp8THSibHDpNcYCWa9EbPgw4MJV7W3lrPmMXwuG0NAoFI
+	lFSJqutIcK1wOcFY87aiV+Tx+cW7zh/nUAb2AEG0pdSBZQntb5k8
+X-Google-Smtp-Source: AGHT+IGlRwitn465eENiEeTq6LL6l3/QBU/x0u7UFX8FqlGKV83UbhFiOxb5+JfDp5NNSE9IOweyJw==
+X-Received: by 2002:a50:d4d7:0:b0:57c:5fd7:ff50 with SMTP id 4fb4d7f45d1cf-57caaac66e0mr3746828a12.35.1718279315024;
+        Thu, 13 Jun 2024 04:48:35 -0700 (PDT)
+Received: from skbuf ([188.25.55.166])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb72e9943sm821018a12.51.2024.06.13.04.48.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jun 2024 04:48:34 -0700 (PDT)
+Date: Thu, 13 Jun 2024 14:48:32 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Martin Schiller <ms@dev.tdt.de>
+Cc: martin.blumenstingl@googlemail.com, hauke@hauke-m.de, andrew@lunn.ch,
+	f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 12/12] net: dsa: lantiq_gswip: Improve error
+ message in gswip_port_fdb()
+Message-ID: <20240613114832.23pvevg6wmyczr7i@skbuf>
+References: <20240611135434.3180973-1-ms@dev.tdt.de>
+ <20240611135434.3180973-13-ms@dev.tdt.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMSo37U3Pree8XbHNBOzNXhFAiPss+8FQms1bLy06xeMeWfTcg@mail.gmail.com>
- <20240613095901.508753-1-jtornosm@redhat.com>
-In-Reply-To: <20240613095901.508753-1-jtornosm@redhat.com>
-From: Yongqin Liu <yongqin.liu@linaro.org>
-Date: Thu, 13 Jun 2024 19:46:57 +0800
-Message-ID: <CAMSo37UzU9WrQOQVo=Bb-LfOwS=GJrsSLMgGAwLY7JoGQ9ap7g@mail.gmail.com>
-Subject: Re: [PATCH] net: usb: ax88179_178a: fix link status when link is set
- to down/up
-To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-Cc: amit.pundir@linaro.org, davem@davemloft.net, edumazet@google.com, 
-	inventor500@vivaldi.net, jstultz@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org, 
-	sumit.semwal@linaro.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240611135434.3180973-13-ms@dev.tdt.de>
 
-Hi, Jose
+On Tue, Jun 11, 2024 at 03:54:34PM +0200, Martin Schiller wrote:
+> From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+> 
+> Print that no FID is found for bridge %s instead of the incorrect
+> message that the port is not part of a bridge.
+> 
+> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+> Acked-by: Hauke Mehrtens <hauke@hauke-m.de>
+> ---
 
-On Thu, 13 Jun 2024 at 17:59, Jose Ignacio Tornos Martinez
-<jtornosm@redhat.com> wrote:
->
-> Hello again,
->
-> There was a problem copying the patch, sorry, here the good one:
+This needs your Signed-off-by tag as well. Anyway, if there is no other
+reason to resend, maybe you can post it here as a reply and the
+maintainers can pick it up while applying.
 
-Thanks very much for the work!
-
-I will test it tomorrow, and let you know the result then.
-
-Best regards,
-Yongqin Liu
->
-> $ git diff drivers/net/usb/ax88179_178a.c
-> diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178=
-a.c
-> index 51c295e1e823..60357796be99 100644
-> --- a/drivers/net/usb/ax88179_178a.c
-> +++ b/drivers/net/usb/ax88179_178a.c
-> @@ -174,7 +174,6 @@ struct ax88179_data {
->         u32 wol_supported;
->         u32 wolopts;
->         u8 disconnecting;
-> -       u8 initialized;
->  };
->
->  struct ax88179_int_data {
-> @@ -327,7 +326,8 @@ static void ax88179_status(struct usbnet *dev, struct=
- urb *urb)
->
->         if (netif_carrier_ok(dev->net) !=3D link) {
->                 usbnet_link_change(dev, link, 1);
-> -               netdev_info(dev->net, "ax88179 - Link status is: %d\n", l=
-ink);
-> +               if (!link)
-> +                       netdev_info(dev->net, "ax88179 - Link status is: =
-%d\n", link);
->         }
->  }
->
-> @@ -1543,6 +1543,7 @@ static int ax88179_link_reset(struct usbnet *dev)
->                          GMII_PHY_PHYSR, 2, &tmp16);
->
->         if (!(tmp16 & GMII_PHY_PHYSR_LINK)) {
-> +               netdev_info(dev->net, "ax88179 - Link status is: 0\n");
->                 return 0;
->         } else if (GMII_PHY_PHYSR_GIGA =3D=3D (tmp16 & GMII_PHY_PHYSR_SMA=
-SK)) {
->                 mode |=3D AX_MEDIUM_GIGAMODE | AX_MEDIUM_EN_125MHZ;
-> @@ -1580,6 +1581,8 @@ static int ax88179_link_reset(struct usbnet *dev)
->
->         netif_carrier_on(dev->net);
->
-> +       netdev_info(dev->net, "ax88179 - Link status is: 1\n");
-> +
->         return 0;
->  }
->
-> @@ -1678,12 +1681,21 @@ static int ax88179_reset(struct usbnet *dev)
->
->  static int ax88179_net_reset(struct usbnet *dev)
->  {
-> -       struct ax88179_data *ax179_data =3D dev->driver_priv;
-> +       u16 tmp16;
->
-> -       if (ax179_data->initialized)
-> +       ax88179_read_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID, GMII_PHY_PHY=
-SR,
-> +                        2, &tmp16);
-> +       if (tmp16) {
-> +               ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MOD=
-E,
-> +                                2, 2, &tmp16);
-> +               if (!(tmp16 & AX_MEDIUM_RECEIVE_EN)) {
-> +                       tmp16 |=3D AX_MEDIUM_RECEIVE_EN;
-> +                       ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_S=
-TATUS_MODE,
-> +                                         2, 2, &tmp16);
-> +               }
-> +       } else {
->                 ax88179_reset(dev);
-> -       else
-> -               ax179_data->initialized =3D 1;
-> +       }
->
->         return 0;
->  }
->
-> Best regards
-> Jos=C3=A9 Ignacio
->
-
-
---=20
-Best Regards,
-Yongqin Liu
----------------------------------------------------------------
-#mailing list
-linaro-android@lists.linaro.org
-http://lists.linaro.org/mailman/listinfo/linaro-android
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
