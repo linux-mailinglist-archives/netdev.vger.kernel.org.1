@@ -1,77 +1,55 @@
-Return-Path: <netdev+bounces-103315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2C70907836
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 18:23:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FA75907854
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 18:33:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B60D41C22797
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:23:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38F3A1C234C6
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:33:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0D41448E6;
-	Thu, 13 Jun 2024 16:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6571F1448DA;
+	Thu, 13 Jun 2024 16:33:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WDd3zUU+"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="FbXLaVek"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D1F812FB0B
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 16:23:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275571420BC;
+	Thu, 13 Jun 2024 16:33:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718295789; cv=none; b=j9vnQhWJcAqgjMQRBKynL5O19gL0m59JxuOk8z81bg6hAS7y/yBNXZX2Vt1zUyzWCn4EgpyPehDrcSQuKI8Z+yLM6kfOjHH8gWQsp40kpCPXL07zOIsZXA4Wl/yAVJ6vLKwtceTwtVEE7JLUBTbHs07jDXXocnwv79KmM3LZfhc=
+	t=1718296388; cv=none; b=LNWSapNjJX1D6e7Tp4+OVsPhMyKqHgHoKMvGFy6vNMYVhbychzFHWFmQLqOrfC4a+W/aRrTsrHx/zQf1BZSA74oBTNhfZoeUMdv7uiBgHOHLpdA6KPk8JFQ+OrlRtxMLQAUyHwiUS6jygOrhOKVEEN6ry18574UadYKxVM52oR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718295789; c=relaxed/simple;
-	bh=4wYSLHs0H1qWUWO5bcMjVjVqRbczULLW2UjbvGozFVQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=WNNYYsE2+BLxCdu6+mShXQFmoB7nIH77qH3zsQbVMMrXC5wOn7gtrPLrzHfKtdPX8oOrKjSzvVDv4gUaUiKXF3muaYRxEkIvNMszeM8AXXw2GSKVQ8NNYxoKZ8GDg/IiQuGFqpxifoKHkftcdhD0I7NOq8Ua58Rm5CzSHaiyl4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WDd3zUU+; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4230366ad7bso6417035e9.1
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 09:23:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718295786; x=1718900586; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4wYSLHs0H1qWUWO5bcMjVjVqRbczULLW2UjbvGozFVQ=;
-        b=WDd3zUU+t2V5WSAat6WSxItLkdsJGUusC+s6ZFQww7qOXDoOJrkkA2lF1eoCoiz3mU
-         YH5m/auHTk2U+xGdYIwqTMHgjD9gdTHlUJ8+JeQD+++6qzlrX6FJytqhErK4A5v+8Plk
-         fAt8V9RxoskmiCnTA31JVU+eqT9qUnXbfghYSh18pH6e355kP6iKSPKZNT87LufSM8T3
-         TU4JtSo6fMVd6hyGeQTDQYGxd9jqpFbzU0faf9rysYQGlm8KF5UjFG3XqdYnOsZ7ZBjR
-         W1PK6af5nggRE/ygK+0pX7UpADgK+E4WMumi7/9zo3DzTxeKH7oqH9oL9qGvFbhV4gpi
-         DsRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718295786; x=1718900586;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4wYSLHs0H1qWUWO5bcMjVjVqRbczULLW2UjbvGozFVQ=;
-        b=bIujoTCnwgdE4fOMHfNIorr8SALj5swTxh2gcGq+w89hcEAx9ok1xd2u7fTRrXSu3s
-         bdOhG6oGx+xhLMcKueAugkTpDpgyw7YpnsUfYB8vG4ejYJ405LiSK7JL0fuBe6TEWGUZ
-         l0w0sjxMM3Sw+jCYM9YK9sZeNXE2TJTi1f7z1Bcd9w7gH0W4Q2ayO+fdyYNwnPEyJedW
-         mWg4uWSIOXQjddcHZGWXMF6A9/C1mtcA7tT9xdPIIoQSlGCqo/FOQjv7sh5VtlSbEq2I
-         ISTjaGvpRqR6Yvga90PKUSZfR+0DoEbWVPxOEG4Kv66H3cl6hdXArXA+rpwWbKJ8trR/
-         XaQg==
-X-Gm-Message-State: AOJu0YxNStQX1jvRH0IbeR3UR7NQrTBSwe51Z9XzmJPDb0LthRUR8sbx
-	zFdB9vchgOY1CJB83a9fBOyxomYtf1HhBCu7LulevjUAyNwQrPWF
-X-Google-Smtp-Source: AGHT+IG1tFaPChnEI92g7+10On1mvcORm6Bw1dFnATsOeK4VVUgZS0y8W4ysIJuooLc/fUXtHWG+oA==
-X-Received: by 2002:a05:600c:4c23:b0:421:756f:b2e8 with SMTP id 5b1f17b1804b1-42304820d66mr3177235e9.11.1718295786227;
-        Thu, 13 Jun 2024 09:23:06 -0700 (PDT)
-Received: from Laptop-X1 ([85.93.125.228])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422874e74c7sm67983495e9.47.2024.06.13.09.23.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jun 2024 09:23:05 -0700 (PDT)
-Date: Thu, 13 Jun 2024 18:23:03 +0200
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: David Ahern <dsahern@kernel.org>
-Cc: Networking <netdev@vger.kernel.org>,
-	Tobias Waldekranz <tobias@waldekranz.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [iproute2] No mst support for bridge?
-Message-ID: <Zmsc54cVKF1wpzj7@Laptop-X1>
+	s=arc-20240116; t=1718296388; c=relaxed/simple;
+	bh=nm9cGc6+xh1I4luo8QBmay1xiRcXxldE8e4qrHpjJy4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kW/aRQd750GC48U00hoyggPKD49HJC6rXaf3uaFGnUTn1FSV96HrpqPSiRHEY2C82vtlfEqZrIlcWyF3Z5w/NKwbDxWqwsU5OI3+y6kE0Yd1DK362HrSYO99yliRZJOLFcTK03o/3GQB6CdOVsIQGEAs7+2/Z0yn9oEctV+lLI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=FbXLaVek; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30197C2BBFC;
+	Thu, 13 Jun 2024 16:33:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1718296387;
+	bh=nm9cGc6+xh1I4luo8QBmay1xiRcXxldE8e4qrHpjJy4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FbXLaVekOEvMok40AsBYllC8PrBd5cN+XoU9vWiEEiR/bu5s8MIKQc8ruxC/MvX3B
+	 sheBGRMmiho9euZ3PHsxHdT+imsr6923G7h861+4aC0G0LB4PHgWDz42Bgej5q6Z1y
+	 ppanmx5sMa92N81TNDbaOjGomtWE9UhU/F1h/CuQ=
+Date: Thu, 13 Jun 2024 18:33:00 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Shay Drory <shayd@nvidia.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	kuba@kernel.org, edumazet@google.com, david.m.ertman@intel.com,
+	rafael@kernel.org, ira.weiny@intel.com, linux-rdma@vger.kernel.org,
+	leon@kernel.org, tariqt@nvidia.com, Parav Pandit <parav@nvidia.com>
+Subject: Re: [PATCH net-next v6 1/2] driver core: auxiliary bus: show
+ auxiliary device IRQs
+Message-ID: <2024061306-from-equal-e2fc@gregkh>
+References: <20240613161912.300785-1-shayd@nvidia.com>
+ <20240613161912.300785-2-shayd@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,16 +58,201 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240613161912.300785-2-shayd@nvidia.com>
 
-Hi David,
+On Thu, Jun 13, 2024 at 07:19:11PM +0300, Shay Drory wrote:
+> PCI subfunctions (SF) are anchored on the auxiliary bus. PCI physical
+> and virtual functions are anchored on the PCI bus. The irq information
+> of each such function is visible to users via sysfs directory "msi_irqs"
+> containing files for each irq entry. However, for PCI SFs such
+> information is unavailable. Due to this users have no visibility on IRQs
+> used by the SFs.
+> Secondly, an SF can be multi function device supporting rdma, netdevice
+> and more. Without irq information at the bus level, the user is unable
+> to view or use the affinity of the SF IRQs.
+> 
+> Hence to match to the equivalent PCI PFs and VFs, add "irqs" directory,
+> for supporting auxiliary devices, containing file for each irq entry.
+> 
+> For example:
+> $ ls /sys/bus/auxiliary/devices/mlx5_core.sf.1/irqs/
+> 50  51  52  53  54  55  56  57  58
+> 
+> Reviewed-by: Parav Pandit <parav@nvidia.com>
+> Signed-off-by: Shay Drory <shayd@nvidia.com>
+> 
+> ---
+> v5-v6:
+> - removed concept of shared and exclusive and hence global xarray (Greg)
+> v4-v5:
+> - restore global mutex and replace refcount_t with simple integer (Greg)
+> v3->4:
+> - remove global mutex (Przemek)
+> v2->v3:
+> - fix function declaration in case SYSFS isn't defined
+> v1->v2:
+> - move #ifdefs from drivers/base/auxiliary.c to
+>   include/linux/auxiliary_bus.h (Greg)
+> - use EXPORT_SYMBOL_GPL instead of EXPORT_SYMBOL (Greg)
+> - Fix kzalloc(ref) to kzalloc(*ref) (Simon)
+> - Add return description in auxiliary_device_sysfs_irq_add() kdoc (Simon)
+> - Fix auxiliary_irq_mode_show doc (kernel test boot)
+> ---
+>  Documentation/ABI/testing/sysfs-bus-auxiliary |  7 ++
+>  drivers/base/auxiliary.c                      | 96 ++++++++++++++++++-
+>  include/linux/auxiliary_bus.h                 | 24 ++++-
+>  3 files changed, 124 insertions(+), 3 deletions(-)
+>  create mode 100644 Documentation/ABI/testing/sysfs-bus-auxiliary
+> 
+> diff --git a/Documentation/ABI/testing/sysfs-bus-auxiliary b/Documentation/ABI/testing/sysfs-bus-auxiliary
+> new file mode 100644
+> index 000000000000..e8752c2354bc
+> --- /dev/null
+> +++ b/Documentation/ABI/testing/sysfs-bus-auxiliary
+> @@ -0,0 +1,7 @@
+> +What:		/sys/bus/auxiliary/devices/.../irqs/
+> +Date:		April, 2024
+> +Contact:	Shay Drory <shayd@nvidia.com>
+> +Description:
+> +		The /sys/devices/.../irqs directory contains a variable set of
+> +		files, with each file is named as irq number similar to PCI PF
+> +		or VF's irq number located in msi_irqs directory.
+> diff --git a/drivers/base/auxiliary.c b/drivers/base/auxiliary.c
+> index d3a2c40c2f12..fcd7dbf20f88 100644
+> --- a/drivers/base/auxiliary.c
+> +++ b/drivers/base/auxiliary.c
+> @@ -158,6 +158,94 @@
+>   *	};
+>   */
+>  
+> +#ifdef CONFIG_SYSFS
 
-I can't recall why iproute2 doesn't have bridge mst support after
-ec7328b59176 ("net: bridge: mst: Multiple Spanning Tree (MST) mode") and
-122c29486e1f ("net: bridge: mst: Support setting and reporting MST port states")
+People really build boxes without sysfs?  Ok :(
 
-Is there a reason that we rejected the iproute2 patch? Or Tobias didn't submit
-the patch?
+But if so, why not move this to a whole new file?  That would make it
+simpler to maintain.
 
-Thanks
-Hangbin
+> +struct auxiliary_irq_info {
+> +	struct device_attribute sysfs_attr;
+> +};
+> +
+> +static struct attribute *auxiliary_irq_attrs[] = {
+> +	NULL
+> +};
+> +
+> +static const struct attribute_group auxiliary_irqs_group = {
+> +	.name = "irqs",
+> +	.attrs = auxiliary_irq_attrs,
+> +};
+> +
+> +static const struct attribute_group *auxiliary_irqs_groups[] = {
+> +	&auxiliary_irqs_group,
+> +	NULL
+> +};
+> +
+> +/**
+> + * auxiliary_device_sysfs_irq_add - add a sysfs entry for the given IRQ
+> + * @auxdev: auxiliary bus device to add the sysfs entry.
+> + * @irq: The associated interrupt number.
+> + *
+> + * This function should be called after auxiliary device have successfully
+> + * received the irq.
+> + *
+> + * Return: zero on success or an error code on failure.
+> + */
+> +int auxiliary_device_sysfs_irq_add(struct auxiliary_device *auxdev, int irq)
+> +{
+> +	struct device *dev = &auxdev->dev;
+> +	struct auxiliary_irq_info *info;
+> +	int ret;
+> +
+> +	info = kzalloc(sizeof(*info), GFP_KERNEL);
+> +	if (!info)
+> +		return -ENOMEM;
+> +
+> +	sysfs_attr_init(&info->sysfs_attr.attr);
+> +	info->sysfs_attr.attr.name = kasprintf(GFP_KERNEL, "%d", irq);
+> +	if (!info->sysfs_attr.attr.name) {
+> +		ret = -ENOMEM;
+> +		goto name_err;
+> +	}
+> +
+> +	ret = xa_insert(&auxdev->irqs, irq, info, GFP_KERNEL);
+> +	if (ret)
+> +		goto auxdev_xa_err;
+> +
+> +	ret = sysfs_add_file_to_group(&dev->kobj, &info->sysfs_attr.attr,
+> +				      auxiliary_irqs_group.name);
+
+Dynamic attributes are rough, because:
+
+
+> +	if (ret)
+> +		goto sysfs_add_err;
+> +
+> +	return 0;
+> +
+> +sysfs_add_err:
+> +	xa_erase(&auxdev->irqs, irq);
+> +auxdev_xa_err:
+> +	kfree(info->sysfs_attr.attr.name);
+> +name_err:
+> +	kfree(info);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_add);
+> +
+> +/**
+> + * auxiliary_device_sysfs_irq_remove - remove a sysfs entry for the given IRQ
+> + * @auxdev: auxiliary bus device to add the sysfs entry.
+> + * @irq: the IRQ to remove.
+> + *
+> + * This function should be called to remove an IRQ sysfs entry.
+> + */
+> +void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev, int irq)
+> +{
+> +	struct auxiliary_irq_info *info = xa_load(&auxdev->irqs, irq);
+> +	struct device *dev = &auxdev->dev;
+> +
+> +	sysfs_remove_file_from_group(&dev->kobj, &info->sysfs_attr.attr,
+> +				     auxiliary_irqs_group.name);
+> +	xa_erase(&auxdev->irqs, irq);
+> +	kfree(info->sysfs_attr.attr.name);
+> +	kfree(info);
+> +}
+> +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_remove);
+
+What is forcing you to remove the irqs after a device is removed from
+the system?
+
+Why not just remove them all automatically?  Why would you ever want to
+remove them after they were added, will they ever actually change over
+the lifespan of a device?
+
+>  int auxiliary_device_init(struct auxiliary_device *auxdev);
+> -int __auxiliary_device_add(struct auxiliary_device *auxdev, const char *modname);
+> -#define auxiliary_device_add(auxdev) __auxiliary_device_add(auxdev, KBUILD_MODNAME)
+> +int __auxiliary_device_add(struct auxiliary_device *auxdev, const char *modname,
+> +			   bool irqs_sysfs_enable);
+> +#define auxiliary_device_add(auxdev) __auxiliary_device_add(auxdev, KBUILD_MODNAME, false)
+> +#define auxiliary_device_add_with_irqs(auxdev) \
+> +	__auxiliary_device_add(auxdev, KBUILD_MODNAME, true)
+
+Ick, no, that way lies madness.
+
+Just keep the original function:
+	auxiliary_device_add()
+as is.
+
+Then, if someone DOES call auxiliary_device_sysfs_irq_add() then add the
+irq directory and file as needed then.
+
+That way no "norml" paths are messed up and over time, we don't keep
+having an explosion of combinations of function calls to create an aux
+device (as we all know, this is NOT going to be the last feature ever
+added to them...)
+
+thanks,
+
+greg k-h
 
