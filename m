@@ -1,323 +1,148 @@
-Return-Path: <netdev+bounces-103099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C4B59064C9
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:19:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3986F9064DB
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:22:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0F31284C02
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 07:19:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D79641F22F6D
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 07:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BEA57CB9;
-	Thu, 13 Jun 2024 07:19:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E9B139CF2;
+	Thu, 13 Jun 2024 07:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="LXoNiHQz"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="gRu2n4lA"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBFD05914A;
-	Thu, 13 Jun 2024 07:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B3D7E578;
+	Thu, 13 Jun 2024 07:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718263186; cv=none; b=G2+EGOWlKz3cIacMUvQjKQW+sPFWxsU5zXG3JDJ+wy0+gDKQMvNUbux5oWgolpwgNOJRmNO3ZVU9z3UNS6qs5ZiWpc6ieT1CsR5dA0pkUEr9HbcmO208itUrSSmHaUCYhiRhLH0E/sQmqy76hwnp9Niqhc+amcDK0NG2XN1Dypo=
+	t=1718263257; cv=none; b=HU2RoE4JfED+viwVw5LxK3eMIGZGQ6o7VCyhv1dw6YTNa1AZth2O7fmHX6G8CVCfrdPlo4pJR6CJ0d0DhkbgvETLafTxqJmPllVuho37mqN+j0sSH0v/292weOMEvhIJ6fhFgwjo3/GnW383XqgUdlxcgeoZBAGMAxL/IFYAD/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718263186; c=relaxed/simple;
-	bh=E9jA9u9v8jccEplkYs0yb9V25UXm8D2eVFbanN5n4u0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=by2UOZEOCFm7z6rEkirpw71C6/f8pZ/h6ChSCqmOtzdw55XpAg6/tEBrIo7b1XaV22Ic9a7GkuUCpRWY7CeFFigGdsO89yblyWfORMvoHZyuOE6YzhsN0pTo51+ceqK0zbtvTyDFTPUlOC+CeBLQCzFp3PfmsMPH8sLcK7EqjBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=LXoNiHQz; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1718263180; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=nsIku9vqfWI9U+m1B+Hdd9np5en26JVTaI/K3JR5D7o=;
-	b=LXoNiHQzvHWt/LwBPuSEygFHN8L6B9yw2XlVU9ecQmI6BrF6YmE45syQWSgFgo26aVkK+LZdXys1zSem7ZMuxeRKwfUX2qHULE2CM/4ymMvcQceubHpeYvhzJSvGxctel+1CTURTqt47GDOTvSyFYwXr5Of6S1fDI2LcCF4oiPo=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W8NCWyR_1718263179;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0W8NCWyR_1718263179)
-          by smtp.aliyun-inc.com;
-          Thu, 13 Jun 2024 15:19:39 +0800
-Date: Thu, 13 Jun 2024 15:19:38 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com,
-	guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
-Subject: Re: [PATCH net-next v7 2/3] net/smc: expose smc proto operations
-Message-ID: <20240613071938.GP78725@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <1717837949-88904-1-git-send-email-alibuda@linux.alibaba.com>
- <1717837949-88904-3-git-send-email-alibuda@linux.alibaba.com>
+	s=arc-20240116; t=1718263257; c=relaxed/simple;
+	bh=8qAmcuxVdy9UciUM3TV8S7ygDBN0xQsnDFgY4xwrUIY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XtZXatTuqeKJzFZhseb/UZLctS7JU+hU9nYpQMLyl86tD5ycGvzvSZgWSpbUNZ2LdXAjuP1bQrti1lSvETIgW5S2zJq4QWkSNn9JLGBwu78Vyj69vfltGhJXlFybOeHjGTwVNdKNeXv39iJF6hydzwPDST0Vf6jXEHSCrqXsiqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=gRu2n4lA; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45D0Anoh019119;
+	Thu, 13 Jun 2024 00:20:21 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=QaJk6KB21ZRtn604FUI/GvT
+	E3L8EUAqkcLA3cQUhvQI=; b=gRu2n4lAeeT7n45jxTLaqVs4nGEFJ5h6qB8z6qP
+	+VJohhoMKZnWKaEcbsABeF0LnruYfvoM4CdxCmOYAfR1da+WxBsw2Y7cA32EGEYA
+	pcB5Wpmp+IOFtClXoupgU5tkiTkcqFMO0GXkgCXovMRVUTF+ZBAUTTZtA3KDSlCL
+	+K2TolowTYk+gEig12SyB+3gNnepYPAUcHTD7lP5+k0kqOMqsSPykPpWHQVcHmjN
+	wq1UQaFjp0PojJmNoxBw47zfc+UqxH39Ug7awzCgq4Y+x9Ailsj17p86LBSWX9UG
+	m3fRRtJIshDBbm3sntD3TkP0PTjhaCnoMD0PVYps2LnVo8g==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3yq8syw4kf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Jun 2024 00:20:03 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 13 Jun 2024 00:20:01 -0700
+Received: from bharat-OptiPlex-3070.marvell.com (10.69.176.80) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server id
+ 15.2.1544.4 via Frontend Transport; Thu, 13 Jun 2024 00:19:57 -0700
+From: Bharat Bhushan <bbhushan2@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <jerinj@marvell.com>,
+        <lcherian@marvell.com>, <richardcochran@gmail.com>
+CC: <bbhushan2@marvell.com>
+Subject: [net-next,v5 0/8] cn10k-ipsec: Add outbound inline ipsec support
+Date: Thu, 13 Jun 2024 12:49:47 +0530
+Message-ID: <20240613071955.2280099-1-bbhushan2@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1717837949-88904-3-git-send-email-alibuda@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: 8xKc_0FLlZxWJUbAKmjd4gETnux2aE5W
+X-Proofpoint-ORIG-GUID: 8xKc_0FLlZxWJUbAKmjd4gETnux2aE5W
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-12_12,2024-06-13_01,2024-05-17_01
 
-On 2024-06-08 17:12:28, D. Wythe wrote:
->From: "D. Wythe" <alibuda@linux.alibaba.com>
->
->Externalize smc proto operations (smc_xxx) to allow
->access from files other than af_smc.c
->
->This is in preparation for the subsequent implementation
->of the AF_INET version of SMC.
->
->Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
->Tested-by: Niklas Schnelle <schnelle@linux.ibm.com>
->Tested-by: Wenjia Zhang <wenjia@linux.ibm.com>
+This patch series adds outbound inline ipsec support on Marvell
+cn10k series of platform. One crypto hardware logical function
+(cpt-lf) per netdev is required for inline ipsec outbound
+functionality. Software prepare and submit crypto hardware
+(CPT) instruction for outbound inline ipsec crypto mode offload.
+The CPT instruction have details for encryption and authentication
+Crypto hardware encrypt, authenticate and provide the ESP packet
+to network hardware logic to transmit ipsec packet.
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+First patch makes dma memory writable for in-place encryption,
+Second patch moves code to common file, Third patch disable
+backpressure on crypto (CPT) and network (NIX) hardware.
+Patch four onwards enables inline outbound ipsec.
 
->---
-> net/smc/af_smc.c | 60 ++++++++++++++++++++++++++++----------------------------
-> net/smc/smc.h    | 33 +++++++++++++++++++++++++++++++
-> 2 files changed, 63 insertions(+), 30 deletions(-)
->
->diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->index 77a9d58..8e3ce76 100644
->--- a/net/smc/af_smc.c
->+++ b/net/smc/af_smc.c
->@@ -170,15 +170,15 @@ static bool smc_hs_congested(const struct sock *sk)
-> 	return false;
-> }
-> 
->-static struct smc_hashinfo smc_v4_hashinfo = {
->+struct smc_hashinfo smc_v4_hashinfo = {
-> 	.lock = __RW_LOCK_UNLOCKED(smc_v4_hashinfo.lock),
-> };
-> 
->-static struct smc_hashinfo smc_v6_hashinfo = {
->+struct smc_hashinfo smc_v6_hashinfo = {
-> 	.lock = __RW_LOCK_UNLOCKED(smc_v6_hashinfo.lock),
-> };
-> 
->-static int smc_hash_sk(struct sock *sk)
->+int smc_hash_sk(struct sock *sk)
-> {
-> 	struct smc_hashinfo *h = sk->sk_prot->h.smc_hash;
-> 	struct hlist_head *head;
->@@ -193,7 +193,7 @@ static int smc_hash_sk(struct sock *sk)
-> 	return 0;
-> }
-> 
->-static void smc_unhash_sk(struct sock *sk)
->+void smc_unhash_sk(struct sock *sk)
-> {
-> 	struct smc_hashinfo *h = sk->sk_prot->h.smc_hash;
-> 
->@@ -207,7 +207,7 @@ static void smc_unhash_sk(struct sock *sk)
->  * work which we didn't do because of user hold the sock_lock in the
->  * BH context
->  */
->-static void smc_release_cb(struct sock *sk)
->+void smc_release_cb(struct sock *sk)
-> {
-> 	struct smc_sock *smc = smc_sk(sk);
-> 
->@@ -307,7 +307,7 @@ static int __smc_release(struct smc_sock *smc)
-> 	return rc;
-> }
-> 
->-static int smc_release(struct socket *sock)
->+int smc_release(struct socket *sock)
-> {
-> 	struct sock *sk = sock->sk;
-> 	struct smc_sock *smc;
->@@ -401,8 +401,8 @@ static struct sock *smc_sock_alloc(struct net *net, struct socket *sock,
-> 	return sk;
-> }
-> 
->-static int smc_bind(struct socket *sock, struct sockaddr *uaddr,
->-		    int addr_len)
->+int smc_bind(struct socket *sock, struct sockaddr *uaddr,
->+	     int addr_len)
-> {
-> 	struct sockaddr_in *addr = (struct sockaddr_in *)uaddr;
-> 	struct sock *sk = sock->sk;
->@@ -1649,8 +1649,8 @@ static void smc_connect_work(struct work_struct *work)
-> 	release_sock(&smc->sk);
-> }
-> 
->-static int smc_connect(struct socket *sock, struct sockaddr *addr,
->-		       int alen, int flags)
->+int smc_connect(struct socket *sock, struct sockaddr *addr,
->+		int alen, int flags)
-> {
-> 	struct sock *sk = sock->sk;
-> 	struct smc_sock *smc;
->@@ -2631,7 +2631,7 @@ static void smc_clcsock_data_ready(struct sock *listen_clcsock)
-> 	read_unlock_bh(&listen_clcsock->sk_callback_lock);
-> }
-> 
->-static int smc_listen(struct socket *sock, int backlog)
->+int smc_listen(struct socket *sock, int backlog)
-> {
-> 	struct sock *sk = sock->sk;
-> 	struct smc_sock *smc;
->@@ -2696,8 +2696,8 @@ static int smc_listen(struct socket *sock, int backlog)
-> 	return rc;
-> }
-> 
->-static int smc_accept(struct socket *sock, struct socket *new_sock,
->-		      struct proto_accept_arg *arg)
->+int smc_accept(struct socket *sock, struct socket *new_sock,
->+	       struct proto_accept_arg *arg)
-> {
-> 	struct sock *sk = sock->sk, *nsk;
-> 	DECLARE_WAITQUEUE(wait, current);
->@@ -2766,8 +2766,8 @@ static int smc_accept(struct socket *sock, struct socket *new_sock,
-> 	return rc;
-> }
-> 
->-static int smc_getname(struct socket *sock, struct sockaddr *addr,
->-		       int peer)
->+int smc_getname(struct socket *sock, struct sockaddr *addr,
->+		int peer)
-> {
-> 	struct smc_sock *smc;
-> 
->@@ -2780,7 +2780,7 @@ static int smc_getname(struct socket *sock, struct sockaddr *addr,
-> 	return smc->clcsock->ops->getname(smc->clcsock, addr, peer);
-> }
-> 
->-static int smc_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
->+int smc_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
-> {
-> 	struct sock *sk = sock->sk;
-> 	struct smc_sock *smc;
->@@ -2818,8 +2818,8 @@ static int smc_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
-> 	return rc;
-> }
-> 
->-static int smc_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->-		       int flags)
->+int smc_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->+		int flags)
-> {
-> 	struct sock *sk = sock->sk;
-> 	struct smc_sock *smc;
->@@ -2868,8 +2868,8 @@ static __poll_t smc_accept_poll(struct sock *parent)
-> 	return mask;
-> }
-> 
->-static __poll_t smc_poll(struct file *file, struct socket *sock,
->-			     poll_table *wait)
->+__poll_t smc_poll(struct file *file, struct socket *sock,
->+		  poll_table *wait)
-> {
-> 	struct sock *sk = sock->sk;
-> 	struct smc_sock *smc;
->@@ -2921,7 +2921,7 @@ static __poll_t smc_poll(struct file *file, struct socket *sock,
-> 	return mask;
-> }
-> 
->-static int smc_shutdown(struct socket *sock, int how)
->+int smc_shutdown(struct socket *sock, int how)
-> {
-> 	struct sock *sk = sock->sk;
-> 	bool do_shutdown = true;
->@@ -3061,8 +3061,8 @@ static int __smc_setsockopt(struct socket *sock, int level, int optname,
-> 	return rc;
-> }
-> 
->-static int smc_setsockopt(struct socket *sock, int level, int optname,
->-			  sockptr_t optval, unsigned int optlen)
->+int smc_setsockopt(struct socket *sock, int level, int optname,
->+		   sockptr_t optval, unsigned int optlen)
-> {
-> 	struct sock *sk = sock->sk;
-> 	struct smc_sock *smc;
->@@ -3148,8 +3148,8 @@ static int smc_setsockopt(struct socket *sock, int level, int optname,
-> 	return rc;
-> }
-> 
->-static int smc_getsockopt(struct socket *sock, int level, int optname,
->-			  char __user *optval, int __user *optlen)
->+int smc_getsockopt(struct socket *sock, int level, int optname,
->+		   char __user *optval, int __user *optlen)
-> {
-> 	struct smc_sock *smc;
-> 	int rc;
->@@ -3174,8 +3174,8 @@ static int smc_getsockopt(struct socket *sock, int level, int optname,
-> 	return rc;
-> }
-> 
->-static int smc_ioctl(struct socket *sock, unsigned int cmd,
->-		     unsigned long arg)
->+int smc_ioctl(struct socket *sock, unsigned int cmd,
->+	      unsigned long arg)
-> {
-> 	union smc_host_cursor cons, urg;
-> 	struct smc_connection *conn;
->@@ -3261,9 +3261,9 @@ static int smc_ioctl(struct socket *sock, unsigned int cmd,
->  * Note that subsequent recv() calls have to wait till all splice() processing
->  * completed.
->  */
->-static ssize_t smc_splice_read(struct socket *sock, loff_t *ppos,
->-			       struct pipe_inode_info *pipe, size_t len,
->-			       unsigned int flags)
->+ssize_t smc_splice_read(struct socket *sock, loff_t *ppos,
->+			struct pipe_inode_info *pipe, size_t len,
->+			unsigned int flags)
-> {
-> 	struct sock *sk = sock->sk;
-> 	struct smc_sock *smc;
->diff --git a/net/smc/smc.h b/net/smc/smc.h
->index 3edec1e..34b781e 100644
->--- a/net/smc/smc.h
->+++ b/net/smc/smc.h
->@@ -34,6 +34,39 @@
-> extern struct proto smc_proto;
-> extern struct proto smc_proto6;
-> 
->+extern struct smc_hashinfo smc_v4_hashinfo;
->+extern struct smc_hashinfo smc_v6_hashinfo;
->+
->+int smc_hash_sk(struct sock *sk);
->+void smc_unhash_sk(struct sock *sk);
->+void smc_release_cb(struct sock *sk);
->+
->+int smc_release(struct socket *sock);
->+int smc_bind(struct socket *sock, struct sockaddr *uaddr,
->+	     int addr_len);
->+int smc_connect(struct socket *sock, struct sockaddr *addr,
->+		int alen, int flags);
->+int smc_accept(struct socket *sock, struct socket *new_sock,
->+	       struct proto_accept_arg *arg);
->+int smc_getname(struct socket *sock, struct sockaddr *addr,
->+		int peer);
->+__poll_t smc_poll(struct file *file, struct socket *sock,
->+		  poll_table *wait);
->+int smc_ioctl(struct socket *sock, unsigned int cmd,
->+	      unsigned long arg);
->+int smc_listen(struct socket *sock, int backlog);
->+int smc_shutdown(struct socket *sock, int how);
->+int smc_setsockopt(struct socket *sock, int level, int optname,
->+		   sockptr_t optval, unsigned int optlen);
->+int smc_getsockopt(struct socket *sock, int level, int optname,
->+		   char __user *optval, int __user *optlen);
->+int smc_sendmsg(struct socket *sock, struct msghdr *msg, size_t len);
->+int smc_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->+		int flags);
->+ssize_t smc_splice_read(struct socket *sock, loff_t *ppos,
->+			struct pipe_inode_info *pipe, size_t len,
->+			unsigned int flags);
->+
-> /* smc sock initialization */
-> void smc_sk_init(struct net *net, struct sock *sk, int protocol);
-> /* clcsock initialization */
->-- 
->1.8.3.1
->
+v4->v5:
+ - Fixed un-initialized warning and pointer check
+   (comment from Kalesh Anakkur Purayil)
+
+v3->v4:
+ - Few error messages in datapath removed and some moved
+   under netif_msg_tx_err().
+ - Added check for crypto offload (XFRM_DEV_OFFLOAD_CRYPTO)
+   Thanks "Leon Romanovsky" for pointing out
+ - Fixed codespell error as per comment from Simon Horman
+ - Added some other cleanup comment from Kalesh Anakkur Purayil
+
+v2->v3:
+ - Fix smatch and sparse erros (Comment from Simon Horman)
+ - Fix build error with W=1 (Comment from Simon Horman)
+   https://patchwork.kernel.org/project/netdevbpf/patch/20240513105446.297451-6-bbhushan2@marvell.com/
+ - Some other minor cleanup as per comment
+   https://www.spinics.net/lists/netdev/msg997197.html
+
+v1->v2:
+ - Fix compilation error to build driver a module
+ - Use dma_wmb() instead of architecture specific barrier
+ - Fix couple of other compilation warnings
+
+Bharat Bhushan (8):
+  octeontx2-pf: map skb data as device writeable
+  octeontx2-pf: Move skb fragment map/unmap to common code
+  octeontx2-af: Disable backpressure between CPT and NIX
+  cn10k-ipsec: Initialize crypto hardware for outb inline ipsec
+  cn10k-ipsec: Add SA add/delete support for outb inline ipsec
+  cn10k-ipsec: Process inline ipsec transmit offload
+  cn10k-ipsec: Allow inline ipsec offload for skb with SA
+  cn10k-ipsec: Enable outbound inline ipsec offload
+
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |    4 +
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |   74 +-
+ .../ethernet/marvell/octeontx2/nic/Makefile   |    1 +
+ .../marvell/octeontx2/nic/cn10k_ipsec.c       | 1068 +++++++++++++++++
+ .../marvell/octeontx2/nic/cn10k_ipsec.h       |  258 ++++
+ .../marvell/octeontx2/nic/otx2_common.c       |   99 +-
+ .../marvell/octeontx2/nic/otx2_common.h       |   25 +
+ .../marvell/octeontx2/nic/otx2_dcbnl.c        |    3 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   19 +-
+ .../marvell/octeontx2/nic/otx2_txrx.c         |   65 +-
+ .../marvell/octeontx2/nic/otx2_txrx.h         |    3 +
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |   10 +-
+ 12 files changed, 1575 insertions(+), 54 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
+
+-- 
+2.34.1
+
 
