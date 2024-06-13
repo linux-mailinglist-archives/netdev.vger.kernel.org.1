@@ -1,237 +1,144 @@
-Return-Path: <netdev+bounces-103097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D427D9064C6
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:19:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 396689064C8
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:19:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E3BD284C3C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 07:19:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D353B1F2279B
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 07:19:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6525914A;
-	Thu, 13 Jun 2024 07:19:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA0A25A7A0;
+	Thu, 13 Jun 2024 07:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="MxQXJsh6"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="X+WWumih"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB957FB;
-	Thu, 13 Jun 2024 07:19:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE6A5F876
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 07:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718263156; cv=none; b=WNRAqLo+3sH8/b9W7KwvygkBiFZ2Bl55/aYjNZdaFcr25V+h44VZGPjQ8IJwGX40VQWjmVLkAJKSsQZDGC1UeSih3HLM7MdF7CK+1r49JSjyMZX44Y2LPk/RlTHOXwbxzOrL+9gcbRrGxbwn7l105dpdGmAstkJiAjlt/kTpeLc=
+	t=1718263159; cv=none; b=EnUaEP7sf04cipHwtu7XmdoHMaoRHGWXhoOwQCi1llZuKskTfQcnqEX3hKu+TOrTGMnl2hh5+MU/G+zViDthPVQGFGDJXxgB0vLAPEqwMtvKe2QBTcvdcFD7qOAlEGpNE0zSokuSgumPF/vZMMGE0+jQJesnAZObVV+BvgDi3Bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718263156; c=relaxed/simple;
-	bh=bpXX6LlaNiPg2YVfB+CCMKceQhG66Hmc332O+CKqz4A=;
+	s=arc-20240116; t=1718263159; c=relaxed/simple;
+	bh=TzeJop5nKLNTds80+WUlKBHV3oFUZ/+WHxCILNbZbsA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q7smW4/hfGjUKqwelP8/1yS26L51ek3p+gS0pjPcv2v3IG3cEp7gntrmdNZTcNuiyY/hkarE4tL7cyLILykXskZ6qBB/ztfxei3f/kWLF4quZVY5B+34wUXR1Big9m5Vw1VaQKXrpPk1LO27QGyTGtihYijMuh6C9SCyEgX+L0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=MxQXJsh6; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1718263149; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=uSS/HnnLu36EYiUk1VYLsstcCCEfbL6d7aU1ouqmUvA=;
-	b=MxQXJsh6Arjsfbt78qOIWpW/9J16o9QRiWb7MEjyD6seDfuSYqzPhA6829pJKMrY4lCyXkP4zesWETsSycPu87HQtZXsf3r+mco2S3nB7iHydsX35AXwUc+lMWWXFbWEHVv5RjSWBeVDQ3He3DTlCS9oHWaDdi60YGjwEzr6wOg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045075189;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W8N1f5e_1718263148;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0W8N1f5e_1718263148)
-          by smtp.aliyun-inc.com;
-          Thu, 13 Jun 2024 15:19:09 +0800
-Date: Thu, 13 Jun 2024 15:19:08 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com,
-	guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
-Subject: Re: [PATCH net-next v7 1/3] net/smc: refactoring initialization of
- smc sock
-Message-ID: <20240613071908.GO78725@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <1717837949-88904-1-git-send-email-alibuda@linux.alibaba.com>
- <1717837949-88904-2-git-send-email-alibuda@linux.alibaba.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AOzCJqJ4nT4TXG2uG1rt+kEQCxzRKr9mwQ4J0an/KpGZxomAUvP70DddgMwHUqG8PFx+Y8YkDvmM1VE6QuFiziDk+Lvt9Ac14hjcWntRM/yVKNdyZrMqLmaO5uPCrKACu4tzL48S+hneTdnZf4OLuAVavegTK86rrbw14hO72Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=X+WWumih; arc=none smtp.client-ip=209.85.128.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-421820fc26dso6502625e9.2
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 00:19:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718263156; x=1718867956; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=TzeJop5nKLNTds80+WUlKBHV3oFUZ/+WHxCILNbZbsA=;
+        b=X+WWumihnXZlo0a6ENGjTplBYJ1oTMvYIa6n6obD0Q+VEZTF/kemD+Wjri3EzqU2GO
+         zz+5pU5nlW6x01Hc28PNzsd0/gXS2EzomXg9xU3hSm90vXNW+MUhEO/oCfw6LcVRoLiR
+         ktvIo8CvU1Uk1a+3z8g5Vrjc/XF2e0R5b1DUGuTIxPhnBqS7nGK23V0cEAdS0jBpD9bj
+         TgCQraUeUvU+bFKdlbrqe46Ennnfby0FqPF4qZ2fu9BhVQri+UiM22g/R1vT4Od3TrJJ
+         Jel0JM8aXYrYWOV82MdNt3RP2968wPq0+m3bPzlb7H648iIhOWQHL+3OVo1flKO1+cWY
+         wS6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718263156; x=1718867956;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TzeJop5nKLNTds80+WUlKBHV3oFUZ/+WHxCILNbZbsA=;
+        b=Tq9XiD08oQVazytf/hZmDdsdURwb/2Z4vEXMJXHSRaoCDroafohV+xfJt99wdzS2NT
+         VHNRwt89D1u5P2s8HuTyXG2K8aFDutPg/+1zOvx4XEXvpqGSuaS0RIGgL/ECkahuYp2h
+         iqyJXuUBvVegJAf1q9NGsrIc9nuZb5JeS12x66daa49mhhKuEH0nZwuRe6sa/b/cfdip
+         PNATkY8wbC4Ykc6XdgkAhQxLZhopSTnSwmR0staDFTOu4GZB7zA9bEOI71fF+uVJ3X+b
+         PzjjvouTlcMC008qChwUBiLOVPcIWbv3hBEg9DLy3zlAOKUnont3FQUVGB5wmVlFhE0N
+         zCNw==
+X-Forwarded-Encrypted: i=1; AJvYcCV/GoRxsRhbP8maq0ci6IorvH4DCJKiSfuVQsTgFnazMmA/yFImbOqKcQS5nEFt4lWG6Eq+jNT0FMxUw5Q+J2c3jNXTF7bp
+X-Gm-Message-State: AOJu0Yz35VUV5D3VUGjtoKyE0+Uy4kz3aGSIJE/OHzn5lA1v3g4MSSoV
+	NDdnoZv592EBHpL1dIChp1EU+2ap9nc5FdbFoZcXa/pphpsK3TUnDgQwYsCrRhQ=
+X-Google-Smtp-Source: AGHT+IGl0YvYwK8MoDJscuypQJ17jwFmwcn09ZKxZqvyzK8MNJmQlR+uPmmOX7iTOIKwEW9afSZARA==
+X-Received: by 2002:a05:600c:1f15:b0:421:f0e2:300b with SMTP id 5b1f17b1804b1-422863b86e6mr38195605e9.17.1718263155474;
+        Thu, 13 Jun 2024 00:19:15 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-360750f22f4sm825165f8f.78.2024.06.13.00.19.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jun 2024 00:19:14 -0700 (PDT)
+Date: Thu, 13 Jun 2024 09:19:11 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, dsahern@kernel.org, mst@redhat.com,
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, leitao@debian.org, netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v3] net: dqs: introduce IFF_NO_BQL private flag
+ for non-BQL drivers
+Message-ID: <Zmqdb-sBBitXIrFo@nanopsycho.orion>
+References: <20240613023549.15213-1-kerneljasonxing@gmail.com>
+ <ZmqFzpQOaQfp7Wjr@nanopsycho.orion>
+ <CAL+tcoAir0u0HTYQCMgVNTkb8RpAMzD1eH-EevL576kt5u7DPw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1717837949-88904-2-git-send-email-alibuda@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL+tcoAir0u0HTYQCMgVNTkb8RpAMzD1eH-EevL576kt5u7DPw@mail.gmail.com>
 
-On 2024-06-08 17:12:27, D. Wythe wrote:
->From: "D. Wythe" <alibuda@linux.alibaba.com>
+Thu, Jun 13, 2024 at 08:08:36AM CEST, kerneljasonxing@gmail.com wrote:
+>On Thu, Jun 13, 2024 at 1:38 PM Jiri Pirko <jiri@resnulli.us> wrote:
+>>
+>> Thu, Jun 13, 2024 at 04:35:49AM CEST, kerneljasonxing@gmail.com wrote:
+>> >From: Jason Xing <kernelxing@tencent.com>
+>> >
+>> >Since commit 74293ea1c4db6 ("net: sysfs: Do not create sysfs for non
+>> >BQL device") limits the non-BQL driver not creating byte_queue_limits
+>> >directory, I found there is one exception, namely, virtio-net driver,
+>> >which should also be limited in netdev_uses_bql(). Let me give it a
+>> >try first.
+>> >
+>> >I decided to introduce a NO_BQL bit because:
+>> >1) it can help us limit virtio-net driver for now.
+>> >2) if we found another non-BQL driver, we can take it into account.
+>> >3) we can replace all the driver meeting those two statements in
+>> >netdev_uses_bql() in future.
+>> >
+>> >For now, I would like to make the first step to use this new bit for dqs
+>> >use instead of replacing/applying all the non-BQL drivers in one go.
+>> >
+>> >As Jakub said, "netdev_uses_bql() is best effort", I think, we can add
+>> >new non-BQL drivers as soon as we find one.
+>> >
+>> >After this patch, there is no byte_queue_limits directory in virtio-net
+>> >driver.
+>>
+>> Please note following patch is currently trying to push bql support for
+>> virtio_net:
+>> https://lore.kernel.org/netdev/20240612170851.1004604-1-jiri@resnulli.us/
 >
->This patch aims to isolate the shared components of SMC socket
->allocation by introducing smc_sk_init() for sock initialization
->and __smc_create_clcsk() for the initialization of clcsock.
+>I saw this one this morning and I'm reviewing/testing it.
 >
->This is in preparation for the subsequent implementation of the
->AF_INET version of SMC.
+>>
+>> When that is merged, this patch is not needed. Could we wait?
 >
->Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->Reviewed-by: Tony Lu <tonylu@linux.alibaba.com>
->Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
->Tested-by: Niklas Schnelle <schnelle@linux.ibm.com>
->Tested-by: Wenjia Zhang <wenjia@linux.ibm.com>
+>Please note this patch is not only written for virtio_net driver.
+>Virtio_net driver is one of possible cases.
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+Yeah, but without virtio_net, there will be no users. What's the point
+of having that in code? I mean, in general, no-user kernel code gets
+removed.
 
->---
-> net/smc/af_smc.c | 86 +++++++++++++++++++++++++++++++-------------------------
-> net/smc/smc.h    |  5 ++++
-> 2 files changed, 53 insertions(+), 38 deletions(-)
+
 >
->diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->index e50a286..77a9d58 100644
->--- a/net/smc/af_smc.c
->+++ b/net/smc/af_smc.c
->@@ -361,25 +361,15 @@ static void smc_destruct(struct sock *sk)
-> 		return;
-> }
-> 
->-static struct sock *smc_sock_alloc(struct net *net, struct socket *sock,
->-				   int protocol)
->+void smc_sk_init(struct net *net, struct sock *sk, int protocol)
-> {
->-	struct smc_sock *smc;
->-	struct proto *prot;
->-	struct sock *sk;
->-
->-	prot = (protocol == SMCPROTO_SMC6) ? &smc_proto6 : &smc_proto;
->-	sk = sk_alloc(net, PF_SMC, GFP_KERNEL, prot, 0);
->-	if (!sk)
->-		return NULL;
->+	struct smc_sock *smc = smc_sk(sk);
-> 
->-	sock_init_data(sock, sk); /* sets sk_refcnt to 1 */
-> 	sk->sk_state = SMC_INIT;
-> 	sk->sk_destruct = smc_destruct;
-> 	sk->sk_protocol = protocol;
-> 	WRITE_ONCE(sk->sk_sndbuf, 2 * READ_ONCE(net->smc.sysctl_wmem));
-> 	WRITE_ONCE(sk->sk_rcvbuf, 2 * READ_ONCE(net->smc.sysctl_rmem));
->-	smc = smc_sk(sk);
-> 	INIT_WORK(&smc->tcp_listen_work, smc_tcp_listen_work);
-> 	INIT_WORK(&smc->connect_work, smc_connect_work);
-> 	INIT_DELAYED_WORK(&smc->conn.tx_work, smc_tx_work);
->@@ -389,6 +379,24 @@ static struct sock *smc_sock_alloc(struct net *net, struct socket *sock,
-> 	sk->sk_prot->hash(sk);
-> 	mutex_init(&smc->clcsock_release_lock);
-> 	smc_init_saved_callbacks(smc);
->+	smc->limit_smc_hs = net->smc.limit_smc_hs;
->+	smc->use_fallback = false; /* assume rdma capability first */
->+	smc->fallback_rsn = 0;
->+}
->+
->+static struct sock *smc_sock_alloc(struct net *net, struct socket *sock,
->+				   int protocol)
->+{
->+	struct proto *prot;
->+	struct sock *sk;
->+
->+	prot = (protocol == SMCPROTO_SMC6) ? &smc_proto6 : &smc_proto;
->+	sk = sk_alloc(net, PF_SMC, GFP_KERNEL, prot, 0);
->+	if (!sk)
->+		return NULL;
->+
->+	sock_init_data(sock, sk); /* sets sk_refcnt to 1 */
->+	smc_sk_init(net, sk, protocol);
-> 
-> 	return sk;
-> }
->@@ -3321,6 +3329,31 @@ static ssize_t smc_splice_read(struct socket *sock, loff_t *ppos,
-> 	.splice_read	= smc_splice_read,
-> };
-> 
->+int smc_create_clcsk(struct net *net, struct sock *sk, int family)
->+{
->+	struct smc_sock *smc = smc_sk(sk);
->+	int rc;
->+
->+	rc = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP,
->+			      &smc->clcsock);
->+	if (rc) {
->+		sk_common_release(sk);
->+		return rc;
->+	}
->+
->+	/* smc_clcsock_release() does not wait smc->clcsock->sk's
->+	 * destruction;  its sk_state might not be TCP_CLOSE after
->+	 * smc->sk is close()d, and TCP timers can be fired later,
->+	 * which need net ref.
->+	 */
->+	sk = smc->clcsock->sk;
->+	__netns_tracker_free(net, &sk->ns_tracker, false);
->+	sk->sk_net_refcnt = 1;
->+	get_net_track(net, &sk->ns_tracker, GFP_KERNEL);
->+	sock_inuse_add(net, 1);
->+	return 0;
->+}
->+
-> static int __smc_create(struct net *net, struct socket *sock, int protocol,
-> 			int kern, struct socket *clcsock)
-> {
->@@ -3346,35 +3379,12 @@ static int __smc_create(struct net *net, struct socket *sock, int protocol,
-> 
-> 	/* create internal TCP socket for CLC handshake and fallback */
-> 	smc = smc_sk(sk);
->-	smc->use_fallback = false; /* assume rdma capability first */
->-	smc->fallback_rsn = 0;
->-
->-	/* default behavior from limit_smc_hs in every net namespace */
->-	smc->limit_smc_hs = net->smc.limit_smc_hs;
-> 
-> 	rc = 0;
->-	if (!clcsock) {
->-		rc = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP,
->-				      &smc->clcsock);
->-		if (rc) {
->-			sk_common_release(sk);
->-			goto out;
->-		}
->-
->-		/* smc_clcsock_release() does not wait smc->clcsock->sk's
->-		 * destruction;  its sk_state might not be TCP_CLOSE after
->-		 * smc->sk is close()d, and TCP timers can be fired later,
->-		 * which need net ref.
->-		 */
->-		sk = smc->clcsock->sk;
->-		__netns_tracker_free(net, &sk->ns_tracker, false);
->-		sk->sk_net_refcnt = 1;
->-		get_net_track(net, &sk->ns_tracker, GFP_KERNEL);
->-		sock_inuse_add(net, 1);
->-	} else {
->+	if (clcsock)
-> 		smc->clcsock = clcsock;
->-	}
->-
->+	else
->+		rc = smc_create_clcsk(net, sk, family);
-> out:
-> 	return rc;
-> }
->diff --git a/net/smc/smc.h b/net/smc/smc.h
->index 18c8b78..3edec1e 100644
->--- a/net/smc/smc.h
->+++ b/net/smc/smc.h
->@@ -34,6 +34,11 @@
-> extern struct proto smc_proto;
-> extern struct proto smc_proto6;
-> 
->+/* smc sock initialization */
->+void smc_sk_init(struct net *net, struct sock *sk, int protocol);
->+/* clcsock initialization */
->+int smc_create_clcsk(struct net *net, struct sock *sk, int family);
->+
-> #ifdef ATOMIC64_INIT
-> #define KERNEL_HAS_ATOMIC64
-> #endif
->-- 
->1.8.3.1
+>After your patch gets merged (I think it will take some time), you
+>could simply remove that one line in virtio_net.c.
 >
+>Thanks.
 
