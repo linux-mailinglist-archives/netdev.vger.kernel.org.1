@@ -1,213 +1,135 @@
-Return-Path: <netdev+bounces-103252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F31B29074C4
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:13:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7D689074CA
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CEFE1F2158E
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:13:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B9DB286567
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:13:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ECFB146A86;
-	Thu, 13 Jun 2024 14:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69350146D63;
+	Thu, 13 Jun 2024 14:12:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RXe269nw"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="L2OdeEdD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAEDE146A9A
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 14:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13BD1448D7;
+	Thu, 13 Jun 2024 14:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718287915; cv=none; b=F9j3PTI3zj6LShkhtFJkCJ2AWMOPosmixykEtOkq7M633oZtGZcEQy6OYPxxpmqPHolHaMfHCdBT1cK4pXC56Lk6yw9t+Q6QhVHr8N1cKILdegECgIu4zqHWhjBaOUn5babtXjvl+5jBYzTEsBljJs3hllkVh1gDD99qJTh6mKg=
+	t=1718287925; cv=none; b=I86ts514cHJIs+9lfKtf0TiX1JFvuCbNzdhoMBmZpePOi72wKEesCNrYrcItQD0zAQUTDBC1oxFj8usSmCQKL9FJiL/4axH8zUfdaNhesFmQHxg2y8FAIV12pzirFCKwSLT3jMHbESn7cxIiW4rXyX00xROF58WTRgI7B7hTGl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718287915; c=relaxed/simple;
-	bh=O6dr3kvkjUXYCKO3ot8Cmn4ORn113k/RdE9VQxXQ1+E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ry+6AqdQiVrkVLgp4dJ4cgq83NTd7Cm94m09tXU2Z8G3d+Bqq1nhVDs7mdQ1Ec6l2yHcJJbtyH2OK3Ka/vdT6d7h10ZDyDSnqfhqMs6KZ1xxLNknhIyOOy1ek82uW6HrOlzhgHOVuf+GNuVT4wUrMzmzvNWXT5pTpbhcJNKV1MY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RXe269nw; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-57c75464e77so1234219a12.0
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 07:11:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718287912; x=1718892712; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O6dr3kvkjUXYCKO3ot8Cmn4ORn113k/RdE9VQxXQ1+E=;
-        b=RXe269nwsPaNjzSSU4ZB5scLXXBqCl8j5ITGPxVCJka16RW2kogxLGctQtAZtSl6BQ
-         9hs8uXiOvZg0fy05N+NTHAiKhG+HjyBkxjik+QOBR1sUEnGdN0SLi4tkS4MTAViHkwUJ
-         l5ptGBtTxzSCPprlmONg83W7FZd2agTkebVprtlE6Uo8LEF4bkX1JrGE6qgsQked+Fl1
-         m5QDXzZRm7NZC/j3k3AeeTUdTqXGQIaDInfYvavYNvb524IbI6Y73/Fu6pPDT04bTB4B
-         y8emJELCJ5T/aqOrmss3a58wd+pPWGO67sracHglD/tm7NT0EZ4lDrOJg/+ZDKFSDNwc
-         LhEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718287912; x=1718892712;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O6dr3kvkjUXYCKO3ot8Cmn4ORn113k/RdE9VQxXQ1+E=;
-        b=dmrU/UkkP8KLVg2fpU04sl8gSuY3xujgUSzmp1AC0OUuf2/Ht9kinx/MFU7HfBxqjf
-         LQtJOOrhpZ185OljBn5G6ZeUsDmjUDHn8hf33HkOLHUQgtyi8pDXZA0DEk/W7HxpESfG
-         CoRIt7UDCX73qnVSunwLVAUNHLfargW6TtwvCEvD9shf3QoebAPdoIHL9oycM+JXbX/S
-         PqzfJkzTe5oYqfvxNyhv3fT2kgCXciBrVJcaNwChNPshr5HSDn/7AhQ+Ef93U57T+XiX
-         n1Kq1cWDKW2t7Fz+tDJbXhFAEaRxjFrqTkBeoI+tqcXPPbGBUEH3WDc03hsSRYv29+Gh
-         usFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVK82yd123faEqSZVa65PFrCti+bAtpEGdvNegajS7oSQ7601MPt9vU9rUWEEIA0BEptun4bJ7291XK5X6DzKp2R4NdeDyP
-X-Gm-Message-State: AOJu0YyIs1hwQzYIUv71RuqFlWPUCqtnCr6bc9xctZ8kEhzOl2KKRoJ/
-	P58DcdL9MeQGxQRpz41HEFUciMErH4PkatJ5SHoIytdqPEryo2iRZY6iIi0X6EM0zah3TRjaxUk
-	MigIH2eQeHrJY2ntHkqXPM+nGhNc=
-X-Google-Smtp-Source: AGHT+IEo2LC3lvHUA2bUJ/5YGwHZmF/x50WP6y3Q/TETKq0jJ/8mp3ihkqC9wo+l1ImNzP6E/+Aw4amRKZ4NdcxiNqY=
-X-Received: by 2002:a50:a45a:0:b0:57c:6e0a:e8d0 with SMTP id
- 4fb4d7f45d1cf-57ca9756beamr3476262a12.1.1718287911609; Thu, 13 Jun 2024
- 07:11:51 -0700 (PDT)
+	s=arc-20240116; t=1718287925; c=relaxed/simple;
+	bh=BP0dHPKrPu1s5lsp6b2VSCZAPBtD2LfDAGF3nZJ/aYg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mKPeoTew5K7KAhRH1tBMnRVXgyjWyWh8QRVrrsIeQtRZ5JzmVeU8MNxFkM/EKHGRThz5ddhQJxJ46GWPMv5MapSB6JlctJ1QuHs6FQDDbXY9qGuqfNT7ayWoXVK4CjJc/tHJI5cF2HLNlkJvHMJ3crwShyiQ0r9TgzScHbuP/5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=L2OdeEdD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 414C2C2BBFC;
+	Thu, 13 Jun 2024 14:12:02 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="L2OdeEdD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1718287920;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Fjz4ZCmXLkYKy1WwR1BKUB9SOdktn0OQ80YKkl5C07A=;
+	b=L2OdeEdDbAYwCCQIo0q3Y5svBHl6HUoVii7Ipx/YqW9msnW5nLiQCcmVhvT3d2aYbXekmX
+	6vGp/7RezmQfWwaVJxWqE0MwVUi9dk5ylrevWbLPzxAvc9yHIJFCNMr0XP5ij6Ppv2K3la
+	u18h46ekO5C4iutUHhucdp/z23ziWUY=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9cf22b43 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Thu, 13 Jun 2024 14:11:58 +0000 (UTC)
+Date: Thu, 13 Jun 2024 16:11:52 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <Zmr-KPG9F6w-uzys@zx2c4.com>
+References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+ <20240612143305.451abf58@kernel.org>
+ <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
+ <Zmov7ZaL-54T9GiM@zx2c4.com>
+ <Zmo9-YGraiCj5-MI@zx2c4.com>
+ <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
+ <Zmrkkel0Fo4_g75a@zx2c4.com>
+ <e06440e2-9121-4c92-8bf2-945977987052@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240613023549.15213-1-kerneljasonxing@gmail.com>
- <ZmqFzpQOaQfp7Wjr@nanopsycho.orion> <CAL+tcoAir0u0HTYQCMgVNTkb8RpAMzD1eH-EevL576kt5u7DPw@mail.gmail.com>
- <Zmqdb-sBBitXIrFo@nanopsycho.orion> <CAL+tcoDCjm86wCHiVXDXMw1fs6ga9hp3x91u+Dy0CGBB=eEp2w@mail.gmail.com>
- <Zmqk5ODEKYcQerWS@nanopsycho.orion> <20240613035148-mutt-send-email-mst@kernel.org>
- <CAL+tcoDZ_8e9SDRdbQSDz=TCRGQ3w0toSZ0U8poUKpQcAHhN7A@mail.gmail.com> <ZmrxdwR2srw11Blo@nanopsycho.orion>
-In-Reply-To: <ZmrxdwR2srw11Blo@nanopsycho.orion>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 13 Jun 2024 22:11:12 +0800
-Message-ID: <CAL+tcoBu0mCDeDTdEYZ5ccboYOuFeBfbNYvefo2dOWgoxAPg+Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] net: dqs: introduce IFF_NO_BQL private flag
- for non-BQL drivers
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, dsahern@kernel.org, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, leitao@debian.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e06440e2-9121-4c92-8bf2-945977987052@paulmck-laptop>
 
-On Thu, Jun 13, 2024 at 9:17=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Thu, Jun 13, 2024 at 11:26:05AM CEST, kerneljasonxing@gmail.com wrote:
-> >On Thu, Jun 13, 2024 at 3:56=E2=80=AFPM Michael S. Tsirkin <mst@redhat.c=
-om> wrote:
-> >>
-> >> On Thu, Jun 13, 2024 at 09:51:00AM +0200, Jiri Pirko wrote:
-> >> > Thu, Jun 13, 2024 at 09:24:27AM CEST, kerneljasonxing@gmail.com wrot=
-e:
-> >> > >On Thu, Jun 13, 2024 at 3:19=E2=80=AFPM Jiri Pirko <jiri@resnulli.u=
-s> wrote:
-> >> > >>
-> >> > >> Thu, Jun 13, 2024 at 08:08:36AM CEST, kerneljasonxing@gmail.com w=
-rote:
-> >> > >> >On Thu, Jun 13, 2024 at 1:38=E2=80=AFPM Jiri Pirko <jiri@resnull=
-i.us> wrote:
-> >> > >> >>
-> >> > >> >> Thu, Jun 13, 2024 at 04:35:49AM CEST, kerneljasonxing@gmail.co=
-m wrote:
-> >> > >> >> >From: Jason Xing <kernelxing@tencent.com>
-> >> > >> >> >
-> >> > >> >> >Since commit 74293ea1c4db6 ("net: sysfs: Do not create sysfs =
-for non
-> >> > >> >> >BQL device") limits the non-BQL driver not creating byte_queu=
-e_limits
-> >> > >> >> >directory, I found there is one exception, namely, virtio-net=
- driver,
-> >> > >> >> >which should also be limited in netdev_uses_bql(). Let me giv=
-e it a
-> >> > >> >> >try first.
-> >> > >> >> >
-> >> > >> >> >I decided to introduce a NO_BQL bit because:
-> >> > >> >> >1) it can help us limit virtio-net driver for now.
-> >> > >> >> >2) if we found another non-BQL driver, we can take it into ac=
-count.
-> >> > >> >> >3) we can replace all the driver meeting those two statements=
- in
-> >> > >> >> >netdev_uses_bql() in future.
-> >> > >> >> >
-> >> > >> >> >For now, I would like to make the first step to use this new =
-bit for dqs
-> >> > >> >> >use instead of replacing/applying all the non-BQL drivers in =
-one go.
-> >> > >> >> >
-> >> > >> >> >As Jakub said, "netdev_uses_bql() is best effort", I think, w=
-e can add
-> >> > >> >> >new non-BQL drivers as soon as we find one.
-> >> > >> >> >
-> >> > >> >> >After this patch, there is no byte_queue_limits directory in =
-virtio-net
-> >> > >> >> >driver.
-> >> > >> >>
-> >> > >> >> Please note following patch is currently trying to push bql su=
-pport for
-> >> > >> >> virtio_net:
-> >> > >> >> https://lore.kernel.org/netdev/20240612170851.1004604-1-jiri@r=
-esnulli.us/
-> >> > >> >
-> >> > >> >I saw this one this morning and I'm reviewing/testing it.
-> >> > >> >
-> >> > >> >>
-> >> > >> >> When that is merged, this patch is not needed. Could we wait?
-> >> > >> >
-> >> > >> >Please note this patch is not only written for virtio_net driver=
-.
-> >> > >> >Virtio_net driver is one of possible cases.
-> >> > >>
-> >> > >> Yeah, but without virtio_net, there will be no users. What's the =
-point
-> >> > >> of having that in code? I mean, in general, no-user kernel code g=
-ets
-> >> > >> removed.
-> >> > >
-> >> > >Are you sure netdev_uses_bql() can limit all the non-bql drivers wi=
-th
-> >> > >those two checks? I haven't investigated this part.
-> >> >
-> >> > Nope. What I say is, if there are other users, let's find them and l=
-et
-> >> > them use what you are introducing here. Otherwise don't add unused c=
-ode.
-> >>
-> >>
-> >> Additionally, it looks like virtio is going to become a
-> >> "sometimes BQL sometimes no-BQL" driver, so what's the plan -
-> >> to set/clear the flag accordingly then? What kind of locking
-> >> will be needed?
-> >
-> >Could we consider the default mode is BQL, so we can remove that new
-> >IFF_NO_BQL flag? If it's hard to take care of these two situations, I
-> >think we could follow this suggestion from Jakub: "netdev_uses_bql()
-> >is best effort". What do you think?
->
-> Make sense.
->
-> Also, note that virtio_net bql utilization is going to be not only
-> dynamically configured, but also per-queue. It would be hard to expose
-> that over one device flag :)
+On Thu, Jun 13, 2024 at 05:46:11AM -0700, Paul E. McKenney wrote:
+> How about a kmem_cache_destroy_rcu() that marks that specified cache
+> for destruction, and then a kmem_cache_destroy_barrier() that waits?
+> 
+> I took the liberty of adding your name to the Google document [1] and
+> adding this section:
 
-At that time, I would let virtio_net driver go, that is to say, I
-wouldn't take it into consideration in netdev_uses_bql() since it's
-too complicated.
+Cool, though no need to make me yellow!
 
-BTW, hope to see your per-queue configured feature patchset soon :)
+> > But then, if that mechanism generally works, we don't really need a new
+> > function and we can just go with the first option of making
+> > kmem_cache_destroy() asynchronously wait. It'll wait, as you described,
+> > but then we adjust the tail of every kfree_rcu batch freeing cycle to
+> > check if there are _still_ any old outstanding kmem_cache_destroy()
+> > requests. If so, then we can splat and keep the old debugging info we
+> > currently have for finding memleaks.
+> 
+> The mechanism can always be sabotaged by memory-leak bugs on the part
+> of the user of the kmem_cache structure in play, right?
+> 
+> OK, but I see your point.  I added this to the existing
+> "kmem_cache_destroy() Lingers for kfree_rcu()" section:
+> 
+> 	One way of preserving this debugging information is to splat if
+> 	all of the slab’s memory has not been freed within a reasonable
+> 	timeframe, perhaps the same 21 seconds that causes an RCU CPU
+> 	stall warning.
+> 
+> Does that capture it?
 
->
->
-> >
-> >>
-> >> > >
-> >> > >>
-> >> > >>
-> >> > >> >
-> >> > >> >After your patch gets merged (I think it will take some time), y=
-ou
-> >> > >> >could simply remove that one line in virtio_net.c.
-> >> > >> >
-> >> > >> >Thanks.
-> >>
+Not quite what I was thinking. Your 21 seconds as a time-based thing I
+guess could be fine. But I was mostly thinking:
+
+1) kmem_cache_destroy() is called, but there are outstanding objects, so
+   it defers.
+
+2) Sometime later, a kfree_rcu_work batch freeing operation runs.
+
+3) At the end of this batch freeing, the kernel notices that the
+   kmem_cache whose destruction was previously deferred still has
+   outstanding objects and has not been destroyed. It can conclude that
+   there's thus been a memory leak.
+
+In other words, instead of having to do this based on timers, you can
+just have the batch freeing code ask, "did those pending kmem_cache
+destructions get completed as a result of this last operation?"
 
