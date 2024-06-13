@@ -1,110 +1,289 @@
-Return-Path: <netdev+bounces-103241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12807907431
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 15:47:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30622907439
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 15:48:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D5E91C227DB
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 13:47:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C3011C23DAB
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 13:48:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDACD144D39;
-	Thu, 13 Jun 2024 13:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F31144D21;
+	Thu, 13 Jun 2024 13:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rQR+S+xm"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="jFSc/htR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D588F68;
-	Thu, 13 Jun 2024 13:47:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8CF4143C59
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 13:48:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718286427; cv=none; b=MvR4jsjjOoebA3YcgM+kzg2JIZbcnrb6Fi/WRQ6hjdte0KA5yxe8EBcBJU+/XKmEgW2b7OZTarSVA1+Vtwi82vRWuWmHnwozsjqpirhyiaQCy1WPRa51/bFMIzqCdpb7/3RWetrvOHs7+oVaqL+aOLmFYat9pZqDo/mz/Aq3zYM=
+	t=1718286484; cv=none; b=MdVhArFWImKS9w2c7nbgdnkhHEStFzZnMfS+Q3wCfBhgfP0OVQB0nHIo9mSftfz3afM2bA67aUwl/LU0LdKSLPJho0ipEjNWx8UpfSqpO0V+0hcY/GrRr9WQoIPoB2FpIwln5sL9xe/vGMUbuAaHfwYYBUBPAucJ8qV0zyO6xDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718286427; c=relaxed/simple;
-	bh=F+vpsUe1Dqx+OiW7G9Jnm5iiQTon9YAexjro/SFNuDA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SFlLXEbmYM1TgKWRfMyVV4J3hJ7WWCKP7YLF++rd5LPvQbhd5QWq04wFmwTGZfW6HZdgJwrGVqMhurgg1jTLcm/+WKXyIN0UlMdPlch7u3rO/U0T4q4QcxJsO8QIqkDwYs4x91sFKFuofn4z/rUmJ3XpHQ2gEeemniuooEZm6Vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rQR+S+xm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5097C2BBFC;
-	Thu, 13 Jun 2024 13:47:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718286427;
-	bh=F+vpsUe1Dqx+OiW7G9Jnm5iiQTon9YAexjro/SFNuDA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rQR+S+xmR2KSIF4UEpapK+WRaIgnwkATsPQq69mgFBtV4TtX9n/55mbgZZjBO4G9f
-	 aZ0gb3FNYi5H1si+U7MAMH3X/VTLgHF6JZb1x398NY9TfhZQnayChxunUqG2GlYKb/
-	 sJBBl1xCGHXVZKChT8Lvj62a4w47r1RmdGnFTfHvJ0c+uvjp2WAO2WPprxyHZVSM8H
-	 Lj2OdTay6E6IE9k/CoiEaueLkWqWWvxfRbqEhbK0JBTogAzYgF0T5k5y9kVZAni+sn
-	 mDgIu4qWLmuyOs+brmU2A0aLGPr+9PF1z4pjRUAmpRluO6xWX/O5ElGDrUH9RT++mp
-	 8yxsYE6frB9Qw==
-Date: Thu, 13 Jun 2024 06:47:06 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: <intel-wired-lan@lists.osuosl.org>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Mina
- Almasry <almasrymina@google.com>,
- <nex.sw.ncis.osdt.itp.upstreaming@intel.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH iwl-next 01/12] libeth: add cacheline / struct alignment
- helpers
-Message-ID: <20240613064706.15f26159@kernel.org>
-In-Reply-To: <43c1ec2f-977e-45cd-b974-e943fa880535@intel.com>
-References: <20240528134846.148890-1-aleksander.lobakin@intel.com>
-	<20240528134846.148890-2-aleksander.lobakin@intel.com>
-	<20240529183409.29a914c2@kernel.org>
-	<43c1ec2f-977e-45cd-b974-e943fa880535@intel.com>
+	s=arc-20240116; t=1718286484; c=relaxed/simple;
+	bh=/dQrRNNz2mPVszGNmHGCjfVyHSU68crTSQrnsrESOs0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EdqrdUPg9cTMp0C6FoA/shbamJwy7fRY3L7LoW6cjorW6BySLE1+ByzSWqEEY9iQgLUxogmS3+QyV9lH4E7OGePjp8X7jRQfFTbPUSuDI6rkvLzsy8gBitLVrVUeZS9urXn280Wu3MjNZH0EJipG1KX0/gAxjnohYjMv9RDlHW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=jFSc/htR; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 1B98944A9F
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 13:47:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1718286473;
+	bh=MFqPztQitJYDktXqBkZ6NLUwtPUevbzJdNjmzYUffpg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=jFSc/htREI/jOxDnpEPnaAtzd/BnNFwdRVTPxItva8fT7xvJuPol3DtrD90jGVaLy
+	 oNRhqECFsP3YUicRxvUBiSlJWpJSrrxyoPiNkchutKzjOA3S8NP1DMYFxFoDex3zO8
+	 FiFIkLsiU7poJ3sNA+pPKy8jryZTba91ThW/+X0P47ehOeD6LmIvhSztjqpeCNBU+v
+	 uKfq1JKoM54lfvGFPeV27OVlMKSmt4QknbkxtuWMgZeMVqS1I8oGV7xP32xybdyM/G
+	 rN4AcjSr6/tJW5vd0mUeh7wGAx/XXUz+lZRVdoxp27SnaDFi32WQ9Baj40h8XCD2j3
+	 zLtFXtwaRHqKg==
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a6f2662d050so49036066b.3
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 06:47:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718286472; x=1718891272;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MFqPztQitJYDktXqBkZ6NLUwtPUevbzJdNjmzYUffpg=;
+        b=auyXtdB7r/9Vb6WDYUu502Dv9sWVBN1Ee18FvXfEnxhYY6+n2ubHCRhFAqHkxQYOEO
+         0daGY+XZbyrbmdAH1rPddlxupjisN1tTFGas07H+qf43QmGdujx+5/tYaH55lY209mSx
+         z8nrgFLaXuh3NzU6v7Join9ZWJe2S0dppJhuDzihrVN0aKZVY5J+m7/OBBfMsMR98LVF
+         k5IJI+kGcJ++0jHx6moxraLbm07JkWnf12f+JxSzvBqY263tPK/oW0YUWOuDphIUCCKl
+         aIvqLX5g/qJ1TpjmDs6fHSD5dhsaYZ8RBE6UXQujkg3WH2KoRoxtujVvZXb0/7yp0x7/
+         z67Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVIMpAl061FdLElRVLBJzZ8ryV33iiSJzHqb2hlgufOjfa2iIHMRiZOP4Im0skue2o6GYgIXgkQ+wc6ysPyvuH0qFMfeSQM
+X-Gm-Message-State: AOJu0YyCK69jtYN3UiPUDsCZohB0nXcYb0pCBQCTHxT9ID9cj/IlhfHf
+	AnJLtN1sIGZDHCio8Zzjw/wHH8+WJOrIeLktM+UQ4djEXOAvoj+Dvu9BRAiHOzKna7NY3+dFIPG
+	jb3hw44kGHCf5xk5zGK1QYR2Y6f0fA0HNy0SyCBEpQ63+nK3TxXwTmuL+R0sx8yGsCtrC6caTWv
+	3EWfqcBUmrDcQB36G10dR2CsFroabgRKKumsNFvtN00K3l
+X-Received: by 2002:a17:907:6d08:b0:a6f:489b:ff50 with SMTP id a640c23a62f3a-a6f489c0235mr351318166b.52.1718286472667;
+        Thu, 13 Jun 2024 06:47:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHUf9nn+WvUhr3fbrsGnbcPHzbl5rRrZzF8VptZiPY/Dy3NlH0XspoK4Nz2ghUOr3OMFIcX2V6Pq7yY5UMQG2k=
+X-Received: by 2002:a17:907:6d08:b0:a6f:489b:ff50 with SMTP id
+ a640c23a62f3a-a6f489c0235mr351316366b.52.1718286472251; Thu, 13 Jun 2024
+ 06:47:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240608025347.90680-1-chengen.du@canonical.com>
+ <66660e3cd5636_8dbbb294c@willemb.c.googlers.com.notmuch> <CAPza5qfVzV7NFiVY1jcZR-+0ey-uKgUjV6OcjmDFvKG3T-2SXA@mail.gmail.com>
+ <666789d3d9d2a_bf52c294e9@willemb.c.googlers.com.notmuch> <CAPza5qe8KAjjZsZdTupXx27kvdPzhBNcDC=Nk5Xjc4O2obEAAA@mail.gmail.com>
+ <6669abb1ea6da_125bdf29449@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6669abb1ea6da_125bdf29449@willemb.c.googlers.com.notmuch>
+From: Chengen Du <chengen.du@canonical.com>
+Date: Thu, 13 Jun 2024 21:47:41 +0800
+Message-ID: <CAPza5qeDZonX5prLPOPQWjD2pNwzQHnhFkxCSkqC3ectWtPP3w@mail.gmail.com>
+Subject: Re: [PATCH v6] af_packet: Handle outgoing VLAN packets without
+ hardware offloading
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, kaber@trash.net, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 13 Jun 2024 12:47:33 +0200 Alexander Lobakin wrote:
-> > Having per-driver grouping defines is a no-go.  
-> 
-> Without it, kdoc warns when I want to describe group fields =\
-> 
-> > Do you need the defines in the first place?  
-> 
-> They allow to describe CLs w/o repeating boilerplates like
-> 
-> 	cacheline_group_begin(blah) __aligned(blah)
-> 	fields
-> 	cacheline_group_end(blah)
+Hi Willem,
 
-And you assert that your boilerplate is somehow nicer than this?
-See my reply to Przemek, I don't think so, and neither do other
-maintainers, judging by how the socket grouping was done.
-You can add new markers to include the align automatically too, etc.
+Thank you for the suggestion.
+I have conducted further tests and found that the results are not as
+we expected.
 
-> > Are you sure the assert you're adding are not going to explode
-> > on some weird arch? Honestly, patch 5 feels like a little too  
-> 
-> I was adjusting and testing it a lot and CI finally started building
-> every arch with no issues some time ago, so yes, I'm sure.
-> 64-byte CL on 64-bit arch behaves the same everywhere, so the assertions
-> for it can be more strict. On other arches, the behaviour is the same as
-> how Eric asserts netdev cachelines in the core code.
-> 
-> > much for a driver..  
-> 
-> We had multiple situations when our team were optimizing the structure
-> layout and then someone added a new field and messed up the layout
-> again. So I ended up with strict assertions.
+I would like to explain my findings based on the following tests:
+    ip link add link ens18 ens18.24 type vlan proto 802.1ad id 24
+    ip link add link ens18.24 ens18.24.25 type vlan proto 802.1Q id 25
+    ifconfig ens18.24 1.0.24.1/24
+    ifconfig ens18.24.25 1.0.25.1/24
+    ping -n 1.0.25.3 > /dev/null 2>&1 &
+    tcpdump -nn -i any -y LINUX_SLL -Q out not tcp and not udp
 
-I understand. Not 100% sure I agree but depends on the team, so okay.
+I have added more logs and found the following results:
+    af_packet: tpacket_rcv: dev->name [ens18.24.25]
+    af_packet: tpacket_rcv: dev->name [ens18.24]
+    af_packet: vlan_get_tci: dev->name [ens18.24], min_header_len
+[14], hard_header_len [18]
+    af_packet: prb_fill_vlan_info: ppd->hv1.tp_vlan_tci [0],
+ppd->hv1.tp_vlan_tpid [8100]
+    af_packet: prb_fill_vlan_info: currect vlan_tci [19], tp_vlan_tpid [810=
+0]
+    af_packet: tpacket_rcv: dev->name [ens18]
+    af_packet: vlan_get_tci: dev->name [ens18], min_header_len [14],
+hard_header_len [14]
+    af_packet: prb_fill_vlan_info: ppd->hv1.tp_vlan_tci [18],
+ppd->hv1.tp_vlan_tpid [88a8]
+    af_packet: prb_fill_vlan_info: currect vlan_tci [18], tp_vlan_tpid [88a=
+8]
 
-> Why is it too much if we have the same stuff for the netdev core?
+It seems that the min_header_len has been set even though the device
+is ens18.24.
+I will continue investigating this issue.
+Thank you for your ongoing assistance.
 
-But we didn't add tcp_* macros and sock_* macros etc.
-Improve the stuff in cache.h is you think its worth it.
-And no struct_groups() please.
+Best regards,
+Chengen Du
+
+On Wed, Jun 12, 2024 at 10:07=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Chengen Du wrote:
+> > Hi Willem,
+> >
+> > On Tue, Jun 11, 2024 at 7:18=E2=80=AFAM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Chengen Du wrote:
+> > > > Hi Willem,
+> > > >
+> > > > I'm sorry, but I would like to confirm the issue further.
+> > > >
+> > > > On Mon, Jun 10, 2024 at 4:19=E2=80=AFAM Willem de Bruijn
+> > > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > > >
+> > > > > Chengen Du wrote:
+> > > > > > The issue initially stems from libpcap. The ethertype will be o=
+verwritten
+> > > > > > as the VLAN TPID if the network interface lacks hardware VLAN o=
+ffloading.
+> > > > > > In the outbound packet path, if hardware VLAN offloading is una=
+vailable,
+> > > > > > the VLAN tag is inserted into the payload but then cleared from=
+ the sk_buff
+> > > > > > struct. Consequently, this can lead to a false negative when ch=
+ecking for
+> > > > > > the presence of a VLAN tag, causing the packet sniffing outcome=
+ to lack
+> > > > > > VLAN tag information (i.e., TCI-TPID). As a result, the packet =
+capturing
+> > > > > > tool may be unable to parse packets as expected.
+> > > > > >
+> > > > > > The TCI-TPID is missing because the prb_fill_vlan_info() functi=
+on does not
+> > > > > > modify the tp_vlan_tci/tp_vlan_tpid values, as the information =
+is in the
+> > > > > > payload and not in the sk_buff struct. The skb_vlan_tag_present=
+() function
+> > > > > > only checks vlan_all in the sk_buff struct. In cooked mode, the=
+ L2 header
+> > > > > > is stripped, preventing the packet capturing tool from determin=
+ing the
+> > > > > > correct TCI-TPID value. Additionally, the protocol in SLL is in=
+correct,
+> > > > > > which means the packet capturing tool cannot parse the L3 heade=
+r correctly.
+> > > > > >
+> > > > > > Link: https://github.com/the-tcpdump-group/libpcap/issues/1105
+> > > > > > Link: https://lore.kernel.org/netdev/20240520070348.26725-1-che=
+ngen.du@canonical.com/T/#u
+> > > > > > Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspace")
+> > > > > > Cc: stable@vger.kernel.org
+> > > > > > Signed-off-by: Chengen Du <chengen.du@canonical.com>
+> > > > >
+> > > > > Overall, solid.
+> > > > >
+> > > > > > ---
+> > > > > >  net/packet/af_packet.c | 57 ++++++++++++++++++++++++++++++++++=
+++++++--
+> > > > > >  1 file changed, 55 insertions(+), 2 deletions(-)
+> > > > > >
+> > > > > > diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> > > > > > index ea3ebc160e25..8cffbe1f912d 100644
+> > > > > > --- a/net/packet/af_packet.c
+> > > > > > +++ b/net/packet/af_packet.c
+> > > > > > @@ -538,6 +538,43 @@ static void *packet_current_frame(struct p=
+acket_sock *po,
+> > > > > >       return packet_lookup_frame(po, rb, rb->head, status);
+> > > > > >  }
+> > > > > >
+> > > > > > +static u16 vlan_get_tci(struct sk_buff *skb)
+> > > > > > +{
+> > > > > > +     struct vlan_hdr vhdr, *vh;
+> > > > > > +     u8 *skb_orig_data =3D skb->data;
+> > > > > > +     int skb_orig_len =3D skb->len;
+> > > > > > +
+> > > > > > +     skb_push(skb, skb->data - skb_mac_header(skb));
+> > > > > > +     vh =3D skb_header_pointer(skb, ETH_HLEN, sizeof(vhdr), &v=
+hdr);
+> > > > >
+> > > > > Don't harcode Ethernet.
+> > > > >
+> > > > > According to documentation VLANs are used with other link layers.
+> > > > >
+> > > > > More importantly, in practice PF_PACKET allows inserting this
+> > > > > skb->protocol on any device.
+> > > > >
+> > > > > We don't use link layer specific constants anywhere in the packet
+> > > > > socket code for this reason. But instead dev->hard_header_len.
+> > > > >
+> > > > > One caveat there is variable length link layer headers, where
+> > > > > dev->min_header_len !=3D dev->hard_header_len. Will just have to =
+fail
+> > > > > on those.
+> > > >
+> > > > Thank you for pointing out this error. I would like to confirm if I
+> > > > need to use dev->hard_header_len to get the correct header length a=
+nd
+> > > > return zero if dev->min_header_len !=3D dev->hard_header_len to han=
+dle
+> > > > variable-length link layer headers. Is there something I
+> > > > misunderstand, or are there other aspects I need to consider furthe=
+r?
+> > >
+> > > That's right.
+> > >
+> > > The min_header_len !=3D hard_header_len check is annoying and may see=
+m
+> > > pedantic. But it's the only way to trust that the next header starts
+> > > at hard_header_len.
+> >
+> > Thank you for your advice.
+> > I have implemented the modification, but I found that the
+> > (min_header_len !=3D hard_header_len) check results in unexpected
+> > behavior in the following test scenario:
+> >     ip link add link ens18 ens18.24 type vlan proto 802.1ad id 24
+> >     ip link add link ens18.24 ens18.24.25 type vlan proto 802.1Q id 25
+> >     ifconfig ens18.24 1.0.24.1/24
+> >     ifconfig ens18.24.25 1.0.25.1/24
+> >     ping -n 1.0.25.3 > /dev/null 2>&1 &
+> >     tcpdump -nn -i any -y LINUX_SLL -Q out not tcp and not udp
+> >
+> > While receiving a packet from ens18.24.25 (802.1Q), the min_header_len
+> > and hard_header_len are 14 and 18, respectively.
+> > This check results in the TCI being 0 instead of 25.
+> > Should we skip this check to display the correct value, or is there
+> > another check that can achieve the same purpose?
+>
+> Interesting. Glad you found this.
+>
+> Makes sense, as VLAN devices have
+>
+>     vlandev->hard_header_len =3D dev->hard_header_len + VLAN_HLEN;
+>
+> Does
+>
+>     if (min_header_len && min_header_len !=3D hard_header_len)
+>
+> resolve it?
+>
+> Few devices actually set min_header_len. Initially, only Ethernet in
+> ether_setup() and loopback. It was introduced for validation in
+> dev_validate_header, and a min_header_len of 0 just skips some basic
+> validation.
+>
+> As long as VLAN devices do not initialize min_header_len (e.g., by
+> inheriting it from the physical device and incorrectly setting it to
+> ETH_HLEN), then this should be fine.
+>
 
