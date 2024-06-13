@@ -1,109 +1,96 @@
-Return-Path: <netdev+bounces-103114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3001990655C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:39:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B534C906577
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:44:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 312101C23058
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 07:39:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C797C1C2025F
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 07:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E8713BC38;
-	Thu, 13 Jun 2024 07:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C323682482;
+	Thu, 13 Jun 2024 07:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="HZLfaw0P"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DP2mWG9W"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA9B13C3D8;
-	Thu, 13 Jun 2024 07:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF21457CB9;
+	Thu, 13 Jun 2024 07:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718264391; cv=none; b=gBMZjwfIsB2OSrMPX+DqfEl8rtfwDNhJkSw2hkiXilwqQVIn+zSIatLQznUaqONYAbALtCgbbilkJDHUm6GNAznRpUL7oUVvXjC5tQMQrGO2rQNGHjQrqqV5QrATpOhzSxS+t20lPuLh3Ysm5CvQIcDZKh/FlQZ4bUVCh7lMsBg=
+	t=1718264686; cv=none; b=eNJILOhbcO2t0W2X9ql07OIWIwEU1OfdRwbBSLEeQpBopgE0dfaam6D5upsU8YZXEqj5OgvYLIvjzkursca6MbOybIvSV8qbdH7OzUliPrzTHp1US/DqNsy9nx27hpNDc52IDdY37QCpqpKb7vOxl2IMpCgp9oZZ/FtrcknEoWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718264391; c=relaxed/simple;
-	bh=TDG1hAEvKTqi8x6dK8QwzoYkuCJJOfpG15LJ6vNyGJM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=F2SM39Yx6gBwuOHU8ogSYaX9ea81CqA+72apZIRsLIxOV9gMdBKQP3vus0xeI3CNrNJfgvIpMOxFawe98c8x6LK3IAiis9xvbP8C72b7EORPAsCAPg1LvRw0A9ewdYI0MDS77wx8M7DUaHClBjpDJOAnXsNZA9cLyMGdCsiQE30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=HZLfaw0P; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 45D7degi088676;
-	Thu, 13 Jun 2024 02:39:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1718264380;
-	bh=2okusDhLwSssKtYayuSI+ewFdBOg2dmNj/EzRz6J07A=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=HZLfaw0PrJDyZqDUmqmX8ctVk1V2Mh2Z2udJ+5X+gEGhoW8rZBq4la2Png1DAa31D
-	 MoBCz+HJFDX7U90ygPInUHBP3eERu8T8S+cJ+i/VukI/DSpexCojohblTW8Wunh4dW
-	 JKuLbI4ECOeA3tws/DgvZxH7/CqQ+IYuTDqJ5UJE=
-Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 45D7deOA055024
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 13 Jun 2024 02:39:40 -0500
-Received: from DFLE100.ent.ti.com (10.64.6.21) by DFLE103.ent.ti.com
- (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 13
- Jun 2024 02:39:39 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 13 Jun 2024 02:39:39 -0500
-Received: from [10.250.214.9] ([10.250.214.9])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 45D7dZ9a102427;
-	Thu, 13 Jun 2024 02:39:36 -0500
-Message-ID: <1c655f3d-7198-4f7b-be14-407345f6a204@ti.com>
-Date: Thu, 13 Jun 2024 10:39:35 +0300
+	s=arc-20240116; t=1718264686; c=relaxed/simple;
+	bh=mel7bwaTI0YQ/pctqBNK1nhGmHDx+xhaXi+DHFUFFF8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M7+jpXinEHh/msiBK/ByHLOjFU5OZ83taZOEvf3h3Uio9oihU+5D5FfOmFW08iu7hkFIjABGqDpIg0ditLA+ScWg+YNZJ4deeVdM/uVmcgUVnrGk63zRyh1E9oaRf6QFVjqbBVD2WPeM53H9S9oeGawGQLDOykIjeVjGS4DeF5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DP2mWG9W; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=GT7AIZgIWhfB3f40JHe4sssXTLZj1T2xiSRKtERm9SM=; b=DP2mWG9WDbCmVmWFiyhxfuq1rN
+	RX48xVvY9ADB7V6llW6XUtwt6ZJQ2fBFn8NfKJikaJWyxeR3FKDwTUkcw6AJg43zeXdURFyOPq3vm
+	SNhfj6/hIpdjHvlZYWo2cKZupc4sQwUy65pCNxrUnKO12ir0516VHTJNvw8HH49IpAWd1K3Eq3PeU
+	ASONUnDRob6PoxBlflH77PJuzZt2fSh2ewt6BmzAK9NtJf8xeXTMEwDxtPzAEvhCfPacrh8lFivQa
+	36KG1Rz2ZUlNF665ws1oqPKFtKubiz1IFDMPD75D2B5FE5WX8oJ17WgwYNMLW5jV8JE04dBG9qala
+	tGd3jAXw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42754)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sHf8L-0005hz-1s;
+	Thu, 13 Jun 2024 08:44:33 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sHf8K-00013v-Ia; Thu, 13 Jun 2024 08:44:32 +0100
+Date: Thu, 13 Jun 2024 08:44:32 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, bryan.whitehead@microchip.com,
+	andrew@lunn.ch, sbauer@blackbox.su, hmehrtens@maxlinear.com,
+	lxu@maxlinear.com, hkallweit1@gmail.com, edumazet@google.com,
+	pabeni@redhat.com, wojciech.drewek@intel.com,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net V4 1/3] net: lan743x: disable WOL upon resume to
+ restore full data path operation
+Message-ID: <ZmqjYEs0G9pGQTog@shell.armlinux.org.uk>
+References: <20240612172539.28565-1-Raju.Lakkaraju@microchip.com>
+ <20240612172539.28565-2-Raju.Lakkaraju@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 17/17] dt-bindings: net: wireless: cc33xx: Add
- ti,cc33xx.yaml
-To: Krzysztof Kozlowski <krzk@kernel.org>, Sabeeh Khan <sabeeh-khan@ti.com>,
-        Kalle Valo <kvalo@kernel.org>, Johannes Berg <johannes.berg@intel.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob
- Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor
- Dooley <conor+dt@kernel.org>
-CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240609182102.2950457-1-michael.nemanov@ti.com>
- <20240609182102.2950457-18-michael.nemanov@ti.com>
- <e7444ff4-763a-44c6-9a73-0c5f590ceaad@kernel.org>
- <0d4fc078-52a7-4d3b-a95e-fd64e0702a99@kernel.org>
-Content-Language: en-US
-From: "Nemanov, Michael" <michael.nemanov@ti.com>
-In-Reply-To: <0d4fc078-52a7-4d3b-a95e-fd64e0702a99@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240612172539.28565-2-Raju.Lakkaraju@microchip.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 10/6/2024 11:17 AM, Krzysztof Kozlowski wrote:
->> On 09/06/2024 20:21, michael.nemanov@ti.com wrote:
->>> From: Michael Nemanov <michael.nemanov@ti.com>
->>>
->> 
->> Missing commit msg (explain the hardware), missing SoB.
-> 
-> And now I found that you actually received such feedback and you just
-> ignored it.
-> 
-> Go back to v1 and respond to each feedback you got.
-> 
-> Best regards,
-> Krzysztof
-> 
+On Wed, Jun 12, 2024 at 10:55:37PM +0530, Raju Lakkaraju wrote:
+> @@ -3728,6 +3729,30 @@ static int lan743x_pm_resume(struct device *dev)
+>  		return ret;
+>  	}
+>  
+> +	ret = lan743x_csr_read(adapter, MAC_WK_SRC);
+> +	netif_info(adapter, drv, adapter->netdev,
+> +		   "Wakeup source : 0x%08X\n", ret);
 
-Oversight on my part, will fix.
+Does this need to be printed at info level, or is it a debug message?
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
