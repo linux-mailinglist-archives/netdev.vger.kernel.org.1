@@ -1,132 +1,106 @@
-Return-Path: <netdev+bounces-103088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 730129063C2
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 08:09:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AD49906402
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 08:24:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D0331C20402
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 06:09:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B25F8285093
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 06:24:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E13135A4B;
-	Thu, 13 Jun 2024 06:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E741D13698D;
+	Thu, 13 Jun 2024 06:24:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NiWDty4P"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="dmey8kFz";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="77i2TfOn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9925937C
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 06:09:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10BBE135A4B
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 06:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718258958; cv=none; b=DOBKrgJMe4wc3GB51ROG7d8PtF1GioQnWr1rbDGNTMw7KAt/b1yhCkLEfS8ole3mLk1A/1jK0ZZ4GZPbN/P6YB3npohDAZ4NA1Gi9zJhgStajZhfh1skLLEjWVcyzphgVjGSBJpMB0xlCK5ra/reqfZpM+KR0IHmeJaHoYNah7s=
+	t=1718259871; cv=none; b=R9lTHcKCZM2h71Pagc9erU5iKZ93rHHZtJchi4LHAUIvSkFdJV9ZTTAYy+IfOQ2Rylx7q1vc9qA1uGMETt4WgczL7zEzZgOi9/ThI+ein4sGlQz5mA+BP9wqnEnylquqBYg/wz7qxNrTF+xm3qxprtZI6hRb+Q3COMaHYfdfOEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718258958; c=relaxed/simple;
-	bh=nXP6x59o/QNZ4r9qxDqq8GkcNNM5e+hJhAIhAS57ld8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MuXIkognf07jiP/WtGK4yVWLIfHEYMO7GE+b52g6iRkTKtiCjNRRzoDtmpW3xBnFU3Lp30nIJyUyqJSzkHaIL769cscM8fMXlq0wh3rVj0BnAULKhEgFJtR0h6hz/7rxi9Bw3Hwt7YLxO48oA6t3k9XRmOTXqQFTXo5ek4yHLUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NiWDty4P; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52bc27cfb14so851463e87.0
-        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 23:09:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718258955; x=1718863755; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nXP6x59o/QNZ4r9qxDqq8GkcNNM5e+hJhAIhAS57ld8=;
-        b=NiWDty4PmH9AsNnaMhG1Kae7BltV/U/rSzTDwgnguf4asRnqRzQaQ4gHqX06ji5Vdz
-         Dt17xf9Ra+I63sCC0VSN3OlNPIiqrpCIaMjbZ07MWR/5StQUEkUg0vIv6HvJiFAopK2r
-         NH5v8lB1o2cJYxdpZPiaReHVqdu3JWfjLdVyLoLN/1iakewjX9zxRafa4AXKT4OzfDM4
-         NikSWGDXF2QA/dMHkT8kBkcTE56VFZaWOleO86Rk6/jGJxpGbnm1ym6WFO1rc/yxvud3
-         XVlW7Ov19MaPEALjTzEfa/8wJw/yINRYg1Jfqof5f4imtWl8Ol1ATy2Yhot9ar4djYlY
-         RqVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718258955; x=1718863755;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nXP6x59o/QNZ4r9qxDqq8GkcNNM5e+hJhAIhAS57ld8=;
-        b=o4gEdoPkhKBG/M7y0hsWmBxUQqG9wzsoYjJNLf45v9lNIz/qs54V+P1lBU53IQ+arZ
-         5ieMUSEXMM/RKwv7nGaaf3i1KGO17fesRpy71fDOg6xfcdI0Hf8VbCO+VujT7DBfryCa
-         5a+wPu2dPsk2YUscR3fFSc4qWr9ownfNbL79hZwx9ZR6XIxE6ZwRGv1RRRePEwacVcoU
-         qN5MQfqG+UIxdcKWOlQnAKE7ZliGBJMZMbYb+DcqvRYF5ODUlp9jHvs6uV/3UELBKzot
-         kiml/W77TdYdUNMmJ8zvuI+vqLOOMvfHZuDfmYxKXsU0CfoeJpz1Ra2ukgDOiAggqF/E
-         w5YQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWccWft3RnrXTpWryMtnjT3B3KJtfxEBb3GLcoFiqJfMyHitR6W8HeHqsClZgH7Kh6lQ+4xK07tRWyC8jdiqmJJqp0vKItd
-X-Gm-Message-State: AOJu0YznBENjV8mBN3slcuTv3nsZpCDjQpU8TEyygqM3dd/AZspnTtl4
-	IWm8ypESGxD5zsGyPovt+pD+naSahAyLVIGNYe4JABxZd8062L9YD91YF7Te/ftFdGLuF8m4qVZ
-	uWg74j+BwUC5x8Luk8qh+4oMjGmg=
-X-Google-Smtp-Source: AGHT+IF6r0ftz6+EysGMEi/2Jsw1545qR1NrhsvTWVUNCgHiLnJUnMcXubdtbhA0SjaAr9x7L4KsrJ2Zn8TJbuI6UUU=
-X-Received: by 2002:a05:6512:3045:b0:52c:8909:bd35 with SMTP id
- 2adb3069b0e04-52c9a3bfb2amr3775742e87.10.1718258954601; Wed, 12 Jun 2024
- 23:09:14 -0700 (PDT)
+	s=arc-20240116; t=1718259871; c=relaxed/simple;
+	bh=++QBLxfIGEfI/6MFJ8ZTewcLVbgbhL8bzVpPAw9gl3w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RTrvbdN5a17L3mIqF1iFeZe4K0OPRwiV4fb2rzQKNALYz7s2f5hyllLdLb49Mc9TlGBnf/huvN/yZBW9Yvf4Cy14w/dFmTUFAhNfC5mvxipMw0zziG2B1K0u21TuLw7/6WjJj/xI7wMkzf8uoO5oOQFwYc31YrSNU3rmzZH2deM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=dmey8kFz; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=77i2TfOn; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 13 Jun 2024 08:24:26 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1718259867;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ggWtUz970+22vIg8AApyNoSovE25dgcCqbLcSQYA7ss=;
+	b=dmey8kFzxUJnouRynx6sLFJpldCURUSbiAiTajD5k03Q4UVlytx1xxnIn3XTPR0EtmtCY5
+	sNlouWWXpsh3vM+dmn6zTud75A8P87N+6GQxMkJTrRkhR3qr4HV/V5U2SP/cEFmADRfT2o
+	BwSH073nFXG5eYFFrTrGGKSEs66RuckkOrTlP1CDHLFimOUy71PWm69uFcXCIRLsSTIV9c
+	O64Dqu9nEtbpS/gSHVHIc1nu7lYPAE+BIDtJlcTZrsiy50sGM03eva9Nh0BYg2wKdEb8uI
+	vU8gtKUQV8cfk9CPwwgDzYftLaoOOJpuF1kKwmBZ1QUhNDxz4nEqNtDryyfGEQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1718259867;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ggWtUz970+22vIg8AApyNoSovE25dgcCqbLcSQYA7ss=;
+	b=77i2TfOncktpUw7ZTTtHDJja9aripZJhBwDzcQvqkEB7y/2Rlrz4kkx/yZdcHAO1ct6gcn
+	pY3REh8SpInUnSDA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: Kurt Kanzenbach <kurt@linutronix.de>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next] igc: Get rid of spurious interrupts
+Message-ID: <20240613062426.Om5bQpR3@linutronix.de>
+References: <20240611-igc_irq-v1-1-49763284cb57@linutronix.de>
+ <87sexi2b7i.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240613023549.15213-1-kerneljasonxing@gmail.com> <ZmqFzpQOaQfp7Wjr@nanopsycho.orion>
-In-Reply-To: <ZmqFzpQOaQfp7Wjr@nanopsycho.orion>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 13 Jun 2024 14:08:36 +0800
-Message-ID: <CAL+tcoAir0u0HTYQCMgVNTkb8RpAMzD1eH-EevL576kt5u7DPw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] net: dqs: introduce IFF_NO_BQL private flag
- for non-BQL drivers
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, dsahern@kernel.org, mst@redhat.com, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, leitao@debian.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87sexi2b7i.fsf@intel.com>
 
-On Thu, Jun 13, 2024 at 1:38=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Thu, Jun 13, 2024 at 04:35:49AM CEST, kerneljasonxing@gmail.com wrote:
-> >From: Jason Xing <kernelxing@tencent.com>
-> >
-> >Since commit 74293ea1c4db6 ("net: sysfs: Do not create sysfs for non
-> >BQL device") limits the non-BQL driver not creating byte_queue_limits
-> >directory, I found there is one exception, namely, virtio-net driver,
-> >which should also be limited in netdev_uses_bql(). Let me give it a
-> >try first.
-> >
-> >I decided to introduce a NO_BQL bit because:
-> >1) it can help us limit virtio-net driver for now.
-> >2) if we found another non-BQL driver, we can take it into account.
-> >3) we can replace all the driver meeting those two statements in
-> >netdev_uses_bql() in future.
-> >
-> >For now, I would like to make the first step to use this new bit for dqs
-> >use instead of replacing/applying all the non-BQL drivers in one go.
-> >
-> >As Jakub said, "netdev_uses_bql() is best effort", I think, we can add
-> >new non-BQL drivers as soon as we find one.
-> >
-> >After this patch, there is no byte_queue_limits directory in virtio-net
-> >driver.
->
-> Please note following patch is currently trying to push bql support for
-> virtio_net:
-> https://lore.kernel.org/netdev/20240612170851.1004604-1-jiri@resnulli.us/
+On 2024-06-12 12:49:21 [-0700], Vinicius Costa Gomes wrote:
+> > diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+> > index 305e05294a26..e666739dfac7 100644
+> > --- a/drivers/net/ethernet/intel/igc/igc_main.c
+> > +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+> > @@ -5811,11 +5815,23 @@ static void igc_watchdog_task(struct work_struct *work)
+> >  	if (adapter->flags & IGC_FLAG_HAS_MSIX) {
+> >  		u32 eics = 0;
+> >  
+> > -		for (i = 0; i < adapter->num_q_vectors; i++)
+> > -			eics |= adapter->q_vector[i]->eims_value;
+> > -		wr32(IGC_EICS, eics);
+> > +		for (i = 0; i < adapter->num_q_vectors; i++) {
+> > +			struct igc_ring *rx_ring = adapter->rx_ring[i];
+> > +
+> > +			if (test_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags)) {
+> 
+> Minor and optional: I guess you can replace test_bit() -> clear_bit()
+> with __test_and_clear_bit() here and below.
 
-I saw this one this morning and I'm reviewing/testing it.
+That are two steps, first test+clear is merged into one and then __ is
+added. The former is doable but it will always lead to a write operation
+while in the common case the flag isn't set so it will be skipped.
+Adding the __ leads to an unlocked operation and I don't see how this is
+synchronized against the other writes. In fact, nobody else is doing it.
 
->
-> When that is merged, this patch is not needed. Could we wait?
-
-Please note this patch is not only written for virtio_net driver.
-Virtio_net driver is one of possible cases.
-
-After your patch gets merged (I think it will take some time), you
-could simply remove that one line in virtio_net.c.
-
-Thanks.
+Sebastian
 
