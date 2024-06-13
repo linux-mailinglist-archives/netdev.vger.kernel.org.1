@@ -1,84 +1,71 @@
-Return-Path: <netdev+bounces-103028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37390906042
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 03:04:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81CD2906045
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 03:08:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6647B217E0
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 01:04:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26CC61F21E29
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 01:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B5E12B83;
-	Thu, 13 Jun 2024 01:04:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088578F62;
+	Thu, 13 Jun 2024 01:08:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hkjYSL7a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R7QvzyXD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B9D8BEC;
-	Thu, 13 Jun 2024 01:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92B44404
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 01:08:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718240661; cv=none; b=CWgXmpgSf3+olKsFm/juT4Z8Sfe6YHSdCOWnm47yf34tUWKmx5Kxlm9rH3Tq0Lv8p0Nsf3CZ55C4rEU39BLUcmgPkh5IfR4YFoJOV0zpVg9M4eBqJVFvp8v2UonRBq4FxCUeD6ssfIsHkD82nxUum+duJF1rCkZOMhpltIAn0z8=
+	t=1718240912; cv=none; b=s+LmfrTRCG/34AICUMR/nC2g3SSBrjZYNm0yq0JP409bKHHAa3nfpa3MN+CutUBqRuRFI16rZ+6yrVOXGO1GdK6Kvy3Doe+bjqlE0EsXUbQI7J7fmtjpo3dORtv2KEx5Mkx7Y6aJz4bc2PsfT/RVXIeaNCwggGqBBVXXg4peQsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718240661; c=relaxed/simple;
-	bh=mUqdzlE2YgruqKLE1C3H5e4Ue5/0C4g77p2kLBoVhBQ=;
+	s=arc-20240116; t=1718240912; c=relaxed/simple;
+	bh=vWcy6KMuC4Dp9rgaLfuSgJZWH/S1TG4fXrK505LJpHM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iS7BC7Kk99nc7G29RIPeEP9J/9hw8zXGTBF5W60w8orkMeKAKJHxdY6WwB8277nZ8ycYByehnSvwTbpXKyl98lvA/SArBO0GfRN6elGKrX9qVVLQzuYBAPPTIpdX/YcbUtLGPuZMHtvFgj1/HYw4vQK698wsS8kO+/S1sB8rA68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hkjYSL7a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF86DC116B1;
-	Thu, 13 Jun 2024 01:04:19 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ROrcWJGj54LtHW69Ys4PsnrljPoyPLg97NSKUWPF24g54yR5A5uSkCVVxMaH5HSc6TbnFOqav3FW5uWkA8uUwMa9D3L4AXGIcaaYpbo054UQnzjaUwxOH8pemjygnnrm2+4LyiAuavffnYtVPoSTxTYGG+2gaOgGaDcqdN3Bi4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R7QvzyXD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 250BAC116B1;
+	Thu, 13 Jun 2024 01:08:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718240660;
-	bh=mUqdzlE2YgruqKLE1C3H5e4Ue5/0C4g77p2kLBoVhBQ=;
+	s=k20201202; t=1718240912;
+	bh=vWcy6KMuC4Dp9rgaLfuSgJZWH/S1TG4fXrK505LJpHM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hkjYSL7aymQsKlAzq6Yed36s96sUhKIrGVugQoUZuBakuqy5MAFwMb9wDNXMy/8dk
-	 ACR/+jWtdDJu4jjEWklpD+2sovBrpkY5/eODSIi6kfyWz1nli+JOxE6wnCctmEFWeO
-	 P7AxEm7W6DW2X0F/fKIMb42o3P8ng7mledOqjOSE9uAdgtmBhgDnZQ/mVfkXuAGfVZ
-	 o3ufs+N3LwP7cUHVV4ENoAMn2SUtlp8fj0337DU8SoDxfUaBEq5y0Svneg2g95ypda
-	 4H7PQ/LRp3qqwbI/9f+7YKLgSJnCF65JdchVhtlas32NqbtfdnUW3dNtHpbEWdCkWV
-	 lT7lmYIFOYLig==
-Date: Wed, 12 Jun 2024 18:04:19 -0700
+	b=R7QvzyXDB3Z6H8zLHn6o4UXtI909BNKPDY54fecGDy1wr76SKLGK6eahpEd9KUBtd
+	 h62Pw/WEK1HiFx573SQcGc/lNZ5nEVgkT5FlwWBuYCV7TTIXzfAtMPfYmOQJZPSNlq
+	 57Cq+beP36BuZf6mwoyXYD5XzFvvT6OB5KwJvhu1VktNMSv0+hh31RuAHHf2EPxEED
+	 7Xm8I9QwtjAjnyBWBE/QI2vKyrSseiMf0EeKpatWo8h5xNCQ+BW274c1uVGX+pLnWd
+	 tu2cIuDPnEZ68aG7MsbOdJX8KdIiVOebXjoR7Ej1WFjrEUpPvvPGPbOBlnYAX1dMST
+	 NAQtPnnYXcsVQ==
+Date: Wed, 12 Jun 2024 18:08:31 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?=
- <ast@fiberby.net>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Edward Cree
- <ecree.xilinx@gmail.com>, Martin Habets <habetsm.xilinx@gmail.com>,
- linux-net-drivers@amd.com, Saeed Mahameed <saeedm@nvidia.com>, Leon
- Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
- linux-rdma@vger.kernel.org, Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org,
- Louis Peens <louis.peens@corigine.com>, oss-drivers@corigine.com,
- linux-kernel@vger.kernel.org, Davide Caratti <dcaratti@redhat.com>,
- i.maximets@ovn.org
-Subject: Re: [PATCH net-next 0/5] net: flower: validate encapsulation
- control flags
-Message-ID: <20240612180419.391f584d@kernel.org>
-In-Reply-To: <20240609173358.193178-1-ast@fiberby.net>
-References: <20240609173358.193178-1-ast@fiberby.net>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <brett.creeley@amd.com>, <drivers@pensando.io>
+Subject: Re: [PATCH net-next 3/8] ionic: add private workqueue per-device
+Message-ID: <20240612180831.4b22d81b@kernel.org>
+In-Reply-To: <20240610230706.34883-4-shannon.nelson@amd.com>
+References: <20240610230706.34883-1-shannon.nelson@amd.com>
+	<20240610230706.34883-4-shannon.nelson@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sun,  9 Jun 2024 17:33:50 +0000 Asbj=C3=B8rn Sloth T=C3=B8nnesen wrote:
-> Now that all drivers properly rejects unsupported flower control flags
-> used with FLOW_DISSECTOR_KEY_CONTROL, then time has come to add similar
-> checks to the drivers supporting FLOW_DISSECTOR_KEY_ENC_CONTROL.
+On Mon, 10 Jun 2024 16:07:01 -0700 Shannon Nelson wrote:
+> Instead of using the system's default workqueue,
+> add a private workqueue for the device to use for
+> its little jobs.
 
-Thanks for doing this work!
-Do you have any more of such series left? Could we perhaps consider
-recording the driver support somewhere in struct net_device and do=20
-the rejecting in the core? That's much easier to extend when adding
-new flags than updating all the drivers.
-This series I think may not be a great first candidate as IIUC all
-drivers would reject so the flag would be half-dead...
+little jobs little point of having your own wq, no?
+At this point of reading the series its a bit unclear why 
+the wq separation is needed.
 
