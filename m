@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-103276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17E829075B7
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:52:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 714E59075B9
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:52:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E88A1C20491
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:52:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E56451F24E63
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:52:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E7E1465B4;
-	Thu, 13 Jun 2024 14:51:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45D91146A90;
+	Thu, 13 Jun 2024 14:51:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ubimet.com header.i=@ubimet.com header.b="iwtSTx9J"
+	dkim=pass (2048-bit key) header.d=ubimet.com header.i=@ubimet.com header.b="cH6pEtt/"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx2-at.ubimet.com (mx2-at.ubimet.com [141.98.226.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2565145FFC;
-	Thu, 13 Jun 2024 14:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5157914659F;
+	Thu, 13 Jun 2024 14:51:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.98.226.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718290313; cv=none; b=rN6s/2qeBGkYzvQGA9W8N/Dre51gaok4fjXSyajZjv8VhmRxaLFtF8UGkDq4HJx3sIPRT6AiziEyNPLvrfSjMZrGpKSC7pcBy5G73uzBSk+HZ9c+tbhPoEh62hAWrxKi5iHhoj6k5CC4NpqKsWzuNZygsiz7AnWn1DlMkV2dFW4=
+	t=1718290315; cv=none; b=mhglsf1QVSU73fyal12jIYSN2i7Gr+UMqL3R1KJAW7BhhWXAcTjfFraJ1NRB08XXfLK3JoS7uV9EPCuFDxpGh3CpGG+oiI6lLoG8aPFsieDc5kGPH10wZlVT5ctE+hpFBy0Ho83wkqLoI4KM8Hm0z3ofF9JqQxxHq1hy//HnAVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718290313; c=relaxed/simple;
-	bh=dCOgK4sfEtIQpb4RENghRtBqFmwAJPeeYxG6sUQTPdI=;
+	s=arc-20240116; t=1718290315; c=relaxed/simple;
+	bh=cW6lVNRGSRj11+IEBD3FMIg7WaF5vxI7Ce5hhtb4xoc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JHpiySHHh9T88NVRa8krp2uDDGMdyd3IUoAShBnffoPDx8ielaMypvACcZ5KXS7baHq4tuLhc+PJQ8nHMxJUzwahqKkRRc4iuIOqjgavb4CRorJRBpTtgTTdjqLO91S0k/etPU9Ofdkry+o3F9lf2N6s+4X5i8FOiP3v6I0yVhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ubimet.com; spf=pass smtp.mailfrom=ubimet.com; dkim=pass (2048-bit key) header.d=ubimet.com header.i=@ubimet.com header.b=iwtSTx9J; arc=none smtp.client-ip=141.98.226.72
+	 MIME-Version:Content-Type; b=GuN9eK3TkhIZMa+mlYYtnKKjOh0+n05lmlb4Gf92EXsDz2oRRXRBjXa9Y61bSAh/Q+PzR85qBfYVZJ6md8Qqzg9OqITxkngtwz3XZ9o96LCCb4h92m3iTud7UZYNzIVwzr9wjsCdYxJcwmV01M29B2ZEcBGLLBU1+D1VF66MD+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ubimet.com; spf=pass smtp.mailfrom=ubimet.com; dkim=pass (2048-bit key) header.d=ubimet.com header.i=@ubimet.com header.b=cH6pEtt/; arc=none smtp.client-ip=141.98.226.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ubimet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ubimet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx2-at.ubimet.com (Postfix) with ESMTP id 44CA281189;
-	Thu, 13 Jun 2024 14:51:50 +0000 (UTC)
+	by mx2-at.ubimet.com (Postfix) with ESMTP id 9C88E8118E;
+	Thu, 13 Jun 2024 14:51:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ubimet.com;
-	s=20200131mdel; t=1718290310;
-	bh=dCOgK4sfEtIQpb4RENghRtBqFmwAJPeeYxG6sUQTPdI=;
+	s=20200131mdel; t=1718290311;
+	bh=cW6lVNRGSRj11+IEBD3FMIg7WaF5vxI7Ce5hhtb4xoc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iwtSTx9J3xUieRImFoua/WutLs3bBXAdgbVLLpi/pAuptT2kucUA+E6nBXD/O21ar
-	 VBsLUeZd5hQ2Q/uAgaPZ9fMb4xqJjjE8ygOgFwSkf6TCkD/oPCikFc4RDX4K8Jn5pU
-	 SVawoKoygB+vCQdegHov37G9vdRB/UwqBRIXwP66R0OgsM2s5DTCdtQ0ozTJDRH519
-	 BKYzvYz38xX+RedqC09Ey5AmHDHEpSkw2EYfRu9YtFE0bylntA6nJpXmciu4f0qjPT
-	 bDpXdCq0G4RLxCo0zPciB1b06dlVvE4oyVRBmgPPeoDu2iz/CBq/gvbCJCnPW+cu/x
-	 9QqSV6+h7Imfw==
+	b=cH6pEtt/x34MtLYjpQCR5qQXzZnvkaIydd0JjkTqB6HyjtFBJmgYQWKyNpevUHc+0
+	 bINRwMLQHggMLhXgDG1/k3I1G3MBuUepWzp/Fs8uZsaROU8Y3rnUJTnbuFYbiLsB6m
+	 ldpcRCz4IzvrBjq4qDSQBxmMUBv6U3jNkGw03I1Nw/N2ig1lP5aVBbHIHua08PQFwh
+	 v+GEXodRW99JT1fY19qv7OySz0/sM5uN4UjsrXnxmGAGHvk7MIX0SZma8F+ceeBOtj
+	 KAsPIaQIVOWLIVVcJyOHtPCbKv6F77JA39mDxCdTBSwj1SPDlLmjJH2jAZxCH+QxdJ
+	 QPK1SZ5C31Anw==
 Received: from mx2-at.ubimet.com ([127.0.0.1])
 	by localhost (mx02.dmz.dc.at.ubimet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id c2BAvqS2Cf8P; Thu, 13 Jun 2024 14:51:50 +0000 (UTC)
-Received: from zimbra-mta01.ext.dc.at.ubimet.com (webmail-dc.at.ubimet.com [10.1.18.22])
-	by mx2-at.ubimet.com (Postfix) with ESMTPS id 35C6481187;
-	Thu, 13 Jun 2024 14:51:50 +0000 (UTC)
+	with ESMTP id hmKLeBIclgYy; Thu, 13 Jun 2024 14:51:51 +0000 (UTC)
+Received: from zimbra-mta01.ext.dc.at.ubimet.com (zimbra-mta01.ext.dc.at.ubimet.com [10.1.18.22])
+	by mx2-at.ubimet.com (Postfix) with ESMTPS id 8EF1D8118D;
+	Thu, 13 Jun 2024 14:51:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTP id 1EB3D8079E;
-	Thu, 13 Jun 2024 14:51:50 +0000 (UTC)
+	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTP id 7A03580771;
+	Thu, 13 Jun 2024 14:51:51 +0000 (UTC)
 Received: from zimbra-mta01.ext.dc.at.ubimet.com ([127.0.0.1])
  by localhost (zimbra-mta01.ext.dc.at.ubimet.com [127.0.0.1]) (amavis, port 10032)
- with ESMTP id 8a9BZDVDmpnA; Thu, 13 Jun 2024 14:51:48 +0000 (UTC)
+ with ESMTP id 60i-LECkLL_8; Thu, 13 Jun 2024 14:51:50 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTP id A8AC680782;
-	Thu, 13 Jun 2024 14:51:48 +0000 (UTC)
+	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTP id 4707880782;
+	Thu, 13 Jun 2024 14:51:50 +0000 (UTC)
 X-Virus-Scanned: amavis at zimbra-mta01.ext.dc.at.ubimet.com
 Received: from zimbra-mta01.ext.dc.at.ubimet.com ([127.0.0.1])
  by localhost (zimbra-mta01.ext.dc.at.ubimet.com [127.0.0.1]) (amavis, port 10026)
- with ESMTP id 2WRalMuHULtR; Thu, 13 Jun 2024 14:51:48 +0000 (UTC)
+ with ESMTP id z1hbTpRenKp5; Thu, 13 Jun 2024 14:51:50 +0000 (UTC)
 Received: from pcn112.wl97.hub.at.ubimet.com (pcn112.it.hub.at.ubimet.com [10.15.66.143])
-	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTPSA id 69B0580771;
-	Thu, 13 Jun 2024 14:51:48 +0000 (UTC)
+	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTPSA id E8FA080771;
+	Thu, 13 Jun 2024 14:51:49 +0000 (UTC)
 From: =?UTF-8?q?Jo=C3=A3o=20Rodrigues?= <jrodrigues@ubimet.com>
 To: 
 Cc: jrodrigues@ubimet.com,
@@ -78,9 +78,9 @@ Cc: jrodrigues@ubimet.com,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org (open list:ETHERNET PHY LIBRARY),
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 2/3] net: phy: dp83867: add cable test support
-Date: Thu, 13 Jun 2024 16:51:52 +0200
-Message-Id: <20240613145153.2345826-3-jrodrigues@ubimet.com>
+Subject: [PATCH net-next 3/3] net: phy: dp83867: Add support for amplitude graph
+Date: Thu, 13 Jun 2024 16:51:53 +0200
+Message-Id: <20240613145153.2345826-4-jrodrigues@ubimet.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240613145153.2345826-1-jrodrigues@ubimet.com>
 References: <20240613145153.2345826-1-jrodrigues@ubimet.com>
@@ -93,294 +93,178 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-TI DP83867 returns TDR information into 5 segments
-for each of the cable.
-Implement the testing based on "Time Domain Reflectometry with DP83867
-and DP83869"
+Output the raw information of each segment.
+Each segment also comes with the distance information,
+but this does not map to the current output.
 
 Signed-off-by: Jo=C3=A3o Rodrigues <jrodrigues@ubimet.com>
 ---
- drivers/net/phy/dp83867.c | 228 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 228 insertions(+)
+ drivers/net/phy/dp83867.c | 86 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 80 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/phy/dp83867.c b/drivers/net/phy/dp83867.c
-index 5741f09e29cb..ff8c97a29195 100644
+index ff8c97a29195..e56a892d3da7 100644
 --- a/drivers/net/phy/dp83867.c
 +++ b/drivers/net/phy/dp83867.c
-@@ -5,6 +5,7 @@
-  */
-=20
- #include <linux/ethtool.h>
-+#include <linux/ethtool_netlink.h>
- #include <linux/kernel.h>
- #include <linux/mii.h>
- #include <linux/module.h>
-@@ -53,6 +54,14 @@
+@@ -54,6 +54,8 @@
  #define DP83867_RXFSOP2	0x013A
  #define DP83867_RXFSOP3	0x013B
  #define DP83867_IO_MUX_CFG	0x0170
-+#define DP83867_TDR_GEN_CFG5	0x0186
-+#define DP83867_TDR_GEN_CFG6	0x0187
-+#define DP83867_TDR_GEN_CFG7	0x0189
-+#define DP83867_TDR_PEAKS_LOC_1	0x0190
-+#define DP83867_TDR_PEAKS_AMP_1	0x019A
-+#define DP83867_TDR_GEN_STATUS	0x01A4
-+#define DP83867_TDR_PEAKS_SIGN_1	0x01A5
-+#define DP83867_TDR_PEAKS_SIGN_2	0x01A6
- #define DP83867_MSE_REG_1	0x0225
- #define DP83867_SGMIICTL	0x00D3
- #define DP83867_10M_SGMII_CFG   0x016F
-@@ -157,6 +166,22 @@
- /* SQI */
- #define DP83867_MAX_SQI	0x07
++#define DP83867_TDR_GEN_CFG2	0x0181
++#define DP83867_TDR_GEN_CFG4	0x0185
+ #define DP83867_TDR_GEN_CFG5	0x0186
+ #define DP83867_TDR_GEN_CFG6	0x0187
+ #define DP83867_TDR_GEN_CFG7	0x0189
+@@ -223,6 +225,8 @@ struct dp83867_private {
+ 	bool set_clk_output;
+ 	u32 clk_output_sel;
+ 	bool sgmii_ref_clk_en;
++	bool cable_test_tdr;
++	s8 pair;
+ };
 =20
-+/* TDR bits */
-+#define DP83867_TDR_GEN_CFG5_FLAGS	0x294A
-+#define DP83867_TDR_GEN_CFG6_FLAGS	0x0A9B
-+#define DP83867_TDR_GEN_CFG7_FLAGS	0x0000
-+#define DP83867_TDR_START	BIT(0)
-+#define DP83867_TDR_DONE	BIT(1)
-+#define DP83867_TDR_FAIL	BIT(2)
-+#define DP83867_TDR_PEAKS_LOC_LOW	GENMASK(7, 0)
-+#define DP83867_TDR_PEAKS_LOC_HIGH	GENMASK(15, 8)
-+#define DP83867_TDR_PEAKS_AMP_LOW	GENMASK(6, 0)
-+#define DP83867_TDR_PEAKS_AMP_HIGH	GENMASK(14, 8)
-+#define DP83867_TDR_INITIAL_THRESHOLD 10
-+#define DP83867_TDR_FINAL_THRESHOLD 24
-+#define DP83867_TDR_OFFSET	16
-+#define DP83867_TDR_P_LOC_CROSS_MODE_SHIFT	8
-+
- #define DP83867_LED_COUNT	4
-=20
- /* LED_DRV bits */
-@@ -1037,6 +1062,205 @@ static int dp83867_loopback(struct phy_device *ph=
-ydev, bool enable)
- 			  enable ? BMCR_LOOPBACK : 0);
+ /* Register values are converted to SNR(dB) as suggested by
+@@ -1068,7 +1072,7 @@ static u32 dp83867_cycles2cm(u32 cycles)
+ 	return cycles * 8 * 20;
  }
 =20
-+static u32 dp83867_cycles2cm(u32 cycles)
-+{
-+	/* for cat. 6 cable, signals travel at 5 ns / m */
-+	return cycles * 8 * 20;
+-static int dp83867_cable_test_start(struct phy_device *phydev)
++static int dp83867_cable_test_common(struct phy_device *phydev)
+ {
+ 	int ret;
+=20
+@@ -1082,11 +1086,38 @@ static int dp83867_cable_test_start(struct phy_de=
+vice *phydev)
+ 	if (ret < 0)
+ 		return ret;
+=20
+-	ret =3D phy_write_mmd(phydev, DP83867_DEVADDR, DP83867_TDR_GEN_CFG5,
+-			    DP83867_TDR_GEN_CFG5_FLAGS);
++	return phy_write_mmd(phydev, DP83867_DEVADDR, DP83867_TDR_GEN_CFG5,
++			     DP83867_TDR_GEN_CFG5_FLAGS);
 +}
 +
 +static int dp83867_cable_test_start(struct phy_device *phydev)
 +{
++	struct dp83867_private *priv =3D phydev->priv;
 +	int ret;
 +
-+	ret =3D phy_write_mmd(phydev, DP83867_DEVADDR, DP83867_TDR_GEN_CFG7,
-+			    DP83867_TDR_GEN_CFG7_FLAGS);
++	ret =3D dp83867_cable_test_common(phydev);
 +	if (ret < 0)
 +		return ret;
 +
-+	ret =3D phy_write_mmd(phydev, DP83867_DEVADDR, DP83867_TDR_GEN_CFG6,
-+			    DP83867_TDR_GEN_CFG6_FLAGS);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret =3D phy_write_mmd(phydev, DP83867_DEVADDR, DP83867_TDR_GEN_CFG5,
-+			    DP83867_TDR_GEN_CFG5_FLAGS);
-+	if (ret < 0)
-+		return ret;
++	priv->cable_test_tdr =3D false;
 +
 +	return phy_write_mmd(phydev, DP83867_DEVADDR, DP83867_CFG3,
 +			     DP83867_TDR_START);
 +}
 +
-+static int dp83867_cable_test_report_trans(struct phy_device *phydev, s8=
- pair,
-+					   int *peak_location, int *peak_value,
-+					   int *peak_sign,
-+					   unsigned int number_peaks)
++static int dp83867_cable_test_tdr_start(struct phy_device *phydev,
++					const struct phy_tdr_config *cfg)
 +{
-+	int fault_rslt =3D ETHTOOL_A_CABLE_RESULT_CODE_OK;
-+	int threshold =3D DP83867_TDR_INITIAL_THRESHOLD;
-+	unsigned long cross_result;
-+	u32 fault_location =3D 0;
-+	int i;
++	struct dp83867_private *priv =3D phydev->priv;
 +	int ret;
 +
-+	for (i =3D number_peaks; i >=3D 0; --i) {
-+		if (peak_value[i] > threshold) {
-+			fault_location =3D
-+				dp83867_cycles2cm(peak_location[i] -
-+					DP83867_TDR_OFFSET) / 2;
-+			if (peak_sign[i] =3D=3D 1) {
-+				fault_rslt =3D
-+					ETHTOOL_A_CABLE_RESULT_CODE_SAME_SHORT;
++	ret =3D dp83867_cable_test_common(phydev);
+ 	if (ret < 0)
+ 		return ret;
+=20
++	priv->cable_test_tdr =3D true;
++	priv->pair =3D cfg->pair;
++
+ 	return phy_write_mmd(phydev, DP83867_DEVADDR, DP83867_CFG3,
+ 			     DP83867_TDR_START);
+ }
+@@ -1105,9 +1136,14 @@ static int dp83867_cable_test_report_trans(struct =
+phy_device *phydev, s8 pair,
+=20
+ 	for (i =3D number_peaks; i >=3D 0; --i) {
+ 		if (peak_value[i] > threshold) {
+-			fault_location =3D
+-				dp83867_cycles2cm(peak_location[i] -
++			if (peak_location[i] >=3D DP83867_TDR_OFFSET) {
++				fault_location =3D dp83867_cycles2cm(peak_location[i] -
+ 					DP83867_TDR_OFFSET) / 2;
 +			} else {
-+				fault_rslt =3D ETHTOOL_A_CABLE_RESULT_CODE_OPEN;
++				phydev_dbg(phydev, "Returned TDR fault location is too low");
++				fault_location =3D dp83867_cycles2cm(peak_location[i]) / 2;
 +			}
-+			break;
-+		}
-+		if (i =3D=3D 1)
-+			threshold =3D DP83867_TDR_FINAL_THRESHOLD;
-+	}
 +
-+	ret =3D phy_read_mmd(phydev, DP83867_DEVADDR, DP83867_TDR_GEN_STATUS);
-+	if (ret < 0)
-+		return ret;
-+
-+	cross_result =3D ret;
-+
-+	if (test_bit(DP83867_TDR_P_LOC_CROSS_MODE_SHIFT + pair -
-+		     ETHTOOL_A_CABLE_PAIR_A, &cross_result))
-+		fault_rslt =3D ETHTOOL_A_CABLE_RESULT_CODE_CROSS_SHORT;
-+
-+	ret =3D ethnl_cable_test_result(phydev, pair, fault_rslt);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (fault_rslt !=3D ETHTOOL_A_CABLE_RESULT_CODE_OK) {
-+		return ethnl_cable_test_fault_length(phydev, pair,
-+						     fault_location);
-+	}
-+	return 0;
-+}
-+
-+static int dp83867_read_tdr_registers(struct phy_device *phydev, s8 pair=
-,
-+				      int *peak_loc, int *peak_val,
-+				      int *peak_sign,
-+				      unsigned int number_peaks)
+ 			if (peak_sign[i] =3D=3D 1) {
+ 				fault_rslt =3D
+ 					ETHTOOL_A_CABLE_RESULT_CODE_SAME_SHORT;
+@@ -1208,6 +1244,39 @@ static int dp83867_read_tdr_registers(struct phy_d=
+evice *phydev, s8 pair,
+ 	return 0;
+ }
+=20
++static int dp83867_simplified_amplitude_graph(struct phy_device *phydev)
 +{
-+	u32 segment_dist, register_dist;
-+	unsigned long peak_sign_result;
-+	int ret;
-+	int i;
-+
-+	segment_dist =3D (pair - ETHTOOL_A_CABLE_PAIR_A) * 5;
-+	for (i =3D 0; i < number_peaks; ++i) {
-+		register_dist =3D (segment_dist + i) / 2;
-+		ret =3D phy_read_mmd(phydev, DP83867_DEVADDR,
-+				   DP83867_TDR_PEAKS_LOC_1 + register_dist);
-+		if (ret < 0)
-+			return ret;
-+		if (((register_dist + i) % 2) =3D=3D 0)
-+			peak_loc[i] =3D FIELD_GET(DP83867_TDR_PEAKS_LOC_LOW, ret);
-+		else
-+			peak_loc[i] =3D FIELD_GET(DP83867_TDR_PEAKS_LOC_HIGH, ret);
-+
-+		ret =3D phy_read_mmd(phydev, DP83867_DEVADDR,
-+				   DP83867_TDR_PEAKS_AMP_1 + register_dist);
-+		if (ret < 0)
-+			return ret;
-+		if (((register_dist + i) % 2) =3D=3D 0)
-+			peak_val[i] =3D FIELD_GET(DP83867_TDR_PEAKS_AMP_LOW, ret);
-+		else
-+			peak_val[i] =3D FIELD_GET(DP83867_TDR_PEAKS_AMP_HIGH, ret);
-+	}
-+
-+	switch (pair) {
-+	case ETHTOOL_A_CABLE_PAIR_A:
-+	case ETHTOOL_A_CABLE_PAIR_B:
-+		ret =3D phy_read_mmd(phydev, DP83867_DEVADDR,
-+				   DP83867_TDR_PEAKS_SIGN_1);
-+		break;
-+	case ETHTOOL_A_CABLE_PAIR_C:
-+	case ETHTOOL_A_CABLE_PAIR_D:
-+		ret =3D phy_read_mmd(phydev, DP83867_DEVADDR,
-+				   DP83867_TDR_PEAKS_SIGN_2);
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+	if (ret < 0)
-+		return ret;
-+
-+	peak_sign_result =3D ret;
-+
-+	switch (pair) {
-+	case ETHTOOL_A_CABLE_PAIR_A:
-+	case ETHTOOL_A_CABLE_PAIR_C:
-+		for (i =3D 0; i < number_peaks; i++)
-+			peak_sign[i] =3D test_bit(i, &peak_sign_result);
-+		break;
-+	case ETHTOOL_A_CABLE_PAIR_B:
-+	case ETHTOOL_A_CABLE_PAIR_D:
-+		for (i =3D 0; i < number_peaks; i++)
-+			peak_sign[i] =3D test_bit(i + 5, &peak_sign_result);
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
-+static int dp83867_cable_test_report_pair(struct phy_device *phydev, s8 =
-pair)
-+{
++	struct dp83867_private *priv =3D phydev->priv;
 +	int peak_sign[5];
 +	int peak_loc[ARRAY_SIZE(peak_sign)];
 +	int peak_val[ARRAY_SIZE(peak_sign)];
++	int i;
++	int mV;
 +	int ret;
-+
-+	ret =3D dp83867_read_tdr_registers(phydev, pair, peak_loc, peak_val,
-+					 peak_sign, ARRAY_SIZE(peak_sign));
-+	if (ret < 0)
-+		return ret;
-+	return dp83867_cable_test_report_trans(phydev, pair, peak_loc,
-+					       peak_val, peak_sign,
-+					       ARRAY_SIZE(peak_sign));
-+}
-+
-+static int dp83867_cable_test_report(struct phy_device *phydev)
-+{
 +	s8 pair;
-+	int ret;
 +
 +	for (pair =3D ETHTOOL_A_CABLE_PAIR_A; pair <=3D ETHTOOL_A_CABLE_PAIR_D;
-+	     ++pair) {
-+		ret =3D dp83867_cable_test_report_pair(phydev, pair);
++			pair++) {
++		if (priv->pair !=3D PHY_PAIR_ALL && pair !=3D priv->pair)
++			continue;
++
++		ret =3D dp83867_read_tdr_registers(phydev, pair, peak_loc,
++						 peak_val, peak_sign,
++						 ARRAY_SIZE(peak_sign));
 +		if (ret < 0)
 +			return ret;
-+	}
 +
++		for (i =3D 0; i < ARRAY_SIZE(peak_loc); i++) {
++			mV =3D peak_val[i];
++			if (peak_sign[i])
++				mV *=3D -1;
++
++			ethnl_cable_test_amplitude(phydev, pair, mV);
++		}
++	}
 +	return 0;
 +}
 +
-+static int dp83867_cable_test_get_status(struct phy_device *phydev,
-+					 bool *finished)
-+{
-+	int ret;
-+
-+	*finished =3D false;
-+
-+	ret =3D phy_read_mmd(phydev, DP83867_DEVADDR, DP83867_CFG3);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (!(ret & DP83867_TDR_DONE))
-+		return 0;
-+
-+	*finished =3D true;
-+
-+	if (ret & DP83867_TDR_FAIL)
-+		return -EBUSY;
-+
-+	return dp83867_cable_test_report(phydev);
-+}
-+
- static int dp83867_get_sqi(struct phy_device *phydev)
+ static int dp83867_cable_test_report_pair(struct phy_device *phydev, s8 =
+pair)
  {
- 	u16 mse_val;
-@@ -1226,6 +1450,7 @@ static struct phy_driver dp83867_driver[] =3D {
- 		.phy_id		=3D DP83867_PHY_ID,
- 		.phy_id_mask	=3D 0xfffffff0,
- 		.name		=3D "TI DP83867",
-+		.flags		=3D PHY_POLL_CABLE_TEST,
- 		/* PHY_GBIT_FEATURES */
+ 	int peak_sign[5];
+@@ -1242,6 +1311,7 @@ static int dp83867_cable_test_report(struct phy_dev=
+ice *phydev)
+ static int dp83867_cable_test_get_status(struct phy_device *phydev,
+ 					 bool *finished)
+ {
++	struct dp83867_private *priv =3D phydev->priv;
+ 	int ret;
 =20
- 		.probe          =3D dp83867_probe,
-@@ -1252,6 +1477,9 @@ static struct phy_driver dp83867_driver[] =3D {
- 		.link_change_notify =3D dp83867_link_change_notify,
+ 	*finished =3D false;
+@@ -1258,7 +1328,10 @@ static int dp83867_cable_test_get_status(struct ph=
+y_device *phydev,
+ 	if (ret & DP83867_TDR_FAIL)
+ 		return -EBUSY;
+=20
+-	return dp83867_cable_test_report(phydev);
++	if (priv->cable_test_tdr)
++		return dp83867_simplified_amplitude_graph(phydev);
++	else
++		return dp83867_cable_test_report(phydev);
+ }
+=20
+ static int dp83867_get_sqi(struct phy_device *phydev)
+@@ -1478,6 +1551,7 @@ static struct phy_driver dp83867_driver[] =3D {
  		.set_loopback	=3D dp83867_loopback,
 =20
-+		.cable_test_start	=3D dp83867_cable_test_start,
-+		.cable_test_get_status	=3D dp83867_cable_test_get_status,
-+
+ 		.cable_test_start	=3D dp83867_cable_test_start,
++		.cable_test_tdr_start	=3D dp83867_cable_test_tdr_start,
+ 		.cable_test_get_status	=3D dp83867_cable_test_get_status,
+=20
  		.led_brightness_set =3D dp83867_led_brightness_set,
- 		.led_hw_is_supported =3D dp83867_led_hw_is_supported,
- 		.led_hw_control_set =3D dp83867_led_hw_control_set,
 --=20
 2.25.1
 
