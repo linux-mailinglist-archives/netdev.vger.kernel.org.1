@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-103269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAC7B90756F
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:41:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFF7990756B
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:40:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC2AF1C22112
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:40:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B12D31C22792
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C623F1465A5;
-	Thu, 13 Jun 2024 14:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A709145FF6;
+	Thu, 13 Jun 2024 14:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jzahjbiD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kqwPFSf+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1BF0146592
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 14:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D770145B12;
+	Thu, 13 Jun 2024 14:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718289632; cv=none; b=qJG99GUXWy3xs92NtJLJTeCFoLw/bZhEDG0WzJQvo03SgDUDync3Qe7W54CA8JzmjHTL6myC1BcknfKSRIIBxC9LL7FngT++Nt+XPZQe+goV1Y3zTYLciehtrI0Uz8rVMCVmRGwG6md4URa/jnv5abdEJvZlkYIZeMKwANzXSNk=
+	t=1718289631; cv=none; b=luqPIfQTjZfpKHEhrLPPDk9804SnuvLNPaMDpEaAz/UvNHBFOXhLK1Be6Z9VKiSD036D15l0r+jRA728QQmm4X2cnULkQ8H/cn8JkqENbZn29++x/VsWagaNuoy9um+XGy+KZ9lFkZb6WnpBQkpUj9dGW59Ng6cZ/F56fAnlWP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718289632; c=relaxed/simple;
-	bh=eL6jUZgUBcewlbxTa3vkHS9UtRtJR1SLX0ncG6lLXh4=;
+	s=arc-20240116; t=1718289631; c=relaxed/simple;
+	bh=jSu+K80o4zD8PvDW3KilUShNh/XJlo5qMMpgO2sQ1W8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ci4W7s79v7VCQKB+SiQL/EDnBZHYDLm+vHNkG24Lo4wdKgKQPtxJiBGYUv0zFTxMw3FB4htudyTCj5u91SqvaEUxHNGjEsmSpzkbIcPXozxgvPvWhwpf8lpZMAlbcpOYYmrsQ0BG+hjSQVMoHYR1uGVHLcN4+9V7RuHW0DPsMQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jzahjbiD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 24D3FC4AF51;
+	 In-Reply-To:To:Cc; b=NKgE6uuMpl0GdiV3x2cFurlhJyiI0SlMdu8o1+D57vhpBNzHsFWET64Wk8+MCBhQtPFEmAsmqbyOQdA+QzAr3YIsWoNMcMXXYjVEyLxrw4m0bCYlEUE6s5zRwxYXMvNQ4FB/ofE/77VYeFc5lxbN0E6BMOiT+7jtpYmMb9UKXDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kqwPFSf+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 38215C4AF49;
 	Thu, 13 Jun 2024 14:40:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718289632;
-	bh=eL6jUZgUBcewlbxTa3vkHS9UtRtJR1SLX0ncG6lLXh4=;
+	s=k20201202; t=1718289631;
+	bh=jSu+K80o4zD8PvDW3KilUShNh/XJlo5qMMpgO2sQ1W8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jzahjbiDwNmpK8LHtNpyhzc10u/6kXMysxM9iBSgmJfzg/AuYBNTu2uOo0d95LgYN
-	 xMmb6YUaMe7X4KWVdkK8oGqa4Q8mmpTjSwd7dlXUjwnPAmUEx2wCFWFs29Eol73SMf
-	 R/cRrucKKQ2KtYZ9U0vMDn7QyrVf8QMvuDHJXHFoKHVO3u45u0O1AXREDOaFu3q515
-	 xFwE+vOh9iP5I03nhdKYrGoUZaFaXCAjy6s+KSuVV7osRliNCinNkAoUJt+mgQ58E9
-	 mCep9FPVbv8BZlSh9EiijYKHIQN8NkUikEj3El0ahGquUa1vPyg8J6nTen9lstV8DN
-	 lndelu2ycFrgQ==
+	b=kqwPFSf+8EUfr/e5BjsNfvlZihqDHFT2p5u/B/7HinLecDqWeh2h7wvKYeiH+H5I7
+	 JALu43/p5tqBahzNhVEH+XqBb/WkFGFeNQYQh4s5CmawMA0J4qeUHmxvrAXFjHY1gX
+	 A0i4DocbkEbjT1vk7DxNvu0MhiBtvjn0xUsrrAGlesy3v/dFwYQlN0kKewXA12B8Ci
+	 JKVJkpjL0JBNwZCeeVv1ob+lNPIfeeLpABWy0xkwdivsnsP4HWSr2tPxpiE/YLcL/r
+	 loNdGoSA2PmOIXBYaOJpPrT6pft4z1yEGkIhOFFMvIzGyFnrR28RKg2CYUT4XSVnGZ
+	 3e2uYjnnqOEpQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 10293C43619;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 29BBFC4314C;
 	Thu, 13 Jun 2024 14:40:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] ionic: fix use after netif_napi_del()
+Subject: Re: [PATCH net] gve: Clear napi->skb before dev_kfree_skb_any()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171828963106.5991.8973378919340586349.git-patchwork-notify@kernel.org>
+ <171828963116.5991.16090491063036449379.git-patchwork-notify@kernel.org>
 Date: Thu, 13 Jun 2024 14:40:31 +0000
-References: <20240612060446.1754392-1-ap420073@gmail.com>
-In-Reply-To: <20240612060446.1754392-1-ap420073@gmail.com>
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, shannon.nelson@amd.com, brett.creeley@amd.com,
- drivers@pensando.io, netdev@vger.kernel.org, jacob.e.keller@intel.com
+References: <20240612001654.923887-1-ziweixiao@google.com>
+In-Reply-To: <20240612001654.923887-1-ziweixiao@google.com>
+To: Ziwei Xiao <ziweixiao@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, jeroendb@google.com,
+ pkaligineedi@google.com, shailend@google.com, hramamurthy@google.com,
+ willemb@google.com, rushilg@google.com, bcf@google.com, csully@google.com,
+ linux-kernel@vger.kernel.org, stable@kernel.org, stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 12 Jun 2024 06:04:46 +0000 you wrote:
-> When queues are started, netif_napi_add() and napi_enable() are called.
-> If there are 4 queues and only 3 queues are used for the current
-> configuration, only 3 queues' napi should be registered and enabled.
-> The ionic_qcq_enable() checks whether the .poll pointer is not NULL for
-> enabling only the using queue' napi. Unused queues' napi will not be
-> registered by netif_napi_add(), so the .poll pointer indicates NULL.
-> But it couldn't distinguish whether the napi was unregistered or not
-> because netif_napi_del() doesn't reset the .poll pointer to NULL.
-> So, ionic_qcq_enable() calls napi_enable() for the queue, which was
-> unregistered by netif_napi_del().
+On Wed, 12 Jun 2024 00:16:54 +0000 you wrote:
+> gve_rx_free_skb incorrectly leaves napi->skb referencing an skb after it
+> is freed with dev_kfree_skb_any(). This can result in a subsequent call
+> to napi_get_frags returning a dangling pointer.
+> 
+> Fix this by clearing napi->skb before the skb is freed.
+> 
+> Fixes: 9b8dd5e5ea48 ("gve: DQO: Add RX path")
+> Cc: stable@vger.kernel.org
+> Reported-by: Shailend Chand <shailend@google.com>
+> Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
+> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> Reviewed-by: Shailend Chand <shailend@google.com>
+> Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] ionic: fix use after netif_napi_del()
-    https://git.kernel.org/netdev/net/c/79f18a41dd05
+  - [net] gve: Clear napi->skb before dev_kfree_skb_any()
+    https://git.kernel.org/netdev/net/c/6f4d93b78ade
 
 You are awesome, thank you!
 -- 
