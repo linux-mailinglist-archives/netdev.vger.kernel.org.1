@@ -1,109 +1,126 @@
-Return-Path: <netdev+bounces-103195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80BA7906DAD
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:02:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 898C6906DBE
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:03:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B07DAB227D2
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 12:02:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CA0A1F256DC
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 12:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A75F146006;
-	Thu, 13 Jun 2024 11:59:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 492C5149C44;
+	Thu, 13 Jun 2024 11:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F+8vn000"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="MeI8MH8G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AAB413D614;
-	Thu, 13 Jun 2024 11:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B7A1465A5;
+	Thu, 13 Jun 2024 11:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718279940; cv=none; b=VmJCXvCEJXxfiw2xDWRFhdfU0//EDkRa82f0S1BLfU0xkuALWZI057mx0TbV3yGF2Q20ZgSf5WNlAyPoHp1rrGjJ4FPVKEAxxkeXvJBgv1hKsOuxuQFtcEjYzLTPJsW9+UdngexPWp/bGKv98LD1H7L4kChs8FRGODKLS/4+sTA=
+	t=1718279953; cv=none; b=eEym6XUlUHeUQRetdQhs0+47Dkdfu2OTsn15opGPDEGokTYX2GBZeCdngY2X+SvKdyopFI47HtfHEPBnGyGFt3z2xNMu1/qTfvERLK4nNiELDL55B5LO89rU95IDYtpRRsB1+QQxNWUD7YUaAW1BzXwoRKjoc5rueP5urWanqiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718279940; c=relaxed/simple;
-	bh=8WZYUofqGNBJTme8Y4hlEJGatZHZJId++XvBDRi53kU=;
+	s=arc-20240116; t=1718279953; c=relaxed/simple;
+	bh=0ciGaQw5y4u0nJS5KStWIT6J+uYIGGdbCRp7w2Mw+jw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xn3q+2Ahu5xVvA+LiO6CURxeshFHIgdsmkWzMseQdFPCUH6J4WBglVFHWNe3/tPIw9QIFBWANNumSGYu8aE3rOVogLUlMJKbbbgqGIrNVvC1DXXen6uobRi+MwO/2+tCwjC/9tAX4Hdwqb9RBaRfgN/meeK+SIp0JYvtzEVKLhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F+8vn000; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-57c83100cb4so841633a12.1;
-        Thu, 13 Jun 2024 04:58:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718279937; x=1718884737; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AHo2/PACREZ++y9XZf47QE0TtTVWYm647o+NEVWiCtQ=;
-        b=F+8vn000eaP0wTHl8sKxUmvzBHrDI6e2jJkTdY0ZJA7j3Mgcy6Updo7DsdfxMbR81w
-         2o9Z23uNMJ8oWIB/pxYC8hFiKmmNUq3JXsvgi8D3mbOw9nhsSpeC3ghJAI9UzBXPsHzB
-         KUCcfXVpfOv6HH29xysX+oa41PqhLLymSs2ELUmmltpbOIjgZPYoFk0IYA/mS4We6kzc
-         peTE/c7LL29vm3t/eSB3qEmmB2TJGQpZECBrmPuMhkuhvgZyNqImU877axndioY0Bs3B
-         ZAOUpB3EZQwJ4SGpQjXVEpB5XvLYTjf9f0HaX7CFL6YnWephEQ7J1tPzL8LGDx+13jsW
-         Q+pQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718279937; x=1718884737;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AHo2/PACREZ++y9XZf47QE0TtTVWYm647o+NEVWiCtQ=;
-        b=PQUCdky30yh5IJSrgK95Q52QON57+ZT2MjMqdSMtCqCFMub7aR4H20unDnHGV+IAX9
-         QT/R/ZscLmMij/7pTqL8g7Fvc945irPpV8rSilThERurq+NsQa2t5c7k15JC9H2SzaPF
-         C982LKI0k7x4hLiJ9TLO3gZk5/cefmHLhGB1Mygs0tqD0ruQBhgR0k1yuEnJSAnRy42z
-         p/hZmbXjHAUg60gMjHd+tuM5WATGFIYxBETKPYAkgnKHCI3V4a7ADqQUK8oqIZiEI8QG
-         3J4zvtU1+cMQw0PnmBUdGq5aBDIhqeIRfMF+ikAvuzACvgR4XK1nDQ3KH/qMxECOUbrP
-         KARQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWY0nwAuGc0HWK4dXbKes7866RX1b+MbW0OLc3mrhjYbJiWT6CbRGPQm/ygyJWr1c6/CPUdIvTva6qyjDYd5jWd7o0chr0xX3nmAGvlvCVBhafHYfWKoIo0N8WxJ2ezRfnD/pVSmFwM4RIsWuEtpOgtMNjAhxrGBIDEiygmDgiKYg==
-X-Gm-Message-State: AOJu0YywsDwHtSk3jYAsg1LAY4zPFF5Wku+jL5xhaefc1bLx/n7xU9d7
-	M+x2Dy2PqkO/99RoEp1ABWTGh2efFQRTkF7bavOIxnv+r9B1uCV9UypLm4roJLI=
-X-Google-Smtp-Source: AGHT+IFljb5W7Hda1Ep6bFX8iK9IkYiLimjo3z9KNGaU35uSzOIGDtZKAyJ6JpMHYHeyhjUIxuXBxQ==
-X-Received: by 2002:a50:8d17:0:b0:57c:6861:d72a with SMTP id 4fb4d7f45d1cf-57ca97497e6mr3057158a12.4.1718279936524;
-        Thu, 13 Jun 2024 04:58:56 -0700 (PDT)
-Received: from skbuf ([188.25.55.166])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb741e911sm826392a12.78.2024.06.13.04.58.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jun 2024 04:58:55 -0700 (PDT)
-Date: Thu, 13 Jun 2024 14:58:53 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Martin Schiller <ms@dev.tdt.de>
-Cc: martin.blumenstingl@googlemail.com, hauke@hauke-m.de, andrew@lunn.ch,
-	f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 06/12] net: dsa: lantiq_gswip: do also enable
- or disable cpu port
-Message-ID: <20240613115853.r264zoqh5neqhwb3@skbuf>
-References: <20240611135434.3180973-1-ms@dev.tdt.de>
- <20240611135434.3180973-1-ms@dev.tdt.de>
- <20240611135434.3180973-7-ms@dev.tdt.de>
- <20240611135434.3180973-7-ms@dev.tdt.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YchvrFWeIFsKcYdk0GjcYRko0HN+7Eacstq6pQecX1GLwEXVAvWZVQFnwrgu4p+yfUgU91pP0/8IWfllQKeW8B5E5pfOqa0CRICQOB+/YQ28Xvz2DkqNXc6jF110/wxOJyvEEskBploeA+/sL1HwsfZ+7y1fulsRpE/nZrTKmlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=MeI8MH8G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FEAAC4AF4D;
+	Thu, 13 Jun 2024 11:59:10 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="MeI8MH8G"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1718279946;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2oQoeraeqQaQpCY62eMS55dJmmDU2cLnySqsO1DV0bg=;
+	b=MeI8MH8G9GaVwTubn3zbemt8iMGjhWu2xlRT5g6xh1L4MS9g8vj3/b4L5Io4CIm+PbC/28
+	K4kTBBhke2rM7bNZ2dv8VC/fK7/9r4oKXzXHf3Yt4ENzPLvg7XFBUp90WP45io3c2/cs6Q
+	JMbCSdFZKlgC96+RmMCLxV7PaJ3gRO0=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ebdb63be (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Thu, 13 Jun 2024 11:59:05 +0000 (UTC)
+Date: Thu, 13 Jun 2024 13:58:59 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <ZmrfA1p2zSVIaYam@zx2c4.com>
+References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+ <20240612143305.451abf58@kernel.org>
+ <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240611135434.3180973-7-ms@dev.tdt.de>
- <20240611135434.3180973-7-ms@dev.tdt.de>
+In-Reply-To: <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
 
-On Tue, Jun 11, 2024 at 03:54:28PM +0200, Martin Schiller wrote:
-> Before commit 74be4babe72f ("net: dsa: do not enable or disable non user
-> ports"), gswip_port_enable/disable() were also executed for the cpu port
-> in gswip_setup() which disabled the cpu port during initialization.
+On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
+> On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
+> > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
+> > > Since SLOB was removed, it is not necessary to use call_rcu
+> > > when the callback only performs kmem_cache_free. Use
+> > > kfree_rcu() directly.
+> > > 
+> > > The changes were done using the following Coccinelle semantic patch.
+> > > This semantic patch is designed to ignore cases where the callback
+> > > function is used in another way.
+> > 
+> > How does the discussion on:
+> >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
+> >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
+> > reflect on this series? IIUC we should hold off..
 > 
-> Let's restore this by removing the dsa_is_user_port checks. Also, let's
-> clean up the gswip_port_enable() function so that we only have to check
-> for the cpu port once. The operation reordering done here is safe.
+> We do need to hold off for the ones in kernel modules (such as 07/14)
+> where the kmem_cache is destroyed during module unload.
 > 
-> Signed-off-by: Martin Schiller <ms@dev.tdt.de>
-> Acked-by: Hauke Mehrtens <hauke@hauke-m.de>
-> ---
+> OK, I might as well go through them...
+> 
+> [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+> 	Needs to wait, see wg_allowedips_slab_uninit().
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Also, notably, this patch needs additionally:
+
+diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
+index e4e1638fce1b..c95f6937c3f1 100644
+--- a/drivers/net/wireguard/allowedips.c
++++ b/drivers/net/wireguard/allowedips.c
+@@ -377,7 +377,6 @@ int __init wg_allowedips_slab_init(void)
+
+ void wg_allowedips_slab_uninit(void)
+ {
+-	rcu_barrier();
+ 	kmem_cache_destroy(node_cache);
+ }
+
+Once kmem_cache_destroy has been fixed to be deferrable.
+
+I assume the other patches are similar -- an rcu_barrier() can be
+removed. So some manual meddling of these might be in order.
+
+Jason
 
