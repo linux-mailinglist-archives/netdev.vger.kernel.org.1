@@ -1,109 +1,135 @@
-Return-Path: <netdev+bounces-103218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42A56907146
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:35:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD29190716B
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3E76B24569
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 12:35:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACD001C243C9
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 12:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7A814265E;
-	Thu, 13 Jun 2024 12:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA9B3C24;
+	Thu, 13 Jun 2024 12:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="PXwyFuT0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA87E14199C;
-	Thu, 13 Jun 2024 12:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0104384;
+	Thu, 13 Jun 2024 12:36:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718282114; cv=none; b=dDF5bkMBkcvhFCshFNXo+RtZIXea+pRx/YB3QwB4GdDwIeSl13bxwWax37VjuM/CZAD8k4ob8/GeBvkFFDFFJT+wDUZAySK28pKB1rCWOaqp50EnYujxofhw+0/HIoVG9kzPwel5ezAovcX41OEjKX5/OZMn3eeAtNxurYTHqzU=
+	t=1718282209; cv=none; b=puoRYQ2hFE7EPkimKgH1O7ogeKnM7uCLAiDyUtyQsQCUd+AfoYUcdk/HIleTARLWsw5b5QW3BcbSGufYl2/611nxJeETxT3PnsM9fbPxEqQNdVWWT27NiMwwxeJfaZxfEQG6zwASNbzcEhpGMPS6uGuReiKk3vyzaeZxz81Hv4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718282114; c=relaxed/simple;
-	bh=Toz5hjv/Fc2vhd9W5Bvfsxt4JvCxbgfNTxqzBTzdYNc=;
-	h=MIME-Version:Content-Type:Date:From:To:Cc:Subject:In-Reply-To:
-	 References:Message-ID; b=EksosMMe8+omhYxMC0R/Ty0b5t7y6qejudvjJ1u/H3qStL3n2LzVRfPSn6Pk5zDgamhY7s+q9/GehUsiorL4Qz31+f1UunwFKI9swRrJCgJ5wRrmPoyLrPp+Ng9QcJ7CqyTF+ChB8QTs3evbBqo9Fz4NKHCwa6Z4lRJNgwTrS0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=194.37.255.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
-Received: from [127.0.0.1] (helo=localhost)
-	by relay.expurgate.net with smtp (Exim 4.92)
-	(envelope-from <prvs=99085fba10=ms@dev.tdt.de>)
-	id 1sHjfa-00234K-PE; Thu, 13 Jun 2024 14:35:10 +0200
-Received: from [195.243.126.94] (helo=securemail.tdt.de)
-	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ms@dev.tdt.de>)
-	id 1sHjfa-00FOry-80; Thu, 13 Jun 2024 14:35:10 +0200
-Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id F01BF240053;
-	Thu, 13 Jun 2024 14:35:09 +0200 (CEST)
-Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id 8594D240050;
-	Thu, 13 Jun 2024 14:35:09 +0200 (CEST)
-Received: from mail.dev.tdt.de (localhost [IPv6:::1])
-	by mail.dev.tdt.de (Postfix) with ESMTP id 25B803852A;
-	Thu, 13 Jun 2024 14:35:09 +0200 (CEST)
+	s=arc-20240116; t=1718282209; c=relaxed/simple;
+	bh=romDsGiHyj+Pvt3P68qf7EXcJ8es7BN5r0u1TQ25g6s=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=UsOTdFhQ1xb/3E9pTKIxUkEoBvZjiNj2WPAuw9kwybpRG3C1XXwY7+FeCgjqmB5V+7j7UhCz49p/xNjXv6JT46tWJMEgb/dnuZGwJKAwF6heakdTFN/zZPMPfWeukwvWQlf56WLSKtF7ULqfSL12x5ZUew4EzpajLOvHU6y1C4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=PXwyFuT0; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1718282203;
+	bh=WW4ftqDIvUMc2IIhJpk+diOslyASBtsvVD8iegY87PQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=PXwyFuT0fc4hMs9pFRG3kpugSS278/qYyt7ZY2A+u//PUS/buq32NBNIvQL63/xXL
+	 tEq34mdCKNjp+ZZoBlNLP5or9K9NG5iBg5S72q0XhgsTF65Pg/FN1vJvm6Rgh7NMXu
+	 no+OD7C3MEvBBqmG+6hujrWnn/zkmFqxqGs70RpryxlDbaKS24tLs9+SeNxstMhcG6
+	 t9bgZDYnr8pF05mpv3OjWUlhZJq5NpTJp9l8IRiiQrpYmukWizAQxR1cHys5FucZ0l
+	 I80tfoay+LQFSUh3wGRp+nZCQwEQAq+mxG67iaNisQlSlACaZIB/gPDCXVn4RPwl7X
+	 bWrMga/romgbg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4W0MNW4qdLz4xrg;
+	Thu, 13 Jun 2024 22:36:43 +1000 (AEST)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Ghadi Elie Rahme <ghadi.rahme@canonical.com>, netdev@vger.kernel.org
+Cc: Ghadi Elie Rahme <ghadi.rahme@canonical.com>, stable@vger.kernel.org
+Subject: Re: [PATCH v2 net] bnx2x: Fix multiple UBSAN array-index-out-of-bounds
+In-Reply-To: <20240612154449.173663-1-ghadi.rahme@canonical.com>
+References: <20240612154449.173663-1-ghadi.rahme@canonical.com>
+Date: Thu, 13 Jun 2024 22:36:42 +1000
+Message-ID: <8734phow85.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Thu, 13 Jun 2024 14:35:09 +0200
-From: Martin Schiller <ms@dev.tdt.de>
-To: martin.blumenstingl@googlemail.com, hauke@hauke-m.de, andrew@lunn.ch,
- f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 08/12] net: dsa: lantiq_gswip: Change literal
- 6 to ETH_ALEN
-Organization: TDT AG
-In-Reply-To: <20240611135434.3180973-9-ms@dev.tdt.de>
-References: <20240611135434.3180973-1-ms@dev.tdt.de>
- <20240611135434.3180973-9-ms@dev.tdt.de>
-Message-ID: <234a55f08593f7c8d003d87b3ff1aac9@dev.tdt.de>
-X-Sender: ms@dev.tdt.de
-User-Agent: Roundcube Webmail/1.3.17
-X-purgate-type: clean
-X-purgate: clean
-X-purgate-ID: 151534::1718282110-DD5928CF-66249D3A/0/0
+Content-Type: text/plain
 
-On 2024-06-11 15:54, Martin Schiller wrote:
-> From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-> 
-> The addr variable in gswip_port_fdb_dump() stores a mac address. Use
-> ETH_ALEN to make this consistent across other drivers.
-> 
-> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
-> Acked-by: Hauke Mehrtens <hauke@hauke-m.de>
-> ---
->  drivers/net/dsa/lantiq_gswip.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/dsa/lantiq_gswip.c 
-> b/drivers/net/dsa/lantiq_gswip.c
-> index 58c069f964dd..525a62a21601 100644
-> --- a/drivers/net/dsa/lantiq_gswip.c
-> +++ b/drivers/net/dsa/lantiq_gswip.c
-> @@ -1413,7 +1413,7 @@ static int gswip_port_fdb_dump(struct dsa_switch
-> *ds, int port,
->  {
->  	struct gswip_priv *priv = ds->priv;
->  	struct gswip_pce_table_entry mac_bridge = {0,};
-> -	unsigned char addr[6];
-> +	unsigned char addr[ETH_ALEN];
->  	int i;
->  	int err;
+Ghadi Elie Rahme <ghadi.rahme@canonical.com> writes:
+> Fix UBSAN warnings that occur when using a system with 32 physical
+> cpu cores or more, or when the user defines a number of Ethernet
+> queues greater than or equal to FP_SB_MAX_E1x using the num_queues
+> module parameter.
+>
+> The value of the maximum number of Ethernet queues should be limited
+> to FP_SB_MAX_E1x in case FCOE is disabled or to [FP_SB_MAX_E1x-1] if
+> enabled to avoid out of bounds reads and writes.
+>
+> Stack traces:
+>
+> UBSAN: array-index-out-of-bounds in
+>        drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c:1529:11
+> index 20 is out of range for type 'stats_query_entry [19]'
+> CPU: 12 PID: 858 Comm: systemd-network Not tainted 6.9.0-060900rc7-generic
+> 	     #202405052133
+> Hardware name: HP ProLiant DL360 Gen9/ProLiant DL360 Gen9,
+> 	       BIOS P89 10/21/2019
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0x76/0xa0
+>  dump_stack+0x10/0x20
+>  __ubsan_handle_out_of_bounds+0xcb/0x110
+>  bnx2x_prep_fw_stats_req+0x2e1/0x310 [bnx2x]
+>  bnx2x_stats_init+0x156/0x320 [bnx2x]
+>  bnx2x_post_irq_nic_init+0x81/0x1a0 [bnx2x]
+>  bnx2x_nic_load+0x8e8/0x19e0 [bnx2x]
+>  bnx2x_open+0x16b/0x290 [bnx2x]
+>  __dev_open+0x10e/0x1d0
+> RIP: 0033:0x736223927a0a
+> Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 41 89 ca
+>       64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f 05 <48> 3d 00
+>       f0 ff ff 77 7e c3 0f 1f 44 00 00 41 54 48 83 ec 30 44 89
+> RSP: 002b:00007ffc0bb2ada8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+> RAX: ffffffffffffffda RBX: 0000583df50f9c78 RCX: 0000736223927a0a
+> RDX: 0000000000000020 RSI: 0000583df50ee510 RDI: 0000000000000003
+> RBP: 0000583df50d4940 R08: 00007ffc0bb2adb0 R09: 0000000000000080
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000583df5103ae0
+> R13: 000000000000035a R14: 0000583df50f9c30 R15: 0000583ddddddf00
+> </TASK>
+> ---[ end trace ]---
+> ------------[ cut here ]------------
+> UBSAN: array-index-out-of-bounds in
+>        drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c:1546:11
+> index 28 is out of range for type 'stats_query_entry [19]'
+> CPU: 12 PID: 858 Comm: systemd-network Not tainted 6.9.0-060900rc7-generic
+> 	     #202405052133
+> Hardware name: HP ProLiant DL360 Gen9/ProLiant DL360 Gen9,
+> 	       BIOS P89 10/21/2019
+> Call Trace:
+> <TASK>
+> dump_stack_lvl+0x76/0xa0
+> dump_stack+0x10/0x20
+> __ubsan_handle_out_of_bounds+0xcb/0x110
+> bnx2x_prep_fw_stats_req+0x2fd/0x310 [bnx2x]
+> bnx2x_stats_init+0x156/0x320 [bnx2x]
+> bnx2x_post_irq_nic_init+0x81/0x1a0 [bnx2x]
+> bnx2x_nic_load+0x8e8/0x19e0 [bnx2x]
+> bnx2x_open+0x16b/0x290 [bnx2x]
+> __dev_open+0x10e/0x1d0
+ 
+I also hit this one on powerpc:
 
-Signed-off-by: Martin Schiller <ms@dev.tdt.de>
+  https://lore.kernel.org/all/87pltc4rs8.fsf@mail.lhotse/
+
+And confirm that this patch fixes it there too.
+
+cheers
 
