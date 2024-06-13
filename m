@@ -1,122 +1,123 @@
-Return-Path: <netdev+bounces-103279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF2379075CC
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:56:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8EE89075DF
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:59:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36CFB281FD7
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:55:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58363286A9C
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:59:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF97C13CA9A;
-	Thu, 13 Jun 2024 14:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F471482EA;
+	Thu, 13 Jun 2024 14:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dIj78LMH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yx0uP1gD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CF482C76
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 14:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30BC146A74
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 14:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718290556; cv=none; b=tfKUu6WYMsgRkeJxAeSoRMwaR0WHH69wHGNNTlIYeRzSAXWQGvCVwesvUimA0QUKBULzDbY8ZmEOdx+9TZYqoCwbBzqOr5TBcwLfdSMhKlPoHL9dtnIDVf6maI0yImbWsbGbwUbgFS6JukcbZ0JfMzLpvissHdTL+kCUDK+Xp2Q=
+	t=1718290763; cv=none; b=NbmT2rGKXgi7wF4c74RIGwtVJTAHue195g6cZ3TBH8tfN85Wkkq0tnUtUIAZV/mGmeOgayphL5SNcCzqlxszc8oPI4xqUKzaoEgJ0uMP4NLPNfjUCgtHr+iNRzlDF/EsiApkBysqZie4BsIDDK5+C50n+wR7XiqcOsX+yA55dv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718290556; c=relaxed/simple;
-	bh=I9eCKOXgkAwUuXOFl5nEg/hz71moPfgCgg6FblIWQZ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Cflb7OW3/QB2JTE1imuU9A/VlZCFi2P0Ztv0BTgQvUe/AC/kmQj2zXSN99hc45fwTti3Jra9Vy0vBhMODVorlPTxfUGwUAD+PIMG9/+gnrav0/2RkUz/AF73sMye7LRQR6cPw8JPqRLNffzuqQ9Ddb7EMXwo3/LRUUDyqq4oL50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dIj78LMH; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a6e43dad8ecso209417666b.1
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 07:55:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718290553; x=1718895353; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I9eCKOXgkAwUuXOFl5nEg/hz71moPfgCgg6FblIWQZ0=;
-        b=dIj78LMHHQAlgHUeHMuGX8k45QLgSpHmDedUD+Fdo3vkka1eN9GH6cBfLm7s2qPUXL
-         suR/53bNk/Pn+XT3sEYsSMK8OV4F1w0iLjSPO2aYV157SBeugxp+DUK0wGbyp/Tg1xN+
-         Pk6rz0/N3z4d5HHGmL3Hwevp6w0ToxfuHCFIv+Nx4Apu7SLWhc1r0XQEWn4lu2SpCf1N
-         PYtUfGHxeBLV8bYd3y8GXHgFdunf/L2xaKUsi5xKH+Zda9+PcH3c3IgNarLt2YLYKEFs
-         FLeLyom6YMIlWbMgjOvp/Ygh9gKMC1GFWH1hzuGhzjIQh7if4BS18KtM84KhH38raMkb
-         5Dhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718290553; x=1718895353;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I9eCKOXgkAwUuXOFl5nEg/hz71moPfgCgg6FblIWQZ0=;
-        b=CzLNccdZkN2WF/jTmbFkGmn63tcMvoLk/1CclkbP8yvxbJJvABbQo4S/HGMKkHOedA
-         LPcZ+d5HuWkwC18/TKmYM0e5IQ2BflueDuK6abfMLm3L26cBoVslhCDwe8TUFItcGAhM
-         /sefWU52uhj3TzQV2nyGmF3PNsEM51/GaMs9Gpw4ij6Gq6iJzfYBjk44/GwDUvTB5kmE
-         vpkdu9n4VW8h2kXypGOh4RofQLqy3KKatxAUKJNWIy1/i6Fp/AqqCChzsIteKKm+NUfc
-         vSkjCcT+TGAa5Mm5QTbV1Xr+dWTtn2sDb5jPo5xw1Sms0E+YF4M9hfp9zeeOr/eZk+zS
-         f/aA==
-X-Gm-Message-State: AOJu0Yw/FpKqoFk6XDKf7e6+3JeiJW6ENokcKK4RhEJbD0pfNruj6uQ0
-	v8rMQ6CifgFItFxE5f8vxRDwh5R2CaFEUn9utu0UVtFhpiHlh4I9wRRFnuNoAWV5PpkWnh6tdA/
-	sQyAe45FY9ZBHQaf9n+LF1Jhz3fs=
-X-Google-Smtp-Source: AGHT+IHU39xBmv4HOV7um4Ve41iC980h91Na4YJv90/BwgO94R8iI5wQVVQ0Ej/e4QumTdA5Mmof8rDrngCecSattkk=
-X-Received: by 2002:a17:906:7f0e:b0:a6f:55e3:ee5f with SMTP id
- a640c23a62f3a-a6f6082e3a2mr4911166b.9.1718290553234; Thu, 13 Jun 2024
- 07:55:53 -0700 (PDT)
+	s=arc-20240116; t=1718290763; c=relaxed/simple;
+	bh=qs2Dz7qjSbW4vccPeJYtnqhSYlxFt3bToMTXiSpftTo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FyjHNWXHVucIh6g6UsK111glMVQ0FRbEFbKyr8+QlfVZ+ZNwMqECUS+NTPM7HdPXuiGpEtUdVJNruHMQYXt5Cq+669BULNzcLHLA8K6J6F5Oh0Sj3fTwmNL8oFTU9411ivvnhN+VrFDtmvi1Ot0ry2Mcntbv68KyjqRn07c0Nas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yx0uP1gD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3950DC32786;
+	Thu, 13 Jun 2024 14:59:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718290763;
+	bh=qs2Dz7qjSbW4vccPeJYtnqhSYlxFt3bToMTXiSpftTo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Yx0uP1gDwb6Y4Yqm1HkVgJV+XZTCZVWS7uCG84X9HKSSFMaQS0J4AMPp7ad4IsapJ
+	 qoO2ZkEOOlPsaVmIC1cKnaUgFF7fYBU0BarcMUdruYJb5CjNP6XXrdNaTcRcTyEWaL
+	 fwfkZWdko+dap8fRG5X0yKRG1OVH0qBmgRZ8jm6KtKSEf/qLD5HTJnKJxxMjj3p8p/
+	 f62qc8Ytsl+pjDZcsx2aff8xXXFgvz9CkAMJvYh6S5F4S+VlwT1Q4p87ZA3D0bLRvq
+	 AKaiyNoQjeVox1FqtNFnZtVsBBvHFs1ljEmVEckDsfSZplYZioAnIaWArr+X/Mnz7p
+	 LYwcb7Uvh/Nlg==
+Date: Thu, 13 Jun 2024 07:59:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maciej =?UTF-8?B?xbtlbmN6eWtvd3NraQ==?= <maze@google.com>
+Cc: Linux NetDev <netdev@vger.kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
+ <davem@davemloft.net>
+Subject: Re: Some sort of netlink RTM_GET(ROUTE|RULE|NEIGH) regression(?) in
+ 6.10-rc3 vs 6.9
+Message-ID: <20240613075922.1052ce99@kernel.org>
+In-Reply-To: <CANP3RGcovrwKpuM-o=V2OYosdb6Xyy+tRM3Qrp3pF7RctEm6LQ@mail.gmail.com>
+References: <CANP3RGc1RG71oPEBXNx_WZFP9AyphJefdO4paczN92n__ds4ow@mail.gmail.com>
+	<20240613062927.54b15104@kernel.org>
+	<CANP3RGcovrwKpuM-o=V2OYosdb6Xyy+tRM3Qrp3pF7RctEm6LQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240613023549.15213-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20240613023549.15213-1-kerneljasonxing@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 13 Jun 2024 22:55:16 +0800
-Message-ID: <CAL+tcoAP=Jg3pXO-_46w5CbrGnGVzHf4woqg3bQNCrb8SMhnrw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] net: dqs: introduce IFF_NO_BQL private flag
- for non-BQL drivers
-To: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, dsahern@kernel.org, mst@redhat.com, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, leitao@debian.org
-Cc: netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 13, 2024 at 10:35=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> Since commit 74293ea1c4db6 ("net: sysfs: Do not create sysfs for non
-> BQL device") limits the non-BQL driver not creating byte_queue_limits
-> directory, I found there is one exception, namely, virtio-net driver,
-> which should also be limited in netdev_uses_bql(). Let me give it a
-> try first.
->
-> I decided to introduce a NO_BQL bit because:
-> 1) it can help us limit virtio-net driver for now.
-> 2) if we found another non-BQL driver, we can take it into account.
-> 3) we can replace all the driver meeting those two statements in
-> netdev_uses_bql() in future.
->
-> For now, I would like to make the first step to use this new bit for dqs
-> use instead of replacing/applying all the non-BQL drivers in one go.
->
-> As Jakub said, "netdev_uses_bql() is best effort", I think, we can add
-> new non-BQL drivers as soon as we find one.
->
-> After this patch, there is no byte_queue_limits directory in virtio-net
-> driver.
->
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+On Thu, 13 Jun 2024 16:21:15 +0200 Maciej =C5=BBenczykowski wrote:
+> Ok, I sent out 2 patches adding the flag in 3 more spots that are
+> enough to get both tests working.
 
-Hello Jakub,
+Thanks!
 
-I wonder why the status of this patch was changed to 'Changes
-Requested'? Is there anything else I should adjust?
+> The first in RTM_GETNEIGH seems obvious enough.
+>=20
+> $ git grep rtnl_register.*RTM_GETNEIGH,
+> net/core/neighbour.c:3894:      rtnl_register(PF_UNSPEC, RTM_GETNEIGH,
+> neigh_get, neigh_dump_info,
+> net/core/rtnetlink.c:6752:      rtnl_register(PF_BRIDGE, RTM_GETNEIGH,
+> rtnl_fdb_get, rtnl_fdb_dump, 0);
+> net/mctp/neigh.c:331:   rtnl_register_module(THIS_MODULE, PF_MCTP, RTM_GE=
+TNEIGH,
+>=20
+> but there is also PF_BRIDGE and PF_MCTP... (though obviously the test
+> doesn't care)
+> (and also RTM_GETNEIGHTBL...)
 
-Thanks,
-Jason
+These weren't converted to the new way, so they will be okay.
+
+> The RTM_GETRULE portion of the second one seems fine too:
+>=20
+> $ git grep rtnl_register.*RTM_GETRULE
+> net/core/fib_rules.c:1296:      rtnl_register(PF_UNSPEC, RTM_GETRULE,
+> NULL, fib_nl_dumprule,
+>=20
+> but I'm less certain about the GET_ROUTE portion there-of... as
+> there's a lot of hits:
+>=20
+> $ git grep rtnl_register.*RTM_GETROUTE
+> net/can/gw.c:1293:      ret =3D rtnl_register_module(THIS_MODULE,
+> PF_CAN, RTM_GETROUTE,
+> net/core/rtnetlink.c:6743:      rtnl_register(PF_UNSPEC, RTM_GETROUTE,
+> NULL, rtnl_dump_all, 0);
+> net/ipv4/fib_frontend.c:1662:   rtnl_register(PF_INET, RTM_GETROUTE,
+> NULL, inet_dump_fib,
+> net/ipv4/ipmr.c:3162:   rtnl_register(RTNL_FAMILY_IPMR, RTM_GETROUTE,
+> net/ipv4/route.c:3696:  rtnl_register(PF_INET, RTM_GETROUTE,
+> inet_rtm_getroute, NULL,
+> net/ipv6/ip6_fib.c:2516:        ret =3D
+> rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETROUTE, NULL,
+> net/ipv6/ip6mr.c:1394:  err =3D rtnl_register_module(THIS_MODULE,
+> RTNL_FAMILY_IP6MR, RTM_GETROUTE,
+> net/ipv6/route.c:6737:  ret =3D rtnl_register_module(THIS_MODULE,
+> PF_INET6, RTM_GETROUTE,
+> net/mctp/route.c:1481:  rtnl_register_module(THIS_MODULE, PF_MCTP, RTM_GE=
+TROUTE,
+> net/mpls/af_mpls.c:2755:        rtnl_register_module(THIS_MODULE,
+> PF_MPLS, RTM_GETROUTE,
+> net/phonet/pn_netlink.c:304:    rtnl_register_module(THIS_MODULE,
+> PF_PHONET, RTM_GETROUTE,
+>=20
+> It seems like maybe v4 and both mr's should be changed too?
+
+Didn't check MR, the v4 route dump has the flag already, AFAICS.
 
