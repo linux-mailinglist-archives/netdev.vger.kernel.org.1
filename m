@@ -1,218 +1,187 @@
-Return-Path: <netdev+bounces-103146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E576990683D
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:12:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B373B906892
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:26:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 645981F23780
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:12:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 080BDB20E6C
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:26:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD0F613DBBD;
-	Thu, 13 Jun 2024 09:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C2913A3E3;
+	Thu, 13 Jun 2024 09:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NHKfTcce"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45E113D8A4
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 09:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E1513D891
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 09:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718269951; cv=none; b=RPiB0aahJ3w2wWnwgcOa54oB/BjYgrRL2dKimeYjc/2qKE1m06P0l+T72zfTnUcUQjzkBxlEgyXeZDuwcSU/rY5vkYX7D7yApVdORPAqMoPEg1pCgjqnw6zsVqax+yV7V2XYO7QydlHPwB420oNCM3PqfwRJVEIvjcACkr3kx8k=
+	t=1718270807; cv=none; b=l+zH1M5j5N1WG9cSW5mVkiE9Vz/g34KjG6wDGiGqT6b7XwYXT88BwRpv4eP8qdVaq0VIy92z+FzRXsj7m8TVKcUDI1jY3ypzgT2NVOMqxve7VsgdQ7KlT9bJkEi3NDuZW2qpbgqZtQ4NirJ0lNBDk9JyQhU0INiRlZQhAUkVcfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718269951; c=relaxed/simple;
-	bh=v3xP34y2Kqz9tAvkUGjtqaPysCSq513+rEw0ux33bZU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=DgWIi3JLsJ6F2LIVVV4YUCiCJx4wr+iDpHbHArzbxq2pmYvFjJSyB6urxwTT3c4EHoNnomVP6yB8YqOF/c3Zfl/OQ5IfWZhcva7U2MNqP9oF+bHgtkUAtE7Gs5NwKodvG3JWlzdfzcW2PCN4W1PcpdxgpQRoTv2QanQ6BSWUB+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-37596e877e9so8499185ab.3
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 02:12:29 -0700 (PDT)
+	s=arc-20240116; t=1718270807; c=relaxed/simple;
+	bh=fKfbpLG4kj1MC1G2aw+4ubK5fDus1DJOJbdJrkS81J0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s7jjLxVRRCvCB24lP2mJYIDMvyL1r0dhDsSKwynweb2rIJwRraHQCj0M32YrlJvnLiY2ISYHvg+3cjM3TtG8q0RYtrvUQ6bNmkmZMTU68z1xVTQ2tufbgD/eSFqEFCYM4vZJWnN8F5ZqjPIHYWswQk3uMKHNb28+gfLBnRtgFXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NHKfTcce; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2eabd22d441so10982471fa.2
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 02:26:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718270804; x=1718875604; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fKfbpLG4kj1MC1G2aw+4ubK5fDus1DJOJbdJrkS81J0=;
+        b=NHKfTcceMchDn9JwbTTtYvJkr1N0sYhVtFskmss0MfckkQ7akRp1gRW8/2AWmFmwt1
+         dJLRtjGMGsgo6IkwSnvSCNgwqg0Z+NXus1lE195HvyD3oX4L8Ch2+M3r6VWw3TsNMtrd
+         f8Un0gOR+zEOBklDtnsI9eBIhznFg29JoZ0xqTvAR1qs4wllG/vjGyYOSbsVMVWgpSoL
+         4ocQdUnWmErcW7K+6gJtQNj6R+dBNh4MvIgQdXYOWClrsRfYWI3EUykhYRj4323NwIjX
+         1khpT9H6QTpMIpjjLU/lV7Je5sjBqEaU1FkHhKUAOP+g2dsDn/AOCLEjJrdGeXACv767
+         ebHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718269949; x=1718874749;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nLMUrKsMG2Xf4e/PTbl5dpOWAgPgPt620Z5seuQUYCY=;
-        b=wVC8tWSyFvPDNRnxKeKn/x2E+okN3JCkJF/Lmal5tI6C1Dx5XGQ/OVlKydExKw8R3Q
-         i7lKa+1v57e45DH1FCE0TLU8yPvO/Wg4cv+Y5p/zAtZkQAeLwKBmXe5UERGwY8XsGGr4
-         cWV0mqUVw89QfX10QD7fjvlynNzYenDQ9hjpW2gcKE4faKkIHy3sjbU1PHNAfZjh6O1D
-         vHqmV7QUXjLmuHc2DybdbeCMXS8dT0OTmPvv21QvaQM/urgrXQkDE2CI/I5+TtrG10C3
-         P5g31cMH1WiN5YMgAkbg0e+AFwe/AZZ4WZKUzTAdGixsOqmj6hgcZcpGYoqACOsyfZZG
-         KdxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXqeoNICz4SoZqbA3FDDTP4epjioBwOiv3s9ckTAi1r5XCTEvqld8GDtbt1gJzLy7GbZi1K+eSuQUeSOu7ZCfWKMxcQ1Kpg
-X-Gm-Message-State: AOJu0YwytRHGv8PwCrrklHNZOZYpz1lV87ferbogpkMy4CcNeA3tSziX
-	JA2tVubdHiw128qFakNdrAHZ2F9LBLf36BUqyvlReFPRKmj1yHwyb83Ql/nOhVw745NqODcfZ+h
-	mPXNTNT29C8cb6iU+pHGLDzhYArk/AGFwKs/kG+yfJFxx9EdLz9ZuYYQ=
-X-Google-Smtp-Source: AGHT+IEaTJHT00Vr7hkv4iPBqju355oH0gjr0pKcus/2z4NhB+o4fK56Kcuy5h+dtz1VI5HvFWdVZZpl5EJ8LUsfF/UEXX8H3RKK
+        d=1e100.net; s=20230601; t=1718270804; x=1718875604;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fKfbpLG4kj1MC1G2aw+4ubK5fDus1DJOJbdJrkS81J0=;
+        b=l8Cm6OdHinxbLwAoCcL9zrB8kygDBE6GSpaKWA4roISGL96IMCJZZ4+0XyxQp7dlVK
+         GKVBQPAjEbX4vtj4Td31SgJ4Vit7Z69vy/1B91aDhQSlj+mR8hjvPrQ1rc+5mMmBpUYn
+         r6/OuiE2ZP4Rrnw0kLQF8BLtxtyTg2/3KFjXqIF4ZVlm06qz2bTEZ8NlvkQQHkSHNX+t
+         HO9/V/7Ych2ZBhnSW95i87bamyCLvwovwGBmPtVhBghxkFvqdQ+GntiDhmZFqQlXgdH7
+         aXocrEwee1gAdmWObai+BZ6OZUmripwWWbB/pAa3NrwIgplBPVt9VuXiQfr+dmOLrj7q
+         nxrg==
+X-Forwarded-Encrypted: i=1; AJvYcCXFNk8Rii4PwxYKilcweOgjPvdOa4bwK3vpPmI75U8gJKJcZG8mFVPff+5Cdw/rk7KSj4eTDG2pTc3UtVeMBQ2GWYNSiSD8
+X-Gm-Message-State: AOJu0Ywp1ja9JFp7GUxbyQait7pgqs6GA4kTj8WqWNvxsxsL7R7uoRR7
+	m4eRMazXZPA2lIhy2k+GplrQX9AaaycfBmOBr3gPz40cpFzIObFnffTEWFMT/1eNcsJPClwph2F
+	pflJ22B4fxbhuecxWBqhl1R8kMuw=
+X-Google-Smtp-Source: AGHT+IGaxvv+6TgfdhKbWU6inD4esTITqvOe50XISM/rjyDrvEMvjeQEKSnkPxlZHSqWofobtbL9AwVz+B//7vV8p+c=
+X-Received: by 2002:a05:6512:3f5:b0:52c:83c7:936a with SMTP id
+ 2adb3069b0e04-52c9a403749mr2717239e87.42.1718270803474; Thu, 13 Jun 2024
+ 02:26:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1feb:b0:374:70ae:e86e with SMTP id
- e9e14a558f8ab-375cd24a4f3mr2695675ab.6.1718269949074; Thu, 13 Jun 2024
- 02:12:29 -0700 (PDT)
-Date: Thu, 13 Jun 2024 02:12:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f17182061ac1e554@google.com>
-Subject: [syzbot] [ppp?] INFO: task hung in ppp_exit_net (4)
-From: syzbot <syzbot+32bd764abd98eb40dea8@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <20240613023549.15213-1-kerneljasonxing@gmail.com>
+ <ZmqFzpQOaQfp7Wjr@nanopsycho.orion> <CAL+tcoAir0u0HTYQCMgVNTkb8RpAMzD1eH-EevL576kt5u7DPw@mail.gmail.com>
+ <Zmqdb-sBBitXIrFo@nanopsycho.orion> <CAL+tcoDCjm86wCHiVXDXMw1fs6ga9hp3x91u+Dy0CGBB=eEp2w@mail.gmail.com>
+ <Zmqk5ODEKYcQerWS@nanopsycho.orion> <20240613035148-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240613035148-mutt-send-email-mst@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 13 Jun 2024 17:26:05 +0800
+Message-ID: <CAL+tcoDZ_8e9SDRdbQSDz=TCRGQ3w0toSZ0U8poUKpQcAHhN7A@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] net: dqs: introduce IFF_NO_BQL private flag
+ for non-BQL drivers
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, davem@davemloft.net, dsahern@kernel.org, 
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
+	leitao@debian.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Thu, Jun 13, 2024 at 3:56=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Thu, Jun 13, 2024 at 09:51:00AM +0200, Jiri Pirko wrote:
+> > Thu, Jun 13, 2024 at 09:24:27AM CEST, kerneljasonxing@gmail.com wrote:
+> > >On Thu, Jun 13, 2024 at 3:19=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> =
+wrote:
+> > >>
+> > >> Thu, Jun 13, 2024 at 08:08:36AM CEST, kerneljasonxing@gmail.com wrot=
+e:
+> > >> >On Thu, Jun 13, 2024 at 1:38=E2=80=AFPM Jiri Pirko <jiri@resnulli.u=
+s> wrote:
+> > >> >>
+> > >> >> Thu, Jun 13, 2024 at 04:35:49AM CEST, kerneljasonxing@gmail.com w=
+rote:
+> > >> >> >From: Jason Xing <kernelxing@tencent.com>
+> > >> >> >
+> > >> >> >Since commit 74293ea1c4db6 ("net: sysfs: Do not create sysfs for=
+ non
+> > >> >> >BQL device") limits the non-BQL driver not creating byte_queue_l=
+imits
+> > >> >> >directory, I found there is one exception, namely, virtio-net dr=
+iver,
+> > >> >> >which should also be limited in netdev_uses_bql(). Let me give i=
+t a
+> > >> >> >try first.
+> > >> >> >
+> > >> >> >I decided to introduce a NO_BQL bit because:
+> > >> >> >1) it can help us limit virtio-net driver for now.
+> > >> >> >2) if we found another non-BQL driver, we can take it into accou=
+nt.
+> > >> >> >3) we can replace all the driver meeting those two statements in
+> > >> >> >netdev_uses_bql() in future.
+> > >> >> >
+> > >> >> >For now, I would like to make the first step to use this new bit=
+ for dqs
+> > >> >> >use instead of replacing/applying all the non-BQL drivers in one=
+ go.
+> > >> >> >
+> > >> >> >As Jakub said, "netdev_uses_bql() is best effort", I think, we c=
+an add
+> > >> >> >new non-BQL drivers as soon as we find one.
+> > >> >> >
+> > >> >> >After this patch, there is no byte_queue_limits directory in vir=
+tio-net
+> > >> >> >driver.
+> > >> >>
+> > >> >> Please note following patch is currently trying to push bql suppo=
+rt for
+> > >> >> virtio_net:
+> > >> >> https://lore.kernel.org/netdev/20240612170851.1004604-1-jiri@resn=
+ulli.us/
+> > >> >
+> > >> >I saw this one this morning and I'm reviewing/testing it.
+> > >> >
+> > >> >>
+> > >> >> When that is merged, this patch is not needed. Could we wait?
+> > >> >
+> > >> >Please note this patch is not only written for virtio_net driver.
+> > >> >Virtio_net driver is one of possible cases.
+> > >>
+> > >> Yeah, but without virtio_net, there will be no users. What's the poi=
+nt
+> > >> of having that in code? I mean, in general, no-user kernel code gets
+> > >> removed.
+> > >
+> > >Are you sure netdev_uses_bql() can limit all the non-bql drivers with
+> > >those two checks? I haven't investigated this part.
+> >
+> > Nope. What I say is, if there are other users, let's find them and let
+> > them use what you are introducing here. Otherwise don't add unused code=
+.
+>
+>
+> Additionally, it looks like virtio is going to become a
+> "sometimes BQL sometimes no-BQL" driver, so what's the plan -
+> to set/clear the flag accordingly then? What kind of locking
+> will be needed?
 
-syzbot found the following issue on:
+Could we consider the default mode is BQL, so we can remove that new
+IFF_NO_BQL flag? If it's hard to take care of these two situations, I
+think we could follow this suggestion from Jakub: "netdev_uses_bql()
+is best effort". What do you think?
 
-HEAD commit:    2ef5971ff345 Merge tag 'vfs-6.10-rc4.fixes' of git://git.k..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13e22cee980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b8786f381e62940f
-dashboard link: https://syzkaller.appspot.com/bug?extid=32bd764abd98eb40dea8
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/db17be0247f3/disk-2ef5971f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/af92d227f130/vmlinux-2ef5971f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f98ae987ba14/bzImage-2ef5971f.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+32bd764abd98eb40dea8@syzkaller.appspotmail.com
-
-INFO: task kworker/u8:4:61 blocked for more than 143 seconds.
-      Not tainted 6.10.0-rc3-syzkaller-00021-g2ef5971ff345 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u8:4    state:D stack:22928 pid:61    tgid:61    ppid:2      flags:0x00004000
-Workqueue: netns cleanup_net
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0xf15/0x5d00 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0xe7/0x350 kernel/sched/core.c:6837
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x5b8/0x9c0 kernel/locking/mutex.c:752
- ppp_exit_net+0xae/0x3b0 drivers/net/ppp/ppp_generic.c:1131
- ops_exit_list+0xb0/0x180 net/core/net_namespace.c:173
- cleanup_net+0x5b7/0xbf0 net/core/net_namespace.c:640
- process_one_work+0x9fb/0x1b60 kernel/workqueue.c:3231
- process_scheduled_works kernel/workqueue.c:3312 [inline]
- worker_thread+0x6c8/0xf70 kernel/workqueue.c:3393
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-INFO: task syz-executor.2:8975 blocked for more than 143 seconds.
-      Not tainted 6.10.0-rc3-syzkaller-00021-g2ef5971ff345 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.2  state:D stack:26656 pid:8975  tgid:8973  ppid:5107   flags:0x00000006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0xf15/0x5d00 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0xe7/0x350 kernel/sched/core.c:6837
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x5b8/0x9c0 kernel/locking/mutex.c:752
- rtnl_lock net/core/rtnetlink.c:79 [inline]
- rtnetlink_rcv_msg+0x372/0xea0 net/core/rtnetlink.c:6632
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2564
- netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
- netlink_unicast+0x542/0x820 net/netlink/af_netlink.c:1361
- netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1905
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0xab5/0xc90 net/socket.c:2585
- ___sys_sendmsg+0x135/0x1e0 net/socket.c:2639
- __sys_sendmsg+0x117/0x1f0 net/socket.c:2668
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fcb2b07cea9
-RSP: 002b:00007fcb2bead0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fcb2b1b3f80 RCX: 00007fcb2b07cea9
-RDX: 0000000000000000 RSI: 0000000020000040 RDI: 0000000000000003
-RBP: 00007fcb2b0ebff4 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007fcb2b1b3f80 R15: 00007ffcd9ec90f8
- </TASK>
-INFO: task syz-executor.4:9029 blocked for more than 144 seconds.
-      Not tainted 6.10.0-rc3-syzkaller-00021-g2ef5971ff345 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.4  state:D stack:25968 pid:9029  tgid:9022  ppid:5111   flags:0x00004006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0xf15/0x5d00 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0xe7/0x350 kernel/sched/core.c:6837
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x5b8/0x9c0 kernel/locking/mutex.c:752
- register_nexthop_notifier+0x1b/0x70 net/ipv4/nexthop.c:3871
- ops_init+0xb9/0x650 net/core/net_namespace.c:139
- setup_net+0x435/0xb40 net/core/net_namespace.c:343
- copy_net_ns+0x2f0/0x670 net/core/net_namespace.c:508
- create_new_namespaces+0x3ea/0xb10 kernel/nsproxy.c:110
- unshare_nsproxy_namespaces+0xc0/0x1f0 kernel/nsproxy.c:228
- ksys_unshare+0x419/0x970 kernel/fork.c:3323
- __do_sys_unshare kernel/fork.c:3394 [inline]
- __se_sys_unshare kernel/fork.c:3392 [inline]
- __x64_sys_unshare+0x31/0x40 kernel/fork.c:3392
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f9f8ae7cea9
-RSP: 002b:00007f9f8bb220c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000110
-RAX: ffffffffffffffda RBX: 00007f9f8afb4120 RCX: 00007f9f8ae7cea9
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000064000600
-RBP: 00007f9f8aeebff4 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000006e R14: 00007f9f8afb4120 R15: 00007ffd19e177f8
- </TASK>
-INFO: task syz-executor.0:9026 blocked for more than 144 seconds.
-      Not tainted 6.10.0-rc3-syzkaller-00021-g2ef5971ff345 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.0  state:D stack:27968 pid:9026  tgid:9023  ppid:6840   flags:0x00004006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0xf15/0x5d00 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0xe7/0x350 kernel/sched/core.c:6837
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x5b8/0x9c0 kernel/locking/mutex.c:752
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+>
+> > >
+> > >>
+> > >>
+> > >> >
+> > >> >After your patch gets merged (I think it will take some time), you
+> > >> >could simply remove that one line in virtio_net.c.
+> > >> >
+> > >> >Thanks.
+>
 
