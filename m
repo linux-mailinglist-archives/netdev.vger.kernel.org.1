@@ -1,461 +1,117 @@
-Return-Path: <netdev+bounces-103081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 109159062C9
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 05:39:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8596F9062CC
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 05:40:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26E591C20DB6
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 03:39:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E9421F22AF5
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 03:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2881304AA;
-	Thu, 13 Jun 2024 03:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 718C7132122;
+	Thu, 13 Jun 2024 03:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="WUM/po79"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD54A2F34;
-	Thu, 13 Jun 2024 03:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07AD41304AA
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 03:39:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718249993; cv=none; b=i1agiZEECWvi2pmURhIsXuRfMR+whVK0OZSRWE1GmQa/GJCRv+x/4MRq1GHTLwO/J2g2nC4mCfs/b8PHH84HzpfF6k3CAvB4E0BhMDUEzZnH/59V1JiWrks8j27WyG0eP8YrEftN02dSo0U+W77lzkLUwNayB2Ljv4LhiJCqD8w=
+	t=1718250002; cv=none; b=XoTK54FiNI2Nue2jBVOHCVpPdET9vvAD3PuPKSjE/BtZx/TczZPsjYNN6UfWcvJNo69fcB+vLOOvLch8Eqp9hkIbCqvH6sGtHatW4pHhc48j1UzHcgJH7fuMyDKFT0eL2/4EudmycOwmEIhj7rkV7FXxO8h8XJKXiTkIesjivVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718249993; c=relaxed/simple;
-	bh=5Voj0mBCq7kgTtakiCk/W7ZjYOhLIpMGyT3bmr0hoNw=;
+	s=arc-20240116; t=1718250002; c=relaxed/simple;
+	bh=LJ5kXAtYL8gEItPISbn48ORF+1W3QeRjbyPGLJisFm4=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=OO//ldTXuK7YCMjFpaIQIuujn703Uc7Gz8zBf4dJuWM4s1l4818Qwh5hiMnlSdeuOQTrWKIyaRTVCz4BKZi9s9oOCn99nf7IdUHkLsD8+4pEYyftIkN/fYRUlfHYFsJeFQbn30DPh6FubFEe3AX5hHCh8g8XCWL9O5Q/SGh5pg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 45D3cnPiB2055487, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 45D3cnPiB2055487
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 13 Jun 2024 11:38:49 +0800
-Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 13 Jun 2024 11:38:45 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 13 Jun 2024 11:38:45 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
- RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
- 15.01.2507.035; Thu, 13 Jun 2024 11:38:45 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Hariprasad Kelam <hkelam@marvell.com>, "kuba@kernel.org" <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "andrew@lunn.ch"
-	<andrew@lunn.ch>,
-        "jiri@resnulli.us" <jiri@resnulli.us>,
-        "horms@kernel.org"
-	<horms@kernel.org>,
-        Ratheesh Kannoth <rkannoth@marvell.com>,
-        Ping-Ke Shih
-	<pkshih@realtek.com>,
-        Larry Chiu <larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v20 06/13] rtase: Implement .ndo_start_xmit function
-Thread-Topic: [PATCH net-next v20 06/13] rtase: Implement .ndo_start_xmit
- function
-Thread-Index: AQHauLdmYuDGRjyaP0maBwRhxExTNLG7e7UAgAgWH6D//99wAIABo12Q
-Date: Thu, 13 Jun 2024 03:38:45 +0000
-Message-ID: <3b25f342510b42d1beac0d602fc5abd7@realtek.com>
-References: <20240607084321.7254-1-justinlai0215@realtek.com>
- <20240607084321.7254-7-justinlai0215@realtek.com>
- <PH0PR18MB44745E2CFEA3CC1D9ADC5AC0DEFB2@PH0PR18MB4474.namprd18.prod.outlook.com>
- <89c92725271a4fa28dbf1e37f3fd5e99@realtek.com>
- <PH0PR18MB4474CB7ED482769F166FC50FDEC02@PH0PR18MB4474.namprd18.prod.outlook.com>
-In-Reply-To: <PH0PR18MB4474CB7ED482769F166FC50FDEC02@PH0PR18MB4474.namprd18.prod.outlook.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	 Content-Type:MIME-Version; b=V0bwFNWIho6FB5FTHWcSQdnEaAT3QFPkC4rQiLH62lPBAmZaFUvstedD8m4g4g+QlG90oMPc8lWbrT7ZMwGrJn9gPJUB8XQRjjhXcBIglr0W+qJA0WO060RycyF27QtLTeW+Su3kSD1ctQ/LUpjPxJTaV8bAhOthx5XW4MxNptI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=WUM/po79; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 80E212C04C9;
+	Thu, 13 Jun 2024 15:39:56 +1200 (NZST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1718249996;
+	bh=LJ5kXAtYL8gEItPISbn48ORF+1W3QeRjbyPGLJisFm4=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=WUM/po796Jg9SzaMxI6QEMDqv9VvHHqwlEICN1jKrdKgop3LK3YePBZdb2leuc/D8
+	 LcwVvqhuTLRPQN0OxAYBv36h8OpOHx9ZMKG92FvW6/dqa8CGzIRcdmpnd+KRVVw+92
+	 mdEUlAm0sg6HJeJ87edG5YAATQJNxKeLHmyyUM2/waA5Lo833JP0EIozgqilS6g1Fs
+	 Tcx6pKdQ/LD7w4SgDYFvc2j5sXnEtv7KfSaXkXcyugl17147BfJIhkB1gCq5f3bOKw
+	 0M5lIBAEB9afhrG7PjkRMhqj1DPOkpRAe3IL635yES51MN5T4MJfnTYkP7CirVoyq9
+	 VkmCf2mwTIfGg==
+Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B666a6a0c0001>; Thu, 13 Jun 2024 15:39:56 +1200
+Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) by
+ svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 13 Jun 2024 15:39:56 +1200
+Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
+ svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
+ 15.02.1544.011; Thu, 13 Jun 2024 15:39:56 +1200
+From: Aryan Srivastava <Aryan.Srivastava@alliedtelesis.co.nz>
+To: "kees@kernel.org" <kees@kernel.org>
+CC: "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "davem@davemloft.net"
+	<davem@davemloft.net>, "mw@semihalf.com" <mw@semihalf.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>
+Subject: Re: [PATCH v1] net: mvpp2: use slab_build_skb for oversized frames
+Thread-Topic: [PATCH v1] net: mvpp2: use slab_build_skb for oversized frames
+Thread-Index: AQHavTxCpfA370i+oU29gaqwaSvBMbHEOXoAgAACO4CAAAXggIAAAX6A
+Date: Thu, 13 Jun 2024 03:39:55 +0000
+Message-ID: <f0ec06fe746c612a5c7c72159e89e51ed0af1953.camel@alliedtelesis.co.nz>
+References: <20240611193318.5ed8003a@kernel.org>
+	 <20240613024900.3842238-1-aryan.srivastava@alliedtelesis.co.nz>
+	 <202406122003.E02C37ADD1@keescook>
+	 <6c2592c517878a69d37e1957d9624d83dbc982ab.camel@alliedtelesis.co.nz>
+	 <202406122033.69D9ABFC24@keescook>
+In-Reply-To: <202406122033.69D9ABFC24@keescook>
+Accept-Language: en-US, en-NZ
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <ACC666166DC08C4AB49BCB249DE070C3@atlnz.lc>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=CvQccW4D c=1 sm=1 tr=0 ts=666a6a0c a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=w1vUsAckAk8A:10 a=IkcTkHD0fZMA:10 a=T1WGqf2p2xoA:10 a=VwQbUJbxAAAA:8 a=Ens2HzU3bXgJHz7i4kkA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=AjGcO6oz07-iQ99wixmX:22
+X-SEG-SpamProfiler-Score: 0
 
-> > > > Implement .ndo_start_xmit function to fill the information of the
-> > > > packet to be transmitted into the tx descriptor, and then the
-> > > > hardware will transmit the packet using the information in the tx
-> > descriptor.
-> > > > In addition, we also implemented the tx_handler function to enable
-> > > > the tx descriptor to be reused.
-> > > >
-> > > > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
-> > > > ---
-> > > >  .../net/ethernet/realtek/rtase/rtase_main.c   | 285
-> ++++++++++++++++++
-> > > >  1 file changed, 285 insertions(+)
-> > > >
-> > > > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > > > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > > > index 23406c195cff..6bdb4edbfbc1 100644
-> > > > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > > > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > > > @@ -256,6 +256,68 @@ static void rtase_mark_to_asic(union
-> > > > rtase_rx_desc *desc, u32 rx_buf_sz)
-> > > >                  cpu_to_le32(RTASE_DESC_OWN | eor | rx_buf_sz));
-> > > > }
-> > > >
-> > > > +static u32 rtase_tx_avail(struct rtase_ring *ring) {
-> > > > +     return READ_ONCE(ring->dirty_idx) + RTASE_NUM_DESC -
-> > > > +            READ_ONCE(ring->cur_idx); }
-> > > > +
-> > > > +static int tx_handler(struct rtase_ring *ring, int budget) {
-> > > > +     const struct rtase_private *tp =3D ring->ivec->tp;
-> > > > +     struct net_device *dev =3D tp->dev;
-> > > > +     u32 dirty_tx, tx_left;
-> > > > +     u32 bytes_compl =3D 0;
-> > > > +     u32 pkts_compl =3D 0;
-> > > > +     int workdone =3D 0;
-> > > > +
-> > > > +     dirty_tx =3D ring->dirty_idx;
-> > > > +     tx_left =3D READ_ONCE(ring->cur_idx) - dirty_tx;
-> > > > +
-> > > > +     while (tx_left > 0) {
-> > > > +             u32 entry =3D dirty_tx % RTASE_NUM_DESC;
-> > > > +             struct rtase_tx_desc *desc =3D ring->desc +
-> > > > +                                    sizeof(struct rtase_tx_desc)
-> > > > + *
-> > > entry;
-> > > > +             u32 status;
-> > > > +
-> > > > +             status =3D le32_to_cpu(desc->opts1);
-> > > > +
-> > > > +             if (status & RTASE_DESC_OWN)
-> > > > +                     break;
-> > > > +
-> > > > +             rtase_unmap_tx_skb(tp->pdev, ring->mis.len[entry],
-> desc);
-> > > > +             ring->mis.len[entry] =3D 0;
-> > > > +             if (ring->skbuff[entry]) {
-> > > > +                     pkts_compl++;
-> > > > +                     bytes_compl +=3D ring->skbuff[entry]->len;
-> > > > +                     napi_consume_skb(ring->skbuff[entry],
-> budget);
-> > > > +                     ring->skbuff[entry] =3D NULL;
-> > > > +             }
-> > > > +
-> > > > +             dirty_tx++;
-> > > > +             tx_left--;
-> > > > +             workdone++;
-> > > > +
-> > > > +             if (workdone =3D=3D RTASE_TX_BUDGET_DEFAULT)
-> > > > +                     break;
-> > > > +     }
-> > > > +
-> > > > +     if (ring->dirty_idx !=3D dirty_tx) {
-> > > > +             dev_sw_netstats_tx_add(dev, pkts_compl,
-> bytes_compl);
-> > > > +             WRITE_ONCE(ring->dirty_idx, dirty_tx);
-> > > > +
-> > > > +             netif_subqueue_completed_wake(dev, ring->index,
-> > > > pkts_compl,
-> > > > +                                           bytes_compl,
-> > > > +
-> rtase_tx_avail(ring),
-> > > > +
-> > > RTASE_TX_START_THRS);
-> > > > +
-> > > > +             if (ring->cur_idx !=3D dirty_tx)
-> > > > +                     rtase_w8(tp, RTASE_TPPOLL,
-> BIT(ring->index));
-> > > > +     }
-> > > > +
-> > > > +     return 0;
-> > > > +}
-> > > > +
-> > > >  static void rtase_tx_desc_init(struct rtase_private *tp, u16 idx) =
- {
-> > > >       struct rtase_ring *ring =3D &tp->tx_ring[idx]; @@ -1014,6
-> > > > +1076,228 @@ static int rtase_close(struct net_device *dev)
-> > > >       return 0;
-> > > >  }
-> > > >
-> > > > +static u32 rtase_tx_vlan_tag(const struct rtase_private *tp,
-> > > > +                          const struct sk_buff *skb) {
-> > > > +     return (skb_vlan_tag_present(skb)) ?
-> > > > +             (RTASE_TX_VLAN_TAG |
-> swab16(skb_vlan_tag_get(skb))) :
-> > > > 0x00; }
-> > > > +
-> > >                Vlan protocol can be either 0x8100 or 0x88A8, how
-> > > does hardware know which header to insert?
-> > > Thanks,
-> > > Hariprasad k
-> >
-> > We only allow the hardware to add 0x8100, the VLAN must at least have
-> > 0x8100 to potentially have 0x88a8, skb_vlan_tag_present indicates that
-> > VLAN exists, hence at least the 0x8100 VLAN would exist.
-> > >
-> Thanks for the explanation, but one question which bothers me is that "ho=
-w
-> hardware knows offset with in the packet"
->=20
-> For example
-> Case 1:       DMAC  + SMAC + 8100 VLAN_ID + IP
->                Here offset is right after the SMAC.
-> Case 2:      DMAC + SMAC + 88A8 VLAN_ID + 8100 VLAN_ID + IP
->                Here offset is right after first vlan tag.
->=20
-> Thanks,
-> Hariprasad k
-
-This driver only enables NETIF_F_HW_VLAN_CTAG_TX, and we only support case =
-1.
-
->=20
-> > > > +static u32 rtase_tx_csum(struct sk_buff *skb, const struct
-> > > > +net_device
-> > > > +*dev) {
-> > > > +     u32 csum_cmd =3D 0;
-> > > > +     u8 ip_protocol;
-> > > > +
-> > > > +     switch (vlan_get_protocol(skb)) {
-> > > > +     case htons(ETH_P_IP):
-> > > > +             csum_cmd =3D RTASE_TX_IPCS_C;
-> > > > +             ip_protocol =3D ip_hdr(skb)->protocol;
-> > > > +             break;
-> > > > +
-> > > > +     case htons(ETH_P_IPV6):
-> > > > +             csum_cmd =3D RTASE_TX_IPV6F_C;
-> > > > +             ip_protocol =3D ipv6_hdr(skb)->nexthdr;
-> > > > +             break;
-> > > > +
-> > > > +     default:
-> > > > +             ip_protocol =3D IPPROTO_RAW;
-> > > > +             break;
-> > > > +     }
-> > > > +
-> > > > +     if (ip_protocol =3D=3D IPPROTO_TCP)
-> > > > +             csum_cmd |=3D RTASE_TX_TCPCS_C;
-> > > > +     else if (ip_protocol =3D=3D IPPROTO_UDP)
-> > > > +             csum_cmd |=3D RTASE_TX_UDPCS_C;
-> > > > +
-> > > > +     csum_cmd |=3D u32_encode_bits(skb_transport_offset(skb),
-> > > > +                                 RTASE_TCPHO_MASK);
-> > > > +
-> > > > +     return csum_cmd;
-> > > > +}
-> > > > +
-> > > > +static int rtase_xmit_frags(struct rtase_ring *ring, struct sk_buf=
-f *skb,
-> > > > +                         u32 opts1, u32 opts2) {
-> > > > +     const struct skb_shared_info *info =3D skb_shinfo(skb);
-> > > > +     const struct rtase_private *tp =3D ring->ivec->tp;
-> > > > +     const u8 nr_frags =3D info->nr_frags;
-> > > > +     struct rtase_tx_desc *txd =3D NULL;
-> > > > +     u32 cur_frag, entry;
-> > > > +
-> > > > +     entry =3D ring->cur_idx;
-> > > > +     for (cur_frag =3D 0; cur_frag < nr_frags; cur_frag++) {
-> > > > +             const skb_frag_t *frag =3D &info->frags[cur_frag];
-> > > > +             dma_addr_t mapping;
-> > > > +             u32 status, len;
-> > > > +             void *addr;
-> > > > +
-> > > > +             entry =3D (entry + 1) % RTASE_NUM_DESC;
-> > > > +
-> > > > +             txd =3D ring->desc + sizeof(struct rtase_tx_desc) * e=
-ntry;
-> > > > +             len =3D skb_frag_size(frag);
-> > > > +             addr =3D skb_frag_address(frag);
-> > > > +             mapping =3D dma_map_single(&tp->pdev->dev, addr, len,
-> > > > +                                      DMA_TO_DEVICE);
-> > > > +
-> > > > +             if (unlikely(dma_mapping_error(&tp->pdev->dev,
-> > > > + mapping)))
-> > > > {
-> > > > +                     if (unlikely(net_ratelimit()))
-> > > > +                             netdev_err(tp->dev,
-> > > > +                                        "Failed to map TX
-> > > fragments
-> > > > DMA!\n");
-> > > > +
-> > > > +                     goto err_out;
-> > > > +             }
-> > > > +
-> > > > +             if (((entry + 1) % RTASE_NUM_DESC) =3D=3D 0)
-> > > > +                     status =3D (opts1 | len | RTASE_RING_END);
-> > > > +             else
-> > > > +                     status =3D opts1 | len;
-> > > > +
-> > > > +             if (cur_frag =3D=3D (nr_frags - 1)) {
-> > > > +                     ring->skbuff[entry] =3D skb;
-> > > > +                     status |=3D RTASE_TX_LAST_FRAG;
-> > > > +             }
-> > > > +
-> > > > +             ring->mis.len[entry] =3D len;
-> > > > +             txd->addr =3D cpu_to_le64(mapping);
-> > > > +             txd->opts2 =3D cpu_to_le32(opts2);
-> > > > +
-> > > > +             /* make sure the operating fields have been updated *=
-/
-> > > > +             dma_wmb();
-> > > > +             txd->opts1 =3D cpu_to_le32(status);
-> > > > +     }
-> > > > +
-> > > > +     return cur_frag;
-> > > > +
-> > > > +err_out:
-> > > > +     rtase_tx_clear_range(ring, ring->cur_idx + 1, cur_frag);
-> > > > +     return -EIO;
-> > > > +}
-> > > > +
-> > > > +static netdev_tx_t rtase_start_xmit(struct sk_buff *skb,
-> > > > +                                 struct net_device *dev) {
-> > > > +     struct skb_shared_info *shinfo =3D skb_shinfo(skb);
-> > > > +     struct rtase_private *tp =3D netdev_priv(dev);
-> > > > +     u32 q_idx, entry, len, opts1, opts2;
-> > > > +     struct netdev_queue *tx_queue;
-> > > > +     bool stop_queue, door_bell;
-> > > > +     u32 mss =3D shinfo->gso_size;
-> > > > +     struct rtase_tx_desc *txd;
-> > > > +     struct rtase_ring *ring;
-> > > > +     dma_addr_t mapping;
-> > > > +     int frags;
-> > > > +
-> > > > +     /* multiqueues */
-> > > > +     q_idx =3D skb_get_queue_mapping(skb);
-> > > > +     ring =3D &tp->tx_ring[q_idx];
-> > > > +     tx_queue =3D netdev_get_tx_queue(dev, q_idx);
-> > > > +
-> > > > +     if (unlikely(!rtase_tx_avail(ring))) {
-> > > > +             if (net_ratelimit())
-> > > > +                     netdev_err(dev, "BUG! Tx Ring full when
-> > > > + queue
-> > > > awake!\n");
-> > > > +             goto err_stop;
-> > > > +     }
-> > > > +
-> > > > +     entry =3D ring->cur_idx % RTASE_NUM_DESC;
-> > > > +     txd =3D ring->desc + sizeof(struct rtase_tx_desc) * entry;
-> > > > +
-> > > > +     opts1 =3D RTASE_DESC_OWN;
-> > > > +     opts2 =3D rtase_tx_vlan_tag(tp, skb);
-> > > > +
-> > > > +     /* tcp segmentation offload (or tcp large send) */
-> > > > +     if (mss) {
-> > > > +             if (shinfo->gso_type & SKB_GSO_TCPV4) {
-> > > > +                     opts1 |=3D RTASE_GIANT_SEND_V4;
-> > > > +             } else if (shinfo->gso_type & SKB_GSO_TCPV6) {
-> > > > +                     if (skb_cow_head(skb, 0))
-> > > > +                             goto err_dma_0;
-> > > > +
-> > > > +                     tcp_v6_gso_csum_prep(skb);
-> > > > +                     opts1 |=3D RTASE_GIANT_SEND_V6;
-> > > > +             } else {
-> > > > +                     WARN_ON_ONCE(1);
-> > > > +             }
-> > > > +
-> > > > +             opts1 |=3D u32_encode_bits(skb_transport_offset(skb),
-> > > > +                                      RTASE_TCPHO_MASK);
-> > > > +             opts2 |=3D u32_encode_bits(mss, RTASE_MSS_MASK);
-> > > > +     } else if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
-> > > > +             opts2 |=3D rtase_tx_csum(skb, dev);
-> > > > +     }
-> > > > +
-> > > > +     frags =3D rtase_xmit_frags(ring, skb, opts1, opts2);
-> > > > +     if (unlikely(frags < 0))
-> > > > +             goto err_dma_0;
-> > > > +
-> > > > +     if (frags) {
-> > > > +             len =3D skb_headlen(skb);
-> > > > +             opts1 |=3D RTASE_TX_FIRST_FRAG;
-> > > > +     } else {
-> > > > +             len =3D skb->len;
-> > > > +             ring->skbuff[entry] =3D skb;
-> > > > +             opts1 |=3D RTASE_TX_FIRST_FRAG |
-> RTASE_TX_LAST_FRAG;
-> > > > +     }
-> > > > +
-> > > > +     if (((entry + 1) % RTASE_NUM_DESC) =3D=3D 0)
-> > > > +             opts1 |=3D (len | RTASE_RING_END);
-> > > > +     else
-> > > > +             opts1 |=3D len;
-> > > > +
-> > > > +     mapping =3D dma_map_single(&tp->pdev->dev, skb->data, len,
-> > > > +                              DMA_TO_DEVICE);
-> > > > +
-> > > > +     if (unlikely(dma_mapping_error(&tp->pdev->dev, mapping))) {
-> > > > +             if (unlikely(net_ratelimit()))
-> > > > +                     netdev_err(dev, "Failed to map TX DMA!\n");
-> > > > +
-> > > > +             goto err_dma_1;
-> > > > +     }
-> > > > +
-> > > > +     ring->mis.len[entry] =3D len;
-> > > > +     txd->addr =3D cpu_to_le64(mapping);
-> > > > +     txd->opts2 =3D cpu_to_le32(opts2);
-> > > > +     txd->opts1 =3D cpu_to_le32(opts1 & ~RTASE_DESC_OWN);
-> > > > +
-> > > > +     /* make sure the operating fields have been updated */
-> > > > +     dma_wmb();
-> > > > +
-> > > > +     door_bell =3D __netdev_tx_sent_queue(tx_queue, skb->len,
-> > > > +                                        netdev_xmit_more());
-> > > > +
-> > > > +     txd->opts1 =3D cpu_to_le32(opts1);
-> > > > +
-> > > > +     skb_tx_timestamp(skb);
-> > > > +
-> > > > +     /* tx needs to see descriptor changes before updated cur_idx =
-*/
-> > > > +     smp_wmb();
-> > > > +
-> > > > +     WRITE_ONCE(ring->cur_idx, ring->cur_idx + frags + 1);
-> > > > +
-> > > > +     stop_queue =3D !netif_subqueue_maybe_stop(dev, ring->index,
-> > > > +
-> > > > + rtase_tx_avail(ring),
-> > > > +
-> > > RTASE_TX_STOP_THRS,
-> > > > +
-> > > RTASE_TX_START_THRS);
-> > > > +
-> > > > +     if (door_bell || stop_queue)
-> > > > +             rtase_w8(tp, RTASE_TPPOLL, BIT(ring->index));
-> > > > +
-> > > > +     return NETDEV_TX_OK;
-> > > > +
-> > > > +err_dma_1:
-> > > > +     ring->skbuff[entry] =3D NULL;
-> > > > +     rtase_tx_clear_range(ring, ring->cur_idx + 1, frags);
-> > > > +
-> > > > +err_dma_0:
-> > > > +     dev->stats.tx_dropped++;
-> > > > +     dev_kfree_skb_any(skb);
-> > > > +     return NETDEV_TX_OK;
-> > > > +
-> > > > +err_stop:
-> > > > +     netif_stop_queue(dev);
-> > > > +     dev->stats.tx_dropped++;
-> > > > +     return NETDEV_TX_BUSY;
-> > > > +}
-> > > > +
-> > > >  static void rtase_enable_eem_write(const struct rtase_private *tp)=
-  {
-> > > >       u8 val;
-> > > > @@ -1065,6 +1349,7 @@ static void rtase_netpoll(struct net_device
-> > > > *dev) static const struct net_device_ops rtase_netdev_ops =3D {
-> > > >       .ndo_open =3D rtase_open,
-> > > >       .ndo_stop =3D rtase_close,
-> > > > +     .ndo_start_xmit =3D rtase_start_xmit,
-> > > >  #ifdef CONFIG_NET_POLL_CONTROLLER
-> > > >       .ndo_poll_controller =3D rtase_netpoll,  #endif
-> > > > --
-> > > > 2.34.1
-> > > >
-
+T24gV2VkLCAyMDI0LTA2LTEyIGF0IDIwOjM0IC0wNzAwLCBLZWVzIENvb2sgd3JvdGU6DQo+IE9u
+IFRodSwgSnVuIDEzLCAyMDI0IGF0IDAzOjEzOjM0QU0gKzAwMDAsIEFyeWFuIFNyaXZhc3RhdmEg
+d3JvdGU6DQo+ID4gT24gV2VkLCAyMDI0LTA2LTEyIGF0IDIwOjA1IC0wNzAwLCBLZWVzIENvb2sg
+d3JvdGU6DQo+ID4gPiBPbiBUaHUsIEp1biAxMywgMjAyNCBhdCAwMjo0OTowMFBNICsxMjAwLCBB
+cnlhbiBTcml2YXN0YXZhIHdyb3RlOg0KPiA+ID4gPiBTZXR0aW5nIGZyYWdfc2l6ZSB0byAwIHRv
+IGluZGljYXRlIGttYWxsb2MgaGFzIGJlZW4gZGVwcmVjYXRlZCwNCj4gPiA+ID4gdXNlIHNsYWJf
+YnVpbGRfc2tiIGRpcmVjdGx5Lg0KPiA+ID4gPiANCj4gPiA+ID4gRml4ZXM6IGNlMDk4ZGExNDk3
+YyAoInNrYnVmZjogSW50cm9kdWNlIHNsYWJfYnVpbGRfc2tiKCkiKQ0KPiA+ID4gPiBTaWduZWQt
+b2ZmLWJ5OiBBcnlhbiBTcml2YXN0YXZhDQo+ID4gPiA+IDxhcnlhbi5zcml2YXN0YXZhQGFsbGll
+ZHRlbGVzaXMuY28ubno+DQo+ID4gPiA+IC0tLQ0KPiA+ID4gPiBDaGFuZ2VzIGluIHYxOg0KPiA+
+ID4gPiAtIEFkZGVkIEZpeGVzIHRhZw0KPiA+ID4gDQo+ID4gPiBUaGlzIGxvb2tzIGxpa2Ugc2lt
+aWxhciB1cGRhdGVzIGxpa2UgY29tbWl0IDk5YjQxNWZlODk4NiAoInRnMzoNCj4gPiA+IFVzZQ0K
+PiA+ID4gc2xhYl9idWlsZF9za2IoKSB3aGVuIG5lZWRlZCIpDQo+ID4gWWVhaCwgSSBub3RpY2Vk
+IHRoYXQgd2hlbiBJIHdhcyBsb29raW5nIGZvciBleGFtcGxlcyBvZiBvdGhlcg0KPiA+ICJGaXhl
+cyINCj4gPiB0YWdzIGZvciB0aGUgInNrYnVmZjogSW50cm9kdWNlIHNsYWJfYnVpbGRfc2tiKCki
+IGNvbW1pdC4gSSBzdXNwZWN0DQo+ID4gdGhlcmUgYXJlIG1hbnkgZHJpdmVycyB0aGF0IHdpbGwg
+bmVlZCB0aGlzICJmaXgiLg0KPiANCj4gWWVhaCwgYXQgdGhlIHRpbWUgdGhlIEFQSSBjaGFuZ2Vz
+IHdhcyBtYWRlIGl0IHdhcyBjbGVhciBpdCB3YXNuJ3QNCj4gZWFzeQ0KPiB0byBpZGVudGlmeSB3
+aGljaCBuZWVkZWQgaXQsIHNvIHRoZSBXQVJOIHdhcyBhZGRlZCBhbG9uZyB3aXRoDQo+IHN1cHBv
+cnRpbmcNCj4gdGhlIG9sZCBzdHlsZSB2aWEgaW50ZXJuYWwgZmFsbC1iYWNrLg0KPiANCj4gLUtl
+ZXMNCkkgbG92ZSB0aGF0IGFib3V0IHRoZSBrZXJuZWwuIEp1c3QgbnVkZ2VzIHlvdSBpbiB0aGUg
+cmlnaHQgZGlyZWN0aW9uLg0KDQotQXJ5YW4NCj4gDQo+ID4gPiANCj4gPiA+IFJldmlld2VkLWJ5
+OiBLZWVzIENvb2sgPGtlZXNAa2VybmVsLm9yZz4NCj4gPiA+IA0KPiA+IA0KPiANCg0K
 
