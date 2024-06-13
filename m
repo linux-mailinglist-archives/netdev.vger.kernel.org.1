@@ -1,194 +1,194 @@
-Return-Path: <netdev+bounces-103226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42E4B90731F
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 15:07:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E94590732F
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 15:09:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDADF284572
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 13:07:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29C87286A6B
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 13:09:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E93E143C55;
-	Thu, 13 Jun 2024 13:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0D1C142E81;
+	Thu, 13 Jun 2024 13:09:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lHpKLv4x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B/prxloI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74BC613D524;
-	Thu, 13 Jun 2024 13:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22A11E49B
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 13:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718284023; cv=none; b=Bl7QObNjP8niiKvmzHmdJBehCOVq0AOydaZ4zVgL4TClo3wtv7irghSlhya2ptebmR+J0LuJPmRYrh0t0tRGU+yvG2T938FW2IT74pMJPYhvBSQT65iuC6lxBI2tpTtvrhbyWTVSBvYZgp197niPngLBc0y6u1uoPmrVgPaA3JY=
+	t=1718284173; cv=none; b=ZdeXF1XYSmfgSh/T2oRicctSrD2aJdhtkjWQsCCegyD8xUBifxcMj70+eiRX3ZYaxl9/RCxXBX4z44Vic9jaXyGGyxhp17BQ8PHvobc/NsM9sk87iUTVqSp7w1b62+VOtzaPCEAMUEcxxNSblj03vjztzotZuR5MLWkQO9Amn2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718284023; c=relaxed/simple;
-	bh=xu1792XvTnU3jDP3FYbYyhez1VlS5TvvwKQ4Hm46MoY=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OMl6W2nbddR8smhTMtvq+NX2WBQ6+9UlYFkbq0cjlqi4H0E1TDiEb29Z9kMH5ySAW6siXGdzD1Rc7gynLibbVYQNLIo/8Lqf54J+tQwR8gGClC7LOpOyFbVosThruIh9DYPFByW0m8nE/B4UTPudc9w7egnYPldBNTvkH1K86+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lHpKLv4x; arc=none smtp.client-ip=209.85.208.170
+	s=arc-20240116; t=1718284173; c=relaxed/simple;
+	bh=ObytPm8pcL7y5ZGPGb2J7I62bPvXDiqgzTsAvmDXBos=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dw+NARfYHHBsNDXlNjf9f4uy7N1ZVaz2Avt3KQ9oauiJ/qcZk6Sy9rY9WR3VICStLSphz97ICMeufZkReapjEp5o07K+BzMj/05ZxDXJQHctdqKyq3KpeWrjUwwTDFUbkflVuBRArMIJorGYPVtp1D3p54dDqJyPBfcU+0o2lDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B/prxloI; arc=none smtp.client-ip=209.85.218.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2ebd95f136bso10801621fa.0;
-        Thu, 13 Jun 2024 06:07:00 -0700 (PDT)
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a6f21ff4e6dso167253166b.3
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 06:09:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718284018; x=1718888818; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=H4qMOlVAmB1+8562nApjJnNhlZQHZLqU1OXBwVXRF78=;
-        b=lHpKLv4xuroqczJt/Ywx8NPgMxPogcx8+78+YIa89Ws8ZSLTpvqmGLUKFxVOQlfbZ2
-         p3z4te5c2HO9g8+O3suERoCg3RYPQchSX4iaJKU9fTNvKa/phzJDhr/z+7O4He/OFnYe
-         z+vy7B7UjBYhkRKHHAgrEPhH4074IEBeknApcjudzORfl08aww/jACSaVNTHc49iqOiP
-         drFuPeWeAkgd4GIMCvMuXfuaJaLYPxgxDLEfl+zbBD5dr6xQh9GDMZGsOOW0TDX7hqdq
-         Wmyds3YQtfZYaUZYYr9qcQMkWfHkD3bTytLzUklplf9Y3kOro87R3TAWy2r1NWhBbd5E
-         2oNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718284018; x=1718888818;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1718284170; x=1718888970; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=H4qMOlVAmB1+8562nApjJnNhlZQHZLqU1OXBwVXRF78=;
-        b=GSH+vuq+atblt2ONCh+TkgHMtZj6fOeBynKrQoCsTlIJASZ6Wj8CgpRYRpv9wPBe3y
-         Rc00TTMV9AlDxmeiSr8HjG2BQTE2dw8zqVNaIgjCmLP5u0teTCPGsGClfXOjWWOF6RM+
-         +/Q4HBoS6kytkJWCK+z3vxAp0OJWKQ5O/qp46b9takYihnLKO6HficNw0CJaABaf7bQl
-         Pdw0940qcxRcHwCXr7KlVjmi6anSBwnoh8dwEYl0Ggi+3mMaShds13A4iEzt+AGbBT+P
-         E9qtJLwB3XcJKJCNjWEoLFmXhebCh4tNbeqkO83AJ9VD3kd86x9w5Ei4KKasIHEUKt8b
-         FklA==
-X-Forwarded-Encrypted: i=1; AJvYcCXP46oBl9LWEeWZOi/nFO9LpfvD0XoXbjOze/y6JDCJBg8tWdMdYajFUlftwyFss9puNTTuHwlKWEIIvIB2jFDl6S48mcaLkYGvh3GMmxC3Nt7i+fd7S0YTjq14gSIWCGOIz0tm6QmrFpxoSLz8uRKbO8OTaPBJykm7iugHg1JzlEzIfwKDGF/EhovOdHI061peiiqbOINYoAEeU8K1Oe31BYZvY0y1xg+p1lCaTCormFL9CGyW9JeCT1+otoXW5Kd6RyhZTAoY612Xsx5F/mExtE0TYRhCV+ArQ8PWpgtBVcGCf0U6qpHyLh1EPdyPWuDnOHi1kTMjytStGOpgxFoZwZnvmOqDI51dN1oLq7M9bcwwBLl1hzW9WwMflZBwbFPR+WwOkcenlUHpYB+la126LQmDHWl6VPD6WGL7woF4mnRQphN7tnjdYSRfwg==
-X-Gm-Message-State: AOJu0YweF5XV8H+UF6myYCXms8mjJEFBK244riqhJzn46zyVY064vIwI
-	b8ZopXLnuMlBjdjlq08IeFphupqb91cIJ/K5Rd/IpLx94tfX950p
-X-Google-Smtp-Source: AGHT+IFNjIqLDbiiJvyVQ+CTYUUPuuKLx47d3/3uk6kw1RXtVGPymnVcCEA7pTqKhgYonTHLU10trQ==
-X-Received: by 2002:a2e:878f:0:b0:2eb:ecba:444a with SMTP id 38308e7fff4ca-2ebfc9fac80mr27236611fa.23.1718284018170;
-        Thu, 13 Jun 2024 06:06:58 -0700 (PDT)
-Received: from pc636 (host-90-233-218-141.mobileonline.telia.com. [90.233.218.141])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ec05c05f56sm2099851fa.42.2024.06.13.06.06.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jun 2024 06:06:57 -0700 (PDT)
-From: Uladzislau Rezki <urezki@gmail.com>
-X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
-Date: Thu, 13 Jun 2024 15:06:54 +0200
-To: "Paul E. McKenney" <paulmck@kernel.org>,
-	Vlastimil Babka <vbabka@suse.cz>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <Zmru7hhz8kPDPsyz@pc636>
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <ZmrfA1p2zSVIaYam@zx2c4.com>
- <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
+        bh=ObytPm8pcL7y5ZGPGb2J7I62bPvXDiqgzTsAvmDXBos=;
+        b=B/prxloI6EeT6l7gQdHlrC9fH0LGjNjDi8k8jvWRAiNEDsZg7p4S5XBzmpghknCmlD
+         bP3KUrppoMw9KjUKhrtEC4qXnMMmlwbQMPqOwILEXbEUHzpgHL5umcwnBMizAeoD6TlT
+         1d/8IFia9sjVGhye0VIPK15dWUphn+kbiHIFR0S8HDzv8/QWvxwPnKikOar0ac6aBF5F
+         RDcHva2bVdke8UdXw6uYIQKmIxnvfHwa6W06uIlvgysm1SC2C8avGbWbUuInZoZKM+LF
+         a0tuPJsVSKoVz0Zcx7IEAnjl37u98ouIRnPd97z2V3DEXp5RSewp/0Uu3UV5GdX4Oibi
+         WQgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718284170; x=1718888970;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ObytPm8pcL7y5ZGPGb2J7I62bPvXDiqgzTsAvmDXBos=;
+        b=VDeq7CpfdLLZe4zmzCKWR83MS1m3pSb1PiqhV6N+A3FyD0Kxnrqu5CqKFZ+PI8zTiw
+         1vWUCbe8ESyd9RxgAPnFNWMzNaXtoWyxik1XwBwq0287FMVmXB/Wrfo+iJHy6LIN0tkO
+         beJL48Krjb3q5sBJj3gL3pzoasef2fHGwysEHfWigDHDyhrJYr6p6jezbo2Br/mDyyNK
+         BuXlKAbDBL67AGcOpSjyupodvC8y9yvh4TJxfgiAFBCOtlkTL73tlGkfAB02pS8BEz5T
+         Rolef9tZ95tuYt80G7FVjpIzZ3jhhT4rKq7IT4xqUJUSbzEwDuSwSxEo9yzNspsLyfgK
+         p24g==
+X-Forwarded-Encrypted: i=1; AJvYcCX7ZCXCBS3hZTFuE2U68+DOm8DW2gbFkh7p//oEANxe4kMzKaH9iXeCZpu3gQvQRrrV41tQdZN9IrmPxmHG27KXxHWR52sr
+X-Gm-Message-State: AOJu0Yy7htRGHdfUtHQaEvWnaLvKlPVELhoOQ02VZIn07S5cZMBU9Zbh
+	pXaY0nAvimj2A6Y4/nRIR/TWivxdAOsIYp/fXXy+XDZPON/2ebBWS4WewXmqQPftqeNQFrstBKK
+	X5VpU2j9dWkMRn8H88U0h7V+Eyxk=
+X-Google-Smtp-Source: AGHT+IESWb9IYL2vX/jrqk4AyrRR4KoHMGkbvdGret/61xVXytB2HEHM8bptZ46X2Fc+27vRclpe6/CZCYDHCzDvLYk=
+X-Received: by 2002:a17:906:7213:b0:a6e:88cc:bee9 with SMTP id
+ a640c23a62f3a-a6f47d52441mr283827766b.24.1718284169655; Thu, 13 Jun 2024
+ 06:09:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
+References: <20240613023549.15213-1-kerneljasonxing@gmail.com>
+ <ZmqFzpQOaQfp7Wjr@nanopsycho.orion> <CAL+tcoAir0u0HTYQCMgVNTkb8RpAMzD1eH-EevL576kt5u7DPw@mail.gmail.com>
+ <Zmqdb-sBBitXIrFo@nanopsycho.orion> <CAL+tcoDCjm86wCHiVXDXMw1fs6ga9hp3x91u+Dy0CGBB=eEp2w@mail.gmail.com>
+ <Zmqk5ODEKYcQerWS@nanopsycho.orion> <20240613035148-mutt-send-email-mst@kernel.org>
+ <CAL+tcoDZ_8e9SDRdbQSDz=TCRGQ3w0toSZ0U8poUKpQcAHhN7A@mail.gmail.com>
+In-Reply-To: <CAL+tcoDZ_8e9SDRdbQSDz=TCRGQ3w0toSZ0U8poUKpQcAHhN7A@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 13 Jun 2024 21:08:51 +0800
+Message-ID: <CAL+tcoAbpnAwHV+zpM672W=1pxW4U0reh9s_R7a4kMKp61fxyg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] net: dqs: introduce IFF_NO_BQL private flag
+ for non-BQL drivers
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, davem@davemloft.net, dsahern@kernel.org, 
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
+	leitao@debian.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 13, 2024 at 05:47:08AM -0700, Paul E. McKenney wrote:
-> On Thu, Jun 13, 2024 at 01:58:59PM +0200, Jason A. Donenfeld wrote:
-> > On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
-> > > On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
-> > > > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
-> > > > > Since SLOB was removed, it is not necessary to use call_rcu
-> > > > > when the callback only performs kmem_cache_free. Use
-> > > > > kfree_rcu() directly.
-> > > > > 
-> > > > > The changes were done using the following Coccinelle semantic patch.
-> > > > > This semantic patch is designed to ignore cases where the callback
-> > > > > function is used in another way.
-> > > > 
-> > > > How does the discussion on:
-> > > >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-> > > >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
-> > > > reflect on this series? IIUC we should hold off..
-> > > 
-> > > We do need to hold off for the ones in kernel modules (such as 07/14)
-> > > where the kmem_cache is destroyed during module unload.
-> > > 
-> > > OK, I might as well go through them...
-> > > 
-> > > [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-> > > 	Needs to wait, see wg_allowedips_slab_uninit().
-> > 
-> > Also, notably, this patch needs additionally:
-> > 
-> > diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
-> > index e4e1638fce1b..c95f6937c3f1 100644
-> > --- a/drivers/net/wireguard/allowedips.c
-> > +++ b/drivers/net/wireguard/allowedips.c
-> > @@ -377,7 +377,6 @@ int __init wg_allowedips_slab_init(void)
-> > 
-> >  void wg_allowedips_slab_uninit(void)
-> >  {
-> > -	rcu_barrier();
-> >  	kmem_cache_destroy(node_cache);
-> >  }
-> > 
-> > Once kmem_cache_destroy has been fixed to be deferrable.
-> > 
-> > I assume the other patches are similar -- an rcu_barrier() can be
-> > removed. So some manual meddling of these might be in order.
-> 
-> Assuming that the deferrable kmem_cache_destroy() is the option chosen,
-> agreed.
+On Thu, Jun 13, 2024 at 5:26=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
 >
-<snip>
-void kmem_cache_destroy(struct kmem_cache *s)
-{
-	int err = -EBUSY;
-	bool rcu_set;
+> On Thu, Jun 13, 2024 at 3:56=E2=80=AFPM Michael S. Tsirkin <mst@redhat.co=
+m> wrote:
+> >
+> > On Thu, Jun 13, 2024 at 09:51:00AM +0200, Jiri Pirko wrote:
+> > > Thu, Jun 13, 2024 at 09:24:27AM CEST, kerneljasonxing@gmail.com wrote=
+:
+> > > >On Thu, Jun 13, 2024 at 3:19=E2=80=AFPM Jiri Pirko <jiri@resnulli.us=
+> wrote:
+> > > >>
+> > > >> Thu, Jun 13, 2024 at 08:08:36AM CEST, kerneljasonxing@gmail.com wr=
+ote:
+> > > >> >On Thu, Jun 13, 2024 at 1:38=E2=80=AFPM Jiri Pirko <jiri@resnulli=
+.us> wrote:
+> > > >> >>
+> > > >> >> Thu, Jun 13, 2024 at 04:35:49AM CEST, kerneljasonxing@gmail.com=
+ wrote:
+> > > >> >> >From: Jason Xing <kernelxing@tencent.com>
+> > > >> >> >
+> > > >> >> >Since commit 74293ea1c4db6 ("net: sysfs: Do not create sysfs f=
+or non
+> > > >> >> >BQL device") limits the non-BQL driver not creating byte_queue=
+_limits
+> > > >> >> >directory, I found there is one exception, namely, virtio-net =
+driver,
+> > > >> >> >which should also be limited in netdev_uses_bql(). Let me give=
+ it a
+> > > >> >> >try first.
+> > > >> >> >
+> > > >> >> >I decided to introduce a NO_BQL bit because:
+> > > >> >> >1) it can help us limit virtio-net driver for now.
+> > > >> >> >2) if we found another non-BQL driver, we can take it into acc=
+ount.
+> > > >> >> >3) we can replace all the driver meeting those two statements =
+in
+> > > >> >> >netdev_uses_bql() in future.
+> > > >> >> >
+> > > >> >> >For now, I would like to make the first step to use this new b=
+it for dqs
+> > > >> >> >use instead of replacing/applying all the non-BQL drivers in o=
+ne go.
+> > > >> >> >
+> > > >> >> >As Jakub said, "netdev_uses_bql() is best effort", I think, we=
+ can add
+> > > >> >> >new non-BQL drivers as soon as we find one.
+> > > >> >> >
+> > > >> >> >After this patch, there is no byte_queue_limits directory in v=
+irtio-net
+> > > >> >> >driver.
+> > > >> >>
+> > > >> >> Please note following patch is currently trying to push bql sup=
+port for
+> > > >> >> virtio_net:
+> > > >> >> https://lore.kernel.org/netdev/20240612170851.1004604-1-jiri@re=
+snulli.us/
+> > > >> >
+> > > >> >I saw this one this morning and I'm reviewing/testing it.
+> > > >> >
+> > > >> >>
+> > > >> >> When that is merged, this patch is not needed. Could we wait?
+> > > >> >
+> > > >> >Please note this patch is not only written for virtio_net driver.
+> > > >> >Virtio_net driver is one of possible cases.
+> > > >>
+> > > >> Yeah, but without virtio_net, there will be no users. What's the p=
+oint
+> > > >> of having that in code? I mean, in general, no-user kernel code ge=
+ts
+> > > >> removed.
+> > > >
+> > > >Are you sure netdev_uses_bql() can limit all the non-bql drivers wit=
+h
+> > > >those two checks? I haven't investigated this part.
+> > >
+> > > Nope. What I say is, if there are other users, let's find them and le=
+t
+> > > them use what you are introducing here. Otherwise don't add unused co=
+de.
+> >
+> >
+> > Additionally, it looks like virtio is going to become a
+> > "sometimes BQL sometimes no-BQL" driver, so what's the plan -
+> > to set/clear the flag accordingly then? What kind of locking
+> > will be needed?
+>
+> Could we consider the default mode is BQL, so we can remove that new
+> IFF_NO_BQL flag? If it's hard to take care of these two situations, I
+> think we could follow this suggestion from Jakub: "netdev_uses_bql()
+> is best effort". What do you think?
 
-	if (unlikely(!s) || !kasan_check_byte(s))
-		return;
+ENA driver faces the same 'problem' because it also has BQL and no-BQL.
 
-	cpus_read_lock();
-	mutex_lock(&slab_mutex);
+Honestly, I don't want to spend too much time on this patch because
+it's not worth it. Allow me to set the IFF_NO_BQL flag for the default
+mode to try our 'best effort' for virtio_net and ENA driver?
 
-	rcu_set = s->flags & SLAB_TYPESAFE_BY_RCU;
-
-	s->refcount--;
-	if (s->refcount)
-		goto out_unlock;
-
-	err = shutdown_cache(s);
-	WARN(err, "%s %s: Slab cache still has objects when called from %pS",
-	     __func__, s->name, (void *)_RET_IP_);
-...
-	cpus_read_unlock();
-	if (!err && !rcu_set)
-		kmem_cache_release(s);
-}
-<snip>
-
-so we have SLAB_TYPESAFE_BY_RCU flag that defers freeing slab-pages
-and a cache by a grace period. Similar flag can be added, like
-SLAB_DESTROY_ONCE_FULLY_FREED, in this case a worker rearm itself
-if there are still objects which should be freed.
-
-Any thoughts here?
-
---
-Uladzislau Rezki
+Thanks,
+Jason
 
