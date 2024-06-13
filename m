@@ -1,197 +1,153 @@
-Return-Path: <netdev+bounces-103117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5748A9065A8
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:51:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B28159065AD
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:51:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 697541C21615
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 07:51:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C4281F25F67
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 07:51:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 323D313C8E3;
-	Thu, 13 Jun 2024 07:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 763E813C90B;
+	Thu, 13 Jun 2024 07:51:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Q2o3oOpm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YZJVw7/f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAFA013C8EC;
-	Thu, 13 Jun 2024 07:51:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C091013CF8A
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 07:51:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718265064; cv=none; b=i4mrapRH+0ynccAE/S5WT9vY2vtbSnT/m5/THvHZ+rYTDfsBraB2NG0f85ON9Ux7uGy1GFA8ess+u5Oc4/YF/++FioEAsEIkVZFhuohEbV0c+kJYL5FJI1TV6WIdEacOIPcXhP3jyaaHE8QVIk9g9LBOc9VDa7t4VHjvhn+4KZY=
+	t=1718265073; cv=none; b=Dh1Y9ibdgmkyedTcDtDHmv5tvP7ZAPA/EJSDw00hC8W0hskES3J9/RVW5djVPRRYX85MAl3l76aSAEwR11JNj+ZUkQloNBSBFXfeWEs0ejMNHzZVNtJCymyIDR9MQjKof8pmcxw6xHjYDu2qlPGTyArdc48lS7qayjlp/jEAITM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718265064; c=relaxed/simple;
-	bh=2U6VMYoQe5rwvZHCfig+zhidXmOGMsfZYrDromw7V7o=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Zja0JjKDAjcNJXflLfxkQ+DZnduqiy/q08hYQJRMqekBdDlgIfnJVR2H5ZVaMeSET5tRWUIVtPzmgSA3/9w/Yq8JWSdUl63ntuN82feu3Zs0NuYgv7+Kl3GM+ncSaqPWk2Pj27rWMjHXJS2WZFWyzUxKqdQQBzlVTS1ZVvIP/DY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Q2o3oOpm; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1718265030; x=1718869830; i=markus.elfring@web.de;
-	bh=86XHRC8lM3zR78u7whQ1QmYwLWKa5DrJEHBzTG8nFA0=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:From:Subject:To:
-	 Cc:References:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=Q2o3oOpmDFKOciSavRbVDNZoxn5cfQeL+fttqeDO4yT6wJa2INgILEGsyx+WrM22
-	 W3N0YWeMJCZ7Q2wWAW+P3+EGnMsELMT9+4nRkC1Fxh62IK+QtADLMv/QzbroWxrE7
-	 B4Rdbt+ydSLQqCqmWhDLDzYa1G6umyU7bEB+L3iJ2tkK2CAF+pXBC1nKwrjCs5sj/
-	 10mRZV7kEtQB28rDIBQPM7hLM4NrIKo9enc9j2V4sR4C1mYlM1qRdXPdDobLph7L+
-	 AL/D4jIAWtmoRceJYaLhTjuNsInDkF+DcmDqKlWujXgnov24ghSrhM9cW1m22lmLQ
-	 eiwMpuSq9de4bfdjCA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1N3ouw-1sQMMA3CFc-00xWbH; Thu, 13
- Jun 2024 09:50:30 +0200
-Message-ID: <1d01ece4-bf4e-4266-942c-289c032bf44d@web.de>
-Date: Thu, 13 Jun 2024 09:50:21 +0200
+	s=arc-20240116; t=1718265073; c=relaxed/simple;
+	bh=GFIcxWXQwNCRH03Z9cLHboBcOBzSFyWQjvAxn613bA8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pIqMgOAkYKu7VegbxD+pX0rEIVbvqNFHwQxAQPEBZe32chGsa5i2DlLtRN8oiNH4QqBSgRe5S/9bVXAZDAUrBfv1jaLx8hNDU8zUPdy0Zt9V7bu5Cu0fjmWtT5y+MePApsxeAZOJ96AXNL4IRCHw/kglzU1mKGo/mB+r1YZEURE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YZJVw7/f; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718265070;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A/n+AhuyhqSsJr+vWl3tvLtoPgeLWQoTZ3U+G+ztgvo=;
+	b=YZJVw7/fCNrUvFGc74dKfyWA0ptIKW0ST6ZajHG67FR5cyoRIhCgAOx+ifyKnbIuo7txHV
+	8v7kz/hjVFkqzNbISFMBWwaOLO8DsUWuDve/qch2ETmXzifcU9u+crskkEVSAKfv7Ql1HI
+	zOLsdKi6dwOQTI9WVonuOU5REFp/oNE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-412-MUAE8IiVMTiu4MOX1b2tMg-1; Thu, 13 Jun 2024 03:51:05 -0400
+X-MC-Unique: MUAE8IiVMTiu4MOX1b2tMg-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-35f09791466so388096f8f.2
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 00:51:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718265064; x=1718869864;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A/n+AhuyhqSsJr+vWl3tvLtoPgeLWQoTZ3U+G+ztgvo=;
+        b=abmx2z9Szff2w5ZUBPu90IdMvq1PJUBlYVE/coYbtsan37OcVYrUEMYeDikSKioZnd
+         x6CeYKDpBKloo0PXbTIdMaLfpd947n4PGNJaLpPruoGPUIiTxVr6u1E8onmAEe+5jrN4
+         orlvwvTvM/LN79SNeflL6Qo73EiwpVsS8neey4Q/GaSE+yW0s76wObvat+YLsEg0leER
+         yMcbnpPvyI6sBW/5wcTJIkBHTxDZ6pWKGuT3HSbH+/Z/R9bfEQgJVpvC+BEHSvRO89IL
+         Q4Vp7hb2lkmCc5C8abJxCaAuJJTPn65S9XS+51H6X1nUoDc5Xn8eSFA4mzqMcFZ/5+93
+         bf1g==
+X-Forwarded-Encrypted: i=1; AJvYcCX9Gfd0sD4Tgp9DMnzGApVI/e3N7yqV2W/OxZ9LCD3ZriAX+mXnlBwQdpX1XIqdii/780S+YSN5xglBwKq+j3x+6923rgPQ
+X-Gm-Message-State: AOJu0YxuQhDvpantSQ3zAOqspYJjp0pa0vGmh3YmdP+oOORZMYftcc7u
+	CBBJe15VwZwQt7B6yS4PxBQ8hl7zK+JQuq3KrBsamZTxQZuv+s/7ig6gbGC4xYjaExgeKZeSUM4
+	iU/zqcImHw8+Mlq0jIZkMZULyyMTpsFRqdlFv7MHkPyM7saLnQFBi+A==
+X-Received: by 2002:a05:6000:d:b0:360:75b3:2cd9 with SMTP id ffacd0b85a97d-36075b32d48mr830145f8f.65.1718265063714;
+        Thu, 13 Jun 2024 00:51:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGecT5yUVKpC78rMOjYPpZNfe8ITqSuJs063PFj3s8mFpH0gfLFXFffpfByk9P/e9suAjpbJA==
+X-Received: by 2002:a05:6000:d:b0:360:75b3:2cd9 with SMTP id ffacd0b85a97d-36075b32d48mr830121f8f.65.1718265063171;
+        Thu, 13 Jun 2024 00:51:03 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:176:94c5:b48b:41a4:81c0:f1c8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36075093d58sm894451f8f.4.2024.06.13.00.50.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jun 2024 00:51:02 -0700 (PDT)
+Date: Thu, 13 Jun 2024 03:50:54 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jakub Kicinski <kuba@kernel.org>, Cindy Lu <lulu@redhat.com>,
+	dtatulea@nvidia.com, jasowang@redhat.com,
+	virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
+Message-ID: <20240613034647-mutt-send-email-mst@kernel.org>
+References: <20240611053239.516996-1-lulu@redhat.com>
+ <20240611185810.14b63d7d@kernel.org>
+ <ZmlAYcRHMqCgYBJD@nanopsycho.orion>
+ <20240612031356-mutt-send-email-mst@kernel.org>
+ <ZmlMuGGY2po6LLCY@nanopsycho.orion>
+ <20240613024756-mutt-send-email-mst@kernel.org>
+ <Zmqd45TnVVZYPwp8@nanopsycho.orion>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: Re: [PATCH net-next v20 02/13] rtase: Implement the .ndo_open
- function
-To: Justin Lai <justinlai0215@realtek.com>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Hariprasad Kelam <hkelam@marvell.com>, Jiri Pirko <jiri@resnulli.us>,
- Larry Chiu <larry.chiu@realtek.com>, Ping-Ke Shih <pkshih@realtek.com>,
- Ratheesh Kannoth <rkannoth@marvell.com>
-References: <20240607084321.7254-3-justinlai0215@realtek.com>
-Content-Language: en-GB
-In-Reply-To: <20240607084321.7254-3-justinlai0215@realtek.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:zT2eDDbCbkAb6TadagnKQKkdrgmhpoPIXLLgkHQKF2xNWCSr8UE
- Fe9EwmhShJ9T4hvcC1VG5Tef0fMj7FZK+XI5/BDbmIIFktF8QmvnGy3wPUzzdxM+6miGVIQ
- tY3gZQQVmj/uRI1mJ3CeLKlM3LM7H0FWTkY8hJ+m6ZoO7NZdRXTE8BSFWtvmwYd3zgGyq4G
- GZ0SRG0zaCk1XjvX11bvQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:bPMSKqIDmNg=;1s7bZP01Mg+SoE2pyTmiWtVKX1O
- nih5VoK6GtdGEBqdtN7o6edm7axYQptZvaW1x9iE8JUInpgIqHrZPeUPaP3T59WizG1P5/jtn
- ztwYXz2Y8fLp2iHzKjITY6+jzCcZ7t7ebXD8iVwkWRCqoxyg0yTSXNmkQMuDdpPVzDxq+ofTC
- 6O/TXKxm4AFmOh3UWZC7qWoHgtCfysX+od21Icszbn9L0wFRqWLTRVJe2zxV9rVoceoMBMFv0
- rf7e7j86Jh4F5pCqkMTsf6shlZKAHENyJIjlAhPHlv34ynSFPSq599OOpSuFtlurWIjrl7PTm
- 3Sf2f19Fvr80QNZaNFIu27sPW+3RDnDpMXgBNz76I/ic7TNVi/g0QeaEry1UAoS72W5KlRVIm
- AoTXqlorS4h7KcyEqTjKfVS2Qjr0htIF3xp8AZvOLul24uqFfYrQ/+zwscIxtW7MNfKyKwEvZ
- 90HNZYpxb1VHjESZJu7g68g967R70msUT3N7cNpPBx1kI1mu3cL7jXbhCYut90bc8BFJbohov
- wte0ulagnYPJWBd4rY5dOXChuBOW5/a+j3afdUiRfmetFbMp+mHhBvcHerc2i2bgPClhVo45H
- INuq2Su2qNJUxj/A0QPhbtcaCCqawiNZWbn3JmgdybMWyiL49zesge4452Xi6D695ecmkIyA+
- ngzqkUtXSTAEieh3fkU+fH/VV3eQZcb5e0jKnPqCuGOXXr1fSBqqKis2vXnzXwdgPsK5ShMl6
- O8aC853Sp3eCrS1de4sfYacuA+4Jp8GyBr2KRykd8HCV89ed6n6CDw4oMvbkZkCkYXwMa4IoD
- jJYBWY+ErFMgOOdmSEtjZxPwkz/hucjo9rLTA0sipTAj8=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zmqd45TnVVZYPwp8@nanopsycho.orion>
 
-=E2=80=A6
-> when requesting irq, because the first group of interrupts needs to
-> process more events, the overall structure will be different from
-> other groups of interrupts, so it needs to be processed separately.
-
-Can such a change description become clearer anyhow?
-
-
-=E2=80=A6
-> +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-=E2=80=A6
-> +static int rtase_alloc_desc(struct rtase_private *tp)
-> +{
-=E2=80=A6
-> +			netdev_err(tp->dev, "Failed to allocate dma memory of "
-> +					    "tx descriptor.\n");
-=E2=80=A6
-
-Would you like to keep the message (from such string literals) in a single=
- line?
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/coding-style.rst?h=3Dv6.10-rc3#n116
+On Thu, Jun 13, 2024 at 09:21:07AM +0200, Jiri Pirko wrote:
+> Thu, Jun 13, 2024 at 08:49:25AM CEST, mst@redhat.com wrote:
+> >On Wed, Jun 12, 2024 at 09:22:32AM +0200, Jiri Pirko wrote:
+> >> Wed, Jun 12, 2024 at 09:15:44AM CEST, mst@redhat.com wrote:
+> >> >On Wed, Jun 12, 2024 at 08:29:53AM +0200, Jiri Pirko wrote:
+> >> >> Wed, Jun 12, 2024 at 03:58:10AM CEST, kuba@kernel.org wrote:
+> >> >> >On Tue, 11 Jun 2024 13:32:32 +0800 Cindy Lu wrote:
+> >> >> >> Add new UAPI to support the mac address from vdpa tool
+> >> >> >> Function vdpa_nl_cmd_dev_config_set_doit() will get the
+> >> >> >> MAC address from the vdpa tool and then set it to the device.
+> >> >> >> 
+> >> >> >> The usage is: vdpa dev set name vdpa_name mac **:**:**:**:**:**
+> >> >> >
+> >> >> >Why don't you use devlink?
+> >> >> 
+> >> >> Fair question. Why does vdpa-specific uapi even exist? To have
+> >> >> driver-specific uapi Does not make any sense to me :/
+> >> >
+> >> >I am not sure which uapi do you refer to? The one this patch proposes or
+> >> >the existing one?
+> >> 
+> >> Sure, I'm sure pointing out, that devlink should have been the answer
+> >> instead of vdpa netlink introduction. That ship is sailed,
+> >
+> >> now we have
+> >> unfortunate api duplication which leads to questions like Jakub's one.
+> >> That's all :/
+> >
+> >
+> >
+> >Yea there's no point to argue now, there were arguments this and that
+> >way.  I don't think we currently have a lot
+> >of duplication, do we?
+> 
+> True. I think it would be good to establish guidelines for api
+> extensions in this area.
+> 
+> >
+> >-- 
+> >MST
+> >
 
 
-=E2=80=A6
-> +static int rtase_alloc_rx_skb(const struct rtase_ring *ring,
-=E2=80=A6
-> +{
-=E2=80=A6
-> +	struct sk_buff *skb =3D NULL;
-=E2=80=A6
-> +	int ret =3D 0;
-=E2=80=A6
-> +	if (!page) {
-> +		netdev_err(tp->dev, "failed to alloc page\n");
-> +		goto err_out;
-=E2=80=A6
-> +	if (!skb) {
-=E2=80=A6
-> +		netdev_err(tp->dev, "failed to build skb\n");
-> +		goto err_out;
-> +	}
-=E2=80=A6
-> +	return ret;
+Guidelines are good, are there existing examples of such guidelines in
+Linux to follow though? Specifically after reviewing this some more, I
+think what Cindy is trying to do is actually provisioning as opposed to
+programming.
 
-I find the following statement more appropriate.
+-- 
+MST
 
-	return 0;
-
-
-> +
-> +err_out:
-> +	if (skb)
-> +		dev_kfree_skb(skb);
-
-Why would you like to repeat such a check after it can be determined
-from the control flow that the used variable contains still a null pointer=
-?
-
-
-> +
-> +	ret =3D -ENOMEM;
-> +	rtase_make_unusable_by_asic(desc);
-> +
-> +	return ret;
-> +}
-=E2=80=A6
-
-It seems that the following statement can be more appropriate.
-
-	return -ENOMEM;
-
-
-May the local variable =E2=80=9Cret=E2=80=9D be omitted here?
-
-
-=E2=80=A6
-> +static int rtase_open(struct net_device *dev)
-> +{
-=E2=80=A6
-> +	int ret;
-> +
-> +	ivec =3D &tp->int_vector[0];
-> +	tp->rx_buf_sz =3D RTASE_RX_BUF_SIZE;
-> +
-> +	ret =3D rtase_alloc_desc(tp);
-> +	if (ret)
-> +		goto err_free_all_allocated_mem;
-=E2=80=A6
-
-I suggest to return directly after such a resource allocation failure.
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/coding-style.rst?h=3Dv6.10-rc3#n532
-
-
-How do you think about to increase the application of scope-based resource=
- management?
-https://elixir.bootlin.com/linux/v6.10-rc3/source/include/linux/cleanup.h#=
-L8
-
-Regards,
-Markus
 
