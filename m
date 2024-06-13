@@ -1,105 +1,131 @@
-Return-Path: <netdev+bounces-103209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C1EE90706B
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:27:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A146907014
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:26:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EA9FB26304
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 12:22:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23DA7B242D9
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 12:24:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00ACD143C52;
-	Thu, 13 Jun 2024 12:19:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12AF9144D07;
+	Thu, 13 Jun 2024 12:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hc3sJT/r"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hfCrzpDL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487ED1448DA
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 12:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF725143C46;
+	Thu, 13 Jun 2024 12:22:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718281141; cv=none; b=QwG79PoGungp3B00mUp7LfP+gWbr9S0Xxme+TmA+0oW4mBnLkqQddAIKE5x2I8nm3RF5mBxDY1/QvoqNZj9DDhEE4H61k74gqaWeGnSp/qMBLPRWiS0HFIjVakqAUY5S83wmBfNkk2+lSUi9zdU6LtiGu0dduHhSRr2N0dfnGNM=
+	t=1718281371; cv=none; b=PsM8I/KnMWmEPIOIERLRTKFoIf1LpGEc6gb7bb/n+7fH7QFbAffVl33vm+HJ85OSYFyMbMPmsPZjZYMtqlTvJljS8vbsaZG0QNMfsarY3CLyZrXSegE4rQXMfu/pOnNWzI0efTcjap0F3ASMvoauX9OLHRk4b8HyM8sTRUUuAlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718281141; c=relaxed/simple;
-	bh=7VBqIooRcVzAauFWwjigxd9vNsSgUjkoVVT8MaF03EU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=BwK7NJM4Ln/gYMZ4848WaixO7HTUTIKSCbf6ww1bWoppC/yFRrwP+DHc0SSxw2lG2K3tLwiOR/LXoOHqpIJXPfZUPlDVn7jqXQrIJU79RegSaXUU3SYIJlleHmsi1SNucGEm1s8JUGz/7ctAKue8//Mqna93qby7X61Y2AdToJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hc3sJT/r; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-57c8bd6b655so15844a12.0
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 05:18:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718281138; x=1718885938; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VSUKXL012FXP73EEnL09IAOfAs1NB28Fx+G7SmsEBW0=;
-        b=Hc3sJT/r/QEeGPetoI25wfMIW6ij0zP+vQ5qgMT9c85MZtfn/ftx2IOiJJ8feNeSlF
-         FlB0MQzYojD0LpzWLdV2w4XXd8p4GJciH9rjVpamNOnpLUHpG6GQojNGmj793GKBtSn9
-         DJ8B8Jj1yUwnx2cf/DhoiznB+zoVP5bAikYDJ4rfR4PIP21Txgm2772JLdHPS9uGix42
-         6HkU+1UahG4hgMo5dbgo9K9afFpF+RSKHOeZZyKW6ns/BtuZ8Or/Kw9kD7gxz0gIn0w4
-         rNnElbCAHlD6dwpARq0PyWopwjNbEip6K7sn4SmnRPxt0iGRxOuWy9kKUaXpK5fcwj7w
-         Y/Bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718281138; x=1718885938;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VSUKXL012FXP73EEnL09IAOfAs1NB28Fx+G7SmsEBW0=;
-        b=qP9aX33HDkpz1WtwZ175qRTg/xOdMHyQ3n2/SC63drUANp5hKgQc5uQNckiXum1cUG
-         6U+/xlZ0QmuVvVunM5v0osS0NwNqzJtAKIZUabVyZLPvCg0iNbGzJKO3WyvvnXH8YVli
-         /r7u916SRPa1iKN7X3Mmtx/v6jM0c23z2guD1ePUYZaAJkG/RV0X8SnQcS3ao2XYP8Ne
-         WjWxMYB05O5qgO1gzEjryf3cYoaxYlr+8jY8TowvKt8XheDuRSqzD1Q0ZA8qEimcmzuo
-         yiHWi7HTt65v/KvDGodfKfpjxtkzmATi9PXxLW33NWMzmct6KcAdZ0rYmjbTPBhjt+Go
-         wofg==
-X-Gm-Message-State: AOJu0YwXbuZqLDEB68O0lLGbQIKd7pu0jdIg4MX4AK5/Nl/EKR7YtkcF
-	hNzhoUEXbJDVbN5sE79QN+LJv49Mty+rfaCeoFTSIORx9glEzc6jhN2Qkp4MxpRtPIh9Ab8wzIm
-	zLJoOoOhLRaITj9LwaNZXppBnCJsg9P+C0i/SnMUXPAVcqobE2z2+
-X-Google-Smtp-Source: AGHT+IF+QYYLDPrYYV3t9mzeYwtD4UnFYkJtffLeJNQB3xaIhyz+MDl2eaUTvRevAdH6DUw4YpoCHrR3ZXqKD6Ta/HY=
-X-Received: by 2002:a05:6402:13c8:b0:57c:9cd6:2a9b with SMTP id
- 4fb4d7f45d1cf-57cb70987eamr157907a12.5.1718281137944; Thu, 13 Jun 2024
- 05:18:57 -0700 (PDT)
+	s=arc-20240116; t=1718281371; c=relaxed/simple;
+	bh=D26C2QGAWbo4I1JNfd9NGM4IGwcESsf+jS9RBEkH0RY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CY2Yf/1cbSaCVVOeeAxNbsOnX+tYIvAsLI9WFjekWGPkWUMJRoL3ndlyyjSUGu0y9Axo7h/waDAzS4qvbVyCwxOs5bS804ZvBbLlepwsBScxrw0nH89G4ue1zovf+WzyWCsaqo+q9l63mSEgfv2GUwoCJHCsDMgBI5hJvC9rTEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=hfCrzpDL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46929C32786;
+	Thu, 13 Jun 2024 12:22:49 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hfCrzpDL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1718281367;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zijv6FPIt5hCtiuqrLBHgYuKfY1FOvo07a77dKOwqRA=;
+	b=hfCrzpDLzmbNtF/sSyUwD/q4E2PbjKj9Fna9CH4V+V4vPbeuYBlZyE1WHIwBmUUgtmwa4e
+	hkAMHeSicVC3lwYY/+b0ttk/c79NH8Y9GniehbCUO4Tz+G6YoeBDfmgGgVjY7xbdbEJGet
+	Tjg4BjizrxilahviyNABzJbhoTcy7oY=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 199f6b88 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Thu, 13 Jun 2024 12:22:46 +0000 (UTC)
+Date: Thu, 13 Jun 2024 14:22:41 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <Zmrkkel0Fo4_g75a@zx2c4.com>
+References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+ <20240612143305.451abf58@kernel.org>
+ <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
+ <Zmov7ZaL-54T9GiM@zx2c4.com>
+ <Zmo9-YGraiCj5-MI@zx2c4.com>
+ <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
-Date: Thu, 13 Jun 2024 14:18:41 +0200
-Message-ID: <CANP3RGc1RG71oPEBXNx_WZFP9AyphJefdO4paczN92n__ds4ow@mail.gmail.com>
-Subject: Some sort of netlink RTM_GET(ROUTE|RULE|NEIGH) regression(?) in
- 6.10-rc3 vs 6.9
-To: Linux NetDev <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
 
-The Android net tests
-(available at https://cs.android.com/android/platform/superproject/main/+/main:kernel/tests/net/test/
-more specifically multinetwork_test.py & neighbour_test.py)
-run via:
-  /...aosp-tests.../net/test/run_net_test.sh --builder
-from within a 6.10-rc3 kernel tree are falling over due to a *plethora* of:
-  TypeError: NLMsgHdr requires a bytes object of length 16, got 4
+On Wed, Jun 12, 2024 at 08:38:02PM -0700, Paul E. McKenney wrote:
+> o	Make the current kmem_cache_destroy() asynchronously wait for
+> 	all memory to be returned, then complete the destruction.
+> 	(This gets rid of a valuable debugging technique because
+> 	in normal use, it is a bug to attempt to destroy a kmem_cache
+> 	that has objects still allocated.)
+> 
+> o	Make a kmem_cache_destroy_rcu() that asynchronously waits for
+> 	all memory to be returned, then completes the destruction.
+> 	(This raises the question of what to is it takes a "long time"
+> 	for the objects to be freed.)
 
-The problems might be limited to RTM_GETROUTE and RTM_GETRULE and RTM_GETNEIGH,
-as various other netlink using xfrm tests appear to be okay...
+These seem like the best two options.
 
-(note: 6.10-rc3 also fails to build for UML due to a buggy bpf change,
-but I sent out a 1-line fix for that already:
-https://patchwork.kernel.org/project/netdevbpf/patch/20240613112520.1526350-1-maze@google.com/
-)
+> o	Make a kmem_cache_free_barrier() that blocks until all
+> 	objects in the specified kmem_cache have been freed.
+> 
+> o	Make a kmem_cache_destroy_wait() that waits for all memory to
+> 	be returned, then does the destruction.  This is equivalent to:
+> 
+> 		kmem_cache_free_barrier(&mycache);
+> 		kmem_cache_destroy(&mycache);
 
-It is of course entirely possible the test code is buggy in how it
-parses netlink, but it has worked for years and years...
+These also seem fine, but I'm less keen about blocking behavior.
 
-Before I go trying to bisect this... anyone have any idea what might
-be the cause?
-Perhaps some sort of change to how these dumps work? Some sort of new
-netlink extended errors?
+Though, along the ideas of kmem_cache_destroy_rcu(), you might also
+consider renaming this last one to kmem_cache_destroy_rcu_wait/barrier().
+This way, it's RCU focused, and you can deal directly with the question
+of, "how long is too long to block/to memleak?"
 
-- Maciej
+Specifically what I mean is that we can still claim a memory leak has
+occurred if one batched kfree_rcu freeing grace period has elapsed since
+the last call to kmem_cache_destroy_rcu_wait/barrier() or
+kmem_cache_destroy_rcu(). In that case, you quit blocking, or you quit
+asynchronously waiting, and then you splat about a memleak like we have
+now.
+
+But then, if that mechanism generally works, we don't really need a new
+function and we can just go with the first option of making
+kmem_cache_destroy() asynchronously wait. It'll wait, as you described,
+but then we adjust the tail of every kfree_rcu batch freeing cycle to
+check if there are _still_ any old outstanding kmem_cache_destroy()
+requests. If so, then we can splat and keep the old debugging info we
+currently have for finding memleaks.
+
+Jason
 
