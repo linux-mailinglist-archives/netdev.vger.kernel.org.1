@@ -1,123 +1,72 @@
-Return-Path: <netdev+bounces-103282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8EE89075DF
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:59:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4134C9075EB
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 17:02:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58363286A9C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:59:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B50D8B23825
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 15:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F471482EA;
-	Thu, 13 Jun 2024 14:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA191494AD;
+	Thu, 13 Jun 2024 15:02:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yx0uP1gD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tIe5FPxB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30BC146A74
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 14:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69A284A41
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 15:02:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718290763; cv=none; b=NbmT2rGKXgi7wF4c74RIGwtVJTAHue195g6cZ3TBH8tfN85Wkkq0tnUtUIAZV/mGmeOgayphL5SNcCzqlxszc8oPI4xqUKzaoEgJ0uMP4NLPNfjUCgtHr+iNRzlDF/EsiApkBysqZie4BsIDDK5+C50n+wR7XiqcOsX+yA55dv8=
+	t=1718290956; cv=none; b=hmtelIBrY1GUEaxHRV5yAcs79NMYRaJYCb7ylsp65bSDSImC4qtxLsYMyS+cGhzlX+F88C9iM64jCSux2s5pg84ngde43H6biybY6i7NnrXc8ZG8sDm1f5WKjS9VIORBhd0z440rUl412xWWE/p+2B8has8qApaDU2TpUjBCLBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718290763; c=relaxed/simple;
-	bh=qs2Dz7qjSbW4vccPeJYtnqhSYlxFt3bToMTXiSpftTo=;
+	s=arc-20240116; t=1718290956; c=relaxed/simple;
+	bh=UqJ6h5x3NPp0wWba9rvV3TGYGP4vN2cl7sKOZ8FFtpk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FyjHNWXHVucIh6g6UsK111glMVQ0FRbEFbKyr8+QlfVZ+ZNwMqECUS+NTPM7HdPXuiGpEtUdVJNruHMQYXt5Cq+669BULNzcLHLA8K6J6F5Oh0Sj3fTwmNL8oFTU9411ivvnhN+VrFDtmvi1Ot0ry2Mcntbv68KyjqRn07c0Nas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yx0uP1gD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3950DC32786;
-	Thu, 13 Jun 2024 14:59:23 +0000 (UTC)
+	 MIME-Version:Content-Type; b=alWui4++Ea1ahVcFXuGuVPK37obaHPHzmTUasoeuPf8uqGLcppKJZEsGZbaKqCngabDBYpidyWhWsiUXuFFGgU7POBWp4Xjj+xTwFE+njK/LIx63KUvOPqJN61++RlpqsXk8iEkAPNqtUmteArR87xsfXsTMmIQ1si80YBkd6no=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tIe5FPxB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0149C4AF4D;
+	Thu, 13 Jun 2024 15:02:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718290763;
-	bh=qs2Dz7qjSbW4vccPeJYtnqhSYlxFt3bToMTXiSpftTo=;
+	s=k20201202; t=1718290956;
+	bh=UqJ6h5x3NPp0wWba9rvV3TGYGP4vN2cl7sKOZ8FFtpk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Yx0uP1gDwb6Y4Yqm1HkVgJV+XZTCZVWS7uCG84X9HKSSFMaQS0J4AMPp7ad4IsapJ
-	 qoO2ZkEOOlPsaVmIC1cKnaUgFF7fYBU0BarcMUdruYJb5CjNP6XXrdNaTcRcTyEWaL
-	 fwfkZWdko+dap8fRG5X0yKRG1OVH0qBmgRZ8jm6KtKSEf/qLD5HTJnKJxxMjj3p8p/
-	 f62qc8Ytsl+pjDZcsx2aff8xXXFgvz9CkAMJvYh6S5F4S+VlwT1Q4p87ZA3D0bLRvq
-	 AKaiyNoQjeVox1FqtNFnZtVsBBvHFs1ljEmVEckDsfSZplYZioAnIaWArr+X/Mnz7p
-	 LYwcb7Uvh/Nlg==
-Date: Thu, 13 Jun 2024 07:59:22 -0700
+	b=tIe5FPxB7+yRUu5TR/u5qcG61CRS6QUvdyzaFfKpiYMr7KdemmYr3C6s45XO5moKN
+	 z0L4eqMesV/fHfShdu35akk49oXXo2N9d/jPRFppGJxX80zwh2YIBufDlP3GrDzL8a
+	 HAkeAE5dhz9nUdk4nsK+HjwM9KpH+YGoOu/1p4UD98DERQV00WwV2/xIIyA+AL8MOx
+	 6xhTgEtG9ZJ/smbOV55+1W1BPSj7l9JRstFAV6H/8p5KdQlIP3hZ3SdxiHT2Q00Y7O
+	 jUY1GxpNE8jOkx9X5g5vjL/EazXJhc74FNmQ3YXFEmWmj3gc8482+LgBf4amuYBQuJ
+	 U8Dyd/vQB74mg==
+Date: Thu, 13 Jun 2024 08:02:34 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Maciej =?UTF-8?B?xbtlbmN6eWtvd3NraQ==?= <maze@google.com>
-Cc: Linux NetDev <netdev@vger.kernel.org>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
- <davem@davemloft.net>
-Subject: Re: Some sort of netlink RTM_GET(ROUTE|RULE|NEIGH) regression(?) in
- 6.10-rc3 vs 6.9
-Message-ID: <20240613075922.1052ce99@kernel.org>
-In-Reply-To: <CANP3RGcovrwKpuM-o=V2OYosdb6Xyy+tRM3Qrp3pF7RctEm6LQ@mail.gmail.com>
-References: <CANP3RGc1RG71oPEBXNx_WZFP9AyphJefdO4paczN92n__ds4ow@mail.gmail.com>
-	<20240613062927.54b15104@kernel.org>
-	<CANP3RGcovrwKpuM-o=V2OYosdb6Xyy+tRM3Qrp3pF7RctEm6LQ@mail.gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: edumazet@google.com, pabeni@redhat.com, davem@davemloft.net,
+ dsahern@kernel.org, mst@redhat.com, jasowang@redhat.com,
+ xuanzhuo@linux.alibaba.com, eperezma@redhat.com, leitao@debian.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v3] net: dqs: introduce IFF_NO_BQL private flag
+ for non-BQL drivers
+Message-ID: <20240613080234.36d61880@kernel.org>
+In-Reply-To: <CAL+tcoAP=Jg3pXO-_46w5CbrGnGVzHf4woqg3bQNCrb8SMhnrw@mail.gmail.com>
+References: <20240613023549.15213-1-kerneljasonxing@gmail.com>
+	<CAL+tcoAP=Jg3pXO-_46w5CbrGnGVzHf4woqg3bQNCrb8SMhnrw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, 13 Jun 2024 16:21:15 +0200 Maciej =C5=BBenczykowski wrote:
-> Ok, I sent out 2 patches adding the flag in 3 more spots that are
-> enough to get both tests working.
+On Thu, 13 Jun 2024 22:55:16 +0800 Jason Xing wrote:
+> I wonder why the status of this patch was changed to 'Changes
+> Requested'? Is there anything else I should adjust?
 
-Thanks!
-
-> The first in RTM_GETNEIGH seems obvious enough.
->=20
-> $ git grep rtnl_register.*RTM_GETNEIGH,
-> net/core/neighbour.c:3894:      rtnl_register(PF_UNSPEC, RTM_GETNEIGH,
-> neigh_get, neigh_dump_info,
-> net/core/rtnetlink.c:6752:      rtnl_register(PF_BRIDGE, RTM_GETNEIGH,
-> rtnl_fdb_get, rtnl_fdb_dump, 0);
-> net/mctp/neigh.c:331:   rtnl_register_module(THIS_MODULE, PF_MCTP, RTM_GE=
-TNEIGH,
->=20
-> but there is also PF_BRIDGE and PF_MCTP... (though obviously the test
-> doesn't care)
-> (and also RTM_GETNEIGHTBL...)
-
-These weren't converted to the new way, so they will be okay.
-
-> The RTM_GETRULE portion of the second one seems fine too:
->=20
-> $ git grep rtnl_register.*RTM_GETRULE
-> net/core/fib_rules.c:1296:      rtnl_register(PF_UNSPEC, RTM_GETRULE,
-> NULL, fib_nl_dumprule,
->=20
-> but I'm less certain about the GET_ROUTE portion there-of... as
-> there's a lot of hits:
->=20
-> $ git grep rtnl_register.*RTM_GETROUTE
-> net/can/gw.c:1293:      ret =3D rtnl_register_module(THIS_MODULE,
-> PF_CAN, RTM_GETROUTE,
-> net/core/rtnetlink.c:6743:      rtnl_register(PF_UNSPEC, RTM_GETROUTE,
-> NULL, rtnl_dump_all, 0);
-> net/ipv4/fib_frontend.c:1662:   rtnl_register(PF_INET, RTM_GETROUTE,
-> NULL, inet_dump_fib,
-> net/ipv4/ipmr.c:3162:   rtnl_register(RTNL_FAMILY_IPMR, RTM_GETROUTE,
-> net/ipv4/route.c:3696:  rtnl_register(PF_INET, RTM_GETROUTE,
-> inet_rtm_getroute, NULL,
-> net/ipv6/ip6_fib.c:2516:        ret =3D
-> rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETROUTE, NULL,
-> net/ipv6/ip6mr.c:1394:  err =3D rtnl_register_module(THIS_MODULE,
-> RTNL_FAMILY_IP6MR, RTM_GETROUTE,
-> net/ipv6/route.c:6737:  ret =3D rtnl_register_module(THIS_MODULE,
-> PF_INET6, RTM_GETROUTE,
-> net/mctp/route.c:1481:  rtnl_register_module(THIS_MODULE, PF_MCTP, RTM_GE=
-TROUTE,
-> net/mpls/af_mpls.c:2755:        rtnl_register_module(THIS_MODULE,
-> PF_MPLS, RTM_GETROUTE,
-> net/phonet/pn_netlink.c:304:    rtnl_register_module(THIS_MODULE,
-> PF_PHONET, RTM_GETROUTE,
->=20
-> It seems like maybe v4 and both mr's should be changed too?
-
-Didn't check MR, the v4 route dump has the flag already, AFAICS.
+Sorry to flip the question on you, but do you think the patch should 
+be merged as is? Given Jiri is adding BQL support to virtio?
 
