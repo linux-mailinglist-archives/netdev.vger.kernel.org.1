@@ -1,391 +1,511 @@
-Return-Path: <netdev+bounces-103224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 153F59072AE
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:50:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1918F907311
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 15:02:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B0531F20EFE
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 12:50:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EC891F239DC
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 13:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2828D143868;
-	Thu, 13 Jun 2024 12:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB221428EC;
+	Thu, 13 Jun 2024 13:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="aRRrGoY6";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="PYSSHLcu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EmJMskZn"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout6-smtp.messagingengine.com (fout6-smtp.messagingengine.com [103.168.172.149])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87F84A0F;
-	Thu, 13 Jun 2024 12:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718282971; cv=none; b=JEPachGujQavJqljUcX1knZTuegqBAKYs4qcRUb2qcZZX9BXoXXLJICX2oWRQQiIMP1fyW8lxPXVvn0rkpl5ipYML5ZgheZFfeBl2l9Tg3gaOsr1CzqSjRU9++bGR1v8FiBUpg63YMv5LqKud7U8Y0NXfZU8yPCWKaF0dIKcOzU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718282971; c=relaxed/simple;
-	bh=NKpJ6Iiw4UYoj+zNEhFPlwvU3HGLwHMcbTc/mWPEcuU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EgjgznLBFABgMtSaGEkj1qefBDV+rmPpFp4XAozOmOlENMboNxOSwLQdtjk88D4OCGJ3ZSHVRa88p94jGd4gZwZEyO5EvdJnqrRk2ktax/PqY6z+K9Ny7BCGLHcD2z3gZNoTG8dTnC6dmylXEH8lMvLsi6yJ0cjkNHoFQ77QocM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=aRRrGoY6; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=PYSSHLcu; arc=none smtp.client-ip=103.168.172.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.48])
-	by mailfout.nyi.internal (Postfix) with ESMTP id B8D3D138067D;
-	Thu, 13 Jun 2024 08:49:26 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute7.internal (MEProxy); Thu, 13 Jun 2024 08:49:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1718282966;
-	 x=1718369366; bh=L6kxJTdBVIwMJxow1m9CrvR/9Wv1u80x1hLwjEViFlM=; b=
-	aRRrGoY6ZzutzkpiHrIdMTRx0lmmlPU3iEcpXUJXFwir00t1HwgQClAD2EK4WYlB
-	S5cL+fqkjPxeSjWAUe7ggPVbLVTqchp8lTe4QAh9mj8NF6jVjsrkyvu0Md35hbjV
-	GE9jI/Wk3BsOb9/IEUvy9pBk08L5U19/7VJtWpRutRUWyF6ZwW7xHDQEYrTnpuUr
-	w/xXTWe1Y9zwhrHppgPfFGQP7fhvOlEC+bCGozRt/dwsUzCH3UwfCrdcAyVLg4ca
-	ffC9U75TPRwcn9q6yALB5CqMHUnGkWyHTkkCtxkOGORqJsIirYEmFadZ7Osa/+Nu
-	OzgHYcW9A65aMNe0HQvFvw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1718282966; x=
-	1718369366; bh=L6kxJTdBVIwMJxow1m9CrvR/9Wv1u80x1hLwjEViFlM=; b=P
-	YSSHLcu5lhhNcMroHOIV8eQP4ikyzN8wSFrn3TB4iSm0VYh7hA1sonVfpQhT1fC+
-	FhgkNg/JQGyzEWLz2eFJW38t2DAgwtt4aOJKffd1vAI4tbw9Q+g+Kfh2Z4pnX//A
-	TjbPkWER3erCmVwIgvw9e2+BA4xvwnZ5G9424TI15UEcCchR13b3ZL+vRXFMGbDt
-	FKwJ3Kd91W77/T3MsWK5ZBtrfkE8MtRoRwbwGjSAaWvzSh4bz/fv4snFu1YxYUwE
-	mUHoAljTXjLkvsECcULMb4mMKr2kZ+bC69roEH8aBSfOuVdBkSrrc5uLK8vSgB2g
-	YjDIajE8EmAT9d6hsdodQ==
-X-ME-Sender: <xms:1epqZsUj4rNNNPqtzX1BHC1gBPPlpeWTCvvWJjc0LBAvdcTYWalWUw>
-    <xme:1epqZglV_trNyBB818l6mDgYsDn6Jw7UtATuyIlEb00Tcf1Gciytt8mtm_nys4NIZ
-    fZFB0fymEoxg1dg5NU>
-X-ME-Received: <xmr:1epqZgajXOjmnoVKY_6oxqwdz2oqp5ovZnuIX3eYPFdS-CA_mwBtPgwV2xjcfVdD9q3KjKb6S4BmmESp-k3aX8FksURHfJk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrfedujedgheegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhk
-    lhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnh
-    gvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeefhfellefh
-    ffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvdelieenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggv
-    rhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgv
-X-ME-Proxy: <xmx:1epqZrU5VOzTWgW1f5eHC_Mbtd-7_t3l82xX1AliaWYVl_zPHvl0Ag>
-    <xmx:1epqZmn01LCgtouo-4mY3eUK1YS5zowsqSINDGmXut_Rs5juZYDsXA>
-    <xmx:1epqZgcD9X1UoFvYQ_ejDRw-f3TUn_fj3BCJi1C9i0V2IgozOIef8A>
-    <xmx:1epqZoElHBH6pVLmMIquPP_f4PSxSF9hWoxYC9YWcbvWUEPsE0s2Fg>
-    <xmx:1upqZrgx78z4_e2i7htWNYY4HHJTlm0AIeW0_g_vZNZmlfbtt5QUs37I>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 13 Jun 2024 08:49:25 -0400 (EDT)
-Date: Thu, 13 Jun 2024 14:49:21 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next,v8] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-Message-ID: <20240613124921.GG382677@ragnatech.se>
-References: <20240613104119.2820792-1-niklas.soderlund+renesas@ragnatech.se>
- <306484c7-4a8c-45ba-b0c6-74514a522f05@bp.renesas.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E341EEE0;
+	Thu, 13 Jun 2024 13:02:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718283755; cv=fail; b=QUfozPp4Adt4YZipb1vardZHez8JLtRnRIkc6+oKwmfAO7kwPaT7SQRdXq1YkYTBUz+jLVZb++5SxNfgUnppgSzDseusrCbdTvZA8abg1ESh24H+YzpBREcW9hK+1KKnNcyiePKgM+rs0k6Z0FlQV2VR5F2/wnCRIKjfrPyi56E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718283755; c=relaxed/simple;
+	bh=ZktHZxOta7Bpf+b2NwH3nhUMJdj++FxDrN8p2mtA0dU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=bdPXBhNQWshvMXXXCjlzG4/QZtWN0wg3s9D5ltDJCwxSGpRenQlMYoOS1b8Jv20jsXWjBrux8tWnNB0WDWNhX2Tw1U06GmIJYHkxl6tIhWXDqyBxoDtz2xCAEJdLvdtzHA6VGeMuj6qFIGocPoexIfAmGW/tetvAxFo3vSO3FsU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EmJMskZn; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718283753; x=1749819753;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ZktHZxOta7Bpf+b2NwH3nhUMJdj++FxDrN8p2mtA0dU=;
+  b=EmJMskZn7J/Ai+ns56g1pnvBOQuLbqEpNgbeGlDF3oKby3nZfwqzuv/C
+   tzrzBajWNreVe6IiGYGU41sfbAL9GYlHLZXBztywHH/aX+IQ630Gwxj8V
+   SoG+7inOARx1WVMo17njvyiL8vqFnHblJpIUu2ZrySXxf1k7rQOwQUV0x
+   q6Y3hIKqcJrefZJPfj1RGaZdUmiExW6jbS0fQndh1U1mwHFgM0Q2mdDlS
+   AJKsBdrn29SCIDJph98kYmteJJfzre2K7rPnYxMEPVUhubD3Es8hidcTg
+   HvtOr2umgoYPNzWuVLiKGbVxfm0z0g/trfu3pO16+zGYUDwEoixws2x47
+   w==;
+X-CSE-ConnectionGUID: JJXH3Xr/TQqeZl/4yrc9dw==
+X-CSE-MsgGUID: jTcu5Iq7ReWitCUj0tUMvw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11101"; a="40508650"
+X-IronPort-AV: E=Sophos;i="6.08,235,1712646000"; 
+   d="scan'208";a="40508650"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2024 06:02:31 -0700
+X-CSE-ConnectionGUID: Xuw8rGukRe6Fk57bYWPXeQ==
+X-CSE-MsgGUID: fSKKhuVJSiSTm/MTsSrnEg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,235,1712646000"; 
+   d="scan'208";a="40246837"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Jun 2024 06:01:20 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 13 Jun 2024 06:01:18 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 13 Jun 2024 06:01:18 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 13 Jun 2024 06:01:18 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 13 Jun 2024 06:01:18 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=APMUEsJKXeKQXgh8Ld5FpgXU36PvEMK3t+CdOGmQ0+h5qIlVrh5rrbFy99NxMyRuO5iLzNPTPLcfj0uWy4b+B1TapGCeca1QFeNWxIQcR9ZKN9g5mbDNlXBSd/M2yCS3EzzpS3vj9zhT9jQuuF69qhUbOvX6tQzoTclGfV7oIrzFElVZm8zmBZ/CTOeEIE5JQSuhRH194LzFXsDK2gvdTKGd6ucJxjDPGvZYD2l1e3/h5bV3KtByzaF1BrNYDRmo8MQ9DrwZPk82x40c39IyoFcA87AyM6WTe6QE3fCnTS+eNwbF+5NYBmBrROJVRguKP1rISVJRpSHuUNjW1IkgWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=m3m+xqT0Qi8VFq3zvXp+W7pSONbBXG4kwPU/vhus/Bs=;
+ b=WJDd0doc1IXViW4DPATnkUUvcGflUpxQowOLhHm5XgjjYMbAS2dbfFuwyznHUnlqgPviYHWvtpX5Z6/vaOazMsoCR5qEa6bs83tm6g9aYjmKyoPCMpdxPc+D96lAnp+5JlYXf8RJTCTBFTBe56CSRMONjOeC/zobnWeDH+DTAeRvyCaJVvUS21qxTo2pF8jP4BGManzKir1B7zedHSb2ECzNh57+N+bxSVXb6Ybnb7tPl/gpUzZudp4pRdUf8Nfm+TrPEqOJJKYuJQQRPQ0EGyJmpM2YcP+slR8kAkDxFnBUjQQ+VIpBwhgTxpZtyguQM9Mr8ECZjfYqnnn7/XJBAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by PH0PR11MB7585.namprd11.prod.outlook.com (2603:10b6:510:28f::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.37; Thu, 13 Jun
+ 2024 13:01:15 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.7677.019; Thu, 13 Jun 2024
+ 13:01:15 +0000
+Message-ID: <a0e8f31e-fa12-4f48-853d-16c78bce1d76@intel.com>
+Date: Thu, 13 Jun 2024 15:01:09 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/15] net: hbl_cn: add habanalabs Core Network driver
+To: Omer Shpigelman <oshpigelman@habana.ai>, <linux-kernel@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dri-devel@lists.freedesktop.org>
+CC: <ogabbay@kernel.org>, <zyehudai@habana.ai>
+References: <20240613082208.1439968-1-oshpigelman@habana.ai>
+ <20240613082208.1439968-2-oshpigelman@habana.ai>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20240613082208.1439968-2-oshpigelman@habana.ai>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VE1PR03CA0028.eurprd03.prod.outlook.com
+ (2603:10a6:803:118::17) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <306484c7-4a8c-45ba-b0c6-74514a522f05@bp.renesas.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH0PR11MB7585:EE_
+X-MS-Office365-Filtering-Correlation-Id: 94ac1b82-2fcb-4be3-f790-08dc8ba8e8a2
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230035|1800799019|366011|376009;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?d2FuV1c0YnZ2NkhHNFNzQ3RaM244R2YyS1hrL3F0MUhqcllPaE42UDE3amV6?=
+ =?utf-8?B?NytWVExVZnBYVGlCQ2tZL1QzT2I0NXhLNEZZeGlEc2lwNW5peGZQMGFLNXhB?=
+ =?utf-8?B?RFBiM3RPWGgyc3N2WGI3eUlzcUJINnRGdmJYbmt4Ry9SMXhEZTlCYkhFSzA4?=
+ =?utf-8?B?U01YT2tBeTZ4Q2krT0RTekV1Z2tONWIxSjFJVitPQXdpZ2puL1NhSHpsajNP?=
+ =?utf-8?B?L255NTFyUVVhNDdjQ3h4a3JHdHZZS2hnOWw2MFJqamJqS0tlVUdIdDh0aUNZ?=
+ =?utf-8?B?bmJrMVZsMUoraGUxYjZqZ2xaYjV1MVJDNlArT0t5VGNCd01uY0h3TVZSanJm?=
+ =?utf-8?B?Qi92YmlNdmN2WVVKcWZxR0FiNVhTV3U2MmVJMFpGcURxNTBLVzFPRnlXRk9N?=
+ =?utf-8?B?OVBNd2xvRGdORHBvVElXOGFvZHlZS3dwVjJIYlRkRi9xVG5RUXJHSHZ2dWRi?=
+ =?utf-8?B?cUxtUWFiUlRncUtkcUoyS25OeklIelNBS2Exb2Y0eXZCT1VNTWpqcUhGR3FJ?=
+ =?utf-8?B?Zm9MbkFjYWxINnJMYXdtaVdna0FaWmpXbFFJV3BNb282Sjgybnc5ZW5wTkxt?=
+ =?utf-8?B?WnF1eGlJS01NV2U0TzdBVndKa25yWDdsUE1DYnBzREN6L3Rwbm15ME01TW53?=
+ =?utf-8?B?bkdPVThtSlJuNzE3aTE1R2oybTl0SFgxWnQ0S0docVplVzRSNWFzT2MwK3Zj?=
+ =?utf-8?B?dWNOWjQxemhsSFhFbm9HeTJqdUFDYVRDTTBuZGthMENObnlWaTNqV0lTQkpr?=
+ =?utf-8?B?MzZxS092bkszY0RtdjZvelBVK1ZGOW5pVXJacCtkbzVGMkwxQ2xvd2ZIb21i?=
+ =?utf-8?B?UWpsOHJVZk5GRUsrMnhNOWswTFFoSUJzNEx0b3lCdTNmV2xJcEd0c2drTUUw?=
+ =?utf-8?B?WEFyeEZaZ2l4dnk2RmhCWExyaDVBNFN0emtJMmJBNEd1dDFCNXRTTGI3MFNj?=
+ =?utf-8?B?ZENHSHlpVGxrcjVsNTAyMWlScVhLUFNPUitmUU1UREo0eFE2MUNiSTlJbUlQ?=
+ =?utf-8?B?aHRDcXdub21RUmVnV2N5VU1qbnFzT1BHMlRTVmJUZG1UdEZiUkJzSXhsdHli?=
+ =?utf-8?B?WW5MY0lVK2RxWHFDZnJOMjBBSmhhT2V0bitpZWxocGFFbDEwRDdtSGRuSUdQ?=
+ =?utf-8?B?dTlRVi9ZaTlSRE1lZWtUSHJ6SGVia0x5OS82UDNGMkU4L3RHUmtVMWEyQjBx?=
+ =?utf-8?B?NTdqa2U5ZmNwTEJsMDExSktDaGtxUzF6NWdhZFRUd042RTRhOEJMMDZhWHNL?=
+ =?utf-8?B?UWtLTlRuMXhTODIzR0ZQTXBJczlZdVRnblpTNjJ4bStFb3YyUnFCWVFtS3c5?=
+ =?utf-8?B?ZkxYb2xaNTNTd2RNZURjekducHRWek4vdTJNc3N1NU5PQU01QzZIdzVoWi9I?=
+ =?utf-8?B?OTJFTFBHNDAvdFROYkN4Si9lSGZWaXRCUGtQVDM2VXZXZ1FnckEzVTJqKzRt?=
+ =?utf-8?B?ZUMvTzA2bzcySkFZVHN4aHhXZTN3dUZkbG10cnZwTnA3QUxHcW5OYnYzTVJM?=
+ =?utf-8?B?QW5qZFVxbXF0SnRST2oyUUQyTXZ0UkFCR2pxZEJtbmZ6SmEvYW9vU3VWWGtS?=
+ =?utf-8?B?Uk5QM2V3MkMrSzBQeE9KTWRsb3RaVFRCTTNyd0o3U0xNYlJRaVZBSzMzaU0r?=
+ =?utf-8?B?RjBmNFFGZ1ZDY09jTzNBUEp1dkdvcm9xLzlRU0VsbzZRS2pSZ0VVRGlzbHVK?=
+ =?utf-8?B?RGZqMXZUR0RYMDVwL3FLWHM2eE5MODFHbTBkM2tTU1NVRWRIWHdEVS9memdK?=
+ =?utf-8?Q?ZihtcFtllazcHwJE0YQMGni3kdoOo/8euE33CEN?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230035)(1800799019)(366011)(376009);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YlhXeDNmTzN0RUY0QUtZcjZXYkI1M3JucVRPTU5xc0drOCtoSFRGN2hzY2tq?=
+ =?utf-8?B?eE8rK1hyWkJxYVg0T0VDc0RYemtNTjloK05ldHE5eEFkcnk2S2o3eXA3dEor?=
+ =?utf-8?B?RmRmVTJ4aTY0OHB6SGp2QzBmVmY2NXRHM2xtNGRUMWg4RXBkcmFqdGNyUmxv?=
+ =?utf-8?B?bEJ5R0JxQkRNOUgrTXdOem90SXpMYVJ4MUkzUTFYSkxpWHpmNWJwK2VUV1lt?=
+ =?utf-8?B?VVE4T2hhMXU5bEhLKzRYNlhnQWh5SVZFaWY4VkJVWktWTFVSMzU3TTNiaXR5?=
+ =?utf-8?B?R29hd1laeGFONU9kRCsyaW0xTEo2Vjl2bHVRcEJYTDFHcjdjaTMrbFh3cW1P?=
+ =?utf-8?B?ZmJHNGhpTjdaajVHd1FxQlR0ZG8rSnNRQU9BU3JMOFBtYkVqRWNMT1JtZzR3?=
+ =?utf-8?B?bGFZRGNMaGZMNm0zOUdKbGg2cVd3V1BBYjhMMFo5YWJKTFdBbGhrR2xQMGox?=
+ =?utf-8?B?Zk82QmhsRlZ1S3RtVnhjMVFQWU94c0F4MkpxMGkrTnVLc2ZvMGtFV2JrY1FN?=
+ =?utf-8?B?MDBMamNwLzcyZVhaNDB5SDJsbGxlL3krbFpUODhSeFhmRHNxQXBaYlBjUURo?=
+ =?utf-8?B?U1g5RnJ0Z2pMdGlBNUhsYzhNeWhPMUl2MHFnNzZXckdxQU1zQ202dE9UbGNH?=
+ =?utf-8?B?YmhrNWZweVVEWjd6MTYrRXgyK2JodEx4empmZStNUFN0cGNBbmFXSEdlT1ZM?=
+ =?utf-8?B?a053S043WEEvSFdqWjd0VWluVk5YTjhBTFpDckY0M0FwT2ZXUVBKZ2wwOWt2?=
+ =?utf-8?B?MVROMTBkWUo5SWRiZGtWNkZVWStmQzRmNWNtNFFvaGJCdWphNzAxaFNHTzJ5?=
+ =?utf-8?B?a2tqL2x3ZjJaa0hOMERzYVdrNmtMTWpFSzRXVFVGcnlWS0ZDamlXSmZyVUFi?=
+ =?utf-8?B?bERKZDhEbGxHalJpMTJ3SDVkcFBDa3hPTVkwVWo4SGh5TU80YjdNekxoL1p0?=
+ =?utf-8?B?K1crVUJFSTFyOCtnSmZWcmFJVDNQc2x6YlhvOG1iNWpXN1AzQW02OWp6ejdn?=
+ =?utf-8?B?VTgwYXBBVnZsSkRPQmpObUdFVzl1Zys2NW5kVGtacjJDV0dTYVpKWW5OM0FJ?=
+ =?utf-8?B?cW1GMkVCV2tWa3BjWndvQklHRUJhaTF6dGVCZEV0bVJ5b3lWRFlFVDJhRCtu?=
+ =?utf-8?B?b2tjZDNxbktsUmVvTTY0VjZhUmJnZlpNZUpZWHRTbEZqVDZ2YWRiQWZtQVZ6?=
+ =?utf-8?B?NmNNaFdKSmhiZWYzUDI3NzVtWHFVSDN3ZlNza3BNS0tQTmJNM0JUM09yWk1T?=
+ =?utf-8?B?NG1qL2UwY25aN3REQ3lTMDlsVWZQSTBUSThRcDkrc3BiL3F5MUtQc2tSQ1Vl?=
+ =?utf-8?B?Rk5qVHR4UmlhUndlN1RXMnpqVnJGSmdUY1N4dFYwaXNKTllKS1JrbXQzNUR5?=
+ =?utf-8?B?MjVTNU1wQlRPbThYRFBNRElua3FrSFg3REZPb1c4clMxdWtDaXhWaUQ3V2ts?=
+ =?utf-8?B?WWd1UTd6UDB6SWFnUEVPVVpRUys0VUI4Q2prVDVMRWdqS1NlZ0JkemtSV0xv?=
+ =?utf-8?B?anRmbU5McE95WTgzZWsxVVpLdjYzMjJjWDQrSlVISHdyQkRpMFNCNitpSnBx?=
+ =?utf-8?B?ZXhjZGd4Q1lYWXNKcGNvWi9vUGZ1R3N6VWRBWEF0V0Rrb3lTY0hrRUViQzFs?=
+ =?utf-8?B?TG5kbkVrMXdidWs5cE5IUmppVE5oT0QrYldEemlvSksvWFd5V3h5cWNaMDhQ?=
+ =?utf-8?B?MHJqODVmK1phOThqanYxdFJiYjQ4WTBpWHY0eTNaM3hoWW1Ma2V6RGltT3NR?=
+ =?utf-8?B?NVFWZHJaTHkwajFoRy90OTlZa3ZCLzhhU1JQemtsdlZHcENHVytBUDV3cW5U?=
+ =?utf-8?B?dVM2bVZDM0Y2THM5K20yaEkxdTdSU0Zic2dEcmdRNXJIWndxK0VOcjc3Ulo3?=
+ =?utf-8?B?WjNEUDhJNWlSSnpDYVhMdU5odnBZTzd3YUV0YXI1L0dFT3pROEJQZCtCSTll?=
+ =?utf-8?B?NkVwVnFsTWErT0d3ekdhdDdwVkRTdXlCM0xiMnNlTGNSWVovQkhzeU95b0p4?=
+ =?utf-8?B?bDVCbm9MZ1ZFelBVQWU3RyswYkphNzh2b3dDT3UwVDFvS2c0Q3U2bXFnZFVv?=
+ =?utf-8?B?RHV1NnhyWjhLRVVRMGUxMUVha1RCbUdXZXNKS2JCUDlkNHREVzNqL1IzWHRN?=
+ =?utf-8?B?TWVlUVdNenAvR3FxOFBTU3lTc1FQd2Y5dTdBNWxNbXBvdnBBZEI4VWh4S3NV?=
+ =?utf-8?Q?sVUdviciwN/xY9FkAYWbDic=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94ac1b82-2fcb-4be3-f790-08dc8ba8e8a2
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2024 13:01:15.5569
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0YpqJRlTo3JYFvaEikmm5FcNcnAiR8SiXfk8pC5nUvXs5q4yYlj94XlB2bYMrVOsrDKTSBwq36OtlGW20ESCaEgYhNUw1t2f1c2cHNCduec=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7585
+X-OriginatorOrg: intel.com
 
-Hi Paul,
-
-Thanks for your feedback.
-
-On 2024-06-13 13:29:30 +0100, Paul Barker wrote:
-> On 13/06/2024 11:41, Niklas Söderlund wrote:
-> > Add initial support for Renesas Ethernet-TSN End-station device of R-Car
-> > V4H. The Ethernet End-station can connect to an Ethernet network using a
-> > 10 Mbps, 100 Mbps, or 1 Gbps full-duplex link via MII/GMII/RMII/RGMII.
-> > Depending on the connected PHY.
-> > 
-> > The driver supports Rx checksum and offload and hardware timestamps.
-> > 
-> > While full power management and suspend/resume is not yet supported the
-> > driver enables runtime PM in order to enable the module clock. While
-> > explicit clock management using clk_enable() would suffice for the
-> > supported SoC, the module could be reused on SoCs where the module is
-> > part of a power domain.
-> > 
-> > Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-> > ---
-> > * Changes since v7
-> > - Properly handle Rx when netpoll is called with 0 budget. Previously
-> >    one Rx packet would be processed in this case.
-> > - Use napi_alloc_skb() instead of netdev_alloc_skb() in Rx.
-> > - Use device implemented 64 bit stats instead of using stats member in
-> >    struct net_device.
-> > - Implement ndo_hwtstamp_{g,s}et instead of acting on SIOC{G,S}HWTSTAMP
-> >    in do_ioctl().
-> > - Fix incorrect error sign when using PTR_ERR().
-> > - Add missing cosmetic space when creating struct of_device_id.
-> > - Rename label error_alloc to error_free.
-> > 
-> > * Changes since v6
-> > - Fix warning added when removing delays depending on phy-mode logic.
-> > 
-> > * Changes since v5
-> > - Removed delays depending on phy-mode logic. This is only needed on
-> >    some SoCs (V4H multiple boards), and currently we can't test on them.
-> >    As this have been a hot topic in review drop it for now so we can
-> >    support V4H single boards which we can test and lets work on the delay
-> >    on-top when we can test it.
-> > 
-> > * Changes since v4
-> > - Enable GPOUT_RDM and GPOUT_TDM delays depending on phy-mode.
-> > 
-> > * Changes since v3
-> > - Add description to commit message why PM operations are used instead
-> >    of explicit management of the clock.
-> > 
-> > * Changes since v2
-> > - Drop extra call to ether_setup(), already called by
-> >    alloc_etherdev_mqs().
-> > - Remove dependency on MII.
-> > - Improve error paths when requestion IRQs.
-> > - Correct the interpretation of which  phy-mode to apply delays for, and
-> >    mask the phy-mode passed to the PHY if MAC adds delays.
-> > 
-> > * Changes since v1
-> > - Remove C45 read/write functions, the phy-core can do that for us.
-> > - Rework the driver to register the MDIO bus at probe time instead of at
-> >    ndo_open().
-> > - Rework rtsn_rx() to take advantages of the improved design proposed
-> >    and upstreamed for R-Car RAVB driver Rx code-path.
-> > - Use napi_complete_done() instead of napi_complete().
-> > - Update commit message to list that the driver supports Rx CSUM
-> >    offload.
-> > - Drop unneeded __iowmb() left from development as well as a stray ;.
-> > - Consider all RGMII modes.
-> > - Move the phy_stop() call to mirror where phy_start() is called.
-> > - Forward IOCTLS from rtsn_do_ioctl() to PHY using ndo_eth_ioctl()
-> > - Align variable names to match core for IOCTLS functions.
-> > - Make sure DMA mask and PTP is registered before registering the ndev.
-> > - Document why the RTSN driver needs to be able to apply delays
-> > - Add checks for which phy-modes the MAC driver can apply delays
-> > - Use snprintf() instead of sprintf()
-> > 
-> > * Changes since RFC
-> > - Fix issues in MDIO communication.
-> > - Use a dedicated OF node for the MDIO bus.
-> > ---
-> >   MAINTAINERS                           |    8 +
-> >   drivers/net/ethernet/renesas/Kconfig  |   10 +
-> >   drivers/net/ethernet/renesas/Makefile |    2 +
-> >   drivers/net/ethernet/renesas/rtsn.c   | 1381 +++++++++++++++++++++++++
-> >   drivers/net/ethernet/renesas/rtsn.h   |  464 +++++++++
-> >   5 files changed, 1865 insertions(+)
-> >   create mode 100644 drivers/net/ethernet/renesas/rtsn.c
-> >   create mode 100644 drivers/net/ethernet/renesas/rtsn.h
+On 6/13/24 10:21, Omer Shpigelman wrote:
+> Add the hbl_cn driver which will serve both Ethernet and InfiniBand
+> drivers.
+> hbl_cn is the layer which is used by the satellite drivers for many shared
+> operations that are needed by both EN and IB subsystems like QPs, CQs etc.
+> The CN driver is initialized via auxiliary bus by the habanalabs driver.
 > 
-> [snip]
-> 
-> > +static int rtsn_rx(struct net_device *ndev, int budget)
-> > +{
-> > +	struct rtsn_private *priv = netdev_priv(ndev);
-> > +	unsigned int ndescriptors;
-> > +	unsigned int rx_packets;
-> > +	unsigned int i;
-> > +	bool get_ts;
-> > +
-> > +	get_ts = priv->ptp_priv->tstamp_rx_ctrl &
-> > +		RCAR_GEN4_RXTSTAMP_TYPE_V2_L2_EVENT;
-> > +
-> > +	ndescriptors = priv->dirty_rx + priv->num_rx_ring - priv->cur_rx;
-> > +	rx_packets = 0;
-> > +	for (i = 0; i < ndescriptors; i++) {
-> > +		const unsigned int entry = priv->cur_rx % priv->num_rx_ring;
-> > +		struct rtsn_ext_ts_desc *desc = &priv->rx_ring[entry];
-> > +		struct sk_buff *skb;
-> > +		dma_addr_t dma_addr;
-> > +		u16 pkt_len;
-> > +
-> > +		/* Stop processing descriptors if budget is consumed. */
-> > +		if (rx_packets >= budget)
-> > +			break;
-> > +
-> > +		/* Stop processing descriptors on first empty. */
-> > +		if ((desc->die_dt & DT_MASK) == DT_FEMPTY)
-> > +			break;
-> > +
-> > +		dma_rmb();
-> > +		pkt_len = le16_to_cpu(desc->info_ds) & RX_DS;
-> > +
-> > +		skb = priv->rx_skb[entry];
-> > +		priv->rx_skb[entry] = NULL;
-> > +		dma_addr = le32_to_cpu(desc->dptr);
-> > +		dma_unmap_single(ndev->dev.parent, dma_addr, PKT_BUF_SZ,
-> > +				 DMA_FROM_DEVICE);
-> > +
-> > +		/* Get timestamp if enabled. */
-> > +		if (get_ts) {
-> > +			struct skb_shared_hwtstamps *shhwtstamps;
-> > +			struct timespec64 ts;
-> > +
-> > +			shhwtstamps = skb_hwtstamps(skb);
-> > +			memset(shhwtstamps, 0, sizeof(*shhwtstamps));
-> > +
-> > +			ts.tv_sec = (u64)le32_to_cpu(desc->ts_sec);
-> > +			ts.tv_nsec = le32_to_cpu(desc->ts_nsec & cpu_to_le32(0x3fffffff));
-> > +
-> > +			shhwtstamps->hwtstamp = timespec64_to_ktime(ts);
-> > +		}
-> > +
-> > +		skb_put(skb, pkt_len);
-> > +		skb->protocol = eth_type_trans(skb, ndev);
-> > +		netif_receive_skb(skb);
-> > +
-> > +		/* Update statistics. */
-> > +		priv->stats.rx_packets++;
-> 
-> I think it's better to do `priv->stats.rx_packets += rx_packets` once at
-> the end of this function instead of repeatedly incrementing another
-> variable on the hot path.
+> Signed-off-by: Omer Shpigelman <oshpigelman@habana.ai>
+> Co-developed-by: Abhilash K V <kvabhilash@habana.ai>
+> Signed-off-by: Abhilash K V <kvabhilash@habana.ai>
+> Co-developed-by: Andrey Agranovich <aagranovich@habana.ai>
+> Signed-off-by: Andrey Agranovich <aagranovich@habana.ai>
+> Co-developed-by: Bharat Jauhari <bjauhari@habana.ai>
+> Signed-off-by: Bharat Jauhari <bjauhari@habana.ai>
+> Co-developed-by: David Meriin <dmeriin@habana.ai>
+> Signed-off-by: David Meriin <dmeriin@habana.ai>
+> Co-developed-by: Sagiv Ozeri <sozeri@habana.ai>
+> Signed-off-by: Sagiv Ozeri <sozeri@habana.ai>
+> Co-developed-by: Zvika Yehudai <zyehudai@habana.ai>
+> Signed-off-by: Zvika Yehudai <zyehudai@habana.ai>
+> ---
+>   .../device_drivers/ethernet/index.rst         |    1 +
+>   .../device_drivers/ethernet/intel/hbl.rst     |   82 +
+>   MAINTAINERS                                   |   11 +
+>   drivers/net/ethernet/intel/Kconfig            |   20 +
+>   drivers/net/ethernet/intel/Makefile           |    1 +
+>   drivers/net/ethernet/intel/hbl_cn/Makefile    |    9 +
+>   .../net/ethernet/intel/hbl_cn/common/Makefile |    3 +
+>   .../net/ethernet/intel/hbl_cn/common/hbl_cn.c | 5954 +++++++++++++++++
+>   .../net/ethernet/intel/hbl_cn/common/hbl_cn.h | 1627 +++++
+>   .../ethernet/intel/hbl_cn/common/hbl_cn_drv.c |  220 +
+>   .../intel/hbl_cn/common/hbl_cn_memory.c       |   40 +
+>   .../ethernet/intel/hbl_cn/common/hbl_cn_phy.c |   33 +
+>   .../ethernet/intel/hbl_cn/common/hbl_cn_qp.c  |   13 +
+>   include/linux/habanalabs/cpucp_if.h           |  125 +-
+>   include/linux/habanalabs/hl_boot_if.h         |    9 +-
+>   include/linux/net/intel/cn.h                  |  474 ++
+>   include/linux/net/intel/cn_aux.h              |  298 +
+>   include/linux/net/intel/cni.h                 |  636 ++
+>   18 files changed, 9545 insertions(+), 11 deletions(-)
 
-We could do that, but I opted for this as it makes more sens to update 
-rx_packets and rx_bytes in the same location IMHO.
+this is a very big patch, it asks for a split; what's worse, it's
+proportional to the size of this series:
+  146 files changed, 148514 insertions(+), 70 deletions(-)
+which is just too big
 
-> 
-> > +		priv->stats.rx_bytes += pkt_len;
-> > +
-> > +		/* Update counters. */
-> > +		priv->cur_rx++;
-> > +		rx_packets++;
-> > +	}
-> > +
-> > +	/* Refill the RX ring buffers */
-> > +	for (; priv->cur_rx - priv->dirty_rx > 0; priv->dirty_rx++) {
-> > +		const unsigned int entry = priv->dirty_rx % priv->num_rx_ring;
-> > +		struct rtsn_ext_ts_desc *desc = &priv->rx_ring[entry];
-> > +		struct sk_buff *skb;
-> > +		dma_addr_t dma_addr;
-> > +
-> > +		desc->info_ds = cpu_to_le16(PKT_BUF_SZ);
-> > +
-> > +		if (!priv->rx_skb[entry]) {
-> > +			skb = napi_alloc_skb(&priv->napi,
-> > +					     PKT_BUF_SZ + RTSN_ALIGN - 1);
-> > +			if (!skb)
-> > +				break;
-> > +			skb_reserve(skb, NET_IP_ALIGN);
-> > +			dma_addr = dma_map_single(ndev->dev.parent, skb->data,
-> > +						  le16_to_cpu(desc->info_ds),
-> > +						  DMA_FROM_DEVICE);
-> > +			if (dma_mapping_error(ndev->dev.parent, dma_addr))
-> > +				desc->info_ds = cpu_to_le16(0);
-> > +			desc->dptr = cpu_to_le32(dma_addr);
-> > +			skb_checksum_none_assert(skb);
-> > +			priv->rx_skb[entry] = skb;
-> > +		}
-> > +
-> > +		dma_wmb();
-> > +		desc->die_dt = DT_FEMPTY | D_DIE;
-> > +	}
-> > +
-> > +	priv->rx_ring[priv->num_rx_ring].die_dt = DT_LINK;
-> > +
-> > +	return rx_packets;
-> > +}
-> 
-> [snip]
-> 
-> > +static netdev_tx_t rtsn_start_xmit(struct sk_buff *skb, struct net_device *ndev)
-> > +{
-> > +	struct rtsn_private *priv = netdev_priv(ndev);
-> > +	struct rtsn_ext_desc *desc;
-> > +	int ret = NETDEV_TX_OK;
-> > +	unsigned long flags;
-> > +	dma_addr_t dma_addr;
-> > +	int entry;
-> > +
-> > +	spin_lock_irqsave(&priv->lock, flags);
-> > +
-> > +	if (priv->cur_tx - priv->dirty_tx > priv->num_tx_ring) {
-> > +		netif_stop_subqueue(ndev, 0);
-> > +		ret = NETDEV_TX_BUSY;
-> > +		goto out;
-> > +	}
-> > +
-> > +	if (skb_put_padto(skb, ETH_ZLEN))
-> > +		goto out;
-> > +
-> > +	dma_addr = dma_map_single(ndev->dev.parent, skb->data, skb->len,
-> > +				  DMA_TO_DEVICE);
-> > +	if (dma_mapping_error(ndev->dev.parent, dma_addr)) {
-> > +		dev_kfree_skb_any(skb);
-> > +		goto out;
-> > +	}
-> > +
-> > +	entry = priv->cur_tx % priv->num_tx_ring;
-> > +	priv->tx_skb[entry] = skb;
-> > +	desc = &priv->tx_ring[entry];
-> > +	desc->dptr = cpu_to_le32(dma_addr);
-> > +	desc->info_ds = cpu_to_le16(skb->len);
-> 
-> Should we check against the maximum TX frame size supported by the
-> hardware here?
-> 
-> Whatever we do here, we should also do in the ravb driver as that makes
-> a similar cpu_to_le16() call to fill the DS field with no check that the
-> HW actually supports transmitting a frame of the given size.
+[...]
 
-Compared to RAVB the RTSN driver do not support splitting a packet over 
-multiple descriptors, so the max frame size adhering to the MTU will 
-always fit using a single descriptor.
+> +Support
+> +=======
+> +For general information, go to the Intel support website at:
+> +https://www.intel.com/support/
+> +
+> +If an issue is identified with the released source code on a supported kernel
+> +with a supported adapter, email the specific information related to the issue
+> +to intel-wired-lan@lists.osuosl.org.
 
-> 
-> > +	desc->info1 = cpu_to_le64(skb->len);
-> > +
-> > +	if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) {
-> > +		skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
-> > +		priv->ts_tag++;
-> > +		desc->info_ds |= cpu_to_le16(TXC);
-> > +		desc->info = priv->ts_tag;
-> > +	}
-> > +
-> > +	skb_tx_timestamp(skb);
-> > +	dma_wmb();
-> > +
-> > +	desc->die_dt = DT_FSINGLE | D_DIE;
-> > +	priv->cur_tx++;
-> > +
-> > +	/* Start xmit */
-> > +	rtsn_write(priv, TRCR0, BIT(TX_CHAIN_IDX));
-> > +out:
-> > +	spin_unlock_irqrestore(&priv->lock, flags);
-> > +	return ret;
-> > +}
-> 
-> Thanks,
-> 
-> -- 
-> Paul Barker
+I'm welcoming you to post next version of the driver to the IWL mailing
+list, and before that, to go through our Intel path for ethernet
+subsystem (rdma and a few smaller ones also go through that)
+(that starts internally, I will PM you the details)
 
+[...]
 
+> +++ b/drivers/net/ethernet/intel/hbl_cn/common/hbl_cn.c
+> @@ -0,0 +1,5954 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright 2020-2024 HabanaLabs, Ltd.
+> + * Copyright (C) 2023-2024, Intel Corporation.
+> + * All Rights Reserved.
+> + */
+> +
+> +#include "hbl_cn.h"
+> +
+> +#include <linux/file.h>
+> +#include <linux/module.h>
+> +#include <linux/overflow.h>
+> +#include <linux/pci.h>
+> +#include <linux/slab.h>
+> +
+> +#define NIC_MIN_WQS_PER_PORT		2
+> +
+> +#define NIC_SEQ_RESETS_TIMEOUT_MS	15000 /* 15 seconds */
+> +#define NIC_MAX_SEQ_RESETS		3
+> +
+> +#define HBL_CN_IPV4_PROTOCOL_UDP	17
+> +
+> +/* SOB mask is not expected to change across ASIC. Hence common defines. */
+> +#define NIC_SOB_INC_MASK		0x80000000
+> +#define NIC_SOB_VAL_MASK		0x7fff
+> +
+> +#define NIC_DUMP_QP_SZ			SZ_4K
+> +
+> +#define HBL_AUX2NIC(aux_dev)	\
+> +	({ \
+> +		struct hbl_aux_dev *__aux_dev = (aux_dev); \
+> +		((__aux_dev)->type == HBL_AUX_DEV_ETH) ? \
+> +		container_of(__aux_dev, struct hbl_cn_device, en_aux_dev) : \
+> +		container_of(__aux_dev, struct hbl_cn_device, ib_aux_dev); \
+> +	})
 
+this should be a function
 
+> +
+> +#define RAND_STAT_CNT(cnt) \
+> +	do { \
+> +		u32 __cnt = get_random_u32(); \
+> +		(cnt) = __cnt; \
+> +		dev_info(hdev->dev, "port %d, %s: %u\n", port, #cnt, __cnt); \
 
+no way for such message, ditto for the function
 
--- 
-Kind Regards,
-Niklas Söderlund
+> +	} while (0)
+> +
+> +struct hbl_cn_stat hbl_cn_mac_fec_stats[] = {
+> +	{"correctable_errors", 0x2, 0x3},
+> +	{"uncorrectable_errors", 0x4, 0x5}
+> +};
+> +
+> +struct hbl_cn_stat hbl_cn_mac_stats_rx[] = {
+> +	{"Octets", 0x0},
+> +	{"OctetsReceivedOK", 0x4},
+> +	{"aAlignmentErrors", 0x8},
+> +	{"aPAUSEMACCtrlFramesReceived", 0xC},
+> +	{"aFrameTooLongErrors", 0x10},
+> +	{"aInRangeLengthErrors", 0x14},
+> +	{"aFramesReceivedOK", 0x18},
+> +	{"aFrameCheckSequenceErrors", 0x1C},
+> +	{"VLANReceivedOK", 0x20},
+> +	{"ifInErrors", 0x24},
+> +	{"ifInUcastPkts", 0x28},
+> +	{"ifInMulticastPkts", 0x2C},
+> +	{"ifInBroadcastPkts", 0x30},
+> +	{"DropEvents", 0x34},
+> +	{"Pkts", 0x38},
+> +	{"UndersizePkts", 0x3C},
+> +	{"Pkts64Octets", 0x40},
+> +	{"Pkts65to127Octets", 0x44},
+> +	{"Pkts128to255Octets", 0x48},
+> +	{"Pkts256to511Octets", 0x4C},
+> +	{"Pkts512to1023Octets", 0x50},
+> +	{"Pkts1024to1518Octets", 0x54},
+> +	{"Pkts1519toMaxOctets", 0x58},
+> +	{"OversizePkts", 0x5C},
+> +	{"Jabbers", 0x60},
+> +	{"Fragments", 0x64},
+> +	{"aCBFCPAUSERx0", 0x68},
+> +	{"aCBFCPAUSERx1", 0x6C},
+> +	{"aCBFCPAUSERx2", 0x70},
+> +	{"aCBFCPAUSERx3", 0x74},
+> +	{"aCBFCPAUSERx4", 0x78},
+> +	{"aCBFCPAUSERx5", 0x7C},
+> +	{"aCBFCPAUSERx6", 0x80},
+> +	{"aCBFCPAUSERx7", 0x84},
+> +	{"aMACControlFramesReceived", 0x88}
+> +};
+> +
+> +struct hbl_cn_stat hbl_cn_mac_stats_tx[] = {
+> +	{"Octets", 0x0},
+> +	{"OctetsTransmittedOK", 0x4},
+> +	{"aPAUSEMACCtrlFramesTransmitted", 0x8},
+> +	{"aFramesTransmittedOK", 0xC},
+> +	{"VLANTransmittedOK", 0x10},
+> +	{"ifOutErrors", 0x14},
+> +	{"ifOutUcastPkts", 0x18},
+> +	{"ifOutMulticastPkts", 0x1C},
+> +	{"ifOutBroadcastPkts", 0x20},
+> +	{"Pkts64Octets", 0x24},
+> +	{"Pkts65to127Octets", 0x28},
+> +	{"Pkts128to255Octets", 0x2C},
+> +	{"Pkts256to511Octets", 0x30},
+> +	{"Pkts512to1023Octets", 0x34},
+> +	{"Pkts1024to1518Octets", 0x38},
+> +	{"Pkts1519toMaxOctets", 0x3C},
+> +	{"aCBFCPAUSETx0", 0x40},
+> +	{"aCBFCPAUSETx1", 0x44},
+> +	{"aCBFCPAUSETx2", 0x48},
+> +	{"aCBFCPAUSETx3", 0x4C},
+> +	{"aCBFCPAUSETx4", 0x50},
+> +	{"aCBFCPAUSETx5", 0x54},
+> +	{"aCBFCPAUSETx6", 0x58},
+> +	{"aCBFCPAUSETx7", 0x5C},
+> +	{"aMACControlFramesTx", 0x60},
+> +	{"Pkts", 0x64}
+> +};
+> +
+> +static const char pcs_counters_str[][ETH_GSTRING_LEN] = {
+> +	{"pcs_local_faults"},
+> +	{"pcs_remote_faults"},
+> +	{"pcs_remote_fault_reconfig"},
+> +	{"pcs_link_restores"},
+> +	{"pcs_link_toggles"},
+> +};
+> +
+> +static size_t pcs_counters_str_len = ARRAY_SIZE(pcs_counters_str);
+> +size_t hbl_cn_mac_fec_stats_len = ARRAY_SIZE(hbl_cn_mac_fec_stats);
+> +size_t hbl_cn_mac_stats_rx_len = ARRAY_SIZE(hbl_cn_mac_stats_rx);
+> +size_t hbl_cn_mac_stats_tx_len = ARRAY_SIZE(hbl_cn_mac_stats_tx);
+
+why those are not const?
+
+> +
+> +static void qps_stop(struct hbl_cn_device *hdev);
+> +static void qp_destroy_work(struct work_struct *work);
+> +static int __user_wq_arr_unset(struct hbl_cn_ctx *ctx, struct hbl_cn_port *cn_port, u32 type);
+> +static void user_cq_destroy(struct kref *kref);
+> +static void set_app_params_clear(struct hbl_cn_device *hdev);
+> +static int hbl_cn_ib_cmd_ctrl(struct hbl_aux_dev *aux_dev, void *cn_ib_ctx, u32 op, void *input,
+> +			      void *output);
+> +static int hbl_cn_ib_query_mem_handle(struct hbl_aux_dev *ib_aux_dev, u64 mem_handle,
+> +				      struct hbl_ib_mem_info *info);
+> +
+> +static void hbl_cn_reset_stats_counters_port(struct hbl_cn_device *hdev, u32 port);
+> +static void hbl_cn_late_init(struct hbl_cn_device *hdev);
+> +static void hbl_cn_late_fini(struct hbl_cn_device *hdev);
+> +static int hbl_cn_sw_init(struct hbl_cn_device *hdev);
+> +static void hbl_cn_sw_fini(struct hbl_cn_device *hdev);
+> +static void hbl_cn_spmu_init(struct hbl_cn_port *cn_port, bool full);
+> +static int hbl_cn_cmd_port_check(struct hbl_cn_device *hdev, u32 port, u32 flags);
+> +static void hbl_cn_qps_stop(struct hbl_cn_port *cn_port);
+> +
+> +static int hbl_cn_request_irqs(struct hbl_cn_device *hdev)
+> +{
+> +	struct hbl_cn_asic_funcs *asic_funcs = hdev->asic_funcs;
+> +
+> +	return asic_funcs->request_irqs(hdev);
+> +}
+> +
+> +static void hbl_cn_free_irqs(struct hbl_cn_device *hdev)
+> +{
+> +	struct hbl_cn_asic_funcs *asic_funcs =  hdev->asic_funcs;
+> +
+> +	asic_funcs->free_irqs(hdev);
+> +}
+> +
+> +static void hbl_cn_synchronize_irqs(struct hbl_aux_dev *cn_aux_dev)
+> +{
+> +	struct hbl_cn_device *hdev = cn_aux_dev->priv;
+> +	struct hbl_cn_asic_funcs *asic_funcs;
+> +
+> +	asic_funcs = hdev->asic_funcs;
+> +
+> +	asic_funcs->synchronize_irqs(hdev);
+> +}
+> +
+> +void hbl_cn_get_frac_info(u64 numerator, u64 denominator, u64 *integer, u64 *exp)
+> +{
+> +	u64 high_digit_n, high_digit_d, integer_tmp, exp_tmp;
+> +	u8 num_digits_n, num_digits_d;
+> +	int i;
+> +
+> +	num_digits_d = hbl_cn_get_num_of_digits(denominator);
+> +	high_digit_d = denominator;
+> +	for (i = 0; i < num_digits_d - 1; i++)
+> +		high_digit_d /= 10;
+> +
+> +	integer_tmp = 0;
+> +	exp_tmp = 0;
+> +
+> +	if (numerator) {
+> +		num_digits_n = hbl_cn_get_num_of_digits(numerator);
+> +		high_digit_n = numerator;
+> +		for (i = 0; i < num_digits_n - 1; i++)
+> +			high_digit_n /= 10;
+> +
+> +		exp_tmp = num_digits_d - num_digits_n;
+> +
+> +		if (high_digit_n < high_digit_d) {
+> +			high_digit_n *= 10;
+> +			exp_tmp++;
+> +		}
+> +
+> +		integer_tmp = div_u64(high_digit_n, high_digit_d);
+> +	}
+> +
+> +	*integer = integer_tmp;
+> +	*exp = exp_tmp;
+> +}
+
+this function sounds suspicious for a network driver, what do you need
+it for?
+
+> +
+> +int hbl_cn_read_spmu_counters(struct hbl_cn_port *cn_port, u64 out_data[], u32 *num_out_data)
+> +{
+> +	struct hbl_cn_device *hdev = cn_port->hdev;
+> +	struct hbl_cn_asic_port_funcs *port_funcs;
+> +	struct hbl_cn_stat *ignore;
+> +	int rc;
+> +
+> +	port_funcs = hdev->asic_funcs->port_funcs;
+> +
+> +	port_funcs->spmu_get_stats_info(cn_port, &ignore, num_out_data);
+
+hard to ignore that you deref uninitialized pointer...
+
+please consider going one step back and start with our internal mailing
+lists, thank you
+Przemek
+
+[...]
 
