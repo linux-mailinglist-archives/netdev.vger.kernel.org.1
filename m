@@ -1,266 +1,155 @@
-Return-Path: <netdev+bounces-103094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2887C90648C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:00:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88D7E90649C
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:10:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EFA2284F73
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 06:59:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B3A31C22A41
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 07:10:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B042013848F;
-	Thu, 13 Jun 2024 06:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3751386A5;
+	Thu, 13 Jun 2024 07:10:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f5EgefON"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EqjRilcz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC4F137C44
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 06:59:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA49137C59
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 07:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718261983; cv=none; b=Xsc1ZkkZ1EycbI5BJyARaSy2N7nu9vjQfXbG4I6+qfvK8BSgRsi/iCKOgDitwmM7uXYu1jzkhBYk16EBjz1Z3kgL+WnRRYn75a5TVHf86c/q7qzohqqunn0OLDh1DKZ05Df8322V/HG1Pu0yxhoEok7Wlu3hSgQHqAQCKojLqVc=
+	t=1718262634; cv=none; b=IBCfgP3nN39g+Ec1u29/ZsEQW4kDFlzOtj865Mn/uOGXJ8aRWq2jegfBKYqGvgk1FCUoYCwk84Qs7r+1v4yZmidDorFasH32C9vCklKbUmnbCDhCVAcUFeaKIqxAkWcPDNSnm1x3l8oDWPiw3aZ3nm6zkz4tngU+90txsxuR+vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718261983; c=relaxed/simple;
-	bh=pJwjntH5QMkuPUwNOFSmpR3KkB6NULCVjIIWybM6pWU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g/aBeJxdx6k0VU+HD4hQIdU63fEalLCaa9CekdasPkUgOi48vIzH2FC2nDASYVQOIn5C3ARlXeSlkE+VZn2PSFAf4dmJ16r7iVMuYgy7cQQF3y/otVlJ/RlKX1Ia1WqJd62Cb+BnvuiwjPYfgx2TJuasK0JCshfzzjmAohYL/NE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f5EgefON; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718261981;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=drA76IDECayT317ZaKBjGX9PcBu+0gorkvMz8yjsoxU=;
-	b=f5EgefONps62rBo5pUFPiFLzm/ZE0EfF3NKzdHFm3+c5rMoT1Z+UlR4jELEQJW1RkESUHi
-	unkZDXeV1e+peAZfwBm97yd+VNqjesGZThjmVMuE+c7XBlyuGKEW8SBKuo6TQCpX5OHCiT
-	irOoWCc4BrYz1fbNa2yDigv1ck+jDQI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-640-GHWNTv63NcKPMq4vpZEQqA-1; Thu, 13 Jun 2024 02:59:36 -0400
-X-MC-Unique: GHWNTv63NcKPMq4vpZEQqA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-35f218c9950so396454f8f.0
-        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 23:59:34 -0700 (PDT)
+	s=arc-20240116; t=1718262634; c=relaxed/simple;
+	bh=u+I1aAVj3a7n6IbIYshQj7+ph2yLn2mQWMRKJjGc/pA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bFP+5kKXV8+pqnmRiiWgtLJOj/6oQcq4a0/+uX6iDqpK/JAFN0laYMO52qVWscKDAc7YQKyqbZ6p/sJ7AGNpM3zhbbKtw7/5Mn3rv/YSFEgiTtFmRqMBVIpoc1J0+uF8tPGoozqF7riv17qVC0hJNGOGRzXlc2kSuocsBXAlBRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=EqjRilcz; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-44051a92f37so6038161cf.1
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 00:10:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1718262631; x=1718867431; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yH0AlsLpSkYHEHDI5h4LrEXxjv4o46QsFNcTAlffGK4=;
+        b=EqjRilcz9ErAU96qrEMal0/rnVxE8Bk7WTeB4yR9aBz9KownJyqxsC5/r2CuANEWbX
+         /SgIm76qH2O8XyI2J0wdwhJP6RJt52ydLOHblwJG/8XpPyxBx0PqFdguSaR4HjIG6cJV
+         R4MAshNKiLuUmwNJEtzvmhgUHjI6xT1qDSJGs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718261974; x=1718866774;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=drA76IDECayT317ZaKBjGX9PcBu+0gorkvMz8yjsoxU=;
-        b=wx8EjUpmEEsv115S9NURVYxwXlDwAlj95axfXJhlZL/gJ7VIiJRDKfBKVyFf7FrXRE
-         yADn92E7424atZrzBhimDVuxu/FPMVPFfqHNKV6dWzk8CyF60+VpAFXhf1g7Kq0KCKXa
-         8B/rj/XlTXL9OtDKKL/0VG/Fr2aQgdVeaoWoObNzvqXTGPwiz+axAG45mAY2kBEYnh9I
-         ne8vixxoUxQ8v1QBhoTyXdAGS1F1h0W0wUxw+gzwgGJ9IjNb0wMTjW2cl0c6NQmP359d
-         d4dPmaGmVCyQdKMKv1yVhzvUzwvbUPWLpuyrWfVHietNLc+3KuNZEs066PwSaLZwRPGm
-         C36w==
-X-Forwarded-Encrypted: i=1; AJvYcCVwn6RerjLYV3oDVqnOVWmhXhg/+wRxzNrrGqfzB0QM+aHOTFu3u1zO//ZoEq55KPLGF5JrMBFF5ywAOXgUOcN+mccLCvJ9
-X-Gm-Message-State: AOJu0Yx7DWY2cWpfNKCg7wnr+hrega2iPChpMWH8VwofUUUS619F9Oo3
-	xE6SB59x071nepCsrnHDNsNjyENbMs10GhjzQUMFkiByxYNf9/Bz3XqdRATMk5jPmqUUxsxwMNR
-	uC+j51BJPmDveq0bLh8PGzgxX3hy6qmEopTOK/Nm8SS0WvEcmexgr4g==
-X-Received: by 2002:adf:fc4a:0:b0:35f:1c26:b68d with SMTP id ffacd0b85a97d-35fe89433c6mr2681765f8f.60.1718261973680;
-        Wed, 12 Jun 2024 23:59:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGTGddEYi8s6Uj9O8LtEdStBWBMju/uoZiQ7uYD8Sqxu92RawWDLo3ZDwPwDowpIYg8Keq/wg==
-X-Received: by 2002:adf:fc4a:0:b0:35f:1c26:b68d with SMTP id ffacd0b85a97d-35fe89433c6mr2681752f8f.60.1718261973066;
-        Wed, 12 Jun 2024 23:59:33 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc7:341:5539:9b1a:2e49:4aac:204e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-360750f22e8sm779696f8f.80.2024.06.12.23.59.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jun 2024 23:59:32 -0700 (PDT)
-Date: Thu, 13 Jun 2024 02:59:29 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Cindy Lu <lulu@redhat.com>
-Cc: dtatulea@nvidia.com, jasowang@redhat.com,
-	virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
-Message-ID: <20240613025548-mutt-send-email-mst@kernel.org>
-References: <20240611053239.516996-1-lulu@redhat.com>
+        d=1e100.net; s=20230601; t=1718262631; x=1718867431;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yH0AlsLpSkYHEHDI5h4LrEXxjv4o46QsFNcTAlffGK4=;
+        b=aYc6JWuruGEHsJC4SsRLqospK89SngLKrLSbX1/P1mv/xYiVp88K3Dicv3GBxmMBMN
+         GO9kl8H218mKHT+dcVbCwHbd1tDmx1YTQTOhMmV6FrWVvmKsKCrciOkwVC4wCfFXBxFX
+         bgM4FKvUiLvfK70Nz/tgvcEGVrIfxCqhIFLIxNtIH7PgDDXhwIdLRNUz2KlhpW1Z0jGl
+         tc0LcBgYbwVCUGiBJd1BovwQzwuBoYCfl0zF/AERzlXLbtvtQaz2d+kiLc3bZY116vxd
+         BescegOdW6x41NipMxNw3GEcFms25WdzutooPWRszYZ7Zsasq8RUmLoxMyfsu2LGZ9NR
+         5n7A==
+X-Gm-Message-State: AOJu0YwkRVopIOsV4w05E2ox4krLRoY3DDThTZKpM974HStMp75WXC55
+	BqPxv5aUv+oqM16TFxINx5zixP+mXi5wlH0Fl6/nPzfv2O8NG56cezl0+HCC3HFwKqbTrS58CDw
+	=
+X-Google-Smtp-Source: AGHT+IHB18P0MbmibFj13ZlZdawFtcl8Crcnz/Kp5EtDjXHjZtOxmZdLv1LZs/NCiyv96h32cmOBLA==
+X-Received: by 2002:ac8:5812:0:b0:442:1282:a40d with SMTP id d75a77b69052e-4421282a663mr323091cf.0.1718262631428;
+        Thu, 13 Jun 2024 00:10:31 -0700 (PDT)
+Received: from localhost (228.221.150.34.bc.googleusercontent.com. [34.150.221.228])
+        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-441ef4fe986sm3741271cf.33.2024.06.13.00.10.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jun 2024 00:10:31 -0700 (PDT)
+From: David Ruth <druth@chromium.org>
+To: netdev@vger.kernel.org
+Cc: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	marcelo.leitner@gmail.com,
+	vladbu@nvidia.com,
+	David Ruth <druth@chromium.org>,
+	syzbot+b87c222546179f4513a7@syzkaller.appspotmail.com
+Subject: [PATCH v2 net] net/sched: cls_api: fix possible infinite loop in tcf_idr_check_alloc()
+Date: Thu, 13 Jun 2024 07:10:21 +0000
+Message-ID: <20240613071021.471432-1-druth@chromium.org>
+X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240611053239.516996-1-lulu@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 11, 2024 at 01:32:32PM +0800, Cindy Lu wrote:
-> Add new UAPI to support the mac address from vdpa tool
-> Function vdpa_nl_cmd_dev_config_set_doit() will get the
-> MAC address from the vdpa tool and then set it to the device.
-> 
-> The usage is: vdpa dev set name vdpa_name mac **:**:**:**:**:**
-> 
-> Here is sample:
-> root@L1# vdpa -jp dev config show vdpa0
-> {
->     "config": {
->         "vdpa0": {
->             "mac": "82:4d:e9:5d:d7:e6",
->             "link ": "up",
->             "link_announce ": false,
->             "mtu": 1500
->         }
->     }
-> }
-> 
-> root@L1# vdpa dev set name vdpa0 mac 00:11:22:33:44:55
-> 
-> root@L1# vdpa -jp dev config show vdpa0
-> {
->     "config": {
->         "vdpa0": {
->             "mac": "00:11:22:33:44:55",
->             "link ": "up",
->             "link_announce ": false,
->             "mtu": 1500
->         }
->     }
-> }
-> 
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
+syzbot found hanging tasks waiting on rtnl_lock [1]
 
+A reproducer is available in the syzbot bug.
 
+When a request to add multiple actions with the same index is sent, the
+second request will block forever on the first request. This holds
+rtnl_lock, and causes tasks to hang.
 
-I think actually the idea of allowing provisioning
-by specifying config of the device is actually valid.
-However
-- the name SET_CONFIG makes people think this allows
-  writing even when e.g. device is assigned to guest
-- having the internal api be mac specific is weird
+Return -EAGAIN to prevent infinite looping, while keeping documented
+behavior.
 
-Shouldn't config be an attribute maybe, not a new command?
+[1]
 
+INFO: task kworker/1:0:5088 blocked for more than 143 seconds.
+Not tainted 6.9.0-rc4-syzkaller-00173-g3cdb45594619 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/1:0 state:D stack:23744 pid:5088 tgid:5088 ppid:2 flags:0x00004000
+Workqueue: events_power_efficient reg_check_chans_work
+Call Trace:
+<TASK>
+context_switch kernel/sched/core.c:5409 [inline]
+__schedule+0xf15/0x5d00 kernel/sched/core.c:6746
+__schedule_loop kernel/sched/core.c:6823 [inline]
+schedule+0xe7/0x350 kernel/sched/core.c:6838
+schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6895
+__mutex_lock_common kernel/locking/mutex.c:684 [inline]
+__mutex_lock+0x5b8/0x9c0 kernel/locking/mutex.c:752
+wiphy_lock include/net/cfg80211.h:5953 [inline]
+reg_leave_invalid_chans net/wireless/reg.c:2466 [inline]
+reg_check_chans_work+0x10a/0x10e0 net/wireless/reg.c:2481
 
-> ---
->  drivers/vdpa/vdpa.c       | 71 +++++++++++++++++++++++++++++++++++++++
->  include/linux/vdpa.h      |  2 ++
->  include/uapi/linux/vdpa.h |  1 +
->  3 files changed, 74 insertions(+)
-> 
-> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
-> index a7612e0783b3..347ae6e7749d 100644
-> --- a/drivers/vdpa/vdpa.c
-> +++ b/drivers/vdpa/vdpa.c
-> @@ -1149,6 +1149,72 @@ static int vdpa_nl_cmd_dev_config_get_doit(struct sk_buff *skb, struct genl_info
->  	return err;
->  }
->  
-> +static int vdpa_nl_cmd_dev_config_set_doit(struct sk_buff *skb,
-> +					   struct genl_info *info)
-> +{
-> +	struct vdpa_dev_set_config set_config = {};
-> +	struct nlattr **nl_attrs = info->attrs;
-> +	struct vdpa_mgmt_dev *mdev;
-> +	const u8 *macaddr;
-> +	const char *name;
-> +	int err = 0;
-> +	struct device *dev;
-> +	struct vdpa_device *vdev;
-> +
-> +	if (!info->attrs[VDPA_ATTR_DEV_NAME])
-> +		return -EINVAL;
-> +
-> +	name = nla_data(info->attrs[VDPA_ATTR_DEV_NAME]);
-> +
-> +	down_write(&vdpa_dev_lock);
-> +	dev = bus_find_device(&vdpa_bus, NULL, name, vdpa_name_match);
-> +	if (!dev) {
-> +		NL_SET_ERR_MSG_MOD(info->extack, "device not found");
-> +		err = -ENODEV;
-> +		goto dev_err;
-> +	}
-> +	vdev = container_of(dev, struct vdpa_device, dev);
-> +	if (!vdev->mdev) {
-> +		NL_SET_ERR_MSG_MOD(
-> +			info->extack,
-> +			"Fail to find the specified management device");
-> +		err = -EINVAL;
-> +		goto mdev_err;
-> +	}
-> +	mdev = vdev->mdev;
-> +	if (nl_attrs[VDPA_ATTR_DEV_NET_CFG_MACADDR]) {
-> +		if (!(mdev->supported_features & BIT_ULL(VIRTIO_NET_F_MAC))) {
-> +			NL_SET_ERR_MSG_FMT_MOD(
-> +				info->extack,
-> +				"Missing features 0x%llx for provided attributes",
-> +				BIT_ULL(VIRTIO_NET_F_MAC));
-> +			err = -EINVAL;
-> +			goto mdev_err;
-> +		}
-> +		macaddr = nla_data(nl_attrs[VDPA_ATTR_DEV_NET_CFG_MACADDR]);
-> +		memcpy(set_config.net.mac, macaddr, ETH_ALEN);
-> +		set_config.mask |= BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MACADDR);
-> +		if (mdev->ops->set_mac) {
-> +			err = mdev->ops->set_mac(mdev, vdev, &set_config);
-> +		} else {
-> +			NL_SET_ERR_MSG_FMT_MOD(
-> +				info->extack,
-> +				"%s device not support set mac address ", name);
-> +		}
-> +
-> +	} else {
-> +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
-> +				       "%s device not support this config ",
-> +				       name);
-> +	}
-> +
-> +mdev_err:
-> +	put_device(dev);
-> +dev_err:
-> +	up_write(&vdpa_dev_lock);
-> +	return err;
-> +}
-> +
->  static int vdpa_dev_config_dump(struct device *dev, void *data)
->  {
->  	struct vdpa_device *vdev = container_of(dev, struct vdpa_device, dev);
-> @@ -1285,6 +1351,11 @@ static const struct genl_ops vdpa_nl_ops[] = {
->  		.doit = vdpa_nl_cmd_dev_stats_get_doit,
->  		.flags = GENL_ADMIN_PERM,
->  	},
-> +	{
-> +		.cmd = VDPA_CMD_DEV_CONFIG_SET,
-> +		.doit = vdpa_nl_cmd_dev_config_set_doit,
-> +		.flags = GENL_ADMIN_PERM,
-> +	},
->  };
->  
->  static struct genl_family vdpa_nl_family __ro_after_init = {
-> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
-> index db15ac07f8a6..c97f4f1da753 100644
-> --- a/include/linux/vdpa.h
-> +++ b/include/linux/vdpa.h
-> @@ -581,6 +581,8 @@ struct vdpa_mgmtdev_ops {
->  	int (*dev_add)(struct vdpa_mgmt_dev *mdev, const char *name,
->  		       const struct vdpa_dev_set_config *config);
->  	void (*dev_del)(struct vdpa_mgmt_dev *mdev, struct vdpa_device *dev);
-> +	int (*set_mac)(struct vdpa_mgmt_dev *mdev, struct vdpa_device *dev,
-> +		       const struct vdpa_dev_set_config *config);
->  };
->  
->  /**
-> diff --git a/include/uapi/linux/vdpa.h b/include/uapi/linux/vdpa.h
-> index 54b649ab0f22..53f249fb26bc 100644
-> --- a/include/uapi/linux/vdpa.h
-> +++ b/include/uapi/linux/vdpa.h
-> @@ -19,6 +19,7 @@ enum vdpa_command {
->  	VDPA_CMD_DEV_GET,		/* can dump */
->  	VDPA_CMD_DEV_CONFIG_GET,	/* can dump */
->  	VDPA_CMD_DEV_VSTATS_GET,
-> +	VDPA_CMD_DEV_CONFIG_SET,
->  };
->  
->  enum vdpa_attr {
-> -- 
-> 2.45.0
+Fixes: 0190c1d452a9 ("net: sched: atomically check-allocate action")
+Reported-by: syzbot+b87c222546179f4513a7@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=b87c222546179f4513a7
+Signed-off-by: David Ruth <druth@chromium.org>
+---
+V1 -> V2: Moved from net-next to net, identified the change this fixes
+
+ net/sched/act_api.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+index 9ee622fb1160..2520708b06a1 100644
+--- a/net/sched/act_api.c
++++ b/net/sched/act_api.c
+@@ -830,7 +830,6 @@ int tcf_idr_check_alloc(struct tc_action_net *tn, u32 *index,
+ 	u32 max;
+ 
+ 	if (*index) {
+-again:
+ 		rcu_read_lock();
+ 		p = idr_find(&idrinfo->action_idr, *index);
+ 
+@@ -839,7 +838,7 @@ int tcf_idr_check_alloc(struct tc_action_net *tn, u32 *index,
+ 			 * index but did not assign the pointer yet.
+ 			 */
+ 			rcu_read_unlock();
+-			goto again;
++			return -EAGAIN;
+ 		}
+ 
+ 		if (!p) {
+-- 
+2.45.2.627.g7a2c4fd464-goog
 
 
