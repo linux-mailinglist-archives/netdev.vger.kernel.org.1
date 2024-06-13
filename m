@@ -1,163 +1,390 @@
-Return-Path: <netdev+bounces-103158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFCEB90697F
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:59:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DE6D9069CC
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 12:17:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0BC11C22764
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:59:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86A72286A5F
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 10:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C95B1411CD;
-	Thu, 13 Jun 2024 09:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 343C1142635;
+	Thu, 13 Jun 2024 10:17:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V5C5tJP+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jORQckmF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A2D7140E22
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 09:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718272759; cv=none; b=eREXe+tRKI1wK9Trjoij3gZy5BFClZBHP49cQqWdWEvQigxdITiE46IQXTKJJzOKcoDbN0sjbr3YFh1BtNtIz/L7YbkGHLNFDhV5Ot1Za+0r2VQhnGLFgNhX8ms5thWJtw3rg+sZUQcxiooXJY6s7oWYEN+Q0/sZfGURiMsOkFY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718272759; c=relaxed/simple;
-	bh=jCiq080FY8/GLZ3f85CnJwt8lnALYICND+Kr+0wWgCE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JqMD0+N1xHGGD9YD64ssEwxefyFp9ZzqP3NfjwTFjiWoDu5SO45KqihXW/i0qiS/vt6GYCEXc2i51E4ObSW0d5Hz7wZRMxeFsxCXTknJkoghVy0h1hKtSEkqPnD6VH9CoxFTV9FwkUUFCqnnd7uZ/BEl/+2t78MIKzleN3ndQTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V5C5tJP+; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718272756;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V8U7PlezzDV+xaQgoC4Cin990sme5WLS2JK3q11wSEk=;
-	b=V5C5tJP+fpuNkJjkgMByMQcbQJe1ESuHoFyczZp1cJPi+0Mz5PzYq9Ie/zpDym+LpkI7Bq
-	xbjbBjldS7QXEAZUmRR4mCCDPAhn9gbDGGZGKBGTXM47mamrZNBh6C+Paf3+zrtrqCghNy
-	y7JmcgvJz572FSXtiGjFHXIBpf2cMtA=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-463-0TgEbf4qMsuYAn4dE498RQ-1; Thu,
- 13 Jun 2024 05:59:11 -0400
-X-MC-Unique: 0TgEbf4qMsuYAn4dE498RQ-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5510019560B5;
-	Thu, 13 Jun 2024 09:59:09 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.192.157])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E389A19560AA;
-	Thu, 13 Jun 2024 09:59:02 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: yongqin.liu@linaro.org
-Cc: amit.pundir@linaro.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	inventor500@vivaldi.net,
-	jstultz@google.com,
-	jtornosm@redhat.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	stable@vger.kernel.org,
-	sumit.semwal@linaro.org
-Subject: Re: [PATCH] net: usb: ax88179_178a: fix link status when link is set to down/up
-Date: Thu, 13 Jun 2024 11:59:00 +0200
-Message-ID: <20240613095901.508753-1-jtornosm@redhat.com>
-In-Reply-To: <CAMSo37U3Pree8XbHNBOzNXhFAiPss+8FQms1bLy06xeMeWfTcg@mail.gmail.com>
-References: <CAMSo37U3Pree8XbHNBOzNXhFAiPss+8FQms1bLy06xeMeWfTcg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECA51422AB
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 10:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718273834; cv=fail; b=hdy/SO14EuJEb8kOp/3W0+DBxAr3WGpFzhal6pgJEoUBni8Vq/39qm09hY4e3yW8zqOoTS9rvZ8qMUSjIaakOcxSSWyFlQ94AyP0/I7hvUco9x1DuQX2Bj6GGwc4TfVamMUBeUiiz4QTC8tAz+7g+ZpjF5vWBAAURxUwdnFvIM8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718273834; c=relaxed/simple;
+	bh=iBJamngYZKXLn6rvVBeZ2s8skX45ymLRpcunNqtX4tg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=n+LWDLkX6WAUTK9DW8U6A15iwWI5aauAjyQpJFC8snCVntSptV18nS6jLz8k7j/G79UJuWkhAYCVdBwG5RidzdzKT7OdepD6faO6559cqIZoQ3n7nWnLFaiTQC1CruZ7bUHp3hkSPAanr2uuHd8w8iuC73xVDoeAzt8PUQs2AXY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jORQckmF; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718273832; x=1749809832;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=iBJamngYZKXLn6rvVBeZ2s8skX45ymLRpcunNqtX4tg=;
+  b=jORQckmFJjiuBBOi5bTO/ycf77Q8ovZlYoR5g62xWBdnihZjUd17kEaC
+   clq7TsphXWIOS+mOHV0RdRaKv/YAW9nUz9PMQHrKpweM+Dk1E9PhhZwRM
+   yq6VWtap031L+6S7bNMsMA14fnr0LvZfkIMpRBJnDy8KeevxSKhGxVA42
+   aQlLQVCFvO/iywWo1OZzwPmC4FznlmqvX7fXtyIMoM9r9aToct3tG6y03
+   VX/86e/ISFNHmsRPuA9Nt2gbj3pvKGmB+/qTg5gFtQmu9t/9NCGu3Ytt7
+   zEnsfvqYXWPS3YR+YJYGO5DzgrLEpqF+IMToh42NYHgxlxsee+sY3QCcz
+   A==;
+X-CSE-ConnectionGUID: ViydtyU9SvemAFjCE3lKPg==
+X-CSE-MsgGUID: CvLDv8w7SEChjdg6ZrWlJQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11101"; a="18939854"
+X-IronPort-AV: E=Sophos;i="6.08,234,1712646000"; 
+   d="scan'208";a="18939854"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2024 03:17:11 -0700
+X-CSE-ConnectionGUID: oH/tCNEQRtqkD6gYOHTRNA==
+X-CSE-MsgGUID: yHgSqWiyRbym3q4KHD8IRw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,234,1712646000"; 
+   d="scan'208";a="40200416"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Jun 2024 03:17:10 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 13 Jun 2024 03:17:10 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 13 Jun 2024 03:17:10 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.41) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 13 Jun 2024 03:17:09 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Q/cw7lJTpnKAPbX3IxR0SHY48UNYtXx8pVIBLM4udVQ/e4x7KDeRktaX8d/S8C7JZMF25m4S8dzIYVKIdTwClYHEOYFkrGH2y1ljIJN0RnA4iyZzWOA+pDkNAWNBZtuARFFmtNic/CCGqfvgRdhkBBETT6T4k1CNVPIEFNnscsPSjdyMbB5E6yim9fVjyO8vq+rrr4689dm/ZtqZAKF9wT8enaUl7F149zLc+ho7/jEn8fbCSVKbAa8LgAsed4AFOgGkZeesAF6XY0vH/uxgt8UXtQZpGvlraT5iHbFCIMPUehYkfV339Fgw1hO6p6K0c0vUA/sRZBDLyPJl+3Lqrg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eLk0hW1gVDWSVnLRviLqDj57gkWQsc3lmMFvOjtk6sM=;
+ b=STiZoveEC3N6rMQDzXRuoqzD/VJnrZAYaKl0PXGFw5rdLn+d7sjQdYHOsdMEnewktFeC4HznhUCNDzxwbtk2pJTKCMF6f0MH8W73zCiFwFPw9aaa6KwhkxOMd/gajZ58WD3+Mny5PSDI45glAIFmd42tcGeQLu79kzkSivMFA1dnqQj+wnITqOnOOJ+uytNhYBbleRyBHaZF4U4UAWB+PS4Vvj7VwjLWEod3yWOV6yRJTOLeE489vSrJFjIDXycTrX+utT7nMpcNrBgOkNgIhJ4tM30ZoBIC439IzAl5jSBPylBqKVvi78GUszP+K3pvxjmhAve0gyUfyP9H9i93ag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by SA2PR11MB4844.namprd11.prod.outlook.com (2603:10b6:806:f9::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.20; Thu, 13 Jun
+ 2024 10:17:08 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.7633.037; Thu, 13 Jun 2024
+ 10:17:08 +0000
+Message-ID: <b6ed60cb-03a8-48fd-bffa-5a8efb0cd143@intel.com>
+Date: Thu, 13 Jun 2024 12:16:40 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: extend tx watchdog
+ timeout
+To: Josh Hay <joshua.a.hay@intel.com>
+CC: David Decotigny <ddecotig@gmail.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, Sridhar Samudrala <sridhar.samudrala@intel.com>
+References: <20240603184714.3697911-1-joshua.a.hay@intel.com>
+ <b30f34a1-48d6-4ff4-b375-d0eef5308261@gmail.com>
+ <cc76768c-d8d4-4c07-93c1-807f3159b573@intel.com>
+ <641b439b-2bc0-4f2b-9871-b522e1141cd1@intel.com>
+ <ef8057dc-28f9-483a-9885-35879ad84b56@intel.com>
+ <a63aff29-c392-4efe-b8c0-9f2305f956fe@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <a63aff29-c392-4efe-b8c0-9f2305f956fe@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DB8PR09CA0005.eurprd09.prod.outlook.com
+ (2603:10a6:10:a0::18) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|SA2PR11MB4844:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8eb138e8-5a1c-4fa4-5cf2-08dc8b91fb29
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230034|376008|1800799018|366010;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SXdiK2QzSW11WFEzR1dSREEyRE96VnVVL0dlNWJqK0lYSWNoYnJ4aWp3a1ZQ?=
+ =?utf-8?B?RFV0MTdlMldLbnJSZStGQWtCekhVcTR4Z2g2K29QUWc0SUJjTnZ5YldDdmJO?=
+ =?utf-8?B?eEVHOTh5VkVTdGlwbmt4T3ZacVdwY2xQeFhrU2ZvWTRiV2lzTU1ON2RjNjZF?=
+ =?utf-8?B?aFJCbTdiV3BOcy8wRjVhbWhrTWxQZVd5cnVsbFBRVTdGOGgyMFcrRm54eG9G?=
+ =?utf-8?B?aUQ2Mzk4TXcxdGRvL3hzYkxXOEV6bEFNMHNuc3ZiUlJIbG1QUXdZc2M5ZGFY?=
+ =?utf-8?B?NTBaTUZwb1pobHJIVVBKUlIvaVNMQkM5clNFQVVEZ1UvUFJ1OVNCWWdPVXdH?=
+ =?utf-8?B?cm1mSy9yT1d3N0JNSjdQbVZubkVuNWFLd3VreDBudThrVTBkbS9jOFRCZzVU?=
+ =?utf-8?B?K3VZcUw1VkdaNGU4ZnlwanZMV0JTOEFSRUloY3V5MDZJRmxiVHBiU0psSWI0?=
+ =?utf-8?B?UWZhTGRxZUlTc2JHc3hCbkZITGRVNzZvckhwVGNrcFpUYVl0NUVwQW1MVUhU?=
+ =?utf-8?B?d2pKOHZaWW53UG9TL1laem0wb3hCSGdaelYwKzl2OHUyTTlMUS84bXZxRlZX?=
+ =?utf-8?B?M0Nyd2xZdDhDREorTmJYck9qd0JKMUppTWRaVHdMWG9zTWR3STN5dzdkbTM2?=
+ =?utf-8?B?MisxdVR1TzVDV3ZvWFFhK2prN3gwUThiM0ZJZE9IN2RmR0ZNZE4yT2EvaHg3?=
+ =?utf-8?B?Uzk2cHFYSy9oT1pQbFJ5clZWb0g2dWNCeGhudEVXcmwvbnA5djMvaEl1dGE3?=
+ =?utf-8?B?YWZZR2dSdjR6YmNaL3BSbmRCUGNsMDFmVDcrYlFOeEdIQldJanpPc3RaRkFq?=
+ =?utf-8?B?TDJraE05a294YWVSYzlkVklCSHNHY2xtZzZ4WHZDbDdLUUxURWZ0SkFHamZJ?=
+ =?utf-8?B?blQxem84b0JhVDBZQ3lVc1BlbHJDNDQyNk9qSktiK3pTTU5SbDFnYmZ6SFFm?=
+ =?utf-8?B?cWF2MTgycHcwMjMvKzhJd1prZGd3aEppbDJLMk4rOUhoVnFWUjlUeGpXdnFx?=
+ =?utf-8?B?L3NoNldZUk1SUFI2bHovcHhxZ0U3OGJQL1FxN1hjMXBGalBwRXczbTIvSWJi?=
+ =?utf-8?B?RU5LMmZMaFFJRFNHd1owWDVrSHE3emNsN1B1V2pRbDNqbmV4K1dRcnhSRUhE?=
+ =?utf-8?B?eDBNMXZ3Q21nUnJpU2thUkx0R0xZSGp0K2plWTVHTTR5VVVXdTZob1AxRG05?=
+ =?utf-8?B?djNJQmNiVmV2QlVzMitCeDZ2TlZDV2lNSEkvZDlIbzVJdEYvUllhd1NXM0FM?=
+ =?utf-8?B?UzJJK2ZJTzAxejQzRjZuSS9yS05zRWtWSTBYZ3ZiRVpuRElub0VuU21RNWRR?=
+ =?utf-8?B?NzZUME1mZmE1UnlTcFl6V3pxUlpWVlVwcGxjMk9DZS9lM0puWHhMNTE1eU9m?=
+ =?utf-8?B?aXhYancxSTRzSTdncXk5Snk5NkczWWF2QzZBdkE5ejhldmRvbkcvUHJTV1Jj?=
+ =?utf-8?B?UWhaWUFzSkZzN0xEQnpWTU13QVhsS2dHQ2JxMVA5Nm03dytndERsREZWZWZn?=
+ =?utf-8?B?NUswMmpmYUo5WjhxK2xlaUZyL2ltNzJPU3duRUFWa1RVQ3FtZktxY3ZHVDJK?=
+ =?utf-8?B?dzI0T0lsaHRJbkU1UWpJOWo2a0RIaWdUS1hJNnZEcWVsNTAvTnpQWDNxcHZv?=
+ =?utf-8?B?UnRaRGJWSHhVQ2psLzdkQjhUN1c2bWJjL1RaZjF3ZC94NG1lM3BkckNNQUsx?=
+ =?utf-8?B?cmhlZEVPZWRrb3YrekJQUjNvdHNhZGFST0ljTVE4b2srVjRCU1FtSnVmZ21s?=
+ =?utf-8?Q?rluLV5nZNsbgbW9R7uofaGLSKTu6brEjEAR1YfZ?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230034)(376008)(1800799018)(366010);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VmtvbjNMRmpFVUhSajB4YWhJRnUwRG43cXdneDJoRlBFcmpQQ0VQaDIvZjlH?=
+ =?utf-8?B?aHdhMC9pSkl4SEVIZTY4bVpva1JLM0NXeFNxUnlMVnlFa0c2Ullzb3VaaTQ2?=
+ =?utf-8?B?a3ZpcmpvcTlMOUI0aVp1WVBtamZvcTV2NndwcFM0MFFQalVYSjF0dE1UQzFv?=
+ =?utf-8?B?bzlrL0NUVHpaUmd4V05MTE5SbzVFMGhOMXl4SytxcmtuaTlSWFkvcjM1QjNH?=
+ =?utf-8?B?bE1UVEJHcjZLOEJ1a1dxZFNvOXRhSWdlU1Y0ZkFmV1VNbEhiL0lqUlhTRFJK?=
+ =?utf-8?B?MmNPb3FBUlRsU0tubndUUnJpbDJ2NXN2NmxOa2lCSGFpamg3aWNCVmJ3SkIx?=
+ =?utf-8?B?bVp3Q0xJQUVUSi9sTHlEaElyYU1mOUwzZGZ4M1BhNC9aaEhLQVA0anB6Q25r?=
+ =?utf-8?B?dDROZUtMWGNjZEwyUGcvdzVjTDIxeFByZUlCSmF2VTBHamFzZzcxL0FOUUJ5?=
+ =?utf-8?B?NFFoSSt4TzJ5Y01RRWJHc1lNcjh3QzNkZjI3WmUxR0FIWTIrcDFlUmVjZk1h?=
+ =?utf-8?B?QWc1TmNoRWZFUjEwK1J0bDExTUJlMFZaNGpidHBUQTZZNlpNaXgxMy9ka0xv?=
+ =?utf-8?B?WDNXU29iOEdIaStyZE0rRlhTTlNLVUhhcEVmL1VvVnpJL2NUem1XOWthcTBs?=
+ =?utf-8?B?bGVTV3pva0J1RituOStVOWRnb3ZBWENBTU5hMXQ2eEd0L3JTYXVmTVpySGhY?=
+ =?utf-8?B?WkZuWDcrZXN2WGo4ODVUSTBZU1Uvbit6clk0Qy81Q2NFU2RrZ3UxVTJXQlNa?=
+ =?utf-8?B?QXM0ZFdnL3ZkeWtzdk9PWVFGOVZ1U2U5UXlTOXBSR0JLRXVuQU9lMWl0eXhT?=
+ =?utf-8?B?ODc5bFZoMUtQMUwvdjRHc09WcE1obU96TExBciszRTRCREF1TjhmU3FFL2t4?=
+ =?utf-8?B?L0poS3pDNjJuQWZmdklnSVNsZDRXNFhXTzhhUVFDY2lnQUtPeUVONVZPWEFV?=
+ =?utf-8?B?RW85elVYTTQrOC9Gb0tJOHhVeTZ1T1htQlBldCtOYVZsWFJmUXU2ZVBUWTZZ?=
+ =?utf-8?B?aHJKMHRBbzJCOHRHM1Y2d1dCUG8yVnhmSVBmSXhzWjUzNStnNzdpdzlxcmR5?=
+ =?utf-8?B?b2xPNE9xRmFXYzRFdE1LVlYyR0ppV1pZYmFRNEhFRXUvcXMwalIrckdBTENY?=
+ =?utf-8?B?dlk5NFpQcmM0M0ovVmwxanc3VHBGbWNWU3p5bGJuTGFQb2Rla3k1MXhMRW8y?=
+ =?utf-8?B?Q000MzFyRXQzNDdpc0VjazBXcytqYU95UUtlTXkyMXloeGtsSHBXYkRlSldr?=
+ =?utf-8?B?T2dWRVVMTXRRS3Z1VTBFSDl6blJZWEFmR2c3U2I5K0UwcWdvblVZbW1KckV2?=
+ =?utf-8?B?bGpTaWxNdnZnUDNXRklqbVhPeUI3U3dHKzhhS01IZ3REZUduUW9VVWdjZWNz?=
+ =?utf-8?B?djkyanBIZ1d2M2V0c0w2Q1VISDJpcFc3N3NqQTVkT2NramdJQWZNQ1RKdEQ0?=
+ =?utf-8?B?WldIdno1cHJ0aEh2S3ltNlJEZVNPUUJpTmt6SzlqZ0c3ZFY0ekNGNFg4bGYr?=
+ =?utf-8?B?L0RQRG1pSVdReXZSQmh0RHdXK2kzVGd6dzRhK20vU3YyWWNDREZNdCtkUDNR?=
+ =?utf-8?B?K09JVGRYSjgrbElTWUcrM1FqQU1ZWHNUeXZnTmwrNURObHRCVE1sRE9RR29t?=
+ =?utf-8?B?c2Q0Rlh4VnZSQ29vNkV5MnlWckZVZEptL3g1RmV2SVByV3psRU9aQTNscmxh?=
+ =?utf-8?B?blF4bTEwa08rYUxRNnZtSVF0SVBpc0hIR05ubm5pc1lDZU1tdlk1bUVWNWJY?=
+ =?utf-8?B?MkpxKzIyRDJVbnIwZEw4aG9DaC9rR1EwVGgyTE1JYTVXd0duUm9UVTFrVzRO?=
+ =?utf-8?B?U1VBdC9xZ3cxeGsrWVFqS0h6ZTJhcHAzeHdXcU1PdmxyMUJ0SU9JWFJFVEJt?=
+ =?utf-8?B?ZVpPbWxtS0hXanpHT1dFd3JWd2ZqWU9sQXlPQmpYaGxyTHlpTk1rUCtBTHVz?=
+ =?utf-8?B?aVRrYVpYRHdPY1hKcStxTjY5Y3NGb2R0cXQrS2hlenFUSFQzbmY5VlducGlJ?=
+ =?utf-8?B?WVVrYnY5U0VBU2tCczdYTmFkK2VDb3JBZm1wMGhoa0toLzdHQ1RGeHJnZld6?=
+ =?utf-8?B?SElvZ1hic2RLSGRQRjg2Z0pHdEFiY28wOE1ySXFTVy9mc051R1Y1Q2M4V3Bx?=
+ =?utf-8?B?bXF6RktPbkovR2VWM0s3dEVxMHBiV2ZyQ09QYmpSd3ZrWWRJZk9Ub3h0Tnlh?=
+ =?utf-8?B?d2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8eb138e8-5a1c-4fa4-5cf2-08dc8b91fb29
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2024 10:17:08.1176
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QOwSUR2oiThW1gKplDWqi+O1RL8VPe8zrOlH2May31Vr1prEtlcKpiXoIGz7RYy9Gsnym9YZbmj7eUP31BNRCX0jP3XyLUuHPrE5dJRPWNg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4844
+X-OriginatorOrg: intel.com
 
-Hello again,
+From: Josh Hay <joshua.a.hay@intel.com>
+Date: Wed, 12 Jun 2024 23:36:29 -0700
 
-There was a problem copying the patch, sorry, here the good one:
+> 
+> 
+> On 6/12/2024 2:34 AM, Alexander Lobakin wrote:
+>> From: Josh Hay <joshua.a.hay@intel.com>
+>> Date: Tue, 11 Jun 2024 11:13:53 -0700
+>>
+>>>
+>>>
+>>> On 6/11/2024 3:44 AM, Alexander Lobakin wrote:
+>>>> From: David Decotigny <ddecotig@gmail.com>
+>>>> Date: Tue, 4 Jun 2024 16:34:48 -0700
+>>
+>> [...]
+>>
+>>>> Note that there are several patches fixing Tx (incl. timeouts) in my
+>>>> tree, including yours (Joshua's) which you somehow didn't send yet ._.
+>>>> Maybe start from them first?
+>>>
+>>> I believe it was you who specifically asked our team to defer pushing
+>>> any upstream patches while you were working on the XDP series "to avoid
+>>> having to rebase", which was a reasonable request at the time. We also
+>>
+>> It was only related to the virtchnl refactoring and later I cancelled
+>> that when I realized it will go earlier than our series.
+>>
+>>> had no reason to believe the existing upstream idpf implementation was
+>>> experiencing timeouts (it is being tested by numerous validation teams).
+>>> So there was no urgency to get those patches upstream. Which patches in
+>>> your tree do you believe fix specific timeout situations? It appears you
+>>
+>> [0][1][2]
+>>
+>>> pulled in some of the changes from the out-of-tree driver, but those
+>>> were all enhancements. It wasn't until the workload that David mentioned
+>>
+>> No, there are all fixes.
+>>
+>> [0] is your from the OOT, extended. > [1] is mine and never was in the
+>> OOT.
+>> [2] is your from the OOT, extended by Michał.
+> 
+> My main point was since no other tx timeouts have been reported on the
+> upstream driver, none of these seem like critical fixes. This particular
 
-$ git diff drivers/net/usb/ax88179_178a.c
-diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
-index 51c295e1e823..60357796be99 100644
---- a/drivers/net/usb/ax88179_178a.c
-+++ b/drivers/net/usb/ax88179_178a.c
-@@ -174,7 +174,6 @@ struct ax88179_data {
-        u32 wol_supported;
-        u32 wolopts;
-        u8 disconnecting;
--       u8 initialized;
- };
- 
- struct ax88179_int_data {
-@@ -327,7 +326,8 @@ static void ax88179_status(struct usbnet *dev, struct urb *urb)
- 
-        if (netif_carrier_ok(dev->net) != link) {
-                usbnet_link_change(dev, link, 1);
--               netdev_info(dev->net, "ax88179 - Link status is: %d\n", link);
-+               if (!link)
-+                       netdev_info(dev->net, "ax88179 - Link status is: %d\n", link);
-        }
- }
- 
-@@ -1543,6 +1543,7 @@ static int ax88179_link_reset(struct usbnet *dev)
-                         GMII_PHY_PHYSR, 2, &tmp16);
- 
-        if (!(tmp16 & GMII_PHY_PHYSR_LINK)) {
-+               netdev_info(dev->net, "ax88179 - Link status is: 0\n");
-                return 0;
-        } else if (GMII_PHY_PHYSR_GIGA == (tmp16 & GMII_PHY_PHYSR_SMASK)) {
-                mode |= AX_MEDIUM_GIGAMODE | AX_MEDIUM_EN_125MHZ;
-@@ -1580,6 +1581,8 @@ static int ax88179_link_reset(struct usbnet *dev)
- 
-        netif_carrier_on(dev->net);
- 
-+       netdev_info(dev->net, "ax88179 - Link status is: 1\n");
-+
-        return 0;
- }
- 
-@@ -1678,12 +1681,21 @@ static int ax88179_reset(struct usbnet *dev)
- 
- static int ax88179_net_reset(struct usbnet *dev)
- {
--       struct ax88179_data *ax179_data = dev->driver_priv;
-+       u16 tmp16;
- 
--       if (ax179_data->initialized)
-+       ax88179_read_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID, GMII_PHY_PHYSR,
-+                        2, &tmp16);
-+       if (tmp16) {
-+               ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE,
-+                                2, 2, &tmp16);
-+               if (!(tmp16 & AX_MEDIUM_RECEIVE_EN)) {
-+                       tmp16 |= AX_MEDIUM_RECEIVE_EN;
-+                       ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE,
-+                                         2, 2, &tmp16);
-+               }
-+       } else {
-                ax88179_reset(dev);
--       else
--               ax179_data->initialized = 1;
-+       }
- 
-        return 0;
- }
+Lots of bugs have never been reported, this doesn't mean they don't exist.
 
-Best regards
-José Ignacio
+> timeout signature did not seem to match any of these in general. E.g. it
+> would have been obvious if the timeout was because of what [0] fixes.
+> It's also possible these timeouts did not manifest on the upstream
+> driver because it is missing other OOT changes.
 
+What I'm saying is that why not try to reproduce the issues that this
+patch tries to hide on my tree with [0][1][2] first and see whether
+they're still here? If they fix the issue, then why extend the timeout?
+
+> 
+>>
+>> They really do help.
+> 
+> No disagreement there. I would've loved to push these changes sooner,
+> but we already covered why that didn't happen.
+
+Because "they're not critical"? Intel's been having Tx timeouts on idpf
+for years. I'd say that at least [1] is critical since this is obvious
+bug. Without [2], XDP just doesn't work on idpf.
+Why isn't [0] critical since without this patch, you stash partial
+packets? And in some cases, ntc/ntu can go beyond the ring size? Is it okay?
+
+> 
+>>
+>> Note that there's one more Tx timeout patch from you in the OOT, but it
+>> actually broke Tx xD
+> 
+> If you are implying that our team would commit code that is knowingly
+> broken, that is absolutely not true. I believe what you're referring to
+
+I didn't say that. I just said that I tried to pull your latest yet
+another Tx timeout fix and with it, I have more timeouts than without.
+
+> is a change that introduced a tx timeout that also took a very specific
+> workload to trigger it. That issue was fixed and not applicable to the
+> current upstream implementation, so I do not see how that is relevant to
+> this conversation.
+
+It was just a side note, don't focus too much on such instead of really
+important stuff.
+
+> 
+>>
+>>> was run on the current driver that we had any indication there were
+>>> timeout issues.
+>>>
+>>>>
+>>>> I don't buy 30 seconds, at least for now. Maybe I'm missing something.
+>>>>
+>>>> Nacked-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+>>>
+>>>
+>>> In the process of debugging the newly discovered timeout, our
+>>> architecture team made it clear that 5 seconds is too low for this type
+>>> of device, with a non deterministic pipeline where packets can take a
+>>> number of exception/slow paths. Admittedly, we don't know the exact
+>>
+>> Slowpath which takes 30 seconds to complete, seriously?
+> 
+> The architecture team said 5s is too low. 30s was chosen to give ample
+> cushion to avoid changing the timeout should this situation come up again.
+
+Just "said", without any details why? Now I can say that 5 is too much
+and we need to have 1 second there. Why believe them, not me, w/o any
+arguments/explanation?
+
+(I at least have an argument that usually packets get sent in a couple
+ us or faster and even 1 second between triggering the sending and
+ receiving a completion is too much and if that happens, there were
+ some HW issues)
+
+> 
+>>
+>>> number, so the solution for the time being was to bump it up with a
+>>> comfortable buffer. As we tune things and debug with various workloads,
+>>> we can bring it back down. As David mentioned, there is precedent for an
+>>> extended timeout for smartnics. Why is it suddenly unacceptable for
+>>> Intel's device?
+>>
+>> I don't know where this "suddenly" comes from.
+>> Because even 5 seconds is too much.
+>> HW usually send packets in microseconds if not faster. Extending the
+>> timeout will hide real issues and make debugging more difficult.
+> 
+> Can you please elaborate on exactly why it would be more difficult? If
+> something is actually wrong in HW, it seems unlikely extra time would
+> correct it. If something is functionally wrong in the driver, why does
+> it matter if it's 5s, 15s, or 30s? It will timeout just the same.
+
+HW can hang and perform a reset and if you have 30 seconds for Tx
+timeout, you can even not notice it. Having 5 seconds or lower for the
+timeout will most likely spot it.
+
+> 
+>>
+>> I suspect this all is for OOO packets with an explicit sending timestamp
+>> passed from the userspace, but as I said, you need to teach the kernel
+>> watchdog to account them.
+> 
+> Out of order completions can happen for numerous reasons, some of which
+> the driver will know nothing about, i.e. the userspace timestamps are
+> not the only things that trigger OOO completions. We can detect that
+> we're processing completion B before A, but it's only at that time that
+> we can tell the stack to _maybe_ expect a delayed completion. I'm open
+> to discussing this further, but it does not seem like a simple solution
+> that can be implemented in the immediate future.
+
+I still didn't get an explanation why a packet can receive an OOO
+completion in whole 30 seconds instead of a couple microseconds.
+I also don't understand why we can receive an OOO completion for packets
+that were send without an explicit timestamp from the userspace. Without
+the timestamp (or some sort of priority etc.), they should be sent in
+the same order as they were passed to the driver, right? If so, why a
+packet can get an OOO completion, which means it was sent not in the
+same order as the driver got them?
+Does HW do some prioritizing even if the kernel didn't ask for it? But
+even if so, HW shouldn't in general delay sending for 30 seconds?
+
+> 
+>> Otherwise, I can ask the driver to send a packet in 31 seconds, what
+>> then, there will be a timeout and you will send a patch to extend it to
+>> 60 seconds?
+> 
+> I hope there are checks in the stack itself that would not allow the
+> packet to be scheduled beyond the timeout window :)
+
+I don't think so, but since I haven't read the actual code, I won't say
+anything particular. Anyway, it was just a side note, my main concerns
+are above.
+
+Thanks,
+Olek
 
