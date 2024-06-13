@@ -1,248 +1,291 @@
-Return-Path: <netdev+bounces-103091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F211B906446
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 08:43:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAA4F90644B
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 08:45:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A235284D9C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 06:43:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 284E21F239D5
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 06:45:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5814C13777D;
-	Thu, 13 Jun 2024 06:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A5B136E1D;
+	Thu, 13 Jun 2024 06:45:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WwueXspO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C8SkEai+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98FE81369B0;
-	Thu, 13 Jun 2024 06:43:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D182F30
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 06:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718260992; cv=none; b=K1LYE6f/hBAbcsCKXVnzOqnpys9vdeUVB9GaK8/DlXUptzIK7ekgl8w1vNatVVPNNV0S3Hauvhlmr8jq1gA1fGfiBTPl0wTyqATxG9XwU8rMBmsywz0W76hDxJtM8RStuM0ruv/4pJ/7WTV9nbGxJvFkXQwLsisAxeneWXZZOUs=
+	t=1718261137; cv=none; b=WAHeSgu6ghUGpT5GYpdw4AE7sC15ohQlcAVTCkAoRGl6R1lcRb0R/cGha7hydOKkWRvvkuE0pBXLC9GxFVzNO4k7MLv544b+Fqr3K4UXRtIa63BCP/a5utI066J8ljTzyImBM0+HItMTBwqIELRPxTBqM28LktoHKj5DyIMKB7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718260992; c=relaxed/simple;
-	bh=aVw2orsoCJBRLL7ubOJpxqa7rJllpYCo+Yila4F04Pw=;
+	s=arc-20240116; t=1718261137; c=relaxed/simple;
+	bh=Ys2Cpp4pmssDa7lg5MrWy/T5Ixop45a9ihsxs2rok0M=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rar/J3YkfAO8JWRnXt0eCo5OOq6HIf+lI9ZbpusNl0Ir7jhedJkMaE+M4A1hqL4XUoDCrHSfZB/mPLdordZPBcLMiWRisEkQ6jFGJlvWAOk9EWmMOWpVrCSTkVky2IOxAK291J4CruGJsUGSzkSf0kCDCVA4TFBmD/N7NpeGbWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WwueXspO; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-62f79de5f49so896607b3.2;
-        Wed, 12 Jun 2024 23:43:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718260989; x=1718865789; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DIkEXiCbdHBjfOGWnmQQ77fch7SYE211jsaY4bM0/Dk=;
-        b=WwueXspOfS9e4Rw4lbKYuh+b5p8BFh9wTvjVvx1kBI74wxAFCv3/7ZvXKi7KPFaQtW
-         V8sVq80KPy5IvUpQSQSbKSTyOwHnlVyjlcv/eoDV7jXAOyzjWC7JreEfyYCz10eAD4vK
-         ZaRWcH8X/IAHx7c5fX6lNmIjthM/OnjLL+HF9fp6G1Yhyhl1LGnFGany0lZ3JzveWrTS
-         cburQL3GjUnNpjZyZpigqLqCXC9FtQ/uCmgVSiWTxEbuSySALh5RKyKHErQ+AfSP4jpC
-         Bs/91eIFM5MeffbiTSOTsMoyF+e5FdkGjw9gAgKGv9InmmpTYJtwJqbeVuoucitMTJJv
-         btJg==
+	 To:Cc:Content-Type; b=klGGmiQTDQ8T1aAhrYmpiZzb5v7/K/jnEwEKo4O8xelUAUn1587Cg4KjM5Aum+FjVEheKYyK1MhtpWbypf8NuT7bWorIbSk2ADbsTI4oBTaWLVsbb0QV/kpm6yjWclIwCSzgGom7CGzSlwcT3dimQp9GlbKfFR4uheaGKSFfadA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C8SkEai+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718261134;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EaOBrgbdpnIFPucJH8WH9dmt441HfDwQ5TxqzEJgnt4=;
+	b=C8SkEai+jmEmARc186K4/hujQLqnKtILEib29brH393PAvLdfp9bIu47M3DYkPVFEImLjF
+	juBz5fkNi7Z4woJewSPKeIMsevlueGBv/RnggLD+2UVsz/tV3QvIcA7uX5iw3nf50+gM7G
+	0mc5QMMqVe22mhTWiITPCJFF7BKfwIM=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-575-py7tUQ5GOZKWJa8X_pMiBg-1; Thu, 13 Jun 2024 02:45:32 -0400
+X-MC-Unique: py7tUQ5GOZKWJa8X_pMiBg-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a6ef6ac6e0aso26794166b.0
+        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 23:45:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718260989; x=1718865789;
+        d=1e100.net; s=20230601; t=1718261131; x=1718865931;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DIkEXiCbdHBjfOGWnmQQ77fch7SYE211jsaY4bM0/Dk=;
-        b=KgwWKCb9TOF0feiUcjyS9JRPT4nbdHAtlN/1jH0WVswZi7YczN+606iiplXqHxP1Ii
-         RQpBOJV1JiqGsF6/oRZpjIPE3Klm2JXHvDWxYS7J+3bZjEibYDPIcqTCB/S0BKwUBZGh
-         hZAztkoMDvvuPtIyoPm+6LGQJZb2dRQOVLc3QSFK0c54P+n0G5SKFxcJDkqihnQi4514
-         beqItRwd44rPFm2igGlHGiMmnc8OZBB4ZxfdvIjlBdjkImc2OhAOlaGUGH68lAwQuQO6
-         uB/qyOzmwyNuLdHKsCD0rnmz0KyoHyIZpkG0ivytn2pBkaYtClVpeV7monUUqsipwbZs
-         LPmg==
-X-Forwarded-Encrypted: i=1; AJvYcCUMQZpmRsFhOLhlXn63ppT2WFjPDEWi5ZW00tD3nZEp4wI+/+JADc1Ach2jlfgNWRhUJmczjH5wEAL4EmggLaalQrlZtae9sZiUa7CvwM0w2+8TfTxhKgxMh/oF
-X-Gm-Message-State: AOJu0Yye6uNXUggGE+yERnjx9DxAamunUhn0rV8eQ/0PqzCxQHTvhTXL
-	QHuHfemqudfNsAbBn4P3JNUDKzcL6NYm4+zl7hxSVPEVZj20/bu56W+t4adwZO+unMFDY/d6OyV
-	bNc2wVSEOcCc3ZWb2xKCdxWruN2X/p5hwuWk=
-X-Google-Smtp-Source: AGHT+IFeEaeognYjH08s2wzNCFZbv7yrug2rEv8hmtakpLvchqy0GdjckggcG+d+4SDUn6jR3cFihW8GmPUWPeKc1dw=
-X-Received: by 2002:a25:1c4:0:b0:dfd:b41d:4a98 with SMTP id
- 3f1490d57ef6-dfe69fca31bmr3184478276.3.1718260989517; Wed, 12 Jun 2024
- 23:43:09 -0700 (PDT)
+        bh=EaOBrgbdpnIFPucJH8WH9dmt441HfDwQ5TxqzEJgnt4=;
+        b=JdQ5z4FQNkIQkCs6lw1k0fiHZhxsCUzSnzBslLb8HpD1LKYYQrCGM7kUgosOKpmRrl
+         aILiWqTtaCUvc2NQ9OdWDRUWdj0GAu4sWH9bIrpI6aMVfsyULJ8YopM/IpJr2YGIs5lb
+         Lt1TCFiOuE+KB3AlZw5SgzxvSVg/sofP0+fBI3gR+BtwMWMnfA8AyE0ACmFVIKbcJsWD
+         oi4CT+WMB/pgMsjJstM2YTSG0ENwIyG7tyzOLy9m3H3MpmK76bdJf4SkPfuUreGN/QzD
+         IiwLXyuK4VwFOVkwKgGPaoVaRyNw/e1XSMUfJWRkgjMoxw3w9uv0RxPC4iMBym9HaMVb
+         Nnbg==
+X-Forwarded-Encrypted: i=1; AJvYcCWYyQJaA7UIJUw7HTQ2ajzlPGzsPKkbeaAt5fWiJs94nrwmFxK5GQc+DwN3EXCUpXSKuP1kRe9brYmzkk+dert3Pi5bfDmM
+X-Gm-Message-State: AOJu0Yw+9pxuZpwKCbeg6ZOVMHg+fAy+xyJ3dzYk0vbQc4W1IUVOtnH6
+	DLIWnRLiR8eR6XLAnJXMX7ARHqiw7MfmzS0GfUIAFFthoYr9TOi4Rs50+mmS8x8RnACuS0NYQEk
+	SUSA02G060JVlaDuF1KpfnFTo+B8//mNnfoLbImKlsuhvITVmOJgBD8weXGCvhaOlr2O1OtQ9+l
+	D/9NhwSXmleeZ4aJX07OlqitTWaPUE
+X-Received: by 2002:a17:906:7f99:b0:a6f:4a2a:935e with SMTP id a640c23a62f3a-a6f4a2a94c6mr225852566b.18.1718261131438;
+        Wed, 12 Jun 2024 23:45:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEYy4AwTtxZrHTSjOgm48lDP81zYFIgfIO/YCdS4gCzAk/Vn8nistPVRk9L5xS0hckO0zz2tvI4n7eld/zASPI=
+X-Received: by 2002:a17:906:7f99:b0:a6f:4a2a:935e with SMTP id
+ a640c23a62f3a-a6f4a2a94c6mr225851166b.18.1718261131016; Wed, 12 Jun 2024
+ 23:45:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1718138187.git.zhuyifei@google.com> <CAJ8uoz2-Kt2o-v3CuLpf2VDv2VtUJL2T307rp04di5hY2ihYHg@mail.gmail.com>
- <ZmmZY3zim4wG7pHR@boxer> <CAA-VZP=zpMeDamaKD60A3761N0CRUynWr54W3bzN5AK2CV4fOg@mail.gmail.com>
-In-Reply-To: <CAA-VZP=zpMeDamaKD60A3761N0CRUynWr54W3bzN5AK2CV4fOg@mail.gmail.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Thu, 13 Jun 2024 08:42:58 +0200
-Message-ID: <CAJ8uoz0ieQ0pX06A+-_idQFOO5Q+0R_jQZLk6wK7tq=7dHvJUg@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next 0/3] selftests: Add AF_XDP functionality test
-To: YiFei Zhu <zhuyifei@google.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	Magnus Karlsson <magnus.karlsson@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Andrii Nakryiko <andrii@kernel.org>, Stanislav Fomichev <sdf@google.com>, 
-	Willem de Bruijn <willemb@google.com>
+References: <20240611053239.516996-1-lulu@redhat.com> <20240612014143-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240612014143-mutt-send-email-mst@kernel.org>
+From: Cindy Lu <lulu@redhat.com>
+Date: Thu, 13 Jun 2024 14:44:52 +0800
+Message-ID: <CACLfguU53VpR=nvppx4BwGM=mi7j99Nr7yzEwd8zNY8ps0iBRQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: dtatulea@nvidia.com, jasowang@redhat.com, 
+	virtualization@lists.linux-foundation.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 12 Jun 2024 at 18:44, YiFei Zhu <zhuyifei@google.com> wrote:
+On Wed, Jun 12, 2024 at 3:12=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
 >
-> On Wed, Jun 12, 2024 at 5:50=E2=80=AFAM Maciej Fijalkowski
-> <maciej.fijalkowski@intel.com> wrote:
+> On Tue, Jun 11, 2024 at 01:32:32PM +0800, Cindy Lu wrote:
+> > Add new UAPI to support the mac address from vdpa tool
+>
+> The patch does not do what commit log says.
+> Instead there's an internal API to set mac and
+> a UAPI to write into config space.
+>
+thanks, Michael, I will rewrite this part
+Thanks
+cindy
+> > Function vdpa_nl_cmd_dev_config_set_doit() will get the
+> > MAC address from the vdpa tool and then set it to the device.
 > >
-> > On Wed, Jun 12, 2024 at 01:47:06PM +0200, Magnus Karlsson wrote:
-> > > On Tue, 11 Jun 2024 at 22:43, YiFei Zhu <zhuyifei@google.com> wrote:
-> > > >
-> > > > We have observed that hardware NIC drivers may have faulty AF_XDP
-> > > > implementations, and there seem to be a lack of a test of various m=
-odes
-> > > > in which AF_XDP could run. This series adds a test to verify that N=
-IC
-> > > > drivers implements many AF_XDP features by performing a send / rece=
-ive
-> > > > of a single UDP packet.
-> > > >
-> > > > I put the C code of the test under selftests/bpf because I'm not re=
-ally
-> > > > sure how I'd build the BPF-related code without the selftests/bpf
-> > > > build infrastructure.
-> > >
-> > > Happy to see that you are contributing a number of new tests. Would i=
-t
-> > > be possible for you to integrate this into the xskxceiver framework?
-> > > You can find that in selftests/bpf too. By default, it will run its
-> > > tests using veth, but if you provide an interface name after the -i
-> > > option, it will run the tests over a real interface. I put the NIC in
-> > > loopback mode to use this feature, but feel free to add a new mode if
-> > > necessary. A lot of the setup and data plane code that you add alread=
-y
-> > > exists in xskxceiver, so I would prefer if you could reuse it. Your
-> > > tests are new though and they would be valuable to have.
+> > The usage is: vdpa dev set name vdpa_name mac **:**:**:**:**:**
 > >
-> > +1
+> > Here is sample:
+> > root@L1# vdpa -jp dev config show vdpa0
+> > {
+> >     "config": {
+> >         "vdpa0": {
+> >             "mac": "82:4d:e9:5d:d7:e6",
+> >             "link ": "up",
+> >             "link_announce ": false,
+> >             "mtu": 1500
+> >         }
+> >     }
+> > }
 > >
-> > I just don't believe that you guys were not aware that xskxceiver exist=
-.
-> > Please provide us a proper explanation/justification why this was not
-> > fulfilling your needs and you decided to go with another test suite.
+> > root@L1# vdpa dev set name vdpa0 mac 00:11:22:33:44:55
+> >
+> > root@L1# vdpa -jp dev config show vdpa0
+> > {
+> >     "config": {
+> >         "vdpa0": {
+> >             "mac": "00:11:22:33:44:55",
+> >             "link ": "up",
+> >             "link_announce ": false,
+> >             "mtu": 1500
+> >         }
+> >     }
+> > }
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > ---
+> >  drivers/vdpa/vdpa.c       | 71 +++++++++++++++++++++++++++++++++++++++
+> >  include/linux/vdpa.h      |  2 ++
+> >  include/uapi/linux/vdpa.h |  1 +
+> >  3 files changed, 74 insertions(+)
+> >
+> > diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
+> > index a7612e0783b3..347ae6e7749d 100644
+> > --- a/drivers/vdpa/vdpa.c
+> > +++ b/drivers/vdpa/vdpa.c
+> > @@ -1149,6 +1149,72 @@ static int vdpa_nl_cmd_dev_config_get_doit(struc=
+t sk_buff *skb, struct genl_info
+> >       return err;
+> >  }
+> >
+> > +static int vdpa_nl_cmd_dev_config_set_doit(struct sk_buff *skb,
+> > +                                        struct genl_info *info)
+> > +{
+> > +     struct vdpa_dev_set_config set_config =3D {};
+> > +     struct nlattr **nl_attrs =3D info->attrs;
+> > +     struct vdpa_mgmt_dev *mdev;
+> > +     const u8 *macaddr;
+> > +     const char *name;
+> > +     int err =3D 0;
+> > +     struct device *dev;
+> > +     struct vdpa_device *vdev;
+> > +
+> > +     if (!info->attrs[VDPA_ATTR_DEV_NAME])
+> > +             return -EINVAL;
+> > +
+> > +     name =3D nla_data(info->attrs[VDPA_ATTR_DEV_NAME]);
+> > +
+> > +     down_write(&vdpa_dev_lock);
+> > +     dev =3D bus_find_device(&vdpa_bus, NULL, name, vdpa_name_match);
+> > +     if (!dev) {
+> > +             NL_SET_ERR_MSG_MOD(info->extack, "device not found");
+> > +             err =3D -ENODEV;
+> > +             goto dev_err;
+> > +     }
+> > +     vdev =3D container_of(dev, struct vdpa_device, dev);
+> > +     if (!vdev->mdev) {
+> > +             NL_SET_ERR_MSG_MOD(
+> > +                     info->extack,
+> > +                     "Fail to find the specified management device");
+> > +             err =3D -EINVAL;
+> > +             goto mdev_err;
+> > +     }
+> > +     mdev =3D vdev->mdev;
+> > +     if (nl_attrs[VDPA_ATTR_DEV_NET_CFG_MACADDR]) {
+> > +             if (!(mdev->supported_features & BIT_ULL(VIRTIO_NET_F_MAC=
+))) {
 >
-> To answer this question, I can't speak for others, but I personally
-> was not fully aware.
 >
-> Over a year ago when we were testing AF_XDP latency on internal NIC
-> drivers, we extended our internal latency test tool to support AF_XDP.
-> And that was when we observed the NICs we were testing had faulty
-> implementations - panics, packet corruptions, random drops; and we
-> decided to simplify the latency suite to add a simple pass/fail test
-> to our testing infrastructure, and we named it xsk_hw. The test was
-> specifically designed to test hardware NICs (rather than veth), and
-> there was a bunch of code around the test, to reserve & setup
-> machines, and to obtain information such as the IP addresses and the
-> host and next hop MACs addresses. At the time, the code was deemed too
-> dependent on our internal multi-machine-testing infrastructure to
-> upstream, but it has been running as part of our test suite since.
+> Seems to poke at a device without even making sure it's a network
+> device.
 >
-> This brings us to recently. I was informed that upstream now have
-> drv-net, and now that upstream also has multi-machine testing, it's
-> time to upstream it. Hence this patch series, which I made after
-> adapting the code to use drv-net and network_helpers.
+sure ,will add the check
+Thansk
+cindy
+> > +                     NL_SET_ERR_MSG_FMT_MOD(
+> > +                             info->extack,
+> > +                             "Missing features 0x%llx for provided att=
+ributes",
+> > +                             BIT_ULL(VIRTIO_NET_F_MAC));
+> > +                     err =3D -EINVAL;
+> > +                     goto mdev_err;
+> > +             }
+> > +             macaddr =3D nla_data(nl_attrs[VDPA_ATTR_DEV_NET_CFG_MACAD=
+DR]);
+> > +             memcpy(set_config.net.mac, macaddr, ETH_ALEN);
+> > +             set_config.mask |=3D BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MACADD=
+R);
+> > +             if (mdev->ops->set_mac) {
+> > +                     err =3D mdev->ops->set_mac(mdev, vdev, &set_confi=
+g);
+> > +             } else {
+> > +                     NL_SET_ERR_MSG_FMT_MOD(
+> > +                             info->extack,
+> > +                             "%s device not support set mac address ",=
+ name);
+> > +             }
+> > +
+> > +     } else {
+> > +             NL_SET_ERR_MSG_FMT_MOD(info->extack,
+> > +                                    "%s device not support this config=
+ ",
+> > +                                    name);
+> > +     }
+> > +
+> > +mdev_err:
+> > +     put_device(dev);
+> > +dev_err:
+> > +     up_write(&vdpa_dev_lock);
+> > +     return err;
+> > +}
+> > +
+> >  static int vdpa_dev_config_dump(struct device *dev, void *data)
+> >  {
+> >       struct vdpa_device *vdev =3D container_of(dev, struct vdpa_device=
+, dev);
+> > @@ -1285,6 +1351,11 @@ static const struct genl_ops vdpa_nl_ops[] =3D {
+> >               .doit =3D vdpa_nl_cmd_dev_stats_get_doit,
+> >               .flags =3D GENL_ADMIN_PERM,
+> >       },
+> > +     {
+> > +             .cmd =3D VDPA_CMD_DEV_CONFIG_SET,
+> > +             .doit =3D vdpa_nl_cmd_dev_config_set_doit,
+> > +             .flags =3D GENL_ADMIN_PERM,
+> > +     },
+> >  };
+> >
+> >  static struct genl_family vdpa_nl_family __ro_after_init =3D {
+> > diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+> > index db15ac07f8a6..c97f4f1da753 100644
+> > --- a/include/linux/vdpa.h
+> > +++ b/include/linux/vdpa.h
+> > @@ -581,6 +581,8 @@ struct vdpa_mgmtdev_ops {
+> >       int (*dev_add)(struct vdpa_mgmt_dev *mdev, const char *name,
+> >                      const struct vdpa_dev_set_config *config);
+> >       void (*dev_del)(struct vdpa_mgmt_dev *mdev, struct vdpa_device *d=
+ev);
+> > +     int (*set_mac)(struct vdpa_mgmt_dev *mdev, struct vdpa_device *de=
+v,
+> > +                    const struct vdpa_dev_set_config *config);
+>
+>
+> Well, now vdpa_mgmtdev_ops which was completely generic is growing
+> a net specific interface. Which begs a question - how is this
+> going to work with other device types?
+>
+Thanks Micheal, I will rewrite this part
+Thanks
+Cindy
+> >  };
+> >
+> >  /**
+> > diff --git a/include/uapi/linux/vdpa.h b/include/uapi/linux/vdpa.h
+> > index 54b649ab0f22..53f249fb26bc 100644
+> > --- a/include/uapi/linux/vdpa.h
+> > +++ b/include/uapi/linux/vdpa.h
+> > @@ -19,6 +19,7 @@ enum vdpa_command {
+> >       VDPA_CMD_DEV_GET,               /* can dump */
+> >       VDPA_CMD_DEV_CONFIG_GET,        /* can dump */
+> >       VDPA_CMD_DEV_VSTATS_GET,
+> > +     VDPA_CMD_DEV_CONFIG_SET,
+> >  };
+> >
+> >  enum vdpa_attr {
+> > --
+> > 2.45.0
+>
 
-I was not aware of drv-net. I think it would be a really good idea to
-just hook up xskxceiver to this even without adding any new tests. If
-this is something that is run automatically for drivers, perfect, we
-should make use of it. Any idea what it would take to make xskxceiver
-use drv-net?
-
-> As for xskxceiver, for me personally, I discarded the idea after
-> reading the initial block comment of xskxceiver saying it spawns two
-> threads in a veth pair to test AF_XDP, which in my mind was like "okay
-> this doesn't test hardware NICs, and to extend that test to hardware
-> is probably a major rewrite that is probably not worth", so I did not
-> look too deeply into its code. I personally was unaware that it can
-> test a real interface, and that's partially my fault.
-
-Or mine for not updating the initial block comment. In any case, no worries=
-!
-
-> I'll take a look at xskxceiver and see how feasible it is to integrate
-> this into xskxceiver.
-
-Thanks! Please keep the drv-net integration in mind. Hopefully it is
-not that much work to tweak xskxceiver to fit into that.
-
-> > >
-> > > You could make the default packet that is sent in xskxceiver be the
-> > > UDP packet that you want and then add all the other logic that you
-> > > have to a number of new tests that you introduce.
-> > >
-> > > > Tested on Google Cloud, with GVE:
-> > > >
-> > > >   $ sudo NETIF=3Dens4 REMOTE_TYPE=3Dssh \
-> > > >     REMOTE_ARGS=3D"root@10.138.15.235" \
-> > > >     LOCAL_V4=3D"10.138.15.234" \
-> > > >     REMOTE_V4=3D"10.138.15.235" \
-> > > >     LOCAL_NEXTHOP_MAC=3D"42:01:0a:8a:00:01" \
-> > > >     REMOTE_NEXTHOP_MAC=3D"42:01:0a:8a:00:01" \
-> > > >     python3 xsk_hw.py
-> > > >
-> > > >   KTAP version 1
-> > > >   1..22
-> > > >   ok 1 xsk_hw.ipv4_basic
-> > > >   ok 2 xsk_hw.ipv4_tx_skb_copy
-> > > >   ok 3 xsk_hw.ipv4_tx_skb_copy_force_attach
-> > > >   ok 4 xsk_hw.ipv4_rx_skb_copy
-> > > >   ok 5 xsk_hw.ipv4_tx_drv_copy
-> > > >   ok 6 xsk_hw.ipv4_tx_drv_copy_force_attach
-> > > >   ok 7 xsk_hw.ipv4_rx_drv_copy
-> > > >   [...]
-> > > >   # Exception| STDERR: b'/tmp/zzfhcqkg/pbgodkgjxsk_hw: recv_pfpacke=
-t: Timeout\n'
-> > > >   not ok 8 xsk_hw.ipv4_tx_drv_zerocopy
-> > > >   ok 9 xsk_hw.ipv4_tx_drv_zerocopy_force_attach
-> > > >   ok 10 xsk_hw.ipv4_rx_drv_zerocopy
-> > > >   [...]
-> > > >   # Exception| STDERR: b'/tmp/zzfhcqkg/pbgodkgjxsk_hw: connect sync=
- client: max_retries\n'
-> > > >   [...]
-> > > >   # Exception| STDERR: b'/linux/tools/testing/selftests/bpf/xsk_hw:=
- open_xsk: Device or resource busy\n'
-> > > >   not ok 11 xsk_hw.ipv4_rx_drv_zerocopy_fill_after_bind
-> > > >   ok 12 xsk_hw.ipv6_basic # SKIP Test requires IPv6 connectivity
-> > > >   [...]
-> > > >   ok 22 xsk_hw.ipv6_rx_drv_zerocopy_fill_after_bind # SKIP Test req=
-uires IPv6 connectivity
-> > > >   # Totals: pass:9 fail:2 xfail:0 xpass:0 skip:11 error:0
-> > > >
-> > > > YiFei Zhu (3):
-> > > >   selftests/bpf: Move rxq_num helper from xdp_hw_metadata to
-> > > >     network_helpers
-> > > >   selftests/bpf: Add xsk_hw AF_XDP functionality test
-> > > >   selftests: drv-net: Add xsk_hw AF_XDP functionality test
-> > > >
-> > > >  tools/testing/selftests/bpf/.gitignore        |   1 +
-> > > >  tools/testing/selftests/bpf/Makefile          |   7 +-
-> > > >  tools/testing/selftests/bpf/network_helpers.c |  27 +
-> > > >  tools/testing/selftests/bpf/network_helpers.h |  16 +
-> > > >  tools/testing/selftests/bpf/progs/xsk_hw.c    |  72 ++
-> > > >  tools/testing/selftests/bpf/xdp_hw_metadata.c |  27 +-
-> > > >  tools/testing/selftests/bpf/xsk_hw.c          | 844 ++++++++++++++=
-++++
-> > > >  .../testing/selftests/drivers/net/hw/Makefile |   1 +
-> > > >  .../selftests/drivers/net/hw/xsk_hw.py        | 133 +++
-> > > >  9 files changed, 1102 insertions(+), 26 deletions(-)
-> > > >  create mode 100644 tools/testing/selftests/bpf/progs/xsk_hw.c
-> > > >  create mode 100644 tools/testing/selftests/bpf/xsk_hw.c
-> > > >  create mode 100755 tools/testing/selftests/drivers/net/hw/xsk_hw.p=
-y
-> > > >
-> > > > --
-> > > > 2.45.2.505.gda0bf45e8d-goog
-> > > >
-> > > >
-> > >
 
