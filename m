@@ -1,119 +1,105 @@
-Return-Path: <netdev+bounces-103348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA0DE907B27
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 20:22:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD1DC907B50
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 20:30:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 462C7B23B85
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 18:22:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B791E1C22E66
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 18:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE90814B940;
-	Thu, 13 Jun 2024 18:21:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lUK9ZmP+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2807114A623;
+	Thu, 13 Jun 2024 18:30:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD5214A624
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 18:21:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BCB14B064
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 18:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718302910; cv=none; b=S8RMP1C7AepcdMdLPSR3MMBUwsmxRDkgra8VdVfXsj6fv7X5E3uQRieSKSyRq59lxtUoQMqO6uE223hXfl6RRhpjZ+632wx4N9yKnBJifacamDflamRhS8EG5X/L5ASmx9K+xk5wCB1jrYq2QcUKuekrJw6LFsNUCm3QGO0DPEI=
+	t=1718303414; cv=none; b=RdH9CHF/JdTqWcjBZgPHKyKde+fh9/7yccvHfldjXAU1rL3J20qo9PWLZZVHuDSAC1iGJdQk2vyePG1eRKsJOwmYPTCa+TTOPqUjai6mrZ/bF2LTD0gM3O0HRtTtyuCFN/JCRK18Lgt8by10QlMoZHJHHzOLYJ72uisfRCSDhJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718302910; c=relaxed/simple;
-	bh=Eg3PsnHVSYuLn+uKCQz7YExSHrr2gIhjUaFUT+0OM7g=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=LmBuqBsFRZsuJupvStI1W/I7XEcE9MrRL5ebjq3KGmzqlOjiDhtCrBr+HNQM7aEyKjbGY5qHst7XWSV6R6Kv4+OU8JtJ6lTdBS/30MLfvhmdLQ0wuupv/2qr0NiZPFqskcGU2DLZhvZ1PG194gu9C4YdcGCQC8yhQlBPc+hereo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lUK9ZmP+; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-42122ac2f38so8760115e9.1
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 11:21:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718302907; x=1718907707; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QUxyMjU71ZE+fUPetZ6OJeVBxDmLzc8mtYCL3gsGt3s=;
-        b=lUK9ZmP+mAfBhy+5w0FZ/fWbkMITJqtWW0NAaRfyZPeTfXL5jMAr7mYStE/wl5KrVU
-         hy0a6wTwzMN+vD1BTuIx8U7aejrTiiqIFNDNkIEIugTpPXNmolkslgBoicXnEOtmI110
-         uN0iBiNNX1tHzgPjJREin7VYCd2i0iEfM2BoPZKeoQb4RrtP1FW0vS88pKKzIrufyO46
-         Coi6hOXVptR4SYI0eEDQ0AEJckgs57x7cYEDWe5YpQ+HpEnIOkgGzvv83XMHkh9iJvB5
-         XU4AbAwdPBXHRFa526OTRiRga5uafHCkgJX4gsS90DWKDvA0Vrk01n1bUjEahNtDfVwv
-         1YpQ==
+	s=arc-20240116; t=1718303414; c=relaxed/simple;
+	bh=x3Uplq3g9tRJ63VMtyTiFluF2YqaQGF7G74yVJkKC50=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=lYZsyJTjPoHlQM8Tm0UMJ5eNOwNiyYMRoGzUbEthSjY1Gq07kA6vIWgEc1RYaNhRMb8ybHEN9xqV9vgXNo5SAn+sBIGeKZPEGPI/0P2SnwSQVpulH3J5PB89DHTvCvuptOrjNEPRLHnzgmXh6fbXo8/QATYWxgYnGP6JtbOeGdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-37596e877e9so15192955ab.3
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 11:30:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718302907; x=1718907707;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1718303412; x=1718908212;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QUxyMjU71ZE+fUPetZ6OJeVBxDmLzc8mtYCL3gsGt3s=;
-        b=OaUrC0VnjODkEb0/bzKGClMIpL9WASbRewoJD1hhiKTX5hGoCLxzjdWJ9eukZGCXMY
-         kPxeLR1f1glEtY14dBV5eqlCrExmhnUj8uesgVGrU3Mozsmb05VeGFe6XgdWVUGlJ0X0
-         9cFMeFnvP8vMjpelPvalKNtNO3mOasoi61zlrRAtO6KeKD6n4HXqAeX+9421JqZvpk+N
-         AX5tgQ4SHL5NRcAPe+Jg0Rh219J8jWBtfM6Tka16GHt6H+7ggymTVRQd3gpKqwUycBeh
-         T067HV/jTzcaQm9ZPlNFxJGBqtYV4uRt35bMUbwCUz5KwLiXfJSLl9KioSrydZgQvPZH
-         tCtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWzk8Zz1K8D7OBQ3zCdsu8CiQfVbW8ruTZWZSMC6hjw3peGNPGurJF0rK7HuhzUmYzaoCRubAiDPXvb2sj+y78VNbgVn7C9
-X-Gm-Message-State: AOJu0Yxr0I7HKozU3nx/kZXK2KifLzRd1a2gKbWy0ripBTqMl4D5k7x/
-	AapcTnDlC83835v1DCHl/wQjFusGegzQV2GYQuvLqeN+LSS70gxanqcze5tQUeo=
-X-Google-Smtp-Source: AGHT+IHE8xPRTkTbm1KPshLdZzNhvmcmIrYIfPgMiJtdCnz+qehS2fJwkgES/YPzH7zgsVHVrvOTGQ==
-X-Received: by 2002:a05:600c:4506:b0:421:392b:7e13 with SMTP id 5b1f17b1804b1-422b6dc80c2mr39801835e9.4.1718302907122;
-        Thu, 13 Jun 2024 11:21:47 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422f641a5b4sm33163135e9.41.2024.06.13.11.21.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jun 2024 11:21:46 -0700 (PDT)
-Date: Thu, 13 Jun 2024 21:21:42 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Hyunwoo Kim <v4bel@theori.io>,
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH net-next] atm: clean up a put_user() calls
-Message-ID: <04a018e8-7433-4f67-8ddd-9357a0114f87@moroto.mountain>
+        bh=x3Uplq3g9tRJ63VMtyTiFluF2YqaQGF7G74yVJkKC50=;
+        b=d31P08BPJ3T6iYf3Qnj2jU+ZfMmx9uEQPEWllQMtmUfkqSaxGXqDOPcn32x/uRrklv
+         k/rh97qbgCKyyZfRQGywh/yUqmYToeiMERoPi0rLsupQYikw1Pnd++dQQ165yG1q3KAE
+         iC1SVHPcCAj6OZD+61CSZWJupY8zgIpbOS4sjwOkAkBjVBIYyP28Z3QiT3M3eXdlMWE+
+         TNH9n+h96ylg4F5r1o6A9Tm00vBcd3u0l1fT/kgHjdxnEjY2n7Qjx4wM3l1Ol8yBOfel
+         OC4UQJqljZoM8UT3oXKpmcCRxqvSZ0R6eCHWGukTtwMyU/iQs73VP9wq9Hdmds3cMutq
+         N14Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXFDp6YL+PlRscZEw2Xeat949pwGLdAcoLZX47yrXwqsc/Tvk4vLzGEiqw5HxGrauvelRxTTwrvPpGThQZhVoEdJztnT4TL
+X-Gm-Message-State: AOJu0YwaVvr52vjU0sk0I+vFEM18dW4HUgrtutRu11y8nWcot9NaE2sf
+	GzPIlUhd/XKocm0PIeBaAR91KjlwOChL0diQmIcigrTOZdh+pEheM2Btik/X7I0Ec3Ihg7qFlNY
+	v/kOiGuHRl39oLnB1AEeURUvtY3XFdxt3v/qu6RKYWtexZvvRsUMEH+8=
+X-Google-Smtp-Source: AGHT+IEJlGFfCPmrxyaBrcHzU59nuv55jCruy9LEhW2H2ynnEHqyLgyvFo36S7EeYSuZK+jHM/JkDgVy1sD23M7tBuFlGOD/yqoc
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+X-Received: by 2002:a05:6e02:164e:b0:375:9f67:6e7d with SMTP id
+ e9e14a558f8ab-375e1021197mr238355ab.4.1718303411783; Thu, 13 Jun 2024
+ 11:30:11 -0700 (PDT)
+Date: Thu, 13 Jun 2024 11:30:11 -0700
+In-Reply-To: <000000000000a62351060e363bdc@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000079de2a061ac9b02c@google.com>
+Subject: Re: [syzbot] memory leak in ___neigh_create (2)
+From: syzbot <syzbot+42cfec52b6508887bbe8@syzkaller.appspotmail.com>
+To: alexander.mikhalitsyn@virtuozzo.com, davem@davemloft.net, den@openvz.org, 
+	dsahern@kernel.org, edumazet@google.com, f.fainelli@gmail.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	nogikh@google.com, pabeni@redhat.com, razor@blackwall.org, 
+	syzkaller-bugs@googlegroups.com, thomas.zeitlhofer+lkml@ze-it.at, 
+	thomas.zeitlhofer@ze-it.at, wangyuweihx@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-Unlike copy_from_user(), put_user() and get_user() return -EFAULT on
-error.  Use the error code directly instead of setting it.
+This bug is marked as fixed by commit:
+net: stop syzbot
 
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+But I can't find it in the tested trees[1] for more than 90 days.
+Is it a correct commit? Please update it by replying:
+
+#syz fix: exact-commit-title
+
+Until then the bug is still considered open and new crashes with
+the same signature are ignored.
+
+Kernel: Linux
+Dashboard link: https://syzkaller.appspot.com/bug?extid=42cfec52b6508887bbe8
+
 ---
- net/atm/ioctl.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+[1] I expect the commit to be present in:
 
-diff --git a/net/atm/ioctl.c b/net/atm/ioctl.c
-index f81f8d56f5c0..0f7a39aeccc8 100644
---- a/net/atm/ioctl.c
-+++ b/net/atm/ioctl.c
-@@ -68,7 +68,7 @@ static int do_vcc_ioctl(struct socket *sock, unsigned int cmd,
- 			goto done;
- 		}
- 		error = put_user(sk->sk_sndbuf - sk_wmem_alloc_get(sk),
--				 (int __user *)argp) ? -EFAULT : 0;
-+				 (int __user *)argp);
- 		goto done;
- 	case SIOCINQ:
- 	{
-@@ -83,7 +83,7 @@ static int do_vcc_ioctl(struct socket *sock, unsigned int cmd,
- 		skb = skb_peek(&sk->sk_receive_queue);
- 		amount = skb ? skb->len : 0;
- 		spin_unlock_irq(&sk->sk_receive_queue.lock);
--		error = put_user(amount, (int __user *)argp) ? -EFAULT : 0;
-+		error = put_user(amount, (int __user *)argp);
- 		goto done;
- 	}
- 	case ATM_SETSC:
--- 
-2.43.0
+1. for-kernelci branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
 
+2. master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git
+
+3. master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git
+
+4. main branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
+
+The full list of 10 trees can be found at
+https://syzkaller.appspot.com/upstream/repos
 
