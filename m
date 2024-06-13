@@ -1,109 +1,110 @@
-Return-Path: <netdev+bounces-103181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0947D906AD7
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 13:18:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C76F906AF3
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 13:25:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DED81C233E1
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:18:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB2431F24044
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:25:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45098141987;
-	Thu, 13 Jun 2024 11:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741DA143753;
+	Thu, 13 Jun 2024 11:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gJNCVWSl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oJooeywx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1674513D28D
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 11:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57EE81735
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 11:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718277491; cv=none; b=twEDvCT+Ruz4lVWUoDPqcGRiKVFAoiHOdAbEGUv7PpLiACkd68/ugv4lQ2sYQBfJJUvRdPnAbwnZpRFK73x5MqmdhzcbBJ1RieAnrjlPalX4Sq4KzqD/Z8KyTLXXHyQiL0yWY2gpn9VwExxu250NfK2CrhaLxh1S4Cgj9XJzRPM=
+	t=1718277943; cv=none; b=lfH9DCh65r0ZsJwdZkqTaBkGZvCU5+DGF+LNLL2ZHjngJt/5wRy2WKB5ZrvztkS/9AqU4lNutGIrrZpWdz7Ao4mFNRM08Zw4TP7Qgc2FySPlDCLfeXzHWaE4D5NOBDbCx1t6RDRwMSwzC33RPjnl8q/CdF9XXYuTLeknvst+fLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718277491; c=relaxed/simple;
-	bh=PwRQ1jcic2GeGuDoKYKK7A1oVIRwq+S2s7y2dByeUfQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O3FU4UfL14M9Uwd5zHl418CW+0wTOK7VrDFp2LeQ/NuU3N7ZLqHstZqaOTE2OhsgWSm1t22TQ7wKHpe+86/BqTWYCDnGg2+0jqyscHH0lTm4mGF1j8brIeE7Tg0IRa+vTl6VG2Llmp0nD3Jl0ccrloDRSvQey6v2XhNJjSyDpE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gJNCVWSl; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: daniel@iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718277487;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qxwpkH10a/Qqq116CU6pqkq3h1coQ0GMCVQ+GwfzBoU=;
-	b=gJNCVWSlwCB66c3mMfMwwSIlZ+Dn+9K5Ab3O7Ifk6HsOfAdryY3xLHhZMw2coIzx4lr2Jb
-	yHqQ6LhbvPi6If/wus2bXC9iyiy+ORxzqbok0tbedacSqxUjDLkJuOo5QxatOjVx3Y4xqR
-	XoPlnjyO1LuS4Zb2xwCf2Hk3sqALKng=
-X-Envelope-To: andrii@kernel.org
-X-Envelope-To: ast@kernel.org
-X-Envelope-To: mykolal@fb.com
-X-Envelope-To: kuba@kernel.org
-X-Envelope-To: martin.lau@linux.dev
-X-Envelope-To: bpf@vger.kernel.org
-X-Envelope-To: netdev@vger.kernel.org
-Message-ID: <895c8713-85a7-48a6-a42c-2c1ac4fe2274@linux.dev>
-Date: Thu, 13 Jun 2024 12:18:02 +0100
+	s=arc-20240116; t=1718277943; c=relaxed/simple;
+	bh=dIEuACjsltwpJD0V+bskvqcb6UYaTtASIQDE9vOPI5Q=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=pRVY5kYQ+SMdY9XXD9THp5BcH5QnRiIEEqzkMK+nVhdYV5wSe1+AiX94OMwILBMOW2bLre+0r0kID/xTHyyf32XGWllmQPwaLLl4dLvPglkq8oPY9ji7VD61IAGfB0ATrTGZ8W/hi/UrpYX5YQYMnKLxkBoj9LAxprXNXLbt3Cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--maze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oJooeywx; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--maze.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dfab38b7f6bso1368875276.0
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 04:25:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718277939; x=1718882739; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lYU5Qi8biKRQ+V307T1KahsI7+1YeIx8/OH0uEw2Xw0=;
+        b=oJooeywxkO0d4Pj61kKsLrSQs1B3a1Tss9sQOUwYGjbxN7OGgVbqr5mA1/xQIyCyz5
+         S51ISzftTY8juze5o5YpEJSHgRGyfoPFhLM5EXukrM8F/8LsTGYHuebR32fIIuROY8BU
+         Kbe/oH7otdcUh8PxEgBL3mEcZV/xO9qk+dd2/xLXUw5humWzrs5A0T2GFAZrcN5LxgV4
+         KIOYZpDUl2d5QqCJ3YzmpzrTtm+1o20q9dMQaUeXFibm57f28s5Eu5o9sWkwlV2/tSMb
+         uxaGeU+M2MXdXEVKNXS8EI9SDNDEApRGHG5QluX6j/qYAmadGKs7lqDuWBTDxWpn/1OP
+         ANJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718277939; x=1718882739;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lYU5Qi8biKRQ+V307T1KahsI7+1YeIx8/OH0uEw2Xw0=;
+        b=LTAlTum9b9WhjZAr85TT77QE6IO+yy1UhQ2Gvd4CYdoup5UJi5VJyOQxIVPxh+2u8q
+         hZyHtqymmmxAHY0qKAbEOurLYU58//6zQF0246Q0Z2TfRcaY0GCMuk3vKUfoFO5pQpfh
+         0AuU1/9mH0SM2gTFUDc0giTms3nKUBkVnwEkjSH8VBZMy/EZeclvmJBOTXuIMM6HbRik
+         StssUPMgl5fa5dXC09c8ewZ90vBYnNeAZuQe4o8xxXAIXFMPL6P5t6b2YJMCMec51zC3
+         prHTXkO9xfu2wPpApBDZ2ZTd8/AlehotLptEC/tLaomDF1Q7+geOMrKD/WIe5b8e3nvT
+         mHVQ==
+X-Gm-Message-State: AOJu0YzDthfgC3TIew40s8o53OfK6YC2oFoUPWAQWZn2WhXPUHMCoUFd
+	ex2PW8se4MM+S+2xOgTxsTJ3YEEBsd/2t6tidn3aJAjKBvLCrRgjrON5iAplw8L5r72iKA==
+X-Google-Smtp-Source: AGHT+IE5cYOWPRlw6S39TBxcIhI0UJc6usmRvvQ+LAF777UZDs8ja6+2n0iUZpH3/qgQ4I32o2LJxR91
+X-Received: from varda.mtv.corp.google.com ([2620:15c:211:200:39d0:ab84:9864:b0c6])
+ (user=maze job=sendgmr) by 2002:a05:6902:706:b0:dff:4a3:2def with SMTP id
+ 3f1490d57ef6-dff04a333edmr496451276.10.1718277939510; Thu, 13 Jun 2024
+ 04:25:39 -0700 (PDT)
+Date: Thu, 13 Jun 2024 04:25:20 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v4 1/2] bpf: add CHECKSUM_COMPLETE to bpf test
- progs
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Jakub Kicinski <kuba@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240606145851.229116-1-vadfed@meta.com>
- <20240612074917.1afacc42@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20240612074917.1afacc42@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
+Message-ID: <20240613112520.1526350-1-maze@google.com>
+Subject: [PATCH bpf] bpf: fix UML x86_64 compile failure
+From: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>
+To: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <zenczykowski@gmail.com>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, BPF Mailing List <bpf@vger.kernel.org>, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Alexei Starovoitov <ast@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/06/2024 15:49, Jakub Kicinski wrote:
-> On Thu, 6 Jun 2024 07:58:50 -0700 Vadim Fedorenko wrote:
->> @@ -1060,9 +1062,19 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
->>   		__skb_push(skb, hh_len);
->>   	if (is_direct_pkt_access)
->>   		bpf_compute_data_pointers(skb);
->> +
->>   	ret = convert___skb_to_skb(skb, ctx);
->>   	if (ret)
->>   		goto out;
->> +
->> +	if (kattr->test.flags & BPF_F_TEST_SKB_CHECKSUM_COMPLETE) {
->> +		const int off = skb_network_offset(skb);
->> +		int len = skb->len - off;
->> +
->> +		skb->csum = skb_checksum(skb, off, len, 0);
->> +		skb->ip_summed = CHECKSUM_COMPLETE;
->> +	}
-> 
-> Looks good, overall, although I'd be tempted to place this before
-> the L2 is pushed, a few lines up, so that we don't need to worry
-> about network offset. Then again, with you approach there is a nice
-> symmetry between the pre- and post- if blocks so either way is fine:
-> 
-> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>
+Cc: John Fastabend <john.fastabend@gmail.com>
+Cc: Alexei Starovoitov <ast@kernel.org>
+Fixes: 1ae6921009e5 ("bpf: inline bpf_get_smp_processor_id() helper")
+Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
+---
+ kernel/bpf/verifier.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Hi Daniel!
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index 36ef8e96787e..7a354b1e6197 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -20313,7 +20313,7 @@ static int do_misc_fixups(struct bpf_verifier_env *=
+env)
+ 			goto next_insn;
+ 		}
+=20
+-#ifdef CONFIG_X86_64
++#if defined(CONFIG_X86_64) && !defined(CONFIG_UML)
+ 		/* Implement bpf_get_smp_processor_id() inline. */
+ 		if (insn->imm =3D=3D BPF_FUNC_get_smp_processor_id &&
+ 		    prog->jit_requested && bpf_jit_supports_percpu_insn()) {
+--=20
+2.45.2.505.gda0bf45e8d-goog
 
-Could you please take a look and merge the series?
-
-Thanks,
-Vadim
 
