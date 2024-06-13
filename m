@@ -1,286 +1,170 @@
-Return-Path: <netdev+bounces-103156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ADB9906941
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:50:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADB0090696A
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:55:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14E612861FF
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:50:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 555DC1F235CB
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F4113EFE1;
-	Thu, 13 Jun 2024 09:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 770D01411F8;
+	Thu, 13 Jun 2024 09:55:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TfvzbFIV"
+	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="UASGHpkB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB4613E024
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 09:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718272213; cv=fail; b=dFPuWjKitiI2pYZdZzD+ZgKCPys2mXexsyU6I3TTjYz5frt1UMoFV/XEvM1f2gE+uB1aSCV6eoXPGPB70RReIzKx6jagEmT0e8UsnF96cIne/+AfQDfy+lqVtP24nnO23HerO4xeQ0FzMdtykCTqDPCU31UVtOQzLVeWtqYQa7w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718272213; c=relaxed/simple;
-	bh=hFW1wVx52bdlwyixvQLS1DKgWJtWTWHYacf57IKlVps=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Q74PANYffZ0Vk5NKJ+WHI/udfsCMTPbAEZk3IERWPEiwFvMWSSH09U0bGKlBLMZDMSoONzzn4FMe2QZhmjB6V2N6HgEWeJE0diUfVsV3WyXKOF/ugDHSg2NZmjxd9W74FubYjtmrIW/7hfE/4OILKnP0Qx32XH6qymbn74yCRSE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TfvzbFIV; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718272212; x=1749808212;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=hFW1wVx52bdlwyixvQLS1DKgWJtWTWHYacf57IKlVps=;
-  b=TfvzbFIVRYD3ynq9jMVNavlf0tNb7YCzNSs93uH+mQNCpHZL6ibqgkbt
-   16huQSluobKlHOAJ2DhasZjNUaO1AhemIe9cFWsK7HU7Z8zwpeIH4raK0
-   5V+qjtRjRQHKel4iO4sqhrpymrKFej0NQtYRWOt0SqxEt2LUFBf9aiFK+
-   vpojEEJ3/BoUpzAyiayD0+3n5oVcSaGxr3E9Jd6Xso4IJdsivkTtMGmr5
-   PiB/GMcdQeK0hQ2lW/x7q3RZ+0E9MfT1PzMFBN+7MsxBGbTrzO8YtrLz9
-   JwWQiEdDdwT/h3Mm5so0qJ36m1e1UxtBBMflswuyGjQsvG96mLsPmK81w
-   Q==;
-X-CSE-ConnectionGUID: DbV/OhFESwCXtfWEwHHF9A==
-X-CSE-MsgGUID: nosuieE7SBGkwgKUZWSyog==
-X-IronPort-AV: E=McAfee;i="6700,10204,11101"; a="32568740"
-X-IronPort-AV: E=Sophos;i="6.08,234,1712646000"; 
-   d="scan'208";a="32568740"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2024 02:50:10 -0700
-X-CSE-ConnectionGUID: s9DKUkR9TESORTS0WS0MgQ==
-X-CSE-MsgGUID: OwrVMMwQRb+0D6jznhHw1w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,234,1712646000"; 
-   d="scan'208";a="39968861"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Jun 2024 02:50:10 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 13 Jun 2024 02:50:10 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Thu, 13 Jun 2024 02:50:10 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 13 Jun 2024 02:50:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AS4HqjKp4Yurf9DK1zD9LovDmyQXhIYNvPt2bsTwTfEJfJ5j4xo5Jzu9IXvQfCZQoPc33f12lPoJloObTv3sWSkw8VWyNr9qSI+pKT2+8AalzxO8dbFxy8ArkAbi/URCnmriUUUr+Gpa8UBTh2PvIMBucMcJAxMhkytexw/1Ey0JKLzRwlRuWloODBsndNwMM5+0kboXtkrVBiVRl9PloDWkWxvcY7yj4OFg8k8Bc5utAM2+ORsVBQmXEhx7Y1ydesmx6/y6VxsJ+MVU5e7FCfrd8JpgHtgGhYGPWxegkEL0nWpDRZil1DEhnPQUVh9lNXZxixzgRScKHBN+vRfGuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NstqdB4dgm/TYhnq9tRjrtjKTxlVVWVWVMMbp+J5t6c=;
- b=GJzUXali9GpU72gJtBai8n4eybClNn2TKxMJefZnaRWnuzPvxdiEScC3W9s2DCbktqT3XsDQ1MgbPcMBYbvKgGlPjpDklgQDCfMVdAMAe/ODVw140VnZsATy36twg8x4zppNSQHK/Rj2YzAe0xVP2psKYAJP7cQMJj0zSB20KZub+v9wrjIQvrgzGXxLq1kMyKnbrqaqoq17Ony38plzI6tK0COnC627nFXy+LRSEtxVfwhqTJD92syjLoDBtIoI5oCXiIuHad0nuNawTusE9GTIaVRPKUBK8u40JCa9mZa4wCUcj3cqKxwbFuv3p+t+2Kpu+vJ+3Iw1fMzAWnbJEQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by IA1PR11MB6170.namprd11.prod.outlook.com (2603:10b6:208:3ea::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.20; Thu, 13 Jun
- 2024 09:50:06 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.7633.037; Thu, 13 Jun 2024
- 09:50:06 +0000
-Message-ID: <d6296028-eb24-4cb4-ae7d-3640f56c8eba@intel.com>
-Date: Thu, 13 Jun 2024 11:49:39 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: extend tx watchdog
- timeout
-To: David Decotigny <ddecotig@google.com>
-CC: Josh Hay <joshua.a.hay@intel.com>, <intel-wired-lan@lists.osuosl.org>,
-	<netdev@vger.kernel.org>, Sridhar Samudrala <sridhar.samudrala@intel.com>
-References: <20240603184714.3697911-1-joshua.a.hay@intel.com>
- <b30f34a1-48d6-4ff4-b375-d0eef5308261@gmail.com>
- <cc76768c-d8d4-4c07-93c1-807f3159b573@intel.com>
- <641b439b-2bc0-4f2b-9871-b522e1141cd1@intel.com>
- <CAG88wWaQaCf1rZAdh-5iWLYWOMfj3o6jtc0J=0_3pPDzP0Cyww@mail.gmail.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <CAG88wWaQaCf1rZAdh-5iWLYWOMfj3o6jtc0J=0_3pPDzP0Cyww@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DB7PR05CA0028.eurprd05.prod.outlook.com
- (2603:10a6:10:36::41) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336771411C2;
+	Thu, 13 Jun 2024 09:54:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718272502; cv=none; b=bxn8ppWDsvNfwdviMu0ZsdpyEE0Ds0bjFWB1HvTsYzlHj0/3PpMfoUpsQU3ox9jxH8jQSuFpDmSrqfZOliKjRJma6uFJDEI7YkIZAG5ks41tBzIsuKURiJL7bOXK2+o5Aow1CAxYiyvzRLU26BikKgD+WExUF7yMf84IHFVtyAY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718272502; c=relaxed/simple;
+	bh=XnuWg2Emch0/204csrIJ1PmV8H0Z4/Kb0XfctwfzmfE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pmscpmDmFelP0j5STxZ2Z2ae6gIHEDwrp4jlie2KTPMarFeh3MsrHqJ/gDBwSoiezFY+hcD9HEr2miOPvLUIH6YCczLsr1TaVg34lJ1VBCOloozOQgCt37fvkeUqAxDLeRyYScaT2ezDHScJUCPT8YNyd9NUTL6iA2PzaS5QC4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=UASGHpkB; arc=none smtp.client-ip=95.143.211.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
+From: Denis Arefev <arefev@swemel.ru>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
+	t=1718272488;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=JxF9v+MgG1oJK9K0GvDYFSNk1WRmKVVkPVwWZtJ2zws=;
+	b=UASGHpkBaR6P9fcZXpMWF0YLq5RGEUYvq+MNYp3J85MYXz8EVrrWVtOPUALLMILWch8hRQ
+	gfAET9Tvo0BxyyWAjbJVQonuuQRO+LA/BO/NgeP+bXQ4GtF/htEu/mMSFRjBbLr6ZJ53mT
+	eQjArYsXZ3KR6NL1zUWnxaj7vkD5+uw=
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	lvc-project@linuxtesting.org
+Subject: [PATCH v2] net: missing check virtio
+Date: Thu, 13 Jun 2024 12:54:48 +0300
+Message-Id: <20240613095448.27118-1-arefev@swemel.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|IA1PR11MB6170:EE_
-X-MS-Office365-Filtering-Correlation-Id: e24dbe89-9b16-4835-9595-08dc8b8e342c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230034|376008|1800799018|366010;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?TDBhalpTNDdmbEIvZmNQNFVOMDh2RUxhR3grUGJuL296NjBrNnBZa04rQ0dL?=
- =?utf-8?B?NlJ2dVIyM25Lb3lsS3lVY2d1cUU4T2tDazhuMTE4c2tRSDJvZUFvNEhIay93?=
- =?utf-8?B?eFhZQjl4cW9NSVQ1d3ZzdWZ3ZUhqQVlqNjA5WWV5SEdqd2thaFVOaTlRdXFR?=
- =?utf-8?B?MG4yRHpPelRyZTNZVEZocXdPM1FtQWpaMTBOVkRSSXhNNUdtQzFHTEo3RSt4?=
- =?utf-8?B?RWQ4VWJwY2lSUUxhNG55OW0wczA1Zzd2QldicWgyOE9LOVhUYkxrN1QrbExX?=
- =?utf-8?B?eUx2cC8yelNjOHUyOENWcEtjSm5xdWZPdUVJY3h3Qm9Rc1FWc0o2cjU0ejBP?=
- =?utf-8?B?ZEFDM1J3TnJ4TEFJNjdhL1BjSTliQkxzc0cxQXpWUFB5L2ROL0JSYzJaZFYw?=
- =?utf-8?B?ck95Z1ZidWhnNDluY1JKQjJUbjhjWWNKVGNlVHgvM0tsdEVWU0hsWUpacm5Y?=
- =?utf-8?B?Y2tNamx4Z1Q2Q3c1V1I2WXRpcGIydEhRQ29ucTF2N3MvS21YTnhDODkwUkNG?=
- =?utf-8?B?VUJjVW5Fd0ZwanhaREVEOEhPYnZhbXRxeUJFeVJkc1ZRQWlrRnJibWYvWlg3?=
- =?utf-8?B?Y1A0cmxBQ204OFlpVTRPNm1JdnVyK052QTRsWFhadFZjU0luTk5mQjQwRzZT?=
- =?utf-8?B?NTJIc0k0U0pwT28xMEVUYmUrZzN2ZTV5UUR4b2hhRmVPTHpTdE9lUEhSSzhh?=
- =?utf-8?B?ZUpIazNBelNIYVIzY3d3Ni9uYU9GYXllSXMwRHd2V2puQlR2LzhyNm10eDVi?=
- =?utf-8?B?enRnL2VRVmFXcC9QMlhzdUY3UEhFUmZCV0lhUmQ0c0ZCbHlDR0g1R1N1STBT?=
- =?utf-8?B?bEQwbmkrOU0xNVhXaDZXOE9VTTVsR1pXcS9BVnQxMjIycW1NdTJKOCtYTnNC?=
- =?utf-8?B?Z1F5R0xGcE5jTG1tSVpSOVdmeWFWOHpOVEZMbjBWZEpyUjd6SHNLTUdBL01C?=
- =?utf-8?B?d2pxSkREQTV2QW13TmRITS9WdkhKUHVFSS82U3JUeTl4RFhNck8xeXYzWkRy?=
- =?utf-8?B?eC96amxHZEdRZ3V4T2x6d1dZSU52Wk5QYklxVUJQWGxhR1NMNFp0aTIvZ2dV?=
- =?utf-8?B?OG5DUjE3b2tYeEE3YklodTA2NWVqeTgwN252TS9qK3BWQTk2KzRaOU85eUMw?=
- =?utf-8?B?SjFZUytGSEtCVTk1NE01YTJnRUYxdUJGSmU0c0d2c0lLSE5UQjFmV09sWm1l?=
- =?utf-8?B?QnhnYWp1OHFTVlowZ3VYTC9KV25TeU5FU0ovSWtSYWsvdGUvQXcrUGtOUFJm?=
- =?utf-8?B?VGx1RU1lMHh5b3VTcTREWDJqcnhtVlVqVE1TZzNPblpRZWxRM05MdXRFWHRt?=
- =?utf-8?B?NkFSNTBRWmlBaVpVSE9RbEtXQXFXNzlOZW1HWUFwUE1oeDh5NHZWckpsTE9s?=
- =?utf-8?B?UXg2b2hCUTdXWTNlMWtzZVl4Q2dXNCs4OHJUSlNNcEN1Rzc1YkgzTlBPeis2?=
- =?utf-8?B?MGFLRTIrRVhyc3dHdUlsQW1xbGVLbDBIV0FSYUFsVkNiT1JhYVJ4UGdXeUE3?=
- =?utf-8?B?aWRLYTlTRGpKb0dqMW01TGF0NzNaY21kK3pmL0p5Y0dCbWs3SWQxdEtxeW5M?=
- =?utf-8?B?QTBGci91a21hbVNrbVhiZXJpL0VveEVqZUFqSEx5ZnlqT3dlNk5VQWlkaVFO?=
- =?utf-8?B?aDNXK1pkT3g3cG9HWmpZNEhwNExrM1ZMTHpuWU13bDlEM0xQaWNBUTV0WDRs?=
- =?utf-8?B?VG1IMTlmbDdCaW5JOXZnOFVUZmlsUk1MTkNVMW92c3o3MjBMUC82NHJmSjU3?=
- =?utf-8?Q?vREr6L36h9Vh1WftlNoIkfzDSmtG9qfSV7lJ4Ht?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230034)(376008)(1800799018)(366010);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VjNWU1VSbnduTWU1TUd5YUFFSXJpVjRFMndTS3N3K0t5WGJEclNiZXFrT2dv?=
- =?utf-8?B?bWI3VXh4Ym5kb1NYWlk1WnpSZUN1QnJGMEtqeTQ0L25aSWlJYnpPVjcybGc5?=
- =?utf-8?B?anp1ZEFZdlhWT0hpOW5zdFMwVlFzMjZidjR1c2JXQWNuTSt3bXhFV0tWSU5K?=
- =?utf-8?B?T1VmQVlwYlAyMW94TFdTSXdLRWtLMGtNUURGSi9sUkkvc0pIdDNMUlJSS042?=
- =?utf-8?B?SDR3L3VLR05ReDRhemxtWWQyWVBXVk5QeFFLa2hGaVRPNWxrc3IzWng0NitP?=
- =?utf-8?B?Zks1NFdpOHIwUmFYK1loN055ZFVyK3EyMnR5K3piSnpIQWx4OFRMek9kbGN5?=
- =?utf-8?B?MTdQY2p0d2xTRnVuTnBHb3VuRk53SDhtYzlwcExNdnM1WHg3YUM3OVJsM0JK?=
- =?utf-8?B?K2NVb1NPb1lJRzVTLzByUEJYbGNpY3dSbjhCTS94RXg3OVVlajNPSWVCV3VD?=
- =?utf-8?B?eWNTb2lpUGpZSDViVVhXT2JhVE9PYXVrejlqTHErR2hvNEdRTVFJanZra2xj?=
- =?utf-8?B?R2ZPeldleGpDVjByUlEvOXFRWmtRdCtnbG9Cdkt4Tm53MHd0MVIySWRTZkoy?=
- =?utf-8?B?amc1VGEzWlNrM2JDVkk4NXVFQVkvWE90SGhwTndmNFNxQXMvOU9hNC90bThq?=
- =?utf-8?B?cmdqZktlVE5NTFZWbG9UMkJqK25XdWg1elFnN1V5ODlxeEF4czl4WWY1SGJY?=
- =?utf-8?B?aFNHa0pLVnhOZ09XaVF4M1o1WDFReDFCMEFuRmtFWGkzRmJ2cHZDNG92MkVH?=
- =?utf-8?B?dlg4b1Y4SXk0TmtFSkIzM2UzZWs4VzdPbnl5RTNpQjkzdkxwdmFReGRuREtq?=
- =?utf-8?B?NHBXQUVJMnRRTXY4YjlDdUQ0K3BBOU55bHV4TVV5NHpmK0NscFZ0clArUndy?=
- =?utf-8?B?SlFxemFzYU9uV0V4KzA5M2duM1JIQjdVTjZNeUNxYTJkM1pxcHQ2K0dpV2FW?=
- =?utf-8?B?NFdQTUhheVhQV2k3cis4czEzaFFTUnFHRVEyaWFsdUFabTdTd3E0QVVEUG5y?=
- =?utf-8?B?QW96dkVWSWpiVWYrSTcwL1A0MGxQV2pncjFjN3FSQWlQSnlJNko5VkdBVm5i?=
- =?utf-8?B?cktjVTRVT2RtakpQcFRncHVWa1dEeDFGVkIrOHRSUzBuT1RMWDlEWHIxRnlO?=
- =?utf-8?B?UEF6K3pMTlBvcGxTQ0t5alhrVnkyUlQ0aHN5MitSTWN1eklSZDgxSDBDNHVx?=
- =?utf-8?B?dGtsbFIzRlc5Y1dpdERsbURpdW9IUmIrbGRaeFZFQmtBN3NvOTVibVNNZDBh?=
- =?utf-8?B?TnVmMFJTKzlVVUFTMWlnY3F0VStxeExmellEYzBJSWp5QVVhWHFGb1ZrRlUw?=
- =?utf-8?B?UkkzcUZkOU91UmR2bWp5OVpaZ0oxT3lZb3QvZUcxSHVrTkxOMENXVGJXcTBq?=
- =?utf-8?B?eThUZk9BZCtTZjYvV2oya0hCOGNTZmNubk9VMVlRVVBHK1FiajZFbmdNckJo?=
- =?utf-8?B?YThpVkJPQW54NnlkZFVEcHloeEpyeE9PRC9mSHhMN2FFb2RuL2pXR0toT2tE?=
- =?utf-8?B?TWFtQzBMazZFbmFqNUFMRHB3VWRnSVd4UWxYaGVlUC8rSkZmb0NLaVc0Uy91?=
- =?utf-8?B?UWt3aEFOZWJXRkZHbWs2SUpjdHpNQmxaNWpXVTNza3lwL3VURlFTN1k5YXMr?=
- =?utf-8?B?YjJSbFhiWVo4eUNuUVFRbU1weWtMN3BxN213cXhGT3l0NFlCd2E2MFZ0cXNm?=
- =?utf-8?B?QzNKaGJDMHJxQXFBbUd6em9ydk1pWDBNTGd6S3hmV250U1h4VXJLcDAvdU5X?=
- =?utf-8?B?RFJHVUpQNFZLNjY1czdKTWNKZEpEN2pzMjVXK2RGbmgreGQ4aklWbVR6TkZx?=
- =?utf-8?B?eTJpTjVzRlRycTVSSVVvWXRKdFYzRm01TGt6TnY4cWU0MVRlSjFoN09RaVpv?=
- =?utf-8?B?WW1yVkZKMVF4QzN1NW9MYkFCeVhFZUgyUGFkQlFzT0w0MmNSVUgwczJqcVM1?=
- =?utf-8?B?QmE1a1J3MUVJQzhvalgxbHdBMzVGTHZWZFNKVytKQmNhYStvRXJ5NUo3ZEdv?=
- =?utf-8?B?UHhuYUd0YUZPRUUwRVpiNFIxNGYzMG9ZVVZ4Sndvb0psR0VCSERVSzN1enB5?=
- =?utf-8?B?aHVCY1l0akJlampzOFZXVzZJdlZSak9JMzQyYU5zcUhVRXdSZzIzNm1yeFEw?=
- =?utf-8?B?bXRwMWVIZ2kxUEdVQlVlV292WXlwMnV2NkZyRUJxMStpTjhQQ1owaStqeXNW?=
- =?utf-8?B?Z0E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e24dbe89-9b16-4835-9595-08dc8b8e342c
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2024 09:50:05.9203
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rx4TMLUcUBW2kaK0BDxPOj85LkQrlffi9K2VvgMm5MVmLHBkFZ5QhyFNYKscl2BZELtfZlg+V3yRuMEFJXBk/ObxHuuwcIzIElo5TXAIEqs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6170
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-From: David Decotigny <ddecotig@google.com>
-Date: Wed, 12 Jun 2024 11:01:46 -0700
+Two missing check in virtio_net_hdr_to_skb() allowed syzbot
+to crash kernels again
 
-> On Tue, Jun 11, 2024 at 11:13 AM Josh Hay <joshua.a.hay@intel.com> wrote:
->>
->>
->>
->> On 6/11/2024 3:44 AM, Alexander Lobakin wrote:
->>> From: David Decotigny <ddecotig@gmail.com>
->>> Date: Tue, 4 Jun 2024 16:34:48 -0700
->>>
->>>>
->>>>
->>>> On 6/3/2024 11:47 AM, Joshua Hay wrote:
->>>>>
->>>>> There are several reasons for a TX completion to take longer than usual
->>>>> to be written back by HW. For example, the completion for a packet that
->>>>> misses a rule will have increased latency. The side effect of these
->>>>> variable latencies for any given packet is out of order completions. The
->>>>> stack sends packet X and Y. If packet X takes longer because of the rule
->>>>> miss in the example above, but packet Y hits, it can go on the wire
->>>>> immediately. Which also means it can be completed first.  The driver
->>>>> will then receive a completion for packet Y before packet X.  The driver
->>>>> will stash the buffers for packet X in a hash table to allow the tx send
->>>>> queue descriptors for both packet X and Y to be reused. The driver will
->>>>> receive the completion for packet X sometime later and have to search
->>>>> the hash table for the associated packet.
->>>>>
->>>>> The driver cleans packets directly on the ring first, i.e. not out of
->>>>> order completions since they are to some extent considered "slow(er)
->>>>> path". However, certain workloads can increase the frequency of out of
->>>>> order completions thus introducing even more latency into the cleaning
->>>>> path. Bump up the timeout value to account for these workloads.
->>>>>
->>>>> Fixes: 0fe45467a104 ("idpf: add create vport and netdev configuration")
->>>>> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
->>>>> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
->>>>> ---
->>>>>    drivers/net/ethernet/intel/idpf/idpf_lib.c | 4 ++--
->>>>>    1 file changed, 2 insertions(+), 2 deletions(-)
->>>>
->>>>
->>>> We tested this patch with our intensive high-performance workloads that
->>>> have been able to reproduce the issue, and it was sufficient to avoid tx
->>>> timeouts. We also noticed that these longer timeouts are not unusual in
->>>> the smartnic space: we see 100s or 50s timeouts for a few NICs, and
->>>
->>> Example?
-> 
-> a sample:
-> 
-> drivers/net/ethernet/cavium/thunder/nic.h:#define
-> NICVF_TX_TIMEOUT                (50 * HZ)
-> drivers/net/ethernet/cavium/thunder/nicvf_main.c:
-> netdev->watchdog_timeo = NICVF_TX_TIMEOUT;
-> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:#define
-> OTX2_TX_TIMEOUT                (100 * HZ)
-> drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:
-> netdev->watchdog_timeo = OTX2_TX_TIMEOUT;
-> drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c:
-> netdev->watchdog_timeo = OTX2_TX_TIMEOUT;
-> drivers/net/ethernet/amazon/ena/ena_netdev.c:
-> netdev->watchdog_timeo = msecs_to_jiffies(hints->netdev_wd_timeout);
+1. After the skb_segment function the buffer may become non-linear
+(nr_frags != 0), but since the SKBTX_SHARED_FRAG flag is not set anywhere
+the __skb_linearize function will not be executed, then the buffer will
+remain non-linear. Then the condition (offset >= skb_headlen(skb))
+becomes true, which causes WARN_ON_ONCE in skb_checksum_help.
 
-This one doesn't say anything at all :D
+2. The struct sk_buff and struct virtio_net_hdr members must be
+mathematically related.
+(gso_size) must be greater than (needed) otherwise WARN_ON_ONCE.
+(remainder) must be greater than (needed) otherwise WARN_ON_ONCE.
+(remainder) may be 0 if division is without remainder.
 
-mlx5 has 15 seconds, but mlx4 has the same TO as well, so this might be
-some legacy stuff.
-Netronome has 5, QLogic has 5, Broadcom 5 etc etc.
-These 50-100 belong to one vendor (Cavium is Marvell) and look like a
-hack to hide HW issues.
+offset+2 (4191) > skb_headlen() (1116)
+WARNING: CPU: 1 PID: 5084 at net/core/dev.c:3303 skb_checksum_help+0x5e2/0x740 net/core/dev.c:3303
+Modules linked in:
+CPU: 1 PID: 5084 Comm: syz-executor336 Not tainted 6.7.0-rc3-syzkaller-00014-gdf60cee26a2e #0
+Hardware name: Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+RIP: 0010:skb_checksum_help+0x5e2/0x740 net/core/dev.c:3303
+Code: 89 e8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 52 01 00 00 44 89 e2 2b 53 74 4c 89 ee 48 c7 c7 40 57 e9 8b e8 af 8f dd f8 90 <0f> 0b 90 90 e9 87 fe ff ff e8 40 0f 6e f9 e9 4b fa ff ff 48 89 ef
+RSP: 0018:ffffc90003a9f338 EFLAGS: 00010286
+RAX: 0000000000000000 RBX: ffff888025125780 RCX: ffffffff814db209
+RDX: ffff888015393b80 RSI: ffffffff814db216 RDI: 0000000000000001
+RBP: ffff8880251257f4 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: 000000000000045c
+R13: 000000000000105f R14: ffff8880251257f0 R15: 000000000000105d
+FS:  0000555555c24380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000002000f000 CR3: 0000000023151000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ip_do_fragment+0xa1b/0x18b0 net/ipv4/ip_output.c:777
+ ip_fragment.constprop.0+0x161/0x230 net/ipv4/ip_output.c:584
+ ip_finish_output_gso net/ipv4/ip_output.c:286 [inline]
+ __ip_finish_output net/ipv4/ip_output.c:308 [inline]
+ __ip_finish_output+0x49c/0x650 net/ipv4/ip_output.c:295
+ ip_finish_output+0x31/0x310 net/ipv4/ip_output.c:323
+ NF_HOOK_COND include/linux/netfilter.h:303 [inline]
+ ip_output+0x13b/0x2a0 net/ipv4/ip_output.c:433
+ dst_output include/net/dst.h:451 [inline]
+ ip_local_out+0xaf/0x1a0 net/ipv4/ip_output.c:129
+ iptunnel_xmit+0x5b4/0x9b0 net/ipv4/ip_tunnel_core.c:82
+ ipip6_tunnel_xmit net/ipv6/sit.c:1034 [inline]
+ sit_tunnel_xmit+0xed2/0x28f0 net/ipv6/sit.c:1076
+ __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4954 [inline]
+ xmit_one net/core/dev.c:3545 [inline]
+ dev_hard_start_xmit+0x13d/0x6d0 net/core/dev.c:3561
+ __dev_queue_xmit+0x7c1/0x3d60 net/core/dev.c:4346
+ dev_queue_xmit include/linux/netdevice.h:3134 [inline]
+ packet_xmit+0x257/0x380 net/packet/af_packet.c:276
+ packet_snd net/packet/af_packet.c:3087 [inline]
+ packet_sendmsg+0x24ca/0x5240 net/packet/af_packet.c:3119
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0xd5/0x180 net/socket.c:745
+ __sys_sendto+0x255/0x340 net/socket.c:2190
+ __do_sys_sendto net/socket.c:2202 [inline]
+ __se_sys_sendto net/socket.c:2198 [inline]
+ __x64_sys_sendto+0xe0/0x1b0 net/socket.c:2198
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-Re "some issues were observed" -- this patch only hides the symptoms, at
-least from what I'm seeing currently. Still no details, so that I could
-understand the reasons for it.
+Found by Linux Verification Center (linuxtesting.org) with Syzkaller
 
-Thanks,
-Olek
+Signed-off-by: Denis Arefev <arefev@swemel.ru>
+---
+ V1 -> V2: incorrect type in argument 2
+ include/linux/virtio_net.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+index 4dfa9b69ca8d..d1d7825318c3 100644
+--- a/include/linux/virtio_net.h
++++ b/include/linux/virtio_net.h
+@@ -56,6 +56,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+ 	unsigned int thlen = 0;
+ 	unsigned int p_off = 0;
+ 	unsigned int ip_proto;
++	u64 ret, remainder, gso_size;
+ 
+ 	if (hdr->gso_type != VIRTIO_NET_HDR_GSO_NONE) {
+ 		switch (hdr->gso_type & ~VIRTIO_NET_HDR_GSO_ECN) {
+@@ -98,6 +99,16 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+ 		u32 off = __virtio16_to_cpu(little_endian, hdr->csum_offset);
+ 		u32 needed = start + max_t(u32, thlen, off + sizeof(__sum16));
+ 
++		if (hdr->gso_size) {
++			gso_size = __virtio16_to_cpu(little_endian, hdr->gso_size);
++			ret = div64_u64_rem(skb->len, gso_size, &remainder);
++			if (!(ret && (hdr->gso_size > needed) &&
++						((remainder > needed) || (remainder == 0)))) {
++				return -EINVAL;
++			}
++			skb_shinfo(skb)->tx_flags |= SKBFL_SHARED_FRAG;
++		}
++
+ 		if (!pskb_may_pull(skb, needed))
+ 			return -EINVAL;
+ 
+-- 
+2.25.1
+
 
