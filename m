@@ -1,142 +1,218 @@
-Return-Path: <netdev+bounces-103145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9656F906812
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:04:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E576990683D
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:12:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 534ED1F2165E
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:04:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 645981F23780
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:12:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8F613DDB5;
-	Thu, 13 Jun 2024 09:02:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="OWpnC1CY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD0F613DBBD;
+	Thu, 13 Jun 2024 09:12:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [217.72.192.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F71E3209;
-	Thu, 13 Jun 2024 09:02:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45E113D8A4
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 09:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718269359; cv=none; b=ekJwa/QhfRvWqYx3O3mNlbq1Jnpu2W9q3AWrFwUKPTY3k074+F4Q90yUMUa9vlk1X/54TCWN+uhhSI0QCMO52ZRQ0p4c01OFRC9bQy9H95pjEEzXwVPCrth2UYA0XLhBweMaslfqYBlyZCNtUKUQVgkGOb7wPpS8/SghO1WCdT4=
+	t=1718269951; cv=none; b=RPiB0aahJ3w2wWnwgcOa54oB/BjYgrRL2dKimeYjc/2qKE1m06P0l+T72zfTnUcUQjzkBxlEgyXeZDuwcSU/rY5vkYX7D7yApVdORPAqMoPEg1pCgjqnw6zsVqax+yV7V2XYO7QydlHPwB420oNCM3PqfwRJVEIvjcACkr3kx8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718269359; c=relaxed/simple;
-	bh=Pa8A117Grgh/veTNDXGqRrOb9XjpDr6HTfDCG0a28fc=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=OSO9llpAl+mbLQPL1E0Xn/otyTtM2EW4SaWmnsfZ7PZEo5FHSJj6D9dBkQzEYEMXnShdNUH5ij4huj0gRC7ZdqGZxSkdo3CxmXzvlIvcZ2sZit9ljF5TFProonVgGn3qpW04ZoTXUZ5bdMeWCaEDApaqbMm445ksaX7XHeym5Sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=OWpnC1CY; arc=none smtp.client-ip=217.72.192.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1718269309; x=1718874109; i=markus.elfring@web.de;
-	bh=uJtL6qWDjplr/HYyz2rXRqMFn2028PH8YTE8yZ9+H+4=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=OWpnC1CY2ZUGW042DocoXibTmjsH4inarEWrx+5OlaNNGE6g05jqKUCrgXBsjlox
-	 BLholm9v49aTu5Mdqc2bZnF0IvyO5oi82QrgDu2G1wUFGsHkqwCmvvz4VobcCp6Fr
-	 x21u/SYjzOPnLZKBMDvgd/FxvVwOxY7lW+3K9+o7Zl9vblguQkgHJpx8YtPlB/quG
-	 hkqSzfXtzxmAorm5eo/TLh+cLYeaSao6LQwmcOQ2obD16+IBl0MqLpYxrs1bVXzs9
-	 b02+Xf0QCT74KNH0U5pV9Z58g989FOyZDfVUl+vzxxcyPFuH44NilrkN+5QudVQ4z
-	 g/983Kz2VN26PWiDtw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1Mtgub-1sXqJG3DRf-011M7l; Thu, 13
- Jun 2024 11:01:49 +0200
-Message-ID: <bb0e9957-816e-4e36-b85c-6c5501e76a8a@web.de>
-Date: Thu, 13 Jun 2024 11:01:44 +0200
+	s=arc-20240116; t=1718269951; c=relaxed/simple;
+	bh=v3xP34y2Kqz9tAvkUGjtqaPysCSq513+rEw0ux33bZU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=DgWIi3JLsJ6F2LIVVV4YUCiCJx4wr+iDpHbHArzbxq2pmYvFjJSyB6urxwTT3c4EHoNnomVP6yB8YqOF/c3Zfl/OQ5IfWZhcva7U2MNqP9oF+bHgtkUAtE7Gs5NwKodvG3JWlzdfzcW2PCN4W1PcpdxgpQRoTv2QanQ6BSWUB+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-37596e877e9so8499185ab.3
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 02:12:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718269949; x=1718874749;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nLMUrKsMG2Xf4e/PTbl5dpOWAgPgPt620Z5seuQUYCY=;
+        b=wVC8tWSyFvPDNRnxKeKn/x2E+okN3JCkJF/Lmal5tI6C1Dx5XGQ/OVlKydExKw8R3Q
+         i7lKa+1v57e45DH1FCE0TLU8yPvO/Wg4cv+Y5p/zAtZkQAeLwKBmXe5UERGwY8XsGGr4
+         cWV0mqUVw89QfX10QD7fjvlynNzYenDQ9hjpW2gcKE4faKkIHy3sjbU1PHNAfZjh6O1D
+         vHqmV7QUXjLmuHc2DybdbeCMXS8dT0OTmPvv21QvaQM/urgrXQkDE2CI/I5+TtrG10C3
+         P5g31cMH1WiN5YMgAkbg0e+AFwe/AZZ4WZKUzTAdGixsOqmj6hgcZcpGYoqACOsyfZZG
+         KdxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXqeoNICz4SoZqbA3FDDTP4epjioBwOiv3s9ckTAi1r5XCTEvqld8GDtbt1gJzLy7GbZi1K+eSuQUeSOu7ZCfWKMxcQ1Kpg
+X-Gm-Message-State: AOJu0YwytRHGv8PwCrrklHNZOZYpz1lV87ferbogpkMy4CcNeA3tSziX
+	JA2tVubdHiw128qFakNdrAHZ2F9LBLf36BUqyvlReFPRKmj1yHwyb83Ql/nOhVw745NqODcfZ+h
+	mPXNTNT29C8cb6iU+pHGLDzhYArk/AGFwKs/kG+yfJFxx9EdLz9ZuYYQ=
+X-Google-Smtp-Source: AGHT+IEaTJHT00Vr7hkv4iPBqju355oH0gjr0pKcus/2z4NhB+o4fK56Kcuy5h+dtz1VI5HvFWdVZZpl5EJ8LUsfF/UEXX8H3RKK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Justin Lai <justinlai0215@realtek.com>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Hariprasad Kelam <hkelam@marvell.com>, Jiri Pirko <jiri@resnulli.us>,
- Larry Chiu <larry.chiu@realtek.com>, Ping-Ke Shih <pkshih@realtek.com>,
- Ratheesh Kannoth <rkannoth@marvell.com>
-References: <20240607084321.7254-2-justinlai0215@realtek.com>
-Subject: Re: [PATCH net-next v20 01/13] rtase: Add pci table supported in this
- module
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240607084321.7254-2-justinlai0215@realtek.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:sweNL4w+HQnpZkpNAQYgqqTaOmGffVhbXOId8m2THQdgCz2PSub
- +vg4W6D4Hl+jedg36m5ngQjkzDm9kfm1cf6x3c4EfpyzVf3GKB3RNjt3e2QJOMMrgYqnpYE
- J613eV5lEVzdpwgOagHeWeD9p1BEkr2agDEW4g2t4KttkWRxbl9AmGm77q2eCymFDTnNDL7
- vh8yD+Oy3fl+yQQGl6oPA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:M4s3FoRaGaU=;JmwsZkCNwoB8ywQRkDaspQw/4V9
- Vc4m1GsRiEu3I6hLNeNVbTbTqzr9zZU263/oFIRJViVmzbOZHbiWTn9TuNcDVwDHiNa/9IZB9
- FgUvy8iqhjengsAhUOc4v5E/ZGnhn1bUdUgKZWVfhuEdvGpYD6pBs0vcTC+F1thOUq9GEt6i2
- LCRe3e4YPWeveynrkoBF/pkCAmLCAfEDFoXoV5GUUTe+OjKUEtFrxYrEdSNo5sAYNPHdyULwc
- OhptEaMbvHJUBcbuSgqjmXXYd3ND5CfWuilsxhlyMqpUqGEi8FgSlmkN7LC5pwNpPRZhh+cfR
- +kGKHTdgOOaoiSyyowjc1fthvSLvKJIp5UBhCJRRJVLeRq5YfGB0oEMX2c3bbFds7ljvlJLvI
- d5477V6QSUcv7Rj8QipBSAzem5SXaK+H35XS7WvUj5vb/ssj/UVEy4nBvrlA1/njOs8DtY6Iz
- DkcvNv7mG1wDjmJSY6f78PcrZjgmHBVa4CPOefyIBXPWOxecUydN4MhvReEnGFvZVhaV5RRa/
- Qol+oYfYpxAQC6JO/qqY+ZGdzjyOeVhpCy/6KQtHVnGoM9S7BqyoVXrl0pl1ti+glC06GKems
- IT254qrtt/3NDapeGlFYHOIPH1LgOb4LvEYkMg2j771P+ArnQoUFVrKm3r0t33MSreNxi+dnV
- CkHGAFDnYXQPihM3UIG4DXhrdSlaXr4E2w3KOC1a+UUKK/u6vc4EUCJwTT1bA73uToHwS9/cP
- 8hJacodTtMGVsTiREAqsjFiUYyOnfY7uiw1aOyWAQFapk98OBb3ZczNDmd3M83FMWauuneEH5
- GS4ienTPvNPuB7lbNqYCytJUmRnGLV5KSVGVr/KIQPwto=
+X-Received: by 2002:a05:6e02:1feb:b0:374:70ae:e86e with SMTP id
+ e9e14a558f8ab-375cd24a4f3mr2695675ab.6.1718269949074; Thu, 13 Jun 2024
+ 02:12:29 -0700 (PDT)
+Date: Thu, 13 Jun 2024 02:12:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f17182061ac1e554@google.com>
+Subject: [syzbot] [ppp?] INFO: task hung in ppp_exit_net (4)
+From: syzbot <syzbot+32bd764abd98eb40dea8@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-> Add pci table supported in this module, and implement pci_driver functio=
-n
-> to initialize this driver, remove this driver, or shutdown this driver.
+Hello,
 
-Can a summary phrase like =E2=80=9CAdd support for a PCI table=E2=80=9D be=
- a bit nicer?
+syzbot found the following issue on:
+
+HEAD commit:    2ef5971ff345 Merge tag 'vfs-6.10-rc4.fixes' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13e22cee980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b8786f381e62940f
+dashboard link: https://syzkaller.appspot.com/bug?extid=32bd764abd98eb40dea8
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/db17be0247f3/disk-2ef5971f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/af92d227f130/vmlinux-2ef5971f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f98ae987ba14/bzImage-2ef5971f.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+32bd764abd98eb40dea8@syzkaller.appspotmail.com
+
+INFO: task kworker/u8:4:61 blocked for more than 143 seconds.
+      Not tainted 6.10.0-rc3-syzkaller-00021-g2ef5971ff345 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/u8:4    state:D stack:22928 pid:61    tgid:61    ppid:2      flags:0x00004000
+Workqueue: netns cleanup_net
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5408 [inline]
+ __schedule+0xf15/0x5d00 kernel/sched/core.c:6745
+ __schedule_loop kernel/sched/core.c:6822 [inline]
+ schedule+0xe7/0x350 kernel/sched/core.c:6837
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x5b8/0x9c0 kernel/locking/mutex.c:752
+ ppp_exit_net+0xae/0x3b0 drivers/net/ppp/ppp_generic.c:1131
+ ops_exit_list+0xb0/0x180 net/core/net_namespace.c:173
+ cleanup_net+0x5b7/0xbf0 net/core/net_namespace.c:640
+ process_one_work+0x9fb/0x1b60 kernel/workqueue.c:3231
+ process_scheduled_works kernel/workqueue.c:3312 [inline]
+ worker_thread+0x6c8/0xf70 kernel/workqueue.c:3393
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+INFO: task syz-executor.2:8975 blocked for more than 143 seconds.
+      Not tainted 6.10.0-rc3-syzkaller-00021-g2ef5971ff345 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.2  state:D stack:26656 pid:8975  tgid:8973  ppid:5107   flags:0x00000006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5408 [inline]
+ __schedule+0xf15/0x5d00 kernel/sched/core.c:6745
+ __schedule_loop kernel/sched/core.c:6822 [inline]
+ schedule+0xe7/0x350 kernel/sched/core.c:6837
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x5b8/0x9c0 kernel/locking/mutex.c:752
+ rtnl_lock net/core/rtnetlink.c:79 [inline]
+ rtnetlink_rcv_msg+0x372/0xea0 net/core/rtnetlink.c:6632
+ netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2564
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x542/0x820 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1905
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0xab5/0xc90 net/socket.c:2585
+ ___sys_sendmsg+0x135/0x1e0 net/socket.c:2639
+ __sys_sendmsg+0x117/0x1f0 net/socket.c:2668
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fcb2b07cea9
+RSP: 002b:00007fcb2bead0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fcb2b1b3f80 RCX: 00007fcb2b07cea9
+RDX: 0000000000000000 RSI: 0000000020000040 RDI: 0000000000000003
+RBP: 00007fcb2b0ebff4 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007fcb2b1b3f80 R15: 00007ffcd9ec90f8
+ </TASK>
+INFO: task syz-executor.4:9029 blocked for more than 144 seconds.
+      Not tainted 6.10.0-rc3-syzkaller-00021-g2ef5971ff345 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.4  state:D stack:25968 pid:9029  tgid:9022  ppid:5111   flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5408 [inline]
+ __schedule+0xf15/0x5d00 kernel/sched/core.c:6745
+ __schedule_loop kernel/sched/core.c:6822 [inline]
+ schedule+0xe7/0x350 kernel/sched/core.c:6837
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x5b8/0x9c0 kernel/locking/mutex.c:752
+ register_nexthop_notifier+0x1b/0x70 net/ipv4/nexthop.c:3871
+ ops_init+0xb9/0x650 net/core/net_namespace.c:139
+ setup_net+0x435/0xb40 net/core/net_namespace.c:343
+ copy_net_ns+0x2f0/0x670 net/core/net_namespace.c:508
+ create_new_namespaces+0x3ea/0xb10 kernel/nsproxy.c:110
+ unshare_nsproxy_namespaces+0xc0/0x1f0 kernel/nsproxy.c:228
+ ksys_unshare+0x419/0x970 kernel/fork.c:3323
+ __do_sys_unshare kernel/fork.c:3394 [inline]
+ __se_sys_unshare kernel/fork.c:3392 [inline]
+ __x64_sys_unshare+0x31/0x40 kernel/fork.c:3392
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f9f8ae7cea9
+RSP: 002b:00007f9f8bb220c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000110
+RAX: ffffffffffffffda RBX: 00007f9f8afb4120 RCX: 00007f9f8ae7cea9
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000064000600
+RBP: 00007f9f8aeebff4 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000006e R14: 00007f9f8afb4120 R15: 00007ffd19e177f8
+ </TASK>
+INFO: task syz-executor.0:9026 blocked for more than 144 seconds.
+      Not tainted 6.10.0-rc3-syzkaller-00021-g2ef5971ff345 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.0  state:D stack:27968 pid:9026  tgid:9023  ppid:6840   flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5408 [inline]
+ __schedule+0xf15/0x5d00 kernel/sched/core.c:6745
+ __schedule_loop kernel/sched/core.c:6822 [inline]
+ schedule+0xe7/0x350 kernel/sched/core.c:6837
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x5b8/0x9c0 kernel/locking/mutex.c:752
 
 
-=E2=80=A6
-> +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> @@ -0,0 +1,640 @@
-=E2=80=A6
-> +static int rtase_init_one(struct pci_dev *pdev,
-> +			  const struct pci_device_id *ent)
-> +{
-=E2=80=A6
-> +	/* identify chip attached to board */
-> +	if (!rtase_check_mac_version_valid(tp)) {
-> +		return dev_err_probe(&pdev->dev, -ENODEV,
-> +				     "unknown chip version, contact rtase "
-> +				     "maintainers (see MAINTAINERS file)\n");
-> +	}
-=E2=80=A6
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-* May curly brackets be omitted here?
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/=
-Documentation/process/coding-style.rst?h=3Dv6.10-rc3#n197
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-* Would you like to keep the message (from such string literals) in a sing=
-le line?
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/=
-Documentation/process/coding-style.rst?h=3Dv6.10-rc3#n116
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-=E2=80=A6
-> +	dev->features |=3D NETIF_F_IP_CSUM;
-> +	dev->features |=3D NETIF_F_HIGHDMA;
-=E2=80=A6
-> +	dev->hw_features |=3D NETIF_F_RXALL;
-> +	dev->hw_features |=3D NETIF_F_RXFCS;
-=E2=80=A6
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-How do you think about to reduce such assignment statements
-(if all desired software options would be passed at once)?
-
-Regards,
-Markus
+If you want to undo deduplication, reply with:
+#syz undup
 
