@@ -1,213 +1,461 @@
-Return-Path: <netdev+bounces-103080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 660439062C1
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 05:39:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 109159062C9
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 05:39:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D0511C20A34
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 03:39:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26E591C20DB6
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 03:39:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D3C13440E;
-	Thu, 13 Jun 2024 03:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/Q38vJo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2881304AA;
+	Thu, 13 Jun 2024 03:39:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC998130A40;
-	Thu, 13 Jun 2024 03:38:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD54A2F34;
+	Thu, 13 Jun 2024 03:39:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718249883; cv=none; b=KRGkE0ok+wbYnTorTmGyFNa6iDPjgFcO66NRaihIrWax6yjmlEGXI2R5MVdljD/82LPZuQtW2zs1x+PC8eePOvIvdLva8h+ANWh/PIWqJIMhNMw4gw8SNj+BCEj1ol7nefqZorcEGx5MmFr8nRCbaAjx1P4bYUGlcfQlB7xvfHA=
+	t=1718249993; cv=none; b=i1agiZEECWvi2pmURhIsXuRfMR+whVK0OZSRWE1GmQa/GJCRv+x/4MRq1GHTLwO/J2g2nC4mCfs/b8PHH84HzpfF6k3CAvB4E0BhMDUEzZnH/59V1JiWrks8j27WyG0eP8YrEftN02dSo0U+W77lzkLUwNayB2Ljv4LhiJCqD8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718249883; c=relaxed/simple;
-	bh=MUF6QJIs92YjVFx9pLVup9B1X4v/FOHgXQ+Q1ulGSY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HW+9VwlcPz5RihUx6mpz0y4hErm5jUTcRWbLAo1ssOQ/imt9cTFXtfOJ1e5as9RT3dXmiFL2HJtY7/oK5vOzmWFwYLdpr6xv4EknNAtSIR5eGbKqatsI54Onvvh7v4SuOb12Kew5sogp2Zxa28SlOHeNVEcxCQJMk3+AS1g6uKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/Q38vJo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7817BC2BBFC;
-	Thu, 13 Jun 2024 03:38:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718249882;
-	bh=MUF6QJIs92YjVFx9pLVup9B1X4v/FOHgXQ+Q1ulGSY8=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=D/Q38vJoRXlXt5XW/4wGVxDR3Ve5LY0YeIOEeyXy3NbqhqX2dZ1j6M305bUwT45/t
-	 UDuYraBOn5RJGcB5wbPp0mVvgGhhjTHGq9Z0Flg5xyFBTSbQm63u8OHLMVmMqygIG8
-	 n9Bktxt8XPwCkrGEjHdwaonD6xgWh8Godtd+lRtFFTJN7g05LyY6qtQ9CoXmzs1IMm
-	 s3wJnTMklP71T4XudKIUo3akJ/RvcV6b0A4eh6dGBbeQLpeU8YyAJJTIYJ6rHLoz8s
-	 fp4CPkLTgzE6dVIPWUBEYXDVCE07lQXMRXq4lTfYFbtT2/hHBATfDcVAbYnccY1Jab
-	 dAuGuN0IsVTKA==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 1975FCE0DEA; Wed, 12 Jun 2024 20:38:02 -0700 (PDT)
-Date: Wed, 12 Jun 2024 20:38:02 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
-	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <Zmov7ZaL-54T9GiM@zx2c4.com>
- <Zmo9-YGraiCj5-MI@zx2c4.com>
+	s=arc-20240116; t=1718249993; c=relaxed/simple;
+	bh=5Voj0mBCq7kgTtakiCk/W7ZjYOhLIpMGyT3bmr0hoNw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=OO//ldTXuK7YCMjFpaIQIuujn703Uc7Gz8zBf4dJuWM4s1l4818Qwh5hiMnlSdeuOQTrWKIyaRTVCz4BKZi9s9oOCn99nf7IdUHkLsD8+4pEYyftIkN/fYRUlfHYFsJeFQbn30DPh6FubFEe3AX5hHCh8g8XCWL9O5Q/SGh5pg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 45D3cnPiB2055487, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 45D3cnPiB2055487
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 13 Jun 2024 11:38:49 +0800
+Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 13 Jun 2024 11:38:45 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 13 Jun 2024 11:38:45 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Thu, 13 Jun 2024 11:38:45 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Hariprasad Kelam <hkelam@marvell.com>, "kuba@kernel.org" <kuba@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "andrew@lunn.ch"
+	<andrew@lunn.ch>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org"
+	<horms@kernel.org>,
+        Ratheesh Kannoth <rkannoth@marvell.com>,
+        Ping-Ke Shih
+	<pkshih@realtek.com>,
+        Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v20 06/13] rtase: Implement .ndo_start_xmit function
+Thread-Topic: [PATCH net-next v20 06/13] rtase: Implement .ndo_start_xmit
+ function
+Thread-Index: AQHauLdmYuDGRjyaP0maBwRhxExTNLG7e7UAgAgWH6D//99wAIABo12Q
+Date: Thu, 13 Jun 2024 03:38:45 +0000
+Message-ID: <3b25f342510b42d1beac0d602fc5abd7@realtek.com>
+References: <20240607084321.7254-1-justinlai0215@realtek.com>
+ <20240607084321.7254-7-justinlai0215@realtek.com>
+ <PH0PR18MB44745E2CFEA3CC1D9ADC5AC0DEFB2@PH0PR18MB4474.namprd18.prod.outlook.com>
+ <89c92725271a4fa28dbf1e37f3fd5e99@realtek.com>
+ <PH0PR18MB4474CB7ED482769F166FC50FDEC02@PH0PR18MB4474.namprd18.prod.outlook.com>
+In-Reply-To: <PH0PR18MB4474CB7ED482769F166FC50FDEC02@PH0PR18MB4474.namprd18.prod.outlook.com>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zmo9-YGraiCj5-MI@zx2c4.com>
 
-On Thu, Jun 13, 2024 at 02:31:53AM +0200, Jason A. Donenfeld wrote:
-> On Thu, Jun 13, 2024 at 01:31:57AM +0200, Jason A. Donenfeld wrote:
-> > On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
-> > > On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
-> > > > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
-> > > > > Since SLOB was removed, it is not necessary to use call_rcu
-> > > > > when the callback only performs kmem_cache_free. Use
-> > > > > kfree_rcu() directly.
-> > > > > 
-> > > > > The changes were done using the following Coccinelle semantic patch.
-> > > > > This semantic patch is designed to ignore cases where the callback
-> > > > > function is used in another way.
-> > > > 
-> > > > How does the discussion on:
-> > > >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-> > > >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
-> > > > reflect on this series? IIUC we should hold off..
-> > > 
-> > > We do need to hold off for the ones in kernel modules (such as 07/14)
-> > > where the kmem_cache is destroyed during module unload.
-> > > 
-> > > OK, I might as well go through them...
-> > > 
-> > > [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-> > > 	Needs to wait, see wg_allowedips_slab_uninit().
-> > 
-> > Right, this has exactly the same pattern as the batman-adv issue:
-> > 
-> >     void wg_allowedips_slab_uninit(void)
-> >     {
-> >             rcu_barrier();
-> >             kmem_cache_destroy(node_cache);
-> >     }
-> > 
-> > I'll hold off on sending that up until this matter is resolved.
-> 
-> BTW, I think this whole thing might be caused by:
-> 
->     a35d16905efc ("rcu: Add basic support for kfree_rcu() batching")
-> 
-> The commit message there mentions:
-> 
->     There is an implication with rcu_barrier() with this patch. Since the
->     kfree_rcu() calls can be batched, and may not be handed yet to the RCU
->     machinery in fact, the monitor may not have even run yet to do the
->     queue_rcu_work(), there seems no easy way of implementing rcu_barrier()
->     to wait for those kfree_rcu()s that are already made. So this means a
->     kfree_rcu() followed by an rcu_barrier() does not imply that memory will
->     be freed once rcu_barrier() returns.
-> 
-> Before that, a kfree_rcu() used to just add a normal call_rcu() into the
-> list, but with the function offset < 4096 as a special marker. So the
-> kfree_rcu() calls would be treated alongside the other call_rcu() ones
-> and thus affected by rcu_barrier(). Looks like that behavior is no more
-> since this commit.
+> > > > Implement .ndo_start_xmit function to fill the information of the
+> > > > packet to be transmitted into the tx descriptor, and then the
+> > > > hardware will transmit the packet using the information in the tx
+> > descriptor.
+> > > > In addition, we also implemented the tx_handler function to enable
+> > > > the tx descriptor to be reused.
+> > > >
+> > > > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> > > > ---
+> > > >  .../net/ethernet/realtek/rtase/rtase_main.c   | 285
+> ++++++++++++++++++
+> > > >  1 file changed, 285 insertions(+)
+> > > >
+> > > > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > > index 23406c195cff..6bdb4edbfbc1 100644
+> > > > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > > @@ -256,6 +256,68 @@ static void rtase_mark_to_asic(union
+> > > > rtase_rx_desc *desc, u32 rx_buf_sz)
+> > > >                  cpu_to_le32(RTASE_DESC_OWN | eor | rx_buf_sz));
+> > > > }
+> > > >
+> > > > +static u32 rtase_tx_avail(struct rtase_ring *ring) {
+> > > > +     return READ_ONCE(ring->dirty_idx) + RTASE_NUM_DESC -
+> > > > +            READ_ONCE(ring->cur_idx); }
+> > > > +
+> > > > +static int tx_handler(struct rtase_ring *ring, int budget) {
+> > > > +     const struct rtase_private *tp =3D ring->ivec->tp;
+> > > > +     struct net_device *dev =3D tp->dev;
+> > > > +     u32 dirty_tx, tx_left;
+> > > > +     u32 bytes_compl =3D 0;
+> > > > +     u32 pkts_compl =3D 0;
+> > > > +     int workdone =3D 0;
+> > > > +
+> > > > +     dirty_tx =3D ring->dirty_idx;
+> > > > +     tx_left =3D READ_ONCE(ring->cur_idx) - dirty_tx;
+> > > > +
+> > > > +     while (tx_left > 0) {
+> > > > +             u32 entry =3D dirty_tx % RTASE_NUM_DESC;
+> > > > +             struct rtase_tx_desc *desc =3D ring->desc +
+> > > > +                                    sizeof(struct rtase_tx_desc)
+> > > > + *
+> > > entry;
+> > > > +             u32 status;
+> > > > +
+> > > > +             status =3D le32_to_cpu(desc->opts1);
+> > > > +
+> > > > +             if (status & RTASE_DESC_OWN)
+> > > > +                     break;
+> > > > +
+> > > > +             rtase_unmap_tx_skb(tp->pdev, ring->mis.len[entry],
+> desc);
+> > > > +             ring->mis.len[entry] =3D 0;
+> > > > +             if (ring->skbuff[entry]) {
+> > > > +                     pkts_compl++;
+> > > > +                     bytes_compl +=3D ring->skbuff[entry]->len;
+> > > > +                     napi_consume_skb(ring->skbuff[entry],
+> budget);
+> > > > +                     ring->skbuff[entry] =3D NULL;
+> > > > +             }
+> > > > +
+> > > > +             dirty_tx++;
+> > > > +             tx_left--;
+> > > > +             workdone++;
+> > > > +
+> > > > +             if (workdone =3D=3D RTASE_TX_BUDGET_DEFAULT)
+> > > > +                     break;
+> > > > +     }
+> > > > +
+> > > > +     if (ring->dirty_idx !=3D dirty_tx) {
+> > > > +             dev_sw_netstats_tx_add(dev, pkts_compl,
+> bytes_compl);
+> > > > +             WRITE_ONCE(ring->dirty_idx, dirty_tx);
+> > > > +
+> > > > +             netif_subqueue_completed_wake(dev, ring->index,
+> > > > pkts_compl,
+> > > > +                                           bytes_compl,
+> > > > +
+> rtase_tx_avail(ring),
+> > > > +
+> > > RTASE_TX_START_THRS);
+> > > > +
+> > > > +             if (ring->cur_idx !=3D dirty_tx)
+> > > > +                     rtase_w8(tp, RTASE_TPPOLL,
+> BIT(ring->index));
+> > > > +     }
+> > > > +
+> > > > +     return 0;
+> > > > +}
+> > > > +
+> > > >  static void rtase_tx_desc_init(struct rtase_private *tp, u16 idx) =
+ {
+> > > >       struct rtase_ring *ring =3D &tp->tx_ring[idx]; @@ -1014,6
+> > > > +1076,228 @@ static int rtase_close(struct net_device *dev)
+> > > >       return 0;
+> > > >  }
+> > > >
+> > > > +static u32 rtase_tx_vlan_tag(const struct rtase_private *tp,
+> > > > +                          const struct sk_buff *skb) {
+> > > > +     return (skb_vlan_tag_present(skb)) ?
+> > > > +             (RTASE_TX_VLAN_TAG |
+> swab16(skb_vlan_tag_get(skb))) :
+> > > > 0x00; }
+> > > > +
+> > >                Vlan protocol can be either 0x8100 or 0x88A8, how
+> > > does hardware know which header to insert?
+> > > Thanks,
+> > > Hariprasad k
+> >
+> > We only allow the hardware to add 0x8100, the VLAN must at least have
+> > 0x8100 to potentially have 0x88a8, skb_vlan_tag_present indicates that
+> > VLAN exists, hence at least the 0x8100 VLAN would exist.
+> > >
+> Thanks for the explanation, but one question which bothers me is that "ho=
+w
+> hardware knows offset with in the packet"
+>=20
+> For example
+> Case 1:       DMAC  + SMAC + 8100 VLAN_ID + IP
+>                Here offset is right after the SMAC.
+> Case 2:      DMAC + SMAC + 88A8 VLAN_ID + 8100 VLAN_ID + IP
+>                Here offset is right after first vlan tag.
+>=20
+> Thanks,
+> Hariprasad k
 
-You might well be right, and thank you for digging into this!
+This driver only enables NETIF_F_HW_VLAN_CTAG_TX, and we only support case =
+1.
 
-> Rather than getting rid of the batching, which seems good for
-> efficiency, I wonder if the right fix to this would be adding a
-> `should_destroy` boolean to kmem_cache, which kmem_cache_destroy() sets
-> to true. And then right after it checks `if (number_of_allocations == 0)
-> actually_destroy()`, and likewise on each kmem_cache_free(), it could
-> check `if (should_destroy && number_of_allocations == 0)
-> actually_destroy()`. This way, the work is delayed until it's safe to do
-> so. This might also mitigate other lurking bugs of bad code that calls
-> kmem_cache_destroy() before kmem_cache_free().
+>=20
+> > > > +static u32 rtase_tx_csum(struct sk_buff *skb, const struct
+> > > > +net_device
+> > > > +*dev) {
+> > > > +     u32 csum_cmd =3D 0;
+> > > > +     u8 ip_protocol;
+> > > > +
+> > > > +     switch (vlan_get_protocol(skb)) {
+> > > > +     case htons(ETH_P_IP):
+> > > > +             csum_cmd =3D RTASE_TX_IPCS_C;
+> > > > +             ip_protocol =3D ip_hdr(skb)->protocol;
+> > > > +             break;
+> > > > +
+> > > > +     case htons(ETH_P_IPV6):
+> > > > +             csum_cmd =3D RTASE_TX_IPV6F_C;
+> > > > +             ip_protocol =3D ipv6_hdr(skb)->nexthdr;
+> > > > +             break;
+> > > > +
+> > > > +     default:
+> > > > +             ip_protocol =3D IPPROTO_RAW;
+> > > > +             break;
+> > > > +     }
+> > > > +
+> > > > +     if (ip_protocol =3D=3D IPPROTO_TCP)
+> > > > +             csum_cmd |=3D RTASE_TX_TCPCS_C;
+> > > > +     else if (ip_protocol =3D=3D IPPROTO_UDP)
+> > > > +             csum_cmd |=3D RTASE_TX_UDPCS_C;
+> > > > +
+> > > > +     csum_cmd |=3D u32_encode_bits(skb_transport_offset(skb),
+> > > > +                                 RTASE_TCPHO_MASK);
+> > > > +
+> > > > +     return csum_cmd;
+> > > > +}
+> > > > +
+> > > > +static int rtase_xmit_frags(struct rtase_ring *ring, struct sk_buf=
+f *skb,
+> > > > +                         u32 opts1, u32 opts2) {
+> > > > +     const struct skb_shared_info *info =3D skb_shinfo(skb);
+> > > > +     const struct rtase_private *tp =3D ring->ivec->tp;
+> > > > +     const u8 nr_frags =3D info->nr_frags;
+> > > > +     struct rtase_tx_desc *txd =3D NULL;
+> > > > +     u32 cur_frag, entry;
+> > > > +
+> > > > +     entry =3D ring->cur_idx;
+> > > > +     for (cur_frag =3D 0; cur_frag < nr_frags; cur_frag++) {
+> > > > +             const skb_frag_t *frag =3D &info->frags[cur_frag];
+> > > > +             dma_addr_t mapping;
+> > > > +             u32 status, len;
+> > > > +             void *addr;
+> > > > +
+> > > > +             entry =3D (entry + 1) % RTASE_NUM_DESC;
+> > > > +
+> > > > +             txd =3D ring->desc + sizeof(struct rtase_tx_desc) * e=
+ntry;
+> > > > +             len =3D skb_frag_size(frag);
+> > > > +             addr =3D skb_frag_address(frag);
+> > > > +             mapping =3D dma_map_single(&tp->pdev->dev, addr, len,
+> > > > +                                      DMA_TO_DEVICE);
+> > > > +
+> > > > +             if (unlikely(dma_mapping_error(&tp->pdev->dev,
+> > > > + mapping)))
+> > > > {
+> > > > +                     if (unlikely(net_ratelimit()))
+> > > > +                             netdev_err(tp->dev,
+> > > > +                                        "Failed to map TX
+> > > fragments
+> > > > DMA!\n");
+> > > > +
+> > > > +                     goto err_out;
+> > > > +             }
+> > > > +
+> > > > +             if (((entry + 1) % RTASE_NUM_DESC) =3D=3D 0)
+> > > > +                     status =3D (opts1 | len | RTASE_RING_END);
+> > > > +             else
+> > > > +                     status =3D opts1 | len;
+> > > > +
+> > > > +             if (cur_frag =3D=3D (nr_frags - 1)) {
+> > > > +                     ring->skbuff[entry] =3D skb;
+> > > > +                     status |=3D RTASE_TX_LAST_FRAG;
+> > > > +             }
+> > > > +
+> > > > +             ring->mis.len[entry] =3D len;
+> > > > +             txd->addr =3D cpu_to_le64(mapping);
+> > > > +             txd->opts2 =3D cpu_to_le32(opts2);
+> > > > +
+> > > > +             /* make sure the operating fields have been updated *=
+/
+> > > > +             dma_wmb();
+> > > > +             txd->opts1 =3D cpu_to_le32(status);
+> > > > +     }
+> > > > +
+> > > > +     return cur_frag;
+> > > > +
+> > > > +err_out:
+> > > > +     rtase_tx_clear_range(ring, ring->cur_idx + 1, cur_frag);
+> > > > +     return -EIO;
+> > > > +}
+> > > > +
+> > > > +static netdev_tx_t rtase_start_xmit(struct sk_buff *skb,
+> > > > +                                 struct net_device *dev) {
+> > > > +     struct skb_shared_info *shinfo =3D skb_shinfo(skb);
+> > > > +     struct rtase_private *tp =3D netdev_priv(dev);
+> > > > +     u32 q_idx, entry, len, opts1, opts2;
+> > > > +     struct netdev_queue *tx_queue;
+> > > > +     bool stop_queue, door_bell;
+> > > > +     u32 mss =3D shinfo->gso_size;
+> > > > +     struct rtase_tx_desc *txd;
+> > > > +     struct rtase_ring *ring;
+> > > > +     dma_addr_t mapping;
+> > > > +     int frags;
+> > > > +
+> > > > +     /* multiqueues */
+> > > > +     q_idx =3D skb_get_queue_mapping(skb);
+> > > > +     ring =3D &tp->tx_ring[q_idx];
+> > > > +     tx_queue =3D netdev_get_tx_queue(dev, q_idx);
+> > > > +
+> > > > +     if (unlikely(!rtase_tx_avail(ring))) {
+> > > > +             if (net_ratelimit())
+> > > > +                     netdev_err(dev, "BUG! Tx Ring full when
+> > > > + queue
+> > > > awake!\n");
+> > > > +             goto err_stop;
+> > > > +     }
+> > > > +
+> > > > +     entry =3D ring->cur_idx % RTASE_NUM_DESC;
+> > > > +     txd =3D ring->desc + sizeof(struct rtase_tx_desc) * entry;
+> > > > +
+> > > > +     opts1 =3D RTASE_DESC_OWN;
+> > > > +     opts2 =3D rtase_tx_vlan_tag(tp, skb);
+> > > > +
+> > > > +     /* tcp segmentation offload (or tcp large send) */
+> > > > +     if (mss) {
+> > > > +             if (shinfo->gso_type & SKB_GSO_TCPV4) {
+> > > > +                     opts1 |=3D RTASE_GIANT_SEND_V4;
+> > > > +             } else if (shinfo->gso_type & SKB_GSO_TCPV6) {
+> > > > +                     if (skb_cow_head(skb, 0))
+> > > > +                             goto err_dma_0;
+> > > > +
+> > > > +                     tcp_v6_gso_csum_prep(skb);
+> > > > +                     opts1 |=3D RTASE_GIANT_SEND_V6;
+> > > > +             } else {
+> > > > +                     WARN_ON_ONCE(1);
+> > > > +             }
+> > > > +
+> > > > +             opts1 |=3D u32_encode_bits(skb_transport_offset(skb),
+> > > > +                                      RTASE_TCPHO_MASK);
+> > > > +             opts2 |=3D u32_encode_bits(mss, RTASE_MSS_MASK);
+> > > > +     } else if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
+> > > > +             opts2 |=3D rtase_tx_csum(skb, dev);
+> > > > +     }
+> > > > +
+> > > > +     frags =3D rtase_xmit_frags(ring, skb, opts1, opts2);
+> > > > +     if (unlikely(frags < 0))
+> > > > +             goto err_dma_0;
+> > > > +
+> > > > +     if (frags) {
+> > > > +             len =3D skb_headlen(skb);
+> > > > +             opts1 |=3D RTASE_TX_FIRST_FRAG;
+> > > > +     } else {
+> > > > +             len =3D skb->len;
+> > > > +             ring->skbuff[entry] =3D skb;
+> > > > +             opts1 |=3D RTASE_TX_FIRST_FRAG |
+> RTASE_TX_LAST_FRAG;
+> > > > +     }
+> > > > +
+> > > > +     if (((entry + 1) % RTASE_NUM_DESC) =3D=3D 0)
+> > > > +             opts1 |=3D (len | RTASE_RING_END);
+> > > > +     else
+> > > > +             opts1 |=3D len;
+> > > > +
+> > > > +     mapping =3D dma_map_single(&tp->pdev->dev, skb->data, len,
+> > > > +                              DMA_TO_DEVICE);
+> > > > +
+> > > > +     if (unlikely(dma_mapping_error(&tp->pdev->dev, mapping))) {
+> > > > +             if (unlikely(net_ratelimit()))
+> > > > +                     netdev_err(dev, "Failed to map TX DMA!\n");
+> > > > +
+> > > > +             goto err_dma_1;
+> > > > +     }
+> > > > +
+> > > > +     ring->mis.len[entry] =3D len;
+> > > > +     txd->addr =3D cpu_to_le64(mapping);
+> > > > +     txd->opts2 =3D cpu_to_le32(opts2);
+> > > > +     txd->opts1 =3D cpu_to_le32(opts1 & ~RTASE_DESC_OWN);
+> > > > +
+> > > > +     /* make sure the operating fields have been updated */
+> > > > +     dma_wmb();
+> > > > +
+> > > > +     door_bell =3D __netdev_tx_sent_queue(tx_queue, skb->len,
+> > > > +                                        netdev_xmit_more());
+> > > > +
+> > > > +     txd->opts1 =3D cpu_to_le32(opts1);
+> > > > +
+> > > > +     skb_tx_timestamp(skb);
+> > > > +
+> > > > +     /* tx needs to see descriptor changes before updated cur_idx =
+*/
+> > > > +     smp_wmb();
+> > > > +
+> > > > +     WRITE_ONCE(ring->cur_idx, ring->cur_idx + frags + 1);
+> > > > +
+> > > > +     stop_queue =3D !netif_subqueue_maybe_stop(dev, ring->index,
+> > > > +
+> > > > + rtase_tx_avail(ring),
+> > > > +
+> > > RTASE_TX_STOP_THRS,
+> > > > +
+> > > RTASE_TX_START_THRS);
+> > > > +
+> > > > +     if (door_bell || stop_queue)
+> > > > +             rtase_w8(tp, RTASE_TPPOLL, BIT(ring->index));
+> > > > +
+> > > > +     return NETDEV_TX_OK;
+> > > > +
+> > > > +err_dma_1:
+> > > > +     ring->skbuff[entry] =3D NULL;
+> > > > +     rtase_tx_clear_range(ring, ring->cur_idx + 1, frags);
+> > > > +
+> > > > +err_dma_0:
+> > > > +     dev->stats.tx_dropped++;
+> > > > +     dev_kfree_skb_any(skb);
+> > > > +     return NETDEV_TX_OK;
+> > > > +
+> > > > +err_stop:
+> > > > +     netif_stop_queue(dev);
+> > > > +     dev->stats.tx_dropped++;
+> > > > +     return NETDEV_TX_BUSY;
+> > > > +}
+> > > > +
+> > > >  static void rtase_enable_eem_write(const struct rtase_private *tp)=
+  {
+> > > >       u8 val;
+> > > > @@ -1065,6 +1349,7 @@ static void rtase_netpoll(struct net_device
+> > > > *dev) static const struct net_device_ops rtase_netdev_ops =3D {
+> > > >       .ndo_open =3D rtase_open,
+> > > >       .ndo_stop =3D rtase_close,
+> > > > +     .ndo_start_xmit =3D rtase_start_xmit,
+> > > >  #ifdef CONFIG_NET_POLL_CONTROLLER
+> > > >       .ndo_poll_controller =3D rtase_netpoll,  #endif
+> > > > --
+> > > > 2.34.1
+> > > >
 
-Here are the current options being considered, including those that
-are completely brain-dead:
-
-o	Document current state.  (Must use call_rcu() if module
-	destroys slab of RCU-protected objects.)
-
-	Need to review Julia's and Uladzislau's series of patches
-	that change call_rcu() of slab objects to kfree_rcu().
-
-o	Make rcu_barrier() wait for kfree_rcu() objects.  (This is
-	surprisingly complex and will wait unnecessarily in some cases.
-	However, it does preserve current code.)
-
-o	Make a kfree_rcu_barrier() that waits for kfree_rcu() objects.
-	(This avoids the unnecessary waits, but adds complexity to
-	kfree_rcu().  This is harder than it looks, but could be done,
-	for example by maintaining pairs of per-CPU counters and handling
-	them in an SRCU-like fashion.  Need some way of communicating the
-	index, though.)
-
-	(There might be use cases where both rcu_barrier() and
-	kfree_rcu_barrier() would need to be invoked.)
-
-	A simpler way to implement this is to scan all of the in-flight
-	objects, and queue each (either separately or in bulk) using
-	call_rcu().  This still has problems with kfree_rcu_mightsleep()
-	under low-memory conditions, in which case there are a bunch
-	of synchronize_rcu() instances waiting.  These instances could
-	use SRCU-like per-CPU arrays of counters.  Or just protect the
-	calls to synchronize_rcu() and the later frees with an SRCU
-	reader, then have the other end call synchronize_srcu().
-
-o	Make the current kmem_cache_destroy() asynchronously wait for
-	all memory to be returned, then complete the destruction.
-	(This gets rid of a valuable debugging technique because
-	in normal use, it is a bug to attempt to destroy a kmem_cache
-	that has objects still allocated.)
-
-o	Make a kmem_cache_destroy_rcu() that asynchronously waits for
-	all memory to be returned, then completes the destruction.
-	(This raises the question of what to is it takes a "long time"
-	for the objects to be freed.)
-
-o	Make a kmem_cache_free_barrier() that blocks until all
-	objects in the specified kmem_cache have been freed.
-
-o	Make a kmem_cache_destroy_wait() that waits for all memory to
-	be returned, then does the destruction.  This is equivalent to:
-
-		kmem_cache_free_barrier(&mycache);
-		kmem_cache_destroy(&mycache);
-
-Uladzislau has started discussions on the last few of these:
-https://lore.kernel.org/all/ZmnL4jkhJLIW924W@pc636/
-
-I have also added this information to a Google Document for
-easier tracking:
-https://docs.google.com/document/d/1v0rcZLvvjVGejT3523W0rDy_sLFu2LWc_NR3fQItZaA/edit?usp=sharing
-
-Other thoughts?
-
-							Thanx, Paul
 
