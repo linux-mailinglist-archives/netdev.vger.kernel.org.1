@@ -1,149 +1,118 @@
-Return-Path: <netdev+bounces-103017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B872E905FB6
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 02:32:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75578905FBE
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 02:32:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5ED631F22870
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 00:32:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFC6B281A4C
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 00:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D28863A5;
-	Thu, 13 Jun 2024 00:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9460652;
+	Thu, 13 Jun 2024 00:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="eF1VsvRJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ngwb8mI+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA15C652;
-	Thu, 13 Jun 2024 00:32:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56A5171C1
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 00:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718238723; cv=none; b=kz9IZJ9RGCIZLnXXGS6F/hkIPFo0YG7XXGqdkRhoh61r72EGJLJozUcb4hR1sRD47Uq0BQeFESSWH45fbtz465gmzMWcnSItmUK84AI4gn0ghPzgcu5J/Vc2MnA8FGHDvYMNONreYzWtk9uSWZPzNBdquN1fC6Glp7CVYF4ah80=
+	t=1718238744; cv=none; b=HHzdzDJ3Rug4xn4oAccv11htvWUGuz12pCIzUG5sI/dTJc/6XXCFhXp4Ata+a3bYCLnS76ACfnsnJTONAdkVG2RBAPqIqtm6xBCNvodMeFwrGhNCGEtmZ+J5WdDG9nuwwqVmrvh1X61zTS41E1Y6fT9CpckN8I2EvbBVPs8HT78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718238723; c=relaxed/simple;
-	bh=+UbqprezWqxEbhKmSRaDsTwuur4mIfjSb1NUN/fCVbQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K4dh9MDL+JHFhrN4K326PI0WduhfcrP0KhZ1vsSROdINZ2B3ogPVKOXnB1Uo+H6O0BytOPqf++V2LhEY9pWfWM0ZnHgVJz2s55AWHMeKQlVmJQpe5brMpR3xllEF7YQuuU8s60sUHVwGOlPGsfkvyKPqZdAOSthwo7h2J7Y9lRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=eF1VsvRJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45E47C116B1;
-	Thu, 13 Jun 2024 00:32:00 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="eF1VsvRJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1718238717;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GLUb85oLbjyoG+FcfWhggv8KT8bN6SBWkCY+yvZAHV8=;
-	b=eF1VsvRJdSDlt+jjhJiKZ5eDDi+CCrqpbP2qILiWHB7HfEnI5D10gtd4TmY1udoArULYFC
-	3p47U2iNEXteOz8cl56PqFBBedrFExfiroU7FcnCZmp/raJumk5hGsmXBZe7KI+jDx3FRz
-	mt6afVKn9JVqLJRPjTB0wjVVNYzZzWI=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0c052d48 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Thu, 13 Jun 2024 00:31:57 +0000 (UTC)
-Date: Thu, 13 Jun 2024 02:31:53 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: "Paul E. McKenney" <paulmck@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
-	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <Zmo9-YGraiCj5-MI@zx2c4.com>
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <Zmov7ZaL-54T9GiM@zx2c4.com>
+	s=arc-20240116; t=1718238744; c=relaxed/simple;
+	bh=CmBlsfAALNy9BI3JHhIDPVDzWhtgjOd2Mz9FbOSx26c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rvokW8PX8zoJxe1UG37dHEiPF1XclCi1wdAAO/KbVyCYE9pWmk9yrMyNWPen+x3MgMF6sLnA0KbP47EtaY/8sSnS76rtjSIPzhbfU2DP+EMV2LjYxUXqkXcLkTu0M7CNopOSc85+pRjvaQD0mteiMHgY/pM0E7vCrDmveMFb3LU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ngwb8mI+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 296F6C116B1;
+	Thu, 13 Jun 2024 00:32:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718238744;
+	bh=CmBlsfAALNy9BI3JHhIDPVDzWhtgjOd2Mz9FbOSx26c=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ngwb8mI+DjJMEpwCtBQwQQEeQ9wQaG32A8++cx2GaUAs6V4QOglYJ4OPlw66YpFLr
+	 7EcH6RPX8E0IO74pm2GQUSSUSL9Ygk1r6Q5rJPWhKMSiXS4sFeVPFEqeQcOppAfAmG
+	 IgnEcqQk9j5CuwJX+0FlkOUI30zhcbC6Ans/QSh6fVlRDjBe+TnPhdPptgq7XGfVo2
+	 8H9gVe76RfYSDCJ7QJSCinZmlxIqQPWl3PdlOxQU05rryl46M83dbyZPJJrft9Zd6Q
+	 78/ClGhJOFf4ZnjzXg904uL3ZOyyjOjuqSU/0/tTSJq9NkXhxmoiB2dDzTOQGwjokF
+	 mAOy09v1vZEbA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	horatiu.vultur@microchip.com,
+	UNGLinuxDriver@microchip.com
+Subject: [PATCH net-next] eth: lan966x: don't clear unsupported stats
+Date: Wed, 12 Jun 2024 17:32:22 -0700
+Message-ID: <20240613003222.3327368-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Zmov7ZaL-54T9GiM@zx2c4.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jun 13, 2024 at 01:31:57AM +0200, Jason A. Donenfeld wrote:
-> On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
-> > On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
-> > > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
-> > > > Since SLOB was removed, it is not necessary to use call_rcu
-> > > > when the callback only performs kmem_cache_free. Use
-> > > > kfree_rcu() directly.
-> > > > 
-> > > > The changes were done using the following Coccinelle semantic patch.
-> > > > This semantic patch is designed to ignore cases where the callback
-> > > > function is used in another way.
-> > > 
-> > > How does the discussion on:
-> > >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-> > >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
-> > > reflect on this series? IIUC we should hold off..
-> > 
-> > We do need to hold off for the ones in kernel modules (such as 07/14)
-> > where the kmem_cache is destroyed during module unload.
-> > 
-> > OK, I might as well go through them...
-> > 
-> > [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-> > 	Needs to wait, see wg_allowedips_slab_uninit().
-> 
-> Right, this has exactly the same pattern as the batman-adv issue:
-> 
->     void wg_allowedips_slab_uninit(void)
->     {
->             rcu_barrier();
->             kmem_cache_destroy(node_cache);
->     }
-> 
-> I'll hold off on sending that up until this matter is resolved.
+Commit 12c2d0a5b8e2 ("net: lan966x: add ethtool configuration and statistics")
+added support for various standard stats. We should not clear the stats
+which are not collected by the device. Core code uses a special
+initializer to detect when device does not report given stat.
 
-BTW, I think this whole thing might be caused by:
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: horatiu.vultur@microchip.com
+CC: UNGLinuxDriver@microchip.com
+---
+ drivers/net/ethernet/microchip/lan966x/lan966x_ethtool.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
-    a35d16905efc ("rcu: Add basic support for kfree_rcu() batching")
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_ethtool.c b/drivers/net/ethernet/microchip/lan966x/lan966x_ethtool.c
+index 06811c60d598..c0fc85ac5db3 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_ethtool.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_ethtool.c
+@@ -376,7 +376,6 @@ static void lan966x_get_eth_mac_stats(struct net_device *dev,
+ 		lan966x->stats[idx + SYS_COUNT_TX_PMAC_BC];
+ 	mac_stats->SingleCollisionFrames =
+ 		lan966x->stats[idx + SYS_COUNT_TX_COL];
+-	mac_stats->MultipleCollisionFrames = 0;
+ 	mac_stats->FramesReceivedOK =
+ 		lan966x->stats[idx + SYS_COUNT_RX_UC] +
+ 		lan966x->stats[idx + SYS_COUNT_RX_MC] +
+@@ -384,26 +383,19 @@ static void lan966x_get_eth_mac_stats(struct net_device *dev,
+ 	mac_stats->FrameCheckSequenceErrors =
+ 		lan966x->stats[idx + SYS_COUNT_RX_CRC] +
+ 		lan966x->stats[idx + SYS_COUNT_RX_CRC];
+-	mac_stats->AlignmentErrors = 0;
+ 	mac_stats->OctetsTransmittedOK =
+ 		lan966x->stats[idx + SYS_COUNT_TX_OCT] +
+ 		lan966x->stats[idx + SYS_COUNT_TX_PMAC_OCT];
+ 	mac_stats->FramesWithDeferredXmissions =
+ 		lan966x->stats[idx + SYS_COUNT_TX_MM_HOLD];
+-	mac_stats->LateCollisions = 0;
+-	mac_stats->FramesAbortedDueToXSColls = 0;
+-	mac_stats->FramesLostDueToIntMACXmitError = 0;
+-	mac_stats->CarrierSenseErrors = 0;
+ 	mac_stats->OctetsReceivedOK =
+ 		lan966x->stats[idx + SYS_COUNT_RX_OCT];
+-	mac_stats->FramesLostDueToIntMACRcvError = 0;
+ 	mac_stats->MulticastFramesXmittedOK =
+ 		lan966x->stats[idx + SYS_COUNT_TX_MC] +
+ 		lan966x->stats[idx + SYS_COUNT_TX_PMAC_MC];
+ 	mac_stats->BroadcastFramesXmittedOK =
+ 		lan966x->stats[idx + SYS_COUNT_TX_BC] +
+ 		lan966x->stats[idx + SYS_COUNT_TX_PMAC_BC];
+-	mac_stats->FramesWithExcessiveDeferral = 0;
+ 	mac_stats->MulticastFramesReceivedOK =
+ 		lan966x->stats[idx + SYS_COUNT_RX_MC];
+ 	mac_stats->BroadcastFramesReceivedOK =
+-- 
+2.45.2
 
-The commit message there mentions:
-
-    There is an implication with rcu_barrier() with this patch. Since the
-    kfree_rcu() calls can be batched, and may not be handed yet to the RCU
-    machinery in fact, the monitor may not have even run yet to do the
-    queue_rcu_work(), there seems no easy way of implementing rcu_barrier()
-    to wait for those kfree_rcu()s that are already made. So this means a
-    kfree_rcu() followed by an rcu_barrier() does not imply that memory will
-    be freed once rcu_barrier() returns.
-
-Before that, a kfree_rcu() used to just add a normal call_rcu() into the
-list, but with the function offset < 4096 as a special marker. So the
-kfree_rcu() calls would be treated alongside the other call_rcu() ones
-and thus affected by rcu_barrier(). Looks like that behavior is no more
-since this commit.
-
-Rather than getting rid of the batching, which seems good for
-efficiency, I wonder if the right fix to this would be adding a
-`should_destroy` boolean to kmem_cache, which kmem_cache_destroy() sets
-to true. And then right after it checks `if (number_of_allocations == 0)
-actually_destroy()`, and likewise on each kmem_cache_free(), it could
-check `if (should_destroy && number_of_allocations == 0)
-actually_destroy()`. This way, the work is delayed until it's safe to do
-so. This might also mitigate other lurking bugs of bad code that calls
-kmem_cache_destroy() before kmem_cache_free().
-
-Jason
 
