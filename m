@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-103027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2722E905FDE
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 03:00:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 523AE905FDF
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 03:00:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31378284110
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2CF7B213D3
 	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 01:00:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9CC7B646;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D76E0AD5B;
 	Thu, 13 Jun 2024 01:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lx54w+3u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cIV9YnqU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED7A3D62;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED4D20E3;
 	Thu, 13 Jun 2024 01:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718240431; cv=none; b=RWiyaC12KBn2rqtgwNRU0S+oSeP+PCJZG/uYqs9f0BsH/3VEm7Oxnq0i3gS3fAUVlf8uC99mH8/nBhG763RtmAkZaA2q3jBruiYDidWB4uJXTF2bFjE4EQ4iq07sJ93RmebzdgisAcfpHVvGz1tiYFSezZn+qK6uyd0xBV+kXgI=
+	t=1718240431; cv=none; b=NQ+gSfnIXbHGpv5D0buFtfBC++ChymIF6dWTQVvAV42JzCLFGoHc2c68YUK4B2lnH2hpuSik2T0B7XYIi99UDKh22hkDLIjIdeQyVGp0UhOUFNMeus5qtatnxDgyJuYWFZy6WOhyae5gV7xRm6FliXF/xjhjkS11QQ0mS58lrqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718240431; c=relaxed/simple;
-	bh=snrbHhwkywdB2nwXGFUJFLEdtmurn2wUbZ9Ec4+DStY=;
+	bh=A90udtY5N2r40p7F+o+B46r7+DdZME9ofup2TjtLCow=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CoB0TXcDBcXZnR6czK3XD6K8LPvE6B9ZriHoVeYTSKqmpcg7gNc0gG0D+5T52zaq7U3JS/oBp+lo/79QKftTOUNZWTiiKgOjvK165BxblWi8cLaXwShjRJJK+i0aF8B02cUlJUUOwCSBhmRipBf9IakVdLinP4e/SoBwqGXgePk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lx54w+3u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DF286C4AF1C;
-	Thu, 13 Jun 2024 01:00:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=QSm0ghOguSggbLlta3Dy4Ylf7hLZlwnp7MW33rYfXnu0mcULs2EIYIMRL6UrEYHipL1YSNnEw6zv/ZGcO0UTp8+NEOkcgxH3h9QCOGr97vNwgwKb+dDLaVcZO6wq5jNbW1BL17xY7cE2Vg3b2evq16DqPrL9LuCSPerdS72SDlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cIV9YnqU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 51F7CC4AF54;
+	Thu, 13 Jun 2024 01:00:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718240431;
-	bh=snrbHhwkywdB2nwXGFUJFLEdtmurn2wUbZ9Ec4+DStY=;
+	bh=A90udtY5N2r40p7F+o+B46r7+DdZME9ofup2TjtLCow=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Lx54w+3ueWNlFTqNtmfevTgllHnk3novugFC6UoRH/qLcf2Mhf/VfUkIIGc7lXPu9
-	 d4TzmIMRiohgP80fAQSMlflTDwRz1arq/NuWX2aFtNqRN6FicjEa8hjSuPOMsyxMyD
-	 8ob7zSzlRl7LqV3ttKxDaPQH+cs0KpfSzFtD1v9qhaTaE+IRxoh2G1yMxgFU6TTLjo
-	 oZQRid0KAa1yk+U8kQDtjuaCjUvrR2xDxiMC0m9rMS7zeSTsPiFCf6UtyrFc5MttOo
-	 KkSpxXPJGPEPh/SwVdoL15/nkoQgfLIZNpwZ1KveRDTfJyu0epOik8YVorBTx0htHt
-	 w/uqKC27VN3UA==
+	b=cIV9YnqU0Fetft+Iy7/EqPcRFVN5LthTleLM43LfB6NqCWVVR7AENsWDgUYeG78pN
+	 v4Dk9iQoywLI0WfkVlzStU4Xmt03+6viYsWaiDa32FzBi+SoksJcFfxHE+YFav9tS0
+	 Inh/67YRR2tirdiNV+1snTGe9eis941fvfkNm6ewKMcQhDgPxspNlLHdoi/Xbm1Q4h
+	 AwP8kWs1V0QN0gkDRm3Cprqs+oENyZd4tMTNNvbdh77s82r25ZiBZS9m4zpWQKLDEa
+	 +lsHWG6LtFp+GEtv7kFLekOpT4XjAepYAiFyCOPiGNjm8HJK/XL+NXUvJ51+VyReKc
+	 E+tzQjqHYHMJQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CC45FC43613;
-	Thu, 13 Jun 2024 01:00:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 452EEC43613;
+	Thu, 13 Jun 2024 01:00:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next] MAINTAINERS: mailmap: Update Stanislav's email
- address
+Subject: Re: [PATCH net-next v6] net: ethernet: mtk_eth_soc: ppe: add support for
+ multiple PPEs
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171824043083.29237.5483891725659346711.git-patchwork-notify@kernel.org>
-Date: Thu, 13 Jun 2024 01:00:30 +0000
-References: <20240612225334.41869-1-sdf@google.com>
-In-Reply-To: <20240612225334.41869-1-sdf@google.com>
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
- haoluo@google.com, jolsa@kernel.org
+ <171824043128.29237.10490597706474690291.git-patchwork-notify@kernel.org>
+Date: Thu, 13 Jun 2024 01:00:31 +0000
+References: <20240607082155.20021-1-eladwf@gmail.com>
+In-Reply-To: <20240607082155.20021-1-eladwf@gmail.com>
+To: Elad Yifee <eladwf@gmail.com>
+Cc: daniel@makrotopia.org, nbd@nbd.name, sean.wang@mediatek.com,
+ Mark-MC.Lee@mediatek.com, lorenzo@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ linux@armlinux.org.uk, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 
 Hello:
 
-This patch was applied to bpf/bpf.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 12 Jun 2024 15:53:29 -0700 you wrote:
-> Moving to personal address for upstream work.
+On Fri,  7 Jun 2024 11:21:50 +0300 you wrote:
+> Add the missing pieces to allow multiple PPEs units, one for each GMAC.
+> mtk_gdm_config has been modified to work on targted mac ID,
+> the inner loop moved outside of the function to allow unrelated
+> operations like setting the MAC's PPE index.
+> Introduce a sanity check in flow_offload_replace to account for
+> non-MTK ingress devices.
+> Additional field 'ppe_idx' was added to struct mtk_mac in order
+> to keep track on the assigned PPE unit.
 > 
-> Signed-off-by: Stanislav Fomichev <sdf@google.com>
-> ---
->  .mailmap    | 1 +
->  MAINTAINERS | 2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
+> [...]
 
 Here is the summary with links:
-  - [bpf-next] MAINTAINERS: mailmap: Update Stanislav's email address
-    https://git.kernel.org/bpf/bpf/c/26ba7c3f139f
+  - [net-next,v6] net: ethernet: mtk_eth_soc: ppe: add support for multiple PPEs
+    https://git.kernel.org/netdev/net-next/c/dee4dd10c79a
 
 You are awesome, thank you!
 -- 
