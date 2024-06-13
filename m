@@ -1,310 +1,172 @@
-Return-Path: <netdev+bounces-103259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0DC5907500
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:18:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30F06907517
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 16:21:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 545B1287C55
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:18:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A114C1F214F2
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 14:21:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E77A4145B2F;
-	Thu, 13 Jun 2024 14:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E930B145A05;
+	Thu, 13 Jun 2024 14:21:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tLfBRN3D"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sYTEzPrM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69330145A1A
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 14:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5482E145A11
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 14:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718288321; cv=none; b=CtwDjN94XE+jW7gtPJBdU7aHCyoOMvL76FDVm8R2K9Ivxv6ddypJT6G5OR+rOhFkKmSIEfdHt1BY0NiL6UGs5QddatDECEIPflyDhnljwnSZkyEFqUYf86VOkCtA9ej8n9NbY8KBnBiOyl3oY7A40qCq2Ny+r4vnBOdujy/RHD0=
+	t=1718288490; cv=none; b=UiasaRK50Fnfq4gOiECVw80QZctfmynqWPKDd1slz4V9i8SWWFJWjNEU84CLlPOysCRplJeiyGTP1P6bmc9HNP/dPY7COhUR1v9vdT26VbIbZ4SSdx7WgHLW8cx44+WHLDwr6uVzpJbe7OHh5/EMknW2ZgQJ3Zk2YDvQibCn7Eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718288321; c=relaxed/simple;
-	bh=85JEwVuIKe/KftRkpLke8Aoka5Lgv+YCkT+qp2fOU5U=;
+	s=arc-20240116; t=1718288490; c=relaxed/simple;
+	bh=aG5jGCB1iABIl8CtNw5VnBcyqvabphYCjqoQwNwdImI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DBz5h6lliVlX0rd1fiVubCmUUdOtgBr7SXonTZ3GCtx6Te0c/NdD0wXgGQEVHuFBOExv5d3HiiHeUgHzqrEh9QaK1E+Vlb+yYCXqfQIfj5kxKlz0g3XtqMCnzp+yvTZMbgCt1P/e0DJgKyTBQeUm4fdf0YRAWPtsAUZv2kd1Pm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tLfBRN3D; arc=none smtp.client-ip=209.85.208.42
+	 To:Cc:Content-Type; b=XNrxPLhf7aYewTlT6LTUB3RUJMevpWUS6dKyH8fuBgVAuyF4L0jSL77+yvyb1sg6SgirPmkgE4sE+woJTTHz3k1GGyODkJIKpaFihVepczZ34t+bi644IQregFTDuMNY1r3i1g+Q4X9v77+vwamq/nuFVl5jC2jgF/JvZud4sPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sYTEzPrM; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5751bcb3139so1152706a12.1
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 07:18:39 -0700 (PDT)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-57c5ec83886so13652a12.1
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 07:21:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718288318; x=1718893118; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1718288488; x=1718893288; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2wBzmun2RrCaRgPyNcy89ODI4aX7kCqGzkCYxhF3xnY=;
-        b=tLfBRN3Dc1oy1HFX8sK76unqXkHeH+h9HBReZv3Q03XfyneTzXEpmxqZuXj3OJpMJs
-         /cF+4VNYMJLhFVe01YGDWuPfin/BkU6gr7jT22cQg9tglgb8YhZXhfcOZkPytPNegntY
-         Kn9udAXQrzL8npscipfJvALpRmhC8t5rlmdbjb4FkIaeeBGNhGvs4xGiTsmxECEObLuO
-         0ynMDUeaBMEdjP0eUpR0/VFW69fM9H/H/3Xpsz7l5vmq1LdHU5MXpkFwpFF6FuVVQvL5
-         6I8pclo/9YZxE0ZqnUd2Pe6I7H9WOhxFVpEB4yRowEmIBTQTokXlP0jePi3B0o5E35RY
-         18dA==
+        bh=pOn7hiM8kuTAVwrSuZ2ykZPt8TnaEO51DR1HZvc1lh4=;
+        b=sYTEzPrMqvRMzzZuYcLjTzj9AUPJmIV0emCpuYrAkkIL1DgcVHH4ChQsxqA7F4S8RZ
+         hbxa9DiDkkTWQqLT/VhDunVoS11OiMj09eBBNRf8kcq7SuyWw/SSoTSTCfjJqiRi8uJp
+         baBeJvla2Gz8ot7mZp3b2uDObMIDvK36IFKsFw2NUJYXJNUhuN3hskhPHdYx/kZk5Jgi
+         oJX8dF2T3XSS73Ew1L6LRA4Gdbx2cm/6moB1/AL+Scdz5w7HvmbGj4z1WXuIzN5Sietc
+         XMrQKxW4r7f6jCNavWJp0ewANOWNqf4/Zi2/lSiZA5Qv9bVxybksTbp47EJjNNthNy4K
+         bc+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718288318; x=1718893118;
+        d=1e100.net; s=20230601; t=1718288488; x=1718893288;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2wBzmun2RrCaRgPyNcy89ODI4aX7kCqGzkCYxhF3xnY=;
-        b=YeESSGWwlDeOWLDgks7/aK9fld+ihGm2TEgP6ZTy62FTn8E6eM+2bhkTDFWUvRl5VY
-         Crv09rnaE5ryklOuLYZtxJycL573BfxKGqTeWU2qXyyK5ZTsVcxzKso76HORCHD1eeoG
-         hP8FxWc2C1SuGXa7T1yM+i7S74habRAMkBqhYrYFGbD/TgpKtGeqp9Q3rkMfV+dm5gbX
-         kG0VE8+4rhe/9VxMOBNa2r6dc052MHpaZ3JDihuI4IpI7V9aXOz/gCYB532yRimBJvCq
-         bcysEdMv1GzzCDR0wscEUzeYsDxTFMnTk8pB+YyM+84T5F5gYALCTXxcjf48hp69Yj4/
-         svIw==
-X-Gm-Message-State: AOJu0Yy3c2EkbIgyiIUaLADIB0AJuN5hy6fYhB1e0bHxgttGpt9BH2OS
-	55vCfj7j1eoFGXSmRLLxenGgWaO4QCaxoi2EkpH4lypraxUbS4rnguTGrq9I9cmSBa5d+Yka/Hj
-	UoIFP27Uy3sKc9zATL5e1rbJfjbbxEUarMisz
-X-Google-Smtp-Source: AGHT+IGGR91TbvvdCO5M/lcoYEexAy68BO6MkHDSEDuQZJK4BYVHQSKOXB6UDTw4lBZYreUPv3qYPyzkPkZtS6UL4po=
-X-Received: by 2002:a17:907:94d1:b0:a6f:4bd5:16bb with SMTP id
- a640c23a62f3a-a6f4bd51782mr329005366b.56.1718288317233; Thu, 13 Jun 2024
- 07:18:37 -0700 (PDT)
+        bh=pOn7hiM8kuTAVwrSuZ2ykZPt8TnaEO51DR1HZvc1lh4=;
+        b=PxvA/TLekPthz4GAlG/0ibDmYbyG9VB8C86hsxh0vEwLaS4w8winnSdpdLf2kEVP1y
+         ZWfCvZ9zrQBsJ2IS3li9r9W9GvwNU0Ap5qF25Kd6MY8d7Gdg4RhtPeRk+aA2R5Cp5zNz
+         5Azxm6LxmT2/JnxhF7K7VXXSWBGr7HQpn7RSorauqUjZCBCddHaImpcW5XaZ3Q+Q5z/W
+         vVIiS1lL6eE9CD+GGOtHsjaB8ESfpyRgjulq6+CL5mTBSt1zbtitJlN3HReCYUlr6rLt
+         Gx5LHGNpOOOimvABFUbkP24ObPMeiaZVRohmxpijdxGTrs6BMQ00nvXZ5vWX5Fo03pp6
+         WMhg==
+X-Gm-Message-State: AOJu0YxPns669HTzNaQ9IhXz6RhsojxBUuiuV1bQJTNqd4Ba5QFzZGFB
+	v1vXVBPUH6MiGMKwWsSmEpDl55S8Jmwve+JlvFBpKGxgWb/q+XVohofJusMPrBSSBk252MIT6MM
+	yo9KEUUWY4C/kB8b26n4i5g4uCWLk4hb6WjKNLTWKii4vZneIfsoq
+X-Google-Smtp-Source: AGHT+IE0enr0hZ6HvjI1+ygD4KomBwNaa+/zEmSRvxMnqImakgZMM2Fr2OfOhWrdmFIl4VUBa6yQXtxXeTdt35/dckM=
+X-Received: by 2002:a05:6402:40c4:b0:57c:9853:589f with SMTP id
+ 4fb4d7f45d1cf-57cb58f33acmr293977a12.2.1718288487435; Thu, 13 Jun 2024
+ 07:21:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240613013557.1169171-1-almasrymina@google.com>
- <20240613013557.1169171-6-almasrymina@google.com> <322e7317-61dc-4f1e-8706-7db6f5f7a030@bp.renesas.com>
-In-Reply-To: <322e7317-61dc-4f1e-8706-7db6f5f7a030@bp.renesas.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 13 Jun 2024 07:18:23 -0700
-Message-ID: <CAHS8izO6T-CSgdfGFw8nMu1EMLz7ZOa_t9v+YCO8jXEM_=iT7A@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 05/13] page_pool: convert to use netmem
-To: Paul Barker <paul.barker.ct@bp.renesas.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Sergey Shtylyov <s.shtylyov@omp.ru>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, linux-mm@kvack.org, 
-	Matthew Wilcox <willy@infradead.org>
+References: <CANP3RGc1RG71oPEBXNx_WZFP9AyphJefdO4paczN92n__ds4ow@mail.gmail.com>
+ <20240613062927.54b15104@kernel.org>
+In-Reply-To: <20240613062927.54b15104@kernel.org>
+From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+Date: Thu, 13 Jun 2024 16:21:15 +0200
+Message-ID: <CANP3RGcovrwKpuM-o=V2OYosdb6Xyy+tRM3Qrp3pF7RctEm6LQ@mail.gmail.com>
+Subject: Re: Some sort of netlink RTM_GET(ROUTE|RULE|NEIGH) regression(?) in
+ 6.10-rc3 vs 6.9
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Linux NetDev <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 13, 2024 at 1:36=E2=80=AFAM Paul Barker
-<paul.barker.ct@bp.renesas.com> wrote:
+On Thu, Jun 13, 2024 at 3:29=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> On 13/06/2024 02:35, Mina Almasry wrote:
-> > Abstrace the memory type from the page_pool so we can later add support
+> On Thu, 13 Jun 2024 14:18:41 +0200 Maciej =C5=BBenczykowski wrote:
+> > The Android net tests
+> > (available at https://cs.android.com/android/platform/superproject/main=
+/+/main:kernel/tests/net/test/
+> > more specifically multinetwork_test.py & neighbour_test.py)
+> > run via:
+> >   /...aosp-tests.../net/test/run_net_test.sh --builder
+> > from within a 6.10-rc3 kernel tree are falling over due to a *plethora*=
+ of:
+> >   TypeError: NLMsgHdr requires a bytes object of length 16, got 4
+> >
+> > The problems might be limited to RTM_GETROUTE and RTM_GETRULE and RTM_G=
+ETNEIGH,
+> > as various other netlink using xfrm tests appear to be okay...
+> >
+> > (note: 6.10-rc3 also fails to build for UML due to a buggy bpf change,
+> > but I sent out a 1-line fix for that already:
+> > https://patchwork.kernel.org/project/netdevbpf/patch/20240613112520.152=
+6350-1-maze@google.com/
+> > )
+> >
+> > It is of course entirely possible the test code is buggy in how it
+> > parses netlink, but it has worked for years and years...
+> >
+> > Before I go trying to bisect this... anyone have any idea what might
+> > be the cause?
+> > Perhaps some sort of change to how these dumps work? Some sort of new
+> > netlink extended errors?
 >
-> s/Abstrace/Abstract/
->
+> Take a look at commit 5b4b62a169e1 ("rtnetlink: make the "split"
+> NLM_DONE handling generic"), there may be more such workarounds missing.
 
-Thanks, will do.
+Ok, I sent out 2 patches adding the flag in 3 more spots that are
+enough to get both tests working.
 
-> > for new memory types. Convert the page_pool to use the new netmem type
-> > abstraction, rather than use struct page directly.
-> >
-> > As of this patch the netmem type is a no-op abstraction: it's always a
-> > struct page underneath. All the page pool internals are converted to
-> > use struct netmem instead of struct page, and the page pool now exports
-> > 2 APIs:
-> >
-> > 1. The existing struct page API.
-> > 2. The new struct netmem API.
-> >
-> > Keeping the existing API is transitional; we do not want to refactor al=
-l
-> > the current drivers using the page pool at once.
-> >
-> > The netmem abstraction is currently a no-op. The page_pool uses
-> > page_to_netmem() to convert allocated pages to netmem, and uses
-> > netmem_to_page() to convert the netmem back to pages to pass to mm APIs=
-,
-> >
-> > Follow up patches to this series add non-paged netmem support to the
-> > page_pool. This change is factored out on its own to limit the code
-> > churn to this 1 patch, for ease of code review.
-> >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> >
-> > ---
-> >
-> > v12:
-> > - Fix allmodconfig build error. Very recently renesas/ravb_main.c added
-> >   a dependency on page_pool that I missed in my rebase. The dependency
-> >   calls page_pool_alloc() directly as it wants to set a custom gfp_mask=
-,
-> >   which is unique as all other drivers call a wrapper to that function.
-> >   Fix it by adding netmem_to_page() in the driver.> - Fix printing netm=
-em trace printing (Pavel).
-> >
-> > v11:
-> > - Fix typing to remove sparse warning. (Paolo/Steven)
-> >
-> > v9:
-> > - Fix sparse error (Simon).
-> >
-> > v8:
-> > - Fix napi_pp_put_page() taking netmem instead of page to fix
-> >   patch-by-patch build error.
-> > - Add net/netmem.h include in this patch to fix patch-by-patch build
-> >   error.
-> >
-> > v6:
-> >
-> > - Rebased on top of the merged netmem_ref type.
-> >
-> > Cc: linux-mm@kvack.org
-> > Cc: Matthew Wilcox <willy@infradead.org>
-> >
-> > ---
-> >  drivers/net/ethernet/renesas/ravb_main.c |   5 +-
-> >  include/linux/skbuff_ref.h               |   4 +-
-> >  include/net/netmem.h                     |  15 ++
-> >  include/net/page_pool/helpers.h          | 120 ++++++---
-> >  include/net/page_pool/types.h            |  14 +-
-> >  include/trace/events/page_pool.h         |  30 +--
-> >  net/bpf/test_run.c                       |   5 +-
-> >  net/core/page_pool.c                     | 304 ++++++++++++-----------
-> >  net/core/skbuff.c                        |   8 +-
-> >  9 files changed, 305 insertions(+), 200 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/eth=
-ernet/renesas/ravb_main.c
-> > index c1546b916e4ef..093236ebfeecb 100644
-> > --- a/drivers/net/ethernet/renesas/ravb_main.c
-> > +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> > @@ -303,8 +303,9 @@ ravb_alloc_rx_buffer(struct net_device *ndev, int q=
-, u32 entry, gfp_t gfp_mask,
-> >
-> >       rx_buff =3D &priv->rx_buffers[q][entry];
-> >       size =3D info->rx_buffer_size;
-> > -     rx_buff->page =3D page_pool_alloc(priv->rx_pool[q], &rx_buff->off=
-set,
-> > -                                     &size, gfp_mask);
-> > +     rx_buff->page =3D netmem_to_page(page_pool_alloc(priv->rx_pool[q]=
-,
-> > +                                                    &rx_buff->offset,
-> > +                                                    &size, gfp_mask));
-> >       if (unlikely(!rx_buff->page)) {
-> >               /* We just set the data size to 0 for a failed mapping wh=
-ich
-> >                * should prevent DMA from happening...
->
-> [snip]
->
-> >
-> > -static inline struct page *page_pool_alloc(struct page_pool *pool,
-> > -                                        unsigned int *offset,
-> > -                                        unsigned int *size, gfp_t gfp)
-> > +static inline netmem_ref page_pool_alloc(struct page_pool *pool,
-> > +                                      unsigned int *offset,
-> > +                                      unsigned int *size, gfp_t gfp)
-> >  {
-> >       unsigned int max_size =3D PAGE_SIZE << pool->p.order;
-> > -     struct page *page;
-> > +     netmem_ref netmem;
-> >
-> >       if ((*size << 1) > max_size) {
-> >               *size =3D max_size;
-> >               *offset =3D 0;
-> > -             return page_pool_alloc_pages(pool, gfp);
-> > +             return page_pool_alloc_netmem(pool, gfp);
-> >       }
-> >
-> > -     page =3D page_pool_alloc_frag(pool, offset, *size, gfp);
-> > -     if (unlikely(!page))
-> > -             return NULL;
-> > +     netmem =3D page_pool_alloc_frag_netmem(pool, offset, *size, gfp);
-> > +     if (unlikely(!netmem))
-> > +             return 0;
-> >
-> >       /* There is very likely not enough space for another fragment, so=
- append
-> >        * the remaining size to the current fragment to avoid truesize
-> > @@ -140,7 +142,7 @@ static inline struct page *page_pool_alloc(struct p=
-age_pool *pool,
-> >               pool->frag_offset =3D max_size;
-> >       }
-> >
-> > -     return page;
-> > +     return netmem;
-> >  }
-> >
-> >  /**
-> > @@ -154,7 +156,7 @@ static inline struct page *page_pool_alloc(struct p=
-age_pool *pool,
-> >   * utilization and performance penalty.
-> >   *
-> >   * Return:
-> > - * Return allocated page or page fragment, otherwise return NULL.
-> > + * Return allocated page or page fragment, otherwise return 0.
-> >   */
-> >  static inline struct page *page_pool_dev_alloc(struct page_pool *pool,
-> >                                              unsigned int *offset,
-> > @@ -162,7 +164,7 @@ static inline struct page *page_pool_dev_alloc(stru=
-ct page_pool *pool,
-> >  {
-> >       gfp_t gfp =3D (GFP_ATOMIC | __GFP_NOWARN);
-> >
-> > -     return page_pool_alloc(pool, offset, size, gfp);
-> > +     return netmem_to_page(page_pool_alloc(pool, offset, size, gfp));
-> >  }
->
-> I find this API change confusing - why should page_pool_alloc() return a
-> netmem_ref but page_pool_dev_alloc() return a struct page *?
->
-> Is there any reason to change page_pool_alloc() anyway? It calls
-> page_pool_alloc_pages() or page_pool_alloc_frag() as appropriate, both
-> of which your patch already converts to wrappers around the appropriate
-> _netmem() functions. In all instances where page_pool_alloc() is called
-> in this patch, you wrap it with netmem_to_page() anyway, there are no
-> calls to page_pool_alloc() added which actually want a netmem_ref.
->
+The first in RTM_GETNEIGH seems obvious enough.
 
-The general gist is that the page_pool API is being converted to use
-netmem_ref instead of page. The existing API, which uses struct page,
-is kept around transitionally, but meant to be removed and everything
-moved to netmem.
+$ git grep rtnl_register.*RTM_GETNEIGH,
+net/core/neighbour.c:3894:      rtnl_register(PF_UNSPEC, RTM_GETNEIGH,
+neigh_get, neigh_dump_info,
+net/core/rtnetlink.c:6752:      rtnl_register(PF_BRIDGE, RTM_GETNEIGH,
+rtnl_fdb_get, rtnl_fdb_dump, 0);
+net/mctp/neigh.c:331:   rtnl_register_module(THIS_MODULE, PF_MCTP, RTM_GETN=
+EIGH,
 
-APIs that current drivers depend on, like page_pool_dev_alloc(), I've
-kept as struct page and added netmem versions when needed. APIs that
-had no external users, like page_pool_alloc(), I took the opportunity
-to move them to netmem immediately. But you recently depended on that.
+but there is also PF_BRIDGE and PF_MCTP... (though obviously the test
+doesn't care)
+(and also RTM_GETNEIGHTBL...)
 
-I thought page_pool_alloc() was an internal function to the page_pool
-not meant to be called from drivers, but the documentation actually
-mentions it. Seems like I need to keep it as page* function
-transitionally as well. I'll look into making this change you
-suggested, there is
-no needed page_pool_alloc() caller at the moment.
+The RTM_GETRULE portion of the second one seems fine too:
 
+$ git grep rtnl_register.*RTM_GETRULE
+net/core/fib_rules.c:1296:      rtnl_register(PF_UNSPEC, RTM_GETRULE,
+NULL, fib_nl_dumprule,
 
---
-Thanks,
-Mina
+but I'm less certain about the GET_ROUTE portion there-of... as
+there's a lot of hits:
+
+$ git grep rtnl_register.*RTM_GETROUTE
+net/can/gw.c:1293:      ret =3D rtnl_register_module(THIS_MODULE,
+PF_CAN, RTM_GETROUTE,
+net/core/rtnetlink.c:6743:      rtnl_register(PF_UNSPEC, RTM_GETROUTE,
+NULL, rtnl_dump_all, 0);
+net/ipv4/fib_frontend.c:1662:   rtnl_register(PF_INET, RTM_GETROUTE,
+NULL, inet_dump_fib,
+net/ipv4/ipmr.c:3162:   rtnl_register(RTNL_FAMILY_IPMR, RTM_GETROUTE,
+net/ipv4/route.c:3696:  rtnl_register(PF_INET, RTM_GETROUTE,
+inet_rtm_getroute, NULL,
+net/ipv6/ip6_fib.c:2516:        ret =3D
+rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETROUTE, NULL,
+net/ipv6/ip6mr.c:1394:  err =3D rtnl_register_module(THIS_MODULE,
+RTNL_FAMILY_IP6MR, RTM_GETROUTE,
+net/ipv6/route.c:6737:  ret =3D rtnl_register_module(THIS_MODULE,
+PF_INET6, RTM_GETROUTE,
+net/mctp/route.c:1481:  rtnl_register_module(THIS_MODULE, PF_MCTP, RTM_GETR=
+OUTE,
+net/mpls/af_mpls.c:2755:        rtnl_register_module(THIS_MODULE,
+PF_MPLS, RTM_GETROUTE,
+net/phonet/pn_netlink.c:304:    rtnl_register_module(THIS_MODULE,
+PF_PHONET, RTM_GETROUTE,
+
+It seems like maybe v4 and both mr's should be changed too?
 
