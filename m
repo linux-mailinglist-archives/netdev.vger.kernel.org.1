@@ -1,116 +1,92 @@
-Return-Path: <netdev+bounces-103360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BA7E907BA7
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 20:41:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E784907BAF
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 20:44:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E1071C2278B
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 18:41:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1CCCB23574
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 18:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B99314A09C;
-	Thu, 13 Jun 2024 18:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C56C14B94C;
+	Thu, 13 Jun 2024 18:43:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HNokVVAx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="esrro/bi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F6F130AC8;
-	Thu, 13 Jun 2024 18:40:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C7914A09C
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 18:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718304057; cv=none; b=BmuvYri4S03FeqyPp6cemQOA6IKLO7Nab4ZaOlDjfeXrec8muGULuHqqS7aTEEl0Q3Vxk6n+ZYSEP53eKUXSQ0Nl4m0zDs47jLamCQRzfZZLHWWE8F/b6qVidC7vMKUiK1fVydqI/W+NN0Szez34HXi0MMtpnuyCxhPHuyb4P3U=
+	t=1718304239; cv=none; b=Xlg6XftJPbPD9PRzoi9N3RVyD+MBs782OHAd57paY/oXXlWzS3jyukejSoYp9aabgT4HoGJ371QrwcXpSokzzAQEBQGjkXHdfpJg//wc9b6HN3xRB90iojBhvJAJDM8fZ4TLneSjzJxk5qzRYfnsTgR7/6+NcpB7BqQ35fufinc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718304057; c=relaxed/simple;
-	bh=dlNtThAMuLJ3XWCpoI7VTxxyt/1MyYvoexTmAVYy2OE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aS2gyPUvE7eGOZYASIYZ6QMs4/iXPGV+xCkQC0WBN/jBO6vF+T1xBh71rE3nXfeiDj9bpnPqHpRry7MMXx57dkwl263KudCDFl3ltXqJWjTgcIMvDvgAJBaVNTD+NmivuCj61kmR/scTE2IZdX3T7qjosr6QkWsdzW4geqC/M+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HNokVVAx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06338C2BBFC;
-	Thu, 13 Jun 2024 18:40:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718304056;
-	bh=dlNtThAMuLJ3XWCpoI7VTxxyt/1MyYvoexTmAVYy2OE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HNokVVAxZYYMWSUAKL4yoMg2IEvn+30uNAZ52QYlT5ph6gQB6bKcBnSVhcILFE70G
-	 4JxsAHhH+kbBX0I9z+89VLKBxQZHzjDsHiBBw0hmXRshhrrMTphd/Q3FwVJuWCGk0d
-	 TI0jERHgSyEBPcOmBaoR/WVONbliJCcJEzUnPEaQx4vMVt1LREyB3IgksjGIpnNnIM
-	 2bdd34Vl6xr/DMXz/MlGMvoGtBYgg1Gs7/Tuw6UgLykDL1YVrNFJUVY5MtC39kg+2C
-	 C5sN3M9yiu/jDVONNR5obFZDqu/C8pkPY7mc8W+uvrqWM5wselH5DGhjyqegqEMA/W
-	 583c3W5dhEHSw==
-Date: Thu, 13 Jun 2024 21:40:51 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Bharat Bhushan <bbhushan2@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jerinj@marvell.com,
-	lcherian@marvell.com, richardcochran@gmail.com
-Subject: Re: [net-next,v4 5/8] cn10k-ipsec: Add SA add/delete support for
- outb inline ipsec
-Message-ID: <20240613184051.GH4966@unreal>
-References: <20240612134622.2157086-1-bbhushan2@marvell.com>
- <20240612134622.2157086-6-bbhushan2@marvell.com>
+	s=arc-20240116; t=1718304239; c=relaxed/simple;
+	bh=UVmtpT7Uco6dpDC+/LW4zHgc8tDk9AOgGFpoBQBAmAc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UhEB1Xu7m4NP/6HLQxBtbKFSwagdta6SD0FF/ykaxWDgezExRBG0r7HYykUJ8o01STATtzGedtDfCnhsWewlte4lvzQnPlpYBeqXnyVC3YEsdIR6FZrM6vUcklc7ZPIVAliJOYmuFG3PjUMeODxPq5y5clCwcMtO4CT/UY/R0gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=esrro/bi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718304236;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=whtleKggswuDdZXJBktLIhnlernjsyNKrmTcF2hDT80=;
+	b=esrro/birI8XCU8ZEAfyuWsbGj74PF8IpKhJONPrbinLmlGmPJTiksqLaLYfiFys76iFW/
+	9LWd9VKlwaer+NSbXch4npEUVrI3Z3lj2pILreuwWh4URUgqwtDfHF4tWv0yXbGzgwzw6j
+	QJBlM+OAyPwgbpaf/7XT4Il267V6RGg=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-414-5kH_4_SfPr23YR9aY769Xg-1; Thu,
+ 13 Jun 2024 14:43:52 -0400
+X-MC-Unique: 5kH_4_SfPr23YR9aY769Xg-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C1C3B1956053;
+	Thu, 13 Jun 2024 18:43:50 +0000 (UTC)
+Received: from fedora-x1.redhat.com (unknown [10.22.17.127])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 425251956087;
+	Thu, 13 Jun 2024 18:43:49 +0000 (UTC)
+From: Kamal Heib <kheib@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Tariq Toukan <tariqt@nvidia.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kamal Heib <kheib@redhat.com>
+Subject: [PATCH net-next 0/3] net/mlx4_en: Use ethtool_puts/sprintf
+Date: Thu, 13 Jun 2024 14:43:30 -0400
+Message-ID: <20240613184333.1126275-1-kheib@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240612134622.2157086-6-bbhushan2@marvell.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Wed, Jun 12, 2024 at 07:16:19PM +0530, Bharat Bhushan wrote:
-> This patch adds support to add and delete Security Association
-> (SA) xfrm ops. Hardware maintains SA context in memory allocated
-> by software. Each SA context is 128 byte aligned and size of
-> each context is multiple of 128-byte. Add support for transport
-> and tunnel ipsec mode, ESP protocol, aead aes-gcm-icv16, key size
-> 128/192/256-bits with 32bit salt.
-> 
-> Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
-> ---
-> v3->v4:
->  - Added check for crypto offload (XFRM_DEV_OFFLOAD_CRYPTO)
->    Thanks "Leon Romanovsky" for pointing out
->  
-> v2->v3:
->  - Removed memset to zero wherever possible
->   (comment from Kalesh Anakkur Purayil)
->  - Corrected error hanlding when setting SA for inbound
->    (comment from Kalesh Anakkur Purayil)
->  - Move "netdev->xfrmdev_ops = &cn10k_ipsec_xfrmdev_ops;" to this patch
->    This fix build error with W=1
-> 
->  .../marvell/octeontx2/nic/cn10k_ipsec.c       | 456 ++++++++++++++++++
->  .../marvell/octeontx2/nic/cn10k_ipsec.h       | 114 +++++
->  2 files changed, 570 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-> index fc1029c17c00..892bdbde92ee 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-> @@ -336,6 +336,12 @@ static int cn10k_outb_cpt_clean(struct otx2_nic *pf)
->  	/* Set inline ipsec disabled for this device */
->  	pf->flags &= ~OTX2_FLAG_INLINE_IPSEC_ENABLED;
->  
-> +	if (!bitmap_empty(pf->ipsec.sa_bitmap, CN10K_IPSEC_OUTB_MAX_SA)) {
-> +		netdev_err(pf->netdev, "SA installed on this device\n");
-> +		mutex_unlock(&pf->ipsec.lock);
-> +		return -EBUSY;
-> +	}
+This patchset updates the mlx4_en driver to use the ethtool_puts and
+ethtool_sprintf helper functions.
 
-Sorry for not really reviewing the patches and posting some random
-comments, but this addition makes me wonder if it is correct
-design/implementation. At the stage of IPsec cleanup, all SAs should be
-removed before this call.
+Signed-off-by: Kamal Heib <kheib@redhat.com>
 
-BTW, In kernel, this type of IPsec is called "Crypto Offload" and not
-"inline ipsec".
+Kamal Heib (3):
+  net/mlx4_en: Use ethtool_puts to fill priv flags strings
+  net/mlx4_en: Use ethtool_puts to fill selftest strings
+  net/mlx4_en: Use ethtool_puts/sprintf to fill stats strings
 
-Thanks
+ .../net/ethernet/mellanox/mlx4/en_ethtool.c   | 58 +++++++------------
+ 1 file changed, 20 insertions(+), 38 deletions(-)
+
+-- 
+2.45.2
+
 
