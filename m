@@ -1,107 +1,104 @@
-Return-Path: <netdev+bounces-103149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FE2A9068D8
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:33:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C48B90692C
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:43:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E90F28477B
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:33:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA2D7286368
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1006C13DDB8;
-	Thu, 13 Jun 2024 09:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 332B0140E3C;
+	Thu, 13 Jun 2024 09:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hhVPUx1a"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="jRzSoEwM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA99C381C4;
-	Thu, 13 Jun 2024 09:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB61A13F45B
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 09:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718271203; cv=none; b=AHQqVIaBUVOduacvCW8vd1bFzFkJf2FeZ/kVZnXkvuIrWPs4my+d+BBZBBb2LGDAAwN1bt4pmcQTCVtLlQZtIX47kyuxFxVD8cI26Dr9mkWiZ7OrfT8GsUrFEc1nLO65BgGS5bohuOCzJD3qkMdtjQJj7QK9WZGHzHhxrOsSEKY=
+	t=1718271819; cv=none; b=d3YRYNdgA1GecFodaV3O3y7sN3rvTCYDesByWP86t3c2Bk1w+jdvb4dxWdXj8hqii6NDRK9T5dKz7jjDNYFxNEL3NLm2I51sgT64LWMAPpYgS9vkE9O+VNfDWa2aJl16d7Iz+0SlTnGrNHL93peAydaobDSW8T2qjXT3Pnc8gu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718271203; c=relaxed/simple;
-	bh=FWl6WVfBlpItvEzqF3u++D6qEfqM0dklJ5gklTNJdEQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SfjDEx6vNTbsVM8FuUj/eaqtwNQO1UcLrh96UenkvjahPivSvzS3N/wjufijcvpvQEEnFUkWwM/jhpfnIEFF4aBLTcaKhyg6SG0gPA+zmzHDktkDSrE4V2oetX0JieX71LAj0LZqLdtPC76KK1X8er4HtliNP6lNMErIfvoox0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hhVPUx1a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23D98C2BBFC;
-	Thu, 13 Jun 2024 09:33:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718271202;
-	bh=FWl6WVfBlpItvEzqF3u++D6qEfqM0dklJ5gklTNJdEQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hhVPUx1aTpkibvfD8f5rMYGoHBBZazMbx62UeXCIfOcCEBK2nUvKbduGu97uQP9Ir
-	 G35Ew/uYrKje4//JhHIXXqjTiAS5mEeZtXApx1ZoEODg2usu0x9CpWQtmLVv9G3UBa
-	 4SZzLj75cjVy7p+1hUVn6FSNsrGN+/ZYxdy20Yp3fRlK3ECN3XnrsnLIYqhdmNlIOh
-	 bYAuXxSovtTnDMPnNMj/5Z6mNVt8yiTW9nXilynB8rbFzy40tPwSGiF872vnhPKCRz
-	 9zo/9vBE+Zpmb58fRvsxbIuN18z3wnRfF9M+Eg0jE1T8Q+xM2kZjDchiVMLrhRhmCN
-	 JhKJo381qFn6Q==
-Message-ID: <4d79cd91-50dc-402e-a4f5-785093341efc@kernel.org>
-Date: Thu, 13 Jun 2024 11:33:13 +0200
+	s=arc-20240116; t=1718271819; c=relaxed/simple;
+	bh=BatHYllYGjnkBtAFKKiZSH/3lSxA5yVkdIv2NqNK3MY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s5pknIIiTXdpBxii7EBCFStH7F8WwVdyJe7+VMugcWIGj/chjzPTPvVoG8Emh3p59+mgXnnxf1SRpbXbr5YnvSgLUPul2Gql32/NxLEQAC3JdgOwKmkGF/Ic8RGVG5bOhvySyMz1UJPho5SDbMw8OJPTrJNZ8n8IMdpIdcmKCdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=jRzSoEwM; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=WtGeO
+	DGLtrCC2vRcOXLwl3JI1hPgIRzC2fi4ArzUZag=; b=jRzSoEwM1T6XTP1TsoN6n
+	pjCfx7wBDqvyqppzWQTT9sWL5PQdUY03p4R/CYxZmOX/PpthRPeXUZZSG5o8SYw0
+	FbPr/o5foXsm+uEYoTzquoByKOyqiGss0/spGRQJ4e5NCFZEqsFChLFNzWqbmh+F
+	PL8zNYY14aFHmPi6DcsI44=
+Received: from vm-dev.test.com (unknown [36.111.140.9])
+	by gzga-smtp-mta-g1-3 (Coremail) with SMTP id _____wBnNyApv2pmg1QMIA--.14264S3;
+	Thu, 13 Jun 2024 17:43:07 +0800 (CST)
+From: wujianguo106@163.com
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	edumazet@google.com,
+	contact@proelbtn.com,
+	pablo@netfilter.org,
+	dsahern@kernel.org,
+	pabeni@redhat.com,
+	wujianguo106@163.com,
+	Jianguo Wu <wujianguo@chinatelecom.cn>
+Subject: [PATCH net v3 0/4] fix NULL dereference trigger by SRv6 with netfilter
+Date: Thu, 13 Jun 2024 17:42:45 +0800
+Message-ID: <20240613094249.32658-1-wujianguo106@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net-next 15/15] net: Move per-CPU flush-lists to
- bpf_net_context on PREEMPT_RT.
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Daniel Bristot de Oliveira <bristot@kernel.org>,
- Boqun Feng <boqun.feng@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>,
- Eric Dumazet <edumazet@google.com>, Frederic Weisbecker
- <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
- Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
- =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Magnus Karlsson <magnus.karlsson@intel.com>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vu?=
- =?UTF-8?Q?sen?= <toke@redhat.com>, Yonghong Song <yonghong.song@linux.dev>,
- bpf@vger.kernel.org
-References: <20240612170303.3896084-1-bigeasy@linutronix.de>
- <20240612170303.3896084-16-bigeasy@linutronix.de>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20240612170303.3896084-16-bigeasy@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wBnNyApv2pmg1QMIA--.14264S3
+X-Coremail-Antispam: 1Uf129KBjvJXoW7tr47XF1DAFyUCrWDXF1UJrb_yoW8Gr1rpF
+	1rG345tF18GF13Jws3GFy0yr4YyFs5CF1Uu34avryDX3s5tFykJw4Skry2qa17u34qqrW3
+	AFy7ta1rGan8A3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRHq2ZUUUUU=
+X-CM-SenderInfo: 5zxmxt5qjx0iiqw6il2tof0z/1tbiRAz8kGVODNfP7AABs2
 
+From: Jianguo Wu <wujianguo@chinatelecom.cn>
 
+v3:
+ - move the sysctl nf_hooks_lwtunnel into the netfilter core.
+ - add CONFIG_IP_NF_MATCH_RPFILTER/CONFIG_IP6_NF_MATCH_RPFILTER
+   into selftest net/config.
+ - set selftrest scripts file mode to 755.
 
-On 12/06/2024 18.44, Sebastian Andrzej Siewior wrote:
-> The per-CPU flush lists, which are accessed from within the NAPI callback
-> (xdp_do_flush() for instance), are per-CPU. There are subject to the
-> same problem as struct bpf_redirect_info.
-> 
-> Add the per-CPU lists cpu_map_flush_list, dev_map_flush_list and
-> xskmap_map_flush_list to struct bpf_net_context. Add wrappers for the
-> access. The lists initialized on first usage (similar to
-> bpf_net_ctx_get_ri()).
-> 
-[...]
-> Reviewed-by: Toke Høiland-Jørgensen<toke@redhat.com>
-> Signed-off-by: Sebastian Andrzej Siewior<bigeasy@linutronix.de>
-> ---
->   include/linux/filter.h | 42 ++++++++++++++++++++++++++++++++++++++++++
->   kernel/bpf/cpumap.c    | 19 +++----------------
->   kernel/bpf/devmap.c    | 11 +++--------
->   net/xdp/xsk.c          | 12 ++++--------
->   4 files changed, 52 insertions(+), 32 deletions(-)
+v2:
+ - fix commit log.
+ - add two selftests.
 
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+Jianguo Wu (4):
+  seg6: fix parameter passing when calling NF_HOOK() in End.DX4 and
+    End.DX6 behaviors
+  netfilter: move the sysctl nf_hooks_lwtunnel into the netfilter core
+  selftests: add selftest for the SRv6 End.DX4 behavior with netfilter
+  selftests: add selftest for the SRv6 End.DX6 behavior with netfilter
+
+ include/net/netns/netfilter.h                 |   3 +
+ net/ipv6/seg6_local.c                         |   8 +-
+ net/netfilter/core.c                          |  13 +-
+ net/netfilter/nf_conntrack_standalone.c       |  15 -
+ net/netfilter/nf_hooks_lwtunnel.c             |  68 ++++
+ net/netfilter/nf_internals.h                  |   6 +
+ tools/testing/selftests/net/Makefile          |   2 +
+ tools/testing/selftests/net/config            |   2 +
+ .../net/srv6_end_dx4_netfilter_test.sh        | 335 +++++++++++++++++
+ .../net/srv6_end_dx6_netfilter_test.sh        | 340 ++++++++++++++++++
+ 10 files changed, 771 insertions(+), 21 deletions(-)
+ create mode 100755 tools/testing/selftests/net/srv6_end_dx4_netfilter_test.sh
+ create mode 100755 tools/testing/selftests/net/srv6_end_dx6_netfilter_test.sh
+
+-- 
+2.25.1
+
 
