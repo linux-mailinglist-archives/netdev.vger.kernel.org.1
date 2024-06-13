@@ -1,64 +1,58 @@
-Return-Path: <netdev+bounces-103416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05D46907EE9
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 00:36:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49A31907F0C
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 00:37:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C54D1F221B6
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 22:36:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DCCF1C2233F
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 22:37:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D22F14BF92;
-	Thu, 13 Jun 2024 22:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8877E14C587;
+	Thu, 13 Jun 2024 22:37:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EsZ/UpTm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="en2g38PW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56CA1411C3;
-	Thu, 13 Jun 2024 22:36:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D0814BF8B
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 22:37:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718318176; cv=none; b=GNgd9RSJw5nEeGUYoMJczyicYuD8m9tnYO12v7Tu6mGwE1vTyWcAJ6CSyMZ55nBHUea+lUiv6LVcVxzseD/DR+DLkuOqUKHG0fsFzHLvXcjCsFuvpIL090D1ndc7Vfpuj3EcZcLmbtplDyk8YlqjnK6FLwReuL4W1PPNX+ssY1Y=
+	t=1718318223; cv=none; b=hO2UFgk5YGOC/6xWnBcS17nziRKzBC2qsWMMkN2/IMHmGdnUpaMKLKTCqmONJ6shI+g3a2RPt19oNFmZldHOS8IUQjvQo6/A19qnAPIVk7f99RNZ7+g5dVyxOfZhILoP0OP6nJJE/Cl/3UABhIzjXOFZR7qwGi3cHZLNWrv7kN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718318176; c=relaxed/simple;
-	bh=tmRXKHGJ5fDdBPnMsyaNw7YI1zgFugypm9sz3cbHjFE=;
+	s=arc-20240116; t=1718318223; c=relaxed/simple;
+	bh=GbEGtyR9TKxOgkkX5baAzysu8m0trasV66GoO10/ZW4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LspTJCKkLKZbEXu4gDBk6AwBAarnatDljwkG+HYN3eR0KsRwx8YqYlEmQ/BwgmOCjaUPtf3X7G7Cl5sEZegtg/WBSUyonJGG5mLeRWINoQE9Eu01l8gCzAZgpsxroDyq8ejmXoktWz+R5kaj0jgAGjd7UAEg6DNWjtSvyvxX+Hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EsZ/UpTm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBC97C2BBFC;
-	Thu, 13 Jun 2024 22:36:14 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cdHP/TPfHCVEhIURUd3EQ4VuZGB0a+PCqMCMnusSQgmZmuSTG5pGnRYPoKK46O3ydpiF6uGScsF8UCZaxXfM2SYS7rqk3BBkaQhN4tSOatu24C8ZkKzoXVvGsYa4nRpiAH4EFiea/D+g4JN6tTVK3PC5Fm/paek3uuLA1JQtj+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=en2g38PW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 993BBC2BBFC;
+	Thu, 13 Jun 2024 22:37:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718318175;
-	bh=tmRXKHGJ5fDdBPnMsyaNw7YI1zgFugypm9sz3cbHjFE=;
+	s=k20201202; t=1718318223;
+	bh=GbEGtyR9TKxOgkkX5baAzysu8m0trasV66GoO10/ZW4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EsZ/UpTmdTpmlzJrmLGauQmNp1wqpFuK4EfgJbCcFTBaZyqMGn3p21OI1OlVtrJF7
-	 dquyLfoz0lxw8qZIU9vxm65oIvTztGQ24Q7DrCTZ/1Y3etpzBqR22fWZKB6bF12jEJ
-	 m+WbafKBGD3tf+MwsZqpyBxrll46jQF5oXJ4dOgFecK1jZ9DZWw0+r3vau9MEDxxL4
-	 JD7/ZoDKyJtiKJVW99adbE7QRrf0HvPS72Mu8SAkTvAFNmCi3qvP0hxfqj1DCFt3w6
-	 TmJNtvItpc/85a6+Mz7/RKmxZuK36tz2DZV/btow5v8YY9geRXQ1K+XHfllE578Efu
-	 SQXtedxndxwSQ==
-Date: Thu, 13 Jun 2024 15:36:14 -0700
+	b=en2g38PWdM8xDtzNnaNuwWwSJAJYLX18qfWje4GYdLa7kSsS0tCu+0fNc7Za2gKFO
+	 xXWcxW8UrwijLa4LZhTOiDbo/CIoCi+ZcsCarAc9pIq4bCzyqNwcB7kFJlpUukpjcx
+	 V46MgVsxDtY7CqCl33Wn4P+wyndEqeBfwFXjnf7j/7FeEES2ZWye4CJll9Dm/4hKvB
+	 A5rxXf5PgZYLap6wKbUKgjz43pQnJHOGYm9+1elqxRR+zg1dxJarUu9Yi1N4YRZgcG
+	 8jh/EPTrTqE7Sj7TWVFXIHZwXNBwlttHt+q2V+EiPn52rknd3GoBaysCJpQBmn6x3x
+	 QZDyykM3pgGWQ==
+Date: Thu, 13 Jun 2024 15:37:01 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: Tariq Toukan <ttoukan.linux@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, nalramli@fastly.com, Saeed Mahameed
- <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, "open
- list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>, Tariq
- Toukan <tariqt@nvidia.com>
-Subject: Re: [net-next v5 2/2] net/mlx5e: Add per queue netdev-genl stats
-Message-ID: <20240613153614.3d758093@kernel.org>
-In-Reply-To: <ZmtusKxkPzSTkMxo@LQ3V64L9R2>
-References: <20240612200900.246492-1-jdamato@fastly.com>
-	<20240612200900.246492-3-jdamato@fastly.com>
-	<0a38f58a-2b1e-4d78-90e1-eb8539f65306@gmail.com>
-	<20240613145817.32992753@kernel.org>
-	<ZmtusKxkPzSTkMxo@LQ3V64L9R2>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+ <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [PATCH net-next 0/6] mlx5 misc patches 2023-06-13
+Message-ID: <20240613153701.3316f61f@kernel.org>
+In-Reply-To: <20240613150525.1e553d10@kernel.org>
+References: <20240613210036.1125203-1-tariqt@nvidia.com>
+	<20240613150525.1e553d10@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,9 +62,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 13 Jun 2024 15:12:00 -0700 Joe Damato wrote:
-> If you have a moment could you take a look and let me know if I've
-> gotten it wrong in my explanation/walk through?
-
-No lies detected :)
+On Thu, 13 Jun 2024 15:05:25 -0700 Jakub Kicinski wrote:
+> Looks small indeed, but fair warning - please prioritize helping Joe get
+> the queue stats merged. After this one we will not be taking any mlx5
+> -next material after qstats are in :(
+                 ^^^^^
+                     until*
 
