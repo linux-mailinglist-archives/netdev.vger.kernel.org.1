@@ -1,300 +1,261 @@
-Return-Path: <netdev+bounces-103378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64080907C67
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 21:21:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EAD6C907C7B
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 21:22:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9047B23015
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 19:21:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C41EB2633F
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 19:22:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8338F158A16;
-	Thu, 13 Jun 2024 19:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89FD15534F;
+	Thu, 13 Jun 2024 19:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FtFbQyd9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BiODEcA+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 305E814E2D6
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 19:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D37C130AC8;
+	Thu, 13 Jun 2024 19:18:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718306275; cv=none; b=lXeEE2xalplpcM6o+o7q9niyw/7IwO5b2HnkPtrbWJcFiqZ/Ji9txMrGGn5LAzFWFIEB77/lbpPjXyyRNXUsW2StvyyvkoY4HsxWsfe3xIugPV023tFc5NHxvQrlW9x38Jtw8/qLuVcbOZfXQ1p10whqOfYhKK0mcXy0jlscroU=
+	t=1718306313; cv=none; b=cUkF8BEwK/d1zXFOOj0JrNMcgUhFTtFPTX6g0kOuOIURvu005N80apde3kIWezkM1P5f9dGAfDQMd8FR44IpVC871ai6w50qhRxx2qlQ6dffV1kOARMwyiT+RZK8Qt0zsacNkdQbGHYQAssMRxyQ1hq3pm2m5Hs5zUYi9r+TMDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718306275; c=relaxed/simple;
-	bh=JnrkH5FyMjsCzZIiYdt1ni9oWej36xLzQp8VsV/K6Oc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Mi5ZiVABay4BimloYMYLWA8xtaRHpRepLsD7w9fXo6MHrUh+5d0XO1oMm8fafzv83EFS+hWhzr9Fu+C4yWs/pawT6BcDKlzJbF4Gk4sPKHDKPpJS7vzYX+hmht3mK64gdNIjpe+dZA6EwyEU7r9pcwDTO/kMKUFllhfb6WsHe/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FtFbQyd9; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6b05c9db85fso7747836d6.2
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 12:17:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1718306272; x=1718911072; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U6QyinaOFJqkp/FwCYbZM2RK9dvc3sFq+NiGTtbWdDw=;
-        b=FtFbQyd9hEgyPQaFcppmnWLiclwQsmsLmNvTmXeXeMUQDRsB3XhWLi4Tzsnr+9aHYa
-         YDikcMSn9jx5SD8OgJCQB5SCm78eB4tR0K1zDf4xY1IYJMqwf1byQG8dWW3nmArFP38I
-         6z0oT+MxGOb+YLTBBs1JdUAnis210oqGTYSgo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718306272; x=1718911072;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U6QyinaOFJqkp/FwCYbZM2RK9dvc3sFq+NiGTtbWdDw=;
-        b=ZPo5fpvPEQVEnuAEni65tRPXH1Jl/tyqjLR6w5z2mJeEMAKjzCaVywHAYPjFI7Ydhj
-         bMD0P3r9A0dhERC/ZU+75pvOtMiq8vmyKzm0Fvhsdm3RsA/RDcllUU93aTV1qlNTpyXN
-         3tWmp0wuVfxxg5RY2GjFEtc4tXNmie6yv/smx3CwUYinqn1642nNyqlnQ3UP9H7LjSA8
-         sXepTDe36OV2JIi27VoMAno/CB2VMhY6aoOEIYG6jk2ZcPIZ0xRzKNBhG6LA8GGEAh2r
-         XNggX8XG/adbKFkIY6h0S/qQvvec1yx56MtiredpLCKkF8xKpwfzv4ybiap0JCUHu3pS
-         ph7A==
-X-Forwarded-Encrypted: i=1; AJvYcCU0FZTMkLdha+bCt5AzV0fyOXxzshCXi7Cx6GTDkxLZ+cXJvlawZ7iNSiWF263PCRPnhuubzASm6v9LHGRcgqyszqN9Qh6y
-X-Gm-Message-State: AOJu0YwvfAhowHN00tCgihaD/Pxo0OYSJdrgs1lIaJwJB2P8iJuZoD/v
-	qYRCery/5BwLcYx4pO3sSYA1YKPUuanFoGGGUPAYHl9N6g2mBQd8w6imwbRq5g==
-X-Google-Smtp-Source: AGHT+IEhHo4/bVvLX5CCRFwAPWXs+0Q6azIN2QMKWV00z/494lBSBlAsOpG3aNUM+fwFk0Vdxltj4A==
-X-Received: by 2002:a05:6214:cab:b0:6b0:6443:7fcb with SMTP id 6a1803df08f44-6b2afc793b7mr7504386d6.10.1718306272057;
-        Thu, 13 Jun 2024 12:17:52 -0700 (PDT)
-Received: from amakhalov-build-vm.eng.vmware.com ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b2a5eb47f6sm9714106d6.82.2024.06.13.12.17.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jun 2024 12:17:51 -0700 (PDT)
-From: Alexey Makhalov <alexey.makhalov@broadcom.com>
-To: linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	bp@alien8.de,
-	hpa@zytor.com,
-	dave.hansen@linux.intel.com,
-	mingo@redhat.com,
-	tglx@linutronix.de
-Cc: x86@kernel.org,
-	netdev@vger.kernel.org,
-	richardcochran@gmail.com,
-	linux-input@vger.kernel.org,
-	dmitry.torokhov@gmail.com,
-	zackr@vmware.com,
-	linux-graphics-maintainer@vmware.com,
-	pv-drivers@vmware.com,
-	timothym@vmware.com,
-	akaher@vmware.com,
-	dri-devel@lists.freedesktop.org,
-	daniel@ffwll.ch,
-	airlied@gmail.com,
-	tzimmermann@suse.de,
-	mripard@kernel.org,
-	maarten.lankhorst@linux.intel.com,
-	horms@kernel.org,
-	kirill.shutemov@linux.intel.com,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Tim Merrifield <tim.merrifield@broadcom.com>
-Subject: [PATCH v11 8/8] x86/vmware: Add TDX hypercall support
-Date: Thu, 13 Jun 2024 12:16:50 -0700
-Message-Id: <20240613191650.9913-9-alexey.makhalov@broadcom.com>
-X-Mailer: git-send-email 2.39.4
-In-Reply-To: <20240613191650.9913-1-alexey.makhalov@broadcom.com>
-References: <20240613191650.9913-1-alexey.makhalov@broadcom.com>
+	s=arc-20240116; t=1718306313; c=relaxed/simple;
+	bh=0dUoIERvha84Ttm88+VYuMJSLvLnVGmZhewF3c9D9Ps=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L7sU2irM7vE6izDa99CtBzZfydBxC4isGPgwGrIYmTWlMeHj4XbtG6ZFmw2/TpY6fLNF6gRXevUJA0xwTQqnpfLIaDvrvDWuAN1k19vp/91R6vAhkRWXn41eXv5YS5saiQwdTgTrzkXH2Wv0cvHJoLDmOUPvNm2e8PJ3QSnQRjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BiODEcA+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90473C2BBFC;
+	Thu, 13 Jun 2024 19:18:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718306313;
+	bh=0dUoIERvha84Ttm88+VYuMJSLvLnVGmZhewF3c9D9Ps=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BiODEcA+596m57waePRbr913TZX70bGwTVw2U5cJow/u7yy3sF6R2rIlvUrh+qb2f
+	 TcdMkIQhP4yRqZPODt5+ZhhoESIkGBCi4njvMtRkhzTjrrR1hZuStkxs0VpIkm2uYj
+	 8zRoIcad7KwuZMVgmpERwGErcraSzkmsweD4f5EAJXXFK6lyM0ISNarP9ZOw1aMhrJ
+	 V2oNjlo+fhM/YdcYWZ8WZIHYJ+Ko5I6NQfAR6kum2OGlYXDsPqO7QqXgpkUPyAFb4+
+	 8Yeg5tEOuSzNF3D437mE5IOh8SqDhmlzOz8xMFJZSSL0PtlFQylD4tnTAywoGj0faz
+	 jx19BE/xTN7mg==
+Date: Thu, 13 Jun 2024 22:18:28 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Omer Shpigelman <oshpigelman@habana.ai>
+Cc: linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	ogabbay@kernel.org, zyehudai@habana.ai
+Subject: Re: [PATCH 11/15] RDMA/hbl: add habanalabs RDMA driver
+Message-ID: <20240613191828.GJ4966@unreal>
+References: <20240613082208.1439968-1-oshpigelman@habana.ai>
+ <20240613082208.1439968-12-oshpigelman@habana.ai>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240613082208.1439968-12-oshpigelman@habana.ai>
 
-VMware hypercalls use I/O port, VMCALL or VMMCALL instructions.
-Add __tdx_hypercall path to support TDX guests.
+On Thu, Jun 13, 2024 at 11:22:04AM +0300, Omer Shpigelman wrote:
+> Add an RDMA driver of Gaudi ASICs family for AI scaling.
+> The driver itself is agnostic to the ASIC in action, it operates according
+> to the capabilities that were passed on device initialization.
+> The device is initialized by the hbl_cn driver via auxiliary bus.
+> The driver also supports QP resource tracking and port/device HW counters.
+> 
+> Signed-off-by: Omer Shpigelman <oshpigelman@habana.ai>
+> Co-developed-by: Abhilash K V <kvabhilash@habana.ai>
+> Signed-off-by: Abhilash K V <kvabhilash@habana.ai>
+> Co-developed-by: Andrey Agranovich <aagranovich@habana.ai>
+> Signed-off-by: Andrey Agranovich <aagranovich@habana.ai>
+> Co-developed-by: Bharat Jauhari <bjauhari@habana.ai>
+> Signed-off-by: Bharat Jauhari <bjauhari@habana.ai>
+> Co-developed-by: David Meriin <dmeriin@habana.ai>
+> Signed-off-by: David Meriin <dmeriin@habana.ai>
+> Co-developed-by: Sagiv Ozeri <sozeri@habana.ai>
+> Signed-off-by: Sagiv Ozeri <sozeri@habana.ai>
+> Co-developed-by: Zvika Yehudai <zyehudai@habana.ai>
+> Signed-off-by: Zvika Yehudai <zyehudai@habana.ai>
 
-No change in high bandwidth hypercalls, as only low bandwidth
-ones are supported for TDX guests.
+I afraid that you misinterpreted the "Co-developed-by" tag. All these
+people are probably touch the code and not actually sit together at
+the same room and write the code together. So, please remove the
+extensive "Co-developed-by" tags.
 
-Co-developed-by: Tim Merrifield <tim.merrifield@broadcom.com>
-Signed-off-by: Tim Merrifield <tim.merrifield@broadcom.com>
-Signed-off-by: Alexey Makhalov <alexey.makhalov@broadcom.com>
----
- arch/x86/include/asm/vmware.h | 45 +++++++++++++++++++++++++++++++
- arch/x86/kernel/cpu/vmware.c  | 51 +++++++++++++++++++++++++++++++++++
- 2 files changed, 96 insertions(+)
+It is not full review yet, but simple pass-by-comments.
 
-diff --git a/arch/x86/include/asm/vmware.h b/arch/x86/include/asm/vmware.h
-index d83444f03969..c9cf43d5ef23 100644
---- a/arch/x86/include/asm/vmware.h
-+++ b/arch/x86/include/asm/vmware.h
-@@ -18,6 +18,12 @@
-  * arg2 - Hypercall command
-  * arg3 bits [15:0] - Port number, LB and direction flags
-  *
-+ * - Low bandwidth TDX hypercalls (x86_64 only) are similar to LB
-+ * hypercalls. They also have up to 6 input and 6 output on registers
-+ * arguments, with different argument to register mapping:
-+ * %r12 (arg0), %rbx (arg1), %r13 (arg2), %rdx (arg3),
-+ * %rsi (arg4), %rdi (arg5).
-+ *
-  * - High bandwidth (HB) hypercalls are I/O port based only. They have
-  * up to 7 input and 7 output arguments passed and returned using
-  * registers: %eax (arg0), %ebx (arg1), %ecx (arg2), %edx (arg3),
-@@ -54,6 +60,12 @@
- #define VMWARE_CMD_GETHZ		45
- #define VMWARE_CMD_GETVCPU_INFO		68
- #define VMWARE_CMD_STEALCLOCK		91
-+/*
-+ * Hypercall command mask:
-+ *   bits [6:0] command, range [0, 127]
-+ *   bits [19:16] sub-command, range [0, 15]
-+ */
-+#define VMWARE_CMD_MASK			0xf007fU
- 
- #define CPUID_VMWARE_FEATURES_ECX_VMMCALL	BIT(0)
- #define CPUID_VMWARE_FEATURES_ECX_VMCALL	BIT(1)
-@@ -64,6 +76,15 @@ extern unsigned long vmware_hypercall_slow(unsigned long cmd,
- 					   u32 *out1, u32 *out2, u32 *out3,
- 					   u32 *out4, u32 *out5);
- 
-+#define VMWARE_TDX_VENDOR_LEAF 0x1af7e4909ULL
-+#define VMWARE_TDX_HCALL_FUNC  1
-+
-+extern unsigned long vmware_tdx_hypercall(unsigned long cmd,
-+					  unsigned long in1, unsigned long in3,
-+					  unsigned long in4, unsigned long in5,
-+					  u32 *out1, u32 *out2, u32 *out3,
-+					  u32 *out4, u32 *out5);
-+
- /*
-  * The low bandwidth call. The low word of %edx is presumed to have OUT bit
-  * set. The high word of %edx may contain input data from the caller.
-@@ -79,6 +100,10 @@ unsigned long vmware_hypercall1(unsigned long cmd, unsigned long in1)
- {
- 	unsigned long out0;
- 
-+	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
-+		return vmware_tdx_hypercall(cmd, in1, 0, 0, 0,
-+					    NULL, NULL, NULL, NULL, NULL);
-+
- 	if (unlikely(!alternatives_patched) && !__is_defined(MODULE))
- 		return vmware_hypercall_slow(cmd, in1, 0, 0, 0,
- 					     NULL, NULL, NULL, NULL, NULL);
-@@ -100,6 +125,10 @@ unsigned long vmware_hypercall3(unsigned long cmd, unsigned long in1,
- {
- 	unsigned long out0;
- 
-+	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
-+		return vmware_tdx_hypercall(cmd, in1, 0, 0, 0,
-+					    out1, out2, NULL, NULL, NULL);
-+
- 	if (unlikely(!alternatives_patched) && !__is_defined(MODULE))
- 		return vmware_hypercall_slow(cmd, in1, 0, 0, 0,
- 					     out1, out2, NULL, NULL, NULL);
-@@ -121,6 +150,10 @@ unsigned long vmware_hypercall4(unsigned long cmd, unsigned long in1,
- {
- 	unsigned long out0;
- 
-+	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
-+		return vmware_tdx_hypercall(cmd, in1, 0, 0, 0,
-+					    out1, out2, out3, NULL, NULL);
-+
- 	if (unlikely(!alternatives_patched) && !__is_defined(MODULE))
- 		return vmware_hypercall_slow(cmd, in1, 0, 0, 0,
- 					     out1, out2, out3, NULL, NULL);
-@@ -143,6 +176,10 @@ unsigned long vmware_hypercall5(unsigned long cmd, unsigned long in1,
- {
- 	unsigned long out0;
- 
-+	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
-+		return vmware_tdx_hypercall(cmd, in1, in3, in4, in5,
-+					    NULL, out2, NULL, NULL, NULL);
-+
- 	if (unlikely(!alternatives_patched) && !__is_defined(MODULE))
- 		return vmware_hypercall_slow(cmd, in1, in3, in4, in5,
- 					     NULL, out2, NULL, NULL, NULL);
-@@ -167,6 +204,10 @@ unsigned long vmware_hypercall6(unsigned long cmd, unsigned long in1,
- {
- 	unsigned long out0;
- 
-+	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
-+		return vmware_tdx_hypercall(cmd, in1, in3, 0, 0,
-+					    NULL, out2, out3, out4, out5);
-+
- 	if (unlikely(!alternatives_patched) && !__is_defined(MODULE))
- 		return vmware_hypercall_slow(cmd, in1, in3, 0, 0,
- 					     NULL, out2, out3, out4, out5);
-@@ -191,6 +232,10 @@ unsigned long vmware_hypercall7(unsigned long cmd, unsigned long in1,
- {
- 	unsigned long out0;
- 
-+	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
-+		return vmware_tdx_hypercall(cmd, in1, in3, in4, in5,
-+					    out1, out2, out3, NULL, NULL);
-+
- 	if (unlikely(!alternatives_patched) && !__is_defined(MODULE))
- 		return vmware_hypercall_slow(cmd, in1, in3, in4, in5,
- 					     out1, out2, out3, NULL, NULL);
-diff --git a/arch/x86/kernel/cpu/vmware.c b/arch/x86/kernel/cpu/vmware.c
-index d24ba03b30b8..708048b8a095 100644
---- a/arch/x86/kernel/cpu/vmware.c
-+++ b/arch/x86/kernel/cpu/vmware.c
-@@ -477,6 +477,57 @@ static bool __init vmware_legacy_x2apic_available(void)
- 		(eax & GETVCPU_INFO_LEGACY_X2APIC);
- }
- 
-+#ifdef CONFIG_INTEL_TDX_GUEST
-+/*
-+ * TDCALL[TDG.VP.VMCALL] uses %rax (arg0) and %rcx (arg2). Therefore,
-+ * we remap those registers to %r12 and %r13, respectively.
-+ */
-+unsigned long vmware_tdx_hypercall(unsigned long cmd,
-+				   unsigned long in1, unsigned long in3,
-+				   unsigned long in4, unsigned long in5,
-+				   u32 *out1, u32 *out2, u32 *out3,
-+				   u32 *out4, u32 *out5)
-+{
-+	struct tdx_module_args args;
-+
-+	if (!hypervisor_is_type(X86_HYPER_VMWARE)) {
-+		pr_warn_once("Incorrect usage\n");
-+		return ULONG_MAX;
-+	}
-+
-+	if (cmd & ~VMWARE_CMD_MASK) {
-+		pr_warn_once("Out of range command %lx\n", cmd);
-+		return ULONG_MAX;
-+	}
-+
-+	args.rbx = in1;
-+	args.rdx = in3;
-+	args.rsi = in4;
-+	args.rdi = in5;
-+	args.r10 = VMWARE_TDX_VENDOR_LEAF;
-+	args.r11 = VMWARE_TDX_HCALL_FUNC;
-+	args.r12 = VMWARE_HYPERVISOR_MAGIC;
-+	args.r13 = cmd;
-+	args.r15 = 0; /* CPL */
-+
-+	__tdx_hypercall(&args);
-+
-+	if (out1)
-+		*out1 = args.rbx;
-+	if (out2)
-+		*out2 = args.r13;
-+	if (out3)
-+		*out3 = args.rdx;
-+	if (out4)
-+		*out4 = args.rsi;
-+	if (out5)
-+		*out5 = args.rdi;
-+
-+	return args.r12;
-+}
-+EXPORT_SYMBOL_GPL(vmware_tdx_hypercall);
-+#endif
-+
- #ifdef CONFIG_AMD_MEM_ENCRYPT
- static void vmware_sev_es_hcall_prepare(struct ghcb *ghcb,
- 					struct pt_regs *regs)
--- 
-2.39.4
+> ---
+>  MAINTAINERS                              |   10 +
+>  drivers/infiniband/Kconfig               |    1 +
+>  drivers/infiniband/hw/Makefile           |    1 +
+>  drivers/infiniband/hw/hbl/Kconfig        |   17 +
+>  drivers/infiniband/hw/hbl/Makefile       |    8 +
+>  drivers/infiniband/hw/hbl/hbl.h          |  326 +++
+>  drivers/infiniband/hw/hbl/hbl_main.c     |  478 ++++
+>  drivers/infiniband/hw/hbl/hbl_verbs.c    | 2686 ++++++++++++++++++++++
+>  include/uapi/rdma/hbl-abi.h              |  204 ++
+>  include/uapi/rdma/hbl_user_ioctl_cmds.h  |   66 +
+>  include/uapi/rdma/hbl_user_ioctl_verbs.h |  106 +
+>  include/uapi/rdma/ib_user_ioctl_verbs.h  |    1 +
+>  12 files changed, 3904 insertions(+)
+>  create mode 100644 drivers/infiniband/hw/hbl/Kconfig
+>  create mode 100644 drivers/infiniband/hw/hbl/Makefile
+>  create mode 100644 drivers/infiniband/hw/hbl/hbl.h
+>  create mode 100644 drivers/infiniband/hw/hbl/hbl_main.c
+>  create mode 100644 drivers/infiniband/hw/hbl/hbl_verbs.c
+>  create mode 100644 include/uapi/rdma/hbl-abi.h
+>  create mode 100644 include/uapi/rdma/hbl_user_ioctl_cmds.h
+>  create mode 100644 include/uapi/rdma/hbl_user_ioctl_verbs.h
 
+<...>
+
+> +#define hbl_ibdev_emerg(ibdev, format, ...)	ibdev_emerg(ibdev, format, ##__VA_ARGS__)
+> +#define hbl_ibdev_alert(ibdev, format, ...)	ibdev_alert(ibdev, format, ##__VA_ARGS__)
+> +#define hbl_ibdev_crit(ibdev, format, ...)	ibdev_crit(ibdev, format, ##__VA_ARGS__)
+> +#define hbl_ibdev_err(ibdev, format, ...)	ibdev_err(ibdev, format, ##__VA_ARGS__)
+> +#define hbl_ibdev_warn(ibdev, format, ...)	ibdev_warn(ibdev, format, ##__VA_ARGS__)
+> +#define hbl_ibdev_notice(ibdev, format, ...)	ibdev_notice(ibdev, format, ##__VA_ARGS__)
+> +#define hbl_ibdev_info(ibdev, format, ...)	ibdev_info(ibdev, format, ##__VA_ARGS__)
+> +#define hbl_ibdev_dbg(ibdev, format, ...)	ibdev_dbg(ibdev, format, ##__VA_ARGS__)
+> +
+> +#define hbl_ibdev_emerg_ratelimited(ibdev, fmt, ...)		\
+> +	ibdev_emerg_ratelimited(ibdev, fmt, ##__VA_ARGS__)
+> +#define hbl_ibdev_alert_ratelimited(ibdev, fmt, ...)		\
+> +	ibdev_alert_ratelimited(ibdev, fmt, ##__VA_ARGS__)
+> +#define hbl_ibdev_crit_ratelimited(ibdev, fmt, ...)		\
+> +	ibdev_crit_ratelimited(ibdev, fmt, ##__VA_ARGS__)
+> +#define hbl_ibdev_err_ratelimited(ibdev, fmt, ...)		\
+> +	ibdev_err_ratelimited(ibdev, fmt, ##__VA_ARGS__)
+> +#define hbl_ibdev_warn_ratelimited(ibdev, fmt, ...)		\
+> +	ibdev_warn_ratelimited(ibdev, fmt, ##__VA_ARGS__)
+> +#define hbl_ibdev_notice_ratelimited(ibdev, fmt, ...)		\
+> +	ibdev_notice_ratelimited(ibdev, fmt, ##__VA_ARGS__)
+> +#define hbl_ibdev_info_ratelimited(ibdev, fmt, ...)		\
+> +	ibdev_info_ratelimited(ibdev, fmt, ##__VA_ARGS__)
+> +#define hbl_ibdev_dbg_ratelimited(ibdev, fmt, ...)		\
+> +	ibdev_dbg_ratelimited(ibdev, fmt, ##__VA_ARGS__)
+> +
+
+Please don't redefine the existing macros. Just use the existing ones.
+
+
+<...>
+
+> +	if (hbl_ib_match_netdev(ibdev, netdev))
+> +		ib_port = hbl_to_ib_port_num(hdev, netdev->dev_port);
+> +	else
+> +		return NOTIFY_DONE;
+
+It is not kernel coding style. Please write:
+if (!hbl_ib_match_netdev(ibdev, netdev))
+    return NOTIFY_DONE;
+
+ib_port = hbl_to_ib_port_num(hdev, netdev->dev_port);
+
+> +
+
+<...>
+
+> +static int hbl_ib_probe(struct auxiliary_device *adev, const struct auxiliary_device_id *id)
+> +{
+> +	struct hbl_aux_dev *aux_dev = container_of(adev, struct hbl_aux_dev, adev);
+> +	struct hbl_ib_aux_ops *aux_ops = aux_dev->aux_ops;
+> +	struct hbl_ib_device *hdev;
+> +	ktime_t timeout;
+> +	int rc;
+> +
+> +	rc = hdev_init(aux_dev);
+> +	if (rc) {
+> +		dev_err(&aux_dev->adev.dev, "Failed to init hdev\n");
+> +		return -EIO;
+> +	}
+> +
+> +	hdev = aux_dev->priv;
+> +
+> +	/* don't allow module unloading while it is attached */
+> +	if (!try_module_get(THIS_MODULE)) {
+
+This part makes wonder, what are you trying to do here? What doesn't work for you
+in standard driver core and module load mechanism?
+
+> +		dev_err(hdev->dev, "Failed to increment %s module refcount\n",
+> +			module_name(THIS_MODULE));
+> +		rc = -EIO;
+> +		goto module_get_err;
+> +	}
+> +
+> +	timeout = ktime_add_ms(ktime_get(), hdev->pending_reset_long_timeout * MSEC_PER_SEC);
+> +	while (1) {
+> +		aux_ops->hw_access_lock(aux_dev);
+> +
+> +		/* if the device is operational, proceed to actual init while holding the lock in
+> +		 * order to prevent concurrent hard reset
+> +		 */
+> +		if (aux_ops->device_operational(aux_dev))
+> +			break;
+> +
+> +		aux_ops->hw_access_unlock(aux_dev);
+> +
+> +		if (ktime_compare(ktime_get(), timeout) > 0) {
+> +			dev_err(hdev->dev, "Timeout while waiting for hard reset to finish\n");
+> +			rc = -EBUSY;
+> +			goto timeout_err;
+> +		}
+> +
+> +		dev_notice_once(hdev->dev, "Waiting for hard reset to finish before probing IB\n");
+> +
+> +		msleep_interruptible(MSEC_PER_SEC);
+> +	}
+
+The code above is unexpected.
+
+> +
+> +	rc = hbl_ib_dev_init(hdev);
+> +	if (rc) {
+> +		dev_err(hdev->dev, "Failed to init ib device\n");
+> +		goto dev_init_err;
+> +	}
+> +
+> +	aux_ops->hw_access_unlock(aux_dev);
+> +
+> +	return 0;
+> +
+> +dev_init_err:
+> +	aux_ops->hw_access_unlock(aux_dev);
+> +timeout_err:
+> +	module_put(THIS_MODULE);
+> +module_get_err:
+> +	hdev_fini(aux_dev);
+> +
+> +	return rc;
+> +}
+
+<...>
+
+> +static int __init hbl_ib_init(void)
+> +{
+> +	pr_info("loading driver\n");
+
+Please remove all these debug prints and leave only the necessary ones.
+
+> +
+> +	return auxiliary_driver_register(&hbl_ib_driver);
+> +}
+> +
+> +static void __exit hbl_ib_exit(void)
+> +{
+> +	auxiliary_driver_unregister(&hbl_ib_driver);
+> +
+> +	pr_info("driver removed\n");
+> +}
+> +
+> +module_init(hbl_ib_init);
+> +module_exit(hbl_ib_exit)
+
+Thanks
 
