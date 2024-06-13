@@ -1,155 +1,111 @@
-Return-Path: <netdev+bounces-103095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88D7E90649C
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:10:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 283D59064BB
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:15:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B3A31C22A41
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 07:10:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FAAB2836F1
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 07:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3751386A5;
-	Thu, 13 Jun 2024 07:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1C34F1FC;
+	Thu, 13 Jun 2024 07:15:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EqjRilcz"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="E0c/uV8r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA49137C59
-	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 07:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5515E7FB;
+	Thu, 13 Jun 2024 07:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718262634; cv=none; b=IBCfgP3nN39g+Ec1u29/ZsEQW4kDFlzOtj865Mn/uOGXJ8aRWq2jegfBKYqGvgk1FCUoYCwk84Qs7r+1v4yZmidDorFasH32C9vCklKbUmnbCDhCVAcUFeaKIqxAkWcPDNSnm1x3l8oDWPiw3aZ3nm6zkz4tngU+90txsxuR+vg=
+	t=1718262940; cv=none; b=Lur5lD1AUWVqgiMkKGy/31NNlwfe2wH539RRWj1D9QC5Fc6psT44moaNKxdBAkt2b5c5nieAA+yM++rLhLNfjUCGEVURiW6LxQ9fCf3oOkI8Z6RPIxfZME5CkrjbxaZ5G4xNraQdxlHSeteDvUwlKI+9uXCTvSRbI6ycdPWFlDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718262634; c=relaxed/simple;
-	bh=u+I1aAVj3a7n6IbIYshQj7+ph2yLn2mQWMRKJjGc/pA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bFP+5kKXV8+pqnmRiiWgtLJOj/6oQcq4a0/+uX6iDqpK/JAFN0laYMO52qVWscKDAc7YQKyqbZ6p/sJ7AGNpM3zhbbKtw7/5Mn3rv/YSFEgiTtFmRqMBVIpoc1J0+uF8tPGoozqF7riv17qVC0hJNGOGRzXlc2kSuocsBXAlBRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=EqjRilcz; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-44051a92f37so6038161cf.1
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 00:10:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1718262631; x=1718867431; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yH0AlsLpSkYHEHDI5h4LrEXxjv4o46QsFNcTAlffGK4=;
-        b=EqjRilcz9ErAU96qrEMal0/rnVxE8Bk7WTeB4yR9aBz9KownJyqxsC5/r2CuANEWbX
-         /SgIm76qH2O8XyI2J0wdwhJP6RJt52ydLOHblwJG/8XpPyxBx0PqFdguSaR4HjIG6cJV
-         R4MAshNKiLuUmwNJEtzvmhgUHjI6xT1qDSJGs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718262631; x=1718867431;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yH0AlsLpSkYHEHDI5h4LrEXxjv4o46QsFNcTAlffGK4=;
-        b=aYc6JWuruGEHsJC4SsRLqospK89SngLKrLSbX1/P1mv/xYiVp88K3Dicv3GBxmMBMN
-         GO9kl8H218mKHT+dcVbCwHbd1tDmx1YTQTOhMmV6FrWVvmKsKCrciOkwVC4wCfFXBxFX
-         bgM4FKvUiLvfK70Nz/tgvcEGVrIfxCqhIFLIxNtIH7PgDDXhwIdLRNUz2KlhpW1Z0jGl
-         tc0LcBgYbwVCUGiBJd1BovwQzwuBoYCfl0zF/AERzlXLbtvtQaz2d+kiLc3bZY116vxd
-         BescegOdW6x41NipMxNw3GEcFms25WdzutooPWRszYZ7Zsasq8RUmLoxMyfsu2LGZ9NR
-         5n7A==
-X-Gm-Message-State: AOJu0YwkRVopIOsV4w05E2ox4krLRoY3DDThTZKpM974HStMp75WXC55
-	BqPxv5aUv+oqM16TFxINx5zixP+mXi5wlH0Fl6/nPzfv2O8NG56cezl0+HCC3HFwKqbTrS58CDw
-	=
-X-Google-Smtp-Source: AGHT+IHB18P0MbmibFj13ZlZdawFtcl8Crcnz/Kp5EtDjXHjZtOxmZdLv1LZs/NCiyv96h32cmOBLA==
-X-Received: by 2002:ac8:5812:0:b0:442:1282:a40d with SMTP id d75a77b69052e-4421282a663mr323091cf.0.1718262631428;
-        Thu, 13 Jun 2024 00:10:31 -0700 (PDT)
-Received: from localhost (228.221.150.34.bc.googleusercontent.com. [34.150.221.228])
-        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-441ef4fe986sm3741271cf.33.2024.06.13.00.10.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jun 2024 00:10:31 -0700 (PDT)
-From: David Ruth <druth@chromium.org>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	marcelo.leitner@gmail.com,
-	vladbu@nvidia.com,
-	David Ruth <druth@chromium.org>,
-	syzbot+b87c222546179f4513a7@syzkaller.appspotmail.com
-Subject: [PATCH v2 net] net/sched: cls_api: fix possible infinite loop in tcf_idr_check_alloc()
-Date: Thu, 13 Jun 2024 07:10:21 +0000
-Message-ID: <20240613071021.471432-1-druth@chromium.org>
-X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
+	s=arc-20240116; t=1718262940; c=relaxed/simple;
+	bh=0KZDVCHU1ke+scOPribbRJfLeKAfVbhgKdVtbbMs45Y=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C7NACx2y+9sLtKzdonlYRUljO0sHsDAODf2HldBwSjK99MgfbxyB7E6C4HRtFOdniuFPdQe765AOcD9MjNDRZ09pql2j/Wh0E2MQ3JMWSfEQOL90IyZPox2pOVzdRIEKq9LdgMw7AXt2OKo7u/gXsqKC47WbUuATYvCf1fw/raE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=E0c/uV8r; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1718262937; x=1749798937;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0KZDVCHU1ke+scOPribbRJfLeKAfVbhgKdVtbbMs45Y=;
+  b=E0c/uV8rG2fVwqevqlQ2vJvou9G55tDTxD9RGM41aUJ37kKFIoWfwimV
+   goTTs7jQ/SsVJOHDs79M6MuEy4zy+eAgdTv1NtZbHU91ZTdixWeVydiGY
+   xU6hGcRLh+aywN50FmaMiRadaVEQZ+JtLvABS6HPzN7kh67fWakjCvzDW
+   rJ3NXnfji8LRwtdWo4eKcv64YWnIbNTQX9fiu992syaJvBNMUygDr72ik
+   61p0SJecZQp9WRNWqF8sVrz6S24YqLxMABFMWcRGl9ja8sFxcLh9oI448
+   FmkvGvP/j7eOLTXz6q8xD9OotOJDtmEkuG4hQh0eHtZKMunDsPE0giT/H
+   A==;
+X-CSE-ConnectionGUID: z6dg9MMNQnuqOU7D85zK+g==
+X-CSE-MsgGUID: h+nuc1/cQb2smCe4kcwaVw==
+X-IronPort-AV: E=Sophos;i="6.08,234,1712646000"; 
+   d="scan'208";a="27356386"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Jun 2024 00:15:35 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 13 Jun 2024 00:15:33 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Thu, 13 Jun 2024 00:15:33 -0700
+Date: Thu, 13 Jun 2024 09:15:32 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <bryan.whitehead@microchip.com>,
+	<andrew@lunn.ch>, <linux@armlinux.org.uk>, <sbauer@blackbox.su>,
+	<hmehrtens@maxlinear.com>, <lxu@maxlinear.com>, <hkallweit1@gmail.com>,
+	<edumazet@google.com>, <pabeni@redhat.com>, <wojciech.drewek@intel.com>,
+	<UNGLinuxDriver@microchip.com>, kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH net V4 2/3] net: lan743x: Support WOL at both the PHY and
+ MAC appropriately
+Message-ID: <20240613071532.tx376cehgvqjgyqx@DEN-DL-M31836.microchip.com>
+References: <20240612172539.28565-1-Raju.Lakkaraju@microchip.com>
+ <20240612172539.28565-3-Raju.Lakkaraju@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20240612172539.28565-3-Raju.Lakkaraju@microchip.com>
 
-syzbot found hanging tasks waiting on rtnl_lock [1]
+The 06/12/2024 22:55, Raju Lakkaraju wrote:
 
-A reproducer is available in the syzbot bug.
+Hi Raju,
 
-When a request to add multiple actions with the same index is sent, the
-second request will block forever on the first request. This holds
-rtnl_lock, and causes tasks to hang.
+> Prevent options not supported by the PHY from being requested to it by the MAC
+> Whenever a WOL option is supported by both, the PHY is given priority
+> since that usually leads to better power savings.
+> 
+> Fixes: e9e13b6adc338 ("lan743x: fix for potential NULL pointer dereference with bare card")
 
-Return -EAGAIN to prevent infinite looping, while keeping documented
-behavior.
+I am not sure if you run checkpatch.pl, but this gives you a warning.
+The sha has too many chars.
 
-[1]
+> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202406052200.w3zuc32H-lkp@intel.com/
 
-INFO: task kworker/1:0:5088 blocked for more than 143 seconds.
-Not tainted 6.9.0-rc4-syzkaller-00173-g3cdb45594619 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/1:0 state:D stack:23744 pid:5088 tgid:5088 ppid:2 flags:0x00004000
-Workqueue: events_power_efficient reg_check_chans_work
-Call Trace:
-<TASK>
-context_switch kernel/sched/core.c:5409 [inline]
-__schedule+0xf15/0x5d00 kernel/sched/core.c:6746
-__schedule_loop kernel/sched/core.c:6823 [inline]
-schedule+0xe7/0x350 kernel/sched/core.c:6838
-schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6895
-__mutex_lock_common kernel/locking/mutex.c:684 [inline]
-__mutex_lock+0x5b8/0x9c0 kernel/locking/mutex.c:752
-wiphy_lock include/net/cfg80211.h:5953 [inline]
-reg_leave_invalid_chans net/wireless/reg.c:2466 [inline]
-reg_check_chans_work+0x10a/0x10e0 net/wireless/reg.c:2481
+I still don't think you should add the 'Reported-by' and 'Closes' tags
+here because you introduced the issue in first V3 of this patch series.
+Because the intel robot says: "If you fix the issue in a separate
+patch/commit (i.e. not just a new version of the same patch/commit),
+kindly add following tags".
 
-Fixes: 0190c1d452a9 ("net: sched: atomically check-allocate action")
-Reported-by: syzbot+b87c222546179f4513a7@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=b87c222546179f4513a7
-Signed-off-by: David Ruth <druth@chromium.org>
----
-V1 -> V2: Moved from net-next to net, identified the change this fixes
-
- net/sched/act_api.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-index 9ee622fb1160..2520708b06a1 100644
---- a/net/sched/act_api.c
-+++ b/net/sched/act_api.c
-@@ -830,7 +830,6 @@ int tcf_idr_check_alloc(struct tc_action_net *tn, u32 *index,
- 	u32 max;
- 
- 	if (*index) {
--again:
- 		rcu_read_lock();
- 		p = idr_find(&idrinfo->action_idr, *index);
- 
-@@ -839,7 +838,7 @@ int tcf_idr_check_alloc(struct tc_action_net *tn, u32 *index,
- 			 * index but did not assign the pointer yet.
- 			 */
- 			rcu_read_unlock();
--			goto again;
-+			return -EAGAIN;
- 		}
- 
- 		if (!p) {
 -- 
-2.45.2.627.g7a2c4fd464-goog
-
+/Horatiu
 
