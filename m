@@ -1,170 +1,163 @@
-Return-Path: <netdev+bounces-103157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADB0090696A
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:55:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFCEB90697F
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 11:59:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 555DC1F235CB
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:55:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0BC11C22764
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 09:59:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 770D01411F8;
-	Thu, 13 Jun 2024 09:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C95B1411CD;
+	Thu, 13 Jun 2024 09:59:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="UASGHpkB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V5C5tJP+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336771411C2;
-	Thu, 13 Jun 2024 09:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A2D7140E22
+	for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 09:59:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718272502; cv=none; b=bxn8ppWDsvNfwdviMu0ZsdpyEE0Ds0bjFWB1HvTsYzlHj0/3PpMfoUpsQU3ox9jxH8jQSuFpDmSrqfZOliKjRJma6uFJDEI7YkIZAG5ks41tBzIsuKURiJL7bOXK2+o5Aow1CAxYiyvzRLU26BikKgD+WExUF7yMf84IHFVtyAY=
+	t=1718272759; cv=none; b=eREXe+tRKI1wK9Trjoij3gZy5BFClZBHP49cQqWdWEvQigxdITiE46IQXTKJJzOKcoDbN0sjbr3YFh1BtNtIz/L7YbkGHLNFDhV5Ot1Za+0r2VQhnGLFgNhX8ms5thWJtw3rg+sZUQcxiooXJY6s7oWYEN+Q0/sZfGURiMsOkFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718272502; c=relaxed/simple;
-	bh=XnuWg2Emch0/204csrIJ1PmV8H0Z4/Kb0XfctwfzmfE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pmscpmDmFelP0j5STxZ2Z2ae6gIHEDwrp4jlie2KTPMarFeh3MsrHqJ/gDBwSoiezFY+hcD9HEr2miOPvLUIH6YCczLsr1TaVg34lJ1VBCOloozOQgCt37fvkeUqAxDLeRyYScaT2ezDHScJUCPT8YNyd9NUTL6iA2PzaS5QC4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=UASGHpkB; arc=none smtp.client-ip=95.143.211.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
-From: Denis Arefev <arefev@swemel.ru>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
-	t=1718272488;
+	s=arc-20240116; t=1718272759; c=relaxed/simple;
+	bh=jCiq080FY8/GLZ3f85CnJwt8lnALYICND+Kr+0wWgCE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JqMD0+N1xHGGD9YD64ssEwxefyFp9ZzqP3NfjwTFjiWoDu5SO45KqihXW/i0qiS/vt6GYCEXc2i51E4ObSW0d5Hz7wZRMxeFsxCXTknJkoghVy0h1hKtSEkqPnD6VH9CoxFTV9FwkUUFCqnnd7uZ/BEl/+2t78MIKzleN3ndQTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V5C5tJP+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718272756;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=JxF9v+MgG1oJK9K0GvDYFSNk1WRmKVVkPVwWZtJ2zws=;
-	b=UASGHpkBaR6P9fcZXpMWF0YLq5RGEUYvq+MNYp3J85MYXz8EVrrWVtOPUALLMILWch8hRQ
-	gfAET9Tvo0BxyyWAjbJVQonuuQRO+LA/BO/NgeP+bXQ4GtF/htEu/mMSFRjBbLr6ZJ53mT
-	eQjArYsXZ3KR6NL1zUWnxaj7vkD5+uw=
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	virtualization@lists.linux.dev,
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V8U7PlezzDV+xaQgoC4Cin990sme5WLS2JK3q11wSEk=;
+	b=V5C5tJP+fpuNkJjkgMByMQcbQJe1ESuHoFyczZp1cJPi+0Mz5PzYq9Ie/zpDym+LpkI7Bq
+	xbjbBjldS7QXEAZUmRR4mCCDPAhn9gbDGGZGKBGTXM47mamrZNBh6C+Paf3+zrtrqCghNy
+	y7JmcgvJz572FSXtiGjFHXIBpf2cMtA=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-463-0TgEbf4qMsuYAn4dE498RQ-1; Thu,
+ 13 Jun 2024 05:59:11 -0400
+X-MC-Unique: 0TgEbf4qMsuYAn4dE498RQ-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5510019560B5;
+	Thu, 13 Jun 2024 09:59:09 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.192.157])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E389A19560AA;
+	Thu, 13 Jun 2024 09:59:02 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: yongqin.liu@linaro.org
+Cc: amit.pundir@linaro.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	inventor500@vivaldi.net,
+	jstultz@google.com,
+	jtornosm@redhat.com,
+	kuba@kernel.org,
 	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	lvc-project@linuxtesting.org
-Subject: [PATCH v2] net: missing check virtio
-Date: Thu, 13 Jun 2024 12:54:48 +0300
-Message-Id: <20240613095448.27118-1-arefev@swemel.ru>
+	pabeni@redhat.com,
+	stable@vger.kernel.org,
+	sumit.semwal@linaro.org
+Subject: Re: [PATCH] net: usb: ax88179_178a: fix link status when link is set to down/up
+Date: Thu, 13 Jun 2024 11:59:00 +0200
+Message-ID: <20240613095901.508753-1-jtornosm@redhat.com>
+In-Reply-To: <CAMSo37U3Pree8XbHNBOzNXhFAiPss+8FQms1bLy06xeMeWfTcg@mail.gmail.com>
+References: <CAMSo37U3Pree8XbHNBOzNXhFAiPss+8FQms1bLy06xeMeWfTcg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Two missing check in virtio_net_hdr_to_skb() allowed syzbot
-to crash kernels again
+Hello again,
 
-1. After the skb_segment function the buffer may become non-linear
-(nr_frags != 0), but since the SKBTX_SHARED_FRAG flag is not set anywhere
-the __skb_linearize function will not be executed, then the buffer will
-remain non-linear. Then the condition (offset >= skb_headlen(skb))
-becomes true, which causes WARN_ON_ONCE in skb_checksum_help.
+There was a problem copying the patch, sorry, here the good one:
 
-2. The struct sk_buff and struct virtio_net_hdr members must be
-mathematically related.
-(gso_size) must be greater than (needed) otherwise WARN_ON_ONCE.
-(remainder) must be greater than (needed) otherwise WARN_ON_ONCE.
-(remainder) may be 0 if division is without remainder.
-
-offset+2 (4191) > skb_headlen() (1116)
-WARNING: CPU: 1 PID: 5084 at net/core/dev.c:3303 skb_checksum_help+0x5e2/0x740 net/core/dev.c:3303
-Modules linked in:
-CPU: 1 PID: 5084 Comm: syz-executor336 Not tainted 6.7.0-rc3-syzkaller-00014-gdf60cee26a2e #0
-Hardware name: Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-RIP: 0010:skb_checksum_help+0x5e2/0x740 net/core/dev.c:3303
-Code: 89 e8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 52 01 00 00 44 89 e2 2b 53 74 4c 89 ee 48 c7 c7 40 57 e9 8b e8 af 8f dd f8 90 <0f> 0b 90 90 e9 87 fe ff ff e8 40 0f 6e f9 e9 4b fa ff ff 48 89 ef
-RSP: 0018:ffffc90003a9f338 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: ffff888025125780 RCX: ffffffff814db209
-RDX: ffff888015393b80 RSI: ffffffff814db216 RDI: 0000000000000001
-RBP: ffff8880251257f4 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000001 R12: 000000000000045c
-R13: 000000000000105f R14: ffff8880251257f0 R15: 000000000000105d
-FS:  0000555555c24380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000002000f000 CR3: 0000000023151000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ip_do_fragment+0xa1b/0x18b0 net/ipv4/ip_output.c:777
- ip_fragment.constprop.0+0x161/0x230 net/ipv4/ip_output.c:584
- ip_finish_output_gso net/ipv4/ip_output.c:286 [inline]
- __ip_finish_output net/ipv4/ip_output.c:308 [inline]
- __ip_finish_output+0x49c/0x650 net/ipv4/ip_output.c:295
- ip_finish_output+0x31/0x310 net/ipv4/ip_output.c:323
- NF_HOOK_COND include/linux/netfilter.h:303 [inline]
- ip_output+0x13b/0x2a0 net/ipv4/ip_output.c:433
- dst_output include/net/dst.h:451 [inline]
- ip_local_out+0xaf/0x1a0 net/ipv4/ip_output.c:129
- iptunnel_xmit+0x5b4/0x9b0 net/ipv4/ip_tunnel_core.c:82
- ipip6_tunnel_xmit net/ipv6/sit.c:1034 [inline]
- sit_tunnel_xmit+0xed2/0x28f0 net/ipv6/sit.c:1076
- __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
- netdev_start_xmit include/linux/netdevice.h:4954 [inline]
- xmit_one net/core/dev.c:3545 [inline]
- dev_hard_start_xmit+0x13d/0x6d0 net/core/dev.c:3561
- __dev_queue_xmit+0x7c1/0x3d60 net/core/dev.c:4346
- dev_queue_xmit include/linux/netdevice.h:3134 [inline]
- packet_xmit+0x257/0x380 net/packet/af_packet.c:276
- packet_snd net/packet/af_packet.c:3087 [inline]
- packet_sendmsg+0x24ca/0x5240 net/packet/af_packet.c:3119
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0xd5/0x180 net/socket.c:745
- __sys_sendto+0x255/0x340 net/socket.c:2190
- __do_sys_sendto net/socket.c:2202 [inline]
- __se_sys_sendto net/socket.c:2198 [inline]
- __x64_sys_sendto+0xe0/0x1b0 net/socket.c:2198
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-Found by Linux Verification Center (linuxtesting.org) with Syzkaller
-
-Signed-off-by: Denis Arefev <arefev@swemel.ru>
----
- V1 -> V2: incorrect type in argument 2
- include/linux/virtio_net.h | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-index 4dfa9b69ca8d..d1d7825318c3 100644
---- a/include/linux/virtio_net.h
-+++ b/include/linux/virtio_net.h
-@@ -56,6 +56,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 	unsigned int thlen = 0;
- 	unsigned int p_off = 0;
- 	unsigned int ip_proto;
-+	u64 ret, remainder, gso_size;
+$ git diff drivers/net/usb/ax88179_178a.c
+diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
+index 51c295e1e823..60357796be99 100644
+--- a/drivers/net/usb/ax88179_178a.c
++++ b/drivers/net/usb/ax88179_178a.c
+@@ -174,7 +174,6 @@ struct ax88179_data {
+        u32 wol_supported;
+        u32 wolopts;
+        u8 disconnecting;
+-       u8 initialized;
+ };
  
- 	if (hdr->gso_type != VIRTIO_NET_HDR_GSO_NONE) {
- 		switch (hdr->gso_type & ~VIRTIO_NET_HDR_GSO_ECN) {
-@@ -98,6 +99,16 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 		u32 off = __virtio16_to_cpu(little_endian, hdr->csum_offset);
- 		u32 needed = start + max_t(u32, thlen, off + sizeof(__sum16));
+ struct ax88179_int_data {
+@@ -327,7 +326,8 @@ static void ax88179_status(struct usbnet *dev, struct urb *urb)
  
-+		if (hdr->gso_size) {
-+			gso_size = __virtio16_to_cpu(little_endian, hdr->gso_size);
-+			ret = div64_u64_rem(skb->len, gso_size, &remainder);
-+			if (!(ret && (hdr->gso_size > needed) &&
-+						((remainder > needed) || (remainder == 0)))) {
-+				return -EINVAL;
-+			}
-+			skb_shinfo(skb)->tx_flags |= SKBFL_SHARED_FRAG;
-+		}
+        if (netif_carrier_ok(dev->net) != link) {
+                usbnet_link_change(dev, link, 1);
+-               netdev_info(dev->net, "ax88179 - Link status is: %d\n", link);
++               if (!link)
++                       netdev_info(dev->net, "ax88179 - Link status is: %d\n", link);
+        }
+ }
+ 
+@@ -1543,6 +1543,7 @@ static int ax88179_link_reset(struct usbnet *dev)
+                         GMII_PHY_PHYSR, 2, &tmp16);
+ 
+        if (!(tmp16 & GMII_PHY_PHYSR_LINK)) {
++               netdev_info(dev->net, "ax88179 - Link status is: 0\n");
+                return 0;
+        } else if (GMII_PHY_PHYSR_GIGA == (tmp16 & GMII_PHY_PHYSR_SMASK)) {
+                mode |= AX_MEDIUM_GIGAMODE | AX_MEDIUM_EN_125MHZ;
+@@ -1580,6 +1581,8 @@ static int ax88179_link_reset(struct usbnet *dev)
+ 
+        netif_carrier_on(dev->net);
+ 
++       netdev_info(dev->net, "ax88179 - Link status is: 1\n");
 +
- 		if (!pskb_may_pull(skb, needed))
- 			return -EINVAL;
+        return 0;
+ }
  
--- 
-2.25.1
+@@ -1678,12 +1681,21 @@ static int ax88179_reset(struct usbnet *dev)
+ 
+ static int ax88179_net_reset(struct usbnet *dev)
+ {
+-       struct ax88179_data *ax179_data = dev->driver_priv;
++       u16 tmp16;
+ 
+-       if (ax179_data->initialized)
++       ax88179_read_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID, GMII_PHY_PHYSR,
++                        2, &tmp16);
++       if (tmp16) {
++               ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE,
++                                2, 2, &tmp16);
++               if (!(tmp16 & AX_MEDIUM_RECEIVE_EN)) {
++                       tmp16 |= AX_MEDIUM_RECEIVE_EN;
++                       ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE,
++                                         2, 2, &tmp16);
++               }
++       } else {
+                ax88179_reset(dev);
+-       else
+-               ax179_data->initialized = 1;
++       }
+ 
+        return 0;
+ }
+
+Best regards
+José Ignacio
 
 
