@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-103596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D772908C2C
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:00:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21F8A908C2D
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:00:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 441711C22116
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:00:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 959951F27D60
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:00:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5FD19AA68;
-	Fri, 14 Jun 2024 12:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4597019AD48;
+	Fri, 14 Jun 2024 12:59:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b8rerUy8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kBcAoEKj"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBD019A29F
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 12:59:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2C019AA42
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 12:59:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718369988; cv=none; b=ebmG/PT74HSPS969r1mugG2HzF4BIyhso8dw+9IastrL1yUjOh1g7eblizE7WWhhO5rRg6CMt8+c1khBPcOLAwY5104SiNHrfk4I1H1ruBdKS2lrN/PNpdJU/vf6LjMr/kYy3UbwchD3wrbYtcBLgDwCeBLJ90eGcQjsaOc+fCw=
+	t=1718369989; cv=none; b=SVtOArKCLokVkPSAQhXYOuBl8Ddxa+f9XzVH6XwPd1oftu7kEES4cglJs00jIZyCGDkhXaA/DtiZCd36tyvCj5nE5zInHh9ucjK2MvBwAJfabdkJ7FeUqJDdCwphAIqVbv9fyUb7Y7YKlAw77NgQy5fJ6Gi9v2vwyz6YYY71l+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718369988; c=relaxed/simple;
-	bh=RQ+MF5jXB/h/fvdS2n1fU48lezgydb1YxJcS0r9H7vg=;
+	s=arc-20240116; t=1718369989; c=relaxed/simple;
+	bh=butJjsOenTRqp5wUeSWwgRsawXI79TJFRc1m/nk9FO4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WLxOoPm0CHDmVLH5RW8zX29qqT6yJKQi3mTw6FpKwmhAJ+l/Fp454v3cFtNxob7V9uXUCmFV8dfNSR9JrT2mKte05hoEXGZlpgFI0WAIjpsw0Ui+KjtxTV5+54UPTl+kng7LCkW5fRPedCbkgSYcYpGwx+AF+IPclDmjQ5ibFWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b8rerUy8; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=Y5BcodPtMpxMvuzKyuiO2Dv60GRDs3z5kkC8do6LytftoG2qGWqnyA9W6nkMwJy04GdBdrB7e7zoZU05PMdXl3CGnbeh7W+T3O7wgPDxr4pqJyDvHts4EOEdPcpanTrv5dbCzzAsCE1WlD5HEzHXWq8UZtFvXM5YYO2ses4v6Bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kBcAoEKj; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718369986; x=1749905986;
+  t=1718369987; x=1749905987;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=RQ+MF5jXB/h/fvdS2n1fU48lezgydb1YxJcS0r9H7vg=;
-  b=b8rerUy8w1ahiM55hb9xDk7yZA7ld7gGMmvXzTYbSuJxR/cxEp/nvJ5y
-   TR6NcXeS60M2eZn33YeQk+T+JeTlr64nygsGUUwvwTn7AVDPB9qvomJCG
-   LoU7dMSwe5EwaK46TAJsaxUnPkLDsb5AHaLOLwn5kLSMskkzrUjtM9N5y
-   s462rRE4U0vipJjS9b6eYE4gQ0x+KRUvseOcEbBU62VnHwZoge4uzauUR
-   EkcMd8qj845+NZMwbi+BhUU3l56zLJ/I1eYvmysIFa6ppci/YsBvlm9pZ
-   gnx2LaNTzWjY2hgPf2UztOTrDVXev44jGzRuHXhR3U5ORbTyJ3ooO93zL
-   Q==;
-X-CSE-ConnectionGUID: CqL5hbgZSpeIaKW9z6VjQg==
-X-CSE-MsgGUID: GLtgEfD4R72RFhgqWvTvSw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11103"; a="40669476"
+  bh=butJjsOenTRqp5wUeSWwgRsawXI79TJFRc1m/nk9FO4=;
+  b=kBcAoEKjzOPqFaPIxK47m2Y4Ke2Mf4LVhRo4ZFHD7hzx00KPR1qC36uJ
+   VkEx3FGdYCkJ2jv9QZOia524B+syUiN9Mufd+x5UlE4nBBR/N8eCUvdE1
+   DXb8ykO8kzv7uGyVqQ14CIHDIt1OHvyLZ7e4mfbn63QOMBJu7oXhd8xDk
+   vB1+ov2y0C0DTMLu8xxGm581GsHRJDy7zKn1A7NZR/ON5qlUM7FFMvLBT
+   QIA9wLJ+y72hmQGuAN4kGBKNjxK36XL3/xBelN/7QOP9Z6HthxX3Vry4k
+   Z+9Tfl7uuf7PssUeXj4AO9K1huPUX9Lrx2l/tNQDz/BWgUT84Hfjy9yD+
+   A==;
+X-CSE-ConnectionGUID: nImc9WezQDmwAuG8rE8N8g==
+X-CSE-MsgGUID: YYHUrx7eTQCs/yh9BXEh0Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11103"; a="40669479"
 X-IronPort-AV: E=Sophos;i="6.08,237,1712646000"; 
-   d="scan'208";a="40669476"
+   d="scan'208";a="40669479"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
   by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2024 05:59:43 -0700
-X-CSE-ConnectionGUID: 05lneK7iSJiOsxS+EuEelg==
-X-CSE-MsgGUID: /Ek4Cn5RSbGfhVMT2GwMkA==
+X-CSE-ConnectionGUID: W20u6cjbRJGh0jyNbs69Yw==
+X-CSE-MsgGUID: GexFWiY/TR2j0vOzg76dRg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,237,1712646000"; 
-   d="scan'208";a="40593811"
+   d="scan'208";a="40593819"
 Received: from c3-1-server.sj.intel.com ([10.232.18.246])
   by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2024 05:59:43 -0700
 From: Anil Samal <anil.samal@intel.com>
@@ -68,9 +68,9 @@ Cc: netdev@vger.kernel.org,
 	Anil Samal <anil.samal@intel.com>,
 	Simon Horman <horms@kernel.org>,
 	Jesse Brandeburg <jesse.brandeburg@intel.com>
-Subject: [PATCH iwl-next v3 2/3] ice: Implement driver functionality to dump fec statistics
-Date: Fri, 14 Jun 2024 05:58:16 -0700
-Message-ID: <20240614125935.900102-3-anil.samal@intel.com>
+Subject: [PATCH iwl-next v3 3/3] ice: Implement driver functionality to dump serdes equalizer values
+Date: Fri, 14 Jun 2024 05:58:17 -0700
+Message-ID: <20240614125935.900102-4-anil.samal@intel.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240614125935.900102-1-anil.samal@intel.com>
 References: <20240614125935.900102-1-anil.samal@intel.com>
@@ -82,370 +82,318 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To debug link issues in the field, it is paramount to
-dump fec corrected/uncorrected block counts from firmware.
-Firmware requires PCS quad number and PCS port number to
-read FEC statistics. Current driver implementation does
-not maintain above physical properties of a port.
+To debug link issues in the field, serdes Tx/Rx equalizer values
+help to determine the health of serdes lane.
 
-Add new driver API to derive physical properties of an input
-port.These properties include PCS quad number, PCS port number,
-serdes lane count, primary serdes lane number.
-Extend ethtool option '--show-fec' to support fec statistics.
-The IEEE standard mandates two sets of counters:
- - 30.5.1.1.17 aFECCorrectedBlocks
- - 30.5.1.1.18 aFECUncorrectableBlocks
-
-Standard defines above statistics per lane but current
-implementation supports total FEC statistics per port
-i.e. sum of all lane per port. Find sample output below
-
-FEC parameters for ens21f0np0:
-Supported/Configured FEC encodings: Auto RS BaseR
-Active FEC encoding: RS
-Statistics:
-  corrected_blocks: 0
-  uncorrectable_blocks: 0
+Extend 'ethtool -d' option to dump serdes Tx/Rx equalizer.
+The following list of equalizer param is supported
+    a. rx_equalization_pre2
+    b. rx_equalization_pre1
+    c. rx_equalization_post1
+    d. rx_equalization_bflf
+    e. rx_equalization_bfhf
+    f. rx_equalization_drate
+    g. tx_equalization_pre1
+    h. tx_equalization_pre3
+    i. tx_equalization_atten
+    j. tx_equalization_post1
+    k. tx_equalization_pre2
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
 Signed-off-by: Anil Samal <anil.samal@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_common.c  |  57 ++++
- drivers/net/ethernet/intel/ice/ice_common.h  |  24 ++
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 308 +++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_ethtool.h |  10 +
- drivers/net/ethernet/intel/ice/ice_type.h    |   8 +
- 5 files changed, 407 insertions(+)
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  51 +++++++
+ drivers/net/ethernet/intel/ice/ice_common.c   |  37 +++++
+ drivers/net/ethernet/intel/ice/ice_common.h   |   2 +
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  | 141 +++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_ethtool.h  |  19 +++
+ 5 files changed, 248 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index 9683842f8880..66f02988d549 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -1470,6 +1470,55 @@ struct ice_aqc_get_sensor_reading_resp {
+ 	} data;
+ };
+ 
++/* DNL call command (indirect 0x0682)
++ * Struct is used for both command and response
++ */
++struct ice_aqc_dnl_call_command {
++	u8 ctx; /* Used in command, reserved in response */
++	u8 reserved;
++	__le16 activity_id;
++#define ICE_AQC_ACT_ID_DNL 0x1129
++	__le32 reserved1;
++	__le32 addr_high;
++	__le32 addr_low;
++};
++
++struct ice_aqc_dnl_equa_param {
++	__le16 data_in;
++#define ICE_AQC_RX_EQU_SHIFT 8
++#define ICE_AQC_RX_EQU_PRE2 (0x10 << ICE_AQC_RX_EQU_SHIFT)
++#define ICE_AQC_RX_EQU_PRE1 (0x11 << ICE_AQC_RX_EQU_SHIFT)
++#define ICE_AQC_RX_EQU_POST1 (0x12 << ICE_AQC_RX_EQU_SHIFT)
++#define ICE_AQC_RX_EQU_BFLF (0x13 << ICE_AQC_RX_EQU_SHIFT)
++#define ICE_AQC_RX_EQU_BFHF (0x14 << ICE_AQC_RX_EQU_SHIFT)
++#define ICE_AQC_RX_EQU_DRATE (0x15 << ICE_AQC_RX_EQU_SHIFT)
++#define ICE_AQC_TX_EQU_PRE1 0x0
++#define ICE_AQC_TX_EQU_PRE3 0x3
++#define ICE_AQC_TX_EQU_ATTEN 0x4
++#define ICE_AQC_TX_EQU_POST1 0x8
++#define ICE_AQC_TX_EQU_PRE2 0xC
++	__le16 op_code_serdes_sel;
++#define ICE_AQC_OP_CODE_SHIFT 4
++#define ICE_AQC_OP_CODE_RX_EQU (0x9 << ICE_AQC_OP_CODE_SHIFT)
++#define ICE_AQC_OP_CODE_TX_EQU (0x10 << ICE_AQC_OP_CODE_SHIFT)
++	__le32 reserved[3];
++};
++
++struct ice_aqc_dnl_equa_respon {
++	/* Equalization value can be negative */
++	int val;
++	__le32 reserved[3];
++};
++
++/* DNL call command/response buffer (indirect 0x0682) */
++struct ice_aqc_dnl_call {
++	union {
++		struct ice_aqc_dnl_equa_param txrx_equa_reqs;
++		__le32 stores[4];
++		struct ice_aqc_dnl_equa_respon txrx_equa_resp;
++	} sto;
++};
++
+ struct ice_aqc_link_topo_params {
+ 	u8 lport_num;
+ 	u8 lport_num_valid;
+@@ -2573,6 +2622,7 @@ struct ice_aq_desc {
+ 		struct ice_aqc_get_link_status get_link_status;
+ 		struct ice_aqc_event_lan_overflow lan_overflow;
+ 		struct ice_aqc_get_link_topo get_link_topo;
++		struct ice_aqc_dnl_call_command dnl_call;
+ 		struct ice_aqc_i2c read_write_i2c;
+ 		struct ice_aqc_read_i2c_resp read_i2c_resp;
+ 		struct ice_aqc_get_set_tx_topo get_set_tx_topo;
+@@ -2697,6 +2747,7 @@ enum ice_adminq_opc {
+ 	ice_aqc_opc_set_phy_rec_clk_out			= 0x0630,
+ 	ice_aqc_opc_get_phy_rec_clk_out			= 0x0631,
+ 	ice_aqc_opc_get_sensor_reading			= 0x0632,
++	ice_aqc_opc_dnl_call                            = 0x0682,
+ 	ice_aqc_opc_get_link_topo			= 0x06E0,
+ 	ice_aqc_opc_read_i2c				= 0x06E2,
+ 	ice_aqc_opc_write_i2c				= 0x06E3,
 diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 03e908405874..891fabfa4bb3 100644
+index 891fabfa4bb3..9cd649053ef8 100644
 --- a/drivers/net/ethernet/intel/ice/ice_common.c
 +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -3375,6 +3375,63 @@ int ice_update_link_info(struct ice_port_info *pi)
+@@ -3375,6 +3375,43 @@ int ice_update_link_info(struct ice_port_info *pi)
  	return status;
  }
  
-+#define FEC_REG_PORT(port) {	\
-+	FEC_CORR_LOW_REG_PORT##port,		\
-+	FEC_CORR_HIGH_REG_PORT##port,	\
-+	FEC_UNCORR_LOW_REG_PORT##port,	\
-+	FEC_UNCORR_HIGH_REG_PORT##port,	\
-+}
-+
-+static const u32 fec_reg[][ICE_FEC_MAX] = {
-+	FEC_REG_PORT(0),
-+	FEC_REG_PORT(1),
-+	FEC_REG_PORT(2),
-+	FEC_REG_PORT(3)
-+};
-+
 +/**
-+ * ice_aq_get_fec_stats - reads fec stats from phy
++ * ice_aq_get_phy_equalization - function to read serdes equaliser
++ * value from firmware using admin queue command.
 + * @hw: pointer to the HW struct
-+ * @pcs_quad: represents pcsquad of user input serdes
-+ * @pcs_port: represents the pcs port number part of above pcs quad
-+ * @fec_type: represents FEC stats type
-+ * @output: pointer to the caller-supplied buffer to return requested fec stats
++ * @data_in: represents the serdes equalization parameter requested
++ * @op_code: represents the serdes number and flag to represent tx or rx
++ * @serdes_num: represents the serdes number
++ * @output: pointer to the caller-supplied buffer to return serdes equaliser
 + *
 + * Return: non-zero status on error and 0 on success.
 + */
-+int ice_aq_get_fec_stats(struct ice_hw *hw, u16 pcs_quad, u16 pcs_port,
-+			 enum ice_fec_stats_types fec_type, u32 *output)
++int ice_aq_get_phy_equalization(struct ice_hw *hw, u16 data_in, u16 op_code,
++				u8 serdes_num, int *output)
 +{
-+	u16 flag = (ICE_AQ_FLAG_RD | ICE_AQ_FLAG_BUF | ICE_AQ_FLAG_SI);
-+	struct ice_sbq_msg_input msg = {};
-+	u32 receiver_id, reg_offset;
++	struct ice_aqc_dnl_call_command *cmd;
++	struct ice_aqc_dnl_call buf = {};
++	struct ice_aq_desc desc;
 +	int err;
 +
-+	if (pcs_port > 3)
-+		return -EINVAL;
++	buf.sto.txrx_equa_reqs.data_in = cpu_to_le16(data_in);
++	buf.sto.txrx_equa_reqs.op_code_serdes_sel =
++		cpu_to_le16(op_code | (serdes_num & 0xF));
++	cmd = &desc.params.dnl_call;
++	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_dnl_call);
++	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_BUF |
++				  ICE_AQ_FLAG_RD |
++				  ICE_AQ_FLAG_SI);
++	desc.datalen = cpu_to_le16(sizeof(struct ice_aqc_dnl_call));
++	cmd->activity_id = cpu_to_le16(ICE_AQC_ACT_ID_DNL);
 +
-+	reg_offset = fec_reg[pcs_port][fec_type];
++	err = ice_aq_send_cmd(hw, &desc, &buf, sizeof(struct ice_aqc_dnl_call),
++			      NULL);
++	*output = err ? 0 : buf.sto.txrx_equa_resp.val;
 +
-+	if (pcs_quad == 0)
-+		receiver_id = FEC_RECEIVER_ID_PCS0;
-+	else if (pcs_quad == 1)
-+		receiver_id = FEC_RECEIVER_ID_PCS1;
-+	else
-+		return -EINVAL;
-+
-+	msg.msg_addr_low = lower_16_bits(reg_offset);
-+	msg.msg_addr_high = receiver_id;
-+	msg.opcode = ice_sbq_msg_rd;
-+	msg.dest_dev = rmn_0;
-+
-+	err = ice_sbq_rw_reg(hw, &msg, flag);
-+	if (err)
-+		return err;
-+
-+	*output = msg.data;
-+	return 0;
++	return err;
 +}
 +
- /**
-  * ice_cache_phy_user_req
-  * @pi: port information structure
+ #define FEC_REG_PORT(port) {	\
+ 	FEC_CORR_LOW_REG_PORT##port,		\
+ 	FEC_CORR_HIGH_REG_PORT##port,	\
 diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index 230ec034dc44..6227ec924bd2 100644
+index 6227ec924bd2..9a9ff5924070 100644
 --- a/drivers/net/ethernet/intel/ice/ice_common.h
 +++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -18,6 +18,27 @@
- #define ICE_SQ_SEND_DELAY_TIME_MS	10
- #define ICE_SQ_SEND_MAX_EXECUTE		3
- 
-+#define FEC_REG_SHIFT 2
-+#define FEC_RECV_ID_SHIFT 4
-+#define FEC_CORR_LOW_REG_PORT0 (0x02 << FEC_REG_SHIFT)
-+#define FEC_CORR_HIGH_REG_PORT0 (0x03 << FEC_REG_SHIFT)
-+#define FEC_UNCORR_LOW_REG_PORT0 (0x04 << FEC_REG_SHIFT)
-+#define FEC_UNCORR_HIGH_REG_PORT0 (0x05 << FEC_REG_SHIFT)
-+#define FEC_CORR_LOW_REG_PORT1 (0x42 << FEC_REG_SHIFT)
-+#define FEC_CORR_HIGH_REG_PORT1 (0x43 << FEC_REG_SHIFT)
-+#define FEC_UNCORR_LOW_REG_PORT1 (0x44 << FEC_REG_SHIFT)
-+#define FEC_UNCORR_HIGH_REG_PORT1 (0x45 << FEC_REG_SHIFT)
-+#define FEC_CORR_LOW_REG_PORT2 (0x4A << FEC_REG_SHIFT)
-+#define FEC_CORR_HIGH_REG_PORT2 (0x4B << FEC_REG_SHIFT)
-+#define FEC_UNCORR_LOW_REG_PORT2 (0x4C << FEC_REG_SHIFT)
-+#define FEC_UNCORR_HIGH_REG_PORT2 (0x4D << FEC_REG_SHIFT)
-+#define FEC_CORR_LOW_REG_PORT3 (0x52 << FEC_REG_SHIFT)
-+#define FEC_CORR_HIGH_REG_PORT3 (0x53 << FEC_REG_SHIFT)
-+#define FEC_UNCORR_LOW_REG_PORT3 (0x54 << FEC_REG_SHIFT)
-+#define FEC_UNCORR_HIGH_REG_PORT3 (0x55 << FEC_REG_SHIFT)
-+#define FEC_RECEIVER_ID_PCS0 (0x33 << FEC_RECV_ID_SHIFT)
-+#define FEC_RECEIVER_ID_PCS1 (0x34 << FEC_RECV_ID_SHIFT)
-+
- int ice_init_hw(struct ice_hw *hw);
- void ice_deinit_hw(struct ice_hw *hw);
- int ice_check_reset(struct ice_hw *hw);
-@@ -122,6 +143,9 @@ int
+@@ -143,6 +143,8 @@ int
  ice_get_link_default_override(struct ice_link_default_override_tlv *ldo,
  			      struct ice_port_info *pi);
  bool ice_is_phy_caps_an_enabled(struct ice_aqc_get_phy_caps_data *caps);
-+int
-+ice_aq_get_fec_stats(struct ice_hw *hw, u16 pcs_quad, u16 pcs_port,
-+		     enum ice_fec_stats_types fec_type, u32 *output);
- 
- enum ice_fc_mode ice_caps_to_fc_mode(u8 caps);
- enum ice_fec_mode ice_caps_to_fec_mode(u8 caps, u8 fec_options);
++int ice_aq_get_phy_equalization(struct ice_hw *hw, u16 data_in, u16 op_code,
++				u8 serdes_num, int *output);
+ int
+ ice_aq_get_fec_stats(struct ice_hw *hw, u16 pcs_quad, u16 pcs_port,
+ 		     enum ice_fec_stats_types fec_type, u32 *output);
 diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 4165a93ed4eb..d9c73ff550ba 100644
+index d9c73ff550ba..0d1d2b4ccee1 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -466,6 +466,221 @@ static int ice_get_regs_len(struct net_device __always_unused *netdev)
- 	return sizeof(ice_regs_dump_list);
+@@ -463,7 +463,8 @@ ice_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *drvinfo)
+ 
+ static int ice_get_regs_len(struct net_device __always_unused *netdev)
+ {
+-	return sizeof(ice_regs_dump_list);
++	return (sizeof(ice_regs_dump_list) +
++		sizeof(struct ice_regdump_to_ethtool));
+ }
+ 
+ /**
+@@ -681,6 +682,140 @@ static int ice_get_port_topology(struct ice_hw *hw, u8 lport,
+ 	return 0;
  }
  
 +/**
-+ * ice_ethtool_get_maxspeed - Get the max speed for given lport
++ * ice_get_tx_rx_equa - read serdes tx rx equaliser param
 + * @hw: pointer to the HW struct
-+ * @lport: logical port for which max speed is requested
-+ * @max_speed: return max speed for input lport
++ * @serdes_num: represents the serdes number
++ * @ptr: structure to read all serdes parameter for given serdes
 + *
-+ * Return: 0 on success, negative on failure.
++ * Return: all serdes equalization parameter supported per serdes number
 + */
-+static int ice_ethtool_get_maxspeed(struct ice_hw *hw, u8 lport, u8 *max_speed)
++static int ice_get_tx_rx_equa(struct ice_hw *hw, u8 serdes_num,
++			      struct ice_serdes_equalization_to_ethtool *ptr)
 +{
-+	struct ice_aqc_get_port_options_elem options[ICE_AQC_PORT_OPT_MAX] = {};
-+	bool active_valid = false, pending_valid = true;
-+	u8 option_count = ICE_AQC_PORT_OPT_MAX;
-+	u8 active_idx = 0, pending_idx = 0;
-+	int status;
-+
-+	status = ice_aq_get_port_options(hw, options, &option_count, lport,
-+					 true, &active_idx, &active_valid,
-+					 &pending_idx, &pending_valid);
-+	if (status)
-+		return -EIO;
-+	if (!active_valid)
-+		return -EINVAL;
-+
-+	*max_speed = options[active_idx].max_lane_speed & ICE_AQC_PORT_OPT_MAX_LANE_M;
-+	return 0;
-+}
-+
-+/**
-+ * ice_is_serdes_muxed - returns whether serdes is muxed in hardware
-+ * @hw: pointer to the HW struct
-+ *
-+ * Return: true when serdes is muxed, false when serdes is not muxed.
-+ */
-+static bool ice_is_serdes_muxed(struct ice_hw *hw)
-+{
-+	u32 reg_value = rd32(hw, GLGEN_SWITCH_MODE_CONFIG);
-+
-+	return FIELD_GET(GLGEN_SWITCH_MODE_CONFIG_25X4_QUAD_M, reg_value);
-+}
-+
-+static int ice_map_port_topology_for_sfp(struct ice_port_topology *port_topology,
-+					 u8 lport, bool is_muxed)
-+{
-+	switch (lport) {
-+	case 0:
-+		port_topology->pcs_quad_select = 0;
-+		port_topology->pcs_port = 0;
-+		port_topology->primary_serdes_lane = 0;
-+		break;
-+	case 1:
-+		port_topology->pcs_quad_select = 1;
-+		port_topology->pcs_port = 0;
-+		if (is_muxed)
-+			port_topology->primary_serdes_lane = 2;
-+		else
-+			port_topology->primary_serdes_lane = 4;
-+		break;
-+	case 2:
-+		port_topology->pcs_quad_select = 0;
-+		port_topology->pcs_port = 1;
-+		port_topology->primary_serdes_lane = 1;
-+		break;
-+	case 3:
-+		port_topology->pcs_quad_select = 1;
-+		port_topology->pcs_port = 1;
-+		if (is_muxed)
-+			port_topology->primary_serdes_lane = 3;
-+		else
-+			port_topology->primary_serdes_lane = 5;
-+		break;
-+	case 4:
-+		port_topology->pcs_quad_select = 0;
-+		port_topology->pcs_port = 2;
-+		port_topology->primary_serdes_lane = 2;
-+		break;
-+	case 5:
-+		port_topology->pcs_quad_select = 1;
-+		port_topology->pcs_port = 2;
-+		port_topology->primary_serdes_lane = 6;
-+		break;
-+	case 6:
-+		port_topology->pcs_quad_select = 0;
-+		port_topology->pcs_port = 3;
-+		port_topology->primary_serdes_lane = 3;
-+		break;
-+	case 7:
-+		port_topology->pcs_quad_select = 1;
-+		port_topology->pcs_port = 3;
-+		port_topology->primary_serdes_lane = 7;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int ice_map_port_topology_for_qsfp(struct ice_port_topology *port_topology,
-+					  u8 lport, bool is_muxed)
-+{
-+	switch (lport) {
-+	case 0:
-+		port_topology->pcs_quad_select = 0;
-+		port_topology->pcs_port = 0;
-+		port_topology->primary_serdes_lane = 0;
-+		break;
-+	case 1:
-+		port_topology->pcs_quad_select = 1;
-+		port_topology->pcs_port = 0;
-+		if (is_muxed)
-+			port_topology->primary_serdes_lane = 2;
-+		else
-+			port_topology->primary_serdes_lane = 4;
-+		break;
-+	case 2:
-+		port_topology->pcs_quad_select = 0;
-+		port_topology->pcs_port = 1;
-+		port_topology->primary_serdes_lane = 1;
-+		break;
-+	case 3:
-+		port_topology->pcs_quad_select = 1;
-+		port_topology->pcs_port = 1;
-+		if (is_muxed)
-+			port_topology->primary_serdes_lane = 3;
-+		else
-+			port_topology->primary_serdes_lane = 5;
-+		break;
-+	case 4:
-+		port_topology->pcs_quad_select = 0;
-+		port_topology->pcs_port = 2;
-+		port_topology->primary_serdes_lane = 2;
-+		break;
-+	case 5:
-+		port_topology->pcs_quad_select = 1;
-+		port_topology->pcs_port = 2;
-+		port_topology->primary_serdes_lane = 6;
-+		break;
-+	case 6:
-+		port_topology->pcs_quad_select = 0;
-+		port_topology->pcs_port = 3;
-+		port_topology->primary_serdes_lane = 3;
-+		break;
-+	case 7:
-+		port_topology->pcs_quad_select = 1;
-+		port_topology->pcs_port = 3;
-+		port_topology->primary_serdes_lane = 7;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_get_port_topology - returns physical topology like pcsquad, pcsport,
-+ *                         serdes number
-+ * @hw: pointer to the HW struct
-+ * @lport: logical port for which physical info requested
-+ * @port_topology: buffer to hold port topology
-+ *
-+ * Return: 0 on success, negative on failure.
-+ */
-+static int ice_get_port_topology(struct ice_hw *hw, u8 lport,
-+				 struct ice_port_topology *port_topology)
-+{
-+	struct ice_aqc_get_link_topo cmd = {};
-+	u16 node_handle = 0;
-+	u8 cage_type = 0;
-+	bool is_muxed;
 +	int err;
-+	u8 ctx;
 +
-+	ctx = ICE_AQC_LINK_TOPO_NODE_TYPE_CAGE << ICE_AQC_LINK_TOPO_NODE_TYPE_S;
-+	ctx |= ICE_AQC_LINK_TOPO_NODE_CTX_PORT << ICE_AQC_LINK_TOPO_NODE_CTX_S;
-+	cmd.addr.topo_params.node_type_ctx = ctx;
++	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_PRE1,
++					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
++					  &ptr->tx_equalization_pre1);
++	if (err)
++		return err;
 +
-+	err = ice_aq_get_netlist_node(hw, &cmd, &cage_type, &node_handle);
++	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_PRE3,
++					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
++					  &ptr->tx_equalization_pre3);
++	if (err)
++		return err;
++
++	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_ATTEN,
++					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
++					  &ptr->tx_equalization_atten);
++	if (err)
++		return err;
++
++	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_POST1,
++					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
++					  &ptr->tx_equalization_post1);
++	if (err)
++		return err;
++
++	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_PRE2,
++					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
++					  &ptr->tx_equalization_pre2);
++	if (err)
++		return err;
++
++	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_PRE2,
++					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
++					  &ptr->rx_equalization_pre2);
++	if (err)
++		return err;
++
++	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_PRE1,
++					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
++					  &ptr->rx_equalization_pre1);
++	if (err)
++		return err;
++
++	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_POST1,
++					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
++					  &ptr->rx_equalization_post1);
++	if (err)
++		return err;
++
++	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_BFLF,
++					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
++					  &ptr->rx_equalization_bflf);
++	if (err)
++		return err;
++
++	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_BFHF,
++					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
++					  &ptr->rx_equalization_bfhf);
++	if (err)
++		return err;
++
++	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_DRATE,
++					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
++					  &ptr->rx_equalization_drate);
++	if (err)
++		return err;
++
++	return 0;
++}
++
++/**
++ * ice_get_extended_regs - returns FEC correctable, uncorrectable stats per
++ *                         pcsquad, pcsport
++ * @netdev: pointer to net device structure
++ * @p: output buffer to fill requested register dump
++ *
++ * Return: 0 on success, negative on failure.
++ */
++static int ice_get_extended_regs(struct net_device *netdev, void *p)
++{
++	struct ice_netdev_priv *np = netdev_priv(netdev);
++	struct ice_regdump_to_ethtool *ice_prv_regs_buf;
++	struct ice_port_topology port_topology = {};
++	struct ice_port_info *pi;
++	struct ice_pf *pf;
++	struct ice_hw *hw;
++	unsigned int i;
++	int err;
++
++	pf = np->vsi->back;
++	hw = &pf->hw;
++	pi = np->vsi->port_info;
++
++	if (!hw || !pi)
++		return -EINVAL;
++
++	/* Serdes parameters are not supported if not the PF VSI */
++	if (np->vsi->type != ICE_VSI_PF)
++		return -EINVAL;
++
++	err = ice_get_port_topology(hw, pi->lport, &port_topology);
 +	if (err)
 +		return -EINVAL;
-+
-+	is_muxed = ice_is_serdes_muxed(hw);
-+
-+	if (cage_type == 0x11 ||	/* SFP+ */
-+	    cage_type == 0x12) {	/* SFP28 */
-+		port_topology->serdes_lane_count = 1;
-+		err = ice_map_port_topology_for_sfp(port_topology, lport, is_muxed);
-+		if (err)
-+			return err;
-+	} else if (cage_type == 0x13 ||	/* QSFP */
-+		   cage_type == 0x14) {	/* QSFP28 */
-+		u8 max_speed = 0;
-+
-+		err = ice_ethtool_get_maxspeed(hw, lport, &max_speed);
-+		if (err)
-+			return err;
-+
-+		if (max_speed == ICE_AQC_PORT_OPT_MAX_LANE_100G)
-+			port_topology->serdes_lane_count = 4;
-+		else if (max_speed == ICE_AQC_PORT_OPT_MAX_LANE_50G)
-+			port_topology->serdes_lane_count = 2;
-+		else
-+			port_topology->serdes_lane_count = 1;
-+
-+		err = ice_map_port_topology_for_qsfp(port_topology, lport, is_muxed);
-+		if (err)
-+			return err;
-+	} else {
++	if (port_topology.serdes_lane_count > 4)
 +		return -EINVAL;
++
++	ice_prv_regs_buf = p;
++
++	/* Get serdes equalization parameter for available serdes */
++	for (i = 0; i < port_topology.serdes_lane_count; i++) {
++		u8 serdes_num = 0;
++
++		serdes_num = port_topology.primary_serdes_lane + i;
++		err = ice_get_tx_rx_equa(hw, serdes_num,
++					 &ice_prv_regs_buf->equalization[i]);
++		if (err)
++			return -EINVAL;
 +	}
 +
 +	return 0;
@@ -454,153 +402,50 @@ index 4165a93ed4eb..d9c73ff550ba 100644
  static void
  ice_get_regs(struct net_device *netdev, struct ethtool_regs *regs, void *p)
  {
-@@ -4268,6 +4483,98 @@ ice_get_module_eeprom(struct net_device *netdev,
- 	return 0;
+@@ -689,10 +824,12 @@ ice_get_regs(struct net_device *netdev, struct ethtool_regs *regs, void *p)
+ 	u32 *regs_buf = (u32 *)p;
+ 	unsigned int i;
+ 
+-	regs->version = 1;
++	regs->version = 2;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(ice_regs_dump_list); ++i)
+ 		regs_buf[i] = rd32(hw, ice_regs_dump_list[i]);
++
++	ice_get_extended_regs(netdev, (void *)&regs_buf[i]);
  }
  
-+/**
-+ * ice_get_port_fec_stats - returns FEC correctable, uncorrectable stats per
-+ *                          pcsquad, pcsport
-+ * @hw: pointer to the HW struct
-+ * @pcs_quad: pcsquad for input port
-+ * @pcs_port: pcsport for input port
-+ * @fec_stats: buffer to hold FEC statistics for given port
-+ *
-+ * Return: 0 on success, negative on failure.
-+ */
-+static int ice_get_port_fec_stats(struct ice_hw *hw, u16 pcs_quad, u16 pcs_port,
-+				  struct ethtool_fec_stats *fec_stats)
-+{
-+	u32 fec_uncorr_low_val = 0, fec_uncorr_high_val = 0;
-+	u32 fec_corr_low_val = 0, fec_corr_high_val = 0;
-+	int err;
-+
-+	if (pcs_quad > 1 || pcs_port > 3)
-+		return -EINVAL;
-+
-+	err = ice_aq_get_fec_stats(hw, pcs_quad, pcs_port, ICE_FEC_CORR_LOW,
-+				   &fec_corr_low_val);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_fec_stats(hw, pcs_quad, pcs_port, ICE_FEC_CORR_HIGH,
-+				   &fec_corr_high_val);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_fec_stats(hw, pcs_quad, pcs_port,
-+				   ICE_FEC_UNCORR_LOW,
-+				   &fec_uncorr_low_val);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_fec_stats(hw, pcs_quad, pcs_port,
-+				   ICE_FEC_UNCORR_HIGH,
-+				   &fec_uncorr_high_val);
-+	if (err)
-+		return err;
-+
-+	fec_stats->uncorrectable_blocks.total = (fec_corr_high_val << 16) +
-+						 fec_corr_low_val;
-+	fec_stats->corrected_blocks.total = (fec_uncorr_high_val << 16) +
-+					     fec_uncorr_low_val;
-+	return 0;
-+}
-+
-+/**
-+ * ice_get_fec_stats - returns FEC correctable, uncorrectable stats per netdev
-+ * @netdev: network interface device structure
-+ * @fec_stats: buffer to hold FEC statistics for given port
-+ *
-+ */
-+static void ice_get_fec_stats(struct net_device *netdev,
-+			      struct ethtool_fec_stats *fec_stats)
-+{
-+	struct ice_netdev_priv *np = netdev_priv(netdev);
-+	struct ice_port_topology port_topology;
-+	struct ice_port_info *pi;
-+	struct ice_pf *pf;
-+	struct ice_hw *hw;
-+	int err;
-+
-+	pf = np->vsi->back;
-+	hw = &pf->hw;
-+	pi = np->vsi->port_info;
-+
-+	if (!hw || !pi)
-+		return;
-+
-+	/* Serdes parameters are not supported if not the PF VSI */
-+	if (np->vsi->type != ICE_VSI_PF)
-+		return;
-+
-+	err = ice_get_port_topology(hw, pi->lport, &port_topology);
-+	if (err) {
-+		netdev_info(netdev, "Extended register dump failed Lport %d\n",
-+			    pi->lport);
-+		return;
-+	}
-+
-+	/* Get FEC correctable, uncorrectable counter */
-+	err = ice_get_port_fec_stats(hw, port_topology.pcs_quad_select,
-+				     port_topology.pcs_port, fec_stats);
-+	if (err) {
-+		netdev_info(netdev, "FEC stats get failed Lport %d Err %d\n",
-+			    pi->lport, err);
-+	}
-+}
-+
- static void ice_get_eth_mac_stats(struct net_device *netdev,
- 				  struct ethtool_eth_mac_stats *mac_stats)
- {
-@@ -4368,6 +4675,7 @@ static const struct ethtool_ops ice_ethtool_ops = {
- 	.cap_rss_sym_xor_supported = true,
- 	.get_link_ksettings	= ice_get_link_ksettings,
- 	.set_link_ksettings	= ice_set_link_ksettings,
-+	.get_fec_stats		= ice_get_fec_stats,
- 	.get_drvinfo		= ice_get_drvinfo,
- 	.get_regs_len		= ice_get_regs_len,
- 	.get_regs		= ice_get_regs,
+ static u32 ice_get_msglevel(struct net_device *netdev)
 diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.h b/drivers/net/ethernet/intel/ice/ice_ethtool.h
-index b88e3da06f13..ffc8ad180e61 100644
+index ffc8ad180e61..9acccae38625 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ethtool.h
 +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.h
-@@ -9,6 +9,16 @@ struct ice_phy_type_to_ethtool {
+@@ -9,6 +9,25 @@ struct ice_phy_type_to_ethtool {
  	u8 link_mode;
  };
  
-+/* Port topology from lport i.e.
-+ * serdes mapping, pcsquad, macport, cage etc...
-+ */
-+struct ice_port_topology {
-+	u16 pcs_port;
-+	u16 primary_serdes_lane;
-+	u16 serdes_lane_count;
-+	u16 pcs_quad_select;
++struct ice_serdes_equalization_to_ethtool {
++	int rx_equalization_pre2;
++	int rx_equalization_pre1;
++	int rx_equalization_post1;
++	int rx_equalization_bflf;
++	int rx_equalization_bfhf;
++	int rx_equalization_drate;
++	int tx_equalization_pre1;
++	int tx_equalization_pre3;
++	int tx_equalization_atten;
++	int tx_equalization_post1;
++	int tx_equalization_pre2;
 +};
 +
- /* Macro to make PHY type to Ethtool link mode table entry.
-  * The index is the PHY type.
++struct ice_regdump_to_ethtool {
++	/* A multilane port can have max 4 serdes */
++	struct ice_serdes_equalization_to_ethtool equalization[4];
++};
++
+ /* Port topology from lport i.e.
+  * serdes mapping, pcsquad, macport, cage etc...
   */
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 21a00bbac96a..c330a436d11a 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -72,6 +72,14 @@ enum ice_aq_res_ids {
- 	ICE_GLOBAL_CFG_LOCK_RES_ID
- };
- 
-+enum ice_fec_stats_types {
-+	ICE_FEC_CORR_LOW,
-+	ICE_FEC_CORR_HIGH,
-+	ICE_FEC_UNCORR_LOW,
-+	ICE_FEC_UNCORR_HIGH,
-+	ICE_FEC_MAX
-+};
-+
- /* FW update timeout definitions are in milliseconds */
- #define ICE_NVM_TIMEOUT			180000
- #define ICE_CHANGE_LOCK_TIMEOUT		1000
 -- 
 2.44.0
 
