@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-103638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8583908D99
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:37:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE064908D9E
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:38:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53A961F241D9
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 14:37:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6598628E570
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 14:38:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1182107B6;
-	Fri, 14 Jun 2024 14:37:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D568C107B6;
+	Fri, 14 Jun 2024 14:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DQuyxCKF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FFdwplrC"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2808C129
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 14:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C2C10A0D
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 14:38:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718375843; cv=none; b=KukuLBPxvzMzZ160AZ0eu8/33MA5vS33V0h4uaO6KYyFgHKyCyam6IwpksKFb4E98Q4+LxGJWaVdSe7l2tjMKFe86QJgu+a/CiO3z432XxlWX5IE5cqiGL5FDCCJNhpK7Zo2cPOgLfvTejGJ0V0qmdiVdavk8uBnV/CXbpkvxN4=
+	t=1718375885; cv=none; b=uB4FNsh2j+RQMz+5zKSVSkgX/JGWtAcscAIbltpj/u/IBDhMEFCNak03IF585UIurFj+6QkBr8p6nB/mrgpkkJePZPtL5YIT+D0fivmVt/PxDmZr0k0xD0rFAquVNSAGKtaYoyNUeZISg8R+q2cqJ2yAKrxlj/H0MfVm+jM/44w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718375843; c=relaxed/simple;
-	bh=T6yv7I5syZZgcNs6PyKRhYS3KfDAA6mZlqzAdOn36Uc=;
+	s=arc-20240116; t=1718375885; c=relaxed/simple;
+	bh=zRcSTM/jhvBjnbHtwwSwnO+RyKYuFmGLajopZybpesk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ilrplrfc1aRr7Hz6W2X+S2mDW8ymm1JLC9jdBEnk/A9oHBBjcNT+O6w++BU7LLpBZBZSul1BLWCMt4TDZVqH02T7cSZSxPWAmKrk4KcHsyhvEiIvb9XKBeUXES/HajH+dv/qeJSbW6LFTDnT96SztArqmk5JBjvhovBiSQ3ysl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DQuyxCKF; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=Od28itr1Hduh6DS81X1gYLXXl9xH3k1GGZU61vdkdYGGzR+RD5xpGGGbApCqCxc//Bj5gt4QSv7Hhmo6mtqqQPj9owJtItvNc3TjQYULK57qnG1pYduYM7XRGKIpc6xL9HtnSjHncNOV4J6402hAHQD6z80ODyzKPAc7wtoKNGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FFdwplrC; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718375839;
+	s=mimecast20190719; t=1718375883;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8VKKhGKwr7TjIxs7MZnTi0KjppWjoseUD7kZ6OFw6gE=;
-	b=DQuyxCKFMcZ3MhP6zRFSlNMXiw+WsZksP46V/5Uhv+gF3uJTEqgszfXbV515PoFakhJ9+/
-	vL4rDhX63E28mRz15fmqe9QUCUadAHylsvwqWgRddjEraJ6T4Yv14+DHvbfX64s1638Dpf
-	I36YTL9/Mrs4l3oI+MFEMg7ckDmt+eg=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ma55eji0wwByhy1PlNAJaDlIbtX5hUNyQUsxW6m6B4Y=;
+	b=FFdwplrC5r2TxQnTraRfwxiOjzz/3t2G78rBBIDydWIYNuhoQMuhUgyxY9Z/5Jvu/RuQKW
+	e7kBIS5ovUAlGAvdL1NLKH6f2TAF/QJv9WxyhyBOdfsZTA48mWgx/GMajdec4HDUhdahc+
+	YyU2b2P98KU3sDmpByv9PKigsu6pAPA=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-125-VtiiJyBcP8qWwfIWdcr20A-1; Fri, 14 Jun 2024 10:37:18 -0400
-X-MC-Unique: VtiiJyBcP8qWwfIWdcr20A-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-57caaaecc6fso1325878a12.2
-        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 07:37:18 -0700 (PDT)
+ us-mta-313-7ZBwZGACP2ugDBHdC3TXlg-1; Fri, 14 Jun 2024 10:38:01 -0400
+X-MC-Unique: 7ZBwZGACP2ugDBHdC3TXlg-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-52c82e67810so1755496e87.3
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 07:37:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718375837; x=1718980637;
+        d=1e100.net; s=20230601; t=1718375875; x=1718980675;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8VKKhGKwr7TjIxs7MZnTi0KjppWjoseUD7kZ6OFw6gE=;
-        b=r2eJfMDpqGXNGDlObiDoGC6M/1Bmd29QNsSgKRl3e4d4RhlejPWmktW32/IdNHnScF
-         ZXP2zWb9nWnQFND4p3zRO65V5JCPyQwu0cgmn+9mbx1pM34Ri5xWvb/kkkPVpinGDxfM
-         lPmp2Iq+LAjB7qv5Jhl4KhRp4zemm8O6+fZ8MBOsG/Bl23UTlk/7xJZ0jsNuppsWVjt5
-         5bjwyaP+jjZTq9kMlnCZrR+7E837Ng52cEuMkHZXifv7TjZwzZy6T1xGVhAv6OV4Hcwo
-         uPrZvGWEt01OZw+WXDbQHC0EKZhrcs8Wg+WvUrMoRrothnzzAWzd3tf60FLYsIdp7TBQ
-         v5UA==
-X-Forwarded-Encrypted: i=1; AJvYcCW1/qP3+wPqoKBFyV0dJmzp5z7tMeHaFPkihgy9hqMfpIn4Qm3BvFvS9HiAXUvzNybZXoFiufmsruB/k42vTcGnpbWTiCKy
-X-Gm-Message-State: AOJu0YxZOOklZqsGU+/GvvBYLboYWoYW62h0DFWtEhUK3D5vA6QHO1X1
-	o2rmUc1KOp+DIHXm8ooAZLGCMPW7IZMeGu1SP6p2hlr00RAJZME0SKsbijU58y6URrKA12/xeO4
-	RGI9L/BVdiB0kJFSkPARRcBAltCLSimCbGlWuZgfTYSv/yF8p5qoWRg==
-X-Received: by 2002:a50:96c3:0:b0:57c:4867:6738 with SMTP id 4fb4d7f45d1cf-57cbd6496b2mr2142629a12.2.1718375837184;
-        Fri, 14 Jun 2024 07:37:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEMIPk9ZbvfOHdHDxFf5K+8em8CG7gzR2Iqm6IoVMPzEdsKvGKc6eizF14fWO0h+dFsk3GJ0w==
-X-Received: by 2002:a50:96c3:0:b0:57c:4867:6738 with SMTP id 4fb4d7f45d1cf-57cbd6496b2mr2142622a12.2.1718375836770;
-        Fri, 14 Jun 2024 07:37:16 -0700 (PDT)
+        bh=ma55eji0wwByhy1PlNAJaDlIbtX5hUNyQUsxW6m6B4Y=;
+        b=WbXrzVMm2Kjsff6+egme/57+G3tGqhOB/mG/KYDvB469fqoB5q2yrABji9Ufkuym/m
+         oEt6dnXYgQKlzienU/Y3VRBNzRyT0EmkdrzGB8aaqUZatRbC4IP5VfNDjgE1JvsHsRgC
+         LQ4eXWKtgPh5AexdJVGWsAEL9aw/bTQm5WToNZLgb2Oyyo3KGBt6NsMgvdC4s7Zs4BLX
+         3A8FNhfNdPfjNbDYsOERfJoIQUGySJ8ZNP6hhxEETtuGfCaoiyZNl+zINm78wt/jEmrZ
+         dB77NjNHfBP0Wtdw1KlT03zaJPpuDAeUNggC2Tfe5u1Sv9U1e35cyHr0dVSrNs7SVtDx
+         uTRw==
+X-Forwarded-Encrypted: i=1; AJvYcCUY0Y9yMYAEqDLdrVNCsE4wkctVwNi9577MxeeT06dZygIEE+WHWknZfmE+rdptPGPMDPh5lRsY1a6Ie+CjcqrhlSslEH/b
+X-Gm-Message-State: AOJu0YwCHOKr1Q0fxR0+Z1qSKh/Zf4pYe07PQ41q5gwXsIZhdK6UwTnu
+	voqdow9jGSDvoeRqiBHT3mKBbEdBblAccxpXTU/lpf9WElb2VXB7XTkgRU8J6YumqelscQAjuUJ
+	IKqKqbBPkcnwno7iDGuveU/jztrpi118WLOKjOdBfZDHh2MCRXcOHaA==
+X-Received: by 2002:a05:6512:1386:b0:52c:823f:2a10 with SMTP id 2adb3069b0e04-52ca6e56edfmr2747330e87.1.1718375875239;
+        Fri, 14 Jun 2024 07:37:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFak61X5Q4K8Fy3vqgh4FnlQ8USF63/URwCi1pVyOdl1kZeb7CjFn+k73mvZyYTw9AmJzOfKQ==
+X-Received: by 2002:a05:6512:1386:b0:52c:823f:2a10 with SMTP id 2adb3069b0e04-52ca6e56edfmr2747312e87.1.1718375874854;
+        Fri, 14 Jun 2024 07:37:54 -0700 (PDT)
 Received: from sgarzare-redhat ([147.229.117.1])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb72da156sm2342251a12.22.2024.06.14.07.37.15
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56da4486sm191157266b.1.2024.06.14.07.37.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jun 2024 07:37:16 -0700 (PDT)
-Date: Fri, 14 Jun 2024 16:37:12 +0200
+        Fri, 14 Jun 2024 07:37:54 -0700 (PDT)
+Date: Fri, 14 Jun 2024 16:37:51 +0200
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Luigi Leonardi <luigi.leonardi@outlook.com>
 Cc: edumazet@google.com, virtualization@lists.linux.dev, 
 	netdev@vger.kernel.org, kuba@kernel.org, kvm@vger.kernel.org, stefanha@redhat.com, 
 	pabeni@redhat.com, davem@davemloft.net, Marco Pinna <marco.pinn95@gmail.com>
-Subject: Re: [PATCH net-next 1/2] vsock/virtio: refactor
- virtio_transport_send_pkt_work
-Message-ID: <i5ofr6nj2fmxqeaswucvhbtvgglhvurzslsismthlrr77v7bsk@aishfdtaq4vb>
+Subject: Re: [PATCH net-next 2/2] vsock/virtio: avoid enqueue packets when
+ work queue is empty
+Message-ID: <2ytwqkmnmp3ebdnhioevunpkyfe5nh2lcpitzggqeu4ptao7ry@ivxkicurl5ft>
 References: <20240614135543.31515-1-luigi.leonardi@outlook.com>
- <AS2P194MB21702C53FEFDC2F8283B5A789AC22@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+ <AS2P194MB21706E349197C1466937052C9AC22@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,224 +91,122 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <AS2P194MB21702C53FEFDC2F8283B5A789AC22@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+In-Reply-To: <AS2P194MB21706E349197C1466937052C9AC22@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
 
-On Fri, Jun 14, 2024 at 03:55:42PM GMT, Luigi Leonardi wrote:
+On Fri, Jun 14, 2024 at 03:55:43PM GMT, Luigi Leonardi wrote:
 >From: Marco Pinna <marco.pinn95@gmail.com>
 >
->This is a preliminary patch to introduce an optimization to
->the enqueue system.
+>This introduces an optimization in virtio_transport_send_pkt:
+>when the work queue (send_pkt_queue) is empty the packet is
+>put directly in the virtqueue reducing latency.
 >
->All the code used to enqueue a packet into the virtqueue
->is removed from virtio_transport_send_pkt_work()
->and moved to the new virtio_transport_send_skb() function.
+>In the following benchmark (pingpong mode) the host sends
+>a payload to the guest and waits for the same payload back.
+>
+>Tool: Fio version 3.37-56
+>Env: Phys host + L1 Guest
+>Payload: 4k
+>Runtime-per-test: 50s
+>Mode: pingpong (h-g-h)
+>Test runs: 50
+>Type: SOCK_STREAM
+>
+>Before (Linux 6.8.11)
+>------
+>mean(1st percentile):     722.45 ns
+>mean(overall):           1686.23 ns
+>mean(99th percentile):  35379.27 ns
+>
+>After
+>------
+>mean(1st percentile):     602.62 ns
+>mean(overall):           1248.83 ns
+>mean(99th percentile):  17557.33 ns
+
+Cool, thanks for this improvement!
+Can you also report your host CPU detail?
+
 >
 >Co-developed-by: Luigi Leonardi <luigi.leonardi@outlook.com>
 >Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
 >Signed-off-by: Marco Pinna <marco.pinn95@gmail.com>
 >---
-> net/vmw_vsock/virtio_transport.c | 134 +++++++++++++++++--------------
-> 1 file changed, 74 insertions(+), 60 deletions(-)
+> net/vmw_vsock/virtio_transport.c | 32 ++++++++++++++++++++++++++++++--
+> 1 file changed, 30 insertions(+), 2 deletions(-)
 >
 >diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index 43d405298857..c930235ecaec 100644
+>index c930235ecaec..e89bf87282b2 100644
 >--- a/net/vmw_vsock/virtio_transport.c
 >+++ b/net/vmw_vsock/virtio_transport.c
->@@ -94,6 +94,78 @@ static u32 virtio_transport_get_local_cid(void)
-> 	return ret;
-> }
->
->+/* Caller need to hold vsock->tx_lock on vq */
->+static int virtio_transport_send_skb(struct sk_buff *skb, struct virtqueue *vq,
->+				     struct virtio_vsock *vsock, bool *restart_rx)
->+{
->+	int ret, in_sg = 0, out_sg = 0;
->+	struct scatterlist **sgs;
->+	bool reply;
->+
->+	reply = virtio_vsock_skb_reply(skb);
->+	sgs = vsock->out_sgs;
->+	sg_init_one(sgs[out_sg], virtio_vsock_hdr(skb),
->+		    sizeof(*virtio_vsock_hdr(skb)));
->+	out_sg++;
->+
->+	if (!skb_is_nonlinear(skb)) {
->+		if (skb->len > 0) {
->+			sg_init_one(sgs[out_sg], skb->data, skb->len);
->+			out_sg++;
->+		}
->+	} else {
->+		struct skb_shared_info *si;
->+		int i;
->+
->+		/* If skb is nonlinear, then its buffer must contain
->+		 * only header and nothing more. Data is stored in
->+		 * the fragged part.
->+		 */
->+		WARN_ON_ONCE(skb_headroom(skb) != sizeof(*virtio_vsock_hdr(skb)));
->+
->+		si = skb_shinfo(skb);
->+
->+		for (i = 0; i < si->nr_frags; i++) {
->+			skb_frag_t *skb_frag = &si->frags[i];
->+			void *va;
->+
->+			/* We will use 'page_to_virt()' for the userspace page
->+			 * here, because virtio or dma-mapping layers will call
->+			 * 'virt_to_phys()' later to fill the buffer descriptor.
->+			 * We don't touch memory at "virtual" address of 
->this page.
->+			 */
->+			va = page_to_virt(skb_frag_page(skb_frag));
->+			sg_init_one(sgs[out_sg],
->+				    va + skb_frag_off(skb_frag),
->+				    skb_frag_size(skb_frag));
->+			out_sg++;
->+		}
->+	}
->+
->+	ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
->+	/* Usually this means that there is no more space available in
->+	 * the vq
->+	 */
->+	if (ret < 0)
->+		goto out;
-
-We use the `out` label just here, so what about remove it since we just 
-return ret?
-
-I mean:
-
-	if (ret < 0)
-		return ret;
-
-...
-
->+
->+	virtio_transport_deliver_tap_pkt(skb);
->+
->+	if (reply) {
->+		struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
->+		int val;
->+
->+		val = atomic_dec_return(&vsock->queued_replies);
->+
->+		/* Do we now have resources to resume rx processing? */
->+		if (val + 1 == virtqueue_get_vring_size(rx_vq))
->+			*restart_rx = true;
->+	}
->+
-
-	return 0;
-}
-
->+out:
->+	return ret;
->+}
->+
-> static void
-> virtio_transport_send_pkt_work(struct work_struct *work)
+>@@ -214,7 +214,9 @@ virtio_transport_send_pkt(struct sk_buff *skb)
 > {
->@@ -111,77 +183,19 @@ virtio_transport_send_pkt_work(struct work_struct *work)
-> 	vq = vsock->vqs[VSOCK_VQ_TX];
+> 	struct virtio_vsock_hdr *hdr;
+> 	struct virtio_vsock *vsock;
+>+	bool use_worker = true;
+> 	int len = skb->len;
+>+	int ret = -1;
+
+Please define ret in the block we use it. Also, we don't need to initialize it.
+
 >
-> 	for (;;) {
->-		int ret, in_sg = 0, out_sg = 0;
->-		struct scatterlist **sgs;
-> 		struct sk_buff *skb;
->-		bool reply;
->+		int ret;
+> 	hdr = virtio_vsock_hdr(skb);
 >
-> 		skb = virtio_vsock_skb_dequeue(&vsock->send_pkt_queue);
-> 		if (!skb)
-> 			break;
+>@@ -235,8 +237,34 @@ virtio_transport_send_pkt(struct sk_buff *skb)
+> 	if (virtio_vsock_skb_reply(skb))
+> 		atomic_inc(&vsock->queued_replies);
 >
->-		reply = virtio_vsock_skb_reply(skb);
->-		sgs = vsock->out_sgs;
->-		sg_init_one(sgs[out_sg], virtio_vsock_hdr(skb),
->-			    sizeof(*virtio_vsock_hdr(skb)));
->-		out_sg++;
->-
->-		if (!skb_is_nonlinear(skb)) {
->-			if (skb->len > 0) {
->-				sg_init_one(sgs[out_sg], skb->data, skb->len);
->-				out_sg++;
->-			}
->-		} else {
->-			struct skb_shared_info *si;
->-			int i;
+>-	virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
+>-	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+>+	/* If the send_pkt_queue is empty there is no need to enqueue the packet.
+
+We should clarify which queue. I mean we are always queueing the packet
+somewhere, or in the internal queue for the worker or in the virtqueue,
+so this comment is not really clear.
+
+>+	 * Just put it on the ringbuff using virtio_transport_send_skb.
+
+ringbuff? Do you mean virtqueue?
+
+>+	 */
+>+
+
+we can avoid this empty line.
+
+>+	if (skb_queue_empty_lockless(&vsock->send_pkt_queue)) {
+>+		bool restart_rx = false;
+>+		struct virtqueue *vq;
+
+... `int ret;` here.
+
+>+
+>+		mutex_lock(&vsock->tx_lock);
+>+
+>+		vq = vsock->vqs[VSOCK_VQ_TX];
+>+
 >+		ret = virtio_transport_send_skb(skb, vq, vsock, &restart_rx);
+
+Ah, at the end we don't need `ret` at all.
+
+What about just `if (!virtio_transport_send_skb())`?
+
+>+		if (ret == 0) {
+>+			use_worker = false;
+>+			virtqueue_kick(vq);
+>+		}
+>+
+>+		mutex_unlock(&vsock->tx_lock);
+>+
+>+		if (restart_rx)
+>+			queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+>+	}
+>+
+>+	if (use_worker) {
+>+		virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
+>+		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+>+	}
 >
-
-nit: I'd remove this new line here.
-
->-			/* If skb is nonlinear, then its buffer must contain
->-			 * only header and nothing more. Data is stored in
->-			 * the fragged part.
->-			 */
->-			WARN_ON_ONCE(skb_headroom(skb) != sizeof(*virtio_vsock_hdr(skb)));
->-
->-			si = skb_shinfo(skb);
->-
->-			for (i = 0; i < si->nr_frags; i++) {
->-				skb_frag_t *skb_frag = &si->frags[i];
->-				void *va;
->-
->-				/* We will use 'page_to_virt()' for the userspace page
->-				 * here, because virtio or dma-mapping layers will call
->-				 * 'virt_to_phys()' later to fill the buffer descriptor.
->-				 * We don't touch memory at "virtual" address of this page.
->-				 */
->-				va = page_to_virt(skb_frag_page(skb_frag));
->-				sg_init_one(sgs[out_sg],
->-					    va + skb_frag_off(skb_frag),
->-					    skb_frag_size(skb_frag));
->-				out_sg++;
->-			}
->-		}
->-
->-		ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, 
->GFP_KERNEL);
->-		/* Usually this means that there is no more space 
->available in
->-		 * the vq
->-		 */
-> 		if (ret < 0) {
-> 			virtio_vsock_skb_queue_head(&vsock->send_pkt_queue, skb);
-> 			break;
-> 		}
->-
->-		virtio_transport_deliver_tap_pkt(skb);
->-
->-		if (reply) {
->-			struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
->-			int val;
->-
->-			val = atomic_dec_return(&vsock->queued_replies);
->-
->-			/* Do we now have resources to resume rx processing? */
->-			if (val + 1 == virtqueue_get_vring_size(rx_vq))
->-				restart_rx = true;
->-		}
->-
-
-nit: maybe I'd move the empty line here.
-
-
-Our usual style is:
-         ret = foo();
-         if (ret < 0) {
-             //error handling
-         }
-
-         next_stuff...
-
-Thanks,
-Stefano
-
-> 		added = true;
-> 	}
->
+> out_rcu:
+> 	rcu_read_unlock();
 >-- 
 >2.45.2
 >
