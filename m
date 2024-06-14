@@ -1,171 +1,129 @@
-Return-Path: <netdev+bounces-103733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D7DD9093F8
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 00:00:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C0A0909403
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 00:04:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B982D1F21DDD
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:00:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9118B22926
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:04:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882B61850BF;
-	Fri, 14 Jun 2024 22:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E99DE185097;
+	Fri, 14 Jun 2024 22:04:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="fMZ/bdWe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xk7r51tr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9911487ED
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 22:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C284A1487ED;
+	Fri, 14 Jun 2024 22:04:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718402422; cv=none; b=j1BHflf1RxE+gZUzYz/y/BoXKqXg+gRq8ovynYHOf7WhLs5LXSerTFtvNmJafq5odEoecKHS921wyBXl8dVsACbsnQpmCYTVrn1ZccGwDFSvO4YsVos7wZSYm9OQyNrFI42McWuTawUYxWgXb8KbBG9dOB1XrJop5tbpQT7SuT0=
+	t=1718402672; cv=none; b=uU6jlfKoQqKVCRvMKO3b5DesP52dOIxUkD1ppsh27y3CLinl3bEQg/LNAyob7uCVNFuKlIPTu1egumCZDxrgqwFvIob2RauFr/RPM/BFHdGIBE04bGwwjDuX5+wSJ62H8tZTo/KPXeswJPLcoOU01cIL9gclZJqnAkCsJmi47Eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718402422; c=relaxed/simple;
-	bh=+5veQkgnVNkMxA9kgPIirgp7ENT3iYRLPKA4QGYdskE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pqni/d4iV3s71j3yJkx5iSJinmVB1dEtaxj2SnRYtJ2vBw2upUZj03jrSQMKU31sA4xtcY/BP+Eu8WymiErMY7ei1zyRaM2avi/GhLYrLiZb1LvzIkggMrZh4nk3heC3cn/Qkz/NQ6m6BDxho39q7VqCON+c/7+OZfitALwm6l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=fMZ/bdWe; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-795a4fde8bfso147013885a.2
-        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 15:00:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1718402420; x=1719007220; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=YICLqeWZ7CPWIj9cycB+v+Sx/kefZlyQDl7Jt1GJ9mk=;
-        b=fMZ/bdWeaWA7whE83xnLlOq9RJ6cBRTmRFhpaKzURd2VcVLPh9/oyAltab2a2+v78J
-         dT1hxsuCamWxCGFqxXm6iYlhgC7zSck/2+w2+t2cYaDdTXx6CsPdYNW14kEsw+gLFvP2
-         6yvkui8SLdhQbrcdSylGTRIsMrg2SRjJL+5c8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718402420; x=1719007220;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YICLqeWZ7CPWIj9cycB+v+Sx/kefZlyQDl7Jt1GJ9mk=;
-        b=XZtfVvlW+slycutW39Ph/Vsad+TYFn6UGTSj73CxCGj1CaA4baJsnn+6LM9vnhffKv
-         HWvlEXEm7vXbEuQcOjW+wSVvxPQj9biWqosFHYd5bnQ4BtTdszNlPofDPU/m+GBqbIP0
-         2m9gZ7NOrxLWGSEcTXPV9WzTFsstYm/BGi987KAYnS4yGs7RRtrHQnE8bZH7vhhc/m1j
-         wCWFBzAMIVEvzbv9sLxxnaVJY682ZmADhxyAMZHHQc8dHYYsSbRRH6ctnHq+ELwUaB2m
-         7Fp+UwA95ke1oArSQz7pNNrAcrJsKVhbTpADML9Nh8u0zFRGmDsaK9kmVxUtb21KnnyX
-         kWaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWa2F4A0pDwJj1f5eaRLOYeE1+75UCjdwaW3RYI1MdQJCduhsrPAZ6yrdqjJqELA6rejWyTuU2jpiXY/aUrBAK2XZm9qgrz
-X-Gm-Message-State: AOJu0YzBLVimUsLCdS5yTSvqfp07k79hJVxKjfb877UkO7AlaztC+ESB
-	Kw/aFxh7bDQZOIO2LAcTg22o01aoY0Ey794ZmQbI9pm9N8YcyoKBZAtUmTPeqA==
-X-Google-Smtp-Source: AGHT+IG/HD2HHZaQReiMiEQIeKbUkIZLrpVW6+XwOsJB6JUy8Iaw3habv8swl8TM2z1Y2OKuwVX6NQ==
-X-Received: by 2002:a0c:d6c7:0:b0:6b2:b251:7d95 with SMTP id 6a1803df08f44-6b2b2517db4mr30028326d6.17.1718402419852;
-        Fri, 14 Jun 2024 15:00:19 -0700 (PDT)
-Received: from [10.66.192.68] ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b2a5f05782sm23013906d6.139.2024.06.14.15.00.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Jun 2024 15:00:19 -0700 (PDT)
-Message-ID: <a640b47b-c1a3-4f0c-8780-ca08edcf089e@broadcom.com>
-Date: Fri, 14 Jun 2024 15:00:12 -0700
+	s=arc-20240116; t=1718402672; c=relaxed/simple;
+	bh=HdKSiteX1Un1YtoVxmJvySJHtIPF5Vxdx6iJwgU2Z2o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ys9v6ziiVF4fbOBxrATNEEdUtKAP9Wl8wsUtO8d0nFkSckKbRfjwXDAEJtyTVheJxwQuqxP6RoU6I3fJnaFS14WhDbbZ0LYwMRkf/O7BUMvBo3LNoWMhia5WDvIFnOuFiLcykZjsT/6C0OZQfgEtYSXOfH8O+iKhu5YmPXXWQDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xk7r51tr; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718402671; x=1749938671;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HdKSiteX1Un1YtoVxmJvySJHtIPF5Vxdx6iJwgU2Z2o=;
+  b=Xk7r51tr6pJYGwBi+l7Q+1dlAUpJfjj9NqnMPIDWsBjGGAL5o1PJPKz1
+   6UDwTnt+IizVNJSwDKfZYpw1iFvbBDygqHhprOKD22qg/WmnuVhUA40pl
+   jXKT540Mc6MFZPopR9xctlysON8DbFpho8q2oJeEIfhKqaZ8nH7GLcQ2R
+   MIvuGofp9RQ/9ap2Sq4QTKVibgNV3Fy5yCPhv2rTivWN2aF7TGSeAz1m7
+   yBeRpxQ4xiImxuhwe9NgUXyiSVyLkrV+9wklvE2Whagl9VYmj0iEtK/L/
+   SC9liV7qW+WKu5QLWoKIuyEuk8V7TNdAbbcv5eelgBgXRgIAa8Oao5XLB
+   Q==;
+X-CSE-ConnectionGUID: 6A5FgMDySOmL4Lk71o27kA==
+X-CSE-MsgGUID: y12ncJbETP2X4uRixApS/Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11103"; a="32855185"
+X-IronPort-AV: E=Sophos;i="6.08,238,1712646000"; 
+   d="scan'208";a="32855185"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2024 15:04:29 -0700
+X-CSE-ConnectionGUID: BIt/LgMwRnKc6/X1k7Mq1w==
+X-CSE-MsgGUID: vDcFpkdNRe+MGRRxoBMNtw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,238,1712646000"; 
+   d="scan'208";a="41127062"
+Received: from lkp-server01.sh.intel.com (HELO 9e3ee4e9e062) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 14 Jun 2024 15:04:24 -0700
+Received: from kbuild by 9e3ee4e9e062 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sIF1y-0001q1-0r;
+	Fri, 14 Jun 2024 22:04:22 +0000
+Date: Sat, 15 Jun 2024 06:03:46 +0800
+From: kernel test robot <lkp@intel.com>
+To: Frank Li <Frank.Li@nxp.com>, Yangbo Lu <yangbo.lu@nxp.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Sean Anderson <sean.anderson@seco.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, Frank Li <Frank.Li@nxp.com>
+Subject: Re: [PATCH 1/2] dt-bindings: ptp: Convert ptp-qoirq to yaml format
+Message-ID: <202406150525.S8VdHLlY-lkp@intel.com>
+References: <20240614-ls_fman-v1-1-cb33c96dc799@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 8/8] x86/vmware: Add TDX hypercall support
-To: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, hpa@zytor.com, dave.hansen@linux.intel.com,
- mingo@redhat.com, tglx@linutronix.de, x86@kernel.org,
- netdev@vger.kernel.org, richardcochran@gmail.com,
- linux-input@vger.kernel.org, dmitry.torokhov@gmail.com, zackr@vmware.com,
- linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
- timothym@vmware.com, akaher@vmware.com, dri-devel@lists.freedesktop.org,
- daniel@ffwll.ch, airlied@gmail.com, tzimmermann@suse.de, mripard@kernel.org,
- maarten.lankhorst@linux.intel.com, horms@kernel.org,
- kirill.shutemov@linux.intel.com, Tim Merrifield <tim.merrifield@broadcom.com>
-References: <20240613191650.9913-1-alexey.makhalov@broadcom.com>
- <20240613191650.9913-9-alexey.makhalov@broadcom.com>
- <844ef200-aabe-4497-85c9-44fc46c9133a@intel.com>
- <20240614161404.GCZmxsTNLSoYTqoRoj@fat_crate.local>
- <74f8300b-3520-4824-81e3-71464e3da3b6@intel.com>
- <1750e44f-f9a9-4c2a-afb3-f1ae8237ccb0@broadcom.com>
- <20240614190956.GFZmyVhLGeyLjwvA6X@fat_crate.local>
-Content-Language: en-US
-From: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Autocrypt: addr=alexey.makhalov@broadcom.com; keydata=
- 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 EuY0
-In-Reply-To: <20240614190956.GFZmyVhLGeyLjwvA6X@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240614-ls_fman-v1-1-cb33c96dc799@nxp.com>
 
+Hi Frank,
 
+kernel test robot noticed the following build warnings:
 
-On 6/14/24 12:09 PM, Borislav Petkov wrote:
-> On Fri, Jun 14, 2024 at 11:32:16AM -0700, Alexey Makhalov wrote:
->>
->>
->> On 6/14/24 9:19 AM, Dave Hansen wrote:
->>> On 6/14/24 09:14, Borislav Petkov wrote:
->>>> On Fri, Jun 14, 2024 at 09:03:22AM -0700, Dave Hansen wrote:
->>> ...
->>>>> You need to zero out all of 'args' somehow.
->>>>
->>>> You mean like this:
->>>>
->>>> 	struct tdx_module_args args = {};
->>>>
->>>> ?
->>>
->>> Yes, or do all the assignments with the initializer.  We seem to do it
->>> both ways, so whatever works.
->>
->> Thanks Dave for pointing that out. I missed that at v7.
-> 
-> Ok, I'll fold this struct initialization oneliner into the last patch.
-> 
-Thanks!
+[auto build test WARNING on 03d44168cbd7fc57d5de56a3730427db758fc7f6]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Frank-Li/dt-bindings-ptp-Convert-ptp-qoirq-to-yaml-format/20240615-043704
+base:   03d44168cbd7fc57d5de56a3730427db758fc7f6
+patch link:    https://lore.kernel.org/r/20240614-ls_fman-v1-1-cb33c96dc799%40nxp.com
+patch subject: [PATCH 1/2] dt-bindings: ptp: Convert ptp-qoirq to yaml format
+reproduce: (https://download.01.org/0day-ci/archive/20240615/202406150525.S8VdHLlY-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406150525.S8VdHLlY-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   Warning: Documentation/devicetree/bindings/net/fsl-fman.txt references a file that doesn't exist: Documentation/devicetree/bindings/ptp/ptp-qoriq.txt
+>> Warning: Documentation/devicetree/bindings/net/fsl-tsec-phy.txt references a file that doesn't exist: Documentation/devicetree/bindings/ptp/ptp-qoriq.txt
+   Warning: Documentation/devicetree/bindings/power/wakeup-source.txt references a file that doesn't exist: Documentation/devicetree/bindings/input/qcom,pm8xxx-keypad.txt
+   Warning: Documentation/devicetree/bindings/regulator/siliconmitus,sm5703-regulator.yaml references a file that doesn't exist: Documentation/devicetree/bindings/mfd/siliconmitus,sm5703.yaml
+   Warning: Documentation/hwmon/g762.rst references a file that doesn't exist: Documentation/devicetree/bindings/hwmon/g762.txt
+   Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/reserved-memory/qcom
+   Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/display/exynos/
+>> Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/ptp/ptp-qoriq.txt
+   Can't open Documentation/output/net.h.rst at ./Documentation/sphinx/parse-headers.pl line 328, <IN> line 13.
+   make[3]: *** [Documentation/userspace-api/media/Makefile:34: Documentation/output/net.h.rst] Error 2
+   Can't open Documentation/output/ca.h.rst at ./Documentation/sphinx/parse-headers.pl line 328, <IN> line 25.
+   make[3]: *** [Documentation/userspace-api/media/Makefile:25: Documentation/output/ca.h.rst] Error 2
+   Can't open Documentation/output/dmx.h.rst at ./Documentation/sphinx/parse-headers.pl line 328, <IN> line 66.
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
