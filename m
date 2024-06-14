@@ -1,114 +1,91 @@
-Return-Path: <netdev+bounces-103445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BB3B908108
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 03:49:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B81290812F
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 03:57:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EAE22830F5
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 01:49:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C7931C21495
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 01:57:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C28B1822F3;
-	Fri, 14 Jun 2024 01:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73281773D;
+	Fri, 14 Jun 2024 01:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pZuRyDC4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lMGmGctS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E420157A43;
-	Fri, 14 Jun 2024 01:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A2519D88A
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 01:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718329780; cv=none; b=LvaJYSEYCvzl8uhdyDsnchsZNYoZ6uwNkk2XL70/Y6P5woPwz1/hx4RdcdN0Bausy/ZvSzqDF/3jTlPadpk+YYB9CazKVO6ostrQgs5acZd6A9u4dHLcD7cpGryRXwnaz5obnSZKPzvG7UpJNWEbeh0n0+bLLzKkVQuKzsnY6uY=
+	t=1718330250; cv=none; b=joN3JoAKQyUA5bkLtq0a7WgT7j1tVw8FaXme77uN9OI5/apCtjEAncgaSumOjTmWa3HTpj7FoWy4HtajKAiaG30mWZ1tTbSKFCRlr2W8y2x9Es9qElbMpeHgp+tegDxh4LnueLDBQrU/drS8PequPB33LY6FVzSRWeKASXuOJgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718329780; c=relaxed/simple;
-	bh=wF21a3UbyHjTYi79R6tU+R0QlOd02VCTZTRWQtWvJA8=;
+	s=arc-20240116; t=1718330250; c=relaxed/simple;
+	bh=5UgsinmFIF3B9EnSVAHU4r/3KDevlNjF1L48MiCeOjg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fkh759iw0+yeFEnxW0FZ/DLnWtt7ZDPEompLfD2qpOPjec95BAI+vZiGNOzSPGCOw5iXjsLgf1+I35UVz4drN1JzESrTpnm//5k7OQA47DvfueIvFrzCTSqRx+YM/Ad5dsCN6R2UKynAWvSAI44N7mkUCyROjT0QwuSc5bKGdPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pZuRyDC4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7803EC2BBFC;
-	Fri, 14 Jun 2024 01:49:39 +0000 (UTC)
+	 MIME-Version:Content-Type; b=NLfbd7EC9rn0YZ3K2e84B2v3voDe/uR57Ixmd/jmE1g7LuysbI++6eNcpQDiMZPBR3pUkVAL9kPdGIgZdkIRe8WbJCPwZXa8pdZ4nkdgBqHoefJBpOaEMHJkfDOImlGekwJAs3CVFKqzp7h+1QkFrseGqLJp/LIqG/es/7kbgb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lMGmGctS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A9B8C2BBFC;
+	Fri, 14 Jun 2024 01:57:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718329780;
-	bh=wF21a3UbyHjTYi79R6tU+R0QlOd02VCTZTRWQtWvJA8=;
+	s=k20201202; t=1718330250;
+	bh=5UgsinmFIF3B9EnSVAHU4r/3KDevlNjF1L48MiCeOjg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pZuRyDC4P9T+WD15psdYAt86/T2Uw9ftn8QYqxeCyxoVzI0SzQAWqg0nSvqePTT8q
-	 S47JPXjOHH9P7wlbw/or3iVnsK/97Xj7pxX/OQigs2eSjY6g0uBD/e86k20hokoJIs
-	 O4ZV+cra2FY2IvVOPubNh40VEg8wh4tXKpetQN6nzKf8tHwWDeZoQl/aztnC8G2EYP
-	 MWrFw1rIHX7j6i6Hyn+BkKeMBI+5QVh0FHfSk+qGEWWAvne0MR3ox3TWMw4/q35tW3
-	 0xcEBA7Ftfu/Nx+HuqnwEpy7Dd6pjxS1SpL8ke87gudyw9LwDISWJ8XCIxg+tk3QKj
-	 Btm8dmHcw3zlw==
-Date: Thu, 13 Jun 2024 18:49:38 -0700
+	b=lMGmGctS/AsZRmHSrtA7btYY+6QyV87iY/JcWcpSkwHRh7VqjiRXmRzHbOz5zsBfY
+	 4dJFYPUmwnD6TrM575uWyw9nNybkPtYZNnLdF22e+Ggh2ukBwmJfUYDdjBcqNiLEaT
+	 lgYsduKXn+UwRkpriaikNa5gfqESN1VqLm0cdCOuIYvlA9bZRas37fFsNEvkbMm1ab
+	 96tY3/F8W1118UUe+5hSKK59mejhyNzs+JWQy1Ew1GGR50uzt5AZhFn93Dty8Cjn0V
+	 acDCGFxuTY9VM3xtd8qRhZ7F4Rg7fqjH9JiDYIrIkkWcOUZO84Nh7PrKlz9TntQl8+
+	 4KgJIfUFaM8jg==
+Date: Thu, 13 Jun 2024 18:57:28 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Abhinav Jain <jain.abhinav177@gmail.com>
-Cc: horms@kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- skhan@linuxfoundation.org, javier.carrasco.cruz@gmail.com
-Subject: Re: [PATCH v2] sefltests: net: Add on/off checks for network
- interface non fixed features
-Message-ID: <20240613184938.0cc8cc56@kernel.org>
-In-Reply-To: <20240609132124.51683-1-jain.abhinav177@gmail.com>
-References: <20240609132124.51683-1-jain.abhinav177@gmail.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+ <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] net: make for_each_netdev_dump() a little more
+ bug-proof
+Message-ID: <20240613185728.6e7bf9ad@kernel.org>
+In-Reply-To: <d6e29acc-c759-48ce-bea2-3088b4d3ea86@intel.com>
+References: <20240613213316.3677129-1-kuba@kernel.org>
+	<d6e29acc-c759-48ce-bea2-3088b4d3ea86@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Sun,  9 Jun 2024 13:21:24 +0000 Abhinav Jain wrote:
-> This patch addresses the TODO (add non fixed feature on/off check).
-> I have tested it manually on my system and made changes as suggested in v1
+On Fri, 14 Jun 2024 03:45:47 +0200 Przemek Kitszel wrote:
+> you are right, it would be easier to go one step [of macros] up, we have
+>   453=E2=94=82 #define xa_for_each_range(xa, index, entry, start, last)  =
+       \
+>   454=E2=94=82         for (index =3D start,                             =
+         \
+>   455=E2=94=82              entry =3D xa_find(xa, &index, last, XA_PRESEN=
+T);      \
+>   456=E2=94=82              entry;                                       =
+       \
+>   457=E2=94=82              entry =3D xa_find_after(xa, &index, last, XA_=
+PRESENT))
+>=20
+> You could simply change L456 to:
+> entry || (index =3D 0);
+> to achieve what you want; but that would slow down a little lot's of
+> places, only to change value of the index that should not be used :P
+>=20
+> For me a proper solution would be to fast forward into C11 era, and move
+> @index allocation into the loop, so value could not be abused.
 
->  	echo "PASS: $netdev: ethtool list features"
-> -	#TODO for each non fixed features, try to turn them on/off
-> +
-> +	while read -r FEATURE VALUE FIXED; do
-> +		[ "$FEATURE" != "Features" ] || continue # Skip "Features" line
-> +		[ "$FIXED" != "[fixed]" ] || continue # Skip fixed features
-> +		feature = "${FEATURE%:*}"
-> +
-> +		ethtool --offload "$netdev" "$feature" off
-> +		if [ $? -eq 0 ]; then
-> +			echo "PASS: $netdev: Turned off feature: $feature"
-> +		else
-> +			echo "FAIL: $netdev: Failed to turn off feature: $feature"
-> +		fi
-> +
-> +		ethtool --offload "$netdev" "$feature" on
+I think we're already in C11 era for that exact reason =F0=9F=A4=90=EF=B8=8F
+But please don't take this as an invitation to do crazy things!
 
-You do off then on, so you assume the feature was on to begin with.
-Not all features will be on. You gotta change the order based on
-the initial state so that the feature goes back to what it was.
-
-> +		if [ $? -eq 0 ]; then
-> +			echo "PASS: $netdev: Turned on feature: $feature"
-> +		else
-> +			echo "FAIL: $netdev: Failed to turn on feature: $feature"
-> +		fi
-> +	done < "$TMP_ETHTOOL_FEATURES"
-
-More importantly, tho, currently in our CI this test passes:
-
-https://netdev.bots.linux.dev/contest.html?test=netdevice-sh
-
-But it doesn't do anything:
-
-https://netdev-3.bots.linux.dev/vmksft-net/results/638724/98-netdevice-sh/stdout
-https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/638544/90-netdevice-sh/stdout
-
-Because I'm guessing the VM does not have any interface to test.
-
-Before we extend the test could you please make the test automatically
-add a veth or netdevsim device if there is no testable device on the
-system? Make sure you remove it before exiting.
-
-You can look at tests in tools/testing/selftests/drivers/net/netdevsim
-for inspiration and library scripts which can be reused.
+In netlink dumps, tho, we keep the index in persistent socket context,
+because the iteration is split into multiple recvmsg() calls,
+each one continuing where the previous one left off.
 
