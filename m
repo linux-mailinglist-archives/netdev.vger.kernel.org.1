@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-103722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 520A2909336
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:10:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97F89909337
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:11:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED78A1F23C00
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 20:10:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F76D287D00
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 20:10:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571B71A38F4;
-	Fri, 14 Jun 2024 20:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 346A91A3BA1;
+	Fri, 14 Jun 2024 20:10:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LDMhy9ZL"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="nrr2+BVK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61B31A2549
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 20:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867D41A2549
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 20:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718395831; cv=none; b=cWp6bVr59s1RAeShNijyAeRP9sZuOy99Ic7anNkL5qo52B0WqqOD9PJKHsIVx7FWeerS3HJKU43jb3fL1pBjlmlwboJBPTR22WREZKdKtGPkx+UGbXtpoYnNQPyzZ9CryXwZHDWcGMsK1Vp7EDPMPIVwjTMfoFPqybMWylZirpA=
+	t=1718395856; cv=none; b=saPO5pV3rxC9/d0/CDFkJ6p7ESGcqD/IFxNzByZMgvvXS3qFAnBQZsO+BoFh2NoCrjycA9N3TLRjUy62xZpVc8o+N79WQJTHYur4QkcVdQawFm2fla07q/l6TGJFRONAMg5V+aRhHGR8bJNiPgoJZFmFujjEghkeY8Dn5NKG9/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718395831; c=relaxed/simple;
-	bh=hpttgVn22xQ91PVIDS3S64poe79nU7c+E3uTSpVGVV4=;
+	s=arc-20240116; t=1718395856; c=relaxed/simple;
+	bh=3XzUQFIgZLyJInCVl3arIYPHSEZ8MszMe/nnaSrfTXc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=U2ZlBs6+sk6Y0sFn/BG/OlhGaQwDUDY8h6QJypZ8RyxF4VEGE4jpyGRoxxj/4F0qLm6wqA/7I5cioLK8fbQ+4seS0wXxizDAdmNT+CqgZPd405OMAa6flk71DnmkqXa+iMEtkZfRcsbyOn7Oin+w3VeYAMDiKRhbPjTnnyRTusY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LDMhy9ZL; arc=none smtp.client-ip=99.78.197.217
+	 MIME-Version:Content-Type; b=Adjtz9hLqqLpcN/TddUcbY41cy/NojkwN9siUgnEVCL0jzYLwSSLBUGhq7+a1zLBVC4c1lSJx2zZyIeLoeCCBd5PRyipsvQ9XNfi9CSvohM1Vj6ns74zstKLswoDUOvS/rFzYhTB6fVu6ToPxm7dR/1T1PTTuSyGIiyBEKzhYJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=nrr2+BVK; arc=none smtp.client-ip=72.21.196.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1718395830; x=1749931830;
+  t=1718395854; x=1749931854;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=XJ1d7cz8uWyNJxvjujXTiKLryHOkMgwrTD0sdIHVs+c=;
-  b=LDMhy9ZL9TyX9Xrlv3MWLKQps8cfCeRZFWhBAn5bWRNYjz2kRQ/8VLib
-   I/koKi8BdAMMsGEpaM9a6zo4nsIQ8PK8C609gF+MxiaPjWY79y0PFtChH
-   G0BWEgI42rqfVuIbdjrmHEAb3my9bRycdL916KQawLZq407y5e/R9PzdR
-   k=;
+  bh=hi4eE1pBj4QgRg5N1Jj961UvVNbJpxC8UbOzajxnvT4=;
+  b=nrr2+BVKUTvPHWclPwOt+WqKDy4UdvK8vExZvGIIav+l+ygmLewJWI8a
+   8HZGzrxLx92fsEHMWHHN3VZkkwgNt8Ycwypd+QOP+0IYBxHlWe4TjudxC
+   bMSy9H/hpVR6kbkwtiiJxfiqDTKJjBHxCGHinYNqcwwl9creYU+/Pq/Xc
+   Q=;
 X-IronPort-AV: E=Sophos;i="6.08,238,1712620800"; 
-   d="scan'208";a="302327437"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2024 20:10:28 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:63341]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.60.144:2525] with esmtp (Farcaster)
- id 33fa8833-562a-4880-87e6-b123f6bb3877; Fri, 14 Jun 2024 20:10:27 +0000 (UTC)
-X-Farcaster-Flow-ID: 33fa8833-562a-4880-87e6-b123f6bb3877
+   d="scan'208";a="407907009"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2024 20:10:53 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:46457]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.37.96:2525] with esmtp (Farcaster)
+ id 61532a0a-c9ab-4720-a6cd-65e8b9e36c38; Fri, 14 Jun 2024 20:10:52 +0000 (UTC)
+X-Farcaster-Flow-ID: 61532a0a-c9ab-4720-a6cd-65e8b9e36c38
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 14 Jun 2024 20:10:27 +0000
+ 15.2.1258.34; Fri, 14 Jun 2024 20:10:52 +0000
 Received: from 88665a182662.ant.amazon.com.com (10.106.100.24) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 14 Jun 2024 20:10:24 +0000
+ 15.2.1258.34; Fri, 14 Jun 2024 20:10:49 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -64,9 +64,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Kent Overstreet <kent.overstreet@linux.dev>, Kuniyuki Iwashima
 	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
 	<netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 07/11] af_unix: Remove U_LOCK_GC_LISTENER.
-Date: Fri, 14 Jun 2024 13:07:11 -0700
-Message-ID: <20240614200715.93150-8-kuniyu@amazon.com>
+Subject: [PATCH v3 net-next 08/11] af_unix: Define locking order for U_RECVQ_LOCK_EMBRYO in unix_collect_skb().
+Date: Fri, 14 Jun 2024 13:07:12 -0700
+Message-ID: <20240614200715.93150-9-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240614200715.93150-1-kuniyu@amazon.com>
 References: <20240614200715.93150-1-kuniyu@amazon.com>
@@ -78,44 +78,93 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWB001.ant.amazon.com (10.13.138.119) To
+X-ClientProxiedBy: EX19D033UWC001.ant.amazon.com (10.13.139.218) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Commit 1971d13ffa84 ("af_unix: Suppress false-positive lockdep splat for
-spin_lock() in __unix_gc().") added U_LOCK_GC_LISTENER for the old GC,
-but it's no longer needed for the new GC.
+While GC is cleaning up cyclic references by SCM_RIGHTS,
+unix_collect_skb() collects skb in the socket's recvq.
 
-Let's remove U_LOCK_GC_LISTENER and unix_state_lock_nested() as there's
-no user.
+If the socket is TCP_LISTEN, we need to collect skb in the
+embryo's queue.  Then, both the listener's recvq lock and
+the embroy's one are held.
+
+The locking is always done in the listener -> embryo order.
+
+Let's define it as unix_recvq_lock_cmp_fn() instead of using
+spin_lock_nested().
+
+Note that the reverse order is defined for consistency.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/af_unix.h | 12 ------------
- 1 file changed, 12 deletions(-)
+ net/unix/af_unix.c | 20 ++++++++++++++++++++
+ net/unix/garbage.c |  8 +-------
+ 2 files changed, 21 insertions(+), 7 deletions(-)
 
-diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-index c42645199cee..63129c79b8cb 100644
---- a/include/net/af_unix.h
-+++ b/include/net/af_unix.h
-@@ -96,18 +96,6 @@ struct unix_sock {
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 5d2728e33f3f..9bbd112926ad 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -170,6 +170,24 @@ static int unix_state_lock_cmp_fn(const struct lockdep_map *_a,
+ 	/* unix_state_double_lock(): ascending address order. */
+ 	return cmp_ptr(a, b);
+ }
++
++static int unix_recvq_lock_cmp_fn(const struct lockdep_map *_a,
++				  const struct lockdep_map *_b)
++{
++	const struct sock *a, *b;
++
++	a = container_of(_a, struct sock, sk_receive_queue.lock.dep_map);
++	b = container_of(_b, struct sock, sk_receive_queue.lock.dep_map);
++
++	/* unix_collect_skb(): listener -> embryo order. */
++	if (a->sk_state == TCP_LISTEN && unix_sk(b)->listener == a)
++		return -1;
++
++	if (b->sk_state == TCP_LISTEN && unix_sk(a)->listener == b)
++		return 1;
++
++	return 0;
++}
+ #endif
  
- #define unix_state_lock(s)	spin_lock(&unix_sk(s)->lock)
- #define unix_state_unlock(s)	spin_unlock(&unix_sk(s)->lock)
--enum unix_socket_lock_class {
--	U_LOCK_NORMAL,
--	U_LOCK_GC_LISTENER, /* used for listening socket while determining gc
--			     * candidates to close a small race window.
--			     */
+ static unsigned int unix_unbound_hash(struct sock *sk)
+@@ -1017,6 +1035,8 @@ static struct sock *unix_create1(struct net *net, struct socket *sock, int kern,
+ 	sk->sk_write_space	= unix_write_space;
+ 	sk->sk_max_ack_backlog	= READ_ONCE(net->unx.sysctl_max_dgram_qlen);
+ 	sk->sk_destruct		= unix_sock_destructor;
++	lock_set_cmp_fn(&sk->sk_receive_queue.lock, unix_recvq_lock_cmp_fn, NULL);
++
+ 	u = unix_sk(sk);
+ 	u->listener = NULL;
+ 	u->vertex = NULL;
+diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+index dfe94a90ece4..eb8aa5171a68 100644
+--- a/net/unix/garbage.c
++++ b/net/unix/garbage.c
+@@ -337,11 +337,6 @@ static bool unix_vertex_dead(struct unix_vertex *vertex)
+ 	return true;
+ }
+ 
+-enum unix_recv_queue_lock_class {
+-	U_RECVQ_LOCK_NORMAL,
+-	U_RECVQ_LOCK_EMBRYO,
 -};
 -
--static inline void unix_state_lock_nested(struct sock *sk,
--				   enum unix_socket_lock_class subclass)
--{
--	spin_lock_nested(&unix_sk(sk)->lock, subclass);
--}
+ static void unix_collect_queue(struct unix_sock *u, struct sk_buff_head *hitlist)
+ {
+ 	skb_queue_splice_init(&u->sk.sk_receive_queue, hitlist);
+@@ -375,8 +370,7 @@ static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist
+ 			skb_queue_walk(queue, skb) {
+ 				struct sk_buff_head *embryo_queue = &skb->sk->sk_receive_queue;
  
- #define peer_wait peer_wq.wait
- 
+-				/* listener -> embryo order, the inversion never happens. */
+-				spin_lock_nested(&embryo_queue->lock, U_RECVQ_LOCK_EMBRYO);
++				spin_lock(&embryo_queue->lock);
+ 				unix_collect_queue(unix_sk(skb->sk), hitlist);
+ 				spin_unlock(&embryo_queue->lock);
+ 			}
 -- 
 2.30.2
 
