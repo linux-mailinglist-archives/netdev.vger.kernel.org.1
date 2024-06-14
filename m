@@ -1,135 +1,222 @@
-Return-Path: <netdev+bounces-103615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48B7D908CAE
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:46:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B971C908CBC
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:50:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 409631C2385B
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:46:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DD5828A71A
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D344C96;
-	Fri, 14 Jun 2024 13:46:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658788BE7;
+	Fri, 14 Jun 2024 13:49:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gLfzyx96"
+	dkim=pass (1024-bit key) header.d=esteem.com header.i=@esteem.com header.b="xFjyNsPx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2136.outbound.protection.outlook.com [40.107.244.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE16C133
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 13:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718372772; cv=none; b=sFBU4eO+h6fFSDIZICwn8GrYwsf4gDFmOJmzwp8AB7Z6uo3A2CkSG6QL57RrNnNqsjE+wq2Dm3f7demexnNg6+QbQVa4++/KlV254zfVkchrvYXXv3bSPI+GbdXqB/dLXhRfTOdbc4fuyrquZtrF/I/FjK50Z+pAJDJ5Au2W8w0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718372772; c=relaxed/simple;
-	bh=zTyIZedtWX2FApGDJgWkCYBBo5yO4RKS1RIBqNmnQ/c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hP1mt6fNNOFfSqfiDJTROEhiYq3Vn5jowDeM2uwNRnGm5V6DLvN++sEVvl45jz/6WzD0OzQXCH4bZuQI5MnOS9jdhMpwyYjjhWx0iTlBHuka3JWLd0b9VUyU1UZVGC6e90dE/zx/nWkGBZ7Z6DvzFkF4xzkdUemQdoQQ9/Eiees=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gLfzyx96; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52c8ddc2b29so2425130e87.3
-        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 06:46:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718372769; x=1718977569; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EqtvZEeZfg5PFo8/EJ1xZoE8ZwqK47qnIgVHBHL0/ak=;
-        b=gLfzyx96taqPORzLundsg/l1beOo0R9WH3P5bF6cIk9YOkJdK3H8qVcQ7lQol06MZC
-         oOdhIFmRGteX7J/6Fa7X8b0TYqYTmOsb3mTXfDGFxoDesJPQSALubUtMFBR5TrJkaIGZ
-         PQ0/uFtw1P6HAUnEOxugdFNpen8VfJ2MkeOjO7yz/3245dkRTFVg1sOeIGvVruRdaKvB
-         4EEUHsBgS7WgvDwQbX69fLWrmN9f/Sj21/9n/pKIcT77tDe8ifTsuDt25jiLJyFA5pPo
-         x81yJsheZnuFOi/TOOnA4A8r0Tv2BKFKiyT+9Zm+lZOiNh9fwBNwdqhqxP7wEu6cIA7h
-         FDxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718372769; x=1718977569;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EqtvZEeZfg5PFo8/EJ1xZoE8ZwqK47qnIgVHBHL0/ak=;
-        b=Hygo3dCNddL+9yFM6t8MU13sEuM7nKy8VT7gmbeReODG+WiemKCYOBufIjOyasSxH1
-         THMh9NwThW5FBqjsDm29PkNoncC4DNuL3mOqB49gcVucst4+t+x+nVI+iO1b+i4w2VRX
-         k13q5xp2kvd3d290QUmqhjlz+uj8I4yA3bNrn2cMqls530rqrT4Dhz9F2ZaP5wHjpoAw
-         bfCbdOytr4kFcSM4RA/QcKS5hzptJi8ZYY19kmI1p1p52GS5iPbzGIhqUJA+9pmjg5m2
-         wxKfdcW5/YK4kvRuAXAqe80umb7cw5umjAjuNingzdQWryDsJ0nQJD+RsW3qy2THd/4c
-         ZXRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXKf6D8nWZLKq2YmFn3Ik5RfD1lq/IhEIkUAk2N4ALHnJpTnWXQlnphxjEpR2HuZlrjlKiBboOVuuER1d1u5M+p/i1XfFks
-X-Gm-Message-State: AOJu0YyYZU9uTlV9GTWuyuLa2fO70lMyzTSQpALxyNrKuKBC76SyUlJ/
-	zyz+14/ay5rW2JglMozb2nyz+p4zr0L0bR88DpbnNu2sFg0UVVoPoVkMMkhC
-X-Google-Smtp-Source: AGHT+IHXH1Jr/cDMWmIdk5tNNb4rGlnFXcxxcuQ0mlmvtouMDoOEIQW+nad/P8kcSZJTKz+Ifx8XYw==
-X-Received: by 2002:a05:6512:12ca:b0:52c:84a2:d848 with SMTP id 2adb3069b0e04-52ca6e9b087mr2983049e87.65.1718372768334;
-        Fri, 14 Jun 2024 06:46:08 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52ca2888595sm523020e87.284.2024.06.14.06.46.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jun 2024 06:46:08 -0700 (PDT)
-Date: Fri, 14 Jun 2024 16:46:05 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
-Subject: Re: [PATCH net-next v13 04/15] net: stmmac: dwmac-loongson: Drop
- duplicated hash-based filter size init
-Message-ID: <67gnb2k2hyyfycopv2tpyn6ccgp5x7a52sct3boj6pedoix44d@crv36xvkt55a>
-References: <cover.1716973237.git.siyanteng@loongson.cn>
- <486b9be6b4b33836d03563679af8b8e3427efb8c.1716973237.git.siyanteng@loongson.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BAC1881E
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 13:49:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.136
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718372956; cv=fail; b=CLLvx2OoqYNkPmzWW5fI3nrtSsQAn/+dstVv0LiyKQnqQmaXyEBNTRSgEOT6so9h8+7EhJG+t3K2JutHuoVir+VDjsM/QnykuoWnmpK2XYQXg1Myj55nhVjZIjdpRhAMITqaB0q9MFT/E5DWX5gvgJi/gk2Rd3ua+xEwfOpSE8Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718372956; c=relaxed/simple;
+	bh=jGDSpEvAr6kg3ZdILSzLjgVaz/3o9z00izF8tUkLwcQ=;
+	h=Message-ID:Date:To:From:Subject:Content-Type:MIME-Version; b=LhjMUBQEp1vcJIDnSNxAjTG4SDV65IfsERgJGhoOsMfLvPQ6DL74gBLqQ1bRuTVSmH5bqRq0p7DMrh6Sag5Ux0VyjsYt8h4M+a/C044AsKHLHo6NHtSPvu0elOvB+1fn98sXm6+EajNvx3u7ccJzJdtlEq64hi2gjzuN+zWTsPE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=esteem.com; spf=pass smtp.mailfrom=esteem.com; dkim=pass (1024-bit key) header.d=esteem.com header.i=@esteem.com header.b=xFjyNsPx; arc=fail smtp.client-ip=40.107.244.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=esteem.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=esteem.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HXKlawSK8BacR1m1CSq4BCiIkme9K5WUR7H/SGsBC6/oyGRUOdDytjJvGAI/ArUJJ81C0cLM7+M7+8YjHNDy2ljPXJ/sdVyZpilfPq5BaHZxQSH0iVR+26GfnmMRplhLn6Z+NzyfN7ZTgSnyqIq+WRGl2m46Jm7jzEM3B9k3qCAVGlPmUq16wXQj2WV6Q6/jyDt8dQIKGtVkuzYWK/kievRb9hoY9xgrz7Iw2Vw2QJwUbaR1Qr5D3BCjpXT+MKoZUqU39135UNnQouJEbaL8i60ZeZVj6AkNgahKUVj5uWA92w/DvAbCPrUyWZ+gy643Ef/owbAXAXm/T2JCPM020Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EQ6w5gEFo0k1baXP+gwMlTEVDrO2OB0CWbtQ7pSWsjs=;
+ b=jc2Ym1xI8fWWE/gPV0ke+O7gM2W1F3PH0Xp8P/Azb5607V2HqxjYGMKu80xSKoQAXI1QCrRuMgWrN1jaFDRba9RAvzRFpNFkDvVTydNaB+mT0wjXDeSo97b4r0lfNMOIt3KXQb9k3X4d5fxIrKLHhca8bUvmTTRsudqcJ8QUvSjncWYpQaFYZDoFQNWRKmFLm4WJ5wPvuBJ3x8wyiWG5m1t1E6qOTS9KpuhJci85QkkYor7+HKfGob4GAo0V4i/pWNRX/KsywzD4qiPSkMaK7NM2oiYURKVTZCogOX8WgPlVlTmQssAbXbGLYihe7R21DHfDWOHbR1ugk4iBPURoUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=esteem.com; dmarc=pass action=none header.from=esteem.com;
+ dkim=pass header.d=esteem.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=esteem.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EQ6w5gEFo0k1baXP+gwMlTEVDrO2OB0CWbtQ7pSWsjs=;
+ b=xFjyNsPxMK7y+I7xUvY4UMK9MxDJDojW+wLhf2DVb2Fo/UnbVoj5kqIYyNQKeBiutelNwxFDXQfxJfFP7FcL3KOfIZhunal6hW4NllQMyKeXfepZLYee7k9MsZjEEQiLozetCAajhh41vdehNrMnXdQqB7MxwV3E36LX42hqbKE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=esteem.com;
+Received: from DM4PR12MB6373.namprd12.prod.outlook.com (2603:10b6:8:a4::7) by
+ DS0PR12MB9347.namprd12.prod.outlook.com (2603:10b6:8:193::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7677.24; Fri, 14 Jun 2024 13:49:10 +0000
+Received: from DM4PR12MB6373.namprd12.prod.outlook.com
+ ([fe80::12f7:eff:380b:589f]) by DM4PR12MB6373.namprd12.prod.outlook.com
+ ([fe80::12f7:eff:380b:589f%6]) with mapi id 15.20.7677.024; Fri, 14 Jun 2024
+ 13:49:10 +0000
+Message-ID: <d653597e-9b1f-4eb7-af36-8d79cc5146b7@esteem.com>
+Date: Fri, 14 Jun 2024 06:49:08 -0700
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: netdev@vger.kernel.org
+From: Neil Hellfeldt <hellfeldt@esteem.com>
+Subject: Throughtput regression due to [v2,net,2/2] tcp: fix delayed ACKs for
+ MSS boundary condition
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0187.namprd03.prod.outlook.com
+ (2603:10b6:303:b8::12) To DM4PR12MB6373.namprd12.prod.outlook.com
+ (2603:10b6:8:a4::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <486b9be6b4b33836d03563679af8b8e3427efb8c.1716973237.git.siyanteng@loongson.cn>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB6373:EE_|DS0PR12MB9347:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4796876-c6b3-42de-c518-08dc8c78c46a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230037|366013|376011|1800799021;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?b2xkZVQ3ZTJyejNSVERPcnowQTVRa2s1dkE3Q3dtQzd3TGtEWDBtU0FtUHJ2?=
+ =?utf-8?B?RWtKc0wwWFMrVWRMQk9oRTAvcVRTLy9NWFNGaVpPb01sMVVKWGZGei95bThJ?=
+ =?utf-8?B?bnFNcSs2Um1oMmtEbVoxVThJNVc2emRTaC8yYWEyTkk0TnRwTjZrM2VRODdR?=
+ =?utf-8?B?ZGI4S1NLWSsxei95UXVzcXQyd0kwZXQzdmVLa0Z6aWp5aFUyN3R5MVRNMjRu?=
+ =?utf-8?B?S3JraWI1S1llL0ovbDZDYXh6RlRraEwwQkx6ekM1eDFFMzBkcExCTllSMjRk?=
+ =?utf-8?B?UWpRclR0Y1FRSFNnRWkyaUs0KytYMjZFRXdibEFCdEt3UER4c2lYUDZCMk1L?=
+ =?utf-8?B?VzF3eWlEdHdQY1VXRWRCNUxKcXcxczkzZURrTzhWRnE2T0s0dGhYblphNUhh?=
+ =?utf-8?B?R1d2S095d0o2MWdRQzVwZm9abytzU2FCbGNpa2xoUUdOR0FuM0N4RlQ2SkV5?=
+ =?utf-8?B?MGxjekE4Znl2SEc0N1BPbEVEZG5rNUlmZEFyMTVxa1RTRnVldFpjSitiaEZM?=
+ =?utf-8?B?SGYvMG0xVjRWNmlFUnVSMmVoUWEvejNJUDBQbzJ2MWx3LzZDSnVMc2Jyalpx?=
+ =?utf-8?B?RUxJcVordzFvK0sxRXdIM3R3dmNJb29uV05sMXFXRTRFVUxXdVhkT2FzTmt5?=
+ =?utf-8?B?aE8yVHpMWFlMQ3lQU2RiRmFsazJaVU94aWxiL3ZJMEQxQ3ZNYmVqVElOVFZr?=
+ =?utf-8?B?anV5ZVZKR2dmcVdFZnJLRVBoRGY1cGhhUEI4YzJsalgvdFpiTmpWWVdOcTJH?=
+ =?utf-8?B?NUhheWF1SGhuRWZtL21OOW1rTmdVMXpTa0ovbzAzYmIxWDZqQ05IQ1l0M00y?=
+ =?utf-8?B?WVhEV09vcXdRSGozeVl4dWxwMzc4ZFhyRkJFQkVuSjJpTlZUUTFVTnQ5REIx?=
+ =?utf-8?B?QXFrSVdmY0FZTnFKM1N0alVVdXNySVI0YW51T0pYc25tc1FWbSt5NW9oUCs4?=
+ =?utf-8?B?clREamRwQzQwY3F4RDBmblE5bWJjR0lqV29QWmgzOWV0Z3RiWGFPVVRoRnd1?=
+ =?utf-8?B?NkllNVFvbjExc3hFbUxkVVdlMk9aWTlUUmNhbVlUU2V5dk5LVmg0R3lJR3JT?=
+ =?utf-8?B?VFVVUEZQaTcrTGpWTXRVcFFtbzFnN1JCd0k2TU5pdEZJaHZTaGxaUWNQYXcx?=
+ =?utf-8?B?WmF6dkQ0Qm00MWgweGRvd1VHa21NVXdzTUZEZU5KMTZqTENxNTJhWVphdk40?=
+ =?utf-8?B?VVRWang1MEZSbytDZ1AzOHd2d2tkMVAybkxENy9rM0ZQR0cxMU1nUFo2TU0v?=
+ =?utf-8?B?a2JCYjRRZWw5MDA0OE1qQXJnMUNGQmtIRFRiMWJFS2t4dlAvdFpxcFhvRmlW?=
+ =?utf-8?B?VmtEa0Y1U0xxQVBzZzhwSWt1T2pjU0hyY0ZMMGNmcGxYYmNzOGozVzVKNmVh?=
+ =?utf-8?B?QzU4bmdCWDZQMzF2Ym1GelUwbmQwUDBvbXoyb0VRS2doaDFJaStNOUZ0WjRq?=
+ =?utf-8?B?TzRLVFprTldaZFhrMndnNDVUeUNyWVBxcXlwK1k3T2JrUU5OaEZNOTFSWFNE?=
+ =?utf-8?B?USszdEN2bTgwTm9VZEVnaTByUTZVQWlJMHJmZnlQeEd2UTY2UE90cWlnR0I0?=
+ =?utf-8?B?YkM2RDFuc0ZSZFJTQ1U0Z29QOUZMQ2ZyNUNsdTl4SnJtd3lmQjFNQlgwekIx?=
+ =?utf-8?B?RE5pUXI5UHY3cGczNElaUkNrVFlBWkVPRXBmL0toY0xsVERDanF1bmpmVDdD?=
+ =?utf-8?B?NEJXbjVvMndCajFLdDVET3pSbWM2Q1NFVU9VOEhuTGNjUnNjZlB5N1NsQjRM?=
+ =?utf-8?Q?aO41iylw12lSpot8yuVXN7RLfuMSkOtaRY+qDxC?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6373.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(376011)(1800799021);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Z1A3KzdpN0c5MXFSQzE3WGpBeTZIUkk1QTN5K3MrNC9OQnBoOUlSeTJzVXZ3?=
+ =?utf-8?B?d2xHM0VNc0RWQjlZTTNjUDBlTXY0RURzbzFYZUVtZ2orbS9Xend5VEZqcnBm?=
+ =?utf-8?B?Ung5UUxEdnlpZExPaVVOSnE5L1pHdUp2aGhnUDFIWDM0dnptODlGbHlhQlV4?=
+ =?utf-8?B?V1kvMjYxYmp0ak5ybW9yRFNFaGk3b2RDMWg3ckduQUM1VFV3THhVc0paYlk1?=
+ =?utf-8?B?dGNFT1VsZUo5bHo0ZHB5Zm5Ib2g5V25NcWZ0WCtZSXpYSCtnd1k5YlZUME1D?=
+ =?utf-8?B?WURxL3VENFQ5MDkyOEdrdGlGQ0RUNGFic1Zsd2ZuRllBclQxL2xhT1FjUnln?=
+ =?utf-8?B?Z3BhL0RLN3J5ZGlIYUpiNXh1clluTnZ2NjVGanpjYkJIUUtvbDZidzloeDlN?=
+ =?utf-8?B?VlErNVNPZW5Ya0NDU1JMNExCaWtmbEFQdVRqbyszTnpzUVMrbzZrOXZVbDQ0?=
+ =?utf-8?B?U2lYTkRzemwvWWdtM0drSjFqbVQwejRWUWcyaTVWNmwrVEx6eVJUQlNFVHhw?=
+ =?utf-8?B?VElLcUcrR0hIY05Jc29tc2V5U0xBQWYvang2WTVlbFAyN0NBcDlZMVBRUDRZ?=
+ =?utf-8?B?Q0hCUGsvNFc1c1ZBdk1tRVhQTURjbUZSczZCYjVOVTFLYUtHVE5tOCt5RXhh?=
+ =?utf-8?B?L1RjaW1FeDFjK3ViekVqY0pJcVNOV2cySnFBekMzTS8wVzErN1NuK2h0YWhZ?=
+ =?utf-8?B?NzA2UWFGUndVV0RlYmlxMWhnOUtaSjZpRkpqSFJ2OVJZRzVGRGxDWHdSNG9I?=
+ =?utf-8?B?Uk5yamg0cmxnYlNJQ0JLOVRaTEhpL3FtQ1hEdnZ6L0x4N21QaHovaUpGcU81?=
+ =?utf-8?B?QkFKczc4OWlBbzJXZHAyL1ZrVnpLZjhKMnd0NmYxYXArVDRtZW5nWHFuYWtI?=
+ =?utf-8?B?WDVUVi9tRkdlN01qa1VSWWRsQ2FNVlpuTU9WUzNwY1cxQXFBN0FJamRrbGl0?=
+ =?utf-8?B?cnpvQWNlT3VZTlZqUE1lRS9Pdno5UlIrN1U3dzZYQ3REUFhRM2czWmdKdTRn?=
+ =?utf-8?B?WmY5cUlFSTR3cEJIcXhicHhWZ3VwVkJRSEx5N2grRWc1Wk1XdzVndDVPdS9i?=
+ =?utf-8?B?M3hsL3E2bVFLOU1TT2pwOXN5VWZSN1pyQWQwb3ZhOUw2RHNucExWbUxoTWZX?=
+ =?utf-8?B?MmN2RkdNYnpSdTVYajFCS3E5YUYxSlpXaVdkUldta1dsN29PS1dYQ092N2h4?=
+ =?utf-8?B?TnFDdW8xd1JHTDI3Y0Y4d0x3akU3M2dYMTFSZWtsYlltYSs4aDVKY1N6T2FX?=
+ =?utf-8?B?enlOZnl1amJFWUtWR3RDM0NKTWwvOXpDclVMZy9TeWpuOGR1Q3dQbHFMeEF6?=
+ =?utf-8?B?R2xERFF0UVhZcjlicXJjK1VmWnFPM3ErdCtLVUlIUlUxa1k5amM2L1hldkFP?=
+ =?utf-8?B?ZzEybjd4K1VJemt1SUNkRkZxZUQ4VGZCQ2ZWTjJkM2RhbndiUUFjN3YyMWgx?=
+ =?utf-8?B?Y2NBMHNJYUJsS2dQZEh2UFlsNUVJd3F1T1ZqUTJLMk1ZUmljWGMwUkdZUENT?=
+ =?utf-8?B?YlFON0Z0QTRBVzlXb2dST2ViTm5lODlJUW9KcTNTa1NkZFg5MkVyTFp4TGhp?=
+ =?utf-8?B?UURETS9OOENDZmh2NHFoSXZrNzRoZW4wQ3R5Q1NTQ2s1ckt6Z2NSdktZZzlW?=
+ =?utf-8?B?WFgvcXNyVEpxWHNuZmhGTmVXMGFzdGZLeVdJR2hTeFg1MlBmNlQrTE43ZUlK?=
+ =?utf-8?B?VTBZQmhRZnpXb1ZHV01CRW9vNHdYRzRGaVgvQm1xTk5iQnFEYkVObG1teEdI?=
+ =?utf-8?B?OHlqVm5McjdZUW9CNnpCaXZlUU1ubzBpNWJqM3pidWsrV1E4TU93VksyMUpQ?=
+ =?utf-8?B?NGYvRkE2YWE5NUcvSjU0UkNhTEVOOWtFY0Q5NWxjK216NTRPVHMxVTJzYXdK?=
+ =?utf-8?B?Q3NHa3l3WGwvLzFIblhlNFViNXV3bXkxNGlFVUJOZURlUVVSeWx4KzdxOXFl?=
+ =?utf-8?B?bWRPVDdDclpRMjFGd3hzdnpWZC9hUjV0Ty9YcmFiWDhudUl1OXFnekpaTFho?=
+ =?utf-8?B?dU8vTjV2bE1ZZ1lDM0gvWUw4Y2FIanJRaElQZXFKWU5uMTl4Qjl6WkQvbE8v?=
+ =?utf-8?B?SjRHeU1LYXc0NTBvS05xUXhYQ01hM2JrZVlvazJ6TGtya2FDK0ZuRlM2TVhw?=
+ =?utf-8?Q?bLLmdzM4GIp/xucCg0lUkfBtr?=
+X-OriginatorOrg: esteem.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4796876-c6b3-42de-c518-08dc8c78c46a
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6373.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2024 13:49:10.1390
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f32e9c2f-8342-451b-8efe-15edc71a9887
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VlcHdg+Q6xE4j75hIi3bBw8Z2jFR+v7o7jThjqbE4ryMmyLZMkviF6eGkJu8rrJfd9ntRNhtL6pmd56AcMP9Bw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB9347
 
-On Wed, May 29, 2024 at 06:19:01PM +0800, Yanteng Si wrote:
-> The plat_stmmacenet_data::multicast_filter_bins field is twice
-> initialized in the loongson_default_data() method. Drop the redundant
-> initialization, but for the readability sake keep the filters init
-> statements defined in the same place of the method.
+Hi,
 
-Looking good. Thanks.
+So I believe I found a regression due to:
+patch: [v2,net,2/2] tcp: fix delayed ACKs for MSS boundary condition
+commit: 4720852ed9afb1c5ab84e96135cb5b73d5afde6f
 
-Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+I recently upgraded our production machines from Ubuntu 16.04 all the 
+way up to 24.04.
 
--Serge(y)
+In the process I noticed that iperf3 was no longer able to get the 
+throughput that it was able to on 16.04
+I found that Ubuntu 22.04 is when it broke. Then I found that Ubuntu's 
+kernel version 5.15.0-92 worked
+fine and version 5.15.0-93 did not. After that I narrowed it down to the 
+patch:
 
-> 
-> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> index 9e40c28d453a..9dbd11766364 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> @@ -16,7 +16,7 @@ static int loongson_default_data(struct plat_stmmacenet_data *plat)
->  	plat->force_sf_dma_mode = 1;
->  
->  	/* Set default value for multicast hash bins */
-> -	plat->multicast_filter_bins = HASH_TABLE_SIZE;
-> +	plat->multicast_filter_bins = 256;
->  
->  	/* Set default value for unicast filter entries */
->  	plat->unicast_filter_entries = 1;
-> @@ -41,7 +41,6 @@ static int loongson_default_data(struct plat_stmmacenet_data *plat)
->  	plat->dma_cfg->pbl = 32;
->  	plat->dma_cfg->pblx8 = true;
->  
-> -	plat->multicast_filter_bins = 256;
->  	return 0;
->  }
->  
-> -- 
-> 2.31.4
-> 
+patch: [v2,net,2/2] tcp: fix delayed ACKs for MSS boundary condition
+commit: 4720852ed9afb1c5ab84e96135cb5b73d5afde6f
+
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 06fe1cf645d5a..8afb0950a6979 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -253,6 +253,19 @@  static void tcp_measure_rcv_mss(struct sock *sk, const struct sk_buff *skb)
+  		if (unlikely(len > icsk->icsk_ack.rcv_mss +
+  				   MAX_TCP_OPTION_SPACE))
+  			tcp_gro_dev_warn(sk, skb, len);
++ /* If the skb has a len of exactly 1*MSS and has the PSH bit
++ * set then it is likely the end of an application write. So
++ * more data may not be arriving soon, and yet the data sender
++ * may be waiting for an ACK if cwnd-bound or using TX zero
++ * copy. So we set ICSK_ACK_PUSHED here so that
++ * tcp_cleanup_rbuf() will send an ACK immediately if the app
++ * reads all of the data and is not ping-pong. If len > MSS
++ * then this logic does not matter (and does not hurt) because
++ * tcp_cleanup_rbuf() will always ACK immediately if the app
++ * reads data and there is more than an MSS of unACKed data.
++ */
++ if (TCP_SKB_CB(skb)->tcp_flags & TCPHDR_PSH)
++ icsk->icsk_ack.pending |= ICSK_ACK_PUSHED;
+  	} else {
+  		/* Otherwise, we make more careful check taking into account,
+  		 * that SACKs block is variable.
+
+
+After I removed the patches I was able to get the expected speeds. I then reverted the patched on most current
+version of the kernel for Ubuntu which is 6.8.0-35 and I was able to get the expected speeds again.
+
+The device unit under test is a embedded device with lwip and built in iperf3 server. It has 100mbit network port.
+It is also a low data rate wireless radio. The expected rate for the Ethernet is ~52000Kbps avg with the patch applied
+it was getting ~38000Kbps. The expected throughput for wireless is ~328kbps with the patch applied were are getting ~292Kbps.
+That a ~27% throughput regression for Ethernet and a ~11% for the wireless.
+
+command used iperf3 -c 172.18.8.134 -P 1 -i 1 -f m -t 10 -4 -w 64K -R
+Iperf version is 3.0.11 from Ubuntu. The newer version of iperf3 3.16 show the correct speeds but shows a saw tooth plot for the wireless.
+
 
