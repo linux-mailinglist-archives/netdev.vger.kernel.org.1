@@ -1,129 +1,150 @@
-Return-Path: <netdev+bounces-103734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C0A0909403
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 00:04:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 370AC909405
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 00:05:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9118B22926
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:04:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6E02B23866
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:05:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E99DE185097;
-	Fri, 14 Jun 2024 22:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B821850BD;
+	Fri, 14 Jun 2024 22:04:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xk7r51tr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="esubgL+P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C284A1487ED;
-	Fri, 14 Jun 2024 22:04:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2877184134;
+	Fri, 14 Jun 2024 22:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718402672; cv=none; b=uU6jlfKoQqKVCRvMKO3b5DesP52dOIxUkD1ppsh27y3CLinl3bEQg/LNAyob7uCVNFuKlIPTu1egumCZDxrgqwFvIob2RauFr/RPM/BFHdGIBE04bGwwjDuX5+wSJ62H8tZTo/KPXeswJPLcoOU01cIL9gclZJqnAkCsJmi47Eo=
+	t=1718402697; cv=none; b=IMrctt5NTXtd7/AY8qx0q8yFhCZa0X7FzsNOG+4zhcWpfi5zfnVci1OAU82iHuaBok+4MsxrKMawX6nbjXthXTAOSgXQzPT5i2Bm5zk9UGxNgjxmhFupj1QiADqtRt/3gvpak3rn7YPwHp4/4OjftOelKC3eDt6hW3153nzYGns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718402672; c=relaxed/simple;
-	bh=HdKSiteX1Un1YtoVxmJvySJHtIPF5Vxdx6iJwgU2Z2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ys9v6ziiVF4fbOBxrATNEEdUtKAP9Wl8wsUtO8d0nFkSckKbRfjwXDAEJtyTVheJxwQuqxP6RoU6I3fJnaFS14WhDbbZ0LYwMRkf/O7BUMvBo3LNoWMhia5WDvIFnOuFiLcykZjsT/6C0OZQfgEtYSXOfH8O+iKhu5YmPXXWQDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xk7r51tr; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718402671; x=1749938671;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=HdKSiteX1Un1YtoVxmJvySJHtIPF5Vxdx6iJwgU2Z2o=;
-  b=Xk7r51tr6pJYGwBi+l7Q+1dlAUpJfjj9NqnMPIDWsBjGGAL5o1PJPKz1
-   6UDwTnt+IizVNJSwDKfZYpw1iFvbBDygqHhprOKD22qg/WmnuVhUA40pl
-   jXKT540Mc6MFZPopR9xctlysON8DbFpho8q2oJeEIfhKqaZ8nH7GLcQ2R
-   MIvuGofp9RQ/9ap2Sq4QTKVibgNV3Fy5yCPhv2rTivWN2aF7TGSeAz1m7
-   yBeRpxQ4xiImxuhwe9NgUXyiSVyLkrV+9wklvE2Whagl9VYmj0iEtK/L/
-   SC9liV7qW+WKu5QLWoKIuyEuk8V7TNdAbbcv5eelgBgXRgIAa8Oao5XLB
-   Q==;
-X-CSE-ConnectionGUID: 6A5FgMDySOmL4Lk71o27kA==
-X-CSE-MsgGUID: y12ncJbETP2X4uRixApS/Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11103"; a="32855185"
-X-IronPort-AV: E=Sophos;i="6.08,238,1712646000"; 
-   d="scan'208";a="32855185"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2024 15:04:29 -0700
-X-CSE-ConnectionGUID: BIt/LgMwRnKc6/X1k7Mq1w==
-X-CSE-MsgGUID: vDcFpkdNRe+MGRRxoBMNtw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,238,1712646000"; 
-   d="scan'208";a="41127062"
-Received: from lkp-server01.sh.intel.com (HELO 9e3ee4e9e062) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 14 Jun 2024 15:04:24 -0700
-Received: from kbuild by 9e3ee4e9e062 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sIF1y-0001q1-0r;
-	Fri, 14 Jun 2024 22:04:22 +0000
-Date: Sat, 15 Jun 2024 06:03:46 +0800
-From: kernel test robot <lkp@intel.com>
-To: Frank Li <Frank.Li@nxp.com>, Yangbo Lu <yangbo.lu@nxp.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Sean Anderson <sean.anderson@seco.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, Frank Li <Frank.Li@nxp.com>
-Subject: Re: [PATCH 1/2] dt-bindings: ptp: Convert ptp-qoirq to yaml format
-Message-ID: <202406150525.S8VdHLlY-lkp@intel.com>
-References: <20240614-ls_fman-v1-1-cb33c96dc799@nxp.com>
+	s=arc-20240116; t=1718402697; c=relaxed/simple;
+	bh=n/dIbEBzku354LPAwJ5AA17Jtd1gqtcu4Ldd7iIeX6s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CkpJhf0lLuBIGvmG++hSHmDZ8Q3SCGuPSOoRNW3WZcW6XUn0ltKZ1qlNtW36YBylcNb4nFfQsV+b0X2JjrstIZcnHAVt9kEUthzo1nZGhAAMvDp9+ropMzkCELCHjJ+DtiruoWYGvi/bRBW7Fm8L0ir9NvIeKKlKff2Ujb6POCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=esubgL+P; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1f717608231so20479855ad.2;
+        Fri, 14 Jun 2024 15:04:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718402695; x=1719007495; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3GvcueyQPUEu25Z3M+kcx0gqsGUqckbLKTeC7p2z6FQ=;
+        b=esubgL+PWuEpJM9iOcUx1C2/51xpDwG/LETchk1NtGrtLBfscIHUP/qhD0p5JCkW73
+         +VszzPC7PAYYPekcrAObhlMPPBFiZEDfO48BgKdvqEry8hCCBJ54dnufR7AToET3DFO0
+         Dz/MpUIhCYbDhZ15JxR0QA33atxyRRlXCTHcfVl8NEK+iN/trKdeqykEWz6x8hbdnG3P
+         xVvZ46PDcy1zSNw+v/s76P2HAoXVcrc9eTu1XgW2IPlXchdh4Z3AJSpu+DoyJgJwuu+Y
+         s2i5Gx9aZRrjnW+dJ4I9MkMORoT8k2XJA6vQzeMURryfacAjO4/6B0oTbqM43E55PLuL
+         YOYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718402695; x=1719007495;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3GvcueyQPUEu25Z3M+kcx0gqsGUqckbLKTeC7p2z6FQ=;
+        b=FPq1qXmz/bKEyDtaSPVvfhtj58uRWnYim8IvX81Gl3nISTaUHSnIu75i8fCsxcs4W9
+         A4hdahVuhGy+W4NwyXXtFVh1gSGLDkSkvVtxk9JJWYOciaTnQk3ynxXSv7TMelljxe1W
+         +1HWgv/L7npneonhZO4xFvxy1Z4O+QbUq8GyQEIoVPpCfWCJ81QGXsnI3FSqsXG7An4b
+         uf/pX6DBI84Pddy92C/jqqbBq5+VZ3rE5w0sqm4nnRdIry5VIiIC4zjrdv+kOaqnChk9
+         SGqhOd3TFqj1jxpmMtTSFp4+mbzgxCwKDV3PJnQ46yTVm3IXgrBpV8pkCG5NK/V6us0i
+         lAMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUJw0DuiE61EfbLFH440B6ZuzdqarXZH0Jsjo+U3NE42A3ArXVk9ovnMYm0m3jd9DyvNBzxCqcL4GO0er7RJEOcwv4r5rK8lWBp/w3FXHEvuvm0BCJzJrqlp92HBFTtQuXJwoNT
+X-Gm-Message-State: AOJu0YyonlD+rFQDBVyfmzissrdiF0HKlZsy3vml7pVGZIOTelm/r+3A
+	LB2YqR1G0jIAxVoCoXkX1Xj0ApdigSixMEJ8t5zbLcctYeus4Swq
+X-Google-Smtp-Source: AGHT+IFqvmnvREoZpL4HIEpMIZNae92JdUxNXwL23tevbC6InKHNUqYV0Ja7ifE4kxB84ngtUtcjvQ==
+X-Received: by 2002:a17:903:234b:b0:1f2:fb02:3dfd with SMTP id d9443c01a7336-1f8625c0deamr45197675ad.11.1718402694709;
+        Fri, 14 Jun 2024 15:04:54 -0700 (PDT)
+Received: from dev0.. ([49.43.162.104])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f855e7ca78sm37008375ad.106.2024.06.14.15.04.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jun 2024 15:04:54 -0700 (PDT)
+From: Abhinav Jain <jain.abhinav177@gmail.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: skhan@linuxfoundation.org,
+	javier.carrasco.cruz@gmail.com,
+	jain.abhinav177@gmail.com
+Subject: [PATCH] virtio_net: Eliminate OOO packets during switching
+Date: Fri, 14 Jun 2024 22:04:22 +0000
+Message-Id: <20240614220422.42733-1-jain.abhinav177@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240614-ls_fman-v1-1-cb33c96dc799@nxp.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Frank,
+Disable the network device & turn off carrier before modifying the
+number of queue pairs.
+Process all the in-flight packets and then turn on carrier, followed
+by waking up all the queues on the network device.
 
-kernel test robot noticed the following build warnings:
+Signed-off-by: Abhinav Jain <jain.abhinav177@gmail.com>
+---
+ drivers/net/virtio_net.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-[auto build test WARNING on 03d44168cbd7fc57d5de56a3730427db758fc7f6]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Frank-Li/dt-bindings-ptp-Convert-ptp-qoirq-to-yaml-format/20240615-043704
-base:   03d44168cbd7fc57d5de56a3730427db758fc7f6
-patch link:    https://lore.kernel.org/r/20240614-ls_fman-v1-1-cb33c96dc799%40nxp.com
-patch subject: [PATCH 1/2] dt-bindings: ptp: Convert ptp-qoirq to yaml format
-reproduce: (https://download.01.org/0day-ci/archive/20240615/202406150525.S8VdHLlY-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202406150525.S8VdHLlY-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   Warning: Documentation/devicetree/bindings/net/fsl-fman.txt references a file that doesn't exist: Documentation/devicetree/bindings/ptp/ptp-qoriq.txt
->> Warning: Documentation/devicetree/bindings/net/fsl-tsec-phy.txt references a file that doesn't exist: Documentation/devicetree/bindings/ptp/ptp-qoriq.txt
-   Warning: Documentation/devicetree/bindings/power/wakeup-source.txt references a file that doesn't exist: Documentation/devicetree/bindings/input/qcom,pm8xxx-keypad.txt
-   Warning: Documentation/devicetree/bindings/regulator/siliconmitus,sm5703-regulator.yaml references a file that doesn't exist: Documentation/devicetree/bindings/mfd/siliconmitus,sm5703.yaml
-   Warning: Documentation/hwmon/g762.rst references a file that doesn't exist: Documentation/devicetree/bindings/hwmon/g762.txt
-   Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/reserved-memory/qcom
-   Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/display/exynos/
->> Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/ptp/ptp-qoriq.txt
-   Can't open Documentation/output/net.h.rst at ./Documentation/sphinx/parse-headers.pl line 328, <IN> line 13.
-   make[3]: *** [Documentation/userspace-api/media/Makefile:34: Documentation/output/net.h.rst] Error 2
-   Can't open Documentation/output/ca.h.rst at ./Documentation/sphinx/parse-headers.pl line 328, <IN> line 25.
-   make[3]: *** [Documentation/userspace-api/media/Makefile:25: Documentation/output/ca.h.rst] Error 2
-   Can't open Documentation/output/dmx.h.rst at ./Documentation/sphinx/parse-headers.pl line 328, <IN> line 66.
-
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 61a57d134544..d0a655a3b4c6 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -3447,7 +3447,6 @@ static void virtnet_get_drvinfo(struct net_device *dev,
+ 
+ }
+ 
+-/* TODO: Eliminate OOO packets during switching */
+ static int virtnet_set_channels(struct net_device *dev,
+ 				struct ethtool_channels *channels)
+ {
+@@ -3471,6 +3470,15 @@ static int virtnet_set_channels(struct net_device *dev,
+ 	if (vi->rq[0].xdp_prog)
+ 		return -EINVAL;
+ 
++	/* Disable network device to prevent packet processing during
++	 * the switch.
++	 */
++	netif_tx_disable(dev);
++	netif_carrier_off(dev);
++
++	/* Make certain that all in-flight packets are processed. */
++	synchronize_net();
++
+ 	cpus_read_lock();
+ 	err = virtnet_set_queues(vi, queue_pairs);
+ 	if (err) {
+@@ -3482,7 +3490,12 @@ static int virtnet_set_channels(struct net_device *dev,
+ 
+ 	netif_set_real_num_tx_queues(dev, queue_pairs);
+ 	netif_set_real_num_rx_queues(dev, queue_pairs);
+- err:
++
++	/* Restart the network device */
++	netif_carrier_on(dev);
++	netif_tx_wake_all_queues(dev);
++
++err:
+ 	return err;
+ }
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.34.1
+
 
