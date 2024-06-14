@@ -1,267 +1,329 @@
-Return-Path: <netdev+bounces-103533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2AB8908797
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 11:35:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8906A9087AD
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 11:40:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B32A1C20C9E
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 09:35:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 967911C23A50
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 09:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B1F31922D5;
-	Fri, 14 Jun 2024 09:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7855192B65;
+	Fri, 14 Jun 2024 09:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XBYdnzgg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K5ySND4h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB82186282
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 09:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718357733; cv=fail; b=mVuRobP1oVH3r8l68FOyDzv3TjhJtu4qnX9mwApc4JoB919hfGgFGQP7SMDK6OVtnNFYDyFUjRolYg+jptI05LL7gbucFS8DbkoWlTV4GIbLa8xH3qB0C4keSmQvj8bAIq5WisTRJb78tFdq+gpKXV04KvIr5wmWKJE3OgEWoxY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718357733; c=relaxed/simple;
-	bh=CuVX2seIPJ+xM5BPL47xyHL3Auq84DlAAcWql7ZYyjo=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=BKDVky0uSjh8m+V3OzRYaIpEWAQl9PPIZ4WvK3ALxImJGJLlJI5+LNXjOdczoFEeJ5E4sqgzs3U8CLL7A/D53nqrXQLlvriem5A6ItrSh7QDKigen05Ul7dnUQlUce56MWDirt5weFrDOQn5I0Qbx1C5ypbY99h9a1PJ4yGv4pE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XBYdnzgg; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718357732; x=1749893732;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=CuVX2seIPJ+xM5BPL47xyHL3Auq84DlAAcWql7ZYyjo=;
-  b=XBYdnzggg5mTibzhohKiMpq3Iz1o1HfiDVvWKMhpDA9xmMc/BuwyouA0
-   79JuBpkfSlJGEivoVkibh1TLQAZY48kzmaRe4Py4x8X2GuIYSj3khDw1d
-   AoTy2NvkT6on4cZP28TBH0yMI/+8QtHS5FyARr4EGi8ekEfSc1dGnQaVu
-   +SFKFq1YgjBRczuuadbHKFxZhtrdOuSmxR40qwDHcS3kfv8qBkRMfaHV5
-   llMeVygDVrZzEZ2QwIz+pFAMa/jA3q9qyLc00M+mkqWcVYGkfITlfkuQF
-   VuFAxAhk87A7Usx2btWn3AgOQ4X118O5REqDcFOlzcIeg303TmTIz8Z6u
-   w==;
-X-CSE-ConnectionGUID: kG3P7gzXTNy1RAZTMlRYRg==
-X-CSE-MsgGUID: XvaeBPU0RJ6zW/PkpkjSXA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11102"; a="15109052"
-X-IronPort-AV: E=Sophos;i="6.08,237,1712646000"; 
-   d="scan'208";a="15109052"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2024 02:35:31 -0700
-X-CSE-ConnectionGUID: SM+t9JLNRJeMRh2fEPGAqw==
-X-CSE-MsgGUID: vi77PhlRQUSc7LuPthkPRQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,237,1712646000"; 
-   d="scan'208";a="71223269"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Jun 2024 02:35:31 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 14 Jun 2024 02:35:30 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Fri, 14 Jun 2024 02:35:30 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 14 Jun 2024 02:35:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T/vi+Z9Z4JF296T35kgDENBtMy6spZ1luvls8e1GejT7uOV1tDv5kRFnbRi7fTPszo6GBFMGmI66LaqYgnytzrJB+KUGms6usx7aQh2kLas8ewybWwteaz8a+MRmfhpF6QGd7tMoXrFkQn3MheVS6qy19Y6BkGN0Zc6+L8Dmw9v5QTM94Lab45B3cvxzvRLCw4plzPAMLArsYyL8Z+ipwFKgwikNN7XKA25rnfmUExV10bMZD9M6Wm/AHEW6pO7QA4BECowUq9o6auKqxqVQzeWl7U8e7IZfnhjXAvjkyrFPeWiq03+Ftne94Ia8BH9Yfw0dsespg9wkWEFlTlVOdQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J3lMsR+9mGnT504p32fHwtVd4KNcx6aMzMo0MzdobTw=;
- b=mi/ywOPmtr6TFzk6NVtaOtO1Tlmr3WDQZ9UQ+JzU6jTZy9arUu7TSVHwVRbwHDHjOKnC0aXcYAEbt4ZD+uEIR36g7kK8M3nJzebjEf9rs13Hi4luz35zbB6XIdNv5vv0tZxRvsH98l22HBS1Hlvyr5okJBMYfartRxTgW7ZRjyD3gf6TwJ8Msbx36ibm0qLdV9x3B8D2UoHHcBp44KkLNHrvkvcJfhSVvomJV2rVRbdAmVoti2UfofS0r4Npatd+CjVZ4tQkre8dXiWqCjpOmZ7GkVAntyoMDgE5ECHAjzc6m292X9ljctXbyFTa6lxgnsy0dkmn9XBzdYiAAURqzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by PH8PR11MB8285.namprd11.prod.outlook.com (2603:10b6:510:1c5::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.24; Fri, 14 Jun
- 2024 09:35:28 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.7633.037; Fri, 14 Jun 2024
- 09:35:28 +0000
-Message-ID: <3092c889-f112-4a20-bc7f-d703c162499c@intel.com>
-Date: Fri, 14 Jun 2024 11:34:53 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH v3 iwl-net 1/8] ice: respect netif
- readiness in AF_XDP ZC related ndo's
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <larysa.zaremba@intel.com>,
-	<netdev@vger.kernel.org>, <michal.kubiak@intel.com>,
-	<anthony.l.nguyen@intel.com>, <jacob.e.keller@intel.com>, Chandan Kumar Rout
-	<chandanx.rout@intel.com>, <magnus.karlsson@intel.com>, Shannon Nelson
-	<shannon.nelson@amd.com>
-References: <20240604132155.3573752-1-maciej.fijalkowski@intel.com>
- <20240604132155.3573752-2-maciej.fijalkowski@intel.com>
- <6f616608-7a56-43d6-9dc9-ea67c2b47030@intel.com> <ZmhdZwzIStFpghZK@boxer>
- <8a835d02-d65f-42be-b4dd-309e9e04d7f0@intel.com>
- <f453bcc8-8528-432d-b90e-35db9d4b0fe9@intel.com> <ZmsVfbDTyZty2/Xh@boxer>
- <ZmsZWfn1ev6KWo3r@boxer>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <ZmsZWfn1ev6KWo3r@boxer>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MI2P293CA0003.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:45::16) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129FB1922FE;
+	Fri, 14 Jun 2024 09:39:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718358000; cv=none; b=iRhaCt/3v3ls+B0RGLrINcmmSl2Pcm+oxpdu5SRCY8gBKPFHXeYdBcR5oWFl0YDfzZaAIRnLJGP5P6DbMYdLERTExqMF88hX6mEdp9ZSGl5lRUH34QWMY7++Dhv3IQa93v8O7tDXd4v/HiRkD/ohy6DzgzXvdyOyR1ViXFOrVSk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718358000; c=relaxed/simple;
+	bh=OBDmvqK7bxGaEV1HPVMAHzuTJ6wumSXTRom7MffOMPg=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Ef60WBeK17dhBW8TL/O7fa2nY6YwfFumOxKSnaYeYrH41K1pRsSqDvXIz+ASaoknK7MGARF2hhsVHmNtJVrv9zKLZ6CcKKpWZhhSWFhOzheR3UgyHz3GAYwEaqUvRqgJHuGUa9+cZtg3C8sroOl4sHt7+GoAV1+q7kP6wrYyyDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K5ySND4h; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-797a7f9b552so124236185a.0;
+        Fri, 14 Jun 2024 02:39:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718357998; x=1718962798; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=enmLRT2XQ6Zrwi5YAY8HYTitEXXxpPPAwekI9RufLrE=;
+        b=K5ySND4hdALUFSWkrIPBute4ed6XENPOTaVSj2DnR9iheQJsu1FFnycoxDUuPXUMcO
+         VUC+L0UNd4ZVpqP5Wzyi5llmFLJ+zVzIw043xT5NsSzIpyS3itxHNUHPYzuFbBSXl1kd
+         wp06LBSFHnv2xLhJ6bgU+urPFdcPuhQCK4Jt60fBVl3ibhvGrdDd0ZJeBdH2ZKJvhrZT
+         0BvXnMo5zQQg2pZ/0mAYBYwz0uLiynPy6fTf/lYQPwg8mks5zTT6FctPDBYiKF6YgL4q
+         0h/3beTX6yCfV/MQwMCtBcNVh/3Sqb309aU71+vNfqm45dJAew/GL7vMJYvG2LA/m/77
+         6rUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718357998; x=1718962798;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=enmLRT2XQ6Zrwi5YAY8HYTitEXXxpPPAwekI9RufLrE=;
+        b=j1LcsmWwY+vQnLa9++KtVAyzX9+pxbWTEYCegXlu6mGZ5CQ9XC1RxHtAsEkl6g4e9s
+         B1olbe7/khBXlq19SKEN0PvcJGGhWs/ge4ZbhPqmOrdf7Bi4ME7Bst1zgJ6poZxYdpbH
+         IwE+adK8YuFZSNjniOR3MFa3pLIp7G1WbbzHrZ2v/jc21t3k9mFNWecGWGiY0I/vV28K
+         13TKcJZ9o0R8AT5QZZiAwjJtu2Mhky9HUO6qDllY79LUp30t1R55jOZw/N0lRCJ67GJC
+         P1skhYCXgRU8zoaW+xXvMsUwLpWCv2E80LRvNshSjyYJAKAUY5AB8SJ+UIrhapxiawKd
+         BJbA==
+X-Forwarded-Encrypted: i=1; AJvYcCXYDlHpTBGCPuz1Cuohj8cqwpBgCY60E4jZQKMwOaG1O16n+GWX+juGPE51QPUALH7GzH0VMKqU1dZHKhYAoEuxapUFsNKdsSR0MQtpcF9Lspvz5BuqglSYXajTiVlEEA80ZowQmr4HF89/SOkhyPlktlkw1dlMVyVx2vPq
+X-Gm-Message-State: AOJu0YyB1rj2FH5hZPg6aWLVvByLJ5kkoJ51xg8K4vmJYdHtQQfeNOSY
+	5g5XmfASoLF60scOmd+m5zdSYIyshDCNpa5Pn4qmNqGy13sJuGex
+X-Google-Smtp-Source: AGHT+IHElPMGfp3Vvn5afdRo9WPrkfuaCNY+3dWID6CwG/6HS0wfTwQ/ZWK8VHM/0zcyrtgJ4en6Gg==
+X-Received: by 2002:a05:620a:2481:b0:795:58cb:2c97 with SMTP id af79cd13be357-798d258de24mr210053485a.48.1718357997832;
+        Fri, 14 Jun 2024 02:39:57 -0700 (PDT)
+Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-798abc037eesm128409185a.72.2024.06.14.02.39.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jun 2024 02:39:57 -0700 (PDT)
+Date: Fri, 14 Jun 2024 05:39:56 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Chengen Du <chengen.du@canonical.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ kaber@trash.net, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org
+Message-ID: <666c0feca4abf_17367e294e2@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAPza5qeDZonX5prLPOPQWjD2pNwzQHnhFkxCSkqC3ectWtPP3w@mail.gmail.com>
+References: <20240608025347.90680-1-chengen.du@canonical.com>
+ <66660e3cd5636_8dbbb294c@willemb.c.googlers.com.notmuch>
+ <CAPza5qfVzV7NFiVY1jcZR-+0ey-uKgUjV6OcjmDFvKG3T-2SXA@mail.gmail.com>
+ <666789d3d9d2a_bf52c294e9@willemb.c.googlers.com.notmuch>
+ <CAPza5qe8KAjjZsZdTupXx27kvdPzhBNcDC=Nk5Xjc4O2obEAAA@mail.gmail.com>
+ <6669abb1ea6da_125bdf29449@willemb.c.googlers.com.notmuch>
+ <CAPza5qeDZonX5prLPOPQWjD2pNwzQHnhFkxCSkqC3ectWtPP3w@mail.gmail.com>
+Subject: Re: [PATCH v6] af_packet: Handle outgoing VLAN packets without
+ hardware offloading
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|PH8PR11MB8285:EE_
-X-MS-Office365-Filtering-Correlation-Id: 272fccce-82d2-44ff-1730-08dc8c555399
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230035|1800799019|366011|376009;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?WTR6ZUFBTnpvSGxhQldUQmVydEoyL1hWTGVwY3E4UEJ3SzEyV2s0ZDFuZ1gr?=
- =?utf-8?B?cVZack5ZbTlhaGNyN2d6cjhQKzVkckFLNXliWmZOcTZYSTBxMW9JVFpyOXgr?=
- =?utf-8?B?REd5ZnBycThoMGpkdkU2MmZ3WkZiaTVEQjE2VVR4SXhKWWh3SDJ2c0dDbUQw?=
- =?utf-8?B?NDBVWlRrNnlmdFZPZ1o0eXBPRnVITTVYUitNLys4bVNucXUyN2ZzTnBROW4x?=
- =?utf-8?B?MmZETGJkZ0dZUHBlSkhZa3ZpOGswT2F4dWN3MTFJcVk4amtGT1VUTDkrMUN2?=
- =?utf-8?B?Qm4vUGkzOVNua1pieEFPOXlVZHZTZTJvMXNINjZjYm1Nc0FEUXp2T3VQUlY5?=
- =?utf-8?B?Z3prZUwvZEJKVFhwd0RiVk9sUDNCbmtrSGd0WEhiR2pHOGxZOWJMUktIZE9k?=
- =?utf-8?B?bi9jcEIwdGJ6dU9lRFJUSnJFVXBod1VSWjNKd1N1czhtWkRoWmx1b0JrNWRo?=
- =?utf-8?B?bkROSENMSitXeHJnaFFMK1c2SDVKVmpmZmVIMDlYWkdreHZEL2UyRDAyVHVH?=
- =?utf-8?B?dTZOV2R2SCtjVTJxRjIyZWZEbi95Nmt6eEpEeGJZOHBiRnYrZFZRZnJnTlJC?=
- =?utf-8?B?eklUYXpvbU1LUFdueUliZW5ZZ3Z5OG1tc0s2Y3FmYytzOVBXRDlVcFRPS2hD?=
- =?utf-8?B?RnRGUFdqQTYrME9xWTg1V1Ruc0xIdzFyYWhGNDR6S29QNWJuY0xoWXZKSWg5?=
- =?utf-8?B?VWdqbHlGdGt5NE5HRGcrazVZVWV1Z2Z1TEFsSStFc2YxaTFKMnJCUi8rK2M5?=
- =?utf-8?B?WHMzZkNzdlgrVWxmbVFnS2dvQncxaHpTRmxkNUdjOVp0OHpXZlRCMkN4c0tM?=
- =?utf-8?B?d3d0aWxkQ0NxZmtaMzRqM3VhYkRoaFJRZHdqNFNuWHBySjZDQ0NOMVQ4clJB?=
- =?utf-8?B?aUFxdHpVSEk1VGx4REQ4UEtFUFFsUE1sLzZnTHp3aWtZNFhES1h6Z2Q1eWpS?=
- =?utf-8?B?MmpwVGtWWjVSTFpEVlQ4TzQ4SjBKY21SWkNTRlIxaE1qamYxN0dQOStmY09n?=
- =?utf-8?B?OUQ2aFZVcDN1akM3WnNaUWJEdXY1M2pxL21xaE5xaER4MjhHK1lJWFA0Ymdp?=
- =?utf-8?B?Qk1ZbzJ2bGM5RHJqZ1NNOEZkQU4vVWx6dTlLZE9nQnFkTzZpK1QvSTdxRnlK?=
- =?utf-8?B?Wm8zREVkM0JVSDVjWkVqcEVYcGVtdkxYNFZOVGYxWnNzTjNoZHFQQldJaTdB?=
- =?utf-8?B?TlAvc1MrTFp3K0ZkNm1GRytZTEpUUDFMOEVsUnd3UVJyVThXUzFiSzZsTHND?=
- =?utf-8?B?NzRkSjdxRnJLYTBYbW1XVEJhYnVoVDhRRGQ2aWxoS01OT1ZuZER6aEY0KzJS?=
- =?utf-8?B?Uis4bjNmdkJaVDJWTmd4V3ZsZWtONDFuMDR5ZXMzdFNheW96ZVh1aHZaQ1hh?=
- =?utf-8?B?aDJPc2FBbmxTQnJpSjR0UUFkRGlWTmJ0RGx3WEpVNHhjN3JJbjIrMVYyaGdv?=
- =?utf-8?B?eXB4czlGUHd3bkc0V3MwbFUxQVEwcllVNDZZTlUrak82VDg2cGxjM2gyVE1t?=
- =?utf-8?B?SGl0Qmowa3pSVHBFV0hvWjZIS0lnVlJ6ZldWTFNXWDdKbFRGcUxXS29oN0xw?=
- =?utf-8?B?YUlVaER5eUo5MklXYzhTT3h4dXlSemFaWXB5WUFuUC9kd1JITkFRQmVyRm1Q?=
- =?utf-8?B?eDZDTm5MWmVFU0w0SWljdmZrNE1UdWJ5cmZDSDBjdGpPRlNKaHE0WkZmZEl2?=
- =?utf-8?B?SkZmVEtHc2FLSWlJOXU3SHJxUldlMVNlV01OVFB4Ly9nRWN4VDQ4MFpOcVEv?=
- =?utf-8?Q?qPMe+YtX8pD5rXKfrFZJw67cVS9i42YMfPH8uaw?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230035)(1800799019)(366011)(376009);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?azFkK2JwSzNaSnJlM1lJTDVpU1dDUzBXNHBmY0RpeFB0dGNUQ1A0Z1FTY3VR?=
- =?utf-8?B?VW9maEFCSDZueEZtTUp1L2dyRHl6aVJYTUlhQUd4TFdGcGVYeWMxRFBObE16?=
- =?utf-8?B?emovTmZsYlVYYU16UktGdDdNRnBPNzU5VGp3eXQ5M2c5dTdrSFRnb0EyYUtj?=
- =?utf-8?B?T1o5Y2NCaURDSHMzQjhtSXRLWW5uYkNBL09sNUsyNmUrZFIrRFcxVVRJQUg4?=
- =?utf-8?B?RkdnR29pcHlCUDcybDRvZHRmNisxQThFWGtjTWtRYllqM0VxME13SHFHNzd6?=
- =?utf-8?B?RlBDd0ZYenhoRGtOUlRicC9JRnlVYzduV2hOb0E5d0J1bnBoVUE0c3E0RjZU?=
- =?utf-8?B?enJ2N1ZUOW1MYmJ0ZlBEdTNqbEtwMXdtUW5IZi9WOWZ6bTFDbGd1bkdNT2lr?=
- =?utf-8?B?YmJ1NTFoYlZ6THo3RTZiWVI4OUVBVmlzNE5sVkE4cE5kM3ZPSW9MOTZUK2t3?=
- =?utf-8?B?Nml3aTZIWTN6UUl5U0F4dERoOFo0SkxZTVNYTVpUczRRWHRDTFIzc3VRV0ky?=
- =?utf-8?B?SkcwU0t4dllnb1lPK0Q4TjhKVkkrR2w4bUJqMVdMYzlyeDNrZnJhNFc3VjFs?=
- =?utf-8?B?NzBKME91MW8xVGVvc1BMSmkvdHVUaFBHYkxtV1N5VFpqUmpTWllwMHZCQ1k1?=
- =?utf-8?B?L2pZQ3NLaEpaMXV5dXVyMkFjUHJqM1paK1BObHRBL0VCSnBrRFVORUthMXg4?=
- =?utf-8?B?ZUREMVo0M083UjU3ZXFKUWRzbFhNZ2xXVWdicGVLeTRKRERVakNPOGVRT2pB?=
- =?utf-8?B?MVBjK215WE1iVG05QW10V2ZBZzNSdG5oSlhvUXgvaC9ESW1VV1lZMHZHTmI5?=
- =?utf-8?B?V0dyd2p5ejIxS1B1MGRQMno4WDlQWmd1REZyVm1iZnJvRmpkRlY2Q0h0elJn?=
- =?utf-8?B?a0NkM0NMTXVLcWFSQTV5Nk52OS9VbzAvb0hXNllVdjFQeTRpaHRkQmpUdDlG?=
- =?utf-8?B?eEhjUFV0U1lkV3RodTA3ekcyRG12c1kyS2JLb05hcFg3dXJ3VWtBeldLcUVI?=
- =?utf-8?B?MndLMFU1TmZsK0svSW1UbmdZaEtUbFU3U0lHLzhJRUc1Q0MwdUcxSUFsYWpj?=
- =?utf-8?B?NmNWMDdYemw3dUE3TThXTm9tTG5XU1B6YWtoNE54bVhaY1dmeG5GMFRhSVN5?=
- =?utf-8?B?dmhRK2VrWG1HWTFsK3lBbTN4UzlaWSsyR2FRYjJrRTBFekxmSzcvcVRyK1pr?=
- =?utf-8?B?RUxLSmZ2MktZNUFxY1ppWTZzM3BUekQvNC8xbmYwNTB3U2ZEUi9QVjVYcUZo?=
- =?utf-8?B?MmNidCtScjBWNHFwSFUzaVZ6WXVEZWx6ckwzQ204UHFRY3h2Qy8vUWsrNjh4?=
- =?utf-8?B?Rk53NFRTbDFydFZtRHpUZjFueGgybkJjVzNWQnRvem9FYmpjSmd1KytVdzJB?=
- =?utf-8?B?WmhrbEZncHl1SjdTMnB1blJOaUIwZG1WdjBaMkpYcjFnWUdVTlpEZEtaQ1ox?=
- =?utf-8?B?RklXQzN2b2dHcU5MVHJZUDZ4d09qaTVrelNDT1NjdGU0dnNRdkxSRXFqZzdO?=
- =?utf-8?B?bDlXeVh3bmcweWpuV05uanhyM2E5M1FOeitpZDNnQWpad3dvTTh0TEVYckxC?=
- =?utf-8?B?NE84Mi9LL2kzUGRuL1UvclRSZjR2MDlSL29raUszSi9BNldjSWlEY1d3MTgr?=
- =?utf-8?B?UmpzRStLV3R1QVk5d1dtTThJdHpQMzcxVTc3MXNRU0RORENUY25pVW9sLzly?=
- =?utf-8?B?WWk5WnJJU0dkNlFFekIvSVUxY1NTTUFwbXZtQkdRZkdJR3hZSDRYUlEyNkVJ?=
- =?utf-8?B?dWNFUmxQSXNKZGdJUXdxZ2ZDSTlrYXkrRFNYQmNEczhrM2hSRXk4RnArUVlE?=
- =?utf-8?B?VnpITHIvZ0FDVTBzVm5XaDNxTlVFSkVXNGhEQ1c4Q0IrUWpXSTBCM1N3WjVT?=
- =?utf-8?B?dVpEdUZWVThrMmY0YW9tSFBwdy9IUEtTaElMQnFLY1JTZ1FteXh6OG1OVGd1?=
- =?utf-8?B?NWRrSTRVVk1LQnAvdk5hNFVJd01tMDFCdHMvWFNBZHdHWG9qMHdGWXZqcC9k?=
- =?utf-8?B?Zk9ycVJ3OEFWRnU4Z2ppdlpDVUpMangzejhSSDNzcWVNbHJCWmF5QkNtT1VZ?=
- =?utf-8?B?OVZkUk5KRlVDYmhua2dzdVZUSXp0aWpZZGpGK2RTRERYTDYzRU1KbGh1dzRK?=
- =?utf-8?B?ejNNZU5kZDhqbStRV2tUaTk3YjhaOXR6WDdhc054MC9xZXBnS0VOQUhQSmxm?=
- =?utf-8?B?ZXc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 272fccce-82d2-44ff-1730-08dc8c555399
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2024 09:35:28.3604
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /yuCCsrOWllfG4nQwBtiJLQ0UMvaFb+LLM9JntMLdLW5LeaSpVanGjDyc+I3lZLT0eVPa7C/PGNGj0Dc/rqh9FSp/DakT0C5428b01r/cOU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB8285
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Date: Thu, 13 Jun 2024 18:07:53 +0200
+Chengen Du wrote:
+> Hi Willem,
+> =
 
-> On Thu, Jun 13, 2024 at 05:51:25PM +0200, Maciej Fijalkowski wrote:
->> On Wed, Jun 12, 2024 at 11:15:31AM +0200, Alexander Lobakin wrote:
->>> From: Alexander Lobakin <aleksander.lobakin@intel.com>
->>> Date: Wed, 12 Jun 2024 11:09:10 +0200
->>>
->>>> From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
->>>> Date: Tue, 11 Jun 2024 16:21:27 +0200
->>>
->>> [...]
->>>
->>>>>>> diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
->>>>>>> index 2015f66b0cf9..1bd4b054dd80 100644
->>>>>>> --- a/drivers/net/ethernet/intel/ice/ice_xsk.c
->>>>>>> +++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
->>>>>>> @@ -1048,6 +1048,10 @@ bool ice_xmit_zc(struct ice_tx_ring *xdp_ring)
->>>>>>>  
->>>>>>>  	ice_clean_xdp_irq_zc(xdp_ring);
->>>>>>>  
->>>>>>> +	if (!netif_carrier_ok(xdp_ring->vsi->netdev) ||
->>>>>>> +	    !netif_running(xdp_ring->vsi->netdev))
->>>
->>> Oh BTW, I noticed some time ago that netif_running() is less precise
->>> than checking for %IFF_UP.
->>> For example, in this piece (main netdev ifup function)[0],
->>> netif_running() will start returning true *before* driver's .ndo_open()
->>> is called, but %IFF_UP will be set only after .ndo_open() is done (with
->>> no issues).
->>
->> I see, thanks for bringing this up! I'd like to try this out. Tony sorry
->> for the noise, but it seems I'll go with v4 and will decorate the
->> mentioned statements with unlikely().
->>
->>> That means, I'd check for %IFF_UP honestly (maybe even before checking
->>> the carrier).
->>
->> I wonder whether it is the ultimate check and two existing ones (that we
->> are adding in this patch) could be dropped?
-> 
-> In netdev closing path [1], __LINK_STATE_START is cleared before IFF_UP.
+> Thank you for the suggestion.
+> I have conducted further tests and found that the results are not as
+> we expected.
+> =
 
-Oh man, inconsistency in its best :D
+> I would like to explain my findings based on the following tests:
+>     ip link add link ens18 ens18.24 type vlan proto 802.1ad id 24
+>     ip link add link ens18.24 ens18.24.25 type vlan proto 802.1Q id 25
+>     ifconfig ens18.24 1.0.24.1/24
+>     ifconfig ens18.24.25 1.0.25.1/24
+>     ping -n 1.0.25.3 > /dev/null 2>&1 &
+>     tcpdump -nn -i any -y LINUX_SLL -Q out not tcp and not udp
+> =
 
-> What we were initially experiencing when netif_running() check wasn't in
-> place was that xsk was producing a bunch of Tx descs when device was being
-> brought down. So let me keep what we have here and add IFF_UP check on
-> top. Better be safe than sorry as the bug we were dealing with was pretty
-> nasty.
+> I have added more logs and found the following results:
+>     af_packet: tpacket_rcv: dev->name [ens18.24.25]
+>     af_packet: tpacket_rcv: dev->name [ens18.24]
+>     af_packet: vlan_get_tci: dev->name [ens18.24], min_header_len
+> [14], hard_header_len [18]
+>     af_packet: prb_fill_vlan_info: ppd->hv1.tp_vlan_tci [0],
+> ppd->hv1.tp_vlan_tpid [8100]
+>     af_packet: prb_fill_vlan_info: currect vlan_tci [19], tp_vlan_tpid =
+[8100]
+>     af_packet: tpacket_rcv: dev->name [ens18]
+>     af_packet: vlan_get_tci: dev->name [ens18], min_header_len [14],
+> hard_header_len [14]
+>     af_packet: prb_fill_vlan_info: ppd->hv1.tp_vlan_tci [18],
+> ppd->hv1.tp_vlan_tpid [88a8]
+>     af_packet: prb_fill_vlan_info: currect vlan_tci [18], tp_vlan_tpid =
+[88a8]
+> =
 
-Sure, I didn't know %IFF_UP's not that reliable :s
+> It seems that the min_header_len has been set even though the device
+> is ens18.24.
+> I will continue investigating this issue.
+> Thank you for your ongoing assistance.
 
-Thanks,
-Olek
+Thanks. Apparently min_header_len cannot be relied on for this. It is
+not explicitly set in most drivers, including in the vlan driver.
+
+Let's not make this series conditional on that.
+
+The number of variable length link layer protocols is minimal, and
+egregious errors are caught by skb_header_pointer. Just use
+dev->hard_header_len as is, without the min_header_len check.
+
+Btw, please remember not to top-post.
+https://subspace.kernel.org/etiquette.html#do-not-top-post-when-replying
+
+ =
+
+> Best regards,
+> Chengen Du
+> =
+
+> On Wed, Jun 12, 2024 at 10:07=E2=80=AFPM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Chengen Du wrote:
+> > > Hi Willem,
+> > >
+> > > On Tue, Jun 11, 2024 at 7:18=E2=80=AFAM Willem de Bruijn
+> > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > >
+> > > > Chengen Du wrote:
+> > > > > Hi Willem,
+> > > > >
+> > > > > I'm sorry, but I would like to confirm the issue further.
+> > > > >
+> > > > > On Mon, Jun 10, 2024 at 4:19=E2=80=AFAM Willem de Bruijn
+> > > > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > > > >
+> > > > > > Chengen Du wrote:
+> > > > > > > The issue initially stems from libpcap. The ethertype will =
+be overwritten
+> > > > > > > as the VLAN TPID if the network interface lacks hardware VL=
+AN offloading.
+> > > > > > > In the outbound packet path, if hardware VLAN offloading is=
+ unavailable,
+> > > > > > > the VLAN tag is inserted into the payload but then cleared =
+from the sk_buff
+> > > > > > > struct. Consequently, this can lead to a false negative whe=
+n checking for
+> > > > > > > the presence of a VLAN tag, causing the packet sniffing out=
+come to lack
+> > > > > > > VLAN tag information (i.e., TCI-TPID). As a result, the pac=
+ket capturing
+> > > > > > > tool may be unable to parse packets as expected.
+> > > > > > >
+> > > > > > > The TCI-TPID is missing because the prb_fill_vlan_info() fu=
+nction does not
+> > > > > > > modify the tp_vlan_tci/tp_vlan_tpid values, as the informat=
+ion is in the
+> > > > > > > payload and not in the sk_buff struct. The skb_vlan_tag_pre=
+sent() function
+> > > > > > > only checks vlan_all in the sk_buff struct. In cooked mode,=
+ the L2 header
+> > > > > > > is stripped, preventing the packet capturing tool from dete=
+rmining the
+> > > > > > > correct TCI-TPID value. Additionally, the protocol in SLL i=
+s incorrect,
+> > > > > > > which means the packet capturing tool cannot parse the L3 h=
+eader correctly.
+> > > > > > >
+> > > > > > > Link: https://github.com/the-tcpdump-group/libpcap/issues/1=
+105
+> > > > > > > Link: https://lore.kernel.org/netdev/20240520070348.26725-1=
+-chengen.du@canonical.com/T/#u
+> > > > > > > Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspace=
+")
+> > > > > > > Cc: stable@vger.kernel.org
+> > > > > > > Signed-off-by: Chengen Du <chengen.du@canonical.com>
+> > > > > >
+> > > > > > Overall, solid.
+> > > > > >
+> > > > > > > ---
+> > > > > > >  net/packet/af_packet.c | 57 ++++++++++++++++++++++++++++++=
+++++++++++--
+> > > > > > >  1 file changed, 55 insertions(+), 2 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/net/packet/af_packet.c b/net/packet/af_packet.=
+c
+> > > > > > > index ea3ebc160e25..8cffbe1f912d 100644
+> > > > > > > --- a/net/packet/af_packet.c
+> > > > > > > +++ b/net/packet/af_packet.c
+> > > > > > > @@ -538,6 +538,43 @@ static void *packet_current_frame(stru=
+ct packet_sock *po,
+> > > > > > >       return packet_lookup_frame(po, rb, rb->head, status);=
+
+> > > > > > >  }
+> > > > > > >
+> > > > > > > +static u16 vlan_get_tci(struct sk_buff *skb)
+> > > > > > > +{
+> > > > > > > +     struct vlan_hdr vhdr, *vh;
+> > > > > > > +     u8 *skb_orig_data =3D skb->data;
+> > > > > > > +     int skb_orig_len =3D skb->len;
+> > > > > > > +
+> > > > > > > +     skb_push(skb, skb->data - skb_mac_header(skb));
+> > > > > > > +     vh =3D skb_header_pointer(skb, ETH_HLEN, sizeof(vhdr)=
+, &vhdr);
+> > > > > >
+> > > > > > Don't harcode Ethernet.
+> > > > > >
+> > > > > > According to documentation VLANs are used with other link lay=
+ers.
+> > > > > >
+> > > > > > More importantly, in practice PF_PACKET allows inserting this=
+
+> > > > > > skb->protocol on any device.
+> > > > > >
+> > > > > > We don't use link layer specific constants anywhere in the pa=
+cket
+> > > > > > socket code for this reason. But instead dev->hard_header_len=
+.
+> > > > > >
+> > > > > > One caveat there is variable length link layer headers, where=
+
+> > > > > > dev->min_header_len !=3D dev->hard_header_len. Will just have=
+ to fail
+> > > > > > on those.
+> > > > >
+> > > > > Thank you for pointing out this error. I would like to confirm =
+if I
+> > > > > need to use dev->hard_header_len to get the correct header leng=
+th and
+> > > > > return zero if dev->min_header_len !=3D dev->hard_header_len to=
+ handle
+> > > > > variable-length link layer headers. Is there something I
+> > > > > misunderstand, or are there other aspects I need to consider fu=
+rther?
+> > > >
+> > > > That's right.
+> > > >
+> > > > The min_header_len !=3D hard_header_len check is annoying and may=
+ seem
+> > > > pedantic. But it's the only way to trust that the next header sta=
+rts
+> > > > at hard_header_len.
+> > >
+> > > Thank you for your advice.
+> > > I have implemented the modification, but I found that the
+> > > (min_header_len !=3D hard_header_len) check results in unexpected
+> > > behavior in the following test scenario:
+> > >     ip link add link ens18 ens18.24 type vlan proto 802.1ad id 24
+> > >     ip link add link ens18.24 ens18.24.25 type vlan proto 802.1Q id=
+ 25
+> > >     ifconfig ens18.24 1.0.24.1/24
+> > >     ifconfig ens18.24.25 1.0.25.1/24
+> > >     ping -n 1.0.25.3 > /dev/null 2>&1 &
+> > >     tcpdump -nn -i any -y LINUX_SLL -Q out not tcp and not udp
+> > >
+> > > While receiving a packet from ens18.24.25 (802.1Q), the min_header_=
+len
+> > > and hard_header_len are 14 and 18, respectively.
+> > > This check results in the TCI being 0 instead of 25.
+> > > Should we skip this check to display the correct value, or is there=
+
+> > > another check that can achieve the same purpose?
+> >
+> > Interesting. Glad you found this.
+> >
+> > Makes sense, as VLAN devices have
+> >
+> >     vlandev->hard_header_len =3D dev->hard_header_len + VLAN_HLEN;
+> >
+> > Does
+> >
+> >     if (min_header_len && min_header_len !=3D hard_header_len)
+> >
+> > resolve it?
+> >
+> > Few devices actually set min_header_len. Initially, only Ethernet in
+> > ether_setup() and loopback. It was introduced for validation in
+> > dev_validate_header, and a min_header_len of 0 just skips some basic
+> > validation.
+> >
+> > As long as VLAN devices do not initialize min_header_len (e.g., by
+> > inheriting it from the physical device and incorrectly setting it to
+> > ETH_HLEN), then this should be fine.
+> >
+
+
 
