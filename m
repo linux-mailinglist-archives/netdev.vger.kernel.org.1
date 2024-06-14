@@ -1,73 +1,84 @@
-Return-Path: <netdev+bounces-103705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA5B790929D
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 20:56:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE37A9092B3
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 21:03:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39E68B21215
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 18:56:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7717CB27727
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 19:03:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E55EE1A01C5;
-	Fri, 14 Jun 2024 18:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2D61991B9;
+	Fri, 14 Jun 2024 19:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NCpAroF4"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EitioGvd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CEA449638
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 18:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C25147C90
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 19:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718391370; cv=none; b=Wok2jy3KtIYaY29SMoDz6cdXd9ln3pDJY3kNYA1ume6Es5xoAn3aJ7Izw4kXQSn4nFG46X9vqvjuPHVc13kn64CGAQV70Rh4ap6fLCqmXFJv2HPfFCmfMZO1fyAp178nQ9ZfGYlTBEfAtwyeY33U+5rBFa8p6T3zVtZ+UeEvEKI=
+	t=1718391821; cv=none; b=qlCRf6LW1sh8Mx9+v+P84zzJ2nKxvz+8fNRUerpGp7FaEgS61p8jd+cFb+eSdwRrcTmM8ewQ8MIKkPaovDzX6fJWbwCb1nglxr/mGgJweGCvdKI1Sxr0m4ZE0GeYsrhRUYZuhJTcZIjBuNvtBTxCYo7H4Zwnz6sIv3r7p9YfTcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718391370; c=relaxed/simple;
-	bh=jF3tiS1JEyL81Yf9rH0oOmLb9UlSLVwCGgfihnbpVpY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O3D7YLprnnN56WxLTrWOSaq71VCxTWLRrFoz9zQJy/XaM/WZCgkr+VGPGauhNo8YzI87r+lD1rHHiCc43IzNwB7xYR5n4VU1yKUCkC5/p8h8QZBozFvjbxdV+s/Q55y3plLefiyektGmIX7EU0h3TWqvpcr1eikPjaJ18C2E/Rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NCpAroF4; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1718391821; c=relaxed/simple;
+	bh=hoSPDQE9UjbVhD2Ix+wBjzVSlow5u229oEe8QRduNfE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kWUFHY2Bgx82f52w3KtWpgFHLeKFw3vL4/DPRvFTxaWpc55IK6ijTw8W8v3ZP+koXredZSuH4bCFunhtdtLDUk0tUrAol7CkM76hsmQXLCKLpyz6UoeFZ+WzzKxhfhpKkaMWFzj9UtShRzHtB9c+woW3z+7+5k8KRhXhYiewLI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=EitioGvd; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6b06e63d288so12651006d6.0
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 12:03:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1718391370; x=1749927370;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=AFs679RKFAbdi+jdCnZSGgy0BgBTxkYviv4qVaxB740=;
-  b=NCpAroF4xLoDP5syTvRSLVN3FhmefY/U/ckdzYqO45QuHpzwApRaUnhN
-   AoinRWB7vgKHaJuWhbfex4FSEp6wni2Hp2dHDoJvGpPg9tChZY3h5Clyw
-   PCJDp3N3wBFTLQZR+9UAKBPArKBWXdn0qR/2uqxAY6SuBT4/7iLkiAlEQ
-   o=;
-X-IronPort-AV: E=Sophos;i="6.08,238,1712620800"; 
-   d="scan'208";a="639467678"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2024 18:56:07 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:7820]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.60.144:2525] with esmtp (Farcaster)
- id 5a18c6c4-11a5-4ec4-aa1d-0cbfd5a61d97; Fri, 14 Jun 2024 18:56:06 +0000 (UTC)
-X-Farcaster-Flow-ID: 5a18c6c4-11a5-4ec4-aa1d-0cbfd5a61d97
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 14 Jun 2024 18:56:05 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.100.24) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 14 Jun 2024 18:56:02 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <pabeni@redhat.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kent.overstreet@linux.dev>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 net-next 08/11] af_unix: Define locking order for U_RECVQ_LOCK_EMBRYO in unix_collect_skb().
-Date: Fri, 14 Jun 2024 11:55:54 -0700
-Message-ID: <20240614185554.86292-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <fe71aefbd50babf1af7c4719f5581e46fce2b4fc.camel@redhat.com>
-References: <fe71aefbd50babf1af7c4719f5581e46fce2b4fc.camel@redhat.com>
+        d=chromium.org; s=google; t=1718391819; x=1718996619; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jHsd061ttJXffGVVKp/MCAPa+ouT4R6OVqLCCj3p4nU=;
+        b=EitioGvdcTKNc6IvDjJD8TC4PigeUSmL+zikwtoHnAcAfabmUqd9hmp+AcIBf6sf+U
+         8XAZDBsNOii3spYPEjDQJNpFm/tG1Pe2com8S/PMb57snllDP962b1iCHYgM0IuFJmtW
+         hW0xXmZufIhRRfFBHKcTill4KiiYPmDDRDT+U=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718391819; x=1718996619;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jHsd061ttJXffGVVKp/MCAPa+ouT4R6OVqLCCj3p4nU=;
+        b=vKYWCx9YGbXDe1qYKds5EdqvjBf7PCwIfGiAwXbP2t9ax1q6L+c5eD0rNMV7HohElO
+         mkTGqiyL24J8iGiCh+6GWQcuNMJQ+W9WWTZ2c7Dw4iiiop/yNrMp5DSGnnMd19igoQu0
+         ycvChM/FzONnq3fvZeRZplusuOMsXyjQ2YbUb65cnuddE5DBXqnDna5L3w8bpOigzVzo
+         jkUyY76rNgApZJgPXSfg7sNnCRqgcSNCRaRJr0nyboOyZf+4rFgk3slOHtYJX0kauUo3
+         M5efzVv4tJhXOVTIgaey4ovU4YG7YesrwSIfre8FWKBtmv5Ipc/BZOodpk8Ecj/J2YUr
+         UZpw==
+X-Gm-Message-State: AOJu0YxdVUa0TN24w8eqTHB2oJAm/qt2i2447aluLpu4PVzinCvfbgZ0
+	aQwtF8QwBGtPf1nCnv4HOFg2QmngLJ2xJa+OmOlaOPBRxkswYm1T5Vv+6olSrD7ilXcbpa3CAHo
+	=
+X-Google-Smtp-Source: AGHT+IE/lxYlVy71AQcf/reGotlfaQCvRCDZ4++4qz/9WzobTHiOWFRoXYiBDp0p3dUrYPr2rMCHOg==
+X-Received: by 2002:ad4:580b:0:b0:6b0:763c:e069 with SMTP id 6a1803df08f44-6b2afc811f2mr37988746d6.18.1718391818809;
+        Fri, 14 Jun 2024 12:03:38 -0700 (PDT)
+Received: from localhost (228.221.150.34.bc.googleusercontent.com. [34.150.221.228])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6b2a5c20f53sm21488616d6.52.2024.06.14.12.03.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Jun 2024 12:03:38 -0700 (PDT)
+From: David Ruth <druth@chromium.org>
+To: netdev@vger.kernel.org
+Cc: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	marcelo.leitner@gmail.com,
+	vladbu@nvidia.com,
+	David Ruth <druth@chromium.org>,
+	syzbot+b87c222546179f4513a7@syzkaller.appspotmail.com
+Subject: [PATCH v3 net] net/sched: act_api: fix possible infinite loop in tcf_idr_check_alloc()
+Date: Fri, 14 Jun 2024 19:03:26 +0000
+Message-ID: <20240614190326.1349786-1-druth@chromium.org>
+X-Mailer: git-send-email 2.45.2.627.g7a2c4fd464-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,70 +86,72 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWC002.ant.amazon.com (10.13.139.212) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Fri, 14 Jun 2024 13:04:06 +0200
-> On Tue, 2024-06-11 at 16:23 -0700, Kuniyuki Iwashima wrote:
-> > From: Kent Overstreet <kent.overstreet@linux.dev>
-> > Date: Tue, 11 Jun 2024 19:17:53 -0400
-> > > On Tue, Jun 11, 2024 at 03:29:02PM GMT, Kuniyuki Iwashima wrote:
-> > > > While GC is cleaning up cyclic references by SCM_RIGHTS,
-> > > > unix_collect_skb() collects skb in the socket's recvq.
-> > > > 
-> > > > If the socket is TCP_LISTEN, we need to collect skb in the
-> > > > embryo's queue.  Then, both the listener's recvq lock and
-> > > > the embroy's one are held.
-> > > > 
-> > > > The locking is always done in the listener -> embryo order.
-> > > > 
-> > > > Let's define it as unix_recvq_lock_cmp_fn() instead of using
-> > > > spin_lock_nested().
-> > > > 
-> > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > > > ---
-> > > >  net/unix/af_unix.c | 17 +++++++++++++++++
-> > > >  net/unix/garbage.c |  8 +-------
-> > > >  2 files changed, 18 insertions(+), 7 deletions(-)
-> > > > 
-> > > > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> > > > index 8d03c5ef61df..8959ee8753d1 100644
-> > > > --- a/net/unix/af_unix.c
-> > > > +++ b/net/unix/af_unix.c
-> > > > @@ -170,6 +170,21 @@ static int unix_state_lock_cmp_fn(const struct lockdep_map *_a,
-> > > >  	/* unix_state_double_lock(): ascending address order. */
-> > > >  	return cmp_ptr(a, b);
-> > > >  }
-> > > > +
-> > > > +static int unix_recvq_lock_cmp_fn(const struct lockdep_map *_a,
-> > > > +				  const struct lockdep_map *_b)
-> > > > +{
-> > > > +	const struct sock *a, *b;
-> > > > +
-> > > > +	a = container_of(_a, struct sock, sk_receive_queue.lock.dep_map);
-> > > > +	b = container_of(_b, struct sock, sk_receive_queue.lock.dep_map);
-> > > > +
-> > > > +	/* unix_collect_skb(): listener -> embryo order. */
-> > > > +	if (a->sk_state == TCP_LISTEN && unix_sk(b)->listener == a)
-> > > > +		return -1;
-> > > > +
-> > > > +	return 0;
-> > > > +}
-> > > >  #endif
-> > > 
-> > > That's not symmetric.
-> > 
-> > I think we agreed this is allowed, no ?
-> > 
-> > https://lore.kernel.org/netdev/thzkgbuwuo3knevpipu4rzsh5qgmwhklihypdgziiruabvh46f@uwdkpcfxgloo/
-> 
-> My understanding of such thread is that you should return 1 for the
-> embryo -> listener order (for consistency). You can keep returning 0
-> for all the other 'undefined' cases.
+syzbot found hanging tasks waiting on rtnl_lock [1]
 
-Ah, I understood.  Will do so in v3.
+A reproducer is available in the syzbot bug.
 
-Thanks!
+When a request to add multiple actions with the same index is sent, the
+second request will block forever on the first request. This holds
+rtnl_lock, and causes tasks to hang.
+
+Return -EAGAIN to prevent infinite looping, while keeping documented
+behavior.
+
+[1]
+
+INFO: task kworker/1:0:5088 blocked for more than 143 seconds.
+Not tainted 6.9.0-rc4-syzkaller-00173-g3cdb45594619 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/1:0 state:D stack:23744 pid:5088 tgid:5088 ppid:2 flags:0x00004000
+Workqueue: events_power_efficient reg_check_chans_work
+Call Trace:
+<TASK>
+context_switch kernel/sched/core.c:5409 [inline]
+__schedule+0xf15/0x5d00 kernel/sched/core.c:6746
+__schedule_loop kernel/sched/core.c:6823 [inline]
+schedule+0xe7/0x350 kernel/sched/core.c:6838
+schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6895
+__mutex_lock_common kernel/locking/mutex.c:684 [inline]
+__mutex_lock+0x5b8/0x9c0 kernel/locking/mutex.c:752
+wiphy_lock include/net/cfg80211.h:5953 [inline]
+reg_leave_invalid_chans net/wireless/reg.c:2466 [inline]
+reg_check_chans_work+0x10a/0x10e0 net/wireless/reg.c:2481
+
+Fixes: 0190c1d452a9 ("net: sched: atomically check-allocate action")
+Reported-by: syzbot+b87c222546179f4513a7@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=b87c222546179f4513a7
+Signed-off-by: David Ruth <druth@chromium.org>
+Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+V2 -> V3: Fixed subject, as the change is to act_api, not cls_api
+V1 -> V2: Moved from net-next to net, identified the change this fixes
+
+ net/sched/act_api.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+index 9ee622fb1160..2520708b06a1 100644
+--- a/net/sched/act_api.c
++++ b/net/sched/act_api.c
+@@ -830,7 +830,6 @@ int tcf_idr_check_alloc(struct tc_action_net *tn, u32 *index,
+ 	u32 max;
+ 
+ 	if (*index) {
+-again:
+ 		rcu_read_lock();
+ 		p = idr_find(&idrinfo->action_idr, *index);
+ 
+@@ -839,7 +838,7 @@ int tcf_idr_check_alloc(struct tc_action_net *tn, u32 *index,
+ 			 * index but did not assign the pointer yet.
+ 			 */
+ 			rcu_read_unlock();
+-			goto again;
++			return -EAGAIN;
+ 		}
+ 
+ 		if (!p) {
+-- 
+2.45.2.627.g7a2c4fd464-goog
+
 
