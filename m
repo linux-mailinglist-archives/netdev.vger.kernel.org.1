@@ -1,65 +1,77 @@
-Return-Path: <netdev+bounces-103499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1AA7908599
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:02:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F347B9085A7
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:07:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66F812822D3
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 08:02:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1701F1C21CC7
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 08:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FFA914A627;
-	Fri, 14 Jun 2024 08:01:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RVptile8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFEF14D29B;
+	Fri, 14 Jun 2024 08:07:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4881474CB;
-	Fri, 14 Jun 2024 08:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7041714A092;
+	Fri, 14 Jun 2024 08:07:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718352116; cv=none; b=XLJiiaDk1NSDhVbsMovnfphzr6giHfwMladFLMlbLPbHVPCWDwDhu9kAD9GjrfuDfCIaQnyaIfE193A62OJhbNUaTIheG4n3htfRJuGPyjw5Hj+covB4xfO4jhHtr7iPxl2l70P2KgWVKOs7Fe2UU1EbaLl2p+iBSfkFYCdx2oo=
+	t=1718352459; cv=none; b=TviMQlqnW8CU1Pem8jzM6Aa877n9szwQj6BG6jSY/kmI684UX1tgMAzoDAv8dOOnP16ZVhPDISL1vmR48B3WfTMMtojzk4d1uSnvcxPOJ4pKY9qvmIHfi2eu5v1dpWhrnppI179zpt4AyGpqF+j6PSNxyqumLgTvx53uNTO/6ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718352116; c=relaxed/simple;
-	bh=AiE3BsoHl6nbAyEPcQt6QjvUqcm6iPgk/BkHE4KsWHg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=G5CYJkuWsyxTrhTjhq29Ffq/pu6aTlp/NANXCJdNrLD0fYKfqfNnzj8kV5nhR++ryhLykn/20jLYYdwuqQHLpT6CAdW9Mmu9ZnKUgZfjuf4y1xvZ3yoh1kHlMzYXVRC39yT7iO+xjg0Rj7ZPppqPe9FXA87nMvAwNIvVFVHbqFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=RVptile8; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45E1fRo7003155;
-	Fri, 14 Jun 2024 08:01:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type
-	:content-transfer-encoding; s=corp-2023-11-20; bh=gGCJMnhO+L8oNf
-	IArlpsLOLy5wZxlT0LIbb7sFe1hZY=; b=RVptile8zcftjCfyE9QkpluaOTDmmd
-	e/XcXEDP1vatdHrlCFpjfbxxOrf/l0Jh9ujaeEoG73bU+PA6Si9GKBW249DkY5gL
-	Wr4S7p2bjb9gHKmJJOh06aCZiTJ1hZS1h1NLhFGvIwUc3tKpvnxjnECQCMB644U6
-	BfFCv1e8YkjIfBX+WliquE9Yzaw+bTOmmH3QwZWRUmMjYl8fS9smekrpr7Moog1N
-	a4UWzf61z6SoOd+Uuyai0wo1wduNnkkLmtRNcpj5ib4x+2GV7+j8jPZDkwYv9OYL
-	lfE8Y7CH16ewV7ewBGnJpYdLdqYR/jhKJgJ6nVB2rL4jxBf5Yt6OdC9Q==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3ymhajb6tx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 14 Jun 2024 08:01:45 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 45E7FWfw020432;
-	Fri, 14 Jun 2024 08:01:44 GMT
-Received: from aakhoje-ol.in.oracle.com (dhcp-10-76-34-154.vpn.oracle.com [10.76.34.154])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3yncaymbrm-1;
-	Fri, 14 Jun 2024 08:01:42 +0000
-From: Anand Khoje <anand.a.khoje@oracle.com>
-To: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Cc: saeedm@mellanox.com, leon@kernel.org, davem@davemloft.net
-Subject: [PATCH v3] net/mlx5 : Reclaim max 50K pages at once
-Date: Fri, 14 Jun 2024 13:31:35 +0530
-Message-ID: <20240614080135.122656-1-anand.a.khoje@oracle.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1718352459; c=relaxed/simple;
+	bh=g+C9sTXUjr0qI4UHD+E6QB+63tYPAwnvonLjEzwycgQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fLKrIT6pjvbQEOBVXHaVXNKENZukRtmVESHJLYBPV+zMpRxf3hqvod1D1BdG2xNdoLbpnh1gQm0TnJbhkhNM2kw1e/I912RFJpLgm11kMhdrm6X0sAVRL0xk5UVn7bgScQeA8de0EOMaoRuxGoq3UoSPNJsiE2D9bGoDLpENnkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: a2a97b682a2311ef9305a59a3cc225df-20240614
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:a77a25a7-59f8-44a1-9001-cbf1ed2b1799,IP:20,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:11
+X-CID-INFO: VERSION:1.1.38,REQID:a77a25a7-59f8-44a1-9001-cbf1ed2b1799,IP:20,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:11
+X-CID-META: VersionHash:82c5f88,CLOUDID:f05c5ef6fa1f85c4176edcfbee525c4f,BulkI
+	D:240614144740H35N4DT4,BulkQuantity:1,Recheck:0,SF:64|66|24|72|19|44|102,T
+	C:nil,Content:0,EDM:-3,IP:-2,URL:11|1,File:nil,RT:nil,Bulk:40,QS:nil,BEC:n
+	il,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_ULN
+X-UUID: a2a97b682a2311ef9305a59a3cc225df-20240614
+Received: from node2.com.cn [(39.156.73.10)] by mailgw.kylinos.cn
+	(envelope-from <luoxuanqiang@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 340878819; Fri, 14 Jun 2024 15:56:41 +0800
+Received: from node2.com.cn (localhost [127.0.0.1])
+	by node2.com.cn (NSMail) with SMTP id 081D3B80758A;
+	Fri, 14 Jun 2024 15:56:41 +0800 (CST)
+X-ns-mid: postfix-666BF7B7-860266110
+Received: from localhost.localdomain (unknown [10.42.12.252])
+	by node2.com.cn (NSMail) with ESMTPA id 79F59B80758A;
+	Fri, 14 Jun 2024 07:56:37 +0000 (UTC)
+From: luoxuanqiang <luoxuanqiang@kylinos.cn>
+To: edumazet@google.com
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	fw@strlen.de,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	luoxuanqiang@kylinos.cn,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH v1 1/1] Fix race for duplicate reqsk on identical SYN
+Date: Fri, 14 Jun 2024 15:56:37 +0800
+Message-Id: <CANn89iJBOAg+KCZBvkUxdAfTS1jacBBcrW6M5AZQvr=UPFJ0dA@mail.gmail.com> (raw)
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240614060012.158026-1-luoxuanqiang@kylinos.cn>
+References: <CANn89iJBOAg+KCZBvkUxdAfTS1jacBBcrW6M5AZQvr=UPFJ0dA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,100 +79,236 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-13_15,2024-06-13_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0
- malwarescore=0 spamscore=0 mlxscore=0 phishscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2406140054
-X-Proofpoint-GUID: A8VZ0y80ZXnz0eB4BkEHfS2vhrAxgWIW
-X-Proofpoint-ORIG-GUID: A8VZ0y80ZXnz0eB4BkEHfS2vhrAxgWIW
+Content-Transfer-Encoding: quoted-printable
 
-In non FLR context, at times CX-5 requests release of ~8 million FW pages.
-This needs humongous number of cmd mailboxes, which to be released once
-the pages are reclaimed. Release of humongous number of cmd mailboxes is
-consuming cpu time running into many seconds. Which with non preemptible
-kernels is leading to critical process starving on that cpu’s RQ.
-To alleviate this, this change restricts the total number of pages
-a worker will try to reclaim maximum 50K pages in one go.
-The limit 50K is aligned with the current firmware capacity/limit of
-releasing 50K pages at once per MLX5_CMD_OP_MANAGE_PAGES + MLX5_PAGES_TAKE
-device command.
+On Fri, Jun 14, 2024 at 8:01=E2=80=AFAM luoxuanqiang <luoxuanqiang@kylino=
+s.cn> wrote:
+>>
+>> When bonding is configured in BOND_MODE_BROADCAST mode, if two identic=
+al SYN packets
+>> are received at the same time and processed on different CPUs, it can =
+potentially
+>> create the same sk (sock) but two different reqsk (request_sock) in tc=
+p_conn_request().
+>>
+>> These two different reqsk will respond with two SYNACK packets, and si=
+nce the generation
+>> of the seq (ISN) incorporates a timestamp, the final two SYNACK packet=
+s will have
+>> different seq values.
+>>
+>> The consequence is that when the Client receives and replies with an A=
+CK to the earlier
+>> SYNACK packet, we will reset(RST) it.
+>>
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> This behavior is consistently reproducible in my local setup, which co=
+mprises:
+>>
+>>                   | NETA1 ------ NETB1 |
+>> PC_A --- bond --- |                    | --- bond --- PC_B
+>>                   | NETA2 ------ NETB2 |
+>>
+>> - PC_A is the Server and has two network cards, NETA1 and NETA2. I hav=
+e bonded these two
+>>   cards using BOND_MODE_BROADCAST mode and configured them to be handl=
+ed by different CPU.
+>>
+>> - PC_B is the Client, also equipped with two network cards, NETB1 and =
+NETB2, which are
+>>   also bonded and configured in BOND_MODE_BROADCAST mode.
+>>
+>> If the client attempts a TCP connection to the server, it might encoun=
+ter a failure.
+>> Capturing packets from the server side reveals:
+>>
+>> 10.10.10.10.45182 > localhost.localdomain.search-agent: Flags [S], seq=
+ 320236027,
+>> 10.10.10.10.45182 > localhost.localdomain.search-agent: Flags [S], seq=
+ 320236027,
+>> localhost.localdomain.search-agent > 10.10.10.10.45182: Flags [S.], se=
+q 2967855116,
+>> localhost.localdomain.search-agent > 10.10.10.10.45182: Flags [S.], se=
+q 2967855123, <=3D=3D
+>> 10.10.10.10.45182 > localhost.localdomain.search-agent: Flags [.], ack=
+ 4294967290,
+>> 10.10.10.10.45182 > localhost.localdomain.search-agent: Flags [.], ack=
+ 4294967290,
+>> localhost.localdomain.search-agent > 10.10.10.10.45182: Flags [R], seq=
+ 2967855117, <=3D=3D
+>> localhost.localdomain.search-agent > 10.10.10.10.45182: Flags [R], seq=
+ 2967855117,
+>>
+>> Two SYNACKs with different seq numbers are sent by localhost, resultin=
+g in an anomaly.
+>>
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> The attempted solution is as follows:
+>> In the tcp_conn_request(), while inserting reqsk into the ehash table,=
+ it also checks
+>> if an entry already exists. If found, it avoids reinsertion and releas=
+es it.
+>>
+>> Simultaneously, In the reqsk_queue_hash_req(), the start of the req->r=
+sk_timer is
+>> adjusted to be after successful insertion.
+>>
+>> Signed-off-by: luoxuanqiang <luoxuanqiang@kylinos.cn>
+>> ---
+>>  include/net/inet_connection_sock.h |  2 +-
+>>  net/dccp/ipv4.c                    |  2 +-
+>>  net/dccp/ipv6.c                    |  2 +-
+>>  net/ipv4/inet_connection_sock.c    | 16 ++++++++++++----
+>>  net/ipv4/tcp_input.c               | 11 ++++++++++-
+>>  5 files changed, 25 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/include/net/inet_connection_sock.h b/include/net/inet_con=
+nection_sock.h
+>> index 7d6b1254c92d..8773d161d184 100644
+>> --- a/include/net/inet_connection_sock.h
+>> +++ b/include/net/inet_connection_sock.h
+>> @@ -264,7 +264,7 @@ struct sock *inet_csk_reqsk_queue_add(struct sock =
+*sk,
+>>                                       struct request_sock *req,
+>>                                       struct sock *child);
+>>  void inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_so=
+ck *req,
+>> -                                  unsigned long timeout);
+>> +                                  unsigned long timeout, bool *found_=
+dup_sk);
+>>  struct sock *inet_csk_complete_hashdance(struct sock *sk, struct sock=
+ *child,
+>>                                          struct request_sock *req,
+>>                                          bool own_req);
+>> diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
+>> index ff41bd6f99c3..13aafdeb9205 100644
+>> --- a/net/dccp/ipv4.c
+>> +++ b/net/dccp/ipv4.c
+>> @@ -657,7 +657,7 @@ int dccp_v4_conn_request(struct sock *sk, struct s=
+k_buff *skb)
+>>         if (dccp_v4_send_response(sk, req))
+>>                 goto drop_and_free;
+>>
+>> -       inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT);
+>> +       inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT, NULL=
+);
+>>         reqsk_put(req);
+>>         return 0;
+>>
+>> diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
+>> index 85f4b8fdbe5e..493cdb12ce2b 100644
+>> --- a/net/dccp/ipv6.c
+>> +++ b/net/dccp/ipv6.c
+>> @@ -400,7 +400,7 @@ static int dccp_v6_conn_request(struct sock *sk, s=
+truct sk_buff *skb)
+>>         if (dccp_v6_send_response(sk, req))
+>>                 goto drop_and_free;
+>>
+>> -       inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT);
+>> +       inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT, NULL=
+);
+>>         reqsk_put(req);
+>>         return 0;
+>>
+>> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connectio=
+n_sock.c
+>> index d81f74ce0f02..d9394db98a5a 100644
+>> --- a/net/ipv4/inet_connection_sock.c
+>> +++ b/net/ipv4/inet_connection_sock.c
+>> @@ -1123,12 +1123,17 @@ static void reqsk_timer_handler(struct timer_l=
+ist *t)
+>>  }
+>>
+>>  static void reqsk_queue_hash_req(struct request_sock *req,
+>> -                                unsigned long timeout)
+>> +                                unsigned long timeout, bool *found_du=
+p_sk)
+>>  {
+>> +
+>> +       inet_ehash_insert(req_to_sk(req), NULL, found_dup_sk);
+>> +       if(found_dup_sk && *found_dup_sk)
+>> +               return;
+>> +
+>> +       /* The timer needs to be setup after a successful insertion. *=
+/
+>
+>I am pretty sure we had a prior attempt to fix this issue, and the fix
+>was problematic.
+>
+>You are moving the inet_ehash_insert() before the mod_timer(), this
+>will add races.
+Could you kindly explain what "races" refer to here? Thank you!
 
-Our tests have shown significant benefit of this change in terms of
-time consumed by dma_pool_free().
-During a test where an event was raised by HCA
-to release 1.3 Million pages, following observations were made:
-
-- Without this change:
-Number of mailbox messages allocated was around 20K, to accommodate
-the DMA addresses of 1.3 million pages.
-The average time spent by dma_pool_free() to free the DMA pool is between
-16 usec to 32 usec.
-           value  ------------- Distribution ------------- count
-             256 |                                         0
-             512 |@                                        287
-            1024 |@@@                                      1332
-            2048 |@                                        656
-            4096 |@@@@@                                    2599
-            8192 |@@@@@@@@@@                               4755
-           16384 |@@@@@@@@@@@@@@@                          7545
-           32768 |@@@@@                                    2501
-           65536 |                                         0
-
-- With this change:
-Number of mailbox messages allocated was around 800; this was to
-accommodate DMA addresses of only 50K pages.
-The average time spent by dma_pool_free() to free the DMA pool in this case
-lies between 1 usec to 2 usec.
-           value  ------------- Distribution ------------- count
-             256 |                                         0
-             512 |@@@@@@@@@@@@@@@@@@                       346
-            1024 |@@@@@@@@@@@@@@@@@@@@@@                   435
-            2048 |                                         0
-            4096 |                                         0
-            8192 |                                         1
-           16384 |                                         0
-
-Signed-off-by: Anand Khoje <anand.a.khoje@oracle.com>
----
-Changes in v3:
-   - Shifted the logic to function req_pages_handler() as per
-     Leon's suggestion.
----
- drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-index 1b38397..e7c2d36 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-@@ -508,6 +508,7 @@ enum {
- 	RELEASE_ALL_PAGES_MASK = 0x4000,
- };
- 
-+#define MAX_RECLAIM_NPAGES -50000
- static int req_pages_handler(struct notifier_block *nb,
- 			     unsigned long type, void *data)
- {
-@@ -539,9 +540,13 @@ static int req_pages_handler(struct notifier_block *nb,
- 
- 	req->dev = dev;
- 	req->func_id = func_id;
--	req->npages = npages;
- 	req->ec_function = ec_function;
- 	req->release_all = release_all;
-+	if (npages < MAX_RECLAIM_NPAGES)
-+		req->npages = MAX_RECLAIM_NPAGES;
-+	else
-+		req->npages = npages;
-+
- 	INIT_WORK(&req->work, pages_work_handler);
- 	queue_work(dev->priv.pg_wq, &req->work);
- 	return NOTIFY_OK;
--- 
-1.8.3.1
-
+>
+>Hint here is the use of TIMER_PINNED.
+>
+>CCing Florian, because he just removed TIMER_PINNED for TW, he might
+>have the context
+>to properly fix this issue.
+>
+>>         timer_setup(&req->rsk_timer, reqsk_timer_handler, TIMER_PINNED=
+);
+>>         mod_timer(&req->rsk_timer, jiffies + timeout);
+>>
+>> -       inet_ehash_insert(req_to_sk(req), NULL, NULL);
+>>         /* before letting lookups find us, make sure all req fields
+>>          * are committed to memory and refcnt initialized.
+>>          */
+>> @@ -1137,9 +1142,12 @@ static void reqsk_queue_hash_req(struct request=
+_sock *req,
+>>  }
+>>
+>>  void inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_so=
+ck *req,
+>> -                                  unsigned long timeout)
+>> +                                  unsigned long timeout, bool *found_=
+dup_sk)
+>>  {
+>> -       reqsk_queue_hash_req(req, timeout);
+>> +       reqsk_queue_hash_req(req, timeout, found_dup_sk);
+>> +       if(found_dup_sk && *found_dup_sk)
+>> +               return;
+>> +
+>>         inet_csk_reqsk_queue_added(sk);
+>>  }
+>>  EXPORT_SYMBOL_GPL(inet_csk_reqsk_queue_hash_add);
+>> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+>> index 9c04a9c8be9d..467f1b7bbd5a 100644
+>> --- a/net/ipv4/tcp_input.c
+>> +++ b/net/ipv4/tcp_input.c
+>> @@ -7255,8 +7255,17 @@ int tcp_conn_request(struct request_sock_ops *r=
+sk_ops,
+>>         } else {
+>>                 tcp_rsk(req)->tfo_listener =3D false;
+>>                 if (!want_cookie) {
+>> +                       bool found_dup_sk =3D false;
+>> +
+>>                         req->timeout =3D tcp_timeout_init((struct sock=
+ *)req);
+>> -                       inet_csk_reqsk_queue_hash_add(sk, req, req->ti=
+meout);
+>> +                       inet_csk_reqsk_queue_hash_add(sk, req, req->ti=
+meout,
+>> +                                                       &found_dup_sk)=
+;
+>> +
+>> +                       if(unlikely(found_dup_sk)){
+>> +                               reqsk_free(req);
+>> +                               return 0;
+>> +                       }
+>> +
+>>                 }
+>>                 af_ops->send_synack(sk, dst, &fl, req, &foc,
+>>                                     !want_cookie ? TCP_SYNACK_NORMAL :
+>> --
+>> 2.25.1
+>>
 
