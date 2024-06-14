@@ -1,243 +1,315 @@
-Return-Path: <netdev+bounces-103690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 666F3909128
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 19:15:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A0DE909135
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 19:17:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E29621F21A7F
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:15:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10092281DD6
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9483E1974EA;
-	Fri, 14 Jun 2024 17:15:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DABB919CCF5;
+	Fri, 14 Jun 2024 17:15:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ggnqrTeb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DNtvNz/F"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E55816D339;
-	Fri, 14 Jun 2024 17:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A517816D4EB;
+	Fri, 14 Jun 2024 17:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718385322; cv=none; b=oHdjbPilSw8XQSHpBQp8vJfJ8m1GYgxEMlc/8VuwEQ09eX2q7pLz23ORHFzNbmcC4W7K8bP6yy98KDoAV/4do8NEKMngoS+figRxfWEDK4BfbUlNNFceM9zokyPrEZyeASfQb8UtRu95tdcSfF7zFCs1H8N5uUq1Fpd6/aC5FqA=
+	t=1718385353; cv=none; b=HHvFv/CKCYbSWrNLoqXcesHaobZb5fQltrmEZpPLm+nf1qa3T4Z6+xRZpkeegTej/KxZlZh4oA0BADzaVAyQvzDQetBuV7w2egIg/bvxvv2i6DXZT/UF7aCe7h29ZgEyWeqNG55vPpzS8Biu77UVikKuTFwfY9kJJxWLRHpB6Zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718385322; c=relaxed/simple;
-	bh=E4kWCwpi97nUrP5r8szVoHd7Nv9FJpe1nSWH5e9Auuc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UskkSSa0OfFfq3RYqXmnK6md6kzMA3STfS4umDktI26rMitfehmeVgjcFfmj+MmD/HU+uTVlS24iEPOlhbKdK18eSLSYozP0LkqgTSd4dWfUXuriZg1pFPyWUE+Kl/4vJT9XWEnUlst5CFbF3re3ezrZgoAPJSsPegGXWUw1uA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ggnqrTeb; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1718385320; x=1749921320;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=E4kWCwpi97nUrP5r8szVoHd7Nv9FJpe1nSWH5e9Auuc=;
-  b=ggnqrTebbmgtWhRumWFEhYvndMlH/jskhGlwdJoFOJ98lSg3RZUV9MIu
-   DNXmXBQr0BQFJK5wrcItRS24TwBSvjc1FculfIl90EbYaRLuGUSot/0l1
-   yDuXrvXQ+zxu1H0D1GGTsCp1taEZ/Zir3MIHRn2rELhzOkTnJ/4NvQfAB
-   RTIN4TTjffZHT0irg/JKBLurnB4FpE7CcEE2Hycv7KGHonIk4xGdYbAmv
-   xENcYSIvuBDpLUs/80gRMSQhXiYfX5+eVNmOP3OcwQgHntb47Ewd5ZPvT
-   3t+7c5HDOK573GpyCmKhUKrhllV1H2X8fzwTmf1VoJqIk2qe9sruVSyrl
-   A==;
-X-CSE-ConnectionGUID: oTu+8oZpRNSsGgyH6m3d9w==
-X-CSE-MsgGUID: zpD7oSHaQluYeCHGlndR3g==
-X-IronPort-AV: E=Sophos;i="6.08,238,1712646000"; 
-   d="scan'208";a="28220421"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Jun 2024 10:15:19 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 14 Jun 2024 10:15:14 -0700
-Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Fri, 14 Jun 2024 10:15:09 -0700
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<bryan.whitehead@microchip.com>, <andrew@lunn.ch>, <linux@armlinux.org.uk>,
-	<sbauer@blackbox.su>, <hmehrtens@maxlinear.com>, <lxu@maxlinear.com>,
-	<hkallweit1@gmail.com>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<wojciech.drewek@intel.com>, <UNGLinuxDriver@microchip.com>
-Subject: [PATCH net V5 3/3] net: phy: mxl-gpy: Remove interrupt mask clearing from config_init
-Date: Fri, 14 Jun 2024 22:41:57 +0530
-Message-ID: <20240614171157.190871-4-Raju.Lakkaraju@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240614171157.190871-1-Raju.Lakkaraju@microchip.com>
-References: <20240614171157.190871-1-Raju.Lakkaraju@microchip.com>
+	s=arc-20240116; t=1718385353; c=relaxed/simple;
+	bh=YZhKL9A/66/JtXeNBaJHZPe3vflt/TP5n7Ycw1491iQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=V6B/lG8SXMMtIRCDIEVFq8sPXQRsNyNGlXm4p0mgcsAVDpmeDkhl0eFhHI16IdUCsQS50OYwBF9BznpnncXL+14mjr2p7jSuW8mhejrI1Cj9K3D3lNiUs588c/zDN+jW//LObqEhQgAPKnjUAsW16rH6ssL0JxTsmNIQyJEv820=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DNtvNz/F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BC0FC2BD10;
+	Fri, 14 Jun 2024 17:15:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718385353;
+	bh=YZhKL9A/66/JtXeNBaJHZPe3vflt/TP5n7Ycw1491iQ=;
+	h=From:Date:Subject:To:Cc:From;
+	b=DNtvNz/Fsr5M7bREgRQH9qR24NkZ29Qno1ESJjO037HIDQQNfH/1UBQAsWlZdwtty
+	 f+DFyg6fPNUPzOda5XuDhz8wCh8dYgqPbe/YQ066xq+f3AuXWp5UenvrLJFWV5h1AZ
+	 jzbdIq/SeUc0fj0lNuUc6kEU4e1VEdnZOqhjjXPuVR2Ky5W3uE8VBDWneZ3e8QbT0M
+	 C2L3/WzD5e45TOGI8vyuf08VJsIDibMh6Mo+jeh/+gt9H8PEyfiJ1q429HTYgf0OaH
+	 GjuX2Z3HjGRK9QekfVSp94R4Zds1FQa82mXaY09FvYw/DrMyrirv09qWG9PRpAIB97
+	 yRPBTAqfkFWug==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Date: Fri, 14 Jun 2024 19:15:29 +0200
+Subject: [PATCH net] selftests: mptcp: userspace_pm: fixed subtest names
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240614-upstream-net-20240614-selftests-mptcp-uspace-pm-fixed-test-names-v1-1-460ad3edb429@kernel.org>
+X-B4-Tracking: v=1; b=H4sIALB6bGYC/z2OQQrDIBRErxL+uh/UhFB6ldKF1bEVqhW/KYWQu
+ 1c3Xb6ZYWZ2EtQIocu0U8UnSnznDvo0kXva/ABH35mMMota9cJbkVZhE2c0/quCV2iQJpxKc4U
+ 3KdaBS+IQv/A8PM42QXhez5i1scGrO/WZUjEy48KVeindjuMH6kJVSJcAAAA=
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=9913; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=YZhKL9A/66/JtXeNBaJHZPe3vflt/TP5n7Ycw1491iQ=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmbHrG24X5OpyXeAeAsxuyddqhL81YkDuBRmseX
+ RS5SalZy92JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZmx6xgAKCRD2t4JPQmmg
+ czUMEADQBfsk102Kt+GlOHG+mbGMNr5bv8dSCR03oVvrlfHqnjsOhO9IL6+fQ8lbdz3ylCGfPKK
+ /qPlj/ino1O6GENZ1FYWSD1QdCEWvjkSgyZmvIa4hJ2KvuQ+G9bag82rHiVFl3G2QzpCSgok6qK
+ Dm5aayH6kAUosACXCHTWxJodtFZ8opcH/O0+JPS8wpGa6fM12NNgFZBPwYoOabwfHZDRZQb9riK
+ FwV0CHVDKdTFnGcNXqUmc85fuG0l2P00y18lozFYxvIYwh2kX8B0dNAg/S97vh6SF1TOP5Uaj7B
+ PnR/+iVA/iHnFEE+tLTKNszUo+6PGv90oeIAfhmH4XUyQYujLR035mJEipo4ykCnBF+aCsqeHFe
+ 2dAv6EDsf+jekzkzPHyNnKaSLOKvXXuoyEX9KSrEUc8POhPnjTa8aL57zqSwgZRUFKDjVKIDVPZ
+ TSyVjPagUbL6qxkDR8sJqURRJlzirreAWkMFIdNl8seU3vraBkSZU9yp11Uw2vlOv2jgRl8msTz
+ RvLyedbLfSuC47FpsZkqV3rPxjGOPTG5Dj4UciSi7Xl84KKmm8IkK+gEPwtzW3sdZ9xPc5fbZVC
+ ym0MGODHtmcnYmbG1o7H0vbd1+EheYXyjgc3Fvfplfz/t1L235II4RY3gIg7nEk2Nm3GPAqKV/g
+ t3OEY1FtJ6SE5tQ==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-When the system resumes from sleep, the phy_init_hw() function invokes
-config_init(), which clears all interrupt masks and causes wake events to be
-lost in subsequent wake sequences. Remove interrupt mask clearing from
-config_init() and preserve relevant masks in config_intr().
+It is important to have fixed (sub)test names in TAP, because these
+names are used to identify them. If they are not fixed, tracking cannot
+be done.
 
-Fixes: 7d901a1e878a ("net: phy: add Maxlinear GPY115/21x/24x driver")
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Some subtests from the userspace_pm selftest were using random numbers
+in their names: the client and server address IDs from $RANDOM, and the
+client port number randomly picked by the kernel when creating the
+connection. These values have been replaced by 'client' and 'server'
+words: that's even more helpful than showing random numbers. Note that
+the addresses IDs are incremented and decremented in the test: +1 or -1
+are then displayed in these cases.
+
+Not to loose info that can be useful for debugging in case of issues,
+these random numbers are now displayed at the beginning of the test.
+
+Fixes: f589234e1af0 ("selftests: mptcp: userspace_pm: format subtests results in TAP")
+Cc: stable@vger.kernel.org
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
-Change List:
-------------
-V4 -> V5:
-  - No change
-V3 -> V4:
-  - No change
-V0 -> V3:
-  - Address the https://lore.kernel.org/lkml/4a565d54-f468-4e32-8a2c-102c1203f72c@lunn.ch/T/
-    review comments
+ tools/testing/selftests/net/mptcp/userspace_pm.sh | 46 ++++++++++++++---------
+ 1 file changed, 28 insertions(+), 18 deletions(-)
 
- drivers/net/phy/mxl-gpy.c | 58 +++++++++++++++++++++++++--------------
- 1 file changed, 38 insertions(+), 20 deletions(-)
+diff --git a/tools/testing/selftests/net/mptcp/userspace_pm.sh b/tools/testing/selftests/net/mptcp/userspace_pm.sh
+index 9e2981f2d7f5..9cb05978269d 100755
+--- a/tools/testing/selftests/net/mptcp/userspace_pm.sh
++++ b/tools/testing/selftests/net/mptcp/userspace_pm.sh
+@@ -160,10 +160,12 @@ make_connection()
+ 	local is_v6=$1
+ 	local app_port=$app4_port
+ 	local connect_addr="10.0.1.1"
++	local client_addr="10.0.1.2"
+ 	local listen_addr="0.0.0.0"
+ 	if [ "$is_v6" = "v6" ]
+ 	then
+ 		connect_addr="dead:beef:1::1"
++		client_addr="dead:beef:1::2"
+ 		listen_addr="::"
+ 		app_port=$app6_port
+ 	else
+@@ -206,6 +208,7 @@ make_connection()
+ 		   [ "$server_serverside" = 1 ]
+ 	then
+ 		test_pass
++		print_title "Connection info: ${client_addr}:${client_port} -> ${connect_addr}:${app_port}"
+ 	else
+ 		test_fail "Expected tokens (c:${client_token} - s:${server_token}) and server (c:${client_serverside} - s:${server_serverside})"
+ 		mptcp_lib_result_print_all_tap
+@@ -297,7 +300,7 @@ test_announce()
+ 	ip netns exec "$ns2"\
+ 	   ./pm_nl_ctl ann 10.0.2.2 token "$client4_token" id $client_addr_id dev\
+ 	   ns2eth1
+-	print_test "ADD_ADDR id:${client_addr_id} 10.0.2.2 (ns2) => ns1, reuse port"
++	print_test "ADD_ADDR id:client 10.0.2.2 (ns2) => ns1, reuse port"
+ 	sleep 0.5
+ 	verify_announce_event $server_evts $ANNOUNCED $server4_token "10.0.2.2" $client_addr_id \
+ 			      "$client4_port"
+@@ -306,7 +309,7 @@ test_announce()
+ 	:>"$server_evts"
+ 	ip netns exec "$ns2" ./pm_nl_ctl ann\
+ 	   dead:beef:2::2 token "$client6_token" id $client_addr_id dev ns2eth1
+-	print_test "ADD_ADDR6 id:${client_addr_id} dead:beef:2::2 (ns2) => ns1, reuse port"
++	print_test "ADD_ADDR6 id:client dead:beef:2::2 (ns2) => ns1, reuse port"
+ 	sleep 0.5
+ 	verify_announce_event "$server_evts" "$ANNOUNCED" "$server6_token" "dead:beef:2::2"\
+ 			      "$client_addr_id" "$client6_port" "v6"
+@@ -316,7 +319,7 @@ test_announce()
+ 	client_addr_id=$((client_addr_id+1))
+ 	ip netns exec "$ns2" ./pm_nl_ctl ann 10.0.2.2 token "$client4_token" id\
+ 	   $client_addr_id dev ns2eth1 port $new4_port
+-	print_test "ADD_ADDR id:${client_addr_id} 10.0.2.2 (ns2) => ns1, new port"
++	print_test "ADD_ADDR id:client+1 10.0.2.2 (ns2) => ns1, new port"
+ 	sleep 0.5
+ 	verify_announce_event "$server_evts" "$ANNOUNCED" "$server4_token" "10.0.2.2"\
+ 			      "$client_addr_id" "$new4_port"
+@@ -327,7 +330,7 @@ test_announce()
+ 	# ADD_ADDR from the server to client machine reusing the subflow port
+ 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server4_token" id\
+ 	   $server_addr_id dev ns1eth2
+-	print_test "ADD_ADDR id:${server_addr_id} 10.0.2.1 (ns1) => ns2, reuse port"
++	print_test "ADD_ADDR id:server 10.0.2.1 (ns1) => ns2, reuse port"
+ 	sleep 0.5
+ 	verify_announce_event "$client_evts" "$ANNOUNCED" "$client4_token" "10.0.2.1"\
+ 			      "$server_addr_id" "$app4_port"
+@@ -336,7 +339,7 @@ test_announce()
+ 	:>"$client_evts"
+ 	ip netns exec "$ns1" ./pm_nl_ctl ann dead:beef:2::1 token "$server6_token" id\
+ 	   $server_addr_id dev ns1eth2
+-	print_test "ADD_ADDR6 id:${server_addr_id} dead:beef:2::1 (ns1) => ns2, reuse port"
++	print_test "ADD_ADDR6 id:server dead:beef:2::1 (ns1) => ns2, reuse port"
+ 	sleep 0.5
+ 	verify_announce_event "$client_evts" "$ANNOUNCED" "$client6_token" "dead:beef:2::1"\
+ 			      "$server_addr_id" "$app6_port" "v6"
+@@ -346,7 +349,7 @@ test_announce()
+ 	server_addr_id=$((server_addr_id+1))
+ 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server4_token" id\
+ 	   $server_addr_id dev ns1eth2 port $new4_port
+-	print_test "ADD_ADDR id:${server_addr_id} 10.0.2.1 (ns1) => ns2, new port"
++	print_test "ADD_ADDR id:server+1 10.0.2.1 (ns1) => ns2, new port"
+ 	sleep 0.5
+ 	verify_announce_event "$client_evts" "$ANNOUNCED" "$client4_token" "10.0.2.1"\
+ 			      "$server_addr_id" "$new4_port"
+@@ -380,7 +383,7 @@ test_remove()
+ 	local invalid_token=$(( client4_token - 1 ))
+ 	ip netns exec "$ns2" ./pm_nl_ctl rem token $invalid_token id\
+ 	   $client_addr_id > /dev/null 2>&1
+-	print_test "RM_ADDR id:${client_addr_id} ns2 => ns1, invalid token"
++	print_test "RM_ADDR id:client ns2 => ns1, invalid token"
+ 	local type
+ 	type=$(mptcp_lib_evts_get_info type "$server_evts")
+ 	if [ "$type" = "" ]
+@@ -394,7 +397,7 @@ test_remove()
+ 	local invalid_id=$(( client_addr_id + 1 ))
+ 	ip netns exec "$ns2" ./pm_nl_ctl rem token "$client4_token" id\
+ 	   $invalid_id > /dev/null 2>&1
+-	print_test "RM_ADDR id:${invalid_id} ns2 => ns1, invalid id"
++	print_test "RM_ADDR id:client+1 ns2 => ns1, invalid id"
+ 	type=$(mptcp_lib_evts_get_info type "$server_evts")
+ 	if [ "$type" = "" ]
+ 	then
+@@ -407,7 +410,7 @@ test_remove()
+ 	:>"$server_evts"
+ 	ip netns exec "$ns2" ./pm_nl_ctl rem token "$client4_token" id\
+ 	   $client_addr_id
+-	print_test "RM_ADDR id:${client_addr_id} ns2 => ns1"
++	print_test "RM_ADDR id:client ns2 => ns1"
+ 	sleep 0.5
+ 	verify_remove_event "$server_evts" "$REMOVED" "$server4_token" "$client_addr_id"
+ 
+@@ -416,7 +419,7 @@ test_remove()
+ 	client_addr_id=$(( client_addr_id - 1 ))
+ 	ip netns exec "$ns2" ./pm_nl_ctl rem token "$client4_token" id\
+ 	   $client_addr_id
+-	print_test "RM_ADDR id:${client_addr_id} ns2 => ns1"
++	print_test "RM_ADDR id:client-1 ns2 => ns1"
+ 	sleep 0.5
+ 	verify_remove_event "$server_evts" "$REMOVED" "$server4_token" "$client_addr_id"
+ 
+@@ -424,7 +427,7 @@ test_remove()
+ 	:>"$server_evts"
+ 	ip netns exec "$ns2" ./pm_nl_ctl rem token "$client6_token" id\
+ 	   $client_addr_id
+-	print_test "RM_ADDR6 id:${client_addr_id} ns2 => ns1"
++	print_test "RM_ADDR6 id:client-1 ns2 => ns1"
+ 	sleep 0.5
+ 	verify_remove_event "$server_evts" "$REMOVED" "$server6_token" "$client_addr_id"
+ 
+@@ -434,7 +437,7 @@ test_remove()
+ 	# RM_ADDR from the server to client machine
+ 	ip netns exec "$ns1" ./pm_nl_ctl rem token "$server4_token" id\
+ 	   $server_addr_id
+-	print_test "RM_ADDR id:${server_addr_id} ns1 => ns2"
++	print_test "RM_ADDR id:server ns1 => ns2"
+ 	sleep 0.5
+ 	verify_remove_event "$client_evts" "$REMOVED" "$client4_token" "$server_addr_id"
+ 
+@@ -443,7 +446,7 @@ test_remove()
+ 	server_addr_id=$(( server_addr_id - 1 ))
+ 	ip netns exec "$ns1" ./pm_nl_ctl rem token "$server4_token" id\
+ 	   $server_addr_id
+-	print_test "RM_ADDR id:${server_addr_id} ns1 => ns2"
++	print_test "RM_ADDR id:server-1 ns1 => ns2"
+ 	sleep 0.5
+ 	verify_remove_event "$client_evts" "$REMOVED" "$client4_token" "$server_addr_id"
+ 
+@@ -451,7 +454,7 @@ test_remove()
+ 	:>"$client_evts"
+ 	ip netns exec "$ns1" ./pm_nl_ctl rem token "$server6_token" id\
+ 	   $server_addr_id
+-	print_test "RM_ADDR6 id:${server_addr_id} ns1 => ns2"
++	print_test "RM_ADDR6 id:server-1 ns1 => ns2"
+ 	sleep 0.5
+ 	verify_remove_event "$client_evts" "$REMOVED" "$client6_token" "$server_addr_id"
+ }
+@@ -479,8 +482,14 @@ verify_subflow_events()
+ 	local locid
+ 	local remid
+ 	local info
++	local e_dport_txt
+ 
+-	info="${e_saddr} (${e_from}) => ${e_daddr}:${e_dport} (${e_to})"
++	# only display the fixed ports
++	if [ "${e_dport}" -ge "${app4_port}" ] && [ "${e_dport}" -le "${app6_port}" ]; then
++		e_dport_txt=":${e_dport}"
++	fi
++
++	info="${e_saddr} (${e_from}) => ${e_daddr}${e_dport_txt} (${e_to})"
+ 
+ 	if [ "$e_type" = "$SUB_ESTABLISHED" ]
+ 	then
+@@ -766,7 +775,7 @@ test_subflows_v4_v6_mix()
+ 	:>"$client_evts"
+ 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server6_token" id\
+ 	   $server_addr_id dev ns1eth2
+-	print_test "ADD_ADDR4 id:${server_addr_id} 10.0.2.1 (ns1) => ns2, reuse port"
++	print_test "ADD_ADDR4 id:server 10.0.2.1 (ns1) => ns2, reuse port"
+ 	sleep 0.5
+ 	verify_announce_event "$client_evts" "$ANNOUNCED" "$client6_token" "10.0.2.1"\
+ 			      "$server_addr_id" "$app6_port"
+@@ -861,7 +870,7 @@ test_listener()
+ 	local listener_pid=$!
+ 
+ 	sleep 0.5
+-	print_test "CREATE_LISTENER 10.0.2.2:$client4_port"
++	print_test "CREATE_LISTENER 10.0.2.2 (client port)"
+ 	verify_listener_events $client_evts $LISTENER_CREATED $AF_INET 10.0.2.2 $client4_port
+ 
+ 	# ADD_ADDR from client to server machine reusing the subflow port
+@@ -878,13 +887,14 @@ test_listener()
+ 	mptcp_lib_kill_wait $listener_pid
+ 
+ 	sleep 0.5
+-	print_test "CLOSE_LISTENER 10.0.2.2:$client4_port"
++	print_test "CLOSE_LISTENER 10.0.2.2 (client port)"
+ 	verify_listener_events $client_evts $LISTENER_CLOSED $AF_INET 10.0.2.2 $client4_port
+ }
+ 
+ print_title "Make connections"
+ make_connection
+ make_connection "v6"
++print_title "Will be using address IDs ${client_addr_id} (client) and ${server_addr_id} (server)"
+ 
+ test_announce
+ test_remove
 
-diff --git a/drivers/net/phy/mxl-gpy.c b/drivers/net/phy/mxl-gpy.c
-index b2d36a3a96f1..e5f8ac4b4604 100644
---- a/drivers/net/phy/mxl-gpy.c
-+++ b/drivers/net/phy/mxl-gpy.c
-@@ -107,6 +107,7 @@ struct gpy_priv {
- 
- 	u8 fw_major;
- 	u8 fw_minor;
-+	u32 wolopts;
- 
- 	/* It takes 3 seconds to fully switch out of loopback mode before
- 	 * it can safely re-enter loopback mode. Record the time when
-@@ -221,6 +222,15 @@ static int gpy_hwmon_register(struct phy_device *phydev)
- }
- #endif
- 
-+static int gpy_ack_interrupt(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* Clear all pending interrupts */
-+	ret = phy_read(phydev, PHY_ISTAT);
-+	return ret < 0 ? ret : 0;
-+}
-+
- static int gpy_mbox_read(struct phy_device *phydev, u32 addr)
- {
- 	struct gpy_priv *priv = phydev->priv;
-@@ -262,16 +272,8 @@ static int gpy_mbox_read(struct phy_device *phydev, u32 addr)
- 
- static int gpy_config_init(struct phy_device *phydev)
- {
--	int ret;
--
--	/* Mask all interrupts */
--	ret = phy_write(phydev, PHY_IMASK, 0);
--	if (ret)
--		return ret;
--
--	/* Clear all pending interrupts */
--	ret = phy_read(phydev, PHY_ISTAT);
--	return ret < 0 ? ret : 0;
-+	/* Nothing to configure. Configuration Requirement Placeholder */
-+	return 0;
- }
- 
- static int gpy21x_config_init(struct phy_device *phydev)
-@@ -627,11 +629,23 @@ static int gpy_read_status(struct phy_device *phydev)
- 
- static int gpy_config_intr(struct phy_device *phydev)
- {
-+	struct gpy_priv *priv = phydev->priv;
- 	u16 mask = 0;
-+	int ret;
-+
-+	ret = gpy_ack_interrupt(phydev);
-+	if (ret)
-+		return ret;
- 
- 	if (phydev->interrupts == PHY_INTERRUPT_ENABLED)
- 		mask = PHY_IMASK_MASK;
- 
-+	if (priv->wolopts & WAKE_MAGIC)
-+		mask |= PHY_IMASK_WOL;
-+
-+	if (priv->wolopts & WAKE_PHY)
-+		mask |= PHY_IMASK_LSTC;
-+
- 	return phy_write(phydev, PHY_IMASK, mask);
- }
- 
-@@ -678,6 +692,7 @@ static int gpy_set_wol(struct phy_device *phydev,
- 		       struct ethtool_wolinfo *wol)
- {
- 	struct net_device *attach_dev = phydev->attached_dev;
-+	struct gpy_priv *priv = phydev->priv;
- 	int ret;
- 
- 	if (wol->wolopts & WAKE_MAGIC) {
-@@ -725,6 +740,8 @@ static int gpy_set_wol(struct phy_device *phydev,
- 		ret = phy_read(phydev, PHY_ISTAT);
- 		if (ret < 0)
- 			return ret;
-+
-+		priv->wolopts |= WAKE_MAGIC;
- 	} else {
- 		/* Disable magic packet matching */
- 		ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2,
-@@ -732,6 +749,13 @@ static int gpy_set_wol(struct phy_device *phydev,
- 					 WOL_EN);
- 		if (ret < 0)
- 			return ret;
-+
-+		/* Disable the WOL interrupt */
-+		ret = phy_clear_bits(phydev, PHY_IMASK, PHY_IMASK_WOL);
-+		if (ret < 0)
-+			return ret;
-+
-+		priv->wolopts &= ~WAKE_MAGIC;
- 	}
- 
- 	if (wol->wolopts & WAKE_PHY) {
-@@ -748,9 +772,11 @@ static int gpy_set_wol(struct phy_device *phydev,
- 		if (ret & (PHY_IMASK_MASK & ~PHY_IMASK_LSTC))
- 			phy_trigger_machine(phydev);
- 
-+		priv->wolopts |= WAKE_PHY;
- 		return 0;
- 	}
- 
-+	priv->wolopts &= ~WAKE_PHY;
- 	/* Disable the link state change interrupt */
- 	return phy_clear_bits(phydev, PHY_IMASK, PHY_IMASK_LSTC);
- }
-@@ -758,18 +784,10 @@ static int gpy_set_wol(struct phy_device *phydev,
- static void gpy_get_wol(struct phy_device *phydev,
- 			struct ethtool_wolinfo *wol)
- {
--	int ret;
-+	struct gpy_priv *priv = phydev->priv;
- 
- 	wol->supported = WAKE_MAGIC | WAKE_PHY;
--	wol->wolopts = 0;
--
--	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, VPSPEC2_WOL_CTL);
--	if (ret & WOL_EN)
--		wol->wolopts |= WAKE_MAGIC;
--
--	ret = phy_read(phydev, PHY_IMASK);
--	if (ret & PHY_IMASK_LSTC)
--		wol->wolopts |= WAKE_PHY;
-+	wol->wolopts = priv->wolopts;
- }
- 
- static int gpy_loopback(struct phy_device *phydev, bool enable)
+---
+base-commit: 89aa3619d141d6cfb6040a561aebb6d99d3e2285
+change-id: 20240614-upstream-net-20240614-selftests-mptcp-uspace-pm-fixed-test-names-368e312afd0b
+
+Best regards,
 -- 
-2.34.1
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
