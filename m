@@ -1,62 +1,61 @@
-Return-Path: <netdev+bounces-103668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A504C908FCB
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 18:14:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BB36908FDD
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 18:16:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FB5D1F22C36
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:14:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AEE2B289DB
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2282F16C696;
-	Fri, 14 Jun 2024 16:14:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8850716B751;
+	Fri, 14 Jun 2024 16:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DHPu368e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P4FzgjLd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE8F16CDB3;
-	Fri, 14 Jun 2024 16:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7C02232A;
+	Fri, 14 Jun 2024 16:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718381650; cv=none; b=WhYIDgN4bZpHT8tLi4iFBN93+lhWOtB4rhm5eMtnVFDx892wG2E91IjjtMw2dJmHfSgaPxJAzMFN+jveGWq7NDAx66GM4JdIl3JYJkTe1E2Q3bDoWvMrQbiWKviY6Mph/jQCtLZJ5VOZXQbEu1iMGiK/0r929dh2eyBbISsjci4=
+	t=1718381739; cv=none; b=SmbOewHjVKBr/31ZagPObp1RX7jNHt9wXVAIEz5dg7MBTloJX1zJ+Wc3XAoikYHaTgCdLy/pw/SRudn9ZvA1o4YIFaZlttLS+xPt8YqfZj8F9ixjU6dk9tR0VCklYMv/tYy1yNxQ2/30a2h61hTOUyW488hLcUFWC1VVCQZ1ByY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718381650; c=relaxed/simple;
-	bh=8hlqOeoJesdrM/kznHbtxymhcdzkztPlTxq5hmHvQlg=;
+	s=arc-20240116; t=1718381739; c=relaxed/simple;
+	bh=lLNDiROxpO6pLANFAbPa5fupMdZGiml5z4NIV4Owxxg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WNFle4RGdWJrTJAT5yTIJkSLMUQ/DGU8V7bsaHa4yj/gOfh7fzLpACMFGBQwc81SZszd5ShoxO8ieQL3nMfISwdoJA5OrqkapmMVx044kmQx49fuzusyBrrrzS9ceo4XZsK9pA3kb136F1mZi/gUoKxofFkabNzSwmhMZHkK6zY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DHPu368e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3EC6C2BD10;
-	Fri, 14 Jun 2024 16:14:06 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=kZVluSrdCDuAhnnRHt0E0gHVVYJma6IamsRcGfnMDh18k800RaPqkFI7aOB6q2HBpyw68dRXOUn4AzDN2AJvGG2opo+o3aWvT0NFMpn7Vo0cLImhrhuCr7ALgn9GLzsdfvZIyh210+AMb0P7qOkXeZllrSBNhY3JAQg+z7u/DmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P4FzgjLd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A95DC2BD10;
+	Fri, 14 Jun 2024 16:15:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718381649;
-	bh=8hlqOeoJesdrM/kznHbtxymhcdzkztPlTxq5hmHvQlg=;
+	s=k20201202; t=1718381739;
+	bh=lLNDiROxpO6pLANFAbPa5fupMdZGiml5z4NIV4Owxxg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DHPu368eBj4oxKcJlzs7NZzauYfn+j/NAjlcGAlQa3jM6ELI1pqpWmQ8GeUhNuimn
-	 mqRhjtdDP47FA6nds9JXRTbo9cank1WWDwcrNg58ugiiN8HkzAWEG8gdYxSVhU3hHI
-	 OAOd+SI9x0dYK46AxDEDhMaooi4i7hKAwOJyWj6ZH/dQl9yWbhJKyO/9poIZvxUmgI
-	 DZhIB/rL/sLCUlz187TLy3EWEFwOFE82luweUNbX55Qyu5d/FsWF95J/zukQM6jWXk
-	 tHML+8mBY3vzud6Z6IwyPS58ofq27aoUvomQp+U9cJYv5OcWg3xnQwdjxGCcZKG8NZ
-	 QC5JUeE0GZasQ==
-Date: Fri, 14 Jun 2024 17:14:04 +0100
+	b=P4FzgjLd3XJALTHDN5SZ0DxcxIl2HYKxFd1d1aBzzoSRnUkpUmVCpZXm/xtvyBN80
+	 PZrbxByDpl6sJNTS3KK/kPylUy1+Bj2tygRjWXU+UxESnLf9B3wxhBPozqq4MfNlTm
+	 LbSi2Qa8ryW7VvzIorqf0YOhGAzxZ3IbJ3e84oJGUHLN/CTEZE2TTEtcFO4PhlsuY7
+	 O9w2KFqxI31a6py5slXQiTIjMwlSV77lsFw5yl/lyfZiJooqBJ/3QYl/NoGVbDAkbH
+	 OY3EH9pOmIXepJF5k/2H9YGR1Z6AAh1ZMpZ/gCI7wn4dp6bl/fUTsgqrlM057+o+DD
+	 KkmKhHyb4MUMg==
+Date: Fri, 14 Jun 2024 17:15:34 +0100
 From: Simon Horman <horms@kernel.org>
 To: Adrian Moreno <amorenoz@redhat.com>
 Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
 	i.maximets@ovn.org, dev@openvswitch.org,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Yotam Gigi <yotam.gi@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/9] net: sched: act_sample: add action
- cookie to sample
-Message-ID: <20240614161404.GS8447@kernel.org>
+Subject: Re: [PATCH net-next v2 3/9] net: psample: skip packet copy if no
+ listeners
+Message-ID: <20240614161534.GT8447@kernel.org>
 References: <20240603185647.2310748-1-amorenoz@redhat.com>
- <20240603185647.2310748-3-amorenoz@redhat.com>
+ <20240603185647.2310748-4-amorenoz@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,11 +64,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240603185647.2310748-3-amorenoz@redhat.com>
+In-Reply-To: <20240603185647.2310748-4-amorenoz@redhat.com>
 
-On Mon, Jun 03, 2024 at 08:56:36PM +0200, Adrian Moreno wrote:
-> If the action has a user_cookie, pass it along to the sample so it can
-> be easily identified.
+On Mon, Jun 03, 2024 at 08:56:37PM +0200, Adrian Moreno wrote:
+> If nobody is listening on the multicast group, generating the sample,
+> which involves copying packet data, seems completely unnecessary.
+> 
+> Return fast in this case.
 > 
 > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 
