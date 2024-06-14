@@ -1,107 +1,129 @@
-Return-Path: <netdev+bounces-103455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D34A9082D1
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 06:01:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAB489082F4
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 06:30:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B46281C22158
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 04:01:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53144283FF3
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 04:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FCFE12C7E3;
-	Fri, 14 Jun 2024 04:00:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F46A130A54;
+	Fri, 14 Jun 2024 04:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="T6mBp3+T"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F24146A6F
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 04:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873851E4BE;
+	Fri, 14 Jun 2024 04:30:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718337657; cv=none; b=UWAsqmFsnUVVDnhmm2S7EV8tkbmxarB+IDVXb5Fq+Vtho9q2S4wFtFuaxQIWpHGocIqn5GI6xANG0iBekbkPc6b26YXinJnUmnVIKwOzfaf/DZU7CPqMm+iWqxx2m78smoQKXwJp+ZasOv9EGkzT1F9OovmGXhwJ8Lry5fib4vk=
+	t=1718339428; cv=none; b=FNjzb/narVxGywEyDXV4GOBuN/aUcU2uAJyU4bTd1fxWPsuY/rt5J704RmVzCMHXESeAQrAwJSmIhNLOQ+9iPMracQUwAoweYXsjgLpNmy+UD95hngQcuPiP8MfQHx+32MZBNS4s0loLDZ5a4+io5plZTW9b2sV8FMwcEXq2v80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718337657; c=relaxed/simple;
-	bh=YD/hzsHGKMaPc9AEbzcC6z/zcPMYzbpxMvd818N27SE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R1sYByqpsnJrS360dmlWfT/F10X4DTxHsRzJgpcnuwca2YfExhfGlGjq1txi9yfXvyHO7BfPIjSkg6yaPjsUodELApQu9geOc7gPzEKi3vayt6H7jQSHSaZB9rnSRYcajdeKl6NiOF6CNpT4OEJREXslvq2UFd22cctBBI868SU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 45E40WLc079668;
-	Fri, 14 Jun 2024 13:00:32 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
- Fri, 14 Jun 2024 13:00:32 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
-Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 45E40WRc079665
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 14 Jun 2024 13:00:32 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <522c0b17-c515-475d-8224-637ca0eaf6a2@I-love.SAKURA.ne.jp>
-Date: Fri, 14 Jun 2024 13:00:30 +0900
+	s=arc-20240116; t=1718339428; c=relaxed/simple;
+	bh=tsflE49CV41bPrXn9OE6AiMLh5pZ25t/Y23e+/qJhy8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Uy0DDbf5yfLuJ+h1QN00wRIMSz5BfFFL3VhprlgQa5g8x1OA+z8wDS/JF0KbyBi9oT3c2rvci0xR+h39z8tXva0lM2w1UPbnJloTX+Bwi3zmdvYbmmF191916wzgvY1xNm64po9gscFzyjdJnXKyzpkrVpAjNQKSYlJ/VZCuGbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=T6mBp3+T; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1718339421; x=1749875421;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tsflE49CV41bPrXn9OE6AiMLh5pZ25t/Y23e+/qJhy8=;
+  b=T6mBp3+TAcOXbjisT1nkUGnadFnFexdPgwJ1vXCEJE+nXhNoO8RiRACZ
+   0ae6tNYN4GgEMYxIAnM2OyzrD5uH2iOnnWE+7Y58Em/ksd6+ag+6l+PMN
+   aU51+1f08691TL+EimfSY9IFgQRYyqeYI5pGTxzXqvKZ/vcVRrOZ2WwxK
+   wwH15jwTu3Xfwb02Ro9VwxrcTwcz7H1V1NsLZHJIzMmd68oV+q8VDxT8V
+   Q8eI3CZKjNDDLxI8WnvXtx49UNOOa0l4WLTzpOnzmrmNZtNSOuOaKrAd2
+   pkJXJXQ6i0GUeqqNJ7qUSZqVcKhnGUx7dWvCm4mfDRKDbLti20PBgiCeR
+   A==;
+X-CSE-ConnectionGUID: OjLhOlxKTSaOlxAEgbhxtA==
+X-CSE-MsgGUID: I14g26kQRLef/3WKsLNqzQ==
+X-IronPort-AV: E=Sophos;i="6.08,236,1712646000"; 
+   d="scan'208";a="194898935"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Jun 2024 21:30:14 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 13 Jun 2024 21:29:34 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Thu, 13 Jun 2024 21:29:34 -0700
+Date: Fri, 14 Jun 2024 09:56:47 +0530
+From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+CC: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, <netdev@vger.kernel.org>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<bryan.whitehead@microchip.com>, <andrew@lunn.ch>, <linux@armlinux.org.uk>,
+	<sbauer@blackbox.su>, <hmehrtens@maxlinear.com>, <lxu@maxlinear.com>,
+	<hkallweit1@gmail.com>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<wojciech.drewek@intel.com>, <UNGLinuxDriver@microchip.com>, "kernel test
+ robot" <lkp@intel.com>
+Subject: Re: [PATCH net V4 2/3] net: lan743x: Support WOL at both the PHY and
+ MAC appropriately
+Message-ID: <ZmvGhwxFNYx1OV4c@HYD-DK-UNGSW21.microchip.com>
+References: <20240612172539.28565-1-Raju.Lakkaraju@microchip.com>
+ <20240612172539.28565-3-Raju.Lakkaraju@microchip.com>
+ <20240613071532.tx376cehgvqjgyqx@DEN-DL-M31836.microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net/sched] Question: Locks for clearing ERR_PTR() value from
- idrinfo->action_idr ?
-To: Pedro Tammela <pctammela@mojatatu.com>,
-        Jamal Hadi Salim <jhs@mojatatu.com>,
-        Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Network Development
- <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <8d61200a-a739-4200-a8a3-5386a834d44f@I-love.SAKURA.ne.jp>
- <de8e2709-8d7f-4e51-a4a4-35bad72ba136@mojatatu.com>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <de8e2709-8d7f-4e51-a4a4-35bad72ba136@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20240613071532.tx376cehgvqjgyqx@DEN-DL-M31836.microchip.com>
 
-On 2024/06/14 11:47, Pedro Tammela wrote:
-> On 13/06/2024 21:58, Tetsuo Handa wrote:
->>
->> Is there a possibility that tcf_idr_check_alloc() is called without holding
->> rtnl_mutex?
+Hi Horatiu,
+
+The 06/13/2024 09:15, Horatiu Vultur wrote:
+> The 06/12/2024 22:55, Raju Lakkaraju wrote:
 > 
-> There is, but not in the code path of this reproducer.
+> Hi Raju,
 > 
->> If yes, adding a sleep before "goto again;" would help. But if no,
->> is this a sign that some path forgot to call tcf_idr_{cleanup,insert_many}() ?
+> > Prevent options not supported by the PHY from being requested to it by the MAC
+> > Whenever a WOL option is supported by both, the PHY is given priority
+> > since that usually leads to better power savings.
+> > 
+> > Fixes: e9e13b6adc338 ("lan743x: fix for potential NULL pointer dereference with bare card")
 > 
-> The reproducer is sending a new action message with 2 actions.
-> Actions are committed to the idr after processing in order to make them visible
-> together and after any errors are caught.
+> I am not sure if you run checkpatch.pl, but this gives you a warning.
+
+I ran the checkpatch.pl on individual files and not on patches.
+
+> The sha has too many chars.
+
+Yes. instead of 12 chars, paste the 13 chars. I will fix this issue in next
+version of patch series.
+
 > 
-> The bug happens when the actions in the message refer to the same index. Since
-> the first processing succeeds, adding -EBUSY to the index, the second processing,
-> which references the same index, will loop forever.
+> > Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+> > Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> > Reported-by: kernel test robot <lkp@intel.com>
+> > Closes: https://lore.kernel.org/oe-kbuild-all/202406052200.w3zuc32H-lkp@intel.com/
 > 
-> After the change to rely on RCU for this check, instead of the idr lock, the hangs
-> became more noticeable to syzbot since now it's hanging a system-wide lock.
+> I still don't think you should add the 'Reported-by' and 'Closes' tags
+> here because you introduced the issue in first V3 of this patch series.
+> Because the intel robot says: "If you fix the issue in a separate
+> patch/commit (i.e. not just a new version of the same patch/commit),
+> kindly add following tags".
+> 
 
-Thank you for explanation. Then, what type of sleep do we want?
+Ok. I will remove.
+> -- 
+> /Horatiu
 
-schedule_timeout_uninteruptible(1)
-(based on an assumption that conflict will be solved shortly) ?
-
-wait_event()/wake_up_all() using one global waitqueue
-(based on an assumption that conflict is rare) ?
-
-wait_event()/wake_up_all() using per struct tcf_idrinfo waitqueue
-(based on an assumption that conflict might not be rare) ?
-
+-- 
+Thanks,                                                                         
+Raju
 
