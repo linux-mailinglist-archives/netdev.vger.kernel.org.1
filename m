@@ -1,107 +1,227 @@
-Return-Path: <netdev+bounces-103683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75AF59090C4
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 18:51:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 665EC9090CF
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 18:56:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 504E4B213D8
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:51:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3F961F261CF
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A91D192B8F;
-	Fri, 14 Jun 2024 16:51:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB2F19AD45;
+	Fri, 14 Jun 2024 16:56:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ubimet.com header.i=@ubimet.com header.b="k3GxTF1i"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iIBeyiYY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx2-at.ubimet.com (mx2-at.ubimet.com [141.98.226.72])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79AA718E0E;
-	Fri, 14 Jun 2024 16:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.98.226.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE37195F2D
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 16:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718383892; cv=none; b=WCXTo9tNkjntcFlj4przvt66luNAXk+BUnjGvVv1z1TDKYqpjgpZ6XLPWSgZhClEoYalNiIJSzEv3ZJKmANPTES8/TuteNv1OoClxfJFhE2IbgWAWG5QEXI/upISZw3yd94kzUeWpIjeX49BKmPXnWWxtCruk80JGKYp2ROFkug=
+	t=1718384174; cv=none; b=clNCTEgRbcJYra6XLKQB4cgGJrntUn4xTl5nSexS/kohWdnurqqfbvaXI5uU05shLdHwFjUY7ZO9s48PiXtxA3cR9yOLT5v6kolqnMjkIbVug/JwHqoHT7oK97QBGkdvXUNmqGnFSQIOWT32Z7UjThUrR/Pwlej3P6FOMzH3e1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718383892; c=relaxed/simple;
-	bh=qrUaj5lI1R/yYXW+ER2z/XL6OGq3gh0QVB/X+hJZpWI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J853GgpW6xUkYQoiGMzQqalT0ZbWcsbMYrcICCnHXd26nFD+f9sHbrLwCVFyZQatArsr4VufrbrSofebEHy3v5Y2xbL4T3XxsMRwA7B0qKO16/M+/lbL63GaIeJ1uE9X20jrsYRD0TkVvYXCHx2unpNzCiSkPkaNP07VDr2i1KI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ubimet.com; spf=pass smtp.mailfrom=ubimet.com; dkim=pass (2048-bit key) header.d=ubimet.com header.i=@ubimet.com header.b=k3GxTF1i; arc=none smtp.client-ip=141.98.226.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ubimet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ubimet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx2-at.ubimet.com (Postfix) with ESMTP id A05E9811C3;
-	Fri, 14 Jun 2024 16:51:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ubimet.com;
-	s=20200131mdel; t=1718383889;
-	bh=qrUaj5lI1R/yYXW+ER2z/XL6OGq3gh0QVB/X+hJZpWI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=k3GxTF1iKjOpdHVBjOmrYp6yWFQKAyrm1B/OZbiChxa5X6hd3sxKuKK+p7V9ZTQ6D
-	 uVl3g1/qG8uqwW/Uylh5xERzagzK0WEjv1JcNBcpLoVRcrW5EpwnoOvmGmeGOGq6Su
-	 uz71epuntOOOMQcurQmrXNhWgHtHcGKzO0clqYrHoxZ3OL5hVQ109bBBA3XXZRLWKP
-	 ln7zMaiCbomuCWfz6QBZdSj+i+Z9ufgvkPbtfbU0WhQ8USwYtq5zEQIXrrseYtf2Zg
-	 pZE7nq9gXX6NYnIxVIqLBDisWe10E75/iiHd5bTDQBYDMl9JF0vVNjPFiGXH+KZG00
-	 YdsRL11iWUzpw==
-Received: from mx2-at.ubimet.com ([127.0.0.1])
-	by localhost (mx02.dmz.dc.at.ubimet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VylruQ35qsGF; Fri, 14 Jun 2024 16:51:29 +0000 (UTC)
-Received: from zimbra-mta01.ext.dc.at.ubimet.com (webmail-dc.at.ubimet.com [10.1.18.22])
-	by mx2-at.ubimet.com (Postfix) with ESMTPS id 8DF4180C5D;
-	Fri, 14 Jun 2024 16:51:29 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTP id 7B38F807AB;
-	Fri, 14 Jun 2024 16:51:29 +0000 (UTC)
-Received: from zimbra-mta01.ext.dc.at.ubimet.com ([127.0.0.1])
- by localhost (zimbra-mta01.ext.dc.at.ubimet.com [127.0.0.1]) (amavis, port 10032)
- with ESMTP id sDMl8jLTD7Xm; Fri, 14 Jun 2024 16:51:28 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTP id AC01C807F2;
-	Fri, 14 Jun 2024 16:51:28 +0000 (UTC)
-X-Virus-Scanned: amavis at zimbra-mta01.ext.dc.at.ubimet.com
-Received: from zimbra-mta01.ext.dc.at.ubimet.com ([127.0.0.1])
- by localhost (zimbra-mta01.ext.dc.at.ubimet.com [127.0.0.1]) (amavis, port 10026)
- with ESMTP id 8bRAqD3JwIzq; Fri, 14 Jun 2024 16:51:28 +0000 (UTC)
-Received: from pcn112 (pcn112.it.hub.at.ubimet.com [10.15.66.143])
-	by zimbra-mta01.ext.dc.at.ubimet.com (Postfix) with ESMTPSA id 5F65F807AB;
-	Fri, 14 Jun 2024 16:51:28 +0000 (UTC)
-Date: Fri, 14 Jun 2024 18:52:10 +0200
-From: =?UTF-8?B?Sm/Do28=?= Rodrigues <jrodrigues@ubimet.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, "open list:ETHERNET PHY LIBRARY"
- <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 2/3] net: phy: dp83867: add cable test support
-Message-ID: <20240614185210.3a53be61@pcn112>
-In-Reply-To: <d2e2232e-7519-4d62-b2be-265058350e08@lunn.ch>
-References: <20240613145153.2345826-1-jrodrigues@ubimet.com>
-	<20240613145153.2345826-3-jrodrigues@ubimet.com>
-	<d2e2232e-7519-4d62-b2be-265058350e08@lunn.ch>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1718384174; c=relaxed/simple;
+	bh=Vj4TQ0WEd/iYuaqi9sLaN+gfs3U3EO6MpUWKfbmYVhM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Fq9Q1Jy0Kx+stSdpyqzm29bjS+BgILKNGsPACXnnxqRxshNcBwAeI737mEBS3nROc6DtIPx8XCi8tZU8EKoHKIEnEqdLdBTyQahJjcUR3bkqDakIJ6obU+xEkSC27/chH7VHOjpLmUyHFSHGMU2Y+PHKBsDRdVJazBWystC74vI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iIBeyiYY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718384171;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=08KlAF1dPNFg+6U2RamZg0E1oBoZjXixTNWJIdnj7fs=;
+	b=iIBeyiYYdwyQbbqw4WjIQrqBrekpH7JZwNeLYDBdGdOgb1+bW2DsLekSUyaf+TCply2ugl
+	W7Eoaqz5054uFg8YB3Qq+ZNlNmnMfmQ8LjaFKmbKzlXa2iX5H7QfxMi9Bi6XhKwcz7BJPf
+	JzSKw8arJw2O+KwerlvIE9QVwNk30pM=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-186-bVN8g-_NOjC5Qbx5xltqBQ-1; Fri,
+ 14 Jun 2024 12:56:06 -0400
+X-MC-Unique: bVN8g-_NOjC5Qbx5xltqBQ-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 81CF7195609E;
+	Fri, 14 Jun 2024 16:56:04 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.16.41])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4533F19560AA;
+	Fri, 14 Jun 2024 16:56:01 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Adrian Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org,  echaudro@redhat.com,  horms@kernel.org,
+  i.maximets@ovn.org,  dev@openvswitch.org,  Pravin B Shelar
+ <pshelar@ovn.org>,  "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 6/9] net: openvswitch: store sampling
+ probability in cb.
+In-Reply-To: <20240603185647.2310748-7-amorenoz@redhat.com> (Adrian Moreno's
+	message of "Mon, 3 Jun 2024 20:56:40 +0200")
+References: <20240603185647.2310748-1-amorenoz@redhat.com>
+	<20240603185647.2310748-7-amorenoz@redhat.com>
+Date: Fri, 14 Jun 2024 12:55:59 -0400
+Message-ID: <f7t4j9vo44g.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Thu, 13 Jun 2024 19:19:45 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
+Adrian Moreno <amorenoz@redhat.com> writes:
 
-> > +/* TDR bits */
-> > +#define DP83867_TDR_GEN_CFG5_FLAGS	0x294A
-> > +#define DP83867_TDR_GEN_CFG6_FLAGS	0x0A9B =20
->=20
-> Is it documented what these bits actually mean?
->=20
->    Andrew
+> The behavior of actions might not be the exact same if they are being
+> executed inside a nested sample action. Store the probability of the
+> parent sample action in the skb's cb area.
 
-No, all three (CFG5, CFG6 and CFG7) are undocumented.
+What does that mean?
 
-Jo=C3=A3o
+> Use the probability in emit_sample to pass it down to psample.
+>
+> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> ---
+>  include/uapi/linux/openvswitch.h |  3 ++-
+>  net/openvswitch/actions.c        | 25 ++++++++++++++++++++++---
+>  net/openvswitch/datapath.h       |  3 +++
+>  net/openvswitch/vport.c          |  1 +
+>  4 files changed, 28 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
+> index a0e9dde0584a..9d675725fa2b 100644
+> --- a/include/uapi/linux/openvswitch.h
+> +++ b/include/uapi/linux/openvswitch.h
+> @@ -649,7 +649,8 @@ enum ovs_flow_attr {
+>   * Actions are passed as nested attributes.
+>   *
+>   * Executes the specified actions with the given probability on a per-packet
+> - * basis.
+> + * basis. Nested actions will be able to access the probability value of the
+> + * parent @OVS_ACTION_ATTR_SAMPLE.
+>   */
+>  enum ovs_sample_attr {
+>  	OVS_SAMPLE_ATTR_UNSPEC,
+> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+> index 3b4dba0ded59..33f6d93ba5e4 100644
+> --- a/net/openvswitch/actions.c
+> +++ b/net/openvswitch/actions.c
+> @@ -1048,12 +1048,15 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
+>  	struct nlattr *sample_arg;
+>  	int rem = nla_len(attr);
+>  	const struct sample_arg *arg;
+> +	u32 init_probability;
+>  	bool clone_flow_key;
+> +	int err;
+>  
+>  	/* The first action is always 'OVS_SAMPLE_ATTR_ARG'. */
+>  	sample_arg = nla_data(attr);
+>  	arg = nla_data(sample_arg);
+>  	actions = nla_next(sample_arg, &rem);
+> +	init_probability = OVS_CB(skb)->probability;
+>  
+>  	if ((arg->probability != U32_MAX) &&
+>  	    (!arg->probability || get_random_u32() > arg->probability)) {
+> @@ -1062,9 +1065,21 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
+>  		return 0;
+>  	}
+>  
+> +	if (init_probability) {
+> +		OVS_CB(skb)->probability = ((u64)OVS_CB(skb)->probability *
+> +					    arg->probability / U32_MAX);
+> +	} else {
+> +		OVS_CB(skb)->probability = arg->probability;
+> +	}
+> +
+
+I'm confused by this.  Eventually, integer arithmetic will practically
+guarantee that nested sample() calls will go to 0.  So eventually, the
+test above will be impossible to meet mathematically.
+
+OTOH, you could argue that a 1% of 50% is low anyway, but it still would
+have a positive probability count, and still be possible for
+get_random_u32() call to match.
+
+I'm not sure about this particular change.  Why do we need it?
+
+>  	clone_flow_key = !arg->exec;
+> -	return clone_execute(dp, skb, key, 0, actions, rem, last,
+> -			     clone_flow_key);
+> +	err = clone_execute(dp, skb, key, 0, actions, rem, last,
+> +			    clone_flow_key);
+> +
+> +	if (!last)
+
+Is this right?  Don't we only want to set the probability on the last
+action?  Should the test be 'if (last)'?
+
+> +		OVS_CB(skb)->probability = init_probability;
+> +
+> +	return err;
+>  }
+>  
+>  /* When 'last' is true, clone() should always consume the 'skb'.
+> @@ -1313,6 +1328,7 @@ static int execute_emit_sample(struct datapath *dp, struct sk_buff *skb,
+>  	struct psample_metadata md = {};
+>  	struct vport *input_vport;
+>  	const struct nlattr *a;
+> +	u32 rate;
+>  	int rem;
+>  
+>  	for (a = nla_data(attr), rem = nla_len(attr); rem > 0;
+> @@ -1337,8 +1353,11 @@ static int execute_emit_sample(struct datapath *dp, struct sk_buff *skb,
+>  
+>  	md.in_ifindex = input_vport->dev->ifindex;
+>  	md.trunc_size = skb->len - OVS_CB(skb)->cutlen;
+> +	md.rate_as_probability = 1;
+> +
+> +	rate = OVS_CB(skb)->probability ? OVS_CB(skb)->probability : U32_MAX;
+>  
+> -	psample_sample_packet(&psample_group, skb, 0, &md);
+> +	psample_sample_packet(&psample_group, skb, rate, &md);
+>  #endif
+>  
+>  	return 0;
+> diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
+> index 0cd29971a907..9ca6231ea647 100644
+> --- a/net/openvswitch/datapath.h
+> +++ b/net/openvswitch/datapath.h
+> @@ -115,12 +115,15 @@ struct datapath {
+>   * fragmented.
+>   * @acts_origlen: The netlink size of the flow actions applied to this skb.
+>   * @cutlen: The number of bytes from the packet end to be removed.
+> + * @probability: The sampling probability that was applied to this skb; 0 means
+> + * no sampling has occurred; U32_MAX means 100% probability.
+>   */
+>  struct ovs_skb_cb {
+>  	struct vport		*input_vport;
+>  	u16			mru;
+>  	u16			acts_origlen;
+>  	u32			cutlen;
+> +	u32			probability;
+>  };
+>  #define OVS_CB(skb) ((struct ovs_skb_cb *)(skb)->cb)
+>  
+> diff --git a/net/openvswitch/vport.c b/net/openvswitch/vport.c
+> index 972ae01a70f7..8732f6e51ae5 100644
+> --- a/net/openvswitch/vport.c
+> +++ b/net/openvswitch/vport.c
+> @@ -500,6 +500,7 @@ int ovs_vport_receive(struct vport *vport, struct sk_buff *skb,
+>  	OVS_CB(skb)->input_vport = vport;
+>  	OVS_CB(skb)->mru = 0;
+>  	OVS_CB(skb)->cutlen = 0;
+> +	OVS_CB(skb)->probability = 0;
+>  	if (unlikely(dev_net(skb->dev) != ovs_dp_get_net(vport->dp))) {
+>  		u32 mark;
+
 
