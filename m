@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-103560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85C19908A49
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 12:40:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE367908A4C
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 12:41:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BA531F2B647
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:40:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AA58282331
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:41:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 526FF1946B1;
-	Fri, 14 Jun 2024 10:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F28A1946B5;
+	Fri, 14 Jun 2024 10:40:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gzC8a44R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ff1ZMpkG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A45B481D0;
-	Fri, 14 Jun 2024 10:40:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67C261946A7;
+	Fri, 14 Jun 2024 10:40:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718361642; cv=none; b=YUXkLqJHTcPjALfM8Uze6F8aX4x7ZwgoKTg3k57sEikcRwU4M58QnX+F8XgkTF2sx0D9Vq0xVJBbmOd13X+/3YwcOWS8Er1SnFzeXDtBm72OuHWYZfchtcc/uAOZkUH9WA1iYOsALjz0mLDPBFsvaD+DkjREVEfbmvTRsgS82gc=
+	t=1718361659; cv=none; b=XJEXMZaBq0hABpQyhUH5WnwpSnCfnwM/Up3TYSwS5PU3HaDl4jtYyBWlm0P9NeORe0RlWjgyLiYB8CPVVCa63MdEoUkWb7PEBURFA5dwIeJQjldvzNt0R6YDYl2yMV8B3FBRHHNUHY1SkPt9PAksWlEEi/mDImgWo61zZnFSABo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718361642; c=relaxed/simple;
-	bh=ub95+rc8EQDLycc7ngH9VSDLKcfdT6+T1cS4ojnuVkM=;
+	s=arc-20240116; t=1718361659; c=relaxed/simple;
+	bh=B/VMUNEG6+XrQ+4IvPLk13QyRGjVOos0niB7ez3rRes=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WluZxmUjSjwpYbClLmVgaUY//aAwqqpg2uM4NktZWrpVjKnMPx3f8F23iQcmBvWz2EAld597Uc3F8IvSflq07DvnG2ZAxoyvJp3/DyXwpMX5+wiFODkS3306oyqBMab5hrX4veAHt4/KPUyNKS/nE22Ue+t51xRvfnb90DqvYko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gzC8a44R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 176BAC2BD10;
-	Fri, 14 Jun 2024 10:40:39 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=mdyQOdn9SxWmeXBgqFbifWFtfcW7EeOJwf61jKFychwVk4tk+uN0ElS/KvksozZ7UzQzYjmoDW3ZjruLsb0GjwEKBbSa9L6G7B3KxTTl8CveR8J9HKAE0IQK/7cPbPgPwdDCGRw2t402xDW7ujNgoFCHSFH57GxiLX3fHmJXYNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ff1ZMpkG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A076C4AF1A;
+	Fri, 14 Jun 2024 10:40:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718361641;
-	bh=ub95+rc8EQDLycc7ngH9VSDLKcfdT6+T1cS4ojnuVkM=;
+	s=k20201202; t=1718361658;
+	bh=B/VMUNEG6+XrQ+4IvPLk13QyRGjVOos0niB7ez3rRes=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gzC8a44RKY3IGTRB0xApvqaNQhw+E7jPoiyxFdzAs6FFfzHrLzQVmN2OThroNkq4B
-	 is8PU/3GhB80W8g6jbbYB/jazHfBkCdx73X84/CwEGKCSy6ZkKrNwGKocUitnseHBU
-	 iMx+ipjNgn+E5cK4onCB2DhnQYmR1kR0r5EpBCs+0bNTLUSEBA5VkuJ8nDFKTp6Ls2
-	 CH+1dd37Si+c9wZ1lYFbVFDqMNEKfkIGxg7GE/Zlf5X48N16W1kkTTZlg+mCd84w8x
-	 vrpo/nYhPsK0fNP6ni0FVKx4Vov4HorFZD1luK14JsRVLhGwVvSfiHKtwDKbak7XMD
-	 +K2Ra1Hngrq9w==
-Date: Fri, 14 Jun 2024 11:40:37 +0100
+	b=Ff1ZMpkGwiDfAwnVgXFT17lPCrGYC47rrh8oJk7068Q7Bbpyp9HEbUL+D24RkKSOX
+	 CAbOxQXsf5OKi/Xbb+r6qe2nL0ytQgbqxM6gxzT3UTG+FHwEeTT8vm1E+pj6BmniM7
+	 Kpbeih0K0y9EDylXpKgbBQeAtlQiYrnGJG8WZQV5uYidXUfQ48X+dDAe7avNwgsC6X
+	 GZKWk223E+0DQ8yT0qYSMFvGNOnYtLlcoFBao3eWmkhubVblR+3VjMjoxg9pu6STPb
+	 nDIs7Ss8x7ZwRXd1B3NLGKagvDrymK65Yb6/Ef9i6l04Q0rGDxs0KptiCwKFb57Kf7
+	 t8TKwT0EBbzxA==
+Date: Fri, 14 Jun 2024 11:40:54 +0100
 From: Simon Horman <horms@kernel.org>
 To: Jesse Brandeburg <jesse.brandeburg@intel.com>
 Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
 	corbet@lwn.net, linux-doc@vger.kernel.org,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH iwl-next v2 2/5] ice: implement ethtool standard stats
-Message-ID: <20240614104037.GE8447@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Hariprasad Kelam <hkelam@marvell.com>
+Subject: Re: [PATCH iwl-next v2 4/5] ice: implement transmit hardware
+ timestamp statistics
+Message-ID: <20240614104054.GF8447@kernel.org>
 References: <20240606224701.359706-1-jesse.brandeburg@intel.com>
- <20240606224701.359706-3-jesse.brandeburg@intel.com>
+ <20240606224701.359706-5-jesse.brandeburg@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,27 +62,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240606224701.359706-3-jesse.brandeburg@intel.com>
+In-Reply-To: <20240606224701.359706-5-jesse.brandeburg@intel.com>
 
-On Thu, Jun 06, 2024 at 03:46:56PM -0700, Jesse Brandeburg wrote:
-> Add support for MAC/pause/RMON stats. This enables reporting hardware
-> statistics in a common way via:
+On Thu, Jun 06, 2024 at 03:46:58PM -0700, Jesse Brandeburg wrote:
+> The kernel now has common statistics for transmit timestamps, so
+> implement them in the ice driver.
 > 
-> ethtool -S eth0 --all-groups
-> and
-> ethtool --include-statistics --show-pause eth0
+> use via
+> ethtool -I -T eth0
 > 
-> While doing so, add support for one new stat, receive length error
-> (RLEC), which is extremely unlikely to happen since most L2 frames have
-> a type/length field specifying a "type", and raw ethernet frames aren't
-> used much any longer.
-> 
-> NOTE: I didn't implement Ctrl aka control frame stats because the
-> hardware doesn't seem to implement support.
-> 
-> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 > Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 > Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+> Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
 > Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
