@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-103725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3C97909339
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:11:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F295490933A
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:12:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 196341C21B21
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 20:11:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8BABFB22AD9
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 20:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F6341A3BAA;
-	Fri, 14 Jun 2024 20:11:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B09831A3BB1;
+	Fri, 14 Jun 2024 20:12:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pzPpoe3x"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="AdE19p/S"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42481A2541
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 20:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516311A2549
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 20:12:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718395914; cv=none; b=G03+yQrBq/wmbg4MrS27V+8lep0qBG+3gOkQGdPj75BSRX2hXtcer5ymQogFMUeCanFFKk2KhLM3nY2eWQcPPfXBaaaY1vFR98dPqA1xUf8ZpvIn1G0jXQglVSC6K4ViYVQQCQc/TOJsk8EDcnhoN7lqq3VAIhsew4cg1usB0Vw=
+	t=1718395929; cv=none; b=E6XKLR4c5QZ8pIWceQL6WcP3ByzFK9fZ/RP11mChI7P5xvYEfdmB3QN1tr2/Uxi377MA3oR/5BwlV9e1jmkU/U3aebjReFSQZOdm9v6hJolxBSFP+xL/T1TSV0+kNfJsFY7bdKpBWhF/YkqzbDqG26EeNVyNlELadVkmrx60UZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718395914; c=relaxed/simple;
-	bh=glM1E3Kki16bAjGJRhS2qWnIV4S4dathaUgPNR1myiU=;
+	s=arc-20240116; t=1718395929; c=relaxed/simple;
+	bh=9vLxe3idRk5b1uJOVF59H8w9g/fkg5OwN97ycQ9KALs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Fg3o687gO/LJiyKXQKO9DMrxoVdjVAKUVx135l76ieGtz9Uh/wNw7Qg67H2dNHCjm0CGHacUAAKlPbITeHIP83x8juyEHifFiTsxlc9IIrOa26BjN3fPSlF7gP6Vg1meEu5gLVRtizL/+xdBbg5+PwdqRoiMvE+WRtJmDlgUJjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pzPpoe3x; arc=none smtp.client-ip=207.171.190.10
+	 MIME-Version:Content-Type; b=PVbn8/EjOdJTTOvRCqZiCGU+wwHxVGO9Q9O7ION3vl+kCHZuNt76NzvFfFzyAiX5UKibYlJbFRXp1I8IHA2DWPt3ts3igFNjT//QFbHgEkTBVx+iLwhlj0oSnXIzRlp76lkv6hZd6KULCLwZr6v0dIRrm2KcTScKhXeTJLHFYj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=AdE19p/S; arc=none smtp.client-ip=99.78.197.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1718395913; x=1749931913;
+  t=1718395928; x=1749931928;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=oTcJRBW37Xt3f00/25+EDery0QPo0IGlmghUMzpyAzM=;
-  b=pzPpoe3xhQY+oXqUuggFfJzpZSdqx4nt76nmemDUKYlvLd3XZgab0iPN
-   yZClhWmQQPEdDp4wURxI5wG9l19x6FntURt5pk5ffcDFFVy9QdzTqPZfp
-   TLOjDKdfW2hevnleMue6EQVgi8EzlrdpEfEEz4dhDiSpg8+YEErc8apI/
-   g=;
+  bh=hMQz1Iga9tD8kg9qYt9PG5emsh92pozfnDsJh2KFXf0=;
+  b=AdE19p/SyC4rg10oAgVG0WYZ0Q8cm4A0fcLPH4qyZhwnN7rTArhVpXTL
+   x+pRe14Oy/0cEfPakXIJqvejUB/PTl1rEWQA0hXLYPXnw3LHxipNMkgZa
+   0lZG0lLf1Thr56I+EiFbrlYDwE8AsObDiG5mvqpwjTMG+ht64bV5bbwS8
+   M=;
 X-IronPort-AV: E=Sophos;i="6.08,238,1712620800"; 
-   d="scan'208";a="350433587"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2024 20:11:46 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:42455]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.30.16:2525] with esmtp (Farcaster)
- id 1368953b-8417-4518-bb65-8e98815bdc26; Fri, 14 Jun 2024 20:11:45 +0000 (UTC)
-X-Farcaster-Flow-ID: 1368953b-8417-4518-bb65-8e98815bdc26
+   d="scan'208";a="303533955"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2024 20:12:08 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:14283]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.60.144:2525] with esmtp (Farcaster)
+ id b3a190ba-6c13-4ae4-8af5-43251b5da7aa; Fri, 14 Jun 2024 20:12:07 +0000 (UTC)
+X-Farcaster-Flow-ID: b3a190ba-6c13-4ae4-8af5-43251b5da7aa
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 14 Jun 2024 20:11:42 +0000
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Fri, 14 Jun 2024 20:12:07 +0000
 Received: from 88665a182662.ant.amazon.com.com (10.106.100.24) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 14 Jun 2024 20:11:39 +0000
+ 15.2.1258.34; Fri, 14 Jun 2024 20:12:04 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -64,9 +64,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Kent Overstreet <kent.overstreet@linux.dev>, Kuniyuki Iwashima
 	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
 	<netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 10/11] af_unix: Remove put_pid()/put_cred() in copy_peercred().
-Date: Fri, 14 Jun 2024 13:07:14 -0700
-Message-ID: <20240614200715.93150-11-kuniyu@amazon.com>
+Subject: [PATCH v3 net-next 11/11] af_unix: Don't use spin_lock_nested() in copy_peercred().
+Date: Fri, 14 Jun 2024 13:07:15 -0700
+Message-ID: <20240614200715.93150-12-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240614200715.93150-1-kuniyu@amazon.com>
 References: <20240614200715.93150-1-kuniyu@amazon.com>
@@ -78,50 +78,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWC003.ant.amazon.com (10.13.139.240) To
+X-ClientProxiedBy: EX19D041UWA004.ant.amazon.com (10.13.139.9) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
 When (AF_UNIX, SOCK_STREAM) socket connect()s to a listening socket,
 the listener's sk_peer_pid/sk_peer_cred are copied to the client in
 copy_peercred().
 
-Then, the client's sk_peer_pid and sk_peer_cred are always NULL, so
-we need not call put_pid() and put_cred() there.
+Then, two sk_peer_locks are held there; one is client's and another
+is listener's.
+
+However, the latter is not needed because we hold the listner's
+unix_state_lock() there and unix_listen() cannot update the cred
+concurrently.
+
+Let's drop the unnecessary spin_lock() and use the bare spin_lock()
+for the client to protect concurrent read by getsockopt(SO_PEERCRED).
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/unix/af_unix.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ net/unix/af_unix.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
 diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 3c62fb4f3df5..c828022128ec 100644
+index c828022128ec..4dffff23a0fd 100644
 --- a/net/unix/af_unix.c
 +++ b/net/unix/af_unix.c
-@@ -760,9 +760,6 @@ static void update_peercred(struct sock *sk)
+@@ -760,19 +760,12 @@ static void update_peercred(struct sock *sk)
  
  static void copy_peercred(struct sock *sk, struct sock *peersk)
  {
--	const struct cred *old_cred;
--	struct pid *old_pid;
--
- 	if (sk < peersk) {
- 		spin_lock(&sk->sk_peer_lock);
- 		spin_lock_nested(&peersk->sk_peer_lock, SINGLE_DEPTH_NESTING);
-@@ -770,16 +767,12 @@ static void copy_peercred(struct sock *sk, struct sock *peersk)
- 		spin_lock(&peersk->sk_peer_lock);
- 		spin_lock_nested(&sk->sk_peer_lock, SINGLE_DEPTH_NESTING);
- 	}
--	old_pid = sk->sk_peer_pid;
--	old_cred = sk->sk_peer_cred;
-+
- 	sk->sk_peer_pid  = get_pid(peersk->sk_peer_pid);
- 	sk->sk_peer_cred = get_cred(peersk->sk_peer_cred);
+-	if (sk < peersk) {
+-		spin_lock(&sk->sk_peer_lock);
+-		spin_lock_nested(&peersk->sk_peer_lock, SINGLE_DEPTH_NESTING);
+-	} else {
+-		spin_lock(&peersk->sk_peer_lock);
+-		spin_lock_nested(&sk->sk_peer_lock, SINGLE_DEPTH_NESTING);
+-	}
++	lockdep_assert_held(&unix_sk(peersk)->lock);
  
- 	spin_unlock(&sk->sk_peer_lock);
- 	spin_unlock(&peersk->sk_peer_lock);
+-	sk->sk_peer_pid  = get_pid(peersk->sk_peer_pid);
++	spin_lock(&sk->sk_peer_lock);
++	sk->sk_peer_pid = get_pid(peersk->sk_peer_pid);
+ 	sk->sk_peer_cred = get_cred(peersk->sk_peer_cred);
 -
--	put_pid(old_pid);
--	put_cred(old_cred);
+ 	spin_unlock(&sk->sk_peer_lock);
+-	spin_unlock(&peersk->sk_peer_lock);
  }
  
  static int unix_listen(struct socket *sock, int backlog)
