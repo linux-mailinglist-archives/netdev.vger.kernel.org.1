@@ -1,148 +1,154 @@
-Return-Path: <netdev+bounces-103715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D11690932C
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:07:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 886F090936D
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:32:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C34A1C22BEB
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 20:07:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 985D41C23643
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 20:32:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B47216D339;
-	Fri, 14 Jun 2024 20:07:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 987D918FC65;
+	Fri, 14 Jun 2024 20:32:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nQ8adDct"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="myTAzNPC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476D9383
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 20:07:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132CB14A4CF;
+	Fri, 14 Jun 2024 20:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718395676; cv=none; b=CKgRyCtneoBEsbjKir9LhB+UpXoNWBZqDYEhP8gBVDOdXCRZVudW9LdnvHI6PirBwfRCZoYmlVHuDt5ApP6mGemaFi/V96lBjaMook4aGU/FQD84FKk0pJ+yMmKj1EW3cdf16qE3eSQkXiNdOEI3AjdJ1i35ffTs7Ybj0ttd3PI=
+	t=1718397157; cv=none; b=IZ/ofQk9OkCxZX8O01/O0z1M0jJA+bdO3hmT2fRtc7R1NEaV7TEHBwwV06p6txIC+2VswVYDV/+WGGSUAWENHxTn0wxb9HysraUlvF4/1JRebr1gdl494ONhGn61LvS89UqlANzVrCHUX8wIHGGWuhcKRgO6/K11hGoiyg/tQLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718395676; c=relaxed/simple;
-	bh=dqV4Cu+9KeoPj+/hyBeYsBT3Q/OPv0b+wYlB4To6psU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AFnxFoFgEaIHYuMor9f4r5MeCf3Q6pGCat2CfbgMA//mCMnX0O0SJflPMhfyGnbY7BFcj5YVIdQnSyWO9oDhJjZY7/+UwKy7muxO16GksgKwtsXexan0w8l4CsEJQH+/6WgZh7Q1jnPmysrzk5qyR6suQ7USQINdlGICvxKUNis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nQ8adDct; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65968C4AF1A;
-	Fri, 14 Jun 2024 20:07:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718395675;
-	bh=dqV4Cu+9KeoPj+/hyBeYsBT3Q/OPv0b+wYlB4To6psU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nQ8adDctga5v8D+0FB6IEp9lGQcugJzN/lnJDE51ox71LqkvlNZHlVQ7oWueTVHTX
-	 6NW5sqQhvFhvB3rrtb4DbFNsSqE/jgo2grXdq3cqHjT3IrJwDZQfwDv0Yvp/5nVt1v
-	 d+rS3uNl7G0xMZAjE0yssNSHt4rLv5f/xLkiA5pEt24nmTZkIHIo74oBFSmhJQmskX
-	 i4LfbvvI/vYyI2BGVwIci6qvDKCV7xNZzS7wBZr9lPnvDxnqCBnps6A491JkFMwURP
-	 DdokO1qK7yR1XjDMDt4H9b80EtgNUpt5w8x5wx7+i7DcCMOG+eAKPT9Bg06iMc+e2F
-	 +ZjRRjBWm0gFQ==
-Date: Fri, 14 Jun 2024 21:07:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: Michael Chan <michael.chan@broadcom.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Adrian Alvarado <adrian.alvarado@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>, netdev@vger.kernel.org,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v1 3/3] bnxt_en: implement netdev_queue_mgmt_ops
-Message-ID: <20240614200751.GY8447@kernel.org>
-References: <20240611023324.1485426-1-dw@davidwei.uk>
- <20240611023324.1485426-4-dw@davidwei.uk>
+	s=arc-20240116; t=1718397157; c=relaxed/simple;
+	bh=L1VZqixVpico4OrBQvGOWbsgyvmCSJfZmLShYcCWJqQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=dj4vD5nHiw25tWxP7fFDgwltI2Y8iqQRCwY/nyY6INozUoYw5s3A9EeclrhOp8rFh9/iwL4BFFabxZV8e8kmuVnDjx5jf/6eDwn7GaXIyq000zNdnCUfhxMu+I7aNX/QnQBaOguubDZxhpEvleFVrcMJsLfnjEZreNUq8g5LcVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=myTAzNPC; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=+HCNZSA4iRcGEvPYHEr/y1MovqU3OVbhI37ShOMMN+4=; b=myTAzNPCVzd2RinBJxJjSozlIb
+	bldQOcxyhbv2/4+7WJk0pyqhq/DIkVAfH89rvVkxgGBW5Yx4Zoc14EswfxwSyJPWw73pAvn8Nsrfe
+	TjEFOl2uhGIjO/Cwd0J4rdv1QbDQG1MylJmQHLvL388JVC0k66LHM6Of12QUuODLkSwkfx2H9B9Eq
+	3m1TBc7VCandNTFXHxIJX38y4tZv5HSx3AdYcq0X+eW3Q+4jy4MJKwKCLH+tapLecnV0lfwwsz+sP
+	LyYC0vHbwwBSmtKzFw2khhyYEHKWGrps9p9VXF8ppskEdCuIrJLPp5+nDQfatA1W9C0hXJn0tDMp8
+	o2phj75Q==;
+Received: from 17.249.197.178.dynamic.cust.swisscom.net ([178.197.249.17] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sIDay-0004p2-If; Fri, 14 Jun 2024 22:32:24 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf 2024-06-14
+Date: Fri, 14 Jun 2024 22:32:23 +0200
+Message-Id: <20240614203223.26500-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240611023324.1485426-4-dw@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27306/Fri Jun 14 10:28:44 2024)
 
-On Mon, Jun 10, 2024 at 07:33:24PM -0700, David Wei wrote:
-> Implement netdev_queue_mgmt_ops for bnxt added in [1].
-> 
-> Two bnxt_rx_ring_info structs are allocated to hold the new/old queue
-> memory. Queue memory is copied from/to the main bp->rx_ring[idx]
-> bnxt_rx_ring_info.
-> 
-> Queue memory is pre-allocated in bnxt_queue_mem_alloc() into a clone,
-> and then copied into bp->rx_ring[idx] in bnxt_queue_mem_start().
-> 
-> Similarly, when bp->rx_ring[idx] is stopped its queue memory is copied
-> into a clone, and then freed later in bnxt_queue_mem_free().
-> 
-> I tested this patchset with netdev_rx_queue_restart(), including
-> inducing errors in all places that returns an error code. In all cases,
-> the queue is left in a good working state.
-> 
-> Rx queues are stopped/started using bnxt_hwrm_vnic_update(), which only
-> affects queues that are not in the default RSS context. This is
-> different to the GVE that also implemented the queue API recently where
-> arbitrary Rx queues can be stopped. Due to this limitation, all ndos
-> returns EOPNOTSUPP if the queue is in the default RSS context.
-> 
-> Thanks to Somnath for helping me with using bnxt_hwrm_vnic_update() to
-> stop/start an Rx queue. With their permission I've added them as
-> Acked-by.
-> 
-> [1]: https://lore.kernel.org/netdev/20240501232549.1327174-2-shailend@google.com/
-> 
-> Acked-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 307 ++++++++++++++++++++++
->  1 file changed, 307 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-...
+The following pull-request contains BPF updates for your *net* tree.
 
-> +static void bnxt_queue_mem_free(struct net_device *dev, void *qmem)
-> +{
-> +	struct bnxt_rx_ring_info *rxr = qmem;
-> +	struct bnxt *bp = netdev_priv(dev);
-> +	struct bnxt_ring_struct *ring;
-> +
-> +	if (bnxt_get_max_rss_ring(bp) >= idx)
-> +		return -EOPNOTSUPP;
+We've added 8 non-merge commits during the last 2 day(s) which contain
+a total of 9 files changed, 92 insertions(+), 11 deletions(-).
 
-Hi David,
+The main changes are:
 
-I guess there was some last minute refactoring and these sloped through the
-cracks. The two lines above seem a bit out of place here.
+1) Silence a syzkaller splat under CONFIG_DEBUG_NET=y in pskb_pull_reason()
+   triggered via __bpf_try_make_writable(), from Florian Westphal.
 
-* idx doesn't exist in this context
-* The return type of this function is void
+2) Fix removal of kfuncs during linking phase which then throws a kernel build
+   warning via resolve_btfids about unresolved symbols, from Tony Ambardar.
 
-> +
-> +	bnxt_free_one_rx_ring(bp, rxr);
-> +	bnxt_free_one_rx_agg_ring(bp, rxr);
-> +
-> +	/* At this point, this NAPI instance has another page pool associated
-> +	 * with it. Disconnect here before freeing the old page pool to avoid
-> +	 * warnings.
-> +	 */
-> +	rxr->page_pool->p.napi = NULL;
-> +	page_pool_destroy(rxr->page_pool);
-> +	rxr->page_pool = NULL;
-> +
-> +	ring = &rxr->rx_ring_struct;
-> +	bnxt_free_ring(bp, &ring->ring_mem);
-> +
-> +	ring = &rxr->rx_agg_ring_struct;
-> +	bnxt_free_ring(bp, &ring->ring_mem);
-> +
-> +	kfree(rxr->rx_agg_bmap);
-> +	rxr->rx_agg_bmap = NULL;
-> +}
+3) Fix a UML x86_64 compilation failure from BPF as pcpu_hot symbol is not
+   available on User Mode Linux, from Maciej Żenczykowski.
 
-...
+4) Fix a register corruption in reg_set_min_max triggering an invariant
+   violation in BPF verifier, from Daniel Borkmann.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Daniel Borkmann, Eric Dumazet, Jiri Olsa, John Fastabend, Juan José 
+López Jaimez, kernel test robot
+
+----------------------------------------------------------------
+
+The following changes since commit 14a20e5b4ad998793c5f43b0330d9e1388446cf3:
+
+  net/ipv6: Fix the RT cache flush via sysctl using a previous delay (2024-06-12 17:51:35 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+for you to fetch changes up to 7bdcedd5c8fb88e7176b93812b139eca5fe0aa46:
+
+  bpf: Harden __bpf_kfunc tag against linker kfunc removal (2024-06-14 19:14:37 +0200)
+
+----------------------------------------------------------------
+bpf-for-netdev
+
+----------------------------------------------------------------
+Daniel Borkmann (3):
+      bpf: Fix reg_set_min_max corruption of fake_reg
+      bpf: Reduce stack consumption in check_stack_write_fixed_off
+      selftests/bpf: Add test coverage for reg_set_min_max handling
+
+Florian Westphal (1):
+      bpf: Avoid splat in pskb_pull_reason
+
+Maciej Żenczykowski (1):
+      bpf: fix UML x86_64 compile failure
+
+Stanislav Fomichev (1):
+      MAINTAINERS: mailmap: Update Stanislav's email address
+
+Tony Ambardar (2):
+      compiler_types.h: Define __retain for __attribute__((__retain__))
+      bpf: Harden __bpf_kfunc tag against linker kfunc removal
+
+ .mailmap                                           |  1 +
+ MAINTAINERS                                        |  2 +-
+ include/linux/bpf_verifier.h                       |  2 ++
+ include/linux/btf.h                                |  2 +-
+ include/linux/compiler_types.h                     | 23 ++++++++++++
+ kernel/bpf/verifier.c                              | 25 ++++++++-----
+ net/core/filter.c                                  |  5 +++
+ tools/testing/selftests/bpf/prog_tests/verifier.c  |  2 ++
+ .../selftests/bpf/progs/verifier_or_jmp32_k.c      | 41 ++++++++++++++++++++++
+ 9 files changed, 92 insertions(+), 11 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/verifier_or_jmp32_k.c
 
