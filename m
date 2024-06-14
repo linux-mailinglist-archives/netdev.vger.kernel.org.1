@@ -1,156 +1,111 @@
-Return-Path: <netdev+bounces-103539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 770679087E6
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 11:46:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0809D90884D
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 11:50:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D0C21F282D6
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 09:46:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B20DD28C0FE
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 09:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D2A192B9F;
-	Fri, 14 Jun 2024 09:45:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CA619ADB6;
+	Fri, 14 Jun 2024 09:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b="gcdgfUiM"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mail.savoirfairelinux.com (mail.savoirfairelinux.com [208.88.110.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48811922FA
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 09:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C54199E8C
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 09:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.88.110.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718358336; cv=none; b=OlXoTZwJI3NX3L2SlloaXszhYqGo6MyQt9Djf8Jy7Y7BnvuTLPG7mriZ9yfdnknU7/VjWLiCxA9roiDYuGT/tTBdt5H7hOa40mYyJCEYSWEL3W76c5JNGOcgqAXwYh5n/xKSbL18XDTkfWELvmoKNDU2N8BGde0NQiVDspwM0Sg=
+	t=1718358417; cv=none; b=GIzzdcoffhnMJ/jRINBmPa0AKa0zAxFE4WsayIaZyQT4OnmggXqV8zzXketI2/1SyaN4oKh2SiaPGADDA4H1UnL1WoiHJGUPEqTBBep/ueuB9qW2fiSLZllDSolOlgovBVZbnqsOnTOnV7q0aZsJmnSB0SyEAscUeOIEnQiG0LA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718358336; c=relaxed/simple;
-	bh=UGXeGLWZTsXFSCEt0SvKoZJVAG3H9kZuD88qPQGsr9E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iI7hc2eZJctFt6FPqz33meOaPRnIGoChPwBrBz0cuLp1r3f7KBLOka5Z/DoHkp3ZWHojkDraE77ixRy7MyGFuO22vQDN1k/DNwnvyoasgb/OxAZZjJ6P5P98nTr12G4E6zSASvoTxIHc3bhhy1BGQ83R95kxxM0Zn4TwFgWe+3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sI3Ul-0000Su-E4; Fri, 14 Jun 2024 11:45:19 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sI3Uj-002Elw-Ox; Fri, 14 Jun 2024 11:45:17 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sI3Uj-006DOn-2E;
-	Fri, 14 Jun 2024 11:45:17 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	stable@vger.kernel.org,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net v2 2/2] net: phy: dp83tg720: get master/slave configuration in link down state
-Date: Fri, 14 Jun 2024 11:45:16 +0200
-Message-Id: <20240614094516.1481231-2-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240614094516.1481231-1-o.rempel@pengutronix.de>
-References: <20240614094516.1481231-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1718358417; c=relaxed/simple;
+	bh=dtCrxUoBRggYTum2XgZdc6h6BZpxJXxEcYVuabREFNQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZZ9L/rOGYkmu5etJQda/kgTf3LWnXeyom0I7V+p9jPLvLNTUKCEvDoqmudjYX4bI2vqZlL0HgUrlyQ/pDiU8ZYKHVDrRYtdP1kSz4MOF8SROZ6OAhDT1m/Bor+maqAhC4iaNdbFaAZ6s5sTTdrAw/gAXLaTAfz1rkcGwycYW5As=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com; spf=pass smtp.mailfrom=savoirfairelinux.com; dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b=gcdgfUiM; arc=none smtp.client-ip=208.88.110.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=savoirfairelinux.com
+Received: from localhost (localhost [127.0.0.1])
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id 38A799C06D2;
+	Fri, 14 Jun 2024 05:46:52 -0400 (EDT)
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+ by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id TrFG7NHj4jlJ; Fri, 14 Jun 2024 05:46:51 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id 9219D9C58EF;
+	Fri, 14 Jun 2024 05:46:51 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.savoirfairelinux.com 9219D9C58EF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=savoirfairelinux.com; s=DFC430D2-D198-11EC-948E-34200CB392D2;
+	t=1718358411; bh=dtCrxUoBRggYTum2XgZdc6h6BZpxJXxEcYVuabREFNQ=;
+	h=From:To:Date:Message-Id:MIME-Version;
+	b=gcdgfUiMAmc68im8yFMHL0rAJyee4IrkpfTG2WHbb+87lKwIAYK/xY4Eg9EFhO8kE
+	 9QQGhvxhDviKsLhOySMiHPs41YXxkBPushI5JE2LzKNiPmwN0F2Lk+7r8r+94V627r
+	 p5uYuXxkX+y5Jsq7RW1cjNyu8HufPb3z4Z3IRDko/Lx10Yw5F3wzpAb8S3IqJry9bn
+	 kJGylAP3HR/Eq0HfkMZs+E6PIeXN0PLXBuLolKkCfrxPyyF8g4PoSg0Em6yoZeaWUV
+	 rqT6rL3Gj1q84/RmajYrrS7GvRqjo8MoqEXzt1xfe338MttLDCG9UWfX4HMubWO4L0
+	 dPPDg0EaKuIww==
+X-Virus-Scanned: amavis at mail.savoirfairelinux.com
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+ by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id 7n3GMCWmGc4a; Fri, 14 Jun 2024 05:46:51 -0400 (EDT)
+Received: from sfl-deribaucourt.rennes.sfl (lmontsouris-657-1-69-118.w80-15.abo.wanadoo.fr [80.15.101.118])
+	by mail.savoirfairelinux.com (Postfix) with ESMTPSA id 327539C06D2;
+	Fri, 14 Jun 2024 05:46:50 -0400 (EDT)
+From: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+To: netdev@vger.kernel.org
+Cc: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	woojung.huh@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	horms@kernel.org,
+	Tristram.Ha@microchip.com,
+	Arun.Ramadoss@microchip.com
+Subject: [PATCH net v6 0/3] Handle new Microchip KSZ 9897 Errata
+Date: Fri, 14 Jun 2024 09:46:39 +0000
+Message-Id: <20240614094642.122464-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
 
-Get master/slave configuration for initial system start with the link in
-down state. This ensures ethtool shows current configuration.  Also
-fixes link reconfiguration with ethtool while in down state, preventing
-ethtool from displaying outdated configuration.
+These patches implement some suggested workarounds from the Microchip KSZ=
+ 9897
+Errata [1].
 
-Even though dp83tg720_config_init() is executed periodically as long as
-the link is in admin up state but no carrier is detected, this is not
-sufficient for the link in admin down state where
-dp83tg720_read_status() is not periodically executed. To cover this
-case, we need an extra read role configuration in
-dp83tg720_config_aneg().
+[1] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Produc=
+tDocuments/Errata/KSZ9897R-Errata-DS80000758.pdf
 
-Fixes: cb80ee2f9bee1 ("net: phy: Add support for the DP83TG720S Ethernet PHY")
-Cc: stable@vger.kernel.org
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
-changes v2:
-- add genphy_c45_pma_baset1_read_master_slave() to .config_aneg
-- add comments
----
- drivers/net/phy/dp83tg720.c | 24 +++++++++++++++++++++---
- 1 file changed, 21 insertions(+), 3 deletions(-)
+v6:
+ - remove KSZ9897 phy_id workaround (was a configuration issue)
+ - use macros for checking link down in monitoring function
+ - check if VLAN is enabled before monitoring resources
+v5: https://lore.kernel.org/all/20240604092304.314636-1-enguerrand.de-rib=
+aucourt@savoirfairelinux.com/
+ - use macros for bitfields
+ - rewrap comments
+ - check ksz_pread* return values
+ - fix spelling mistakes
+ - remove KSZ9477 suspend/resume deletion patch
+v4: https://lore.kernel.org/all/20240531142430.678198-1-enguerrand.de-rib=
+aucourt@savoirfairelinux.com/
+ - Rebase on net/main
+ - Add Fixes: tags to the patches
+ - reverse x-mas tree order
+ - use pseudo phy_id instead of match_phy_device
+v3: https://lore.kernel.org/all/20240530102436.226189-1-enguerrand.de-rib=
+aucourt@savoirfairelinux.com/
 
-diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
-index 1186dfc70fb3c..c706429b225a2 100644
---- a/drivers/net/phy/dp83tg720.c
-+++ b/drivers/net/phy/dp83tg720.c
-@@ -36,11 +36,20 @@
- 
- static int dp83tg720_config_aneg(struct phy_device *phydev)
- {
-+	int ret;
-+
- 	/* Autoneg is not supported and this PHY supports only one speed.
- 	 * We need to care only about master/slave configuration if it was
- 	 * changed by user.
- 	 */
--	return genphy_c45_pma_baset1_setup_master_slave(phydev);
-+	ret = genphy_c45_pma_baset1_setup_master_slave(phydev);
-+	if (ret)
-+		return ret;
-+
-+	/* Re-read role configuration to make changes visible even if
-+	 * the link is in administrative down state.
-+	 */
-+	return genphy_c45_pma_baset1_read_master_slave(phydev);
- }
- 
- static int dp83tg720_read_status(struct phy_device *phydev)
-@@ -69,6 +78,8 @@ static int dp83tg720_read_status(struct phy_device *phydev)
- 			return ret;
- 
- 		/* After HW reset we need to restore master/slave configuration.
-+		 * genphy_c45_pma_baset1_read_master_slave() call will be done
-+		 * by the dp83tg720_config_aneg() function.
- 		 */
- 		ret = dp83tg720_config_aneg(phydev);
- 		if (ret)
-@@ -168,8 +179,15 @@ static int dp83tg720_config_init(struct phy_device *phydev)
- 	/* In case the PHY is bootstrapped in managed mode, we need to
- 	 * wake it.
- 	 */
--	return phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_LPS_CFG3,
--			     DP83TG720S_LPS_CFG3_PWR_MODE_0);
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_LPS_CFG3,
-+			    DP83TG720S_LPS_CFG3_PWR_MODE_0);
-+	if (ret)
-+		return ret;
-+
-+	/* Make role configuration visible for ethtool on init and after
-+	 * rest.
-+	 */
-+	return genphy_c45_pma_baset1_read_master_slave(phydev);
- }
- 
- static struct phy_driver dp83tg720_driver[] = {
--- 
-2.39.2
 
 
