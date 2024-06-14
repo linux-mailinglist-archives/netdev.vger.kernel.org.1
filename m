@@ -1,107 +1,126 @@
-Return-Path: <netdev+bounces-103646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2807C908E3A
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:10:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B50908E58
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:13:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C39E328D6AF
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:10:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E3A71C23184
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E1916D31C;
-	Fri, 14 Jun 2024 15:06:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A5D16F0EA;
+	Fri, 14 Jun 2024 15:08:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="m+GJT4R1"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="ElG3alYV"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B851116C438;
-	Fri, 14 Jun 2024 15:06:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E855F16B72B
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 15:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718377582; cv=none; b=WyDg/4bfFLcpwsUh+kNuh3cNEkQPymPOJJ/0P/OP5sQsdnz0mk3PuIedBbXz89KtT9AYllnC40lsvPHo2xQp0ENqvTTEg8lrduUhc99jY0hu4Y2yrFjMzfMDl2dIeglIaBfUaJyN9EUIAASviJm8KUShgB/zx1HKm1gn9as/uOc=
+	t=1718377735; cv=none; b=mr9Ve1PfAK1nLWskYquQfRINaoIO4O4VFFfMomrPp8CzxDe/cyM/cQtfI85M64LMj8O3iqGNjHz01MQ/+thjkFvbMtpCDsMW/KSKT4UymBzzh27gE979NVX20tndeDCawrYf3Wmafi4fh/Eo44E1ETLg6vTY+UXWuRKjz9+mL68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718377582; c=relaxed/simple;
-	bh=34ohSfG/19qWn2etFbhp9iM+FQgkPY8fkgZFPwCTa0Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sg6NSQzEgGUiAummkXLjxRuwo6FqdsO7Llxrg41vr95nxA6xBYa1vskSTXS4kbpIQrFYAN+gzINRYmvIVR2Fecf0mTj7cRYXwFDKC0fZ00LnOEY4qV7Bb3vgp02y44qPR9YI/PKmyQFX8efIbVNmoL9+Jcv8DrxVcM10r4oTrvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=m+GJT4R1; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=TPWeQET4FCKXxDGX1xF4koHOa0ZvF4mNa6FEu8k1Afo=; b=m+GJT4R19N7iFPs+QEnUVDnoI0
-	QHj72LwHtAWCxFgRBHh5R2WW82+URvw6y6pjl4wJbX0yFQm22cJ0E7T7bDP6z6a/lvOwppc2+VNSm
-	w+JaUFORMm0qz65yJb7Oz6Fl2sBeranqE4qXNYEkkEyjlCtgqcx8HS1NyL+xbDNjw+gcf1VzKemNI
-	DxOQXGeSiNbDiCgOsOySVd57JvCi4Zn5P90UxzxH+PfaiL0ZHNjk/Lqjpp5R1ZlQ8qF19Q385AlQK
-	XgtjDh1i44L19MjE/6dYtlJOXtc0uV5Vcps5tiLjMeSLhpqKysqVZ8+dPibjtUF7h/gNDP++aYeY1
-	iLQOJq9g==;
-Received: from [50.53.4.147] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sI8VM-000000039lw-476j;
-	Fri, 14 Jun 2024 15:06:17 +0000
-Message-ID: <cb3613ed-210f-4fd2-bca3-28542c1b961c@infradead.org>
-Date: Fri, 14 Jun 2024 08:06:12 -0700
+	s=arc-20240116; t=1718377735; c=relaxed/simple;
+	bh=HrDFMm3wKTp0UO86+kI8aHZ3XDSGQ+2b7UCsc2lJ5RU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZyHbkpDX+2cusn8SCCj/M3mNEorFi9J96VZ9zrzyS0sEFkykmAtFowhzb9xMR7bpMNwhIRy0Nd6Hxg5qbpa5awSs+JWFSO77c959tHXqyq5PdzFg6vTvKkKB8AeY2i1uyOOjDqxQzOuWET6xAAaBvKIPyCK/OdKx3MAEW3SZ3JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=ElG3alYV; arc=none smtp.client-ip=209.85.167.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3d227b1f4f0so1166932b6e.3
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 08:08:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1718377733; x=1718982533; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=so5U+szNbhr5bnxSQqrZZ3bBxHi8XinDGxihgq18GlU=;
+        b=ElG3alYVenfyC60oeKAQUBdtwT+VkJo6fF/6P1CcBLrjWqFpF7ibdC/RPMGWxRype4
+         wBY4AWisfWXxbN/jWxq2CSeia32mKcOOSRY/gGz2XdzYNsmfnh9z4Rb6xpOeTnsNicg8
+         ODgsdBUGXuYYBXwVz6ccg0CG63X6AuRuW9OvR1dpErtmYJB0IF4qFhCKzRcsqKRsbXsb
+         vTDBBCur+7jOH+/gel7Ochi3Hw7OXPMcFTO6zZc8Css8AvgLmTYadppy++y4AcUCxskE
+         SnSF8tu6h7JFwQcF/Hn+rhLR2gMrbtzEfTLTH7HXg7Knh7FAKModOc/hfmjYFPRbpnOv
+         W0hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718377733; x=1718982533;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=so5U+szNbhr5bnxSQqrZZ3bBxHi8XinDGxihgq18GlU=;
+        b=YV2SVoKc9b7iuM93IsLXOw0zRcD1RI504OXEFkJXIKSv4bEBX3Kjb7Ix0V7CRpjdNN
+         PK3gj0VODpN4saAgMGmqM5AAy/0Yb1R+0FKMUrju6ez9AZ9RfjQSeu/ThXyWnFbvDhqp
+         7gmM8A9XyIjM9SNnIUwykSh0poIupSWPanUbVSDHsgcQGW9uANVMwXdVImxJT0T9jlk5
+         bEiCw+geV99FlEtE99rexEw80KjiQ7LJJK90wYy5H2tuA+tW5XzgPqJvVrrVOEgYxq5J
+         dy0Z6LJX8aGuOklr2Uq6ggDcDwXvQ5pTPO3Yl7c4DFdD2+QovoBHw28xcZ4B5P4Rf9mu
+         8Ong==
+X-Gm-Message-State: AOJu0YxOjHMlCSpgmD6s8d9xAiKnd4hq3/VpGTk8KSkzevFpNPFrkp9F
+	ceVet5eju5xbKjqVi/0XzgMkCpX+inJ1qr0M/4A04woQEYZ5usgry56o4lCvU43TkNC6gUTCmaA
+	YC2TYC8/ZTBTHCP3cSCLQTx+pe5wHRF9VITBn3eLQIeVYMDlyAg==
+X-Google-Smtp-Source: AGHT+IFwLI89Z0cObJU/BB4y3EADZgT0NPGQP8yPvcIcc70tnoYEV1Wzk2snZ+CT8t98W5JCjs0/zjJ2FHkRh1NIJcU=
+X-Received: by 2002:a05:6808:170b:b0:3d2:2b43:1804 with SMTP id
+ 5614622812f47-3d24e8e108bmr3360579b6e.19.1718377732934; Fri, 14 Jun 2024
+ 08:08:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Documentation: Remove "ltpc=" from the
- kernel-parameters.txt
-To: Thomas Huth <thuth@redhat.com>, linux-doc@vger.kernel.org,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
-References: <20240614084633.560069-1-thuth@redhat.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20240614084633.560069-1-thuth@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240607160753.1787105-1-omosnace@redhat.com> <171834962895.31068.8051988032320283876.git-patchwork-notify@kernel.org>
+In-Reply-To: <171834962895.31068.8051988032320283876.git-patchwork-notify@kernel.org>
+From: Paul Moore <paul@paul-moore.com>
+Date: Fri, 14 Jun 2024 11:08:41 -0400
+Message-ID: <CAHC9VhSRUW5hQNmXUGt2zd8hQUFB0wuXh=yZqAzH7t+erzqRKQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] cipso: make cipso_v4_skbuff_delattr() fully remove
+ the CIPSO options
+To: Ondrej Mosnacek <omosnace@redhat.com>
+Cc: netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	patchwork-bot+netdevbpf@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Jun 14, 2024 at 3:20=E2=80=AFAM <patchwork-bot+netdevbpf@kernel.org=
+> wrote:
+>
+> Hello:
+>
+> This series was applied to netdev/net.git (main)
+> by David S. Miller <davem@davemloft.net>:
 
+Welp, that was premature based on the testing requests in the other
+thread, but what's done is done.
 
-On 6/14/24 1:46 AM, Thomas Huth wrote:
-> The string "ltpc" cannot be found in the source code anymore. This
-> kernel parameter likely belonged to the LocalTalk PC card module
-> which has been removed in commit 03dcb90dbf62 ("net: appletalk:
-> remove Apple/Farallon LocalTalk PC support"), so we should remove
-> it from kernel-parameters.txt now, too.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+Ondrej, please accelerate the testing if possible as this patchset now
+in the netdev tree and it would be good to know if it need a fix or
+reverting before the next merge window.
 
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+> On Fri,  7 Jun 2024 18:07:51 +0200 you wrote:
+> > This series aims to improve cipso_v4_skbuff_delattr() to fully
+> > remove the CIPSO options instead of just clearing them with NOPs.
+> > That is implemented in the second patch, while the first patch is
+> > a bugfix for cipso_v4_delopt() that the second patch depends on.
+> >
+> > Tested using selinux-testsuite a TMT/Beakerlib test from this PR:
+> > https://src.fedoraproject.org/tests/selinux/pull-request/488
+> >
+> > [...]
+>
+> Here is the summary with links:
+>   - [v2,1/2] cipso: fix total option length computation
+>     https://git.kernel.org/netdev/net/c/9f3616991233
+>   - [v2,2/2] cipso: make cipso_v4_skbuff_delattr() fully remove the CIPSO=
+ options
+>     (no matching commit)
+>
+> You are awesome, thank you!
+> --
+> Deet-doot-dot, I am a bot.
+> https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Thanks.
-
-> ---
->  Documentation/admin-guide/kernel-parameters.txt | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index 423427bf6e49..a9b905bbc8ca 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -3184,9 +3184,6 @@
->  			unlikely, in the extreme case this might damage your
->  			hardware.
->  
-> -	ltpc=		[NET]
-> -			Format: <io>,<irq>,<dma>
-> -
->  	lsm.debug	[SECURITY] Enable LSM initialization debugging output.
->  
->  	lsm=lsm1,...,lsmN
-
--- 
-~Randy
+--=20
+paul-moore.com
 
