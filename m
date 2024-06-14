@@ -1,184 +1,202 @@
-Return-Path: <netdev+bounces-103628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AEB3908D63
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:31:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 177F3908D72
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 912071F2302D
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 14:31:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 847FB1F23E84
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 14:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A36D518;
-	Fri, 14 Jun 2024 14:31:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C791642B;
+	Fri, 14 Jun 2024 14:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="NTj3WqvQ"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="eh5r25wg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF3E19D8B7;
-	Fri, 14 Jun 2024 14:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01CCDDA5
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 14:32:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718375483; cv=none; b=GPETNfFj3bqwOXx9Og7gyCNKagba0rBiP36WqV2zUAnAvnMBZoFT3Rtbch2ng6eIyy0qv8GpAKKtp0Yy1lTX13oQmw5q7qN/15N0/vnsD8VL8PWxSAZRNVnHoGKWKt10sYIxxmJYDvBq8vC/XsEWz4Jl/FPirJlB+9sLz2pW07U=
+	t=1718375578; cv=none; b=K046JzNqEl3XRIo0SjfGML3DlccNDsrKAm+7qQacA1qDsa5PIlxD/zvIxa9bTR8OSdvgIpYNvC9UgsafbpjPOmIaEnfevGx6tcMeP0ZF9V+PRjek3s1lUI7DxDiH5fgUDpQlVm+4PFQjwHLpMa0O26iKBPWdEJ3pEPbcKR/wU2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718375483; c=relaxed/simple;
-	bh=H5Yy/sxdwgIuX8tRfVn5eMnCQ3Elk6flBf23hdxKehg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=KYcQo/4eLorFs9+KXz/ghhFg3of/7s2cIInsxdIBAebuk5cwJ4WZxdqIoTUGNxIfYASTg4ClpNfb6OmOA3ZCw9NsdHCjrbImNCIIR6kIqr21rMbafPn1FD/RyMuimuwfgn+D/+LXEis+Ops6pu/IXeJXXTETeEn0O823xa/i9xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=NTj3WqvQ; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45E9GYAg004651;
-	Fri, 14 Jun 2024 14:31:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	PmEScxo8p+jswVM+m3Pf0pxK0QWrkpyXHZXyuUSc9qQ=; b=NTj3WqvQk4Z8c2Mz
-	jQF2KEJtDN1iC9Waft6qYGiKp8KzqMEuOYNohR/AMQJSGko2a9CH1JkTDiEGj54q
-	COzrsJeNdacMyVu0zGBgQtsGkiQ/DwP5YR+C2nhphOCvYgSpwMb2D/x+mvQ7WUob
-	5jpLOe99RLvPSthL8kWa9W2DrugzIG/sVMCq85FQGE4oL6eaQb66+qJzgAKoElj9
-	Zq0kzvSqSarfevgBADU+HnOcN1N2eNW1zn/G9KOZCw0LCVlXjNzoYZTmQ93qwGUn
-	PE7ZjZuxzQtnZyEOzTkTDPreTN6ObL5ctie3d/sGtviyYE7yfzRwmGBZZHYuMZnj
-	Iso03g==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yr6q4j1j7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Jun 2024 14:31:06 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45EEV5In008383
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Jun 2024 14:31:05 GMT
-Received: from [10.226.59.182] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 14 Jun
- 2024 07:31:04 -0700
-Message-ID: <c275ee49-ac59-058c-7482-c8a92338e7a2@quicinc.com>
-Date: Fri, 14 Jun 2024 08:31:03 -0600
+	s=arc-20240116; t=1718375578; c=relaxed/simple;
+	bh=RKc6T39/lDmb0PfrWOKSfypECfYy+KzXmzWz6xd1B3s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=paxiQLBq/UjTFkVBbTSTjl65ygeWGqAireKtZHJJtugfS3/SZMyUSL7agWD22h21ZKwg8HuCGkZrguRpGFrGy7boPk2NeVBHYrBnWPLxCF567fTpZeEQrs3IVUrn7t2vGls3t+SfmZ0dKWFfDunJ5B+GtSJ4WUb5R/Tk40gNIyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=eh5r25wg; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2c4f0f9230eso342046a91.2
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 07:32:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1718375576; x=1718980376; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tmTKXhIPP/E6AeMNlSr6idjALZflTqy4gRU9SHdel9M=;
+        b=eh5r25wgHjpU8EnKrCAlj5lO1bJ82v194Tq98vRZvknWMKYJe4ctul/jprhud4V9I1
+         MCLf2PvS6BG3sbZ+SZAz4EKf9b2CYQaQbM/XNgKJfTvtJe2Mn0/2WBqWdVq3uriCbMZE
+         v3aXuAPRVpf1W+J64THiMsWcPZdvj1fZaRmSy1QvRpN87sbAn64NxQh8Sdheefb4bOZ+
+         3Nv+sjv8/L3SKWHie9P1kBzBhwFf3cifuV7xhndyaFNrPbUTS/E9eL95dCPTlogRn1Kv
+         iZ9PyCkiht2ArK2WB8gx1SHO/0jChvbbT03PY/eaIS6qPfehAHOIP5HzBTkPgSCsMHv9
+         yE3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718375576; x=1718980376;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tmTKXhIPP/E6AeMNlSr6idjALZflTqy4gRU9SHdel9M=;
+        b=DKl2ZjmYUJcwPMbEWgdbbl8Z74W4SogVXe7ftKPpGfo5/Ii41RtTKLvbupzJue3fds
+         LjrFB1q2pdTkbQZaQ+Qb4p6P6Hu5Mi8RmsgugSmhM2ClEnThUk83vfcmkMFbfN3r6fZ8
+         bMOzY3luU+HwRDrGCXG3Pga7HlPJqlNH1PiIfDwXzKjD8AXY9+kjBG618PYWTzaB9y+1
+         Hx2POzRtgHQ8NfyK+w00f7lRCscaiAg5Gk5XIRn8I7mbKkP26WOgg0ZXA8HL/KGt0Abr
+         Mabm6huCatScdLBT0ARqCT44gOpeFNl8D6xTLEfqHHA20IbCMCd18gpEeFs9nJIEueoF
+         Lm0g==
+X-Forwarded-Encrypted: i=1; AJvYcCXrz4B/Sx2cOn0FpoNIdXBXnLTMbU1QceXtBjoe482DFzXqJAOLthFeZUdOLPNWyRZg75Yz8eFudKQw36GBxSMwWXQeL7IQ
+X-Gm-Message-State: AOJu0YwxOJHjUpyKaBXQCx0hr4ZDkzmNl1G1PtAggG+N1YQ5U5FdIRJF
+	vNm+K4sjx4i63QazSd9vunjAn1sCriVo+ZnSWZl/p74m7CyltinySyU3Pb4rehTE2vsziETfo76
+	F9uNgyMK3s6sgkovxJdoPlTIODweE3RcdcVSbGA==
+X-Google-Smtp-Source: AGHT+IFPiAh0aeBq6xYUjN8mX4IW/PAsfUQs8jb283aqV3dQ8WT2sDgO3JG1TYGiMkc7aIHTJxWeuXKKUMN+LnZejZE=
+X-Received: by 2002:a17:90a:b30f:b0:2b3:9ce8:1239 with SMTP id
+ 98e67ed59e1d1-2c4db132d2cmr2981189a91.6.1718375575765; Fri, 14 Jun 2024
+ 07:32:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: [PATCH v2 1/2] bus: mhi: host: Import mux_id item
-Content-Language: en-US
-To: Loic Poulain <loic.poulain@linaro.org>,
-        Manivannan Sadhasivam
-	<manivannan.sadhasivam@linaro.org>
-CC: Slark Xiao <slark_xiao@163.com>, <ryazanov.s.a@gmail.com>,
-        <johannes@sipsolutions.net>, <netdev@vger.kernel.org>,
-        <mhi@lists.linux.dev>, <linux-arm-msm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20240612093842.359805-1-slark_xiao@163.com>
- <20240612094609.GA58302@thinkpad>
- <87aecf24-cdbb-70d2-a3d1-8d1cacf18401@quicinc.com>
- <20240612145147.GB58302@thinkpad>
- <CAMZdPi-6GPWkj-wu4_mRucRBWXR03eYXu4vgbjtcns6mr0Yk9A@mail.gmail.com>
-From: Jeffrey Hugo <quic_jhugo@quicinc.com>
-In-Reply-To: <CAMZdPi-6GPWkj-wu4_mRucRBWXR03eYXu4vgbjtcns6mr0Yk9A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: OcAp4mqsCNinlbDH_rQGfAU64AzKUZHb
-X-Proofpoint-GUID: OcAp4mqsCNinlbDH_rQGfAU64AzKUZHb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-14_12,2024-06-14_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 spamscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0
- bulkscore=0 adultscore=0 clxscore=1015 malwarescore=0 phishscore=0
- mlxlogscore=977 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406140096
+References: <CALrw=nEVktSeq4HcLqM0VfTrdHCLHeqi71-fKD8+UcBjtoVaBA@mail.gmail.com>
+ <20240613194047.36478-1-kuniyu@amazon.com>
+In-Reply-To: <20240613194047.36478-1-kuniyu@amazon.com>
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Fri, 14 Jun 2024 10:32:44 -0400
+Message-ID: <CALrw=nHaNZfkkEiYot=aSTZ0_9QzhxRkumnaCv=DOz8pJtZOiQ@mail.gmail.com>
+Subject: Re: [PATCH] net: do not leave dangling sk pointer in inet_create()/inet6_create()
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, dsa@cumulusnetworks.com, dsahern@kernel.org, 
+	edumazet@google.com, kernel-team@cloudflare.com, kraig@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/14/2024 4:17 AM, Loic Poulain wrote:
-> On Wed, 12 Jun 2024 at 16:51, Manivannan Sadhasivam
-> <manivannan.sadhasivam@linaro.org> wrote:
->>
->> On Wed, Jun 12, 2024 at 08:19:13AM -0600, Jeffrey Hugo wrote:
->>> On 6/12/2024 3:46 AM, Manivannan Sadhasivam wrote:
->>>> On Wed, Jun 12, 2024 at 05:38:42PM +0800, Slark Xiao wrote:
->>>>
->>>> Subject could be improved:
->>>>
->>>> bus: mhi: host: Add configurable mux_id for MBIM mode
->>>>
->>>>> For SDX72 MBIM mode, it starts data mux id from 112 instead of 0.
->>>>> This would lead to device can't ping outside successfully.
->>>>> Also MBIM side would report "bad packet session (112)".
->>>>> So we add a default mux_id value for SDX72. And this value
->>>>> would be transferred to wwan mbim side.
->>>>>
->>>>> Signed-off-by: Slark Xiao <slark_xiao@163.com>
->>>>> ---
->>>>>    drivers/bus/mhi/host/pci_generic.c | 3 +++
->>>>>    include/linux/mhi.h                | 2 ++
->>>>>    2 files changed, 5 insertions(+)
->>>>>
->>>>> diff --git a/drivers/bus/mhi/host/pci_generic.c b/drivers/bus/mhi/host/pci_generic.c
->>>>> index 0b483c7c76a1..9e9adf8320d2 100644
->>>>> --- a/drivers/bus/mhi/host/pci_generic.c
->>>>> +++ b/drivers/bus/mhi/host/pci_generic.c
->>>>> @@ -53,6 +53,7 @@ struct mhi_pci_dev_info {
->>>>>            unsigned int dma_data_width;
->>>>>            unsigned int mru_default;
->>>>>            bool sideband_wake;
->>>>> + unsigned int mux_id;
->>>>>    };
->>>>>    #define MHI_CHANNEL_CONFIG_UL(ch_num, ch_name, el_count, ev_ring) \
->>>>> @@ -469,6 +470,7 @@ static const struct mhi_pci_dev_info mhi_foxconn_sdx72_info = {
->>>>>            .dma_data_width = 32,
->>>>>            .mru_default = 32768,
->>>>>            .sideband_wake = false,
->>>>> + .mux_id = 112,
->>>>>    };
->>>>>    static const struct mhi_channel_config mhi_mv3x_channels[] = {
->>>>> @@ -1035,6 +1037,7 @@ static int mhi_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->>>>>            mhi_cntrl->runtime_get = mhi_pci_runtime_get;
->>>>>            mhi_cntrl->runtime_put = mhi_pci_runtime_put;
->>>>>            mhi_cntrl->mru = info->mru_default;
->>>>> + mhi_cntrl->link_id = info->mux_id;
->>>>
->>>> Again, 'link_id' is just a WWAN term. Use 'mux_id' here also.
->>>
->>> Does this really belong in MHI?  If this was DT, I don't think we would put
->>> this value in DT, but rather have the driver (MBIM) detect the device and
->>> code in the required value.
->>>
->>
->> I believe this is a modem value rather than MHI. But I was OK with keeping it in
->> MHI driver since we kind of keep modem specific config.
->>
->> But if WWAN can detect the device and apply the config, I'm all over it.
-> 
-> That would require at least some information from the MHI bus for the
-> MBIM driver
-> to make a decision, such as a generic device ID, or quirk flags...
+On Thu, Jun 13, 2024 at 3:41=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> From: Ignat Korchagin <ignat@cloudflare.com>
+> Date: Wed, 12 Jun 2024 14:22:36 -0400
+> > > And curious if bpf_get_socket_cookie() can be called any socket
+> > > family to trigger the splat.  e.g. ieee802154_create() seems to
+> > > have the same bug.
+> >
+> > Just judging from the code - yes, indeed.
+> >
+> > > If so, how about clearing sock->sk in sk_common_release() ?
+> >
+> > This was my first thought, but I was a bit put off by the fact that
+> > sk_common_release() is called from many places and the sk object
+> > itself is reference counted. So not every call to sk_common_release()
+> > seems to actually free the sk object.
+>
+> sk_common_release() is called
+>
+>   1. when we fail to create a socket (socket() or accept() syscall)
+>   2. when we release the last refcount of the socket's file descriptor
+>      (basically close() syscall)
+>
+> The issue only happens at 1. because we clear sock->sk at 2. in
+> __sock_release() after calling sock->ops->release().
+>
+> So, we need not take care of these callers of sk_common_release().
+>
+>   - inet_release
+>     - ->close()
+>       - udp_lib_close
+>       - ping_close
+>       - raw_close
+>       - rawv6_close
+>       - l2tp_ip_close
+>       - l2tp_ip6_close
+>       - sctp_close
+>   - ieee802154_sock_release
+>     - ->close()
+>       - raw_close
+>       - dgram_close
+>   - mctp_release
+>     - ->close()
+>       - mctp_sk_close
+>   - pn_socket_release
+>     - ->close()
+>       - pn_sock_close
+>       - pep_sock_close
+>
+> Then, the rest of the callers are:
+>
+>   - __sock_create
+>     - pf->create()
+>       - inet_create
+>       - inet6_create
+>       - ieee802154_create
+>       - smc_create
+>         - __smc_create
+>
+>   - setsockopt(TCP_ULP)
+>     - smc_ulp_init
+>       - __smc_create
+>
+>   - sctp_accept
+>     - sctp_v4_create_accept_sk
+>     - sctp_v6_create_accept_sk
+>
+> we need not care about sctp_v[46]_create_accept_sk() because they don't s=
+et
+> sock->sk for the socket; we don't pass sock to sock_init_data(NULL, newsk=
+)
+> before calling sk_common_release().
+>
+> __sock_create() path and SMC's ULP path have the same issue, and
+> sk_common_release() releases the last refcount of struct sock there.
+>
+> So, I think we can set NULL to sock->sk in sk_common_release().
 
-I don't see why.
+Thanks for the explanation. Makes sense. I'll spin up a v2 with this
+(and try to test it as well).
 
-The "simple" way to do it would be to have the controller define a 
-different channel name, and then have the MBIM driver probe on that. 
-The MBIM driver could attach driver data saying that it needs to have a 
-specific mux_id.
-
-Or, with zero MHI/Controller changes, the MBIM driver could parse the 
-mhi_device struct, get to the struct device, for the underlying device, 
-and extract the PCIe Device ID and match that to a white list of known 
-devices that need this property.
-
-I guess if the controller could attach a private void * to the 
-mhi_device that is opaque to MHI, but allows MBIM to make a decision, 
-that would be ok.  Such a mechanism would be generic, and extensible to 
-other usecases of the same "class".
-
--Jeff
+>
+> > Secondly, I was put off by this
+> > comment (which I don't fully understand TBH) [1]
+> >
+> > On the other hand - in inet/inet6_create() we definitely know that the
+> > object would be freed, because we just created that.
+> >
+> > But if someone more familiar with the code confirms it is
+> > better/possible to do in sk_common_release(), I'm happy to adjust and
+> > it would be cleaner indeed.
+> >
+> > > ---8<---
+> > > diff --git a/net/core/sock.c b/net/core/sock.c
+> > > index 8629f9aecf91..bbc94954d9bf 100644
+> > > --- a/net/core/sock.c
+> > > +++ b/net/core/sock.c
+> > > @@ -3754,6 +3754,9 @@ void sk_common_release(struct sock *sk)
+> > >          * until the last reference will be released.
+> > >          */
+> > >
+> > > +       if (sk->sk_socket)
+> > > +               sk->sk_socket->sk =3D NULL;
+> > > +
+> > >         sock_orphan(sk);
+> > >
+> > >         xfrm_sk_free_policy(sk);
+> > > ---8<---
+> >
+> > [1]: https://elixir.bootlin.com/linux/v6.10-rc3/source/include/net/sock=
+.h#L1985
+>
 
