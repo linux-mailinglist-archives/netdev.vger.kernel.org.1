@@ -1,91 +1,78 @@
-Return-Path: <netdev+bounces-103447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B81290812F
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 03:57:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F84E908142
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 04:02:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C7931C21495
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 01:57:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41D041F232AA
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 02:02:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73281773D;
-	Fri, 14 Jun 2024 01:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D02942042;
+	Fri, 14 Jun 2024 02:02:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lMGmGctS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fX+5kW92"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A2519D88A
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 01:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23E2219D880;
+	Fri, 14 Jun 2024 02:02:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718330250; cv=none; b=joN3JoAKQyUA5bkLtq0a7WgT7j1tVw8FaXme77uN9OI5/apCtjEAncgaSumOjTmWa3HTpj7FoWy4HtajKAiaG30mWZ1tTbSKFCRlr2W8y2x9Es9qElbMpeHgp+tegDxh4LnueLDBQrU/drS8PequPB33LY6FVzSRWeKASXuOJgk=
+	t=1718330528; cv=none; b=B/7Otv+YvzeR8iSkwFDTcsmoPmCc9qw3nSK/mSe6gxLqOwBKj3nCCh9fYtETbYuPrqM8aj2rbLdp+lmmkvmuKOZrmKvv9KWsTPCSTmnxc3i69Ty95oiIYocZZFAI0xyV5UHzaFCaiZp6Vlb51LVM6NVVjqy1sGo7aDRq9n0T92A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718330250; c=relaxed/simple;
-	bh=5UgsinmFIF3B9EnSVAHU4r/3KDevlNjF1L48MiCeOjg=;
+	s=arc-20240116; t=1718330528; c=relaxed/simple;
+	bh=i0Unidx12tTiWIx1eeP25XQcBZgQqPxSt9lxWiYuap8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NLfbd7EC9rn0YZ3K2e84B2v3voDe/uR57Ixmd/jmE1g7LuysbI++6eNcpQDiMZPBR3pUkVAL9kPdGIgZdkIRe8WbJCPwZXa8pdZ4nkdgBqHoefJBpOaEMHJkfDOImlGekwJAs3CVFKqzp7h+1QkFrseGqLJp/LIqG/es/7kbgb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lMGmGctS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A9B8C2BBFC;
-	Fri, 14 Jun 2024 01:57:29 +0000 (UTC)
+	 MIME-Version:Content-Type; b=sfnjCAN3iI6IV6EqH0MPOMxHl+9Xwgnmq37FG5X0k30arSb8ylKEt8fblowRzI1I2+F9tdJqjRYB/dXujdbbPF4MmcWIu4eUnANU6QfRDV5N0xLPf73qy+kZNLqYRqcTwX/ca2Lu0TadM75DvLo479HPZiTQU6i7SqKaCsZrFN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fX+5kW92; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ECC2C2BBFC;
+	Fri, 14 Jun 2024 02:02:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718330250;
-	bh=5UgsinmFIF3B9EnSVAHU4r/3KDevlNjF1L48MiCeOjg=;
+	s=k20201202; t=1718330527;
+	bh=i0Unidx12tTiWIx1eeP25XQcBZgQqPxSt9lxWiYuap8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lMGmGctS/AsZRmHSrtA7btYY+6QyV87iY/JcWcpSkwHRh7VqjiRXmRzHbOz5zsBfY
-	 4dJFYPUmwnD6TrM575uWyw9nNybkPtYZNnLdF22e+Ggh2ukBwmJfUYDdjBcqNiLEaT
-	 lgYsduKXn+UwRkpriaikNa5gfqESN1VqLm0cdCOuIYvlA9bZRas37fFsNEvkbMm1ab
-	 96tY3/F8W1118UUe+5hSKK59mejhyNzs+JWQy1Ew1GGR50uzt5AZhFn93Dty8Cjn0V
-	 acDCGFxuTY9VM3xtd8qRhZ7F4Rg7fqjH9JiDYIrIkkWcOUZO84Nh7PrKlz9TntQl8+
-	 4KgJIfUFaM8jg==
-Date: Thu, 13 Jun 2024 18:57:28 -0700
+	b=fX+5kW92Y+Jr4MYaW0r6yc3tCOpFxqFzU/3ASQzn1OiaK/8UoEmrEu551ANdjVSWj
+	 GnoakdxOGrrBJtxA/wxDrZrqnhAfODJkuCoibR8M1AxPEAYg9zpaIQEJUtgnW8kfVS
+	 SbDsJod35FAsOxmpISOMGrneGM8c61viSa2ZSpoYC3jmsgf92RJSPdaaHk52t9q5dP
+	 xaaX01kx3R69yLEDkIWXshGgVv+J1NS2Y2dtbevUQKCeBVXcQX80wkRJAF5XyqMygK
+	 0/a3I5ew67QTg3G80TWyi17VNmgfrfdXIhzBPFqHldI0KqiZQy/6Jo1u3nMax26nV+
+	 SIpgQ2w5+tV8Q==
+Date: Thu, 13 Jun 2024 19:02:06 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
- <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] net: make for_each_netdev_dump() a little more
- bug-proof
-Message-ID: <20240613185728.6e7bf9ad@kernel.org>
-In-Reply-To: <d6e29acc-c759-48ce-bea2-3088b4d3ea86@intel.com>
-References: <20240613213316.3677129-1-kuba@kernel.org>
-	<d6e29acc-c759-48ce-bea2-3088b4d3ea86@intel.com>
+To: Geetha sowjanya <gakula@marvell.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <davem@davemloft.net>, <pabeni@redhat.com>, <edumazet@google.com>,
+ <sgoutham@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: Re: [net-next PATCH v5 02/10] octeontx2-pf: RVU representor driver
+Message-ID: <20240613190206.77280642@kernel.org>
+In-Reply-To: <20240611162213.22213-3-gakula@marvell.com>
+References: <20240611162213.22213-1-gakula@marvell.com>
+	<20240611162213.22213-3-gakula@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, 14 Jun 2024 03:45:47 +0200 Przemek Kitszel wrote:
-> you are right, it would be easier to go one step [of macros] up, we have
->   453=E2=94=82 #define xa_for_each_range(xa, index, entry, start, last)  =
-       \
->   454=E2=94=82         for (index =3D start,                             =
-         \
->   455=E2=94=82              entry =3D xa_find(xa, &index, last, XA_PRESEN=
-T);      \
->   456=E2=94=82              entry;                                       =
-       \
->   457=E2=94=82              entry =3D xa_find_after(xa, &index, last, XA_=
-PRESENT))
->=20
-> You could simply change L456 to:
-> entry || (index =3D 0);
-> to achieve what you want; but that would slow down a little lot's of
-> places, only to change value of the index that should not be used :P
->=20
-> For me a proper solution would be to fast forward into C11 era, and move
-> @index allocation into the loop, so value could not be abused.
+On Tue, 11 Jun 2024 21:52:05 +0530 Geetha sowjanya wrote:
+>  obj-$(CONFIG_OCTEONTX2_PF) += rvu_nicpf.o otx2_ptp.o
+>  obj-$(CONFIG_OCTEONTX2_VF) += rvu_nicvf.o otx2_ptp.o
+> +obj-$(CONFIG_RVU_ESWITCH) += rvu_rep.o
+>  
+>  rvu_nicpf-y := otx2_pf.o otx2_common.o otx2_txrx.o otx2_ethtool.o \
+>                 otx2_flows.o otx2_tc.o cn10k.o otx2_dmac_flt.o \
+>                 otx2_devlink.o qos_sq.o qos.o
+>  rvu_nicvf-y := otx2_vf.o otx2_devlink.o
+> +rvu_rep-y := rep.o otx2_devlink.o
 
-I think we're already in C11 era for that exact reason =F0=9F=A4=90=EF=B8=8F
-But please don't take this as an invitation to do crazy things!
+You gotta fix the symbol duplication first, please:
 
-In netlink dumps, tho, we keep the index in persistent socket context,
-because the iteration is split into multiple recvmsg() calls,
-each one continuing where the previous one left off.
+drivers/net/ethernet/marvell/octeontx2/nic/Makefile: otx2_devlink.o is added to multiple modules: rvu_nicpf rvu_nicvf rvu_rep
 
