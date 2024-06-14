@@ -1,113 +1,104 @@
-Return-Path: <netdev+bounces-103664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C94E908F9A
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 18:04:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CA0F908FBC
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 18:11:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B6851C20E90
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:04:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34C2D1F22B50
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:11:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94AB146A9D;
-	Fri, 14 Jun 2024 16:04:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6476916B751;
+	Fri, 14 Jun 2024 16:11:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="URq1dqzn";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="+ETc5Tgr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ahZf/ccb"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8A32B9A5;
-	Fri, 14 Jun 2024 16:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD476CDB3;
+	Fri, 14 Jun 2024 16:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718381090; cv=none; b=UvI/9sXprpbfj8FQevdWAK7kLBsSVjPQQ+PZJBApGOTU6H/vxwrcWrRz6gXIWVkEW0z0sbbJdCnw0jrM739th274YJYjYBRlvKdHxUW7rP3c6GOTG0Si3oXtolN0Z1fc1RVSBgM2QKl5bHLHTn2cZ35xVoBSgY28m2Jy5UZuf+I=
+	t=1718381496; cv=none; b=SNSoJO/g0GpfBJaMp+kWnKJ1teOiihtZhBCjkZdbE2yPITfWLvtkrJNK7QCbcrIOGjX1g75eYSQ+CMkZTJt6jgg/N+rTdsAOn/MbNyv+oLZKDiBBFdrFRALJeU5LRhcN937rYPVhJ7QTmYVpfTiTAQj7QJsJdxFzAlVhbFjZAlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718381090; c=relaxed/simple;
-	bh=4WF6JZsC3Ht/Gfaa311jklZxD5KElK3svrdFuhozFhY=;
+	s=arc-20240116; t=1718381496; c=relaxed/simple;
+	bh=Y11qylTcMXSe5/oFaWd9ccqY6xOb5K0E3H4fKo7i4BU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YgiJzRrekbIXJ3Mz8ge/OAc9htAh/CEg6xLTSmvxkdzdw3NkBRaJcdWckb/1hJschgyqNa4QZnChhRU+xHWPrIop5JqKCmTdddVU4GQc/5zf6h+b6bvTadAWgOl+F7tP1PPTtK0RnRjRwOX5qpvdgkD/Nn2luhvPTNNgcC8JfdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=URq1dqzn; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=+ETc5Tgr; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 14 Jun 2024 18:04:45 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1718381086;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gi0Ctfyyc/5laoLje+Jfda9IFf+g17QR1+NTWKKpkzY=;
-	b=URq1dqznDFEyKvue5WWUyghEYBMGpwkh7txsThmmwcrVQ9KyJWpXdEkMBaPnXU5plEZaWE
-	UpwgjyiI0tqjui61steL9vafHgl3QziQRHIa/xdOJHmSBFk5Jq8XJcoG6k1gXZiT2sTBJJ
-	8J6QQzVlYhQhq6CvfWr+WF9xfnMFjWM/KNhu6uJFwf0pyjeVVQvw7QEPCLVuIK6h4zWYkx
-	q+7akQ0MnhrQZuIotH+00OP5cc5fnGfUeNf9e+FRquJryXwpnjfGiBY7i1IE98w2wSKq5h
-	WIP8Q5y/jFuQRoPt0Exoo13e/oH8HQ448JKvBIKf6w1nVLjDMmweSjv/gQu38A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1718381086;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gi0Ctfyyc/5laoLje+Jfda9IFf+g17QR1+NTWKKpkzY=;
-	b=+ETc5Tgr4yxAnUx+RKxcPxbLMEHt1UG8hPckBJGyZivqlVqKpBe0CffC3DZfuhDoqTQ1kO
-	5QXSf3GHBEIa6RDQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Daniel Bristot de Oliveira <bristot@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
-	Ben Segall <bsegall@google.com>,
-	Daniel Bristot de Oliveira <bristot@redhat.com>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>
-Subject: Re: [PATCH v6 net-next 08/15] net: softnet_data: Make xmit.recursion
- per task.
-Message-ID: <20240614160445.UdPsIOTW@linutronix.de>
-References: <20240612170303.3896084-1-bigeasy@linutronix.de>
- <20240612170303.3896084-9-bigeasy@linutronix.de>
- <20240612131829.2e33ca71@rorschach.local.home>
- <20240614082758.6pSMV3aq@linutronix.de>
- <CANn89i+YfdmKSMgHni4ogMDq0BpFQtjubA0RxXcfZ8fpgV5_fw@mail.gmail.com>
- <20240614094809.gvOugqZT@linutronix.de>
- <834b61b93df3cbf5053e459f337e622e2c510fbd.camel@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CtZ9Rri9KU1FRgnk4BxSTGpvWyKKmEz+BaBZpxH0pZL1zWqMGTkWO+aCsAiqk5YA2M+XtTM6UgVB7rEa4XTZfon9IMfK3UdDxEbSwjbE9TuraeD0yaYkWqMBFBZe10EtzRIMNHX/9+8CBNOASBxE/Rv4UMSfNNB6f4KXmYbuS7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ahZf/ccb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9C8BC2BD10;
+	Fri, 14 Jun 2024 16:11:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718381495;
+	bh=Y11qylTcMXSe5/oFaWd9ccqY6xOb5K0E3H4fKo7i4BU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ahZf/ccbbybr/r4coTPcq6i/A1fbSnqQStKe6wZV4Vky54gDKsFaQLAEvkkFxfYFM
+	 0k1G6/MMuDwlzCUZlVWwwoty7pko2YHa67rXZkgcbzTy93RclN0UjNtRibEB/V+kgL
+	 8pjLcLpI4zC59jAgbxkrs1FK0SSbcjfoiKGaT3eRCINmQtR2k4PrTdzZoU3T1/v1XF
+	 tGs6Nu1FfbtRww5MkPg5plsgno8PI1tTK5mffvJAyNDm2nCgrE/xUQGZLSlg50e+Mh
+	 u/PaDaYwV8qI/U4fdcOmLz5nqrc2wmPg5Dm4ZCaAJ3VD5RlhIpYdOxJg9vLcl0T9FB
+	 AGpKk2cPkKTqg==
+Date: Fri, 14 Jun 2024 17:11:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: Adrian Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
+	i.maximets@ovn.org, dev@openvswitch.org,
+	Yotam Gigi <yotam.gi@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 4/9] net: psample: allow using rate as
+ probability
+Message-ID: <20240614161130.GP8447@kernel.org>
+References: <20240603185647.2310748-1-amorenoz@redhat.com>
+ <20240603185647.2310748-5-amorenoz@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <834b61b93df3cbf5053e459f337e622e2c510fbd.camel@redhat.com>
+In-Reply-To: <20240603185647.2310748-5-amorenoz@redhat.com>
 
-On 2024-06-14 16:08:42 [+0200], Paolo Abeni wrote:
+On Mon, Jun 03, 2024 at 08:56:38PM +0200, Adrian Moreno wrote:
+> Although not explicitly documented in the psample module itself, the
+> definition of PSAMPLE_ATTR_SAMPLE_RATE seems inherited from act_sample.
 > 
-> I personally think (fear mostly) there is still the potential for some
-> (performance) regression. I think it would be safer to introduce this
-> change under a compiler conditional and eventually follow-up with a
-> patch making the code generic.
+> Quoting tc-sample(8):
+> "RATE of 100 will lead to an average of one sampled packet out of every
+> 100 observed."
 > 
-> Should such later change prove to be problematic, we could revert it
-> without impacting the series as a whole. 
-
-Sounds reasonable. In that case let me stick with "v6.5" of this patch
-(as just posted due the `more' member) and then I could introduce an
-option for !RT to use this optionally so it can be tested widely.
-
-> Thanks!
+> With this semantics, the rates that we can express with an unsigned
+> 32-bits number are very unevenly distributed and concentrated towards
+> "sampling few packets".
+> For example, we can express a probability of 2.32E-8% but we
+> cannot express anything between 100% and 50%.
 > 
-> Paolo
+> For sampling applications that are capable of sampling a decent
+> amount of packets, this sampling rate semantics is not very useful.
+> 
+> Add a new flag to the uAPI that indicates that the sampling rate is
+> expressed in scaled probability, this is:
+> - 0 is 0% probability, no packets get sampled.
+> - U32_MAX is 100% probability, all packets get sampled.
+> 
+> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 
-Sebastian
+Hi Adrian,
+
+Would it be possible to add appropriate documentation for
+rate - both the original ratio variant, and the new probability
+variant - somewhere?
+
+That aside, this looks good to me.
+
+...
 
