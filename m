@@ -1,108 +1,166 @@
-Return-Path: <netdev+bounces-103498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8758590858C
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:00:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1AA7908599
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:02:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 818381C2211A
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 08:00:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66F812822D3
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 08:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18532157A43;
-	Fri, 14 Jun 2024 07:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FFA914A627;
+	Fri, 14 Jun 2024 08:01:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="NVpPFKIm"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RVptile8"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A8C183091;
-	Fri, 14 Jun 2024 07:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4881474CB;
+	Fri, 14 Jun 2024 08:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718351968; cv=none; b=M/hHx4Q5P3/L+rZLcC7DUel7I1RU/dZoG8GSi1Z/CZHLvrjm9D84OqPVZbFYPXE0hFRpJKB2ab8XlDXNngZj6d3f2dvrLcHR+nfw5Y01mL+PDdgc4cSawIr7vQqVpwOum4FKeAyXOOuGrqT37D3/Q+DiLCazdMTGfwV/4SoZWVQ=
+	t=1718352116; cv=none; b=XLJiiaDk1NSDhVbsMovnfphzr6giHfwMladFLMlbLPbHVPCWDwDhu9kAD9GjrfuDfCIaQnyaIfE193A62OJhbNUaTIheG4n3htfRJuGPyjw5Hj+covB4xfO4jhHtr7iPxl2l70P2KgWVKOs7Fe2UU1EbaLl2p+iBSfkFYCdx2oo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718351968; c=relaxed/simple;
-	bh=WLsQLfSBgdrbdcbL23bGEE1GXt0r8cyRHZPC0kRFL0s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ZA/dlE74pLPC46v4Tu7do5vGGNDuMurJ6L2iCFfr4nv93WSiL3K+tzaBmaKmspd2PQqFAT0RdiCgWXA4zq/EHR06zMAMpHo582/SzIx2pTz5AD4M6gXPH0iSUPtoOJ7jTrBdNi9UeNchQvyaEdlXPZQT3Jbi8o2oA+SSmq8jtMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=NVpPFKIm; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 5B1F0A0B23;
-	Fri, 14 Jun 2024 09:59:17 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=mail; bh=X48ANnpZpKQn6FVdiODA
-	epUqBqw7Ho8W5zl8HyAQNVc=; b=NVpPFKImG4zlvpc1bIohpS/M7Xqwa8TSwhOw
-	gNVjxwUFXZ47igNHo3g9dBEKYZvfJ0FFAHVsIv0UNEl3SKcnj6FMh7l5AzC/z9Yj
-	PWyEnh6AhgOpUQFB1PxzQmmn1GMulv0Dp+6gA1hp+HCnutYaiAIHiKhJCHPZq/da
-	Vac1yBJexCezUxn5Zfnp/WBVzH4/nRc17FzNfZZ6CFjKJa9ss2I2bKG54V2QCtO7
-	bQ6Hvj7J5t3eRy1oMcw2JGOOmsPMFlsMHMb/ax4qB8l315qwz5ej6TN2n58LmunO
-	jBrpuepeu3kpPMbTHmCxyVyUB83lRgu5rpGIRMNa1oaLASg2+pJfJ+EVQgAIB/ov
-	CPhGrb5BpQnK/8awvkLPoxyy3DixzcKMgpvB3CRguL9WPAsMEzDlcRfnAGUXBREK
-	NzOIrYuWfZy1WD498MizZUCRZXsjBL7wdySb270PGa4yrARS1zjJ2y/+7ZzYlyCV
-	EGvWm+0XppGCTObxgVEOBKaDkJrKgkDNjJJ8s8pcYPop2e27sI8oKyJyKtcifY3+
-	XNJhFPjWy9HWyiF4UuJl4IvmgnkYROKYZ0XUUQjGk52J9Sk7FupsLhkouE/9DQFg
-	6YwL4E8anHC7CioF2OF5AxSua96H39aBNC8dLmTIQgpJl5Tko+qp97tdqDZUdgns
-	nl0+MoM=
-Message-ID: <0f315501-e8cb-4904-8c43-d9721fdef846@prolan.hu>
-Date: Fri, 14 Jun 2024 09:59:16 +0200
+	s=arc-20240116; t=1718352116; c=relaxed/simple;
+	bh=AiE3BsoHl6nbAyEPcQt6QjvUqcm6iPgk/BkHE4KsWHg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=G5CYJkuWsyxTrhTjhq29Ffq/pu6aTlp/NANXCJdNrLD0fYKfqfNnzj8kV5nhR++ryhLykn/20jLYYdwuqQHLpT6CAdW9Mmu9ZnKUgZfjuf4y1xvZ3yoh1kHlMzYXVRC39yT7iO+xjg0Rj7ZPppqPe9FXA87nMvAwNIvVFVHbqFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=RVptile8; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45E1fRo7003155;
+	Fri, 14 Jun 2024 08:01:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type
+	:content-transfer-encoding; s=corp-2023-11-20; bh=gGCJMnhO+L8oNf
+	IArlpsLOLy5wZxlT0LIbb7sFe1hZY=; b=RVptile8zcftjCfyE9QkpluaOTDmmd
+	e/XcXEDP1vatdHrlCFpjfbxxOrf/l0Jh9ujaeEoG73bU+PA6Si9GKBW249DkY5gL
+	Wr4S7p2bjb9gHKmJJOh06aCZiTJ1hZS1h1NLhFGvIwUc3tKpvnxjnECQCMB644U6
+	BfFCv1e8YkjIfBX+WliquE9Yzaw+bTOmmH3QwZWRUmMjYl8fS9smekrpr7Moog1N
+	a4UWzf61z6SoOd+Uuyai0wo1wduNnkkLmtRNcpj5ib4x+2GV7+j8jPZDkwYv9OYL
+	lfE8Y7CH16ewV7ewBGnJpYdLdqYR/jhKJgJ6nVB2rL4jxBf5Yt6OdC9Q==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3ymhajb6tx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 14 Jun 2024 08:01:45 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 45E7FWfw020432;
+	Fri, 14 Jun 2024 08:01:44 GMT
+Received: from aakhoje-ol.in.oracle.com (dhcp-10-76-34-154.vpn.oracle.com [10.76.34.154])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3yncaymbrm-1;
+	Fri, 14 Jun 2024 08:01:42 +0000
+From: Anand Khoje <anand.a.khoje@oracle.com>
+To: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Cc: saeedm@mellanox.com, leon@kernel.org, davem@davemloft.net
+Subject: [PATCH v3] net/mlx5 : Reclaim max 50K pages at once
+Date: Fri, 14 Jun 2024 13:31:35 +0530
+Message-ID: <20240614080135.122656-1-anand.a.khoje@oracle.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH resubmit 2] net: fec: Fix FEC_ECR_EN1588 being cleared on
- link-down
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Frank Li <Frank.Li@freescale.com>, "David S. Miller"
-	<davem@davemloft.net>, <imx@lists.linux.dev>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Richard Cochran <richardcochran@gmail.com>,
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>
-References: <20240611080405.673431-1-csokas.bence@prolan.hu>
- <20240613081233.6ff570cd@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
-In-Reply-To: <20240613081233.6ff570cd@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
- ATLAS.intranet.prolan.hu (10.254.0.229)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2945A129576D776B
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-13_15,2024-06-13_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0
+ malwarescore=0 spamscore=0 mlxscore=0 phishscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2406140054
+X-Proofpoint-GUID: A8VZ0y80ZXnz0eB4BkEHfS2vhrAxgWIW
+X-Proofpoint-ORIG-GUID: A8VZ0y80ZXnz0eB4BkEHfS2vhrAxgWIW
 
-On 6/13/24 17:12, Jakub Kicinski wrote:
-> On Tue, 11 Jun 2024 10:04:05 +0200 Csókás, Bence wrote:
->> +	if (fep->bufdesc_ex) {
->> +		val = readl(fep->hwp + FEC_ECNTRL);
->> +		val |= FEC_ECR_EN1588;
->> +		writel(val, fep->hwp + FEC_ECNTRL);
-> 
-> FEC_ECNTRL gets written multiple times in this function,
-> including with 0, and then you RMW it to add this flag.
-> 
-> Is this intentional? It really seems like you should be
-> adding this flag more consistently or making sure its
-> not cleared, rather than appending "add it back" at the
-> end of the function...
+In non FLR context, at times CX-5 requests release of ~8 million FW pages.
+This needs humongous number of cmd mailboxes, which to be released once
+the pages are reclaimed. Release of humongous number of cmd mailboxes is
+consuming cpu time running into many seconds. Which with non preemptible
+kernels is leading to critical process starving on that cpu’s RQ.
+To alleviate this, this change restricts the total number of pages
+a worker will try to reclaim maximum 50K pages in one go.
+The limit 50K is aligned with the current firmware capacity/limit of
+releasing 50K pages at once per MLX5_CMD_OP_MANAGE_PAGES + MLX5_PAGES_TAKE
+device command.
 
-It only writes 0 if WOL is disabled AND the device has the MULTI_QUEUES 
-quirk. Otherwise, we either write FEC_ECR_RESET, which resets the device 
-(and the HW changes ECNTRL to its reset value), OR we RMW set the WOL 
-sleep bits. And then, if some more quirks are set, we set ETHEREN.
+Our tests have shown significant benefit of this change in terms of
+time consumed by dma_pool_free().
+During a test where an event was raised by HCA
+to release 1.3 Million pages, following observations were made:
 
-So I think RMW is the safest route here, instead of trying to keep track 
-of all these different branches, re-read ECNTRL after reset etc.
+- Without this change:
+Number of mailbox messages allocated was around 20K, to accommodate
+the DMA addresses of 1.3 million pages.
+The average time spent by dma_pool_free() to free the DMA pool is between
+16 usec to 32 usec.
+           value  ------------- Distribution ------------- count
+             256 |                                         0
+             512 |@                                        287
+            1024 |@@@                                      1332
+            2048 |@                                        656
+            4096 |@@@@@                                    2599
+            8192 |@@@@@@@@@@                               4755
+           16384 |@@@@@@@@@@@@@@@                          7545
+           32768 |@@@@@                                    2501
+           65536 |                                         0
 
-Bence
+- With this change:
+Number of mailbox messages allocated was around 800; this was to
+accommodate DMA addresses of only 50K pages.
+The average time spent by dma_pool_free() to free the DMA pool in this case
+lies between 1 usec to 2 usec.
+           value  ------------- Distribution ------------- count
+             256 |                                         0
+             512 |@@@@@@@@@@@@@@@@@@                       346
+            1024 |@@@@@@@@@@@@@@@@@@@@@@                   435
+            2048 |                                         0
+            4096 |                                         0
+            8192 |                                         1
+           16384 |                                         0
+
+Signed-off-by: Anand Khoje <anand.a.khoje@oracle.com>
+---
+Changes in v3:
+   - Shifted the logic to function req_pages_handler() as per
+     Leon's suggestion.
+---
+ drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
+index 1b38397..e7c2d36 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
+@@ -508,6 +508,7 @@ enum {
+ 	RELEASE_ALL_PAGES_MASK = 0x4000,
+ };
+ 
++#define MAX_RECLAIM_NPAGES -50000
+ static int req_pages_handler(struct notifier_block *nb,
+ 			     unsigned long type, void *data)
+ {
+@@ -539,9 +540,13 @@ static int req_pages_handler(struct notifier_block *nb,
+ 
+ 	req->dev = dev;
+ 	req->func_id = func_id;
+-	req->npages = npages;
+ 	req->ec_function = ec_function;
+ 	req->release_all = release_all;
++	if (npages < MAX_RECLAIM_NPAGES)
++		req->npages = MAX_RECLAIM_NPAGES;
++	else
++		req->npages = npages;
++
+ 	INIT_WORK(&req->work, pages_work_handler);
+ 	queue_work(dev->priv.pg_wq, &req->work);
+ 	return NOTIFY_OK;
+-- 
+1.8.3.1
 
 
