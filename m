@@ -1,179 +1,133 @@
-Return-Path: <netdev+bounces-103598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F7F2908C35
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:01:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0863D908C3B
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:06:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FCBB1F281E1
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:01:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D8A1281EEE
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:06:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F345519ADB3;
-	Fri, 14 Jun 2024 13:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9958B190477;
+	Fri, 14 Jun 2024 13:06:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="m81n540M"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2jgY/LjQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018CF19ADA4
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 13:01:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A15E14885C
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 13:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718370082; cv=none; b=JqyKkVCm+wIiZEHNY5+jsiBSHqE1FbmcKR/o7/n2a4/3nX5DAFkpO4EQwIKOS0eNUl+DCFyhouwMOfRSAuFipw4foiSuKEXwQRS3QvL+bXRJgxFS8St14biTIuI3pZy1cAVbgNUaqQH8noew2VYnnse7AMH1LZELtNTmi5aJEDU=
+	t=1718370380; cv=none; b=AlsG1qsuZIPUdKd4uNoGkrRBGtR9ruQpKWvWzVSLS3D+m1YJ3sPCLUDI9YpBymVSseiatp+Po0FHDlQgxJe9+/SqRBXP/BLZHjL4OWwsEINBBzd6PAc2IZ7dLTvprTcPRpYYVLVnq7SlsSu9PywikFsq+ESmSmy3P7waOMOPrCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718370082; c=relaxed/simple;
-	bh=hMvpZ9tbClbrtkjPDgxqeJECwCWJoQC4gPzaXkKI5VE=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:References; b=W8vb1VRPYWe58ca+D61ECCnjBI2xMMp5yH80VZ76Nll10v/K3k3r4lRNjlB//RLypboPqeAxyA/pUSeZMBtnX1GW5IeYN5eZzjyB96SmXux6D4JjIBymFbZMDPbrztu7eKiIPH+Fx670K4tzfkWuxu26AqIEMrRAkVkx/LHZHOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=m81n540M; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20240614130118euoutp01e70e3555f8a935f46e22f17510f3b3b0~Y4HtVwSe41135311353euoutp01S
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 13:01:18 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20240614130118euoutp01e70e3555f8a935f46e22f17510f3b3b0~Y4HtVwSe41135311353euoutp01S
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1718370078;
-	bh=Cu9Kth/VrhXwdZCe9UNE3CqQju5jHEgy4z5jh3by9oU=;
-	h=Date:From:To:Subject:In-Reply-To:References:From;
-	b=m81n540MYWTAA9ydrCEFZoh5sPrQ3Qz8hD/mLU7LAD8raEfX7M3BXmZ5BQNE8jawp
-	 x2EX1wDs8vdMzyNoYeVjXPiiT7JPk4BUINRz0R01I94fu3ui6GGwxfaFoB2/j0Y0In
-	 vTwvo8IV4g7FfBTbGoqs6zTLJdzoAtf3QzSOQiik=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20240614130117eucas1p1c39ba449271398be15a5ea68c843d411~Y4Hs5JJlv2271122711eucas1p1P;
-	Fri, 14 Jun 2024 13:01:17 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-	eusmges2new.samsung.com (EUCPMTA) with SMTP id 57.7C.09875.D1F3C666; Fri, 14
-	Jun 2024 14:01:17 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240614130117eucas1p2657abb565497200b6f1425771ae37129~Y4Hsgg1rh0312203122eucas1p2F;
-	Fri, 14 Jun 2024 13:01:17 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240614130117eusmtrp11437275246ceae19229be6dbc6195987~Y4Hsfyw_q3250832508eusmtrp1L;
-	Fri, 14 Jun 2024 13:01:17 +0000 (GMT)
-X-AuditID: cbfec7f4-131ff70000002693-9d-666c3f1dc2de
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms2.samsung.com (EUCPMTA) with SMTP id B8.D7.09010.D1F3C666; Fri, 14
-	Jun 2024 14:01:17 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240614130116eusmtip2e539933a9e2dd0d084995254c57ec5fa~Y4HsMU8NA1374913749eusmtip2N;
-	Fri, 14 Jun 2024 13:01:16 +0000 (GMT)
-Received: from localhost (106.210.248.168) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Fri, 14 Jun 2024 14:01:15 +0100
-Date: Fri, 14 Jun 2024 15:01:10 +0200
-From: Joel Granados <j.granados@samsung.com>
-To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
-	Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, Boqun Feng
-	<boqun.feng@gmail.com>, Suren Baghdasaryan <surenb@google.com>, "Kent
- Overstreet" <kent.overstreet@linux.dev>, Andrew Morton
-	<akpm@linux-foundation.org>, Luis Chamberlain <mcgrof@kernel.org>, Kees Cook
-	<keescook@chromium.org>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
-	Abeni <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
-	<linux-mm@kvack.org>, <linux-fsdevel@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH 8/8] sysctl: Warn on an empty procname element
-Message-ID: <20240614130110.rovlk7be2ytkcm6x@joelS2.panther.com>
+	s=arc-20240116; t=1718370380; c=relaxed/simple;
+	bh=SnUQNI6UHQP5MbPqCnlHxHpVurWDkYrxspXEtgwaH54=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BGIxMIZ7gAPxWt8X27qOPxwE0IyibhvvgjOx1bJh8HUZq5EIwknuv0yvUZj4zQH2cp/OHINLmcZ3QZr1APiO5cz+ZNnu9jPnkGR/BPVmYN5DYi3GrREN4WvgOmTBCUXRGNw8vGd0QVmCKbdhJMKOfXa1ZZWim0En5knLN+uF+1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2jgY/LjQ; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-df773f9471fso3563581276.3
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 06:06:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718370377; x=1718975177; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7fRKhubzFyYMHPVT4nS15jvFr0tZ15mqILMaqnV6cNg=;
+        b=2jgY/LjQV9T9KwdxoEgdgqWIgXfaDBYcvYrwUawYzFthrSQ41BLxG0Q/pRGgA9mQYF
+         isMz06AfIwpd6dW/CSbenM8Lc/rkSDJhTOU6ZKrv6WWEdX3Dy96LUu/sfnhkc7Hv6/qY
+         D2iEbQCSVZcaTZsDDsfYPgISZeyKQPmCTbBe8axabuQg5APBJvdEqwlPi6iF1e09zUVa
+         BOU8Lmur3NwtFlvy6dA8cy4WbzWyDtmAS4kr4PCpWaDbUL1rR7jPcli6FuJceE+SHtGH
+         lH0VvNjQ7WYK4zPMv/jWmj/CARK+hpJKnSJWt2pSCUefT8PJ6PkuthLnUIxOhcYp1ZRH
+         h5zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718370377; x=1718975177;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7fRKhubzFyYMHPVT4nS15jvFr0tZ15mqILMaqnV6cNg=;
+        b=j6uarjXSX+XuCTnDUyYq7PVDYmwAA3L9RUpnE4PvgDRTXPQDdrZgrVKVyMua1xdLB2
+         FAs3K4gjY/qLv2pj+qHbDP3DZ40YGLacthsSm8HL7aEqet0vUs74A4iU5A5h3AdpKTez
+         jDKStu74pSvF81gnnOVBPzzNUar3GxdVg/pJ1vQ1gHFhuvfOVAFJyPpqBUiP90/ZZIdH
+         4vBK9jh2C5I2hWo++qSQ/cUEw2mUGatL/l4z7g/iZT6deaibHsDLimF9WTsPzwXPT1pa
+         eZFI/qzt2JqHL9D8yF6KhlTh5cv2dxB9MSkdAmr43j4kyDHYrSqULFCBTKejMuBj1epy
+         6x+w==
+X-Gm-Message-State: AOJu0YzpM0/u+Oxaoc548yNCHY2mIHxtJru1JTrM85ltzyfzZawE8zFX
+	HqJaO2Ww5+g4kvDl+txzxqImtKRbg4cY+nM0tsDx344ZQEQuVpS7/qe6JFYZC5mlGDDPiCTZvxx
+	tX0gfOZTMaw==
+X-Google-Smtp-Source: AGHT+IGIoTzHzTFDFsyv1dPaltPPdn/E5X6Cw9mb6zbL+w9fxfWZJaVo6SWO3fdCWvcUwkVcatanyPY7TGVySQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:150b:b0:dfa:8ed1:8f1b with SMTP
+ id 3f1490d57ef6-dff15402e19mr658855276.1.1718370377078; Fri, 14 Jun 2024
+ 06:06:17 -0700 (PDT)
+Date: Fri, 14 Jun 2024 13:06:15 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240604-jag-sysctl_remset-v1-8-2df7ecdba0bd@samsung.com>
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrIKsWRmVeSWpSXmKPExsWy7djPc7qy9jlpBu0vlSzmrF/DZrFmSyOT
-	xZzzLSwWT489Yrc4051rMfv5V2aLC9v6WC327D3JYnF51xw2i3tr/rNanD52gsXixoSnjBaX
-	Dixgsji2QMzi2+k3jBbHew8wWUy+tIDNouWOqYOQx+yGiyweW1beZPLYOesuu8eCTaUem1do
-	eWxa1cnmsenTJHaPEzN+s3gsbJjK7PF+31U2j8+b5AK4o7hsUlJzMstSi/TtErgyju48ylhw
-	iKtiwoQpzA2Mezi6GDk4JARMJE4/AzK5OIQEVjBK3P68i6mLkRPI+cIoceGGM0TiM6PE17Yz
-	YAmQhjn/mpggEssZJZbun8sOV7X04V1mCGcro8TLia0sIDtYBFQltk6QBulmE9CROP/mDliN
-	iEAvq8T/LacZQRLCAk4SE7ZNB1vBK+Ag0bRpLSOELShxcuYTFhCbGah5we5PbCAzmQWkJZb/
-	4wAJcwq4S/y/eIkN4jplieWnZzJD2LUSp7bcArtUQuASp8SqhkOsEAkXiVcLtjFC2MISr45v
-	YYewZSROT+5hgWiYzCix/98HdghnNaPEssav0ACwlmi58gSqw1Fi8/R+VkhI8knceCsIcSif
-	xKRt05khwrwSHW1CENVqEqvvvWGBCMtInPvEN4FRaRaSL2ch+XIWwpcLGJlXMYqnlhbnpqcW
-	G+WllusVJ+YWl+al6yXn525iBKbC0/+Of9nBuPzVR71DjEwcjIcYJTiYlUR4Zy3MShPiTUms
-	rEotyo8vKs1JLT7EKM3BoiTOq5oinyokkJ5YkpqdmlqQWgSTZeLglGpg2lj+um2ldGWZXL/o
-	2ReTMhVb89hPVhx0CG7je14w84j+S871C/gOC5i+TttwX8p3BqPrjvnahmbv+udJyLLt/m95
-	ooBj4hq/1/uzIi8mHLcpmWzFcirhe0F1N7vKd9PoyYtuB2V9iJP+8jfk1betk5Tkoti6GK4e
-	nnRhT8sP0XmfQiMiyyskZuzeMZf7trOJ1IX7mZyOFd2zxHSvpbnd4N1X3+Zxxs+xaWcqu96t
-	WZvUdrYUdD+5510np2i8PfjZ/XPO1r8jfkuuE4pZ/mXyqf1eNZtPun78IbZ0/bmbZSl3T2xp
-	v2Tg2noo223PtAi7Q2vTv87yZDkvEOGfYCu2qkhJm39u3rIzIhx3f9/Zp8RSnJFoqMVcVJwI
-	AKUgeSX0AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrMIsWRmVeSWpSXmKPExsVy+t/xe7qy9jlpBl/WclnMWb+GzWLNlkYm
-	iznnW1gsnh57xG5xpjvXYvbzr8wWF7b1sVrs2XuSxeLyrjlsFvfW/Ge1OH3sBIvFjQlPGS0u
-	HVjAZHFsgZjFt9NvGC2O9x5gsph8aQGbRcsdUwchj9kNF1k8tqy8yeSxc9Zddo8Fm0o9Nq/Q
-	8ti0qpPNY9OnSeweJ2b8ZvFY2DCV2eP9vqtsHp83yQVwR+nZFOWXlqQqZOQXl9gqRRtaGOkZ
-	WlroGZlY6hkam8daGZkq6dvZpKTmZJalFunbJehlHN15lLHgEFfFhAlTmBsY93B0MXJySAiY
-	SMz518TUxcjFISSwlFHi44EFrBAJGYmNX65C2cISf651sUEUfWSU2Hy5gw0kISSwlVHiyD3L
-	LkYODhYBVYmtE6RBwmwCOhLn39xhBqkXEehmlbi26DYjSEJYwEliwrbpTCA2r4CDRNOmtYwQ
-	Q68zSlxt+MECkRCUODnzCZjNDDRpwe5PbCALmAWkJZb/A7uaU8Bd4v/FS2wQxylLLD89kxnC
-	rpX4/PcZ4wRGoVlIJs1CMmkWwqQFjMyrGEVSS4tz03OLjfSKE3OLS/PS9ZLzczcxAmN/27Gf
-	W3Ywrnz1Ue8QIxMH4yFGCQ5mJRHeWQuz0oR4UxIrq1KL8uOLSnNSiw8xmgK9P5FZSjQ5H5h8
-	8kriDc0MTA1NzCwNTC3NjJXEeT0LOhKFBNITS1KzU1MLUotg+pg4OKUamNT+r56rsGbGjJeF
-	On6TZnsEztogKpO/sPfl5yw/t9id3dNUK1Y9uFpg4f/EpNYn6PYciRPiksf/df4Td47LlpcU
-	m1HjbVHbL23yUdJN5nTawzvLLxw/2n0xu0BOy5ElSSX2hKKzQuupTbqTZl9r/s9W16yn/ULz
-	1NTaydznVWe8CGK8yl6Ra3Dv59RDqSoXgnwElbe7aPY/37G06N6rBZVd05d4nun6GRYkMGFR
-	nb29SL1trHXyhVkCTEZnNR4+jXhudVLksOGWG8km7S90X3Uzbpa+rZ985Nwm4QWvEqa6HbWz
-	uslzb34z4/TuvUbtPx2/PPTRnPTzrPtsydmyh7XvP9Q0kjjx9G6avkngNiWW4oxEQy3mouJE
-	AF8X9TCGAwAA
-X-CMS-MailID: 20240614130117eucas1p2657abb565497200b6f1425771ae37129
-X-Msg-Generator: CA
-X-RootMTR: 20240604063006eucas1p144c1d1a90606e5cd0c1852c6270ed3e1
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240604063006eucas1p144c1d1a90606e5cd0c1852c6270ed3e1
-References: <20240604-jag-sysctl_remset-v1-0-2df7ecdba0bd@samsung.com>
-	<CGME20240604063006eucas1p144c1d1a90606e5cd0c1852c6270ed3e1@eucas1p1.samsung.com>
-	<20240604-jag-sysctl_remset-v1-8-2df7ecdba0bd@samsung.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.627.g7a2c4fd464-goog
+Message-ID: <20240614130615.396837-1-edumazet@google.com>
+Subject: [PATCH net] tcp: clear tp->retrans_stamp in tcp_rcv_fastopen_synack()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, stable@vger.kernel.org, 
+	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jun 04, 2024 at 08:29:26AM +0200, Joel Granados via B4 Relay wrote:
-> From: Joel Granados <j.granados@samsung.com>
-> 
-> Add a pr_err warning in case a ctl_table is registered with a sentinel
-> element containing a NULL procname.
-> 
-> Signed-off-by: Joel Granados <j.granados@samsung.com>
-> ---
->  fs/proc/proc_sysctl.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
-> index 806700b70dea..f65098de5fcb 100644
-> --- a/fs/proc/proc_sysctl.c
-> +++ b/fs/proc/proc_sysctl.c
-> @@ -1119,6 +1119,8 @@ static int sysctl_check_table(const char *path, struct ctl_table_header *header)
->  	struct ctl_table *entry;
->  	int err = 0;
->  	list_for_each_table_entry(entry, header) {
-> +		if (!entry->procname)
-> +			err |= sysctl_err(path, entry, "procname is null");
->  		if ((entry->proc_handler == proc_dostring) ||
->  		    (entry->proc_handler == proc_dobool) ||
->  		    (entry->proc_handler == proc_dointvec) ||
-> 
-> -- 
-> 2.43.0
-> 
-> 
-To add to this check, I sent out a static analysis check to smatch in
-such a way that a warning will be printed out if there is a ctl_table
-element with a procname or prog_handler that are NULL. You can see it
-here https://lore.kernel.org/all/20240614-master-v1-1-c652f5aa15fb@samsung.com/
+Some applications were reporting ETIMEDOUT errors on apparently
+good looking flows, according to packet dumps.
 
-Best
+We were able to root cause the issue to an accidental setting
+of tp->retrans_stamp in the following scenario:
+
+- client sends TFO SYN with data.
+- server has TFO disabled, ACKs only SYN but not payload.
+- client receives SYNACK covering only SYN.
+- tcp_ack() eats SYN and sets tp->retrans_stamp to 0.
+- tcp_rcv_fastopen_synack() calls tcp_xmit_retransmit_queue()
+  to retransmit TFO payload w/o SYN, sets tp->retrans_stamp to "now",
+  but we are not in any loss recovery state.
+- TFO payload is ACKed.
+- we are not in any loss recovery state, and don't see any dupacks,
+  so we don't get to any code path that clears tp->retrans_stamp.
+- tp->retrans_stamp stays non-zero for the lifetime of the connection.
+- after first RTO, tcp_clamp_rto_to_user_timeout() clamps second RTO
+  to 1 jiffy due to bogus tp->retrans_stamp.
+- on clamped RTO with non-zero icsk_retransmits, retransmits_timed_out()
+  sets start_ts from tp->retrans_stamp from TFO payload retransmit
+  hours/days ago, and computes bogus long elapsed time for loss recovery,
+  and suffers ETIMEDOUT early.
+
+Fixes: a7abf3cd76e1 ("tcp: consider using standard rtx logic in tcp_rcv_fastopen_synack()")
+CC: stable@vger.kernel.org
+Co-developed-by: Neal Cardwell <ncardwell@google.com>
+Signed-off-by: Neal Cardwell <ncardwell@google.com>
+Co-developed-by: Yuchung Cheng <ycheng@google.com>
+Signed-off-by: Yuchung Cheng <ycheng@google.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv4/tcp_input.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 9c04a9c8be9dfaa0ec2437b3748284e57588b216..01d208e0eef31fd87c7faaf5a3d10b8f52e99ee0 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -6296,6 +6296,7 @@ static bool tcp_rcv_fastopen_synack(struct sock *sk, struct sk_buff *synack,
+ 		skb_rbtree_walk_from(data)
+ 			 tcp_mark_skb_lost(sk, data);
+ 		tcp_xmit_retransmit_queue(sk);
++		tp->retrans_stamp = 0;
+ 		NET_INC_STATS(sock_net(sk),
+ 				LINUX_MIB_TCPFASTOPENACTIVEFAIL);
+ 		return true;
 -- 
+2.45.2.627.g7a2c4fd464-goog
 
-Joel Granados
 
