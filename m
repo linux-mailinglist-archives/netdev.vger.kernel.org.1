@@ -1,58 +1,50 @@
-Return-Path: <netdev+bounces-103526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3D1B9086D7
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:57:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6A2E9086E5
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 11:00:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EFBD281F32
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 08:57:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 817781F22ABB
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 09:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8DF18FC9F;
-	Fri, 14 Jun 2024 08:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0AB7191496;
+	Fri, 14 Jun 2024 09:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="HEuozICN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WOCG+U8d"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9568F188CC1;
-	Fri, 14 Jun 2024 08:57:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B709118C32B;
+	Fri, 14 Jun 2024 09:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718355438; cv=none; b=geC9fOoEXh42yetDMIs2Dtl1vYW5rl2Ddh0rSo2p+6brFKOAYCN+y3Z2lRFmCo2K6j4TZuc55epARLTLNZ4noArIfLwoQjoWJBEJGiqHPIhYIwJeRoJdRbbdJS7yHvH6f6dVZS8FiGF67r8L/sU4rcbBycQHcRhhl2g0qwgHgF0=
+	t=1718355638; cv=none; b=ef5wSaGd/wJMKL8QRkyIuwkv7c899dz0bSSgZj1ezlZTk0s6IpHEexPhgLBP23Yvmt7S3KTw42wniYo65HR3zG3hjtkIcNihJVRMuSpBufncwUDiCuK8lDTt+BTkzqVhC/Jx/b8CooWumOBcSGBaLc0IcyUcL6NTGmzZcc5Yrvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718355438; c=relaxed/simple;
-	bh=xdriQCpMjpmNVBrCJ1jZItM9KNv2DMY2gtCZacQO0LA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ELvtqOsf+DNhpGxvPFaIP0/NEhYRoB4+q5YcyS4WYpczBkkSfIA1js1Ca1IfTPseja2z8vKclTTUqmgW5/tLfrhVbIs+VJO/2EwQ9z+ExveDB82lKwAm1hdhFvNIf7y6plxOxx/tQLiFS16Yr1cgwL1mSikv/4Iq3CxzdLuq1AE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=HEuozICN; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=oVycumswJpHb/XGD7yqMZ1AATV19rhYlmNYcNDoFmxg=; t=1718355436; x=1719565036; 
-	b=HEuozICNQ4y1crtaBu23IzEJCyxoo4oNQBaZ71BXeK/1PnKV5kI9GfgsOOQEvsXjF5HEfKnO1Xv
-	8AoVghIOG9x1IXYhTnuGnu3fl2ME2PvNZfUvRZQikUkbaWLsUmcQtA9xzbr8l8hsF8IwOFbgdGlmv
-	MhwfY3ql9paUS2bjHuJRWDUEVE5x456/rxpIm3T9QpUYwS8S9G9HRVszfuB5pZIcff6tw301efdmd
-	rAUaoTs1/IJR/yK0zWhdM52TApOJ7XUetnQuqqB3ehjvzSUaaa3nRbW2CHLqYirJBJrPPrehhu2ZU
-	371Uy1b3Jp0lMSZy96N26CtSaRlEbYq/jqow==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1sI2kD-0000000DcLz-3Kf6;
-	Fri, 14 Jun 2024 10:57:14 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: pull-request: wireless-2024-06-14
-Date: Fri, 14 Jun 2024 10:56:44 +0200
-Message-ID: <20240614085710.24103-3-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1718355638; c=relaxed/simple;
+	bh=epfSrd8hbeGIbDDSU+mnrqQJEh9H0kdbYyucSYP1AJg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=M71FJp25qo7utPrezpMMr4Hprcj3GMhrvJD5YHNaYb0mUryctkz0ujIxqng+zyvTb9qbh6nFQeOqf+z7vwgJ2wTBtnZskbUv/xh4y51RuQ9FL6FWQxhx6H+fn0nDxhbdCfH70aNENVC9MVE1ioQtNm573ry9dun3vBoAG/1L+8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WOCG+U8d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 35B17C4AF1C;
+	Fri, 14 Jun 2024 09:00:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718355638;
+	bh=epfSrd8hbeGIbDDSU+mnrqQJEh9H0kdbYyucSYP1AJg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=WOCG+U8duy/bkqurFvsSKh0My/oFop7YfeUJkN+aaf6/beCzhfsIsqrTwpS6pVbd3
+	 5nTzKeD8zeGmU/U5c696MGdf8WOJOAzrqYMWRnZ4KMS7D7kOHZ0uyM6Y0aOV1bmJ1z
+	 Iw5PDoHyu8y9nKXUhP9ixiw/TO9pDkwURGPcjUhTJAcnjifM1EAJojtP3eOl7f2YDx
+	 eqUC4A+telnroweMhhtdCsinFhj6jdeAUBExBM7pul7ahVd53sb5H9GtIqxgCmW2Ag
+	 qWTSAAAKedKLuL2qfhwwNkJJKWgbnczG8MaLP5gTbkRNZ99fh1S+atdtb+1jWxhbZd
+	 5Bxgw5L3ROP0A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 240A4C43616;
+	Fri, 14 Jun 2024 09:00:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,65 +52,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next,PATCH v7 0/8] Series to deliver Ethernet for STM32MP13
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171835563814.26751.8950769573761217764.git-patchwork-notify@kernel.org>
+Date: Fri, 14 Jun 2024 09:00:38 +0000
+References: <20240611083606.733453-1-christophe.roullier@foss.st.com>
+In-Reply-To: <20240611083606.733453-1-christophe.roullier@foss.st.com>
+To: Christophe ROULLIER <christophe.roullier@foss.st.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ richardcochran@gmail.com, joabreu@synopsys.com, lgirdwood@gmail.com,
+ broonie@kernel.org, marex@denx.de, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 
-Hi,
+Hello:
 
-Here are a couple of fixes for net, including one for the
-monitor mode regression you'd asked about.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Please pull and let us know if there's any problem.
+On Tue, 11 Jun 2024 10:35:58 +0200 you wrote:
+> STM32MP13 is STM32 SOC with 2 GMACs instances
+>     GMAC IP version is SNPS 4.20.
+>     GMAC IP configure with 1 RX and 1 TX queue.
+>     DMA HW capability register supported
+>     RX Checksum Offload Engine supported
+>     TX Checksum insertion supported
+>     Wake-Up On Lan supported
+>     TSO supported
+> Rework dwmac glue to simplify management for next stm32 (integrate RFC from Marek)
+> 
+> [...]
 
-Thanks,
-johannes
+Here is the summary with links:
+  - [net-next,v7,1/8] dt-bindings: net: add STM32MP13 compatible in documentation for stm32
+    https://git.kernel.org/netdev/net-next/c/8a9044e5169b
+  - [net-next,v7,2/8] net: stmmac: dwmac-stm32: Separate out external clock rate validation
+    https://git.kernel.org/netdev/net-next/c/582ac134963e
+  - [net-next,v7,3/8] net: stmmac: dwmac-stm32: Separate out external clock selector
+    https://git.kernel.org/netdev/net-next/c/63b0aa8ea73f
+  - [net-next,v7,4/8] net: stmmac: dwmac-stm32: Extract PMCR configuration
+    https://git.kernel.org/netdev/net-next/c/92704f8c0e7a
+  - [net-next,v7,5/8] net: stmmac: dwmac-stm32: Clean up the debug prints
+    https://git.kernel.org/netdev/net-next/c/c60a54b52026
+  - [net-next,v7,6/8] net: stmmac: dwmac-stm32: Fix Mhz to MHz
+    https://git.kernel.org/netdev/net-next/c/cbfad55322ce
+  - [net-next,v7,7/8] net: stmmac: dwmac-stm32: Mask support for PMCR configuration
+    https://git.kernel.org/netdev/net-next/c/4f37dc467ffe
+  - [net-next,v7,8/8] net: stmmac: dwmac-stm32: add management of stm32mp13 for stm32
+    https://git.kernel.org/netdev/net-next/c/50bbc0393114
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-The following changes since commit 819bda58e77bb67974f94dc1aa11b0556b6f6889:
-
-  wifi: rtlwifi: Ignore IEEE80211_CONF_CHANGE_RETRY_LIMITS (2024-06-01 13:15:26 +0300)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2024-06-14
-
-for you to fetch changes up to 0d9c2beed116e623ac30810d382bd67163650f98:
-
-  wifi: mac80211: fix monitor channel with chanctx emulation (2024-06-14 09:14:08 +0200)
-
-----------------------------------------------------------------
-Various fixes:
- * cfg80211: wext scan
- * mac80211: monitor regression, scan counted_by, offload
- * iwlwifi: locking, 6 GHz scan, remain-on-channel
-
-----------------------------------------------------------------
-Ayala Beker (1):
-      wifi: iwlwifi: scan: correctly check if PSC listen period is needed
-
-Dmitry Antipov (1):
-      wifi: cfg80211: wext: add extra SIOCSIWSCAN data check
-
-Johannes Berg (2):
-      wifi: cfg80211: wext: set ssids=NULL for passive scans
-      wifi: mac80211: fix monitor channel with chanctx emulation
-
-Kenton Groombridge (1):
-      wifi: mac80211: Avoid address calculations via out of bounds array indexing
-
-Remi Pommarel (1):
-      wifi: mac80211: Recalc offload when monitor stop
-
-Shaul Triebitz (2):
-      wifi: iwlwifi: mvm: unlock mvm mutex
-      wifi: iwlwifi: mvm: fix ROC version check
-
- drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c  |  2 +-
- drivers/net/wireless/intel/iwlwifi/mvm/scan.c      |  2 +-
- .../net/wireless/intel/iwlwifi/mvm/time-event.c    |  2 ++
- net/mac80211/driver-ops.c                          | 17 +++++++++++++++++
- net/mac80211/iface.c                               | 22 ++++++++++------------
- net/mac80211/scan.c                                | 17 +++++++++--------
- net/mac80211/util.c                                |  2 +-
- net/wireless/scan.c                                | 12 +++++++++---
- 8 files changed, 50 insertions(+), 26 deletions(-)
 
