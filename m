@@ -1,94 +1,123 @@
-Return-Path: <netdev+bounces-103707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A9DA9092B4
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 21:04:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E84949092D2
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 21:10:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF537B26CF2
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 19:04:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92D601F257A2
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 19:10:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A8F61A01C5;
-	Fri, 14 Jun 2024 19:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F681A38C2;
+	Fri, 14 Jun 2024 19:10:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gtBlaZo/"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="GMMByZxo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CCF19FA93
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 19:04:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF8841A01C5;
+	Fri, 14 Jun 2024 19:10:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718391886; cv=none; b=Lc6EA1ThOwPzN0Nicvsa8SoW5vfXkfxnpIqv37nx/tno8eX31cS/k86rxPK2deJKVrhElQRa/N3o2wqxF+rwHPQvi7TD9zHEwVfXnlh8VmgAInKWcm4r+Dpc6NuuSWWYAgVmKKVsQIGuyUrhZu3LPVQca81sJEnio0RrYbwBbAw=
+	t=1718392237; cv=none; b=T1gFQ/4GPcz363WmXM23aWE9Pnvd1OkeELjr3j2LY+s29qnrMvzJ8mRkqe8dgA1SncOF2zR0g7401Yi1D9zFGvVtnYESy1iK6IqsfkYnM6stFiOWH8LZj60gcT2DudfFofhegWOA2RbFHc8EGZIubBRvTCJFCRzGeR1TklPQhTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718391886; c=relaxed/simple;
-	bh=Hdh96DNeu5O15TNIGmeJKcxmDvDRfqChBPKTWie1jp8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jk23rHpukoIbQX56RXrXB35GvUbp1u+LvFM9wtOKO+HISbLpVA7htyrM6B50i28XE5cT8xzSBl3Xl7BLKXaxC0kYLAoA6dFJ7eyfwjDX3jO/371PgTCi9vgpGMpYzjmZYV1NtBWaivkXHaGX5lC5F5MbhpMXepPiZTSU5tKucgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gtBlaZo/; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6b06446f667so12931096d6.2
-        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 12:04:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718391884; x=1718996684; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hdh96DNeu5O15TNIGmeJKcxmDvDRfqChBPKTWie1jp8=;
-        b=gtBlaZo/McfwqwaBJ3GoO1Wxr6XQFaidWs8T0S6gYiM2s83+Co8D7ssquwHobCGm+T
-         xbd6g51YfMC1mpNEhgx9SD4e3CeaYsxORtiKQxdzcqMRpBzrf4b5LsVlnAlLbN8fwzSD
-         sMl9NbCSWuHOUmonFORM8WUmXls/mwmFHufulwrBH73scBl4hXGnz/JVLkVP31tuNPC5
-         73FNPhJoqRnQZov4WYthSeFSV0ljBiYs/P5tzQ2yVvWy86NQC2DBeqDWIME+ZsNaFL5g
-         Z6PR9iEpnmBu/yyhZPTdOYL468WerIDhCFtJTi9sT6TxmxBZvUdV6/rOzQu8OQazO6C1
-         u7hQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718391884; x=1718996684;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Hdh96DNeu5O15TNIGmeJKcxmDvDRfqChBPKTWie1jp8=;
-        b=ASQRjDyBKIvPex+KpdMvz2eIyOYpb0XvCbRmZd6ataZiUiYu+oUXOm0DXY6YW7QuzH
-         HnqHPwcwtBNKcLmRs1nGRk4hyig8/dHSwOHE18NcbSW2L1sNhPSn2a+Zj91N7CaOZja7
-         0vWur2mZsRmKj4FlKF1d3HEtXAldvLxeTXaRg6n9ZYwXZ1pNKRDB1EX2tXpy0PD9FaKi
-         cflvbs0vq/X2RqsMtnxcfWUXZcyU3zGTta2EY9bb2/3gP+IKOMHqcL54V+ACgzNqH7uu
-         81wd50Tr/1lNhQ0YF4B2pTacmYIX7ywXwLF6J41y4warLGgWa4jWyl0+E5aIWrSugNKD
-         rmUQ==
-X-Gm-Message-State: AOJu0Yz0dRbJAi+o0V2ICyoFOQervxiFfU/xKuW4cq5fhZ5qesWqMS74
-	rCTbNe3dXhVxxWTJkzq6qKuptvsHetSaHxDNs7BVsZWJlLkiFBaqLyXP+E4E7TjvyyAvWPMbTBe
-	Kl9xP3wF5mfvnmdAnEjbCY9M6YMxeFLT6do3y
-X-Google-Smtp-Source: AGHT+IEqk0+RaqSbOzvS5VSZBxkWGiiPBazEGl9HoA320TDzUGaZQHRGxkEQyi/8W7l5comlriZIErEBAFhUZ1pxXBU=
-X-Received: by 2002:ad4:56e7:0:b0:6b2:9d43:f060 with SMTP id
- 6a1803df08f44-6b2afccf0c7mr39897636d6.33.1718391883377; Fri, 14 Jun 2024
- 12:04:43 -0700 (PDT)
+	s=arc-20240116; t=1718392237; c=relaxed/simple;
+	bh=/McNpSiwC81uTiinpfWk+KdIlSVxE/p1HFilAYM2544=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VwxSKIV3S1B9gyTMBSdmUQITl7VcTmKtJ39Vj8+9dAxtClJzeL4AtsrGVwVuAlW2csTYfu+6WzEcnx/CbTi1ugpNqzYTHjBMxyvbavtd621Rf/HfWjoQsWRUawpR41icwG0cd+MYqPxzLSsQHy4l/MKdswFi5lruxm6+zeD5bow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=GMMByZxo; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 48A8B40E019F;
+	Fri, 14 Jun 2024 19:10:33 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id B5wNnYZxtOcc; Fri, 14 Jun 2024 19:10:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1718392229; bh=YHoeX2aqNxFOwawwQ+u5gyShZuN1d3XKK09wgoJEq6M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GMMByZxogyqO6iERv7yE9B7Z+yBq6IlzYQqdEj+amC/+SOkkItb2DuZlWjCQQ1A6s
+	 4j1l3t+xWiBaOYtb1Al3DKaXwLYbfyEbq6vBOtibH3OjF/V7yrzolInVRgYc6AMYy1
+	 BPfOWGzHMmCGjmKpE0fwq2kvxt7ITrQ/CDLbpRlMGaITjvpc+cooDPh4hjbqbMARrc
+	 T4DqEw1jIwN+zP3q3iz6jK8lSCUkBVd4JFPnoznFFEx6V6rgfTNHC1Ya6hHOUYGerP
+	 Q57jaD74y8ePgm4lOTLR9TCHMjDaPmM9uRYgNmLuU2eqAARF8vX616Ujz3wAGfTyLK
+	 E5TZmCp7aCUmazqXGtQAwE+0xxALHZCoDv6pF+a2uN51Q4JxwqAoDfQkYnKnmIFS9l
+	 JbITCJLj6U7tSyrhVqRPatVQdvVLoBchGuxljqYuJp/zNW1N/n4Tyl8JZ69yyB8x6X
+	 y7ExtB5sc/1Hloa/p/JGAzXdGa1U1IPFlhzn+MEU+X3B9NhLEA+LwX3NZkWNOD9Tgx
+	 8jPMEICeHzymu5qZSHKHGkpJgHRXvfor9d6MR4pvbBpgpuLFWoDj0Aug+D84BzZaRp
+	 WveoTopHFukaDU9dgrasYcIpVsvYEHREkHgYfbe7KMFFdmpwiyvBPlihqjieXCpD+g
+	 kAdmvYhHy+8dVwGMXIAmsTHo=
+Received: from zn.tnic (p5de8ee85.dip0.t-ipconnect.de [93.232.238.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6B90C40E00C9;
+	Fri, 14 Jun 2024 19:10:02 +0000 (UTC)
+Date: Fri, 14 Jun 2024 21:09:56 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Alexey Makhalov <alexey.makhalov@broadcom.com>
+Cc: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, hpa@zytor.com,
+	dave.hansen@linux.intel.com, mingo@redhat.com, tglx@linutronix.de,
+	x86@kernel.org, netdev@vger.kernel.org, richardcochran@gmail.com,
+	linux-input@vger.kernel.org, dmitry.torokhov@gmail.com,
+	zackr@vmware.com, linux-graphics-maintainer@vmware.com,
+	pv-drivers@vmware.com, timothym@vmware.com, akaher@vmware.com,
+	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
+	tzimmermann@suse.de, mripard@kernel.org,
+	maarten.lankhorst@linux.intel.com, horms@kernel.org,
+	kirill.shutemov@linux.intel.com,
+	Tim Merrifield <tim.merrifield@broadcom.com>
+Subject: Re: [PATCH v11 8/8] x86/vmware: Add TDX hypercall support
+Message-ID: <20240614190956.GFZmyVhLGeyLjwvA6X@fat_crate.local>
+References: <20240613191650.9913-1-alexey.makhalov@broadcom.com>
+ <20240613191650.9913-9-alexey.makhalov@broadcom.com>
+ <844ef200-aabe-4497-85c9-44fc46c9133a@intel.com>
+ <20240614161404.GCZmxsTNLSoYTqoRoj@fat_crate.local>
+ <74f8300b-3520-4824-81e3-71464e3da3b6@intel.com>
+ <1750e44f-f9a9-4c2a-afb3-f1ae8237ccb0@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240613071021.471432-1-druth@chromium.org> <CAM0EoMkrTcMrsd=8249inrU4HaCP9nh4xva+LO1ayF_ONH=-DQ@mail.gmail.com>
-In-Reply-To: <CAM0EoMkrTcMrsd=8249inrU4HaCP9nh4xva+LO1ayF_ONH=-DQ@mail.gmail.com>
-From: David Ruth <druth@google.com>
-Date: Fri, 14 Jun 2024 15:04:05 -0400
-Message-ID: <CAKHmtrQnUZQddue2HGq8wAvE_N_esYv2DwMNYp5rOArGzc2kZw@mail.gmail.com>
-Subject: Re: [PATCH v2 net] net/sched: cls_api: fix possible infinite loop in tcf_idr_check_alloc()
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	marcelo.leitner@gmail.com, vladbu@nvidia.com, 
-	syzbot+b87c222546179f4513a7@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1750e44f-f9a9-4c2a-afb3-f1ae8237ccb0@broadcom.com>
 
-> Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
->
-> Small nit, should subject be:
-> net/sched: act_api: fix possible infinite loop in tcf_idr_check_alloc()
+On Fri, Jun 14, 2024 at 11:32:16AM -0700, Alexey Makhalov wrote:
+> 
+> 
+> On 6/14/24 9:19 AM, Dave Hansen wrote:
+> > On 6/14/24 09:14, Borislav Petkov wrote:
+> > > On Fri, Jun 14, 2024 at 09:03:22AM -0700, Dave Hansen wrote:
+> > ...
+> > > > You need to zero out all of 'args' somehow.
+> > > 
+> > > You mean like this:
+> > > 
+> > > 	struct tdx_module_args args = {};
+> > > 
+> > > ?
+> > 
+> > Yes, or do all the assignments with the initializer.  We seem to do it
+> > both ways, so whatever works.
+> 
+> Thanks Dave for pointing that out. I missed that at v7.
 
-Yes, thanks for catching this. Resent with the suggested change.
+Ok, I'll fold this struct initialization oneliner into the last patch.
 
-> cheers,
-> jamal
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
