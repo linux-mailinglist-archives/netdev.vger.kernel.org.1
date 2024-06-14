@@ -1,266 +1,144 @@
-Return-Path: <netdev+bounces-103679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E421490905A
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 18:34:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBA9990904E
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 18:33:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E21461C2424B
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:34:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E2482815AF
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:33:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 555501ABCDD;
-	Fri, 14 Jun 2024 16:31:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EFA135280;
+	Fri, 14 Jun 2024 16:30:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Cj8FmAYj";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DaOjhVSX";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Cj8FmAYj";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DaOjhVSX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G97+Wiom"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BDD1ABCBE;
-	Fri, 14 Jun 2024 16:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27B901AB52F;
+	Fri, 14 Jun 2024 16:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718382660; cv=none; b=q4mJHm2hwmdYfl9ZzTXYajHlsG0SGySQFZy9CICvuiy/10MK/8RrEV+C0sXuY1kcYmzXUho0se1b/0E1G0cke+oHu+EDDU3e0M7gFYYO9UiYMNncFbZ/1P8pF2xln6JKmpRakbjKS9XeMgEj+Rmd8ocCrEj5jgdq6A0FcjC3Ri0=
+	t=1718382655; cv=none; b=Q6bdb/J6At1354OROgt0A8OnqSAAI0zfcO9RlMm5wPud8Tz5t8kcqFwZiuv98bdGAyriIQh3gosjIzzpzXAON6PqJe4wfm47u893Q5bNQvCg2AvccSHn4d6PNrdFpajR6YOj0guSlArhnyeA+DW/AkETswuuC6mSB5Vau6E93oI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718382660; c=relaxed/simple;
-	bh=XKkvYpzilvAEE/2RfdhRbhpL5cY/9xwiyRLEwPWPwIM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cRhQMarCJmnxi+Igt8zjrd+k4QcL+rekIimnt+2V+uIdLteqc7jXBYVi5FXA+4jngzZjz88tbK7lkKaMTLZ1KOFB8SotiQmC/30qoomusX5Cg8q9qDpYiCoKep1Nknxj9uiC5l7kRp1bVjH9QSXOxpWP5265hnHUxhGBuy1EqTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Cj8FmAYj; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DaOjhVSX; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Cj8FmAYj; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DaOjhVSX; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id AF0AF2069E;
-	Fri, 14 Jun 2024 16:30:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1718382656; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Kwq8WeoOYXAFfq4ENmQXheUFFriDONAIFF1ZwyrMatE=;
-	b=Cj8FmAYjfaJwgcUep2VvZi+ZdpumPDMSTCD18DcxK2BlvzK2uqrcoi/2FwY1xzlQtIXCNB
-	3a3ld8ERwsvsVzVR2loEl04dGgQy49pte6dVZRao7WlADbO/++1kovfQ/zUHRp5evxTdw9
-	p/SGqdl+Y00UKy29r7Agg4o5GxgNn1Q=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1718382656;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Kwq8WeoOYXAFfq4ENmQXheUFFriDONAIFF1ZwyrMatE=;
-	b=DaOjhVSXyK5C5nsgHnlqok6wipuPy8d1+0Gl1xN0i3uqozvBxYGbWj2kjRcqXd21VVSun9
-	YlKFkP3BQEBmQeDw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Cj8FmAYj;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=DaOjhVSX
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1718382656; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Kwq8WeoOYXAFfq4ENmQXheUFFriDONAIFF1ZwyrMatE=;
-	b=Cj8FmAYjfaJwgcUep2VvZi+ZdpumPDMSTCD18DcxK2BlvzK2uqrcoi/2FwY1xzlQtIXCNB
-	3a3ld8ERwsvsVzVR2loEl04dGgQy49pte6dVZRao7WlADbO/++1kovfQ/zUHRp5evxTdw9
-	p/SGqdl+Y00UKy29r7Agg4o5GxgNn1Q=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1718382656;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Kwq8WeoOYXAFfq4ENmQXheUFFriDONAIFF1ZwyrMatE=;
-	b=DaOjhVSXyK5C5nsgHnlqok6wipuPy8d1+0Gl1xN0i3uqozvBxYGbWj2kjRcqXd21VVSun9
-	YlKFkP3BQEBmQeDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 73D2813AAF;
-	Fri, 14 Jun 2024 16:30:56 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id sT3IFUBwbGbIcwAAD6G6ig
-	(envelope-from <krisman@suse.de>); Fri, 14 Jun 2024 16:30:56 +0000
-From: Gabriel Krisman Bertazi <krisman@suse.de>
-To: axboe@kernel.dk
-Cc: io-uring@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Gabriel Krisman Bertazi <krisman@suse.de>
-Subject: [PATCH v2 4/4] io_uring: Introduce IORING_OP_LISTEN
-Date: Fri, 14 Jun 2024 12:30:47 -0400
-Message-ID: <20240614163047.31581-4-krisman@suse.de>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240614163047.31581-1-krisman@suse.de>
-References: <20240614163047.31581-1-krisman@suse.de>
+	s=arc-20240116; t=1718382655; c=relaxed/simple;
+	bh=4uMCD3nfnmamh+k914AZ9iNaZiZ2iLQY8YW/o+RixDM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I5C52zVAxnSjtw0PQkxovg0AsF3Jg0x9KEz7INN9x4veFoOPKHrrEAzPXFM5Vb0ZQvHY/CduEiS/mH8RCacivftLbVmFCmb2ewJHaPZqe8EbnJHUQU01RP3KJJ+l3wtBRqWA7xZGqb9TcWzpDyPWA61ZXG5sIsj1toXfQ7MvboQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G97+Wiom; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CE24C2BD10;
+	Fri, 14 Jun 2024 16:30:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718382654;
+	bh=4uMCD3nfnmamh+k914AZ9iNaZiZ2iLQY8YW/o+RixDM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G97+WiomIY+D1ScJvy+hWtvGznEx91P7NiLKw1qcgJ99tAQHrmn62kfqKjwz4Huqw
+	 zaXjNqnM0oar5JZ7AMC7V/J1HJUrYj7k1XtSqxMtS10HyfX75UoUSU8Sx/Ikv000nE
+	 MlJ6HJG/MCsjPIbCra2j5XPn6Boxj+1YQHyWsoEVTjgPX8t0JH42QF1DjbXySDIz2Z
+	 YzkOil7NFjfE8zjaqOoWuhUYqNFp6ayy36oq0G3/WAQ4HDQ9fjwrIsMfqZQpBGtAoC
+	 bas4pGTLt4b9shevSwSOMi1ixt4IUQS11CBozeMN9sOKI9bRwP5/OQDu8mAPTIaw/i
+	 Chgx66MC+MT1Q==
+Date: Fri, 14 Jun 2024 17:30:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Michal Simek <michal.simek@amd.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	linux-kernel@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>
+Subject: Re: [PATCH net-next 3/3] net: xilinx: axienet: Add statistics support
+Message-ID: <20240614163050.GV8447@kernel.org>
+References: <20240610231022.2460953-1-sean.anderson@linux.dev>
+ <20240610231022.2460953-4-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	MIME_TRACE(0.00)[0:+];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_SOME(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:email,suse.de:dkim];
-	RCVD_TLS_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: AF0AF2069E
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240610231022.2460953-4-sean.anderson@linux.dev>
 
-IORING_OP_LISTEN provides the semantic of listen(2) via io_uring.  While
-this is an essentially synchronous system call, the main point is to
-enable a network path to execute fully with io_uring registered and
-descriptorless files.
+On Mon, Jun 10, 2024 at 07:10:22PM -0400, Sean Anderson wrote:
+> Add support for reading the statistics counters, if they are enabled.
+> The counters may be 64-bit, but we can't detect this as there's no
+> ability bit for it and the counters are read-only. Therefore, we assume
+> the counters are 32-bits. To ensure we don't miss an overflow, we need
+> to read all counters at regular intervals, configurable with
+> stats-block-usecs. This should be often enough to ensure the bytes
+> counters don't wrap at 2.5 Gbit/s.
+> 
+> Another complication is that the counters may be reset when the device
+> is reset (depending on configuration). To ensure the counters persist
+> across link up/down (including suspend/resume), we maintain our own
+> 64-bit versions along with the last counter value we saw. Because we
+> might wait up to 100 ms for the reset to complete, we use a mutex to
+> protect writing hw_stats. We can't sleep in ndo_get_stats64, so we use a
+> u64_stats_sync to protect readers.
+> 
+> We can't use the byte counters for either get_stats64 or
+> get_eth_mac_stats. This is because the byte counters include everything
+> in the frame (destination address to FCS, inclusive). But
+> rtnl_link_stats64 wants bytes excluding the FCS, and
+> ethtool_eth_mac_stats wants to exclude the L2 overhead (addresses and
+> length/type).
+> 
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+> ---
+> 
+>  drivers/net/ethernet/xilinx/xilinx_axienet.h  |  81 ++++++
+>  .../net/ethernet/xilinx/xilinx_axienet_main.c | 267 +++++++++++++++++-
+>  2 files changed, 345 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
 
-Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
+...
 
----
-changes since v1:
-- Drop empty lines ahead of return (Jens).
----
- include/uapi/linux/io_uring.h |  1 +
- io_uring/net.c                | 28 ++++++++++++++++++++++++++++
- io_uring/net.h                |  3 +++
- io_uring/opdef.c              | 13 +++++++++++++
- 4 files changed, 45 insertions(+)
+> @@ -434,6 +502,11 @@ struct skbuf_dma_descriptor {
+>   * @tx_packets: TX packet count for statistics
+>   * @tx_bytes:	TX byte count for statistics
+>   * @tx_stat_sync: Synchronization object for TX stats
+> + * @hw_last_counter: Last-seen value of each statistic
+> + * @hw_stats: Interface statistics periodically updated from hardware counters
+> + * @hw_stats_sync: Synchronization object for @hw_stats
 
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index 4ef153d95c87..2aaf7ee256ac 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -258,6 +258,7 @@ enum io_uring_op {
- 	IORING_OP_FIXED_FD_INSTALL,
- 	IORING_OP_FTRUNCATE,
- 	IORING_OP_BIND,
-+	IORING_OP_LISTEN,
- 
- 	/* this goes last, obviously */
- 	IORING_OP_LAST,
-diff --git a/io_uring/net.c b/io_uring/net.c
-index 8cbc29aff15c..028e126ab30c 100644
---- a/io_uring/net.c
-+++ b/io_uring/net.c
-@@ -56,6 +56,11 @@ struct io_bind {
- 	int				addr_len;
- };
- 
-+struct io_listen {
-+	struct file			*file;
-+	int				backlog;
-+};
-+
- struct io_sr_msg {
- 	struct file			*file;
- 	union {
-@@ -1751,6 +1756,29 @@ int io_bind(struct io_kiocb *req, unsigned int issue_flags)
- 	return 0;
- }
- 
-+int io_listen_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
-+{
-+	struct io_listen *listen = io_kiocb_to_cmd(req, struct io_listen);
-+
-+	if (sqe->addr || sqe->buf_index || sqe->rw_flags || sqe->splice_fd_in || sqe->addr2)
-+		return -EINVAL;
-+
-+	listen->backlog = READ_ONCE(sqe->len);
-+	return 0;
-+}
-+
-+int io_listen(struct io_kiocb *req, unsigned int issue_flags)
-+{
-+	struct io_listen *listen = io_kiocb_to_cmd(req, struct io_listen);
-+	int ret;
-+
-+	ret = __sys_listen_socket(sock_from_file(req->file), listen->backlog);
-+	if (ret < 0)
-+		req_set_fail(req);
-+	io_req_set_res(req, ret, 0);
-+	return 0;
-+}
-+
- void io_netmsg_cache_free(const void *entry)
- {
- 	struct io_async_msghdr *kmsg = (struct io_async_msghdr *) entry;
-diff --git a/io_uring/net.h b/io_uring/net.h
-index 49f9a7bc1113..52bfee05f06a 100644
---- a/io_uring/net.h
-+++ b/io_uring/net.h
-@@ -52,6 +52,9 @@ void io_send_zc_cleanup(struct io_kiocb *req);
- int io_bind_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe);
- int io_bind(struct io_kiocb *req, unsigned int issue_flags);
- 
-+int io_listen_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe);
-+int io_listen(struct io_kiocb *req, unsigned int issue_flags);
-+
- void io_netmsg_cache_free(const void *entry);
- #else
- static inline void io_netmsg_cache_free(const void *entry)
-diff --git a/io_uring/opdef.c b/io_uring/opdef.c
-index 19ee9445f024..7d5c51fb8e6e 100644
---- a/io_uring/opdef.c
-+++ b/io_uring/opdef.c
-@@ -503,6 +503,16 @@ const struct io_issue_def io_issue_defs[] = {
- 		.async_size		= sizeof(struct io_async_msghdr),
- #else
- 		.prep			= io_eopnotsupp_prep,
-+#endif
-+	},
-+	[IORING_OP_LISTEN] = {
-+#if defined(CONFIG_NET)
-+		.needs_file		= 1,
-+		.prep			= io_listen_prep,
-+		.issue			= io_listen,
-+		.async_size		= sizeof(struct io_async_msghdr),
-+#else
-+		.prep			= io_eopnotsupp_prep,
- #endif
- 	},
- };
-@@ -724,6 +734,9 @@ const struct io_cold_def io_cold_defs[] = {
- 	[IORING_OP_BIND] = {
- 		.name			= "BIND",
- 	},
-+	[IORING_OP_LISTEN] = {
-+		.name			= "LISTEN",
-+	},
- };
- 
- const char *io_uring_get_opcode(u8 opcode)
--- 
-2.45.2
+nit: s/hw_stats_sync/hw_stat_sync/
 
+     Flagged by kernel-doc -none
+
+> + * @stats_lock: Lock for writing @hw_stats and @hw_last_counter
+> + * @stats_work: Work for reading the hardware statistics counters
+>   * @dma_err_task: Work structure to process Axi DMA errors
+>   * @tx_irq:	Axidma TX IRQ number
+>   * @rx_irq:	Axidma RX IRQ number
+> @@ -452,6 +525,7 @@ struct skbuf_dma_descriptor {
+>   * @coalesce_usec_rx:	IRQ coalesce delay for RX
+>   * @coalesce_count_tx:	Store the irq coalesce on TX side.
+>   * @coalesce_usec_tx:	IRQ coalesce delay for TX
+> + * @coalesce_usec_stats: Delay between hardware statistics refreshes
+>   * @use_dmaengine: flag to check dmaengine framework usage.
+>   * @tx_chan:	TX DMA channel.
+>   * @rx_chan:	RX DMA channel.
+> @@ -505,6 +579,12 @@ struct axienet_local {
+>  	u64_stats_t tx_bytes;
+>  	struct u64_stats_sync tx_stat_sync;
+>  
+> +	u32 hw_last_counter[STAT_COUNT];
+> +	u64_stats_t hw_stats[STAT_COUNT];
+> +	struct u64_stats_sync hw_stat_sync;
+> +	struct mutex stats_lock;
+> +	struct delayed_work stats_work;
+> +
+>  	struct work_struct dma_err_task;
+>  
+>  	int tx_irq;
+
+...
 
