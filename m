@@ -1,224 +1,297 @@
-Return-Path: <netdev+bounces-103620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0688B908CC9
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:56:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 220E6908CCF
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:57:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABEE2285024
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:56:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C15D1F26B5B
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:57:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40E6BA38;
-	Fri, 14 Jun 2024 13:56:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="dLfUj49/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 304C979CF;
+	Fri, 14 Jun 2024 13:57:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03olkn2057.outbound.protection.outlook.com [40.92.59.57])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15FABE65;
-	Fri, 14 Jun 2024 13:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.59.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718373360; cv=fail; b=gpkcIzoTo3Lrt2GheGa3mb3POlN1Dm5htcgHJRU0xa1IDszohdBg/bhtl7Zqa8cyv69kdoV9uODupUa7toiRuhzr+z7NGT5TRsNUoPE9+7r875pjSZ5dz2UaadCHNIG1cmYktzV6T9ORReCVHeoKid7LNbkYRYRheelZ2QSapjg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718373360; c=relaxed/simple;
-	bh=PbcR8chyGrvRobCuehcXslLl+Q50d6BejioPRAdAJOM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hJAIiv35YQLCeSdKUDHSYg7MVXggAS6GfYauyMxF616sgXMRa8V6Av7ZkZMahcJZIHpk5iVjSjCC2pkV2vMVe7g/EKJGAyYXFiqYr5a7HZ+e9BpM2vV+No+yRfcXBZCr5EhHQqhxVwS9ms6A6ZXrZCribfXqPOfMf/8VqE31DGg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=dLfUj49/; arc=fail smtp.client-ip=40.92.59.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E2DaS/H4saj1To0E2acGxi9jQxMWbt2h3MTmV8TzgP7IRyVGzFAEKdk7ar4yOec9XFsXvf3C7eAVDBJf+27cDiWizU7MZwIigGldJElLXEOc9hoIBgWrwGEcIuFHSwNyb/SIIOHFjyWytu34Ls7fjyNYsFq/5WbpXKyJDjG841ghaCncL5I8d9ymFL13b8yiVPflN+v8ogoHEjqzXNE18t8HfuLjwFftfDym8f52JQzRn/sSWOAHtoCsSi64ZO8YRzLvFAE4Qb6oEFWRRh5pC4xtRJrkFlbD5kHKSv7BJ4zS7dKSau/SzymB9vVqjJNyIf+aNIEIPTgXuBT60CkgZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Vbq4SBZ24qmRTbz8LqgCwYGwTDk8D5Sa4oWquQYwEhM=;
- b=SLlDDuglFE/1LZjte4Y48COo1ICmM1G8iWWGiIzpzhI6rC5zqfU4DQJG/NtVpngm5B8Y14ht9HB1TdrgkIcKBVkmFXcKDitK2B4cCanVzcHgv4BL3gxyc7auAhnMGawQPUos7dI7JtRvG7lWKZxHutM0eIowWYkHduUkyEyerW4T4ulbsHM6Fkiq+H6IXasVDXKwBxdBcAMQqc5EmupHT7/K1K6Elxwyzpl7NRWUls11GcEpZHYmr/JYfn39VoxyJ1zk/cz9GbmmRgbCDtwiaDWJtQOgciKaA/5yMrLffx4EN15769WAlr5qJ3qebdGp+K4UZ6TRkqxckSuvmhLzOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vbq4SBZ24qmRTbz8LqgCwYGwTDk8D5Sa4oWquQYwEhM=;
- b=dLfUj49/C5ACfMGcm2Rkvk1bXciMnwKmjzKs+MveUT+BPo1Sat3EHFQbdnNTFYpIYQ/m0MmMwtMBZm8DeAGjVJe2sdi4+oW463rfzL+EJzL/lJ7co5n1QzKn2pwiZw5jJRMyI+Cn7tlmLLnEFKquTEtZ7HU2ZZfBC1wt0BSAKfTncRDRM0SLrGSiWLjFsPdPimJlFaNfY0hGUeW6FY9+bKBjdOW24z6QFuCt1DrFwTCFA1aDa6Pd9osC5Jvomv3uGYLrG/WOhFsuEbEmKkWKLFP3ervGf28H3W8KqTBGv0kgxd4jMGqMQNH62zcP0Apvd/5B1xJWI0K3NPQh7bldyg==
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
- by PAXP194MB1469.EURP194.PROD.OUTLOOK.COM (2603:10a6:102:1a8::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.24; Fri, 14 Jun
- 2024 13:55:51 +0000
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::3d63:e123:2c2f:c930]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::3d63:e123:2c2f:c930%3]) with mapi id 15.20.7677.024; Fri, 14 Jun 2024
- 13:55:51 +0000
-From: Luigi Leonardi <luigi.leonardi@outlook.com>
-To: sgarzare@redhat.com,
-	edumazet@google.com,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	kvm@vger.kernel.org,
-	stefanha@redhat.com,
-	pabeni@redhat.com,
-	davem@davemloft.net
-Cc: Marco Pinna <marco.pinn95@gmail.com>,
-	Luigi Leonardi <luigi.leonardi@outlook.com>
-Subject: [PATCH net-next 2/2] vsock/virtio: avoid enqueue packets when work queue is empty
-Date: Fri, 14 Jun 2024 15:55:43 +0200
-Message-ID:
- <AS2P194MB21706E349197C1466937052C9AC22@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240614135543.31515-1-luigi.leonardi@outlook.com>
-References: <20240614135543.31515-1-luigi.leonardi@outlook.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [zmAx0oZ3aW9aLNZjpKtjFc1D5puwy8oS]
-X-ClientProxiedBy: MI0P293CA0015.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:44::8) To AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:20b:642::8)
-X-Microsoft-Original-Message-ID:
- <20240614135543.31515-3-luigi.leonardi@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BDC19D8AE
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 13:57:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718373441; cv=none; b=BncP6BH4wdgT7BPk0BaidpZw5z4XWJJne8FmBVgwVp0GLYXElHFtS0BcZLECalZY2rK1pMkwchy/Roabz8TWziqPJ3jHdqJ7uuiG3aHWsioWwDKE4KHyyJh2DCzVXhep22oQdJ6sAGMHehJZcgm2Aal2FoSJVXe/RdPiYjFNtok=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718373441; c=relaxed/simple;
+	bh=BYD8UOEU2vVnYti+IZtFPBfQoWeOOHaqqXqCOEEm9a4=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=R+j0WpP6o4jf+G4RiH7iJG6mNb9RG2wLEN0q/ShcIwmKhW0q2DjFe1f4U0KagXJMGVnkIzyilIE6F0UXGB0gy1s0lR3DbazIKgjOttQMpTsY8G0QBMqsnxDeJ+w/aFNsElXjZ5UbLHEt1eCVw0wWuaj6AD5yUFAnGZYVFd4NUW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-7e1fe2ba2e1so214560739f.3
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 06:57:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718373438; x=1718978238;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AKfSpRWCAohZXKFpcx5c8GbsuZPJk363sAvhcB7aaFk=;
+        b=Uizgc/f5pNLptnqvur2uOxmPjl9XkvtcFw3/gQnvislsx3Bm9sa3+64qv0WYgBT4K0
+         LBYMdlFCEERkGse0T+vVk2cR+6bDqi9UBL47Ca3P/o5ptF2O0vnlrNzZSoaxe9kEFC0H
+         WF5KGRZQYrup5EyhhfP5qPIdWMITwNkgOHP/4GtpeI/CoqjuNzKk99c5EG4gaIPrF6Lt
+         BQBgcxrRQVY85VqAObMs8LTULwiEGAouF182UWKmLc/sKLzTiicBaS+xHfNzTaIMq8Kq
+         UxWmQ/5+qzUqzKIr0jmkHeb8gXx4FlW8eHePo61+tEXsEKUOH/pKgW1u3mHgfatNiQ92
+         oLXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXo1SFxMxwzehG/9f+tdGwiy+RqSiM/kQ56atShdfdeaXqL4ff3hmcPy+xfeGA8zMYaMpvW0Jhe/olTA1tR4f4Wp1XhXRtV
+X-Gm-Message-State: AOJu0YzYjsTe4kNOZoSKMRwNqSAwkRgYrFPlzvBMKLtfN/RMrd6wbpV1
+	h4yJxAqpTL2K2y9GD5mE9hJ9WHgpTKUOkVJduZ9ZXgmaufwTp/SbemDE2sNA5YjC7R8cHB26VYg
+	VnO9RKKzKxEqztodfw04bEZ6RbIGUnyP0mQ5OJkZCmnoEuzR9GFCaeYc=
+X-Google-Smtp-Source: AGHT+IGun4W5Tjwq8Ryn2pfhvlBE3+obd/1fTziq7wxTty3KC22+aeEND9OHvCNW7ijYqKL8UNSkGSaV4yNuchci12SYaO5w11IE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|PAXP194MB1469:EE_
-X-MS-Office365-Filtering-Correlation-Id: 76ae548f-9d8b-46db-c92a-08dc8c79b3b9
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|461199025|3412199022|440099025|1710799023;
-X-Microsoft-Antispam-Message-Info:
-	WW/B1PvIk5+eqfQhx3R2kSqmMKWbQevi5x8gs1W3/3v/3NrEFRxD2ig37z7hTazVM2HqZizQKLNnLfQS8+ZOhVx/ZODmeNnqpwyIjddVTLqB3uVUR99KMHSHODY4syjMDpIouP5hAM9IGX9Tz50G7YX8+KYWMN9otMLm6N5f9I9yUQ0yfoqgG2qDs+vQ9MT8REdNFQrn8T7QSNLNnTdt1ylMF9zT+bPqNPrrG0tDA+Em0d1d0/iI5Xn1KbRVbzoFO9npNsfeM1a4ge9F0R6I/c7lBsqy4X8GIsLURSxi+sFHn+/vnV0/HaiNZ4ZWY+fotIWHOw+U7CG10XsZb1yfKLTt2YGjOTnjwwNo16PfirBzKTKyxnnd5nxOmkoyAzjbxHT2EEf4T/SlUfRbAoprtWo+ZFLVy5cJTvpvb0Aw3Lnv+GpNI/2XKxZsWWH5fsmFxrY0617zFBRWJF0oMD4aA7O7YbPecsse59AFQst2vHAzojwDbWGJ6qDLmi0mg1hng60Uo7c5gKXE6gwZaszUSBXR4eqiFsZjmkumusHsGbRizDy/s6k8GU1H5WXFyT9S/cBlcgGBP5Fz7pS2J7xzxVXO4ztG3E9Ggz9u7WY6fq5M5qNJTVxlvThMyLxNC/kU
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?38IOLlKAPMECLKOWiFCXC/SnZAHV6noRMaF1OMct1BM9BEK55wniP5uzjmYd?=
- =?us-ascii?Q?7DQPghEZPFAzC8sHropJnPYBf+CG8arg76HB8UmHPGDlh6pkBoc/Xo1Sspk6?=
- =?us-ascii?Q?vqtce8CUZLGH6lJYzOpouRwURQMGKUNgx34TVcwlMufx8quHemUisL/ov/kb?=
- =?us-ascii?Q?fb8XOdjpEKABkfpt0dga5ZuItbWTPGAWi6HCuO7bWgIpoA5TtFoI8KSH8CW7?=
- =?us-ascii?Q?/PQJNTdndUVGli50j5flyL85ZcJ7mtkLdakS4x7lYfRfmKSaLZhYRsuI5wIP?=
- =?us-ascii?Q?2axe6bBI0oeYQQwaGT6QLl5/4b7ybI4+ALeFgl6xSVz8S/ZSl4ltRwBTVrSE?=
- =?us-ascii?Q?xDaMNpi5pRL31/rR4kVNIqbVWZQ8pwRVyfY5JI9g4YYKOM4AS4iGerkH6V5K?=
- =?us-ascii?Q?1stn6HaHv3fiw9geawr9dMptNNFThOx7HP5nqulhhAopw/dfBpTLu3yBxRmd?=
- =?us-ascii?Q?mD3nyeEuMYfmUAbN3BUic9Al1pimZys10RLsyt0iEY4vG0lrosRWqGfs58x8?=
- =?us-ascii?Q?bWloyzfe2IhuYf/m7uIjfYKA5LIgmCHbtE23Aur0bVRBpPCwOD3HUS63poeC?=
- =?us-ascii?Q?nBeSRWhpBmiZ3b2nuyfLRwolZCoxuVBBo0fZYjcDKvu4VuY/UeN4iDgAzQX7?=
- =?us-ascii?Q?LXVuOWol2Nw7Dn413pOCYWqOPV4X/uCysmjOc8IB6dQYrI/UvNxdvN7ACxLg?=
- =?us-ascii?Q?OndpO8sZqF+jzH+7jcNYzvI1Xx/I+h0iXQHGJp6zvzOsGSX/3UPXG5M+pgwk?=
- =?us-ascii?Q?OtIw2S9IB6r6vbCv3lIfphdfgsp6LXsleAWqO4JMhlJnIjZp5DX/bPL5Deky?=
- =?us-ascii?Q?GHZBV7zIbOKId4JUe9/CNkIraT+8oDo7Mw/cPKlQVdCJtYtUsD3ZDoLDtpga?=
- =?us-ascii?Q?SsKx3Tuf5spBQhdTuNDMjMjcNb/fxve8Y+qpl7ojrkwXDppELXkxPvu0kCzj?=
- =?us-ascii?Q?//4KFLCx9gN/OKgrQsCJxgLnEBlqwI42Yb/1LYTk1HPyyXXrRUrE/oQj83Ez?=
- =?us-ascii?Q?Esmz/cPLBN9GDKOypfsaBFWZMDWgL9QfF+Xv2mb2DvvxoW8poBwZTakFKmw+?=
- =?us-ascii?Q?lYQBJG8uu4opw6uIdqldUM2Uv9d2iRWWnMSANzZnUGVM6UPRseGCFPo2CqmM?=
- =?us-ascii?Q?Alvd1UI2RIPSIo4UXUXMZB55c5EQ8219GE+CSrMBbOuqj6Lg7Qfa7psfSkH2?=
- =?us-ascii?Q?aFY2Z8gK5xsBTeedydfh0ZAthGOXXae6M46vMVr8PrXI/Cs8ibFQroIO2Rmc?=
- =?us-ascii?Q?OzRba2sgKKapYxDj/V/S?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 76ae548f-9d8b-46db-c92a-08dc8c79b3b9
-X-MS-Exchange-CrossTenant-AuthSource: AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2024 13:55:51.5906
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXP194MB1469
+X-Received: by 2002:a05:6e02:194d:b0:375:dad7:a664 with SMTP id
+ e9e14a558f8ab-375e1036551mr1968155ab.6.1718373438558; Fri, 14 Jun 2024
+ 06:57:18 -0700 (PDT)
+Date: Fri, 14 Jun 2024 06:57:18 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000065a682061ad9fe42@google.com>
+Subject: [syzbot] [net?] KASAN: slab-out-of-bounds Read in mini_qdisc_pair_swap
+From: syzbot <syzbot+f243d5f2675d3151439a@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com, 
+	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Marco Pinna <marco.pinn95@gmail.com>
+Hello,
 
-This introduces an optimization in virtio_transport_send_pkt:
-when the work queue (send_pkt_queue) is empty the packet is
-put directly in the virtqueue reducing latency.
+syzbot found the following issue on:
 
-In the following benchmark (pingpong mode) the host sends
-a payload to the guest and waits for the same payload back.
+HEAD commit:    707081b61156 Merge branch 'for-next/core', remote-tracking..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=149601f1180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=caeac3f3565b057a
+dashboard link: https://syzkaller.appspot.com/bug?extid=f243d5f2675d3151439a
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
 
-Tool: Fio version 3.37-56
-Env: Phys host + L1 Guest
-Payload: 4k
-Runtime-per-test: 50s
-Mode: pingpong (h-g-h)
-Test runs: 50
-Type: SOCK_STREAM
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Before (Linux 6.8.11)
-------
-mean(1st percentile):     722.45 ns
-mean(overall):           1686.23 ns
-mean(99th percentile):  35379.27 ns
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6cad68bf7532/disk-707081b6.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1a27e5400778/vmlinux-707081b6.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/67dfc53755d0/Image-707081b6.gz.xz
 
-After
-------
-mean(1st percentile):     602.62 ns
-mean(overall):           1248.83 ns
-mean(99th percentile):  17557.33 ns
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f243d5f2675d3151439a@syzkaller.appspotmail.com
 
-Co-developed-by: Luigi Leonardi <luigi.leonardi@outlook.com>
-Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
-Signed-off-by: Marco Pinna <marco.pinn95@gmail.com>
+==================================================================
+BUG: KASAN: slab-out-of-bounds in mini_qdisc_pair_swap+0x68/0x164 net/sched/sch_generic.c:1557
+Read of size 8 at addr ffff00018c4b9000 by task kworker/u4:6/261
+
+CPU: 1 PID: 261 Comm: kworker/u4:6 Not tainted 6.8.0-rc7-syzkaller-g707081b61156 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+Workqueue: netns cleanup_net
+Call trace:
+ dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:291
+ show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:298
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd0/0x124 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x178/0x518 mm/kasan/report.c:488
+ kasan_report+0xd8/0x138 mm/kasan/report.c:601
+ __asan_report_load8_noabort+0x20/0x2c mm/kasan/report_generic.c:381
+ mini_qdisc_pair_swap+0x68/0x164 net/sched/sch_generic.c:1557
+ clsact_chain_head_change+0x28/0x38 net/sched/sch_ingress.c:60
+ tcf_chain_head_change_item net/sched/cls_api.c:493 [inline]
+ tcf_chain0_head_change_cb_del+0x1e0/0x2d8 net/sched/cls_api.c:940
+ tcf_block_put_ext+0xfc/0x33c net/sched/cls_api.c:1529
+ clsact_destroy+0x1fc/0x790 net/sched/sch_ingress.c:300
+ __qdisc_destroy+0x160/0x4b8 net/sched/sch_generic.c:1067
+ qdisc_put net/sched/sch_generic.c:1094 [inline]
+ shutdown_scheduler_queue+0x168/0x200 net/sched/sch_generic.c:1147
+ dev_shutdown+0x244/0x480 net/sched/sch_generic.c:1481
+ unregister_netdevice_many_notify+0x7f4/0x17b8 net/core/dev.c:11073
+ unregister_netdevice_many net/core/dev.c:11139 [inline]
+ default_device_exit_batch+0xa1c/0xa9c net/core/dev.c:11619
+ ops_exit_list net/core/net_namespace.c:175 [inline]
+ cleanup_net+0x5dc/0x8d0 net/core/net_namespace.c:618
+ process_one_work+0x694/0x1204 kernel/workqueue.c:2633
+ process_scheduled_works kernel/workqueue.c:2706 [inline]
+ worker_thread+0x938/0xef4 kernel/workqueue.c:2787
+ kthread+0x288/0x310 kernel/kthread.c:388
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
+
+Allocated by task 5782:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x40/0x78 mm/kasan/common.c:68
+ kasan_save_alloc_info+0x40/0x50 mm/kasan/generic.c:575
+ poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
+ __kasan_kmalloc+0xac/0xc4 mm/kasan/common.c:387
+ kasan_kmalloc include/linux/kasan.h:211 [inline]
+ kmalloc_trace+0x26c/0x49c mm/slub.c:4012
+ kmalloc include/linux/slab.h:590 [inline]
+ kzalloc include/linux/slab.h:711 [inline]
+ uevent_show+0x160/0x320 drivers/base/core.c:2656
+ dev_attr_show+0x60/0xcc drivers/base/core.c:2364
+ sysfs_kf_seq_show+0x2d0/0x43c fs/sysfs/file.c:59
+ kernfs_seq_show+0x150/0x1fc fs/kernfs/file.c:205
+ seq_read_iter+0x3e0/0xc44 fs/seq_file.c:230
+ kernfs_fop_read_iter+0x144/0x5c8 fs/kernfs/file.c:279
+ call_read_iter include/linux/fs.h:2081 [inline]
+ new_sync_read fs/read_write.c:395 [inline]
+ vfs_read+0x78c/0x954 fs/read_write.c:476
+ ksys_read+0x15c/0x26c fs/read_write.c:619
+ __do_sys_read fs/read_write.c:629 [inline]
+ __se_sys_read fs/read_write.c:627 [inline]
+ __arm64_sys_read+0x7c/0x90 fs/read_write.c:627
+ __invoke_syscall arch/arm64/kernel/syscall.c:34 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:48
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:133
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:152
+ el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
+ el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+
+Freed by task 5782:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x40/0x78 mm/kasan/common.c:68
+ kasan_save_free_info+0x54/0x6c mm/kasan/generic.c:589
+ poison_slab_object+0x124/0x18c mm/kasan/common.c:240
+ __kasan_slab_free+0x3c/0x70 mm/kasan/common.c:256
+ kasan_slab_free include/linux/kasan.h:184 [inline]
+ slab_free_hook mm/slub.c:2121 [inline]
+ slab_free mm/slub.c:4299 [inline]
+ kfree+0x144/0x3cc mm/slub.c:4409
+ uevent_show+0x1c8/0x320 drivers/base/core.c:2669
+ dev_attr_show+0x60/0xcc drivers/base/core.c:2364
+ sysfs_kf_seq_show+0x2d0/0x43c fs/sysfs/file.c:59
+ kernfs_seq_show+0x150/0x1fc fs/kernfs/file.c:205
+ seq_read_iter+0x3e0/0xc44 fs/seq_file.c:230
+ kernfs_fop_read_iter+0x144/0x5c8 fs/kernfs/file.c:279
+ call_read_iter include/linux/fs.h:2081 [inline]
+ new_sync_read fs/read_write.c:395 [inline]
+ vfs_read+0x78c/0x954 fs/read_write.c:476
+ ksys_read+0x15c/0x26c fs/read_write.c:619
+ __do_sys_read fs/read_write.c:629 [inline]
+ __se_sys_read fs/read_write.c:627 [inline]
+ __arm64_sys_read+0x7c/0x90 fs/read_write.c:627
+ __invoke_syscall arch/arm64/kernel/syscall.c:34 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:48
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:133
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:152
+ el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
+ el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+
+The buggy address belongs to the object at ffff00018c4b8000
+ which belongs to the cache kmalloc-4k of size 4096
+The buggy address is located 0 bytes to the right of
+ allocated 4096-byte region [ffff00018c4b8000, ffff00018c4b9000)
+
+The buggy address belongs to the physical page:
+page:000000000267b9c9 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1cc4b8
+head:000000000267b9c9 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0x5ffc00000000840(slab|head|node=0|zone=2|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 05ffc00000000840 ffff0000c0002140 fffffdffc6008a00 dead000000000002
+raw: 0000000000000000 0000000000040004 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff00018c4b8f00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff00018c4b8f80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff00018c4b9000: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+                   ^
+ ffff00018c4b9080: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff00018c4b9100: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
+Unable to handle kernel paging request at virtual address e0d5c054000002d6
+KASAN: maybe wild-memory-access in range [0x06b202a0000016b0-0x06b202a0000016b7]
+Mem abort info:
+  ESR = 0x0000000096000004
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x04: level 0 translation fault
+Data abort info:
+  ISV = 0, ISS = 0x00000004, ISS2 = 0x00000000
+  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+[e0d5c054000002d6] address between user and kernel address ranges
+Internal error: Oops: 0000000096000004 [#1] PREEMPT SMP
+Modules linked in:
+CPU: 1 PID: 261 Comm: kworker/u4:6 Tainted: G    B              6.8.0-rc7-syzkaller-g707081b61156 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+Workqueue: netns cleanup_net
+pstate: 00400005 (nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : mini_qdisc_pair_swap+0x130/0x164 net/sched/sch_generic.c:1585
+lr : mini_qdisc_pair_swap+0x124/0x164 net/sched/sch_generic.c:1585
+sp : ffff800097bb74e0
+x29: ffff800097bb74e0 x28: 1fffe00018f4985c x27: ffff800089180b74
+x26: 1fffe00018f4986c x25: 06b202a000001696 x24: dfff800000000000
+x23: 1fffe00031897200 x22: ffff00018c4b9000 x21: ffff0000c7a4c310
+x20: 00000000000170f0 x19: 06b202a0000016b6 x18: 1fffe00036804396
+x17: ffff80008ec9d000 x16: ffff800080276f8c x15: 0000000000000001
+x14: 1ffff00011dcf390 x13: 0000000000000000 x12: 0000000000000000
+x11: 0000000000000001 x10: 0000000000000000 x9 : 1fffe00018b89781
+x8 : 00d64054000002d6 x7 : 1fffe00036804397 x6 : ffff8000803be9e4
+x5 : 0000000000000000 x4 : 0000000000000001 x3 : 0000000000000000
+x2 : ffff0000c5c4bc00 x1 : 0000000000000000 x0 : 00000000000170f0
+Call trace:
+ mini_qdisc_pair_swap+0x130/0x164 net/sched/sch_generic.c:1585
+ clsact_chain_head_change+0x28/0x38 net/sched/sch_ingress.c:60
+ tcf_chain_head_change_item net/sched/cls_api.c:493 [inline]
+ tcf_chain0_head_change_cb_del+0x1e0/0x2d8 net/sched/cls_api.c:940
+ tcf_block_put_ext+0xfc/0x33c net/sched/cls_api.c:1529
+ clsact_destroy+0x1fc/0x790 net/sched/sch_ingress.c:300
+ __qdisc_destroy+0x160/0x4b8 net/sched/sch_generic.c:1067
+ qdisc_put net/sched/sch_generic.c:1094 [inline]
+ shutdown_scheduler_queue+0x168/0x200 net/sched/sch_generic.c:1147
+ dev_shutdown+0x244/0x480 net/sched/sch_generic.c:1481
+ unregister_netdevice_many_notify+0x7f4/0x17b8 net/core/dev.c:11073
+ unregister_netdevice_many net/core/dev.c:11139 [inline]
+ default_device_exit_batch+0xa1c/0xa9c net/core/dev.c:11619
+ ops_exit_list net/core/net_namespace.c:175 [inline]
+ cleanup_net+0x5dc/0x8d0 net/core/net_namespace.c:618
+ process_one_work+0x694/0x1204 kernel/workqueue.c:2633
+ process_scheduled_works kernel/workqueue.c:2706 [inline]
+ worker_thread+0x938/0xef4 kernel/workqueue.c:2787
+ kthread+0x288/0x310 kernel/kthread.c:388
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
+Code: 97b951d7 91008333 aa0003f4 d343fe68 (38786908) 
+---[ end trace 0000000000000000 ]---
+----------------
+Code disassembly (best guess):
+   0:	97b951d7 	bl	0xfffffffffee5475c
+   4:	91008333 	add	x19, x25, #0x20
+   8:	aa0003f4 	mov	x20, x0
+   c:	d343fe68 	lsr	x8, x19, #3
+* 10:	38786908 	ldrb	w8, [x8, x24] <-- trapping instruction
+
+
 ---
- net/vmw_vsock/virtio_transport.c | 32 ++++++++++++++++++++++++++++++--
- 1 file changed, 30 insertions(+), 2 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index c930235ecaec..e89bf87282b2 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -214,7 +214,9 @@ virtio_transport_send_pkt(struct sk_buff *skb)
- {
- 	struct virtio_vsock_hdr *hdr;
- 	struct virtio_vsock *vsock;
-+	bool use_worker = true;
- 	int len = skb->len;
-+	int ret = -1;
- 
- 	hdr = virtio_vsock_hdr(skb);
- 
-@@ -235,8 +237,34 @@ virtio_transport_send_pkt(struct sk_buff *skb)
- 	if (virtio_vsock_skb_reply(skb))
- 		atomic_inc(&vsock->queued_replies);
- 
--	virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
--	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
-+	/* If the send_pkt_queue is empty there is no need to enqueue the packet.
-+	 * Just put it on the ringbuff using virtio_transport_send_skb.
-+	 */
-+
-+	if (skb_queue_empty_lockless(&vsock->send_pkt_queue)) {
-+		bool restart_rx = false;
-+		struct virtqueue *vq;
-+
-+		mutex_lock(&vsock->tx_lock);
-+
-+		vq = vsock->vqs[VSOCK_VQ_TX];
-+
-+		ret = virtio_transport_send_skb(skb, vq, vsock, &restart_rx);
-+		if (ret == 0) {
-+			use_worker = false;
-+			virtqueue_kick(vq);
-+		}
-+
-+		mutex_unlock(&vsock->tx_lock);
-+
-+		if (restart_rx)
-+			queue_work(virtio_vsock_workqueue, &vsock->rx_work);
-+	}
-+
-+	if (use_worker) {
-+		virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
-+		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
-+	}
- 
- out_rcu:
- 	rcu_read_unlock();
--- 
-2.45.2
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
