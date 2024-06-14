@@ -1,98 +1,107 @@
-Return-Path: <netdev+bounces-103645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECC97908DE4
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:52:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2807C908E3A
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:10:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C528288688
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 14:52:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C39E328D6AF
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 379D8C121;
-	Fri, 14 Jun 2024 14:52:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E1916D31C;
+	Fri, 14 Jun 2024 15:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VYkIX0+B"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="m+GJT4R1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F5EBE65
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 14:52:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B851116C438;
+	Fri, 14 Jun 2024 15:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718376763; cv=none; b=Olkwr0xaGxi7Z65GFglW4pDhBlz6/yXjWlKA3fLjMLAoIxpY+ffk1K4b70K6xUx1x6xBeHKi/wYS8z2bbCro9tPh+V4zj8m+K0lLex/WzVC0ixw1fs89eD8dFEG/XOk6cXlWBkcRU0ZxxiZL3u/2GwP0nuO9R3GQ3TMOfQ+p9gs=
+	t=1718377582; cv=none; b=WyDg/4bfFLcpwsUh+kNuh3cNEkQPymPOJJ/0P/OP5sQsdnz0mk3PuIedBbXz89KtT9AYllnC40lsvPHo2xQp0ENqvTTEg8lrduUhc99jY0hu4Y2yrFjMzfMDl2dIeglIaBfUaJyN9EUIAASviJm8KUShgB/zx1HKm1gn9as/uOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718376763; c=relaxed/simple;
-	bh=rGIR/8k9eXv/gnpx3GqoAphOuvDbdQ/Y3p6Ynj9I6G8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tgsTBYzZ/y8sOPyhciHs2V1c1PqYENaRDBiHqJeJHCq2dL2Uh6TKOINNIKm1c/ZYd4Bi6XOLuJp+pN+YJOaAkIfE9y0hrlRRi4zDaBWlEeCaMaz2PyH+sh1yFd+/CMUVn0/MxfD4oKdbMnegsidKOYTsrM7Y2DKOrdwZnkAbx2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VYkIX0+B; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718376760;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=w3Tj40xdXz1V8iDRdZxj++51q//lWoAPJZZ30wVGOuE=;
-	b=VYkIX0+Bken7H41j/8C2/kwUtFMEXTWIWLaXbwOZPr52HNtAV4u34q64jynWhX3AotYOc6
-	xxJn6yciizgsNWBbkJcFbLkAgChJ262mypG16thYOgExpyIkWGGjdcy5c11UpcZarMnANe
-	+LwAttgjUAHhFZFpC8Kgu2MpZipG568=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-116-BtliFC6RPKmv5vHt8N8GMA-1; Fri,
- 14 Jun 2024 10:52:37 -0400
-X-MC-Unique: BtliFC6RPKmv5vHt8N8GMA-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C1F8619560B0;
-	Fri, 14 Jun 2024 14:52:35 +0000 (UTC)
-Received: from fedora-x1.redhat.com (unknown [10.22.18.62])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 75E923000219;
-	Fri, 14 Jun 2024 14:52:34 +0000 (UTC)
-From: Kamal Heib <kheib@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kamal Heib <kheib@redhat.com>
-Subject: [PATCH net-next] net: sun3lance: Remove redundant assignment
-Date: Fri, 14 Jun 2024 10:52:31 -0400
-Message-ID: <20240614145231.13322-1-kheib@redhat.com>
+	s=arc-20240116; t=1718377582; c=relaxed/simple;
+	bh=34ohSfG/19qWn2etFbhp9iM+FQgkPY8fkgZFPwCTa0Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sg6NSQzEgGUiAummkXLjxRuwo6FqdsO7Llxrg41vr95nxA6xBYa1vskSTXS4kbpIQrFYAN+gzINRYmvIVR2Fecf0mTj7cRYXwFDKC0fZ00LnOEY4qV7Bb3vgp02y44qPR9YI/PKmyQFX8efIbVNmoL9+Jcv8DrxVcM10r4oTrvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=m+GJT4R1; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=TPWeQET4FCKXxDGX1xF4koHOa0ZvF4mNa6FEu8k1Afo=; b=m+GJT4R19N7iFPs+QEnUVDnoI0
+	QHj72LwHtAWCxFgRBHh5R2WW82+URvw6y6pjl4wJbX0yFQm22cJ0E7T7bDP6z6a/lvOwppc2+VNSm
+	w+JaUFORMm0qz65yJb7Oz6Fl2sBeranqE4qXNYEkkEyjlCtgqcx8HS1NyL+xbDNjw+gcf1VzKemNI
+	DxOQXGeSiNbDiCgOsOySVd57JvCi4Zn5P90UxzxH+PfaiL0ZHNjk/Lqjpp5R1ZlQ8qF19Q385AlQK
+	XgtjDh1i44L19MjE/6dYtlJOXtc0uV5Vcps5tiLjMeSLhpqKysqVZ8+dPibjtUF7h/gNDP++aYeY1
+	iLQOJq9g==;
+Received: from [50.53.4.147] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sI8VM-000000039lw-476j;
+	Fri, 14 Jun 2024 15:06:17 +0000
+Message-ID: <cb3613ed-210f-4fd2-bca3-28542c1b961c@infradead.org>
+Date: Fri, 14 Jun 2024 08:06:12 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Documentation: Remove "ltpc=" from the
+ kernel-parameters.txt
+To: Thomas Huth <thuth@redhat.com>, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
+References: <20240614084633.560069-1-thuth@redhat.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20240614084633.560069-1-thuth@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-There is no point in initializing an ndo to NULL, therefore the
-assignment is redundant and can be removed.
 
-Signed-off-by: Kamal Heib <kheib@redhat.com>
----
- drivers/net/ethernet/amd/sun3lance.c | 1 -
- 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/amd/sun3lance.c b/drivers/net/ethernet/amd/sun3lance.c
-index 246f34c43765..fe12051d8471 100644
---- a/drivers/net/ethernet/amd/sun3lance.c
-+++ b/drivers/net/ethernet/amd/sun3lance.c
-@@ -296,7 +296,6 @@ static const struct net_device_ops lance_netdev_ops = {
- 	.ndo_stop		= lance_close,
- 	.ndo_start_xmit		= lance_start_xmit,
- 	.ndo_set_rx_mode	= set_multicast_list,
--	.ndo_set_mac_address	= NULL,
- 	.ndo_validate_addr	= eth_validate_addr,
- };
- 
+On 6/14/24 1:46 AM, Thomas Huth wrote:
+> The string "ltpc" cannot be found in the source code anymore. This
+> kernel parameter likely belonged to the LocalTalk PC card module
+> which has been removed in commit 03dcb90dbf62 ("net: appletalk:
+> remove Apple/Farallon LocalTalk PC support"), so we should remove
+> it from kernel-parameters.txt now, too.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+
+Thanks.
+
+> ---
+>  Documentation/admin-guide/kernel-parameters.txt | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index 423427bf6e49..a9b905bbc8ca 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -3184,9 +3184,6 @@
+>  			unlikely, in the extreme case this might damage your
+>  			hardware.
+>  
+> -	ltpc=		[NET]
+> -			Format: <io>,<irq>,<dma>
+> -
+>  	lsm.debug	[SECURITY] Enable LSM initialization debugging output.
+>  
+>  	lsm=lsm1,...,lsmN
+
 -- 
-2.45.2
-
+~Randy
 
