@@ -1,88 +1,82 @@
-Return-Path: <netdev+bounces-103709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E84949092D2
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 21:10:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 314B99092F7
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 21:34:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92D601F257A2
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 19:10:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5506B1C228DC
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 19:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F681A38C2;
-	Fri, 14 Jun 2024 19:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31671A38E7;
+	Fri, 14 Jun 2024 19:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="GMMByZxo"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Piy7/8cY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF8841A01C5;
-	Fri, 14 Jun 2024 19:10:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC8D26AD7;
+	Fri, 14 Jun 2024 19:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718392237; cv=none; b=T1gFQ/4GPcz363WmXM23aWE9Pnvd1OkeELjr3j2LY+s29qnrMvzJ8mRkqe8dgA1SncOF2zR0g7401Yi1D9zFGvVtnYESy1iK6IqsfkYnM6stFiOWH8LZj60gcT2DudfFofhegWOA2RbFHc8EGZIubBRvTCJFCRzGeR1TklPQhTs=
+	t=1718393638; cv=none; b=dl+pCGeNQ2hQSLtgfDQar0YVr9tBn9Xoz2YTqbNxPUcjA5EyTrRwu28myy0oAxeTQPeEPS22PYLNrJfmvyLvdkP9gO7iYohkokIA9Pc4bp+o5prIwXozRfeY3lEfzN2eIHPNb4JzWvQH3afgsMAzTOG61BJ7TsQuZkdpAhpevJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718392237; c=relaxed/simple;
-	bh=/McNpSiwC81uTiinpfWk+KdIlSVxE/p1HFilAYM2544=;
+	s=arc-20240116; t=1718393638; c=relaxed/simple;
+	bh=un2DKs68DVerlXBeKlpV6w20TzStZ/MgihGnCdsi2EU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VwxSKIV3S1B9gyTMBSdmUQITl7VcTmKtJ39Vj8+9dAxtClJzeL4AtsrGVwVuAlW2csTYfu+6WzEcnx/CbTi1ugpNqzYTHjBMxyvbavtd621Rf/HfWjoQsWRUawpR41icwG0cd+MYqPxzLSsQHy4l/MKdswFi5lruxm6+zeD5bow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=GMMByZxo; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 48A8B40E019F;
-	Fri, 14 Jun 2024 19:10:33 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id B5wNnYZxtOcc; Fri, 14 Jun 2024 19:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1718392229; bh=YHoeX2aqNxFOwawwQ+u5gyShZuN1d3XKK09wgoJEq6M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GMMByZxogyqO6iERv7yE9B7Z+yBq6IlzYQqdEj+amC/+SOkkItb2DuZlWjCQQ1A6s
-	 4j1l3t+xWiBaOYtb1Al3DKaXwLYbfyEbq6vBOtibH3OjF/V7yrzolInVRgYc6AMYy1
-	 BPfOWGzHMmCGjmKpE0fwq2kvxt7ITrQ/CDLbpRlMGaITjvpc+cooDPh4hjbqbMARrc
-	 T4DqEw1jIwN+zP3q3iz6jK8lSCUkBVd4JFPnoznFFEx6V6rgfTNHC1Ya6hHOUYGerP
-	 Q57jaD74y8ePgm4lOTLR9TCHMjDaPmM9uRYgNmLuU2eqAARF8vX616Ujz3wAGfTyLK
-	 E5TZmCp7aCUmazqXGtQAwE+0xxALHZCoDv6pF+a2uN51Q4JxwqAoDfQkYnKnmIFS9l
-	 JbITCJLj6U7tSyrhVqRPatVQdvVLoBchGuxljqYuJp/zNW1N/n4Tyl8JZ69yyB8x6X
-	 y7ExtB5sc/1Hloa/p/JGAzXdGa1U1IPFlhzn+MEU+X3B9NhLEA+LwX3NZkWNOD9Tgx
-	 8jPMEICeHzymu5qZSHKHGkpJgHRXvfor9d6MR4pvbBpgpuLFWoDj0Aug+D84BzZaRp
-	 WveoTopHFukaDU9dgrasYcIpVsvYEHREkHgYfbe7KMFFdmpwiyvBPlihqjieXCpD+g
-	 kAdmvYhHy+8dVwGMXIAmsTHo=
-Received: from zn.tnic (p5de8ee85.dip0.t-ipconnect.de [93.232.238.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6B90C40E00C9;
-	Fri, 14 Jun 2024 19:10:02 +0000 (UTC)
-Date: Fri, 14 Jun 2024 21:09:56 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Cc: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, hpa@zytor.com,
-	dave.hansen@linux.intel.com, mingo@redhat.com, tglx@linutronix.de,
-	x86@kernel.org, netdev@vger.kernel.org, richardcochran@gmail.com,
-	linux-input@vger.kernel.org, dmitry.torokhov@gmail.com,
-	zackr@vmware.com, linux-graphics-maintainer@vmware.com,
-	pv-drivers@vmware.com, timothym@vmware.com, akaher@vmware.com,
-	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
-	tzimmermann@suse.de, mripard@kernel.org,
-	maarten.lankhorst@linux.intel.com, horms@kernel.org,
-	kirill.shutemov@linux.intel.com,
-	Tim Merrifield <tim.merrifield@broadcom.com>
-Subject: Re: [PATCH v11 8/8] x86/vmware: Add TDX hypercall support
-Message-ID: <20240614190956.GFZmyVhLGeyLjwvA6X@fat_crate.local>
-References: <20240613191650.9913-1-alexey.makhalov@broadcom.com>
- <20240613191650.9913-9-alexey.makhalov@broadcom.com>
- <844ef200-aabe-4497-85c9-44fc46c9133a@intel.com>
- <20240614161404.GCZmxsTNLSoYTqoRoj@fat_crate.local>
- <74f8300b-3520-4824-81e3-71464e3da3b6@intel.com>
- <1750e44f-f9a9-4c2a-afb3-f1ae8237ccb0@broadcom.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=A5O4zg/6E5qHVKs3c8INeozn/yCj0lrM3OGaEMV7P0Y+0O6D3bR5gNgd0fArTmglhgLXkhnUt9aaXO5/h15zYzD7wXiR0UN589jbazD6q4dym9gA+Vto8AlS7sSREOCzwnnHCyWpZbIV1PVG7l0ghBlmbsBxDjKYnTtbJPzKCQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=Piy7/8cY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF8CBC2BD10;
+	Fri, 14 Jun 2024 19:33:55 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Piy7/8cY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1718393634;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DXA9wvv5IhNhdgqqoog09hrS0W28PIbc3nCXFgq2mxA=;
+	b=Piy7/8cYE5kX8QxCb1ovvf7Oew+mzdXJL4F6If9Frkz4X0RUzqFF12WjwrhUhRlUy+iIKO
+	DoV+j//Avs/4vzAsOjkSD1yxY/bbFo9eXQkn/oEw9txGMiy9XDfptZ5hiqtMHXpzOrUrXv
+	cPfOpW6hB2UusbVHO75CZUsDVUtb8kw=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6d22401f (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Fri, 14 Jun 2024 19:33:52 +0000 (UTC)
+Date: Fri, 14 Jun 2024 21:33:45 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Uladzislau Rezki <urezki@gmail.com>
+Cc: "Paul E. McKenney" <paulmck@kernel.org>,
+	Vlastimil Babka <vbabka@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <ZmybGZDbXkw7JTjc@zx2c4.com>
+References: <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
+ <ZmrfA1p2zSVIaYam@zx2c4.com>
+ <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
+ <Zmru7hhz8kPDPsyz@pc636>
+ <7efde25f-6af5-4a67-abea-b26732a8aca1@paulmck-laptop>
+ <Zmsuswo8OPIhY5KJ@pc636>
+ <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
+ <ZmszOd5idhf2Cb-v@pc636>
+ <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
+ <Zmw5FTX752g0vtlD@pc638.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,33 +85,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1750e44f-f9a9-4c2a-afb3-f1ae8237ccb0@broadcom.com>
+In-Reply-To: <Zmw5FTX752g0vtlD@pc638.lan>
 
-On Fri, Jun 14, 2024 at 11:32:16AM -0700, Alexey Makhalov wrote:
-> 
-> 
-> On 6/14/24 9:19 AM, Dave Hansen wrote:
-> > On 6/14/24 09:14, Borislav Petkov wrote:
-> > > On Fri, Jun 14, 2024 at 09:03:22AM -0700, Dave Hansen wrote:
-> > ...
-> > > > You need to zero out all of 'args' somehow.
-> > > 
-> > > You mean like this:
-> > > 
-> > > 	struct tdx_module_args args = {};
-> > > 
-> > > ?
-> > 
-> > Yes, or do all the assignments with the initializer.  We seem to do it
-> > both ways, so whatever works.
-> 
-> Thanks Dave for pointing that out. I missed that at v7.
+On Fri, Jun 14, 2024 at 02:35:33PM +0200, Uladzislau Rezki wrote:
+> +	/* Should a destroy process be deferred? */
+> +	if (s->flags & SLAB_DEFER_DESTROY) {
+> +		list_move_tail(&s->list, &slab_caches_defer_destroy);
+> +		schedule_delayed_work(&slab_caches_defer_destroy_work, HZ);
+> +		goto out_unlock;
+> +	}
 
-Ok, I'll fold this struct initialization oneliner into the last patch.
+Wouldn't it be smoother to have the actual kmem_cache_free() function
+check to see if it's been marked for destruction and the refcount is
+zero, rather than polling every one second? I mentioned this approach
+in: https://lore.kernel.org/all/Zmo9-YGraiCj5-MI@zx2c4.com/ -
 
--- 
-Regards/Gruss,
-    Boris.
+    I wonder if the right fix to this would be adding a `should_destroy`
+    boolean to kmem_cache, which kmem_cache_destroy() sets to true. And
+    then right after it checks `if (number_of_allocations == 0)
+    actually_destroy()`, and likewise on each kmem_cache_free(), it
+    could check `if (should_destroy && number_of_allocations == 0)
+    actually_destroy()`. 
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Jason
 
