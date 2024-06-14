@@ -1,153 +1,127 @@
-Return-Path: <netdev+bounces-103515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61AF5908642
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:26:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45646908647
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:28:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 171F01F215D4
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 08:26:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEA971F22693
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 08:28:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5CFF185087;
-	Fri, 14 Jun 2024 08:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5A4185087;
+	Fri, 14 Jun 2024 08:28:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fBeWzj5h"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="maj2hoIn";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="5hSzIfF4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDC018413A;
-	Fri, 14 Jun 2024 08:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD0B1836DE;
+	Fri, 14 Jun 2024 08:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718353564; cv=none; b=Cfo6joHXdFaT94feDMhs6hBngrnTPzgfwxSFbZeIAdT1e8pjOV3qpbeHvTqUyGD39plBnItpWP8Eq0n+0d35/Zy7DJPSTv4UU+GL1u5+5q0j4/+3ODEaU0HMfzJll48TjV1P5qZ1kRsgdo08I7d/t+eJD7fEYKS/57axW/H8sfY=
+	t=1718353692; cv=none; b=OejZWGD9DdEss+AXLITChL0GjZu900Lq1a6KqiWg7WIh4t7oCbHI41b6xG5UqOlAcONz+AHsQoBynOnRV58QdgMVXJqKtXQsOWHAkIxsNvnOBaE3tHpwIHqfAUmsIUVyFAKHPkZQxqnUCaYZllH3Y9o8w2JaaHxyxbt20Trocj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718353564; c=relaxed/simple;
-	bh=MnoDPn7esVk0izTPWWobr9ZqeVKg3ab/Yn7Gm5y+UBA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XGDrllbiki4i389Y6eYqjV4efzTyXeB3vIE4ZGoMGFC++DDsdBykoMBle2acsHscYU6g1/QVaKDY/PumzEwUqPpX8Nkt1MSatL69i4ElnN2j3DhJyVZf9Mvkoo99d3PBCTo/BNIFSqFvhWTP3CMwgbAmrshahXFY5o8/6cpsYBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fBeWzj5h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7CD0C2BD10;
-	Fri, 14 Jun 2024 08:26:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718353564;
-	bh=MnoDPn7esVk0izTPWWobr9ZqeVKg3ab/Yn7Gm5y+UBA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fBeWzj5hq3tKjt0bijmfdMota/lHKvhW0efUz66hSe2svOi0f6+vILbmBOo3SC+22
-	 BgdjjhWBGuKeGPaSV8X4j6igyXFUomfxm8pmjohHLUkduGdDsWNbn9iMdI41B8nx5c
-	 1p8JW8G0JSUgYzAiEEkngQfE1VjbtrDSFB+HJZslw81jXbSvYwcgfkD7fG4Ngjl4qP
-	 h3u3wQPFgUcL9DWZGX/MBv4bTh7SQDgPs95EJ0W91i6lMYkmt5qFMCuBKmbBUHx3NJ
-	 oFlgS+WwcDRHnQuTbjtVjRoOGMSEa9ULF50JRLiSP/kjZ9Bk44/xggVbDuY1iomnA6
-	 WHrOyNS/1gfeA==
-Date: Fri, 14 Jun 2024 10:25:58 +0200
-From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Chris Packham  <Chris.Packham@alliedtelesis.co.nz>, "andrew@lunn.ch"
- <andrew@lunn.ch>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
- "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "davem@davemloft.net"
- <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "ericwouds@gmail.com" <ericwouds@gmail.com>
-Subject: Re: [PATCH next-next] net: phy: realtek: add support for rtl8224
- 2.5Gbps PHY
-Message-ID: <20240614102558.32dcba79@dellmb>
-In-Reply-To: <fbf2be8d31579d1c9305fd961751fc6f0a4b4556.camel@redhat.com>
-References: <20240611053415.2111723-1-chris.packham@alliedtelesis.co.nz>
-	<c3d699a1-2f24-41c5-b0a7-65db025eedbc@alliedtelesis.co.nz>
-	<20240612090707.7da3fc01@dellmb>
-	<fbf2be8d31579d1c9305fd961751fc6f0a4b4556.camel@redhat.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1718353692; c=relaxed/simple;
+	bh=5y3JIRl5B8fTjGFCjViDuLr0cHXTRA4yiKCDgSZN1NI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VTyGFXPQg+kROBoOQ1+udMpz2cwqlCUSa2JA+CByz4ipeAYfUQtE25VD0EZKb85VaiKJkFEij+6bHyvb9kD9I5uyGM38v2BIZf2pzJQO5/fg67NIrtkv6VdVUlYlHERg6+dmUfK0SLdY0PKCqPvwSBKlBqn21rTR86R6GjU/178=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=maj2hoIn; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=5hSzIfF4; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Fri, 14 Jun 2024 10:27:58 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1718353680;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L3nKvveBbIdAVcomoyZQI6KphWn4AlPcGB27/+M6BDk=;
+	b=maj2hoIn4ulJag7Dw8dSiyVu8OHipxA/llSTfgfpS2gSsRxF2HK4wjf6a0dqFcF3DyyLdX
+	t2XLX1MN9BGC+FtR6rbVv3aSwGFWGcIETjaAAFlT8dBVpuYBDZkfzcxeHZ3gvl7sgiqmim
+	IIRoHPnnnyYMJFzrApetR2NjJEhoDQBgVFORMJBGK0IRJmGV6EHpvjAjvBojsrMOZxOGU/
+	GoXav+Jg828LyRBoPPNRFoPIOr8MESwr51QtLgR2TShBXdqFg6WPVCKGAOs2nC+1z/xREx
+	3mlRoddFN13R6OZqfBw700iBIqKDHoyHRtLhcPvO3tvfm1mLaLjgeLmT30qSqw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1718353680;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L3nKvveBbIdAVcomoyZQI6KphWn4AlPcGB27/+M6BDk=;
+	b=5hSzIfF4aLTdTYxEaqozQd2jH7+jZXJQfrFiItzikUfs1NXoNEyRIcu4b3IfQdmAIDNa+M
+	sSbDkT29lfPLuFDQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Daniel Bristot de Oliveira <bristot@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+	Ben Segall <bsegall@google.com>,
+	Daniel Bristot de Oliveira <bristot@redhat.com>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>
+Subject: Re: [PATCH v6 net-next 08/15] net: softnet_data: Make xmit.recursion
+ per task.
+Message-ID: <20240614082758.6pSMV3aq@linutronix.de>
+References: <20240612170303.3896084-1-bigeasy@linutronix.de>
+ <20240612170303.3896084-9-bigeasy@linutronix.de>
+ <20240612131829.2e33ca71@rorschach.local.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240612131829.2e33ca71@rorschach.local.home>
 
-On Fri, 14 Jun 2024 10:18:47 +0200
-Paolo Abeni <pabeni@redhat.com> wrote:
+On 2024-06-12 13:18:29 [-0400], Steven Rostedt wrote:
+> On Wed, 12 Jun 2024 18:44:34 +0200
+> Sebastian Andrzej Siewior <bigeasy@linutronix.de> wrote:
+> 
+> > Softirq is preemptible on PREEMPT_RT. Without a per-CPU lock in
+> > local_bh_disable() there is no guarantee that only one device is
+> > transmitting at a time.
+> > With preemption and multiple senders it is possible that the per-CPU
+> > recursion counter gets incremented by different threads and exceeds
+> > XMIT_RECURSION_LIMIT leading to a false positive recursion alert.
+> > 
+> > Instead of adding a lock to protect the per-CPU variable it is simpler
+> > to make the counter per-task. Sending and receiving skbs happens always
+> > in thread context anyway.
+> > 
+> > Having a lock to protected the per-CPU counter would block/ serialize two
+> > sending threads needlessly. It would also require a recursive lock to
+> > ensure that the owner can increment the counter further.
+> > 
+> > Make the recursion counter a task_struct member on PREEMPT_RT.
+> 
+> I'm curious to what would be the harm to using a per_task counter
+> instead of per_cpu outside of PREEMPT_RT. That way, we wouldn't have to
+> have the #ifdef.
 
-> On Wed, 2024-06-12 at 09:07 +0200, Marek Beh=C3=BAn wrote:
-> > On Tue, 11 Jun 2024 20:42:43 +0000
-> > Chris Packham <Chris.Packham@alliedtelesis.co.nz> wrote:
-> >  =20
-> > > +cc Eric W and Marek.
-> > >=20
-> > > On 11/06/24 17:34, Chris Packham wrote: =20
-> > > > The Realtek RTL8224 PHY is a 2.5Gbps capable PHY. It only uses the
-> > > > clause 45 MDIO interface and can leverage the support that has alre=
-ady
-> > > > been added for the other 822x PHYs.
-> > > >=20
-> > > > Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
-> > > > ---
-> > > >=20
-> > > > Notes:
-> > > >      I'm currently testing this on an older kernel because the boar=
-d I'm
-> > > >      using has a SOC/DSA switch that has a driver in openwrt for Li=
-nux 5.15.
-> > > >      I have tried to selectively back port the bits I need from the=
- other
-> > > >      rtl822x work so this should be all that is required for the rt=
-l8224.
-> > > >     =20
-> > > >      There's quite a lot that would need forward porting get a work=
-ing system
-> > > >      against a current kernel so hopefully this is small enough tha=
-t it can
-> > > >      land while I'm trying to figure out how to untangle all the ot=
-her bits.
-> > > >     =20
-> > > >      One thing that may appear lacking is the lack of rate_matching=
- support.
-> > > >      According to the documentation I have know the interface used =
-on the
-> > > >      RTL8224 is (q)uxsgmii so no rate matching is required. As I'm =
-still
-> > > >      trying to get things completely working that may change if I g=
-et new
-> > > >      information.
-> > > >=20
-> > > >   drivers/net/phy/realtek.c | 8 ++++++++
-> > > >   1 file changed, 8 insertions(+)
-> > > >=20
-> > > > diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-> > > > index 7ab41f95dae5..2174893c974f 100644
-> > > > --- a/drivers/net/phy/realtek.c
-> > > > +++ b/drivers/net/phy/realtek.c
-> > > > @@ -1317,6 +1317,14 @@ static struct phy_driver realtek_drvs[] =3D {
-> > > >   		.resume         =3D rtlgen_resume,
-> > > >   		.read_page      =3D rtl821x_read_page,
-> > > >   		.write_page     =3D rtl821x_write_page,
-> > > > +	}, {
-> > > > +		PHY_ID_MATCH_EXACT(0x001ccad0),
-> > > > +		.name		=3D "RTL8224 2.5Gbps PHY",
-> > > > +		.get_features   =3D rtl822x_c45_get_features,
-> > > > +		.config_aneg    =3D rtl822x_c45_config_aneg,
-> > > > +		.read_status    =3D rtl822x_c45_read_status,
-> > > > +		.suspend        =3D genphy_c45_pma_suspend,
-> > > > +		.resume         =3D rtlgen_c45_resume,
-> > > >   	}, {
-> > > >   		PHY_ID_MATCH_EXACT(0x001cc961),
-> > > >   		.name		=3D "RTL8366RB Gigabit Ethernet"   =20
-> >=20
-> > Don't you need rtl822xb_config_init for serdes configuration? =20
->=20
-> Marek, I read the above as you would prefer to have such support
-> included from the beginning, as such I'm looking forward a new version
-> of this patch.
->=20
-> Please raise a hand if I read too much in your reply.
+There should be a hole on !RT, too so we shouldn't gain weight. The
+limit is set to 8 so an u8 would be enough. The counter is only accessed
+with BH-disabled so it will be used only in one context since it can't
+schedule().
 
-I am raising my hand :) I just wanted to point it out.
-If this code works for Chris' hardware, it is okay even without the
-.config_init.
+I think it should work fine. netdev folks, you want me to remove that
+ifdef and use a per-Task counter unconditionally?
 
-Marek
+> -- Steve
+
+Sebastian
 
