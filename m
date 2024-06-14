@@ -1,110 +1,148 @@
-Return-Path: <netdev+bounces-103460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10CA2908347
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 07:22:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80773908351
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 07:28:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20BA91C212F9
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 05:21:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BDFF1C22190
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 05:28:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ABF013CF9E;
-	Fri, 14 Jun 2024 05:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B501F1474B1;
+	Fri, 14 Jun 2024 05:28:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bG3LGOmV"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B0F26ADE
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 05:21:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40635146D77;
+	Fri, 14 Jun 2024 05:28:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718342508; cv=none; b=N7LcZ3eqdOSFdgiOKngZbpmy4nVs9G5tLmnB+3v9ZDdN3racyPMfky130h5fVJiiGAgB1YSVPbWdphocCt+a+QuLRlOPckggCwg5KGiW6Ma5IRrBgbDTXIbe04THvBVrcSFFJ0J22T10QBboNOT8pJrHk0VENaOdvXIUlLS47Tk=
+	t=1718342930; cv=none; b=fYfgQPsT08pKyDRRVQ2sc85LKAur7s2Qhx/j06CUVkpT6rmAToLp7m9BN/OxXJz4bgbiGaA9y/pJNEfRKwRdK1+PUSF/hW4Ga2l6ggPr9viPnwgEYTbuBVgMEAGGqZw6hc6/moPiEi5RSL2sNscZUu85y3urwTkyyJt+yIlcc0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718342508; c=relaxed/simple;
-	bh=fKO/5zkOVclOdvCQkxPk3POF8YxQHXOsRIKmY0snq5s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AZM/c78OxIFEDZrjw/HqDoVQ0TmONyvnhoYfJwTeBGuK7r5yUSOfWmtR06semqlNYDbeG6lFpSAjq8tNAmaiah95z/dwJEmZiI+TYXEMfFAwYh2paIAY75BWkgFWkkP/+/qsGWukceqAbsCPVUTt5uR6uvDmTH6TWdSfdvfDqeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sHzNF-0007H8-Tv; Fri, 14 Jun 2024 07:21:17 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sHzND-002C5W-ON; Fri, 14 Jun 2024 07:21:15 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sHzND-00AKed-29;
-	Fri, 14 Jun 2024 07:21:15 +0200
-Date: Fri, 14 Jun 2024 07:21:15 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	stable@vger.kernel.org, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net v1 2/2] net: phy: dp83tg720: get initial master/slave
- configuration
-Message-ID: <ZmvTS9YI8LACJOND@pengutronix.de>
-References: <20240613183034.2407798-1-o.rempel@pengutronix.de>
- <20240613183034.2407798-2-o.rempel@pengutronix.de>
- <f88abfe3-a66c-4e65-b627-7adf7f04580f@lunn.ch>
+	s=arc-20240116; t=1718342930; c=relaxed/simple;
+	bh=4AYzeDRQoygv9tptn5empnF0ZSheTur+UeZr/as2jho=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eBABK2M2qDr35T2tvFqzkXjyKDCMpyA4CiA+kUF42gU3Sbj5VnxIXOM8NuXE4Bb4cfsKDgVMIxXozmNSWPncRuc5ryutGj0aI7gOsfOzEFp/3bNDwbBtuHU3xgP8GjjwD6sLQu+pfYPHGaWfCIGbxnPUnIWNT5iJcVI9O3IzpOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bG3LGOmV; arc=none smtp.client-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6f977acff19so827693a34.3;
+        Thu, 13 Jun 2024 22:28:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718342928; x=1718947728; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Dw/wpX2rAqV+uUeAuGGK7ciQ1Eeb9FNFDIAoWNVW3Fw=;
+        b=bG3LGOmVoQdDGaFhKm/+UlHVy3LJE33iAyyevQyZx4/E8vPHjfjzpp7tcA4siAr0cu
+         B6c3ZPt0fi+dwnWHIa355R2TEDh9/yuX7SwSWqjPBsrIaeOw4qov4sINlUTOFfeu9Wop
+         4fdveOzJQHit0RSGKJb5K8rqJWo0vRDE0rz89rOf08IS8Wk6fswCVeqx6U3xy27pXYn/
+         Xxwm4hkmE3GU5HsypdbGBbCTWaJQTDTi/37GWDlC3RZeVlJ9UxmMrU0zJtp2r3pPv5nT
+         0X+paXdXXRwLVCghiy/zwyvYBYH3iiPHdM+BhV7vpnBhPZ87kaXeItFjbm/+BFYgRAbM
+         lZhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718342928; x=1718947728;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dw/wpX2rAqV+uUeAuGGK7ciQ1Eeb9FNFDIAoWNVW3Fw=;
+        b=K5EiMeAeOKXBpBSZGQXk74xtqk7FtaWzjpHmnSvrx5FuHS9UsqmI6GNlzt7/xv2Jyk
+         LhDk+cLYmBf/sLMu4rlCXYFvDuwQ18Wk/xtE5IPewx4ihd3w1HOOQBgXBNSx3Zj0R/EK
+         E2b4O+pkbck3dw7SbMm5OgwZNuBRuyQnM/GGpkWJWkcd+zBBadbuoMcb1mgprJriCqFz
+         kv1C7Gnste46qSLuKbIiAEllQnO9f4m4BI3Tdum2H01FEfF1rjbzeJ8Gxeq0K5jeZgnh
+         CJclhC+elDbPSXSKdwSaLsTj5vdUfnE1Ia0RM1yC8fqyNstekjsN7VeErgP9YNMaLkl2
+         C+2A==
+X-Forwarded-Encrypted: i=1; AJvYcCVtTBWpfpsesr5Hg84/b4Yb78bUDy3XGG+4bjsR0/CXJsHROnT/+k2+ZWk/v/RGDQI6T4k/Ke6O3ytfOg+REQe9qli7kzV1WUg4wRlgxh/3wOxMz9I317o99EV8/SlYv/xoPHh1
+X-Gm-Message-State: AOJu0YyU4ZkM2d+i6dVvyU7ZQe9ke3y1eDDQ1BkKvvVDZlQJwDA2JUMv
+	DNIxASlsPpsQMoi/hbERurlglnEcV6rN3UvJfKBTdWkoDZKsteLT
+X-Google-Smtp-Source: AGHT+IHGmC3uIyBCAhuw0E+MosfhQS9mHFZU4B9Da80064YdPUcHuTQB2Xbr9RyhO+OvfFAHopjXmg==
+X-Received: by 2002:a05:6870:41d4:b0:254:a09c:6ddf with SMTP id 586e51a60fabf-2584298e0ffmr1896203fac.24.1718342928140;
+        Thu, 13 Jun 2024 22:28:48 -0700 (PDT)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-705cc91f699sm2242495b3a.36.2024.06.13.22.28.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jun 2024 22:28:47 -0700 (PDT)
+Date: Fri, 14 Jun 2024 13:28:35 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: "David S. Miller" <davem@davemloft.net>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Joao Pinto <jpinto@synopsys.com>, Corinna Vinschen <vinschen@redhat.com>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH net-next v1] net: stmmac: Enable TSO on VLANs
+Message-ID: <20240614132835.000025bb@gmail.com>
+In-Reply-To: <ZmrN2W8Fye450TKs@shell.armlinux.org.uk>
+References: <20240613023808.448495-1-0x1207@gmail.com>
+	<ZmrN2W8Fye450TKs@shell.armlinux.org.uk>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f88abfe3-a66c-4e65-b627-7adf7f04580f@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 13, 2024 at 09:33:01PM +0200, Andrew Lunn wrote:
-> On Thu, Jun 13, 2024 at 08:30:34PM +0200, Oleksij Rempel wrote:
-> > Get initial master/slave configuration, otherwise ethtool
-> > wont be able to provide this information until link is
-> > established. This makes troubleshooting harder, since wrong
-> > role configuration would prevent the link start.
-> 
-> I looked at how genphy_c45_read_status() works. If we have
-> phydev->autoneg == AUTONEG_ENABLE then genphy_c45_baset1_read_status()
-> is called which sets phydev->master_slave_get. If not AUTONEG_ENABLE
-> it calls genphy_c45_read_pma() which ends up calling
-> genphy_c45_pma_baset1_read_master_slave().
-> 
-> So it seems like the .read_status op should be setting master/slave
-> each time it is called, and not one time during .config_init.
-> 
-> What do you think?
+On Thu, 13 Jun 2024 11:45:45 +0100
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 
-Yes, you are right. I verified it:
-In case of this driver, .config_init will be executed every time no link
-is detected over phy_init_hw() call. If link is detected
-genphy_c45_pma_baset1_read_master_slave() is called directly.
-It is not directly visible but read_master_slave() will be executed on
-every  .read_status.
+> On Thu, Jun 13, 2024 at 10:38:08AM +0800, Furong Xu wrote:
+> > @@ -4239,16 +4239,32 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+> >  	struct stmmac_txq_stats *txq_stats;
+> >  	int tmp_pay_len = 0, first_tx;
+> >  	struct stmmac_tx_queue *tx_q;
+> > -	bool has_vlan, set_ic;
+> > +	bool set_ic;
+> >  	u8 proto_hdr_len, hdr;
+> >  	u32 pay_len, mss;
+> >  	dma_addr_t des;
+> >  	int i;
+> > +	struct vlan_ethhdr *veth;
+> >  
+> >  	tx_q = &priv->dma_conf.tx_queue[queue];
+> >  	txq_stats = &priv->xstats.txq_stats[queue];
+> >  	first_tx = tx_q->cur_tx;
+> >  
+> > +	if (skb_vlan_tag_present(skb)) {
+> > +		/* Always insert VLAN tag to SKB payload for TSO frames.
+> > +		 *
+> > +		 * Never insert VLAN tag by HW, since segments splited by
+> > +		 * TSO engine will be un-tagged by mistake.
+> > +		 */
+> > +		skb_push(skb, VLAN_HLEN);
+> > +		memmove(skb->data, skb->data + VLAN_HLEN, ETH_ALEN * 2);
+> > +
+> > +		veth = skb_vlan_eth_hdr(skb);
+> > +		veth->h_vlan_proto = skb->vlan_proto;
+> > +		veth->h_vlan_TCI = htons(skb_vlan_tag_get(skb));
+> > +		__vlan_hwaccel_clear_tag(skb);
+> > +	}  
+> 
+> I think drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c::
+> otx2_sq_append_skb() does something similar, but uses a helper
+> instead:
+> 
+>         if (skb_shinfo(skb)->gso_size && !is_hw_tso_supported(pfvf, skb)) {
+>                 /* Insert vlan tag before giving pkt to tso */
+>                 if (skb_vlan_tag_present(skb))
+>                         skb = __vlan_hwaccel_push_inside(skb);
+>                 otx2_sq_append_tso(pfvf, sq, skb, qidx);
+>                 return true;
+>         }
+> 
+> Maybe __vlan_hwaccel_push_inside() should be used here?
+> 
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Yes, it should. Thanks for your comments.
+I will send a new patch.
 
