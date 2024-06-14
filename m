@@ -1,62 +1,57 @@
-Return-Path: <netdev+bounces-103427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 630BF907FF5
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 01:56:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3575F90800C
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 02:05:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7673F1C21755
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 23:56:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4989A1C21522
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 00:05:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32BF914A602;
-	Thu, 13 Jun 2024 23:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDAE4383;
+	Fri, 14 Jun 2024 00:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XwPAzlx9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F3YK6jHZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D4C139D04;
-	Thu, 13 Jun 2024 23:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F9436C;
+	Fri, 14 Jun 2024 00:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718322986; cv=none; b=DzKeibNutbuc2o8PQCuniVBNrInxL639dTtFGhtYPVrgUMNcmWMlEowgBreQU0w9y1XUTqzTBqxB8ga7SQU/5RZsMRruruL6bjdBRWHSkdq8qBYylMhORTvdqZ4PCjqO1K+iu34z+oH5sfoY236GRIuovltkALR4Uhsp8w5FO5g=
+	t=1718323523; cv=none; b=ZTj/a1f1EwULgHlNM9/AG09cVxawMD37m9bxC7MoRBNmkQiUh1QHC8Y0gkna1kKsi2HydPitypwI5GSO+QVFww9QZPwBH5h/psDcY1BjO8Mm/tv6c0PD6gpLwhYNpHZekVoj64PeOOng3BHPszqTF9McPvodA0Xo6jF0HFBGPlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718322986; c=relaxed/simple;
-	bh=wQDFflUnmobvjhJcXXTOXEm6xj6JxzdgpjMPzhngbpQ=;
+	s=arc-20240116; t=1718323523; c=relaxed/simple;
+	bh=Tk/dh+spZSrmoPxZSBkQvt8dVNeejP0S+XKt7FjCMgE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SyQztAEze3amahDSpdpO974wGwp0mubnPCHQb7xrsMlC2Bsnp7P5eYSw9abIXlmC69EzlAmpMHpOEhdQLyrDLvAaIzhltRELfsus0MzOEwAM8wpeOu7flU2si6jErNitFwftbQ0S76sRWhJ8T2LTAI0yCenbv55jeqy7npiq5K8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XwPAzlx9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8FDFC4AF1C;
-	Thu, 13 Jun 2024 23:56:24 +0000 (UTC)
+	 MIME-Version:Content-Type; b=CXl8yJfI5L/js4UIbu7bHpKqJ6/+NAcFG5pvdnv9gnMoaA5i3FPLBtQdCQxQVesGQGycw+B8xrJ5LK/zKXCPUmVgIG0gSDXM7pUrrajedT/eWlwrZ19YCUfhRzx4YgcJeXIePX16Dn3iCNETVJDTg6dkI5SkbdtwIQYY/75KZn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F3YK6jHZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 055A0C2BBFC;
+	Fri, 14 Jun 2024 00:05:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718322985;
-	bh=wQDFflUnmobvjhJcXXTOXEm6xj6JxzdgpjMPzhngbpQ=;
+	s=k20201202; t=1718323523;
+	bh=Tk/dh+spZSrmoPxZSBkQvt8dVNeejP0S+XKt7FjCMgE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XwPAzlx9WTPjngjTcEgyxNeaI/IFID8fkdNiyTjLQfyQ5bGvMPJ/RC2R0FIEGVqob
-	 MwE9pXb/vaipH3c7T6ECtM7fn7Lpi6qyILAwNq2bIvlydhi+SUyWZSEnspiNbIbkRZ
-	 /00Xc4WYFPwNpgs5tqeVuvMXt2I3nv0UHIzAy479cEjUV0zJLpQllLIQ8Jbr+bZ7nG
-	 QA+k1qMoHVLMFSe4CFA6yeku0dkPbG7Tm6cClfTPcfj0ZDJnV5V7I/VbLF9ZaCHx50
-	 zlc156wBM+oX3wO3LH0BGj/JqX/zgSxbSJW5qyPcY3bV83nAA84C4o/H+NyXaFB52h
-	 u24vE3OGn8qbg==
-Date: Thu, 13 Jun 2024 16:56:23 -0700
+	b=F3YK6jHZweq8ERTiE2Yxuef/VSKTggOsD3eT2DybprJiyIinMBXHBgDO33Vn9b0Gp
+	 z6QLIFrO3lrHQJvsA0cNw/mA6i2XK9coEDWk70rHSmcKGpp5bcblOFuEOaw0vOqTEG
+	 sr9gTbinGnHBtB0VdX0UFtSYkq1Fw0VnZb/nN3i6k58Q3phgGdGhtwE6jgR14ILyul
+	 s4D1p5/Nbr+6sqr6yGGgGnN/Xgv+vC1SdKmgP6ZwE8nblTLbMMblrStn0W9T3fc1JN
+	 1uQST6uaOgl19uEfKdQ+P+jK+DX0uFc+Llk+J2MzyJ04sSNVClEC7fvuQxihxnatkm
+	 Zz2FY9P/5YODA==
+Date: Thu, 13 Jun 2024 17:05:22 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, Olga
- Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
- <tom@talpey.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Lorenzo Bianconi
- <lorenzo@kernel.org>, Trond Myklebust <trond.myklebust@hammerspace.com>,
- Anna Schumaker <anna@kernel.org>, linux-nfs@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 5/5] nfsd: new netlink ops to get/set server
- pool_mode
-Message-ID: <20240613165623.2a5150e8@kernel.org>
-In-Reply-To: <20240613-nfsd-next-v3-5-3b51c3c2fc59@kernel.org>
-References: <20240613-nfsd-next-v3-0-3b51c3c2fc59@kernel.org>
-	<20240613-nfsd-next-v3-5-3b51c3c2fc59@kernel.org>
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Joe Perches
+ <joe@perches.com>, Qingfang Deng <qingfang.deng@siflower.com.cn>
+Subject: Re: [PATCH net-next] etherdevice: Optimize is_broadcast_ether_addr
+Message-ID: <20240613170522.0961c781@kernel.org>
+In-Reply-To: <20240613073441.781919-1-dqfext@gmail.com>
+References: <20240613073441.781919-1-dqfext@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,13 +61,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 13 Jun 2024 14:34:34 -0400 Jeff Layton wrote:
-> +	err = nla_put_string(skb, NFSD_A_POOL_MODE_MODE, buf) ||
-> +	      nla_put_u32(skb, NFSD_A_POOL_MODE_NPOOLS, nfsd_nrpools(net));
+On Thu, 13 Jun 2024 15:34:41 +0800 Qingfang Deng wrote:
+> Like is_zero_ether_addr, is_broadcast_ether_addr can also be optimized
+> by using a 32-bit load if CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS is set.
+> Sign extension is used to populate the upper 16-bit of the 16-bit load.
 
-bitwise or?
+Can you provide more context on why it's beneficial. I mean, there's a
+lot of code in the kernel one could micro-optimize...
 
-Other option would be to move sunrpc_get_pool_mode() before allocation
-that way all error codes past allocations are EMSGSIZE and life is
-simpler.
+Show us the assembly, cycle counts, where it's used on fast paths...
+-- 
+pw-bot: cr
 
