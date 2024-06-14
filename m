@@ -1,89 +1,62 @@
-Return-Path: <netdev+bounces-103735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 370AC909405
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 00:05:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C5F1909427
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 00:28:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6E02B23866
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:05:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDB771F227C2
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B821850BD;
-	Fri, 14 Jun 2024 22:04:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="esubgL+P"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4377D186E25;
+	Fri, 14 Jun 2024 22:28:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from orthanc.universe-factory.net (orthanc.universe-factory.net [104.238.176.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2877184134;
-	Fri, 14 Jun 2024 22:04:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951AE146A8E;
+	Fri, 14 Jun 2024 22:28:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=104.238.176.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718402697; cv=none; b=IMrctt5NTXtd7/AY8qx0q8yFhCZa0X7FzsNOG+4zhcWpfi5zfnVci1OAU82iHuaBok+4MsxrKMawX6nbjXthXTAOSgXQzPT5i2Bm5zk9UGxNgjxmhFupj1QiADqtRt/3gvpak3rn7YPwHp4/4OjftOelKC3eDt6hW3153nzYGns=
+	t=1718404113; cv=none; b=c6sHw5r1UmpWX42kKLiDnR02hNsfOxNI2Rz9WLffRoRqTtcZoUUV89TDokg3+DpKyEthDzH3k6vlnI7fLQE45RebK3ySO7MTnh9Yug6zVRaYHXeBnSfOe2VLzxQmbRooUjetMhlnsxEgVaofpFSrWggIu12ez2hzsmL6u9pbDpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718402697; c=relaxed/simple;
-	bh=n/dIbEBzku354LPAwJ5AA17Jtd1gqtcu4Ldd7iIeX6s=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CkpJhf0lLuBIGvmG++hSHmDZ8Q3SCGuPSOoRNW3WZcW6XUn0ltKZ1qlNtW36YBylcNb4nFfQsV+b0X2JjrstIZcnHAVt9kEUthzo1nZGhAAMvDp9+ropMzkCELCHjJ+DtiruoWYGvi/bRBW7Fm8L0ir9NvIeKKlKff2Ujb6POCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=esubgL+P; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1f717608231so20479855ad.2;
-        Fri, 14 Jun 2024 15:04:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718402695; x=1719007495; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3GvcueyQPUEu25Z3M+kcx0gqsGUqckbLKTeC7p2z6FQ=;
-        b=esubgL+PWuEpJM9iOcUx1C2/51xpDwG/LETchk1NtGrtLBfscIHUP/qhD0p5JCkW73
-         +VszzPC7PAYYPekcrAObhlMPPBFiZEDfO48BgKdvqEry8hCCBJ54dnufR7AToET3DFO0
-         Dz/MpUIhCYbDhZ15JxR0QA33atxyRRlXCTHcfVl8NEK+iN/trKdeqykEWz6x8hbdnG3P
-         xVvZ46PDcy1zSNw+v/s76P2HAoXVcrc9eTu1XgW2IPlXchdh4Z3AJSpu+DoyJgJwuu+Y
-         s2i5Gx9aZRrjnW+dJ4I9MkMORoT8k2XJA6vQzeMURryfacAjO4/6B0oTbqM43E55PLuL
-         YOYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718402695; x=1719007495;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3GvcueyQPUEu25Z3M+kcx0gqsGUqckbLKTeC7p2z6FQ=;
-        b=FPq1qXmz/bKEyDtaSPVvfhtj58uRWnYim8IvX81Gl3nISTaUHSnIu75i8fCsxcs4W9
-         A4hdahVuhGy+W4NwyXXtFVh1gSGLDkSkvVtxk9JJWYOciaTnQk3ynxXSv7TMelljxe1W
-         +1HWgv/L7npneonhZO4xFvxy1Z4O+QbUq8GyQEIoVPpCfWCJ81QGXsnI3FSqsXG7An4b
-         uf/pX6DBI84Pddy92C/jqqbBq5+VZ3rE5w0sqm4nnRdIry5VIiIC4zjrdv+kOaqnChk9
-         SGqhOd3TFqj1jxpmMtTSFp4+mbzgxCwKDV3PJnQ46yTVm3IXgrBpV8pkCG5NK/V6us0i
-         lAMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUJw0DuiE61EfbLFH440B6ZuzdqarXZH0Jsjo+U3NE42A3ArXVk9ovnMYm0m3jd9DyvNBzxCqcL4GO0er7RJEOcwv4r5rK8lWBp/w3FXHEvuvm0BCJzJrqlp92HBFTtQuXJwoNT
-X-Gm-Message-State: AOJu0YyonlD+rFQDBVyfmzissrdiF0HKlZsy3vml7pVGZIOTelm/r+3A
-	LB2YqR1G0jIAxVoCoXkX1Xj0ApdigSixMEJ8t5zbLcctYeus4Swq
-X-Google-Smtp-Source: AGHT+IFqvmnvREoZpL4HIEpMIZNae92JdUxNXwL23tevbC6InKHNUqYV0Ja7ifE4kxB84ngtUtcjvQ==
-X-Received: by 2002:a17:903:234b:b0:1f2:fb02:3dfd with SMTP id d9443c01a7336-1f8625c0deamr45197675ad.11.1718402694709;
-        Fri, 14 Jun 2024 15:04:54 -0700 (PDT)
-Received: from dev0.. ([49.43.162.104])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f855e7ca78sm37008375ad.106.2024.06.14.15.04.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jun 2024 15:04:54 -0700 (PDT)
-From: Abhinav Jain <jain.abhinav177@gmail.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	virtualization@lists.linux.dev,
+	s=arc-20240116; t=1718404113; c=relaxed/simple;
+	bh=uUA2+FX6VTSsOybb4e6VmoDgXuVZI/yyoqS9UFhVENQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XZ5Xupw3RrizhqtTtIgP3Mg7hS6H5ZXxZc9mtE1wdRnKTskPsdO9BM9/9+EObj1Y1yloaRA7jPK/QBzvG4QeUBdzTUo77qC6E4MJONOrn1xWSvqYtC017OcM+DdUDN06Ku4NI2xrroPKP0PZLcLmz6mXKUk7DhU6Jls/18JY0KQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=universe-factory.net; spf=pass smtp.mailfrom=universe-factory.net; arc=none smtp.client-ip=104.238.176.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=universe-factory.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=universe-factory.net
+Received: from avalon.fritz.box (unknown [IPv6:2001:19f0:6c01:100::2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by orthanc.universe-factory.net (Postfix) with ESMTPSA id AF1C71F401;
+	Sat, 15 Jun 2024 00:22:27 +0200 (CEST)
+From: Matthias Schiffer <mschiffer@universe-factory.net>
+To: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: skhan@linuxfoundation.org,
-	javier.carrasco.cruz@gmail.com,
-	jain.abhinav177@gmail.com
-Subject: [PATCH] virtio_net: Eliminate OOO packets during switching
-Date: Fri, 14 Jun 2024 22:04:22 +0000
-Message-Id: <20240614220422.42733-1-jain.abhinav177@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Matthias Schiffer <mschiffer@universe-factory.net>
+Subject: [PATCH net-next 1/2] net: dsa: mt7530: factor out bridge join/leave logic
+Date: Sat, 15 Jun 2024 00:21:53 +0200
+Message-ID: <378bc964b49f9e9954336e99009932ac22bfe172.1718400508.git.mschiffer@universe-factory.net>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,59 +65,155 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Disable the network device & turn off carrier before modifying the
-number of queue pairs.
-Process all the in-flight packets and then turn on carrier, followed
-by waking up all the queues on the network device.
+As preparation for implementing bridge port isolation, move the logic to
+add and remove bits in the port matrix into a new helper
+mt7530_update_port_member(), which is called from
+mt7530_port_bridge_join() and mt7530_port_bridge_leave().
 
-Signed-off-by: Abhinav Jain <jain.abhinav177@gmail.com>
+No functional change intended.
+
+Signed-off-by: Matthias Schiffer <mschiffer@universe-factory.net>
 ---
- drivers/net/virtio_net.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ drivers/net/dsa/mt7530.c | 103 +++++++++++++++++----------------------
+ 1 file changed, 46 insertions(+), 57 deletions(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 61a57d134544..d0a655a3b4c6 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3447,7 +3447,6 @@ static void virtnet_get_drvinfo(struct net_device *dev,
- 
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index 598434d8d6e4..ecacaefdd694 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -1302,6 +1302,50 @@ mt7530_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+ 		   FID_PST(FID_BRIDGED, stp_state));
  }
  
--/* TODO: Eliminate OOO packets during switching */
- static int virtnet_set_channels(struct net_device *dev,
- 				struct ethtool_channels *channels)
++static void mt7530_update_port_member(struct mt7530_priv *priv, int port,
++				      const struct net_device *bridge_dev, bool join)
++	__must_hold(&priv->reg_mutex)
++{
++	struct dsa_port *dp = dsa_to_port(priv->ds, port), *other_dp;
++	struct mt7530_port *p = &priv->ports[port], *other_p;
++	struct dsa_port *cpu_dp = dp->cpu_dp;
++	u32 port_bitmap = BIT(cpu_dp->index);
++	int other_port;
++
++	dsa_switch_for_each_user_port(other_dp, priv->ds) {
++		other_port = other_dp->index;
++		other_p = &priv->ports[other_port];
++
++		if (dp == other_dp)
++			continue;
++
++		/* Add/remove this port to/from the port matrix of the other
++		 * ports in the same bridge. If the port is disabled, port
++		 * matrix is kept and not being setup until the port becomes
++		 * enabled.
++		 */
++		if (!dsa_port_offloads_bridge_dev(other_dp, bridge_dev))
++			continue;
++
++		if (join) {
++			other_p->pm |= PCR_MATRIX(BIT(port));
++			port_bitmap |= BIT(other_port);
++		} else {
++			other_p->pm &= ~PCR_MATRIX(BIT(port));
++		}
++
++		if (other_p->enable)
++			mt7530_rmw(priv, MT7530_PCR_P(other_port),
++				   PCR_MATRIX_MASK, other_p->pm);
++	}
++
++	/* Add/remove the all other ports to this port matrix. */
++	p->pm = PCR_MATRIX(port_bitmap);
++	if (priv->ports[port].enable)
++		mt7530_rmw(priv, MT7530_PCR_P(port),
++			   PCR_MATRIX_MASK, p->pm);
++}
++
+ static int
+ mt7530_port_pre_bridge_flags(struct dsa_switch *ds, int port,
+ 			     struct switchdev_brport_flags flags,
+@@ -1345,39 +1389,11 @@ mt7530_port_bridge_join(struct dsa_switch *ds, int port,
+ 			struct dsa_bridge bridge, bool *tx_fwd_offload,
+ 			struct netlink_ext_ack *extack)
  {
-@@ -3471,6 +3470,15 @@ static int virtnet_set_channels(struct net_device *dev,
- 	if (vi->rq[0].xdp_prog)
- 		return -EINVAL;
+-	struct dsa_port *dp = dsa_to_port(ds, port), *other_dp;
+-	struct dsa_port *cpu_dp = dp->cpu_dp;
+-	u32 port_bitmap = BIT(cpu_dp->index);
+ 	struct mt7530_priv *priv = ds->priv;
  
-+	/* Disable network device to prevent packet processing during
-+	 * the switch.
-+	 */
-+	netif_tx_disable(dev);
-+	netif_carrier_off(dev);
-+
-+	/* Make certain that all in-flight packets are processed. */
-+	synchronize_net();
-+
- 	cpus_read_lock();
- 	err = virtnet_set_queues(vi, queue_pairs);
- 	if (err) {
-@@ -3482,7 +3490,12 @@ static int virtnet_set_channels(struct net_device *dev,
+ 	mutex_lock(&priv->reg_mutex);
  
- 	netif_set_real_num_tx_queues(dev, queue_pairs);
- 	netif_set_real_num_rx_queues(dev, queue_pairs);
-- err:
-+
-+	/* Restart the network device */
-+	netif_carrier_on(dev);
-+	netif_tx_wake_all_queues(dev);
-+
-+err:
- 	return err;
- }
+-	dsa_switch_for_each_user_port(other_dp, ds) {
+-		int other_port = other_dp->index;
+-
+-		if (dp == other_dp)
+-			continue;
+-
+-		/* Add this port to the port matrix of the other ports in the
+-		 * same bridge. If the port is disabled, port matrix is kept
+-		 * and not being setup until the port becomes enabled.
+-		 */
+-		if (!dsa_port_offloads_bridge(other_dp, &bridge))
+-			continue;
+-
+-		if (priv->ports[other_port].enable)
+-			mt7530_set(priv, MT7530_PCR_P(other_port),
+-				   PCR_MATRIX(BIT(port)));
+-		priv->ports[other_port].pm |= PCR_MATRIX(BIT(port));
+-
+-		port_bitmap |= BIT(other_port);
+-	}
+-
+-	/* Add the all other ports to this port matrix. */
+-	if (priv->ports[port].enable)
+-		mt7530_rmw(priv, MT7530_PCR_P(port),
+-			   PCR_MATRIX_MASK, PCR_MATRIX(port_bitmap));
+-	priv->ports[port].pm |= PCR_MATRIX(port_bitmap);
++	mt7530_update_port_member(priv, port, bridge.dev, true);
  
+ 	/* Set to fallback mode for independent VLAN learning */
+ 	mt7530_rmw(priv, MT7530_PCR_P(port), PCR_PORT_VLAN_MASK,
+@@ -1478,38 +1494,11 @@ static void
+ mt7530_port_bridge_leave(struct dsa_switch *ds, int port,
+ 			 struct dsa_bridge bridge)
+ {
+-	struct dsa_port *dp = dsa_to_port(ds, port), *other_dp;
+-	struct dsa_port *cpu_dp = dp->cpu_dp;
+ 	struct mt7530_priv *priv = ds->priv;
+ 
+ 	mutex_lock(&priv->reg_mutex);
+ 
+-	dsa_switch_for_each_user_port(other_dp, ds) {
+-		int other_port = other_dp->index;
+-
+-		if (dp == other_dp)
+-			continue;
+-
+-		/* Remove this port from the port matrix of the other ports
+-		 * in the same bridge. If the port is disabled, port matrix
+-		 * is kept and not being setup until the port becomes enabled.
+-		 */
+-		if (!dsa_port_offloads_bridge(other_dp, &bridge))
+-			continue;
+-
+-		if (priv->ports[other_port].enable)
+-			mt7530_clear(priv, MT7530_PCR_P(other_port),
+-				     PCR_MATRIX(BIT(port)));
+-		priv->ports[other_port].pm &= ~PCR_MATRIX(BIT(port));
+-	}
+-
+-	/* Set the cpu port to be the only one in the port matrix of
+-	 * this port.
+-	 */
+-	if (priv->ports[port].enable)
+-		mt7530_rmw(priv, MT7530_PCR_P(port), PCR_MATRIX_MASK,
+-			   PCR_MATRIX(BIT(cpu_dp->index)));
+-	priv->ports[port].pm = PCR_MATRIX(BIT(cpu_dp->index));
++	mt7530_update_port_member(priv, port, bridge.dev, false);
+ 
+ 	/* When a port is removed from the bridge, the port would be set up
+ 	 * back to the default as is at initial boot which is a VLAN-unaware
 -- 
-2.34.1
+2.45.2
 
 
