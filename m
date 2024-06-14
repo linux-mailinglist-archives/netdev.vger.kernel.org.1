@@ -1,374 +1,472 @@
-Return-Path: <netdev+bounces-103607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E0C8908C75
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:30:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE4F7908C7E
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:31:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 059B2B22B0B
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:30:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06DFE28A19F
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:31:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EDB6163;
-	Fri, 14 Jun 2024 13:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F2D63B;
+	Fri, 14 Jun 2024 13:31:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="skJHY3dP";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="A9hRDTUL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bmC/5q0g"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0488519ADA8
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 13:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.153.233
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718371804; cv=fail; b=OQqGxgjEXFUF5F2SAhUBR4QXvdb+aEtUhLBdN2Q8BDOViu5LNkF/+RJ93W3dDOFDaeNAICfv54/GgHlqicXmpRUCCnfWEB0wdxB9Q9HqhlpujA5tfPpOukZJ+HpsKP+WFIwOVHyg9eOscNEm/mJtsZlHFKCYq+WnbHHU6axASns=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718371804; c=relaxed/simple;
-	bh=cfPanGhMPyLlSUYBgBNcBlICaAS5Q4Ue2yakqX/5dj4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=E2tqkdTYpOWQc4Pnj6PMUIaLVrWsiqcX/KeCG9sdWgx1pQEHPeGUD2oDRNl/hfxDnZzFzALptq3rul4b7leeEsukW2ml3KDIjVnxfRt0S935VoHVQeLMZ7MQQbNK2V91R+Jr/Scaj99LCiAxMCKwltxw3OvXL0lG+kag48TGlFU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=skJHY3dP; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=A9hRDTUL; arc=fail smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1718371801; x=1749907801;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=cfPanGhMPyLlSUYBgBNcBlICaAS5Q4Ue2yakqX/5dj4=;
-  b=skJHY3dPg3tWOI1XL2+ugI7Spc0OF4Ewktb2mf2l0BL1zLTWCyTF4lmK
-   CO4AotwM52BuCzAkjilFhXBYGXy2nGjReMpmZh4g6/Cj2oNzaQM9z2ZV2
-   ZPxAXweP5AfLFKWTOe8a/STqmMP3i7Dd1OPXp/0ziArjEx0oGPURPoIXs
-   FmlqL4pxaRCSTYoIu1oG0NjYIG7gp/utwR1t2xKlZx5wiTJmKSmCVg4iD
-   5MEDZNstAvkf2kV7BzU3hwBmqqSEyaj86wqG0ykcY6gSpVxmn9A55rK0L
-   VMCtY0GsEBBD//1N47UD0uuPQc6gcbDfKUQrsHc9TkoM0XpoX+TzMFF2B
-   g==;
-X-CSE-ConnectionGUID: 18vXMq0QTaqJyU5gVEK0aQ==
-X-CSE-MsgGUID: shuY2RkUSAaMj3YHxphQBQ==
-X-IronPort-AV: E=Sophos;i="6.08,237,1712646000"; 
-   d="scan'208";a="27563191"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Jun 2024 06:29:54 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 14 Jun 2024 06:29:46 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 14 Jun 2024 06:29:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TEtJaIwFrWsGxGljyfYnaDh/m24nSHFRfwgY4iNPxLVifc4+7FKN5MNOk0Gab22HtPLNN/pDA/LclpQ6+klxqOKtMrhDJK/MeyKIzmcVfPzpk1AZHtdw+LbEu7MsmzrJkzpfAWUdGPNFciNq8V81RMtYLZI5PoLpW7R4Y2ngtm+B7Nl1/Sw06WjLMWAohh0i2ERHNYSwMVKILl/dQZdRTJ3oKeF9y2Cdi69Th5r5x5xwcQbisMSpcLRP+W50OR+kbj0HXWotCTHLT1zrILRfuN5JvPq9tWeeMJ/fL0VRMjffsnzcjtWkBgZf/jbhnjogQ6dquySY5tV0KxBE6YFnpA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cfPanGhMPyLlSUYBgBNcBlICaAS5Q4Ue2yakqX/5dj4=;
- b=C2W/fg6zKFMz8jbUsHKYPIKtou9jKbR8tyN1E4NamQiG5MnndXpIZxR4uTtPI9DKd/iGnA9dokctDduV3fDaXkMHvoB+lcW//mohesEJcPqwKXyvrsEvHOFbd2IrLJRxIm2d7ISTPiLcw/TwnqfgCyrx48UkMIXl/4FTFDRD1L0wppwbhHCCkESLWiObGKVmSgnMLIE6xyzu0IDQet0qwjeh1qioN+y3eFEQA6/iNE9jmrH0RLw9HT5MeEyW5Wpm79ZkabX0TrfIsNvon3rDoNEevmbWWPbefgb77IE/JtIqHXrGn2unRZENjd4VM6mWKsPAaofTlwLwBRwDWowiVw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cfPanGhMPyLlSUYBgBNcBlICaAS5Q4Ue2yakqX/5dj4=;
- b=A9hRDTULS/3K34/7nKS6zPMapzhuq9jjED3Lw+CmYliDvTRfcHTw7PR8tfzXE9OgEY/k+PG9v6pVKu5+lcgmROyNvNucWkILb3NFalPN2jviYtcP9VSU+DF3BIVw28EGBoTI1EwDAy+5YkmRuw/OtlueooF/MhxevvT9w5OME+KxbwrYYQ6i+21np7C7w4/wzMn0AHn4ivxCwZcHL4I+rJ/bbA8Jw+X88yWvue1Zjg6O6XW05oSEI69l6Yj9Rdi08As4+ttPbj6tXgbQc0d1OqDienrSxEQ4W9zNtqGeea/NB9HIYvKNlW1PHmjSUBEIexLdsWaHHxTX5/OwGFA2Fg==
-Received: from BL0PR11MB2913.namprd11.prod.outlook.com (2603:10b6:208:79::29)
- by PH7PR11MB7720.namprd11.prod.outlook.com (2603:10b6:510:2b3::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.26; Fri, 14 Jun
- 2024 13:29:41 +0000
-Received: from BL0PR11MB2913.namprd11.prod.outlook.com
- ([fe80::3bc1:80d8:bfa5:e742]) by BL0PR11MB2913.namprd11.prod.outlook.com
- ([fe80::3bc1:80d8:bfa5:e742%7]) with mapi id 15.20.7677.024; Fri, 14 Jun 2024
- 13:29:40 +0000
-From: <Woojung.Huh@microchip.com>
-To: <enguerrand.de-ribaucourt@savoirfairelinux.com>
-CC: <UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>
-Subject: RE: KSZ9897 RMII ports support
-Thread-Topic: KSZ9897 RMII ports support
-Thread-Index: AQHauOKWABCBqyY9kUOyhBXqEndhr7G8YIUggAlogICAABPpUIABC3kAgABjM9A=
-Date: Fri, 14 Jun 2024 13:29:40 +0000
-Message-ID: <BL0PR11MB2913957939FE5E262A241B03E7C22@BL0PR11MB2913.namprd11.prod.outlook.com>
-References: <21cd1015-dae8-414e-84d3-a250247a0b51@savoirfairelinux.com>
- <BL0PR11MB291351263F7C03607F84F965E7FB2@BL0PR11MB2913.namprd11.prod.outlook.com>
- <6972b36e-2ee2-4b8b-9a35-147fe842a8cd@savoirfairelinux.com>
- <BL0PR11MB2913CE140EC9B807BD8CBBE2E7C12@BL0PR11MB2913.namprd11.prod.outlook.com>
- <0308c1c8-1d9a-47e7-a25d-b090417af2d5@savoirfairelinux.com>
-In-Reply-To: <0308c1c8-1d9a-47e7-a25d-b090417af2d5@savoirfairelinux.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR11MB2913:EE_|PH7PR11MB7720:EE_
-x-ms-office365-filtering-correlation-id: 04fafcd0-c6ad-4dad-9c7e-08dc8c760b91
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230037|366013|376011|1800799021|38070700015;
-x-microsoft-antispam-message-info: =?utf-8?B?RTBmdTBVMmZtWkJST3VRMlpkWHhZb0dUc1IzL2pnR3Exayt6UVhiSDRWTkVK?=
- =?utf-8?B?UlVnd21TYXYyb2xjNzVJY0dwM0EwcUdEZTR0MG4xM2FGNDNwS296alA5THNF?=
- =?utf-8?B?WEY0VXVxN3JlbWN6dzBjSW9nVnRRZloxZDRieWZubFZCL2FocHZJZEhHVHky?=
- =?utf-8?B?ZmUrSTFLR3NIYlJLUU5sbk9GcWt2WjJiaHMxZHJvd3hvOG9zU1R1SWhKeEZu?=
- =?utf-8?B?NEpObHgvS2E0aHNJb2FxUXF6OUZpQ0xpVjRPTGJHd01XbS9IWjlUYWJaY3BG?=
- =?utf-8?B?M1RjR3J2RFp3RUtGMzVnWUhWZURoNUhVNjBvMWRXaXFkZGVhSktDQU1KeFFH?=
- =?utf-8?B?NmFndUc3TDRHck1IVzB0UlZVRUg3bEY1UUFXMndZVVRFSFdqbXl5VzNOLzZs?=
- =?utf-8?B?eHZhOEhTUHF0ejN4cHAralMrZlhRYkVoR25RREFVeWo5OWtOK3h2bWY1ZXpT?=
- =?utf-8?B?MDI1OWQzeXNoaG9SblU0VHJKNVl3WHU5ckdNeVJIeHlHUEZYaEJ2TlNCSjMv?=
- =?utf-8?B?NWI4WEVrSnpabWdqUSsxQldxNkNXQlJUR1NlZVIzWk9LM09ST2sxNENPa0k0?=
- =?utf-8?B?RXUxMTJMUlVLeDZVbXhXeU9xT0drTUJ3WFFmUkczVFJrUjBqSGNuMzRGYXda?=
- =?utf-8?B?ZVQ1ajViYmNBeFNpWFVSb2NnZEVYbTR2WHVmUEpGME1MN3I3c000VGJZeFlq?=
- =?utf-8?B?cTFoZ3RaN1JCVFBLU2JQZ3ZRWHdUYmFrSHJGOHNOOTZkYVcySjI4RWs1NExR?=
- =?utf-8?B?aHBSbGNOWGc4cU1iczN3eEFYa0o4QUpIcFdkSGFxL3dKbmxzU1AyZEEwbjMz?=
- =?utf-8?B?a0hvYjZKby9BQ2ltUURTdWtDTFJnRXJwU2xjU1doYVhmb2lrQkl0eCsyTzI2?=
- =?utf-8?B?SHRSMWk0SFY0M2RmMWJyZ3ArVTZhd0N6SHRZL0p5dnVnd2VWbFZGV2ltVy91?=
- =?utf-8?B?WlVqVmVOdDVyQURBeUEwc0ZzdVVjekhHQXBzcjBWZ0tXcWtBOHFsdFA1Snli?=
- =?utf-8?B?eHFLUS93OFpza3RWUSs1WVVONGlpcWtuMUZ6MXp6M2l3Nkw4N1VvZ1Vza2Nk?=
- =?utf-8?B?MlY3MGdtT201cGZBVUxLc2h4V2tVQkY1Y2EvdS9zcG1XUnlHVGl6aHYzTzdH?=
- =?utf-8?B?cFNKWGNhTjFRRVF6Q2dKYmZ3OEdRS0RVemJ4cWNJWXE2ZlRrSDhLTm5HS3B6?=
- =?utf-8?B?QmQzc0kxWFlvUTBVTWJOdElwL3ZTeGl6TlVhTVJDZzBPamFta3p3QStRVE1u?=
- =?utf-8?B?NXlqNDdjR0pEWU5iU1FaR2pjbmxHUkU2bDF5TCtwZmY3bFYvS3Q3aTk4YTRS?=
- =?utf-8?B?VHRXcmVsd3pFeHJSZXZNeGxxVStKZURqb0ZHUFhaa2o0RCtuWDR1RDhjLzFC?=
- =?utf-8?B?V095WWJJZGhiRFZFQWI1L0hJUmt1MjBrdEl3T3V2QjFUeEFrbDh2bnR4b3pT?=
- =?utf-8?B?WWpEdklGeUJCcGhKaXFVY01WVDBma2hDR1dES01hS3NPYk52QmRxTzVqL3V1?=
- =?utf-8?B?ZXl6aElNZ0JNZ3RqVjdtRXlheG5UYU1PZHZkY0llQnVpb05yenA4NVczRjJJ?=
- =?utf-8?B?R3R5YUpQODZucE1yNHhocGJhd0thek11NVdMZlYrZjRtSVhSL0o0V3pKZ1NI?=
- =?utf-8?B?QmN4MTNnQmU1eU9zWk96Mkt5WU9LMHRjVmJGWVBKS3N0cFdZT05WZU9QVE9y?=
- =?utf-8?B?Q2VPMWQwelIyNnhZTWMzT0xRRUFJOEl2NTlLdkFabGxkZEN5VHFKNU45VGRB?=
- =?utf-8?Q?WGOPLDN/CONQ2asslbTDbKoXtSOH+Gf3ZMRV13M?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB2913.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(376011)(1800799021)(38070700015);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?QVhTaHl5RmVKUzdSanZQbU02U2liZXNBOVBIRVkvZTdXdklZU2kxamFibkVi?=
- =?utf-8?B?Qk5uWEwrVlhjL2EwdlF6b0Y4Nm41UTlJcW5tNHpYQ1dacytQY0RyR0RiYjdW?=
- =?utf-8?B?SmNoL0o0OUNSYVFLcWVENlUxek5odXI5NGhxYTJsTzZZSUhhWHByRU84V3J3?=
- =?utf-8?B?UTJKNGJiWHdSZ3RsM3d0N245K2NPRlAweDFvM1lXR0hEUmVnYkhwa3AxRUtS?=
- =?utf-8?B?bFgzZzlFWTlVdGF2Q1pYdGFRSE1VSkdWMDNpQnB4SEhZSU0vRXVhdTB0Tko4?=
- =?utf-8?B?RG9NYnNRL1R5Qk9rQlh5cVo5YnJuRGlWWWtNM1dtUTg1djhDUzNHM3pVRlJi?=
- =?utf-8?B?YkZ1SWxGQVFUcWdxTjNhWjBEYU9GTG05ODFPVUh5eVZLTm00N0FxWDkwaTJF?=
- =?utf-8?B?eklsUEZSNjk1dUluSWJwdWNuZ25Ycjg0TEdVb3NzRE4xSWxJeTRSSWdrNXZS?=
- =?utf-8?B?WEZZQ1pOUEZRMnFhUkdtRjlqWGczVy93YldMODZmWkNCWGJQSUZyS0JHMzNP?=
- =?utf-8?B?Y09jaEQvTmFsMk1nVHJXdzgwNzNFakhPZitMcGFlZnBYNG9FNUVhT0pMeEpw?=
- =?utf-8?B?Z0o5blpJQW9rZ21WS2J4WnZBcmF1dTE2VWVnZ24yZzdWdzh1N0cweVk5NGFQ?=
- =?utf-8?B?cWlkdHB6VlZXTkFjc05KWlpiem1IVkZ5RXBJczY1YUlYUlFKcXRVMDExWk1w?=
- =?utf-8?B?R3dGR21oZXlYcVF1WG9JcmpWWGVxdHk5aTd5MC96a2FhQjM5WWUvZW5WeHFm?=
- =?utf-8?B?SDV1ZFVEem13UnhCb2NpQXluVDJ4RjVuRzFYZEZhSStHemFpWkVPbEFkdG9N?=
- =?utf-8?B?TWEwc0t2dTNtTXBraGFLd3ZPLzlIUmJNa1ZoOXhBNjdMWjNQbTlOeWUwMFR0?=
- =?utf-8?B?OWxncVk2SkNNSzhzZmlKL1pVaS84UlNad3p4dndkN2JIY1VuaDdvTkRmbUV3?=
- =?utf-8?B?ZWtJK1FMRUNtWVJQa2N6dEZGSTZ3UWg2RkhiOFpYRitZbW5jMlRmNnN3RkN6?=
- =?utf-8?B?LytIdVAySWMyOERVb0VRWkJTb3pvZ01mUjFGYy9Rb0J5bFp0MElJNUVaNHA4?=
- =?utf-8?B?WklweEZpMVQzanIvM2RhalVZcUpLRGpYUlZaMXpMWTRPMHlCSWdWRjF0VWVR?=
- =?utf-8?B?dlN2QnM3Y0FZT3YrQXRGTTIvVmNUdnBqZFhwbXZSa29pOFN5RVBzTklqNHhM?=
- =?utf-8?B?Z2JxRWR6bWRiWjBycUVDdFo2RHkrQ0I2eTUwS3M2dkZtdWErWjVKSENuWTRF?=
- =?utf-8?B?ekxrcGozenEzOERIUXJlMHljak1LRThwcXB0ZGtGKzZ0MW1zMGZYSW1hM01q?=
- =?utf-8?B?eHR0MmxvcDVNWExMbGNiSzF5QkdZNUVvK01OZUVZOURtSkdCY21Ha1pSSTFU?=
- =?utf-8?B?Q2FWZkJ2dEJ4UCtMN1podVJ6ZFRoM21ralErOHVWV1NuUFBrdTc0bjFGTXRV?=
- =?utf-8?B?UDMvVDlzNmkrcnpLcWZmTVdSdU1LRWFxd1h2QzR5OEpEVWVHYStkVzdmU3lh?=
- =?utf-8?B?V09tb2VYNXVIMGFGckQ2T253dUZaeWozZTE1SVZuUjRZMXdnektVTG4yWjBt?=
- =?utf-8?B?eHpsbGxNSWt6dkV0M2NuWGp3cGk4ZVMvd2E5Q051QnpJUm5VUUhjQjVxRGpj?=
- =?utf-8?B?MGJPdE00RHNKbzhmSU5yOGh0SWVwaGJaTm43eFhKMjVsc1Q4dnU3MC83Yktt?=
- =?utf-8?B?bUJUQVZrR0RkNVBDeXRSUlYxVmlmWEZmQjZCWWJZbHlhM2hDYzlNd29nRldB?=
- =?utf-8?B?bThSRERSdkFJWm1xNUVaQ21pSGE2SkVEVVUzTWZUNUxXT05hZStjOXpDWVQ4?=
- =?utf-8?B?WmFmT1ZIQUpyUmh1alhjS0U3bHdmMmNWemZZRkFqWmhJUHlTR2swVXRRQU5U?=
- =?utf-8?B?OHBuUEl6RlZZOG0xWGdZWWRZZ3FuUXFIVVl0SW0zYXQ4eUUrQlpETVpwWm9N?=
- =?utf-8?B?WVg0em9ubWJUZ0N1UXQwdFJISjJXMnhvclZRT1luZVFPT1R3NVZ4Y3pYY2NP?=
- =?utf-8?B?aVVEcCs5bExheURTVDN5eGs5cUlZanZDdkN1OUNmdjk3dXl3M3FLWVdOM3FS?=
- =?utf-8?B?c0dtaFZWR0xmbEpaNnBWbTF1TDFEVnFzZGFldGhhYkFXTkdPaldMUXIxMXdl?=
- =?utf-8?Q?eedMTK0wgHTodm+O0h0kQpVmC?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F374F17D2
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 13:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718371888; cv=none; b=TlQguiilpNZCwThWrrp4m+7yZ7Hu55mdjdfX3AdI2hMS4ILkBYbsUr13Twkl5nwF7gFW2dx305wd8LJ51Eb8tnxWrjCRx/gGZm/+t0k5PnRcXRk+HDRDZV72a6WOCQbJZ6VGt0vC+sVC+9DREBqWfn5vSXp4IlyZxCi132jBw9g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718371888; c=relaxed/simple;
+	bh=it62vQX57boSAMMVFKKGm+Q4ILzNle+Aw2AfmrE7gcU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MUeZhAP3z+hpNwSqNMlHwTnsTGvNnhIFb8s6mF2vQfda4Bnd+UzJHSJu9hmgwbsaGy1kMJMH+IM7SY1xyRfuIenBVhUdsMavp/GT9rGOtAR+tNzkC6psPWY5PrH/Y0+7OdYij+MMsTabsa6GuYecm2vcEmng7GD/5ldQPZ+YQBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bmC/5q0g; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2ec002caf3eso35624371fa.1
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 06:31:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718371884; x=1718976684; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=l8cNtJ0KAG7AoCM0lxu+9LqGYW69eFGTTDu4sYYR7Ys=;
+        b=bmC/5q0gTQa/UjgaAHBEYVh3MXzxIjGN2CmF/nLYCh2M5/Qi0DbzOz6A1FE1jTe/sU
+         2LSyfGHoyC45SeYengoVb3XEzF5x+NZrHglq/UKepGwt3yEDbxdotfUwFlpnPQ5mjEjD
+         Cg803Tae9i9VtCgk3J+FzBqNKQFMHNEW8picy5mALNnw1CBzmPvhO+iqCN9C3jdoEv2l
+         XUtpwY4+0oyKpoPeRj9bYMDgsFOwVj83Zsbxbp4fPpxTLAh63Or2Gyk9svy7oiocotSJ
+         6UTmzLvzKZxy6D0HpkPXKQ8bDV/KSL3xcfDu27AcgaA0ypZB4e5GykF5mrPg81PcOgfq
+         dA+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718371884; x=1718976684;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l8cNtJ0KAG7AoCM0lxu+9LqGYW69eFGTTDu4sYYR7Ys=;
+        b=NYlSYjsFLMeam1RW+dXBnncj1ABBCyT4CzjGyIh3BbQdq+HEyM08yvee8W4JM7eYWa
+         tWb61IvESnfBn2ncI90SI5sdOQrJ7Q0icJM0nBoML5dslMwvB4Rs6q+099JGzJJHCRVN
+         gLff54XSioplDCf96aLCBM1wxg0ETGCPapStRBDNFKC5TYvUtY7+K6yFLlA7pdkPccik
+         tmWfWYRYUTRRdctLp7z2xOTME91DrRvbsOVblFG19QHnvHmKkwJwCLggIDxqoH9J0urV
+         aVaEx4MZcRPnwfI6eCONIcYY1jAHyvIXoh5z+1RxMHXZnIQdOLIfB2zzTHRoncT96Zlw
+         nGnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWeUFJa8DhZDtepjswU051vy44lNPrRMs9c8Y0P4kn+pDuEMX7hOELqguuz01feMKBgP1h3o/wWjNswgvUplEa1iEMvQVED
+X-Gm-Message-State: AOJu0YxLYCNgmqB8waR/gPbQrtegWIXeNX8sQ425dxIJKblHqHZsU+yU
+	zkaNpinc7XzjtcZVtMoXR7u5yf1d6vyixUqn5bcwuV/MOgVq9Ytw
+X-Google-Smtp-Source: AGHT+IH5bGJmHo6XG1RqtGjED13vixzWP1Ir+X6Jz/jBmZdz8PWTgDsIwVjSoZx+ktWMD8lwMSGbdQ==
+X-Received: by 2002:a2e:8099:0:b0:2eb:dced:71aa with SMTP id 38308e7fff4ca-2ec0e4826e6mr21094901fa.15.1718371883694;
+        Fri, 14 Jun 2024 06:31:23 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ec05c99e96sm5390391fa.128.2024.06.14.06.31.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jun 2024 06:31:23 -0700 (PDT)
+Date: Fri, 14 Jun 2024 16:31:20 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
+Subject: Re: [PATCH net-next v13 02/15] net: stmmac: Add multi-channel support
+Message-ID: <s2nglkzifuhqwfop5ztdaep3cag23s4z2re3s7wvmnf6vkuidi@jnywporyoay7>
+References: <cover.1716973237.git.siyanteng@loongson.cn>
+ <b4ab0f87284b5f2b0f03961b76878dcc000830c2.1716973237.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB2913.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 04fafcd0-c6ad-4dad-9c7e-08dc8c760b91
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jun 2024 13:29:40.7510
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: XyFfTRNJHXpiSihFpdIbyOEd/yuvJC/NWDIlnFL9bs+uiVElz4nL/S0bOKMdLmh31Rw/aKpBYDjSOgvN9eQCnyQrEJFQT4njOLPk+nCQQXg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7720
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b4ab0f87284b5f2b0f03961b76878dcc000830c2.1716973237.git.siyanteng@loongson.cn>
 
-SGkgRW5ndWVycmFuZCwNCg0KR2xhZCB0aGF0IHRoZSBpc3N1ZSBpcyByZXNvbHZlZC4NCldpbGwg
-YXNrIHRvIGNsb3NlIHRoZSB0aWNrZXQgdG9vIHdpdGggbG9nIG9mIGVtYWlsIHRocmVhZC4NCg0K
-QmVzdCByZWdhcmRzDQpXb29qdW5nDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4g
-RnJvbTogRW5ndWVycmFuZCBkZSBSaWJhdWNvdXJ0IDxlbmd1ZXJyYW5kLmRlLQ0KPiByaWJhdWNv
-dXJ0QHNhdm9pcmZhaXJlbGludXguY29tPg0KPiBTZW50OiBGcmlkYXksIEp1bmUgMTQsIDIwMjQg
-MzozMyBBTQ0KPiBUbzogV29vanVuZyBIdWggLSBDMjE2OTkgPFdvb2p1bmcuSHVoQG1pY3JvY2hp
-cC5jb20+DQo+IENjOiBVTkdMaW51eERyaXZlciA8VU5HTGludXhEcml2ZXJAbWljcm9jaGlwLmNv
-bT47IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IEtTWjk4OTcgUk1JSSBw
-b3J0cyBzdXBwb3J0DQo+IA0KPiBFWFRFUk5BTCBFTUFJTDogRG8gbm90IGNsaWNrIGxpbmtzIG9y
-IG9wZW4gYXR0YWNobWVudHMgdW5sZXNzIHlvdSBrbm93IHRoZQ0KPiBjb250ZW50IGlzIHNhZmUN
-Cj4gDQo+IEhlbGxvIFdvb2p1bmcsDQo+IA0KPiBJIGdvdCB0aGUgbmV0d29yayB0cmFmZmljIHRv
-IHdvcmsgYWdhaW4gYnkgcHV0aW5nIGJhY2sgYHBoeS1tb2RlID0NCj4gInJtaWkiO2AgaW4gdGhl
-IE1BQyBkdHMgbm9kZSwgYnV0IHN0aWxsIHdpdGhvdXQgYHBoeS1oYW5kbGVgLiBTbyB3ZQ0KPiBm
-b3VuZCBvdXQgdGhhdCB0aGUgaW1wcm9wZXIgcGh5X2lkIHdhcyBhIGNvbmZpZ3VyYXRpb24gaXNz
-dWUgb24gbXkgZW5kLg0KPiBJJ20gZ29pbmcgdG8gc3VibWl0IGEgdjYgb2YgbXkgcGF0Y2hlcyB3
-aXRoIGp1c3QgdGhlIGVycmF0YSBmaXhlcywgd2hpbGUNCj4gY2hhbmdpbmcgd2hhdCBoYXMgYmVl
-biBzdWdnZXN0ZWQgb24gdjUuDQo+IA0KPiBUaGFua3MgYSBsb3QgZm9yIHlvdXIgaGVscCwNCj4g
-DQo+IEVuZ3VlcnJhbmQgZGUgUmliYXVjb3VydA0KPiBTYXZvaXItZmFpcmUgTGludXgNCj4gDQo+
-IE9uIDEzLzA2LzIwMjQgMTg6MzUsIFdvb2p1bmcuSHVoQG1pY3JvY2hpcC5jb20gd3JvdGU6DQo+
-ID4gSGkgRW5ndWVycmFuZCwNCj4gPg0KPiA+IEJlY2F1c2UgaXQgaXMgbm93IGRlYnVnZ2luZyBj
-b25maWd1cmF0aW9uIGJldHdlZW4gaS5NWDZVTEwgTklDIGFuZCBLU1o5ODk3LA0KPiA+IEkgd291
-bGQgbGlrZSB0byByZW1vdmUgbmV0ZGV2QC4uIGZyb20gY2MgaWYgeW91IGFncmVlLg0KPiA+DQo+
-ID4gQXMgbWVudGlvbmVkIGJlZm9yZSwgcGVyc29ucyB3aG8gY2FuIGRvIGhhbmRzLW9uIHdpdGgg
-S1NaIHN3aXRjaCBhcmUgb3V0DQo+IGZvcg0KPiA+IHZhY2F0aW9uIHVudGlsIGVuZCBvZiBuZXh0
-IHdlZWsuIFNvcnJ5IHRoYXQgc3VwcG9ydCBjb3VsZCBiZSBsaW1pdGVkDQo+ID4gYnkgcmVzb3Vy
-Y2VzIGFuZCBrbm93bGVkZ2UgYXQgdGhpcyBwb2ludCBldmVuIHRob3VnaCBJIHRyeSBteSBiZXN0
-Lg0KPiA+DQo+ID4+IFJYIHBhY2tldHM6ODY2IGVycm9yczo4NjIgZHJvcHBlZDo4NjIgb3ZlcnJ1
-bnM6MCBmcmFtZTowDQo+ID4gSSBkb24ndCBrbm93IHRlc3QgZW52aXJvbm1lbnQuIHN3MHAxIGlz
-IHRoZSBvbmx5IHBvcnQgY29ubmVjdGVkIGZyb20NCj4gc3dpdGNoIG9yIG5vdC4NCj4gPiBQZXIg
-dGhpcyBzdGF0LCBvbmx5IDQgcGFja2V0cyBhcmUgTk9UIGRyb3BwZWQgYXQgc3cwcDEuDQo+ID4g
-QmVjYXVzZSBhbGwgZXJyb3IgY291bnQgaXMgZHJvcC1jb3VudCAoUnhEcm9wUGFja2V0cyksIHN1
-c3BlY3QgdGhhdCBzd2l0Y2gNCj4gcGFja2V0DQo+ID4gYnVmZmVyIGdvdCBmdWxsIGFuZCBzdGFy
-dGVkIGRyb3BwaW5nIHRoZSBpbmNvbWluZyBwYWNrZXRzLg0KPiA+DQo+ID4gQmVjYXVzZSB0aGVy
-ZSBpcyBubyBSWCBjb3VudCBvbiBldGgwLCBhc3N1bWUgdGhhdCBDUFUgcG9ydCBLU1o5ODk3IGNh
-bid0DQo+IHNlbmQgYW55DQo+ID4gcGFja2V0IG91dCB0byBpLk1YNlVMTC4NCj4gPg0KPiA+IENh
-biB5b3UgcGxlYXNlIGNhcHR1cmUgKHdpcmVzaGFyayBvciB0Y3BkdW1wKSBvdmVyIGJyMCBhbmQg
-ZXRoMCBhbmQgc2hhcmUNCj4gZmlsZXMgd2l0aCB1cz8NCj4gPiBBbmQsIHN0YXRzIGZyb20gZXRo
-MCAoaS5lLiwgZXRodG9vbCAtUyBldGgwKSB0b28/DQo+ID4NCj4gPiBCZWNhdXNlIGV0aDAgc3Rp
-bGwgc2hvd3MgVHggY291bnQgaW5jcmVhc2UsIGd1ZXNzIGV0aDAgdGhpbmtzIGxpbmsgaXMgdXAN
-Cj4gYW5kDQo+ID4gc2VudCBvdXQgc29tZSBwYWNrZXRzIHRvIEtTWjk4OTcuDQo+ID4NCj4gPiBU
-aGFua3MuDQo+ID4gV29vanVuZw0KPiA+DQo+ID4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0t
-DQo+ID4+IEZyb206IEVuZ3VlcnJhbmQgZGUgUmliYXVjb3VydCA8ZW5ndWVycmFuZC5kZS0NCj4g
-Pj4gcmliYXVjb3VydEBzYXZvaXJmYWlyZWxpbnV4LmNvbT4NCj4gPj4gU2VudDogVGh1cnNkYXks
-IEp1bmUgMTMsIDIwMjQgMTA6MjQgQU0NCj4gPj4gVG86IFdvb2p1bmcgSHVoIC0gQzIxNjk5IDxX
-b29qdW5nLkh1aEBtaWNyb2NoaXAuY29tPg0KPiA+PiBDYzogVU5HTGludXhEcml2ZXIgPFVOR0xp
-bnV4RHJpdmVyQG1pY3JvY2hpcC5jb20+OyBuZXRkZXZAdmdlci5rZXJuZWwub3JnDQo+ID4+IFN1
-YmplY3Q6IFJlOiBLU1o5ODk3IFJNSUkgcG9ydHMgc3VwcG9ydA0KPiA+Pg0KPiA+PiBFWFRFUk5B
-TCBFTUFJTDogRG8gbm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVudHMgdW5sZXNzIHlv
-dSBrbm93DQo+IHRoZQ0KPiA+PiBjb250ZW50IGlzIHNhZmUNCj4gPj4NCj4gPj4gSGVsbG8sDQo+
-ID4+DQo+ID4+IEkndmUgc2ltcGxpZmllZCBteSBkdHMgYWNjb3JkaW5nbHkgKHNlZSBiZWxsb3cp
-LiBIb3dldmVyLCBJIG5vIGxvbmdlcg0KPiA+PiByZWNlaXZlIHBhY2tldHMgb24gbXkgYnJpZGdl
-IGludGVyZmFjZS4gSW50ZXJmYWNlcyBldGgwLCBicjAgYW5kDQo+ID4+IGV4dGVybmFsIHBvcnRz
-IHByb3Blcmx5IHJlcG9ydCBsaW5rIFVQIGFuZCBJIGNhbiBzZWUgUlggY291bnRlcnMgZ29pbmcN
-Cj4gPj4gdXAgb24gdGhlIGV4dGVybmFsIHBvcnRzIGludGVyZmFjZXMgKHN3MHAqKS4gWWV0LCBp
-ZmNvbmZpZyBub3cgcmVwb3J0cyAwDQo+ID4+IFJYIHBhY2tldHMgb24gZXRoMCBhbmQgYnIwIG5v
-dywgd2hpbGUgSSBzZWUgMCBUWCBwYWNrZXRzIG9uIHN3MHAqLg0KPiA+Pg0KPiA+PiBgYGANCj4g
-Pj4gJCBpZmNvbmZpZw0KPiA+PiBicjANCj4gPj4gICAgICAgICAgICAgVVAgQlJPQURDQVNUIFJV
-Tk5JTkcgTVVMVElDQVNUICBNVFU6MTUwMCAgTWV0cmljOjENCj4gPj4gICAgICAgICAgICAgUlgg
-cGFja2V0czowIGVycm9yczowIGRyb3BwZWQ6MCBvdmVycnVuczowIGZyYW1lOjANCj4gPj4gICAg
-ICAgICAgICAgVFggcGFja2V0czoyNCBlcnJvcnM6MCBkcm9wcGVkOjAgb3ZlcnJ1bnM6MCBjYXJy
-aWVyOjANCj4gPj4NCj4gPj4gZXRoMA0KPiA+PiAgICAgICAgICAgICBVUCBCUk9BRENBU1QgUlVO
-TklORyBNVUxUSUNBU1QgIE1UVToxNTA2ICBNZXRyaWM6MQ0KPiA+PiAgICAgICAgICAgICBSWCBw
-YWNrZXRzOjAgZXJyb3JzOjAgZHJvcHBlZDowIG92ZXJydW5zOjAgZnJhbWU6MA0KPiA+PiAgICAg
-ICAgICAgICBUWCBwYWNrZXRzOjYyIGVycm9yczowIGRyb3BwZWQ6MCBvdmVycnVuczowIGNhcnJp
-ZXI6MA0KPiA+Pg0KPiA+PiBzdzBwMQ0KPiA+PiAgICAgICAgICAgICBVUCBCUk9BRENBU1QgUlVO
-TklORyBNVUxUSUNBU1QgIE1UVToxNTAwICBNZXRyaWM6MQ0KPiA+PiAgICAgICAgICAgICBSWCBw
-YWNrZXRzOjg2NiBlcnJvcnM6ODYyIGRyb3BwZWQ6ODYyIG92ZXJydW5zOjAgZnJhbWU6MA0KPiA+
-PiAgICAgICAgICAgICBUWCBwYWNrZXRzOjAgZXJyb3JzOjAgZHJvcHBlZDowIG92ZXJydW5zOjAg
-Y2FycmllcjowDQo+ID4+IGBgYA0KPiA+Pg0KPiA+PiBNeSBicmlkZ2UgY29uZmlndXJhdGlvbiBp
-cyBiYXNlZCBvbiB0aGUgZHNhIGRvY3VtZW50YXRpb246DQo+ID4+ICAgIC0NCj4gPj4gaHR0cHM6
-Ly9kb2NzLmtlcm5lbC5vcmcvbmV0d29ya2luZy9kc2EvY29uZmlndXJhdGlvbi5odG1sI2NvbmZp
-Z3VyYXRpb24tDQo+ID4+IHdpdGgtdGFnZ2luZy1zdXBwb3J0DQo+ID4+DQo+ID4+IENvdWxkIHlv
-dSBoZWxwIG1lIHVuZGVyc3RhbmQgd2hhdCdzIG1pc3NpbmcgdG8gcHJvcGVybHkgZXhjaGFuZ2Ug
-cGFja2V0cw0KPiA+PiB0aHJvdWdoIG15IGJyaWRnZSBpbnRlcmZhY2Ugd2l0aCB0aGUgbmV3IFJN
-SUkgY29uZmlndXJhdGlvbj8NCj4gPj4NCj4gPj4gSXQncyBwb3NzaWJsZSB0aGUgcHJldmlvdXMg
-cGh5X2lkIGJlaW5nIHJlYWQgY29ycmVzcG9uZGVkIHRvIHRoZSBvdGhlcg0KPiA+PiBTT00ncyBF
-dGhlcm5ldCdzIFBIWSBzaW5jZSBpdCB1c2VkIHRoZSBzYW1lIE1ESU8gYWRkcmVzcyBJIGhhZCBk
-ZWNsYXJlZA0KPiA+PiBpbiB0aGUgRFRTLg0KPiA+Pg0KPiA+PiBUaGFua3MgZm9yIHlvdXIgc3Vw
-cG9ydCwNCj4gPj4NCj4gPj4gRW5ndWVycmFuZCBkZSBSaWJhdWNvdXJ0DQo+ID4+IFNhdm9pci1m
-YWlyZSBMaW51eA0KPiA+Pg0KPiA+PiBgYGBjDQo+ID4+IGV0aGVybmV0QDIwYjQwMDAgew0KPiA+
-PiAgICAgICAgICBjb21wYXRpYmxlID0gImZzbCxpbXg2dWwtZmVjXDBmc2wsaW14NnEtZmVjIjsN
-Cj4gPj4gICAgICAgICAgLi4uDQo+ID4+ICAgICAgICAgIC9kZWxldGUtcHJvcGVydHkvIHBoeS1t
-b2RlOw0KPiA+PiAgICAgICAgICAvZGVsZXRlLXByb3BlcnR5LyBwaHktaGFuZGxlOw0KPiA+PiAg
-ICAgICAgICBwaGFuZGxlID0gPDB4MGM+Ow0KPiA+PiAgICAgICAgICBmaXhlZC1saW5rIHsNCj4g
-Pj4gICAgICAgICAgICAgICAgICBzcGVlZCA9IDwweDY0PjsNCj4gPj4gICAgICAgICAgICAgICAg
-ICBmdWxsLWR1cGxleDsNCj4gPj4gICAgICAgICAgfTsNCj4gPj4gfTsNCj4gPj4NCj4gPj4gc3Bp
-QDIwMTAwMDAgew0KPiA+PiAgICAgICAgICBrc3o5ODk3QDAgew0KPiA+PiAgICAgICAgICAgICAg
-ICAgIHBvcnRzIHsNCj4gPj4gICAgICAgICAgICAgICAgICAgICAgICAgIHBvcnRANSB7DQo+ID4+
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJlZyA9IDwweDA1PjsNCj4gPj4gICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbGFiZWwgPSAiY3B1IjsNCj4gPj4gICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgZXRoZXJuZXQgPSA8MHgwYz47DQo+ID4+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHBoeS1tb2RlID0gInJtaWkiOw0KPiA+PiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICByeC1pbnRlcm5hbC1kZWxheS1wcyA9IDwweDVk
-Yz47DQo+ID4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZpeGVkLWxpbmsgew0K
-PiA+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNwZWVkID0gPDB4
-NjQ+Ow0KPiA+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZ1bGwt
-ZHVwbGV4Ow0KPiA+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB9Ow0KPiA+PiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgfTsNCj4gPj4gICAgICAgICAgICAgICAgICB9Ow0KPiA+
-PiAgICAgICAgICB9Ow0KPiA+PiB9Ow0KPiA+Pg0KPiA+PiBldGhlcm5ldEAyMTg4MDAwIHsNCj4g
-Pj4gICAgICAgICAgc3RhdHVzID0gImRpc2FibGVkIjsNCj4gPj4gfTsNCj4gPj4gYGBgDQo+ID4+
-DQo+ID4+IE9uIDA3LzA2LzIwMjQgMTc6MzksIFdvb2p1bmcuSHVoQG1pY3JvY2hpcC5jb20gd3Jv
-dGU6DQo+ID4+PiBIaSBFbmd1ZXJyYW5kLA0KPiA+Pj4NCj4gPj4+IFRoYW5rcyBmb3IgY3JlYXRp
-bmcgbmV3IHRocmVhZC4gQ29udGludWUgZnJvbSBbMV0uDQo+ID4+Pg0KPiA+Pj4gWW91IGNhbiBj
-aGVjayBTQU1BNSArIEtTWjk0NzcgRVZCIERUUy4NCj4gPj4+IFsyXSBpcyBob3N0IE1BQyBzaWRl
-IHNldHRpbmcgYW5kDQo+ID4+PiBbM10gaXMgaG9zdCBwb3J0IHNldHRpbmcgb2YgS1NaIHN3aXRj
-aCBzaWRlLg0KPiA+Pj4NCj4gPj4+IFlvdXIgZXRoZXJuZXRAMjBiNDAwMCBoYXMgcGh5LWhhbmRs
-ZSB3aGljaCBpcyBub3QgaW4gWzJdLg0KPiA+Pj4gInBoeS1oYW5kbGUgPSA8MHgxNT4iIHNwZWNp
-ZmllcyB0byAia3N6OTg5N3BvcnQ1QDEiIHVuZGVyICJtZGlvIi4NCj4gPj4+IEkgdGhpbmsgdGhp
-cyBpcyBzZXR0aW5nIHlvdSBkb24ndCBuZWVkIHRvIHNwZWNpZnkuDQo+ID4+Pg0KPiA+Pj4gImZp
-eGVkLWxpbmsiIHVuZGVyICJldGhlcm5ldEAyMGI0MDAwIiBhbHJlYWR5IHNwZWNpZmllZA0KPiA+
-Pj4gdGhlcmUgaXMgbm8gUEhZIChmaXhlZCBwaHkpIGZvciAiZXRoZXJuZXRAMjBiNDAwMCIgYW5k
-IGl0IGlzIGVub3VnaC4NCj4gPj4+DQo+ID4+PiBLU1o5ODk3IHNoYXJlcyBhIHBpbiBvbiBTREkv
-U0RBL01ESU8sIG5vIE1ESU8gaXMgYWN0aXZlIGluIHlvdXIgc2V0dXANCj4gPj4gYmVjYXVzZQ0K
-PiA+Pj4gU1BJIGlzIGVuYWJsZSBmb3IgS1NaIHN3aXRjaCBjb250cm9sIGFjY2Vzcy4NCj4gPj4+
-IEkgZ3Vlc3MgImtzejk4OTdwb3J0NUAxIiB1bmRlciAibWRpbyIgY2F1c2VzIHBoeSBzY2Fubmlu
-ZyBvbiBob3N0IE1ESU8NCj4gYnVzLA0KPiA+Pj4gYW5kIGFzc3VtZSB0aGF0IHRoZXJlIGlzIEtT
-WjgwODEgUEhZIG9uIHRoZSBob3N0IHN5c3RlbSAocHJvYmFibHkgb24NCj4gTkVUMT8pDQo+ID4+
-Pg0KPiA+Pj4gUGxlYXNlIGxldCBtZSBrbm93IG15IGFzc2Vzc21lbnQgaXMgbm90IGNvcnJlY3Qu
-IFdlIGNhbiBjb250aW51ZSB0bw0KPiBkZWJ1Zw0KPiA+PiB0aGlzIGlzc3VlLg0KPiA+Pj4NCj4g
-Pj4+PiBgYGBjDQo+ID4+Pj4gZXRoZXJuZXRAMjBiNDAwMCB7DQo+ID4+Pj4gICAgICAgIGNvbXBh
-dGlibGUgPSAiZnNsLGlteDZ1bC1mZWNcMGZzbCxpbXg2cS1mZWMiOw0KPiA+Pj4+ICAgICAgICAu
-Li4NCj4gPj4+PiAgICAgICAgcGh5LW1vZGUgPSAicm1paSI7DQo+ID4+Pj4gICAgICAgIHBoeS1o
-YW5kbGUgPSA8MHgxNT47DQo+ID4+Pj4gICAgICAgIGZpeGVkLWxpbmsgew0KPiA+Pj4+ICAgICAg
-ICAgICAgc3BlZWQgPSA8MHg2ND47DQo+ID4+Pj4gICAgICAgICAgICBmdWxsLWR1cGxleDsNCj4g
-Pj4+PiAgICAgICAgfTsNCj4gPj4+PiB9Ow0KPiA+Pj4+DQo+ID4+Pj4gLy8gTURJTyBidXMgaXMg
-b25seSBkZWZpbmVkIG9uIGV0aDEgYnV0IHNoYXJlZCB3aXRoIGV0aDINCj4gPj4+PiBldGhlcm5l
-dEAyMTg4MDAwIHsNCj4gPj4+PiAgICAgICAgICAgIC4uLg0KPiA+Pj4+ICAgICAgICBtZGlvIHsN
-Cj4gPj4+PiAgICAgICAgICAgICAgICAgICAgLi4uDQo+ID4+Pj4gICAgICAgICAgICBrc3o5ODk3
-cG9ydDVAMSB7DQo+ID4+Pj4gICAgICAgICAgICAgICAgY29tcGF0aWJsZSA9ICJldGhlcm5ldC1w
-aHktaWVlZTgwMi4zLWMyMiI7DQo+ID4+Pj4gICAgICAgICAgICAgICAgLi4uDQo+ID4+Pj4gICAg
-ICAgICAgICAgICAgY2xvY2stbmFtZXMgPSAicm1paS1yZWYiOw0KPiA+Pj4+ICAgICAgICAgICAg
-ICAgIHBoYW5kbGUgPSA8MHgxNT47DQo+ID4+Pj4gICAgICAgICAgICB9Ow0KPiA+Pj4+IH07DQo+
-ID4+Pj4NCj4gPj4+PiBzcGlAMjAxMDAwMCB7DQo+ID4+Pj4gICAgICAgICAgICAuLi4NCj4gPj4+
-PiAgICAgICAga3N6OTg5N0AwIHsNCj4gPj4+PiAgICAgICAgICAgIGNvbXBhdGlibGUgPSAibWlj
-cm9jaGlwLGtzejk4OTciOw0KPiA+Pj4+ICAgICAgICAgICAgLi4uDQo+ID4+Pj4gICAgICAgICAg
-ICBwb3J0cyB7DQo+ID4+Pj4gICAgICAgICAgICAgICAgLi4uDQo+ID4+Pj4gICAgICAgICAgICAg
-ICAgLy8gR01BQzYNCj4gPj4+PiAgICAgICAgICAgICAgICBwb3J0QDUgew0KPiA+Pj4+ICAgICAg
-ICAgICAgICAgICAgICByZWcgPSA8MHgwNT47DQo+ID4+Pj4gICAgICAgICAgICAgICAgICAgIGxh
-YmVsID0gImNwdSI7DQo+ID4+Pj4gICAgICAgICAgICAgICAgICAgIGV0aGVybmV0ID0gPDB4MGM+
-Ow0KPiA+Pj4+ICAgICAgICAgICAgICAgICAgICBwaHktbW9kZSA9ICJybWlpIjsNCj4gPj4+PiAg
-ICAgICAgICAgICAgICAgICAgcngtaW50ZXJuYWwtZGVsYXktcHMgPSA8MHg1ZGM+Ow0KPiA+Pj4+
-ICAgICAgICAgICAgICAgICAgICBmaXhlZC1saW5rIHsNCj4gPj4+PiAgICAgICAgICAgICAgICAg
-ICAgICAgIHNwZWVkID0gPDB4NjQ+Ow0KPiA+Pj4+ICAgICAgICAgICAgICAgICAgICAgICAgZnVs
-bC1kdXBsZXg7DQo+ID4+Pj4gICAgICAgICAgICAgICAgICAgIH07DQo+ID4+Pj4gICAgICAgICAg
-ICAgICAgfTsNCj4gPj4+PiAgICAgICAgICAgIH07DQo+ID4+Pj4gICAgICAgIH07DQo+ID4+Pj4g
-fTsNCj4gPj4+PiBgYGANCj4gPj4+DQo+ID4+Pg0KPiA+Pj4gWzFdDQo+ID4+DQo+IGh0dHBzOi8v
-bG9yZS5rZXJuZWwub3JnL25ldGRldi9CTDBQUjExTUIyOTEzQkFCQjEzMERBQjFFNzY4ODEwRUZF
-N0ZCMkBCTDBQUjENCj4gPj4gMU1CMjkxMy5uYW1wcmQxMS5wcm9kLm91dGxvb2suY29tLw0KPiA+
-Pj4gWzJdIGh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L25l
-dGRldi9uZXQtDQo+ID4+IG5leHQuZ2l0L3RyZWUvYXJjaC9hcm0vYm9vdC9kdHMvbWljcm9jaGlw
-L2F0OTEtDQo+IHNhbWE1ZDNfa3N6OTQ3N19ldmIuZHRzI241MA0KPiA+Pj4gWzNdIGh0dHBzOi8v
-Z2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L25ldGRldi9uZXQtDQo+ID4+
-IG5leHQuZ2l0L3RyZWUvYXJjaC9hcm0vYm9vdC9kdHMvbWljcm9jaGlwL2F0OTEtDQo+IHNhbWE1
-ZDNfa3N6OTQ3N19ldmIuZHRzI24xNTANCj4gPj4+DQo+ID4+Pj4gLS0tLS1PcmlnaW5hbCBNZXNz
-YWdlLS0tLS0NCj4gPj4+PiBGcm9tOiBFbmd1ZXJyYW5kIGRlIFJpYmF1Y291cnQgPGVuZ3VlcnJh
-bmQuZGUtDQo+ID4+Pj4gcmliYXVjb3VydEBzYXZvaXJmYWlyZWxpbnV4LmNvbT4NCj4gPj4+PiBT
-ZW50OiBGcmlkYXksIEp1bmUgNywgMjAyNCA5OjU3IEFNDQo+ID4+Pj4gVG86IFdvb2p1bmcgSHVo
-IC0gQzIxNjk5IDxXb29qdW5nLkh1aEBtaWNyb2NoaXAuY29tPjsgbmV0ZGV2DQo+ID4+Pj4gPG5l
-dGRldkB2Z2VyLmtlcm5lbC5vcmc+DQo+ID4+Pj4gQ2M6IFVOR0xpbnV4RHJpdmVyIDxVTkdMaW51
-eERyaXZlckBtaWNyb2NoaXAuY29tPg0KPiA+Pj4+IFN1YmplY3Q6IEtTWjk4OTcgUk1JSSBwb3J0
-cyBzdXBwb3J0DQo+ID4+Pj4NCj4gPj4+PiBFWFRFUk5BTCBFTUFJTDogRG8gbm90IGNsaWNrIGxp
-bmtzIG9yIG9wZW4gYXR0YWNobWVudHMgdW5sZXNzIHlvdSBrbm93DQo+ID4+IHRoZQ0KPiA+Pj4+
-IGNvbnRlbnQgaXMgc2FmZQ0KPiA+Pj4+DQo+ID4+Pj4gSGVsbG8sIHRoaXMgaXMgYSBmb2xsb3cg
-dXAgdG86DQo+ID4+Pj4NCj4gPj4+Pg0KPiA+Pg0KPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9u
-ZXRkZXYvQkwwUFIxMU1CMjkxM0JBQkIxMzBEQUIxRTc2ODgxMEVGRTdGQjJAQkwwUFIxDQo+ID4+
-Pj4gMU1CMjkxMy5uYW1wcmQxMS5wcm9kLm91dGxvb2suY29tLw0KPiA+Pj4+DQo+ID4+Pj4gSSBo
-YXZlIHN1Ym1pdHRlZCBwYXRjaGVzIHRvIHN1cHBvcnQgdGhlIEtTWjk4OTcgUk1JSSBwb3J0IChH
-TUFDNikNCj4gPj4+PiBjb25uZWN0ZWQgdG8gYW4gaS5NWDZVTEwgKFNlZSBhYm92ZSBkaXNjdXNz
-aW9uKS4gVGhlIGN1cnJlbnQgcGF0Y2gNCj4gPj4+PiBpbXBsZW1lbnRzIGEgcHNldWRvIFBIWS1J
-RCBiZWNhdXNlIHRoZSBvbmUgZW1pdHRlZCBieSBLU1o5ODk3UiBjb2xsaWRlcw0KPiA+Pj4+IHdp
-dGggS1NaODA4MS4NCj4gPj4+Pg0KPiA+Pj4+IEFyZSB0aGVyZSBvdGhlciB3YXlzIHRvIHN1cHBv
-cnQgdGhpcyBSTUlJIGNvbm5lY3Rpb24gdGhhdCB3ZSB3YW50IHRvDQo+ID4+Pj4gZXhwbG9yZT8N
-Cj4gPj4+Pg0KPiA+Pj4+IEJlc3QgUmVnYXJkcywNCj4gPj4+Pg0KPiA+Pj4+IEVuZ3VlcnJhbmQg
-ZGUgUmliYXVjb3VydA0KDQo=
+Hi Yanteng
+
+On Wed, May 29, 2024 at 06:18:18PM +0800, Yanteng Si wrote:
+> DW GMAC v3.x multi-channels feature is implemented as multiple
+> sets of the same CSRs. Here is only preliminary support, it will
+> be useful for the driver further evolution and for the users
+> having multi-channel DWGMAC v3.x devices.
+
+Why haven't you picked up the commit log suggested on v12? It has more
+details about the feature and the change context. Please use it:
+
+"DW GMAC v3.73 can be equipped with the Audio Video (AV) feature which
+enables transmission of time-sensitive traffic over bridged local area
+networks (DWC Ethernet QoS Product). In that case there can be up to two
+additional DMA-channels available with no Tx COE support (unless there is
+vendor-specific IP-core alterations). Each channel is implemented as a
+separate Control and Status register (CSR) for managing the transmit and
+receive functions, descriptor handling, and interrupt handling.
+
+Add the multi-channels DW GMAC controllers support just by making sure the
+already implemented DMA-configs are performed on the per-channel basis.
+
+Note the only currently known instance of the multi-channel DW GMAC
+IP-core is the LS2K2000 GNET controller, which has been released with the
+vendor-specific feature extension of having eight DMA-channels. The device
+support will be added in one of the following up commits."
+
+> 
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> ---
+>  .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  2 +-
+>  .../ethernet/stmicro/stmmac/dwmac1000_dma.c   | 32 ++++++++++---------
+>  .../net/ethernet/stmicro/stmmac/dwmac_dma.h   | 20 ++++++++++--
+>  .../net/ethernet/stmicro/stmmac/dwmac_lib.c   | 30 ++++++++---------
+>  drivers/net/ethernet/stmicro/stmmac/hwif.h    |  2 +-
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 14 ++++----
+>  6 files changed, 60 insertions(+), 40 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+> index d87079016952..cc93f73a380e 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+> @@ -395,7 +395,7 @@ static void sun8i_dwmac_dma_start_tx(struct stmmac_priv *priv,
+>  	writel(v, ioaddr + EMAC_TX_CTL1);
+>  }
+>  
+> -static void sun8i_dwmac_enable_dma_transmission(void __iomem *ioaddr)
+> +static void sun8i_dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
+>  {
+>  	u32 v;
+>  
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> index bb82ee9b855f..f161ec9ac490 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> @@ -70,15 +70,17 @@ static void dwmac1000_dma_axi(void __iomem *ioaddr, struct stmmac_axi *axi)
+>  	writel(value, ioaddr + DMA_AXI_BUS_MODE);
+>  }
+>  
+> -static void dwmac1000_dma_init(void __iomem *ioaddr,
+> -			       struct stmmac_dma_cfg *dma_cfg)
+> +static void dwmac1000_dma_init_channel(struct stmmac_priv *priv,
+> +				       void __iomem *ioaddr,
+> +				       struct stmmac_dma_cfg *dma_cfg, u32 chan)
+>  {
+> -	u32 value = readl(ioaddr + DMA_BUS_MODE);
+>  	int txpbl = dma_cfg->txpbl ?: dma_cfg->pbl;
+>  	int rxpbl = dma_cfg->rxpbl ?: dma_cfg->pbl;
+> +	u32 value;
+>  
+> -	/*
+> -	 * Set the DMA PBL (Programmable Burst Length) mode.
+> +	value = readl(ioaddr + DMA_CHAN_BUS_MODE(chan));
+> +
+> +	/* Set the DMA PBL (Programmable Burst Length) mode.
+>  	 *
+>  	 * Note: before stmmac core 3.50 this mode bit was 4xPBL, and
+>  	 * post 3.5 mode bit acts as 8*PBL.
+> @@ -104,10 +106,10 @@ static void dwmac1000_dma_init(void __iomem *ioaddr,
+>  	if (dma_cfg->aal)
+>  		value |= DMA_BUS_MODE_AAL;
+>  
+> -	writel(value, ioaddr + DMA_BUS_MODE);
+> +	writel(value, ioaddr + DMA_CHAN_BUS_MODE(chan));
+>  
+>  	/* Mask interrupts by writing to CSR7 */
+> -	writel(DMA_INTR_DEFAULT_MASK, ioaddr + DMA_INTR_ENA);
+> +	writel(DMA_INTR_DEFAULT_MASK, ioaddr + DMA_CHAN_INTR_ENA(chan));
+>  }
+>  
+>  static void dwmac1000_dma_init_rx(struct stmmac_priv *priv,
+> @@ -116,7 +118,7 @@ static void dwmac1000_dma_init_rx(struct stmmac_priv *priv,
+>  				  dma_addr_t dma_rx_phy, u32 chan)
+>  {
+>  	/* RX descriptor base address list must be written into DMA CSR3 */
+> -	writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR);
+> +	writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_CHAN_RCV_BASE_ADDR(chan));
+>  }
+>  
+>  static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
+> @@ -125,7 +127,7 @@ static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
+>  				  dma_addr_t dma_tx_phy, u32 chan)
+>  {
+>  	/* TX descriptor base address list must be written into DMA CSR4 */
+> -	writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_TX_BASE_ADDR);
+> +	writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_CHAN_TX_BASE_ADDR(chan));
+>  }
+>  
+>  static u32 dwmac1000_configure_fc(u32 csr6, int rxfifosz)
+> @@ -153,7 +155,7 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
+>  					    void __iomem *ioaddr, int mode,
+>  					    u32 channel, int fifosz, u8 qmode)
+>  {
+> -	u32 csr6 = readl(ioaddr + DMA_CONTROL);
+> +	u32 csr6 = readl(ioaddr + DMA_CHAN_CONTROL(channel));
+>  
+>  	if (mode == SF_DMA_MODE) {
+>  		pr_debug("GMAC: enable RX store and forward mode\n");
+> @@ -175,14 +177,14 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
+>  	/* Configure flow control based on rx fifo size */
+>  	csr6 = dwmac1000_configure_fc(csr6, fifosz);
+>  
+> -	writel(csr6, ioaddr + DMA_CONTROL);
+> +	writel(csr6, ioaddr + DMA_CHAN_CONTROL(channel));
+>  }
+>  
+>  static void dwmac1000_dma_operation_mode_tx(struct stmmac_priv *priv,
+>  					    void __iomem *ioaddr, int mode,
+>  					    u32 channel, int fifosz, u8 qmode)
+>  {
+> -	u32 csr6 = readl(ioaddr + DMA_CONTROL);
+> +	u32 csr6 = readl(ioaddr + DMA_CHAN_CONTROL(channel));
+>  
+>  	if (mode == SF_DMA_MODE) {
+>  		pr_debug("GMAC: enable TX store and forward mode\n");
+> @@ -209,7 +211,7 @@ static void dwmac1000_dma_operation_mode_tx(struct stmmac_priv *priv,
+>  			csr6 |= DMA_CONTROL_TTC_256;
+>  	}
+>  
+> -	writel(csr6, ioaddr + DMA_CONTROL);
+> +	writel(csr6, ioaddr + DMA_CHAN_CONTROL(channel));
+>  }
+>  
+>  static void dwmac1000_dump_dma_regs(struct stmmac_priv *priv,
+> @@ -271,12 +273,12 @@ static int dwmac1000_get_hw_feature(void __iomem *ioaddr,
+>  static void dwmac1000_rx_watchdog(struct stmmac_priv *priv,
+>  				  void __iomem *ioaddr, u32 riwt, u32 queue)
+>  {
+> -	writel(riwt, ioaddr + DMA_RX_WATCHDOG);
+> +	writel(riwt, ioaddr + DMA_CHAN_RX_WATCHDOG(queue));
+>  }
+>  
+>  const struct stmmac_dma_ops dwmac1000_dma_ops = {
+>  	.reset = dwmac_dma_reset,
+> -	.init = dwmac1000_dma_init,
+> +	.init_chan = dwmac1000_dma_init_channel,
+>  	.init_rx_chan = dwmac1000_dma_init_rx,
+>  	.init_tx_chan = dwmac1000_dma_init_tx,
+>  	.axi = dwmac1000_dma_axi,
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+> index 72672391675f..363a85469594 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+> @@ -22,6 +22,23 @@
+>  #define DMA_INTR_ENA		0x0000101c	/* Interrupt Enable */
+>  #define DMA_MISSED_FRAME_CTR	0x00001020	/* Missed Frame Counter */
+>  
+> +/* Following DMA defines are channels oriented */
+> +#define DMA_CHAN_BASE_OFFSET			0x100
+> +
+> +static inline u32 dma_chan_base_addr(u32 base, u32 chan)
+> +{
+> +	return base + chan * DMA_CHAN_BASE_OFFSET;
+> +}
+> +
+
+> +#define DMA_CHAN_XMT_POLL_DEMAND(chan)	dma_chan_base_addr(DMA_XMT_POLL_DEMAND, chan)
+> +#define DMA_CHAN_INTR_ENA(chan)	dma_chan_base_addr(DMA_INTR_ENA, chan)
+> +#define DMA_CHAN_CONTROL(chan)		dma_chan_base_addr(DMA_CONTROL, chan)
+> +#define DMA_CHAN_STATUS(chan)		dma_chan_base_addr(DMA_STATUS, chan)
+> +#define DMA_CHAN_BUS_MODE(chan)	dma_chan_base_addr(DMA_BUS_MODE, chan)
+> +#define DMA_CHAN_RCV_BASE_ADDR(chan)	dma_chan_base_addr(DMA_RCV_BASE_ADDR, chan)
+> +#define DMA_CHAN_TX_BASE_ADDR(chan)	dma_chan_base_addr(DMA_TX_BASE_ADDR, chan)
+> +#define DMA_CHAN_RX_WATCHDOG(chan)	dma_chan_base_addr(DMA_RX_WATCHDOG, chan)
+> +
+
+Please re-define the macros in the address ascending order:
+DMA_CHAN_BUS_MODE()
+DMA_CHAN_XMT_POLL_DEMAND()
+DMA_CHAN_RCV_POLL_DEMAND()
+DMA_CHAN_RCV_BASE_ADDR()
+DMA_CHAN_TX_BASE_ADDR()
+DMA_CHAN_STATUS()
+DMA_CHAN_CONTROL()
+DMA_CHAN_INTR_ENA()
+DMA_CHAN_MISSED_FRAME_CTR()
+DMA_CHAN_RX_WATCHDOG()
+
+* Please don't forget DMA_CHAN_RCV_POLL_DEMAND() and
+DMA_CHAN_MISSED_FRAME_CTR() macros you've missed in your patch.
+
+>  /* SW Reset */
+>  #define DMA_BUS_MODE_SFT_RESET	0x00000001	/* Software Reset */
+>  
+> @@ -152,7 +169,7 @@
+>  #define NUM_DWMAC1000_DMA_REGS	23
+>  #define NUM_DWMAC4_DMA_REGS	27
+>  
+> -void dwmac_enable_dma_transmission(void __iomem *ioaddr);
+> +void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan);
+>  void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  			  u32 chan, bool rx, bool tx);
+>  void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+> @@ -168,5 +185,4 @@ void dwmac_dma_stop_rx(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  			struct stmmac_extra_stats *x, u32 chan, u32 dir);
+>  int dwmac_dma_reset(void __iomem *ioaddr);
+
+> -
+
+What has been wrong with this empty line so you decided to remove it?)
+
+-Serge(y) 
+
+>  #endif /* __DWMAC_DMA_H__ */
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+> index 85e18f9a22f9..4846bf49c576 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+> @@ -28,65 +28,65 @@ int dwmac_dma_reset(void __iomem *ioaddr)
+>  }
+>  
+>  /* CSR1 enables the transmit DMA to check for new descriptor */
+> -void dwmac_enable_dma_transmission(void __iomem *ioaddr)
+> +void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
+>  {
+> -	writel(1, ioaddr + DMA_XMT_POLL_DEMAND);
+> +	writel(1, ioaddr + DMA_CHAN_XMT_POLL_DEMAND(chan));
+>  }
+>  
+>  void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  			  u32 chan, bool rx, bool tx)
+>  {
+> -	u32 value = readl(ioaddr + DMA_INTR_ENA);
+> +	u32 value = readl(ioaddr + DMA_CHAN_INTR_ENA(chan));
+>  
+>  	if (rx)
+>  		value |= DMA_INTR_DEFAULT_RX;
+>  	if (tx)
+>  		value |= DMA_INTR_DEFAULT_TX;
+>  
+> -	writel(value, ioaddr + DMA_INTR_ENA);
+> +	writel(value, ioaddr + DMA_CHAN_INTR_ENA(chan));
+>  }
+>  
+>  void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  			   u32 chan, bool rx, bool tx)
+>  {
+> -	u32 value = readl(ioaddr + DMA_INTR_ENA);
+> +	u32 value = readl(ioaddr + DMA_CHAN_INTR_ENA(chan));
+>  
+>  	if (rx)
+>  		value &= ~DMA_INTR_DEFAULT_RX;
+>  	if (tx)
+>  		value &= ~DMA_INTR_DEFAULT_TX;
+>  
+> -	writel(value, ioaddr + DMA_INTR_ENA);
+> +	writel(value, ioaddr + DMA_CHAN_INTR_ENA(chan));
+>  }
+>  
+>  void dwmac_dma_start_tx(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  			u32 chan)
+>  {
+> -	u32 value = readl(ioaddr + DMA_CONTROL);
+> +	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+>  	value |= DMA_CONTROL_ST;
+> -	writel(value, ioaddr + DMA_CONTROL);
+> +	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+>  }
+>  
+>  void dwmac_dma_stop_tx(struct stmmac_priv *priv, void __iomem *ioaddr, u32 chan)
+>  {
+> -	u32 value = readl(ioaddr + DMA_CONTROL);
+> +	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+>  	value &= ~DMA_CONTROL_ST;
+> -	writel(value, ioaddr + DMA_CONTROL);
+> +	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+>  }
+>  
+>  void dwmac_dma_start_rx(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  			u32 chan)
+>  {
+> -	u32 value = readl(ioaddr + DMA_CONTROL);
+> +	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+>  	value |= DMA_CONTROL_SR;
+> -	writel(value, ioaddr + DMA_CONTROL);
+> +	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+>  }
+>  
+>  void dwmac_dma_stop_rx(struct stmmac_priv *priv, void __iomem *ioaddr, u32 chan)
+>  {
+> -	u32 value = readl(ioaddr + DMA_CONTROL);
+> +	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+>  	value &= ~DMA_CONTROL_SR;
+> -	writel(value, ioaddr + DMA_CONTROL);
+> +	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+>  }
+>  
+>  #ifdef DWMAC_DMA_DEBUG
+> @@ -165,7 +165,7 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  	struct stmmac_pcpu_stats *stats = this_cpu_ptr(priv->xstats.pcpu_stats);
+>  	int ret = 0;
+>  	/* read the status register (CSR5) */
+> -	u32 intr_status = readl(ioaddr + DMA_STATUS);
+> +	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
+>  
+>  #ifdef DWMAC_DMA_DEBUG
+>  	/* Enable it to monitor DMA rx/tx status in case of critical problems */
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> index 413441eb6ea0..d807ee4b066e 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> @@ -197,7 +197,7 @@ struct stmmac_dma_ops {
+>  	/* To track extra statistic (if supported) */
+>  	void (*dma_diagnostic_fr)(struct stmmac_extra_stats *x,
+>  				  void __iomem *ioaddr);
+> -	void (*enable_dma_transmission) (void __iomem *ioaddr);
+> +	void (*enable_dma_transmission)(void __iomem *ioaddr, u32 chan);
+>  	void (*enable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  			       u32 chan, bool rx, bool tx);
+>  	void (*disable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 99da314508c3..0eef95c15cd0 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -2370,9 +2370,11 @@ static void stmmac_dma_operation_mode(struct stmmac_priv *priv)
+>  	if (txfifosz == 0)
+>  		txfifosz = priv->dma_cap.tx_fifo_size;
+>  
+> -	/* Adjust for real per queue fifo size */
+> -	rxfifosz /= rx_channels_count;
+> -	txfifosz /= tx_channels_count;
+> +	/* Split up the shared Tx/Rx FIFO memory on DW QoS Eth and DW XGMAC */
+> +	if (priv->plat->has_gmac4 || priv->plat->has_xgmac) {
+> +		rxfifosz /= rx_channels_count;
+> +		txfifosz /= tx_channels_count;
+> +	}
+>  
+>  	if (priv->plat->force_thresh_dma_mode) {
+>  		txmode = tc;
+> @@ -2556,7 +2558,7 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
+>  				       true, priv->mode, true, true,
+>  				       xdp_desc.len);
+>  
+> -		stmmac_enable_dma_transmission(priv, priv->ioaddr);
+> +		stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
+>  
+>  		xsk_tx_metadata_to_compl(meta,
+>  					 &tx_q->tx_skbuff_dma[entry].xsk_meta);
+> @@ -4752,7 +4754,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+>  
+>  	netdev_tx_sent_queue(netdev_get_tx_queue(dev, queue), skb->len);
+>  
+> -	stmmac_enable_dma_transmission(priv, priv->ioaddr);
+> +	stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
+>  
+>  	stmmac_flush_tx_descriptors(priv, queue);
+>  	stmmac_tx_timer_arm(priv, queue);
+> @@ -4979,7 +4981,7 @@ static int stmmac_xdp_xmit_xdpf(struct stmmac_priv *priv, int queue,
+>  		u64_stats_update_end(&txq_stats->q_syncp);
+>  	}
+>  
+> -	stmmac_enable_dma_transmission(priv, priv->ioaddr);
+> +	stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
+>  
+>  	entry = STMMAC_GET_ENTRY(entry, priv->dma_conf.dma_tx_size);
+>  	tx_q->cur_tx = entry;
+> -- 
+> 2.31.4
+> 
 
