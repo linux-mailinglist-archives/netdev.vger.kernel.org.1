@@ -1,111 +1,198 @@
-Return-Path: <netdev+bounces-103710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 314B99092F7
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 21:34:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B17A9909308
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 21:40:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5506B1C228DC
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 19:34:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C1201F23539
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 19:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31671A38E7;
-	Fri, 14 Jun 2024 19:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CA9E1A38E7;
+	Fri, 14 Jun 2024 19:40:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Piy7/8cY"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="GdPLF6ZB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC8D26AD7;
-	Fri, 14 Jun 2024 19:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A78514882B
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 19:40:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718393638; cv=none; b=dl+pCGeNQ2hQSLtgfDQar0YVr9tBn9Xoz2YTqbNxPUcjA5EyTrRwu28myy0oAxeTQPeEPS22PYLNrJfmvyLvdkP9gO7iYohkokIA9Pc4bp+o5prIwXozRfeY3lEfzN2eIHPNb4JzWvQH3afgsMAzTOG61BJ7TsQuZkdpAhpevJM=
+	t=1718394049; cv=none; b=iCA1WrBujqqJWybO7iFP69qRYp58IESoshgUw9sA77D3MInW3t9Ylvl2EHp7xtgaXRSxEetLFg4s7VQGOl3X5g0uRAlWBTyF1s7h/sF35CoEhX6lZfYD9+AJJTofJfo6EWU2yMAU88TTo/TAukoeecNEqeMNzR6Ws/Bu4I5/cOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718393638; c=relaxed/simple;
-	bh=un2DKs68DVerlXBeKlpV6w20TzStZ/MgihGnCdsi2EU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A5O4zg/6E5qHVKs3c8INeozn/yCj0lrM3OGaEMV7P0Y+0O6D3bR5gNgd0fArTmglhgLXkhnUt9aaXO5/h15zYzD7wXiR0UN589jbazD6q4dym9gA+Vto8AlS7sSREOCzwnnHCyWpZbIV1PVG7l0ghBlmbsBxDjKYnTtbJPzKCQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=Piy7/8cY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF8CBC2BD10;
-	Fri, 14 Jun 2024 19:33:55 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Piy7/8cY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1718393634;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DXA9wvv5IhNhdgqqoog09hrS0W28PIbc3nCXFgq2mxA=;
-	b=Piy7/8cYE5kX8QxCb1ovvf7Oew+mzdXJL4F6If9Frkz4X0RUzqFF12WjwrhUhRlUy+iIKO
-	DoV+j//Avs/4vzAsOjkSD1yxY/bbFo9eXQkn/oEw9txGMiy9XDfptZ5hiqtMHXpzOrUrXv
-	cPfOpW6hB2UusbVHO75CZUsDVUtb8kw=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6d22401f (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Fri, 14 Jun 2024 19:33:52 +0000 (UTC)
-Date: Fri, 14 Jun 2024 21:33:45 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: "Paul E. McKenney" <paulmck@kernel.org>,
-	Vlastimil Babka <vbabka@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <ZmybGZDbXkw7JTjc@zx2c4.com>
-References: <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <ZmrfA1p2zSVIaYam@zx2c4.com>
- <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
- <Zmru7hhz8kPDPsyz@pc636>
- <7efde25f-6af5-4a67-abea-b26732a8aca1@paulmck-laptop>
- <Zmsuswo8OPIhY5KJ@pc636>
- <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
- <ZmszOd5idhf2Cb-v@pc636>
- <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
- <Zmw5FTX752g0vtlD@pc638.lan>
+	s=arc-20240116; t=1718394049; c=relaxed/simple;
+	bh=VqNw2ns7aqtWqDR0d5abv9h9DSXkqkFbhkx4mdQOkI8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JtmFPDjjahLhXoUdFh8MDW+lcUUCMXJDiOoR0kT8lYbmJ5SFTQYQoZUMFBw15JjBeimbSiygwpXwROdhx5Y3LrKGBSgnWa5uhxh1L7FOQfHnoXDJuN7ojE783qOUqAgoQmKm0MuEU/sf1YxV88SaAHBWTqSViMy6c3mQ6rm5zfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=GdPLF6ZB; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57c7ec8f1fcso3071512a12.0
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 12:40:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1718394045; x=1718998845; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wbc4GSgCSERDLxOuFdZrA/q/zxBmzXnyTxqibt9VdMs=;
+        b=GdPLF6ZBrIuMGKusGj1cDSHwE4PMQconZgUcSvXqO09whx4gb+M8m5jeX5h9XUP+ZF
+         q6Qt+a3u2Tp2e72LJRVCgaohhYV5KoVxipn8NB3nFyur8C8dfhIhoPf38mSuT1q7uawt
+         mGvGEyvLL4wd5wUBosXWdkA+DM3+2WndiXAh61t+VAzUVq7U2b0Wj/ngCKqVwAxqWWnA
+         c3Gd7Gy+zr4w5Eu698f5tCIrL1vb0Pl7Wjc7gNUQcIQgS4hdhGPJozAVJnwFydIcR95f
+         R7ssTsmygMFi2/iuRJXkXKsq+QSCNPZTEZY/t+GvWyyt1oNqFXdF2TfNY27vSOlMATPp
+         EFaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718394045; x=1718998845;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Wbc4GSgCSERDLxOuFdZrA/q/zxBmzXnyTxqibt9VdMs=;
+        b=kO0gkvqY/CtX3+/sW6++UHk9ok3H9431czVnTxNoMWMPXfFxt7lyhholM2Y2oufYJc
+         foctKZF1vvhLxUDAUYGlqVajtgSSvfsURVSiPtfS7OaSscZ+h2hd7KizSCATVQWlEp96
+         E1oiRCHITzVwftgfhGPQRLtoC33PcZNUaMgQURAsSrsiE9Dhw17HRTk7ziOVXvHmQeVa
+         ulkTTsFMwcZmIDb5Q8i2b5OqZsujhnzR66Forw05or3PaYXLCosI2hmTVHkIZaE5PPps
+         RGcga6iAv4iEZWdSjSnEPqgUMDI+TLAuvBlz0sDO1g3F2mQIFFv/ccLikqpxgqa6P+f1
+         hZRw==
+X-Forwarded-Encrypted: i=1; AJvYcCVvIJab1Udi47StzypBo0nUZGo8DUIkxGxitf3DlDtC8c1gr0NZSfyBHyrq2Ov8rpYNnnjlJwSECGEPbVBIwAc15v8RluvR
+X-Gm-Message-State: AOJu0YyX2ez0CCZvAn1+9/LNsNa+WIap/R2HeTbBmrq8De+/gAa0hKJu
+	H+DHiIxg3GBwq7vvzG8GNfLJjmgXLTwCp3B6jniAwcwmx4en5CiU/yII0gLHviQkR60fvgmCy7p
+	dl5lNeU/89J0sN1rNY8XFJIsE9W4sDREK7CbGzA==
+X-Google-Smtp-Source: AGHT+IEH8WEKx3xQbq1+oKvg4iOkF+AGoOi+MlB17Wrarh1LPwitVZ/727ewHKaMbj47weG8aVpunbjT5+1+Srui+5I=
+X-Received: by 2002:a50:8747:0:b0:57c:563b:f37f with SMTP id
+ 4fb4d7f45d1cf-57cbd67dbedmr2527046a12.19.1718394045408; Fri, 14 Jun 2024
+ 12:40:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Zmw5FTX752g0vtlD@pc638.lan>
+References: <cover.1718136376.git.yan@cloudflare.com> <dcfa5db9be2d29b68fe7c87b3f017e98e5ec83b4.1718136376.git.yan@cloudflare.com>
+ <fed7b2ca-5180-417f-a676-fb126157dff3@kernel.org> <86109f6c4a8303950ac13811a3f8506ff44a6cfc.camel@redhat.com>
+In-Reply-To: <86109f6c4a8303950ac13811a3f8506ff44a6cfc.camel@redhat.com>
+From: Yan Zhai <yan@cloudflare.com>
+Date: Fri, 14 Jun 2024 14:40:34 -0500
+Message-ID: <CAO3-PboH9aNSC7RaJdkouFoa5L2Eoqi7OjLuAay9EGABr1fEBQ@mail.gmail.com>
+Subject: Re: [PATCH v4 net-next 1/7] net: add rx_sk to trace_kfree_skb
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Abhishek Chauhan <quic_abchauha@quicinc.com>, Mina Almasry <almasrymina@google.com>, 
+	Florian Westphal <fw@strlen.de>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	David Howells <dhowells@redhat.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Pavel Begunkov <asml.silence@gmail.com>, 
+	linux-kernel@vger.kernel.org, kernel-team@cloudflare.com, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Neil Horman <nhorman@tuxdriver.com>, 
+	linux-trace-kernel@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 14, 2024 at 02:35:33PM +0200, Uladzislau Rezki wrote:
-> +	/* Should a destroy process be deferred? */
-> +	if (s->flags & SLAB_DEFER_DESTROY) {
-> +		list_move_tail(&s->list, &slab_caches_defer_destroy);
-> +		schedule_delayed_work(&slab_caches_defer_destroy_work, HZ);
-> +		goto out_unlock;
-> +	}
+On Fri, Jun 14, 2024 at 5:15=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On Wed, 2024-06-12 at 09:59 +0200, Jesper Dangaard Brouer wrote:
+> >
+> > On 11/06/2024 22.11, Yan Zhai wrote:
+> > > skb does not include enough information to find out receiving
+> > > sockets/services and netns/containers on packet drops. In theory
+> > > skb->dev tells about netns, but it can get cleared/reused, e.g. by TC=
+P
+> > > stack for OOO packet lookup. Similarly, skb->sk often identifies a lo=
+cal
+> > > sender, and tells nothing about a receiver.
+> > >
+> > > Allow passing an extra receiving socket to the tracepoint to improve
+> > > the visibility on receiving drops.
+> > >
+> > > Signed-off-by: Yan Zhai<yan@cloudflare.com>
+> > > ---
+> > > v3->v4: adjusted the TP_STRUCT field order to be consistent
+> > > v2->v3: fixed drop_monitor function prototype
+> > > ---
+> > >   include/trace/events/skb.h | 11 +++++++----
+> > >   net/core/dev.c             |  2 +-
+> > >   net/core/drop_monitor.c    |  9 ++++++---
+> > >   net/core/skbuff.c          |  2 +-
+> > >   4 files changed, 15 insertions(+), 9 deletions(-)
+> > >
+> > > diff --git a/include/trace/events/skb.h b/include/trace/events/skb.h
+> > > index 07e0715628ec..3e9ea1cca6f2 100644
+> > > --- a/include/trace/events/skb.h
+> > > +++ b/include/trace/events/skb.h
+> > > @@ -24,13 +24,14 @@ DEFINE_DROP_REASON(FN, FN)
+> > >   TRACE_EVENT(kfree_skb,
+> > >
+> > >     TP_PROTO(struct sk_buff *skb, void *location,
+> > > -            enum skb_drop_reason reason),
+> > > +            enum skb_drop_reason reason, struct sock *rx_sk),
+> > >
+> > > -   TP_ARGS(skb, location, reason),
+> > > +   TP_ARGS(skb, location, reason, rx_sk),
+> > >
+> > >     TP_STRUCT__entry(
+> > >             __field(void *,         skbaddr)
+> > >             __field(void *,         location)
+> > > +           __field(void *,         rx_skaddr)
+> >
+> > Is there any reason for appending the "addr" part to "rx_sk" ?
+> > It makes it harder to read this is the sk (socket).
+> >
+> > AFAICR the skbaddr naming is a legacy thing.
+>
+> I'm double-minded about the above: I can see your point, but on the
+> flip side the 'addr' suffix is consistently used in net-related
+> tracepoints.
+> >
+> > >             __field(unsigned short, protocol)
+> > >             __field(enum skb_drop_reason,   reason)
+> > >     ),
+> > > @@ -38,12 +39,14 @@ TRACE_EVENT(kfree_skb,
+> > >     TP_fast_assign(
+> > >             __entry->skbaddr =3D skb;
+> > >             __entry->location =3D location;
+> > > +           __entry->rx_skaddr =3D rx_sk;
+> > >             __entry->protocol =3D ntohs(skb->protocol);
+> > >             __entry->reason =3D reason;
+> > >     ),
+> > >
+> > > -   TP_printk("skbaddr=3D%p protocol=3D%u location=3D%pS reason: %s",
+> > > -             __entry->skbaddr, __entry->protocol, __entry->location,
+> > > +   TP_printk("skbaddr=3D%p rx_skaddr=3D%p protocol=3D%u location=3D%=
+pS reason: %s",
+> >                                ^^^^^^^^^
+> > I find it hard to visually tell skbaddr and rx_skaddr apart.
+> > And especially noticing the "skb" vs "sk" part of the string.
+>
+> I agree 'rx_skaddr' is sub-optimal. Either be consistent with all the
+> other net tracepoints and use 'skaddr' (which will very likely will
+> increase Jesper concerns, but I personally have no problem with such
+> format) or prefer readability with something alike 'rx_sk' or (even
+> better) 'sk'.
+>
 
-Wouldn't it be smoother to have the actual kmem_cache_free() function
-check to see if it's been marked for destruction and the refcount is
-zero, rather than polling every one second? I mentioned this approach
-in: https://lore.kernel.org/all/Zmo9-YGraiCj5-MI@zx2c4.com/ -
+Jesper explained to me in a private message that "addr" makes more
+sense when there was no BPF, since likely nothing would dereference
+the pointer anymore at that time, so it's purely an address. But it is
+no longer the case now. Also, in later patches of this change, I am
+already breaking the "convention" by replacing kfree_skb with
+sk_skb_reason_drop, so how about breaking it once more, and just
+calling it "rx_sk". I want to keep the "rx_" to emphasize this is a
+receiving socket. Let me send an amended version early next week and
+see if more thoughts come.
 
-    I wonder if the right fix to this would be adding a `should_destroy`
-    boolean to kmem_cache, which kmem_cache_destroy() sets to true. And
-    then right after it checks `if (number_of_allocations == 0)
-    actually_destroy()`, and likewise on each kmem_cache_free(), it
-    could check `if (should_destroy && number_of_allocations == 0)
-    actually_destroy()`. 
+thanks
+Yan
 
-Jason
+
+> Thanks,
+>
+> Paolo
+>
 
