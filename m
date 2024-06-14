@@ -1,201 +1,171 @@
-Return-Path: <netdev+bounces-103732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AF689093B0
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 23:36:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D7DD9093F8
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 00:00:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3EB21F222AC
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 21:36:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B982D1F21DDD
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF1C15B562;
-	Fri, 14 Jun 2024 21:36:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882B61850BF;
+	Fri, 14 Jun 2024 22:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f/GZJE4+"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="fMZ/bdWe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B4914882D;
-	Fri, 14 Jun 2024 21:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9911487ED
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 22:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718401006; cv=none; b=dFeqK0Jt3+OtmbD9CYJvHf5XJzqMXEEv2s1XC72OOmZuCcD3PcZlRl8G8bzkJDhidUkH0D+hTXr+4CQ5B3rXv1EaZM1+kbh0/p+oTOvDa110U7b5ZjlGl/9iAzKAbmFEo+m4rTGOdtix8wsDfmQpZe10zPoicE8orns+O9NE7gw=
+	t=1718402422; cv=none; b=j1BHflf1RxE+gZUzYz/y/BoXKqXg+gRq8ovynYHOf7WhLs5LXSerTFtvNmJafq5odEoecKHS921wyBXl8dVsACbsnQpmCYTVrn1ZccGwDFSvO4YsVos7wZSYm9OQyNrFI42McWuTawUYxWgXb8KbBG9dOB1XrJop5tbpQT7SuT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718401006; c=relaxed/simple;
-	bh=q0g6ibi75ZEzD6ggra8+zOk+wRYXZj61KZeiY/yG4P0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kzngoKG4RAUzgcwQFoj9hsqvS10DNRtSywQp7fSRCdgpkHV6Gx8HlhATaMEbkKNVDqqJGohjBRxojjY2jV/cLW12Xf4lOqoUC8beNhgeFV5DAGoCQUd0dAMaemg8aJ/B0hL2RPn8c8WWDzMh6F1L70QqbAodiYGjamk4Zob4hGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f/GZJE4+; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52c4b92c09bso3912823e87.1;
-        Fri, 14 Jun 2024 14:36:44 -0700 (PDT)
+	s=arc-20240116; t=1718402422; c=relaxed/simple;
+	bh=+5veQkgnVNkMxA9kgPIirgp7ENT3iYRLPKA4QGYdskE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Pqni/d4iV3s71j3yJkx5iSJinmVB1dEtaxj2SnRYtJ2vBw2upUZj03jrSQMKU31sA4xtcY/BP+Eu8WymiErMY7ei1zyRaM2avi/GhLYrLiZb1LvzIkggMrZh4nk3heC3cn/Qkz/NQ6m6BDxho39q7VqCON+c/7+OZfitALwm6l8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=fMZ/bdWe; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-795a4fde8bfso147013885a.2
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 15:00:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718401003; x=1719005803; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=bPuWx3FNS7o7yVF4Y5MNousWkGaU6pMFEqKrEXP5xc4=;
-        b=f/GZJE4+Rz36qz/SFySMk59b3bqp6qSY85IJc9EYXwOUJGhbz3fiY98sT9WXyjpH2m
-         vCWQyEHBJ21FWkrnSxjRAORcodPJft9pT7r4onrfxx6+49fLliKz4YE7xmRmi+QllsFt
-         MZm5ymCe5E7651KMU0RXM3ZB5UE7ipGNdIE3dGqfO7IMWb1Y/27NaClin74bIwc7Xy1Z
-         sDjYUpd30mR9Hqx+ZW9erQweXCDQLL37edRiq1hR+JtRSIOpF5hO0QTTU6ROSfspwhdJ
-         eRWuvHiAZY+ywOkeZUyInnAotYCZ3E3dKEelGcHkmx6Qo1e95Yn4QDJ/E83BOpUSlJzo
-         eBiw==
+        d=broadcom.com; s=google; t=1718402420; x=1719007220; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YICLqeWZ7CPWIj9cycB+v+Sx/kefZlyQDl7Jt1GJ9mk=;
+        b=fMZ/bdWeaWA7whE83xnLlOq9RJ6cBRTmRFhpaKzURd2VcVLPh9/oyAltab2a2+v78J
+         dT1hxsuCamWxCGFqxXm6iYlhgC7zSck/2+w2+t2cYaDdTXx6CsPdYNW14kEsw+gLFvP2
+         6yvkui8SLdhQbrcdSylGTRIsMrg2SRjJL+5c8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718401003; x=1719005803;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bPuWx3FNS7o7yVF4Y5MNousWkGaU6pMFEqKrEXP5xc4=;
-        b=ipneLUmRhQQjxmd5c9VBiShB+udDco56hQAgwFA54bSTYTzKuVouV5zkV+0uZygpcR
-         AjT68VxwN3fdqayDpQ1pCHbFzec05xU9ja6GWAPMlI4X3vktA0s7UVQX8eDVRRJ26dSG
-         8Jun4WCJ3z5PyeS35w7J76H5F/MrfzyT7hY/3N2EPM4LjIWFVGCpXfwjq0Njlt2T3eqI
-         xvxHuGsyGqPrDMi9e4tgfCDyrrNghpT7ReK10qwZK/Fa5KIAbgonm4gwV+oBKB+Pm1HX
-         wEk8fD36/I8ZIQxajiVXtvyS56PsOrulx3dUdh1XUV3MkQdDsFtIfRzOA2VAp/KLh2cL
-         5VTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJiksZyzaIQURlsWCQS/QGw5Ae1mSPuBtE6ZRhFDxiQ6wj8nTEZgnwE7p7DobMxjS7nRVluhuYzpf2hgDIVo3oKGK/xKYBAqPeqTCXwULr+Y1naiLMEGWxY5/6kg0jD+8pdadx
-X-Gm-Message-State: AOJu0YytuvuK4Jf0QbXxwoaZ7U/oWUJaSzEEgaEk21sgYw20LjvKpnkj
-	i9kWahcIIBC431gNF1ldfdEhBoUNYwKjnOW+YWKvTgKf9+zI4AwFfWZyKKI62F/FlhMqC9AmYWC
-	yLcDEzQT6jwP2OqrZOTWQ7exl6Go=
-X-Google-Smtp-Source: AGHT+IEmoSgtLwTY+KHsVc6GIwPMGR12YEcFNBBLmXtGr5ut1UXzXRAgLLv9mlDWzXaAwyJs4Pi7+h87CcyKoFuT5U0=
-X-Received: by 2002:a19:f014:0:b0:52c:8440:1d7b with SMTP id
- 2adb3069b0e04-52ca6e6e549mr2491614e87.36.1718401002763; Fri, 14 Jun 2024
- 14:36:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718402420; x=1719007220;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YICLqeWZ7CPWIj9cycB+v+Sx/kefZlyQDl7Jt1GJ9mk=;
+        b=XZtfVvlW+slycutW39Ph/Vsad+TYFn6UGTSj73CxCGj1CaA4baJsnn+6LM9vnhffKv
+         HWvlEXEm7vXbEuQcOjW+wSVvxPQj9biWqosFHYd5bnQ4BtTdszNlPofDPU/m+GBqbIP0
+         2m9gZ7NOrxLWGSEcTXPV9WzTFsstYm/BGi987KAYnS4yGs7RRtrHQnE8bZH7vhhc/m1j
+         wCWFBzAMIVEvzbv9sLxxnaVJY682ZmADhxyAMZHHQc8dHYYsSbRRH6ctnHq+ELwUaB2m
+         7Fp+UwA95ke1oArSQz7pNNrAcrJsKVhbTpADML9Nh8u0zFRGmDsaK9kmVxUtb21KnnyX
+         kWaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWa2F4A0pDwJj1f5eaRLOYeE1+75UCjdwaW3RYI1MdQJCduhsrPAZ6yrdqjJqELA6rejWyTuU2jpiXY/aUrBAK2XZm9qgrz
+X-Gm-Message-State: AOJu0YzBLVimUsLCdS5yTSvqfp07k79hJVxKjfb877UkO7AlaztC+ESB
+	Kw/aFxh7bDQZOIO2LAcTg22o01aoY0Ey794ZmQbI9pm9N8YcyoKBZAtUmTPeqA==
+X-Google-Smtp-Source: AGHT+IG/HD2HHZaQReiMiEQIeKbUkIZLrpVW6+XwOsJB6JUy8Iaw3habv8swl8TM2z1Y2OKuwVX6NQ==
+X-Received: by 2002:a0c:d6c7:0:b0:6b2:b251:7d95 with SMTP id 6a1803df08f44-6b2b2517db4mr30028326d6.17.1718402419852;
+        Fri, 14 Jun 2024 15:00:19 -0700 (PDT)
+Received: from [10.66.192.68] ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b2a5f05782sm23013906d6.139.2024.06.14.15.00.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Jun 2024 15:00:19 -0700 (PDT)
+Message-ID: <a640b47b-c1a3-4f0c-8780-ca08edcf089e@broadcom.com>
+Date: Fri, 14 Jun 2024 15:00:12 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aa5ffa9a-62cc-4a79-9368-989f5684c29c@alliedtelesis.co.nz> <CACRpkdbF-OsV_jUp42yttvdjckqY0MsLg4kGxTr3JDnjGzLRsA@mail.gmail.com>
-In-Reply-To: <CACRpkdbF-OsV_jUp42yttvdjckqY0MsLg4kGxTr3JDnjGzLRsA@mail.gmail.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Fri, 14 Jun 2024 18:36:31 -0300
-Message-ID: <CAJq09z6dN0TkxxjmXT6yui8ydRUPTLcpFHyeExq_41RmSDdaHg@mail.gmail.com>
-Subject: Re: net: dsa: Realtek switch drivers
-To: Linus Walleij <linus.walleij@linaro.org>, 
-	Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: "alsi@bang-olufsen.dk" <alsi@bang-olufsen.dk>, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, "olteanv@gmail.com" <olteanv@gmail.com>, 
-	=?UTF-8?B?TWFyZWsgQmVow7pu?= <kabel@kernel.org>, 
-	"ericwouds@gmail.com" <ericwouds@gmail.com>, David Miller <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"justinstitt@google.com" <justinstitt@google.com>, 
-	"rmk+kernel@armlinux.org.uk" <rmk+kernel@armlinux.org.uk>, netdev <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-
-Hello Chris and Linus,
-
-> > I'm starting to look at some L2/L3 switches with Realtek silicon. I see
-> > in the upstream kernel there are dsa drivers for a couple of simple L2
-> > switches. While openwrt has support for a lot of the more advanced
-> > silicon. I'm just wondering if there is a particular reason no-one has
-> > attempted to upstream support for these switches?
->
-> It began with the RTL8366RB ("RTL8366 revision B") which I think is
-> equivalent to RTL8366S as well, but have not been able to test.
->
-> Then Luiz and Alvin jumped in and fixed up the RTL8365MB family.
->
-> So the support is pretty much what is stated in the DT bindings
-> in Documentation/devicetree/bindings/net/dsa/realtek.yaml:
->
-> properties:
->   compatible:
->     enum:
->       - realtek,rtl8365mb
->       - realtek,rtl8366rb
->     description: |
->       realtek,rtl8365mb:
->         Use with models RTL8363NB, RTL8363NB-VB, RTL8363SC, RTL8363SC-VB,
->         RTL8364NB, RTL8364NB-VB, RTL8365MB, RTL8366SC, RTL8367RB-VB, RTL8367S,
->         RTL8367SB, RTL8370MB, RTL8310SR
->       realtek,rtl8366rb:
->         Use with models RTL8366RB, RTL8366S
->
-> It may look like just RTL8365 and RTL8366 on the surface but the sub-version
-> is detected at runtime.
->
-> > If I were to start
-> > grabbing drivers from openwrt and trying to get them landed would that
-> > be a problem?
->
-> I think the base is there, when I started with RTL8366RB it was pretty
-> uphill but the kernel DSA experts (Vladimir & Andrew especially) are super
-> helpful so eventually we have arrived at something that works reasonably.
->
-> The RTL8356MB-family driver is more advanced and has a lot more features,
-> notably it supports all known RTL8367 variants.
-
-I played with RTL8367R. It mostly works with rtl8365mb driver but I
-wasn't able to enable the CPU tagging. Although
-
-> The upstream OpenWrt in target/linux/generic/files/drivers/net/phy
-> has the following drivers for the old switchdev:
-> -rw-r--r--. 1 linus linus 25382 Jun  7 21:44 rtl8306.c
-> -rw-r--r--. 1 linus linus 40268 Jun  7 21:44 rtl8366rb.c
-> -rw-r--r--. 1 linus linus 33681 Jun  7 21:44 rtl8366s.c
-> -rw-r--r--. 1 linus linus 36324 Jun  7 21:44 rtl8366_smi.c
-> -rw-r--r--. 1 linus linus  4838 Jun  7 21:44 rtl8366_smi.h
-> -rw-r--r--. 1 linus linus 58021 Jun 12 18:50 rtl8367b.c
-> -rw-r--r--. 1 linus linus 59612 Jun 12 18:50 rtl8367.c
->
-> As far as I can tell we cover all but RTL8306 with the current in-tree
-> drivers, the only reason these are still in OpenWrt would be that some
-> boards are not migrated to DSA.
-
-These drivers you listed are mostly found in old or low spec devices.
-There is little incentive to invest too much time to migrate them. For
-rtl8365mb, it still lacks support for vlan and forwarding offload. So,
-the swconfig driver still makes sense.
-There is also a performance problem with checksum offloading. These
-switches are used with non-realtek SoC, which might lead to:
-
-"Checksum offload should work with category 1 and 2 taggers when the
-DSA conduit driver declares NETIF_F_HW_CSUM in vlan_features and looks
-at csum_start and csum_offset. For those cases, DSA will shift the
-checksum start and offset by the tag size. If the DSA conduit driver
-still uses the legacy NETIF_F_IP_CSUM or NETIF_F_IPV6_CSUM in
-vlan_features, the offload might only work if the offload hardware
-already expects that specific tag (perhaps due to matching vendors).
-DSA user ports inherit those flags from the conduit, and it is up to
-the driver to correctly fall back to software checksum when the IP
-header is not where the hardware expects. If that check is
-ineffective, the packets might go to the network without a proper
-checksum (the checksum field will have the pseudo IP header sum). For
-category 3, when the offload hardware does not already expect the
-switch tag in use, the checksum must be calculated before any tag is
-inserted (i.e. inside the tagger). Otherwise, the DSA conduit would
-include the tail tag in the (software or hardware) checksum
-calculation. Then, when the tag gets stripped by the switch during
-transmission, it will leave an incorrect IP checksum in place."
-See: https://docs.kernel.org/networking/dsa/dsa.html
-
-> But maybe I missed something?
-
-I guess Chris is talking about the realtek target that uses Realtek
-SoC (target/linux/realtek/files-5.15/). That is a completely different
-beast. Although it might share some (or a lot) logic with current
-upstream drivers, it is way more complex. It might require a
-multi-function device driver. Anyway, the current realtek SoC/target
-drivers need some love, like using regmap, implement functions using
-an abstraction layer (and not if model a inside the code), get rid of
-all magic numbers and replace them with meaningful macros, create a
-proper tagger (and not translate a generic one just before forwarding
-it). In OpenWrt, a code that gets things done might be acceptable but
-the upstream kernel requires something more maintainable. So, if you
-want to upstream those drivers, you can start by improving them in the
-openwrt.
-
-> Yours,
-> Linus Walleij
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 8/8] x86/vmware: Add TDX hypercall support
+To: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, hpa@zytor.com, dave.hansen@linux.intel.com,
+ mingo@redhat.com, tglx@linutronix.de, x86@kernel.org,
+ netdev@vger.kernel.org, richardcochran@gmail.com,
+ linux-input@vger.kernel.org, dmitry.torokhov@gmail.com, zackr@vmware.com,
+ linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
+ timothym@vmware.com, akaher@vmware.com, dri-devel@lists.freedesktop.org,
+ daniel@ffwll.ch, airlied@gmail.com, tzimmermann@suse.de, mripard@kernel.org,
+ maarten.lankhorst@linux.intel.com, horms@kernel.org,
+ kirill.shutemov@linux.intel.com, Tim Merrifield <tim.merrifield@broadcom.com>
+References: <20240613191650.9913-1-alexey.makhalov@broadcom.com>
+ <20240613191650.9913-9-alexey.makhalov@broadcom.com>
+ <844ef200-aabe-4497-85c9-44fc46c9133a@intel.com>
+ <20240614161404.GCZmxsTNLSoYTqoRoj@fat_crate.local>
+ <74f8300b-3520-4824-81e3-71464e3da3b6@intel.com>
+ <1750e44f-f9a9-4c2a-afb3-f1ae8237ccb0@broadcom.com>
+ <20240614190956.GFZmyVhLGeyLjwvA6X@fat_crate.local>
+Content-Language: en-US
+From: Alexey Makhalov <alexey.makhalov@broadcom.com>
+Autocrypt: addr=alexey.makhalov@broadcom.com; keydata=
+ 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 EuY0
+In-Reply-To: <20240614190956.GFZmyVhLGeyLjwvA6X@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-Regards,
 
-Luiz
+On 6/14/24 12:09 PM, Borislav Petkov wrote:
+> On Fri, Jun 14, 2024 at 11:32:16AM -0700, Alexey Makhalov wrote:
+>>
+>>
+>> On 6/14/24 9:19 AM, Dave Hansen wrote:
+>>> On 6/14/24 09:14, Borislav Petkov wrote:
+>>>> On Fri, Jun 14, 2024 at 09:03:22AM -0700, Dave Hansen wrote:
+>>> ...
+>>>>> You need to zero out all of 'args' somehow.
+>>>>
+>>>> You mean like this:
+>>>>
+>>>> 	struct tdx_module_args args = {};
+>>>>
+>>>> ?
+>>>
+>>> Yes, or do all the assignments with the initializer.  We seem to do it
+>>> both ways, so whatever works.
+>>
+>> Thanks Dave for pointing that out. I missed that at v7.
+> 
+> Ok, I'll fold this struct initialization oneliner into the last patch.
+> 
+Thanks!
 
