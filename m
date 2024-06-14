@@ -1,140 +1,222 @@
-Return-Path: <netdev+bounces-103697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C26269091F3
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 19:46:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C31E9091FC
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 19:48:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D223C1C235D2
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:46:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B3331F240DA
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:48:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5CE482DB;
-	Fri, 14 Jun 2024 17:46:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB1419DF51;
+	Fri, 14 Jun 2024 17:48:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="RyFScOOv"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AVfKxho2"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2065519D89C;
-	Fri, 14 Jun 2024 17:46:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF0919D093
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 17:48:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718387203; cv=none; b=N7uOnnq6SBOYRvbaKkXxblMlO0A1csuA2xA82qlMfMlM7G8Zb9MWvYsqAU44aYrpMbMh1jM1JJVWaSo5DSevl5j/sgx2NPe9iKql9WcQZwupRjuFTVeqy2WGV8A5Gw9HnHcrGhBiM2ffSUd/pumavvGxtrS2gT0OHNR9CaWsctI=
+	t=1718387324; cv=none; b=qYYUlICVu2BfZpCL8W0ZItNaY/26MC1WbwehZt7oTe6rktl4bje9SC7Vk20o/rDyqgrO2X/+Km0cP3UR62zbKOBRwbww3i2jOT6u7H7qxtinPMTN5gfddBBXBN3iVh3rqJksJbb6N7NzxrAlymFAWiDewIBb0LCkHWMsXyT9j44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718387203; c=relaxed/simple;
-	bh=FUhw5QSPT52a+n51aUGW5MWySfTN62An4zO5LFmLXlg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gmNLvPD69xIC7OUX4yqWTShiFnQuTT32QrmcKiUUyiwAnjyyYO/T7WwFnHZEy+2SizAc6CYKnpPSliMlnnw7hKU6cUmqWqLHHGnWsQjwBwniiAc1wnqSqt1ILwbKFoSY/5Z0Nhiwg/XC6WDoIAue2pRKIxfZE9lyu6NmG8IIMSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=RyFScOOv; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=VLp0XKh59OcMtWOpegZjhoT2Uyd2kf1eZygBpGw1rsc=; b=RyFScOOv02S+cmpl/z+zry8jWZ
-	4Ql+RZ9Ko1bSpLGTcwpEN7SHVwBt3hfQp5iAPTG88/4v6NGFkMHHVmI69NYq6tDmIlb+5W08BsY/q
-	XrhqmI6yU6sapMPi4VwjK9ViJDsz7BeG+/vSo/acrDoAb2MeqJObWoT4PMD0j82D/M/VFi0s4chHR
-	DURdpOET2UoxjeoYxfgMp9gCNWoPxARX9i4TxvfPw9i75IOVWSnPgw6TElfepHCPCQZ11xVkvjhWR
-	UYVXOeOKjb+rngRSVfsZzjwzWtpgGnwJZaYlMAMGNlksAy4DDi+JbLmcN8mRTx9uAJ1ko/qBek0bX
-	NyW8uHrg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59072)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sIB0C-000280-0u;
-	Fri, 14 Jun 2024 18:46:16 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sIB09-0002Jc-8R; Fri, 14 Jun 2024 18:46:13 +0100
-Date: Fri, 14 Jun 2024 18:46:13 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Alexandra Winter <wintera@linux.ibm.com>
-Subject: Re: [PATCH net-next v15 07/14] net: Add struct kernel_ethtool_ts_info
-Message-ID: <ZmyB5cUz6zWcw4nr@shell.armlinux.org.uk>
-References: <20240612-feature_ptp_netnext-v15-0-b2a086257b63@bootlin.com>
- <20240612-feature_ptp_netnext-v15-7-b2a086257b63@bootlin.com>
- <19d5b8f250979c7c244e7b5b08d12783667576ee.camel@redhat.com>
+	s=arc-20240116; t=1718387324; c=relaxed/simple;
+	bh=92J8SyqxIdf2oE6L5pTOUXazVSTyJnFiR/byTfNtl/o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hWk1mf5Pug1qUOY8zM37QFEKfVMzZl6rtxp6cI1jH1H8A6DI21UmgUgcjvKnX2QSsLI4laCe1UeZ+oEin2vPp5vOyLY9UoD6ZY9njojiR7ZtbhvxnEHl3H4DAmaOYrzIpznIg+WXB/2A6If1WCL+xEXcq2VYOtvy+kyu3tbRZxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AVfKxho2; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6316253dc52so18049617b3.0
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 10:48:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1718387321; x=1718992121; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P/1LOPv92dlO9DKKyPTS9cPz+tBToHnqWBwgmZh3nDw=;
+        b=AVfKxho2HOkrGPN0M2Zq1/bMxgOLQz3fhN/A+DC8VLDeHkJ4h8xH8y5VYOEJSaXA0x
+         6CTgNtmppB0wrfbKpiKzclvhGgrAZ6ZnXYoM4Gt+fjHT6u0OVSYj1Yyqlae9QBafSq+U
+         cZXTQegp5zEF1XrMocEEg2J6sZzjW03LsyE8wycbf//X5vfOV9aT3eer4N2caGvdgYkg
+         M7Fc9nzEpVJQbpxWxvLPsq49PYoBEu8WI6VYEgr0FGPgDsUVIVo/TR/o9EDkBTB9iieu
+         6jbUfUX7eLKCiIwe+2hFVmAAKJGfXExDpYg2ICmVrmP9siuqKI0qfkawhgEBe99mOhrG
+         0pUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718387321; x=1718992121;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P/1LOPv92dlO9DKKyPTS9cPz+tBToHnqWBwgmZh3nDw=;
+        b=gv1yeGhSz4y/E/D5caLG9Wp/JV+MdayJg5JXfHSr1qY7rMzIVDSzGrgOOzYHZsid1W
+         QfYedAMwQig/Kyq2DQ8Z3Xj8hKciEvy8RqVyTM8Ih11O3sBGP06t2KMDtbE6rKB83/An
+         GWIMRF9qLah6rZlcAjR+DakkyPtDs2jujOvAyACekSzvje670QSH4lnfrN/re6lWbAXH
+         PzW2xVGSUOsESjwWs8krLzmTAn+yyodaSGbb9umHYO7NPyLZ2F60TMdpRs4NMlDTAvuT
+         aoEeKnT0r72GXUoVcrR9cgveHayIvIfe+RRLa+8LiOtYdKvoJKfBPC484KO/U4fabLSU
+         GH0A==
+X-Forwarded-Encrypted: i=1; AJvYcCXn+MABe2E6nd68aV7XXWNzaSNK4PiMSv6u0h+C72+XpUfcP74zeIkj985adaiaHESQu/k+D+qO8ahA1R9JeERswN9BEQFP
+X-Gm-Message-State: AOJu0YzZHgUVGwCgv9x/5GL+7BZ26QuPtKZwQ/A3u52RexQPz2evRbKX
+	5494I1Icb2VgMRm1rzsvuyChg40CXSBxrcYZiCUyldqfIocCMIbIiIwYdxM56r8ZrSVWJghJeRQ
+	mMRh5kJyrd4BPyNd0YOjr7Eek0KL24WYrNWzFPw==
+X-Google-Smtp-Source: AGHT+IGUxEdaon415iN8h281a2LuqoE9nZyftt9g8HQiehPuXE3/tb0mRmefYubCxnRYFAQS7EzlNNoC73f3DBYcL/8=
+X-Received: by 2002:a25:c785:0:b0:de6:1057:c85f with SMTP id
+ 3f1490d57ef6-dff1537c45dmr3081777276.22.1718387321539; Fri, 14 Jun 2024
+ 10:48:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <19d5b8f250979c7c244e7b5b08d12783667576ee.camel@redhat.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <CAMSo37U3Pree8XbHNBOzNXhFAiPss+8FQms1bLy06xeMeWfTcg@mail.gmail.com>
+ <20240613095901.508753-1-jtornosm@redhat.com> <CAMSo37UzU9WrQOQVo=Bb-LfOwS=GJrsSLMgGAwLY7JoGQ9ap7g@mail.gmail.com>
+In-Reply-To: <CAMSo37UzU9WrQOQVo=Bb-LfOwS=GJrsSLMgGAwLY7JoGQ9ap7g@mail.gmail.com>
+From: Yongqin Liu <yongqin.liu@linaro.org>
+Date: Sat, 15 Jun 2024 01:48:30 +0800
+Message-ID: <CAMSo37XjHhBz1hc_se0Fj8=gnju-iOT52Nf60jwLJ1hPN_kUaQ@mail.gmail.com>
+Subject: Re: [PATCH] net: usb: ax88179_178a: fix link status when link is set
+ to down/up
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Cc: amit.pundir@linaro.org, davem@davemloft.net, edumazet@google.com, 
+	inventor500@vivaldi.net, jstultz@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org, 
+	sumit.semwal@linaro.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 14, 2024 at 04:02:04PM +0200, Paolo Abeni wrote:
-> On Wed, 2024-06-12 at 17:04 +0200, Kory Maincent wrote:
-> > In prevision to add new UAPI for hwtstamp we will be limited to the struct
-> > ethtool_ts_info that is currently passed in fixed binary format through the
-> > ETHTOOL_GET_TS_INFO ethtool ioctl. It would be good if new kernel code
-> > already started operating on an extensible kernel variant of that
-> > structure, similar in concept to struct kernel_hwtstamp_config vs struct
-> > hwtstamp_config.
-> > 
-> > Since struct ethtool_ts_info is in include/uapi/linux/ethtool.h, here
-> > we introduce the kernel-only structure in include/linux/ethtool.h.
-> > The manual copy is then made in the function called by ETHTOOL_GET_TS_INFO.
-> > 
-> > Acked-by: Shannon Nelson <shannon.nelson@amd.com>
-> > Acked-by: Alexandra Winter <wintera@linux.ibm.com>
-> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> 
-> I think it would be nice if a few more vendors could actually step-in
-> and test/ack the driver specific bits.
+Hello, Jose
 
-Well, in part this series was triggered because of an issue having
-PTP support in Marvell's PP2 driver, and then the issue that if we
-add it to the Marvell PHY driver, the platforms that are currently
-using the PP2 based PTP support were forced into the weird situation
-that some of the PTP calls hit the PP2 driver and others hit the
-PHY driver.
+On Thu, 13 Jun 2024 at 19:46, Yongqin Liu <yongqin.liu@linaro.org> wrote:
+>
+> Hi, Jose
+>
+> On Thu, 13 Jun 2024 at 17:59, Jose Ignacio Tornos Martinez
+> <jtornosm@redhat.com> wrote:
+> >
+> > Hello again,
+> >
+> > There was a problem copying the patch, sorry, here the good one:
+>
+> Thanks very much for the work!
+>
+> I will test it tomorrow, and let you know the result then.
+>
 
-I had sent Kory an email a couple of weeks ago saying that I'm
-unlikely to be able to test this out in that setup any time soon,
-I've had high work pressure for the last seven-ish weeks, and I
-would need to be in front of the hardware, which is fairly rare
-at the moment, and I'm not going to be in front of the hardware
-until August. So I'm just not going to be able to test it in a
-reasonable time scale.
+I tested with the ACK android15-6.6 and the android-mainline branches,
+which have the issue reported,
+after applying this patch, the network works again now.
 
-There's not a lot I can do about that, sorry.
+Here is the console output from the mainline branch, in case you want to ch=
+eck:
+https://gist.github.com/liuyq/bd3fdada41411bc89a0cd4acf9ec11cf
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks again for all the help!
+
+Best regards,
+Yongqin Liu
+
+
+
+> >
+> > $ git diff drivers/net/usb/ax88179_178a.c
+> > diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_1=
+78a.c
+> > index 51c295e1e823..60357796be99 100644
+> > --- a/drivers/net/usb/ax88179_178a.c
+> > +++ b/drivers/net/usb/ax88179_178a.c
+> > @@ -174,7 +174,6 @@ struct ax88179_data {
+> >         u32 wol_supported;
+> >         u32 wolopts;
+> >         u8 disconnecting;
+> > -       u8 initialized;
+> >  };
+> >
+> >  struct ax88179_int_data {
+> > @@ -327,7 +326,8 @@ static void ax88179_status(struct usbnet *dev, stru=
+ct urb *urb)
+> >
+> >         if (netif_carrier_ok(dev->net) !=3D link) {
+> >                 usbnet_link_change(dev, link, 1);
+> > -               netdev_info(dev->net, "ax88179 - Link status is: %d\n",=
+ link);
+> > +               if (!link)
+> > +                       netdev_info(dev->net, "ax88179 - Link status is=
+: %d\n", link);
+> >         }
+> >  }
+> >
+> > @@ -1543,6 +1543,7 @@ static int ax88179_link_reset(struct usbnet *dev)
+> >                          GMII_PHY_PHYSR, 2, &tmp16);
+> >
+> >         if (!(tmp16 & GMII_PHY_PHYSR_LINK)) {
+> > +               netdev_info(dev->net, "ax88179 - Link status is: 0\n");
+> >                 return 0;
+> >         } else if (GMII_PHY_PHYSR_GIGA =3D=3D (tmp16 & GMII_PHY_PHYSR_S=
+MASK)) {
+> >                 mode |=3D AX_MEDIUM_GIGAMODE | AX_MEDIUM_EN_125MHZ;
+> > @@ -1580,6 +1581,8 @@ static int ax88179_link_reset(struct usbnet *dev)
+> >
+> >         netif_carrier_on(dev->net);
+> >
+> > +       netdev_info(dev->net, "ax88179 - Link status is: 1\n");
+> > +
+> >         return 0;
+> >  }
+> >
+> > @@ -1678,12 +1681,21 @@ static int ax88179_reset(struct usbnet *dev)
+> >
+> >  static int ax88179_net_reset(struct usbnet *dev)
+> >  {
+> > -       struct ax88179_data *ax179_data =3D dev->driver_priv;
+> > +       u16 tmp16;
+> >
+> > -       if (ax179_data->initialized)
+> > +       ax88179_read_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID, GMII_PHY_P=
+HYSR,
+> > +                        2, &tmp16);
+> > +       if (tmp16) {
+> > +               ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_M=
+ODE,
+> > +                                2, 2, &tmp16);
+> > +               if (!(tmp16 & AX_MEDIUM_RECEIVE_EN)) {
+> > +                       tmp16 |=3D AX_MEDIUM_RECEIVE_EN;
+> > +                       ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM=
+_STATUS_MODE,
+> > +                                         2, 2, &tmp16);
+> > +               }
+> > +       } else {
+> >                 ax88179_reset(dev);
+> > -       else
+> > -               ax179_data->initialized =3D 1;
+> > +       }
+> >
+> >         return 0;
+> >  }
+> >
+> > Best regards
+> > Jos=C3=A9 Ignacio
+> >
+>
+>
+> --
+> Best Regards,
+> Yongqin Liu
+> ---------------------------------------------------------------
+> #mailing list
+> linaro-android@lists.linaro.org
+> http://lists.linaro.org/mailman/listinfo/linaro-android
+
+
+
+--
+Best Regards,
+Yongqin Liu
+---------------------------------------------------------------
+#mailing list
+linaro-android@lists.linaro.org
+http://lists.linaro.org/mailman/listinfo/linaro-android
 
