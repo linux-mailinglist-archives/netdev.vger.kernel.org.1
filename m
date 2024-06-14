@@ -1,314 +1,130 @@
-Return-Path: <netdev+bounces-103500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F347B9085A7
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:07:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DAFF9085B3
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:10:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1701F1C21CC7
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 08:07:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 788DE1C21DA0
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 08:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFEF14D29B;
-	Fri, 14 Jun 2024 08:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0515185091;
+	Fri, 14 Jun 2024 08:10:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dr+i4lKe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7041714A092;
-	Fri, 14 Jun 2024 08:07:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E8818413E
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 08:10:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718352459; cv=none; b=TviMQlqnW8CU1Pem8jzM6Aa877n9szwQj6BG6jSY/kmI684UX1tgMAzoDAv8dOOnP16ZVhPDISL1vmR48B3WfTMMtojzk4d1uSnvcxPOJ4pKY9qvmIHfi2eu5v1dpWhrnppI179zpt4AyGpqF+j6PSNxyqumLgTvx53uNTO/6ic=
+	t=1718352601; cv=none; b=DllHcTrMpY+/Y28DotLp7C8jENdmCYXxKiTIeX4lIZIqTD8cKpSLisvNKFMMK+koMa/4F3L1lYGWWii5NxFwj8JJR1RerhXrFukqrJLVKQ8hA2nAzNdDDXemIZ3/v1ZWk5rHsMmgFd8A8BXniIByZLH3cFrpkVJwmsfVDGbpEN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718352459; c=relaxed/simple;
-	bh=g+C9sTXUjr0qI4UHD+E6QB+63tYPAwnvonLjEzwycgQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fLKrIT6pjvbQEOBVXHaVXNKENZukRtmVESHJLYBPV+zMpRxf3hqvod1D1BdG2xNdoLbpnh1gQm0TnJbhkhNM2kw1e/I912RFJpLgm11kMhdrm6X0sAVRL0xk5UVn7bgScQeA8de0EOMaoRuxGoq3UoSPNJsiE2D9bGoDLpENnkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: a2a97b682a2311ef9305a59a3cc225df-20240614
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.38,REQID:a77a25a7-59f8-44a1-9001-cbf1ed2b1799,IP:20,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:11
-X-CID-INFO: VERSION:1.1.38,REQID:a77a25a7-59f8-44a1-9001-cbf1ed2b1799,IP:20,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:11
-X-CID-META: VersionHash:82c5f88,CLOUDID:f05c5ef6fa1f85c4176edcfbee525c4f,BulkI
-	D:240614144740H35N4DT4,BulkQuantity:1,Recheck:0,SF:64|66|24|72|19|44|102,T
-	C:nil,Content:0,EDM:-3,IP:-2,URL:11|1,File:nil,RT:nil,Bulk:40,QS:nil,BEC:n
-	il,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_ULN
-X-UUID: a2a97b682a2311ef9305a59a3cc225df-20240614
-Received: from node2.com.cn [(39.156.73.10)] by mailgw.kylinos.cn
-	(envelope-from <luoxuanqiang@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 340878819; Fri, 14 Jun 2024 15:56:41 +0800
-Received: from node2.com.cn (localhost [127.0.0.1])
-	by node2.com.cn (NSMail) with SMTP id 081D3B80758A;
-	Fri, 14 Jun 2024 15:56:41 +0800 (CST)
-X-ns-mid: postfix-666BF7B7-860266110
-Received: from localhost.localdomain (unknown [10.42.12.252])
-	by node2.com.cn (NSMail) with ESMTPA id 79F59B80758A;
-	Fri, 14 Jun 2024 07:56:37 +0000 (UTC)
-From: luoxuanqiang <luoxuanqiang@kylinos.cn>
-To: edumazet@google.com
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	fw@strlen.de,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	luoxuanqiang@kylinos.cn,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH v1 1/1] Fix race for duplicate reqsk on identical SYN
-Date: Fri, 14 Jun 2024 15:56:37 +0800
-Message-Id: <CANn89iJBOAg+KCZBvkUxdAfTS1jacBBcrW6M5AZQvr=UPFJ0dA@mail.gmail.com> (raw)
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240614060012.158026-1-luoxuanqiang@kylinos.cn>
-References: <CANn89iJBOAg+KCZBvkUxdAfTS1jacBBcrW6M5AZQvr=UPFJ0dA@mail.gmail.com>
+	s=arc-20240116; t=1718352601; c=relaxed/simple;
+	bh=07sN0rozFupB3KVDJ2ujRXSWOpuv4cGxuHIeIFmDozI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OzaHQ8GspD5l/aO54voEq5VR7lhyp/g6yWu8vavXjCSmDciTUyqJ12v/7TVHtEjhw44+feV8b6kOyAlma9D4N265Z8nEIrNbNVMA4u74NzgN0Kwxlfh++bGf1HEKFP5iFbzdWQF4gN2KxcCietD7PLVpB2WMHSip9O/Ar3YQQI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dr+i4lKe; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718352599;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=07sN0rozFupB3KVDJ2ujRXSWOpuv4cGxuHIeIFmDozI=;
+	b=dr+i4lKed+iFM+pUeJbcHgm11xrlmFEawY1NNlj+4UiGhprgIQceQSBdBlSwJqgik96JT8
+	RiNvivjNrlAOGr/BDXvevHesygYHyN89oYkOi4tIfIiKUDO6S9iLW4YBiUZe4zRmA1S1EU
+	GiB+2dmtkRnOBLJvmNRdjIH2MTAZfpY=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-70-lzll6S3BPLmYi-usxwuqYg-1; Fri, 14 Jun 2024 04:09:56 -0400
+X-MC-Unique: lzll6S3BPLmYi-usxwuqYg-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2ebf477ed09so3110561fa.0
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 01:09:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718352594; x=1718957394;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=07sN0rozFupB3KVDJ2ujRXSWOpuv4cGxuHIeIFmDozI=;
+        b=BUK3vP8P2YEDkKXa1GWV077DOb8fvb73renAqZoVt6rBgRobeOyI4vo538/2Vpkik+
+         /ufoLBcGHTYJpESzod0EW6rWYxActjxqShCy9CqEwbcOALcZsVOvMhvMFlVuZPgMIDnS
+         dZhVcE/Wr1uDtarmsK1XPWdqUo9A2n+m0hgnSe+LhPmd6Il/zMhve+FPHm3K0x61Kv3c
+         h5/Mctj+jWlLDOjOVdvqjoPaAn8LJc1p4JoDyrm16BkaZ/e338nx4FvUy0THZ+spG2J/
+         RVBnABzDy9be8oPa+EalsUXxx919mK9rmiTFz+rdV07tNri4X+bErnPEdhuNROulgXN9
+         vhWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVpU/aOZPRzLksSKKcJqrVMtsTCPhbYJlazOXGlrTtXNtsz0mTI9jSWhipa3AHlHkO3kW+xKxAChXkHEIJfc+mS41Qx6P7P
+X-Gm-Message-State: AOJu0YwGH+QyKRzWpLC1cpC7bdoJd0Zpe7Jq9g2+slNPZVKBsEW1ANcR
+	HF6Vjl9rqDm/tlOICJbpi/jEWrnrYr+dx53/pJEqqCu/sVwQem2088OWfEzLT8Ok1sm8UH5JrH1
+	OnIv7truhEmiB21UiAvR3QZybp32rwum1s+/Gn/075F6PbmDtpR8Dqw==
+X-Received: by 2002:a2e:a7d4:0:b0:2eb:e6fe:3092 with SMTP id 38308e7fff4ca-2ec0e5bcd63mr13427701fa.4.1718352594654;
+        Fri, 14 Jun 2024 01:09:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEbnj/wUARZGCSnPtpGXrqUaztU9wGKj+7M4hvQP3ofG5dGi2o3qiVT0U3tw/x2CC40PMvHYQ==
+X-Received: by 2002:a2e:a7d4:0:b0:2eb:e6fe:3092 with SMTP id 38308e7fff4ca-2ec0e5bcd63mr13427501fa.4.1718352594164;
+        Fri, 14 Jun 2024 01:09:54 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b083:7210:de1e:fd05:fa25:40db])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-423047e28b7sm24566125e9.44.2024.06.14.01.09.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jun 2024 01:09:53 -0700 (PDT)
+Message-ID: <c4ae602bd44e6b6ad739e1e17c444ca75587435e.camel@redhat.com>
+Subject: Re: [PATCH net-next] tcp: Add tracepoint for rxtstamp coalescing
+From: Paolo Abeni <pabeni@redhat.com>
+To: Philo Lu <lulie@linux.alibaba.com>, netdev@vger.kernel.org, 
+	edumazet@google.com
+Cc: rostedt@goodmis.org, mhiramat@kernel.org,
+ mathieu.desnoyers@efficios.com,  davem@davemloft.net, dsahern@kernel.org,
+ kuba@kernel.org,  xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com
+Date: Fri, 14 Jun 2024 10:09:51 +0200
+In-Reply-To: <20240611045830.67640-1-lulie@linux.alibaba.com>
+References: <20240611045830.67640-1-lulie@linux.alibaba.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 14, 2024 at 8:01=E2=80=AFAM luoxuanqiang <luoxuanqiang@kylino=
-s.cn> wrote:
->>
->> When bonding is configured in BOND_MODE_BROADCAST mode, if two identic=
-al SYN packets
->> are received at the same time and processed on different CPUs, it can =
-potentially
->> create the same sk (sock) but two different reqsk (request_sock) in tc=
-p_conn_request().
->>
->> These two different reqsk will respond with two SYNACK packets, and si=
-nce the generation
->> of the seq (ISN) incorporates a timestamp, the final two SYNACK packet=
-s will have
->> different seq values.
->>
->> The consequence is that when the Client receives and replies with an A=
-CK to the earlier
->> SYNACK packet, we will reset(RST) it.
->>
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>
->> This behavior is consistently reproducible in my local setup, which co=
-mprises:
->>
->>                   | NETA1 ------ NETB1 |
->> PC_A --- bond --- |                    | --- bond --- PC_B
->>                   | NETA2 ------ NETB2 |
->>
->> - PC_A is the Server and has two network cards, NETA1 and NETA2. I hav=
-e bonded these two
->>   cards using BOND_MODE_BROADCAST mode and configured them to be handl=
-ed by different CPU.
->>
->> - PC_B is the Client, also equipped with two network cards, NETB1 and =
-NETB2, which are
->>   also bonded and configured in BOND_MODE_BROADCAST mode.
->>
->> If the client attempts a TCP connection to the server, it might encoun=
-ter a failure.
->> Capturing packets from the server side reveals:
->>
->> 10.10.10.10.45182 > localhost.localdomain.search-agent: Flags [S], seq=
- 320236027,
->> 10.10.10.10.45182 > localhost.localdomain.search-agent: Flags [S], seq=
- 320236027,
->> localhost.localdomain.search-agent > 10.10.10.10.45182: Flags [S.], se=
-q 2967855116,
->> localhost.localdomain.search-agent > 10.10.10.10.45182: Flags [S.], se=
-q 2967855123, <=3D=3D
->> 10.10.10.10.45182 > localhost.localdomain.search-agent: Flags [.], ack=
- 4294967290,
->> 10.10.10.10.45182 > localhost.localdomain.search-agent: Flags [.], ack=
- 4294967290,
->> localhost.localdomain.search-agent > 10.10.10.10.45182: Flags [R], seq=
- 2967855117, <=3D=3D
->> localhost.localdomain.search-agent > 10.10.10.10.45182: Flags [R], seq=
- 2967855117,
->>
->> Two SYNACKs with different seq numbers are sent by localhost, resultin=
-g in an anomaly.
->>
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>
->> The attempted solution is as follows:
->> In the tcp_conn_request(), while inserting reqsk into the ehash table,=
- it also checks
->> if an entry already exists. If found, it avoids reinsertion and releas=
-es it.
->>
->> Simultaneously, In the reqsk_queue_hash_req(), the start of the req->r=
-sk_timer is
->> adjusted to be after successful insertion.
->>
->> Signed-off-by: luoxuanqiang <luoxuanqiang@kylinos.cn>
->> ---
->>  include/net/inet_connection_sock.h |  2 +-
->>  net/dccp/ipv4.c                    |  2 +-
->>  net/dccp/ipv6.c                    |  2 +-
->>  net/ipv4/inet_connection_sock.c    | 16 ++++++++++++----
->>  net/ipv4/tcp_input.c               | 11 ++++++++++-
->>  5 files changed, 25 insertions(+), 8 deletions(-)
->>
->> diff --git a/include/net/inet_connection_sock.h b/include/net/inet_con=
-nection_sock.h
->> index 7d6b1254c92d..8773d161d184 100644
->> --- a/include/net/inet_connection_sock.h
->> +++ b/include/net/inet_connection_sock.h
->> @@ -264,7 +264,7 @@ struct sock *inet_csk_reqsk_queue_add(struct sock =
-*sk,
->>                                       struct request_sock *req,
->>                                       struct sock *child);
->>  void inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_so=
-ck *req,
->> -                                  unsigned long timeout);
->> +                                  unsigned long timeout, bool *found_=
-dup_sk);
->>  struct sock *inet_csk_complete_hashdance(struct sock *sk, struct sock=
- *child,
->>                                          struct request_sock *req,
->>                                          bool own_req);
->> diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
->> index ff41bd6f99c3..13aafdeb9205 100644
->> --- a/net/dccp/ipv4.c
->> +++ b/net/dccp/ipv4.c
->> @@ -657,7 +657,7 @@ int dccp_v4_conn_request(struct sock *sk, struct s=
-k_buff *skb)
->>         if (dccp_v4_send_response(sk, req))
->>                 goto drop_and_free;
->>
->> -       inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT);
->> +       inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT, NULL=
-);
->>         reqsk_put(req);
->>         return 0;
->>
->> diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
->> index 85f4b8fdbe5e..493cdb12ce2b 100644
->> --- a/net/dccp/ipv6.c
->> +++ b/net/dccp/ipv6.c
->> @@ -400,7 +400,7 @@ static int dccp_v6_conn_request(struct sock *sk, s=
-truct sk_buff *skb)
->>         if (dccp_v6_send_response(sk, req))
->>                 goto drop_and_free;
->>
->> -       inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT);
->> +       inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT, NULL=
-);
->>         reqsk_put(req);
->>         return 0;
->>
->> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connectio=
-n_sock.c
->> index d81f74ce0f02..d9394db98a5a 100644
->> --- a/net/ipv4/inet_connection_sock.c
->> +++ b/net/ipv4/inet_connection_sock.c
->> @@ -1123,12 +1123,17 @@ static void reqsk_timer_handler(struct timer_l=
-ist *t)
->>  }
->>
->>  static void reqsk_queue_hash_req(struct request_sock *req,
->> -                                unsigned long timeout)
->> +                                unsigned long timeout, bool *found_du=
-p_sk)
->>  {
->> +
->> +       inet_ehash_insert(req_to_sk(req), NULL, found_dup_sk);
->> +       if(found_dup_sk && *found_dup_sk)
->> +               return;
->> +
->> +       /* The timer needs to be setup after a successful insertion. *=
-/
->
->I am pretty sure we had a prior attempt to fix this issue, and the fix
->was problematic.
->
->You are moving the inet_ehash_insert() before the mod_timer(), this
->will add races.
-Could you kindly explain what "races" refer to here? Thank you!
+On Tue, 2024-06-11 at 12:58 +0800, Philo Lu wrote:
+> During tcp coalescence, rx timestamps of the former skb ("to" in
+> tcp_try_coalesce), will be lost. This may lead to inaccurate
+> timestamping results if skbs come out of order.
+>=20
+> Here is an example.
+> Assume a message consists of 3 skbs, namely A, B, and C. And these skbs
+> are processed by tcp in the following order:
+> A -(1us)-> C -(1ms)-> B
 
->
->Hint here is the use of TIMER_PINNED.
->
->CCing Florian, because he just removed TIMER_PINNED for TW, he might
->have the context
->to properly fix this issue.
->
->>         timer_setup(&req->rsk_timer, reqsk_timer_handler, TIMER_PINNED=
-);
->>         mod_timer(&req->rsk_timer, jiffies + timeout);
->>
->> -       inet_ehash_insert(req_to_sk(req), NULL, NULL);
->>         /* before letting lookups find us, make sure all req fields
->>          * are committed to memory and refcnt initialized.
->>          */
->> @@ -1137,9 +1142,12 @@ static void reqsk_queue_hash_req(struct request=
-_sock *req,
->>  }
->>
->>  void inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_so=
-ck *req,
->> -                                  unsigned long timeout)
->> +                                  unsigned long timeout, bool *found_=
-dup_sk)
->>  {
->> -       reqsk_queue_hash_req(req, timeout);
->> +       reqsk_queue_hash_req(req, timeout, found_dup_sk);
->> +       if(found_dup_sk && *found_dup_sk)
->> +               return;
->> +
->>         inet_csk_reqsk_queue_added(sk);
->>  }
->>  EXPORT_SYMBOL_GPL(inet_csk_reqsk_queue_hash_add);
->> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
->> index 9c04a9c8be9d..467f1b7bbd5a 100644
->> --- a/net/ipv4/tcp_input.c
->> +++ b/net/ipv4/tcp_input.c
->> @@ -7255,8 +7255,17 @@ int tcp_conn_request(struct request_sock_ops *r=
-sk_ops,
->>         } else {
->>                 tcp_rsk(req)->tfo_listener =3D false;
->>                 if (!want_cookie) {
->> +                       bool found_dup_sk =3D false;
->> +
->>                         req->timeout =3D tcp_timeout_init((struct sock=
- *)req);
->> -                       inet_csk_reqsk_queue_hash_add(sk, req, req->ti=
-meout);
->> +                       inet_csk_reqsk_queue_hash_add(sk, req, req->ti=
-meout,
->> +                                                       &found_dup_sk)=
-;
->> +
->> +                       if(unlikely(found_dup_sk)){
->> +                               reqsk_free(req);
->> +                               return 0;
->> +                       }
->> +
->>                 }
->>                 af_ops->send_synack(sk, dst, &fl, req, &foc,
->>                                     !want_cookie ? TCP_SYNACK_NORMAL :
->> --
->> 2.25.1
->>
+IMHO the above order makes the changelog confusing
+
+> If C is coalesced to B, the final rx timestamps of the message will be
+> those of C. That is, the timestamps show that we received the message
+> when C came (including hardware and software). However, we actually
+> received it 1ms later (when B came).
+>=20
+> With the added tracepoint, we can recognize such cases and report them
+> if we want.
+
+We really need very good reasons to add new tracepoints to TCP. I'm
+unsure if the above example match such requirement. The reported
+timestamp actually matches the first byte in the aggregate segment,
+inferring anything more is IMHO stretching too far the API semantic.
+
+Cheers,
+
+Paolo
+
 
