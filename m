@@ -1,138 +1,162 @@
-Return-Path: <netdev+bounces-103589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 184BF908BE8
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 14:43:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85AD2908BF2
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 14:44:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AF521C21D1E
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 12:43:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11E4C2877DE
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 12:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE874199E8C;
-	Fri, 14 Jun 2024 12:42:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0CD01991D2;
+	Fri, 14 Jun 2024 12:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r8uwoXuc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2DF19752F;
-	Fri, 14 Jun 2024 12:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE8F1991C3
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 12:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718368942; cv=none; b=NavCr84QE7SPG5aYyDwtL2+Nn9510u2+FFQPQaFV/xmzGK0YKiUEsIKNLPi65L1nYsNP/mhTKUv3WeNXn1jgO64yv4yVBDZoYwFwqOH6otH1GTtFRAoaf7P4gWl5PZGR1riEoNk9DJgLFJQO37hZkhzW1ittbfrgRtJOU40RjBM=
+	t=1718369016; cv=none; b=W3tIcUUOvP6ZhPRH4WX3jg+kx39GgEULQ7W/mvS8w0AJ24aRzDO1vajqgtqKITv0Bh7BGcqaBl35sFMaQOga/GLqIFeCu6uewlL2MdnqqxSSGs7ck2+bVJtdvxo1AvOWKdXFM5U0tlAoiM3s6UaVwIEzzg+pFNdvJ9Aemc41Occ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718368942; c=relaxed/simple;
-	bh=xX+0hJOY5wHV2sFTLz2I53WZq9oVZ069f2wFZkuYpXA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fPZYHYxFvmOY/nfJU3eHTZ2qbwCUedO2uJ8YKZ2IHhGxH0uoTT528TG/0kznpzymjGdJdhu6xtYmLmRdiFj3lHTUdStIuVG2M8r6z45ah0qhxWe3RzaxU3IQqh1WoXMdmQbTDW4bysp09SZMjP90rycFI503KUMIaVceA9AaHm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 8485f3962a4b11ef9305a59a3cc225df-20240614
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.38,REQID:4eaac0dc-8ad9-48ef-8e6e-a3f37f87e633,IP:20,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:5
-X-CID-INFO: VERSION:1.1.38,REQID:4eaac0dc-8ad9-48ef-8e6e-a3f37f87e633,IP:20,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:5
-X-CID-META: VersionHash:82c5f88,CLOUDID:36e2953cecde2afbdb3f01b0793d3341,BulkI
-	D:240614185458SXRYECY3,BulkQuantity:1,Recheck:0,SF:64|66|24|17|19|44|102,T
-	C:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:40,QS:nil,BEC:nil,
-	COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_FSI,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
-X-UUID: 8485f3962a4b11ef9305a59a3cc225df-20240614
-Received: from node2.com.cn [(39.156.73.10)] by mailgw.kylinos.cn
-	(envelope-from <luoxuanqiang@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 215960080; Fri, 14 Jun 2024 20:42:10 +0800
-Received: from node2.com.cn (localhost [127.0.0.1])
-	by node2.com.cn (NSMail) with SMTP id 445C8B80758A;
-	Fri, 14 Jun 2024 20:42:10 +0800 (CST)
-X-ns-mid: postfix-666C3AA2-18629611
-Received: from [10.42.12.252] (unknown [10.42.12.252])
-	by node2.com.cn (NSMail) with ESMTPA id ADCC7B80758A;
-	Fri, 14 Jun 2024 12:42:08 +0000 (UTC)
-Message-ID: <7075bb26-ede9-0dc7-fe93-e18703e5ddaa@kylinos.cn>
-Date: Fri, 14 Jun 2024 20:42:07 +0800
+	s=arc-20240116; t=1718369016; c=relaxed/simple;
+	bh=uDzve8H3dCkfmELZWZLzl/N50oTljXg6cmrTDCRiAg4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vm5E7+vI7XzbtcDlMHEIr8ttuupuuGS+3VeXyW5b0BQVgBtw/KOuF7FEraS4qdzX2l0z7qF8XlNgqbl7uG7nDJfnAw3m/AAHSXeLtq3sLOZGpmWV1XM+b53wQt0+pOuf7/13mn9aMD7l1XUwD+XkPp5PoFeEBxa2NnwZo/MSnI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r8uwoXuc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47C4FC2BD10;
+	Fri, 14 Jun 2024 12:43:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718369016;
+	bh=uDzve8H3dCkfmELZWZLzl/N50oTljXg6cmrTDCRiAg4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=r8uwoXucf1fwVkVi307nyKhhdTzCq4AHD5QRmjBGM3iLnf9eFT0mxyP7ZuK9i+/jO
+	 S1HGT3eRqly1Xt5Ce30MYr49SiqoVLMRyLphbrxpN9dLwQRuzUnM9mbU+vr8xLU7P/
+	 j6dfw/oZzIBk96b3E0f/s8xci/fbDlZrheQYMqqTTfZpcOjYqTn8a/aQlYLDw+JpKU
+	 14BdAW8XL3EzB+xh84p5NnStwqIhTfMH5O7HiVKIQoQcvwfbb/WWSxI25UZhmhq8Ma
+	 7VKOp5gmIDGzLHv2S62Ozqv9UF6tzFjki4bIJxm8nwEpnUJjweI7fRRhX6gyZmaJBh
+	 ugRLPSJ35DtSQ==
+Date: Fri, 14 Jun 2024 13:43:31 +0100
+From: Simon Horman <horms@kernel.org>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	jacob.e.keller@intel.com, michal.kubiak@intel.com,
+	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
+	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
+	pio.raczynski@gmail.com, jiri@nvidia.com,
+	mateusz.polchlopek@intel.com, shayd@nvidia.com, kuba@kernel.org
+Subject: Re: [iwl-next v3 3/4] ice: move VSI configuration outside repr setup
+Message-ID: <20240614124331.GL8447@kernel.org>
+References: <20240610074434.1962735-1-michal.swiatkowski@linux.intel.com>
+ <20240610074434.1962735-4-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH net v2] Fix race for duplicate reqsk on identical SYN
-Content-Language: en-US
-To: Florian Westphal <fw@strlen.de>
-Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
- kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- pabeni@redhat.com, kuniyu@amazon.com, dccp@vger.kernel.org
-References: <20240614102628.446642-1-luoxuanqiang@kylinos.cn>
- <20240614105441.GA24596@breakpoint.cc>
-From: luoxuanqiang <luoxuanqiang@kylinos.cn>
-In-Reply-To: <20240614105441.GA24596@breakpoint.cc>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240610074434.1962735-4-michal.swiatkowski@linux.intel.com>
 
+On Mon, Jun 10, 2024 at 09:44:33AM +0200, Michal Swiatkowski wrote:
+> It is needed because subfunction port representor shouldn't configure
+> the source VSI during representor creation.
+> 
+> Move the code to separate function and call it only in case the VF port
+> representor is being created.
+> 
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-=E5=9C=A8 2024/6/14 18:54, Florian Westphal =E5=86=99=E9=81=93:
-> luoxuanqiang <luoxuanqiang@kylinos.cn> wrote:
->>   include/net/inet_connection_sock.h |  2 +-
->>   net/dccp/ipv4.c                    |  2 +-
->>   net/dccp/ipv6.c                    |  2 +-
->>   net/ipv4/inet_connection_sock.c    | 15 +++++++++++----
->>   net/ipv4/tcp_input.c               | 11 ++++++++++-
->>   5 files changed, 24 insertions(+), 8 deletions(-)
->>
->> diff --git a/include/net/inet_connection_sock.h b/include/net/inet_con=
-nection_sock.h
->> index 7d6b1254c92d..8773d161d184 100644
->> --- a/include/net/inet_connection_sock.h
->> +++ b/include/net/inet_connection_sock.h
->> @@ -264,7 +264,7 @@ struct sock *inet_csk_reqsk_queue_add(struct sock =
-*sk,
->>   				      struct request_sock *req,
->>   				      struct sock *child);
->>   void inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_s=
-ock *req,
->> -				   unsigned long timeout);
->> +				   unsigned long timeout, bool *found_dup_sk);
-> Nit:
->
-> I think it would be preferrable to change retval to bool rather than
-> bool *found_dup_sk extra arg, so one can do
->
-> bool inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_sock=
- *req,
->    				   unsigned long timeout)
-> {
-> 	if (!reqsk_queue_hash_req(req, timeout))
-> 		return false;
->
-> i.e. let retval indicate wheter reqsk was inserted or not.
->
-> Patch looks good to me otherwise.
+Hi Michal,
 
-Thank you for your confirmation!
+The nit below notwithstanding, this looks good to me.
 
-Regarding your suggestion, I had considered it before,
-but besides tcp_conn_request() calling inet_csk_reqsk_queue_hash_add(),
-dccp_v4(v6)_conn_request() also calls it. However, there is no
-consideration for a failed insertion within that function, so it's
-reasonable to let the caller decide whether to check for duplicate
-reqsk.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-The purpose of my modification this time is solely to confirm if a
-reqsk for the same connection has already been inserted into the ehash.
-If the insertion fails, inet_ehash_insert() will handle the
-non-insertion gracefully, and I only need to release the duplicate
-reqsk. I believe this change is minimal and effective.
+> ---
+>  drivers/net/ethernet/intel/ice/ice_eswitch.c | 55 ++++++++++++++------
+>  drivers/net/ethernet/intel/ice/ice_eswitch.h | 10 ++++
+>  drivers/net/ethernet/intel/ice/ice_repr.c    |  7 +++
+>  3 files changed, 57 insertions(+), 15 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> index 7b57a6561a5a..3f73f46111fc 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> @@ -117,17 +117,10 @@ static int ice_eswitch_setup_repr(struct ice_pf *pf, struct ice_repr *repr)
+>  	struct ice_vsi *vsi = repr->src_vsi;
+>  	struct metadata_dst *dst;
+>  
+> -	ice_remove_vsi_fltr(&pf->hw, vsi->idx);
+>  	repr->dst = metadata_dst_alloc(0, METADATA_HW_PORT_MUX,
+>  				       GFP_KERNEL);
+>  	if (!repr->dst)
+> -		goto err_add_mac_fltr;
+> -
+> -	if (ice_vsi_update_security(vsi, ice_vsi_ctx_clear_antispoof))
+> -		goto err_dst_free;
+> -
+> -	if (ice_vsi_add_vlan_zero(vsi))
+> -		goto err_update_security;
+> +		return -ENOMEM;
+>  
+>  	netif_keep_dst(uplink_vsi->netdev);
+>  
+> @@ -136,16 +129,48 @@ static int ice_eswitch_setup_repr(struct ice_pf *pf, struct ice_repr *repr)
+>  	dst->u.port_info.lower_dev = uplink_vsi->netdev;
+>  
+>  	return 0;
+> +}
+>  
+> -err_update_security:
+> +/**
+> + * ice_eswitch_cfg_vsi - configure VSI to work in slow-path
+> + * @vsi: VSI structure of representee
+> + * @mac: representee MAC
+> + *
+> + * Return: 0 on success, non-zero on error.
+> + */
+> +int ice_eswitch_cfg_vsi(struct ice_vsi *vsi, const u8 *mac)
+> +{
+> +	int err;
+> +
+> +	ice_remove_vsi_fltr(&vsi->back->hw, vsi->idx);
+> +
+> +	err = ice_vsi_update_security(vsi, ice_vsi_ctx_clear_antispoof);
+> +	if (err)
+> +		goto err_update_security;
+> +
+> +	err = ice_vsi_add_vlan_zero(vsi);
+> +	if (err)
+> +		goto err_vlan_zero;
+> +
+> +	return 0;
+> +
+> +err_vlan_zero:
+>  	ice_vsi_update_security(vsi, ice_vsi_ctx_set_antispoof);
 
-Those are my considerations.
+nit: Please consider continuing the practice, that is used for the labels
+     removed by this patch, of naming labels after what they do rather
+     than what jumps to them.
 
+> -err_dst_free:
+> -	metadata_dst_free(repr->dst);
+> -	repr->dst = NULL;
+> -err_add_mac_fltr:
+> -	ice_fltr_add_mac_and_broadcast(vsi, repr->parent_mac, ICE_FWD_TO_VSI);
+> +err_update_security:
+> +	ice_fltr_add_mac_and_broadcast(vsi, mac, ICE_FWD_TO_VSI);
+>  
+> -	return -ENODEV;
+> +	return err;
+> +}
+> +
+
+...
 
