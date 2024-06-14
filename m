@@ -1,133 +1,121 @@
-Return-Path: <netdev+bounces-103599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0863D908C3B
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:06:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55D0C908C4B
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:10:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D8A1281EEE
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:06:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E51D6289AB8
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9958B190477;
-	Fri, 14 Jun 2024 13:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7805C19A2A9;
+	Fri, 14 Jun 2024 13:10:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2jgY/LjQ"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="U8DNlf1x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A15E14885C
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 13:06:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784111991B3;
+	Fri, 14 Jun 2024 13:10:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718370380; cv=none; b=AlsG1qsuZIPUdKd4uNoGkrRBGtR9ruQpKWvWzVSLS3D+m1YJ3sPCLUDI9YpBymVSseiatp+Po0FHDlQgxJe9+/SqRBXP/BLZHjL4OWwsEINBBzd6PAc2IZ7dLTvprTcPRpYYVLVnq7SlsSu9PywikFsq+ESmSmy3P7waOMOPrCA=
+	t=1718370639; cv=none; b=Qfbkibdc8aQFU0Kz0IFTQKqqHiPH1yh899xNI83ir5Opqgz2fN2Wy/j2foddKyCIiy/MLR7Evg0DmVTp9Ys5CD7GJqLz2HCPrm08pd3fl/4TJ2L7FqgF8ByssHiys4F6m3PqAvRFZMm8CwTbXtj0uK2SkCih4i3G2aOQ8JDH684=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718370380; c=relaxed/simple;
-	bh=SnUQNI6UHQP5MbPqCnlHxHpVurWDkYrxspXEtgwaH54=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BGIxMIZ7gAPxWt8X27qOPxwE0IyibhvvgjOx1bJh8HUZq5EIwknuv0yvUZj4zQH2cp/OHINLmcZ3QZr1APiO5cz+ZNnu9jPnkGR/BPVmYN5DYi3GrREN4WvgOmTBCUXRGNw8vGd0QVmCKbdhJMKOfXa1ZZWim0En5knLN+uF+1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2jgY/LjQ; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-df773f9471fso3563581276.3
-        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 06:06:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718370377; x=1718975177; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7fRKhubzFyYMHPVT4nS15jvFr0tZ15mqILMaqnV6cNg=;
-        b=2jgY/LjQV9T9KwdxoEgdgqWIgXfaDBYcvYrwUawYzFthrSQ41BLxG0Q/pRGgA9mQYF
-         isMz06AfIwpd6dW/CSbenM8Lc/rkSDJhTOU6ZKrv6WWEdX3Dy96LUu/sfnhkc7Hv6/qY
-         D2iEbQCSVZcaTZsDDsfYPgISZeyKQPmCTbBe8axabuQg5APBJvdEqwlPi6iF1e09zUVa
-         BOU8Lmur3NwtFlvy6dA8cy4WbzWyDtmAS4kr4PCpWaDbUL1rR7jPcli6FuJceE+SHtGH
-         lH0VvNjQ7WYK4zPMv/jWmj/CARK+hpJKnSJWt2pSCUefT8PJ6PkuthLnUIxOhcYp1ZRH
-         h5zQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718370377; x=1718975177;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7fRKhubzFyYMHPVT4nS15jvFr0tZ15mqILMaqnV6cNg=;
-        b=j6uarjXSX+XuCTnDUyYq7PVDYmwAA3L9RUpnE4PvgDRTXPQDdrZgrVKVyMua1xdLB2
-         FAs3K4gjY/qLv2pj+qHbDP3DZ40YGLacthsSm8HL7aEqet0vUs74A4iU5A5h3AdpKTez
-         jDKStu74pSvF81gnnOVBPzzNUar3GxdVg/pJ1vQ1gHFhuvfOVAFJyPpqBUiP90/ZZIdH
-         4vBK9jh2C5I2hWo++qSQ/cUEw2mUGatL/l4z7g/iZT6deaibHsDLimF9WTsPzwXPT1pa
-         eZFI/qzt2JqHL9D8yF6KhlTh5cv2dxB9MSkdAmr43j4kyDHYrSqULFCBTKejMuBj1epy
-         6x+w==
-X-Gm-Message-State: AOJu0YzpM0/u+Oxaoc548yNCHY2mIHxtJru1JTrM85ltzyfzZawE8zFX
-	HqJaO2Ww5+g4kvDl+txzxqImtKRbg4cY+nM0tsDx344ZQEQuVpS7/qe6JFYZC5mlGDDPiCTZvxx
-	tX0gfOZTMaw==
-X-Google-Smtp-Source: AGHT+IGIoTzHzTFDFsyv1dPaltPPdn/E5X6Cw9mb6zbL+w9fxfWZJaVo6SWO3fdCWvcUwkVcatanyPY7TGVySQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:150b:b0:dfa:8ed1:8f1b with SMTP
- id 3f1490d57ef6-dff15402e19mr658855276.1.1718370377078; Fri, 14 Jun 2024
- 06:06:17 -0700 (PDT)
-Date: Fri, 14 Jun 2024 13:06:15 +0000
+	s=arc-20240116; t=1718370639; c=relaxed/simple;
+	bh=jzwkfggLDXFJDcRbziWhvAco8PbVOMWsz0rQYdDWX58=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pM22Q8wyBwMvHlKjs3jjYUoSV6xQJOtBMc8c1Dfaro/OfTuqnoRfZDQzd3Cuw+qlV8/Oue58JqfsPZ5p+OZ2t4Sxiz5p/82OY/oyQre4HzKXCB4No5eQfvZu82jeH0MR87G0LGmDQFhOXuwagPVJEU5ehdG1gCMu73pOfZaCBdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=U8DNlf1x; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45EAWa9V026928;
+	Fri, 14 Jun 2024 15:09:54 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=selector1; bh=u88B3uHAwNfzN7+owQRQcC
+	LwIQp1OrA8QpebdDFwe/o=; b=U8DNlf1xzJ9iYyIiP7Tljjc9V/cK9rd5fi4d3s
+	ofUxQYPsWHbPI9MSpuxKqZrO69BT++q+9wgWGixTiulNdmAzqtToXWJYVtSIghSr
+	Lx6TTkbIdfvKhAoMRXZoDvGce4n8FXHgqKrLXau5WoEPFK+0KnpV2vBl5mmvownB
+	qGGo3jucZA5n92qOwjdXmBLegW/5TO46SpZgA0ps15i2wRAaz/TYiNOfylHc6TZe
+	kKi0v7/QPcJBWyp9ZDnRJ6Kh4bPRrdDcmIJK51geVm9aenUuTFNUtk8oAoDFsU3X
+	s8HHBu8s0N5W89IXmkAuUAggmz4MstLdxhyq8CXt35Z+diIQ==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yrfuj9wsb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Jun 2024 15:09:54 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 112AE40046;
+	Fri, 14 Jun 2024 15:09:38 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id D14D3214D2E;
+	Fri, 14 Jun 2024 15:08:24 +0200 (CEST)
+Received: from localhost (10.252.5.68) by SHFDAG1NODE2.st.com (10.75.129.70)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 14 Jun
+ 2024 15:08:21 +0200
+From: Christophe Roullier <christophe.roullier@foss.st.com>
+To: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+        Mark
+ Brown <broonie@kernel.org>,
+        Christophe Roullier
+	<christophe.roullier@foss.st.com>,
+        Marek Vasut <marex@denx.de>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: [net-next,PATCH 0/2] Series to deliver Ethernet for STM32MP25
+Date: Fri, 14 Jun 2024 15:08:10 +0200
+Message-ID: <20240614130812.72425-1-christophe.roullier@foss.st.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.2.627.g7a2c4fd464-goog
-Message-ID: <20240614130615.396837-1-edumazet@google.com>
-Subject: [PATCH net] tcp: clear tp->retrans_stamp in tcp_rcv_fastopen_synack()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, stable@vger.kernel.org, 
-	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To SHFDAG1NODE2.st.com
+ (10.75.129.70)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-14_10,2024-06-14_03,2024-05-17_01
 
-Some applications were reporting ETIMEDOUT errors on apparently
-good looking flows, according to packet dumps.
+STM32MP25 is STM32 SOC with 2 GMACs instances.
+    GMAC IP version is SNPS 5.3x.
+    GMAC IP configure with 2 RX and 4 TX queue.
+    DMA HW capability register supported
+    RX Checksum Offload Engine supported
+    TX Checksum insertion supported
+    Wake-Up On Lan supported
+    TSO supported
 
-We were able to root cause the issue to an accidental setting
-of tp->retrans_stamp in the following scenario:
+Christophe Roullier (2):
+  dt-bindings: net: add STM32MP25 compatible in documentation for stm32
+  net: stmmac: dwmac-stm32: stm32: add management of stm32mp25 for stm32
 
-- client sends TFO SYN with data.
-- server has TFO disabled, ACKs only SYN but not payload.
-- client receives SYNACK covering only SYN.
-- tcp_ack() eats SYN and sets tp->retrans_stamp to 0.
-- tcp_rcv_fastopen_synack() calls tcp_xmit_retransmit_queue()
-  to retransmit TFO payload w/o SYN, sets tp->retrans_stamp to "now",
-  but we are not in any loss recovery state.
-- TFO payload is ACKed.
-- we are not in any loss recovery state, and don't see any dupacks,
-  so we don't get to any code path that clears tp->retrans_stamp.
-- tp->retrans_stamp stays non-zero for the lifetime of the connection.
-- after first RTO, tcp_clamp_rto_to_user_timeout() clamps second RTO
-  to 1 jiffy due to bogus tp->retrans_stamp.
-- on clamped RTO with non-zero icsk_retransmits, retransmits_timed_out()
-  sets start_ts from tp->retrans_stamp from TFO payload retransmit
-  hours/days ago, and computes bogus long elapsed time for loss recovery,
-  and suffers ETIMEDOUT early.
+ .../devicetree/bindings/net/stm32-dwmac.yaml  |   6 +
+ .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 121 +++++++++++++++---
+ 2 files changed, 110 insertions(+), 17 deletions(-)
 
-Fixes: a7abf3cd76e1 ("tcp: consider using standard rtx logic in tcp_rcv_fastopen_synack()")
-CC: stable@vger.kernel.org
-Co-developed-by: Neal Cardwell <ncardwell@google.com>
-Signed-off-by: Neal Cardwell <ncardwell@google.com>
-Co-developed-by: Yuchung Cheng <ycheng@google.com>
-Signed-off-by: Yuchung Cheng <ycheng@google.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/tcp_input.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 9c04a9c8be9dfaa0ec2437b3748284e57588b216..01d208e0eef31fd87c7faaf5a3d10b8f52e99ee0 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -6296,6 +6296,7 @@ static bool tcp_rcv_fastopen_synack(struct sock *sk, struct sk_buff *synack,
- 		skb_rbtree_walk_from(data)
- 			 tcp_mark_skb_lost(sk, data);
- 		tcp_xmit_retransmit_queue(sk);
-+		tp->retrans_stamp = 0;
- 		NET_INC_STATS(sock_net(sk),
- 				LINUX_MIB_TCPFASTOPENACTIVEFAIL);
- 		return true;
+base-commit: 404dbd26322f50c8123bf5bff9a409356889035f
 -- 
-2.45.2.627.g7a2c4fd464-goog
+2.25.1
 
 
