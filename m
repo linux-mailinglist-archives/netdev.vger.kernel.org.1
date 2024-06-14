@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-103692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1C90909131
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D280909130
 	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 19:16:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80C92B2829E
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:16:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46BC71C21093
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:16:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5720719EEDB;
-	Fri, 14 Jun 2024 17:15:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C25411A0AE9;
+	Fri, 14 Jun 2024 17:15:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="M3nQu8C8"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="r3Vlb3Zl"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A3719DF6B;
-	Fri, 14 Jun 2024 17:15:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061431974EA;
+	Fri, 14 Jun 2024 17:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718385330; cv=none; b=aPyfNGDveSlPlona6beey1agYv2jxpPIywmwb9C3xDNIe6lORTwlcTkjyyE0VEpwGYmKH4D+uGvY1l9zZyyk0ghKh8oWLIhOiGoXpgQBfjCs2zYdfmyWjBV3zieEMMJAflwO+BbW5yyBJLVE3Lvha6+ye0qGo2eKeEGdkOZO490=
+	t=1718385331; cv=none; b=NU0wliP0NzGEnnnCoxkdpBIpRUoG4WzcVRAtwaxEINzd3LhGwyDFD2nSl30fTnQ40xHk6MV/MeRLeQz9zkJePDcWn7hfhf5d/nXSa7UqiAEE38hzYvepoS56bNHdViK15xPTpsE2Y1ybONvwD3IQko/QKn02xox7BoBSg34SCIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718385330; c=relaxed/simple;
-	bh=8sSXErA72XHH0FmZV55gKMk3lGpLdJz0hZpC1Oyy1x0=;
+	s=arc-20240116; t=1718385331; c=relaxed/simple;
+	bh=ERY31lbQ9ymOsxtCzVpP4HOibxzB6fNrq3B3Ti28nEo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JRG0T2yUC4m6mN6lQs63oJrAyDb02Ns0bDSKLGbDRatGtz/Szik9Y2919qCfHO5BOSiTx4aFRq792o27x8yQ0gKNybQxEAoeeasb3b91Wr/GHLP9ZiE7Nxa2tETvkVO+hyqsGe4L413q4RVQBCK5LMAci/YEBkdDYTdxLW182pM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=M3nQu8C8; arc=none smtp.client-ip=68.232.153.233
+	 MIME-Version:Content-Type; b=VcQOlqhpAyHgk2iGKQWMVkheCY66A9g82CLBQf831T4LmJqmmlfJPO4RplhxP3sMqcAXpZV/sCY099Tx7JZd1LM0Qcm2Q5XLCBWmGxZr6a7Iv2mRwKCVTuU4iRfh2Yf1J3JYqvG/dZTBcN2SdXQ9fQ0vmNL0TCcdlvNjpy4s4hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=r3Vlb3Zl; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,28 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1718385329; x=1749921329;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8sSXErA72XHH0FmZV55gKMk3lGpLdJz0hZpC1Oyy1x0=;
-  b=M3nQu8C8X0FYt1MibaYPojAu3c8JNOi+H2NFT9xuzCDRZt2OC0psd7EE
-   nzAEVybVjV6dfiiIXdRP/nyD9k9I1nwzR9DUqUkihD7HKrba/WTbjLEC0
-   Q9OarFsyjAml4obaP6UEYrIUBblgiIp4KKZFR0AMWry638cXmvKrzn+fF
-   IaPkTYavEQ/QRHO+M8YlIpq2VjT2Fvt20fboQfFVubKD48MFl7s0UbGXu
-   qJf6tGWoN88veorcoaIWQb9eRFxQq/mRqL1Jnsc7LhrPrtxsTkDny4U6t
-   gqL2WqyYH7x9lNiT2yIl8dl8ETj8H/PJ4ESV1YKKtO+veV97kFV73GVow
-   A==;
-X-CSE-ConnectionGUID: ARXfGER+SECGbybsuTH9RQ==
-X-CSE-MsgGUID: KjEbXRY2Qy2YV4n6Us94FQ==
+  bh=ERY31lbQ9ymOsxtCzVpP4HOibxzB6fNrq3B3Ti28nEo=;
+  b=r3Vlb3Zl/+xRksXeVGp8QnPC62zFOgLkO2Ggt3oyEKQ38hckLpZu8Woj
+   PMpPB5nU/zOpiW5GkkeTYhyCI+ZGkeFoEGpg9GRqG3kQaVPsfBpMcSOZd
+   cjLb+U/mRyTDyfNwxF90u0MqAF2Wa53+NGlihLFwJM241iJOwA1vYFQ3N
+   JoflGqbWM4VSuWzJyr6fY0dReTuyTB325qGvHjF+jP5f9Iuc22QJJbJfG
+   E+MRxmpbiee21cxW0DKoIVnqbMKqjJJE4WLv93Uirh7SGS2BisTeIQNb5
+   XRyccf6dKhdugGmNQSfsPnDmgk4xnHL2MKh6iJxibkXZGsA1/Iceb7/7Z
+   Q==;
+X-CSE-ConnectionGUID: FkzynaL6Qw6YgMHq0F4nsw==
+X-CSE-MsgGUID: QxxoVixiRUePyTcyhQN//g==
 X-IronPort-AV: E=Sophos;i="6.08,238,1712646000"; 
-   d="scan'208";a="258450493"
+   d="scan'208";a="194985066"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Jun 2024 10:15:26 -0700
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Jun 2024 10:15:29 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 14 Jun 2024 10:15:03 -0700
+ 15.1.2507.35; Fri, 14 Jun 2024 10:15:08 -0700
 Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Fri, 14 Jun 2024 10:14:58 -0700
+ 15.1.2507.35 via Frontend Transport; Fri, 14 Jun 2024 10:15:03 -0700
 From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
@@ -65,9 +65,9 @@ CC: <davem@davemloft.net>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
 	<sbauer@blackbox.su>, <hmehrtens@maxlinear.com>, <lxu@maxlinear.com>,
 	<hkallweit1@gmail.com>, <edumazet@google.com>, <pabeni@redhat.com>,
 	<wojciech.drewek@intel.com>, <UNGLinuxDriver@microchip.com>
-Subject: [PATCH net V5 1/3] net: lan743x: disable WOL upon resume to restore full data path operation
-Date: Fri, 14 Jun 2024 22:41:55 +0530
-Message-ID: <20240614171157.190871-2-Raju.Lakkaraju@microchip.com>
+Subject: [PATCH net V5 2/3] net: lan743x: Support WOL at both the PHY and MAC appropriately
+Date: Fri, 14 Jun 2024 22:41:56 +0530
+Message-ID: <20240614171157.190871-3-Raju.Lakkaraju@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240614171157.190871-1-Raju.Lakkaraju@microchip.com>
 References: <20240614171157.190871-1-Raju.Lakkaraju@microchip.com>
@@ -80,149 +80,174 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-When Wake-on-LAN (WoL) is active and the system is in suspend mode, triggering
-a system event can wake the system from sleep, which may block the data path.
-To restore normal data path functionality after waking, disable all wake-up
-events. Furthermore, clear all Write 1 to Clear (W1C) status bits by writing
-1's to them.
+Prevent options not supported by the PHY from being requested to it by the MAC
+Whenever a WOL option is supported by both, the PHY is given priority
+since that usually leads to better power savings.
 
-Fixes: 4d94282afd95 ("lan743x: Add power management support")
+Fixes: e9e13b6adc33 ("lan743x: fix for potential NULL pointer dereference with bare card")
 Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 ---
 Change List:
 ------------
 V4 -> V5:
-  - Change Wakeup source message from info to debug
+  - Change Fixes's SHA from 13 chars to 12 chars
+  - Remove the "Reported-by" and "Closes" tags
 V3 -> V4:
-  - No change
+  - Fix the support for "CONFIG_PM=N" 
 V2 -> V3:
-  - No change
+  - Remove the "phy does not support WOL" debug message which is not required
+  - Remove WAKE_PHY support option from Ethernet MAC (LAN743x/PCI11x1x) driver
+  - Add "phy_wol_supported" and "phy_wolopts" variables to hold PHY's WOL config
 V1 -> V2:
   - Repost - No change
 V0 -> V1:
-  - Variable "data" change from "int" to "unsigned int"
- drivers/net/ethernet/microchip/lan743x_main.c | 30 ++++++++++++++++---
- drivers/net/ethernet/microchip/lan743x_main.h | 24 +++++++++++++++
- 2 files changed, 50 insertions(+), 4 deletions(-)
+  - Change the "phy does not support WOL" print from netif_info() to
+    netif_dbg()
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index 6be8a43c908a..48835bdc2e63 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.c
-+++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -3575,7 +3575,7 @@ static void lan743x_pm_set_wol(struct lan743x_adapter *adapter)
+ .../net/ethernet/microchip/lan743x_ethtool.c  | 44 +++++++++++++++++--
+ drivers/net/ethernet/microchip/lan743x_main.c | 18 ++++++--
+ drivers/net/ethernet/microchip/lan743x_main.h |  4 ++
+ 3 files changed, 58 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+index d0f4ff4ee075..0d1740d64676 100644
+--- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
++++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+@@ -1127,8 +1127,12 @@ static void lan743x_ethtool_get_wol(struct net_device *netdev,
+ 	if (netdev->phydev)
+ 		phy_ethtool_get_wol(netdev->phydev, wol);
  
- 	/* clear wake settings */
- 	pmtctl = lan743x_csr_read(adapter, PMT_CTL);
--	pmtctl |= PMT_CTL_WUPS_MASK_;
-+	pmtctl |= PMT_CTL_WUPS_MASK_ | PMT_CTL_RES_CLR_WKP_MASK_;
- 	pmtctl &= ~(PMT_CTL_GPIO_WAKEUP_EN_ | PMT_CTL_EEE_WAKEUP_EN_ |
- 		PMT_CTL_WOL_EN_ | PMT_CTL_MAC_D3_RX_CLK_OVR_ |
- 		PMT_CTL_RX_FCT_RFE_D3_CLK_OVR_ | PMT_CTL_ETH_PHY_WAKE_EN_);
-@@ -3710,6 +3710,7 @@ static int lan743x_pm_resume(struct device *dev)
- 	struct pci_dev *pdev = to_pci_dev(dev);
- 	struct net_device *netdev = pci_get_drvdata(pdev);
+-	wol->supported |= WAKE_BCAST | WAKE_UCAST | WAKE_MCAST |
+-		WAKE_MAGIC | WAKE_PHY | WAKE_ARP;
++	if (wol->supported != adapter->phy_wol_supported)
++		netif_warn(adapter, drv, adapter->netdev,
++			   "PHY changed its supported WOL! old=%x, new=%x\n",
++			   adapter->phy_wol_supported, wol->supported);
++
++	wol->supported |= MAC_SUPPORTED_WAKES;
+ 
+ 	if (adapter->is_pci11x1x)
+ 		wol->supported |= WAKE_MAGICSECURE;
+@@ -1143,7 +1147,39 @@ static int lan743x_ethtool_set_wol(struct net_device *netdev,
+ {
  	struct lan743x_adapter *adapter = netdev_priv(netdev);
-+	u32 data;
- 	int ret;
  
- 	pci_set_power_state(pdev, PCI_D0);
-@@ -3728,6 +3729,30 @@ static int lan743x_pm_resume(struct device *dev)
- 		return ret;
++	/* WAKE_MAGICSEGURE is a modifier of and only valid together with
++	 * WAKE_MAGIC
++	 */
++	if ((wol->wolopts & WAKE_MAGICSECURE) && !(wol->wolopts & WAKE_MAGIC))
++		return -EINVAL;
++
++	if (netdev->phydev) {
++		struct ethtool_wolinfo phy_wol;
++		int ret;
++
++		phy_wol.wolopts = wol->wolopts & adapter->phy_wol_supported;
++
++		/* If WAKE_MAGICSECURE was requested, filter out WAKE_MAGIC
++		 * for PHYs that do not support WAKE_MAGICSECURE
++		 */
++		if (wol->wolopts & WAKE_MAGICSECURE &&
++		    !(adapter->phy_wol_supported & WAKE_MAGICSECURE))
++			phy_wol.wolopts &= ~WAKE_MAGIC;
++
++		ret = phy_ethtool_set_wol(netdev->phydev, &phy_wol);
++		if (ret && (ret != -EOPNOTSUPP))
++			return ret;
++
++		if (ret == -EOPNOTSUPP)
++			adapter->phy_wolopts = 0;
++		else
++			adapter->phy_wolopts = phy_wol.wolopts;
++	} else {
++		adapter->phy_wolopts = 0;
++	}
++
+ 	adapter->wolopts = 0;
++	wol->wolopts &= ~adapter->phy_wolopts;
+ 	if (wol->wolopts & WAKE_UCAST)
+ 		adapter->wolopts |= WAKE_UCAST;
+ 	if (wol->wolopts & WAKE_MCAST)
+@@ -1164,10 +1200,10 @@ static int lan743x_ethtool_set_wol(struct net_device *netdev,
+ 		memset(adapter->sopass, 0, sizeof(u8) * SOPASS_MAX);
  	}
  
-+	ret = lan743x_csr_read(adapter, MAC_WK_SRC);
-+	netif_dbg(adapter, drv, adapter->netdev,
-+		  "Wakeup source : 0x%08X\n", ret);
-+
-+	/* Clear the wol configuration and status bits. Note that
-+	 * the status bits are "Write One to Clear (W1C)"
-+	 */
-+	data = MAC_WUCSR_EEE_TX_WAKE_ | MAC_WUCSR_EEE_RX_WAKE_ |
-+	       MAC_WUCSR_RFE_WAKE_FR_ | MAC_WUCSR_PFDA_FR_ | MAC_WUCSR_WUFR_ |
-+	       MAC_WUCSR_MPR_ | MAC_WUCSR_BCAST_FR_;
-+	lan743x_csr_write(adapter, MAC_WUCSR, data);
-+
-+	data = MAC_WUCSR2_NS_RCD_ | MAC_WUCSR2_ARP_RCD_ |
-+	       MAC_WUCSR2_IPV6_TCPSYN_RCD_ | MAC_WUCSR2_IPV4_TCPSYN_RCD_;
-+	lan743x_csr_write(adapter, MAC_WUCSR2, data);
-+
-+	data = MAC_WK_SRC_ETH_PHY_WK_ | MAC_WK_SRC_IPV6_TCPSYN_RCD_WK_ |
-+	       MAC_WK_SRC_IPV4_TCPSYN_RCD_WK_ | MAC_WK_SRC_EEE_TX_WK_ |
-+	       MAC_WK_SRC_EEE_RX_WK_ | MAC_WK_SRC_RFE_FR_WK_ |
-+	       MAC_WK_SRC_PFDA_FR_WK_ | MAC_WK_SRC_MP_FR_WK_ |
-+	       MAC_WK_SRC_BCAST_FR_WK_ | MAC_WK_SRC_WU_FR_WK_ |
-+	       MAC_WK_SRC_WK_FR_SAVED_;
-+	lan743x_csr_write(adapter, MAC_WK_SRC, data);
-+
- 	/* open netdev when netdev is at running state while resume.
- 	 * For instance, it is true when system wakesup after pm-suspend
- 	 * However, it is false when system wakes up after suspend GUI menu
-@@ -3736,9 +3761,6 @@ static int lan743x_pm_resume(struct device *dev)
- 		lan743x_netdev_open(netdev);
++	wol->wolopts = adapter->wolopts | adapter->phy_wolopts;
+ 	device_set_wakeup_enable(&adapter->pdev->dev, (bool)wol->wolopts);
  
- 	netif_device_attach(netdev);
--	ret = lan743x_csr_read(adapter, MAC_WK_SRC);
--	netif_info(adapter, drv, adapter->netdev,
--		   "Wakeup source : 0x%08X\n", ret);
- 
- 	return 0;
+-	return netdev->phydev ? phy_ethtool_set_wol(netdev->phydev, wol)
+-			: -ENETDOWN;
++	return 0;
  }
+ #endif /* CONFIG_PM */
+ 
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index 48835bdc2e63..e418539565b1 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -3118,6 +3118,17 @@ static int lan743x_netdev_open(struct net_device *netdev)
+ 		if (ret)
+ 			goto close_tx;
+ 	}
++
++#ifdef CONFIG_PM
++	if (adapter->netdev->phydev) {
++		struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
++
++		phy_ethtool_get_wol(netdev->phydev, &wol);
++		adapter->phy_wol_supported = wol.supported;
++		adapter->phy_wolopts = wol.wolopts;
++	}
++#endif
++
+ 	return 0;
+ 
+ close_tx:
+@@ -3587,10 +3598,9 @@ static void lan743x_pm_set_wol(struct lan743x_adapter *adapter)
+ 
+ 	pmtctl |= PMT_CTL_ETH_PHY_D3_COLD_OVR_ | PMT_CTL_ETH_PHY_D3_OVR_;
+ 
+-	if (adapter->wolopts & WAKE_PHY) {
+-		pmtctl |= PMT_CTL_ETH_PHY_EDPD_PLL_CTL_;
++	if (adapter->phy_wolopts)
+ 		pmtctl |= PMT_CTL_ETH_PHY_WAKE_EN_;
+-	}
++
+ 	if (adapter->wolopts & WAKE_MAGIC) {
+ 		wucsr |= MAC_WUCSR_MPEN_;
+ 		macrx |= MAC_RX_RXEN_;
+@@ -3686,7 +3696,7 @@ static int lan743x_pm_suspend(struct device *dev)
+ 	lan743x_csr_write(adapter, MAC_WUCSR2, 0);
+ 	lan743x_csr_write(adapter, MAC_WK_SRC, 0xFFFFFFFF);
+ 
+-	if (adapter->wolopts)
++	if (adapter->wolopts || adapter->phy_wolopts)
+ 		lan743x_pm_set_wol(adapter);
+ 
+ 	if (adapter->is_pci11x1x) {
 diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
-index 645bc048e52e..fac0f33d10b2 100644
+index fac0f33d10b2..3b2585a384e2 100644
 --- a/drivers/net/ethernet/microchip/lan743x_main.h
 +++ b/drivers/net/ethernet/microchip/lan743x_main.h
-@@ -61,6 +61,7 @@
- #define PMT_CTL_RX_FCT_RFE_D3_CLK_OVR_		BIT(18)
- #define PMT_CTL_GPIO_WAKEUP_EN_			BIT(15)
- #define PMT_CTL_EEE_WAKEUP_EN_			BIT(13)
-+#define PMT_CTL_RES_CLR_WKP_MASK_		GENMASK(9, 8)
- #define PMT_CTL_READY_				BIT(7)
- #define PMT_CTL_ETH_PHY_RST_			BIT(4)
- #define PMT_CTL_WOL_EN_				BIT(3)
-@@ -227,12 +228,31 @@
- #define MAC_WUCSR				(0x140)
- #define MAC_MP_SO_EN_				BIT(21)
- #define MAC_WUCSR_RFE_WAKE_EN_			BIT(14)
-+#define MAC_WUCSR_EEE_TX_WAKE_			BIT(13)
-+#define MAC_WUCSR_EEE_RX_WAKE_			BIT(11)
-+#define MAC_WUCSR_RFE_WAKE_FR_			BIT(9)
-+#define MAC_WUCSR_PFDA_FR_			BIT(7)
-+#define MAC_WUCSR_WUFR_				BIT(6)
-+#define MAC_WUCSR_MPR_				BIT(5)
-+#define MAC_WUCSR_BCAST_FR_			BIT(4)
- #define MAC_WUCSR_PFDA_EN_			BIT(3)
- #define MAC_WUCSR_WAKE_EN_			BIT(2)
- #define MAC_WUCSR_MPEN_				BIT(1)
- #define MAC_WUCSR_BCST_EN_			BIT(0)
+@@ -1042,6 +1042,8 @@ enum lan743x_sgmii_lsd {
+ 	LINK_2500_SLAVE
+ };
  
- #define MAC_WK_SRC				(0x144)
-+#define MAC_WK_SRC_ETH_PHY_WK_			BIT(17)
-+#define MAC_WK_SRC_IPV6_TCPSYN_RCD_WK_		BIT(16)
-+#define MAC_WK_SRC_IPV4_TCPSYN_RCD_WK_		BIT(15)
-+#define MAC_WK_SRC_EEE_TX_WK_			BIT(14)
-+#define MAC_WK_SRC_EEE_RX_WK_			BIT(13)
-+#define MAC_WK_SRC_RFE_FR_WK_			BIT(12)
-+#define MAC_WK_SRC_PFDA_FR_WK_			BIT(11)
-+#define MAC_WK_SRC_MP_FR_WK_			BIT(10)
-+#define MAC_WK_SRC_BCAST_FR_WK_			BIT(9)
-+#define MAC_WK_SRC_WU_FR_WK_			BIT(8)
-+#define MAC_WK_SRC_WK_FR_SAVED_			BIT(7)
-+
- #define MAC_MP_SO_HI				(0x148)
- #define MAC_MP_SO_LO				(0x14C)
- 
-@@ -295,6 +315,10 @@
- #define RFE_INDX(index)			(0x580 + (index << 2))
- 
- #define MAC_WUCSR2			(0x600)
-+#define MAC_WUCSR2_NS_RCD_		BIT(7)
-+#define MAC_WUCSR2_ARP_RCD_		BIT(6)
-+#define MAC_WUCSR2_IPV6_TCPSYN_RCD_	BIT(5)
-+#define MAC_WUCSR2_IPV4_TCPSYN_RCD_	BIT(4)
- 
- #define SGMII_ACC			(0x720)
- #define SGMII_ACC_SGMII_BZY_		BIT(31)
++#define MAC_SUPPORTED_WAKES  (WAKE_BCAST | WAKE_UCAST | WAKE_MCAST | \
++			      WAKE_MAGIC | WAKE_ARP)
+ struct lan743x_adapter {
+ 	struct net_device       *netdev;
+ 	struct mii_bus		*mdiobus;
+@@ -1049,6 +1051,8 @@ struct lan743x_adapter {
+ #ifdef CONFIG_PM
+ 	u32			wolopts;
+ 	u8			sopass[SOPASS_MAX];
++	u32			phy_wolopts;
++	u32			phy_wol_supported;
+ #endif
+ 	struct pci_dev		*pdev;
+ 	struct lan743x_csr      csr;
 -- 
 2.34.1
 
