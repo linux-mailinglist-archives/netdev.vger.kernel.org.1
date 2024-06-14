@@ -1,133 +1,148 @@
-Return-Path: <netdev+bounces-103726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F295490933A
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:12:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D11690932C
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 22:07:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8BABFB22AD9
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 20:12:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C34A1C22BEB
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 20:07:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B09831A3BB1;
-	Fri, 14 Jun 2024 20:12:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B47216D339;
+	Fri, 14 Jun 2024 20:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="AdE19p/S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nQ8adDct"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516311A2549
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 20:12:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476D9383
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 20:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718395929; cv=none; b=E6XKLR4c5QZ8pIWceQL6WcP3ByzFK9fZ/RP11mChI7P5xvYEfdmB3QN1tr2/Uxi377MA3oR/5BwlV9e1jmkU/U3aebjReFSQZOdm9v6hJolxBSFP+xL/T1TSV0+kNfJsFY7bdKpBWhF/YkqzbDqG26EeNVyNlELadVkmrx60UZg=
+	t=1718395676; cv=none; b=CKgRyCtneoBEsbjKir9LhB+UpXoNWBZqDYEhP8gBVDOdXCRZVudW9LdnvHI6PirBwfRCZoYmlVHuDt5ApP6mGemaFi/V96lBjaMook4aGU/FQD84FKk0pJ+yMmKj1EW3cdf16qE3eSQkXiNdOEI3AjdJ1i35ffTs7Ybj0ttd3PI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718395929; c=relaxed/simple;
-	bh=9vLxe3idRk5b1uJOVF59H8w9g/fkg5OwN97ycQ9KALs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PVbn8/EjOdJTTOvRCqZiCGU+wwHxVGO9Q9O7ION3vl+kCHZuNt76NzvFfFzyAiX5UKibYlJbFRXp1I8IHA2DWPt3ts3igFNjT//QFbHgEkTBVx+iLwhlj0oSnXIzRlp76lkv6hZd6KULCLwZr6v0dIRrm2KcTScKhXeTJLHFYj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=AdE19p/S; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1718395928; x=1749931928;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hMQz1Iga9tD8kg9qYt9PG5emsh92pozfnDsJh2KFXf0=;
-  b=AdE19p/SyC4rg10oAgVG0WYZ0Q8cm4A0fcLPH4qyZhwnN7rTArhVpXTL
-   x+pRe14Oy/0cEfPakXIJqvejUB/PTl1rEWQA0hXLYPXnw3LHxipNMkgZa
-   0lZG0lLf1Thr56I+EiFbrlYDwE8AsObDiG5mvqpwjTMG+ht64bV5bbwS8
-   M=;
-X-IronPort-AV: E=Sophos;i="6.08,238,1712620800"; 
-   d="scan'208";a="303533955"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2024 20:12:08 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:14283]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.60.144:2525] with esmtp (Farcaster)
- id b3a190ba-6c13-4ae4-8af5-43251b5da7aa; Fri, 14 Jun 2024 20:12:07 +0000 (UTC)
-X-Farcaster-Flow-ID: b3a190ba-6c13-4ae4-8af5-43251b5da7aa
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 14 Jun 2024 20:12:07 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.100.24) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 14 Jun 2024 20:12:04 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kent Overstreet <kent.overstreet@linux.dev>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
-	<netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 11/11] af_unix: Don't use spin_lock_nested() in copy_peercred().
-Date: Fri, 14 Jun 2024 13:07:15 -0700
-Message-ID: <20240614200715.93150-12-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240614200715.93150-1-kuniyu@amazon.com>
-References: <20240614200715.93150-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1718395676; c=relaxed/simple;
+	bh=dqV4Cu+9KeoPj+/hyBeYsBT3Q/OPv0b+wYlB4To6psU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AFnxFoFgEaIHYuMor9f4r5MeCf3Q6pGCat2CfbgMA//mCMnX0O0SJflPMhfyGnbY7BFcj5YVIdQnSyWO9oDhJjZY7/+UwKy7muxO16GksgKwtsXexan0w8l4CsEJQH+/6WgZh7Q1jnPmysrzk5qyR6suQ7USQINdlGICvxKUNis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nQ8adDct; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65968C4AF1A;
+	Fri, 14 Jun 2024 20:07:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718395675;
+	bh=dqV4Cu+9KeoPj+/hyBeYsBT3Q/OPv0b+wYlB4To6psU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nQ8adDctga5v8D+0FB6IEp9lGQcugJzN/lnJDE51ox71LqkvlNZHlVQ7oWueTVHTX
+	 6NW5sqQhvFhvB3rrtb4DbFNsSqE/jgo2grXdq3cqHjT3IrJwDZQfwDv0Yvp/5nVt1v
+	 d+rS3uNl7G0xMZAjE0yssNSHt4rLv5f/xLkiA5pEt24nmTZkIHIo74oBFSmhJQmskX
+	 i4LfbvvI/vYyI2BGVwIci6qvDKCV7xNZzS7wBZr9lPnvDxnqCBnps6A491JkFMwURP
+	 DdokO1qK7yR1XjDMDt4H9b80EtgNUpt5w8x5wx7+i7DcCMOG+eAKPT9Bg06iMc+e2F
+	 +ZjRRjBWm0gFQ==
+Date: Fri, 14 Jun 2024 21:07:51 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Wei <dw@davidwei.uk>
+Cc: Michael Chan <michael.chan@broadcom.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Adrian Alvarado <adrian.alvarado@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>, netdev@vger.kernel.org,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1 3/3] bnxt_en: implement netdev_queue_mgmt_ops
+Message-ID: <20240614200751.GY8447@kernel.org>
+References: <20240611023324.1485426-1-dw@davidwei.uk>
+ <20240611023324.1485426-4-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA004.ant.amazon.com (10.13.139.9) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240611023324.1485426-4-dw@davidwei.uk>
 
-When (AF_UNIX, SOCK_STREAM) socket connect()s to a listening socket,
-the listener's sk_peer_pid/sk_peer_cred are copied to the client in
-copy_peercred().
+On Mon, Jun 10, 2024 at 07:33:24PM -0700, David Wei wrote:
+> Implement netdev_queue_mgmt_ops for bnxt added in [1].
+> 
+> Two bnxt_rx_ring_info structs are allocated to hold the new/old queue
+> memory. Queue memory is copied from/to the main bp->rx_ring[idx]
+> bnxt_rx_ring_info.
+> 
+> Queue memory is pre-allocated in bnxt_queue_mem_alloc() into a clone,
+> and then copied into bp->rx_ring[idx] in bnxt_queue_mem_start().
+> 
+> Similarly, when bp->rx_ring[idx] is stopped its queue memory is copied
+> into a clone, and then freed later in bnxt_queue_mem_free().
+> 
+> I tested this patchset with netdev_rx_queue_restart(), including
+> inducing errors in all places that returns an error code. In all cases,
+> the queue is left in a good working state.
+> 
+> Rx queues are stopped/started using bnxt_hwrm_vnic_update(), which only
+> affects queues that are not in the default RSS context. This is
+> different to the GVE that also implemented the queue API recently where
+> arbitrary Rx queues can be stopped. Due to this limitation, all ndos
+> returns EOPNOTSUPP if the queue is in the default RSS context.
+> 
+> Thanks to Somnath for helping me with using bnxt_hwrm_vnic_update() to
+> stop/start an Rx queue. With their permission I've added them as
+> Acked-by.
+> 
+> [1]: https://lore.kernel.org/netdev/20240501232549.1327174-2-shailend@google.com/
+> 
+> Acked-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 307 ++++++++++++++++++++++
+>  1 file changed, 307 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 
-Then, two sk_peer_locks are held there; one is client's and another
-is listener's.
+...
 
-However, the latter is not needed because we hold the listner's
-unix_state_lock() there and unix_listen() cannot update the cred
-concurrently.
+> +static void bnxt_queue_mem_free(struct net_device *dev, void *qmem)
+> +{
+> +	struct bnxt_rx_ring_info *rxr = qmem;
+> +	struct bnxt *bp = netdev_priv(dev);
+> +	struct bnxt_ring_struct *ring;
+> +
+> +	if (bnxt_get_max_rss_ring(bp) >= idx)
+> +		return -EOPNOTSUPP;
 
-Let's drop the unnecessary spin_lock() and use the bare spin_lock()
-for the client to protect concurrent read by getsockopt(SO_PEERCRED).
+Hi David,
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/unix/af_unix.c | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+I guess there was some last minute refactoring and these sloped through the
+cracks. The two lines above seem a bit out of place here.
 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index c828022128ec..4dffff23a0fd 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -760,19 +760,12 @@ static void update_peercred(struct sock *sk)
- 
- static void copy_peercred(struct sock *sk, struct sock *peersk)
- {
--	if (sk < peersk) {
--		spin_lock(&sk->sk_peer_lock);
--		spin_lock_nested(&peersk->sk_peer_lock, SINGLE_DEPTH_NESTING);
--	} else {
--		spin_lock(&peersk->sk_peer_lock);
--		spin_lock_nested(&sk->sk_peer_lock, SINGLE_DEPTH_NESTING);
--	}
-+	lockdep_assert_held(&unix_sk(peersk)->lock);
- 
--	sk->sk_peer_pid  = get_pid(peersk->sk_peer_pid);
-+	spin_lock(&sk->sk_peer_lock);
-+	sk->sk_peer_pid = get_pid(peersk->sk_peer_pid);
- 	sk->sk_peer_cred = get_cred(peersk->sk_peer_cred);
--
- 	spin_unlock(&sk->sk_peer_lock);
--	spin_unlock(&peersk->sk_peer_lock);
- }
- 
- static int unix_listen(struct socket *sock, int backlog)
--- 
-2.30.2
+* idx doesn't exist in this context
+* The return type of this function is void
 
+> +
+> +	bnxt_free_one_rx_ring(bp, rxr);
+> +	bnxt_free_one_rx_agg_ring(bp, rxr);
+> +
+> +	/* At this point, this NAPI instance has another page pool associated
+> +	 * with it. Disconnect here before freeing the old page pool to avoid
+> +	 * warnings.
+> +	 */
+> +	rxr->page_pool->p.napi = NULL;
+> +	page_pool_destroy(rxr->page_pool);
+> +	rxr->page_pool = NULL;
+> +
+> +	ring = &rxr->rx_ring_struct;
+> +	bnxt_free_ring(bp, &ring->ring_mem);
+> +
+> +	ring = &rxr->rx_agg_ring_struct;
+> +	bnxt_free_ring(bp, &ring->ring_mem);
+> +
+> +	kfree(rxr->rx_agg_bmap);
+> +	rxr->rx_agg_bmap = NULL;
+> +}
+
+...
 
