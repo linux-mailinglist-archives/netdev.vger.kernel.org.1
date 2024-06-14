@@ -1,152 +1,201 @@
-Return-Path: <netdev+bounces-103451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9B709081C7
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 04:42:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5A389081C5
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 04:42:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06321283A86
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 02:42:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEFCA1C216C2
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 02:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D029A1836C6;
-	Fri, 14 Jun 2024 02:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C127183083;
+	Fri, 14 Jun 2024 02:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j4RfEauM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F1qQV7c2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5149A183083;
-	Fri, 14 Jun 2024 02:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8762138495
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 02:42:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718332934; cv=none; b=QytSD+7Nbl0zAQ79YtwJRlprbUqc8aW+n/YYDASt/OJjREddkVjZ6UCsBTeNHy1lpAO+FczEddC5K41xnCDBBvAD1PfY02mzbzryP65XFqouEIKqXTL9NS+z5EVDco1EfkErsAPaiitNjVmbBbE26liipURkZqn1CBA7BvdKMs0=
+	t=1718332927; cv=none; b=iWEtJiqdiPqTmoDSbKkmmkYoZAbTW6o+DSR5fYuk0SqNELaMQacNqBnCbjXGpYX2jWguWN8Ex9K3mH/mU4IOb1QxQPliWmzG5vdWtpGxR2AEB1lVv7lVotJaudWtQ6kmaV+JbbKElSaO0DFfG1ewSr4X07nZLydSIhcNWGhQm7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718332934; c=relaxed/simple;
-	bh=vNjTA0syhWWpwu4OQvLgeCxKSSMi3SLyACzq+WGQKdE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X3mzQV9l4IXGUBEnFlJ8DidJgeef9VIE5dPeZkDJMGjbZfPEa4J7TJKR63bv243DMPBsRWaDdqdFDbLkMyaYf0BnrJoNY93wwWlWBr8mjoVdhqHSivLF1/E8SaU4s4+D8FSNkPclr8saGz4TPMpXbvwaw2JxaV0ki+byDcIkbm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j4RfEauM; arc=none smtp.client-ip=209.85.219.52
+	s=arc-20240116; t=1718332927; c=relaxed/simple;
+	bh=eJcfdaMdA07SaswdyNBflb0Ypzy5RD1D/ZaEDlKmL+c=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=CKKO66MQVYYQDpb0c86fIV1A6S+9S4m2wVoHiAC68hWhSatGUfdNmQ3wIRowBYzvIMmSapvK/Moge6dPCFAyIFBtpqmVkWxoUSjtHFsOWpLS2718U2g2KOY0/vsxkKnfmx72H+e6aS2a8fkfKy3vDaK/l298+Idu7TlIvs5nF0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F1qQV7c2; arc=none smtp.client-ip=209.85.216.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6b064841f81so13799756d6.1;
-        Thu, 13 Jun 2024 19:42:13 -0700 (PDT)
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2c2cb6750fcso282243a91.1
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 19:42:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718332932; x=1718937732; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bkn1Dqg/KvSsIEf4PMDdbgaHl7N3wpCE5dnCq2yPOs0=;
-        b=j4RfEauMXjxQqQpvwfxVMUXnZh+zOan8Ibj+eIRWz/BFjPSrkoAd6y5WVXKC4mOZlX
-         zpvL4mlIxlQFD0D5MWJZGVW47Ce0DqQMt0HfBCCQGKAtZ2PoyQb/Ku3FcLO25GZVRVHA
-         5TnNWmKz4v4zCcKGOKvqVANbM+sAV66N+sfD8k6kd82VTyLjWqWC8k3pKJ4p2f6O+XYB
-         vBRubLXoz2Ldh25ZTNyVoyI8RH3ajd1m+bnn4qpqC7PYjuMfctp44ng4KO79mQQyxfRc
-         d/9z9XvfK+Drlvt6MuC9VmTjn3Uw18yrgNqGkR0kSLyQ7POkZMo56ke8SjiTHZvlAbf7
-         wPzQ==
+        d=gmail.com; s=20230601; t=1718332925; x=1718937725; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oXcTiESkKmSEI3/A7naH7yCYLW8EORfhzjr241vKkZM=;
+        b=F1qQV7c2XarnwV+Hl2WZ8dCezB8MJN4TOOhhlwd3LOU/sX5UZwwNxH1ZWO/CSHO7Wh
+         KTfCWTQX758CW5B0TxExRL66y0aqKCU9BLyAwRKGr7u0U5/HsLwLq2F0Ohg+jPC6oNQw
+         llsJa88zHbqVJhvKY+8587hGHtU5ZIXjAEIzKSQ+2dUb6i4yVoCgivIAyvliT0XcwCJ9
+         I3nv5tR8zQCS+X3h/HHNrRz5rTAcZaogslLs5tjBEeR05W/BxIdk+DBVsNAvSE1Uyz82
+         F43JMqfmmjHFJ6bHjJ+Yr5Am9gnbQATRPn3KpTVy/FDn9bmqos0K527qufyvDttMR0Gb
+         gGfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718332932; x=1718937732;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bkn1Dqg/KvSsIEf4PMDdbgaHl7N3wpCE5dnCq2yPOs0=;
-        b=D//UuvOPEQy/YMwoXz53VwyW2Te5rtVa70Tx1nsUrbUXZAD1aJ4SIgCnDBrkkoIIlB
-         sA6qlTb/An19Wo85tBce7yUa1HveFLr0lUxjsUHMjzbaqm9nFrl8dkJGhpPofDH3+o5e
-         c4VaH+1ZUoYTQBlu+Aj+CGSlOlitqLfLkTUucAfmTcCa0KDVdT5a9C0+nkparn0TggBi
-         JPjcqqszSgEFR+nPm0qJ/zB8w7nNVKKwSBeOh0Ptzw03vTQPUGBI+3Im4u2l+s86QxR+
-         Do8eoJNTskH3hpOZzYr0Y28SF/Zcx026nG9/t5gHo1uruJkq9FN7jfcnpgweIHyO3eiS
-         /UNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUwPgUywI3Ed4fLS1xr5h2RoxhMpv2kIIVv53YJBYH4ATYV6Xms0hDvFb0m/4GF9YJ9j+0WULCU5+U3UBmOF/y8uv47L/p8fQp+wZ3FNp9eALFptUd0iLQ8dT6uUvkJwfXh+A4ps8yhgWYvbMNF1PvG1lajsLg/pIqK7IE28Q86L4cLF0uhrm7tXF3vRrugt/CdnyveqwgGafsK7wH/uAwhZP0E5GB2tHS8dXoVYvKrmUYQ73fz+y241LWLl+IHAc2fL+87B00P5GNpLHKQZw/lorUhwt2A1ZGPxX06XGwCjxJYSzj6Og+Je0PbURTif6Q4oirJ4Q==
-X-Gm-Message-State: AOJu0Yye13G9yt2IChSfhKxQ0eK78IxlaqtlIARg3FPKPs2SH6DNL/O3
-	OJW6ByPDXrXE/uKr7JG8QWta7rsZccmEX594xjtSEcbHk6FeT1lkCatw9TaKRaj9xmlkUQgDct5
-	0csKOaDNj1U8iU8VKttY7QulSuJc=
-X-Google-Smtp-Source: AGHT+IH2yJkDatqeZR2Ou1juwPDu1s/BD6Hx184YCW7utolqXQ5u8htp4butw/HzKwBNPXerjjKUWiJm/DxherGGPpI=
-X-Received: by 2002:a0c:c581:0:b0:6b0:8ff6:7565 with SMTP id
- 6a1803df08f44-6b2afd6e8a0mr14215336d6.49.1718332932181; Thu, 13 Jun 2024
- 19:42:12 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718332925; x=1718937725;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oXcTiESkKmSEI3/A7naH7yCYLW8EORfhzjr241vKkZM=;
+        b=stPmXXi0Yv6Mp0gclZbzzeRJ3ROkQuk6cfKKkcT6K2AgjxsEzBdHVqsECgbljyPTYo
+         OUXT43v3AzQVu5aLgWdF7y/i11+rUC+z9Atox1dipZDCT6v2CXmbPcSLugBzEw6GXWFJ
+         QqPwGycNMttmwsqeRed0GJ7nrGFlkIHhgUtAcEzLeDfuyqw6uPFDcqmorUdnVzGVGBPB
+         omDaTU/wvpK7KelGailPmGFIm/Pgd55VFjKXX+jICqBB6s5Vi0/CKGTW01KUCEz4Jk32
+         +p6CJflmPbZwwC55al5SVhnt5pwJ5Hudm6jHyITO+iCqDFdsue99D1cIKb1BsTnCsKX5
+         PjWg==
+X-Forwarded-Encrypted: i=1; AJvYcCXvJJnkybHCwFIqGLMQcc+UqviOvH1vwDe+wiS8JA639eSQKG1NhaL0kv/JQdrTbr6QqLIFs96NCEOqcP9Nw1ijwxq3qVHA
+X-Gm-Message-State: AOJu0Yww3OwS5hnXGlKqvg4KXmUGtl/dmmpqsZsEzkE3eDFWaSO6Ikc5
+	VlatYx9SU66akeBI3tp+IRp1A9+Rb74Qe0PDTh88WHn40kKRRTXW
+X-Google-Smtp-Source: AGHT+IEICIkQs8A+B34zBHFMD99pHMOb2TmZK0WTgrO65ikjLQU7JZDSy85APcZxDf8met28jTobqw==
+X-Received: by 2002:a05:6a20:da9d:b0:1b5:ae2c:c730 with SMTP id adf61e73a8af0-1bae8001712mr1847090637.3.1718332924775;
+        Thu, 13 Jun 2024 19:42:04 -0700 (PDT)
+Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f855f40947sm21189865ad.276.2024.06.13.19.42.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jun 2024 19:42:04 -0700 (PDT)
+Date: Fri, 14 Jun 2024 11:41:52 +0900 (JST)
+Message-Id: <20240614.114152.1787364292761357690.fujita.tomonori@gmail.com>
+To: kuba@kernel.org
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
+ horms@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
+ linux@armlinux.org.uk, hfdevel@gmx.net, naveenm@marvell.com,
+ jdamato@fastly.com
+Subject: Re: [PATCH net-next v10 4/7] net: tn40xx: add basic Tx handling
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <20240613174808.67eb994c@kernel.org>
+References: <20240611045217.78529-1-fujita.tomonori@gmail.com>
+	<20240611045217.78529-5-fujita.tomonori@gmail.com>
+	<20240613174808.67eb994c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240613023044.45873-1-laoar.shao@gmail.com> <20240613023044.45873-6-laoar.shao@gmail.com>
- <20240613141435.fad09579c934dbb79a3086cc@linux-foundation.org> <CAHk-=wgqrwFXK-CO8-V4fwUh5ymnUZ=wJnFyufV1dM9rC1t3Lg@mail.gmail.com>
-In-Reply-To: <CAHk-=wgqrwFXK-CO8-V4fwUh5ymnUZ=wJnFyufV1dM9rC1t3Lg@mail.gmail.com>
-From: Yafang Shao <laoar.shao@gmail.com>
-Date: Fri, 14 Jun 2024 10:41:34 +0800
-Message-ID: <CALOAHbCrZp2XV_zp0-mH2frW2Fk15Tz-A9J0K6gcJTbSXvTsPg@mail.gmail.com>
-Subject: Re: [PATCH v2 05/10] mm/util: Fix possible race condition in kstrdup()
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, ebiederm@xmission.com, 
-	alexei.starovoitov@gmail.com, rostedt@goodmis.org, linux-mm@kvack.org, 
-	linux-fsdevel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 14, 2024 at 6:18=E2=80=AFAM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Thu, 13 Jun 2024 at 14:14, Andrew Morton <akpm@linux-foundation.org> w=
-rote:
-> >
-> > The concept sounds a little strange.  If some code takes a copy of a
-> > string while some other code is altering it, yes, the result will be a
-> > mess.  This is why get_task_comm() exists, and why it uses locking.
->
-> The thing is, get_task_comm() is terminally broken.
->
-> Nobody sane uses it, and sometimes it's literally _because_ it uses locki=
-ng.
->
-> Let's look at the numbers:
->
->  - 39 uses of get_task_comm()
->
->  - 2 uses of __get_task_comm() because the locking doesn't work
->
->  - 447 uses of raw "current->comm"
->
->  - 112 uses of raw 'ta*sk->comm' (and possibly
->
-> IOW, we need to just accept the fact that nobody actually wants to use
-> "get_task_comm()". It's a broken interface. It's inconvenient, and the
-> locking makes it worse.
->
-> Now, I'm not convinced that kstrdup() is what anybody should use
-> should, but of the 600 "raw" uses of ->comm, four of them do seem to
-> be kstrdup.
->
-> Not great, I think they could be removed, but they are examples of
-> people doing this. And I think it *would* be good to have the
-> guarantee that yes, the kstrdup() result is always a proper string,
-> even if it's used for unstable sources. Who knows what other unstable
-> sources exist?
->
-> I do suspect that most of the raw uses of 'xyz->comm' is for
-> printouts. And I think we would be better with a '%pTSK' vsnprintf()
-> format thing for that.
+On Thu, 13 Jun 2024 17:48:08 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-I will implement this change in the next step if no one else handles it.
+> On Tue, 11 Jun 2024 13:52:14 +0900 FUJITA Tomonori wrote:
+>> +	/* 1. load MAC (obsolete) */
+>> +	/* 2. disable Rx (and Tx) */
+>> +	tn40_write_reg(priv, TN40_REG_GMAC_RXF_A, 0);
+>> +	mdelay(100);
+> 
+> Why mdelay()? 100ms of CPU spinning in a loop is not great.
+> I only see calls to tn40_sw_reset() from open and close, both
+> of which can sleep so you should be able to use msleep().
 
+Yes, msleep() works here. Will fix.
+
+>> +	/* 3. Disable port */
+>> +	tn40_write_reg(priv, TN40_REG_DIS_PORT, 1);
+>> +	/* 4. Disable queue */
+>> +	tn40_write_reg(priv, TN40_REG_DIS_QU, 1);
+>> +	/* 5. Wait until hw is disabled */
+>> +	for (i = 0; i < 50; i++) {
+>> +		if (tn40_read_reg(priv, TN40_REG_RST_PORT) & 1)
+>> +			break;
+>> +		mdelay(10);
+> 
+> read_poll_timeout() ?
+
+Will fix.
+
+>> +	}
+>> +	if (i == 50)
+>> +		netdev_err(priv->ndev, "SW reset timeout. continuing anyway\n");
+> 
+> 
+>> +	if (unlikely(vid >= 4096)) {
+> 
+> can the core actually call with an invalid vid? I don't thinks so..
+
+Will remove.
+
+>> +	struct tn40_priv *priv = netdev_priv(ndev);
+>> +
+>> +	u32 rxf_val = TN40_GMAC_RX_FILTER_AM | TN40_GMAC_RX_FILTER_AB |
+>> +		TN40_GMAC_RX_FILTER_OSEN | TN40_GMAC_RX_FILTER_TXFC;
+>> +	int i;
+>> +
+> 
+> nit: no empty lines between variable declarations
+
+Oops, will fix.
+
+>> +		u8 hash;
+>> +		struct netdev_hw_addr *mclist;
+>> +		u32 reg, val;
+> 
+> nit: declaration lines longest to shortest within a block
+
+Sorry, I thought that xmastree tool can find this but it can't. Will fix.
+
+>> +static void tn40_get_stats(struct net_device *ndev,
+>> +			   struct rtnl_link_stats64 *stats)
+>> +{
+>> +	struct tn40_priv *priv = netdev_priv(ndev);
+>> +
+>> +	netdev_stats_to_stats64(stats, &priv->net_stats);
+> 
+> You should hold the stats in driver priv, probably:
+> 
+> from struct net_device:
+> 
+> 	struct net_device_stats	stats; /* not used by modern drivers */
 >
-> Sadly, I don't think coccinelle can do the kinds of transforms that
-> involve printf format strings.
 
-Yes, we need to carefully check them one by one.
+Currently, net_device_stats struct is in tn40_priv struct. You meant
+the driver shouldn't use net_device_stats struct?
 
->
-> And no, a printk() string still couldn't use the locking version.
->
->                Linus
+Note that some TX40xx chips support HW statistics. Seems that my NIC
+supports the feature so I plan to send a patch for that after the
+initial driver is merged.
+
+>> +static int tn40_priv_init(struct tn40_priv *priv)
+>> +{
+>> +	int ret;
+>> +
+>> +	tn40_set_link_speed(priv, 0);
+>> +
+>> +	ret = tn40_hw_reset(priv);
+>> +	if (ret)
+>> +		return ret;
+> 
+> But probe already called reset, is there a reason to reset multiple
+> times? Would be good to add some reason why in a comment (if you know)
+
+I didn't know why the original driver does this. Seems the NIC works
+without the above hw reset. Will remove.
+
+>> +	/* Set GPIO[9:0] to output 0 */
+>> +	tn40_write_reg(priv, 0x51E0, 0x30010006);	/* GPIO_OE_ WR CMD */
+>> +	tn40_write_reg(priv, 0x51F0, 0x0);	/* GPIO_OE_ DATA */
+>> +	tn40_write_reg(priv, TN40_REG_MDIO_CMD_STAT, 0x3ec8);
+>> +
+>> +	// we use tx descriptors to load a firmware.
+> 
+> nit: stick to a single style of comments? ;)
+
+Oops, will fix.
 
 
-
---=20
-Regards
-Yafang
+Thanks a lot!
 
