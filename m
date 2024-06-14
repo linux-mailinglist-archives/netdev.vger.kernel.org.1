@@ -1,120 +1,117 @@
-Return-Path: <netdev+bounces-103452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE6D59081CD
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 04:43:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C5D3908203
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 04:51:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 639891F21C2D
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 02:43:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 311B9282845
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 02:51:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C9E183083;
-	Fri, 14 Jun 2024 02:43:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0E4183067;
+	Fri, 14 Jun 2024 02:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="db4vAFJT"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="WHL3rQII"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A87181D13
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 02:43:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C9C374FE
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 02:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718332988; cv=none; b=qp9cFQc/GxJTln53WOtMVNbWWNGjwhwsuBfesIeNQHYKqBw/bGGEjYWJL+IiSv7In8UIOcWUQQI8uxB12Rjg0UVwI2RLDmg5pDjc7V5u5i43cEHC6K8vspwLNSnDjyqmw/Qqm0M2npwEUnYwFI03iMQZJ60ZF6RH0SwFOM8vxMg=
+	t=1718333267; cv=none; b=D8smcSaRZnXMMaD3DOSbmJ1XVBdE4nO6dvSSLUDLZbAcqs8kYXOrTqJDEhVycLp9bUQPucaW86YT2HC+D70RUSZPgCqOTZkV6rPQno1pQc6qRI/GbEKVum08Q5nHbedMhw2kIohuNJfQ7Kfd2Hqxo45sSCvpDY8w0NUjDDAUqpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718332988; c=relaxed/simple;
-	bh=MifZ4DhUPbvDFUbSsQTONtPEw2jhS26matJ6cIUiCdg=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=q3Ba0Rxf8d1JyK6U6bUgPedi6QOa5uqwueNzhRgI5PwWv6B6pbkUGBt5Xb/NFvmq234G7r2YIYEyBOK/oYrfttIUPBxssew0mPKxU6q/eZ7owZIm8/5bf+eE+UAXPatNel9wTl6JolgtpmtMcYxd8QNJhDNxcQfNtwFKaiRPYi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=db4vAFJT; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2c2c1473f73so278751a91.3
-        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 19:43:06 -0700 (PDT)
+	s=arc-20240116; t=1718333267; c=relaxed/simple;
+	bh=uVZB5kz+WSij71fy+S9z+Z5qsj0MjMMhk1EVCUlnwA8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j5U3KnkMUI5Z4R/ahEQa4AAFaIK3EUJ03iG11tU5syR/1q/l9lG1HjbWr9T2CCiuu8d1RHldmacRicZzPaAglc0LqeOKnOmryle2kfx79j/2ay5JHcZo/Je7PXwJTfHoshifoHKQ28DKqPZlm1qsM14D9kd7BquKvR4sEQrAaCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=WHL3rQII; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-681ad081695so1304713a12.3
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 19:47:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718332986; x=1718937786; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wBTRqf40LfEGN5vHQ/vfM9lJgNNTCQL0HfEIdi1WsoQ=;
-        b=db4vAFJTcdYfkAYkFAK2uFbqgZV3GXYRCxqS76Eh28w51UFFjTPSdHcFz+WXYwPsx6
-         ORJFVvE9j9LcsTzFmnlr9j55X8p3eA1O5smvu/oj0JU/r5vOpRdM24wGZ/2Ks3E4ZfvY
-         cU6cLdXby5eqECoKboeZBR+e8Wprpie9R16wG9vRPIhnUvh7qSJW+lZo5aniiVYbzHTo
-         p/pGCvMhMMCRhszFG9I+QjMRJTAJCS3RDQzvBp0IPHr7xiUCLaPHpKOWwbRmlU1sVMW8
-         rZTdIY/0yGFMHV6v0NYw48mgbebteMkD1Dua7wn/pyhldHf/wXFDH8XugbYafMrRxhVV
-         WYLA==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1718333265; x=1718938065; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uxSLIdsJYn8L13kFMpqrr8gKJyf66QofWKoZIgr+wgY=;
+        b=WHL3rQII6D97Rc8IB0Tkg/sf9KH0EY5SsngNoCk4w6D4EPurhhqDTzRJL3MMMFXzcR
+         JVgZUWVPNZCSo7GbWWCY5q+AvkSyb7/uwKjOLoK4ma/mS4XMiHUWgzkxOx1hOnlJIf89
+         p/n56OaoQyNjBLth8QBBzbbEJR4z2Ez0zgSmgZfDra3QLaC+z+az79/hx5uYV67qZPEV
+         QUomIWwB3NOeEQE5N67I/AA7IAdq19wjxt9/u/NV3BdM1rqmPoEglwZoa7hT99rPoHoy
+         snqCUezjM9YfsATEtfFIJxCSXlInUs4TK7UTqdDPyM77enkIr/D8nPeOj9isCq5R4FOy
+         45Xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718332986; x=1718937786;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=wBTRqf40LfEGN5vHQ/vfM9lJgNNTCQL0HfEIdi1WsoQ=;
-        b=tihFyS/pN9WuAT/8b+eA2PEJpkFSW8wp26I73sH0kd4GhOCYgZ9D6x1GM7tC59217+
-         KUZjgciaUuaaXX1WIztLqaNakNroNucwfd/7mmjA435QxJAh/OsE6MoGmonIgmK5ZHKj
-         IJ/f88jh3vZPJueIT4m5AAvWAFWtM6FYhsfPHbGJSyLMho5XMPM2FlmxCEK1/zbWgOot
-         gZnBJ4qXxbUcKW+qEqA2xuklUQosD6l8JP/EAT1Ifo6b4dHiOXauD0iqRsclHB03/bZb
-         DU0VItv39PljrsDOhku0FesxTSmtya432bzB/II6M6XUcAMhB7T78632HP26Zd/uvXCk
-         RYAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUMvSRf3Por4ZyTJwBaFMKuGgZwdSR8b9n7gU6QwG08jZo1eusAjld45r345AgS/1fGfk2SsYGj7KpNtxJppzrkSE5AL4aa
-X-Gm-Message-State: AOJu0YyRzRR3MAL1I5uGeK0vSM+3f4wkA61T46GYb0pixyNw/VGTk6ZM
-	qgDSoQa/W1NoEMBGHGt7b9NqF4G8Vo0oMTuUjdOfuFmqTEzx+jlmS+hTiILr
-X-Google-Smtp-Source: AGHT+IHW9WeYEorZgLaAdMBw+XYN5LVkk3SZ0yamiYLRwod1dyzggAX9vujB+055aBkKQMt9xs5vTA==
-X-Received: by 2002:a17:90a:b116:b0:2c4:d7f3:faff with SMTP id 98e67ed59e1d1-2c4dbd3b776mr1589014a91.3.1718332986011;
-        Thu, 13 Jun 2024 19:43:06 -0700 (PDT)
-Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c4c45fa925sm2560037a91.29.2024.06.13.19.43.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jun 2024 19:43:05 -0700 (PDT)
-Date: Fri, 14 Jun 2024 11:43:01 +0900 (JST)
-Message-Id: <20240614.114301.1799707546162462902.fujita.tomonori@gmail.com>
-To: kuba@kernel.org
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
- horms@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
- linux@armlinux.org.uk, hfdevel@gmx.net, naveenm@marvell.com,
- jdamato@fastly.com
-Subject: Re: [PATCH net-next v10 4/7] net: tn40xx: add basic Tx handling
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <20240613173038.18b2a1ce@kernel.org>
-References: <20240611045217.78529-1-fujita.tomonori@gmail.com>
-	<20240611045217.78529-5-fujita.tomonori@gmail.com>
-	<20240613173038.18b2a1ce@kernel.org>
+        d=1e100.net; s=20230601; t=1718333265; x=1718938065;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uxSLIdsJYn8L13kFMpqrr8gKJyf66QofWKoZIgr+wgY=;
+        b=qnqrphS5l2QLaNUYlPGJvMMSEa1HNDdpP0gly4hmpsQJnx1dfZAAwdvYVyYvgC9M1x
+         bmY93zqN5EufVrvvupXV2sL009R31lgmDLwC2GcAGscgdzb+AC2NE1PR2hadwI3XqmP0
+         0tkPAprsa5NaVMbscNgTp4+TP39sabsTA32bLENjDPSoWid7rwmkS8/lya/2ydQJlMsE
+         IIViDnNgmiLC9eZu/XCFEFcsiTuCWA6bPrMxKwnZuWuFJG8QXsD8dZvgds5ttJCvX1Hl
+         hpSgVgIuV1dFmMTO6Cmb/Xz7CN/8tj6FORSPKV4arrvAaGNcRRdMXmbbSFvJggCfUh/+
+         t1Ug==
+X-Forwarded-Encrypted: i=1; AJvYcCUoKecBz0Usdwwlz3KCmcaD5lIiqDoev2k+TWTftPm41f9xQfOveEWoe8ZJslgVbisJCaxYXBJW7kc5NPb807BQ1IWvW1NA
+X-Gm-Message-State: AOJu0Yx43FQxoSDhTF9TSfAHm1qTx1Qjbmn72+e7S9Flq7nHEYH7j3N1
+	2Ypj6n+Njm1iW8C9qrxzU1l27ZbGPbHL8Qe2phiLF/37nLV+De8PQqY+0D3MsigVrp80tFuM+Zs
+	=
+X-Google-Smtp-Source: AGHT+IE683ajsRBcowE+5k6F8E0Aj8v+p6LFMNxEoJG3EgV/0IHdxu404aCfy3pjHiZMUdB2OS4dpg==
+X-Received: by 2002:a05:6a20:8405:b0:1b2:b220:2db6 with SMTP id adf61e73a8af0-1bae7e22a62mr1754652637.6.1718333264722;
+        Thu, 13 Jun 2024 19:47:44 -0700 (PDT)
+Received: from ?IPV6:2804:14d:5c5e:44fb:3a42:c007:5df5:153a? ([2804:14d:5c5e:44fb:3a42:c007:5df5:153a])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c4c45f7840sm2567380a91.32.2024.06.13.19.47.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jun 2024 19:47:44 -0700 (PDT)
+Message-ID: <de8e2709-8d7f-4e51-a4a4-35bad72ba136@mojatatu.com>
+Date: Thu, 13 Jun 2024 23:47:38 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net/sched] Question: Locks for clearing ERR_PTR() value from
+ idrinfo->action_idr ?
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Network Development
+ <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+References: <8d61200a-a739-4200-a8a3-5386a834d44f@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <8d61200a-a739-4200-a8a3-5386a834d44f@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Thu, 13 Jun 2024 17:30:38 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
-
-> On Tue, 11 Jun 2024 13:52:14 +0900 FUJITA Tomonori wrote:
->> +static void tn40_init_txd_sizes(void)
->> +{
->> +	int i, lwords;
->> +
->> +	if (tn40_txd_sizes[0].bytes)
->> +		return;
->> +
->> +	/* 7 - is number of lwords in txd with one phys buffer
->> +	 * 3 - is number of lwords used for every additional phys buffer
->> +	 */
->> +	for (i = 0; i < TN40_MAX_PBL; i++) {
->> +		lwords = 7 + (i * 3);
->> +		if (lwords & 1)
->> +			lwords++;	/* pad it with 1 lword */
->> +		tn40_txd_sizes[i].qwords = lwords >> 1;
->> +		tn40_txd_sizes[i].bytes = lwords << 2;
->> +	}
->> +}
+On 13/06/2024 21:58, Tetsuo Handa wrote:
 > 
-> Since this initializes global data - you should do it in module init.
-> Due to this you can't rely on module_pci_driver(), you gotta write
-> the module init / exit functions by hand.
+> Is there a possibility that tcf_idr_check_alloc() is called without holding
+> rtnl_mutex?
 
-Indeed, I'll fix.
+There is, but not in the code path of this reproducer.
+
+> If yes, adding a sleep before "goto again;" would help. But if no,
+> is this a sign that some path forgot to call tcf_idr_{cleanup,insert_many}() ?
+
+The reproducer is sending a new action message with 2 actions.
+Actions are committed to the idr after processing in order to make them 
+visible together and after any errors are caught.
+
+The bug happens when the actions in the message refer to the same index. 
+Since the first processing succeeds, adding -EBUSY to the index, the 
+second processing, which references the same index, will loop forever.
+
+After the change to rely on RCU for this check, instead of the idr lock, 
+the hangs became more noticeable to syzbot since now it's hanging a 
+system-wide lock.
 
