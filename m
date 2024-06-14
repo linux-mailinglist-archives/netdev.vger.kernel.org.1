@@ -1,225 +1,309 @@
-Return-Path: <netdev+bounces-103625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CCCA908D02
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:09:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03C9E908D33
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:18:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F00F31C25200
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 14:09:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E48A1F245D0
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 14:18:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE41D268;
-	Fri, 14 Jun 2024 14:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D99DF60;
+	Fri, 14 Jun 2024 14:17:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rx82NLw0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="enGq2mrG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CE2DC121
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 14:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C423317552;
+	Fri, 14 Jun 2024 14:17:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718374135; cv=none; b=gFixgyFjAQ/Z0fYBYG8rXbQVzRI6n49H73/ojPcVDVDDc/Yl7D3HeOanmVEox1CULWc6rhTMnXlngHJ1WH5I6LrjRD2andyZoL4f8nfjt3bRQ5xlPVnSJeepnPEu6tRJRr6ER3NwWkZ3QsStapsE0Mv5FY/qEolcGBqsnsdjEso=
+	t=1718374651; cv=none; b=liDL/DFaXH1QvQGTpjXm03EbwJhJ4nWopR1tFETGD/kQoLtSjX91cF6CXSaiPcHHVxO/UU/819g3hz/X4eP/qwYxA7j8G3OB5g+qx/bvKxQjba0KlbhXjcDil9a3GlTOLox9oLhu20i4hpKcg4MRsGWWWiAB9ErMfkFgCwm9Z0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718374135; c=relaxed/simple;
-	bh=i7fBhkE22YnP4Bqn7Gw6/lRTqCPjsqlYhYf1Rvq+VO4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sRQXrYKLFmfmZw34GLdQDwln+etMHPctVJReuQn0/Vd5oXZZfdMzlwCDtQw5j7etzj48tjQmmSpV+xBU3x91h8uks8mrMYHVlscRd83RKufzr2/NPFncxU84sthhfQccx3qCD9KBOeNlEWTM68QpU/DgoOSCIRcsg98EFM7k7OU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rx82NLw0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718374132;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=sei/AlzPitkzh30oWFQLawwYGSDtixmAw+yG8sdJyPQ=;
-	b=Rx82NLw0vmEdKKoW8nMccXflCpR4ZJBFVA0tuwbLeCwvqOZY/PJowt+JFg5xhgXIdEOXsc
-	q7OUuGmLGt17dtuzQi4b6+bSptDRdz2GO2mCLZb+Scj2NAhQ+GtCI1yidx1BLuotte0hdp
-	CLWbdknd4NQCW2qw6RVJZ06UFsfihQ4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-396-nqh8yJsyPbm2PszuUJJXqg-1; Fri, 14 Jun 2024 10:08:50 -0400
-X-MC-Unique: nqh8yJsyPbm2PszuUJJXqg-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42180d2a0d6so3441945e9.1
-        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 07:08:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718374125; x=1718978925;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sei/AlzPitkzh30oWFQLawwYGSDtixmAw+yG8sdJyPQ=;
-        b=i4MHrH325FLjEZeGGdKzZX096NTcmi2xbdLttPUl+RaP/lC5hdvRAx3hviMT3ShXC1
-         MhCBvs0Cgf1OC8/9NFfg8TBeUCl1Ba/2SgNStgFsrQq2NkbI8K6/kC/7wBuJugx4/qLv
-         Fb9+g6ST8EEQdQGmj2vjTReI1SpV22AZlLCnhO2Thg2WCDNNOANVMWC0j52AHYgRqK1f
-         3qse35kM5v5ULI47mMMc71NjsfuaarNfCU2xjUGgDslWOSxVYrs1ffAj9V5JInkQWwik
-         2gsRncXq3gzV0iEcg+YFgw3CuRTgrniJ9/GueXgivAavhqOOkK8FFO5gfKZcxtqgoGTD
-         ftaw==
-X-Forwarded-Encrypted: i=1; AJvYcCUkIuitjO2Tf0aBojAwdcAvV1AQOnMpfIP43Tph6EHnFrn4RVh6r9zStmLj5KHOWiQ8BBqoT/0PdzOLNUWGqEtj15glMzbi
-X-Gm-Message-State: AOJu0Yx3YYX1bno9S/xoHhujbwu1ICqfxFHDf1hIieBqgJLvBzbFwX2/
-	hAJ860BqyHMFQH02Ff41KN5d39sfi8VEQoHwFq1a6MdtNEtcZbYVxEQcPEWFwCUF+Y+jGpS3SuE
-	5PKsz5Qtl1sJq651GuTFoW8I6ep9Demo8nkCFMz3Wmds1cA8mndOtUW3vY1BBhVoT
-X-Received: by 2002:a05:600c:314e:b0:421:de31:76 with SMTP id 5b1f17b1804b1-42304849009mr20570355e9.3.1718374125156;
-        Fri, 14 Jun 2024 07:08:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFSWPYoDukuiUzS+4Z4nzmvxNfQT6o9nqibK4enYXrliymBeNMI/R12YC4i1AGKfmbDzrD1mQ==
-X-Received: by 2002:a05:600c:314e:b0:421:de31:76 with SMTP id 5b1f17b1804b1-42304849009mr20570025e9.3.1718374124719;
-        Fri, 14 Jun 2024 07:08:44 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b083:7210::f71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422f8be0c69sm62597875e9.33.2024.06.14.07.08.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jun 2024 07:08:43 -0700 (PDT)
-Message-ID: <834b61b93df3cbf5053e459f337e622e2c510fbd.camel@redhat.com>
-Subject: Re: [PATCH v6 net-next 08/15] net: softnet_data: Make
- xmit.recursion per task.
-From: Paolo Abeni <pabeni@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Eric Dumazet
-	 <edumazet@google.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Daniel
- Bristot de Oliveira <bristot@kernel.org>, Boqun Feng
- <boqun.feng@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, Frederic
- Weisbecker <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>, Jakub
- Kicinski <kuba@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Thomas
- Gleixner <tglx@linutronix.de>, Waiman Long <longman@redhat.com>, Will
- Deacon <will@kernel.org>, Ben Segall <bsegall@google.com>, Daniel Bristot
- de Oliveira <bristot@redhat.com>,  Dietmar Eggemann
- <dietmar.eggemann@arm.com>, Juri Lelli <juri.lelli@redhat.com>, Mel Gorman
- <mgorman@suse.de>,  Valentin Schneider <vschneid@redhat.com>, Vincent
- Guittot <vincent.guittot@linaro.org>
-Date: Fri, 14 Jun 2024 16:08:42 +0200
-In-Reply-To: <20240614094809.gvOugqZT@linutronix.de>
-References: <20240612170303.3896084-1-bigeasy@linutronix.de>
-	 <20240612170303.3896084-9-bigeasy@linutronix.de>
-	 <20240612131829.2e33ca71@rorschach.local.home>
-	 <20240614082758.6pSMV3aq@linutronix.de>
-	 <CANn89i+YfdmKSMgHni4ogMDq0BpFQtjubA0RxXcfZ8fpgV5_fw@mail.gmail.com>
-	 <20240614094809.gvOugqZT@linutronix.de>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1718374651; c=relaxed/simple;
+	bh=HzM1P2wltArweRMwNc/uraZDA3v7C8Lye0dy8r17d1I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AGYNChaWj+OA6WJCnHxEvQlRLDGwuxB6RXaiCcxFKs3MQ6/eA5JuKksgx3aLzwcfGM6UbWV9X2RNeBeaekV5kNDo1NynWZ/hndkaiUgKgrB5s8HcVj08zbcm9W2PeRph8oicTb5CBq9HyFMchzRx1G204fY/3CRjt2wx/vlksAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=enGq2mrG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BAB0C2BD10;
+	Fri, 14 Jun 2024 14:17:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718374650;
+	bh=HzM1P2wltArweRMwNc/uraZDA3v7C8Lye0dy8r17d1I=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=enGq2mrGXyiDflnlp/G6BJQ/cZy8IDUJwULK32R+JqiwL41iLspanhyQbz+Kexpv7
+	 oKiBDdcOvH1KGM+cYlFEsrV+mqTDrKrZTe6Em5VGzzQWU1m3QHPSQ3+Ek4j1hiNakO
+	 y2jCxd/gwPMc+ubNmuR/C/IEFneWdnJbu/uYqu6Rm1RHxsZUXY0ajrjyEipZnI4rK6
+	 oMJESYEoCfmaKYoj+hABuXDw+0LBUYVW8YIHcq0hngIgzKaNKgxFK6XfVh7lYKbwFS
+	 n8TaSFwroDltDo97A/mqYxLlZoClIe3aMuKzKut+n/7H257rxEgJIdKAZPs1SZFGFr
+	 6qA6nECcSxM9Q==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id E8314CE0760; Fri, 14 Jun 2024 07:17:29 -0700 (PDT)
+Date: Fri, 14 Jun 2024 07:17:29 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Uladzislau Rezki <urezki@gmail.com>
+Cc: Vlastimil Babka <vbabka@suse.cz>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <addbec8f-a67c-4191-8a3c-1181488947cb@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
+ <ZmrfA1p2zSVIaYam@zx2c4.com>
+ <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
+ <Zmru7hhz8kPDPsyz@pc636>
+ <7efde25f-6af5-4a67-abea-b26732a8aca1@paulmck-laptop>
+ <Zmsuswo8OPIhY5KJ@pc636>
+ <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
+ <ZmszOd5idhf2Cb-v@pc636>
+ <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
+ <Zmw5FTX752g0vtlD@pc638.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zmw5FTX752g0vtlD@pc638.lan>
 
-On Fri, 2024-06-14 at 11:48 +0200, Sebastian Andrzej Siewior wrote:
-> On 2024-06-14 10:38:15 [+0200], Eric Dumazet wrote:
-> > > I think it should work fine. netdev folks, you want me to remove that
-> > > ifdef and use a per-Task counter unconditionally?
-> >=20
-> > It depends if this adds another cache line miss/dirtying or not.
-> >=20
-> > What about other fields from softnet_data.xmit ?
->=20
-> duh. Looking at the `more' member I realise that this needs to move to
-> task_struct on RT, too. Therefore I would move the whole xmit struct.
->=20
-> The xmit cacheline starts within the previous member (xfrm_backlog) and
-> ends before the following member starts. So it kind of has its own
-> cacheline.
-> With defconfig, if we move it to the front of task struct then we go from
->=20
-> > struct task_struct {
-> >         struct thread_info         thread_info;          /*     0    24=
- */
-> >         unsigned int               __state;              /*    24     4=
- */
-> >         unsigned int               saved_state;          /*    28     4=
- */
-> >         void *                     stack;                /*    32     8=
- */
-> >         refcount_t                 usage;                /*    40     4=
- */
-> >         unsigned int               flags;                /*    44     4=
- */
-> >         unsigned int               ptrace;               /*    48     4=
- */
-> >         int                        on_cpu;               /*    52     4=
- */
-> >         struct __call_single_node  wake_entry;           /*    56    16=
- */
-> >         /* --- cacheline 1 boundary (64 bytes) was 8 bytes ago --- */
-> >         unsigned int               wakee_flips;          /*    72     4=
- */
-> >=20
-> >         /* XXX 4 bytes hole, try to pack */
-> >=20
-> >         long unsigned int          wakee_flip_decay_ts;  /*    80     8=
- */
->=20
-> to
->=20
-> > struct task_struct {
-> >         struct thread_info         thread_info;          /*     0    24=
- */
-> >         unsigned int               __state;              /*    24     4=
- */
-> >         unsigned int               saved_state;          /*    28     4=
- */
-> >         void *                     stack;                /*    32     8=
- */
-> >         refcount_t                 usage;                /*    40     4=
- */
-> >         unsigned int               flags;                /*    44     4=
- */
-> >         unsigned int               ptrace;               /*    48     4=
- */
-> >         struct {
-> >                 u16                recursion;            /*    52     2=
- */
-> >                 u8                 more;                 /*    54     1=
- */
-> >                 u8                 skip_txqueue;         /*    55     1=
- */
-> >         } xmit;                                          /*    52     4=
- */
-> >         struct __call_single_node  wake_entry;           /*    56    16=
- */
-> >         /* --- cacheline 1 boundary (64 bytes) was 8 bytes ago --- */
-> >         int                        on_cpu;               /*    72     4=
- */
-> >         unsigned int               wakee_flips;          /*    76     4=
- */
-> >         long unsigned int          wakee_flip_decay_ts;  /*    80     8=
- */
->=20
->=20
-> stuffed a hole due to adding `xmit' and moving `on_cpu'. In the end the
-> total size of task_struct remained the same.
-> The cache line should be hot due to `flags' usage in
->=20
-> > static void handle_softirqs(bool ksirqd)
-> > {
-> >          unsigned long old_flags =3D current->flags;
-> =E2=80=A6
-> >         current->flags &=3D ~PF_MEMALLOC;
->=20
-> Then there is a bit of code before net_XX_action() and the usage of
-> either of the members so not sure if it is gone by then=E2=80=A6
->=20
-> Is this what we want or not?
+On Fri, Jun 14, 2024 at 02:35:33PM +0200, Uladzislau Rezki wrote:
+> On Thu, Jun 13, 2024 at 11:13:52AM -0700, Paul E. McKenney wrote:
+> > On Thu, Jun 13, 2024 at 07:58:17PM +0200, Uladzislau Rezki wrote:
+> > > On Thu, Jun 13, 2024 at 10:45:59AM -0700, Paul E. McKenney wrote:
+> > > > On Thu, Jun 13, 2024 at 07:38:59PM +0200, Uladzislau Rezki wrote:
+> > > > > On Thu, Jun 13, 2024 at 08:06:30AM -0700, Paul E. McKenney wrote:
+> > > > > > On Thu, Jun 13, 2024 at 03:06:54PM +0200, Uladzislau Rezki wrote:
+> > > > > > > On Thu, Jun 13, 2024 at 05:47:08AM -0700, Paul E. McKenney wrote:
+> > > > > > > > On Thu, Jun 13, 2024 at 01:58:59PM +0200, Jason A. Donenfeld wrote:
+> > > > > > > > > On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
+> > > > > > > > > > On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
+> > > > > > > > > > > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
+> > > > > > > > > > > > Since SLOB was removed, it is not necessary to use call_rcu
+> > > > > > > > > > > > when the callback only performs kmem_cache_free. Use
+> > > > > > > > > > > > kfree_rcu() directly.
+> > > > > > > > > > > > 
+> > > > > > > > > > > > The changes were done using the following Coccinelle semantic patch.
+> > > > > > > > > > > > This semantic patch is designed to ignore cases where the callback
+> > > > > > > > > > > > function is used in another way.
+> > > > > > > > > > > 
+> > > > > > > > > > > How does the discussion on:
+> > > > > > > > > > >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
+> > > > > > > > > > >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
+> > > > > > > > > > > reflect on this series? IIUC we should hold off..
+> > > > > > > > > > 
+> > > > > > > > > > We do need to hold off for the ones in kernel modules (such as 07/14)
+> > > > > > > > > > where the kmem_cache is destroyed during module unload.
+> > > > > > > > > > 
+> > > > > > > > > > OK, I might as well go through them...
+> > > > > > > > > > 
+> > > > > > > > > > [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+> > > > > > > > > > 	Needs to wait, see wg_allowedips_slab_uninit().
+> > > > > > > > > 
+> > > > > > > > > Also, notably, this patch needs additionally:
+> > > > > > > > > 
+> > > > > > > > > diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
+> > > > > > > > > index e4e1638fce1b..c95f6937c3f1 100644
+> > > > > > > > > --- a/drivers/net/wireguard/allowedips.c
+> > > > > > > > > +++ b/drivers/net/wireguard/allowedips.c
+> > > > > > > > > @@ -377,7 +377,6 @@ int __init wg_allowedips_slab_init(void)
+> > > > > > > > > 
+> > > > > > > > >  void wg_allowedips_slab_uninit(void)
+> > > > > > > > >  {
+> > > > > > > > > -	rcu_barrier();
+> > > > > > > > >  	kmem_cache_destroy(node_cache);
+> > > > > > > > >  }
+> > > > > > > > > 
+> > > > > > > > > Once kmem_cache_destroy has been fixed to be deferrable.
+> > > > > > > > > 
+> > > > > > > > > I assume the other patches are similar -- an rcu_barrier() can be
+> > > > > > > > > removed. So some manual meddling of these might be in order.
+> > > > > > > > 
+> > > > > > > > Assuming that the deferrable kmem_cache_destroy() is the option chosen,
+> > > > > > > > agreed.
+> > > > > > > >
+> > > > > > > <snip>
+> > > > > > > void kmem_cache_destroy(struct kmem_cache *s)
+> > > > > > > {
+> > > > > > > 	int err = -EBUSY;
+> > > > > > > 	bool rcu_set;
+> > > > > > > 
+> > > > > > > 	if (unlikely(!s) || !kasan_check_byte(s))
+> > > > > > > 		return;
+> > > > > > > 
+> > > > > > > 	cpus_read_lock();
+> > > > > > > 	mutex_lock(&slab_mutex);
+> > > > > > > 
+> > > > > > > 	rcu_set = s->flags & SLAB_TYPESAFE_BY_RCU;
+> > > > > > > 
+> > > > > > > 	s->refcount--;
+> > > > > > > 	if (s->refcount)
+> > > > > > > 		goto out_unlock;
+> > > > > > > 
+> > > > > > > 	err = shutdown_cache(s);
+> > > > > > > 	WARN(err, "%s %s: Slab cache still has objects when called from %pS",
+> > > > > > > 	     __func__, s->name, (void *)_RET_IP_);
+> > > > > > > ...
+> > > > > > > 	cpus_read_unlock();
+> > > > > > > 	if (!err && !rcu_set)
+> > > > > > > 		kmem_cache_release(s);
+> > > > > > > }
+> > > > > > > <snip>
+> > > > > > > 
+> > > > > > > so we have SLAB_TYPESAFE_BY_RCU flag that defers freeing slab-pages
+> > > > > > > and a cache by a grace period. Similar flag can be added, like
+> > > > > > > SLAB_DESTROY_ONCE_FULLY_FREED, in this case a worker rearm itself
+> > > > > > > if there are still objects which should be freed.
+> > > > > > > 
+> > > > > > > Any thoughts here?
+> > > > > > 
+> > > > > > Wouldn't we also need some additional code to later check for all objects
+> > > > > > being freed to the slab, whether or not that code is  initiated from
+> > > > > > kmem_cache_destroy()?
+> > > > > >
+> > > > > Same away as SLAB_TYPESAFE_BY_RCU is handled from the kmem_cache_destroy() function.
+> > > > > It checks that flag and if it is true and extra worker is scheduled to perform a
+> > > > > deferred(instead of right away) destroy after rcu_barrier() finishes.
+> > > > 
+> > > > Like this?
+> > > > 
+> > > > 	SLAB_DESTROY_ONCE_FULLY_FREED
+> > > > 
+> > > > 	Instead of adding a new kmem_cache_destroy_rcu()
+> > > > 	or kmem_cache_destroy_wait() API member, instead add a
+> > > > 	SLAB_DESTROY_ONCE_FULLY_FREED flag that can be passed to the
+> > > > 	existing kmem_cache_destroy() function.  Use of this flag would
+> > > > 	suppress any warnings that would otherwise be issued if there
+> > > > 	was still slab memory yet to be freed, and it would also spawn
+> > > > 	workqueues (or timers or whatever) to do any needed cleanup work.
+> > > > 
+> > > >
+> > > The flag is passed as all others during creating a cache:
+> > > 
+> > >   slab = kmem_cache_create(name, size, ..., SLAB_DESTROY_ONCE_FULLY_FREED | OTHER_FLAGS, NULL);
+> > > 
+> > > the rest description is correct to me.
+> > 
+> > Good catch, fixed, thank you!
+> > 
+> And here we go with prototype(untested):
 
-I personally think (fear mostly) there is still the potential for some
-(performance) regression. I think it would be safer to introduce this
-change under a compiler conditional and eventually follow-up with a
-patch making the code generic.
+Thank you for putting this together!  It looks way simpler than I would
+have guessed, and quite a bit simpler than I would expect it would be
+to extend rcu_barrier() to cover kfree_rcu().
 
-Should such later change prove to be problematic, we could revert it
-without impacting the series as a whole.=20
+> <snip>
+> diff --git a/include/linux/slab.h b/include/linux/slab.h
+> index 7247e217e21b..700b8a909f8a 100644
+> --- a/include/linux/slab.h
+> +++ b/include/linux/slab.h
+> @@ -59,6 +59,7 @@ enum _slab_flag_bits {
+>  #ifdef CONFIG_SLAB_OBJ_EXT
+>  	_SLAB_NO_OBJ_EXT,
+>  #endif
+> +	_SLAB_DEFER_DESTROY,
+>  	_SLAB_FLAGS_LAST_BIT
+>  };
+>  
+> @@ -139,6 +140,7 @@ enum _slab_flag_bits {
+>   */
+>  /* Defer freeing slabs to RCU */
+>  #define SLAB_TYPESAFE_BY_RCU	__SLAB_FLAG_BIT(_SLAB_TYPESAFE_BY_RCU)
+> +#define SLAB_DEFER_DESTROY __SLAB_FLAG_BIT(_SLAB_DEFER_DESTROY)
+>  /* Trace allocations and frees */
+>  #define SLAB_TRACE		__SLAB_FLAG_BIT(_SLAB_TRACE)
+>  
+> diff --git a/mm/slab_common.c b/mm/slab_common.c
+> index 1560a1546bb1..99458a0197b5 100644
+> --- a/mm/slab_common.c
+> +++ b/mm/slab_common.c
+> @@ -45,6 +45,11 @@ static void slab_caches_to_rcu_destroy_workfn(struct work_struct *work);
+>  static DECLARE_WORK(slab_caches_to_rcu_destroy_work,
+>  		    slab_caches_to_rcu_destroy_workfn);
+>  
+> +static LIST_HEAD(slab_caches_defer_destroy);
+> +static void slab_caches_defer_destroy_workfn(struct work_struct *work);
+> +static DECLARE_DELAYED_WORK(slab_caches_defer_destroy_work,
+> +	slab_caches_defer_destroy_workfn);
+> +
+>  /*
+>   * Set of flags that will prevent slab merging
+>   */
+> @@ -448,6 +453,31 @@ static void slab_caches_to_rcu_destroy_workfn(struct work_struct *work)
+>  	}
+>  }
+>  
+> +static void
+> +slab_caches_defer_destroy_workfn(struct work_struct *work)
+> +{
+> +	struct kmem_cache *s, *s2;
+> +
+> +	mutex_lock(&slab_mutex);
+> +	list_for_each_entry_safe(s, s2, &slab_caches_defer_destroy, list) {
+> +		if (__kmem_cache_empty(s)) {
+> +			/* free asan quarantined objects */
+> +			kasan_cache_shutdown(s);
+> +			(void) __kmem_cache_shutdown(s);
+> +
+> +			list_del(&s->list);
+> +
+> +			debugfs_slab_release(s);
+> +			kfence_shutdown_cache(s);
+> +			kmem_cache_release(s);
+> +		}
 
-Thanks!
+My guess is that there would want to be a splat if the slab stuck around
+for too long, but maybe that should instead be handled elsewhere or in
+some other way?  I must defer to you guys on that one.
 
-Paolo
+							Thanx, Paul
+
+> +	}
+> +	mutex_unlock(&slab_mutex);
+> +
+> +	if (!list_empty(&slab_caches_defer_destroy))
+> +		schedule_delayed_work(&slab_caches_defer_destroy_work, HZ);
+> +}
+> +
+>  static int shutdown_cache(struct kmem_cache *s)
+>  {
+>  	/* free asan quarantined objects */
+> @@ -493,6 +523,13 @@ void kmem_cache_destroy(struct kmem_cache *s)
+>  	if (s->refcount)
+>  		goto out_unlock;
+>  
+> +	/* Should a destroy process be deferred? */
+> +	if (s->flags & SLAB_DEFER_DESTROY) {
+> +		list_move_tail(&s->list, &slab_caches_defer_destroy);
+> +		schedule_delayed_work(&slab_caches_defer_destroy_work, HZ);
+> +		goto out_unlock;
+> +	}
+> +
+>  	err = shutdown_cache(s);
+>  	WARN(err, "%s %s: Slab cache still has objects when called from %pS",
+>  	     __func__, s->name, (void *)_RET_IP_);
+> <snip>
+
 
 
