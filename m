@@ -1,94 +1,92 @@
-Return-Path: <netdev+bounces-103652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15C5E908EA2
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:25:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE671908EEE
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:36:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BBA31C20AC8
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:25:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C87BFB2115A
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF1A516D332;
-	Fri, 14 Jun 2024 15:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41CE753361;
+	Fri, 14 Jun 2024 15:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aeFf45bd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYzqraBA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7654962D
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 15:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F5AF9D9;
+	Fri, 14 Jun 2024 15:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718378632; cv=none; b=p4k0hciM3hwnmgXMfW4ojWC25sCqfsy2j+yk035D2p8AuRXhTJoV7W8aufGjGfJB3ULGaLHecuMBvOlAi1yEByu2zPkxO7CnxHg/5M4DJcquZ719P+Ww+LuNucZ4eLjsmsBQYtsDtYAZnveMmBnliZNXV1kuCGxz9zeCkt5Ra3g=
+	t=1718379031; cv=none; b=Hu2zzPQAq0w3iohzJiwXNthk31TLRHNlV7qBvdZsrm5lmwOszNjgWg0XwAU8fSgcrAhti1IdCpO0jfvX12jpiqVDbo4w4t5JffxaHzZOVxoc/86uINqxj6tw9sT9t2SnCXhz5tJqkVIAObwDvF7Og7O/9VqZ3m8yvWC3R+wXWQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718378632; c=relaxed/simple;
-	bh=DUQr91y9Dt2Oj5Jod0E091p2jOz6JawjaskCfoS9wnQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l6wV4O9dCsMO4wtZUB4EZiMHyd2LK0kc7EpAIoK2pZUE8OO4qyE8tDeet6mkJFtLuTnKJBWWbxdSXG5/wd0lmoOT1268vG8Yesg0B3SZSiuLgUf4PBqKEsahAryB2mrHV6fG8cUA2Pc7ocpj9YhjlSKT+1E8JKvM3Gx6R7zwgU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aeFf45bd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28701C2BD10;
-	Fri, 14 Jun 2024 15:23:52 +0000 (UTC)
+	s=arc-20240116; t=1718379031; c=relaxed/simple;
+	bh=pCfMTOS37syFgYU+24EBPb0CfjmBN9EKatbKg1iniSY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=dYpk1iuuDWDMURedS6vhz7FXfDpUe01Ovi5pvDjrMTYiKHLPiHrtNH6CbQjbVooeFYp43Y4PyN0AUjvYOMg9NgLBrQ8wfFKY9n6JuNNRQRY0UAeLWfioo8Jyow1LHKEfxrMEgMKZ3tqdzE4tAHJFpybdcx0dzNxTiZ8alx87EWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dYzqraBA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A1C83C32786;
+	Fri, 14 Jun 2024 15:30:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718378632;
-	bh=DUQr91y9Dt2Oj5Jod0E091p2jOz6JawjaskCfoS9wnQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aeFf45bdud0O/Kc9wftYe8AqZSLkVb00nsMDGILHICsrmycJFpH61Hx9IvAX+PVJO
-	 ZJXqoUhdNQELoHCCBmD3Cxj6KiNe3HgI6HF7v4jO8pjY7Ker8pUBlb6q4F9vTXBXhD
-	 MA79IHGyS/jQIRjnnRHh+4iEheAtAVgSxcGmYrKB7+MMmxnCmd5V2aPQZAjBM43CCs
-	 mHgbTKDywSIdGjnPbjKD4m7RXEdXsA8lEZZ7W6Iy/BiY18zGEQ6FfbasXPbKrNOpRr
-	 ltABeOQ9/VEy341SYu68CRyK22bQ3/61yqRpf21qca0HOINfP8OAeAvdnQMEx1WrDE
-	 0NARInMf6lfFA==
-Date: Fri, 14 Jun 2024 08:23:51 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, horms@kernel.org,
- jiri@resnulli.us, pabeni@redhat.com, linux@armlinux.org.uk,
- hfdevel@gmx.net, naveenm@marvell.com, jdamato@fastly.com
-Subject: Re: [PATCH net-next v10 4/7] net: tn40xx: add basic Tx handling
-Message-ID: <20240614082351.7fc8d66c@kernel.org>
-In-Reply-To: <20240614.114152.1787364292761357690.fujita.tomonori@gmail.com>
-References: <20240611045217.78529-1-fujita.tomonori@gmail.com>
-	<20240611045217.78529-5-fujita.tomonori@gmail.com>
-	<20240613174808.67eb994c@kernel.org>
-	<20240614.114152.1787364292761357690.fujita.tomonori@gmail.com>
+	s=k20201202; t=1718379030;
+	bh=pCfMTOS37syFgYU+24EBPb0CfjmBN9EKatbKg1iniSY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=dYzqraBAlNGIC79y5D0HmeMW1gnqnUvDuQsgdVpQ2hL3mHl10yegCEMb8LBKa0R8o
+	 3QYw95Q5BM1O1q70n+lt5LXb7JlgUAAvYPwrtoAmw7NTNyFtux6apevYt2TG06LIVZ
+	 oukyPxe/hPW37UCu4JgQ4u4g+h4kvbyRRjNplZIzuveIwDH3DYGR30aSAdTpjxfkAJ
+	 ldeaABb3UOfUMHTRBxgzxqBx4DzxtrSKa5aW0ZWjg1VJNmHOohhL0g4rotz1cWYByY
+	 ULRw38JTAC6NHZwYrIRPXyrZQvey4ufMm3DlKErc4muWyiW99e1i2XJxYwKGVqYAhh
+	 V0DZQ3HhfJdCQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 93B12C43612;
+	Fri, 14 Jun 2024 15:30:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf] bpf: avoid splat in pskb_pull_reason
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171837903059.8969.17261138323063584002.git-patchwork-notify@kernel.org>
+Date: Fri, 14 Jun 2024 15:30:30 +0000
+References: <20240614101801.9496-1-fw@strlen.de>
+In-Reply-To: <20240614101801.9496-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: bpf@vger.kernel.org, martin.lau@linux.dev, daniel@iogearbox.net,
+ netdev@vger.kernel.org,
+ syzbot+0c4150bff9fff3bf023c@syzkaller.appspotmail.com, edumazet@google.com
 
-On Fri, 14 Jun 2024 11:41:52 +0900 (JST) FUJITA Tomonori wrote:
-> >> +static void tn40_get_stats(struct net_device *ndev,
-> >> +			   struct rtnl_link_stats64 *stats)
-> >> +{
-> >> +	struct tn40_priv *priv = netdev_priv(ndev);
-> >> +
-> >> +	netdev_stats_to_stats64(stats, &priv->net_stats);  
-> > 
-> > You should hold the stats in driver priv, probably:
-> > 
-> > from struct net_device:
-> > 
-> > 	struct net_device_stats	stats; /* not used by modern drivers */
-> >  
+Hello:
+
+This patch was applied to bpf/bpf.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
+
+On Fri, 14 Jun 2024 12:17:33 +0200 you wrote:
+> syzkaller builds (CONFIG_DEBUG_NET=y) frequently trigger a debug
+> hint in pskb_may_pull.
 > 
-> Currently, net_device_stats struct is in tn40_priv struct. You meant
-> the driver shouldn't use net_device_stats struct?
+> We'd like to retain this debug check because it might hint at integer
+> overflows and other issues (kernel code should pull headers, not huge
+> value).
+> 
+> [...]
 
-Oh, I misread, I just saw netdev_stats_to_stats64( and didn't read
-further. Doesn't look like you're using any of the magic properties
-of struct net_device_stats, so yes, just replace it with struct
-rtnl_link_stats64 in the priv, and with minor adjustments that should be it.
+Here is the summary with links:
+  - [bpf] bpf: avoid splat in pskb_pull_reason
+    https://git.kernel.org/bpf/bpf/c/2bbe3e5a2f4e
 
-> Note that some TX40xx chips support HW statistics. Seems that my NIC
-> supports the feature so I plan to send a patch for that after the
-> initial driver is merged.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Sounds like a good plan :)
+
 
