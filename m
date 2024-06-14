@@ -1,133 +1,153 @@
-Return-Path: <netdev+bounces-103514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E734190863E
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:25:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61AF5908642
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:26:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8417228D6B5
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 08:25:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 171F01F215D4
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 08:26:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E3E1836DE;
-	Fri, 14 Jun 2024 08:25:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5CFF185087;
+	Fri, 14 Jun 2024 08:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VmV1WZxj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fBeWzj5h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B2F18412E
-	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 08:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDC018413A;
+	Fri, 14 Jun 2024 08:26:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718353518; cv=none; b=eEAaUHtNFmtsJwQrM1+eZc5d5DiTxGvVoTIQMZRWM75lhPt7olCXkhjbCPSDzljruO85F0FOfl2hJU8E2lt6cxhg2NzVBIUnEM6pr7pk1RgB/tD5y74z++ccVAYSHFaGVK5hWDlER8SlejqnBzYhHwURZUtZvOhPZZZYWJSs0Xw=
+	t=1718353564; cv=none; b=Cfo6joHXdFaT94feDMhs6hBngrnTPzgfwxSFbZeIAdT1e8pjOV3qpbeHvTqUyGD39plBnItpWP8Eq0n+0d35/Zy7DJPSTv4UU+GL1u5+5q0j4/+3ODEaU0HMfzJll48TjV1P5qZ1kRsgdo08I7d/t+eJD7fEYKS/57axW/H8sfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718353518; c=relaxed/simple;
-	bh=j0ige63tNDeqkoRgKmbWXdcRg6UtCz60XQwalweLsTs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=onYANkdvqX7d0SQvLtcYs/jv+a5Y+v+mA7GrBgqJSGV3pmVzZiOLJdcM9MyW15KPzYn0ie1lOXVb7jPJww6uvKyyIiONc6XvbzDmNLqQhTGKEsju9i7busJoQeptLwRgjmZ7YKM98BZO/zdV6DflatWUWlxEDuMALCk3W0PB4hE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VmV1WZxj; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-57a16f4b8bfso11465a12.0
-        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 01:25:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718353515; x=1718958315; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j0ige63tNDeqkoRgKmbWXdcRg6UtCz60XQwalweLsTs=;
-        b=VmV1WZxjNXUEiKt6lkuZ5YCbS2wbhyChvKmRJUBLDsbu5uHOjNnufoCot66pgjmGxN
-         UGXnc1K7qomgfHy7c6Zd+1UGAoMUiglQ3sQFMgGSurGzUZ282S7AuJb+90E4FGO9gQBf
-         ejtE3jLJRknmMYNsAKAWktOrGQ8U6os13KSi1TnSEbnUJeBo8jq2/NAoKvg3vdbhhDZm
-         yWgnCfHQRisfS0ctmn9MBD/c9gkvdQ7bDHHofyoEqMFf7Cd/RdvejB2VvMbIZIer3VCG
-         dAN0wtcDBy8KOK8oi1BbhUqo13qE1iO0IcDE7QA5oThNS+XMZdBlBB/Q++2uBoq3KtqT
-         RhEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718353515; x=1718958315;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=j0ige63tNDeqkoRgKmbWXdcRg6UtCz60XQwalweLsTs=;
-        b=iLcVAT1dWf+gFZ6wxtLpjDC12OHySm20xk9oYgFx86OyWXROoN4L989aXyWM162x8R
-         naCLaZthfSft18RKH/4s+jnbLA3laSvk+bYHf9xpNMUOv96sJ5DB/5EZquGByPkZoXjw
-         0IPzY19s+Z5ZkhBOsHZ74uyg9K41v9FOQqx2P3Smp/6FOUTI8U3vfcxFoH+Zf5lV7rvY
-         JEuwAz0bN0q9NesyPgB3SGS8iMxZ6Bdy5GxgcJ8N/ywkNv1bG02MUBZR+D5VLalo8/2b
-         OjwxZZeAc4X7jt5WkJrUdsaevdzeK2Sb87EfroatbKY9+eQUcWrP9CZzfQRYJfOzZFOm
-         SHhg==
-X-Forwarded-Encrypted: i=1; AJvYcCXtCfPmBRLeAjTmuc3kq7lqqV1xOpTTy1kMgu44s31Awn9Stm7DlGtoFQxfRCENurCvUkLNvgqiwo4cZaZ5CMhXmx5cTbC4
-X-Gm-Message-State: AOJu0YwC8/LoOfCtmo2SRqKhZgkqaH0rFVMiD8VbIkbKI0ZZpIQEKnWF
-	+GhPWss1JPKEe44SoVbyveVJOqtTUTmwUO5CP9y4CFqiPJXhntsGeQXDuMwk9IoDCjGoQMOfOR5
-	rXMMAKDMhgLtqMLDudYBCxTHvsGwT7+bnxzXP
-X-Google-Smtp-Source: AGHT+IHEli08KGm2a1wLSdujkI4kay45Ih8tszllA5JMQp9Khg4YDNeDtlFB5NALarfIqWIzcXOczTzBfWurJz45COo=
-X-Received: by 2002:a05:6402:27c6:b0:57c:b799:2527 with SMTP id
- 4fb4d7f45d1cf-57cc0afaa4cmr90302a12.7.1718353515061; Fri, 14 Jun 2024
- 01:25:15 -0700 (PDT)
+	s=arc-20240116; t=1718353564; c=relaxed/simple;
+	bh=MnoDPn7esVk0izTPWWobr9ZqeVKg3ab/Yn7Gm5y+UBA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XGDrllbiki4i389Y6eYqjV4efzTyXeB3vIE4ZGoMGFC++DDsdBykoMBle2acsHscYU6g1/QVaKDY/PumzEwUqPpX8Nkt1MSatL69i4ElnN2j3DhJyVZf9Mvkoo99d3PBCTo/BNIFSqFvhWTP3CMwgbAmrshahXFY5o8/6cpsYBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fBeWzj5h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7CD0C2BD10;
+	Fri, 14 Jun 2024 08:26:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718353564;
+	bh=MnoDPn7esVk0izTPWWobr9ZqeVKg3ab/Yn7Gm5y+UBA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fBeWzj5hq3tKjt0bijmfdMota/lHKvhW0efUz66hSe2svOi0f6+vILbmBOo3SC+22
+	 BgdjjhWBGuKeGPaSV8X4j6igyXFUomfxm8pmjohHLUkduGdDsWNbn9iMdI41B8nx5c
+	 1p8JW8G0JSUgYzAiEEkngQfE1VjbtrDSFB+HJZslw81jXbSvYwcgfkD7fG4Ngjl4qP
+	 h3u3wQPFgUcL9DWZGX/MBv4bTh7SQDgPs95EJ0W91i6lMYkmt5qFMCuBKmbBUHx3NJ
+	 oFlgS+WwcDRHnQuTbjtVjRoOGMSEa9ULF50JRLiSP/kjZ9Bk44/xggVbDuY1iomnA6
+	 WHrOyNS/1gfeA==
+Date: Fri, 14 Jun 2024 10:25:58 +0200
+From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Chris Packham  <Chris.Packham@alliedtelesis.co.nz>, "andrew@lunn.ch"
+ <andrew@lunn.ch>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+ "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "ericwouds@gmail.com" <ericwouds@gmail.com>
+Subject: Re: [PATCH next-next] net: phy: realtek: add support for rtl8224
+ 2.5Gbps PHY
+Message-ID: <20240614102558.32dcba79@dellmb>
+In-Reply-To: <fbf2be8d31579d1c9305fd961751fc6f0a4b4556.camel@redhat.com>
+References: <20240611053415.2111723-1-chris.packham@alliedtelesis.co.nz>
+	<c3d699a1-2f24-41c5-b0a7-65db025eedbc@alliedtelesis.co.nz>
+	<20240612090707.7da3fc01@dellmb>
+	<fbf2be8d31579d1c9305fd961751fc6f0a4b4556.camel@redhat.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240611045830.67640-1-lulie@linux.alibaba.com> <c4ae602bd44e6b6ad739e1e17c444ca75587435e.camel@redhat.com>
-In-Reply-To: <c4ae602bd44e6b6ad739e1e17c444ca75587435e.camel@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 14 Jun 2024 10:25:01 +0200
-Message-ID: <CANn89iK88gJG2PsEnXWmN=kPydVqbNGZeLQ69p+Ho+60FWzaSw@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: Add tracepoint for rxtstamp coalescing
-To: Paolo Abeni <pabeni@redhat.com>, Mike Maloney <maloney@google.com>, 
-	Willem de Bruijn <willemb@google.com>
-Cc: Philo Lu <lulie@linux.alibaba.com>, netdev@vger.kernel.org, rostedt@goodmis.org, 
-	mhiramat@kernel.org, mathieu.desnoyers@efficios.com, davem@davemloft.net, 
-	dsahern@kernel.org, kuba@kernel.org, xuanzhuo@linux.alibaba.com, 
-	dust.li@linux.alibaba.com, Soheil Hassas Yeganeh <soheil@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 14, 2024 at 10:09=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
->
-> On Tue, 2024-06-11 at 12:58 +0800, Philo Lu wrote:
-> > During tcp coalescence, rx timestamps of the former skb ("to" in
-> > tcp_try_coalesce), will be lost. This may lead to inaccurate
-> > timestamping results if skbs come out of order.
-> >
-> > Here is an example.
-> > Assume a message consists of 3 skbs, namely A, B, and C. And these skbs
-> > are processed by tcp in the following order:
-> > A -(1us)-> C -(1ms)-> B
->
-> IMHO the above order makes the changelog confusing
->
-> > If C is coalesced to B, the final rx timestamps of the message will be
-> > those of C. That is, the timestamps show that we received the message
-> > when C came (including hardware and software). However, we actually
-> > received it 1ms later (when B came).
-> >
-> > With the added tracepoint, we can recognize such cases and report them
-> > if we want.
->
-> We really need very good reasons to add new tracepoints to TCP. I'm
-> unsure if the above example match such requirement. The reported
-> timestamp actually matches the first byte in the aggregate segment,
-> inferring anything more is IMHO stretching too far the API semantic.
->
+On Fri, 14 Jun 2024 10:18:47 +0200
+Paolo Abeni <pabeni@redhat.com> wrote:
 
-Note the current behavior was a conscious choice, see
-commit 98aaa913b4ed2503244 ("tcp: Extend SOF_TIMESTAMPING_RX_SOFTWARE
-to TCP recvmsg")
-for the rationale.
+> On Wed, 2024-06-12 at 09:07 +0200, Marek Beh=C3=BAn wrote:
+> > On Tue, 11 Jun 2024 20:42:43 +0000
+> > Chris Packham <Chris.Packham@alliedtelesis.co.nz> wrote:
+> >  =20
+> > > +cc Eric W and Marek.
+> > >=20
+> > > On 11/06/24 17:34, Chris Packham wrote: =20
+> > > > The Realtek RTL8224 PHY is a 2.5Gbps capable PHY. It only uses the
+> > > > clause 45 MDIO interface and can leverage the support that has alre=
+ady
+> > > > been added for the other 822x PHYs.
+> > > >=20
+> > > > Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
+> > > > ---
+> > > >=20
+> > > > Notes:
+> > > >      I'm currently testing this on an older kernel because the boar=
+d I'm
+> > > >      using has a SOC/DSA switch that has a driver in openwrt for Li=
+nux 5.15.
+> > > >      I have tried to selectively back port the bits I need from the=
+ other
+> > > >      rtl822x work so this should be all that is required for the rt=
+l8224.
+> > > >     =20
+> > > >      There's quite a lot that would need forward porting get a work=
+ing system
+> > > >      against a current kernel so hopefully this is small enough tha=
+t it can
+> > > >      land while I'm trying to figure out how to untangle all the ot=
+her bits.
+> > > >     =20
+> > > >      One thing that may appear lacking is the lack of rate_matching=
+ support.
+> > > >      According to the documentation I have know the interface used =
+on the
+> > > >      RTL8224 is (q)uxsgmii so no rate matching is required. As I'm =
+still
+> > > >      trying to get things completely working that may change if I g=
+et new
+> > > >      information.
+> > > >=20
+> > > >   drivers/net/phy/realtek.c | 8 ++++++++
+> > > >   1 file changed, 8 insertions(+)
+> > > >=20
+> > > > diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+> > > > index 7ab41f95dae5..2174893c974f 100644
+> > > > --- a/drivers/net/phy/realtek.c
+> > > > +++ b/drivers/net/phy/realtek.c
+> > > > @@ -1317,6 +1317,14 @@ static struct phy_driver realtek_drvs[] =3D {
+> > > >   		.resume         =3D rtlgen_resume,
+> > > >   		.read_page      =3D rtl821x_read_page,
+> > > >   		.write_page     =3D rtl821x_write_page,
+> > > > +	}, {
+> > > > +		PHY_ID_MATCH_EXACT(0x001ccad0),
+> > > > +		.name		=3D "RTL8224 2.5Gbps PHY",
+> > > > +		.get_features   =3D rtl822x_c45_get_features,
+> > > > +		.config_aneg    =3D rtl822x_c45_config_aneg,
+> > > > +		.read_status    =3D rtl822x_c45_read_status,
+> > > > +		.suspend        =3D genphy_c45_pma_suspend,
+> > > > +		.resume         =3D rtlgen_c45_resume,
+> > > >   	}, {
+> > > >   		PHY_ID_MATCH_EXACT(0x001cc961),
+> > > >   		.name		=3D "RTL8366RB Gigabit Ethernet"   =20
+> >=20
+> > Don't you need rtl822xb_config_init for serdes configuration? =20
+>=20
+> Marek, I read the above as you would prefer to have such support
+> included from the beginning, as such I'm looking forward a new version
+> of this patch.
+>=20
+> Please raise a hand if I read too much in your reply.
 
-Perhaps another application would need to add a new timestamp to report
-both the oldest and newest timestamps.
+I am raising my hand :) I just wanted to point it out.
+If this code works for Chris' hardware, it is okay even without the
+.config_init.
 
-Or add a socket flag to prevent coalescing for applications needing
-precise timestamps.
-
-Willem might know better about this.
-
-I agree the tracepoint seems not needed. What about solving the issue inste=
-ad ?
+Marek
 
