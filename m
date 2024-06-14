@@ -1,445 +1,151 @@
-Return-Path: <netdev+bounces-103657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25D08908F30
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:44:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A75F908F54
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:50:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 909D21F29AE2
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:44:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC52A286C3E
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:50:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F0D71A2C0E;
-	Fri, 14 Jun 2024 15:41:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BeqS4xml"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84CB282E1;
+	Fri, 14 Jun 2024 15:50:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3272B18FC65;
-	Fri, 14 Jun 2024 15:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 524C94EB55
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 15:50:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718379686; cv=none; b=tH96jHJ3sZvAaA9pVpsnJ7jtYNIJ5RppE7nvTIm0UDKjoaq3A6Wh3VmwYvG6JELPwIHBAUQN2TZQFVDd6jRaLekZHAUeLg53AsUkhEF/9g8irkbnyBlu7ALOG4iT7TgNK4fU5gY1EVEiocCa9oVYYdJ6R1B2MGOTWKRCO7GpoVE=
+	t=1718380222; cv=none; b=ho5I9YH+ixoBQhesk1osczc2S3ZVBF/fRDjfnpN5qHkvKWkLNkk1CNKh9nihllnoXHUpTzBbxVP3D+WtHQBmzBZmyHoD9Cza5O9lHSwMbyvaG0c21QSzzaOs37n9xHhIjSYkpzmkfuDL1LjkOITmqQwKZVJT2D2LjkfAjNG6VJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718379686; c=relaxed/simple;
-	bh=ERcp5kXmQlnWrfWJNm+pEDEBM0zIgNxUiUi/ClpluvA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=axjRlrlMnWnSYfJBjDPbTuf+dMsdJK5CKNVYlERevUwzNl839t0jr0r2oQbLtX9J39d+4ZQzgzZAmkXUFzx++f0T/CW2HegkEjuzeWeo/nf0hnqa0GcpchvGO6T04h4rCAWCwaSiwv1+IkyBNp8HmTs8BBsjQ1B5Bq71mX/mTxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BeqS4xml; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EEDFC2BD10;
-	Fri, 14 Jun 2024 15:41:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718379685;
-	bh=ERcp5kXmQlnWrfWJNm+pEDEBM0zIgNxUiUi/ClpluvA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BeqS4xmlpjQArjp32ghNKbmxytoJZlhOozxNnalJZ1RIPcdOwhk2RmoPPzif55yBb
-	 hJlAYJ7pSfXiy2CHqWcXaa7YwwvlUah++P38fQuTL4TGc7WEXCwCr6P1J5NJ7wVhw/
-	 pBEf3mhNZ7lp5EggxOlOoElSWdMOupnAC7CyZALMjBO7Rws6oRBlnYBaZGTIMwSLKK
-	 oetFBn6WnM7T8yUZXl5xjpSTlQBQvJOIc2e8pCRgG99aJ0zuwxmMrbMrpmxVvICRIk
-	 1kuqyYp7ewQegb/SfTxQnthPcvZy84wt0GeQqrjX4VQLqw/rDZUS4oWhT9ytuqPuwP
-	 m2oYIsOqZI6lA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: bpf@vger.kernel.org
-Cc: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	lorenzo.bianconi@redhat.com,
-	toke@redhat.com,
-	fw@strlen.de,
-	hawk@kernel.org,
-	horms@kernel.org,
-	donhunte@redhat.com,
-	memxor@gmail.com
-Subject: [PATCH v5 bpf-next 3/3] selftests/bpf: Add selftest for bpf_xdp_flow_lookup kfunc
-Date: Fri, 14 Jun 2024 17:40:48 +0200
-Message-ID: <6472c7a775f6a329d16352092071fda8676c2809.1718379122.git.lorenzo@kernel.org>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <cover.1718379122.git.lorenzo@kernel.org>
-References: <cover.1718379122.git.lorenzo@kernel.org>
+	s=arc-20240116; t=1718380222; c=relaxed/simple;
+	bh=eEaMUsD2rZrdszBawcdmXrpAkK9gZi0K/sFTkhrTvJw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=cIgzqj4cP7k0juElr748HkneUHCnYo2FxwDZjsoF2GOrzXt31CuiY40vSJk9oWEYmGNhp2OUly+8JvgXzkCr3rmZ6oV+ofsXtlyw4YrWSTsyezlCxhb5dRUwURGkCySt+Awn6OyUMEb5MrAb/sw0a+UqNk1eDKDcoeMVsoLf8y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3759b8709afso24884795ab.3
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 08:50:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718380220; x=1718985020;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=q2j2pYJL3E7Tl8CHR3yVJ1heQbZR4qqoUVD6Td5o04c=;
+        b=VA+KPsqayL+yNEr+a3rn5Pi/Bbh4Z6ONrCgrXgiStTcpey/UMSFDGo+DkiHAOJbZGU
+         7Qts/q+H/24/WahQGp2Vp+aNPHBpQoKgH6hebHAczB3YMyTiNexUfYyt0yfqIJufrDex
+         8pxlZlXuLhKnile6k9lKFXB6iG75Czz/s6rg0oweLSPhbQHu0nswT6e55Y2TrIe/LvO8
+         +g7eVnjWQ47tsLqHv8Ik26PuyBXnyTPEIIr9pA26ARPNO9Q2+CpJ4zIVUiLSZT0MXCeW
+         V/xWy0uJfxL7fG1TKKt2NNqGyKaPoiKnkUz/eLQxaCw2XjX7p/5LoZXk4pRQ16E3z1tD
+         EXfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVhUC6Qh52fym3wnJU5InnMoQvMhHfaTCQ1QYyNi32WNYQzL376rAVwngr9XN3h+9b1Krd5oyVqvm//k3w2jV2UMLGz15hj
+X-Gm-Message-State: AOJu0YzJte+iWxN9lq32DlxcsTtoZqrzwRAiGzosZE6CNWJ2Nylhw2Dr
+	ZedX5YVB1J2LJMyUG+zt2u4cETOMnZl01qtM/EBMj11TDjA1q1M3XLWwGqCr2h269kWlkWfV34P
+	fE1zBdB6Or0VikZue8heYz5f+mwUGL6o2iWIL3CYQXV+m/fJK2fd5D6U=
+X-Google-Smtp-Source: AGHT+IH1zmV3U3XvSe6YiB+uqVWTuWnQPg4pCFKXeRSuAMpaB6caxUG3TcLORbeaK4pVcuQTukWd2YCPMggg0GFH303blRVbltAo
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1c29:b0:375:a03d:773a with SMTP id
+ e9e14a558f8ab-375e0e27c0fmr1674525ab.1.1718380220552; Fri, 14 Jun 2024
+ 08:50:20 -0700 (PDT)
+Date: Fri, 14 Jun 2024 08:50:20 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a2aa7a061adb921e@google.com>
+Subject: [syzbot] [wpan?] WARNING in lowpan_xmit
+From: syzbot <syzbot+ba0ca9eb9e8da84dadeb@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, 
+	miquel.raynal@bootlin.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Introduce e2e selftest for bpf_xdp_flow_lookup kfunc through
-xdp_flowtable utility.
+Hello,
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+syzbot found the following issue on:
+
+HEAD commit:    2ccbdf43d5e7 Merge tag 'for-linus' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17789a56980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b8786f381e62940f
+dashboard link: https://syzkaller.appspot.com/bug?extid=ba0ca9eb9e8da84dadeb
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/a4edf8b28d7f/disk-2ccbdf43.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/5f9b0fd6168d/vmlinux-2ccbdf43.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a2c5f918ca4f/bzImage-2ccbdf43.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ba0ca9eb9e8da84dadeb@syzkaller.appspotmail.com
+
+ieee802154 phy0 wpan0: encryption failed: -22
+ieee802154 phy1 wpan1: encryption failed: -22
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 1237 at include/linux/skbuff.h:3069 skb_network_header_len include/linux/skbuff.h:3069 [inline]
+WARNING: CPU: 1 PID: 1237 at include/linux/skbuff.h:3069 lowpan_header net/ieee802154/6lowpan/tx.c:236 [inline]
+WARNING: CPU: 1 PID: 1237 at include/linux/skbuff.h:3069 lowpan_xmit+0xe38/0x11a0 net/ieee802154/6lowpan/tx.c:282
+Modules linked in:
+CPU: 1 PID: 1237 Comm: aoe_tx0 Not tainted 6.10.0-rc3-syzkaller-00044-g2ccbdf43d5e7 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+RIP: 0010:skb_network_header_len include/linux/skbuff.h:3069 [inline]
+RIP: 0010:lowpan_header net/ieee802154/6lowpan/tx.c:236 [inline]
+RIP: 0010:lowpan_xmit+0xe38/0x11a0 net/ieee802154/6lowpan/tx.c:282
+Code: 85 7c fe ff ff 48 01 81 48 02 00 00 e8 91 ea 24 fe e9 59 fc ff ff e8 d7 79 f4 f6 90 0f 0b 90 e9 17 f6 ff ff e8 c9 79 f4 f6 90 <0f> 0b 90 e9 fa f6 ff ff e8 bb 79 f4 f6 0f b7 8d e0 fe ff ff 48 c7
+RSP: 0018:ffffc900049979c0 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffff888022284cb0 RCX: ffffffff8a99627f
+RDX: ffff8880232b1e00 RSI: ffffffff8a996b87 RDI: 0000000000000003
+RBP: ffffc90004997b60 R08: 0000000000000003 R09: 000000000000ffff
+R10: 000000000000ffff R11: 0000000000000000 R12: ffff88807cecf836
+R13: 000000000000ffff R14: ffffc90004997a50 R15: ffff88807cecf780
+FS:  0000000000000000(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd216ae56c6 CR3: 0000000061aee000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __netdev_start_xmit include/linux/netdevice.h:4882 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4896 [inline]
+ xmit_one net/core/dev.c:3578 [inline]
+ dev_hard_start_xmit+0x143/0x790 net/core/dev.c:3594
+ __dev_queue_xmit+0x7ba/0x4130 net/core/dev.c:4393
+ dev_queue_xmit include/linux/netdevice.h:3095 [inline]
+ tx+0xcc/0x190 drivers/block/aoe/aoenet.c:62
+ kthread+0x1e7/0x3c0 drivers/block/aoe/aoecmd.c:1229
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+
 ---
- tools/testing/selftests/bpf/config            |  13 ++
- .../selftests/bpf/prog_tests/xdp_flowtable.c  | 168 ++++++++++++++++++
- .../selftests/bpf/progs/xdp_flowtable.c       | 146 +++++++++++++++
- 3 files changed, 327 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/xdp_flowtable.c
- create mode 100644 tools/testing/selftests/bpf/progs/xdp_flowtable.c
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-index 2fb16da78dce8..5291e97df7494 100644
---- a/tools/testing/selftests/bpf/config
-+++ b/tools/testing/selftests/bpf/config
-@@ -83,6 +83,19 @@ CONFIG_NF_CONNTRACK_MARK=y
- CONFIG_NF_CONNTRACK_ZONES=y
- CONFIG_NF_DEFRAG_IPV4=y
- CONFIG_NF_DEFRAG_IPV6=y
-+CONFIG_NF_TABLES=y
-+CONFIG_NF_TABLES_INET=y
-+CONFIG_NF_TABLES_NETDEV=y
-+CONFIG_NF_TABLES_IPV4=y
-+CONFIG_NF_TABLES_IPV6=y
-+CONFIG_NETFILTER_INGRESS=y
-+CONFIG_NF_FLOW_TABLE=y
-+CONFIG_NF_FLOW_TABLE_INET=y
-+CONFIG_NETFILTER_NETLINK=y
-+CONFIG_NFT_FLOW_OFFLOAD=y
-+CONFIG_IP_NF_IPTABLES=y
-+CONFIG_IP6_NF_IPTABLES=y
-+CONFIG_IP6_NF_FILTER=y
- CONFIG_NF_NAT=y
- CONFIG_RC_CORE=y
- CONFIG_SECURITY=y
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_flowtable.c b/tools/testing/selftests/bpf/prog_tests/xdp_flowtable.c
-new file mode 100644
-index 0000000000000..e1bf141d34015
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_flowtable.c
-@@ -0,0 +1,168 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <test_progs.h>
-+#include <network_helpers.h>
-+#include <bpf/btf.h>
-+#include <linux/if_link.h>
-+#include <linux/udp.h>
-+#include <net/if.h>
-+#include <unistd.h>
-+
-+#include "xdp_flowtable.skel.h"
-+
-+#define TX_NETNS_NAME	"ns0"
-+#define RX_NETNS_NAME	"ns1"
-+
-+#define TX_NAME		"v0"
-+#define FORWARD_NAME	"v1"
-+#define RX_NAME		"d0"
-+
-+#define TX_MAC		"00:00:00:00:00:01"
-+#define FORWARD_MAC	"00:00:00:00:00:02"
-+#define RX_MAC		"00:00:00:00:00:03"
-+#define DST_MAC		"00:00:00:00:00:04"
-+
-+#define TX_ADDR		"10.0.0.1"
-+#define FORWARD_ADDR	"10.0.0.2"
-+#define RX_ADDR		"20.0.0.1"
-+#define DST_ADDR	"20.0.0.2"
-+
-+#define PREFIX_LEN	"8"
-+#define N_PACKETS	10
-+#define UDP_PORT	12345
-+#define UDP_PORT_STR	"12345"
-+
-+static int send_udp_traffic(void)
-+{
-+	struct sockaddr_storage addr;
-+	int i, sock;
-+
-+	if (make_sockaddr(AF_INET, DST_ADDR, UDP_PORT, &addr, NULL))
-+		return -EINVAL;
-+
-+	sock = socket(AF_INET, SOCK_DGRAM, 0);
-+	if (sock < 0)
-+		return sock;
-+
-+	for (i = 0; i < N_PACKETS; i++) {
-+		unsigned char buf[] = { 0xaa, 0xbb, 0xcc };
-+		int n;
-+
-+		n = sendto(sock, buf, sizeof(buf), MSG_NOSIGNAL | MSG_CONFIRM,
-+			   (struct sockaddr *)&addr, sizeof(addr));
-+		if (n != sizeof(buf)) {
-+			close(sock);
-+			return -EINVAL;
-+		}
-+
-+		usleep(50000); /* 50ms */
-+	}
-+	close(sock);
-+
-+	return 0;
-+}
-+
-+void test_xdp_flowtable(void)
-+{
-+	struct xdp_flowtable *skel = NULL;
-+	struct nstoken *tok = NULL;
-+	int iifindex, stats_fd;
-+	__u32 value, key = 0;
-+	struct bpf_link *link;
-+
-+	if (SYS_NOFAIL("nft -v")) {
-+		fprintf(stdout, "Missing required nft tool\n");
-+		test__skip();
-+		return;
-+	}
-+
-+	SYS(out, "ip netns add " TX_NETNS_NAME);
-+	SYS(out, "ip netns add " RX_NETNS_NAME);
-+
-+	tok = open_netns(RX_NETNS_NAME);
-+	if (!ASSERT_OK_PTR(tok, "setns"))
-+		goto out;
-+
-+	SYS(out, "sysctl -qw net.ipv4.conf.all.forwarding=1");
-+
-+	SYS(out, "ip link add " TX_NAME " type veth peer " FORWARD_NAME);
-+	SYS(out, "ip link set " TX_NAME " netns " TX_NETNS_NAME);
-+	SYS(out, "ip link set dev " FORWARD_NAME " address " FORWARD_MAC);
-+	SYS(out,
-+	    "ip addr add " FORWARD_ADDR "/" PREFIX_LEN " dev " FORWARD_NAME);
-+	SYS(out, "ip link set dev " FORWARD_NAME " up");
-+
-+	SYS(out, "ip link add " RX_NAME " type dummy");
-+	SYS(out, "ip link set dev " RX_NAME " address " RX_MAC);
-+	SYS(out, "ip addr add " RX_ADDR "/" PREFIX_LEN " dev " RX_NAME);
-+	SYS(out, "ip link set dev " RX_NAME " up");
-+
-+	/* configure the flowtable */
-+	SYS(out, "nft add table ip filter");
-+	SYS(out,
-+	    "nft add flowtable ip filter f { hook ingress priority 0\\; "
-+	    "devices = { " FORWARD_NAME ", " RX_NAME " }\\; }");
-+	SYS(out,
-+	    "nft add chain ip filter forward "
-+	    "{ type filter hook forward priority 0\\; }");
-+	SYS(out,
-+	    "nft add rule ip filter forward ip protocol udp th dport "
-+	    UDP_PORT_STR " flow add @f");
-+
-+	/* Avoid ARP calls */
-+	SYS(out,
-+	    "ip -4 neigh add " DST_ADDR " lladdr " DST_MAC " dev " RX_NAME);
-+
-+	close_netns(tok);
-+	tok = open_netns(TX_NETNS_NAME);
-+	if (!ASSERT_OK_PTR(tok, "setns"))
-+		goto out;
-+
-+	SYS(out, "ip addr add " TX_ADDR "/" PREFIX_LEN " dev " TX_NAME);
-+	SYS(out, "ip link set dev " TX_NAME " address " TX_MAC);
-+	SYS(out, "ip link set dev " TX_NAME " up");
-+	SYS(out, "ip route add default via " FORWARD_ADDR);
-+
-+	close_netns(tok);
-+	tok = open_netns(RX_NETNS_NAME);
-+	if (!ASSERT_OK_PTR(tok, "setns"))
-+		goto out;
-+
-+	iifindex = if_nametoindex(FORWARD_NAME);
-+	if (!ASSERT_NEQ(iifindex, 0, "iifindex"))
-+		goto out;
-+
-+	skel = xdp_flowtable__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "skel"))
-+		goto out;
-+
-+	link = bpf_program__attach_xdp(skel->progs.xdp_flowtable_do_lookup,
-+				       iifindex);
-+	if (!ASSERT_OK_PTR(link, "prog_attach"))
-+		goto out;
-+
-+	close_netns(tok);
-+	tok = open_netns(TX_NETNS_NAME);
-+	if (!ASSERT_OK_PTR(tok, "setns"))
-+		goto out;
-+
-+	if (!ASSERT_OK(send_udp_traffic(), "send udp"))
-+		goto out;
-+
-+	close_netns(tok);
-+	tok = open_netns(RX_NETNS_NAME);
-+	if (!ASSERT_OK_PTR(tok, "setns"))
-+		goto out;
-+
-+	stats_fd = bpf_map__fd(skel->maps.stats);
-+	if (!ASSERT_OK(bpf_map_lookup_elem(stats_fd, &key, &value),
-+		       "bpf_map_update_elem stats"))
-+		goto out;
-+
-+	ASSERT_GE(value, N_PACKETS - 2, "bpf_xdp_flow_lookup failed");
-+out:
-+	xdp_flowtable__destroy(skel);
-+	if (tok)
-+		close_netns(tok);
-+	SYS_NOFAIL("ip netns del " TX_NETNS_NAME);
-+	SYS_NOFAIL("ip netns del " RX_NETNS_NAME);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/xdp_flowtable.c b/tools/testing/selftests/bpf/progs/xdp_flowtable.c
-new file mode 100644
-index 0000000000000..8297b30b0764b
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/xdp_flowtable.c
-@@ -0,0 +1,146 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#define BPF_NO_KFUNC_PROTOTYPES
-+#include <vmlinux.h>
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_endian.h>
-+
-+#define MAX_ERRNO	4095
-+
-+#define ETH_P_IP	0x0800
-+#define ETH_P_IPV6	0x86dd
-+#define IP_MF		0x2000	/* "More Fragments" */
-+#define IP_OFFSET	0x1fff	/* "Fragment Offset" */
-+#define AF_INET		2
-+#define AF_INET6	10
-+
-+struct bpf_flowtable_opts___local {
-+	s32 error;
-+};
-+
-+struct flow_offload_tuple_rhash *
-+bpf_xdp_flow_lookup(struct xdp_md *, struct bpf_fib_lookup *,
-+		    struct bpf_flowtable_opts___local *, u32) __ksym;
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__type(key, __u32);
-+	__type(value, __u32);
-+	__uint(max_entries, 1);
-+} stats SEC(".maps");
-+
-+static bool xdp_flowtable_offload_check_iphdr(struct iphdr *iph)
-+{
-+	/* ip fragmented traffic */
-+	if (iph->frag_off & bpf_htons(IP_MF | IP_OFFSET))
-+		return false;
-+
-+	/* ip options */
-+	if (iph->ihl * 4 != sizeof(*iph))
-+		return false;
-+
-+	if (iph->ttl <= 1)
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool xdp_flowtable_offload_check_tcp_state(void *ports, void *data_end,
-+						  u8 proto)
-+{
-+	if (proto == IPPROTO_TCP) {
-+		struct tcphdr *tcph = ports;
-+
-+		if (tcph + 1 > data_end)
-+			return false;
-+
-+		if (tcph->fin || tcph->rst)
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+SEC("xdp.frags")
-+int xdp_flowtable_do_lookup(struct xdp_md *ctx)
-+{
-+	void *data_end = (void *)(long)ctx->data_end;
-+	struct bpf_flowtable_opts___local opts = {};
-+	struct flow_offload_tuple_rhash *tuplehash;
-+	struct bpf_fib_lookup tuple = {
-+		.ifindex = ctx->ingress_ifindex,
-+	};
-+	void *data = (void *)(long)ctx->data;
-+	struct ethhdr *eth = data;
-+	struct flow_ports *ports;
-+	__u32 *val, key = 0;
-+
-+	if (eth + 1 > data_end)
-+		return XDP_DROP;
-+
-+	switch (eth->h_proto) {
-+	case bpf_htons(ETH_P_IP): {
-+		struct iphdr *iph = data + sizeof(*eth);
-+
-+		ports = (struct flow_ports *)(iph + 1);
-+		if (ports + 1 > data_end)
-+			return XDP_PASS;
-+
-+		/* sanity check on ip header */
-+		if (!xdp_flowtable_offload_check_iphdr(iph))
-+			return XDP_PASS;
-+
-+		if (!xdp_flowtable_offload_check_tcp_state(ports, data_end,
-+							   iph->protocol))
-+			return XDP_PASS;
-+
-+		tuple.family		= AF_INET;
-+		tuple.tos		= iph->tos;
-+		tuple.l4_protocol	= iph->protocol;
-+		tuple.tot_len		= bpf_ntohs(iph->tot_len);
-+		tuple.ipv4_src		= iph->saddr;
-+		tuple.ipv4_dst		= iph->daddr;
-+		tuple.sport		= ports->source;
-+		tuple.dport		= ports->dest;
-+		break;
-+	}
-+	case bpf_htons(ETH_P_IPV6): {
-+		struct in6_addr *src = (struct in6_addr *)tuple.ipv6_src;
-+		struct in6_addr *dst = (struct in6_addr *)tuple.ipv6_dst;
-+		struct ipv6hdr *ip6h = data + sizeof(*eth);
-+
-+		ports = (struct flow_ports *)(ip6h + 1);
-+		if (ports + 1 > data_end)
-+			return XDP_PASS;
-+
-+		if (ip6h->hop_limit <= 1)
-+			return XDP_PASS;
-+
-+		if (!xdp_flowtable_offload_check_tcp_state(ports, data_end,
-+							   ip6h->nexthdr))
-+			return XDP_PASS;
-+
-+		tuple.family		= AF_INET6;
-+		tuple.l4_protocol	= ip6h->nexthdr;
-+		tuple.tot_len		= bpf_ntohs(ip6h->payload_len);
-+		*src			= ip6h->saddr;
-+		*dst			= ip6h->daddr;
-+		tuple.sport		= ports->source;
-+		tuple.dport		= ports->dest;
-+		break;
-+	}
-+	default:
-+		return XDP_PASS;
-+	}
-+
-+	tuplehash = bpf_xdp_flow_lookup(ctx, &tuple, &opts, sizeof(opts));
-+	if (!tuplehash)
-+		return XDP_PASS;
-+
-+	val = bpf_map_lookup_elem(&stats, &key);
-+	if (val)
-+		__sync_add_and_fetch(val, 1);
-+
-+	return XDP_PASS;
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.45.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
