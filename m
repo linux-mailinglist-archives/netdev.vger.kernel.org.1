@@ -1,315 +1,172 @@
-Return-Path: <netdev+bounces-103694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A0DE909135
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 19:17:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C70F690915D
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 19:22:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10092281DD6
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:17:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40A161F21645
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:22:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DABB919CCF5;
-	Fri, 14 Jun 2024 17:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7090515EFAA;
+	Fri, 14 Jun 2024 17:22:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DNtvNz/F"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Y4ROH0HX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A517816D4EB;
-	Fri, 14 Jun 2024 17:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C7B9441
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 17:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718385353; cv=none; b=HHvFv/CKCYbSWrNLoqXcesHaobZb5fQltrmEZpPLm+nf1qa3T4Z6+xRZpkeegTej/KxZlZh4oA0BADzaVAyQvzDQetBuV7w2egIg/bvxvv2i6DXZT/UF7aCe7h29ZgEyWeqNG55vPpzS8Biu77UVikKuTFwfY9kJJxWLRHpB6Zc=
+	t=1718385737; cv=none; b=PDWlTM2Cp6L1VQWd9gBS+u/auCDJvbOojvbBYwd0YyN/f3Ue0AxVvkeLMstcoQqJEVeyuouL2SKZVmzDo5+CNj+VDvWaQ963FObGtTvIWrWRhVu/f70gpqbHkZTz0KH2oB6FXq9ISsEGZdRwnjTFPA9zeMibyYIxOcCgml2Ios0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718385353; c=relaxed/simple;
-	bh=YZhKL9A/66/JtXeNBaJHZPe3vflt/TP5n7Ycw1491iQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=V6B/lG8SXMMtIRCDIEVFq8sPXQRsNyNGlXm4p0mgcsAVDpmeDkhl0eFhHI16IdUCsQS50OYwBF9BznpnncXL+14mjr2p7jSuW8mhejrI1Cj9K3D3lNiUs588c/zDN+jW//LObqEhQgAPKnjUAsW16rH6ssL0JxTsmNIQyJEv820=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DNtvNz/F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BC0FC2BD10;
-	Fri, 14 Jun 2024 17:15:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718385353;
-	bh=YZhKL9A/66/JtXeNBaJHZPe3vflt/TP5n7Ycw1491iQ=;
-	h=From:Date:Subject:To:Cc:From;
-	b=DNtvNz/Fsr5M7bREgRQH9qR24NkZ29Qno1ESJjO037HIDQQNfH/1UBQAsWlZdwtty
-	 f+DFyg6fPNUPzOda5XuDhz8wCh8dYgqPbe/YQ066xq+f3AuXWp5UenvrLJFWV5h1AZ
-	 jzbdIq/SeUc0fj0lNuUc6kEU4e1VEdnZOqhjjXPuVR2Ky5W3uE8VBDWneZ3e8QbT0M
-	 C2L3/WzD5e45TOGI8vyuf08VJsIDibMh6Mo+jeh/+gt9H8PEyfiJ1q429HTYgf0OaH
-	 GjuX2Z3HjGRK9QekfVSp94R4Zds1FQa82mXaY09FvYw/DrMyrirv09qWG9PRpAIB97
-	 yRPBTAqfkFWug==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 14 Jun 2024 19:15:29 +0200
-Subject: [PATCH net] selftests: mptcp: userspace_pm: fixed subtest names
+	s=arc-20240116; t=1718385737; c=relaxed/simple;
+	bh=o9eXq3EK01bsWp9vS8wSUEb5UAKO2zkI5PMDWtfqUCc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=McLzUVs5hsGDy3nl160XYcIyQGVupMT+Nz3Fj5dH3nGI5Uydx2LcXhFANJpSdEFe4/CbT6JaaOWFmLHEeZbMTX/HvLHA1YXQQ2sO2AMv3mWUT7M9qDzKP4i71P7d+9xjOu8UvH9qtFeP54Qy1KTd1Z77kPDnGYvW2K80L3GKNco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Y4ROH0HX; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=pGSKTYEY3XLoZvCSCn2sR/kLClqwmlZjZwZrOeUP/pI=; b=Y4ROH0HXzL2kfp04FwoQZ+KxX1
+	orX20RnLFtLM8Is4YgL8rtOC+L2u/EHCsJF26vNb5zHBx8SYBsNl/Lc9lWxXP46V9wyeadOKZheLJ
+	rUhSy3+ecQSM1HOgbO/RX5hsgC04OvtitpYnpY9CUcuI+qByWcXU0uQCofC9avCiPp3JUmFHJrHD8
+	GV9CfkggdTJl+3sOLK8meqVcN2PUbtLcEEpqlFXxuL7bY7OeHhSfr5KKRiQJnd//ME/SSWXmcCryY
+	M+VVylxr9dmV4GJQAuRvsic8nYrekNFNbyX1Um5IIn7NHNpf/HemgB1a+6GvsIPF4PppzaR4tig+L
+	5NrGt8GQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55500)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sIAcV-00025Z-1h;
+	Fri, 14 Jun 2024 18:21:47 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sIAcT-0002IT-B0; Fri, 14 Jun 2024 18:21:45 +0100
+Date: Fri, 14 Jun 2024 18:21:45 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Romain Gantois <romain.gantois@bootlin.com>
+Subject: Re: [PATCH net-next v2 1/5] net: stmmac: add select_pcs() platform
+ method
+Message-ID: <Zmx8KfFtEXIAVziC@shell.armlinux.org.uk>
+References: <ZmrLbdwv6ALoy+gs@shell.armlinux.org.uk>
+ <E1sHhoM-00Fesu-8E@rmk-PC.armlinux.org.uk>
+ <2xl2icmnhym4pzikivo6wqeyqny6ewrbqlfvsxrisykztdcaip@mp54uqtmrgyf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240614-upstream-net-20240614-selftests-mptcp-uspace-pm-fixed-test-names-v1-1-460ad3edb429@kernel.org>
-X-B4-Tracking: v=1; b=H4sIALB6bGYC/z2OQQrDIBRErxL+uh/UhFB6ldKF1bEVqhW/KYWQu
- 1c3Xb6ZYWZ2EtQIocu0U8UnSnznDvo0kXva/ABH35mMMota9cJbkVZhE2c0/quCV2iQJpxKc4U
- 3KdaBS+IQv/A8PM42QXhez5i1scGrO/WZUjEy48KVeindjuMH6kJVSJcAAAA=
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=9913; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=YZhKL9A/66/JtXeNBaJHZPe3vflt/TP5n7Ycw1491iQ=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmbHrG24X5OpyXeAeAsxuyddqhL81YkDuBRmseX
- RS5SalZy92JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZmx6xgAKCRD2t4JPQmmg
- czUMEADQBfsk102Kt+GlOHG+mbGMNr5bv8dSCR03oVvrlfHqnjsOhO9IL6+fQ8lbdz3ylCGfPKK
- /qPlj/ino1O6GENZ1FYWSD1QdCEWvjkSgyZmvIa4hJ2KvuQ+G9bag82rHiVFl3G2QzpCSgok6qK
- Dm5aayH6kAUosACXCHTWxJodtFZ8opcH/O0+JPS8wpGa6fM12NNgFZBPwYoOabwfHZDRZQb9riK
- FwV0CHVDKdTFnGcNXqUmc85fuG0l2P00y18lozFYxvIYwh2kX8B0dNAg/S97vh6SF1TOP5Uaj7B
- PnR/+iVA/iHnFEE+tLTKNszUo+6PGv90oeIAfhmH4XUyQYujLR035mJEipo4ykCnBF+aCsqeHFe
- 2dAv6EDsf+jekzkzPHyNnKaSLOKvXXuoyEX9KSrEUc8POhPnjTa8aL57zqSwgZRUFKDjVKIDVPZ
- TSyVjPagUbL6qxkDR8sJqURRJlzirreAWkMFIdNl8seU3vraBkSZU9yp11Uw2vlOv2jgRl8msTz
- RvLyedbLfSuC47FpsZkqV3rPxjGOPTG5Dj4UciSi7Xl84KKmm8IkK+gEPwtzW3sdZ9xPc5fbZVC
- ym0MGODHtmcnYmbG1o7H0vbd1+EheYXyjgc3Fvfplfz/t1L235II4RY3gIg7nEk2Nm3GPAqKV/g
- t3OEY1FtJ6SE5tQ==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2xl2icmnhym4pzikivo6wqeyqny6ewrbqlfvsxrisykztdcaip@mp54uqtmrgyf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-It is important to have fixed (sub)test names in TAP, because these
-names are used to identify them. If they are not fixed, tracking cannot
-be done.
+On Fri, Jun 14, 2024 at 07:38:40PM +0300, Serge Semin wrote:
+> Hi Russell
+> 
+> On Thu, Jun 13, 2024 at 11:36:06AM +0100, Russell King (Oracle) wrote:
+> > Allow platform drivers to provide their logic to select an appropriate
+> > PCS.
+> > 
+> > Tested-by: Romain Gantois <romain.gantois@bootlin.com>
+> > Reviewed-by: Romain Gantois <romain.gantois@bootlin.com>
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 7 +++++++
+> >  include/linux/stmmac.h                            | 4 +++-
+> >  2 files changed, 10 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > index bbedf2a8c60f..302aa4080de3 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > @@ -949,6 +949,13 @@ static struct phylink_pcs *stmmac_mac_select_pcs(struct phylink_config *config,
+> >  						 phy_interface_t interface)
+> >  {
+> >  	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
+> > +	struct phylink_pcs *pcs;
+> > +
+> > +	if (priv->plat->select_pcs) {
+> > +		pcs = priv->plat->select_pcs(priv, interface);
+> > +		if (!IS_ERR(pcs))
+> > +			return pcs;
+> > +	}
+> >  
+> >  	if (priv->hw->xpcs)
+> >  		return &priv->hw->xpcs->pcs;
+> > diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> > index 8f0f156d50d3..9c54f82901a1 100644
+> > --- a/include/linux/stmmac.h
+> > +++ b/include/linux/stmmac.h
+> > @@ -13,7 +13,7 @@
+> >  #define __STMMAC_PLATFORM_DATA
+> >  
+> >  #include <linux/platform_device.h>
+> > -#include <linux/phy.h>
+> > +#include <linux/phylink.h>
+> >  
+> >  #define MTL_MAX_RX_QUEUES	8
+> >  #define MTL_MAX_TX_QUEUES	8
+> > @@ -271,6 +271,8 @@ struct plat_stmmacenet_data {
+> >  	void (*dump_debug_regs)(void *priv);
+> 
+> >  	int (*pcs_init)(struct stmmac_priv *priv);
+> >  	void (*pcs_exit)(struct stmmac_priv *priv);
+> > +	struct phylink_pcs *(*select_pcs)(struct stmmac_priv *priv,
+> > +					  phy_interface_t interface);
+> 
+> Just a small note/nitpick. We've got pcs_init() and pcs_exit()
+> callbacks. Both of them have the pcs_ prefix followed by the action
+> verb. What about using the same notation for the PCS-select method,
+> using the plat_stmmacenet_data::pcs_select() callback-name instead?
 
-Some subtests from the userspace_pm selftest were using random numbers
-in their names: the client and server address IDs from $RANDOM, and the
-client port number randomly picked by the kernel when creating the
-connection. These values have been replaced by 'client' and 'server'
-words: that's even more helpful than showing random numbers. Note that
-the addresses IDs are incremented and decremented in the test: +1 or -1
-are then displayed in these cases.
+From phylink's perspective, it's not part of the PCS, it's something
+that the MAC does.
 
-Not to loose info that can be useful for debugging in case of issues,
-these random numbers are now displayed at the beginning of the test.
+The interface passed in to mac_select_pcs() so so the MAC code can
+decide which PCS (if it has many to choose from) will be used for
+the specified interface mode to either a PHY or other device
+connected to the netdev. It isn't a PCS operation, it's an
+operation that returns an appropriate PCS.
 
-Fixes: f589234e1af0 ("selftests: mptcp: userspace_pm: format subtests results in TAP")
-Cc: stable@vger.kernel.org
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/net/mptcp/userspace_pm.sh | 46 ++++++++++++++---------
- 1 file changed, 28 insertions(+), 18 deletions(-)
+So, I want to keep "select_pcs" as at least a suffix, because it
+is selecting a PCS. Eventually, I would like to see the stmmac
+implementations check the "interface" passed to it before deciding
+whether to return a PCS or not - thus how it's intended to be
+implemented.
 
-diff --git a/tools/testing/selftests/net/mptcp/userspace_pm.sh b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-index 9e2981f2d7f5..9cb05978269d 100755
---- a/tools/testing/selftests/net/mptcp/userspace_pm.sh
-+++ b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-@@ -160,10 +160,12 @@ make_connection()
- 	local is_v6=$1
- 	local app_port=$app4_port
- 	local connect_addr="10.0.1.1"
-+	local client_addr="10.0.1.2"
- 	local listen_addr="0.0.0.0"
- 	if [ "$is_v6" = "v6" ]
- 	then
- 		connect_addr="dead:beef:1::1"
-+		client_addr="dead:beef:1::2"
- 		listen_addr="::"
- 		app_port=$app6_port
- 	else
-@@ -206,6 +208,7 @@ make_connection()
- 		   [ "$server_serverside" = 1 ]
- 	then
- 		test_pass
-+		print_title "Connection info: ${client_addr}:${client_port} -> ${connect_addr}:${app_port}"
- 	else
- 		test_fail "Expected tokens (c:${client_token} - s:${server_token}) and server (c:${client_serverside} - s:${server_serverside})"
- 		mptcp_lib_result_print_all_tap
-@@ -297,7 +300,7 @@ test_announce()
- 	ip netns exec "$ns2"\
- 	   ./pm_nl_ctl ann 10.0.2.2 token "$client4_token" id $client_addr_id dev\
- 	   ns2eth1
--	print_test "ADD_ADDR id:${client_addr_id} 10.0.2.2 (ns2) => ns1, reuse port"
-+	print_test "ADD_ADDR id:client 10.0.2.2 (ns2) => ns1, reuse port"
- 	sleep 0.5
- 	verify_announce_event $server_evts $ANNOUNCED $server4_token "10.0.2.2" $client_addr_id \
- 			      "$client4_port"
-@@ -306,7 +309,7 @@ test_announce()
- 	:>"$server_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl ann\
- 	   dead:beef:2::2 token "$client6_token" id $client_addr_id dev ns2eth1
--	print_test "ADD_ADDR6 id:${client_addr_id} dead:beef:2::2 (ns2) => ns1, reuse port"
-+	print_test "ADD_ADDR6 id:client dead:beef:2::2 (ns2) => ns1, reuse port"
- 	sleep 0.5
- 	verify_announce_event "$server_evts" "$ANNOUNCED" "$server6_token" "dead:beef:2::2"\
- 			      "$client_addr_id" "$client6_port" "v6"
-@@ -316,7 +319,7 @@ test_announce()
- 	client_addr_id=$((client_addr_id+1))
- 	ip netns exec "$ns2" ./pm_nl_ctl ann 10.0.2.2 token "$client4_token" id\
- 	   $client_addr_id dev ns2eth1 port $new4_port
--	print_test "ADD_ADDR id:${client_addr_id} 10.0.2.2 (ns2) => ns1, new port"
-+	print_test "ADD_ADDR id:client+1 10.0.2.2 (ns2) => ns1, new port"
- 	sleep 0.5
- 	verify_announce_event "$server_evts" "$ANNOUNCED" "$server4_token" "10.0.2.2"\
- 			      "$client_addr_id" "$new4_port"
-@@ -327,7 +330,7 @@ test_announce()
- 	# ADD_ADDR from the server to client machine reusing the subflow port
- 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server4_token" id\
- 	   $server_addr_id dev ns1eth2
--	print_test "ADD_ADDR id:${server_addr_id} 10.0.2.1 (ns1) => ns2, reuse port"
-+	print_test "ADD_ADDR id:server 10.0.2.1 (ns1) => ns2, reuse port"
- 	sleep 0.5
- 	verify_announce_event "$client_evts" "$ANNOUNCED" "$client4_token" "10.0.2.1"\
- 			      "$server_addr_id" "$app4_port"
-@@ -336,7 +339,7 @@ test_announce()
- 	:>"$client_evts"
- 	ip netns exec "$ns1" ./pm_nl_ctl ann dead:beef:2::1 token "$server6_token" id\
- 	   $server_addr_id dev ns1eth2
--	print_test "ADD_ADDR6 id:${server_addr_id} dead:beef:2::1 (ns1) => ns2, reuse port"
-+	print_test "ADD_ADDR6 id:server dead:beef:2::1 (ns1) => ns2, reuse port"
- 	sleep 0.5
- 	verify_announce_event "$client_evts" "$ANNOUNCED" "$client6_token" "dead:beef:2::1"\
- 			      "$server_addr_id" "$app6_port" "v6"
-@@ -346,7 +349,7 @@ test_announce()
- 	server_addr_id=$((server_addr_id+1))
- 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server4_token" id\
- 	   $server_addr_id dev ns1eth2 port $new4_port
--	print_test "ADD_ADDR id:${server_addr_id} 10.0.2.1 (ns1) => ns2, new port"
-+	print_test "ADD_ADDR id:server+1 10.0.2.1 (ns1) => ns2, new port"
- 	sleep 0.5
- 	verify_announce_event "$client_evts" "$ANNOUNCED" "$client4_token" "10.0.2.1"\
- 			      "$server_addr_id" "$new4_port"
-@@ -380,7 +383,7 @@ test_remove()
- 	local invalid_token=$(( client4_token - 1 ))
- 	ip netns exec "$ns2" ./pm_nl_ctl rem token $invalid_token id\
- 	   $client_addr_id > /dev/null 2>&1
--	print_test "RM_ADDR id:${client_addr_id} ns2 => ns1, invalid token"
-+	print_test "RM_ADDR id:client ns2 => ns1, invalid token"
- 	local type
- 	type=$(mptcp_lib_evts_get_info type "$server_evts")
- 	if [ "$type" = "" ]
-@@ -394,7 +397,7 @@ test_remove()
- 	local invalid_id=$(( client_addr_id + 1 ))
- 	ip netns exec "$ns2" ./pm_nl_ctl rem token "$client4_token" id\
- 	   $invalid_id > /dev/null 2>&1
--	print_test "RM_ADDR id:${invalid_id} ns2 => ns1, invalid id"
-+	print_test "RM_ADDR id:client+1 ns2 => ns1, invalid id"
- 	type=$(mptcp_lib_evts_get_info type "$server_evts")
- 	if [ "$type" = "" ]
- 	then
-@@ -407,7 +410,7 @@ test_remove()
- 	:>"$server_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl rem token "$client4_token" id\
- 	   $client_addr_id
--	print_test "RM_ADDR id:${client_addr_id} ns2 => ns1"
-+	print_test "RM_ADDR id:client ns2 => ns1"
- 	sleep 0.5
- 	verify_remove_event "$server_evts" "$REMOVED" "$server4_token" "$client_addr_id"
- 
-@@ -416,7 +419,7 @@ test_remove()
- 	client_addr_id=$(( client_addr_id - 1 ))
- 	ip netns exec "$ns2" ./pm_nl_ctl rem token "$client4_token" id\
- 	   $client_addr_id
--	print_test "RM_ADDR id:${client_addr_id} ns2 => ns1"
-+	print_test "RM_ADDR id:client-1 ns2 => ns1"
- 	sleep 0.5
- 	verify_remove_event "$server_evts" "$REMOVED" "$server4_token" "$client_addr_id"
- 
-@@ -424,7 +427,7 @@ test_remove()
- 	:>"$server_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl rem token "$client6_token" id\
- 	   $client_addr_id
--	print_test "RM_ADDR6 id:${client_addr_id} ns2 => ns1"
-+	print_test "RM_ADDR6 id:client-1 ns2 => ns1"
- 	sleep 0.5
- 	verify_remove_event "$server_evts" "$REMOVED" "$server6_token" "$client_addr_id"
- 
-@@ -434,7 +437,7 @@ test_remove()
- 	# RM_ADDR from the server to client machine
- 	ip netns exec "$ns1" ./pm_nl_ctl rem token "$server4_token" id\
- 	   $server_addr_id
--	print_test "RM_ADDR id:${server_addr_id} ns1 => ns2"
-+	print_test "RM_ADDR id:server ns1 => ns2"
- 	sleep 0.5
- 	verify_remove_event "$client_evts" "$REMOVED" "$client4_token" "$server_addr_id"
- 
-@@ -443,7 +446,7 @@ test_remove()
- 	server_addr_id=$(( server_addr_id - 1 ))
- 	ip netns exec "$ns1" ./pm_nl_ctl rem token "$server4_token" id\
- 	   $server_addr_id
--	print_test "RM_ADDR id:${server_addr_id} ns1 => ns2"
-+	print_test "RM_ADDR id:server-1 ns1 => ns2"
- 	sleep 0.5
- 	verify_remove_event "$client_evts" "$REMOVED" "$client4_token" "$server_addr_id"
- 
-@@ -451,7 +454,7 @@ test_remove()
- 	:>"$client_evts"
- 	ip netns exec "$ns1" ./pm_nl_ctl rem token "$server6_token" id\
- 	   $server_addr_id
--	print_test "RM_ADDR6 id:${server_addr_id} ns1 => ns2"
-+	print_test "RM_ADDR6 id:server-1 ns1 => ns2"
- 	sleep 0.5
- 	verify_remove_event "$client_evts" "$REMOVED" "$client6_token" "$server_addr_id"
- }
-@@ -479,8 +482,14 @@ verify_subflow_events()
- 	local locid
- 	local remid
- 	local info
-+	local e_dport_txt
- 
--	info="${e_saddr} (${e_from}) => ${e_daddr}:${e_dport} (${e_to})"
-+	# only display the fixed ports
-+	if [ "${e_dport}" -ge "${app4_port}" ] && [ "${e_dport}" -le "${app6_port}" ]; then
-+		e_dport_txt=":${e_dport}"
-+	fi
-+
-+	info="${e_saddr} (${e_from}) => ${e_daddr}${e_dport_txt} (${e_to})"
- 
- 	if [ "$e_type" = "$SUB_ESTABLISHED" ]
- 	then
-@@ -766,7 +775,7 @@ test_subflows_v4_v6_mix()
- 	:>"$client_evts"
- 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server6_token" id\
- 	   $server_addr_id dev ns1eth2
--	print_test "ADD_ADDR4 id:${server_addr_id} 10.0.2.1 (ns1) => ns2, reuse port"
-+	print_test "ADD_ADDR4 id:server 10.0.2.1 (ns1) => ns2, reuse port"
- 	sleep 0.5
- 	verify_announce_event "$client_evts" "$ANNOUNCED" "$client6_token" "10.0.2.1"\
- 			      "$server_addr_id" "$app6_port"
-@@ -861,7 +870,7 @@ test_listener()
- 	local listener_pid=$!
- 
- 	sleep 0.5
--	print_test "CREATE_LISTENER 10.0.2.2:$client4_port"
-+	print_test "CREATE_LISTENER 10.0.2.2 (client port)"
- 	verify_listener_events $client_evts $LISTENER_CREATED $AF_INET 10.0.2.2 $client4_port
- 
- 	# ADD_ADDR from client to server machine reusing the subflow port
-@@ -878,13 +887,14 @@ test_listener()
- 	mptcp_lib_kill_wait $listener_pid
- 
- 	sleep 0.5
--	print_test "CLOSE_LISTENER 10.0.2.2:$client4_port"
-+	print_test "CLOSE_LISTENER 10.0.2.2 (client port)"
- 	verify_listener_events $client_evts $LISTENER_CLOSED $AF_INET 10.0.2.2 $client4_port
- }
- 
- print_title "Make connections"
- make_connection
- make_connection "v6"
-+print_title "Will be using address IDs ${client_addr_id} (client) and ${server_addr_id} (server)"
- 
- test_announce
- test_remove
+"pcs_select" seems to make it sound like it's part of a PCS
+implementation, which as I've explained above, it isn't. It also
+doesn't convey that it's selecting a PCS based on its arguments.
 
----
-base-commit: 89aa3619d141d6cfb6040a561aebb6d99d3e2285
-change-id: 20240614-upstream-net-20240614-selftests-mptcp-uspace-pm-fixed-test-names-368e312afd0b
+I'd also like to keep the ability to grep for "select_pcs" to
+find implementations and not have complex grep expressions to
+find whatever the driver has called it! To that end, I much prefer
+that drivers that name sub-implementations the same way that
+phylink names them to make grepping easier.
 
-Best regards,
 -- 
-Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
