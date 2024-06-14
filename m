@@ -1,162 +1,77 @@
-Return-Path: <netdev+bounces-103601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFBDA908C48
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:10:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6499908C5D
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:19:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12C331C21391
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:10:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D6EC1F2598A
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:19:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09F3B1991B3;
-	Fri, 14 Jun 2024 13:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F59B195961;
+	Fri, 14 Jun 2024 13:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="szKBJHBi"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2CE26ACA;
-	Fri, 14 Jun 2024 13:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82DFB19D88D
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 13:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718370631; cv=none; b=frmhxxoqsck0gHU8Oek7YTxHzpKTXEHM+QTrQL3WtPm1MS7w2wppVJfKdCN5OB6Dn5racH2FPwY6KAxFIF9TkBm/XxCq+G24nChfxs4mwVuTFfAHeyJfc+8DZSlFlLpXSsqw+ctH0hMu4YBW8C9p4b7Uj/hQ6soc2aamGa/0l10=
+	t=1718371143; cv=none; b=F3FdjpDZZcu7ckZerHEAca1ZVvniq81/gb5ZRbwordB1/mWQypKzK36u4CZGO0Uil2/Z0lrEekn5Io/UJl72QxH1hJLPfjyGffcXFMSi6qEiGZGO1LZo+SOCOhcdeh+BtRJo/TAlcXZeL8G3hNOgOmLEH10yUMDv33yrknWUs7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718370631; c=relaxed/simple;
-	bh=t6/aZbBkHavmNxAjU9DaKNPdfyzRr5nCb9srEUp31QI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qRN4MqeoldQ1LtJYW/y8V8BSjAfyyJsW5QpEDUdP8k5M4JFVEnGIfpMJtJYwXgBAcJ4bXpjceHxghsFx1VA4e7rLf8BmlNSfsGKmG3h0xghTANANBtQocsIQiFgFnwdQJFra4kPCo5kl7/CW2/xzSqQYWOO93b15miSKJI2XWuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4W10033k6XzwSSq;
-	Fri, 14 Jun 2024 21:06:11 +0800 (CST)
-Received: from canpemm500007.china.huawei.com (unknown [7.192.104.62])
-	by mail.maildlp.com (Postfix) with ESMTPS id 24AF5180081;
-	Fri, 14 Jun 2024 21:10:20 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by canpemm500007.china.huawei.com
- (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 14 Jun
- 2024 21:10:19 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <tkhai@ya.ru>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<yuehaibing@huawei.com>
-Subject: [PATCH] netns: Make get_net_ns() handle zero refcount net
-Date: Fri, 14 Jun 2024 21:13:02 +0800
-Message-ID: <20240614131302.2698509-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1718371143; c=relaxed/simple;
+	bh=m9lSb3QAWikP0J3HhBLcDNBlQ7/QWPKO+rndXKGp9Q4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I2AbPAkkIk6J/LYVs29ZMVDk14u3pnrnd5u5SBA56WV0LiTmOvwtuPPZ16aOPpMsvQcR4FSQmGyo0S7TuvnSmlLtKtundqbr9SLtUHX96K2Z12RJsXFeOe260yx7lbhIlYKuX2OQZjhdoysCSnyZvzOOX018qmLLrwa412yZ88c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=szKBJHBi; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=KrOkMNp3+uOLZeamc4MykVL0gGV2BfOa/4BAf7io1E0=; b=szKBJHBiy5P9PO6t0yc8ltTfO/
+	53sGmfixa23tCsYCjEhR1WlSn43akXKMipnGtvXndjUWOBs88BpA2C+QgUNO6VeiM6B1XBO+R61Nj
+	hAE2XO9kohZlWEqp5kZ2VRLof69pB6AyA3he4WTFav7S6+qn5/m4btZoFRyyiall4D30=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sI6pV-00044L-3r; Fri, 14 Jun 2024 15:18:57 +0200
+Date: Fri, 14 Jun 2024 15:18:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+Cc: netdev@vger.kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
+	horms@kernel.org, Tristram.Ha@microchip.com,
+	Arun.Ramadoss@microchip.com
+Subject: Re: [PATCH net v6 1/3] net: phy: micrel: add Microchip KSZ 9477 to
+ the device table
+Message-ID: <c4198e44-0f75-4486-88c9-ee6e3d8b0d08@lunn.ch>
+References: <20240614094642.122464-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+ <20240614094642.122464-2-enguerrand.de-ribaucourt@savoirfairelinux.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- canpemm500007.china.huawei.com (7.192.104.62)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240614094642.122464-2-enguerrand.de-ribaucourt@savoirfairelinux.com>
 
-Syzkaller hit a warning:
-refcount_t: addition on 0; use-after-free.
-WARNING: CPU: 3 PID: 7890 at lib/refcount.c:25 refcount_warn_saturate+0xdf/0x1d0
-Modules linked in:
-CPU: 3 PID: 7890 Comm: tun Not tainted 6.10.0-rc3-00100-gcaa4f9578aba-dirty #310
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-RIP: 0010:refcount_warn_saturate+0xdf/0x1d0
-Code: 41 49 04 31 ff 89 de e8 9f 1e cd fe 84 db 75 9c e8 76 26 cd fe c6 05 b6 41 49 04 01 90 48 c7 c7 b8 8e 25 86 e8 d2 05 b5 fe 90 <0f> 0b 90 90 e9 79 ff ff ff e8 53 26 cd fe 0f b6 1
-RSP: 0018:ffff8881067b7da0 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff811c72ac
-RDX: ffff8881026a2140 RSI: ffffffff811c72b5 RDI: 0000000000000001
-RBP: ffff8881067b7db0 R08: 0000000000000000 R09: 205b5d3730353139
-R10: 0000000000000000 R11: 205d303938375420 R12: ffff8881086500c4
-R13: ffff8881086500c4 R14: ffff8881086500b0 R15: ffff888108650040
-FS:  00007f5b2961a4c0(0000) GS:ffff88823bd00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055d7ed36fd18 CR3: 00000001482f6000 CR4: 00000000000006f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ? show_regs+0xa3/0xc0
- ? __warn+0xa5/0x1c0
- ? refcount_warn_saturate+0xdf/0x1d0
- ? report_bug+0x1fc/0x2d0
- ? refcount_warn_saturate+0xdf/0x1d0
- ? handle_bug+0xa1/0x110
- ? exc_invalid_op+0x3c/0xb0
- ? asm_exc_invalid_op+0x1f/0x30
- ? __warn_printk+0xcc/0x140
- ? __warn_printk+0xd5/0x140
- ? refcount_warn_saturate+0xdf/0x1d0
- get_net_ns+0xa4/0xc0
- ? __pfx_get_net_ns+0x10/0x10
- open_related_ns+0x5a/0x130
- __tun_chr_ioctl+0x1616/0x2370
- ? __sanitizer_cov_trace_switch+0x58/0xa0
- ? __sanitizer_cov_trace_const_cmp2+0x1c/0x30
- ? __pfx_tun_chr_ioctl+0x10/0x10
- tun_chr_ioctl+0x2f/0x40
- __x64_sys_ioctl+0x11b/0x160
- x64_sys_call+0x1211/0x20d0
- do_syscall_64+0x9e/0x1d0
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f5b28f165d7
-Code: b3 66 90 48 8b 05 b1 48 2d 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 81 48 2d 00 8
-RSP: 002b:00007ffc2b59c5e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f5b28f165d7
-RDX: 0000000000000000 RSI: 00000000000054e3 RDI: 0000000000000003
-RBP: 00007ffc2b59c650 R08: 00007f5b291ed8c0 R09: 00007f5b2961a4c0
-R10: 0000000029690010 R11: 0000000000000246 R12: 0000000000400730
-R13: 00007ffc2b59cf40 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-Kernel panic - not syncing: kernel: panic_on_warn set ...
+On Fri, Jun 14, 2024 at 09:46:40AM +0000, Enguerrand de Ribaucourt wrote:
+> PHY_ID_KSZ9477 was supported but not added to the device table passed to
+> MODULE_DEVICE_TABLE.
+> 
+> Fixes: fc3973a1fa09 ("phy: micrel: add Microchip KSZ 9477 Switch PHY support")
+> Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
 
-This is trigger as below:
-          ns0                                    ns1
-tun_set_iff() //dev is tun0
-   tun->dev = dev
-//ip link set tun0 netns ns1
-                                       put_net() //ref is 0
-__tun_chr_ioctl() //TUNGETDEVNETNS
-   net = dev_net(tun->dev);
-   open_related_ns(&net->ns, get_net_ns); //ns1
-     get_net_ns()
-        get_net() //addition on 0
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Use maybe_get_net() in get_net_ns in case net's ref is zero to fix this
-
-Fixes: 0c3e0e3bb623 ("tun: Add ioctl() TUNGETDEVNETNS cmd to allow obtaining real net ns of tun device")
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- net/core/net_namespace.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 4f7a61688d18..6a823ba906c6 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -693,11 +693,16 @@ EXPORT_SYMBOL_GPL(__put_net);
-  * get_net_ns - increment the refcount of the network namespace
-  * @ns: common namespace (net)
-  *
-- * Returns the net's common namespace.
-+ * Returns the net's common namespace or ERR_PTR() if ref is zero.
-  */
- struct ns_common *get_net_ns(struct ns_common *ns)
- {
--	return &get_net(container_of(ns, struct net, ns))->ns;
-+	struct net *net;
-+
-+	net = maybe_get_net(container_of(ns, struct net, ns));
-+	if (net)
-+		return &net->ns;
-+	return ERR_PTR(-EINVAL);
- }
- EXPORT_SYMBOL_GPL(get_net_ns);
- 
--- 
-2.34.1
-
+    Andrew
 
