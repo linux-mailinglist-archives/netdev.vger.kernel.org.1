@@ -1,303 +1,137 @@
-Return-Path: <netdev+bounces-103603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0E6A908C4D
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:10:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4F49908C41
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:08:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D988B24A66
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:10:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F80D1C257C0
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 13:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A110A19AD99;
-	Fri, 14 Jun 2024 13:10:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 888EB19A2B5;
+	Fri, 14 Jun 2024 13:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="P6EpU0QI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bmIkdB6S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C0B195807;
-	Fri, 14 Jun 2024 13:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6DA218FC65
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 13:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718370639; cv=none; b=eaZ7OPrjKofzRt4efXZDtPOrckndSu6jYJWTnGBdVOcB5mPLHsCJfH7AfJ9EzjcKyudVqPFG7A57YMpjKrGgZbRxJnAxJoizzZQhCLVHP7TePyCKK+ofF80YTUBqmT11Zk/Nc7nJqsRUQYTYPkgn0ErbtIeqEaHZKkDPkweE8m8=
+	t=1718370530; cv=none; b=N+kcSNJXEpD5AEK5fHo4XDfYk+Gw6VDLi0YrkyPvLVvEBWEvm1OLh0Nu+XwixXuDIO46qW1NZF1SDeQXVIqMLEYvTJ4DFLMDt5iAue9sjYuzNrSWz59F2XYwXiokOj/YoG/Hkd2elwuhAkRQHvT4pmcy84id2GFpfWcjJAMyytI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718370639; c=relaxed/simple;
-	bh=JvvA6l2G2REf3JBSFgFR8doBSOSy5252PpOPT6cr/sI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UfUtxytbTob6O30agQN4lIeKePaip5ViLEa43+PZI21UwjswwsXR5tZdbIA+yd5sHTtdouzf9afiu4+abQtv+KSFik3GyIs/yY9Qh40SiO4QzdJCg2ZMFoF0dQrHTKKLIl/xdB1C+5XQIxu9LIT6FUTi6WfdJzAwS2rjUbF38mQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=P6EpU0QI; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45E8kead019656;
-	Fri, 14 Jun 2024 15:09:54 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	wxtvJM/S8LG5cPErR7HthqNE9krEBOGgu5Sip7uN34o=; b=P6EpU0QIwUVS06SA
-	7FdNG+PgNaanMcpLqF6lrWueyoVrsrwj4Ukh5oxh4wQIt1xlerQzvgiwHqOHrptO
-	cptuUYsGCY6DhzQdvateVbKL72jKvZopEUdF46J7boEAg2U7EPGvRc8jktjbtx7+
-	235WNQwJZtEsz6WRwokbs4KbyymN0QYXTgmuIHrgiwRii/6MtNPIq0atIfjMEnkq
-	K9/jOOVKs75EPFghGZJcSnzOKvRltPzHpZr7IP1XRS6BxyUNif6vICmVT5AgSWSL
-	LchSh8WOBzCFQ8gnJI4mXLgzxRQ46m5xcKedt73hB9glIIwZZx4NcJo3x1FVTcl+
-	0c+pgw==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ypbp2rr88-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Jun 2024 15:09:54 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 11C4540047;
-	Fri, 14 Jun 2024 15:09:38 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id AB225214D2C;
-	Fri, 14 Jun 2024 15:08:24 +0200 (CEST)
-Received: from localhost (10.252.5.68) by SHFDAG1NODE2.st.com (10.75.129.70)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 14 Jun
- 2024 15:08:23 +0200
-From: Christophe Roullier <christophe.roullier@foss.st.com>
-To: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
-        Mark
- Brown <broonie@kernel.org>,
-        Christophe Roullier
-	<christophe.roullier@foss.st.com>,
-        Marek Vasut <marex@denx.de>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: [net-next,PATCH 2/2] net: stmmac: dwmac-stm32: stm32: add management of stm32mp25 for stm32
-Date: Fri, 14 Jun 2024 15:08:12 +0200
-Message-ID: <20240614130812.72425-3-christophe.roullier@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240614130812.72425-1-christophe.roullier@foss.st.com>
-References: <20240614130812.72425-1-christophe.roullier@foss.st.com>
+	s=arc-20240116; t=1718370530; c=relaxed/simple;
+	bh=RhpMA204NZDYJYNHGbObqP1HVKtXQG0aL387cmYERWI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hmlu61c2T2IkH3De39j3SQfChbkH6WET3PqryAMGmf6eenWR3tgQY5c9Z146pHOWcLAUMvgLOp1cvN8beT9L8A2HxxaprR02XkKcDZrmmoLSF8PWdYtc0jO5ErEBm6cAXZoQn1ClZ1Qu1iw1j0dSsdH8n7gVH76LJMsgvwChX7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bmIkdB6S; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718370527;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=o66M81Kt0vn1cGekbi5B1k+DRIpH0j0EOW3GSkaUuxs=;
+	b=bmIkdB6SvbKNXyGXLBFSBQef9LtjM9/BuLB5F8q14N1Uu0o8SXPTvjywupWznOkZOpkZhH
+	81OLO+87jo9mx7Ev6X4XZgxuANkUiltab2hmjuOPQbJvCTc2b5cL/CUd23sGjpLUXNiMDG
+	KajrxVkrEGsO7I2Hzh3+XaN9rVV014o=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-417-dKiANskbNfKdONDsPGSgog-1; Fri, 14 Jun 2024 09:08:46 -0400
+X-MC-Unique: dKiANskbNfKdONDsPGSgog-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2ebf477ed09so3617661fa.0
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 06:08:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718370524; x=1718975324;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=o66M81Kt0vn1cGekbi5B1k+DRIpH0j0EOW3GSkaUuxs=;
+        b=E2kcBH2w5ETaJeB7HEDsPIacOSfIAO4LmPJcpPWzPxdma1CUpfpOCo9fHnfFTbWQfd
+         qJ+0DEoyh8Wg0sB7tNKYIl7PUNJ1xdw4tLBNWaDDDmfiEtG4f+ce1PquK1W0vEE6IX9l
+         JyNctps1LgrIchAgXrPNOlFPH5KvasnA/Sy5mjADP5wREmRFeJ7+JFROAvU/t8fsMFsb
+         cZUgHRKI/YXtkmTdgrldu0jR3We1x+SROeBhxNNJQtSl8B5cncnpQS1H+3laYtU+EcSv
+         SFvq6o1grWu2MPjNa5L0/XJuMpm8qO0ByxlNCYnloR48CLOoQqzy2DOGGNLsnXF5X1Lg
+         n7Ig==
+X-Forwarded-Encrypted: i=1; AJvYcCVX6deEjD3YbKeWCkir8rcxU3QCjPg8dkbiIKdQw0URJRITpa28kUr2CBvJ/hhyFn2sygV3EhoBzV+IjGkVc8iQggYOao5T
+X-Gm-Message-State: AOJu0Yx94NYjq1rWvS6beKGeJtKVOwbx0YpJhlkI8TIJ3vLH+vxvoeZ+
+	9yF/cEPbO4gvrpEdLkbu/EgZYtqY7EBg/A+QJBpJyH8kLwQn9g9D9wWPy4BnNvctmUVS8KJgfX3
+	Z/phSah4l8EgFb/Eq716mfGdE0wfv1QEfIdZw/o4i/B1+jHVko6SMSTx6kNLGcg==
+X-Received: by 2002:ac2:5f5b:0:b0:52c:a7c8:ec3c with SMTP id 2adb3069b0e04-52ca7c8ecf1mr1344573e87.0.1718370524056;
+        Fri, 14 Jun 2024 06:08:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHJ57w4Gx5dDKQsq3VemcAEipsIPrhuSF7VcNJmUPeZ0WTy/9bR151y62TJZ0xzmZpmJBwfPA==
+X-Received: by 2002:ac2:5f5b:0:b0:52c:a7c8:ec3c with SMTP id 2adb3069b0e04-52ca7c8ecf1mr1344560e87.0.1718370523593;
+        Fri, 14 Jun 2024 06:08:43 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b083:7210::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42286eef9c1sm98099655e9.7.2024.06.14.06.08.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jun 2024 06:08:43 -0700 (PDT)
+Message-ID: <1b99efc20adda0b1f24ec477b3612caedb704374.camel@redhat.com>
+Subject: Re: [PATCH] hippi: fix possible buffer overflow caused by bad DMA
+ value in rr_start_xmit()
+From: Paolo Abeni <pabeni@redhat.com>
+To: Huai-Yuan Liu <qq810974084@gmail.com>, jes@trained-monkey.org, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org
+Cc: linux-hippi@sunsite.dk, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, baijiaju1990@gmail.com
+Date: Fri, 14 Jun 2024 15:08:41 +0200
+In-Reply-To: <20240612093153.297167-1-qq810974084@gmail.com>
+References: <20240612093153.297167-1-qq810974084@gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-14_10,2024-06-14_03,2024-05-17_01
 
-Add Ethernet support for STM32MP25.
-STM32MP25 is STM32 SOC with 2 GMACs instances.
-GMAC IP version is SNPS 5.3x.
-GMAC IP configure with 2 RX and 4 TX queue.
-DMA HW capability register supported
-RX Checksum Offload Engine supported
-TX Checksum insertion supported
-Wake-Up On Lan supported
-TSO supported
+On Wed, 2024-06-12 at 17:31 +0800, Huai-Yuan Liu wrote:
+> The value rrpriv->info->tx_ctrl is stored in DMA memory, and it is
+> assigned to txctrl, so txctrl->pi can be modified at any time by maliciou=
+s
+> hardware. Becausetxctrl->pi is assigned to index, buffer overflow may
+> occur when the code "rrpriv->tx_skbuff[index]" is executed.
+>=20
+> To address this issue, the index should be checked.
+>=20
+> Fixes: f33a7251c825 ("hippi: switch from 'pci_' to 'dma_' API")
+> Signed-off-by: Huai-Yuan Liu <qq810974084@gmail.com>
+> ---
+>  drivers/net/hippi/rrunner.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/drivers/net/hippi/rrunner.c b/drivers/net/hippi/rrunner.c
+> index aa8f828a0ae7..184f0933bca0 100644
+> --- a/drivers/net/hippi/rrunner.c
+> +++ b/drivers/net/hippi/rrunner.c
+> @@ -1440,6 +1440,11 @@ static netdev_tx_t rr_start_xmit(struct sk_buff *s=
+kb,
+>  	txctrl =3D &rrpriv->info->tx_ctrl;
+> =20
+>  	index =3D txctrl->pi;
+> +	if (index < 0 || index >=3D TX_RING_ENTRIES) {
 
-Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
----
- .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 121 +++++++++++++++---
- 1 file changed, 104 insertions(+), 17 deletions(-)
+'index' is u32, the first condition is not needed.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-index b2db0e26c4e4..49685fc9c7ee 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-@@ -53,7 +53,18 @@
- #define SYSCFG_MCU_ETH_SEL_MII		0
- #define SYSCFG_MCU_ETH_SEL_RMII		1
- 
--/* STM32MP1 register definitions
-+/* STM32MP2 register definitions */
-+#define SYSCFG_MP2_ETH_MASK		GENMASK(31, 0)
-+
-+#define SYSCFG_ETHCR_ETH_PTP_CLK_SEL	BIT(2)
-+#define SYSCFG_ETHCR_ETH_CLK_SEL	BIT(1)
-+#define SYSCFG_ETHCR_ETH_REF_CLK_SEL	BIT(0)
-+
-+#define SYSCFG_ETHCR_ETH_SEL_MII	0
-+#define SYSCFG_ETHCR_ETH_SEL_RGMII	BIT(4)
-+#define SYSCFG_ETHCR_ETH_SEL_RMII	BIT(6)
-+
-+/* STM32MPx register definitions
-  *
-  * Below table summarizes the clock requirement and clock sources for
-  * supported phy interface modes.
-@@ -277,6 +288,49 @@ static int stm32mp1_configure_pmcr(struct plat_stmmacenet_data *plat_dat)
- 				 dwmac->mode_mask, val);
- }
- 
-+static int stm32mp2_configure_syscfg(struct plat_stmmacenet_data *plat_dat)
-+{
-+	struct stm32_dwmac *dwmac = plat_dat->bsp_priv;
-+	u32 reg = dwmac->mode_reg;
-+	int val = 0;
-+
-+	switch (plat_dat->mac_interface) {
-+	case PHY_INTERFACE_MODE_MII:
-+		break;
-+	case PHY_INTERFACE_MODE_GMII:
-+		if (dwmac->enable_eth_ck)
-+			val |= SYSCFG_ETHCR_ETH_CLK_SEL;
-+		break;
-+	case PHY_INTERFACE_MODE_RMII:
-+		val = SYSCFG_ETHCR_ETH_SEL_RMII;
-+		if (dwmac->enable_eth_ck)
-+			val |= SYSCFG_ETHCR_ETH_REF_CLK_SEL;
-+		break;
-+	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+		val = SYSCFG_ETHCR_ETH_SEL_RGMII;
-+		if (dwmac->enable_eth_ck)
-+			val |= SYSCFG_ETHCR_ETH_CLK_SEL;
-+		break;
-+	default:
-+		dev_err(dwmac->dev, "Mode %s not supported",
-+			phy_modes(plat_dat->mac_interface));
-+		/* Do not manage others interfaces */
-+		return -EINVAL;
-+	}
-+
-+	dev_dbg(dwmac->dev, "Mode %s", phy_modes(plat_dat->mac_interface));
-+
-+	/*  select PTP (IEEE1588) clock selection from RCC (ck_ker_ethxptp) */
-+	val |= SYSCFG_ETHCR_ETH_PTP_CLK_SEL;
-+
-+	/* Update ETHCR (set register) */
-+	return regmap_update_bits(dwmac->regmap, reg,
-+				 SYSCFG_MP2_ETH_MASK, val);
-+}
-+
- static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
- {
- 	int ret;
-@@ -292,6 +346,21 @@ static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
- 	return stm32mp1_configure_pmcr(plat_dat);
- }
- 
-+static int stm32mp2_set_mode(struct plat_stmmacenet_data *plat_dat)
-+{
-+	int ret;
-+
-+	ret = stm32mp1_select_ethck_external(plat_dat);
-+	if (ret)
-+		return ret;
-+
-+	ret = stm32mp1_validate_ethck_rate(plat_dat);
-+	if (ret)
-+		return ret;
-+
-+	return stm32mp2_configure_syscfg(plat_dat);
-+}
-+
- static int stm32mcu_set_mode(struct plat_stmmacenet_data *plat_dat)
- {
- 	struct stm32_dwmac *dwmac = plat_dat->bsp_priv;
-@@ -348,12 +417,6 @@ static int stm32_dwmac_parse_data(struct stm32_dwmac *dwmac,
- 		return PTR_ERR(dwmac->clk_rx);
- 	}
- 
--	if (dwmac->ops->parse_data) {
--		err = dwmac->ops->parse_data(dwmac, dev);
--		if (err)
--			return err;
--	}
--
- 	/* Get mode register */
- 	dwmac->regmap = syscon_regmap_lookup_by_phandle(np, "st,syscon");
- 	if (IS_ERR(dwmac->regmap))
-@@ -365,20 +428,14 @@ static int stm32_dwmac_parse_data(struct stm32_dwmac *dwmac,
- 		return err;
- 	}
- 
--	dwmac->mode_mask = SYSCFG_MP1_ETH_MASK;
--	err = of_property_read_u32_index(np, "st,syscon", 2, &dwmac->mode_mask);
--	if (err) {
--		if (dwmac->ops->is_mp13)
--			dev_err(dev, "Sysconfig register mask must be set (%d)\n", err);
--		else
--			dev_dbg(dev, "Warning sysconfig register mask not set\n");
--	}
-+	if (dwmac->ops->parse_data)
-+		err = dwmac->ops->parse_data(dwmac, dev);
- 
- 	return err;
- }
- 
--static int stm32mp1_parse_data(struct stm32_dwmac *dwmac,
--			       struct device *dev)
-+static int stm32mpx_common_parse_data(struct stm32_dwmac *dwmac,
-+				      struct device *dev)
- {
- 	struct platform_device *pdev = to_platform_device(dev);
- 	struct device_node *np = dev->of_node;
-@@ -439,6 +496,27 @@ static int stm32mp1_parse_data(struct stm32_dwmac *dwmac,
- 	return err;
- }
- 
-+static int stm32mp1_parse_data(struct stm32_dwmac *dwmac,
-+			       struct device *dev)
-+{
-+	struct device_node *np = dev->of_node;
-+	int err = 0;
-+
-+	if (stm32mpx_common_parse_data(dwmac, dev))
-+		return err;
-+
-+	dwmac->mode_mask = SYSCFG_MP1_ETH_MASK;
-+	err = of_property_read_u32_index(np, "st,syscon", 2, &dwmac->mode_mask);
-+	if (err) {
-+		if (dwmac->ops->is_mp13)
-+			dev_err(dev, "Sysconfig register mask must be set (%d)\n", err);
-+		else
-+			dev_dbg(dev, "Warning sysconfig register mask not set\n");
-+	}
-+
-+	return err;
-+}
-+
- static int stm32_dwmac_probe(struct platform_device *pdev)
- {
- 	struct plat_stmmacenet_data *plat_dat;
-@@ -586,10 +664,19 @@ static struct stm32_ops stm32mp13_dwmac_data = {
- 	.clk_rx_enable_in_suspend = true
- };
- 
-+static struct stm32_ops stm32mp25_dwmac_data = {
-+	.set_mode = stm32mp2_set_mode,
-+	.suspend = stm32mp1_suspend,
-+	.resume = stm32mp1_resume,
-+	.parse_data = stm32mpx_common_parse_data,
-+	.clk_rx_enable_in_suspend = true
-+};
-+
- static const struct of_device_id stm32_dwmac_match[] = {
- 	{ .compatible = "st,stm32-dwmac", .data = &stm32mcu_dwmac_data},
- 	{ .compatible = "st,stm32mp1-dwmac", .data = &stm32mp1_dwmac_data},
- 	{ .compatible = "st,stm32mp13-dwmac", .data = &stm32mp13_dwmac_data},
-+	{ .compatible = "st,stm32mp25-dwmac", .data = &stm32mp25_dwmac_data},
- 	{ }
- };
- MODULE_DEVICE_TABLE(of, stm32_dwmac_match);
--- 
-2.25.1
+> +		printk("invalid index value %02x\n", index);
+
+please use netdev_err() instead.
+
+Thanks,
+
+Paolo
 
 
