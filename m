@@ -1,103 +1,202 @@
-Return-Path: <netdev+bounces-103649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E75C908E69
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 17:15:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98FAE908DDE
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 16:51:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E132E28AF15
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 15:15:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 250C02822AA
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 14:51:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4037019B5A5;
-	Fri, 14 Jun 2024 15:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E58BE65;
+	Fri, 14 Jun 2024 14:51:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rJSYDq3n"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="mkbY3dCt"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4623919AA6E;
-	Fri, 14 Jun 2024 15:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680BC3E49E;
+	Fri, 14 Jun 2024 14:51:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718377900; cv=none; b=qpTEASackckHNaD9xUMs++/BPslxaQ9IWlPo+ra2H7N4gOd7fPlWY52A44JYc/Oyyfb/GjEVwmr0KwPv84Hb4HynkGL0uJdMEGkbO6tSLm2id2gd4MJ7qBph8KIQ5ty+D9RCIAa9jnOkHpzD6cvNh4x/df+Ps/ODd3SFGUYb8Jc=
+	t=1718376663; cv=none; b=k8X5QMj5roYnoJoGtXZx6ZziA5WiRj/e66on5/qGY4GBTngprDEfe13gSTJ3Mnh28AHI1s1C+Sl1KinPvPQVEvkKS7A9qGLBxYvLy2bofncUYCQZKOfxsod4f0wuRfFJdiBKozRzkioHJGHO4UN6dg34HLXQJalrebkxhy4VyHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718377900; c=relaxed/simple;
-	bh=/3Mg5rIwDCahxGgJ6iiybRmVjRLsews/D+g4t1liyx0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gLFw2AhO6fQqgJ/Yw/XovAnulKiYlx3vtjv+WH8RK5abA+pn7IvS1JL50auM+9ZULqtMB/nKxJlO5/wCYRMhURl9Iyy5y2MRBx6HkH3xVFo1qwDkOCG6Moo85NI3F1wy4RukSudQupWQYpHvdN0z9R6EQpjhUKqqBP/kcem50Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rJSYDq3n; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=bfVN5YN8JhVjpssbPI26uslRFd4p7nnZEhkAMORv9XM=; b=rJSYDq3nwAThqM8pk0ZJ+N9e74
-	TPoy0AM3t84gM/r3tHQE1vUj/c1wpZe8mZTmb35nvVPCAumadBWluGk5SelJDcpQOKLKT3TDA/QoI
-	05lnooBitw/KIhJNOt3chdZr095Qq707t7gsmpyQ7TJgSap1S1HzoZgcPKU+7OC/lgiY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sI8Cv-0004TC-Hl; Fri, 14 Jun 2024 16:47:13 +0200
-Date: Fri, 14 Jun 2024 16:47:13 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Paul Geurts <paul.geurts@prodrive-technologies.com>
-Cc: wei.fang@nxp.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, imx@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] fec_main: Register net device before initializing the
- MDIO bus
-Message-ID: <222fed4c-1613-40ec-b0a2-35b181fac795@lunn.ch>
-References: <51faeed2-6a6b-439b-80e6-8cf2b5ce401a@lunn.ch>
- <20240614084050.1205641-1-paul.geurts@prodrive-technologies.com>
+	s=arc-20240116; t=1718376663; c=relaxed/simple;
+	bh=sri2A0ayJbrzdKWKAvmUFe3YY4mrTnbaZ63M+nVED+8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ovhny6r4RPq+LbgPGWcKzUXq3zQxYAyZmrEWwctr2mm/WuA+V0mVwHT6YJmGUP5gCGSX1uI5h3Nsm6fq1JRkJqCfNQGby6qhgvXRK5YfNA35gOMNZdrIhnne48WASJnXl7UvuW6x40jDNgYaqJrOwSd7NFU/stW9l1fGGk9bovo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=mkbY3dCt; arc=none smtp.client-ip=212.227.15.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1718376647; x=1718981447; i=wahrenst@gmx.net;
+	bh=WulOT9HA+qRUhT4J0i1kdDLEP5zluj749l5FNLCA2Kw=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:
+	 MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=mkbY3dCtIWFqjkwjHu/YykC455R+KGYJX0yUk5XT2uqcASa6PwC6N9UDatFvwEuS
+	 ra8pAXeUFvKCzhnXRR1aQYYTcen6chn4/kKagvI+OSCM29baKY/J2eRsL/8+Jcofi
+	 CDuQWnd5SFQeLULLXOD2kkIR6yBuHuCWCBnhtHjjRlONGJShOauihwv5ZAQTPrVeE
+	 cOBw0ONdVH2JSKcM2tWvRXvIo39HbAv2Y8KGP4a8qtFLvJiMvKS4XfpmX6asrymTT
+	 RoARGsTstBQI7V4avvZJcVYXQXWRy7NKGBgITXlEV0274hXNroMDjn3+ZARW4Fdqf
+	 fYdQmjt4RfrWodJkxg==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from stefanw-SCHENKER ([37.4.248.43]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MG9gE-1sARhq3wUe-00GCDd; Fri, 14
+ Jun 2024 16:50:47 +0200
+From: Stefan Wahren <wahrenst@gmx.net>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Christoph Fritz <chf.fritz@googlemail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: [PATCH] qca_spi: Make interrupt remembering atomic
+Date: Fri, 14 Jun 2024 16:50:30 +0200
+Message-Id: <20240614145030.7781-1-wahrenst@gmx.net>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240614084050.1205641-1-paul.geurts@prodrive-technologies.com>
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:MMIjMJkZN5H/uxDjyYuJvGeNKkDIiI9uqnUSl8xlTxjyPR/WdVD
+ AZrP792t7Syo+HPwIzU48uQhsasl9K3UNWVOet4IOYQ7TPRii+cAazHVWhFzdyildvQYHAi
+ OwXAzR7qgRWkcpCjLuw7fSR8UQWxPW+yUQRgUzhKMNUD9wWUPleKiAG5hD5aQMXmZeVE/Wf
+ 8emea0jLQUpW6czQ73dTA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:QKGSz+3Uq9Q=;Th4U6teX93NJ3IGoWxWmTQHrGik
+ UdQltb5tqGoF/om2W0r6W9qTkTjKRRLhCkSUmE8kD7GUBfl7t97lD5Xhv3VZbhvo7JjRwZ/ev
+ mhfBz2snMo7ScC4tKxNh5p1malrajZWxPooWKM+oiXJ3L7W5FCN6JT1bpkMxW4vM6ogAe0UB9
+ 87SZF1E6a/8aqkghRnPokbIQni1AHNVvrFO+fUJ+YSYXU3LBRpaz672q+1ggPL+oxxy9LJflR
+ ACI0fJ/blV4ZFXeJv2msWNXqoIbFunZudmLUm3DdtazvLGPx+0L9zS/Gdxik3qx52bKFa6BvI
+ oppCMxrEGCadWSUc7EsSXThFM+EtjglGlLBytvOT0h3VJfTC2lb+1UqZR6qytQ8QNdUqYuL8P
+ M03GvRmYHoqWgQrTyTucXSUl6k6PfnVzpV99QCJPN6C3RNpSk7GoyNTWuVfx5r9m+hHbyKFIA
+ uT2uxmOTE23NyDZRpybx+rDGaHCRsuGoyh9vIffUuIbW49gYcCdicbuQFD/P2uTvj22NktDg1
+ QXKf5h41BdHzJU5aYNuBforsXwDiw7bfHMZ+pqjx5B7saXj7R7ZzpGH9ZOZJ3cpJyBSy7mHor
+ HFk+lb0cBF6FF2F6nMIb0XBGYffmKGk3v+VGYcVZnz/VvzC1xwmBsnB28zYcY35zkuLr1sVf8
+ 8LRR06v3jyRJmZvKyMXcS+LH4PscRtwWYcYgIFVJecAH0QSXE54PTkURwMuysAovfYbJ/OgUd
+ xhIngupMyjHTjcXYBj2VXAOcX18OQLS+SuFXuyneWievBppmCjcr/5Vi2mLarjPhX8dpZJEew
+ 8rXqus3Ul0LIsuDPBfHEpc637+U5J7VTunh2VBc+VZGxk=
 
-On Fri, Jun 14, 2024 at 10:40:50AM +0200, Paul Geurts wrote:
-> > On Thu, Jun 13, 2024 at 04:41:11PM +0200, Paul Geurts wrote:
-> > > Registration of the FEC MDIO bus triggers a probe of all devices
-> > > connected to that bus. DSA based Ethernet switch devices connect to the
-> > > uplink Ethernet port during probe. When a DSA based, MDIO controlled
-> > > Ethernet switch is connected to FEC, it cannot connect the uplink port,
-> > > as the FEC MDIO port is registered before the net device is being
-> > > registered. This causes an unnecessary defer of the Ethernet switch
-> > > driver probe.
-> > > 
-> > > Register the net device before initializing and registering the MDIO
-> > > bus.
-> > 
-> > The problem with this is, as soon as you call register_netdev(), the
-> > device is alive and sending packets. It can be sending packets even
-> > before register_netdev() returns, e.g. in the case of NFS root. So
-> > fec_enet_open() gets called, and tried to find its PHY. But the MDIO
-> > bus is not registered yet....
-> 
-> Valid argument there. I was trying to make the initialization more efficient,
-> but you are correct.
+The whole mechanism to remember occurred SPI interrupts is not atomic,
+which could lead to unexpected behavior. So fix this by using atomic bit
+operations instead.
 
-Any changes to make this more efficient probably needs to be generic,
-and not in a specific Ethernet driver. One idea might be, when parsing
-the DT node for the MDIO bus, look to see if the device on the bus has
-a compatible which indicates it is not a PHY. If so, try to make the
-driver core put the device straight into deferred state, without even
-trying the first probe.
+Fixes: 291ab06ecf67 ("net: qualcomm: new Ethernet over SPI driver for QCA7=
+000")
+Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+=2D--
+Changes since RFC:
+- No change, just resend
 
-Also, look at driver core devlink stuff. It tries to keep track of
-resource dependencies, and only probe devices when their resources are
-available. It does not seem to understand DSA too well, and it might
-be made better. But this is complex, we have dependency loops in
-network drivers, which causes devlink issues.
+ drivers/net/ethernet/qualcomm/qca_debug.c |  6 ++----
+ drivers/net/ethernet/qualcomm/qca_spi.c   | 16 ++++++++--------
+ drivers/net/ethernet/qualcomm/qca_spi.h   |  3 +--
+ 3 files changed, 11 insertions(+), 14 deletions(-)
 
-       Andrew
+diff --git a/drivers/net/ethernet/qualcomm/qca_debug.c b/drivers/net/ether=
+net/qualcomm/qca_debug.c
+index ff3b89e9028e..ad06da0fdaa0 100644
+=2D-- a/drivers/net/ethernet/qualcomm/qca_debug.c
++++ b/drivers/net/ethernet/qualcomm/qca_debug.c
+@@ -98,10 +98,8 @@ qcaspi_info_show(struct seq_file *s, void *what)
+
+ 	seq_printf(s, "IRQ              : %d\n",
+ 		   qca->spi_dev->irq);
+-	seq_printf(s, "INTR REQ         : %u\n",
+-		   qca->intr_req);
+-	seq_printf(s, "INTR SVC         : %u\n",
+-		   qca->intr_svc);
++	seq_printf(s, "INTR             : %lx\n",
++		   qca->intr);
+
+ 	seq_printf(s, "SPI max speed    : %lu\n",
+ 		   (unsigned long)qca->spi_dev->max_speed_hz);
+diff --git a/drivers/net/ethernet/qualcomm/qca_spi.c b/drivers/net/etherne=
+t/qualcomm/qca_spi.c
+index 5799ecc88a87..8f7ce6b51a1c 100644
+=2D-- a/drivers/net/ethernet/qualcomm/qca_spi.c
++++ b/drivers/net/ethernet/qualcomm/qca_spi.c
+@@ -35,6 +35,8 @@
+
+ #define MAX_DMA_BURST_LEN 5000
+
++#define SPI_INTR 0
++
+ /*   Modules parameters     */
+ #define QCASPI_CLK_SPEED_MIN 1000000
+ #define QCASPI_CLK_SPEED_MAX 16000000
+@@ -579,14 +581,14 @@ qcaspi_spi_thread(void *data)
+ 			continue;
+ 		}
+
+-		if ((qca->intr_req =3D=3D qca->intr_svc) &&
++		if (!test_bit(SPI_INTR, &qca->intr) &&
+ 		    !qca->txr.skb[qca->txr.head])
+ 			schedule();
+
+ 		set_current_state(TASK_RUNNING);
+
+-		netdev_dbg(qca->net_dev, "have work to do. int: %d, tx_skb: %p\n",
+-			   qca->intr_req - qca->intr_svc,
++		netdev_dbg(qca->net_dev, "have work to do. int: %lu, tx_skb: %p\n",
++			   qca->intr,
+ 			   qca->txr.skb[qca->txr.head]);
+
+ 		qcaspi_qca7k_sync(qca, QCASPI_EVENT_UPDATE);
+@@ -600,8 +602,7 @@ qcaspi_spi_thread(void *data)
+ 			msleep(QCASPI_QCA7K_REBOOT_TIME_MS);
+ 		}
+
+-		if (qca->intr_svc !=3D qca->intr_req) {
+-			qca->intr_svc =3D qca->intr_req;
++		if (test_and_clear_bit(SPI_INTR, &qca->intr)) {
+ 			start_spi_intr_handling(qca, &intr_cause);
+
+ 			if (intr_cause & SPI_INT_CPU_ON) {
+@@ -663,7 +664,7 @@ qcaspi_intr_handler(int irq, void *data)
+ {
+ 	struct qcaspi *qca =3D data;
+
+-	qca->intr_req++;
++	set_bit(SPI_INTR, &qca->intr);
+ 	if (qca->spi_thread)
+ 		wake_up_process(qca->spi_thread);
+
+@@ -679,8 +680,7 @@ qcaspi_netdev_open(struct net_device *dev)
+ 	if (!qca)
+ 		return -EINVAL;
+
+-	qca->intr_req =3D 1;
+-	qca->intr_svc =3D 0;
++	set_bit(SPI_INTR, &qca->intr);
+ 	qca->sync =3D QCASPI_SYNC_UNKNOWN;
+ 	qcafrm_fsm_init_spi(&qca->frm_handle);
+
+diff --git a/drivers/net/ethernet/qualcomm/qca_spi.h b/drivers/net/etherne=
+t/qualcomm/qca_spi.h
+index d59cb2352cee..8f4808695e82 100644
+=2D-- a/drivers/net/ethernet/qualcomm/qca_spi.h
++++ b/drivers/net/ethernet/qualcomm/qca_spi.h
+@@ -81,8 +81,7 @@ struct qcaspi {
+ 	struct qcafrm_handle frm_handle;
+ 	struct sk_buff *rx_skb;
+
+-	unsigned int intr_req;
+-	unsigned int intr_svc;
++	unsigned long intr;
+ 	u16 reset_count;
+
+ #ifdef CONFIG_DEBUG_FS
+=2D-
+2.34.1
+
 
