@@ -1,119 +1,155 @@
-Return-Path: <netdev+bounces-103457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF6FE9082FC
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 06:34:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1055B90830C
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 06:40:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 284E228439D
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 04:34:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79D48B22A40
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 04:40:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C227212DD8E;
-	Fri, 14 Jun 2024 04:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF801474B1;
+	Fri, 14 Jun 2024 04:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="QWLKlybd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MrXkLg84"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809F48479;
-	Fri, 14 Jun 2024 04:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3112146D6E
+	for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 04:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718339658; cv=none; b=Hl4eAxZGb2ljfh6pRkfzHeDYcHRJpBZRehJ0wV3A0t2RpGCIZoRZRxbyblSikCRxxWMYjJE66swC6+iyRh833GRcRLNxkxyHZkaq53UTdFO2bpPdyhwto5EfI3HfF5xsrpP2ZprDZxkxR2LGFY0I4ucy6WHGuFBB/HtDZ9QlTAM=
+	t=1718340041; cv=none; b=FUNFR74VbFp/qR5EIpjnkBWyCH8gj3WinGDc5v/nsPqHy/9Y+ror4JfqEHmWOndk05go6Itcx4zQUjkMKRHjnxg2D8RTcdNnOA0/KssoNpgoqf/rH8rpnk81RbCj3ZfQA99e6iTz6lm7DysLCv/Bw6AvZP2xz2S7VJmtVm+27yg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718339658; c=relaxed/simple;
-	bh=6oLS7NlxzKsN5itD6m/GaOkmu+FsXpvr3txVhSx2uN4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fl1PXoNDKuXq+blzfbgBOa/ElMGInj3eX8r+dN3nswZf6WdiohJlc3lPE711xep8TJQnjBi6IfNTwy+snmcH4eaUbFQhg4qB69GnGTtctI9MHO3aEL5Vy/B9mJx6NjcDaVYuGiEutuW2+HnTomWmflED86uk1duY532966Mq6/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=QWLKlybd; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1718339656; x=1749875656;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6oLS7NlxzKsN5itD6m/GaOkmu+FsXpvr3txVhSx2uN4=;
-  b=QWLKlybdB8F0TrywFKHfjSIunVhwGH5O2YoSlgd/6fZL41RLmIqaCTAL
-   aj95ZaxEMuZiHdsO+vCzOFDUDYPpsO8m2JT5/lzGbOYuT+eMdp1rRcPs3
-   c0xDzOl7Jw6IKVTQtbdJ11YA+VaDPinUTRDUg6xkdQLQI7GF2QiGBiD3k
-   3/fGdQps8HfcpGm+oPIhQUmB/GCAgpk8Xux98htu64V7a5x60P3NPq/em
-   T+gRh0bzzN/JvxNGrjK5rBKwDfwKUmI5a3v44xnGVh8ipC65kil8E1Ads
-   FjSjJi+2eYBUgvTN6OvgNSNlzbGa1fonD1s0QVtwVHSvgWx7TXHqIe3Wo
-   w==;
-X-CSE-ConnectionGUID: bLxVCISsTUiZ12rdpwUNiw==
-X-CSE-MsgGUID: jnaoROPnQyGXQjHlrCKWBQ==
-X-IronPort-AV: E=Sophos;i="6.08,236,1712646000"; 
-   d="scan'208";a="194899419"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Jun 2024 21:34:15 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 13 Jun 2024 21:33:45 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Thu, 13 Jun 2024 21:33:44 -0700
-Date: Fri, 14 Jun 2024 10:00:58 +0530
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<bryan.whitehead@microchip.com>, <andrew@lunn.ch>, <sbauer@blackbox.su>,
-	<hmehrtens@maxlinear.com>, <lxu@maxlinear.com>, <hkallweit1@gmail.com>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <wojciech.drewek@intel.com>,
-	<UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net V4 1/3] net: lan743x: disable WOL upon resume to
- restore full data path operation
-Message-ID: <ZmvHgg5SDYlrO9yB@HYD-DK-UNGSW21.microchip.com>
-References: <20240612172539.28565-1-Raju.Lakkaraju@microchip.com>
- <20240612172539.28565-2-Raju.Lakkaraju@microchip.com>
- <ZmqjYEs0G9pGQTog@shell.armlinux.org.uk>
+	s=arc-20240116; t=1718340041; c=relaxed/simple;
+	bh=eNn5sF/0OujnxZsAQT7n4zaO4fElnsdrJ3NYPpfOQHs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mI550S1q7h26uNxc/mXU1YbM+v6CVKSrc5uD9lC7x+tDMRKOYYDL4fiET/9yQ/1u1e17h8cZkV6CzStSomqu0xrFFtrLz1CVIspB3THdwA7QsEJDYMPXik9/dNE6A51FYj4S+EQanwtqZNKNOa/aNmrgF8um44NcnDpEOE1ua20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MrXkLg84; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-52bc29c79fdso2387541e87.1
+        for <netdev@vger.kernel.org>; Thu, 13 Jun 2024 21:40:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718340037; x=1718944837; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kR7b6aZyZ2ErhsA0LvgqlgbPkmTng+vkDIc2255311w=;
+        b=MrXkLg84ZY8N2IswP1VtCmWEMTWgpWhAr/qg3y8gs/+8Wx/oebkTeiuJu+6sJ1EvEw
+         YD+tIMD0SMCaEoPpULoSZLbbWootuBMNRs9rOQF1RUN1mihgSq5XfzJQ7aVPG8BaWahT
+         FqvAnprGnMXDtl7l2CZ0Zy5UyQRJ/oINfqieGSf2YX2j724AcEsQSRKj2jHxlAGXBSNl
+         8jkIVFH9GtMS2wGn5UfBZ4Ziqg9DgOtozLEmmt0Xv/uLq6j72M6kfLPFfEe9qkYaeNV7
+         6M8cPpy9I8Hm4BN12Z9kO8m5CdMyJ2SOzblaIDSJ6wuinw8Oz/OD5Rl4ertjC0OOVXI5
+         zuWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718340037; x=1718944837;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kR7b6aZyZ2ErhsA0LvgqlgbPkmTng+vkDIc2255311w=;
+        b=tGgjRbnP19YNTfBsSGuLb2U13V06cwsRQ0HNHrqWVuMBkuLZyb0Ate+AvzgbYkhLhK
+         31UnPQSweExVAhK64v7XstQi2MXQlkcLrUK8gP4hGJPllYkhP/LWAQFmWT53EMdzxvMq
+         riatNiVIaMstPtwqCUf+UluXY3f/T20U+GBx6YofC3XmWCQ8fM9TvvmuizNyJiQvTa1d
+         psVhkRRqP8hEhIewKTTHDPX2g0d6p1mnE+S9o+QNWwm4PvdnqP3X00ya9/NrDFQfdy4C
+         wxeKx6TMFHeOnY/UUr50Y1PfqdL9unKaoJrHMEIFVw8bxd/W0mNKQ1En7VVCUIhaYF8i
+         T4/A==
+X-Gm-Message-State: AOJu0YwzDTQDxBI23XoLahrxkziv5uq5ChMLioByPasVmewwpwHnEMat
+	O9oDjYM0kmmp0mn3wL7ZCh3Ony1oYEFKm4gcNeY2fOCppm5PajgXKzSZBXLXI6Nci5O/7s2O8yI
+	nEhYd7tVkA5shYKNhBXdH5UQUCEP+nbjx2owB
+X-Google-Smtp-Source: AGHT+IF+QwVsnGgzoMf0Qw+xtz4R8CDXmuxU4LRGzv8WS6/BQHNgwgM8v9u52HDoANwX7UmBcb4VUEBhXtKfrjHouB0=
+X-Received: by 2002:a19:6449:0:b0:52c:84ac:8fa2 with SMTP id
+ 2adb3069b0e04-52ca6e56eb8mr1005405e87.7.1718340036348; Thu, 13 Jun 2024
+ 21:40:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <ZmqjYEs0G9pGQTog@shell.armlinux.org.uk>
+References: <20240613013557.1169171-1-almasrymina@google.com> <20240613183453.2423e23b@kernel.org>
+In-Reply-To: <20240613183453.2423e23b@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 13 Jun 2024 21:40:24 -0700
+Message-ID: <CAHS8izNqMOAONExpBwtJBqseRnyv+ukw5LbFdevQXD4zc+7thg@mail.gmail.com>
+Subject: Re: [PATCH net-next v12 00/13] Device Memory TCP
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Sergey Shtylyov <s.shtylyov@omp.ru>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Russell King,
+On Thu, Jun 13, 2024 at 6:35=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 13 Jun 2024 01:35:37 +0000 Mina Almasry wrote:
+> > v12: https://patchwork.kernel.org/project/netdevbpf/list/?series=3D8597=
+47&state=3D*
+>
+> patches 5 and 6 transiently break the build
+>
+> ../include/trace/events/page_pool.h:65:23: error: use of undeclared ident=
+ifier 'NET_IOV'
+>    65 |                   __entry->netmem & NET_IOV, __entry->pfn, __entr=
+y->release)
+>       |                                     ^
+> ../include/trace/events/page_pool.h:91:23: error: use of undeclared ident=
+ifier 'NET_IOV'
+>    91 |                   __entry->netmem & NET_IOV, __entry->pfn, __entr=
+y->hold)
+>       |                                     ^
+>
+> Looking at NIPA status the builders are 12h behind, so please don't
+> repost immediately. This series takes a lot of compute cycles to build.
+>
+> FWIW there is a docker version of NIPA checks in the nipa repo.
+>
+> https://github.com/linux-netdev/nipa/tree/main/docker
+>
+> IDK if it still works, but could help avoid mistakes..
 
-The 06/13/2024 08:44, Russell King (Oracle) wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
-> 
-> On Wed, Jun 12, 2024 at 10:55:37PM +0530, Raju Lakkaraju wrote:
-> > @@ -3728,6 +3729,30 @@ static int lan743x_pm_resume(struct device *dev)
-> >               return ret;
-> >       }
-> >
-> > +     ret = lan743x_csr_read(adapter, MAC_WK_SRC);
-> > +     netif_info(adapter, drv, adapter->netdev,
-> > +                "Wakeup source : 0x%08X\n", ret);
-> 
-> Does this need to be printed at info level, or is it a debug message?
+My sincere apologies. I have trouble with the patch-by-patch
+allmodconfig build being very slow on my setup with the headers I'm
+touching, and I've been running into false positives with the C=3D1 &
+W=3D1 checks. I've been trying to look at the nipa scripts and porting
+them over to my setup. I'll take a look at the docker image and if
+not, at least make sure the patch-by-patch allmodconfig with C=3D1 and
+W=3D1 is working.
 
-Print at info level helps the tester/sqa team to identify the root cause of
-the wake and confirm the test cases.
-In general, tester does not enable debug level messages for testing.
-
-Still, if we need to change from info to debug, i can change.
-Please let me know.
-
-> 
-> Thanks.
-> 
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-
--- 
-Thanks,                                                                         
-Raju
+--=20
+Thanks,
+Mina
 
