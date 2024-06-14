@@ -1,51 +1,63 @@
-Return-Path: <netdev+bounces-103562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 662D3908A54
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 12:42:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72DF69089A3
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 12:20:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D76F62828E2
-	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:41:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72CB91C26DD0
+	for <lists+netdev@lfdr.de>; Fri, 14 Jun 2024 10:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873BE194A4E;
-	Fri, 14 Jun 2024 10:41:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE801993BA;
+	Fri, 14 Jun 2024 10:18:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="OFslIQ+A"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362B113BAC8;
-	Fri, 14 Jun 2024 10:41:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6931A19754A;
+	Fri, 14 Jun 2024 10:18:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718361717; cv=none; b=dEe3YeQ+RGeN0KtiAeaMumctKcXFoeKpEeh3homhBBV8CiCGWAvrDbKFKMQyYEe1iKajmmLDlMx7MsWwtD+t17uWT2POB0VyTe2w1YAlYFWppXdNFWZpWEQgPS4DvkRJN01xuZkNJu2Km7V37GjF6YT+Qvzlyl7BllyCK8l0Px4=
+	t=1718360317; cv=none; b=TcBuutl1YVmPWCtJnw5ayQIsPoD22u9sjgV5d0dkbMGRFlnrSBuimBsTpYQdjr6CBegr1ecQCYKs3S6dNIxiLj1OnLDriDxiZUX7hvnBJnPmwusHnKj5jcxWKSzFSHVpeWpkn+Yb7rNFqD8qYT43IaV/6PeLBisUwKGnvGQDf6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718361717; c=relaxed/simple;
-	bh=ObrLnWLylDgIi0cwLW/8c/nXDOdv5xtSmYQL4VlAcEs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n5hXF2TllpWl3Y+azL6OD+YYuNDvLZwaBCb6UmAw4XkkEsj3p41M2+8de13wNhGtJOr46cfPVJ3/UFvMFyOSpK7m8op80PzGC7cfhFIYxsMOEZYVBLja1RBhTJR/2nWU78E/BfKT2zuDS4R6osslt53xUGb6CtQkVhGGG1QMjH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1sI4NQ-0006Nk-RT; Fri, 14 Jun 2024 12:41:48 +0200
-From: Florian Westphal <fw@strlen.de>
-To: bpf@vger.kernel.org
-Cc: martin.lau@linux.dev,
-	daniel@iogearbox.net,
+	s=arc-20240116; t=1718360317; c=relaxed/simple;
+	bh=9sQxTcB4tQcicv3SgwJlLxCQ8Gwg5BkPrUfSOqMLj5Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ocC6yR80i4xv0lJ0CdL6UJFGn0gqdT84Ffw8/RnUFYlCnhYZUKEuUq8aH8vOE2OmKVxXqj78qdimn0auvXRDDIb+EesWSvCddRD34HMQLAJaCGGdcU+APePGuR/VraGQNIvc7b8ofJ8xdTaf86IDA4iqXbtQ1snohZYfZ5gPusA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=OFslIQ+A; arc=none smtp.client-ip=95.143.211.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
+From: Denis Arefev <arefev@swemel.ru>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
+	t=1718360306;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xG1AQXuw8xV0an8P6VCKByYew/mF3CYP7qNVxhJkJ7A=;
+	b=OFslIQ+AwLcdrvdVlRhus0hfY038/oT5zqHecaJhOhY9lt6uI87bTL1iOey3o52ki1ZfDF
+	gD6WOhSiAxm9ZNmhg+DKmw5Cczm5h8vkHv7Hso2m3nA0tdVm70LD6/2Csf+sFx1LDR+wk5
+	xktdnReIjxLOvnEzl18u0YK+d7Xs4Qw=
+To: jiri@resnulli.us
+Cc: arefev@swemel.ru,
+	edumazet@google.com,
+	eperezma@redhat.com,
+	jasowang@redhat.com,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	mst@redhat.com,
 	netdev@vger.kernel.org,
-	Florian Westphal <fw@strlen.de>,
-	syzbot+0c4150bff9fff3bf023c@syzkaller.appspotmail.com,
-	Eric Dumazet <edumazet@google.com>
-Subject: [PATCH bpf] bpf: avoid splat in pskb_pull_reason
-Date: Fri, 14 Jun 2024 12:17:33 +0200
-Message-ID: <20240614101801.9496-1-fw@strlen.de>
-X-Mailer: git-send-email 2.44.2
-In-Reply-To: <9f254c96-54f2-4457-b7ab-1d9f6187939c@gmail.com>
-References: <9f254c96-54f2-4457-b7ab-1d9f6187939c@gmail.com>
+	virtualization@lists.linux.dev,
+	xuanzhuo@linux.alibaba.com
+Subject: [PATCH v2] net: missing check virtio
+Date: Fri, 14 Jun 2024 13:18:26 +0300
+Message-Id: <20240614101826.30518-1-arefev@swemel.ru>
+In-Reply-To: <ZmsG41ezsAfok_fs@nanopsycho.orion>
+References: <ZmsG41ezsAfok_fs@nanopsycho.orion>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,49 +66,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-syzkaller builds (CONFIG_DEBUG_NET=y) frequently trigger a debug
-hint in pskb_may_pull.
+Yeah, I was thinking of adding Fixes: 
 
-We'd like to retain this debug check because it might hint at integer
-overflows and other issues (kernel code should pull headers, not huge
-value).
+But this code is new, it complements what is done.
+1. check (!(ret && (hdr->gso_size > needed) &&
+               ((remainder > needed) || (remainder == 0)))) 
+ complements comit 0f6925b3e8da0
 
-In bpf case, this splat isn't interesting at all: such (nonsensical) bpf
-programs are typically generated by a fuzzer anyway.
-
-Do what Eric suggested and suppress such warning.
-
-For CONFIG_DEBUG_NET=n we don't need the extra check because
-pskb_may_pull will do the right thing: return an error without the
-WARN() backtrace.
-
-Reported-by: syzbot+0c4150bff9fff3bf023c@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=0c4150bff9fff3bf023c
-Fixes: 219eee9c0d16 ("net: skbuff: add overflow debug check to pull/push helpers")
-Link: https://lore.kernel.org/netdev/9f254c96-54f2-4457-b7ab-1d9f6187939c@gmail.com/
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- net/core/filter.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 2510464692af..9933851c685e 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -1665,6 +1665,11 @@ static DEFINE_PER_CPU(struct bpf_scratchpad, bpf_sp);
- static inline int __bpf_try_make_writable(struct sk_buff *skb,
- 					  unsigned int write_len)
- {
-+#ifdef CONFIG_DEBUG_NET
-+	/* Avoid a splat in pskb_may_pull_reason() */
-+	if (write_len > INT_MAX)
-+		return -EINVAL;
-+#endif
- 	return skb_ensure_writable(skb, write_len);
- }
- 
--- 
-2.44.2
+2. The setting of the SKBFL_SHARED_FRAG flag can be associated with this comit cef401de7be8c.
+In the skb_checksum_help function, a check for skb_has_shared_frag has been added.
+If the flag is not set, the skb buffer will remain non-linear, which is not good. 
 
 
