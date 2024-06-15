@@ -1,172 +1,106 @@
-Return-Path: <netdev+bounces-103767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 196C790965C
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 08:41:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A24F90965D
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 08:41:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A6C7B22450
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 06:40:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E262CB2226C
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 06:41:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD7AE17552;
-	Sat, 15 Jun 2024 06:40:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E0613FEE;
+	Sat, 15 Jun 2024 06:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FxjXVN62"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WzL6tVAK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D648A13FEE
-	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 06:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A05156CF
+	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 06:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718433648; cv=none; b=f45ugeZdkfpbzxclgrmynKaLErxgC2aSr7XjD4mNxqXFp3yKU4xArrsYgVxcX/GgB4+GO6LAhhQwp7CkTn0/Wh/qccAHog1MfPYIQLc/DF/eKB6G0ww9HUu86v87NzbSMElyukrf1sizEWQy7gYfEUxI2IV6iEhMTPIDILm3OOw=
+	t=1718433688; cv=none; b=d9w5PgdylRD6bHC+KzL0tgJiihnyenVT28Y9GIrMoqcJJF/39eh+35kWGxaTVmI/hweIHB/gtkJuNKBXR0DqekuccoJK7IYg0dtBUDP9cn+XAN37BcajgK9hfYpuHVU8WYoI+NICdvgET/A75gYpDqbxaA/hwKzBvc8rkbuV+K0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718433648; c=relaxed/simple;
-	bh=sib4YKtv2vrN7WbeiB89o6mszigju6nK0A421ikJigg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e6KUQQCu4pIMGCtvLP0+h9xsnR3a7fvc9wFrO0iT7t7lAuZceXG+K3LDKlKU3Gw1Fr4Y70j/wdw6cgBKsdGE/Te5LG0HuHZmBQTaHRTJ2oWSIHhtc0G6VhXYIC8RobPoCBz+qKjhEEtUntyDd9iTHuKFLMPpinF9e+hHy1ldIlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FxjXVN62; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4216d9952d2so35395e9.0
-        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 23:40:45 -0700 (PDT)
+	s=arc-20240116; t=1718433688; c=relaxed/simple;
+	bh=R3qo9vT/3Ny/L2SMBNiEQkPVIaLA11lP8GBmG952+F0=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=ZglvNaNlxwO55hr9rgl1ZkH11eMKt3A6FrK0p+EFt6MJjuLfP9GJV3OO+yT7FnJf2dBtpWzcUJEXTxrHXMyJDiFolvrnwpAznihwD7vdYqmh4qKKG69XRATZFgrgzBAwiij5sb9XR64ZoiLrdTyXULGr2boQ4w0z16cY0WZ3gMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WzL6tVAK; arc=none smtp.client-ip=209.85.167.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3d2275b045cso69564b6e.1
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 23:41:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718433644; x=1719038444; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dhCTYBtOyXxcQJdvWxQ/6fDzuoGa5DKKIIfaVtLh4Yc=;
-        b=FxjXVN624p182QcNs3l9fvloYbJZSJ7ZxPLbb8opgTl8+KQL9bxisxQ8xcdZrfcslu
-         qXHDMKjuAy6Jk1lOEpJBB+psMFJpJZ208hhE2Tmr6kodqBFS80R4aWt0Z+odsJ+lLj9Z
-         RT71Pn+ye6WbrX2yfi/VWDJWSpV4ZMejE0lzcUhFsYjRRRfeQ+W1h8+qA/oD/SHsH8Ct
-         M5EQtPeMeOxBv5Xser8SAvoJJ6zTl6afdQrib2ySkJtC39KqhClg2bzzlS7i2hHHHoyJ
-         HrDW9HeJR97sdfDTMlfnWGwqR7E0cwPYgpDx8amDpLWfz7dTNjTnstwl2vCRInTvBWTi
-         XDvQ==
+        d=gmail.com; s=20230601; t=1718433686; x=1719038486; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+VASFZnizAeezOFSH2Eo8hHg2edA+OgRyZ9HyybhSL4=;
+        b=WzL6tVAK2/7yBHSoBXQ7oxYwAJcjd5SS9AFhcD3C38CQ5GqfAvfUyi0l2Io2i/deMw
+         ZKRigtcnYDi5GQ4i588qCyFlf4YFctuea32Us4nyYArEy50itIW2qiykyVohEp2E9RPe
+         GK+mPQM6wyMt2I3L6zt+WFkCJhk4PqdPikMSG9mj7cTzFypI1tsjSehgOA4P2vYbo5Ec
+         PMlSq4cSjdUBJvYP/XidgIRmr9/q4S6tyr28heVNLiUH7dXh5n04gfZfELyhHZMRr4oA
+         o/HuMRKEfx58MeUADRRSTlxg5DLCUe/2OY7HJBbLXlQdDmebzq4viQatu48f7UGfyiAV
+         6JHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718433644; x=1719038444;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dhCTYBtOyXxcQJdvWxQ/6fDzuoGa5DKKIIfaVtLh4Yc=;
-        b=QXxr3KB/jV8EYEoCH4fmr4Y2IHtmS8YE6f3Ypp3DPHWosuV1SgKw2t0KAbFp0PIwsM
-         5nyXI0dIjxuEwvRffDwVQ9oCfGpXeta/sKm/BL4+uKZ8n/LeQwac/B8Bn/LRMFOxnM/H
-         GIw8p2FKEx/bEDRdbK0jUe+WPlGLnhYxrLHoDi1G+AuizaszkveFbZslhrDQgyby7om/
-         JyDX5V7MxFFbgEwDXFv/tmhw7cwws1tcYM2hSPO4LEFqTwXMzeIVbgYtK+Jisq5S1Dj9
-         XXsnx6hmOIQWaXXgH+MG8zj38cAO9xs2e+p4hBpzKTTOF+VooSJKPFrhwhI7kWTXTt84
-         BOCA==
-X-Forwarded-Encrypted: i=1; AJvYcCVfsxrsYeGGz8cRuEf8pEfzxHqb+uRxvDYLHmdSPf+9yIkDi0HPpwijUOSE8MpRJfk9KLJGvHRjDRmErBUGAwyuM4Yx7IJn
-X-Gm-Message-State: AOJu0YynU4NcJsn5wth5C5/tUDuVfDuenQClAc3cRLGa4c0X3Fm1BZYN
-	etvtPbtZ22Wl65qGhChC+aZODQmNb4gYBDk4Fnb08WY+BIKQ5Hf6x4jbp9c4nsSlDGCsy9XvD6c
-	YL6aicDEV3fdGiM9iHO0TIZdq7r/u0iw4Dfjs
-X-Google-Smtp-Source: AGHT+IG2fMCqI6iKs1hVBi52SKUXZCXi2GieXXtLK+FqM+P97xGx7W4NYhFjItO1co2wFv6S1Dx6t2BcJZ/L1MdAlis=
-X-Received: by 2002:a05:600c:1f15:b0:423:798:38e3 with SMTP id
- 5b1f17b1804b1-423b6691387mr602385e9.5.1718433643863; Fri, 14 Jun 2024
- 23:40:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718433686; x=1719038486;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+VASFZnizAeezOFSH2Eo8hHg2edA+OgRyZ9HyybhSL4=;
+        b=LWMojwzNO7m/j8wKunkmtakQEpNkLST8Tj0Vd4M6OxrTflTEnZyg3IOApudqvtxvdT
+         HO5ucVtbzpmNnbPbyUtcwzjKlGKmyZwEmUK63f1CEqhkRZ+NcQ5H3UIrOoHUpUEiaj0t
+         VlxllG7sMk+3W2vNG0skNhRGjSgbG+SBPan+HHylant3VYVj0g87L3GszSsVOEUIHQmM
+         LSPJtztU+F8ZnwHJrOmtX+okgOtjhJxm7Be8TP56Sv2Fz/V3Cawo7+KPbg8UCERBTckz
+         IH/mForPvt1q71o1feJPYFGp1i1WMJNRl7FMQ7ynWBHC/jMoQ9Qr9cLixmvzd/I3YGHW
+         c9xQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVD9tWWPg2sZhzZYVbGMeRvr3+ySPE/rR3R5jg6t72qjHIfZ41LmE+568rDuR3qESgr02ybDGS7TcUU7nIoE6AxFWE8xDHW
+X-Gm-Message-State: AOJu0YyUaNHmLMKHmA2KwyJ07UNot1wndd/cN9l+yZPi+T5NVucDaCGh
+	ZGj8KKxuj8f5HZfTcxvfJ5Az609PPezYKzrfU+hdAy6Ck9f9J/YK
+X-Google-Smtp-Source: AGHT+IEKe5Rb7tozm3aDswm3CqCxuN5cx+d0xk/2nBPX35d8qtqHTIsnwSFW/1zMoTq1iqMemLkiHA==
+X-Received: by 2002:a05:6808:2116:b0:3d2:30ce:3263 with SMTP id 5614622812f47-3d24e8bbc22mr5048367b6e.1.1718433686223;
+        Fri, 14 Jun 2024 23:41:26 -0700 (PDT)
+Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-705cc91dc5csm4200480b3a.10.2024.06.14.23.41.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jun 2024 23:41:25 -0700 (PDT)
+Date: Sat, 15 Jun 2024 15:41:20 +0900 (JST)
+Message-Id: <20240615.154120.1592275076225685842.fujita.tomonori@gmail.com>
+To: kuba@kernel.org
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
+ horms@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
+ linux@armlinux.org.uk, hfdevel@gmx.net, naveenm@marvell.com,
+ jdamato@fastly.com
+Subject: Re: [PATCH net-next v10 4/7] net: tn40xx: add basic Tx handling
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <20240614082351.7fc8d66c@kernel.org>
+References: <20240613174808.67eb994c@kernel.org>
+	<20240614.114152.1787364292761357690.fujita.tomonori@gmail.com>
+	<20240614082351.7fc8d66c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <7075bb26-ede9-0dc7-fe93-e18703e5ddaa@kylinos.cn> <20240614222433.19580-1-kuniyu@amazon.com>
-In-Reply-To: <20240614222433.19580-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 15 Jun 2024 08:40:32 +0200
-Message-ID: <CANn89i+RP1K+mOd5V7LOKMFtMhy0rZrpFDCDQ-RbQ31GkYbc9g@mail.gmail.com>
-Subject: Re: [PATCH net v2] Fix race for duplicate reqsk on identical SYN
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: luoxuanqiang@kylinos.cn, davem@davemloft.net, dccp@vger.kernel.org, 
-	dsahern@kernel.org, fw@strlen.de, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jun 15, 2024 at 12:24=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.c=
-om> wrote:
->
-> From: luoxuanqiang <luoxuanqiang@kylinos.cn>
-> Date: Fri, 14 Jun 2024 20:42:07 +0800
-> > =E5=9C=A8 2024/6/14 18:54, Florian Westphal =E5=86=99=E9=81=93:
-> > > luoxuanqiang <luoxuanqiang@kylinos.cn> wrote:
-> > >>   include/net/inet_connection_sock.h |  2 +-
-> > >>   net/dccp/ipv4.c                    |  2 +-
-> > >>   net/dccp/ipv6.c                    |  2 +-
-> > >>   net/ipv4/inet_connection_sock.c    | 15 +++++++++++----
-> > >>   net/ipv4/tcp_input.c               | 11 ++++++++++-
-> > >>   5 files changed, 24 insertions(+), 8 deletions(-)
-> > >>
-> > >> diff --git a/include/net/inet_connection_sock.h b/include/net/inet_c=
-onnection_sock.h
-> > >> index 7d6b1254c92d..8773d161d184 100644
-> > >> --- a/include/net/inet_connection_sock.h
-> > >> +++ b/include/net/inet_connection_sock.h
-> > >> @@ -264,7 +264,7 @@ struct sock *inet_csk_reqsk_queue_add(struct soc=
-k *sk,
-> > >>                                  struct request_sock *req,
-> > >>                                  struct sock *child);
-> > >>   void inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request=
-_sock *req,
-> > >> -                             unsigned long timeout);
-> > >> +                             unsigned long timeout, bool *found_dup=
-_sk);
-> > > Nit:
-> > >
-> > > I think it would be preferrable to change retval to bool rather than
-> > > bool *found_dup_sk extra arg, so one can do
->
-> +1
->
->
-> > >
-> > > bool inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_so=
-ck *req,
-> > >                                unsigned long timeout)
-> > > {
-> > >     if (!reqsk_queue_hash_req(req, timeout))
-> > >             return false;
-> > >
-> > > i.e. let retval indicate wheter reqsk was inserted or not.
-> > >
-> > > Patch looks good to me otherwise.
-> >
-> > Thank you for your confirmation!
-> >
-> > Regarding your suggestion, I had considered it before,
-> > but besides tcp_conn_request() calling inet_csk_reqsk_queue_hash_add(),
-> > dccp_v4(v6)_conn_request() also calls it. However, there is no
-> > consideration for a failed insertion within that function, so it's
-> > reasonable to let the caller decide whether to check for duplicate
-> > reqsk.
->
-> I guess you followed 01770a1661657 where found_dup_sk was introduced,
-> but note that the commit is specific to TCP SYN Cookie and TCP Fast Open
-> and DCCP is not related.
->
-> Then, own_req is common to TCP and DCCP, so found_dup_sk was added as an
-> additional argument.
->
-> However, another similar commit 5e0724d027f05 actually added own_req chec=
-k
-> in DCCP path.
->
-> I personally would'nt care if DCCP was not changed to handle such a
-> failure because DCCP will be removed next year, but I still prefer
-> Florian's suggestion.
->
+On Fri, 14 Jun 2024 08:23:51 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-Other things to consider :
+>> Currently, net_device_stats struct is in tn40_priv struct. You meant
+>> the driver shouldn't use net_device_stats struct?
+> 
+> Oh, I misread, I just saw netdev_stats_to_stats64( and didn't read
+> further. Doesn't look like you're using any of the magic properties
+> of struct net_device_stats, so yes, just replace it with struct
+> rtnl_link_stats64 in the priv, and with minor adjustments that should be it.
 
-- I presume this patch targets net tree, and luoxuanqiang needs the
-fix to reach stable trees.
-
-- This means a Fixes: tag is needed
-
-- This also means that we should favor a patch with no or trivial
-conflicts for stable backports.
-
-Should the patch target the net-next tree, then the requirements can
-be different.
+I see. I'll replace the net_device_stats struct in the priv with
+rtnl_link_stats64 struct. The minor adjustments include
+u64_stats_sync, I suppose.
 
