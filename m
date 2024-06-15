@@ -1,155 +1,163 @@
-Return-Path: <netdev+bounces-103804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC5D19098EA
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 17:27:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 238F19098F3
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 17:42:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AA56282304
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 15:27:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0870F1C20F43
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 15:42:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80CDE4964F;
-	Sat, 15 Jun 2024 15:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5413349640;
+	Sat, 15 Jun 2024 15:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nQSjQzvq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF616446A2
-	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 15:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5ADE49639
+	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 15:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718465240; cv=none; b=IoTyW4umx408Aj9tPnH6JOnGPsNgt2ABJDtx+gbreLfXUThw7GF1tVt0nu2G9t3jSA0isC2lD+a2JSo2e8n9Zg6Tph7VWpcvLKkKDeRBsZA8FVl1leZdGW3ESfPM9EOxpULJK0a6UBM3lw/OPAdLH0j9BvvBmjDZRmpPrNOB9Lo=
+	t=1718466155; cv=none; b=hNGU1wgpEsEPS46fxUNZfIRTJL/EXPT7F777+FiX533gTbyDCYjlKXjLpO9UqeKtwV5VN3eZfzMOnlIF/MNzaKlTC0Z8mfeZ2BAf6cE98wFja1kIoIu/So4u0qeN3rJQnOSYL5qHlRYxDBdTrhbWiUJmptutFtNPPEB+bYaM/Ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718465240; c=relaxed/simple;
-	bh=KLmwnTp5/uLSTrRQsi8bP+Cfvy4rYnzOll7HQ8+mxzw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=IIDdUKLqKU1WqcVR5WauwWh1ltLOn0ILhHHB4WwzQZMEzl5LMLnh+ZmHEevurbMDK/uv+RROwWzVMufnK89r5yXNw9uVrei+GczJZtvNz6tZOhnJoPXnHjYg/TbVcYNLnZ4+ORVebrlr7vb/sLfhSYHtrAr94uxioJizXXL5IWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-37586a82295so31237815ab.3
-        for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 08:27:18 -0700 (PDT)
+	s=arc-20240116; t=1718466155; c=relaxed/simple;
+	bh=lEEY8Jlmt1onLM18KdBKoMrU4cTUdjJcWsk2DYBNaCM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NMJW/lWH0DdLjp8xItMHVQGrVHtxLvIRqJf8qiKy45HWsBY8DB0IeaYC6mjH3FTc8wjhJzeuTWsaMnMH5f9LeVulZqHzl12W6vMnhBJjftBW2wqEwlbQH3OiqIBe07xDPVayAn2BKJh+ewNyGZnkN140ZtNgu5lINots3Mxdt2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nQSjQzvq; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-62f43c95de4so61887427b3.3
+        for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 08:42:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718466152; x=1719070952; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=T+8P+4Xokq8b3Cgc8RIYjbNh/L5Vhpye0HRGUvnCqQA=;
+        b=nQSjQzvqW+7EaYCuniEAqrwM5CF3u/JLxOJ0k9CkqbCXYcOdqlRTBGy2hmMrI9Cn6C
+         wOEKJEvinD4kdZeO2q8+0RU5n6Rj0g7C85/chE3vpHxkQUs84G06XgXA7iyi+K5DXfOh
+         XGV5+2+UGgaAm3NX3b1gl0oBErxCnwdS3FnMY6G394vHuEq5i0f5MtG8Y75saWj1LK50
+         IrqGQ+aPAEP71kuFiD592+IzH+U30b6mAnB0jnoTxPp0sxLc5Tf8M9gXD5eVYficpysY
+         iOjr9MYUcYufrWP+NKv/KmY/R61BtZK5Cy+sCYnCRMQnB0pbByYeUK3X0TSKTX1nXESy
+         6CBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718465238; x=1719070038;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1718466152; x=1719070952;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=8+9tTVxFZusiaA47yPp0vC08EjPeT2WvhoYv6sS5kiE=;
-        b=glaOeEcPRiwyZrUEdpvWIgoqnLFL6ijQmD9WWIZhpLK9qLL/F0sv9LezQnIBS71JLQ
-         cX/B1xd5ll1NlnPtNw9YZ8zObggSPIVvaB7ev1A981JQ2P00KYIalPSUcZ0DsNkT52n2
-         YCIdcI9htLdWuAUW/mUOYzJFDbkHcyD+y+u0Rr9eyrJPbXuSGeK27ZWrsg3QVcCRTd24
-         sPPhDDJ7dOqXbB2JGaHaJmMjKoMh6g1zkBZfWCJ61thy7ilcZKZUnkIOyzbJ2OvmhDEu
-         VCoNHuv8BCvuweZG+VYhTT+avgXeK6IKojLb7KE1TGPx+ScKBbAL3I1bV1HPB645peNC
-         LaZA==
-X-Forwarded-Encrypted: i=1; AJvYcCVAmJ7Z3kHUzhXPTUrcaX1djl1KRxEzoblhjw0jU/LEDxlydxoAl11hvQal+mNYOdRdGwxpeCmTPomDw40e8E/3jjjaEcTO
-X-Gm-Message-State: AOJu0Yy7V104oYAFGoHU8+ChQm0jgNU/79LfiEktUXyp78VkPePM0oUC
-	zPU7HIsrLZrEeedyAkke8VGJvYIzP3mAsoF6cNzg4QohOkubjih4bN1Z/1Pyygjxi0+t51g5Kjg
-	lZ13SmmXT1CmprDFPZlcwxde4T+fUDuhLRSBut+FPbZnaoIdLv3qVwl8=
-X-Google-Smtp-Source: AGHT+IGJ+voMZpV3ZhKvkkvTOX0i3O+i8IcRA8nGFlcUcLelBIdZhCrzTA1OSHhfAz8nlNsuSTnoXKybfcaTItFRZPnCvplYvFA2
+        bh=T+8P+4Xokq8b3Cgc8RIYjbNh/L5Vhpye0HRGUvnCqQA=;
+        b=UF5ESpTpv7+C2BaYy5lXT0pYZmVR7DmPycFcx9bhfk0rtQWUkZ7Wj4ZdKQr59Ppkew
+         QSTljLVSeeauqgdKA7W1bCBuZtFzb5iJiys0ieIJ3VGqoOKeiqGmz8wjEVtTw9+WmPv/
+         oof5uCe6SC1uTdJU5wFzmZfHRQ26WkiU0jikXD6mX6w7RbxgGsVyQJUrmxwzRakFK5fl
+         6YJ5bqUxBmb+WqOTSvldKaL7u6pOSIZg56rCp7IeUWrzgh+jnI/I58vtxzh2Ga9UPqWr
+         b9XQpAYCTHcPdm5p+nw4z2pXCsbbEMaE2VKCYBIPOCTWiwz0m8rhyi1Xzw8gMlr7MmfM
+         CRuA==
+X-Forwarded-Encrypted: i=1; AJvYcCWNmlkiCSMp7ALAmdq0eGoNxkuQtjYKmIA0uhzKFFP9ds45WLPSvt/LsRkWHB6C4SNHmVBAtKd8GWaiE0fLI3hQQH6Gtz1Y
+X-Gm-Message-State: AOJu0YwSKd63CmDNVZYXzMxQlgXqJn2mUiO2B8+kv9FvC5DdU/OzGe/t
+	J0/NKI4J//rVCzwRzFKvjodp6PaDrBHJfJ1Nb8JD4U1qYQa4yQaGDzS3CYaYbyPLTwNSd3U96rn
+	M9yZBeSQNbg==
+X-Google-Smtp-Source: AGHT+IHAm/6SO8IQRzaFpWQp1EPz7uA98CA45Ebz5pn9OSZOYucb9ET7zb2IJaj0IgaI9q/zz8yY6/j6DgO7ag==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1083:b0:dff:338c:fde6 with SMTP
+ id 3f1490d57ef6-dff338d037emr112068276.6.1718466152662; Sat, 15 Jun 2024
+ 08:42:32 -0700 (PDT)
+Date: Sat, 15 Jun 2024 15:42:31 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c29:b0:375:9deb:ceb8 with SMTP id
- e9e14a558f8ab-375e1014718mr3264365ab.3.1718465238151; Sat, 15 Jun 2024
- 08:27:18 -0700 (PDT)
-Date: Sat, 15 Jun 2024 08:27:18 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000014478e061aef5e1e@google.com>
-Subject: [syzbot] [net?] [usb?] KMSAN: uninit-value in rtl8150_get_link_ksettings
-From: syzbot <syzbot+2a7bab173edebd242de7@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, petkan@nucleusys.com, 
-	syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.627.g7a2c4fd464-goog
+Message-ID: <20240615154231.234442-1-edumazet@google.com>
+Subject: [PATCH net] xfrm6: check ip6_dst_idev() return value in xfrm6_get_saddr()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+ip6_dst_idev() can return NULL, xfrm6_get_saddr() must act accordingly.
 
-syzbot found the following issue on:
+syzbot reported:
 
-HEAD commit:    101b7a97143a Merge tag 'acpi-6.10-rc1' of git://git.kernel..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=120871ca980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7ac2f8c387a23814
-dashboard link: https://syzkaller.appspot.com/bug?extid=2a7bab173edebd242de7
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: i386
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/4f673334a91c/disk-101b7a97.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8e6db59f4091/vmlinux-101b7a97.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7e5782387c9d/bzImage-101b7a97.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2a7bab173edebd242de7@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in rtl8150_get_link_ksettings+0x3d0/0x420 drivers/net/usb/rtl8150.c:794
- rtl8150_get_link_ksettings+0x3d0/0x420 drivers/net/usb/rtl8150.c:794
- __ethtool_get_link_ksettings+0x17d/0x270 net/ethtool/ioctl.c:445
- linkinfo_prepare_data+0xe2/0x290 net/ethtool/linkinfo.c:37
- ethnl_default_dump_one net/ethtool/netlink.c:460 [inline]
- ethnl_default_dumpit+0x458/0xd80 net/ethtool/netlink.c:494
- genl_dumpit+0x19d/0x290 net/netlink/genetlink.c:1025
- netlink_dump+0xa05/0x15b0 net/netlink/af_netlink.c:2269
- __netlink_dump_start+0xb3a/0xce0 net/netlink/af_netlink.c:2386
- genl_family_rcv_msg_dumpit net/netlink/genetlink.c:1074 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1190 [inline]
- genl_rcv_msg+0x106d/0x12c0 net/netlink/genetlink.c:1208
- netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2559
- genl_rcv+0x40/0x60 net/netlink/genetlink.c:1217
- netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
- netlink_unicast+0xf4c/0x1260 net/netlink/af_netlink.c:1361
- netlink_sendmsg+0x10df/0x11f0 net/netlink/af_netlink.c:1905
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:745
- ____sys_sendmsg+0x877/0xb60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg+0x225/0x3c0 net/socket.c:2667
- __compat_sys_sendmsg net/compat.c:346 [inline]
- __do_compat_sys_sendmsg net/compat.c:353 [inline]
- __se_compat_sys_sendmsg net/compat.c:350 [inline]
- __ia32_compat_sys_sendmsg+0x9d/0xe0 net/compat.c:350
- ia32_sys_call+0x209f/0x40a0 arch/x86/include/generated/asm/syscalls_32.h:371
- do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
- __do_fast_syscall_32+0xb4/0x120 arch/x86/entry/common.c:386
- do_fast_syscall_32+0x38/0x80 arch/x86/entry/common.c:411
- do_SYSENTER_32+0x1f/0x30 arch/x86/entry/common.c:449
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-
-Local variable bmcr created at:
- rtl8150_get_link_ksettings+0x52/0x420
- __ethtool_get_link_ksettings+0x17d/0x270 net/ethtool/ioctl.c:445
-
-CPU: 1 PID: 18500 Comm: syz-executor.1 Not tainted 6.9.0-syzkaller-02339-g101b7a97143a #0
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 1 PID: 12 Comm: kworker/u8:1 Not tainted 6.10.0-rc2-syzkaller-00383-gb8481381d4e2 #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-=====================================================
+Workqueue: wg-kex-wg1 wg_packet_handshake_send_worker
+ RIP: 0010:xfrm6_get_saddr+0x93/0x130 net/ipv6/xfrm6_policy.c:64
+Code: df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 97 00 00 00 4c 8b ab d8 00 00 00 48 b8 00 00 00 00 00 fc ff df 4c 89 ea 48 c1 ea 03 <80> 3c 02 00 0f 85 86 00 00 00 4d 8b 6d 00 e8 ca 13 47 01 48 b8 00
+RSP: 0018:ffffc90000117378 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: ffff88807b079dc0 RCX: ffffffff89a0d6d7
+RDX: 0000000000000000 RSI: ffffffff89a0d6e9 RDI: ffff88807b079e98
+RBP: ffff88807ad73248 R08: 0000000000000007 R09: fffffffffffff000
+R10: ffff88807b079dc0 R11: 0000000000000007 R12: ffffc90000117480
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f4586d00440 CR3: 0000000079042000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+  xfrm_get_saddr net/xfrm/xfrm_policy.c:2452 [inline]
+  xfrm_tmpl_resolve_one net/xfrm/xfrm_policy.c:2481 [inline]
+  xfrm_tmpl_resolve+0xa26/0xf10 net/xfrm/xfrm_policy.c:2541
+  xfrm_resolve_and_create_bundle+0x140/0x2570 net/xfrm/xfrm_policy.c:2835
+  xfrm_bundle_lookup net/xfrm/xfrm_policy.c:3070 [inline]
+  xfrm_lookup_with_ifid+0x4d1/0x1e60 net/xfrm/xfrm_policy.c:3201
+  xfrm_lookup net/xfrm/xfrm_policy.c:3298 [inline]
+  xfrm_lookup_route+0x3b/0x200 net/xfrm/xfrm_policy.c:3309
+  ip6_dst_lookup_flow+0x15c/0x1d0 net/ipv6/ip6_output.c:1256
+  send6+0x611/0xd20 drivers/net/wireguard/socket.c:139
+  wg_socket_send_skb_to_peer+0xf9/0x220 drivers/net/wireguard/socket.c:178
+  wg_socket_send_buffer_to_peer+0x12b/0x190 drivers/net/wireguard/socket.c:200
+  wg_packet_send_handshake_initiation+0x227/0x360 drivers/net/wireguard/send.c:40
+  wg_packet_handshake_send_worker+0x1c/0x30 drivers/net/wireguard/send.c:51
+  process_one_work+0x9fb/0x1b60 kernel/workqueue.c:3231
+  process_scheduled_works kernel/workqueue.c:3312 [inline]
+  worker_thread+0x6c8/0xf70 kernel/workqueue.c:3393
+  kthread+0x2c1/0x3a0 kernel/kthread.c:389
+  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
 
-
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/ipv6/xfrm6_policy.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/ipv6/xfrm6_policy.c b/net/ipv6/xfrm6_policy.c
+index cc885d3aa9e5947b0f087d599c97a020ba6fe385..2f1ea5f999a259a96693566d3e776a1391b70c57 100644
+--- a/net/ipv6/xfrm6_policy.c
++++ b/net/ipv6/xfrm6_policy.c
+@@ -56,12 +56,18 @@ static int xfrm6_get_saddr(struct net *net, int oif,
+ {
+ 	struct dst_entry *dst;
+ 	struct net_device *dev;
++	struct inet6_dev *idev;
+ 
+ 	dst = xfrm6_dst_lookup(net, 0, oif, NULL, daddr, mark);
+ 	if (IS_ERR(dst))
+ 		return -EHOSTUNREACH;
+ 
+-	dev = ip6_dst_idev(dst)->dev;
++	idev = ip6_dst_idev(dst);
++	if (!idev) {
++		dst_release(dst);
++		return -EHOSTUNREACH;
++	}
++	dev = idev->dev;
+ 	ipv6_dev_get_saddr(dev_net(dev), dev, &daddr->in6, 0, &saddr->in6);
+ 	dst_release(dst);
+ 	return 0;
+-- 
+2.45.2.627.g7a2c4fd464-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
