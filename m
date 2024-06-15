@@ -1,106 +1,211 @@
-Return-Path: <netdev+bounces-103768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A24F90965D
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 08:41:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 74F0190968A
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 09:33:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E262CB2226C
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 06:41:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4615B21E5D
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 07:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E0613FEE;
-	Sat, 15 Jun 2024 06:41:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 522271401B;
+	Sat, 15 Jun 2024 07:33:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WzL6tVAK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S1ReQlZU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A05156CF
-	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 06:41:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2095B524C;
+	Sat, 15 Jun 2024 07:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718433688; cv=none; b=d9w5PgdylRD6bHC+KzL0tgJiihnyenVT28Y9GIrMoqcJJF/39eh+35kWGxaTVmI/hweIHB/gtkJuNKBXR0DqekuccoJK7IYg0dtBUDP9cn+XAN37BcajgK9hfYpuHVU8WYoI+NICdvgET/A75gYpDqbxaA/hwKzBvc8rkbuV+K0=
+	t=1718436782; cv=none; b=jyOUOtSWq+gaFl74uBaCC0iRwwpyU1kuKgA7RjDhXqhSERwbnK5s1n9ih+/wxHYPZjEl/QRPgGwjB/rSDnUXyqLee9eGyFMWTt60xPDhrg1RKfhH3GGncWcMjgDOw4lThvGNz53JE78BSCSxLNyRZYwoh687bMVTl4gmDtZYBHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718433688; c=relaxed/simple;
-	bh=R3qo9vT/3Ny/L2SMBNiEQkPVIaLA11lP8GBmG952+F0=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=ZglvNaNlxwO55hr9rgl1ZkH11eMKt3A6FrK0p+EFt6MJjuLfP9GJV3OO+yT7FnJf2dBtpWzcUJEXTxrHXMyJDiFolvrnwpAznihwD7vdYqmh4qKKG69XRATZFgrgzBAwiij5sb9XR64ZoiLrdTyXULGr2boQ4w0z16cY0WZ3gMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WzL6tVAK; arc=none smtp.client-ip=209.85.167.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3d2275b045cso69564b6e.1
-        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 23:41:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718433686; x=1719038486; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+VASFZnizAeezOFSH2Eo8hHg2edA+OgRyZ9HyybhSL4=;
-        b=WzL6tVAK2/7yBHSoBXQ7oxYwAJcjd5SS9AFhcD3C38CQ5GqfAvfUyi0l2Io2i/deMw
-         ZKRigtcnYDi5GQ4i588qCyFlf4YFctuea32Us4nyYArEy50itIW2qiykyVohEp2E9RPe
-         GK+mPQM6wyMt2I3L6zt+WFkCJhk4PqdPikMSG9mj7cTzFypI1tsjSehgOA4P2vYbo5Ec
-         PMlSq4cSjdUBJvYP/XidgIRmr9/q4S6tyr28heVNLiUH7dXh5n04gfZfELyhHZMRr4oA
-         o/HuMRKEfx58MeUADRRSTlxg5DLCUe/2OY7HJBbLXlQdDmebzq4viQatu48f7UGfyiAV
-         6JHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718433686; x=1719038486;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+VASFZnizAeezOFSH2Eo8hHg2edA+OgRyZ9HyybhSL4=;
-        b=LWMojwzNO7m/j8wKunkmtakQEpNkLST8Tj0Vd4M6OxrTflTEnZyg3IOApudqvtxvdT
-         HO5ucVtbzpmNnbPbyUtcwzjKlGKmyZwEmUK63f1CEqhkRZ+NcQ5H3UIrOoHUpUEiaj0t
-         VlxllG7sMk+3W2vNG0skNhRGjSgbG+SBPan+HHylant3VYVj0g87L3GszSsVOEUIHQmM
-         LSPJtztU+F8ZnwHJrOmtX+okgOtjhJxm7Be8TP56Sv2Fz/V3Cawo7+KPbg8UCERBTckz
-         IH/mForPvt1q71o1feJPYFGp1i1WMJNRl7FMQ7ynWBHC/jMoQ9Qr9cLixmvzd/I3YGHW
-         c9xQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVD9tWWPg2sZhzZYVbGMeRvr3+ySPE/rR3R5jg6t72qjHIfZ41LmE+568rDuR3qESgr02ybDGS7TcUU7nIoE6AxFWE8xDHW
-X-Gm-Message-State: AOJu0YyUaNHmLMKHmA2KwyJ07UNot1wndd/cN9l+yZPi+T5NVucDaCGh
-	ZGj8KKxuj8f5HZfTcxvfJ5Az609PPezYKzrfU+hdAy6Ck9f9J/YK
-X-Google-Smtp-Source: AGHT+IEKe5Rb7tozm3aDswm3CqCxuN5cx+d0xk/2nBPX35d8qtqHTIsnwSFW/1zMoTq1iqMemLkiHA==
-X-Received: by 2002:a05:6808:2116:b0:3d2:30ce:3263 with SMTP id 5614622812f47-3d24e8bbc22mr5048367b6e.1.1718433686223;
-        Fri, 14 Jun 2024 23:41:26 -0700 (PDT)
-Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-705cc91dc5csm4200480b3a.10.2024.06.14.23.41.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jun 2024 23:41:25 -0700 (PDT)
-Date: Sat, 15 Jun 2024 15:41:20 +0900 (JST)
-Message-Id: <20240615.154120.1592275076225685842.fujita.tomonori@gmail.com>
-To: kuba@kernel.org
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
- horms@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
- linux@armlinux.org.uk, hfdevel@gmx.net, naveenm@marvell.com,
- jdamato@fastly.com
-Subject: Re: [PATCH net-next v10 4/7] net: tn40xx: add basic Tx handling
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <20240614082351.7fc8d66c@kernel.org>
-References: <20240613174808.67eb994c@kernel.org>
-	<20240614.114152.1787364292761357690.fujita.tomonori@gmail.com>
-	<20240614082351.7fc8d66c@kernel.org>
+	s=arc-20240116; t=1718436782; c=relaxed/simple;
+	bh=wgIviLql9xjHQhQaoRPN2xsCGK+9G4KbVXYZmBVurK0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JyXu/K9PoTzGj59JQnKZmerSsGWIDo7fA6iB/HlZs2ycZyPt5JA/xWs9MvZJlXjSPUoARrogjCx9nS9npUCntkBZRmy+PdDAUnuUIkFyRMMT8/hgPAD4xN/q0fc7CTUPYx5hrpExdCkiaY4+CpzjfujNKvfmjQqARQg200DPqto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S1ReQlZU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 268FDC116B1;
+	Sat, 15 Jun 2024 07:32:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718436781;
+	bh=wgIviLql9xjHQhQaoRPN2xsCGK+9G4KbVXYZmBVurK0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=S1ReQlZUGPjAAQriVbxXOTkLhtymELA+gVt31Q7ViXw4uqbhYT7LF+xjWLw8Sm17j
+	 6p/Q7kijNVAdhdikXbvQtHZMSgemf8BIQJcjLvaqup19NUJvL8PaekpFiRcAF817F6
+	 Cycg6cJnxY2fyhUYINrh8dGoKTzJ62jbn3C511CG6ENMahJF5ppBFTYygkfqPLwDBn
+	 ZaxcJ1SzaW5TrjWnV1M9Tkl8BYlMYlTr39AGcI3/qhQlbyfcqh6zfvBI0jWmX9Zj+y
+	 bBWRyqAk9RZbXCkfhFrtKL6Gmapm7JAkSziXZgtMsxQTvUF3cvD15UMT1Uih+j3BLl
+	 IY81STomopRzw==
+Date: Sat, 15 Jun 2024 08:32:56 +0100
+From: Simon Horman <horms@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Mina Almasry <almasrymina@google.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH iwl-next 03/12] idpf: split &idpf_queue into 4
+ strictly-typed queue structures
+Message-ID: <20240615073256.GZ8447@kernel.org>
+References: <20240528134846.148890-1-aleksander.lobakin@intel.com>
+ <20240528134846.148890-4-aleksander.lobakin@intel.com>
+ <20240601085308.GY491852@kernel.org>
+ <b110726e-d496-4975-8089-57a4931da47d@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b110726e-d496-4975-8089-57a4931da47d@intel.com>
 
-On Fri, 14 Jun 2024 08:23:51 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
-
->> Currently, net_device_stats struct is in tn40_priv struct. You meant
->> the driver shouldn't use net_device_stats struct?
+On Thu, Jun 13, 2024 at 01:03:00PM +0200, Alexander Lobakin wrote:
+> From: Simon Horman <horms@kernel.org>
+> Date: Sat, 1 Jun 2024 09:53:08 +0100
 > 
-> Oh, I misread, I just saw netdev_stats_to_stats64( and didn't read
-> further. Doesn't look like you're using any of the magic properties
-> of struct net_device_stats, so yes, just replace it with struct
-> rtnl_link_stats64 in the priv, and with minor adjustments that should be it.
+> > On Tue, May 28, 2024 at 03:48:37PM +0200, Alexander Lobakin wrote:
+> >> Currently, sizeof(struct idpf_queue) is 32 Kb.
+> >> This is due to the 12-bit hashtable declaration at the end of the queue.
+> >> This HT is needed only for Tx queues when the flow scheduling mode is
+> >> enabled. But &idpf_queue is unified for all of the queue types,
+> >> provoking excessive memory usage.
+> >> The unified structure in general makes the code less effective via
+> >> suboptimal fields placement. You can't avoid that unless you make unions
+> >> each 2 fields. Even then, different field alignment etc., doesn't allow
+> >> you to optimize things to the limit.
+> >> Split &idpf_queue into 4 structures corresponding to the queue types:
+> >> RQ (Rx queue), SQ (Tx queue), FQ (buffer queue), and CQ (completion
+> >> queue). Place only needed fields there and shortcuts handy for hotpath.
+> >> Allocate the abovementioned hashtable dynamically and only when needed,
+> >> keeping &idpf_tx_queue relatively short (192 bytes, same as Rx). This HT
+> >> is used only for OOO completions, which aren't really hotpath anyway.
+> >> Note that this change must be done atomically, otherwise it's really
+> >> easy to get lost and miss something.
+> >>
+> >> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> > 
+> > ...
+> > 
+> >> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> > 
+> > ...
+> > 
+> >> @@ -1158,20 +1325,22 @@ static void idpf_rxq_set_descids(struct idpf_vport *vport, struct idpf_queue *q)
+> >>   */
+> >>  static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
+> >>  {
+> >> -	bool flow_sch_en;
+> >> -	int err, i;
+> >> +	bool split, flow_sch_en;
+> >> +	int i;
+> >>  
+> >>  	vport->txq_grps = kcalloc(vport->num_txq_grp,
+> >>  				  sizeof(*vport->txq_grps), GFP_KERNEL);
+> >>  	if (!vport->txq_grps)
+> >>  		return -ENOMEM;
+> >>  
+> >> +	split = idpf_is_queue_model_split(vport->txq_model);
+> >>  	flow_sch_en = !idpf_is_cap_ena(vport->adapter, IDPF_OTHER_CAPS,
+> >>  				       VIRTCHNL2_CAP_SPLITQ_QSCHED);
+> >>  
+> >>  	for (i = 0; i < vport->num_txq_grp; i++) {
+> >>  		struct idpf_txq_group *tx_qgrp = &vport->txq_grps[i];
+> >>  		struct idpf_adapter *adapter = vport->adapter;
+> >> +		struct idpf_txq_stash *stashes;
+> >>  		int j;
+> >>  
+> >>  		tx_qgrp->vport = vport;
+> >> @@ -1180,45 +1349,62 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
+> >>  		for (j = 0; j < tx_qgrp->num_txq; j++) {
+> >>  			tx_qgrp->txqs[j] = kzalloc(sizeof(*tx_qgrp->txqs[j]),
+> >>  						   GFP_KERNEL);
+> >> -			if (!tx_qgrp->txqs[j]) {
+> >> -				err = -ENOMEM;
+> >> +			if (!tx_qgrp->txqs[j])
+> >>  				goto err_alloc;
+> >> -			}
+> >> +		}
+> >> +
+> >> +		if (split && flow_sch_en) {
+> >> +			stashes = kcalloc(num_txq, sizeof(*stashes),
+> >> +					  GFP_KERNEL);
+> > 
+> > Hi Alexander,
+> > 
+> > Here stashes is assigned a memory allocation and
+> > then then assigned to tx_qgrp->stashes a few lines below...
+> > 
+> >> +			if (!stashes)
+> >> +				goto err_alloc;
+> >> +
+> >> +			tx_qgrp->stashes = stashes;
+> >>  		}
+> >>  
+> >>  		for (j = 0; j < tx_qgrp->num_txq; j++) {
+> >> -			struct idpf_queue *q = tx_qgrp->txqs[j];
+> >> +			struct idpf_tx_queue *q = tx_qgrp->txqs[j];
+> >>  
+> >>  			q->dev = &adapter->pdev->dev;
+> >>  			q->desc_count = vport->txq_desc_count;
+> >>  			q->tx_max_bufs = idpf_get_max_tx_bufs(adapter);
+> >>  			q->tx_min_pkt_len = idpf_get_min_tx_pkt_len(adapter);
+> >> -			q->vport = vport;
+> >> +			q->netdev = vport->netdev;
+> >>  			q->txq_grp = tx_qgrp;
+> >> -			hash_init(q->sched_buf_hash);
+> >>  
+> >> -			if (flow_sch_en)
+> >> -				set_bit(__IDPF_Q_FLOW_SCH_EN, q->flags);
+> >> +			if (!split) {
+> >> +				q->clean_budget = vport->compln_clean_budget;
+> >> +				idpf_queue_assign(CRC_EN, q,
+> >> +						  vport->crc_enable);
+> >> +			}
+> >> +
+> >> +			if (!flow_sch_en)
+> >> +				continue;
+> >> +
+> >> +			if (split) {
+> > 
+> > ... but here elements of stashes seem to be assigned to q->stash
+> > without stashes having being initialised.
+> > 
+> > Flagged by Smatch
+> 
+> Hi! Yes, I saw the report, but isn't it a false positive?
+> 
+> Allocation happens when `split && flow_sch_en`, and here we have
+> 
+> 			if (!flow_sch_en)
+> 				continue;
+> 
+> 			if (split)
+> 				// assign
+> 
+> IOW the assignment can't happen without the allocation?
 
-I see. I'll replace the net_device_stats struct in the priv with
-rtnl_link_stats64 struct. The minor adjustments include
-u64_stats_sync, I suppose.
+Thanks, and sorry for missing the points you highlight above.
+I agree that this is a false positive.
+
+> 
+> > 
+> >> +				q->stash = &stashes[j];
+> >> +				hash_init(q->stash->sched_buf_hash);
+> >> +			}
+> >> +
+> >> +			idpf_queue_set(FLOW_SCH_EN, q);
+> 
+> Thanks,
+> Olek
+> 
 
