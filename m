@@ -1,176 +1,215 @@
-Return-Path: <netdev+bounces-103779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5382909754
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 11:41:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2805909781
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 11:56:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EF9A284552
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 09:41:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AE41283FD2
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 09:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4206D224D1;
-	Sat, 15 Jun 2024 09:41:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9BD328DDF;
+	Sat, 15 Jun 2024 09:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="cKpwuuCg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WoeRlsMv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813701CF96
-	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 09:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369B110A11;
+	Sat, 15 Jun 2024 09:56:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718444465; cv=none; b=WH/bQ4kV1//ior8V/LaEMi2hQOdoXJjuSv/1fbqFzWmeFXwu6xTDrMxuNU+wz1tmiu2wWM7k556knJHvIhbnRFEHn1mp4fpQmcMxbY6GUz2FUliIskMaSdGwv6x6xmFThqU98Nb2e8IcWM5iiUgEIqLVN+szVn5DorFr2Ph8gZU=
+	t=1718445386; cv=none; b=qEvkD0+j24gyoA1bVFXI2KyLm9+AIcM1NU/Uvf5oE5Zysq+Mn6HdKLpIY/h8ZMZ1sxDQfEQvzDwrsecdNThGY8xgyFtARUKxqr0o8Si5kVAx2MB+Pvq4aTHvaDvH3d9pd8Z4M3RJv8A1aMv9+XkCq+Gh3qKnCqo7DCgJe9NMigg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718444465; c=relaxed/simple;
-	bh=lUac5tF0AUoJuQTSNJfwmnyilaoEyDoTyEWDta/czRM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z9oocte4mtDk5VL21UcbNrPTdsvY0AjRWCD9ItPIbDQTuBdLO+kXnSHgcFkniebX5Tduf4W3F+5V/xJI2Ut6nBp3aBwbo017lEX46U3uVq47f0M1Wj2UAQlx7qJgmlyGemES5iL4NmZ2o1fqYGUzqegCNXdurqQzAKMMyNu0O6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=cKpwuuCg; arc=none smtp.client-ip=212.227.15.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1718444447; x=1719049247; i=hfdevel@gmx.net;
-	bh=5N7RTEWkyG7FrwsAznJXwQRWU0QYsx609shhmDAEoZA=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=cKpwuuCgL/76RqwtCst+Lz6rmWroHDaY3dFUQypIzT3XuNIJA+/9ZeXMljCJY9lQ
-	 ZiApbnB6MRUGhb4woY3Wx5lXR4gYSc3NPtFl0/BxYQTRJrqY+AnpGQXcrqfgPCr1t
-	 RpV+fO/VpWLFUPOaPO6BUHjhV1uU80oPL6S6itTnsvH/h2Ki8a3EmaNAShWvQvmYT
-	 rl4TS2nb9ffVdxqFsWfOE8gpJOkEaNdO1Sz2hhmuqB9If6KKCHH+ua4MdqfNlR8xl
-	 D0xyPFetY/QTPol5lNR4oK7adI4UZZwEy3Dijsg5bB+KNO3SXiL2rIYT3wJag83VA
-	 3xxREOwkfvab2mfjMw==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [10.0.0.23] ([77.33.175.99]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1McpJg-1ssIsn1YbC-00aOz4; Sat, 15
- Jun 2024 11:40:47 +0200
-Message-ID: <2f9cf951-f357-402c-9da7-77276a9a6a63@gmx.net>
-Date: Sat, 15 Jun 2024 11:40:45 +0200
+	s=arc-20240116; t=1718445386; c=relaxed/simple;
+	bh=N2YEApRjXLgw063ZUXNRkiHZcwFijtkyX5h2sRacRUQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CfrIR5ss5F+zCG6jtZlW4ewp4nw/6IHMOMPTo9jPLrZUWWTKHu+Pv1GsXRPOV/2IlFp6wG3j6pyOGxSOCyD1+PcjSTsQ2/rVgd614sJH+VJa5q9vkLgkN55GY2FI1gtIAWzcYGlBc4Mr2/VyED5c7pUoJRan/VQXEFrq9xG7ioQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WoeRlsMv; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-70109d34a16so2632338b3a.2;
+        Sat, 15 Jun 2024 02:56:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718445384; x=1719050184; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tg5u5ShuykptgMBL5I5DS/hZACOm+i1CYfL5BzH1+bY=;
+        b=WoeRlsMvPCt+aaEiGFGuPIMI0I3wVO789dVR9TrT1TUBjAUo6geKoA07YMnNl7JF6J
+         RmkL3RP99qj7C+khwMm8173kgT4VX10gfiuJHjZX1r2WD6Km04tUcAt4eGYK8J0EFCtY
+         +Fm55kolU0K2PLKZAL7YHAmLNw/yoO7DKauM8Umutflr5mla8yl+bPpZEJEB05ItSuDu
+         srFJZGMxk3jyvMHW2qZXbq76gRI6BNGPAky4yTdsLnS9RWfyADlPlwLarYnLl/2MXsgU
+         aE7zEbBxCpoE0Fa4mSXQAPsLz5v7l5QcptlRyf1Zxg7Qu/8hnPr/G7izpbeG4zDBRGn+
+         HhVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718445384; x=1719050184;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tg5u5ShuykptgMBL5I5DS/hZACOm+i1CYfL5BzH1+bY=;
+        b=mKZN1asqdcskE3Z1CLboB3QHsWdBfayjy6PQidP6ySWAZ3ewyD5m+h+zfoTws57R3n
+         /xLgA9V+fmEcL2gNB5R1wLUD8BTb6R5yIQGuogCJqSxK0qKe1UCbdW2pV+5VZ80RJlug
+         6EP+yZdfftByoqzML7bTp5eW7A8OOiXdmP6gomjoD3EPzUBqTOe1UEnvU0h/e04Ng/A8
+         QArYpeYQ0WuWjCKH3HBgrw71Ps6mDEWmfhPlE381DrjbPQYoKHUiqVIvnryiqk7IK9Y6
+         qj0axXOrlWyezYgAAhUh3ZSzVfDAFuPwwq2yDsDwGHzXKP1XU1NDEZTwKCMBOl7MXjtD
+         x5Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCVm6e9EKVUcpB0jCUHAI06dLwGeRLQMdMQOZR3Kfijvdd3YN/7A6rfJD9EEgmi+OVWsRP1j05Hps7HbQ10XZXZfxoziLDcnQyAXH/6g
+X-Gm-Message-State: AOJu0YwB6NQzC4KZpMp7p3C4QN2Csn+Hq9zsf+37Z8JFwON21tYrXwGu
+	bLyVC5D3usyOj8hapLGmhKKm4tQNIzlVPGgw51LskI+zUQ9Yuaad
+X-Google-Smtp-Source: AGHT+IEDUVaqWTyE5K7lkt2gzZ4FztGsgWD9JDp9eG7o9DJF60GqM8BDrnujcRy+GpHK8csEE5ZSVA==
+X-Received: by 2002:aa7:8b94:0:b0:702:65de:19e5 with SMTP id d2e1a72fcca58-705d722b7a3mr5165325b3a.33.1718445384256;
+        Sat, 15 Jun 2024 02:56:24 -0700 (PDT)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-705ccb71715sm4531309b3a.175.2024.06.15.02.56.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Jun 2024 02:56:23 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Eric Dumazet <edumazet@google.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>,
+	Corinna Vinschen <vinschen@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	xfr@outlook.com,
+	rock.xu@nio.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v4] net: stmmac: Enable TSO on VLANs
+Date: Sat, 15 Jun 2024 17:56:11 +0800
+Message-Id: <20240615095611.517323-1-0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 4/7] net: tn40xx: add basic Tx handling
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: kuba@kernel.org, netdev@vger.kernel.org, andrew@lunn.ch,
- horms@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
- linux@armlinux.org.uk, naveenm@marvell.com, jdamato@fastly.com
-References: <20240611045217.78529-5-fujita.tomonori@gmail.com>
- <20240613173038.18b2a1ce@kernel.org>
- <1ae2ddab-b6d2-499d-9aa1-3033c730bb87@gmx.net>
- <20240615.180209.1799432003527929919.fujita.tomonori@gmail.com>
-Content-Language: en-US
-From: Hans-Frieder Vogt <hfdevel@gmx.net>
-In-Reply-To: <20240615.180209.1799432003527929919.fujita.tomonori@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:7Cl8j6OTd3TijRxAn/K5JFUrYurjhQLnrV0EH7K8mJshmbGPSlK
- dCVfghtRuojgTpQp//knRvs5anacx/oCLriJ5JHv5Xb+OuHW+m0RgMEG7aRhKC+s9d+twFp
- lBbtXZ4r8tYa+NiEC3ahSjEi32m8jj9UsIMkSfpgUeGsutvs+HA6CksOaZV+kqg5RIffz9i
- EcNTVcZKu9eMFvBUDECBg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:8EIYI5b8npg=;m8OdhK8+vfSX4UNidXy6fuIFDZ/
- yIKx6FAvrrs3t6WtwiWEu1U6AzqygYDHn3TdT+NfMHc1QhFfhB4Ue7hc9Rnun4l+z7R+7HqYd
- 24dGtGyvz/oojSfMysRAPGyMadTLHM8zdPicC5xoIGOr2gMKMnrnY3DxAgWqDNFwXh1i6n36g
- EmPmI1R2DwT1QhK9oyb8NzBZQlkjOV7IKMga3BJyCPyPh397l6faM+gyR620ccXPhRQGq2VPi
- oejyHquoM/fnKe3mF1dbLuqKpDtJN66ert54ZywUNcaOJAR6bX7C8Y4eH1KP3/Ovd+5/Tfv32
- yxAS8sWQ0akcvG8kYBuUa2wbOW82Bu0ebnSjH2s+uINKrVfvRgHc/dKeiJt9acx/yo1PKACF+
- MWiX543ZrKpXclqj4GPAgrLIvbShQZeawlAyB8DMpUuSy79nCmio+hqI8EK5QFKkcpTrjdZVz
- 3BuTwnUr9vXhqP3Il5dF/AjNQirL1VQtNXaO6QF/Si6/gLfMUGpJIsn+h9QxRvB2KYIO2IXzd
- Y1K5Pcizkf4rEOh3E8a5Jd6OdBjID5KiKoMqk8BVgT9Lx/ysVEAO2mNSY41+uScH4I1qyOiCe
- rcorCVSohXM+SeEtz+Nq+JP29TKkdpZa0Asa8nj6o4B9yAnEXuxarANKG2xR4YvQ0X/3K7owN
- 6khc2Y971PBVRkgTSpeHg4qWGpB/DGmoFT+WqedSjeVGGdY+PuP/Jbz4fMZvZRu+vImC7ghqL
- XyRoOkOSPPHi2mCyQUwj9qn3e1HtpAk//7Nk1wMlJR4YuMI6cLDcFIVi7ZJiv3r79k3knLsM/
- pPdOOwKMFzrKVfrYoEdXlOWRflf/qUAYYnbofvixi7dHI=
+Content-Transfer-Encoding: 8bit
 
-On 15.06.2024 11.02, FUJITA Tomonori wrote:
-> On Sat, 15 Jun 2024 09:44:31 +0200
-> Hans-Frieder Vogt <hfdevel@gmx.net> wrote:
->
->>> On Tue, 11 Jun 2024 13:52:14 +0900 FUJITA Tomonori wrote:
->>>> +static void tn40_init_txd_sizes(void)
->>>> +{
->>>> +	int i, lwords;
->>>> +
->>>> +	if (tn40_txd_sizes[0].bytes)
->>>> +		return;
->>>> +
->>>> +	/* 7 - is number of lwords in txd with one phys buffer
->>>> +	 * 3 - is number of lwords used for every additional phys buffer
->>>> +	 */
->>>> +	for (i =3D 0; i < TN40_MAX_PBL; i++) {
->>>> +		lwords =3D 7 + (i * 3);
->>>> +		if (lwords & 1)
->>>> +			lwords++;	/* pad it with 1 lword */
->>>> +		tn40_txd_sizes[i].qwords =3D lwords >> 1;
->>>> +		tn40_txd_sizes[i].bytes =3D lwords << 2;
->>>> +	}
->>>> +}
->>> Since this initializes global data - you should do it in module init.
->>> Due to this you can't rely on module_pci_driver(), you gotta write
->>> the module init / exit functions by hand.
->> I would rather move tn40_txd_sizes into tn40_priv and initialize it at
->> probe-time. Just thinking what will happen if there is more than one
->> tn40 card in a computer. Then a driver-based global struct would lead
->> to
->> all sorts of problems.
-> The tn40_txd_sizes array is ready-only and the same values are used
-> for all TN40 cards? So no need to move it into the priv?
+The TSO engine works well when the frames are not VLAN Tagged.
+But it will produce broken segments when frames are VLAN Tagged.
 
-very good point!
-But if this is anyway just a constant translation table, why not
-pre-calculating it and making it a real const?
-something like:
+The first segment is all good, while the second segment to the
+last segment are broken, they lack of required VLAN tag.
 
-/* Sizes of tx desc (including padding if needed) as function of the SKB's
- =C2=A0* frag number
- =C2=A0* 7 - is number of lwords in txd with one phys buffer
- =C2=A0* 3 - is number of lwords used for every additional phys buffer
- =C2=A0* for (i =3D 0; i < TN40_MAX_PBL; i++) {
- =C2=A0*=C2=A0=C2=A0=C2=A0 lwords =3D 7 + (i * 3);
- =C2=A0*=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (lwords & 1)
- =C2=A0*=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 lwords++;=
-=C2=A0=C2=A0=C2=A0 pad it with 1 lword
- =C2=A0*=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 tn40_txd_sizes[i].qwords =3D=
- lwords >> 1;
- =C2=A0*=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 tn40_txd_sizes[i].bytes =3D =
-lwords << 2;
- =C2=A0* }
- =C2=A0*/
-static struct {
- =C2=A0=C2=A0 =C2=A0u16 bytes;
- =C2=A0=C2=A0 =C2=A0u16 qwords;=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 /* qw=
-ord =3D 64 bit */
-} const tn40_txd_sizes[] =3D {
- =C2=A0=C2=A0 =C2=A0{ 0x20, 0x04 },
- =C2=A0=C2=A0 =C2=A0{ 0x28, 0x05 },
- =C2=A0=C2=A0 =C2=A0{ 0x38, 0x07 },
- =C2=A0=C2=A0 =C2=A0{ 0x40, 0x08 },
- =C2=A0=C2=A0 =C2=A0{ 0x50, 0x0a },
- =C2=A0=C2=A0 =C2=A0{ 0x58, 0x0b },
- =C2=A0=C2=A0 =C2=A0{ 0x68, 0x0d },
- =C2=A0=C2=A0 =C2=A0{ 0x70, 0x0e },
- =C2=A0=C2=A0 =C2=A0{ 0x80, 0x10 },
- =C2=A0=C2=A0 =C2=A0{ 0x88, 0x11 },
- =C2=A0=C2=A0 =C2=A0{ 0x98, 0x13 },
- =C2=A0=C2=A0 =C2=A0{ 0xa0, 0x14 },
- =C2=A0=C2=A0 =C2=A0{ 0xb0, 0x16 },
- =C2=A0=C2=A0 =C2=A0{ 0xb8, 0x17 },
- =C2=A0=C2=A0 =C2=A0{ 0xc8, 0x19 },
- =C2=A0=C2=A0 =C2=A0{ 0xd0, 0x1a },
- =C2=A0=C2=A0 =C2=A0{ 0xe0, 0x1c },
- =C2=A0=C2=A0 =C2=A0{ 0xe8, 0x1d },
- =C2=A0=C2=A0 =C2=A0{ 0xf8, 0x1f },
-};
+An example here:
+========
+// 1st segment of a VLAN Tagged TSO frame, nothing wrong.
+MacSrc > MacDst, ethertype 802.1Q (0x8100), length 1518: vlan 100, p 1, ethertype IPv4 (0x0800), HostA:42643 > HostB:5201: Flags [.], seq 1:1449
 
-#define TN40_MAX_PBL (ARRAY_SIZE(tn40_txd_sizes))
+// 2nd to last segments of a VLAN Tagged TSO frame, VLAN tag is missing.
+MacSrc > MacDst, ethertype IPv4 (0x0800), length 1514: HostA:42643 > HostB:5201: Flags [.], seq 1449:2897
+MacSrc > MacDst, ethertype IPv4 (0x0800), length 1514: HostA:42643 > HostB:5201: Flags [.], seq 2897:4345
+MacSrc > MacDst, ethertype IPv4 (0x0800), length 1514: HostA:42643 > HostB:5201: Flags [.], seq 4345:5793
+MacSrc > MacDst, ethertype IPv4 (0x0800), length 1514: HostA:42643 > HostB:5201: Flags [P.], seq 5793:7241
+
+// normal VLAN Tagged non-TSO frame, nothing wrong.
+MacSrc > MacDst, ethertype 802.1Q (0x8100), length 1022: vlan 100, p 1, ethertype IPv4 (0x0800), HostA:42643 > HostB:5201: Flags [P.], seq 7241:8193
+MacSrc > MacDst, ethertype 802.1Q (0x8100), length 70: vlan 100, p 1, ethertype IPv4 (0x0800), HostA:42643 > HostB:5201: Flags [F.], seq 8193
+========
+
+When transmitting VLAN Tagged TSO frames, never insert VLAN tag by HW,
+always insert VLAN tag to SKB payload, then TSO works well on VLANs for
+all MAC cores.
+
+Tested on DWMAC CORE 5.10a, DWMAC CORE 5.20a and DWXGMAC CORE 3.20a
+
+Signed-off-by: Furong Xu <0x1207@gmail.com>
+---
+  Changes in v4:
+    - Re-arrange variables to keep reverse x-mas tree order.
+
+  Changes in v3:
+    - Drop packet and increase stats counter when vlan tag insert fails.
+
+  Changes in v2:
+    - Use __vlan_hwaccel_push_inside() to insert vlan tag to the payload.
+---
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 32 +++++++++++--------
+ 1 file changed, 19 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 5ddbb0d44373..83b654b7a9fd 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -4237,18 +4237,32 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
+ 	struct dma_desc *desc, *first, *mss_desc = NULL;
+ 	struct stmmac_priv *priv = netdev_priv(dev);
+-	int nfrags = skb_shinfo(skb)->nr_frags;
+-	u32 queue = skb_get_queue_mapping(skb);
++	int tmp_pay_len = 0, first_tx, nfrags;
+ 	unsigned int first_entry, tx_packets;
+ 	struct stmmac_txq_stats *txq_stats;
+-	int tmp_pay_len = 0, first_tx;
+ 	struct stmmac_tx_queue *tx_q;
+-	bool has_vlan, set_ic;
++	u32 pay_len, mss, queue;
+ 	u8 proto_hdr_len, hdr;
+-	u32 pay_len, mss;
+ 	dma_addr_t des;
++	bool set_ic;
+ 	int i;
+ 
++	/* Always insert VLAN tag to SKB payload for TSO frames.
++	 *
++	 * Never insert VLAN tag by HW, since segments splited by
++	 * TSO engine will be un-tagged by mistake.
++	 */
++	if (skb_vlan_tag_present(skb)) {
++		skb = __vlan_hwaccel_push_inside(skb);
++		if (unlikely(!skb)) {
++			priv->xstats.tx_dropped++;
++			return NETDEV_TX_OK;
++		}
++	}
++
++	nfrags = skb_shinfo(skb)->nr_frags;
++	queue = skb_get_queue_mapping(skb);
++
+ 	tx_q = &priv->dma_conf.tx_queue[queue];
+ 	txq_stats = &priv->xstats.txq_stats[queue];
+ 	first_tx = tx_q->cur_tx;
+@@ -4301,9 +4315,6 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+ 			skb->data_len);
+ 	}
+ 
+-	/* Check if VLAN can be inserted by HW */
+-	has_vlan = stmmac_vlan_insert(priv, skb, tx_q);
+-
+ 	first_entry = tx_q->cur_tx;
+ 	WARN_ON(tx_q->tx_skbuff[first_entry]);
+ 
+@@ -4313,9 +4324,6 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		desc = &tx_q->dma_tx[first_entry];
+ 	first = desc;
+ 
+-	if (has_vlan)
+-		stmmac_set_desc_vlan(priv, first, STMMAC_VLAN_INSERT);
+-
+ 	/* first descriptor: fill Headers on Buf1 */
+ 	des = dma_map_single(priv->device, skb->data, skb_headlen(skb),
+ 			     DMA_TO_DEVICE);
+@@ -7682,8 +7690,6 @@ int stmmac_dvr_probe(struct device *device,
+ 		ndev->features |= NETIF_F_RXHASH;
+ 
+ 	ndev->vlan_features |= ndev->features;
+-	/* TSO doesn't work on VLANs yet */
+-	ndev->vlan_features &= ~NETIF_F_TSO;
+ 
+ 	/* MTU range: 46 - hw-specific max */
+ 	ndev->min_mtu = ETH_ZLEN - ETH_HLEN;
+-- 
+2.34.1
 
 
