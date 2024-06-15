@@ -1,59 +1,63 @@
-Return-Path: <netdev+bounces-103815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D8129099FE
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 23:21:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2473D909A06
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 23:35:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE3191F21D1A
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 21:21:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07A5E1C20DE3
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 21:35:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 609601C68E;
-	Sat, 15 Jun 2024 21:21:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2354F881;
+	Sat, 15 Jun 2024 21:35:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EECE179A8
-	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 21:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349BE8F48
+	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 21:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718486469; cv=none; b=ZYwtwUdfEyuGF/aXTNk4R7FGv8fRRLzJhcPgph+ZwEhxM0E890UzHywNh1/ojfBCKbIQ8MOVGBdTQ3fK452RtCYy4ym5f/1wJZ77jj3hC0SKSWnd+v8OSSd1Xt4BDDJLXROHkxIFqTPWABvtHLJe54jq6duzNf+04TayAibjGzQ=
+	t=1718487343; cv=none; b=eU6lUSISX+nLkKW724lBQbXncokxdyjQjjKEntXkNCcF16UaHaA3EV9AS6tQMNEofrmzVDLAXK95rZXA7beaIOmw0VDmiAT0WeB77Cy20ws7pFudIZ7wF4W1OT77d3ZkY0NzGvU9MmysLNoSTptTRoH/nUcl3bXN6wQtDY33hg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718486469; c=relaxed/simple;
-	bh=sSdyUbGYfx+mUB6e4EJY+pbTDYsZbR5crjYv4C45xvI=;
+	s=arc-20240116; t=1718487343; c=relaxed/simple;
+	bh=qmJN1lve7JcoiGFq1UrMKhgHoWc3m9quj0gzt2Le7jk=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=af4uC3VsW61ClxW20SGrP9bduJDdPqsMYIzdi/zlplXrDzwbaotC4pIrdaQeCKiKnvtFjk/t353fgt/R2ovBAZ4uM8P7+aC3OLOVMMxJnhrmx37HkObJzWwKbP83DggkCrIdeUV/v4P7DWsUImI+lE3IAr9CA5S0YsInG03WyQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+	 MIME-Version:Content-Type; b=m8G+HAI0VM1tRRwspP7rAE+wJ0YdTT/GMgUgqfWuPid+BTY2AZAKIromOjcM0M+s60fftQjuDC4GsdxeNuXrTLkLDhTV0lwEOgq+SUZ0N9y0qqlYjc+swVTSJf/pIw85ufk6t0OFCN1RikSlTxdIdNvYuid+k7W8VH9h2hJleyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
 Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
  relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-116-e4PTO85oMRyhbYwuP-_vaA-1; Sat, 15 Jun 2024 22:20:53 +0100
-X-MC-Unique: e4PTO85oMRyhbYwuP-_vaA-1
+ uk-mta-257-WcpmdJxuOlyzpwH8SkS-PQ-1; Sat, 15 Jun 2024 22:35:28 +0100
+X-MC-Unique: WcpmdJxuOlyzpwH8SkS-PQ-1
 Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
  (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sat, 15 Jun
- 2024 22:20:17 +0100
+ 2024 22:34:52 +0100
 Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Sat, 15 Jun 2024 22:20:17 +0100
+ id 15.00.1497.048; Sat, 15 Jun 2024 22:34:52 +0100
 From: David Laight <David.Laight@ACULAB.COM>
-To: 'Shannon Nelson' <shannon.nelson@amd.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
-	"kuba@kernel.org" <kuba@kernel.org>, "edumazet@google.com"
-	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>
-CC: "brett.creeley@amd.com" <brett.creeley@amd.com>, "drivers@pensando.io"
-	<drivers@pensando.io>
-Subject: RE: [PATCH net-next 7/8] ionic: Use an u16 for rx_copybreak
-Thread-Topic: [PATCH net-next 7/8] ionic: Use an u16 for rx_copybreak
-Thread-Index: AQHau4sD/nDUY/efCkW3PCGaFvsKj7HJXBaw
-Date: Sat, 15 Jun 2024 21:20:17 +0000
-Message-ID: <1cfefa13c8f34ccca322639a05122d6d@AcuMS.aculab.com>
-References: <20240610230706.34883-1-shannon.nelson@amd.com>
- <20240610230706.34883-8-shannon.nelson@amd.com>
-In-Reply-To: <20240610230706.34883-8-shannon.nelson@amd.com>
+To: 'Christoph Hellwig' <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
+CC: Jakub Kicinski <kuba@kernel.org>, Aurelien Aptel <aaptel@nvidia.com>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "kbusch@kernel.org"
+	<kbusch@kernel.org>, "axboe@fb.com" <axboe@fb.com>, "chaitanyak@nvidia.com"
+	<chaitanyak@nvidia.com>, "davem@davemloft.net" <davem@davemloft.net>
+Subject: RE: [PATCH v25 00/20] nvme-tcp receive offloads
+Thread-Topic: [PATCH v25 00/20] nvme-tcp receive offloads
+Thread-Index: AQHau8pbCx3DyDdCX0iDpwrmm4Yu8LHJXahA
+Date: Sat, 15 Jun 2024 21:34:52 +0000
+Message-ID: <df4db10f6f3946e29e7e7340cfa82c33@AcuMS.aculab.com>
+References: <20240529160053.111531-1-aaptel@nvidia.com>
+ <20240530183906.4534c029@kernel.org> <20240531061142.GB17723@lst.de>
+ <06d9c3c9-8d27-46bf-a0cf-0c3ea1a0d3ec@grimberg.me>
+ <20240610122939.GA21899@lst.de>
+ <9a03d3bf-c48f-4758-9d7f-a5e7920ec68f@grimberg.me>
+ <20240611064132.GA6727@lst.de>
+In-Reply-To: <20240611064132.GA6727@lst.de>
 Accept-Language: en-GB, en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
@@ -70,70 +74,44 @@ Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-From: Shannon Nelson
-> Sent: 11 June 2024 00:07
+From: Christoph Hellwig
+> Sent: 11 June 2024 07:42
 >=20
-> From: Brett Creeley <brett.creeley@amd.com>
+> On Mon, Jun 10, 2024 at 05:30:34PM +0300, Sagi Grimberg wrote:
+> >> efficient header splitting in the NIC, either hard coded or even
+> >> better downloadable using something like eBPF.
+> >
+> > From what I understand, this is what this offload is trying to do. It u=
+ses
+> > the nvme command_id similar to how the read_stag is used in iwarp,
+> > it tracks the NVMe/TCP pdus to split pdus from data transfers, and maps
+> > the command_id to an internal MR for dma purposes.
+> >
+> > What I think you don't like about this is the interface that the offloa=
+d
+> > exposes
+> > to the TCP ulp driver (nvme-tcp in our case)?
 >=20
-> To make space for other data members on the first cache line reduce
-> rx_copybreak from an u32 to u16.  The max Rx buffer size we support
-> is (u16)-1 anyway so this makes sense.
+> I don't see why a memory registration is needed at all.
 >=20
-> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-> ---
->  drivers/net/ethernet/pensando/ionic/ionic_ethtool.c | 10 +++++++++-
->  drivers/net/ethernet/pensando/ionic/ionic_lif.h     |  2 +-
->  2 files changed, 10 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-> b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-> index 91183965a6b7..26acd82cf6bc 100644
-> --- a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-> +++ b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-> @@ -872,10 +872,18 @@ static int ionic_set_tunable(struct net_device *dev=
-,
->  =09=09=09     const void *data)
->  {
->  =09struct ionic_lif *lif =3D netdev_priv(dev);
-> +=09u32 rx_copybreak, max_rx_copybreak;
->=20
->  =09switch (tuna->id) {
->  =09case ETHTOOL_RX_COPYBREAK:
-> -=09=09lif->rx_copybreak =3D *(u32 *)data;
-> +=09=09rx_copybreak =3D *(u32 *)data;
-> +=09=09max_rx_copybreak =3D min_t(u32, U16_MAX, IONIC_MAX_BUF_LEN);
+> The by far biggest painpoint when doing storage protocols (including
+> file systems) over IP based storage is the data copy on the receive
+> path because the payload is not aligned to a page boundary.
 
-I doubt that needs to be min_t() or that you really need the temporary.
-
-> +=09=09if (rx_copybreak > max_rx_copybreak) {
-> +=09=09=09netdev_err(dev, "Max supported rx_copybreak size: %u\n",
-> +=09=09=09=09   max_rx_copybreak);
-> +=09=09=09return -EINVAL;
-> +=09=09}
-> +=09=09lif->rx_copybreak =3D (u16)rx_copybreak;
->  =09=09break;
->  =09default:
->  =09=09return -EOPNOTSUPP;
-> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.h
-> b/drivers/net/ethernet/pensando/ionic/ionic_lif.h
-> index 40b28d0b858f..50fda9bdc4b8 100644
-> --- a/drivers/net/ethernet/pensando/ionic/ionic_lif.h
-> +++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.h
-> @@ -206,7 +206,7 @@ struct ionic_lif {
->  =09unsigned int nxqs;
->  =09unsigned int ntxq_descs;
->  =09unsigned int nrxq_descs;
-> -=09u32 rx_copybreak;
-> +=09u16 rx_copybreak;
->  =09u64 rxq_features;
->  =09u16 rx_mode;
-
-There seem to be 6 pad bytes here - why not just use them??
-
->  =09u64 hw_features;
+How much does the copy cost anyway?
+If the hardware has merged the segments then it should be a single copy.
+On x86 (does anyone care about anything else :-) 'rep mosvb' with a
+cache-line aligned destination runs at 64 bytes/clock.
+(The source alignment doesn't matter at all.)
+I guess it loads the source data into the D-cache, the target is probably
+required anyway - or you wouldn't be doing a read.
 
 =09David
+
+>=20
+> So we need to figure out a way that is as stateless as possible that
+> allows aligning the actual data payload on a page boundary in an
+> otherwise normal IP receive path.
 
 -
 Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
