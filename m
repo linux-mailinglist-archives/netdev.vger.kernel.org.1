@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-103754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6EE590955D
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A5AF90955C
 	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 03:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B6B0B21633
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 01:50:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E7801C219FF
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 01:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B19F1870;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 107221C2E;
 	Sat, 15 Jun 2024 01:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u6bMh3/K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SJmPutmU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBAB3173
-	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 01:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBAE01396;
+	Sat, 15 Jun 2024 01:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718416231; cv=none; b=NYaJ1TNj97yigLAQNKh+uPj8zYAPIqd0V/0Ko9qtNsbHxu8p6d77BekcNO3E2ivUzxq/1b0Aka/JgU2z1GPUPGbh/wePL3B9dcbyV+SFNRI4YNa5AACC1PlMdbAgTHtsqI0KOzI3geWufv4GrBTucBavJdhXve6J2HT2rKja/ok=
+	t=1718416232; cv=none; b=hON0Ou3dGVPCZsylG313cgM8L7MIyO3scU3wp8XlIehSNa7ZdH6QKdDMDgh86m1N2upXqXNyhQU4u01+rGLNzQLm3CgaNhouR9rQOboIJuQOz7i714FV9suqWsTOeivqxxyDnt56Mij8U18ChTxP3kLgxUJyLW8PdcXpY7t9rFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718416231; c=relaxed/simple;
-	bh=c9J+cDBZTacouJeC8CbfnkBG4Kv+RpgFW6i2DANS140=;
+	s=arc-20240116; t=1718416232; c=relaxed/simple;
+	bh=oimMEDP3KlUxDKSZudA/NIUUBekqHfLip7MbA1d5XYk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lqdgSsKIuBvF/V/qu8NxI1UrIoU6UT6972/j51VMJwRzxz6wOgd9UDieYpd19FSTmgOW+Y6Z02FKs54PCWVoTuzrV1IbJJaTGcYpJM8Tpe1f3fdMZk5FgAJGaz0M4W1gNk/kWzpD4XFSTA5lUgRkYRST/1cTqYXm8sLOUh0PSPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u6bMh3/K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B7A8C4AF1C;
+	 In-Reply-To:To:Cc; b=Jzf+P5QDHSBjGQxZqEMVwgIg7ylnSm4KaxqMp4814UDX57rK9rzSyRQsfIjoGcWEU6Glt9T3tcbaB7ioW5IxXTqio7f8V5KF6+7zPWQDrZESSUkd20AiXjqxR7L0f+/y4JMhbmGvpkutEVmhPk1Cod+YjKskY2d0EXkCUJTKpug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SJmPutmU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 83B2CC32786;
 	Sat, 15 Jun 2024 01:50:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718416231;
-	bh=c9J+cDBZTacouJeC8CbfnkBG4Kv+RpgFW6i2DANS140=;
+	bh=oimMEDP3KlUxDKSZudA/NIUUBekqHfLip7MbA1d5XYk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=u6bMh3/KoYlT/JXo5tjEcC1jFF3WPUvjN7Xw1cFEXD4AF1J6LVHH9grMT2IypfAkW
-	 Z38AOVyd4CdHe+PJZVyqrwNlJ8j9Il+39Qxyyf7zBillY6eM1LeYaivvjNrWaBsVF5
-	 L2yxIUCBzbd64RDrGCErEAytUX3HZi1E6/HM/nfMzZw4lp8DLSnLs6/Ct8NAQuHeuD
-	 LSKIJX+AkoI+FmMKGwozgeIrIU3zh/Wc2jHsyHZ7TAka5DaCiyba9zS9qYX6S625p7
-	 vtOihaLjT4BHDXJVRlYFc9EdHuAm2AcviKXvmjZICn6Vhsgq6z4PHp/Pn2m2Jf+wZH
-	 UneKvPfkSSiXQ==
+	b=SJmPutmUW1vTLBCbA3f4F3Me6ZXdp8UWQiIq1hpHX5Bedd5nAfiyJ2zKwmQ4y4Jn7
+	 gKkYYcz6StkjZRs71HXWHignp+a1reiSjgsRYVPxEhF9O6Tq03y+n/Z5rzwFPdF3Uk
+	 4/ahMCRvL/SAIlMk/iyD7Jx1l53Eare+xi4zqGfsx4vwDUxzjprRgmiyXHutGPVsM1
+	 7FBFjDPIF+aGr7tSaHcrN2hlfi9JU5ioqhJfHx+rSopnnUZv+g4fnYWfIKawHIy1lE
+	 D4TaDT/tICPAC95Ie3/ami5ZpN40h9qLkv5cKrTcDmSz5MUnvUXwnuhLS3nRpEQawC
+	 sttvFbyBtakFA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 626C4C43612;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6F31AC43619;
 	Sat, 15 Jun 2024 01:50:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,42 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] netdev-genl: fix error codes when outputting XDP features
+Subject: Re: pull-request: bpf 2024-06-14
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171841623139.3120.6737242474826552980.git-patchwork-notify@kernel.org>
+ <171841623144.3120.15362052319177248923.git-patchwork-notify@kernel.org>
 Date: Sat, 15 Jun 2024 01:50:31 +0000
-References: <20240613213044.3675745-1-kuba@kernel.org>
-In-Reply-To: <20240613213044.3675745-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, hawk@kernel.org, amritha.nambiar@intel.com,
- sridhar.samudrala@intel.com, alardam@gmail.com, lorenzo@kernel.org,
- memxor@gmail.com
+References: <20240614203223.26500-1-daniel@iogearbox.net>
+In-Reply-To: <20240614203223.26500-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This pull request was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 13 Jun 2024 14:30:44 -0700 you wrote:
-> -EINVAL will interrupt the dump. The correct error to return
-> if we have more data to dump is -EMSGSIZE.
+On Fri, 14 Jun 2024 22:32:23 +0200 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
 > 
-> Discovered by doing:
+> The following pull-request contains BPF updates for your *net* tree.
 > 
->   for i in `seq 80`; do ip link add type veth; done
->   ./cli.py --dbg-small-recv 5300 --spec netdev.yaml --dump dev-get >> /dev/null
->   [...]
->      nl_len = 64 (48) nl_flags = 0x0 nl_type = 19
->      nl_len = 20 (4) nl_flags = 0x2 nl_type = 3
->   	error: -22
+> We've added 8 non-merge commits during the last 2 day(s) which contain
+> a total of 9 files changed, 92 insertions(+), 11 deletions(-).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] netdev-genl: fix error codes when outputting XDP features
-    https://git.kernel.org/netdev/net/c/7ed352d34f1a
+  - pull-request: bpf 2024-06-14
+    https://git.kernel.org/netdev/net/c/c64da10adb57
 
 You are awesome, thank you!
 -- 
