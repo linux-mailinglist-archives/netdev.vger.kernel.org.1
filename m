@@ -1,57 +1,65 @@
-Return-Path: <netdev+bounces-103796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 082E6909892
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 16:01:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C84B59098A5
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 16:28:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67DD4B21962
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 14:01:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78947281F7A
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 14:28:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C70F51DDC9;
-	Sat, 15 Jun 2024 14:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D78045030;
+	Sat, 15 Jun 2024 14:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lYDjIGpf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VhnKZD7e"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 938468F49;
-	Sat, 15 Jun 2024 14:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A2A49624;
+	Sat, 15 Jun 2024 14:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718460081; cv=none; b=bADpkQVYqfloYemeUERzmlHNDfGB7G4qa5zNuSbgBCuTFFVi4ZsLvTLS4rYgcfbZB9kvmxccwFeekTEXSzzaGQfuuFq+1JsCE2N3YxQPQePIvrJtyx9rtR2KhVQlmlwMC+zc72H7jyJ6X7suG/xJArNa38oOxQg+zPHNI570XDg=
+	t=1718461703; cv=none; b=Xzcokv287ys2zKOWeDrTcShxFwuEYtKLak9Oh/fws16sqscfWsGtLkZgrHfC82YGtrjhhpZf840C32/jIdeWzKRZ3DYyXA4CpvYFNIBEdLkXDeYLyBL0ueIumej9QeBk3sDmRLMHUiLjcvKpZdFn/iDoYaHebPg+DMC+TggbIlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718460081; c=relaxed/simple;
-	bh=IsxKzE/HmgWh8VZzRAf30TKKzYJD2eMOIxM3xKuR0gs=;
+	s=arc-20240116; t=1718461703; c=relaxed/simple;
+	bh=uapNe6daeUuo6aEAI9k9slBYeR6ie3LDPRu+C4G/1NU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ReS4Yb0jYbzPayg/Vi9Q5LIqmZRomsW7alnZJl6LlPGXDbfblAJCWFpOaT9X0XWwCTkGIom246/AaEo25HyfwNGfwSkdCJU/V7UV+mfBgMChyCLLcpwHqeB11ZSdAA2b+FZZ70rlpcrAlMmv9sslmj6KbmDZfxVEr3erMaIaS4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lYDjIGpf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90C74C116B1;
-	Sat, 15 Jun 2024 14:01:19 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=q1CQiskAkdYErOfbkrRq5WWpcxF/V2RhJJgE8wrSq6vDEqlF0aDTFp5q7nN9oe81VgPKSPfTDR7gS9uWOrUJkpN4et/cEf/pCb18WjwLvT4uRAqDAIv4d2WHGsI0cN9LTVMdt0WhOqHc2ObXK3xkB7Cs2nfNsJFRsb2lyP0CVR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VhnKZD7e; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3A83C116B1;
+	Sat, 15 Jun 2024 14:28:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718460081;
-	bh=IsxKzE/HmgWh8VZzRAf30TKKzYJD2eMOIxM3xKuR0gs=;
+	s=k20201202; t=1718461702;
+	bh=uapNe6daeUuo6aEAI9k9slBYeR6ie3LDPRu+C4G/1NU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lYDjIGpfuIJTylGIhZpcN330hkrVOh2g34HHpVYyVdpsEYQk1pIlPKW7Dlr+TsKT0
-	 gQkpkmy8oyvsp9YW9m7IouUN7DFmMgl6eLD6VjixPIlQtJjJ5DLnwHI1QqOgkBfLNY
-	 AV6EDzdVk72EX7yQlHkC8dRBq/d8HymGRr88LxW/oJZbREWDTZ+8FZfVUsHmSbsOYy
-	 ND7n9ka9xum0ezDTaup8y/kDkEfHql8yjJ4gpiPwlhca5PX21ZDtui83OMVyM0Mks4
-	 Wk9pIleya05aleMv9rYZj/eENUr6XomOc2kReB/JdRBxlMlaSlJWd2/0+5hErrrdLy
-	 cG94whQ0ct/Xg==
-Date: Sat, 15 Jun 2024 15:01:17 +0100
+	b=VhnKZD7eaNQtOLKIQsKbOXbEK5Re7tDo7eav4A6VztwGZ0lMNDnyhSSeiFu9ETIYn
+	 v2+swGmpyvzsyrpkBbaf6XJIXS8t2DPm8PuS2NcCRmK2XmYbdyPreBPKRtocyP30VZ
+	 i64RLcXmQSpNY6iAg540YyKldnGd3BFwztl5SmbJgkt4T7rVWhT/LoT7li1pIgUupC
+	 v94AljzRFAb8Yt0ELLmaBGxanZttDE3JLwv9XhHbGplgSlmQgC6EcOC+OHr7quhlWO
+	 huPCqqAOYRHdF95cGbjEu+PyH9c8ePumTDg7T8IRGyfQTFUzT0iFXzTxRB2PpyllAK
+	 BYDkg7icd23Lg==
+Date: Sat, 15 Jun 2024 15:28:17 +0100
 From: Simon Horman <horms@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>,
-	Patrisious Haddad <phaddad@nvidia.com>, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH mlx5-next] RDMA/mlx5: Add Qcounters
- req_transport_retries_exceeded/req_rnr_retries_exceeded
-Message-ID: <20240615140117.GC8447@kernel.org>
-References: <250466af94f4989d638fab168e246035530e912f.1718301543.git.leon@kernel.org>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Erick Archer <erick.archer@outlook.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH net-next] net: mana: Use mana_cleanup_port_context() for
+ rxq cleanup
+Message-ID: <20240615142817.GD8447@kernel.org>
+References: <1718349548-28697-1-git-send-email-shradhagupta@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,20 +68,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <250466af94f4989d638fab168e246035530e912f.1718301543.git.leon@kernel.org>
+In-Reply-To: <1718349548-28697-1-git-send-email-shradhagupta@linux.microsoft.com>
 
-On Thu, Jun 13, 2024 at 09:00:04PM +0300, Leon Romanovsky wrote:
-> From: Patrisious Haddad <phaddad@nvidia.com>
+On Fri, Jun 14, 2024 at 12:19:08AM -0700, Shradha Gupta wrote:
 > 
-> The req_transport_retries_exceeded counter shows the number of times
-> requester detected transport retries exceed error.
+> To cleanup rxqs in port context structures, instead of duplicating the
+> code, use existing function mana_cleanup_port_context() which does
+> the exact cleanup that's needed.
 > 
-> The req_rnr_retries_exceeded counter show the number of times the
-> requester detected RNR NAKs retries exceed error.
-> 
-> Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+
+Thanks for following-up with this clean-up, much appreciated.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
-
 
