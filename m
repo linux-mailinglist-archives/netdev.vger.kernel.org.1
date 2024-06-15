@@ -1,111 +1,211 @@
-Return-Path: <netdev+bounces-103808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9968909916
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 19:00:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECA349098FD
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 18:08:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A95C1F2212B
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 17:00:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C96851C209CF
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 16:08:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58B0749656;
-	Sat, 15 Jun 2024 17:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C4743E49E;
+	Sat, 15 Jun 2024 16:08:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="hiQOM69u"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dkX3vbuI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-23.smtpout.orange.fr [80.12.242.23])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C527F2E40E;
-	Sat, 15 Jun 2024 17:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C69481C4
+	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 16:08:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718470811; cv=none; b=iEyHceiZL8owXJ7VV+PYCgkGEDcXeI078CS8ZAPAuDCeyw+8NOG+nAoOJHBWFEu41E4TsxuicuJAR88/QGMBKOCbn7uTUDmc2yP37GuxTAdS6QZwRnDXhKPgGSkeu21Fcd/VN01tNFfza9Vo/kJWmblLXuTO4vx5fkEkn02ZUJE=
+	t=1718467685; cv=none; b=lsY4UGZkDlSbmS7+1I0cCmkkza37qiWCg7BH8UBPX8/36c2xL6uUl0pi7NehAGH7s/kXNj2+lNKKECW2cEBJ7LfCljSVrCdvRh7r7u78VNp06sYt6k3UeVG8+hpNdmvm1hPzu/khS9uquAxZWH0XdL5DAIQ4q8UvlU8/hfHn2DE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718470811; c=relaxed/simple;
-	bh=qPF1/OwfQhKdvkx3zxh32aqPDUxcsGhv8/DRvBq/Z8A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ULyBZ0PtOxGtzcH/5bGXtfLQCXkjf5hnFXkz1UVgGR59Qr8tL/iEGPY+mlKXJLL2UoAQZw1bGGpg4fSshCpyZmkSRDSgOF2rUh/Pxsuf0ByMmOMU+M4WAAlPlKZLmqDnQMMHtqe5p7yCWE+30TU9ukmCS5pmfNnkQvpHDfPMJ9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=hiQOM69u; arc=none smtp.client-ip=80.12.242.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([86.243.222.230])
-	by smtp.orange.fr with ESMTPA
-	id INU5s0lg7j7S3INU5s5aIM; Sat, 15 Jun 2024 09:05:58 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1718435158;
-	bh=PTZjlzNRSwP9GntpvKn6bnVzhdAKr24YVJ985FiFhsg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=hiQOM69uCw/4OOKrtOqV2oIo8U6AdvxY7BuahOK40hMk/5CITfzQutK1lzLjBsj8K
-	 DwE94Gehm/4ieAwlJYcJpisB1VSrJgBcg3bIgU8H9xlBTsNNddaoBsYZ9jT0plJT2s
-	 2tgNiVCAYfv8S5OM4bBG46YwASXZ+7v5OeqmNCF0SFyTcGMMNQguewxWxadNTc9+rH
-	 C3gC/DycKNTYATsBdGzyALAPH8di6KGLminlk8I7PXapHzYjq8ntvoAMCDQDbg1FN+
-	 L66sz0S4W1AIDkFCbTr2yVm86kbhoxo9RsYFfwtr/gSSVM3VExyB/ieF12LFFxu1mU
-	 lWT7k4FnAHuZg==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 15 Jun 2024 09:05:58 +0200
-X-ME-IP: 86.243.222.230
-Message-ID: <3946b327-5e89-43d3-9dc3-10dd10bd41bc@wanadoo.fr>
-Date: Sat, 15 Jun 2024 09:05:56 +0200
+	s=arc-20240116; t=1718467685; c=relaxed/simple;
+	bh=fRhejE+LD/p9cqrf/3lNvG4iuIolAEo0RFfvpCA+VJE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=CnmockaClDoFNnRwqZ7TN+WpB5ClS8G/yjHbitJ7HBDlsp6iMcXb7M43cD4O6ZVUymp112r9oiIH38B0MvDh29Qlfnyeb6pp3gn0swa3MrSaQICHyMnGH1hbOpi2zorn9rGaA59ZhRdaDD0KNda+xDnyn8OVIkv0Ckq8dXByCOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dkX3vbuI; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dee902341c0so4943252276.3
+        for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 09:08:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718467682; x=1719072482; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/STVbNQ0XyXh73+jy1lVdnu8EOuL4NxrKZzvrDAl7aQ=;
+        b=dkX3vbuIml9nRVIkKJV6GTmen1PGV/PTfOQnX4+aQJ/7xQtgJE8rEsXVTfXnBaGHYp
+         /hfgLmjI3nsRiHaUDu5XH9QHFG3ULjdAVTJ7QZPNG1+kXbmHtUWMZQdO3EQpenkoNOw8
+         Sp8dYr8h1jjV0NPUC5bOsCzQOHJ51WjKxa1B8eWy6f4ZNbTU9iemshoHMjsULOH11i/h
+         I7ViI2M5XbNrjq+9mcm25DXW538E1N2IuJp8QPlkqpiVvxzL5zbjqdBP16x2DSFH+RCM
+         eQFEzOYo4oQCrYYjRf11nHa34Np/SzPq/nqh4lKI4sPz115oJ5u3zJyF8bnlIxXxo1RG
+         /8Ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718467682; x=1719072482;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/STVbNQ0XyXh73+jy1lVdnu8EOuL4NxrKZzvrDAl7aQ=;
+        b=nX2Q4WAmnZVrPhDHdXDAYo9e5wv3ULMNnp2oNNp/H+2GLnJqZCIram8PPBVuXTru6i
+         NWrtFQApdH3YL1mpaiDy015W1WyjU12rDsW2Wfwvc3KyeS9sZKmOzfqczHGbNzbXVL2n
+         MtsG8zlbFvk2xxn1qyYAG8RRWgiGVN3coJGrUi2rZLuqhymfv6FWxc+hipuBR8ea95Dg
+         Mb91bVp0nqQqf+/1FFiIHE/+fb/XbhfiptfUVsLKDT8BQRwHoggOK2cyW0zWCFcew3N0
+         +RDN17335k0vXSybP/vSWmBggBeiqaGwZO4wKIsxUL5EhvFnq82omX0mqLywEnXYZIBE
+         MysA==
+X-Forwarded-Encrypted: i=1; AJvYcCWE0rNkfQ7wVcXMb8cA3FhOtVmPYM7548P3FdHTYypEsJq16Z7LbpsWLfijV/ckl6kcjji09/VV9nWFhJIZ/PziwVBJ3Ew6
+X-Gm-Message-State: AOJu0YzD4yTyaMRxUxvjdR5ypIh8fkNZvFytpbh0IAKk1hCOZaVBCH91
+	cqQteUaKpfqFnwT/AwYWKHw4Mfl1qIAwIoWen6gP7oSbpzhfOXWhXOII58SSO9QRSPaTW1Jf4VP
+	gYDf/hfML5w==
+X-Google-Smtp-Source: AGHT+IGU+Y1whwXT9toa8M9TWzf/Dla68DMs2soP9H+LllNWPALjBNg4Oxw17Lz4Q1U4/+OYvvLhg91GBarDVg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:938b:0:b0:dda:d7cf:5c2c with SMTP id
+ 3f1490d57ef6-dff154676camr312528276.13.1718467682196; Sat, 15 Jun 2024
+ 09:08:02 -0700 (PDT)
+Date: Sat, 15 Jun 2024 16:08:00 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ptp: fix integer overflow in max_vclocks_store
-To: Dan Carpenter <dan.carpenter@linaro.org>, Yangbo Lu <yangbo.lu@nxp.com>
-Cc: Richard Cochran <richardcochran@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <d094ecbe-8b14-45cc-8cd8-f70fdeca55d8@moroto.mountain>
-Content-Language: en-MW
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <d094ecbe-8b14-45cc-8cd8-f70fdeca55d8@moroto.mountain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.627.g7a2c4fd464-goog
+Message-ID: <20240615160800.250667-1-edumazet@google.com>
+Subject: [PATCH net] wifi: cfg80211: restrict NL80211_ATTR_TXQ_QUANTUM values
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Johannes Berg <johannes@sipsolutions.net>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	"=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?=" <toke@toke.dk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Le 14/06/2024 à 19:31, Dan Carpenter a écrit :
-> On 32bit systems, the "4 * max" multiply can overflow.  Use size_mul()
-> to fix this.
-> 
-> Fixes: 44c494c8e30e ("ptp: track available ptp vclocks information")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->   drivers/ptp/ptp_sysfs.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/ptp/ptp_sysfs.c b/drivers/ptp/ptp_sysfs.c
-> index a15460aaa03b..bc1562fcd6c9 100644
-> --- a/drivers/ptp/ptp_sysfs.c
-> +++ b/drivers/ptp/ptp_sysfs.c
-> @@ -296,7 +296,7 @@ static ssize_t max_vclocks_store(struct device *dev,
->   	if (max < ptp->n_vclocks)
->   		goto out;
->   
-> -	size = sizeof(int) * max;
-> +	size = size_mul(sizeof(int), max);
->   	vclock_index = kzalloc(size, GFP_KERNEL);
+syzbot is able to trigger softlockups, setting NL80211_ATTR_TXQ_QUANTUM
+to 2^31.
 
-kcalloc() maybe?
+We had a similar issue in sch_fq, fixed with commit
+d9e15a273306 ("pkt_sched: fq: do not accept silly TCA_FQ_QUANTUM")
 
->   	if (!vclock_index) {
->   		err = -ENOMEM;
+watchdog: BUG: soft lockup - CPU#1 stuck for 26s! [kworker/1:0:24]
+Modules linked in:
+irq event stamp: 131135
+ hardirqs last  enabled at (131134): [<ffff80008ae8778c>] __exit_to_kernel_=
+mode arch/arm64/kernel/entry-common.c:85 [inline]
+ hardirqs last  enabled at (131134): [<ffff80008ae8778c>] exit_to_kernel_mo=
+de+0xdc/0x10c arch/arm64/kernel/entry-common.c:95
+ hardirqs last disabled at (131135): [<ffff80008ae85378>] __el1_irq arch/ar=
+m64/kernel/entry-common.c:533 [inline]
+ hardirqs last disabled at (131135): [<ffff80008ae85378>] el1_interrupt+0x2=
+4/0x68 arch/arm64/kernel/entry-common.c:551
+ softirqs last  enabled at (125892): [<ffff80008907e82c>] neigh_hh_init net=
+/core/neighbour.c:1538 [inline]
+ softirqs last  enabled at (125892): [<ffff80008907e82c>] neigh_resolve_out=
+put+0x268/0x658 net/core/neighbour.c:1553
+ softirqs last disabled at (125896): [<ffff80008904166c>] local_bh_disable+=
+0x10/0x34 include/linux/bottom_half.h:19
+CPU: 1 PID: 24 Comm: kworker/1:0 Not tainted 6.9.0-rc7-syzkaller-gfda5695d6=
+92c #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Goo=
+gle 03/27/2024
+Workqueue: mld mld_ifc_work
+pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=3D--)
+ pc : __list_del include/linux/list.h:195 [inline]
+ pc : __list_del_entry include/linux/list.h:218 [inline]
+ pc : list_move_tail include/linux/list.h:310 [inline]
+ pc : fq_tin_dequeue include/net/fq_impl.h:112 [inline]
+ pc : ieee80211_tx_dequeue+0x6b8/0x3b4c net/mac80211/tx.c:3854
+ lr : __list_del_entry include/linux/list.h:218 [inline]
+ lr : list_move_tail include/linux/list.h:310 [inline]
+ lr : fq_tin_dequeue include/net/fq_impl.h:112 [inline]
+ lr : ieee80211_tx_dequeue+0x67c/0x3b4c net/mac80211/tx.c:3854
+sp : ffff800093d36700
+x29: ffff800093d36a60 x28: ffff800093d36960 x27: dfff800000000000
+x26: ffff0000d800ad50 x25: ffff0000d800abe0 x24: ffff0000d800abf0
+x23: ffff0000e0032468 x22: ffff0000e00324d4 x21: ffff0000d800abf0
+x20: ffff0000d800abf8 x19: ffff0000d800abf0 x18: ffff800093d363c0
+x17: 000000000000d476 x16: ffff8000805519dc x15: ffff7000127a6cc8
+x14: 1ffff000127a6cc8 x13: 0000000000000004 x12: ffffffffffffffff
+x11: ffff7000127a6cc8 x10: 0000000000ff0100 x9 : 0000000000000000
+x8 : 0000000000000000 x7 : 0000000000000000 x6 : 0000000000000000
+x5 : ffff80009287aa08 x4 : 0000000000000008 x3 : ffff80008034c7fc
+x2 : ffff0000e0032468 x1 : 00000000da0e46b8 x0 : ffff0000e0032470
+Call trace:
+  __list_del include/linux/list.h:195 [inline]
+  __list_del_entry include/linux/list.h:218 [inline]
+  list_move_tail include/linux/list.h:310 [inline]
+  fq_tin_dequeue include/net/fq_impl.h:112 [inline]
+  ieee80211_tx_dequeue+0x6b8/0x3b4c net/mac80211/tx.c:3854
+  wake_tx_push_queue net/mac80211/util.c:294 [inline]
+  ieee80211_handle_wake_tx_queue+0x118/0x274 net/mac80211/util.c:315
+  drv_wake_tx_queue net/mac80211/driver-ops.h:1350 [inline]
+  schedule_and_wake_txq net/mac80211/driver-ops.h:1357 [inline]
+  ieee80211_queue_skb+0x18e8/0x2244 net/mac80211/tx.c:1664
+  ieee80211_tx+0x260/0x400 net/mac80211/tx.c:1966
+  ieee80211_xmit+0x278/0x354 net/mac80211/tx.c:2062
+  __ieee80211_subif_start_xmit+0xab8/0x122c net/mac80211/tx.c:4338
+  ieee80211_subif_start_xmit+0xe0/0x438 net/mac80211/tx.c:4532
+  __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+  netdev_start_xmit include/linux/netdevice.h:4917 [inline]
+  xmit_one net/core/dev.c:3531 [inline]
+  dev_hard_start_xmit+0x27c/0x938 net/core/dev.c:3547
+  __dev_queue_xmit+0x1678/0x33fc net/core/dev.c:4341
+  dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+  neigh_resolve_output+0x558/0x658 net/core/neighbour.c:1563
+  neigh_output include/net/neighbour.h:542 [inline]
+  ip6_finish_output2+0x104c/0x1ee8 net/ipv6/ip6_output.c:137
+  ip6_finish_output+0x428/0x7a0 net/ipv6/ip6_output.c:222
+  NF_HOOK_COND include/linux/netfilter.h:303 [inline]
+  ip6_output+0x270/0x594 net/ipv6/ip6_output.c:243
+  dst_output include/net/dst.h:450 [inline]
+  NF_HOOK+0x160/0x4f0 include/linux/netfilter.h:314
+  mld_sendpack+0x7b4/0x10f4 net/ipv6/mcast.c:1818
+  mld_send_cr net/ipv6/mcast.c:2119 [inline]
+  mld_ifc_work+0x840/0xd0c net/ipv6/mcast.c:2650
+  process_one_work+0x7b8/0x15d4 kernel/workqueue.c:3267
+  process_scheduled_works kernel/workqueue.c:3348 [inline]
+  worker_thread+0x938/0xef4 kernel/workqueue.c:3429
+  kthread+0x288/0x310 kernel/kthread.c:388
+  ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
 
+Fixes: 52539ca89f36 ("cfg80211: Expose TXQ stats and parameters to userspac=
+e")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
+---
+ net/wireless/nl80211.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Unrelated but, a few lines above, should the:
-	if (max == ptp->max_vclocks)
-		return count;
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 3c0bca4238d357c01b6fe92bb0f2b2b8a2917725..72c7bf55858166b8fc12114f090=
+bf085d652db6b 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -468,6 +468,10 @@ static const struct netlink_range_validation nl80211_p=
+unct_bitmap_range =3D {
+ 	.max =3D 0xffff,
+ };
+=20
++static const struct netlink_range_validation q_range =3D {
++	.max =3D INT_MAX,
++};
++
+ static const struct nla_policy nl80211_policy[NUM_NL80211_ATTR] =3D {
+ 	[0] =3D { .strict_start_type =3D NL80211_ATTR_HE_OBSS_PD },
+ 	[NL80211_ATTR_WIPHY] =3D { .type =3D NLA_U32 },
+@@ -754,7 +758,7 @@ static const struct nla_policy nl80211_policy[NUM_NL802=
+11_ATTR] =3D {
+=20
+ 	[NL80211_ATTR_TXQ_LIMIT] =3D { .type =3D NLA_U32 },
+ 	[NL80211_ATTR_TXQ_MEMORY_LIMIT] =3D { .type =3D NLA_U32 },
+-	[NL80211_ATTR_TXQ_QUANTUM] =3D { .type =3D NLA_U32 },
++	[NL80211_ATTR_TXQ_QUANTUM] =3D NLA_POLICY_FULL_RANGE(NLA_U32, &q_range),
+ 	[NL80211_ATTR_HE_CAPABILITY] =3D
+ 		NLA_POLICY_VALIDATE_FN(NLA_BINARY, validate_he_capa,
+ 				       NL80211_HE_MAX_CAPABILITY_LEN),
+--=20
+2.45.2.627.g7a2c4fd464-goog
 
-be after:
-	if (mutex_lock_interruptible(&ptp->n_vclocks_mux))
-		return -ERESTARTSYS;
-
-as done in n_vclocks_store()?
-
-CJ
 
