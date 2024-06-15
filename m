@@ -1,153 +1,111 @@
-Return-Path: <netdev+bounces-103806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C16B9098F7
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 17:59:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9968909916
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 19:00:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 574BB1C20C50
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 15:59:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A95C1F2212B
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 17:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BECA1DFD2;
-	Sat, 15 Jun 2024 15:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58B0749656;
+	Sat, 15 Jun 2024 17:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="hiQOM69u"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-23.smtpout.orange.fr [80.12.242.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860C449625
-	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 15:59:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C527F2E40E;
+	Sat, 15 Jun 2024 17:00:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718467193; cv=none; b=B0gO61IXPNRINdHlPkfzm0vOH7bHYK2LuMylLy2ulQicu1kE13oqXK9WxOWrNcNHaUHZe8Pjr5WC4FwODa2VPPeOjBn9hVLY3VtBK9pWBlP0uFefleXQWR66cn1t3EwzETjFuHJIdb/+jX5ZRx4ZvXhxHGUmqWdpXRI8mR3Zn8g=
+	t=1718470811; cv=none; b=iEyHceiZL8owXJ7VV+PYCgkGEDcXeI078CS8ZAPAuDCeyw+8NOG+nAoOJHBWFEu41E4TsxuicuJAR88/QGMBKOCbn7uTUDmc2yP37GuxTAdS6QZwRnDXhKPgGSkeu21Fcd/VN01tNFfza9Vo/kJWmblLXuTO4vx5fkEkn02ZUJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718467193; c=relaxed/simple;
-	bh=KHGjTMoWuQRlBoNsHFxOocl0TQ1I2SITqYCzam/HvNA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VaKx710z/b20AULEQMf4RkqrxuRF+FSwKg31UuAK7LVZcrlStYaSZCwhB6Mic2DM8cRVwxQq46LpIiQDstCfOeDJRkS9YDPjUyStgKotuuHV5mXbVTMDSulX/eltp+lXRjiZTlIupkyMkcp8UdMQ/zZxhKwhNiVIyFv6vF8ibQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sIVoZ-0008SV-OF; Sat, 15 Jun 2024 17:59:39 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sIVoW-002XHL-Q3; Sat, 15 Jun 2024 17:59:36 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sIVoW-00CMu4-2I;
-	Sat, 15 Jun 2024 17:59:36 +0200
-Date: Sat, 15 Jun 2024 17:59:36 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de
-Subject: Re: [PATCH net-next v3 5/7] net: ethtool: Add new power limit get
- and set features
-Message-ID: <Zm26aJaz7Z7LAXNT@pengutronix.de>
-References: <20240614-feature_poe_power_cap-v3-0-a26784e78311@bootlin.com>
- <20240614-feature_poe_power_cap-v3-5-a26784e78311@bootlin.com>
+	s=arc-20240116; t=1718470811; c=relaxed/simple;
+	bh=qPF1/OwfQhKdvkx3zxh32aqPDUxcsGhv8/DRvBq/Z8A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ULyBZ0PtOxGtzcH/5bGXtfLQCXkjf5hnFXkz1UVgGR59Qr8tL/iEGPY+mlKXJLL2UoAQZw1bGGpg4fSshCpyZmkSRDSgOF2rUh/Pxsuf0ByMmOMU+M4WAAlPlKZLmqDnQMMHtqe5p7yCWE+30TU9ukmCS5pmfNnkQvpHDfPMJ9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=hiQOM69u; arc=none smtp.client-ip=80.12.242.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [192.168.1.37] ([86.243.222.230])
+	by smtp.orange.fr with ESMTPA
+	id INU5s0lg7j7S3INU5s5aIM; Sat, 15 Jun 2024 09:05:58 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1718435158;
+	bh=PTZjlzNRSwP9GntpvKn6bnVzhdAKr24YVJ985FiFhsg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=hiQOM69uCw/4OOKrtOqV2oIo8U6AdvxY7BuahOK40hMk/5CITfzQutK1lzLjBsj8K
+	 DwE94Gehm/4ieAwlJYcJpisB1VSrJgBcg3bIgU8H9xlBTsNNddaoBsYZ9jT0plJT2s
+	 2tgNiVCAYfv8S5OM4bBG46YwASXZ+7v5OeqmNCF0SFyTcGMMNQguewxWxadNTc9+rH
+	 C3gC/DycKNTYATsBdGzyALAPH8di6KGLminlk8I7PXapHzYjq8ntvoAMCDQDbg1FN+
+	 L66sz0S4W1AIDkFCbTr2yVm86kbhoxo9RsYFfwtr/gSSVM3VExyB/ieF12LFFxu1mU
+	 lWT7k4FnAHuZg==
+X-ME-Helo: [192.168.1.37]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sat, 15 Jun 2024 09:05:58 +0200
+X-ME-IP: 86.243.222.230
+Message-ID: <3946b327-5e89-43d3-9dc3-10dd10bd41bc@wanadoo.fr>
+Date: Sat, 15 Jun 2024 09:05:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ptp: fix integer overflow in max_vclocks_store
+To: Dan Carpenter <dan.carpenter@linaro.org>, Yangbo Lu <yangbo.lu@nxp.com>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <d094ecbe-8b14-45cc-8cd8-f70fdeca55d8@moroto.mountain>
+Content-Language: en-MW
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <d094ecbe-8b14-45cc-8cd8-f70fdeca55d8@moroto.mountain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240614-feature_poe_power_cap-v3-5-a26784e78311@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi Köry,
-
-On Fri, Jun 14, 2024 at 04:33:21PM +0200, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+Le 14/06/2024 à 19:31, Dan Carpenter a écrit :
+> On 32bit systems, the "4 * max" multiply can overflow.  Use size_mul()
+> to fix this.
 > 
-> This patch expands the status information provided by ethtool for PSE c33
-> with power limit. It also adds a call to pse_ethtool_set_pw_limit() to
-> configure the PSE control power limit.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> Fixes: 44c494c8e30e ("ptp: track available ptp vclocks information")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 > ---
+>   drivers/ptp/ptp_sysfs.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Change in v3:
-> - Add ethtool netlink documentation.
-> ---
->  Documentation/networking/ethtool-netlink.rst |  8 ++++++
->  include/uapi/linux/ethtool_netlink.h         |  1 +
->  net/ethtool/pse-pd.c                         | 42 +++++++++++++++++++++++-----
->  3 files changed, 44 insertions(+), 7 deletions(-)
-> 
-> diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-> index 7dbf2ef3ac0e..a78b6aea84af 100644
-> --- a/Documentation/networking/ethtool-netlink.rst
-> +++ b/Documentation/networking/ethtool-netlink.rst
-> @@ -1737,6 +1737,7 @@ Kernel response contents:
->                                                    PoE PSE.
->    ``ETHTOOL_A_C33_PSE_EXT_SUBSTATE``         u32  power extended substatus of
->                                                    the PoE PSE.
-> +  ``ETHTOOL_A_C33_PSE_PW_LIMIT``             u32  power limit of the PoE PSE.
->    ======================================  ======  =============================
->  
->  When set, the optional ``ETHTOOL_A_PODL_PSE_ADMIN_STATE`` attribute identifies
-> @@ -1799,6 +1800,9 @@ Possible values are:
->  		  ethtool_c33_pse_ext_substate_power_not_available
->  		  ethtool_c33_pse_ext_substate_short_detected
->  
-> +When set, the optional ``ETHTOOL_A_C33_PSE_PW_LIMIT`` attribute identifies
-> +the C33 PSE power limit in mW.
-> +
->  PSE_SET
->  =======
->  
-> @@ -1810,6 +1814,7 @@ Request contents:
->    ``ETHTOOL_A_PSE_HEADER``                nested  request header
->    ``ETHTOOL_A_PODL_PSE_ADMIN_CONTROL``       u32  Control PoDL PSE Admin state
->    ``ETHTOOL_A_C33_PSE_ADMIN_CONTROL``        u32  Control PSE Admin state
-> +  ``ETHTOOL_A_C33_PSE_PW_LIMIT``             u32  Control PoE PSE power limit
->    ======================================  ======  =============================
->  
->  When set, the optional ``ETHTOOL_A_PODL_PSE_ADMIN_CONTROL`` attribute is used
-> @@ -1820,6 +1825,9 @@ to control PoDL PSE Admin functions. This option is implementing
->  The same goes for ``ETHTOOL_A_C33_PSE_ADMIN_CONTROL`` implementing
->  ``IEEE 802.3-2022`` 30.9.1.2.1 acPSEAdminControl.
->  
-> +When set, the optional ``ETHTOOL_A_C33_PSE_PW_LIMIT`` attribute is used
-> +to control C33 PSE power limit in mW.
+> diff --git a/drivers/ptp/ptp_sysfs.c b/drivers/ptp/ptp_sysfs.c
+> index a15460aaa03b..bc1562fcd6c9 100644
+> --- a/drivers/ptp/ptp_sysfs.c
+> +++ b/drivers/ptp/ptp_sysfs.c
+> @@ -296,7 +296,7 @@ static ssize_t max_vclocks_store(struct device *dev,
+>   	if (max < ptp->n_vclocks)
+>   		goto out;
+>   
+> -	size = sizeof(int) * max;
+> +	size = size_mul(sizeof(int), max);
+>   	vclock_index = kzalloc(size, GFP_KERNEL);
+
+kcalloc() maybe?
+
+>   	if (!vclock_index) {
+>   		err = -ENOMEM;
 
 
-The corresponding name int the IEEE 802.3-2022 seems to be pse_avail_pwr
-in 145.2.5.4 Variables and pse_available_power in 33.2.4.4 Variables.
+Unrelated but, a few lines above, should the:
+	if (max == ptp->max_vclocks)
+		return count;
 
-This variable is using classes instead of mW. pd692x0 seems to use
-classes instead of mW too. May be it is better to use classes for UAPI
-too? 
+be after:
+	if (mutex_lock_interruptible(&ptp->n_vclocks_mux))
+		return -ERESTARTSYS;
 
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+as done in n_vclocks_store()?
+
+CJ
 
