@@ -1,135 +1,164 @@
-Return-Path: <netdev+bounces-103746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CAA49094FC
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 02:16:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0864F909509
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 02:27:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD086B2128B
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 00:16:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B822B215FD
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 00:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B6DA1373;
-	Sat, 15 Jun 2024 00:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A742B1361;
+	Sat, 15 Jun 2024 00:27:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="UTUX4AJr"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Dc/w2rHL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7EC10E9
-	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 00:16:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18331373
+	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 00:27:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718410582; cv=none; b=lcaTVuKreIxvJjn08xifk/b/Aa7U/7eNlh/nbcvloQmhVjNVlzfM/LY1fQFh6QZGlTNsb4GH8bvWz0b2wvcRQDHj3YMcw99w4KRnbL+O3z/ond4GrGSfVqBeNOEMLDVQJW1LxOfGFXITZrIBW8gt/5iDGS51GhYBcdUu4nWf8u4=
+	t=1718411259; cv=none; b=BKlpB0UccVvau3/3zQCnZXy55KVzlRJj06JgSp7eSbIwraiC5/hFsJ+kr/Jshpltw8f7C5TumJUmGL+8yLBxzpgSH/7iRkuUlepHzreMbdcA200Sp+lst1BL/bY6AZSKpDuD302+8CIwlOurq4umJxqrWxyUon1HPVpVBxJ3yR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718410582; c=relaxed/simple;
-	bh=Ah9XF3VhfC6uL+Y7yxuXm+X0XsWWOB0OHtRfi0aa7Tk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KtEBEjXw8QimtfgkMwlqHHNUuAdMfxf8ZcyJp5iB/26IFI5i+qHJNzL7V+HCAeYG+QV+E5jsO2qKo3fSW0rA/juStWRtujDafLz6xfWgI/2/BUlrLbAA9wzDTXUB5nJ9vj9M6XPrzXk2J0dnHTkhU7+pJFwY3j3Rhw6+Oo19UKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=UTUX4AJr; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-70423e8e6c9so2476535b3a.0
-        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 17:16:21 -0700 (PDT)
+	s=arc-20240116; t=1718411259; c=relaxed/simple;
+	bh=slNoO3bqgkHEaz9NyBkrJhjsb0AR7lUeC2Smn2xUEnA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eDYJFNKgpegnWocgBn6PmO5yHUBuUO7yH0qdw3AtYs+Q2zBAaCSiZjgWoWtd8htX+YDBZcyvrYgKkJPpQlgJ7utisZ7sBGsMALZABk1Pk8qN6BVJ/tSjG38YbBp8pj9QPwGYbypRgm5tJzvo1kn6hfrXyncE+QiC3tNLn8tMcSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Dc/w2rHL; arc=none smtp.client-ip=209.85.160.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-254ceab70e3so400465fac.2
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 17:27:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1718410580; x=1719015380; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dbQfy6Bm8n8TNDG5hBa+dXfTA5IW7C1pPdTr7l75iCw=;
-        b=UTUX4AJrJlz2ePVxj+nYvXt1eBakA5iu62o7NvcvIYyuz0Xi72kSsRU/1pAPTwIXGB
-         591lsNDTVTOR6KPj39/hPWN5GrDCF+H7Q7uwctOv2iaLZEno6LJz/s6mfn9QQpOx/X+3
-         9g61QqesRNB++i5VFJTjDMGuWAeSeW1sFRS+tLHyOr+xPGHEPcoXjVM6sE4OQA2DTH1J
-         du52YAW2SP1yCtNpQBX2Cr9EHewQYq4VDR7o2kokOY0cHtzVsEszRieqsaKeb9lUzd6S
-         3lt4mTDtVH7PPqpQmZcsXss6kbjtYX29YvbmuNsbt2WmCp6Gxxo4gurLXYlwMlhOTz8y
-         Tkcg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1718411256; x=1719016056; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OacbGWobXxCOaMTOEqE8F+FgVQF2VVAjHlZ9RIbqrF8=;
+        b=Dc/w2rHLJUV38HBMb5c+JrrHLD6En/Zde9psXZdUeLXr78eXdsLHEze2pLP93p2I1y
+         DSGNzgy17UBUfy+IMDdqVr1PAK0IrMG5wLCMoa0apA1uR7OgurkU3O8EiLj7Gveu2AOn
+         OpQuUMIXRTqWxU2lpDgWt4WHtjznuaOLW4EvqRv9VHrrL1ne4xcO3dbJXvn0hhhrMe+9
+         EQl0dOGCgH7z7J8I0kd0OT4GCy6CNqcf9zRoqN5A65Mw0N6FACTV+1uCemXowOzDMIQA
+         Yvb2A59yCv3URjM3eR99Wp+WbaY/DUzu8CwnAoEHIksMEYtGubPJraYJTc9YdUbzN4CK
+         uNiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718410580; x=1719015380;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dbQfy6Bm8n8TNDG5hBa+dXfTA5IW7C1pPdTr7l75iCw=;
-        b=hTB8M3nW0RcFYSZolTyQZTr6CWyZXe7WnUhCTbG3HZ62yoJRMeC+jUlqXd5gKZwRzW
-         yXqA3svx39UNS6as/ZpA+6R9wpl5CuB49qYM5V3PSXVNPz6Qe4r9j4jbNBA1749l1QE0
-         blEXH+xpp8n7oyBqI6y8AtQSXyq+q7h9jB84oXN/EoUdNwOi6seHh2EabB3NCCeFw3dX
-         R7RIrD1GM+L/EAbOojdAiaykpCflGuWdAOj1XaSD8G2NpdYs3W0v5euL/mnW0m62clZj
-         59oZYx1q2gKdDfD4E7QPcC84dOoNMxjiF0+LKFhcsSQXzFcl3ffDqZ5IdJHbXFqkC64R
-         ui1w==
-X-Forwarded-Encrypted: i=1; AJvYcCWVsZRX2p5KeJ5EbR7mm+Lnbf8yvAnBWndiWdG2bi5QpCG+Pe9f8uvaXk7WtTNXpUpazTqgyKwcQaTtLoeUbjOmju25UFFn
-X-Gm-Message-State: AOJu0Yz/QtP2Risc9f95Sg3qxmICfzZKEGTL71WA1EwdX92jSrVOWcz+
-	WtfOJYMq4RNIGCQhAXFLy/I8ZABlS9N1YW3CL5larJmyozFDJ6LjMu2MEz7rbuA=
-X-Google-Smtp-Source: AGHT+IGnrXmEyH8r24NhyhAqUyF2qFmWVTxhyF32OwfqT86eX9M8aSQDG2YlmH6KZDu1FSFJOoZ/0A==
-X-Received: by 2002:a05:6a20:d80d:b0:1b2:cf6c:d5ae with SMTP id adf61e73a8af0-1bae844443cmr4560825637.59.1718410580416;
-        Fri, 14 Jun 2024 17:16:20 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-705cc967334sm3638921b3a.57.2024.06.14.17.16.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jun 2024 17:16:20 -0700 (PDT)
-Date: Fri, 14 Jun 2024 17:16:18 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Omer Shpigelman <oshpigelman@habana.ai>
-Cc: linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
- ogabbay@kernel.org, zyehudai@habana.ai
-Subject: Re: [PATCH 09/15] net: hbl_en: add habanalabs Ethernet driver
-Message-ID: <20240614171618.3b65b3c9@hermes.local>
-In-Reply-To: <20240613082208.1439968-10-oshpigelman@habana.ai>
-References: <20240613082208.1439968-1-oshpigelman@habana.ai>
-	<20240613082208.1439968-10-oshpigelman@habana.ai>
+        d=1e100.net; s=20230601; t=1718411256; x=1719016056;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OacbGWobXxCOaMTOEqE8F+FgVQF2VVAjHlZ9RIbqrF8=;
+        b=k05WBR/35EFEc5fF8VODG2lXAikPAVR+53O7Cuz5N7+h7kM07gRzXZrtGKKCk/JIU7
+         JjXzbNhCL6zawcCFuKQmaSC6fkNotXQJR2NFZG9wHZtU3cb+63k0NsWid3cs64dzc2/v
+         LZwYd8IbhgOOVjlHJ6Vae9T2mWL/I+Ex9NuUiiykZONIds0etFWiiyIwxJw0qkmdkual
+         fYUSk7PwlsAP91yimYxzq3BPjtHgH4P4LeKRdILBDfTmDHVSJgZ/NjnKlL6zsQ+FcFxS
+         +Eb8MXPFJvpYD8eD6vC7VpLxP37Y9VeHOgzsR+n7YUPyWAFL5jpn+4KrBrTPZlIAh44i
+         +PMw==
+X-Forwarded-Encrypted: i=1; AJvYcCU4BBDDgl6cUzKIx1hEnsgK+hWSFLa8L7sTET3hMHDwxalXNmlww9fOIGQGPAoHlIVgQ0rnxQ3Y6usX7zwBHfDn21Hl9q4O
+X-Gm-Message-State: AOJu0YyUWoyPey3gd3N3VVr6Ri1epi2qKoQduJEIahTGdH7trCngUOyy
+	RR2V151TaG2gNr5QsJOM9U4bDikZJKVcRmzReudcGQXrscCH9J19IwlGJ7UbXE8lRveug9Ym++E
+	w
+X-Google-Smtp-Source: AGHT+IFGVcv1B+CD6eFMF8v06Wz14Wuvm1nTAkxtfRpFOmrMJRnU3HKfUTN0aML1i0RXDnHeUQVpsA==
+X-Received: by 2002:a05:6358:70a:b0:1a1:c9f1:f72d with SMTP id e5c5f4694b2df-1a1c9f1f74bmr85104455d.3.1718411255783;
+        Fri, 14 Jun 2024 17:27:35 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6fedf0bef16sm3201570a12.43.2024.06.14.17.27.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Jun 2024 17:27:35 -0700 (PDT)
+Message-ID: <bb0efa49-9987-4374-8764-d26668f606d1@kernel.dk>
+Date: Fri, 14 Jun 2024 18:27:33 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/4] io_uring: Introduce IORING_OP_BIND
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, krisman@suse.de
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org
+References: <20240614163047.31581-3-krisman@suse.de>
+ <20240614224643.21456-1-kuniyu@amazon.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240614224643.21456-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-> +
-> +/* get the src IP as it is done in devinet_ioctl() */
-> +static int hbl_en_get_src_ip(struct hbl_aux_dev *aux_dev, u32 port_idx, u32 *src_ip)
-> +{
-> +	struct hbl_en_port *port = HBL_EN_PORT(aux_dev, port_idx);
-> +	struct net_device *ndev = port->ndev;
-> +	struct in_device *in_dev;
-> +	struct in_ifaddr *ifa;
-> +	int rc = 0;
-> +
-> +	/* for the case where no src IP is configured */
-> +	*src_ip = 0;
-> +
-> +	/* rtnl lock should be acquired in relevant flows before taking configuration lock */
-> +	if (!rtnl_is_locked()) {
-> +		netdev_err(port->ndev, "Rtnl lock is not acquired, can't proceed\n");
-> +		rc = -EFAULT;
-> +		goto out;
-> +	}
-> +
-> +	in_dev = __in_dev_get_rtnl(ndev);
-> +	if (!in_dev) {
-> +		netdev_err(port->ndev, "Failed to get IPv4 struct\n");
-> +		rc = -EFAULT;
-> +		goto out;
-> +	}
-> +
-> +	ifa = rtnl_dereference(in_dev->ifa_list);
-> +
-> +	while (ifa) {
-> +		if (!strcmp(ndev->name, ifa->ifa_label)) {
-> +			/* convert the BE to native and later on it will be
-> +			 * written to the HW as LE in QPC_SET
-> +			 */
-> +			*src_ip = be32_to_cpu(ifa->ifa_local);
-> +			break;
-> +		}
-> +		ifa = rtnl_dereference(ifa->ifa_next);
-> +	}
-> +out:
-> +	return rc;
-> +}
+On 6/14/24 4:46 PM, Kuniyuki Iwashima wrote:
+> From: Gabriel Krisman Bertazi <krisman@suse.de>
+> Date: Fri, 14 Jun 2024 12:30:46 -0400
+>> IORING_OP_BIND provides the semantic of bind(2) via io_uring.  While
+>> this is an essentially synchronous system call, the main point is to
+>> enable a network path to execute fully with io_uring registered and
+>> descriptorless files.
+>>
+>> Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
+>>
+>> ---
+>> changes since v1:
+>> - drop explocit error handling for move_addr_to_kernel (jens)
+>> - Remove empty line ahead of return;
+>> ---
+>>  include/uapi/linux/io_uring.h |  1 +
+>>  io_uring/net.c                | 36 +++++++++++++++++++++++++++++++++++
+>>  io_uring/net.h                |  3 +++
+>>  io_uring/opdef.c              | 13 +++++++++++++
+>>  4 files changed, 53 insertions(+)
+>>
+>> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+>> index 994bf7af0efe..4ef153d95c87 100644
+>> --- a/include/uapi/linux/io_uring.h
+>> +++ b/include/uapi/linux/io_uring.h
+>> @@ -257,6 +257,7 @@ enum io_uring_op {
+>>  	IORING_OP_FUTEX_WAITV,
+>>  	IORING_OP_FIXED_FD_INSTALL,
+>>  	IORING_OP_FTRUNCATE,
+>> +	IORING_OP_BIND,
+>>  
+>>  	/* this goes last, obviously */
+>>  	IORING_OP_LAST,
+>> diff --git a/io_uring/net.c b/io_uring/net.c
+>> index 0a48596429d9..8cbc29aff15c 100644
+>> --- a/io_uring/net.c
+>> +++ b/io_uring/net.c
+>> @@ -51,6 +51,11 @@ struct io_connect {
+>>  	bool				seen_econnaborted;
+>>  };
+>>  
+>> +struct io_bind {
+>> +	struct file			*file;
+>> +	int				addr_len;
+>> +};
+>> +
+>>  struct io_sr_msg {
+>>  	struct file			*file;
+>>  	union {
+>> @@ -1715,6 +1720,37 @@ int io_connect(struct io_kiocb *req, unsigned int issue_flags)
+>>  	return IOU_OK;
+>>  }
+>>  
+>> +int io_bind_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+>> +{
+>> +	struct io_bind *bind = io_kiocb_to_cmd(req, struct io_bind);
+>> +	struct sockaddr __user *uaddr;
+>> +	struct io_async_msghdr *io;
+>> +
+>> +	if (sqe->len || sqe->buf_index || sqe->rw_flags || sqe->splice_fd_in)
+>> +		return -EINVAL;
+>> +
+>> +	uaddr = u64_to_user_ptr(READ_ONCE(sqe->addr));
+>> +	bind->addr_len =  READ_ONCE(sqe->addr2);
+>                         ^^
+> nit: double space
 
-Does this device require IPv4? What about users and infrastructures that use IPv6 only?
-IPv4 is legacy at this point.
+Thanks for spotting those, I can just remove those two while applying.
+Mostly just a note to Grabriel, no need to re-post for that.
+
+-- 
+Jens Axboe
+
 
