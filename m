@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-103744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06DCF9094F0
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 02:05:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69ED59094F7
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 02:10:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58B36B2124A
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 00:05:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85B6D1C2110C
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 00:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D377645;
-	Sat, 15 Jun 2024 00:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDEF1646;
+	Sat, 15 Jun 2024 00:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="0MSXZg8C"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="p3iX5pcc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0DFD621
-	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 00:05:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378DB621
+	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 00:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718409953; cv=none; b=RIQld7SqDbxIGbbUnAfRv/F37GxAo8gMAzeZA5cJeM/mCvj0S5SZjgImJJyK45PrHyHp4FklC6b1gR2srBv2+Rhxdm5EwR5mlcYe6qE+6aCN6gFBrfs53wnlWHihMOWPf8rg/usiPpOzMG+F/z2RqSpdtXO/RfmHF1ty6JJ3e4I=
+	t=1718410245; cv=none; b=lPLX19kYPAuIev5iQGny/fx4cdPwwTcnpX3CsX3t531mQsWgCumbgzAYN2+FyQfujKO3TyTZk7lAL2ISPCeJexqIk1u853tU2dJd4lVABzjc70JPdwpjDoRX7gNmV3obg7oA9CzVA8gVLTi0oj9CYjgVAkLGikM2f8rjPjxYh40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718409953; c=relaxed/simple;
-	bh=f6AoYhX2XyzT+ZH0EktrmSnDM4D3zhudlPqVu/nrjns=;
+	s=arc-20240116; t=1718410245; c=relaxed/simple;
+	bh=gNewejaBAdSyW6TmuZ4lHfjXg+C8jYnOyd0Gqj1kBkQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YtsGowp6eaT9osFh2Qqk7NbZuSS6HUYfQ9rjIrp5vxQP4PuAgPF8I6bXU2gXe/WlhUZs9boo73EXdxeSuRNxPvzByvmpEsTkOfPNOBtTjknoQFIyA+QKKUwXQB3GsieLVJGXGcvf0BVvlBgnbwSINothFHEw1Ix/6j0+EsPmOLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=0MSXZg8C; arc=none smtp.client-ip=209.85.215.175
+	 MIME-Version:Content-Type; b=oyLgIaDSj5W/tQqTM0HTDLhG1rvhZxmEo/KTYP8zUBMBWC0o6w2VSiOKkfsPqpcyZm8Jvt/vkDmvzyu6AOV5ZvRpgMFy+Bly676t555ZNxm6DEYJMvje54IuaHjHjr5u80La2h4vxcJCfOxJJe1GmFvhi2e+2nimqoOpNiNr6vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=p3iX5pcc; arc=none smtp.client-ip=209.85.160.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-6c4f3e0e3d2so2137485a12.1
-        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 17:05:51 -0700 (PDT)
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-254aec5a084so1156602fac.3
+        for <netdev@vger.kernel.org>; Fri, 14 Jun 2024 17:10:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1718409951; x=1719014751; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1718410243; x=1719015043; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=c21Xnr26mF4XhO4v24lG8CYkDryUnaevoVevI7wRSgQ=;
-        b=0MSXZg8CqtR1DAOlvKfLZM5qykyu832wLgqtz53yfABK2/qNcNy6klqSu/6+KihLGe
-         SEF/F1BThMGlrBM8bkr/I5yEYHprNTwNzugD+WoXvVzuFeDMf4NX/CeaIuRajcheefX8
-         MHthXF23rggit3Hgox1mW1VqqIHg5nsW4F4RcOLSY8b3F6JdGtJ5GnkQitlZhuj3AmBD
-         3BcRExcb09vADiQtEQert2rhbC5dPW7o3RequLC3g/3J32QxmHs52WAwB9FATzIuAjLc
-         Sx1cXqpyQ/ICGkpn/jfoC2CbTI76TOgCqupwT7mjZugX8fwJbi55l9NbA4kHtZ2S+AoS
-         3yGw==
+        bh=IDFKg2giSlNRp2CWnI6wzIZGjcEuH3CutRdpX5N8j6g=;
+        b=p3iX5pcciietJf8MyQs5x5zoqEMz/q2yy7lid8CdVWiVelJjom+PPTA1MPnxmztpv1
+         LbfXbwtYiiWdN5SWzVqsEe8UrS8JJ3Z6Zh0Pzv+bPEm3hoxkPRWwVMbe8D2runXP3FfG
+         bnfyryj20kXv4yN83Acdt5R+0fM/TCnUhWXX5yGY7pYaXgLhdOGv+NJcL89ljdHFS975
+         AXHLISu+fcUy2RrL6Ci6zga1w/cEPdI8rZTZcLLjrvwBLNfXFfAt188NYJq4aIRxR7BT
+         asHjiiw78MFI8Z5Xynk/uwrZSnUkruXyvR+pu6G+OPU/Rk2LIvp8dldoxc5kj6TQf9Kg
+         55Lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718409951; x=1719014751;
+        d=1e100.net; s=20230601; t=1718410243; x=1719015043;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=c21Xnr26mF4XhO4v24lG8CYkDryUnaevoVevI7wRSgQ=;
-        b=kOiv2kirghR6+87gb5nf40hFFXY0MrU8fhtrQOAOrJUmob/G1P/4rR5Y/sssMF5d9z
-         KCKxDQNl+sTJacx7tAFTthKcUDajXZgC3GUnaQXY07Zw0Y5wNRiS0Zcz9FgTHl5he5ig
-         Irzs4ZMCRN+X+tLdyzgBsbNZoyo6VZJYWQ02rHkOhk/hGNdnSDmTT6HHo5K6Cp31zq57
-         xx3kZoYn4bE11zbZWEpxAOkwVVzJrNyElrKgO3VcqK1m9aMk9RRbk58+qeBBXWIzk4MY
-         nfl5BCLacPHYqhBwFjjIj2NF3zYGhOGevzZbsY5UOXS/wYgsDChPjUDpyi9eyAkbW5Dz
-         efkA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfOS/LKEu+N+wZigwTOssY/Hq1gXnml3B2LtWrHBOmoNJRKI4C56cSK+efaofqdoGsTlbQxR9aSXjo0ZVf+EVRlLCWthpX
-X-Gm-Message-State: AOJu0YzPUBVUmCGS/Vf2K3ulcR2/qbSLNyHXurqukoM82I50rSPaKPY/
-	kIDKz0Ho+PqhF/wWWv+h6iu7Wxii4n1PA47TnCoiuSr2Hq1Oiz/v/f499aP9+C8=
-X-Google-Smtp-Source: AGHT+IHET3q/ZWVI0gCLmEytjo+qe1Q0o8W6KZxsgsqtRPqlyJa6ges0MNDa6YBygs6HHNzj/wFOeQ==
-X-Received: by 2002:a17:903:1250:b0:1f7:2050:9a76 with SMTP id d9443c01a7336-1f8625c0d68mr49770465ad.8.1718409950685;
-        Fri, 14 Jun 2024 17:05:50 -0700 (PDT)
+        bh=IDFKg2giSlNRp2CWnI6wzIZGjcEuH3CutRdpX5N8j6g=;
+        b=pi3rTRO6IqksDvVZlWJbm9g30Ppn9FLMxJqAoyr6wGJpcSB4iGA4T3GBw4VyVz2vGS
+         a5Ao4ptKRLbhWe5c2LRjQm9yz8efBTw4DT7HmkzE+184qnlOWfsi25y2fzgXyo95DBEq
+         K01T9F6shsBGJzcCYjC1hP3Zo1Wugr5xmfdOl/OP5NzyE7qaz4Gtb7u8DAoisGlJ6pM5
+         EA511bVQv5WRbi5GbswjUpFuYdRgDDCYjXxG671GKXKAUD5bOS3WSk8GqeWve+UqCYWs
+         paqnF9A/V1oF0Cqg4AES3VxKrmC8y/GWX1kVvBPsdN8quxJ+ao9VHslOw32XygIqp3F2
+         t5Ew==
+X-Forwarded-Encrypted: i=1; AJvYcCWNQ7a21+syMJ8FVP734TJPKLzZT1FqiRW24PbPGD72J89N3ZGMQp0eA5pj0XlmxDS2E187C1I04c/ptBX/wPxmNRdD3Ttz
+X-Gm-Message-State: AOJu0YyuZPzoGRDlEVSKxRkr3KBZJxC0r8tPuAHT1tKOa23qKvU8LJi7
+	myGaD+OQh6nA1HK5rPZqxxpxWbm4EgAkjJ8kPg7ggAVYQjckrISZCQAdZoBm5kc=
+X-Google-Smtp-Source: AGHT+IETiLeYvMfLS5qJj9lv2YNeygiz2aZ7N7GNkbFdmRrbP/g2iRj/7hvSY6Q5nrBEuc1N17ZyFw==
+X-Received: by 2002:a05:6870:f145:b0:258:37f4:755c with SMTP id 586e51a60fabf-25842b0cfa0mr4379647fac.46.1718410243257;
+        Fri, 14 Jun 2024 17:10:43 -0700 (PDT)
 Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f855f17f92sm37976575ad.221.2024.06.14.17.05.49
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-705cd498aeesm3574633b3a.23.2024.06.14.17.10.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jun 2024 17:05:50 -0700 (PDT)
-Date: Fri, 14 Jun 2024 17:05:48 -0700
+        Fri, 14 Jun 2024 17:10:42 -0700 (PDT)
+Date: Fri, 14 Jun 2024 17:10:41 -0700
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: Omer Shpigelman <oshpigelman@habana.ai>
 Cc: linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
  netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
  ogabbay@kernel.org, zyehudai@habana.ai
-Subject: Re: [PATCH 01/15] net: hbl_cn: add habanalabs Core Network driver
-Message-ID: <20240614170548.188ead0d@hermes.local>
-In-Reply-To: <20240613082208.1439968-2-oshpigelman@habana.ai>
+Subject: Re: [PATCH 09/15] net: hbl_en: add habanalabs Ethernet driver
+Message-ID: <20240614171041.7b880232@hermes.local>
+In-Reply-To: <20240613082208.1439968-10-oshpigelman@habana.ai>
 References: <20240613082208.1439968-1-oshpigelman@habana.ai>
-	<20240613082208.1439968-2-oshpigelman@habana.ai>
+	<20240613082208.1439968-10-oshpigelman@habana.ai>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,128 +87,36 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
+On Thu, 13 Jun 2024 11:22:02 +0300
+Omer Shpigelman <oshpigelman@habana.ai> wrote:
 
-> +#define HBL_AUX2NIC(aux_dev)	\
-> +	({ \
-> +		struct hbl_aux_dev *__aux_dev = (aux_dev); \
-> +		((__aux_dev)->type == HBL_AUX_DEV_ETH) ? \
-> +		container_of(__aux_dev, struct hbl_cn_device, en_aux_dev) : \
-> +		container_of(__aux_dev, struct hbl_cn_device, ib_aux_dev); \
-> +	})
+> +static int hbl_en_ports_reopen(struct hbl_aux_dev *aux_dev)
+> +{
+> +	struct hbl_en_device *hdev = aux_dev->priv;
+> +	struct hbl_en_port *port;
+> +	int rc = 0, i;
 > +
-> +#define RAND_STAT_CNT(cnt) \
-> +	do { \
-> +		u32 __cnt = get_random_u32(); \
-> +		(cnt) = __cnt; \
-> +		dev_info(hdev->dev, "port %d, %s: %u\n", port, #cnt, __cnt); \
-> +	} while (0)
+> +	for (i = 0; i < hdev->max_num_of_ports; i++) {
+> +		if (!(hdev->ports_mask & BIT(i)))
+> +			continue;
 > +
-> +struct hbl_cn_stat hbl_cn_mac_fec_stats[] = {
-> +	{"correctable_errors", 0x2, 0x3},
-> +	{"uncorrectable_errors", 0x4, 0x5}
-> +};
+> +		port = &hdev->ports[i];
+> +
+> +		/* It could be that the port was shutdown by 'ip link set down' and there is no need
+> +		 * in reopening it.
+> +		 * Since we mark the ports as in reset even if they are disabled, we clear the flag
+> +		 * here anyway.
+> +		 * See hbl_en_ports_stop_prepare() for more info.
+> +		 */
+> +		if (!netif_running(port->ndev)) {
+> +			atomic_set(&port->in_reset, 0);
+> +			continue;
+> +		}
 > +
 
-These tables should be marked const?
+Rather than duplicating network device state in your own flags, it would be better to use
+existing infrastructure. Read Documentation/networking/operstates.rst
 
-> +struct hbl_cn_stat hbl_cn_mac_stats_rx[] = {
-> +	{"Octets", 0x0},
-> +	{"OctetsReceivedOK", 0x4},
-> +	{"aAlignmentErrors", 0x8},
-> +	{"aPAUSEMACCtrlFramesReceived", 0xC},
-> +	{"aFrameTooLongErrors", 0x10},
-> +	{"aInRangeLengthErrors", 0x14},
-> +	{"aFramesReceivedOK", 0x18},
-> +	{"aFrameCheckSequenceErrors", 0x1C},
-> +	{"VLANReceivedOK", 0x20},
-> +	{"ifInErrors", 0x24},
-> +	{"ifInUcastPkts", 0x28},
-> +	{"ifInMulticastPkts", 0x2C},
-> +	{"ifInBroadcastPkts", 0x30},
-> +	{"DropEvents", 0x34},
-> +	{"Pkts", 0x38},
-> +	{"UndersizePkts", 0x3C},
-> +	{"Pkts64Octets", 0x40},
-> +	{"Pkts65to127Octets", 0x44},
-> +	{"Pkts128to255Octets", 0x48},
-> +	{"Pkts256to511Octets", 0x4C},
-> +	{"Pkts512to1023Octets", 0x50},
-> +	{"Pkts1024to1518Octets", 0x54},
-> +	{"Pkts1519toMaxOctets", 0x58},
-> +	{"OversizePkts", 0x5C},
-> +	{"Jabbers", 0x60},
-> +	{"Fragments", 0x64},
-> +	{"aCBFCPAUSERx0", 0x68},
-> +	{"aCBFCPAUSERx1", 0x6C},
-> +	{"aCBFCPAUSERx2", 0x70},
-> +	{"aCBFCPAUSERx3", 0x74},
-> +	{"aCBFCPAUSERx4", 0x78},
-> +	{"aCBFCPAUSERx5", 0x7C},
-> +	{"aCBFCPAUSERx6", 0x80},
-> +	{"aCBFCPAUSERx7", 0x84},
-> +	{"aMACControlFramesReceived", 0x88}
-> +};
-> +
-> +struct hbl_cn_stat hbl_cn_mac_stats_tx[] = {
-> +	{"Octets", 0x0},
-> +	{"OctetsTransmittedOK", 0x4},
-> +	{"aPAUSEMACCtrlFramesTransmitted", 0x8},
-> +	{"aFramesTransmittedOK", 0xC},
-> +	{"VLANTransmittedOK", 0x10},
-> +	{"ifOutErrors", 0x14},
-> +	{"ifOutUcastPkts", 0x18},
-> +	{"ifOutMulticastPkts", 0x1C},
-> +	{"ifOutBroadcastPkts", 0x20},
-> +	{"Pkts64Octets", 0x24},
-> +	{"Pkts65to127Octets", 0x28},
-> +	{"Pkts128to255Octets", 0x2C},
-> +	{"Pkts256to511Octets", 0x30},
-> +	{"Pkts512to1023Octets", 0x34},
-> +	{"Pkts1024to1518Octets", 0x38},
-> +	{"Pkts1519toMaxOctets", 0x3C},
-> +	{"aCBFCPAUSETx0", 0x40},
-> +	{"aCBFCPAUSETx1", 0x44},
-> +	{"aCBFCPAUSETx2", 0x48},
-> +	{"aCBFCPAUSETx3", 0x4C},
-> +	{"aCBFCPAUSETx4", 0x50},
-> +	{"aCBFCPAUSETx5", 0x54},
-> +	{"aCBFCPAUSETx6", 0x58},
-> +	{"aCBFCPAUSETx7", 0x5C},
-> +	{"aMACControlFramesTx", 0x60},
-> +	{"Pkts", 0x64}
-> +};
-> +
-> +static const char pcs_counters_str[][ETH_GSTRING_LEN] = {
-> +	{"pcs_local_faults"},
-> +	{"pcs_remote_faults"},
-> +	{"pcs_remote_fault_reconfig"},
-> +	{"pcs_link_restores"},
-> +	{"pcs_link_toggles"},
-> +};
-> +
-> +static size_t pcs_counters_str_len = ARRAY_SIZE(pcs_counters_str);
-> +size_t hbl_cn_mac_fec_stats_len = ARRAY_SIZE(hbl_cn_mac_fec_stats);
-> +size_t hbl_cn_mac_stats_rx_len = ARRAY_SIZE(hbl_cn_mac_stats_rx);
-> +size_t hbl_cn_mac_stats_tx_len = ARRAY_SIZE(hbl_cn_mac_stats_tx);
-> +
-> +static void qps_stop(struct hbl_cn_device *hdev);
-> +static void qp_destroy_work(struct work_struct *work);
-> +static int __user_wq_arr_unset(struct hbl_cn_ctx *ctx, struct hbl_cn_port *cn_port, u32 type);
-> +static void user_cq_destroy(struct kref *kref);
-> +static void set_app_params_clear(struct hbl_cn_device *hdev);
-> +static int hbl_cn_ib_cmd_ctrl(struct hbl_aux_dev *aux_dev, void *cn_ib_ctx, u32 op, void *input,
-> +			      void *output);
-> +static int hbl_cn_ib_query_mem_handle(struct hbl_aux_dev *ib_aux_dev, u64 mem_handle,
-> +				      struct hbl_ib_mem_info *info);
-> +
-> +static void hbl_cn_reset_stats_counters_port(struct hbl_cn_device *hdev, u32 port);
-> +static void hbl_cn_late_init(struct hbl_cn_device *hdev);
-> +static void hbl_cn_late_fini(struct hbl_cn_device *hdev);
-> +static int hbl_cn_sw_init(struct hbl_cn_device *hdev);
-> +static void hbl_cn_sw_fini(struct hbl_cn_device *hdev);
-> +static void hbl_cn_spmu_init(struct hbl_cn_port *cn_port, bool full);
-> +static int hbl_cn_cmd_port_check(struct hbl_cn_device *hdev, u32 port, u32 flags);
-> +static void hbl_cn_qps_stop(struct hbl_cn_port *cn_port);
+Then you could also get rid of the kludge timer stuff in hbl_en_close().
 
-Can you reorder code so forward declarations are not required?
 
