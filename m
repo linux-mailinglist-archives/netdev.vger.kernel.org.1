@@ -1,254 +1,122 @@
-Return-Path: <netdev+bounces-103790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB93D9097FB
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 13:42:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71F31909812
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 14:01:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45FD01F21882
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 11:42:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F415E2837CB
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 12:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F18603BBF2;
-	Sat, 15 Jun 2024 11:42:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA293F9FC;
+	Sat, 15 Jun 2024 12:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ft/qP8NF"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="pZh/myXj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535C7125BA
-	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 11:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E895C4779F;
+	Sat, 15 Jun 2024 12:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718451741; cv=none; b=bykhGRrlMbU37HwVk76Twhpo4t6BCrt9lD7qn5AH1LxFzMvZNd2tMi2TsK38WAzD0SUpRwtLoCCv8m/P5UDoWJa4Vs/+RZ1TY72bZ6d+TmBmCZDi8tFN5Id4GoLlWgHVofyW9N2sdnBFeerTJdrl6N2jpqnR57E/KYDaps3AXFc=
+	t=1718452882; cv=none; b=IoVIrpz6cRYHadgKULNS8hM+1gjzM0U/l4AtGhT/+yW4jPc43NCdxNvebqPTruKi/91/UX1j9clDXiRKAM1PEqcFTUgdQjwwaq5otQUcRAOEVIh3nhn1t6CbhEISLXf2Cua4bAuBDUPcczGjXOfUO6ZfygcOmX7NlurAuMpwmrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718451741; c=relaxed/simple;
-	bh=bo1od2d2cQ/V1GI3VDVxtJuvCloT8dB0xwpGixe8CBM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=uDa7BcPOpd2EZWaK1Nb3G4U+bxsv6hSfK2qS2f6sAuqBv8F3BJfBuST9OVDJHVdeBe2pk84mJWOF1mCCHsb1Aquw8W5zBcKfO1ipMrYMvbIf3ZgENOu5RZi8nR3JkmqMLLgI9SaUUeDToSNru3um6ljV+9Kte5JqhStf/n91X/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ft/qP8NF; arc=none smtp.client-ip=209.85.167.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3c9d70d93dbso1802908b6e.3
-        for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 04:42:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718451739; x=1719056539; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6lGM5YzzJeuAkTp/attYWDDSwNdcpnU1kRskfp0NH7k=;
-        b=Ft/qP8NFy0c8oAW8rZYLa1KjnYfkeKt/MUOfs8xBzzL2ml42V9n4GRL2RWgC3OJJ8R
-         2lDfiL0xIiw3Eb9QFCnj4wEH/5tLxfBF7VTbmtUy9NUApxL6pROfKEUbWg4e/A9kMlRJ
-         /a2n3MtroXqQ5bG4pSPzw2LNZZesUr65Gz1SolyNNvJPlI2EXSvMN470G7cMhGz8qZ5g
-         Wo4sn5X+UCTU3ZAOkGow66YrbIGEXUByLQjnCzRoGhXRmsVZDDPdLKGe6AzzSDLifWi6
-         LSthO0gj/0FIU0DsW4WegaAE7RGin2BZUzeKBiToi1rbyAk0PI+JC+fg54z8FMXE+Zru
-         y2UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718451739; x=1719056539;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6lGM5YzzJeuAkTp/attYWDDSwNdcpnU1kRskfp0NH7k=;
-        b=ezDkwEuwzseo4LVVWIrgs9I2H7jwW7r5Wggl+4FqaHfqu5zl9ll2CEjJOzYa+bi57f
-         wBM+ePnI8b0YCF0Omq0Tp2mvtiUBnjyzFIHVigpvg0WvGt5uKfrH9MuiDuQCUyo3/vf3
-         3wOjOItbLk+qPvGEk+4XADA11dbcfrmN4YhpZuPGmoH030r1AndUcQ/WIFSX65saNnEk
-         xlqylkWSiRaooVSGc9Vo8CU9+mxMDu1705g3/qT5vZ1Thp6eIg7XdJoEFox6BbHAhl1H
-         GqtobqkByV2Zt6r9ioSwhApkgDx/vgjYGm/1lJnDHr+xIExh45pYEW8ozoXwDYv8edcU
-         xmLg==
-X-Forwarded-Encrypted: i=1; AJvYcCUmwLE2MjlCif9wVa7JfuY+pGkZ3zXrreA8ZyrI2mKuhx3/mQ68Uike/A2IsVrnpxJTKAECmmsVnLTHNIObuOgYHzo7AoF9
-X-Gm-Message-State: AOJu0YxIJfCpsyHBtXFMp1A4AyomL5kuScoS6CMkZuO3fz0WC99txxdC
-	z4j528JvRZm8ZzYVAYvQ/ie371culFE1BygxZR7kKmbcJjevGWDQRXbbI6jg
-X-Google-Smtp-Source: AGHT+IHsZ8nwwx7m5fEpKuIINWlVF9EvXPHsfrm8N1wy4ejew6YodbzbutFq7W1oiupK6x0LtDOCPA==
-X-Received: by 2002:a05:6808:1527:b0:3d2:1b8a:be60 with SMTP id 5614622812f47-3d24e98755bmr5404846b6e.42.1718451739231;
-        Sat, 15 Jun 2024 04:42:19 -0700 (PDT)
-Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-798aaedbf6fsm238524085a.48.2024.06.15.04.42.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Jun 2024 04:42:18 -0700 (PDT)
-Date: Sat, 15 Jun 2024 07:42:18 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: zijianzhang@bytedance.com, 
- netdev@vger.kernel.org
-Cc: edumazet@google.com, 
- willemdebruijn.kernel@gmail.com, 
- cong.wang@bytedance.com, 
- xiaochun.lu@bytedance.com, 
- Zijian Zhang <zijianzhang@bytedance.com>
-Message-ID: <666d7e1a7b72d_1ba35a294a5@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240613233133.2463193-3-zijianzhang@bytedance.com>
-References: <20240613233133.2463193-1-zijianzhang@bytedance.com>
- <20240613233133.2463193-3-zijianzhang@bytedance.com>
-Subject: Re: [PATCH net-next v5 2/4] sock: support put_cmsg to userspace in TX
- path
+	s=arc-20240116; t=1718452882; c=relaxed/simple;
+	bh=OT/HKUKOCIKwj/yAboIO2XCrsuGuzqCYpdcgZ+8PYjY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Dv98p72v46i3gZh1MHVmWHNVlBSIa21Q6OL7FaR/AvEJVuV+7gN/EwjluC1yVVyRpW2gaJdNqO+o5WhAvLr1GlwCvCTvTvokrvZVaJP2P9oZEhOIRIR1ZRNyGvGbpZyY0y2PEScEaiHkS5UtyfXHDCXVCPpyCuxteKUtid94uto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=pZh/myXj; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45FBfSBT018819;
+	Sat, 15 Jun 2024 12:00:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=WliGhlPHqj+gEVrbetMvgS
+	lUq+iGOkxMB/rjvW5/fhs=; b=pZh/myXjiblRjLIASajEkdo/hKnDIFJd8eItx+
+	TDCVycsx++9XeE5iQTRn9vi351epD6tNI132Jhkk/z8Vqr39Uuxk9fXGEUEHFcoz
+	2Wzd1YM1f/r9/R0duclbE4G9d11ZIMUZ/O0vfbwOFi+GFxB5ToW8U25uLzqDc1vm
+	WhhPCKwZzp6qM65PbSt9INYB4bejZ873iDg6jo0hvWbMVx3Xr0wiKTppMSW+J4LW
+	OuXqVNZeOCcZyoa62VAX7oOCMgMBirqFvsuvL9K7Q/NXXRbeHCIfh8heyQAZ4zVx
+	icQciiIzxBZFE5SAFYMZ8MUz7jLjBoPlPZabionZYxMtePTg==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ys31u0hkq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 15 Jun 2024 12:00:45 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45FC0iKl026458
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 15 Jun 2024 12:00:44 GMT
+Received: from luoj-gv.qualcomm.com (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sat, 15 Jun
+ 2024 05:00:40 -0700
+From: Luo Jie <quic_luoj@quicinc.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
+        <conor+dt@kernel.org>, <andrew@lunn.ch>, <hkallweit1@gmail.com>,
+        <linux@armlinux.org.uk>, <corbet@lwn.net>, <vladimir.oltean@nxp.com>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
+Subject: [PATCH net-next v2 0/2] Introduce PHY mode 10G-QXGMII
+Date: Sat, 15 Jun 2024 20:00:26 +0800
+Message-ID: <20240615120028.2384732-1-quic_luoj@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: tUazm06b5owhuoBp9eYVOR8_0qoPyqd8
+X-Proofpoint-ORIG-GUID: tUazm06b5owhuoBp9eYVOR8_0qoPyqd8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-15_08,2024-06-14_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 phishscore=0 adultscore=0 priorityscore=1501
+ spamscore=0 mlxscore=0 malwarescore=0 mlxlogscore=802 bulkscore=0
+ suspectscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2405170001 definitions=main-2406150091
 
-zijianzhang@ wrote:
-> From: Zijian Zhang <zijianzhang@bytedance.com>
-> 
-> Since ____sys_sendmsg creates a kernel copy of msg_control and passes
-> that to the callees, put_cmsg will write into this kernel buffer. If
-> people want to piggyback some information like timestamps upon returning
-> of sendmsg. ____sys_sendmsg will have to copy_to_user to the original buf,
-> which is not supported. As a result, users typically have to call recvmsg
-> on the ERRMSG_QUEUE of the socket, incurring extra system call overhead.
-> 
-> This commit supports put_cmsg to userspace in TX path by storing user
-> msg_control address in a new field in struct msghdr, and adding a new bit
-> flag use_msg_control_user_tx to toggle the behavior of put_cmsg. Thus,
-> it's possible to piggyback information in the msg_control of sendmsg.
-> 
-> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
-> Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
-> ---
->  include/linux/socket.h |  4 ++++
->  net/compat.c           | 33 +++++++++++++++++++++++++--------
->  net/core/scm.c         | 42 ++++++++++++++++++++++++++++++++----------
->  net/socket.c           |  2 ++
->  4 files changed, 63 insertions(+), 18 deletions(-)
-> 
-> diff --git a/include/linux/socket.h b/include/linux/socket.h
-> index 89d16b90370b..8d3db04f4a39 100644
-> --- a/include/linux/socket.h
-> +++ b/include/linux/socket.h
-> @@ -71,9 +71,12 @@ struct msghdr {
->  		void __user	*msg_control_user;
->  	};
->  	bool		msg_control_is_user : 1;
-> +	bool		use_msg_control_user_tx : 1;
->  	bool		msg_get_inq : 1;/* return INQ after receive */
->  	unsigned int	msg_flags;	/* flags on received message */
-> +	void __user	*msg_control_user_tx;	/* msg_control_user in TX piggyback path */
->  	__kernel_size_t	msg_controllen;	/* ancillary data buffer length */
-> +	__kernel_size_t msg_controllen_user_tx; /* msg_controllen in TX piggyback path */
->  	struct kiocb	*msg_iocb;	/* ptr to iocb for async requests */
->  	struct ubuf_info *msg_ubuf;
->  	int (*sg_from_iter)(struct sock *sk, struct sk_buff *skb,
-> @@ -391,6 +394,7 @@ struct ucred {
->  
->  extern int move_addr_to_kernel(void __user *uaddr, int ulen, struct sockaddr_storage *kaddr);
->  extern int put_cmsg(struct msghdr*, int level, int type, int len, void *data);
+This patch series adds 10G-QXGMII mode for PHY driver. The patch
+series is split from the QCA8084 PHY driver patch series below.
+https://lore.kernel.org/all/20231215074005.26976-1-quic_luoj@quicinc.com/
+ 
+Per Andrew Lunn’s advice, submitting this patch series for acceptance
+as they already include the necessary 'Reviewed-by:' tags. This way,
+they need not wait for QCA8084 series patches to conclude review.
 
-> diff --git a/net/core/scm.c b/net/core/scm.c
-> index 4f6a14babe5a..de70ff1981a1 100644
-> --- a/net/core/scm.c
-> +++ b/net/core/scm.c
-> @@ -228,25 +228,29 @@ int __scm_send(struct socket *sock, struct msghdr *msg, struct scm_cookie *p)
->  }
->  EXPORT_SYMBOL(__scm_send);
->  
-> -int put_cmsg(struct msghdr * msg, int level, int type, int len, void *data)
-> +static int __put_cmsg(struct msghdr *msg, int level, int type, int len, void *data)
->  {
->  	int cmlen = CMSG_LEN(len);
-> +	__kernel_size_t msg_controllen;
->  
-> +	msg_controllen = msg->use_msg_control_user_tx ?
-> +		msg->msg_controllen_user_tx : msg->msg_controllen;
->  	if (msg->msg_flags & MSG_CMSG_COMPAT)
->  		return put_cmsg_compat(msg, level, type, len, data);
->  
-> -	if (!msg->msg_control || msg->msg_controllen < sizeof(struct cmsghdr)) {
-> +	if (!msg->msg_control || msg_controllen < sizeof(struct cmsghdr)) {
->  		msg->msg_flags |= MSG_CTRUNC;
->  		return 0; /* XXX: return error? check spec. */
->  	}
-> -	if (msg->msg_controllen < cmlen) {
-> +	if (msg_controllen < cmlen) {
->  		msg->msg_flags |= MSG_CTRUNC;
-> -		cmlen = msg->msg_controllen;
-> +		cmlen = msg_controllen;
->  	}
->  
-> -	if (msg->msg_control_is_user) {
-> -		struct cmsghdr __user *cm = msg->msg_control_user;
-> +	if (msg->use_msg_control_user_tx || msg->msg_control_is_user) {
-> +		struct cmsghdr __user *cm;
->  
-> +		cm = msg->msg_control_is_user ? msg->msg_control_user : msg->msg_control_user_tx;
->  		check_object_size(data, cmlen - sizeof(*cm), true);
->  
->  		if (!user_write_access_begin(cm, cmlen))
-> @@ -267,12 +271,17 @@ int put_cmsg(struct msghdr * msg, int level, int type, int len, void *data)
->  		memcpy(CMSG_DATA(cm), data, cmlen - sizeof(*cm));
->  	}
->  
-> -	cmlen = min(CMSG_SPACE(len), msg->msg_controllen);
-> -	if (msg->msg_control_is_user)
-> +	cmlen = min(CMSG_SPACE(len), msg_controllen);
-> +	if (msg->msg_control_is_user) {
->  		msg->msg_control_user += cmlen;
-> -	else
-> +		msg->msg_controllen -= cmlen;
-> +	} else if (msg->use_msg_control_user_tx) {
-> +		msg->msg_control_user_tx += cmlen;
-> +		msg->msg_controllen_user_tx -= cmlen;
-> +	} else {
->  		msg->msg_control += cmlen;
-> -	msg->msg_controllen -= cmlen;
-> +		msg->msg_controllen -= cmlen;
-> +	}
->  	return 0;
->  
->  efault_end:
-> @@ -280,8 +289,21 @@ int put_cmsg(struct msghdr * msg, int level, int type, int len, void *data)
->  efault:
->  	return -EFAULT;
->  }
-> +
-> +int put_cmsg(struct msghdr *msg, int level, int type, int len, void *data)
-> +{
-> +	msg->use_msg_control_user_tx = false;
-> +	return __put_cmsg(msg, level, type, len, data);
-> +}
->  EXPORT_SYMBOL(put_cmsg);
->  
-> +int put_cmsg_user_tx(struct msghdr *msg, int level, int type, int len, void *data)
-> +{
-> +	msg->use_msg_control_user_tx = true;
-> +	return __put_cmsg(msg, level, type, len, data);
-> +}
-> +EXPORT_SYMBOL(put_cmsg_user_tx);
-> +
->  void put_cmsg_scm_timestamping64(struct msghdr *msg, struct scm_timestamping_internal *tss_internal)
->  {
->  	struct scm_timestamping64 tss;
-> diff --git a/net/socket.c b/net/socket.c
-> index e416920e9399..2755bc7bef9c 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -2561,6 +2561,8 @@ static int ____sys_sendmsg(struct socket *sock, struct msghdr *msg_sys,
->  		err = -EFAULT;
->  		if (copy_from_user(ctl_buf, msg_sys->msg_control_user, ctl_len))
->  			goto out_freectl;
-> +		msg_sys->msg_control_user_tx = msg_sys->msg_control_user;
-> +		msg_sys->msg_controllen_user_tx = msg_sys->msg_controllen;
+Changes in v2:
+	* remove PHY_INTERFACE_MODE_10G_QXGMII from workaround of
+	  validation in the phylink_validate_phy. 10G_QXGMII will
+	  be set into phy->possible_interfaces in its .config_init
+	  method of PHY driver that supports it. 
 
-No need for this separate user_tx pointer and put_cmsg_user_tx.
+Vladimir Oltean (2):
+  net: phy: introduce core support for phy-mode = "10g-qxgmii"
+  dt-bindings: net: ethernet-controller: add 10g-qxgmii mode
 
-___sys_sendmsg copies the user data to a stack allocated kernel
-buffer. All subsequent operations are on this buffer. __put_cmsg
-already supports writing to this kernel buffer.
+ .../devicetree/bindings/net/ethernet-controller.yaml     | 1 +
+ Documentation/networking/phy.rst                         | 6 ++++++
+ drivers/net/phy/phy-core.c                               | 1 +
+ drivers/net/phy/phylink.c                                | 9 ++++++++-
+ include/linux/phy.h                                      | 4 ++++
+ include/linux/phylink.h                                  | 1 +
+ 6 files changed, 21 insertions(+), 1 deletion(-)
 
-All that is needed is to copy_to_user the buffer on return from
-__sock_sendmsg. And only if it should be copied, which the bit in
-msghdr can signal.
 
->  		msg_sys->msg_control = ctl_buf;
->  		msg_sys->msg_control_is_user = false;
->  	}
-> -- 
-> 2.20.1
-> 
-
+base-commit: 934c29999b57b835d65442da6f741d5e27f3b584
+-- 
+2.34.1
 
 
