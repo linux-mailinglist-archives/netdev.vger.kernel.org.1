@@ -1,121 +1,181 @@
-Return-Path: <netdev+bounces-103816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2473D909A06
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 23:35:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A5E2909A0B
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 23:47:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07A5E1C20DE3
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 21:35:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDB42281916
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 21:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2354F881;
-	Sat, 15 Jun 2024 21:35:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 711B04964E;
+	Sat, 15 Jun 2024 21:47:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BCTEqJeq"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349BE8F48
-	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 21:35:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DBF1D53F
+	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 21:47:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718487343; cv=none; b=eU6lUSISX+nLkKW724lBQbXncokxdyjQjjKEntXkNCcF16UaHaA3EV9AS6tQMNEofrmzVDLAXK95rZXA7beaIOmw0VDmiAT0WeB77Cy20ws7pFudIZ7wF4W1OT77d3ZkY0NzGvU9MmysLNoSTptTRoH/nUcl3bXN6wQtDY33hg8=
+	t=1718488054; cv=none; b=AW04oBZTm21wbFR6CeNVS/mysj/NcF+rbx8gv+XBXEd7zJSwRaYC0gepJQ7g210s4s4A/RNwdFqteN3cUyRYvxk1Wuc82Av7zyjwIq7l2JnO6opYS3GsOX/RvV6SQ0B3hxe2Sn5/VBJgllXpg4rISmr6zapuWdPC7Rsb40quSMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718487343; c=relaxed/simple;
-	bh=qmJN1lve7JcoiGFq1UrMKhgHoWc3m9quj0gzt2Le7jk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=m8G+HAI0VM1tRRwspP7rAE+wJ0YdTT/GMgUgqfWuPid+BTY2AZAKIromOjcM0M+s60fftQjuDC4GsdxeNuXrTLkLDhTV0lwEOgq+SUZ0N9y0qqlYjc+swVTSJf/pIw85ufk6t0OFCN1RikSlTxdIdNvYuid+k7W8VH9h2hJleyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-257-WcpmdJxuOlyzpwH8SkS-PQ-1; Sat, 15 Jun 2024 22:35:28 +0100
-X-MC-Unique: WcpmdJxuOlyzpwH8SkS-PQ-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sat, 15 Jun
- 2024 22:34:52 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Sat, 15 Jun 2024 22:34:52 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Christoph Hellwig' <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
-CC: Jakub Kicinski <kuba@kernel.org>, Aurelien Aptel <aaptel@nvidia.com>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "kbusch@kernel.org"
-	<kbusch@kernel.org>, "axboe@fb.com" <axboe@fb.com>, "chaitanyak@nvidia.com"
-	<chaitanyak@nvidia.com>, "davem@davemloft.net" <davem@davemloft.net>
-Subject: RE: [PATCH v25 00/20] nvme-tcp receive offloads
-Thread-Topic: [PATCH v25 00/20] nvme-tcp receive offloads
-Thread-Index: AQHau8pbCx3DyDdCX0iDpwrmm4Yu8LHJXahA
-Date: Sat, 15 Jun 2024 21:34:52 +0000
-Message-ID: <df4db10f6f3946e29e7e7340cfa82c33@AcuMS.aculab.com>
-References: <20240529160053.111531-1-aaptel@nvidia.com>
- <20240530183906.4534c029@kernel.org> <20240531061142.GB17723@lst.de>
- <06d9c3c9-8d27-46bf-a0cf-0c3ea1a0d3ec@grimberg.me>
- <20240610122939.GA21899@lst.de>
- <9a03d3bf-c48f-4758-9d7f-a5e7920ec68f@grimberg.me>
- <20240611064132.GA6727@lst.de>
-In-Reply-To: <20240611064132.GA6727@lst.de>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1718488054; c=relaxed/simple;
+	bh=G5dTdWAWhOfeMQQleLTCJ1vNe5GtEE8ajP48RYjrXWE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FmZSAHAVzmZp9fYAZAMg9NJY6nXZVV7m9RBZijoB/auu0N6JKO5yW8TWn+OVdFX+w//AzkUoEbcAB7Uw19AjDn0DzLDSxRi/6Lnu4VYUgZ+4i5s0BeUD3XODADzOhprT9lU5/ZbMCGXLpfQH/NINawYAUlxkm+A8jzxXsUw8Qnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BCTEqJeq; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4405c2263eeso16958621cf.0
+        for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 14:47:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718488051; x=1719092851; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=h9jzv1SMlWSVyfXjNSF6E2bsDuOzPP27ZQ0/cjQRYBA=;
+        b=BCTEqJeqFQPsx2OzIJojwreX8K3V2K4ZSKjkDy1lH/pD7DNbKp39/I16Alm5FgQGPX
+         IhEn6Fbl5DdxGJg1G3HzG9OrklrWExFoJ4MRSBWcy8LtNQKnl2iL8Ty2l4G3WARm8NOF
+         xhBu96JUFJrUc4bGd/c1YK/QfTZHm73P3dghMEFIjw0/3VtTz8nSrDvNRRcdNAalQhZ+
+         eKk7yLN6Mp05q+f7m3SUGwaJYVoPDtVUKwK9ct/pU88WBSntcFFQ8bHgo0tPYFfs+NAJ
+         RptPsGqkWavlejB+jX2ZrGY0ylJqCYj4X0V68IcxAjKFz70is1QNGw4VKkU66/7s6Jbn
+         x41g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718488051; x=1719092851;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=h9jzv1SMlWSVyfXjNSF6E2bsDuOzPP27ZQ0/cjQRYBA=;
+        b=uaisEV4HY6EKUVDlG3FffHjthIlbj9Ij3fSW6X2N29UrXIbsgau39oWNJjnEBQG4OG
+         q/pJ/3dSeLd6vkAYW1t3z9BkbbxhI4p5i/B0ayqAjJize6l/nqD0Zl+rMmUE0ogUiMcb
+         LB+Wge9Rl5oJhtyWuUxxZ6YDFsEqXErhbT/Ty/4s4HSjwvSos6nqFMv3zPWyDQLlySk0
+         dEyn82vJo6mpQKToI0TmxfeoPl3eGPKOZt1AOkdbwGlolCrBfNLvGYIi5shtN+RnG7ne
+         0jhdH1V8UsOaAmrdUD4vIlGuyNBtlgOLThBXnMIe5hO+JS/ujV0ziflOae/OY6R/WXj9
+         2tsg==
+X-Gm-Message-State: AOJu0Yyd/qH/ys/f3fykHXkL6pF2pCaSlMqqwOlTLgiISnAUz3YSVX3c
+	o4tl/aiU7ajkIkdBZUtKn6M2qU1Jwz5NF1TwvKdgxi4ZTQreLBGVa+P/Efsd
+X-Google-Smtp-Source: AGHT+IFHP9HcuH+sEy5gXvMP5H8uFzw7NADXkjjk4L7sg7gttDqfCXSl/7x7VTBe0mGBNQmeZKgiJw==
+X-Received: by 2002:ac8:5a8c:0:b0:440:60f3:733b with SMTP id d75a77b69052e-4421685caa4mr66735761cf.14.1718488051063;
+        Sat, 15 Jun 2024 14:47:31 -0700 (PDT)
+Received: from wsfd-netdev15.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-442198f6160sm21222751cf.45.2024.06.15.14.47.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Jun 2024 14:47:30 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Paul Blakey <paulb@mellanox.com>,
+	Yossi Kuperman <yossiku@mellanox.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Subject: [PATCH net] sched: act_ct: add netns into the key of tcf_ct_flow_table
+Date: Sat, 15 Jun 2024 17:47:30 -0400
+Message-ID: <1db5b6cc6902c5fc6f8c6cbd85494a2008087be5.1718488050.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-From: Christoph Hellwig
-> Sent: 11 June 2024 07:42
->=20
-> On Mon, Jun 10, 2024 at 05:30:34PM +0300, Sagi Grimberg wrote:
-> >> efficient header splitting in the NIC, either hard coded or even
-> >> better downloadable using something like eBPF.
-> >
-> > From what I understand, this is what this offload is trying to do. It u=
-ses
-> > the nvme command_id similar to how the read_stag is used in iwarp,
-> > it tracks the NVMe/TCP pdus to split pdus from data transfers, and maps
-> > the command_id to an internal MR for dma purposes.
-> >
-> > What I think you don't like about this is the interface that the offloa=
-d
-> > exposes
-> > to the TCP ulp driver (nvme-tcp in our case)?
->=20
-> I don't see why a memory registration is needed at all.
->=20
-> The by far biggest painpoint when doing storage protocols (including
-> file systems) over IP based storage is the data copy on the receive
-> path because the payload is not aligned to a page boundary.
+zones_ht is a global hashtable for flow_table with zone as key. However,
+it does not consider netns when getting a flow_table from zones_ht in
+tcf_ct_init(), and it means an act_ct action in netns A may get a
+flow_table that belongs to netns B if it has the same zone value.
 
-How much does the copy cost anyway?
-If the hardware has merged the segments then it should be a single copy.
-On x86 (does anyone care about anything else :-) 'rep mosvb' with a
-cache-line aligned destination runs at 64 bytes/clock.
-(The source alignment doesn't matter at all.)
-I guess it loads the source data into the D-cache, the target is probably
-required anyway - or you wouldn't be doing a read.
+In Shuang's test with the TOPO:
 
-=09David
+  tcf2_c <---> tcf2_sw1 <---> tcf2_sw2 <---> tcf2_s
 
->=20
-> So we need to figure out a way that is as stateless as possible that
-> allows aligning the actual data payload on a page boundary in an
-> otherwise normal IP receive path.
+tcf2_sw1 and tcf2_sw2 saw the same flow and used the same flow table,
+which caused their ct entries entering unexpected states and the
+TCP connection not able to end normally.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
+This patch fixes the issue simply by adding netns into the key of
+tcf_ct_flow_table so that an act_ct action gets a flow_table that
+belongs to its own netns in tcf_ct_init().
+
+Note that for easy coding we don't use tcf_ct_flow_table.nf_ft.net,
+as the ct_ft is initialized after inserting it to the hashtable in
+tcf_ct_flow_table_get() and also it requires to implement several
+functions in rhashtable_params including hashfn, obj_hashfn and
+obj_cmpfn.
+
+Fixes: 64ff70b80fd4 ("net/sched: act_ct: Offload established connections to flow table")
+Reported-by: Shuang Li <shuali@redhat.com>
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ net/sched/act_ct.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
+index baac083fd8f1..2a96d9c1db65 100644
+--- a/net/sched/act_ct.c
++++ b/net/sched/act_ct.c
+@@ -41,21 +41,26 @@ static struct workqueue_struct *act_ct_wq;
+ static struct rhashtable zones_ht;
+ static DEFINE_MUTEX(zones_mutex);
+ 
++struct zones_ht_key {
++	struct net *net;
++	u16 zone;
++};
++
+ struct tcf_ct_flow_table {
+ 	struct rhash_head node; /* In zones tables */
+ 
+ 	struct rcu_work rwork;
+ 	struct nf_flowtable nf_ft;
+ 	refcount_t ref;
+-	u16 zone;
++	struct zones_ht_key key;
+ 
+ 	bool dying;
+ };
+ 
+ static const struct rhashtable_params zones_params = {
+ 	.head_offset = offsetof(struct tcf_ct_flow_table, node),
+-	.key_offset = offsetof(struct tcf_ct_flow_table, zone),
+-	.key_len = sizeof_field(struct tcf_ct_flow_table, zone),
++	.key_offset = offsetof(struct tcf_ct_flow_table, key),
++	.key_len = sizeof_field(struct tcf_ct_flow_table, key),
+ 	.automatic_shrinking = true,
+ };
+ 
+@@ -316,11 +321,12 @@ static struct nf_flowtable_type flowtable_ct = {
+ 
+ static int tcf_ct_flow_table_get(struct net *net, struct tcf_ct_params *params)
+ {
++	struct zones_ht_key key = { .net = net, .zone = params->zone };
+ 	struct tcf_ct_flow_table *ct_ft;
+ 	int err = -ENOMEM;
+ 
+ 	mutex_lock(&zones_mutex);
+-	ct_ft = rhashtable_lookup_fast(&zones_ht, &params->zone, zones_params);
++	ct_ft = rhashtable_lookup_fast(&zones_ht, &key, zones_params);
+ 	if (ct_ft && refcount_inc_not_zero(&ct_ft->ref))
+ 		goto out_unlock;
+ 
+@@ -329,7 +335,7 @@ static int tcf_ct_flow_table_get(struct net *net, struct tcf_ct_params *params)
+ 		goto err_alloc;
+ 	refcount_set(&ct_ft->ref, 1);
+ 
+-	ct_ft->zone = params->zone;
++	ct_ft->key = key;
+ 	err = rhashtable_insert_fast(&zones_ht, &ct_ft->node, zones_params);
+ 	if (err)
+ 		goto err_insert;
+-- 
+2.43.0
 
 
