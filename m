@@ -1,162 +1,99 @@
-Return-Path: <netdev+bounces-103811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEFD2909995
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 20:28:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16C21909999
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 20:33:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78CD2B218F7
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 18:28:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A85801F214B0
+	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 18:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C515916B;
-	Sat, 15 Jun 2024 18:28:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35523EA72;
+	Sat, 15 Jun 2024 18:33:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BBD67olG"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE82F50A63
-	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 18:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8BB266AB
+	for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 18:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718476126; cv=none; b=UIuoRUi/K7PV+c4QNuKItQ8fXScNrm2+MMBpQH20qNtb5zJswaE+AGaiBiN6Ie7pScsRx82E1JXa8TX5WE59cJm6u5FrO9iZFQRtU2gIJp+MTq27kchttzAl9O/JERpcfq2/xMPwBkvVZPjQf1gEBk4o/3Pp0IagzGUNmtHIobg=
+	t=1718476398; cv=none; b=nyHR9Y/77r5j64IiH2cI8fA2LvBV+9u2nX+DZztYqm61v14IWRxqK4QC5KN4I5LDf9RkS4yF4FQQIWgRmUtyMthNDCsVGoxacorRPyZXdHr0Fr6lYhPhfuQdQ364s2Bll7zBQJ1TIWNnSYcVYEbvCa3azS9nivG6Wz5GHGucfWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718476126; c=relaxed/simple;
-	bh=EjCvFD/vXDxnYWBzrGzfa3vlIfwcz0jJKRtI1/iM2uM=;
+	s=arc-20240116; t=1718476398; c=relaxed/simple;
+	bh=JpGqASoCZ86bv0shQ5QKjxonvdNmSrTh2q9zZrJZxTQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UUlZzV6e3SPtXLtuRXpFnKKNLE+L3oncOGNuJB2QLU5YCkSstutpthsm5SmOTd7/racD1QHZrDhnFk0uSewdi360sipUw5p2Gp0voaIWu8Etl6XjurXK1PjiToVtkiOtJo2FYZkD0dgfWmjvedMBSmUZLrRCTHq3VMoI4Atia6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sIY8e-0006CS-HZ; Sat, 15 Jun 2024 20:28:32 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sIY8c-002Ypw-FF; Sat, 15 Jun 2024 20:28:30 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sIY8c-00COTO-1D;
-	Sat, 15 Jun 2024 20:28:30 +0200
-Date: Sat, 15 Jun 2024 20:28:30 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de
-Subject: Re: [PATCH net-next v3 5/7] net: ethtool: Add new power limit get
- and set features
-Message-ID: <Zm3dTuXuVEF9MhDS@pengutronix.de>
-References: <20240614-feature_poe_power_cap-v3-0-a26784e78311@bootlin.com>
- <20240614-feature_poe_power_cap-v3-5-a26784e78311@bootlin.com>
- <Zm26aJaz7Z7LAXNT@pengutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ctugpycwCHLNjzYAr7Oj5VhvoRbz7zXgwXpTehnxp1t+ZD0A9xswvjKSWTm3PNltPgikyf/1lG+6u7v7WKaFabwHgiUhHlWgdss2n8cN0ZkblOtybNkEhIfi6pluDt9GrqORgnml5miVtqv1/tndQ7jbjoo/0FEatxEsJ8tBP1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BBD67olG; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=6WtuBsvTVAZZ1ae/0FKDU2wWMj93n4nLEHbmdKnFP7k=; b=BB
+	D67olGHxz/PqHxY6cKZPMPqY5QFRGP8zY6F/zFRAHkGxJMPZn8ARqVFigOEUD5n0Oa4ParcEH2b9Z
+	gIO394qan3RIewAi8tTHrGjudcMDkJdd4ZD86S8U22Q5/I5jRzvUjvGa/oQa/bky2UT2djJDQTSox
+	Nx8Doeuyt9qWYa0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sIYD2-0008wW-9C; Sat, 15 Jun 2024 20:33:04 +0200
+Date: Sat, 15 Jun 2024 20:33:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Hans-Frieder Vogt <hfdevel@gmx.net>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, kuba@kernel.org,
+	netdev@vger.kernel.org, horms@kernel.org, jiri@resnulli.us,
+	pabeni@redhat.com, linux@armlinux.org.uk, naveenm@marvell.com,
+	jdamato@fastly.com
+Subject: Re: [PATCH net-next v10 4/7] net: tn40xx: add basic Tx handling
+Message-ID: <00d00a1c-2a78-4b7d-815d-8977fb4795be@lunn.ch>
+References: <20240611045217.78529-5-fujita.tomonori@gmail.com>
+ <20240613173038.18b2a1ce@kernel.org>
+ <1ae2ddab-b6d2-499d-9aa1-3033c730bb87@gmx.net>
+ <20240615.180209.1799432003527929919.fujita.tomonori@gmail.com>
+ <2f9cf951-f357-402c-9da7-77276a9a6a63@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <Zm26aJaz7Z7LAXNT@pengutronix.de>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <2f9cf951-f357-402c-9da7-77276a9a6a63@gmx.net>
 
-On Sat, Jun 15, 2024 at 05:59:36PM +0200, Oleksij Rempel wrote:
-> Hi KÃ¶ry,
-> 
-> On Fri, Jun 14, 2024 at 04:33:21PM +0200, Kory Maincent wrote:
-> > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> > 
-> > This patch expands the status information provided by ethtool for PSE c33
-> > with power limit. It also adds a call to pse_ethtool_set_pw_limit() to
-> > configure the PSE control power limit.
-> > 
-> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> > ---
-> > 
-> > Change in v3:
-> > - Add ethtool netlink documentation.
-> > ---
-> >  Documentation/networking/ethtool-netlink.rst |  8 ++++++
-> >  include/uapi/linux/ethtool_netlink.h         |  1 +
-> >  net/ethtool/pse-pd.c                         | 42 +++++++++++++++++++++++-----
-> >  3 files changed, 44 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-> > index 7dbf2ef3ac0e..a78b6aea84af 100644
-> > --- a/Documentation/networking/ethtool-netlink.rst
-> > +++ b/Documentation/networking/ethtool-netlink.rst
-> > @@ -1737,6 +1737,7 @@ Kernel response contents:
-> >                                                    PoE PSE.
-> >    ``ETHTOOL_A_C33_PSE_EXT_SUBSTATE``         u32  power extended substatus of
-> >                                                    the PoE PSE.
-> > +  ``ETHTOOL_A_C33_PSE_PW_LIMIT``             u32  power limit of the PoE PSE.
-> >    ======================================  ======  =============================
-> >  
-> >  When set, the optional ``ETHTOOL_A_PODL_PSE_ADMIN_STATE`` attribute identifies
-> > @@ -1799,6 +1800,9 @@ Possible values are:
-> >  		  ethtool_c33_pse_ext_substate_power_not_available
-> >  		  ethtool_c33_pse_ext_substate_short_detected
-> >  
-> > +When set, the optional ``ETHTOOL_A_C33_PSE_PW_LIMIT`` attribute identifies
-> > +the C33 PSE power limit in mW.
-> > +
-> >  PSE_SET
-> >  =======
-> >  
-> > @@ -1810,6 +1814,7 @@ Request contents:
-> >    ``ETHTOOL_A_PSE_HEADER``                nested  request header
-> >    ``ETHTOOL_A_PODL_PSE_ADMIN_CONTROL``       u32  Control PoDL PSE Admin state
-> >    ``ETHTOOL_A_C33_PSE_ADMIN_CONTROL``        u32  Control PSE Admin state
-> > +  ``ETHTOOL_A_C33_PSE_PW_LIMIT``             u32  Control PoE PSE power limit
-> >    ======================================  ======  =============================
-> >  
-> >  When set, the optional ``ETHTOOL_A_PODL_PSE_ADMIN_CONTROL`` attribute is used
-> > @@ -1820,6 +1825,9 @@ to control PoDL PSE Admin functions. This option is implementing
-> >  The same goes for ``ETHTOOL_A_C33_PSE_ADMIN_CONTROL`` implementing
-> >  ``IEEE 802.3-2022`` 30.9.1.2.1 acPSEAdminControl.
-> >  
-> > +When set, the optional ``ETHTOOL_A_C33_PSE_PW_LIMIT`` attribute is used
-> > +to control C33 PSE power limit in mW.
-> 
-> 
-> The corresponding name int the IEEE 802.3-2022 seems to be pse_avail_pwr
-> in 145.2.5.4 Variables and pse_available_power in 33.2.4.4 Variables.
-> 
-> This variable is using classes instead of mW. pd692x0 seems to use
-> classes instead of mW too. May be it is better to use classes for UAPI
-> too? 
+> /* Sizes of tx desc (including padding if needed) as function of the SKB's
+>  * frag number
+>  * 7 - is number of lwords in txd with one phys buffer
+>  * 3 - is number of lwords used for every additional phys buffer
+>  * for (i = 0; i < TN40_MAX_PBL; i++) {
+>  *    lwords = 7 + (i * 3);
+>  *        if (lwords & 1)
+>  *            lwords++;    pad it with 1 lword
+>  *        tn40_txd_sizes[i].qwords = lwords >> 1;
+>  *        tn40_txd_sizes[i].bytes = lwords << 2;
+>  * }
+>  */
+> static struct {
+>     u16 bytes;
+>     u16 qwords;        /* qword = 64 bit */
+> } const tn40_txd_sizes[] = {
+>     { 0x20, 0x04 },
+>     { 0x28, 0x05 },
+>     { 0x38, 0x07 },
 
-Huh... i took some more time to investigate it. Looks like there is no
-simple answer. Some devices seems to write power class on the box. Other
-client devices write power consumption in watts. IEEE 802.3-2022
-provides LLDP specification with PowerValue for watts and PowerClass for
-classes. Different product user interfaces provide class and/or watts.
-So, let's go with watts then. Please update the name to something like
-pse_available_power_value or pse_available_power_value_limit and
-document how it is related to State diagrams in the IEEE spec.
+Nice comment section. Please keep it to help explain the table.
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+I did wounder if calculating the value as needed would be any
+slower/faster than doing a table access. Doing arithmetic is very
+cheap compared to a cache miss for a table lookup. Something which
+could be bench marked and optimised later.
+
+     Andrew
 
