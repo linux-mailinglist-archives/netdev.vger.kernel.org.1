@@ -1,179 +1,211 @@
-Return-Path: <netdev+bounces-103828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46D7B909BB3
-	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 07:54:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A33A0909BC4
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 08:07:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 728E0B2130E
-	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 05:54:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 588DE283067
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 06:07:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52CCC16D4E9;
-	Sun, 16 Jun 2024 05:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D09916D9A1;
+	Sun, 16 Jun 2024 06:07:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56F216D30F
-	for <netdev@vger.kernel.org>; Sun, 16 Jun 2024 05:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D519535C4
+	for <netdev@vger.kernel.org>; Sun, 16 Jun 2024 06:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718517262; cv=none; b=L+GQoV8VBTDWTBKS7xHEDeKgoCI2dzInde6hyslsNgvMwn3eA2N7a6o0dGTfikBfkGNaCdGAK5hGiqFxTotiOgItdcz8RKNgSlWCqv0+pNHsgm0tVjeFDrKjYveLHxWiiZRacJYHl1YQ4MSf1UKIGYAuAacoDuTgDAg0QsaHwB0=
+	t=1718518058; cv=none; b=bvT5RprAWVilwsu5h5mjs5AkXIc6KBEYe271BxmiffCwMN046CyZDXW/+DVS8zbdWRFOeFryany3hCPI+XxB6PuOE3Tc6ku/i+wjauyWRHjpZbXgZ4mz2AAe7M7oShWrUZ2P91NGk2GfRhN97yDX0VtrzecAp/7z/TP+WgLPmFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718517262; c=relaxed/simple;
-	bh=B1Mi2iB4rh+LdPeBChRnGFShUhSfHM6ihPGxVKoaAwM=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=fGxnsCHRc+/qBqjZx+5Y+9LrZR/Q1emmrHqdLAZ9DsuTFruOAtUrAamtrLS33kCXI1bsTUX5ds3eJcczvlv55uvCd9ku+otOxqGT2b27A/VZWj2tTzqDEeyhFO1E1IiomSuzArCsHossQxt2MhqACTAkflb1FURzgfAJrpBXU4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-375e4d55457so21751365ab.0
-        for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 22:54:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718517260; x=1719122060;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=romJDKF4YYdUcNlHKmmiJoWHinqaoX9oJ6SM72wKzyk=;
-        b=vqbgtkj1xslUK0GozfwPvb3E3UNboWcbK3+Tbet64AdNuxepC1DKPr2g5HXKXGhl7N
-         gi1xTjPHIEdhEfTtWVxmRhbWxgBwkLVTCPGl81dF/UpgpJ3JCxi9b4K77SUqOLFUEDRI
-         YdcOq7ZOKZipkF9KpkxjfrkB1K54dKdHJMs5WHPQam/v2PkOPdB2qXx39GMzTretYEPU
-         ncwAZ0dkbsu7Iv+pGGJP3efsuPlHiE3NyFTjwjCQxAZh7KmUtFtc1Wb/dcl6mVrZecNI
-         WaNT8vG0idDb51fviG3OqqkASRd/B1URgaVN5iXIIRaJZR0CNNdh6ZQ9J2FLHhQ9ZpIm
-         Fc2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX1So73EyBFFlO3XcA5lUcahG7JNw5wZ1R2RBR7kLdFPbbY1a9WkOZjjdgOuRhMYSkCWZBLJ/ViK3h5mAO27ieZ7x9XcgqD
-X-Gm-Message-State: AOJu0YyJLTfbNLQz3tWO8Es/mR6ko5Py18WpzQNZTo8cajvNk0ux73L/
-	jhfktQlnjkmCWvtjs6WhmeY/EldsFhmTtkCPXMyjTIAKrGwNzq8SaGQ9U38O5GcrYq4UGSY3IAx
-	ml0OhfJ9Yvc/AcuvmH0f0Zk+snoxzccQRwdjJkCVoFKESmLorOcAun3I=
-X-Google-Smtp-Source: AGHT+IE2Gd+LOe88pC+S0lKc6d8yttgEK0N/YWyestZ/pdZSMy4wAkxPXqJ47g9Prl9B8V7DJLFuWv6LzPsnTqBeF0wTRpUHU0aJ
+	s=arc-20240116; t=1718518058; c=relaxed/simple;
+	bh=ZOaUURSedLapqy2s8nwqiwJKvSVsYpd9QKxBufVJBX0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ruQAJTbQWCA3GyLOBax7MP86SNooUtr/S4ejNcPRClrDWeDDAfEFzkfUREeoJwSAws7a/M/OC+I4hwwRs31jlqQtwlRA3sqzoXdNWJyg/TdXDexM/dV8xu4y5FOVr7ApDj9euXhVSoeeeri7QKfPPFD0NxsJfzNUTaqxsAYd7L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sIj2x-0000jq-5u; Sun, 16 Jun 2024 08:07:23 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sIj2u-002flU-P8; Sun, 16 Jun 2024 08:07:20 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sIj2u-00E95Z-2B;
+	Sun, 16 Jun 2024 08:07:20 +0200
+Date: Sun, 16 Jun 2024 08:07:20 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de
+Subject: Re: [PATCH net-next v3 5/7] net: ethtool: Add new power limit get
+ and set features
+Message-ID: <Zm6BGJxu4bLVszFD@pengutronix.de>
+References: <20240614-feature_poe_power_cap-v3-0-a26784e78311@bootlin.com>
+ <20240614-feature_poe_power_cap-v3-5-a26784e78311@bootlin.com>
+ <Zm26aJaz7Z7LAXNT@pengutronix.de>
+ <Zm3dTuXuVEF9MhDS@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c29:b0:375:9deb:ceb8 with SMTP id
- e9e14a558f8ab-375e1014718mr3864085ab.3.1718517259888; Sat, 15 Jun 2024
- 22:54:19 -0700 (PDT)
-Date: Sat, 15 Jun 2024 22:54:19 -0700
-In-Reply-To: <00000000000041df050616f6ba4e@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d0fffc061afb7a2c@google.com>
-Subject: Re: [syzbot] [mm?] possible deadlock in __mmap_lock_do_trace_start_locking
-From: syzbot <syzbot+6ff90931779bcdfc840c@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Zm3dTuXuVEF9MhDS@pengutronix.de>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+On Sat, Jun 15, 2024 at 08:28:30PM +0200, Oleksij Rempel wrote:
+> > > diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+> > > index 7dbf2ef3ac0e..a78b6aea84af 100644
+> > > --- a/Documentation/networking/ethtool-netlink.rst
+> > > +++ b/Documentation/networking/ethtool-netlink.rst
+> > > @@ -1737,6 +1737,7 @@ Kernel response contents:
+> > >                                                    PoE PSE.
+> > >    ``ETHTOOL_A_C33_PSE_EXT_SUBSTATE``         u32  power extended substatus of
+> > >                                                    the PoE PSE.
+> > > +  ``ETHTOOL_A_C33_PSE_PW_LIMIT``             u32  power limit of the PoE PSE.
+> > >    ======================================  ======  =============================
+> > >  
+> > >  When set, the optional ``ETHTOOL_A_PODL_PSE_ADMIN_STATE`` attribute identifies
+> > > @@ -1799,6 +1800,9 @@ Possible values are:
+> > >  		  ethtool_c33_pse_ext_substate_power_not_available
+> > >  		  ethtool_c33_pse_ext_substate_short_detected
+> > >  
+> > > +When set, the optional ``ETHTOOL_A_C33_PSE_PW_LIMIT`` attribute identifies
+> > > +the C33 PSE power limit in mW.
 
-HEAD commit:    36534d3c5453 tcp: use signed arithmetic in tcp_rtx_probe0_..
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=110e9dde980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=333ebe38d43c42e2
-dashboard link: https://syzkaller.appspot.com/bug?extid=6ff90931779bcdfc840c
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1585acfa980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17bdb7ee980000
+Except of current value, we need an interface to return list of supported
+ranges. For example a controller with flexible configuration will have
+one entry 
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/4e648f638b5f/disk-36534d3c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/bbe0d41240f1/vmlinux-36534d3c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/17eb17ecd214/bzImage-36534d3c.xz
+Proposed interface may look like this:
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6ff90931779bcdfc840c@syzkaller.appspotmail.com
+  ``ETHTOOL_A_C33_PSE_AVAIL_PWR_VAL_LIMIT``  u32  Get PoE PSE currently configured power value limit
+  ``ETHTOOL_A_C33_PSE_PWR_LIMIT_RANGES``     nested  Supported power limit configuration ranges  
+  ======================================  ======  =============================
 
-============================================
-WARNING: possible recursive locking detected
-6.10.0-rc2-syzkaller-00242-g36534d3c5453 #0 Not tainted
---------------------------------------------
-syz-executor181/5090 is trying to acquire lock:
-ffff8880b9538828 (lock#9){+.+.}-{2:2}, at: local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
-ffff8880b9538828 (lock#9){+.+.}-{2:2}, at: __mmap_lock_do_trace_start_locking+0x83/0x620 mm/mmap_lock.c:230
+ +------------------------------------------+--------+----------------------------+
+ | ``ETHTOOL_A_C33_PSE_PWR_VAL_LIMIT_RANGES``   | nested | array of power limit ranges|
+ +-+----------------------------------------+--------+----------------------------+
+ | | ``ETHTOOL_A_C33_PSE_PWR_VAL_LIMIT_RANGE_ENTRY`` | nested | one power limit range  |
+ +-+-+--------------------------------------+--------+----------------------------+
+ | | | ``ETHTOOL_A_C33_PSE_PWR_VAL_LIMIT_MIN``  | u32    | minimum power value (mW)   |
+ +-+-+--------------------------------------+--------+----------------------------+
+ | | | ``ETHTOOL_A_C33_PSE_PWR_VAL_LIMIT_MAX``  | u32    | maximum power value (mW)   |
+ +-+-+--------------------------------------+--------+----------------------------+
 
-but task is already holding lock:
-ffff8880b9538828 (lock#9){+.+.}-{2:2}, at: local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
-ffff8880b9538828 (lock#9){+.+.}-{2:2}, at: __mmap_lock_do_trace_start_locking+0x83/0x620 mm/mmap_lock.c:230
+The min/max values should provide ranges actually configurable by PSE controller.
+If controller works with fixed classes, the min and max values will be equal.
 
-other info that might help us debug this:
- Possible unsafe locking scenario:
+The ethtool output may look like this:
 
-       CPU0
-       ----
-  lock(lock#9);
-  lock(lock#9);
+$ ethtool --get-pse eth0
 
- *** DEADLOCK ***
+Power Information for eth0:
+=====================================
+Current Power Limit: 15000 mW
+Current Power Consumption: 12000 mW
 
- May be due to missing lock nesting notation
+Supported Power Limit Ranges:
+  - Range 1: 0 - 7500 mW
+  - Range 2: 7501 - 15000 mW
+  - Range 3: 15001 - 30000 mW
 
-3 locks held by syz-executor181/5090:
- #0: ffff8880b9538828 (lock#9){+.+.}-{2:2}, at: local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
- #0: ffff8880b9538828 (lock#9){+.+.}-{2:2}, at: __mmap_lock_do_trace_start_locking+0x83/0x620 mm/mmap_lock.c:230
- #1: ffffffff8e333fa0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
- #1: ffffffff8e333fa0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
- #1: ffffffff8e333fa0 (rcu_read_lock){....}-{1:2}, at: get_mem_cgroup_from_mm+0x38/0x2a0 mm/memcontrol.c:1265
- #2: ffffffff8e333fa0 (rcu_read_lock){....}-{1:2}, at: trace_call_bpf+0xbc/0x8a0
+Port Power Priority: 3
+Supported Priority Range: 1 - 5
 
-stack backtrace:
-CPU: 1 PID: 5090 Comm: syz-executor181 Not tainted 6.10.0-rc2-syzkaller-00242-g36534d3c5453 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- check_deadlock kernel/locking/lockdep.c:3062 [inline]
- validate_chain+0x15d3/0x5900 kernel/locking/lockdep.c:3856
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
- local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
- __mmap_lock_do_trace_start_locking+0x9c/0x620 mm/mmap_lock.c:230
- __mmap_lock_trace_start_locking include/linux/mmap_lock.h:29 [inline]
- mmap_read_trylock include/linux/mmap_lock.h:162 [inline]
- stack_map_get_build_id_offset+0x98a/0x9d0 kernel/bpf/stackmap.c:141
- __bpf_get_stack+0x4ad/0x5a0 kernel/bpf/stackmap.c:449
- bpf_prog_e6cf5f9c69743609+0x42/0x46
- bpf_dispatcher_nop_func include/linux/bpf.h:1243 [inline]
- __bpf_prog_run include/linux/filter.h:691 [inline]
- bpf_prog_run include/linux/filter.h:698 [inline]
- bpf_prog_run_array include/linux/bpf.h:2103 [inline]
- trace_call_bpf+0x369/0x8a0 kernel/trace/bpf_trace.c:147
- perf_trace_run_bpf_submit+0x7c/0x1d0 kernel/events/core.c:10269
- perf_trace_lock+0x388/0x490 include/trace/events/lock.h:50
- trace_lock_release include/trace/events/lock.h:69 [inline]
- lock_release+0x986/0x9f0 kernel/locking/lockdep.c:5765
- rcu_lock_release include/linux/rcupdate.h:339 [inline]
- rcu_read_unlock include/linux/rcupdate.h:812 [inline]
- get_mem_cgroup_from_mm+0x1ad/0x2a0 mm/memcontrol.c:1271
- get_mm_memcg_path+0x1b/0x600 mm/mmap_lock.c:202
- __mmap_lock_do_trace_start_locking+0x134/0x620 mm/mmap_lock.c:230
- __mmap_lock_trace_start_locking include/linux/mmap_lock.h:29 [inline]
- mmap_read_lock include/linux/mmap_lock.h:143 [inline]
- acct_collect+0x7e7/0x830 kernel/acct.c:563
- do_exit+0x936/0x27e0 kernel/exit.c:853
- do_group_exit+0x207/0x2c0 kernel/exit.c:1023
- __do_sys_exit_group kernel/exit.c:1034 [inline]
- __se_sys_exit_group kernel/exit.c:1032 [inline]
- __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1032
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f9c47742279
-Code: 90 49 c7 c0 b8 ff ff ff be e7 00 00 00 ba 3c 00 00 00 eb 12 0f 1f 44 00 00 89 d0 0f 05 48 3d 00 f0 ff ff 77 1c f4 89 f0 0f 05 <48> 3d 00 f0 ff ff 76 e7 f7 d8 64 41 89 00 eb df 0f 1f 80 00 00 00
-RSP: 002b:00007ffd321ae558 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f9c47742279
-RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
-RBP: 00007f9c477bd2b0 R08: ffffffffffffffb8 R09: 00000000000000a0
-R10: 00000000000000a0 R11: 0000000000000246 R12: 00007f9c477bd2b0
-R13: 0000000000000000 R14: 00007f9c477bdd20 R15: 00007f9c47713400
- </TASK>
+Pairs in Use: 4
+Pair Configuration Type: Alternative A (MDI-X) and Alternative B(S)
+PSE Type: Type 4
+Detected PD Class: Class 5 (40000 mW max)
+
+Low-Level Classification:
+  - Classification Type: Autodetected
+  - Configured PD Class: Class 5 (40000 mW max)
+
+Maintain Power Signature (MPS) State: Present
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+> > > +
+> > >  PSE_SET
+> > >  =======
+> > >  
+> > > @@ -1810,6 +1814,7 @@ Request contents:
+> > >    ``ETHTOOL_A_PSE_HEADER``                nested  request header
+> > >    ``ETHTOOL_A_PODL_PSE_ADMIN_CONTROL``       u32  Control PoDL PSE Admin state
+> > >    ``ETHTOOL_A_C33_PSE_ADMIN_CONTROL``        u32  Control PSE Admin state
+> > > +  ``ETHTOOL_A_C33_PSE_PW_LIMIT``             u32  Control PoE PSE power limit
+> > >    ======================================  ======  =============================
+> > >  
+> > >  When set, the optional ``ETHTOOL_A_PODL_PSE_ADMIN_CONTROL`` attribute is used
+> > > @@ -1820,6 +1825,9 @@ to control PoDL PSE Admin functions. This option is implementing
+> > >  The same goes for ``ETHTOOL_A_C33_PSE_ADMIN_CONTROL`` implementing
+> > >  ``IEEE 802.3-2022`` 30.9.1.2.1 acPSEAdminControl.
+> > >  
+> > > +When set, the optional ``ETHTOOL_A_C33_PSE_PW_LIMIT`` attribute is used
+> > > +to control C33 PSE power limit in mW.
+> > 
+> > 
+> > The corresponding name int the IEEE 802.3-2022 seems to be pse_avail_pwr
+> > in 145.2.5.4 Variables and pse_available_power in 33.2.4.4 Variables.
+> > 
+> > This variable is using classes instead of mW. pd692x0 seems to use
+> > classes instead of mW too. May be it is better to use classes for UAPI
+> > too? 
+> 
+> Huh... i took some more time to investigate it. Looks like there is no
+> simple answer. Some devices seems to write power class on the box. Other
+> client devices write power consumption in watts. IEEE 802.3-2022
+> provides LLDP specification with PowerValue for watts and PowerClass for
+> classes. Different product user interfaces provide class and/or watts.
+> So, let's go with watts then. Please update the name to something like
+> pse_available_power_value or pse_available_power_value_limit and
+> document how it is related to State diagrams in the IEEE spec.
+
+Here is proposal for documentation:
+
+  ``ETHTOOL_A_C33_PSE_AVAIL_PWR_VAL_LIMIT``  u32  Control PoE PSE available power value limit
+
+When set, the optional ``ETHTOOL_A_C33_PSE_AVAIL_PWR_VAL_LIMIT`` attribute is
+used  to control the available power value limit for C33 PSE in milliwatts.
+This attribute corresponds  to the `pse_available_power` variable described in
+``IEEE 802.3-2022`` 33.2.4.4 Variables  and `pse_avail_pwr` in 145.2.5.4
+Variables, which are described in power classes. 
+
+It was decided to use milliwatts for this interface to unify it with other
+power monitoring interfaces, which also use milliwatts, and to align with
+various existing products that document power consumption in watts rather than
+classes. If power limit configuration based on classes is needed, the
+conversion can be done in user space, for example by ethtool.
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
