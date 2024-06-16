@@ -1,86 +1,68 @@
-Return-Path: <netdev+bounces-103870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E599909E71
-	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 18:16:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A546F909E7A
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 18:19:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92883281487
-	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 16:16:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 135ECB20D38
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 16:19:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F5411CAB;
-	Sun, 16 Jun 2024 16:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D74F175BF;
+	Sun, 16 Jun 2024 16:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Ibx6coRh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ReT+8a6L"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493FADDAB;
-	Sun, 16 Jun 2024 16:15:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7CB12E47;
+	Sun, 16 Jun 2024 16:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718554556; cv=none; b=BoAklj6TOZzJrGPilw8XynO82WGcW7z0ueDrLZ209mBZYSVKMrWClcZ7URviO0spMh1VgWargpMPIvuo7FufkjQIlef7D2yg5Lsf9+nM0FrTgOTpea0Qc7oWubLJC6SCA4/aIixHKkM8/dm8mAhqbpL7d1zBSs+tqPxsW+yUS/Y=
+	t=1718554783; cv=none; b=kUzNCnddSzSGxXBKnerXWCJIWVBRrmWBZ2z+bfSBngS/tyD5cQpaeo87IZRxikhVl0H9YacbksIMiVkZQEgWLEs+a02PriSR12hgPy2l4+U9SRWhDmiyokBUmtpLq0nBdBh9c0Xk606LISnq/ljvDiEZIQVwDKs06RTHjYead+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718554556; c=relaxed/simple;
-	bh=TUsATysmdrlJFnEcVyb09WxWXOukeW5xaFd/AodO77I=;
+	s=arc-20240116; t=1718554783; c=relaxed/simple;
+	bh=qR+9FEx9x0bJ3F5nqrI0gOfNAfsFaGmwjugmSOv/3oU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H+QvQPq7a9XlWl+FfLp58Uxu1zKsnXxVtMkArZWDOLfHnopSAR3dzN9ylyHyVd011leEus+esYnijEMGXGxIBaMMOLPFPpvkBfqUOpgCzeGWaKr9qdAWNxdPelS70H6ZbFZG84ff2u3VYAmt5YvYN4MihSfxN7AkZ4oUHssZX9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Ibx6coRh; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=DI8ao85LkW0rGY8C34vKTHTfc1vvHRa0HNhrgN4f+Qs=; b=Ibx6coRhBdGtgLYoRkBMnNKLGC
-	GbXU88eI/XDtIAVwIcgUb97faEjw0h113h7HrNpY7JgR6yHrS0YMzOxVRy/NDsQLQcjRbYCwcS2vW
-	sqa5ny+e8ipXy8qRTwBteJo11z1h0Z9oqVQbtKyFLMnHffAlXBbQo6LQDHnxnPzuZIEFBrOp6Meuw
-	7d2qG7pvj+3vIcOGglstX2XprraTZPHZcG+0DFc9L3ZoUGZGfhD3F0xWXAwM1LpZdLFbSEpSpSXR6
-	yv2yMXt+flz4K7vKGH+sTF7qvg/M/QXPvl/MB+3ri2ZLmg3Poei/L3xuexFgoAKO0jMMhFcDICvhl
-	GmESJctQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56890)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sIsXf-0004F3-0p;
-	Sun, 16 Jun 2024 17:15:43 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sIsXg-00047j-Vn; Sun, 16 Jun 2024 17:15:45 +0100
-Date: Sun, 16 Jun 2024 17:15:44 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Nathan Chancellor <nathan@kernel.org>,
-	Antoine Tenart <atenart@kernel.org>
-Subject: Re: [PATCH net-next v13 05/13] net: ethtool: Allow passing a phy
- index for some commands
-Message-ID: <Zm8PsLcoccsezveh@shell.armlinux.org.uk>
-References: <20240607071836.911403-1-maxime.chevallier@bootlin.com>
- <20240607071836.911403-6-maxime.chevallier@bootlin.com>
- <20240613182613.5a11fca5@kernel.org>
- <20240616180231.338c2e6c@fedora>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OwkehIq1SNPqkPfsbx/tUza5RkYk6REaWll/MNzQ1C4Pm0ybOwv6eZwv+YU5p2w6Bl4T3FhMPt/HJoGBkQjzVylwBSlP+gXBuc4Di6KH8hA7EtKg9LgQDTcI725paY0qt2QWKwX+6lV0KOgp7v/I1FbOs26IN3l2DJyQ5RRCEk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ReT+8a6L; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=GVCvajlkzGyB22Se2ZOzmrs2oP4nXY5Ynx4z1DMOBb0=; b=ReT+8a6LUzQeJGHrfBShmparlj
+	ub5DAmAfIxHXxTxSWn8wbRVzRO8h4bzrhyR4k47VFslXAF/WhnpOXoxQdv4QauE98YPboWjfImQ0z
+	GPADWAoFALpXtfrpwsFONrCWJhxbhGfwHoidwmdic3JNQ1z9ihGwylSP0a2T5qyoHe9o=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sIsb8-000Bu1-So; Sun, 16 Jun 2024 18:19:18 +0200
+Date: Sun, 16 Jun 2024 18:19:18 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yojana Mallik <y-mallik@ti.com>
+Cc: schnelle@linux.ibm.com, wsa+renesas@sang-engineering.com,
+	diogo.ivo@siemens.com, rdunlap@infradead.org, horms@kernel.org,
+	vigneshr@ti.com, rogerq@ti.com, danishanwar@ti.com,
+	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+	davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, srk@ti.com, rogerq@kernel.org,
+	Siddharth Vadapalli <s-vadapalli@ti.com>
+Subject: Re: [PATCH net-next v2 2/3] net: ethernet: ti: Register the RPMsg
+ driver as network device
+Message-ID: <efff16aa-33d9-45eb-ac42-86f3411abfc9@lunn.ch>
+References: <20240531064006.1223417-1-y-mallik@ti.com>
+ <20240531064006.1223417-3-y-mallik@ti.com>
+ <4416ada7-399b-4ea0-88b0-32ca432d777b@lunn.ch>
+ <2d65aa06-cadd-4462-b8b9-50c9127e6a30@ti.com>
+ <f14a554c-555f-4830-8be5-13988ddbf0ba@lunn.ch>
+ <b07cfdfe-dce4-484b-b8a8-9d0e49985c60@ti.com>
+ <8b4dc94a-0d59-499f-8f28-d503e91f2b27@lunn.ch>
+ <60bc57a7-732b-4dcb-ae72-158639a635c0@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,71 +71,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240616180231.338c2e6c@fedora>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <60bc57a7-732b-4dcb-ae72-158639a635c0@ti.com>
 
-On Sun, Jun 16, 2024 at 06:02:31PM +0200, Maxime Chevallier wrote:
-> Hello Jakub,
-> 
-> On Thu, 13 Jun 2024 18:26:13 -0700
-> Jakub Kicinski <kuba@kernel.org> wrote:
-> 
-> > On Fri,  7 Jun 2024 09:18:18 +0200 Maxime Chevallier wrote:
-> > > +		if (tb[ETHTOOL_A_HEADER_PHY_INDEX]) {
-> > > +			struct nlattr *phy_id;
-> > > +
-> > > +			phy_id = tb[ETHTOOL_A_HEADER_PHY_INDEX];
-> > > +			phydev = phy_link_topo_get_phy(dev,
-> > > +						       nla_get_u32(phy_id));  
-> > 
-> > Sorry for potentially repeating question (please put the answer in the
-> > commit message) - are phys guaranteed not to disappear, even if the
-> > netdev gets closed? this has no rtnl protection
-> 
-> I'll answer here so that people can correct me if I'm wrong, but I'll
-> also add it in the commit logs as well (and possibly with some fixes
-> depending on how this discussion goes)
-> 
-> While a PHY can be attached to/detached from a netdevice at open/close,
-> the phy_device itself will keep on living, as its lifetime is tied to
-> the underlying mdio_device (however phy_attach/detach take a ref on the
-> phy_device, preventing it from vanishing while it's attached to a
-> netdev)
-> 
-> I think the worst that could happen is that phy_detach() gets
-> called (at ndo_close() for example, but that's not the only possible
-> call site for that), and right after we manually unbind the PHY, which
-> will drop its last refcount, while we hold a pointer to it :
-> 
-> 			phydev = phy_link_topo_get_phy()
->  phy_detach(phydev)
->  unbind on phydev
-> 			/* access phydev */
-> 			
-> PHY device lifetime is, from my understanding, not protected by
-> rtnl() so should a lock be added, I don't think rtnl_lock() would be
-> the one to use.
+> The Linux Remoteproc driver which initializes remote processor cores carves out
+> a section from DDR memory as reserved memory for each remote processor on the
+> SOC. This memory region has been reserved in the Linux device tree file as
+> reserved-memory. Out of this reserved memory for R5 core some memory is
+> reserved for shared memory.
 
-... and that will cause deadlocks. For example, ethernet drivers can
-call phy_disconnect() from their .ndo_close method, which will be
-called with the RTNL lock held. This calls phy_detach(), so
-phy_detach() also gets called while the RTNL lock is held.
+I don't know much about rpmsg, so i read the documentation:
 
-SFP will call all phylib methods while holding the RTNL lock as well
-(because that's the only safe way to add or remove a PHY, as it stops
-other changes to the config that may conflict, and also ensures that
-e.g. paths in phylib will not be in-use when the PHY is being
-destroyed.)
+https://docs.kernel.org/staging/rpmsg.html
 
-So, rather than thinking that phylib should add RTNL locking, it
-would be much more sensible to do what phylink does, and enforce
-that the RTNL will be held when netdev related methods are called,
-but also require that paths that end up changing phylib's configuration
-(e.g. removing a PHY driver) end up taking the RTNL lock - because
-that is the only way to be sure that none of the phylib methods
-that call into the driver are currently executing in another thread.
+There is no mention of carving out a region of DDR memory. It says
+nothing about memory reserved in DT.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+The API is pretty much: Please send these bytes to the peer. Call this
+callback when bytes have been received from a peer.
+
+> The shared memory is divided into two distinct regions:
+> one for the A53 -> R5 data path (Tx buffer for Linux), and other for R5 -> A53
+> data path (Rx buffer for Linux).
+
+As i said in my previous message. Forget about the A54->R5. Think
+about a generic architecture. You have an RPMSG facility using the API
+described in the documentation. You have a block of shared
+memory. That memory could be VRAM, it could be a dual port SRAM, a PCI
+BAR region, or some DDR which both CPU have mapped into their address
+space. Design a protocol around that. This might mean you need to
+modify your firmware. It might mean you need to throw away your
+firmware and start again. But for mainline, we want something generic
+which any vendor can use with a wide range of hardware, with as few
+assumptions as possible.
+
+	Andrew
 
