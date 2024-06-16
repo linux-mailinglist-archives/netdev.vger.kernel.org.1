@@ -1,139 +1,133 @@
-Return-Path: <netdev+bounces-103895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C3C190A0D0
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 01:29:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A29C90A0DB
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 01:46:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CBF51C20BB1
-	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 23:29:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F121D282511
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 23:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20F8473450;
-	Sun, 16 Jun 2024 23:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB255339B;
+	Sun, 16 Jun 2024 23:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="gAFhGmu6"
+	dkim=pass (2048-bit key) header.d=orange.com header.i=@orange.com header.b="WH1A/8gO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from smtp-out.orange.com (smtp-out.orange.com [80.12.126.237])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E7F73460
-	for <netdev@vger.kernel.org>; Sun, 16 Jun 2024 23:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E7C225D6
+	for <netdev@vger.kernel.org>; Sun, 16 Jun 2024 23:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.126.237
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718580563; cv=none; b=nHCy/HvKVZgGazVQjdJi1rEQlgy7qeGTXVqW+5SuD1uwF/FQBapZ5/petkmq1bVF6dKxFWeKSt7w6ghEObzcdSfIUFHU0vMTPO4ZBa7rgTfnHp2sodYw2Tlrd+U4uygL3N+jkNWtKhN7z0AJ794rAXit09typjCwn5UMkbM5MlU=
+	t=1718581565; cv=none; b=FOZT1BOLzaN8ef9zU6fe9zzimhZP6u9fyzAz2CKaCeJfJB7jLX5drPgAAUbiIfFMFxgbcM1GuRfMXz97aoDmxIG/b+h3LJYNnAJ6Dui4c6x/Zh6df9tbmcid7VhYDNeucbILX7MaSymWppwufsE6rKn8DEe+OCYXYI6wE+Cc4PY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718580563; c=relaxed/simple;
-	bh=gOciLYtchYd2XJ9QGH+XcZEjC0E1vrYvClZahq0KXiY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SNkxW8ZFKZhrlE8FDqPZRKKQj4mS2Xf5vsDHy+Vt7+09Crj1hENv8DkahSTHVuPQ913izD7V0/xTjNqP5whclCMzIFRnMyed9iB0PVNvbEClvQkHkgDv5IMm+xn+pTRtl4dp+CD/ZSgWoj124F+ZlscptaIvtUQtI35VfU18LOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=gAFhGmu6; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1sIzJ2-00CPiT-EQ; Mon, 17 Jun 2024 01:29:04 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=Qq9WoMHoRlLG4XhKk8QkKDshMMSQc1UcVZ8ivaMTrfY=; b=gAFhGmu68RS5nGxri0jHKnYEw7
-	1GP4lau6M059rfRLtlWoKA8dXEAwyU4WD2V5qcDsMlhogXSZE3/8OCUp8cJnUQQqpOuBIQHEViSP9
-	BlxeZ1ipTGuSlyvFaALmGRLVPryLKH/jgKH6/yIPP9T89TdtwKa/srq9gQE6v7e5W4fQeT9MYvEi6
-	KzQWwG+ILM4DLBB2BJKJmxNz5avaK6PQeToBj5t5gUCfeZzBkj/LdyRMIH0W8/iQ4dbRcDCP8ai3G
-	ncOQnZpBISgS7B6kYYV1A0q/20bcWg96T5tlRI/Kl+Dil9VikVTOFZL0tgMDTiIaHMB/8O4zX0fku
-	VcNKDJIQ==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1sIzJ1-0005GK-DM; Mon, 17 Jun 2024 01:29:03 +0200
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1sIzIs-00423d-87; Mon, 17 Jun 2024 01:28:54 +0200
-Message-ID: <4b894ffd-9fe2-4c15-a901-6765ab538a01@rbox.co>
-Date: Mon, 17 Jun 2024 01:28:52 +0200
+	s=arc-20240116; t=1718581565; c=relaxed/simple;
+	bh=zcxiwp3D8zJXCOAtoRa05uSl9eG8151E4t29MsTWfl4=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=u9kS+eHLEyFGS4HBEa5R9QIdmPnEpQcNtAynQdAVgJqgfCDsgjZjdBTr+pRP/YdSUXoRM0D8mxuRVDrW9hb1hBJBWqE89JvtL27K0q5Wl8Bwd37lrEY4fZTBlJJ8XF3icqA41YXfLXCG7e0U6/XnLC/h/CKNUTuZITjsWXyDl/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=orange.com; spf=pass smtp.mailfrom=orange.com; dkim=pass (2048-bit key) header.d=orange.com header.i=@orange.com header.b=WH1A/8gO; arc=none smtp.client-ip=80.12.126.237
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=orange.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=orange.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=orange.com; i=@orange.com; q=dns/txt; s=orange002;
+  t=1718581561; x=1750117561;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   in-reply-to:content-transfer-encoding:from;
+  bh=zcxiwp3D8zJXCOAtoRa05uSl9eG8151E4t29MsTWfl4=;
+  b=WH1A/8gOLj9lJMGmnhq69JnyTJmkjE05pOoMmpwFhFzUWkLZBygiO4Z8
+   JYxpltRSW23L87YpIiHedFeqYLYRDprpa5hZJdBRQltRHUoPKX/fzuPTi
+   sLfeSUW9AtO8Pjytx/j98hJrY4+8rlcdeS+xb7b3lPVvoMctqPK5wTCY4
+   uhIPWXFqIRJKdaXX7fJ8JHGCUmFj4+idC7l2F2pnVIRBJi7fod4FMQD3J
+   jj79gzTu8e+S35TEMsIH1JYsC4FngfprrvgtkXW1ic1xvr1NibLwZ8zg3
+   q5BJtiMY9BmNy/Xv9F/9JYjP9IO3eMvciDs41sG9KqSijFz8SPxbt4tni
+   g==;
+Received: from unknown (HELO opfedv1rlp0g.nor.fr.ftgroup) ([x.x.x.x]) by
+ smtp-out.orange.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 17 Jun 2024 01:45:53 +0200
+Received: from unknown (HELO OPE16NORMBX104.corporate.adroot.infra.ftgroup)
+ ([x.x.x.x]) by opfedv1rlp0g.nor.fr.ftgroup with
+ ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Jun 2024 01:45:53 +0200
+Received: from [x.x.x.x] [x.x.x.x] by OPE16NORMBX104.corporate.adroot.infra.ftgroup
+ [x.x.x.x] with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39;
+ Mon, 17 Jun 2024 01:45:52 +0200
+From: alexandre.ferrieux@orange.com
+X-IronPort-AV: E=Sophos;i="6.08,243,1712613600"; 
+   d="scan'208";a="154808975"
+Message-ID: <22b3012d-3d70-492a-8786-d6c6beef2eb4@orange.com>
+Date: Mon, 17 Jun 2024 01:45:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net 01/15] af_unix: Set sk->sk_state under
- unix_state_lock() for truly disconencted peer.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: cong.wang@bytedance.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
- pabeni@redhat.com
-References: <cc8a0165-f2e9-43a7-a1a2-28808929d27e@rbox.co>
- <20240610174906.32921-1-kuniyu@amazon.com>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <20240610174906.32921-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Betterbird (Linux)
+Subject: Re: [PATCH net v2] Fix race for duplicate reqsk on identical SYN
+To: luoxuanqiang <luoxuanqiang@kylinos.cn>, <edumazet@google.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <fw@strlen.de>,
+	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<kuniyu@amazon.com>
+References: <20240614102628.446642-1-luoxuanqiang@kylinos.cn>
+Content-Language: fr, en-US
+In-Reply-To: <20240614102628.446642-1-luoxuanqiang@kylinos.cn>
+X-ClientProxiedBy: OPE16NORMBX204.corporate.adroot.infra.ftgroup (10.115.26.9)
+ To OPE16NORMBX104.corporate.adroot.infra.ftgroup (10.115.26.5)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 
-On 6/10/24 19:49, Kuniyuki Iwashima wrote:
-> From: Michal Luczaj <mhal@rbox.co>
-> Date: Mon, 10 Jun 2024 14:55:08 +0200
->> On 6/9/24 23:03, Kuniyuki Iwashima wrote:
->>> (...)
->>> Sorry, I think I was wrong and we can't use smp_store_release()
->>> and smp_load_acquire(), and smp_[rw]mb() is needed.
->>>
->>> Given we avoid adding code in the hotpath in the original fix
->>> 8866730aed510 [0], I prefer adding unix_state_lock() in the SOCKMAP
->>> path again.
->>>
->>> [0]: https://lore.kernel.org/bpf/6545bc9f7e443_3358c208ae@john.notmuch/
->>
->> You're saying smp_wmb() in connect() is too much for the hot path, do I
->> understand correctly?
-> 
-> Yes, and now I think WARN_ON_ONCE() would be enough because it's unlikely
-> that the delay happens between the two store ops and concurrent bpf()
-> is in progress.
-> 
-> If syzkaller was able to hit this on vanilla kernel, we can revisit.
-> 
-> Then, probably we could just do s/WARN_ON_ONCE/unlikely/ because users
-> who call bpf() in such a way know that the state was TCP_CLOSE while
-> calling bpf().
-> 
-> ---8<---
-> diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
-> index bd84785bf8d6..46dc747349f2 100644
-> --- a/net/unix/unix_bpf.c
-> +++ b/net/unix/unix_bpf.c
-> @@ -181,6 +181,9 @@ int unix_stream_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool r
->  	 */
->  	if (!psock->sk_pair) {
->  		sk_pair = unix_peer(sk);
-> +		if (WARN_ON_ONCE(!sk_pair))
-> +			return -EINVAL;
-> +
->  		sock_hold(sk_pair);
->  		psock->sk_pair = sk_pair;
->  	}
-> ---8<---
+T24gMTQvMDYvMjAyNCAxMjoyNiwgbHVveHVhbnFpYW5nIHdyb3RlOg0KPiBXaGVuIGJvbmRpbmcg
+aXMgY29uZmlndXJlZCBpbiBCT05EX01PREVfQlJPQURDQVNUIG1vZGUsIGlmIHR3byBpZGVudGlj
+YWwNCj4gU1lOIHBhY2tldHMgYXJlIHJlY2VpdmVkIGF0IHRoZSBzYW1lIHRpbWUgYW5kIHByb2Nl
+c3NlZCBvbiBkaWZmZXJlbnQgQ1BVcywNCj4gaXQgY2FuIHBvdGVudGlhbGx5IGNyZWF0ZSB0aGUg
+c2FtZSBzayAoc29jaykgYnV0IHR3byBkaWZmZXJlbnQgcmVxc2sNCj4gKHJlcXVlc3Rfc29jaykg
+aW4gdGNwX2Nvbm5fcmVxdWVzdCgpLg0KPg0KPiBUaGVzZSB0d28gZGlmZmVyZW50IHJlcXNrIHdp
+bGwgcmVzcG9uZCB3aXRoIHR3byBTWU5BQ0sgcGFja2V0cywgYW5kIHNpbmNlDQo+IHRoZSBnZW5l
+cmF0aW9uIG9mIHRoZSBzZXEgKElTTikgaW5jb3Jwb3JhdGVzIGEgdGltZXN0YW1wLCB0aGUgZmlu
+YWwgdHdvDQo+IFNZTkFDSyBwYWNrZXRzIHdpbGwgaGF2ZSBkaWZmZXJlbnQgc2VxIHZhbHVlcy4N
+Cj4NCj4gVGhlIGNvbnNlcXVlbmNlIGlzIHRoYXQgd2hlbiB0aGUgQ2xpZW50IHJlY2VpdmVzIGFu
+ZCByZXBsaWVzIHdpdGggYW4gQUNLDQo+IHRvIHRoZSBlYXJsaWVyIFNZTkFDSyBwYWNrZXQsIHdl
+IHdpbGwgcmVzZXQoUlNUKSBpdC4NCj4NCj4gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQpUaGlzIGlzIGNsb3Nl
+LCBidXQgbm90IGlkZW50aWNhbCwgdG8gYSByYWNlIHdlIG9ic2VydmVkIG9uIGEgKnNpbmdsZSog
+Q1BVIHdpdGgNCnRoZSBUUFJPWFkgaXB0YWJsZXMgdGFyZ2V0LCBpbiB0aGUgZm9sbG93aW5nIHNp
+dHVhdGlvbjoNCg0KIMKgLSB0d28gaWRlbnRpY2FsIFNZTnMsIHNlbnQgb25lIHNlY29uZCBhcGFy
+dCBmcm9tIHRoZSBzYW1lIGNsaWVudCBzb2NrZXQsDQogwqDCoCBhcnJpdmUgYmFjay10by1iYWNr
+IG9uIHRoZSBpbnRlcmZhY2UgKGR1ZSB0byBuZXR3b3JrIGppdHRlcikNCg0KIMKgLSB0aGV5IGhh
+cHBlbiB0byBiZSBoYW5kbGVkIGluIHRoZSBzYW1lIGJhdGNoIG9mIHBhY2tldCBmcm9tIG9uZSBz
+b2Z0aXJxDQogwqDCoCBuYW1lX3lvdXJfbmljX3BvbGwoKQ0KDQogwqAtIHRoZXJlLCB0d28gbG9v
+cHMgcnVuIHNlcXVlbnRpYWxseTogb25lIGZvciBuZXRmaWx0ZXIgKGRvaW5nIFRQUk9YWSksIG9u
+ZQ0KIMKgwqAgZm9yIHRoZSBuZXR3b3JrIHN0YWNrIChkb2luZyBUQ1AgcHJvY2Vzc2luZykNCg0K
+IMKgLSB0aGUgZmlyc3QgZ2VuZXJhdGVzIHR3byBkaXN0aW5jdCBjb250ZXh0cyBmb3IgdGhlIHR3
+byBTWU5zDQoNCiDCoC0gdGhlIHNlY29uZCByZXNwZWN0cyB0aGVzZSBjb250ZXh0cyBhbmQgbmV2
+ZXIgZ2V0cyBhIGNoYW5jZSB0byBtZXJnZSB0aGVtDQoNClRoZSByZXN1bHQgaXMgZXhhY3RseSBh
+cyB5b3UgZGVzY3JpYmUsIGJ1dCBpbiB0aGlzIGNhc2UgdGhlcmUgaXMgbm8gbmVlZCBmb3IgDQpi
+b25kaW5nLA0KYW5kIGV2ZXJ5dGhpbmcgaGFwcGVucyBpbiBvbmUgc2luZ2xlIENQVSwgd2hpY2gg
+aXMgcHJldHR5IGlyb25pYyBmb3IgYSByYWNlLg0KTXkgdW5lZHVjYXRlZCBmZWVsaW5nIGlzIHRo
+YXQgdGhlIHR3byBsb29wcyBhcmUgdGhlIGNhdXNlIG9mIGEgc2ltdWxhdGVkDQpwYXJhbGxlbGlz
+bSwgeWllbGRpbmcgdGhlIHJhY2UuIElmIGVhY2ggcGFja2V0IG9mIHRoZSBiYXRjaCB3YXMgaGFu
+ZGxlZA0KInRvIGNvbXBsZXRpb24iIChmdWxsIG5ldGZpbHRlciBoYW5kbGluZyBmb2xsb3dlZCBp
+bW1lZGlhdGVseSBieSBmdWxsIG5ldHdvcmsNCnN0YWNrIGluZ2VzdGlvbiksIHRoZSBwcm9ibGVt
+IHdvdWxkIG5vdCBleGlzdC4NCg0KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fDQpDZSBtZXNzYWdlIGV0IHNlcyBwaWVjZXMgam9pbnRlcyBwZXV2ZW50
+IGNvbnRlbmlyIGRlcyBpbmZvcm1hdGlvbnMgY29uZmlkZW50aWVsbGVzIG91IHByaXZpbGVnaWVl
+cyBldCBuZSBkb2l2ZW50IGRvbmMNCnBhcyBldHJlIGRpZmZ1c2VzLCBleHBsb2l0ZXMgb3UgY29w
+aWVzIHNhbnMgYXV0b3Jpc2F0aW9uLiBTaSB2b3VzIGF2ZXogcmVjdSBjZSBtZXNzYWdlIHBhciBl
+cnJldXIsIHZldWlsbGV6IGxlIHNpZ25hbGVyDQphIGwnZXhwZWRpdGV1ciBldCBsZSBkZXRydWly
+ZSBhaW5zaSBxdWUgbGVzIHBpZWNlcyBqb2ludGVzLiBMZXMgbWVzc2FnZXMgZWxlY3Ryb25pcXVl
+cyBldGFudCBzdXNjZXB0aWJsZXMgZCdhbHRlcmF0aW9uLA0KT3JhbmdlIGRlY2xpbmUgdG91dGUg
+cmVzcG9uc2FiaWxpdGUgc2kgY2UgbWVzc2FnZSBhIGV0ZSBhbHRlcmUsIGRlZm9ybWUgb3UgZmFs
+c2lmaWUuIE1lcmNpLg0KDQpUaGlzIG1lc3NhZ2UgYW5kIGl0cyBhdHRhY2htZW50cyBtYXkgY29u
+dGFpbiBjb25maWRlbnRpYWwgb3IgcHJpdmlsZWdlZCBpbmZvcm1hdGlvbiB0aGF0IG1heSBiZSBw
+cm90ZWN0ZWQgYnkgbGF3Ow0KdGhleSBzaG91bGQgbm90IGJlIGRpc3RyaWJ1dGVkLCB1c2VkIG9y
+IGNvcGllZCB3aXRob3V0IGF1dGhvcmlzYXRpb24uDQpJZiB5b3UgaGF2ZSByZWNlaXZlZCB0aGlz
+IGVtYWlsIGluIGVycm9yLCBwbGVhc2Ugbm90aWZ5IHRoZSBzZW5kZXIgYW5kIGRlbGV0ZSB0aGlz
+IG1lc3NhZ2UgYW5kIGl0cyBhdHRhY2htZW50cy4NCkFzIGVtYWlscyBtYXkgYmUgYWx0ZXJlZCwg
+T3JhbmdlIGlzIG5vdCBsaWFibGUgZm9yIG1lc3NhZ2VzIHRoYXQgaGF2ZSBiZWVuIG1vZGlmaWVk
+LCBjaGFuZ2VkIG9yIGZhbHNpZmllZC4NClRoYW5rIHlvdS4K
 
-Oh. That's a peculiar approach :) But, hey, it's your call.
-
-Another AF_UNIX sockmap issue is with OOB. When OOB packet is sent, skb is
-added to recv queue, but also u->oob_skb is set. Here's the problem: when
-this skb goes through bpf_sk_redirect_map() and is moved between socks,
-oob_skb remains set on the original sock.
-
-[   23.688994] WARNING: CPU: 2 PID: 993 at net/unix/garbage.c:351 unix_collect_queue+0x6c/0xb0
-[   23.689019] CPU: 2 PID: 993 Comm: kworker/u32:13 Not tainted 6.10.0-rc2+ #137
-[   23.689021] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
-[   23.689024] Workqueue: events_unbound __unix_gc
-[   23.689027] RIP: 0010:unix_collect_queue+0x6c/0xb0
-
-I wanted to write a patch, but then I realized I'm not sure what's the
-expected behaviour. Should the oob_skb setting follow to the skb's new sock
-or should it be dropped (similarly to what is happening today with
-scm_fp_list, i.e. redirect strips inflights)?
 
