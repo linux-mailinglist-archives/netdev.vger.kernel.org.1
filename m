@@ -1,99 +1,89 @@
-Return-Path: <netdev+bounces-103850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7699909E2A
-	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 17:36:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A820909E2E
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 17:38:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E55A28142F
-	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 15:36:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E90122811D9
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 15:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A031095B;
-	Sun, 16 Jun 2024 15:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020C314005;
+	Sun, 16 Jun 2024 15:38:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vWmkIGWe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b1hYyAqb"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A8E0ECF;
-	Sun, 16 Jun 2024 15:35:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A5C11CAB;
+	Sun, 16 Jun 2024 15:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718552161; cv=none; b=SPo1ZGObERtRkhyoRhW7jyzOQZkCfsMkQm4HnuEgZ/4hNGm/9AQ+iaM2s0sMUwaFMGYQkYGypznHtKHO+EC38lDCShYJ8ECYeshPCzCkIiXCJxfcJlsUoz7ckHrS5/tiZPPIrpuFpManFCo7swuiLL36a5pTTTRqjdziIip19Vs=
+	t=1718552306; cv=none; b=HhLreYLZJt6oRng/jZitAWoCD0RB3qKRZ7Q4MYEEu295ufWJFszuuIgqj1sefP5soNmg+oM4HK3k4Me9G7aCoKMDQOR2FB3f5NkGOtmJPgqvraQ2futorwjGj2irKdBM9LbQOr/3aMFDXY3sIJ+N/6delAyw7xpAmpENE60jeRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718552161; c=relaxed/simple;
-	bh=LOI867/+QyASPFl05QqM8rdNaj3xPQj92rpYPHp0V/M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uBGnLoildD3oOdm8ndAf9gKgh8U+njmwtOEtlePjsxb6VSeW5xW5Iq8TnW9Q3aKwPSprp+HtoB1fqCzL+zuftm/tE9mSgnMHXKGPTd+EWxteoHWYeHQno3OhIwdd1WkXyXKyvRuE9SKE7AomJ+waYcJD8fCey4nfTja4alvfYms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vWmkIGWe; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=CzgUYlbwpAE7jfJG5Wq5ME+fPoSlySfMs6W+eYQNnaI=; b=vWmkIGWewCwx6GcJleZj4n7Q/q
-	/r4y9PA8YSdD7Fu2GUNK0DH1Fm7DAbipBVkbVcczFnaZhOiReYm8cWth5bVEV5kwV9ho6RhEOLlx5
-	PI/r27HWfDnHJKcnB0rWH3LReDyIrbo61cxA36REky69wMwQkV6vXBxVlWF05oj6N0Y8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sIrv2-000BgU-Kq; Sun, 16 Jun 2024 17:35:48 +0200
-Date: Sun, 16 Jun 2024 17:35:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Matthias Schiffer <mschiffer@universe-factory.net>
-Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>
-Subject: Re: [PATCH net-next 2/2] net: dsa: mt7530: add support for bridge
- port isolation
-Message-ID: <0dcdf71c-8b47-4490-bee2-8551c75f19e0@lunn.ch>
-References: <378bc964b49f9e9954336e99009932ac22bfe172.1718400508.git.mschiffer@universe-factory.net>
- <15263cb9bbc63d5cc66428e7438e0b5324306aa4.1718400508.git.mschiffer@universe-factory.net>
- <4eaf2bcb-4fad-4211-a48e-079a5c2a6767@arinc9.com>
- <8b80f4c7-a6bc-4ac9-bee4-9a36e70a6474@universe-factory.net>
+	s=arc-20240116; t=1718552306; c=relaxed/simple;
+	bh=gaiDuH/UwxUBAbTw97a7QxxnL1TjSr3yzzQI0+k68W0=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=QIsdD7gM2LffiqcYu/U59biLCp29It7K13pqRrh8T1KlaXpyYFp6XDoTTSMAHqL77n/rZ7qPMin2raQuX1yaEOvKZmwW+/5J5+YGIGUhZYMtpGOy0X+Avsd7TbCAyfs01NAfvNh6YGaHt6+ALKhyzdKqHvG+5dKY4TKhc+ANWJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b1hYyAqb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C93F4C2BBFC;
+	Sun, 16 Jun 2024 15:38:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718552306;
+	bh=gaiDuH/UwxUBAbTw97a7QxxnL1TjSr3yzzQI0+k68W0=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=b1hYyAqb/mYWA1DX6VA/jwYFqDgqTnJ5W17J2FzGzsxeowRnLsyJZPFtnBxNmPtWV
+	 8L/3tnqRqXk92/2rztAvnLVJqpiXS7WiMyWwcQq6Ws3ogPLdHbJ1kWq3GV125XlnCU
+	 sF6go6+uaAP8sY4j0QUvXXPiSEzY9yFFlE7KitOhnGTJI38SWBuQX7FWV/qyROLOJQ
+	 RPSbRtZ2YP7DL+rgA+aKhm5G9OnRD/0TIeQTPCAOffXcqlEWkvwh+6L3IMmw1CvtQ7
+	 cqEj+16b4DgofCYEJgn5NC2F6P9PAFzeuWtJzQWef3pJOr8fzgQ8DE4ITiQ/kKaZuG
+	 N4AnmeOcI/k9g==
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Jianbo Liu <jianbol@nvidia.com>, linux-kernel@vger.kernel.org, 
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
+ Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+ Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>
+In-Reply-To: <cover.1717409369.git.leon@kernel.org>
+References: <cover.1717409369.git.leon@kernel.org>
+Subject: Re: (subset) [PATCH rdma-next 0/3] Delay mlx5_ib internal
+ resources allocations
+Message-Id: <171855230192.136500.7249427705216716337.b4-ty@kernel.org>
+Date: Sun, 16 Jun 2024 18:38:21 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8b80f4c7-a6bc-4ac9-bee4-9a36e70a6474@universe-factory.net>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14-dev
 
-> As far as I can tell, the rules are:
+
+On Mon, 03 Jun 2024 13:26:36 +0300, Leon Romanovsky wrote:
+> Internal mlx5_ib resources are created during mlx5_ib module load. This
+> behavior is not optimal because it consumes resources that are not
+> needed when SFs are created. This patch series delays the creation of
+> mlx5_ib internal resources to the stage when they actually used.
 > 
-> - non-isolated ports can communicate with every port
-> - isolated ports can't communicate with other isolated ports
-> - communication is symmetric
+> Thanks
+> 
+> [...]
 
-It is a bit more subtle than that.
+Applied, thanks!
 
-By default, all ports should be isolated. They can exchange packets
-with the CPU port, but nothing else. This goes back to the model of
-switches just look like a bunch of netdev interfaces. By default,
-linux netdev interfaces are standalone. You need to add a bridge
-before packets can flow between ports.
+[2/3] IB/mlx5: Create UMR QP just before first reg_mr occurs
+      https://git.kernel.org/rdma/rdma/c/638420115cc4ad
+[3/3] IB/mlx5: Allocate resources just before first QP/SRQ is created
+      https://git.kernel.org/rdma/rdma/c/5895e70f2e6e8d
 
-Once you add a bridge, ports within that bridge can exchange
-packets. However, there can be multiple bridges. So a port needs to be
-isolated from ports in another bridge, but non-isolated to ports
-within the same bridge.
+Best regards,
+-- 
+Leon Romanovsky <leon@kernel.org>
 
-       Andrew
 
