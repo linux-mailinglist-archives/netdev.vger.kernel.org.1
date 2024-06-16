@@ -1,125 +1,150 @@
-Return-Path: <netdev+bounces-103818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67055909A0C
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 23:50:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBDD9909AE1
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 02:59:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C98942838A5
-	for <lists+netdev@lfdr.de>; Sat, 15 Jun 2024 21:50:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B1362829A2
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 00:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31C261FF4;
-	Sat, 15 Jun 2024 21:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA6019D883;
+	Sun, 16 Jun 2024 00:59:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="YKZaPHJO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gi1ZCA3j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECD8179A8;
-	Sat, 15 Jun 2024 21:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89CC11847
+	for <netdev@vger.kernel.org>; Sun, 16 Jun 2024 00:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718488222; cv=none; b=bMSvw6DOOmq3Vtv0c2ncMh6U4ROQXiL7ZYy77q1/pAaNsTA6lYcrSbdnu5P8GlrlkdAp5kKx2TMQ2v9N0S0CnehiEv6F+XmZXur08Z9blS0maqClV7qaLTRVs5ZeI3kC5Z9epxDVh1mU+jiM1E5ISvw4KVYcJCDjvztpQSB+bAU=
+	t=1718499582; cv=none; b=NozKpG+dLKL5FCZpk/TeEvfIQbeJM6Ksj+VchRnse/RmNDnPx/LHmLBZjtFbxUguFNOq2k2zA8AADqONf32WnwGr0AnGrWM80tB+U9KQ4WHhUVQIMHD/AW53HafoWvaEltg6a9Pz6ZWNyeACwRE18DrJ7OczGEY646KDadaSQFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718488222; c=relaxed/simple;
-	bh=uu1WWpxIq5VIarKafJyQwgPBec0xd5BV54SUOdG0Fck=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WBie2Lu9Fix13rPo00vgmutFlnWr77iYM8Oc1t/lHHljYoU6d43gJDyudRaIpcOL4YF5bIwFHZ48EM+MKElUI8oo0tBC8e0ETShWJt6ZpxcIX4ZESaBUHX3cCEEJyTSZTpcc68OtAP5DB4kdsFVFT+aG0JMJjkkx5VHBVfI7Paw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=YKZaPHJO; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45FKr7GN020565;
-	Sat, 15 Jun 2024 21:50:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	BmnjQqYT5WAJg2A+SDNeEI4GjxYKoUJi9ctIjvw5UPc=; b=YKZaPHJON3afAsWV
-	S9/Ke9lSxy2xd1q4NK+qyEqngWIKm2p+0pq/e4ejYaFNJMhsacuNXyXl4Alg9ooG
-	wJbjW5rqdWu8QfFyUSrY7RGlYYdEz8IfItHSYYP+4u89/EV4DojXqzO+rdRDD+Kv
-	DijVoMgXJFmEZsXIHrw7glp/fmQnM9R8z4BUCEG7LzKYcHPOcQOXsM2bIWGjBFBd
-	EJhb6ROg1qMbO8RY/aaw7bcpmt1DI3pvCV55fC70l//VkQ3NrbAD7Vi8G69gwmV+
-	meTdxMO8brxuL4xjOBhaaTLFmWV2jWI8kbde62NymgZEuuvf54SCODVUHdRzOn8x
-	H6QxLg==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ys3qf128g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 15 Jun 2024 21:50:14 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45FLoDTq007589
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 15 Jun 2024 21:50:13 GMT
-Received: from [10.48.243.167] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sat, 15 Jun
- 2024 14:50:12 -0700
-Message-ID: <7da04855-13a1-49f9-9336-424a9b6c6ad8@quicinc.com>
-Date: Sat, 15 Jun 2024 14:50:11 -0700
+	s=arc-20240116; t=1718499582; c=relaxed/simple;
+	bh=bczbtfmuUFuzwcB/Jva6HuCWrmCYtSqfqx8XaoUW1uM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JrcpbrKdmk3hPzPhHUGC1D89EuEzQvXZS4nlYrxT2BlCZmxl/LMFIZ53TQ9Q1xMamEZdJ78le0jmCgUPdFyHVfuEMciYewKVGopFxZUQ5jb9wCKN1Hz1ciSNihG/Ddxj3oLOgzoy9Jbvb2kTkYm2BavOwxVv9q38AoJcVENdTQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gi1ZCA3j; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-57c6011d75dso3994015a12.3
+        for <netdev@vger.kernel.org>; Sat, 15 Jun 2024 17:59:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718499579; x=1719104379; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8oitD049c3ru4Mw040oUrvTlgnNPnCqDCXvuuTGbKCA=;
+        b=gi1ZCA3jWgxoLzUwhz1kEUz0pFNyiob7ZOU6kBl3Snn3f7ZKy+RwbRT+heCKcwIKic
+         OsPId9YMBC4kDQVqnlfhbRFVIYjWKiRzdW2hrbyhwopOSE8E4/F0VcDW3JDVrlOMylzg
+         FvQep+oZ0sKNglNXJ89gTa3OebUcb2K6a0JubYhMaeg0fENfrdr1uVWE7tiYcvBz1rY/
+         y4jD2DROFFYNGkdGZALp7miK0v+Zd+0D6ZesmdO4H2X+1RQUqA+Iv0TJlKd6dBBwUAO/
+         53Rm3VjQ2pwJAqUmku4g3qqS5r8GSxdoN8Mje85ZMKIXLmuRo+gSMsF21k0VIY8Ks5R9
+         MoKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718499579; x=1719104379;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8oitD049c3ru4Mw040oUrvTlgnNPnCqDCXvuuTGbKCA=;
+        b=IkFjfLMkDieWQOLOw9l/I5H6u82ZeEBLkC7KMMph9vaHSVosAXxSiCB1iP8TNpaw0s
+         w3TSVW0gKUH/z4kQdEWwvx5/nUSOxC2C3ZescySlGYnKwf7zTfsHZ2CUGHdx1ZGFOWHn
+         Gid3FMSvQSQ/ZQsS/rQc1/S7PeLxOwC4JPTEWFDT3tnWCOri+mLd0P+cld8TJkdLNE9N
+         IDO0wc9DL7hNDRWeDJyaGjK4ivwk+pYNdHWo7TdtpYwbrE87DhmE23/h978kTzfMQP0O
+         G8PHXBqkUvP2jdkVgj3eUTkWMmJXBs1IkjHPNYJjibpV/5de98Gq+NCVDE0ftOCp9ahW
+         vUcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX16+Fe77iR9cC9cRSa9AqyXiKqd+IyvG6LskugisHlXsuUm8I1eBAMZyqVgk8ugoayUkszGT8gST11X2O8CTmdZXKRXcNs
+X-Gm-Message-State: AOJu0YwqtT3nvpOrf6HzTidZ+K30/gQ9H7sqGC3iwC8wV+qCXzKblIj1
+	3WQkFcWI9907MypZYQ9vzjrHEWeyUpmV7SCDeVb9oTVEfK6b0hWE7BUfGX9MSkd6Gos/PzFstkA
+	Rom70N4HNFEdv/kt9Ces4mUY14Uo=
+X-Google-Smtp-Source: AGHT+IGmNsFShYM/M3EGHpmA9ji0HYxvWTDpD/jatTRiID+f2mwigBCkqxDsy+2qE/7chb7UhocsOV9y6TtJzeGWeFk=
+X-Received: by 2002:a50:ed82:0:b0:57c:bf3b:76f8 with SMTP id
+ 4fb4d7f45d1cf-57cbf3b7900mr3981481a12.1.1718499578431; Sat, 15 Jun 2024
+ 17:59:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] vringh: add MODULE_DESCRIPTION()
-Content-Language: en-US
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg KH
-	<gregkh@linuxfoundation.org>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>
-References: <20240516-md-vringh-v1-1-31bf37779a5a@quicinc.com>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <20240516-md-vringh-v1-1-31bf37779a5a@quicinc.com>
+References: <20240615151454.166404-1-edumazet@google.com>
+In-Reply-To: <20240615151454.166404-1-edumazet@google.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sun, 16 Jun 2024 08:59:00 +0800
+Message-ID: <CAL+tcoBkzoehNPvjVe89to7fBqaFdh2Wo5VZF=o54cprJtr6aw@mail.gmail.com>
+Subject: Re: [PATCH net] ipv6: prevent possible NULL dereference in rt6_probe()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: t2kBISLsiaqvX0X_UssUBEvWD0an67TU
-X-Proofpoint-ORIG-GUID: t2kBISLsiaqvX0X_UssUBEvWD0an67TU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-15_15,2024-06-14_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
- malwarescore=0 spamscore=0 mlxlogscore=946 bulkscore=0 phishscore=0
- lowpriorityscore=0 mlxscore=0 priorityscore=1501 adultscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406150166
+Content-Transfer-Encoding: quoted-printable
 
-On 5/16/2024 6:57 PM, Jeff Johnson wrote:
-> Fix the allmodconfig 'make w=1' issue:
-> 
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/vhost/vringh.o
-> 
-> Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
-> ---
->  drivers/vhost/vringh.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> index 7b8fd977f71c..73e153f9b449 100644
-> --- a/drivers/vhost/vringh.c
-> +++ b/drivers/vhost/vringh.c
-> @@ -1614,4 +1614,5 @@ EXPORT_SYMBOL(vringh_need_notify_iotlb);
->  
->  #endif
->  
-> +MODULE_DESCRIPTION("host side of a virtio ring");
->  MODULE_LICENSE("GPL");
-> 
-> ---
-> base-commit: 7f094f0e3866f83ca705519b1e8f5a7d6ecce232
-> change-id: 20240516-md-vringh-c43803ae0ba4
-> 
+On Sat, Jun 15, 2024 at 11:15=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> syzbot caught a NULL dereference in rt6_probe() [1]
+>
+> Bail out if  __in6_dev_get() returns NULL.
+>
+> [1]
+> Oops: general protection fault, probably for non-canonical address 0xdfff=
+fc00000000cb: 0000 [#1] PREEMPT SMP KASAN PTI
+> KASAN: null-ptr-deref in range [0x0000000000000658-0x000000000000065f]
+> CPU: 1 PID: 22444 Comm: syz-executor.0 Not tainted 6.10.0-rc2-syzkaller-0=
+0383-gb8481381d4e2 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 04/02/2024
+>  RIP: 0010:rt6_probe net/ipv6/route.c:656 [inline]
+>  RIP: 0010:find_match+0x8c4/0xf50 net/ipv6/route.c:758
+> Code: 14 fd f7 48 8b 85 38 ff ff ff 48 c7 45 b0 00 00 00 00 48 8d b8 5c 0=
+6 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 14 02 48=
+ 89 f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 19
+> RSP: 0018:ffffc900034af070 EFLAGS: 00010203
+> RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc90004521000
+> RDX: 00000000000000cb RSI: ffffffff8990d0cd RDI: 000000000000065c
+> RBP: ffffc900034af150 R08: 0000000000000005 R09: 0000000000000000
+> R10: 0000000000000001 R11: 0000000000000002 R12: 000000000000000a
+> R13: 1ffff92000695e18 R14: ffff8880244a1d20 R15: 0000000000000000
+> FS:  00007f4844a5a6c0(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000001b31b27000 CR3: 000000002d42c000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>   rt6_nh_find_match+0xfa/0x1a0 net/ipv6/route.c:784
+>   nexthop_for_each_fib6_nh+0x26d/0x4a0 net/ipv4/nexthop.c:1496
+>   __find_rr_leaf+0x6e7/0xe00 net/ipv6/route.c:825
+>   find_rr_leaf net/ipv6/route.c:853 [inline]
+>   rt6_select net/ipv6/route.c:897 [inline]
+>   fib6_table_lookup+0x57e/0xa30 net/ipv6/route.c:2195
+>   ip6_pol_route+0x1cd/0x1150 net/ipv6/route.c:2231
+>   pol_lookup_func include/net/ip6_fib.h:616 [inline]
+>   fib6_rule_lookup+0x386/0x720 net/ipv6/fib6_rules.c:121
+>   ip6_route_output_flags_noref net/ipv6/route.c:2639 [inline]
+>   ip6_route_output_flags+0x1d0/0x640 net/ipv6/route.c:2651
+>   ip6_dst_lookup_tail.constprop.0+0x961/0x1760 net/ipv6/ip6_output.c:1147
+>   ip6_dst_lookup_flow+0x99/0x1d0 net/ipv6/ip6_output.c:1250
+>   rawv6_sendmsg+0xdab/0x4340 net/ipv6/raw.c:898
+>   inet_sendmsg+0x119/0x140 net/ipv4/af_inet.c:853
+>   sock_sendmsg_nosec net/socket.c:730 [inline]
+>   __sock_sendmsg net/socket.c:745 [inline]
+>   sock_write_iter+0x4b8/0x5c0 net/socket.c:1160
+>   new_sync_write fs/read_write.c:497 [inline]
+>   vfs_write+0x6b6/0x1140 fs/read_write.c:590
+>   ksys_write+0x1f8/0x260 fs/read_write.c:643
+>   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>   do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> Fixes: 52e1635631b3 ("[IPV6]: ROUTE: Add router_probe_interval sysctl.")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Just following up to see if anything else is needed to pick this up.
-
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
