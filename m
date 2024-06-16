@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-103830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9CE5909BF4
-	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 08:50:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 984B6909BF6
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 08:52:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E2501F218EE
-	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 06:50:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74D6E1C20BE2
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 06:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9E016DED1;
-	Sun, 16 Jun 2024 06:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A9B16D33B;
+	Sun, 16 Jun 2024 06:52:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="nPovZ99v"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="URJDSw0R"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4787A16C864;
-	Sun, 16 Jun 2024 06:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F22016C6B9;
+	Sun, 16 Jun 2024 06:52:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718520607; cv=none; b=nIXfqbDHmpYrgaVq43ahMU3KZnoP19ojK4yyzhA6oFM/pEw+JOGATEfbHBsrO0SlEoM6cuF/gEOsZOG+sdNYl0mqfhJRSzTKWXV79z4U+xrbxdMdVyO/1hTvLO0XvPkNQQiOvREYlYcdwe5ys24trPWXkeE2UP+S2OZab1EaKk0=
+	t=1718520739; cv=none; b=LqCJiYAXTCssuRnQVNYaXRSDcYHRwtxgAzKaYva78WPeo1cfOrUOZug2dwNU0Mx3Wvxk2VSV0WtnFZWih9O0cXA0l8lZPaAjQ8/bTUOkBgG6W4csn7HhDJaJyM6s2w8ysFtnARPr4NGj1PBHPPPB4ODX1Am2/ySp5R1MAwBjC8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718520607; c=relaxed/simple;
-	bh=zvYytH/tkPFqEpQ06iZFxiNfJaS+oXW2wNzfOOiScQs=;
+	s=arc-20240116; t=1718520739; c=relaxed/simple;
+	bh=zS4o3OQMs27DD48GGi2eICvp90N88lJ+aBAPOVqrmwU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CY0XgQN+hpRio4X1trgFJ9o3e+vrnTqP1P2JsEZLDDvcQGNGC0zuivJrtNf3BrLNc2Zmjq0Sg0ka+USuVNn1Kq4W0pktqqKw58yCZiD5w8ur+dyvWD9ODMZGJPUt2XzRP1W1/nG2/ELz48Wrfu4ng9WA7hBErpvYvUL3vIncnFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=nPovZ99v; arc=none smtp.client-ip=217.70.183.193
+	 In-Reply-To:Content-Type; b=I2pgnhdoeST01H7Ta6DzSXioEKzsQuLV3IYB6QKpExpUvxuDJJmjB+wDtCmkgxij60/78X2M3ciqyR0A0I0PT+RpcVb6Z9s6H5CDuRRqstUii2xDOKvv4rDp/hXiHHfUgqgCOPofdZbaulAq3aR8vHbyQ/Cjnu2E5MNKJo9bzf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=URJDSw0R; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 31BDC240003;
-	Sun, 16 Jun 2024 06:49:49 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 97DDD60002;
+	Sun, 16 Jun 2024 06:52:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1718520596;
+	t=1718520728;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oepipccJ4+xfU5ZrXbRCGP8qtlNKoyECJMJmUGJDpJY=;
-	b=nPovZ99vizahHrb9+csaQlYDereOrVESm1iKgeJv+z7U5QelYHYKWGbOhnECUgXNIbta+Y
-	lYDd7pwaEHTudVGST8KuALea8IfEi4UF8pRHEzFLXReUBbZAMpkBtEbXCIS9xrZ+T6nnrG
-	uqXjO+B3exmqcPQqMg6tNLKARyks0mfjcXpe+n3YZun2dhUNh4ct99MI/HcGBturj69PQ7
-	fPx9XqL0AJlLya9RlPE5gkHgD+Xc0d7iU9Hp00eFQav8g1zk9lD9NaDzuV7FVWK77HjaBS
-	AaZP6407I9ukj4gICe4YwX1jihFmZOAfhQxIpGMHo+wmWzMt7dqKms7yBcMA4A==
-Message-ID: <a26d619c-fc63-4b2d-8313-210a37b1661a@arinc9.com>
-Date: Sun, 16 Jun 2024 09:49:48 +0300
+	bh=v0NRmtqRvui5lSo5ejnM/TPk8rKVveCep0FEncp4fz4=;
+	b=URJDSw0ROWgdxLyQtqGmBp3FXbS76oXFWhc0w52aDEtrc/HKQglNGK6LONCjXGd714mjG6
+	XqAiiFe883IQS2HqxURq/0PjL6JqX18nnNA4tE27d+VGRJU3O/Io89dpgOqMNN8SN+Klmj
+	1nQPJV3jeC6e87iaEotBC2U6CJ6f/qXYUddXHpIQ73ND/MUDgq1bTd9xs7SFpdKujb88jr
+	R3wbbAlKdRxKqouXDqWp7NATeHngafn4eF71LQFNqbBNDzsdHkZuL333NbLqWdrPhsRx2m
+	S8UsuSLVXZTbqalksayOP9CG6ADxKReCk6iJhRVgXgbcHEBmDGYVftrQzk4nYg==
+Message-ID: <4eaf2bcb-4fad-4211-a48e-079a5c2a6767@arinc9.com>
+Date: Sun, 16 Jun 2024 09:52:00 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,8 +54,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net: dsa: mt7530: factor out bridge
- join/leave logic
+Subject: Re: [PATCH net-next 2/2] net: dsa: mt7530: add support for bridge
+ port isolation
 To: Matthias Schiffer <mschiffer@universe-factory.net>,
  Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
  Sean Wang <sean.wang@mediatek.com>
@@ -68,97 +68,67 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 References: <378bc964b49f9e9954336e99009932ac22bfe172.1718400508.git.mschiffer@universe-factory.net>
+ <15263cb9bbc63d5cc66428e7438e0b5324306aa4.1718400508.git.mschiffer@universe-factory.net>
 Content-Language: en-US
 From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <378bc964b49f9e9954336e99009932ac22bfe172.1718400508.git.mschiffer@universe-factory.net>
+In-Reply-To: <15263cb9bbc63d5cc66428e7438e0b5324306aa4.1718400508.git.mschiffer@universe-factory.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: arinc.unal@arinc9.com
 
 On 15/06/2024 01:21, Matthias Schiffer wrote:
-> As preparation for implementing bridge port isolation, move the logic to
-> add and remove bits in the port matrix into a new helper
-> mt7530_update_port_member(), which is called from
-> mt7530_port_bridge_join() and mt7530_port_bridge_leave().
-> 
-> No functional change intended.
+> Remove a pair of ports from the port matrix when both ports have the
+> isolated flag set.
 > 
 > Signed-off-by: Matthias Schiffer <mschiffer@universe-factory.net>
 > ---
->   drivers/net/dsa/mt7530.c | 103 +++++++++++++++++----------------------
->   1 file changed, 46 insertions(+), 57 deletions(-)
+>   drivers/net/dsa/mt7530.c | 21 ++++++++++++++++++---
+>   drivers/net/dsa/mt7530.h |  1 +
+>   2 files changed, 19 insertions(+), 3 deletions(-)
 > 
 > diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-> index 598434d8d6e4..ecacaefdd694 100644
+> index ecacaefdd694..44939379aba8 100644
 > --- a/drivers/net/dsa/mt7530.c
 > +++ b/drivers/net/dsa/mt7530.c
-> @@ -1302,6 +1302,50 @@ mt7530_stp_state_set(struct dsa_switch *ds, int port, u8 state)
->   		   FID_PST(FID_BRIDGED, stp_state));
+> @@ -1303,7 +1303,8 @@ mt7530_stp_state_set(struct dsa_switch *ds, int port, u8 state)
 >   }
 >   
-> +static void mt7530_update_port_member(struct mt7530_priv *priv, int port,
-> +				      const struct net_device *bridge_dev, bool join)
-> +	__must_hold(&priv->reg_mutex)
+>   static void mt7530_update_port_member(struct mt7530_priv *priv, int port,
+> -				      const struct net_device *bridge_dev, bool join)
+> +				      const struct net_device *bridge_dev,
+> +				      bool join)
 
-Please run git clang-format on the patch.
+Run git clang-format on this patch as well please.
 
-> +{
-> +	struct dsa_port *dp = dsa_to_port(priv->ds, port), *other_dp;
-> +	struct mt7530_port *p = &priv->ports[port], *other_p;
-> +	struct dsa_port *cpu_dp = dp->cpu_dp;
-> +	u32 port_bitmap = BIT(cpu_dp->index);
-> +	int other_port;
+>   	__must_hold(&priv->reg_mutex)
+>   {
+>   	struct dsa_port *dp = dsa_to_port(priv->ds, port), *other_dp;
+> @@ -1311,6 +1312,7 @@ static void mt7530_update_port_member(struct mt7530_priv *priv, int port,
+>   	struct dsa_port *cpu_dp = dp->cpu_dp;
+>   	u32 port_bitmap = BIT(cpu_dp->index);
+>   	int other_port;
+> +	bool isolated;
+>   
+>   	dsa_switch_for_each_user_port(other_dp, priv->ds) {
+>   		other_port = other_dp->index;
+> @@ -1327,7 +1329,9 @@ static void mt7530_update_port_member(struct mt7530_priv *priv, int port,
+>   		if (!dsa_port_offloads_bridge_dev(other_dp, bridge_dev))
+>   			continue;
+>   
+> -		if (join) {
+> +		isolated = p->isolated && other_p->isolated;
 > +
-> +	dsa_switch_for_each_user_port(other_dp, priv->ds) {
-> +		other_port = other_dp->index;
-> +		other_p = &priv->ports[other_port];
-> +
-> +		if (dp == other_dp)
-> +			continue;
-> +
-> +		/* Add/remove this port to/from the port matrix of the other
-> +		 * ports in the same bridge. If the port is disabled, port
-> +		 * matrix is kept and not being setup until the port becomes
-> +		 * enabled.
-> +		 */
-> +		if (!dsa_port_offloads_bridge_dev(other_dp, bridge_dev))
+> +		if (join && !isolated) {
+>   			other_p->pm |= PCR_MATRIX(BIT(port));
+>   			port_bitmap |= BIT(other_port);
+>   		} else {
 
-Would be helpful to mention in the patch log that
-dsa_port_offloads_bridge_dev() is now being used instead of
-dsa_port_offloads_bridge().
-
-> +			continue;
-> +
-> +		if (join) {
-> +			other_p->pm |= PCR_MATRIX(BIT(port));
-> +			port_bitmap |= BIT(other_port);
-> +		} else {
-> +			other_p->pm &= ~PCR_MATRIX(BIT(port));
-> +		}
-> +
-> +		if (other_p->enable)
-> +			mt7530_rmw(priv, MT7530_PCR_P(other_port),
-> +				   PCR_MATRIX_MASK, other_p->pm);
-> +	}
-> +
-> +	/* Add/remove the all other ports to this port matrix. */
-
-I would add to this comment: When removing, only the CPU port will remain
-in the port matrix of this port.
-
-To not omit the original comment:
-
-	/* Set the cpu port to be the only one in the port matrix of
-	 * this port.
-	 */
-
-> +	p->pm = PCR_MATRIX(port_bitmap);
-> +	if (priv->ports[port].enable)
-> +		mt7530_rmw(priv, MT7530_PCR_P(port),
-> +			   PCR_MATRIX_MASK, p->pm);
-
-I see changes to have the code streamlined. Overall, I would appreciate a
-more verbose patch log.
+Why must other_p->isolated be true as well? If I understand correctly, when
+a user port is isolated, non isolated ports can't communicate with it
+whilst the CPU port can. If I were to isolate a port which is the only
+isolated one at the moment, the isolated flag would not be true. Therefore,
+the isolated port would not be removed from the port matrix of other user
+ports. Why not only check for p->isolated?
 
 Arınç
 
