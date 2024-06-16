@@ -1,87 +1,90 @@
-Return-Path: <netdev+bounces-103892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A068990A008
-	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 23:52:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0321690A009
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 23:53:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CF53281D09
-	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 21:52:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F3291F219E4
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 21:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14842B2CF;
-	Sun, 16 Jun 2024 21:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32BEB6A33F;
+	Sun, 16 Jun 2024 21:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IQibg6oh"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769E92BD18
-	for <netdev@vger.kernel.org>; Sun, 16 Jun 2024 21:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1272A2B2CF;
+	Sun, 16 Jun 2024 21:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718574718; cv=none; b=rHMqg+WV8INyCb4qdNxv6u0OtJAI3LgHmuuL36hzKp8OKLxYBhILq69avBJwj5Zt2VDEngcMgU5262yZuVds8STMacduYo++1rILGOipMYwhvsV1YyuLY82ncLZxceXw3QJ7qVq8F7LQKQs8PDo4MMtyr+g0V3cN99hm2SGvx2Y=
+	t=1718574813; cv=none; b=H8ZzKwbRkhK47+o47PIvPigGgYqVa11/GAKlhGT3gdrL0BoVE43GPmWPcxMUk0qUaWbJwYlkULmlxDmc0/m+Zd3FD4PLq2RXF0ku/N4Zx29CgrfAQfVeMl4SUrePhYZP8ggjhrPcSvAkjk8A56ismtdBwU/Y4AScmle9yZfkRXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718574718; c=relaxed/simple;
-	bh=Jh38fFY1jsJz1TLAvGhQSBUq4K58MBDXKK8QwxU01kA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=Rf7W8rjRAdv7vFFzyv2VwDnjBibfc1q5Mcs/UfxgPLK4vIw8AXl7ofS0b45WbEkxnfarK/q+imNYi7QZCWL1GdqORy29oOWK1yZQK7Ay1IsNP+4UbiXWTRgJTm+eCAjK0i7pgeaMunnH1kMtcMrxX+EUAyrMSLnxmh4CZnqa8ZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-116-n0_F1G1IMxuoN5XOZzHLJA-1; Sun, 16 Jun 2024 22:51:45 +0100
-X-MC-Unique: n0_F1G1IMxuoN5XOZzHLJA-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 16 Jun
- 2024 22:51:05 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Sun, 16 Jun 2024 22:51:05 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Sagi Grimberg' <sagi@grimberg.me>, kernel test robot
-	<oliver.sang@intel.com>, Matthew Wilcox <willy@infradead.org>
-CC: "oe-lkp@lists.linux.dev" <oe-lkp@lists.linux.dev>, "lkp@intel.com"
-	<lkp@intel.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Subject: RE: [PATCH] net: micro-optimize skb_datagram_iter
-Thread-Topic: [PATCH] net: micro-optimize skb_datagram_iter
-Thread-Index: AQHav87vWshbN1FSGkaaeddPsMjEkbHK7lSQ
-Date: Sun, 16 Jun 2024 21:51:05 +0000
-Message-ID: <e2bce6704b20491e8eb2edd822ae6404@AcuMS.aculab.com>
+	s=arc-20240116; t=1718574813; c=relaxed/simple;
+	bh=ANevp3J6itMEKMzRHvOiIxR3wfs2r6Kv1C5d1BF4QFY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WX+hFlBGD2J6a8CsCLUZO4hzEZVzipal/Dneb5uOOKR3KPeySDAddiT8AtQ3ddaTf5qn0CCv3DM0IiWeTbHO/VC65OM7QmCj5jfvqewPuJ240fmM1dbSBv+ZhwnFqvPbeVg1RZjxfYrpGNyOoXNeVP7+U/gpbSNPJPndR3pRMYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=IQibg6oh; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=a9wblOxsMO7GfPhaiHgIqea1S0c8DWX+aoF5hDQ4B40=; b=IQibg6ohidMQBvMxttCzVTpkD1
+	ZDxqLrsho3LQ3CtDZy0JbZdTXw+zJUU/3bCTqK7hrHaI1sLpQW6H6GNAXs54V6Iha7ZKuTx4VLSAs
+	NWXimpgZ4KzYRwxmFfjFI5CVtvJyAXB4C/2q07uUvGllbwMaARn9V9/bTCWXv9wib4/X7USnUaqVJ
+	ijuob+R8MqOK2lsP6qNDsROynhLqnKaUXr7ZBIhFdgzIqkGg8bP5aEETRW6Kyr6NLgTmC44X5DtCM
+	GeFYqWQhP9Mu1P3+r4eTahhtqa4CIOpxnGZTPINZyapTqCLolZDS3xtL2YA3NvI2YMiVFRJIRsphE
+	q8Ao/u5w==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sIxoP-00000001UpH-0STC;
+	Sun, 16 Jun 2024 21:53:21 +0000
+Date: Sun, 16 Jun 2024 22:53:20 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: David Laight <David.Laight@aculab.com>
+Cc: 'Sagi Grimberg' <sagi@grimberg.me>,
+	kernel test robot <oliver.sang@intel.com>,
+	"oe-lkp@lists.linux.dev" <oe-lkp@lists.linux.dev>,
+	"lkp@intel.com" <lkp@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH] net: micro-optimize skb_datagram_iter
+Message-ID: <Zm9e0OpCaucP4836@casper.infradead.org>
 References: <202406161539.b5ff7b20-oliver.sang@intel.com>
  <4937ffd4-f30a-4bdb-9166-6aebb19ca950@grimberg.me>
-In-Reply-To: <4937ffd4-f30a-4bdb-9166-6aebb19ca950@grimberg.me>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+ <e2bce6704b20491e8eb2edd822ae6404@AcuMS.aculab.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e2bce6704b20491e8eb2edd822ae6404@AcuMS.aculab.com>
 
-RnJvbTogU2FnaSBHcmltYmVyZw0KPiBTZW50OiAxNiBKdW5lIDIwMjQgMTA6MjQNCi4uLg0KPiA+
-IFsgMTMuNDk4NjYzXVsgVDE4OV0gRUlQOiB1c2VyY29weV9hYm9ydCAobW0vdXNlcmNvcHkuYzox
-MDIgKGRpc2NyaW1pbmF0b3IgMTIpKQ0KPiA+IFsgICAxMy40OTk0MjRdWyAgVDE5NF0gdXNlcmNv
-cHk6IEtlcm5lbCBtZW1vcnkgZXhwb3N1cmUgYXR0ZW1wdCBkZXRlY3RlZCBmcm9tIGttYXAgKG9m
-ZnNldCAwLCBzaXplDQo+IDgxOTIpIQ0KPiANCj4gSG1tLCBub3Qgc3VyZSBJIHVuZGVyc3RhbmQg
-ZXhhY3RseSB3aHkgY2hhbmdpbmcga21hcCgpIHRvDQo+IGttYXBfbG9jYWxfcGFnZSgpIGV4cG9z
-ZSB0aGlzLA0KPiBidXQgaXQgbG9va3MgbGlrZSBtbS91c2VyY29weSBkb2VzIG5vdCBsaWtlIHNp
-emU9ODE5MiB3aGVuIGNvcHlpbmcgZm9yDQo+IHRoZSBza2IgZnJhZy4NCg0KQ2FuJ3QgYSB1c2Vy
-Y29weSBmYXVsdCBhbmQgaGF2ZSB0byByZWFkIHRoZSBwYWdlIGZyb20gc3dhcD8NClNvIHRoZSBw
-cm9jZXNzIGNhbiBzbGVlcCBhbmQgdGhlbiBiZSByZXNjaGVkdWxlZCBvbiBhIGRpZmZlcmVudCBj
-cHU/DQpTbyB5b3UgY2FuJ3QgdXNlIGttYXBfbG9jYWxfcGFnZSgpIGhlcmUgYXQgYWxsLg0KDQoJ
-RGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1v
-dW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEz
-OTczODYgKFdhbGVzKQ0K
+On Sun, Jun 16, 2024 at 09:51:05PM +0000, David Laight wrote:
+> From: Sagi Grimberg
+> > Sent: 16 June 2024 10:24
+> ...
+> > > [ 13.498663][ T189] EIP: usercopy_abort (mm/usercopy.c:102 (discriminator 12))
+> > > [   13.499424][  T194] usercopy: Kernel memory exposure attempt detected from kmap (offset 0, size
+> > 8192)!
+> > 
+> > Hmm, not sure I understand exactly why changing kmap() to
+> > kmap_local_page() expose this,
+> > but it looks like mm/usercopy does not like size=8192 when copying for
+> > the skb frag.
+> 
+> Can't a usercopy fault and have to read the page from swap?
+> So the process can sleep and then be rescheduled on a different cpu?
+> So you can't use kmap_local_page() here at all.
 
+I don't think you understand how kmap_local_page() works.
 
