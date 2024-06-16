@@ -1,116 +1,122 @@
-Return-Path: <netdev+bounces-103839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CE57909CF3
-	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 12:21:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26CAA909CF7
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 12:28:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 618D71C20999
-	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 10:21:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 319D81C20910
+	for <lists+netdev@lfdr.de>; Sun, 16 Jun 2024 10:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D370E187340;
-	Sun, 16 Jun 2024 10:21:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="NzMtdvmT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C5916D9C9;
+	Sun, 16 Jun 2024 10:28:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-251-59.mail.qq.com (out203-205-251-59.mail.qq.com [203.205.251.59])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B590F481A5
-	for <netdev@vger.kernel.org>; Sun, 16 Jun 2024 10:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.251.59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B97FC0B
+	for <netdev@vger.kernel.org>; Sun, 16 Jun 2024 10:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718533275; cv=none; b=ZvZuq8mOGjfA+CQt5gZn5Ae0gaGuyEJqQbqSb0YLkRuKjPC1ucxtQAhLNsS8mP4rxy++ydn6WKODigpZd318aTq7A1xwPUqrLVTyCEu6CNsQfTtm9D3+2K4jMMZalqDCnYD/pYDXeUzas08Px273/ouLl5z/B2/owjilvLmbATU=
+	t=1718533720; cv=none; b=PZAnhBqbvgpFKbIfyQqmpnlssBvwabGCKD3qHokMrWg+CxLt0flVKUdmFwt8Pty0SqZ2OF/G3IayAO2uRQ5lZBft/34eqiTXMYFOwaYETIGauidSkcy3kBe7bFiqMA/88kFs4bohDam6h7RIz1Zw6v+vecDmk96Pp/uzqtxioIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718533275; c=relaxed/simple;
-	bh=/gF+TPeSqpiiOPBUTi1DdfZLffw2Xi7zZSekGwAhyuI=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=gCo9zggxF1D+tcQN0SCMhOsmseCp1CYUWdoSjbmuVXsRsYGgDDvJVGZRAGZQ+PaWB1f/4UH+iDurgY4TzcXP8C++ILm/LUjg+PYfE3BdA6NheTOPaKYcWfV7SiSzGrE8qwxEqlYohcqygINLthGyW0j9VU480jx7ObTpAuxSpmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=NzMtdvmT; arc=none smtp.client-ip=203.205.251.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1718533265; bh=9H+M+GoTLUJBtiF3+IABcXAnLDBNfpaHHLcYInAzR2M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=NzMtdvmTVRBFZMYIR0j/N2UIhoOeeEis+fzbY/xprFb9u56GDznfUeGHuxtTu1JKP
-	 rs4ZyaGygW/rzs1VNP7EwacVe+MOVxdUSFbbXVrVHx+Zjhlh4QffI8YsUfR/hhD+0A
-	 kUdGX3vIDJ8CGVQhWNpoi45wfyl1FUtZCAhtMfes=
-Received: from pek-lxu-l1.wrs.com ([111.198.228.103])
-	by newxmesmtplogicsvrsza29-0.qq.com (NewEsmtp) with SMTP
-	id 53A90AC0; Sun, 16 Jun 2024 18:20:58 +0800
-X-QQ-mid: xmsmtpt1718533258ts70uv51b
-Message-ID: <tencent_880C74B1776566183DC9363096E037A64A09@qq.com>
-X-QQ-XMAILINFO: ND42uzdxTIzrMsG1rW4qAKnSoj6jgTZADUhkRaamPWeIm5a+peVtxdY87+KA8H
-	 1+vFUixkjQtVcO0AmX/MUAVmRvd+WL2XmukyQOmWtBhPiIO3MV1U53Aj8YULjsEwmAUs48x0XkNQ
-	 a/viW5+6EmONtoczByZJWT33XADv7DXa8ZfGXl9jIRgQy4FVl+rBzxa4az5Njf36b2lPMHIw9OQx
-	 cQyUe7K7TAFhPDbxsa35s8PJ2ixmJ//WMhBnauRKngp/X7LXZgNvPXNCs2AJwrKYILbK+W0ZJ8II
-	 veIum0/0kVGVkuP+LqEvqYhQgzOCsxcBTjvNnKnZ/Ln1IA/CifvktuL/5HWwc3o4ZyO2cNC1gxkH
-	 Qh8apiSbsIcfcM/cry6HioBnHEW9OeUGdmXJNjuLOTCMCGq6JpsHY16090pKJt8vODW5+EvU6Pmg
-	 CpcQ9ywQjOPFJeXUg/e6L6M5j+PnhkCDsmn9P9FTPHxPBBAH1sLTEA9CxWL2I5Wu6jgH+B7Utd/k
-	 +gv26hIf1fTERUBE4Hl4o85xoowVsPUJz1O71szX6O/cvsMJK4HjxVV5vwGnjTPhBWcY9kt5Lkse
-	 k3+4673cKlL98xQgYBakbFeQqGXTM6ElJCLpItBkUuVCRwMZSlY19HCqslErHOo8ZN8mJ3EINZJc
-	 kLFmLz7/Hlel9yhl/kdP15NBmnLn+cv2F/GO09wtgNGA0mP8UcRUKKFArlGm27JXlqVJWPlLA4XI
-	 z8VzV23cGdjcVuGEO6pC8AEmhOb/j/ZIjHpYA66Bjg9zRtvNO1eMU4BtAuLHi8x5s2h9D9nc9UdU
-	 5d20VFf61FBhyC2EkTDEFon2QL7c5BUhv5p0tK8VdgchP872VMKT/XfxQ8R8eGbW4tOl+jnzkUXf
-	 b+jv6EjdVSQW36tbZOL3dfsAVI7z49htJD3UVQ3A3bGJeD7NTtzsKPjgDLvBHv2UdLJg8Le+Gh
-X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
-From: Edward Adam Davis <eadavis@qq.com>
-To: syzbot+b2545b087a01a7319474@syzkaller.appspotmail.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	johan.hedberg@gmail.com,
-	kuba@kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	luiz.von.dentz@intel.com,
-	marcel@holtmann.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com,
-	william.xuanziyang@huawei.com
-Subject: [PATCH] bluetooth: handle value within the ida range should not be handled in BIG
-Date: Sun, 16 Jun 2024 18:20:59 +0800
-X-OQ-MSGID: <20240616102058.417715-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <000000000000bf4687061269eb1b@google.com>
-References: <000000000000bf4687061269eb1b@google.com>
+	s=arc-20240116; t=1718533720; c=relaxed/simple;
+	bh=5xDu7kjBCv083a7ymHqcCPEXM/1frXMMXeesebw9J6k=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=jH5MUC3ghQNGUxFXnLT+NICoHinJoWFsnuE9Lp3SwjfymKHv0tfmViLLuoBY+bjuxy/GUytdDyPkkBZKkL5jxVLscpEc6mTbQVL1EWv0Piy6eaZ+HWSBsG1tESuk8vbA7IGNUYGO23hn73tBu53Siwnr8wh2b6nEz1TvPpImPxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-32-FvT-k9JnOOC27og0Aj3Qfw-1; Sun, 16 Jun 2024 11:28:31 +0100
+X-MC-Unique: FvT-k9JnOOC27og0Aj3Qfw-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 16 Jun
+ 2024 11:27:52 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Sun, 16 Jun 2024 11:27:52 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Andrew Lunn' <andrew@lunn.ch>
+CC: 'Shannon Nelson' <shannon.nelson@amd.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
+	"kuba@kernel.org" <kuba@kernel.org>, "edumazet@google.com"
+	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"brett.creeley@amd.com" <brett.creeley@amd.com>, "drivers@pensando.io"
+	<drivers@pensando.io>
+Subject: RE: [PATCH net-next 7/8] ionic: Use an u16 for rx_copybreak
+Thread-Topic: [PATCH net-next 7/8] ionic: Use an u16 for rx_copybreak
+Thread-Index: AQHau4sD/nDUY/efCkW3PCGaFvsKj7HJXBawgAA1KgCAAKUs4A==
+Date: Sun, 16 Jun 2024 10:27:52 +0000
+Message-ID: <610168e14b814c67b2ef63f1a4fb0eca@AcuMS.aculab.com>
+References: <20240610230706.34883-1-shannon.nelson@amd.com>
+ <20240610230706.34883-8-shannon.nelson@amd.com>
+ <1cfefa13c8f34ccca322639a05122d6d@AcuMS.aculab.com>
+ <ead82f17-b890-4834-9b18-8c548ed985d5@lunn.ch>
+In-Reply-To: <ead82f17-b890-4834-9b18-8c548ed985d5@lunn.ch>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-hci_le_big_sync_established_evt is necessary to filter out cases where the handle
-value is belone to ida id range, otherwise ida will be erroneously released in 
-hci_conn_cleanup. 
+From: Andrew Lunn
+> Sent: 16 June 2024 02:29
+>=20
+> > > --- a/drivers/net/ethernet/pensando/ionic/ionic_lif.h
+> > > +++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.h
+> > > @@ -206,7 +206,7 @@ struct ionic_lif {
+> > >  =09unsigned int nxqs;
+> > >  =09unsigned int ntxq_descs;
+> > >  =09unsigned int nrxq_descs;
+> > > -=09u32 rx_copybreak;
+> > > +=09u16 rx_copybreak;
+> > >  =09u64 rxq_features;
+> > >  =09u16 rx_mode;
+> >
+> > There seem to be 6 pad bytes here - why not just use them??
+>=20
+> Or at least move rx_copybreak next to rx_mode so the compiler can pack
+> them together.
+>=20
+> It would be good to include some output from pahole in the commit
+> message to show the goal of this patch has actually been reached.
 
-Fixes: 181a42edddf5 ("Bluetooth: Make handle of hci_conn be unique")
-Reported-by: syzbot+b2545b087a01a7319474@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- net/bluetooth/hci_event.c | 3 +++
- 1 file changed, 3 insertions(+)
+And then start asking whether the fields are grouped for cache usage at all=
+.
+And whether the structure itself is allocated by kmalloc() or is nested
+in something else.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a487f9df8145..4130d64d9a80 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6893,6 +6893,9 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
- 
- 		bis = hci_conn_hash_lookup_handle(hdev, handle);
- 		if (!bis) {
-+                        if (handle > HCI_CONN_HANDLE_MAX)
-+                               continue;
-+
- 			bis = hci_conn_add(hdev, ISO_LINK, BDADDR_ANY,
- 					   HCI_ROLE_SLAVE, handle);
- 			if (IS_ERR(bis))
--- 
-2.43.0
+You might worry about structure holes because they make the structure
+larger - but that only matters if the allocator rounds it up to a
+bigger size. And that only really matters if you allocate lots of them.
+
+So the dominant part of this change is probably the extra code.
+
+When you add the extra flag as 'uint flag:1' you also generate worse
+code that just using a 'u8' - so not worth it unless you need to pack
+multiple flags into a word.
+
+Of course, slight re-ordering to avoid holes is usually fine.
+
+=09David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
 
