@@ -1,147 +1,130 @@
-Return-Path: <netdev+bounces-104170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4539C90B677
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 18:33:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83AC990B684
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 18:36:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E6481C22D6D
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:33:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22F9A1F23838
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:36:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC04E15F32D;
-	Mon, 17 Jun 2024 16:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3276415F30B;
+	Mon, 17 Jun 2024 16:36:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="lqmD0K57"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BZ5rxkkV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F5F20B3E;
-	Mon, 17 Jun 2024 16:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E12215D5CA
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 16:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718642020; cv=none; b=PqPuxX6TC6b+R/nD31G6vcCnS374tBkRHWqvXeUkGKqkpAXMs87keBUQIjHQ12R3n81ZLxP0U7ZiHyVJ2fq5kme2esE7p/W1x+t5POqAzr2layOpDdHv2wt5a2eQU63J3JxCsBLhHkIShU71huPrRWFBJXg4ZbD4moGtqkZgQc8=
+	t=1718642182; cv=none; b=FasPozaB1J8d3QjHGNcif4FUQ6R/hBfRn+auO6LezWvCEJHW0QFqeYCZBQWhYWxr9mFkgYhX+qxp3cjf0t3v0ZajF80FliJ6/za3qTMTHG5CUIMgYme76FYakb+TCzwEOx6qbBHQcn5fahh7I1w6TcTq7LoioZPX7aVyfaVT40s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718642020; c=relaxed/simple;
-	bh=AqajSV0X4jhG6ZZwm0pL6IyE58bEqZ6C1lsJRn/cy6g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NBjydcqjDd25qMMDri01TXjw7CdjncKTnMb1+G/m+DrmToz/afTi22fJitUpR3LAYOxJn/VI7MT2gu8YiwonKW9lCGb3bdTEp1iyvCx/gxtHSdKiA3Oom8moOeULZGFR4fmAJT0CG1VuOhOUKp9n9LQNgFJC3EFaLcMpduE0ud0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=lqmD0K57; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39163C4AF48;
-	Mon, 17 Jun 2024 16:33:39 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="lqmD0K57"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1718642017;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dUjKSm9UM4O1aKGbEZjvZRgCeGJk15TE1+l7iyYY+0E=;
-	b=lqmD0K57cnaPOftHh2pOum828X1k5uUv0Vyx2HD1+u8cZfhtcNcmaJO3Jde0keMY78Ap/O
-	TP1hCGHPmLCeXxG7ZdUXs/CPJ7wNLwf1Rwwgjd5I+wJyed+uUTgzNPiCteakfasG+gGmeX
-	AZiaHQP3EqVbkxlqL/iUR3o0NHjrlw4=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 17900858 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Mon, 17 Jun 2024 16:33:37 +0000 (UTC)
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-24c9f73ccaaso2639015fac.1;
-        Mon, 17 Jun 2024 09:33:36 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUknrKrjOdOG7XPcDZjYfP6lcQeB0Q9gHxZdtLN7BRKd3Ek2pFK5VWuDQaj0rgX37F/iIuCbXv12qpgBUE2JX6kptFeU4blWxoqw0HKZsZqHgWiKogQMj+jkLQKK4qtLkylut6B12yxJyGIBUaTKpGyrRJMxG+GRpmvl7rJDYLsyHizMAY3yzj+23+C5EYyu5rpahDlZXE+nWwysNdQfGmPscQm7fes3hLY7PMClU374rvRv5vHkqmXw1latoR3rBA1IBYc3X0eCZrL0xTAI8SPV6NjXRoybcEHmbnALazXEz7+A0NBJ1nrune5QPsjw+57e+9Iz+WvxgOHAP7iF1/bbRkBYtpuWaXW+d9zhsHwr9pXRVAaJUFTHLhFOnYOhzpU7e3IpysjkmtjzjUBmPG6Ji2pxkMk4zoL8PCwjKCbtoQIB2alpaxFSLc2kQ==
-X-Gm-Message-State: AOJu0YzaE0FTtrdP3CuOVp1XJdhfltEwufehgSXE1G8yAMSJwZuFqX6E
-	qf39MDm2D0jf7lbcoiWnTdQVIrpwlApchJKS1b8gn2obII2bKO/MCbtfzYTrUxXehbcBHaae6jL
-	YBo7Vex95MLqdXdADlRekZNd8sqk=
-X-Google-Smtp-Source: AGHT+IH73cxa8bEaSx0br+R63lisN9Zy21+jpj61L5jMj9rENcrv4EuyB2mn51tWhnn9axbMUQaQmVNUc4nOeGH0JmU=
-X-Received: by 2002:a05:6870:9725:b0:254:9ba7:488b with SMTP id
- 586e51a60fabf-25842ba524dmr11130088fac.40.1718642015158; Mon, 17 Jun 2024
- 09:33:35 -0700 (PDT)
+	s=arc-20240116; t=1718642182; c=relaxed/simple;
+	bh=CSL1o6fxGIv2fzLFvOKd91kLRU4Tlnt1Dy/MrMijLHQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lLl45DiLENGieizjhDuTsKGGD5OxFHVHMf67+ePSNL7yd3FQPlVHA9zE+VF2TiD+zgBxtKAAjBz1Asr6LJyJc4tK9McW4f7NPbmVjijrBfDX+hDwoOw1g2zU7Sj2fd/qCOX0cl1rITmkkntg/uAbsOhedOXbsK4VsvBsteKdZd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BZ5rxkkV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5ED13C2BD10;
+	Mon, 17 Jun 2024 16:36:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718642181;
+	bh=CSL1o6fxGIv2fzLFvOKd91kLRU4Tlnt1Dy/MrMijLHQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BZ5rxkkVgYgfYqImdSA/XCUNH35lYEgmuFPMboc2Ikai6OGxt0rhSTlDiVBFexuCV
+	 2f9IoQJdO9DF8S/ojMND0Wah2Ng5XrC92HLlvEOU0AKnOqCZ8aWTr118RZcvIc7GtO
+	 o2u43YZ/3AMV2f2XcWnWXmGy7VkB/XsaDHloo+LA1K3IsPanI+4/TQnU/sO5D7OAVU
+	 FqMonfQVMYFk5fA4E7kuS2mxQNEV+hssrH+TMzg3529szQuGsAYfBF8M87DNyARCpU
+	 pyKcPSbzMS7RAQIB3qUghiuLSnVEwqTPJ16Cn1rWdc1xZsyNsc96HFUfttiaDGzgUU
+	 Db9yDVfczVgUQ==
+Date: Mon, 17 Jun 2024 09:36:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maciej =?UTF-8?B?xbtlbmN6eWtvd3NraQ==?= <zenczykowski@gmail.com>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, "David
+ S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net v2] neighbour: add RTNL_FLAG_DUMP_SPLIT_NLM_DONE to
+ RTM_GETNEIGH
+Message-ID: <20240617093620.12a9b539@kernel.org>
+In-Reply-To: <CANP3RGeENFk0RFD2m1kBuOJxdAhKEjR=9caokkKah35py5kXbg@mail.gmail.com>
+References: <20240615113224.4141608-1-maze@google.com>
+	<CANP3RGeENFk0RFD2m1kBuOJxdAhKEjR=9caokkKah35py5kXbg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Zmru7hhz8kPDPsyz@pc636> <7efde25f-6af5-4a67-abea-b26732a8aca1@paulmck-laptop>
- <Zmsuswo8OPIhY5KJ@pc636> <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
- <ZmszOd5idhf2Cb-v@pc636> <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
- <Zmw5FTX752g0vtlD@pc638.lan> <ZmybGZDbXkw7JTjc@zx2c4.com> <ZnA_QFvuyABnD3ZA@pc636>
- <ZnBOkZClsvAUa_5X@zx2c4.com> <ZnBkvYdbAWILs7qx@pc636>
-In-Reply-To: <ZnBkvYdbAWILs7qx@pc636>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Mon, 17 Jun 2024 18:33:23 +0200
-X-Gmail-Original-Message-ID: <CAHmME9r4q8erE3E-Xn61ZkSOdDDrgx6jhTAywx3ca4=G0z=wAA@mail.gmail.com>
-Message-ID: <CAHmME9r4q8erE3E-Xn61ZkSOdDDrgx6jhTAywx3ca4=G0z=wAA@mail.gmail.com>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: "Paul E. McKenney" <paulmck@kernel.org>, Vlastimil Babka <vbabka@suse.cz>, Jakub Kicinski <kuba@kernel.org>, 
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org, 
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev, 
-	linux-trace-kernel@vger.kernel.org, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, kvm@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org, 
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org, 
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>, 
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
-	linux-nfs@vger.kernel.org, linux-can@vger.kernel.org, 
-	Lai Jiangshan <jiangshanlai@gmail.com>, netfilter-devel@vger.kernel.org, 
-	coreteam@netfilter.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 17, 2024 at 6:30=E2=80=AFPM Uladzislau Rezki <urezki@gmail.com>=
- wrote:
-> Here if an "err" is less then "0" means there are still objects
-> whereas "is_destroyed" is set to "true" which is not correlated
-> with a comment:
->
-> "Destruction happens when no objects"
+On Sun, 16 Jun 2024 10:09:07 +0200 Maciej =C5=BBenczykowski wrote:
+> For the other patch, I've tracked down:
+>   32affa5578f0 ("fib: rules: no longer hold RTNL in fib_nl_dumprule()")
+> which causes half the regression.
+>=20
+> But... I haven't figured out what causes the final half (or third
+> depending on how you look at it).
 
-The comment is just poorly written. But the logic of the code is right.
+To be completely honest I also have a fix queued for the other case,
+since it was reported already a month ago. But I "forgot" to send it.
+I had these tags on it:
 
->
-> >  out_unlock:
-> >       mutex_unlock(&slab_mutex);
-> >       cpus_read_unlock();
-> > diff --git a/mm/slub.c b/mm/slub.c
-> > index 1373ac365a46..7db8fe90a323 100644
-> > --- a/mm/slub.c
-> > +++ b/mm/slub.c
-> > @@ -4510,6 +4510,8 @@ void kmem_cache_free(struct kmem_cache *s, void *=
-x)
-> >               return;
-> >       trace_kmem_cache_free(_RET_IP_, x, s);
-> >       slab_free(s, virt_to_slab(x), x, _RET_IP_);
-> > +     if (s->is_destroyed)
-> > +             kmem_cache_destroy(s);
-> >  }
-> >  EXPORT_SYMBOL(kmem_cache_free);
-> >
-> > @@ -5342,9 +5344,6 @@ static void free_partial(struct kmem_cache *s, st=
-ruct kmem_cache_node *n)
-> >               if (!slab->inuse) {
-> >                       remove_partial(n, slab);
-> >                       list_add(&slab->slab_list, &discard);
-> > -             } else {
-> > -                     list_slab_objects(s, slab,
-> > -                       "Objects remaining in %s on __kmem_cache_shutdo=
-wn()");
-> >               }
-> >       }
-> >       spin_unlock_irq(&n->list_lock);
-> >
-> Anyway it looks like it was not welcome to do it in the kmem_cache_free()
-> function due to performance reason.
+    Reported-by: Stefano Brivio <sbrivio@redhat.com>
+    Link: https://lore.kernel.org/all/20240315124808.033ff58d@elisabeth
+    Reported-by: Ilya Maximets <i.maximets@ovn.org>
+    Link: https://lore.kernel.org/all/02b50aae-f0e9-47a4-8365-a977a85975d3@=
+ovn.org
+    Fixes: 4ce5dc9316de ("inet: switch inet_dump_fib() to RCU protection")
+    Fixes: 5fc68320c1fb ("ipv6: remove RTNL protection from inet6_dump_fib(=
+)")
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-"was not welcome" - Vlastimil mentioned *potential* performance
-concerns before I posted this. I suspect he might have a different
-view now, maybe?
+LMK if you want to resend yours or I should send mine, because Ilya
+pinged the old thread this morning..
 
-Vlastimil, this is just checking a boolean (which could be
-unlikely()'d), which should have pretty minimal overhead. Is that
-alright with you?
+> I've also spent quite a while trying to figure out what exactly is
+> going wrong in the python netlink parsing code.
+> The code leaves a *lot* to be desired...
+>=20
+> Turns out it doesn't honour the nlmsghdr.length field of NLMSG_DONE
+> messages, so it only reads the header (16 bytes) instead of the kernel
+> generated 20=3D16+4 NULL bytes.  I'm not sure why those extra 4 bytes
+> are there, but they are... (anyone know?)
 
-Jason
+They are the error code. Just like in a netlink ack. And similarly
+extack attrs may follow. Main difference with ack off the top of my
+head is that DONE never echos the request.
+
+> This results in a leftover 4 bytes, which then fail to parse as
+> another nlmsghdr (because it also effectively ignores that it's a DONE
+> and continues parsing).
+> Which explains the failure:
+>   TypeError: NLMsgHdr requires a bytes object of length 16, got 4
+>=20
+> Fixing the parsing, results in things hanging, because we ignore the DONE.
+>=20
+> Fixing that... causes more issues (or I'm still confused about how the
+> rest works, it's hard to follow, complicated by python's lack of types
+> and some apparently dead code).
+>=20
+> Ultimately I think the right answer is to simply fix the horribly
+> broken netlink parser, which only ever worked by (more-or-less)
+> chance.  We have plenty of time (months) to fix it in time for the
+> next release of Android after 15/V, which will be the first one to
+> support a kernel newer than 6.6 LTS anyway.
+>=20
+> Furthermore, the python netlink parser is only used in the test
+> framework, while the non-test code itself uses C++& java netlink
+> parsers (that I have not yet looked at) but is likely to either work
+> or contain entirely different classes of bugs ;-)
+
+We do have: tools/net/ynl/lib/ynl.py in the tree, FWIW.=20
+It's BSD-licensed, feel free to lift it / some of it.
+It's designed for the netlink YAML specs but the basics like=20
+message / attr parsing should work.
 
