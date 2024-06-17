@@ -1,90 +1,82 @@
-Return-Path: <netdev+bounces-104084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1136590B1B7
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:24:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9922090B1C5
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:25:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 229431C23593
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 14:24:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACBD31C20404
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 14:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F59919AA43;
-	Mon, 17 Jun 2024 13:35:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A55F1AB8E0;
+	Mon, 17 Jun 2024 13:36:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="jAOTmJrF"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="RSuya5hQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D039F19AA40
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 13:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2CC1AB526
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 13:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718631304; cv=none; b=JGQK5vSs/VIZDZ5Q/RNgSbFOiLT5m7wHX4eac2dBvCHCg870nwikZDC0iDi8W+RnMm6EvcJm3zP+ZKWIRd8GF8/6ARrd5C8BIZj6U287PYg3Yxcb3sFppfBVEROyp/94oWHzSOPtLgW3UABzuGHyxPaZT/bOauSq0LEXrQsh8L4=
+	t=1718631388; cv=none; b=VXVCI69/rWWdkWvLrBqx2r4Yw2kgdcW0M2ZT/4O8w/+9HT8ZyFUb+OjD3Cp4tKalPEkPl9957KXr3uRAU+74cdG67F7airZKUNYQ+wV/OTkMcSdZB4OumJKAsjkxuB8m5b3Ym/c9ElR29hOI/7JbGVGY+z2J9hIhL1utFpcz93o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718631304; c=relaxed/simple;
-	bh=6OKT3WqegH1QtD1wyuXce6fGlAETjVHusGyC+Pzsr8k=;
+	s=arc-20240116; t=1718631388; c=relaxed/simple;
+	bh=fkadhAyonb7RymKr0Hwj9qGiWcoaWFoudlddldfbojY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TPfAGkj6KqvXvGOi2BJnabRaQERm3/lLqP/8r++NorK/zb4saljhSRTN4oOaa8vW3uJJWUvVeUe2KsDw8ZfFIFZfR81/BJABmWGdjx5TaaSj5KtwRAWnYtMBiTOvJco8k9cUpQ9WV0xg+3dObcmjgo2KO101mRLxdE/eXmX7vxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=jAOTmJrF; arc=none smtp.client-ip=209.85.128.65
+	 Content-Type:Content-Disposition:In-Reply-To; b=OlexTxEqe5ZWsB9Co8efKjhLDjEW5pZJbEJ/y5MVKo5F60nOVflYoygVrHKdoRCOZWmcle4g9cAmrUieJK4GwhQyFemEzBgN6uQ0T/y38fsRhUpj7uL1lFbRequq+yq7ecUKoPNRvvPaQ3GC8JAjg0CVoqyP0stupfxGl83w7fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=RSuya5hQ; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-421f4d1c057so33817255e9.3
-        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 06:35:01 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4217136a74dso36220805e9.2
+        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 06:36:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718631300; x=1719236100; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718631385; x=1719236185; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cXOhkuogz//QmdU93D8xI7eVOtiFpWIJJnt6ZBb+35s=;
-        b=jAOTmJrFP08T1REb5f+CfKg6NEONPfnKQUOuCbm9XT4CHMC+ViyQxiaoy4XnfX/H9q
-         NRP4huNInhEg2r2md9EKBXl1MZbeXiVk0vWKPE77izNvhb0QhDoRZLQwVjgsk9CSBgWv
-         dHzU1+gXqstwDBmpvSxh/u3tMl3y5ZzjmtggRQ9dcTqFM8PH5NrTIRRFmuuH6iw0OuA8
-         4kzSji64iC0mU2K92+eUG3GJk+KrP2svP0ojZfeHEKlUkAHpAnKozI2Zvzc/osyf1bpR
-         QiBZPKXqj7ow/tgkcwcyo7ir/E0Peuv5NCiYKNGWh9sLatYc33TKAk65JOa6rCkqlC21
-         dryg==
+        bh=Y+FTQb5W5/GJ/Nb4LvauMZmPKUHXtT9dcXAWj/SvSDY=;
+        b=RSuya5hQGrSTTwFtuBl6/rYKn0k7rEetc7C6wa05py67lGIzR/fbqmVDhimOcIRaBG
+         7RwakKGjGsMaKVOboJFC1+LESpkzRkTnjQwfH378O35qHiWOTFjjAOKkNUFyIFD51xuq
+         PvKe5njleoOP0wDETKSDt+r+pkI3CowbJKFegbDGnnyu16ZcPs4UUvMLcdQCj/x3u1S3
+         koGIWbpIAQd8CT0x2B7O470E4HLeXjA7XaQ97LZaW7rxx2WIEerzzYf8iSMqFO+c0mkJ
+         1wdWiaJTV1Yj/gG26UtsjDtglxY0mWaAw95ta7iRSb5y1xj9/dNB+61jVBGJmhgDlTP5
+         0P2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718631300; x=1719236100;
+        d=1e100.net; s=20230601; t=1718631385; x=1719236185;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cXOhkuogz//QmdU93D8xI7eVOtiFpWIJJnt6ZBb+35s=;
-        b=qzewezr2ANw/A+namxDUYvA7asx7SDFgJULiHZddfz67UK/qN2NcsTsuBz/W37wG1F
-         lwv0G1C/EDaibnJV4/lEmhfTzhPvHpPOK2c74hAp36+ZBFzHycN7G8IM7Kjg1AySFxeP
-         axSeooRxudM8fApu3Oy86682l/XApNNHQ1RT1MHHsh9Md+Uf14iTDlqikM81baOTKVUK
-         JCkbwj4qYTeQdQ2jredzDtjQYbBd8CnUAR5TiETlLGtf0HTxiZSRKyCaLDBgbR0xbjf9
-         fuKsFTm7DF0hREm56PKX6o286edvpBO8twt1mu/ARh36v5gr+TT943GKrpwOuTCbtLID
-         VrfQ==
-X-Gm-Message-State: AOJu0YxQEU9/NM6BD5UvJicjS18IFeIbKyRIsoxkLxOy2WZYmrZVoo5B
-	lCjq7uYIe8CcFveaw/7yz5DM1euOGzb3XfcEJK50pDB7z0g4CYetTX3uJp3+GdM=
-X-Google-Smtp-Source: AGHT+IG6C1PBpqaaWvWNAxk7Rv1Qc1N+l7EJFwfh6/c3prESpScO1tKh4vNfH7nfLGf3e2rMTio8eQ==
-X-Received: by 2002:a05:600c:4448:b0:421:819c:5d6b with SMTP id 5b1f17b1804b1-423048262c3mr72180135e9.23.1718631299909;
-        Mon, 17 Jun 2024 06:34:59 -0700 (PDT)
+        bh=Y+FTQb5W5/GJ/Nb4LvauMZmPKUHXtT9dcXAWj/SvSDY=;
+        b=XekirrW2OJXA2+JQMvGK4qbhjGNr9lw5UUC8x/EzyuGJjLxAWtMH/h1aM3zDJurc9B
+         xMt/2DfNY+QCr9+xnONcMTsmf2Q7ymhFdn/DPZ3ncktwD/1/uDgHFjBbmnk6aF9fB8gK
+         AhyJ+ah24HFShJfO87X6vnNPLnQ5pePupHYdtPgdhKZN1/LrHeMROd+aILr0UZJsigDU
+         VCQfEX23HgoaDhG7OSEHxT67lhoQnZ92Rge0uRzU6eMz/kIktjnUB+pz0a1XQLamb2hY
+         AJp5XOloKMWbJQFYBzImrfrwCrjedVDT7/iI3THg1kCBC6pVzjIn7FutGq0sO4D/B8Xz
+         ycdw==
+X-Forwarded-Encrypted: i=1; AJvYcCU5/1URaHKjp2rbhzGoLxEIUoTQwVQrka2mobadeVBE+Z9rkzf0cszfZfEFlOd2aURJ6wDFIjXtpr8OV8uW+PmO/xw1Xe4i
+X-Gm-Message-State: AOJu0Yw5PSbFPv5xy6thOz5F5ocdHrNmTxEr+YlgdBeUzjEMO8Q8QBZx
+	aMrcx1xPIUkeIhKjzrmz6XEZ7THM5i7utvFvyBr0iYiyeLQYx+j/eymW9Q4ftTM=
+X-Google-Smtp-Source: AGHT+IHgsgd/TPVM+18WkZs2+AeqnSk2SRZRbmmdW0ObBeSJuDLzDBQ2FjqSWprz5A6LjcnamvKJ7w==
+X-Received: by 2002:a05:6000:bcc:b0:360:7a01:6afd with SMTP id ffacd0b85a97d-3607a74e760mr6960206f8f.10.1718631385486;
+        Mon, 17 Jun 2024 06:36:25 -0700 (PDT)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422f602f620sm158614925e9.19.2024.06.17.06.34.58
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36074e0e5adsm12011860f8f.0.2024.06.17.06.36.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 06:34:59 -0700 (PDT)
-Date: Mon, 17 Jun 2024 15:34:55 +0200
+        Mon, 17 Jun 2024 06:36:25 -0700 (PDT)
+Date: Mon, 17 Jun 2024 15:36:20 +0200
 From: Jiri Pirko <jiri@resnulli.us>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	Thomas Huth <thuth@linux.vnet.ibm.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>
-Subject: Re: [PATCH 1/2] virtio_net: checksum offloading handling fix
-Message-ID: <ZnA7f5wW0VXQGPQw@nanopsycho.orion>
-References: <20240617131524.63662-1-hengqi@linux.alibaba.com>
- <20240617131524.63662-2-hengqi@linux.alibaba.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Yangbo Lu <yangbo.lu@nxp.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH v2 net] ptp: fix integer overflow in max_vclocks_store
+Message-ID: <ZnA71MTiaESQTUMp@nanopsycho.orion>
+References: <ee8110ed-6619-4bd7-9024-28c1f2ac24f4@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,30 +85,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240617131524.63662-2-hengqi@linux.alibaba.com>
+In-Reply-To: <ee8110ed-6619-4bd7-9024-28c1f2ac24f4@moroto.mountain>
 
-Mon, Jun 17, 2024 at 03:15:23PM CEST, hengqi@linux.alibaba.com wrote:
->In virtio spec 0.95, VIRTIO_NET_F_GUEST_CSUM was designed to handle
->partially checksummed packets, and the validation of fully checksummed
->packets by the device is independent of VIRTIO_NET_F_GUEST_CSUM
->negotiation. However, the specification erroneously stated:
+Mon, Jun 17, 2024 at 11:34:32AM CEST, dan.carpenter@linaro.org wrote:
+>On 32bit systems, the "4 * max" multiply can overflow.  Use kcalloc()
+>to do the allocation to prevent this.
 >
->  "If VIRTIO_NET_F_GUEST_CSUM is not negotiated, the device MUST set flags
->   to zero and SHOULD supply a fully checksummed packet to the driver."
->
->This statement is inaccurate because even without VIRTIO_NET_F_GUEST_CSUM
->negotiation, the device can still set the VIRTIO_NET_HDR_F_DATA_VALID flag.
->Essentially, the device can facilitate the validation of these packets'
->checksums - a process known as RX checksum offloading - removing the need
->for the driver to do so.
->
->This scenario is currently not implemented in the driver and requires
->correction. The necessary specification correction[1] has been made and
->approved in the virtio TC vote.
->[1] https://lists.oasis-open.org/archives/virtio-comment/202401/msg00011.html
->
->Fixes: 4f49129be6fa ("virtio-net: Set RXCSUM feature if GUEST_CSUM is available")
->Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+>Fixes: 44c494c8e30e ("ptp: track available ptp vclocks information")
+>Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
