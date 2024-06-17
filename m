@@ -1,124 +1,88 @@
-Return-Path: <netdev+bounces-104184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4731690B735
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 18:58:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB76990B73D
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 18:58:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D638228223A
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:58:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68C1D28125A
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:58:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9822B166308;
-	Mon, 17 Jun 2024 16:58:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64EBE166306;
+	Mon, 17 Jun 2024 16:58:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="flFAYgY/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="djttx0PR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C330161B6A;
-	Mon, 17 Jun 2024 16:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D8B8161B6A;
+	Mon, 17 Jun 2024 16:58:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718643485; cv=none; b=hkHWr3MwHi93pOVnrF1QmzK6Jko0mQYZrqCjIvz0U7sRZUHBOij0bftdrsMssHSdPdUh3iZ1wxs0SMm2KDMt/DVDYYnD3OWkQT+aqZQOFV3CLqvhO3LnBPaaGvwfVD619aubpRSE450sfj7vCbh1CbUruimop/cNJ6es0aK4HAs=
+	t=1718643534; cv=none; b=BPrPES3pSQC2ttlG3ACSdPiNwoADt+QsE5APeW8Tyc7LhlGie0vKIO06M3tAH17rU82jOogAVKcfIbOzFFSvQb+zimtbGenquSgj04hmt2Kcl7uYoPWqW8hhNxtg63/hzkM/Oa+tQRgJukNs0yzWV8k7njpkumjB082rBl/7COE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718643485; c=relaxed/simple;
-	bh=fUjYaRe8sqwn+3/vFWBWn9gD6kaYbkbJlyulqCM3tGo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bXn9PnxUjhkzN/Wr8Ylg+WIQl6qfVhFJvfZWb2aRZb+ihxsm0dgakyuaXKayRDo0D/7scBWcZDh/eCRlj3XAPw+LapWtEsSmWstE3Z+TXC8EmRKp8zucjZmFArUdeCXjpktauE4fAxmsPrR2g4e+3HEP3QLvtFLK4hzxUIGXguA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=flFAYgY/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EB0CC2BD10;
-	Mon, 17 Jun 2024 16:58:02 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="flFAYgY/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1718643480;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3Er+nOtS55CJu3Syh5+61jyHDlq8/Vrsh+iYYZbfn+o=;
-	b=flFAYgY/nnqqK8ubdy9niyG0NubdT4klfUfroBy/DNbbO5DVT8vPRu3BffTtJ7pQodZOaN
-	Y3wGFg0sxRrxjV2DzwGTt5JcGvNy16RrLu7AO/l+9eaew+eczEo86Y/W+NUwvsFaEBJxH+
-	IIdE/u1uTCF4+OVrHDCFLUq2WCu7sHI=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 4270396f (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Mon, 17 Jun 2024 16:57:57 +0000 (UTC)
-Date: Mon, 17 Jun 2024 18:57:45 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: "Paul E. McKenney" <paulmck@kernel.org>,
-	Vlastimil Babka <vbabka@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <ZnBrCQy13jZV_hyZ@zx2c4.com>
-References: <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
- <ZmszOd5idhf2Cb-v@pc636>
- <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
- <Zmw5FTX752g0vtlD@pc638.lan>
- <ZmybGZDbXkw7JTjc@zx2c4.com>
- <ZnA_QFvuyABnD3ZA@pc636>
- <ZnBOkZClsvAUa_5X@zx2c4.com>
- <ZnBkvYdbAWILs7qx@pc636>
- <CAHmME9r4q8erE3E-Xn61ZkSOdDDrgx6jhTAywx3ca4=G0z=wAA@mail.gmail.com>
- <ZnBnb1WkJFXs5L6z@pc636>
+	s=arc-20240116; t=1718643534; c=relaxed/simple;
+	bh=dpdVP1VDv8kFRM0EqSc1BHPLy5nCZCtoPOXrRCz7Db0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cHccduKR86KFf5JRyPgLlFVdoklFYi1hiyVHxOau0tBVokhGMhdOr1yWOgWT5NUqteQrmS/pz/rYjR11k8u6IHy3s+wh3tEEAm31UoERPzPweaizGXoeLEDvBQ3PWRj92/2cK0dOGARSEQeditWJQhegPcBPK1iM0xP5pMwk8Y0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=djttx0PR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C86AC2BD10;
+	Mon, 17 Jun 2024 16:58:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718643533;
+	bh=dpdVP1VDv8kFRM0EqSc1BHPLy5nCZCtoPOXrRCz7Db0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=djttx0PRC8yBOwLGknH4Jf64hsQKYt3iWpc7lnf+cmYDTi9QR6bAljomlKRIgyLoU
+	 AVBhGb2HRR8nIwb6/l+sF6FV6PKgoeMdDsIeoCQ2pmXDcly4BTms6rnbz87Oac1DVg
+	 H+YHXP4DwesJ68s9HWUXqOzqDVXUmcL0KUB2pix2crXdJ8e9kSTEOSzYccBqYAGsMA
+	 9x4mhBVQZjzwB2yyFMOt9YxzvSL2pG2nrGDcxNqw5heNfpurw21TNz33UG3uXuwFB6
+	 A9DP54TEYSATYnPNuX7sU7F6dGG6shdNhbfef+Nn3TZOe2GatA0Ohf5EF0lRl8nesZ
+	 Olik7aORC1MLg==
+Date: Mon, 17 Jun 2024 09:58:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Matthew Wilcox <willy@infradead.org>, kernel test robot
+ <oliver.sang@intel.com>, oe-lkp@lists.linux.dev, lkp@intel.com,
+ netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, David Howells
+ <dhowells@redhat.com>
+Subject: Re: [PATCH] net: micro-optimize skb_datagram_iter
+Message-ID: <20240617095852.66c96be9@kernel.org>
+In-Reply-To: <033294ee-e6e6-4dca-b60c-019cb72a6857@grimberg.me>
+References: <202406161539.b5ff7b20-oliver.sang@intel.com>
+	<4937ffd4-f30a-4bdb-9166-6aebb19ca950@grimberg.me>
+	<Zm9fju2J6vBvl-E0@casper.infradead.org>
+	<033294ee-e6e6-4dca-b60c-019cb72a6857@grimberg.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZnBnb1WkJFXs5L6z@pc636>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 17, 2024 at 06:42:23PM +0200, Uladzislau Rezki wrote:
-> On Mon, Jun 17, 2024 at 06:33:23PM +0200, Jason A. Donenfeld wrote:
-> > On Mon, Jun 17, 2024 at 6:30 PM Uladzislau Rezki <urezki@gmail.com> wrote:
-> > > Here if an "err" is less then "0" means there are still objects
-> > > whereas "is_destroyed" is set to "true" which is not correlated
-> > > with a comment:
-> > >
-> > > "Destruction happens when no objects"
-> > 
-> > The comment is just poorly written. But the logic of the code is right.
-> > 
-> OK.
-> 
-> > >
-> > > >  out_unlock:
-> > > >       mutex_unlock(&slab_mutex);
-> > > >       cpus_read_unlock();
-> > > > diff --git a/mm/slub.c b/mm/slub.c
-> > > > index 1373ac365a46..7db8fe90a323 100644
-> > > > --- a/mm/slub.c
-> > > > +++ b/mm/slub.c
-> > > > @@ -4510,6 +4510,8 @@ void kmem_cache_free(struct kmem_cache *s, void *x)
-> > > >               return;
-> > > >       trace_kmem_cache_free(_RET_IP_, x, s);
-> > > >       slab_free(s, virt_to_slab(x), x, _RET_IP_);
-> > > > +     if (s->is_destroyed)
-> > > > +             kmem_cache_destroy(s);
+On Mon, 17 Jun 2024 09:29:53 +0300 Sagi Grimberg wrote:
+> > Probably because kmap() returns page_address() for non-highmem pages
+> > while kmap_local_page() actually returns a kmap address:
 > >
-> Here i am not follow you. How do you see that a cache has been fully
-> freed? Or is it just super draft code?
+> >          if (!IS_ENABLED(CONFIG_DEBUG_KMAP_LOCAL_FORCE_MAP) && !PageHighMem(page))
+> >                  return page_address(page);
+> >          return __kmap_local_pfn_prot(page_to_pfn(page), prot);
+> >
+> > so if skb frags are always lowmem (are they?) this is a false positive.  
+> 
+> AFAIR these buffers are coming from the RX ring, so they should be 
+> coming from a page_frag_cache,
+> so I want to say always low memory?
+> 
+> > if they can be highmem, then you've uncovered a bug that nobody's
+> > noticed because nobody's testing on 32-bit any more.  
+> 
+> Not sure, Jakub? Eric?
 
-kmem_cache_destroy() does this in shutdown_cache().
+My uneducated guess would be that until recent(ish) sendpage rework
+from David Howells all high mem pages would have been single pages.
 
