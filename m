@@ -1,101 +1,91 @@
-Return-Path: <netdev+bounces-104142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 660FC90B4EE
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:45:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD0BC90B58B
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:59:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15BBC289284
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:45:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 090A3B2A683
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:46:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694DC157E6C;
-	Mon, 17 Jun 2024 15:17:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA9AB158D7B;
+	Mon, 17 Jun 2024 15:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tOkmJLck"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b0Egcz5w"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39EE028F3;
-	Mon, 17 Jun 2024 15:17:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E511158D77;
+	Mon, 17 Jun 2024 15:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718637439; cv=none; b=ZMSUxmoMc4jQQOwFTeSSIbZDhNbHiLIPqoN0GUkkqTXcPMF2fqsuklYNJPmYj5ps9nKB5h1FCm1OXmENyiSVf9KjdAdTyX1iJwgjVfJAIVLmr0ED9mHkAtmb0LJrek61xwVEB+r6zP+aGHhRyMmLI5U/1mHI8VKJOcynYtDquTc=
+	t=1718637604; cv=none; b=cYOIqCmaSwn21GEghdL7yigR8DSpHUb5Ss5QoijOKtK+r+G+5I2UNkD1g51mooJoO5/NXBnwB3XZ1OHor58ztN/Qt0PeygAKNKHwOhqZY4ejbtb+9GedwLEjMqlkgkyZCZCsgczgr8/j+n9UiMG2Kw8WYNg5YHrlKsHTc8rHi4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718637439; c=relaxed/simple;
-	bh=j/ICI7Yq4Ovs9RcOtASdlDvF1NTyk5EhUxXvqJdSzZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SiXMFYTkad33mnCz8sks65Q2kghQD0L0G4jhWaE+pBRiKKBTA3B1WpnsSoF0ydejXk9Fgy4iHhOEU7lQvyZCYEkpwisqzogFYZ9+zj4xvigUTnJGBTcPNCH8TS7uQvBUbNdB4bXEpPpu+bVGDp/kXgcxWoZV4DDTYz6OuBQbYOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tOkmJLck; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98028C2BD10;
-	Mon, 17 Jun 2024 15:17:15 +0000 (UTC)
+	s=arc-20240116; t=1718637604; c=relaxed/simple;
+	bh=9jJLrF/6NbGsgQCvXVBt2x6elX8/EKdyI2Lp4Ov7Puo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gIn9lrgCJpMyiE30euXhcY/7fTawsqaWmFC/0qzYdlhaO95ZpiDfpNnWIanj1tDOCyxzP0Z9gtyQRvoN3e2G6BzhMnSY/xZTV4KjH4S5FKF4Och9/7yD+CjfWcg9qLCRUBMHxTX4QGfLELmCKUVTkSclRpwexlfkjP5JMhcoCgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b0Egcz5w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C34F1C2BD10;
+	Mon, 17 Jun 2024 15:20:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718637438;
-	bh=j/ICI7Yq4Ovs9RcOtASdlDvF1NTyk5EhUxXvqJdSzZA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tOkmJLckwpXrWq5QiVdZI4ydJyka2LiM7oXyMcqK/TOUBwUS3jKkTvpRQ6OBFtvAr
-	 ZrStizh31wlf2osxmhWWTY2qKM2zaQQr4B1fRbS2vCwzeb0mSmxYSxfAvVFmsfC46L
-	 MrUJL6dkcy3Ml7ii7swuEm0iT0D3i0yXtB+P7vJ7SmlI0MswoWEQoAgpNEGB/cTLdH
-	 wMVF0DYkts3dZYGbVeKe/JNdG5VaIcB+2eufYn3d2hi1e7qcAyxO6xjXg3ACj3zdeS
-	 4VfS+Bpeb17nnw6yVDNe9AtNUgXiWDSXc2yXhI0LBSrUL2lU/qfPGhKi6JdR3gBghc
-	 KIRjNyupivc9A==
-Date: Mon, 17 Jun 2024 16:17:13 +0100
-From: Simon Horman <horms@kernel.org>
-To: Kamil =?utf-8?B?SG9yw6Fr?= - 2N <kamilh@axis.com>
-Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
-	andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 4/4] net: phy: bcm-phy-lib: Implement BroadR-Reach
- link modes
-Message-ID: <20240617151713.GW8447@kernel.org>
-References: <20240617113841.3694934-1-kamilh@axis.com>
- <20240617113841.3694934-5-kamilh@axis.com>
+	s=k20201202; t=1718637604;
+	bh=9jJLrF/6NbGsgQCvXVBt2x6elX8/EKdyI2Lp4Ov7Puo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=b0Egcz5wY6JJJbRJH2mJFg5nSWE0RQ5nxe5jOaXHpK9HpjJ270esJtCpRCwruMWTW
+	 x/4mrJFaVgVt40jkUhq1qLNGp6O8JxSI9UGq0OrBHx1rRZTG6wxvjPOn/ppwm+X3gK
+	 KfvHbXLD6U1YdS6Pyv+YwJRI4b9D3g09o9ptfDy3eGr3QZ09ipRA8XBbb3+LasYFhz
+	 hawzEYBp85tfKfU+/HYlzhr6LRN0JA7plSXGNpLbX/lsuAiB5QoQ6lQqnzqtPxXT7D
+	 2AVgXredJjvRuuaV+5J+6qF05XljQaer6vA0zYiKH5VTXS7OIyLVZ+H8lPlIm/ZBi0
+	 uIlvM5Ke9jjyQ==
+Date: Mon, 17 Jun 2024 08:20:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, Parav Pandit <parav@nvidia.com>, Jason
+ Wang <jasowang@redhat.com>, Cindy Lu <lulu@redhat.com>, Dragos Tatulea
+ <dtatulea@nvidia.com>, "virtualization@lists.linux-foundation.org"
+ <virtualization@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
+Message-ID: <20240617082002.3daaf9d4@kernel.org>
+In-Reply-To: <20240617094314-mutt-send-email-mst@kernel.org>
+References: <20240611053239.516996-1-lulu@redhat.com>
+	<20240611185810.14b63d7d@kernel.org>
+	<ZmlAYcRHMqCgYBJD@nanopsycho.orion>
+	<CACGkMEtKFZwPpzjNBv2j6Y5L=jYTrW4B8FnSLRMWb_AtqqSSDQ@mail.gmail.com>
+	<PH0PR12MB5481BAABF5C43F9500D2852CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
+	<ZnAETXPWG2BvyqSc@nanopsycho.orion>
+	<PH0PR12MB5481F6F62D8E47FB6DFAD206DCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
+	<ZnAgefA1ge11bbFp@nanopsycho.orion>
+	<PH0PR12MB548116966222E720D831AA4CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
+	<ZnAz8xchRroVOyCY@nanopsycho.orion>
+	<20240617094314-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240617113841.3694934-5-kamilh@axis.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 17, 2024 at 01:38:41PM +0200, Kamil Horák - 2N wrote:
-> Implement single-pair BroadR-Reach modes on bcm5481x PHY by Broadcom.
-> Create set of functions alternative to IEEE 802.3 to handle configuration
-> of these modes on compatible Broadcom PHYs.
+On Mon, 17 Jun 2024 09:47:21 -0400 Michael S. Tsirkin wrote:
+> I don't know what this discussion is about, at this point.
+> For better or worse, vdpa gained interfaces for provisioning
+> new devices. Yes the solution space was wide but it's been there
+> for years so kind of too late to try and make people
+> move to another interface for that.
 > 
-> Signed-off-by: Kamil Horák - 2N <kamilh@axis.com>
+> Having said that, vdpa interfaces are all built around
+> virtio spec. Let's try to stick to that.
 
-...
-
-> +/**
-> + * lre_update_link - update link status in @phydev
-> + * @phydev: target phy_device struct
-> + *
-> + * Description: Update the value in phydev->link to reflect the
-> + *   current link value.  In order to do this, we need to read
-> + *   the status register twice, keeping the second value.
-> + *   This is a genphy_update_link modified to work on LRE registers
-> + *   of BroadR-Reach PHY
-> + */
-
-Hi Kamil,
-
-A minor nit from my side:
-
-Please consider adding a "Returns:" section to this kernel doc.
-Doing so as a follow-up would be fine IMHO.
-
-Flagged by kernel-doc -none -Wall
-
-> +static int lre_update_link(struct phy_device *phydev)
-
-...
+But the virtio spec doesn't allow setting the MAC...
+I'm probably just lost in the conversation but there's hypervisor side
+and there is user/VM side, each of them already has an interface to set
+the MAC. The MAC doesn't matter, but I want to make sure my mental model
+matches reality in case we start duplicating too much..
 
