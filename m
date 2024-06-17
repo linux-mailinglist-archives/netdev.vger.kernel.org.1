@@ -1,290 +1,195 @@
-Return-Path: <netdev+bounces-103931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5BCC90A644
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:00:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 673EE90A66A
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:05:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94D65B25E87
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 07:00:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBBB01F2479C
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 07:05:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7D518735A;
-	Mon, 17 Jun 2024 07:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0739718FC73;
+	Mon, 17 Jun 2024 07:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CmaNH9hZ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="CriPB39C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2064.outbound.protection.outlook.com [40.107.93.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067BD13B28A;
-	Mon, 17 Jun 2024 07:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718607604; cv=none; b=KAm9eH9dzt2MegscAABVLpQuvvCw4WZgqZHRdOLb79+Rx+vA/iq58D6mJkp09je7eTwidLTelsJjoqEirZqa5K7Y5K3WPKaat3quHyNB/q3WSc+Jzx1UVBeAnpTBVepLLe42slYX3fnzVkxZxO++AmMyYxYEeD2SbojQXJHKBEM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718607604; c=relaxed/simple;
-	bh=/hbaAgyGIPPhVG4P0OCPoMtvi95I8xCPbHS9u7/7aeQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yrj1krC9ufh94QPVyPzXlR8ErhHEvgWfLm9inshmmFV15yp2R6sTbjwOyIWDch4vy8vOuzKUCC9JSbE4r60ynryNgdbd8GH+IY7CBKjgY2Tao6ByZw6dQR+JhJ1xXso/aEsI4w06Tsmr4KFRQA7mVMV4+EPetDvvTq5LJPpEHxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CmaNH9hZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AE53C2BD10;
-	Mon, 17 Jun 2024 06:59:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718607603;
-	bh=/hbaAgyGIPPhVG4P0OCPoMtvi95I8xCPbHS9u7/7aeQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CmaNH9hZhKG/+3f3KwCFC104mRHj15+nwXX5vTPeeUU0o6VcftZ9Uarc1FVkYyHRH
-	 FtklDNE1f2EjQu8odsTakFzuUCu+23LRwAdR/BpggkMa0jJ1or1STdRpMAhdD5nfPp
-	 euLIU7bUHubUzSXcNehJS5SHLM42cdCvV4O27SKMBnMuoLujjXnQMIpD6DUvNAu0iN
-	 jHMN3Kp0nTDdUxHGgd8OKq8HXnjg9CG3hA7ZHwrzx88/Mj7Odl2dQtP0CPM8DvlKzo
-	 Npc55b5YI+7pQfuhLhib0oCKivNSRjXwEDjuUX1RwG7Iu/v+2VYYlO6uCV4tojTLHs
-	 rZUOguS8pEfNw==
-Message-ID: <28a6ff46-ad12-45c6-9ccb-f99fd08f3265@kernel.org>
-Date: Mon, 17 Jun 2024 08:59:56 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7404E188CB2;
+	Mon, 17 Jun 2024 07:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718607867; cv=fail; b=RosUuFjRBUrV6IjnMVbt+WoczKcNfBxERFtK02N4BWg5/tRk4YT8U1kFUYt5J86Bn6LEUzszLlqbi72UbX+sF0uO3VpubI7je6ULeleEBYJjaEDUbEpVShx9pS+huJSDWrtxEEdTMIh9aMJpnFIzNheBKvjvoCxiqCXaIfmoE1I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718607867; c=relaxed/simple;
+	bh=8T2sIu1A5qyyxLktjUk/3hkTDPit6l/IHgYrOcAXxBk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ox3G1IhVir/oNYj7G5vOaGgfpUFMiBQ6566w6RjNE81TZDRm3AFhLEZvdWEx/2hI54V73t031GPk0nYMWWfB+X5XudLTBg9ycYuel8vNxmAvhII89vtE/VFHVz24Y73iDKjR7XYt0dMcYrg9iGPGswabG0rrmB0uZHFIwudnjjA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=CriPB39C; arc=fail smtp.client-ip=40.107.93.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FdURIFsbA7NZM8ZO+iMYNSlFCxvte9ksYOOn3NrkJbrKsKRHgcF9N+k94Fr+gBUmzZMxvXa3dR+cKfKAmM/lHsEPWiLsHmU+Rz628KhF+m8Ocus/E2WrL1imKC02FsWIfUiVVUmhIYIZyrDaxVxn9Wyq8e5UZvjijIW9B6OgY5G8vpvW4ri3qQPorCmQm9k2GwQGbnnDdl9r13J1lV2bvEii3ORgzU1qr2Y2gdmtMMhss3jCAMyMNr2CiQMEXQlFkxaO/uNyCIdI/Q1SEgj5QbxqWuAwbbPYp2zdY+IA1O+AxNG2mH+oZd6r1GlSQ8X9HucGCtpE+D9sFOTw7/N4zQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3qGkJj32BdmFJ2a+GWtSjwf23HkckDu0wh5c9SBC5r4=;
+ b=IFMIxuZpkHpvm6aymqiIQSAzgZUYYk7+ekOm/l8+P8RMX9dbP9KmEsyS6bv04/A7n8rSIW4cnABfDLwzGkRwLKXeNJFnRgfTpf/Rem/c69QkasqQCsytN7v69S9yrHFyyGYSEloNdwuWjdY816mJfN1GoLzgragMKfG3vD4Za8rYGdtTablBbhCxecjX/XmFCF7wf0CCGHy75IUVT+IIAp4/sMRaY7BIMHRoXHgswDLmBJ/q43+GHASHnhIhJiyPYgn0htjY8rNWXWlU3901z+YQcLiYhwCLflGlbBvkvbobKQr0ypXmnfbXDsHVP/3SEkEEzh0tivNQiX+awsbPSA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=microchip.com smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3qGkJj32BdmFJ2a+GWtSjwf23HkckDu0wh5c9SBC5r4=;
+ b=CriPB39CxYzN2HWPUvgp5Bp8Za5hXUaA25Efu5Sm0BsVBf648cKEYIlZHqXI6X1z+gcF+ikLz3E3ltKLA0qqqHvbf0Ize45F+zfEBYg8G/Fg16KtDcBxPaf277TjhTPmnZ8Hozdl1uKuWoqHTHPa3x1UJEroEI2kYnHaiPXvY4k=
+Received: from DS7PR03CA0269.namprd03.prod.outlook.com (2603:10b6:5:3b3::34)
+ by CYYPR12MB8853.namprd12.prod.outlook.com (2603:10b6:930:cb::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Mon, 17 Jun
+ 2024 07:04:24 +0000
+Received: from DS3PEPF0000C37C.namprd04.prod.outlook.com
+ (2603:10b6:5:3b3:cafe::35) by DS7PR03CA0269.outlook.office365.com
+ (2603:10b6:5:3b3::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31 via Frontend
+ Transport; Mon, 17 Jun 2024 07:04:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ DS3PEPF0000C37C.mail.protection.outlook.com (10.167.23.6) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7677.15 via Frontend Transport; Mon, 17 Jun 2024 07:04:24 +0000
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 17 Jun
+ 2024 02:04:18 -0500
+Received: from xhdvineethc40.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
+ Transport; Mon, 17 Jun 2024 02:04:14 -0500
+From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+To: <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<linux@armlinux.org.uk>, <vadim.fedorenko@linux.dev>, <andrew@lunn.ch>
+CC: <vineeth.karumanchi@amd.com>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <git@amd.com>
+Subject: [PATCH net-next v6 0/4] net: macb: WOL enhancements 
+Date: Mon, 17 Jun 2024 12:34:09 +0530
+Message-ID: <20240617070413.2291511-1-vineeth.karumanchi@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: ptp: Convert ptp-qoirq to yaml format
-To: Frank Li <Frank.Li@nxp.com>, Yangbo Lu <yangbo.lu@nxp.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Madalin Bucur <madalin.bucur@nxp.com>, Sean Anderson <sean.anderson@seco.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, imx@lists.linux.dev
-References: <20240614-ls_fman-v1-0-cb33c96dc799@nxp.com>
- <20240614-ls_fman-v1-1-cb33c96dc799@nxp.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240614-ls_fman-v1-1-cb33c96dc799@nxp.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+Received-SPF: None (SATLEXMB03.amd.com: vineeth.karumanchi@amd.com does not
+ designate permitted sender hosts)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37C:EE_|CYYPR12MB8853:EE_
+X-MS-Office365-Filtering-Correlation-Id: f21642e8-a138-4e91-f76e-08dc8e9bb836
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230037|1800799021|7416011|376011|82310400023|36860700010|921017;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?NmJMOVprwsiqWY8+hJWsvGXV8luzaYHEkPfRD7dyCtLZYUhhAd1B7IkZ0J7A?=
+ =?us-ascii?Q?CcTkQxBjXgsCEmynO4c0VfB8dexEPJe4wUIpMRGDbgtoZb/45AiByCIVvg3d?=
+ =?us-ascii?Q?xqhYvE/QZa8eYpYBVo7SPe6iRV5CCmI1PGx2bDeRRC65+zwwFWfUyxRCqs5h?=
+ =?us-ascii?Q?jIwKyN8bGXtw3RNBt9E2/T3BvKF7adyHrYbkZNAMygyZSnCkyB/h1QdBuELz?=
+ =?us-ascii?Q?QhbuSeveo0R2FfIh0t07p5O9QKx1oNABUOcLsODxQvx+T5EcYK9NFD8eJybN?=
+ =?us-ascii?Q?L8LaxDCfKyU1j5gk4/EuzBfK7xjz4QOTPkGzcFPO6utu3wnvgT7o06I9P7EX?=
+ =?us-ascii?Q?zWN93qLBNU3OiBjJske6g/Swn/+E77jUjHVhfOOGTwRAybczlcaXhRqHG7gi?=
+ =?us-ascii?Q?F/ZW5pwsfIjdx3Njt2W4pFixrQFzexnHsqFfPwD4DtrEwBBbOguJGth/CCmg?=
+ =?us-ascii?Q?2IUA5WbtsUDRKSycI/5TNE5yaeQGW1Scmvl3yO5v8cvrCaxsOWz2TqvouYQM?=
+ =?us-ascii?Q?OaGJw/iwC0FILDJB+Bu8oy8Wi3D7QZWVu/nEDkhzckU31W3BK0OPJVAUgBzU?=
+ =?us-ascii?Q?bv3YVsMm8346czSBOYJ/52tOY2U9lpAxBCm487M96F68mBRf0g75W9Ir+pI/?=
+ =?us-ascii?Q?q4xSbj0wH5LEe3gaQjlUc7s/eo1IIsw7wYLvUN4WeVABAvqcLdhaM6Um6Uih?=
+ =?us-ascii?Q?KDGcB3TUNs/mCNZwp8SV8KiVDQCwn+X533X93eFd8yavD/ybu0XpcWlcfqSJ?=
+ =?us-ascii?Q?OX0DEFXTLfEVScQzILldspErzN+iEANq7TxZrAN9788QnPhRLFgNfffssvDa?=
+ =?us-ascii?Q?1yRAXhVm0yKVEs1WuWGaljZzuLlWaA5TEMJvNytSeJ03VWP0hJhwbYh5iONp?=
+ =?us-ascii?Q?mv4Uoo7uMFzQ//n/4lf+nOf0gb5Sh/hpLM1FQTn1uxmgSTmxR9IqrooAhkji?=
+ =?us-ascii?Q?C/2lx+02AwQNKqI/WJZhwYH1+FJva40MrVYcVQi/BEzJDmi8k5HdLFF5xwjx?=
+ =?us-ascii?Q?mEPtZsB1Sv8qUZHEzEXHmCvIE/D/Tx/ujd28PZz313B/fxGwxNE6RY0lZcur?=
+ =?us-ascii?Q?scJEGv58jiPve6irt9sfzWNprUkZaSNc9T+20uaI1p81Ikk/FWuES8gkZpNF?=
+ =?us-ascii?Q?ftNhBfDja8dF7GofBSvyYx/N6EC7yt0LqazlmgH6IhhegLv/GHKICr6bNAtU?=
+ =?us-ascii?Q?EHY80cMavUWBHA7fIjfqg5/1qgGGzRMYnJZHSfpb4Kj+l5572+DiXg7aIiRt?=
+ =?us-ascii?Q?GTqXO0XoTatvRezsoU7Lus0j1dQN8y5u7Sk/YUHm3+oLOhcDMKC5rhEiwFPI?=
+ =?us-ascii?Q?JH3e29UrMpu1pzakcKBrsgxk6r3fBskMIrZ7CHEseUfM3kVSmZUoNuoaSIsE?=
+ =?us-ascii?Q?KGOKn1kDsb0MlHgwPRmMGtj8oboh?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(1800799021)(7416011)(376011)(82310400023)(36860700010)(921017);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jun 2024 07:04:24.0359
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f21642e8-a138-4e91-f76e-08dc8e9bb836
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF0000C37C.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8853
 
-On 14/06/2024 22:33, Frank Li wrote:
-> diff --git a/Documentation/devicetree/bindings/ptp/ptp-qoriq.yaml b/Documentation/devicetree/bindings/ptp/ptp-qoriq.yaml
-> new file mode 100644
-> index 0000000000000..585e8bffd90c9
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/ptp/ptp-qoriq.yaml
+- Add provisioning for queue tie-off and queue disable during suspend.
+- Add support for ARP packet types to WoL.
+- Advertise WoL attributes by default.
+- Extend MACB supported WoL modes to the PHY supported WoL modes.
+- Deprecate magic-packet property.
 
-Filename based on compatible. Can be fsl,ptp.yaml
+Changes in V6:
+- Use rcu_access_pointer() instead of rcu_dereference()
+- Add conditional check on __in_dev_get_rcu() return pointer
 
-> @@ -0,0 +1,148 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/ptp/ptp-qoriq.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Freescale QorIQ 1588 timer based PTP clock
-> +
-> +maintainers:
-> +  - Frank Li <Frank.Li@nxp.com>
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - fsl,etsec-ptp
-> +      - fsl,fman-ptp-timer
-> +      - fsl,dpaa2-ptp
-> +      - fsl,enetc-ptp
-> +    description: |
-> +      Should be "fsl,etsec-ptp" for eTSEC
-> +      Should be "fsl,fman-ptp-timer" for DPAA FMan
-> +      Should be "fsl,dpaa2-ptp" for DPAA2
-> +      Should be "fsl,enetc-ptp" for ENETC
+Changes in V5:
+- Update comment and error message.
+v5 link : https://lore.kernel.org/netdev/20240611162827.887162-1-vineeth.karumanchi@amd.com/
 
-You can write it simpler, e.g.
-- fsl,etsec-ptp   # eTSEC
+Changes in V4:
+- Extend MACB supported wol modes to the PHY supported modes.
+- Drop previous ACK from v2 series on 4/4 patch for further review.
+v4 link : https://lore.kernel.org/lkml/20240610053936.622237-1-vineeth.karumanchi@amd.com/
 
-and then you see that this does not bring any new information - your
-comment duplicates the compatible. Just drop.
+Changes in V3:
+- Advertise WOL by default.
+- Drop previous ACK for further review.
+v3 link : https://lore.kernel.org/netdev/20240605102457.4050539-1-vineeth.karumanchi@amd.com/
 
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    minItems: 2
-> +    maxItems: 4
+Changes in v2:
+- Re-implement WOL using CAPS instead of device-tree attribute.
+- Deprecate device-tree "magic-packet" property.
+- Sorted CAPS values.
+- New Bit fields inline with existing implementation.
+- Optimize code.
+- Fix sparse warnings.
+- Addressed minor review comments.
+v2 link : https://lore.kernel.org/netdev/20240222153848.2374782-1-vineeth.karumanchi@amd.com/
 
-Items should be described.
-
-> +
-> +  clocks:
-> +    maxItems: 1
-> +
-> +  fsl,cksel:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description: |
-> +      Timer reference clock source.
-> +
-> +      Reference clock source is determined by the value, which is holded
-> +      in CKSEL bits in TMR_CTRL register. "fsl,cksel" property keeps the
-> +      value, which will be directly written in those bits, that is why,
-> +      according to reference manual, the next clock sources can be used:
-> +
-> +      For eTSEC,
-> +      <0> - external high precision timer reference clock (TSEC_TMR_CLK
-> +            input is used for this purpose);
-> +      <1> - eTSEC system clock;
-> +      <2> - eTSEC1 transmit clock;
-> +      <3> - RTC clock input.
-> +
-> +      For DPAA FMan,
-> +      <0> - external high precision timer reference clock (TMR_1588_CLK)
-> +      <1> - MAC system clock (1/2 FMan clock)
-> +      <2> - reserved
-> +      <3> - RTC clock oscillator
-> +
-> +  fsl,tclk-period:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description: Timer reference clock period in nanoseconds.
-> +
-> +  fsl,tmr-prsc:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description: Prescaler, divides the output clock.
-> +
-> +  fsl,tmr-add:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description: Frequency compensation value.
-> +
-> +  fsl,tmr-fiper1:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description: Fixed interval period pulse generator.
-> +
-> +  fsl,tmr-fiper2:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description: Fixed interval period pulse generator.
-> +
-> +  fsl,tmr-fiper3:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description:
-> +      Fixed interval period pulse generator.
-> +      Supported only on DPAA2 and ENETC hardware.
-> +
-> +  fsl,max-adj:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description: |
-> +      Maximum frequency adjustment in parts per billion.
-> +
-> +      These properties set the operational parameters for the PTP
-> +      clock. You must choose these carefully for the clock to work right.
-> +      Here is how to figure good values:
-> +
-> +      TimerOsc     = selected reference clock   MHz
-> +      tclk_period  = desired clock period       nanoseconds
-> +      NominalFreq  = 1000 / tclk_period         MHz
-> +      FreqDivRatio = TimerOsc / NominalFreq     (must be greater that 1.0)
-> +      tmr_add      = ceil(2^32 / FreqDivRatio)
-> +      OutputClock  = NominalFreq / tmr_prsc     MHz
-> +      PulseWidth   = 1 / OutputClock            microseconds
-> +      FiperFreq1   = desired frequency in Hz
-> +      FiperDiv1    = 1000000 * OutputClock / FiperFreq1
-> +      tmr_fiper1   = tmr_prsc * tclk_period * FiperDiv1 - tclk_period
-> +      max_adj      = 1000000000 * (FreqDivRatio - 1.0) - 1
-> +
-> +      The calculation for tmr_fiper2 is the same as for tmr_fiper1. The
-> +      driver expects that tmr_fiper1 will be correctly set to produce a 1
-> +      Pulse Per Second (PPS) signal, since this will be offered to the PPS
-> +      subsystem to synchronize the Linux clock.
-> +
-> +      When this attribute is not used, the IEEE 1588 timer reference clock
-> +      will use the eTSEC system clock (for Gianfar) or the MAC system
-> +      clock (for DPAA).
-> +
-> +  fsl,extts-fifo:
-> +    $ref: /schemas/types.yaml#/definitions/flag
-> +    description:
-> +      The presence of this property indicates hardware
-> +      support for the external trigger stamp FIFO
-> +
-> +  little-endian:
-> +    $ref: /schemas/types.yaml#/definitions/flag
-> +    description:
-> +      The presence of this property indicates the 1588 timer
-> +      support for the external trigger stamp FIFO.
-> +      IP block is little-endian mode. The default endian mode
-> +      is big-endian.
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    ptp_clock@24e00 {
-
-phc@
-
-> +        compatible = "fsl,etsec-ptp";
-> +        reg = <0x24E00 0xB0>;
-
-Lowercase hex, in other places as well.
+v1 link : https://lore.kernel.org/lkml/20240130104845.3995341-1-vineeth.karumanchi@amd.com/#t
 
 
-> +        interrupts = <12 0x8>, <13 0x8>;
+Vineeth Karumanchi (4):
+  net: macb: queue tie-off or disable during WOL suspend
+  net: macb: Enable queue disable
+  net: macb: Add ARP support to WOL
+  dt-bindings: net: cdns,macb: Deprecate magic-packet property
 
-Use proper defines for interrupt flags.
+ .../devicetree/bindings/net/cdns,macb.yaml    |   1 +
+ drivers/net/ethernet/cadence/macb.h           |   8 ++
+ drivers/net/ethernet/cadence/macb_main.c      | 122 +++++++++++++-----
+ 3 files changed, 101 insertions(+), 30 deletions(-)
 
-> +        interrupt-parent = <&ipic>;
-> +        fsl,cksel       = <1>;
-
-
-Best regards,
-Krzysztof
+-- 
+2.34.1
 
 
