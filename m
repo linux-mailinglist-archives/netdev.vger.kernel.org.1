@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-104061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFB7B90B131
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:13:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5135090B0E3
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:05:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E0D2B36A11
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:57:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA1091F2A233
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 14:05:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D87216EB4A;
-	Mon, 17 Jun 2024 13:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10AF318EFF6;
+	Mon, 17 Jun 2024 13:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RE5yKVw2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nl62hy/e"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F295A16EB42;
-	Mon, 17 Jun 2024 13:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C9B18EFF1;
+	Mon, 17 Jun 2024 13:26:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718630721; cv=none; b=PwgenGqNHPvtCpFNMRgZkG1bIbFskVBOfl6WMIAcvgnfuVkrTG5zNzH1h2mBEo/rqq5cmyaAsIYSy3Qho+KWS4yYJAq3b5GJgf2vd37NVPJugIRBYfM1X0Q9yVRBbtXnW72YVE0E0O53/OWwPY3Nw9NUjq2kBYu/lsEJ4dXiehA=
+	t=1718630792; cv=none; b=HIvW6stWRab0mzhQr4gNiw5pNlyiaHQwQclVovFKHMVtNHqa6YK2v1KBEtMOIUY/WrC+1XtA0/WR0C593b52SjeRWh4gTLgxkVFBPwD01Q87mWPoP2ASens/OTpfj2ECbQl8eFyCaAwU9Ho3QAKwbqU9AEcz/lWU5qLOSlkCP9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718630721; c=relaxed/simple;
-	bh=t+VJMoHbS5aMzSdzqTh+8YeLJC/JfqfBNiQW1Ei54KY=;
+	s=arc-20240116; t=1718630792; c=relaxed/simple;
+	bh=gXP+HGtKZBJTAK+ZamdQmVHy9NzhVXSFas4iEwLoRqs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CjgTLOkIJfBpCjwpwBWXiGq5YiBs7CzKbJ7LxgEtuvtKLEij74njMZ0YlaBkzkwnY0MehfmxFWh5ha2caCja978u4XScgb0ejHXeQVjjV+5G1jenEvGRfl7O58D+ypvyOK/SIlZE5Wr27Hcjakkjfx/znmlgkwe3dAZ3Rh8QWDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RE5yKVw2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36510C4AF4D;
-	Mon, 17 Jun 2024 13:25:19 +0000 (UTC)
+	 MIME-Version; b=SD2N4VxcftAuvLXbRgEDfWEJveyiSoYYvrY5vlBub/+Et61QsvLH806YcFEVYXTvqc7dcuvfvv82MyI8wlbsrZtobg2z3nizbEiPY7bE6Cg8ICJxWb+8uJZpmujQbecNViGD435G7yK8QEIAQEmzh3QaM5nKU4DbDfgV0Ltqe3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nl62hy/e; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40583C4AF1C;
+	Mon, 17 Jun 2024 13:26:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718630720;
-	bh=t+VJMoHbS5aMzSdzqTh+8YeLJC/JfqfBNiQW1Ei54KY=;
+	s=k20201202; t=1718630791;
+	bh=gXP+HGtKZBJTAK+ZamdQmVHy9NzhVXSFas4iEwLoRqs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RE5yKVw2QFTnHBrJuphAkOpFioG0CgfNrQjG4xyeCCqCwVzuZARPKvcM1fj50TMPi
-	 jSudY4zoQ02TJkPaMLh2DBITOjIWIveigXxHLWJs9veT80S2kde+hFQOh674EH9V3x
-	 W/iPl+asiQQsjgYbS07m4DvkiWs/qNtY1BvyCmeuHJnvYgW80pnob5sZ+FtQvPzu8B
-	 57PIzwatlYai5BV80tvheHjihkqLTraMsi6UlxcpMe/pe6Tm1tmVs83CjQbltuaEkH
-	 Gk/6IWEd2ZCZ1pjYbo5iAAJN+MlHzW+MV6CTW8GyIVzkSZQBrV4NrFSYeFYyx9C8i1
-	 0H6rJKNLe+i0Q==
+	b=nl62hy/epbvobo2qWCmn25LL5gyMdxSizr7zIJ3xauIHLKa5fv1le9xKiQxJ1YxpL
+	 vByaTeXyF7TUlsDpJzhMIOVhoHnMFGzEDM4OSvAA0Dp4KrK9nx5RhbEFjPMZtGwYfx
+	 HR2U65FHPKH5fR+qkZFYotJNnoL8svG2Zj0feMtmsck8FQMlVaCHDKSTsSJFDUQgJS
+	 7j117WEpPh+4okAEExCzIBg/TUIdZRhjduwlkD0+YyFC8trWv1pCPq/hsVGEebzPu8
+	 t/ac6fIKM8ZEYVLTQxXYmjYgResfJ2bsmPuKTId8ANTxtfe3xZLVu5oM20CQtT6ogL
+	 R0qT5FMpD5fOw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>,
-	syzbot+8830db5d3593b5546d2e@syzkaller.appspotmail.com,
+Cc: Nicolas Escande <nico.escande@gmail.com>,
+	Johannes Berg <johannes.berg@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	johannes@sipsolutions.net,
 	davem@davemloft.net,
@@ -54,12 +54,12 @@ Cc: Johannes Berg <johannes.berg@intel.com>,
 	pabeni@redhat.com,
 	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 13/29] wifi: mac80211: handle tasklet frames before stopping
-Date: Mon, 17 Jun 2024 09:24:17 -0400
-Message-ID: <20240617132456.2588952-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 08/21] wifi: mac80211: mesh: init nonpeer_pm to active by default in mesh sdata
+Date: Mon, 17 Jun 2024 09:25:45 -0400
+Message-ID: <20240617132617.2589631-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240617132456.2588952-1-sashal@kernel.org>
-References: <20240617132456.2588952-1-sashal@kernel.org>
+In-Reply-To: <20240617132617.2589631-1-sashal@kernel.org>
+References: <20240617132617.2589631-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,84 +68,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.94
+X-stable-base: Linux 5.15.161
 Content-Transfer-Encoding: 8bit
 
-From: Johannes Berg <johannes.berg@intel.com>
+From: Nicolas Escande <nico.escande@gmail.com>
 
-[ Upstream commit 177c6ae9725d783f9e96f02593ce8fb2639be22f ]
+[ Upstream commit 6f6291f09a322c1c1578badac8072d049363f4e6 ]
 
-The code itself doesn't want to handle frames from the driver
-if it's already stopped, but if the tasklet was queued before
-and runs after the stop, then all bets are off. Flush queues
-before actually stopping, RX should be off at this point since
-all the interfaces are removed already, etc.
+With a ath9k device I can see that:
+	iw phy phy0 interface add mesh0 type mp
+	ip link set mesh0 up
+	iw dev mesh0 scan
 
-Reported-by: syzbot+8830db5d3593b5546d2e@syzkaller.appspotmail.com
-Link: https://msgid.link/20240515135318.b05f11385c9a.I41c1b33a2e1814c3a7ef352cd7f2951b91785617@changeid
+Will start a scan with the Power Management bit set in the Frame Control Field.
+This is because we set this bit depending on the nonpeer_pm variable of the mesh
+iface sdata and when there are no active links on the interface it remains to
+NL80211_MESH_POWER_UNKNOWN.
+
+As soon as links starts to be established, it wil switch to
+NL80211_MESH_POWER_ACTIVE as it is the value set by befault on the per sta
+nonpeer_pm field.
+As we want no power save by default, (as expressed with the per sta ini values),
+lets init it to the expected default value of NL80211_MESH_POWER_ACTIVE.
+
+Also please note that we cannot change the default value from userspace prior to
+establishing a link as using NL80211_CMD_SET_MESH_CONFIG will not work before
+NL80211_CMD_JOIN_MESH has been issued. So too late for our initial scan.
+
+Signed-off-by: Nicolas Escande <nico.escande@gmail.com>
+Link: https://msgid.link/20240527141759.299411-1-nico.escande@gmail.com
 Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/mac80211/ieee80211_i.h |  2 ++
- net/mac80211/main.c        | 10 ++++++++--
- net/mac80211/util.c        |  2 ++
- 3 files changed, 12 insertions(+), 2 deletions(-)
+ net/mac80211/mesh.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
-index 3e14d5c9aa1b4..0d8a9bb925384 100644
---- a/net/mac80211/ieee80211_i.h
-+++ b/net/mac80211/ieee80211_i.h
-@@ -1782,6 +1782,8 @@ void ieee80211_link_info_change_notify(struct ieee80211_sub_if_data *sdata,
- void ieee80211_configure_filter(struct ieee80211_local *local);
- u32 ieee80211_reset_erp_info(struct ieee80211_sub_if_data *sdata);
- 
-+void ieee80211_handle_queued_frames(struct ieee80211_local *local);
-+
- u64 ieee80211_mgmt_tx_cookie(struct ieee80211_local *local);
- int ieee80211_attach_ack_skb(struct ieee80211_local *local, struct sk_buff *skb,
- 			     u64 *cookie, gfp_t gfp);
-diff --git a/net/mac80211/main.c b/net/mac80211/main.c
-index 6faba47b7b0ea..89771f0e0ae70 100644
---- a/net/mac80211/main.c
-+++ b/net/mac80211/main.c
-@@ -300,9 +300,8 @@ u32 ieee80211_reset_erp_info(struct ieee80211_sub_if_data *sdata)
- 	       BSS_CHANGED_ERP_SLOT;
- }
- 
--static void ieee80211_tasklet_handler(struct tasklet_struct *t)
-+void ieee80211_handle_queued_frames(struct ieee80211_local *local)
- {
--	struct ieee80211_local *local = from_tasklet(local, t, tasklet);
- 	struct sk_buff *skb;
- 
- 	while ((skb = skb_dequeue(&local->skb_queue)) ||
-@@ -327,6 +326,13 @@ static void ieee80211_tasklet_handler(struct tasklet_struct *t)
- 	}
- }
- 
-+static void ieee80211_tasklet_handler(struct tasklet_struct *t)
-+{
-+	struct ieee80211_local *local = from_tasklet(local, t, tasklet);
-+
-+	ieee80211_handle_queued_frames(local);
-+}
-+
- static void ieee80211_restart_work(struct work_struct *work)
- {
- 	struct ieee80211_local *local =
-diff --git a/net/mac80211/util.c b/net/mac80211/util.c
-index 1088d90e355ba..08e6691cdc4a4 100644
---- a/net/mac80211/util.c
-+++ b/net/mac80211/util.c
-@@ -2207,6 +2207,8 @@ u32 ieee80211_sta_get_rates(struct ieee80211_sub_if_data *sdata,
- 
- void ieee80211_stop_device(struct ieee80211_local *local)
- {
-+	ieee80211_handle_queued_frames(local);
-+
- 	ieee80211_led_radio(local, false);
- 	ieee80211_mod_tpt_led_trig(local, 0, IEEE80211_TPT_LEDTRIG_FL_RADIO);
- 
+diff --git a/net/mac80211/mesh.c b/net/mac80211/mesh.c
+index 6847fdf934392..6202157f467b1 100644
+--- a/net/mac80211/mesh.c
++++ b/net/mac80211/mesh.c
+@@ -1628,6 +1628,7 @@ void ieee80211_mesh_init_sdata(struct ieee80211_sub_if_data *sdata)
+ 	ifmsh->last_preq = jiffies;
+ 	ifmsh->next_perr = jiffies;
+ 	ifmsh->csa_role = IEEE80211_MESH_CSA_ROLE_NONE;
++	ifmsh->nonpeer_pm = NL80211_MESH_POWER_ACTIVE;
+ 	/* Allocate all mesh structures when creating the first mesh interface. */
+ 	if (!mesh_allocated)
+ 		ieee80211s_init();
 -- 
 2.43.0
 
