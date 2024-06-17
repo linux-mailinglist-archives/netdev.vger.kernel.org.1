@@ -1,63 +1,65 @@
-Return-Path: <netdev+bounces-104047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2226290B11E
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:10:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CC9E90B211
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:32:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03667B26B3C
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:36:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FA3AB3645A
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:44:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD94F1B0130;
-	Mon, 17 Jun 2024 13:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559BF1BE230;
+	Mon, 17 Jun 2024 13:23:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c2yfcADe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QQTcJAYo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942231B0129;
-	Mon, 17 Jun 2024 13:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E821BD4E0;
+	Mon, 17 Jun 2024 13:23:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718630529; cv=none; b=FGKAH7uhZEP9Bebt+E4cBft2t6LF8nZgfCQAx7AMCfDzGSZTHI0+ilxT5Gulb55ioLpabBwtZBnZCIQ/1Dz1i3ZXgwZ7yYOn3+CLYCWrr/LcRLLwmp2aHIgqKLrF7ca0j4gBzyykMVoslptbz2ETltkfwbStvnp4AyCYhsq/sgs=
+	t=1718630612; cv=none; b=Jy7RXbS8888oStfQWVjGqrZHORfoPURSC5q7FSdwvgJ27qKEZrOnCup3m+5qHqSo1HH9b5Zr/zKiEjc4RXZWSXqtoQ7552lS0kWSDMfczLpqb/O451E5X3NPesfy1Jl5MbL7ip5eSLO0hUUIl1TnPdQKcGZhVW+ro+GB0C9I50I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718630529; c=relaxed/simple;
-	bh=gBBmWF8YTIjh0DlT+b6kdKqtSsPfi3eXXh024j8qgOM=;
+	s=arc-20240116; t=1718630612; c=relaxed/simple;
+	bh=yAc7Cg+LvcJNP6MHenJI3HRC/4+g2Ha2WT6arXir4J0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O3Dcm/dI2yXaYHWf6QKJIo8kM2FJm8tQY76wKzSEMBmOtyCLwd6plO3ZRtk3x3qc0FXNMNVEnSn/62ntqVb+zMqaSMOwtXT5RJPGi5sHN8t6kybh8T4yAgRhRStd93mtuzhIVMEwr2fBelzTV6sz0gFIZg2WhV5mW18q8f3IM6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c2yfcADe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2536EC4AF1D;
-	Mon, 17 Jun 2024 13:22:08 +0000 (UTC)
+	 MIME-Version; b=DqUTA7l+CIYsOzbx5oxl327UaWoSFRyByCx7qm8XHoeDA4Tyykinvsa0M0dWwaL08ew5cV4cAVQSex5R2ARA2me6icXKzi5pdJJZyJ3gXxQhBj5nZeBZdtkYBjFfRXL9X7CzY45iyY3+fSV7vmJfySQ5facfWkScf6JDH/zEAX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QQTcJAYo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74F1FC4AF1C;
+	Mon, 17 Jun 2024 13:23:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718630529;
-	bh=gBBmWF8YTIjh0DlT+b6kdKqtSsPfi3eXXh024j8qgOM=;
+	s=k20201202; t=1718630611;
+	bh=yAc7Cg+LvcJNP6MHenJI3HRC/4+g2Ha2WT6arXir4J0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=c2yfcADerqKpHXm0GRwG/W8jTlWDk1hgtFKhLoXmWiOgYydTKJcXixzpbUxhl6I4L
-	 9DbsOG2IK3tGD2M6O3ssB9/Vvltoy+T2V1m+4ejsyJh1+6R3G2dbwI91FtbAau5gwn
-	 134z3o1uZxp4PghqISwnxulx9/c6uvArDjKSzpts87hA5LQTencNtrwpkzl1srIGx/
-	 6GFlW9h+/dvF9Off1/vhzI9t2GypjckeyjpJlEmOMTYyxM5sJ32A2Dn7BQGINdQSW/
-	 TEnR6EhwWxWo4jWMyheSCWzbfxbJEiPIFzYUxVrZI68JAShoJ5XXmk5BiLPoTVGqYo
-	 YSJ55WCGkZpng==
+	b=QQTcJAYo6APCfTbQwHDSQSDCvNQGLV9h14LuX2XwTaEHXpWK1l/ab89Bh4sDKtKlj
+	 8oI/vW6AUhjRUs9g1Ru05VlnhssBlC7E1c/Z2xa0RnnQHhvIVsR/O9a7GX1MwEfwYU
+	 b6X3T28LUxPqsvf+MFIXIBOs0on66ZGRfut8cdim/K10tDOML2gJZPuzcEoDe1t/yP
+	 kzUnuk3n/h3CazEtmFmkfDkTZSda6QMk4ba+RjOgENMTc8cy6S5mU0dWaybh1NsoC/
+	 lZS7TLXivuGKtC8v3byEt7QS1nEAgEMwFI5yMN3oQ+Jx9ORFPs0GCj3tHqWQYAg3SD
+	 EP1XsBE6vHXjw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	Alexander Aring <aahringo@redhat.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Johannes Berg <johannes.berg@intel.com>,
+	syzbot+de87c09cc7b964ea2e23@syzkaller.appspotmail.com,
 	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
 	davem@davemloft.net,
-	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.9 34/44] net: ipv6: rpl_iptunnel: block BH in rpl_output() and rpl_input()
-Date: Mon, 17 Jun 2024 09:19:47 -0400
-Message-ID: <20240617132046.2587008-34-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 12/35] wifi: mac80211: apply mcast rate only if interface is up
+Date: Mon, 17 Jun 2024 09:22:10 -0400
+Message-ID: <20240617132309.2588101-12-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240617132046.2587008-1-sashal@kernel.org>
-References: <20240617132046.2587008-1-sashal@kernel.org>
+In-Reply-To: <20240617132309.2588101-1-sashal@kernel.org>
+References: <20240617132309.2588101-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,93 +68,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.9.5
+X-stable-base: Linux 6.6.34
 Content-Transfer-Encoding: 8bit
 
-From: Eric Dumazet <edumazet@google.com>
+From: Johannes Berg <johannes.berg@intel.com>
 
-[ Upstream commit db0090c6eb12c31246438b7fe2a8f1b833e7a653 ]
+[ Upstream commit 02c665f048a439c0d58cc45334c94634bd7c18e6 ]
 
-As explained in commit 1378817486d6 ("tipc: block BH
-before using dst_cache"), net/core/dst_cache.c
-helpers need to be called with BH disabled.
+If the interface isn't enabled, don't apply multicast
+rate changes immediately.
 
-Disabling preemption in rpl_output() is not good enough,
-because rpl_output() is called from process context,
-lwtunnel_output() only uses rcu_read_lock().
-
-We might be interrupted by a softirq, re-enter rpl_output()
-and corrupt dst_cache data structures.
-
-Fix the race by using local_bh_disable() instead of
-preempt_disable().
-
-Apply a similar change in rpl_input().
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Alexander Aring <aahringo@redhat.com>
-Acked-by: Paolo Abeni <pabeni@redhat.com>
-Link: https://lore.kernel.org/r/20240531132636.2637995-3-edumazet@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reported-by: syzbot+de87c09cc7b964ea2e23@syzkaller.appspotmail.com
+Link: https://msgid.link/20240515133410.d6cffe5756cc.I47b624a317e62bdb4609ff7fa79403c0c444d32d@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv6/rpl_iptunnel.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+ net/mac80211/cfg.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv6/rpl_iptunnel.c b/net/ipv6/rpl_iptunnel.c
-index a013b92cbb860..2c83b7586422d 100644
---- a/net/ipv6/rpl_iptunnel.c
-+++ b/net/ipv6/rpl_iptunnel.c
-@@ -212,9 +212,9 @@ static int rpl_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 	if (unlikely(err))
- 		goto drop;
+diff --git a/net/mac80211/cfg.c b/net/mac80211/cfg.c
+index 505f1d6ccd16c..f3fc0be9d8eac 100644
+--- a/net/mac80211/cfg.c
++++ b/net/mac80211/cfg.c
+@@ -2953,8 +2953,9 @@ static int ieee80211_set_mcast_rate(struct wiphy *wiphy, struct net_device *dev,
+ 	memcpy(sdata->vif.bss_conf.mcast_rate, rate,
+ 	       sizeof(int) * NUM_NL80211_BANDS);
  
--	preempt_disable();
-+	local_bh_disable();
- 	dst = dst_cache_get(&rlwt->cache);
--	preempt_enable();
-+	local_bh_enable();
+-	ieee80211_link_info_change_notify(sdata, &sdata->deflink,
+-					  BSS_CHANGED_MCAST_RATE);
++	if (ieee80211_sdata_running(sdata))
++		ieee80211_link_info_change_notify(sdata, &sdata->deflink,
++						  BSS_CHANGED_MCAST_RATE);
  
- 	if (unlikely(!dst)) {
- 		struct ipv6hdr *hdr = ipv6_hdr(skb);
-@@ -234,9 +234,9 @@ static int rpl_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 			goto drop;
- 		}
- 
--		preempt_disable();
-+		local_bh_disable();
- 		dst_cache_set_ip6(&rlwt->cache, dst, &fl6.saddr);
--		preempt_enable();
-+		local_bh_enable();
- 	}
- 
- 	skb_dst_drop(skb);
-@@ -268,23 +268,21 @@ static int rpl_input(struct sk_buff *skb)
- 		return err;
- 	}
- 
--	preempt_disable();
-+	local_bh_disable();
- 	dst = dst_cache_get(&rlwt->cache);
--	preempt_enable();
- 
- 	if (!dst) {
- 		ip6_route_input(skb);
- 		dst = skb_dst(skb);
- 		if (!dst->error) {
--			preempt_disable();
- 			dst_cache_set_ip6(&rlwt->cache, dst,
- 					  &ipv6_hdr(skb)->saddr);
--			preempt_enable();
- 		}
- 	} else {
- 		skb_dst_drop(skb);
- 		skb_dst_set(skb, dst);
- 	}
-+	local_bh_enable();
- 
- 	err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
- 	if (unlikely(err))
+ 	return 0;
+ }
 -- 
 2.43.0
 
