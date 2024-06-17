@@ -1,90 +1,96 @@
-Return-Path: <netdev+bounces-104096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2C0D90B325
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:00:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA59B90B332
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:01:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AA341F25CDF
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:00:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 701951F23460
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:01:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6740813A88F;
-	Mon, 17 Jun 2024 14:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1FE513C3FE;
+	Mon, 17 Jun 2024 14:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fzTkO4Co"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eeUml2zM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E34C13A87E;
-	Mon, 17 Jun 2024 14:08:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 773D513C3F2;
+	Mon, 17 Jun 2024 14:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718633299; cv=none; b=aMJ9+BCqBQem+/RhinfxqOTWea9BbU8RtOKtBjQsnR/r0eV5aDI9K/L6nl9J5i5Et/JCXHzFTud43+4Rwhoba+PMhKHlijza4v7sO3HAteOyE117yZEHGVeHimgM82Btv/F8gGzxqPViM1vW49bq/y0E+HifaJPQNg0z2yaKHBg=
+	t=1718633431; cv=none; b=BZgaa3e/0KbzYDcuy7meQeoRolyvY1yxp9wa/kjNcl9rHFJ9pGaDEluxlsEJq95GkfUQ4KBrTPM06ScXT7NHdSvId3PCVGDf2yRWJFo0yonbrgzJ8AtWYdL/Ap/eocZTfpqJXDkUHqPR0WseBNepcOBYhXBM+EIAThP7Wh3HkiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718633299; c=relaxed/simple;
-	bh=VDZUhwNjkG3pJs10hYRM/sN2hB2r+IdiNzMss5536HU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jl/JJMHHcwdQkcPLlB9LOr9fquUIlpAwzpLnZd7/Ix868fJqgo5P+iD7qYKgYRgBuEK+BFRNhdogn8tPZ0rnetQiVEzTrXNFv891oB2Sa7v/mcsX3PCmYnlJw5z10o7vf1AxJzVk4Wz8sWXbeURF8+RfEqdn5FR+jamS2YvzX5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fzTkO4Co; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AF42C2BD10;
-	Mon, 17 Jun 2024 14:08:16 +0000 (UTC)
+	s=arc-20240116; t=1718633431; c=relaxed/simple;
+	bh=ZY0frUm/l/ELazp3keFtHSZU2+jYmNK9nHk3XE/5PDM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MLgMl43w/KHY0NmMchjyXIBpKy8BaCt8krxr1AnxpFF4pSDkoq9KyWzOcv/M3Fm7uK/4qgWul0FCmTo+2aUhyrDNkVtBq510H/C34AhVPy4r2jasx38JECuUv6Nk1YrVKXNtONnwM5dlNlVwlxIcYj3CNL1OYPsVGEeddJKKUkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eeUml2zM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1AD6EC4DDF3;
+	Mon, 17 Jun 2024 14:10:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718633298;
-	bh=VDZUhwNjkG3pJs10hYRM/sN2hB2r+IdiNzMss5536HU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fzTkO4CokjBGBd1coSbf4mpqCBFV57CfVwyivUM2tcke7Qicrn+M2H0ullnFTtFxp
-	 THx2m2FSW82Gi4xUI9G5HTv/kZbKWjfIVBRycWnwTFf1Lgmmdg6oZU751e/w7Y3mwF
-	 1Y58U6hdrIcMJfZAGSeXeaRKGRaIkez+5qrSB91wwl+7rhXJxmUeC4l4qhetxVsecc
-	 7FtYYRfJHG70A9divfFlzj7UNlQWMJMRLcJPFk/+w/Q7gbXAXRwl/BBZBpJ15EwVWu
-	 Db9VXh/03antn2lqStQF/q64vfHOtxchVSG6cczsR/hDIqZzs70cGzl/Egf5tT+JWo
-	 uxdTrGwmaMFOA==
-Date: Mon, 17 Jun 2024 15:08:13 +0100
-From: Simon Horman <horms@kernel.org>
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] selftests: mptcp: userspace_pm: fixed subtest names
-Message-ID: <20240617140813.GU8447@kernel.org>
-References: <20240614-upstream-net-20240614-selftests-mptcp-uspace-pm-fixed-test-names-v1-1-460ad3edb429@kernel.org>
+	s=k20201202; t=1718633431;
+	bh=ZY0frUm/l/ELazp3keFtHSZU2+jYmNK9nHk3XE/5PDM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eeUml2zMnU9Tr5usyo/xu22P0H0SOSWbGapAD48Ecn7eOpCgavdMidKMLs0eJS9DY
+	 mL9Uart+1OAdxwAb6t5nIgWaaIGP0z8KEJDhtsm58N6FJiN3tYjHnRREycPY1u1ZE2
+	 qZOleREEQumGu+73JOertCtKUPMelURDh5/yciWo54NHp7yBMPUxKGYWVRD3a6Pc+x
+	 Chd041nW/rl82cKPyZ6gEu82jrx+EjXVvWml44LO8c1sxdVEgmBoUJyc2p1wzJAzwF
+	 ZSt0ODjkQ8Xr7aQhr5M6AT16PCK3VuClD8wQy3TYnxiDsLGnTqk+hDYTJYlL7VS3N3
+	 oCJn4IgFdTHbw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EF192C4361B;
+	Mon, 17 Jun 2024 14:10:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240614-upstream-net-20240614-selftests-mptcp-uspace-pm-fixed-test-names-v1-1-460ad3edb429@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] Bluetooth: Ignore too large handle values in BIG
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171863343097.8850.935824555783496146.git-patchwork-notify@kernel.org>
+Date: Mon, 17 Jun 2024 14:10:30 +0000
+References: <tencent_E43E1B2F25E4BA5EBBEC33229E5E1BEB4B08@qq.com>
+In-Reply-To: <tencent_E43E1B2F25E4BA5EBBEC33229E5E1BEB4B08@qq.com>
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: pmenzel@molgen.mpg.de, davem@davemloft.net, edumazet@google.com,
+ johan.hedberg@gmail.com, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
+ marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ syzkaller-bugs@googlegroups.com, william.xuanziyang@huawei.com
 
-On Fri, Jun 14, 2024 at 07:15:29PM +0200, Matthieu Baerts (NGI0) wrote:
-> It is important to have fixed (sub)test names in TAP, because these
-> names are used to identify them. If they are not fixed, tracking cannot
-> be done.
-> 
-> Some subtests from the userspace_pm selftest were using random numbers
-> in their names: the client and server address IDs from $RANDOM, and the
-> client port number randomly picked by the kernel when creating the
-> connection. These values have been replaced by 'client' and 'server'
-> words: that's even more helpful than showing random numbers. Note that
-> the addresses IDs are incremented and decremented in the test: +1 or -1
-> are then displayed in these cases.
-> 
-> Not to loose info that can be useful for debugging in case of issues,
-> these random numbers are now displayed at the beginning of the test.
-> 
-> Fixes: f589234e1af0 ("selftests: mptcp: userspace_pm: format subtests results in TAP")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Hello:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Mon, 17 Jun 2024 19:09:37 +0800 you wrote:
+> hci_le_big_sync_established_evt is necessary to filter out cases where the
+> handle value is belonging to ida id range, otherwise ida will be erroneously
+> released in hci_conn_cleanup.
+> 
+> Fixes: 181a42edddf5 ("Bluetooth: Make handle of hci_conn be unique")
+> Reported-by: syzbot+b2545b087a01a7319474@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=b2545b087a01a7319474
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2] Bluetooth: Ignore too large handle values in BIG
+    https://git.kernel.org/bluetooth/bluetooth-next/c/401ad9b792e1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
