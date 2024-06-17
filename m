@@ -1,253 +1,290 @@
-Return-Path: <netdev+bounces-103930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AC4190A62B
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 08:56:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5BCC90A644
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:00:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1ECEBB28DCD
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 06:55:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94D65B25E87
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 07:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63FF186E25;
-	Mon, 17 Jun 2024 06:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7D518735A;
+	Mon, 17 Jun 2024 07:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CmaNH9hZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2E11862A1;
-	Mon, 17 Jun 2024 06:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067BD13B28A;
+	Mon, 17 Jun 2024 07:00:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718607326; cv=none; b=Ocxr4a9rqsxH+98Xyhait8OR4oQcpJXL2acHl/pI9IoEBzW1E3NBhTqztrcWnNly08j2lot8GIXjhBldo8WFXJu59YyHzq7js+c+vG9gwoyMDKFQhufyZNVNCv5YsIlRN2m4j6/LcYe5Ti4NuY0FeWsCUGVgK6IZWpOeYIXifw8=
+	t=1718607604; cv=none; b=KAm9eH9dzt2MegscAABVLpQuvvCw4WZgqZHRdOLb79+Rx+vA/iq58D6mJkp09je7eTwidLTelsJjoqEirZqa5K7Y5K3WPKaat3quHyNB/q3WSc+Jzx1UVBeAnpTBVepLLe42slYX3fnzVkxZxO++AmMyYxYEeD2SbojQXJHKBEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718607326; c=relaxed/simple;
-	bh=EbPM1ua44OR0qDCHbt7If6j3enB1A/91OBJIk+WTcZ0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=RiGEsZn6/gq0DheIX+T/RsVGkvk8oDMcE3GiLjluThYBURnoyPy0BIB/XkspV/pS3VvLKr4GNlL1zSB16tD2rZaTMpmrSl57EHYYKKyWdGz57a6F+LjbWkG2toRpOIJSwHoLTYOkl37rcdES92N9BIWZ6BBKD7Vi3zdZK6Fyeq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 45H6t0rlD2868264, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 45H6t0rlD2868264
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 17 Jun 2024 14:55:00 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 17 Jun 2024 14:55:00 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 17 Jun 2024 14:55:00 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
- RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
- 15.01.2507.035; Mon, 17 Jun 2024 14:55:00 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "andrew@lunn.ch"
-	<andrew@lunn.ch>,
-        "jiri@resnulli.us" <jiri@resnulli.us>,
-        "horms@kernel.org"
-	<horms@kernel.org>,
-        "rkannoth@marvell.com" <rkannoth@marvell.com>,
-        "Ping-Ke
- Shih" <pkshih@realtek.com>,
-        Larry Chiu <larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v20 10/13] rtase: Implement ethtool function
-Thread-Topic: [PATCH net-next v20 10/13] rtase: Implement ethtool function
-Thread-Index: AQHauLe4t8TnjFOscEGW3MirT25lzrHEW4aAgAC1QoA=
-Date: Mon, 17 Jun 2024 06:54:59 +0000
-Message-ID: <82ea81963af9482aa45d0463a21956b5@realtek.com>
-References: <20240607084321.7254-1-justinlai0215@realtek.com>
-	<20240607084321.7254-11-justinlai0215@realtek.com>
- <20240612173505.095c4117@kernel.org>
-In-Reply-To: <20240612173505.095c4117@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1718607604; c=relaxed/simple;
+	bh=/hbaAgyGIPPhVG4P0OCPoMtvi95I8xCPbHS9u7/7aeQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Yrj1krC9ufh94QPVyPzXlR8ErhHEvgWfLm9inshmmFV15yp2R6sTbjwOyIWDch4vy8vOuzKUCC9JSbE4r60ynryNgdbd8GH+IY7CBKjgY2Tao6ByZw6dQR+JhJ1xXso/aEsI4w06Tsmr4KFRQA7mVMV4+EPetDvvTq5LJPpEHxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CmaNH9hZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AE53C2BD10;
+	Mon, 17 Jun 2024 06:59:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718607603;
+	bh=/hbaAgyGIPPhVG4P0OCPoMtvi95I8xCPbHS9u7/7aeQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CmaNH9hZhKG/+3f3KwCFC104mRHj15+nwXX5vTPeeUU0o6VcftZ9Uarc1FVkYyHRH
+	 FtklDNE1f2EjQu8odsTakFzuUCu+23LRwAdR/BpggkMa0jJ1or1STdRpMAhdD5nfPp
+	 euLIU7bUHubUzSXcNehJS5SHLM42cdCvV4O27SKMBnMuoLujjXnQMIpD6DUvNAu0iN
+	 jHMN3Kp0nTDdUxHGgd8OKq8HXnjg9CG3hA7ZHwrzx88/Mj7Odl2dQtP0CPM8DvlKzo
+	 Npc55b5YI+7pQfuhLhib0oCKivNSRjXwEDjuUX1RwG7Iu/v+2VYYlO6uCV4tojTLHs
+	 rZUOguS8pEfNw==
+Message-ID: <28a6ff46-ad12-45c6-9ccb-f99fd08f3265@kernel.org>
+Date: Mon, 17 Jun 2024 08:59:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] dt-bindings: ptp: Convert ptp-qoirq to yaml format
+To: Frank Li <Frank.Li@nxp.com>, Yangbo Lu <yangbo.lu@nxp.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Madalin Bucur <madalin.bucur@nxp.com>, Sean Anderson <sean.anderson@seco.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, imx@lists.linux.dev
+References: <20240614-ls_fman-v1-0-cb33c96dc799@nxp.com>
+ <20240614-ls_fman-v1-1-cb33c96dc799@nxp.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240614-ls_fman-v1-1-cb33c96dc799@nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> On Fri, 7 Jun 2024 16:43:18 +0800 Justin Lai wrote:
-> > Implement the ethtool function to support users to obtain network card
-> > information, including obtaining various device settings, Report
-> > whether physical link is up, Report pause parameters, Set pause
-> > parameters, Return a set of strings that describe the requested
-> > objects, Get number of strings that @get_strings will write, Return
-> > extended statistics about the device.
->=20
-> You don't implement get_strings any more.
+On 14/06/2024 22:33, Frank Li wrote:
+> diff --git a/Documentation/devicetree/bindings/ptp/ptp-qoriq.yaml b/Documentation/devicetree/bindings/ptp/ptp-qoriq.yaml
+> new file mode 100644
+> index 0000000000000..585e8bffd90c9
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/ptp/ptp-qoriq.yaml
 
-Sorry, I will modify it.
+Filename based on compatible. Can be fsl,ptp.yaml
 
->=20
-> > +static void rtase_get_drvinfo(struct net_device *dev,
-> > +                           struct ethtool_drvinfo *drvinfo) {
-> > +     const struct rtase_private *tp =3D netdev_priv(dev);
-> > +
-> > +     strscpy(drvinfo->driver, KBUILD_MODNAME, 32);
->=20
-> sizeof(drvinfo->driver) instead of the literal 32?
+> @@ -0,0 +1,148 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/ptp/ptp-qoriq.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Freescale QorIQ 1588 timer based PTP clock
+> +
+> +maintainers:
+> +  - Frank Li <Frank.Li@nxp.com>
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - fsl,etsec-ptp
+> +      - fsl,fman-ptp-timer
+> +      - fsl,dpaa2-ptp
+> +      - fsl,enetc-ptp
+> +    description: |
+> +      Should be "fsl,etsec-ptp" for eTSEC
+> +      Should be "fsl,fman-ptp-timer" for DPAA FMan
+> +      Should be "fsl,dpaa2-ptp" for DPAA2
+> +      Should be "fsl,enetc-ptp" for ENETC
 
-It seems like a better approach, I'll switch to using
-sizeof(drvinfo->driver), thank you.
+You can write it simpler, e.g.
+- fsl,etsec-ptp   # eTSEC
 
->=20
-> > +     strscpy(drvinfo->bus_info, pci_name(tp->pdev), 32);
->=20
-> Can you double check that overwriting these fields is actually needed?
-> I think core will fill this in for you in ethtool_get_drvinfo()
+and then you see that this does not bring any new information - your
+comment duplicates the compatible. Just drop.
 
-I have removed this line of code for testing. Before removing the code,
-I could obtain bus info by entering "ethtool -i". However, after removing
-the code, entering "ethtool -i" no longer retrieves the bus info.
-Therefore, I believe that this line of code is still necessary.
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    minItems: 2
+> +    maxItems: 4
 
->=20
-> > +     if ((value & (RTASE_FORCE_TXFLOW_EN |
-> RTASE_FORCE_RXFLOW_EN)) =3D=3D
-> > +         (RTASE_FORCE_TXFLOW_EN | RTASE_FORCE_RXFLOW_EN)) {
-> > +             pause->rx_pause =3D 1;
-> > +             pause->tx_pause =3D 1;
-> > +     } else if ((value & RTASE_FORCE_TXFLOW_EN)) {
->=20
-> unnecessary parenthesis
->=20
-> > +             pause->tx_pause =3D 1;
-> > +     } else if ((value & RTASE_FORCE_RXFLOW_EN)) {
->=20
-> same here
->=20
+Items should be described.
 
-Sorry, I will remove the unnecessary parentheses, thank you.
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +  fsl,cksel:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: |
+> +      Timer reference clock source.
+> +
+> +      Reference clock source is determined by the value, which is holded
+> +      in CKSEL bits in TMR_CTRL register. "fsl,cksel" property keeps the
+> +      value, which will be directly written in those bits, that is why,
+> +      according to reference manual, the next clock sources can be used:
+> +
+> +      For eTSEC,
+> +      <0> - external high precision timer reference clock (TSEC_TMR_CLK
+> +            input is used for this purpose);
+> +      <1> - eTSEC system clock;
+> +      <2> - eTSEC1 transmit clock;
+> +      <3> - RTC clock input.
+> +
+> +      For DPAA FMan,
+> +      <0> - external high precision timer reference clock (TMR_1588_CLK)
+> +      <1> - MAC system clock (1/2 FMan clock)
+> +      <2> - reserved
+> +      <3> - RTC clock oscillator
+> +
+> +  fsl,tclk-period:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: Timer reference clock period in nanoseconds.
+> +
+> +  fsl,tmr-prsc:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: Prescaler, divides the output clock.
+> +
+> +  fsl,tmr-add:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: Frequency compensation value.
+> +
+> +  fsl,tmr-fiper1:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: Fixed interval period pulse generator.
+> +
+> +  fsl,tmr-fiper2:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: Fixed interval period pulse generator.
+> +
+> +  fsl,tmr-fiper3:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description:
+> +      Fixed interval period pulse generator.
+> +      Supported only on DPAA2 and ENETC hardware.
+> +
+> +  fsl,max-adj:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: |
+> +      Maximum frequency adjustment in parts per billion.
+> +
+> +      These properties set the operational parameters for the PTP
+> +      clock. You must choose these carefully for the clock to work right.
+> +      Here is how to figure good values:
+> +
+> +      TimerOsc     = selected reference clock   MHz
+> +      tclk_period  = desired clock period       nanoseconds
+> +      NominalFreq  = 1000 / tclk_period         MHz
+> +      FreqDivRatio = TimerOsc / NominalFreq     (must be greater that 1.0)
+> +      tmr_add      = ceil(2^32 / FreqDivRatio)
+> +      OutputClock  = NominalFreq / tmr_prsc     MHz
+> +      PulseWidth   = 1 / OutputClock            microseconds
+> +      FiperFreq1   = desired frequency in Hz
+> +      FiperDiv1    = 1000000 * OutputClock / FiperFreq1
+> +      tmr_fiper1   = tmr_prsc * tclk_period * FiperDiv1 - tclk_period
+> +      max_adj      = 1000000000 * (FreqDivRatio - 1.0) - 1
+> +
+> +      The calculation for tmr_fiper2 is the same as for tmr_fiper1. The
+> +      driver expects that tmr_fiper1 will be correctly set to produce a 1
+> +      Pulse Per Second (PPS) signal, since this will be offered to the PPS
+> +      subsystem to synchronize the Linux clock.
+> +
+> +      When this attribute is not used, the IEEE 1588 timer reference clock
+> +      will use the eTSEC system clock (for Gianfar) or the MAC system
+> +      clock (for DPAA).
+> +
+> +  fsl,extts-fifo:
+> +    $ref: /schemas/types.yaml#/definitions/flag
+> +    description:
+> +      The presence of this property indicates hardware
+> +      support for the external trigger stamp FIFO
+> +
+> +  little-endian:
+> +    $ref: /schemas/types.yaml#/definitions/flag
+> +    description:
+> +      The presence of this property indicates the 1588 timer
+> +      support for the external trigger stamp FIFO.
+> +      IP block is little-endian mode. The default endian mode
+> +      is big-endian.
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    ptp_clock@24e00 {
 
-> > +             pause->rx_pause =3D 1;
-> > +     }
-> > +}
-> > +
-> > +static int rtase_set_pauseparam(struct net_device *dev,
-> > +                             struct ethtool_pauseparam *pause) {
-> > +     const struct rtase_private *tp =3D netdev_priv(dev);
-> > +     u16 value =3D rtase_r16(tp, RTASE_CPLUS_CMD);
-> > +
-> > +     if (pause->autoneg)
-> > +             return -EOPNOTSUPP;
-> > +
-> > +     value &=3D ~(RTASE_FORCE_TXFLOW_EN |
-> RTASE_FORCE_RXFLOW_EN);
-> > +
-> > +     if (pause->tx_pause)
-> > +             value |=3D RTASE_FORCE_TXFLOW_EN;
-> > +
-> > +     if (pause->rx_pause)
-> > +             value |=3D RTASE_FORCE_RXFLOW_EN;
-> > +
-> > +     rtase_w16(tp, RTASE_CPLUS_CMD, value);
-> > +     return 0;
-> > +}
-> > +
-> > +static void rtase_get_eth_mac_stats(struct net_device *dev,
-> > +                                 struct ethtool_eth_mac_stats
-> *stats)
-> > +{
-> > +     struct rtase_private *tp =3D netdev_priv(dev);
-> > +     const struct rtase_counters *counters;
-> > +
-> > +     counters =3D tp->tally_vaddr;
-> > +     if (!counters)
->=20
-> you fail probe if this is NULL, why check if here?
->=20
+phc@
 
-Sorry, this check seems unnecessary, I will remove it.
+> +        compatible = "fsl,etsec-ptp";
+> +        reg = <0x24E00 0xB0>;
 
-> > +             return;
-> > +
-> > +     rtase_dump_tally_counter(tp);
-> > +
-> > +     stats->FramesTransmittedOK =3D le64_to_cpu(counters->tx_packets);
-> > +     stats->SingleCollisionFrames =3D
-> le32_to_cpu(counters->tx_one_collision);
-> > +     stats->MultipleCollisionFrames =3D
-> > +             le32_to_cpu(counters->tx_multi_collision);
-> > +     stats->FramesReceivedOK =3D le64_to_cpu(counters->rx_packets);
-> > +     stats->FrameCheckSequenceErrors =3D
-> > + le32_to_cpu(counters->rx_errors);
->=20
-> You dont report this in rtase_get_stats64() as crc errors, are these real=
-ly CRC /
-> FCS errors or other errors?
+Lowercase hex, in other places as well.
 
-Our rx_error indeed refers to crc_error. I will assign the value of
-rx_error to the crc_error in rtase_get_stats64().
 
->=20
-> > +     stats->AlignmentErrors =3D le16_to_cpu(counters->align_errors);
-> > +     stats->FramesAbortedDueToXSColls =3D
-> le16_to_cpu(counters->tx_aborted);
-> > +     stats->FramesLostDueToIntMACXmitError =3D
-> > +             le64_to_cpu(counters->tx_errors);
-> > +     stats->FramesLostDueToIntMACRcvError =3D
-> > +             le16_to_cpu(counters->rx_missed);
->=20
-> Are you sure this is the correct statistic to report as?
-> What's the definition of rx_missed in the datasheet?
+> +        interrupts = <12 0x8>, <13 0x8>;
 
-What we refer to as rx miss is the packets that can't be received because
-the fifo in the MAC is full. We consider this a type of MAC error, identica=
-l
-to the definition of FramesLostDueToIntMACRcvError.
+Use proper defines for interrupt flags.
 
->=20
-> Also is 16 bits enough for a packet counter at 5Gbps?
-> Don't you have to periodically accumulate this counter so that it doesn't=
- wrap
-> around?
+> +        interrupt-parent = <&ipic>;
+> +        fsl,cksel       = <1>;
 
-Indeed, this counter may wrap, but we don't need to accumulate it, because
-an increase in the number of rx_miss largely indicates that the system
-processing speed is not fast enough. Therefore, the size of this counter
-doesn't need to be too large.
 
->=20
-> > +     stats->MulticastFramesReceivedOK =3D
-> le32_to_cpu(counters->rx_multicast);
-> > +     stats->BroadcastFramesReceivedOK =3D
-> > +le64_to_cpu(counters->rx_broadcast);
-> > +}
-> > +
-> > +static const struct ethtool_ops rtase_ethtool_ops =3D {
-> > +     .get_drvinfo =3D rtase_get_drvinfo,
-> > +     .get_link =3D ethtool_op_get_link,
-> > +     .get_link_ksettings =3D rtase_get_settings,
-> > +     .get_pauseparam =3D rtase_get_pauseparam,
-> > +     .set_pauseparam =3D rtase_set_pauseparam,
-> > +     .get_eth_mac_stats =3D rtase_get_eth_mac_stats,
-> > +     .get_ts_info =3D ethtool_op_get_ts_info, };
-> > +
-> >  static void rtase_init_netdev_ops(struct net_device *dev)  {
-> >       dev->netdev_ops =3D &rtase_netdev_ops;
-> > +     dev->ethtool_ops =3D &rtase_ethtool_ops;
-> >  }
-> >
-> >  static void rtase_reset_interrupt(struct pci_dev *pdev,
+Best regards,
+Krzysztof
 
 
