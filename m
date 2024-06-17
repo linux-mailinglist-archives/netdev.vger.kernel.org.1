@@ -1,174 +1,115 @@
-Return-Path: <netdev+bounces-103966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2E3A90A998
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 11:31:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD1B990A9A8
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 11:34:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8154D28C376
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:31:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EC9B28A256
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:34:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 328F2193079;
-	Mon, 17 Jun 2024 09:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D86A192B83;
+	Mon, 17 Jun 2024 09:34:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="qo76LF7n"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PbqQOMOP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833C9192B82
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 09:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8058A190053
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 09:34:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718616644; cv=none; b=hzXrLXpnvzMEa+0x0hUQkP00Ui5JpIAQ+JjMmB3eeptnOc/9UL5CnKpRx1TFYBC/ivFp+7hSY8VrrLWG7QcVpiKfsin/0bsG7iG8fKN+3GHQ31IC2XhoIyw/5B+iFb5wYk+f5VIc1A3er/3ktCw40ayDN9G13WLiADdwWrlRR6A=
+	t=1718616880; cv=none; b=WXWZMOU8naNL305t6GsSSGERzRx3hUfujabkiRRKCr1YyU/dUs785vt0otmnBWyL1Xm0doNMJh74G4S3OFhbyWrxBP8UlZpWd5vEjkA/oNKYn1yBbI4si9i1nqvV1ZoRdovwe2fMFVJh7RT2hQJUiHkxHAfRt8XIb/e9PfwZWc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718616644; c=relaxed/simple;
-	bh=QLxX4Rpj7zYvuJpj/kPpfbxaCfiDItCMeqMDeGVl4V4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f6uC5nAicLt1yYxLXs7Ya+4lP+sEoJ5foBrnpiAB7dGlVr5EZ7OgwS+JzdUUceqhs6IvZ37Ovc100O3OjhHE/Hf2CwsE1kAiztgCL4szs3UBYz7t+LhvDyogMpaFqeJK02eUPyu7iiBdujHnY0Nf+JnJ9B/u6oBP1AcKuoRhiFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=qo76LF7n; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-52cc129c78fso108898e87.2
-        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 02:30:42 -0700 (PDT)
+	s=arc-20240116; t=1718616880; c=relaxed/simple;
+	bh=eQ3GEmVfz/NFFavQ5n+cPs0wp3Jo10dh1DwRVPw1aME=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=FHPjcpmsOMkw2KCrVsg/YHOkX1zwVf79vCTcr4ylgigg+k6P9hN9m5temB4OeLmnhuZNHqQiwXBnDBOgJM2HQVWJfabMb7GTOJToH9EKDPh6yqj0/6kHXkYzPj7ZR+s2+DRq5TXVXeZuMHeM3QjXn8N2LsGP4SKErjaGJEUBPM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PbqQOMOP; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52c8ddc2b29so4546556e87.3
+        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 02:34:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718616640; x=1719221440; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8QLktAGNTjUFJei+a7Yp7B+dYTOmyOgcx1VIYD5aK+o=;
-        b=qo76LF7nDvXgRAknReGqBrbCSsy7mQj892E5Ldwgb1jViJ5GpGtMSF91p+xeokXjwQ
-         nUJFNfwie78O0GZpKp9lTtulyV1LdSSSwrQ93GkK48ygSEKc/QpDEUj83p4PbebIi3ja
-         kqEFGiqv+WnxokgYDrUsOBchxzNVNXM83JuFaeuJj9Wh9RyK4PvOWF5FXo8sOuFhXfWS
-         ldx8RAHmWoxsunsyaz3AP7DAFWcCbetybYilfDIIOfdsXkx+0buXXHSGt6gjaJNArtlw
-         qm7a0OYoX19W9B9fJSM8qImg34KPa3aO09D3cuitsD0xkmDfoHBi92EktDsPWAVcnYvO
-         Ynlg==
+        d=linaro.org; s=google; t=1718616877; x=1719221677; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pZqlfzq0gqd8L9nHKEtDudKTVJ2RTjWVZ3OJQhA6rBE=;
+        b=PbqQOMOPL+ZjqEOB2y7P3WMc7nwjms/hKhbpjzmpBdWoX8Wea+u8Md/MMdbE67z9Qa
+         fUe+RmpDytiSpJJ/2M0rdzFXPAGtl5aSjzJcn/mmKDkAzVsUC+ONIiyX8DEVkgXvbK/n
+         LvmLsAcz49Vn5PGl6dU1ciOkqJ4o+zuChoCZuKEf9LS6SDBY2UxaGgqnpXPS00GL7V5n
+         2p2vuLpVI+WzhymLz6pivD0YrI0/ROB1NeMLBIUT5MW4ucwei+Pje+ZeM9nHo04x8489
+         0rIxiYByQrNgkJ8KHPlPjSKDXK3BXkt16M/BZ7+dqyGK06e7BGmlBjrFqcqiM1Y6O/vH
+         1/0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718616640; x=1719221440;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1718616877; x=1719221677;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8QLktAGNTjUFJei+a7Yp7B+dYTOmyOgcx1VIYD5aK+o=;
-        b=fnB92ol7PSLPjUZJO7D5z5+tWoT1GIo8pnGYrTrkvjSezgyQsF3oVGWd2Be4JRx/uQ
-         X+Muox1Fx0hMva4Drp/5N54DOj2GAK9SyEpdW27CRTPyqIlqes+EhyGMaAEtr6tLLHHK
-         1ECmSrSUNnDE1iPtpyEG7zz1idiTDrEK75G3nrWjquTSOIePNSlG0ldJFKFi7JzD66Jl
-         Kcb7Ge1bBsSYaXTdHzafekT447FVexNQvD76rsHUrBmCQuijxUWDTbAhPGJVFfFgI0AS
-         5ulMJ9QK7yS1HFdkRlO9qhY0lCIGeGZ0+7WEDO05sJgkqlGzbyie4B+HNDnmevG8J+9M
-         ZsHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUcrvw2gOXOJasdBO5t78XuCfbixkP82vbcLmnEiQnb2uf9s0niQ927Jj0jR6P7ge554DbmrTPomREi8qXxtnfRgYEGWnWJ
-X-Gm-Message-State: AOJu0YxylyqbmVrk+8X97E7X+52hw2HfpdOi7j2+br19INgx6OMAw5X3
-	Uty4UikvNdPbCt5/8P4HS0AcnDBpskI7fHkMrC4WN6qgD2ESnPRi+BqY9XsP17A=
-X-Google-Smtp-Source: AGHT+IFeQQ3VLHyWUDWMF94tKcMqEnxKjztlgo/DGQL+ULZYyDevfiUpxD8t+PLZ6eWIpx+EZWjgJQ==
-X-Received: by 2002:a19:385b:0:b0:52c:9846:3b8c with SMTP id 2adb3069b0e04-52ca6e6c7ffmr5359133e87.41.1718616640555;
-        Mon, 17 Jun 2024 02:30:40 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422874e71dcsm188650685e9.44.2024.06.17.02.30.38
+        bh=pZqlfzq0gqd8L9nHKEtDudKTVJ2RTjWVZ3OJQhA6rBE=;
+        b=fD0YWUU2Iz4CU6DqUZ7eOciczHCO7hNwx3T3XQIW73+YAsvT9aWnrVRU5gMRDs/ayh
+         IjGsJX/UG3V1IcdFakny5YLsnY/Uq5ObWq4vBcIQ+m4GSMKVtL93OidjSeJpJL0kxH8B
+         5ySplOMjMmV0bYSKEEOZEZDzHafHHLyjlmjAWLPbjl7yx6QWmjPJ+U8FR3LJswabsnXd
+         rjBpxMp2Sz2PsXGrv6vd+j5BMwACSy2CEeWkeA5YfY8qoo1SusgXLX9wuQwTZuKNP6Gq
+         eGIMEYEgluGPtMax6C7CAENR8CyT+XyX1Rve/OoPnUdFzwmIyZygjI1CoDv39d3DwORW
+         4M5w==
+X-Forwarded-Encrypted: i=1; AJvYcCXiWP+L12mk9wsvuk/squKbLVmuOPqRBOMjuDWafpoqKY01zmVXIGBJkd2uhgSR5GD8wYGvm3vUUyabiumGg0rURVBc5rdm
+X-Gm-Message-State: AOJu0YyIgtSMGm2CtqUjTzA6i6WAx35mHUllO09InlMsp/lUFHv2VAPR
+	XzPzjhR2JaBAlE3MQpxN80NbtukNY1UKYaiXwaRd3BVlvSji6isPRYZv+s5ROpk=
+X-Google-Smtp-Source: AGHT+IGTlennQ1HIxAYqKG4+OH6QB/vWUXrpLW9Q5q5XLEK9WNED7iZgfkSiN+EXrJNQbyVatzIneA==
+X-Received: by 2002:a05:6512:1c2:b0:52b:863a:59b4 with SMTP id 2adb3069b0e04-52ca6e6e576mr6799194e87.41.1718616876583;
+        Mon, 17 Jun 2024 02:34:36 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422f602e0c2sm152224985e9.14.2024.06.17.02.34.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 02:30:39 -0700 (PDT)
-Date: Mon, 17 Jun 2024 11:30:36 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Xing <kerneljasonxing@gmail.com>,
-	Heng Qi <hengqi@linux.alibaba.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, netdev@vger.kernel.org
-Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
-Message-ID: <ZnACPN-uDHZAwURl@nanopsycho.orion>
-References: <CACGkMEsy37mg-GwRXJNBBkvhEuaEYw-g3wthv_XS7+t5=ALhiA@mail.gmail.com>
- <ZmG9YWUcaW4S94Eq@nanopsycho.orion>
- <CACGkMEug18UTJ4HDB+E4-U84UnhyrY-P5kW4et5tnS9E7Pq2Gw@mail.gmail.com>
- <ZmKrGBLiNvDVKL2Z@nanopsycho.orion>
- <CACGkMEvQ04NBUBwrc9AyvLqskSbQ_4OBUK=B9a+iktLcPLeyrg@mail.gmail.com>
- <ZmLZkVML2a3mT2Hh@nanopsycho.orion>
- <20240607062231-mutt-send-email-mst@kernel.org>
- <ZmLvWnzUBwgpbyeh@nanopsycho.orion>
- <20240610101346-mutt-send-email-mst@kernel.org>
- <CACGkMEvWa9OZXhb2==VNw_t2SDdb9etLSvuWa=OWkDFr0rHLQA@mail.gmail.com>
+        Mon, 17 Jun 2024 02:34:36 -0700 (PDT)
+Date: Mon, 17 Jun 2024 12:34:32 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Yangbo Lu <yangbo.lu@nxp.com>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: [PATCH v2 net] ptp: fix integer overflow in max_vclocks_store
+Message-ID: <ee8110ed-6619-4bd7-9024-28c1f2ac24f4@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEvWa9OZXhb2==VNw_t2SDdb9etLSvuWa=OWkDFr0rHLQA@mail.gmail.com>
+X-Mailer: git-send-email haha only kidding
 
-Mon, Jun 17, 2024 at 03:44:55AM CEST, jasowang@redhat.com wrote:
->On Mon, Jun 10, 2024 at 10:19 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->>
->> On Fri, Jun 07, 2024 at 01:30:34PM +0200, Jiri Pirko wrote:
->> > Fri, Jun 07, 2024 at 12:23:37PM CEST, mst@redhat.com wrote:
->> > >On Fri, Jun 07, 2024 at 11:57:37AM +0200, Jiri Pirko wrote:
->> > >> >True. Personally, I would like to just drop orphan mode. But I'm not
->> > >> >sure others are happy with this.
->> > >>
->> > >> How about to do it other way around. I will take a stab at sending patch
->> > >> removing it. If anyone is against and has solid data to prove orphan
->> > >> mode is needed, let them provide those.
->> > >
->> > >Break it with no warning and see if anyone complains?
->> >
->> > This is now what I suggested at all.
->> >
->> > >No, this is not how we handle userspace compatibility, normally.
->> >
->> > Sure.
->> >
->> > Again:
->> >
->> > I would send orphan removal patch containing:
->> > 1) no module options removal. Warn if someone sets it up
->> > 2) module option to disable napi is ignored
->> > 3) orphan mode is removed from code
->> >
->> > There is no breakage. Only, hypotetically performance downgrade in some
->> > hypotetical usecase nobody knows of.
->>
->> Performance is why people use virtio. It's as much a breakage as any
->> other bug. The main difference is, with other types of breakage, they
->> are typically binary and we can not tolerate them at all.  A tiny,
->> negligeable performance regression might be tolarable if it brings
->> other benefits. I very much doubt avoiding interrupts is
->> negligeable though. And making code simpler isn't a big benefit,
->> users do not care.
->
->It's not just making code simpler. As discussed in the past, it also
->fixes real bugs.
->
->>
->> > My point was, if someone presents
->> > solid data to prove orphan is needed during the patch review, let's toss
->> > out the patch.
->> >
->> > Makes sense?
->>
->> It's not hypothetical - if anything, it's hypothetical that performance
->> does not regress.  And we just got a report from users that see a
->> regression without.  So, not really.
->
->Probably, but do we need to define a bar here? Looking at git history,
->we didn't ask a full benchmark for a lot of commits that may touch
+On 32bit systems, the "4 * max" multiply can overflow.  Use kcalloc()
+to do the allocation to prevent this.
 
-Moreover, there is no "benchmark" to run anyway, is it?
+Fixes: 44c494c8e30e ("ptp: track available ptp vclocks information")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+v2: It's better to use kcalloc() instead of size_mul().
 
+ drivers/ptp/ptp_sysfs.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
->performance.
->
->Thanks
->
->>
->> >
->> > >
->> > >--
->> > >MST
->> > >
->>
->
+diff --git a/drivers/ptp/ptp_sysfs.c b/drivers/ptp/ptp_sysfs.c
+index a15460aaa03b..6b1b8f57cd95 100644
+--- a/drivers/ptp/ptp_sysfs.c
++++ b/drivers/ptp/ptp_sysfs.c
+@@ -296,8 +296,7 @@ static ssize_t max_vclocks_store(struct device *dev,
+ 	if (max < ptp->n_vclocks)
+ 		goto out;
+ 
+-	size = sizeof(int) * max;
+-	vclock_index = kzalloc(size, GFP_KERNEL);
++	vclock_index = kcalloc(max, sizeof(int), GFP_KERNEL);
+ 	if (!vclock_index) {
+ 		err = -ENOMEM;
+ 		goto out;
+-- 
+2.43.0
+
 
