@@ -1,160 +1,124 @@
-Return-Path: <netdev+bounces-104188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C637590B75F
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:04:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B99690B764
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:05:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C36A1F223A7
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:04:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B04E283848
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 931C71684BB;
-	Mon, 17 Jun 2024 17:04:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="EB2EkGMp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D061684B5;
+	Mon, 17 Jun 2024 17:05:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335ED157A41;
-	Mon, 17 Jun 2024 17:04:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAFD15D5A9
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 17:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718643886; cv=none; b=qkcsgBQyW0rexLKdZ78TNvWDCma4os597paEArZokglqfi33DymwRx6wfBOI9+7hvgisLvysTBdedq0DzoQFBldOg72vuP/kDK2qUgPXN7A4psdTAQ3+sPrP/fO+LlECCDMcKd9cw0an5bE60LcjeuRegk6Il52uFLHOMIzYM5k=
+	t=1718643918; cv=none; b=GHn633vda6Le3geFmb2bkk05jWmpBejnmXRk4+XKMzqiGSIjeuUxik0kVDy7B20nl7EFI7dJ1pIL1gYN8qdcFNCd1gEbR1L2sOu10yRfsdHFCDXPclw3etR2IyFOqXWsl6PYmmseiG4VuHrnqrunloV589Tz6xbQzSJwqx15z3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718643886; c=relaxed/simple;
-	bh=aTo9WYNfxMDXZ7XIaowP99DTt7UkkCN5iUpRoKtIZ2g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dsl3/YOPNyS6QHfnbNS/r18sXYQod2vZ2/kpzY4mOIvF7ZL4rdhZIT7/xPmHTz7oyckn9poapuPIsDChPy6C3A6WgDxGy6nLvgMV8anFIgBlBMJwawmm6kZFdO+J1xhAPTk23bBVWsv16bMCf5NqDPb+XZrqN3Rb5xz9G7JvvR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=EB2EkGMp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 552BDC2BD10;
-	Mon, 17 Jun 2024 17:04:43 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="EB2EkGMp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1718643881;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ARICZd145/mpU/6/C4ChaIGt7llEKLdE0hg6cGdHWdo=;
-	b=EB2EkGMp1iSSR/ZoBjTvLsRipbJ/3GyF1pF67bPbTJpZpZViXHWNSdGe3Wp0tZUf6UwcS3
-	PPQY3tLkcp6pOnHOdpKJJIurtRSa2uJJxmso4eaZw7W4rybzLkYu5iwhPsWnqpDdk5ApWJ
-	+Lmz+dK5Qx+05M2/zNiFzoH33PNzOFM=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 81f95149 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Mon, 17 Jun 2024 17:04:41 +0000 (UTC)
-Date: Mon, 17 Jun 2024 19:04:34 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Uladzislau Rezki <urezki@gmail.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <ZnBsomxy_cCnnIBy@zx2c4.com>
-References: <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
- <ZmszOd5idhf2Cb-v@pc636>
- <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
- <Zmw5FTX752g0vtlD@pc638.lan>
- <ZmybGZDbXkw7JTjc@zx2c4.com>
- <ZnA_QFvuyABnD3ZA@pc636>
- <ZnBOkZClsvAUa_5X@zx2c4.com>
- <ZnBkvYdbAWILs7qx@pc636>
- <CAHmME9r4q8erE3E-Xn61ZkSOdDDrgx6jhTAywx3ca4=G0z=wAA@mail.gmail.com>
- <b415b8e3-24cc-4747-a30d-706e1dcfdff7@suse.cz>
+	s=arc-20240116; t=1718643918; c=relaxed/simple;
+	bh=+xBUJtvpslbkYDcggXsCPZD/p6lLcG3lUMBECT+3grs=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=TRzQ1Lsqs+YPkettWIy63biFfX7ZxrznPyW8cQZVyGqqU0XtogPObQTeFikvuLlAcxvdU+1BRELEcaiiD+AjhWluEtlsbL/BIRACI5/TMFSjnSvo5bqlzMmo9qP0a8nwy7dSetVodegcFL3UhySDpSaO3NKt/bnNnflb+6zCdt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 850B920008;
+	Mon, 17 Jun 2024 17:05:11 +0000 (UTC)
+Message-ID: <c05fd51d-7562-434f-be58-a58c181748aa@ovn.org>
+Date: Mon, 17 Jun 2024 19:05:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b415b8e3-24cc-4747-a30d-706e1dcfdff7@suse.cz>
+User-Agent: Mozilla Thunderbird
+Cc: i.maximets@ovn.org, davem@davemloft.net, netdev@vger.kernel.org,
+ edumazet@google.com, pabeni@redhat.com, Stefano Brivio <sbrivio@redhat.com>,
+ dsahern@kernel.org, donald.hunter@gmail.com,
+ Sabrina Dubroca <sdubroca@redhat.com>
+Subject: Re: [PATCH net] inet: bring NLM_DONE out to a separate recv() again
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20240411180202.399246-1-kuba@kernel.org>
+ <a25fa200-090f-456e-9885-fe25701dbd94@ovn.org>
+ <4b4f35b9-6419-49a4-b73e-5d02e3cbc69a@ovn.org>
+ <20240617093658.60998763@kernel.org>
+Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <20240617093658.60998763@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: i.maximets@ovn.org
 
-On Mon, Jun 17, 2024 at 06:38:52PM +0200, Vlastimil Babka wrote:
-> On 6/17/24 6:33 PM, Jason A. Donenfeld wrote:
-> > On Mon, Jun 17, 2024 at 6:30 PM Uladzislau Rezki <urezki@gmail.com> wrote:
-> >> Here if an "err" is less then "0" means there are still objects
-> >> whereas "is_destroyed" is set to "true" which is not correlated
-> >> with a comment:
-> >>
-> >> "Destruction happens when no objects"
-> > 
-> > The comment is just poorly written. But the logic of the code is right.
-> > 
-> >>
-> >> >  out_unlock:
-> >> >       mutex_unlock(&slab_mutex);
-> >> >       cpus_read_unlock();
-> >> > diff --git a/mm/slub.c b/mm/slub.c
-> >> > index 1373ac365a46..7db8fe90a323 100644
-> >> > --- a/mm/slub.c
-> >> > +++ b/mm/slub.c
-> >> > @@ -4510,6 +4510,8 @@ void kmem_cache_free(struct kmem_cache *s, void *x)
-> >> >               return;
-> >> >       trace_kmem_cache_free(_RET_IP_, x, s);
-> >> >       slab_free(s, virt_to_slab(x), x, _RET_IP_);
-> >> > +     if (s->is_destroyed)
-> >> > +             kmem_cache_destroy(s);
-> >> >  }
-> >> >  EXPORT_SYMBOL(kmem_cache_free);
-> >> >
-> >> > @@ -5342,9 +5344,6 @@ static void free_partial(struct kmem_cache *s, struct kmem_cache_node *n)
-> >> >               if (!slab->inuse) {
-> >> >                       remove_partial(n, slab);
-> >> >                       list_add(&slab->slab_list, &discard);
-> >> > -             } else {
-> >> > -                     list_slab_objects(s, slab,
-> >> > -                       "Objects remaining in %s on __kmem_cache_shutdown()");
-> >> >               }
-> >> >       }
-> >> >       spin_unlock_irq(&n->list_lock);
-> >> >
-> >> Anyway it looks like it was not welcome to do it in the kmem_cache_free()
-> >> function due to performance reason.
-> > 
-> > "was not welcome" - Vlastimil mentioned *potential* performance
-> > concerns before I posted this. I suspect he might have a different
-> > view now, maybe?
-> > 
-> > Vlastimil, this is just checking a boolean (which could be
-> > unlikely()'d), which should have pretty minimal overhead. Is that
-> > alright with you?
+On 6/17/24 18:36, Jakub Kicinski wrote:
+> On Mon, 17 Jun 2024 17:09:44 +0200 Ilya Maximets wrote:
+>>> FWIW, on current net-next this fixes the issue with Libreswan and IPv4
+>>> (IPv6 issue remains, obviously).  I also did a round of other OVS system
+>>> tests and they worked fine.
+>>>
+>>> Tested-by: Ilya Maximets <i.maximets@ovn.org>  
+>>
+>> Hi, Jakub.  Now that IPv6 change is in 6.10-rc, do you plan to submit a similar
+>> fix for it as well?  (Sorry if I missed it.)  Libreswan is getting stuck on IPv6
+>> route lookups with 6.10-rc4.
+>>
+>> Note: Libreswan fixed the issue on their main branch, but it is not available in
+>> any release yet, and I'm not sure if the fix is going to make it into stable
+>> releases.
 > 
-> Well I doubt we can just set and check it without any barriers? The
-> completion of the last pending kfree_rcu() might race with
-> kmem_cache_destroy() in a way that will leave the cache there forever, no?
-> And once we add barriers it becomes a perf issue?
+> Sorry for the delay, we'll get it resolved before this week's PR.
 
-Hm, yea you might be right about barriers being required. But actually,
-might this point toward a larger problem with no matter what approach,
-polling or event, is chosen? If the current rule is that
-kmem_cache_free() must never race with kmem_cache_destroy(), because
-users have always made diligent use of call_rcu()/rcu_barrier() and
-such, but now we're going to let those race with each other - either by
-my thing above or by polling - so we're potentially going to get in trouble
-and need some barriers anyway. 
+Ack.  Thanks!
 
-I think?
-
-Jason
+Best regards, Ilya Maximets.
 
