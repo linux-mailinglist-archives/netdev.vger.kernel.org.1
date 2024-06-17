@@ -1,215 +1,121 @@
-Return-Path: <netdev+bounces-104062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CB6290B08E
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:58:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B90A90B080
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:56:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B77E728537E
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:58:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DB171C21921
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:56:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE27316EB74;
-	Mon, 17 Jun 2024 13:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36DB116CD1A;
+	Mon, 17 Jun 2024 13:25:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AeNG0Ln0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PYwlBlW6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4507416DC39
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 13:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A9316CD18;
+	Mon, 17 Jun 2024 13:25:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718630721; cv=none; b=NApWakMVrK907faho4140C9oqdWLbehnICmwic/3ncYsXq4BG0aCYQG1S0LSbIStrzcDM3yrFuKvU4ZJRtABqA6zoXgA6/KCzcbu98RmtKLWEd9MreQsrH3unUyhqwt9XRUUrrXBfSL4lU8dtNTo0dZEGxbevTWbNnqEmas41Vw=
+	t=1718630717; cv=none; b=SPbd76jSLF3HFlfm7P2TAjbSuP6ePHQIEqmcaZRDJ6NV7Iy8PrSk06tMrhuN7JwIAqQL79wsMriQxxowrp/uSaSwK8/B13fMPbNl8R3o7pBKz53B8N5xFPo8pZtXhZkk/rsaCWWjPYaRcR9+wj+s5f74+J0Lo2ii052l7/NOpUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718630721; c=relaxed/simple;
-	bh=XpHPCsRoAdT6X6eunW6DKBI0v60GhrvSCGL4vzbBDvA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IJLcwTvXs26OH4Ehw02neHi8kKIY/E3Vh5GItEGEkYRwnb5dN3Kt/oUF8jJ0pB/oZndXyT5dRWxRzUlAMuP59F5ujacDyhGzt+bXX+02u+ikd8cjH3bfYG+0Wekiix8q78s35IVq15Y717GqatehN/k+ydLY2XEokHnWlf05Hxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AeNG0Ln0; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718630720; x=1750166720;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=XpHPCsRoAdT6X6eunW6DKBI0v60GhrvSCGL4vzbBDvA=;
-  b=AeNG0Ln0hpoD/YkhxX/Ud+bryaGFdXhLJyZYsf2F40SP4QANS0Mbabh3
-   7/vXTZFRCtg0XCB8Zizz9UM5u7FgFEx9rJBxAP/0F3Io5W/93BXPnCkDK
-   Pdq2rhtiQxXk0aQHtCMQ3I/Z0NPoCfydb6qQi+Na7ge4u/ZfTcKG4so6n
-   cMiveSQ6NJYHyf4HPaEElt0sXacdSxw/HvIsKJLTeZqFiGwssed3c/VOx
-   +82iOTO7z4qA5EkoVfJ7EzYXimhLvN1CtxYdhqh2CXnRu+RvsPqRT2v3D
-   qNlfNOm3NKqz6pzV8MCYUr88igqNpy89IknjenEsCEJdA4cKiPK9vR3/P
-   w==;
-X-CSE-ConnectionGUID: WU7+8INPQmObfxKBipUUgA==
-X-CSE-MsgGUID: ofYf+FOxR5eWwUEx3Xcy0g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11105"; a="15287103"
-X-IronPort-AV: E=Sophos;i="6.08,244,1712646000"; 
-   d="scan'208";a="15287103"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2024 06:25:15 -0700
-X-CSE-ConnectionGUID: fucocOo7Swu8yBFJeJlzqw==
-X-CSE-MsgGUID: 2p5Z51AGRiGmjCT9DgRTzg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,244,1712646000"; 
-   d="scan'208";a="46121212"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa003.jf.intel.com with ESMTP; 17 Jun 2024 06:25:12 -0700
-Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id BFB73333DA;
-	Mon, 17 Jun 2024 14:25:01 +0100 (IST)
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Lukasz Czapnik <lukasz.czapnik@intel.com>,
-	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: [PATCH iwl-next v1] ice: do not init struct ice_adapter more times than needed
-Date: Mon, 17 Jun 2024 15:24:07 +0200
-Message-Id: <20240617132407.107292-1-przemyslaw.kitszel@intel.com>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1718630717; c=relaxed/simple;
+	bh=R9gQ5TWisbAU0V37/lrPQFfzIfNu5uluZ0CmaDwYwDI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=kie4ab8nSBPnOU6EO9dckdALdc0ZECpZtUloUCGFz0I/0JAjBAC1UobMglGu+5CVuVNl1Obhyxh2uptVPwKtFo3oXGAy0bp+tVG4p+w1wk7AJ8VmLicCTYSzcQiwls9fahDoAvZUXkULrGZ9zUZra7Kcs8k5r0fa7hmAyoi8HUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PYwlBlW6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DF4DC4AF49;
+	Mon, 17 Jun 2024 13:25:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718630716;
+	bh=R9gQ5TWisbAU0V37/lrPQFfzIfNu5uluZ0CmaDwYwDI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=PYwlBlW6RSSZ+XKawrHf3TQYD4/BjQaEtSYbRd0VTZW+IXcMoZ+ddnNHdUlFFaX1l
+	 iThBtxF4CmcGtKYNQukoYDdM0s1cobfiD4we4gIb61x31Kbl9Sca1pF2liguWKNuBY
+	 3M6TE2dL6VTXsspvIGZ9LyxcMaKYf/Mr423nXUw6p48Erw2I9MTM6iHrxysJyhCQa9
+	 1myPk5c4BcZ0AGwKls49oeK3c72ffEJief19xd7j2GuhbAVv+zegPGV4JG9mCoLsf6
+	 F/16Ry10D3miQ1Hgb8X9lW5TdblZ/5KTImDGMggwBHswLT16UBGheOLFxd+lpb305W
+	 /U4FwY64UMMbQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Nicolas Escande <nico.escande@gmail.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 11/29] wifi: mac80211: mesh: init nonpeer_pm to active by default in mesh sdata
+Date: Mon, 17 Jun 2024 09:24:15 -0400
+Message-ID: <20240617132456.2588952-11-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240617132456.2588952-1-sashal@kernel.org>
+References: <20240617132456.2588952-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.1.94
 Content-Transfer-Encoding: 8bit
 
-Allocate and initialize struct ice_adapter object only once per physical
-card instead of once per port. This is not a big deal by now, but we want
-to extend this struct more and more in the near future. Our plans include
-PTP stuff and a devlink instance representing whole-device/physical card.
+From: Nicolas Escande <nico.escande@gmail.com>
 
-Transactions requiring to be sleep-able (like those doing user (here ice)
-memory allocation) must be performed with an additional (on top of xarray)
-mutex. Adding it here removes need to xa_lock() manually.
+[ Upstream commit 6f6291f09a322c1c1578badac8072d049363f4e6 ]
 
-Since this commit is a reimplementation of ice_adapter_get(), a rather new
-scoped_guard() wrapper for locking is used to simplify the logic.
+With a ath9k device I can see that:
+	iw phy phy0 interface add mesh0 type mp
+	ip link set mesh0 up
+	iw dev mesh0 scan
 
-It's worth to mention that xa_insert() use gives us both slot reservation
-and checks if it is already filled, what simplifies code a tiny	bit.
+Will start a scan with the Power Management bit set in the Frame Control Field.
+This is because we set this bit depending on the nonpeer_pm variable of the mesh
+iface sdata and when there are no active links on the interface it remains to
+NL80211_MESH_POWER_UNKNOWN.
 
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+As soon as links starts to be established, it wil switch to
+NL80211_MESH_POWER_ACTIVE as it is the value set by befault on the per sta
+nonpeer_pm field.
+As we want no power save by default, (as expressed with the per sta ini values),
+lets init it to the expected default value of NL80211_MESH_POWER_ACTIVE.
+
+Also please note that we cannot change the default value from userspace prior to
+establishing a link as using NL80211_CMD_SET_MESH_CONFIG will not work before
+NL80211_CMD_JOIN_MESH has been issued. So too late for our initial scan.
+
+Signed-off-by: Nicolas Escande <nico.escande@gmail.com>
+Link: https://msgid.link/20240527141759.299411-1-nico.escande@gmail.com
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/intel/ice/ice_adapter.c | 60 +++++++++-----------
- 1 file changed, 28 insertions(+), 32 deletions(-)
+ net/mac80211/mesh.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
-index 52d15ef7f4b1..ad84d8ad49a6 100644
---- a/drivers/net/ethernet/intel/ice/ice_adapter.c
-+++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
-@@ -11,6 +11,7 @@
- #include "ice_adapter.h"
- 
- static DEFINE_XARRAY(ice_adapters);
-+static DEFINE_MUTEX(ice_adapters_mutex);
- 
- /* PCI bus number is 8 bits. Slot is 5 bits. Domain can have the rest. */
- #define INDEX_FIELD_DOMAIN GENMASK(BITS_PER_LONG - 1, 13)
-@@ -47,8 +48,6 @@ static void ice_adapter_free(struct ice_adapter *adapter)
- 	kfree(adapter);
- }
- 
--DEFINE_FREE(ice_adapter_free, struct ice_adapter*, if (_T) ice_adapter_free(_T))
--
- /**
-  * ice_adapter_get - Get a shared ice_adapter structure.
-  * @pdev: Pointer to the pci_dev whose driver is getting the ice_adapter.
-@@ -64,53 +63,50 @@ DEFINE_FREE(ice_adapter_free, struct ice_adapter*, if (_T) ice_adapter_free(_T))
-  */
- struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
- {
--	struct ice_adapter *ret, __free(ice_adapter_free) *adapter = NULL;
- 	unsigned long index = ice_adapter_index(pdev);
--
--	adapter = ice_adapter_new();
--	if (!adapter)
--		return ERR_PTR(-ENOMEM);
--
--	xa_lock(&ice_adapters);
--	ret = __xa_cmpxchg(&ice_adapters, index, NULL, adapter, GFP_KERNEL);
--	if (xa_is_err(ret)) {
--		ret = ERR_PTR(xa_err(ret));
--		goto unlock;
--	}
--	if (ret) {
--		refcount_inc(&ret->refcount);
--		goto unlock;
-+	struct ice_adapter *adapter;
-+	int err;
-+
-+	scoped_guard(mutex, &ice_adapters_mutex) {
-+		err = xa_insert(&ice_adapters, index, NULL, GFP_KERNEL);
-+		if (err == -EBUSY) {
-+			adapter = xa_load(&ice_adapters, index);
-+			refcount_inc(&adapter->refcount);
-+			return adapter;
-+		}
-+		if (err)
-+			return ERR_PTR(err);
-+
-+		adapter = ice_adapter_new();
-+		if (!adapter)
-+			return ERR_PTR(-ENOMEM);
-+		xa_store(&ice_adapters, index, adapter, GFP_KERNEL);
- 	}
--	ret = no_free_ptr(adapter);
--unlock:
--	xa_unlock(&ice_adapters);
--	return ret;
-+	return adapter;
- }
- 
- /**
-  * ice_adapter_put - Release a reference to the shared ice_adapter structure.
-  * @pdev: Pointer to the pci_dev whose driver is releasing the ice_adapter.
-  *
-  * Releases the reference to ice_adapter previously obtained with
-  * ice_adapter_get.
-  *
-- * Context: Any.
-+ * Context: Process, may sleep.
-  */
- void ice_adapter_put(const struct pci_dev *pdev)
- {
- 	unsigned long index = ice_adapter_index(pdev);
- 	struct ice_adapter *adapter;
- 
--	xa_lock(&ice_adapters);
--	adapter = xa_load(&ice_adapters, index);
--	if (WARN_ON(!adapter))
--		goto unlock;
-+	scoped_guard(mutex, &ice_adapters_mutex) {
-+		adapter = xa_load(&ice_adapters, index);
-+		if (WARN_ON(!adapter))
-+			return;
-+		if (!refcount_dec_and_test(&adapter->refcount))
-+			return;
- 
--	if (!refcount_dec_and_test(&adapter->refcount))
--		goto unlock;
--
--	WARN_ON(__xa_erase(&ice_adapters, index) != adapter);
-+		WARN_ON(xa_erase(&ice_adapters, index) != adapter);
-+	}
- 	ice_adapter_free(adapter);
--unlock:
--	xa_unlock(&ice_adapters);
- }
-
-base-commit: 37cf9b0b18612fcb52a819518074e4a0beabe29a
+diff --git a/net/mac80211/mesh.c b/net/mac80211/mesh.c
+index 5a99b8f6e465f..9c9b47d153c28 100644
+--- a/net/mac80211/mesh.c
++++ b/net/mac80211/mesh.c
+@@ -1625,6 +1625,7 @@ void ieee80211_mesh_init_sdata(struct ieee80211_sub_if_data *sdata)
+ 	ifmsh->last_preq = jiffies;
+ 	ifmsh->next_perr = jiffies;
+ 	ifmsh->csa_role = IEEE80211_MESH_CSA_ROLE_NONE;
++	ifmsh->nonpeer_pm = NL80211_MESH_POWER_ACTIVE;
+ 	/* Allocate all mesh structures when creating the first mesh interface. */
+ 	if (!mesh_allocated)
+ 		ieee80211s_init();
 -- 
-2.39.3
+2.43.0
 
 
