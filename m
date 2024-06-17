@@ -1,95 +1,253 @@
-Return-Path: <netdev+bounces-103929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58C4590A618
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 08:51:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AC4190A62B
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 08:56:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67C8C1C25D17
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 06:51:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1ECEBB28DCD
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 06:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1DCC186E2A;
-	Mon, 17 Jun 2024 06:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63FF186E25;
+	Mon, 17 Jun 2024 06:55:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828A9186E28;
-	Mon, 17 Jun 2024 06:51:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2E11862A1;
+	Mon, 17 Jun 2024 06:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718607064; cv=none; b=Q2vh4U7T1nD3letZfC+ULIU5cXgv/dGXIjzNgYAyOnO08XNnevasCtdkizG4eMdaeiYfLLM8nnvXQ2bp2EX+KLSQ/KHXlBpGhnGDJRafCmdmM2u8XDfEvABjGWD/EkDAx9pPrt3m9jUi7SvtJGQP14LRM9HbKINJUmD+lQINwS8=
+	t=1718607326; cv=none; b=Ocxr4a9rqsxH+98Xyhait8OR4oQcpJXL2acHl/pI9IoEBzW1E3NBhTqztrcWnNly08j2lot8GIXjhBldo8WFXJu59YyHzq7js+c+vG9gwoyMDKFQhufyZNVNCv5YsIlRN2m4j6/LcYe5Ti4NuY0FeWsCUGVgK6IZWpOeYIXifw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718607064; c=relaxed/simple;
-	bh=IpZp/mW7DMENtlLsoUg2ZdNM2pVMUs566c4uDXHoagY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TxHYLx+Q9gXrcc4fKpjXQyi2LBnsOMTGQseWvjjbk8vyAfr5ElibGdXdfHmVZgb3gPtft0nXJ+QhHIOpdM719suw/4ZRiV3XICkHRyZ4VyICHWvKPta+5Qj39cEmBAzhorb8ueeYfZzFTzlhgbKqeoMO1CEcS14KsmlxV+/bgDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-254d001d03dso1946218fac.3;
-        Sun, 16 Jun 2024 23:51:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718607062; x=1719211862;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/Sn9t5PlhzvSPMNNXtLlu/LCQ1ItTnvGxpqPZVw4pGg=;
-        b=lww0h+WpBDAHLq8no7qVaDNjjUxhzdcg7ylqm9RuflS7qg2L9YuZdeRx5GzchgaYIw
-         El5ExnLOkiL6lkYfHFN5Ih+UkaT8siXvfhx/HvDrIMMkO30lAjLIV3rvlyhOZrcQoKvo
-         /5qlbtNags+nyUsIALsgXvCIpdXHpJi6caTRZJnLe+8u15aMBP2DqAfcN0b3OOJsZLWn
-         b1XUfU5QrSU3nU317zqvFmU3Hc5QuNu11qDTpZgwiu9PDP+14O4O9YW3SIDDJ6SFRijw
-         bZLyDJEvzUIsJOmPDnvNPhUeIKakQ34dgGkvp4cGyAv13Rgzk+ciFL8QB8JF8kvMfILA
-         7Cpg==
-X-Forwarded-Encrypted: i=1; AJvYcCXj4MPQoicd+42knkHVHMXFDByjSsQPe4nhL4kVbmPvZrfBCeJXUkJsAuUsdPKG3QzeRVwJF9E59Xx/jnmJ2ZJfrd8QfCW9NHMeim0FDYhCL3RjrElUqa/7u1MrWaKf2EOf5SUo
-X-Gm-Message-State: AOJu0YzB4lOe7v0z5orkrKQPYp9s0fNf60dN1XQG/XZlVLF27PJEyAE+
-	cqxV2UmwAxvgUZguTlEZcTxinaRVbmdhWcMOlLx19NKGN0sPXph/
-X-Google-Smtp-Source: AGHT+IHfWy5HY4azx7+8jbNehkTLCPbqguVaeJkk7pvS0tEAPCcTnja5wC36XqD9w+T1+d3jfmuBNA==
-X-Received: by 2002:a05:6870:e243:b0:254:bb5d:468c with SMTP id 586e51a60fabf-258428c33fbmr10403311fac.21.1718607062413;
-        Sun, 16 Jun 2024 23:51:02 -0700 (PDT)
-Received: from liuwe-devbox-debian-v2 ([20.69.120.36])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-705cc925fe7sm7047427b3a.19.2024.06.16.23.51.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Jun 2024 23:51:01 -0700 (PDT)
-Date: Mon, 17 Jun 2024 06:50:56 +0000
-From: Wei Liu <wei.liu@kernel.org>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Erick Archer <erick.archer@outlook.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH net-next] net: mana: Use mana_cleanup_port_context() for
- rxq cleanup
-Message-ID: <Zm_c0ElvAMMelKMz@liuwe-devbox-debian-v2>
-References: <1718349548-28697-1-git-send-email-shradhagupta@linux.microsoft.com>
+	s=arc-20240116; t=1718607326; c=relaxed/simple;
+	bh=EbPM1ua44OR0qDCHbt7If6j3enB1A/91OBJIk+WTcZ0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=RiGEsZn6/gq0DheIX+T/RsVGkvk8oDMcE3GiLjluThYBURnoyPy0BIB/XkspV/pS3VvLKr4GNlL1zSB16tD2rZaTMpmrSl57EHYYKKyWdGz57a6F+LjbWkG2toRpOIJSwHoLTYOkl37rcdES92N9BIWZ6BBKD7Vi3zdZK6Fyeq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 45H6t0rlD2868264, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 45H6t0rlD2868264
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 17 Jun 2024 14:55:00 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 17 Jun 2024 14:55:00 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 17 Jun 2024 14:55:00 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Mon, 17 Jun 2024 14:55:00 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "andrew@lunn.ch"
+	<andrew@lunn.ch>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org"
+	<horms@kernel.org>,
+        "rkannoth@marvell.com" <rkannoth@marvell.com>,
+        "Ping-Ke
+ Shih" <pkshih@realtek.com>,
+        Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v20 10/13] rtase: Implement ethtool function
+Thread-Topic: [PATCH net-next v20 10/13] rtase: Implement ethtool function
+Thread-Index: AQHauLe4t8TnjFOscEGW3MirT25lzrHEW4aAgAC1QoA=
+Date: Mon, 17 Jun 2024 06:54:59 +0000
+Message-ID: <82ea81963af9482aa45d0463a21956b5@realtek.com>
+References: <20240607084321.7254-1-justinlai0215@realtek.com>
+	<20240607084321.7254-11-justinlai0215@realtek.com>
+ <20240612173505.095c4117@kernel.org>
+In-Reply-To: <20240612173505.095c4117@kernel.org>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1718349548-28697-1-git-send-email-shradhagupta@linux.microsoft.com>
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Fri, Jun 14, 2024 at 12:19:08AM -0700, Shradha Gupta wrote:
-> 
-> To cleanup rxqs in port context structures, instead of duplicating the
-> code, use existing function mana_cleanup_port_context() which does
-> the exact cleanup that's needed.
-> 
-> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> On Fri, 7 Jun 2024 16:43:18 +0800 Justin Lai wrote:
+> > Implement the ethtool function to support users to obtain network card
+> > information, including obtaining various device settings, Report
+> > whether physical link is up, Report pause parameters, Set pause
+> > parameters, Return a set of strings that describe the requested
+> > objects, Get number of strings that @get_strings will write, Return
+> > extended statistics about the device.
+>=20
+> You don't implement get_strings any more.
 
-Reviewed-by: Wei Liu <wei.liu@kernel.org>
+Sorry, I will modify it.
+
+>=20
+> > +static void rtase_get_drvinfo(struct net_device *dev,
+> > +                           struct ethtool_drvinfo *drvinfo) {
+> > +     const struct rtase_private *tp =3D netdev_priv(dev);
+> > +
+> > +     strscpy(drvinfo->driver, KBUILD_MODNAME, 32);
+>=20
+> sizeof(drvinfo->driver) instead of the literal 32?
+
+It seems like a better approach, I'll switch to using
+sizeof(drvinfo->driver), thank you.
+
+>=20
+> > +     strscpy(drvinfo->bus_info, pci_name(tp->pdev), 32);
+>=20
+> Can you double check that overwriting these fields is actually needed?
+> I think core will fill this in for you in ethtool_get_drvinfo()
+
+I have removed this line of code for testing. Before removing the code,
+I could obtain bus info by entering "ethtool -i". However, after removing
+the code, entering "ethtool -i" no longer retrieves the bus info.
+Therefore, I believe that this line of code is still necessary.
+
+>=20
+> > +     if ((value & (RTASE_FORCE_TXFLOW_EN |
+> RTASE_FORCE_RXFLOW_EN)) =3D=3D
+> > +         (RTASE_FORCE_TXFLOW_EN | RTASE_FORCE_RXFLOW_EN)) {
+> > +             pause->rx_pause =3D 1;
+> > +             pause->tx_pause =3D 1;
+> > +     } else if ((value & RTASE_FORCE_TXFLOW_EN)) {
+>=20
+> unnecessary parenthesis
+>=20
+> > +             pause->tx_pause =3D 1;
+> > +     } else if ((value & RTASE_FORCE_RXFLOW_EN)) {
+>=20
+> same here
+>=20
+
+Sorry, I will remove the unnecessary parentheses, thank you.
+
+> > +             pause->rx_pause =3D 1;
+> > +     }
+> > +}
+> > +
+> > +static int rtase_set_pauseparam(struct net_device *dev,
+> > +                             struct ethtool_pauseparam *pause) {
+> > +     const struct rtase_private *tp =3D netdev_priv(dev);
+> > +     u16 value =3D rtase_r16(tp, RTASE_CPLUS_CMD);
+> > +
+> > +     if (pause->autoneg)
+> > +             return -EOPNOTSUPP;
+> > +
+> > +     value &=3D ~(RTASE_FORCE_TXFLOW_EN |
+> RTASE_FORCE_RXFLOW_EN);
+> > +
+> > +     if (pause->tx_pause)
+> > +             value |=3D RTASE_FORCE_TXFLOW_EN;
+> > +
+> > +     if (pause->rx_pause)
+> > +             value |=3D RTASE_FORCE_RXFLOW_EN;
+> > +
+> > +     rtase_w16(tp, RTASE_CPLUS_CMD, value);
+> > +     return 0;
+> > +}
+> > +
+> > +static void rtase_get_eth_mac_stats(struct net_device *dev,
+> > +                                 struct ethtool_eth_mac_stats
+> *stats)
+> > +{
+> > +     struct rtase_private *tp =3D netdev_priv(dev);
+> > +     const struct rtase_counters *counters;
+> > +
+> > +     counters =3D tp->tally_vaddr;
+> > +     if (!counters)
+>=20
+> you fail probe if this is NULL, why check if here?
+>=20
+
+Sorry, this check seems unnecessary, I will remove it.
+
+> > +             return;
+> > +
+> > +     rtase_dump_tally_counter(tp);
+> > +
+> > +     stats->FramesTransmittedOK =3D le64_to_cpu(counters->tx_packets);
+> > +     stats->SingleCollisionFrames =3D
+> le32_to_cpu(counters->tx_one_collision);
+> > +     stats->MultipleCollisionFrames =3D
+> > +             le32_to_cpu(counters->tx_multi_collision);
+> > +     stats->FramesReceivedOK =3D le64_to_cpu(counters->rx_packets);
+> > +     stats->FrameCheckSequenceErrors =3D
+> > + le32_to_cpu(counters->rx_errors);
+>=20
+> You dont report this in rtase_get_stats64() as crc errors, are these real=
+ly CRC /
+> FCS errors or other errors?
+
+Our rx_error indeed refers to crc_error. I will assign the value of
+rx_error to the crc_error in rtase_get_stats64().
+
+>=20
+> > +     stats->AlignmentErrors =3D le16_to_cpu(counters->align_errors);
+> > +     stats->FramesAbortedDueToXSColls =3D
+> le16_to_cpu(counters->tx_aborted);
+> > +     stats->FramesLostDueToIntMACXmitError =3D
+> > +             le64_to_cpu(counters->tx_errors);
+> > +     stats->FramesLostDueToIntMACRcvError =3D
+> > +             le16_to_cpu(counters->rx_missed);
+>=20
+> Are you sure this is the correct statistic to report as?
+> What's the definition of rx_missed in the datasheet?
+
+What we refer to as rx miss is the packets that can't be received because
+the fifo in the MAC is full. We consider this a type of MAC error, identica=
+l
+to the definition of FramesLostDueToIntMACRcvError.
+
+>=20
+> Also is 16 bits enough for a packet counter at 5Gbps?
+> Don't you have to periodically accumulate this counter so that it doesn't=
+ wrap
+> around?
+
+Indeed, this counter may wrap, but we don't need to accumulate it, because
+an increase in the number of rx_miss largely indicates that the system
+processing speed is not fast enough. Therefore, the size of this counter
+doesn't need to be too large.
+
+>=20
+> > +     stats->MulticastFramesReceivedOK =3D
+> le32_to_cpu(counters->rx_multicast);
+> > +     stats->BroadcastFramesReceivedOK =3D
+> > +le64_to_cpu(counters->rx_broadcast);
+> > +}
+> > +
+> > +static const struct ethtool_ops rtase_ethtool_ops =3D {
+> > +     .get_drvinfo =3D rtase_get_drvinfo,
+> > +     .get_link =3D ethtool_op_get_link,
+> > +     .get_link_ksettings =3D rtase_get_settings,
+> > +     .get_pauseparam =3D rtase_get_pauseparam,
+> > +     .set_pauseparam =3D rtase_set_pauseparam,
+> > +     .get_eth_mac_stats =3D rtase_get_eth_mac_stats,
+> > +     .get_ts_info =3D ethtool_op_get_ts_info, };
+> > +
+> >  static void rtase_init_netdev_ops(struct net_device *dev)  {
+> >       dev->netdev_ops =3D &rtase_netdev_ops;
+> > +     dev->ethtool_ops =3D &rtase_ethtool_ops;
+> >  }
+> >
+> >  static void rtase_reset_interrupt(struct pci_dev *pdev,
+
 
