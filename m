@@ -1,177 +1,191 @@
-Return-Path: <netdev+bounces-104162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B4F290B79C
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:17:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F087B90B797
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:15:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01BB5B36BBD
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:14:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 97D47B34DDC
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F8036AB8;
-	Mon, 17 Jun 2024 16:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A100F53A9;
+	Mon, 17 Jun 2024 16:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AJZfp6QY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JIBJZSWt"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C901D952C;
-	Mon, 17 Jun 2024 16:14:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C781B949
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 16:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718640866; cv=none; b=Oa3Pbbqz5I5TIrClbY2cmGQsRUZc6KJgnGyrQiAYV9gywg/0I72Ugc2awaZZtp+fyWjKi77pXkTWqNsciGDJtHHllnKSL6ju/ggWQYGVrxfkEO83jksnfXpWJECBD6k8H2rd/9OUPf5Fca+P9V1AT7jNBL2+qxiDG1lCrZKvxUc=
+	t=1718640996; cv=none; b=stvGXngID5aAjR0wm/kvv9Ci86ow3zwZzFke6yYwTsR46Y6mDdZOuWqG1OPy2LGrc1QicQtKRdmNqBpDwNyspT0f51am9DA3BeLDONYW9iIaTWibe7RfQxeDKjwA2ZgqK7NL/CJzYbDQyLfg0WWogzG4pK/SJp6wOyaEJnIyjQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718640866; c=relaxed/simple;
-	bh=cT0AAvEJ5+7GRrwFlT2hy5GZUsUCnO3yJnOeRS4jWGA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VePCHm7sIDAGdLpRb+bGkfZmu4L1UzmnXh3vtdcAU4KCC+eH+6gj6QMrF9wxriXXN+RxUgCSsgnYDXMQTvIbiglkP6bS8VX4yNvZPIDKnEM9yvWAEfNpsTlR7iga2rmqi3QpMFmgqmBGclVSN47Mm6c1AumFr2KGuXnJN4YXh3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AJZfp6QY; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2D44540005;
-	Mon, 17 Jun 2024 16:14:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1718640856;
+	s=arc-20240116; t=1718640996; c=relaxed/simple;
+	bh=+wbrMXHI1K3udEIdhQFfHU1ul3eAvVPemeTSl10tqzA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gVWVCqsmRJ9kJ9CkZtwe2EUeKcahSmS9e8u5rmm/mRO1hnEAkNUiXXPmrDc9gbkHHUetER79SmabHGEW0d7Midz4N54n0xTL8ASGhJLqflp+jF5e6vZhMxxf8kpyfBG5ZxeGYPWlFP6ghN3re0jrzOvhwPJ9rtrLuls2lO4hU1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JIBJZSWt; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718640994;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iz+UjwJJad9LiOiMA4eIoqFfH5EIpqwtGStSs8qGvyY=;
-	b=AJZfp6QYD0lCh15kuisT2712c3jXhgUrdKl5zGE/oY8soC1ya+siEAXWpefHTFQa115qLC
-	iLc9mZ1OJ0zb+UNP5w/Im108csFG4g3g1hmhn4zoDsB+hb20704Yd3b6wAE9z76arTq3ZE
-	Wkb+vwjQxNYNieeBiGD93hi5Uo3PHS/cLryDKcN3RHA2q1auucrIr4xgfKhJflHrTXzMGA
-	ShuUu2nswI6Uh9LJ50qehuccPOEbHeEeF3re/BGNiTH0qON6l6FsFXzOHDi4NCcyAu0V/O
-	854sKrAQ9RA8yl7W0kCRoiDpO1Cqtz1Ojc2Idj+tJ7rQ0elIIORyVc77ACFFCQ==
-Date: Mon, 17 Jun 2024 18:14:13 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>,
- kernel@pengutronix.de
-Subject: Re: [PATCH net-next v3 5/7] net: ethtool: Add new power limit get
- and set features
-Message-ID: <20240617181413.12178f95@kmaincent-XPS-13-7390>
-In-Reply-To: <Zm6BGJxu4bLVszFD@pengutronix.de>
-References: <20240614-feature_poe_power_cap-v3-0-a26784e78311@bootlin.com>
- <20240614-feature_poe_power_cap-v3-5-a26784e78311@bootlin.com>
- <Zm26aJaz7Z7LAXNT@pengutronix.de>
- <Zm3dTuXuVEF9MhDS@pengutronix.de>
- <Zm6BGJxu4bLVszFD@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	bh=POQUo9ZYFx2TRBMxz/20fM6AHmLGnv+tvZ6Yfe8E564=;
+	b=JIBJZSWtM4sX+oh07ckZUbvRYNGDy7m5K0pxdk7aWSAVJJkLReejtMefeJB7nI0a/OZn8n
+	HNYjzMsNrvWwJipJqzjWGNWZVJutZo/sn+vVpRGnPtSIyuh5D74pSlzHTFVH7aECFy022s
+	VqaYLbEZcphmvgkccdTJCGBlhqvNV0c=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-620-FBYYCV08M0SL06ixJ7bcYA-1; Mon, 17 Jun 2024 12:16:32 -0400
+X-MC-Unique: FBYYCV08M0SL06ixJ7bcYA-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ebe4b327a6so34286031fa.3
+        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 09:16:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718640991; x=1719245791;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=POQUo9ZYFx2TRBMxz/20fM6AHmLGnv+tvZ6Yfe8E564=;
+        b=i3iAk791+PTPtl5erui9UTyFSg8est74274pi7UxWuXPgd+fkEtP402kejaC8/v0OP
+         Qv8nm22t4WRp0S8xD5aymAwPcp8Mv4BSpZTHvFlSW74hirxdnzld2hiiYMuiQYYjpE+I
+         /qpTpH7EGLcIGK2aHAWGZWtijCLOIS4Sz70rbAowpb0aOblFIYar6+PR51xeR5O6R1kS
+         1n5GQP6HeZTE7uFLen6IGN7fFLK74CD32ZJYRIOpYcJ1FW9h1WOEiNptNqmF0xrAmeoL
+         t6tU/0XHPamUVSIhjdWEa/NXw8kCES6rsj54xqBdQKBNRv6wJ1W7yMcOviyO7MNxcfaV
+         ZOaw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/X547kr7kB6NxW6VvVQa8ollo++eZc6ogHCeIHhX+tVn7Zbz1gIypdULr6MQTliEtyi+NA4ecl4/MhVQ3n02NQgJCnOSE
+X-Gm-Message-State: AOJu0Yw4l8/wN7nUWb6jZ2P9DumqUwAYQZth8jT/6m1ENGXlRAPVRX1r
+	ETfdGkkeWfsy3taIWa0wjhHwoxEPqfWG0v5PVqkax8tTJsvuEw1fLVAFEyA649VZ8hjvQEpZynw
+	m4yZHhWmMEF8EbVm3Nk7cq43Ney6Noi7g++LyrNRlKiHe+e1Q1n2Zkg==
+X-Received: by 2002:a2e:b60e:0:b0:2eb:3281:5655 with SMTP id 38308e7fff4ca-2ec0e5d13c2mr73095841fa.26.1718640990984;
+        Mon, 17 Jun 2024 09:16:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IENS3KQDOp3objS9rqmf8lxn0GTyDBxVOhps/4Ykbq3BO9fpHje+C9/neMWBdUOIIrAR/h3uA==
+X-Received: by 2002:a2e:b60e:0:b0:2eb:3281:5655 with SMTP id 38308e7fff4ca-2ec0e5d13c2mr73095621fa.26.1718640990425;
+        Mon, 17 Jun 2024 09:16:30 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:17c:d4a1:48dc:2f16:ab1d:e55a])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ec25647ec2sm7042141fa.56.2024.06.17.09.16.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jun 2024 09:16:29 -0700 (PDT)
+Date: Mon, 17 Jun 2024 12:16:24 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Jason Xing <kerneljasonxing@gmail.com>,
+	Heng Qi <hengqi@linux.alibaba.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	john.fastabend@gmail.com, netdev@vger.kernel.org
+Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
+Message-ID: <20240617121448-mutt-send-email-mst@kernel.org>
+References: <ZmG9YWUcaW4S94Eq@nanopsycho.orion>
+ <CACGkMEug18UTJ4HDB+E4-U84UnhyrY-P5kW4et5tnS9E7Pq2Gw@mail.gmail.com>
+ <ZmKrGBLiNvDVKL2Z@nanopsycho.orion>
+ <CACGkMEvQ04NBUBwrc9AyvLqskSbQ_4OBUK=B9a+iktLcPLeyrg@mail.gmail.com>
+ <ZmLZkVML2a3mT2Hh@nanopsycho.orion>
+ <20240607062231-mutt-send-email-mst@kernel.org>
+ <ZmLvWnzUBwgpbyeh@nanopsycho.orion>
+ <20240610101346-mutt-send-email-mst@kernel.org>
+ <CACGkMEvWa9OZXhb2==VNw_t2SDdb9etLSvuWa=OWkDFr0rHLQA@mail.gmail.com>
+ <ZnACPN-uDHZAwURl@nanopsycho.orion>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZnACPN-uDHZAwURl@nanopsycho.orion>
 
-On Sun, 16 Jun 2024 08:07:20 +0200
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+On Mon, Jun 17, 2024 at 11:30:36AM +0200, Jiri Pirko wrote:
+> Mon, Jun 17, 2024 at 03:44:55AM CEST, jasowang@redhat.com wrote:
+> >On Mon, Jun 10, 2024 at 10:19 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >>
+> >> On Fri, Jun 07, 2024 at 01:30:34PM +0200, Jiri Pirko wrote:
+> >> > Fri, Jun 07, 2024 at 12:23:37PM CEST, mst@redhat.com wrote:
+> >> > >On Fri, Jun 07, 2024 at 11:57:37AM +0200, Jiri Pirko wrote:
+> >> > >> >True. Personally, I would like to just drop orphan mode. But I'm not
+> >> > >> >sure others are happy with this.
+> >> > >>
+> >> > >> How about to do it other way around. I will take a stab at sending patch
+> >> > >> removing it. If anyone is against and has solid data to prove orphan
+> >> > >> mode is needed, let them provide those.
+> >> > >
+> >> > >Break it with no warning and see if anyone complains?
+> >> >
+> >> > This is now what I suggested at all.
+> >> >
+> >> > >No, this is not how we handle userspace compatibility, normally.
+> >> >
+> >> > Sure.
+> >> >
+> >> > Again:
+> >> >
+> >> > I would send orphan removal patch containing:
+> >> > 1) no module options removal. Warn if someone sets it up
+> >> > 2) module option to disable napi is ignored
+> >> > 3) orphan mode is removed from code
+> >> >
+> >> > There is no breakage. Only, hypotetically performance downgrade in some
+> >> > hypotetical usecase nobody knows of.
+> >>
+> >> Performance is why people use virtio. It's as much a breakage as any
+> >> other bug. The main difference is, with other types of breakage, they
+> >> are typically binary and we can not tolerate them at all.  A tiny,
+> >> negligeable performance regression might be tolarable if it brings
+> >> other benefits. I very much doubt avoiding interrupts is
+> >> negligeable though. And making code simpler isn't a big benefit,
+> >> users do not care.
+> >
+> >It's not just making code simpler. As discussed in the past, it also
+> >fixes real bugs.
+> >
+> >>
+> >> > My point was, if someone presents
+> >> > solid data to prove orphan is needed during the patch review, let's toss
+> >> > out the patch.
+> >> >
+> >> > Makes sense?
+> >>
+> >> It's not hypothetical - if anything, it's hypothetical that performance
+> >> does not regress.  And we just got a report from users that see a
+> >> regression without.  So, not really.
+> >
+> >Probably, but do we need to define a bar here? Looking at git history,
+> >we didn't ask a full benchmark for a lot of commits that may touch
 
-> On Sat, Jun 15, 2024 at 08:28:30PM +0200, Oleksij Rempel wrote:
->  [...] =20
->=20
-> Except of current value, we need an interface to return list of supported
-> ranges. For example a controller with flexible configuration will have
-> one entry=20
+It's patently obvious that not getting interrupts is better than
+getting interrupts. The onus of proof would be on people who claim
+otherwise.
 
-Yes, good idea.
-=20
-> Proposed interface may look like this:
->=20
->   ``ETHTOOL_A_C33_PSE_AVAIL_PWR_VAL_LIMIT``  u32  Get PoE PSE currently
-> configured power value limit ``ETHTOOL_A_C33_PSE_PWR_LIMIT_RANGES``
-> nested  Supported power limit configuration ranges
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D  =3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
->=20
->  +------------------------------------------+--------+-------------------=
----------+
->  | ``ETHTOOL_A_C33_PSE_PWR_VAL_LIMIT_RANGES``   | nested | array of power
-> limit ranges|
-> +-+----------------------------------------+--------+--------------------=
---------+
-> | | ``ETHTOOL_A_C33_PSE_PWR_VAL_LIMIT_RANGE_ENTRY`` | nested | one power
-> limit range  |
-> +-+-+--------------------------------------+--------+--------------------=
---------+
-> | | | ``ETHTOOL_A_C33_PSE_PWR_VAL_LIMIT_MIN``  | u32    | minimum power v=
-alue
-> (mW)   |
-> +-+-+--------------------------------------+--------+--------------------=
---------+
-> | | | ``ETHTOOL_A_C33_PSE_PWR_VAL_LIMIT_MAX``  | u32    | maximum power v=
-alue
-> (mW)   |
-> +-+-+--------------------------------------+--------+--------------------=
---------+
 
-Not sure the ETHTOOL_A_C33_PSE_PWR_VAL_LIMIT_RANGE_ENTRY bring anything
-interesting.
+> Moreover, there is no "benchmark" to run anyway, is it?
+> 
 
- +--------------------------------------------+--------+-------------------=
----------+
- | ``ETHTOOL_A_C33_PSE_PWR_VAL_LIMIT_RANGES`` | nested | array of power lim=
-it ranges|
- +-+------------------------------------------+--------+-------------------=
----------+
- | | ``ETHTOOL_A_C33_PSE_PWR_VAL_LIMIT_MIN``  | u32    | minimum power valu=
-e (mW)   |
- +-+------------------------------------------+--------+-------------------=
----------+
- | | ``ETHTOOL_A_C33_PSE_PWR_VAL_LIMIT_MAX``  | u32    | maximum power valu=
-e (mW)   |
- +-+------------------------------------------+--------+-------------------=
----------+
+Tought.  Talk to users that report regressions.
 
-> > Huh... i took some more time to investigate it. Looks like there is no
-> > simple answer. Some devices seems to write power class on the box. Other
-> > client devices write power consumption in watts. IEEE 802.3-2022
-> > provides LLDP specification with PowerValue for watts and PowerClass for
-> > classes. Different product user interfaces provide class and/or watts.
-> > So, let's go with watts then. Please update the name to something like
-> > pse_available_power_value or pse_available_power_value_limit and
-> > document how it is related to State diagrams in the IEEE spec. =20
->=20
-> Here is proposal for documentation:
->=20
->   ``ETHTOOL_A_C33_PSE_AVAIL_PWR_VAL_LIMIT``  u32  Control PoE PSE availab=
-le
-> power value limit
->=20
-> When set, the optional ``ETHTOOL_A_C33_PSE_AVAIL_PWR_VAL_LIMIT`` attribut=
-e is
-> used  to control the available power value limit for C33 PSE in milliwatt=
-s.
-> This attribute corresponds  to the `pse_available_power` variable describ=
-ed in
-> ``IEEE 802.3-2022`` 33.2.4.4 Variables  and `pse_avail_pwr` in 145.2.5.4
-> Variables, which are described in power classes.=20
->=20
-> It was decided to use milliwatts for this interface to unify it with other
-> power monitoring interfaces, which also use milliwatts, and to align with
-> various existing products that document power consumption in watts rather=
- than
-> classes. If power limit configuration based on classes is needed, the
-> conversion can be done in user space, for example by ethtool.
 
-Thanks for the rephrasing!
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+> >performance.
+> >
+> >Thanks
+> >
+> >>
+> >> >
+> >> > >
+> >> > >--
+> >> > >MST
+> >> > >
+> >>
+> >
+
 
