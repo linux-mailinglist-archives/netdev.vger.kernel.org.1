@@ -1,232 +1,137 @@
-Return-Path: <netdev+bounces-103970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A3E590A9E3
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 11:39:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86EC990AA28
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 11:50:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 433A71C23869
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:39:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28E7C28D00A
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2CE5194A65;
-	Mon, 17 Jun 2024 09:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70DA519415E;
+	Mon, 17 Jun 2024 09:39:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MaORckUH"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Ar4BAu0e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 902E8194083;
-	Mon, 17 Jun 2024 09:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7218190053
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 09:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718617104; cv=none; b=SX7Q/sJIQk9stVu4oKox0je1DL3rc9sJRODgoGLskSdwvVDpd0VZXkS6g0H2fWkFE4lX/DrwOQaEO9IlryXWPLgZEHesIUlibXDn5oU1xOki/JqlV2ZCOqR22M/1CnKHp8xf8Y0V/AN5hXx8+zAyzo4NgrayUGj53g3ha/FAU0k=
+	t=1718617172; cv=none; b=WzgIraOQN1gMKEAvjhBZY6nxVZ4MqMlS4xIrv4llbfRUYKFfumwg0uKKrQ52/+DQVduBVLwtKNxul1LWHpW5Usx+u9vnEp5RPpA5PtQROJs0qQ+fz1hyL2kaBG9EKU7Zg0i4QxKQS2G8Ku+f3EvBmTNgCNB0Mm/VwsfmwRgvDy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718617104; c=relaxed/simple;
-	bh=hu+7JHtL6Prd6V/S2TJxZvc5nnlMUcfi+uYAd+zwbqo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=FHA2HkvloA97/5mNL27JlVX/c5sisUeaJkqi4QBx5+Y2PwDhHZOnCxl3T3KckbGy5uoItBeYQVjgEeAn7zosqAZGnhJygKPgfL2N6L4WEL56irULRiV7T4qFhCsv53C8I2idsumGPzGgP0kcmcENz7r7prv0t5jzFLAInuh41rI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MaORckUH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6FA3FC4AF4D;
-	Mon, 17 Jun 2024 09:38:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718617104;
-	bh=hu+7JHtL6Prd6V/S2TJxZvc5nnlMUcfi+uYAd+zwbqo=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=MaORckUHWYj6sDx9O4aXAC553bWsVjE01n9gHDRNa/+SygwtQoryd/ci3ig+bCiwm
-	 5qDgbKNrpM46Sp3F6OSP+Rwo3YGwaJ8KkBxryGaOfMzJgKBhLlgDGBHtq2IjH7xV9u
-	 HDCdMZJh2CPFs9oa/ny5/L2vaWh0fktfqIdmzGRrNLYs9o7zcBKZB+Ij7Qm+ljUBD/
-	 8C8SWc+f9FSi9OEYPas6NDoB7lXUgzCxDzl6GajWp9qTVTX0q92UB3tzV4YEw3jYWM
-	 S8AMup/QhtGAjSA4Z1V7e/uAqJz9VvXjqnLTJD7XYHAxb/R4gGjaME0qoj9bA3Jy0P
-	 bK+WUqQfh3eXg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 659DBC27C7B;
-	Mon, 17 Jun 2024 09:38:24 +0000 (UTC)
-From: Nikita Shubin via B4 Relay <devnull+nikita.shubin.maquefel.me@kernel.org>
-Date: Mon, 17 Jun 2024 12:36:51 +0300
-Subject: [PATCH v10 17/38] net: cirrus: add DT support for Cirrus EP93xx
+	s=arc-20240116; t=1718617172; c=relaxed/simple;
+	bh=w6euua8DdAndSBqtwxLw75oNhUUVr0fLiGLrdXsOKIg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tVISotYbvJ3BQQeLznM0SqVDUJS7DIfLVfl8T/OvFJyub+izPzO7m7HuTkzYbMVZyOoNW2AvoGpk/NrNdVZBMvMoFr0eViqK14+HCbRP0hqPs+ujt9fuUvSmLKpnGDW0dEjPJFOQyd36X6tDaEHoIug4jdje2qE2mX6g3X0v4so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Ar4BAu0e; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-57c73a3b3d7so4663675a12.1
+        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 02:39:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718617169; x=1719221969; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jWyeWccl/2aEbivUkA2fQdZreCyT8NBDVsWDIMF7kK0=;
+        b=Ar4BAu0e3HBjgt8WTbvI3pAaMMjA8Xcg5BJ71MQiIZuYnJkrjvwhF7ke98kMrCmdFx
+         7mTfjn7u3dWyKjkUuQ7kDkdGF0Q1aU3EU0DV73rNNIdeAnlvMAmWX93nQcShb/6aCLr3
+         XnZQbwbQphyzZvAy3FlTdo1I0jBkl7VF8oZGvMW2nrUHQm0S0IIQvZ9HNMSs3273x7r3
+         z6XGk7M42oo+o1yGCHFXiRn1+rofZm08QoaDt2M23sdiAx8r/gG6Dp4dKqC5YedMQ+kq
+         WOe1/gXXMdNp0pJjCDZ9EYwPcTnAgAjBEXecSxI1g652zQeTDZjSrpwFmBk8azyqVVBM
+         1UeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718617169; x=1719221969;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jWyeWccl/2aEbivUkA2fQdZreCyT8NBDVsWDIMF7kK0=;
+        b=aCmRH2fi88pksKq1rRTqCqDLzPlx67oXc+jJL8QJ2Z3G05YDByXO7h///cCJbmAChQ
+         W5U73FmzrFapfVlkFVsYkYX5igZsicYQANg0CqcO1G6LU581irYRND0NU6zDA2wkvbcY
+         e4p76hbn9WsjxcTbJiegf4xFyfjj2V4rOfcG7PwgkL6qJ1+yMpxpaBOtKE8w9Z8iM45W
+         RtDP6+ZrajKEOVXPZRwbsDXZXsIR4cYllpjW5q9l2AS3/byNI4+GkzPcK9YULnF06pni
+         jBmp6oXGeVumdKu5FockFI7ERmmH9drV+PHuThYPMzhja22lN4tYLEXx566en2mfFZyY
+         Eb6A==
+X-Forwarded-Encrypted: i=1; AJvYcCVNux1panNnPgH6XybUaDaq3K40tbPe07+VibTZHBbbE+XYhweKoyU8aiYMVaQXnMZKsClRlWBhsDWdZS3b4PnPgxUfCmso
+X-Gm-Message-State: AOJu0Yx8eGyC0oB64S/odj9UGyNLTua8yboWbKTA4ccMnE2I/FPmNqNi
+	r9MDe1FgjNhH+Z0Z/gO+ql9abAhIDqNraBTu38eLNU+28drpjuYpyf6uVRk0THM=
+X-Google-Smtp-Source: AGHT+IGp6uk6Ht7TdfIqqo0ajPFbRj2WbXpaBM2/Fev0ZqRwXqgcuvLouIHuUc2CjEsT4jUPUz2Q/Q==
+X-Received: by 2002:a50:a458:0:b0:57a:322c:b1a5 with SMTP id 4fb4d7f45d1cf-57cbd6a6d1dmr5264380a12.38.1718617169052;
+        Mon, 17 Jun 2024 02:39:29 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb72ce12fsm6169015a12.7.2024.06.17.02.39.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jun 2024 02:39:28 -0700 (PDT)
+Date: Mon, 17 Jun 2024 11:39:25 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Parav Pandit <parav@nvidia.com>
+Cc: Jason Wang <jasowang@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Cindy Lu <lulu@redhat.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+	"mst@redhat.com" <mst@redhat.com>,
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
+Message-ID: <ZnAETXPWG2BvyqSc@nanopsycho.orion>
+References: <20240611053239.516996-1-lulu@redhat.com>
+ <20240611185810.14b63d7d@kernel.org>
+ <ZmlAYcRHMqCgYBJD@nanopsycho.orion>
+ <CACGkMEtKFZwPpzjNBv2j6Y5L=jYTrW4B8FnSLRMWb_AtqqSSDQ@mail.gmail.com>
+ <PH0PR12MB5481BAABF5C43F9500D2852CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240617-ep93xx-v10-17-662e640ed811@maquefel.me>
-References: <20240617-ep93xx-v10-0-662e640ed811@maquefel.me>
-In-Reply-To: <20240617-ep93xx-v10-0-662e640ed811@maquefel.me>
-To: Hartley Sweeten <hsweeten@visionengravers.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Arnd Bergmann <arnd@arndb.de>, Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.13-dev-e3e53
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1718617100; l=4277;
- i=nikita.shubin@maquefel.me; s=20230718; h=from:subject:message-id;
- bh=b1GOTD5HubzYgxiOB7lYJxNswjw8j/5q0+HrSptbhew=;
- b=TW2ze5BBLD02v6bE9kZxBE28MvSmBcgffe4xoXMbBeQz7kKInJrrly8nuLCGqU36dJKx1x3te3Zq
- KvcTWgAtB8ZAMEvaDaVFkRjWOkZeLQDld0kyFlA88uW3+CwUQowV
-X-Developer-Key: i=nikita.shubin@maquefel.me; a=ed25519;
- pk=vqf5YIUJ7BJv3EJFaNNxWZgGuMgDH6rwufTLflwU9ac=
-X-Endpoint-Received: by B4 Relay for nikita.shubin@maquefel.me/20230718
- with auth_id=65
-X-Original-From: Nikita Shubin <nikita.shubin@maquefel.me>
-Reply-To: nikita.shubin@maquefel.me
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <PH0PR12MB5481BAABF5C43F9500D2852CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
 
-From: Nikita Shubin <nikita.shubin@maquefel.me>
+Mon, Jun 17, 2024 at 04:57:23AM CEST, parav@nvidia.com wrote:
+>
+>
+>> From: Jason Wang <jasowang@redhat.com>
+>> Sent: Monday, June 17, 2024 7:18 AM
+>> 
+>> On Wed, Jun 12, 2024 at 2:30 PM Jiri Pirko <jiri@resnulli.us> wrote:
+>> >
+>> > Wed, Jun 12, 2024 at 03:58:10AM CEST, kuba@kernel.org wrote:
+>> > >On Tue, 11 Jun 2024 13:32:32 +0800 Cindy Lu wrote:
+>> > >> Add new UAPI to support the mac address from vdpa tool Function
+>> > >> vdpa_nl_cmd_dev_config_set_doit() will get the MAC address from the
+>> > >> vdpa tool and then set it to the device.
+>> > >>
+>> > >> The usage is: vdpa dev set name vdpa_name mac **:**:**:**:**:**
+>> > >
+>> > >Why don't you use devlink?
+>> >
+>> > Fair question. Why does vdpa-specific uapi even exist? To have
+>> > driver-specific uapi Does not make any sense to me :/
+>> 
+>> It came with devlink first actually, but switched to a dedicated uAPI.
+>> 
+>> Parav(cced) may explain more here.
+>> 
+>Devlink configures function level mac that applies to all protocol devices (vdpa, rdma, netdev) etc.
+>Additionally, vdpa device level mac can be different (an additional one) to apply to only vdpa traffic.
+>Hence dedicated uAPI was added.
 
-- add OF ID match table
-- get phy_id from the device tree, as part of mdio
-- copy_addr is now always used, as there is no SoC/board that aren't
-- dropped platform header
+There is 1:1 relation between vdpa instance and devlink port, isn't it?
+Then we have:
+       devlink port function set DEV/PORT_INDEX hw_addr ADDR
 
-Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
-Tested-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/net/ethernet/cirrus/ep93xx_eth.c | 63 ++++++++++++++++----------------
- 1 file changed, 32 insertions(+), 31 deletions(-)
+Which does exactly what you need, configure function hw address (mac).
 
-diff --git a/drivers/net/ethernet/cirrus/ep93xx_eth.c b/drivers/net/ethernet/cirrus/ep93xx_eth.c
-index 1f495cfd7959..2523d9c9d1b8 100644
---- a/drivers/net/ethernet/cirrus/ep93xx_eth.c
-+++ b/drivers/net/ethernet/cirrus/ep93xx_eth.c
-@@ -16,13 +16,12 @@
- #include <linux/ethtool.h>
- #include <linux/interrupt.h>
- #include <linux/moduleparam.h>
-+#include <linux/of.h>
- #include <linux/platform_device.h>
- #include <linux/delay.h>
- #include <linux/io.h>
- #include <linux/slab.h>
- 
--#include <linux/platform_data/eth-ep93xx.h>
--
- #define DRV_MODULE_NAME		"ep93xx-eth"
- 
- #define RX_QUEUE_ENTRIES	64
-@@ -738,25 +737,6 @@ static const struct net_device_ops ep93xx_netdev_ops = {
- 	.ndo_set_mac_address	= eth_mac_addr,
- };
- 
--static struct net_device *ep93xx_dev_alloc(struct ep93xx_eth_data *data)
--{
--	struct net_device *dev;
--
--	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
--	if (dev == NULL)
--		return NULL;
--
--	eth_hw_addr_set(dev, data->dev_addr);
--
--	dev->ethtool_ops = &ep93xx_ethtool_ops;
--	dev->netdev_ops = &ep93xx_netdev_ops;
--
--	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
--
--	return dev;
--}
--
--
- static void ep93xx_eth_remove(struct platform_device *pdev)
- {
- 	struct net_device *dev;
-@@ -786,27 +766,47 @@ static void ep93xx_eth_remove(struct platform_device *pdev)
- 
- static int ep93xx_eth_probe(struct platform_device *pdev)
- {
--	struct ep93xx_eth_data *data;
- 	struct net_device *dev;
- 	struct ep93xx_priv *ep;
- 	struct resource *mem;
-+	void __iomem *base_addr;
-+	struct device_node *np;
-+	u32 phy_id;
- 	int irq;
- 	int err;
- 
- 	if (pdev == NULL)
- 		return -ENODEV;
--	data = dev_get_platdata(&pdev->dev);
- 
- 	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	irq = platform_get_irq(pdev, 0);
- 	if (!mem || irq < 0)
- 		return -ENXIO;
- 
--	dev = ep93xx_dev_alloc(data);
-+	base_addr = ioremap(mem->start, resource_size(mem));
-+	if (!base_addr)
-+		return dev_err_probe(&pdev->dev, -EIO, "Failed to ioremap ethernet registers\n");
-+
-+	np = of_parse_phandle(pdev->dev.of_node, "phy-handle", 0);
-+	if (!np)
-+		return dev_err_probe(&pdev->dev, -ENODEV, "Please provide \"phy-handle\"\n");
-+
-+	err = of_property_read_u32(np, "reg", &phy_id);
-+	of_node_put(np);
-+	if (err)
-+		return dev_err_probe(&pdev->dev, -ENOENT, "Failed to locate \"phy_id\"\n");
-+
-+	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
- 	if (dev == NULL) {
- 		err = -ENOMEM;
- 		goto err_out;
- 	}
-+
-+	eth_hw_addr_set(dev, base_addr + 0x50);
-+	dev->ethtool_ops = &ep93xx_ethtool_ops;
-+	dev->netdev_ops = &ep93xx_netdev_ops;
-+	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
-+
- 	ep = netdev_priv(dev);
- 	ep->dev = dev;
- 	SET_NETDEV_DEV(dev, &pdev->dev);
-@@ -822,15 +822,10 @@ static int ep93xx_eth_probe(struct platform_device *pdev)
- 		goto err_out;
- 	}
- 
--	ep->base_addr = ioremap(mem->start, resource_size(mem));
--	if (ep->base_addr == NULL) {
--		dev_err(&pdev->dev, "Failed to ioremap ethernet registers\n");
--		err = -EIO;
--		goto err_out;
--	}
-+	ep->base_addr = base_addr;
- 	ep->irq = irq;
- 
--	ep->mii.phy_id = data->phy_id;
-+	ep->mii.phy_id = phy_id;
- 	ep->mii.phy_id_mask = 0x1f;
- 	ep->mii.reg_num_mask = 0x1f;
- 	ep->mii.dev = dev;
-@@ -857,12 +852,18 @@ static int ep93xx_eth_probe(struct platform_device *pdev)
- 	return err;
- }
- 
-+static const struct of_device_id ep93xx_eth_of_ids[] = {
-+	{ .compatible = "cirrus,ep9301-eth" },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, ep93xx_eth_of_ids);
- 
- static struct platform_driver ep93xx_eth_driver = {
- 	.probe		= ep93xx_eth_probe,
- 	.remove_new	= ep93xx_eth_remove,
- 	.driver		= {
- 		.name	= "ep93xx-eth",
-+		.of_match_table = ep93xx_eth_of_ids,
- 	},
- };
- 
-
--- 
-2.43.2
-
-
+When you say VDPA traffic, do you suggest there might be VDPA instance
+and netdev running on the same VF in parallel. If yes, do we have 2
+eswitch port representors to be separately used to steer the traffic?
+If no, how is that supposed to be working?
 
