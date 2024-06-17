@@ -1,124 +1,115 @@
-Return-Path: <netdev+bounces-104238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C00690BB5A
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 21:46:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6016290BB63
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 21:50:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15912B250C0
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:46:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17E642856D4
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:50:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC54614AAD;
-	Mon, 17 Jun 2024 19:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC869188CDE;
+	Mon, 17 Jun 2024 19:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kq1qgEuF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA883D53E;
-	Mon, 17 Jun 2024 19:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B24D53E;
+	Mon, 17 Jun 2024 19:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718653565; cv=none; b=KUPXUhkKtDlMbUYmmOG8bcPy7d0dAqhVeVxa1xx5hpo/afePZR6E/RxRoQKnlLuLY9dLCu3rHAbx4FFWBc6Pnu25d0PIB+Jvm6KCYZnqzXs/87VIqKcwu1He+2S3oeXLIC6hgglTCHzw6HoOAZVIuQzO/h95O3r7chia6HjiyjU=
+	t=1718653798; cv=none; b=JrF9NO4wlSCos/mepmZKjRT/3QUp8jXEkMRV8wdk43bIF9SuYU8aJG+Vum9FTBgPgOjfVETOh+Jz2RR0maSrqfv55P7FQJeeZd98zZx9DqzOLs5desjyvXKNAYNk/EUaMsxecWj4SZFhsbDb4mVEi2Phju7dcUrV1XvtpbSeGZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718653565; c=relaxed/simple;
-	bh=K5ORaED9ut2XUwtSsL7d9/RgxE6XVAqRyIwqKv/I8zg=;
-	h=Subject:From:To:CC:References:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=JIO1K8Hzn5qWkSt94wpsni+ay49qN/Iy7x4PL6i7yxsGxL2YQ9f4dK7337C/Ck1VyOhkj/V5I29j2Q8OKWU7ly7izWcREmQD+0ivZ4IosEDiwwmDd4DozG7QDUxnxadDlkwp5QzcJioxbpua6x4Zbn5cjSrZo+FPwtI3+5TnBUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.72.187) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 17 Jun
- 2024 22:45:52 +0300
-Subject: Re: [net-next PATCH 1/2] net: ravb: Fix maximum MTU for GbEth devices
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-CC: Biju Das <biju.das.jz@bp.renesas.com>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>, Lad Prabhakar
-	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Mitsuhiro Kimura
-	<mitsuhiro.kimura.kc@renesas.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240615103038.973-1-paul.barker.ct@bp.renesas.com>
- <20240615103038.973-2-paul.barker.ct@bp.renesas.com>
- <e61ce8b4-fb9a-8b4f-23e1-7cfd6dd1040d@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <b2131a94-ab79-64ee-20d2-e977b082f83c@omp.ru>
-Date: Mon, 17 Jun 2024 22:45:52 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1718653798; c=relaxed/simple;
+	bh=5NIgnbUFM1+PrOJ60r8IgF7BZQd0mHyp5RnS6Y72WEk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ArXTJ1/KpfOpWHs04gxmvGaZz+fvUp6Krk26fqGbCx3/MwVcWYcWoAX9pmgz3TQ77ssqPrItAjx2OQ0KhBl2JGvKRsYVW4sibWbcpT4RbQwTRQSQRMNfFnUmrwcjm/PpujeauLO9xs1Sr8iSBTeXJ3aCTtNEH7YrexN2f6v7Zf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kq1qgEuF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07058C2BD10;
+	Mon, 17 Jun 2024 19:49:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718653798;
+	bh=5NIgnbUFM1+PrOJ60r8IgF7BZQd0mHyp5RnS6Y72WEk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kq1qgEuF6cLKPDMIZA2H84uNE++wSDMrqUymEpzT++7NAQmZ4vMR2nM6Vb/hm5OqB
+	 EgFgFS8zB74swq8D56N5YXK7D9971IGl1zVJqtXMllIoqiUaE1S59MKKHRHQ+l/XMO
+	 HNhOxa9E6rG2Ny4rifsO4RKjRJTJvf2Dt77193x3tRnQw3r0hrfTK7DwDICC6stDq3
+	 1Bz+LBpNBE1fki6D0rYVZGbhhCJD5uQsa+h+FxpHqAmf52dDqf78hU2JerfqX2khxI
+	 0dqR6l1rap0bjrKVLosTNS6cPL39j30/IE04U7jvLN3+eB08cRIFkUzfRvk2l88Fxn
+	 ib1BoV6KQIXDg==
+Date: Mon, 17 Jun 2024 20:49:53 +0100
+From: Simon Horman <horms@kernel.org>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: Geetha sowjanya <gakula@marvell.com>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+	Sunil Goutham <sgoutham@marvell.com>
+Subject: Re: [net-next PATCH v5 02/10] octeontx2-pf: RVU representor driver
+Message-ID: <20240617194953.GA8447@kernel.org>
+References: <20240611162213.22213-3-gakula@marvell.com>
+ <ac47a370-99ca-4fb9-8fb0-800894d04c57@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <e61ce8b4-fb9a-8b4f-23e1-7cfd6dd1040d@omp.ru>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 06/17/2024 19:20:05
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 185970 [Jun 17 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 20 0.3.20
- 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_arrow_text}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.72.187 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.72.187
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 06/17/2024 19:39:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 6/17/2024 4:39:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ac47a370-99ca-4fb9-8fb0-800894d04c57@web.de>
 
-On 6/17/24 10:38 PM, Sergey Shtylyov wrote:
-[...]
-
->> The datasheets for all SoCs using the GbEth IP specify a maximum
->> transmission frame size of 1.5 kByte. I've confirmed through internal
->> discussions that support for 1522 byte frames has been validated, which
->> allows us to support the default MTU of 1500 bytes after reserving space
->> for the Ethernet header, frame checksums and an optional VLAN tag.
->>
->> Fixes: 2e95e08ac009 ("ravb: Add rx_max_buf_size to struct ravb_hw_info")
->> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
-> [...]
+On Sat, Jun 15, 2024 at 05:11:53PM +0200, Markus Elfring wrote:
+> > This patch adds basic driver for the RVU representor.
+> …
 > 
-> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> Please improve such a change description with imperative wordings.
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.10-rc3#n94
+> 
+> Can an adjusted summary phrase become also a bit more helpful?
+> https://elixir.bootlin.com/linux/v6.10-rc3/source/Documentation/process/maintainer-tip.rst#L124
+> 
+> 
+> …
+> > +static int rvu_get_rep_cnt(struct otx2_nic *priv)
+> > +{
+> …
+> > +	mutex_lock(&priv->mbox.lock);
+> > +	req = otx2_mbox_alloc_msg_get_rep_cnt(&priv->mbox);
+> …
+> > +exit:
+> > +	mutex_unlock(&priv->mbox.lock);
+> > +	return err;
+> > +}
+> …
+> 
+> Would you become interested to apply a statement like “guard(mutex)(&priv->mbox.lock);”?
+> https://elixir.bootlin.com/linux/v6.10-rc3/source/include/linux/mutex.h#L196
+> 
+> 
+> …
+> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.h
+> > @@ -0,0 +1,31 @@
+> …
+> > +#ifndef REP_H
+> > +#define REP_H
+> …
+> 
+> Can unique include guards be more desirable also for this software?
 
-   Sounds like this is a also fix for the net.git tho?
+As Andrew Lunn said eleswhere [1]:
 
-[...]
+"We decided for netdev that guard() was too magical, at least for the
+ moment. Lets wait a few years to see how it pans out. scoped_guard()
+ is however O.K."
 
-MBR, Sergey
+[1] https://lore.kernel.org/netdev/f2ddbeaa-e053-467f-96d2-699999d72aba@lunn.ch/
 
