@@ -1,112 +1,126 @@
-Return-Path: <netdev+bounces-103957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6573190A861
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 10:28:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B12A390A867
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 10:30:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D3401F219BA
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 08:28:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2D971C20D8A
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 08:30:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1F27190466;
-	Mon, 17 Jun 2024 08:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8971919049A;
+	Mon, 17 Jun 2024 08:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kMvTYB8A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZrPbou6g"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9087187342;
-	Mon, 17 Jun 2024 08:28:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8BE17F5;
+	Mon, 17 Jun 2024 08:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718612919; cv=none; b=a4b2OsCHeaAfOOi3qtvVH0bUj+Etsq//fufqwtjD2gnnx3kpoHmfQrggd4pU6hIBLF7xBvtbgXhvhIDZhMXuVdINZYuSDkXuIM0QCxyHFiLT8ai+pYBfZ82vp7YUlnywB7NWhtAZywPNqOtHuUTA2sD6AI4VG2pI/OUsBbzHuHM=
+	t=1718613046; cv=none; b=HDxVmjDIDFJxpUJyU/kkqqeebd/n4OlXK8E8doGF/1SpGNtZGWknmin1KmJmUunM75B3quV0mRAWuxGLn2VfGrwa7XT+NwrmYJ7KNPAPTOtBQJBnFWANH7LMhAevRCRmm72yC8Kk59hAINPs/R0ATdFsKUdIAogWLNmFE6imF/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718612919; c=relaxed/simple;
-	bh=ByABHIgX/ho9/cT/uZjXBPibJy0YoUkL6nxvrr1uzjg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hN4DJAAcxgLMgXtqlb4GDHN4iESidGM/3eU6aJEDE/Hnf3Y0OHtsr6doiq12KFUwWJVXfkCoElPKCcL0GWjneJrlVXEW0Xw4D65buz5d/VpHuPVllQfX2r2PuWiu851/zSSAdqDQTL2O9EwyIFvBlJ7W+Mm1wd/5h59sNqlKO9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kMvTYB8A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23D76C2BD10;
-	Mon, 17 Jun 2024 08:28:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718612919;
-	bh=ByABHIgX/ho9/cT/uZjXBPibJy0YoUkL6nxvrr1uzjg=;
-	h=From:Date:Subject:To:Cc:From;
-	b=kMvTYB8AMwNK3K8joduMysIumj/1naUwwAm+Z+TpIKCpubvP3WpZTv0b3XwLpWa80
-	 cE2D4SNd3K1Vx+IkpHBtyOlJ7WyQhj0Yd8Uvvqo+ETe4ABDU83xfasl2TzB2z0jNy1
-	 tpra7bGtRP2xkT0INaiTa67N7357H6ktdgH3zfd+O4NjxM8JAFdPr+5Du2Ef7hYr5W
-	 MgCbtBi5xBC5B/NVnAFJgpf4FFB3lUaavP0cf75COAd/34XWbxOuHmt/7mEdbAgse8
-	 /vyHyBH6jILwiVBvd2yO602DfGdP816l3gcqktRYYZiXZvvVWY5GGQd/Qfq1pcAUUj
-	 OyXayJHzLTYHw==
-From: Simon Horman <horms@kernel.org>
-Date: Mon, 17 Jun 2024 09:28:33 +0100
-Subject: [PATCH net] selftests: openvswitch: Use bash as interpreter
+	s=arc-20240116; t=1718613046; c=relaxed/simple;
+	bh=yYxw7L+gzDilEI/XWHbKIFjpkH6nrx3hA+WiZNpLLP0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=qTKOlwO4OTakvHKmFp/vPqrbcRr9yU3NLSlTHepGYMB01OaxfBSVPipKxfZTA2ryNxVeZm7XwzxkSb0OvHLiEp0+2LFmFF66DTZX/u03z8RKfY0Tub/bDOf6o2XTF7ioZQRuzTrP0eZwSgzxxBJ2+EnixRCJjIHSeZnOV8aZHjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZrPbou6g; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-35f1bc2ab37so3554974f8f.1;
+        Mon, 17 Jun 2024 01:30:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718613043; x=1719217843; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YVSDet1jU8e9qxWG/OSUjestn/66Ck7NYAywURhS3+I=;
+        b=ZrPbou6gOgZDcOGEH/lITWZ5rRSCmZuSBFEhg1W1hIAUqmbuuthowKjSH6hWMa0u6c
+         xlnJuo1BwgIZ/FahOZtZYQG4n0JvrRvDQLiHQPJsdGBhwmX4pVT7NnkBMId4l9u7izVE
+         V1EAsQZoWfG3Ax3IUctuXWrys7zenqskwCqJte/ySkDlwEdvfQeItAWbFRfDX7kT2BCy
+         L73sItveiGSqAuy6TClWOAODjHU2y7groaWhe9+a9vFjnxCDeiN2NvhZyglfarxtdUhT
+         d5i1GLcvRxng9sNm87iqpcFmPrkpMNczqzwB+ZUk7kbjq8lkKHkdtDVn5UbGecOukzKM
+         7gsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718613043; x=1719217843;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YVSDet1jU8e9qxWG/OSUjestn/66Ck7NYAywURhS3+I=;
+        b=VHVHdQ7C7dOrS8M0a8ONEs5W9lALLVYaK6sSwIXSz1GmSe6f+Ds62ZSfpRpIr3fHaa
+         kha9NiDzM3E1+sTO36cjDp7fjZWut2w7CiOY5wQHMpxMaZlKjdFNYsYNPo21CMGK7ya8
+         7t+a1EUjbC5S/doj5PWXLQOcvmcp5yrcQHCOgu+CP5xyhMqlRKEXRPwrQEwUnAJPSWUd
+         qxtOcpYJ7ceMQxVR7Atl7Eo+TBwFjLgzwU+QhCXmT1w+r/2smoYv6l06G7N9NZPtE16V
+         fwhD1x4fOGSGDU855ZhxfAWHFUu8IKNkUBdUuKJ8LfgULEYkvhbwOz96lt/sF3hhLqpq
+         D27Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVzPJdx6no6P2n0qcDg2L+dq2OPtqNKAmHZmj3Xcq3Z9ETe41Jcc6J+blYNnpWpOxC8/Be+1Q3ZKxtKPhOdC2Jpf0RgCRd2CdDcUjm1Xc8SK1C+Ne/FzTR2YSgEyD9oiM/eExzsXAEKm35ZEls24AqMqFG5+XeFOTbbxWkxwCDH5Q==
+X-Gm-Message-State: AOJu0YxJkK02ADhnmHtB5q3JL65t5txhNCDyULVfTqdBWZ1xNc8dvdM7
+	UCmVVF0cxmZSA8MX+iAwBY8N4jfKVGiCkPivUU+evbkHxtEab69M
+X-Google-Smtp-Source: AGHT+IGbJvNXxttiBMa1KsFPj/tmntA/qNIHNUlo5b9laNDyBmWTRtbokJXpTeLkSl34hyQYAX13sA==
+X-Received: by 2002:a5d:42cb:0:b0:360:82d6:5e98 with SMTP id ffacd0b85a97d-36082d65fa1mr4975741f8f.51.1718613042899;
+        Mon, 17 Jun 2024 01:30:42 -0700 (PDT)
+Received: from [10.158.37.53] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3607509c9a0sm11331771f8f.27.2024.06.17.01.30.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Jun 2024 01:30:42 -0700 (PDT)
+Message-ID: <9ec867ad-6b7b-4ca9-83c6-66e9aa674cae@gmail.com>
+Date: Mon, 17 Jun 2024 11:30:40 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v5 2/2] net/mlx5e: Add per queue netdev-genl stats
+To: Joe Damato <jdamato@fastly.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, nalramli@fastly.com,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ "open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20240612200900.246492-1-jdamato@fastly.com>
+ <20240612200900.246492-3-jdamato@fastly.com>
+ <0a38f58a-2b1e-4d78-90e1-eb8539f65306@gmail.com>
+ <20240613145817.32992753@kernel.org> <ZmtusKxkPzSTkMxo@LQ3V64L9R2>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <ZmtusKxkPzSTkMxo@LQ3V64L9R2>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240617-ovs-selftest-bash-v1-1-7ae6ccd3617b@kernel.org>
-X-B4-Tracking: v=1; b=H4sIALDzb2YC/x3MMQqAMAxA0atIZgOmiIpXEYdWUw1IlaaIULy7x
- fEN/2dQjsIKY5Uh8i0qZyiguoJlt2FjlLUYTGPapqMez1tR+fCJNaGzuiMZct53ZNfBQemuyF6
- e/zlB4ATz+34XcRdmaAAAAA==
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Aaron Conole <aconole@redhat.com>, Adrian Moreno <amorenoz@redhat.com>, 
- Pravin B Shelar <pshelar@ovn.org>, Shuah Khan <shuah@kernel.org>, 
- netdev@vger.kernel.org, dev@openvswitch.org, 
- linux-kselftest@vger.kernel.org
-X-Mailer: b4 0.12.3
 
-openvswitch.sh makes use of substitutions of the form ${ns:0:1}, to
-obtain the first character of $ns. Empirically, this is works with bash
-but not dash. When run with dash these evaluate to an empty string and
-printing an error to stdout.
 
- # dash -c 'ns=client; echo "${ns:0:1}"' 2>error
- # cat error
- dash: 1: Bad substitution
- # bash -c 'ns=client; echo "${ns:0:1}"' 2>error
- c
- # cat error
 
-This leads to tests that neither pass nor fail.
-F.e.
+On 14/06/2024 1:12, Joe Damato wrote:
+> On Thu, Jun 13, 2024 at 02:58:17PM -0700, Jakub Kicinski wrote:
+>> On Thu, 13 Jun 2024 23:25:12 +0300 Tariq Toukan wrote:
+>>>> +		for (i = priv->channels.params.num_channels; i < priv->stats_nch; i++) {
+>>>
+>>> IIUC, per the current kernel implementation, the lower parts won't be
+>>> completed in a loop over [0..real_num_rx_queues-1], as that loop is
+>>> conditional, happening only if the queues are active.
+>>
+>> Could you rephrase this? Is priv->channels.params.num_channels
+>> non-zero also when device is closed? I'm just guessing from
+>> the code, TBH, I can't parse your reply :(
+> 
+> I don't mean to speak for Tariq (so my apologies Tariq), but I
+> suspect it may not be clear in which cases IFF_UP is checked and in
+> which cases get_base is called.
+> 
 
- TEST: arp_ping                                                      [START]
- adding sandbox 'test_arp_ping'
- Adding DP/Bridge IF: sbx:test_arp_ping dp:arpping {, , }
- create namespaces
- ./openvswitch.sh: 282: eval: Bad substitution
- TEST: ct_connect_v4                                                 [START]
- adding sandbox 'test_ct_connect_v4'
- Adding DP/Bridge IF: sbx:test_ct_connect_v4 dp:ct4 {, , }
- ./openvswitch.sh: 322: eval: Bad substitution
- create namespaces
+Exactly.
 
-Resolve this by making openvswitch.sh a bash script.
+> I tried to clear it up in my longer response with examples from
+> code.
+> 
+> If you have a moment could you take a look and let me know if I've
+> gotten it wrong in my explanation/walk through?
 
-Fixes: 918423fda910 ("selftests: openvswitch: add an initial flow programming case")
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- tools/testing/selftests/net/openvswitch/openvswitch.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index 5cae53543849..15bca0708717 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -1,4 +1,4 @@
--#!/bin/sh
-+#!/bin/bash
- # SPDX-License-Identifier: GPL-2.0
- #
- # OVS kernel module self tests
-
+Thanks for the detailed explanation.
 
