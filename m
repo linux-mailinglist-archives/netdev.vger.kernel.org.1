@@ -1,261 +1,184 @@
-Return-Path: <netdev+bounces-104020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2962F90AE84
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:00:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4EBC90AE8A
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:02:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BD1228A94C
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:00:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3DA91C20C54
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CD5A194AC7;
-	Mon, 17 Jun 2024 13:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C62F194C9C;
+	Mon, 17 Jun 2024 13:02:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VV6O8OIB"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="temkr+ko"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A87E19755E;
-	Mon, 17 Jun 2024 13:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718629209; cv=fail; b=tS/lP4XAAPx171MI43/atgpf9H8aYa/a8HPtiGjNKP0IeJCyqskfTMWFUqLklGMhNzk2XUY/3t9TgCnmutmRs5uHUCmhyVuEhcOzeZGYvNM208Sc3V6ZxGJ3AREQ+cqhxkE47NunXy1ebOai9egjrJGcm7GhOIUy16N/N8dYoZU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718629209; c=relaxed/simple;
-	bh=PdCxM7Z08J2LWwZFrjonwQ0iI8dcNroU8H0F0DFa7JE=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=WgU07xF/EL3xGaV+fwkCFfweh5Fz+fsb8QpC330X6QsCKR46ieYtAQRwiIrjPrdsSHfi7vjcW4BWBmN1AEZNghmyMH4kZUAJNeMuI2Llccnhuimx8MCdUxXTP/5w2ZoaaW7exMFtDLdhU3WrApMTuvIagHJZAD1+GNxZQjAl5Qg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VV6O8OIB; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718629207; x=1750165207;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=PdCxM7Z08J2LWwZFrjonwQ0iI8dcNroU8H0F0DFa7JE=;
-  b=VV6O8OIBfIHQaJcr7gRdx7BCLCX7v90zF56bSwm6A//Lg75Ztfx7JA2w
-   8yS486rZPD+CpjNFJJMTnuoXz3sGYYIEK6qoO8i+AVBeuj6+BxyYRuNb3
-   XZhgjEnjtdM041Wup/j4+Ir8t8IuVoRphP/jhuGl1OAQgoIKNmDshC8qU
-   Bukiq5FXMLssAjxMa9wb3B+wP57vUK6bThQoatzWBN0AlrvlW3kgj7UWC
-   c0hW5FGJLmTbmgwP8Xmzlr3mF87xiN0o1+8unwiSKj4bjfCMD5CesoavV
-   x3k+tBbzXEBRBl+hoCx0kwy37u1DoPlrqeoTWmuhxiztz4VDK+OzloVKU
-   Q==;
-X-CSE-ConnectionGUID: IDUBLM9hTA+jFCtu4ReUQw==
-X-CSE-MsgGUID: /03xrHKPTyWmuU7MmF9jPw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11105"; a="32922115"
-X-IronPort-AV: E=Sophos;i="6.08,244,1712646000"; 
-   d="scan'208";a="32922115"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2024 06:00:06 -0700
-X-CSE-ConnectionGUID: 4QdnMJceT9e+8JbaUi+uIA==
-X-CSE-MsgGUID: 7HEd4HWJQL6Ieg7LZBQazw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,244,1712646000"; 
-   d="scan'208";a="41122881"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Jun 2024 06:00:06 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 17 Jun 2024 06:00:05 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 17 Jun 2024 06:00:05 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 17 Jun 2024 06:00:05 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.41) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 17 Jun 2024 06:00:04 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IYbPdMF9/Vk9hgeSfqlwuthqPKzGIFDOPRjI7w9SB10kjS7x23xHYVHCgDWQBd+3cL4hd9/DYJfC0/m+OPstV2zXC+4SjT3QpyMnMDJjg4hManhqR+ExY8a0tBRexh0DwRLWw3URI43Mrz7XFkp0tKh0LQoWa2OVxisxj/BEUJtaTWlnMIwPPlO5am0NcwHKanjka34ul9sL/WJIj7fkpNdrqO8PqJl8Vpyd6+9cAPgo4XR264X2vzQ9JxYwLQKxF6R3WcSlocHElL33OQLH/O1WvLnYflIFQZtmVsd9jIXj0Iedl2TRd8mich+oXQYGuSw4SnPbY6c9fj1uqJkoxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0+ZlTcx8Efb29mL4dyIaBX8z/KCMJcbDL5SrhpM68tg=;
- b=G29lIQLpl/scjWIaS4/q+OY5iGlJhPZxxj7qTvwvsrE9E0ZBt3cJLfOeJcUJfZfGfLbbuuKqU5ykMNssIWkzNBExkKQpVIL8rEFXAZAWcKaS/pXUSJk5O0QeYN075Itk/ezhnPJ5BbSUEG1Pt/E36kcVhgrB0+jOQDvnAFqZoOcTtATbOaop3eAcL0/KFYkKY2FBRZby6+tDwXFWY7W1v7MGonBacPWwPs7xMzB/wrSXyeHdhWNNLLnkWa4/LvYQUqBwXn1XyJuPyspkAKRiNaBQNmfBAYz4B166xoY6Pyzgag99t/Ciu4WlVRVjnjvhJfZgAkyV6i3vmaI0oUzXPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by IA1PR11MB6396.namprd11.prod.outlook.com (2603:10b6:208:3ab::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Mon, 17 Jun
- 2024 13:00:02 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.7677.030; Mon, 17 Jun 2024
- 13:00:02 +0000
-Message-ID: <da984106-43eb-42cc-a8c0-be859c6e84e9@intel.com>
-Date: Mon, 17 Jun 2024 14:58:59 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] ice: use proper macro for testing bit
-To: Simon Horman <horms@kernel.org>, Petr Oros <poros@redhat.com>
-CC: <netdev@vger.kernel.org>, <ivecera@redhat.com>,
-	<przemyslaw.kitszel@intel.com>, Jesse Brandeburg
-	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Marcin
- Szycik" <marcin.szycik@linux.intel.com>, Konrad Knitter
-	<konrad.knitter@intel.com>, Marcin Domagala <marcinx.domagala@intel.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20240614094338.467052-1-poros@redhat.com>
- <20240615151641.GG8447@kernel.org>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20240615151641.GG8447@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DU7P194CA0012.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:10:553::18) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5A3186294
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 13:02:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718629371; cv=none; b=IdzF06kU37VTLrdlVlczYfS4ehRbJPSkDgkwIrWkEUryb3KIxLlZRfTyJIAkP7hf9j1t6TvVb40GV8E00TvjQzxFuiPNlzt04U3NNSyIA52RqyAl75ms8GJRGIlzw771iDH6r70ox3V9VjD0O5MMprhnrxyqleiigC/zfcespno=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718629371; c=relaxed/simple;
+	bh=TRpITMfhSedBWCyK8bo5vy9+rNDpUJBCcfGkU+oVsl8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GryOnANOy+goFyeCNka29jUXyR2VRRpllvh27jNOSxKkuDfithv88cred8h2i91IsgxymMMpAtzh9Zb+hqzWfiAji94D4fELCZvAWmySXTNDL2g81Usb919elu32QYnF1ERWbeEh9p1nuOSgjQas07upy11VZiHgGt0f6942I1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=temkr+ko; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a6f13dddf7eso524229066b.0
+        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 06:02:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718629368; x=1719234168; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=IPWu6UjDZMnQVTRsZX0tk4x7xzpqv9lDVHERGvbzAHw=;
+        b=temkr+koJoVWlHdG/HBKUxDCmvwXgmgR+Q24OF4DQwwS2ZntPNQs2VBl4HL7X8MrZn
+         r2Z2F1vSe+3TsqS9lPf9X+ZR9nCzLS9mRGCP7pyjwPXpB6szM8lykMP7YBwxK02bu40P
+         fjMDHwymsZMMvEyp/h+kZ26FF9ik4zHq7oDmasPb1YR08RyDG8m5PdAlona0gSuPVF2/
+         g3q0agwQcIrkF4mqr0v/YPdM/ICE7cxDgpZKDiXIKFBROV6PMYr4xsSqXEHT6JwB6ERW
+         hLI4HIWawOQ7a0U9uqelJoGlAzAayACKbFA19WesD3sdu4lJGp0oP+KDkZELWARPzn25
+         WMTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718629368; x=1719234168;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IPWu6UjDZMnQVTRsZX0tk4x7xzpqv9lDVHERGvbzAHw=;
+        b=mJJ7rFNcJxl31yWIaMVAA2LZxUIBDmBcmC3L7NWCANyK3bg1Cwmn32Jk6rzXuUrwLr
+         qpLVtyC5qmnLEGP/Jtw/envAyR8aZo+NPVjsu/OrJXoXle6LMTt5BFN4AK3m55sGi/+t
+         Z+0nMwPDqJmfNTS5BVilPeGTFa7tEnYl4/f+uJ6E8TSCCqYWdcftTCQNC9MblVD7Bw7l
+         ogHDVMHcOJL5pJf8xnvp+IJZCbknZePqtCj1awM4nJgH7znzvtr9mHVN6RiSS3so+CJy
+         wjJanghiTkJO4Yob47bjRHgjTHru1jLKiiKvpMrUrgbXxPsko8E/8aiV7R2PKOUybEgh
+         XyPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX7wvxRsuOjtJNRpq+Y8kbJGzXNjbGr9W3H5tlSncN+7JTkN+5X5u0Co3ysBcAEjcv1xNZ4EGomhnaGvX64tigaKeE64c7T
+X-Gm-Message-State: AOJu0YyUJpU7yIixQKYuGH87UVDBfIhl5D1IMtAWHwVn0BpFjsohs0N8
+	HVnervnRZIZbiB+MWr0Eyp1SuWkC85sZms8ZH7Ps/9778oMd29atNoXupQlUrzc=
+X-Google-Smtp-Source: AGHT+IGcudZokFT78RyZ7cYSlZbHBwzJ8nGrQcqcTLF+Nm30y+RQMLNd7Az1DxCGUnWXSUhfn6Te8w==
+X-Received: by 2002:a17:906:c0cc:b0:a6f:16c7:9130 with SMTP id a640c23a62f3a-a6f60d2976bmr640523766b.28.1718629367294;
+        Mon, 17 Jun 2024 06:02:47 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cddba1b0esm2137421a12.84.2024.06.17.06.02.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jun 2024 06:02:46 -0700 (PDT)
+Date: Mon, 17 Jun 2024 15:02:43 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Parav Pandit <parav@nvidia.com>
+Cc: Jason Wang <jasowang@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Cindy Lu <lulu@redhat.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+	"mst@redhat.com" <mst@redhat.com>,
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
+Message-ID: <ZnAz8xchRroVOyCY@nanopsycho.orion>
+References: <20240611053239.516996-1-lulu@redhat.com>
+ <20240611185810.14b63d7d@kernel.org>
+ <ZmlAYcRHMqCgYBJD@nanopsycho.orion>
+ <CACGkMEtKFZwPpzjNBv2j6Y5L=jYTrW4B8FnSLRMWb_AtqqSSDQ@mail.gmail.com>
+ <PH0PR12MB5481BAABF5C43F9500D2852CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <ZnAETXPWG2BvyqSc@nanopsycho.orion>
+ <PH0PR12MB5481F6F62D8E47FB6DFAD206DCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <ZnAgefA1ge11bbFp@nanopsycho.orion>
+ <PH0PR12MB548116966222E720D831AA4CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|IA1PR11MB6396:EE_
-X-MS-Office365-Filtering-Correlation-Id: cdc66f99-e85a-475a-2e5f-08dc8ecd6681
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230037|366013|7416011|376011|1800799021;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?NERvYWRIZmx3bWlzS0JCYjZ4TGNuNkdtdW9Qd1REUWZnUm9QTlpOYjBiUU9Q?=
- =?utf-8?B?MzZ4S2JjUGFIUWpsMmlJcmxuTmJGZy9mVnBUYlAzNlNWR0xBa2hnaEpEV1lO?=
- =?utf-8?B?OGlCWC92R0M4VjA5T0o0b1JzSWtJUzVZNU0wSkRjU3UxeFQ2Vm92cjB2NXIw?=
- =?utf-8?B?SlBpK1pEdVdDWHdLdXkwcDZwUGU2U0s1MUNCZ3lRTlBTeTVXblBTK0NKQ1FS?=
- =?utf-8?B?RzQza0Y3TG9kTVFLMHVsN0ptY012cUhUczZkdzVjN0hGN2JWZDlmK3FUK2lP?=
- =?utf-8?B?ejBabmRtUzRQQmNkMG8yZmdzcTE1RHR6K1p5V3hkSC9RaVZseFFVbytvbitQ?=
- =?utf-8?B?ZldqaVJDMjRrL1pKQWlLN0lCL0NhYitNUWtWaVBhRS84NGppWjlNTlpETDA1?=
- =?utf-8?B?cXJ3YXJwWkZ6SVdOUlp2SkN5Tk11d3ZhQnFPZklEaHo2bXpkRmI2RkFoNVJv?=
- =?utf-8?B?bGtKR29mS1I5WjRTdHZBTmJQTlhGV1grdFZITTF6NmQyQ0tBNU9va1VZTEd3?=
- =?utf-8?B?QkNETm14cXZoNnFHR0I5UUpGMG5yYXhyRHMvYXdLTVR3VnFETGpDRTZDbFA0?=
- =?utf-8?B?ZkNXelMwRDY0NzhYUzZxdW10bFBHUkEzVFRpRW9JV2tGK2dLRmZNVE1FYmpE?=
- =?utf-8?B?U2ZGeWZTY0ZZb0xJeHJlQ2t6L016dElFaHdBMXh2d0Yrb0tjNXM2aWZITlBi?=
- =?utf-8?B?QVQ3ZFhSd1BmWTl0Q0pmeFF6eEpGNjRieGluN0MrV0FOdC9QVXBUdm9zN05i?=
- =?utf-8?B?ak1XMUNDR1M5N1c2c3h6TFZJaHh5QzU2Rkc3RzNQQVRWZEdCM0oraXcxaWg1?=
- =?utf-8?B?RnpwTGZFU3prZjZCcEp3SUhtcFU1U1VTeHo1WVFWWnQ4MGZoaHphTDlFVSsv?=
- =?utf-8?B?TW40M3c3bFJqT3YvRGdPUllkMVova1dTcDBEOFVQU3Rwcmw5cFptNXo0d0lj?=
- =?utf-8?B?RkFId3IxVk05c0kyTEhNenFMeDFsRVR0Nkx4cUw5ZFVXaFdGVHY2MFNwNG9M?=
- =?utf-8?B?UEZKVVVhOXJSc2R6VkdpckdJVUNGNXQ4YUlaeVFBUHltd2RNL2lFRTNFcjBm?=
- =?utf-8?B?TG5OWStnZkxqbThaMndtcnN4TXB2VjNScEFGcEx3YUM1L0RWUmh6RGNObEdW?=
- =?utf-8?B?eUpJRWlYa1VlQU9SVGxhS2dUT2JHUHpxK3Rmb1JWTkE4eXA1TE1zYk8ycFZ6?=
- =?utf-8?B?VFpMV255V3ByU0pVU1pTMUVaR3hQVVpVVDBHNFNVVEdLQnRlZmhkNWZ0MW4z?=
- =?utf-8?B?SG5neGVHeVpma1pHWjlJanJadm5WZkxvK2ZkLzZvZUNJT0kydCtJdGp5T1Ur?=
- =?utf-8?B?YnVkMWtnV0hjbk5LcmNaVGhPQnQ4UHQ0NWVlamwwZ1VwbS9JaU1wSVJvbUg0?=
- =?utf-8?B?UXltSThkQm55RFRWSnREMUwxVmxDbzd4V1lTR1RTZGZKMXgyS2FROTFLMExD?=
- =?utf-8?B?SFkzUXFoTWVTTTkxckhSa2syQkViZXBNSzlqYjFLOEF4OUFwUE5GeTQwcTZL?=
- =?utf-8?B?Z0tuQ3BSZmNGUWcvVUVVblUwOGJ3a0ttN2t4TGtvSGlOZ2MwUWR3VzAyejRj?=
- =?utf-8?B?a3FWTlNWcnY5czg3OE1SZ2g1TVoyNCtoWUFNekh1Q2dwQWJ4Q29sVmhnMnpR?=
- =?utf-8?B?QXY0dndzbXEycDA1VklBVEFScjIwY1NIQ0ZDT29CR2daM0pHeEk4ZEpJMndm?=
- =?utf-8?B?clNkMVlKQWJhZmJmcFNyeVlUc1VOSG0vKytnTitOcjhQbDJ5ZnFTVFhPT2tF?=
- =?utf-8?Q?JKh11iLwgx+L2Zr+S9llGrU1Di8haMzVvMw6FYB?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(7416011)(376011)(1800799021);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VjJtMlpsem9pcEVaZitha0MzeVd4MExYMGpJZHZXcklQV2tSOG5UeXg4R3BO?=
- =?utf-8?B?OUpKdVgrc3k4aE0yOUFnZzUwZ2RyWG1ucSs1Ulpqdk92dmNxZ1JpK05GTkVv?=
- =?utf-8?B?Q0k2a3o2QU56YlduM0tNS2p0NXFRTHNKakFwY0hoT2l2YlBNOHZ6Sk5RZUlQ?=
- =?utf-8?B?UFVCam9NZkdyK2R2dGx5NUpCd2NOTis4Zm9xY3dHSlNoY2xnZE5SdkkzR3c1?=
- =?utf-8?B?VHRHZ3psa0FDazN6WVV0QkMvdHNLeDk4blJ1WlZISGxXT2lDcXg1Y2UrWTBD?=
- =?utf-8?B?YXN0K2Y3VTFIMXFvZkRZQmtvdTlBWVlUS2hNY2tHMi84OWdxYVB4Qjluc2Ez?=
- =?utf-8?B?UElFYlNKYzVaWm9tYkw4RDlyUnUxSXlRR3AvbFV3K1lMRkRnSVo4UUl3Mkxx?=
- =?utf-8?B?QnRnTmpvWFdUWllJOEw5c2EwMnNpTEltbWdvZ2ZVdTZwRWEwZzNsYm9sYllV?=
- =?utf-8?B?VHFlZGdJamJIUWdoWnNkelVJUzlGMHVvVWNINUFBZWpuMDJNMDRyOXc3a1BQ?=
- =?utf-8?B?aGhEM2FVdm9JVFl4dDk2bDBuYktjdUFqVm5xNlZST1Fla1NBZUZ6QWduSzZS?=
- =?utf-8?B?RHE3M1ZPY04yZHVvMCtwMm11RWU5QzFhZUJmSHoxUVlQK2dtenE4SUFLZkoz?=
- =?utf-8?B?UTJIN0lGWG5kcHBCcHFLaXJKWDZiNnpwTXBpdE5pR1RIOGVLakgrL3FuWGxL?=
- =?utf-8?B?WkxaL01BREsxUm9FVU5IVnVmS2FvRzQxdWpPMmlSMTJIK3I5bEtMMnlUc3hl?=
- =?utf-8?B?UlBFSkcvVy9qb3p5dkJVYkt1UXZpV0JmdzBjOEU5MVdraDFHWXRHd1BZTEth?=
- =?utf-8?B?NTdYeThlOHdOd0JvME5tMEl1NUFYRkl2RVZ3ZFd0ZTlwYk9GeEdpVG51cldn?=
- =?utf-8?B?RnBDVnVVb3QvZkRDem9RTW9qckMwSkl4RFBnRCtlMmxpQStRVXQxOTlKM2V1?=
- =?utf-8?B?ZmFHRDFMcGp2TlNIc3VEQTJFVjNOeS9YKzI3eUUybmwyVDczQlpwVnU1bkRa?=
- =?utf-8?B?OWxiR0ZHRUd3VmZqUHRuM09qZnRCSDIxY282N0hDVUJLMUFLekN3R0I5blps?=
- =?utf-8?B?THYrR1ljU3VMek5MTjgzN2gzeWhHR0hjdmZyY29HMjJqSGxLbGdkSitxRzFW?=
- =?utf-8?B?K1RXN1hjenJWVEk0QVFCM3hraVN5OHIxcmhtazdTMExUYTluTGVsdk1DQUJw?=
- =?utf-8?B?Z0NwSU84eGt1czhpY2RtWG9DQmpWUU1Td2xDTEk1OHJDL1ZJV3p2dVVHazBh?=
- =?utf-8?B?T3ppUjJ3eUI0VGhKUWxMYnZXdmVaODExalVIRDR4aCtCZkVuQkdLR1Z6Z1Vn?=
- =?utf-8?B?R2lEN3JsK3hIWWJQYk41MmxQbjdSTmRsTHc3K2VXN25lMVhGczhrcGd2NThI?=
- =?utf-8?B?L1REWGhGTzhIRVZCQ0MzZDRvb3RWWEk4VlFERytXZ091TUovU3JTV2hSOWQ3?=
- =?utf-8?B?b1hsVUxzQTE1K3RpU2ZwKzd3QzZFMis2VnU4T3pXbGhwVWovRG84Nk9SeVdS?=
- =?utf-8?B?OTU1a3o0R1ZUZ1Rhc3VqNWM4bjltbmhlaGZGYnd5RzlzSGN1VFd3VEdIS093?=
- =?utf-8?B?cHhBeDlUaUI4WEZkbDY4RzJ3RVlqM3ozWldtM1BmR1RJZUpkeFVteXZTNzFN?=
- =?utf-8?B?NFFGdzRiazFiUU9tc1Y3ZnV4blRuaUtYSEcxcDkrMk9VRTVnRCs2aU5PRGVz?=
- =?utf-8?B?VDFibWVKUHVUdkp6ZTJGZTVqSTA2aCtLOXg1aDBXek5iMEVPZGtiazYxQjk5?=
- =?utf-8?B?T0lveXhZSzlrMVY2cjBiU3FleDNWaDI2VkVIUG9SMVZMa0VBRkt5bXZDQkU3?=
- =?utf-8?B?T3o5WXpuY1dnOTNEbVhpaEJqS28rRWtWUzdhN3UyZm1yaXk1aXhTYWRobkFN?=
- =?utf-8?B?cCs2Zm9Pd2hhem1FdldFNkRhWkpkZjNISlE3Q3daOWtqMnlxY29vUFduYmk5?=
- =?utf-8?B?MW1ha29IcTJ4aDZneDl0QzBDWjIrRTk3VTJKcFJteDRrb25ubmxiUlRsaWlq?=
- =?utf-8?B?Z21SUXdNUVdOTmRwV2hOSmZHYXJXdStYU3Bxb2NNNmJYSUlPWElDQWg1Smln?=
- =?utf-8?B?c29aYXhuZlU5akZGNER1K3d5TEROS1hoU2doNE52M3lDZ01URzhXL1FnSWgw?=
- =?utf-8?B?L3VpMFlac0lISmRWa1NYZXZLeTNkeVRWYXdDTlJ3S1FFblFmQjhoL2RHTnpT?=
- =?utf-8?B?UGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: cdc66f99-e85a-475a-2e5f-08dc8ecd6681
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jun 2024 13:00:02.1386
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BAlJuFsTBFVW4oo8l1GnbK+/1q8RUxHVnDFYOHNtgqR35pcu51w2etnsFprigb7NhcHZsmEeEH1NDq+NwLEzQbkTs/TteS6TpBJCs7L5iTw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6396
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <PH0PR12MB548116966222E720D831AA4CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
 
-From: Simon Horman <horms@kernel.org>
-Date: Sat, 15 Jun 2024 16:16:41 +0100
+Mon, Jun 17, 2024 at 01:48:02PM CEST, parav@nvidia.com wrote:
+>
+>> From: Jiri Pirko <jiri@resnulli.us>
+>> Sent: Monday, June 17, 2024 5:10 PM
+>> 
+>> Mon, Jun 17, 2024 at 11:44:53AM CEST, parav@nvidia.com wrote:
+>> >
+>> >> From: Jiri Pirko <jiri@resnulli.us>
+>> >> Sent: Monday, June 17, 2024 3:09 PM
+>> >>
+>> >> Mon, Jun 17, 2024 at 04:57:23AM CEST, parav@nvidia.com wrote:
+>> >> >
+>> >> >
+>> >> >> From: Jason Wang <jasowang@redhat.com>
+>> >> >> Sent: Monday, June 17, 2024 7:18 AM
+>> >> >>
+>> >> >> On Wed, Jun 12, 2024 at 2:30 PM Jiri Pirko <jiri@resnulli.us> wrote:
+>> >> >> >
+>> >> >> > Wed, Jun 12, 2024 at 03:58:10AM CEST, kuba@kernel.org wrote:
+>> >> >> > >On Tue, 11 Jun 2024 13:32:32 +0800 Cindy Lu wrote:
+>> >> >> > >> Add new UAPI to support the mac address from vdpa tool
+>> >> >> > >> Function
+>> >> >> > >> vdpa_nl_cmd_dev_config_set_doit() will get the MAC address
+>> >> >> > >> from the vdpa tool and then set it to the device.
+>> >> >> > >>
+>> >> >> > >> The usage is: vdpa dev set name vdpa_name mac
+>> >> >> > >> **:**:**:**:**:**
+>> >> >> > >
+>> >> >> > >Why don't you use devlink?
+>> >> >> >
+>> >> >> > Fair question. Why does vdpa-specific uapi even exist? To have
+>> >> >> > driver-specific uapi Does not make any sense to me :/
+>> >> >>
+>> >> >> It came with devlink first actually, but switched to a dedicated uAPI.
+>> >> >>
+>> >> >> Parav(cced) may explain more here.
+>> >> >>
+>> >> >Devlink configures function level mac that applies to all protocol
+>> >> >devices
+>> >> (vdpa, rdma, netdev) etc.
+>> >> >Additionally, vdpa device level mac can be different (an additional
+>> >> >one) to
+>> >> apply to only vdpa traffic.
+>> >> >Hence dedicated uAPI was added.
+>> >>
+>> >> There is 1:1 relation between vdpa instance and devlink port, isn't it?
+>> >> Then we have:
+>> >>        devlink port function set DEV/PORT_INDEX hw_addr ADDR
+>> >>
+>> >Above command is privilege command done by the hypervisor on the port
+>> function.
+>> >Vpda level setting the mac is similar to a function owner driver setting the
+>> mac on the self netdev (even though devlink side has configured some mac for
+>> it).
+>> >For example,
+>> >$ ip link set dev wlan1 address 00:11:22:33:44:55
+>> 
+>> Hmm, under what sceratio exacly this is needed?
+>The administrator on the host creating a vdpa device for the VM wants to configure the mac address for the VM.
+>This administrator may not have the access to the devlink port function.
+>Or he may just prefer a different MAC (theoretical case).
 
-> On Fri, Jun 14, 2024 at 11:43:38AM +0200, Petr Oros wrote:
->> Do not use _test_bit() macro for testing bit. The proper macro for this
->> is one without underline.
-> 
-> Hi Petr,
-> 
-> it might be nice to include a brief explanation as to
-> why test_bit() is correct.
+Right, but that is not reason for new uapi but rather reason to alter
+existing devlink model to have the "host side". We discussed this many
+times.
 
-Let me explain this as the author of all those bitops wrappers :D
-Petr is free to include either this or his own brief into v2.
 
-_test_bit() is what test_bit() was prior to my const-optimization. It
-directly calls arch_test_bit(), i.e. the arch-specific implementation
-(or the generic one). It's strictly _internal_ and shouldn't be used
-anywhere outside the actual test_bit() macro.
+>
+>> I mean, the VM that has VDPA device can actually do that too. 
+>VM cannot do. Virtio spec do not allow modifying the mac address.
 
-test_bit() is a wrapper which checks whether the bitmap and the bit
-number are compile-time constants and if so, it calls the optimized
-function which evaluates this call to a compile-time constant as well.
-If either of them is not a compile-time constant, it just calls _test_bit().
-test_bit() is the actual function to use anywhere in the kernel.
+I see. Any good reason to not allow that?
 
-IOW, calling _test_bit() avoids potential compile-time optimizations.
 
-From what I see in the code, &sensors is not a compile-time constant,
-thus most probably there are no object code changes before and after
-the patch. But anyway, we shouldn't call internal wrappers instead of
-the actual API, so this fix is correct.
+>
+>> That is the actual function owner.
+>vdpa is not mapping a whole VF to the VM.
+>It is getting some synthetic PCI device composed using several software (kernel) and user space layers.
+>so VM is not the function owner.
 
-> 
->>
->> Fixes: 4da71a77fc3b ("ice: read internal temperature sensor")
->> Signed-off-by: Petr Oros <poros@redhat.com>
->> Acked-by: Ivan Vecera <ivecera@redhat.com>
-
-To be added to v2:
-
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-
-Thanks,
-Olek
+Sure, but owner of the netdev side, to what the mac is related. That is
+my point.
 
