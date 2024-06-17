@@ -1,126 +1,109 @@
-Return-Path: <netdev+bounces-103958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B12A390A867
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 10:30:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C4F890A8F6
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 11:04:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2D971C20D8A
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 08:30:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21B961F244CA
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8971919049A;
-	Mon, 17 Jun 2024 08:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED0B191472;
+	Mon, 17 Jun 2024 09:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZrPbou6g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tBua7iJD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8BE17F5;
-	Mon, 17 Jun 2024 08:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45FF190686;
+	Mon, 17 Jun 2024 09:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718613046; cv=none; b=HDxVmjDIDFJxpUJyU/kkqqeebd/n4OlXK8E8doGF/1SpGNtZGWknmin1KmJmUunM75B3quV0mRAWuxGLn2VfGrwa7XT+NwrmYJ7KNPAPTOtBQJBnFWANH7LMhAevRCRmm72yC8Kk59hAINPs/R0ATdFsKUdIAogWLNmFE6imF/M=
+	t=1718615037; cv=none; b=OVRpqGzu8q4glaUJ0L9zXt+AS1MmasIsZkARIY64QcRXub1B6KBXb3CbErwjjXlNwvgBpLMNC+ZmrpTwEZud7q9AvLtPT2JkIDg/r8aaSv1zRNC0j1H//C7lCwwTNQkZcnSUsKjK6AslqCszQq3ODNE3jhY/ycvSRhEJ/MCZZ84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718613046; c=relaxed/simple;
-	bh=yYxw7L+gzDilEI/XWHbKIFjpkH6nrx3hA+WiZNpLLP0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=qTKOlwO4OTakvHKmFp/vPqrbcRr9yU3NLSlTHepGYMB01OaxfBSVPipKxfZTA2ryNxVeZm7XwzxkSb0OvHLiEp0+2LFmFF66DTZX/u03z8RKfY0Tub/bDOf6o2XTF7ioZQRuzTrP0eZwSgzxxBJ2+EnixRCJjIHSeZnOV8aZHjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZrPbou6g; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-35f1bc2ab37so3554974f8f.1;
-        Mon, 17 Jun 2024 01:30:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718613043; x=1719217843; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YVSDet1jU8e9qxWG/OSUjestn/66Ck7NYAywURhS3+I=;
-        b=ZrPbou6gOgZDcOGEH/lITWZ5rRSCmZuSBFEhg1W1hIAUqmbuuthowKjSH6hWMa0u6c
-         xlnJuo1BwgIZ/FahOZtZYQG4n0JvrRvDQLiHQPJsdGBhwmX4pVT7NnkBMId4l9u7izVE
-         V1EAsQZoWfG3Ax3IUctuXWrys7zenqskwCqJte/ySkDlwEdvfQeItAWbFRfDX7kT2BCy
-         L73sItveiGSqAuy6TClWOAODjHU2y7groaWhe9+a9vFjnxCDeiN2NvhZyglfarxtdUhT
-         d5i1GLcvRxng9sNm87iqpcFmPrkpMNczqzwB+ZUk7kbjq8lkKHkdtDVn5UbGecOukzKM
-         7gsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718613043; x=1719217843;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YVSDet1jU8e9qxWG/OSUjestn/66Ck7NYAywURhS3+I=;
-        b=VHVHdQ7C7dOrS8M0a8ONEs5W9lALLVYaK6sSwIXSz1GmSe6f+Ds62ZSfpRpIr3fHaa
-         kha9NiDzM3E1+sTO36cjDp7fjZWut2w7CiOY5wQHMpxMaZlKjdFNYsYNPo21CMGK7ya8
-         7t+a1EUjbC5S/doj5PWXLQOcvmcp5yrcQHCOgu+CP5xyhMqlRKEXRPwrQEwUnAJPSWUd
-         qxtOcpYJ7ceMQxVR7Atl7Eo+TBwFjLgzwU+QhCXmT1w+r/2smoYv6l06G7N9NZPtE16V
-         fwhD1x4fOGSGDU855ZhxfAWHFUu8IKNkUBdUuKJ8LfgULEYkvhbwOz96lt/sF3hhLqpq
-         D27Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVzPJdx6no6P2n0qcDg2L+dq2OPtqNKAmHZmj3Xcq3Z9ETe41Jcc6J+blYNnpWpOxC8/Be+1Q3ZKxtKPhOdC2Jpf0RgCRd2CdDcUjm1Xc8SK1C+Ne/FzTR2YSgEyD9oiM/eExzsXAEKm35ZEls24AqMqFG5+XeFOTbbxWkxwCDH5Q==
-X-Gm-Message-State: AOJu0YxJkK02ADhnmHtB5q3JL65t5txhNCDyULVfTqdBWZ1xNc8dvdM7
-	UCmVVF0cxmZSA8MX+iAwBY8N4jfKVGiCkPivUU+evbkHxtEab69M
-X-Google-Smtp-Source: AGHT+IGbJvNXxttiBMa1KsFPj/tmntA/qNIHNUlo5b9laNDyBmWTRtbokJXpTeLkSl34hyQYAX13sA==
-X-Received: by 2002:a5d:42cb:0:b0:360:82d6:5e98 with SMTP id ffacd0b85a97d-36082d65fa1mr4975741f8f.51.1718613042899;
-        Mon, 17 Jun 2024 01:30:42 -0700 (PDT)
-Received: from [10.158.37.53] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3607509c9a0sm11331771f8f.27.2024.06.17.01.30.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jun 2024 01:30:42 -0700 (PDT)
-Message-ID: <9ec867ad-6b7b-4ca9-83c6-66e9aa674cae@gmail.com>
-Date: Mon, 17 Jun 2024 11:30:40 +0300
+	s=arc-20240116; t=1718615037; c=relaxed/simple;
+	bh=THa1cIbc5tm8begwrxwa5OJJ+G0okx8FqtWT7e7BWZU=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=pEbE02fwC9aqwxwuE2164LZs6xYwIqxsQvSVi2Xl3S/YV5tjimu/JXwrwAu2oUv5qoIDG36kmjoe/sy+llhahiE5q2gw6E0W+OCLAr2SphrD/v0X563fUOPKKGaAGuhjvHqyn11L1GmIABnE5gDewWLYWj8QKlRy4M6T81dogfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tBua7iJD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82926C2BD10;
+	Mon, 17 Jun 2024 09:03:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718615036;
+	bh=THa1cIbc5tm8begwrxwa5OJJ+G0okx8FqtWT7e7BWZU=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=tBua7iJDkc8Y2cmXCtRKuJMl9ctDCr7nY0rG4J98jFn/eV49vtr8e9uORP/aGFGGK
+	 0jiqol8vvv18U/pB3BBqL5CCIDjWhN/oB17eKeoAjlfyLMCxomP8RMTdN7jluyCG6i
+	 H9oFOrB0tiz4eHlZuJX7Uvdc0wlPwAfg3cSrceUGT3ZORNQntkwuwb5JNA7z79W28e
+	 bmvpZMul7+vOjz9jOv+JXucDCYS7EwFKvx0N1Ym7uHj1MELLeQLKtLPuCqY/5mcbwv
+	 X0u0MPrzEj6niTGf6wDm8S7bjuVri1tBD0jzzJ7cAEr4urDeqqioMeF+gy8g5U6QBd
+	 WFj1dpewcfjTw==
+From: Kalle Valo <kvalo@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: linux-wireless@vger.kernel.org,  Felix Fietkau <nbd@nbd.name>,  Lorenzo
+ Bianconi <lorenzo@kernel.org>,  Ryder Lee <ryder.lee@mediatek.com>,
+  Shayne Chen <shayne.chen@mediatek.com>,  Sean Wang
+ <sean.wang@mediatek.com>,  Matthias Brugger <matthias.bgg@gmail.com>,
+  AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+  netdev@vger.kernel.org,  horms@kernel.org,  kees@kernel.org,
+  kuba@kernel.org,  Bo Jiao <Bo.Jiao@mediatek.com>,  Daniel Golle
+ <daniel@makrotopia.org>,  Alexander Couzens <lynxis@fe80.eu>,  Deren Wu
+ <deren.wu@mediatek.com>,  Ming Yen Hsieh <mingyen.hsieh@mediatek.com>,
+  Leon Yen <leon.yen@mediatek.com>,  Quan Zhou <quan.zhou@mediatek.com>,
+  Ingo Rohloff <lundril@gmx.de>,  Sujuan Chen <sujuan.chen@mediatek.com>,
+  StanleyYP Wang <StanleyYP.Wang@mediatek.com>,  Benjamin Lin
+ <benjamin-jw.lin@mediatek.com>,  Peter Chiu <chui-hao.chiu@mediatek.com>,
+  linux-kernel@vger.kernel.org (open list:ARM/Mediatek SoC support),
+  linux-arm-kernel@lists.infradead.org (moderated list:ARM/Mediatek SoC
+ support),  linux-mediatek@lists.infradead.org (moderated list:ARM/Mediatek
+ SoC support)
+Subject: Re: [PATCH] wifi: mt76: un-embedd netdev from mt76_dev
+References: <20240614115317.657700-1-leitao@debian.org>
+Date: Mon, 17 Jun 2024 12:03:49 +0300
+In-Reply-To: <20240614115317.657700-1-leitao@debian.org> (Breno Leitao's
+	message of "Fri, 14 Jun 2024 04:52:42 -0700")
+Message-ID: <87cyogkkju.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next v5 2/2] net/mlx5e: Add per queue netdev-genl stats
-To: Joe Damato <jdamato@fastly.com>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, nalramli@fastly.com,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- "open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>
-References: <20240612200900.246492-1-jdamato@fastly.com>
- <20240612200900.246492-3-jdamato@fastly.com>
- <0a38f58a-2b1e-4d78-90e1-eb8539f65306@gmail.com>
- <20240613145817.32992753@kernel.org> <ZmtusKxkPzSTkMxo@LQ3V64L9R2>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <ZmtusKxkPzSTkMxo@LQ3V64L9R2>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
+Breno Leitao <leitao@debian.org> writes:
 
+> Embedding net_device into structures prohibits the usage of flexible
+> arrays in the net_device structure. For more details, see the discussion
+> at [1].
+>
+> Un-embed the net_devices from struct mt76_dev by converting them
+> into pointers, and allocating them dynamically. Use the leverage
+> alloc_netdev_dummy() to allocate the net_device object at
+> mt76_dma_init().
+>
+> The free of the device occurs at mt76_dma_cleanup().
+>
+> Link: https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/ [1]
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>
+> PS: Due to the lack of hardware, this patch was not tested on a real
+> hardware, unfortunately.
+>
+> PS2: this is the last driver that is still using embedded netdevices.
 
-On 14/06/2024 1:12, Joe Damato wrote:
-> On Thu, Jun 13, 2024 at 02:58:17PM -0700, Jakub Kicinski wrote:
->> On Thu, 13 Jun 2024 23:25:12 +0300 Tariq Toukan wrote:
->>>> +		for (i = priv->channels.params.num_channels; i < priv->stats_nch; i++) {
->>>
->>> IIUC, per the current kernel implementation, the lower parts won't be
->>> completed in a loop over [0..real_num_rx_queues-1], as that loop is
->>> conditional, happening only if the queues are active.
->>
->> Could you rephrase this? Is priv->channels.params.num_channels
->> non-zero also when device is closed? I'm just guessing from
->> the code, TBH, I can't parse your reply :(
-> 
-> I don't mean to speak for Tariq (so my apologies Tariq), but I
-> suspect it may not be clear in which cases IFF_UP is checked and in
-> which cases get_base is called.
-> 
+Is this patch a dependency to other patches? I'm asking because it will
+be _slow_ to get this patch to net-next via wireless trees. If there's
+urgency then it's much better to take it directly to net-next (of course
+with acks from Felix and Lorenzo).
 
-Exactly.
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
 
-> I tried to clear it up in my longer response with examples from
-> code.
-> 
-> If you have a moment could you take a look and let me know if I've
-> gotten it wrong in my explanation/walk through?
-
-Thanks for the detailed explanation.
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
