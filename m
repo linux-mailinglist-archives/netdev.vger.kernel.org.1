@@ -1,116 +1,158 @@
-Return-Path: <netdev+bounces-103980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1453A90AAE7
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 12:19:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA3FA90AB84
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 12:41:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B065E1F21C90
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 10:19:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CE2CB287B3
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 10:29:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADC4C194083;
-	Mon, 17 Jun 2024 10:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7759C194A51;
+	Mon, 17 Jun 2024 10:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SG3zL9Tz"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A0817B413
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 10:19:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28A2194156
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 10:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718619551; cv=none; b=K7SzJbg5JNQGlf+Sg5sFrsythRdlSy2Mk7MTCPgQlbhTkYp8idrJQKQV74ZbzbXKHOZABr82sfwV+dywWDGWaWnlNGcepZZ4RVy6X0URS6XqkkuwYXCaaglSdbUTmhUjI1T8QCffmBdJqSebl/dGxh07rFRRk/7oTN2MrA3gg2s=
+	t=1718620164; cv=none; b=k5HYrKcW+bwYVZqDMbxCMuOwFqXHgKyBoJ+6iwKi8ofPZd1jwZ49v+/h4s0a9+knLJbXAgvTya7r+499qTL+A82rUMi838pWAWRprHxcfH54AvxGx69V8fVCnKxxeLKwAOpQfSwEMSw2qtlgdd3iZF2v5OKS3tQQbjl5KD3oEKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718619551; c=relaxed/simple;
-	bh=Mp1RjHMU3/RVbL4rUjYPB+tCdG1+8HIZNgK/uAPxw7Q=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=GYejqTqtwgeOBqGmG9orpfXwHZrUHU+dKJHkqQfxm4j5khcu+mhGzv8Vvlki213ZavKNQtX4XrrIIqTH02u0f+MDroHBeb3GxN0bdIIKcE7JPfSk8JVExXA4izUiZ6pE+JC4+lI7cVgF2mTCA96KqrkviwMp2u1PNUJq02Vu0Ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-55-XgXb84H0Pvqbn7RJYgkCXg-1; Mon, 17 Jun 2024 11:19:01 +0100
-X-MC-Unique: XgXb84H0Pvqbn7RJYgkCXg-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 17 Jun
- 2024 11:18:18 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Mon, 17 Jun 2024 11:18:18 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Matthew Wilcox' <willy@infradead.org>
-CC: 'Sagi Grimberg' <sagi@grimberg.me>, kernel test robot
-	<oliver.sang@intel.com>, "oe-lkp@lists.linux.dev" <oe-lkp@lists.linux.dev>,
-	"lkp@intel.com" <lkp@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>
-Subject: RE: [PATCH] net: micro-optimize skb_datagram_iter
-Thread-Topic: [PATCH] net: micro-optimize skb_datagram_iter
-Thread-Index: AQHav87vWshbN1FSGkaaeddPsMjEkbHK7lSQ///wfgCAAN/H4A==
-Date: Mon, 17 Jun 2024 10:18:18 +0000
-Message-ID: <e6a1eb41578c46609aa862b8f9148665@AcuMS.aculab.com>
-References: <202406161539.b5ff7b20-oliver.sang@intel.com>
- <4937ffd4-f30a-4bdb-9166-6aebb19ca950@grimberg.me>
- <e2bce6704b20491e8eb2edd822ae6404@AcuMS.aculab.com>
- <Zm9e0OpCaucP4836@casper.infradead.org>
-In-Reply-To: <Zm9e0OpCaucP4836@casper.infradead.org>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1718620164; c=relaxed/simple;
+	bh=f7swwUMUk17vjjx+uev+yMPnjzGgCHtMLFMwUcUfkr0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IQ3MmVzCQPvYZpJWBspF65zG9XWS8u0jSV/7zZocj5qSu5hXzk7aplL3perJFwfC4whycc7XI7D0AC2vTNBWjrilmfnY9e5WbYNLXmm8bd2pdDrpsaU9abRUYGaeR5viIEwSQpc7WOYMc8juyRzj0w6KSuFI0Xln+Iu6MM+1las=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SG3zL9Tz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718620161;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1FUyctF7pqaFU0497LUN/9JXL84PlJqzX/VUt5AsG98=;
+	b=SG3zL9TzE4+vrNR4OkdR1U1fDiy/0ecPoPez9iWK5u9mEL1KChTJ4R9ai89eZlYgGr1a5c
+	jUCi+2XkDat01lsEuEI9pud9j+Yxg5fjQlI8zOFZDa0UZBcVFyMA9Xuq1dG5SIPs/eVKYl
+	VwwgNIoSvv8x7OpHk847qqHXYOXaEgQ=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-318--OKZ7eSUPl6bQ8KmEPZVQg-1; Mon,
+ 17 Jun 2024 06:29:17 -0400
+X-MC-Unique: -OKZ7eSUPl6bQ8KmEPZVQg-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 284731955DDF;
+	Mon, 17 Jun 2024 10:29:15 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.192.164])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id ED1DC19560AE;
+	Mon, 17 Jun 2024 10:29:08 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: jtornosm@redhat.com,
+	stable@vger.kernel.org,
+	Yongqin Liu <yongqin.liu@linaro.org>,
+	=?UTF-8?q?Antje=20Miederh=C3=B6fer?= <a.miederhoefer@gmx.de>,
+	Arne Fitzenreiter <arne_f@ipfire.org>
+Subject: [PATCH] net: usb: ax88179_178a: improve reset check
+Date: Mon, 17 Jun 2024 12:28:21 +0200
+Message-ID: <20240617102839.654316-1-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-From: Matthew Wilcox
-> Sent: 16 June 2024 22:53
->=20
-> On Sun, Jun 16, 2024 at 09:51:05PM +0000, David Laight wrote:
-> > From: Sagi Grimberg
-> > > Sent: 16 June 2024 10:24
-> > ...
-> > > > [ 13.498663][ T189] EIP: usercopy_abort (mm/usercopy.c:102 (discrim=
-inator 12))
-> > > > [   13.499424][  T194] usercopy: Kernel memory exposure attempt det=
-ected from kmap (offset 0,
-> size
-> > > 8192)!
-> > >
-> > > Hmm, not sure I understand exactly why changing kmap() to
-> > > kmap_local_page() expose this,
-> > > but it looks like mm/usercopy does not like size=3D8192 when copying =
-for
-> > > the skb frag.
-> >
-> > Can't a usercopy fault and have to read the page from swap?
-> > So the process can sleep and then be rescheduled on a different cpu?
-> > So you can't use kmap_local_page() here at all.
->=20
-> I don't think you understand how kmap_local_page() works.
+After ecf848eb934b ("net: usb: ax88179_178a: fix link status when link is
+set to down/up") to not reset from usbnet_open after the reset from
+usbnet_probe at initialization stage to speed up this, some issues have
+been reported.
 
-Quite likely :-)
+It seems to happen that if the initialization is slower, and some time
+passes between the probe operation and the open operation, the second reset
+from open is necessary too to have the device working. The reason is that
+if there is no activity with the phy, this is "disconnected".
 
-But I thought it was a cheap way of temporarily mapping a physical memory
-page into the current cpu's page tables without having to do any IPI to
-tell other cpu about the insert or removal?
-Which would require that the process not be migrated, which pretty much
-implies that pre-emption be disabled.
+In order to improve this, the solution is to detect when the phy is
+"disconnected", and we can use the phy status register for this. So we will
+only reset the device from reset operation in this situation, that is, only
+if necessary.
 
-=09David
+The same bahavior is happening when the device is stopped (link set to
+down) and later is restarted (link set to up), so if the phy keeps working
+we only need to enable the mac again, but if enough time passes between the
+device stop and restart, reset is necessary, and we can detect the
+situation checking the phy status register too.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
+cc: stable@vger.kernel.org # 6.6+
+Fixes: ecf848eb934b ("net: usb: ax88179_178a: fix link status when link is set to down/up")
+Reported-by: Yongqin Liu <yongqin.liu@linaro.org>
+Reported-by: Antje Miederhöfer <a.miederhoefer@gmx.de>
+Reported-by: Arne Fitzenreiter <arne_f@ipfire.org>
+Tested-by: Yongqin Liu <yongqin.liu@linaro.org>
+Tested-by: Antje Miederhöfer <a.miederhoefer@gmx.de>
+Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+---
+ drivers/net/usb/ax88179_178a.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
+index 51c295e1e823..c2fb736f78b2 100644
+--- a/drivers/net/usb/ax88179_178a.c
++++ b/drivers/net/usb/ax88179_178a.c
+@@ -174,7 +174,6 @@ struct ax88179_data {
+ 	u32 wol_supported;
+ 	u32 wolopts;
+ 	u8 disconnecting;
+-	u8 initialized;
+ };
+ 
+ struct ax88179_int_data {
+@@ -1678,12 +1677,21 @@ static int ax88179_reset(struct usbnet *dev)
+ 
+ static int ax88179_net_reset(struct usbnet *dev)
+ {
+-	struct ax88179_data *ax179_data = dev->driver_priv;
++	u16 tmp16;
+ 
+-	if (ax179_data->initialized)
++	ax88179_read_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID, GMII_PHY_PHYSR,
++			 2, &tmp16);
++	if (tmp16) {
++		ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE,
++				 2, 2, &tmp16);
++		if (!(tmp16 & AX_MEDIUM_RECEIVE_EN)) {
++			tmp16 |= AX_MEDIUM_RECEIVE_EN;
++			ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE,
++					  2, 2, &tmp16);
++		}
++	} else {
+ 		ax88179_reset(dev);
+-	else
+-		ax179_data->initialized = 1;
++	}
+ 
+ 	return 0;
+ }
+-- 
+2.45.1
 
 
