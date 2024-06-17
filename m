@@ -1,313 +1,175 @@
-Return-Path: <netdev+bounces-103924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C62D90A5D7
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 08:30:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FEA790A5D4
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 08:30:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC706B27A49
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 06:30:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB86B28B881
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 06:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3085217F36D;
-	Mon, 17 Jun 2024 06:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GWGZ/Nkq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50BC91802A8;
+	Mon, 17 Jun 2024 06:30:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2100.outbound.protection.outlook.com [40.107.117.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5BA1862B2
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 06:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718605826; cv=none; b=K81SdT+n5qlv36vc/+NPIC7DG75cK4jvRYupCa7pq4kd0M/eCAAIh4bINkwwmmvbcC3RgonZGHssrQtr/tYsiYpusUejMQS0XABrx1LxofGfDMNejgTmV437lwQa/e5Kie/fjc4JaEJ133ftB7zkI0xHXwurlF8mG9OjKyAbGBY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718605826; c=relaxed/simple;
-	bh=1vNAZpaWLsDmOCQWHPjOdnJz1MkV43RHrHiSXdX7QSQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AS69TbRvgG7toAPfsr+5AA9xrsX5oXW5hpxUMk99X9kokPgQm1v8isJpxxKS9i9aEfLsI03+oJOB8bp0Z5p6QmG7wLRxZdRcShJndgF2uyL8+EWtD+jKF/Iiq5hf7AWOyBgxzFp4Cz8xqhkRV2lFf+q2n+LyAvAZ03PmLpTwYwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GWGZ/Nkq; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718605823;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l906IYyq70SFyJgtFbhtA8WRiFy7rbwEmyMP36goir0=;
-	b=GWGZ/Nkq9Xbny66TO1u7WgmjAFGIqUlnn7XpHXLjUibz7zOJEHINWQkLVnG3d0WAjj/fop
-	QzTF3yITmm3TlkkcLMqpjosql7HrEnbKI4K3M8Qr+slQsk5TLpvS9cVsw7fcsDNb/OdRRF
-	s1Qftf9t+JFZoa6NuLJMwPVnEy3Bwdc=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-691-PYsLZBYANZiEBEIprwP2dg-1; Mon, 17 Jun 2024 02:30:22 -0400
-X-MC-Unique: PYsLZBYANZiEBEIprwP2dg-1
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-6c7e13b6a62so3508801a12.0
-        for <netdev@vger.kernel.org>; Sun, 16 Jun 2024 23:30:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718605821; x=1719210621;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l906IYyq70SFyJgtFbhtA8WRiFy7rbwEmyMP36goir0=;
-        b=j/docLN11kwN1aKGsrXmHhXTl8MYpDLCKmMgLBOtvVN94VWrmpIjNzUPi09QKxYbIW
-         J2H41j4PC/3gbu4jgnGQHA8BZFS0sFtbI9F/YZdcXBo44iDbuWdVk9kxlDaANFcN7pgY
-         tqls9B8UsRxHTG9uSRUezmU743Pr5obH9rKdFaj3rDeUNeWsvR+ns85lhIQHzeN+o2cu
-         NRlBggOJIfrgTdZjXP6DWlkfFXu5mLdg/0SrdpRwQIfQyp+FJvGRVPDhk/yUglnx3whr
-         iOxV4MTJUW0e8+RlcxaPf11UItz47447jKy+RWg7zAVthbzsEc+bDaMAYD5EcyLMknUP
-         DPzg==
-X-Gm-Message-State: AOJu0Yw6Yqu3zoFBewqmuA6G3vNgZ9SYRklWZnS74cUnRrCW4Xjyc88t
-	Ss+jTOdUhi3P3WmtwEDb09/vWqjVncLflJRxfpZVIdqhGb14uV5nmPcvEZUlmBvrG6iX1ChYItJ
-	sZDoPNX0yT2AH7hrq8Mgq3zvAxSCSprFZZWciNb/Ky07TRVpV2Q3pppwetm9FCGhUH6VMr10aFR
-	d5r9/bR9gBL9qNoufgQ8kx6ZqsNXz1BOxUQ8E394A=
-X-Received: by 2002:a05:6a20:9187:b0:1b6:245d:7e58 with SMTP id adf61e73a8af0-1bae7eb9feemr8783608637.23.1718605820895;
-        Sun, 16 Jun 2024 23:30:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFFqQ1FgUq82J4MpPNruV45skSqWPLiKNK0Uzc8J41/jRNuyAR1XP4rOEjZ/IkXhyLdO/Ss0z/gPvKHjtrsLYg=
-X-Received: by 2002:a05:6a20:9187:b0:1b6:245d:7e58 with SMTP id
- adf61e73a8af0-1bae7eb9feemr8783592637.23.1718605820508; Sun, 16 Jun 2024
- 23:30:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BBD44DA1F;
+	Mon, 17 Jun 2024 06:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.117.100
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718605823; cv=fail; b=sxTpQi3JKVw7TwBcKTDIXWWgxL5dfSxS9gOS+clRAfjW/rLl6dUXhocdHeQhc4cja9Bt4JxCQU1HnnNgMljNFb+OdGmuu0o1VEiPWrdQo+rWn75WUXsfj7l2zvUxT6VUNcLzlZEDMOKKUoslw2Ft/UlfUPAUEVPNfwwB2imcOzI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718605823; c=relaxed/simple;
+	bh=B3n1UV86aRJvlfT2Ha9MjIMrVu7wtgdBKEob+Sy5rCc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=dQ6faSu5qlU95yIvJvjmBYpDZpwNuB+c3SG5731djr4QYCvoFYR39jzF5l2rij2DICFYU77/nI+E7W9e9YhyR9yvGSdrGFo2YxW5npB4xN3gtQXHkikWxeWOMB35qUafTkr7biVAy1poOnr7lJpelXv+vbh91E7IGonsMmlyuiU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wesion.com; spf=pass smtp.mailfrom=wesion.com; arc=fail smtp.client-ip=40.107.117.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wesion.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wesion.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IYHLD+xqLXPPDoBFXGf/NFkdXosXiYt2Rqsfif/ZVz5cXciTi3RByECR5LY9eVEkcoMp6ISQXGoYy6gWbhYBSNqZ/LOmA1B28ogJFu0ImsZgU9UYERqtg+w/lnCSfgDrEnNLExaY/9/K0oq5Nssx4j3ym+80SL4BeLnejcQmo9iq4ASE2IMkudvy+GP63qpnv3KabVOs4KNgvTYlHneJEHQwqvbSpBsKZfYbn9wb2zYbtNTkBeqQM5ET4k8w3UBAVFKgdZMRod6b1ZmGzae5ZbMqfTiB3kbVx1Nna6Iclo9I7PsM5Q+wrGGiN6ycOCrTEKkbQr1gxnO0Zw+LDCgzxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=B3n1UV86aRJvlfT2Ha9MjIMrVu7wtgdBKEob+Sy5rCc=;
+ b=GDyeJemBJDvjVrbGhyA2JKFcZhIzcx0Zr5GzCeZ/twxhGkwrOOWTrA11ETtQvZpdzT/eEQ6sNSFzkCE9X6fwoeaJaqBAqblqr6PIcKBQ++UrTGZ6eNBs5iSxNDGus8iRHPZ4TKM7FWuJCfuNKpIN7LozdsEjnp5XIVp76FDnwTmXSfaQdnQ8QTOkNLZmaXFvJebMnYM7uW0ChzFYGaKa9gjP1RO7XKnd0HesjiSpdrjhqKGzw/Bi3BQdMwUBeimu3U/BOi0bCLV5x1UAzvhqHVMjJnG2yYCsLjiE6wE/YgKMijXC0ySQhPlwdxcQRxJ/2Rx/E1bMLUMcgbYXw3QmeQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wesion.com; dmarc=pass action=none header.from=wesion.com;
+ dkim=pass header.d=wesion.com; arc=none
+Received: from TYZPR03MB7001.apcprd03.prod.outlook.com (2603:1096:400:26a::14)
+ by SEYPR03MB7728.apcprd03.prod.outlook.com (2603:1096:101:14a::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Mon, 17 Jun
+ 2024 06:30:15 +0000
+Received: from TYZPR03MB7001.apcprd03.prod.outlook.com
+ ([fe80::78dd:5e68:1a9c:36c0]) by TYZPR03MB7001.apcprd03.prod.outlook.com
+ ([fe80::78dd:5e68:1a9c:36c0%6]) with mapi id 15.20.7677.029; Mon, 17 Jun 2024
+ 06:30:15 +0000
+From: Jacobe Zang <jacobe.zang@wesion.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>, "kvalo@kernel.org"
+	<kvalo@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org"
+	<robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>
+CC: Nick Xie <nick@khadas.com>, "arend@broadcom.com" <arend@broadcom.com>,
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v1] dt-bindings: net: wireless: BCM4329 binding: add
+ pci14e4,449d
+Thread-Topic: [PATCH v1] dt-bindings: net: wireless: BCM4329 binding: add
+ pci14e4,449d
+Thread-Index: AQHawGAwKfgdJrUz80SR/3Lp8iKvprHLe7OAgAABBk4=
+Date: Mon, 17 Jun 2024 06:30:14 +0000
+Message-ID:
+ <TYZPR03MB70014E22C5CD2BA3452F31D880CD2@TYZPR03MB7001.apcprd03.prod.outlook.com>
+References: <20240617024341.3106240-1-jacobe.zang@wesion.com>
+ <bbd04c56-451a-4a5f-938c-2ce4ccec7253@kernel.org>
+In-Reply-To: <bbd04c56-451a-4a5f-938c-2ce4ccec7253@kernel.org>
+Accept-Language: en-US, zh-CN
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wesion.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TYZPR03MB7001:EE_|SEYPR03MB7728:EE_
+x-ms-office365-filtering-correlation-id: 23fbf06f-ee49-45cb-7bb3-08dc8e96f2d7
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230037|7416011|376011|1800799021|366013|38070700015;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?wbMBjaFsMjRfnI2CIlI0t+1nmNstZyiO9lS1U3PNN8WUbMo/qJSFgK3bgr?=
+ =?iso-8859-1?Q?rBdI9mv5krbsCuhayEmOAMiCNxxtyHG6g3Z8ryAqIWw+T7r/flCg8wbNh9?=
+ =?iso-8859-1?Q?gw5JpcLf800tuXxslnSofu/OD8KXGx4XgPX1XQ5rAjX358UHqyh1+Pacyk?=
+ =?iso-8859-1?Q?nyoP1VDgyKUqo0jrxL+aCxI1ZJIwgbRDT+H2+ap9ujW5WlQaGpu2HuPsfG?=
+ =?iso-8859-1?Q?QAjYHTGXSmOv+Y0RWh2ExshHk31/iTlJr9xMf9fNGbkX2YPRhlT+GuQmv4?=
+ =?iso-8859-1?Q?mI4r1bUhGPSA3knW39GHmtkAvfPeuoTUe9WRBhdfLMCkE+du1hpjM3hhBX?=
+ =?iso-8859-1?Q?9CfOhUUPZGYRxU240d6pmI+YmXqoadMSBv3YaxoySpCPnC0yvr70lLnb9l?=
+ =?iso-8859-1?Q?gFrpemBekk1WKzlhmj+1fmbq8dZq0vxfuVgzT5WbLqv/rSJrTbzkJkJzp6?=
+ =?iso-8859-1?Q?mhl3uH0mXg2Ob0QhNsbjf6DXIofsDYuemqnVSiAXQhxUZPdVCPh8ig6s2i?=
+ =?iso-8859-1?Q?ATIi4jpb6UOZ0Q8v45MZJSlgB/EAiMlLWFcEHDhIquTqMa/Qu/eb3rP4Lf?=
+ =?iso-8859-1?Q?AF/jrIr1MSIpt6uTB+ZI/OkgI2hHZTZOjXT+1gC8Emj1Y24mxxDfVcIqvu?=
+ =?iso-8859-1?Q?wS4CgKwCnAHfPMnNGe+dGALpqcmkUNxKT+xT2ULP6XT9xAvpaYeIJFo0ID?=
+ =?iso-8859-1?Q?kXPK4S82fCF3ZHKI9enSfZKK9moepolBmF8S2or1dHdmeP1KfASh6J0wVY?=
+ =?iso-8859-1?Q?449WuSSNtL4RI2+H/wZGxc/XTrdFXKMeB2hJx3cgMOrgwSvd0FH6bDaon3?=
+ =?iso-8859-1?Q?NI71rqlir2C/lg3DBo8ntkD4AJ3KbwgLfx4GzY37VyjeVzJvxQAeMTMNx8?=
+ =?iso-8859-1?Q?z3I7Vq9VjkA4H4xl1QJxYRCPilwLn+CtBoeun1V5UNgzB+4C6P2FfytCRV?=
+ =?iso-8859-1?Q?k/i682ePARqBJ78bG3de9ane4qpqEidzTyKHp5ahOy93FR4l4zX155Pqk+?=
+ =?iso-8859-1?Q?0nuZhvAtvQHjRZKspFXOKmziPZnBiTqZWK3GRVZSjm5L/eAf7YBYaEAu2/?=
+ =?iso-8859-1?Q?5XtyuDBP4xCXjES7B1nUiMFgluITmZ8YO5sL4nDeHt/Zq7givY7yWuTnXG?=
+ =?iso-8859-1?Q?fAx6VCdUI1ajYHbKb1Dyum4Dig+tz9asDOvPSl3C3ETWaQbp8bFto3pr0B?=
+ =?iso-8859-1?Q?0GyYzxy0svUBixIijgyjgrw8UQdVdpThHdRTXrhmtJ/hMvk07nmc6ghUNG?=
+ =?iso-8859-1?Q?nicoQd3JNBuA+017mnkRPvbeYipV9ZXV8KQVMKI2/i2IKiPYRoIPSU2W1q?=
+ =?iso-8859-1?Q?xA9yE4KJaDnkk4FeuanY01e12G6CULFxRqRmR+m5DxFXnd7iXLxBRpZsSE?=
+ =?iso-8859-1?Q?oRYEzcJplMpSGYJkQ35X2jqr3GGfo4E0jX8naTQ+LPZvao5OQUBUo=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR03MB7001.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(7416011)(376011)(1800799021)(366013)(38070700015);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?LAj7KxfRotoVgENEW2Cpoc0bBDJ5MtaZ/uXsHQrzG3sk7pYd6IpP8RgmFj?=
+ =?iso-8859-1?Q?onNZSA5anV1iVzNPcBjtfnd3buRPQAd3x2W7Zhfa9ZQ2xhw11U6d3cV3GO?=
+ =?iso-8859-1?Q?DiPaUzW4TxNx5ezpGo/BEl8T69/d+288R2mMPIdS0pXtwjlqr8sbTHUxGm?=
+ =?iso-8859-1?Q?b8U21iBDVBt/B3RYjXPF4HCZHf1m0KThyQsia6/qSiN2cwU8fYnyEPDZVL?=
+ =?iso-8859-1?Q?fPHUsJpphJiPfYGOMGjkffoNEUNc54ezREm5a+Oi+sH56Azwtmk30446SG?=
+ =?iso-8859-1?Q?thVmo4TwMXta4+sHtPLMBtR0oivSbHL7K0CQZtpUlOKFEDyfp2lsPcz+wv?=
+ =?iso-8859-1?Q?VuKqJqjiOAwfw5GBOIDuZeXGXGKWnZP7UlwzeeNHi1QvWYY+oDFyeneIY9?=
+ =?iso-8859-1?Q?CB1gOIfR/O2udb+Z/2fCJDlcZSTIxF4coqP5Kqxazwjy1Ggn5an3dzEXco?=
+ =?iso-8859-1?Q?4pfHbPppHvnS5xX3kN3GO+Ug005HbN2jo7DpaDHLps/gC3WH8LiKFI8Edd?=
+ =?iso-8859-1?Q?sZFGlpIFkI035aE9EATVv2unIZaYUFvglhL/QnmEYXgUrnRgt/lSfG2PBW?=
+ =?iso-8859-1?Q?etf4sMwbY3OqoymYNG7QsjzakVJO0YTcLk39Ap139j+c9mvvOpyIannV6S?=
+ =?iso-8859-1?Q?CfuPVAUaw9y0g95U1zxiYHS+xkiogV0Bp6fLzY1FNMDZOirpV+sRMdYNsa?=
+ =?iso-8859-1?Q?m8t8yMB2nlF8waSe+pYnYY12dqZurKAoXu85rbWAzV3MCql8mBB7DQyAsq?=
+ =?iso-8859-1?Q?pY/yHUztWMkIamO4LRNQCHzF7v4aJ+ZxmR6IWK+iF2N9LdVtM7wg+D8NTR?=
+ =?iso-8859-1?Q?wCqmKkubGR+dZ/5SfogQ+tmllKEzjlLnQe4WQ7Dn4HrkE/5qrbEi5TepiJ?=
+ =?iso-8859-1?Q?N32Hhf0TPyUFMenRJi/+e2XMHDfv7qgdoVYJ8j5I69XQTcvIgjlB0YGES9?=
+ =?iso-8859-1?Q?/64rIBAtL278m9ZpwigxeEHXdO+LKjyms1fEpMHUuA0ylpBVUrmQiydtSp?=
+ =?iso-8859-1?Q?jUPSn6Y+xo0Q4Pz2RoM+H1UbbZdxroSdL0BfVTdKsK9/7/Alz7ykRBpNef?=
+ =?iso-8859-1?Q?49/IxWYYEfzyXfSVbU8bVzJTK4WSsSmnyPGI1n8OSvC2rExWhCfKMlFQDA?=
+ =?iso-8859-1?Q?D3CfUXOrzhm4Wjyp9r6B3AwQcqHPxOQ5BAnrv/CpIxkHhwZ2gemmBRM5Kp?=
+ =?iso-8859-1?Q?zKEsFfb/bVPFnw6ISB7Xu0p8Re3nm7BJ8RhqFMQXa9YO/EYv7wJpj5aqg6?=
+ =?iso-8859-1?Q?QbRfr6aCKoYPAUvx6fkI6i60taF3suZbgdVjr4zGxDWw2q1xCw/++UeOUj?=
+ =?iso-8859-1?Q?LnTBnGqa/KX/Bhwma9+/fLjZS172yPjGIdC37rQleGn0TTkrXJ2mWBalqn?=
+ =?iso-8859-1?Q?bxOI7aeoLf5FoGc1niF2AokrmxgG3qKjPhIFMlpeXhR/IRUss2rQnQyPUR?=
+ =?iso-8859-1?Q?mRr5/5dGM8BPI9pyAu6H6iMhL0UVmENftj4RxceRu3rVzfC9TZLyYszGvH?=
+ =?iso-8859-1?Q?OfPShvByPmVGkQlk5QUXbruf6DmXuOVgUXvn79+ubMZoj5S5C9sq9rpLTS?=
+ =?iso-8859-1?Q?Mcn0Kv1i79EQrpyVlpATsHgRHELpUHfGhOnIM+/7awFY9zdDxI6OHsjqmx?=
+ =?iso-8859-1?Q?Wy6OBhqPAg3WfkAqKe28aA40ICmikDMbwT?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240614063933.108811-1-xuanzhuo@linux.alibaba.com> <20240614063933.108811-12-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20240614063933.108811-12-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 17 Jun 2024 14:30:07 +0800
-Message-ID: <CACGkMEsWg95zXVsnDWrAU1qRS0uuEJJR0rw7LVOV-fGuBGzQCQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 11/15] virtio_net: xsk: tx: support xmit xsk buffer
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev, 
-	bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: wesion.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TYZPR03MB7001.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 23fbf06f-ee49-45cb-7bb3-08dc8e96f2d7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2024 06:30:14.9566
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 2dc3bd76-7ac2-4780-a5b7-6c6cc6b5af9b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: MIt9D9B4ygYj213r4ky+Unkq9ZCJcAdDB1Dvh1LddstxgrX5rZY+RGtOgh1T4ngjhWAuOahu60hnwBRENLYc0A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEYPR03MB7728
 
-On Fri, Jun 14, 2024 at 2:40=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
->
-> The driver's tx napi is very important for XSK. It is responsible for
-> obtaining data from the XSK queue and sending it out.
->
-> At the beginning, we need to trigger tx napi.
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->  drivers/net/virtio_net.c | 121 ++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 119 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 2767338dc060..7e811f392768 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -535,10 +535,13 @@ enum virtnet_xmit_type {
->         VIRTNET_XMIT_TYPE_SKB,
->         VIRTNET_XMIT_TYPE_XDP,
->         VIRTNET_XMIT_TYPE_DMA,
-> +       VIRTNET_XMIT_TYPE_XSK,
->  };
->
->  #define VIRTNET_XMIT_TYPE_MASK (VIRTNET_XMIT_TYPE_SKB | VIRTNET_XMIT_TYP=
-E_XDP \
-> -                               | VIRTNET_XMIT_TYPE_DMA)
-> +                               | VIRTNET_XMIT_TYPE_DMA | VIRTNET_XMIT_TY=
-PE_XSK)
-> +
-> +#define VIRTIO_XSK_FLAG_OFFSET 4
->
->  static enum virtnet_xmit_type virtnet_xmit_ptr_strip(void **ptr)
->  {
-> @@ -768,6 +771,10 @@ static void __free_old_xmit(struct send_queue *sq, b=
-ool in_napi,
->                          * func again.
->                          */
->                         goto retry;
-> +
-> +               case VIRTNET_XMIT_TYPE_XSK:
-> +                       /* Make gcc happy. DONE in subsequent commit */
-
-This is probably a hint that the next patch should be squashed here.
-
-> +                       break;
->                 }
->         }
->  }
-> @@ -1265,6 +1272,102 @@ static void check_sq_full_and_disable(struct virt=
-net_info *vi,
->         }
->  }
->
-> +static void *virtnet_xsk_to_ptr(u32 len)
-> +{
-> +       unsigned long p;
-> +
-> +       p =3D len << VIRTIO_XSK_FLAG_OFFSET;
-> +
-> +       return virtnet_xmit_ptr_mix((void *)p, VIRTNET_XMIT_TYPE_XSK);
-> +}
-> +
-> +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32 len=
-)
-> +{
-> +       sg->dma_address =3D addr;
-> +       sg->length =3D len;
-> +}
-> +
-> +static int virtnet_xsk_xmit_one(struct send_queue *sq,
-> +                               struct xsk_buff_pool *pool,
-> +                               struct xdp_desc *desc)
-> +{
-> +       struct virtnet_info *vi;
-> +       dma_addr_t addr;
-> +
-> +       vi =3D sq->vq->vdev->priv;
-> +
-> +       addr =3D xsk_buff_raw_get_dma(pool, desc->addr);
-> +       xsk_buff_raw_dma_sync_for_device(pool, addr, desc->len);
-> +
-> +       sg_init_table(sq->sg, 2);
-> +
-> +       sg_fill_dma(sq->sg, sq->xsk.hdr_dma_address, vi->hdr_len);
-> +       sg_fill_dma(sq->sg + 1, addr, desc->len);
-> +
-> +       return virtqueue_add_outbuf(sq->vq, sq->sg, 2,
-> +                                   virtnet_xsk_to_ptr(desc->len), GFP_AT=
-OMIC);
-> +}
-> +
-> +static int virtnet_xsk_xmit_batch(struct send_queue *sq,
-> +                                 struct xsk_buff_pool *pool,
-> +                                 unsigned int budget,
-> +                                 u64 *kicks)
-> +{
-> +       struct xdp_desc *descs =3D pool->tx_descs;
-> +       bool kick =3D false;
-> +       u32 nb_pkts, i;
-> +       int err;
-> +
-> +       budget =3D min_t(u32, budget, sq->vq->num_free);
-> +
-> +       nb_pkts =3D xsk_tx_peek_release_desc_batch(pool, budget);
-> +       if (!nb_pkts)
-> +               return 0;
-> +
-> +       for (i =3D 0; i < nb_pkts; i++) {
-> +               err =3D virtnet_xsk_xmit_one(sq, pool, &descs[i]);
-> +               if (unlikely(err)) {
-> +                       xsk_tx_completed(sq->xsk.pool, nb_pkts - i);
-> +                       break;
-
-Any reason we don't need a kick here?
-
-> +               }
-> +
-> +               kick =3D true;
-> +       }
-> +
-> +       if (kick && virtqueue_kick_prepare(sq->vq) && virtqueue_notify(sq=
-->vq))
-> +               (*kicks)++;
-> +
-> +       return i;
-> +}
-> +
-> +static bool virtnet_xsk_xmit(struct send_queue *sq, struct xsk_buff_pool=
- *pool,
-> +                            int budget)
-> +{
-> +       struct virtnet_info *vi =3D sq->vq->vdev->priv;
-> +       struct virtnet_sq_free_stats stats =3D {};
-> +       u64 kicks =3D 0;
-> +       int sent;
-> +
-> +       __free_old_xmit(sq, true, &stats);
-> +
-> +       sent =3D virtnet_xsk_xmit_batch(sq, pool, budget, &kicks);
-> +
-> +       if (!is_xdp_raw_buffer_queue(vi, sq - vi->sq))
-> +               check_sq_full_and_disable(vi, vi->dev, sq);
-> +
-> +       u64_stats_update_begin(&sq->stats.syncp);
-> +       u64_stats_add(&sq->stats.packets, stats.packets);
-> +       u64_stats_add(&sq->stats.bytes,   stats.bytes);
-> +       u64_stats_add(&sq->stats.kicks,   kicks);
-> +       u64_stats_add(&sq->stats.xdp_tx,  sent);
-> +       u64_stats_update_end(&sq->stats.syncp);
-> +
-> +       if (xsk_uses_need_wakeup(pool))
-> +               xsk_set_tx_need_wakeup(pool);
-> +
-> +       return sent =3D=3D budget;
-> +}
-> +
->  static int __virtnet_xdp_xmit_one(struct virtnet_info *vi,
->                                    struct send_queue *sq,
->                                    struct xdp_frame *xdpf)
-> @@ -2707,6 +2810,7 @@ static int virtnet_poll_tx(struct napi_struct *napi=
-, int budget)
->         struct virtnet_info *vi =3D sq->vq->vdev->priv;
->         unsigned int index =3D vq2txq(sq->vq);
->         struct netdev_queue *txq;
-> +       bool xsk_busy =3D false;
->         int opaque;
->         bool done;
->
-> @@ -2719,7 +2823,11 @@ static int virtnet_poll_tx(struct napi_struct *nap=
-i, int budget)
->         txq =3D netdev_get_tx_queue(vi->dev, index);
->         __netif_tx_lock(txq, raw_smp_processor_id());
->         virtqueue_disable_cb(sq->vq);
-> -       free_old_xmit(sq, true);
-> +
-> +       if (sq->xsk.pool)
-> +               xsk_busy =3D virtnet_xsk_xmit(sq, sq->xsk.pool, budget);
-
-How about rename this to "xsk_sent"?
-
-> +       else
-> +               free_old_xmit(sq, true);
->
->         if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS) {
->                 if (netif_tx_queue_stopped(txq)) {
-> @@ -2730,6 +2838,11 @@ static int virtnet_poll_tx(struct napi_struct *nap=
-i, int budget)
->                 netif_tx_wake_queue(txq);
->         }
->
-> +       if (xsk_busy) {
-> +               __netif_tx_unlock(txq);
-> +               return budget;
-> +       }
-> +
->         opaque =3D virtqueue_enable_cb_prepare(sq->vq);
->
->         done =3D napi_complete_done(napi, 0);
-> @@ -5715,6 +5828,10 @@ static void virtnet_sq_free_unused_buf(struct virt=
-queue *vq, void *buf)
->         case VIRTNET_XMIT_TYPE_DMA:
->                 virtnet_sq_unmap(sq, &buf);
->                 goto retry;
-> +
-> +       case VIRTNET_XMIT_TYPE_XSK:
-> +               /* Make gcc happy. DONE in subsequent commit */
-> +               break;
->         }
->  }
->
-> --
-> 2.32.0.3.g01195cf9f
->
-
-Thanks
-
+> You do not add prefix here. Drop unrelated parts of commit msg.=0A=
+=0A=
+OK, I will remove unrelated parts. The reason why I added it is that when I=
+ do ./script/checkpatch.pl the patch, it said the compatible is not documen=
+t.=0A=
+=0A=
+=0A=
+---=0A=
+Best Regards=0A=
+Jacobe=
 
