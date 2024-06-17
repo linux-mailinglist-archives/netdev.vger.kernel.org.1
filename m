@@ -1,271 +1,260 @@
-Return-Path: <netdev+bounces-104234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26F5590BA8B
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 21:04:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9B2290BA8E
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 21:08:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AE281F21765
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:04:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60A322878B4
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2973A198E6D;
-	Mon, 17 Jun 2024 19:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D37198A0D;
+	Mon, 17 Jun 2024 19:08:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DbfyuHXI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YozlLf7m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000C5198843;
-	Mon, 17 Jun 2024 19:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921CC364BE;
+	Mon, 17 Jun 2024 19:08:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718651075; cv=none; b=ObmgxvU+qYHZ/mgPbs26i9e6wltOVKAfN73UMlqfIGrvyyRgGhtHud35RX7PlvfONIlCr8n7evA2IVnuu3ISq/MtkpBrQUTsrNeZr8ZO95X6ZkIu1GBwjiyTvw0G2webCP4Z/67lHOyaKno90FKQjs5uAs1n6NBkGirFinlGtEg=
+	t=1718651284; cv=none; b=ut2VgdpMTLolt/4w3nPE0vusVFyLtn5mrP4zlE+3/Dt5a9BQaVY7HYYOzdioJYkLq6EviGselXdurB8CfQ/3yzwhNtDTnChQpmeabf7iZveU4VhRDkE7FcWKT+qyGAfx67YZteCrsQu6pdMHaIqtszvCnxKhBVxyrJFCg2dFWf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718651075; c=relaxed/simple;
-	bh=HD6iO8hWvr/4Q3/xpn2c58NGmdSa4rpuRfGbqAneJkQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MWNi3AS3q4z4dfleTETnXe1/14WVVwGEu7N4C8t2pcNYasT5lsx4zWgOzRjWYVccdJLDevxdGtgcYMNxxhG1zAhDAS4M9Cdvit3W4b5MmeVUGWgUvGjREFMvM+ng6rWcBRRSuXdff6/1Get3OxwmfNEnWPvQ+vrUAyxYq+yk/9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DbfyuHXI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA9F8C2BD10;
-	Mon, 17 Jun 2024 19:04:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718651074;
-	bh=HD6iO8hWvr/4Q3/xpn2c58NGmdSa4rpuRfGbqAneJkQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DbfyuHXIOLqyw+jyFvf5BHQoFBBkiFyDeVz/0/SzPeTvwrnFH1F0QxMMjNNUkKc4Q
-	 7t/2sFp8ASlWWEfcCfJ0Nm/roP8BmWmFhFCO5oJGxRGf+jPP2r1JeYe4iPrLgNr+x2
-	 E7yGusmxfXzpML9gMVOermBxQXeBPtF1UOsHj1SsLrNv0ILZYLaOcfbWdQtmO3iHqQ
-	 d5g1sDEDPnzm+m3mAQWbUxl8qe1hyUAbdfIJ7Jz0pF4ao83I7c32jqonqKTIO+7eoq
-	 y0A+h3yFlLNhxpfb3VEdRNxVQA4eCXDI4Zs8d4hu5JijpAFgK7/UiMSDw7Gv7kKGuj
-	 9hKsXETDhyTTQ==
-Date: Mon, 17 Jun 2024 22:04:29 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Omer Shpigelman <oshpigelman@habana.ai>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"ogabbay@kernel.org" <ogabbay@kernel.org>,
-	Zvika Yehudai <zyehudai@habana.ai>
-Subject: Re: [PATCH 11/15] RDMA/hbl: add habanalabs RDMA driver
-Message-ID: <20240617190429.GB4025@unreal>
-References: <20240613082208.1439968-1-oshpigelman@habana.ai>
- <20240613082208.1439968-12-oshpigelman@habana.ai>
- <20240613191828.GJ4966@unreal>
- <fbb34afa-8a38-4124-9384-9b858ce2c4e5@habana.ai>
+	s=arc-20240116; t=1718651284; c=relaxed/simple;
+	bh=F7rPyK5AG73Q5gxMe9v27RKSWK+iTffH6tEkcyjLvuQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=HPSn3BP8dUzLxsJ0n5XZjkOdm8tFZieEruxw2ChpX/kGYq/8os+9Obgw9bZrfqmK1hbWXjSpOjcXOUKGsprBNDZPtTmiRDsGoZZIok/NE6BVlGzG8RzHlWKaU/nDKfygnZvxFVH3dFMAYr37IRPEhsF2sb/ed3Dd9LGZawDELhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YozlLf7m; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-441187684e3so30399481cf.3;
+        Mon, 17 Jun 2024 12:08:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718651281; x=1719256081; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OVmWjhI4LxI1RGpnFHROdhgzv6RHapEzTRQ8EdXC5mc=;
+        b=YozlLf7m261jmYAShzed+5rwGUm9KNIfYLEpn6F3yqHrK8S5LBK9vkIJN26tTxAixa
+         faPN+AiwFPVQKwbY9Dn/xjp8PE1gGKctTWS6xoAP0OmwEp5CvdgmoM+zxUea7+gQ/N9s
+         hrgBHMocekmgdHr//eEi7nrWpJ6gpSyvcQVMIsDv3VR+SWodfb6ute8AzLBCQqG0/kUE
+         M5h3f2PsKVVT4ezMAJcT35KsHuPvzRstZ9o5/cPxBMSGcDcD6qX4XYOPs/fDWszgYDA4
+         vdHyFpKpPzFacgV0j4HmQsu+R9K04bF8CSozfGC6YKxB1oxLF1XKBJ7IkvEimFuiP//I
+         a2kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718651281; x=1719256081;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OVmWjhI4LxI1RGpnFHROdhgzv6RHapEzTRQ8EdXC5mc=;
+        b=CFM6+gi7IXcCpzTW+XpbZw8kqeVRkZ1z/Q0XOJS3OBEqNIZuX0HqD+gniTk1H5pAl6
+         wyWj7ZYYWcA/gK2j9eYwzzhe0tHvJFw5e03XkxzAYQDAtWkDNK6zPBWHJbgS4jMivt9a
+         467Eer6hrp3qL9qI41zYqyLHjinjlHmYCvni0RXgMsIEYXCMvdlVv5vDK75w1ibrVmiQ
+         Oc0hEN81e+16pzf2LS/XMPgVNhL8L5K3qNVBYcQh0Jv8zC1biMQ0MO7PDvb8URsxUX1W
+         Xlj5ExghzdX6Pv3qb1Vk7hTbWjLbqKrXVdElC5PteaV6hClzQu2PyeBDDbdKDdjwAcDS
+         r8Tg==
+X-Forwarded-Encrypted: i=1; AJvYcCWskjqU/z9P5y5Dhs/HDxbuMzcecKBTB6S7mxYZLfW/waFRX312v9DJDg8YTkuGqoFBPlWexl9EYy5C/1ZDwp1uiOBrP0BpfBZz2O7YJjd+xc47I7C2+35rE9C4Ryy7KO7LDZTb0HkOr9qJoHtyhzEujDjeaUZGLupd1OH8
+X-Gm-Message-State: AOJu0YwgDPJerHWza0VQRGyG5wcrM23iSnhU71DF84nPBzcMnT4ACC+/
+	6vpJJMMOAvjz392tlGvVEXte34ahqNTsMsYyXUFNggnNF6xqUXho
+X-Google-Smtp-Source: AGHT+IGWJEYYbga0s24RJNsB+VnxGMhLe6eCDv2y7owLqb0oa/tteYV+YrLRdO3cDYzbtq06F8zBog==
+X-Received: by 2002:a05:6214:4b85:b0:6b0:76f1:8639 with SMTP id 6a1803df08f44-6b2afd5a04amr108308886d6.42.1718651280272;
+        Mon, 17 Jun 2024 12:08:00 -0700 (PDT)
+Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b2a5ed9075sm57794056d6.102.2024.06.17.12.07.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jun 2024 12:07:58 -0700 (PDT)
+Date: Mon, 17 Jun 2024 15:07:58 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jiri Pirko <jiri@resnulli.us>, 
+ Chengen Du <chengen.du@canonical.com>
+Cc: willemdebruijn.kernel@gmail.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ kaber@trash.net, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org
+Message-ID: <6670898e1ca78_21d16f2946f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <ZnAdiDjI_unrELB8@nanopsycho.orion>
+References: <20240617054514.127961-1-chengen.du@canonical.com>
+ <ZnAdiDjI_unrELB8@nanopsycho.orion>
+Subject: Re: [PATCH v8] af_packet: Handle outgoing VLAN packets without
+ hardware offloading
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fbb34afa-8a38-4124-9384-9b858ce2c4e5@habana.ai>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 17, 2024 at 05:43:49PM +0000, Omer Shpigelman wrote:
-> On 6/13/24 22:18, Leon Romanovsky wrote:
-> > [Some people who received this message don't often get email from leon@kernel.org. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+Jiri Pirko wrote:
+> Mon, Jun 17, 2024 at 07:45:14AM CEST, chengen.du@canonical.com wrote:
+> >The issue initially stems from libpcap. The ethertype will be overwritten
+> >as the VLAN TPID if the network interface lacks hardware VLAN offloading.
+> >In the outbound packet path, if hardware VLAN offloading is unavailable,
+> >the VLAN tag is inserted into the payload but then cleared from the sk_buff
+> >struct. Consequently, this can lead to a false negative when checking for
+> >the presence of a VLAN tag, causing the packet sniffing outcome to lack
+> >VLAN tag information (i.e., TCI-TPID). As a result, the packet capturing
+> >tool may be unable to parse packets as expected.
+> >
+> >The TCI-TPID is missing because the prb_fill_vlan_info() function does not
+> >modify the tp_vlan_tci/tp_vlan_tpid values, as the information is in the
+> >payload and not in the sk_buff struct. The skb_vlan_tag_present() function
+> >only checks vlan_all in the sk_buff struct. In cooked mode, the L2 header
+> >is stripped, preventing the packet capturing tool from determining the
+> >correct TCI-TPID value. Additionally, the protocol in SLL is incorrect,
+> >which means the packet capturing tool cannot parse the L3 header correctly.
+> >
+> >Link: https://github.com/the-tcpdump-group/libpcap/issues/1105
+> >Link: https://lore.kernel.org/netdev/20240520070348.26725-1-chengen.du@canonical.com/T/#u
+> >Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspace")
+> >Cc: stable@vger.kernel.org
+> >Signed-off-by: Chengen Du <chengen.du@canonical.com>
+> >---
+> > net/packet/af_packet.c | 86 +++++++++++++++++++++++++++++++++++++++++-
+> > 1 file changed, 84 insertions(+), 2 deletions(-)
+> >
+> >diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> >index ea3ebc160e25..84e8884a77e3 100644
+> >--- a/net/packet/af_packet.c
+> >+++ b/net/packet/af_packet.c
+> >@@ -538,6 +538,61 @@ static void *packet_current_frame(struct packet_sock *po,
+> > 	return packet_lookup_frame(po, rb, rb->head, status);
+> > }
 > > 
-> > On Thu, Jun 13, 2024 at 11:22:04AM +0300, Omer Shpigelman wrote:
-> >> Add an RDMA driver of Gaudi ASICs family for AI scaling.
-> >> The driver itself is agnostic to the ASIC in action, it operates according
-> >> to the capabilities that were passed on device initialization.
-> >> The device is initialized by the hbl_cn driver via auxiliary bus.
-> >> The driver also supports QP resource tracking and port/device HW counters.
-> >>
-> >> Signed-off-by: Omer Shpigelman <oshpigelman@habana.ai>
-> >> Co-developed-by: Abhilash K V <kvabhilash@habana.ai>
-> >> Signed-off-by: Abhilash K V <kvabhilash@habana.ai>
-> >> Co-developed-by: Andrey Agranovich <aagranovich@habana.ai>
-> >> Signed-off-by: Andrey Agranovich <aagranovich@habana.ai>
-> >> Co-developed-by: Bharat Jauhari <bjauhari@habana.ai>
-> >> Signed-off-by: Bharat Jauhari <bjauhari@habana.ai>
-> >> Co-developed-by: David Meriin <dmeriin@habana.ai>
-> >> Signed-off-by: David Meriin <dmeriin@habana.ai>
-> >> Co-developed-by: Sagiv Ozeri <sozeri@habana.ai>
-> >> Signed-off-by: Sagiv Ozeri <sozeri@habana.ai>
-> >> Co-developed-by: Zvika Yehudai <zyehudai@habana.ai>
-> >> Signed-off-by: Zvika Yehudai <zyehudai@habana.ai>
+> >+static u16 vlan_get_tci(struct sk_buff *skb, struct net_device *dev)
+> >+{
+> >+	struct vlan_hdr vhdr, *vh;
+> >+	u8 *skb_orig_data = skb->data;
+> >+	int skb_orig_len = skb->len;
+> >+	unsigned int header_len;
+> >+
+> >+	if (!dev)
+> >+		return 0;
+> >+
+> >+	/* In the SOCK_DGRAM scenario, skb data starts at the network
+> >+	 * protocol, which is after the VLAN headers. The outer VLAN
+> >+	 * header is at the hard_header_len offset in non-variable
+> >+	 * length link layer headers. If it's a VLAN device, the
+> >+	 * min_header_len should be used to exclude the VLAN header
+> >+	 * size.
+> >+	 */
+> >+	if (dev->min_header_len == dev->hard_header_len)
+> >+		header_len = dev->hard_header_len;
+> >+	else if (is_vlan_dev(dev))
+> >+		header_len = dev->min_header_len;
+> >+	else
+> >+		return 0;
+> >+
+> >+	skb_push(skb, skb->data - skb_mac_header(skb));
+> >+	vh = skb_header_pointer(skb, header_len, sizeof(vhdr), &vhdr);
+> >+	if (skb_orig_data != skb->data) {
+> >+		skb->data = skb_orig_data;
+> >+		skb->len = skb_orig_len;
+> >+	}
+> >+	if (unlikely(!vh))
+> >+		return 0;
+> >+
+> >+	return ntohs(vh->h_vlan_TCI);
+> >+}
+> >+
+> >+static __be16 vlan_get_protocol_dgram(struct sk_buff *skb)
+> >+{
+> >+	__be16 proto = skb->protocol;
+> >+
+> >+	if (unlikely(eth_type_vlan(proto))) {
+> >+		u8 *skb_orig_data = skb->data;
+> >+		int skb_orig_len = skb->len;
+> >+
+> >+		skb_push(skb, skb->data - skb_mac_header(skb));
+> >+		proto = __vlan_get_protocol(skb, proto, NULL);
+> >+		if (skb_orig_data != skb->data) {
+> >+			skb->data = skb_orig_data;
+> >+			skb->len = skb_orig_len;
+> >+		}
+> >+	}
+> >+
+> >+	return proto;
+> >+}
+> >+
+> > static void prb_del_retire_blk_timer(struct tpacket_kbdq_core *pkc)
+> > {
+> > 	del_timer_sync(&pkc->retire_blk_timer);
+> >@@ -1007,10 +1062,16 @@ static void prb_clear_rxhash(struct tpacket_kbdq_core *pkc,
+> > static void prb_fill_vlan_info(struct tpacket_kbdq_core *pkc,
+> > 			struct tpacket3_hdr *ppd)
+> > {
+> >+	struct packet_sock *po = container_of(pkc, struct packet_sock, rx_ring.prb_bdqc);
+> >+
+> > 	if (skb_vlan_tag_present(pkc->skb)) {
+> > 		ppd->hv1.tp_vlan_tci = skb_vlan_tag_get(pkc->skb);
+> > 		ppd->hv1.tp_vlan_tpid = ntohs(pkc->skb->vlan_proto);
+> > 		ppd->tp_status = TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+> >+	} else if (unlikely(po->sk.sk_type == SOCK_DGRAM && eth_type_vlan(pkc->skb->protocol))) {
+> >+		ppd->hv1.tp_vlan_tci = vlan_get_tci(pkc->skb, pkc->skb->dev);
+> >+		ppd->hv1.tp_vlan_tpid = ntohs(pkc->skb->protocol);
+> >+		ppd->tp_status = TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+> > 	} else {
+> > 		ppd->hv1.tp_vlan_tci = 0;
+> > 		ppd->hv1.tp_vlan_tpid = 0;
+> >@@ -2428,6 +2489,10 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+> > 			h.h2->tp_vlan_tci = skb_vlan_tag_get(skb);
+> > 			h.h2->tp_vlan_tpid = ntohs(skb->vlan_proto);
+> > 			status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+> >+		} else if (unlikely(sk->sk_type == SOCK_DGRAM && eth_type_vlan(skb->protocol))) {
+> >+			h.h2->tp_vlan_tci = vlan_get_tci(skb, skb->dev);
+> >+			h.h2->tp_vlan_tpid = ntohs(skb->protocol);
+> >+			status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+> > 		} else {
+> > 			h.h2->tp_vlan_tci = 0;
+> > 			h.h2->tp_vlan_tpid = 0;
+> >@@ -2457,7 +2522,8 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+> > 	sll->sll_halen = dev_parse_header(skb, sll->sll_addr);
+> > 	sll->sll_family = AF_PACKET;
+> > 	sll->sll_hatype = dev->type;
+> >-	sll->sll_protocol = skb->protocol;
+> >+	sll->sll_protocol = (sk->sk_type == SOCK_DGRAM) ?
+> >+		vlan_get_protocol_dgram(skb) : skb->protocol;
+> > 	sll->sll_pkttype = skb->pkt_type;
+> > 	if (unlikely(packet_sock_flag(po, PACKET_SOCK_ORIGDEV)))
+> > 		sll->sll_ifindex = orig_dev->ifindex;
+> >@@ -3482,7 +3548,8 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+> > 		/* Original length was stored in sockaddr_ll fields */
+> > 		origlen = PACKET_SKB_CB(skb)->sa.origlen;
+> > 		sll->sll_family = AF_PACKET;
+> >-		sll->sll_protocol = skb->protocol;
+> >+		sll->sll_protocol = (sock->type == SOCK_DGRAM) ?
+> >+			vlan_get_protocol_dgram(skb) : skb->protocol;
+> > 	}
 > > 
-> > I afraid that you misinterpreted the "Co-developed-by" tag. All these
-> > people are probably touch the code and not actually sit together at
-> > the same room and write the code together. So, please remove the
-> > extensive "Co-developed-by" tags.
-> > 
-> > It is not full review yet, but simple pass-by-comments.
-> > 
+> > 	sock_recv_cmsgs(msg, sk, skb);
+> >@@ -3539,6 +3606,21 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+> > 			aux.tp_vlan_tci = skb_vlan_tag_get(skb);
+> > 			aux.tp_vlan_tpid = ntohs(skb->vlan_proto);
+> > 			aux.tp_status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+> >+		} else if (unlikely(sock->type == SOCK_DGRAM && eth_type_vlan(skb->protocol))) {
 > 
-> Actually except of two, all of the mentioned persons sat in the same room
-> and developed the code together.
-> The remaining two are located on a different site (but also together).
-> Isn't that what "Co-developed-by" tag for?
-> I wanted to give them credit for writing the code but I can remove if it's
-> not common.
+> I don't understand why this would be needed here. We spent quite a bit
+> of efford in the past to make sure vlan header is always stripped.
+> Could you fix that in tx path to fulfill the expectation?
 
-Signed-off-by will be enough to give them credit. 
+Doesn't that require NETIF_F_HW_VLAN_CTAG_TX?
 
-> 
-> >> ---
-> >>  MAINTAINERS                              |   10 +
-> >>  drivers/infiniband/Kconfig               |    1 +
-> >>  drivers/infiniband/hw/Makefile           |    1 +
-> >>  drivers/infiniband/hw/hbl/Kconfig        |   17 +
-> >>  drivers/infiniband/hw/hbl/Makefile       |    8 +
-> >>  drivers/infiniband/hw/hbl/hbl.h          |  326 +++
-> >>  drivers/infiniband/hw/hbl/hbl_main.c     |  478 ++++
-> >>  drivers/infiniband/hw/hbl/hbl_verbs.c    | 2686 ++++++++++++++++++++++
-> >>  include/uapi/rdma/hbl-abi.h              |  204 ++
-> >>  include/uapi/rdma/hbl_user_ioctl_cmds.h  |   66 +
-> >>  include/uapi/rdma/hbl_user_ioctl_verbs.h |  106 +
-> >>  include/uapi/rdma/ib_user_ioctl_verbs.h  |    1 +
-> >>  12 files changed, 3904 insertions(+)
-> >>  create mode 100644 drivers/infiniband/hw/hbl/Kconfig
-> >>  create mode 100644 drivers/infiniband/hw/hbl/Makefile
-> >>  create mode 100644 drivers/infiniband/hw/hbl/hbl.h
-> >>  create mode 100644 drivers/infiniband/hw/hbl/hbl_main.c
-> >>  create mode 100644 drivers/infiniband/hw/hbl/hbl_verbs.c
-> >>  create mode 100644 include/uapi/rdma/hbl-abi.h
-> >>  create mode 100644 include/uapi/rdma/hbl_user_ioctl_cmds.h
-> >>  create mode 100644 include/uapi/rdma/hbl_user_ioctl_verbs.h
-> > 
-> > <...>
-> > 
-> >> +#define hbl_ibdev_emerg(ibdev, format, ...)  ibdev_emerg(ibdev, format, ##__VA_ARGS__)
-> >> +#define hbl_ibdev_alert(ibdev, format, ...)  ibdev_alert(ibdev, format, ##__VA_ARGS__)
-> >> +#define hbl_ibdev_crit(ibdev, format, ...)   ibdev_crit(ibdev, format, ##__VA_ARGS__)
-> >> +#define hbl_ibdev_err(ibdev, format, ...)    ibdev_err(ibdev, format, ##__VA_ARGS__)
-> >> +#define hbl_ibdev_warn(ibdev, format, ...)   ibdev_warn(ibdev, format, ##__VA_ARGS__)
-> >> +#define hbl_ibdev_notice(ibdev, format, ...) ibdev_notice(ibdev, format, ##__VA_ARGS__)
-> >> +#define hbl_ibdev_info(ibdev, format, ...)   ibdev_info(ibdev, format, ##__VA_ARGS__)
-> >> +#define hbl_ibdev_dbg(ibdev, format, ...)    ibdev_dbg(ibdev, format, ##__VA_ARGS__)
-> >> +
-> >> +#define hbl_ibdev_emerg_ratelimited(ibdev, fmt, ...)         \
-> >> +     ibdev_emerg_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >> +#define hbl_ibdev_alert_ratelimited(ibdev, fmt, ...)         \
-> >> +     ibdev_alert_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >> +#define hbl_ibdev_crit_ratelimited(ibdev, fmt, ...)          \
-> >> +     ibdev_crit_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >> +#define hbl_ibdev_err_ratelimited(ibdev, fmt, ...)           \
-> >> +     ibdev_err_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >> +#define hbl_ibdev_warn_ratelimited(ibdev, fmt, ...)          \
-> >> +     ibdev_warn_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >> +#define hbl_ibdev_notice_ratelimited(ibdev, fmt, ...)                \
-> >> +     ibdev_notice_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >> +#define hbl_ibdev_info_ratelimited(ibdev, fmt, ...)          \
-> >> +     ibdev_info_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >> +#define hbl_ibdev_dbg_ratelimited(ibdev, fmt, ...)           \
-> >> +     ibdev_dbg_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >> +
-> > 
-> > Please don't redefine the existing macros. Just use the existing ones.
-> > 
-> > 
-> > <...>
-> > 
-> 
-> That's a leftover from some debug code. I'll remove.
-> 
-> >> +     if (hbl_ib_match_netdev(ibdev, netdev))
-> >> +             ib_port = hbl_to_ib_port_num(hdev, netdev->dev_port);
-> >> +     else
-> >> +             return NOTIFY_DONE;
-> > 
-> > It is not kernel coding style. Please write:
-> > if (!hbl_ib_match_netdev(ibdev, netdev))
-> >     return NOTIFY_DONE;
-> > 
-> > ib_port = hbl_to_ib_port_num(hdev, netdev->dev_port);
-> > 
-> 
-> I'll fix the code, thanks.
-> 
-> >> +
-> > 
-> > <...>
-> > 
-> >> +static int hbl_ib_probe(struct auxiliary_device *adev, const struct auxiliary_device_id *id)
-> >> +{
-> >> +     struct hbl_aux_dev *aux_dev = container_of(adev, struct hbl_aux_dev, adev);
-> >> +     struct hbl_ib_aux_ops *aux_ops = aux_dev->aux_ops;
-> >> +     struct hbl_ib_device *hdev;
-> >> +     ktime_t timeout;
-> >> +     int rc;
-> >> +
-> >> +     rc = hdev_init(aux_dev);
-> >> +     if (rc) {
-> >> +             dev_err(&aux_dev->adev.dev, "Failed to init hdev\n");
-> >> +             return -EIO;
-> >> +     }
-> >> +
-> >> +     hdev = aux_dev->priv;
-> >> +
-> >> +     /* don't allow module unloading while it is attached */
-> >> +     if (!try_module_get(THIS_MODULE)) {
-> > 
-> > This part makes wonder, what are you trying to do here? What doesn't work for you
-> > in standard driver core and module load mechanism?
-> > 
-> 
-> Before auxiliary bus was introduced, we used EXPORT_SYMBOLs for inter
-> driver communication. That incremented the refcount of the used module so
-> it couldn't be removed while it is in use.
-> Auxiliary bus usage doesn't increment the used module refcount and hence
-> the used module can be removed while it is in use and that's something
-> we don't want to allow.
-> We could solve it by some global locking or in_use atomic but the most
-> simple and clean way is just to increment the used module refcount on
-> auxiliary device probe and decrement it on auxiliary device removal.
+I also wondered whether we should just convert the skb for this case
+with skb_vlan_untag, to avoid needing new PF_PACKET logic to handle
+unstripped tags in the packet socket code. But it seems equally
+complex.
 
-No, you was supposed to continue to use EXPORT_SYMBOLs and don't
-invent auxiliary ops structure (this is why you lost module
-reference counting).
-
-> 
-> >> +             dev_err(hdev->dev, "Failed to increment %s module refcount\n",
-> >> +                     module_name(THIS_MODULE));
-> >> +             rc = -EIO;
-> >> +             goto module_get_err;
-> >> +     }
-> >> +
-> >> +     timeout = ktime_add_ms(ktime_get(), hdev->pending_reset_long_timeout * MSEC_PER_SEC);
-> >> +     while (1) {
-> >> +             aux_ops->hw_access_lock(aux_dev);
-> >> +
-> >> +             /* if the device is operational, proceed to actual init while holding the lock in
-> >> +              * order to prevent concurrent hard reset
-> >> +              */
-> >> +             if (aux_ops->device_operational(aux_dev))
-> >> +                     break;
-> >> +
-> >> +             aux_ops->hw_access_unlock(aux_dev);
-> >> +
-> >> +             if (ktime_compare(ktime_get(), timeout) > 0) {
-> >> +                     dev_err(hdev->dev, "Timeout while waiting for hard reset to finish\n");
-> >> +                     rc = -EBUSY;
-> >> +                     goto timeout_err;
-> >> +             }
-> >> +
-> >> +             dev_notice_once(hdev->dev, "Waiting for hard reset to finish before probing IB\n");
-> >> +
-> >> +             msleep_interruptible(MSEC_PER_SEC);
-> >> +     }
-> > 
-> > The code above is unexpected.
-> > 
-> 
-> We have no control on when the user insmod the IB driver. 
-
-It is not true, this is controlled through module dependencies
-mechanism.
-
-> As a result it is possible that the IB auxiliary device will be probed
-> while the compute device is under reset (due to some HW error).
-
-No, it is not possible. If you structure your driver right.
-
-Thanks
+Aside from this conversation whether we need to support this
+unstripped case at all, code LGTM.
 
