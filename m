@@ -1,159 +1,196 @@
-Return-Path: <netdev+bounces-104273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE41290BCB4
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 23:15:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D5AFD90BCC4
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 23:18:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 989A628559D
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 21:15:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 581EF284143
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 21:18:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39CD91991BD;
-	Mon, 17 Jun 2024 21:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A900219924A;
+	Mon, 17 Jun 2024 21:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Q2BHM1va"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="pa0lswvz";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="uDHwF1Or";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="FF0jdC88";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="TuCB6fhw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728191991DD;
-	Mon, 17 Jun 2024 21:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8431991DD;
+	Mon, 17 Jun 2024 21:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718658931; cv=none; b=iToLhQIrAAhwA6iq3L4U1I5tbEdlS0sAS8SmAeXrkl227IHvdtDqqZm3sGRxa6ObrwUHcOJ+D6cIFa+J/iYfScWPyR+tQRYbF8VM6Trl4t6G7mOSHtQoHl1DLmpkAdtOYJOMKsjfnRZJ1gvAsS8xh3hEayJF/g8sEl7Nf2nhVPY=
+	t=1718659081; cv=none; b=B94QUgZNn185sqfpDSmqz1kUhvocr6u7hNg4C8Z1kdh9p7m5pr+ffgI4jdcXQClQc8wvFWADpx3/T+349tJcNVU/lN3oZ/A+zgM5KZxq7oHYZeuVdqOQdWlHJInvUbeRHBbshlaXjVwBRynFGTKEgNYrh/SrZZ4kERn12ePy87I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718658931; c=relaxed/simple;
-	bh=TPgwPxxcuXihDS6Fd5kqNYs3tbUpZkERktoUP7ijzLk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lm1p17j8LRta3ve6D/2XEyRlcEGaFTukg55AqVHGxdzY21Fqut0R+1g4bmlTW0z7mQkkxk1eXVK0g6rJA+D7DjiyugZfA9n5IzKSGZtSsz4DiQnogMXSTM47dU7UGY9azwnrriDHFOe0T1XMjG3NGlMpiF895yFklGPeOwTJA/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Q2BHM1va; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1718658930; x=1750194930;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ywO+hwyTv+j8f6emuBiZ+9A/DunuRT51chwUSajyKgU=;
-  b=Q2BHM1vaDcksDdv0+OrF7KggixW+J/nlpqsoRcgz8HIKqzpdF/2EMHcS
-   oSadV20fwlr1VOwlK769uD9mwBLa/wmqYG/sZo7KdNXuysv8uxEIcW0/D
-   n64j8q3wcCq6lxSzi1gh5ediQdARc1br7pGuk6Jawo7EgsSIAIkg8sF0l
-   M=;
-X-IronPort-AV: E=Sophos;i="6.08,245,1712620800"; 
-   d="scan'208";a="426890372"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2024 21:15:24 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:33573]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.97:2525] with esmtp (Farcaster)
- id 4bb6c7f5-0243-4830-be5b-a3a2332fbbc5; Mon, 17 Jun 2024 21:15:23 +0000 (UTC)
-X-Farcaster-Flow-ID: 4bb6c7f5-0243-4830-be5b-a3a2332fbbc5
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Mon, 17 Jun 2024 21:15:23 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.38) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Mon, 17 Jun 2024 21:15:20 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <ignat@cloudflare.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kernel-team@cloudflare.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <revest@chromium.org>, <stable@vger.kernel.org>
-Subject: Re: [PATCH net v3] net: do not leave a dangling sk pointer, when socket creation fails
-Date: Mon, 17 Jun 2024 14:15:04 -0700
-Message-ID: <20240617211504.91973-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240617210205.67311-1-ignat@cloudflare.com>
-References: <20240617210205.67311-1-ignat@cloudflare.com>
+	s=arc-20240116; t=1718659081; c=relaxed/simple;
+	bh=CycXSzWtI++XwaIZ8T4bfyISqqnnJafiRd07i759+wo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oqYLcBvdxj+NfRaVusIg0avOVeksAJeNonPRJGyqVVKvyLMeILaRB1vfNob96KCQm4KZt50piv1gWs8Bjomt4s2l+Qyt5qrtC/oSPBZ/UAVXCeRQYX/3y7St/IuvC2+/EmejrI/L4u4cM000KJCSUlGjkr+22Zw/Y55DfdlE8jM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=pa0lswvz; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=uDHwF1Or; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=FF0jdC88; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=TuCB6fhw; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id ABA921F395;
+	Mon, 17 Jun 2024 21:17:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1718659077; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IUds48oScu4/C+pkGPV1ry62ZJoePkIvLYk2jW3f754=;
+	b=pa0lswvzDFMjD8H7K4gdtAUq5symiJaQRcEJTjFu4e/Aw/UniD4OjZndbSp/Uu7qVqV4Jw
+	Bld+pO5JBLkMwO+x3Fnd3CwF1tfQHPHFMzn7r1uQKnyFMhAHHepmbXEps5ckzykTKieaoV
+	xFhUH1/ZZfxtme24TLVbED3e7a+sZho=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1718659077;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IUds48oScu4/C+pkGPV1ry62ZJoePkIvLYk2jW3f754=;
+	b=uDHwF1Oro49W1/+Lg8Aumr/UbHq+X8871hqwesFOgR4apjhiRGrItN7gCEjvBAs6D+uTQz
+	j8aLNJ49YSO7p9BQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1718659076; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IUds48oScu4/C+pkGPV1ry62ZJoePkIvLYk2jW3f754=;
+	b=FF0jdC88vsv3Mazo5aoTk/icaEwSKhBU9g/15c7soDFDi/7D3b7GT4wE3fOvSSfJt3Uzn/
+	maZOpELYGdji/vMja5AQs5K8FcMvbesycLyixY4dCanyjRNBR1LO+QH8plF1WWPo2+BK87
+	XYTYr6ulYEryja/CJGfoAl+B5INpgbY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1718659076;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IUds48oScu4/C+pkGPV1ry62ZJoePkIvLYk2jW3f754=;
+	b=TuCB6fhwOvdyoJ1YLynNsz7cy1vl4m/OgMpfHRHpVjrdJr4EDStSvK76MnPDBmm3uL3boo
+	KLBlQyL45iZAzlAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5A0BD13AAA;
+	Mon, 17 Jun 2024 21:17:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id SlZzFQSocGYMTgAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 17 Jun 2024 21:17:56 +0000
+Message-ID: <bbc96338-825d-434e-80e8-6407c947780b@suse.cz>
+Date: Mon, 17 Jun 2024 23:19:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Uladzislau Rezki <urezki@gmail.com>, "Paul E. McKenney"
+ <paulmck@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+ linux-trace-kernel@vger.kernel.org,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, kvm@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+ wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+ ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+ Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+ Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+ linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+References: <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
+ <ZmszOd5idhf2Cb-v@pc636>
+ <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
+ <Zmw5FTX752g0vtlD@pc638.lan> <ZmybGZDbXkw7JTjc@zx2c4.com>
+ <ZnA_QFvuyABnD3ZA@pc636> <ZnBOkZClsvAUa_5X@zx2c4.com>
+ <ZnBkvYdbAWILs7qx@pc636>
+ <CAHmME9r4q8erE3E-Xn61ZkSOdDDrgx6jhTAywx3ca4=G0z=wAA@mail.gmail.com>
+ <b415b8e3-24cc-4747-a30d-706e1dcfdff7@suse.cz> <ZnBsomxy_cCnnIBy@zx2c4.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Content-Language: en-US
+In-Reply-To: <ZnBsomxy_cCnnIBy@zx2c4.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Score: -8.29
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-8.29 / 50.00];
+	REPLY(-4.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,inria.fr,vger.kernel.org,lists.linux.dev,efficios.com,lists.ozlabs.org,linux.ibm.com,csgroup.eu,lists.zx2c4.com,suse.de,netapp.com,oracle.com,talpey.com,netfilter.org];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
 
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Mon, 17 Jun 2024 22:02:05 +0100
-> It is possible to trigger a use-after-free by:
->   * attaching an fentry probe to __sock_release() and the probe calling the
->     bpf_get_socket_cookie() helper
->   * running traceroute -I 1.1.1.1 on a freshly booted VM
+On 6/17/24 7:04 PM, Jason A. Donenfeld wrote:
+>>> Vlastimil, this is just checking a boolean (which could be
+>>> unlikely()'d), which should have pretty minimal overhead. Is that
+>>> alright with you?
+>>
+>> Well I doubt we can just set and check it without any barriers? The
+>> completion of the last pending kfree_rcu() might race with
+>> kmem_cache_destroy() in a way that will leave the cache there forever, no?
+>> And once we add barriers it becomes a perf issue?
 > 
-> A KASAN enabled kernel will log something like below (decoded and stripped):
-> ==================================================================
-> BUG: KASAN: slab-use-after-free in __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
-> Read of size 8 at addr ffff888007110dd8 by task traceroute/299
+> Hm, yea you might be right about barriers being required. But actually,
+> might this point toward a larger problem with no matter what approach,
+> polling or event, is chosen? If the current rule is that
+> kmem_cache_free() must never race with kmem_cache_destroy(), because
+
+Yes calling alloc/free operations that race with destroy is a bug and we
+can't prevent that.
+
+> users have always made diligent use of call_rcu()/rcu_barrier() and
+
+But the issue we are solving here is a bit different - the users are not
+buggy, they do kfree_rcu() and then kmem_cache_destroy() and no more
+operations on the cache afterwards. We need to ensure that the handling
+of kfree_rcu() (which ultimately is basically kmem_cache_free() but
+internally to rcu/slub) doesn't race with kmem_cache_destroy().
+
+> such, but now we're going to let those race with each other - either by
+> my thing above or by polling - so we're potentially going to get in trouble
+> and need some barriers anyway. 
+
+The barrier in the async part of kmem_cache_destroy() should be enough
+to make sure all kfree_rcu() have finished before we proceed with the
+potentially racy parts of destroying, and we should be able to avoid
+changes in kmem_cache_free().
+
+> I think?
 > 
-> CPU: 2 PID: 299 Comm: traceroute Tainted: G            E      6.10.0-rc2+ #2
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-> Call Trace:
->  <TASK>
-> dump_stack_lvl (lib/dump_stack.c:117 (discriminator 1))
-> print_report (mm/kasan/report.c:378 mm/kasan/report.c:488)
-> ? __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
-> kasan_report (mm/kasan/report.c:603)
-> ? __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
-> kasan_check_range (mm/kasan/generic.c:183 mm/kasan/generic.c:189)
-> __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
-> bpf_get_socket_ptr_cookie (./arch/x86/include/asm/preempt.h:94 ./include/linux/sock_diag.h:42 net/core/filter.c:5094 net/core/filter.c:5092)
-> bpf_prog_875642cf11f1d139___sock_release+0x6e/0x8e
-> bpf_trampoline_6442506592+0x47/0xaf
-> __sock_release (net/socket.c:652)
-> __sock_create (net/socket.c:1601)
-> ...
-> Allocated by task 299 on cpu 2 at 78.328492s:
-> kasan_save_stack (mm/kasan/common.c:48)
-> kasan_save_track (mm/kasan/common.c:68)
-> __kasan_slab_alloc (mm/kasan/common.c:312 mm/kasan/common.c:338)
-> kmem_cache_alloc_noprof (mm/slub.c:3941 mm/slub.c:4000 mm/slub.c:4007)
-> sk_prot_alloc (net/core/sock.c:2075)
-> sk_alloc (net/core/sock.c:2134)
-> inet_create (net/ipv4/af_inet.c:327 net/ipv4/af_inet.c:252)
-> __sock_create (net/socket.c:1572)
-> __sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
-> __x64_sys_socket (net/socket.c:1718)
-> do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
-> entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-> 
-> Freed by task 299 on cpu 2 at 78.328502s:
-> kasan_save_stack (mm/kasan/common.c:48)
-> kasan_save_track (mm/kasan/common.c:68)
-> kasan_save_free_info (mm/kasan/generic.c:582)
-> poison_slab_object (mm/kasan/common.c:242)
-> __kasan_slab_free (mm/kasan/common.c:256)
-> kmem_cache_free (mm/slub.c:4437 mm/slub.c:4511)
-> __sk_destruct (net/core/sock.c:2117 net/core/sock.c:2208)
-> inet_create (net/ipv4/af_inet.c:397 net/ipv4/af_inet.c:252)
-> __sock_create (net/socket.c:1572)
-> __sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
-> __x64_sys_socket (net/socket.c:1718)
-> do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
-> entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-> 
-> Fix this by clearing the struct socket reference in sk_common_release() to cover
-> all protocol families create functions, which may already attached the
-> reference to the sk object with sock_init_data().
-> 
-> Fixes: c5dbb89fc2ac ("bpf: Expose bpf_get_socket_cookie to tracing programs")
-> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
-> Cc: stable@vger.kernel.org
-> Link: https://lore.kernel.org/netdev/20240613194047.36478-1-kuniyu@amazon.com/T/
-
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-Thanks!
-
-
-P.S. next time, please make sure 24h pass before reposting for netdev.
-
-  See: Documentation/process/maintainer-netdev.rst
+> Jason
 
