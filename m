@@ -1,126 +1,99 @@
-Return-Path: <netdev+bounces-104082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB80E90B190
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:21:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFF3A90B19E
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:22:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C29D283E27
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 14:21:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 760D11F2878C
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 14:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 341E21C0060;
-	Mon, 17 Jun 2024 13:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iXGdA9La"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D0F199E99;
+	Mon, 17 Jun 2024 13:29:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9D11C0059;
-	Mon, 17 Jun 2024 13:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376C8198A34;
+	Mon, 17 Jun 2024 13:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718630890; cv=none; b=sfvAa6I2WyJTLlQ97m86pRio2/xB2DFtBBwBxJUzUb68G9xFK0iYwJVY8h9rAJdM+59jbAjQUlouYh5fh37qpfswLsAT2Rc2w6jIe02D1rjm+7Qi7yNJGWKS5QWabLTUOsXZBlQj4W7RnsYzhB2ptljtccRJuPzn7VsgebwpduY=
+	t=1718630973; cv=none; b=fMgoGJ+q3HuZDEEvJ9cC30UPaLInueC/xydJ7+FX7ceUEareSb8yvyiNhYCebtlmJ7frHtdmAUtbfOgFLdSUQobKDBpRVx7iOWppcMFD+NFewNOd3d1COggirOR9XBwpws0yHVWeqTzlOHaoH/fkc8RwRPR0v+SgGwIxqdDr9zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718630890; c=relaxed/simple;
-	bh=5omyRClCkTdS8MIQwGuerjGj7Gg1hN8AhaFWJi9Oszg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pW1wB6LDwQrfsSAau4BxuFFQoqT8m6ATIRx8R7A8GTlWFFNsTd4VI2ZAODl0NznnaFZ4kMEK/Ek11fImrxFKqIv+9K3DaI/OQI+aPYOU5pGsNAzV31e+nnEA+ILnYd5QzL6AfoRID4dcb6bTtGzqr6SsaTEVsme87OCM7+bFLnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iXGdA9La; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E644FC2BD10;
-	Mon, 17 Jun 2024 13:28:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718630889;
-	bh=5omyRClCkTdS8MIQwGuerjGj7Gg1hN8AhaFWJi9Oszg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iXGdA9LaZxb6BMFPqOTInU11EUqjx7WgeCb5L14Z0i2clpA0ZzqGYXuD8o5YIc+KF
-	 bO3XKIfCtp0RKMbP7n/YwdgNhwlWT3ouUZ36Pa9oOOKsUxXzZFCdmZhN7Gi7fm1iDu
-	 /+qqvDfk4siKvc5qC1SiBUxpQ6dzfanuSZZhZHwieNcsIlNZxnYa3ZU5xF4iQoGtKa
-	 s1O1zRF2BP9EPiRTlX1iq+EfinGHhTCVskNJrhe0Rp60yJAAnMOw1RuKPIywIEnkIR
-	 FSksaiURnow7L+nif+Utv1tmgNSlpUd04jVhe7rn8aQs2b3BQ8IxbcNVGhah9iXS1k
-	 pl8ft77BaVOOg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 7/9] ila: block BH in ila_output()
-Date: Mon, 17 Jun 2024 09:27:52 -0400
-Message-ID: <20240617132757.2590643-7-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240617132757.2590643-1-sashal@kernel.org>
-References: <20240617132757.2590643-1-sashal@kernel.org>
+	s=arc-20240116; t=1718630973; c=relaxed/simple;
+	bh=dmN1xl9dYL2wT6I3eezHhEJnFRaCUhhBxyyStgpeFyU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=DMru3wVf7HBKfdSMEqDhJrBgrBgUTc8EqU75vL4zD5kzezeN2Zw4NwxlHqZ8vpFRkDMcSDnpL+et+981QEnJAG/LZ9AJ8L0jJzZsPafbOuQpPw1MQUhr0tAgsFLad1Pa/RtorI4nGVEtccKMZG5KO7vDDSuAtx8jAFz+ExXSf/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 45HDSp4kA3235470, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 45HDSp4kA3235470
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 17 Jun 2024 21:28:51 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 17 Jun 2024 21:28:52 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 17 Jun 2024 21:28:51 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Mon, 17 Jun 2024 21:28:51 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Markus Elfring <Markus.Elfring@web.de>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Simon Horman <horms@kernel.org>
+CC: LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Hariprasad Kelam <hkelam@marvell.com>, Jiri Pirko <jiri@resnulli.us>,
+        "Larry
+ Chiu" <larry.chiu@realtek.com>,
+        Ping-Ke Shih <pkshih@realtek.com>,
+        "Ratheesh
+ Kannoth" <rkannoth@marvell.com>
+Subject: RE: [v20 02/13] rtase: Implement the .ndo_open function
+Thread-Topic: [v20 02/13] rtase: Implement the .ndo_open function
+Thread-Index: AQHawJ5eL1A+vv787Ey/gTxPzZ037bHL8dBA
+Date: Mon, 17 Jun 2024 13:28:51 +0000
+Message-ID: <0c57021d0bfc444ebe640aa4c5845496@realtek.com>
+References: <20240607084321.7254-3-justinlai0215@realtek.com>
+ <1d01ece4-bf4e-4266-942c-289c032bf44d@web.de>
+ <ef7c83dea1d849ad94acef81819f9430@realtek.com>
+ <6b284a02-15e2-4eba-9d5f-870a8baa08e8@web.de>
+In-Reply-To: <6b284a02-15e2-4eba-9d5f-870a8baa08e8@web.de>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.19.316
-Content-Transfer-Encoding: 8bit
 
-From: Eric Dumazet <edumazet@google.com>
-
-[ Upstream commit cf28ff8e4c02e1ffa850755288ac954b6ff0db8c ]
-
-As explained in commit 1378817486d6 ("tipc: block BH
-before using dst_cache"), net/core/dst_cache.c
-helpers need to be called with BH disabled.
-
-ila_output() is called from lwtunnel_output()
-possibly from process context, and under rcu_read_lock().
-
-We might be interrupted by a softirq, re-enter ila_output()
-and corrupt dst_cache data structures.
-
-Fix the race by using local_bh_disable().
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Acked-by: Paolo Abeni <pabeni@redhat.com>
-Link: https://lore.kernel.org/r/20240531132636.2637995-5-edumazet@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/ipv6/ila/ila_lwt.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv6/ila/ila_lwt.c b/net/ipv6/ila/ila_lwt.c
-index 3d56a2fb6f86f..c7630776bd8e8 100644
---- a/net/ipv6/ila/ila_lwt.c
-+++ b/net/ipv6/ila/ila_lwt.c
-@@ -58,7 +58,9 @@ static int ila_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 		return orig_dst->lwtstate->orig_output(net, sk, skb);
- 	}
- 
-+	local_bh_disable();
- 	dst = dst_cache_get(&ilwt->dst_cache);
-+	local_bh_enable();
- 	if (unlikely(!dst)) {
- 		struct ipv6hdr *ip6h = ipv6_hdr(skb);
- 		struct flowi6 fl6;
-@@ -86,8 +88,11 @@ static int ila_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 			goto drop;
- 		}
- 
--		if (ilwt->connected)
-+		if (ilwt->connected) {
-+			local_bh_disable();
- 			dst_cache_set_ip6(&ilwt->dst_cache, dst, &fl6.saddr);
-+			local_bh_enable();
-+		}
- 	}
- 
- 	skb_dst_set(skb, dst);
--- 
-2.43.0
-
+DQo+ID4+IEhvdyBkbyB5b3UgdGhpbmsgYWJvdXQgdG8gaW5jcmVhc2UgdGhlIGFwcGxpY2F0aW9u
+IG9mIHNjb3BlLWJhc2VkIHJlc291cmNlDQo+IG1hbmFnZW1lbnQ/DQo+ID4+IGh0dHBzOi8vZWxp
+eGlyLmJvb3RsaW4uY29tL2xpbnV4L3Y2LjEwLXJjMy9zb3VyY2UvaW5jbHVkZS9saW51eC9jbGVh
+bg0KPiA+PiB1cC5oI0w4DQo+ID4NCj4gPiBEdWUgdG8gb3VyIHR4IGFuZCByeCBlYWNoIGhhdmlu
+ZyBtdWx0aXBsZSBxdWV1ZXMgdGhhdCBuZWVkIHRvIGFsbG9jYXRlDQo+ID4gZGVzY3JpcHRvcnMs
+IGlmIGFueSBvbmUgb2YgdGhlIHF1ZXVlcyBmYWlscyB0byBhbGxvY2F0ZSwNCj4gPiBydGFzZV9h
+bGxvY19kZXNjKCkgd2lsbCByZXR1cm4gYW4gZXJyb3IuIFRoZXJlZm9yZSwgdXNpbmcgJ2dvdG8n
+DQo+ID4gaGVyZSByYXRoZXIgdGhhbiBkaXJlY3RseSByZXR1cm5pbmcgc2VlbXMgdG8gYmUgcmVh
+c29uYWJsZS4NCj4gDQo+IFNvbWUgZ290byBjaGFpbnMgY2FuIGJlIHJlcGxhY2VkIGJ5IGZ1cnRo
+ZXIgdXNhZ2Ugb2YgYWR2YW5jZWQgY2xlYW51cA0KPiB0ZWNobmlxdWVzLCBjYW4ndCB0aGV5Pw0K
+PiANCj4gUmVnYXJkcywNCj4gTWFya3VzDQoNCnJ0YXNlX2FsbG9jX2Rlc2MoKSBpcyB1c2VkIHRv
+IGFsbG9jYXRlIERNQSBtZW1vcnkuIA0KSSdkIGxpa2UgdG8gYXNrIGlmIGl0J3MgYmV0dGVyIHRv
+IGtlZXAgb3VyIGN1cnJlbnQgbWV0aG9kPw0KDQo=
 
