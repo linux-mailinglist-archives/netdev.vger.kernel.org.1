@@ -1,181 +1,95 @@
-Return-Path: <netdev+bounces-104194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02D6B90B7C6
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:21:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63CA890B7F2
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:24:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 822B11F24AF8
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:21:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E82E92833E2
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:24:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 668A816DC08;
-	Mon, 17 Jun 2024 17:20:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A44E16EB5E;
+	Mon, 17 Jun 2024 17:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="pF+dQpe4";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="bfvFXSsA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LXPvPn9u"
 X-Original-To: netdev@vger.kernel.org
-Received: from wfhigh3-smtp.messagingengine.com (wfhigh3-smtp.messagingengine.com [64.147.123.154])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFFB16D4E1;
-	Mon, 17 Jun 2024 17:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD4716DC2D
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 17:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718644851; cv=none; b=ACjY/lANhq5KR+Kyg6VfwquewTlp4LPcXh+jvh/EH3px0XjrZ8XBgyfoqzILMfV/umEfK6ezhPSAvE0VG3FIyvtMq2sP1ZsSxuCNkBxM+AXc7a/sVxbsqNRlGnOaWnHyDqBHjf7L+bG9Qe19Ub2jzXhDx7DFwpMXO077MYdPw8E=
+	t=1718645054; cv=none; b=IfrdBHBfLSyC8xJUjijKJpvMYCiECjoKyNptzMVVBtHqRG6nZAl98B5X+YC4KaxjVdOvAjj5BNrt++2LZnzwNkIdYujrmVFMLipsKcUTvrst+Q1QcS9/IYE4jPg1vIpRP+Nq7m+UpWLpxG6ILz5CnRpkFsXHyRTVmAT3fGFJMg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718644851; c=relaxed/simple;
-	bh=+5/FUHkbw3NH+kQzndB/Y0YlhYz2S/Z2mC1HKOOwKcg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UU0pPI+vvmj/ISaGyOaqdN4YmBRAUE7L5RVXueqAFW96VnkF2ztTn5gJ2GDmO3By9E7y3DWniwJ9P2xaD+tT1ffQzoku5rJ2Z0SdzB7obdvHIW+cB/gVfOCNWSgalNCe4sVzNvrgef2zo06Zy+Y5/wyPzNNU2H/LYKeN/RXNldY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=pF+dQpe4; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=bfvFXSsA; arc=none smtp.client-ip=64.147.123.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-	by mailfhigh.west.internal (Postfix) with ESMTP id CF5C6180012E;
-	Mon, 17 Jun 2024 13:20:45 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Mon, 17 Jun 2024 13:20:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1718644845;
-	 x=1718731245; bh=l1CctP9H/9iN5K+wiFA+tdgZqWgJKcdpigi7qJiuTpc=; b=
-	pF+dQpe42Wf2I7wDHVBhgINh8wdhQxniO7/8tKSgnxGP9Pt1dFzulbJGZw/6cTRN
-	KUc7w7QwaImnLqcTr4679Au9xKclnqaLfEvxl6MEw4mwMcUtk7YNG12y5c19jZUP
-	h1ndurrzSJsYQPQ0mb+HXMEQPjnmujPhP3eHPxSJ+38YzPqww9RKsWOgaQfbiGIo
-	FHYYDbEghxcxROAqLFVJigQl+N6dqpJ7vqt3Q94hB5IFJO/Hw+oXqG1+DehstkpA
-	GPWmVJD2fiXVv3VvQ9iNHs+ZnqUuc7BqkHQ9JONfrRd61USVczbkM1lq2ctF1QBy
-	1Lt+aHPtCrfpFffQG2vQZA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1718644845; x=
-	1718731245; bh=l1CctP9H/9iN5K+wiFA+tdgZqWgJKcdpigi7qJiuTpc=; b=b
-	fvFXSsA6UUcagW9hXCpFIUgDIjyj1vi1TBOJ09bLgVUtByCRX1oEiTAdgn4ay0km
-	TJNlbi+57T3oMOHV4KKdJImKDyNyLUll26Q4Y/T3odPOjQE3OeS2Ifj1pDpjx/8a
-	PMvTL0FZW9N+e78NXSG0308jrYcglC6DSMyhNVHzzHyd2FQlZ5w/hajpTInbJ7XH
-	XsgyR/aI98T9Ky2o+rGWdfsN2m4uDtbPz13BlhHys3PttTRWYMsQibGgC/gFBU3a
-	oHSKEwQVlt3rA8JXoLyhXN+LwX2QkJ7hKLRwEIge3wqueJo/b5qhSV3tXVehwX8G
-	AJ+9HhkHH6zBcjMWIEPUg==
-X-ME-Sender: <xms:bHBwZu3tS_rZi70gNbt8j5QIp4wTPmb2aqq1FbifbrJJ3zOnxgq5Mg>
-    <xme:bHBwZhFYie5L0P1YwyW2oavULVrtA0j3qJZxjwUPyi-VVJ6K11WSGD2trvz_JSuYs
-    nSQUiDNuvQWrDsEZOM>
-X-ME-Received: <xmr:bHBwZm4dptohXF7QMqETjGgY8LFV23YEEcV85kINhGeT2mMmWyC3FxqcehH1JZHT-qykuzJRbjBb3o7yFpVfTl1PzzRvadk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrfedvhedgudduudcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomheppfhi
-    khhlrghsucfunpguvghrlhhunhguuceonhhikhhlrghsrdhsohguvghrlhhunhguodhrvg
-    hnvghsrghssehrrghgnhgrthgvtghhrdhsvgeqnecuggftrfgrthhtvghrnhepfefhleel
-    hfffjefgfedugfegjeelhfevheeikefhueelgfdtfeeuhefftddvleeinecuvehluhhsth
-    gvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhikhhlrghsrdhsohgu
-    vghrlhhunhguodhrvghnvghsrghssehrrghgnhgrthgvtghhrdhsvg
-X-ME-Proxy: <xmx:bHBwZv3HdiGb3Eozz_uWQCPw7aU3itoXFq44Ji6mCj6mSyYBxGnb8Q>
-    <xmx:bHBwZhE5wPbdSM2QUwMZ1naFKUsOM4wWeGK94TrguAUpJS8plusfWQ>
-    <xmx:bHBwZo8usJ05qvs6wpZ1Gykbl16Y4vvVilQAmpPyXnjSZGqcz1JzIQ>
-    <xmx:bHBwZmneSc5VlDk3iRYnp2yDgu5fCjFrEBr_g4mW4_IVxLuCJHG0Rw>
-    <xmx:bXBwZgDicQgg1FDAm3iwcF9a5Eb0kqSDuJMXG9phLBim8lkMTTOVchbN>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 17 Jun 2024 13:20:44 -0400 (EDT)
-Date: Mon, 17 Jun 2024 19:20:41 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next,v8] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-Message-ID: <20240617172041.GN382677@ragnatech.se>
-References: <20240613104119.2820792-1-niklas.soderlund+renesas@ragnatech.se>
- <306484c7-4a8c-45ba-b0c6-74514a522f05@bp.renesas.com>
- <20240613124921.GG382677@ragnatech.se>
- <adbe998e-d410-4797-b8a7-24d45ca7a1bc@bp.renesas.com>
+	s=arc-20240116; t=1718645054; c=relaxed/simple;
+	bh=qapk+M0fAQpXalVcEmkEZe+nvZycMQQn2U0PZdsXwkA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lPSkovaw80K9heQUd2xd7vud90HcZ85XsP1yddABABo1UbyXx9+g0UtxxgFEZZaLxfXdYPMJkq0HPNxHxWDbJdSJQ2fmk3tCJEvMH00V5as0ae8mc2Icfwm74ETMprZvMVW8qzMn//odluU6dUJJtL3bLbFW20MaA6152uP0n0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LXPvPn9u; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718645052;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=PQG1dIYUC1pjJkVhXERij4oho4CExQtMEDV6mzee4QE=;
+	b=LXPvPn9up097S9mbARW+cgniSFPoE0VtktnZ02c/DeMyFuDdVnHJOcmKiMF6beGkphBV71
+	VR/MigvN024T36lALMy59PFbTr+9ACmJjS4y+82v47VkuSCqtAgkWNUX4MM4cwHrwqZu+G
+	l2WoD4/GDc8NJZJagdGeY4KJAAIGNDw=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-122-4EtdMWQQOma558wG2kSh7g-1; Mon,
+ 17 Jun 2024 13:24:09 -0400
+X-MC-Unique: 4EtdMWQQOma558wG2kSh7g-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BB00F1956089;
+	Mon, 17 Jun 2024 17:24:07 +0000 (UTC)
+Received: from fedora-x1.redhat.com (unknown [10.22.18.62])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 44FF11956087;
+	Mon, 17 Jun 2024 17:24:06 +0000 (UTC)
+From: Kamal Heib <kheib@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Tariq Toukan <tariqt@nvidia.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kamal Heib <kheib@redhat.com>
+Subject: [PATCH net-next v2 0/3] net/mlx4_en: Use ethtool_puts/sprintf
+Date: Mon, 17 Jun 2024 13:23:26 -0400
+Message-ID: <20240617172329.239819-1-kheib@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <adbe998e-d410-4797-b8a7-24d45ca7a1bc@bp.renesas.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Hi Paul,
+This patchset updates the mlx4_en driver to use the ethtool_puts and
+ethtool_sprintf helper functions.
 
-On 2024-06-17 14:41:52 +0100, Paul Barker wrote:
-<snip>
-> >>> +	entry = priv->cur_tx % priv->num_tx_ring;
-> >>> +	priv->tx_skb[entry] = skb;
-> >>> +	desc = &priv->tx_ring[entry];
-> >>> +	desc->dptr = cpu_to_le32(dma_addr);
-> >>> +	desc->info_ds = cpu_to_le16(skb->len);
-> >>
-> >> Should we check against the maximum TX frame size supported by the
-> >> hardware here?
-> >>
-> >> Whatever we do here, we should also do in the ravb driver as that makes
-> >> a similar cpu_to_le16() call to fill the DS field with no check that the
-> >> HW actually supports transmitting a frame of the given size.
-> > 
-> > Compared to RAVB the RTSN driver do not support splitting a packet over 
-> > multiple descriptors, so the max frame size adhering to the MTU will 
-> > always fit using a single descriptor.
-> > 
-> 
-> My concern here is with pathological or malicious packets.
+Changes from v1:
+- Remove unused variable.
 
-A malicious Tx packet due to local VLAN setup? There must be easier ways 
-to crash a machine if you got the permissions to configure interface 
-VLAN settings :-) But I agree the user shall be protected from
-misconfiguration.
+Signed-off-by: Kamal Heib <kheib@redhat.com>
 
-> For example,
-> you can use stacked VLANS (QinQ, QinQinQ, etc) to expand the size of the
-> TX frame for a given MTU since the bytes used by the extra VLAN tags are
-> not counted as payload bytes.
+Kamal Heib (3):
+  net/mlx4_en: Use ethtool_puts to fill priv flags strings
+  net/mlx4_en: Use ethtool_puts to fill selftest strings
+  net/mlx4_en: Use ethtool_puts/sprintf to fill stats strings
 
-This is interesting, I only played with single and double tagging never 
-QinQinQ.. . For some reason I assumed that after double tagging space 
-where going to be consumed from the payload. But indeed setting up 4 
-levels of VLAN tags shows the payload can be force to stay the same and 
-the skb->len do indeed grow.
-
-  $ ip link add link end0 name end0.2 type vlan id 2
-  $ ifconfig end0.2 10.0.2.10 netmask 255.255.255.0 up
-  $ ip link add link end0.2 name end0.3 type vlan id 3
-  $ ifconfig end0.3 10.0.3.10 netmask 255.255.255.0 up
-  $ ip link add link end0.3 name end0.4 type vlan id 4
-  $ ifconfig end0.4 10.0.4.10 netmask 255.255.255.0 up
-  $ ip link add link end0.4 name end0.5 type vlan id 5
-  $ ifconfig end0.5 10.0.5.10 netmask 255.255.255.0 up
-  $ ping -s 1500 10.0.5.1  # Give an skb->len of 1530
-  $ ping -s 1500 10.0.4.1  # Give an skb->len of 1526
-  $ ping -s 1500 10.0.3.1  # Give an skb->len of 1522
-  $ ping -s 1500 10.0.2.1  # Give an skb->len of 1518
-  $ ping -s 1500 10.0.1.1  # Give an skb->len of 1514 (no tags)
-
-The above was produced using RAVB and not RTSN and similar VLANS on a 
-2nd device was setup to allow for ICMP traffic and replies.
-
-> 
-> At least with the RZ/G2L family, no verification has been performed on
-> sending packets larger than 1526 bytes to my knowledge. Even using only
-> one TX descriptor, I was able to completely lock up the GbEth IP by
-> pushing a 2kB frame into the TX queue. So I do think it is worth adding
-> some checks here.
-
-I will add a check for this to RTSN.
+ .../net/ethernet/mellanox/mlx4/en_ethtool.c   | 59 +++++++------------
+ 1 file changed, 20 insertions(+), 39 deletions(-)
 
 -- 
-Kind Regards,
-Niklas Söderlund
+2.45.2
+
 
