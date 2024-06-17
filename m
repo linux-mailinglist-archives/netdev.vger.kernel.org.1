@@ -1,54 +1,64 @@
-Return-Path: <netdev+bounces-104038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52E6390AF0C
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:22:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7374B90AED7
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:15:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0F041F266B8
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:22:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 017422874E2
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD33D198A0C;
-	Mon, 17 Jun 2024 13:18:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3839C197A7F;
+	Mon, 17 Jun 2024 13:15:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="vKbkJ7Xx"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E457C19885F;
-	Mon, 17 Jun 2024 13:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8814A1E4B2
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 13:15:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718630281; cv=none; b=tVKv/NbKoOagHFRlPVdsCjnVh0Z3HfP3FegeDnm4/WVnZ8Za20Zg2VVkEX4f8tY0lJH3vg4N9SVuysEjkxC+nJptFEouHbzB01dXemLWZ789s5BSbWpKLhUWoIyYxwuryEPwMpQUu7tR/jS5eiNhqEdUDp4i9bOVAL0fZzPmuB0=
+	t=1718630131; cv=none; b=rCOAHv8l82td6nq0Ni20wPzbR+Viqx25Ga/hk9R9HJLs1ZmzDO4DiGrXRMUzJvubC3nKf1Aih9UmpmnsyTlsFZmA6qipH/yMYwB22FfygX4ogq0iziEiWsBc1k51UddqaydEnOIXldeqvMQXs/2INyGCtdaHeL90QPoeKz/yXhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718630281; c=relaxed/simple;
-	bh=DQpyE4LcoP5CQrtouqqIWkyt30utSJoMGx1TjK1UjWg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mCZNaU6t+yxtgUkAN+ATwMS6C5Q3W2EF4aF8mzhz9SEUwhyx3G07mi0BNur6D6kGP28723/+f0zZJG9OQDnC3XxMWzGl5mqDCjJfU3KN3ZXgTHGNmFZDWYy9eVji0VZUctgCknauBB2LolqF88N2IPLRwEO5OCNHTbrHz3fnn28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4W2r0f16sWznVxD;
-	Mon, 17 Jun 2024 21:13:06 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id BC16814011B;
-	Mon, 17 Jun 2024 21:17:57 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 17 Jun 2024 21:17:57 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>
-Subject: [PATCH net-next v8 13/13] mm: page_frag: add a entry in MAINTAINERS for page_frag
-Date: Mon, 17 Jun 2024 21:14:12 +0800
-Message-ID: <20240617131413.25189-14-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240617131413.25189-1-linyunsheng@huawei.com>
-References: <20240617131413.25189-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1718630131; c=relaxed/simple;
+	bh=qHRPw/KBBbsAFqNkLz4ziuTxm5Rn/bpfahLjLpZ2/fA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZLqPW61NACgQ2GJXW6KVMZtPuiT3aeilCg0WwQKlmKx4WnNfOYApsgJWW6o5lTJ5ACYSWz/i2k4EEcm30Htkfhx+S0j9/FUY+c4P4EiTaMMEB1WYjp6ou3yE09xHIuuW4Wyf6HA+uu2FkrEG7K2yaW6IVg1ONTlSvJWUQOdgQgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=vKbkJ7Xx; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1718630125; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=Ef4HQitn4WyyEIc0kKx7VbSRz//I5N1vzF0yMoWvwh8=;
+	b=vKbkJ7Xx3oHoS6qHcFdMJxMzn21YGtyteWxs2YwwCkhsMANb8c5RqdI5TAhEoLy4H4ZtShoVEMcJo3ItuQCN80PuHU+W9HkIMQo85DRSXWW0sD9Wd8okFzPbf1cKcVavW7mIf9PAVBYg9mL87sTgFJjuuR7A4IAjTQ9xjXF3lz0=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045075189;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0W8foG1G_1718630124;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W8foG1G_1718630124)
+          by smtp.aliyun-inc.com;
+          Mon, 17 Jun 2024 21:15:25 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: netdev@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: Thomas Huth <thuth@linux.vnet.ibm.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>
+Subject: [PATCH 0/2] virtio_net: fixes for checksum offloading and XDP handling
+Date: Mon, 17 Jun 2024 21:15:22 +0800
+Message-Id: <20240617131524.63662-1-hengqi@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,47 +66,23 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemf200006.china.huawei.com (7.185.36.61)
 
-After this patchset, page_frag is a small subsystem/library
-on its own, so add a entry in MAINTAINERS for to indicate
-the new subsystem/library's maintainer, maillist, status and
-file lists of page_frag.
+This series of patches aim to address two specific issues identified in
+the virtio_net driver related to checksum offloading and XDP processing of
+fully checksummed packets.
 
-Alexander is the orginal author of page_frag, add him in the
-MAINTAINERS too.
+The first patch corrects the handling of checksum offloading in the driver.
+The second patch addresses an issue where the XDP program had no trouble
+with fully checksummed packets.
 
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
----
- MAINTAINERS | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Heng Qi (2):
+  virtio_net: checksum offloading handling fix
+  virtio_net: fixing XDP for fully checksummed packets handling
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e66b7d4324ae..16ff7a33c199 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16951,6 +16951,17 @@ F:	mm/page-writeback.c
- F:	mm/readahead.c
- F:	mm/truncate.c
- 
-+PAGE FRAG
-+M:	Alexander Duyck <alexander.duyck@gmail.com>
-+M:	Yunsheng Lin <linyunsheng@huawei.com>
-+L:	linux-mm@kvack.org
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	Documentation/mm/page_frags.rst
-+F:	include/linux/page_frag_cache.h
-+F:	mm/page_frag_cache.c
-+F:	mm/page_frag_test.c
-+
- PAGE POOL
- M:	Jesper Dangaard Brouer <hawk@kernel.org>
- M:	Ilias Apalodimas <ilias.apalodimas@linaro.org>
+ drivers/net/virtio_net.c | 32 +++++++++++++++++++++++++++++---
+ 1 file changed, 29 insertions(+), 3 deletions(-)
+
 -- 
-2.33.0
+2.32.0.3.g01195cf9f
 
 
