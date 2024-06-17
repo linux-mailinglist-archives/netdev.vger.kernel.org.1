@@ -1,170 +1,118 @@
-Return-Path: <netdev+bounces-103899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1927E90A1E4
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 03:45:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B18E290A1FF
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 03:49:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77C8E28142D
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 01:45:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60D391F22623
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 01:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC6E512B144;
-	Mon, 17 Jun 2024 01:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D2117B433;
+	Mon, 17 Jun 2024 01:48:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GuX4yWAK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B9qj6foo"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C61D156652
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 01:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487DD17F4E7
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 01:48:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718588711; cv=none; b=qF/xwj/u2kVzT0Gge7nJVtk6Lbf83Pp96rbnw7USfZEJXyFPihCH98JAUv2HraIWNSdxsNrXDE1pcyLhfBhXWLXoTVBPFWJaQ4QXyqcdo5BhLD/pxzU4T03GJ7OhpNJwYPDRU390OUXxIBdzqUM8yRCWwHrkx7waMI2Dn6U2rWE=
+	t=1718588916; cv=none; b=Gyr+xFe4bjNvh0VylogR4ZxEHnQDUd6TDDC1Z3afny+I9p5HJ75XWWu5vBzRTvxt4rfo1tu8NeCjYuY8wgm+yMkFSNIN5WmuuepFml/0QGU0Q7W0/57AzgIJejNuB4r0Ppni5EsQSQxyJD8OwSY8d3zhJzrWFKEVbzpu+XusLqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718588711; c=relaxed/simple;
-	bh=t5MD1ex9VlAS8c468F/2oWD+5J03aRRoVhgBc7qIz0k=;
+	s=arc-20240116; t=1718588916; c=relaxed/simple;
+	bh=qwH5sb3vw4u2639u+bU4F9qqkIWaZ2UhByObXQ3U8j0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bQR9tEl2bvd5TAYSLgU8x7rfLHEVzO6VDNkoNZfGRTiCxUIqqP7nrf/yRjcsM7r3vqZ37U1vfljQrGJr1Z/1z8vC+G4B7ggcxmWAo5j+/N3gHL9CUxxOWkLCTqbHBOVu+DW1nI3OT+1xtKwNHXvpnX2VFs7lN2TJMPwxc88MdrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GuX4yWAK; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=azg+0Ib7Tode4GDD/74Io3xUDdLPimULvumZlBmMP5E46gUNb+iNZ/Hgpsw7Bh3U03ggRBybycXz4sKmp5w1nDiY8CQrOAAQRiNRzC8lwWEB5X04S5BtETE+n0romLz6dW3qLHa/iX0rzMvbc/Bj6bFKBEhLOsclT1gmKn7fg4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B9qj6foo; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718588709;
+	s=mimecast20190719; t=1718588914;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=varLkYvQXXiVYrsly37DyVexBnZsFAUL1jZV89pLMSc=;
-	b=GuX4yWAKQG6FCAFfZdQf8J8buiG4ob9K9fnaQmygUF+HMErud4FgBRrxZKabZJfDTRoMRL
-	ywDROFVrtqnml5mSaukyYP+DVOAxr+Ys2Jm1ZOU2NOfx5Cf2GMCNpAJRK5t8vR3diVJvAx
-	GJdTjYmHHmROg8NxIO3MLtoYhYxwFaI=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=qwH5sb3vw4u2639u+bU4F9qqkIWaZ2UhByObXQ3U8j0=;
+	b=B9qj6foott3WrrGsrXh3XsBfCQnr1QuN73X7FjVu1qqpqHgpiFNINgzrBOHnRn7tpaJIi2
+	kAS21pnDgqR3gcOqG8yA3zhaZJyZXUVL+e/z9BBggLukrEcGixpPaUdCyrzcFHbxrf8ODG
+	zymK6EbM7UCDlEBzic6c+iGcxchkQew=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-519-hMA29X0OPue4_BqMxvcuFA-1; Sun, 16 Jun 2024 21:45:07 -0400
-X-MC-Unique: hMA29X0OPue4_BqMxvcuFA-1
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2c51c2f1d78so890167a91.1
-        for <netdev@vger.kernel.org>; Sun, 16 Jun 2024 18:45:07 -0700 (PDT)
+ us-mta-389-Iz4vS3m6Pa-4ufDyx4e8jg-1; Sun, 16 Jun 2024 21:48:30 -0400
+X-MC-Unique: Iz4vS3m6Pa-4ufDyx4e8jg-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2c2dfbc48easo4185883a91.2
+        for <netdev@vger.kernel.org>; Sun, 16 Jun 2024 18:48:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718588707; x=1719193507;
+        d=1e100.net; s=20230601; t=1718588909; x=1719193709;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=varLkYvQXXiVYrsly37DyVexBnZsFAUL1jZV89pLMSc=;
-        b=AyB3x2jQ04lUZQ4C8z1f4UX/1TOKKA9ECwl/5JLn7DO8Q/7/lWWIwHqYlOg4eNAAZe
-         e+4d9zRlJaBgDsA4lcmpjPIuPQDv9bu/wm6Z7tBRmwUmErBekd/zgWgfMcrf21eAfcH4
-         dyE0xylHJd97oINCOMjOdNLFRogOpGSyX2TEUPXZ+y1Mu1IQ8Iv0r40vE/aSkZUGO5l7
-         Y9ifcS6PgKWfSwdpT/AMYwNreDeovyk88ZwKPYrK1zuEQ/HPKhM+UrOIyWc9OtronYoH
-         tXiMOhm/D4HHrLRRqE4i/6TZjbW9HRZ+8xvqZhgw3leEixe3M1lxarHeEAJCNM4Mc95P
-         A4Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCVLv5oQjmSA2PL/UWBR1w5b6bE8YKsCw/xhITegUU2lcrpp8U6/YwXc0oRYEaxrfV6eVDdKn6XSCt5+hKCuKrbmk1kYygp/
-X-Gm-Message-State: AOJu0Yw6SJalGeIM6EA8bve2kV5FF082RDePRJtopwbM+b8wsXu/Q/+L
-	9xfSIN27zE9qtrrDWE3441mPKvIqms8u2bsvd4Jo107NRlVS7gfG6HWwt/bY7ARRsL5StfTAPu5
-	lUKwa4U3Qh8x12Mp0lYksVSu+MtIDfjnZk3vKZIE5mQE5C7nVc/DPuaPziIgzIsDivNVE1EI2QP
-	i50dQLpEWIaMlBj4PsYrJ2cqCbPgOn
-X-Received: by 2002:a17:90b:1109:b0:2c3:2557:3de8 with SMTP id 98e67ed59e1d1-2c4dba4cc8bmr6965577a91.33.1718588706645;
-        Sun, 16 Jun 2024 18:45:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE0AkWfMq72NwUEMIwBQBHsf866KKlMTTJe+fIwJHWEiL0M9NimZLgYzfnZ5J7nZR659gGCPKCffH8bhH406rg=
-X-Received: by 2002:a17:90b:1109:b0:2c3:2557:3de8 with SMTP id
- 98e67ed59e1d1-2c4dba4cc8bmr6965570a91.33.1718588706277; Sun, 16 Jun 2024
- 18:45:06 -0700 (PDT)
+        bh=qwH5sb3vw4u2639u+bU4F9qqkIWaZ2UhByObXQ3U8j0=;
+        b=VpqxbvuaQAvMX4RLezHMNQv23XM1dGylfFvBlSy6h0E+w0SPrtay3S8ouhayv/YA0H
+         TwbgssxAKoWIF/abm3bVKdqujRLNPb9HVzv2EkOwQtODB4LNFyB9KipW4PWSZbLfDhRt
+         ZWXPKvVYeb5nXJEB1FxVZU5OWHZG+1QGo1ORRECYNjKJxEjr895UFbVHNbirmY+8kaUK
+         uh55Ibqc6juomzpc0JvNvantkyJupChx+m7/q29Bv21WaktuQJt5PcqM6NcHpnDaoqbz
+         Lda3DvECBc3ZZ5O3rb7hxMEZk1oYKnBttLiQOs9JEu34GTXfdGjGnkJcIVwyCtE0ZHOY
+         8Siw==
+X-Forwarded-Encrypted: i=1; AJvYcCXOK0ySh8l2omstG56X9a2kzMxBDT4da8ghWnR9Sb7VVCFXS7JBO5gz9eBKvA/ricBuksK/V20yBHAMV2Uxo6dpWbyB2yYd
+X-Gm-Message-State: AOJu0YxAjazSF7QWOOOEZe5AN9wZzLBXi8PKpNHMxYb5rcWvRGmoXWWY
+	lLF/9lRIauL13JxdnNiEnJNNcIDAM9CcCtaiE8qOnmfoJ+/jO1w5Oqzwb7+vRQDmuJRGNyZSMth
+	RhlfPND3ohRY+G6es8YDMQ7d3LKbgxhlR0s+2nkLGbXllHdKlMJ0LvNwdChYFNSnAN10zw1lVrY
+	4Lk47jQH1ryzFEthfkSf7HDQf3CtaS
+X-Received: by 2002:a17:90b:803:b0:2c4:fc64:6b81 with SMTP id 98e67ed59e1d1-2c4fc646c13mr5027225a91.31.1718588909235;
+        Sun, 16 Jun 2024 18:48:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFj+RTz1EYy7hweDAE1ICq45L/lGIK63DQpX9VOBUb8HY2SxFjoa3c8mAZlpi5oGyIBYrcUXdO1Y9miqAIgA9g=
+X-Received: by 2002:a17:90b:803:b0:2c4:fc64:6b81 with SMTP id
+ 98e67ed59e1d1-2c4fc646c13mr5027209a91.31.1718588908759; Sun, 16 Jun 2024
+ 18:48:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CACGkMEvh6nKfFMp5fb6tbijrs88vgSofCNkwN1UzKHnf6RqURg@mail.gmail.com>
- <20240606020248-mutt-send-email-mst@kernel.org> <CACGkMEsy37mg-GwRXJNBBkvhEuaEYw-g3wthv_XS7+t5=ALhiA@mail.gmail.com>
- <ZmG9YWUcaW4S94Eq@nanopsycho.orion> <CACGkMEug18UTJ4HDB+E4-U84UnhyrY-P5kW4et5tnS9E7Pq2Gw@mail.gmail.com>
- <ZmKrGBLiNvDVKL2Z@nanopsycho.orion> <CACGkMEvQ04NBUBwrc9AyvLqskSbQ_4OBUK=B9a+iktLcPLeyrg@mail.gmail.com>
- <ZmLZkVML2a3mT2Hh@nanopsycho.orion> <20240607062231-mutt-send-email-mst@kernel.org>
- <ZmLvWnzUBwgpbyeh@nanopsycho.orion> <20240610101346-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240610101346-mutt-send-email-mst@kernel.org>
+References: <20240611053239.516996-1-lulu@redhat.com> <20240611185810.14b63d7d@kernel.org>
+ <ZmlAYcRHMqCgYBJD@nanopsycho.orion>
+In-Reply-To: <ZmlAYcRHMqCgYBJD@nanopsycho.orion>
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 17 Jun 2024 09:44:55 +0800
-Message-ID: <CACGkMEvWa9OZXhb2==VNw_t2SDdb9etLSvuWa=OWkDFr0rHLQA@mail.gmail.com>
-Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, Jason Xing <kerneljasonxing@gmail.com>, 
-	Heng Qi <hengqi@linux.alibaba.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, xuanzhuo@linux.alibaba.com, 
-	virtualization@lists.linux.dev, ast@kernel.org, daniel@iogearbox.net, 
-	hawk@kernel.org, john.fastabend@gmail.com, netdev@vger.kernel.org
+Date: Mon, 17 Jun 2024 09:48:17 +0800
+Message-ID: <CACGkMEtKFZwPpzjNBv2j6Y5L=jYTrW4B8FnSLRMWb_AtqqSSDQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jakub Kicinski <kuba@kernel.org>, Cindy Lu <lulu@redhat.com>, dtatulea@nvidia.com, 
+	mst@redhat.com, virtualization@lists.linux-foundation.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, netdev@vger.kernel.org, 
+	Parav Pandit <parav@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 10, 2024 at 10:19=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com=
-> wrote:
+On Wed, Jun 12, 2024 at 2:30=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote=
+:
 >
-> On Fri, Jun 07, 2024 at 01:30:34PM +0200, Jiri Pirko wrote:
-> > Fri, Jun 07, 2024 at 12:23:37PM CEST, mst@redhat.com wrote:
-> > >On Fri, Jun 07, 2024 at 11:57:37AM +0200, Jiri Pirko wrote:
-> > >> >True. Personally, I would like to just drop orphan mode. But I'm no=
-t
-> > >> >sure others are happy with this.
-> > >>
-> > >> How about to do it other way around. I will take a stab at sending p=
-atch
-> > >> removing it. If anyone is against and has solid data to prove orphan
-> > >> mode is needed, let them provide those.
-> > >
-> > >Break it with no warning and see if anyone complains?
+> Wed, Jun 12, 2024 at 03:58:10AM CEST, kuba@kernel.org wrote:
+> >On Tue, 11 Jun 2024 13:32:32 +0800 Cindy Lu wrote:
+> >> Add new UAPI to support the mac address from vdpa tool
+> >> Function vdpa_nl_cmd_dev_config_set_doit() will get the
+> >> MAC address from the vdpa tool and then set it to the device.
+> >>
+> >> The usage is: vdpa dev set name vdpa_name mac **:**:**:**:**:**
 > >
-> > This is now what I suggested at all.
-> >
-> > >No, this is not how we handle userspace compatibility, normally.
-> >
-> > Sure.
-> >
-> > Again:
-> >
-> > I would send orphan removal patch containing:
-> > 1) no module options removal. Warn if someone sets it up
-> > 2) module option to disable napi is ignored
-> > 3) orphan mode is removed from code
-> >
-> > There is no breakage. Only, hypotetically performance downgrade in some
-> > hypotetical usecase nobody knows of.
+> >Why don't you use devlink?
 >
-> Performance is why people use virtio. It's as much a breakage as any
-> other bug. The main difference is, with other types of breakage, they
-> are typically binary and we can not tolerate them at all.  A tiny,
-> negligeable performance regression might be tolarable if it brings
-> other benefits. I very much doubt avoiding interrupts is
-> negligeable though. And making code simpler isn't a big benefit,
-> users do not care.
+> Fair question. Why does vdpa-specific uapi even exist? To have
+> driver-specific uapi Does not make any sense to me :/
 
-It's not just making code simpler. As discussed in the past, it also
-fixes real bugs.
+It came with devlink first actually, but switched to a dedicated uAPI.
 
->
-> > My point was, if someone presents
-> > solid data to prove orphan is needed during the patch review, let's tos=
-s
-> > out the patch.
-> >
-> > Makes sense?
->
-> It's not hypothetical - if anything, it's hypothetical that performance
-> does not regress.  And we just got a report from users that see a
-> regression without.  So, not really.
-
-Probably, but do we need to define a bar here? Looking at git history,
-we didn't ask a full benchmark for a lot of commits that may touch
-performance.
+Parav(cced) may explain more here.
 
 Thanks
-
->
-> >
-> > >
-> > >--
-> > >MST
-> > >
 >
 
 
