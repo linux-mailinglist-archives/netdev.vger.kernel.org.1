@@ -1,429 +1,135 @@
-Return-Path: <netdev+bounces-104245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF59F90BBF6
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 22:20:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 938D590BC0E
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 22:22:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B6D31F2351E
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 20:20:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C9D21C234E9
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 20:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D891919B588;
-	Mon, 17 Jun 2024 20:18:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="V44x4KTt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB8E198A02;
+	Mon, 17 Jun 2024 20:18:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2119.outbound.protection.outlook.com [40.107.212.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B4B19AD74;
-	Mon, 17 Jun 2024 20:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.119
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718655481; cv=fail; b=d/r6OSlBqQoGIL+7iM7gb3r1fmRrkg9hISlGE/1O5AYTB8FUNEsY1yKkW65ZuVYwv2IYRrohZ18V50HgL3wCyoudfwSlu25aj+Vgnoo/U6vAZ76Q7Ugt+fO3/XcpyYYyFFKisWIZOn86UcDnC/Nxvc4yfXQTsVNDMYcc/QjTY2M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718655481; c=relaxed/simple;
-	bh=qiKNJ8UVrJKAn1PBpX6jNP/5ZmROv7iV6C2/wZyK2Ns=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=hvm1G7aYUrgSqBS7D9nzgG2MrXxhBCUgSjSCOTe6v3H++IdR3BOxRbJeJFd69NpaWdO9av06q50CoGqyhIZtvcF4t2ZDKd1OJdozCdr4JY8gE77ukLw0LRbSGpj84PinBqXHOb56WiX2xjWlvA1DI8/6ah7s3MhVJBDtkavszM4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=V44x4KTt; arc=fail smtp.client-ip=40.107.212.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MixjAlSDqdlVpOnwgVtitkpot1OdY8MYFirHPTFzyty/nzMLB2sbTfGtl0BkSuZHkiV5FJHHBe+EUs2T9tlYT9qzF8Ly8QfWIWTd8R0QpHPAKlqZIbJBoglhM92ovCKqKzorxlM/MkrtlOgAX+Nnn2m8UtRah4gzhUJOq+RIwtXSkE8A7S2SPnxhn174L1Ii9NttNvklMlO69Z8cTrfEIT45+2cfy/qTIU+kCdntEeATnpLvGLehiOYT3BE0o0Kl8enSJPG3LbiiVlYGBx+yayffslTWu6x3wTpBmhTzxscG0wiG50qmAo62cUuAunz58MqXELpxPIWucUk0FCCyDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9HYUiF36VAQygZk04mouuaiq8J+XwsDnFl/8YNF5QoI=;
- b=bwDLFCam30cPC0PT/yVdAAqYzU8p5ehP2QcAoJcMiuFuE/XHDt2VLZTiEJM5c1IPAqX0riWgfuenTqPWCtbYyuwvmbKLegEuPQzkhaDXRjJEfXGJS0jTflmXSj0PyvFxK7rTq3BKBfLBCj2LMm/GZLcWVsPoSyWTpwhm+gCeAqcc6uDhPLGWegknVqiSOl0TWfP40Z+FMmtKQeaqzva1k3cXHKRg7/nA3yKTBENE9ZG5ZTqd9NFRXWnQjeLYms/WCN4YdbgETjOtVdmd2IsW9tM4t3Dc8tMEARKdr9VEae3N+08rNWRbR/cOn8yq9mYfFFNxcXXb5T51AJilg7Zs9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9HYUiF36VAQygZk04mouuaiq8J+XwsDnFl/8YNF5QoI=;
- b=V44x4KTt8OAeDdqtbKsK/3NNNKuPTAmQKDacK7LETKPmKBXt0gxfPGYHXOc8pi2jVxS/Sxav5mmj2Miv8BGUOMOy3fb8/lvon6zLCwftF/BFVCSdg13h5bmBNw01grXLTKyV2rzwASelcToLullZo8qValTFBsF6ebbnl/rgTiA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-Received: from BY5PR21MB1443.namprd21.prod.outlook.com (2603:10b6:a03:21f::18)
- by DS7PR21MB3551.namprd21.prod.outlook.com (2603:10b6:8:90::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.7; Mon, 17 Jun
- 2024 20:17:50 +0000
-Received: from BY5PR21MB1443.namprd21.prod.outlook.com
- ([fe80::2c5a:1a34:2c8d:48ef]) by BY5PR21MB1443.namprd21.prod.outlook.com
- ([fe80::2c5a:1a34:2c8d:48ef%4]) with mapi id 15.20.7698.007; Mon, 17 Jun 2024
- 20:17:50 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: haiyangz@microsoft.com,
-	decui@microsoft.com,
-	stephen@networkplumber.org,
-	kys@microsoft.com,
-	paulros@microsoft.com,
-	olaf@aepfle.de,
-	vkuznets@redhat.com,
-	davem@davemloft.net,
-	wei.liu@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	leon@kernel.org,
-	longli@microsoft.com,
-	ssengar@linux.microsoft.com,
-	linux-rdma@vger.kernel.org,
-	daniel@iogearbox.net,
-	john.fastabend@gmail.com,
-	bpf@vger.kernel.org,
-	ast@kernel.org,
-	hawk@kernel.org,
-	tglx@linutronix.de,
-	shradhagupta@linux.microsoft.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3,net-next] net: mana: Add support for page sizes other than 4KB on ARM64
-Date: Mon, 17 Jun 2024 13:17:26 -0700
-Message-Id: <1718655446-6576-1-git-send-email-haiyangz@microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-Content-Type: text/plain
-X-ClientProxiedBy: MW4PR04CA0379.namprd04.prod.outlook.com
- (2603:10b6:303:81::24) To BY5PR21MB1443.namprd21.prod.outlook.com
- (2603:10b6:a03:21f::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795E9198848;
+	Mon, 17 Jun 2024 20:18:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718655532; cv=none; b=cEWTGXxsXqcOallRAQzuFep2nBWi+tCYpbj9KoY0BWq5q/nzp23kaNwYD5pj/QBkWpHRDA07Vm6/7iOy2CP0JoAl7Y2DoICrOrLWFpdpfZw0fBAI2xRlD0bBVGO9bNadK4L2dnIvpx3ecQZhqPJ9XRrwxv2o9omcia6uaTqiy98=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718655532; c=relaxed/simple;
+	bh=7nTZdXlj9pK8ilY2G1QjiWHZ7xNto8ux71yowmGhmRE=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Kys++1Zmh/T7JckdMmDu/5Sri80qp3YgD2u2YdHNFlgQqXhRvhJ396Pj5dJZWwgJ9UByXS0pN8AvPyrUeU8MKSu9UjI8Wq7exvbC5zDhVJ+SAGVMiFnMvCP+2W1zmo3xTVj67UURfDnis6PYo2g1vosp3RSQ6sPB9beRObChjCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.72.187) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 17 Jun
+ 2024 23:18:34 +0300
+Subject: Re: [net-next PATCH 2/2] net: ravb: Fix R-Car RX frame size limit
+To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+CC: Biju Das <biju.das.jz@bp.renesas.com>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>, Lad Prabhakar
+	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Mitsuhiro Kimura
+	<mitsuhiro.kimura.kc@renesas.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240615103038.973-1-paul.barker.ct@bp.renesas.com>
+ <20240615103038.973-3-paul.barker.ct@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <a2669de0-f432-5f7b-a80e-b5d050e37b6e@omp.ru>
+Date: Mon, 17 Jun 2024 23:18:33 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Sender: LKML haiyangz <lkmlhyz@microsoft.com>
-X-MS-Exchange-MessageSentRepresentingType: 2
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY5PR21MB1443:EE_|DS7PR21MB3551:EE_
-X-MS-Office365-Filtering-Correlation-Id: ef3d5153-2ee7-4c05-80fe-08dc8f0a8f4c
-X-LD-Processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
- BCL:0;ARA:13230037|52116011|376011|366013|7416011|1800799021|38350700011;
-X-Microsoft-Antispam-Message-Info:
- =?us-ascii?Q?nttNluiRPWdqnv9cVjxEokiYlVpRweRa4VzHh1CDMRZxIef0SUHUMlP6tdXC?=
- =?us-ascii?Q?SN2nYJOpp9gCPUtWCE/iaYK85FR0g7F9ytF9KVKGrAv5w63wI5cXeZzKQFeM?=
- =?us-ascii?Q?tRbqjMdOxKhmZs1n4LHBcEOv4ODb3ql0xKUYZoD49//lmFmkBDkLzKhVi7vV?=
- =?us-ascii?Q?HqMTbiX8aUBfK8ZwCIQQsYYCpc5Vtp8Aq63r2oOqi7FGNUxHccUku2akVGNy?=
- =?us-ascii?Q?s2LAH3/IT0nI49dqGbQrLWrYeMEE26F7T6N2dU+AGMce/TanHsYpZsavUvNP?=
- =?us-ascii?Q?Q3uAX5U1FXuu+3NCHwX0vozH5FU4vC0NqY3iSobWE2wfSexEeUuDhRW2DrpB?=
- =?us-ascii?Q?HHc+jB2rXDenhwDY1pqd7/sO+miF0x1js9DGPGepOjTzJfgLEbgxPJIsqtE/?=
- =?us-ascii?Q?QKHXCGBydfTXHzgkPe7QfGS68zfp3gLX8GoozE5vpGsM/QcLO5aemX8r19hO?=
- =?us-ascii?Q?6p0mlPYT+d28nghMc1afvNRRbNvJZISjhMEilnzo/dLltE7bsXp22aFAc+EW?=
- =?us-ascii?Q?Yi3dFqZ7MBhPXhvr1kfLma/0jdCC59/uehSJ+LhAvOho4AqhM6vgLXABNbDC?=
- =?us-ascii?Q?go6oBtoyunHqLwdD7T9z5r7q+UVAw48G2Y+9rtVaBo3iXWpJllFmlUxw7OUx?=
- =?us-ascii?Q?rwu24aSrQAXxt7iYZ9VhTbS0vTlu8xiaH9nSe0ZMO6I7QP8W6JxfhVk8NEuE?=
- =?us-ascii?Q?l90G0SNdv+DtpMWLmI1upnTPE8iULzOo7KHGyf9taQ/HTrIDXbajAL2iLrh3?=
- =?us-ascii?Q?Zq6k+ffHXpFHN1uDTE5B9EDFIwjh6Nd8CwsWdCoco4AOxTkv2rbz0zkog4nL?=
- =?us-ascii?Q?CgTRL5YFP9qm17987DGgMnsvxuzU8h+xwTWQfP8dyrmNwQuysh0giEaWqzzS?=
- =?us-ascii?Q?KSIAmfec56JwjSNPrDxLMf2uvPH/wVWJtB9VRwAzu2ZpKwujE7cTY1OkwlMH?=
- =?us-ascii?Q?qgIWvLM7EYC4reNtbImwlK1Lguv0DTUrrLXhxv2+5hT6r8lxFxDmvXUXKG1S?=
- =?us-ascii?Q?7mHBek2sWWlaVjAxx3soyILOwiN0f0zUHGmVlNUPy7mof0XMc2fBJHYqs5HJ?=
- =?us-ascii?Q?nvsUUpyEWj5UcNxtQ3GzlwSHpdd/MMPb8Kaume2f8KxHBBDVe+9Ykayj033m?=
- =?us-ascii?Q?E2NnDHisJrWxGPyJ6qIhhgrnnTJ89CvhDumdzJWKDd2DoWlDcvQjIInHbVOf?=
- =?us-ascii?Q?nIfJ1bL+3/OsAsraBp8mhXHWnVU43mstAi8Gl4Oe7h3VtW9uz0g6+0MRH1rE?=
- =?us-ascii?Q?V0oBO16doRqpoGvt7hXnHtuwO6tgCJ1MH0njdl5nHOq1/o8NyjPaKTjKdHDP?=
- =?us-ascii?Q?Lzj6VSbdephU4S5X4pwh0WYxB/kDHJ80eP2fHIZK1BFPV8NeBybANFgqmLSz?=
- =?us-ascii?Q?rg/fn/c=3D?=
-X-Forefront-Antispam-Report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR21MB1443.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(52116011)(376011)(366013)(7416011)(1800799021)(38350700011);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
- =?us-ascii?Q?MFY8AcW0EzpHW7NZUWwOc0nqteNdWBTVYwEegxrzDRjefNcpgBKDY5jjmBir?=
- =?us-ascii?Q?Vg6w2iEyNMFVjjLWUaCZR8XPIiCttcYyDovUtKvyqp7epvD6FikNubQPNegA?=
- =?us-ascii?Q?b+neu6q3quw3t2+fEg53ioSoUG0fY6OfWMpTfHoNdAL/CmsjSZIjDwn6U+qv?=
- =?us-ascii?Q?hubQF94r8XIu2Uwh5MaHfgORuHZXZFu1rm/wrIQ8P/bgRHKd83nmTqeJcYO7?=
- =?us-ascii?Q?NnECUIpVOH4MiIxwZICZtLis5Se4GjLUEz/O7L/nxU1r8fks1I3hapn61cS1?=
- =?us-ascii?Q?VMHPoYRawmiMFRJ//GIa1avLP+6QRRF2DKRBeP5aqwKCkdAfJ3G/8xJj1p8X?=
- =?us-ascii?Q?r9o92SHpdvnB+wXheBVHmip2/FvxWSnKj01EeSei7/eJhCQHagCcUbbzgHzL?=
- =?us-ascii?Q?QUsSTVNlm39hSOIf+AgWgo4HAzeaL9kYzmsOKHdYOAttOnYJgVOWTEMnx37W?=
- =?us-ascii?Q?8Cz5509awp9RJ5eXM3xAGwqIEIk1zntmjt+HMKTcwKOgXYkRcHOJomQnfeOK?=
- =?us-ascii?Q?uwUO4iRvDVSqFp/jCG/SZkODVc2WlT6gKCfbfw2O8BJSMhd3PSYGr/TsJIT/?=
- =?us-ascii?Q?60b7h8Qfe36yKGjEAxP6GLMzGaW6SPFWJBTG0sLMyQRwWeSZrLjXhzsjZXQE?=
- =?us-ascii?Q?MtDfW/4xAdLw/SwiiTyFdMfheVr9kb+9te60aXuLPay26Y/UZgsy9VNIFR0z?=
- =?us-ascii?Q?D3bC6qafEHskOqyjypSsTzQEv2tofTZ0Lzh4EQFrhY7qUK2pcGwFLQr1ZL9V?=
- =?us-ascii?Q?eok5TbhruDJHq/a3ihLydQfbHlLJEkmBBY8+Ix5dweWvrC25ke+AamGLMLMZ?=
- =?us-ascii?Q?9G2If+EAE9DISiHdMnLgAlCGWFPQiCsShbQJd/GygYzrPnK7aMBZTMiFWXe1?=
- =?us-ascii?Q?ZASvdN8ZF9M6hT11UIuAvSCO3WILpQ9sSWo8IR8AhtCYmzxEQZC1tX3gm0ca?=
- =?us-ascii?Q?MfoiDNKsMD8e2LB8UsMt2V1bXvYkoZ+jzWXz516ZBtjALsRCDHBhXYJUvqXH?=
- =?us-ascii?Q?ULlTXw/0NNNlOoKseJyVorjHP3JyhWTNMMwooJRZQAj66FBqYZzrZpXCuGHM?=
- =?us-ascii?Q?DEYzAUq7YFd3XS0DqeBQ494YAJR+CzfjQlhg+uUU7MYmGvA59x6gnBEDca01?=
- =?us-ascii?Q?Wi37Uy4bKkShMC4t7+cRiNy/fjZrHJpJCMBa1SxlVkpVWNZFFnXjcVf1vFHH?=
- =?us-ascii?Q?bT4U8QTSZxTmTW8hj/tVuvdWZteZu5A92/2eTqrbqtspSImJih2HxYMSIilg?=
- =?us-ascii?Q?bE9Pj89dD99+1S/PYACA/O7gxVTVj2ehnEWAN2Jpj2+xehQE/2GOM7AKf/9S?=
- =?us-ascii?Q?WoIz9Nheo44PZZqjyraD/kbGEby+R5IFhyqc6ziYM8GZuESpq5H3d956iINH?=
- =?us-ascii?Q?uo4hCi1/tSO4w2M8DsUQLrS3zvE2IZ7NU+2Uxbgna/SULtaDgryjtV5L356K?=
- =?us-ascii?Q?SKo8uNIISB2PVI3+SR97uqlt3OJHJUAHyiUcyw42js6/6cTe9vNJAe21MIbu?=
- =?us-ascii?Q?+Avi9cZV5VqyHQrGDHe0aMUIDK9zacOZnk/P3pI4iHhd+iy3Lzfc2+jvcNn8?=
- =?us-ascii?Q?kxugjVaaQqTHYD0Mu43NCJbAT7VDdXC2ZcbVsNMI?=
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ef3d5153-2ee7-4c05-80fe-08dc8f0a8f4c
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR21MB1443.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jun 2024 20:17:50.0928
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6uf9ymco/IjJYqixVQwk7hGJo2s8ApFJnn6zzcmI5XXLKdpyBi1R++G8vwC9+/dM6XiNpDqFWSOewF/frWaW9g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR21MB3551
+In-Reply-To: <20240615103038.973-3-paul.barker.ct@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 06/17/2024 19:52:29
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 185970 [Jun 17 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 20 0.3.20
+ 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.72.187 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.72.187
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 06/17/2024 19:56:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 6/17/2024 4:39:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-As defined by the MANA Hardware spec, the queue size for DMA is 4KB
-minimal, and power of 2. And, the HWC queue size has to be exactly
-4KB.
+On 6/15/24 1:30 PM, Paul Barker wrote:
 
-To support page sizes other than 4KB on ARM64, define the minimal
-queue size as a macro separately from the PAGE_SIZE, which we always
-assumed it to be 4KB before supporting ARM64.
+> The RX frame size limit should not be based on the current MTU setting.
+> Instead it should be based on the hardware capabilities.
+> 
+> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
 
-Also, add MANA specific macros and update code related to size
-alignment, DMA region calculations, etc.
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+   Sounds like this is also a fix for net.git tho?
 
----
-v3: Updated two lenth checks as suggested by Michael.
+[...]
 
-v2: Updated alignments, naming as suggested by Michael and Paul.
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 02cbf850bd85..481c854cb305 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -555,8 +555,10 @@ static void ravb_emac_init_gbeth(struct net_device *ndev)
+>  
+>  static void ravb_emac_init_rcar(struct net_device *ndev)
+>  {
+> +	struct ravb_private *priv = netdev_priv(ndev);
+> +
+>  	/* Receive frame limit set register */
+> -	ravb_write(ndev, ndev->mtu + ETH_HLEN + VLAN_HLEN + ETH_FCS_LEN, RFLR);
+> +	ravb_write(ndev, priv->info->rx_max_frame_size + ETH_FCS_LEN, RFLR);
 
----
- drivers/net/ethernet/microsoft/Kconfig            |  2 +-
- drivers/net/ethernet/microsoft/mana/gdma_main.c   | 10 +++++-----
- drivers/net/ethernet/microsoft/mana/hw_channel.c  | 14 +++++++-------
- drivers/net/ethernet/microsoft/mana/mana_en.c     |  8 ++++----
- drivers/net/ethernet/microsoft/mana/shm_channel.c | 13 +++++++------
- include/net/mana/gdma.h                           | 10 +++++++++-
- include/net/mana/mana.h                           |  3 ++-
- 7 files changed, 35 insertions(+), 25 deletions(-)
+   Aha, that's what we're doing in ravb_emac_init_gbeth()...
 
-diff --git a/drivers/net/ethernet/microsoft/Kconfig b/drivers/net/ethernet/microsoft/Kconfig
-index 286f0d5697a1..901fbffbf718 100644
---- a/drivers/net/ethernet/microsoft/Kconfig
-+++ b/drivers/net/ethernet/microsoft/Kconfig
-@@ -18,7 +18,7 @@ if NET_VENDOR_MICROSOFT
- config MICROSOFT_MANA
- 	tristate "Microsoft Azure Network Adapter (MANA) support"
- 	depends on PCI_MSI
--	depends on X86_64 || (ARM64 && !CPU_BIG_ENDIAN && ARM64_4K_PAGES)
-+	depends on X86_64 || (ARM64 && !CPU_BIG_ENDIAN)
- 	depends on PCI_HYPERV
- 	select AUXILIARY_BUS
- 	select PAGE_POOL
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 1332db9a08eb..e1d70d21e207 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -182,7 +182,7 @@ int mana_gd_alloc_memory(struct gdma_context *gc, unsigned int length,
- 	dma_addr_t dma_handle;
- 	void *buf;
- 
--	if (length < PAGE_SIZE || !is_power_of_2(length))
-+	if (length < MANA_PAGE_SIZE || !is_power_of_2(length))
- 		return -EINVAL;
- 
- 	gmi->dev = gc->dev;
-@@ -717,7 +717,7 @@ EXPORT_SYMBOL_NS(mana_gd_destroy_dma_region, NET_MANA);
- static int mana_gd_create_dma_region(struct gdma_dev *gd,
- 				     struct gdma_mem_info *gmi)
- {
--	unsigned int num_page = gmi->length / PAGE_SIZE;
-+	unsigned int num_page = gmi->length / MANA_PAGE_SIZE;
- 	struct gdma_create_dma_region_req *req = NULL;
- 	struct gdma_create_dma_region_resp resp = {};
- 	struct gdma_context *gc = gd->gdma_context;
-@@ -727,10 +727,10 @@ static int mana_gd_create_dma_region(struct gdma_dev *gd,
- 	int err;
- 	int i;
- 
--	if (length < PAGE_SIZE || !is_power_of_2(length))
-+	if (length < MANA_PAGE_SIZE || !is_power_of_2(length))
- 		return -EINVAL;
- 
--	if (offset_in_page(gmi->virt_addr) != 0)
-+	if (!MANA_PAGE_ALIGNED(gmi->virt_addr))
- 		return -EINVAL;
- 
- 	hwc = gc->hwc.driver_data;
-@@ -751,7 +751,7 @@ static int mana_gd_create_dma_region(struct gdma_dev *gd,
- 	req->page_addr_list_len = num_page;
- 
- 	for (i = 0; i < num_page; i++)
--		req->page_addr_list[i] = gmi->dma_handle +  i * PAGE_SIZE;
-+		req->page_addr_list[i] = gmi->dma_handle +  i * MANA_PAGE_SIZE;
- 
- 	err = mana_gd_send_request(gc, req_msg_size, req, sizeof(resp), &resp);
- 	if (err)
-diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-index bbc4f9e16c98..cafded2f9382 100644
---- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-+++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-@@ -362,12 +362,12 @@ static int mana_hwc_create_cq(struct hw_channel_context *hwc, u16 q_depth,
- 	int err;
- 
- 	eq_size = roundup_pow_of_two(GDMA_EQE_SIZE * q_depth);
--	if (eq_size < MINIMUM_SUPPORTED_PAGE_SIZE)
--		eq_size = MINIMUM_SUPPORTED_PAGE_SIZE;
-+	if (eq_size < MANA_MIN_QSIZE)
-+		eq_size = MANA_MIN_QSIZE;
- 
- 	cq_size = roundup_pow_of_two(GDMA_CQE_SIZE * q_depth);
--	if (cq_size < MINIMUM_SUPPORTED_PAGE_SIZE)
--		cq_size = MINIMUM_SUPPORTED_PAGE_SIZE;
-+	if (cq_size < MANA_MIN_QSIZE)
-+		cq_size = MANA_MIN_QSIZE;
- 
- 	hwc_cq = kzalloc(sizeof(*hwc_cq), GFP_KERNEL);
- 	if (!hwc_cq)
-@@ -429,7 +429,7 @@ static int mana_hwc_alloc_dma_buf(struct hw_channel_context *hwc, u16 q_depth,
- 
- 	dma_buf->num_reqs = q_depth;
- 
--	buf_size = PAGE_ALIGN(q_depth * max_msg_size);
-+	buf_size = MANA_PAGE_ALIGN(q_depth * max_msg_size);
- 
- 	gmi = &dma_buf->mem_info;
- 	err = mana_gd_alloc_memory(gc, buf_size, gmi);
-@@ -497,8 +497,8 @@ static int mana_hwc_create_wq(struct hw_channel_context *hwc,
- 	else
- 		queue_size = roundup_pow_of_two(GDMA_MAX_SQE_SIZE * q_depth);
- 
--	if (queue_size < MINIMUM_SUPPORTED_PAGE_SIZE)
--		queue_size = MINIMUM_SUPPORTED_PAGE_SIZE;
-+	if (queue_size < MANA_MIN_QSIZE)
-+		queue_size = MANA_MIN_QSIZE;
- 
- 	hwc_wq = kzalloc(sizeof(*hwc_wq), GFP_KERNEL);
- 	if (!hwc_wq)
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index b89ad4afd66e..1381de866b2e 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -1904,10 +1904,10 @@ static int mana_create_txq(struct mana_port_context *apc,
- 	 *  to prevent overflow.
- 	 */
- 	txq_size = MAX_SEND_BUFFERS_PER_QUEUE * 32;
--	BUILD_BUG_ON(!PAGE_ALIGNED(txq_size));
-+	BUILD_BUG_ON(!MANA_PAGE_ALIGNED(txq_size));
- 
- 	cq_size = MAX_SEND_BUFFERS_PER_QUEUE * COMP_ENTRY_SIZE;
--	cq_size = PAGE_ALIGN(cq_size);
-+	cq_size = MANA_PAGE_ALIGN(cq_size);
- 
- 	gc = gd->gdma_context;
- 
-@@ -2204,8 +2204,8 @@ static struct mana_rxq *mana_create_rxq(struct mana_port_context *apc,
- 	if (err)
- 		goto out;
- 
--	rq_size = PAGE_ALIGN(rq_size);
--	cq_size = PAGE_ALIGN(cq_size);
-+	rq_size = MANA_PAGE_ALIGN(rq_size);
-+	cq_size = MANA_PAGE_ALIGN(cq_size);
- 
- 	/* Create RQ */
- 	memset(&spec, 0, sizeof(spec));
-diff --git a/drivers/net/ethernet/microsoft/mana/shm_channel.c b/drivers/net/ethernet/microsoft/mana/shm_channel.c
-index 5553af9c8085..0f1679ebad96 100644
---- a/drivers/net/ethernet/microsoft/mana/shm_channel.c
-+++ b/drivers/net/ethernet/microsoft/mana/shm_channel.c
-@@ -6,6 +6,7 @@
- #include <linux/io.h>
- #include <linux/mm.h>
- 
-+#include <net/mana/gdma.h>
- #include <net/mana/shm_channel.h>
- 
- #define PAGE_FRAME_L48_WIDTH_BYTES 6
-@@ -155,8 +156,8 @@ int mana_smc_setup_hwc(struct shm_channel *sc, bool reset_vf, u64 eq_addr,
- 		return err;
- 	}
- 
--	if (!PAGE_ALIGNED(eq_addr) || !PAGE_ALIGNED(cq_addr) ||
--	    !PAGE_ALIGNED(rq_addr) || !PAGE_ALIGNED(sq_addr))
-+	if (!MANA_PAGE_ALIGNED(eq_addr) || !MANA_PAGE_ALIGNED(cq_addr) ||
-+	    !MANA_PAGE_ALIGNED(rq_addr) || !MANA_PAGE_ALIGNED(sq_addr))
- 		return -EINVAL;
- 
- 	if ((eq_msix_index & VECTOR_MASK) != eq_msix_index)
-@@ -183,7 +184,7 @@ int mana_smc_setup_hwc(struct shm_channel *sc, bool reset_vf, u64 eq_addr,
- 
- 	/* EQ addr: low 48 bits of frame address */
- 	shmem = (u64 *)ptr;
--	frame_addr = PHYS_PFN(eq_addr);
-+	frame_addr = MANA_PFN(eq_addr);
- 	*shmem = frame_addr & PAGE_FRAME_L48_MASK;
- 	all_addr_h4bits |= (frame_addr >> PAGE_FRAME_L48_WIDTH_BITS) <<
- 		(frame_addr_seq++ * PAGE_FRAME_H4_WIDTH_BITS);
-@@ -191,7 +192,7 @@ int mana_smc_setup_hwc(struct shm_channel *sc, bool reset_vf, u64 eq_addr,
- 
- 	/* CQ addr: low 48 bits of frame address */
- 	shmem = (u64 *)ptr;
--	frame_addr = PHYS_PFN(cq_addr);
-+	frame_addr = MANA_PFN(cq_addr);
- 	*shmem = frame_addr & PAGE_FRAME_L48_MASK;
- 	all_addr_h4bits |= (frame_addr >> PAGE_FRAME_L48_WIDTH_BITS) <<
- 		(frame_addr_seq++ * PAGE_FRAME_H4_WIDTH_BITS);
-@@ -199,7 +200,7 @@ int mana_smc_setup_hwc(struct shm_channel *sc, bool reset_vf, u64 eq_addr,
- 
- 	/* RQ addr: low 48 bits of frame address */
- 	shmem = (u64 *)ptr;
--	frame_addr = PHYS_PFN(rq_addr);
-+	frame_addr = MANA_PFN(rq_addr);
- 	*shmem = frame_addr & PAGE_FRAME_L48_MASK;
- 	all_addr_h4bits |= (frame_addr >> PAGE_FRAME_L48_WIDTH_BITS) <<
- 		(frame_addr_seq++ * PAGE_FRAME_H4_WIDTH_BITS);
-@@ -207,7 +208,7 @@ int mana_smc_setup_hwc(struct shm_channel *sc, bool reset_vf, u64 eq_addr,
- 
- 	/* SQ addr: low 48 bits of frame address */
- 	shmem = (u64 *)ptr;
--	frame_addr = PHYS_PFN(sq_addr);
-+	frame_addr = MANA_PFN(sq_addr);
- 	*shmem = frame_addr & PAGE_FRAME_L48_MASK;
- 	all_addr_h4bits |= (frame_addr >> PAGE_FRAME_L48_WIDTH_BITS) <<
- 		(frame_addr_seq++ * PAGE_FRAME_H4_WIDTH_BITS);
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index c547756c4284..83963d9e804d 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -224,7 +224,15 @@ struct gdma_dev {
- 	struct auxiliary_device *adev;
- };
- 
--#define MINIMUM_SUPPORTED_PAGE_SIZE PAGE_SIZE
-+/* MANA_PAGE_SIZE is the DMA unit */
-+#define MANA_PAGE_SHIFT 12
-+#define MANA_PAGE_SIZE BIT(MANA_PAGE_SHIFT)
-+#define MANA_PAGE_ALIGN(x) ALIGN((x), MANA_PAGE_SIZE)
-+#define MANA_PAGE_ALIGNED(addr) IS_ALIGNED((unsigned long)(addr), MANA_PAGE_SIZE)
-+#define MANA_PFN(a) ((a) >> MANA_PAGE_SHIFT)
-+
-+/* Required by HW */
-+#define MANA_MIN_QSIZE MANA_PAGE_SIZE
- 
- #define GDMA_CQE_SIZE 64
- #define GDMA_EQE_SIZE 16
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 59823901b74f..e39b8676fe54 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -42,7 +42,8 @@ enum TRI_STATE {
- 
- #define MAX_SEND_BUFFERS_PER_QUEUE 256
- 
--#define EQ_SIZE (8 * PAGE_SIZE)
-+#define EQ_SIZE (8 * MANA_PAGE_SIZE)
-+
- #define LOG2_EQ_THROTTLE 3
- 
- #define MAX_PORTS_IN_MANA_DEV 256
--- 
-2.34.1
+[...]
 
+MBR, Sergey
 
