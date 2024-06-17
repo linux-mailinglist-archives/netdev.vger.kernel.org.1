@@ -1,180 +1,159 @@
-Return-Path: <netdev+bounces-104060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7506C90B08B
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:57:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2226290B11E
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:10:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E9081F22710
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:57:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03667B26B3C
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:36:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B3B16CD18;
-	Mon, 17 Jun 2024 13:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD94F1B0130;
+	Mon, 17 Jun 2024 13:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S8cEi+yM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c2yfcADe"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E5716DC0B
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 13:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942231B0129;
+	Mon, 17 Jun 2024 13:22:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718630720; cv=none; b=PDWnpLO+T5EPalSaImzM0kR0dTXGsMHXnNX3nYBVyCfzvSwxH/TVlaJj/dUfIYrJ7LV29PmWDp0JWlZ1pIis0e1/W91mqvyOg3s2N5maIb2dFOgCxNGcOabgyFl3yjiR3GU2eZ0e6Slt5AKRRPxEngmWliYM5L1Nfi3Ej9RLb68=
+	t=1718630529; cv=none; b=FGKAH7uhZEP9Bebt+E4cBft2t6LF8nZgfCQAx7AMCfDzGSZTHI0+ilxT5Gulb55ioLpabBwtZBnZCIQ/1Dz1i3ZXgwZ7yYOn3+CLYCWrr/LcRLLwmp2aHIgqKLrF7ca0j4gBzyykMVoslptbz2ETltkfwbStvnp4AyCYhsq/sgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718630720; c=relaxed/simple;
-	bh=e0Ai7S6YQSXLPsDKMzDQYJxDo/I6cDjDA6YZygp1mvE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eIfVrXy3d1juuTSgiGLgIqvDk3vZ5yMfHMc+glq7dOQwF02V6E0ood9gAoZuf3S2hxXodhoUbewvsGQv39a4CGy1oGHVlAXlKwFCHkOuk8t7g29FPN7FuzIIl6nXhK/9sAILZuqBVLfc9fvw3NyMtwM3Lo9kqh66xulZIuU/uCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S8cEi+yM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718630718;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/S3QsnopAU1g3EZ48Lr3+KF/tnwo0ee82bp6T2xhvDs=;
-	b=S8cEi+yM5tXwym7NqL5eTO/Jv+nHAgZlp2YvsMeg9hzOp8MIleVnq8ktsbPVPJA18ZeDGF
-	Ufad7CE2IqJi63khIvGjbuiMGuMtVUK6jr8qb/8BPRSuBOwGjp+OlAw07wgml5djVLxO/n
-	cIUzd1DYZAmUlCjjiKG0BZDiCyJ8zMw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-363-uqzjWB3fNgCESX7GFBDwRg-1; Mon, 17 Jun 2024 09:25:16 -0400
-X-MC-Unique: uqzjWB3fNgCESX7GFBDwRg-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-36083bd1b12so2308034f8f.1
-        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 06:25:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718630715; x=1719235515;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/S3QsnopAU1g3EZ48Lr3+KF/tnwo0ee82bp6T2xhvDs=;
-        b=t8OUZVqaHgXMt0CEUn2YW5ppH7diyOryaJOC4aRdP6qtc2bJppsXIoXVlk0OaCl1Pf
-         pPfLAgmWDLmWZztFkcbyNOT/6q4N0BbUk26S2bpdRA14+qmGpQ7RxkZv6UHil+xm39zE
-         tiReSmCcPZvZGYtATjbBqUN8v65BWOoCBY2LA//0k/COtERK1Ycjzkk/xrv3t6pSM/bs
-         DVQR0xgVNavUsg1LAWk7Ih1AD8wi6sW8WM9/eygPL6YRaFqOoypdzJVIYIs4idxW42Vi
-         P8+XB5bMBwz8rDWm6MjBYJNCcQ9Q88eQ7bxu5wmk10jPfnhPTVnbuMNHmgvgnNPtmwxQ
-         HtkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWLEtesiypQ4m3/nMsCNzvrkcICcqXdWv6UegtJcnRy4YALjXd/I6cq9s+FFmuWylViRfcwff9cg8hNDnZSGzfvljPfpqsy
-X-Gm-Message-State: AOJu0Yza+F1DwYE2bCYWo/OXBFRfW/QNK9ZvneOplYZPbDJRLP/9HyCq
-	5g2EJK4mrVSro+mM6ttaX7UC2BFus5Br8MQToLMcn/UQ5770G7Em08iy1uUF88PN7smMYYsco/D
-	CT8sEZfqlmgB/qCDEw2Z4sr8cg4kbPvXKslafQMLUVUmw58nfUH6elg==
-X-Received: by 2002:adf:e850:0:b0:35f:204c:889f with SMTP id ffacd0b85a97d-3607a7833b0mr8786832f8f.56.1718630715268;
-        Mon, 17 Jun 2024 06:25:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE5RKQQn0KRZhLjfi6KZQa3K/TTM2W1cxHcRKnOc2A/u+LNZscYxGxayZdx96GzT+RJtL3BLQ==
-X-Received: by 2002:adf:e850:0:b0:35f:204c:889f with SMTP id ffacd0b85a97d-3607a7833b0mr8786801f8f.56.1718630714671;
-        Mon, 17 Jun 2024 06:25:14 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:7439:b500:58cc:2220:93ce:7c4a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3607509353csm11912155f8f.22.2024.06.17.06.25.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 06:25:13 -0700 (PDT)
-Date: Mon, 17 Jun 2024 09:25:10 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Abhinav Jain <jain.abhinav177@gmail.com>
-Cc: jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org, javier.carrasco.cruz@gmail.com
-Subject: Re: [PATCH] virtio_net: Eliminate OOO packets during switching
-Message-ID: <20240617091919-mutt-send-email-mst@kernel.org>
-References: <20240614220422.42733-1-jain.abhinav177@gmail.com>
+	s=arc-20240116; t=1718630529; c=relaxed/simple;
+	bh=gBBmWF8YTIjh0DlT+b6kdKqtSsPfi3eXXh024j8qgOM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=O3Dcm/dI2yXaYHWf6QKJIo8kM2FJm8tQY76wKzSEMBmOtyCLwd6plO3ZRtk3x3qc0FXNMNVEnSn/62ntqVb+zMqaSMOwtXT5RJPGi5sHN8t6kybh8T4yAgRhRStd93mtuzhIVMEwr2fBelzTV6sz0gFIZg2WhV5mW18q8f3IM6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c2yfcADe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2536EC4AF1D;
+	Mon, 17 Jun 2024 13:22:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718630529;
+	bh=gBBmWF8YTIjh0DlT+b6kdKqtSsPfi3eXXh024j8qgOM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=c2yfcADerqKpHXm0GRwG/W8jTlWDk1hgtFKhLoXmWiOgYydTKJcXixzpbUxhl6I4L
+	 9DbsOG2IK3tGD2M6O3ssB9/Vvltoy+T2V1m+4ejsyJh1+6R3G2dbwI91FtbAau5gwn
+	 134z3o1uZxp4PghqISwnxulx9/c6uvArDjKSzpts87hA5LQTencNtrwpkzl1srIGx/
+	 6GFlW9h+/dvF9Off1/vhzI9t2GypjckeyjpJlEmOMTYyxM5sJ32A2Dn7BQGINdQSW/
+	 TEnR6EhwWxWo4jWMyheSCWzbfxbJEiPIFzYUxVrZI68JAShoJ5XXmk5BiLPoTVGqYo
+	 YSJ55WCGkZpng==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>,
+	Alexander Aring <aahringo@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.9 34/44] net: ipv6: rpl_iptunnel: block BH in rpl_output() and rpl_input()
+Date: Mon, 17 Jun 2024 09:19:47 -0400
+Message-ID: <20240617132046.2587008-34-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240617132046.2587008-1-sashal@kernel.org>
+References: <20240617132046.2587008-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240614220422.42733-1-jain.abhinav177@gmail.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.9.5
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 14, 2024 at 10:04:22PM +0000, Abhinav Jain wrote:
-> Disable the network device & turn off carrier before modifying the
-> number of queue pairs.
-> Process all the in-flight packets and then turn on carrier, followed
-> by waking up all the queues on the network device.
+From: Eric Dumazet <edumazet@google.com>
 
-Did you test that there's a workload with OOO and
-this patch actually prevents that?
+[ Upstream commit db0090c6eb12c31246438b7fe2a8f1b833e7a653 ]
 
-> 
-> Signed-off-by: Abhinav Jain <jain.abhinav177@gmail.com>
+As explained in commit 1378817486d6 ("tipc: block BH
+before using dst_cache"), net/core/dst_cache.c
+helpers need to be called with BH disabled.
 
+Disabling preemption in rpl_output() is not good enough,
+because rpl_output() is called from process context,
+lwtunnel_output() only uses rcu_read_lock().
 
-> ---
->  drivers/net/virtio_net.c | 17 +++++++++++++++--
->  1 file changed, 15 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 61a57d134544..d0a655a3b4c6 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -3447,7 +3447,6 @@ static void virtnet_get_drvinfo(struct net_device *dev,
->  
->  }
->  
-> -/* TODO: Eliminate OOO packets during switching */
->  static int virtnet_set_channels(struct net_device *dev,
->  				struct ethtool_channels *channels)
->  {
-> @@ -3471,6 +3470,15 @@ static int virtnet_set_channels(struct net_device *dev,
->  	if (vi->rq[0].xdp_prog)
->  		return -EINVAL;
->  
-> +	/* Disable network device to prevent packet processing during
-> +	 * the switch.
-> +	 */
-> +	netif_tx_disable(dev);
-> +	netif_carrier_off(dev);
+We might be interrupted by a softirq, re-enter rpl_output()
+and corrupt dst_cache data structures.
 
-Won't turning off carrier cause a lot of damage such as
-changing IP and so on?
+Fix the race by using local_bh_disable() instead of
+preempt_disable().
 
-> +
-> +	/* Make certain that all in-flight packets are processed. */
-> +	synchronize_net();
-> +
+Apply a similar change in rpl_input().
 
-The comment seems to say what the code does not do.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Alexander Aring <aahringo@redhat.com>
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+Link: https://lore.kernel.org/r/20240531132636.2637995-3-edumazet@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/ipv6/rpl_iptunnel.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-
-Also, doing this under rtnl is a heavy weight operation.
-
-
-
->  	cpus_read_lock();
->  	err = virtnet_set_queues(vi, queue_pairs);
->  	if (err) {
-> @@ -3482,7 +3490,12 @@ static int virtnet_set_channels(struct net_device *dev,
->  
->  	netif_set_real_num_tx_queues(dev, queue_pairs);
->  	netif_set_real_num_rx_queues(dev, queue_pairs);
-> - err:
-> +
-> +	/* Restart the network device */
-> +	netif_carrier_on(dev);
-> +	netif_tx_wake_all_queues(dev);
-> +
-> +err:
->  	return err;
->  }
->  
-
-
-
-Given the result is, presumably, improved performance with less
-packet loss due to OOO, I'd like to see some actual testing results,
-hopefully also measuring the effect on CPU load.
-
-
-
-
-> -- 
-> 2.34.1
+diff --git a/net/ipv6/rpl_iptunnel.c b/net/ipv6/rpl_iptunnel.c
+index a013b92cbb860..2c83b7586422d 100644
+--- a/net/ipv6/rpl_iptunnel.c
++++ b/net/ipv6/rpl_iptunnel.c
+@@ -212,9 +212,9 @@ static int rpl_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 	if (unlikely(err))
+ 		goto drop;
+ 
+-	preempt_disable();
++	local_bh_disable();
+ 	dst = dst_cache_get(&rlwt->cache);
+-	preempt_enable();
++	local_bh_enable();
+ 
+ 	if (unlikely(!dst)) {
+ 		struct ipv6hdr *hdr = ipv6_hdr(skb);
+@@ -234,9 +234,9 @@ static int rpl_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 			goto drop;
+ 		}
+ 
+-		preempt_disable();
++		local_bh_disable();
+ 		dst_cache_set_ip6(&rlwt->cache, dst, &fl6.saddr);
+-		preempt_enable();
++		local_bh_enable();
+ 	}
+ 
+ 	skb_dst_drop(skb);
+@@ -268,23 +268,21 @@ static int rpl_input(struct sk_buff *skb)
+ 		return err;
+ 	}
+ 
+-	preempt_disable();
++	local_bh_disable();
+ 	dst = dst_cache_get(&rlwt->cache);
+-	preempt_enable();
+ 
+ 	if (!dst) {
+ 		ip6_route_input(skb);
+ 		dst = skb_dst(skb);
+ 		if (!dst->error) {
+-			preempt_disable();
+ 			dst_cache_set_ip6(&rlwt->cache, dst,
+ 					  &ipv6_hdr(skb)->saddr);
+-			preempt_enable();
+ 		}
+ 	} else {
+ 		skb_dst_drop(skb);
+ 		skb_dst_set(skb, dst);
+ 	}
++	local_bh_enable();
+ 
+ 	err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
+ 	if (unlikely(err))
+-- 
+2.43.0
 
 
