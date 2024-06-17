@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-103969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 136E790A9E0
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 11:39:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A3E590A9E3
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 11:39:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFE7728825E
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:39:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 433A71C23869
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:39:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC07194A53;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2CE5194A65;
 	Mon, 17 Jun 2024 09:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tsCpNwGN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MaORckUH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFF31946C6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 902E8194083;
 	Mon, 17 Jun 2024 09:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718617104; cv=none; b=hsmLN+W0SORWdIUb6hhEznyvvJdU3c3OqszVBuUDhfY2ALGy3OU4v5Bz1gT5FgApuWDqemRmYenSmEg/3lwoMWV7Um5tzGLLuVsn9Pw0gDl4Z0qa0Qb3WxeA96rEpSxLGURmJcBzqUokuiQJTc1NzuzZVpMO4cjDhvBa7OtuOYI=
+	t=1718617104; cv=none; b=SX7Q/sJIQk9stVu4oKox0je1DL3rc9sJRODgoGLskSdwvVDpd0VZXkS6g0H2fWkFE4lX/DrwOQaEO9IlryXWPLgZEHesIUlibXDn5oU1xOki/JqlV2ZCOqR22M/1CnKHp8xf8Y0V/AN5hXx8+zAyzo4NgrayUGj53g3ha/FAU0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718617104; c=relaxed/simple;
-	bh=4P6bcFjMz2Z81KccelmzzJW3x4QXkAmbT0oSpWl6AJs=;
+	bh=hu+7JHtL6Prd6V/S2TJxZvc5nnlMUcfi+uYAd+zwbqo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XXUJqeLkXwawcdskfgo1hPy91/1192iT6hhVXuLnE5wAk6DgI+j261i3cd2KuaPiwmR7r1BPJtEBqTIMTFCVszrJEJfNxgkLCBdMAZIEgWAbac7ptWA//j+c7bsN6ZvPVySTDDERxst7XpguyT4M2OlXA+8NkoP7hUtNIOMNwMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tsCpNwGN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5F603C4DE09;
+	 In-Reply-To:To:Cc; b=FHA2HkvloA97/5mNL27JlVX/c5sisUeaJkqi4QBx5+Y2PwDhHZOnCxl3T3KckbGy5uoItBeYQVjgEeAn7zosqAZGnhJygKPgfL2N6L4WEL56irULRiV7T4qFhCsv53C8I2idsumGPzGgP0kcmcENz7r7prv0t5jzFLAInuh41rI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MaORckUH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6FA3FC4AF4D;
 	Mon, 17 Jun 2024 09:38:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718617104;
-	bh=4P6bcFjMz2Z81KccelmzzJW3x4QXkAmbT0oSpWl6AJs=;
+	bh=hu+7JHtL6Prd6V/S2TJxZvc5nnlMUcfi+uYAd+zwbqo=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=tsCpNwGN6afUGHpYZDk3RYYVyHcq0EZnZM7LLN8+jVJR0XagDhcfCS0syleURU9qz
-	 zc01gjZLBDUY0bxaVo++BEWcen5Y4dXWPKEmD5PUbelS8eY/AzFOLh8CIPJPOqsoC1
-	 LrDKAt7KdMSZwgH35Mt12azDzejGYOMnhX1YDrOW87etMQsYf8IOHBOF9SvO/VCIr/
-	 BGyMQIBw5cpvdQdm++RyvLnKKHP0TdO2c6z3GYL7gosv7Eul+J2X+ji5cuSnRBKByz
-	 cpG9YW+0FUG5/7tp7cGefXTResnwDo9RrlUgQ6kFah2ZK6DCueLWm0/sK4BqlzDG/Z
-	 v77g94FPXkAaQ==
+	b=MaORckUHWYj6sDx9O4aXAC553bWsVjE01n9gHDRNa/+SygwtQoryd/ci3ig+bCiwm
+	 5qDgbKNrpM46Sp3F6OSP+Rwo3YGwaJ8KkBxryGaOfMzJgKBhLlgDGBHtq2IjH7xV9u
+	 HDCdMZJh2CPFs9oa/ny5/L2vaWh0fktfqIdmzGRrNLYs9o7zcBKZB+Ij7Qm+ljUBD/
+	 8C8SWc+f9FSi9OEYPas6NDoB7lXUgzCxDzl6GajWp9qTVTX0q92UB3tzV4YEw3jYWM
+	 S8AMup/QhtGAjSA4Z1V7e/uAqJz9VvXjqnLTJD7XYHAxb/R4gGjaME0qoj9bA3Jy0P
+	 bK+WUqQfh3eXg==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53EFBC2BA1A;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 659DBC27C7B;
 	Mon, 17 Jun 2024 09:38:24 +0000 (UTC)
 From: Nikita Shubin via B4 Relay <devnull+nikita.shubin.maquefel.me@kernel.org>
-Date: Mon, 17 Jun 2024 12:36:50 +0300
-Subject: [PATCH v10 16/38] dt-bindings: net: Add Cirrus EP93xx
+Date: Mon, 17 Jun 2024 12:36:51 +0300
+Subject: [PATCH v10 17/38] net: cirrus: add DT support for Cirrus EP93xx
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,25 +55,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240617-ep93xx-v10-16-662e640ed811@maquefel.me>
+Message-Id: <20240617-ep93xx-v10-17-662e640ed811@maquefel.me>
 References: <20240617-ep93xx-v10-0-662e640ed811@maquefel.me>
 In-Reply-To: <20240617-ep93xx-v10-0-662e640ed811@maquefel.me>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Alexander Sverdlin <alexander.sverdlin@gmail.com>, 
- Nikita Shubin <nikita.shubin@maquefel.me>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Hartley Sweeten <hsweeten@visionengravers.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Arnd Bergmann <arnd@arndb.de>, Andrew Lunn <andrew@lunn.ch>
 X-Mailer: b4 0.13-dev-e3e53
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1718617100; l=2030;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1718617100; l=4277;
  i=nikita.shubin@maquefel.me; s=20230718; h=from:subject:message-id;
- bh=2EI3oik4KHOxom6rjRW5fPr9iZissgfzSJoa2Vw9jd0=;
- b=oXTNSEjBimv7+u5cuG18isF71bTlqEdBKHy3rS/RsHSfrv/o1QlYlnfhvcyA9rv7zNuP1gN97uYF
- NWaqlXsDC6mBELBBRX8lh1ZtslQ+f5YoJXgUmvqlhfAlQNgIBCUM
+ bh=b1GOTD5HubzYgxiOB7lYJxNswjw8j/5q0+HrSptbhew=;
+ b=TW2ze5BBLD02v6bE9kZxBE28MvSmBcgffe4xoXMbBeQz7kKInJrrly8nuLCGqU36dJKx1x3te3Zq
+ KvcTWgAtB8ZAMEvaDaVFkRjWOkZeLQDld0kyFlA88uW3+CwUQowV
 X-Developer-Key: i=nikita.shubin@maquefel.me; a=ed25519;
  pk=vqf5YIUJ7BJv3EJFaNNxWZgGuMgDH6rwufTLflwU9ac=
 X-Endpoint-Received: by B4 Relay for nikita.shubin@maquefel.me/20230718
@@ -83,79 +78,152 @@ Reply-To: nikita.shubin@maquefel.me
 
 From: Nikita Shubin <nikita.shubin@maquefel.me>
 
-Add YAML bindings for ep93xx SoC Ethernet Controller.
+- add OF ID match table
+- get phy_id from the device tree, as part of mdio
+- copy_addr is now always used, as there is no SoC/board that aren't
+- dropped platform header
 
 Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Tested-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- .../devicetree/bindings/net/cirrus,ep9301-eth.yaml | 59 ++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+ drivers/net/ethernet/cirrus/ep93xx_eth.c | 63 ++++++++++++++++----------------
+ 1 file changed, 32 insertions(+), 31 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/cirrus,ep9301-eth.yaml b/Documentation/devicetree/bindings/net/cirrus,ep9301-eth.yaml
-new file mode 100644
-index 000000000000..ad0915307095
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/cirrus,ep9301-eth.yaml
-@@ -0,0 +1,59 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/cirrus,ep9301-eth.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/drivers/net/ethernet/cirrus/ep93xx_eth.c b/drivers/net/ethernet/cirrus/ep93xx_eth.c
+index 1f495cfd7959..2523d9c9d1b8 100644
+--- a/drivers/net/ethernet/cirrus/ep93xx_eth.c
++++ b/drivers/net/ethernet/cirrus/ep93xx_eth.c
+@@ -16,13 +16,12 @@
+ #include <linux/ethtool.h>
+ #include <linux/interrupt.h>
+ #include <linux/moduleparam.h>
++#include <linux/of.h>
+ #include <linux/platform_device.h>
+ #include <linux/delay.h>
+ #include <linux/io.h>
+ #include <linux/slab.h>
+ 
+-#include <linux/platform_data/eth-ep93xx.h>
+-
+ #define DRV_MODULE_NAME		"ep93xx-eth"
+ 
+ #define RX_QUEUE_ENTRIES	64
+@@ -738,25 +737,6 @@ static const struct net_device_ops ep93xx_netdev_ops = {
+ 	.ndo_set_mac_address	= eth_mac_addr,
+ };
+ 
+-static struct net_device *ep93xx_dev_alloc(struct ep93xx_eth_data *data)
+-{
+-	struct net_device *dev;
+-
+-	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
+-	if (dev == NULL)
+-		return NULL;
+-
+-	eth_hw_addr_set(dev, data->dev_addr);
+-
+-	dev->ethtool_ops = &ep93xx_ethtool_ops;
+-	dev->netdev_ops = &ep93xx_netdev_ops;
+-
+-	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
+-
+-	return dev;
+-}
+-
+-
+ static void ep93xx_eth_remove(struct platform_device *pdev)
+ {
+ 	struct net_device *dev;
+@@ -786,27 +766,47 @@ static void ep93xx_eth_remove(struct platform_device *pdev)
+ 
+ static int ep93xx_eth_probe(struct platform_device *pdev)
+ {
+-	struct ep93xx_eth_data *data;
+ 	struct net_device *dev;
+ 	struct ep93xx_priv *ep;
+ 	struct resource *mem;
++	void __iomem *base_addr;
++	struct device_node *np;
++	u32 phy_id;
+ 	int irq;
+ 	int err;
+ 
+ 	if (pdev == NULL)
+ 		return -ENODEV;
+-	data = dev_get_platdata(&pdev->dev);
+ 
+ 	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	irq = platform_get_irq(pdev, 0);
+ 	if (!mem || irq < 0)
+ 		return -ENXIO;
+ 
+-	dev = ep93xx_dev_alloc(data);
++	base_addr = ioremap(mem->start, resource_size(mem));
++	if (!base_addr)
++		return dev_err_probe(&pdev->dev, -EIO, "Failed to ioremap ethernet registers\n");
 +
-+title: EP93xx SoC Ethernet Controller
++	np = of_parse_phandle(pdev->dev.of_node, "phy-handle", 0);
++	if (!np)
++		return dev_err_probe(&pdev->dev, -ENODEV, "Please provide \"phy-handle\"\n");
 +
-+maintainers:
-+  - Alexander Sverdlin <alexander.sverdlin@gmail.com>
-+  - Nikita Shubin <nikita.shubin@maquefel.me>
++	err = of_property_read_u32(np, "reg", &phy_id);
++	of_node_put(np);
++	if (err)
++		return dev_err_probe(&pdev->dev, -ENOENT, "Failed to locate \"phy_id\"\n");
 +
-+allOf:
-+  - $ref: ethernet-controller.yaml#
++	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
+ 	if (dev == NULL) {
+ 		err = -ENOMEM;
+ 		goto err_out;
+ 	}
 +
-+properties:
-+  compatible:
-+    oneOf:
-+      - const: cirrus,ep9301-eth
-+      - items:
-+          - enum:
-+              - cirrus,ep9302-eth
-+              - cirrus,ep9307-eth
-+              - cirrus,ep9312-eth
-+              - cirrus,ep9315-eth
-+          - const: cirrus,ep9301-eth
++	eth_hw_addr_set(dev, base_addr + 0x50);
++	dev->ethtool_ops = &ep93xx_ethtool_ops;
++	dev->netdev_ops = &ep93xx_netdev_ops;
++	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
 +
-+  reg:
-+    items:
-+      - description: The physical base address and size of IO range
-+
-+  interrupts:
-+    items:
-+      - description: Combined signal for various interrupt events
-+
-+  phy-handle: true
-+
-+  mdio:
-+    $ref: mdio.yaml#
-+    unevaluatedProperties: false
-+    description: optional node for embedded MDIO controller
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - phy-handle
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    ethernet@80010000 {
-+        compatible = "cirrus,ep9301-eth";
-+        reg = <0x80010000 0x10000>;
-+        interrupt-parent = <&vic1>;
-+        interrupts = <7>;
-+        phy-handle = <&phy0>;
-+    };
+ 	ep = netdev_priv(dev);
+ 	ep->dev = dev;
+ 	SET_NETDEV_DEV(dev, &pdev->dev);
+@@ -822,15 +822,10 @@ static int ep93xx_eth_probe(struct platform_device *pdev)
+ 		goto err_out;
+ 	}
+ 
+-	ep->base_addr = ioremap(mem->start, resource_size(mem));
+-	if (ep->base_addr == NULL) {
+-		dev_err(&pdev->dev, "Failed to ioremap ethernet registers\n");
+-		err = -EIO;
+-		goto err_out;
+-	}
++	ep->base_addr = base_addr;
+ 	ep->irq = irq;
+ 
+-	ep->mii.phy_id = data->phy_id;
++	ep->mii.phy_id = phy_id;
+ 	ep->mii.phy_id_mask = 0x1f;
+ 	ep->mii.reg_num_mask = 0x1f;
+ 	ep->mii.dev = dev;
+@@ -857,12 +852,18 @@ static int ep93xx_eth_probe(struct platform_device *pdev)
+ 	return err;
+ }
+ 
++static const struct of_device_id ep93xx_eth_of_ids[] = {
++	{ .compatible = "cirrus,ep9301-eth" },
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(of, ep93xx_eth_of_ids);
+ 
+ static struct platform_driver ep93xx_eth_driver = {
+ 	.probe		= ep93xx_eth_probe,
+ 	.remove_new	= ep93xx_eth_remove,
+ 	.driver		= {
+ 		.name	= "ep93xx-eth",
++		.of_match_table = ep93xx_eth_of_ids,
+ 	},
+ };
+ 
 
 -- 
 2.43.2
