@@ -1,113 +1,104 @@
-Return-Path: <netdev+bounces-104146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0812E90B513
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:49:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F07890B54D
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:53:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EE571C232EA
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:49:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CA1C283D40
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8EB15B0FD;
-	Mon, 17 Jun 2024 15:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38C0C135A49;
+	Mon, 17 Jun 2024 15:36:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="T+b5HyRn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aX78jsrw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-225.siemens.flowmailer.net (mta-64-225.siemens.flowmailer.net [185.136.64.225])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5797815AD93
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 15:22:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E8BF12F373;
+	Mon, 17 Jun 2024 15:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718637754; cv=none; b=OnhmxUcQXVL6J77/HuPp3vfWTxufKEaFz6X1wl/aBW+vnfR43H5h1rj+Q8b11hsdiTIih2sQe9aOt2W+QafnQ5Lvc3ovYe7/SpF6HSj5XUo5rrhsLYPVXEH8wsADBNQqwDgHCWB29odqItLt4rIG5z2Db2RUoUDbIs+LdcDXdnQ=
+	t=1718638562; cv=none; b=bJf+TENF0ZvKLmsCxoCGScFuT4Xiae2naD1ZugzpmEKmeg+lMdkLv6T1uClWJnVnr6QJ0lbJ1yrfZG3/9G/8UXPNRUvDTvyprugYQkzYKu4njZFI70I6erVIDpgygsMxqZhQxjIlq2hQbkoHfa1DoIiLRrM2pE5JliEi0jSF5bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718637754; c=relaxed/simple;
-	bh=NUfirnAzHuSC6GjuRr39bgT7xFG/QnrzxnLmvJJpzEw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=M8Nyu52EsT8TMiz1kVI8xOP1KQgIxKYLIBprzNkF9fjpAH84MaKY6E3jtAEgI7zjUZf7tWjmmHDHW1s8xt1FcbQIDqQaFDleRZG9d4zHMweD8YIyn5kdyI00XvzwgY7iETDCLlxE/3IDVCj1IEnjZpQcVEnMuvwzPmfvAARGNw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=T+b5HyRn; arc=none smtp.client-ip=185.136.64.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-225.siemens.flowmailer.net with ESMTPSA id 20240617152232b2423056954a7779a0
-        for <netdev@vger.kernel.org>;
-        Mon, 17 Jun 2024 17:22:32 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
- d=siemens.com; i=diogo.ivo@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=Oycy2PZfe8iU4x5Oth2BIpAhAkhezYYXv0lKcaObIIg=;
- b=T+b5HyRnp/UlgYKskzm7WtKDOeP1leTCsEY2IVd+AMchE47MYFhR9rak9jOOM9xhpVIsVM
- /9DI3VVfuLPgxGkqEBWe8kyiwUV0EFn4/RrKVb+m5IlqYjOwepczUHwgTCSw1oDOmhjQ1Bvm
- n1eddNVDiiGDwleC5uIDA+kK/QaXM=;
-From: Diogo Ivo <diogo.ivo@siemens.com>
-Date: Mon, 17 Jun 2024 16:21:44 +0100
-Subject: [PATCH net-next v4 5/5] arm64: dts: ti: iot2050: Add IEP
- interrupts for SR1.0 devices
+	s=arc-20240116; t=1718638562; c=relaxed/simple;
+	bh=oKkY8DUJHqJi7aq4RzMoPZQz16x9vtWfrZmff64niHc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HgfpXfbdw7F4lRgr1rO4bUkGziyxaSAR+ugnztPbvujMa/7LxK4fSZ6f0ETpud2FvQ9Ui1kE7fjw9AZgT7FO+3qo7diSpeUhajNDMMd9jidqcfkOMnUb183GY27k3p8vWAhhnVmT+4yEUN968msPgzvy+jazbGhRgqz2q8ifgPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aX78jsrw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 922FEC4AF1D;
+	Mon, 17 Jun 2024 15:35:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718638561;
+	bh=oKkY8DUJHqJi7aq4RzMoPZQz16x9vtWfrZmff64niHc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aX78jsrwC+Iubhy0j5Twmwszbgt+IQ4rh0xY7VOQlt/7Q8167saErxNEwaYeanoBj
+	 GK3FzWq1cvzggYHLlRZHWO7tONlD9s1WwlTVW5kWVzNXQj0760Fd610oLn/ksssEYk
+	 Ikd48iBggZhQ7ZlzkGkh6mejRrpQaRZD17TKZAWdYHb5uNV4KTaHSP4JGcUxuurxVh
+	 rrrTmD9i8zKFFQ7s3ys9QI3IbGHXPc146KYS0VIeMlS4Ol1/uP7jgsau3FHYch/XRY
+	 88Mft3cJ0sF4vGVbaZpXFgG3k6gUpTE8Poljvfqi+3xElrForLMEhLQsn20wp8JZfC
+	 qpamPkyMLa5jA==
+Date: Mon, 17 Jun 2024 16:35:54 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Diogo Ivo <diogo.ivo@siemens.com>
+Cc: MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jan Kiszka <jan.kiszka@siemens.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v4 3/5] dt-bindings: net: Add IEP interrupt
+Message-ID: <20240617-buzz-balancing-c2168d853a6c@spud>
+References: <20240617-iep-v4-0-fa20ff4141a3@siemens.com>
+ <20240617-iep-v4-3-fa20ff4141a3@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240617-iep-v4-5-fa20ff4141a3@siemens.com>
-References: <20240617-iep-v4-0-fa20ff4141a3@siemens.com>
-In-Reply-To: <20240617-iep-v4-0-fa20ff4141a3@siemens.com>
-To: MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, Nishanth Menon <nm@ti.com>, 
- Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Jan Kiszka <jan.kiszka@siemens.com>, 
- Jacob Keller <jacob.e.keller@intel.com>, Simon Horman <horms@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
- Diogo Ivo <diogo.ivo@siemens.com>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1718637741; l=952;
- i=diogo.ivo@siemens.com; s=20240529; h=from:subject:message-id;
- bh=NUfirnAzHuSC6GjuRr39bgT7xFG/QnrzxnLmvJJpzEw=;
- b=6yGc6t0mNOXX/amiiBx871ZW6Yaw3OZ97DZTGWZr+t6octkNNP/rlZzDSdRzen3U/7/fdWA25
- l1PCm71VFUtAZREJeJH/gJp1jNU4xqUtO97g05hSpSs7DRy7fuu4K70
-X-Developer-Key: i=diogo.ivo@siemens.com; a=ed25519;
- pk=BRGXhMh1q5KDlZ9y2B8SodFFY8FGupal+NMtJPwRpUQ=
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-1320519:519-21489:flowmailer
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="3pdF+DqPTBZylhD/"
+Content-Disposition: inline
+In-Reply-To: <20240617-iep-v4-3-fa20ff4141a3@siemens.com>
 
-Add the interrupts needed for PTP Hardware Clock support via IEP
-in SR1.0 devices.
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
----
- arch/arm64/boot/dts/ti/k3-am65-iot2050-common-pg1.dtsi | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+--3pdF+DqPTBZylhD/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/arch/arm64/boot/dts/ti/k3-am65-iot2050-common-pg1.dtsi b/arch/arm64/boot/dts/ti/k3-am65-iot2050-common-pg1.dtsi
-index ef7897763ef8..0a29ed172215 100644
---- a/arch/arm64/boot/dts/ti/k3-am65-iot2050-common-pg1.dtsi
-+++ b/arch/arm64/boot/dts/ti/k3-am65-iot2050-common-pg1.dtsi
-@@ -73,3 +73,15 @@ &icssg0_eth {
- 		    "rx0", "rx1",
- 		    "rxmgm0", "rxmgm1";
- };
-+
-+&icssg0_iep0 {
-+	interrupt-parent = <&icssg0_intc>;
-+	interrupts = <7 7 7>;
-+	interrupt-names = "iep_cap_cmp";
-+};
-+
-+&icssg0_iep1 {
-+	interrupt-parent = <&icssg0_intc>;
-+	interrupts = <56 8 8>;
-+	interrupt-names = "iep_cap_cmp";
-+};
+On Mon, Jun 17, 2024 at 04:21:42PM +0100, Diogo Ivo wrote:
+> The IEP interrupt is used in order to support both capture events, where
+> an incoming external signal gets timestamped on arrival, and compare
+> events, where an interrupt is generated internally when the IEP counter
+> reaches a programmed value.
+>=20
+> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
 
--- 
-2.45.2
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
+--3pdF+DqPTBZylhD/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZnBX2gAKCRB4tDGHoIJi
+0sCPAP4mFlD9F3AigFkn1v2kp8M9jRDptuUlm1pj5CqYi+/BPgEArpsowjrWpJ8j
+9KuM1nqEckGmX8RSrxcfMPxJgEAhAwg=
+=kcYr
+-----END PGP SIGNATURE-----
+
+--3pdF+DqPTBZylhD/--
 
