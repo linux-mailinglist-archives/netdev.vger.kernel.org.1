@@ -1,99 +1,84 @@
-Return-Path: <netdev+bounces-104113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA1C990B453
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:30:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 58C2E90B457
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 646BC1F27CA0
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:30:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF7441F27D72
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB96413A250;
-	Mon, 17 Jun 2024 15:02:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5253713A409;
+	Mon, 17 Jun 2024 15:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FA7meC4E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CJDWjegn"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1051110958;
-	Mon, 17 Jun 2024 15:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AAAB13A404;
+	Mon, 17 Jun 2024 15:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718636551; cv=none; b=Rp3JCo5O/1zpoSmvSBoZUo6KlB9zgi0mRGgfXn6Su5gSS/jfgodwTL4/pG9AkV/89p6SzmKy5CGze/o8TVCNM2Ge8UcV+KQMB3mS8Sl4czJ/ceZJV/EIh0nPncCeq1kq0RM+3KoWdSoP9lfROFIGfhCqFpL9Y2j/3uMw27Z5FqE=
+	t=1718636554; cv=none; b=SXl97V7NcNjfyeyUEjaxa3b08S3Y//22qlnnVSywUtOZPbrCkZCGr6oT7htdHrvf/rG3YDhJkQTUxEkxxqTy09ZMdYOncE0/XlowWGq84g12qMBgf1g6SUjvtIkEKMd1jUehC0AnG4q6nBqwsxfjKyXS2iy076KHxEWW5eul0bI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718636551; c=relaxed/simple;
-	bh=Gp3uR0qZ+/SQJ4MnZLms8pVZ4Xf2Bw9ZLHrWOyvmpPY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hp4i4R4obTzvPQdIjyEutnUV5lzSJAI+Xfp2lLzSt0VG1RWL70Rw+kkn6eau0zWILypLB/D9pcB91MLnEEie7Wmwwbs/EiVUUyX/LY3/Yh+eXKhpzBbwHNfJ43rQ+M4BM2DJRbi0+/Gfw83fTf/IVkma0rN+lrX17yeNemOS404=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FA7meC4E; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=nIdL7P86hcKvhF+tvLQiYN1713n2GXUoWwoYBL1KXZc=; b=FA
-	7meC4EcKsGp7Bc73EpvI0iZ/MsHIgAybJgVbVC5Dbqt3O1gcwASYCJO+vqF3E/eh8PgwhsbGLdgK2
-	KlnA+Qs3YMiNXd6JaB1DKBD5gyC7kNy/Prlkmw0HZ9hNhRahFNONHYSP2pruUmCQPrBnyHll/jJfr
-	WIFSCPlQDoP/MdI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sJDsG-000HYN-Gp; Mon, 17 Jun 2024 17:02:24 +0200
-Date: Mon, 17 Jun 2024 17:02:24 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: Abhilash K V <kvabhilash@habana.ai>,
-	Andrey Agranovich <aagranovich@habana.ai>,
-	Bharat Jauhari <bjauhari@habana.ai>,
-	David Meriin <dmeriin@habana.ai>,
-	Omer Shpigelman <oshpigelman@habana.ai>,
-	Sagiv Ozeri <sozeri@habana.ai>, Zvika Yehudai <zyehudai@habana.ai>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 01/15] net: hbl_cn: add habanalabs Core Network driver
-Message-ID: <f2ddbeaa-e053-467f-96d2-699999d72aba@lunn.ch>
-References: <20240613082208.1439968-2-oshpigelman@habana.ai>
- <9d13548f-7707-4741-9824-390146462db0@web.de>
+	s=arc-20240116; t=1718636554; c=relaxed/simple;
+	bh=7tMtBsozJ4vfFPoqkmk5Y+AG0DM1FQ9OaHqRv+mSHEo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AXzz73RFiIFx4he1nmz5eyBT24qbnSQS6Is3kXfMtOGzteO0ierE438ytPr14qRmsTqUJ/G7wCl9esr6voau5EMDMnGkGCHggaoFRrxbnANVTjRvcjRp/99sfTuMUvtWdDKetdRFkdO6nLLV90oFn+vwHYbnyJCuU5OLO7orFbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CJDWjegn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18575C2BD10;
+	Mon, 17 Jun 2024 15:02:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718636553;
+	bh=7tMtBsozJ4vfFPoqkmk5Y+AG0DM1FQ9OaHqRv+mSHEo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CJDWjegn35aeMTxpDeMLqnbflARfS0mJhpNldjJXrC416QpGefF9xW4/2IFDXdODg
+	 UEDeqfU7kN2hrsAF81Wi3yjJe2XeEILzwHzYYdZC0aD7084n5o+e0RwCEITHF8p1PA
+	 AaqDQl1ipTJreeJd3uyLOe5wgIUzQIWwwlbog8q4p9j0wg46RVUciEubh3Kitez22V
+	 5RtRi1YwfLMWWVNy93eu+aEC7rbimePwFXs79aNCvMos43L922zEY5oFxn2QsTlE7+
+	 xEoscNEU/uNtl7HEtUiyFXibf9WqAVoL2NlsZkRGk6oaqHur8Ro9XTnvqcb1k2/+DB
+	 bMhHXyHYFW7yA==
+Date: Mon, 17 Jun 2024 08:02:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+ <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "andrew@lunn.ch"
+ <andrew@lunn.ch>, "jiri@resnulli.us" <jiri@resnulli.us>, "horms@kernel.org"
+ <horms@kernel.org>, "rkannoth@marvell.com" <rkannoth@marvell.com>, "Ping-Ke
+ Shih" <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
+Subject: Re: [PATCH net-next v20 07/13] rtase: Implement a function to
+ receive packets
+Message-ID: <20240617080232.620a2452@kernel.org>
+In-Reply-To: <5115e5398ce742718a24ec31a0beaff5@realtek.com>
+References: <20240607084321.7254-1-justinlai0215@realtek.com>
+	<20240607084321.7254-8-justinlai0215@realtek.com>
+	<20240612174311.7bd028e1@kernel.org>
+	<5115e5398ce742718a24ec31a0beaff5@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9d13548f-7707-4741-9824-390146462db0@web.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 17, 2024 at 04:05:57PM +0200, Markus Elfring wrote:
-> …
-> > +++ b/drivers/net/ethernet/intel/hbl_cn/common/hbl_cn.c
-> > @@ -0,0 +1,5954 @@
-> …
-> > +int hbl_cn_read_spmu_counters(struct hbl_cn_port *cn_port, u64 out_data[], u32 *num_out_data)
-> > +{
-> …
-> > +	mutex_lock(&cn_port->cnt_lock);
-> > +	rc = port_funcs->spmu_sample(cn_port, *num_out_data, out_data);
-> > +	mutex_unlock(&cn_port->cnt_lock);
-> > +
-> > +	return rc;
-> > +}
-> …
+On Mon, 17 Jun 2024 06:44:55 +0000 Justin Lai wrote:
+> > > +             /* make sure discriptor has been updated */
+> > > +             rmb();  
+> > 
+> > Barriers are between things. What is this barrier between?  
 > 
-> Would you become interested to apply a statement like “guard(mutex)(&cn_port->cnt_lock);”?
-> https://elixir.bootlin.com/linux/v6.10-rc4/source/include/linux/mutex.h#L196
+> At the end of this do while loop, it fetches the next descriptor. This
+> barrier is mainly used between fetching the next descriptor and using
+> the next descriptor, to ensure that the content of the next descriptor is
+> completely fetched before using it.
 
-Hi Markus
-
-We decided for netdev that guard() was too magical, at least for the
-moment. Lets wait a few years to see how it pans out. scoped_guard()
-is however O.K.
-
-   Andrew
+What does it mean to "fetch the next descriptor"? The prefetch?
+Prefetches are not ordered at all.
 
