@@ -1,94 +1,116 @@
-Return-Path: <netdev+bounces-104010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9654690ADAC
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 14:10:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57AF990ADAF
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 14:10:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A9E11F21AF6
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 12:10:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E7DA1C22D8E
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 12:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC43194C7C;
-	Mon, 17 Jun 2024 12:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5032E194C7C;
+	Mon, 17 Jun 2024 12:10:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OSgF56k5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vKjnky9d"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880B9194C67;
-	Mon, 17 Jun 2024 12:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294C4194C67;
+	Mon, 17 Jun 2024 12:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718626228; cv=none; b=Ujzz8Aw+aDn789RMjPlgcotMR3K+iAXUgnNtp6mLDeqs2EWEW1Q7Z+JzUKGWP71Q/wMTXZHK+eUlc6drZzn4I7sIkU5tVVuW0tmFHsQWlIYg3RKMOLe1t1vCYFCwT1IF2fuqXM42Qq96ECEPKFJfBjVwPxOzNpRWgjOC4eG7MTs=
+	t=1718626234; cv=none; b=DShLjoMi8DWwXMMYu9sT6b50vzSG8B3YBYO9eeIXvwKbYucProIa/ODx3rzXg5bCMKB6OoNOxmw9wSMS5WnBNNGgXVML/TJKOSdrmgOVBH9Fl6fkYgqlbgx+DK3ZK82tN2bUzyngXvLXNvpmzYZeKZbrRY02iH66wuG6SCW+i7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718626228; c=relaxed/simple;
-	bh=DyawOSkp08/NBbf1PChYtj9JupVvK/uwKZI7ZwqqxMM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EWYASR5AqW6BC9vwpmCmQaChpnIIVarJgLdFFOS9E6SJmb/qX6SMMZWpzKYonnE9dBKsCA8VGFFzxGn+Txk3OgL1uEZGiPkqQVckOGH+iV9vH88nR/KfWxk39t/ArMsyGy0iYl7uUuQFvWicncVPt4UPl3aDouIk8oFj+29QRiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OSgF56k5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 00F2CC4AF1D;
-	Mon, 17 Jun 2024 12:10:27 +0000 (UTC)
+	s=arc-20240116; t=1718626234; c=relaxed/simple;
+	bh=qblzdiviYT3MtcEgu/h6QToMzITqf5gDxw6DymenjaM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uNVLgArw5fzmtoLXm5S1E8lc3xDq4xYCVyctX7E1oajJoTM7zpADlgQKdk8mrVBzuxhQJlkGztOW3wJanRgBbqvKniTywJwmGTsJZMHthyRLfgdLWsKWwLxLQfiCwlrT120i4IuBlktUBvMzXwJsjxSea6B7W1rS1rAXcsDfoh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vKjnky9d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 136A8C2BD10;
+	Mon, 17 Jun 2024 12:10:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718626228;
-	bh=DyawOSkp08/NBbf1PChYtj9JupVvK/uwKZI7ZwqqxMM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OSgF56k5z15nExQvCDaALzwgqIHxpS/DKERmrP9lUXGT+eodhS9Z4M10aAX7Y66Jr
-	 3cm46kb0/6LZqdxtkfaRndiymOni9Ym0sdGob2E+TC8dSTI3f4m3aogUj/sOqzMPbv
-	 Mq462T6ZlvlOpDrvZT/y9rhxeh1y7v1Ki6MQ2MLjy70WIAQRHRknRIie7dr7nFXAVl
-	 XH2PXOnZYOjQXhDXCC82pIDgQ6YPQP7r7kKQ3WcDiFjWBiA5opx4WTfzj9o2/20JtM
-	 QdvF8Ooj9afvFduFCVkYQM9wBUfIPdhILRE+qDBZRec6Evtb5LarUNlX5HBZxj+oKu
-	 bZj1o210bomSQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E0E47C4332E;
-	Mon, 17 Jun 2024 12:10:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1718626233;
+	bh=qblzdiviYT3MtcEgu/h6QToMzITqf5gDxw6DymenjaM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vKjnky9dDHoQC1/PAnQ2MoxtSE6seSeo8gyCE1GDx9vw1xE9cwLDkoC3dSoODukmX
+	 57MNMHvbDDXZjb0lhaax8Pkl016LgJGZNvmvN1Uq2xnS3RgxciVKZEugzWjYa/Ugtb
+	 9V9N4T8hB2FZQsy0av6+pOzDd2iPlZxAwc7tdZeMJUUQca8GMKyD73/f5D4uVfJDRp
+	 xV4KFjOG4djUXLLj3U/l8goPT7DB8m2JAkYl4iJfER2jKTg7QPv1LOxoRGsOdxmm82
+	 x5uYxYaywk1IkaL7MsOhT5963mAr1lbv8nJQp2SINU4Ih1YCxC1m6B8c70Kqo2jKFa
+	 kGRIpVaDKOFHg==
+Date: Mon, 17 Jun 2024 13:10:28 +0100
+From: Simon Horman <horms@kernel.org>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 02/12] net: dsa: vsc73xx: Add vlan filtering
+Message-ID: <20240617121028.GS8447@kernel.org>
+References: <20240611195007.486919-1-paweldembicki@gmail.com>
+ <20240611195007.486919-3-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] netrom: Fix a memory leak in nr_heartbeat_expiry()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171862622791.26206.17391169744722640892.git-patchwork-notify@kernel.org>
-Date: Mon, 17 Jun 2024 12:10:27 +0000
-References: <20240613082300.294668-1-Ilia.Gavrilov@infotecs.ru>
-In-Reply-To: <20240613082300.294668-1-Ilia.Gavrilov@infotecs.ru>
-To: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-Cc: ralf@linux-mips.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, kuniyu@amazon.com,
- linux-hams@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
- syzbot+d327a1f3b12e1e206c16@syzkaller.appspotmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240611195007.486919-3-paweldembicki@gmail.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu, 13 Jun 2024 08:23:00 +0000 you wrote:
-> syzbot reported a memory leak in nr_create() [0].
+On Tue, Jun 11, 2024 at 09:49:54PM +0200, Pawel Dembicki wrote:
+> This patch implements VLAN filtering for the vsc73xx driver.
 > 
-> Commit 409db27e3a2e ("netrom: Fix use-after-free of a listening socket.")
-> added sock_hold() to the nr_heartbeat_expiry() function, where
-> a) a socket has a SOCK_DESTROY flag or
-> b) a listening socket has a SOCK_DEAD flag.
+> After starting VLAN filtering, the switch is reconfigured from QinQ to
+> a simple VLAN aware mode. This is required because VSC73XX chips do not
+> support inner VLAN tag filtering.
 > 
-> [...]
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 
-Here is the summary with links:
-  - [net] netrom: Fix a memory leak in nr_heartbeat_expiry()
-    https://git.kernel.org/netdev/net/c/0b9130247f3b
+...
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Hi Pawel,
 
+Two minor spelling nits from my side for your consideration.
 
+> diff --git a/drivers/net/dsa/vitesse-vsc73xx.h b/drivers/net/dsa/vitesse-vsc73xx.h
+> index 2997f7e108b1..fc8b7a73d652 100644
+> --- a/drivers/net/dsa/vitesse-vsc73xx.h
+> +++ b/drivers/net/dsa/vitesse-vsc73xx.h
+> @@ -14,6 +14,27 @@
+>   */
+>  #define VSC73XX_MAX_NUM_PORTS	8
+>  
+> +/**
+> + * struct vsc73xx_portinfo - port data structure: contains storage data
+> + * @pvid_vlan_filtering_configured: imforms if port have configured pvid in vlan
+> + *	fitering mode
+
+fitering -> filtering
+
+> + * @pvid_vlan_filtering: pvid vlan number used in vlan fitering mode
+
+Likewise here.
+
+Flagged by checkpatch.pl --codespell
+
+> + * @pvid_tag_8021q_configured: imforms if port have configured pvid in tag_8021q
+> + *	mode
+> + * @pvid_tag_8021q: pvid vlan number used in tag_8021q mode
+> + * @untagged_tag_8021q_configured: imforms if port have configured untagged vlan
+> + *	in tag_8021q mode
+> + * @untagged_tag_8021q: untagged vlan number used in tag_8021q mode
+> + */
+
+...
 
