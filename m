@@ -1,114 +1,116 @@
-Return-Path: <netdev+bounces-103979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FD7D90AAC9
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 12:08:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1453A90AAE7
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 12:19:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F367281DC8
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 10:08:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B065E1F21C90
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 10:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8716193097;
-	Mon, 17 Jun 2024 10:08:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="ma5Bo46F"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADC4C194083;
+	Mon, 17 Jun 2024 10:19:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.12])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417CA1922C7;
-	Mon, 17 Jun 2024 10:08:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A0817B413
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 10:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718618918; cv=none; b=TaenAwDl86NDAX4s734cWK1gnPWthDwGY5I8OxEZeow11pNeE2gTaqX/J98l1DztTD2TeTH8Sl5wOPMiHpY6MXZ+k8YFDYSmLZgQflQNZr2YSbXzqCU2i1cYlmS891YVavEaWwt3+NTdxSNuA3RFfdbwYdSXU5sZazf0dMk68Jc=
+	t=1718619551; cv=none; b=K7SzJbg5JNQGlf+Sg5sFrsythRdlSy2Mk7MTCPgQlbhTkYp8idrJQKQV74ZbzbXKHOZABr82sfwV+dywWDGWaWnlNGcepZZ4RVy6X0URS6XqkkuwYXCaaglSdbUTmhUjI1T8QCffmBdJqSebl/dGxh07rFRRk/7oTN2MrA3gg2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718618918; c=relaxed/simple;
-	bh=TaxsO8A8ub1Kl+G8RAHhURMfNaORdUuzVR35IOWc2Us=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qbFfMvydFkWsPqMdQu40yj71dWO62zSi4s9oEVw5p0KWoBFy+cyy6fqYZPC6BI3rTvE+SQQBv+HAdNsqxCKnvl6WpYp/2f4BfB6xSPBzi9Rx1rwc8D8c53ihKymZDjSv7GM2rzPuY0ECyQm63Yz9P70fsFcUnrrlYz90EuASOfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=ma5Bo46F; arc=none smtp.client-ip=212.227.17.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1718618874; x=1719223674; i=markus.elfring@web.de;
-	bh=TaxsO8A8ub1Kl+G8RAHhURMfNaORdUuzVR35IOWc2Us=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=ma5Bo46Fv0vhwksF3QxGchVDD11mEG78xEc9FyNlGsbKgZI1LlZRz7Bv72EFMlH9
-	 /0En/bGvmlaau/fjcko7qU04lUOj23ckOUMih5Z9FfU8XS8P3mNUs5sIn86HIHkm4
-	 BRJFUEW0vLm0UIQXQVmW8bR5pObYcbU2FTpRaRDI8+gm/xb36omiN8CEGRxJnM0Gl
-	 7lJztCZlKWTtPZ7FFAMyfsyzZEr3mccH4P+lsBFfrMPL7fc+6LQiVeSEn0oE/sX83
-	 uU4TQuz6Q6hf/XtTzhAOig3FUM+m+nx2Ah9MoJW1ypIXLSlb37m7iS4rtUg86nLWU
-	 1+Ka/XI1DG+SceKrtg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1N8n08-1sPSPM1GJa-00ulRF; Mon, 17
- Jun 2024 12:07:54 +0200
-Message-ID: <6b284a02-15e2-4eba-9d5f-870a8baa08e8@web.de>
-Date: Mon, 17 Jun 2024 12:07:48 +0200
+	s=arc-20240116; t=1718619551; c=relaxed/simple;
+	bh=Mp1RjHMU3/RVbL4rUjYPB+tCdG1+8HIZNgK/uAPxw7Q=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=GYejqTqtwgeOBqGmG9orpfXwHZrUHU+dKJHkqQfxm4j5khcu+mhGzv8Vvlki213ZavKNQtX4XrrIIqTH02u0f+MDroHBeb3GxN0bdIIKcE7JPfSk8JVExXA4izUiZ6pE+JC4+lI7cVgF2mTCA96KqrkviwMp2u1PNUJq02Vu0Ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-55-XgXb84H0Pvqbn7RJYgkCXg-1; Mon, 17 Jun 2024 11:19:01 +0100
+X-MC-Unique: XgXb84H0Pvqbn7RJYgkCXg-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 17 Jun
+ 2024 11:18:18 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Mon, 17 Jun 2024 11:18:18 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Matthew Wilcox' <willy@infradead.org>
+CC: 'Sagi Grimberg' <sagi@grimberg.me>, kernel test robot
+	<oliver.sang@intel.com>, "oe-lkp@lists.linux.dev" <oe-lkp@lists.linux.dev>,
+	"lkp@intel.com" <lkp@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>
+Subject: RE: [PATCH] net: micro-optimize skb_datagram_iter
+Thread-Topic: [PATCH] net: micro-optimize skb_datagram_iter
+Thread-Index: AQHav87vWshbN1FSGkaaeddPsMjEkbHK7lSQ///wfgCAAN/H4A==
+Date: Mon, 17 Jun 2024 10:18:18 +0000
+Message-ID: <e6a1eb41578c46609aa862b8f9148665@AcuMS.aculab.com>
+References: <202406161539.b5ff7b20-oliver.sang@intel.com>
+ <4937ffd4-f30a-4bdb-9166-6aebb19ca950@grimberg.me>
+ <e2bce6704b20491e8eb2edd822ae6404@AcuMS.aculab.com>
+ <Zm9e0OpCaucP4836@casper.infradead.org>
+In-Reply-To: <Zm9e0OpCaucP4836@casper.infradead.org>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [v20 02/13] rtase: Implement the .ndo_open function
-To: Justin Lai <justinlai0215@realtek.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Hariprasad Kelam <hkelam@marvell.com>, Jiri Pirko <jiri@resnulli.us>,
- Larry Chiu <larry.chiu@realtek.com>, Ping-Ke Shih <pkshih@realtek.com>,
- Ratheesh Kannoth <rkannoth@marvell.com>
-References: <20240607084321.7254-3-justinlai0215@realtek.com>
- <1d01ece4-bf4e-4266-942c-289c032bf44d@web.de>
- <ef7c83dea1d849ad94acef81819f9430@realtek.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <ef7c83dea1d849ad94acef81819f9430@realtek.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:0bUc5Xvq0TvjvOY8nCnUp3iYnU/l2VPXA976WEEsyigooLEZn/y
- CwZWd7INAFsvjsmbHp7G2BrI0EPi8ZHJXeh9IpFEb0V2k2IPT7IqWbNNM0wsUYVzffo+Td7
- hU73J1CkmQd+0th4o8yBp2cWTMJZUKwqW5YzONRX+Zq4p4TU39k2hJOBDcyy3YwLY2gM0RD
- /LflWIq8Yy+R3fVeUgc7w==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:6lHu8sL5HPI=;Isuzt4XBBOHDeLdcrnEb4Pcu35p
- eJQH2LVasE5qYiQyEwzS9ihp+KcuvLpi1DrWv1CGJzHiM5to6zagirZ+e8WbsLpYagaj35afN
- PFNh2lStEOus6ndFdUftr1WPFET4NNaSivg8qVZmZdwT4gRKVTtHBKBfOPjmDsM8FYmm9ZIxv
- RIC+yxkRM4NLRh9cQ6wOC93wW4sF1/SVBLIbhs+CTvZnArU5l6kQYFz7XJoPoHwyYhK2ZZ9Uv
- g9AF+yr1iVB69j5PFeU02l8NOpVfvz+MUeSKivT839lVCzCqG/NrZZYW45VFesdeEf3pj3rKB
- flsqqa8MJpt1Wf6Ocnf/I3oR7tQKkWqIshICByQqIReIz5PF2dp1dz5sxRwecTgQyg5shEig6
- bzyGAhso4sPSLQdkIiYUUZbrQIUtpBLa0L+cCo2n9pABQk/cnryxftls4hBj95bKE1vbAs1YZ
- ZlVZHXtiKVl9Mj+G4NyOz1j/JlzLdmWta8q/puR/P1nKbhAoxK67NXcAJNX6+CR8EqhdcR3+A
- tvCMpSOmk3g5Jd7kzFL/1rz+q4CTZuZgnJwaygNnExVzalsYt+B/F+KZf2wQbZWDM6bR97JkB
- VXGqnJckLjwA31qaknLKXjGhPCsJl/TeV/eYPf9TB466snQ4RogD54S8QTablh9Fz0We5HrWP
- kA297vcZSpF7HQH0QpycJt7assOuvFGwLvGOjPQG4NluYrBqV+QHLIeeg4+NOS/p098EniMF2
- wUV4iC6nxCLpDG01C3kmlkZdUPUPpHGF1MooNfgwPsErk7cm3AwAWTMsaWjcpw5VLqjd4Jcoe
- wthttMvysz22q+PD5iM+s8qxYw6Epiv90rRlEUcS5SQI4=
 
->> How do you think about to increase the application of scope-based resou=
-rce management?
->> https://elixir.bootlin.com/linux/v6.10-rc3/source/include/linux/cleanup=
-.h#L8
->
-> Due to our tx and rx each having multiple queues that need to
-> allocate descriptors, if any one of the queues fails to allocate,
-> rtase_alloc_desc() will return an error. Therefore, using 'goto'
-> here rather than directly returning seems to be reasonable.
+From: Matthew Wilcox
+> Sent: 16 June 2024 22:53
+>=20
+> On Sun, Jun 16, 2024 at 09:51:05PM +0000, David Laight wrote:
+> > From: Sagi Grimberg
+> > > Sent: 16 June 2024 10:24
+> > ...
+> > > > [ 13.498663][ T189] EIP: usercopy_abort (mm/usercopy.c:102 (discrim=
+inator 12))
+> > > > [   13.499424][  T194] usercopy: Kernel memory exposure attempt det=
+ected from kmap (offset 0,
+> size
+> > > 8192)!
+> > >
+> > > Hmm, not sure I understand exactly why changing kmap() to
+> > > kmap_local_page() expose this,
+> > > but it looks like mm/usercopy does not like size=3D8192 when copying =
+for
+> > > the skb frag.
+> >
+> > Can't a usercopy fault and have to read the page from swap?
+> > So the process can sleep and then be rescheduled on a different cpu?
+> > So you can't use kmap_local_page() here at all.
+>=20
+> I don't think you understand how kmap_local_page() works.
 
-Some goto chains can be replaced by further usage of advanced cleanup tech=
-niques,
-can't they?
+Quite likely :-)
 
-Regards,
-Markus
+But I thought it was a cheap way of temporarily mapping a physical memory
+page into the current cpu's page tables without having to do any IPI to
+tell other cpu about the insert or removal?
+Which would require that the process not be migrated, which pretty much
+implies that pre-emption be disabled.
+
+=09David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
+
 
