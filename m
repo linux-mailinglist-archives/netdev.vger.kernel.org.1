@@ -1,182 +1,112 @@
-Return-Path: <netdev+bounces-104149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2653790B5D3
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 18:10:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DCEA90B6C6
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 18:44:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CE7DB2F49E
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:49:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EFA84B3D717
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:51:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF2015B156;
-	Mon, 17 Jun 2024 15:22:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68D9C171B6;
+	Mon, 17 Jun 2024 15:28:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="kepDV1/3"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="b6PfhvWe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-227.siemens.flowmailer.net (mta-64-227.siemens.flowmailer.net [185.136.64.227])
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D442315B0FB
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 15:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D24134DE;
+	Mon, 17 Jun 2024 15:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718637757; cv=none; b=QQBwd0KxTlcA1vGeSrCSLGDrqQXRmzu+5iiKpQeKOz7nIqRfRuk+8TbNYuroZvmT8Rn0445u+iZiKAYKAZrAEOUvMeHR5APLldzwIv7d1BI0mYDfX1qlEhPixHH+u4N9cS2QktDHsLgeMkmJ/WxZTmAarYPbbCOimh/XWgOOXyU=
+	t=1718638102; cv=none; b=WnPDjgpKAJRa9tZXAN7Jz+Jh0xB7979wMMjAnOugFjZbXO7EKE7G+YqugTRCgCs+0kw/Wzvwi904HjSzTR+33kpF2Hqmgnvy18Aa/FqGb3Jw0iwsrZEMie+GhBxWtDWpkVT488m23IkPPjjEQuZxC4QUjBTH29MXHpgmx2mD34w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718637757; c=relaxed/simple;
-	bh=JdeJqrlg8CfqPk2aFFrPUXdjz8LMnLs/ckxgdkPntHg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Idn/6fqQsbDhEJMZz6vZ0eB8JRifaN7cLhJVif6/jo3kP28HS9S2e2k5lVk5S2pe2iluATGzSFj4Fijol0Q6kd5zfn2lWgqJUqQDNp5b3kCXvrvL9Ppg+l9mUtx3/gRoJA1TDpBBU7gUzmH4mDia75h3Sq2FzvuCDTR7ZHM4ftM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=kepDV1/3; arc=none smtp.client-ip=185.136.64.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-227.siemens.flowmailer.net with ESMTPSA id 202406171522266a0ab8709c9aaf81a5
-        for <netdev@vger.kernel.org>;
-        Mon, 17 Jun 2024 17:22:26 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
- d=siemens.com; i=diogo.ivo@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=Fxp6XouXtcm6HEHNTUrhXH4PgJrnOGuaFeg/ybdFDmQ=;
- b=kepDV1/3ozToSVeN5YAbn800RaJw+ckTHES+KIyaAeDJ1GPVB0Y+Is7QiewUefDa+YnpMa
- F+XlNg2me3TRcXCj5D7BfXU1t6VRy/zsMDyPuqIbObykaEBCYjlRQe0b99HzU8GxQ9SsZyvy
- mEPjMhDUw1VbpVMqI6TW0cV+dhsW8=;
-From: Diogo Ivo <diogo.ivo@siemens.com>
-Date: Mon, 17 Jun 2024 16:21:41 +0100
-Subject: [PATCH net-next v4 2/5] net: ti: icss-iep: Remove spinlock-based
- synchronization
+	s=arc-20240116; t=1718638102; c=relaxed/simple;
+	bh=1dDye3xMz9kCshlVTroWnygLjhXc9vMSQN03NQdnELM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=URTc+fSo65ZjIWElw2kifNh6Db2eII44go/8rWVe3RQuQEar/jRilNCsHIV0n7Yy4aSl4LuprJ7YgOLXWLadnsJ1XoptQbIPG+dZ7Y3+3jQ+XccgpTpiPg2YzRTCF3EGckVL+IdaHtNXoTMtL3IpB51TKAWDTwB4wKK1hKB66jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=b6PfhvWe; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1718638096; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=l+12FevlX3fdnfHXW0LMF9KRFfVUfjKWXSd2yQeA1ZQ=;
+	b=b6PfhvWejcbXIWb0eUa8M/7QGPtM8N+KrmHU5QCUWBZP7UzfV+3aagQ/4LygyR5pWIcB401HcNlDV+EYRgxr4TOWcDIdvjmmV5b0DoaDQi7qA02h2fRX4tAZRAyKrjiWjn6j2EM2GF75gtt+9Q45FVymrVdpHXzdD/2T0a6wmw4=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045075189;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0W8gs1NW_1718638094;
+Received: from 30.15.205.40(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W8gs1NW_1718638094)
+          by smtp.aliyun-inc.com;
+          Mon, 17 Jun 2024 23:28:15 +0800
+Message-ID: <2f77825b-c6db-491a-867d-1d7d357ea2a3@linux.alibaba.com>
+Date: Mon, 17 Jun 2024 23:28:14 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240617-iep-v4-2-fa20ff4141a3@siemens.com>
-References: <20240617-iep-v4-0-fa20ff4141a3@siemens.com>
-In-Reply-To: <20240617-iep-v4-0-fa20ff4141a3@siemens.com>
-To: MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, Nishanth Menon <nm@ti.com>, 
- Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Jan Kiszka <jan.kiszka@siemens.com>, 
- Jacob Keller <jacob.e.keller@intel.com>, Simon Horman <horms@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
- Diogo Ivo <diogo.ivo@siemens.com>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1718637740; l=3238;
- i=diogo.ivo@siemens.com; s=20240529; h=from:subject:message-id;
- bh=JdeJqrlg8CfqPk2aFFrPUXdjz8LMnLs/ckxgdkPntHg=;
- b=2HxZqi6sESfK5Wqxb9jateLja5oygdPcYT309hPE+AzVRLLKPa2c+CXq8/M4uxMZjCVIaM0xN
- p0qSrKiag1cCVcbfFAovNRky7+uioDC0sfNJrWOl+xPtBN84RxqP4Sq
-X-Developer-Key: i=diogo.ivo@siemens.com; a=ed25519;
- pk=BRGXhMh1q5KDlZ9y2B8SodFFY8FGupal+NMtJPwRpUQ=
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-1320519:519-21489:flowmailer
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: mana: Use mana_cleanup_port_context() for
+ rxq cleanup
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+ Erick Archer <erick.archer@outlook.com>,
+ Konstantin Taranov <kotaranov@microsoft.com>, Simon Horman
+ <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Dexuan Cui <decui@microsoft.com>,
+ Wei Liu <wei.liu@kernel.org>, Haiyang Zhang <haiyangz@microsoft.com>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Shradha Gupta <shradhagupta@microsoft.com>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+ linux-hyperv@vger.kernel.org
+References: <1718349548-28697-1-git-send-email-shradhagupta@linux.microsoft.com>
+From: Heng Qi <hengqi@linux.alibaba.com>
+In-Reply-To: <1718349548-28697-1-git-send-email-shradhagupta@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-As all sources of concurrency in hardware register access occur in
-non-interrupt context eliminate spinlock-based synchronization and
-rely on the mutex-based synchronization that is already present.
 
-Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
----
- drivers/net/ethernet/ti/icssg/icss_iep.c | 14 --------------
- 1 file changed, 14 deletions(-)
+在 2024/6/14 下午3:19, Shradha Gupta 写道:
+> To cleanup rxqs in port context structures, instead of duplicating the
+> code, use existing function mana_cleanup_port_context() which does
+> the exact cleanup that's needed.
+>
+> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> ---
+>   drivers/net/ethernet/microsoft/mana/mana_en.c | 6 ++----
+>   1 file changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index b89ad4afd66e..93e526e5dd16 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> @@ -2529,8 +2529,7 @@ static int mana_init_port(struct net_device *ndev)
+>   	return 0;
+>   
+>   reset_apc:
+> -	kfree(apc->rxqs);
+> -	apc->rxqs = NULL;
+> +	mana_cleanup_port_context(apc);
+>   	return err;
+>   }
+>   
+> @@ -2787,8 +2786,7 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+>   free_indir:
+>   	mana_cleanup_indir_table(apc);
+>   reset_apc:
+> -	kfree(apc->rxqs);
+> -	apc->rxqs = NULL;
+> +	mana_cleanup_port_context(apc);
+>   free_net:
+>   	*ndev_storage = NULL;
+>   	netdev_err(ndev, "Failed to probe vPort %d: %d\n", port_idx, err);
 
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
-index 3025e9c18970..d52e42fa64f2 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.c
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-@@ -110,7 +110,6 @@ struct icss_iep {
- 	struct ptp_clock_info ptp_info;
- 	struct ptp_clock *ptp_clock;
- 	struct mutex ptp_clk_mutex;	/* PHC access serializer */
--	spinlock_t irq_lock; /* CMP IRQ vs icss_iep_ptp_enable access */
- 	u32 def_inc;
- 	s16 slow_cmp_inc;
- 	u32 slow_cmp_count;
-@@ -192,14 +191,11 @@ static void icss_iep_update_to_next_boundary(struct icss_iep *iep, u64 start_ns)
-  */
- static void icss_iep_settime(struct icss_iep *iep, u64 ns)
- {
--	unsigned long flags;
--
- 	if (iep->ops && iep->ops->settime) {
- 		iep->ops->settime(iep->clockops_data, ns);
- 		return;
- 	}
- 
--	spin_lock_irqsave(&iep->irq_lock, flags);
- 	if (iep->pps_enabled || iep->perout_enabled)
- 		writel(0, iep->base + iep->plat_data->reg_offs[ICSS_IEP_SYNC_CTRL_REG]);
- 
-@@ -210,7 +206,6 @@ static void icss_iep_settime(struct icss_iep *iep, u64 ns)
- 		writel(IEP_SYNC_CTRL_SYNC_N_EN(0) | IEP_SYNC_CTRL_SYNC_EN,
- 		       iep->base + iep->plat_data->reg_offs[ICSS_IEP_SYNC_CTRL_REG]);
- 	}
--	spin_unlock_irqrestore(&iep->irq_lock, flags);
- }
- 
- /**
-@@ -546,7 +541,6 @@ static int icss_iep_perout_enable_hw(struct icss_iep *iep,
- static int icss_iep_perout_enable(struct icss_iep *iep,
- 				  struct ptp_perout_request *req, int on)
- {
--	unsigned long flags;
- 	int ret = 0;
- 
- 	mutex_lock(&iep->ptp_clk_mutex);
-@@ -559,11 +553,9 @@ static int icss_iep_perout_enable(struct icss_iep *iep,
- 	if (iep->perout_enabled == !!on)
- 		goto exit;
- 
--	spin_lock_irqsave(&iep->irq_lock, flags);
- 	ret = icss_iep_perout_enable_hw(iep, req, on);
- 	if (!ret)
- 		iep->perout_enabled = !!on;
--	spin_unlock_irqrestore(&iep->irq_lock, flags);
- 
- exit:
- 	mutex_unlock(&iep->ptp_clk_mutex);
-@@ -575,7 +567,6 @@ static int icss_iep_pps_enable(struct icss_iep *iep, int on)
- {
- 	struct ptp_clock_request rq;
- 	struct timespec64 ts;
--	unsigned long flags;
- 	int ret = 0;
- 	u64 ns;
- 
-@@ -589,8 +580,6 @@ static int icss_iep_pps_enable(struct icss_iep *iep, int on)
- 	if (iep->pps_enabled == !!on)
- 		goto exit;
- 
--	spin_lock_irqsave(&iep->irq_lock, flags);
--
- 	rq.perout.index = 0;
- 	if (on) {
- 		ns = icss_iep_gettime(iep, NULL);
-@@ -607,8 +596,6 @@ static int icss_iep_pps_enable(struct icss_iep *iep, int on)
- 	if (!ret)
- 		iep->pps_enabled = !!on;
- 
--	spin_unlock_irqrestore(&iep->irq_lock, flags);
--
- exit:
- 	mutex_unlock(&iep->ptp_clk_mutex);
- 
-@@ -853,7 +840,6 @@ static int icss_iep_probe(struct platform_device *pdev)
- 
- 	iep->ptp_info = icss_iep_ptp_info;
- 	mutex_init(&iep->ptp_clk_mutex);
--	spin_lock_init(&iep->irq_lock);
- 	dev_set_drvdata(dev, iep);
- 	icss_iep_disable(iep);
- 
+Reviewed-by: Heng Qi <hengqi@linux.alibaba.com>
 
--- 
-2.45.2
-
+Thanks!
 
