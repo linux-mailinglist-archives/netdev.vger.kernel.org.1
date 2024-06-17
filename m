@@ -1,89 +1,88 @@
-Return-Path: <netdev+bounces-104057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6878890B065
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:54:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7506C90B08B
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:57:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E23451F22121
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:54:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E9081F22710
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:57:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC05B3DABFA;
-	Mon, 17 Jun 2024 13:25:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B3B16CD18;
+	Mon, 17 Jun 2024 13:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I0QSnAJT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S8cEi+yM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA8B21C193
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 13:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E5716DC0B
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 13:25:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718630704; cv=none; b=AwBKuxk+2unLRw/PJkcYqUsrm5JKBItA57qW/0zDaER0i1KM77hCgIaCG9FL/Y5/F0YsUEyXN0MqEL9K90JFXDAZpEoJiV4PauG2+1Ov4NSHyu8QSdWy7sKsn1kUHxiM79eSgwej3yAyHPqAf+I3pNS3XAZsyzNrjEbUmGObnYA=
+	t=1718630720; cv=none; b=PDWnpLO+T5EPalSaImzM0kR0dTXGsMHXnNX3nYBVyCfzvSwxH/TVlaJj/dUfIYrJ7LV29PmWDp0JWlZ1pIis0e1/W91mqvyOg3s2N5maIb2dFOgCxNGcOabgyFl3yjiR3GU2eZ0e6Slt5AKRRPxEngmWliYM5L1Nfi3Ej9RLb68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718630704; c=relaxed/simple;
-	bh=UffNg64kltXiNMQy07YaTpOg7r4pBCC49Y6FPB+maXw=;
+	s=arc-20240116; t=1718630720; c=relaxed/simple;
+	bh=e0Ai7S6YQSXLPsDKMzDQYJxDo/I6cDjDA6YZygp1mvE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jztpg/LZira0cvzIjpw7rg0cuxkWYxrLE6jacNT3Cla3OuLcF8ON4XqcbJW5Q0iLBlXjPYHiWgHxPpYRrkmf2dv05TmGlEiRpszlMQBcHSbiqG55I2HA5xc0HTYoCPN5ir5wjy1M/DDtRAEZWPKJgPmsjjfbIW/g2/PexCNTvvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I0QSnAJT; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=eIfVrXy3d1juuTSgiGLgIqvDk3vZ5yMfHMc+glq7dOQwF02V6E0ood9gAoZuf3S2hxXodhoUbewvsGQv39a4CGy1oGHVlAXlKwFCHkOuk8t7g29FPN7FuzIIl6nXhK/9sAILZuqBVLfc9fvw3NyMtwM3Lo9kqh66xulZIuU/uCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S8cEi+yM; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718630702;
+	s=mimecast20190719; t=1718630718;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=gNdwNvulKIO4JOfhW5zSdvn5q7O0IrSkNwM4LbWgZA4=;
-	b=I0QSnAJT6vYXtZA7AVTv8eToMQce1tWMb0WK/+ORo2+MDsAK6+nAv3mUvAot1aWKmh3jrX
-	D3q3dyqcEijx/qFCL3R/otL4Ku2QYzZpW9MlrtvA8jvBUJo+JbNNE+jllS8FKyFIWmBOu6
-	tEZIgVrTzj1mQy0mIYh8sCHb/nqF2uk=
+	bh=/S3QsnopAU1g3EZ48Lr3+KF/tnwo0ee82bp6T2xhvDs=;
+	b=S8cEi+yM5tXwym7NqL5eTO/Jv+nHAgZlp2YvsMeg9hzOp8MIleVnq8ktsbPVPJA18ZeDGF
+	Ufad7CE2IqJi63khIvGjbuiMGuMtVUK6jr8qb/8BPRSuBOwGjp+OlAw07wgml5djVLxO/n
+	cIUzd1DYZAmUlCjjiKG0BZDiCyJ8zMw=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-494-12u4oZaUMEKkbfDivnQElQ-1; Mon, 17 Jun 2024 09:25:00 -0400
-X-MC-Unique: 12u4oZaUMEKkbfDivnQElQ-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-35f2030f868so3158166f8f.2
-        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 06:25:00 -0700 (PDT)
+ us-mta-363-uqzjWB3fNgCESX7GFBDwRg-1; Mon, 17 Jun 2024 09:25:16 -0400
+X-MC-Unique: uqzjWB3fNgCESX7GFBDwRg-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-36083bd1b12so2308034f8f.1
+        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 06:25:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718630699; x=1719235499;
+        d=1e100.net; s=20230601; t=1718630715; x=1719235515;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gNdwNvulKIO4JOfhW5zSdvn5q7O0IrSkNwM4LbWgZA4=;
-        b=Kcd4XMbRC4i8VMkZVUNq1E0L54t/Zjwdnf0kaDVr92DqcTA5CWiHaOBkTzZNa6ZkKp
-         kxiHVguhcuyjyqXyHzVBwBwPHFctGq610/I/4MB5zI4hlAN3wtVAlsE8XZMqKkDR4zzq
-         WM3wyN/QKHVWJHVuEkmZ2bJ7MnXRVF6s3TfOjZU9qLjzSZ8MqiVCl+IRa3WP9rErlN6A
-         9w0yrv5D9dSx0h8qYLrnCl5DkflEHvsXypFZ2kCaegrJXf5AEXJAJVjKTd9fUa0yrB5C
-         GxgTOTpKZ0yR/rlQjjemqwrawVyQ1ncy3j8gH7oCa/6SwuJmZS0TmNZXGVnHl4n2DegH
-         R0sg==
-X-Forwarded-Encrypted: i=1; AJvYcCXPfD7BjJIO0j4GJ2pM8DlA8TE8PwKDi9bh7xxhOql2epWBcqTUO18zqD18/CJ+jitw5q8xN6Vn2wt/FBjEC2wcIHeIqLEx
-X-Gm-Message-State: AOJu0Yypy28XD1xbLGRVUamqFgeZwQ94J9IdncYfiC3SHLKpYXtC7I/r
-	4kW3QkEQk0ZSN6vucHaAt86TiKoyCvepmYEjNz1nzNIaYCmel9sjniFkHrMe/2G07chomh2gs1f
-	lnJbbJ9ab1FWX0atWSymiYOVlaH/fTQVR/3JPlzq1mxRBHlg1RJF6VA==
-X-Received: by 2002:a5d:46c6:0:b0:360:9a04:57ba with SMTP id ffacd0b85a97d-3609a04587dmr1509650f8f.31.1718630699514;
-        Mon, 17 Jun 2024 06:24:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHRxoRznz4bsF2t8WDRmKhi4N1xEAy+HXiK9JIkYxIFPdtbiwxr4Y2KaDbSLkoIb3poAiSTrQ==
-X-Received: by 2002:a5d:46c6:0:b0:360:9a04:57ba with SMTP id ffacd0b85a97d-3609a04587dmr1509626f8f.31.1718630699176;
-        Mon, 17 Jun 2024 06:24:59 -0700 (PDT)
-Received: from fedora (lmontsouris-659-1-55-176.w193-248.abo.wanadoo.fr. [193.248.58.176])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36075093499sm12071989f8f.8.2024.06.17.06.24.58
+        bh=/S3QsnopAU1g3EZ48Lr3+KF/tnwo0ee82bp6T2xhvDs=;
+        b=t8OUZVqaHgXMt0CEUn2YW5ppH7diyOryaJOC4aRdP6qtc2bJppsXIoXVlk0OaCl1Pf
+         pPfLAgmWDLmWZztFkcbyNOT/6q4N0BbUk26S2bpdRA14+qmGpQ7RxkZv6UHil+xm39zE
+         tiReSmCcPZvZGYtATjbBqUN8v65BWOoCBY2LA//0k/COtERK1Ycjzkk/xrv3t6pSM/bs
+         DVQR0xgVNavUsg1LAWk7Ih1AD8wi6sW8WM9/eygPL6YRaFqOoypdzJVIYIs4idxW42Vi
+         P8+XB5bMBwz8rDWm6MjBYJNCcQ9Q88eQ7bxu5wmk10jPfnhPTVnbuMNHmgvgnNPtmwxQ
+         HtkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWLEtesiypQ4m3/nMsCNzvrkcICcqXdWv6UegtJcnRy4YALjXd/I6cq9s+FFmuWylViRfcwff9cg8hNDnZSGzfvljPfpqsy
+X-Gm-Message-State: AOJu0Yza+F1DwYE2bCYWo/OXBFRfW/QNK9ZvneOplYZPbDJRLP/9HyCq
+	5g2EJK4mrVSro+mM6ttaX7UC2BFus5Br8MQToLMcn/UQ5770G7Em08iy1uUF88PN7smMYYsco/D
+	CT8sEZfqlmgB/qCDEw2Z4sr8cg4kbPvXKslafQMLUVUmw58nfUH6elg==
+X-Received: by 2002:adf:e850:0:b0:35f:204c:889f with SMTP id ffacd0b85a97d-3607a7833b0mr8786832f8f.56.1718630715268;
+        Mon, 17 Jun 2024 06:25:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE5RKQQn0KRZhLjfi6KZQa3K/TTM2W1cxHcRKnOc2A/u+LNZscYxGxayZdx96GzT+RJtL3BLQ==
+X-Received: by 2002:adf:e850:0:b0:35f:204c:889f with SMTP id ffacd0b85a97d-3607a7833b0mr8786801f8f.56.1718630714671;
+        Mon, 17 Jun 2024 06:25:14 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:7439:b500:58cc:2220:93ce:7c4a])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3607509353csm11912155f8f.22.2024.06.17.06.25.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 06:24:58 -0700 (PDT)
-Date: Mon, 17 Jun 2024 15:24:56 +0200
-From: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
-To: Luigi Leonardi <luigi.leonardi@outlook.com>
-Cc: sgarzare@redhat.com, edumazet@google.com, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, kuba@kernel.org, kvm@vger.kernel.org, 
-	stefanha@redhat.com, pabeni@redhat.com, davem@davemloft.net, 
-	Marco Pinna <marco.pinn95@gmail.com>
-Subject: Re: [PATCH net-next 2/2] vsock/virtio: avoid enqueue packets when
- work queue is empty
-Message-ID: <jjewa7jiltjnoauat3nnaeezhtcwi6k4xf5mkllykcqw4gyfgi@glwzqxp5r76q>
-References: <20240614135543.31515-1-luigi.leonardi@outlook.com>
- <AS2P194MB21706E349197C1466937052C9AC22@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+        Mon, 17 Jun 2024 06:25:13 -0700 (PDT)
+Date: Mon, 17 Jun 2024 09:25:10 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Abhinav Jain <jain.abhinav177@gmail.com>
+Cc: jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org, javier.carrasco.cruz@gmail.com
+Subject: Re: [PATCH] virtio_net: Eliminate OOO packets during switching
+Message-ID: <20240617091919-mutt-send-email-mst@kernel.org>
+References: <20240614220422.42733-1-jain.abhinav177@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,52 +91,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AS2P194MB21706E349197C1466937052C9AC22@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+In-Reply-To: <20240614220422.42733-1-jain.abhinav177@gmail.com>
 
-Hello,
+On Fri, Jun 14, 2024 at 10:04:22PM +0000, Abhinav Jain wrote:
+> Disable the network device & turn off carrier before modifying the
+> number of queue pairs.
+> Process all the in-flight packets and then turn on carrier, followed
+> by waking up all the queues on the network device.
 
-thanks for working on this! I have some minor thoughts.
+Did you test that there's a workload with OOO and
+this patch actually prevents that?
 
-On Fri, Jun 14, 2024 at 03:55:43PM +0200, Luigi Leonardi wrote:
-> From: Marco Pinna <marco.pinn95@gmail.com>
 > 
-> This introduces an optimization in virtio_transport_send_pkt:
-> when the work queue (send_pkt_queue) is empty the packet is
-> put directly in the virtqueue reducing latency.
-> 
-> In the following benchmark (pingpong mode) the host sends
-> a payload to the guest and waits for the same payload back.
-> 
-> Tool: Fio version 3.37-56
-> Env: Phys host + L1 Guest
-> Payload: 4k
-> Runtime-per-test: 50s
-> Mode: pingpong (h-g-h)
-> Test runs: 50
-> Type: SOCK_STREAM
-> 
-> Before (Linux 6.8.11)
-> ------
-> mean(1st percentile):     722.45 ns
-> mean(overall):           1686.23 ns
-> mean(99th percentile):  35379.27 ns
-> 
-> After
-> ------
-> mean(1st percentile):     602.62 ns
-> mean(overall):           1248.83 ns
-> mean(99th percentile):  17557.33 ns
-> 
+> Signed-off-by: Abhinav Jain <jain.abhinav177@gmail.com>
 
-I think It would be interesting to know what exactly the test does, and,
-if the test is triggering the improvement, i.e., the better results are
-due to enqueuing packets directly to the virtqueue instead of letting
-the worker does it. If I understand correctly, this patch focuses on the
-case in which the worker queue is empty. I think the test can always
-send packets at a frequency so the worker queue is always empty, but
-maybe, this is a corner case and most of the time the worker queue is
-not empty in a non-testing environment.
 
-Matias
+> ---
+>  drivers/net/virtio_net.c | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 61a57d134544..d0a655a3b4c6 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3447,7 +3447,6 @@ static void virtnet_get_drvinfo(struct net_device *dev,
+>  
+>  }
+>  
+> -/* TODO: Eliminate OOO packets during switching */
+>  static int virtnet_set_channels(struct net_device *dev,
+>  				struct ethtool_channels *channels)
+>  {
+> @@ -3471,6 +3470,15 @@ static int virtnet_set_channels(struct net_device *dev,
+>  	if (vi->rq[0].xdp_prog)
+>  		return -EINVAL;
+>  
+> +	/* Disable network device to prevent packet processing during
+> +	 * the switch.
+> +	 */
+> +	netif_tx_disable(dev);
+> +	netif_carrier_off(dev);
+
+Won't turning off carrier cause a lot of damage such as
+changing IP and so on?
+
+> +
+> +	/* Make certain that all in-flight packets are processed. */
+> +	synchronize_net();
+> +
+
+The comment seems to say what the code does not do.
+
+
+Also, doing this under rtnl is a heavy weight operation.
+
+
+
+>  	cpus_read_lock();
+>  	err = virtnet_set_queues(vi, queue_pairs);
+>  	if (err) {
+> @@ -3482,7 +3490,12 @@ static int virtnet_set_channels(struct net_device *dev,
+>  
+>  	netif_set_real_num_tx_queues(dev, queue_pairs);
+>  	netif_set_real_num_rx_queues(dev, queue_pairs);
+> - err:
+> +
+> +	/* Restart the network device */
+> +	netif_carrier_on(dev);
+> +	netif_tx_wake_all_queues(dev);
+> +
+> +err:
+>  	return err;
+>  }
+>  
+
+
+
+Given the result is, presumably, improved performance with less
+packet loss due to OOO, I'd like to see some actual testing results,
+hopefully also measuring the effect on CPU load.
+
+
+
+
+> -- 
+> 2.34.1
 
 
