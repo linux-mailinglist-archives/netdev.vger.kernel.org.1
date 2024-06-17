@@ -1,80 +1,88 @@
-Return-Path: <netdev+bounces-104160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D26590B5F0
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 18:12:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A142E90B602
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 18:14:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 101CA285200
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:12:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D3461F210EF
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:14:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C7E314AB8;
-	Mon, 17 Jun 2024 16:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E600D1D9534;
+	Mon, 17 Jun 2024 16:14:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tGMxqYUW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fHx2k56f"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17C514AAD;
-	Mon, 17 Jun 2024 16:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1E76AB8
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 16:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718640750; cv=none; b=p2O8ZIn2XWHOgro7v7mTcv/QRte6RWyKnvtOm8UVXKYQbhwotFN0FSm696tR+X7Z3+DFS2uXaNbIHdzPml1+qeU0hAMtcIlC9MJltBhNE/GHXIlQIXwgK7u14+BiIUMHBX6RIHVsbRS3ArUb6czl1u0g3XbTnDpzt/xyaAYdngo=
+	t=1718640863; cv=none; b=K0HD5XUa6MM7Mq8Qys7DqfEEtAN+AQBw2ZjzzUG3PZAoDtcVM9fvyHgcfrJeyCZl9TTYymsP/YERfCRgzBLALhTl7AgOqvd07AQhBzFHEGIs+IyIBSijwoEj1GY6ysUdSZ1G8gW4WCmbcbxloejlKKBNYIcemWGNj7gMmnskOiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718640750; c=relaxed/simple;
-	bh=+gtWCVLAIwVN9QYLGAITeupOhR87qFGefwq+Ci8vsv0=;
+	s=arc-20240116; t=1718640863; c=relaxed/simple;
+	bh=2jMwxQewd+8WDZGv6NOK7cJXTWSPZNZhzGB+cFhY6wA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lfnytt5vgpt/qTYkazNmCj5dc9kqUO22kjx11ElBlvjb7D/Bi/9Yid22KdLowk5y6/TuJyA0svj4P+aUy0x5+9ju2xuTmft0IhNKryGrZJweZzv9s4O+243AVw9B5jr72lOGffK966IFgK95AcmUbu+bEOzx8ooSMACSPLetZ4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tGMxqYUW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45957C3277B;
-	Mon, 17 Jun 2024 16:12:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718640749;
-	bh=+gtWCVLAIwVN9QYLGAITeupOhR87qFGefwq+Ci8vsv0=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=tGMxqYUWUZidJOkTYRC4FVvYBSBOWSgclx4qkkf2YhB76G0qNpmpl3h3ZG/PV3BOy
-	 xlZXdbbOvZ6jW6KZZoE8jW1tSsMXb9BTJYiUY+4BFP1x4DLKJ88c59xgouIGwbGnfH
-	 pzOLAUlBJvqVtt/nGes5ftIvMNsA0KW74j39YxI7CsKwDMIstY8QCTis+Vm1d09ssf
-	 Brg/opMBq5bCqKivChkp0axZbqIBv6L47ipGD98z9wwNolXOn9myeZNXKM1TRS3DUb
-	 bJJ9eMBF03SfToJMq6gfQl4IveoZO6GqEFk38XBSPXCG+yBO8oun6MjojXjI6saj96
-	 ETfYabYghHfAQ==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id C3424CE09F5; Mon, 17 Jun 2024 09:12:28 -0700 (PDT)
-Date: Mon, 17 Jun 2024 09:12:28 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"Uladzislau Rezki (Sony)" <urezki@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <Zmov7ZaL-54T9GiM@zx2c4.com>
- <Zmo9-YGraiCj5-MI@zx2c4.com>
- <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
- <Zmrkkel0Fo4_g75a@zx2c4.com>
- <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
+	 Content-Type:Content-Disposition:In-Reply-To; b=baOQmNOdmf4umyA/fghjTYi++OA0pxblHQti8QN4JiEw3MNHXFdXg9ehEGDmJIpp0unf3iZZz4dtJEdwvpsra0ZRHvnieDaqfN/U7lbIy6Mk5I8qlQXdoNQQHALaiMFkNI9U2JpMvYwIIm01iORaxuatf97a0pWyvHdGTHlsVoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fHx2k56f; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718640860;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tdS7HdTjamJqZQvjpytbBcG9HZLsuSC96RMHEWu0PCI=;
+	b=fHx2k56fj+dHhKxVJQLXDEqwRXgnp/+wVuLrT/mPL3lRab4ypMFrLWR8pw1DFVWye5AF9p
+	GwKU4l5MbWp6KX7dhHVjqqio3mqBKUtyd/GQLUnukweIAKjE+JfwvacVnbAsuniao+0+PJ
+	WBo66r58+KZV4rYbmjLsMeG90tAs2Q0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-411-9OHjFbiDNheqlt8121BVDQ-1; Mon, 17 Jun 2024 12:14:19 -0400
+X-MC-Unique: 9OHjFbiDNheqlt8121BVDQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-423034c6119so25502535e9.2
+        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 09:14:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718640858; x=1719245658;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tdS7HdTjamJqZQvjpytbBcG9HZLsuSC96RMHEWu0PCI=;
+        b=Z2fY5a3IpcUmXK1wTMX39Rh3QCmb8tUsmM8AYcgymIZuXEYxjjmlZa/x72sXIPl0KT
+         mXA+PmNSoIlHxVCYMW3ba2JDi+yJXJYnKMwd8aNZ13ZdFo2C7afNjSsZZNyO7oS92tTd
+         KinAv0HB5jtJ6whaU+A0uswRWLMiM/+01q9lMI+RgaDX46V4E8KqfEYCJuX71QBQAwge
+         Vzg9VB7u8BvIAshlzoSN8LXfHX7F//ZiA4WZ+FYHOQHo9Obg/k2gPiT5vqYSdIyEVwQQ
+         EIu4dDUujZZ3+UV6nncS9r3xpz7A/5azRI/p0IuJAprvygKsDRRTW4K9VkB91tzJlVWm
+         RDBQ==
+X-Gm-Message-State: AOJu0YzX9kPdQRu5Ywv0CJtBxCKH5Tep1DqyvGD/IkZL5IIloAvC7GOt
+	pitTgpw9VEraytstc2Y0X8zkiy4aK1CB1IxQeunM8b8gcmP4HedN8y4cBv8ZG2Q4BzKzUGx0ZJN
+	h/kyTPDHaWb8hrcGXTckMBCX2rbT6aDH9h4r3jon+rWmqfW86MhufNA==
+X-Received: by 2002:a05:600c:1d07:b0:421:7435:88d7 with SMTP id 5b1f17b1804b1-42304844106mr94329285e9.26.1718640858297;
+        Mon, 17 Jun 2024 09:14:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFr87ATNUs/p+ZpcBH8Wairi2HMEiV960OMo2BTrJWfe9r6Tu7Sm7VZx6L0DFFW4J1GkyFwmg==
+X-Received: by 2002:a05:600c:1d07:b0:421:7435:88d7 with SMTP id 5b1f17b1804b1-42304844106mr94329095e9.26.1718640857767;
+        Mon, 17 Jun 2024 09:14:17 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:17c:d4a1:48dc:2f16:ab1d:e55a])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422f6320bd8sm162571805e9.32.2024.06.17.09.14.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jun 2024 09:14:17 -0700 (PDT)
+Date: Mon, 17 Jun 2024 12:14:11 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	john.fastabend@gmail.com, dave.taht@gmail.com,
+	kerneljasonxing@gmail.com, hengqi@linux.alibaba.com
+Subject: Re: [PATCH net-next v2] virtio_net: add support for Byte Queue Limits
+Message-ID: <20240617121234-mutt-send-email-mst@kernel.org>
+References: <20240612170851.1004604-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,77 +91,221 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
+In-Reply-To: <20240612170851.1004604-1-jiri@resnulli.us>
 
-On Mon, Jun 17, 2024 at 05:10:50PM +0200, Vlastimil Babka wrote:
-> On 6/13/24 2:22 PM, Jason A. Donenfeld wrote:
-> > On Wed, Jun 12, 2024 at 08:38:02PM -0700, Paul E. McKenney wrote:
-> >> o	Make the current kmem_cache_destroy() asynchronously wait for
-> >> 	all memory to be returned, then complete the destruction.
-> >> 	(This gets rid of a valuable debugging technique because
-> >> 	in normal use, it is a bug to attempt to destroy a kmem_cache
-> >> 	that has objects still allocated.)
+On Wed, Jun 12, 2024 at 07:08:51PM +0200, Jiri Pirko wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
 > 
-> This seems like the best option to me. As Jason already said, the debugging
-> technique is not affected significantly, if the warning just occurs
-> asynchronously later. The module can be already unloaded at that point, as
-> the leak is never checked programatically anyway to control further
-> execution, it's just a splat in dmesg.
-
-Works for me!
-
-> > Specifically what I mean is that we can still claim a memory leak has
-> > occurred if one batched kfree_rcu freeing grace period has elapsed since
-> > the last call to kmem_cache_destroy_rcu_wait/barrier() or
-> > kmem_cache_destroy_rcu(). In that case, you quit blocking, or you quit
-> > asynchronously waiting, and then you splat about a memleak like we have
-> > now.
+> Add support for Byte Queue Limits (BQL).
 > 
-> Yes so we'd need the kmem_cache_free_barrier() for a slab kunit test (or the
-> pessimistic variant waiting for the 21 seconds), and a polling variant of
-> the same thing for the asynchronous destruction. Or we don't need a polling
-> variant if it's ok to invoke such a barrier in a schedule_work() workfn.
+> Tested on qemu emulated virtio_net device with 1, 2 and 4 queues.
+> Tested with fq_codel and pfifo_fast. Super netperf with 50 threads is
+> running in background. Netperf TCP_RR results:
 > 
-> We should not need any new kmem_cache flag nor kmem_cache_destroy() flag to
-> burden the users of kfree_rcu() with. We have __kmem_cache_shutdown() that
-> will try to flush everything immediately and if it doesn't succeed, we can
-> assume kfree_rcu() might be in flight and try to wait for it asynchronously,
-> without any flags.
-
-That does sound like a very attractive approach.
-
-> SLAB_TYPESAFE_BY_RCU is still handled specially because it has special
-> semantics as well.
+> NOBQL FQC 1q:  159.56  159.33  158.50  154.31    agv: 157.925
+> NOBQL FQC 2q:  184.64  184.96  174.73  174.15    agv: 179.62
+> NOBQL FQC 4q:  994.46  441.96  416.50  499.56    agv: 588.12
+> NOBQL PFF 1q:  148.68  148.92  145.95  149.48    agv: 148.2575
+> NOBQL PFF 2q:  171.86  171.20  170.42  169.42    agv: 170.725
+> NOBQL PFF 4q: 1505.23 1137.23 2488.70 3507.99    agv: 2159.7875
+>   BQL FQC 1q: 1332.80 1297.97 1351.41 1147.57    agv: 1282.4375
+>   BQL FQC 2q:  768.30  817.72  864.43  974.40    agv: 856.2125
+>   BQL FQC 4q:  945.66  942.68  878.51  822.82    agv: 897.4175
+>   BQL PFF 1q:  149.69  151.49  149.40  147.47    agv: 149.5125
+>   BQL PFF 2q: 2059.32  798.74 1844.12  381.80    agv: 1270.995
+>   BQL PFF 4q: 1871.98 4420.02 4916.59 13268.16   agv: 6119.1875
 > 
-> As for users of call_rcu() with arbitrary callbacks that might be functions
-> from the module that is about to unload, these should not return from
-> kmem_cache_destroy() with objects in flight. But those should be using
-> rcu_barrier() before calling kmem_cache_destroy() already, and probably we
-> should not try to handle this automagically? Maybe one potential change with
-> the described approach is that today they would get the "cache not empty"
-> warning immediately. But that wouldn't stop the module unload so later the
-> callbacks would try to execute unmapped code anyway. With the new approach
-> the asynchronous handling might delay the "cache not empty" warnings (or
-> not, if kmem_cache_free_barrier() would finish before a rcu_barrier() would)
-> so the unmapped code execution would come first. I don't think that would be
-> a regression.
+> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+> ---
+> v1->v2:
+> - moved netdev_tx_completed_queue() call into __free_old_xmit(),
+>   propagate use_napi flag to __free_old_xmit() and only call
+>   netdev_tx_completed_queue() in case it is true
+> - added forgotten call to netdev_tx_reset_queue()
+> - fixed stats for xdp packets
+> - fixed bql accounting when __free_old_xmit() is called from xdp path
+> - handle the !use_napi case in start_xmit() kick section
+> ---
+>  drivers/net/virtio_net.c | 50 +++++++++++++++++++++++++---------------
+>  1 file changed, 32 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 61a57d134544..5863c663ccab 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -84,7 +84,9 @@ struct virtnet_stat_desc {
+>  
+>  struct virtnet_sq_free_stats {
+>  	u64 packets;
+> +	u64 xdp_packets;
+>  	u64 bytes;
+> +	u64 xdp_bytes;
+>  };
+>  
+>  struct virtnet_sq_stats {
+> @@ -506,29 +508,33 @@ static struct xdp_frame *ptr_to_xdp(void *ptr)
+>  	return (struct xdp_frame *)((unsigned long)ptr & ~VIRTIO_XDP_FLAG);
+>  }
+>  
+> -static void __free_old_xmit(struct send_queue *sq, bool in_napi,
+> +static void __free_old_xmit(struct send_queue *sq, struct netdev_queue *txq,
+> +			    bool in_napi, bool use_napi,
+>  			    struct virtnet_sq_free_stats *stats)
+>  {
+>  	unsigned int len;
+>  	void *ptr;
+>  
+>  	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
+> -		++stats->packets;
+> -
+>  		if (!is_xdp_frame(ptr)) {
+>  			struct sk_buff *skb = ptr;
+>  
+>  			pr_debug("Sent skb %p\n", skb);
+>  
+> +			stats->packets++;
+>  			stats->bytes += skb->len;
+>  			napi_consume_skb(skb, in_napi);
+>  		} else {
+>  			struct xdp_frame *frame = ptr_to_xdp(ptr);
+>  
+> -			stats->bytes += xdp_get_frame_len(frame);
+> +			stats->xdp_packets++;
+> +			stats->xdp_bytes += xdp_get_frame_len(frame);
+>  			xdp_return_frame(frame);
+>  		}
+>  	}
+> +	if (use_napi)
+> +		netdev_tx_completed_queue(txq, stats->packets, stats->bytes);
+> +
+>  }
+>  
+>  /* Converting between virtqueue no. and kernel tx/rx queue no.
+> @@ -955,21 +961,22 @@ static void virtnet_rq_unmap_free_buf(struct virtqueue *vq, void *buf)
+>  	virtnet_rq_free_buf(vi, rq, buf);
+>  }
+>  
+> -static void free_old_xmit(struct send_queue *sq, bool in_napi)
+> +static void free_old_xmit(struct send_queue *sq, struct netdev_queue *txq,
+> +			  bool in_napi, bool use_napi)
+>  {
+>  	struct virtnet_sq_free_stats stats = {0};
+>  
+> -	__free_old_xmit(sq, in_napi, &stats);
+> +	__free_old_xmit(sq, txq, in_napi, use_napi, &stats);
+>  
+>  	/* Avoid overhead when no packets have been processed
+>  	 * happens when called speculatively from start_xmit.
+>  	 */
+> -	if (!stats.packets)
+> +	if (!stats.packets && !stats.xdp_packets)
+>  		return;
+>  
+>  	u64_stats_update_begin(&sq->stats.syncp);
+> -	u64_stats_add(&sq->stats.bytes, stats.bytes);
+> -	u64_stats_add(&sq->stats.packets, stats.packets);
+> +	u64_stats_add(&sq->stats.bytes, stats.bytes + stats.xdp_bytes);
+> +	u64_stats_add(&sq->stats.packets, stats.packets + stats.xdp_packets);
+>  	u64_stats_update_end(&sq->stats.syncp);
+>  }
+>  
+> @@ -1003,7 +1010,9 @@ static void check_sq_full_and_disable(struct virtnet_info *vi,
+>  	 * early means 16 slots are typically wasted.
+>  	 */
+>  	if (sq->vq->num_free < 2+MAX_SKB_FRAGS) {
+> -		netif_stop_subqueue(dev, qnum);
+> +		struct netdev_queue *txq = netdev_get_tx_queue(dev, qnum);
+> +
+> +		netif_tx_stop_queue(txq);
+>  		u64_stats_update_begin(&sq->stats.syncp);
+>  		u64_stats_inc(&sq->stats.stop);
+>  		u64_stats_update_end(&sq->stats.syncp);
+> @@ -1012,7 +1021,7 @@ static void check_sq_full_and_disable(struct virtnet_info *vi,
+>  				virtqueue_napi_schedule(&sq->napi, sq->vq);
+>  		} else if (unlikely(!virtqueue_enable_cb_delayed(sq->vq))) {
+>  			/* More just got used, free them then recheck. */
+> -			free_old_xmit(sq, false);
+> +			free_old_xmit(sq, txq, false, use_napi);
+>  			if (sq->vq->num_free >= 2+MAX_SKB_FRAGS) {
+>  				netif_start_subqueue(dev, qnum);
+>  				u64_stats_update_begin(&sq->stats.syncp);
+> @@ -1138,7 +1147,8 @@ static int virtnet_xdp_xmit(struct net_device *dev,
+>  	}
+>  
+>  	/* Free up any pending old buffers before queueing new ones. */
+> -	__free_old_xmit(sq, false, &stats);
+> +	__free_old_xmit(sq, netdev_get_tx_queue(dev, sq - vi->sq),
+> +			false, sq->napi.weight, &stats);
 
-Agreed.
 
-There are some use cases where a call_rcu() from a module without an
-rcu_barrier() would be OK, for example, if the callback function was
-defined in the core kernel and either: (1) The memory was from kmalloc()
-or (2) The memory was from kmem_cache_alloc() and your suggested
-changes above have been applied.  My current belief is that these are
-too special of cases to be worth optimizing for, so that the rule should
-remain "If you use call_rcu() in a module, you must call rcu_barrier()
-within the module-unload code."
+So what happens if sq->napi.weight changes while packet is in the queue?
+What prevents that?
 
-There have been discussions of having module-unload automatically invoke
-rcu_barrier() if needed, but thus far we have not come up with a good
-way to do this.  Challenges include things like static inline functions
-from the core kernel invoking call_rcu(), in which case how to figure
-out that the rcu_barrier() is not needed?
 
-							Thanx, Paul
+
+>  
+>  	for (i = 0; i < n; i++) {
+>  		struct xdp_frame *xdpf = frames[i];
+> @@ -2313,7 +2323,7 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
+>  
+>  		do {
+>  			virtqueue_disable_cb(sq->vq);
+> -			free_old_xmit(sq, true);
+> +			free_old_xmit(sq, txq, true, true);
+>  		} while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
+>  
+>  		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
+> @@ -2412,6 +2422,7 @@ static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
+>  		goto err_xdp_reg_mem_model;
+>  
+>  	virtnet_napi_enable(vi->rq[qp_index].vq, &vi->rq[qp_index].napi);
+> +	netdev_tx_reset_queue(netdev_get_tx_queue(vi->dev, qp_index));
+>  	virtnet_napi_tx_enable(vi, vi->sq[qp_index].vq, &vi->sq[qp_index].napi);
+>  
+>  	return 0;
+> @@ -2471,7 +2482,7 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
+>  	txq = netdev_get_tx_queue(vi->dev, index);
+>  	__netif_tx_lock(txq, raw_smp_processor_id());
+>  	virtqueue_disable_cb(sq->vq);
+> -	free_old_xmit(sq, true);
+> +	free_old_xmit(sq, txq, true, true);
+>  
+>  	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
+>  		if (netif_tx_queue_stopped(txq)) {
+> @@ -2559,17 +2570,18 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
+>  	struct send_queue *sq = &vi->sq[qnum];
+>  	int err;
+>  	struct netdev_queue *txq = netdev_get_tx_queue(dev, qnum);
+> -	bool kick = !netdev_xmit_more();
+> +	bool xmit_more = netdev_xmit_more();
+>  	bool use_napi = sq->napi.weight;
+> +	bool kick;
+>  
+>  	/* Free up any pending old buffers before queueing new ones. */
+>  	do {
+>  		if (use_napi)
+>  			virtqueue_disable_cb(sq->vq);
+>  
+> -		free_old_xmit(sq, false);
+> +		free_old_xmit(sq, txq, false, use_napi);
+>  
+> -	} while (use_napi && kick &&
+> +	} while (use_napi && !xmit_more &&
+>  	       unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
+>  
+>  	/* timestamp packet in software */
+> @@ -2598,7 +2610,9 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
+>  
+>  	check_sq_full_and_disable(vi, dev, sq);
+>  
+> -	if (kick || netif_xmit_stopped(txq)) {
+> +	kick = use_napi ? __netdev_tx_sent_queue(txq, skb->len, xmit_more) :
+> +			  !xmit_more && netif_xmit_stopped(txq);
+> +	if (kick) {
+>  		if (virtqueue_kick_prepare(sq->vq) && virtqueue_notify(sq->vq)) {
+>  			u64_stats_update_begin(&sq->stats.syncp);
+>  			u64_stats_inc(&sq->stats.kicks);
+> -- 
+> 2.45.1
+
 
