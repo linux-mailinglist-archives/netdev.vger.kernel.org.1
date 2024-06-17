@@ -1,270 +1,575 @@
-Return-Path: <netdev+bounces-103949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 517A790A7E3
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:57:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31BC590A824
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 10:09:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F862B2727B
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 07:57:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF7511F23DE5
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 08:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B322918FDBC;
-	Mon, 17 Jun 2024 07:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 423DE18FDC8;
+	Mon, 17 Jun 2024 08:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="kXnWeXGN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CB919005D;
-	Mon, 17 Jun 2024 07:56:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B3A18628D
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 08:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718611016; cv=none; b=i1zI2ctnY/NK65heQyEcUMsGn7fFthXvb4K+AaQ/QHtsj94RCpROgrnXVOR5bwk2i28FmN91x+Z1Lyc+HTlnsED0GyEkhVeVIgRiS6I4ACVssKbCX1ibnmBGOUf88qrtnDkhPjIZEhsiZN+mWB5+aK9CEyIIbtwY4cobzTwGqC8=
+	t=1718611740; cv=none; b=d9CkFBo7EuoVCuoaCFFfvfhGmRr/X70Scv+mzJDQSw5pJ0HonTs/nrJkdZ8NQmvIEt78yATPtTuHRr+PoS4tZVqXlYutgnvtDXirR2KtFzQ4Zu1AZ1LnIMFNBp8uRXoA31qsuQdra2mQFdnvUPN81R8GOh9754M1QsW14mdu2PA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718611016; c=relaxed/simple;
-	bh=MYjaPWxvd0zWSAPoX2STJiQiDpNqeno+Fw71ehmaaAE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=V/nJqWfT4TJ3e879mINDh6CpXxP+8atzwxK19oygoO7K+L6vLkxhbwcAtUc7OJhGpOSAlfXaeX/Ix+xxJ1Cgw8Mx7M6JE1Ccy7qpWr+nTvfoTPx5ZhXKSa/rR/T6tzN8Wtl8NFz04/ZccjFtKDltB1r6E1mc6voZljEXBjJdgZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 241da90a2c7f11ef9305a59a3cc225df-20240617
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.38,REQID:edb0b905-6b20-4754-b49c-d4320a87b90d,IP:10,
-	URL:0,TC:0,Content:-25,EDM:-25,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,
-	ACTION:release,TS:-55
-X-CID-INFO: VERSION:1.1.38,REQID:edb0b905-6b20-4754-b49c-d4320a87b90d,IP:10,UR
-	L:0,TC:0,Content:-25,EDM:-25,RT:0,SF:-15,FILE:0,BULK:0,RULE:EDM_GE969F26,A
-	CTION:release,TS:-55
-X-CID-META: VersionHash:82c5f88,CLOUDID:e36f6093ae4c588f80860c67b85a17f9,BulkI
-	D:240617155646E5UZ8R2Y,BulkQuantity:0,Recheck:0,SF:17|19|44|66|24|102,TC:n
-	il,Content:0,EDM:1|19,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,
-	COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: 241da90a2c7f11ef9305a59a3cc225df-20240617
-Received: from node2.com.cn [(39.156.73.10)] by mailgw.kylinos.cn
-	(envelope-from <luoxuanqiang@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 218619999; Mon, 17 Jun 2024 15:56:45 +0800
-Received: from node2.com.cn (localhost [127.0.0.1])
-	by node2.com.cn (NSMail) with SMTP id A31C0B80758A;
-	Mon, 17 Jun 2024 15:56:44 +0800 (CST)
-X-ns-mid: postfix-666FEC3C-52643062
-Received: from localhost.localdomain (unknown [10.42.12.252])
-	by node2.com.cn (NSMail) with ESMTPA id A7BA1B80758A;
-	Mon, 17 Jun 2024 07:56:40 +0000 (UTC)
-From: luoxuanqiang <luoxuanqiang@kylinos.cn>
-To: edumazet@google.com
-Cc: kuniyu@amazon.com,
-	davem@davemloft.net,
-	dccp@vger.kernel.org,
-	dsahern@kernel.org,
-	fw@strlen.de,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	alexandre.ferrieux@orange.com
-Subject: [PATCH net v3] Fix race for duplicate reqsk on identical SYN
-Date: Mon, 17 Jun 2024 15:56:40 +0800
-Message-Id: <20240617075640.207570-1-luoxuanqiang@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1718611740; c=relaxed/simple;
+	bh=OjNyNLrCJcKH0nNeI5uFHGiJJgaa2WZleuHU6NxEwg8=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=dX0TgeCvtNLlhkU3uciKPZk7K/BXUjFH6hnT0QVVIfK79Zk3/grXqwmsK5PfToIT6a1JinlvRe9cFGNRaNi9hiICKzCDS75ydUiHc4uvs92JQl8ARoTooyiQ52xkUUtP5AKPx5cPYSpoMptOYUjTt14TeoIE+f0T/a2s2YMXAq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=kXnWeXGN; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1718611728; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=baTGbjOXYj2449XpstO0V/eCJsz986nZ4IK+u8zw7Mg=;
+	b=kXnWeXGNcxzxSz7RUcPQplaqSb4GKvTsf+YyfWSjlTZnI+CifVrYZXdaDsD33p3x4EaSzqS1L1J0OYUfqAqjCEr1EHBjcrZvxTJyDdWLYD7SjAP6sIVcHHJDJretqhl5BzMmN9Mg3feKs7nqr3JpD130aVPFFiX4fca/7rKikSY=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045075189;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0W8b91p-_1718611727;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W8b91p-_1718611727)
+          by smtp.aliyun-inc.com;
+          Mon, 17 Jun 2024 16:08:48 +0800
+Message-ID: <1718609268.7814527-9-hengqi@linux.alibaba.com>
+Subject: Re: [PATCH net-next v3 4/4] virtio_net: improve dim command request efficiency
+Date: Mon, 17 Jun 2024 15:27:48 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org,
+ virtualization@lists.linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20240606061446.127802-1-hengqi@linux.alibaba.com>
+ <20240606061446.127802-5-hengqi@linux.alibaba.com>
+ <CACGkMEuFJ=xeeBt9GiCLj8AeJg-u-JG4F9_+8vBoH4dhZ-z=3Q@mail.gmail.com>
+In-Reply-To: <CACGkMEuFJ=xeeBt9GiCLj8AeJg-u-JG4F9_+8vBoH4dhZ-z=3Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
 
-When bonding is configured in BOND_MODE_BROADCAST mode, if two identical
-SYN packets are received at the same time and processed on different CPUs=
-,
-it can potentially create the same sk (sock) but two different reqsk
-(request_sock) in tcp_conn_request().
+On Mon, 17 Jun 2024 12:05:30 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Thu, Jun 6, 2024 at 2:15=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.com>=
+ wrote:
+> >
+> > Currently, control vq handles commands synchronously,
+> > leading to increased delays for dim commands during multi-queue
+> > VM configuration and directly impacting dim performance.
+> >
+> > To address this, we are shifting to asynchronous processing of
+> > ctrlq's dim commands.
+> >
+> > Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> > ---
+> >  drivers/net/virtio_net.c | 233 ++++++++++++++++++++++++++++++++++-----
+> >  1 file changed, 208 insertions(+), 25 deletions(-)
+> >
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index e59e12bb7601..0338528993ab 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -376,6 +376,13 @@ struct control_buf {
+> >         struct completion completion;
+> >  };
+> >
+> > +struct virtnet_coal_node {
+> > +       struct control_buf ctrl;
+> > +       struct virtio_net_ctrl_coal_vq coal_vqs;
+> > +       bool is_coal_wait;
+> > +       struct list_head list;
+> > +};
+> > +
+> >  struct virtnet_info {
+> >         struct virtio_device *vdev;
+> >         struct virtqueue *cvq;
+> > @@ -420,6 +427,9 @@ struct virtnet_info {
+> >         /* Lock to protect the control VQ */
+> >         struct mutex cvq_lock;
+> >
+> > +       /* Work struct for acquisition of cvq processing results. */
+> > +       struct work_struct get_cvq;
+> > +
+> >         /* Host can handle any s/g split between our header and packet =
+data */
+> >         bool any_header_sg;
+> >
+> > @@ -464,6 +474,14 @@ struct virtnet_info {
+> >         struct virtnet_interrupt_coalesce intr_coal_tx;
+> >         struct virtnet_interrupt_coalesce intr_coal_rx;
+> >
+> > +       /* Free nodes used for concurrent delivery */
+> > +       struct mutex coal_free_lock;
+> > +       struct list_head coal_free_list;
+> > +
+> > +       /* Filled when there are no free nodes or cvq buffers */
+> > +       struct mutex coal_wait_lock;
+> > +       struct list_head coal_wait_list;
+> > +
+> >         unsigned long guest_offloads;
+> >         unsigned long guest_offloads_capable;
+> >
+> > @@ -670,7 +688,7 @@ static void virtnet_cvq_done(struct virtqueue *cvq)
+> >  {
+> >         struct virtnet_info *vi =3D cvq->vdev->priv;
+> >
+> > -       complete(&vi->ctrl->completion);
+> > +       schedule_work(&vi->get_cvq);
+> >  }
+> >
+> >  static void skb_xmit_done(struct virtqueue *vq)
+> > @@ -2696,7 +2714,7 @@ static bool virtnet_send_command_reply(struct vir=
+tnet_info *vi,
+> >                                        struct scatterlist *in)
+> >  {
+> >         struct scatterlist *sgs[5], hdr, stat;
+> > -       u32 out_num =3D 0, tmp, in_num =3D 0;
+> > +       u32 out_num =3D 0, in_num =3D 0;
+> >         int ret;
+> >
+> >         /* Caller should know better */
+> > @@ -2730,14 +2748,14 @@ static bool virtnet_send_command_reply(struct v=
+irtnet_info *vi,
+> >                 return false;
+> >         }
+> >
+> > -       if (unlikely(!virtqueue_kick(vi->cvq)))
+> > -               goto unlock;
+> > +       if (unlikely(!virtqueue_kick(vi->cvq))) {
+> > +               mutex_unlock(&vi->cvq_lock);
+> > +               return false;
+> > +       }
+> > +       mutex_unlock(&vi->cvq_lock);
+> >
+> > -       wait_for_completion(&vi->ctrl->completion);
+> > -       virtqueue_get_buf(vi->cvq, &tmp);
+> > +       wait_for_completion(&ctrl->completion);
+> >
+> > -unlock:
+> > -       mutex_unlock(&vi->cvq_lock);
+> >         return ctrl->status =3D=3D VIRTIO_NET_OK;
+> >  }
+> >
+> > @@ -2747,6 +2765,86 @@ static bool virtnet_send_command(struct virtnet_=
+info *vi, u8 class, u8 cmd,
+> >         return virtnet_send_command_reply(vi, class, cmd, vi->ctrl, out=
+, NULL);
+> >  }
+> >
+> > +static void virtnet_process_dim_cmd(struct virtnet_info *vi,
+> > +                                   struct virtnet_coal_node *node)
+> > +{
+> > +       u16 qnum =3D le16_to_cpu(node->coal_vqs.vqn) / 2;
+> > +
+> > +       mutex_lock(&vi->rq[qnum].dim_lock);
+> > +       vi->rq[qnum].intr_coal.max_usecs =3D
+> > +               le32_to_cpu(node->coal_vqs.coal.max_usecs);
+> > +       vi->rq[qnum].intr_coal.max_packets =3D
+> > +               le32_to_cpu(node->coal_vqs.coal.max_packets);
+> > +       vi->rq[qnum].dim.state =3D DIM_START_MEASURE;
+> > +       mutex_unlock(&vi->rq[qnum].dim_lock);
+> > +
+> > +       if (node->is_coal_wait) {
+> > +               mutex_lock(&vi->coal_wait_lock);
+> > +               list_del(&node->list);
+> > +               mutex_unlock(&vi->coal_wait_lock);
+> > +               kfree(node);
+> > +       } else {
+> > +               mutex_lock(&vi->coal_free_lock);
+> > +               list_add(&node->list, &vi->coal_free_list);
+> > +               mutex_unlock(&vi->coal_free_lock);
+> > +       }
+> > +}
+> > +
+> > +static int virtnet_add_dim_command(struct virtnet_info *vi,
+> > +                                  struct virtnet_coal_node *coal_node)
+> > +{
+> > +       struct scatterlist sg;
+> > +       int ret;
+> > +
+> > +       sg_init_one(&sg, &coal_node->coal_vqs, sizeof(coal_node->coal_v=
+qs));
+> > +       ret =3D virtnet_send_command_reply(vi, VIRTIO_NET_CTRL_NOTF_COA=
+L,
+> > +                                        VIRTIO_NET_CTRL_NOTF_COAL_VQ_S=
+ET,
+> > +                                        &coal_node->ctrl, &sg, NULL);
+> > +       if (!ret) {
+> > +               dev_warn(&vi->dev->dev,
+> > +                        "Failed to change coalescing params.\n");
+> > +               return ret;
+> > +       }
+> > +
+> > +       virtnet_process_dim_cmd(vi, coal_node);
+> > +
+> > +       return 0;
+> > +}
+> > +
+> > +static void virtnet_get_cvq_work(struct work_struct *work)
+> > +{
+> > +       struct virtnet_info *vi =3D
+> > +               container_of(work, struct virtnet_info, get_cvq);
+> > +       struct virtnet_coal_node *wait_coal;
+> > +       bool valid =3D false;
+> > +       unsigned int tmp;
+> > +       void *res;
+> > +
+> > +       mutex_lock(&vi->cvq_lock);
+> > +       while ((res =3D virtqueue_get_buf(vi->cvq, &tmp)) !=3D NULL) {
+> > +               complete((struct completion *)res);
+> > +               valid =3D true;
+> > +       }
+> > +       mutex_unlock(&vi->cvq_lock);
+>=20
+> How could we synchronize with the device in this case?
+>=20
+> E.g what happens if the device finishes another buf here?
 
-These two different reqsk will respond with two SYNACK packets, and since
-the generation of the seq (ISN) incorporates a timestamp, the final two
-SYNACK packets will have different seq values.
+That's a good question. I think we can solve it using the following snippet?
 
-The consequence is that when the Client receives and replies with an ACK
-to the earlier SYNACK packet, we will reset(RST) it.
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index e59e12bb7601..5dc3e1244016 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+@@ -420,6 +427,12 @@ struct virtnet_info {
+        /* Lock to protect the control VQ */
+        struct mutex cvq_lock;
 
-This behavior is consistently reproducible in my local setup,
-which comprises:
++       /* Atomic to confirm whether the cvq work is scheduled. */
++       atomic_t scheduled;
++
++       /* Work struct for acquisition of cvq processing results. */
++       struct work_struct get_cvq;
++
 
-                  | NETA1 ------ NETB1 |
-PC_A --- bond --- |                    | --- bond --- PC_B
-                  | NETA2 ------ NETB2 |
 
-- PC_A is the Server and has two network cards, NETA1 and NETA2. I have
-  bonded these two cards using BOND_MODE_BROADCAST mode and configured
-  them to be handled by different CPU.
-
-- PC_B is the Client, also equipped with two network cards, NETB1 and
-  NETB2, which are also bonded and configured in BOND_MODE_BROADCAST mode=
-.
-
-If the client attempts a TCP connection to the server, it might encounter
-a failure. Capturing packets from the server side reveals:
-
-10.10.10.10.45182 > localhost: Flags [S], seq 320236027,
-10.10.10.10.45182 > localhost: Flags [S], seq 320236027,
-localhost > 10.10.10.10.45182: Flags [S.], seq 2967855116,
-localhost > 10.10.10.10.45182: Flags [S.], seq 2967855123, <=3D=3D
-10.10.10.10.45182 > localhost: Flags [.], ack 4294967290,
-10.10.10.10.45182 > localhost: Flags [.], ack 4294967290,
-localhost > 10.10.10.10.45182: Flags [R], seq 2967855117, <=3D=3D
-localhost > 10.10.10.10.45182: Flags [R], seq 2967855117,
-
-Two SYNACKs with different seq numbers are sent by localhost,
-resulting in an anomaly.
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-The attempted solution is as follows:
-In the tcp_conn_request(), while inserting reqsk into the ehash table,
-it also checks if an entry already exists. If found, it avoids
-reinsertion and releases it.
-
-Simultaneously, In the reqsk_queue_hash_req(), the start of the
-req->rsk_timer is adjusted to be after successful insertion.
-
-Signed-off-by: luoxuanqiang <luoxuanqiang@kylinos.cn>
----
- include/net/inet_connection_sock.h |  4 ++--
- net/dccp/ipv4.c                    |  2 +-
- net/dccp/ipv6.c                    |  2 +-
- net/ipv4/inet_connection_sock.c    | 19 +++++++++++++------
- net/ipv4/tcp_input.c               |  9 ++++++++-
- 5 files changed, 25 insertions(+), 11 deletions(-)
-
-diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connec=
-tion_sock.h
-index 7d6b1254c92d..8ebab6220dbc 100644
---- a/include/net/inet_connection_sock.h
-+++ b/include/net/inet_connection_sock.h
-@@ -263,8 +263,8 @@ struct dst_entry *inet_csk_route_child_sock(const str=
-uct sock *sk,
- struct sock *inet_csk_reqsk_queue_add(struct sock *sk,
- 				      struct request_sock *req,
- 				      struct sock *child);
--void inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_sock =
-*req,
--				   unsigned long timeout);
-+bool inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_sock =
-*req,
-+				   unsigned long timeout, bool *found_dup_sk);
- struct sock *inet_csk_complete_hashdance(struct sock *sk, struct sock *c=
-hild,
- 					 struct request_sock *req,
- 					 bool own_req);
-diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
-index ff41bd6f99c3..13aafdeb9205 100644
---- a/net/dccp/ipv4.c
-+++ b/net/dccp/ipv4.c
-@@ -657,7 +657,7 @@ int dccp_v4_conn_request(struct sock *sk, struct sk_b=
-uff *skb)
- 	if (dccp_v4_send_response(sk, req))
- 		goto drop_and_free;
-=20
--	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT);
-+	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT, NULL);
- 	reqsk_put(req);
- 	return 0;
-=20
-diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
-index 85f4b8fdbe5e..493cdb12ce2b 100644
---- a/net/dccp/ipv6.c
-+++ b/net/dccp/ipv6.c
-@@ -400,7 +400,7 @@ static int dccp_v6_conn_request(struct sock *sk, stru=
-ct sk_buff *skb)
- 	if (dccp_v6_send_response(sk, req))
- 		goto drop_and_free;
-=20
--	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT);
-+	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT, NULL);
- 	reqsk_put(req);
- 	return 0;
-=20
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_s=
-ock.c
-index d81f74ce0f02..2fa9b33ae26a 100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -1122,25 +1122,32 @@ static void reqsk_timer_handler(struct timer_list=
- *t)
- 	inet_csk_reqsk_queue_drop_and_put(oreq->rsk_listener, oreq);
- }
-=20
--static void reqsk_queue_hash_req(struct request_sock *req,
--				 unsigned long timeout)
-+static bool reqsk_queue_hash_req(struct request_sock *req,
-+				 unsigned long timeout, bool *found_dup_sk)
+@@ -670,7 +691,9 @@ static void virtnet_cvq_done(struct virtqueue *cvq)
  {
-+	if (!inet_ehash_insert(req_to_sk(req), NULL, found_dup_sk))
-+		return false;
-+
-+	/* The timer needs to be setup after a successful insertion. */
- 	timer_setup(&req->rsk_timer, reqsk_timer_handler, TIMER_PINNED);
- 	mod_timer(&req->rsk_timer, jiffies + timeout);
-=20
--	inet_ehash_insert(req_to_sk(req), NULL, NULL);
- 	/* before letting lookups find us, make sure all req fields
- 	 * are committed to memory and refcnt initialized.
- 	 */
- 	smp_wmb();
- 	refcount_set(&req->rsk_refcnt, 2 + 1);
-+	return true;
- }
-=20
--void inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_sock =
-*req,
--				   unsigned long timeout)
-+bool inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_sock =
-*req,
-+				   unsigned long timeout, bool *found_dup_sk)
- {
--	reqsk_queue_hash_req(req, timeout);
-+	if (!reqsk_queue_hash_req(req, timeout, found_dup_sk))
-+		return false;
-+
- 	inet_csk_reqsk_queue_added(sk);
-+	return true;
- }
- EXPORT_SYMBOL_GPL(inet_csk_reqsk_queue_hash_add);
-=20
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 9c04a9c8be9d..e006c374f781 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -7255,8 +7255,15 @@ int tcp_conn_request(struct request_sock_ops *rsk_=
-ops,
- 	} else {
- 		tcp_rsk(req)->tfo_listener =3D false;
- 		if (!want_cookie) {
-+			bool found_dup_sk =3D false;
-+
- 			req->timeout =3D tcp_timeout_init((struct sock *)req);
--			inet_csk_reqsk_queue_hash_add(sk, req, req->timeout);
-+			if (unlikely(!inet_csk_reqsk_queue_hash_add(sk, req, req->timeout,
-+								    &found_dup_sk))) {
-+				reqsk_free(req);
-+				return 0;
-+			}
-+
- 		}
- 		af_ops->send_synack(sk, dst, &fl, req, &foc,
- 				    !want_cookie ? TCP_SYNACK_NORMAL :
---=20
-2.25.1
+        struct virtnet_info *vi =3D cvq->vdev->priv;
 
+-       complete(&vi->ctrl->completion);
++       virtqueue_disable_cb(cvq);
++       if (!atomic_xchg(&vi->scheduled, 1))
++               schedule_work(&vi->get_cvq);
+ }
+
+
++static void virtnet_get_cvq_work(struct work_struct *work)
++{
++       struct virtnet_info *vi =3D
++               container_of(work, struct virtnet_info, get_cvq);
++       struct virtnet_coal_node *wait_coal;
++       bool valid =3D false;
++       unsigned int tmp;
++       void *res;
++
++       mutex_lock(&vi->cvq_lock);
++       while ((res =3D virtqueue_get_buf(vi->cvq, &tmp)) !=3D NULL) {
++               complete((struct completion *)res);
++               valid =3D true;
++       }
++       mutex_unlock(&vi->cvq_lock);
++
++       atomic_set(&vi->scheduled, 0);
++       virtqueue_enable_cb_prepare(vi->cvq);
++}
+
+>=20
+> > +
+> > +       if (!valid)
+> > +               return;
+> > +
+> > +       while (true) {
+> > +               wait_coal =3D NULL;
+> > +               mutex_lock(&vi->coal_wait_lock);
+> > +               if (!list_empty(&vi->coal_wait_list))
+> > +                       wait_coal =3D list_first_entry(&vi->coal_wait_l=
+ist,
+> > +                                                    struct virtnet_coa=
+l_node,
+> > +                                                    list);
+> > +               mutex_unlock(&vi->coal_wait_lock);
+> > +               if (wait_coal)
+> > +                       if (virtnet_add_dim_command(vi, wait_coal))
+> > +                               break;
+> > +               else
+> > +                       break;
+> > +       }
+>=20
+> This is still an ad-hoc optimization for dim in the general path here.
+>=20
+> Could we have a fn callback so for non dim it's just a completion and
+> for dim it would be a schedule_work()?
+>=20
+
+OK, I will try this.
+
+And how about this :
+
++static void virtnet_cvq_work_sched(struct virtqueue *cvq)
++{
++       struct virtnet_info *vi =3D cvq->vdev->priv;
++
++       virtqueue_disable_cb(cvq);
++       if (!atomic_xchg(&vi->scheduled, 1))
++               schedule_work(&vi->get_cvq);
++}
++
+ static void virtnet_cvq_done(struct virtqueue *cvq)
+ {
+        struct virtnet_info *vi =3D cvq->vdev->priv;
++       unsigned int tmp;
+
++       virtqueue_get_buf(vi->cvq, &tmp);
+        complete(&vi->ctrl->completion);
+ }
+
+@@ -5318,7 +5472,11 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+
+        /* Parameters for control virtqueue, if any */
+        if (vi->has_cvq) {
+-               callbacks[total_vqs - 1] =3D virtnet_cvq_done;
++               if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
++                       callbacks[total_vqs - 1] =3D virtnet_cvq_work_sched;
++               else
++                       callbacks[total_vqs - 1] =3D virtnet_cvq_done;
++
+                names[total_vqs - 1] =3D "control";
+        }
+
+> > +}
+> >  static int virtnet_set_mac_address(struct net_device *dev, void *p)
+> >  {
+> >         struct virtnet_info *vi =3D netdev_priv(dev);
+> > @@ -4398,35 +4496,73 @@ static int virtnet_send_notf_coal_vq_cmds(struc=
+t virtnet_info *vi,
+> >         return 0;
+> >  }
+> >
+> > +static void virtnet_put_wait_coal(struct virtnet_info *vi,
+> > +                                 struct receive_queue *rq,
+> > +                                 struct dim_cq_moder moder)
+> > +{
+> > +       struct virtnet_coal_node *wait_node;
+> > +
+> > +       wait_node =3D kzalloc(sizeof(*wait_node), GFP_KERNEL);
+> > +       if (!wait_node) {
+> > +               rq->dim.state =3D DIM_START_MEASURE;
+> > +               return;
+> > +       }
+> > +
+> > +       wait_node->is_coal_wait =3D true;
+> > +       wait_node->coal_vqs.vqn =3D cpu_to_le16(rxq2vq(rq - vi->rq));
+> > +       wait_node->coal_vqs.coal.max_usecs =3D cpu_to_le32(moder.usec);
+> > +       wait_node->coal_vqs.coal.max_packets =3D cpu_to_le32(moder.pkts=
+);
+> > +       mutex_lock(&vi->coal_wait_lock);
+> > +       list_add_tail(&wait_node->list, &vi->coal_wait_list);
+> > +       mutex_unlock(&vi->coal_wait_lock);
+> > +}
+> > +
+> >  static void virtnet_rx_dim_work(struct work_struct *work)
+> >  {
+> >         struct dim *dim =3D container_of(work, struct dim, work);
+> >         struct receive_queue *rq =3D container_of(dim,
+> >                         struct receive_queue, dim);
+> >         struct virtnet_info *vi =3D rq->vq->vdev->priv;
+> > -       struct net_device *dev =3D vi->dev;
+> > +       struct virtnet_coal_node *avail_coal;
+> >         struct dim_cq_moder update_moder;
+> > -       int qnum, err;
+> >
+> > -       qnum =3D rq - vi->rq;
+> > +       update_moder =3D net_dim_get_rx_moderation(dim->mode, dim->prof=
+ile_ix);
+> >
+> >         mutex_lock(&rq->dim_lock);
+> > -       if (!rq->dim_enabled)
+> > -               goto out;
+> > -
+> > -       update_moder =3D net_dim_get_rx_moderation(dim->mode, dim->prof=
+ile_ix);
+> > -       if (update_moder.usec !=3D rq->intr_coal.max_usecs ||
+> > -           update_moder.pkts !=3D rq->intr_coal.max_packets) {
+> > -               err =3D virtnet_send_rx_ctrl_coal_vq_cmd(vi, qnum,
+> > -                                                      update_moder.use=
+c,
+> > -                                                      update_moder.pkt=
+s);
+> > -               if (err)
+> > -                       pr_debug("%s: Failed to send dim parameters on =
+rxq%d\n",
+> > -                                dev->name, qnum);
+> > -               dim->state =3D DIM_START_MEASURE;
+> > +       if (!rq->dim_enabled ||
+> > +           (update_moder.usec =3D=3D rq->intr_coal.max_usecs &&
+> > +            update_moder.pkts =3D=3D rq->intr_coal.max_packets)) {
+> > +               rq->dim.state =3D DIM_START_MEASURE;
+> > +               mutex_unlock(&rq->dim_lock);
+> > +               return;
+> >         }
+> > -out:
+> >         mutex_unlock(&rq->dim_lock);
+> > +
+> > +       mutex_lock(&vi->cvq_lock);
+> > +       if (vi->cvq->num_free < 3) {
+> > +               virtnet_put_wait_coal(vi, rq, update_moder);
+> > +               mutex_unlock(&vi->cvq_lock);
+> > +               return;
+> > +       }
+>=20
+> Could we simply sleep instead of using a list here?
+
+Do you mean using a semaphore, or a waitqueue?
+
+>=20
+> > +       mutex_unlock(&vi->cvq_lock);
+> > +
+> > +       mutex_lock(&vi->coal_free_lock);
+> > +       if (list_empty(&vi->coal_free_list)) {
+> > +               virtnet_put_wait_coal(vi, rq, update_moder);
+> > +               mutex_unlock(&vi->coal_free_lock);
+> > +               return;
+> > +       }
+> > +
+> > +       avail_coal =3D list_first_entry(&vi->coal_free_list,
+> > +                                     struct virtnet_coal_node, list);
+> > +       avail_coal->coal_vqs.vqn =3D cpu_to_le16(rxq2vq(rq - vi->rq));
+> > +       avail_coal->coal_vqs.coal.max_usecs =3D cpu_to_le32(update_mode=
+r.usec);
+> > +       avail_coal->coal_vqs.coal.max_packets =3D cpu_to_le32(update_mo=
+der.pkts);
+> > +
+> > +       list_del(&avail_coal->list);
+> > +       mutex_unlock(&vi->coal_free_lock);
+> > +
+> > +       virtnet_add_dim_command(vi, avail_coal);
+> >  }
+> >
+> >  static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
+> > @@ -4839,6 +4975,7 @@ static void virtnet_freeze_down(struct virtio_dev=
+ice *vdev)
+> >         flush_work(&vi->config_work);
+> >         disable_rx_mode_work(vi);
+> >         flush_work(&vi->rx_mode_work);
+> > +       flush_work(&vi->get_cvq);
+> >
+> >         netif_tx_lock_bh(vi->dev);
+> >         netif_device_detach(vi->dev);
+> > @@ -5612,6 +5749,45 @@ static const struct xdp_metadata_ops virtnet_xdp=
+_metadata_ops =3D {
+> >         .xmo_rx_hash                    =3D virtnet_xdp_rx_hash,
+> >  };
+> >
+> > +static void virtnet_del_coal_free_list(struct virtnet_info *vi)
+> > +{
+> > +       struct virtnet_coal_node *coal_node, *tmp;
+> > +
+> > +       list_for_each_entry_safe(coal_node, tmp,  &vi->coal_free_list, =
+list) {
+> > +               list_del(&coal_node->list);
+> > +               kfree(coal_node);
+> > +       }
+> > +}
+> > +
+> > +static int virtnet_init_coal_list(struct virtnet_info *vi)
+> > +{
+> > +       struct virtnet_coal_node *coal_node;
+> > +       int batch_dim_nums;
+> > +       int i;
+> > +
+> > +       INIT_LIST_HEAD(&vi->coal_free_list);
+> > +       mutex_init(&vi->coal_free_lock);
+> > +
+> > +       INIT_LIST_HEAD(&vi->coal_wait_list);
+> > +       mutex_init(&vi->coal_wait_lock);
+> > +
+> > +       if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
+> > +               return 0;
+> > +
+> > +       batch_dim_nums =3D min((unsigned int)vi->max_queue_pairs,
+> > +                            virtqueue_get_vring_size(vi->cvq) / 3);
+> > +       for (i =3D 0; i < batch_dim_nums; i++) {
+> > +               coal_node =3D kzalloc(sizeof(*coal_node), GFP_KERNEL);
+> > +               if (!coal_node) {
+> > +                       virtnet_del_coal_free_list(vi);
+> > +                       return -ENOMEM;
+> > +               }
+> > +               list_add(&coal_node->list, &vi->coal_free_list);
+> > +       }
+> > +
+> > +       return 0;
+> > +}
+> > +
+> >  static int virtnet_probe(struct virtio_device *vdev)
+> >  {
+> >         int i, err =3D -ENOMEM;
+> > @@ -5797,6 +5973,9 @@ static int virtnet_probe(struct virtio_device *vd=
+ev)
+> >         if (err)
+> >                 goto free;
+> >
+> > +       if (virtnet_init_coal_list(vi))
+> > +               goto free;
+> > +
+> >         if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL)) {
+> >                 vi->intr_coal_rx.max_usecs =3D 0;
+> >                 vi->intr_coal_tx.max_usecs =3D 0;
+> > @@ -5838,6 +6017,7 @@ static int virtnet_probe(struct virtio_device *vd=
+ev)
+> >         if (vi->has_rss || vi->has_rss_hash_report)
+> >                 virtnet_init_default_rss(vi);
+> >
+> > +       INIT_WORK(&vi->get_cvq, virtnet_get_cvq_work);
+> >         init_completion(&vi->ctrl->completion);
+> >         enable_rx_mode_work(vi);
+> >
+> > @@ -5967,11 +6147,14 @@ static void virtnet_remove(struct virtio_device=
+ *vdev)
+> >         flush_work(&vi->config_work);
+> >         disable_rx_mode_work(vi);
+> >         flush_work(&vi->rx_mode_work);
+> > +       flush_work(&vi->get_cvq);
+>=20
+> Do we need to prevent cvq work from being scheduled here?
+
+You are right, I'll fix in the next version.
+
+Thanks!
+
+>=20
+> Thanks
+>=20
+> >
+> >         unregister_netdev(vi->dev);
+> >
+> >         net_failover_destroy(vi->failover);
+> >
+> > +       virtnet_del_coal_free_list(vi);
+> > +
+> >         remove_vq_common(vi);
+> >
+> >         free_netdev(vi->dev);
+> > --
+> > 2.32.0.3.g01195cf9f
+> >
+>=20
 
