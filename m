@@ -1,271 +1,121 @@
-Return-Path: <netdev+bounces-104041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D648E90AF1B
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:24:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F16190AFD0
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:44:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B6D32894A4
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:24:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 851E01C24081
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05864198E6E;
-	Mon, 17 Jun 2024 13:20:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4CF1BD4FE;
+	Mon, 17 Jun 2024 13:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AkyQDocK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ow2GLpYf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170A7197A88;
-	Mon, 17 Jun 2024 13:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830351BD4F7;
+	Mon, 17 Jun 2024 13:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718630445; cv=none; b=oTe7oK4bxZ7pHbBAq0+w1ZHRmj2+Jy+a1gUWMr9gcL0Uro3QZEPrVpOID8g0R19+eFTJJ4vswW2DwCA5TDQuCOm+hMw1dCSCI2Q3pc1E6jzL2fHn52EaMreF9dJFS0nNOV0sOq/AeIaGuQ990xu6Z4pdBe+XoPyHc8EZcAHGFr4=
+	t=1718630610; cv=none; b=fcG0lLjARjrEbReux51MKWGeq2f2Le++wjllCLnTD68yE+v1NY5HYONEbJqm2yCcFmfM1dbYjaw0ez2E9h7SgBVfHL6oi/4PTuH/newMDDjDJWqtftPXti/8T8FIWKz9c7dUrHBMBaz/zINjvXiJTxHXRHEaQZ+YFm9utc2Pwm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718630445; c=relaxed/simple;
-	bh=1nrAD4KfLSnRE+kqydRysazLWCkP8jJyqBGQ4Hd6vr8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eL+lleYxG/K/uGosnkev+hauwd374azZyCbeGClCBCl6PvtPJryZFjeXwY3jmV0Prkky5Pc6Go4bO93mRP6/wBfi7TqxMZa+ecII5cFMU+cZ12Jt9PTHT4uYZ0pyZs4ov8CgPLoexsXOmqOb3V5t6NsaaKcXcqakOa2FhJLHpDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AkyQDocK; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a6e43dad8ecso757187366b.1;
-        Mon, 17 Jun 2024 06:20:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718630442; x=1719235242; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FUae8JuWsbpwcHSTs/RVPWcmF5+7RW32qrRGZUORids=;
-        b=AkyQDocKAkm3wA9QKpVyA3+wOLD0HS9GSqpOg028xfcDzF0NXcxR7vcJdrRuk8BCm0
-         8KqsHCGdRdaSb+BG3REBtMo2QJzpAManHpxrDaml23UuYF3xADfRvaAaF4D0/7H6FGNt
-         XRZeA8rGZIZadbca/QlvcGf910sTa6sN4xriq4khh9cBbzeutPi1bOOh0U6S0JxZKOrH
-         uxNW/oKCbgi2MMt+7jV4g2dp+NG/lXZDbFTeaS/U3SXhKsdumymUnwXjrP+b+TXdw/r2
-         Ly4F/kQaRpO8v9/rV2L52II6ETsHg/5NyC3LdK5JpJzdTnGUHWN0CX/n7JM1FBkCb/Gm
-         86+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718630442; x=1719235242;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FUae8JuWsbpwcHSTs/RVPWcmF5+7RW32qrRGZUORids=;
-        b=ZW+V9G2epyh/KysUSiJ3x6oFhva4gSbBZobC2IGmmKvo74OM/IAm/4GoYoRetDYNt8
-         avo0ItGEBpady45+/IMqqJp5jJ7cWNx4lvbRkByEc8ywgw3/64nwnlPXlwkdb+LLaHgP
-         lC+DAepvktzbIdHQY9vjtHgLNMJwFu8NRNXREybx3rL43mUqKzGPMJITQ+dBtcPjBKnh
-         mppseJrch7EgVnBnPyoyXYLct6yeQ1Y21fLAJjHUGAtN5b0afp5r5N6Uv0EmN5qZuvnx
-         ybjjwr5giPJ5/I/ZXlEn9GWXEkNCgXnJSiTZWZigKE8PXrld4U48ZdeM242Q2lQkCpoz
-         u2AA==
-X-Forwarded-Encrypted: i=1; AJvYcCWchIxPUAgYDKe3Rr9kUh/w5051MexNXM1Qtynww3WkOaMBsaGkp/uGYI/gGA4U8fzq5saajeMe8IsEiaRA5YmLXgoV1tzOwgVb7t6fX2QOhze/m7nL0gUzDE3iDCSX+h/Zqs/fg1rQK8nFSfhYT2bAIRuiEBXk0BGqnw8BmLztJUYvE4F7/XZuKHOkikZJbcm75UL6JFBFUzkbbuIbVq2rn5KEcG/j7QAu6tjI3U7C5ZHFRVnfHM7msW3S6v6CGa0u+l/PdnOm9OUdi8xWOfqx70MUJGgEXmU3HQ7t5/ZvqVIaqb0uLK7qEdbzqFFlJ8P4stRe/tFX+WiPXxIgCyTrS+J17I+3PwmZUNj8rRMJ101KlpEppk/2tnHkYDY5rmCjuT+ZRM57NsTdfRFc+BG+xEzLrgxDieBoZ4i4RF03Zej3rFEjnE+TPWQaO90ZnFvOUlvVaSaLZ8wtuaqJF6Zdqezo2i643SBzlfi9SleWIYDRD0TxrwzMZiT2ba151+0xniCJhmXHR09Y19/j6fLZM9CBBx8zNTjk9GxndZS5/vUUFe1kO9+1
-X-Gm-Message-State: AOJu0YxbwIZI1DTTNzRaxcvZNypArwvupsJuQ57jOCJWMQ5vs5nTECdq
-	G0I0m7viSD1k+3bOgVDZXs980Kq2FkNRW/FnrwEr5vb4ub9vtvnSLtqi+S/U
-X-Google-Smtp-Source: AGHT+IHyYrCA4cWOAfaQmJOiDF7VHhRCpPr7ss5P86Xw14pxsXCUj8adUxCN6A9F4atdUbL10vfY8g==
-X-Received: by 2002:a17:906:354e:b0:a6f:c17:1572 with SMTP id a640c23a62f3a-a6f5247429amr788950266b.33.1718630442157;
-        Mon, 17 Jun 2024 06:20:42 -0700 (PDT)
-Received: from [192.168.42.82] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56f41700sm514847966b.152.2024.06.17.06.20.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jun 2024 06:20:41 -0700 (PDT)
-Message-ID: <8cd3af33-3a86-478a-a5ac-462c2cca732a@gmail.com>
-Date: Mon, 17 Jun 2024 14:20:42 +0100
+	s=arc-20240116; t=1718630610; c=relaxed/simple;
+	bh=AN+qpo3ItwQXO5qFPg3qM/nxaDZ/P/Ny7NzmFypCeQg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UY+Wi0fEnUqkInqUiZE9DLq9W/R7DTpVb4WMohYjWHfvWO/eBvef+D9+g6DJSq9VLYViSMSBwVrznzGEvddxIUCzBOgIBKWVnGGFY+EXKBn7jd5zO408+fdUkA77o7KZ0y8mC11YopB7Lr26Fn3j041Z1aiFYD+aE/+MpEG3Nn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ow2GLpYf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEDADC4AF50;
+	Mon, 17 Jun 2024 13:23:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718630610;
+	bh=AN+qpo3ItwQXO5qFPg3qM/nxaDZ/P/Ny7NzmFypCeQg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ow2GLpYfIyhX9hxm8SGOzBy4/yHAOh1BG3tjCRDs8mAp58N+10lS5N6nTYBnOxBlV
+	 jiilrZx5q7N+j4r/vLyhXJggYiXB1uM4OzhUQm2s5b0VwUjlNMOpCP81dbd/2WfUW4
+	 B8LeOH+pzNMNVsSF9p6zF0Oyt7R7lI32PtGaMJr+VgNkvjec5F1GIUsyGmiWXBo8+u
+	 IS6KiCvaszmbK3Z1hJ+JnvXcJSKOe0Kqhn3uXBopqR3sHCVHde3YmdOvlkETCNlboX
+	 cKb82IadGR+WaE6Hqv17y1ilHwpTOi2RVvsbP9+zIs+zSOw+BI7v5US5yCs8lru/CP
+	 sKnf3XwAaBnuw==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Nicolas Escande <nico.escande@gmail.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 11/35] wifi: mac80211: mesh: init nonpeer_pm to active by default in mesh sdata
+Date: Mon, 17 Jun 2024 09:22:09 -0400
+Message-ID: <20240617132309.2588101-11-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240617132309.2588101-1-sashal@kernel.org>
+References: <20240617132309.2588101-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 01/13] netdev: add netdev_rx_queue_restart()
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Sergey Shtylyov <s.shtylyov@omp.ru>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>,
- Nikolay Aleksandrov <razor@blackwall.org>, David Wei <dw@davidwei.uk>,
- Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>,
- Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-References: <20240613013557.1169171-1-almasrymina@google.com>
- <20240613013557.1169171-2-almasrymina@google.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20240613013557.1169171-2-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.6.34
+Content-Transfer-Encoding: 8bit
 
-On 6/13/24 02:35, Mina Almasry wrote:
-> Add netdev_rx_queue_restart() function to netdev_rx_queue.h
+From: Nicolas Escande <nico.escande@gmail.com>
 
-see nit below
+[ Upstream commit 6f6291f09a322c1c1578badac8072d049363f4e6 ]
 
-Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+With a ath9k device I can see that:
+	iw phy phy0 interface add mesh0 type mp
+	ip link set mesh0 up
+	iw dev mesh0 scan
 
+Will start a scan with the Power Management bit set in the Frame Control Field.
+This is because we set this bit depending on the nonpeer_pm variable of the mesh
+iface sdata and when there are no active links on the interface it remains to
+NL80211_MESH_POWER_UNKNOWN.
 
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> 
-> ---
-> 
-> v11:
-> - Fix not checking dev->queue_mgmt_ops (Pavel).
-> - Fix ndo_queue_mem_free call that passed the wrong pointer (David).
-> 
-> v9: https://lore.kernel.org/all/20240502045410.3524155-4-dw@davidwei.uk/
-> (submitted by David).
-> - fixed SPDX license identifier (Simon).
-> - Rebased on top of merged queue API definition, and changed
->    implementation to match that.
-> - Replace rtnl_lock() with rtnl_is_locked() to make it useable from my
->    netlink code where rtnl is already locked.
-> 
-> ---
->   include/net/netdev_rx_queue.h |  3 ++
->   net/core/Makefile             |  1 +
->   net/core/netdev_rx_queue.c    | 74 +++++++++++++++++++++++++++++++++++
->   3 files changed, 78 insertions(+)
->   create mode 100644 net/core/netdev_rx_queue.c
-> 
-> diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
-> index aa1716fb0e53c..e78ca52d67fbf 100644
-> --- a/include/net/netdev_rx_queue.h
-> +++ b/include/net/netdev_rx_queue.h
-> @@ -54,4 +54,7 @@ get_netdev_rx_queue_index(struct netdev_rx_queue *queue)
->   	return index;
->   }
->   #endif
-> +
-> +int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq);
-> +
->   #endif
-> diff --git a/net/core/Makefile b/net/core/Makefile
-> index 62be9aef25285..f82232b358a2c 100644
-> --- a/net/core/Makefile
-> +++ b/net/core/Makefile
-> @@ -19,6 +19,7 @@ obj-$(CONFIG_NETDEV_ADDR_LIST_TEST) += dev_addr_lists_test.o
->   
->   obj-y += net-sysfs.o
->   obj-y += hotdata.o
-> +obj-y += netdev_rx_queue.o
->   obj-$(CONFIG_PAGE_POOL) += page_pool.o page_pool_user.o
->   obj-$(CONFIG_PROC_FS) += net-procfs.o
->   obj-$(CONFIG_NET_PKTGEN) += pktgen.o
-> diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
-> new file mode 100644
-> index 0000000000000..de0575cf6df5d
-> --- /dev/null
-> +++ b/net/core/netdev_rx_queue.c
-> @@ -0,0 +1,74 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +
-> +#include <linux/netdevice.h>
-> +#include <net/netdev_queues.h>
-> +#include <net/netdev_rx_queue.h>
-> +
-> +int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
-> +{
-> +	void *new_mem, *old_mem;
-> +	int err;
-> +
-> +	if (!dev->queue_mgmt_ops || !dev->queue_mgmt_ops->ndo_queue_stop ||
-> +	    !dev->queue_mgmt_ops->ndo_queue_mem_free ||
-> +	    !dev->queue_mgmt_ops->ndo_queue_mem_alloc ||
-> +	    !dev->queue_mgmt_ops->ndo_queue_start)
-> +		return -EOPNOTSUPP;
-> +
-> +	DEBUG_NET_WARN_ON_ONCE(!rtnl_is_locked());
-> +
-> +	new_mem = kvzalloc(dev->queue_mgmt_ops->ndo_queue_mem_size, GFP_KERNEL);
-> +	if (!new_mem)
-> +		return -ENOMEM;
-> +
-> +	old_mem = kvzalloc(dev->queue_mgmt_ops->ndo_queue_mem_size, GFP_KERNEL);
-> +	if (!old_mem) {
-> +		err = -ENOMEM;
-> +		goto err_free_new_mem;
-> +	}
-> +
-> +	err = dev->queue_mgmt_ops->ndo_queue_mem_alloc(dev, new_mem, rxq_idx);
-> +	if (err)
-> +		goto err_free_old_mem;
-> +
-> +	err = dev->queue_mgmt_ops->ndo_queue_stop(dev, old_mem, rxq_idx);
-> +	if (err)
-> +		goto err_free_new_queue_mem;
-> +
-> +	err = dev->queue_mgmt_ops->ndo_queue_start(dev, new_mem, rxq_idx);
-> +	if (err)
-> +		goto err_start_queue;
-> +
-> +	dev->queue_mgmt_ops->ndo_queue_mem_free(dev, old_mem);
-> +
-> +	kvfree(old_mem);
-> +	kvfree(new_mem);
-> +
-> +	return 0;
-> +
-> +err_start_queue:
-> +	/* Restarting the queue with old_mem should be successful as we haven't
-> +	 * changed any of the queue configuration, and there is not much we can
-> +	 * do to recover from a failure here.
-> +	 *
-> +	 * WARN if the we fail to recover the old rx queue, and at least free
+As soon as links starts to be established, it wil switch to
+NL80211_MESH_POWER_ACTIVE as it is the value set by befault on the per sta
+nonpeer_pm field.
+As we want no power save by default, (as expressed with the per sta ini values),
+lets init it to the expected default value of NL80211_MESH_POWER_ACTIVE.
 
-nit "if the we"
+Also please note that we cannot change the default value from userspace prior to
+establishing a link as using NL80211_CMD_SET_MESH_CONFIG will not work before
+NL80211_CMD_JOIN_MESH has been issued. So too late for our initial scan.
 
-> +	 * old_mem so we don't also leak that.
-> +	 */
-> +	if (dev->queue_mgmt_ops->ndo_queue_start(dev, old_mem, rxq_idx)) {
-> +		WARN(1,
-> +		     "Failed to restart old queue in error path. RX queue %d may be unhealthy.",
-> +		     rxq_idx);
-> +		dev->queue_mgmt_ops->ndo_queue_mem_free(dev, old_mem);
-> +	}
-> +
-> +err_free_new_queue_mem:
-> +	dev->queue_mgmt_ops->ndo_queue_mem_free(dev, new_mem);
-> +
-> +err_free_old_mem:
-> +	kvfree(old_mem);
-> +
-> +err_free_new_mem:
-> +	kvfree(new_mem);
-> +
-> +	return err;
-> +}
+Signed-off-by: Nicolas Escande <nico.escande@gmail.com>
+Link: https://msgid.link/20240527141759.299411-1-nico.escande@gmail.com
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/mac80211/mesh.c | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/net/mac80211/mesh.c b/net/mac80211/mesh.c
+index 7b3ecc288f09d..25223184d6e5b 100644
+--- a/net/mac80211/mesh.c
++++ b/net/mac80211/mesh.c
+@@ -1792,6 +1792,7 @@ void ieee80211_mesh_init_sdata(struct ieee80211_sub_if_data *sdata)
+ 	ifmsh->last_preq = jiffies;
+ 	ifmsh->next_perr = jiffies;
+ 	ifmsh->csa_role = IEEE80211_MESH_CSA_ROLE_NONE;
++	ifmsh->nonpeer_pm = NL80211_MESH_POWER_ACTIVE;
+ 	/* Allocate all mesh structures when creating the first mesh interface. */
+ 	if (!mesh_allocated)
+ 		ieee80211s_init();
 -- 
-Pavel Begunkov
+2.43.0
+
 
