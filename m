@@ -1,38 +1,40 @@
-Return-Path: <netdev+bounces-103976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A34B90AA86
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 12:00:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F23090AA93
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 12:02:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CC1828E986
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 10:00:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F18881F24564
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 10:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F43618FC96;
-	Mon, 17 Jun 2024 10:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA06188CD0;
+	Mon, 17 Jun 2024 10:02:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF04E45C07;
-	Mon, 17 Jun 2024 10:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC11A18C326
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 10:02:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718618418; cv=none; b=tsDXUbyKtZvhw+/Vj+Zg8nvQP7bD99ybmdLDZjTPkOhzlHo+NdA4ni6Mm7Pj4w/OeY52hZEwv5U87H2DkPxI7vhEmgQv8m3CENw4q8pkjpttCDWPlRz1JVAwV4R7C1eM/QgKB5NHwqmZR0NKzX6SPbSQPS5l61K/qrhc3piVHHM=
+	t=1718618545; cv=none; b=ZXDJgxgg3FCdtb/Rx9p4njVU4iC1TOHtEvYytklbcG6gTkLSuVM2eT2Su9UsavH8OCNqfZCpRAeZRCKHP+ztcFtKMgmESlgZXvrK1oB1kdkdc1jOV1iDcaL4VOgAAUGtUaNTbiR7FqeyshyEDy3YBa+jjVCitX/eElMxOpUw2Ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718618418; c=relaxed/simple;
-	bh=c5f2mDXfkzjDZWTR699Otez+U1yi5IdhD5sYZYhFhms=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=eIwhg9SgqWNhioDgZkHvp/niqFj/84nlz7rLxmt/svcbgyslfdVsXzmnFAl91HNRf3K/aXhab4Rhrigr8kwjrbBXIwDnDasX1+QT5trACIJElbVI1lmzmqJE8SwpL8UHm91JMt7say3XTv+HULHS7j4dfpMHRf2lFFBE0BIVghQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 454036000B;
-	Mon, 17 Jun 2024 10:00:05 +0000 (UTC)
-Message-ID: <282d4b46-70c1-454b-810a-ef3353f1b0f2@ovn.org>
-Date: Mon, 17 Jun 2024 12:00:04 +0200
+	s=arc-20240116; t=1718618545; c=relaxed/simple;
+	bh=IBL2p5cX+CU7WpuIWMGRn3Cl9Z2pe6CTPZkt5FZJDfc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gl8tpw4DMD6xFTOfhEJlkI+pDqOhX5Bg9qt6FZEbuCYy1tGQ7lgf1nM+A4BF3k1M9QIhqS1AcPuW7IeyW6myB8EabfZ+9BHKPaVbgFqAJCYZfNRGcz1NcQLUCDXSoU4Im51l4rkZmEugZwiXUTztv9ABMpLfshHn6D0SsSHQM3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.110.225])
+	by gateway (Coremail) with SMTP id _____8Dxi+o2CXBmpYkHAA--.30517S3;
+	Mon, 17 Jun 2024 18:00:22 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.110.225])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxssQzCXBmIWMlAA--.13502S3;
+	Mon, 17 Jun 2024 18:00:20 +0800 (CST)
+Message-ID: <eb305275-6509-4887-ad33-67969a9d5144@loongson.cn>
+Date: Mon, 17 Jun 2024 18:00:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -40,115 +42,196 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, aconole@redhat.com, echaudro@redhat.com,
- horms@kernel.org, dev@openvswitch.org, Jamal Hadi Salim <jhs@mojatatu.com>,
- Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/9] net: sched: act_sample: add action cookie
- to sample
-To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
-References: <20240603185647.2310748-1-amorenoz@redhat.com>
- <20240603185647.2310748-3-amorenoz@redhat.com>
+Subject: Re: [PATCH net-next v13 06/15] net: stmmac: dwmac-loongson: Detach
+ GMAC-specific platform data init
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
+References: <cover.1716973237.git.siyanteng@loongson.cn>
+ <b987281834a734777ad02acf96e968f05024c031.1716973237.git.siyanteng@loongson.cn>
+ <wosihpytgfb6icdw7326xtez45cm6mbfykt4b7nlmg76xpwu4m@6xwvqj7ls7is>
 Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <20240603185647.2310748-3-amorenoz@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: i.maximets@ovn.org
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <wosihpytgfb6icdw7326xtez45cm6mbfykt4b7nlmg76xpwu4m@6xwvqj7ls7is>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8DxssQzCXBmIWMlAA--.13502S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3Aw18JrW8ArW5Wr4ktF4UJrc_yoW7CF43pr
+	W8Ca9rWa47XF1xtw4Dtw4UZry5ArW3t34UuF1Ut3WfGryDCw1jq3W2gF409FZ7ZFWkuw12
+	vF1jkr43uFs8KwbCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
+	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8uc_3UUUUU==
 
-On 6/3/24 20:56, Adrian Moreno wrote:
-> If the action has a user_cookie, pass it along to the sample so it can
-> be easily identified.
-> 
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
->  net/sched/act_sample.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/net/sched/act_sample.c b/net/sched/act_sample.c
-> index a69b53d54039..5c3f86ec964a 100644
-> --- a/net/sched/act_sample.c
-> +++ b/net/sched/act_sample.c
-> @@ -165,9 +165,11 @@ TC_INDIRECT_SCOPE int tcf_sample_act(struct sk_buff *skb,
->  				     const struct tc_action *a,
->  				     struct tcf_result *res)
->  {
-> +	u8 cookie_data[TC_COOKIE_MAX_SIZE] = {};
+Hi Serge,
 
-Is it necessary to initialize these 16 bytes on every call?
-Might be expensive.  We're passing the data length around,
-so the uninitialized parts should not be accessed.
+在 2024/6/15 00:19, Serge Semin 写道:
+> On Wed, May 29, 2024 at 06:19:03PM +0800, Yanteng Si wrote:
+>> Loongson delivers two types of the network devices: Loongson GMAC and
+>> Loongson GNET in the framework of four CPU/Chipsets revisions:
+>>
+>>     Chip             Network  PCI Dev ID   Synopys Version   DMA-channel
+>> LS2K1000 CPU         GMAC      0x7a03       v3.50a/v3.73a        1
+>> LS7A1000 Chipset     GMAC      0x7a03       v3.50a/v3.73a        1
+>> LS2K2000 CPU         GNET      0x7a13          v3.73a            8
+>> LS7A2000 Chipset     GNET      0x7a13          v3.73a            1
+> You mentioned in the cover-letter
+> https://lore.kernel.org/netdev/cover.1716973237.git.siyanteng@loongson.cn/
+> that LS2K now have GMAC NICs too:
+> " 1. The current LS2K2000 also have a GMAC(and two GNET) that supports 8
+>      channels, so we have to reconsider the initialization of
+>      tx/rx_queues_to_use into probe();"
+>
+> But I don't see much changes in the series which would indicate that
+> new data. Please clarify what does it mean:
+>
+> Does it mean LS2K2000 has two types of the DW GMACs, right?
+Yes!
+>
+> Are both of them based on the DW GMAC v3.73a IP-core with AV-feature
+> enabled and 8 DMA-channels?
+Yes!
+>
+> Seeing you called the new device as GMAC it doesn't have an
+> integrated PHY as GNETs do, does it? If so, then neither
+> STMMAC_FLAG_DISABLE_FORCE_1000 nor loongson_gnet_fix_speed() relevant
+> for the new device, right?
+YES!
+>
+> Why haven't you changed the sheet in the commit log? Shall the sheet
+> be updated like this:
+>
+>      Chip             Network  PCI Dev ID   Synopys Version   DMA-channel
+>   LS2K1000 CPU         GMAC      0x7a03       v3.50a/v3.73a        1
+>   LS7A1000 Chipset     GMAC      0x7a03       v3.50a/v3.73a        1
+> +LS2K2000 CPU         GMAC      0x7a13          v3.73a            8
+>   LS2K2000 CPU         GNET      0x7a13          v3.73a            8
+>   LS7A2000 Chipset     GNET      0x7a13          v3.73a            1
+>
+> ?
 
-Best regards, Ilya Maximets.
+No! PCI Dev ID of GMAC is 0x7a03. So:
 
->  	struct tcf_sample *s = to_sample(a);
->  	struct psample_group *psample_group;
->  	struct psample_metadata md = {};
-> +	struct tc_cookie *user_cookie;
->  	int retval;
->  
->  	tcf_lastuse_update(&s->tcf_tm);
-> @@ -189,6 +191,16 @@ TC_INDIRECT_SCOPE int tcf_sample_act(struct sk_buff *skb,
->  		if (skb_at_tc_ingress(skb) && tcf_sample_dev_ok_push(skb->dev))
->  			skb_push(skb, skb->mac_len);
->  
-> +		rcu_read_lock();
-> +		user_cookie = rcu_dereference(a->user_cookie);
-> +		if (user_cookie) {
-> +			memcpy(cookie_data, user_cookie->data,
-> +			       user_cookie->len);
-> +			md.user_cookie = cookie_data;
-> +			md.user_cookie_len = user_cookie->len;
-> +		}
-> +		rcu_read_unlock();
-> +
->  		md.trunc_size = s->truncate ? s->trunc_size : skb->len;
->  		psample_sample_packet(psample_group, skb, s->rate, &md);
->  
+  LS2K1000 CPU         GMAC      0x7a03       v3.50a/v3.73a 1
+  LS7A1000 Chipset     GMAC      0x7a03       v3.50a/v3.73a 1
++LS2K2000 CPU         GMAC      0x7a03          v3.73a 8
+  LS2K2000 CPU         GNET      0x7a13          v3.73a 8
+  LS7A2000 Chipset     GNET      0x7a13          v3.73a 1
+
+>
+> I'll continue reviewing the series after the questions above are
+> clarified.
+
+OK, If anything else is unclear, please let me know.
+
+
+Thanks,
+
+Yanteng
+
+
+>
+> -Serge(y)
+>
+>> The driver currently supports the chips with the Loongson GMAC network
+>> device. As a preparation before adding the Loongson GNET support
+>> detach the Loongson GMAC-specific platform data initializations to the
+>> loongson_gmac_data() method and preserve the common settings in the
+>> loongson_default_data().
+>>
+>> While at it drop the return value statement from the
+>> loongson_default_data() method as redundant.
+>>
+>> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+>> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+>> ---
+>>   .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 19 ++++++++++++-------
+>>   1 file changed, 12 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> index 739b73f4fc35..ad3f44440963 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> @@ -11,7 +11,7 @@
+>>   
+>>   #define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
+>>   
+>> -static int loongson_default_data(struct plat_stmmacenet_data *plat)
+>> +static void loongson_default_data(struct plat_stmmacenet_data *plat)
+>>   {
+>>   	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
+>>   	plat->has_gmac = 1;
+>> @@ -20,16 +20,14 @@ static int loongson_default_data(struct plat_stmmacenet_data *plat)
+>>   	/* Set default value for multicast hash bins */
+>>   	plat->multicast_filter_bins = 256;
+>>   
+>> +	plat->mac_interface = PHY_INTERFACE_MODE_NA;
+>> +
+>>   	/* Set default value for unicast filter entries */
+>>   	plat->unicast_filter_entries = 1;
+>>   
+>>   	/* Set the maxmtu to a default of JUMBO_LEN */
+>>   	plat->maxmtu = JUMBO_LEN;
+>>   
+>> -	/* Set default number of RX and TX queues to use */
+>> -	plat->tx_queues_to_use = 1;
+>> -	plat->rx_queues_to_use = 1;
+>> -
+>>   	/* Disable Priority config by default */
+>>   	plat->tx_queues_cfg[0].use_prio = false;
+>>   	plat->rx_queues_cfg[0].use_prio = false;
+>> @@ -42,6 +40,11 @@ static int loongson_default_data(struct plat_stmmacenet_data *plat)
+>>   
+>>   	plat->dma_cfg->pbl = 32;
+>>   	plat->dma_cfg->pblx8 = true;
+>> +}
+>> +
+>> +static int loongson_gmac_data(struct plat_stmmacenet_data *plat)
+>> +{
+>> +	loongson_default_data(plat);
+>>   
+>>   	return 0;
+>>   }
+>> @@ -111,11 +114,10 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   	}
+>>   
+>>   	plat->phy_interface = phy_mode;
+>> -	plat->mac_interface = PHY_INTERFACE_MODE_GMII;
+>>   
+>>   	pci_set_master(pdev);
+>>   
+>> -	loongson_default_data(plat);
+>> +	loongson_gmac_data(plat);
+>>   	pci_enable_msi(pdev);
+>>   	memset(&res, 0, sizeof(res));
+>>   	res.addr = pcim_iomap_table(pdev)[0];
+>> @@ -140,6 +142,9 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   		goto err_disable_msi;
+>>   	}
+>>   
+>> +	plat->tx_queues_to_use = 1;
+>> +	plat->rx_queues_to_use = 1;
+>> +
+>>   	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+>>   	if (ret)
+>>   		goto err_disable_msi;
+>> -- 
+>> 2.31.4
+>>
 
 
