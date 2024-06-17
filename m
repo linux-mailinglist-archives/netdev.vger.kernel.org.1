@@ -1,176 +1,121 @@
-Return-Path: <netdev+bounces-104040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14AC990AF12
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:23:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4493690AF45
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:29:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33A391C2161C
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:23:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D44A0289DF6
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF959198A2B;
-	Mon, 17 Jun 2024 13:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC921A01D9;
+	Mon, 17 Jun 2024 13:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UaHpX00H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HpeBujbl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2ECA17FAA2;
-	Mon, 17 Jun 2024 13:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BFA11A01CA;
+	Mon, 17 Jun 2024 13:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718630291; cv=none; b=O2cvS1O49g4xMDNuvvom0tuUb3dxF+BGWtjN22KrUtl6gQO+hP/DLDAXnnq16qClqA6P0aE1K+rvxsOC3o0qGsE+tvHLMU0/HalgtgwLJIHGxKQz8Q+WiZawAYoTo1076386otyKfAoCyYtOr5hVjbj6+IrjdNudLGzZ2PU/eCM=
+	t=1718630472; cv=none; b=AnfuwMUHhWPZpv5qkVmJSVldbnDfUyXwU0NxbE4IA8JgKvr+st+Q8jRi3erpXrENMfaQ/+gXF/2A+dc0UsHmNiCtBDLiITw+ZUVV73xYT9M13i+ouXgsW+xm5uhrpfoClrSpIJobJwJkzdNpWrIYpJ+RMRvSPVckkGO8ffiKk0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718630291; c=relaxed/simple;
-	bh=gtTvgsZapgBgfFHVMZ2FpeBT5zJ8mnTafDMFjnTGrW4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YH35BIxSV2W//om2I804N3hmBxmqEKR8CM00SP3t3vnf5J+kxSIhXN0ptNixffb8owbxOYDSU3TgRqOjPkWWSuErtbq7/ziJuRV6D03JhVwv9wIJmG6cc/O/OdcKCtS36WddQxPGUFMukHmRAaPOblkWgyN1nDGz2I7Ag+CjDbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UaHpX00H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99F09C2BD10;
-	Mon, 17 Jun 2024 13:18:10 +0000 (UTC)
+	s=arc-20240116; t=1718630472; c=relaxed/simple;
+	bh=7sMmr0W+ZNWG77z3Z80KDAuawwS/RyzpRiRosMOSNDs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=orvdO7oCOIrabCfTV1BrIw6GDOUd/40xQQHnU3Y27WLsoLO4b9EUcQYK6L2D62bWQRnTfHcvVwpycEUO8msoQ5+CuCJiZMm0s6yxhswETt/5FFQm0L9Pv+WiuobjNUnBHFN+AVxOMvXjzbkLVmXtN7rm2ytV2t07Vd66Vcyvaxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HpeBujbl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7B26C4AF48;
+	Mon, 17 Jun 2024 13:21:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718630291;
-	bh=gtTvgsZapgBgfFHVMZ2FpeBT5zJ8mnTafDMFjnTGrW4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UaHpX00HJrBDUziBt452PjFgQyHAtm6wJzsifYNNB5SjBy1idVcFy01BBfdLGAsjb
-	 /LZv5YsIpDu+Kf3JH0oxbNN0l9w9o14AUaQPyuHYhTXyie/nLRBMclt6MJYzOoYM7F
-	 PRrGiuW6zODa0d57FMu4JfvftQQ+jaqqKPDZsMw/8MvvGXYPiLE5d9ybXIRXDl5yzk
-	 VAyd9ZD+oV0JfL7p1BTBOFdcFQADHkgb9+KCv/7mU4rL6bGyYUKSL/esSb8WNy42sB
-	 eleVuaG46S9EqdAVLCCYjKZX7hHOMFBFXYr2M7kcX6WvIbyh4vDv9sol49y6yceWbP
-	 c+EYeXE+0xvyA==
-Date: Mon, 17 Jun 2024 16:18:07 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Omer Shpigelman <oshpigelman@habana.ai>
-Cc: linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	ogabbay@kernel.org, zyehudai@habana.ai
-Subject: Re: [PATCH 04/15] net: hbl_cn: QP state machine
-Message-ID: <20240617131807.GE6805@unreal>
-References: <20240613082208.1439968-1-oshpigelman@habana.ai>
- <20240613082208.1439968-5-oshpigelman@habana.ai>
+	s=k20201202; t=1718630471;
+	bh=7sMmr0W+ZNWG77z3Z80KDAuawwS/RyzpRiRosMOSNDs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=HpeBujblA+1/7ldew/UZooSzaKVE8QXvN5HRJyCgj4R9K+zH6npkEi+MmeH6BlWBU
+	 4wjaHGGp0QJzQF3DHU4Fi8eBfKTSCOOH59xK8/31YEsdm0d5fqYd4BQ86u9tLhds4C
+	 k16sfi6l/XKv6p3ozKCilgg3Cx/EMCchSjgkLvr42NZbMS37zCu0s8PS+vDgkhamiu
+	 pqaHZyDHLDOLFqFdcCefti6NyDfx+pIyPwg70yW7nL4XgpeTqHBGrAdLDgOH5jiCha
+	 z6WXnBJM8FeAiNPG/p+3rTzgTLMQy6D6UfXYqezrO0gKF8uOUo5Y/y9INAO5ZKyG87
+	 XagceqRYbwebg==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Nicolas Escande <nico.escande@gmail.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.9 14/44] wifi: mac80211: mesh: init nonpeer_pm to active by default in mesh sdata
+Date: Mon, 17 Jun 2024 09:19:27 -0400
+Message-ID: <20240617132046.2587008-14-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240617132046.2587008-1-sashal@kernel.org>
+References: <20240617132046.2587008-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240613082208.1439968-5-oshpigelman@habana.ai>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.9.5
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jun 13, 2024 at 11:21:57AM +0300, Omer Shpigelman wrote:
-> Add a common QP state machine which handles the moving for a QP from one
-> state to another including performing necessary checks, draining
-> in-flight transactions, invalidating caches and error reporting.
-> 
-> Signed-off-by: Omer Shpigelman <oshpigelman@habana.ai>
-> Co-developed-by: Abhilash K V <kvabhilash@habana.ai>
-> Signed-off-by: Abhilash K V <kvabhilash@habana.ai>
-> Co-developed-by: Andrey Agranovich <aagranovich@habana.ai>
-> Signed-off-by: Andrey Agranovich <aagranovich@habana.ai>
-> Co-developed-by: Bharat Jauhari <bjauhari@habana.ai>
-> Signed-off-by: Bharat Jauhari <bjauhari@habana.ai>
-> Co-developed-by: David Meriin <dmeriin@habana.ai>
-> Signed-off-by: David Meriin <dmeriin@habana.ai>
-> Co-developed-by: Sagiv Ozeri <sozeri@habana.ai>
-> Signed-off-by: Sagiv Ozeri <sozeri@habana.ai>
-> Co-developed-by: Zvika Yehudai <zyehudai@habana.ai>
-> Signed-off-by: Zvika Yehudai <zyehudai@habana.ai>
-> ---
->  .../ethernet/intel/hbl_cn/common/hbl_cn_qp.c  | 480 +++++++++++++++++-
->  1 file changed, 479 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/hbl_cn/common/hbl_cn_qp.c b/drivers/net/ethernet/intel/hbl_cn/common/hbl_cn_qp.c
-> index 9ddc23bf8194..26ebdf448193 100644
-> --- a/drivers/net/ethernet/intel/hbl_cn/common/hbl_cn_qp.c
-> +++ b/drivers/net/ethernet/intel/hbl_cn/common/hbl_cn_qp.c
-> @@ -6,8 +6,486 @@
+From: Nicolas Escande <nico.escande@gmail.com>
 
-<...>
+[ Upstream commit 6f6291f09a322c1c1578badac8072d049363f4e6 ]
 
-> +/* The following table represents the (valid) operations that can be performed on
-> + * a QP in order to move it from one state to another
-> + * For example: a QP in RTR state can be moved to RTS state using the CN_QP_OP_RTR_2RTS
-> + * operation.
-> + */
-> +static const enum hbl_cn_qp_state_op qp_valid_state_op[CN_QP_NUM_STATE][CN_QP_NUM_STATE] = {
-> +	[CN_QP_STATE_RESET] = {
-> +		[CN_QP_STATE_RESET]	= CN_QP_OP_2RESET,
-> +		[CN_QP_STATE_INIT]	= CN_QP_OP_RST_2INIT,
-> +		[CN_QP_STATE_SQD]	= CN_QP_OP_NOP,
-> +		[CN_QP_STATE_QPD]	= CN_QP_OP_NOP,
-> +	},
-> +	[CN_QP_STATE_INIT] = {
-> +		[CN_QP_STATE_RESET]	= CN_QP_OP_2RESET,
-> +		[CN_QP_STATE_ERR]	= CN_QP_OP_2ERR,
-> +		[CN_QP_STATE_INIT]	= CN_QP_OP_NOP,
-> +		[CN_QP_STATE_RTR]	= CN_QP_OP_INIT_2RTR,
-> +		[CN_QP_STATE_SQD]	= CN_QP_OP_NOP,
-> +		[CN_QP_STATE_QPD]	= CN_QP_OP_NOP,
-> +	},
-> +	[CN_QP_STATE_RTR] = {
-> +		[CN_QP_STATE_RESET]	= CN_QP_OP_2RESET,
-> +		[CN_QP_STATE_ERR]	= CN_QP_OP_2ERR,
-> +		[CN_QP_STATE_RTR]	= CN_QP_OP_RTR_2RTR,
-> +		[CN_QP_STATE_RTS]	= CN_QP_OP_RTR_2RTS,
-> +		[CN_QP_STATE_SQD]	= CN_QP_OP_NOP,
-> +		[CN_QP_STATE_QPD]	= CN_QP_OP_RTR_2QPD,
-> +	},
-> +	[CN_QP_STATE_RTS] = {
-> +		[CN_QP_STATE_RESET]	= CN_QP_OP_2RESET,
-> +		[CN_QP_STATE_ERR]	= CN_QP_OP_2ERR,
-> +		[CN_QP_STATE_RTS]	= CN_QP_OP_RTS_2RTS,
-> +		[CN_QP_STATE_SQD]	= CN_QP_OP_RTS_2SQD,
-> +		[CN_QP_STATE_QPD]	= CN_QP_OP_RTS_2QPD,
-> +		[CN_QP_STATE_SQERR]	= CN_QP_OP_RTS_2SQERR,
-> +	},
-> +	[CN_QP_STATE_SQD] = {
-> +		[CN_QP_STATE_RESET]	= CN_QP_OP_2RESET,
-> +		[CN_QP_STATE_ERR]	= CN_QP_OP_2ERR,
-> +		[CN_QP_STATE_SQD]	= CN_QP_OP_SQD_2SQD,
-> +		[CN_QP_STATE_RTS]	= CN_QP_OP_SQD_2RTS,
-> +		[CN_QP_STATE_QPD]	= CN_QP_OP_SQD_2QPD,
-> +		[CN_QP_STATE_SQERR]	= CN_QP_OP_SQD_2SQ_ERR,
-> +	},
-> +	[CN_QP_STATE_QPD] = {
-> +		[CN_QP_STATE_RESET]	= CN_QP_OP_2RESET,
-> +		[CN_QP_STATE_ERR]	= CN_QP_OP_2ERR,
-> +		[CN_QP_STATE_SQD]	= CN_QP_OP_NOP,
-> +		[CN_QP_STATE_QPD]	= CN_QP_OP_NOP,
-> +		[CN_QP_STATE_RTR]	= CN_QP_OP_QPD_2RTR,
-> +	},
-> +	[CN_QP_STATE_SQERR] = {
-> +		[CN_QP_STATE_RESET]	= CN_QP_OP_2RESET,
-> +		[CN_QP_STATE_ERR]	= CN_QP_OP_2ERR,
-> +		[CN_QP_STATE_SQD]	= CN_QP_OP_SQ_ERR_2SQD,
-> +		[CN_QP_STATE_SQERR]	= CN_QP_OP_NOP,
-> +	},
-> +	[CN_QP_STATE_ERR] = {
-> +		[CN_QP_STATE_RESET]	= CN_QP_OP_2RESET,
-> +		[CN_QP_STATE_ERR]	= CN_QP_OP_2ERR,
-> +	}
-> +};
+With a ath9k device I can see that:
+	iw phy phy0 interface add mesh0 type mp
+	ip link set mesh0 up
+	iw dev mesh0 scan
 
-I don't understand why IBTA QP state machine is declared in ETH driver
-and not in IB driver.
+Will start a scan with the Power Management bit set in the Frame Control Field.
+This is because we set this bit depending on the nonpeer_pm variable of the mesh
+iface sdata and when there are no active links on the interface it remains to
+NL80211_MESH_POWER_UNKNOWN.
 
-> +
+As soon as links starts to be established, it wil switch to
+NL80211_MESH_POWER_ACTIVE as it is the value set by befault on the per sta
+nonpeer_pm field.
+As we want no power save by default, (as expressed with the per sta ini values),
+lets init it to the expected default value of NL80211_MESH_POWER_ACTIVE.
 
-<...>
+Also please note that we cannot change the default value from userspace prior to
+establishing a link as using NL80211_CMD_SET_MESH_CONFIG will not work before
+NL80211_CMD_JOIN_MESH has been issued. So too late for our initial scan.
 
-> +		/* Release lock while we wait before retry.
-> +		 * Note, we can assert that we are already locked.
-> +		 */
-> +		port_funcs->cfg_unlock(cn_port);
-> +
-> +		msleep(20);
-> +
-> +		port_funcs->cfg_lock(cn_port);
+Signed-off-by: Nicolas Escande <nico.escande@gmail.com>
+Link: https://msgid.link/20240527141759.299411-1-nico.escande@gmail.com
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/mac80211/mesh.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-lock/unlock through ops pointer doesn't look like a good idea.
+diff --git a/net/mac80211/mesh.c b/net/mac80211/mesh.c
+index cbc9b5e40cb35..6d4510221c98e 100644
+--- a/net/mac80211/mesh.c
++++ b/net/mac80211/mesh.c
+@@ -1776,6 +1776,7 @@ void ieee80211_mesh_init_sdata(struct ieee80211_sub_if_data *sdata)
+ 	ifmsh->last_preq = jiffies;
+ 	ifmsh->next_perr = jiffies;
+ 	ifmsh->csa_role = IEEE80211_MESH_CSA_ROLE_NONE;
++	ifmsh->nonpeer_pm = NL80211_MESH_POWER_ACTIVE;
+ 	/* Allocate all mesh structures when creating the first mesh interface. */
+ 	if (!mesh_allocated)
+ 		ieee80211s_init();
+-- 
+2.43.0
 
-Thanks
 
