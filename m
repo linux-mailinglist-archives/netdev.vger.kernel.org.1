@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-104258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03C3D90BC6D
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 22:54:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D94790BC6E
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 22:54:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81E861F21D93
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 20:54:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 847361C2144F
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 20:54:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3FF8199241;
-	Mon, 17 Jun 2024 20:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FFFF199253;
+	Mon, 17 Jun 2024 20:54:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5771A1990A8
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA97B1991AD
 	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 20:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718657662; cv=none; b=iykZOK6+CKPZAjtsK3RoxQ+/coNV+0JwKMG1IbJnM7TbclPHTQH0Goy+JRdmorkChiZpJOtuzFMvsva7j1uZli6KBqKQvonmZF+2AzZnlvrswhaKUGer5E61eFkLmgnPlQjVeKHVXXJLApYlMyQyjjEqyQG2g4TCMxuoPy9JEWo=
+	t=1718657663; cv=none; b=cGvzVhJ/hsXdW9cE+iJN3q+18ZCZtQgr3KVbSzQqcMwmISQiJVEyYG5pe/PpsMEdWazoxSCeSuPhfGxKR9KETTRC51+TdTdx7f1xwiu7wM8uoS8z4msYztSdR84/uY3BOGtYCJx84NyltHi2jG89TzL+rNpRcc+ogwVStn6SFz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718657662; c=relaxed/simple;
-	bh=c+XvZSFybbO+JSKwWl/paiMX31tasAgAnvgd2oopo+U=;
+	s=arc-20240116; t=1718657663; c=relaxed/simple;
+	bh=48WRZojmHLOMDFcMg16PIM4SrFpOxz+3egbaw/jTZ8M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ipapy/Ipj4DOcppAcZlR5/Z7TbFpeYPT+xvOU8axRvMoL7tGYqk+ILjTx2aEvIjj/WFfpCMo5mnJR5e9Cywoc6DK1x2LYDQDFfILyXaYpTv7a5lEGF+sH/+yAcQ1qKAu3+iHEh6HbAWFbEfCLK/JP0wPX3vG3ldQI0bVBIWJGG0=
+	 MIME-Version; b=f/DcAKTic6NcIX8IEJTBs6hr+QP8Vc39zTUL4AhuBQOPlB+DRZ6oGsEY2KiZFW6KjvBpP5RSTo5uvQnKulQU4qlB6tKe/1GNscy4X79eC5xhslel/kasEtRqQM/PykY/ThyzzeNwe6/Qin3upOIWiNIr3AQ40fTMgHBMH02SHjI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
@@ -31,17 +31,17 @@ Received: from labnh.big (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id C1D087D126;
-	Mon, 17 Jun 2024 20:54:20 +0000 (UTC)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 2D82C7D127;
+	Mon, 17 Jun 2024 20:54:21 +0000 (UTC)
 From: Christian Hopps <chopps@chopps.org>
 To: devel@linux-ipsec.org
 Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 	netdev@vger.kernel.org,
 	Christian Hopps <chopps@chopps.org>,
 	Christian Hopps <chopps@labn.net>
-Subject: [PATCH ipsec-next v4 06/18] xfrm: add mode_cbs module functionality
-Date: Mon, 17 Jun 2024 16:53:04 -0400
-Message-ID: <20240617205316.939774-7-chopps@chopps.org>
+Subject: [PATCH ipsec-next v4 07/18] xfrm: add generic iptfs defines and functionality
+Date: Mon, 17 Jun 2024 16:53:05 -0400
+Message-ID: <20240617205316.939774-8-chopps@chopps.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240617205316.939774-1-chopps@chopps.org>
 References: <20240617205316.939774-1-chopps@chopps.org>
@@ -55,315 +55,260 @@ Content-Transfer-Encoding: 8bit
 
 From: Christian Hopps <chopps@labn.net>
 
-Add a set of callbacks xfrm_mode_cbs to xfrm_state. These callbacks
-enable the addition of new xfrm modes, such as IP-TFS to be defined
-in modules.
+Define `XFRM_MODE_IPTFS` and `IPSEC_MODE_IPTFS` constants, and add these to
+switch case and conditionals adjacent with the existing TUNNEL modes.
 
 Signed-off-by: Christian Hopps <chopps@labn.net>
 ---
- include/net/xfrm.h     | 39 ++++++++++++++++++++++++++++++++++
- net/xfrm/xfrm_device.c |  3 ++-
- net/xfrm/xfrm_input.c  | 14 ++++++++++--
- net/xfrm/xfrm_output.c |  2 ++
- net/xfrm/xfrm_policy.c | 18 ++++++++++------
- net/xfrm/xfrm_state.c  | 48 ++++++++++++++++++++++++++++++++++++++++++
- net/xfrm/xfrm_user.c   | 13 ++++++++++++
- 7 files changed, 127 insertions(+), 10 deletions(-)
+ include/net/xfrm.h         |  1 +
+ include/uapi/linux/ipsec.h |  3 ++-
+ include/uapi/linux/snmp.h  |  3 +++
+ net/ipv4/esp4.c            |  3 ++-
+ net/ipv6/esp6.c            |  3 ++-
+ net/netfilter/nft_xfrm.c   |  3 ++-
+ net/xfrm/xfrm_device.c     |  1 +
+ net/xfrm/xfrm_output.c     |  4 ++++
+ net/xfrm/xfrm_policy.c     |  8 ++++++--
+ net/xfrm/xfrm_proc.c       |  3 +++
+ net/xfrm/xfrm_state.c      | 12 ++++++++++++
+ net/xfrm/xfrm_user.c       | 10 ++++++++++
+ 12 files changed, 48 insertions(+), 6 deletions(-)
 
 diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 7c9be06f8302..cb75ec2993bf 100644
+index cb75ec2993bf..0d8abf7bd32e 100644
 --- a/include/net/xfrm.h
 +++ b/include/net/xfrm.h
-@@ -206,6 +206,7 @@ struct xfrm_state {
- 		u16		family;
- 		xfrm_address_t	saddr;
- 		int		header_len;
-+		int		enc_hdr_len;
- 		int		trailer_len;
- 		u32		extra_flags;
- 		struct xfrm_mark	smark;
-@@ -292,6 +293,9 @@ struct xfrm_state {
- 	 * interpreted by xfrm_type methods. */
- 	void			*data;
- 	u8			dir;
-+
-+	const struct xfrm_mode_cbs	*mode_cbs;
-+	void				*mode_data;
+@@ -37,6 +37,7 @@
+ #define XFRM_PROTO_COMP		108
+ #define XFRM_PROTO_IPIP		4
+ #define XFRM_PROTO_IPV6		41
++#define XFRM_PROTO_IPTFS	IPPROTO_AGGFRAG
+ #define XFRM_PROTO_ROUTING	IPPROTO_ROUTING
+ #define XFRM_PROTO_DSTOPTS	IPPROTO_DSTOPTS
+ 
+diff --git a/include/uapi/linux/ipsec.h b/include/uapi/linux/ipsec.h
+index 50d8ee1791e2..696b790f4346 100644
+--- a/include/uapi/linux/ipsec.h
++++ b/include/uapi/linux/ipsec.h
+@@ -14,7 +14,8 @@ enum {
+ 	IPSEC_MODE_ANY		= 0,	/* We do not support this for SA */
+ 	IPSEC_MODE_TRANSPORT	= 1,
+ 	IPSEC_MODE_TUNNEL	= 2,
+-	IPSEC_MODE_BEET         = 3
++	IPSEC_MODE_BEET         = 3,
++	IPSEC_MODE_IPTFS        = 4
  };
  
- static inline struct net *xs_net(struct xfrm_state *x)
-@@ -444,6 +448,41 @@ struct xfrm_type_offload {
- int xfrm_register_type_offload(const struct xfrm_type_offload *type, unsigned short family);
- void xfrm_unregister_type_offload(const struct xfrm_type_offload *type, unsigned short family);
+ enum {
+diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
+index adf5fd78dd50..77eb078f06a6 100644
+--- a/include/uapi/linux/snmp.h
++++ b/include/uapi/linux/snmp.h
+@@ -339,6 +339,9 @@ enum
+ 	LINUX_MIB_XFRMACQUIREERROR,		/* XfrmAcquireError */
+ 	LINUX_MIB_XFRMOUTSTATEDIRERROR,		/* XfrmOutStateDirError */
+ 	LINUX_MIB_XFRMINSTATEDIRERROR,		/* XfrmInStateDirError */
++	LINUX_MIB_XFRMNOSKBERROR,		/* XfrmNoSkbError */
++	LINUX_MIB_XFRMINIPTFSERROR,		/* XfrmInIptfsError */
++	LINUX_MIB_XFRMOUTNOQSPACE,		/* XfrmOutNoQueueSpace */
+ 	__LINUX_MIB_XFRMMAX
+ };
  
-+struct xfrm_mode_cbs {
-+	struct module	*owner;
-+	/* Add/delete state in the new xfrm_state in `x`. */
-+	int	(*create_state)(struct xfrm_state *x);
-+	void	(*delete_state)(struct xfrm_state *x);
-+
-+	/* Called while handling the user netlink options. */
-+	int	(*user_init)(struct net *net, struct xfrm_state *x,
-+			     struct nlattr **attrs,
-+			     struct netlink_ext_ack *extack);
-+	int	(*copy_to_user)(struct xfrm_state *x, struct sk_buff *skb);
-+	int     (*clone)(struct xfrm_state *x, struct xfrm_state *orig);
-+	unsigned int (*sa_len)(const struct xfrm_state *x);
-+
-+	u32	(*get_inner_mtu)(struct xfrm_state *x, int outer_mtu);
-+
-+	/* Called to handle received xfrm (egress) packets. */
-+	int	(*input)(struct xfrm_state *x, struct sk_buff *skb);
-+
-+	/* Placed in dst_output of the dst when an xfrm_state is bound. */
-+	int	(*output)(struct net *net, struct sock *sk, struct sk_buff *skb);
-+
-+	/**
-+	 * Prepare the skb for output for the given mode. Returns:
-+	 *    Error value, if 0 then skb values should be as follows:
-+	 *    transport_header should point at ESP header
-+	 *    network_header should point at Outer IP header
-+	 *    mac_header should point at protocol/nexthdr of the outer IP
-+	 */
-+	int	(*prepare_output)(struct xfrm_state *x, struct sk_buff *skb);
-+};
-+
-+int xfrm_register_mode_cbs(u8 mode, const struct xfrm_mode_cbs *mode_cbs);
-+void xfrm_unregister_mode_cbs(u8 mode);
-+
- static inline int xfrm_af2proto(unsigned int family)
- {
- 	switch(family) {
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index 7d38ddd64115..2da9fd4efb70 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -809,7 +809,8 @@ int esp_input_done2(struct sk_buff *skb, int err)
+ 	}
+ 
+ 	skb_pull_rcsum(skb, hlen);
+-	if (x->props.mode == XFRM_MODE_TUNNEL)
++	if (x->props.mode == XFRM_MODE_TUNNEL ||
++	    x->props.mode == XFRM_MODE_IPTFS)
+ 		skb_reset_transport_header(skb);
+ 	else
+ 		skb_set_transport_header(skb, -ihl);
+diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+index 27df148530a6..0e50ff3eccdb 100644
+--- a/net/ipv6/esp6.c
++++ b/net/ipv6/esp6.c
+@@ -858,7 +858,8 @@ int esp6_input_done2(struct sk_buff *skb, int err)
+ 	skb_postpull_rcsum(skb, skb_network_header(skb),
+ 			   skb_network_header_len(skb));
+ 	skb_pull_rcsum(skb, hlen);
+-	if (x->props.mode == XFRM_MODE_TUNNEL)
++	if (x->props.mode == XFRM_MODE_TUNNEL ||
++	    x->props.mode == XFRM_MODE_IPTFS)
+ 		skb_reset_transport_header(skb);
+ 	else
+ 		skb_set_transport_header(skb, -hdr_len);
+diff --git a/net/netfilter/nft_xfrm.c b/net/netfilter/nft_xfrm.c
+index 1c866757db55..620238c6ef4c 100644
+--- a/net/netfilter/nft_xfrm.c
++++ b/net/netfilter/nft_xfrm.c
+@@ -112,7 +112,8 @@ static bool xfrm_state_addr_ok(enum nft_xfrm_keys k, u8 family, u8 mode)
+ 		return true;
+ 	}
+ 
+-	return mode == XFRM_MODE_BEET || mode == XFRM_MODE_TUNNEL;
++	return mode == XFRM_MODE_BEET || mode == XFRM_MODE_TUNNEL ||
++	       mode == XFRM_MODE_IPTFS;
+ }
+ 
+ static void nft_xfrm_state_get_key(const struct nft_xfrm *priv,
 diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-index 2455a76a1cff..f91b2bee8190 100644
+index f91b2bee8190..b73af6918028 100644
 --- a/net/xfrm/xfrm_device.c
 +++ b/net/xfrm/xfrm_device.c
-@@ -42,7 +42,8 @@ static void __xfrm_mode_tunnel_prep(struct xfrm_state *x, struct sk_buff *skb,
- 		skb->transport_header = skb->network_header + hsize;
- 
- 	skb_reset_mac_len(skb);
--	pskb_pull(skb, skb->mac_len + x->props.header_len);
-+	pskb_pull(skb,
-+		  skb->mac_len + x->props.header_len - x->props.enc_hdr_len);
- }
- 
- static void __xfrm_mode_beet_prep(struct xfrm_state *x, struct sk_buff *skb,
-diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
-index 71b42de6e3c9..8ef1af2d39bf 100644
---- a/net/xfrm/xfrm_input.c
-+++ b/net/xfrm/xfrm_input.c
-@@ -438,6 +438,9 @@ static int xfrm_inner_mode_input(struct xfrm_state *x,
- 		WARN_ON_ONCE(1);
- 		break;
- 	default:
-+		if (x->mode_cbs && x->mode_cbs->input)
-+			return x->mode_cbs->input(x, skb);
-+
- 		WARN_ON_ONCE(1);
- 		break;
- 	}
-@@ -485,6 +488,10 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- 
- 		family = x->props.family;
- 
-+		/* An encap_type of -3 indicates reconstructed inner packet */
-+		if (encap_type == -3)
-+			goto resume_decapped;
-+
- 		/* An encap_type of -1 indicates async resumption. */
- 		if (encap_type == -1) {
- 			async = 1;
-@@ -672,11 +679,14 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- 
- 		XFRM_MODE_SKB_CB(skb)->protocol = nexthdr;
- 
--		if (xfrm_inner_mode_input(x, skb)) {
-+		err = xfrm_inner_mode_input(x, skb);
-+		if (err == -EINPROGRESS)
-+			return 0;
-+		else if (err) {
- 			XFRM_INC_STATS(net, LINUX_MIB_XFRMINSTATEMODEERROR);
- 			goto drop;
- 		}
--
-+resume_decapped:
- 		if (x->outer_mode.flags & XFRM_MODE_FLAG_TUNNEL) {
- 			decaps = 1;
- 			break;
+@@ -69,6 +69,7 @@ static void __xfrm_mode_beet_prep(struct xfrm_state *x, struct sk_buff *skb,
+ static void xfrm_outer_mode_prep(struct xfrm_state *x, struct sk_buff *skb)
+ {
+ 	switch (x->outer_mode.encap) {
++	case XFRM_MODE_IPTFS:
+ 	case XFRM_MODE_TUNNEL:
+ 		if (x->outer_mode.family == AF_INET)
+ 			return __xfrm_mode_tunnel_prep(x, skb,
 diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
-index e5722c95b8bb..ef81359e4038 100644
+index ef81359e4038..b5025cf6136e 100644
 --- a/net/xfrm/xfrm_output.c
 +++ b/net/xfrm/xfrm_output.c
-@@ -472,6 +472,8 @@ static int xfrm_outer_mode_output(struct xfrm_state *x, struct sk_buff *skb)
- 		WARN_ON_ONCE(1);
- 		break;
- 	default:
-+		if (x->mode_cbs && x->mode_cbs->prepare_output)
-+			return x->mode_cbs->prepare_output(x, skb);
- 		WARN_ON_ONCE(1);
- 		break;
+@@ -677,6 +677,10 @@ static void xfrm_get_inner_ipproto(struct sk_buff *skb, struct xfrm_state *x)
+ 
+ 		return;
  	}
++	if (x->outer_mode.encap == XFRM_MODE_IPTFS) {
++		xo->inner_ipproto = IPPROTO_AGGFRAG;
++		return;
++	}
+ 
+ 	/* non-Tunnel Mode */
+ 	if (!skb->encapsulation)
 diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 298b3a9eb48d..a3b50e8bc85a 100644
+index a3b50e8bc85a..dd58f84b4c13 100644
 --- a/net/xfrm/xfrm_policy.c
 +++ b/net/xfrm/xfrm_policy.c
-@@ -2721,13 +2721,17 @@ static struct dst_entry *xfrm_bundle_create(struct xfrm_policy *policy,
+@@ -2474,6 +2474,7 @@ xfrm_tmpl_resolve_one(struct xfrm_policy *policy, const struct flowi *fl,
+ 		struct xfrm_tmpl *tmpl = &policy->xfrm_vec[i];
  
- 		dst1->input = dst_discard;
+ 		if (tmpl->mode == XFRM_MODE_TUNNEL ||
++		    tmpl->mode == XFRM_MODE_IPTFS ||
+ 		    tmpl->mode == XFRM_MODE_BEET) {
+ 			remote = &tmpl->id.daddr;
+ 			local = &tmpl->saddr;
+@@ -3266,7 +3267,8 @@ struct dst_entry *xfrm_lookup_with_ifid(struct net *net,
+ ok:
+ 	xfrm_pols_put(pols, drop_pols);
+ 	if (dst && dst->xfrm &&
+-	    dst->xfrm->props.mode == XFRM_MODE_TUNNEL)
++	    (dst->xfrm->props.mode == XFRM_MODE_TUNNEL ||
++	     dst->xfrm->props.mode == XFRM_MODE_IPTFS))
+ 		dst->flags |= DST_XFRM_TUNNEL;
+ 	return dst;
  
--		rcu_read_lock();
--		afinfo = xfrm_state_afinfo_get_rcu(inner_mode->family);
--		if (likely(afinfo))
--			dst1->output = afinfo->output;
--		else
--			dst1->output = dst_discard_out;
--		rcu_read_unlock();
-+		if (xfrm[i]->mode_cbs && xfrm[i]->mode_cbs->output) {
-+			dst1->output = xfrm[i]->mode_cbs->output;
-+		} else {
-+			rcu_read_lock();
-+			afinfo = xfrm_state_afinfo_get_rcu(inner_mode->family);
-+			if (likely(afinfo))
-+				dst1->output = afinfo->output;
-+			else
-+				dst1->output = dst_discard_out;
-+			rcu_read_unlock();
-+		}
- 
- 		xdst_prev = xdst;
+@@ -4503,6 +4505,7 @@ static int migrate_tmpl_match(const struct xfrm_migrate *m, const struct xfrm_tm
+ 		switch (t->mode) {
+ 		case XFRM_MODE_TUNNEL:
+ 		case XFRM_MODE_BEET:
++		case XFRM_MODE_IPTFS:
+ 			if (xfrm_addr_equal(&t->id.daddr, &m->old_daddr,
+ 					    m->old_family) &&
+ 			    xfrm_addr_equal(&t->saddr, &m->old_saddr,
+@@ -4545,7 +4548,8 @@ static int xfrm_policy_migrate(struct xfrm_policy *pol,
+ 				continue;
+ 			n++;
+ 			if (pol->xfrm_vec[i].mode != XFRM_MODE_TUNNEL &&
+-			    pol->xfrm_vec[i].mode != XFRM_MODE_BEET)
++			    pol->xfrm_vec[i].mode != XFRM_MODE_BEET &&
++			    pol->xfrm_vec[i].mode != XFRM_MODE_IPTFS)
+ 				continue;
+ 			/* update endpoints */
+ 			memcpy(&pol->xfrm_vec[i].id.daddr, &mp->new_daddr,
+diff --git a/net/xfrm/xfrm_proc.c b/net/xfrm/xfrm_proc.c
+index eeb984be03a7..e851b388995a 100644
+--- a/net/xfrm/xfrm_proc.c
++++ b/net/xfrm/xfrm_proc.c
+@@ -43,6 +43,9 @@ static const struct snmp_mib xfrm_mib_list[] = {
+ 	SNMP_MIB_ITEM("XfrmAcquireError", LINUX_MIB_XFRMACQUIREERROR),
+ 	SNMP_MIB_ITEM("XfrmOutStateDirError", LINUX_MIB_XFRMOUTSTATEDIRERROR),
+ 	SNMP_MIB_ITEM("XfrmInStateDirError", LINUX_MIB_XFRMINSTATEDIRERROR),
++	SNMP_MIB_ITEM("XfrmNoSkbError", LINUX_MIB_XFRMNOSKBERROR),
++	SNMP_MIB_ITEM("XfrmInIptfsError", LINUX_MIB_XFRMINIPTFSERROR),
++	SNMP_MIB_ITEM("XfrmOutNoQueueSpace", LINUX_MIB_XFRMOUTNOQSPACE),
+ 	SNMP_MIB_SENTINEL
+ };
  
 diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 649bb739df0d..e9ea5c5dd183 100644
+index e9ea5c5dd183..dad36ff30510 100644
 --- a/net/xfrm/xfrm_state.c
 +++ b/net/xfrm/xfrm_state.c
-@@ -513,6 +513,36 @@ static const struct xfrm_mode *xfrm_get_mode(unsigned int encap, int family)
- 	return NULL;
- }
+@@ -465,6 +465,11 @@ static const struct xfrm_mode xfrm4_mode_map[XFRM_MODE_MAX] = {
+ 		.flags = XFRM_MODE_FLAG_TUNNEL,
+ 		.family = AF_INET,
+ 	},
++	[XFRM_MODE_IPTFS] = {
++		.encap = XFRM_MODE_IPTFS,
++		.flags = XFRM_MODE_FLAG_TUNNEL,
++		.family = AF_INET,
++	},
+ };
  
-+static struct xfrm_mode_cbs xfrm_mode_cbs_map[XFRM_MODE_MAX];
-+
-+int xfrm_register_mode_cbs(u8 mode, const struct xfrm_mode_cbs *mode_cbs)
-+{
-+	if (mode >= XFRM_MODE_MAX)
-+		return -EINVAL;
-+
-+	xfrm_mode_cbs_map[mode] = *mode_cbs;
-+	return 0;
-+}
-+EXPORT_SYMBOL(xfrm_register_mode_cbs);
-+
-+void xfrm_unregister_mode_cbs(u8 mode)
-+{
-+	if (mode >= XFRM_MODE_MAX)
-+		return;
-+
-+	memset(&xfrm_mode_cbs_map[mode], 0, sizeof(xfrm_mode_cbs_map[mode]));
-+}
-+EXPORT_SYMBOL(xfrm_unregister_mode_cbs);
-+
-+static const struct xfrm_mode_cbs *xfrm_get_mode_cbs(u8 mode)
-+{
-+	if (mode >= XFRM_MODE_MAX)
-+		return NULL;
-+	if (mode == XFRM_MODE_IPTFS && !xfrm_mode_cbs_map[mode].create_state)
-+		request_module("xfrm-iptfs");
-+	return &xfrm_mode_cbs_map[mode];
-+}
-+
- void xfrm_state_free(struct xfrm_state *x)
- {
- 	kmem_cache_free(xfrm_state_cache, x);
-@@ -521,6 +551,8 @@ EXPORT_SYMBOL(xfrm_state_free);
+ static const struct xfrm_mode xfrm6_mode_map[XFRM_MODE_MAX] = {
+@@ -486,6 +491,11 @@ static const struct xfrm_mode xfrm6_mode_map[XFRM_MODE_MAX] = {
+ 		.flags = XFRM_MODE_FLAG_TUNNEL,
+ 		.family = AF_INET6,
+ 	},
++	[XFRM_MODE_IPTFS] = {
++		.encap = XFRM_MODE_IPTFS,
++		.flags = XFRM_MODE_FLAG_TUNNEL,
++		.family = AF_INET6,
++	},
+ };
  
- static void ___xfrm_state_destroy(struct xfrm_state *x)
- {
-+	if (x->mode_cbs && x->mode_cbs->delete_state)
-+		x->mode_cbs->delete_state(x);
- 	hrtimer_cancel(&x->mtimer);
- 	del_timer_sync(&x->rtimer);
- 	kfree(x->aead);
-@@ -678,6 +710,7 @@ struct xfrm_state *xfrm_state_alloc(struct net *net)
- 		x->replay_maxage = 0;
- 		x->replay_maxdiff = 0;
- 		spin_lock_init(&x->lock);
-+		x->mode_data = NULL;
- 	}
- 	return x;
- }
-@@ -1747,6 +1780,12 @@ static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
- 	x->new_mapping_sport = 0;
- 	x->dir = orig->dir;
- 
-+	x->mode_cbs = orig->mode_cbs;
-+	if (x->mode_cbs && x->mode_cbs->clone) {
-+		if (x->mode_cbs->clone(x, orig))
-+			goto error;
-+	}
-+
- 	return x;
- 
-  error:
-@@ -2786,6 +2825,9 @@ u32 xfrm_state_mtu(struct xfrm_state *x, int mtu)
+ static const struct xfrm_mode *xfrm_get_mode(unsigned int encap, int family)
+@@ -2111,6 +2121,7 @@ static int __xfrm6_state_sort_cmp(const void *p)
+ #endif
  	case XFRM_MODE_TUNNEL:
- 		break;
- 	default:
-+		if (x->mode_cbs && x->mode_cbs->get_inner_mtu)
-+			return x->mode_cbs->get_inner_mtu(x, mtu);
-+
- 		WARN_ON_ONCE(1);
- 		break;
+ 	case XFRM_MODE_BEET:
++	case XFRM_MODE_IPTFS:
+ 		return 4;
  	}
-@@ -2871,6 +2913,12 @@ int __xfrm_init_state(struct xfrm_state *x, bool init_replay, bool offload,
- 			goto error;
+ 	return 5;
+@@ -2137,6 +2148,7 @@ static int __xfrm6_tmpl_sort_cmp(const void *p)
+ #endif
+ 	case XFRM_MODE_TUNNEL:
+ 	case XFRM_MODE_BEET:
++	case XFRM_MODE_IPTFS:
+ 		return 3;
  	}
- 
-+	x->mode_cbs = xfrm_get_mode_cbs(x->props.mode);
-+	if (x->mode_cbs && x->mode_cbs->create_state) {
-+		err = x->mode_cbs->create_state(x);
-+		if (err)
-+			goto error;
-+	}
- error:
- 	return err;
- }
+ 	return 4;
 diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index 6537bd520363..dfd52637abed 100644
+index dfd52637abed..177dc0b23002 100644
 --- a/net/xfrm/xfrm_user.c
 +++ b/net/xfrm/xfrm_user.c
-@@ -914,6 +914,12 @@ static struct xfrm_state *xfrm_state_construct(struct net *net,
- 			goto error;
- 	}
+@@ -379,6 +379,14 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
+ 	case XFRM_MODE_ROUTEOPTIMIZATION:
+ 	case XFRM_MODE_BEET:
+ 		break;
++	case XFRM_MODE_IPTFS:
++		if (sa_dir == 0) {
++			NL_SET_ERR_MSG(
++				extack,
++				"IP-TFS mode requires in or out direction attribute");
++			goto out;
++		}
++		break;
  
-+	if (x->mode_cbs && x->mode_cbs->user_init) {
-+		err = x->mode_cbs->user_init(net, x, attrs, extack);
-+		if (err)
-+			goto error;
-+	}
-+
- 	return x;
- 
- error:
-@@ -1327,6 +1333,10 @@ static int copy_to_user_state_extra(struct xfrm_state *x,
- 		if (ret)
- 			goto out;
- 	}
-+	if (x->mode_cbs && x->mode_cbs->copy_to_user)
-+		ret = x->mode_cbs->copy_to_user(x, skb);
-+	if (ret)
-+		goto out;
- 	if (x->mapping_maxage) {
- 		ret = nla_put_u32(skb, XFRMA_MTIMER_THRESH, x->mapping_maxage);
- 		if (ret)
-@@ -3526,6 +3536,9 @@ static inline unsigned int xfrm_sa_len(struct xfrm_state *x)
- 	if (x->dir)
- 		l += nla_total_size(sizeof(x->dir));
- 
-+	if (x->mode_cbs && x->mode_cbs->sa_len)
-+		l += x->mode_cbs->sa_len(x);
-+
- 	return l;
- }
- 
+ 	default:
+ 		NL_SET_ERR_MSG(extack, "Unsupported mode");
+@@ -1973,6 +1981,8 @@ static int validate_tmpl(int nr, struct xfrm_user_tmpl *ut, u16 family,
+ 				return -EINVAL;
+ 			}
+ 			break;
++		case XFRM_MODE_IPTFS:
++			break;
+ 		default:
+ 			if (ut[i].family != prev_family) {
+ 				NL_SET_ERR_MSG(extack, "Mode in template doesn't support a family change");
 -- 
 2.45.2
 
