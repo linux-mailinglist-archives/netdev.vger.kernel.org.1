@@ -1,162 +1,254 @@
-Return-Path: <netdev+bounces-104157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E67E90B589
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:59:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E86E290B62C
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 18:21:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46DB01C22A38
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:59:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 751D1B303C5
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:04:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D2714D297;
-	Mon, 17 Jun 2024 15:48:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A761419A1;
+	Mon, 17 Jun 2024 14:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GdQVZF5E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jurD3cZV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972BF14D293
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 15:48:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C4514038E;
+	Mon, 17 Jun 2024 14:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718639301; cv=none; b=mbTCfQKQ6/Tay2SO3Toq10PkXPnx41HynhuIPfuvspvB+HIT14gq1kvwToQAyj0bp52JK0sn+T5LR0RUAAmz82FZGkHRtIvvan/r73TbUgfnaB8p8TN4yt7w2fL08MAK+TRcGMkQH43Qqe3eux7T5mQDs7Aj9irkyjyOaP9TH6o=
+	t=1718633819; cv=none; b=Bm6pyB+DZgSqwdYASmRPWlwKqvI03d6PquEUw9w/d7tSlW//8s3z+/nbYnP8nRXKOYvaKDe/nI+imZBPH9ShTu9SxzN0nBFVW0OgbDLCn9hTE//qjzqwML7biusLLF6M5sIP28e1EVQgy9q0n9m7DMS7zHDEp6KbH4kBHgLz/9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718639301; c=relaxed/simple;
-	bh=NtoBkFGBc3E/iPdGLo93DnYQxr46AH4EvAM+llTMuwk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XLL8BJh0eXFslZCVcE/kb2Ev44LZqmPvMd8YHj9fK98+yE8GpvgPlmfiXiX5Z3vN7x7ISzZTGJ9iTEgm4UzPKhh5fI9TLUPYdsh8zi2saw7UWh5f96Wgrlj5Kc+P1rCrzvFr3XdFGhhTtO3NKBUugYRRDkzD5usoo4mu9JO/vDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GdQVZF5E; arc=none smtp.client-ip=209.85.208.54
+	s=arc-20240116; t=1718633819; c=relaxed/simple;
+	bh=EKHULvpqNZT7k8Un31/LE5FzemNbHyJHUksXDrB0rig=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ha0IV6U+r4X1IUmXXZzcEHSN7kG8FbEnDRdmlzjMkF0XnDcZhLjtkQx02Xej/HdeIfnAU93+yU9hM6FRaAK9MGAn6CmmZUvNO427C/f2wfZ7gqVe+hKBkFQr0/LHzqWD5nwXh4q7z0zzgnc+6EaN9xT5BoJmnPGrk5xsRPVLCPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jurD3cZV; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57c7ec8f1fcso5299297a12.0
-        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 08:48:18 -0700 (PDT)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a6f11a2d18aso582622066b.2;
+        Mon, 17 Jun 2024 07:16:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718639297; x=1719244097; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xL3/WvJ5bI8knynduP5GyBliOLt03xCeOpkE0FZwiag=;
-        b=GdQVZF5E7qye12cJ7ZVIgZCBeDvoVObqMjb2ekBAOOGE/eRCON3Pa69/h+h0DZY5Du
-         4fuvX9+yAUTcZmWotRBpjMTPWdkbVMgmwdpRKokpzCkN8XrNVTFJmVs9u1USRAvRvnKT
-         YI9mPhgwMkSPudmjiVjlHzgtRAv4ZhyBsgNFAO67ja1sa5cbBVQV+3RLXznDPtg1+Egt
-         P911/Ibxr/AgPvGGWw1VNv7clDy36vrc91B+GONj1WvKXsZcEfluwiN99l5qv4bUe0Ze
-         RLV7Cl0j4/4+klzjjRClPUV+vZL5JR4QstKWgcwSjK29/GPU3IKC8RA5ShAEnZQSsZHe
-         XPBA==
+        d=gmail.com; s=20230601; t=1718633816; x=1719238616; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Drz0c1Oa4e/cLUt8BmnU83fUjCzoD8CgDqb9N07B3fI=;
+        b=jurD3cZVbyeVSUSW0vE0zigkqAldLoJaWsm4EEm1IUoET8bixTZ3KpialR/4nH+fMw
+         lGRtc6WIZB4Z0DfOuBIVwyvWABC++D1yM4CdX42ATFJOK0tkos/OpKSv8SNMHgTEVgnh
+         qZ67k37pLSsbi+oWHV1ll6EXGlXoehxpnLAfbhOwq+splzedn/UkVcj99iAoXujg9xLa
+         pirYVcdtk4h9vx8xOqJd5Efvb7/WdpOa5H/ypgt/0W9bsejcYR5UmrTpUZSxfvA8tGjE
+         m42+xLADEW/TNiiU2gE4BRIIX50JkD5ZyQA9r736hgw3wdbNXczaV+3e95HF5O0TeDlr
+         fEcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718639297; x=1719244097;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xL3/WvJ5bI8knynduP5GyBliOLt03xCeOpkE0FZwiag=;
-        b=umSdxmyHtuNIkW3Op/hlnR3TqcAyyPF36/liOwvwH++BS/1vNStkgT6GVFOJN7FOS5
-         RtWPrcC2bIF+uSB5d5mRFPpMdxK/93lkHSeV315DOHAReQvV6u1gKOJH7aXcEHpRwKFN
-         mgBv127YQ+g6JCnG7NRKrPwgNC1G5f/bR9kZFUFAAkBUFE+bjlIcuI4D1ZMeIasnLRN9
-         4lCCppbvwZciVcuKQRJqaRor/1WJLhhBdIR9OHezoxNeLNqmZLQInl00EsITC3h9vwKx
-         Yngvc9uJirdYu6XPdjTXQnrvQMUVK+ExDhTXDB2BHJbp/7qqQj9Mon7enOmIOFewnheP
-         /RBg==
-X-Gm-Message-State: AOJu0YwCHM2LseomqECAiwFp25S+pGymXZYu7+FjwnIIAIcfL+h25tYN
-	aQON4KApDRWMf82tzhx4jF9Th4oBIT7oTOHhh95UgjkRXlN+zHKHPHzD7K6+d6pfDYylAwIngzP
-	NGrAB95RP6ZVVoonygcLGnMh53cE=
-X-Google-Smtp-Source: AGHT+IGNPmTPx1E0cFnL6ihuIFXcCMyOQWVLcxbc0sjhh0aXjy0vK8tDOVXkldRu3GQ+fuvnZjW6iMTCemGxKKNUdaw=
-X-Received: by 2002:a17:907:6b8e:b0:a6f:80ff:4050 with SMTP id
- a640c23a62f3a-a6f80ff41c7mr313552966b.25.1718639296601; Mon, 17 Jun 2024
- 08:48:16 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718633816; x=1719238616;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Drz0c1Oa4e/cLUt8BmnU83fUjCzoD8CgDqb9N07B3fI=;
+        b=HspPGse7fPPKiybvhm6spN9qoindqD0/GibrFXCOfGJcsqtCLn43LRtjv2YZFMZT8T
+         PjSlRUpjvmK6bGHVmThW6xOqSM3Agy2zkBXxbHrAaxlisRqx43wv3rZhHB0K71kB8pup
+         iJpuKtCiRrbUWvbfas4TySvj52iBegOte7fhNE5skEd0nNwutBX30DaNU46mi3hxxPxF
+         cTZGQjbDcLK7rJcs4fDCrkIFo+S5muKKtM4IdUhPjoQnqIGlCsGdwgjeRidkFKCFl4fr
+         KwCBKVK4/DH3iZtVRx1DMlXeB9NEnxzgMvRGAfwT4zpySYA1ARIDNQBWjghVH/yZTGRC
+         73Gw==
+X-Forwarded-Encrypted: i=1; AJvYcCV1f46RY4Bni/WI51yixEXGyh/a9r5Czw11jSwmKfK7p/6GJawsoSA02/IGHqoKankdPbmbYTKWM+M5fkKt181H04+uccIYj8oAvfKlyqBXmufowEIzxJ0BM3LsW0xGHhxNcWsSsvX6iA7/vYZURbSzkSEqqELkPWmu2k4MvU6wSavoC+PweXZ15AgV+2/7FCYJ+IN/s/GrC5oaZ/Fk3QlpVp/pGD+sE4eqmhuDZ5yBaylN5+dPemTUQcL9+3+L5htxGvDNUjABTXAlQcUjrAims4Fx0B0k26ox0IExCektVqTrLYpP263aa0Fv3OMNjkWk0tTG3nOgCDCvP+lryCiPaMvPK+IL5QZoRpmn21uoLr+Ktd3OijqGOnvVXdKklZe85VPHe4YOPkOZvw98kyav5lSYHQNVf4Q5VZAYdkCfgi8GbWdeC337O8SZ8k/6n1SRLFntC74BYCuKxA74Jbzkw5xcIuIGV+XJ09rUJMM/l4/c2eBzLJtOIZd9wbhYHVMeZnmCSVHLfdyy8/pUTPLxub4O/niz27yHZgKiLQVztmf8xcXTehTG
+X-Gm-Message-State: AOJu0YxA7a7eB670T9JrOQo6BcYWAM7bo6MtQlGxQ0yQUOnFsU4XTyp4
+	1RI8ndUEAJJ0oHydOhPK5/zx208/9I/JarKKUltYJxzhAGahUX4H
+X-Google-Smtp-Source: AGHT+IFokiO39Qki+IyFQ+TRRzsTCRMTNhTNMlfnFWf73BlGYeWH1z0yP3M3M0hW8ADbaYfa4+g3mQ==
+X-Received: by 2002:a17:906:4555:b0:a6f:523a:8e93 with SMTP id a640c23a62f3a-a6f60de2129mr643249766b.71.1718633815552;
+        Mon, 17 Jun 2024 07:16:55 -0700 (PDT)
+Received: from [192.168.42.82] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56db67e5sm518501066b.66.2024.06.17.07.16.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Jun 2024 07:16:55 -0700 (PDT)
+Message-ID: <439590d4-0f05-4f5e-80ec-e7fdf214e307@gmail.com>
+Date: Mon, 17 Jun 2024 15:16:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240612170851.1004604-1-jiri@resnulli.us> <CAL+tcoARbB=xBqsxQJ6PWbCcHUgpFhoXBq0BAJHrKc0+1NNcvA@mail.gmail.com>
- <Zm_-vk5heG6rkZEf@nanopsycho.orion>
-In-Reply-To: <Zm_-vk5heG6rkZEf@nanopsycho.orion>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 17 Jun 2024 23:47:38 +0800
-Message-ID: <CAL+tcoDf=2xMS4G1sbm8y=LDcUqP0Ft6AZ1Ts4Ar8jtYA_=QUQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] virtio_net: add support for Byte Queue Limits
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, mst@redhat.com, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	dave.taht@gmail.com, hengqi@linux.alibaba.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 06/13] page_pool: devmem support
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+ Sergey Shtylyov <s.shtylyov@omp.ru>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
+ <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>,
+ Nikolay Aleksandrov <razor@blackwall.org>, David Wei <dw@davidwei.uk>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>,
+ Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ linux-mm@kvack.org, Matthew Wilcox <willy@infradead.org>
+References: <20240613013557.1169171-1-almasrymina@google.com>
+ <20240613013557.1169171-7-almasrymina@google.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20240613013557.1169171-7-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 17, 2024 at 5:15=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Fri, Jun 14, 2024 at 11:54:04AM CEST, kerneljasonxing@gmail.com wrote:
-> >Hello Jiri,
-> >
-> >On Thu, Jun 13, 2024 at 1:08=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wr=
-ote:
-> >>
-> >> From: Jiri Pirko <jiri@nvidia.com>
-> >>
-> >> Add support for Byte Queue Limits (BQL).
-> >>
-> >> Tested on qemu emulated virtio_net device with 1, 2 and 4 queues.
-> >> Tested with fq_codel and pfifo_fast. Super netperf with 50 threads is
-> >> running in background. Netperf TCP_RR results:
-> >>
-> >> NOBQL FQC 1q:  159.56  159.33  158.50  154.31    agv: 157.925
-> >> NOBQL FQC 2q:  184.64  184.96  174.73  174.15    agv: 179.62
-> >> NOBQL FQC 4q:  994.46  441.96  416.50  499.56    agv: 588.12
-> >> NOBQL PFF 1q:  148.68  148.92  145.95  149.48    agv: 148.2575
-> >> NOBQL PFF 2q:  171.86  171.20  170.42  169.42    agv: 170.725
-> >> NOBQL PFF 4q: 1505.23 1137.23 2488.70 3507.99    agv: 2159.7875
-> >>   BQL FQC 1q: 1332.80 1297.97 1351.41 1147.57    agv: 1282.4375
-> >>   BQL FQC 2q:  768.30  817.72  864.43  974.40    agv: 856.2125
-> >>   BQL FQC 4q:  945.66  942.68  878.51  822.82    agv: 897.4175
-> >>   BQL PFF 1q:  149.69  151.49  149.40  147.47    agv: 149.5125
-> >>   BQL PFF 2q: 2059.32  798.74 1844.12  381.80    agv: 1270.995
-> >>   BQL PFF 4q: 1871.98 4420.02 4916.59 13268.16   agv: 6119.1875
-> >
-> >I cannot get such a huge improvement when I was doing multiple tests
-> >between two VMs. I'm pretty sure the BQL feature is working, but the
-> >numbers look the same with/without BQL.
-> >
-> >VM 1 (client):
-> >16 cpus, x86_64, 4 queues, the latest net-next kernel with/without
-> >this patch, pfifo_fast, napi_tx=3Dtrue, napi_weight=3D128
-> >
-> >VM 2 (server):
-> >16 cpus, aarch64, 4 queues, the latest net-next kernel without this
-> >patch, pfifo_fast
-> >
-> >What the 'ping' command shows to me between two VMs is : rtt
-> >min/avg/max/mdev =3D 0.233/0.257/0.300/0.024 ms
-> >
-> >I started 50 netperfs to communicate the other side with the following c=
-ommand:
-> >#!/bin/bash
-> >
-> >for i in $(seq 5000 5050);
-> >do
-> >netperf -p $i -H [ip addr] -l 60 -t TCP_RR -- -r 64,64 > /dev/null 2>&1 =
-&
-> >done
-> >
-> >The results are around 30423.62 txkB/s. If I remove '-r 64 64', they
-> >are still the same/similar.
->
-> You have to stress the line by parallel TCP_STREAM instances (50 in my
-> case). For consistent results, use -p portnum,locport to specify the
-> local port.
+On 6/13/24 02:35, Mina Almasry wrote:
+> Convert netmem to be a union of struct page and struct netmem. Overload
+> the LSB of struct netmem* to indicate that it's a net_iov, otherwise
+> it's a page.
+> 
+> Currently these entries in struct page are rented by the page_pool and
+> used exclusively by the net stack:
+> 
+> struct {
+> 	unsigned long pp_magic;
+> 	struct page_pool *pp;
+> 	unsigned long _pp_mapping_pad;
+> 	unsigned long dma_addr;
+> 	atomic_long_t pp_ref_count;
+> };
+> 
+> Mirror these (and only these) entries into struct net_iov and implement
+> netmem helpers that can access these common fields regardless of
+> whether the underlying type is page or net_iov.
+> 
+> Implement checks for net_iov in netmem helpers which delegate to mm
+> APIs, to ensure net_iov are never passed to the mm stack.
+> 
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
 
-Thanks. Even though the results of TCP_RR mode vary sometimes, I can
-see a big improvement in the total value of those results under such
-circumstances.
-With BQL, the throughput is 2159.17
-Without BQL, it's 1099.33
+Apart from small comments below
 
-Please feel free to add the tag:
-Tested-by: Jason Xing <kerneljasonxing@gmail.com>
+Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
 
-Thanks,
-Jason
+
+> ---
+>   include/net/netmem.h            | 137 ++++++++++++++++++++++++++++++--
+>   include/net/page_pool/helpers.h |  25 +++---
+>   net/core/devmem.c               |   3 +
+>   net/core/page_pool.c            |  26 +++---
+>   net/core/skbuff.c               |  22 +++--
+>   5 files changed, 168 insertions(+), 45 deletions(-)
+> 
+> diff --git a/include/net/netmem.h b/include/net/netmem.h
+> index 664df8325ece5..35ad237fdf29e 100644
+> --- a/include/net/netmem.h
+> +++ b/include/net/netmem.h
+...
+> -/* Converting from page to netmem is always safe, because a page can always be
+> - * a netmem.
+> - */
+>   static inline netmem_ref page_to_netmem(struct page *page)
+>   {
+>   	return (__force netmem_ref)page;
+> @@ -68,17 +107,103 @@ static inline netmem_ref page_to_netmem(struct page *page)
+>   
+>   static inline int netmem_ref_count(netmem_ref netmem)
+>   {
+> +	/* The non-pp refcount of net_iov is always 1. On net_iov, we only
+> +	 * support pp refcounting which uses the pp_ref_count field.
+> +	 */
+> +	if (netmem_is_net_iov(netmem))
+> +		return 1;
+> +
+>   	return page_ref_count(netmem_to_page(netmem));
+>   }
+>   
+>   static inline unsigned long netmem_to_pfn(netmem_ref netmem)
+>   {
+> +	if (netmem_is_net_iov(netmem))
+> +		return 0;
+
+IIRC 0 is a valid pfn. Not much of a concern since it's
+used only for tracing, but might make sense to pass some
+invalid pfn if there is one
+
+> +
+>   	return page_to_pfn(netmem_to_page(netmem));
+>   }
+>   
+...
+>   static inline netmem_ref netmem_compound_head(netmem_ref netmem)
+>   {
+> +	/* niov are never compounded */
+> +	if (netmem_is_net_iov(netmem))
+> +		return netmem;
+> +
+>   	return page_to_netmem(compound_head(netmem_to_page(netmem)));
+>   }
+>   
+> +static inline void *netmem_address(netmem_ref netmem)
+
+I don't think it's used anywhere, do I miss it?
+
+> +{
+> +	if (netmem_is_net_iov(netmem))
+> +		return NULL;
+> +
+> +	return page_address(netmem_to_page(netmem));
+> +}
+> +
+...
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index a5957d3359762..1152e3547795a 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -26,6 +26,8 @@
+...
+>   
+>   /* If the page refcnt == 1, this will try to recycle the page.
+> @@ -714,7 +713,7 @@ __page_pool_put_page(struct page_pool *pool, netmem_ref netmem,
+>   	 * refcnt == 1 means page_pool owns page, and can recycle it.
+>   	 *
+>   	 * page is NOT reusable when allocated when system is under
+> -	 * some pressure. (page_is_pfmemalloc)
+> +	 * some pressure. (page_pool_page_is_pfmemalloc)
+
+There is no page_pool_page_is_pfmemalloc()
+
+>   	 */
+>   	if (likely(__page_pool_page_can_be_recycled(netmem))) {
+>   		/* Read barrier done in page_ref_count / READ_ONCE */
+> @@ -727,6 +726,7 @@ __page_pool_put_page(struct page_pool *pool, netmem_ref netmem,
+>   		/* Page found as candidate for recycling */
+>   		return netmem;
+>   	}
+
+-- 
+Pavel Begunkov
 
