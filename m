@@ -1,319 +1,270 @@
-Return-Path: <netdev+bounces-103950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B4BF90A7EF
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:58:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 517A790A7E3
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:57:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 172DC28A91E
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 07:58:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F862B2727B
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 07:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32EBA19004D;
-	Mon, 17 Jun 2024 07:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="KWonQ4IV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B322918FDBC;
+	Mon, 17 Jun 2024 07:56:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D0F39FFB;
-	Mon, 17 Jun 2024 07:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CB919005D;
+	Mon, 17 Jun 2024 07:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718611112; cv=none; b=cWhzJyzo3y6NM4RCNjYeoYesBlD5N+OPy4/lUZAEtrW2KTSKbN+cwaxMN15Z0QXVR0/VR7g+I8wRXgxupO0YOJcYuELI0v+NL+vrQ4zjWrAOw63MOV3qISkkZckKcS1Ce/cp2NewtkE4tpwCRY/kYjJRtlES0C0LZcx18Y4WB5Y=
+	t=1718611016; cv=none; b=i1zI2ctnY/NK65heQyEcUMsGn7fFthXvb4K+AaQ/QHtsj94RCpROgrnXVOR5bwk2i28FmN91x+Z1Lyc+HTlnsED0GyEkhVeVIgRiS6I4ACVssKbCX1ibnmBGOUf88qrtnDkhPjIZEhsiZN+mWB5+aK9CEyIIbtwY4cobzTwGqC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718611112; c=relaxed/simple;
-	bh=BUwe8NWB4XMebs6DN66UkxIZma16VsDQo8lFih4wqx8=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=g8Nj76aT/j3r5AuYJspMr8Ey1jsszD91Gy6xypP+cxDGlEZZMQ8ZkwPH6hU9U1ui2Qn9ttHc6SxtZBXOCIoaDRpZJiGpkuSaKMGphsmjw7bJ3gIg42U02Vu5IPxrSI6g7ro5iqrlZWsdJNHaaZqQt3M5j6ARYD7p7pGxtMOQxe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=KWonQ4IV; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1718611105; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=KkXyNy4nPWs5iLXPRTfMZfZK1JRxusa9+ju97vFjvsw=;
-	b=KWonQ4IVq8Pq0Q9dqCaPEAV0gXSruNpz9jYG0YcEs0+bd6DWZhwDraXEuziQs6fLs+FarAlac1+kQfh8Km2Iy6QtOkOw5eGpLhSsUQ4xWhg5nwCPkbLgGFYABtrcezlWk46l7F/h12XL5RmALo9Cf/Tyj1YeD6l2iCnnx92IKTk=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R371e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033022160150;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W8a1ykr_1718611104;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W8a1ykr_1718611104)
-          by smtp.aliyun-inc.com;
-          Mon, 17 Jun 2024 15:58:25 +0800
-Message-ID: <1718610955.756943-6-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v5 15/15] virtio_net: xsk: rx: support recv small mode
-Date: Mon, 17 Jun 2024 15:55:55 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240614063933.108811-1-xuanzhuo@linux.alibaba.com>
- <20240614063933.108811-16-xuanzhuo@linux.alibaba.com>
- <CACGkMEtzWQLN9D9+5jZFcn4MNNfDPQ77TK3D5B78NXPyq5u-Gg@mail.gmail.com>
-In-Reply-To: <CACGkMEtzWQLN9D9+5jZFcn4MNNfDPQ77TK3D5B78NXPyq5u-Gg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1718611016; c=relaxed/simple;
+	bh=MYjaPWxvd0zWSAPoX2STJiQiDpNqeno+Fw71ehmaaAE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=V/nJqWfT4TJ3e879mINDh6CpXxP+8atzwxK19oygoO7K+L6vLkxhbwcAtUc7OJhGpOSAlfXaeX/Ix+xxJ1Cgw8Mx7M6JE1Ccy7qpWr+nTvfoTPx5ZhXKSa/rR/T6tzN8Wtl8NFz04/ZccjFtKDltB1r6E1mc6voZljEXBjJdgZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 241da90a2c7f11ef9305a59a3cc225df-20240617
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:edb0b905-6b20-4754-b49c-d4320a87b90d,IP:10,
+	URL:0,TC:0,Content:-25,EDM:-25,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,
+	ACTION:release,TS:-55
+X-CID-INFO: VERSION:1.1.38,REQID:edb0b905-6b20-4754-b49c-d4320a87b90d,IP:10,UR
+	L:0,TC:0,Content:-25,EDM:-25,RT:0,SF:-15,FILE:0,BULK:0,RULE:EDM_GE969F26,A
+	CTION:release,TS:-55
+X-CID-META: VersionHash:82c5f88,CLOUDID:e36f6093ae4c588f80860c67b85a17f9,BulkI
+	D:240617155646E5UZ8R2Y,BulkQuantity:0,Recheck:0,SF:17|19|44|66|24|102,TC:n
+	il,Content:0,EDM:1|19,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,
+	COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: 241da90a2c7f11ef9305a59a3cc225df-20240617
+Received: from node2.com.cn [(39.156.73.10)] by mailgw.kylinos.cn
+	(envelope-from <luoxuanqiang@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 218619999; Mon, 17 Jun 2024 15:56:45 +0800
+Received: from node2.com.cn (localhost [127.0.0.1])
+	by node2.com.cn (NSMail) with SMTP id A31C0B80758A;
+	Mon, 17 Jun 2024 15:56:44 +0800 (CST)
+X-ns-mid: postfix-666FEC3C-52643062
+Received: from localhost.localdomain (unknown [10.42.12.252])
+	by node2.com.cn (NSMail) with ESMTPA id A7BA1B80758A;
+	Mon, 17 Jun 2024 07:56:40 +0000 (UTC)
+From: luoxuanqiang <luoxuanqiang@kylinos.cn>
+To: edumazet@google.com
+Cc: kuniyu@amazon.com,
+	davem@davemloft.net,
+	dccp@vger.kernel.org,
+	dsahern@kernel.org,
+	fw@strlen.de,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	alexandre.ferrieux@orange.com
+Subject: [PATCH net v3] Fix race for duplicate reqsk on identical SYN
+Date: Mon, 17 Jun 2024 15:56:40 +0800
+Message-Id: <20240617075640.207570-1-luoxuanqiang@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 17 Jun 2024 15:10:48 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Fri, Jun 14, 2024 at 2:39=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > The virtnet_xdp_handler() is re-used. But
-> >
-> > 1. We need to copy data to create skb for XDP_PASS.
-> > 2. We need to call xsk_buff_free() to release the buffer.
-> > 3. The handle for xdp_buff is difference.
-> >
-> > If we pushed this logic into existing receive handle(merge and small),
-> > we would have to maintain code scattered inside merge and small (and bi=
-g).
-> > So I think it is a good choice for us to put the xsk code into an
-> > independent function.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio_net.c | 142 +++++++++++++++++++++++++++++++++++++--
-> >  1 file changed, 138 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 4e5645d8bb7d..72c4d2f0c0ea 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -534,8 +534,10 @@ struct virtio_net_common_hdr {
-> >
-> >  static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf=
-);
-> >  static void virtnet_xsk_completed(struct send_queue *sq, int num);
-> > -static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct rec=
-eive_queue *rq,
-> > -                                  struct xsk_buff_pool *pool, gfp_t gf=
-p);
-> > +static int virtnet_xdp_handler(struct bpf_prog *xdp_prog, struct xdp_b=
-uff *xdp,
-> > +                              struct net_device *dev,
-> > +                              unsigned int *xdp_xmit,
-> > +                              struct virtnet_rq_stats *stats);
-> >
-> >  enum virtnet_xmit_type {
-> >         VIRTNET_XMIT_TYPE_SKB,
-> > @@ -1218,6 +1220,11 @@ static void virtnet_rq_unmap_free_buf(struct vir=
-tqueue *vq, void *buf)
-> >
-> >         rq =3D &vi->rq[i];
-> >
-> > +       if (rq->xsk.pool) {
-> > +               xsk_buff_free((struct xdp_buff *)buf);
-> > +               return;
-> > +       }
-> > +
-> >         if (!vi->big_packets || vi->mergeable_rx_bufs)
-> >                 virtnet_rq_unmap(rq, buf, 0);
-> >
-> > @@ -1308,6 +1315,120 @@ static void sg_fill_dma(struct scatterlist *sg,=
- dma_addr_t addr, u32 len)
-> >         sg->length =3D len;
-> >  }
-> >
-> > +static struct xdp_buff *buf_to_xdp(struct virtnet_info *vi,
-> > +                                  struct receive_queue *rq, void *buf,=
- u32 len)
-> > +{
-> > +       struct xdp_buff *xdp;
-> > +       u32 bufsize;
-> > +
-> > +       xdp =3D (struct xdp_buff *)buf;
-> > +
-> > +       bufsize =3D xsk_pool_get_rx_frame_size(rq->xsk.pool) + vi->hdr_=
-len;
-> > +
-> > +       if (unlikely(len > bufsize)) {
-> > +               pr_debug("%s: rx error: len %u exceeds truesize %u\n",
-> > +                        vi->dev->name, len, bufsize);
-> > +               DEV_STATS_INC(vi->dev, rx_length_errors);
-> > +               xsk_buff_free(xdp);
-> > +               return NULL;
-> > +       }
-> > +
-> > +       xsk_buff_set_size(xdp, len);
-> > +       xsk_buff_dma_sync_for_cpu(xdp);
-> > +
-> > +       return xdp;
-> > +}
-> > +
-> > +static struct sk_buff *xdp_construct_skb(struct receive_queue *rq,
-> > +                                        struct xdp_buff *xdp)
-> > +{
-> > +       unsigned int metasize =3D xdp->data - xdp->data_meta;
-> > +       struct sk_buff *skb;
-> > +       unsigned int size;
-> > +
-> > +       size =3D xdp->data_end - xdp->data_hard_start;
-> > +       skb =3D napi_alloc_skb(&rq->napi, size);
-> > +       if (unlikely(!skb)) {
-> > +               xsk_buff_free(xdp);
-> > +               return NULL;
-> > +       }
-> > +
-> > +       skb_reserve(skb, xdp->data_meta - xdp->data_hard_start);
-> > +
-> > +       size =3D xdp->data_end - xdp->data_meta;
-> > +       memcpy(__skb_put(skb, size), xdp->data_meta, size);
-> > +
-> > +       if (metasize) {
-> > +               __skb_pull(skb, metasize);
-> > +               skb_metadata_set(skb, metasize);
-> > +       }
-> > +
-> > +       xsk_buff_free(xdp);
-> > +
-> > +       return skb;
-> > +}
-> > +
-> > +static struct sk_buff *virtnet_receive_xsk_small(struct net_device *de=
-v, struct virtnet_info *vi,
-> > +                                                struct receive_queue *=
-rq, struct xdp_buff *xdp,
-> > +                                                unsigned int *xdp_xmit,
-> > +                                                struct virtnet_rq_stat=
-s *stats)
-> > +{
-> > +       struct bpf_prog *prog;
-> > +       u32 ret;
-> > +
-> > +       ret =3D XDP_PASS;
-> > +       rcu_read_lock();
-> > +       prog =3D rcu_dereference(rq->xdp_prog);
-> > +       if (prog)
-> > +               ret =3D virtnet_xdp_handler(prog, xdp, dev, xdp_xmit, s=
-tats);
-> > +       rcu_read_unlock();
-> > +
-> > +       switch (ret) {
-> > +       case XDP_PASS:
-> > +               return xdp_construct_skb(rq, xdp);
-> > +
-> > +       case XDP_TX:
-> > +       case XDP_REDIRECT:
-> > +               return NULL;
-> > +
-> > +       default:
-> > +               /* drop packet */
-> > +               xsk_buff_free(xdp);
-> > +               u64_stats_inc(&stats->drops);
-> > +               return NULL;
-> > +       }
-> > +}
->
-> Let's use a separate patch for this to decouple new functions with refact=
-oring.
->
-> Or even use a separate series for rx zerocopy.
+When bonding is configured in BOND_MODE_BROADCAST mode, if two identical
+SYN packets are received at the same time and processed on different CPUs=
+,
+it can potentially create the same sk (sock) but two different reqsk
+(request_sock) in tcp_conn_request().
 
+These two different reqsk will respond with two SYNACK packets, and since
+the generation of the seq (ISN) incorporates a timestamp, the final two
+SYNACK packets will have different seq values.
 
-This is for xsk. I can not get you.
+The consequence is that when the Client receives and replies with an ACK
+to the earlier SYNACK packet, we will reset(RST) it.
 
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
->
-> > +
-> > +static struct sk_buff *virtnet_receive_xsk_buf(struct virtnet_info *vi=
-, struct receive_queue *rq,
-> > +                                              void *buf, u32 len,
-> > +                                              unsigned int *xdp_xmit,
-> > +                                              struct virtnet_rq_stats =
-*stats)
-> > +{
-> > +       struct net_device *dev =3D vi->dev;
-> > +       struct sk_buff *skb =3D NULL;
-> > +       struct xdp_buff *xdp;
-> > +
-> > +       len -=3D vi->hdr_len;
-> > +
-> > +       u64_stats_add(&stats->bytes, len);
-> > +
-> > +       xdp =3D buf_to_xdp(vi, rq, buf, len);
-> > +       if (!xdp)
-> > +               return NULL;
->
-> Don't we need to check if XDP is enabled before those operations?
->
-> > +
-> > +       if (unlikely(len < ETH_HLEN)) {
-> > +               pr_debug("%s: short packet %i\n", dev->name, len);
-> > +               DEV_STATS_INC(dev, rx_length_errors);
-> > +               xsk_buff_free(xdp);
-> > +               return NULL;
-> > +       }
-> > +
-> > +       if (!vi->mergeable_rx_bufs)
-> > +               skb =3D virtnet_receive_xsk_small(dev, vi, rq, xdp, xdp=
-_xmit, stats);
-> > +
-> > +       return skb;
-> > +}
-> > +
-> >  static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct rec=
-eive_queue *rq,
-> >                                    struct xsk_buff_pool *pool, gfp_t gf=
-p)
-> >  {
-> > @@ -2713,9 +2834,22 @@ static int virtnet_receive(struct receive_queue =
-*rq, int budget,
-> >         void *buf;
-> >         int i;
-> >
-> > -       if (!vi->big_packets || vi->mergeable_rx_bufs) {
-> > -               void *ctx;
-> > +       if (rq->xsk.pool) {
-> > +               struct sk_buff *skb;
-> > +
-> > +               while (packets < budget) {
-> > +                       buf =3D virtqueue_get_buf(rq->vq, &len);
-> > +                       if (!buf)
-> > +                               break;
-> >
-> > +                       skb =3D virtnet_receive_xsk_buf(vi, rq, buf, le=
-n, xdp_xmit, &stats);
->
-> The function name is confusing for example, xsk might not be even enabled.
+This behavior is consistently reproducible in my local setup,
+which comprises:
 
+                  | NETA1 ------ NETB1 |
+PC_A --- bond --- |                    | --- bond --- PC_B
+                  | NETA2 ------ NETB2 |
 
-If rq->xsk.pool is true, the xsk is enable.
+- PC_A is the Server and has two network cards, NETA1 and NETA2. I have
+  bonded these two cards using BOND_MODE_BROADCAST mode and configured
+  them to be handled by different CPU.
 
-Thanks.
+- PC_B is the Client, also equipped with two network cards, NETB1 and
+  NETB2, which are also bonded and configured in BOND_MODE_BROADCAST mode=
+.
 
+If the client attempts a TCP connection to the server, it might encounter
+a failure. Capturing packets from the server side reveals:
 
->
-> > +                       if (skb)
-> > +                               virtnet_receive_done(vi, rq, skb);
-> > +
-> > +                       packets++;
-> > +               }
-> > +       } else if (!vi->big_packets || vi->mergeable_rx_bufs) {
-> > +               void *ctx;
-> >                 while (packets < budget &&
-> >                        (buf =3D virtnet_rq_get_buf(rq, &len, &ctx))) {
-> >                         receive_buf(vi, rq, buf, len, ctx, xdp_xmit, &s=
-tats);
-> > --
-> > 2.32.0.3.g01195cf9f
-> >
->
-> Thanks
->
+10.10.10.10.45182 > localhost: Flags [S], seq 320236027,
+10.10.10.10.45182 > localhost: Flags [S], seq 320236027,
+localhost > 10.10.10.10.45182: Flags [S.], seq 2967855116,
+localhost > 10.10.10.10.45182: Flags [S.], seq 2967855123, <=3D=3D
+10.10.10.10.45182 > localhost: Flags [.], ack 4294967290,
+10.10.10.10.45182 > localhost: Flags [.], ack 4294967290,
+localhost > 10.10.10.10.45182: Flags [R], seq 2967855117, <=3D=3D
+localhost > 10.10.10.10.45182: Flags [R], seq 2967855117,
+
+Two SYNACKs with different seq numbers are sent by localhost,
+resulting in an anomaly.
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+The attempted solution is as follows:
+In the tcp_conn_request(), while inserting reqsk into the ehash table,
+it also checks if an entry already exists. If found, it avoids
+reinsertion and releases it.
+
+Simultaneously, In the reqsk_queue_hash_req(), the start of the
+req->rsk_timer is adjusted to be after successful insertion.
+
+Signed-off-by: luoxuanqiang <luoxuanqiang@kylinos.cn>
+---
+ include/net/inet_connection_sock.h |  4 ++--
+ net/dccp/ipv4.c                    |  2 +-
+ net/dccp/ipv6.c                    |  2 +-
+ net/ipv4/inet_connection_sock.c    | 19 +++++++++++++------
+ net/ipv4/tcp_input.c               |  9 ++++++++-
+ 5 files changed, 25 insertions(+), 11 deletions(-)
+
+diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connec=
+tion_sock.h
+index 7d6b1254c92d..8ebab6220dbc 100644
+--- a/include/net/inet_connection_sock.h
++++ b/include/net/inet_connection_sock.h
+@@ -263,8 +263,8 @@ struct dst_entry *inet_csk_route_child_sock(const str=
+uct sock *sk,
+ struct sock *inet_csk_reqsk_queue_add(struct sock *sk,
+ 				      struct request_sock *req,
+ 				      struct sock *child);
+-void inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_sock =
+*req,
+-				   unsigned long timeout);
++bool inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_sock =
+*req,
++				   unsigned long timeout, bool *found_dup_sk);
+ struct sock *inet_csk_complete_hashdance(struct sock *sk, struct sock *c=
+hild,
+ 					 struct request_sock *req,
+ 					 bool own_req);
+diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
+index ff41bd6f99c3..13aafdeb9205 100644
+--- a/net/dccp/ipv4.c
++++ b/net/dccp/ipv4.c
+@@ -657,7 +657,7 @@ int dccp_v4_conn_request(struct sock *sk, struct sk_b=
+uff *skb)
+ 	if (dccp_v4_send_response(sk, req))
+ 		goto drop_and_free;
+=20
+-	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT);
++	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT, NULL);
+ 	reqsk_put(req);
+ 	return 0;
+=20
+diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
+index 85f4b8fdbe5e..493cdb12ce2b 100644
+--- a/net/dccp/ipv6.c
++++ b/net/dccp/ipv6.c
+@@ -400,7 +400,7 @@ static int dccp_v6_conn_request(struct sock *sk, stru=
+ct sk_buff *skb)
+ 	if (dccp_v6_send_response(sk, req))
+ 		goto drop_and_free;
+=20
+-	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT);
++	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT, NULL);
+ 	reqsk_put(req);
+ 	return 0;
+=20
+diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_s=
+ock.c
+index d81f74ce0f02..2fa9b33ae26a 100644
+--- a/net/ipv4/inet_connection_sock.c
++++ b/net/ipv4/inet_connection_sock.c
+@@ -1122,25 +1122,32 @@ static void reqsk_timer_handler(struct timer_list=
+ *t)
+ 	inet_csk_reqsk_queue_drop_and_put(oreq->rsk_listener, oreq);
+ }
+=20
+-static void reqsk_queue_hash_req(struct request_sock *req,
+-				 unsigned long timeout)
++static bool reqsk_queue_hash_req(struct request_sock *req,
++				 unsigned long timeout, bool *found_dup_sk)
+ {
++	if (!inet_ehash_insert(req_to_sk(req), NULL, found_dup_sk))
++		return false;
++
++	/* The timer needs to be setup after a successful insertion. */
+ 	timer_setup(&req->rsk_timer, reqsk_timer_handler, TIMER_PINNED);
+ 	mod_timer(&req->rsk_timer, jiffies + timeout);
+=20
+-	inet_ehash_insert(req_to_sk(req), NULL, NULL);
+ 	/* before letting lookups find us, make sure all req fields
+ 	 * are committed to memory and refcnt initialized.
+ 	 */
+ 	smp_wmb();
+ 	refcount_set(&req->rsk_refcnt, 2 + 1);
++	return true;
+ }
+=20
+-void inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_sock =
+*req,
+-				   unsigned long timeout)
++bool inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_sock =
+*req,
++				   unsigned long timeout, bool *found_dup_sk)
+ {
+-	reqsk_queue_hash_req(req, timeout);
++	if (!reqsk_queue_hash_req(req, timeout, found_dup_sk))
++		return false;
++
+ 	inet_csk_reqsk_queue_added(sk);
++	return true;
+ }
+ EXPORT_SYMBOL_GPL(inet_csk_reqsk_queue_hash_add);
+=20
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 9c04a9c8be9d..e006c374f781 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -7255,8 +7255,15 @@ int tcp_conn_request(struct request_sock_ops *rsk_=
+ops,
+ 	} else {
+ 		tcp_rsk(req)->tfo_listener =3D false;
+ 		if (!want_cookie) {
++			bool found_dup_sk =3D false;
++
+ 			req->timeout =3D tcp_timeout_init((struct sock *)req);
+-			inet_csk_reqsk_queue_hash_add(sk, req, req->timeout);
++			if (unlikely(!inet_csk_reqsk_queue_hash_add(sk, req, req->timeout,
++								    &found_dup_sk))) {
++				reqsk_free(req);
++				return 0;
++			}
++
+ 		}
+ 		af_ops->send_synack(sk, dst, &fl, req, &foc,
+ 				    !want_cookie ? TCP_SYNACK_NORMAL :
+--=20
+2.25.1
+
 
