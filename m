@@ -1,261 +1,215 @@
-Return-Path: <netdev+bounces-104049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 720BF90AF9F
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:40:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CB6290B08E
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:58:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DC211C2122E
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:40:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B77E728537E
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 13:58:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35EDF1B5818;
-	Mon, 17 Jun 2024 13:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE27316EB74;
+	Mon, 17 Jun 2024 13:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gXgMU4Xp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AeNG0Ln0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54763198E98;
-	Mon, 17 Jun 2024 13:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4507416DC39
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 13:25:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718630568; cv=none; b=lSuGGUdOWzBaslCD7gt3bFMFUWs2hE/zlv60i7Nrvw+SJCVW1+K4knuYDs5y0rSl3kFbTMw6BNZynCkIKLxHxPnQovpfOa9UrZswlPJaeirl0yhgj5XSFkcEp3zxN6DIOc6nQj8P59wQrG67hy2Uq5URbLWrfqPNy9dPCKJS7xQ=
+	t=1718630721; cv=none; b=NApWakMVrK907faho4140C9oqdWLbehnICmwic/3ncYsXq4BG0aCYQG1S0LSbIStrzcDM3yrFuKvU4ZJRtABqA6zoXgA6/KCzcbu98RmtKLWEd9MreQsrH3unUyhqwt9XRUUrrXBfSL4lU8dtNTo0dZEGxbevTWbNnqEmas41Vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718630568; c=relaxed/simple;
-	bh=PdMIx7ts4oz1uQk5eiNfGe66l/dzc3Wnxf+2+lDmu1I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oTjzl9/UtvXU/oUGYO7zO8qHbM/k1g+N4VgcMkKUjOya1zNSxouc5y8oULO31W47IziNFCEYQO/MuB/whgJ7tLLqlqop28xWRMPWfurRM3E1zNoEdQXprmZe4JggsPCJ+WABgA15t2safeoex1KeEvAQ4Na++cSIsZazs0k98eM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gXgMU4Xp; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a6f8ebbd268so73877366b.0;
-        Mon, 17 Jun 2024 06:22:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718630564; x=1719235364; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pwj3Fw5B61alhB5+Nki7VXPagt0jdp377yGvLMhtmxI=;
-        b=gXgMU4XpUMCQCIqHF9UK2HX1ZanWkgCER2aLmo6Dt1/EWYxFau/yN5wzHW5zHodjGl
-         gsTxSl07zBxU/nxM8PqPdU1MK0ekJfdS06AH6VfokE95B/2i+bn0JrVFSXAAlodHC8xg
-         zUPNKIMGeidE4wqy/BUGVdQW2s2/eo2Dvp4ZtlBmQSZwH/wy1rQuSuJIS6p3asM7Z8ui
-         H35+m00AJyzuReGWpI2PyhnHroMg0GkKpw7XC9HeFjGS9xmNf8XBSfyElaGD9F6WHJ42
-         6e0Jpp8KAKKYreA6TD3qz0igI5AkJTTUe3JMy1aANYiUMYFzrZWZTKxojQBZmhuJjknb
-         EP4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718630564; x=1719235364;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pwj3Fw5B61alhB5+Nki7VXPagt0jdp377yGvLMhtmxI=;
-        b=YrIayEOk8gNqF+4L/3lb2BGRDnv+yexjNihn1Vtjrp0YKfRGKpAeY51/Y+N+IgAY7C
-         msYGt5mJoInflOdr8c7McSfHkKOURLUkD+MZuIYJY9czlIxZwfIBQishxiLRNnHVfUnw
-         KWOvyUHTIGAWCFe+wCjuBW9bA/7/RXai/IlcS9amF9KrutIAqzx3li+TilMEmzHeDdSc
-         akkinTdkbdKF6bFpzrvmhD5aeKHRO4HhkavzHyFR0xxXyy5sxRn5BZAdxjBsKAizJUIT
-         DbPUhXu5fqGf+FFSwXImdYzz66weBI9W2J4U+RDSWZSYHZm6kQFJVdK2eIpOcVI5vv4/
-         1YnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWlLSlUeL1S+Z4sW93KjDIHoVg3T8YV8/iwW0XuBoLw4G0SS8gMNFIXUt9yJ48PfWOJ9aVkirv/mkqr2/wHXKCrkoWCPu/rDvfyR+OFU1gSz0CAgiMk8xbTsLusAw64koUk4/gh8Y/Tv4FjKbEH1Z4+qyJGEpopqWjJj6ncfe1OXP1G5NUzewzOL7YFDIHul/gG6kR5dWDxxjR3O23TqPJ8thhBETmxSmE+6RcHgTMUh++YT5YhMYV+H9SluoEy3h0WShi4rVAIx3L+PxH3OdwJpkDUMGcvMcQYhXLP4yF4uknAd9ubKz62KHMpNnDc3TTDvGgYRucgPISZNvhQAR2ZQdKH9W5/bGozd+JQiaDqMK7lUlHG7h6l/lJGXccfIPXL84lIba+0jCwdeEJg7AgUxAP17qofj/M3avCA3xkOFzqMT4amxKWV5zBnlIkRHJfLhYvqwL6D6sr9Xm1f9AKBQWu6qdPgYzChKw4a+pdiMFPBAsmBrVxs5i/k4pXs68byCeDz6l1haaXiHgb4DFT5a/04ZiV6NwVpBRVctNHYVaQOmgQyUwf5
-X-Gm-Message-State: AOJu0YzHrTaU0H70gAqCadzr+frcm0M9HaieD6ELITSxIu2n7Rvl2Mg/
-	xtClpJ9gmvpA5H37gP1fGJ7CAa8J3vJecPgZ32L94iZmEYkbVQu3
-X-Google-Smtp-Source: AGHT+IEU7bSdU44tFLpRT61VrE4rRir5BezTbPl/p80FyKx5ycfOabVN7gLSnIoqzOZDAYrOc9lyjA==
-X-Received: by 2002:a17:906:f851:b0:a6f:b5a:f5b9 with SMTP id a640c23a62f3a-a6f608b9addmr640674266b.32.1718630564415;
-        Mon, 17 Jun 2024 06:22:44 -0700 (PDT)
-Received: from [192.168.42.82] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f6a1f2cb9sm383873066b.17.2024.06.17.06.22.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jun 2024 06:22:44 -0700 (PDT)
-Message-ID: <c45c5888-497b-4e95-a139-43a05279af65@gmail.com>
-Date: Mon, 17 Jun 2024 14:22:45 +0100
+	s=arc-20240116; t=1718630721; c=relaxed/simple;
+	bh=XpHPCsRoAdT6X6eunW6DKBI0v60GhrvSCGL4vzbBDvA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IJLcwTvXs26OH4Ehw02neHi8kKIY/E3Vh5GItEGEkYRwnb5dN3Kt/oUF8jJ0pB/oZndXyT5dRWxRzUlAMuP59F5ujacDyhGzt+bXX+02u+ikd8cjH3bfYG+0Wekiix8q78s35IVq15Y717GqatehN/k+ydLY2XEokHnWlf05Hxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AeNG0Ln0; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718630720; x=1750166720;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=XpHPCsRoAdT6X6eunW6DKBI0v60GhrvSCGL4vzbBDvA=;
+  b=AeNG0Ln0hpoD/YkhxX/Ud+bryaGFdXhLJyZYsf2F40SP4QANS0Mbabh3
+   7/vXTZFRCtg0XCB8Zizz9UM5u7FgFEx9rJBxAP/0F3Io5W/93BXPnCkDK
+   Pdq2rhtiQxXk0aQHtCMQ3I/Z0NPoCfydb6qQi+Na7ge4u/ZfTcKG4so6n
+   cMiveSQ6NJYHyf4HPaEElt0sXacdSxw/HvIsKJLTeZqFiGwssed3c/VOx
+   +82iOTO7z4qA5EkoVfJ7EzYXimhLvN1CtxYdhqh2CXnRu+RvsPqRT2v3D
+   qNlfNOm3NKqz6pzV8MCYUr88igqNpy89IknjenEsCEJdA4cKiPK9vR3/P
+   w==;
+X-CSE-ConnectionGUID: WU7+8INPQmObfxKBipUUgA==
+X-CSE-MsgGUID: ofYf+FOxR5eWwUEx3Xcy0g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11105"; a="15287103"
+X-IronPort-AV: E=Sophos;i="6.08,244,1712646000"; 
+   d="scan'208";a="15287103"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2024 06:25:15 -0700
+X-CSE-ConnectionGUID: fucocOo7Swu8yBFJeJlzqw==
+X-CSE-MsgGUID: 2p5Z51AGRiGmjCT9DgRTzg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,244,1712646000"; 
+   d="scan'208";a="46121212"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa003.jf.intel.com with ESMTP; 17 Jun 2024 06:25:12 -0700
+Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id BFB73333DA;
+	Mon, 17 Jun 2024 14:25:01 +0100 (IST)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Lukasz Czapnik <lukasz.czapnik@intel.com>,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>
+Subject: [PATCH iwl-next v1] ice: do not init struct ice_adapter more times than needed
+Date: Mon, 17 Jun 2024 15:24:07 +0200
+Message-Id: <20240617132407.107292-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 03/13] netdev: support binding dma-buf to
- netdevice
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Sergey Shtylyov <s.shtylyov@omp.ru>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>,
- Nikolay Aleksandrov <razor@blackwall.org>, David Wei <dw@davidwei.uk>,
- Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>,
- Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20240613013557.1169171-1-almasrymina@google.com>
- <20240613013557.1169171-4-almasrymina@google.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20240613013557.1169171-4-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 6/13/24 02:35, Mina Almasry wrote:
-> Add a netdev_dmabuf_binding struct which represents the
-> dma-buf-to-netdevice binding. The netlink API will bind the dma-buf to
-> rx queues on the netdevice. On the binding, the dma_buf_attach
-> & dma_buf_map_attachment will occur. The entries in the sg_table from
-> mapping will be inserted into a genpool to make it ready
-> for allocation.
-> 
-> The chunks in the genpool are owned by a dmabuf_chunk_owner struct which
-> holds the dma-buf offset of the base of the chunk and the dma_addr of
-> the chunk. Both are needed to use allocations that come from this chunk.
-> 
-> We create a new type that represents an allocation from the genpool:
-> net_iov. We setup the net_iov allocation size in the
-> genpool to PAGE_SIZE for simplicity: to match the PAGE_SIZE normally
-> allocated by the page pool and given to the drivers.
-> 
-> The user can unbind the dmabuf from the netdevice by closing the netlink
-> socket that established the binding. We do this so that the binding is
-> automatically unbound even if the userspace process crashes.
-> 
-> The binding and unbinding leaves an indicator in struct netdev_rx_queue
-> that the given queue is bound, but the binding doesn't take effect until
-> the driver actually reconfigures its queues, and re-initializes its page
-> pool.
-> 
-> The netdev_dmabuf_binding struct is refcounted, and releases its
-> resources only when all the refs are released.
-> 
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
+Allocate and initialize struct ice_adapter object only once per physical
+card instead of once per port. This is not a big deal by now, but we want
+to extend this struct more and more in the near future. Our plans include
+PTP stuff and a devlink instance representing whole-device/physical card.
 
-Apart from the comment below
+Transactions requiring to be sleep-able (like those doing user (here ice)
+memory allocation) must be performed with an additional (on top of xarray)
+mutex. Adding it here removes need to xa_lock() manually.
 
-Reviewed-by: Pavel Begunkov <asml.silence@gmail.com> # excluding netlink
+Since this commit is a reimplementation of ice_adapter_get(), a rather new
+scoped_guard() wrapper for locking is used to simplify the logic.
 
+It's worth to mention that xa_insert() use gives us both slot reservation
+and checks if it is already filled, what simplifies code a tiny	bit.
 
-> diff --git a/include/net/devmem.h b/include/net/devmem.h
-> new file mode 100644
-> index 0000000000000..eaf3fd965d7a8
-...
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index c361a7b69da86..84c9f96a6c9bf 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -158,6 +158,9 @@
->   #include <net/page_pool/types.h>
->   #include <net/page_pool/helpers.h>
->   #include <net/rps.h>
-> +#include <linux/genalloc.h>
-> +#include <linux/dma-buf.h>
-> +#include <net/devmem.h>
->   
->   #include "dev.h"
->   #include "net-sysfs.h"
-> diff --git a/net/core/devmem.c b/net/core/devmem.c
-> new file mode 100644
-> index 0000000000000..951a06004c430
-> --- /dev/null
-> +++ b/net/core/devmem.c
-> @@ -0,0 +1,252 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + *      Devmem TCP
-> + *
-> + *      Authors:	Mina Almasry <almasrymina@google.com>
-> + *			Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> + *			Kaiyuan Zhang <kaiyuanz@google.com
-> + */
-> +
-> +#include <linux/types.h>
-> +#include <linux/mm.h>
-> +#include <linux/netdevice.h>
-> +#include <trace/events/page_pool.h>
-> +#include <net/netdev_rx_queue.h>
-> +#include <net/page_pool/types.h>
-> +#include <net/page_pool/helpers.h>
-> +#include <linux/genalloc.h>
-> +#include <linux/dma-buf.h>
-> +#include <net/devmem.h>
-> +#include <net/netdev_queues.h>
-> +
-> +/* Device memory support */
-> +
-> +#if defined(CONFIG_DMA_SHARED_BUFFER) && defined(CONFIG_GENERIC_ALLOCATOR)
-> +static void net_devmem_dmabuf_free_chunk_owner(struct gen_pool *genpool,
-> +					       struct gen_pool_chunk *chunk,
-> +					       void *not_used)
-> +{
-> +	struct dmabuf_genpool_chunk_owner *owner = chunk->owner;
-> +
-> +	kvfree(owner->niovs);
-> +	kfree(owner);
-> +}
-> +
-> +void __net_devmem_dmabuf_binding_free(struct net_devmem_dmabuf_binding *binding)
-> +{
-> +	size_t size, avail;
-> +
-> +	gen_pool_for_each_chunk(binding->chunk_pool,
-> +				net_devmem_dmabuf_free_chunk_owner, NULL);
-> +
-> +	size = gen_pool_size(binding->chunk_pool);
-> +	avail = gen_pool_avail(binding->chunk_pool);
-> +
-> +	if (!WARN(size != avail, "can't destroy genpool. size=%zu, avail=%zu",
-> +		  size, avail))
-> +		gen_pool_destroy(binding->chunk_pool);
-> +
-> +	dma_buf_unmap_attachment(binding->attachment, binding->sgt,
-> +				 DMA_FROM_DEVICE);
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_adapter.c | 60 +++++++++-----------
+ 1 file changed, 28 insertions(+), 32 deletions(-)
 
-It's unmapped here as DMA_FROM_DEVICE, a fail path does DMA_BIDIRECTIONAL,
-dma_buf_map_attachment() passes BIDIRECTIONAL.
+diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
+index 52d15ef7f4b1..ad84d8ad49a6 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adapter.c
++++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
+@@ -11,6 +11,7 @@
+ #include "ice_adapter.h"
+ 
+ static DEFINE_XARRAY(ice_adapters);
++static DEFINE_MUTEX(ice_adapters_mutex);
+ 
+ /* PCI bus number is 8 bits. Slot is 5 bits. Domain can have the rest. */
+ #define INDEX_FIELD_DOMAIN GENMASK(BITS_PER_LONG - 1, 13)
+@@ -47,8 +48,6 @@ static void ice_adapter_free(struct ice_adapter *adapter)
+ 	kfree(adapter);
+ }
+ 
+-DEFINE_FREE(ice_adapter_free, struct ice_adapter*, if (_T) ice_adapter_free(_T))
+-
+ /**
+  * ice_adapter_get - Get a shared ice_adapter structure.
+  * @pdev: Pointer to the pci_dev whose driver is getting the ice_adapter.
+@@ -64,53 +63,50 @@ DEFINE_FREE(ice_adapter_free, struct ice_adapter*, if (_T) ice_adapter_free(_T))
+  */
+ struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
+ {
+-	struct ice_adapter *ret, __free(ice_adapter_free) *adapter = NULL;
+ 	unsigned long index = ice_adapter_index(pdev);
+-
+-	adapter = ice_adapter_new();
+-	if (!adapter)
+-		return ERR_PTR(-ENOMEM);
+-
+-	xa_lock(&ice_adapters);
+-	ret = __xa_cmpxchg(&ice_adapters, index, NULL, adapter, GFP_KERNEL);
+-	if (xa_is_err(ret)) {
+-		ret = ERR_PTR(xa_err(ret));
+-		goto unlock;
+-	}
+-	if (ret) {
+-		refcount_inc(&ret->refcount);
+-		goto unlock;
++	struct ice_adapter *adapter;
++	int err;
++
++	scoped_guard(mutex, &ice_adapters_mutex) {
++		err = xa_insert(&ice_adapters, index, NULL, GFP_KERNEL);
++		if (err == -EBUSY) {
++			adapter = xa_load(&ice_adapters, index);
++			refcount_inc(&adapter->refcount);
++			return adapter;
++		}
++		if (err)
++			return ERR_PTR(err);
++
++		adapter = ice_adapter_new();
++		if (!adapter)
++			return ERR_PTR(-ENOMEM);
++		xa_store(&ice_adapters, index, adapter, GFP_KERNEL);
+ 	}
+-	ret = no_free_ptr(adapter);
+-unlock:
+-	xa_unlock(&ice_adapters);
+-	return ret;
++	return adapter;
+ }
+ 
+ /**
+  * ice_adapter_put - Release a reference to the shared ice_adapter structure.
+  * @pdev: Pointer to the pci_dev whose driver is releasing the ice_adapter.
+  *
+  * Releases the reference to ice_adapter previously obtained with
+  * ice_adapter_get.
+  *
+- * Context: Any.
++ * Context: Process, may sleep.
+  */
+ void ice_adapter_put(const struct pci_dev *pdev)
+ {
+ 	unsigned long index = ice_adapter_index(pdev);
+ 	struct ice_adapter *adapter;
+ 
+-	xa_lock(&ice_adapters);
+-	adapter = xa_load(&ice_adapters, index);
+-	if (WARN_ON(!adapter))
+-		goto unlock;
++	scoped_guard(mutex, &ice_adapters_mutex) {
++		adapter = xa_load(&ice_adapters, index);
++		if (WARN_ON(!adapter))
++			return;
++		if (!refcount_dec_and_test(&adapter->refcount))
++			return;
+ 
+-	if (!refcount_dec_and_test(&adapter->refcount))
+-		goto unlock;
+-
+-	WARN_ON(__xa_erase(&ice_adapters, index) != adapter);
++		WARN_ON(xa_erase(&ice_adapters, index) != adapter);
++	}
+ 	ice_adapter_free(adapter);
+-unlock:
+-	xa_unlock(&ice_adapters);
+ }
 
-
-> +	dma_buf_detach(binding->dmabuf, binding->attachment);
-> +	dma_buf_put(binding->dmabuf);
-> +	xa_destroy(&binding->bound_rxq_list);
-> +	kfree(binding);
-> +}
-> +
-> +/* Protected by rtnl_lock() */
-> +static DEFINE_XARRAY_FLAGS(net_devmem_dmabuf_bindings, XA_FLAGS_ALLOC1);
-> +
-...
-
+base-commit: 37cf9b0b18612fcb52a819518074e4a0beabe29a
 -- 
-Pavel Begunkov
+2.39.3
+
 
