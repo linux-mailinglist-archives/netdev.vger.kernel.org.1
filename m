@@ -1,99 +1,122 @@
-Return-Path: <netdev+bounces-104083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFF3A90B19E
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:22:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1136590B1B7
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:24:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 760D11F2878C
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 14:22:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 229431C23593
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 14:24:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D0F199E99;
-	Mon, 17 Jun 2024 13:29:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F59919AA43;
+	Mon, 17 Jun 2024 13:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="jAOTmJrF"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376C8198A34;
-	Mon, 17 Jun 2024 13:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D039F19AA40
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 13:35:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718630973; cv=none; b=fMgoGJ+q3HuZDEEvJ9cC30UPaLInueC/xydJ7+FX7ceUEareSb8yvyiNhYCebtlmJ7frHtdmAUtbfOgFLdSUQobKDBpRVx7iOWppcMFD+NFewNOd3d1COggirOR9XBwpws0yHVWeqTzlOHaoH/fkc8RwRPR0v+SgGwIxqdDr9zo=
+	t=1718631304; cv=none; b=JGQK5vSs/VIZDZ5Q/RNgSbFOiLT5m7wHX4eac2dBvCHCg870nwikZDC0iDi8W+RnMm6EvcJm3zP+ZKWIRd8GF8/6ARrd5C8BIZj6U287PYg3Yxcb3sFppfBVEROyp/94oWHzSOPtLgW3UABzuGHyxPaZT/bOauSq0LEXrQsh8L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718630973; c=relaxed/simple;
-	bh=dmN1xl9dYL2wT6I3eezHhEJnFRaCUhhBxyyStgpeFyU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=DMru3wVf7HBKfdSMEqDhJrBgrBgUTc8EqU75vL4zD5kzezeN2Zw4NwxlHqZ8vpFRkDMcSDnpL+et+981QEnJAG/LZ9AJ8L0jJzZsPafbOuQpPw1MQUhr0tAgsFLad1Pa/RtorI4nGVEtccKMZG5KO7vDDSuAtx8jAFz+ExXSf/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 45HDSp4kA3235470, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 45HDSp4kA3235470
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 17 Jun 2024 21:28:51 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 17 Jun 2024 21:28:52 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 17 Jun 2024 21:28:51 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
- RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
- 15.01.2507.035; Mon, 17 Jun 2024 21:28:51 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Markus Elfring <Markus.Elfring@web.de>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric
- Dumazet" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>,
-        Simon Horman <horms@kernel.org>
-CC: LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-        Hariprasad Kelam <hkelam@marvell.com>, Jiri Pirko <jiri@resnulli.us>,
-        "Larry
- Chiu" <larry.chiu@realtek.com>,
-        Ping-Ke Shih <pkshih@realtek.com>,
-        "Ratheesh
- Kannoth" <rkannoth@marvell.com>
-Subject: RE: [v20 02/13] rtase: Implement the .ndo_open function
-Thread-Topic: [v20 02/13] rtase: Implement the .ndo_open function
-Thread-Index: AQHawJ5eL1A+vv787Ey/gTxPzZ037bHL8dBA
-Date: Mon, 17 Jun 2024 13:28:51 +0000
-Message-ID: <0c57021d0bfc444ebe640aa4c5845496@realtek.com>
-References: <20240607084321.7254-3-justinlai0215@realtek.com>
- <1d01ece4-bf4e-4266-942c-289c032bf44d@web.de>
- <ef7c83dea1d849ad94acef81819f9430@realtek.com>
- <6b284a02-15e2-4eba-9d5f-870a8baa08e8@web.de>
-In-Reply-To: <6b284a02-15e2-4eba-9d5f-870a8baa08e8@web.de>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1718631304; c=relaxed/simple;
+	bh=6OKT3WqegH1QtD1wyuXce6fGlAETjVHusGyC+Pzsr8k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TPfAGkj6KqvXvGOi2BJnabRaQERm3/lLqP/8r++NorK/zb4saljhSRTN4oOaa8vW3uJJWUvVeUe2KsDw8ZfFIFZfR81/BJABmWGdjx5TaaSj5KtwRAWnYtMBiTOvJco8k9cUpQ9WV0xg+3dObcmjgo2KO101mRLxdE/eXmX7vxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=jAOTmJrF; arc=none smtp.client-ip=209.85.128.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-421f4d1c057so33817255e9.3
+        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 06:35:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718631300; x=1719236100; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cXOhkuogz//QmdU93D8xI7eVOtiFpWIJJnt6ZBb+35s=;
+        b=jAOTmJrFP08T1REb5f+CfKg6NEONPfnKQUOuCbm9XT4CHMC+ViyQxiaoy4XnfX/H9q
+         NRP4huNInhEg2r2md9EKBXl1MZbeXiVk0vWKPE77izNvhb0QhDoRZLQwVjgsk9CSBgWv
+         dHzU1+gXqstwDBmpvSxh/u3tMl3y5ZzjmtggRQ9dcTqFM8PH5NrTIRRFmuuH6iw0OuA8
+         4kzSji64iC0mU2K92+eUG3GJk+KrP2svP0ojZfeHEKlUkAHpAnKozI2Zvzc/osyf1bpR
+         QiBZPKXqj7ow/tgkcwcyo7ir/E0Peuv5NCiYKNGWh9sLatYc33TKAk65JOa6rCkqlC21
+         dryg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718631300; x=1719236100;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cXOhkuogz//QmdU93D8xI7eVOtiFpWIJJnt6ZBb+35s=;
+        b=qzewezr2ANw/A+namxDUYvA7asx7SDFgJULiHZddfz67UK/qN2NcsTsuBz/W37wG1F
+         lwv0G1C/EDaibnJV4/lEmhfTzhPvHpPOK2c74hAp36+ZBFzHycN7G8IM7Kjg1AySFxeP
+         axSeooRxudM8fApu3Oy86682l/XApNNHQ1RT1MHHsh9Md+Uf14iTDlqikM81baOTKVUK
+         JCkbwj4qYTeQdQ2jredzDtjQYbBd8CnUAR5TiETlLGtf0HTxiZSRKyCaLDBgbR0xbjf9
+         fuKsFTm7DF0hREm56PKX6o286edvpBO8twt1mu/ARh36v5gr+TT943GKrpwOuTCbtLID
+         VrfQ==
+X-Gm-Message-State: AOJu0YxQEU9/NM6BD5UvJicjS18IFeIbKyRIsoxkLxOy2WZYmrZVoo5B
+	lCjq7uYIe8CcFveaw/7yz5DM1euOGzb3XfcEJK50pDB7z0g4CYetTX3uJp3+GdM=
+X-Google-Smtp-Source: AGHT+IG6C1PBpqaaWvWNAxk7Rv1Qc1N+l7EJFwfh6/c3prESpScO1tKh4vNfH7nfLGf3e2rMTio8eQ==
+X-Received: by 2002:a05:600c:4448:b0:421:819c:5d6b with SMTP id 5b1f17b1804b1-423048262c3mr72180135e9.23.1718631299909;
+        Mon, 17 Jun 2024 06:34:59 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422f602f620sm158614925e9.19.2024.06.17.06.34.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jun 2024 06:34:59 -0700 (PDT)
+Date: Mon, 17 Jun 2024 15:34:55 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
+	Thomas Huth <thuth@linux.vnet.ibm.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>
+Subject: Re: [PATCH 1/2] virtio_net: checksum offloading handling fix
+Message-ID: <ZnA7f5wW0VXQGPQw@nanopsycho.orion>
+References: <20240617131524.63662-1-hengqi@linux.alibaba.com>
+ <20240617131524.63662-2-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240617131524.63662-2-hengqi@linux.alibaba.com>
 
-DQo+ID4+IEhvdyBkbyB5b3UgdGhpbmsgYWJvdXQgdG8gaW5jcmVhc2UgdGhlIGFwcGxpY2F0aW9u
-IG9mIHNjb3BlLWJhc2VkIHJlc291cmNlDQo+IG1hbmFnZW1lbnQ/DQo+ID4+IGh0dHBzOi8vZWxp
-eGlyLmJvb3RsaW4uY29tL2xpbnV4L3Y2LjEwLXJjMy9zb3VyY2UvaW5jbHVkZS9saW51eC9jbGVh
-bg0KPiA+PiB1cC5oI0w4DQo+ID4NCj4gPiBEdWUgdG8gb3VyIHR4IGFuZCByeCBlYWNoIGhhdmlu
-ZyBtdWx0aXBsZSBxdWV1ZXMgdGhhdCBuZWVkIHRvIGFsbG9jYXRlDQo+ID4gZGVzY3JpcHRvcnMs
-IGlmIGFueSBvbmUgb2YgdGhlIHF1ZXVlcyBmYWlscyB0byBhbGxvY2F0ZSwNCj4gPiBydGFzZV9h
-bGxvY19kZXNjKCkgd2lsbCByZXR1cm4gYW4gZXJyb3IuIFRoZXJlZm9yZSwgdXNpbmcgJ2dvdG8n
-DQo+ID4gaGVyZSByYXRoZXIgdGhhbiBkaXJlY3RseSByZXR1cm5pbmcgc2VlbXMgdG8gYmUgcmVh
-c29uYWJsZS4NCj4gDQo+IFNvbWUgZ290byBjaGFpbnMgY2FuIGJlIHJlcGxhY2VkIGJ5IGZ1cnRo
-ZXIgdXNhZ2Ugb2YgYWR2YW5jZWQgY2xlYW51cA0KPiB0ZWNobmlxdWVzLCBjYW4ndCB0aGV5Pw0K
-PiANCj4gUmVnYXJkcywNCj4gTWFya3VzDQoNCnJ0YXNlX2FsbG9jX2Rlc2MoKSBpcyB1c2VkIHRv
-IGFsbG9jYXRlIERNQSBtZW1vcnkuIA0KSSdkIGxpa2UgdG8gYXNrIGlmIGl0J3MgYmV0dGVyIHRv
-IGtlZXAgb3VyIGN1cnJlbnQgbWV0aG9kPw0KDQo=
+Mon, Jun 17, 2024 at 03:15:23PM CEST, hengqi@linux.alibaba.com wrote:
+>In virtio spec 0.95, VIRTIO_NET_F_GUEST_CSUM was designed to handle
+>partially checksummed packets, and the validation of fully checksummed
+>packets by the device is independent of VIRTIO_NET_F_GUEST_CSUM
+>negotiation. However, the specification erroneously stated:
+>
+>  "If VIRTIO_NET_F_GUEST_CSUM is not negotiated, the device MUST set flags
+>   to zero and SHOULD supply a fully checksummed packet to the driver."
+>
+>This statement is inaccurate because even without VIRTIO_NET_F_GUEST_CSUM
+>negotiation, the device can still set the VIRTIO_NET_HDR_F_DATA_VALID flag.
+>Essentially, the device can facilitate the validation of these packets'
+>checksums - a process known as RX checksum offloading - removing the need
+>for the driver to do so.
+>
+>This scenario is currently not implemented in the driver and requires
+>correction. The necessary specification correction[1] has been made and
+>approved in the virtio TC vote.
+>[1] https://lists.oasis-open.org/archives/virtio-comment/202401/msg00011.html
+>
+>Fixes: 4f49129be6fa ("virtio-net: Set RXCSUM feature if GUEST_CSUM is available")
+>Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
