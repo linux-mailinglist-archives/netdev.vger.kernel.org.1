@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-104216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C511C90B923
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 20:10:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD0B090B927
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 20:11:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36AC81F22240
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 18:10:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B674A1C23FC1
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 18:11:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51AB0198E88;
-	Mon, 17 Jun 2024 18:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AAC21991D0;
+	Mon, 17 Jun 2024 18:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="bvZ7840m"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="LcZYx/gn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AAA198A2C
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 18:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2DAB1991A3
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 18:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718647756; cv=none; b=FLgueIK+ACIy+Kv4kv3QMmPOp0J0fRB5ctXdWAbvqxjDOZl5j5rkXCYsVmrYEDXWUUhkQICcpSZoEUmhGiNDrJQD08zZbtAzrDU6hCuwR7kEsjREHCYT9V9W5uXVZxiGN5CmduDI4alFSolCAW2AZBogHLXdI1oAF5XU2N39B3o=
+	t=1718647759; cv=none; b=KvsABS+KQrd3OVVPyJ9CL1uY5yK/RjRIw8K5NRbJunSYEiGVuu52e/MwLMnJ0dYmc3iwMqwoLwpN2xFXZEbtl65yvrUQlhYCrTBemWhTrZYa1XfhTae6f4ITpltsP5tM6psU3T/HKp9y4Mu5kjwRXXcVpujoHz/eDArDj+6QTic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718647756; c=relaxed/simple;
-	bh=Gs30pldD4IYhwgM9Z2RPF0lE51iD4CooDjoR4sEXvh0=;
+	s=arc-20240116; t=1718647759; c=relaxed/simple;
+	bh=jkzjDY7vnEB8DqdbcGuw7ABHpoGpOOOicO2KkYgqYYM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ealAmFK1WLG29O1gspZD97IzVHhush8+EPI4PwJ6OBt7LvFlgJ4P51JvmEeQm4XtXICw+8xny/HIOWnzYLvIl9EsC+2JDKkHrtvz1ee1/nluabD2xfOq2QYJmLH30QIzOfR2FZlwFMR0ejiYqT+nihLd7MbjZnSLz4+Ujt/ZCDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=bvZ7840m; arc=none smtp.client-ip=209.85.222.176
+	 Content-Type:Content-Disposition:In-Reply-To; b=LgKBq0TfufooDU4qk+Z6bY+FvsFt0V2Soo5dFGN+fBejwbDR1e4D2WF69L7V3NsobMj8ZD6C91qdWhyNoDHSruWC9PrkACVlyxf/66yOE7ej4vHGbPh2X45GNMrGFVIPM3rSHRhrEo6OMX0uLIkgfrvaSifR0xZKyBNkOtIReqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=LcZYx/gn; arc=none smtp.client-ip=209.85.160.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7955dc86cacso267855685a.0
-        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 11:09:14 -0700 (PDT)
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-24542b8607fso2439488fac.1
+        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 11:09:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1718647753; x=1719252553; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1718647756; x=1719252556; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8Z9GdxrPO2MLCd8f731wHDlufWSwkyCPNseSHb6h3wQ=;
-        b=bvZ7840mQ/paBsmPRPxSVBd9fItARG5pJWifKSD0AgfNJs3ckdtYnNpM4aL618vE+e
-         SRVXuAxZwGkRu6jYBjciGkORF0fX2B2Kd6uF+AeiBeQcJOeMcEmLaw9smV7F9MK3CStQ
-         9IjFii9cZR1xR66PpdVPKayIA/vNIjUMZZdy7/yl9y8JpTs8mus3BXhVoG3dGDgb8pZh
-         Ozfu9i3Vvt4rzIKFld+/0kO8r4H7Lo5sH+MpB6RyLd0Bkk25epI0cpOxfCvcCakeRYkw
-         XIUAyU82Rkjzkl/rwS+1UkIpupms83PAczB++SFgTjO3R3tlEuswuUIBBXbfgP6yf5iv
-         B92w==
+        bh=ZokBvFXzTLhgVv1PaHNF9XfQX0m9YCf5c4LTRhvqEjE=;
+        b=LcZYx/gnJJsug/Sfl6L0zHhZRKyWVZgwrlhA4zu+CahJizK2gO5QdzMgb+0xsnzQNo
+         evan3dyYTPgNvsA3sPaW8sr+AytInQBktb4lXU2wG38l+esEeyoDurHkJagLp+ojcbbO
+         Gsz5XgS4Q1I62M4OJaS+obs0lQjRYApw6JH0w2twa8T4hCr3dDN8DDMmC67qLXKPPtSZ
+         +mebRKNQ35IQ9khJsw7NSZbIKZGcYGpM1ITbxujiP0YCrvhazv1nAHkQC8TinfZwWzPJ
+         fiJI7LXJB7shJpgWuFRf8NcFOgPrBcY3CApWsdywRl15SMCnvg5avCUtLfK0+DZYCjhJ
+         12lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718647753; x=1719252553;
+        d=1e100.net; s=20230601; t=1718647756; x=1719252556;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8Z9GdxrPO2MLCd8f731wHDlufWSwkyCPNseSHb6h3wQ=;
-        b=iEvRCPpPhPnWquUnwUKHnXFOrxJirJIUBHWy62954CIdSaEiUfK5jh0ibbRXdS1IoJ
-         7Er10YXOljDDp/5lN9Qx1g1656ybAytyp/Wx/IlR7nrVs6iHAgZ2CUwCwfaJ1j4015JT
-         MIR177ao+WO58SUY441vXojX3oXvcwgBIbMI2PCuJjx4T5P3flLD5nXzdgIBCYzEz5gf
-         jzMaZpTJKS2MqPGQIVsRG4UC3yLrr/PVNF7xY/ds8L8zjUEpiF8tATiTqew7TfTwaNw7
-         6r8JnLwgBZCm6hvUFZiQoQBsdPU1OQSSHfrZj29FS9RgV375Y6eGiiwUe9jOV/X7H0V4
-         YQRw==
-X-Gm-Message-State: AOJu0YxJkDb3maicq2tGXlSMokRvyQbyGTlxanCm0JzkjJZSWv4JaeRB
-	BXWcTcqK24PBhtTwZObTkD8MhTHBh5WV9RK2H7rKalYLvne9ks0ym4kxa1E7+TJHFztGcXdV/r0
-	auoE=
-X-Google-Smtp-Source: AGHT+IHroIevk21hjLcbft/c8w4BD7iUbwtag7vsyVE2cExFTsXyvzn4MvDWzC/0dInP64m8SG8xzg==
-X-Received: by 2002:a05:620a:4410:b0:795:8e7f:8995 with SMTP id af79cd13be357-798d26aa973mr1058999785a.74.1718647752904;
-        Mon, 17 Jun 2024 11:09:12 -0700 (PDT)
+        bh=ZokBvFXzTLhgVv1PaHNF9XfQX0m9YCf5c4LTRhvqEjE=;
+        b=GEwbvErZbsRowE+c6XYT6NyydSsTJ9n9XrWKOzt59sREbBKVnsyAr1P80CVW8x7j46
+         PXogboTIZyD+gA9JhPAGh5oCEPGxVU/ApnbAxamkQX2JQYLg/OldtymS1qvrUWo/XWd5
+         NAheDLahxg7A+PPTbT6EX5/rEgRU5vNHjnOT0q0ZqAnCNi+b23Zu89H+UwP7EPBa2SxM
+         pCUe7It1ruJNKdX6NalMlB1Dh/iS6LtIdFUQo+kpbJTHdl9iGMF7IUmLs1ehlmkFv5up
+         R1NWHfhD3obGeas713E1XiC7jkkKEnIcCR028RlEthCjA+BpXE6QVbDTUm9dFefsxTbh
+         AqUg==
+X-Gm-Message-State: AOJu0YxsVD+YoAmADbt1LYkv1dA8lRkkwhWli9uSp1i4ErrlR3F3CKK2
+	zw/XdfXWOeYt6o+aTKu7fbT1rzjsbKRp5jdBrNzvIix4M8+j+tlW6JgEr3k75hFg6XnYIxGtzVd
+	6hzU=
+X-Google-Smtp-Source: AGHT+IFFC2G/bSVkCKnhdhy6XgDtxqeArS3o3uSF0Inup/+kbVo1ad1TRgDLl5euVpsu7c0aiEjQlw==
+X-Received: by 2002:a05:6870:584:b0:254:6eb5:ab2f with SMTP id 586e51a60fabf-258428976b3mr12669126fac.6.1718647756618;
+        Mon, 17 Jun 2024 11:09:16 -0700 (PDT)
 Received: from debian.debian ([2a09:bac5:7a49:f9b::18e:164])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-798abe4b45esm448173885a.120.2024.06.17.11.09.10
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-798aaecce85sm451625885a.41.2024.06.17.11.09.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 11:09:12 -0700 (PDT)
-Date: Mon, 17 Jun 2024 11:09:09 -0700
+        Mon, 17 Jun 2024 11:09:15 -0700 (PDT)
+Date: Mon, 17 Jun 2024 11:09:13 -0700
 From: Yan Zhai <yan@cloudflare.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -90,8 +90,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Neil Horman <nhorman@tuxdriver.com>,
 	linux-trace-kernel@vger.kernel.org,
 	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: [PATCH net-next v5 2/7] net: introduce sk_skb_reason_drop function
-Message-ID: <5610bfe554a02f92dd279fad839e65503902f710.1718642328.git.yan@cloudflare.com>
+Subject: [PATCH net-next v5 3/7] ping: use sk_skb_reason_drop to free rx
+ packets
+Message-ID: <3b6f00440b880559fa3918504d85521702921e3b.1718642328.git.yan@cloudflare.com>
 References: <cover.1718642328.git.yan@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -103,114 +104,27 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1718642328.git.yan@cloudflare.com>
 
-Long used destructors kfree_skb and kfree_skb_reason do not pass
-receiving socket to packet drop tracepoints trace_kfree_skb.
-This makes it hard to track packet drops of a certain netns (container)
-or a socket (user application).
+Replace kfree_skb_reason with sk_skb_reason_drop and pass the receiving
+socket to the tracepoint.
 
-The naming of these destructors are also not consistent with most sk/skb
-operating functions, i.e. functions named "sk_xxx" or "skb_xxx".
-Introduce a new functions sk_skb_reason_drop as drop-in replacement for
-kfree_skb_reason on local receiving path. Callers can now pass receiving
-sockets to the tracepoints.
-
-kfree_skb and kfree_skb_reason are still usable but they are now just
-inline helpers that call sk_skb_reason_drop.
-
-Note it is not feasible to do the same to consume_skb. Packets not
-dropped can flow through multiple receive handlers, and have multiple
-receiving sockets. Leave it untouched for now.
-
-Suggested-by: Eric Dumazet <edumazet@google.com>
 Signed-off-by: Yan Zhai <yan@cloudflare.com>
 ---
-v1->v2: changes function names to be more consistent with common sk/skb
-operations
----
- include/linux/skbuff.h | 10 ++++++++--
- net/core/skbuff.c      | 22 ++++++++++++----------
- 2 files changed, 20 insertions(+), 12 deletions(-)
+ net/ipv4/ping.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index fe7d8dbef77e..c479a2515a62 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -1251,8 +1251,14 @@ static inline bool skb_data_unref(const struct sk_buff *skb,
- 	return true;
- }
- 
--void __fix_address
--kfree_skb_reason(struct sk_buff *skb, enum skb_drop_reason reason);
-+void __fix_address sk_skb_reason_drop(struct sock *sk, struct sk_buff *skb,
-+				      enum skb_drop_reason reason);
-+
-+static inline void
-+kfree_skb_reason(struct sk_buff *skb, enum skb_drop_reason reason)
-+{
-+	sk_skb_reason_drop(NULL, skb, reason);
-+}
- 
- /**
-  *	kfree_skb - free an sk_buff with 'NOT_SPECIFIED' reason
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 2854afdd713f..9def11fe42c4 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -1190,7 +1190,8 @@ void __kfree_skb(struct sk_buff *skb)
- EXPORT_SYMBOL(__kfree_skb);
- 
- static __always_inline
--bool __kfree_skb_reason(struct sk_buff *skb, enum skb_drop_reason reason)
-+bool __sk_skb_reason_drop(struct sock *sk, struct sk_buff *skb,
-+			  enum skb_drop_reason reason)
- {
- 	if (unlikely(!skb_unref(skb)))
- 		return false;
-@@ -1203,26 +1204,27 @@ bool __kfree_skb_reason(struct sk_buff *skb, enum skb_drop_reason reason)
- 	if (reason == SKB_CONSUMED)
- 		trace_consume_skb(skb, __builtin_return_address(0));
- 	else
--		trace_kfree_skb(skb, __builtin_return_address(0), reason, NULL);
-+		trace_kfree_skb(skb, __builtin_return_address(0), reason, sk);
- 	return true;
- }
- 
- /**
-- *	kfree_skb_reason - free an sk_buff with special reason
-+ *	sk_skb_reason_drop - free an sk_buff with special reason
-+ *	@sk: the socket to receive @skb, or NULL if not applicable
-  *	@skb: buffer to free
-  *	@reason: reason why this skb is dropped
-  *
-- *	Drop a reference to the buffer and free it if the usage count has
-- *	hit zero. Meanwhile, pass the drop reason to 'kfree_skb'
-- *	tracepoint.
-+ *	Drop a reference to the buffer and free it if the usage count has hit
-+ *	zero. Meanwhile, pass the receiving socket and drop reason to
-+ *	'kfree_skb' tracepoint.
-  */
- void __fix_address
--kfree_skb_reason(struct sk_buff *skb, enum skb_drop_reason reason)
-+sk_skb_reason_drop(struct sock *sk, struct sk_buff *skb, enum skb_drop_reason reason)
- {
--	if (__kfree_skb_reason(skb, reason))
-+	if (__sk_skb_reason_drop(sk, skb, reason))
- 		__kfree_skb(skb);
- }
--EXPORT_SYMBOL(kfree_skb_reason);
-+EXPORT_SYMBOL(sk_skb_reason_drop);
- 
- #define KFREE_SKB_BULK_SIZE	16
- 
-@@ -1261,7 +1263,7 @@ kfree_skb_list_reason(struct sk_buff *segs, enum skb_drop_reason reason)
- 	while (segs) {
- 		struct sk_buff *next = segs->next;
- 
--		if (__kfree_skb_reason(segs, reason)) {
-+		if (__sk_skb_reason_drop(NULL, segs, reason)) {
- 			skb_poison_list(segs);
- 			kfree_skb_add_bulk(segs, &sa, reason);
- 		}
+diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
+index 823306487a82..619ddc087957 100644
+--- a/net/ipv4/ping.c
++++ b/net/ipv4/ping.c
+@@ -946,7 +946,7 @@ static enum skb_drop_reason __ping_queue_rcv_skb(struct sock *sk,
+ 	pr_debug("ping_queue_rcv_skb(sk=%p,sk->num=%d,skb=%p)\n",
+ 		 inet_sk(sk), inet_sk(sk)->inet_num, skb);
+ 	if (sock_queue_rcv_skb_reason(sk, skb, &reason) < 0) {
+-		kfree_skb_reason(skb, reason);
++		sk_skb_reason_drop(sk, skb, reason);
+ 		pr_debug("ping_queue_rcv_skb -> failed\n");
+ 		return reason;
+ 	}
 -- 
 2.30.2
 
