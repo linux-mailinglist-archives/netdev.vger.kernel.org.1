@@ -1,135 +1,275 @@
-Return-Path: <netdev+bounces-104246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 938D590BC0E
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 22:22:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E578D90BC13
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 22:23:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C9D21C234E9
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 20:22:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 665321F23CB6
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 20:23:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB8E198A02;
-	Mon, 17 Jun 2024 20:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F99B199E98;
+	Mon, 17 Jun 2024 20:19:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ANwKa/09"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795E9198848;
-	Mon, 17 Jun 2024 20:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47EDC166313;
+	Mon, 17 Jun 2024 20:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718655532; cv=none; b=cEWTGXxsXqcOallRAQzuFep2nBWi+tCYpbj9KoY0BWq5q/nzp23kaNwYD5pj/QBkWpHRDA07Vm6/7iOy2CP0JoAl7Y2DoICrOrLWFpdpfZw0fBAI2xRlD0bBVGO9bNadK4L2dnIvpx3ecQZhqPJ9XRrwxv2o9omcia6uaTqiy98=
+	t=1718655582; cv=none; b=GC+qKfyg0wpXVPLl6p2Hiede4ONP7VTOTH2psq8VD9uITfiOY+kPQF5EjvmDkJ5l6CmmTiSe18f7bWIeg22kTEO/P6VxEiGv/MmDrajuistYZg/dbnUDWwXpnEX/CnT6w5V1IukeaLQTHIrcNmiC9poDhkix4dzxWVMYSlhyF48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718655532; c=relaxed/simple;
-	bh=7nTZdXlj9pK8ilY2G1QjiWHZ7xNto8ux71yowmGhmRE=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Kys++1Zmh/T7JckdMmDu/5Sri80qp3YgD2u2YdHNFlgQqXhRvhJ396Pj5dJZWwgJ9UByXS0pN8AvPyrUeU8MKSu9UjI8Wq7exvbC5zDhVJ+SAGVMiFnMvCP+2W1zmo3xTVj67UURfDnis6PYo2g1vosp3RSQ6sPB9beRObChjCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.72.187) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 17 Jun
- 2024 23:18:34 +0300
-Subject: Re: [net-next PATCH 2/2] net: ravb: Fix R-Car RX frame size limit
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-CC: Biju Das <biju.das.jz@bp.renesas.com>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>, Lad Prabhakar
-	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Mitsuhiro Kimura
-	<mitsuhiro.kimura.kc@renesas.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240615103038.973-1-paul.barker.ct@bp.renesas.com>
- <20240615103038.973-3-paul.barker.ct@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <a2669de0-f432-5f7b-a80e-b5d050e37b6e@omp.ru>
-Date: Mon, 17 Jun 2024 23:18:33 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1718655582; c=relaxed/simple;
+	bh=N8x5zJ/pB5kq4w04/hbJ0il4gQkhGn2FR96DWw3tXIA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DCrxINJ5R86LVbDa5fzn/5bEikvLoprh3zoaSuOV8JptLliCizedjx1HrQKeZXpQwyLHoRR4N9BM1CoYpeWOAfNiNLAapjZLMYqSed7xyxlUYF8HIylhAuFnwRH/CTAyRKULPYUrIKyU0Q69nwppQ6BZW4NzakOjfhOZcJ2xOhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ANwKa/09; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C353EC2BD10;
+	Mon, 17 Jun 2024 20:19:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718655581;
+	bh=N8x5zJ/pB5kq4w04/hbJ0il4gQkhGn2FR96DWw3tXIA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ANwKa/09gm+TnuisqeyJjkxiOJvOkN6qSPU6i2RtE2TuGMr9XEoyqoJhHbAT1WnAm
+	 /9e8q7xLyMDD08DR/nf8fzvUv0Mhpri1rySoQLIvPlMVCOqtfPz3dnsQj/Td64PmII
+	 7cJxg3JkVEA4boxVtkIvsKIXZhMPzn5uo5BU+k0HO5OIAy0fnlfBCdG+ChE4nRQloT
+	 TkQGLHKBdC9uytdtbd2hLsI9YU2Y3VF1IEMYwV31A1gYAfV2Mryhw8UHDDSwzGlR9W
+	 0TviJLqCOyQJ3jEpZNpsrieZsL3MztUA3bRUzHgAfZR0oPgZwa5VhiQzXlyvFcT6kd
+	 qJPN7FVMlbN2g==
+Date: Mon, 17 Jun 2024 21:19:37 +0100
+From: Simon Horman <horms@kernel.org>
+To: Geetha sowjanya <gakula@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+	sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
+Subject: Re: [net-next PATCH v5 05/10] octeontx2-af: Add packet path between
+ representor and VF
+Message-ID: <20240617201937.GB8447@kernel.org>
+References: <20240611162213.22213-1-gakula@marvell.com>
+ <20240611162213.22213-6-gakula@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240615103038.973-3-paul.barker.ct@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 06/17/2024 19:52:29
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 185970 [Jun 17 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 20 0.3.20
- 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.72.187 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.72.187
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 06/17/2024 19:56:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 6/17/2024 4:39:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240611162213.22213-6-gakula@marvell.com>
 
-On 6/15/24 1:30 PM, Paul Barker wrote:
-
-> The RX frame size limit should not be based on the current MTU setting.
-> Instead it should be based on the hardware capabilities.
+On Tue, Jun 11, 2024 at 09:52:08PM +0530, Geetha sowjanya wrote:
+> Current HW, do not support in-built switch which will forward pkts
+> between representee and representor. When representor is put under
+> a bridge and pkts needs to be sent to representee, then pkts from
+> representor are sent on a HW internal loopback channel, which again
+> will be punted to ingress pkt parser. Now the rules that this patch
+> installs are the MCAM filters/rules which will match against these
+> pkts and forward them to representee.
+> The rules that this patch installs are for basic
+> representor <=> representee path similar to Tun/TAP between VM and
+> Host.
 > 
-> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+Hi Geetha,
 
-   Sounds like this is also a fix for net.git tho?
+Some minor feedback from my side.
 
-[...]
+...
 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 02cbf850bd85..481c854cb305 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -555,8 +555,10 @@ static void ravb_emac_init_gbeth(struct net_device *ndev)
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
+> index cf13c5f0a3c5..e137bb9383a2 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
+> @@ -13,6 +13,252 @@
+>  #include "rvu.h"
+>  #include "rvu_reg.h"
 >  
->  static void ravb_emac_init_rcar(struct net_device *ndev)
->  {
-> +	struct ravb_private *priv = netdev_priv(ndev);
+> +static int rvu_rep_get_vlan_id(struct rvu *rvu, u16 pcifunc)
+> +{
+> +	int id;
 > +
->  	/* Receive frame limit set register */
-> -	ravb_write(ndev, ndev->mtu + ETH_HLEN + VLAN_HLEN + ETH_FCS_LEN, RFLR);
-> +	ravb_write(ndev, priv->info->rx_max_frame_size + ETH_FCS_LEN, RFLR);
+> +	for (id = 0; id < rvu->rep_cnt; id++)
+> +		if (rvu->rep2pfvf_map[id] == pcifunc)
+> +			return id;
+> +	return -ENODEV;
+> +}
 
-   Aha, that's what we're doing in ravb_emac_init_gbeth()...
+rvu_rep_get_vlan_id() can return an error,
+but it is not checked by callers. Should it be?
+If not, perhaps rvu_rep_get_vlan_id can return a u16?
 
-[...]
+> +
+> +static int rvu_rep_tx_vlan_cfg(struct rvu *rvu,  u16 pcifunc,
+> +			       u16 vlan_tci, int *vidx)
+> +{
+> +	struct nix_vtag_config_rsp rsp = {};
+> +	struct nix_vtag_config req = {};
+> +	u64 etype = ETH_P_8021Q;
+> +	int err;
+> +
+> +	/* Insert vlan tag */
+> +	req.hdr.pcifunc = pcifunc;
+> +	req.vtag_size = VTAGSIZE_T4;
+> +	req.cfg_type = 0; /* tx vlan cfg */
+> +	req.tx.cfg_vtag0 = true;
+> +	req.tx.vtag0 = etype << 48 | ntohs(vlan_tci);
 
-MBR, Sergey
+This does not seem correct. vlan_tci is host byte-order,
+but ntohs expects a big-endian value as it's argument.
+
+Flagged by Sparse.
+
+> +
+> +	err = rvu_mbox_handler_nix_vtag_cfg(rvu, &req, &rsp);
+> +	if (err) {
+> +		dev_err(rvu->dev, "Tx vlan config failed\n");
+> +		return err;
+> +	}
+> +	*vidx = rsp.vtag0_idx;
+> +	return 0;
+> +}
+
+...
+
+> +static int rvu_rep_install_rx_rule(struct rvu *rvu, u16 pcifunc,
+> +				   u16 entry, bool rte)
+> +{
+> +	struct npc_install_flow_req req = {};
+> +	struct npc_install_flow_rsp rsp = {};
+> +	struct rvu_pfvf *pfvf;
+> +	u16 vlan_tci, rep_id;
+> +
+> +	pfvf = rvu_get_pfvf(rvu, pcifunc);
+> +
+> +	/* To stree the traffic from Representee to Representor */
+
+nit: steer
+
+> +	rep_id = (u16)rvu_rep_get_vlan_id(rvu, pcifunc);
+
+This cast seems unnecessary, or at least inconsistent
+with the other call to rvu_rep_get_vlan_id.
+
+> +	if (rte) {
+> +		vlan_tci = rep_id | 0x1ull << 8;
+
+ull seems a bit excessive as these are otherwise 16bit values.
+And in any case, perhaps BIT(8) can be used here.
+
+> +		req.vf = rvu->rep_pcifunc;
+> +		req.op = NIX_RX_ACTIONOP_UCAST;
+> +		req.index = rep_id;
+> +	} else {
+> +		vlan_tci = rep_id;
+> +		req.vf = pcifunc;
+> +		req.op = NIX_RX_ACTION_DEFAULT;
+> +	}
+> +
+> +	rvu_rep_rx_vlan_cfg(rvu, req.vf);
+> +	req.entry = entry;
+> +	req.hdr.pcifunc = 0; /* AF is requester */
+> +	req.features = BIT_ULL(NPC_OUTER_VID) | BIT_ULL(NPC_VLAN_ETYPE_CTAG);
+> +	req.vtag0_valid = true;
+> +	req.vtag0_type = NIX_AF_LFX_RX_VTAG_TYPE0;
+> +	req.packet.vlan_etype = (__be16)ETH_P_8021Q;
+> +	req.mask.vlan_etype = (__be16)ETH_P_8021Q;
+> +	req.packet.vlan_tci = (__be16)vlan_tci;
+> +	req.mask.vlan_tci = (__be16)0xffff;
+
+0xffff is isomorphic, so this point isn't particularly relevant,
+but the 3 casts above that don't look right: these are host-byte
+order values, they shouldn't be cast as big-endian..
+
+Also flagged by Sparse.
+
+> +
+> +	req.channel = RVU_SWITCH_LBK_CHAN;
+> +	req.chan_mask = 0xffff;
+> +	req.intf = pfvf->nix_rx_intf;
+> +
+> +	return rvu_mbox_handler_npc_install_flow(rvu, &req, &rsp);
+> +}
+> +
+> +static int rvu_rep_install_tx_rule(struct rvu *rvu, u16 pcifunc, u16 entry,
+> +				   bool rte)
+> +{
+> +	struct npc_install_flow_req req = {};
+> +	struct npc_install_flow_rsp rsp = {};
+> +	struct rvu_pfvf *pfvf;
+> +	int vidx, err;
+> +	u16 vlan_tci;
+> +	u8 lbkid;
+> +
+> +	pfvf = rvu_get_pfvf(rvu, pcifunc);
+> +	vlan_tci = rvu_rep_get_vlan_id(rvu, pcifunc);
+> +	if (rte)
+> +		vlan_tci |= 0x1ull << 8;
+
+BIT(8) seems appropriate here too.
+
+> +
+> +	err = rvu_rep_tx_vlan_cfg(rvu, pcifunc, vlan_tci, &vidx);
+> +	if (err)
+> +		return err;
+> +
+> +	lbkid = pfvf->nix_blkaddr == BLKADDR_NIX0 ? 0 : 1;
+> +	req.hdr.pcifunc = 0; /* AF is requester */
+> +	if (rte) {
+> +		req.vf = pcifunc;
+> +	} else {
+> +		req.vf = rvu->rep_pcifunc;
+> +		req.packet.sq_id = vlan_tci;
+> +		req.mask.sq_id = 0xffff;
+> +	}
+> +
+> +	req.entry = entry;
+> +	req.intf = pfvf->nix_tx_intf;
+> +	req.op = NIX_TX_ACTIONOP_UCAST_CHAN;
+> +	req.index = (lbkid << 8) | RVU_SWITCH_LBK_CHAN;
+> +	req.set_cntr = 1;
+> +	req.vtag0_def = vidx;
+> +	req.vtag0_op = 1;
+> +	return rvu_mbox_handler_npc_install_flow(rvu, &req, &rsp);
+> +}
+
+...
+
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
+> index 3cb8dc820fdd..e276a354d9e4 100644
+
+...
+
+> @@ -230,7 +248,7 @@ int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
+>  	return err;
+>  }
+>  
+> -static int rvu_rep_rsrc_free(struct otx2_nic *priv)
+> +static void rvu_rep_rsrc_free(struct otx2_nic *priv)
+>  {
+>  	struct otx2_qset *qset = &priv->qset;
+>  	int wrk;
+> @@ -241,13 +259,12 @@ static int rvu_rep_rsrc_free(struct otx2_nic *priv)
+>  
+>  	otx2_free_hw_resources(priv);
+>  	otx2_free_queue_mem(qset);
+> -	return 0;
+>  }
+>  
+>  static int rvu_rep_rsrc_init(struct otx2_nic *priv)
+>  {
+>  	struct otx2_qset *qset = &priv->qset;
+> -	int err = 0;
+> +	int err;
+>  
+>  	err = otx2_alloc_queue_mem(priv);
+>  	if (err)
+
+The last two hunks don't seem strictly related to the rest of this patch.
+Perhaps they belong squashed into earlier patches of this series?
 
