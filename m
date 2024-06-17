@@ -1,175 +1,281 @@
-Return-Path: <netdev+bounces-103936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E74E290A677
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:07:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 387B490A67F
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 09:08:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 692501F247B5
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 07:07:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BACA31F21932
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 07:08:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AEF5190494;
-	Mon, 17 Jun 2024 07:04:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A766A187358;
+	Mon, 17 Jun 2024 07:08:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="joTUHrPn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B8AIWVDs"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2041.outbound.protection.outlook.com [40.107.244.41])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B673D190479;
-	Mon, 17 Jun 2024 07:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718607882; cv=fail; b=b0/OcBUMWkOvM8qUwGutEAEMFbD9yfqw++fHNAtlWmnXCyBDrhz2UvqViQgOz7XmC0zcmaMh8Jc4WplOHhiICM07o26eeh/OnifrS9XqPZ9TMZwCzSWyAiLmFDhxGnSK62g2+oZTPLKEBpv4HJ04Ggctnlp0nvKqWHfuzTNsZBA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718607882; c=relaxed/simple;
-	bh=JkXez2qJZvQa49DEDAn0mAxBd0XqLq3AT+iQ1SqxX0s=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K3bEtazcZ8pcHQw0rU061bDApxFqpAS0FOEYu25Q5qXJMODiVL83gmHp7w7WovUA/5B/zTmiYVeqxAQFoON/Bpid3syHyXiGrfp1ndzmoHwchrHDS/eMQmApas6Ocyil/vnWyFMnW1MzHPCI1SY8/bn994HgR4zBclXpj+ILvyo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=joTUHrPn; arc=fail smtp.client-ip=40.107.244.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hT3iq9LsKlZjdVA35OKW6GuiHa8JjXY5I1/gPehR71T/GKIGKSX2IGPAPXIDuhffDJ8Tlhxf+nVKdmxE8T3Zwcd1yN65ndZELs8Xaghn3f7eWLd+VyAngwyEf8GJcW5kEJZ1W8fACO+UOTu9DiLiW0IqFRb32dpbmzjXqJHVLZ9hlhhspu0HCKiTF9peohLEZ0zPOu4JVchLDxvTQXjouJ6FnC9UO9E4HeQwmdWqGEVrWPyf+0MIFG9HXpBKFMgHpr2Z0KMcOTpxdLXnsm9eagRHARitfv9zSKRfcplfpdoVPIjXQIJOc0aRZ0gm5sq/dSVAwT9sZWl17aPjFPrLQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=65IL+f5STpJuNlS+ntBsjZ4BhYTF37B+zPjZiTWIns0=;
- b=fmXZnjBR6QL1My6WEngle2weiKAWU3gU53RSBANexoLsoqPTT+w9n/+p8Ccl1kOQY43JDIV8wM8pIXF7KlPGSjDjmmtgXAlLEXm7J0SCir4tjeZnhuErd0Atz2bgv730AhYs27khvNXduZG+18+xQTXnR5s0zaPe6axJefp3xdSwGiVnB3BmJiM2n/P8o+ukh/K1akvkgAz28K7XQ7f2AY25uHKommfDi2Gpfvo7FhV/1NzREHjwFJxGwIWIZlTLWaJcQHjm+JOM7oZxxBnfo7hJi9J3KBAJVF1rC71n3/SeGp8Z7llIY5lmyCmzvKdzJIsGM8oDopo4juUyPloMDA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=microchip.com smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=65IL+f5STpJuNlS+ntBsjZ4BhYTF37B+zPjZiTWIns0=;
- b=joTUHrPniO7eUHWgiwe8MryWjZa0qIodHqamyiHQwxrGuz9KffNwYdOaVDJ54MPaRUiEyydxtoyp6wD+riaf6aKZA7xCxXRbHMn8R1fzoDG+C6M48zFvDItQG/hHLUcfybBbFpxzgjxkSkMm9VYOYIYTjeCGmIpLONmPhIFzAZc=
-Received: from DM6PR11CA0036.namprd11.prod.outlook.com (2603:10b6:5:190::49)
- by MN0PR12MB5787.namprd12.prod.outlook.com (2603:10b6:208:376::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Mon, 17 Jun
- 2024 07:04:38 +0000
-Received: from DS1PEPF00017095.namprd03.prod.outlook.com
- (2603:10b6:5:190:cafe::72) by DM6PR11CA0036.outlook.office365.com
- (2603:10b6:5:190::49) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31 via Frontend
- Transport; Mon, 17 Jun 2024 07:04:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF00017095.mail.protection.outlook.com (10.167.17.138) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7677.15 via Frontend Transport; Mon, 17 Jun 2024 07:04:37 +0000
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 17 Jun
- 2024 02:04:36 -0500
-Received: from xhdvineethc40.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Mon, 17 Jun 2024 02:04:32 -0500
-From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
-To: <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-	<linux@armlinux.org.uk>, <vadim.fedorenko@linux.dev>, <andrew@lunn.ch>
-CC: <vineeth.karumanchi@amd.com>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <git@amd.com>
-Subject: [PATCH net-next v6 4/4] dt-bindings: net: cdns,macb: Deprecate magic-packet property
-Date: Mon, 17 Jun 2024 12:34:13 +0530
-Message-ID: <20240617070413.2291511-5-vineeth.karumanchi@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240617070413.2291511-1-vineeth.karumanchi@amd.com>
-References: <20240617070413.2291511-1-vineeth.karumanchi@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB949187322
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 07:08:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718608114; cv=none; b=BUAdW1tBA/JvQSX1X+T5ViIfFGN/bEo0dFadxo/+ym2090T7nKNuMIJdeBpxIotnxNbiXA7r7adiwCL88ph8vD1cxmeSyFIFn3sJkgD4uOhnKBTqMAMNyY/dgmxgIUupSgqE42F4hyIsG7CJBU8P17q0EfcDGFlmemWCyDVqKHw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718608114; c=relaxed/simple;
+	bh=USrfOZY7YjcJr3YXnlPp2uzKRs8/h1OqgvruayPDXP4=;
+	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MekSWwUaA9pqeK7ozE9EzLGSB5q9WGlbQYz0jBUG1Fh2thDXglEa3xzz9SS9J1AxvxpHo66V7K3p+CgSz43MR7s+OFoVgpIeaEr5AxM2JspcfJ/btePdIx45TK3uj63crRXCODfAFpQcF/TIDElT5dr5qsEOl1Q4FjQwEnO98OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B8AIWVDs; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718608111;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VFnZWNFJWyA94C2L1f2HcpW9Z4CdvGnFQUz/35+GLvM=;
+	b=B8AIWVDs/y0X5erhVaGibouqRHHA7l5JGICcTPr4PH6IRRO5Q6t3dCNa6oNi2M1hF+iKvU
+	K0D9M1bx7NM0yH9NDKCotAfiE6sba3MbE03aV1wY0bGN+0HBw22xsFkYjxLf2JRKp4h85M
+	AEk8fo393V8V8lnfeibuJiP+5g9OLA8=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-658-8bWIi0BWMFql7xtkJXnWwg-1; Mon, 17 Jun 2024 03:08:26 -0400
+X-MC-Unique: 8bWIi0BWMFql7xtkJXnWwg-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6b077178ca4so54136046d6.0
+        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 00:08:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718608106; x=1719212906;
+        h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VFnZWNFJWyA94C2L1f2HcpW9Z4CdvGnFQUz/35+GLvM=;
+        b=rVFFcy0CWHw2AP/M18gq81uzZDIXNi0qnL6zKR02wQIzd25GywhNO+k/y/7OW3VJ0R
+         c+Wx0F4VJyMs31BvL5vMp4Fzu/pohbz0/HzBsaTOc7AG0Y5R7OjMOG1jeilyPMGgqM0Z
+         3s7NW/6DPmqW224VoC7Vm8qEm6hhPxg+sBpR2DFRyd++UnGIAXn2IQ2VMygqxAlyMf9z
+         rqv4Ztgz+k8eJj4ieKsFGdHx6afiw5XzNZbZqWPSdnExMxaoIVbsGUmyPp9C/prprfu4
+         k2V+mkf/3YBCW1n+jHswGgyw9ea5rb1PC+IPLvMk7wLdr1pEqlnh/t74sd87pJgnWlXi
+         7vHQ==
+X-Gm-Message-State: AOJu0YxRJVIyc6fYAbxrPnl/fx2tUbp4Jer2j6x07OStyiwpwzbfzP/R
+	yyo5+UgrENK8ejvb7SWmYsTM1znf3VSammulL1xKRdPI1wch/yYM8HNT3swPfPZFkEU0IyhRM+N
+	/kXAt8/44OVUr9hsZFS8elPGgpUa14OXZQb3XrPse8O8yuEp0namTvTJj7NTsea/cdNJzR9xrFJ
+	HG40PO66Fyk2JxLFfAwVtDKgQ1jq0G
+X-Received: by 2002:a0c:e78d:0:b0:6b0:6400:3b6f with SMTP id 6a1803df08f44-6b2afc78e7emr89614616d6.8.1718608105379;
+        Mon, 17 Jun 2024 00:08:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHngmpoF0G1Kpc6044Rkne2yjimTQKfws9kfGdgowCpRPFvfoKKY3G5g8yuJotyXboNdv+HW7uPscrnjkgdiZM=
+X-Received: by 2002:a0c:e78d:0:b0:6b0:6400:3b6f with SMTP id
+ 6a1803df08f44-6b2afc78e7emr89614506d6.8.1718608105010; Mon, 17 Jun 2024
+ 00:08:25 -0700 (PDT)
+Received: from 311643009450 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 17 Jun 2024 07:08:24 +0000
+From: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
+References: <20240603185647.2310748-1-amorenoz@redhat.com> <20240603185647.2310748-7-amorenoz@redhat.com>
+ <f7t4j9vo44g.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Received-SPF: None (SATLEXMB04.amd.com: vineeth.karumanchi@amd.com does not
- designate permitted sender hosts)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017095:EE_|MN0PR12MB5787:EE_
-X-MS-Office365-Filtering-Correlation-Id: e83b49b3-0e5f-4d2f-8e0e-08dc8e9bc054
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230037|36860700010|7416011|376011|82310400023|1800799021|921017;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?gp3GcLOKeJ0vOBXLz4M25TUxAk6ggdr2/U9hcRfgMewkXqK5LrB1DF5mS6yn?=
- =?us-ascii?Q?RlZCRYibojSJKIF7yX8Yz//fgXpj55mdeOQp7R69kgQGT9KRXaBsUdBDyZLh?=
- =?us-ascii?Q?6cdDvmu7lJIl+d1Mcm9uKs58xBqhE6SxHG48df9DZZD+IJ2AZa9/0UQAdW3A?=
- =?us-ascii?Q?CVWmoJ2s02EE/AIFSWDtuThdmDXlN/emy9p8upevgRDoPnkiIzq/AiobGEIo?=
- =?us-ascii?Q?WHhQPxxeA9vrTMMt9oBLj9slqfiCgnUFYVSAzYMKs0Tt18MpS5ACkfQmSxs8?=
- =?us-ascii?Q?FC0rkbv+S7DT0/MEY8EWq867kSvO5/hsuyZuq6OpaF3oVXoxLAeETWWD6y4O?=
- =?us-ascii?Q?kd085FbaONzc77Q8/1UWcaB3rsDBxrt7vVFySjaEEX0zn4ARtrKtyWXXHHYT?=
- =?us-ascii?Q?OR6DkLCUBiycefeS0RCnRaS10dD+gkznH4Op7Xx5F64F07niHmqKVaxaB2dO?=
- =?us-ascii?Q?Q/cYcFzKZ/RDkAkcwuLcipAPtpOHC3Ofnzu8a8PQ/LYO6PoCX9L4+Zzp1Leh?=
- =?us-ascii?Q?jdOX4Ll+lVsp4HdPUkNS4ZRQGtadWj7CaV8JJHyY+lYoQD7teBjaqGzCOGj+?=
- =?us-ascii?Q?SiecphxWeK10d927kCWFg68iTvzykzJ8qIP7t9sm3u4QsAS2bVfEp7kMjH/M?=
- =?us-ascii?Q?KmI1v3ieVdTD8p5o3dQM6ciLmXeW1ayE9O5BS0SFM38pZkkqwWsxTO80gajx?=
- =?us-ascii?Q?X6gHWXITf/xe1FG8+fKKnuPlzpSQJW7iWPrbj0QZOm2KfXAL8Qmm/GLVrQkl?=
- =?us-ascii?Q?pM8vjpV+9KO31g0qJ/YCH1dIw/f1Pn6/vr+IXML+0rSwhJxgcPnjUW8PbooV?=
- =?us-ascii?Q?OIzFp/NkiGJIovCvnKdjAh62XECBR6uQA6DhkEaMJyAx00rwnI88N4y7/Umg?=
- =?us-ascii?Q?y8KmypGvnFdufVd4Bjopo3Qn7mrDAKCEZbCL15bbmiEY/HhnDimLcNoUBusf?=
- =?us-ascii?Q?Jl6Nvj1HSbzRNgN8SOcLTbkmVCEm+WuuGlgbjfYOvTWdadNEKSgpuM0CfDlw?=
- =?us-ascii?Q?MMZZF8Igd7S+oePzsrxFqkb1JBAdPIZkR98IApRs+gmlGDzSFDdNwIh6t2DF?=
- =?us-ascii?Q?ZilxtIby2w9RtNwrSpEDCnYfLUZSEKsB+zzYQ01WIj2/LtGoBAbKs/lZYWn1?=
- =?us-ascii?Q?7N+EOtv79r1DOcrF4CjqREpuTfJ8A9CBhSJb5sMx83UHDUwsy1xBW5ppdVpW?=
- =?us-ascii?Q?sDVEVi5WdWPXhhU1SNt/6rBlNnVzyHFmwWan2CZkjJxCc1hAZp0vq9PIZxsP?=
- =?us-ascii?Q?tgGAkcfxwMAPf1lK6v7xLdC1dHW3bzuRDmm0mXMiJEzNN/h0v2LRbc9d9+Pe?=
- =?us-ascii?Q?p0MO+Nf2mkoEnh7tE9c2DXZ+mnWxu4f1cteVsSZoYJs2xsM8udRTYGiJQZCi?=
- =?us-ascii?Q?mgp0JRDeKZvHZwowAyrhkr5Z9faIqzD92aVFYQqiUWjkf+YXK/vHSDcnzlC9?=
- =?us-ascii?Q?tcOCoLXzHyU=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(36860700010)(7416011)(376011)(82310400023)(1800799021)(921017);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jun 2024 07:04:37.6515
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e83b49b3-0e5f-4d2f-8e0e-08dc8e9bc054
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF00017095.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5787
+In-Reply-To: <f7t4j9vo44g.fsf@redhat.com>
+Date: Mon, 17 Jun 2024 07:08:24 +0000
+Message-ID: <CAG=2xmPW=1HzojWhHaE3z_x5u_Dv1zPVmMn4cSmV6DF4fzq5KA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 6/9] net: openvswitch: store sampling
+ probability in cb.
+To: Aaron Conole <aconole@redhat.com>
+Cc: netdev@vger.kernel.org, echaudro@redhat.com, horms@kernel.org, 
+	i.maximets@ovn.org, dev@openvswitch.org, Pravin B Shelar <pshelar@ovn.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-WOL modes such as magic-packet should be an OS policy.
-By default, advertise supported modes and use ethtool to activate
-the required mode.
+On Fri, Jun 14, 2024 at 12:55:59PM GMT, Aaron Conole wrote:
+> Adrian Moreno <amorenoz@redhat.com> writes:
+>
+> > The behavior of actions might not be the exact same if they are being
+> > executed inside a nested sample action. Store the probability of the
+> > parent sample action in the skb's cb area.
+>
+> What does that mean?
+>
 
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- Documentation/devicetree/bindings/net/cdns,macb.yaml | 1 +
- 1 file changed, 1 insertion(+)
+Emit action, for instance, needs the probability so that psample
+consumers know what was the sampling rate applied. Also, the way we
+should inform about packet drops (via kfree_skb_reason) changes (see
+patch 7/9).
 
-diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-index 2c71e2cf3a2f..3c30dd23cd4e 100644
---- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
-+++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-@@ -146,6 +146,7 @@ patternProperties:
- 
-       magic-packet:
-         type: boolean
-+        deprecated: true
-         description:
-           Indicates that the hardware supports waking up via magic packet.
- 
--- 
-2.34.1
+> > Use the probability in emit_sample to pass it down to psample.
+> >
+> > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> > ---
+> >  include/uapi/linux/openvswitch.h |  3 ++-
+> >  net/openvswitch/actions.c        | 25 ++++++++++++++++++++++---
+> >  net/openvswitch/datapath.h       |  3 +++
+> >  net/openvswitch/vport.c          |  1 +
+> >  4 files changed, 28 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
+> > index a0e9dde0584a..9d675725fa2b 100644
+> > --- a/include/uapi/linux/openvswitch.h
+> > +++ b/include/uapi/linux/openvswitch.h
+> > @@ -649,7 +649,8 @@ enum ovs_flow_attr {
+> >   * Actions are passed as nested attributes.
+> >   *
+> >   * Executes the specified actions with the given probability on a per-packet
+> > - * basis.
+> > + * basis. Nested actions will be able to access the probability value of the
+> > + * parent @OVS_ACTION_ATTR_SAMPLE.
+> >   */
+> >  enum ovs_sample_attr {
+> >  	OVS_SAMPLE_ATTR_UNSPEC,
+> > diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+> > index 3b4dba0ded59..33f6d93ba5e4 100644
+> > --- a/net/openvswitch/actions.c
+> > +++ b/net/openvswitch/actions.c
+> > @@ -1048,12 +1048,15 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
+> >  	struct nlattr *sample_arg;
+> >  	int rem = nla_len(attr);
+> >  	const struct sample_arg *arg;
+> > +	u32 init_probability;
+> >  	bool clone_flow_key;
+> > +	int err;
+> >
+> >  	/* The first action is always 'OVS_SAMPLE_ATTR_ARG'. */
+> >  	sample_arg = nla_data(attr);
+> >  	arg = nla_data(sample_arg);
+> >  	actions = nla_next(sample_arg, &rem);
+> > +	init_probability = OVS_CB(skb)->probability;
+> >
+> >  	if ((arg->probability != U32_MAX) &&
+> >  	    (!arg->probability || get_random_u32() > arg->probability)) {
+> > @@ -1062,9 +1065,21 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
+> >  		return 0;
+> >  	}
+> >
+> > +	if (init_probability) {
+> > +		OVS_CB(skb)->probability = ((u64)OVS_CB(skb)->probability *
+> > +					    arg->probability / U32_MAX);
+> > +	} else {
+> > +		OVS_CB(skb)->probability = arg->probability;
+> > +	}
+> > +
+>
+> I'm confused by this.  Eventually, integer arithmetic will practically
+> guarantee that nested sample() calls will go to 0.  So eventually, the
+> test above will be impossible to meet mathematically.
+>
+> OTOH, you could argue that a 1% of 50% is low anyway, but it still would
+> have a positive probability count, and still be possible for
+> get_random_u32() call to match.
+>
+
+Using OVS's probability semantics, we can express probabilities as low
+as (100/U32_MAX)% which is pretty low indeed. However, just because the
+probability of executing the action is low I don't think we should not
+report it.
+
+Rethinking the integer arithmetics, it's true that we should avoid
+hitting zero on the division, eg: nesting 6x 1% sampling rates will make
+the result be zero which will make probability restoration fail on the
+way back. Threrefore, the new probability should be at least 1.
+
+
+> I'm not sure about this particular change.  Why do we need it?
+>
+
+Why do we need to propagate the probability down to nested "sample"
+actions? or why do we need to store the probability in the cb area in
+the first place?
+
+The former: Just for correctness as only storing the last one would be
+incorrect. Although I don't know of any use for nested "sample" actions.
+The latter: To pass it down to psample so that sample receivers know how
+the sampling rate applied (and, e.g: do throughput estimations like OVS
+does with IPFIX).
+
+
+> >  	clone_flow_key = !arg->exec;
+> > -	return clone_execute(dp, skb, key, 0, actions, rem, last,
+> > -			     clone_flow_key);
+> > +	err = clone_execute(dp, skb, key, 0, actions, rem, last,
+> > +			    clone_flow_key);
+> > +
+> > +	if (!last)
+>
+> Is this right?  Don't we only want to set the probability on the last
+> action?  Should the test be 'if (last)'?
+>
+
+This is restoring the parent's probability after the actions in the
+current sample action have been executed.
+
+If it was the last action there is no need to restore the probability
+back to the parent's (or zero if it's there's only one level) since no
+further action will require it. And more importantly, if it's the last
+action, the packet gets free'ed inside that "branch" so we must not
+access its memory.
+
+
+> > +		OVS_CB(skb)->probability = init_probability;
+> > +
+> > +	return err;
+> >  }
+> >
+> >  /* When 'last' is true, clone() should always consume the 'skb'.
+> > @@ -1313,6 +1328,7 @@ static int execute_emit_sample(struct datapath *dp, struct sk_buff *skb,
+> >  	struct psample_metadata md = {};
+> >  	struct vport *input_vport;
+> >  	const struct nlattr *a;
+> > +	u32 rate;
+> >  	int rem;
+> >
+> >  	for (a = nla_data(attr), rem = nla_len(attr); rem > 0;
+> > @@ -1337,8 +1353,11 @@ static int execute_emit_sample(struct datapath *dp, struct sk_buff *skb,
+> >
+> >  	md.in_ifindex = input_vport->dev->ifindex;
+> >  	md.trunc_size = skb->len - OVS_CB(skb)->cutlen;
+> > +	md.rate_as_probability = 1;
+> > +
+> > +	rate = OVS_CB(skb)->probability ? OVS_CB(skb)->probability : U32_MAX;
+> >
+> > -	psample_sample_packet(&psample_group, skb, 0, &md);
+> > +	psample_sample_packet(&psample_group, skb, rate, &md);
+> >  #endif
+> >
+> >  	return 0;
+> > diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
+> > index 0cd29971a907..9ca6231ea647 100644
+> > --- a/net/openvswitch/datapath.h
+> > +++ b/net/openvswitch/datapath.h
+> > @@ -115,12 +115,15 @@ struct datapath {
+> >   * fragmented.
+> >   * @acts_origlen: The netlink size of the flow actions applied to this skb.
+> >   * @cutlen: The number of bytes from the packet end to be removed.
+> > + * @probability: The sampling probability that was applied to this skb; 0 means
+> > + * no sampling has occurred; U32_MAX means 100% probability.
+> >   */
+> >  struct ovs_skb_cb {
+> >  	struct vport		*input_vport;
+> >  	u16			mru;
+> >  	u16			acts_origlen;
+> >  	u32			cutlen;
+> > +	u32			probability;
+> >  };
+> >  #define OVS_CB(skb) ((struct ovs_skb_cb *)(skb)->cb)
+> >
+> > diff --git a/net/openvswitch/vport.c b/net/openvswitch/vport.c
+> > index 972ae01a70f7..8732f6e51ae5 100644
+> > --- a/net/openvswitch/vport.c
+> > +++ b/net/openvswitch/vport.c
+> > @@ -500,6 +500,7 @@ int ovs_vport_receive(struct vport *vport, struct sk_buff *skb,
+> >  	OVS_CB(skb)->input_vport = vport;
+> >  	OVS_CB(skb)->mru = 0;
+> >  	OVS_CB(skb)->cutlen = 0;
+> > +	OVS_CB(skb)->probability = 0;
+> >  	if (unlikely(dev_net(skb->dev) != ovs_dp_get_net(vport->dp))) {
+> >  		u32 mark;
+>
 
 
