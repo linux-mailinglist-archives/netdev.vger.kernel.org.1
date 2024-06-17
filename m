@@ -1,109 +1,118 @@
-Return-Path: <netdev+bounces-104178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B601F90B79A
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:16:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 452C690B70A
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 18:51:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50D09B2263F
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:50:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED0D72855F8
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:51:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99551662E0;
-	Mon, 17 Jun 2024 16:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B561161924;
+	Mon, 17 Jun 2024 16:51:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZUBbOFPD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="js6dk8wq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9569F161904
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 16:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038EA1D9526;
+	Mon, 17 Jun 2024 16:51:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718643035; cv=none; b=V8bWz4dYhJWdmxffQaBdNiGpzgqE+kd3s903sUPb+rZEzCMkQs3XEt8Mz1DaEmYgKiWN3CjEM71IDPtSVFMXwMa0fjgSUiMq5S3wGG3JO2WxwFPbjth3edUzZabSpiFdUGqBLbVoZslgKCUC0W4VsyDBUBLkw5V5dCNQVdOknv4=
+	t=1718643108; cv=none; b=evNesHPpfan7Bpu+o0tzbE/afKRSjBocjhwSXtTMLM1zRC0e589/Wq2Rvcos2x1mxJwHSLaRjyINQmK2VfFjIjc+MITnZLuWdYYDMPk0YToWM3f0o2LkoRxWgQLihZq8kGifXykvcFIkwIeyFRd3mtsDI14GN4JUe8cC8DMAVEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718643035; c=relaxed/simple;
-	bh=D63MtkbAqqlmii321085ZHjnulMiTBM6NBCGF/gfAFY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=A/KS8e7HUr00rcF2Vl5RcccoY61SoGnH7Y75qm2adduniW5IarAMUU8T+PL/63jXDXhxx8xUcJoGCm/9hA9nblC9RQbXr7RneAwRXe8LRUCxQeHM9TfHEDYN7mW+ip+z3OO3J18TLSm4dA9Zazv3Qlo5Nr7QNFCtdl3o/vq88bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZUBbOFPD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F7D3C2BD10;
-	Mon, 17 Jun 2024 16:50:33 +0000 (UTC)
+	s=arc-20240116; t=1718643108; c=relaxed/simple;
+	bh=JQ9/ew7gNBZkCvIaaYqgstiKB/4Vesu8cj+i8F8ugsU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ktpti6ki88geR1F2bk9hiunwaTQh3xzMILMT7PIMZLWA7H8NSkwr7kKoI93kGQTLwgRpUcp277XVmxZUiZFD9qW9NOdIBn6wGgcSdnDgFjzbDWsoMsUUfENOUfY9SpYjIdxJaGITbKFA5BqGLq9/8BmnXKicYMiuO2m1JA1bKAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=js6dk8wq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35318C2BD10;
+	Mon, 17 Jun 2024 16:51:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718643035;
-	bh=D63MtkbAqqlmii321085ZHjnulMiTBM6NBCGF/gfAFY=;
-	h=From:Date:Subject:To:Cc:From;
-	b=ZUBbOFPDLkbM7fKOZglIn5VzgEZkp89y+1IPZ2NFW0DnzPL01cRRU2ccQV+0fz010
-	 +A3Z4g7T4memPFqGbl1mdnBIN6l8gFMlD0Lbfwm03qaF6k36mSVqM9HZTvzYvQHseH
-	 ehgNgwzS/LTGbTtiKxH+L5wdW9c+/cEBuny5kNj78es03ZPsG01BbangP/+w528xYp
-	 8+YVrAeUl62OPZhL4uJSYKVzrNjcYSlQ66Whkl9VAtkqj0N2EWV8iduC7WOVAsmYBp
-	 emhB3PykckJuiWcsx/8GrH6x93BTxTIsTHPOFUqZWbnFbpy7j4CdjGuoQGt+HN9WFt
-	 sXV7IH4ZS1R6Q==
+	s=k20201202; t=1718643107;
+	bh=JQ9/ew7gNBZkCvIaaYqgstiKB/4Vesu8cj+i8F8ugsU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=js6dk8wqM2vGwMzBeUoVi9zTNzBclB3440OFZMVql27MEzKvs9qPHQ+iFbYjg4RPl
+	 e6LfgSYfhvTz/ZAASx9i/y+n5osVCeyw3wyX+2V1Bybmxn/iiL2uTEy5IWrMUCin4o
+	 NFHkjg/Dq2HSuud6miltzRHaXxmuMoQGnzsv6/wj2ODGlySkqlZuR8+GL9qw8oofio
+	 xc0xNZpCkErpd/26ZwF9hyqUBISr53j5kzktT6RQYO8O6D86cHHXwqCupZMCVRwbgH
+	 FzsB4/rTrfpP48RKMUaUsOOTHBeB6bUehepbWadDtqo2CErEnNq5ARbmlXF/+auxme
+	 eFHf/oNq/37Cg==
+Date: Mon, 17 Jun 2024 17:51:42 +0100
 From: Simon Horman <horms@kernel.org>
-Date: Mon, 17 Jun 2024 17:50:26 +0100
-Subject: [PATCH net] octeontx2-pf: Add error handling to VLAN unoffload
- handling
+To: Furong Xu <0x1207@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Eric Dumazet <edumazet@google.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>,
+	Corinna Vinschen <vinschen@redhat.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH net-next v4] net: stmmac: Enable TSO on VLANs
+Message-ID: <20240617165142.GX8447@kernel.org>
+References: <20240615095611.517323-1-0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240617-otx2-vlan-push-v1-1-5cf20a70570e@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAFJpcGYC/x3MSQqAMAxA0atI1gbsQKteRVw4pBqQKq2KULy7x
- eVb/J8gUmCK0BYJAt0cefcZoixgWge/EPKcDbKSujLC4n4+Eu9t8HhccUXljB1rZXVjBeToCOT
- 4+YcdeDqhf98PR6f+0WUAAAA=
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Sunil Goutham <sgoutham@marvell.com>, 
- Geetha sowjanya <gakula@marvell.com>, 
- Subbaraya Sundeep <sbhatta@marvell.com>, 
- Hariprasad Kelam <hkelam@marvell.com>, 
- Naveen Mamindlapalli <naveenm@marvell.com>, netdev@vger.kernel.org
-X-Mailer: b4 0.12.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240615095611.517323-1-0x1207@gmail.com>
 
-otx2_sq_append_skb makes used of __vlan_hwaccel_push_inside()
-to unoffload VLANs - push them from skb meta data into skb data.
-However, it omitts a check for __vlan_hwaccel_push_inside()
-returning NULL.
+On Sat, Jun 15, 2024 at 05:56:11PM +0800, Furong Xu wrote:
+> The TSO engine works well when the frames are not VLAN Tagged.
+> But it will produce broken segments when frames are VLAN Tagged.
+> 
+> The first segment is all good, while the second segment to the
+> last segment are broken, they lack of required VLAN tag.
+> 
+> An example here:
+> ========
+> // 1st segment of a VLAN Tagged TSO frame, nothing wrong.
+> MacSrc > MacDst, ethertype 802.1Q (0x8100), length 1518: vlan 100, p 1, ethertype IPv4 (0x0800), HostA:42643 > HostB:5201: Flags [.], seq 1:1449
+> 
+> // 2nd to last segments of a VLAN Tagged TSO frame, VLAN tag is missing.
+> MacSrc > MacDst, ethertype IPv4 (0x0800), length 1514: HostA:42643 > HostB:5201: Flags [.], seq 1449:2897
+> MacSrc > MacDst, ethertype IPv4 (0x0800), length 1514: HostA:42643 > HostB:5201: Flags [.], seq 2897:4345
+> MacSrc > MacDst, ethertype IPv4 (0x0800), length 1514: HostA:42643 > HostB:5201: Flags [.], seq 4345:5793
+> MacSrc > MacDst, ethertype IPv4 (0x0800), length 1514: HostA:42643 > HostB:5201: Flags [P.], seq 5793:7241
+> 
+> // normal VLAN Tagged non-TSO frame, nothing wrong.
+> MacSrc > MacDst, ethertype 802.1Q (0x8100), length 1022: vlan 100, p 1, ethertype IPv4 (0x0800), HostA:42643 > HostB:5201: Flags [P.], seq 7241:8193
+> MacSrc > MacDst, ethertype 802.1Q (0x8100), length 70: vlan 100, p 1, ethertype IPv4 (0x0800), HostA:42643 > HostB:5201: Flags [F.], seq 8193
+> ========
+> 
+> When transmitting VLAN Tagged TSO frames, never insert VLAN tag by HW,
+> always insert VLAN tag to SKB payload, then TSO works well on VLANs for
+> all MAC cores.
+> 
+> Tested on DWMAC CORE 5.10a, DWMAC CORE 5.20a and DWXGMAC CORE 3.20a
+> 
+> Signed-off-by: Furong Xu <0x1207@gmail.com>
+> ---
+>   Changes in v4:
+>     - Re-arrange variables to keep reverse x-mas tree order.
+> 
+>   Changes in v3:
+>     - Drop packet and increase stats counter when vlan tag insert fails.
+> 
+>   Changes in v2:
+>     - Use __vlan_hwaccel_push_inside() to insert vlan tag to the payload.
 
-Found by inspection based on [1] and [2].
-Compile tested only.
+Thanks this both seems correct to me and
+I believe it addresses the review of earlier revisions.
 
-[1] Re: [PATCH net-next v1] net: stmmac: Enable TSO on VLANs
-    https://lore.kernel.org/all/ZmrN2W8Fye450TKs@shell.armlinux.org.uk/
-[2] Re: [PATCH net-next v2] net: stmmac: Enable TSO on VLANs
-    https://lore.kernel.org/all/CANn89i+11L5=tKsa7V7Aeyxaj6nYGRwy35PAbCRYJ73G+b25sg@mail.gmail.com/
-
-Fixes: fd9d7859db6c ("octeontx2-pf: Implement ingress/egress VLAN offload")
-Signed-off-by: Simon Horman <horms@kernel.org>
----
-I audited callers of __vlan_hwaccel_push_inside in net
-and this appears to be the only one that needs this fix.
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-index a16e9f244117..929b4eac25d9 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-@@ -1174,8 +1174,11 @@ bool otx2_sq_append_skb(struct net_device *netdev, struct otx2_snd_queue *sq,
- 
- 	if (skb_shinfo(skb)->gso_size && !is_hw_tso_supported(pfvf, skb)) {
- 		/* Insert vlan tag before giving pkt to tso */
--		if (skb_vlan_tag_present(skb))
-+		if (skb_vlan_tag_present(skb)) {
- 			skb = __vlan_hwaccel_push_inside(skb);
-+			if (!skb)
-+				return true;
-+		}
- 		otx2_sq_append_tso(pfvf, sq, skb, qidx);
- 		return true;
- 	}
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
