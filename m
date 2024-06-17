@@ -1,191 +1,192 @@
-Return-Path: <netdev+bounces-104271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B823A90BC82
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 23:02:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9C4990BC9A
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 23:08:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACC0E1C238D6
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 21:02:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FFB41F23BBB
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 21:08:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11210191465;
-	Mon, 17 Jun 2024 21:02:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB94C1991B8;
+	Mon, 17 Jun 2024 21:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="CXcw69Bt"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="j8DR5IyT";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="kBTrNAKz";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ExLPViHA";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="WLqXyqYV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360B718FC67
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 21:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C965A178387;
+	Mon, 17 Jun 2024 21:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718658134; cv=none; b=lmcif38q/qdpNmKm9M/q6AjAabkzgw0t/M5dofbgyv7Ipu519TzQr4sqN5S2pksoHJsTKfQa9dUr0MHIi4HGiAItdMU8iEJSxcjnxFWwjO/mCxXJSV4/k5oYR/bIDailC2owl1vC20KBCJM96qZztoj+LjNE29v03JvPsj+ZBw8=
+	t=1718658480; cv=none; b=ucYQIwkJ9xNKHpio9Yusm31vQPvrfK8V/uLytzqUsHD17FNNIlON1K/RFOd4sxQiePwU3MNaqE8RmumIcR/E5ikG/zCo4uGJpSGl/LPOS9la8oGXQoQjXDH6DKkacY2hd1QnSTbvpMOOWTHmzYZXiVoa+yddRTqlfOFk2Yp/qw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718658134; c=relaxed/simple;
-	bh=B1gm5DdSgfQg0HYANDyrQqb7o+BBNjtrye8Q7TCAO24=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=roqLQ4fVZCj0H35nLJUwftB7oUsNnAJdpeNAVXhBVvSqBTnLaaM1/RQZZqbjz1nILXJqrRHDS/gQXbRTdN1pBzvrhR1sw5kHV1613OnNP37VW9kjn+xs7a5lHJS1p2s+smL/25r5XQRv3Rym3JTIr7jW5jogH3ftjAzgf/xX+YI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=CXcw69Bt; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4218180a122so34015985e9.1
-        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 14:02:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1718658130; x=1719262930; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oPx3c/l3RFVX5AVFhiQ8z+HSbtAyDh/1YQdyx0NkN2c=;
-        b=CXcw69Bth/r9P4uVi64ZM1nz53o12g2Ezky2/5rbcrWQBsrViVwpWgscwEJ6S3k7/+
-         1pVGLiE2xTsx/J7cdsPKFGX83u75+MRzW1zLplRabd4IcdMd3k7M4k3JUmWUlIx3IItA
-         QohzS9xuJep1Bi46qLJxOO5Lllc/SjaPDTJRzS/bzsMMx3vim6i5Rqdx/R3tfSUl8qgL
-         iRQssf2C+fVQBZJwEunfalPMysK4r7LXFOP8Xx5GMrwnIGibXUevU2lYSxIfeulbdL7x
-         nWhGL5aL3eDWvT5wCJQuzO7R/UNG02R3cu0sSDBpmnqen2UFYXGugbX0H8Dit1STAzEp
-         lScA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718658130; x=1719262930;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oPx3c/l3RFVX5AVFhiQ8z+HSbtAyDh/1YQdyx0NkN2c=;
-        b=Xe2Z1gPWF20Z7ySZfkVEzUbgvsPPdpzJLSSyAJTt1DAWdWkqwseZyI4hLFsewvUOA4
-         XoALmuEsPfViyskkgaRXA7OuHIt9ggUEb+Ka9644vqr17t0G1Nj71JVDPHe7SatxP9k0
-         JA+Yfgln39rSd9n065bRf9awbAuY9ZgD+NSUfCZoD3NkTCclqee6a0H7GT6f9ciPbjjy
-         rJgsHuq2CWwUTr/F0YVy8rw/LUfOO+NerE9c1J19wXlYF9pM0ukb7Fcv1eBGxtk4NPAC
-         X577qOWFDRmJ46ryHO70FeGpAew5X3ruTf9GZqIRgUDxGgEwSx3eA4U+FhyYvYt0hBPH
-         9ovg==
-X-Forwarded-Encrypted: i=1; AJvYcCVi0kPjDNJd+Y7AnNEsCQLc7oNpOFsNDBenSqF5yogds6hCYa0i4QTQ3PjkDTvn30PUbBFIzpSDyLK/gLxKKDuBj/orViqa
-X-Gm-Message-State: AOJu0YwS+2ymFN1LwIiF6jp/SX/OBYGj5/NA2v1N/S+jUDr0z10opkZe
-	oNi3rBDl+/U10XZNf9rXyZStstUFMVdEPiFbbgHTMI4E3cmgwqAAS4Act4Pvn6JIiHTBO6JJZhI
-	YQPE=
-X-Google-Smtp-Source: AGHT+IGcxuXyC2SdGVAFBszcVrgGgRvP+9b1oJO0U/ENeuHdki+g5WhfdCkuP0boUryoDWn93EsGNA==
-X-Received: by 2002:a05:600c:138b:b0:421:7c20:a263 with SMTP id 5b1f17b1804b1-42304824084mr97239765e9.11.1718658130377;
-        Mon, 17 Jun 2024 14:02:10 -0700 (PDT)
-Received: from localhost.localdomain ([104.28.231.254])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422874de618sm207988465e9.37.2024.06.17.14.02.09
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 17 Jun 2024 14:02:09 -0700 (PDT)
-From: Ignat Korchagin <ignat@cloudflare.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Florent Revest <revest@chromium.org>,
-	kernel-team@cloudflare.com,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net v3] net: do not leave a dangling sk pointer, when socket creation fails
-Date: Mon, 17 Jun 2024 22:02:05 +0100
-Message-Id: <20240617210205.67311-1-ignat@cloudflare.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+	s=arc-20240116; t=1718658480; c=relaxed/simple;
+	bh=k+TahLSrZQJeuAovXTUYK4EXgCZs7QSBpbkVUlcW2BY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PkwvFj/gMwfqVWFFOqCzklHwe5qZRPnZn64wIDz49KBgC3b8F7hPqcC1WMQTO9bmR6dow+009ywoMjZkrI7Oxv1F348p1lv8nv2zKRrO7y5fMKCKixhsdcDPLNCisqbSZGeZ/OIY6T8h+c7AlmKu/aNB4AmsWcJBaJ3KBErslTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=j8DR5IyT; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=kBTrNAKz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ExLPViHA; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=WLqXyqYV; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id E56CA1F395;
+	Mon, 17 Jun 2024 21:07:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1718658477; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GhqD1JZCa8h9LMBNO3ezSkJWmrAJo6LNKwZwWzpwW1M=;
+	b=j8DR5IyTlZofLM3Hvz795hVPWecqlsAUGRjaVX6rGmVl4s8wFxQjMCcsQeMN74lbbXwaaV
+	hTN4M7Abcua5OS9vlrq6S6k1bjXyNwXWZn96drMcZpBy6IsfS0RnVhSQAk37i7IstTDUWp
+	rpF3KkC5gtwzGDnovQkL5uqT0kkOzfE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1718658477;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GhqD1JZCa8h9LMBNO3ezSkJWmrAJo6LNKwZwWzpwW1M=;
+	b=kBTrNAKzCrUTsHKBNNdHM9fIefNunqMk9H0V2GRXVjqhJsp4yMpNQugUxDzwpIso8wl3sd
+	3X3+6JzZgyYXBTDg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1718658476; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GhqD1JZCa8h9LMBNO3ezSkJWmrAJo6LNKwZwWzpwW1M=;
+	b=ExLPViHAvbM4j+i3e8gYnQrDA6vIdKvLTIxoCpcpkWQE2ZLqW4rwPiOg9UK5Wq/2VtWuYE
+	4sQygQz4l2h2KSa2NL3yNM/h8QwPSPSgJSY+nSqXRmCM222DXJCtB+sJBz+r3s6hc7e0Sc
+	3w6Tit18RpeR0sEumZnX+0dTL8N8c4k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1718658476;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GhqD1JZCa8h9LMBNO3ezSkJWmrAJo6LNKwZwWzpwW1M=;
+	b=WLqXyqYVgXmVxEHMGDdUcfDT4nZ30EJhWlenIyGCKj3KY+2QIEZ0Hm3PDge/OK6kv6R0Xe
+	BryspmBkQnZmAQAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D268B13AAA;
+	Mon, 17 Jun 2024 21:07:55 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id MnYzMqulcGZ9SwAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 17 Jun 2024 21:07:55 +0000
+Message-ID: <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
+Date: Mon, 17 Jun 2024 23:08:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+To: Uladzislau Rezki <urezki@gmail.com>
+Cc: paulmck@kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+ Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+ linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, kvm@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+ wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+ ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+ Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+ Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+ linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ kasan-dev <kasan-dev@googlegroups.com>
+References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+ <20240612143305.451abf58@kernel.org>
+ <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
+ <Zmov7ZaL-54T9GiM@zx2c4.com> <Zmo9-YGraiCj5-MI@zx2c4.com>
+ <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
+ <Zmrkkel0Fo4_g75a@zx2c4.com> <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
+ <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
+ <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz> <ZnCDgdg1EH6V7w5d@pc636>
+From: Vlastimil Babka <vbabka@suse.cz>
+Content-Language: en-US
+In-Reply-To: <ZnCDgdg1EH6V7w5d@pc636>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-8.29 / 50.00];
+	REPLY(-4.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	RCVD_TLS_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,zx2c4.com,inria.fr,vger.kernel.org,lists.linux.dev,efficios.com,lists.ozlabs.org,linux.ibm.com,csgroup.eu,gmail.com,lists.zx2c4.com,suse.de,netapp.com,oracle.com,talpey.com,netfilter.org,googlegroups.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	R_RATELIMIT(0.00)[to_ip_from(RLr583pch5u74edj9dsne3chzi)]
+X-Spam-Flag: NO
+X-Spam-Score: -8.29
+X-Spam-Level: 
 
-It is possible to trigger a use-after-free by:
-  * attaching an fentry probe to __sock_release() and the probe calling the
-    bpf_get_socket_cookie() helper
-  * running traceroute -I 1.1.1.1 on a freshly booted VM
+On 6/17/24 8:42 PM, Uladzislau Rezki wrote:
+>> +
+>> +	s = container_of(work, struct kmem_cache, async_destroy_work);
+>> +
+>> +	// XXX use the real kmem_cache_free_barrier() or similar thing here
+> It implies that we need to introduce kfree_rcu_barrier(), a new API, which i
+> wanted to avoid initially.
 
-A KASAN enabled kernel will log something like below (decoded and stripped):
-==================================================================
-BUG: KASAN: slab-use-after-free in __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
-Read of size 8 at addr ffff888007110dd8 by task traceroute/299
+I wanted to avoid new API or flags for kfree_rcu() users and this would
+be achieved. The barrier is used internally so I don't consider that an
+API to avoid. How difficult is the implementation is another question,
+depending on how the current batching works. Once (if) we have sheaves
+proven to work and move kfree_rcu() fully into SLUB, the barrier might
+also look different and hopefully easier. So maybe it's not worth to
+invest too much into that barrier and just go for the potentially
+longer, but easier to implement?
 
-CPU: 2 PID: 299 Comm: traceroute Tainted: G            E      6.10.0-rc2+ #2
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
-dump_stack_lvl (lib/dump_stack.c:117 (discriminator 1))
-print_report (mm/kasan/report.c:378 mm/kasan/report.c:488)
-? __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
-kasan_report (mm/kasan/report.c:603)
-? __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
-kasan_check_range (mm/kasan/generic.c:183 mm/kasan/generic.c:189)
-__sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
-bpf_get_socket_ptr_cookie (./arch/x86/include/asm/preempt.h:94 ./include/linux/sock_diag.h:42 net/core/filter.c:5094 net/core/filter.c:5092)
-bpf_prog_875642cf11f1d139___sock_release+0x6e/0x8e
-bpf_trampoline_6442506592+0x47/0xaf
-__sock_release (net/socket.c:652)
-__sock_create (net/socket.c:1601)
-...
-Allocated by task 299 on cpu 2 at 78.328492s:
-kasan_save_stack (mm/kasan/common.c:48)
-kasan_save_track (mm/kasan/common.c:68)
-__kasan_slab_alloc (mm/kasan/common.c:312 mm/kasan/common.c:338)
-kmem_cache_alloc_noprof (mm/slub.c:3941 mm/slub.c:4000 mm/slub.c:4007)
-sk_prot_alloc (net/core/sock.c:2075)
-sk_alloc (net/core/sock.c:2134)
-inet_create (net/ipv4/af_inet.c:327 net/ipv4/af_inet.c:252)
-__sock_create (net/socket.c:1572)
-__sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
-__x64_sys_socket (net/socket.c:1718)
-do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
-entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+> Since you do it asynchronous can we just repeat
+> and wait until it a cache is furry freed?
 
-Freed by task 299 on cpu 2 at 78.328502s:
-kasan_save_stack (mm/kasan/common.c:48)
-kasan_save_track (mm/kasan/common.c:68)
-kasan_save_free_info (mm/kasan/generic.c:582)
-poison_slab_object (mm/kasan/common.c:242)
-__kasan_slab_free (mm/kasan/common.c:256)
-kmem_cache_free (mm/slub.c:4437 mm/slub.c:4511)
-__sk_destruct (net/core/sock.c:2117 net/core/sock.c:2208)
-inet_create (net/ipv4/af_inet.c:397 net/ipv4/af_inet.c:252)
-__sock_create (net/socket.c:1572)
-__sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
-__x64_sys_socket (net/socket.c:1718)
-do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
-entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+The problem is we want to detect the cases when it's not fully freed
+because there was an actual read. So at some point we'd need to stop the
+repeats because we know there can no longer be any kfree_rcu()'s in
+flight since the kmem_cache_destroy() was called.
 
-Fix this by clearing the struct socket reference in sk_common_release() to cover
-all protocol families create functions, which may already attached the
-reference to the sk object with sock_init_data().
+> I am asking because inventing a new kfree_rcu_barrier() might not be so
+> straight forward.
 
-Fixes: c5dbb89fc2ac ("bpf: Expose bpf_get_socket_cookie to tracing programs")
-Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
-Cc: stable@vger.kernel.org
-Link: https://lore.kernel.org/netdev/20240613194047.36478-1-kuniyu@amazon.com/T/
----
-Changes in v3:
-  * re-added KASAN repro steps to the commit message (somehow stripped in v2)
-  * stripped timestamps and thread id from the KASAN splat
-  * removed comment from the code (commit message should be enough)
+Agreed.
 
-Changes in v2:
-  * moved the NULL-ing of the socket reference to sk_common_release() (as
-    suggested by Kuniyuki Iwashima)
-  * trimmed down the KASAN report in the commit message to show only relevant
-    info
-
- net/core/sock.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 8629f9aecf91..100e975073ca 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -3742,6 +3742,9 @@ void sk_common_release(struct sock *sk)
- 
- 	sk->sk_prot->unhash(sk);
- 
-+	if (sk->sk_socket)
-+		sk->sk_socket->sk = NULL;
-+
- 	/*
- 	 * In this point socket cannot receive new packets, but it is possible
- 	 * that some packets are in flight because some CPU runs receiver and
--- 
-2.39.2
-
+> 
+> --
+> Uladzislau Rezki
 
