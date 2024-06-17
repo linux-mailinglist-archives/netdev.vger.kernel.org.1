@@ -1,50 +1,88 @@
-Return-Path: <netdev+bounces-104270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFBCE90BC79
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 22:55:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B823A90BC82
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 23:02:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCF261C2158E
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 20:55:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACC0E1C238D6
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 21:02:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A822019AD4A;
-	Mon, 17 Jun 2024 20:54:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11210191465;
+	Mon, 17 Jun 2024 21:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="CXcw69Bt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D32FE19A28A
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 20:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360B718FC67
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 21:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718657667; cv=none; b=MhhBuwEzYEN3rHj30bW2yrxwfe8mi8pYyLZVdDhRuNWxF3Des/Wmc4FKE4P5/H9DxhFlqVe9qxMQ2ScBUcfHjQI7QSlAHjsTcvJkQMyfwOP094dVkQo6v1qaAJ53wKcRdGHZV08z6XTsywc2Cps1E1Cc/7OpLn3QbqBKBtZdA8g=
+	t=1718658134; cv=none; b=lmcif38q/qdpNmKm9M/q6AjAabkzgw0t/M5dofbgyv7Ipu519TzQr4sqN5S2pksoHJsTKfQa9dUr0MHIi4HGiAItdMU8iEJSxcjnxFWwjO/mCxXJSV4/k5oYR/bIDailC2owl1vC20KBCJM96qZztoj+LjNE29v03JvPsj+ZBw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718657667; c=relaxed/simple;
-	bh=IhiHLwPsUb0JstSf98vHGlxgYPVgvEn83plPKW5TNio=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QgsEPxWnFG5Et+opSpRsZaAWZn37C2OohPV+y0ndioeTDkRMoO23ADd28YZhNyPb7EOuP7UK/Zp5uJl2xK44oDKFmbFB1lpseCbqgZsxoY0eI8l5JdauBD97q2ASxSOqKdFxI1lcjNfQSPej1Yt/j+Uw9HAoHaRqpBbZCwhrHM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from labnh.big (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 711987D12A;
-	Mon, 17 Jun 2024 20:54:25 +0000 (UTC)
-From: Christian Hopps <chopps@chopps.org>
-To: devel@linux-ipsec.org
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	s=arc-20240116; t=1718658134; c=relaxed/simple;
+	bh=B1gm5DdSgfQg0HYANDyrQqb7o+BBNjtrye8Q7TCAO24=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=roqLQ4fVZCj0H35nLJUwftB7oUsNnAJdpeNAVXhBVvSqBTnLaaM1/RQZZqbjz1nILXJqrRHDS/gQXbRTdN1pBzvrhR1sw5kHV1613OnNP37VW9kjn+xs7a5lHJS1p2s+smL/25r5XQRv3Rym3JTIr7jW5jogH3ftjAzgf/xX+YI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=CXcw69Bt; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4218180a122so34015985e9.1
+        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 14:02:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1718658130; x=1719262930; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oPx3c/l3RFVX5AVFhiQ8z+HSbtAyDh/1YQdyx0NkN2c=;
+        b=CXcw69Bth/r9P4uVi64ZM1nz53o12g2Ezky2/5rbcrWQBsrViVwpWgscwEJ6S3k7/+
+         1pVGLiE2xTsx/J7cdsPKFGX83u75+MRzW1zLplRabd4IcdMd3k7M4k3JUmWUlIx3IItA
+         QohzS9xuJep1Bi46qLJxOO5Lllc/SjaPDTJRzS/bzsMMx3vim6i5Rqdx/R3tfSUl8qgL
+         iRQssf2C+fVQBZJwEunfalPMysK4r7LXFOP8Xx5GMrwnIGibXUevU2lYSxIfeulbdL7x
+         nWhGL5aL3eDWvT5wCJQuzO7R/UNG02R3cu0sSDBpmnqen2UFYXGugbX0H8Dit1STAzEp
+         lScA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718658130; x=1719262930;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oPx3c/l3RFVX5AVFhiQ8z+HSbtAyDh/1YQdyx0NkN2c=;
+        b=Xe2Z1gPWF20Z7ySZfkVEzUbgvsPPdpzJLSSyAJTt1DAWdWkqwseZyI4hLFsewvUOA4
+         XoALmuEsPfViyskkgaRXA7OuHIt9ggUEb+Ka9644vqr17t0G1Nj71JVDPHe7SatxP9k0
+         JA+Yfgln39rSd9n065bRf9awbAuY9ZgD+NSUfCZoD3NkTCclqee6a0H7GT6f9ciPbjjy
+         rJgsHuq2CWwUTr/F0YVy8rw/LUfOO+NerE9c1J19wXlYF9pM0ukb7Fcv1eBGxtk4NPAC
+         X577qOWFDRmJ46ryHO70FeGpAew5X3ruTf9GZqIRgUDxGgEwSx3eA4U+FhyYvYt0hBPH
+         9ovg==
+X-Forwarded-Encrypted: i=1; AJvYcCVi0kPjDNJd+Y7AnNEsCQLc7oNpOFsNDBenSqF5yogds6hCYa0i4QTQ3PjkDTvn30PUbBFIzpSDyLK/gLxKKDuBj/orViqa
+X-Gm-Message-State: AOJu0YwS+2ymFN1LwIiF6jp/SX/OBYGj5/NA2v1N/S+jUDr0z10opkZe
+	oNi3rBDl+/U10XZNf9rXyZStstUFMVdEPiFbbgHTMI4E3cmgwqAAS4Act4Pvn6JIiHTBO6JJZhI
+	YQPE=
+X-Google-Smtp-Source: AGHT+IGcxuXyC2SdGVAFBszcVrgGgRvP+9b1oJO0U/ENeuHdki+g5WhfdCkuP0boUryoDWn93EsGNA==
+X-Received: by 2002:a05:600c:138b:b0:421:7c20:a263 with SMTP id 5b1f17b1804b1-42304824084mr97239765e9.11.1718658130377;
+        Mon, 17 Jun 2024 14:02:10 -0700 (PDT)
+Received: from localhost.localdomain ([104.28.231.254])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422874de618sm207988465e9.37.2024.06.17.14.02.09
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 17 Jun 2024 14:02:09 -0700 (PDT)
+From: Ignat Korchagin <ignat@cloudflare.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
-	Christian Hopps <chopps@chopps.org>,
-	Christian Hopps <chopps@labn.net>
-Subject: [PATCH ipsec-next v4 18/18] xfrm: iptfs: add tracepoint functionality
-Date: Mon, 17 Jun 2024 16:53:16 -0400
-Message-ID: <20240617205316.939774-19-chopps@chopps.org>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240617205316.939774-1-chopps@chopps.org>
-References: <20240617205316.939774-1-chopps@chopps.org>
+	linux-kernel@vger.kernel.org
+Cc: Florent Revest <revest@chromium.org>,
+	kernel-team@cloudflare.com,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net v3] net: do not leave a dangling sk pointer, when socket creation fails
+Date: Mon, 17 Jun 2024 22:02:05 +0100
+Message-Id: <20240617210205.67311-1-ignat@cloudflare.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,415 +91,101 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Christian Hopps <chopps@labn.net>
+It is possible to trigger a use-after-free by:
+  * attaching an fentry probe to __sock_release() and the probe calling the
+    bpf_get_socket_cookie() helper
+  * running traceroute -I 1.1.1.1 on a freshly booted VM
 
-Add tracepoints to the IP-TFS code.
+A KASAN enabled kernel will log something like below (decoded and stripped):
+==================================================================
+BUG: KASAN: slab-use-after-free in __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
+Read of size 8 at addr ffff888007110dd8 by task traceroute/299
 
-Signed-off-by: Christian Hopps <chopps@labn.net>
+CPU: 2 PID: 299 Comm: traceroute Tainted: G            E      6.10.0-rc2+ #2
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+dump_stack_lvl (lib/dump_stack.c:117 (discriminator 1))
+print_report (mm/kasan/report.c:378 mm/kasan/report.c:488)
+? __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
+kasan_report (mm/kasan/report.c:603)
+? __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
+kasan_check_range (mm/kasan/generic.c:183 mm/kasan/generic.c:189)
+__sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
+bpf_get_socket_ptr_cookie (./arch/x86/include/asm/preempt.h:94 ./include/linux/sock_diag.h:42 net/core/filter.c:5094 net/core/filter.c:5092)
+bpf_prog_875642cf11f1d139___sock_release+0x6e/0x8e
+bpf_trampoline_6442506592+0x47/0xaf
+__sock_release (net/socket.c:652)
+__sock_create (net/socket.c:1601)
+...
+Allocated by task 299 on cpu 2 at 78.328492s:
+kasan_save_stack (mm/kasan/common.c:48)
+kasan_save_track (mm/kasan/common.c:68)
+__kasan_slab_alloc (mm/kasan/common.c:312 mm/kasan/common.c:338)
+kmem_cache_alloc_noprof (mm/slub.c:3941 mm/slub.c:4000 mm/slub.c:4007)
+sk_prot_alloc (net/core/sock.c:2075)
+sk_alloc (net/core/sock.c:2134)
+inet_create (net/ipv4/af_inet.c:327 net/ipv4/af_inet.c:252)
+__sock_create (net/socket.c:1572)
+__sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
+__x64_sys_socket (net/socket.c:1718)
+do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+
+Freed by task 299 on cpu 2 at 78.328502s:
+kasan_save_stack (mm/kasan/common.c:48)
+kasan_save_track (mm/kasan/common.c:68)
+kasan_save_free_info (mm/kasan/generic.c:582)
+poison_slab_object (mm/kasan/common.c:242)
+__kasan_slab_free (mm/kasan/common.c:256)
+kmem_cache_free (mm/slub.c:4437 mm/slub.c:4511)
+__sk_destruct (net/core/sock.c:2117 net/core/sock.c:2208)
+inet_create (net/ipv4/af_inet.c:397 net/ipv4/af_inet.c:252)
+__sock_create (net/socket.c:1572)
+__sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
+__x64_sys_socket (net/socket.c:1718)
+do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+
+Fix this by clearing the struct socket reference in sk_common_release() to cover
+all protocol families create functions, which may already attached the
+reference to the sk object with sock_init_data().
+
+Fixes: c5dbb89fc2ac ("bpf: Expose bpf_get_socket_cookie to tracing programs")
+Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+Cc: stable@vger.kernel.org
+Link: https://lore.kernel.org/netdev/20240613194047.36478-1-kuniyu@amazon.com/T/
 ---
- net/xfrm/trace_iptfs.h | 218 +++++++++++++++++++++++++++++++++++++++++
- net/xfrm/xfrm_iptfs.c  |  62 +++++++++++-
- 2 files changed, 279 insertions(+), 1 deletion(-)
- create mode 100644 net/xfrm/trace_iptfs.h
+Changes in v3:
+  * re-added KASAN repro steps to the commit message (somehow stripped in v2)
+  * stripped timestamps and thread id from the KASAN splat
+  * removed comment from the code (commit message should be enough)
 
-diff --git a/net/xfrm/trace_iptfs.h b/net/xfrm/trace_iptfs.h
-new file mode 100644
-index 000000000000..0425f051572f
---- /dev/null
-+++ b/net/xfrm/trace_iptfs.h
-@@ -0,0 +1,218 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* xfrm_trace_iptfs.h
-+ *
-+ * August 12 2023, Christian Hopps <chopps@labn.net>
-+ *
-+ * Copyright (c) 2023, LabN Consulting, L.L.C.
-+ */
-+
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM iptfs
-+
-+#if !defined(_TRACE_IPTFS_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_IPTFS_H
-+
-+#include <linux/kernel.h>
-+#include <linux/skbuff.h>
-+#include <linux/tracepoint.h>
-+#include <net/ip.h>
-+
-+struct xfrm_iptfs_data;
-+
-+TRACE_EVENT(iptfs_egress_recv,
-+	    TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u16 blkoff),
-+	    TP_ARGS(skb, xtfs, blkoff),
-+	    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+			     __field(void *, head)
-+			     __field(void *, head_pg_addr)
-+			     __field(void *, pg0addr)
-+			     __field(u32, skb_len)
-+			     __field(u32, data_len)
-+			     __field(u32, headroom)
-+			     __field(u32, tailroom)
-+			     __field(u32, tail)
-+			     __field(u32, end)
-+			     __field(u32, pg0off)
-+			     __field(u8, head_frag)
-+			     __field(u8, frag_list)
-+			     __field(u8, nr_frags)
-+			     __field(u16, blkoff)),
-+	    TP_fast_assign(__entry->skb = skb;
-+			   __entry->head = skb->head;
-+			   __entry->skb_len = skb->len;
-+			   __entry->data_len = skb->data_len;
-+			   __entry->headroom = skb_headroom(skb);
-+			   __entry->tailroom = skb_tailroom(skb);
-+			   __entry->tail = skb->tail;
-+			   __entry->end = skb->end;
-+			   __entry->head_frag = skb->head_frag;
-+			   __entry->frag_list = (bool)skb_shinfo(skb)->frag_list;
-+			   __entry->nr_frags = skb_shinfo(skb)->nr_frags;
-+			   __entry->blkoff = blkoff;
-+			   __entry->head_pg_addr = page_address(virt_to_head_page(skb->head));
-+			   __entry->pg0addr = (__entry->nr_frags
-+					       ? page_address(netmem_to_page(skb_shinfo(skb)->frags[0].netmem))
-+					       : NULL);
-+			   __entry->pg0off = (__entry->nr_frags
-+					      ? skb_shinfo(skb)->frags[0].offset
-+					      : 0);
-+		    ),
-+	    TP_printk("EGRESS: skb=%p len=%u data_len=%u headroom=%u head_frag=%u frag_list=%u nr_frags=%u blkoff=%u\n\t\ttailroom=%u tail=%u end=%u head=%p hdpgaddr=%p pg0->addr=%p pg0->data=%p pg0->off=%u",
-+		      __entry->skb, __entry->skb_len, __entry->data_len, __entry->headroom,
-+		      __entry->head_frag, __entry->frag_list, __entry->nr_frags, __entry->blkoff,
-+		      __entry->tailroom, __entry->tail, __entry->end, __entry->head,
-+		      __entry->head_pg_addr, __entry->pg0addr, __entry->pg0addr + __entry->pg0off,
-+		      __entry->pg0off)
-+	)
-+
-+DECLARE_EVENT_CLASS(iptfs_ingress_preq_event,
-+		    TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs,
-+			     u32 pmtu, u8 was_gso),
-+		    TP_ARGS(skb, xtfs, pmtu, was_gso),
-+		    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+				     __field(u32, skb_len)
-+				     __field(u32, data_len)
-+				     __field(u32, pmtu)
-+				     __field(u32, queue_size)
-+				     __field(u32, proto_seq)
-+				     __field(u8, proto)
-+				     __field(u8, was_gso)
-+			    ),
-+		    TP_fast_assign(__entry->skb = skb;
-+				   __entry->skb_len = skb->len;
-+				   __entry->data_len = skb->data_len;
-+				   __entry->queue_size =
-+					xtfs->cfg.max_queue_size - xtfs->queue_size;
-+				   __entry->proto = __trace_ip_proto(ip_hdr(skb));
-+				   __entry->proto_seq = __trace_ip_proto_seq(ip_hdr(skb));
-+				   __entry->pmtu = pmtu;
-+				   __entry->was_gso = was_gso;
-+			    ),
-+		    TP_printk("INGRPREQ: skb=%p len=%u data_len=%u qsize=%u proto=%u proto_seq=%u pmtu=%u was_gso=%u",
-+			      __entry->skb, __entry->skb_len, __entry->data_len,
-+			      __entry->queue_size, __entry->proto, __entry->proto_seq,
-+			      __entry->pmtu, __entry->was_gso));
-+
-+DEFINE_EVENT(iptfs_ingress_preq_event, iptfs_enqueue,
-+	     TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u32 pmtu, u8 was_gso),
-+	     TP_ARGS(skb, xtfs, pmtu, was_gso));
-+
-+DEFINE_EVENT(iptfs_ingress_preq_event, iptfs_no_queue_space,
-+	     TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u32 pmtu, u8 was_gso),
-+	     TP_ARGS(skb, xtfs, pmtu, was_gso));
-+
-+DEFINE_EVENT(iptfs_ingress_preq_event, iptfs_too_big,
-+	     TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u32 pmtu, u8 was_gso),
-+	     TP_ARGS(skb, xtfs, pmtu, was_gso));
-+
-+DECLARE_EVENT_CLASS(iptfs_ingress_postq_event,
-+		    TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff, struct iphdr *iph),
-+		    TP_ARGS(skb, mtu, blkoff, iph),
-+		    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+				     __field(u32, skb_len)
-+				     __field(u32, data_len)
-+				     __field(u32, mtu)
-+				     __field(u32, proto_seq)
-+				     __field(u16, blkoff)
-+				     __field(u8, proto)),
-+		    TP_fast_assign(__entry->skb = skb;
-+				   __entry->skb_len = skb->len;
-+				   __entry->data_len = skb->data_len;
-+				   __entry->mtu = mtu;
-+				   __entry->blkoff = blkoff;
-+				   __entry->proto = iph ? __trace_ip_proto(iph) : 0;
-+				   __entry->proto_seq = iph ? __trace_ip_proto_seq(iph) : 0;
-+			    ),
-+		    TP_printk("INGRPSTQ: skb=%p len=%u data_len=%u mtu=%u blkoff=%u proto=%u proto_seq=%u",
-+			      __entry->skb, __entry->skb_len, __entry->data_len, __entry->mtu,
-+			      __entry->blkoff, __entry->proto, __entry->proto_seq));
-+
-+DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_dequeue,
-+	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
-+		      struct iphdr *iph),
-+	     TP_ARGS(skb, mtu, blkoff, iph));
-+
-+DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_fragmenting,
-+	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
-+		      struct iphdr *iph),
-+	     TP_ARGS(skb, mtu, blkoff, iph));
-+
-+DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_final_fragment,
-+	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
-+		      struct iphdr *iph),
-+	     TP_ARGS(skb, mtu, blkoff, iph));
-+
-+DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_toobig,
-+	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
-+		      struct iphdr *iph),
-+	     TP_ARGS(skb, mtu, blkoff, iph));
-+
-+TRACE_EVENT(iptfs_ingress_nth_peek,
-+	    TP_PROTO(struct sk_buff *skb, u32 remaining),
-+	    TP_ARGS(skb, remaining),
-+	    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+			     __field(u32, skb_len)
-+			     __field(u32, remaining)),
-+	    TP_fast_assign(__entry->skb = skb;
-+			   __entry->skb_len = skb->len;
-+			   __entry->remaining = remaining;
-+		    ),
-+	    TP_printk("INGRPSTQ: NTHPEEK: skb=%p len=%u remaining=%u",
-+		      __entry->skb, __entry->skb_len, __entry->remaining));
-+
-+TRACE_EVENT(iptfs_ingress_nth_add, TP_PROTO(struct sk_buff *skb, u8 share_ok),
-+	    TP_ARGS(skb, share_ok),
-+	    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+			     __field(u32, skb_len)
-+			     __field(u32, data_len)
-+			     __field(u8, share_ok)
-+			     __field(u8, head_frag)
-+			     __field(u8, pp_recycle)
-+			     __field(u8, cloned)
-+			     __field(u8, shared)
-+			     __field(u8, nr_frags)
-+			     __field(u8, frag_list)
-+		    ),
-+	    TP_fast_assign(__entry->skb = skb;
-+			   __entry->skb_len = skb->len;
-+			   __entry->data_len = skb->data_len;
-+			   __entry->share_ok = share_ok;
-+			   __entry->head_frag = skb->head_frag;
-+			   __entry->pp_recycle = skb->pp_recycle;
-+			   __entry->cloned = skb_cloned(skb);
-+			   __entry->shared = skb_shared(skb);
-+			   __entry->nr_frags = skb_shinfo(skb)->nr_frags;
-+			   __entry->frag_list = (bool)skb_shinfo(skb)->frag_list;
-+		    ),
-+	    TP_printk("INGRPSTQ: NTHADD: skb=%p len=%u data_len=%u share_ok=%u head_frag=%u pp_recycle=%u cloned=%u shared=%u nr_frags=%u frag_list=%u",
-+		      __entry->skb, __entry->skb_len, __entry->data_len, __entry->share_ok,
-+		      __entry->head_frag, __entry->pp_recycle, __entry->cloned, __entry->shared,
-+		      __entry->nr_frags, __entry->frag_list));
-+
-+DECLARE_EVENT_CLASS(iptfs_timer_event,
-+		    TP_PROTO(struct xfrm_iptfs_data *xtfs, u64 time_val),
-+		    TP_ARGS(xtfs, time_val),
-+		    TP_STRUCT__entry(__field(u64, time_val)
-+				     __field(u64, set_time)),
-+		    TP_fast_assign(__entry->time_val = time_val;
-+				   __entry->set_time = xtfs->iptfs_settime;
-+			    ),
-+		    TP_printk("TIMER: set_time=%llu time_val=%llu",
-+			      __entry->set_time, __entry->time_val));
-+
-+DEFINE_EVENT(iptfs_timer_event, iptfs_timer_start,
-+	     TP_PROTO(struct xfrm_iptfs_data *xtfs, u64 time_val),
-+	     TP_ARGS(xtfs, time_val));
-+
-+DEFINE_EVENT(iptfs_timer_event, iptfs_timer_expire,
-+	     TP_PROTO(struct xfrm_iptfs_data *xtfs, u64 time_val),
-+	     TP_ARGS(xtfs, time_val));
-+
-+#endif /* _TRACE_IPTFS_H */
-+
-+/* This part must be outside protection */
-+#undef TRACE_INCLUDE_PATH
-+#define TRACE_INCLUDE_PATH ../../net/xfrm
-+#undef TRACE_INCLUDE_FILE
-+#define TRACE_INCLUDE_FILE trace_iptfs
-+#include <trace/define_trace.h>
-diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-index 049a94a5531b..1cebe0f56d60 100644
---- a/net/xfrm/xfrm_iptfs.c
-+++ b/net/xfrm/xfrm_iptfs.c
-@@ -18,6 +18,7 @@
- #include <crypto/aead.h>
+Changes in v2:
+  * moved the NULL-ing of the socket reference to sk_common_release() (as
+    suggested by Kuniyuki Iwashima)
+  * trimmed down the KASAN report in the commit message to show only relevant
+    info
+
+ net/core/sock.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 8629f9aecf91..100e975073ca 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3742,6 +3742,9 @@ void sk_common_release(struct sock *sk)
  
- #include "xfrm_inout.h"
-+#include "trace_iptfs.h"
+ 	sk->sk_prot->unhash(sk);
  
- /* IPTFS encap (header) values. */
- #define IPTFS_SUBTYPE_BASIC 0
-@@ -87,6 +88,39 @@ static enum hrtimer_restart iptfs_drop_timer(struct hrtimer *me);
- /* Utility Functions */
- /* ================= */
- 
-+static u32 __trace_ip_proto(struct iphdr *iph)
-+{
-+	if (iph->version == 4)
-+		return iph->protocol;
-+	return ((struct ipv6hdr *)iph)->nexthdr;
-+}
++	if (sk->sk_socket)
++		sk->sk_socket->sk = NULL;
 +
-+static u32 __trace_ip_proto_seq(struct iphdr *iph)
-+{
-+	void *nexthdr;
-+	u32 protocol = 0;
-+
-+	if (iph->version == 4) {
-+		nexthdr = (void *)(iph + 1);
-+		protocol = iph->protocol;
-+	} else if (iph->version == 6) {
-+		nexthdr = (void *)(((struct ipv6hdr *)(iph)) + 1);
-+		protocol = ((struct ipv6hdr *)(iph))->nexthdr;
-+	}
-+	switch (protocol) {
-+	case IPPROTO_ICMP:
-+		return ntohs(((struct icmphdr *)nexthdr)->un.echo.sequence);
-+	case IPPROTO_ICMPV6:
-+		return ntohs(((struct icmp6hdr *)nexthdr)->icmp6_sequence);
-+	case IPPROTO_TCP:
-+		return ntohl(((struct tcphdr *)nexthdr)->seq);
-+	case IPPROTO_UDP:
-+		return ntohs(((struct udphdr *)nexthdr)->source);
-+	default:
-+		return 0;
-+	}
-+}
-+
- static u64 __esp_seq(struct sk_buff *skb)
- {
- 	u64 seq = ntohl(XFRM_SKB_CB(skb)->seq.input.low);
-@@ -402,6 +436,13 @@ static int skb_copy_bits_seq(struct skb_seq_state *st, int offset, void *to,
- 	}
- }
- 
-+/* ================================== */
-+/* IPTFS Trace Event Definitions      */
-+/* ================================== */
-+
-+#define CREATE_TRACE_POINTS
-+#include "trace_iptfs.h"
-+
- /* ================================== */
- /* IPTFS Receiving (egress) Functions */
- /* ================================== */
-@@ -891,6 +932,8 @@ static int iptfs_input_ordered(struct xfrm_state *x, struct sk_buff *skb)
- 	}
- 	data = sizeof(*ipth);
- 
-+	trace_iptfs_egress_recv(skb, xtfs, be16_to_cpu(ipth->block_offset));
-+
- 	/* Set data past the basic header */
- 	if (ipth->subtype == IPTFS_SUBTYPE_CC) {
- 		/* Copy the rest of the CC header */
-@@ -1786,9 +1829,10 @@ static int iptfs_output_collect(struct net *net, struct sock *sk,
- 		 */
- 		if (!ok) {
- nospace:
-+			trace_iptfs_no_queue_space(skb, xtfs, pmtu, was_gso);
- 			if (skb->dev)
- 				XFRM_INC_STATS(dev_net(skb->dev),
--				       LINUX_MIB_XFRMOUTNOQSPACE);
-+					       LINUX_MIB_XFRMOUTNOQSPACE);
- 			kfree_skb_reason(skb, SKB_DROP_REASON_FULL_RING);
- 			continue;
- 		}
-@@ -1797,6 +1841,7 @@ static int iptfs_output_collect(struct net *net, struct sock *sk,
- 		 * enqueue.
- 		 */
- 		if (xtfs->cfg.dont_frag && iptfs_is_too_big(sk, skb, pmtu)) {
-+			trace_iptfs_too_big(skb, xtfs, pmtu, was_gso);
- 			kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
- 			continue;
- 		}
-@@ -1805,6 +1850,8 @@ static int iptfs_output_collect(struct net *net, struct sock *sk,
- 		ok = iptfs_enqueue(xtfs, skb);
- 		if (!ok)
- 			goto nospace;
-+
-+		trace_iptfs_enqueue(skb, xtfs, pmtu, was_gso);
- 	}
- 
- 	/* Start a delay timer if we don't have one yet */
-@@ -1812,6 +1859,7 @@ static int iptfs_output_collect(struct net *net, struct sock *sk,
- 		hrtimer_start(&xtfs->iptfs_timer, xtfs->init_delay_ns,
- 			      IPTFS_HRTIMER_MODE);
- 		xtfs->iptfs_settime = ktime_get_raw_fast_ns();
-+		trace_iptfs_timer_start(xtfs, xtfs->init_delay_ns);
- 	}
- 
- 	spin_unlock_bh(&x->lock);
-@@ -1909,6 +1957,7 @@ static int iptfs_copy_create_frags(struct sk_buff **skbp,
- 	to_copy = skb->len - offset;
- 	while (to_copy) {
- 		/* Send all but last fragment to allow agg. append */
-+		trace_iptfs_first_fragmenting(nskb, mtu, to_copy, NULL);
- 		list_add_tail(&nskb->list, &sublist);
- 
- 		/* FUTURE: if the packet has an odd/non-aligning length we could
-@@ -1934,6 +1983,8 @@ static int iptfs_copy_create_frags(struct sk_buff **skbp,
- 
- 	/* return last fragment that will be unsent (or NULL) */
- 	*skbp = nskb;
-+	if (nskb)
-+		trace_iptfs_first_final_fragment(nskb, mtu, blkoff, NULL);
- 
- 	/* trim the original skb to MTU */
- 	if (!err)
-@@ -2038,6 +2089,8 @@ static int iptfs_first_skb(struct sk_buff **skbp, struct xfrm_iptfs_data *xtfs,
- 	/* We've split these up before queuing */
- 	BUG_ON(skb_is_gso(skb));
- 
-+	trace_iptfs_first_dequeue(skb, mtu, 0, ip_hdr(skb));
-+
- 	/* Simple case -- it fits. `mtu` accounted for all the overhead
- 	 * including the basic IPTFS header.
- 	 */
-@@ -2140,6 +2193,7 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
- 				XFRM_INC_STATS(dev_net(skb->dev),
- 				       LINUX_MIB_XFRMOUTERROR);
- 
-+			trace_iptfs_first_toobig(skb, mtu, 0, ip_hdr(skb));
- 			kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
- 			continue;
- 		}
-@@ -2187,6 +2241,7 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
- 		 * case.
- 		 */
- 		while ((skb2 = skb_peek(list))) {
-+			trace_iptfs_ingress_nth_peek(skb2, remaining);
- 			if (skb2->len > remaining)
- 				break;
- 
-@@ -2224,6 +2279,8 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
- 			skb->len += skb2->len;
- 			remaining -= skb2->len;
- 
-+			trace_iptfs_ingress_nth_add(skb2, share_ok);
-+
- 			if (share_ok) {
- 				iptfs_consume_frags(skb, skb2);
- 			} else {
-@@ -2273,6 +2330,9 @@ static enum hrtimer_restart iptfs_delay_timer(struct hrtimer *me)
- 	 * already).
- 	 */
- 
-+	trace_iptfs_timer_expire(
-+		xtfs, (unsigned long long)(ktime_get_raw_fast_ns() - settime));
-+
- 	iptfs_output_queued(x, &list);
- 
- 	return HRTIMER_NORESTART;
+ 	/*
+ 	 * In this point socket cannot receive new packets, but it is possible
+ 	 * that some packets are in flight because some CPU runs receiver and
 -- 
-2.45.2
+2.39.2
 
 
