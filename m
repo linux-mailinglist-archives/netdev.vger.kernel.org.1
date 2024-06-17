@@ -1,260 +1,187 @@
-Return-Path: <netdev+bounces-104235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9B2290BA8E
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 21:08:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E987C90BAAB
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 21:15:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60A322878B4
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:08:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09F501C22B95
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:15:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D37198A0D;
-	Mon, 17 Jun 2024 19:08:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DA831990BA;
+	Mon, 17 Jun 2024 19:15:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YozlLf7m"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HANXyEhB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921CC364BE;
-	Mon, 17 Jun 2024 19:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D12CF4E2;
+	Mon, 17 Jun 2024 19:15:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718651284; cv=none; b=ut2VgdpMTLolt/4w3nPE0vusVFyLtn5mrP4zlE+3/Dt5a9BQaVY7HYYOzdioJYkLq6EviGselXdurB8CfQ/3yzwhNtDTnChQpmeabf7iZveU4VhRDkE7FcWKT+qyGAfx67YZteCrsQu6pdMHaIqtszvCnxKhBVxyrJFCg2dFWf4=
+	t=1718651721; cv=none; b=nOFEykaLR32XHhIsTPSpeti4x1pSgUi6Dl2fYXWEG70+9MxN+I37ayCmqtdoCyeovyUaqsyRvM+tiMEJ+D6O+2yD3RJHSn+62j63TjlUKa/k+9gpYDeFT4aUYoFvpTrzz1EVw4WU48YwQy64LByKoqJuBi8hUZumRAB/s5AbGNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718651284; c=relaxed/simple;
-	bh=F7rPyK5AG73Q5gxMe9v27RKSWK+iTffH6tEkcyjLvuQ=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=HPSn3BP8dUzLxsJ0n5XZjkOdm8tFZieEruxw2ChpX/kGYq/8os+9Obgw9bZrfqmK1hbWXjSpOjcXOUKGsprBNDZPtTmiRDsGoZZIok/NE6BVlGzG8RzHlWKaU/nDKfygnZvxFVH3dFMAYr37IRPEhsF2sb/ed3Dd9LGZawDELhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YozlLf7m; arc=none smtp.client-ip=209.85.160.176
+	s=arc-20240116; t=1718651721; c=relaxed/simple;
+	bh=nsufkampkQL2B/KAL+B3WIShcveSuYLyusXyX+/OFns=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RffSTQOBRSHzSr3kDdWL/C2dnPSH570Zc6yHv/xeKghqfvE/s6jH23VKH6yGlD7DIzZqygheVNbA68uOAtqAZqbbxQVN1kffdDHdsdf8UDq6xOQtEB8/wPhFPHggPXWusKslN1pf/SXURKzAzC/J2zQX1FL+Rkknf0i7f+koSW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HANXyEhB; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-441187684e3so30399481cf.3;
-        Mon, 17 Jun 2024 12:08:02 -0700 (PDT)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57cce3bc8c6so2771519a12.3;
+        Mon, 17 Jun 2024 12:15:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718651281; x=1719256081; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OVmWjhI4LxI1RGpnFHROdhgzv6RHapEzTRQ8EdXC5mc=;
-        b=YozlLf7m261jmYAShzed+5rwGUm9KNIfYLEpn6F3yqHrK8S5LBK9vkIJN26tTxAixa
-         faPN+AiwFPVQKwbY9Dn/xjp8PE1gGKctTWS6xoAP0OmwEp5CvdgmoM+zxUea7+gQ/N9s
-         hrgBHMocekmgdHr//eEi7nrWpJ6gpSyvcQVMIsDv3VR+SWodfb6ute8AzLBCQqG0/kUE
-         M5h3f2PsKVVT4ezMAJcT35KsHuPvzRstZ9o5/cPxBMSGcDcD6qX4XYOPs/fDWszgYDA4
-         vdHyFpKpPzFacgV0j4HmQsu+R9K04bF8CSozfGC6YKxB1oxLF1XKBJ7IkvEimFuiP//I
-         a2kg==
+        d=gmail.com; s=20230601; t=1718651718; x=1719256518; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RTI1O6QA7ca9OdFzDxJ8jDm0hCKKz6E+AKsMSF5c9gg=;
+        b=HANXyEhB51G9lWZwRDA1TOvJNnGv/ofkV+kDmuSt/rKrULJ6xyRh2HBWyjyqHEQASJ
+         +j7agjw4Kva8YAgjMVVUSMq6z+QlPRLneyycPJz0BjrIccphF3ydLvKSrEDa6f0aD/4y
+         JV0BVMsa9E12gzG93ygjZTWzxGCxeOligbNCtOGOaKeEA6hXIhS3HMwLr03TheiWv7NZ
+         FOAh09l9mNZ/zDXe2go2ChA07t4phg7nyZRkTHz/7UdHHyI/Kk4xz4+mQY867Mgcjxx6
+         t3mxgEhNP4/HK5JHevm1CAseJKqIKADOUneXl6l+krvaFjvBFDfaTZTPMH8NX66CBc3s
+         0f0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718651281; x=1719256081;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OVmWjhI4LxI1RGpnFHROdhgzv6RHapEzTRQ8EdXC5mc=;
-        b=CFM6+gi7IXcCpzTW+XpbZw8kqeVRkZ1z/Q0XOJS3OBEqNIZuX0HqD+gniTk1H5pAl6
-         wyWj7ZYYWcA/gK2j9eYwzzhe0tHvJFw5e03XkxzAYQDAtWkDNK6zPBWHJbgS4jMivt9a
-         467Eer6hrp3qL9qI41zYqyLHjinjlHmYCvni0RXgMsIEYXCMvdlVv5vDK75w1ibrVmiQ
-         Oc0hEN81e+16pzf2LS/XMPgVNhL8L5K3qNVBYcQh0Jv8zC1biMQ0MO7PDvb8URsxUX1W
-         Xlj5ExghzdX6Pv3qb1Vk7hTbWjLbqKrXVdElC5PteaV6hClzQu2PyeBDDbdKDdjwAcDS
-         r8Tg==
-X-Forwarded-Encrypted: i=1; AJvYcCWskjqU/z9P5y5Dhs/HDxbuMzcecKBTB6S7mxYZLfW/waFRX312v9DJDg8YTkuGqoFBPlWexl9EYy5C/1ZDwp1uiOBrP0BpfBZz2O7YJjd+xc47I7C2+35rE9C4Ryy7KO7LDZTb0HkOr9qJoHtyhzEujDjeaUZGLupd1OH8
-X-Gm-Message-State: AOJu0YwgDPJerHWza0VQRGyG5wcrM23iSnhU71DF84nPBzcMnT4ACC+/
-	6vpJJMMOAvjz392tlGvVEXte34ahqNTsMsYyXUFNggnNF6xqUXho
-X-Google-Smtp-Source: AGHT+IGWJEYYbga0s24RJNsB+VnxGMhLe6eCDv2y7owLqb0oa/tteYV+YrLRdO3cDYzbtq06F8zBog==
-X-Received: by 2002:a05:6214:4b85:b0:6b0:76f1:8639 with SMTP id 6a1803df08f44-6b2afd5a04amr108308886d6.42.1718651280272;
-        Mon, 17 Jun 2024 12:08:00 -0700 (PDT)
-Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b2a5ed9075sm57794056d6.102.2024.06.17.12.07.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 12:07:58 -0700 (PDT)
-Date: Mon, 17 Jun 2024 15:07:58 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jiri Pirko <jiri@resnulli.us>, 
- Chengen Du <chengen.du@canonical.com>
-Cc: willemdebruijn.kernel@gmail.com, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- kaber@trash.net, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org
-Message-ID: <6670898e1ca78_21d16f2946f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <ZnAdiDjI_unrELB8@nanopsycho.orion>
-References: <20240617054514.127961-1-chengen.du@canonical.com>
- <ZnAdiDjI_unrELB8@nanopsycho.orion>
-Subject: Re: [PATCH v8] af_packet: Handle outgoing VLAN packets without
- hardware offloading
+        d=1e100.net; s=20230601; t=1718651718; x=1719256518;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RTI1O6QA7ca9OdFzDxJ8jDm0hCKKz6E+AKsMSF5c9gg=;
+        b=hWb6mdp7gFx/3r5K2QEq/32nA2uOmpLT3UIJljCRaYUHehZDMSigXAj+DX0eXYaHNb
+         rJNOWD2DGsbcN+yjKdnGhgJWHXO2XQPavgD2jTyidZpW/2EHk40h9T6hfQuiysBXYBSv
+         zKJgDvvuAgYFunpTpVIkb6vVvFnY/EfF/ztYYCxURodBPi0raS9Bv/uFEFvghUTBaTbg
+         HUOIMUmwlXoqR2zFjYuOm3IrJ7jZjyJGiz5TGQ5RkthN+exgYweZ1zoRiAj1zeGzTGkb
+         oGAuncXmY1iTb13lOfxfbyXFLIT7HW3pKueEmIta2RXNdkTKfqy4XhIYVqCL6eWNPOOe
+         l5aA==
+X-Forwarded-Encrypted: i=1; AJvYcCWgzo9l7x071P6jenBNY0DCnB4K1SSENdBQkUqPbXJYpsyWrkJABFnDCxfuQ93OP7SgZbb63ReQ/JWy5uStVdU74EmZXXWKOJQ/rpiNQb1XokJctAMJdOHzlIIWA7C8yqY8cc36lWneIlqmvBU61PPpQKNhz8wD7GJaZJf+CDx9/Nr2EGhrIeANrCEwlwxOda6hYJwAayjpTpU9z4wRAH+K8/ENDTL+SyMV8YUg9IIW8PwZDYMBWnCyFnLQNhkZ/rEifvawAjpOZVs8qXI/BPaER6CZ6I/dD/0fBtzr9dzd+yA4vgXwOPay3V5bDdZ3rVpgP1gBq1pJy5chAciQKiAG3ZH062A5zt3gk6/YRt5+DFSz6hdwwD1nDyg9axp1pIO0YGDElcC/fqQ6wktkbAFXd5hIEP/7RjBbZKOfGjPnWymqD8rCRjq2cOzxh5WtFXCpwLuV2y24GC1yydE7KsD6Ftbd7uB8ZKtEd8ke8UyeVI8ioJDSzMMOyQaEOtYIiCTIVvRIZQ==
+X-Gm-Message-State: AOJu0YycgqRiOaGC3XEhLbbGkw9FaW8+UbsV7HoeYegOKY/XZfgp5Sjp
+	eHRNZ3KyX+uDD6ur2G4cSvKuzLrNxMGMipc4Co0JKB8h/LTUDgda
+X-Google-Smtp-Source: AGHT+IHBSjL7hP+WPtAP2SKF5/rsbIqC60y9fVUpbG/XrFpirHjiCxXr5Vsl09CmHgTmroNfpH7Tcw==
+X-Received: by 2002:a50:9b45:0:b0:57c:9cd3:4f96 with SMTP id 4fb4d7f45d1cf-57cbd908fcdmr6110311a12.40.1718651717456;
+        Mon, 17 Jun 2024 12:15:17 -0700 (PDT)
+Received: from [192.168.42.137] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57ce0457d82sm2034856a12.39.2024.06.17.12.15.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Jun 2024 12:15:16 -0700 (PDT)
+Message-ID: <ff109ca0-3056-45fd-b1ae-5482e1affeb0@gmail.com>
+Date: Mon, 17 Jun 2024 20:15:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v10 02/14] net: page_pool: create hooks for
+ custom page providers
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: David Ahern <dsahern@kernel.org>, David Wei <dw@davidwei.uk>,
+ Mina Almasry <almasrymina@google.com>, Christoph Hellwig
+ <hch@infradead.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+ Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
+ <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
+References: <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com>
+ <CAHS8izNmT_NzgCu1pY1RKgJh+kP2rCL_90Gqau2Pkd3-48Q1_w@mail.gmail.com>
+ <eb237e6e-3626-4435-8af5-11ed3931b0ac@gmail.com>
+ <be2d140f-db0f-4d15-967c-972ea6586b5c@kernel.org>
+ <20240607145247.GG791043@ziepe.ca>
+ <45803740-442c-4298-b47e-2d87ae5a6012@davidwei.uk>
+ <54975459-7a5a-46ff-a9ae-dc16ceffbab4@gmail.com>
+ <20240610121625.GI791043@ziepe.ca>
+ <59443d14-1f1d-42bb-8be3-73e6e4a0b683@kernel.org>
+ <00c67cf0-2bf3-4eaf-b200-ffe00d91593b@gmail.com>
+ <20240610221500.GN791043@ziepe.ca>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20240610221500.GN791043@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Jiri Pirko wrote:
-> Mon, Jun 17, 2024 at 07:45:14AM CEST, chengen.du@canonical.com wrote:
-> >The issue initially stems from libpcap. The ethertype will be overwritten
-> >as the VLAN TPID if the network interface lacks hardware VLAN offloading.
-> >In the outbound packet path, if hardware VLAN offloading is unavailable,
-> >the VLAN tag is inserted into the payload but then cleared from the sk_buff
-> >struct. Consequently, this can lead to a false negative when checking for
-> >the presence of a VLAN tag, causing the packet sniffing outcome to lack
-> >VLAN tag information (i.e., TCI-TPID). As a result, the packet capturing
-> >tool may be unable to parse packets as expected.
-> >
-> >The TCI-TPID is missing because the prb_fill_vlan_info() function does not
-> >modify the tp_vlan_tci/tp_vlan_tpid values, as the information is in the
-> >payload and not in the sk_buff struct. The skb_vlan_tag_present() function
-> >only checks vlan_all in the sk_buff struct. In cooked mode, the L2 header
-> >is stripped, preventing the packet capturing tool from determining the
-> >correct TCI-TPID value. Additionally, the protocol in SLL is incorrect,
-> >which means the packet capturing tool cannot parse the L3 header correctly.
-> >
-> >Link: https://github.com/the-tcpdump-group/libpcap/issues/1105
-> >Link: https://lore.kernel.org/netdev/20240520070348.26725-1-chengen.du@canonical.com/T/#u
-> >Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspace")
-> >Cc: stable@vger.kernel.org
-> >Signed-off-by: Chengen Du <chengen.du@canonical.com>
-> >---
-> > net/packet/af_packet.c | 86 +++++++++++++++++++++++++++++++++++++++++-
-> > 1 file changed, 84 insertions(+), 2 deletions(-)
-> >
-> >diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> >index ea3ebc160e25..84e8884a77e3 100644
-> >--- a/net/packet/af_packet.c
-> >+++ b/net/packet/af_packet.c
-> >@@ -538,6 +538,61 @@ static void *packet_current_frame(struct packet_sock *po,
-> > 	return packet_lookup_frame(po, rb, rb->head, status);
-> > }
-> > 
-> >+static u16 vlan_get_tci(struct sk_buff *skb, struct net_device *dev)
-> >+{
-> >+	struct vlan_hdr vhdr, *vh;
-> >+	u8 *skb_orig_data = skb->data;
-> >+	int skb_orig_len = skb->len;
-> >+	unsigned int header_len;
-> >+
-> >+	if (!dev)
-> >+		return 0;
-> >+
-> >+	/* In the SOCK_DGRAM scenario, skb data starts at the network
-> >+	 * protocol, which is after the VLAN headers. The outer VLAN
-> >+	 * header is at the hard_header_len offset in non-variable
-> >+	 * length link layer headers. If it's a VLAN device, the
-> >+	 * min_header_len should be used to exclude the VLAN header
-> >+	 * size.
-> >+	 */
-> >+	if (dev->min_header_len == dev->hard_header_len)
-> >+		header_len = dev->hard_header_len;
-> >+	else if (is_vlan_dev(dev))
-> >+		header_len = dev->min_header_len;
-> >+	else
-> >+		return 0;
-> >+
-> >+	skb_push(skb, skb->data - skb_mac_header(skb));
-> >+	vh = skb_header_pointer(skb, header_len, sizeof(vhdr), &vhdr);
-> >+	if (skb_orig_data != skb->data) {
-> >+		skb->data = skb_orig_data;
-> >+		skb->len = skb_orig_len;
-> >+	}
-> >+	if (unlikely(!vh))
-> >+		return 0;
-> >+
-> >+	return ntohs(vh->h_vlan_TCI);
-> >+}
-> >+
-> >+static __be16 vlan_get_protocol_dgram(struct sk_buff *skb)
-> >+{
-> >+	__be16 proto = skb->protocol;
-> >+
-> >+	if (unlikely(eth_type_vlan(proto))) {
-> >+		u8 *skb_orig_data = skb->data;
-> >+		int skb_orig_len = skb->len;
-> >+
-> >+		skb_push(skb, skb->data - skb_mac_header(skb));
-> >+		proto = __vlan_get_protocol(skb, proto, NULL);
-> >+		if (skb_orig_data != skb->data) {
-> >+			skb->data = skb_orig_data;
-> >+			skb->len = skb_orig_len;
-> >+		}
-> >+	}
-> >+
-> >+	return proto;
-> >+}
-> >+
-> > static void prb_del_retire_blk_timer(struct tpacket_kbdq_core *pkc)
-> > {
-> > 	del_timer_sync(&pkc->retire_blk_timer);
-> >@@ -1007,10 +1062,16 @@ static void prb_clear_rxhash(struct tpacket_kbdq_core *pkc,
-> > static void prb_fill_vlan_info(struct tpacket_kbdq_core *pkc,
-> > 			struct tpacket3_hdr *ppd)
-> > {
-> >+	struct packet_sock *po = container_of(pkc, struct packet_sock, rx_ring.prb_bdqc);
-> >+
-> > 	if (skb_vlan_tag_present(pkc->skb)) {
-> > 		ppd->hv1.tp_vlan_tci = skb_vlan_tag_get(pkc->skb);
-> > 		ppd->hv1.tp_vlan_tpid = ntohs(pkc->skb->vlan_proto);
-> > 		ppd->tp_status = TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
-> >+	} else if (unlikely(po->sk.sk_type == SOCK_DGRAM && eth_type_vlan(pkc->skb->protocol))) {
-> >+		ppd->hv1.tp_vlan_tci = vlan_get_tci(pkc->skb, pkc->skb->dev);
-> >+		ppd->hv1.tp_vlan_tpid = ntohs(pkc->skb->protocol);
-> >+		ppd->tp_status = TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
-> > 	} else {
-> > 		ppd->hv1.tp_vlan_tci = 0;
-> > 		ppd->hv1.tp_vlan_tpid = 0;
-> >@@ -2428,6 +2489,10 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
-> > 			h.h2->tp_vlan_tci = skb_vlan_tag_get(skb);
-> > 			h.h2->tp_vlan_tpid = ntohs(skb->vlan_proto);
-> > 			status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
-> >+		} else if (unlikely(sk->sk_type == SOCK_DGRAM && eth_type_vlan(skb->protocol))) {
-> >+			h.h2->tp_vlan_tci = vlan_get_tci(skb, skb->dev);
-> >+			h.h2->tp_vlan_tpid = ntohs(skb->protocol);
-> >+			status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
-> > 		} else {
-> > 			h.h2->tp_vlan_tci = 0;
-> > 			h.h2->tp_vlan_tpid = 0;
-> >@@ -2457,7 +2522,8 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
-> > 	sll->sll_halen = dev_parse_header(skb, sll->sll_addr);
-> > 	sll->sll_family = AF_PACKET;
-> > 	sll->sll_hatype = dev->type;
-> >-	sll->sll_protocol = skb->protocol;
-> >+	sll->sll_protocol = (sk->sk_type == SOCK_DGRAM) ?
-> >+		vlan_get_protocol_dgram(skb) : skb->protocol;
-> > 	sll->sll_pkttype = skb->pkt_type;
-> > 	if (unlikely(packet_sock_flag(po, PACKET_SOCK_ORIGDEV)))
-> > 		sll->sll_ifindex = orig_dev->ifindex;
-> >@@ -3482,7 +3548,8 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> > 		/* Original length was stored in sockaddr_ll fields */
-> > 		origlen = PACKET_SKB_CB(skb)->sa.origlen;
-> > 		sll->sll_family = AF_PACKET;
-> >-		sll->sll_protocol = skb->protocol;
-> >+		sll->sll_protocol = (sock->type == SOCK_DGRAM) ?
-> >+			vlan_get_protocol_dgram(skb) : skb->protocol;
-> > 	}
-> > 
-> > 	sock_recv_cmsgs(msg, sk, skb);
-> >@@ -3539,6 +3606,21 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> > 			aux.tp_vlan_tci = skb_vlan_tag_get(skb);
-> > 			aux.tp_vlan_tpid = ntohs(skb->vlan_proto);
-> > 			aux.tp_status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
-> >+		} else if (unlikely(sock->type == SOCK_DGRAM && eth_type_vlan(skb->protocol))) {
+On 6/10/24 23:15, Jason Gunthorpe wrote:
+> On Mon, Jun 10, 2024 at 08:20:08PM +0100, Pavel Begunkov wrote:
+>> On 6/10/24 16:16, David Ahern wrote:
 > 
-> I don't understand why this would be needed here. We spent quite a bit
-> of efford in the past to make sure vlan header is always stripped.
-> Could you fix that in tx path to fulfill the expectation?
+>>>> There is no reason you shouldn't be able to use your fast io_uring
+>>>> completion and lifecycle flow with DMABUF backed memory. Those are not
+>>>> widly different things and there is good reason they should work
+>>>> together.
+>>
+>> Let's not mix up devmem TCP and dmabuf specifically, as I see it
+>> your question was concerning the latter: "... DMABUF memory registered
+>> through Mina's mechanism". io_uring's zcrx can trivially get dmabuf
+>> support in future, as mentioned it's mostly the setup side. ABI,
+>> buffer workflow and some details is a separate issue, and I don't
+>> see how further integration aside from what we're already sharing
+>> is beneficial, on opposite it'll complicate things.
+> 
+> Again, I am talking about composability here, duplicating the DMABUF
+> stuff into io_uring is not composable, it is just duplicating things.
 
-Doesn't that require NETIF_F_HW_VLAN_CTAG_TX?
+Ok, then registering, say, a dmabuf via devmem TCP and then using it
+in io_uring. Let's say we make devmem TCP API to be able to register
+a dmabuf without using it, from where io_uring can take ownership
+over it and use in the flow. And I strongly believe the same memory
+region/dmabuf should never be used by both at the same time and hence
+lifetime of any such memory should be exclusively bound to io_uring.
 
-I also wondered whether we should just convert the skb for this case
-with skb_vlan_untag, to avoid needing new PF_PACKET logic to handle
-unstripped tags in the packet socket code. But it seems equally
-complex.
+That leaves the user api, where to add memory you need to create
+a netlink socket and pass everything through it, which is an extra
+step, and then letting know io_uring that it can use the memory, not
+forgetting to eject it from netlink. That's not a good api as far as
+it goes with io_uring.
 
-Aside from this conversation whether we need to support this
-unstripped case at all, code LGTM.
+I don't think slight duplicating of registration is a problem when
+the upside is much cleaner API. Internals, however, can be easily
+shared. We can even say that the net stack should provide helpers
+like init_page_pool_from_dmabuf_fd() and now allow poking into
+related bits aside from it (initialising net_iov / etc.).
+
+> It does not match the view that there should be two distinct layers
+> here, one that provides the pages and one that manages the
+> lifecycle. As HCH pushes for pages either come from the allocator and
+> get to use the struct folio or the come from a dmabuf and they
+> don't. That is it, the only two choices.
+> 
+> The iouring stuff is trying to confuse the source of the pages with
+> the lifecycle - which is surely convenient, but is why Christoph is
+> opposing it.
+
+-- 
+Pavel Begunkov
 
