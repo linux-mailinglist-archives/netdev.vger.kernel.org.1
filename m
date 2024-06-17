@@ -1,210 +1,98 @@
-Return-Path: <netdev+bounces-104107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D11B490B40A
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:23:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1848390B423
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:25:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D7D028DDFA
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:23:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF45C1F25892
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 15:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9655915FA8C;
-	Mon, 17 Jun 2024 14:45:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87BBD1D9507;
+	Mon, 17 Jun 2024 14:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jJEj4efi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CdnI448E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B981415FA77;
-	Mon, 17 Jun 2024 14:45:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631B91D9504
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 14:52:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718635545; cv=none; b=jkJOWrPrBzepku6NixjfW69+c5bMUXchY7knpRZDAPJCiyOEWnjtUmE/eDn/afq6lEhIULtdyS1HFBCLGvDgjsDSnDMmop/iI7cxUudRVQeTEIGWseCUAY3NAPDJSeDjM66zWAgalgZW7zhemEwxTe5MN3nwK2FkU6avvIlai1I=
+	t=1718635967; cv=none; b=eMwTDwsK7GFt+Vkg5fJ4miB0aqzbIj9WP4/pD0ic6+6RAGMg4PmJqvTwG7LxJW+a/HZc46KymDDkyQg7HxRTXkQJrvu5xDE5sqiBlojQCNjwsTaqY0MTq3EBL8MM3O76ZHMGpvC+Ow4XYUR/wvez9FbKbfb9k3ITb+MlZJWhZ7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718635545; c=relaxed/simple;
-	bh=rFVsoK865UN32ZC+/dEHN/mQE5ZBn9kkvYV25JTrEHM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oLuQUsJM0TXVxgkoXehzcFpvK+Q7I6Oi93o1Lmivxz5+6yb+YkvJuQGXjlQ4v3XCHQyPt34yj7w4fAClKWjdzEt5xeMe15RKivI1Z9GRpDW3scbsdADU3zvrAff0XPk54QKlZ3NEHv+KyU8aOxpm+fdy8FEcJhnOLsG0EqQW+Mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jJEj4efi; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a6f09eaf420so519264266b.3;
-        Mon, 17 Jun 2024 07:45:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718635542; x=1719240342; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ah3rcgKtsiLLs9s7Ep0iHOREj7mRgLBYmdEE8sYGz64=;
-        b=jJEj4efijRqlYzaiwfpV62eIpDfDx9+5ZsV9vDy7gteF6E2KsKun5uGC5Rbaqb4iOo
-         nnRzGttnsVzlwJv7UeAgPaqFaFreqMV5+Rx2VZ9gQmHS2nR5/7jVfcjDQx0REz82YrPd
-         W9JmaY3hM2TVjwduqN+PTnXWQVXnv766EQpAYyU1vkhES1iVZauDFUvL2ftMDGd9ip5k
-         MMP6NTad1SEYIebq9+hBMt2I+4eaD+YqV3iaNagwCsKnWP4AUAKI9rEgywii1oS1SxQQ
-         2bTknUjBsGJtXlq0W8ye/1Kl6DV4s4nUa7Dbfla8hy36NB8uuQiVnezjjgKRdwckdMUi
-         qV1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718635542; x=1719240342;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ah3rcgKtsiLLs9s7Ep0iHOREj7mRgLBYmdEE8sYGz64=;
-        b=PEfqkyX+UAA2ipiTczPNSmADI4cHJYUO+8MMeDfHFX9EfqXk5CFrRvYMPd5q5LBPvk
-         b/zLmfB4Re1dQuKm1hpL+2bvdM2PiAP/j6g2fFnhM2u3ZIplTANuVziBW7GImLFcEBhB
-         ZdbPfQUN5UJ2md2yXKJMYTAmYwoBu2nglQxqSjabKyqDQcA0PcEyDZRe93PnpGiOIW0s
-         FjO2c+lt/Jgip+0nFdVLzOgm0dniIWgaTdOQGhP8iYgTS6WNDyF/Vps5dMe691gPEW+R
-         5aYiXACZQbCwvmuecD7csMpZJD5/wEzwTvKSnyobI9h+ZzX2yx+Sg82+8md3PNMlJMgJ
-         vaxw==
-X-Forwarded-Encrypted: i=1; AJvYcCV6Qu1hNTIXDGWBjaLOdKPabPsn5blNBf22rLfwGHedUQNV7elp4hSubn5+B97gR6ie9QIR5mWSiOL3y7LayFVllJNJArOY9mdldK4rPndYOvN+P/SKzXSuHcJWlxh6teRoymxCGTrrjGaVRqDC57Fn/Iv0YuXWNc8SubWJ5K6sd6k8UjtfLaQXPKy2GnoDKzQ9W89FS4aI2REdIclq9Eli9xDywKt2g6UN1ZBhmN9geXUvek9lm4JTya41rMoA6X01p7Tg8xFJEnIB+6uOWpNpJEseHwENoejH/EgS2HSl8hGoAE/vt/3SBMGhNSMjDfcstn76Cu2RcMf5ZCktByTW9yLbeNGUi7xoSeqJrWtAiLF7nwMwz4e0vqCzHSCcZt0c4iJZEHJQU1125DwkZQhICVYIfRso3eZ6+/NdJJSNn049GlXzRC9H/GY6ypTsZhmO6QByuWh7fVCL7TQ5b+Re5Hfmx/IdvZls9bWf9LUxn5PR1yv72J1JfvEk9qhxfRNQCMsDlfCwjze4sNKZQNqY2RQcLet+X/+6Jk8KvwMCuQqOy7V81doa
-X-Gm-Message-State: AOJu0YwL+fsaQIYP3BYBAKUsYYbEpvj8VW+jZpvFqPf8kjyzZkuVOwnU
-	31ck+TZz+IeM0Z4DMHEs67LUmByaAQBQkQgotvglOIwNqRZ1Xcxq
-X-Google-Smtp-Source: AGHT+IGy29Bog/6x0frVCqVR0gtIWSVZ7NmfaBwvNVXbu4bGaKBQqObsvBBOakN7w58CXi9kwdrLlg==
-X-Received: by 2002:a17:906:aacb:b0:a5a:6bde:c3fb with SMTP id a640c23a62f3a-a6f60d29568mr573906666b.28.1718635541341;
-        Mon, 17 Jun 2024 07:45:41 -0700 (PDT)
-Received: from [192.168.42.82] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56fa41cbsm522762466b.225.2024.06.17.07.45.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jun 2024 07:45:40 -0700 (PDT)
-Message-ID: <14b7af66-04fe-4b49-94d6-bea5d554252e@gmail.com>
-Date: Mon, 17 Jun 2024 15:45:42 +0100
+	s=arc-20240116; t=1718635967; c=relaxed/simple;
+	bh=MG9R0YfcKoDfDsSnG7bCZrb8TdRezjqK3o93Y26S1tw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I3L2mTgcjxxu8RG3wtqwX54LiZndYT+TjFQ+qxzfspbxVe6SvhtTlPzN1/uOYV/PFguXQgMZwQ6RtbGQJRK2QF2HMjDn0qaq+43YCfo4PlK3vBu3+5GyxWHwUst1gpZByujQWnKeHbCemTqtoZWdgEBXSrr0rfyK2k6uIP3hSGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CdnI448E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18967C2BD10;
+	Mon, 17 Jun 2024 14:52:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718635966;
+	bh=MG9R0YfcKoDfDsSnG7bCZrb8TdRezjqK3o93Y26S1tw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CdnI448E7dlOEMvXHIL43p3SKF1g+6khI9sOn99rKqrjgzzTr45BhRTDk05D/GZBi
+	 gJYL+H9T58CvtvKH75QvWBrVvzgfs0xGb/zsphaDAzSjBO+HXbXziFqzUN7FT9wYfc
+	 uAHPIA+RMUWx6pJ/7OS9XTdWnfBsqe73kGeI4T5wLfWHxqU59gB8TP1xMh+rmZvdPi
+	 fqpryfnXl7jHdGGfobSdybZFUNo3Hl17G+CGQqFpE6tVsC8AkrRDW/jbvfPU09YpC2
+	 uvGAN63FOua4xp0MJr4pi94TxXYYNUQ9vIXXaSnyjqe3BYDtFK/v5mZGkJZjvMtEQq
+	 0GkXvTkOKxEeQ==
+Date: Mon, 17 Jun 2024 15:52:42 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Anil Samal <anil.samal@intel.com>, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, leszek.pepiak@intel.com,
+	przemyslaw.kitszel@intel.com, lukasz.czapnik@intel.com,
+	anthony.l.nguyen@intel.com,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>
+Subject: Re: [PATCH iwl-next v3 3/3] ice: Implement driver functionality to
+ dump serdes equalizer values
+Message-ID: <20240617145242.GV8447@kernel.org>
+References: <20240614125935.900102-1-anil.samal@intel.com>
+ <20240614125935.900102-4-anil.samal@intel.com>
+ <20240614175559.4826e4aa@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 07/13] memory-provider: dmabuf devmem memory
- provider
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Sergey Shtylyov <s.shtylyov@omp.ru>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>,
- Nikolay Aleksandrov <razor@blackwall.org>, David Wei <dw@davidwei.uk>,
- Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>,
- Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20240613013557.1169171-1-almasrymina@google.com>
- <20240613013557.1169171-8-almasrymina@google.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20240613013557.1169171-8-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240614175559.4826e4aa@kernel.org>
 
-On 6/13/24 02:35, Mina Almasry wrote:
-> Implement a memory provider that allocates dmabuf devmem in the form of
-> net_iov.
+On Fri, Jun 14, 2024 at 05:55:59PM -0700, Jakub Kicinski wrote:
+> On Fri, 14 Jun 2024 05:58:17 -0700 Anil Samal wrote:
+> > To debug link issues in the field, serdes Tx/Rx equalizer values
+> > help to determine the health of serdes lane.
+> > 
+> > Extend 'ethtool -d' option to dump serdes Tx/Rx equalizer.
+> > The following list of equalizer param is supported
+> >     a. rx_equalization_pre2
+> >     b. rx_equalization_pre1
+> >     c. rx_equalization_post1
+> >     d. rx_equalization_bflf
+> >     e. rx_equalization_bfhf
+> >     f. rx_equalization_drate
+> >     g. tx_equalization_pre1
+> >     h. tx_equalization_pre3
+> >     i. tx_equalization_atten
+> >     j. tx_equalization_post1
+> >     k. tx_equalization_pre2
 > 
-> The provider receives a reference to the struct netdev_dmabuf_binding
-> via the pool->mp_priv pointer. The driver needs to set this pointer for
-> the provider in the net_iov.
-> 
-> The provider obtains a reference on the netdev_dmabuf_binding which
-> guarantees the binding and the underlying mapping remains alive until
-> the provider is destroyed.
-> 
-> Usage of PP_FLAG_DMA_MAP is required for this memory provide such that
-> the page_pool can provide the driver with the dma-addrs of the devmem.
-> 
-> Support for PP_FLAG_DMA_SYNC_DEV is omitted for simplicity & p.order !=
-> 0.
-> 
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> I'd be tempted to create a dedicated way to dump vendor specific signal
+> quality indicators (both for Ethernet and PCIe). Feels little cleaner
+> than appending to a flat mixed-purpose dump. But either way is fine by
+> me, TBH. Much better than vendor tools poking into the BAR...
 
-Comments below, apart from them
++1
 
-Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
-
-
-> diff --git a/net/core/devmem.c b/net/core/devmem.c
-> index f4fd9b9dbb675..d3843eade5fc2 100644
-> --- a/net/core/devmem.c
-> +++ b/net/core/devmem.c
-> @@ -17,6 +17,7 @@
-...
-> +
-> +bool mp_dmabuf_devmem_release_page(struct page_pool *pool, netmem_ref netmem)
-> +{
-> +	WARN_ON_ONCE(!netmem_is_net_iov(netmem));
-> +	WARN_ON_ONCE(atomic_long_read(netmem_get_pp_ref_count_ref(netmem)) !=
-> +		     1);
-
-If you're adding it anyway, maybe
-"if (warn) return" ?
-
-> +
-> +	page_pool_clear_pp_info(netmem);
-> +
-> +	net_devmem_free_dmabuf(netmem_to_net_iov(netmem));
-> +
-> +	/* We don't want the page pool put_page()ing our net_iovs. */
-> +	return false;
-> +}
-> +
->   #endif
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 1152e3547795a..22e3c58648d42 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -13,6 +13,7 @@
-...
-> @@ -269,7 +275,25 @@ static int page_pool_init(struct page_pool *pool,
->   	if (pool->dma_map)
->   		get_device(pool->p.dev);
->   
-> +	if (pool->p.queue)
-> +		pool->mp_priv = READ_ONCE(pool->p.queue->mp_params.mp_priv);
-> +
-> +	if (pool->mp_priv) {
-> +		err = mp_dmabuf_devmem_init(pool);
-> +		if (err) {
-> +			pr_warn("%s() mem-provider init failed %d\n", __func__,
-> +				err);
-> +			goto free_ptr_ring;
-
-Should also free stats, look up
-
-free_percpu(pool->recycle_stats);
-
--- 
-Pavel Begunkov
+In particular, I agree that either way ethtool -d is
+better than than vendor tools poking into the BAR.
+Because the Kernel can mediate access to the hardware
+and see the data.
 
