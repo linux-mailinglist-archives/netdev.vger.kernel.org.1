@@ -1,59 +1,57 @@
-Return-Path: <netdev+bounces-104091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B263E90B2EF
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:54:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D1FB90B301
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 16:56:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B83B61C2163C
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 14:54:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 190E11C21D46
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 14:56:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852F916849B;
-	Mon, 17 Jun 2024 13:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8EC10A2B;
+	Mon, 17 Jun 2024 14:01:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MtTKoTJ+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ClXaVSFw"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384F31684B6
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 13:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9896B1BC43
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 14:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718632736; cv=none; b=V2fJpi1bqMcXCZRxvN3pGVDC79QY1icPfSzxfUrOxE9pzNDQNF+Vyl4mqAMxijszOMshDmZfXXtjGGHXO2RJLELJ+cu5l+KG2IA4vTkHg0BFipkHonUo8YITLrlePSCnSbr8Ib70kgT5Rj/mH5CtkkSnPhzkCvAaQEY6C6/8mfQ=
+	t=1718632896; cv=none; b=n3gMmPvFr8Fm7tSFmZaoKJp3TeudxU0pxYOV3xNp7vL/qtTgCsuSOvZA+FQAAWGq79qBcP2F9weObYAmxTVjG+9kPMaXs/GSJ/fQm0D4QXhVT2OM+ClHkGKp2DzNXFCRmM+3D9z3J+83upi36GjTk3qp67Bmolw7trvGwvkMF9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718632736; c=relaxed/simple;
-	bh=W/Aqk/7oXaEh9mhEB9Hn8rNRREtOVyHsZ3CZasc7xfI=;
+	s=arc-20240116; t=1718632896; c=relaxed/simple;
+	bh=ZSTtpCZOHnxjZs6PTQF1g7rTOoGh1x9yJulQj1I5kaI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uazlwKYxTuAN5KEp7Yhq2NVeE32Ko9//3IJxn/iaGnwguCAeg+4LhinmJViLQ03Fp/u878V4oZaojQDN6WjKVK+RD+j/dZtQQbBX+tvs6TB36QjFZa3TdQP7eeFlKxmrnmSwS9T1Qi/FBBRs/DyLGUxuFdt1j67hDP9ffR1jEI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MtTKoTJ+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=AHvkV7+GLtuXZMnRGYTf+DwpIumYTAJbV1dBEGg5O0o=; b=MtTKoTJ+73HCi7KgrNTPD1OjfM
-	+rH/cR9bGR0PtNSOSQBaSrOOOJ2QCSSBUiRMTEAZXXDEy8Y7TkwIEIZS89wfiX0zIko55B9MoGtjX
-	48uG/eEJqdiaQ3KbIICMD46cnMqZ8pXnFomO9CByZlGqPyLWIvCr0UesYaYJcPMOVbzg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sJCsi-000H5O-81; Mon, 17 Jun 2024 15:58:48 +0200
-Date: Mon, 17 Jun 2024 15:58:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: hfdevel@gmx.net, kuba@kernel.org, netdev@vger.kernel.org,
-	horms@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
-	linux@armlinux.org.uk, naveenm@marvell.com, jdamato@fastly.com
-Subject: Re: [PATCH net-next v10 4/7] net: tn40xx: add basic Tx handling
-Message-ID: <5a38a8c6-a4a2-4e5e-b6a8-b02e86b8cd5a@lunn.ch>
-References: <00d00a1c-2a78-4b7d-815d-8977fb4795be@lunn.ch>
- <20240616.214622.1129224628661848031.fujita.tomonori@gmail.com>
- <8c67377e-888e-4c90-85a6-33983b323029@lunn.ch>
- <20240617.144427.323441716293852123.fujita.tomonori@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eefX+pdGjsJSHhmzP1ZYCMK+LhYbwXfiFknTV7opTVFVXmjLDMNcuj+LynY2oTsTBNIpqNA62SEZxb7VOmv1dn1hf7uxo4WPbgAHyUEfp0dLtXu7k605r7ZoD4KxaUeByTUmPBF+TRZe/RBVrpSe89JFIyFQDZYuZCsGfEGAge4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ClXaVSFw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21EBDC2BD10;
+	Mon, 17 Jun 2024 14:01:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718632896;
+	bh=ZSTtpCZOHnxjZs6PTQF1g7rTOoGh1x9yJulQj1I5kaI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ClXaVSFwFP7ZVVO8UtNNj7LEODi+6OKSidaaCQRIubS3jSz8JIMZP46ZVITX3O8ik
+	 KwGfFy5geGZ1YMj+hU5xL//UTdI7TCDepgIfKyCo5ydbokYMvnqpF3i7cI3tuOk/6B
+	 b39DzeuyIDyt7Is0YqngA4U8y6DQi/uZlFfGQC/RRblnP/ul236XWu6TXpWZJ/R4bl
+	 inFyd52cmhN+3kT8aAGFua7HcCcZmu2a8vJCpHhCtpweYlJoUu2ipEMEd3VOLpl96X
+	 ZT80t8pbCT2FAbhCrPv2lJklQUON+v4dDilY7rBj8iW9P14N/XsWXA+DnF8l7egLjP
+	 1XRCz8hjXCoKw==
+Date: Mon, 17 Jun 2024 15:01:33 +0100
+From: Simon Horman <horms@kernel.org>
+To: Marcin Szycik <marcin.szycik@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Piotr Gardocki <piotrx.gardocki@intel.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH iwl-next] ice: Distinguish driver reset and removal for
+ AQ shutdown
+Message-ID: <20240617140133.GT8447@kernel.org>
+References: <20240614103811.1178779-1-marcin.szycik@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,18 +60,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240617.144427.323441716293852123.fujita.tomonori@gmail.com>
+In-Reply-To: <20240614103811.1178779-1-marcin.szycik@linux.intel.com>
 
-> 1) initializing the table in module_init.
+On Fri, Jun 14, 2024 at 12:38:11PM +0200, Marcin Szycik wrote:
+> From: Piotr Gardocki <piotrx.gardocki@intel.com>
 > 
-> 2) embedding the calculated values (as Hans suggested).
+> Admin queue command for shutdown AQ contains a flag to indicate driver
+> unload. However, the flag is always set in the driver, even for resets. It
+> can cause the firmware to consider driver as unloaded once the PF reset is
+> triggered on all ports of device, which could lead to unexpected results.
 > 
-> 3) calculating the values as needed instead of using the table.
+> Add an additional function parameter to functions that shutdown AQ,
+> indicating whether the driver is actually unloading.
 > 
-> 
-> Which one were you thinking? I have no preference here.
+> Reviewed-by: Ahmed Zaki <ahmed.zaki@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Piotr Gardocki <piotrx.gardocki@intel.com>
+> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 
-2)
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-	Andrew
 
