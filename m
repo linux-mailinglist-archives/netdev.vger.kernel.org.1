@@ -1,124 +1,207 @@
-Return-Path: <netdev+bounces-104189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B99690B764
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:05:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7597790B774
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 19:07:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B04E283848
-	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:05:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15BB82837A9
+	for <lists+netdev@lfdr.de>; Mon, 17 Jun 2024 17:07:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D061684B5;
-	Mon, 17 Jun 2024 17:05:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D17A16A92E;
+	Mon, 17 Jun 2024 17:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AjGP1Uvw"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAFD15D5A9
-	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 17:05:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 582D316A927
+	for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 17:07:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718643918; cv=none; b=GHn633vda6Le3geFmb2bkk05jWmpBejnmXRk4+XKMzqiGSIjeuUxik0kVDy7B20nl7EFI7dJ1pIL1gYN8qdcFNCd1gEbR1L2sOu10yRfsdHFCDXPclw3etR2IyFOqXWsl6PYmmseiG4VuHrnqrunloV589Tz6xbQzSJwqx15z3Q=
+	t=1718644048; cv=none; b=UsTzp6Nf9W1WFaYAYRqIuoMPBhdwt+WVcg3k+yRppzMiWnrNIUeOgRgz+ugzc9W2J5XnuFFNnnhK9UOhHT/MgVD8WHQhF5XDze1Es9nGpW610Q/ZYNwf0/aAlVORFytvq7WelVPUQaXqtj/lpalWMSbgPMSxIqMeBxECX5SViRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718643918; c=relaxed/simple;
-	bh=+xBUJtvpslbkYDcggXsCPZD/p6lLcG3lUMBECT+3grs=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=TRzQ1Lsqs+YPkettWIy63biFfX7ZxrznPyW8cQZVyGqqU0XtogPObQTeFikvuLlAcxvdU+1BRELEcaiiD+AjhWluEtlsbL/BIRACI5/TMFSjnSvo5bqlzMmo9qP0a8nwy7dSetVodegcFL3UhySDpSaO3NKt/bnNnflb+6zCdt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 850B920008;
-	Mon, 17 Jun 2024 17:05:11 +0000 (UTC)
-Message-ID: <c05fd51d-7562-434f-be58-a58c181748aa@ovn.org>
-Date: Mon, 17 Jun 2024 19:05:10 +0200
+	s=arc-20240116; t=1718644048; c=relaxed/simple;
+	bh=isAef4kyo+aqgSX5kMYIHyN6cxW5aJLQ92JaKXfmtkw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Fay+AnWQbTZXnupYHO87mpH+vvTIhMnBruS+KWfWRYxzc1G443OXCh6SUb4zxCJ7e1AmWl9N+o4UUh6QerZfDBtzcmtTYFe93FsC/NZIVrvVtOs8Vrb+lYZtlwCjmlewEs7/h9o8TLat21CfgPBY4Eh/zLgI+PB6rP01P+KPB5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AjGP1Uvw; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718644045;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S0q3UoheA5039wyfgwL1xfkXawhxErq/3dVfP7AVeXQ=;
+	b=AjGP1UvwpVmKgetTjvI3aJhjgXS7THGG/NyypUxAn2RczyHwwSjnLNHDOGw1jwRZ6I7zvd
+	W0MDhxobDxh5kZbe3RAVLXpSyGHuDlhY4UWqVkWUTZVKAx0SlL83dgbTl1aRRrj3Tn1eYS
+	2MCwmDkHCNioQpjopeQkdUUHunmDhR8=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-316-g7cW8nOoOmK9fuDaVkw4Jg-1; Mon,
+ 17 Jun 2024 13:07:22 -0400
+X-MC-Unique: g7cW8nOoOmK9fuDaVkw4Jg-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4DD3919560A7;
+	Mon, 17 Jun 2024 17:07:19 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.16.41])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 496BD1956054;
+	Mon, 17 Jun 2024 17:07:16 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: =?utf-8?Q?Adri=C3=A1n?= Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org,  dev@openvswitch.org,
+  linux-kselftest@vger.kernel.org,  linux-kernel@vger.kernel.org,  Pravin B
+ Shelar <pshelar@ovn.org>,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Shuah Khan <shuah@kernel.org>,  Stefano Brivio
+ <sbrivio@redhat.com>,  Ilya Maximets <i.maximets@ovn.org>
+Subject: Re: [RFC net-next 3/7] selftests: openvswitch: Add set() and
+ set_masked() support.
+In-Reply-To: <CAG=2xmM_z28JA1hm_PxATrUxB96miqpVRT4-WO+MHfFeaYZwPg@mail.gmail.com>
+	(=?utf-8?Q?=22Adri=C3=A1n?= Moreno"'s message of "Mon, 17 Jun 2024 12:18:44
+ +0000")
+References: <20240613181333.984810-1-aconole@redhat.com>
+	<20240613181333.984810-4-aconole@redhat.com>
+	<CAG=2xmM_z28JA1hm_PxATrUxB96miqpVRT4-WO+MHfFeaYZwPg@mail.gmail.com>
+Date: Mon, 17 Jun 2024 13:07:14 -0400
+Message-ID: <f7tfrtbmrb1.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, davem@davemloft.net, netdev@vger.kernel.org,
- edumazet@google.com, pabeni@redhat.com, Stefano Brivio <sbrivio@redhat.com>,
- dsahern@kernel.org, donald.hunter@gmail.com,
- Sabrina Dubroca <sdubroca@redhat.com>
-Subject: Re: [PATCH net] inet: bring NLM_DONE out to a separate recv() again
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20240411180202.399246-1-kuba@kernel.org>
- <a25fa200-090f-456e-9885-fe25701dbd94@ovn.org>
- <4b4f35b9-6419-49a4-b73e-5d02e3cbc69a@ovn.org>
- <20240617093658.60998763@kernel.org>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <20240617093658.60998763@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: i.maximets@ovn.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 6/17/24 18:36, Jakub Kicinski wrote:
-> On Mon, 17 Jun 2024 17:09:44 +0200 Ilya Maximets wrote:
->>> FWIW, on current net-next this fixes the issue with Libreswan and IPv4
->>> (IPv6 issue remains, obviously).  I also did a round of other OVS system
->>> tests and they worked fine.
->>>
->>> Tested-by: Ilya Maximets <i.maximets@ovn.org>  
+Adri=C3=A1n Moreno <amorenoz@redhat.com> writes:
+
+> On Thu, Jun 13, 2024 at 02:13:29PM GMT, Aaron Conole wrote:
+>> These will be used in upcoming commits to set specific attributes for
+>> interacting with tunnels.  Since set() will use the key parsing routine,=
+ we
+>> also make sure to prepend it with an open paren, for the action parsing =
+to
+>> properly understand it.
 >>
->> Hi, Jakub.  Now that IPv6 change is in 6.10-rc, do you plan to submit a similar
->> fix for it as well?  (Sorry if I missed it.)  Libreswan is getting stuck on IPv6
->> route lookups with 6.10-rc4.
+>> Signed-off-by: Aaron Conole <aconole@redhat.com>
+>> ---
+>>  .../selftests/net/openvswitch/ovs-dpctl.py    | 39 +++++++++++++++++--
+>>  1 file changed, 35 insertions(+), 4 deletions(-)
 >>
->> Note: Libreswan fixed the issue on their main branch, but it is not available in
->> any release yet, and I'm not sure if the fix is going to make it into stable
->> releases.
-> 
-> Sorry for the delay, we'll get it resolved before this week's PR.
+>> diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tool=
+s/testing/selftests/net/openvswitch/ovs-dpctl.py
+>> index 73768f3af6e5..fee64c31d4d4 100644
+>> --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+>> +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+>> @@ -284,7 +284,7 @@ class ovsactions(nla):
+>>          ("OVS_ACTION_ATTR_UNSPEC", "none"),
+>>          ("OVS_ACTION_ATTR_OUTPUT", "uint32"),
+>>          ("OVS_ACTION_ATTR_USERSPACE", "userspace"),
+>> -        ("OVS_ACTION_ATTR_SET", "none"),
+>> +        ("OVS_ACTION_ATTR_SET", "ovskey"),
+>>          ("OVS_ACTION_ATTR_PUSH_VLAN", "none"),
+>>          ("OVS_ACTION_ATTR_POP_VLAN", "flag"),
+>>          ("OVS_ACTION_ATTR_SAMPLE", "none"),
+>> @@ -292,7 +292,7 @@ class ovsactions(nla):
+>>          ("OVS_ACTION_ATTR_HASH", "none"),
+>>          ("OVS_ACTION_ATTR_PUSH_MPLS", "none"),
+>>          ("OVS_ACTION_ATTR_POP_MPLS", "flag"),
+>> -        ("OVS_ACTION_ATTR_SET_MASKED", "none"),
+>> +        ("OVS_ACTION_ATTR_SET_MASKED", "ovskey"),
+>>          ("OVS_ACTION_ATTR_CT", "ctact"),
+>>          ("OVS_ACTION_ATTR_TRUNC", "uint32"),
+>>          ("OVS_ACTION_ATTR_PUSH_ETH", "none"),
+>> @@ -469,6 +469,14 @@ class ovsactions(nla):
+>>                      print_str +=3D "clone("
+>>                      print_str +=3D datum.dpstr(more)
+>>                      print_str +=3D ")"
+>> +                elif field[0] =3D=3D "OVS_ACTION_ATTR_SET" or \
+>> +                     field[0] =3D=3D "OVS_ACTION_ATTR_SET_MASKED":
+>> +                    print_str +=3D "set"
+>> +                    if field[0] =3D=3D "OVS_ACTION_ATTR_SET_MASKED":
+>> +                        print_str +=3D "_masked"
+>> +                    print_str +=3D "("
+>> +                    print_str +=3D datum.dpstr(more)
+>> +                    print_str +=3D ")"
+>>                  else:
+>>                      try:
+>>                          print_str +=3D datum.dpstr(more)
+>> @@ -547,6 +555,25 @@ class ovsactions(nla):
+>>                  self["attrs"].append(("OVS_ACTION_ATTR_CLONE", subacts))
+>>                  actstr =3D actstr[parsedLen:]
+>>                  parsed =3D True
+>> +            elif parse_starts_block(actstr, "set(", False):
+>> +                parencount +=3D 1
+>> +                k =3D ovskey()
+>> +                actstr =3D actstr[len("set("):]
+>> +                actstr =3D k.parse(actstr, None)
+>> +                self["attrs"].append(("OVS_ACTION_ATTR_SET", k))
+>> +                if not actstr.startswith(")"):
+>> +                    actstr =3D ")" + actstr
+>> +                parsed =3D True
+>> +            elif parse_starts_block(actstr, "set_masked(", False):
+>> +                parencount +=3D 1
+>> +                k =3D ovskey()
+>> +                m =3D ovskey()
+>> +                actstr =3D actstr[len("set_masked("):]
+>> +                actstr =3D k.parse(actstr, m)
+>> +                self["attrs"].append(("OVS_ACTION_ATTR_SET_MASKED", [k,=
+ m]))
+>> +                if not actstr.startswith(")"):
+>> +                    actstr =3D ")" + actstr
+>> +                parsed =3D True
+>>              elif parse_starts_block(actstr, "ct(", False):
+>>                  parencount +=3D 1
+>>                  actstr =3D actstr[len("ct(") :]
+>> @@ -1312,7 +1339,7 @@ class ovskey(nla):
+>>                  mask["attrs"].append([field[0], m])
+>>              self["attrs"].append([field[0], k])
+>>
+>> -            flowstr =3D flowstr[strspn(flowstr, "),") :]
+>> +            flowstr =3D flowstr[strspn(flowstr, "), ") :]
+>>
+>>          return flowstr
+>>
+>> @@ -1898,7 +1925,11 @@ class OvsFlow(GenericNetlinkSocket):
+>>              ):
+>>                  print_str +=3D "drop"
+>>              else:
+>> -                print_str +=3D actsmsg.dpstr(more)
+>> +                if type(actsmsg) =3D=3D "list":
+>
+> nit: I belive the recommended way of comparing types is using
+> "isinstance":
+>
+> https://www.flake8rules.com/rules/E721.html
+>
+> Also, I don't see what can make actmsg be a list. It should always be an
+> instance of "ovsactions", right?
 
-Ack.  Thanks!
+Yes, you're right.  This was some debug code that I was messing with and
+it made it into this submission.  I've dropped it :)  Thanks for the review!
 
-Best regards, Ilya Maximets.
+>
+>> +                    for act in actsmsg:
+>> +                        print_str +=3D act.dpstr(more)
+>> +                else:
+>> +                    print_str +=3D actsmsg.dpstr(more)
+>>
+>>              return print_str
+>>
+>> --
+>> 2.45.1
+>>
+
 
