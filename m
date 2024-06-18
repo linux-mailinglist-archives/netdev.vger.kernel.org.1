@@ -1,266 +1,375 @@
-Return-Path: <netdev+bounces-104387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5327B90C5E6
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 12:09:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5698090C5F4
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 12:10:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 256F42832AC
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 10:09:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25A011C21436
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 10:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4D1F15E5C3;
-	Tue, 18 Jun 2024 07:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6206613C3D5;
+	Tue, 18 Jun 2024 07:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=habana.ai header.i=@habana.ai header.b="h6aSfoKY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hqONyaqT"
 X-Original-To: netdev@vger.kernel.org
-Received: from cluster-d.mailcontrol.com (cluster-d.mailcontrol.com [85.115.60.190])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD3515E5A8;
-	Tue, 18 Jun 2024 07:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=85.115.60.190
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718695814; cv=fail; b=jWeHUgsuek4Lc422n5TmFVcMbjHSeywCdslv2yd/2P80NVrOIkYmAghClTnvjSSj2s12tIG9EWxb0rqVRa0twOTOs9n0SyOiQ/Fja5F/7CpZcYeaYiDilJIFIrqOv/BcV/gX5hJrohd9pQsR2GyL7riuuomC85dE6BivePSaUhw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718695814; c=relaxed/simple;
-	bh=w8emV60irwApa7v5EjvYM4a/eN4KTSxbUBSyKfITF6Y=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=IIq/FTza8jxjQt5mEvI9YrIEQyEgZPdw3xeBAsTaRUwR7nvqUljFyDmkjNahn8aaZhvrpkFCqt/7YNZ4e8Vm2R6RZFUqQsWUUwDt7MkX+lOMImsq3Ea5bX5zOehZ/Gwiphh/SzP3YOTOFC+CIMVF1c9uDrccM1qipOSUM4K8VUE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=habana.ai; spf=pass smtp.mailfrom=habana.ai; dkim=pass (2048-bit key) header.d=habana.ai header.i=@habana.ai header.b=h6aSfoKY; arc=fail smtp.client-ip=85.115.60.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=habana.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=habana.ai
-Received: from rly01d.srv.mailcontrol.com (localhost [127.0.0.1])
-	by rly01d.srv.mailcontrol.com (MailControl) with ESMTP id 45I7U0Pw202661;
-	Tue, 18 Jun 2024 08:30:00 +0100
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by rly01d.srv.mailcontrol.com (MailControl) id 45I7T5HA189093;
-	Tue, 18 Jun 2024 08:29:05 +0100
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05lp2168.outbound.protection.outlook.com [104.47.17.168])
-	by rly01d-eth0.srv.mailcontrol.com (envelope-sender oshpigelman@habana.ai) (MIMEDefang) with ESMTP id 45I7T2Yq187787
-	(TLS bits=256 verify=OK); Tue, 18 Jun 2024 08:29:05 +0100 (BST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Pe5pw+HRmG/zaEf0C1Fk2ezIYFTQ2/pukpmJtU3va9Y9L0vOHjmyLPIh1Y9uz+kMncOmwNdZUnwGwQQxzkAciFGKF1a0oF6LNw0HhMxJ8h6WF54ROBG/esEZsbQ4kVRUoalNsIHv6D8Sv6uwtY5+CDSLfsRTdfGII53qaPUS5zDUh5bHuW402hHLwnWr2sYTAli0H1ChCL2skbHrDXJuc0bXCd1wXvL6pXmV+/kuDIBF0F5jMzb+bnXVJd44Jy45Dp5M4v/oz5qemX7nrXA0+gRHcT8DauTi/nN4I5iFx7CXeiEJXlUGeNOdYygFNDpaxOpbp8B9SRgK8G3taCr9XQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=w8emV60irwApa7v5EjvYM4a/eN4KTSxbUBSyKfITF6Y=;
- b=fFP8ElkwA1IHPu9RgZX9IMtMxXppr6RIZ6QOaBsqrvwuUzUSQLXsnYIxQKcZpzeNEY3eyt6/Ylis+0Zqhwxda+1jjKegGZTvqwHJUkDP2jvJvRWu7F1UyYrMw2pAhh2R+4BkRr6TXeKbatfBuvOHcPy8w/37FXcA5/IzsnMakzGcAX1M3UOnK36YFI9D/4OEgr2+jjZtyt3J+rsH6YEhtQaglPPoWVBlz3CboHGtc5L0LPAn0h5i8QsNKUOy3tshPbSTrUZoQAXH9glSelBcIKiZRRxeMEXRyaxMKccIgv312cpQkbY1Jdp2JfDUxM8OdTe8ouKj0Rlu87vqY+m78w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=habana.ai; dmarc=pass action=none header.from=habana.ai;
- dkim=pass header.d=habana.ai; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=habana.ai;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=w8emV60irwApa7v5EjvYM4a/eN4KTSxbUBSyKfITF6Y=;
- b=h6aSfoKYF7iWmJcEDaxVMoYYxo9z5gQeS8/xofh3ll2nNgfW8us1IdB+hVdY4j+Azd1AFpAyQJvL6umFg/7aV+o36OHolyfSzI24UyzEIchiQPAb9ymAXnGuuY3U0/RuMPTHl5dAG/UfExfE/RhqxK9/XqIfM+kodXuJuONkiS9ZFL/+Sdb42Pon/b6LEWG7HwdVZRhcNeDiUdzHcZBvgiaPMO0xWIlRkc7Por3mRHmFR6axIrd94EMdtCxf5gU5K6g7pRjVvcFfxl337LigOlk8KyDDkRD+Wkqomvz/Lcbouf4TieLsZriNN0tRvc6EVfQ2ODTo9hkj02uZMiSMWQ==
-Received: from PAWPR02MB9149.eurprd02.prod.outlook.com (2603:10a6:102:33d::18)
- by PAVPR02MB9570.eurprd02.prod.outlook.com (2603:10a6:102:304::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Tue, 18 Jun
- 2024 07:28:23 +0000
-Received: from PAWPR02MB9149.eurprd02.prod.outlook.com
- ([fe80::90a0:a4f0:72e9:58b9]) by PAWPR02MB9149.eurprd02.prod.outlook.com
- ([fe80::90a0:a4f0:72e9:58b9%3]) with mapi id 15.20.7677.030; Tue, 18 Jun 2024
- 07:28:23 +0000
-From: Omer Shpigelman <oshpigelman@habana.ai>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "ogabbay@kernel.org" <ogabbay@kernel.org>,
-        Zvika Yehudai <zyehudai@habana.ai>
-Subject: Re: [PATCH 01/15] net: hbl_cn: add habanalabs Core Network driver
-Thread-Topic: [PATCH 01/15] net: hbl_cn: add habanalabs Core Network driver
-Thread-Index: AQHavWrVVuRHPTgJKUqRN0LFtHgrD7HFqK+AgAX3iYCAAD1vAIABSbUA
-Date: Tue, 18 Jun 2024 07:28:23 +0000
-Message-ID: <405af235-e47e-476d-b3e9-b2b4d2413459@habana.ai>
-References: <20240613082208.1439968-1-oshpigelman@habana.ai>
- <20240613082208.1439968-2-oshpigelman@habana.ai>
- <a0e8f31e-fa12-4f48-853d-16c78bce1d76@intel.com>
- <83a6029e-1e45-4ce7-99bb-a3643ddbf8ab@habana.ai>
- <20240617114818.GB6805@unreal>
-In-Reply-To: <20240617114818.GB6805@unreal>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=habana.ai;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAWPR02MB9149:EE_|PAVPR02MB9570:EE_
-x-ms-office365-filtering-correlation-id: fe912ae4-e57a-4190-c07c-08dc8f683c9c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: 
- BCL:0;ARA:13230037|1800799021|41320700010|366013|38070700015;
-x-microsoft-antispam-message-info: 
- =?utf-8?B?NDB3TFJIQTk5ZHIwbXNZYVlaby92OUpFT2dlNHRMa0dubnlzRmdudnJPeVV5?=
- =?utf-8?B?ZTh3NE5zSS85aXc2cTFsWERwVzdmdlpjRHVpaGh6ZVZZMWZzMFNRU0VLd20z?=
- =?utf-8?B?ei9CQWVYcmFReVFRM2hCeUd2djZpMmRMaGFqWFVSY0x1QWljZ1hkTjJBajN4?=
- =?utf-8?B?R2g3MVY1Tjl5U0s1bzRxMllHd3lFYVZidUxTMitpS1Y4YnJlMjBtSTZmY1pl?=
- =?utf-8?B?L0crbDNsYXZobmVaNkJLNXl2cEkrMzNTVEV5UFpBb09TbDZPWkxjUG91SEZt?=
- =?utf-8?B?Vjc4cG5xVUN3VE9UVHpyeEY3THQzcGdpZFNVakJCS2grR1R1aDh1UUE4Q0pr?=
- =?utf-8?B?Mk1oa09zSDJoMnlSbHQ2bTR1YnVOSExrQS9NdysyYTVONkFvM2RxMlVJb1dw?=
- =?utf-8?B?Qll5R2Z0N05SRjhVQzViL29wTVlHMHFML2lMRWFqeE9sdmVSVG0ydmVFT1Iw?=
- =?utf-8?B?UktleFplYjNrQ0NTaEV0QjREeElLVHFibi93OHlaU3dURi9YbnltdXRQRjRp?=
- =?utf-8?B?VTVTekgxVFp3RFVpeWFUTndEV2lDdDkyclZsc2lJZTFvcStKNXJ5cDRqMHR6?=
- =?utf-8?B?SG9tQ0lLZTFPcVc3Rit5MzZ5ZEtpSUJiTytLTDRNVXh5YlVDb2l4a0h3OHQ4?=
- =?utf-8?B?U3BkK3U5Skx0d01MQllzbjNlTC85K0JxT2NycUQ0YXhhQ3BzU3c1Wk5PQmZ3?=
- =?utf-8?B?MmNWUVkyRG9QQmlmaFk1Mkt2N0FTbHFVeDBETVNaUVNlYy9lSnF2VS9iYkcy?=
- =?utf-8?B?U1lhS0g1cEVSRUdCOXpwYnovajJWejdUcDdiMnRscFFqV2pXbHBaTW8yYVZl?=
- =?utf-8?B?OGFIMDhnU1dXdldKZGJjWkdSemQ2LzRrNnJLcDAyY2tkYUNENngvZ3dRQ2xz?=
- =?utf-8?B?VlAxaHh2Nmk0bEhXSnNrVzU5QzNIV2tJMzh1Sll4cW5vdmZvdUl2SXgzNTNx?=
- =?utf-8?B?UzRtUnpBVWQ4RzRkditPWldMcTNmM1lEeEFEZmEvWXBhWFNUZmJ1ZUUyUklx?=
- =?utf-8?B?cHJiU1MwM0JuYVAvQVU4V29kYWdHMCtsNDVSTlR1cENnNjl5Z2xCSDcvMHpq?=
- =?utf-8?B?OGpJWExHSW4yRmdlSVNDRmFlUXFSUFFEK0hlMkJJRU02d210c1BiV05zZUVR?=
- =?utf-8?B?NWptMkVLT0JDdUVhQW90YkYvdnRtcjk5SEM0ekdHRTRXZU5oMDBra3ZnZ3Vv?=
- =?utf-8?B?Tk5YaERrMzdyMFRYK1J4TGoyclZuZGtGKzIzQTYwQXlLaTV1VTcwcmNMQ2xN?=
- =?utf-8?B?VDA1Z1hWQkdCazZjdDhlVVE1aE1QSE5FQzdLbDBzVnJlMFVlQ01jQjhid3hD?=
- =?utf-8?B?US9rT0pyOU1mbno5QlRxS3Vwa1JqcE1jOXlOcmtSbU9SRDBVbG5neWZaSkxD?=
- =?utf-8?B?YW4zVThSYWRaM1lyaFc1a1RxOTF3Q1FLYjJqN05nTUgrVVhaZnlYUG5nTEo4?=
- =?utf-8?B?VkR1ZFlkRzhHRlBsVnBOeFZDUUhmRmlzaWNEQlQxSVdBaGxka1h1TEZSUHZz?=
- =?utf-8?B?dGRMeW01d3Zsd3lhRXZma094SFd5T04zNmY2TWJ3N2xyRDZ4TDduSHNUWXFu?=
- =?utf-8?B?bFNrOUh6Mk0yZFh6eWJtUGdLWkx3ZmRmRDdVS205blBoR0NHdVlNUnllZXpj?=
- =?utf-8?B?UnhZakVqNGlYYTlmcGU3SnAwaDFuSGs3VEVpdm8zWmNkUlpFbTJsVjdkb2NM?=
- =?utf-8?B?Wjc5bVBVOThVMDRTNGFDKzJack13SCtteXEwTnJCa3M2ekg0ajlVRUc0QlNz?=
- =?utf-8?B?aUlCb0lCQUZxaTZLOE1IanAwZi9WQVh6ZDd6bzc5OXFWTmdzYXpnY1ViZXVX?=
- =?utf-8?Q?1Dx0uPlnfJFXHbtIELg+M0qPMBJkOcL/sNOsQ=3D?=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAWPR02MB9149.eurprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(1800799021)(41320700010)(366013)(38070700015);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?utf-8?B?TXRrcUxwVnA5SmVoQ1Q3STFVTjdGSjlreXd3MytBV3RUQU9yaEsrc0VLZnh3?=
- =?utf-8?B?cXQ2dld1WmVkWFBkb2dVZUxuT01ianBmQ1dHVHozSmF1K3BiRGNGdGV6UWdO?=
- =?utf-8?B?NDRyM0FYY0x2OHpZQ3JnOG9qb1BXWVMzb3psb2tpMzcxTW9zNnJWOUlxOTBO?=
- =?utf-8?B?cHRBUDloL3p4NzIvMVFQQ3JPSERpbmhkbENSWGdxQmJRVWxmK1JTSUJ0Yjl4?=
- =?utf-8?B?MVFwUklLQVhyb1l2Q2o1SlZKdDdUVkdCM09VeXZFYUNVM2htWVJqdjF0bkd2?=
- =?utf-8?B?ak1DdmgxQldRZ0huYTJTalpWbGVnT3ZNUFg5cHA4bm04NXVvQnVBeEtORk1t?=
- =?utf-8?B?MTJRZnpScjEwd1g4WVBwdStKTWJGZTYxYkJkRXlHQ1psQkhBWmhBUDRtZGk1?=
- =?utf-8?B?eHRkYS9ESDNJaURUci9iR2VMLzJTNjhubVMzdFJycTRydjdTNXdOemlqajR2?=
- =?utf-8?B?MGx1QlhVdmJId1MxNXdSTkNicGtYSVlLOVR4LytvY2ZxbFVsaVI4Z1NKSUhD?=
- =?utf-8?B?UmNYVXF1R3VZNEV0NUhFL1NVQUplS2E5R0krZWx1Vnp1Z3JqRnRWWXdKS0JL?=
- =?utf-8?B?UmhZMHNydzRidFhZSnhDWHpQSWYwWGpMK3pyY0d0VVZ2cUhvRDhFdXM4L3lo?=
- =?utf-8?B?bk9PYjloUisrN2c0VjlwcDZGbWRFQTVHTll3Ky9uUDBaYnpIUzlCM1A5K2Mv?=
- =?utf-8?B?WnJzd2xOUXdwOEQzK2gwNVRjTVZNZ3lHcytWVGt4TVlpbjh3eGZnazhGTlNj?=
- =?utf-8?B?a1hUYkEwK2VsSkZuOWlwRkNLSm00QXo4a0UxbmtSbTZOenMyTGlWTWdsYVZy?=
- =?utf-8?B?aU9ndGlSZ1AySldyYXlMWk92Z3ZkZmk2NXVkWmFpTmVkTUhESWNLUytHdnpl?=
- =?utf-8?B?Y2RpYUlHZEtocFFabGpsMWRMYmg3bnM2Y29INzFQaVZuOVRoU0xqallreW9o?=
- =?utf-8?B?RU1KYVozSTVGNU5xZTJBVkFxUGhOc1kwazg1RHlTZUNadWhzem9tdW5CUUNw?=
- =?utf-8?B?cW1yR1M5VmtldXdNNGV0WWlRKzloTSthUE5yMmtRaDJ0ZlA3M1JWZ04wcHpt?=
- =?utf-8?B?ckNFRDY4eHBXcTVHNWxNNXVHTGh0QnoyVmFZRno5a2JuMzk3VzdPTnRtM3Bh?=
- =?utf-8?B?YThlUGxNeXRNTzBiTjdDMDZTNzlGTkJKckw3dXc1SDhNWTIrZllxcHZ6eWdJ?=
- =?utf-8?B?NmpJbHRUNDY5cUx6MmtiSGZOT3VycGh2MEZZWTZVdTlCVGpNaUhNSjY4Z1NM?=
- =?utf-8?B?M0pEbHp4WklXOFRVdVhBNmFDVThLSjBaZyt5aC9HcVVCUlhMZ1dYVUxqREd3?=
- =?utf-8?B?T1c3bm8rMDgra2NyZmJrUUh6aUluMFA5Ukl5V3pSYlFxQVJhZVF5SHcyVFBy?=
- =?utf-8?B?N2FVTHhqYUR0M01SMUl0MlNoTy8xMTJBakp5cGdGT3B4WXdXNkY3WCtkTFNy?=
- =?utf-8?B?ZHBMd0wrMXMwRzVWdm14aXM2cVZxTW50ZVo5VCt1Sm03TTd2VnZGYm5vc0ho?=
- =?utf-8?B?ZGxHNEhwOXBHbHhuRFNmZU1HSWt4REhsRkFiU2NRWndwNFBKc0E2OFQ0bXBF?=
- =?utf-8?B?UGdiNmVaclM5S1JYQ0dYY3RpN2ozNVVNcXJQZy9IQXU1N3VZbjdqTU1lRlBz?=
- =?utf-8?B?dE1xRStYaVlzNE9OemtVQzVwZTE0VGgwRGY4UmZHMmJnUWVHL3lwK0ZBNTZl?=
- =?utf-8?B?dXpPaS84SnJtL080MEowbFlCbGppUC9KdTRGcENyRUlSbU1FT2FIR3IvcUJh?=
- =?utf-8?B?cHc3SGFvbFFJTUtsY3FuZVBwbmZPZlY0TkFxOWZ6OE8zb3k3L2dNeUMzUi93?=
- =?utf-8?B?Q05teUpDdjJORStQdmY2a3dtcjBkd29TZUs0UmNUaVgzSG9jd29Sck9GTGU0?=
- =?utf-8?B?MUd5bTAyNC8rODNHOExoSEJvNUc4ZXpGRFZwbmp6VjF6bWFsM2x0L250UzMy?=
- =?utf-8?B?SDB6dFJrcXFCZ2FJVUNoV0Z6NGg1OWVSMVpHUlhiaU02d0EzZG84YUltNzRN?=
- =?utf-8?B?bThEN00xMGo3TkExZEQzRU0xMFltZmVVUTQxMVFsaHRxczM0NCtucDZRcHhw?=
- =?utf-8?B?dERCQ296V0RwSlp6d0VETnNZUG5XbitReW5XbEJhdjZGV3hlTUQycWZ5aStZ?=
- =?utf-8?Q?SfDxR1PLi4CoTvKxo9j2t9M8j?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5F42CF7A4531164783A6522B221AF58C@eurprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FD812E71
+	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 07:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718696004; cv=none; b=tZDc9aVklF+qYyuu5La29wDduAi7KAQU5KxiDlxlLYoUG9nDl0mWxEIodPK3hmL29iJFypHtAzdSOEavwWaYnApzEt2GXh9ghtQLh4hh1eOctTNdhJKpWwFJ075SSz+i2XJ3a4xOjD6V7vlTgAb+5Q76CDHcF02MMwLsYiFuFkc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718696004; c=relaxed/simple;
+	bh=H//8BSv4ggrLxowhkNrbObSOlWxgFWRkdd0cHb8UjRI=;
+	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AIn1Fv96I+EhQHpe/lU9UbdBE0QEkmjNtNsjm5u30/1LdKfRBJlVOMDPUJWDujbeU8IU59Uz74Uwl6xGd01+MAw/1QPOXwgMZUfCAF2HQpYOI7A4FwlpCnJEyBa66eeJnq7bn3tAG66h+Or3eWGTSmZC0y9RUH6iLdn5PG2i8S0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hqONyaqT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718696001;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=u+gJX5mOOklJgcIWDcgc8reyiNZqlCJU5tp8bTTf1IU=;
+	b=hqONyaqTswhSlMNFfTmN2EfAWTI4YX54qIktFxwW+DYC53xQtCfw8x/eyjwPVc1nSYs4mX
+	Hb6f3jNl98TLrE2LswJ5ncFLYuA9xbTlMSd+taCzDhirbL4aH6viVD9v5rRBTnrodeiAdR
+	1AwGVjCFUe19w1jBgaX1MXQO+o8wQ+0=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-338-7cEl_NHHOu-LnoVTzZ072g-1; Tue, 18 Jun 2024 03:33:20 -0400
+X-MC-Unique: 7cEl_NHHOu-LnoVTzZ072g-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6b2da812211so15074176d6.1
+        for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 00:33:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718696000; x=1719300800;
+        h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u+gJX5mOOklJgcIWDcgc8reyiNZqlCJU5tp8bTTf1IU=;
+        b=dH1/zvlwfZAUULq0glN0/5Y2G+JHF15yVsCdIRibF7cvgWF4QX6hsE8+ofDsPb4I15
+         Z1dmSGuZIRsdPU9R7/+k8rU60p+oEdK8AgwEWYg0B1NKMuSkHQoENz23qthrn/c5yMEt
+         fyRajxSj9jWDw/lq87UTePOP7Q7PhLlkWzqYM5B3mZGa4Z0wZ96pMWPoHwO5EWc7wfS2
+         THyey7TOSW9pM3UI7bm0QcSNGH30fqdaoXUpNPTBXfvV1Bgg/jv86HNE62BtNBJHnxbI
+         9UZOTr0pEUrzph8VEa0TVzCKZVYPWSAAAWnZmsNRzQabSwUndRp807Ya0P9OoIZ40b8L
+         /c+w==
+X-Gm-Message-State: AOJu0YyCpxcKNhFZE5X8BY3QSkX7GqdRJgHOEL6evXsrrAdNWX6Xazgx
+	NQ0ItHwoNoBn1XIT7E6IgojQZbfmM9DZvczMCoAqOF8gWNMvJKvuoDIa75hb8X5C6YQydSY9COU
+	KQ36ksaMcOft3LT5esQmflEglvyuPwzeKrrOdYeawfUZyKLMbyD9+B1yvAOIPuuAP2sushdGcNl
+	BWnLLSypZd9+5sPNc8Jx+oBiVfROdh
+X-Received: by 2002:a05:6214:883:b0:6b0:792b:5997 with SMTP id 6a1803df08f44-6b2afd5c564mr128586756d6.46.1718695999698;
+        Tue, 18 Jun 2024 00:33:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGhtkzgllN3nCGGFNDyNoeim9DaJnmDiJYMCNKEvV9xtmuJmUsUaB8suc0/XQUadK6Lfelu/Z0r9f6z8XQfblg=
+X-Received: by 2002:a05:6214:883:b0:6b0:792b:5997 with SMTP id
+ 6a1803df08f44-6b2afd5c564mr128586576d6.46.1718695999334; Tue, 18 Jun 2024
+ 00:33:19 -0700 (PDT)
+Received: from 311643009450 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 18 Jun 2024 07:33:18 +0000
+From: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
+References: <20240603185647.2310748-1-amorenoz@redhat.com> <20240603185647.2310748-6-amorenoz@redhat.com>
+ <4f89a9b9-999c-4d1f-8831-48045e6a74f6@ovn.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	3ghZ3S5welyCDp+K5lQDd6/KVQtq9oBiJVD3jxT1Qm8/l1yaZOlDcMcsHWgnt42jUVy9BaLOtKgs9LtLCkSFQZRcsK4Y3dlUhtTanSOi4/HdWL1ANepNaKz9NLq6CvT9w9at+jdUKxemnNyKClpA6VRAJXJlXCD9MGbCK/8jICfgnRN9AHTN0oQcxCjrUKbeV3I216uPBo9mWvixngyZxuTrf7x6dczqIfl+T9eCAgm0rgm+zYv1VOzHNJAYSmK8//ZXqAKEAVc71yPLO5HHFeMz9M39ZkEN3Y00kbi8WNgb56XPsxtUFuq1Wy3+le655rmgjXkQLJCyirBKfHXIZV5fJ5Nam+ocy1SL5mg8xNFWeWF4POw3QwVv/fqEBo2MZR34BKVhI+dEOIi7N312WcB4saRvmZQbtnK82qE4uMtiR6ZQcb8nQbeyoA0r58pXuCwvh6PVO6ivQmoLrJl4EgNBa/knP4bpRb/BD0h5C3idnxEDlbLLjRpa/Qd6hQN4Tq/RjS6jNuV/STY4fteXTgulOt5drs52fX9okPMb0sM2YCowLEXr8iuvqXQeEkgxaWJPlbvQIuyiLnVM+9f+E7aNwOWQGNkTGR7Paw3Rlgb3hnaIEeY929xZn+gB5jti
-X-OriginatorOrg: habana.ai
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAWPR02MB9149.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fe912ae4-e57a-4190-c07c-08dc8f683c9c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jun 2024 07:28:23.5456
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0d4d4539-213c-4ed8-a251-dc9766ba127a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ynCSlU2NIRfiYiGViJdl++Mk46HFu0cWxYz0d2j2Pdk97iQkrLhDgezGVOfpnXywp0T8g7zP85aUT38KZ7tB9g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAVPR02MB9570
-X-MailControlDKIMCheck: cGFzcyBoYWJhbmEuYWkgW3Bhc3Nd
-X-MailControl-OutInfo: MTcxODY5NTgwMjpGUEtleTEucHJpdjpNm5PWkgKTzPaCde75WwN7DWiQ/HqMIzJLNPpRA78g/rwvboh2kVdezHM7W8nzBWuUDiQXe96hZKQNH75OY4lj2r+1FBdxUdyi+QWYQTsEJ4penSKZiuIWIN0bc7P730z++C1MNcNWgbV4pOHQqpsF33isf5qMEVIrssAPMnrwjMWhbohqBenKJ0qq6PmEgU6HVqZadjgkIJvVszkx+wT5HdNQa+Yu1f6cMi4isgqVCbgTWWsOvsYlpLyBV6N6eFJG2Sd1UDPXHgT43mex6LAK18YNuOOnVcKy+lKG5lpmXJY3sPyimE66uLo0VN+j4cxJ8r+AIawdKNgRFjrmQEWf
-X-Scanned-By: MailControl 44278.2145 (www.mailcontrol.com) on 10.68.1.111
+In-Reply-To: <4f89a9b9-999c-4d1f-8831-48045e6a74f6@ovn.org>
+Date: Tue, 18 Jun 2024 07:33:16 +0000
+Message-ID: <CAG=2xmPHcyLbuMCVR6ysKigboWg1E_xCHFMxEKUceerioO-OFg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 5/9] net: openvswitch: add emit_sample action
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com, 
+	horms@kernel.org, dev@openvswitch.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar <pshelar@ovn.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-T24gNi8xNy8yNCAxNDo0OCwgTGVvbiBSb21hbm92c2t5IHdyb3RlOg0KPiBbU29tZSBwZW9wbGUg
-d2hvIHJlY2VpdmVkIHRoaXMgbWVzc2FnZSBkb24ndCBvZnRlbiBnZXQgZW1haWwgZnJvbSBsZW9u
-QGtlcm5lbC5vcmcuIExlYXJuIHdoeSB0aGlzIGlzIGltcG9ydGFudCBhdCBodHRwczovL2FrYS5t
-cy9MZWFybkFib3V0U2VuZGVySWRlbnRpZmljYXRpb24gXQ0KPiANCj4gT24gTW9uLCBKdW4gMTcs
-IDIwMjQgYXQgMDg6MDg6MjZBTSArMDAwMCwgT21lciBTaHBpZ2VsbWFuIHdyb3RlOg0KPj4gT24g
-Ni8xMy8yNCAxNjowMSwgUHJ6ZW1layBLaXRzemVsIHdyb3RlOg0KPj4+IFtTb21lIHBlb3BsZSB3
-aG8gcmVjZWl2ZWQgdGhpcyBtZXNzYWdlIGRvbid0IG9mdGVuIGdldCBlbWFpbCBmcm9tIHByemVt
-eXNsYXcua2l0c3plbEBpbnRlbC5jb20uIExlYXJuIHdoeSB0aGlzIGlzIGltcG9ydGFudCBhdCBo
-dHRwczovL2FrYS5tcy9MZWFybkFib3V0U2VuZGVySWRlbnRpZmljYXRpb24gXQ0KPj4+DQo+Pj4g
-T24gNi8xMy8yNCAxMDoyMSwgT21lciBTaHBpZ2VsbWFuIHdyb3RlOg0KPj4+PiBBZGQgdGhlIGhi
-bF9jbiBkcml2ZXIgd2hpY2ggd2lsbCBzZXJ2ZSBib3RoIEV0aGVybmV0IGFuZCBJbmZpbmlCYW5k
-DQo+Pj4+IGRyaXZlcnMuDQo+Pj4+IGhibF9jbiBpcyB0aGUgbGF5ZXIgd2hpY2ggaXMgdXNlZCBi
-eSB0aGUgc2F0ZWxsaXRlIGRyaXZlcnMgZm9yIG1hbnkgc2hhcmVkDQo+Pj4+IG9wZXJhdGlvbnMg
-dGhhdCBhcmUgbmVlZGVkIGJ5IGJvdGggRU4gYW5kIElCIHN1YnN5c3RlbXMgbGlrZSBRUHMsIENR
-cyBldGMuDQo+Pj4+IFRoZSBDTiBkcml2ZXIgaXMgaW5pdGlhbGl6ZWQgdmlhIGF1eGlsaWFyeSBi
-dXMgYnkgdGhlIGhhYmFuYWxhYnMgZHJpdmVyLg0KPj4+Pg0KPj4+PiBTaWduZWQtb2ZmLWJ5OiBP
-bWVyIFNocGlnZWxtYW4gPG9zaHBpZ2VsbWFuQGhhYmFuYS5haT4NCj4+Pj4gQ28tZGV2ZWxvcGVk
-LWJ5OiBBYmhpbGFzaCBLIFYgPGt2YWJoaWxhc2hAaGFiYW5hLmFpPg0KPj4+PiBTaWduZWQtb2Zm
-LWJ5OiBBYmhpbGFzaCBLIFYgPGt2YWJoaWxhc2hAaGFiYW5hLmFpPg0KPj4+PiBDby1kZXZlbG9w
-ZWQtYnk6IEFuZHJleSBBZ3Jhbm92aWNoIDxhYWdyYW5vdmljaEBoYWJhbmEuYWk+DQo+Pj4+IFNp
-Z25lZC1vZmYtYnk6IEFuZHJleSBBZ3Jhbm92aWNoIDxhYWdyYW5vdmljaEBoYWJhbmEuYWk+DQo+
-Pj4+IENvLWRldmVsb3BlZC1ieTogQmhhcmF0IEphdWhhcmkgPGJqYXVoYXJpQGhhYmFuYS5haT4N
-Cj4+Pj4gU2lnbmVkLW9mZi1ieTogQmhhcmF0IEphdWhhcmkgPGJqYXVoYXJpQGhhYmFuYS5haT4N
-Cj4+Pj4gQ28tZGV2ZWxvcGVkLWJ5OiBEYXZpZCBNZXJpaW4gPGRtZXJpaW5AaGFiYW5hLmFpPg0K
-Pj4+PiBTaWduZWQtb2ZmLWJ5OiBEYXZpZCBNZXJpaW4gPGRtZXJpaW5AaGFiYW5hLmFpPg0KPj4+
-PiBDby1kZXZlbG9wZWQtYnk6IFNhZ2l2IE96ZXJpIDxzb3plcmlAaGFiYW5hLmFpPg0KPj4+PiBT
-aWduZWQtb2ZmLWJ5OiBTYWdpdiBPemVyaSA8c296ZXJpQGhhYmFuYS5haT4NCj4+Pj4gQ28tZGV2
-ZWxvcGVkLWJ5OiBadmlrYSBZZWh1ZGFpIDx6eWVodWRhaUBoYWJhbmEuYWk+DQo+Pj4+IFNpZ25l
-ZC1vZmYtYnk6IFp2aWthIFllaHVkYWkgPHp5ZWh1ZGFpQGhhYmFuYS5haT4NCj4+Pj4gLS0tDQo+
-Pj4+ICAgLi4uL2RldmljZV9kcml2ZXJzL2V0aGVybmV0L2luZGV4LnJzdCAgICAgICAgIHwgICAg
-MSArDQo+Pj4+ICAgLi4uL2RldmljZV9kcml2ZXJzL2V0aGVybmV0L2ludGVsL2hibC5yc3QgICAg
-IHwgICA4MiArDQo+Pj4+ICAgTUFJTlRBSU5FUlMgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIHwgICAxMSArDQo+Pj4+ICAgZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvS2NvbmZp
-ZyAgICAgICAgICAgIHwgICAyMCArDQo+Pj4+ICAgZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwv
-TWFrZWZpbGUgICAgICAgICAgIHwgICAgMSArDQo+Pj4+ICAgZHJpdmVycy9uZXQvZXRoZXJuZXQv
-aW50ZWwvaGJsX2NuL01ha2VmaWxlICAgIHwgICAgOSArDQo+Pj4+ICAgLi4uL25ldC9ldGhlcm5l
-dC9pbnRlbC9oYmxfY24vY29tbW9uL01ha2VmaWxlIHwgICAgMyArDQo+Pj4+ICAgLi4uL25ldC9l
-dGhlcm5ldC9pbnRlbC9oYmxfY24vY29tbW9uL2hibF9jbi5jIHwgNTk1NCArKysrKysrKysrKysr
-KysrKw0KPj4+PiAgIC4uLi9uZXQvZXRoZXJuZXQvaW50ZWwvaGJsX2NuL2NvbW1vbi9oYmxfY24u
-aCB8IDE2MjcgKysrKysNCj4+Pj4gICAuLi4vZXRoZXJuZXQvaW50ZWwvaGJsX2NuL2NvbW1vbi9o
-YmxfY25fZHJ2LmMgfCAgMjIwICsNCj4+Pj4gICAuLi4vaW50ZWwvaGJsX2NuL2NvbW1vbi9oYmxf
-Y25fbWVtb3J5LmMgICAgICAgfCAgIDQwICsNCj4+Pj4gICAuLi4vZXRoZXJuZXQvaW50ZWwvaGJs
-X2NuL2NvbW1vbi9oYmxfY25fcGh5LmMgfCAgIDMzICsNCj4+Pj4gICAuLi4vZXRoZXJuZXQvaW50
-ZWwvaGJsX2NuL2NvbW1vbi9oYmxfY25fcXAuYyAgfCAgIDEzICsNCj4+Pj4gICBpbmNsdWRlL2xp
-bnV4L2hhYmFuYWxhYnMvY3B1Y3BfaWYuaCAgICAgICAgICAgfCAgMTI1ICstDQo+Pj4+ICAgaW5j
-bHVkZS9saW51eC9oYWJhbmFsYWJzL2hsX2Jvb3RfaWYuaCAgICAgICAgIHwgICAgOSArLQ0KPj4+
-PiAgIGluY2x1ZGUvbGludXgvbmV0L2ludGVsL2NuLmggICAgICAgICAgICAgICAgICB8ICA0NzQg
-KysNCj4+Pj4gICBpbmNsdWRlL2xpbnV4L25ldC9pbnRlbC9jbl9hdXguaCAgICAgICAgICAgICAg
-fCAgMjk4ICsNCj4+Pj4gICBpbmNsdWRlL2xpbnV4L25ldC9pbnRlbC9jbmkuaCAgICAgICAgICAg
-ICAgICAgfCAgNjM2ICsrDQo+Pj4+ICAgMTggZmlsZXMgY2hhbmdlZCwgOTU0NSBpbnNlcnRpb25z
-KCspLCAxMSBkZWxldGlvbnMoLSkNCj4+Pg0KPj4+IHRoaXMgaXMgYSB2ZXJ5IGJpZyBwYXRjaCwg
-aXQgYXNrcyBmb3IgYSBzcGxpdDsgd2hhdCdzIHdvcnNlLCBpdCdzDQo+Pj4gcHJvcG9ydGlvbmFs
-IHRvIHRoZSBzaXplIG9mIHRoaXMgc2VyaWVzOg0KPj4+ICAxNDYgZmlsZXMgY2hhbmdlZCwgMTQ4
-NTE0IGluc2VydGlvbnMoKyksIDcwIGRlbGV0aW9ucygtKQ0KPj4+IHdoaWNoIGlzIGp1c3QgdG9v
-IGJpZw0KPj4+DQo+Pj4gWy4uLl0NCj4+Pg0KPj4NCj4+IFllYWgsIHdlbGwgSSdtIGxpbWl0ZWQg
-dG8gMTUgcGF0Y2hlcyBwZXIgcGF0Y2ggc2V0IGFjY29yZGluZyB0byB0aGUga2VybmVsDQo+PiBk
-b2Mgc28gSSBoYWQgdG8gaGF2ZSB0aGlzIGJpZyBwYXRjaC4NCj4+IE91ciBjaGFuZ2VzIGFyZSBj
-b250YWluZWQgaW4gNCBkaWZmZXJlbnQgZHJpdmVycyBhbmQgYWxsIG9mIHRoZSBjaGFuZ2VzDQo+
-PiBzaG91bGQgYmUgbWVyZ2VkIHRvZ2V0aGVyIHNvIHRoZSBIVyB3aWxsIGJlIG9wZXJhdGlvbmFs
-Lg0KPj4gSGVuY2UgSSBoYWQgdG8gc3F1ZWV6ZSBzb21lIGNvZGUgdG8gYSBiaWcgcGF0Y2guDQo+
-IA0KPiBTdWJtaXQgeW91ciBjb2RlIGluIG11bHRpcGxlIHN0ZXBzLiBPbmUgZHJpdmVyIGF0IGEg
-dGltZS4NCj4gDQo+IFRoYW5rcw0KDQpJIGNhbiBwdXNoIGVhY2ggZHJpdmVyIGF0IGEgdGltZSBi
-dXQgaXQgaXMgbWlzc2luZyB0aGUgYmlnIGNvbnRleHQuIEV2ZXJ5DQpzaW5nbGUgZHJpdmVyIGlz
-IHVzZWxlc3Mgd2l0aG91dCB0aGUgb3RoZXJzIChvciBhdCBsZWFzdCBhIHN1YnNldCBvZg0KdGhl
-bSkuDQpCdXQgSSdsbCBkbyB0aGF0IGFueXdheSBzbyBpdCB3aWxsIGJlIHBvc3NpYmxlIHRvIHJl
-dmlldy4NClRoYW5rcy4NCg==
+On Mon, Jun 17, 2024 at 12:44:45PM GMT, Ilya Maximets wrote:
+> On 6/3/24 20:56, Adrian Moreno wrote:
+> > Add support for a new action: emit_sample.
+> >
+> > This action accepts a u32 group id and a variable-length cookie and uses
+> > the psample multicast group to make the packet available for
+> > observability.
+> >
+> > The maximum length of the user-defined cookie is set to 16, same as
+> > tc_cookie, to discourage using cookies that will not be offloadable.
+> >
+> > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> > ---
+> >  Documentation/netlink/specs/ovs_flow.yaml | 17 ++++++++
+> >  include/uapi/linux/openvswitch.h          | 25 ++++++++++++
+> >  net/openvswitch/actions.c                 | 50 +++++++++++++++++++++++
+> >  net/openvswitch/flow_netlink.c            | 33 ++++++++++++++-
+> >  4 files changed, 124 insertions(+), 1 deletion(-)
+>
+> Some nits below, beside ones already mentioned.
+>
+
+Thanks, Ilya.
+
+> >
+> > diff --git a/Documentation/netlink/specs/ovs_flow.yaml b/Documentation/netlink/specs/ovs_flow.yaml
+> > index 4fdfc6b5cae9..a7ab5593a24f 100644
+> > --- a/Documentation/netlink/specs/ovs_flow.yaml
+> > +++ b/Documentation/netlink/specs/ovs_flow.yaml
+> > @@ -727,6 +727,12 @@ attribute-sets:
+> >          name: dec-ttl
+> >          type: nest
+> >          nested-attributes: dec-ttl-attrs
+> > +      -
+> > +        name: emit-sample
+> > +        type: nest
+> > +        nested-attributes: emit-sample-attrs
+> > +        doc: |
+> > +          Sends a packet sample to psample for external observation.
+> >    -
+> >      name: tunnel-key-attrs
+> >      enum-name: ovs-tunnel-key-attr
+> > @@ -938,6 +944,17 @@ attribute-sets:
+> >        -
+> >          name: gbp
+> >          type: u32
+> > +  -
+> > +    name: emit-sample-attrs
+> > +    enum-name: ovs-emit-sample-attr
+> > +    name-prefix: ovs-emit-sample-attr-
+> > +    attributes:
+> > +      -
+> > +        name: group
+> > +        type: u32
+> > +      -
+> > +        name: cookie
+> > +        type: binary
+> >
+> >  operations:
+> >    name-prefix: ovs-flow-cmd-
+> > diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
+> > index efc82c318fa2..a0e9dde0584a 100644
+> > --- a/include/uapi/linux/openvswitch.h
+> > +++ b/include/uapi/linux/openvswitch.h
+> > @@ -914,6 +914,30 @@ struct check_pkt_len_arg {
+> >  };
+> >  #endif
+> >
+> > +#define OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE 16
+> > +/**
+> > + * enum ovs_emit_sample_attr - Attributes for %OVS_ACTION_ATTR_EMIT_SAMPLE
+> > + * action.
+> > + *
+> > + * @OVS_EMIT_SAMPLE_ATTR_GROUP: 32-bit number to identify the source of the
+> > + * sample.
+> > + * @OVS_EMIT_SAMPLE_ATTR_COOKIE: A variable-length binary cookie that contains
+> > + * user-defined metadata. The maximum length is 16 bytes.
+>
+> s/16/OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE/
+>
+> > + *
+> > + * Sends the packet to the psample multicast group with the specified group and
+> > + * cookie. It is possible to combine this action with the
+> > + * %OVS_ACTION_ATTR_TRUNC action to limit the size of the packet being emitted.
+> > + */
+> > +enum ovs_emit_sample_attr {
+> > +	OVS_EMIT_SAMPLE_ATTR_UNPSEC,
+> > +	OVS_EMIT_SAMPLE_ATTR_GROUP,	/* u32 number. */
+> > +	OVS_EMIT_SAMPLE_ATTR_COOKIE,	/* Optional, user specified cookie. */
+> > +	__OVS_EMIT_SAMPLE_ATTR_MAX
+> > +};
+> > +
+> > +#define OVS_EMIT_SAMPLE_ATTR_MAX (__OVS_EMIT_SAMPLE_ATTR_MAX - 1)
+> > +
+> > +
+> >  /**
+> >   * enum ovs_action_attr - Action types.
+> >   *
+> > @@ -1004,6 +1028,7 @@ enum ovs_action_attr {
+> >  	OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
+> >  	OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
+> >  	OVS_ACTION_ATTR_DROP,         /* u32 error code. */
+> > +	OVS_ACTION_ATTR_EMIT_SAMPLE,  /* Nested OVS_EMIT_SAMPLE_ATTR_*. */
+> >
+> >  	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
+> >  				       * from userspace. */
+> > diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+> > index 964225580824..3b4dba0ded59 100644
+> > --- a/net/openvswitch/actions.c
+> > +++ b/net/openvswitch/actions.c
+> > @@ -24,6 +24,11 @@
+> >  #include <net/checksum.h>
+> >  #include <net/dsfield.h>
+> >  #include <net/mpls.h>
+> > +
+> > +#if IS_ENABLED(CONFIG_PSAMPLE)
+> > +#include <net/psample.h>
+> > +#endif
+> > +
+> >  #include <net/sctp/checksum.h>
+> >
+> >  #include "datapath.h"
+> > @@ -1299,6 +1304,46 @@ static int execute_dec_ttl(struct sk_buff *skb, struct sw_flow_key *key)
+> >  	return 0;
+> >  }
+> >
+> > +static int execute_emit_sample(struct datapath *dp, struct sk_buff *skb,
+> > +			       const struct sw_flow_key *key,
+> > +			       const struct nlattr *attr)
+> > +{
+> > +#if IS_ENABLED(CONFIG_PSAMPLE)
+> > +	struct psample_group psample_group = {};
+> > +	struct psample_metadata md = {};
+> > +	struct vport *input_vport;
+> > +	const struct nlattr *a;
+> > +	int rem;
+> > +
+> > +	for (a = nla_data(attr), rem = nla_len(attr); rem > 0;
+> > +	     a = nla_next(a, &rem)) {
+>
+> Since the action is strictly validated, can use use nla_for_each_attr()
+> or nla_for_each_nested() ?
+>
+
+Probably, yes.
+
+> > +		switch (nla_type(a)) {
+> > +		case OVS_EMIT_SAMPLE_ATTR_GROUP:
+> > +			psample_group.group_num = nla_get_u32(a);
+> > +			break;
+> > +
+> > +		case OVS_EMIT_SAMPLE_ATTR_COOKIE:
+> > +			md.user_cookie = nla_data(a);
+> > +			md.user_cookie_len = nla_len(a);
+> > +			break;
+> > +		}
+> > +	}
+> > +
+> > +	psample_group.net = ovs_dp_get_net(dp);
+> > +
+> > +	input_vport = ovs_vport_rcu(dp, key->phy.in_port);
+> > +	if (!input_vport)
+> > +		input_vport = ovs_vport_rcu(dp, OVSP_LOCAL);
+>
+> We may need to check that we actually found the local port.
+>
+
+Sure. What can cause the local port not to exist?
+
+> > +
+> > +	md.in_ifindex = input_vport->dev->ifindex;
+> > +	md.trunc_size = skb->len - OVS_CB(skb)->cutlen;
+> > +
+> > +	psample_sample_packet(&psample_group, skb, 0, &md);
+> > +#endif
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  /* Execute a list of actions against 'skb'. */
+> >  static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
+> >  			      struct sw_flow_key *key,
+> > @@ -1502,6 +1547,11 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
+> >  			ovs_kfree_skb_reason(skb, reason);
+> >  			return 0;
+> >  		}
+> > +
+> > +		case OVS_ACTION_ATTR_EMIT_SAMPLE:
+> > +			err = execute_emit_sample(dp, skb, key, a);
+> > +			OVS_CB(skb)->cutlen = 0;
+> > +			break;
+> >  		}
+> >
+> >  		if (unlikely(err)) {
+> > diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
+> > index f224d9bcea5e..eb59ff9c8154 100644
+> > --- a/net/openvswitch/flow_netlink.c
+> > +++ b/net/openvswitch/flow_netlink.c
+> > @@ -64,6 +64,7 @@ static bool actions_may_change_flow(const struct nlattr *actions)
+> >  		case OVS_ACTION_ATTR_TRUNC:
+> >  		case OVS_ACTION_ATTR_USERSPACE:
+> >  		case OVS_ACTION_ATTR_DROP:
+> > +		case OVS_ACTION_ATTR_EMIT_SAMPLE:
+> >  			break;
+> >
+> >  		case OVS_ACTION_ATTR_CT:
+> > @@ -2409,7 +2410,7 @@ static void ovs_nla_free_nested_actions(const struct nlattr *actions, int len)
+> >  	/* Whenever new actions are added, the need to update this
+> >  	 * function should be considered.
+> >  	 */
+> > -	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 24);
+> > +	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 25);
+> >
+> >  	if (!actions)
+> >  		return;
+> > @@ -3157,6 +3158,29 @@ static int validate_and_copy_check_pkt_len(struct net *net,
+> >  	return 0;
+> >  }
+> >
+> > +static int validate_emit_sample(const struct nlattr *attr)
+> > +{
+> > +	static const struct nla_policy policy[OVS_EMIT_SAMPLE_ATTR_MAX + 1] = {
+> > +		[OVS_EMIT_SAMPLE_ATTR_GROUP] = { .type = NLA_U32 },
+> > +		[OVS_EMIT_SAMPLE_ATTR_COOKIE] = {
+> > +			.type = NLA_BINARY,
+> > +			.len = OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE
+>
+> Maybe add a trailing comma here as well, since it's not a one-line definition.
+> Just in case.
+>
+
+Sure.
+
+> > +		},
+> > +	};
+> > +	struct nlattr *a[OVS_EMIT_SAMPLE_ATTR_MAX  + 1];
+>
+> One too many spaces                              ^^
+>
+
+Thanks.
+
+> > +	int err;
+> > +
+> > +	if (!IS_ENABLED(CONFIG_PSAMPLE))
+> > +		return -EOPNOTSUPP;
+> > +
+> > +	err = nla_parse_nested(a, OVS_EMIT_SAMPLE_ATTR_MAX, attr, policy,
+> > +			       NULL);
+> > +	if (err)
+> > +		return err;
+> > +
+> > +	return a[OVS_EMIT_SAMPLE_ATTR_GROUP] ? 0 : -EINVAL;
+> > +}
+> > +
+> >  static int copy_action(const struct nlattr *from,
+> >  		       struct sw_flow_actions **sfa, bool log)
+> >  {
+> > @@ -3212,6 +3236,7 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
+> >  			[OVS_ACTION_ATTR_ADD_MPLS] = sizeof(struct ovs_action_add_mpls),
+> >  			[OVS_ACTION_ATTR_DEC_TTL] = (u32)-1,
+> >  			[OVS_ACTION_ATTR_DROP] = sizeof(u32),
+> > +			[OVS_ACTION_ATTR_EMIT_SAMPLE] = (u32)-1,
+> >  		};
+> >  		const struct ovs_action_push_vlan *vlan;
+> >  		int type = nla_type(a);
+> > @@ -3490,6 +3515,12 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
+> >  				return -EINVAL;
+> >  			break;
+> >
+> > +		case OVS_ACTION_ATTR_EMIT_SAMPLE:
+> > +			err = validate_emit_sample(a);
+> > +			if (err)
+> > +				return err;
+> > +			break;
+> > +
+> >  		default:
+> >  			OVS_NLERR(log, "Unknown Action type %d", type);
+> >  			return -EINVAL;
+>
+
 
