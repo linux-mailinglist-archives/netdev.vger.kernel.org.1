@@ -1,196 +1,293 @@
-Return-Path: <netdev+bounces-104552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A723C90D392
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:08:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A985A90D57C
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:39:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32EBB286C28
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 14:08:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB6FBB25CEC
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 14:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0471B1991CB;
-	Tue, 18 Jun 2024 13:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63FFE19D09D;
+	Tue, 18 Jun 2024 13:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="H5oo0uMz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aePpCj3U"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3DCA13A899;
-	Tue, 18 Jun 2024 13:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718718576; cv=none; b=j8xKqyQI/JzjNjdVGniY/osxYVJozMil+N7Vqcdl82bAnl9XZLtXwbE+r6kJmp/83oE/1iHQL32u7XemYIaGbF7iZpZ6jQv0ylr3d/sNkPCMLiSd421Es03932FnhCnUsi1lVlsQvqc2R4b2DeGtd8KOsCIaQDJ8qS6XNGpQn4E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718718576; c=relaxed/simple;
-	bh=2Gh42P65F4M62z4zrr6A450lagcXTdXdAmZ6brdw7kM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tcGjCSkfdYT5UXcwq3rnIfyHvh0ILku25ENZLmOnQmeopbyWpIDKPiKuoaDQgc7TnQKk/pk7Qsf5EYD24S6xLJM+mexkaSzXfISK9xQGLp+Y5UmI9cD8Oynp0DnkZIDzcmuS8UElvfliIXxYKpfSleFtDllz2tiNv+OOCqROnUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=H5oo0uMz; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 2E34A8786C;
-	Tue, 18 Jun 2024 15:49:30 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1718718571;
-	bh=7L0RwYFtaSvc1XTo/PTgwck491NQdc26UYc5Z/uRAPk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H5oo0uMzhcdf6MZTiOZZ9245jhl7UKw3n3rOGVHJ24XQmLZtsWDGTzbd7reBPo3bO
-	 k7zaVRKp43gI+7ICR2JCyOG8e+2F6PzBP4flv/UzwYCS5m8gENo6Yx6rTmOv55uWm8
-	 BoGrd5sUkKZIWAgOXX3Px+8kmJarPesdhu5K2i1a9d1wDx2ErCLuEdO8KHJ2qPJEDe
-	 J4g0HLCx98HNpr2e+bTCnkzHmZ1s5TjgN6+E3uTVR4VDkHLJbH7+UbuwBv4KSj69+j
-	 unIea25fVI7E9S0RUKhnAHAGT7a0gPrNg7rCVqzUZodOyjT4gygaWDLn81E8b4Tqw5
-	 uVQ3Xpc4uxtjA==
-Date: Tue, 18 Jun 2024 15:49:28 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, Oleksij
- Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com, Sebastian
- Andrzej Siewior <bigeasy@linutronix.de>, Simon Horman <horms@kernel.org>,
- "Ricardo B. Marliere" <ricardo@marliere.net>, Casper Andersson
- <casper.casan@gmail.com>, linux-kernel@vger.kernel.org, Woojung Huh
- <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [PATCH v1 net-next] net: dsa: Allow only up to two HSR HW
- offloaded ports for KSZ9477
-Message-ID: <20240618154928.29f631e6@wsk>
-In-Reply-To: <339031f6-e732-43b4-9e83-0e2098df65ef@moroto.mountain>
-References: <20240618130433.1111485-1-lukma@denx.de>
-	<339031f6-e732-43b4-9e83-0e2098df65ef@moroto.mountain>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8644A159205
+	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 13:50:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718718605; cv=fail; b=UucFEFR0cAErrvZBwqJRWk8D4K+T5ztlB+hnQQkubxK9Ii8bX93HMe8R1RpT3s7Ig8aFhiwNfETGUJxm7ZgV9tqqCOnsYTx5QOZjWWspErfrl1iBQofNVA+cVFJjjpMTMerzzU8fPc59bCkcrN3INLjAYyW6NAwnpJdP4OM/EV4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718718605; c=relaxed/simple;
+	bh=XKYjAsKRs1adMwNCWld0ontnlCux+uB5hk4ST+JKFbQ=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=mon5jnaQHbrhVdO7gemIv162aLmlJqr87Ny6bw1UJlZGCWJrJcuNcDD12UUWdHmv2WN6aSVYE8d+yL1UkKr41tJ7LePZ2dYY4uaSKovTRftZZ3VzSK5rdRxiWISX5K75X4WM0v/AWHMce/T1KJh9zDstRkZ6uHgB8KaLH04ZfoM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aePpCj3U; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718718603; x=1750254603;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=XKYjAsKRs1adMwNCWld0ontnlCux+uB5hk4ST+JKFbQ=;
+  b=aePpCj3UaclefYe78wEfJF6d78ZNBeCJ4fXcqEIhxa9vB1KpsSIP/ugn
+   xdzIiqiRlWKl4PejqT8kTT8gObrlf8jYvWMFAaMXUrsBCY14cNdy5+LJC
+   9zo1UXUO27yvco8rWjz6yKvlkKf4CgFzrVkDcFPpjbzTb0yJ8+RJ05NuX
+   3qbRpr4TT6FIzXoDZDN5lLXQlug1lj73+03TdPGTooitCcuaOMcp5roB1
+   VGG5l0czDzNu6BlUm12Rb6PNqzylV7T81io/dVq5yPQLPImDyme9GkONZ
+   E9E1Cm2ggpYN/6guiOSNwPP/VZQAAI7uYrAEpK9VxT9UeaoGzg8HhV3re
+   g==;
+X-CSE-ConnectionGUID: +SYF9WTmR+OCuy5tPAs6Tg==
+X-CSE-MsgGUID: 4DklR+3CTDOXbAmeBLUAtw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11107"; a="33133686"
+X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
+   d="scan'208";a="33133686"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2024 06:50:03 -0700
+X-CSE-ConnectionGUID: kbYGdOTITkquu5KQj02C8g==
+X-CSE-MsgGUID: VQKkNtsvQUWYW5qSKyvtfw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
+   d="scan'208";a="46104952"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Jun 2024 06:50:03 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 18 Jun 2024 06:50:02 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 18 Jun 2024 06:50:02 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 18 Jun 2024 06:50:02 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 18 Jun 2024 06:50:02 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=H16g+VkjPBZ53IGdZkGxCPZlLtjztRqvUQNmP2IJvF/ez1SDwFGYMWLUJlf3YwIlz0D0/g3x5Pi1LFNg594CA5mHa6AIMWoVSFv0pAtk9PBbqvetdzotX+s5+ttl6TVHNsRq2VxpkItNu1d+LQXMLG7oVf+Ng7GehwX5ZZO+YJaR/haNDMKKfygAYFdle0j2l8uqvzxWEI2YBIkYuG1hgEc9NdQXQn+hdTae2GNEqGU8NfVL47FkgolHs1q/zIs2Eu4HeFK2D4YT5qvhOwmf2U7R0p1PRoU/sxpbiyBwuvi8cEiokOLiHXR5LBM53iPjA5AV1nyVRFaipyAyzTTrOQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fHzNatcUxYF2mLWbFjqOg7f7VW4RioErGAY9z/Dx/ao=;
+ b=NU5VoXFLBul0C0fBg7SxyHehPo7SmsfdYTU3Yo1j+DgZs0bDqQUNNys+NRQfYrkdpXwS2mWOWbQNSJecVW19dn3+7FDT7TpjdTpGmcqzTcKyjfESPNPhGi9E4Laj+eE27YTG624wLV5EgVTKxxeFobRH202iC2nmrC7ScWgDcQkbhQeGmNyrBuB+X5RylskGGFuqbhHUXJPt1BGYfMJJzz1SJ9mlMga+ER+M0s5eG5xcoQ6eL4B7l3dnrcbBeXHBwxmffEmSe+ARU/0GEj82yab79L5tVQ6sXS+VOMIfuqp8PARv0S2ItPsBAVCyUxghdzFhdI2l+/hZc9bmu4WelA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by CYYPR11MB8388.namprd11.prod.outlook.com (2603:10b6:930:c2::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31; Tue, 18 Jun
+ 2024 13:50:00 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.7698.017; Tue, 18 Jun 2024
+ 13:50:00 +0000
+Message-ID: <07519e33-23e8-48b1-a445-c128b40e1c36@intel.com>
+Date: Tue, 18 Jun 2024 15:49:54 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v4] i40e: fix hot issue NVM
+ content is corrupted after nvmupdate
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	<anthony.l.nguyen@intel.com>
+CC: <netdev@vger.kernel.org>, Kelvin Kang <kelvin.kang@intel.com>, "Arkadiusz
+ Kubalewski" <arkadiusz.kubalewski@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+References: <20240618132111.3193963-1-aleksandr.loktionov@intel.com>
+Content-Language: en-US
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <20240618132111.3193963-1-aleksandr.loktionov@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR04CA0128.eurprd04.prod.outlook.com
+ (2603:10a6:803:f0::26) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Xk=wfuMJ3pzqQq/ynaJuO7z";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|CYYPR11MB8388:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9b5c4730-79d3-4fe7-86e2-08dc8f9d8c26
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230037|1800799021|366013|376011;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?Nyt3QjkvZ253M0JNRFczWHViSjBsZThpR0k0dENSb0dHZk1aU0pQR3owOG9D?=
+ =?utf-8?B?VUtya1o5dnFzYVhON0tYSDh2Si85VFdqYnh0SzRGV2dzZHV1emFZVjFmQnVB?=
+ =?utf-8?B?VU9nMzRaM1g5aENRR3RxejJaamhCc250dlZGNW1IUE4rbUM2YVVkWkdFblNE?=
+ =?utf-8?B?YkhRcHBrWFdZemgxM2UwMFVTRVRYLzR3Sk9ZK0NWd2I3aFJtM1hJcDRwSFI5?=
+ =?utf-8?B?Y2p6WVRpSW5vWU91SDNTYmQwYjlTMm1xelZnTTBoM2JEZ082ZTRlaWdibWg1?=
+ =?utf-8?B?MThuaUxybHpIUVNQbVFmMnE4YnJ2K0J3cEt1RnBUL2ZjMWRTNXJyMWZucW9w?=
+ =?utf-8?B?andTc2dpYnRRcGNLNVB5aWh0SUxSOEhPTURtczNvSm85T2tLcjV6dllLRkZ2?=
+ =?utf-8?B?akNsQVlPZkgyWWJoM01ybHFHSVN0a0VIMUpUajhEOVd6MlQzalhpZCtlM2E4?=
+ =?utf-8?B?SVdKNmU1TjZxeUU0RGNpc2ltdkpkM0c3OGxNcVVCMlJpbmZjMzVsdG50d01k?=
+ =?utf-8?B?bG43ZGU1WFkyZzdMZlFMTE95bU1UdEppc1E3K1JUVlc5UDhCN1hVL3pnY0gz?=
+ =?utf-8?B?OWkwSzMwejBrQnkxUTczdXFNR29PZUZZc09VMEc2Q0JnT1JUTys5bkdJbjcv?=
+ =?utf-8?B?b2dLYVlWWk9hMk40aGJIMVBGdWliZ2FnaGhKQ2k5WjdaUmE2Skc0OFE0M0dN?=
+ =?utf-8?B?N2JwWDYrbjJKSUQwamFiR2EvWnBxbWVDQXpzVGswNXkxU2JhQ2NBZVRMSktr?=
+ =?utf-8?B?Z0k4TnhhTm1CTDk0U2tuVlVLelo1T1c4Y0FDb3F6d2xmbmdrUCtvK0tLZU5O?=
+ =?utf-8?B?M1JvQmdTanpNRlFvYlRmYzhJYWJSK3hqTTE0NmR6R25mMitQaXhTTStSblV4?=
+ =?utf-8?B?ZHY3L1ZhQkRrY0JyTlFydEFwdWMrQ2FDT1d0RFdSVVo2emJMSmpoc1pOZE5I?=
+ =?utf-8?B?VGNMNmlWMlBLT0dpZTlaa3FjcXQxQU1Zb1d6UG5KYUhjTlB2dTBOd2hYWS85?=
+ =?utf-8?B?aURySHAxK20xaDFpLzVaOEVZRy9jTnpmaG5UamJ4Yi9xczYyOVYydzl1UHlK?=
+ =?utf-8?B?VUNKemtDOVBpTVNjTk0wVHFVdGZER254VmpQL3dtbDJSckFiazBsMjczaDhR?=
+ =?utf-8?B?UklaWHpMWlNQUWlOa091V0tzcC91T1lDbXVsd3BJMC94QkJsSElUZ0M5R21u?=
+ =?utf-8?B?bk16aXFVaXRPL3BQTTY4REFFaDIvVTR6QWwzLzR2VG9RbndMd0xaZituNGx6?=
+ =?utf-8?B?U3ZiYVkzSkJYK1UzVzhyY1pBdktPOGRUczJ0bFRwSHR1SGpVdkpaZ1BOTWlo?=
+ =?utf-8?B?eHNrRHBPbE5YZTEzWng4V0J1dXdkMUtFd2dwcGIvYWd5blZweXh2emxxK2VG?=
+ =?utf-8?B?L29jaUMxNmprUUZFSkZhRDQ4dllVVE1VOXN4M2xWcDdjdGUxRmYzaWRRdWF1?=
+ =?utf-8?B?RFpoUTJ5Qm54M3packdlVndzeTN4MDJ0Si9EVDBpMXNIVDNXcXpNQzVWS3A1?=
+ =?utf-8?B?VTRBcjl2cS81V0Q5VnZvNkp3TUZWNE83b1VnSFlWN1VQWVZvc2lvWm9oNDNV?=
+ =?utf-8?B?dzBjNzBxV2NxbzhFWjBiblZ3WlFFbk5BYkFmN1plcTBPOG5WdXlwZWtxVDRW?=
+ =?utf-8?B?eE5DcmZkMFZIK1huVmxJZW14L2dhOEJlYzYzQzZOSDliSmdieDdCczBZZWg3?=
+ =?utf-8?Q?e4MBh1u56IB1gzPy+Q4J?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(1800799021)(366013)(376011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZHZQSkxzR0RIWWJrTk4xL0p0d09FNERIWmNDQlpNWmdVVGVHOGNub2R3RW9k?=
+ =?utf-8?B?djV5WTB6dzkyZk9SWURVTWZHRzIvZDlXek03VUV2Z0RJZEQxeTdwazV1Y2do?=
+ =?utf-8?B?WUkydW81YWVhV1R3M01pTHh4NDFIQUxDQmNPYXY5cms1SytWeDdwVmVyaGpi?=
+ =?utf-8?B?WlRIRUVnQk55VGlWdDhHRmFZTk04Sk9oc0Z5eTBXWk5YbmMyRGRIQTlrREhY?=
+ =?utf-8?B?Y09OOUU2M0w0UnBNNXdoblNZRGdqWHNZQnMrdVVneDRhTFM5bEZ3Qm5CMlla?=
+ =?utf-8?B?R2xXdFRNN2FQUUM4ckYrbFZqUURpZVAwcXJRV3p3b0t0WlB2TjM1enFNRndn?=
+ =?utf-8?B?U3NGWUVRQ2ZtdXE5NmZMSHRMZ0cwbG91Y3pxVnlRMk5yV0lhTVhXVU1hOGhi?=
+ =?utf-8?B?ZzVjZEtLSWNBR01PdWNnYithYXA1c1F4d1VsRlZoSTRhTlJWYTdDM1RMa1Vh?=
+ =?utf-8?B?bEc2b2hNOGJBUXdSL01PelNSaDNucnNlbzFVSnIwYVBNa3g5dDBGNC9hamUr?=
+ =?utf-8?B?Wld6Uy9TWGREN05IME14ZUNHZTRQY0JlVXdySm41cmM3TzRNejUrSmV1R2FF?=
+ =?utf-8?B?N2hGNi80UzQ0OHFyZWdjSHhEZUdvbDliRHh5NkFOczJ5aGp1VCtkRVJSU3d2?=
+ =?utf-8?B?Z01HNUh1MDBhY3lqaVpEbmlpZGlSRWwvNFJQMnFLYWlkK3B2VW1hdVlCdTNn?=
+ =?utf-8?B?MStETG92L1VaMFFCRkFTU0c5VWF1VzI1RjBqR0xNVlNPZjJCbTFsOWlqaHI0?=
+ =?utf-8?B?RUpCWFo0SU5TMFNZYmtWTzh2RThSMHZ1cjlyRE1xaWxqZEE2cFo5SzNNRkc3?=
+ =?utf-8?B?YXRDdmtOTERTdFdYbWZUTXowUms2cTR5dXo4Vkt4STdUNTlvL1VCTUFSR1lK?=
+ =?utf-8?B?eWJKNXpSeFBVS3JXcStSSFNGMThNaGc5TDBDc3Y1OUF1dldrc0tDMmtITlBF?=
+ =?utf-8?B?YVdTTWhXc1NUOUtueHh6L0FxekFHNnpHSzdrODcweG8yU3c2Q0U3VWN2YTRO?=
+ =?utf-8?B?S0xqZG5IUXREaHVGYTRpbHdSRzErY3dkK044S21KQTFGS0gramVwbnFYQ1Iz?=
+ =?utf-8?B?c1BreVhDT0JiZVN5a2FmVmJyMzZ5TTRpdE82WkRGTlYrTXZOMUJyTytwREQ4?=
+ =?utf-8?B?UEZMdHk1cFNoYkFIeXkxZ3ZGMDFEbzJXQmQ2cERleGt4UjBGTFRNWTlHQXdi?=
+ =?utf-8?B?VzhHbElYa25WSUNZZGNjNS8rQkNEWjh4cUlyaG5SOFc1Y2FWRkZUUVZUVnN4?=
+ =?utf-8?B?T3d5ZEk2anF0RWNZMVlTUWRiVEJiL1h6cmpDWWxzUEMzcVpqeDhtdVpiS2k4?=
+ =?utf-8?B?QUZnYjNrVHV3RDVBa0g5aVNOSmdPTkZ3VGpEUDJMR1ladUcxQUNHYTVLSjZW?=
+ =?utf-8?B?WlFGUVRjNmFSbTFibGpCNFgweDVjbytqR29Wb2o0WlJpNmxXMFo1U0dhemZJ?=
+ =?utf-8?B?RGkwOXAyaXB0WDNTMTZhWUdod0xBTmIvclVBbWFyb2Y1dC8rdFJLL2hqcUtT?=
+ =?utf-8?B?MEVRZnJLblBSazl3Y0JEYlRVcmlGMWsyT1ZneDhLVTJIRVA4eDE1Yzg3ZFIv?=
+ =?utf-8?B?c1NrUTlRVHAxRGplYjdFaHoyblV6YSt3MDhpRWQ3U2hEWlJWeTE5a09kK0RB?=
+ =?utf-8?B?aFVmQ1dxZDZVdmN5MmtCWWZncmNadmRibERJVG9MZlF2N08xVHphczhoenFN?=
+ =?utf-8?B?TG9yekNCVDNvNUQyeFA3SkZGQWVHWGJacGNZckswR2wxVzNVSnZibHRKZjAw?=
+ =?utf-8?B?WjVyVFdxUktyWWRLUHlPNmwvNitUK2VORkovM3F4UmdZejhpRlRLYjI2V2to?=
+ =?utf-8?B?ZnZDLzA1dVlSVG9nRk54dk8veVkwcmM5ZmZmT2ZYeHlBaWNPdkkxRUFoVkZk?=
+ =?utf-8?B?OTRUOTNLZDZudDlxNStNM05pYk0vNFhSWXNadzN6eUMwL2w3cTVHbmNMclpP?=
+ =?utf-8?B?Z1JiRnJ1bEhucUY2WENlMmZzVExGNUVYN1BEZVhzWHhwNU0wSEt5V3VDUk8w?=
+ =?utf-8?B?WEhlZ1pYY2IzQS8vbWFpcEdKdndwSXRxMnR5aTNwbldUVmY1SDlzU0xFZU1a?=
+ =?utf-8?B?NkRBVitMUUlYMVZ1eGJVaEE0dXVabDZ0VUJJVURheWJTUlR0TG5GQzZCT2k0?=
+ =?utf-8?B?a2NVYTVxaUhDUDBZdGlURHUxSHo2TjgxZzhxd3NWSURUY2hkaXgySzdjcnJK?=
+ =?utf-8?Q?Q20FSI2Tr3EwLruEx9uB6zo=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9b5c4730-79d3-4fe7-86e2-08dc8f9d8c26
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2024 13:50:00.4591
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: B2iDrjRWNydOzTkQAGkKAWP1xg6Z47KJcxaXUyMZh6tHwdYx00SJqt4IRroGteCgMSbPP1a0krEY+AD52f1fmUQzrzBS12+sEYd5E6Wegvs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8388
+X-OriginatorOrg: intel.com
 
---Sig_/Xk=wfuMJ3pzqQq/ynaJuO7z
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 6/18/24 15:21, Aleksandr Loktionov wrote:
+> The bug affects users only at the time when they try to update NVM, and
+> only F/W versions that generate errors while nvmupdate. For example, X710DA2
+> with 0x8000ECB7 F/W is affected, but there are probably more...
+> 
+> Command for reproduction is just NVM update:
+>   ./nvmupdate64
 
-Hi Dan,
+nvmupdate64 is not an upstream tool, but it's fine to mention it here,
+as we don't have a better alternative for i40e as of now
 
-> On Tue, Jun 18, 2024 at 03:04:33PM +0200, Lukasz Majewski wrote:
-> > The KSZ9477 allows HSR in-HW offloading for any of two selected
-> > ports. This patch adds check if one tries to use more than two
-> > ports with HSR offloading enabled.
-> >=20
-> > Signed-off-by: Lukasz Majewski <lukma@denx.de> =20
->=20
-> Is this a bug fix?
+> 
+> In the log instead of:
+>   i40e_nvmupd_exec_aq err I40E_ERR_ADMIN_QUEUE_ERROR aq_err I40E_AQ_RC_ENOMEM)
+> appears:
+>   i40e_nvmupd_exec_aq err -EIO aq_err I40E_AQ_RC_ENOMEM
+> 
+> But the problematic code did silently convert EIO into EAGAIN which forced
+> nvmupdate to ignore EAGAIN error and retry the same operation until timeout.
+> That's why NVM update takes 20+ minutes to finish with the fail in the end.
 
-This seems to be fixing stuff, which was added earlier to next-next.
+this paragraph tells more about nvmupdate tool problems that the driver
 
+> 
+> After commit 230f3d53a547 ("i40e: remove i40e_status"), which should only
+> replace F/W specific error codes with Linux kernel generic, 
 
->  What is the impact for the user?
+> all EIO errors
+> suddenly started to be converted into EAGAIN
 
-Impact is that this board with this particular setup can just
-malfunction.
+all or just this one that you are fixing here?
 
->  Fixes tag?
+> which leads nvmupdate to retry
+> until it timeouts and sometimes fails after more than 20 minutes in the
+> middle of NVM update, so NVM becomes corrupted.
+> 
+> Remove wrong EIO to EGAIN conversion and pass all errors as is.
+> 
+> Fixes: 230f3d53a547 ("i40e: remove i40e_status")
 
-Ok.
+That is a proper tag, and the description makes it clear that we want
+the patch finally applied, thank you for the efforts to make it well
+described.
 
->  Add
-> this information to the commit message when you resend.
+> Co-developed-by: Kelvin Kang <kelvin.kang@intel.com>
+> Signed-off-by: Kelvin Kang <kelvin.kang@intel.com>
 
-I will wait a few days for input and then send v2.
+this 2 line removal was indeed developed by two of you?
 
-Thanks for the input.
+> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+> v3->v4 commit message update
 
->=20
-> > ---
-> >  drivers/net/dsa/microchip/ksz_common.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >=20
-> > diff --git a/drivers/net/dsa/microchip/ksz_common.c
-> > b/drivers/net/dsa/microchip/ksz_common.c index
-> > 2818e24e2a51..0d68f0a5bf19 100644 ---
-> > a/drivers/net/dsa/microchip/ksz_common.c +++
-> > b/drivers/net/dsa/microchip/ksz_common.c @@ -3913,6 +3913,9 @@
-> > static int ksz_hsr_join(struct dsa_switch *ds, int port, struct
-> > net_device *hsr, if (ret) return ret;
-> > =20
-> > +	if (dev->chip_id =3D=3D KSZ9477_CHIP_ID &&
-> > hweight8(dev->hsr_ports) > 1)
-> > +		return -EOPNOTSUPP; =20
->=20
-> Put this condition before the ksz_switch_macaddr_get().  Otherwise
-> we'd need to do a ksz_switch_macaddr_put().
->=20
-> If dev->chip_id !=3D KSZ9477_CHIP_ID then we would have already
-> returned. Really, that should be the first check in this function.
-> The hsr_get_version() should be moved to right before we use the
-> version. (But that's a separate issue, not related to this patch so
-> ignore it).
->=20
-> So do something like this but write a better error message.
->=20
-> regards,
-> dan carpenter
->=20
-> diff --git a/drivers/net/dsa/microchip/ksz_common.c
-> b/drivers/net/dsa/microchip/ksz_common.c index
-> 2818e24e2a51..181e81af3a78 100644 ---
-> a/drivers/net/dsa/microchip/ksz_common.c +++
-> b/drivers/net/dsa/microchip/ksz_common.c @@ -3906,6 +3906,11 @@
-> static int ksz_hsr_join(struct dsa_switch *ds, int port, struct
-> net_device *hsr, return -EOPNOTSUPP; }
-> =20
-> +	if (hweight8(dev->hsr_ports) > 1) {
-> +		NL_SET_ERR_MSG_MOD(extack, "Cannot offload more than
-> two ports (in use=3D0x%x)", dev->hsr_ports);
-> +		return -EOPNOTSUPP;
-> +	}
-> +
->  	/* Self MAC address filtering, to avoid frames traversing
->  	 * the HSR ring more than once.
->  	 */
->=20
->=20
+Please fix the subject line too, it's what will be the most frequently
+read part of your work, and with stay in git for decades. You could use:
+i40e: fix wrong error code replacement
 
+and add link in changelog section:
+v4: 
+https://lore.kernel.org/netdev/20240618132111.3193963-1-aleksandr.loktionov@intel.com/T/#u
 
+> v2->v3 commit messege typos
+> v1->v2 commit message update
+> ---
+>   drivers/net/ethernet/intel/i40e/i40e_adminq.h | 4 ----
+>   1 file changed, 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.h b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
+> index ee86d2c..55b5bb8 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_adminq.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
+> @@ -109,10 +109,6 @@ static inline int i40e_aq_rc_to_posix(int aq_ret, int aq_rc)
+>   		-EFBIG,      /* I40E_AQ_RC_EFBIG */
+>   	};
+>   
+> -	/* aq_rc is invalid if AQ timed out */
+> -	if (aq_ret == -EIO)
+> -		return -EAGAIN;
+> -
+>   	if (!((u32)aq_rc < (sizeof(aq_to_posix) / sizeof((aq_to_posix)[0]))))
+>   		return -ERANGE;
+>   
 
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/Xk=wfuMJ3pzqQq/ynaJuO7z
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmZxkGgACgkQAR8vZIA0
-zr1YQwf/S+xziRYqZaOOkBrR3AVVSMhUkTpDUf39rSwfVvfe1M2H3R8tmJvaJK96
-/dfLP6om6L97IizZPbHOCmGHoeMyby6x25pTo+1PndmzX6++LbaKSjcICv8zDWWk
-0XMSx+UYu0rSpN4Ua75bgoTsPTXVn0vbHyXFR6vIs4L4xWrjk8D0PD6lfhhmna65
-qqL+qQJu5BkIVCCFFnWgKpEk+oXGh68GCjPZmI05bbP6z/xVUJzQjetAK9RT2gQS
-de9mGsDpckXFVQkwyPsTY64IrgJ6X8UcXbScnlksvBEpkAQe4ZZ4d/lQ7TKX3dTX
-yW0+4WXPEY2HD8w7s1a1BMLFE53CDQ==
-=Nfig
------END PGP SIGNATURE-----
-
---Sig_/Xk=wfuMJ3pzqQq/ynaJuO7z--
 
