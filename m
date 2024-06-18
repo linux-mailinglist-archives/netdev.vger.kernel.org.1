@@ -1,183 +1,159 @@
-Return-Path: <netdev+bounces-104462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F211390C9D9
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:40:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D41290C9DB
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:40:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78D181F21E61
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:40:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24D1C1F22F93
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91221156F20;
-	Tue, 18 Jun 2024 10:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 204FE156C5E;
+	Tue, 18 Jun 2024 10:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KJOK0Lkl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o1ZTi43O"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF7614F10B
-	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 10:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AB7DDDA;
+	Tue, 18 Jun 2024 10:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718708101; cv=none; b=Xtvc+EtCdDuw42PHb65tqbYKTRwtmCt7INUvV7nregdT0M8s1nKPAcRPscAEsPlLT3AsrRdW94dooSvqTUWaYfHuBpHmmfNjDxt6cX2v5SyCOJ1ONn67uLG19wdIfKJ+68O87TUoowSPBJ9C9pxCnpOVyxpx/g9p9ywwKSgXqlc=
+	t=1718708226; cv=none; b=JTbZDBrbmi29nS/6AG5r6FYNUJZLFHJzTiaFRz+ITnA384fFkvbRZ6bMaV5o9byYLfTIQnDiNN7jTY3zUwjTwx4sZqncXZcJ6W2FmuolhUFEG1cbpLTbo8wiRdBplNa3oJBK/04HpEzMvYnqUSyracWA8erJ2HyOYXpR+tHt2f0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718708101; c=relaxed/simple;
-	bh=61RFQmmExL4kZNsXeRLegrMtDugYDBbo2Sq3ZfnXMx4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=JJbgJBvq0+h2U6iV3KG0QXOGpBiunTe6zTZBQzlWW1doh0eqkkP/yIEk0IrXiC3QU5//n3h5vkPlicoKAIfy/Pt4eHEBgCfHpwXuAUzvzpfCkjnZ8E/sSznLOnsnix2WPI2w9dt9lBBmBOC6JZ4x/SFKZtbrCVwHSkQfLlP4v+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KJOK0Lkl; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718708098;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=R+ZB30OmLW0cAiqPfvf9C3X9ciOtU7/gl0L91dnALD0=;
-	b=KJOK0LklcZmLauT7ef4mvu8z4T6TYlSY/ks87D08KeVlJiG2SADBS9PKYyjFJImTN8yOr3
-	WYgOn1+h+9NVRFQAcVS3Y1VvI/I9ebkB3j771xhB5+WkTFe2FJtTKDNvbw1wUEy87VsBAC
-	ReIE8ZWpGfYjqsECqMVEy2pPlWqMGlQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-527-AgC1tcRGP-KKWrN8GFxnmA-1; Tue, 18 Jun 2024 06:54:57 -0400
-X-MC-Unique: AgC1tcRGP-KKWrN8GFxnmA-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42180d2a0d6so8150695e9.1
-        for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 03:54:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718708096; x=1719312896;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R+ZB30OmLW0cAiqPfvf9C3X9ciOtU7/gl0L91dnALD0=;
-        b=G+IHijsOlWrczya0HeVintvVaJQbMgcJIsHXkR1dFbnZq5MSy20tvIMWx7jnprOu72
-         LDFGVrxUoqU6QuoIRQubKpp4mU+x5EBSuhGnIYXbLt6pnDEhwHrMiu2TurJ0RPZYy/8n
-         PbZcqdvlFSygpVq+cgL2OgxxC8DycFDMoQY+cp6GfAhXGQoWXKvO+5J36YiryHSBfthk
-         znI8jWAvxVNrIrupAaeGAZ8387oZ6HK8mgjN/rtTQSdE/6uIS5izHRNhUnFsZdX2BBJ8
-         itmfTAaNOPeDNZw62pejBw9hHGcstVgYh++cd0oYVZtC7MRmPTC4RawO5OqyoqEnGI6a
-         ugeg==
-X-Forwarded-Encrypted: i=1; AJvYcCVZiJ0bHbTjdMQSGlSEDPT/4EAb9t/zfCiXl6y83UnFvyYG8x4H1X1zPWoAaFVXXV3G/t1sCgZ3wekQ/UXRZs0Z7SfUr9E0
-X-Gm-Message-State: AOJu0YyLPk+HSaxmtb0CVwBcHNdv5dCb2t/eQaIuwO7tdn01YohaKyJa
-	F9hnxKX3xRnXGRDRL5sCglemQ618gu8trqzyOB5mzZgzuAhIvRl750ErjzGTgAkmhGOL2HZpaGh
-	arqUVSZ4oMv0LQvcP4wNZHlO1Vn/T4x/muM3YVEzsvaa+k5oCi5OupWKAuF8M5A==
-X-Received: by 2002:a5d:64e7:0:b0:35f:2584:770e with SMTP id ffacd0b85a97d-3607a6d1b12mr8610960f8f.0.1718708095900;
-        Tue, 18 Jun 2024 03:54:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFxOPksMWYlLot75Lv1s3C9MTfPHt5HNH3XtADGASab/m3zJaX5ydBljvx+aY7TP8QmHEXk9Q==
-X-Received: by 2002:a5d:64e7:0:b0:35f:2584:770e with SMTP id ffacd0b85a97d-3607a6d1b12mr8610948f8f.0.1718708095412;
-        Tue, 18 Jun 2024 03:54:55 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b0b4:c10::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36075093a13sm14012848f8f.9.2024.06.18.03.54.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jun 2024 03:54:54 -0700 (PDT)
-Message-ID: <230e7159f1e9d3ae0d5317c913a0797baac8dc3a.camel@redhat.com>
-Subject: Re: [PATCH v3 net-next 04/11] af_unix: Define locking order for
- U_LOCK_SECOND in unix_stream_connect().
-From: Paolo Abeni <pabeni@redhat.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, Kent Overstreet
-	 <kent.overstreet@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Kuniyuki Iwashima
- <kuni1840@gmail.com>,  netdev@vger.kernel.org
-Date: Tue, 18 Jun 2024 12:54:53 +0200
-In-Reply-To: <20240614200715.93150-5-kuniyu@amazon.com>
-References: <20240614200715.93150-1-kuniyu@amazon.com>
-	 <20240614200715.93150-5-kuniyu@amazon.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1718708226; c=relaxed/simple;
+	bh=XG0My1/c07ozmDk65TvEOPJoQ8jeo+r+3UR7UrRFX9Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fDIuflyw/02VwP3rwS2OMfWVTqEuEFc8hqmLaGyszto8/5z3K8d09gklzMfXh+ua3GlHD4mj+T8fpD/iQ8jyNYH/ypdgIR7jDa1444PABOu3SnKTtio2DPW/xoFCGZSt0v4+JLEdCM0K9bRN/G5h0VHPHHzwpkDbcmBtwuiZCUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o1ZTi43O; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97AEDC4AF48;
+	Tue, 18 Jun 2024 10:57:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718708225;
+	bh=XG0My1/c07ozmDk65TvEOPJoQ8jeo+r+3UR7UrRFX9Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=o1ZTi43OV4DFMNq83eALZBNS3qIlWr5eADtosWX4DgtESBzUNdTR/d2EzaJmsu/bO
+	 cnMqrA0Ud+oRE5gVAefVlysGPl7G7oSxTN6bepTEZBfDUmO0Jlpb7FU80CWs+LcjLI
+	 BiASfcHx02cUPHf15TKw0hKk3Rp+mhHAxq45ZCKz5VUiDeFkuqE0oL8QEiGlw4p73A
+	 t39OEeM3WlcMTMZaDOftM2hoeGgbGwtN2HytKqCDaLMHt/Y5GCh9th8sfOXzUhvKQJ
+	 EPXVN7uLfojG1BRJvKdq+b9SfOWltzE8MgxKt+eJJ9LY02fZzf7sTfd974GDmXeKTx
+	 mjfcSoil3sgiA==
+Date: Tue, 18 Jun 2024 11:56:59 +0100
+From: Simon Horman <horms@kernel.org>
+To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	linux@armlinux.org.uk, vadim.fedorenko@linux.dev, andrew@lunn.ch,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, git@amd.com
+Subject: Re: [PATCH net-next v6 3/4] net: macb: Add ARP support to WOL
+Message-ID: <20240618105659.GL8447@kernel.org>
+References: <20240617070413.2291511-1-vineeth.karumanchi@amd.com>
+ <20240617070413.2291511-4-vineeth.karumanchi@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240617070413.2291511-4-vineeth.karumanchi@amd.com>
 
-On Fri, 2024-06-14 at 13:07 -0700, Kuniyuki Iwashima wrote:
-> While a SOCK_(STREAM|SEQPACKET) socket connect()s to another, we hold
-> two locks of them by unix_state_lock() and unix_state_lock_nested() in
-> unix_stream_connect().
->=20
-> Before unix_state_lock_nested(), the following is guaranteed by checking
-> sk->sk_state:
->=20
->   1. The first socket is TCP_LISTEN
->   2. The second socket is not the first one
->   3. Simultaneous connect() must fail
->=20
-> So, the client state can be TCP_CLOSE or TCP_LISTEN or TCP_ESTABLISHED.
->=20
-> Let's define the expected states as unix_state_lock_cmp_fn() instead of
-> using unix_state_lock_nested().
->=20
-> Note that 2. is detected by debug_spin_lock_before() and 3. cannot be
-> expressed as lock_cmp_fn.
->=20
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->  include/net/af_unix.h |  1 -
->  net/unix/af_unix.c    | 26 +++++++++++++++++++++++++-
->  2 files changed, 25 insertions(+), 2 deletions(-)
->=20
-> diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-> index b6eedf7650da..fd813ad73ab8 100644
-> --- a/include/net/af_unix.h
-> +++ b/include/net/af_unix.h
-> @@ -98,7 +98,6 @@ struct unix_sock {
->  #define unix_state_unlock(s)	spin_unlock(&unix_sk(s)->lock)
->  enum unix_socket_lock_class {
->  	U_LOCK_NORMAL,
-> -	U_LOCK_SECOND,	/* for double locking, see unix_state_double_lock(). */
->  	U_LOCK_DIAG, /* used while dumping icons, see sk_diag_dump_icons(). */
->  	U_LOCK_GC_LISTENER, /* used for listening socket while determining gc
->  			     * candidates to close a small race window.
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index 88f2c5d039c4..5d2728e33f3f 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -143,6 +143,30 @@ static int unix_state_lock_cmp_fn(const struct lockd=
-ep_map *_a,
->  	a =3D container_of(_a, struct unix_sock, lock.dep_map);
->  	b =3D container_of(_b, struct unix_sock, lock.dep_map);
-> =20
-> +	if (a->sk.sk_state =3D=3D TCP_LISTEN) {
-> +		/* unix_stream_connect(): Before the 2nd unix_state_lock(),
-> +		 *
-> +		 *   1. a is TCP_LISTEN.
-> +		 *   2. b is not a.
-> +		 *   3. concurrent connect(b -> a) must fail.
-> +		 *
-> +		 * Except for 2. & 3., the b's state can be any possible
-> +		 * value due to concurrent connect() or listen().
-> +		 *
-> +		 * 2. is detected in debug_spin_lock_before(), and 3. cannot
-> +		 * be expressed as lock_cmp_fn.
-> +		 */
-> +		switch (b->sk.sk_state) {
-> +		case TCP_CLOSE:
-> +		case TCP_ESTABLISHED:
-> +		case TCP_LISTEN:
-> +			return -1;
-> +		default:
-> +			/* Invalid case. */
-> +			return 0;
+On Mon, Jun 17, 2024 at 12:34:12PM +0530, Vineeth Karumanchi wrote:
+> Extend wake-on LAN support with an ARP packet.
+> 
+> Currently, if PHY supports WOL, ethtool ignores the modes supported
+> by MACB. This change extends the WOL modes with MACB supported modes.
+> 
+> Advertise wake-on LAN supported modes by default without relying on
+> dt node. By default, wake-on LAN will be in disabled state.
+> Using ethtool, users can enable/disable or choose packet types.
+> 
+> For wake-on LAN via ARP, ensure the IP address is assigned and
+> report an error otherwise.
+> 
+> Co-developed-by: Harini Katakam <harini.katakam@amd.com>
+> Signed-off-by: Harini Katakam <harini.katakam@amd.com>
+> Signed-off-by: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+
+...
+
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+
+...
+
+> @@ -84,8 +85,7 @@ struct sifive_fu540_macb_mgmt {
+>  #define GEM_MTU_MIN_SIZE	ETH_MIN_MTU
+>  #define MACB_NETIF_LSO		NETIF_F_TSO
+>  
+> -#define MACB_WOL_HAS_MAGIC_PACKET	(0x1 << 0)
+> -#define MACB_WOL_ENABLED		(0x1 << 1)
+> +#define MACB_WOL_ENABLED		(0x1 << 0)
+
+
+nit: BIT() could be used here
+
+>  
+>  #define HS_SPEED_10000M			4
+>  #define MACB_SERDES_RATE_10G		1
+
+...
+
+> @@ -5290,6 +5289,14 @@ static int __maybe_unused macb_suspend(struct device *dev)
+>  		macb_writel(bp, TSR, -1);
+>  		macb_writel(bp, RSR, -1);
+>  
+> +		tmp = (bp->wolopts & WAKE_MAGIC) ? MACB_BIT(MAG) : 0;
+> +		if (bp->wolopts & WAKE_ARP) {
+> +			tmp |= MACB_BIT(ARP);
+> +			/* write IP address into register */
+> +			tmp |= MACB_BFEXT(IP,
+> +					 (__force u32)(cpu_to_be32p((uint32_t *)&ifa->ifa_local)));
+
+Hi Vineeth and Harini,
+
+I guess I must be reading this wrong, beause I am confused
+by the intent of the endeness handling above.
+
+* ifa->ifa_local is a 32-bit big-endian value
+
+* It's address is cast to a 32-bit host-endian pointer
+
+  nit: I think u32 would be preferable to uint32_t; this is kernel code.
+
+* The value at this address is then converted to a host byte order value.
+
+  nit: Why is cpu_to_be32p() used here instead of the more commonly used
+       cpu_to_be32() ?
+
+  More importantly, why is a host byte order value being converted from
+  big-endian to host byte order?
+
+* The value returned by cpu_to_be32p, which is big-endian, because
+  that is what that function does, is then cast to host-byte order.
+
+
+So overall we have:
+
+1. Cast from big endian to host byte order
+2. Conversion from host byte order to big endian
+   (a bytes-swap on litte endian hosts; no-op on big endian hosts)
+3. Cast from big endian to host byte oder
+
+All three of these steps seem to warrant explanation.
+And the combination is confusing to say the least.
+
+
 > +		}
+> +
+>  		/* Change interrupt handler and
+>  		 * Enable WoL IRQ on queue 0
 
-I'm sorry for missing this before, but I'm wondering if we need to
-enforce even this case to be symmetric? that is, explicitly check for b
-state =3D=3D TCP_LISTEN, ...
-
-Kent, WDYT?
-
-Thanks!
-
-Paolo
-
+...
 
