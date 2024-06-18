@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-104370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9291190C529
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:06:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D6A490C539
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:17:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96C7A1C2122C
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 09:06:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F07C4B20B4B
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 09:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7A615575E;
-	Tue, 18 Jun 2024 07:25:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29889156F29;
+	Tue, 18 Jun 2024 07:25:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="WZrmrHQ5";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Vo0QfjUF"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="aF0ybsnW";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="V1tddVWU"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E53413A248;
-	Tue, 18 Jun 2024 07:25:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71338156878;
+	Tue, 18 Jun 2024 07:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718695536; cv=none; b=EmPvkhLWHrEPrn/vrGnTemkx2BhDWpXMBwdXc6wcCxFJTdj7kb8cpHA22LUGsmJLxTPhzPrAwdNQiO5cU8wDnwhrRLBLKz3J2eaUP6n7hhFCiAiPXF+4J2J6GgG4J21NarFHKwkD4763DdrlL5ArFzxZYFgaPfRqGlMZT/EoOsE=
+	t=1718695539; cv=none; b=Gmpw/QcxNgB4hkBQUjPiT3rE1ui6yZURmtAkx4v8nwqRVizRfqIg94YBklRpIj2F8XP2aiMX7s460JOvMP7RNsIFlfxb6B9ZcXQGyLbqskU4++1+hyJWgIt/5NnxZQzqMIDxdeW2ir1Y82mb68wYu/uh7R0h/WWTi44iQRAAAks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718695536; c=relaxed/simple;
-	bh=0tDt6dndm3G+sNUSXkkpHRLf5liVs4gyYGuZT2hGejw=;
+	s=arc-20240116; t=1718695539; c=relaxed/simple;
+	bh=3nOCXH40kHfZO87SmAo125DaEM6dygak/4wmXIHT9LM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RYB/jvf3IlBQ3+TyPE090HbwOgdJj1xIYuX5+5xpDbvce4YUs9WbErZzddzjAWk4A+75xgxjCJ33F0lBgwZiVhRDYrMdXd/SECTRb9QfRW73WkLNEj6vd2mKZ5n8KDVN4oc28wlmkBAYdsrDG+CoJm4Ngy4NspndSFs7PE4H8ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=WZrmrHQ5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Vo0QfjUF; arc=none smtp.client-ip=193.142.43.55
+	 MIME-Version; b=RvmAHOcSKdl2GJRPI+pRkj8MyeV9HxCSgMr+ANV3/3N5HlVIBCr9L/RVZG4VR3HKxtbM8VNXBwYogYwhL0umoLFFWJUZWnQYAHKZmqsZoZGKOjbYJH0eZw16yhbu9eZbonFomEr6lcLGSNM+hJC7e5nHmRoZbM5TbGjuhM0xZ+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=aF0ybsnW; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=V1tddVWU; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
@@ -39,21 +39,21 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GruW12PU2Ogt+fndrHHiAUjJt1cIYrbQg9Rnf7vvA4s=;
-	b=WZrmrHQ5aTkyKU94qJz04MoQ/zU03ZdKYK+rDpDfktAYnNAs2ocd6eFC5kip2zbKsTTC27
-	eJ0NVv1NePKLcTgVglrFzWdZRFH2oIG2P+M7GYWXMlIVqKArSwGrYpe+OBch/9U05YCyPt
-	PlBp574SUsN1F4RlMnEiLQK3HkPMEb3+/r5UvEYDOLuFZYrVj0BQPrI2i2c/Y4mD8JLGGo
-	2ZjVX9Rgj1dU+KU5BZerEM3SZCRgDjWgJURG5zgdRA31zqYUi/S5tXc6hrprji8nBS139n
-	YJVHEgN8ssRLSn98PC36iMwR2cOlcjSj3mKmgtk6KGg0myinWWBBmHrFwwEnRA==
+	bh=+6ZJx97XD1+mNbkUbduQBaAsweYRZijjNDkdfe4a/D8=;
+	b=aF0ybsnWTEcK6NbLNKE6h4Rp6gDQKVDbtuBX2+p2/5V/UyyEwhFBJLadx2hCqC9EKDRoxs
+	iV9oM43Gz9eRC9XVABOhU8lhvtkAYNyRQz1OlcdspmP9pFDCXIaUFLZ8aBIgxv73IOPyRY
+	7XtxH8YZahoZ+PaGySr68AGI/z/DeD+vqg98vIVq2wH4b1bkW7ALqWMi2DjxnDl07v8kEx
+	6Zx0nGAMbheKXGZWNjsvo4r8St5l0apGfGeHs5MrFWZDPTfIgBuvYDN78obXhF/P+lFMTE
+	rPhdHU9Nm4koopsZCJ4K3aX7A5TPTa4OMc2o0tpLG4l6xLAkiLQW5jmMpk75EQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
 	s=2020e; t=1718695532;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GruW12PU2Ogt+fndrHHiAUjJt1cIYrbQg9Rnf7vvA4s=;
-	b=Vo0QfjUFRT7b8T9YVoNBFsZ477nCErWvRdr7i19VBJiS3PH3yqaA/JRxEBPAsYBSvO3y9D
-	t32IFmSIdUtyS5AA==
+	bh=+6ZJx97XD1+mNbkUbduQBaAsweYRZijjNDkdfe4a/D8=;
+	b=V1tddVWU1sNSTuhJrAyjMY53PjqHLkDpfVSfYlKyTyKqxHKmCSrO3xNjdTzYmqh9Gf65bT
+	VQTXCPmN8yIACiCg==
 To: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -69,10 +69,11 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Waiman Long <longman@redhat.com>,
 	Will Deacon <will@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH v7 net-next 04/15] net: Use nested-BH locking for napi_alloc_cache.
-Date: Tue, 18 Jun 2024 09:13:20 +0200
-Message-ID: <20240618072526.379909-5-bigeasy@linutronix.de>
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	David Ahern <dsahern@kernel.org>
+Subject: [PATCH v7 net-next 05/15] net/tcp_sigpool: Use nested-BH locking for sigpool_scratch.
+Date: Tue, 18 Jun 2024 09:13:21 +0200
+Message-ID: <20240618072526.379909-6-bigeasy@linutronix.de>
 In-Reply-To: <20240618072526.379909-1-bigeasy@linutronix.de>
 References: <20240618072526.379909-1-bigeasy@linutronix.de>
 Precedence: bulk
@@ -83,139 +84,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-napi_alloc_cache is a per-CPU variable and relies on disabled BH for its
+sigpool_scratch is a per-CPU variable and relies on disabled BH for its
 locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
 this data structure requires explicit locking.
 
-Add a local_lock_t to the data structure and use local_lock_nested_bh()
-for locking. This change adds only lockdep coverage and does not alter
-the functional behaviour for !PREEMPT_RT.
+Make a struct with a pad member (original sigpool_scratch) and a
+local_lock_t and use local_lock_nested_bh() for locking. This change
+adds only lockdep coverage and does not alter the functional behaviour
+for !PREEMPT_RT.
 
+Cc: David Ahern <dsahern@kernel.org>
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
- net/core/skbuff.c | 29 ++++++++++++++++++++++++-----
- 1 file changed, 24 insertions(+), 5 deletions(-)
+ net/ipv4/tcp_sigpool.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 656b298255c5f..0c13cfa20658f 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -277,6 +277,7 @@ static void *page_frag_alloc_1k(struct page_frag_1k *nc=
-, gfp_t gfp_mask)
- #endif
+diff --git a/net/ipv4/tcp_sigpool.c b/net/ipv4/tcp_sigpool.c
+index 8512cb09ebc09..d8a4f192873a2 100644
+--- a/net/ipv4/tcp_sigpool.c
++++ b/net/ipv4/tcp_sigpool.c
+@@ -10,7 +10,14 @@
+ #include <net/tcp.h>
 =20
- struct napi_alloc_cache {
+ static size_t __scratch_size;
+-static DEFINE_PER_CPU(void __rcu *, sigpool_scratch);
++struct sigpool_scratch {
 +	local_lock_t bh_lock;
- 	struct page_frag_cache page;
- 	struct page_frag_1k page_small;
- 	unsigned int skb_count;
-@@ -284,7 +285,9 @@ struct napi_alloc_cache {
- };
-=20
- static DEFINE_PER_CPU(struct page_frag_cache, netdev_alloc_cache);
--static DEFINE_PER_CPU(struct napi_alloc_cache, napi_alloc_cache);
-+static DEFINE_PER_CPU(struct napi_alloc_cache, napi_alloc_cache) =3D {
++	void __rcu *pad;
++};
++
++static DEFINE_PER_CPU(struct sigpool_scratch, sigpool_scratch) =3D {
 +	.bh_lock =3D INIT_LOCAL_LOCK(bh_lock),
 +};
 =20
- /* Double check that napi_get_frags() allocates skbs with
-  * skb->head being backed by slab, not a page fragment.
-@@ -306,11 +309,16 @@ void napi_get_frags_check(struct napi_struct *napi)
- void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_mask)
+ struct sigpool_entry {
+ 	struct crypto_ahash	*hash;
+@@ -72,7 +79,7 @@ static int sigpool_reserve_scratch(size_t size)
+ 			break;
+ 		}
+=20
+-		old_scratch =3D rcu_replace_pointer(per_cpu(sigpool_scratch, cpu),
++		old_scratch =3D rcu_replace_pointer(per_cpu(sigpool_scratch.pad, cpu),
+ 					scratch, lockdep_is_held(&cpool_mutex));
+ 		if (!cpu_online(cpu) || !old_scratch) {
+ 			kfree(old_scratch);
+@@ -93,7 +100,7 @@ static void sigpool_scratch_free(void)
+ 	int cpu;
+=20
+ 	for_each_possible_cpu(cpu)
+-		kfree(rcu_replace_pointer(per_cpu(sigpool_scratch, cpu),
++		kfree(rcu_replace_pointer(per_cpu(sigpool_scratch.pad, cpu),
+ 					  NULL, lockdep_is_held(&cpool_mutex)));
+ 	__scratch_size =3D 0;
+ }
+@@ -277,7 +284,8 @@ int tcp_sigpool_start(unsigned int id, struct tcp_sigpo=
+ol *c) __cond_acquires(RC
+ 	/* Pairs with tcp_sigpool_reserve_scratch(), scratch area is
+ 	 * valid (allocated) until tcp_sigpool_end().
+ 	 */
+-	c->scratch =3D rcu_dereference_bh(*this_cpu_ptr(&sigpool_scratch));
++	local_lock_nested_bh(&sigpool_scratch.bh_lock);
++	c->scratch =3D rcu_dereference_bh(*this_cpu_ptr(&sigpool_scratch.pad));
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(tcp_sigpool_start);
+@@ -286,6 +294,7 @@ void tcp_sigpool_end(struct tcp_sigpool *c) __releases(=
+RCU_BH)
  {
- 	struct napi_alloc_cache *nc =3D this_cpu_ptr(&napi_alloc_cache);
-+	void *data;
+ 	struct crypto_ahash *hash =3D crypto_ahash_reqtfm(c->req);
 =20
- 	fragsz =3D SKB_DATA_ALIGN(fragsz);
-=20
--	return __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC,
-+	local_lock_nested_bh(&napi_alloc_cache.bh_lock);
-+	data =3D __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC,
- 				       align_mask);
-+	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
-+	return data;
-+
- }
- EXPORT_SYMBOL(__napi_alloc_frag_align);
-=20
-@@ -338,16 +346,20 @@ static struct sk_buff *napi_skb_cache_get(void)
- 	struct napi_alloc_cache *nc =3D this_cpu_ptr(&napi_alloc_cache);
- 	struct sk_buff *skb;
-=20
-+	local_lock_nested_bh(&napi_alloc_cache.bh_lock);
- 	if (unlikely(!nc->skb_count)) {
- 		nc->skb_count =3D kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
- 						      GFP_ATOMIC,
- 						      NAPI_SKB_CACHE_BULK,
- 						      nc->skb_cache);
--		if (unlikely(!nc->skb_count))
-+		if (unlikely(!nc->skb_count)) {
-+			local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 			return NULL;
-+		}
- 	}
-=20
- 	skb =3D nc->skb_cache[--nc->skb_count];
-+	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 	kasan_mempool_unpoison_object(skb, kmem_cache_size(net_hotdata.skbuff_cac=
-he));
-=20
- 	return skb;
-@@ -740,9 +752,13 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *=
-dev, unsigned int len,
- 		pfmemalloc =3D nc->pfmemalloc;
- 	} else {
- 		local_bh_disable();
-+		local_lock_nested_bh(&napi_alloc_cache.bh_lock);
-+
- 		nc =3D this_cpu_ptr(&napi_alloc_cache.page);
- 		data =3D page_frag_alloc(nc, len, gfp_mask);
- 		pfmemalloc =3D nc->pfmemalloc;
-+
-+		local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 		local_bh_enable();
- 	}
-=20
-@@ -806,11 +822,11 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *na=
-pi, unsigned int len)
- 		goto skb_success;
- 	}
-=20
--	nc =3D this_cpu_ptr(&napi_alloc_cache);
--
- 	if (sk_memalloc_socks())
- 		gfp_mask |=3D __GFP_MEMALLOC;
-=20
-+	local_lock_nested_bh(&napi_alloc_cache.bh_lock);
-+	nc =3D this_cpu_ptr(&napi_alloc_cache);
- 	if (NAPI_HAS_SMALL_PAGE_FRAG && len <=3D SKB_WITH_OVERHEAD(1024)) {
- 		/* we are artificially inflating the allocation size, but
- 		 * that is not as bad as it may look like, as:
-@@ -832,6 +848,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi=
-, unsigned int len)
- 		data =3D page_frag_alloc(&nc->page, len, gfp_mask);
- 		pfmemalloc =3D nc->page.pfmemalloc;
- 	}
-+	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
-=20
- 	if (unlikely(!data))
- 		return NULL;
-@@ -1429,6 +1446,7 @@ static void napi_skb_cache_put(struct sk_buff *skb)
- 	if (!kasan_mempool_poison_object(skb))
- 		return;
-=20
-+	local_lock_nested_bh(&napi_alloc_cache.bh_lock);
- 	nc->skb_cache[nc->skb_count++] =3D skb;
-=20
- 	if (unlikely(nc->skb_count =3D=3D NAPI_SKB_CACHE_SIZE)) {
-@@ -1440,6 +1458,7 @@ static void napi_skb_cache_put(struct sk_buff *skb)
- 				     nc->skb_cache + NAPI_SKB_CACHE_HALF);
- 		nc->skb_count =3D NAPI_SKB_CACHE_HALF;
- 	}
-+	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- }
-=20
- void __napi_kfree_skb(struct sk_buff *skb, enum skb_drop_reason reason)
++	local_unlock_nested_bh(&sigpool_scratch.bh_lock);
+ 	rcu_read_unlock_bh();
+ 	ahash_request_free(c->req);
+ 	crypto_free_ahash(hash);
 --=20
 2.45.2
 
