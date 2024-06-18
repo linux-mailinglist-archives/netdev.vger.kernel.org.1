@@ -1,65 +1,48 @@
-Return-Path: <netdev+bounces-104431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68AEB90C7B3
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 12:51:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F356890C7B5
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 12:51:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FF8D284D90
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 10:51:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AEDA1F26A23
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 10:51:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7520F155CAE;
-	Tue, 18 Jun 2024 09:11:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2D71155758;
+	Tue, 18 Jun 2024 09:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="G9NxefmJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IqAOasgD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647AE155385;
-	Tue, 18 Jun 2024 09:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33AE13DB99;
+	Tue, 18 Jun 2024 09:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718701905; cv=none; b=bIbZKUo9oc6NKZPwywGYiZwznG7CGK1+axYVVpCF6KwwA7xVnGtlSTnBN9aZIflPWV7WdH5lKBw+X6lBB1pWzj0nAECTUodUbo8XR0axoRVdSRlQciHErx4h9LRkRO8QJ67mjlWsnQARTA9JuY5sfQr+BpuXJcLokEKf2gblbQU=
+	t=1718702009; cv=none; b=iX8ZsYfkkTC9Og4nnkXRtkofTUtEm9vgQIxCJtKtiaxhhbmTcGpKkLlx/pHZnYcphU4x+wjQ7K2yVVJD9CJ4Mlzev2khlpnHCttVPPyUOAQvEAQxKSozx8f+sjVS7bOsLz1gOYK6VAn56hcitjcxThD7HoMXjiq2Riv8v+R/Xxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718701905; c=relaxed/simple;
-	bh=aTKh7qoNC6ncYKFdcn3vrsfsJi4IWy5Xroe9fbCuJ70=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Z4QHCIxWoDZP7luXf4PwDKRlk6AGXsHVSIpnoYBrT6cD9vi11rcxtrwEoN8ziOMgGW8xCiQzCyIiwhHhkSJVvZXoeIK42U+/lYmBujOtac18fR+//Ka9Cj8KLOdI/cGNU3YmTYEE+T72NpmFY1I359mWQLCX9DuJbNPrenElxHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=G9NxefmJ; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45I6Z9Yu004223;
-	Tue, 18 Jun 2024 11:10:52 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	mZ2gz1uO27QN7pXr1aHkYNUz1eKbUVDgHMdiHyPJKlI=; b=G9NxefmJuyB0GvV2
-	KOENsiD6laEfu4yo/CqfY466TRBnafFJnl8yv6Ayhuq5CpMuYk8gzgb3LWd3VTRj
-	/pYT7B20oQsadjXWZi3BFK/PYgi6oI4ZR0NUe6DvhJR96U3MtkKuphMM3xWBKSvs
-	mLotnNBd/J5amNgQQ8BYkqgaVoZR5FewmNYgwcOy1JnvKJxcOB/nU5ZVowA7lEEp
-	qRofcPWgCuG8JPw9NlvDdyiQcUBEhv5Tq7NJ9n2zI/wx3PC/A44s0O0BBZZ7I39r
-	d17IWMBDBxSnT3nWbE1AZBny1FFqgActjbdpirhhLm6jsb+saN4ViiNF5BXz5255
-	TQX9Gg==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ys1uct15y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Jun 2024 11:10:52 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 2A8894002D;
-	Tue, 18 Jun 2024 11:10:45 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 10A4D212FD7;
-	Tue, 18 Jun 2024 11:09:38 +0200 (CEST)
-Received: from [10.48.86.164] (10.48.86.164) by SHFDAG1NODE2.st.com
- (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 18 Jun
- 2024 11:09:37 +0200
-Message-ID: <8c3f1696-d67c-4960-ad3a-90461c896aa5@foss.st.com>
-Date: Tue, 18 Jun 2024 11:09:36 +0200
+	s=arc-20240116; t=1718702009; c=relaxed/simple;
+	bh=b3HK2kOnus2xn44LD4/7n1YbYkes4t+zstxuJ2EcEtM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DxWRIlG7EnoGAQIpABnvzaresHZ+I/2OUMLXj2P0fnjN9E0+MbvX3z1+M7ytTrZQha74pFKhVvDX+XvPa9D9pqsdTvQA92spZ9wr5+8qoZUQFmbeOOzn+bxiVY4L1kQO2rAIs2a7eDii3ujMLEClQh25ji0BsV6ulSas7dHT8dQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IqAOasgD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F25A6C4AF1D;
+	Tue, 18 Jun 2024 09:13:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718702009;
+	bh=b3HK2kOnus2xn44LD4/7n1YbYkes4t+zstxuJ2EcEtM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IqAOasgDKg0i8YKqY+6jfNvoc+FomZys6U4FtzsyyOQVf641TkJyp7gaY/BC+2JyT
+	 LRtVUJo8Ck5AoECAgx+mPjvwtQdzZMEhCamBtjo25a0yju+yorMgNePo0ngFYxc4aw
+	 J70W0SrSHlNOLgGaW2w12SoZvw9VJb7UEM6JNlgQgoRlU8FvjANC5mWRmRxhzMrVT5
+	 FaaZrC0L0nCDperZloobwzIDYJFTnDf6QSt7rM6BvLylb6aThK5Vnbm1+D9/YtEvUi
+	 3gdxuOdYlrUyo9sdZde9D9BNoqqFL6KfKO7llmEfz8/0lBzdDtLD2Fy0/LkGLqpq8W
+	 3KbnudCA8KRgQ==
+Message-ID: <655bbb57-3806-44fe-81a9-5c6e8d1e048c@kernel.org>
+Date: Tue, 18 Jun 2024 11:13:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,102 +50,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,PATCH 2/2] net: stmmac: dwmac-stm32: stm32: add
- management of stm32mp25 for stm32
-To: Marek Vasut <marex@denx.de>, "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        Liam Girdwood
-	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20240614130812.72425-1-christophe.roullier@foss.st.com>
- <20240614130812.72425-3-christophe.roullier@foss.st.com>
- <4c2f1bac-4957-4814-bf62-816340bd9ff6@denx.de>
- <09010b02-fb55-4c4b-9d0c-36bd0b370dc8@foss.st.com>
- <39d35f6d-4f82-43af-883b-a574b8a67a1a@denx.de>
+Subject: Re: [PATCH] xdp: remove WARN() from __xdp_reg_mem_model()
+To: Daniil Dulov <d.dulov@aladdin.ru>, Alexei Starovoitov <ast@kernel.org>
+Cc: Daniel Borkmann <daniel@iogearbox.net>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org
+References: <20240617162708.492159-1-d.dulov@aladdin.ru>
 Content-Language: en-US
-From: Christophe ROULLIER <christophe.roullier@foss.st.com>
-In-Reply-To: <39d35f6d-4f82-43af-883b-a574b8a67a1a@denx.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-18_02,2024-06-17_01,2024-05-17_01
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20240617162708.492159-1-d.dulov@aladdin.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Marek,
 
-On 6/17/24 17:57, Marek Vasut wrote:
-> On 6/17/24 1:23 PM, Christophe ROULLIER wrote:
->
-> Hi,
->
->>>> +static int stm32mp2_configure_syscfg(struct plat_stmmacenet_data 
->>>> *plat_dat)
->>>> +{
->>>> +    struct stm32_dwmac *dwmac = plat_dat->bsp_priv;
->>>> +    u32 reg = dwmac->mode_reg;
->>>> +    int val = 0;
->>>> +
->>>> +    switch (plat_dat->mac_interface) {
->>>> +    case PHY_INTERFACE_MODE_MII:
->>>> +        break;
->>>
->>> dwmac->enable_eth_ck does not apply to MII mode ? Why ?
->>
->> It is like MP1 and MP13, nothing to set in syscfg register for case 
->> MII mode wo crystal.
->
-> Have a look at STM32MP15xx RM0436 Figure 83. Peripheral clock 
-> distribution for Ethernet.
->
-> If RCC (top-left corner of the figure) generates 25 MHz MII clock 
-> (yellow line) on eth_clk_fb (top-right corner), can I set 
-> ETH_REF_CLK_SEL to position '1' and ETH_SEL[2] to '0' and feed ETH 
-> (right side) clk_rx_i input with 25 MHz clock that way ?
->
-> I seems like this should be possible, at least theoretically. Can you 
-> check with the hardware/silicon people ?
-No it is not possible (it will work if speed (and frequency) is fixed  
-25Mhz=100Mbps, but for speed 10Mbps (2,5MHz) it will not work. (you can 
-see than diviser are only for RMII mode)
->
-> As a result, the MII/RMII mode would behave in a very similar way, and 
-> so would GMII/RGMII mode behave in a very similar way. Effectively you 
-> would end up with this (notice the fallthrough statements):
->
-> +    case PHY_INTERFACE_MODE_RMII:
-> +        val = SYSCFG_ETHCR_ETH_SEL_RMII;
-> +        fallthrough;
-> +    case PHY_INTERFACE_MODE_MII:
-> +        if (dwmac->enable_eth_ck)
-> +            val |= SYSCFG_ETHCR_ETH_REF_CLK_SEL;
-> +        break;
-> +
-> +    case PHY_INTERFACE_MODE_RGMII:
-> +    case PHY_INTERFACE_MODE_RGMII_ID:
-> +    case PHY_INTERFACE_MODE_RGMII_RXID:
-> +    case PHY_INTERFACE_MODE_RGMII_TXID:
-> +        val = SYSCFG_ETHCR_ETH_SEL_RGMII;
-> +        fallthrough;
-> +    case PHY_INTERFACE_MODE_GMII:
-> +        if (dwmac->enable_eth_ck)
-> +            val |= SYSCFG_ETHCR_ETH_CLK_SEL;
-> +        break;
->
-> [...]
+
+On 17/06/2024 18.27, Daniil Dulov wrote:
+> Syzkaller reports a warning in __xdp_reg_mem_model().
+> 
+> The warning occurs only if __mem_id_init_hash_table() returns
+> an error. It returns the error in two cases:
+> 
+>      1. memory allocation fails;
+>      2. rhashtable_init() fails when some fields of rhashtable_params
+>         struct are not initialized properly.
+> 
+> The second case cannot happen since there is a static const
+> rhashtable_params struct with valid fields. So, warning is only triggered
+> when there is a problem with memory allocation.
+> 
+> Thus, there is no sense in using WARN() to handle this error and it can be
+> safely removed.
+> 
+> WARNING: CPU: 0 PID: 5065 at net/core/xdp.c:299 __xdp_reg_mem_model+0x2d9/0x650 net/core/xdp.c:299
+> 
+> CPU: 0 PID: 5065 Comm: syz-executor883 Not tainted 6.8.0-syzkaller-05271-gf99c5f563c17 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+> RIP: 0010:__xdp_reg_mem_model+0x2d9/0x650 net/core/xdp.c:299
+> 
+> Call Trace:
+>   xdp_reg_mem_model+0x22/0x40 net/core/xdp.c:344
+>   xdp_test_run_setup net/bpf/test_run.c:188 [inline]
+>   bpf_test_run_xdp_live+0x365/0x1e90 net/bpf/test_run.c:377
+>   bpf_prog_test_run_xdp+0x813/0x11b0 net/bpf/test_run.c:1267
+>   bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4240
+>   __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5649
+>   __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
+>   __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
+>   __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
+>   do_syscall_64+0xfb/0x240
+>   entry_SYSCALL_64_after_hwframe+0x6d/0x75
+> 
+> Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+> 
+> Fixes: 8d5d88527587 ("xdp: rhashtable with allocator ID to pointer mapping")
+> Signed-off-by: Daniil Dulov <d.dulov@aladdin.ru>
+> ---
+>   net/core/xdp.c | 1 -
+>   1 file changed, 1 deletion(-)
+> 
+
+Sure, looks like we can remove this WARN_ON()
+
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+
+> diff --git a/net/core/xdp.c b/net/core/xdp.c
+> index 41693154e426..fb2f00e3f701 100644
+> --- a/net/core/xdp.c
+> +++ b/net/core/xdp.c
+> @@ -296,7 +296,6 @@ static struct xdp_mem_allocator *__xdp_reg_mem_model(struct xdp_mem_info *mem,
+>   		ret = __mem_id_init_hash_table();
+>   		mutex_unlock(&mem_id_lock);
+>   		if (ret < 0) {
+> -			WARN_ON(1);
+>   			return ERR_PTR(ret);
+>   		}
+>   	}
 
