@@ -1,366 +1,207 @@
-Return-Path: <netdev+bounces-104574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C918C90D618
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:52:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C59A590D61D
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:52:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F8FC1F211E1
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 14:52:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC1EC287B53
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 14:52:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E008F13A41E;
-	Tue, 18 Jun 2024 14:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA331419BA;
+	Tue, 18 Jun 2024 14:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="jZNH8ACD"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="DP6GEE3Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C5020310
-	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 14:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DFA139CFC;
+	Tue, 18 Jun 2024 14:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718721904; cv=none; b=e9ha2OrJ+mk+X1jNAwwqxLiLvfPSett5aU7QNoywSRA6vBmt/2KcMkD7izGpsw8VOmDrxQXuXKcBNuzpH5iTuVtzvrR+o1bssWcozfeyLoLcmDuLuzA/1E28K26eKoT+KYnUjASxLCBPEqS2H1lcC+xwm5SeO5ROLueqr/ghr9M=
+	t=1718721951; cv=none; b=Fq4caqE2sbpEw8TK970gRV8weo8zWtTRHZ4gDuffVEKlCCACrg/+h4ksSfl4QH+F8i6DQZyKXEZ48dQsEELaE6YWbRAK1+LvjywzBSdwzNqo4dGxUWqMkrsCtMbQw4k1Ahw02pLACCkkyGn3KJm1VJqvHjTje3NQDJH8PaGyYLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718721904; c=relaxed/simple;
-	bh=DRMavt8N2YnlZCvD17z11VwAfNLnw/2GNeVmSBQxuzs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kcg7RnjhEcM8Kc+HcQxYK/ViVwEZvvs48AhoaAyT8moXYGpqy4KlD+AYeh1HZUDHTyW6I9OVicJ2b0NdT9VqZS+Xo3TM4M7I0zRYwjMzOsTLUAgDPPZmMjcXBuIDF6TKQd1P8v3s45+hLA/sfwcAY6ZlRVcITq0Je8jz4AgyXR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=jZNH8ACD; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42278f3aea4so48915105e9.1
-        for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 07:45:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718721900; x=1719326700; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jDHbCFW7qj4JoJ70BZacxRKzokWqUTwX9tIpuWgcM6Q=;
-        b=jZNH8ACDnf65bCVyMkBwtd9eNIzjE3yKiE4lY7+7IVsTA9xVIT3GuijQHdRochwgQG
-         IqSUuKGkBlhwgjTdlgiaZ1aq1QaIFPxA8Em5tRGEcDlmKakn47o47EoGv3ZVefVwmgki
-         +K+1co4PJ+IQ3PNoHDmrHv5j3NQu3fKG8n96GcgXUzbACOhZrjHjAFhavykgw+nuY2Mr
-         sa2+LQ52krHEP41ApXVsCZpp6A8rOEdh5eNg1FeEYdvm7EGkvfZSsO93jjzqIFA/+ifk
-         D8cm8iMTmGcaKsnIjH4qyG4C82X8HlGNvWfqcGis3KgQxr3lp2KHRooshMX0T7gNDiXJ
-         Z6dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718721900; x=1719326700;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jDHbCFW7qj4JoJ70BZacxRKzokWqUTwX9tIpuWgcM6Q=;
-        b=AMNpFTsOoWKGN6uUfiNqQBKADn4kL3HrBdFWgCJ+cR07c7CZ25SZ+B7y/3THL3PUOY
-         JPAO7KDXNvM4sl+hldBD8hKd8KMNQlbguuUdO498p50+DHHyHrRWF8R7u88VxVG7F0tQ
-         WhGHlNsrGuM8g/xy0PoW9dSLPhU0Sf4Pg0hNOvppLlHP6okKWSInewJNWxQZixqzoDOh
-         sUz1rDnbhG4IAOA4XbUCeFGdVOThNlVfzgRlxgULV6XnTXUqW5lkZ9f4kJPUQShgOLjb
-         i+wYNirG/vEjY0ViVGrxdS95/2PkzgBWbGxwxWdyYpObxLWHQ2lqXPuqlpvTBrfNoPJI
-         mlJg==
-X-Gm-Message-State: AOJu0YzfL3nSnE7DkclhkNZ5wVvg0JKNF1HdjJtGvkp36nHBED9rOJ7m
-	X2IFAXNIfd2UPB3qu0Z5dXs9DI/ZGmYhSs+q+aF/5IkL0mZWP1B/yD4bNJ8lsAyP6zK7WPs0W/Q
-	UvGQ=
-X-Google-Smtp-Source: AGHT+IFQNOdfZ4EHM+UVjCKTW7opa7MiMU0Dy+RbzU/tevZyt9DEt1izlXiF6hJtTIomD95rPErt/A==
-X-Received: by 2002:a5d:5917:0:b0:35f:296c:27b2 with SMTP id ffacd0b85a97d-3607a7b6255mr9687120f8f.22.1718721900104;
-        Tue, 18 Jun 2024 07:45:00 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3607509c79bsm14426978f8f.41.2024.06.18.07.44.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jun 2024 07:44:59 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	virtualization@lists.linux.dev,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	dave.taht@gmail.com,
-	kerneljasonxing@gmail.com,
-	hengqi@linux.alibaba.com
-Subject: [PATCH net-next v3] virtio_net: add support for Byte Queue Limits
-Date: Tue, 18 Jun 2024 16:44:56 +0200
-Message-ID: <20240618144456.1688998-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.45.1
+	s=arc-20240116; t=1718721951; c=relaxed/simple;
+	bh=/eXZnkslDtXtwLMQzzo568CwMVqG0SYfQ/UyG0IHN2c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PClvj/rFzI5L73QDoEm8T0YiXyMA7l1cgxiF7hwo5WPEzWQxTDzo+NRkl0h70GBqZipDHXmCUJu3vSRCBeQr38yv6lf17GdnA+Z3FdVTXvg1rEEEpsSophYPRmgK21TktkGaHy4b1lu1EgXsLByHjVKhorbBPXkNZl3o5OJTQCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=DP6GEE3Q; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id C4C6A881DB;
+	Tue, 18 Jun 2024 16:45:46 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1718721947;
+	bh=Ojk5mwSvw+tC6y+Z5fiUjKgjEOz15W+RAyfOfEfKZRE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DP6GEE3QWmViRXPM6lpRCuxF39Ag8BD30mSTgJgZ+ybArBY+nMyJ7lpF+LaQwzKXN
+	 j9YEfRiXQVVWVQc0+J2EbyF1OWL3GqSZl7lH12cs4sffPVLJ262yzAJj91O5O8JKLp
+	 0yW5hAxywVL2CSwdH4ABlkpbZsrrkg0S/Czhe7ETeMYCtOFxmMCCpBBv5hWZ7og6JB
+	 uHbVB7b5As54UTqFgbIDZBy1g/4umujstA2Htc6Ebr1DBePqJbm4dm352BcjhFKqVo
+	 2F7RqVgItXMoZKdUurHmuSGEf2luCN1wrdTKLWLtIRHM/JG4p3GMt+r/FRcVIOtAVh
+	 vME1LG1zfbQtQ==
+Date: Tue, 18 Jun 2024 16:45:45 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: <Woojung.Huh@microchip.com>
+Cc: <dan.carpenter@linaro.org>, <andrew@lunn.ch>, <olteanv@gmail.com>,
+ <kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+ <edumazet@google.com>, <davem@davemloft.net>, <o.rempel@pengutronix.de>,
+ <Tristram.Ha@microchip.com>, <bigeasy@linutronix.de>, <horms@kernel.org>,
+ <ricardo@marliere.net>, <casper.casan@gmail.com>,
+ <linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
+Subject: Re: [PATCH v1 net-next] net: dsa: Allow only up to two HSR HW
+ offloaded ports for KSZ9477
+Message-ID: <20240618164545.14817f7e@wsk>
+In-Reply-To: <BL0PR11MB291397353642C808454F575CE7CE2@BL0PR11MB2913.namprd11.prod.outlook.com>
+References: <20240618130433.1111485-1-lukma@denx.de>
+	<339031f6-e732-43b4-9e83-0e2098df65ef@moroto.mountain>
+	<24b69bf0-03c9-414a-ac5d-ef82c2eed8f6@lunn.ch>
+	<1e2529b4-41f2-4483-9b17-50c6410d8eab@moroto.mountain>
+	<BL0PR11MB291397353642C808454F575CE7CE2@BL0PR11MB2913.namprd11.prod.outlook.com>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/=faO5bG0JahLBSA=3O3EqoV";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-From: Jiri Pirko <jiri@nvidia.com>
+--Sig_/=faO5bG0JahLBSA=3O3EqoV
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Add support for Byte Queue Limits (BQL).
+Hi Dan, Andrew, Woojung
 
-Tested on qemu emulated virtio_net device with 1, 2 and 4 queues.
-Tested with fq_codel and pfifo_fast. Super netperf with 50 threads is
-running in background. Netperf TCP_RR results:
+> Hi Dan & Andrew,
+>=20
+> > On Tue, Jun 18, 2024 at 03:52:23PM +0200, Andrew Lunn wrote: =20
+> > > > diff --git a/drivers/net/dsa/microchip/ksz_common.c =20
+> > b/drivers/net/dsa/microchip/ksz_common.c =20
+> > > > index 2818e24e2a51..181e81af3a78 100644
+> > > > --- a/drivers/net/dsa/microchip/ksz_common.c
+> > > > +++ b/drivers/net/dsa/microchip/ksz_common.c
+> > > > @@ -3906,6 +3906,11 @@ static int ksz_hsr_join(struct
+> > > > dsa_switch *ds, =20
+> > int port, struct net_device *hsr, =20
+> > > >             return -EOPNOTSUPP;
+> > > >     }
+> > > >
+> > > > +   if (hweight8(dev->hsr_ports) > 1) {
+> > > > +           NL_SET_ERR_MSG_MOD(extack, "Cannot offload more
+> > > > than two =20
+> > ports (in use=3D0x%x)", dev->hsr_ports); =20
+> > > > +           return -EOPNOTSUPP;
+> > > > +   } =20
+> > >
+> > > Hi Dan
+> > >
+> > > I don't know HSR to well, but this is offloading to hardware, to
+> > > accelerate what Linux is already doing in software. It should be,
+> > > if the hardware says it cannot do it, software will continue to
+> > > do the job. So the extack message should never be seen. =20
+> >=20
+> > Ah.  Okay.  However the rest of the function prints similar messages
+> > and so probably we could remove those error messages as well.  To be
+> > honest, I just wanted something which functioned as a comment and
+> > mentioned "two ports".  Perhaps the condition would be more clear
+> > as =20
+> > >=3D 2 instead of > 1? =20
+> >  =20
+>=20
+> I'm not a HSR expert and so could be a dummy question.
+>=20
+> I think this case (upto 2 HSR port offload) is different from other
+> offload error.=20
 
-NOBQL FQC 1q:  159.56  159.33  158.50  154.31    agv: 157.925
-NOBQL FQC 2q:  184.64  184.96  174.73  174.15    agv: 179.62
-NOBQL FQC 4q:  994.46  441.96  416.50  499.56    agv: 588.12
-NOBQL PFF 1q:  148.68  148.92  145.95  149.48    agv: 148.2575
-NOBQL PFF 2q:  171.86  171.20  170.42  169.42    agv: 170.725
-NOBQL PFF 4q: 1505.23 1137.23 2488.70 3507.99    agv: 2159.7875
-  BQL FQC 1q: 1332.80 1297.97 1351.41 1147.57    agv: 1282.4375
-  BQL FQC 2q:  768.30  817.72  864.43  974.40    agv: 856.2125
-  BQL FQC 4q:  945.66  942.68  878.51  822.82    agv: 897.4175
-  BQL PFF 1q:  149.69  151.49  149.40  147.47    agv: 149.5125
-  BQL PFF 2q: 2059.32  798.74 1844.12  381.80    agv: 1270.995
-  BQL PFF 4q: 1871.98 4420.02 4916.59 13268.16   agv: 6119.1875
+It is not so different.
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
-v2->v3:
-- fixed the switch from/to orphan mode while skbs are yet to be
-  completed by using the second least significant bit in virtqueue
-  token pointer to indicate skb is orphan. Don't account orphan
-  skbs in completion.
-- reorganized parallel skb/xdp free stats accounting to napi/others.
-- fixed kick condition check in orphan mode
-v1->v2:
-- moved netdev_tx_completed_queue() call into __free_old_xmit(),
-  propagate use_napi flag to __free_old_xmit() and only call
-  netdev_tx_completed_queue() in case it is true
-- added forgotten call to netdev_tx_reset_queue()
-- fixed stats for xdp packets
-- fixed bql accounting when __free_old_xmit() is called from xdp path
-- handle the !use_napi case in start_xmit() kick section
----
- drivers/net/virtio_net.c | 81 ++++++++++++++++++++++++++++------------
- 1 file changed, 57 insertions(+), 24 deletions(-)
+In this case when we'd call:
+ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 interlink lan3
+supervision 45 version 1
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 61a57d134544..9f9b86874173 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -47,7 +47,8 @@ module_param(napi_tx, bool, 0644);
- #define VIRTIO_XDP_TX		BIT(0)
- #define VIRTIO_XDP_REDIR	BIT(1)
- 
--#define VIRTIO_XDP_FLAG	BIT(0)
-+#define VIRTIO_XDP_FLAG		BIT(0)
-+#define VIRTIO_ORPHAN_FLAG	BIT(1)
- 
- /* RX packet size EWMA. The average packet size is used to determine the packet
-  * buffer size when refilling RX rings. As the entire RX ring may be refilled
-@@ -85,6 +86,8 @@ struct virtnet_stat_desc {
- struct virtnet_sq_free_stats {
- 	u64 packets;
- 	u64 bytes;
-+	u64 napi_packets;
-+	u64 napi_bytes;
- };
- 
- struct virtnet_sq_stats {
-@@ -506,29 +509,50 @@ static struct xdp_frame *ptr_to_xdp(void *ptr)
- 	return (struct xdp_frame *)((unsigned long)ptr & ~VIRTIO_XDP_FLAG);
- }
- 
--static void __free_old_xmit(struct send_queue *sq, bool in_napi,
--			    struct virtnet_sq_free_stats *stats)
-+static bool is_orphan_skb(void *ptr)
-+{
-+	return (unsigned long)ptr & VIRTIO_ORPHAN_FLAG;
-+}
-+
-+static void *skb_to_ptr(struct sk_buff *skb, bool orphan)
-+{
-+	return (void *)((unsigned long)skb | (orphan ? VIRTIO_ORPHAN_FLAG : 0));
-+}
-+
-+static struct sk_buff *ptr_to_skb(void *ptr)
-+{
-+	return (struct sk_buff *)((unsigned long)ptr & ~VIRTIO_ORPHAN_FLAG);
-+}
-+
-+static void __free_old_xmit(struct send_queue *sq, struct netdev_queue *txq,
-+			    bool in_napi, struct virtnet_sq_free_stats *stats)
- {
- 	unsigned int len;
- 	void *ptr;
- 
- 	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
--		++stats->packets;
--
- 		if (!is_xdp_frame(ptr)) {
--			struct sk_buff *skb = ptr;
-+			struct sk_buff *skb = ptr_to_skb(ptr);
- 
- 			pr_debug("Sent skb %p\n", skb);
- 
--			stats->bytes += skb->len;
-+			if (is_orphan_skb(ptr)) {
-+				stats->packets++;
-+				stats->bytes += skb->len;
-+			} else {
-+				stats->napi_packets++;
-+				stats->napi_bytes += skb->len;
-+			}
- 			napi_consume_skb(skb, in_napi);
- 		} else {
- 			struct xdp_frame *frame = ptr_to_xdp(ptr);
- 
-+			stats->packets++;
- 			stats->bytes += xdp_get_frame_len(frame);
- 			xdp_return_frame(frame);
- 		}
- 	}
-+	netdev_tx_completed_queue(txq, stats->napi_packets, stats->napi_bytes);
- }
- 
- /* Converting between virtqueue no. and kernel tx/rx queue no.
-@@ -955,21 +979,22 @@ static void virtnet_rq_unmap_free_buf(struct virtqueue *vq, void *buf)
- 	virtnet_rq_free_buf(vi, rq, buf);
- }
- 
--static void free_old_xmit(struct send_queue *sq, bool in_napi)
-+static void free_old_xmit(struct send_queue *sq, struct netdev_queue *txq,
-+			  bool in_napi)
- {
- 	struct virtnet_sq_free_stats stats = {0};
- 
--	__free_old_xmit(sq, in_napi, &stats);
-+	__free_old_xmit(sq, txq, in_napi, &stats);
- 
- 	/* Avoid overhead when no packets have been processed
- 	 * happens when called speculatively from start_xmit.
- 	 */
--	if (!stats.packets)
-+	if (!stats.packets && !stats.napi_packets)
- 		return;
- 
- 	u64_stats_update_begin(&sq->stats.syncp);
--	u64_stats_add(&sq->stats.bytes, stats.bytes);
--	u64_stats_add(&sq->stats.packets, stats.packets);
-+	u64_stats_add(&sq->stats.bytes, stats.bytes + stats.napi_bytes);
-+	u64_stats_add(&sq->stats.packets, stats.packets + stats.napi_packets);
- 	u64_stats_update_end(&sq->stats.syncp);
- }
- 
-@@ -1003,7 +1028,9 @@ static void check_sq_full_and_disable(struct virtnet_info *vi,
- 	 * early means 16 slots are typically wasted.
- 	 */
- 	if (sq->vq->num_free < 2+MAX_SKB_FRAGS) {
--		netif_stop_subqueue(dev, qnum);
-+		struct netdev_queue *txq = netdev_get_tx_queue(dev, qnum);
-+
-+		netif_tx_stop_queue(txq);
- 		u64_stats_update_begin(&sq->stats.syncp);
- 		u64_stats_inc(&sq->stats.stop);
- 		u64_stats_update_end(&sq->stats.syncp);
-@@ -1012,7 +1039,7 @@ static void check_sq_full_and_disable(struct virtnet_info *vi,
- 				virtqueue_napi_schedule(&sq->napi, sq->vq);
- 		} else if (unlikely(!virtqueue_enable_cb_delayed(sq->vq))) {
- 			/* More just got used, free them then recheck. */
--			free_old_xmit(sq, false);
-+			free_old_xmit(sq, txq, false);
- 			if (sq->vq->num_free >= 2+MAX_SKB_FRAGS) {
- 				netif_start_subqueue(dev, qnum);
- 				u64_stats_update_begin(&sq->stats.syncp);
-@@ -1138,7 +1165,8 @@ static int virtnet_xdp_xmit(struct net_device *dev,
- 	}
- 
- 	/* Free up any pending old buffers before queueing new ones. */
--	__free_old_xmit(sq, false, &stats);
-+	__free_old_xmit(sq, netdev_get_tx_queue(dev, sq - vi->sq),
-+			false, &stats);
- 
- 	for (i = 0; i < n; i++) {
- 		struct xdp_frame *xdpf = frames[i];
-@@ -2313,7 +2341,7 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
- 
- 		do {
- 			virtqueue_disable_cb(sq->vq);
--			free_old_xmit(sq, true);
-+			free_old_xmit(sq, txq, true);
- 		} while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
- 
- 		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
-@@ -2412,6 +2440,7 @@ static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
- 		goto err_xdp_reg_mem_model;
- 
- 	virtnet_napi_enable(vi->rq[qp_index].vq, &vi->rq[qp_index].napi);
-+	netdev_tx_reset_queue(netdev_get_tx_queue(vi->dev, qp_index));
- 	virtnet_napi_tx_enable(vi, vi->sq[qp_index].vq, &vi->sq[qp_index].napi);
- 
- 	return 0;
-@@ -2471,7 +2500,7 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
- 	txq = netdev_get_tx_queue(vi->dev, index);
- 	__netif_tx_lock(txq, raw_smp_processor_id());
- 	virtqueue_disable_cb(sq->vq);
--	free_old_xmit(sq, true);
-+	free_old_xmit(sq, txq, true);
- 
- 	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
- 		if (netif_tx_queue_stopped(txq)) {
-@@ -2505,7 +2534,7 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
- 	return 0;
- }
- 
--static int xmit_skb(struct send_queue *sq, struct sk_buff *skb)
-+static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
- {
- 	struct virtio_net_hdr_mrg_rxbuf *hdr;
- 	const unsigned char *dest = ((struct ethhdr *)skb->data)->h_dest;
-@@ -2549,7 +2578,8 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb)
- 			return num_sg;
- 		num_sg++;
- 	}
--	return virtqueue_add_outbuf(sq->vq, sq->sg, num_sg, skb, GFP_ATOMIC);
-+	return virtqueue_add_outbuf(sq->vq, sq->sg, num_sg,
-+				    skb_to_ptr(skb, orphan), GFP_ATOMIC);
- }
- 
- static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
-@@ -2559,24 +2589,25 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	struct send_queue *sq = &vi->sq[qnum];
- 	int err;
- 	struct netdev_queue *txq = netdev_get_tx_queue(dev, qnum);
--	bool kick = !netdev_xmit_more();
-+	bool xmit_more = netdev_xmit_more();
- 	bool use_napi = sq->napi.weight;
-+	bool kick;
- 
- 	/* Free up any pending old buffers before queueing new ones. */
- 	do {
- 		if (use_napi)
- 			virtqueue_disable_cb(sq->vq);
- 
--		free_old_xmit(sq, false);
-+		free_old_xmit(sq, txq, false);
- 
--	} while (use_napi && kick &&
-+	} while (use_napi && !xmit_more &&
- 	       unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
- 
- 	/* timestamp packet in software */
- 	skb_tx_timestamp(skb);
- 
- 	/* Try to transmit */
--	err = xmit_skb(sq, skb);
-+	err = xmit_skb(sq, skb, !use_napi);
- 
- 	/* This should not happen! */
- 	if (unlikely(err)) {
-@@ -2598,7 +2629,9 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 	check_sq_full_and_disable(vi, dev, sq);
- 
--	if (kick || netif_xmit_stopped(txq)) {
-+	kick = use_napi ? __netdev_tx_sent_queue(txq, skb->len, xmit_more) :
-+			  !xmit_more || netif_xmit_stopped(txq);
-+	if (kick) {
- 		if (virtqueue_kick_prepare(sq->vq) && virtqueue_notify(sq->vq)) {
- 			u64_stats_update_begin(&sq->stats.syncp);
- 			u64_stats_inc(&sq->stats.kicks);
--- 
-2.45.1
+lan1 and lan2 are correctly configured as ports, which can use HSR
+offloading on ksz9477.
 
+However, when we do already have two bits set in hsr_ports, we need to
+return (-ENOTSUPP), so the interlink port (HSR-SAN) would be used with
+SW based HSR interlink support.
+
+Otherwise, I do see some strange behaviour, as some HSR frames are
+visible on HSR-SAN network and vice versa causing switch to drop frames.
+
+Also conceptually - the interlink (i.e. HSR-SAN port) shall be only SW
+supported as it is also possible to use ksz9477 with only SW based HSR
+(i.e. port0/1 -> hsr0 with offloading, port2 -> HSR-SAN/interlink,
+port4/5 -> hsr1 with SW based HSR).
+
+> Others are checking whether offload is possible or
+> not, so SW HSR can kick in when -EOPNOTSUPP returns.=20
+
+Yes, this is exactly the case.
+
+> However, this
+> happens when joining 3rd (2+) port with hardware offload is enabled.
+> It is still working two ports are in HW HSR offload and next ports
+> are in SW HSR?
+
+As written above, it seems like the in-chip VLAN register is modified
+and some frames are passed between HSR and SAN networks, which is wrong.
+
+Best would be to have only two ports with HSR offloading enabled and
+then others with SW based HSR if required.
+
+For me the:
+
+NL_SET_ERR_MSG_MOD(extack, "Cannot offload more than two ports (in
+use=3D0x%x)", dev->hsr_ports);
+
+is fine - as it informs that no more HSR offloading is possible (and
+allows to SW based RedBox/HSR-SAN operation).
+
+>=20
+> Thanks.
+> Woojung
+
+
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/=faO5bG0JahLBSA=3O3EqoV
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmZxnZkACgkQAR8vZIA0
+zr1pDAgAz8iqxMsI8PaedNynjdgMDokKLvfzbsccYcMauZXGlALZ1sKG4xrZ6w6b
+nKRiE6X+EAuCWKLP4d3sTegMP2wg7iAfNFSTwQYltBFndzTPwopi2rf7h5lHQIHV
+w+QxPdn4Dpap0Tcf1Qdb+c+NJzBirrNbNgONrqO5IXgfZA0IsEKxg7tpxj+y8r23
+ygZhw6fSR2As7b0xwy9Oy2f0FZAFXZRpfBgxvHmoj7v2HiRVRx6uuZJMVhU7Ov0q
+wUId3AIiXdrhOdgtyPrS6qTcniWtmPI3vT33KcFZQxzmZOvt5gvIAAJdt2ivuyS0
+OBFpZcy0HUyW2ig31R3SI2RftxSCFQ==
+=A1DY
+-----END PGP SIGNATURE-----
+
+--Sig_/=faO5bG0JahLBSA=3O3EqoV--
 
