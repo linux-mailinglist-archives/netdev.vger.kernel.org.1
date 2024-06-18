@@ -1,285 +1,169 @@
-Return-Path: <netdev+bounces-104445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E091190C8FF
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:20:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6A8290C907
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:21:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70E8E1F21B7E
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:20:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 446AA1F22200
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:21:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB6F15B0EB;
-	Tue, 18 Jun 2024 10:08:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7EA313C82C;
+	Tue, 18 Jun 2024 10:10:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BJKyO5B2"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963D415AADA;
-	Tue, 18 Jun 2024 10:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205FE12AAC9
+	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 10:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718705303; cv=none; b=qunKr2fIJDQbKO2G0GzAksl3QGotyj48LFwn1XQAQ4wka2Rw6xhx/+llhNxbPdba8sSxUroS9O8dkftX86wptW7YGo28vfwglYS18ltxMeX8p8e7zWt8ZerILPWwishYlYlF8eYdOiZ0mh493OSZQ7EUsacHapgMHJFeB5LxI3s=
+	t=1718705416; cv=none; b=i2jdfTs6zc5mkpaZJST3j3TpWZwE8Gvd+AVQxsPICrWvRs9Z18i5tX64hZRoKew3Roe6U/hBdBB37bw/pjyusI2uQlZcbjyUNCgsNu++6y18b0sTcFARSKLUgWWQfo2IF6bh4ZMwu6HONDafj3hQ4QsIEr3l/p67RGAkPMiU9hM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718705303; c=relaxed/simple;
-	bh=7IQZIzDUaH+DZTelsMvGbihcm8DZ7Mg6WJM/HZES0qo=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=CoDKwBrw40unew4RIAj69TsfBmxLVnlbacnxm+OfZvG5pyn9ayFHAzs6ad1pBNL3ZWewTm5kPVHcMzTIlKWE+2gncv5zDkq/B/Fci5A98DnqI46tXSqGyxH6ooxpyjkY6VAuyNw7KgXDnuq+BBavQxlZO9j3W5oqjaCFWUoY5k8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D047BFF809;
-	Tue, 18 Jun 2024 10:08:16 +0000 (UTC)
-Message-ID: <b6464b49-a81d-45ab-9acc-95a86e9adb78@ovn.org>
-Date: Tue, 18 Jun 2024 12:08:16 +0200
+	s=arc-20240116; t=1718705416; c=relaxed/simple;
+	bh=xBlSITPDrWMGqBk7RX81DxBRK6FBCQLiSeBn0AOw/FA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=M7qi076WAefBvUk838z0T30R4v5WCShEfkZBa29GGb/QZZNRgZcPd1k/QSyLTu7ko2cnkqu1VDZ2w6LzlAUAdXu7KA+YmBd5Iqd35u4l89rv5CSlIhERufiJGzWaOxP1IX6s7kIqgGE1PkK1PgndoBrntptDyc0PuFcUjyViPis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BJKyO5B2; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4217a96de38so38344085e9.1
+        for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 03:10:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1718705413; x=1719310213; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nFv+H+J5KVtQDId7j7CojiPG2lRqqZRtUi9PX0uMdRw=;
+        b=BJKyO5B2iYwZX5w5Z8GksLGryr0x7kGKy6hXKplhu+Gg4Wqc6xRn1aRq3NAysVFtHs
+         QQA9FH/FVvstw+s31uxNprWq9ZiFuV3rPsODyX6vI2N2R/Vqz0odb/EGXMQtZV0s5pp0
+         pqRcLCotYc3R3MY1QXPzqB6HDnQE+CzSiS7LzMA4kYnTmagcbySnE/384mPkr1R4x7x7
+         +xzNfxRtT/rf7oHqbL18WOO88XTpyUQlfkR7sFCZg8lmukSI+hU/arHKkLbQpqlw+5WA
+         9LsS8ANiVOyix1n++EdKuV4nJOocIRJRsq1psQg5McIiJus4mT9Sbc2LNCsayBexv9pn
+         IpVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718705413; x=1719310213;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nFv+H+J5KVtQDId7j7CojiPG2lRqqZRtUi9PX0uMdRw=;
+        b=C2IfwLPTZZpPUYeZq2HNMlrzjU2D5pyJ+hrq/fPB2hvQV6ZQShBAAJz9FUCv5mOYfg
+         q0WwTQ6LsCgn1MdVycEyyxj4KPvx3YaUCLwb1ykjNZzRHFPx6dbEBklC7CfGG7J3/moi
+         4TZYhhBD/8NkwJchM6jvUt1gZtjxS9BRDxLZXMVqtM0UQK31KWyiV7mzT4anvZJxRPxb
+         UnnQQ2LDnCSNTPJEfd2j6HKWU1uMc0QfVCLy/GziY7OKzjG26r56zb2t0+bIuA8YzKt0
+         gMeBJhlxy8P8EW6ZaCFVFQpkj3WQ9atSC+BjQukv3DPnxYffXUOYvIcyMtyCbAKwQpW5
+         Q/xg==
+X-Forwarded-Encrypted: i=1; AJvYcCUsP2bb7j1iQ/CEx/r5jfihb3UtSF+t56Xix3SZsA4zB/elJdvkJuWOsW6CbK9Aax9co+0wczI+F7odoYjrD7OQFXOhrUjY
+X-Gm-Message-State: AOJu0YzJcQjXBuGQZUXl9l7snaNInYj7oa0ygypxCVBLrkBliLwaPEkP
+	nRyRh4n0CbfGX5ByHeLQRabYXEUi1aM1gNuLvRVFyokhU/lZqLmk8liCVDUjR9U=
+X-Google-Smtp-Source: AGHT+IFDpjGxbjE1yj2KaQhJtnTzZWL6+zm6itz1Q5fudeNujgBXsOq2XLy3QruSXpvSAkpsEQdWlw==
+X-Received: by 2002:a05:600c:45cd:b0:421:7eff:efb8 with SMTP id 5b1f17b1804b1-423056e01dbmr100092885e9.31.1718705413279;
+        Tue, 18 Jun 2024 03:10:13 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422874de607sm222957765e9.34.2024.06.18.03.10.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jun 2024 03:10:12 -0700 (PDT)
+Date: Tue, 18 Jun 2024 13:10:08 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: linux-scsi@vger.kernel.org
+Cc: open-iscsi@googlegroups.com, netdev@vger.kernel.org,
+	Kees Cook <kees@kernel.org>, Justin Stitt <justinstitt@google.com>,
+	linux-hardening@vger.kernel.org
+Subject: [bug report] [SCSI] iscsi_transport: Add support to display CHAP
+ list and delete CHAP entry
+Message-ID: <a60ed02d-3191-4e9d-b296-0a961a81a66d@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, netdev@vger.kernel.org, aconole@redhat.com,
- echaudro@redhat.com, horms@kernel.org, dev@openvswitch.org,
- Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar <pshelar@ovn.org>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 5/9] net: openvswitch: add emit_sample action
-To: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
-References: <20240603185647.2310748-1-amorenoz@redhat.com>
- <20240603185647.2310748-6-amorenoz@redhat.com>
- <4f89a9b9-999c-4d1f-8831-48045e6a74f6@ovn.org>
- <CAG=2xmPHcyLbuMCVR6ysKigboWg1E_xCHFMxEKUceerioO-OFg@mail.gmail.com>
- <ec135d28-5642-4393-a175-439c13c4d4f8@ovn.org>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <ec135d28-5642-4393-a175-439c13c4d4f8@ovn.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: i.maximets@ovn.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 6/18/24 11:47, Ilya Maximets wrote:
-> On 6/18/24 09:33, Adrián Moreno wrote:
->> On Mon, Jun 17, 2024 at 12:44:45PM GMT, Ilya Maximets wrote:
->>> On 6/3/24 20:56, Adrian Moreno wrote:
->>>> Add support for a new action: emit_sample.
->>>>
->>>> This action accepts a u32 group id and a variable-length cookie and uses
->>>> the psample multicast group to make the packet available for
->>>> observability.
->>>>
->>>> The maximum length of the user-defined cookie is set to 16, same as
->>>> tc_cookie, to discourage using cookies that will not be offloadable.
->>>>
->>>> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
->>>> ---
->>>>  Documentation/netlink/specs/ovs_flow.yaml | 17 ++++++++
->>>>  include/uapi/linux/openvswitch.h          | 25 ++++++++++++
->>>>  net/openvswitch/actions.c                 | 50 +++++++++++++++++++++++
->>>>  net/openvswitch/flow_netlink.c            | 33 ++++++++++++++-
->>>>  4 files changed, 124 insertions(+), 1 deletion(-)
->>>
->>> Some nits below, beside ones already mentioned.
->>>
->>
->> Thanks, Ilya.
->>
->>>>
->>>> diff --git a/Documentation/netlink/specs/ovs_flow.yaml b/Documentation/netlink/specs/ovs_flow.yaml
->>>> index 4fdfc6b5cae9..a7ab5593a24f 100644
->>>> --- a/Documentation/netlink/specs/ovs_flow.yaml
->>>> +++ b/Documentation/netlink/specs/ovs_flow.yaml
->>>> @@ -727,6 +727,12 @@ attribute-sets:
->>>>          name: dec-ttl
->>>>          type: nest
->>>>          nested-attributes: dec-ttl-attrs
->>>> +      -
->>>> +        name: emit-sample
->>>> +        type: nest
->>>> +        nested-attributes: emit-sample-attrs
->>>> +        doc: |
->>>> +          Sends a packet sample to psample for external observation.
->>>>    -
->>>>      name: tunnel-key-attrs
->>>>      enum-name: ovs-tunnel-key-attr
->>>> @@ -938,6 +944,17 @@ attribute-sets:
->>>>        -
->>>>          name: gbp
->>>>          type: u32
->>>> +  -
->>>> +    name: emit-sample-attrs
->>>> +    enum-name: ovs-emit-sample-attr
->>>> +    name-prefix: ovs-emit-sample-attr-
->>>> +    attributes:
->>>> +      -
->>>> +        name: group
->>>> +        type: u32
->>>> +      -
->>>> +        name: cookie
->>>> +        type: binary
->>>>
->>>>  operations:
->>>>    name-prefix: ovs-flow-cmd-
->>>> diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
->>>> index efc82c318fa2..a0e9dde0584a 100644
->>>> --- a/include/uapi/linux/openvswitch.h
->>>> +++ b/include/uapi/linux/openvswitch.h
->>>> @@ -914,6 +914,30 @@ struct check_pkt_len_arg {
->>>>  };
->>>>  #endif
->>>>
->>>> +#define OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE 16
->>>> +/**
->>>> + * enum ovs_emit_sample_attr - Attributes for %OVS_ACTION_ATTR_EMIT_SAMPLE
->>>> + * action.
->>>> + *
->>>> + * @OVS_EMIT_SAMPLE_ATTR_GROUP: 32-bit number to identify the source of the
->>>> + * sample.
->>>> + * @OVS_EMIT_SAMPLE_ATTR_COOKIE: A variable-length binary cookie that contains
->>>> + * user-defined metadata. The maximum length is 16 bytes.
->>>
->>> s/16/OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE/
->>>
->>>> + *
->>>> + * Sends the packet to the psample multicast group with the specified group and
->>>> + * cookie. It is possible to combine this action with the
->>>> + * %OVS_ACTION_ATTR_TRUNC action to limit the size of the packet being emitted.
->>>> + */
->>>> +enum ovs_emit_sample_attr {
->>>> +	OVS_EMIT_SAMPLE_ATTR_UNPSEC,
->>>> +	OVS_EMIT_SAMPLE_ATTR_GROUP,	/* u32 number. */
->>>> +	OVS_EMIT_SAMPLE_ATTR_COOKIE,	/* Optional, user specified cookie. */
->>>> +	__OVS_EMIT_SAMPLE_ATTR_MAX
->>>> +};
->>>> +
->>>> +#define OVS_EMIT_SAMPLE_ATTR_MAX (__OVS_EMIT_SAMPLE_ATTR_MAX - 1)
->>>> +
->>>> +
->>>>  /**
->>>>   * enum ovs_action_attr - Action types.
->>>>   *
->>>> @@ -1004,6 +1028,7 @@ enum ovs_action_attr {
->>>>  	OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
->>>>  	OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
->>>>  	OVS_ACTION_ATTR_DROP,         /* u32 error code. */
->>>> +	OVS_ACTION_ATTR_EMIT_SAMPLE,  /* Nested OVS_EMIT_SAMPLE_ATTR_*. */
->>>>
->>>>  	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
->>>>  				       * from userspace. */
->>>> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
->>>> index 964225580824..3b4dba0ded59 100644
->>>> --- a/net/openvswitch/actions.c
->>>> +++ b/net/openvswitch/actions.c
->>>> @@ -24,6 +24,11 @@
->>>>  #include <net/checksum.h>
->>>>  #include <net/dsfield.h>
->>>>  #include <net/mpls.h>
->>>> +
->>>> +#if IS_ENABLED(CONFIG_PSAMPLE)
->>>> +#include <net/psample.h>
->>>> +#endif
->>>> +
->>>>  #include <net/sctp/checksum.h>
->>>>
->>>>  #include "datapath.h"
->>>> @@ -1299,6 +1304,46 @@ static int execute_dec_ttl(struct sk_buff *skb, struct sw_flow_key *key)
->>>>  	return 0;
->>>>  }
->>>>
->>>> +static int execute_emit_sample(struct datapath *dp, struct sk_buff *skb,
->>>> +			       const struct sw_flow_key *key,
->>>> +			       const struct nlattr *attr)
->>>> +{
->>>> +#if IS_ENABLED(CONFIG_PSAMPLE)
->>>> +	struct psample_group psample_group = {};
->>>> +	struct psample_metadata md = {};
->>>> +	struct vport *input_vport;
->>>> +	const struct nlattr *a;
->>>> +	int rem;
->>>> +
->>>> +	for (a = nla_data(attr), rem = nla_len(attr); rem > 0;
->>>> +	     a = nla_next(a, &rem)) {
->>>
->>> Since the action is strictly validated, can use use nla_for_each_attr()
->>> or nla_for_each_nested() ?
->>>
->>
->> Probably, yes.
->>
->>>> +		switch (nla_type(a)) {
->>>> +		case OVS_EMIT_SAMPLE_ATTR_GROUP:
->>>> +			psample_group.group_num = nla_get_u32(a);
->>>> +			break;
->>>> +
->>>> +		case OVS_EMIT_SAMPLE_ATTR_COOKIE:
->>>> +			md.user_cookie = nla_data(a);
->>>> +			md.user_cookie_len = nla_len(a);
->>>> +			break;
->>>> +		}
->>>> +	}
->>>> +
->>>> +	psample_group.net = ovs_dp_get_net(dp);
->>>> +
->>>> +	input_vport = ovs_vport_rcu(dp, key->phy.in_port);
->>>> +	if (!input_vport)
->>>> +		input_vport = ovs_vport_rcu(dp, OVSP_LOCAL);
->>>
->>> We may need to check that we actually found the local port.
->>>
->>
->> Sure. What can cause the local port not to exist?
-> 
-> I would assume that since we're only protected by RCU here, there can be
-> a race with datapath destruction that will remove the local port.
+Hi SCSI and netlink developers,
 
-But, actually, we don't even need to look anything up.  The original
-input vport should be available in OVS_CB(skb)->input_vport.
+Commit 6260a5d22122 ("[SCSI] iscsi_transport: Add support to display
+CHAP list and delete CHAP entry") from Feb 27, 2012 (linux-next),
+leads to the following Smatch static checker warning:
 
-Best regards, Ilya Maximets.
+	drivers/scsi/scsi_transport_iscsi.c:3340 iscsi_get_chap()
+	warn: potential user controlled sizeof overflow 'ev->u.get_chap.num_entries * 524' '0-u32max * 524' type='uint'
+
+drivers/scsi/scsi_transport_iscsi.c
+    3319 static int
+    3320 iscsi_get_chap(struct iscsi_transport *transport, struct nlmsghdr *nlh)
+    3321 {
+    3322         struct iscsi_uevent *ev = nlmsg_data(nlh);
+    3323         struct Scsi_Host *shost = NULL;
+    3324         struct iscsi_chap_rec *chap_rec;
+    3325         struct iscsi_internal *priv;
+    3326         struct sk_buff *skbchap;
+    3327         struct nlmsghdr *nlhchap;
+    3328         struct iscsi_uevent *evchap;
+    3329         uint32_t chap_buf_size;
+    3330         int len, err = 0;
+    3331         char *buf;
+    3332 
+    3333         if (!transport->get_chap)
+    3334                 return -EINVAL;
+    3335 
+    3336         priv = iscsi_if_transport_lookup(transport);
+    3337         if (!priv)
+    3338                 return -EINVAL;
+    3339 
+--> 3340         chap_buf_size = (ev->u.get_chap.num_entries * sizeof(*chap_rec));
+    3341         len = nlmsg_total_size(sizeof(*ev) + chap_buf_size);
+
+Smatch doesn't trust nlmsg_data().  ev->u.get_chap.num_entries and
+chap_buf_size are both u32 types so it looks like this integer overflow
+warning is valid.  On the other hand, hopefully, you trust your ISCSI
+transport.
+
+Then we pass the overflowed value to nlmsg_total_size() and do three
+more integer overflows:
+
+1) sizeof(*ev) + chap_buf_size
+2) NLMSG_HDRLEN + payload
+3) NLMSG_ALIGN()  (ALIGN macros wrap to zero)
+
+So my solution was going to be use size_mul(ev->u.get_chap.num_entries,
+sizeof(*chap_rec)) for the multiply.
+
+I kind of want it to be a static checker error when code uses
+size_add/mul() and saves the result to anything except unsigned long.
+Or when code uses the result to do further math.  The problem with
+this is that people like struct_size() and use it even when they know
+the result can't overflow so this generates false positive warnings.
+
+Also maybe we should harden nlmsg_total_size() against integer
+overflows?
+
+regards,
+dan carpenter
+
+    3342 
+    3343         shost = scsi_host_lookup(ev->u.get_chap.host_no);
+    3344         if (!shost) {
+    3345                 printk(KERN_ERR "%s: failed. Could not find host no %u\n",
+    3346                        __func__, ev->u.get_chap.host_no);
+    3347                 return -ENODEV;
+    3348         }
+    3349 
+    3350         do {
+    3351                 int actual_size;
+    3352 
+    3353                 skbchap = alloc_skb(len, GFP_KERNEL);
+    3354                 if (!skbchap) {
+    3355                         printk(KERN_ERR "can not deliver chap: OOM\n");
+    3356                         err = -ENOMEM;
+    3357                         goto exit_get_chap;
+    3358                 }
+    3359 
+    3360                 nlhchap = __nlmsg_put(skbchap, 0, 0, 0,
+    3361                                       (len - sizeof(*nlhchap)), 0);
+
 
 
