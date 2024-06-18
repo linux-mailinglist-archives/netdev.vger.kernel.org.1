@@ -1,89 +1,115 @@
-Return-Path: <netdev+bounces-104443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8EDB90C8A4
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:12:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66C2590C8AF
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:13:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61A871F20FA3
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:12:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB972282315
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:13:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7000C1ACE7F;
-	Tue, 18 Jun 2024 09:56:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YNt27QS4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3260B20BA9F;
+	Tue, 18 Jun 2024 09:57:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9A020A930;
-	Tue, 18 Jun 2024 09:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F6E20BA8D;
+	Tue, 18 Jun 2024 09:57:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718704577; cv=none; b=rwhPZUH0nZodYOfynYaLy7E2CqbwLTxmJ4pECJMjuo8syfpiUFjWFJOR9bqG6T8bsYkUhb9mA8qqNFk6Tign5o+4nAPsVSuFUFnKByEfotDR8Aqf1C14mkUmznZXr82p3xPxhVBHcDqc+c42J/raCZodd9gQGmZF3Ku0mADDSwM=
+	t=1718704641; cv=none; b=d32yNYBW5VmTcEiUDftYshZIyilTCuyYc44CXtNUVP0rAS7eesJb3udp3KOz3wM3lqCDibOh+ma+N7IqdCQoIkyhGzodH+iRAnbLb/S0e9lyg98HWOsvTWTympL352e+comZp8pL2gpAWujBMryde0fy4qMaZZP/YPT3L1gt4Jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718704577; c=relaxed/simple;
-	bh=KjFrD3x7om3gSIqL3pNxCEjKTXG59g1dkIyKmefkQlU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ewFGV/6nhkwdovik2nLGxY5BAPTAT0w5Ldl6DfGgWFCHAuFHoEN8ezpqzzygIHyCF1ieVShJhf3PLMq8oWV8HGw9GKugCPnNuRz89IocDuDTfVWbyG7kA3EHUzlcEy5HyBxW+R46YD0ftXOGjBk5wWOBWy1vHFmeV7ZasFfcIUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YNt27QS4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21AB1C4AF1A;
-	Tue, 18 Jun 2024 09:56:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718704576;
-	bh=KjFrD3x7om3gSIqL3pNxCEjKTXG59g1dkIyKmefkQlU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YNt27QS4sw4M6YYfzSPylnGv63F3Qqrd/RAWyAJGj4fx2OScnBYkYvlkTZDaJ3Yu5
-	 x0JoOA99zqVx6Uu1F/sux9O360tqk4se7RLtW4/Ek7jcKpH/tJsde84YLolhRahDJL
-	 PKsxU/zg2l21dIcDnae3V/CVqQdIEmN9JrQ2HECCW8dimE2kuLAdXlBTkSybDPD+jE
-	 xesC0DGTbbOK14iuNgR/lkmycBLC+CSPxMg3lZdIsdpy3CSoiqu3T9tzIftqIvEZej
-	 cRwDH8EzlLokxEdedE9vqP3Od6eQsorkBWDvC7bnLZ0KNg7LM9DMQWTb21hnfBqpZ4
-	 ibv9T2zZr62uw==
-Date: Tue, 18 Jun 2024 10:56:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Xiaolei Wang <xiaolei.wang@windriver.com>
-Cc: olteanv@gmail.com, linux@armlinux.org.uk, alexandre.torgue@foss.st.com,
-	andrew@lunn.ch, joabreu@synopsys.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com, wojciech.drewek@intel.com,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net v2 PATCH] net: stmmac: No need to calculate speed divider
- when offload is disabled
-Message-ID: <20240618095608.GI8447@kernel.org>
-References: <20240617013922.1035854-1-xiaolei.wang@windriver.com>
+	s=arc-20240116; t=1718704641; c=relaxed/simple;
+	bh=kQT2vNmbzC611SxXjaKEACv+4h8nw9vPYq7MFYi4xfk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=HRuP/Spx0ElqWH//BhtRFz/nquIN1HBa6pgolXZwNpkttIKi9Rn96Uy7QZrJdgzJQ4kGzGjQ4T7YTNS75wWCdF7Vwr6ukTIqw0j+jMndus9fAKJjha5mS4y76m8jjTj0AH7hW+XFd/weJ6OboFymahl5IBadvl/StCA94IYYZMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 45I9ufP23332592, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 45I9ufP23332592
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 18 Jun 2024 17:56:41 +0800
+Received: from RTEXMBS05.realtek.com.tw (172.21.6.98) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 18 Jun 2024 17:56:41 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS05.realtek.com.tw (172.21.6.98) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 18 Jun 2024 17:56:41 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Tue, 18 Jun 2024 17:56:41 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Jakub Kicinski <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org" <horms@kernel.org>,
+        "rkannoth@marvell.com"
+	<rkannoth@marvell.com>,
+        Ping-Ke Shih <pkshih@realtek.com>,
+        Larry Chiu
+	<larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v20 10/13] rtase: Implement ethtool function
+Thread-Topic: [PATCH net-next v20 10/13] rtase: Implement ethtool function
+Thread-Index: AQHauLe4t8TnjFOscEGW3MirT25lzrHEW4aAgAC1QoCABncfgIAByXtA
+Date: Tue, 18 Jun 2024 09:56:40 +0000
+Message-ID: <1f0376e1dbc846a799d62a56bc6c9ff2@realtek.com>
+References: <20240607084321.7254-1-justinlai0215@realtek.com>
+ <20240607084321.7254-11-justinlai0215@realtek.com>
+ <20240612173505.095c4117@kernel.org>
+ <82ea81963af9482aa45d0463a21956b5@realtek.com>
+ <94c758fc-cfcf-4a11-95b6-ca57cc85ed3e@lunn.ch>
+In-Reply-To: <94c758fc-cfcf-4a11-95b6-ca57cc85ed3e@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240617013922.1035854-1-xiaolei.wang@windriver.com>
 
-On Mon, Jun 17, 2024 at 09:39:22AM +0800, Xiaolei Wang wrote:
-> commit be27b8965297 ("net: stmmac: replace priv->speed with
-> the portTransmitRate from the tc-cbs parameters") introduced
-> a problem. When deleting, it prompts "Invalid portTransmitRate
-> 0 (idleSlope - sendSlope)" and exits. Add judgment on cbs.enable.
-> Only when offload is enabled, speed divider needs to be calculated.
-> 
-> Fixes: be27b8965297 ("net: stmmac: replace priv->speed with the portTransmitRate from the tc-cbs parameters")
-> Signed-off-by: Xiaolei Wang <xiaolei.wang@windriver.com>
-> ---
-> 
-> Change log:
-> 
-> v1:
->     https://patchwork.kernel.org/project/netdevbpf/patch/20240614081916.764761-1-xiaolei.wang@windriver.com/
-> v2:
->     When offload is disabled, ptr is initialized to 0
-
-Thanks for the update.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+>=20
+> > > > +     strscpy(drvinfo->bus_info, pci_name(tp->pdev), 32);
+> > >
+> > > Can you double check that overwriting these fields is actually needed=
+?
+> > > I think core will fill this in for you in ethtool_get_drvinfo()
+> >
+> > I have removed this line of code for testing. Before removing the
+> > code, I could obtain bus info by entering "ethtool -i". However, after
+> > removing the code, entering "ethtool -i" no longer retrieves the bus in=
+fo.
+>=20
+> https://elixir.bootlin.com/linux/latest/source/net/ethtool/ioctl.c#L710
+>=20
+>         if (ops->get_drvinfo) {
+>                 ops->get_drvinfo(dev, &rsp->info);
+>                 if (!rsp->info.bus_info[0] && parent)
+>                         strscpy(rsp->info.bus_info, dev_name(parent),
+>                                 sizeof(rsp->info.bus_info));
+>=20
+> This suggests you have not set the parent device.
+>=20
+>         Andrew
+Hi Andrew,
+I understand your explanation. However, when we input ethtool -i,
+shouldn't we aim to get the bus info of the actual device rather than
+the parent device? That's why I think we need to add this line.
 
