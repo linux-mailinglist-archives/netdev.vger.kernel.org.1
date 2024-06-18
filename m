@@ -1,134 +1,249 @@
-Return-Path: <netdev+bounces-104544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B205990D2A9
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 15:52:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09FE690D2BF
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 15:53:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A243A1C228DB
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:52:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E087285194
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:53:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC8415AAB1;
-	Tue, 18 Jun 2024 13:21:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25E4F1494A1;
+	Tue, 18 Jun 2024 13:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="luCTMmq3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SKZIQl0O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E9B13D8B6
-	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 13:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9A6145B31
+	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 13:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718716885; cv=none; b=IoazrONMyX5+G899Y8nargK/fzMejha2BuBY/9hhpF0UdV5uNnrQ8sbYQp2+EWsHMQJGmgMsH9ptPI6GU+i9BbrXO/X1RR5cvDAnHdDQBQJvYJN+w/huk19+lGAjjZUnf83t7u94FbX85MagcD89hW1Ww5u6BrXY1Jc99o5EK8M=
+	t=1718717293; cv=none; b=K7I0dAcoii95MhTx6dNSyqj2mZY8LmBPlFcjEWI1rlg9e4dopB3fnsYdHsOb1OBItIrF8Zl64DfRdy2Xep9L8ThyMo1mzfeixYD0HiT5ek6cjHXgY7Fuo6Pgn1HQaKRW6xo6sbeNMU3HUFusXI2sghX3ouZaQfArsXHk1h4MP18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718716885; c=relaxed/simple;
-	bh=wy7j2R85Pbh6Ocvt3qLCd/PJ4DM68J2wxPkzjTBaZ3E=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U1VDALHSsJ0i9vaodi+P5+hqUT5sJ0bOcYzqTWsa4j4NuAPQRVgkXWqb096TCp2B+Vo50jwcgWEmJRdmWJJkUpf5z8ZzYNOY3a9L9P2Bmyt3Wc+ihi07Ybr3Fi+N3SXPZkDS60T51t9xfQXlNKB8TXtxA/1JBkkZMfoA3If7CSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=luCTMmq3; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718716884; x=1750252884;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=wy7j2R85Pbh6Ocvt3qLCd/PJ4DM68J2wxPkzjTBaZ3E=;
-  b=luCTMmq3zggm8DBfqgvd49iJgKpsaocKos+eL0SC2QsEATfU/pCwJAyz
-   fAWPbyjVP6ZhenKfm0pV6GzbAjEdqXKMmbwXZsnqYIeBspTNEvvBcWeBF
-   0msAkV7a8EZGSBYvZkGq/VWAusrodP1mzoG0cdVMc9JbFKg2yJSe9AsYb
-   gZpMu7nOmkgDjGYFgebjya2Zjggk8OKQmczlpQBXCOeDbJirWmKY2+cXu
-   wH5fjuL6DABHpS3OaYGwsu6gQXMfxwB7CNJNjiHemUWsS15yCDDnxPwye
-   NiJ5aatYlFxOKF5cSkGR9WwfmqnBbv4o3ulsuubgTvXM5NgsdNA7NOjek
-   g==;
-X-CSE-ConnectionGUID: QoSF6L0BSUeYeQGpyp2YsA==
-X-CSE-MsgGUID: NcEdpFr3SCqgBuEpvIukMA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11107"; a="41002051"
-X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
-   d="scan'208";a="41002051"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2024 06:21:14 -0700
-X-CSE-ConnectionGUID: A2te/nlgSiWgiljpCu8qjw==
-X-CSE-MsgGUID: 9ZfXCtzbRT+gsPyXEmTY3g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
-   d="scan'208";a="41500950"
-Received: from unknown (HELO amlin-019-225.igk.intel.com) ([10.102.19.225])
-  by fmviesa008.fm.intel.com with ESMTP; 18 Jun 2024 06:21:12 -0700
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org,
-	Kelvin Kang <kelvin.kang@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH iwl-net v4] i40e: fix hot issue NVM content is corrupted after nvmupdate
-Date: Tue, 18 Jun 2024 15:21:11 +0200
-Message-Id: <20240618132111.3193963-1-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1718717293; c=relaxed/simple;
+	bh=w7UA21E8727CURep6Q4a3EaARXcCZGoKJ2hh9jNwujU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=AIMBqAuUEV+d3f7Brw5xuE6St2a6nVJzWxQxPDJBrbspx/x91X/lnm4p0WRYWrbjrCOdRwxys7sNjF5HiiUCZp9fqk9GDxzlH8BNslzA9mZbb4VxVMrB83iyawUqmxTZ+fbKeyzYK4p7Ag4UmLjB+X+ILNTVjTLxMuW11zuOvGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SKZIQl0O; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718717289;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QHQZyI1Ki5OZBByzaWYPnHf52cOaMXF9qafettPp8bg=;
+	b=SKZIQl0OXmHGUbhzQTlN2Wgw8AVCoHVKi6+lHJUluTwkaoPNvXUtTiZikI5sH9pv91vSRL
+	f+Vg2yrjX2//SJAcoizvaps6BHvEg/2Y5RQ9EV2V5Dbw/5Ue3MnzlchR/fL1evxyMG9/am
+	DL5Utz1FK0+gSdCvTjohIjmDrZcWdV4=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-457-FFdFBcDHMtedj7fSzWijvQ-1; Tue,
+ 18 Jun 2024 09:28:04 -0400
+X-MC-Unique: FFdFBcDHMtedj7fSzWijvQ-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4793F19560B9;
+	Tue, 18 Jun 2024 13:28:02 +0000 (UTC)
+Received: from RHTRH0061144 (dhcp-17-72.bos.redhat.com [10.18.17.72])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C73A619560AF;
+	Tue, 18 Jun 2024 13:27:59 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: =?utf-8?Q?Adri=C3=A1n?= Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org,  echaudro@redhat.com,  horms@kernel.org,
+  i.maximets@ovn.org,  dev@openvswitch.org,  Pravin B Shelar
+ <pshelar@ovn.org>,  "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  Shuah Khan <shuah@kernel.org>,
+  linux-kselftest@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 9/9] selftests: openvswitch: add emit_sample
+ test
+In-Reply-To: <CAG=2xmO-mtQOMABEAXNxEoa6NH5Hgae1x5+XWU5ZnLFg2n7b=g@mail.gmail.com>
+	(=?utf-8?Q?=22Adri=C3=A1n?= Moreno"'s message of "Tue, 18 Jun 2024 09:08:14
+ +0000")
+References: <20240603185647.2310748-1-amorenoz@redhat.com>
+	<20240603185647.2310748-10-amorenoz@redhat.com>
+	<f7tzfrnmp0q.fsf@redhat.com>
+	<CAG=2xmPvAfQx4jSFbBPTcEdo2Z6w93vo6-Uo5rVMLbu8qS1SOA@mail.gmail.com>
+	<CAG=2xmO-mtQOMABEAXNxEoa6NH5Hgae1x5+XWU5ZnLFg2n7b=g@mail.gmail.com>
+Date: Tue, 18 Jun 2024 09:27:58 -0400
+Message-ID: <f7tplsel6sh.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-The bug affects users only at the time when they try to update NVM, and
-only F/W versions that generate errors while nvmupdate. For example, X710DA2
-with 0x8000ECB7 F/W is affected, but there are probably more...
+Adri=C3=A1n Moreno <amorenoz@redhat.com> writes:
 
-Command for reproduction is just NVM update:
- ./nvmupdate64
+> On Mon, Jun 17, 2024 at 07:18:05AM GMT, Adri=C3=A1n Moreno wrote:
+>> On Fri, Jun 14, 2024 at 01:07:33PM GMT, Aaron Conole wrote:
+>> > Adrian Moreno <amorenoz@redhat.com> writes:
+>> >
+>> > > Add a test to verify sampling packets via psample works.
+>> > >
+>> > > In order to do that, create a subcommand in ovs-dpctl.py to listen to
+>> > > on the psample multicast group and print samples.
+>> > >
+>> > > In order to also test simultaneous sFlow and psample actions and
+>> > > packet truncation, add missing parsing support for "userspace" and
+>> > > "trunc" actions.
+>> >
+>> > Maybe split that into a separate patch.  This has a bugfix and 3
+>> > features being pushed in.  I know it's already getting long as a serie=
+s,
+>> > so maybe it's okay to fold the userspace attribute bugfix with the par=
+se
+>> > support (since it wasn't really usable before).
+>> >
+>>
+>> OK. Sounds reasonable.
+>>
+>> > > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+>> > > ---
+>> > >  .../selftests/net/openvswitch/openvswitch.sh  |  99 +++++++++++++++-
+>> > >  .../selftests/net/openvswitch/ovs-dpctl.py    | 112 +++++++++++++++=
+++-
+>> > >  2 files changed, 204 insertions(+), 7 deletions(-)
+>> > >
+>> > > diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh =
+b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+>> > > index 5cae53543849..f6e0ae3f6424 100755
+>> > > --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
+>> > > +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+>> > > @@ -20,7 +20,8 @@ tests=3D"
+>> > >  	nat_related_v4				ip4-nat-related: ICMP related matches work with =
+SNAT
+>> > >  	netlink_checks				ovsnl: validate netlink attrs and settings
+>> > >  	upcall_interfaces			ovs: test the upcall interfaces
+>> > > -	drop_reason				drop: test drop reasons are emitted"
+>> > > +	drop_reason				drop: test drop reasons are emitted
+>> > > +	emit_sample 				emit_sample: Sampling packets with psample"
+>> > >
+>> > >  info() {
+>> > >      [ $VERBOSE =3D 0 ] || echo $*
+>> > > @@ -170,6 +171,19 @@ ovs_drop_reason_count()
+>> > >  	return `echo "$perf_output" | grep "$pattern" | wc -l`
+>> > >  }
+>> > >
+>> > > +ovs_test_flow_fails () {
+>> > > +	ERR_MSG=3D"Flow actions may not be safe on all matching packets"
+>> > > +
+>> > > +	PRE_TEST=3D$(dmesg | grep -c "${ERR_MSG}")
+>> > > +	ovs_add_flow $@ &> /dev/null $@ && return 1
+>> > > +	POST_TEST=3D$(dmesg | grep -c "${ERR_MSG}")
+>> > > +
+>> > > +	if [ "$PRE_TEST" =3D=3D "$POST_TEST" ]; then
+>> > > +		return 1
+>> > > +	fi
+>> > > +	return 0
+>> > > +}
+>> > > +
+>> > >  usage() {
+>> > >  	echo
+>> > >  	echo "$0 [OPTIONS] [TEST]..."
+>> > > @@ -184,6 +198,89 @@ usage() {
+>> > >  	exit 1
+>> > >  }
+>> > >
+>> > > +
+>> > > +# emit_sample test
+>> > > +# - use emit_sample to observe packets
+>> > > +test_emit_sample() {
+>> > > +	sbx_add "test_emit_sample" || return $?
+>> > > +
+>> > > +	# Add a datapath with per-vport dispatching.
+>> > > +	ovs_add_dp "test_emit_sample" emit_sample -V 2:1 || return 1
+>> > > +
+>> > > +	info "create namespaces"
+>> > > +	ovs_add_netns_and_veths "test_emit_sample" "emit_sample" \
+>> > > +		client c0 c1 172.31.110.10/24 -u || return 1
+>> > > +	ovs_add_netns_and_veths "test_emit_sample" "emit_sample" \
+>> > > +		server s0 s1 172.31.110.20/24 -u || return 1
+>> > > +
+>> > > +	# Check if emit_sample actions can be configured.
+>> > > +	ovs_add_flow "test_emit_sample" emit_sample \
+>> > > +	'in_port(1),eth(),eth_type(0x0806),arp()' 'emit_sample(group=3D1)'
+>> > > +	if [ $? =3D=3D 1 ]; then
+>> > > +		info "no support for emit_sample - skipping"
+>> > > +		ovs_exit_sig
+>> > > +		return $ksft_skip
+>> > > +	fi
+>> > > +
+>> > > +	ovs_del_flows "test_emit_sample" emit_sample
+>> > > +
+>> > > +	# Allow ARP
+>> > > +	ovs_add_flow "test_emit_sample" emit_sample \
+>> > > +		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
+>> > > +	ovs_add_flow "test_emit_sample" emit_sample \
+>> > > +		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
+>> > > +
+>> > > +	# Test action verification.
+>> > > +	OLDIFS=3D$IFS
+>> > > +	IFS=3D'*'
+>> > > +	min_key=3D'in_port(1),eth(),eth_type(0x0800),ipv4()'
+>> > > +	for testcase in \
+>> > > +		"cookie to large"*"emit_sample(group=3D1,cookie=3D161514131211100=
+9080706050403020100)" \
+>> > > +		"no group with cookie"*"emit_sample(cookie=3Dabcd)" \
+>> > > +		"no group"*"sample()";
+>> > > +	do
+>> > > +		set -- $testcase;
+>> > > +		ovs_test_flow_fails "test_emit_sample" emit_sample $min_key $2
+>> > > +		if [ $? =3D=3D 1 ]; then
+>> > > +			info "failed - $1"
+>> > > +			return 1
+>> > > +		fi
+>> > > +	done
+>> > > +	IFS=3D$OLDIFS
+>> > > +
+>> > > +	# Sample first 14 bytes of all traffic.
+>> > > +	ovs_add_flow "test_emit_sample" emit_sample \
+>> > > +	"in_port(1),eth(),eth_type(0x0800),ipv4(src=3D172.31.110.10,proto=
+=3D1),icmp()" "trunc(14),emit_sample(group=3D1,cookie=3Dc0ffee),2"
+>> > > +
+>> > > +	# Sample all traffic. In this case, use a sample() action with both
+>> > > +	# emit_sample and an upcall emulating simultaneous local sampling =
+and
+>> > > +	# sFlow / IPFIX.
+>> > > +	nlpid=3D$(grep -E "listening on upcall packet handler" $ovs_dir/s0=
+.out | cut -d ":" -f 2 | tr -d ' ')
+>> > > +	ovs_add_flow "test_emit_sample" emit_sample \
+>> > > +	"in_port(2),eth(),eth_type(0x0800),ipv4(src=3D172.31.110.20,proto=
+=3D1),icmp()" "sample(sample=3D100%,actions(emit_sample(group=3D2,cookie=3D=
+eeff0c),userspace(pid=3D${nlpid},userdata=3Deeff0c))),1"
+>> > > +
+>> > > +	# Record emit_sample data.
+>> > > +	python3 $ovs_base/ovs-dpctl.py psample >$ovs_dir/psample.out 2>$ov=
+s_dir/psample.err &
+>> > > +	pid=3D$!
+>> > > +	on_exit "ovs_sbx test_emit_sample kill -TERM $pid 2>/dev/null"
+>> >
+>> >   Maybe ovs_netns_spawn_daemon ?
+>> >
+>>
+>> I'll take a look at it, thanks.
+>>
+>
+> I've looked into ovs_netns_spawn_daemon and I think it'll not be useful
+> for this command since it needs to run in the default namespace. I can
+> add a new "ovs_spawn_daemon" so it's reusable. WDYT?
 
-In the log instead of:
- i40e_nvmupd_exec_aq err I40E_ERR_ADMIN_QUEUE_ERROR aq_err I40E_AQ_RC_ENOMEM)
-appears:
- i40e_nvmupd_exec_aq err -EIO aq_err I40E_AQ_RC_ENOMEM
+Okay
 
-But the problematic code did silently convert EIO into EAGAIN which forced
-nvmupdate to ignore EAGAIN error and retry the same operation until timeout.
-That's why NVM update takes 20+ minutes to finish with the fail in the end.
-
-After commit 230f3d53a547 ("i40e: remove i40e_status"), which should only
-replace F/W specific error codes with Linux kernel generic, all EIO errors
-suddenly started to be converted into EAGAIN which leads nvmupdate to retry
-until it timeouts and sometimes fails after more than 20 minutes in the
-middle of NVM update, so NVM becomes corrupted.
-
-Remove wrong EIO to EGAIN conversion and pass all errors as is.
-
-Fixes: 230f3d53a547 ("i40e: remove i40e_status")
-Co-developed-by: Kelvin Kang <kelvin.kang@intel.com>
-Signed-off-by: Kelvin Kang <kelvin.kang@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
-v3->v4 commit message update
-v2->v3 commit messege typos
-v1->v2 commit message update
----
- drivers/net/ethernet/intel/i40e/i40e_adminq.h | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.h b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-index ee86d2c..55b5bb8 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-@@ -109,10 +109,6 @@ static inline int i40e_aq_rc_to_posix(int aq_ret, int aq_rc)
- 		-EFBIG,      /* I40E_AQ_RC_EFBIG */
- 	};
- 
--	/* aq_rc is invalid if AQ timed out */
--	if (aq_ret == -EIO)
--		return -EAGAIN;
--
- 	if (!((u32)aq_rc < (sizeof(aq_to_posix) / sizeof((aq_to_posix)[0]))))
- 		return -ERANGE;
- 
--- 
-2.25.1
+>> [...]
 
 
