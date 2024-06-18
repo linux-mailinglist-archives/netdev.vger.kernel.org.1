@@ -1,123 +1,248 @@
-Return-Path: <netdev+bounces-104604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50D0190D8D9
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 18:17:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB2D390D8DB
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 18:17:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61BB41C22FE4
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:17:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 677471F26647
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 774DE152190;
-	Tue, 18 Jun 2024 16:12:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99191E877;
+	Tue, 18 Jun 2024 16:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="lc9PVF+p";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="LS/OLGrv"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="nwyVp0VM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0FF513A89B;
-	Tue, 18 Jun 2024 16:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FEA7524C4;
+	Tue, 18 Jun 2024 16:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718727166; cv=none; b=q9jPsWB2jZdeHUEc6Ns26O26em19b8mQ1pwlZ35ym+zdjpfj9XTNTy8xGslJgifvFqkScKRUBwla8AwtOze33nvCYatqU2YaTFMZA/Za4LytsKqJ2oEbElDpKqJFg2xgfGwyOZFahSmgiksSqalzEjU8jeFEJkIZ/c9+aenghs0=
+	t=1718727222; cv=none; b=H5GH9vWLUSjXbsJtnHWBDzEuhtOm8Lqi0Sy3E+P/lR1Y09M/jYBUWUvGO3BGztX7zqEmAxKQssZ1AbiBDxLUW9xuvdUNlmOTp9vQrMIuCwjFFXDwaf6Zw29gwY6mv8svHotjzu4jY64GMnMGFuVwjeakp/XiVUwdLEDxH3Yvyig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718727166; c=relaxed/simple;
-	bh=qNULmo001mC5yL2uC9neAijsJRYb5joYOHW/sq9OTls=;
-	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=cSlRQ90jpS7cD6EtM0TXBTMxhqgnTQZM07O6dOZSqmblb5OiS4N6zBKcsWq9SpkIk7ggIxCfslug498hfe8QAHCFZFo1toYqQsfEGzDnGCdezd4ygktcCeaN+yWxgFtNbcF4EMdbveHlSxiNqmf86wsPi1XcmI/+lNl3SlV8dPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=lc9PVF+p; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=LS/OLGrv reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1718727163; x=1750263163;
-  h=message-id:subject:from:to:cc:date:
-   content-transfer-encoding:mime-version;
-  bh=qNULmo001mC5yL2uC9neAijsJRYb5joYOHW/sq9OTls=;
-  b=lc9PVF+p//dq3Jl8gPUS0lGu9UN83ZYr6lB7KOqemgeSXB+WzW8XWmOi
-   4jGqGqO2+dHZQHedOScRo5OKAeqoQwOEG4RsSOmrXoaW2Hpl3Sfpt7XkO
-   BHZf5R+eMv1texL/VpjI+1/0jzLdQRzd1S8no4bq9Ihb41Op1CbF/XJax
-   49hqxcLwGZ1P6S1PeJremc2Cu42C1Mu358L1Ez3q6aYGV9z+fZ522aHWU
-   A2sAo6lY9DLwhnZq9OUxd8r7XaKWEcKYhTUK4d/BZ8ENsEaYCeM59+R4Q
-   oPOJ2sk7bHTfM6zJvjcrrn8oRRt8P1yrh1Ejgb4agCaYP3+E8cZyUf//e
-   Q==;
-X-CSE-ConnectionGUID: UFIXNrYPRUOnvkwpxts+4w==
-X-CSE-MsgGUID: orx72WeMR0idy2RCELZc2Q==
-X-IronPort-AV: E=Sophos;i="6.08,247,1712613600"; 
-   d="scan'208";a="37457616"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 18 Jun 2024 18:12:35 +0200
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3B5051664C9;
-	Tue, 18 Jun 2024 18:12:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1718727150;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding; bh=qNULmo001mC5yL2uC9neAijsJRYb5joYOHW/sq9OTls=;
-	b=LS/OLGrv/yld6GBB/DMqXy8/DiycpIH+FNzKfCT7A2THBG0TLcjyMVprzeFtT/JA8GS/5A
-	7KwK2puAK0sVidAs3x6YI47wboRSfT3jPJhZZeNSKziSkfHl6iR2Wh1rIayE50KgvOuadq
-	8Pd0CcW7N0DZOLiK1eVZAIQutJ74AyAVm7aiycrcyNL5esZ7IuEoLGm5WnpNmJOOkQHcA7
-	ASjTte6NPB6sqiwfgALZS3ZIFWVQr+lj7p0RmvtNm9VLtKwVvRJUAQki0VQIYSpyWoXapv
-	KaWGdHyFCdALxvIbx46/q/6l8k7dV0GmdTnVR6MQMA01ZCrN7BWKhxQXGqGzpA==
-Message-ID: <e72771c75988a2460fa8b557b0e2d32e6894f75d.camel@ew.tq-group.com>
-Subject: Kernel hang caused by commit "can: m_can: Start/Cancel polling
- timer together with interrupts"
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: Markus Schneider-Pargmann <msp@baylibre.com>
-Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Marc Kleine-Budde
- <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Tony Lindgren
- <tony@atomide.com>, Judith Mendez <jm@ti.com>,  linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,  linux@ew.tq-group.com
-Date: Tue, 18 Jun 2024 18:12:27 +0200
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1718727222; c=relaxed/simple;
+	bh=K+ZgJRFtcOw1rvXzvtOs8fHZi5JIhFJypsiDrxlBV/8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XK3YE5Ch5zN+fsgRB8T1zB4zvA8/cpN/WbRttKfyWYO4JHrGNFvCOW7Z0Vn4WSQl5h8HTdVdIA68nG+m7sHPYOrzoGDCNP+T7PizHvnPxEFab5YfR+J0cVwCrkKQlwuAAQYFuLPks8LSmKm2b3+PX6fu3xgzWyLMqOR6PNpiP6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=nwyVp0VM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84F7CC3277B;
+	Tue, 18 Jun 2024 16:13:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1718727222;
+	bh=K+ZgJRFtcOw1rvXzvtOs8fHZi5JIhFJypsiDrxlBV/8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nwyVp0VMfXCZrdbsz9rtAx8aZBePsTR9hUjLpC/vvhU8Ehl49q+E6vTHibV5ZtK2u
+	 m0HyFPErmMnCPJb1qD+lXGF1wVKPM5hYh34Jptb2ecD4oODfd10HZ4YBxKv27goA1/
+	 pw7aHIiTE1A2F5orTYA0GTaUHhEKWtBnhnLGdbDE=
+Date: Tue, 18 Jun 2024 18:13:38 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Shay Drory <shayd@nvidia.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	kuba@kernel.org, edumazet@google.com, david.m.ertman@intel.com,
+	rafael@kernel.org, ira.weiny@intel.com, linux-rdma@vger.kernel.org,
+	leon@kernel.org, tariqt@nvidia.com, Parav Pandit <parav@nvidia.com>
+Subject: Re: [PATCH net-next v7 1/2] driver core: auxiliary bus: show
+ auxiliary device IRQs
+Message-ID: <2024061849-cupped-throwback-4fee@gregkh>
+References: <20240618150902.345881-1-shayd@nvidia.com>
+ <20240618150902.345881-2-shayd@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240618150902.345881-2-shayd@nvidia.com>
 
-Hi Markus,
+On Tue, Jun 18, 2024 at 06:09:01PM +0300, Shay Drory wrote:
+> diff --git a/drivers/base/auxiliary_sysfs.c b/drivers/base/auxiliary_sysfs.c
+> new file mode 100644
+> index 000000000000..3f112fd26e72
+> --- /dev/null
+> +++ b/drivers/base/auxiliary_sysfs.c
+> @@ -0,0 +1,110 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES
+> + */
+> +
+> +#include <linux/auxiliary_bus.h>
+> +#include <linux/slab.h>
+> +
+> +struct auxiliary_irq_info {
+> +	struct device_attribute sysfs_attr;
+> +};
+> +
+> +static struct attribute *auxiliary_irq_attrs[] = {
+> +	NULL
+> +};
+> +
+> +static const struct attribute_group auxiliary_irqs_group = {
+> +	.name = "irqs",
+> +	.attrs = auxiliary_irq_attrs,
+> +};
+> +
+> +static int auxiliary_irq_dir_prepare(struct auxiliary_device *auxdev)
+> +{
+> +	int ret = 0;
+> +
+> +	mutex_lock(&auxdev->lock);
+> +	if (auxdev->dir_exists)
+> +		goto unlock;
 
-we've found that recent kernels hang on the TI AM62x SoC (where no m_can in=
-terrupt is available and
-thus the polling timer is used), always a few seconds after the CAN interfa=
-ces are set up.
+You do know about cleanup.h, right?  Please use it.
 
-I have bisected the issue to commit a163c5761019b ("can: m_can: Start/Cance=
-l polling timer together
-with interrupts"). Both master and 6.6 stable (which received a backport of=
- the commit) are
-affected. On 6.6 the commit is easy to revert, but on master a lot has happ=
-ened on top of that
-change.
-
-As far as I can tell, the reason is that hrtimer_cancel() tries to cancel t=
-he timer synchronously,
-which will deadlock when called from the hrtimer callback itself (hrtimer_c=
-allback -> m_can_isr ->
-m_can_disable_all_interrupts -> hrtimer_cancel).
-
-I can try to come up with a fix, but I think you are much more familiar wit=
-h the driver code. Please
-let me know if you need any more information.
-
-Best regards,
-Matthias
+But what exactly are you trying to protect here?  How will you race and
+add two irqs at the same time?  Driver probe is always single threaded,
+so what would be calling this at the same time from multiple places?
 
 
---=20
-TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
-any
-Amtsgericht M=C3=BCnchen, HRB 105018
-Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
-neider
-https://www.tq-group.com/
+> +
+> +	xa_init(&auxdev->irqs);
+> +	ret = devm_device_add_group(&auxdev->dev, &auxiliary_irqs_group);
+> +	if (!ret)
+> +		auxdev->dir_exists = 1;
+> +
+> +unlock:
+> +	mutex_unlock(&auxdev->lock);
+> +	return ret;
+> +}
+> +
+> +/**
+> + * auxiliary_device_sysfs_irq_add - add a sysfs entry for the given IRQ
+> + * @auxdev: auxiliary bus device to add the sysfs entry.
+> + * @irq: The associated interrupt number.
+> + *
+> + * This function should be called after auxiliary device have successfully
+> + * received the irq.
+> + *
+> + * Return: zero on success or an error code on failure.
+> + */
+> +int auxiliary_device_sysfs_irq_add(struct auxiliary_device *auxdev, int irq)
+> +{
+> +	struct device *dev = &auxdev->dev;
+> +	struct auxiliary_irq_info *info;
+> +	int ret;
+> +
+> +	ret = auxiliary_irq_dir_prepare(auxdev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	info = kzalloc(sizeof(*info), GFP_KERNEL);
+> +	if (!info)
+> +		return -ENOMEM;
+> +
+> +	sysfs_attr_init(&info->sysfs_attr.attr);
+> +	info->sysfs_attr.attr.name = kasprintf(GFP_KERNEL, "%d", irq);
+> +	if (!info->sysfs_attr.attr.name) {
+> +		ret = -ENOMEM;
+> +		goto name_err;
+> +	}
+> +
+> +	ret = xa_insert(&auxdev->irqs, irq, info, GFP_KERNEL);
+
+So no lock happening here, either use it always, or not at all?
+
+
+> +	if (ret)
+> +		goto auxdev_xa_err;
+> +
+> +	ret = sysfs_add_file_to_group(&dev->kobj, &info->sysfs_attr.attr,
+> +				      auxiliary_irqs_group.name);
+
+You do know that you are never going to see these files from the
+userspace library tools that watch sysfs, right?  libudev will never see
+them as you are adding them AFTER the device is created.
+
+So, because of that, who is really going to use these files?
+
+
+> +	if (ret)
+> +		goto sysfs_add_err;
+> +
+> +	return 0;
+> +
+> +sysfs_add_err:
+> +	xa_erase(&auxdev->irqs, irq);
+> +auxdev_xa_err:
+> +	kfree(info->sysfs_attr.attr.name);
+> +name_err:
+> +	kfree(info);
+
+Again, cleanup.h is your friend.
+
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_add);
+> +
+> +/**
+> + * auxiliary_device_sysfs_irq_remove - remove a sysfs entry for the given IRQ
+> + * @auxdev: auxiliary bus device to add the sysfs entry.
+> + * @irq: the IRQ to remove.
+> + *
+> + * This function should be called to remove an IRQ sysfs entry.
+> + */
+> +void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev, int irq)
+> +{
+> +	struct auxiliary_irq_info *info = xa_load(&auxdev->irqs, irq);
+> +	struct device *dev = &auxdev->dev;
+> +
+> +	sysfs_remove_file_from_group(&dev->kobj, &info->sysfs_attr.attr,
+> +				     auxiliary_irqs_group.name);
+> +	xa_erase(&auxdev->irqs, irq);
+> +	kfree(info->sysfs_attr.attr.name);
+> +	kfree(info);
+> +}
+> +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_remove);
+> diff --git a/include/linux/auxiliary_bus.h b/include/linux/auxiliary_bus.h
+> index de21d9d24a95..96be140bd1ff 100644
+> --- a/include/linux/auxiliary_bus.h
+> +++ b/include/linux/auxiliary_bus.h
+> @@ -58,6 +58,7 @@
+>   *       in
+>   * @name: Match name found by the auxiliary device driver,
+>   * @id: unique identitier if multiple devices of the same name are exported,
+> + * @irqs: irqs xarray contains irq indices which are used by the device,
+>   *
+>   * An auxiliary_device represents a part of its parent device's functionality.
+>   * It is given a name that, combined with the registering drivers
+> @@ -138,7 +139,10 @@
+>  struct auxiliary_device {
+>  	struct device dev;
+>  	const char *name;
+> +	struct xarray irqs;
+> +	struct mutex lock; /* Protects "irqs" directory creation */
+
+Protects it from what?
+
+
+>  	u32 id;
+> +	u8 dir_exists:1;
+
+I don't think this is needed, but if it really is, just use a bool.
+
+
+>  };
+>  
+>  /**
+> @@ -212,8 +216,24 @@ int auxiliary_device_init(struct auxiliary_device *auxdev);
+>  int __auxiliary_device_add(struct auxiliary_device *auxdev, const char *modname);
+>  #define auxiliary_device_add(auxdev) __auxiliary_device_add(auxdev, KBUILD_MODNAME)
+>  
+> +#ifdef CONFIG_SYSFS
+> +int auxiliary_device_sysfs_irq_add(struct auxiliary_device *auxdev, int irq);
+> +void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev,
+> +				       int irq);
+
+You can use longer lines :)
+
+thanks,
+
+greg k-h
 
