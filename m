@@ -1,146 +1,171 @@
-Return-Path: <netdev+bounces-104627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0F0A90DA46
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 19:05:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 943D790DA51
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 19:07:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 762B9287548
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 17:05:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 477A8281C74
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 17:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BD313A868;
-	Tue, 18 Jun 2024 17:05:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DCD913BC35;
+	Tue, 18 Jun 2024 17:06:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OukbcIEE"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="hQgI7JIu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03olkn2073.outbound.protection.outlook.com [40.92.57.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F55F446DE;
-	Tue, 18 Jun 2024 17:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718730303; cv=none; b=SvxoPafmtNd3L3MkOGnTVRbBzhupa5llYmrpIQnHUHrdaAUoDw2+vjplzpV5FlAhLuFdW68YQrnof3Rw/Sz8B2aNWhHDF9gix7f4D0olw9Bndluji6xPSSELR6Yqs9sgqYAhBSqc3/AHMpBSocMSS7zS0d2QLPg6jogGY7voNk0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718730303; c=relaxed/simple;
-	bh=ZGKWTfzgdsRzX+gb0DKjPB4QTpCqlNfAGwSotcVfJfQ=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u0Iv6ChIaZXAayT7o8jO39IPg51r8K+koiAOEoJEcvJPNKSSsYRfLPbe46Nv5oQB1/m1v29DjpS9GgWmhKYDRrxjmNwRGp49YooRUsyP4JqNDCGahuvKxs/HhJcnJzcPacw4qLKLHqKx16mEuUvfyCj6ccekROTxGfYJgLTZoz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OukbcIEE; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-52cc1528c83so1390274e87.2;
-        Tue, 18 Jun 2024 10:05:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718730299; x=1719335099; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IUxkOd1P94AHf2/v22AwVnsR6zTygx+CenIExiQ2kdI=;
-        b=OukbcIEEzEULfnngkvOfWN5Jxtd8f9bUskkaRi10JvQK/N0LV1RsfkXVfizjUMFaTq
-         hkQA3oatdvpZPhK5X99w+nR280UspF2wR7oEtkFcNTKIc+GoTn52yQ8XT9QmN4Qczlq/
-         SDOWpvX6pJuDQz979WkszmrHAdW7rlj2sxtNW71TMq5TQ9HFs3t6mVcky91sXkdibyye
-         Ri8Vy9CcyHL6YWdZFyFIB3NFKdQVUVydG78pzD+j86Nbw5qSPmTvJOijz3xHvGwI3xCS
-         Pv5gMQxPD9hlo+oI1/LsQt+Zk1g44DT6lA0Sjg4trJOpwxL12MR/hj2EwN0Uq1/Ccpis
-         GycQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718730299; x=1719335099;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IUxkOd1P94AHf2/v22AwVnsR6zTygx+CenIExiQ2kdI=;
-        b=FuWoVuGWgYqykKuQjfs2mZiesvRlfFhEVw0KtFjfnY0cVCVfmKmrE7CwEBIyWzMNjD
-         ME6zv6C5CcLcxqG9+V6Clk8PDA+rvnRsWPR35u3jl+paKmbCxB5TYSgtkvNoTcSkxkzA
-         3gOUiSQXBezfKC6Bu2GNCKh3qNMMqpHls2hVGxWTgX+x0iEnwN1shMFbRWU+AnrGkzQr
-         p7ejh6TAxyByc6EHLWR8sfnXF7IEiW+fz7dOU7YUnyfh7+EdImYFnP1ZlOPwZS3bPthp
-         +tEJ0U3naLoH43IsrGnbni7T/9d1eyk2a46tATid4tQYkswjqE+GaLJ/WIi30bZEeeE1
-         cZwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUryeFt+RBiZLOVLvPpWwztXvy0rC16PeWkcmAYmoD+DXdaFwsXvCo5gczrYedVHftf7CPfVAR2gDOpm+I9BXhDGzwnp/p1E/WdAd2b5yx95EmhTxmrEVr0cTbV
-X-Gm-Message-State: AOJu0Yzb35DyZo2Sko2hM+7H5FzD6OjnJzxtDrba8N8fyQHmjUWldpjC
-	nR4UzL8lCxC9psmbBHsWSHra8Qtw7gKIbAFytOxGDzClVwT456JM1SHM3bed
-X-Google-Smtp-Source: AGHT+IHes2RYjoazEyMOFAVg8gbqKFVipIBrWoqotKt6HG2FRIYgS8sfRN2AqCcv0I+tP2O5RuXVUQ==
-X-Received: by 2002:a05:6512:348c:b0:52c:8c5b:b7d8 with SMTP id 2adb3069b0e04-52ccaa60842mr124012e87.30.1718730299049;
-        Tue, 18 Jun 2024 10:04:59 -0700 (PDT)
-Received: from pc636 (host-90-233-216-238.mobileonline.telia.com. [90.233.216.238])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52ca282f0dbsm1551538e87.109.2024.06.18.10.04.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jun 2024 10:04:58 -0700 (PDT)
-From: Uladzislau Rezki <urezki@gmail.com>
-X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
-Date: Tue, 18 Jun 2024 19:04:56 +0200
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "Paul E. McKenney" <paulmck@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	rcu@vger.kernel.org
-Subject: Re: [TEST] TCP MD5 vs kmemleak
-Message-ID: <ZnG-OII33VP7bPJp@pc636>
-References: <20240617072451.1403e1d2@kernel.org>
- <CAJwJo6ZjhLLSiBUntdGT8a6-d5pjdXyVv9AAQ3Yx1W01Nq=dwg@mail.gmail.com>
- <20240618074037.66789717@kernel.org>
- <fae8f7191d50797a435936d41f08df9c83a9d092.camel@redhat.com>
- <ee5a9d15-deaf-40c9-a559-bbc0f11fbe76@paulmck-laptop>
- <20240618100210.16c028e1@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACF513AD12;
+	Tue, 18 Jun 2024 17:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.57.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718730412; cv=fail; b=dfPFGxCOMXXOtbAo3RA5SUEjsC/QlSrESLXe6GcD7oErkfKMJxIRBR58E6LCnYeU/2gKoxHpvBl6xHFWNjudWNP9LqJy8/vtk5BXRWApVaZOb3uyMlRbv/CY/i62P6JiFd5qdDeeNQbQmKQhvrYuGJIVup+nOwVXHDB+E25Wpaw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718730412; c=relaxed/simple;
+	bh=Iu0KXbmaSbcHGv+qwxX7KvdlFvAuc6tP2WDDM+laUrY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=iuDuN+FEqEitXCsfiMsiwrnmmzas+BYe03jRI0GpDuFAls+EvvgnEsQqtNAEfaSjLWqabBY6qeQn4ik87qAepHF6L0UnDrrjPQMeYahJAwioLabxJwM92js+DgXnI48KbGC8NGgkpk31gscEgDQNHdADSJsFuV+2M1CqZ4lnZN4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=hQgI7JIu; arc=fail smtp.client-ip=40.92.57.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VdrhjlRXS16MtRUS90zrssAPnAofUbvBeQyTFFTgE39nQRDCBHuOvZeuLCeODxPn9H250zXhrJsB2UkJvlEhIt1EFzXO/u3KuASqj/QLjIo97FUgKFnoFtuChYD/VJhh3B2YIvISQAiHe3MgLcQjomeeSIOXQcLC9PbX+bHkoMzN1btXJoWk903Vo/teh6gHcieLn8V2t0eFYYZlC/+ElwmkVpHaPGWsybxEmu2OxAsWuQgcW5D/L8ik+ngXU6eHxhiF6riY8YERifcwfSi9E2RTruwQZX5mUUd5DEcilD6myJR3WljqQHFiA1SNDUxHCejx/VgI2MpSna8FjZ+NUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Iu0KXbmaSbcHGv+qwxX7KvdlFvAuc6tP2WDDM+laUrY=;
+ b=LujtaQL4cAg712+CXud41OudpSD2uPBa/jmCHP/uf3s+dlSMNWHAaUB7a9YmgbmL9HembIbBlm7AjLDv27vQLNUeGwmRSwjOv3TAEuDLN/xcfEJR7dYzkyvj2lOzoLZ6Va6+wDJjMoeat0YUWw8EOdwbXKt08UVBbVFOWOV3i/NHsuSmyTE+s2LeKLyI1Ad1eCUM/igA29kDrrRUbqxcx1rI2ixJc9GIvyjm56xNfbrMc9UtPD0Ecv6xBlEfkSmsczE/rxKQoGg3PYG20+2GYO4ltU/KBqCMDjJYNKhxTrHLurMb+17SDAw9fBOo6oOo4OSh107so4XlEtIzqVjz1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Iu0KXbmaSbcHGv+qwxX7KvdlFvAuc6tP2WDDM+laUrY=;
+ b=hQgI7JIux7IBRlgqVA5XLR9YBMB/c3cJ58ilNQNvaG10xoEmKHRqdxgmXikrQLahwWZ2bLLWSuc0OgmSUwackkPli1PEMwJ7Ex/NfODbxzqwIt5QXie84QN1XK7uhNO7wdMZcuL+hgNEbDCh9OkRCJkiVNRt0HNjYdA3nJUWMnUqpEqSfp9HTkC7bE73O0HQZr9yN77sR5zGwURHz3yWkZ+m7ggUzyGJcD2yFsvBYMbXOWImjC/JzOi0fyV0P9AlxrIg9B0277Nt9s7xYWQ2eLSQOYUpqs05ZEJrjDzGEulSkNgm+86NZq/UOZUaFAazgZw9QGnx8x30ThNZq0dNdQ==
+Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
+ by PAXP194MB1469.EURP194.PROD.OUTLOOK.COM (2603:10a6:102:1a8::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Tue, 18 Jun
+ 2024 17:06:48 +0000
+Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ ([fe80::3d63:e123:2c2f:c930]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ ([fe80::3d63:e123:2c2f:c930%4]) with mapi id 15.20.7677.030; Tue, 18 Jun 2024
+ 17:06:47 +0000
+From: Luigi Leonardi <luigi.leonardi@outlook.com>
+To: mvaralar@redhat.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	kvm@vger.kernel.org,
+	luigi.leonardi@outlook.com,
+	marco.pinn95@gmail.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	sgarzare@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next 2/2] vsock/virtio: avoid enqueue packets when work queue is empty
+Date: Tue, 18 Jun 2024 19:05:54 +0200
+Message-ID:
+ <AS2P194MB2170E2A932679C37B87562539ACE2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <jjewa7jiltjnoauat3nnaeezhtcwi6k4xf5mkllykcqw4gyfgi@glwzqxp5r76q>
+References: <jjewa7jiltjnoauat3nnaeezhtcwi6k4xf5mkllykcqw4gyfgi@glwzqxp5r76q>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [AgMXQ0+TrTSac1IRUDK8vMcI5sKrDLqn]
+X-ClientProxiedBy: MI1P293CA0013.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:2::15) To AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ (2603:10a6:20b:642::8)
+X-Microsoft-Original-Message-ID:
+ <20240618170553.48483-2-luigi.leonardi@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240618100210.16c028e1@kernel.org>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|PAXP194MB1469:EE_
+X-MS-Office365-Filtering-Correlation-Id: e10ddb0e-e87c-4bb8-b6a9-08dc8fb9097e
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|461199025|3412199022|440099025|1710799023;
+X-Microsoft-Antispam-Message-Info:
+	GXLH3XrMs99QVvm2DSUDQPUrv9wsWA2RqpYolBzgjeeTD57nczT3wNvcqQV1DpkH4rO40ixDWL37BK5TciCPZ2BiQPW+r0/En1Da3sGyoT+1ZnMLZZQPzYcN67xZP0r3Nu/nxvbPOHGFSz0OrHB5pzZ/qRrGo0wk1E1WexTcXvyLEuNqcAK2PbO8yoHsD53IDnb6VNhs8ooyGiDgN0vge2mkeXs/tfsKrYm5gTP9gFX8iEYf9ydTu9KIrVH99VoSkZKN0uBwDHuFV7CSRL/yt/ROfvGw37eClxNA3rEWPuDliRWFjBpFljAjtq6qady45SP5nQAA6QutwHUgntEXb55/kx6u1zLva+JswA7pP2604mA1VZ6o69LAwAYg0gcjQsFZDsBJ8K9WPDJYwKvJWTIfgUPr72IH2KzHssg6lTpRICEyTIs5acHPCAqc6pRkTtE+CWBGfIMxfGHKmDIw5xcyJXXlA6P91rWbEw62iGrS4xU7USNeHqfp6BcfLMxV4AVuzzOy1bsjebbgRhZvo+DF7d3acQyiGv42Tj0aJb3Zfsa0IwEKA2MF+RTYuXQtlsvLBSBuSvfMwv66Dg+U2VIMxjzDY+ONVMHjonYPFVewgH+gqJKl/bGDc2e7ByEo
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?THM3jP8BrBcgpi/9SXSbdazmP9E83RetHPss/bn9InqdiB+usQ2VxGdGgivh?=
+ =?us-ascii?Q?woazaDPnTgZWyYvOq8OlcOfMMfz5Vjkj34l6QCzTirF85MYU4nWdLPjkW6U+?=
+ =?us-ascii?Q?WjKWDe8YeBaBouVIAu6phBLUv1V99cyit08z00VFKn+VkOTJ3tS1iJt+r4Ry?=
+ =?us-ascii?Q?UfkJ13Tr9sgxyuAp0W9hwGblPBYOJmlJLXyI97wVF36fdvGZwiewEPc19P1V?=
+ =?us-ascii?Q?lF3mEfMbkMnKACUTWy8VNKQXUzcQ7w6u5HYlaNkm8WF6dsnCn6VK7p2MTbFK?=
+ =?us-ascii?Q?LyxFPcFGeV7iv7dqJcBv370bFq0QlzZCFwCTarwft4AvBE+uEJWvDjRMPsFX?=
+ =?us-ascii?Q?eB4kdfwdeXVVUidKWgpACMc5GhLNDiWcrgqiG/RAfKNCl6fjdALI3Xjt3/Q0?=
+ =?us-ascii?Q?Ly6g14QCTto4vge6IzdcPy+Rl5CMSeFqIKHNafaR7RR1W4ESzlixU2pFFi7o?=
+ =?us-ascii?Q?2svnaeJlYY9f3POgPPLQWwbGW41CNvd0XKyl+EH2XZB3sl0YZl/go+VdDazx?=
+ =?us-ascii?Q?grQW6RKB8yRuF2bJTM/f8JgjaI/wj6NH2SVKbj7lhGhOZe4L/ntktzQTRwGX?=
+ =?us-ascii?Q?cdhDV4b+CHqlJRwSE7/gf4d7xKI/EIXp3FEyHmX5nE2hGGzWw/qGM7AGdt+H?=
+ =?us-ascii?Q?k83oS6yZWKvyfKq3pLoBXnsRtBImdOZREorztGBIEzVOu3OQ2PNfVqUPugqD?=
+ =?us-ascii?Q?k89BElELL2jXfq+e9guOVYogBF/gkGDMwUP7+0fudGHbOQFFnge6RguPw4l/?=
+ =?us-ascii?Q?9lcOravW7zTwynag62/7o9CheY0NNTfPBEdEejSw16IXVTH4wvEBG+XFWVM4?=
+ =?us-ascii?Q?kc1eP+Kp58fUFFFP0lHg6lfpU9rXHDfP/hxJm/Ep3uc79WyTzvoNNqcyObSZ?=
+ =?us-ascii?Q?PA/xnyXgPK8ZZcTRJUTNyKzp6gSBTx6nJyFlZi3AyADW9d6mh9t0rBY9bVHe?=
+ =?us-ascii?Q?dNQ467goQk9VkiqvuyRRwo5lJsy8QCxgCT7ACe6YInY6ZQ1y6JtFjR4oeza2?=
+ =?us-ascii?Q?sge8EVuS7fP7FNyC5hoV+cloCQrLg+gvMpSGtsYOnsg7IjHSuEODeqsHWma8?=
+ =?us-ascii?Q?Zb8IOGR+5Iv7qKbuc367J6tb0GmnSCD+/aDnYJkiiFpa+X28gxucLzkSF7WY?=
+ =?us-ascii?Q?6nlewSLsVbfGByywqu6Sn4yJhgvhitQrmpOVUWEri09+eAtRs8TWigGW+BLn?=
+ =?us-ascii?Q?gzA/VI95UuAhVHCJrBIkbc3UDDS8VcUyXSkL1ciHsPWGbHJJIx72Xlmhqb7R?=
+ =?us-ascii?Q?B0k4EulATAXdETj6MWfi?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e10ddb0e-e87c-4bb8-b6a9-08dc8fb9097e
+X-MS-Exchange-CrossTenant-AuthSource: AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2024 17:06:47.4068
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXP194MB1469
 
-On Tue, Jun 18, 2024 at 10:02:10AM -0700, Jakub Kicinski wrote:
-> On Tue, 18 Jun 2024 09:42:35 -0700 Paul E. McKenney wrote:
-> > > FTR, with mptcp self-tests we hit a few kmemleak false positive on RCU
-> > > freed pointers, that where addressed by to this patch:
-> > > 
-> > > commit 5f98fd034ca6fd1ab8c91a3488968a0e9caaabf6
-> > > Author: Catalin Marinas <catalin.marinas@arm.com>
-> > > Date:   Sat Sep 30 17:46:56 2023 +0000
-> > > 
-> > >     rcu: kmemleak: Ignore kmemleak false positives when RCU-freeing objects
-> > > 
-> > > I'm wondering if this is hitting something similar? Possibly due to
-> > > lazy RCU callbacks invoked after MSECS_MIN_AGE???  
-> 
-> Dmitry mentioned this commit, too, but we use the same config for MPTCP
-> tests, and while we repro TCP AO failures quite frequently, mptcp
-> doesn't seem to have failed once.
-> 
-> > Fun!  ;-)
-> > 
-> > This commit handles memory passed to kfree_rcu() and friends, but
-> > not memory passed to call_rcu() and friends.  Of course, call_rcu()
-> > does not necessarily know the full extent of the memory passed to it,
-> > for example, if passed a linked list, call_rcu() will know only about
-> > the head of that list.
-> > 
-> > There are similar challenges with synchronize_rcu() and friends.
-> 
-> To be clear I think Dmitry was suspecting kfree_rcu(), he mentioned
-> call_rcu() as something he was expecting to have a similar issue but 
-> it in fact appeared immune.
-> 
-In the kfree_rcu() there is "an ignore" injection:
+Hi Stefano and Matias,
 
-<snip>
-	/*
-	 * The kvfree_rcu() caller considers the pointer freed at this point
-	 * and likely removes any references to it. Since the actual slab
-	 * freeing (and kmemleak_free()) is deferred, tell kmemleak to ignore
-	 * this object (no scanning or false positives reporting).
-	 */
-	kmemleak_ignore(ptr);
+@Stefano Thanks for your review(s)! I'll send a V2 by the end of the week.
 
-	// Set timer to drain after KFREE_DRAIN_JIFFIES.
-	if (rcu_scheduler_active == RCU_SCHEDULER_RUNNING)
-		schedule_delayed_monitor_work(krcp);
-<snip>
+@Matias
 
---
-Uladzislau Rezki
+Thanks for your feedback!
+
+> I think It would be interesting to know what exactly the test does
+
+It's relatively easy: I used fio's pingpong mode. This mode is specifically
+for measuring the latency, the way it works is by sending packets,
+in my case, from the host to the guest. and waiting for the other side
+to send them back. The latency I wrote in the commit is the "completion
+latency". The total throughput on my system is around 16 Gb/sec.
+
+> if the test is triggering the improvement
+
+Yes! I did some additional testing and I can confirm you that during this
+test, the worker queue is never used!
+
+> If I understand correctly, this patch focuses on the
+> case in which the worker queue is empty
+
+Correct!
+
+> I think the test can always send packets at a frequency so the worker queue
+> is always empty. but maybe, this is a corner case and most of the time the
+> worker queue is not empty in a non-testing environment.
+
+I'm not sure about this, but IMHO this optimization is free, there is no
+penalty for using it, in the worst case the system will work as usual.
+In any case, I'm more than happy to do some additional testing, do you have
+anything in mind?
+
+Luigi
 
