@@ -1,170 +1,175 @@
-Return-Path: <netdev+bounces-104418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF99090C713
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 12:34:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA54590C715
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 12:34:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C7A4B23B2F
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 10:34:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49E051F252D0
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 10:34:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE6314D71C;
-	Tue, 18 Jun 2024 08:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 562E41AAE32;
+	Tue, 18 Jun 2024 08:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SqqoL4MZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="chsLF/OH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6819139D0C;
-	Tue, 18 Jun 2024 08:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BF414E2D5
+	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 08:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718699133; cv=none; b=XTOTa2s4hXbWTNp0eHKW4Mi1lJfYDe40PCVeKmAGCQYIhSNz2zPZzZG7QaAQA9/AtSlZ6/b2S1wfxSbOYJYVfO6hwKS9WRUnD7wZirq8lgceR38xQc29bEYsxDcAzWzSC9ENYKxCLer5k6mDZgZqC5fjtrpDv2bx/Qa3NPNt/Fs=
+	t=1718699179; cv=none; b=KlB7ZCrHhqw9F6pJAMeBkKYYkHvEEDzK281moPxjg0sdj3VYPyongqEwVy4eV7RsBtuc/VHnkW1tl/JaEu0qbxOuAhBjSSuAjMsyw+1B8R4Ut0zLXCySbEriwjQn30lygjh4p84V14efwBYcL1yefH8nAnZDA3OcuJH+WVVIljw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718699133; c=relaxed/simple;
-	bh=QZB8fHDIjOnQPiFT+614qTT2f4FhbW7aTgu//lNGJho=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q+wFJLi0uM0Bj2iMtKA+/KFPOWxxO/Hywv7j4qOzBKgOrIanE6TvgQx6XfQjV9Cn3g9MLB25Wl5cBG/4mJP2wFV6BDCGeT3RuHkNLXqChWRKDWzgwz6vxCLOOwicwvwm0rqnYUZjKgi3Tq7OyTYqUFj9O8p9owGNhnb7xVLI/3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SqqoL4MZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 325ABC4AF1A;
-	Tue, 18 Jun 2024 08:25:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718699133;
-	bh=QZB8fHDIjOnQPiFT+614qTT2f4FhbW7aTgu//lNGJho=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SqqoL4MZ5OETxeD2FwhJk6e65JRq8fDu6IiHj70QFOFMHYfuDtPFADnyYFrXOaDk2
-	 ytSY6CjxaLCwuqB3crxfaUvevf0mnS/7kgYYPp8ebhlUr3GB0GJ+9Zr1tKkjdQ5lxp
-	 jNV+pVBZ1UqjD62lhlYrKkv+6XqyPf5c2likm5wzkCMc5YhgqlRZSHdv/QbdPfRVZg
-	 GlaJAMhjjX7XlJeuPKnlNaWSgoSnmaa9MqHnCxjaFJoCAPNCRo1woPCLM5XyYNaOUB
-	 THhKw6R7QJI2l8ytvwnPRnnlu5/pcK0JIuXFS4NLS5weB7PzuFVxNE9dJWB15wHA3X
-	 85FfFxm//RYxg==
-Date: Tue, 18 Jun 2024 09:25:28 +0100
-From: Simon Horman <horms@kernel.org>
-To: Geetha sowjanya <gakula@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
-Subject: Re: [net-next PATCH v5 03/10] octeontx2-pf: Create representor netdev
-Message-ID: <20240618082528.GD8447@kernel.org>
-References: <20240611162213.22213-1-gakula@marvell.com>
- <20240611162213.22213-4-gakula@marvell.com>
+	s=arc-20240116; t=1718699179; c=relaxed/simple;
+	bh=g4WS8oXJ9ThgmbB0X4X/raZWanyBvfS7aFg2Ed8tr4s=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=j8VKIc8dBmyZZGhKWWww9Q7geqpC63Pi2czI+CO/npAhEo2vUv4qKPS5ZG71RWTXgJX0TrSu3rBBw2/Om5DRO94NAUcPTDaNYc+oMlhxi3iuZz+ex9W0dkDW6L8Kae3lO1h7+1sMoYmI1zOSgtIAO8+5kBdqW5+eRMZWtI9XiME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=chsLF/OH; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718699176;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=p2ATvm11PclBQWx70TQOYEfubW2SvZbggiMm3LQ7tFE=;
+	b=chsLF/OHGUrOZFibmI+YrqFKpsP8BJ7vMVHbII0TSU3mCn3GrUveKurA7pV/XvoTZIDxOc
+	Wy0QcR7d1XcDy3QRKClqe86sgw6JVB4mdR7XF9ZViOXg71w4uQi+Qjp3xVOKqLXcIYZLD6
+	qlhIk+5rN6fgvvoAJ83iaVOF9slB7Ys=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-417--EKCj1fOMh-paTQz_SEj2w-1; Tue, 18 Jun 2024 04:26:15 -0400
+X-MC-Unique: -EKCj1fOMh-paTQz_SEj2w-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4217aad795aso2355425e9.3
+        for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 01:26:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718699174; x=1719303974;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=p2ATvm11PclBQWx70TQOYEfubW2SvZbggiMm3LQ7tFE=;
+        b=Ey9k30eLAV/rOCBA6aoNdyZ2XFJvKhjka9aHgkmD2xitQW30q5P5fMjIugTIvshY9V
+         WiQ0DqE5tSeUl+pWVrlCCqbo6u4sDXnE+8LJSZujM28Oo6qO7pgow0x0VafUfmb5Jk88
+         PqISeO7PvcGbHG3h/iJHpHMPgpek25bzpnapCZTAB90nWxlAv/kRmD2zCzW8Mt/AhhoS
+         P/WQxlg7ei/sn+L6xo+qijDl9p5Zy5/P/bz30VzBG8iOqvWmBH75iN7rC7Y7IWYyU3/z
+         enquDB6Fvph5v0mu7khlGR3GiDW+53kJ0v4uvvgWaP+J9acJm+gW5XiaKd5er7LfhUhp
+         hABg==
+X-Forwarded-Encrypted: i=1; AJvYcCUtKQ39wZzyQbhkxMqkVBbl71u4ZhB42OappnQmNbTllphHpg5JQChEm00wHLEi1m8prxrKhBpTnY2s6CHZbS0b3xV03AUP
+X-Gm-Message-State: AOJu0YyXa+YnkRml9ZfxULEG+I8nf+/y6y3cutAtjd+Z2QH8ZBbIjw8X
+	Ru3j8WlHRo6iZtOlRmARHxXye3Sl7Zr231vv41T5MRM8dpcJq0PZuqH+DT5ttCXukMITwfmfVvg
+	/U4fUFCLE6RVcSAj9puQd9mb0l2oMD3yniK8SYfECIE38U/Q7z0kjxzdJQaJjxg==
+X-Received: by 2002:a05:600c:1d1b:b0:421:74d4:f32c with SMTP id 5b1f17b1804b1-42304d7f7b9mr88461515e9.1.1718699173982;
+        Tue, 18 Jun 2024 01:26:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFWqpCxWr0uOe6kQvSYzFQxJy29SIUhW3T6yuKBV46eMgVNLb1HfpI+xg2q6FhUZ3RLVF0LYA==
+X-Received: by 2002:a05:600c:1d1b:b0:421:74d4:f32c with SMTP id 5b1f17b1804b1-42304d7f7b9mr88461355e9.1.1718699173592;
+        Tue, 18 Jun 2024 01:26:13 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b0b4:c10::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42301a7c850sm175348375e9.6.2024.06.18.01.26.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jun 2024 01:26:13 -0700 (PDT)
+Message-ID: <294c30a62d415c9b641be32df2b527cfff19ef62.camel@redhat.com>
+Subject: Re: [PATCH v5 3/4] net: dropreason: use new __print_sym() in tracing
+From: Paolo Abeni <pabeni@redhat.com>
+To: Johannes Berg <johannes@sipsolutions.net>, linux-kernel@vger.kernel.org
+Cc: linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, Johannes Berg <johannes.berg@intel.com>
+Date: Tue, 18 Jun 2024 10:26:11 +0200
+In-Reply-To: <20240614081956.19832-8-johannes@sipsolutions.net>
+References: <20240614081956.19832-6-johannes@sipsolutions.net>
+	 <20240614081956.19832-8-johannes@sipsolutions.net>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240611162213.22213-4-gakula@marvell.com>
 
-On Tue, Jun 11, 2024 at 09:52:06PM +0530, Geetha sowjanya wrote:
-> Adds initial devlink support to set/get the switchdev mode.
-> Representor netdevs are created for each rvu devices when
-> the switch mode is set to 'switchdev'. These netdevs are
-> be used to control and configure VFs.
-> 
-> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
-
-...
-
-> +void rvu_rep_destroy(struct otx2_nic *priv)
-> +{
-> +	struct rep_dev *rep;
-> +	int rep_id;
+On Fri, 2024-06-14 at 10:19 +0200, Johannes Berg wrote:
+> From: Johannes Berg <johannes.berg@intel.com>
+>=20
+> The __print_symbolic() could only ever print the core
+> drop reasons, since that's the way the infrastructure
+> works. Now that we have __print_sym() with all the
+> advantages mentioned in that commit, convert to that
+> and get all the drop reasons from all subsystems. As
+> we already have a list of them, that's really easy.
+>=20
+> This is a little bit of .text (~100 bytes in my build)
+> and saves a lot of .data (~17k).
+>=20
+> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> ---
+>  include/net/dropreason.h   |  5 +++++
+>  include/trace/events/skb.h | 16 +++-----------
+>  net/core/skbuff.c          | 43 ++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 51 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/include/net/dropreason.h b/include/net/dropreason.h
+> index 56cb7be92244..c157070b5303 100644
+> --- a/include/net/dropreason.h
+> +++ b/include/net/dropreason.h
+> @@ -42,6 +42,11 @@ struct drop_reason_list {
+>  extern const struct drop_reason_list __rcu *
+>  drop_reasons_by_subsys[SKB_DROP_REASON_SUBSYS_NUM];
+> =20
+> +#ifdef CONFIG_TRACEPOINTS
+> +const char *drop_reason_lookup(unsigned long long value);
+> +void drop_reason_show(struct seq_file *m);
+> +#endif
 > +
-> +	rvu_rep_free_cq_rsrc(priv);
-> +	for (rep_id = 0; rep_id < priv->rep_cnt; rep_id++) {
-> +		rep = priv->reps[rep_id];
-> +		unregister_netdev(rep->netdev);
-> +		free_netdev(rep->netdev);
-> +	}
-> +	kfree(priv->reps);
-> +}
-> +
-> +int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
-> +{
-> +	int rep_cnt = priv->rep_cnt;
-> +	struct net_device *ndev;
-> +	struct rep_dev *rep;
-> +	int rep_id, err;
-> +	u16 pcifunc;
-> +
-> +	priv->reps = kcalloc(rep_cnt, sizeof(struct rep_dev *), GFP_KERNEL);
-> +	if (!priv->reps)
-> +		return -ENOMEM;
-> +
-> +	for (rep_id = 0; rep_id < rep_cnt; rep_id++) {
-> +		ndev = alloc_etherdev(sizeof(*rep));
-> +		if (!ndev) {
-> +			NL_SET_ERR_MSG_FMT_MOD(extack,
-> +					       "PFVF representor:%d creation failed",
-> +					       rep_id);
-> +			err = -ENOMEM;
-> +			goto exit;
-> +		}
-> +
-> +		rep = netdev_priv(ndev);
-> +		priv->reps[rep_id] = rep;
-> +		rep->mdev = priv;
-> +		rep->netdev = ndev;
-> +		rep->rep_id = rep_id;
-> +
-> +		ndev->min_mtu = OTX2_MIN_MTU;
-> +		ndev->max_mtu = priv->hw.max_mtu;
-> +		pcifunc = priv->rep_pf_map[rep_id];
-> +		rep->pcifunc = pcifunc;
-> +
-> +		snprintf(ndev->name, sizeof(ndev->name), "r%dp%d", rep_id,
-> +			 rvu_get_pf(pcifunc));
-> +
-> +		eth_hw_addr_random(ndev);
-> +		err = register_netdev(ndev);
-> +		if (err) {
-> +			NL_SET_ERR_MSG_MOD(extack,
-> +					   "PFVF reprentator registration failed");
+>  void drop_reasons_register_subsys(enum skb_drop_reason_subsys subsys,
+>  				  const struct drop_reason_list *list);
+>  void drop_reasons_unregister_subsys(enum skb_drop_reason_subsys subsys);
+> diff --git a/include/trace/events/skb.h b/include/trace/events/skb.h
+> index 07e0715628ec..8a1a63f9e796 100644
+> --- a/include/trace/events/skb.h
+> +++ b/include/trace/events/skb.h
+> @@ -8,15 +8,9 @@
+>  #include <linux/skbuff.h>
+>  #include <linux/netdevice.h>
+>  #include <linux/tracepoint.h>
+> +#include <net/dropreason.h>
+> =20
+> -#undef FN
+> -#define FN(reason)	TRACE_DEFINE_ENUM(SKB_DROP_REASON_##reason);
+> -DEFINE_DROP_REASON(FN, FN)
+> -
+> -#undef FN
+> -#undef FNe
+> -#define FN(reason)	{ SKB_DROP_REASON_##reason, #reason },
+> -#define FNe(reason)	{ SKB_DROP_REASON_##reason, #reason }
+> +TRACE_DEFINE_SYM_FNS(drop_reason, drop_reason_lookup, drop_reason_show);
+> =20
+>  /*
+>   * Tracepoint for free an sk_buff:
+> @@ -44,13 +38,9 @@ TRACE_EVENT(kfree_skb,
+> =20
+>  	TP_printk("skbaddr=3D%p protocol=3D%u location=3D%pS reason: %s",
+>  		  __entry->skbaddr, __entry->protocol, __entry->location,
+> -		  __print_symbolic(__entry->reason,
+> -				   DEFINE_DROP_REASON(FN, FNe)))
+> +		  __print_sym(__entry->reason, drop_reason ))
 
-Hi Geetha,
+Minor nit: if you have to repost for other reasons,       ^^ here
+checkpatch complains for the extra space.
 
-(The most recently allocated) ndev appears to be leaked here.
+Otherwise LGTM,
 
-I think that one way to address this could be to moving the contents of
-this loop into a separate function that unwinds the most recent allocation
-on error.
+Thanks!
 
-Highlighted by Smatch (although it seems a bit confused here).
+Paolo
 
- .../rep.c:184 rvu_rep_create() warn: 'ndev' from alloc_etherdev_mqs() not released on lines: 184.
- .../rep.c:184 rvu_rep_create() warn: 'ndev' from register_netdev() not released on lines: 184.
-
-Sorry for not bringing this up earlier: it is at least the third time I
-have looked over this, and for some reason I didn't notice this the other
-times.
-
-> +			goto exit;
-> +		}
-> +	}
-> +	err = rvu_rep_napi_init(priv, extack);
-> +	if (err)
-> +		goto exit;
-> +
-> +	return 0;
-> +exit:
-> +	while (--rep_id >= 0) {
-> +		rep = priv->reps[rep_id];
-> +		unregister_netdev(rep->netdev);
-> +		free_netdev(rep->netdev);
-> +	}
-> +	kfree(priv->reps);
-> +	return err;
-> +}
-> +
->  static int rvu_rep_rsrc_free(struct otx2_nic *priv)
->  {
->  	struct otx2_qset *qset = &priv->qset;
-
-...
 
