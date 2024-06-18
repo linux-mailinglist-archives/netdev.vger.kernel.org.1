@@ -1,332 +1,238 @@
-Return-Path: <netdev+bounces-104307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00FA690C172
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 03:40:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8283A90C18F
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 03:43:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 344B6B22605
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 01:40:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F05DFB22F30
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 01:43:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7958115E9B;
-	Tue, 18 Jun 2024 01:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3029615E9B;
+	Tue, 18 Jun 2024 01:43:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="FqmzsqJW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sns5uOLC"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1B314295;
-	Tue, 18 Jun 2024 01:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0237910A16;
+	Tue, 18 Jun 2024 01:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718674851; cv=none; b=SOo2dbOInFgofO9wvRTo1U5MJfym9ijyOiNvvansVTWZ7om0fGLtbruq7NOuDTemSlNf6sMId6wHR9Zr8QWrkfkdEOecsebq/rdB2NvtM0r4mBd2szlEzmKlCssVVvgX4VextDDPJiadgIzLCd7m+vR3nz6LQ9iX4hfSBIx6Ff8=
+	t=1718675014; cv=none; b=hMlCc9sS29JFqchVOgqwFZtI2NA+xeQU5SxlkuDgJtLvRd+1eGY7FrKTg1Zh4Rbypw+Q5MjJ6ZlNnH3QKuBtBMPEncaT8RhzoKZMeZqt+MqiIeZc48d8ITvCarnSTVfxHgZxVj2S40D4ZzFSVITv1rRtbO3Et83lQuzmOeAnQd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718674851; c=relaxed/simple;
-	bh=hvQTP8Ry/qU1EpjbUIawlcOMrW4GBpWF0fVUYya78NM=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=OjqRNyALDG/UuRf10RVDlWSnjrNaRilXXY5u+DYpvq9mMOfGIBVpZyBE7mPsQGZNj5K/x11XljYENUY4U8NgHZI8+InEgy09YbqIfMzMLpezmCxtv7tPEHLB3mjeZDVzPI3jKJTNvJypQKCMKpWhckDkxGqyknLGYJA+5kkzduo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=FqmzsqJW; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1718674846; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=XUzSPYOwy9ttnTtGkmH+DS8/GdC3Dw7Xnzzm2WXn79o=;
-	b=FqmzsqJWptKs7t4vd+nnN9wE5+nxRnmD7rNfzl7AGA7IDNQfPT1vnfj/aXWiYmzI5jLkKCqexTo8l4ceF6Ba/bAnQEQTogwFB2PmPTO1NAL1Jc28ID+wgLp17VX6YpIajJ/5njxpB3E04cTL/uTkWG4rxUoI5mQpD2ICEc0Ei2w=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067109;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W8hvTFB_1718674844;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W8hvTFB_1718674844)
-          by smtp.aliyun-inc.com;
-          Tue, 18 Jun 2024 09:40:45 +0800
-Message-ID: <1718674830.0975292-4-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v5 11/15] virtio_net: xsk: tx: support xmit xsk buffer
-Date: Tue, 18 Jun 2024 09:40:30 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240614063933.108811-1-xuanzhuo@linux.alibaba.com>
- <20240614063933.108811-12-xuanzhuo@linux.alibaba.com>
- <CACGkMEsWg95zXVsnDWrAU1qRS0uuEJJR0rw7LVOV-fGuBGzQCQ@mail.gmail.com>
- <1718610681.9219804-5-xuanzhuo@linux.alibaba.com>
- <CACGkMEsn8h9UCy66i_N6zOPbW7V=fSswPWRjsjJFKc310YUu3g@mail.gmail.com>
-In-Reply-To: <CACGkMEsn8h9UCy66i_N6zOPbW7V=fSswPWRjsjJFKc310YUu3g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1718675014; c=relaxed/simple;
+	bh=lKZVylMEDQkBXztZ/GoU0xvg0FZppHHM24DQfAEF2UA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k2RAoiZIBqh+crXJeUXSTu+pK7nkqLpNpJddZ1vGmRzmEjEuSRYhKJhnIN5EQYy64vRaKvHpHec+B4PkJ0aJDyEtfIH3Pf2SxcaR0mK4iq64C243v1asbSihJxNYpor+uQpzitbAuiphLxpzlpIG0KtHFPTJWuYFsmAKfwVmvb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sns5uOLC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94245C2BD10;
+	Tue, 18 Jun 2024 01:43:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718675013;
+	bh=lKZVylMEDQkBXztZ/GoU0xvg0FZppHHM24DQfAEF2UA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sns5uOLCBDXtFflQPRb8aI6UDSIcGHeKA44luZnmiuFjkvlwAVPuZ7xRpWqukrkO0
+	 hKdJfPQ6LPut2DVolR0sGSnhgCH9eYyQuHrKALPegSHOs0RBPuLsEynd7vig1h7qhC
+	 DCB08+wD/EEzIBk0Ut2LXxwCT71i9LHI8NFbEocoGAeezgBdRvR/bq7pOMTnKunJfY
+	 TTWv2nwYrmlAzEMe1tibmNSqDt770O+7NhT8koT35ZXfF59ZFL3dYVRNm25QGxKiVA
+	 dSSH2EALwv7RLRc4vE/o37kmYB10W3Ks3BsQr2eMFaWrNnCLY2yeXzRCgI5eNcDWBV
+	 /lwKRxqrbeofw==
+Date: Mon, 17 Jun 2024 18:43:31 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: Re: [PATCH net-next v15 13/14] net: ethtool: tsinfo: Add support
+ for hwtstamp provider and get/set hwtstamp config
+Message-ID: <20240617184331.0ddfd08e@kernel.org>
+In-Reply-To: <20240612-feature_ptp_netnext-v15-13-b2a086257b63@bootlin.com>
+References: <20240612-feature_ptp_netnext-v15-0-b2a086257b63@bootlin.com>
+	<20240612-feature_ptp_netnext-v15-13-b2a086257b63@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 18 Jun 2024 09:06:50 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Mon, Jun 17, 2024 at 3:54=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > On Mon, 17 Jun 2024 14:30:07 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Fri, Jun 14, 2024 at 2:40=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.ali=
-baba.com> wrote:
-> > > >
-> > > > The driver's tx napi is very important for XSK. It is responsible f=
-or
-> > > > obtaining data from the XSK queue and sending it out.
-> > > >
-> > > > At the beginning, we need to trigger tx napi.
-> > > >
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > ---
-> > > >  drivers/net/virtio_net.c | 121 +++++++++++++++++++++++++++++++++++=
-+++-
-> > > >  1 file changed, 119 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > index 2767338dc060..7e811f392768 100644
-> > > > --- a/drivers/net/virtio_net.c
-> > > > +++ b/drivers/net/virtio_net.c
-> > > > @@ -535,10 +535,13 @@ enum virtnet_xmit_type {
-> > > >         VIRTNET_XMIT_TYPE_SKB,
-> > > >         VIRTNET_XMIT_TYPE_XDP,
-> > > >         VIRTNET_XMIT_TYPE_DMA,
-> > > > +       VIRTNET_XMIT_TYPE_XSK,
-> > > >  };
-> > > >
-> > > >  #define VIRTNET_XMIT_TYPE_MASK (VIRTNET_XMIT_TYPE_SKB | VIRTNET_XM=
-IT_TYPE_XDP \
-> > > > -                               | VIRTNET_XMIT_TYPE_DMA)
-> > > > +                               | VIRTNET_XMIT_TYPE_DMA | VIRTNET_X=
-MIT_TYPE_XSK)
-> > > > +
-> > > > +#define VIRTIO_XSK_FLAG_OFFSET 4
-> > > >
-> > > >  static enum virtnet_xmit_type virtnet_xmit_ptr_strip(void **ptr)
-> > > >  {
-> > > > @@ -768,6 +771,10 @@ static void __free_old_xmit(struct send_queue =
-*sq, bool in_napi,
-> > > >                          * func again.
-> > > >                          */
-> > > >                         goto retry;
-> > > > +
-> > > > +               case VIRTNET_XMIT_TYPE_XSK:
-> > > > +                       /* Make gcc happy. DONE in subsequent commi=
-t */
-> > >
-> > > This is probably a hint that the next patch should be squashed here.
-> >
-> > The code for the xmit patch is more. So I separate the code out.
-> >
-> > >
-> > > > +                       break;
-> > > >                 }
-> > > >         }
-> > > >  }
-> > > > @@ -1265,6 +1272,102 @@ static void check_sq_full_and_disable(struc=
-t virtnet_info *vi,
-> > > >         }
-> > > >  }
-> > > >
-> > > > +static void *virtnet_xsk_to_ptr(u32 len)
-> > > > +{
-> > > > +       unsigned long p;
-> > > > +
-> > > > +       p =3D len << VIRTIO_XSK_FLAG_OFFSET;
-> > > > +
-> > > > +       return virtnet_xmit_ptr_mix((void *)p, VIRTNET_XMIT_TYPE_XS=
-K);
-> > > > +}
-> > > > +
-> > > > +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u=
-32 len)
-> > > > +{
-> > > > +       sg->dma_address =3D addr;
-> > > > +       sg->length =3D len;
-> > > > +}
-> > > > +
-> > > > +static int virtnet_xsk_xmit_one(struct send_queue *sq,
-> > > > +                               struct xsk_buff_pool *pool,
-> > > > +                               struct xdp_desc *desc)
-> > > > +{
-> > > > +       struct virtnet_info *vi;
-> > > > +       dma_addr_t addr;
-> > > > +
-> > > > +       vi =3D sq->vq->vdev->priv;
-> > > > +
-> > > > +       addr =3D xsk_buff_raw_get_dma(pool, desc->addr);
-> > > > +       xsk_buff_raw_dma_sync_for_device(pool, addr, desc->len);
-> > > > +
-> > > > +       sg_init_table(sq->sg, 2);
-> > > > +
-> > > > +       sg_fill_dma(sq->sg, sq->xsk.hdr_dma_address, vi->hdr_len);
-> > > > +       sg_fill_dma(sq->sg + 1, addr, desc->len);
-> > > > +
-> > > > +       return virtqueue_add_outbuf(sq->vq, sq->sg, 2,
-> > > > +                                   virtnet_xsk_to_ptr(desc->len), =
-GFP_ATOMIC);
-> > > > +}
-> > > > +
-> > > > +static int virtnet_xsk_xmit_batch(struct send_queue *sq,
-> > > > +                                 struct xsk_buff_pool *pool,
-> > > > +                                 unsigned int budget,
-> > > > +                                 u64 *kicks)
-> > > > +{
-> > > > +       struct xdp_desc *descs =3D pool->tx_descs;
-> > > > +       bool kick =3D false;
-> > > > +       u32 nb_pkts, i;
-> > > > +       int err;
-> > > > +
-> > > > +       budget =3D min_t(u32, budget, sq->vq->num_free);
-> > > > +
-> > > > +       nb_pkts =3D xsk_tx_peek_release_desc_batch(pool, budget);
-> > > > +       if (!nb_pkts)
-> > > > +               return 0;
-> > > > +
-> > > > +       for (i =3D 0; i < nb_pkts; i++) {
-> > > > +               err =3D virtnet_xsk_xmit_one(sq, pool, &descs[i]);
-> > > > +               if (unlikely(err)) {
-> > > > +                       xsk_tx_completed(sq->xsk.pool, nb_pkts - i);
-> > > > +                       break;
-> > >
-> > > Any reason we don't need a kick here?
-> >
-> > After the loop, I checked the kick.
-> >
-> > Do you mean kick for the packet that encountered the error?
->
-> Nope, I mis-read the code but kick is actually i =3D=3D 0 here.
+On Wed, 12 Jun 2024 17:04:13 +0200 Kory Maincent wrote:
+> Enhance 'get' command to retrieve tsinfo of hwtstamp providers within a
+> network topology and read current hwtstamp configuration.
+> 
+> Introduce support for ETHTOOL_MSG_TSINFO_SET ethtool netlink socket to
+> configure hwtstamp of a PHC provider. Note that simultaneous hwtstamp
+> isn't supported; configuring a new one disables the previous setting.
+> 
+> Also, add support for a specific dump command to retrieve all hwtstamp
+> providers within the network topology, with added functionality for
+> filtered dump to target a single interface.
 
-Will fix.
+Could you split this up, a little bit? It's rather large for a core
+change.
 
+>  Desired behavior is passed into the kernel and to a specific device by
+> -calling ioctl(SIOCSHWTSTAMP) with a pointer to a struct ifreq whose
+> -ifr_data points to a struct hwtstamp_config. The tx_type and
+> -rx_filter are hints to the driver what it is expected to do. If
+> -the requested fine-grained filtering for incoming packets is not
+> +calling the tsinfo netlink socket ETHTOOL_MSG_TSINFO_SET.
+> +The ETHTOOL_A_TSINFO_TX_TYPES, ETHTOOL_A_TSINFO_RX_FILTERS and
+> +ETHTOOL_A_TSINFO_HWTSTAMP_FLAGS netlink attributes are then used to set the
+> +struct hwtstamp_config accordingly.
 
-Thanks.
+nit: EHTOOL_A* defines in `` `` quotes?
 
+> +		if (hwtstamp && ptp_clock_phydev(hwtstamp->ptp) == phydev) {
+> +			rcu_assign_pointer(dev->hwtstamp, NULL);
+> +			synchronize_rcu();
+>  			kfree(hwtstamp);
 
+Could you add an rcu_head to this struct and use kfree_rcu()
+similarly later use an rcu call to do the dismantle?
+synchronize_rcu() can be slow.
 
->
-> >
-> >
-> > >
-> > > > +               }
-> > > > +
-> > > > +               kick =3D true;
-> > > > +       }
-> > > > +
-> > > > +       if (kick && virtqueue_kick_prepare(sq->vq) && virtqueue_not=
-ify(sq->vq))
-> > > > +               (*kicks)++;
-> > > > +
-> > > > +       return i;
-> > > > +}
-> > > > +
-> > > > +static bool virtnet_xsk_xmit(struct send_queue *sq, struct xsk_buf=
-f_pool *pool,
-> > > > +                            int budget)
-> > > > +{
-> > > > +       struct virtnet_info *vi =3D sq->vq->vdev->priv;
-> > > > +       struct virtnet_sq_free_stats stats =3D {};
-> > > > +       u64 kicks =3D 0;
-> > > > +       int sent;
-> > > > +
-> > > > +       __free_old_xmit(sq, true, &stats);
-> > > > +
-> > > > +       sent =3D virtnet_xsk_xmit_batch(sq, pool, budget, &kicks);
-> > > > +
-> > > > +       if (!is_xdp_raw_buffer_queue(vi, sq - vi->sq))
-> > > > +               check_sq_full_and_disable(vi, vi->dev, sq);
-> > > > +
-> > > > +       u64_stats_update_begin(&sq->stats.syncp);
-> > > > +       u64_stats_add(&sq->stats.packets, stats.packets);
-> > > > +       u64_stats_add(&sq->stats.bytes,   stats.bytes);
-> > > > +       u64_stats_add(&sq->stats.kicks,   kicks);
-> > > > +       u64_stats_add(&sq->stats.xdp_tx,  sent);
-> > > > +       u64_stats_update_end(&sq->stats.syncp);
-> > > > +
-> > > > +       if (xsk_uses_need_wakeup(pool))
-> > > > +               xsk_set_tx_need_wakeup(pool);
-> > > > +
-> > > > +       return sent =3D=3D budget;
-> > > > +}
-> > > > +
-> > > >  static int __virtnet_xdp_xmit_one(struct virtnet_info *vi,
-> > > >                                    struct send_queue *sq,
-> > > >                                    struct xdp_frame *xdpf)
-> > > > @@ -2707,6 +2810,7 @@ static int virtnet_poll_tx(struct napi_struct=
- *napi, int budget)
-> > > >         struct virtnet_info *vi =3D sq->vq->vdev->priv;
-> > > >         unsigned int index =3D vq2txq(sq->vq);
-> > > >         struct netdev_queue *txq;
-> > > > +       bool xsk_busy =3D false;
-> > > >         int opaque;
-> > > >         bool done;
-> > > >
-> > > > @@ -2719,7 +2823,11 @@ static int virtnet_poll_tx(struct napi_struc=
-t *napi, int budget)
-> > > >         txq =3D netdev_get_tx_queue(vi->dev, index);
-> > > >         __netif_tx_lock(txq, raw_smp_processor_id());
-> > > >         virtqueue_disable_cb(sq->vq);
-> > > > -       free_old_xmit(sq, true);
-> > > > +
-> > > > +       if (sq->xsk.pool)
-> > > > +               xsk_busy =3D virtnet_xsk_xmit(sq, sq->xsk.pool, bud=
-get);
-> > >
-> > > How about rename this to "xsk_sent"?
-> >
-> >
-> > OK
-> >
-> > Thanks.
-> >
-> >
-> > >
-> > > > +       else
-> > > > +               free_old_xmit(sq, true);
-> > > >
-> > > >         if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS) {
-> > > >                 if (netif_tx_queue_stopped(txq)) {
-> > > > @@ -2730,6 +2838,11 @@ static int virtnet_poll_tx(struct napi_struc=
-t *napi, int budget)
-> > > >                 netif_tx_wake_queue(txq);
-> > > >         }
-> > > >
-> > > > +       if (xsk_busy) {
-> > > > +               __netif_tx_unlock(txq);
-> > > > +               return budget;
-> > > > +       }
-> > > > +
-> > > >         opaque =3D virtqueue_enable_cb_prepare(sq->vq);
-> > > >
-> > > >         done =3D napi_complete_done(napi, 0);
-> > > > @@ -5715,6 +5828,10 @@ static void virtnet_sq_free_unused_buf(struc=
-t virtqueue *vq, void *buf)
-> > > >         case VIRTNET_XMIT_TYPE_DMA:
-> > > >                 virtnet_sq_unmap(sq, &buf);
-> > > >                 goto retry;
-> > > > +
-> > > > +       case VIRTNET_XMIT_TYPE_XSK:
-> > > > +               /* Make gcc happy. DONE in subsequent commit */
-> > > > +               break;
-> > > >         }
-> > > >  }
-> > > >
-> > > > --
-> > > > 2.32.0.3.g01195cf9f
-> > > >
-> > >
-> > > Thanks
-> > >
-> >
->
+> +enum {
+> +	ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_UNSPEC,
+> +	ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_INDEX,		/* u32 */
+> +	ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_QUALIFIER,		/* u32 */
+> +
+> +	__ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_CNT,
+> +	ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_MAX = (__ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_CNT - 1)
+> +};
+> +
+>  
+
+nit: double new line
+
+> +const struct nla_policy ethnl_tsinfo_get_policy[ETHTOOL_A_TSINFO_MAX + 1] = {
+>  	[ETHTOOL_A_TSINFO_HEADER]		=
+>  		NLA_POLICY_NESTED(ethnl_header_policy_stats),
+> +	[ETHTOOL_A_TSINFO_GHWTSTAMP] =
+> +		NLA_POLICY_MAX(NLA_U8, 1),
+
+I think this can be an NLA_FLAG, but TBH I'm also confused about 
+the semantics. Can you explain what it does from user perspective?
+
+> +	[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER] =
+> +		NLA_POLICY_NESTED(ethnl_tsinfo_hwtstamp_provider_policy),
+>  };
+>  
+> +static int tsinfo_parse_hwtstamp_provider(const struct nlattr *nest,
+> +					  struct hwtst_provider *hwtst,
+> +					  struct netlink_ext_ack *extack,
+> +					  bool *mod)
+> +{
+> +	struct nlattr *tb[ARRAY_SIZE(ethnl_tsinfo_hwtstamp_provider_policy)];
+
+Could you find a more sensible name for this policy?
+
+> +	int ret;
+> +
+> +	ret = nla_parse_nested(tb,
+> +			       ARRAY_SIZE(ethnl_tsinfo_hwtstamp_provider_policy) - 1,
+> +			       nest,
+> +			       ethnl_tsinfo_hwtstamp_provider_policy, extack);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	if (NL_REQ_ATTR_CHECK(extack, nest, tb, ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_INDEX) ||
+> +	    NL_REQ_ATTR_CHECK(extack, nest, tb, ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_QUALIFIER))
+
+nit: wrap at 80 chars, if you can, please
+
+> +		return -EINVAL;
+> +
+> +	ethnl_update_u32(&hwtst->index,
+> +			 tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_INDEX],
+> +			 mod);
+> +	ethnl_update_u32(&hwtst->qualifier,
+> +			 tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_QUALIFIER],
+> +			 mod);
+> +
+> +	return 0;
+> +}
+
+>  static int tsinfo_prepare_data(const struct ethnl_req_info *req_base,
+>  			       struct ethnl_reply_data *reply_base,
+>  			       const struct genl_info *info)
+>  {
+>  	struct tsinfo_reply_data *data = TSINFO_REPDATA(reply_base);
+> +	struct tsinfo_req_info *req = TSINFO_REQINFO(req_base);
+>  	struct net_device *dev = reply_base->dev;
+>  	int ret;
+>  
+>  	ret = ethnl_ops_begin(dev);
+>  	if (ret < 0)
+>  		return ret;
+> +
+> +	if (req->get_hwtstamp) {
+> +		struct kernel_hwtstamp_config cfg = {};
+> +
+> +		if (!dev->netdev_ops->ndo_hwtstamp_get) {
+> +			ret = -EOPNOTSUPP;
+> +			goto out;
+> +		}
+> +
+> +		ret = dev_get_hwtstamp_phylib(dev, &cfg);
+> +		data->hwtst_config.tx_type = BIT(cfg.tx_type);
+> +		data->hwtst_config.rx_filter = BIT(cfg.rx_filter);
+> +		data->hwtst_config.flags = BIT(cfg.flags);
+> +		goto out;
+
+This is wrong AFAICT, everything up to this point was a nit pick ;)
+Please take a look at 89e281ebff72e6, I think you're reintroducing a
+form of the same bug. If ETHTOOL_FLAG_STATS was set, you gotta run stats
+init.
+
+Perhaps you can move the stats getting up, and turn this code into if
+/ else if / else, without the goto.
+
+> +int ethnl_tsinfo_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+> +{
+> +	struct ethnl_tsinfo_dump_ctx *ctx = (void *)cb->ctx;
+> +	struct net *net = sock_net(skb->sk);
+> +	struct net_device *dev;
+> +	int ret = 0;
+> +
+> +	rtnl_lock();
+> +	if (ctx->req_info->base.dev) {
+> +		ret = ethnl_tsinfo_dump_one_dev(skb,
+> +						ctx->req_info->base.dev,
+> +						cb);
+> +	} else {
+> +		for_each_netdev_dump(net, dev, ctx->pos_ifindex) {
+> +			ret = ethnl_tsinfo_dump_one_dev(skb, dev, cb);
+> +			if (ret < 0 && ret != -EOPNOTSUPP)
+> +				break;
+> +			ctx->pos_phcindex = 0;
+> +		}
+> +	}
+> +	rtnl_unlock();
+> +
+> +	if (ret == -EMSGSIZE && skb->len)
+> +		return skb->len;
+> +	return ret;
+
+You can just return ret without the if converting to skb->len
+af_netlink will handle the EMSGSIZE errors in the same way.
 
