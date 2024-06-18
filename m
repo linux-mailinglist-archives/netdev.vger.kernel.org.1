@@ -1,62 +1,59 @@
-Return-Path: <netdev+bounces-104525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E230E90CEEE
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 15:22:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8623690CF00
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 15:23:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95DA5284396
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:22:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95A8A1C227E7
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:23:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B162A1BD8E9;
-	Tue, 18 Jun 2024 12:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87CD91BE24F;
+	Tue, 18 Jun 2024 12:43:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IGUPKmN7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qW+ZRN0V"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856291BD8E1;
-	Tue, 18 Jun 2024 12:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7EC1BE24C;
+	Tue, 18 Jun 2024 12:43:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718714607; cv=none; b=DxTgaXxyimZYZvPSAIL/CzHofAOV3+dfYfReAh989z0e6/1/KjKvVkD7UCrym2i05aiLHVSMIHI5Ik69LlJfNvmk7IiHJpIgZbHEkTvMvclrFCLb4AHeTEy21sAwKkSuUdYpq+UfE3oYvXX0gAbV7taEnMBWZoeuXEMetyvTOgY=
+	t=1718714611; cv=none; b=VAzS6R6tZGoHmaqsPU+ngWXbTeFxVhHXU2b2AbKP4TCIJ108m0yCw0iqfceL0pmO+JQStlQ8pdCOuA5qZM/0ZzQhvPrHX4aAlg85V6C8CTa/TCRruIwGvUADW2SfSjOWpkwqAA+cQTzLci2pkrxxElzsVRT/L6gZxkHRBlvNEQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718714607; c=relaxed/simple;
-	bh=DAXdSrNib3nAqs34GBlQ8mEf5onKDLdz52x00VpFSjA=;
+	s=arc-20240116; t=1718714611; c=relaxed/simple;
+	bh=5omyRClCkTdS8MIQwGuerjGj7Gg1hN8AhaFWJi9Oszg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cjKwp7W790yntn/+FFzisihrCGtNGYT6+gXFWGn/kQbC8WcKAPB6GS9LL8zA1X0x9DEV14Nz5f5L7nxIT0uAwl8fUo/a3ZOB7Vsqr71kGqEwFfG+5n5SuvmfRvPiJiyxcGkDJvqnv8bO1XkIwu7wAVFHQccXDamiMz8jc5Se9Ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IGUPKmN7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00E25C4AF49;
-	Tue, 18 Jun 2024 12:43:25 +0000 (UTC)
+	 MIME-Version; b=SqUWh2R0dH148y4nOLxkBLmu4tu16UF0vy8m1wWfJguKmFykdMEaDv6tuKGotTeKpiH9eBeMzXpkHpVj8MsV4peeQIYRQXp3U7AntzuowwKSZ2hxd7naQeWjtS8hUk0KTNwxE0tbhlQHAORVbUTqtZghCTvLZSIYPwBGwbsORBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qW+ZRN0V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 457E8C4AF1D;
+	Tue, 18 Jun 2024 12:43:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718714607;
-	bh=DAXdSrNib3nAqs34GBlQ8mEf5onKDLdz52x00VpFSjA=;
+	s=k20201202; t=1718714611;
+	bh=5omyRClCkTdS8MIQwGuerjGj7Gg1hN8AhaFWJi9Oszg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IGUPKmN7Qb1NXAPOUgsP1yt+4XBbADs/Ww3Nyckldwq/yzJ5fVtaHYdIcVcIx5qkR
-	 1luUWwX7zfMQOb1+LqH5rM/0KUWZ8R/ghmV25d1b6Y5/Qtn+Gl1HnEbsPlclSWFpG5
-	 baJ3KrUeHWu2xtCwmChFJQSjWQMZ/W0WvGJ4ZHa9FjvIGD3S20AJ9W9LeVlmovSfRk
-	 fOz1XnDIn8MYZKWxWBIO3IiRxqpgceMcSQzYQtpEbEK1hdqbU9kUuLxOymsoQeVqZK
-	 AUC/4m2GVToAWkqEMmNE8J/j9mSG3+oxpcwmhGKaUT04XzPCPkXL121N0ARDJgdDh4
-	 84U8cRjnF+3Xw==
+	b=qW+ZRN0V73cXmNfI7hG+ElTr0fJTLg1ZOCxRJrmyzN1wmVV7OJgscm9fo2ROtkzNA
+	 T4p6+Bq85rYm3UFT1JXxyoYinIvlIOptJed/Z24RmJS7CrxwACbO+1IpGUCB/Z59nn
+	 lMfa1GT6fvU2HxE13gDQbPg47v4B/F2ZymCw+6LjQgr77QY400DM0r3kreMwNgV/DH
+	 r04SJncB6f9eUzI1zCBq30+0sofSpTkS/oIx05KH5LBSaZ47jtjvB9LdOujxQXt3fJ
+	 z04lAEfmAHg1Rd1FqF9n/UZAjFe8Hwtd3pefD0evwF1Shl15Sls5RAbeMdc04KJtLF
+	 lU+/Zq8yAtqLg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Dmitry Antipov <dmantipov@yandex.ru>,
-	Johannes Berg <johannes.berg@intel.com>,
+Cc: Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
 	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
+	dsahern@kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 5/9] wifi: mac80211: fix UBSAN noise in ieee80211_prep_hw_scan()
-Date: Tue, 18 Jun 2024 08:43:11 -0400
-Message-ID: <20240618124318.3304798-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 7/9] ila: block BH in ila_output()
+Date: Tue, 18 Jun 2024 08:43:13 -0400
+Message-ID: <20240618124318.3304798-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240618124318.3304798-1-sashal@kernel.org>
 References: <20240618124318.3304798-1-sashal@kernel.org>
@@ -71,78 +68,58 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 4.19.316
 Content-Transfer-Encoding: 8bit
 
-From: Dmitry Antipov <dmantipov@yandex.ru>
+From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit 92ecbb3ac6f3fe8ae9edf3226c76aa17b6800699 ]
+[ Upstream commit cf28ff8e4c02e1ffa850755288ac954b6ff0db8c ]
 
-When testing the previous patch with CONFIG_UBSAN_BOUNDS, I've
-noticed the following:
+As explained in commit 1378817486d6 ("tipc: block BH
+before using dst_cache"), net/core/dst_cache.c
+helpers need to be called with BH disabled.
 
-UBSAN: array-index-out-of-bounds in net/mac80211/scan.c:372:4
-index 0 is out of range for type 'struct ieee80211_channel *[]'
-CPU: 0 PID: 1435 Comm: wpa_supplicant Not tainted 6.9.0+ #1
-Hardware name: LENOVO 20UN005QRT/20UN005QRT <...BIOS details...>
-Call Trace:
- <TASK>
- dump_stack_lvl+0x2d/0x90
- __ubsan_handle_out_of_bounds+0xe7/0x140
- ? timerqueue_add+0x98/0xb0
- ieee80211_prep_hw_scan+0x2db/0x480 [mac80211]
- ? __kmalloc+0xe1/0x470
- __ieee80211_start_scan+0x541/0x760 [mac80211]
- rdev_scan+0x1f/0xe0 [cfg80211]
- nl80211_trigger_scan+0x9b6/0xae0 [cfg80211]
- ...<the rest is not too useful...>
+ila_output() is called from lwtunnel_output()
+possibly from process context, and under rcu_read_lock().
 
-Since '__ieee80211_start_scan()' leaves 'hw_scan_req->req.n_channels'
-uninitialized, actual boundaries of 'hw_scan_req->req.channels' can't
-be checked in 'ieee80211_prep_hw_scan()'. Although an initialization
-of 'hw_scan_req->req.n_channels' introduces some confusion around
-allocated vs. used VLA members, this shouldn't be a problem since
-everything is correctly adjusted soon in 'ieee80211_prep_hw_scan()'.
+We might be interrupted by a softirq, re-enter ila_output()
+and corrupt dst_cache data structures.
 
-Cleanup 'kmalloc()' math in '__ieee80211_start_scan()' by using the
-convenient 'struct_size()' as well.
+Fix the race by using local_bh_disable().
 
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
-Link: https://msgid.link/20240517153332.18271-2-dmantipov@yandex.ru
-[improve (imho) indentation a bit]
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+Link: https://lore.kernel.org/r/20240531132636.2637995-5-edumazet@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/mac80211/scan.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ net/ipv6/ila/ila_lwt.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/net/mac80211/scan.c b/net/mac80211/scan.c
-index e3d8be4feea50..76fb858dc890d 100644
---- a/net/mac80211/scan.c
-+++ b/net/mac80211/scan.c
-@@ -652,15 +652,21 @@ static int __ieee80211_start_scan(struct ieee80211_sub_if_data *sdata,
- 			local->hw_scan_ies_bufsize *= n_bands;
+diff --git a/net/ipv6/ila/ila_lwt.c b/net/ipv6/ila/ila_lwt.c
+index 3d56a2fb6f86f..c7630776bd8e8 100644
+--- a/net/ipv6/ila/ila_lwt.c
++++ b/net/ipv6/ila/ila_lwt.c
+@@ -58,7 +58,9 @@ static int ila_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 		return orig_dst->lwtstate->orig_output(net, sk, skb);
+ 	}
+ 
++	local_bh_disable();
+ 	dst = dst_cache_get(&ilwt->dst_cache);
++	local_bh_enable();
+ 	if (unlikely(!dst)) {
+ 		struct ipv6hdr *ip6h = ipv6_hdr(skb);
+ 		struct flowi6 fl6;
+@@ -86,8 +88,11 @@ static int ila_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 			goto drop;
  		}
  
--		local->hw_scan_req = kmalloc(
--				sizeof(*local->hw_scan_req) +
--				req->n_channels * sizeof(req->channels[0]) +
--				local->hw_scan_ies_bufsize, GFP_KERNEL);
-+		local->hw_scan_req = kmalloc(struct_size(local->hw_scan_req,
-+							 req.channels,
-+							 req->n_channels) +
-+					     local->hw_scan_ies_bufsize,
-+					     GFP_KERNEL);
- 		if (!local->hw_scan_req)
- 			return -ENOMEM;
+-		if (ilwt->connected)
++		if (ilwt->connected) {
++			local_bh_disable();
+ 			dst_cache_set_ip6(&ilwt->dst_cache, dst, &fl6.saddr);
++			local_bh_enable();
++		}
+ 	}
  
- 		local->hw_scan_req->req.ssids = req->ssids;
- 		local->hw_scan_req->req.n_ssids = req->n_ssids;
-+		/* None of the channels are actually set
-+		 * up but let UBSAN know the boundaries.
-+		 */
-+		local->hw_scan_req->req.n_channels = req->n_channels;
-+
- 		ies = (u8 *)local->hw_scan_req +
- 			sizeof(*local->hw_scan_req) +
- 			req->n_channels * sizeof(req->channels[0]);
+ 	skb_dst_set(skb, dst);
 -- 
 2.43.0
 
