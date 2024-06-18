@@ -1,135 +1,107 @@
-Return-Path: <netdev+bounces-104358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D0FD90C3DE
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 08:43:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EDAA190C3ED
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 08:47:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84DDC2849F9
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 06:43:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58BE32813FA
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 06:47:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDAC36A8CF;
-	Tue, 18 Jun 2024 06:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19076A8CF;
+	Tue, 18 Jun 2024 06:47:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="L0vABP1f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FR3GCyJe"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D104D9E9;
-	Tue, 18 Jun 2024 06:43:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E75B4D8DC;
+	Tue, 18 Jun 2024 06:47:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718693009; cv=none; b=ndqwo70nFhbeeiZJ/NeA7X1PQ6ABSApEugC0yR3G1mKUweLTKSDWbzwAkJTgDSBmFpeoq4WRQzOxpjWxLmLA1N5/LP9N1mNyLgf6KzS7P2sUEbqKwb6E7LF9K3R7Pc3JVOeSa0PhqetAAPCgoSCBwN7IPm5oU8P/35o9rfHM2Pg=
+	t=1718693272; cv=none; b=TCAhn/o4GEWAMada/5cjxp244Z1VbVVz6VTyaftcucCoTNvhLRycgXSV5JQ63rSJEKGOgZpl1oZrpnYpCpsPJ+jb8dxBJGV5dGQ7KLx44sgbEm/tbbiqmrYkEBCWS6ADg/xUtsHRU0EzlZLDnXtdWadWbCdnPzQu3B7qXKqgLss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718693009; c=relaxed/simple;
-	bh=VpgJPad+08pstL0ZoWCCeKae7OP1hyR3SvT9SVEit8g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V1S9Ml0ETnhzxiWDRsN3PDrwZJlH7MXJTuMEHFUPfFqNv7I7Z3L198yjSOTx4YBJEZWzRBCtF/Te3o5EEUNoUCCLcbzXrGZ7Prw4gqwAyf51bV0gwEnSnRYmvBnBZls8XICaBQ3nfnpuEVoP3pxEaQatAfzDRQ6/v++zoZ3BRus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=L0vABP1f; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=xIkCb0DXrPi2i+bQKQrhJv9RbtgOZyK9PyIWQ2EUHTE=; b=L0vABP1f825b9Xo3raJ9hulo7A
-	Uo4uoOV2vhy7muoBeOW/TB5V/l0+kHaLHQUt8KX+GAt5Yj7YUqmyxPlhKYuf2lTo2JtLbVsZ+YVsj
-	QDPFYKr34JiZXCBcVZawwjtADj1qK6BHJJ9KCkk7nauvWFPo4H28zswTZmzR+elu7xmP5o8OgPJE/
-	VXRo151WFZrse5FpNgbTZ0TUQoMKvf6i3fmi1+rDXvDP3xbW4odddxZfbMBKD4jbqRY01eGdJOaYS
-	nj5A1ODp12D2/vsnP8NnbsAW27Om+ZgazSCXtrr3rm5KnhqNG/JGBFlIPcQTcR7OWaXaJ5CJGPTqd
-	NS3QCLmQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sJSYo-0000000DqmO-2M4P;
-	Tue, 18 Jun 2024 06:43:18 +0000
-Date: Mon, 17 Jun 2024 23:43:18 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-	Matt Turner <mattst88@gmail.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Shailend Chand <shailend@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Subject: Re: [PATCH net-next v10 02/14] net: page_pool: create hooks for
- custom page providers
-Message-ID: <ZnEshp0VICflc6Bg@infradead.org>
-References: <20240530201616.1316526-1-almasrymina@google.com>
- <20240530201616.1316526-3-almasrymina@google.com>
- <ZlqzER_ufrhlB28v@infradead.org>
- <CAHS8izMU_nMEr04J9kXiX6rJqK4nQKA+W-enKLhNxvK7=H2pgA@mail.gmail.com>
- <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com>
- <ZmAgszZpSrcdHtyl@infradead.org>
- <ee9a55cd-7541-4865-ab2a-9e860b88c9e4@gmail.com>
- <Zmfv6_uWAVavYJNj@infradead.org>
- <8ca3e144-75f3-4e57-9ae0-cc88f245094e@gmail.com>
+	s=arc-20240116; t=1718693272; c=relaxed/simple;
+	bh=PM+mWy06h9/Uw7jEvdyJMsz+j9sC9p1M6A4RbMMCuGY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pJIOC4qJ1OCtZMy9wM3scSY+ff1gLxOSeZEzV+giSIrf4/RZz0MDYDT3G58HniaOkS0WK1HnxsZDDaxGd32y59YYN+j0agfg7q1a6Je/l8i10aSZYaIMycT9yTqsOkH95+ZQw6apAKDvjlxTJd4x0Gtc0oTuKbofMSMggjGrysA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FR3GCyJe; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-627efad69b4so48867297b3.3;
+        Mon, 17 Jun 2024 23:47:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718693270; x=1719298070; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PM+mWy06h9/Uw7jEvdyJMsz+j9sC9p1M6A4RbMMCuGY=;
+        b=FR3GCyJe5Yn4eIWOpRr1t/O8d9oOgje2jW14YRm1vFHgjVJqNqTEgcVMVCYBdOsup9
+         CzAy65pLdz9UYb8fpELHW5eZawojKjweHXSbZ4EEPBKQh0Bkaf+QV4SJ6MVnpyfvj89G
+         iCSzBlndVGtpynBcPJGgrwQfCSC1uG9HiScGYBSZrym8Oa9CRQhJvtYSeISNYdYi/aiw
+         NnDmlndDQ3m7mvbZgeMAVd4E4Gy7KA4HkBogBzK6uGrgkw1+2+boafhhE+z1aaq9UxG4
+         /OZk+qJcpIp26S3Iuh2s1kujbP7pOJcak77ZdbpXDzhXGMTfeg2sF9huFDiT7LFhtpoI
+         WIdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718693270; x=1719298070;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PM+mWy06h9/Uw7jEvdyJMsz+j9sC9p1M6A4RbMMCuGY=;
+        b=PcRVkrHDG4gTR1o1tG5Tsj6p7HFgeCZAXM733byWKQXp4PGibtRA/uGxXvLulA8wB+
+         wDyp+xPhN1hdhl0G0RZhyB4YXcqTV24tJgVAtO5dSkIAVXinUVtR85hiQLmcj25b6ml6
+         4X5StGraCviLL7Qso89qHmG+5M2mdifeqgMAHjw4hzOoCzMoMK9h/V/N5OxBNHNlb62R
+         qLfIF+Bh/Uf8w/sCfdAlbzkQ65RfxMKc/zhHUi0wYED3eeiJGgqDPiZRASdMHvcEvZEZ
+         dUGRGqonTYHRfCBpEPI1MefGM7F0crcmlRg11vsgGiyoivfH6SuRPHP795JWvbpkzedm
+         OoFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUtysknfIlHUJ1V6IqXe6j83tvS31MZLjTYd9oG2KMssuYi/7YAmKocI+qOx2DlXz541ygmYy0yD5laMlRsAJrpfM1spsyukGIA9spAwS/Xbo04pNfwL2g3ooAEr2htsVlPkc9V
+X-Gm-Message-State: AOJu0YwKQqyd7mEstl2cTG5HBRsXpom2bd16eIR7Z6SXMArJhojmBFDn
+	kbPtjJCPe6fDpJLifihaaDCfxdPoLEZ/yOZKUWFXuxw6FOigTDhlzt4ssdxrAsyJ3h/Al9KTXhB
+	PT99VE9QgIkDoEJy1W9/imDoKDtJvyhUZJuU=
+X-Google-Smtp-Source: AGHT+IGL30rIET/M5LzgDltzRx6XXB6YgqW9oZuMa6bA/c6W37Gi2k9nXkoUak9FdwwM4W4azUvhMGBjs2MXgz8++ks=
+X-Received: by 2002:a81:7cd5:0:b0:632:b827:a1ba with SMTP id
+ 00721157ae682-6333082fb6bmr91760287b3.7.1718693270316; Mon, 17 Jun 2024
+ 23:47:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8ca3e144-75f3-4e57-9ae0-cc88f245094e@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20240613073441.781919-1-dqfext@gmail.com> <20240613170522.0961c781@kernel.org>
+In-Reply-To: <20240613170522.0961c781@kernel.org>
+From: Qingfang Deng <dqfext@gmail.com>
+Date: Tue, 18 Jun 2024 14:47:31 +0800
+Message-ID: <CALW65jay2+n_FhREhikVWoUEMQ2mytbrmQ9UzhjtCEv1gmtvQA@mail.gmail.com>
+Subject: Re: [PATCH net-next] etherdevice: Optimize is_broadcast_ether_addr
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Joe Perches <joe@perches.com>, Qingfang Deng <qingfang.deng@siflower.com.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 17, 2024 at 07:04:43PM +0100, Pavel Begunkov wrote:
-> > There should be no other memory source other than the page allocator
-> > and dmabuf.  If you need different life time control for your
-> > zero copy proposal don't mix that up with the contol of the memory
-> > source.
-> 
-> No idea how I'm mixing it up when I was explaining exactly this
-> all along as well as that the callback (and presumably the call
-> site in general) you was so eager to nack is used exactly to
-> implement the life time control.
+Hi Jakub,
 
-And that's exactly my point.  You want to use one callback to mix
-allocation source and life time control.  That's the perfect recipe
-to create an un-extensible un-composable mess.
+On Fri, Jun 14, 2024 at 8:05=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+> Can you provide more context on why it's beneficial. I mean, there's a
+> lot of code in the kernel one could micro-optimize...
+>
+> Show us the assembly, cycle counts, where it's used on fast paths...
 
+is_broadcast_ether_addr is used in bridge forwarding fast paths
+(br_dev_xmit, br_multicast_flood, br_handle_frame_finish), and often
+in combination with is_multicast_ether_addr.
+Since commit d54385ce68cd ("etherdev: Process is_multicast_ether_addr
+at same size as other operations"), is_multicast_ether_addr already
+does a 32-bit load. We can avoid duplicate loads by applying the same
+approach to is_broadcast_ether_addr and save a few instructions.
+Tested with x86_64, aarch64 and RISC-V compilers.
+
+> --
+> pw-bot: cr
 
