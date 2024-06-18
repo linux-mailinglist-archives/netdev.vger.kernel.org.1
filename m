@@ -1,142 +1,146 @@
-Return-Path: <netdev+bounces-104626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1CA290DA42
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 19:05:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0F0A90DA46
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 19:05:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B61AF286BF6
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 17:05:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 762B9287548
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 17:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F2C11514F4;
-	Tue, 18 Jun 2024 17:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BD313A868;
+	Tue, 18 Jun 2024 17:05:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rep0Gl2V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OukbcIEE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75B115098D
-	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 17:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F55F446DE;
+	Tue, 18 Jun 2024 17:05:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718730237; cv=none; b=WFtnLSRTgGTWzCmVwQa/1gzOrM07xQ5Kpn+3UVn2zegDTwG+ut7QgoTrMqhIekAbpdA9xT/UFUpfzEwjLCAyMKj5gSym5J2yzIn8IXqfTBU5A5pc4hNfjQtj43O0bfurBAwT3UVVzDPY76thT5Rkt0hC49lFe02yfturOoS/xnw=
+	t=1718730303; cv=none; b=SvxoPafmtNd3L3MkOGnTVRbBzhupa5llYmrpIQnHUHrdaAUoDw2+vjplzpV5FlAhLuFdW68YQrnof3Rw/Sz8B2aNWhHDF9gix7f4D0olw9Bndluji6xPSSELR6Yqs9sgqYAhBSqc3/AHMpBSocMSS7zS0d2QLPg6jogGY7voNk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718730237; c=relaxed/simple;
-	bh=tU4Pl8FhzvPz6/+O1I7wCGcjD88hvKemRL7+LEj0dtQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=fDhgPBk4eIG9LLeYQO9Hrz7xForjmOaWaHG77oV06rE0OyoOIc0w+CACZPStRi+EYJ6E7/wfxSSAQelslU3RlMcgfx/8GczLEjADEvnTIap7eF+ZjwsymbdhGVuaJFp/AsRIuZ4ZRpTI1hN5vqYJNE5EVhMlyWo2lygwdWUyYWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rep0Gl2V; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: andrew@lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718730232;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uhC3fIlPeEFs/L5Am5S/C/DO9R5qMPwRn4AKQZcbuHg=;
-	b=rep0Gl2VcCDeh4HBiHD+VKEdZKbOadCJVC+FQFC0B7rg73n8fHbB2Z1Iy8AjDyYEeNRnZX
-	Mnj4qONz7erBHo0XddGSvOaNXm1QUG216f+7WT+njRQV64AFvWUiNzjM1yufmZ35ZF/zvk
-	pcXaCKsjNl2JcRdQHz4W6AnyZ0CXwKo=
-X-Envelope-To: radhey.shyam.pandey@amd.com
-X-Envelope-To: netdev@vger.kernel.org
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
-X-Envelope-To: michal.simek@amd.com
-X-Envelope-To: kuba@kernel.org
-X-Envelope-To: linux@armlinux.org.uk
-X-Envelope-To: pabeni@redhat.com
-X-Envelope-To: edumazet@google.com
-X-Envelope-To: linux-kernel@vger.kernel.org
-X-Envelope-To: davem@davemloft.net
-Message-ID: <6f4916a0-f949-4289-9839-d89af574600d@linux.dev>
-Date: Tue, 18 Jun 2024 13:03:47 -0400
+	s=arc-20240116; t=1718730303; c=relaxed/simple;
+	bh=ZGKWTfzgdsRzX+gb0DKjPB4QTpCqlNfAGwSotcVfJfQ=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u0Iv6ChIaZXAayT7o8jO39IPg51r8K+koiAOEoJEcvJPNKSSsYRfLPbe46Nv5oQB1/m1v29DjpS9GgWmhKYDRrxjmNwRGp49YooRUsyP4JqNDCGahuvKxs/HhJcnJzcPacw4qLKLHqKx16mEuUvfyCj6ccekROTxGfYJgLTZoz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OukbcIEE; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-52cc1528c83so1390274e87.2;
+        Tue, 18 Jun 2024 10:05:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718730299; x=1719335099; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IUxkOd1P94AHf2/v22AwVnsR6zTygx+CenIExiQ2kdI=;
+        b=OukbcIEEzEULfnngkvOfWN5Jxtd8f9bUskkaRi10JvQK/N0LV1RsfkXVfizjUMFaTq
+         hkQA3oatdvpZPhK5X99w+nR280UspF2wR7oEtkFcNTKIc+GoTn52yQ8XT9QmN4Qczlq/
+         SDOWpvX6pJuDQz979WkszmrHAdW7rlj2sxtNW71TMq5TQ9HFs3t6mVcky91sXkdibyye
+         Ri8Vy9CcyHL6YWdZFyFIB3NFKdQVUVydG78pzD+j86Nbw5qSPmTvJOijz3xHvGwI3xCS
+         Pv5gMQxPD9hlo+oI1/LsQt+Zk1g44DT6lA0Sjg4trJOpwxL12MR/hj2EwN0Uq1/Ccpis
+         GycQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718730299; x=1719335099;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IUxkOd1P94AHf2/v22AwVnsR6zTygx+CenIExiQ2kdI=;
+        b=FuWoVuGWgYqykKuQjfs2mZiesvRlfFhEVw0KtFjfnY0cVCVfmKmrE7CwEBIyWzMNjD
+         ME6zv6C5CcLcxqG9+V6Clk8PDA+rvnRsWPR35u3jl+paKmbCxB5TYSgtkvNoTcSkxkzA
+         3gOUiSQXBezfKC6Bu2GNCKh3qNMMqpHls2hVGxWTgX+x0iEnwN1shMFbRWU+AnrGkzQr
+         p7ejh6TAxyByc6EHLWR8sfnXF7IEiW+fz7dOU7YUnyfh7+EdImYFnP1ZlOPwZS3bPthp
+         +tEJ0U3naLoH43IsrGnbni7T/9d1eyk2a46tATid4tQYkswjqE+GaLJ/WIi30bZEeeE1
+         cZwA==
+X-Forwarded-Encrypted: i=1; AJvYcCUryeFt+RBiZLOVLvPpWwztXvy0rC16PeWkcmAYmoD+DXdaFwsXvCo5gczrYedVHftf7CPfVAR2gDOpm+I9BXhDGzwnp/p1E/WdAd2b5yx95EmhTxmrEVr0cTbV
+X-Gm-Message-State: AOJu0Yzb35DyZo2Sko2hM+7H5FzD6OjnJzxtDrba8N8fyQHmjUWldpjC
+	nR4UzL8lCxC9psmbBHsWSHra8Qtw7gKIbAFytOxGDzClVwT456JM1SHM3bed
+X-Google-Smtp-Source: AGHT+IHes2RYjoazEyMOFAVg8gbqKFVipIBrWoqotKt6HG2FRIYgS8sfRN2AqCcv0I+tP2O5RuXVUQ==
+X-Received: by 2002:a05:6512:348c:b0:52c:8c5b:b7d8 with SMTP id 2adb3069b0e04-52ccaa60842mr124012e87.30.1718730299049;
+        Tue, 18 Jun 2024 10:04:59 -0700 (PDT)
+Received: from pc636 (host-90-233-216-238.mobileonline.telia.com. [90.233.216.238])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52ca282f0dbsm1551538e87.109.2024.06.18.10.04.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jun 2024 10:04:58 -0700 (PDT)
+From: Uladzislau Rezki <urezki@gmail.com>
+X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
+Date: Tue, 18 Jun 2024 19:04:56 +0200
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Paul E. McKenney" <paulmck@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	rcu@vger.kernel.org
+Subject: Re: [TEST] TCP MD5 vs kmemleak
+Message-ID: <ZnG-OII33VP7bPJp@pc636>
+References: <20240617072451.1403e1d2@kernel.org>
+ <CAJwJo6ZjhLLSiBUntdGT8a6-d5pjdXyVv9AAQ3Yx1W01Nq=dwg@mail.gmail.com>
+ <20240618074037.66789717@kernel.org>
+ <fae8f7191d50797a435936d41f08df9c83a9d092.camel@redhat.com>
+ <ee5a9d15-deaf-40c9-a559-bbc0f11fbe76@paulmck-laptop>
+ <20240618100210.16c028e1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 3/3] net: xilinx: axienet: Add statistics support
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Michal Simek <michal.simek@amd.com>, Jakub Kicinski <kuba@kernel.org>,
- Russell King <linux@armlinux.org.uk>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org,
- "David S . Miller" <davem@davemloft.net>
-References: <20240610231022.2460953-1-sean.anderson@linux.dev>
- <20240610231022.2460953-4-sean.anderson@linux.dev>
- <40cff9a6-bad3-4f85-8cbc-6d4bc72f9b9f@lunn.ch>
- <4d3871c1-afa1-4402-ad62-2fdb9d58dc3c@linux.dev>
-Content-Language: en-US
-In-Reply-To: <4d3871c1-afa1-4402-ad62-2fdb9d58dc3c@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240618100210.16c028e1@kernel.org>
 
-Hi Andrew,
+On Tue, Jun 18, 2024 at 10:02:10AM -0700, Jakub Kicinski wrote:
+> On Tue, 18 Jun 2024 09:42:35 -0700 Paul E. McKenney wrote:
+> > > FTR, with mptcp self-tests we hit a few kmemleak false positive on RCU
+> > > freed pointers, that where addressed by to this patch:
+> > > 
+> > > commit 5f98fd034ca6fd1ab8c91a3488968a0e9caaabf6
+> > > Author: Catalin Marinas <catalin.marinas@arm.com>
+> > > Date:   Sat Sep 30 17:46:56 2023 +0000
+> > > 
+> > >     rcu: kmemleak: Ignore kmemleak false positives when RCU-freeing objects
+> > > 
+> > > I'm wondering if this is hitting something similar? Possibly due to
+> > > lazy RCU callbacks invoked after MSECS_MIN_AGE???  
+> 
+> Dmitry mentioned this commit, too, but we use the same config for MPTCP
+> tests, and while we repro TCP AO failures quite frequently, mptcp
+> doesn't seem to have failed once.
+> 
+> > Fun!  ;-)
+> > 
+> > This commit handles memory passed to kfree_rcu() and friends, but
+> > not memory passed to call_rcu() and friends.  Of course, call_rcu()
+> > does not necessarily know the full extent of the memory passed to it,
+> > for example, if passed a linked list, call_rcu() will know only about
+> > the head of that list.
+> > 
+> > There are similar challenges with synchronize_rcu() and friends.
+> 
+> To be clear I think Dmitry was suspecting kfree_rcu(), he mentioned
+> call_rcu() as something he was expecting to have a similar issue but 
+> it in fact appeared immune.
+> 
+In the kfree_rcu() there is "an ignore" injection:
 
-On 6/11/24 11:36, Sean Anderson wrote:
-> On 6/10/24 20:26, Andrew Lunn wrote:
->>> +static u64 axienet_stat(struct axienet_local *lp, enum temac_stat stat)
->>> +{
->>> +	return u64_stats_read(&lp->hw_stats[stat]);
->>> +}
->>> @@ -1695,6 +1760,35 @@ axienet_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
->>>  		stats->tx_packets = u64_stats_read(&lp->tx_packets);
->>>  		stats->tx_bytes = u64_stats_read(&lp->tx_bytes);
->>>  	} while (u64_stats_fetch_retry(&lp->tx_stat_sync, start));
->>> +
->>> +	if (!(lp->features & XAE_FEATURE_STATS))
->>> +		return;
->>> +
->>> +	do {
->>> +		start = u64_stats_fetch_begin(&lp->hw_stat_sync);
->>> +		stats->rx_length_errors =
->>> +			axienet_stat(lp, STAT_RX_LENGTH_ERRORS);
->> 
->> I'm i reading this correctly. You are returning the counters from the
->> last refresh period. What is that? 2.5Gbps would wrapper around a 32
->> byte counter in 13 seconds. I hope these statistics are not 13 seconds
->> out of date?
-> 
-> By default we use a 1 Hz refresh period. You can of course configure this
-> up to 13 seconds, but we refuse to raise it further since we risk missing
-> a wrap-around. It's configurable by userspace so they can determine how
-> out-of-date they like their stats (vs how often they want to wake up the
-> CPU).
-> 
->> Since axienet_stats_update() also uses the lp->hw_stat_sync, i don't
->> see why you cannot read the hardware counter value and update to the
->> latest value.
-> 
-> We would need to synchronize against updates to hw_last_counter. Imagine
-> a scenario like
-> 
-> CPU 1					CPU 2
-> __axienet_device_reset()
-> 	axienet_stats_update()
-> 					axienet_stat()
-> 						u64_stats_read()
-> 						axienet_ior()
-> 	/* device reset */
-> 	hw_last_counter = 0
-> 						stats->foo = ... - hw_last_counter[...]
-> 
-> and now we have a glitch in the counter values, since we effectively are
-> double-counting the current counter value. Alternatively, we could read
-> the counter after reset but before hw_last_counter was updated and get a
-> glitch due to underflow.
+<snip>
+	/*
+	 * The kvfree_rcu() caller considers the pointer freed at this point
+	 * and likely removes any references to it. Since the actual slab
+	 * freeing (and kmemleak_free()) is deferred, tell kmemleak to ignore
+	 * this object (no scanning or false positives reporting).
+	 */
+	kmemleak_ignore(ptr);
 
-Does this make sense to you? If it does, I'll send v2 with just the mutex
-change and the variable rename pointed out by Simon.
+	// Set timer to drain after KFREE_DRAIN_JIFFIES.
+	if (rcu_scheduler_active == RCU_SCHEDULER_RUNNING)
+		schedule_delayed_monitor_work(krcp);
+<snip>
 
---Sean
-
+--
+Uladzislau Rezki
 
