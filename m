@@ -1,96 +1,144 @@
-Return-Path: <netdev+bounces-104464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3464790C9E8
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:42:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC6CD90C9EA
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:42:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 706D928884E
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:42:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40AE61F21D73
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E12D715821A;
-	Tue, 18 Jun 2024 11:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6BB7185E79;
+	Tue, 18 Jun 2024 11:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pqBUgYGL";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="9kzf8PVi"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E47D1581EF;
-	Tue, 18 Jun 2024 11:02:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465361581EF;
+	Tue, 18 Jun 2024 11:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718708541; cv=none; b=G0431QOU1+nAib8yO+ZeBEwPA91tAEydbeUwNUOis0HsmuQjMxO+DppJAO/lRHLqe7qYUq+Chb3yjzDTolo+nQB0LJCTFID50buwbC3nY252L8sHB14PzRRwLDKKYQSsYx4wvUn9qXF14Bwcz6EIyOkpFO4fn3oNzJAs0gQSqhM=
+	t=1718708564; cv=none; b=bHD4MtOWfvFesZT0t6fcQfalTZ1nXG0XS6IK8phHrmaUIFTIBCenqL0oeyPY8bdrKT34wQvTPQuEmnV8i8wqO2gGKfy1o8+q/Eqi2n+vb4u574mEti7AXeP7RgUzHOo8JRdzEgs6KjPN7bsWHQIfxjgBeSz33tMKQHfuG99/uy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718708541; c=relaxed/simple;
-	bh=JmMqCzUFzGdntw8cFxUiHsUFzFPMlt7PsprJzWJyifA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=bihPj+V+zLiX+vHh0+sLPa2PaDweqI7aBmNOQBJprwWjsHTw7iDoD2dxbnJwB1oqt49cee3Bhh2dxJLQl/kajTbwxgEG+pSCoTUT4LobV7UJO+H3IydYufP5t41Df/fM3wpSTq8V1/8xTOpA2jPiT7aSujLqYfk81us5iwME8hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 45IB1VAS0398675, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 45IB1VAS0398675
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 18 Jun 2024 19:01:31 +0800
-Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 18 Jun 2024 19:01:31 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXDAG02.realtek.com.tw (172.21.6.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 18 Jun 2024 19:01:30 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
- RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
- 15.01.2507.035; Tue, 18 Jun 2024 19:01:30 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Markus Elfring <Markus.Elfring@web.de>, Simon Horman <horms@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, LKML <linux-kernel@vger.kernel.org>,
-        Andrew Lunn
-	<andrew@lunn.ch>, Hariprasad Kelam <hkelam@marvell.com>,
-        Jiri Pirko
-	<jiri@resnulli.us>, Larry Chiu <larry.chiu@realtek.com>,
-        Ping-Ke Shih
-	<pkshih@realtek.com>,
-        Ratheesh Kannoth <rkannoth@marvell.com>
-Subject: RE: [v20 02/13] rtase: Implement the .ndo_open function
-Thread-Topic: [v20 02/13] rtase: Implement the .ndo_open function
-Thread-Index: AQHawJ5eL1A+vv787Ey/gTxPzZ037bHL8dBA///X7QCAABcWAIABe3RQ
-Date: Tue, 18 Jun 2024 11:01:30 +0000
-Message-ID: <d8ca31ba65364e60af91bca644a96db5@realtek.com>
-References: <20240607084321.7254-3-justinlai0215@realtek.com>
- <1d01ece4-bf4e-4266-942c-289c032bf44d@web.de>
- <ef7c83dea1d849ad94acef81819f9430@realtek.com>
- <6b284a02-15e2-4eba-9d5f-870a8baa08e8@web.de>
- <0c57021d0bfc444ebe640aa4c5845496@realtek.com>
- <20240617185956.GY8447@kernel.org>
- <202406181007.45IA7eWxA3305754@rtits1.realtek.com.tw>
-In-Reply-To: <202406181007.45IA7eWxA3305754@rtits1.realtek.com.tw>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1718708564; c=relaxed/simple;
+	bh=y5HsbT5jRNYRTXQM94q8J6xW8lmsgNiQLRDa7hBnciE=;
+	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=MzSV39a7RLNBK2ABgh0GGQfpLzKgTRvJ/MNVVGxB9DPZcbCEHjtyE2pklU185/8x0buO086mdDtKS3SEUK0X3gJ1dbt/0tXKUork1TP8id0IpptxsVZPagIYhFmLvIV4nOl9AJWSQeMHbDCdZ2h6s6mcufEzM9HbHu3pFLV5MX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pqBUgYGL; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=9kzf8PVi; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1718708561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RrmwcXMzcWaczPV/n3eM3LrRD+UsKzXu3JcMOPGCJqo=;
+	b=pqBUgYGL1ioi5qG7fflSY/IuKpF3N/Tii2lkcY5zWBgZWSpsVcU27+Cyn1aqUNeGK+xNRQ
+	feAyS6hwLMD6UJBabVntutzPxarSx4b1789rfwlwH/mvmSdZOba7pyXnhojTkjvKO9Nq7k
+	e29Vj17pzV+I3W/SpqvcKxv97Sse3BsmuD/waKAPaX/6wY9ooAvCf7r4/iifOuXSPAq1x4
+	Ym3tGFLlldzwV+7cpPe+tLlkrLD8fIDbzm2FL8vTLZ8GosQW7INzZMjXjI7VQ1VjPNrzgi
+	UTe/K68kUvZi74gVkUZtgBR0fbjpOyzcqp94RuAPJl1Es4XReN3/C0JCTCRhUw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1718708561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RrmwcXMzcWaczPV/n3eM3LrRD+UsKzXu3JcMOPGCJqo=;
+	b=9kzf8PViNV38alYXmBbji4vW411yTTAVJbic4aFX/h45kgQc/VDJlK/AcEBLzdiF9eR8+N
+	WQl4SxUAg5X3k/Bw==
+To: syzbot <syzbot+e620313b27e2be807d3b@syzkaller.appspotmail.com>,
+ anna-maria@linutronix.de, frederic@kernel.org,
+ linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+ netdev@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Petr Mladek
+ <pmladek@suse.com>, John Ogness <jogness@linutronix.de>
+Subject: Re: [syzbot] [kernel?] possible deadlock in hrtimer_try_to_cancel
+In-Reply-To: <000000000000d6e3cf061b2531ea@google.com>
+References: <000000000000d6e3cf061b2531ea@google.com>
+Date: Tue, 18 Jun 2024 13:02:40 +0200
+Message-ID: <87r0cuqzsf.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
 
-PiANCj4gPiBJIHdvdWxkIGFsc28gc3VnZ2VzdCByZWFkaW5nIE1hcmt1cydzIGFkdmljZSB3aXRo
-IGR1ZSBjYXJlLCBhcyBpdCBpcw0KPiA+IG5vdCBhbHdheXMgYWxpZ25lZCB3aXRoIGJlc3QgcHJh
-Y3RpY2UgZm9yIE5ldHdvcmtpbmcgY29kZS4NCj4gDQo+IEkgZGFyZSB0byBwcm9wb3NlIGZ1cnRo
-ZXIgY29sbGF0ZXJhbCBldm9sdXRpb24gYWNjb3JkaW5nIHRvIGF2YWlsYWJsZQ0KPiBwcm9ncmFt
-bWluZyBpbnRlcmZhY2VzLg0KPiANCj4gUmVnYXJkcywNCj4gTWFya3VzDQoNClRoYW5rIHlvdSBm
-b3IgeW91ciBzdWdnZXN0aW9uLCBidXQgc2luY2Ugd2Ugc3RpbGwgbmVlZCB0byBzdXJ2ZXkgdGhl
-IG5ldw0KbWV0aG9kLCB3ZSB3YW50IHRvIHVzZSB0aGUgZ290byBtZXRob2QgZm9yIHRoaXMgY3Vy
-cmVudCB2ZXJzaW9uIG9mIHRoZQ0KcGF0Y2ggYW5kIG1ha2UgbW9kaWZpY2F0aW9ucyBiYXNlZCBv
-biBTaW1vbidzIHN1Z2dlc3Rpb25zLg0K
+On Tue, Jun 18 2024 at 00:40, syzbot wrote:
+> ------------[ cut here ]------------
+> ======================================================
+> WARNING: possible circular locking dependency detected
+> 6.10.0-rc3-syzkaller-00044-g2ccbdf43d5e7 #0 Not tainted
+> ------------------------------------------------------
+> kworker/u32:10/1146 is trying to acquire lock:
+> ffffffff8dba3118 ((console_sem).lock){-.-.}-{2:2}, at: down_trylock+0x12/0x70 kernel/locking/semaphore.c:139
+>
+> but task is already holding lock:
+> ffff88802c32c9d8 (hrtimer_bases.lock){-.-.}-{2:2}, at: lock_hrtimer_base kernel/time/hrtimer.c:175 [inline]
+> ffff88802c32c9d8 (hrtimer_bases.lock){-.-.}-{2:2}, at: hrtimer_try_to_cancel+0xa9/0x500 kernel/time/hrtimer.c:1333
+>
+> which lock already depends on the new lock.
+
+Right. That's caused by this:
+
+> WARNING: CPU: 3 PID: 1146 at lib/timerqueue.c:55 timerqueue_del+0xfe/0x150 lib/timerqueue.c:55
+
+         WARN_ON_ONCE(RB_EMPTY_NODE(&node->node));
+
+The warning is inside the hrtimer base lock held region which is known
+to be problematic vs. printk...
+
+> Modules linked in:
+> CPU: 3 PID: 1146 Comm: kworker/u32:10 Not tainted 6.10.0-rc3-syzkaller-00044-g2ccbdf43d5e7 #0
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+> Workqueue: netns cleanup_net
+> RIP: 0010:timerqueue_del+0xfe/0x150 lib/timerqueue.c:55
+> Code: 28 9e ff ff 4c 89 e1 48 ba 00 00 00 00 00 fc ff df 48 c1 e9 03 80 3c 11 00 75 45 48 89 45 08 e9 7b ff ff ff e8 f3 90 c0 f6 90 <0f> 0b 90 e9 43 ff ff ff 48 89 df e8 a2 c4 1d f7 eb 8a 4c 89 e7 e8
+> RSP: 0018:ffffc90007267918 EFLAGS: 00010093
+> RAX: 0000000000000000 RBX: ffffe8ffad04d080 RCX: ffffffff8acdfe20
+> RDX: ffff88802045a440 RSI: ffffffff8acdfedd RDI: 0000000000000006
+> RBP: ffff88802c32ca90 R08: 0000000000000006 R09: ffffe8ffad04d080
+> R10: ffffe8ffad04d080 R11: 0000000000000001 R12: ffffe8ffad04d080
+> R13: 0000000000000001 R14: ffff88802c32c9c0 R15: 0000000000000000
+> FS:  0000000000000000(0000) GS:ffff88802c300000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00000000ffeb8c2c CR3: 000000005beb8000 CR4: 0000000000350ef0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  __remove_hrtimer+0x99/0x290 kernel/time/hrtimer.c:1118
+>  remove_hrtimer kernel/time/hrtimer.c:1167 [inline]
+>  hrtimer_try_to_cancel+0x2a5/0x500 kernel/time/hrtimer.c:1336
+>  hrtimer_cancel+0x16/0x40 kernel/time/hrtimer.c:1445
+>  napi_disable+0x13a/0x1e0 net/core/dev.c:6648
+>  gro_cells_destroy net/core/gro_cells.c:116 [inline]
+>  gro_cells_destroy+0x102/0x4d0 net/core/gro_cells.c:106
+>  netdev_run_todo+0x775/0x1250 net/core/dev.c:10693
+>  cleanup_net+0x591/0xbf0 net/core/net_namespace.c:636
+>  process_one_work+0x958/0x1ad0 kernel/workqueue.c:3231
+>  process_scheduled_works kernel/workqueue.c:3312 [inline]
+>  worker_thread+0x6c8/0xf70 kernel/workqueue.c:3393
+>  kthread+0x2c1/0x3a0 kernel/kthread.c:389
+>  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+IOW, this tries to remove a hrtimer which is not queued, but has
+hrtimer::state != HRTIMER_STATE_INACTIVE.
+
+This means the timer is either not initialized or got corrupted.
+
+The circular locking problem is the fallout which cannot be solved due
+to the current printk semantics. The upcoming atomic consoles should
+handle this nicely.
+
+Thanks,
+
+        tglx
 
