@@ -1,41 +1,38 @@
-Return-Path: <netdev+bounces-104442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5996490C89B
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:11:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B21690C867
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:07:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC202B24336
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:11:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A8F61C2226C
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5681ACE8F;
-	Tue, 18 Jun 2024 09:55:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1409E204F0F;
+	Tue, 18 Jun 2024 09:47:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7411ACE7F;
-	Tue, 18 Jun 2024 09:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AB27204F0C;
+	Tue, 18 Jun 2024 09:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718704549; cv=none; b=dMj+s5m2RRfjz4GURDs1tSpnCanxrDaYWXHAU02MnNPGJzl9eDwuzlhopS1kQl+TNozSX+NlPq17Te8Be4SRgxLrDRyiVr9Ykp/L6swPJ3zkoul3OYX5jJo+jH5ZosJvu9PaaGd3V//LwD+tGAbgG9F1XMH2PQK6TNAlS+ILEoU=
+	t=1718704067; cv=none; b=aVwkaOEZSr8CjZ1/grMPTd1AXDPESKaDZVsB0L9v2xM59uHi8AAtebZBZ1rs4IaM5RXbS3zb5QSLiysx2wegGwI+HWoSZClKssJn3JlJsNWyaQDfHviBNWVc77HGozkPAP3pbBSrbr6KG37qZDyDtf7qSEywHEC3ylKA55TruRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718704549; c=relaxed/simple;
-	bh=qd8tDe9P9tKzVK4z5CfJoRXC5U0gCQnlacAQ4A6bGf4=;
+	s=arc-20240116; t=1718704067; c=relaxed/simple;
+	bh=w8SHkAhQ2KYa9gX5f0d9nDfNJAt76UIQ3b09bZQbNLM=;
 	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=OJDaOiFVfL/ZsnEvP0VlEYhZgfGoekOv9PRe4hUEFpZStMpuJCUaooWGBr2xnJmoq4UvhNAYhVYGd9wcoQ/aKDTwsX6dbh0Rq6Jg0Dt+hZEa70BBYZ/buWZPeMlwNLPkEIl3uX/cqsigRjVLccIt1IRBVhXZLHR7jyNqjoWWT+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.178.240
+	 In-Reply-To:Content-Type; b=XRsawjmzQlB9eepcsq/OGnWB1CW+/5elfJp3g2m0KbLOoLZ0RrduUgw1+2+u5NaKb8PTHNAFcFOPwfcwVAWTZwoDMCFbMdLAWa3VYDvMUfPH7yRRrWzMgquL6rTN/1x8WAZtzx/lPyw1x7+PlDhrVMTO+vVhT8EFFSeVZ41vBAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
-Received: from relay4-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::224])
-	by mslow1.mail.gandi.net (Postfix) with ESMTP id 97703C7245;
-	Tue, 18 Jun 2024 09:43:03 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3E6DAE0005;
-	Tue, 18 Jun 2024 09:42:53 +0000 (UTC)
-Message-ID: <3d6130f7-8d3a-41fd-ad4d-9a0c79496739@ovn.org>
-Date: Tue, 18 Jun 2024 11:42:52 +0200
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1F40E240003;
+	Tue, 18 Jun 2024 09:47:36 +0000 (UTC)
+Message-ID: <ec135d28-5642-4393-a175-439c13c4d4f8@ovn.org>
+Date: Tue, 18 Jun 2024 11:47:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,18 +42,17 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Cc: i.maximets@ovn.org, netdev@vger.kernel.org, aconole@redhat.com,
  echaudro@redhat.com, horms@kernel.org, dev@openvswitch.org,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/9] net: sched: act_sample: add action cookie
- to sample
+ Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar <pshelar@ovn.org>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 5/9] net: openvswitch: add emit_sample action
+Content-Language: en-US
 To: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
 References: <20240603185647.2310748-1-amorenoz@redhat.com>
- <20240603185647.2310748-3-amorenoz@redhat.com>
- <282d4b46-70c1-454b-810a-ef3353f1b0f2@ovn.org>
- <CAG=2xmMqfBLeFjqzzHG3uHLx9d8sDsdbguxZm8cxbR5nEVDZ7Q@mail.gmail.com>
-Content-Language: en-US
+ <20240603185647.2310748-6-amorenoz@redhat.com>
+ <4f89a9b9-999c-4d1f-8831-48045e6a74f6@ovn.org>
+ <CAG=2xmPHcyLbuMCVR6ysKigboWg1E_xCHFMxEKUceerioO-OFg@mail.gmail.com>
 From: Ilya Maximets <i.maximets@ovn.org>
 Autocrypt: addr=i.maximets@ovn.org; keydata=
  xsFNBF77bOMBEADVZQ4iajIECGfH3hpQMQjhIQlyKX4hIB3OccKl5XvB/JqVPJWuZQRuqNQG
@@ -101,47 +97,183 @@ Autocrypt: addr=i.maximets@ovn.org; keydata=
  o9OQwoMf2+pKNG3J+EMuU4g4ZHGzxI0isyww7PpEHx6sxFEvMhsOp7qnjPsQUcnGIIiqKlTj
  H7i86580VndsKrRK99zJrm4s9Tg/7OFP1SpVvNvSM4TRXSzVF25WVfLgeloN1yHC5Wsqk33X
  XNtNovqA0TLFjhfyyetBsIOgpGakgBNieC9GnY7tC3AG+BqG5jnVuGqSTO+iM/d+lsoa+w==
-In-Reply-To: <CAG=2xmMqfBLeFjqzzHG3uHLx9d8sDsdbguxZm8cxbR5nEVDZ7Q@mail.gmail.com>
+In-Reply-To: <CAG=2xmPHcyLbuMCVR6ysKigboWg1E_xCHFMxEKUceerioO-OFg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: i.maximets@ovn.org
 
-On 6/18/24 09:38, Adrián Moreno wrote:
-> On Mon, Jun 17, 2024 at 12:00:04PM GMT, Ilya Maximets wrote:
+On 6/18/24 09:33, Adrián Moreno wrote:
+> On Mon, Jun 17, 2024 at 12:44:45PM GMT, Ilya Maximets wrote:
 >> On 6/3/24 20:56, Adrian Moreno wrote:
->>> If the action has a user_cookie, pass it along to the sample so it can
->>> be easily identified.
+>>> Add support for a new action: emit_sample.
+>>>
+>>> This action accepts a u32 group id and a variable-length cookie and uses
+>>> the psample multicast group to make the packet available for
+>>> observability.
+>>>
+>>> The maximum length of the user-defined cookie is set to 16, same as
+>>> tc_cookie, to discourage using cookies that will not be offloadable.
 >>>
 >>> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 >>> ---
->>>  net/sched/act_sample.c | 12 ++++++++++++
->>>  1 file changed, 12 insertions(+)
->>>
->>> diff --git a/net/sched/act_sample.c b/net/sched/act_sample.c
->>> index a69b53d54039..5c3f86ec964a 100644
->>> --- a/net/sched/act_sample.c
->>> +++ b/net/sched/act_sample.c
->>> @@ -165,9 +165,11 @@ TC_INDIRECT_SCOPE int tcf_sample_act(struct sk_buff *skb,
->>>  				     const struct tc_action *a,
->>>  				     struct tcf_result *res)
->>>  {
->>> +	u8 cookie_data[TC_COOKIE_MAX_SIZE] = {};
+>>>  Documentation/netlink/specs/ovs_flow.yaml | 17 ++++++++
+>>>  include/uapi/linux/openvswitch.h          | 25 ++++++++++++
+>>>  net/openvswitch/actions.c                 | 50 +++++++++++++++++++++++
+>>>  net/openvswitch/flow_netlink.c            | 33 ++++++++++++++-
+>>>  4 files changed, 124 insertions(+), 1 deletion(-)
 >>
->> Is it necessary to initialize these 16 bytes on every call?
->> Might be expensive.  We're passing the data length around,
->> so the uninitialized parts should not be accessed.
+>> Some nits below, beside ones already mentioned.
 >>
 > 
-> They "should" not, indeed. I was just trying to be extra careful.
-> Are you worried TC_COOKIE_MAX_SIZE could grow or the cycles needed to
-> clear the current 16 bytes?
+> Thanks, Ilya.
+> 
+>>>
+>>> diff --git a/Documentation/netlink/specs/ovs_flow.yaml b/Documentation/netlink/specs/ovs_flow.yaml
+>>> index 4fdfc6b5cae9..a7ab5593a24f 100644
+>>> --- a/Documentation/netlink/specs/ovs_flow.yaml
+>>> +++ b/Documentation/netlink/specs/ovs_flow.yaml
+>>> @@ -727,6 +727,12 @@ attribute-sets:
+>>>          name: dec-ttl
+>>>          type: nest
+>>>          nested-attributes: dec-ttl-attrs
+>>> +      -
+>>> +        name: emit-sample
+>>> +        type: nest
+>>> +        nested-attributes: emit-sample-attrs
+>>> +        doc: |
+>>> +          Sends a packet sample to psample for external observation.
+>>>    -
+>>>      name: tunnel-key-attrs
+>>>      enum-name: ovs-tunnel-key-attr
+>>> @@ -938,6 +944,17 @@ attribute-sets:
+>>>        -
+>>>          name: gbp
+>>>          type: u32
+>>> +  -
+>>> +    name: emit-sample-attrs
+>>> +    enum-name: ovs-emit-sample-attr
+>>> +    name-prefix: ovs-emit-sample-attr-
+>>> +    attributes:
+>>> +      -
+>>> +        name: group
+>>> +        type: u32
+>>> +      -
+>>> +        name: cookie
+>>> +        type: binary
+>>>
+>>>  operations:
+>>>    name-prefix: ovs-flow-cmd-
+>>> diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
+>>> index efc82c318fa2..a0e9dde0584a 100644
+>>> --- a/include/uapi/linux/openvswitch.h
+>>> +++ b/include/uapi/linux/openvswitch.h
+>>> @@ -914,6 +914,30 @@ struct check_pkt_len_arg {
+>>>  };
+>>>  #endif
+>>>
+>>> +#define OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE 16
+>>> +/**
+>>> + * enum ovs_emit_sample_attr - Attributes for %OVS_ACTION_ATTR_EMIT_SAMPLE
+>>> + * action.
+>>> + *
+>>> + * @OVS_EMIT_SAMPLE_ATTR_GROUP: 32-bit number to identify the source of the
+>>> + * sample.
+>>> + * @OVS_EMIT_SAMPLE_ATTR_COOKIE: A variable-length binary cookie that contains
+>>> + * user-defined metadata. The maximum length is 16 bytes.
+>>
+>> s/16/OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE/
+>>
+>>> + *
+>>> + * Sends the packet to the psample multicast group with the specified group and
+>>> + * cookie. It is possible to combine this action with the
+>>> + * %OVS_ACTION_ATTR_TRUNC action to limit the size of the packet being emitted.
+>>> + */
+>>> +enum ovs_emit_sample_attr {
+>>> +	OVS_EMIT_SAMPLE_ATTR_UNPSEC,
+>>> +	OVS_EMIT_SAMPLE_ATTR_GROUP,	/* u32 number. */
+>>> +	OVS_EMIT_SAMPLE_ATTR_COOKIE,	/* Optional, user specified cookie. */
+>>> +	__OVS_EMIT_SAMPLE_ATTR_MAX
+>>> +};
+>>> +
+>>> +#define OVS_EMIT_SAMPLE_ATTR_MAX (__OVS_EMIT_SAMPLE_ATTR_MAX - 1)
+>>> +
+>>> +
+>>>  /**
+>>>   * enum ovs_action_attr - Action types.
+>>>   *
+>>> @@ -1004,6 +1028,7 @@ enum ovs_action_attr {
+>>>  	OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
+>>>  	OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
+>>>  	OVS_ACTION_ATTR_DROP,         /* u32 error code. */
+>>> +	OVS_ACTION_ATTR_EMIT_SAMPLE,  /* Nested OVS_EMIT_SAMPLE_ATTR_*. */
+>>>
+>>>  	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
+>>>  				       * from userspace. */
+>>> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+>>> index 964225580824..3b4dba0ded59 100644
+>>> --- a/net/openvswitch/actions.c
+>>> +++ b/net/openvswitch/actions.c
+>>> @@ -24,6 +24,11 @@
+>>>  #include <net/checksum.h>
+>>>  #include <net/dsfield.h>
+>>>  #include <net/mpls.h>
+>>> +
+>>> +#if IS_ENABLED(CONFIG_PSAMPLE)
+>>> +#include <net/psample.h>
+>>> +#endif
+>>> +
+>>>  #include <net/sctp/checksum.h>
+>>>
+>>>  #include "datapath.h"
+>>> @@ -1299,6 +1304,46 @@ static int execute_dec_ttl(struct sk_buff *skb, struct sw_flow_key *key)
+>>>  	return 0;
+>>>  }
+>>>
+>>> +static int execute_emit_sample(struct datapath *dp, struct sk_buff *skb,
+>>> +			       const struct sw_flow_key *key,
+>>> +			       const struct nlattr *attr)
+>>> +{
+>>> +#if IS_ENABLED(CONFIG_PSAMPLE)
+>>> +	struct psample_group psample_group = {};
+>>> +	struct psample_metadata md = {};
+>>> +	struct vport *input_vport;
+>>> +	const struct nlattr *a;
+>>> +	int rem;
+>>> +
+>>> +	for (a = nla_data(attr), rem = nla_len(attr); rem > 0;
+>>> +	     a = nla_next(a, &rem)) {
+>>
+>> Since the action is strictly validated, can use use nla_for_each_attr()
+>> or nla_for_each_nested() ?
+>>
+> 
+> Probably, yes.
+> 
+>>> +		switch (nla_type(a)) {
+>>> +		case OVS_EMIT_SAMPLE_ATTR_GROUP:
+>>> +			psample_group.group_num = nla_get_u32(a);
+>>> +			break;
+>>> +
+>>> +		case OVS_EMIT_SAMPLE_ATTR_COOKIE:
+>>> +			md.user_cookie = nla_data(a);
+>>> +			md.user_cookie_len = nla_len(a);
+>>> +			break;
+>>> +		}
+>>> +	}
+>>> +
+>>> +	psample_group.net = ovs_dp_get_net(dp);
+>>> +
+>>> +	input_vport = ovs_vport_rcu(dp, key->phy.in_port);
+>>> +	if (!input_vport)
+>>> +		input_vport = ovs_vport_rcu(dp, OVSP_LOCAL);
+>>
+>> We may need to check that we actually found the local port.
+>>
+> 
+> Sure. What can cause the local port not to exist?
 
-I'm assuming that any extra cycles spent per packet are undesirable,
-so should be avoided, if possible.  Even if we save 1-2 cycles per
-packet, it's a lot when we talk about millions of packets per second.
-
-In this particular case, it seems, we do not sacrifice anything, so
-it's just a couple of cycles back for free.
+I would assume that since we're only protected by RCU here, there can be
+a race with datapath destruction that will remove the local port.
 
 Best regards, Ilya Maximets.
 
