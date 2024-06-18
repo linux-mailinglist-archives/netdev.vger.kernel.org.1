@@ -1,115 +1,123 @@
-Return-Path: <netdev+bounces-104603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78FAC90D8CB
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 18:15:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50D0190D8D9
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 18:17:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EA821F2528E
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:15:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61BB41C22FE4
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:17:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FDA15689A;
-	Tue, 18 Jun 2024 16:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 774DE152190;
+	Tue, 18 Jun 2024 16:12:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XOy5JeVs"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="lc9PVF+p";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="LS/OLGrv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8084F5EA;
-	Tue, 18 Jun 2024 16:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0FF513A89B;
+	Tue, 18 Jun 2024 16:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718727115; cv=none; b=LTXmfNXgyfHUcK4i6TaX/oBTzl1SAIqgVi8Y0rfLY2+M+E3yxkbXFQ85cwWjeSLCos3aP2Q33dZzt9CQqM1LcWO4MhtOnXhZWRnpHUkXMirZgJzMBitGH6HI8E8TAIIWNLgaQXTlYaERa/h2eZLGNSYKzQ0XoKsKPo/vP9H21E8=
+	t=1718727166; cv=none; b=q9jPsWB2jZdeHUEc6Ns26O26em19b8mQ1pwlZ35ym+zdjpfj9XTNTy8xGslJgifvFqkScKRUBwla8AwtOze33nvCYatqU2YaTFMZA/Za4LytsKqJ2oEbElDpKqJFg2xgfGwyOZFahSmgiksSqalzEjU8jeFEJkIZ/c9+aenghs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718727115; c=relaxed/simple;
-	bh=2hmMSMcK/DYRjUA5lhYtRVqQYkfz7USAMb6rWWQ3auM=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=a7NtX9hiKEF4CFLTZzfttGIbYAgX0RGrgk7Q6g095Xvwe71B1P9PDCBd+tWqw0iFqse6CQCKLXTCZqxKBbVyVKtQaC+Wn+Seeuw31j90Wh1HeAozCv1QrGMvZuh9eX8FgKY7qa8/d1lzOXemTfP7BHDdSSdnZCi8Re75QVeGQMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XOy5JeVs; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-57a4d7ba501so7011970a12.2;
-        Tue, 18 Jun 2024 09:11:53 -0700 (PDT)
+	s=arc-20240116; t=1718727166; c=relaxed/simple;
+	bh=qNULmo001mC5yL2uC9neAijsJRYb5joYOHW/sq9OTls=;
+	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=cSlRQ90jpS7cD6EtM0TXBTMxhqgnTQZM07O6dOZSqmblb5OiS4N6zBKcsWq9SpkIk7ggIxCfslug498hfe8QAHCFZFo1toYqQsfEGzDnGCdezd4ygktcCeaN+yWxgFtNbcF4EMdbveHlSxiNqmf86wsPi1XcmI/+lNl3SlV8dPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=lc9PVF+p; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=LS/OLGrv reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718727112; x=1719331912; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vdhfQI9T5+yxPiraAgbpmOt7qEOjgccH7WBORNtfHfE=;
-        b=XOy5JeVsltAB8Kdw6lBOYVtRkgs8gb6MTyYYSJwMrVGFF6ZebYByThmCyJoPOFvCqK
-         nQwOLQEdJRcQ6XfUgtN8ocq3TxUTBYhAob4/Itnp5bdVrvmfk1Z4XIylsRxiTct6CWm4
-         FRnBVqUPcIo5P1T1w7YOkVOw5HOYLhXLN+682YFUyIwrupDjj/u9veyRqjKod0QVuSw3
-         zzNm3KgCIxiBEl+JCMPnZq1+mqD9vRwjrayTVVu6tvEe3coRePCPiFR52yhzEjCZNiEw
-         9h37Ya/HxV+5MmX0gF15ux11Hxs5N6Q5M5eUSQpIg/0dw+wci1wmL48+I7l0IbrV1KJb
-         FEvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718727112; x=1719331912;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=vdhfQI9T5+yxPiraAgbpmOt7qEOjgccH7WBORNtfHfE=;
-        b=vgQvB8qNMlyq+x7O9cf+Sgm7cOkm7DyveH8k6wbBbPTyxeMXhrts6YgpXvPhTiNjlq
-         RbuCT+OSX1HrqpTK+5/bqaVFn0aWwax5jML1bu/y8MSTi1mjCMkgdddkrwpQgyw6G8iO
-         s6zB/bXdAVMK0DcxTXNH0gDb5O4TqJNHiFAFkdsKx4vAHxybmoPel3GNdOnR0r0lRugf
-         D4X0nZkYObosrtcZm7Yo7OIstPPs+lCi9hrzKEPzYezn9bFeuaHRMzVRKx5aFPo7Urfe
-         +vUNR40DNm0vGXyESwTudOP+vUSn+i8S7PUj7HwBziMuR7R4boKJhICMhb+mHfg11TV2
-         2Ygg==
-X-Forwarded-Encrypted: i=1; AJvYcCXBnL04FdD5yUJN2LZrIzMi+Q1fVaDUl7Zs9AXFfmZyVzlGclDxKFZMRJusPni+Bav89Va+T45RoSUCENQL1lPkPMYxVd3DQ8ff6vLF0Uw+kK8K7QhHSHiZvKW/xGUsIDWaL64MACrOquOig9pUpKIRGex9Iih3z5hD6CJX0hK7zg==
-X-Gm-Message-State: AOJu0YzYQJ0Hf6fAdSDoXJjwacG1OJKmM/x9u5NncwioGPCZuKp3ZpTi
-	fltibpkg/bYe9PMyYRr9nl7LwKAAnVq4EXkOJrbv/Pb/EBgjcVlJ
-X-Google-Smtp-Source: AGHT+IEfZ9HaFQBufIL+uJmK6fz39+P64leJ9sWW5fe/okGzJN3xQA3FngvVzo6bSVhv/MbpbmaRQA==
-X-Received: by 2002:a50:8a97:0:b0:572:7bda:1709 with SMTP id 4fb4d7f45d1cf-57cbd649655mr8559509a12.9.1718727112118;
-        Tue, 18 Jun 2024 09:11:52 -0700 (PDT)
-Received: from ?IPV6:2a02:a449:4071:1:32d0:42ff:fe10:6983? (2a02-a449-4071-1-32d0-42ff-fe10-6983.fixed6.kpn.net. [2a02:a449:4071:1:32d0:42ff:fe10:6983])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb74387ffsm7997213a12.81.2024.06.18.09.11.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Jun 2024 09:11:51 -0700 (PDT)
-Message-ID: <0b889b87-5442-4fd4-b26f-8d5d67695c77@gmail.com>
-Date: Tue, 18 Jun 2024 18:11:49 +0200
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1718727163; x=1750263163;
+  h=message-id:subject:from:to:cc:date:
+   content-transfer-encoding:mime-version;
+  bh=qNULmo001mC5yL2uC9neAijsJRYb5joYOHW/sq9OTls=;
+  b=lc9PVF+p//dq3Jl8gPUS0lGu9UN83ZYr6lB7KOqemgeSXB+WzW8XWmOi
+   4jGqGqO2+dHZQHedOScRo5OKAeqoQwOEG4RsSOmrXoaW2Hpl3Sfpt7XkO
+   BHZf5R+eMv1texL/VpjI+1/0jzLdQRzd1S8no4bq9Ihb41Op1CbF/XJax
+   49hqxcLwGZ1P6S1PeJremc2Cu42C1Mu358L1Ez3q6aYGV9z+fZ522aHWU
+   A2sAo6lY9DLwhnZq9OUxd8r7XaKWEcKYhTUK4d/BZ8ENsEaYCeM59+R4Q
+   oPOJ2sk7bHTfM6zJvjcrrn8oRRt8P1yrh1Ejgb4agCaYP3+E8cZyUf//e
+   Q==;
+X-CSE-ConnectionGUID: UFIXNrYPRUOnvkwpxts+4w==
+X-CSE-MsgGUID: orx72WeMR0idy2RCELZc2Q==
+X-IronPort-AV: E=Sophos;i="6.08,247,1712613600"; 
+   d="scan'208";a="37457616"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 18 Jun 2024 18:12:35 +0200
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3B5051664C9;
+	Tue, 18 Jun 2024 18:12:28 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1718727150;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=qNULmo001mC5yL2uC9neAijsJRYb5joYOHW/sq9OTls=;
+	b=LS/OLGrv/yld6GBB/DMqXy8/DiycpIH+FNzKfCT7A2THBG0TLcjyMVprzeFtT/JA8GS/5A
+	7KwK2puAK0sVidAs3x6YI47wboRSfT3jPJhZZeNSKziSkfHl6iR2Wh1rIayE50KgvOuadq
+	8Pd0CcW7N0DZOLiK1eVZAIQutJ74AyAVm7aiycrcyNL5esZ7IuEoLGm5WnpNmJOOkQHcA7
+	ASjTte6NPB6sqiwfgALZS3ZIFWVQr+lj7p0RmvtNm9VLtKwVvRJUAQki0VQIYSpyWoXapv
+	KaWGdHyFCdALxvIbx46/q/6l8k7dV0GmdTnVR6MQMA01ZCrN7BWKhxQXGqGzpA==
+Message-ID: <e72771c75988a2460fa8b557b0e2d32e6894f75d.camel@ew.tq-group.com>
+Subject: Kernel hang caused by commit "can: m_can: Start/Cancel polling
+ timer together with interrupts"
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: Markus Schneider-Pargmann <msp@baylibre.com>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Marc Kleine-Budde
+ <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Tony Lindgren
+ <tony@atomide.com>, Judith Mendez <jm@ti.com>,  linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,  linux@ew.tq-group.com
+Date: Tue, 18 Jun 2024 18:12:27 +0200
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Johan Jonker <jbx6244@gmail.com>
-Subject: [PATCH v1 0/3] cleanup arc emac
-To: heiko@sntech.de
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
- linux-kernel@vger.kernel.org
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-The Rockchip emac binding for rk3036/rk3066/rk3188 has been converted to YAML
-with the ethernet-phy node in a mdio node. This requires some driver fixes
-by someone that can do hardware testing.
+Hi Markus,
 
-In order to make a future fix easier make the driver 'Rockchip only'
-by removing the obsolete part of the arc emac driver.
+we've found that recent kernels hang on the TI AM62x SoC (where no m_can in=
+terrupt is available and
+thus the polling timer is used), always a few seconds after the CAN interfa=
+ces are set up.
 
-Johan Jonker (3):
-  ARM: dts: rockchip: rk3xxx: fix emac node
-  net: ethernet: arc: remove emac_arc driver
-  dt-bindings: net: remove arc_emac.txt
+I have bisected the issue to commit a163c5761019b ("can: m_can: Start/Cance=
+l polling timer together
+with interrupts"). Both master and 6.6 stable (which received a backport of=
+ the commit) are
+affected. On 6.6 the commit is easy to revert, but on master a lot has happ=
+ened on top of that
+change.
 
- .../devicetree/bindings/net/arc_emac.txt      | 46 ----------
- arch/arm/boot/dts/rockchip/rk3066a.dtsi       |  4 -
- arch/arm/boot/dts/rockchip/rk3xxx.dtsi        |  7 +-
- drivers/net/ethernet/arc/Kconfig              | 10 ---
- drivers/net/ethernet/arc/Makefile             |  1 -
- drivers/net/ethernet/arc/emac_arc.c           | 88 -------------------
- 6 files changed, 2 insertions(+), 154 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/net/arc_emac.txt
- delete mode 100644 drivers/net/ethernet/arc/emac_arc.c
+As far as I can tell, the reason is that hrtimer_cancel() tries to cancel t=
+he timer synchronously,
+which will deadlock when called from the hrtimer callback itself (hrtimer_c=
+allback -> m_can_isr ->
+m_can_disable_all_interrupts -> hrtimer_cancel).
 
---
-2.39.2
+I can try to come up with a fix, but I think you are much more familiar wit=
+h the driver code. Please
+let me know if you need any more information.
 
+Best regards,
+Matthias
+
+
+--=20
+TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
+any
+Amtsgericht M=C3=BCnchen, HRB 105018
+Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
+neider
+https://www.tq-group.com/
 
