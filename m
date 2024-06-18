@@ -1,154 +1,271 @@
-Return-Path: <netdev+bounces-104596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F08C290D7E5
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 17:55:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0D5B90D7FA
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 18:01:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7A402815F1
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 15:55:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7153D1F2314B
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3769D3EA76;
-	Tue, 18 Jun 2024 15:55:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9FF46450;
+	Tue, 18 Jun 2024 16:01:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GH1xLuWs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bvMfxMNF"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08645D299;
-	Tue, 18 Jun 2024 15:55:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718726148; cv=none; b=FJKeQibxLPNyZs/aphdNVHzB58FCGviQhlXjAipYvBqImlZtYrYI9QPzy/5Vl6ntYbMBJTNojMzvg1wuUTnarXJEadVODJ3t4VoLCw/NPLGkykNn8D8P+M5qeqM+7595IVQ9u1NSXjliuzEs0KJeaIshFNpxlsj+5HZABWc8bXM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718726148; c=relaxed/simple;
-	bh=lhjj25VP5M4sTOzHNNjscKcLGzs0m0KUFagNmmsLVCY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ndhp3YFugIpjo7o4053ZIYxfPCjVRPDwuVKXFAylRmw6lG9VknPeQQH8ByZrIXJiAjapzgyhkGcipa8qqfRT2zRqhbNxn8XkKbhu6zgvZgAgEWxWXPr8DGSSkfH07SjkqI734JcNyZoRFrL8ecrGE9wfk3DF4aoOuuYjXFann7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GH1xLuWs; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 833B11BF204;
-	Tue, 18 Jun 2024 15:55:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1718726137;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V2KE/O5mxQyzYGqNyk0NZy+aO7Wf1mUhJbeharOTLWU=;
-	b=GH1xLuWsQxAhseqDqFHZLD/PAHYZJjFDGtEsCC1ScJeUUlB6N1r9kc7jpvEKmvzMil1ZLw
-	N7wVAJzKpSnPXXL/hbSWtz0+ILKsU1RIIZRu/IrIfG75FCcKItUgfR+M54pq6bbI7L4dtr
-	IX0N3HpabnDfVqLo0OzGu7jQVD00B2p5g9HSkO5PrG0kZdPRe1U3u/NepoJIeZqKetZj43
-	L5QZaneld0T0Npc8RpVNG6z6+EdYPoreOCeTyULCfvm6IJEp3OOJTx8tqRAoZVp5vYufPZ
-	JeobUn7bnS1yOLi9zePgor/7ilQKJspTnQn9BfPegr1Wx3fffcDxqFTbXCIZIQ==
-Date: Tue, 18 Jun 2024 17:55:33 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: "Arnd Bergmann" <arnd@arndb.de>
-Cc: "Simon Horman" <horms@kernel.org>, "Sai Krishna Gajula"
- <saikrishnag@marvell.com>, "Thomas Gleixner" <tglx@linutronix.de>, "Rob
- Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>, "David S . Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Lee Jones"
- <lee@kernel.org>, "Horatiu Vultur" <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, "Andrew Lunn" <andrew@lunn.ch>, "Heiner
- Kallweit" <hkallweit1@gmail.com>, "Russell King" <linux@armlinux.org.uk>,
- "Saravana Kannan" <saravanak@google.com>, "Bjorn Helgaas"
- <bhelgaas@google.com>, "Philipp Zabel" <p.zabel@pengutronix.de>, "Lars
- Povlsen" <lars.povlsen@microchip.com>, "Steen Hegelund"
- <Steen.Hegelund@microchip.com>, "Daniel Machon"
- <daniel.machon@microchip.com>, "Alexandre Belloni"
- <alexandre.belloni@bootlin.com>, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, "Allan
- Nielsen" <allan.nielsen@microchip.com>, "Luca Ceresoli"
- <luca.ceresoli@bootlin.com>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>, "Clement Leger" <clement.leger@bootlin.com>
-Subject: Re: [PATCH v2 01/19] mfd: syscon: Add reference counting and device
- managed support
-Message-ID: <20240618175533.3e1534ca@bootlin.com>
-In-Reply-To: <b685d5e5-09d3-4916-ad0b-d329c166e149@app.fastmail.com>
-References: <20240527161450.326615-1-herve.codina@bootlin.com>
-	<20240527161450.326615-2-herve.codina@bootlin.com>
-	<b685d5e5-09d3-4916-ad0b-d329c166e149@app.fastmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7BCC1CAB3;
+	Tue, 18 Jun 2024 16:01:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718726492; cv=fail; b=sGW2aUk7KNOR3xvH0ChzIaCJ4A6WdjqHpoJRImhJBkghFATDK4OeIjAuVRGYaYCRzqlYKf1aud0V/GN0YPdkYtxjlqrZZbahrSUaX0QQ5qA9Cgvaioe9zSeyEPGlSb6XsGWEi+QIc8M5Lpj/k6+IEPzg72gBYvfyDtcejgyN5cc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718726492; c=relaxed/simple;
+	bh=j6/sGIWIxj9EoEpTyDcRjtu/OgPihgCxaQVt4hNXHV8=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=V/o00i67iRe6F1N0WYKYaKG6oy5E0xfgIZ4Bonur595ozDD7NHZpb5Ggi1x77OYexCbBfXt0YatTI9qo4ccBEWg8BLlMhVXU1+Y/mQo0YbKdhyNtNaQWGu0+DSmf+gSlpFGqyPznQ6gpcxTKraLs2IxlQStryPgK8JjZTUpA4Pk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bvMfxMNF; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718726490; x=1750262490;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=j6/sGIWIxj9EoEpTyDcRjtu/OgPihgCxaQVt4hNXHV8=;
+  b=bvMfxMNFqa/Of7MipMMj00vbhYU/cgXW7u8H1u5sUmZ87Yz0ww7JTX77
+   1JZQAhGBmV843ORvZ4cvDW38uDZ1E2czOYogxZwxnMkY2gLtrE5S0Gggm
+   s0es62PQUHQ9KtEyLH5AZ5pbI1qTUJeHum2SQglmGnhCoFLfotXDOk83L
+   jE2BkvPu7sO5xGaRtCXhmRfPlA+TWbdhT5nazjgC69OV32yf3WDxonaDo
+   sNM9C2mnME4ZJtp5NGOfhR0pKXG3HvMrJ0G3qtYvx7comia51k+Uem6rU
+   NMmdjt16gZeS2ZF0tvf/ehzlvlvR+xkycWJFNnhCG0Z2XDEkyOgDxwggE
+   w==;
+X-CSE-ConnectionGUID: r0+f9+B8Tk+EcQnl9OqpvA==
+X-CSE-MsgGUID: xVPMjtsWQxicTTprkHfG9g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11107"; a="15586876"
+X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
+   d="scan'208";a="15586876"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2024 09:01:22 -0700
+X-CSE-ConnectionGUID: q6bu/SvKRrm25bPVZ3jA5w==
+X-CSE-MsgGUID: Upng9T6YRTudK9fyNcw7jA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
+   d="scan'208";a="72350761"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Jun 2024 09:01:22 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 18 Jun 2024 09:01:21 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 18 Jun 2024 09:01:21 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 18 Jun 2024 09:01:21 -0700
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.41) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 18 Jun 2024 09:01:20 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fMduYHng00f5M5LxR9UeegQPgEwk9qLjp+RAfToMh6SbpsPKpwIr92TT+u7E5IPBnTVN2E271Q93267/h2puJVTt2mcTX2N6NgGZqe3rmJJuzi0EeVv4vBvIOk67OFg4ejL94Kyn8AK5r7pRtwMNiENRXi+PZOJkmShWXyA2S2iu2QkFNXq3bkGiI+2Wvzrhyw9Ilf0A0ZPwtKQXiRsAdVUekTGWqxzM1LPdxU2COHSsZvvQXVL8s3EydV4jyF2U3CWb9+CcoaNjAkTCdkDH1TbTu1oRl+cVLQCTwlEjPT7/LMxPAz2kDMW1TB6x1um6QsE5IEy8pEuGreorYtBNdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=V4i0flyTcreghIoDCKMN/13ammvbx9QAL42ETZrjzbk=;
+ b=WdTNEclcewDMebOTd7009qD3W9I4nNuOe4fEGQ1iTywjIGr2OAJePfPwIShjy463PCJzAg/p44wYuzsT4Mieo/kTbwQ8i3DV0ui0ai3k5SXtS7CgHqjAMDzhuUN3kDpsMJM/r3FKMK8OD0FKTpRbHdMemz9gfsqptUbQgdptP6zlfgL5mK2l4qxiGCOP8GGbaDTST8PFzN1V2zU/5MkBtDInfjRk3iaaoagv4X29fzSeR5IdgO+EpI/zrooGe/M58w0KItX4RwOOXkp4TGeJSt4yYBleDns4R2HkfH72wgPMuOaeaMSxdCjiI+PrgV8lLyChbW3JhSTQqgK0HJ0eTw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by DS7PR11MB6061.namprd11.prod.outlook.com (2603:10b6:8:74::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7677.32; Tue, 18 Jun 2024 16:01:18 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.7698.017; Tue, 18 Jun 2024
+ 16:01:17 +0000
+Message-ID: <c6df0934-df09-42e1-b6d7-74ea02428d3b@intel.com>
+Date: Tue, 18 Jun 2024 18:01:11 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 11/15] RDMA/hbl: add habanalabs RDMA driver
+To: Omer Shpigelman <oshpigelman@habana.ai>, Leon Romanovsky <leon@kernel.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"ogabbay@kernel.org" <ogabbay@kernel.org>, Zvika Yehudai <zyehudai@habana.ai>
+References: <20240613082208.1439968-1-oshpigelman@habana.ai>
+ <20240613082208.1439968-12-oshpigelman@habana.ai>
+ <20240613191828.GJ4966@unreal>
+ <fbb34afa-8a38-4124-9384-9b858ce2c4e5@habana.ai>
+ <20240617190429.GB4025@unreal>
+ <461bf44e-fd2f-4c8b-bc41-48d48e5a7fcb@habana.ai>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <461bf44e-fd2f-4c8b-bc41-48d48e5a7fcb@habana.ai>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VE1PR03CA0022.eurprd03.prod.outlook.com
+ (2603:10a6:802:a0::34) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|DS7PR11MB6061:EE_
+X-MS-Office365-Filtering-Correlation-Id: f44642d4-d052-463b-c05f-08dc8fafe37c
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230037|366013|1800799021|376011;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?ZlVJK0JVRG9qR0dTeUIramFITVRyRW1DWGVMTjN1dkV6VDd1dEJGTGJVaXlq?=
+ =?utf-8?B?TzNwcVd5V0JoNmpUZW5LRnBuazN2a0xBbVdBK3NlQkxaZytubThKNTBOS1Jw?=
+ =?utf-8?B?TjBQWm1mdGNHV2xNUWZMVFptaGlIVUlOOEdEdXpXZkNoSG1Wa0owM2ZlUmd4?=
+ =?utf-8?B?Ykp4eXZlSGNFZWMyaVVsZWI5MVBVUGNyOWdSdW4wbnp6ZDRwdHRjaEtSSWt3?=
+ =?utf-8?B?UFg5OWM0MWNQUXVZWGFVbUdzOW50Yi90VEZvTUpGcDNKMGNvUFJFdHlBVnF6?=
+ =?utf-8?B?SmdlMDlpdXBiVlNHM0hjWmpmRDdqdUVRRENxZGcydnVYMTQ3TWJyNHk4aWxt?=
+ =?utf-8?B?Yi8yUisybkhjMXVWakhFb0RMREdqdjByNFNOQXI3OURFdllCbUFsRkFWNm50?=
+ =?utf-8?B?OU9iaTRZRlYzTm82Z1FiSHRMUE1EUFIrUytwcWVTQklUMmFINk9ta040bEJy?=
+ =?utf-8?B?dXl3SVYxTDg1T29WVzRtZjM2aWxtYTd4UWthcW9vdGlJMWVIemQ4L0JHOW9z?=
+ =?utf-8?B?ZVVMYW1RNEl5SmVTK0I2UlVzQUxiaUJNeWlMWEJacFpGSGk5OG53NVV3RGVv?=
+ =?utf-8?B?eUNIT25LK0ZRSHNOQ09ydDhnZS96d1RCbnByNmtmYVFCeS9peEd6dFF5TFJt?=
+ =?utf-8?B?N0xRYndxZFRpMG5NaGp3UXJQK1Qwb29zRjNMSkNicG9ESlRSWlU4dXRtTHBn?=
+ =?utf-8?B?QUZ4TGhMdHVmS24xMmZSd0M2RFhVSjdOY1VzZVVsdVAvc20zaTdEdVFRVUxv?=
+ =?utf-8?B?K3ZGckZXUmtwb0VjakRGa1JyUVNnRFVxeEVZbDJES1o1TEhpY05zb3ZOOHVE?=
+ =?utf-8?B?bC9takdQZmkxRG03aUt3Q1VMTWVTZE4zQ3JoRFQ2ZWxMTGdMaHhTVFduNmc4?=
+ =?utf-8?B?ekkwa0crSjlyNi9JOUxxSlVZUWNabGpaMG14UTV2WVlBeFJBdG9oSTBPTURK?=
+ =?utf-8?B?b1lTMkp4RnphNGJxY0FQSjIweWtnWGp6NGk4ZWQreXVCc1UrQ2I5ZGROMU4r?=
+ =?utf-8?B?UHhENWE2eTdxamN3dEhpaG5xSjdtSC9Xcklvd3cwS0ZYUlpYZWpKMytGdGEz?=
+ =?utf-8?B?UjUyZmpNeGRWTDVFV2IyQTFyN0FON21KanhSTm52bWxMdEV3eE9rR241MHdG?=
+ =?utf-8?B?YXAySytUUVhyUFR6RzZtV0JGeXNuVjZHWXg2RExvd09LUGpFRlVZUGJsQ1FY?=
+ =?utf-8?B?YnBHcEkvbE0wZTJIN3pGeHpoblhvN3NHQ1E1QkRqZ3JFczlsVHNUZXhmS2cw?=
+ =?utf-8?B?WGo3bkpMMHNpdVlNTkxxZENUOFRyU0IrZCt4NVBzRzNMbVA3aDlISHFDaTVT?=
+ =?utf-8?B?eWRNN2VUUjZCYVNJejV1ODlvbUtRWDMyN290TzUvTXBoRHhnRnJWSFBSZ216?=
+ =?utf-8?B?NmxKSkFGYUI1YWlHRWUvb0xyOEpRREpxMVlHREc5aG9UaEVOTm5YMzYwSzJU?=
+ =?utf-8?B?dXFpcFZMLzRKM2pEQlVCTWovTGQxaDdHa0YvNzF5eVI3TzF4MzZNVW5QakhS?=
+ =?utf-8?B?SitkdEljWFYwOExESVlPVU5jb1VYVCtlN1B1d0FEZGI0ak1rWFpnbjR0UGxP?=
+ =?utf-8?B?WmIzQ2hiNTZtNVVYOHY0bW9zVDBpTVJvRlE3eTJTYkdDWVBoSlc4TjdRMVBn?=
+ =?utf-8?B?aU0ydWlVRU0yK0pTWHI2aUxqK0VYYzlLNmV3MmdGZU10SWVRREUzajBRQ2h5?=
+ =?utf-8?B?eWdjZFVHWDRYTkRMVkRwVWV2U0xpc1lucWgxcUVTOHU4RDl2THlWWU5HUkxo?=
+ =?utf-8?Q?1hCgqrdXn6Csoopc1JrPvaEPSLQZISr3CQd5DEX?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(1800799021)(376011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MURJb0dZWkNzNDNSb2YwZVVrMThvNEdEcTdUKzlpL2xnVTlWTDNGTVpia1hj?=
+ =?utf-8?B?QlgzTTVZV09zaFBFcCt4QTRvdzZvOENWWjVuTkhMNzhzVW5vZlVPeUQ5WkNs?=
+ =?utf-8?B?UFQ0QWYxMm1tZVRXR1g1RE4yQlNNYnVjc0daaTdqZU1maEtuQ016MVlXdmdK?=
+ =?utf-8?B?a3VIZ05jS3ExK1BaTGhmUTBKLzUxV2tLQ3BndG8zNFh2LzgyNm81bnIwYXFS?=
+ =?utf-8?B?WGI5Zm5VM0lrNWJ2Y1VvS1hiY085N1pkWnZ1Wkk2cExjakx0YWtRMldTaUtY?=
+ =?utf-8?B?UXFXYlk3TWh1RHZMcjA4K056NUZtOEdFekc0WTJjcG1lUCs2UGRVakZuSWpm?=
+ =?utf-8?B?Y25jUlVObVRKNjFWRWJFQkhacEg2M3ZlOU5WdGxDYUtEbUl0SWhEay9YMXVw?=
+ =?utf-8?B?UEEwZG1OdG9YZWx0VmVyU3JzdTVSNXA3bmZ5TGEvcFpMangxM28rdERUbHZ6?=
+ =?utf-8?B?dCswRktIREwvN3VDMzhYZU9FVk9JTlhSMzZPVU9vMFRsMkF6ME9mNG4xWDNS?=
+ =?utf-8?B?c3BpT3JXbXplN1IvU2ZyQ3pxYzJtTVozQkNSbDN1ZFBtWHRsaTJBN0E3YUZE?=
+ =?utf-8?B?TkRKVXFJNXFTUFFhNHFLUUIrbDQ1dWxKL3dYUXZWd3ZXNHdHMXBLbk5aNWwz?=
+ =?utf-8?B?a09UU1p5NWRSY0VsUWJwUDhpMkJTeVJGcGh1RGJSclJSK2JtZytIOFovMGR6?=
+ =?utf-8?B?MnoyMmw4eUNZV2NNU0htN3ByVkxzb0k1UGxrLzFWLyt1SHdxQzhrc1lTUHd5?=
+ =?utf-8?B?UVlScUhVbUxvYlQ3cVVFV1B3Q2NEN0k4L3VMUm1PaWEzdkRtQWVOSlZjS0Vo?=
+ =?utf-8?B?NjVSZkJsV3R4MWxWTllSS0NJUFIrVDBvZ21BaTRXLzZIRlhVdlMzNlA0bS9a?=
+ =?utf-8?B?V2RBQ2UwR3hvTTFLTkNacmY4S0tTcFN2STRxUmJtN1VtT3M2bldiZ0dPUnZZ?=
+ =?utf-8?B?TVN4bW1GcmY5ajMzRnJDMFpkbW9NSmR0b1VQNEdJY2thQVNDTGpIbjJ1MVZL?=
+ =?utf-8?B?QzFVdGR5T2hhbVBJK1ZWQkZlVHVJZmNzMHlHcVVBM0tDT1YvSzkvMjZmWHV1?=
+ =?utf-8?B?c1YrdWpVMDBEYTRPKzN4NWEzcEV4QUpmbjZnNnhjN3BVWjFjcndmYk5SWC9V?=
+ =?utf-8?B?ai9yT0RTODJIdGRzLzJodGJVcXFaTlFuUHYvdTBUTDcxVEtnTDVib1hPcExL?=
+ =?utf-8?B?T1kyM0U0a0RWejI2MFZ3ZFFRdWNCd2tLeGw0TkxXM1dHcXlPbW84dk44WURs?=
+ =?utf-8?B?ekltdHRLZUFXVCtuLzlWMitMWXJSNXREUkM2TjNqOUNMclgweUVqRzdlbDJI?=
+ =?utf-8?B?SndMSlk5OEp2WVh5Rldac1BsT3hjNUhDdXFtd1grL0M5dDhUZ1pyR3VJS1Yv?=
+ =?utf-8?B?UlJaNGt1OXZQdm9oeUdDWFgzZUZOSkpta094WW9sQlNkOWUrY1BtWldyVHpG?=
+ =?utf-8?B?SHJ4L0QzanR5cHA2NUVqZkpGSWhRMW1wdGhHNm92VXFlandabFYzVXlTcGZI?=
+ =?utf-8?B?UHJqS0xidGtIRzBpWnArU0ZaNzBtQ0x6dERRYmxlNXRmYTVneTlMVHJRU1M3?=
+ =?utf-8?B?TGFFaXNGK2QwWkZrQUFWT3d3WDdzV2pJUHprU2FFMDBIcnNPTDRPNVVkWm1F?=
+ =?utf-8?B?MkNlSkFDNFRUbHEyVUF2SFExN0pwYzFjUkRqRDgvditRcVlYZjl0SHhRQkhE?=
+ =?utf-8?B?cXhaZHVRNW41QWozdWZCWi9WZHdZbVlRNU9ZSFcxdHFRN2w1ajh5OEdOeHQ1?=
+ =?utf-8?B?bzhJV1g3eTJPc2pJSE9WclRFdHhzWWpJV2ZQNS9nbzUweHNmNTJjd1dNazZV?=
+ =?utf-8?B?c0sxY0JiZnB3cjU4YjAxWTMvOWFUZExtUmJwWmtUYXExK2VkNW9mVDQ1RjRj?=
+ =?utf-8?B?L2R2RDhhaUhzZnh6dVBZdmNaYTV1NjNYZXo2RlNFa05zKzVNbDVXOUM4Mmov?=
+ =?utf-8?B?QTFRVDRxTGhYblhVc1VvV0pScmpGTFJvOVA0VmhmZXVOcHVnQkROTy91ZEUv?=
+ =?utf-8?B?Qjg0eG1uYnBITFlNY1U1cWpmZzdrY0M3L1ZoakpqUjNncFQzVmhIRkZSU1dW?=
+ =?utf-8?B?Z3JFZzBjcFl0K09JbXNJdEVNdlRoSkZuMWdLelNPclJoMHM3cFlnT3ZOVW9p?=
+ =?utf-8?B?a0g4MVM2QmdoUnlVWjBoMjlLcnZISFhaM1BaMEE0VUxIdDM4YVY3eElYaGN6?=
+ =?utf-8?Q?nSXp5KVsCI9pnfq7fydC8Fo=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f44642d4-d052-463b-c05f-08dc8fafe37c
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2024 16:01:17.9117
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CS06HjBe1GieqN/83UElAp5ZIc7yDKIIoYLVZecUOKc1bZe/cZJXO39kRC7Tf2t9mFruk2LAyCzm+p165TSDk7/Z8Skk2za8FjdKVH9KkUc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6061
+X-OriginatorOrg: intel.com
 
-Hi Arnd,
-
-On Tue, 18 Jun 2024 16:53:30 +0200
-"Arnd Bergmann" <arnd@arndb.de> wrote:
-
-> On Mon, May 27, 2024, at 18:14, Herve Codina wrote:
-> > From: Clément Léger <clement.leger@bootlin.com>
-> >
-> > Syscon releasing is not supported.
-> > Without release function, unbinding a driver that uses syscon whether
-> > explicitly or due to a module removal left the used syscon in a in-use
-> > state.
-> >
-> > For instance a syscon_node_to_regmap() call from a consumer retrieve a
-> > syscon regmap instance. Internally, syscon_node_to_regmap() can create
-> > syscon instance and add it to the existing syscon list. No API is
-> > available to release this syscon instance, remove it from the list and
-> > free it when it is not used anymore.
-> >
-> > Introduce reference counting in syscon in order to keep track of syscon
-> > usage using syscon_{get,put}() and add a device managed version of
-> > syscon_regmap_lookup_by_phandle(), to automatically release the syscon
-> > instance on the consumer removal.
-> >
-> > Signed-off-by: Clément Léger <clement.leger@bootlin.com>
-> > Signed-off-by: Herve Codina <herve.codina@bootlin.com>  
+On 6/18/24 13:08, Omer Shpigelman wrote:
+> On 6/17/24 22:04, Leon Romanovsky wrote:
+>> [Some people who received this message don't often get email from leon@kernel.org. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+>>
+>> On Mon, Jun 17, 2024 at 05:43:49PM +0000, Omer Shpigelman wrote:
+>>> On 6/13/24 22:18, Leon Romanovsky wrote:
+>>>> [Some people who received this message don't often get email from leon@kernel.org. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+>>>>
+>>>> On Thu, Jun 13, 2024 at 11:22:04AM +0300, Omer Shpigelman wrote:
+>>>>> Add an RDMA driver of Gaudi ASICs family for AI scaling.
+>>>>> The driver itself is agnostic to the ASIC in action, it operates according
+>>>>> to the capabilities that were passed on device initialization.
+>>>>> The device is initialized by the hbl_cn driver via auxiliary bus.
+>>>>> The driver also supports QP resource tracking and port/device HW counters.
+>>>>>
+>>>>> Signed-off-by: Omer Shpigelman <oshpigelman@habana.ai>
+>>>>> Co-developed-by: Abhilash K V <kvabhilash@habana.ai>
+>>>>> Signed-off-by: Abhilash K V <kvabhilash@habana.ai>
+>>>>> Co-developed-by: Andrey Agranovich <aagranovich@habana.ai>
+>>>>> Signed-off-by: Andrey Agranovich <aagranovich@habana.ai>
+>>>>> Co-developed-by: Bharat Jauhari <bjauhari@habana.ai>
+>>>>> Signed-off-by: Bharat Jauhari <bjauhari@habana.ai>
+>>>>> Co-developed-by: David Meriin <dmeriin@habana.ai>
+>>>>> Signed-off-by: David Meriin <dmeriin@habana.ai>
+>>>>> Co-developed-by: Sagiv Ozeri <sozeri@habana.ai>
+>>>>> Signed-off-by: Sagiv Ozeri <sozeri@habana.ai>
+>>>>> Co-developed-by: Zvika Yehudai <zyehudai@habana.ai>
+>>>>> Signed-off-by: Zvika Yehudai <zyehudai@habana.ai>
+>>>>
+>>>> I afraid that you misinterpreted the "Co-developed-by" tag. All these
+>>>> people are probably touch the code and not actually sit together at
+>>>> the same room and write the code together. So, please remove the
+>>>> extensive "Co-developed-by" tags.
+>>>>
+>>>> It is not full review yet, but simple pass-by-comments.
+>>>>
+>>>
+>>> Actually except of two, all of the mentioned persons sat in the same room
+>>> and developed the code together.
+>>> The remaining two are located on a different site (but also together).
+>>> Isn't that what "Co-developed-by" tag for?
+>>> I wanted to give them credit for writing the code but I can remove if it's
+>>> not common.
+>>
+>> Signed-off-by will be enough to give them credit.
+>>
 > 
-> This all looks correct from an implementation perspective,
-> but it does add a lot of complexity if now every syscon user
-> feels compelled to actually free up their resources again,
-> while nothing else should actually depend on this.
-> 
-> The only reference I found in your series here is the
-> reset controller, and it only does a single update to
-> the regmap in the probe function.
-> 
-> Would it be possible to just make the syscon support in
-> the reset driver optional and instead poke the register
-> in the mfd driver itself when this is used as a pci device?
-> Or do you expect to see the syscon get used in other
-> places in the future for the PCI case?
+> Ok, good enough.
 > 
 
-IMHO, I don't think that poking the register in the mfd driver and so
-avoiding syscon usage is the right solution.
+I would say that a lone sign-off give a little of credit compared to the
+co-developed-by tag. OTOH the list here is unusually long. What makes it
+even more tricky to evaluate is the fact that there is a lot of code ;)
 
-Indeed, additional devices can be added in the DT overlay and an other
-syscon user can be present.
-
-Also, overlays can be used on other PCI devices in the future and these PCI
-devices can use drivers that are syscon users. In that case, the same kind
-of workaround will be needed and maybe a quite more complex one depending on
-syscon users.
-
-The root issue is that syscon does not support removal.
-I prefer fixing this root issue instead of finding a kind of workaround.
-
-Even if all syscon users are not fixed right now (and probably don't need to
-be fixed), a solution with the new devm_syscon_regmap_lookup_by_phandle() is
-available and drivers that need to release their resources because of a
-device removal can easily move to devm_syscon_regmap_lookup_by_phandle().
-
-Best regards,
-Hervé
+So, I would suggest to re-evaluate this on your next (trimmed down)
+revisions.
 
