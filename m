@@ -1,213 +1,184 @@
-Return-Path: <netdev+bounces-104475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 696A690CA6D
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:53:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0855290CA78
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:53:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1C432886F3
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:53:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AFFB1C227B0
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:53:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C3C14E2CF;
-	Tue, 18 Jun 2024 11:34:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D42153593;
+	Tue, 18 Jun 2024 11:35:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="daHxZvM9"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2054.outbound.protection.outlook.com [40.107.100.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698B914EC6A
-	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 11:34:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718710489; cv=none; b=r0hW8nJRT6mFLRAGYClB+QoyJvK+H9xR1kvE/ynovXUJnFPn61cytj4D0y/XpK0dNbC59Sh+It+CGFJM9PhbNQSD4BNN7axs98GbVxg5i4lV/6UCx6wemTU4JQLSerXLvSaLjzZqNbcgNMdtqksVsUxqM5gpYHS4QulJdTj3TnA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718710489; c=relaxed/simple;
-	bh=iuZNj5Qlke3/pyLd5HiMIfrXyL4XIFo+tL3ORstrJpQ=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=JZHLYglY/hKraLYX85eHhYg+GxhIU8/cBgpIUC9jEuGekx+vRAf5Gt280k2zr18gxxdEcmL0CkZOzWVn0Qb+mLs2y/SGqtEklA1KqcmbWx6p8qml3BKj+JTlg+75+okjQmu7RL9ewZ4Wm8/3Tx7vBMdw0jSGsFzaS8XPHkp9Vdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 89F4B6000F;
-	Tue, 18 Jun 2024 11:34:35 +0000 (UTC)
-Message-ID: <e90b291a-0e19-4b80-9738-5b769fcdcdfd@ovn.org>
-Date: Tue, 18 Jun 2024 13:34:34 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C204E14F113
+	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 11:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718710533; cv=fail; b=SPDn58zowCG8Wpi3h1yXf3sNBUe+QZWvfMLfIEmv8lB9Z7ZpCfctxOlMam5b7g55hIvdLkloh3dtYrghtmwTKd7x/0790pPTVYdn82yS0u4ZxcH2SStdDxb+KHXVkBW1QU1OI4uId4O+ZLMnDp0OhCg+vgDHSH/eaY+SViVRf/A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718710533; c=relaxed/simple;
+	bh=GLAcHNL/tYoXkLs699GgTiu7laBHP/fpRmWCGxqnfmQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=W6tCPoqk4QqjogJtR9KXPrTUuJn46ADiTdinqoX/vof5vb1+gwZAT+8TJg37EVQLcEmvIxidV7VjVspIrfLTxMd4v4d931bHwMU0J9efzT4EAPwhHnxEE6IbwXnyP1nG/KhUr3m8H2OQQ0zFYFF7dhHwZKssdLr0UU7q992vbSI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=daHxZvM9; arc=fail smtp.client-ip=40.107.100.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=neHSrozz6RabkT3MDGIOWj028kJtI5A00856xuJEDZ4lWtZ+1cSrE6lNWFrq0uJ5prvWtr1emTp98DXapWaf5VGwhU9Ohuq2+lBCzyDjqToGQtYTBvFwr413+WWmyTwQVTa/huORxiuIL0NASLySg5KA3IgJBBj7Ls42zorxQSKs0WwBz+LzHtyprAyBhC0lR9fyTlI7KjFOBK0e1r0NJ34Gag1yi1WDA7faJM6mFKh0EoxMRtO6XVYBIRb5PhQniArlzCeO5shph3rR4xN89sdyqW3DlFpSn1mlbvjqcboa1txtIFcZp+BAZrgMcVmZfY3QD9V92g3NBUpJ5BSqGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WG5t92+gLA03yf7OR7oc9yQqp//zzLI7hpef3xVaqxM=;
+ b=KtGptNKMfkKmaE1vH6TeDe4FNEerD2gAjjUrg++5oGgkWf9nKGJE3U0g3m4G0A5EekCpsw2+o+x9fjIFQLiyk7BI95DYrLUEyUasm2Fh5Et/ccSOx7I8coMng6bHZfX+zUQw6A9PdqQp1dWZPBsIOKQBQaeneQUhJhllivh6yVSBLBfAYbEZhjmVgOItOaNgsODWPE9aXhkiyn+RE9HQczzrxlQxgXUtXYG4Xo0R5Q445h5L8eI29l+9VEw9XbmkMS7BUpyZJuPmeRk44wqWLEtX8Lc+MDXa5kg/1Tq6CRuYuMUyTaNwIJdVnYXdAVsyFwbspBVsSo/ANMYJMtaKEw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WG5t92+gLA03yf7OR7oc9yQqp//zzLI7hpef3xVaqxM=;
+ b=daHxZvM93AfSFdgAiva/i0cchKn6VsBRKyArB+743J+YAIgbI8J8TTXBAWYX6t1MNT5ecHcT2zbyt3rNka6BIGeub0h14NIKmoemB4vAwfNnyEWhi5hKe1QEk/HRmY7pSLHXiLFP2sM7RxvLinjwEdtsVesT7zzqxMwvBna2EmC1Ukz6Rgd4lbEkVIyO8VJ5eGasbjy+J7M7oWdF5T14XZ5HJM9dpcAaKqGU9eoE6eLlhiAslqNWlUGBawTGpN/VL8yRsuUmAGeiQ3YpgfAIxQjz63tlYNOe8NTqe5KgMLR2Wod0Xc6HX/MX2FYgSHH9oBuOEQPDoC9vSdYC8lmIwA==
+Received: from CH0PR03CA0050.namprd03.prod.outlook.com (2603:10b6:610:b3::25)
+ by SA1PR12MB8919.namprd12.prod.outlook.com (2603:10b6:806:38e::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Tue, 18 Jun
+ 2024 11:35:26 +0000
+Received: from DS3PEPF0000C37A.namprd04.prod.outlook.com
+ (2603:10b6:610:b3:cafe::4e) by CH0PR03CA0050.outlook.office365.com
+ (2603:10b6:610:b3::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30 via Frontend
+ Transport; Tue, 18 Jun 2024 11:35:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS3PEPF0000C37A.mail.protection.outlook.com (10.167.23.4) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7677.15 via Frontend Transport; Tue, 18 Jun 2024 11:35:25 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 18 Jun
+ 2024 04:35:11 -0700
+Received: from yaviefel.mtl.com (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 18 Jun
+ 2024 04:35:06 -0700
+From: Petr Machata <petrm@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>
+CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Amit
+ Cohen" <amcohen@nvidia.com>, <mlxsw@nvidia.com>
+Subject: [PATCH net-next 0/7] mlxsw: Use page pool for Rx buffers allocation
+Date: Tue, 18 Jun 2024 13:34:39 +0200
+Message-ID: <cover.1718709196.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, Davide Caratti <dcaratti@redhat.com>,
- Florian Westphal <fw@strlen.de>, Jamal Hadi Salim <jhs@mojatatu.com>,
- Eric Dumazet <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- kuba@kernel.org, Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net,
- Pablo Neira Ayuso <pablo@netfilter.org>, Aaron Conole <aconole@redhat.com>
-Subject: Re: [PATCH net-next 3/3] openvswitch: set IPS_CONFIRMED in tmpl
- status only when commit is set in conntrack
-To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
- dev@openvswitch.org
-References: <cover.1689541664.git.lucien.xin@gmail.com>
- <cf477f4a26579e752465a5951c1d28ba109346e3.1689541664.git.lucien.xin@gmail.com>
- <d35d01d9-83de-4862-85a7-574a6c4dc8f5@ovn.org>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <d35d01d9-83de-4862-85a7-574a6c4dc8f5@ovn.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: i.maximets@ovn.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37A:EE_|SA1PR12MB8919:EE_
+X-MS-Office365-Filtering-Correlation-Id: e9cbc693-6373-4140-52e7-08dc8f8abf5c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230037|376011|1800799021|82310400023|36860700010;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?vVnBrRH2ZRfILzuIaPqeGyNFoZOHSl4Jn0J33106hojSg2kz8h/VX4JNuV3E?=
+ =?us-ascii?Q?qiSGr8s17KnVyuEQDdb7hGMfV56tNcIbsqq9ekpN7BrpiSe0YJ8JP6Yw1uCA?=
+ =?us-ascii?Q?2ayAyhRo6xkHQijgjS+5jxLJntCCcLagp5K4B2pJhuP+KPllS/JlA9otfXMx?=
+ =?us-ascii?Q?wEX+4/C+YnsSKaYiwtzQlI1wqBlj/SLX50R9ri5SoyFO1mxPL4MgigL4VJum?=
+ =?us-ascii?Q?xpuX+Pv+Zdirl0XqBQb4q8Cbs/Hat7GMWySxOIoyVWcUC3FSo+wY8toSixlc?=
+ =?us-ascii?Q?ntHdfnj9Ie3UmAphzh7x02Lag/bcSo4FppLLHPowjLMEFOHRrnMP1bLMFTVR?=
+ =?us-ascii?Q?Xj4MRvPv/csXflAmwJUfddRmIZkpL/z1qOBoJNMyzXNXFjBrULe9EbQzb0i6?=
+ =?us-ascii?Q?jSTKTv8AD4ibpFdJMzA9LJzTrFRpId21LX5kdYmNnH77BRSLiKjtiqzn9Fm1?=
+ =?us-ascii?Q?4cU9VcxiIoreaLK3Zl/cGTuNbed6qwJmKjNBJ+CFPrQgwZbmEKe+xw99SNx5?=
+ =?us-ascii?Q?nipPWLFDTvUe/C8OJz6J67NOwLe9faaCTIiiaiecHZkOZEt+LxOYUC1e1ORG?=
+ =?us-ascii?Q?9GrofQCXokSfAf+hFvH0ckU8hjcK4j1yYAZu5qgBfPTFc6uJZpX9i98SJjJK?=
+ =?us-ascii?Q?5UNN9n4+CTfDvnovR17QKWtX0qhPcaqu++FKPnIwJgjO3oi4JGjwKiBqdZAv?=
+ =?us-ascii?Q?+W2XHs5k0heOteHU6keElYEZ3coy9GWYWQFkUstaNrC17y7DhlnO1/WVcQvt?=
+ =?us-ascii?Q?yzmckOl2vIjOIUp9+xf7cXUDDldpM3iXVEiApHpS2oCtbifLlFGDi1SpgVw2?=
+ =?us-ascii?Q?jwZJ9MLz17wQdnt6xU9bt5/C+1biRP07gbA6BNEvcx1YY3752wbEudLV1e3C?=
+ =?us-ascii?Q?AxG1z9u4UO8xzxGYl60Arz7YMkgpe9u+RpRNQB5mEdk0p/r9n7aL6PChKbjt?=
+ =?us-ascii?Q?6KzMQhncG2MDMDREV2y4pLDQCUwJg5bjAmsjA3XkKVX+KnB3o/GyeDk3rwAy?=
+ =?us-ascii?Q?s+iyOPSAPgT0tEHIbDNnPIB88L66kYyRUVdYBx4dX9V/CgIDTVU5aPlDCb7L?=
+ =?us-ascii?Q?rBvIGNfvl5gx20RB/1ViUtaa+mJJVKcpYTVqGW2NBYLe3xWBsRayR3HqrC2+?=
+ =?us-ascii?Q?fUEANkkhGYZeVi3p2zBjdMGzDQXg65PvZC0vvefNVlXpDEpDhB61cfhahWza?=
+ =?us-ascii?Q?OUawaSBmYrKZqLsw/A+nk0c6Ap4YZCbjR1a+FMzu929cit5Kg5DQuxXIHLpI?=
+ =?us-ascii?Q?elYbKWkpd4vVIcD+SjPe+R6YcUtewgFyuvIoDWbrMu+0zl40yJSQXIujXP9H?=
+ =?us-ascii?Q?DFhbJ7KTfS9ssdsQOLilOmeiqEKeX3ZBaQeEiOvkaV4/x1UAYr5pD1oNQbaa?=
+ =?us-ascii?Q?L9+wmzDK0BGTvtD4aRGQRBbohptARD/CA1HBH826cPBCLZimWA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230037)(376011)(1800799021)(82310400023)(36860700010);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2024 11:35:25.6962
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9cbc693-6373-4140-52e7-08dc8f8abf5c
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF0000C37A.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8919
 
-On 6/17/24 22:10, Ilya Maximets wrote:
-> On 7/16/23 23:09, Xin Long wrote:
->> By not setting IPS_CONFIRMED in tmpl that allows the exp not to be removed
->> from the hashtable when lookup, we can simplify the exp processing code a
->> lot in openvswitch conntrack.
->>
->> Signed-off-by: Xin Long <lucien.xin@gmail.com>
->> ---
->>  net/openvswitch/conntrack.c | 78 +++++--------------------------------
->>  1 file changed, 10 insertions(+), 68 deletions(-)
->>
->> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
->> index 331730fd3580..fa955e892210 100644
->> --- a/net/openvswitch/conntrack.c
->> +++ b/net/openvswitch/conntrack.c
->> @@ -455,45 +455,6 @@ static int ovs_ct_handle_fragments(struct net *net, struct sw_flow_key *key,
->>  	return 0;
->>  }
->>  
->> -static struct nf_conntrack_expect *
->> -ovs_ct_expect_find(struct net *net, const struct nf_conntrack_zone *zone,
->> -		   u16 proto, const struct sk_buff *skb)
->> -{
->> -	struct nf_conntrack_tuple tuple;
->> -	struct nf_conntrack_expect *exp;
->> -
->> -	if (!nf_ct_get_tuplepr(skb, skb_network_offset(skb), proto, net, &tuple))
->> -		return NULL;
->> -
->> -	exp = __nf_ct_expect_find(net, zone, &tuple);
->> -	if (exp) {
->> -		struct nf_conntrack_tuple_hash *h;
->> -
->> -		/* Delete existing conntrack entry, if it clashes with the
->> -		 * expectation.  This can happen since conntrack ALGs do not
->> -		 * check for clashes between (new) expectations and existing
->> -		 * conntrack entries.  nf_conntrack_in() will check the
->> -		 * expectations only if a conntrack entry can not be found,
->> -		 * which can lead to OVS finding the expectation (here) in the
->> -		 * init direction, but which will not be removed by the
->> -		 * nf_conntrack_in() call, if a matching conntrack entry is
->> -		 * found instead.  In this case all init direction packets
->> -		 * would be reported as new related packets, while reply
->> -		 * direction packets would be reported as un-related
->> -		 * established packets.
->> -		 */
->> -		h = nf_conntrack_find_get(net, zone, &tuple);
->> -		if (h) {
->> -			struct nf_conn *ct = nf_ct_tuplehash_to_ctrack(h);
->> -
->> -			nf_ct_delete(ct, 0, 0);
->> -			nf_ct_put(ct);
->> -		}
->> -	}
->> -
->> -	return exp;
->> -}
->> -
->>  /* This replicates logic from nf_conntrack_core.c that is not exported. */
->>  static enum ip_conntrack_info
->>  ovs_ct_get_info(const struct nf_conntrack_tuple_hash *h)
->> @@ -852,36 +813,16 @@ static int ovs_ct_lookup(struct net *net, struct sw_flow_key *key,
->>  			 const struct ovs_conntrack_info *info,
->>  			 struct sk_buff *skb)
->>  {
->> -	struct nf_conntrack_expect *exp;
->> -
->> -	/* If we pass an expected packet through nf_conntrack_in() the
->> -	 * expectation is typically removed, but the packet could still be
->> -	 * lost in upcall processing.  To prevent this from happening we
->> -	 * perform an explicit expectation lookup.  Expected connections are
->> -	 * always new, and will be passed through conntrack only when they are
->> -	 * committed, as it is OK to remove the expectation at that time.
->> -	 */
->> -	exp = ovs_ct_expect_find(net, &info->zone, info->family, skb);
->> -	if (exp) {
->> -		u8 state;
->> -
->> -		/* NOTE: New connections are NATted and Helped only when
->> -		 * committed, so we are not calling into NAT here.
->> -		 */
->> -		state = OVS_CS_F_TRACKED | OVS_CS_F_NEW | OVS_CS_F_RELATED;
->> -		__ovs_ct_update_key(key, state, &info->zone, exp->master);
-> 
-> Hi, Xin, others.
-> 
-> Unfortunately, it seems like removal of this code broke the expected behavior.
-> OVS in userspace expects that SYN packet of a new related FTP connection will
-> get +new+rel+trk flags, but after this patch we're only getting +rel+trk and not
-> new.  This is a problem because we need to commit this connection with the label
-> and we do that for +new packets.  If we can't get +new packet we'll have to commit
-> every single +rel+trk packet, which doesn't make a lot of sense.  And it's a
-> significant behavior change regardless.
+Amit Cohen  writes:
 
-Interestingly enough I see +new+rel+trk packets in cases without SNAT,
-but we can only get +rel+trk in cases with SNAT.  So, this may be just
-a generic conntrack bug somewhere.  At least the behavior seems fairly
-inconsistent.
+After using NAPI to process events from hardware, the next step is to
+use page pool for Rx buffers allocation, which is also enhances
+performance.
 
-> 
-> Could you, please, take a look?
-> 
-> The issue can be reproduced by running check-kernel tests in OVS repo.
-> 'FTP SNAT orig tuple' tests fail 100% of the time.
-> 
-> Best regards, Ilya Maximets.
+To simplify this change, first use page pool to allocate one continuous
+buffer for each packet, later memory consumption can be improved by using
+fragmented buffers.
+
+This set significantly enhances mlxsw driver performance, CPU can handle
+about 370% of the packets per second it previously handled.
+
+The next planned improvement is using XDP to optimize telemetry.
+
+Patch set overview:
+Patches #1-#2 are small preparations for page pool usage
+Patch #3 initializes page pool, but do not use it
+Patch #4 converts the driver to use page pool for buffers allocations
+Patch #5 is an optimization for buffer access
+Patch #6 cleans up an unused structure
+Patch #7 uses napi_consume_skb() as part of Tx completion
+
+Amit Cohen (7):
+  mlxsw: pci: Split NAPI setup/teardown into two steps
+  mlxsw: pci: Store CQ pointer as part of RDQ structure
+  mlxsw: pci: Initialize page pool per CQ
+  mlxsw: pci: Use page pool for Rx buffers allocation
+  mlxsw: pci: Optimize data buffer access
+  mlxsw: pci: Do not store SKB for RDQ elements
+  mlxsw: pci: Use napi_consume_skb() to free SKB as part of Tx
+    completion
+
+ drivers/net/ethernet/mellanox/mlxsw/Kconfig |   1 +
+ drivers/net/ethernet/mellanox/mlxsw/pci.c   | 199 ++++++++++++++------
+ 2 files changed, 142 insertions(+), 58 deletions(-)
+
+-- 
+2.45.0
 
 
