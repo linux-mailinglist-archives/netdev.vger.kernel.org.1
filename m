@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-104346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F080190C366
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 08:18:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F093290C368
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 08:18:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75D82B22E88
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 06:18:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 045C61C22DDF
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 06:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541C91CA9F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67163BBD7;
 	Tue, 18 Jun 2024 06:18:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ir5nyWS+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WMcHrDoz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2480E1C2A8;
-	Tue, 18 Jun 2024 06:18:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D6B288BD;
+	Tue, 18 Jun 2024 06:18:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718691528; cv=none; b=JLzuxZ91EkWS6p7TythN1E2S0WcInp3Y68IfEvKjbR3SDgfNs3ZXqtriU1aMtjbGBbWIX66cdedU6JEJu2qLsjXLB71I8yVMIyFZH/2Tzki2nCGX9bYuGnI83w9h0A9bbP2kSWmpbsdTpBnjVUGJ/sHAeVAmY7GnaGBlfo68iCE=
+	t=1718691528; cv=none; b=JRQ071/hexIze4DS3MVXdHLUIJ2sXAxaaBKQknaDoTw6yIVNl438nyGCQ0scqwHP7KOJC45zLR2dmgUiZUVchja9z9nRDEYPEJijkj7e//PAKx6FAVV35Uwq9c4LnlbohlkWS4LbSe0gErOV+GvM/LWI/F3RKgSsmAJq/wJYAFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718691528; c=relaxed/simple;
-	bh=kbllykrcxB7X3VfffLCQJ1493vNgA9J8ctVO7kMB7TM=;
+	bh=B0wwOEW0AXU6v2wfhgxSRvC9Pm9S8DtDCbov3rbAIE8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dgLkaatWHWRlrRLotAnO9DlmzQt+2ARsug4FaoEIjpOso66r05m87oYk3w6vU71jAG9EVPWi7tEFTh7xE7soEQlGVQv7qGO2TXIxuQcZ/LOFLJV6SAhuK0M7Za0optNrDPSZA23PDytgO3QVXTrNi39VklNqvpYaQ0bUAhIVc3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ir5nyWS+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0446FC3277B;
-	Tue, 18 Jun 2024 06:18:42 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=Wl5gfln7xyhaALucIjSqz41sN5yObeUjsESpUYNT8BXQAMxq6w1lMuAhoUyuTttz7jeL1TKdkUzqLBNu4UTwCWsjc0AZ3fSjVR/9PswmRrz6wmpunFFftp1xzMuv2JwnE/oxxqnVs9u3GQIrUYLKesFr1GylaOwT7MRF0MX78R8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WMcHrDoz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34D2EC4AF1C;
+	Tue, 18 Jun 2024 06:18:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718691527;
-	bh=kbllykrcxB7X3VfffLCQJ1493vNgA9J8ctVO7kMB7TM=;
+	s=k20201202; t=1718691528;
+	bh=B0wwOEW0AXU6v2wfhgxSRvC9Pm9S8DtDCbov3rbAIE8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ir5nyWS+JzMaOpsFPP407oKl4hddjF0tXzZYzLE5xK22VnIlqLdh1rxLrf5C/eKln
-	 302o4YMFVZB2Sw762KMS4pOsSpcZDiSmYuSfOCdF6dmGNiJYrHHfMw0ORWZU6n5izG
-	 XbT9wGPSSKpxOAlMRaAlv6zlPwY2nYKAT/i5gTnZ8+yJHEiJjcSzMWt54PRxaVb2QX
-	 qDUSmr1JL9xWUOONWKddkB/mPr0l5DmZb0H+jnQ6gGGu0QkAqiiHVLO0dzyh/h+PzV
-	 zOzddRsmqQXKmhCDPAd06alwtyW1p43qxZdniw1Jx1Zsy7//UoRSU/HUfHiN7Jx/Ov
-	 WG37sx5eaTBWg==
-Message-ID: <b05ad9b5-f072-4faf-b6f2-2ec341917742@kernel.org>
+	b=WMcHrDozcn9hytSKw6uSppeT3H7hc4riZdfEGhYhpSo+WeitzUleJuc0Aw55UmcQA
+	 uPi8C95012gsfE9xEEO3cXB8G8w8I2WDTLCl5HQL90SudLgHofKEfpKjM3MNUI5DqJ
+	 47gVvWT/8SRwJHDqcaZlH4sQuRewiAEyPH1eTkvW1p9wZhWfISDKA5Xr6QW6TFT3Iq
+	 Cwr0/DVr5uA/u8MpipjFVDKt49ZoJl0PTd0da4KrqKLJvE2AnLFMvWPJur1mth4net
+	 /yags20DbI68J0OmrHexhVw7s9KUDPuqLfleXtQGyhHQEjrP2PMcZ9jKlmEPaflco+
+	 PErYqO2MGv7jQ==
+Message-ID: <fc8a117d-9723-44fe-afa3-f1a5af37a1a6@kernel.org>
 Date: Tue, 18 Jun 2024 08:18:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,43 +50,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 3/7] ping: use sk_skb_reason_drop to free rx
- packets
-To: Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- David Ahern <dsahern@kernel.org>,
- Abhishek Chauhan <quic_abchauha@quicinc.com>,
- Mina Almasry <almasrymina@google.com>, Florian Westphal <fw@strlen.de>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- David Howells <dhowells@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Pavel Begunkov <asml.silence@gmail.com>, linux-kernel@vger.kernel.org,
- kernel-team@cloudflare.com, Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Neil Horman <nhorman@tuxdriver.com>, linux-trace-kernel@vger.kernel.org,
- Dan Carpenter <dan.carpenter@linaro.org>
-References: <cover.1718642328.git.yan@cloudflare.com>
- <3b6f00440b880559fa3918504d85521702921e3b.1718642328.git.yan@cloudflare.com>
+Subject: Re: [PATCH 2/2] dt-bindings: net: Convert fsl-fman to yaml
+To: Frank Li <Frank.li@nxp.com>
+Cc: Yangbo Lu <yangbo.lu@nxp.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Madalin Bucur <madalin.bucur@nxp.com>, Sean Anderson
+ <sean.anderson@seco.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev
+References: <20240614-ls_fman-v1-0-cb33c96dc799@nxp.com>
+ <20240614-ls_fman-v1-2-cb33c96dc799@nxp.com>
+ <a71bf75f-8c2c-44cc-baeb-3feabd1757b9@kernel.org>
+ <ZnB+HtkEh1r8EKG7@lizhi-Precision-Tower-5810>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <3b6f00440b880559fa3918504d85521702921e3b.1718642328.git.yan@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <ZnB+HtkEh1r8EKG7@lizhi-Precision-Tower-5810>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-
-On 17/06/2024 20.09, Yan Zhai wrote:
-> Replace kfree_skb_reason with sk_skb_reason_drop and pass the receiving
-> socket to the tracepoint.
+On 17/06/2024 20:19, Frank Li wrote:
+>>> +  reg:
+>>> +    maxItems: 1
+>>> +
+>>> +  ranges: true
+>>
+>> That's odd. Why do you need ranges without children?
 > 
-> Signed-off-by: Yan Zhai<yan@cloudflare.com>
-> ---
->   net/ipv4/ping.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> It think it is legacy method in driver.
+> 
+> 	muram_node = of_find_matching_node(fm_node, fman_muram_match);                              
+>         if (!muram_node) {                                                                          
+>                 err = -EINVAL;                                                                      
+>                 dev_err(&of_dev->dev, "%s: could not find MURAM node\n",                            
+>                         __func__);                                                                  
+>                 goto fman_free;                                                                     
+>         }                                                                                           
+>                                                                                                     
+>         err = of_address_to_resource(muram_node, 0,                                                 
+>                                      &fman->dts_params.muram_res);                                  
+>         if (err) {                                                                                  
+>                 of_node_put(muram_node);                                                            
+>                 dev_err(&of_dev->dev, "%s: of_address_to_resource() = %d\n",                        
+>                         __func__, err);                                                             
+>                 goto fman_free;                                                                     
+>         }  
 
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+And how is this related to ranges?
+
+>>
+
+Best regards,
+Krzysztof
+
 
