@@ -1,321 +1,183 @@
-Return-Path: <netdev+bounces-104461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 378CF90C9C8
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:38:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F211390C9D9
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:40:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B857F1F225A1
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:38:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78D181F21E61
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:40:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A78131E5D;
-	Tue, 18 Jun 2024 10:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91221156F20;
+	Tue, 18 Jun 2024 10:55:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FInN7Rae"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KJOK0Lkl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36CDC154422
-	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 10:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF7614F10B
+	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 10:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718707812; cv=none; b=s8AY2+vKs79sE9SSK5eJ+HP2makSJf/RFMlFCc/A8hGGjeM58HkW4Jwqlq50ZKp1qLs6/vh6XtlqjYCu93kQWAMjiK4jKYek15gmCWo5u2NG7VZ0focn+V8hKtPtd6/vyDA/VC337D0sU4F2+Pz5vX8QIvU8zDCWS1eoMxjYWl0=
+	t=1718708101; cv=none; b=Xtvc+EtCdDuw42PHb65tqbYKTRwtmCt7INUvV7nregdT0M8s1nKPAcRPscAEsPlLT3AsrRdW94dooSvqTUWaYfHuBpHmmfNjDxt6cX2v5SyCOJ1ONn67uLG19wdIfKJ+68O87TUoowSPBJ9C9pxCnpOVyxpx/g9p9ywwKSgXqlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718707812; c=relaxed/simple;
-	bh=zuIaHaRc2wHSelfPBTrftpxGVNzZzHi84yYkdxXtb/w=;
-	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D4QUiF6iLAu/MeN2B2gWY8H2v1EMWhAzxuokPQyf5803PBpd3brEEdzVb8oOS3GaZyleWswwvdto9VRf48Pv6SQmeA9fEftgZ04aPKjcDDE/hJpdKDBPbDnyy3E9HFzmtNXHJpJ7ZSuHthGAvIa7/693odEp4yVoy06/IfAHbX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FInN7Rae; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1718708101; c=relaxed/simple;
+	bh=61RFQmmExL4kZNsXeRLegrMtDugYDBbo2Sq3ZfnXMx4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=JJbgJBvq0+h2U6iV3KG0QXOGpBiunTe6zTZBQzlWW1doh0eqkkP/yIEk0IrXiC3QU5//n3h5vkPlicoKAIfy/Pt4eHEBgCfHpwXuAUzvzpfCkjnZ8E/sSznLOnsnix2WPI2w9dt9lBBmBOC6JZ4x/SFKZtbrCVwHSkQfLlP4v+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KJOK0Lkl; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718707809;
+	s=mimecast20190719; t=1718708098;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l/ChfiVgZBMW+Q5CvBZD4jxxA/Fmx+01TB6ag5A/b44=;
-	b=FInN7RaeP35/Mn1vLllt+UF6g5vrgdgJKYIo6W1NfLZpYevCZDtPQ6OrjUExgQBzks71lA
-	AdBr5A5QS2M54ZVT7qTEMtNGQyT/qppj7MaMUCrd1CKXM4Pe86MD3cF6nm8J29PrZe1qzM
-	CfRJl997ZoofSwcT1bs/MtJEmaCHJrk=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=R+ZB30OmLW0cAiqPfvf9C3X9ciOtU7/gl0L91dnALD0=;
+	b=KJOK0LklcZmLauT7ef4mvu8z4T6TYlSY/ks87D08KeVlJiG2SADBS9PKYyjFJImTN8yOr3
+	WYgOn1+h+9NVRFQAcVS3Y1VvI/I9ebkB3j771xhB5+WkTFe2FJtTKDNvbw1wUEy87VsBAC
+	ReIE8ZWpGfYjqsECqMVEy2pPlWqMGlQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-58-kVOHHVj5O3SjS670hy0QQA-1; Tue, 18 Jun 2024 06:50:07 -0400
-X-MC-Unique: kVOHHVj5O3SjS670hy0QQA-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6b06ce632b3so67473056d6.3
-        for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 03:50:07 -0700 (PDT)
+ us-mta-527-AgC1tcRGP-KKWrN8GFxnmA-1; Tue, 18 Jun 2024 06:54:57 -0400
+X-MC-Unique: AgC1tcRGP-KKWrN8GFxnmA-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42180d2a0d6so8150695e9.1
+        for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 03:54:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718707807; x=1719312607;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
-         :mime-version:references:from:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=l/ChfiVgZBMW+Q5CvBZD4jxxA/Fmx+01TB6ag5A/b44=;
-        b=jFA6cmqE94Naj4+/R/4DIl4NbKgfnQcwTpaY6KPI30tFAR3JQ3SIQtySABRyNhuzKg
-         72Io4W6TEaLuLe4Jab+QAWnAAPmWoZMFOGgNpnqsF38Hvgzepj3bdiWqi7vukxn6w6hi
-         X0389v9Rv61NwzGzQ7gml/cSBLQnyckHpGIcWEAjJaRSZqxwhOoFnGEDjziEXVOxQEIG
-         0FD6yhbJc+5l2Q29tQW3fEdu4uyrqEyFXm1LhMJLCS8K67FEHtoo/slzmHzdzt9yXpaR
-         xlR4WI3+/VwPYi6mU6p8UBowz4XCpoBuxuY0hx9GeylIs49qHjEySVKxBDaLUHvuZD3B
-         kUxQ==
-X-Gm-Message-State: AOJu0YyL2ErYhmp0ON1LPheADXGm/sL7hLAcck8Zv6TABjoclYlzoF1b
-	/7NL2BYDgeitIfI4BRZAV2RAEo+w04iD46kXO+WSz5drWWEvPC8Dap1GtmZLgOvAvA3DSeiCkwM
-	sFJq5ricDmp/DSIoy1iy3eD9EQFrCB9kLAPvOI0XxsnfJuppNyZBur607alHKltKc0LN/HjECwr
-	aH+6eZCN9qvsgnVhFcn806vxXLC3M4
-X-Received: by 2002:ad4:5150:0:b0:6b0:77a8:f416 with SMTP id 6a1803df08f44-6b2b00bfea5mr127020696d6.47.1718707807305;
-        Tue, 18 Jun 2024 03:50:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHZcXk+B1DGjBzWsshT0SLNobf3SFzVN5baTdv30Ptg1ZIe+fv5v4OlrJ687YcCxXqWrUXq11SvL/itCPlicUg=
-X-Received: by 2002:ad4:5150:0:b0:6b0:77a8:f416 with SMTP id
- 6a1803df08f44-6b2b00bfea5mr127020526d6.47.1718707806942; Tue, 18 Jun 2024
- 03:50:06 -0700 (PDT)
-Received: from 311643009450 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 18 Jun 2024 10:50:05 +0000
-From: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
-References: <20240603185647.2310748-1-amorenoz@redhat.com> <20240603185647.2310748-8-amorenoz@redhat.com>
- <8624ccf8-e9e2-4a95-a25c-7d3166bb3256@ovn.org> <f8050877-1728-4723-acb8-8a8ab7674470@ovn.org>
- <CAG=2xmPAwvCR4ky0cu7Yai29v3H592-ATXtNkhsNJ-vTwR4BVw@mail.gmail.com> <5f293bac-4117-4f93-8d3f-636d6ce236a4@ovn.org>
+        d=1e100.net; s=20230601; t=1718708096; x=1719312896;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=R+ZB30OmLW0cAiqPfvf9C3X9ciOtU7/gl0L91dnALD0=;
+        b=G+IHijsOlWrczya0HeVintvVaJQbMgcJIsHXkR1dFbnZq5MSy20tvIMWx7jnprOu72
+         LDFGVrxUoqU6QuoIRQubKpp4mU+x5EBSuhGnIYXbLt6pnDEhwHrMiu2TurJ0RPZYy/8n
+         PbZcqdvlFSygpVq+cgL2OgxxC8DycFDMoQY+cp6GfAhXGQoWXKvO+5J36YiryHSBfthk
+         znI8jWAvxVNrIrupAaeGAZ8387oZ6HK8mgjN/rtTQSdE/6uIS5izHRNhUnFsZdX2BBJ8
+         itmfTAaNOPeDNZw62pejBw9hHGcstVgYh++cd0oYVZtC7MRmPTC4RawO5OqyoqEnGI6a
+         ugeg==
+X-Forwarded-Encrypted: i=1; AJvYcCVZiJ0bHbTjdMQSGlSEDPT/4EAb9t/zfCiXl6y83UnFvyYG8x4H1X1zPWoAaFVXXV3G/t1sCgZ3wekQ/UXRZs0Z7SfUr9E0
+X-Gm-Message-State: AOJu0YyLPk+HSaxmtb0CVwBcHNdv5dCb2t/eQaIuwO7tdn01YohaKyJa
+	F9hnxKX3xRnXGRDRL5sCglemQ618gu8trqzyOB5mzZgzuAhIvRl750ErjzGTgAkmhGOL2HZpaGh
+	arqUVSZ4oMv0LQvcP4wNZHlO1Vn/T4x/muM3YVEzsvaa+k5oCi5OupWKAuF8M5A==
+X-Received: by 2002:a5d:64e7:0:b0:35f:2584:770e with SMTP id ffacd0b85a97d-3607a6d1b12mr8610960f8f.0.1718708095900;
+        Tue, 18 Jun 2024 03:54:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFxOPksMWYlLot75Lv1s3C9MTfPHt5HNH3XtADGASab/m3zJaX5ydBljvx+aY7TP8QmHEXk9Q==
+X-Received: by 2002:a5d:64e7:0:b0:35f:2584:770e with SMTP id ffacd0b85a97d-3607a6d1b12mr8610948f8f.0.1718708095412;
+        Tue, 18 Jun 2024 03:54:55 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b0b4:c10::f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36075093a13sm14012848f8f.9.2024.06.18.03.54.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jun 2024 03:54:54 -0700 (PDT)
+Message-ID: <230e7159f1e9d3ae0d5317c913a0797baac8dc3a.camel@redhat.com>
+Subject: Re: [PATCH v3 net-next 04/11] af_unix: Define locking order for
+ U_LOCK_SECOND in unix_stream_connect().
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, Kent Overstreet
+	 <kent.overstreet@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Kuniyuki Iwashima
+ <kuni1840@gmail.com>,  netdev@vger.kernel.org
+Date: Tue, 18 Jun 2024 12:54:53 +0200
+In-Reply-To: <20240614200715.93150-5-kuniyu@amazon.com>
+References: <20240614200715.93150-1-kuniyu@amazon.com>
+	 <20240614200715.93150-5-kuniyu@amazon.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5f293bac-4117-4f93-8d3f-636d6ce236a4@ovn.org>
-Date: Tue, 18 Jun 2024 10:50:05 +0000
-Message-ID: <CAG=2xmPbpvYGy1rAkcLsK6PFxCx3bmZyXKX5RTag8XZBTxMZdg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 7/9] net: openvswitch: do not notify drops
- inside sample
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com, 
-	horms@kernel.org, dev@openvswitch.org, Pravin B Shelar <pshelar@ovn.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 18, 2024 at 12:22:23PM GMT, Ilya Maximets wrote:
-> On 6/18/24 09:00, Adri=C3=A1n Moreno wrote:
-> > On Mon, Jun 17, 2024 at 02:10:37PM GMT, Ilya Maximets wrote:
-> >> On 6/17/24 13:55, Ilya Maximets wrote:
-> >>> On 6/3/24 20:56, Adrian Moreno wrote:
-> >>>> The OVS_ACTION_ATTR_SAMPLE action is, in essence,
-> >>>> observability-oriented.
-> >>>>
-> >>>> Apart from some corner case in which it's used a replacement of clon=
-e()
-> >>>> for old kernels, it's really only used for sFlow, IPFIX and now,
-> >>>> local emit_sample.
-> >>>>
-> >>>> With this in mind, it doesn't make much sense to report
-> >>>> OVS_DROP_LAST_ACTION inside sample actions.
-> >>>>
-> >>>> For instance, if the flow:
-> >>>>
-> >>>>   actions:sample(..,emit_sample(..)),2
-> >>>>
-> >>>> triggers a OVS_DROP_LAST_ACTION skb drop event, it would be extremel=
-y
-> >>>> confusing for users since the packet did reach its destination.
-> >>>>
-> >>>> This patch makes internal action execution silently consume the skb
-> >>>> instead of notifying a drop for this case.
-> >>>>
-> >>>> Unfortunately, this patch does not remove all potential sources of
-> >>>> confusion since, if the sample action itself is the last action, e.g=
-:
-> >>>>
-> >>>>     actions:sample(..,emit_sample(..))
-> >>>>
-> >>>> we actually _should_ generate a OVS_DROP_LAST_ACTION event, but we a=
-ren't.
-> >>>>
-> >>>> Sadly, this case is difficult to solve without breaking the
-> >>>> optimization by which the skb is not cloned on last sample actions.
-> >>>> But, given explicit drop actions are now supported, OVS can just add=
- one
-> >>>> after the last sample() and rewrite the flow as:
-> >>>>
-> >>>>     actions:sample(..,emit_sample(..)),drop
-> >>>>
-> >>>> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> >>>> ---
-> >>>>  net/openvswitch/actions.c | 13 +++++++++++--
-> >>>>  1 file changed, 11 insertions(+), 2 deletions(-)
-> >>>>
-> >>>> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-> >>>> index 33f6d93ba5e4..54fc1abcff95 100644
-> >>>> --- a/net/openvswitch/actions.c
-> >>>> +++ b/net/openvswitch/actions.c
-> >>>> @@ -82,6 +82,15 @@ static struct action_fifo __percpu *action_fifos;
-> >>>>  static struct action_flow_keys __percpu *flow_keys;
-> >>>>  static DEFINE_PER_CPU(int, exec_actions_level);
-> >>>>
-> >>>> +static inline void ovs_drop_skb_last_action(struct sk_buff *skb)
-> >>>> +{
-> >>>> +	/* Do not emit packet drops inside sample(). */
-> >>>> +	if (OVS_CB(skb)->probability)
-> >>>> +		consume_skb(skb);
-> >>>> +	else
-> >>>> +		ovs_kfree_skb_reason(skb, OVS_DROP_LAST_ACTION);
-> >>>> +}
-> >>>> +
-> >>>>  /* Make a clone of the 'key', using the pre-allocated percpu 'flow_=
-keys'
-> >>>>   * space. Return NULL if out of key spaces.
-> >>>>   */
-> >>>> @@ -1061,7 +1070,7 @@ static int sample(struct datapath *dp, struct =
-sk_buff *skb,
-> >>>>  	if ((arg->probability !=3D U32_MAX) &&
-> >>>>  	    (!arg->probability || get_random_u32() > arg->probability)) {
-> >>>>  		if (last)
-> >>>> -			ovs_kfree_skb_reason(skb, OVS_DROP_LAST_ACTION);
-> >>>> +			ovs_drop_skb_last_action(skb);
-> >>
-> >> Always consuming the skb at this point makes sense, since having smapl=
-e()
-> >> as a last action is a reasonable thing to have.  But this looks more l=
-ike
-> >> a fix for the original drop reason patch set.
-> >>
-> >
-> > I don't think consuming the skb at this point makes sense. It was very
-> > intentionally changed to a drop since a very common use-case for
-> > sampling is drop-sampling, i.e: replacing an empty action list (that
-> > triggers OVS_DROP_LAST_ACTION) with a sample(emit_sample()). Ideally,
-> > that replacement should not have any effect on the number of
-> > OVS_DROP_LAST_ACTION being reported as the packets are being treated in
-> > the same way (only observed in one case).
-> >
-> >
-> >>>>  		return 0;
-> >>>>  	}
-> >>>>
-> >>>> @@ -1579,7 +1588,7 @@ static int do_execute_actions(struct datapath =
-*dp, struct sk_buff *skb,
-> >>>>  		}
-> >>>>  	}
-> >>>>
-> >>>> -	ovs_kfree_skb_reason(skb, OVS_DROP_LAST_ACTION);
-> >>>> +	ovs_drop_skb_last_action(skb);
-> >>>
-> >>> I don't think I agree with this one.  If we have a sample() action wi=
-th
-> >>> a lot of different actions inside and we reached the end while the la=
-st
-> >>> action didn't consume the skb, then we should report that.  E.g.
-> >>> "sample(emit_sample(),push_vlan(),set(eth())),2"  should report that =
-the
-> >>> cloned skb was dropped.  "sample(push_vlan(),emit_sample())" should n=
-ot.
-> >>>
-> >
-> > What is the use case for such action list? Having an action branch
-> > executed randomly doesn't make sense to me if it's not some
-> > observability thing (which IMHO should not trigger drops).
->
-> It is exactly my point.  A list of actions that doesn't end is some sort
-> of a terminal action (output, drop, etc) does not make a lot of sense and
-> hence should be signaled as an unexpected drop, so users can re-check the
-> pipeline in case they missed the terminal action somehow.
->
-> >
-> >>> The only actions that are actually consuming the skb are "output",
-> >>> "userspace", "recirc" and now "emit_sample".  "output" and "recirc" a=
-re
-> >>> consuming the skb "naturally" by stealing it when it is the last acti=
-on.
-> >>> "userspace" has an explicit check to consume the skb if it is the las=
-t
-> >>> action.  "emit_sample" should have the similar check.  It should like=
-ly
-> >>> be added at the point of action introduction instead of having a sepa=
-rate
-> >>> patch.
-> >>>
-> >
-> > Unlinke "output", "recirc", "userspace", etc. with emit_sample the
-> > packet does not continue it's way through the datapath.
->
-> After "output" the packet leaves the datapath too, i.e. does not continue
-> it's way through OVS datapath.
->
+On Fri, 2024-06-14 at 13:07 -0700, Kuniyuki Iwashima wrote:
+> While a SOCK_(STREAM|SEQPACKET) socket connect()s to another, we hold
+> two locks of them by unix_state_lock() and unix_state_lock_nested() in
+> unix_stream_connect().
+>=20
+> Before unix_state_lock_nested(), the following is guaranteed by checking
+> sk->sk_state:
+>=20
+>   1. The first socket is TCP_LISTEN
+>   2. The second socket is not the first one
+>   3. Simultaneous connect() must fail
+>=20
+> So, the client state can be TCP_CLOSE or TCP_LISTEN or TCP_ESTABLISHED.
+>=20
+> Let's define the expected states as unix_state_lock_cmp_fn() instead of
+> using unix_state_lock_nested().
+>=20
+> Note that 2. is detected by debug_spin_lock_before() and 3. cannot be
+> expressed as lock_cmp_fn.
+>=20
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>  include/net/af_unix.h |  1 -
+>  net/unix/af_unix.c    | 26 +++++++++++++++++++++++++-
+>  2 files changed, 25 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+> index b6eedf7650da..fd813ad73ab8 100644
+> --- a/include/net/af_unix.h
+> +++ b/include/net/af_unix.h
+> @@ -98,7 +98,6 @@ struct unix_sock {
+>  #define unix_state_unlock(s)	spin_unlock(&unix_sk(s)->lock)
+>  enum unix_socket_lock_class {
+>  	U_LOCK_NORMAL,
+> -	U_LOCK_SECOND,	/* for double locking, see unix_state_double_lock(). */
+>  	U_LOCK_DIAG, /* used while dumping icons, see sk_diag_dump_icons(). */
+>  	U_LOCK_GC_LISTENER, /* used for listening socket while determining gc
+>  			     * candidates to close a small race window.
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 88f2c5d039c4..5d2728e33f3f 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -143,6 +143,30 @@ static int unix_state_lock_cmp_fn(const struct lockd=
+ep_map *_a,
+>  	a =3D container_of(_a, struct unix_sock, lock.dep_map);
+>  	b =3D container_of(_b, struct unix_sock, lock.dep_map);
+> =20
+> +	if (a->sk.sk_state =3D=3D TCP_LISTEN) {
+> +		/* unix_stream_connect(): Before the 2nd unix_state_lock(),
+> +		 *
+> +		 *   1. a is TCP_LISTEN.
+> +		 *   2. b is not a.
+> +		 *   3. concurrent connect(b -> a) must fail.
+> +		 *
+> +		 * Except for 2. & 3., the b's state can be any possible
+> +		 * value due to concurrent connect() or listen().
+> +		 *
+> +		 * 2. is detected in debug_spin_lock_before(), and 3. cannot
+> +		 * be expressed as lock_cmp_fn.
+> +		 */
+> +		switch (b->sk.sk_state) {
+> +		case TCP_CLOSE:
+> +		case TCP_ESTABLISHED:
+> +		case TCP_LISTEN:
+> +			return -1;
+> +		default:
+> +			/* Invalid case. */
+> +			return 0;
+> +		}
 
-I meant a broader concept of "datapath". The packet continues. For the
-userspace action this is true only for the CONTROLLER ofp action but
-since the datapath does not know which action it's implementing, we
-cannot do better.
+I'm sorry for missing this before, but I'm wondering if we need to
+enforce even this case to be symmetric? that is, explicitly check for b
+state =3D=3D TCP_LISTEN, ...
 
-> >
-> > It would be very confusing if OVS starts monitoring drops and adds a bu=
-nch
-> > of flows such as "actions:emit_sample()" and suddently it stops reporti=
-ng such
-> > drops via standard kfree_skb_reason. Packets _are_ being dropped here,
-> > we are just observing them.
->
-> This might make sense from the higher logic in user space application, bu=
-t
-> it doesn't from the datapath perspective.  And also, if the user adds the
-> 'emit_sample' action for drop monitring, they already know where to find
-> packet samples, they don't need to use tools like dropwatch anymore.
-> This packet is not dropped from the datapath perspective, it is sampled.
->
-> >
-> > And if we change emit_sample to trigger a drop if it's the last action,
-> > then "sample(50%, emit_sample()),2" will trigger a drop half of the tim=
-es
-> > which is also terribly confusing.
->
-> If emit_sample is the last action, then skb should be consumed silently.
-> The same as for "output" and "userspace".
->
-> >
-> > I think we should try to be clear and informative with what we
-> > _actually_ drop and not require the user that is just running
-> > "dropwatch" to understand the internals of the OVS module.
->
-> If someone is already using sampling to watch their packet drops, why wou=
-ld
-> they use dropwatch?
->
-> >
-> > So if you don't want to accept the "observational" nature of sample(),
-> > the only other solution that does not bring even more confusion to OVS
-> > drops would be to have userspace add explicit drop actions. WDYT?
-> >
->
-> These are not drops from the datapath perspective.  Users can add explici=
-t
-> drop actions if they want to, but I'm really not sure why they would do t=
-hat
-> if they are already capturing all these packets in psample, sFlow or IPFI=
-X.
+Kent, WDYT?
 
-Because there is not a single "user". Tools and systems can be built on
-top of tracepoints and samples and they might not be coordinated between
-them. Some observability application can be always enabled and doing
-constant network monitoring or statistics while other lower level tools
-can be run at certain moments to troubleshoot issues.
+Thanks!
 
-In order to run dropwatch in a node you don't need to have rights to
-access the OpenFlow controller and ask it to change the OpenFlow rules
-or else dropwatch simply will not show actual packet drops.
-
-To me it seems obvious that drop sampling (via emit_sample) "includes"
-drop reporting via emit_sample. In both cases you get the packet
-headers, but in one case you also get OFP controller metadata. Now even
-if there is a system that uses both, does it make sense to push to them
-the responsibility of dealing with them being mutually exclusive?
-
-I think this makes debugging OVS datapath unnecessarily obscure when we
-know the packet is actually being dropped intentionally by OVS.
-
-What's the problem with having OVS write the following?
-    "sample(50%, emit_sample()),drop(0)"
-
-Thanks,
-Adri=C3=A1n
+Paolo
 
 
