@@ -1,207 +1,147 @@
-Return-Path: <netdev+bounces-104575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59A590D61D
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:52:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5149590D630
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:54:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC1EC287B53
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 14:52:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A0961F2178D
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 14:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA331419BA;
-	Tue, 18 Jun 2024 14:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0494E14BF86;
+	Tue, 18 Jun 2024 14:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="DP6GEE3Q"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="FEbEx+UZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DFA139CFC;
-	Tue, 18 Jun 2024 14:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD282139C1;
+	Tue, 18 Jun 2024 14:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718721951; cv=none; b=Fq4caqE2sbpEw8TK970gRV8weo8zWtTRHZ4gDuffVEKlCCACrg/+h4ksSfl4QH+F8i6DQZyKXEZ48dQsEELaE6YWbRAK1+LvjywzBSdwzNqo4dGxUWqMkrsCtMbQw4k1Ahw02pLACCkkyGn3KJm1VJqvHjTje3NQDJH8PaGyYLI=
+	t=1718722083; cv=none; b=oPNbFNjqTodqmy6Ur4LyuaL7N5rEpC4Lc8tBTosiHCUbjtJr5vxZJ64nqG8R5l85AlZWdqo3ifHpVPDg+Lgxz4rni9uNgdotJZ18f3Zo/8PV6Vrg21SA/SvcvKVV0PHKMbK/y9LXAidWN7+Sk6MGqVCY1nDI1qhmh38RwOUp594=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718721951; c=relaxed/simple;
-	bh=/eXZnkslDtXtwLMQzzo568CwMVqG0SYfQ/UyG0IHN2c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PClvj/rFzI5L73QDoEm8T0YiXyMA7l1cgxiF7hwo5WPEzWQxTDzo+NRkl0h70GBqZipDHXmCUJu3vSRCBeQr38yv6lf17GdnA+Z3FdVTXvg1rEEEpsSophYPRmgK21TktkGaHy4b1lu1EgXsLByHjVKhorbBPXkNZl3o5OJTQCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=DP6GEE3Q; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	s=arc-20240116; t=1718722083; c=relaxed/simple;
+	bh=AptMB+YIiD2q53qVWsQoJqIp+iSh1nUp7RFHH6Hf/ik=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PY+C86f19fnMpYAK3uWWLSu2Kqh0wgHPeQK8M2aTwZHwMnC/dUuqeiawS0ElUc7pO3td+LIwrWkvPoU0OyGXNXiXAwJXTxperJ/bgbME95RWEJYoAE7S/J5OxDoyW1Rrc1hvbf8C04NlNdhL98+/BGeEoyD83f3OSo5uzsu9SzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=FEbEx+UZ; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1718722080;
+	bh=AptMB+YIiD2q53qVWsQoJqIp+iSh1nUp7RFHH6Hf/ik=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FEbEx+UZSasLc7cTDBrhO6RxoZODD2ORZ/GcdPip5l5O1vtkDrBkWHydICrYy80cZ
+	 AkgZIln2jKxEU8mSYvmtCtHSoUMn3Vt2KzOTPVe5BSgh5dDOh1XBoQyOIKTFVYDFZL
+	 f5ulw1hxHi/tpLIyrWit4RzFFzUZLrv3dv8WGi88112JMtorTp9LhO8xfM/cKk58vl
+	 b8o034LkaZdrDSz7PbB2inMB/sbFCoNaQ/er1LVNoM8IIxKGvhX51n08wApd/P0A1k
+	 l0BWdgmScyVvQjDD1rEDESKSuEGhvR5SVdo3zgsGxZw96/FLCn5a8dL0dnVBBAzEJJ
+	 66x0QI/ESyvDw==
+Received: from mercury (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id C4C6A881DB;
-	Tue, 18 Jun 2024 16:45:46 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1718721947;
-	bh=Ojk5mwSvw+tC6y+Z5fiUjKgjEOz15W+RAyfOfEfKZRE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DP6GEE3QWmViRXPM6lpRCuxF39Ag8BD30mSTgJgZ+ybArBY+nMyJ7lpF+LaQwzKXN
-	 j9YEfRiXQVVWVQc0+J2EbyF1OWL3GqSZl7lH12cs4sffPVLJ262yzAJj91O5O8JKLp
-	 0yW5hAxywVL2CSwdH4ABlkpbZsrrkg0S/Czhe7ETeMYCtOFxmMCCpBBv5hWZ7og6JB
-	 uHbVB7b5As54UTqFgbIDZBy1g/4umujstA2Htc6Ebr1DBePqJbm4dm352BcjhFKqVo
-	 2F7RqVgItXMoZKdUurHmuSGEf2luCN1wrdTKLWLtIRHM/JG4p3GMt+r/FRcVIOtAVh
-	 vME1LG1zfbQtQ==
-Date: Tue, 18 Jun 2024 16:45:45 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: <Woojung.Huh@microchip.com>
-Cc: <dan.carpenter@linaro.org>, <andrew@lunn.ch>, <olteanv@gmail.com>,
- <kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
- <edumazet@google.com>, <davem@davemloft.net>, <o.rempel@pengutronix.de>,
- <Tristram.Ha@microchip.com>, <bigeasy@linutronix.de>, <horms@kernel.org>,
- <ricardo@marliere.net>, <casper.casan@gmail.com>,
- <linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH v1 net-next] net: dsa: Allow only up to two HSR HW
- offloaded ports for KSZ9477
-Message-ID: <20240618164545.14817f7e@wsk>
-In-Reply-To: <BL0PR11MB291397353642C808454F575CE7CE2@BL0PR11MB2913.namprd11.prod.outlook.com>
-References: <20240618130433.1111485-1-lukma@denx.de>
-	<339031f6-e732-43b4-9e83-0e2098df65ef@moroto.mountain>
-	<24b69bf0-03c9-414a-ac5d-ef82c2eed8f6@lunn.ch>
-	<1e2529b4-41f2-4483-9b17-50c6410d8eab@moroto.mountain>
-	<BL0PR11MB291397353642C808454F575CE7CE2@BL0PR11MB2913.namprd11.prod.outlook.com>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	(Authenticated sender: sre)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 35C6B3780629;
+	Tue, 18 Jun 2024 14:48:00 +0000 (UTC)
+Received: by mercury (Postfix, from userid 1000)
+	id D25721060734; Tue, 18 Jun 2024 16:47:59 +0200 (CEST)
+Date: Tue, 18 Jun 2024 16:47:59 +0200
+From: Sebastian Reichel <sebastian.reichel@collabora.com>
+To: Arend Van Spriel <aspriel@gmail.com>
+Cc: Jacobe Zang <jacobe.zang@wesion.com>, kvalo@kernel.org, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, nick@khadas.com, 
+	arend@broadcom.com, linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] dt-bindings: net: wireless: BCM4329 binding: add
+ pci14e4,449d
+Message-ID: <si3gjsfqcixdrwzf4nmxvugpcbrhglchxxm5vwnr52rhsvuflc@5r2g4g2xd7au>
+References: <20240617024341.3106240-1-jacobe.zang@wesion.com>
+ <b6b06a15-b7de-4351-ab9e-5234d2b91496@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/=faO5bG0JahLBSA=3O3EqoV";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="bqocjo5pd32uxgd2"
+Content-Disposition: inline
+In-Reply-To: <b6b06a15-b7de-4351-ab9e-5234d2b91496@gmail.com>
 
---Sig_/=faO5bG0JahLBSA=3O3EqoV
-Content-Type: text/plain; charset=US-ASCII
+
+--bqocjo5pd32uxgd2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Hi Dan, Andrew, Woojung
+Hi,
 
-> Hi Dan & Andrew,
->=20
-> > On Tue, Jun 18, 2024 at 03:52:23PM +0200, Andrew Lunn wrote: =20
-> > > > diff --git a/drivers/net/dsa/microchip/ksz_common.c =20
-> > b/drivers/net/dsa/microchip/ksz_common.c =20
-> > > > index 2818e24e2a51..181e81af3a78 100644
-> > > > --- a/drivers/net/dsa/microchip/ksz_common.c
-> > > > +++ b/drivers/net/dsa/microchip/ksz_common.c
-> > > > @@ -3906,6 +3906,11 @@ static int ksz_hsr_join(struct
-> > > > dsa_switch *ds, =20
-> > int port, struct net_device *hsr, =20
-> > > >             return -EOPNOTSUPP;
-> > > >     }
-> > > >
-> > > > +   if (hweight8(dev->hsr_ports) > 1) {
-> > > > +           NL_SET_ERR_MSG_MOD(extack, "Cannot offload more
-> > > > than two =20
-> > ports (in use=3D0x%x)", dev->hsr_ports); =20
-> > > > +           return -EOPNOTSUPP;
-> > > > +   } =20
-> > >
-> > > Hi Dan
-> > >
-> > > I don't know HSR to well, but this is offloading to hardware, to
-> > > accelerate what Linux is already doing in software. It should be,
-> > > if the hardware says it cannot do it, software will continue to
-> > > do the job. So the extack message should never be seen. =20
+On Tue, Jun 18, 2024 at 01:09:07PM GMT, Arend Van Spriel wrote:
+> On 6/17/2024 4:43 AM, Jacobe Zang wrote:
+> > It's a Broadcom Wi-Fi module connected via the PCIe interface and also
+> > add prefix in vendor-prefix.yaml
 > >=20
-> > Ah.  Okay.  However the rest of the function prints similar messages
-> > and so probably we could remove those error messages as well.  To be
-> > honest, I just wanted something which functioned as a comment and
-> > mentioned "two ports".  Perhaps the condition would be more clear
-> > as =20
-> > >=3D 2 instead of > 1? =20
-> >  =20
+> > Link:https://lore.kernel.org/linux-devicetree/20240617023517.3104427-1-=
+jacobe.zang@wesion.com/T/#u
+> > Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
+> > ---
+> >   .../devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml      | 1 +
+> >   1 file changed, 1 insertion(+)
+> >=20
+> > diff --git a/Documentation/devicetree/bindings/net/wireless/brcm,bcm432=
+9-fmac.yaml b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-f=
+mac.yaml
+> > index e564f20d8f415..0477566acd72a 100644
+> > --- a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.=
+yaml
+> > +++ b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.=
+yaml
+> > @@ -53,6 +53,7 @@ properties:
+> >             - pci14e4,4488  # BCM4377
+> >             - pci14e4,4425  # BCM4378
+> >             - pci14e4,4433  # BCM4387
+> > +          - pci14e4,449d  # BCM4329
 >=20
-> I'm not a HSR expert and so could be a dummy question.
->=20
-> I think this case (upto 2 HSR port offload) is different from other
-> offload error.=20
+> I can not find that device id. Can you provide more information where you
+> came across this device. The BCM4329 as I know it is an 802.11n *SDIO*
+> device. Not a PCI device.
 
-It is not so different.
+It's the device id used by AP6275P, see this discussion from half a
+year ago [0]. It is used by Rockchip's RK3588 evaluation board, which
+apparently resulted in some RK3588 boards using the same chip.
 
-In this case when we'd call:
-ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 interlink lan3
-supervision 45 version 1
+[0] https://patchwork.kernel.org/project/linux-wireless/patch/c7b331edd65b6=
+6521a6605177d654e55051568a3.camel@toradex.com/
 
-lan1 and lan2 are correctly configured as ports, which can use HSR
-offloading on ksz9477.
+Greetings,
 
-However, when we do already have two bits set in hsr_ports, we need to
-return (-ENOTSUPP), so the interlink port (HSR-SAN) would be used with
-SW based HSR interlink support.
+-- Sebastian
 
-Otherwise, I do see some strange behaviour, as some HSR frames are
-visible on HSR-SAN network and vice versa causing switch to drop frames.
-
-Also conceptually - the interlink (i.e. HSR-SAN port) shall be only SW
-supported as it is also possible to use ksz9477 with only SW based HSR
-(i.e. port0/1 -> hsr0 with offloading, port2 -> HSR-SAN/interlink,
-port4/5 -> hsr1 with SW based HSR).
-
-> Others are checking whether offload is possible or
-> not, so SW HSR can kick in when -EOPNOTSUPP returns.=20
-
-Yes, this is exactly the case.
-
-> However, this
-> happens when joining 3rd (2+) port with hardware offload is enabled.
-> It is still working two ports are in HW HSR offload and next ports
-> are in SW HSR?
-
-As written above, it seems like the in-chip VLAN register is modified
-and some frames are passed between HSR and SAN networks, which is wrong.
-
-Best would be to have only two ports with HSR offloading enabled and
-then others with SW based HSR if required.
-
-For me the:
-
-NL_SET_ERR_MSG_MOD(extack, "Cannot offload more than two ports (in
-use=3D0x%x)", dev->hsr_ports);
-
-is fine - as it informs that no more HSR offloading is possible (and
-allows to SW based RedBox/HSR-SAN operation).
-
->=20
-> Thanks.
-> Woojung
-
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/=faO5bG0JahLBSA=3O3EqoV
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+--bqocjo5pd32uxgd2
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmZxnZkACgkQAR8vZIA0
-zr1pDAgAz8iqxMsI8PaedNynjdgMDokKLvfzbsccYcMauZXGlALZ1sKG4xrZ6w6b
-nKRiE6X+EAuCWKLP4d3sTegMP2wg7iAfNFSTwQYltBFndzTPwopi2rf7h5lHQIHV
-w+QxPdn4Dpap0Tcf1Qdb+c+NJzBirrNbNgONrqO5IXgfZA0IsEKxg7tpxj+y8r23
-ygZhw6fSR2As7b0xwy9Oy2f0FZAFXZRpfBgxvHmoj7v2HiRVRx6uuZJMVhU7Ov0q
-wUId3AIiXdrhOdgtyPrS6qTcniWtmPI3vT33KcFZQxzmZOvt5gvIAAJdt2ivuyS0
-OBFpZcy0HUyW2ig31R3SI2RftxSCFQ==
-=A1DY
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmZxnhEACgkQ2O7X88g7
++prHZA/+PhQDVUsUiui4n/4jAvQYSZ6Q5SB7dV1JndGlFwxfs+u8IuBLfSRxID3U
+nAkQTcdiC1cPj1g7NPcoI15IM8Xjejt3x9yF+sd7Vx9QqAikJpyT2K/tZynMnikc
+2z5LOkNkEBTbGSOWTglD4WsLhz3WDYZRkEGE5ff6WmqODuNwRbJdC2FvgVOkHcn2
+hlSSiNeRXW7w6x7HpqHpZZSerauuTIDYSfUMsbnxW8QCKsKv41UwLDWaLy/rplOx
+yIUSrHFcgVvhGpB+cAQnjLcGOqrThJ3fuFghn7a9kIdfnj2Wes98kV8nbewMCLd/
+c+2hRA61BsNNtfli2xHRShQhkmYuzL+/koO4D4Z6rRnxEftLZx0oITarlTkdOChh
+K4pfyQegkK6FM4RJgEwrJh8JrurEwNp3kaVS5nO5S6bHRlrl2R6hZD1B56W70amg
+SChGzcyz4mDl8vIEMhWnLh1jAUCtupJtYpNbWJNvD71ouCMgBmyQQrYVSl5nTM6V
+K+GTtv4Fr8HlvECgQpU7GbqW/RdNz4y7VOyN1ZWkvfu6ilARR7sr+d3LcKRGwm3+
+Ke/Tbjr2VCRy2oUG/T7JO+JutPQABDx9tqhdO7Tzezbp6KZUDnQiz8dKr4YpP4bU
+2N3GcDORymGCwqL3ZwnfU4eWcvRQkgGjuT7iJUPPtsr7LGWQG5s=
+=UN5E
 -----END PGP SIGNATURE-----
 
---Sig_/=faO5bG0JahLBSA=3O3EqoV--
+--bqocjo5pd32uxgd2--
 
