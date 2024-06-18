@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-104677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C91090DF3C
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 00:46:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 770CA90DF35
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 00:45:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DC591C229C5
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 22:46:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 048D71F2364B
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 22:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D12CD185E78;
-	Tue, 18 Jun 2024 22:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 963FE1741EE;
+	Tue, 18 Jun 2024 22:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="fvdmJOQ+"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="IOgZSOtZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2052.outbound.protection.outlook.com [40.107.243.52])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2083.outbound.protection.outlook.com [40.107.244.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082AB185E5A
-	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 22:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E8728DD0
+	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 22:45:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.83
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718750734; cv=fail; b=JLp8mW9lMTdSqUlnR/mF2Enxn673oTYXSCUSbD/WOuBFSOktf7mAbF7BoMHQv8e9aNp+HG0VzsKNYlOd+GKd/7mDcD8k8+jSwnS7BnrnlJLdT0SXej6fkhIq7ZIdVMrTN1dQGhA4Vs8eKxTsPBK9MohAMRhFk0Apq7Sbv8CHHhA=
+	t=1718750728; cv=fail; b=Bbw0vPIvFzTvLUXzBTczWR41/fYDOVG4V4CKIXJRoED9iO0lPI6O0QsAiuTD7KSaF1hSCVuECRoFN938LntLX1wlW5TWi5AJfXAnhrolvFvs7MVV98cKaXHbg8+pItO7rocClPvbgtvi7EeZ/tPBY0gf2BTX8S6qfOMnYeqVkZA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718750734; c=relaxed/simple;
-	bh=NH/i32OBl5qEUbsvhy8xQzaefvZyIFqbjFgLtWNq+F8=;
+	s=arc-20240116; t=1718750728; c=relaxed/simple;
+	bh=juuiHLs2BHljX700KBXmd4jGsVmi7/mm37Y5HR2Hl+c=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r5uxna3qAQq37SZ9TbQyS7+V4eRVe34uqBxGzsrItJ808ORogX5QSfxhRZNQqreM/TjBP1zPjZ1JAHIlnvWyikhu7FjyutdHjhQjV6LJ9gn5NiVD/JeND174IKKJ2rd8iyflhDLfik/KJAf2tXz8eJTePoOKe5bI7AWUbMzp3eg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=fvdmJOQ+; arc=fail smtp.client-ip=40.107.243.52
+	 MIME-Version:Content-Type; b=MvOYFADJvVokR9KETuBQd5ttkGogkoJPExDIDkPOs6R0O0Y0v2qm486IkjmKgd7yW2lBgcmfMntmXaNDQBUGl5nTezTIkRoCA/841fhoPBIEpxDJHScw/5n00MfakpOiu1EAji4ZNzZ7Xe6Le1M931/viBrveTvjMlzZQk1M/As=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=IOgZSOtZ; arc=fail smtp.client-ip=40.107.244.83
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WHk6rB9oriyH+NeMQ9d7uYregRea0XL2QGm/VRvSAcXsiaDb8mXzt5ITKffdLi/oT4q13e6qa6qcgbNZRFj51ZEvTcJ/Ly6td/T0mGWFixIU3YY1DUNuUGHzWuuiahCx9Di11ySCQpm+QfYP9uDXutzKM1I4rLS0O3aHf/ImTc+ylIJlN0QMfsLt9KOjI3q9AEQTq3hS1rQdIa4NS4o1mDCa3pb6bAjvlD/KvasqHJtk/AgqeIOOkZmZmzYgGcpsYvvR4s4WO/UnLudq034jE3fe/fxCRL+boz9FKSRLOvHUtB+aTfd2XXLOr/S12+BIRgWuOfLm/NuY9nWNBxw7fQ==
+ b=ihzfHUYJpKBbE0TW0MqEQP1YUD0AWBawYfaB//4ZN1aRsTUVfJ+C1F3rXnqjdXtg16cR8NwjZomip2iYZwjzFpF1qroG2sHx/F4m86ZQGo0pu0DFrqRebmLKotQPB+QmearjFYfGZ/61c3aOeU/uyUO41D/Zmy6APHPXzJEKm2jBJzurGO7HmxhfaBWHBdgGdeD7rO/GrchRsbZoeIOalfduEkug3tsaVJAqAlTTovLrYZWdNwpQAuATPU00JKE6X4AiZZDbXa6cwJTyS/p45B8KvBZpY7s9W4IXfZKTAmUkOKoJDWQ4V07e++cJMsIaX7NQ5JnvuDMwbeQsQBxb3g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XpOAWH6SolhTy6HM0xygNf0nqLgapjwyT3RRowdZjOQ=;
- b=no4Za68tQSR3XEsZ4OYSJN7HtXVwmOxTyKXz5imZcS7RxJMZyFdKpGWLAugez/WVJ3K5lEuSkP2VUdl7RO3a2QSIu8uzJvIMTlDYznygwQHaLbOaHF9jT+l45/M7up0fQPAxgpNXBuidegvnRCdOxefI4kvUEAxymIsPPM0T3YVYFQlUi/L0SMBK6TEF6+3d/tYQRGoyt/grroZTzbfM0oTZVEn8uhBLWOJGVIQnIKLn2zk4rV28W9j6GPe1+lCiKdj9nrV+/Io3Y7K6jnjbeCEETjFJxBfTd7hRvX85Bqb+OxmDGr50qTMq87QOBZsPs84Ix7WovnP2lSMKlxvqxw==
+ bh=j7PxDsoehu9MdvHtGqyyASPJQFjINpvSHOaXzMmniJQ=;
+ b=W6rXeme9O+hzQzuMstSkEKcWBK8s6zAMaYQG2+1MFNpXbrlmShMDAtQob9FbZwMNz194aooz+aWpaQcVvkrf/JidlaqHZboLOiWARJfPwlI9Z+sqiccK6/8lTdDHJyXz9pqLVKBf0fbENAhTwymFxKn0/NvrTofefbJzRxHjGLHfraTNZIsZlyrOMfmzXc5brZezV5pIwDKF4knC5ZtCZrKOWoviw17SVGUHUWgDBpgBtyZOS8cobM2MrNONWHf/IxYe7Hs7IbHP21H/raDhj1sl/C/tsoCruWuqblEgAYTxi59ihCmTVs7LHJqXgBd20r0NKWaL9sClpx5NWTnOaQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XpOAWH6SolhTy6HM0xygNf0nqLgapjwyT3RRowdZjOQ=;
- b=fvdmJOQ+pl9U/+1M4plxBTVcAcHtCpM1OHBzpQynLeASDyMaalglChAJAgDlHV3RnSZRXQTCBWT6XGrMOteAA3s49dE23gXgEBtu0kKTWwhakOGX10+bhL8EFs7yhha3MPE2vtq+H2wk4WWXgHN/FjMD5df9s9Kf8ny0z5HwDZQ=
-Received: from BLAPR03CA0067.namprd03.prod.outlook.com (2603:10b6:208:329::12)
- by SJ0PR12MB7081.namprd12.prod.outlook.com (2603:10b6:a03:4ae::17) with
+ bh=j7PxDsoehu9MdvHtGqyyASPJQFjINpvSHOaXzMmniJQ=;
+ b=IOgZSOtZ26Y9HNwunAGiIoTMDMcoq7jkZ+ahieQTRZQ+zOb5RVPGEfNv4ignuhwbI1xbQ2yYl/nyxm+en1ZQMck/0dQIinYnO7ejCbGRsUZMtATJII1PdptyRuJcLPsY352JCzWmkKeZx63SnOV0XFUFuLGvtN2SRxj2yqFi2Dg=
+Received: from BLAPR03CA0090.namprd03.prod.outlook.com (2603:10b6:208:329::35)
+ by DS0PR12MB8502.namprd12.prod.outlook.com (2603:10b6:8:15b::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.19; Tue, 18 Jun
- 2024 22:45:21 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Tue, 18 Jun
+ 2024 22:45:23 +0000
 Received: from MN1PEPF0000ECD7.namprd02.prod.outlook.com
- (2603:10b6:208:329:cafe::74) by BLAPR03CA0067.outlook.office365.com
- (2603:10b6:208:329::12) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:208:329:cafe::7) by BLAPR03CA0090.outlook.office365.com
+ (2603:10b6:208:329::35) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.32 via Frontend
- Transport; Tue, 18 Jun 2024 22:45:17 +0000
+ Transport; Tue, 18 Jun 2024 22:45:23 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,15 +65,15 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  MN1PEPF0000ECD7.mail.protection.outlook.com (10.167.242.136) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7677.15 via Frontend Transport; Tue, 18 Jun 2024 22:45:17 +0000
+ 15.20.7677.15 via Frontend Transport; Tue, 18 Jun 2024 22:45:23 +0000
 Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 18 Jun
- 2024 17:45:16 -0500
+ 2024 17:45:19 -0500
 Received: from xcbecree42x.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39 via Frontend
- Transport; Tue, 18 Jun 2024 17:45:14 -0500
+ Transport; Tue, 18 Jun 2024 17:45:16 -0500
 From: <edward.cree@amd.com>
 To: <linux-net-drivers@amd.com>, <davem@davemloft.com>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>
@@ -83,9 +83,9 @@ CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>,
 	<sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
 	<hkelam@marvell.com>, <saeedm@nvidia.com>, <leon@kernel.org>,
 	<jacob.e.keller@intel.com>, <andrew@lunn.ch>, <ahmed.zaki@intel.com>
-Subject: [PATCH v5 net-next 1/7] net: move ethtool-related netdev state into its own struct
-Date: Tue, 18 Jun 2024 23:44:21 +0100
-Message-ID: <03163fb4a362a6f72fc423d6ca7d4e2d62577bcf.1718750587.git.ecree.xilinx@gmail.com>
+Subject: [PATCH v5 net-next 2/7] net: ethtool: attach an XArray of custom RSS contexts to a netdevice
+Date: Tue, 18 Jun 2024 23:44:22 +0100
+Message-ID: <9976837c86b656c1f2bea7753362f4770530f49d.1718750587.git.ecree.xilinx@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <cover.1718750586.git.ecree.xilinx@gmail.com>
 References: <cover.1718750586.git.ecree.xilinx@gmail.com>
@@ -101,283 +101,180 @@ Received-SPF: None (SATLEXMB04.amd.com: edward.cree@amd.com does not designate
  permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD7:EE_|SJ0PR12MB7081:EE_
-X-MS-Office365-Filtering-Correlation-Id: b57f146b-b09f-4edd-ab69-08dc8fe8535b
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD7:EE_|DS0PR12MB8502:EE_
+X-MS-Office365-Filtering-Correlation-Id: 895a5c78-ff7c-4d59-5b68-08dc8fe856f6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230037|1800799021|36860700010|7416011|82310400023|376011;
+	BCL:0;ARA:13230037|82310400023|1800799021|36860700010|7416011|376011;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?37awiuv/4+MtXhXnrgr3U8uctlI+mBFXc8yvfDQkaK5WH7gcAoPcqOYz2qbj?=
- =?us-ascii?Q?5tcuu5IzbeEUxQ3/m30GqMykQpgsaRpr8gDb35nFgFIsevFVh9D1j2kFXyM/?=
- =?us-ascii?Q?y+5ysu+Bgp+WE5zNXLCYt2DCs/LtMR2BeR0YOjpFPfsYKpos9M/cKzRLSIlv?=
- =?us-ascii?Q?cMh4BEApeTbVrnMxDN9CSrSLFO9sDg0Gl/qt1he1XAAeIXAuyWKQ4lfL7rHf?=
- =?us-ascii?Q?sW9y2iucjbhoxc/NPnjHNJ7aUsRaJST8M23LgqcLrpCvKbiCTgWcHJKz8tmV?=
- =?us-ascii?Q?DFO+Vc8yU4qOFfv1U73pVU06CKnCV4j7tuzyc/Wge1Jw2v1EPGSg06kDx9Dv?=
- =?us-ascii?Q?PdF0oqfF7Hs8hdB/flH9iGSbxx1CHaJotm8fRyl7BJLKGitU8gSdSIGjc7Ao?=
- =?us-ascii?Q?UBbsy4/BzKZhMdO6nZtVlOUIUvJfzIiFvTcAlXDdSP4KNqbtBw1c0Qwsd51f?=
- =?us-ascii?Q?ddEqMN5zLXEd8nSTSKjs5QqpvdLYBA8gvMe5P3VrkUs9yvv8uJJL5nlfwqN6?=
- =?us-ascii?Q?NDR7nfvTW8gKaNxFKBz8/JpetMjxC58z90+9sacuRaE26PRtgJMWTZ7BRgSh?=
- =?us-ascii?Q?nl4qyVUaZ77evWgMgxDqS/roujeqIQHLNV0xrfy4rcXV4B/4fAED9vb9sOnB?=
- =?us-ascii?Q?pId1EHPJdRG2Vx4Eh/ZDSNMjLrpFKTpkO12vAUDd40RE/TPkWz00OIbapH55?=
- =?us-ascii?Q?CwmcqZ6+dvpxbsdWNIoJWLMCKtTk/27NRAGJXM6ss+tFzVgPXTkpRriviW0U?=
- =?us-ascii?Q?bNEi8MKDYEaAV7d5sjn4hlvFNcQRfHiFBJuvVmKTGiOzykA41SBJjcgW8K8p?=
- =?us-ascii?Q?+L5qqm476hsMAWrk/G7ZeEgJ+R9JGge4mpkteKU4X8o2d0nf6+gt590AgWBb?=
- =?us-ascii?Q?VxmOXGJLkKNlmNWfrzYzCbNHvp6KO62TecU85r5bcH7dSP04FVE0DB2PWFS8?=
- =?us-ascii?Q?6n4DY+2urMy8caqZMORLnOaKli52cw1i+eefyEC8R1U2CdfdO7AJnhEiKCYV?=
- =?us-ascii?Q?TT/JTFQbC8sy0Nj9fIFJ6KUm/vq2j3nkr09zBGjqY23+/jH8I47GvetSYddE?=
- =?us-ascii?Q?otQZV2mS55+tWDiFiA8zruE4T2cev2QHnFxspKbIN1oO6mhVvfF2qIXtJtRy?=
- =?us-ascii?Q?kb7O44mK4pilaHe8s3BreK/tXYxsHEoyVEHru62VGvgzDEZf0SfGeaKfsPo8?=
- =?us-ascii?Q?HbxcKvxFeoPKhPcz6hGoOcxfPCTqznUpoeKoj62qtiGPg45pHi9AXLzdHrqS?=
- =?us-ascii?Q?D+RStDVmnmshqVOYWssugI3C9WIyasO8GyxtT7Ls5HdwhL/T42av2W0j+MAR?=
- =?us-ascii?Q?CpZQiOuPZ1KpkgDOrb1dhQJ1pb4278FD2LNdmKsbIZtsV5Uf7ln95XADoZOQ?=
- =?us-ascii?Q?uxwj+J15ebgeuxQpR7MYxK7SrG6YO5MasCF+0P48vYQnvEQH+w=3D=3D?=
+	=?us-ascii?Q?4sJb23HhXwUm4IF6pW7r8HiF+gLD7COzZdL/36VsgsJPqEkSQarivxGAZOXM?=
+ =?us-ascii?Q?kYKzWKUu7YIb74ncRp943OEbuSouMvd5vBYbk013NTkNq2iDzzDj+S949ST2?=
+ =?us-ascii?Q?iHDfBQnrcJVlnm+Tr2sVOTIq6+/COe0GYcxD0bG3TScijH9Q47OsrpopSr2u?=
+ =?us-ascii?Q?L4sturYPBMd759MuXAwHEeiYdFvjKTaovsBRm1HQbNoUlMfnfBaLCr0ENQm9?=
+ =?us-ascii?Q?RVZZhXh42FZYANPjd/Lj88FMMffqZjVk+RIKeNPX7+wxXe/Qt0qu/gssxOu1?=
+ =?us-ascii?Q?XgqggIo9kA0Zs/WVNvcJ3WNGfNOJzh6H78cvX63PF0xvqH+gT195CKMMBagQ?=
+ =?us-ascii?Q?nJeiAvBJ8IyHWZDsjRsaagcoZYlPvmGBDn9dHS2FcSvV9r5kTLAVyvslA/vx?=
+ =?us-ascii?Q?TaD2s8CUClKVsmKmdRfR5oP1aCXDT8VfpV6kylllbMCEdX0Vjzhmb5faZ8Fe?=
+ =?us-ascii?Q?i30okGTfdnUSJBIBXDL8KGC1GuLTs+hEDfT1MV/Iqv3m3gbqtr8vOGKVcIOb?=
+ =?us-ascii?Q?Lj/rR0d4fm/u6ypqPDIw++yOoDHQH3RXEvfWGvWPcYzCumSciEgrps7WU5SH?=
+ =?us-ascii?Q?WT1irJXfEibGezOb5pyHxHK7RA+P2p9w/Lw3zOiUnOmDYhizlSZb0FEGvc91?=
+ =?us-ascii?Q?t1AlT5Ku2MThwjVOa9FPKjWsqLGhnj04sVd0RZZ+5yGKSa93QlFDuqGkdXr2?=
+ =?us-ascii?Q?MjGW1CcpNu40P0s/gLX+s3HSSFOcaEGeJiXKX5mISpzfrEiho9mA5ltT8nuI?=
+ =?us-ascii?Q?lU1H5qSt4UCeYMXSKmmkZ626SvKLu9ZT74tm1n/1d0U/Q78VZOaGRCfaZhvs?=
+ =?us-ascii?Q?eqx2+QqDQSYFYfbDAWSRfWAxBUFaeVbCEemg/j6XKynHDfDNmvz5Qep9Xjtc?=
+ =?us-ascii?Q?Rm+Uh/ArZzqly0Noovp8bqG3tZ4laQ2872M4lTa3n8HY6CjqMFf0zSPQ//TX?=
+ =?us-ascii?Q?6uWwwJ9LjB1HmO1D7aE6eP2pbsbJlVVS0itsaCVrbzfO7/8GYv6jDJJ3Ij90?=
+ =?us-ascii?Q?87TLNYxZpmHIZPKZQ69e8cZLlq5g3BBFnNCA7Tc1mFTvypuUzlOner6Nh+mc?=
+ =?us-ascii?Q?CM6y1hOOy2hPW9Ehs0PzyvZuzEYqUKh1lDQo8meR86jlm7O83cuts7SeEbjV?=
+ =?us-ascii?Q?MoBD/ZPreOrqhYcetpd8F0vrsgwJza1uiOFXJEDkd1+pybONN4rufPqm15wd?=
+ =?us-ascii?Q?4MjY842Mr6PqT6kmabVQBskwCf1RJl6dcVjBKUZ616BBqqTPkdUKqGUkHJBj?=
+ =?us-ascii?Q?F+s831Itk/FyV+2duNjrY9dfaiZGm8V93GHBHZ5PW27F2IauvfwJ7UnfCiho?=
+ =?us-ascii?Q?cMXM86I2LqTk48Fip8OffBQII8a3yfx4p+kB/aeU90dCG8ZmY6Bd6uVLMVqP?=
+ =?us-ascii?Q?O0mvObiqTF9b3094D2eE6qcByLelzEkdDvCmPeZigCM8tO6UeA=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(1800799021)(36860700010)(7416011)(82310400023)(376011);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(82310400023)(1800799021)(36860700010)(7416011)(376011);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2024 22:45:17.2844
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2024 22:45:23.3156
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b57f146b-b09f-4edd-ab69-08dc8fe8535b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 895a5c78-ff7c-4d59-5b68-08dc8fe856f6
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	MN1PEPF0000ECD7.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7081
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8502
 
 From: Edward Cree <ecree.xilinx@gmail.com>
 
-net_dev->ethtool is a pointer to new struct ethtool_netdev_state, which
- currently contains only the wol_enabled field.
+Each context stores the RXFH settings (indir, key, and hfunc) as well
+ as optionally some driver private data.
+Delete any still-existing contexts at netdev unregister time.
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 ---
- drivers/net/ethernet/realtek/r8169_main.c        | 4 ++--
- drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c | 4 ++--
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c    | 2 +-
- drivers/net/phy/phy.c                            | 2 +-
- drivers/net/phy/phy_device.c                     | 5 +++--
- drivers/net/phy/phylink.c                        | 2 +-
- include/linux/ethtool.h                          | 8 ++++++++
- include/linux/netdevice.h                        | 7 ++++---
- net/core/dev.c                                   | 4 ++++
- net/ethtool/ioctl.c                              | 2 +-
- net/ethtool/wol.c                                | 2 +-
- 11 files changed, 28 insertions(+), 14 deletions(-)
+ include/linux/ethtool.h | 42 +++++++++++++++++++++++++++++++++++++++++
+ net/core/dev.c          | 31 ++++++++++++++++++++++++++++++
+ 2 files changed, 73 insertions(+)
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 9246ea2118ff..714d2e804694 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -1608,7 +1608,7 @@ static void __rtl8169_set_wol(struct rtl8169_private *tp, u32 wolopts)
- 
- 	if (!tp->dash_enabled) {
- 		rtl_set_d3_pll_down(tp, !wolopts);
--		tp->dev->wol_enabled = wolopts ? 1 : 0;
-+		tp->dev->ethtool->wol_enabled = wolopts ? 1 : 0;
- 	}
- }
- 
-@@ -5478,7 +5478,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		rtl_set_d3_pll_down(tp, true);
- 	} else {
- 		rtl_set_d3_pll_down(tp, false);
--		dev->wol_enabled = 1;
-+		dev->ethtool->wol_enabled = 1;
- 	}
- 
- 	jumbo_max = rtl_jumbo_max(tp);
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-index 46a5a3e95202..e868f7ef4920 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-@@ -37,9 +37,9 @@ static int ngbe_set_wol(struct net_device *netdev,
- 	wx->wol = 0;
- 	if (wol->wolopts & WAKE_MAGIC)
- 		wx->wol = WX_PSR_WKUP_CTL_MAG;
--	netdev->wol_enabled = !!(wx->wol);
-+	netdev->ethtool->wol_enabled = !!(wx->wol);
- 	wr32(wx, WX_PSR_WKUP_CTL, wx->wol);
--	device_set_wakeup_enable(&pdev->dev, netdev->wol_enabled);
-+	device_set_wakeup_enable(&pdev->dev, netdev->ethtool->wol_enabled);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index e894e01d030d..a8119de60deb 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -650,7 +650,7 @@ static int ngbe_probe(struct pci_dev *pdev,
- 	if (wx->wol_hw_supported)
- 		wx->wol = NGBE_PSR_WKUP_CTL_MAG;
- 
--	netdev->wol_enabled = !!(wx->wol);
-+	netdev->ethtool->wol_enabled = !!(wx->wol);
- 	wr32(wx, NGBE_PSR_WKUP_CTL, wx->wol);
- 	device_set_wakeup_enable(&pdev->dev, wx->wol);
- 
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index c4236564c1cd..785182fa5fe0 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1309,7 +1309,7 @@ static irqreturn_t phy_interrupt(int irq, void *phy_dat)
- 		if (netdev) {
- 			struct device *parent = netdev->dev.parent;
- 
--			if (netdev->wol_enabled)
-+			if (netdev->ethtool->wol_enabled)
- 				pm_system_wakeup();
- 			else if (device_may_wakeup(&netdev->dev))
- 				pm_wakeup_dev_event(&netdev->dev, 0, true);
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 6c6ec9475709..473cbc1d497b 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -296,7 +296,7 @@ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
- 	if (!netdev)
- 		goto out;
- 
--	if (netdev->wol_enabled)
-+	if (netdev->ethtool->wol_enabled)
- 		return false;
- 
- 	/* As long as not all affected network drivers support the
-@@ -1984,7 +1984,8 @@ int phy_suspend(struct phy_device *phydev)
- 		return 0;
- 
- 	phy_ethtool_get_wol(phydev, &wol);
--	phydev->wol_enabled = wol.wolopts || (netdev && netdev->wol_enabled);
-+	phydev->wol_enabled = wol.wolopts ||
-+			      (netdev && netdev->ethtool->wol_enabled);
- 	/* If the device has WOL enabled, we cannot suspend the PHY */
- 	if (phydev->wol_enabled && !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
- 		return -EBUSY;
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 02427378acfd..38e4e7c0f7d5 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -2275,7 +2275,7 @@ void phylink_suspend(struct phylink *pl, bool mac_wol)
- {
- 	ASSERT_RTNL();
- 
--	if (mac_wol && (!pl->netdev || pl->netdev->wol_enabled)) {
-+	if (mac_wol && (!pl->netdev || pl->netdev->ethtool->wol_enabled)) {
- 		/* Wake-on-Lan enabled, MAC handling */
- 		mutex_lock(&pl->state_mutex);
- 
 diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index 6fd9107d3cc0..8cd6b3c993f1 100644
+index 8cd6b3c993f1..a68b83a6d61f 100644
 --- a/include/linux/ethtool.h
 +++ b/include/linux/ethtool.h
-@@ -998,6 +998,14 @@ int ethtool_virtdev_set_link_ksettings(struct net_device *dev,
- 				       const struct ethtool_link_ksettings *cmd,
- 				       u32 *dev_speed, u8 *dev_duplex);
- 
-+/**
-+ * struct ethtool_netdev_state - per-netdevice state for ethtool features
-+ * @wol_enabled:	Wake-on-LAN is enabled
-+ */
-+struct ethtool_netdev_state {
-+	unsigned		wol_enabled:1;
-+};
-+
- struct phy_device;
- struct phy_tdr_config;
- struct phy_plca_cfg;
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 85111502cf8f..bd88ecb61598 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -79,6 +79,7 @@ struct xdp_buff;
- struct xdp_frame;
- struct xdp_metadata_ops;
- struct xdp_md;
-+struct ethtool_netdev_state;
- 
- typedef u32 xdp_features_t;
- 
-@@ -1985,8 +1986,6 @@ enum netdev_reg_state {
-  *			switch driver and used to set the phys state of the
-  *			switch port.
-  *
-- *	@wol_enabled:	Wake-on-LAN is enabled
-- *
-  *	@threaded:	napi threaded mode is enabled
-  *
-  *	@net_notifier_list:	List of per-net netdev notifier block
-@@ -1998,6 +1997,7 @@ enum netdev_reg_state {
-  *	@udp_tunnel_nic_info:	static structure describing the UDP tunnel
-  *				offload capabilities of the device
-  *	@udp_tunnel_nic:	UDP tunnel offload state
-+ *	@ethtool:	ethtool related state
-  *	@xdp_state:		stores info on attached XDP BPF programs
-  *
-  *	@nested_level:	Used as a parameter of spin_lock_nested() of
-@@ -2372,7 +2372,6 @@ struct net_device {
- 	struct lock_class_key	*qdisc_tx_busylock;
- 	bool			proto_down;
- 	bool			threaded;
--	unsigned		wol_enabled:1;
- 
- 	struct list_head	net_notifier_list;
- 
-@@ -2383,6 +2382,8 @@ struct net_device {
- 	const struct udp_tunnel_nic_info	*udp_tunnel_nic_info;
- 	struct udp_tunnel_nic	*udp_tunnel_nic;
- 
-+	struct ethtool_netdev_state *ethtool;
-+
- 	/* protected by rtnl_lock */
- 	struct bpf_xdp_entity	xdp_state[__MAX_XDP_MODE];
- 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index c361a7b69da8..29351bbea803 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11065,6 +11065,9 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
- 	dev->real_num_rx_queues = rxqs;
- 	if (netif_alloc_rx_queues(dev))
- 		goto free_all;
-+	dev->ethtool = kzalloc(sizeof(*dev->ethtool), GFP_KERNEL_ACCOUNT);
-+	if (!dev->ethtool)
-+		goto free_all;
- 
- 	strcpy(dev->name, name);
- 	dev->name_assign_type = name_assign_type;
-@@ -11115,6 +11118,7 @@ void free_netdev(struct net_device *dev)
- 		return;
- 	}
- 
-+	kfree(dev->ethtool);
- 	netif_free_tx_queues(dev);
- 	netif_free_rx_queues(dev);
- 
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index e645d751a5e8..998571f05deb 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -1503,7 +1503,7 @@ static int ethtool_set_wol(struct net_device *dev, char __user *useraddr)
- 	if (ret)
- 		return ret;
- 
--	dev->wol_enabled = !!wol.wolopts;
-+	dev->ethtool->wol_enabled = !!wol.wolopts;
- 	ethtool_notify(dev, ETHTOOL_MSG_WOL_NTF, NULL);
- 
- 	return 0;
-diff --git a/net/ethtool/wol.c b/net/ethtool/wol.c
-index 0ed56c9ac1bc..a39d8000d808 100644
---- a/net/ethtool/wol.c
-+++ b/net/ethtool/wol.c
-@@ -137,7 +137,7 @@ ethnl_set_wol(struct ethnl_req_info *req_info, struct genl_info *info)
- 	ret = dev->ethtool_ops->set_wol(dev, &wol);
- 	if (ret)
- 		return ret;
--	dev->wol_enabled = !!wol.wolopts;
-+	dev->ethtool->wol_enabled = !!wol.wolopts;
- 	return 1;
+@@ -159,6 +159,46 @@ static inline u32 ethtool_rxfh_indir_default(u32 index, u32 n_rx_rings)
+ 	return index % n_rx_rings;
  }
  
++/**
++ * struct ethtool_rxfh_context - a custom RSS context configuration
++ * @indir_size: Number of u32 entries in indirection table
++ * @key_size: Size of hash key, in bytes
++ * @priv_size: Size of driver private data, in bytes
++ * @hfunc: RSS hash function identifier.  One of the %ETH_RSS_HASH_*
++ * @input_xfrm: Defines how the input data is transformed. Valid values are one
++ *	of %RXH_XFRM_*.
++ * @indir_no_change: indir was not specified at create time
++ * @key_no_change: hkey was not specified at create time
++ */
++struct ethtool_rxfh_context {
++	u32 indir_size;
++	u32 key_size;
++	u16 priv_size;
++	u8 hfunc;
++	u8 input_xfrm;
++	u8 indir_configured:1;
++	u8 key_configured:1;
++	/* private: driver private data, indirection table, and hash key are
++	 * stored sequentially in @data area.  Use below helpers to access.
++	 */
++	u8 data[] __aligned(sizeof(void *));
++};
++
++static inline void *ethtool_rxfh_context_priv(struct ethtool_rxfh_context *ctx)
++{
++	return ctx->data;
++}
++
++static inline u32 *ethtool_rxfh_context_indir(struct ethtool_rxfh_context *ctx)
++{
++	return (u32 *)(ctx->data + ALIGN(ctx->priv_size, sizeof(u32)));
++}
++
++static inline u8 *ethtool_rxfh_context_key(struct ethtool_rxfh_context *ctx)
++{
++	return (u8 *)(ethtool_rxfh_context_indir(ctx) + ctx->indir_size);
++}
++
+ /* declare a link mode bitmap */
+ #define __ETHTOOL_DECLARE_LINK_MODE_MASK(name)		\
+ 	DECLARE_BITMAP(name, __ETHTOOL_LINK_MODE_MASK_NBITS)
+@@ -1000,9 +1040,11 @@ int ethtool_virtdev_set_link_ksettings(struct net_device *dev,
+ 
+ /**
+  * struct ethtool_netdev_state - per-netdevice state for ethtool features
++ * @rss_ctx:		XArray of custom RSS contexts
+  * @wol_enabled:	Wake-on-LAN is enabled
+  */
+ struct ethtool_netdev_state {
++	struct xarray		rss_ctx;
+ 	unsigned		wol_enabled:1;
+ };
+ 
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 29351bbea803..cc85baa3624b 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -10285,6 +10285,9 @@ int register_netdevice(struct net_device *dev)
+ 	if (ret)
+ 		return ret;
+ 
++	/* rss ctx ID 0 is reserved for the default context, start from 1 */
++	xa_init_flags(&dev->ethtool->rss_ctx, XA_FLAGS_ALLOC1);
++
+ 	spin_lock_init(&dev->addr_list_lock);
+ 	netdev_set_addr_lockdep_class(dev);
+ 
+@@ -11184,6 +11187,32 @@ void synchronize_net(void)
+ }
+ EXPORT_SYMBOL(synchronize_net);
+ 
++static void netdev_rss_contexts_free(struct net_device *dev)
++{
++	struct ethtool_rxfh_context *ctx;
++	unsigned long context;
++
++	xa_for_each(&dev->ethtool->rss_ctx, context, ctx) {
++		struct ethtool_rxfh_param rxfh;
++
++		rxfh.indir = ethtool_rxfh_context_indir(ctx);
++		rxfh.key = ethtool_rxfh_context_key(ctx);
++		rxfh.hfunc = ctx->hfunc;
++		rxfh.input_xfrm = ctx->input_xfrm;
++		rxfh.rss_context = context;
++		rxfh.rss_delete = true;
++
++		xa_erase(&dev->ethtool->rss_ctx, context);
++		if (dev->ethtool_ops->cap_rss_ctx_supported)
++			dev->ethtool_ops->set_rxfh(dev, &rxfh, NULL);
++		else /* can't happen */
++			pr_warn_once("No callback to remove RSS context from %s\n",
++				     netdev_name(dev));
++		kfree(ctx);
++	}
++	xa_destroy(&dev->ethtool->rss_ctx);
++}
++
+ /**
+  *	unregister_netdevice_queue - remove device from the kernel
+  *	@dev: device
+@@ -11287,6 +11316,8 @@ void unregister_netdevice_many_notify(struct list_head *head,
+ 		netdev_name_node_alt_flush(dev);
+ 		netdev_name_node_free(dev->name_node);
+ 
++		netdev_rss_contexts_free(dev);
++
+ 		call_netdevice_notifiers(NETDEV_PRE_UNINIT, dev);
+ 
+ 		if (dev->netdev_ops->ndo_uninit)
 
