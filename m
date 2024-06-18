@@ -1,159 +1,96 @@
-Return-Path: <netdev+bounces-104463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D41290C9DB
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:40:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3464790C9E8
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:42:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24D1C1F22F93
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:40:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 706D928884E
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 204FE156C5E;
-	Tue, 18 Jun 2024 10:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o1ZTi43O"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E12D715821A;
+	Tue, 18 Jun 2024 11:02:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AB7DDDA;
-	Tue, 18 Jun 2024 10:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E47D1581EF;
+	Tue, 18 Jun 2024 11:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718708226; cv=none; b=JTbZDBrbmi29nS/6AG5r6FYNUJZLFHJzTiaFRz+ITnA384fFkvbRZ6bMaV5o9byYLfTIQnDiNN7jTY3zUwjTwx4sZqncXZcJ6W2FmuolhUFEG1cbpLTbo8wiRdBplNa3oJBK/04HpEzMvYnqUSyracWA8erJ2HyOYXpR+tHt2f0=
+	t=1718708541; cv=none; b=G0431QOU1+nAib8yO+ZeBEwPA91tAEydbeUwNUOis0HsmuQjMxO+DppJAO/lRHLqe7qYUq+Chb3yjzDTolo+nQB0LJCTFID50buwbC3nY252L8sHB14PzRRwLDKKYQSsYx4wvUn9qXF14Bwcz6EIyOkpFO4fn3oNzJAs0gQSqhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718708226; c=relaxed/simple;
-	bh=XG0My1/c07ozmDk65TvEOPJoQ8jeo+r+3UR7UrRFX9Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fDIuflyw/02VwP3rwS2OMfWVTqEuEFc8hqmLaGyszto8/5z3K8d09gklzMfXh+ua3GlHD4mj+T8fpD/iQ8jyNYH/ypdgIR7jDa1444PABOu3SnKTtio2DPW/xoFCGZSt0v4+JLEdCM0K9bRN/G5h0VHPHHzwpkDbcmBtwuiZCUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o1ZTi43O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97AEDC4AF48;
-	Tue, 18 Jun 2024 10:57:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718708225;
-	bh=XG0My1/c07ozmDk65TvEOPJoQ8jeo+r+3UR7UrRFX9Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o1ZTi43OV4DFMNq83eALZBNS3qIlWr5eADtosWX4DgtESBzUNdTR/d2EzaJmsu/bO
-	 cnMqrA0Ud+oRE5gVAefVlysGPl7G7oSxTN6bepTEZBfDUmO0Jlpb7FU80CWs+LcjLI
-	 BiASfcHx02cUPHf15TKw0hKk3Rp+mhHAxq45ZCKz5VUiDeFkuqE0oL8QEiGlw4p73A
-	 t39OEeM3WlcMTMZaDOftM2hoeGgbGwtN2HytKqCDaLMHt/Y5GCh9th8sfOXzUhvKQJ
-	 EPXVN7uLfojG1BRJvKdq+b9SfOWltzE8MgxKt+eJJ9LY02fZzf7sTfd974GDmXeKTx
-	 mjfcSoil3sgiA==
-Date: Tue, 18 Jun 2024 11:56:59 +0100
-From: Simon Horman <horms@kernel.org>
-To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
-Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	linux@armlinux.org.uk, vadim.fedorenko@linux.dev, andrew@lunn.ch,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, git@amd.com
-Subject: Re: [PATCH net-next v6 3/4] net: macb: Add ARP support to WOL
-Message-ID: <20240618105659.GL8447@kernel.org>
-References: <20240617070413.2291511-1-vineeth.karumanchi@amd.com>
- <20240617070413.2291511-4-vineeth.karumanchi@amd.com>
+	s=arc-20240116; t=1718708541; c=relaxed/simple;
+	bh=JmMqCzUFzGdntw8cFxUiHsUFzFPMlt7PsprJzWJyifA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=bihPj+V+zLiX+vHh0+sLPa2PaDweqI7aBmNOQBJprwWjsHTw7iDoD2dxbnJwB1oqt49cee3Bhh2dxJLQl/kajTbwxgEG+pSCoTUT4LobV7UJO+H3IydYufP5t41Df/fM3wpSTq8V1/8xTOpA2jPiT7aSujLqYfk81us5iwME8hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 45IB1VAS0398675, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 45IB1VAS0398675
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 18 Jun 2024 19:01:31 +0800
+Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 18 Jun 2024 19:01:31 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXDAG02.realtek.com.tw (172.21.6.101) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 18 Jun 2024 19:01:30 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Tue, 18 Jun 2024 19:01:30 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Markus Elfring <Markus.Elfring@web.de>, Simon Horman <horms@kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, LKML <linux-kernel@vger.kernel.org>,
+        Andrew Lunn
+	<andrew@lunn.ch>, Hariprasad Kelam <hkelam@marvell.com>,
+        Jiri Pirko
+	<jiri@resnulli.us>, Larry Chiu <larry.chiu@realtek.com>,
+        Ping-Ke Shih
+	<pkshih@realtek.com>,
+        Ratheesh Kannoth <rkannoth@marvell.com>
+Subject: RE: [v20 02/13] rtase: Implement the .ndo_open function
+Thread-Topic: [v20 02/13] rtase: Implement the .ndo_open function
+Thread-Index: AQHawJ5eL1A+vv787Ey/gTxPzZ037bHL8dBA///X7QCAABcWAIABe3RQ
+Date: Tue, 18 Jun 2024 11:01:30 +0000
+Message-ID: <d8ca31ba65364e60af91bca644a96db5@realtek.com>
+References: <20240607084321.7254-3-justinlai0215@realtek.com>
+ <1d01ece4-bf4e-4266-942c-289c032bf44d@web.de>
+ <ef7c83dea1d849ad94acef81819f9430@realtek.com>
+ <6b284a02-15e2-4eba-9d5f-870a8baa08e8@web.de>
+ <0c57021d0bfc444ebe640aa4c5845496@realtek.com>
+ <20240617185956.GY8447@kernel.org>
+ <202406181007.45IA7eWxA3305754@rtits1.realtek.com.tw>
+In-Reply-To: <202406181007.45IA7eWxA3305754@rtits1.realtek.com.tw>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240617070413.2291511-4-vineeth.karumanchi@amd.com>
 
-On Mon, Jun 17, 2024 at 12:34:12PM +0530, Vineeth Karumanchi wrote:
-> Extend wake-on LAN support with an ARP packet.
-> 
-> Currently, if PHY supports WOL, ethtool ignores the modes supported
-> by MACB. This change extends the WOL modes with MACB supported modes.
-> 
-> Advertise wake-on LAN supported modes by default without relying on
-> dt node. By default, wake-on LAN will be in disabled state.
-> Using ethtool, users can enable/disable or choose packet types.
-> 
-> For wake-on LAN via ARP, ensure the IP address is assigned and
-> report an error otherwise.
-> 
-> Co-developed-by: Harini Katakam <harini.katakam@amd.com>
-> Signed-off-by: Harini Katakam <harini.katakam@amd.com>
-> Signed-off-by: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
-
-...
-
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-
-...
-
-> @@ -84,8 +85,7 @@ struct sifive_fu540_macb_mgmt {
->  #define GEM_MTU_MIN_SIZE	ETH_MIN_MTU
->  #define MACB_NETIF_LSO		NETIF_F_TSO
->  
-> -#define MACB_WOL_HAS_MAGIC_PACKET	(0x1 << 0)
-> -#define MACB_WOL_ENABLED		(0x1 << 1)
-> +#define MACB_WOL_ENABLED		(0x1 << 0)
-
-
-nit: BIT() could be used here
-
->  
->  #define HS_SPEED_10000M			4
->  #define MACB_SERDES_RATE_10G		1
-
-...
-
-> @@ -5290,6 +5289,14 @@ static int __maybe_unused macb_suspend(struct device *dev)
->  		macb_writel(bp, TSR, -1);
->  		macb_writel(bp, RSR, -1);
->  
-> +		tmp = (bp->wolopts & WAKE_MAGIC) ? MACB_BIT(MAG) : 0;
-> +		if (bp->wolopts & WAKE_ARP) {
-> +			tmp |= MACB_BIT(ARP);
-> +			/* write IP address into register */
-> +			tmp |= MACB_BFEXT(IP,
-> +					 (__force u32)(cpu_to_be32p((uint32_t *)&ifa->ifa_local)));
-
-Hi Vineeth and Harini,
-
-I guess I must be reading this wrong, beause I am confused
-by the intent of the endeness handling above.
-
-* ifa->ifa_local is a 32-bit big-endian value
-
-* It's address is cast to a 32-bit host-endian pointer
-
-  nit: I think u32 would be preferable to uint32_t; this is kernel code.
-
-* The value at this address is then converted to a host byte order value.
-
-  nit: Why is cpu_to_be32p() used here instead of the more commonly used
-       cpu_to_be32() ?
-
-  More importantly, why is a host byte order value being converted from
-  big-endian to host byte order?
-
-* The value returned by cpu_to_be32p, which is big-endian, because
-  that is what that function does, is then cast to host-byte order.
-
-
-So overall we have:
-
-1. Cast from big endian to host byte order
-2. Conversion from host byte order to big endian
-   (a bytes-swap on litte endian hosts; no-op on big endian hosts)
-3. Cast from big endian to host byte oder
-
-All three of these steps seem to warrant explanation.
-And the combination is confusing to say the least.
-
-
-> +		}
-> +
->  		/* Change interrupt handler and
->  		 * Enable WoL IRQ on queue 0
-
-...
+PiANCj4gPiBJIHdvdWxkIGFsc28gc3VnZ2VzdCByZWFkaW5nIE1hcmt1cydzIGFkdmljZSB3aXRo
+IGR1ZSBjYXJlLCBhcyBpdCBpcw0KPiA+IG5vdCBhbHdheXMgYWxpZ25lZCB3aXRoIGJlc3QgcHJh
+Y3RpY2UgZm9yIE5ldHdvcmtpbmcgY29kZS4NCj4gDQo+IEkgZGFyZSB0byBwcm9wb3NlIGZ1cnRo
+ZXIgY29sbGF0ZXJhbCBldm9sdXRpb24gYWNjb3JkaW5nIHRvIGF2YWlsYWJsZQ0KPiBwcm9ncmFt
+bWluZyBpbnRlcmZhY2VzLg0KPiANCj4gUmVnYXJkcywNCj4gTWFya3VzDQoNClRoYW5rIHlvdSBm
+b3IgeW91ciBzdWdnZXN0aW9uLCBidXQgc2luY2Ugd2Ugc3RpbGwgbmVlZCB0byBzdXJ2ZXkgdGhl
+IG5ldw0KbWV0aG9kLCB3ZSB3YW50IHRvIHVzZSB0aGUgZ290byBtZXRob2QgZm9yIHRoaXMgY3Vy
+cmVudCB2ZXJzaW9uIG9mIHRoZQ0KcGF0Y2ggYW5kIG1ha2UgbW9kaWZpY2F0aW9ucyBiYXNlZCBv
+biBTaW1vbidzIHN1Z2dlc3Rpb25zLg0K
 
