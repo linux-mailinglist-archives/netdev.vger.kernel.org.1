@@ -1,148 +1,111 @@
-Return-Path: <netdev+bounces-104383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07D8A90C483
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 09:40:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D06B190C486
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 09:42:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 429EC1F22F56
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 07:40:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6B7F283924
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 07:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BF5113AA37;
-	Tue, 18 Jun 2024 07:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613EF15B133;
+	Tue, 18 Jun 2024 07:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="dKTpAEYR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62ABC15B0F0;
-	Tue, 18 Jun 2024 07:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16AF813AD2F
+	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 07:27:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718695630; cv=none; b=BS/Od/u12tDVspxyZCsqYfmAcb1EZ2H0ULbgks4L4US1A37R4w2Asr4ulqpCeiuSgbqrurP8SsiOPxAWSXffKcAOlNwoiLLa2oiNmEtDFKxpL7M2+x4mQRfsRDK7rEQi2DUXSCF6Rts4DOF9TuUjQxnCnmlXHThUwdD3nhGmB00=
+	t=1718695638; cv=none; b=mZ67dsZpNNUE1i2i4in/5+JY/aQWs7x9FaH9j2XTU3YifxKJgneIALetdj2k7RE4olAtYF26+ngQjaaNcB+lrvb3d0nwP7plDZ/Ys5P86GsxZkaFXUrH+xCKwjbrRKtkNjAbUjpzJ9bnchtluo12KKoNAYVrhoLGdATf5nOAyp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718695630; c=relaxed/simple;
-	bh=v+8kEJ1OUngwE8rxso5D9lb/3tGgmgmX7ZUQc61K5XI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nUC5rSUQqljSusl1t/tSehy9J3+8ZDyiQlbs+xL/ho3m3INua5cxUaJzEERjBL/cz3CDcxHwfU6LxDRNS2QgOhDtw4EG06OnxyLxq5GTFBFHw+Ys8f8JJ5iequkrWOP3oaB/sj4SdWKg8Oq23jVN56pHRoEGOs3Idd27xkixVZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 67bed1d82d4311ef9305a59a3cc225df-20240618
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.38,REQID:57452060-6d28-4dc8-8c16-2a184e905e64,IP:25,
-	URL:0,TC:0,Content:9,EDM:0,RT:0,SF:1,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:35
-X-CID-INFO: VERSION:1.1.38,REQID:57452060-6d28-4dc8-8c16-2a184e905e64,IP:25,UR
-	L:0,TC:0,Content:9,EDM:0,RT:0,SF:1,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:35
-X-CID-META: VersionHash:82c5f88,CLOUDID:9d76cedba94e646680ad55363fc6a752,BulkI
-	D:2406171554551IQWSKXU,BulkQuantity:1,Recheck:0,SF:24|72|19|42|74|57|66|81
-	7|102,TC:nil,Content:4|-5,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:40,QS:ni
-	l,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 1,FCT|NGT
-X-CID-BAS: 1,FCT|NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_8B, HR_CTT_MISS
-	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_SJ_LANG
-	HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE, HR_SJ_PHRASE_LEN
-	HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME, IP_TRUSTED
-	SRC_TRUSTED, DN_TRUSTED, SA_UNTRUSTED, SA_UNFAMILIAR, SN_UNTRUSTED
-	SN_UNFAMILIAR, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_BAD
-	CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU
-	AMN_T1, AMN_GOOD, AMN_C_TI, AMN_C_BU, ABX_MISS_RDNS
-X-UUID: 67bed1d82d4311ef9305a59a3cc225df-20240618
-X-User: lihongfu@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.255)] by mailgw.kylinos.cn
-	(envelope-from <lihongfu@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 2042290132; Tue, 18 Jun 2024 15:21:39 +0800
-From: Hongfu Li <lihongfu@kylinos.cn>
-To: yanjun.zhu@linux.dev
-Cc: allison.henderson@oracle.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	lihongfu@kylinos.cn,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	rds-devel@oss.oracle.com
-Subject: [PATCH] rds:Simplify the allocation of slab caches
-Date: Tue, 18 Jun 2024 15:21:21 +0800
-Message-Id: <20240618072121.67838-1-lihongfu@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <5a2cbc3e-bb37-4753-9c47-b196399ecf0a@linux.dev>
-References: <5a2cbc3e-bb37-4753-9c47-b196399ecf0a@linux.dev>
+	s=arc-20240116; t=1718695638; c=relaxed/simple;
+	bh=uXOh84tRw7JM0hk61OuwPn77OEQNmgd7xadk/+3HU5E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=obWS+jjtb2/pbxdB+bhTAqGIP7D4A/Xn8bFF2UAG2TViYI8U69tSrJjPXrFY34WFDJpn4c6LRQat8nPByz2jvdZEUfX1p+Oep8ev3gZq2TVtv+RYixNcnZFWA7BDLZmMtJsVI27sKJ9xDTvBFQgFyZjA2XSopk0vRdqoel68Fa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=dKTpAEYR; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3621ac606e1so146939f8f.1
+        for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 00:27:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718695634; x=1719300434; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uXOh84tRw7JM0hk61OuwPn77OEQNmgd7xadk/+3HU5E=;
+        b=dKTpAEYR0EfqNEUMQLF3IaIKN+2JHfsqY/X2eKtG/pQp2mCXIIGACX8hbYqS5npeDC
+         2xMP1AlX/M701oEikBf8HPuc2RuTNg53ewJnpNmjlfh4V2KmDvBMqQj7aGyniWHHIkXv
+         euFfhytYMpbJEvglUkONPKXBZpeJi7+KLmeJP83fTQlBhtmO16IDiehiwl//2kGc+4Pf
+         Nay4mCdIGwx4wQGt5b0vCixykGkB3hzEx4p6JxRXzbO5lzR11VQpwAgNtyBeqYsMAQDn
+         nFgoIzqI3qwpymUYFr8k2gmC8Y9C4wIyTCejRDIWbYwbRXsiI2GCaeZ9ytggUc96C7tp
+         AszQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718695634; x=1719300434;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uXOh84tRw7JM0hk61OuwPn77OEQNmgd7xadk/+3HU5E=;
+        b=gxj2Rmn8rruKxtsnfPuuCtrY9PztxymOIRk1RqORV8IkzMqflYmyGra0hhYavzdKLx
+         3KaC54ddvKLwm2CrLR7/VkbuExlHIc6QfeGNJsM1hPgzd+xzqSHSyhpuHNklhjFwxUZj
+         ZaolaHagENxIOZJAjxJbDUpwyxBxxNJuYv3l6Y/hIdcZSjYeavmrJ0aXCVDgSNLMuaVJ
+         of/8YUU0xoeVYX7b/ktNMUavrQ6oJ71087OkIuy2eWhEUb+t3CRseWz5CtfPL6B5Vlr7
+         6Q4AXWsz0DXJIo6AER/d7GhQXPnQRzmVvwykHVJzH6tR/eu4ugEfsqqjtweDKmAUDEh9
+         DUlA==
+X-Gm-Message-State: AOJu0Yw2c9tLizYhxnMx6kr9iL9gYs1os9xqPTb8xivuSUKDy9s8+oc+
+	ZQDaEh+FW/k01kA8fidt738Nz+ISamFHnxD/3a0+DJjTx2TMLOMbH6r/12SALrBJtZlSvCd7evO
+	mlxc=
+X-Google-Smtp-Source: AGHT+IEiD9HPWMksGb86K4t83TwefsWnTek/Dk85JIPTZqVAnQILOfjJTHtlUYKReFRU83zE7UTQbA==
+X-Received: by 2002:a5d:44c3:0:b0:362:2af4:43cc with SMTP id ffacd0b85a97d-3622af444f3mr689891f8f.19.1718695634106;
+        Tue, 18 Jun 2024 00:27:14 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3608accd8b3sm8044223f8f.71.2024.06.18.00.27.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jun 2024 00:27:13 -0700 (PDT)
+Date: Tue, 18 Jun 2024 09:27:10 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [TEST] virtio tests need veth?
+Message-ID: <ZnE2zkSHyg5miJSq@nanopsycho.orion>
+References: <20240617072614.75fe79e7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240617072614.75fe79e7@kernel.org>
 
->> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
->> to simplify the creation of SLAB caches.
->> 
->> Signed-off-by: Hongfu Li <lihongfu@kylinos.cn>
->> ---
->>   net/rds/tcp.c      | 4 +---
->>   net/rds/tcp_recv.c | 4 +---
->>   2 files changed, 2 insertions(+), 6 deletions(-)
->> 
->> diff --git a/net/rds/tcp.c b/net/rds/tcp.c
->> index d8111ac83bb6..3dc6956f66f8 100644
->> --- a/net/rds/tcp.c
->> +++ b/net/rds/tcp.c
->> @@ -719,9 +719,7 @@ static int __init rds_tcp_init(void)
->>   {
->>   	int ret;
->>   
->> -	rds_tcp_conn_slab = kmem_cache_create("rds_tcp_connection",
->> -					      sizeof(struct rds_tcp_connection),
->> -					      0, 0, NULL);
->> +	rds_tcp_conn_slab = KMEM_CACHE(rds_tcp_connection, 0);
-
->KMEM_CACHE is declared as below:
+Mon, Jun 17, 2024 at 04:26:14PM CEST, kuba@kernel.org wrote:
+>Hi Jiri!
 >
->/*
->  * Please use this macro to create slab caches. Simply specify the
->  * name of the structure and maybe some flags that are listed above.
->  *
->  * The alignment of the struct determines object alignment. If you
->  * f.e. add ____cacheline_aligned_in_smp to the struct declaration
->  * then the objects will be properly aligned in SMP configurations.
->  */
->#define KMEM_CACHE(__struct, __flags)                                   \
->                 kmem_cache_create(#__struct, sizeof(struct __struct),   \
->                         __alignof__(struct __struct), (__flags), NULL)
+>I finally hooked up the virtio tests to NIPA.
+>Looks like they are missing CONFIG options?
 
-Sorry, I'll check it carefully next time.
+Could you add:
+CONFIG_NET_L3_MASTER_DEV=y
+CONFIG_IPV6_MULTIPLE_TABLES=y
+CONFIG_NET_VRF=m
+CONFIG_BPF_SYSCALL=y
+CONFIG_CGROUP_BPF=y
+CONFIG_IPV6=y
+?
 
-Thanks, 
+They are in tools/testing/selftests/net/forwarding/config and I assumed
+since virtio tests depend on net/forwarding/lib.sh, it is not needed to
+repeat the config options in tools/testing/selftests/drivers/net/virtio_net/config
+Apparently that was false assumption.
 
-Hongfu Li
+Will send patch adding it once you confirm it helped if that is okay
+with you .
 
->>   	if (!rds_tcp_conn_slab) {
->>   		ret = -ENOMEM;
->>   		goto out;
->> diff --git a/net/rds/tcp_recv.c b/net/rds/tcp_recv.c
->> index c00f04a1a534..7997a19d1da3 100644
->> --- a/net/rds/tcp_recv.c
->> +++ b/net/rds/tcp_recv.c
->> @@ -337,9 +337,7 @@ void rds_tcp_data_ready(struct sock *sk)
->>   
->>   int rds_tcp_recv_init(void)
->>   {
->> -	rds_tcp_incoming_slab = kmem_cache_create("rds_tcp_incoming",
->> -					sizeof(struct rds_tcp_incoming),
->> -					0, 0, NULL);
->> +	rds_tcp_incoming_slab = KMEM_CACHE(rds_tcp_incoming, 0);
->>   	if (!rds_tcp_incoming_slab)
->>   		return -ENOMEM;
->>   	return 0;
+Thanks!
+
 
