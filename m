@@ -1,248 +1,150 @@
-Return-Path: <netdev+bounces-104605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB2D390D8DB
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 18:17:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B1A590D8DF
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 18:17:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 677471F26647
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:17:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5393F1F26834
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:17:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99191E877;
-	Tue, 18 Jun 2024 16:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF7B8061D;
+	Tue, 18 Jun 2024 16:14:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="nwyVp0VM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gx5MAdQL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FEA7524C4;
-	Tue, 18 Jun 2024 16:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2FFF77101;
+	Tue, 18 Jun 2024 16:13:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718727222; cv=none; b=H5GH9vWLUSjXbsJtnHWBDzEuhtOm8Lqi0Sy3E+P/lR1Y09M/jYBUWUvGO3BGztX7zqEmAxKQssZ1AbiBDxLUW9xuvdUNlmOTp9vQrMIuCwjFFXDwaf6Zw29gwY6mv8svHotjzu4jY64GMnMGFuVwjeakp/XiVUwdLEDxH3Yvyig=
+	t=1718727241; cv=none; b=u5CqycKbxqmqp6eUts/E4cD0sM1BtqgV6RTVdhxfmtR8DdW0fV67/WNCgYNvJU6lGnsTcy9XT+dST0zgfNNgbV03E5McSuhwN43/Kzj25oq2eKG99gOliKyNdTBBPJ+dki6La8jMt5RN4p+gm9KFl0kKH7o2yzYs1DyPRrOjtAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718727222; c=relaxed/simple;
-	bh=K+ZgJRFtcOw1rvXzvtOs8fHZi5JIhFJypsiDrxlBV/8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XK3YE5Ch5zN+fsgRB8T1zB4zvA8/cpN/WbRttKfyWYO4JHrGNFvCOW7Z0Vn4WSQl5h8HTdVdIA68nG+m7sHPYOrzoGDCNP+T7PizHvnPxEFab5YfR+J0cVwCrkKQlwuAAQYFuLPks8LSmKm2b3+PX6fu3xgzWyLMqOR6PNpiP6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=nwyVp0VM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84F7CC3277B;
-	Tue, 18 Jun 2024 16:13:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1718727222;
-	bh=K+ZgJRFtcOw1rvXzvtOs8fHZi5JIhFJypsiDrxlBV/8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nwyVp0VMfXCZrdbsz9rtAx8aZBePsTR9hUjLpC/vvhU8Ehl49q+E6vTHibV5ZtK2u
-	 m0HyFPErmMnCPJb1qD+lXGF1wVKPM5hYh34Jptb2ecD4oODfd10HZ4YBxKv27goA1/
-	 pw7aHIiTE1A2F5orTYA0GTaUHhEKWtBnhnLGdbDE=
-Date: Tue, 18 Jun 2024 18:13:38 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Shay Drory <shayd@nvidia.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	kuba@kernel.org, edumazet@google.com, david.m.ertman@intel.com,
-	rafael@kernel.org, ira.weiny@intel.com, linux-rdma@vger.kernel.org,
-	leon@kernel.org, tariqt@nvidia.com, Parav Pandit <parav@nvidia.com>
-Subject: Re: [PATCH net-next v7 1/2] driver core: auxiliary bus: show
- auxiliary device IRQs
-Message-ID: <2024061849-cupped-throwback-4fee@gregkh>
-References: <20240618150902.345881-1-shayd@nvidia.com>
- <20240618150902.345881-2-shayd@nvidia.com>
+	s=arc-20240116; t=1718727241; c=relaxed/simple;
+	bh=eXst0iPbk4Bb/LthjJ/eB/W1T9uteyF/EYvmEJ3Pnto=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=c/YrAU8TmsToY6T7CLISslUZFCfo5eKQTV+tc87B1srVBk8PFne35RxkWN7fMv9Gl0gQAdNgf832Bpq3ryOtIWxnJyWyhNXbqkwV1+Dhlhp2jJ2GOEQqhZNL23QZd+iK2mBFxSaNKuVtmK2lmttx0Wzoiajs0fKFNy7718LpYi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gx5MAdQL; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a689ad8d1f6so684079666b.2;
+        Tue, 18 Jun 2024 09:13:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718727238; x=1719332038; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WWTx77d5eJnGnctm36s2wsX3pxrVWFjQDRGqkPWp/lw=;
+        b=gx5MAdQLeeCmHvUj5R5LdL+pkt22WNMZVMP+Zr+HhlwnvYCkfL7hRfRkPEfKqHEmk9
+         mDEmbbGC8f2iT7s7KyATQmQWtN+hrMiKra8GaOYAqLMm7XRy28p8QzmsYnXuuLDW6j9E
+         OmeftvxjzMgPyfl1vaKLtJC07u9p9EFS+GguO+Fng1AvrHHmllbGJRHYuffu13A8fgkp
+         GmQ8zpumNEG8Y91D66I90KfLwAeUjghYS2to7q+re3RYvTRsIKabnCLItMTgTpqkbNUh
+         sp26K9FFc81wfarIXjYyMH7Vs507LXz+mpXLLZ5vxOMnw6n1cJthU3t3nfOHggfjTxF3
+         8gUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718727238; x=1719332038;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WWTx77d5eJnGnctm36s2wsX3pxrVWFjQDRGqkPWp/lw=;
+        b=jmah7AsIJ3uPg5IW7SZiaucYa55MQGMXCqaJkXTaWI9SGMejbgOp7BXvylWfSlpdsy
+         Pm4pwVMpTDheJKEays4tX2ZOOpoAZ0tAzEo3Jrd0uFEXRlW5ZDwpBMSlmVNX+w/zym5s
+         L33bRYsQ4tcCanRFpRj8YJD5sRpZsBOPUzIBjgx8083b2lGC5/5IBQmYKODPOEDxY5Un
+         cFksAiXqTR5ZDpdY668xDMoALUnUqHoqjoxLshiULpcf8Rqms7w5OTUW7a53FBKa2D6d
+         EbKyLkPw3dvwkMxyVHP+WvilapNJh4TsCGNfBPb8NfaDWFTPn1MrGYMC2/7x79ETWSaS
+         yMJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUenZTo0EeeTJamzGohlM0Tjrz/qOqt3WD1kUDy2NAVw2LjyWYevFgoaOOALN1/b64K0LCOpX+u7xzPEWDmnKGlpRIPn6nP2xfO5txARYkH5vns6y1EaewNCkXPhVZMYa2CLRHvxqzV/RH2gevRvkB6XKu+VqM4CgcPG3QfIeNX3w==
+X-Gm-Message-State: AOJu0YxMLTOhiUd+RJzc7nn/peCEz/VGuRB57uHl2QuyENEizEdc8doA
+	m2AnHS75/fD9mRXXFSSMCUwzAaUWm9j7J8ZVJ/VLttR/9Nq0DlHF
+X-Google-Smtp-Source: AGHT+IFrJd2P1zNowiuFxfXKuLeFkY8i8OFcYY9grJ9wDu0sz0akTQp39THa3fEyzQyVz6uSY4TVxw==
+X-Received: by 2002:a17:907:a645:b0:a6f:8f20:a0b with SMTP id a640c23a62f3a-a6f8f200abcmr324363766b.30.1718727238121;
+        Tue, 18 Jun 2024 09:13:58 -0700 (PDT)
+Received: from ?IPV6:2a02:a449:4071:1:32d0:42ff:fe10:6983? (2a02-a449-4071-1-32d0-42ff-fe10-6983.fixed6.kpn.net. [2a02:a449:4071:1:32d0:42ff:fe10:6983])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56dd3109sm633560966b.95.2024.06.18.09.13.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Jun 2024 09:13:57 -0700 (PDT)
+Message-ID: <12f50bef-ba6e-4d96-8ced-08682c931da9@gmail.com>
+Date: Tue, 18 Jun 2024 18:13:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240618150902.345881-2-shayd@nvidia.com>
+User-Agent: Mozilla Thunderbird
+From: Johan Jonker <jbx6244@gmail.com>
+Subject: [PATCH v1 1/3] ARM: dts: rockchip: rk3xxx: fix emac node
+To: heiko@sntech.de
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <0b889b87-5442-4fd4-b26f-8d5d67695c77@gmail.com>
+Content-Language: en-US
+In-Reply-To: <0b889b87-5442-4fd4-b26f-8d5d67695c77@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 18, 2024 at 06:09:01PM +0300, Shay Drory wrote:
-> diff --git a/drivers/base/auxiliary_sysfs.c b/drivers/base/auxiliary_sysfs.c
-> new file mode 100644
-> index 000000000000..3f112fd26e72
-> --- /dev/null
-> +++ b/drivers/base/auxiliary_sysfs.c
-> @@ -0,0 +1,110 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES
-> + */
-> +
-> +#include <linux/auxiliary_bus.h>
-> +#include <linux/slab.h>
-> +
-> +struct auxiliary_irq_info {
-> +	struct device_attribute sysfs_attr;
-> +};
-> +
-> +static struct attribute *auxiliary_irq_attrs[] = {
-> +	NULL
-> +};
-> +
-> +static const struct attribute_group auxiliary_irqs_group = {
-> +	.name = "irqs",
-> +	.attrs = auxiliary_irq_attrs,
-> +};
-> +
-> +static int auxiliary_irq_dir_prepare(struct auxiliary_device *auxdev)
-> +{
-> +	int ret = 0;
-> +
-> +	mutex_lock(&auxdev->lock);
-> +	if (auxdev->dir_exists)
-> +		goto unlock;
+In the combined DT of rk3066a/rk3188 the emac node uses as place holder
+the compatible string "snps,arc-emac". The last real user nSIM_700
+of the "snps,arc-emac" compatible string in a driver was removed in 2019.
+Rockchip emac nodes don't make use of this common fall back string.
+In order to removed unused driver code replace this string with
+"rockchip,rk3066-emac".
+As we are there remove the blank lines and sort.
 
-You do know about cleanup.h, right?  Please use it.
+Signed-off-by: Johan Jonker <jbx6244@gmail.com>
+---
 
-But what exactly are you trying to protect here?  How will you race and
-add two irqs at the same time?  Driver probe is always single threaded,
-so what would be calling this at the same time from multiple places?
+[PATCH 8/8] ARC: nSIM_700: remove unused network options
+https://lore.kernel.org/all/20191023124417.5770-9-Eugeniy.Paltsev@synopsys.com/
+---
+ arch/arm/boot/dts/rockchip/rk3066a.dtsi | 4 ----
+ arch/arm/boot/dts/rockchip/rk3xxx.dtsi  | 7 ++-----
+ 2 files changed, 2 insertions(+), 9 deletions(-)
 
+diff --git a/arch/arm/boot/dts/rockchip/rk3066a.dtsi b/arch/arm/boot/dts/rockchip/rk3066a.dtsi
+index 5e0750547ab5..3f6d49459734 100644
+--- a/arch/arm/boot/dts/rockchip/rk3066a.dtsi
++++ b/arch/arm/boot/dts/rockchip/rk3066a.dtsi
+@@ -896,7 +896,3 @@ &vpu {
+ &wdt {
+ 	compatible = "rockchip,rk3066-wdt", "snps,dw-wdt";
+ };
+-
+-&emac {
+-	compatible = "rockchip,rk3066-emac";
+-};
+diff --git a/arch/arm/boot/dts/rockchip/rk3xxx.dtsi b/arch/arm/boot/dts/rockchip/rk3xxx.dtsi
+index f37137f298d5..e6a78bcf9163 100644
+--- a/arch/arm/boot/dts/rockchip/rk3xxx.dtsi
++++ b/arch/arm/boot/dts/rockchip/rk3xxx.dtsi
+@@ -194,17 +194,14 @@ usb_host: usb@101c0000 {
+ 	};
 
-> +
-> +	xa_init(&auxdev->irqs);
-> +	ret = devm_device_add_group(&auxdev->dev, &auxiliary_irqs_group);
-> +	if (!ret)
-> +		auxdev->dir_exists = 1;
-> +
-> +unlock:
-> +	mutex_unlock(&auxdev->lock);
-> +	return ret;
-> +}
-> +
-> +/**
-> + * auxiliary_device_sysfs_irq_add - add a sysfs entry for the given IRQ
-> + * @auxdev: auxiliary bus device to add the sysfs entry.
-> + * @irq: The associated interrupt number.
-> + *
-> + * This function should be called after auxiliary device have successfully
-> + * received the irq.
-> + *
-> + * Return: zero on success or an error code on failure.
-> + */
-> +int auxiliary_device_sysfs_irq_add(struct auxiliary_device *auxdev, int irq)
-> +{
-> +	struct device *dev = &auxdev->dev;
-> +	struct auxiliary_irq_info *info;
-> +	int ret;
-> +
-> +	ret = auxiliary_irq_dir_prepare(auxdev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	info = kzalloc(sizeof(*info), GFP_KERNEL);
-> +	if (!info)
-> +		return -ENOMEM;
-> +
-> +	sysfs_attr_init(&info->sysfs_attr.attr);
-> +	info->sysfs_attr.attr.name = kasprintf(GFP_KERNEL, "%d", irq);
-> +	if (!info->sysfs_attr.attr.name) {
-> +		ret = -ENOMEM;
-> +		goto name_err;
-> +	}
-> +
-> +	ret = xa_insert(&auxdev->irqs, irq, info, GFP_KERNEL);
+ 	emac: ethernet@10204000 {
+-		compatible = "snps,arc-emac";
++		compatible = "rockchip,rk3066-emac";
+ 		reg = <0x10204000 0x3c>;
+ 		interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
+-
+-		rockchip,grf = <&grf>;
+-
+ 		clocks = <&cru HCLK_EMAC>, <&cru SCLK_MAC>;
+ 		clock-names = "hclk", "macref";
+ 		max-speed = <100>;
+ 		phy-mode = "rmii";
+-
++		rockchip,grf = <&grf>;
+ 		status = "disabled";
+ 	};
 
-So no lock happening here, either use it always, or not at all?
+--
+2.39.2
 
-
-> +	if (ret)
-> +		goto auxdev_xa_err;
-> +
-> +	ret = sysfs_add_file_to_group(&dev->kobj, &info->sysfs_attr.attr,
-> +				      auxiliary_irqs_group.name);
-
-You do know that you are never going to see these files from the
-userspace library tools that watch sysfs, right?  libudev will never see
-them as you are adding them AFTER the device is created.
-
-So, because of that, who is really going to use these files?
-
-
-> +	if (ret)
-> +		goto sysfs_add_err;
-> +
-> +	return 0;
-> +
-> +sysfs_add_err:
-> +	xa_erase(&auxdev->irqs, irq);
-> +auxdev_xa_err:
-> +	kfree(info->sysfs_attr.attr.name);
-> +name_err:
-> +	kfree(info);
-
-Again, cleanup.h is your friend.
-
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_add);
-> +
-> +/**
-> + * auxiliary_device_sysfs_irq_remove - remove a sysfs entry for the given IRQ
-> + * @auxdev: auxiliary bus device to add the sysfs entry.
-> + * @irq: the IRQ to remove.
-> + *
-> + * This function should be called to remove an IRQ sysfs entry.
-> + */
-> +void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev, int irq)
-> +{
-> +	struct auxiliary_irq_info *info = xa_load(&auxdev->irqs, irq);
-> +	struct device *dev = &auxdev->dev;
-> +
-> +	sysfs_remove_file_from_group(&dev->kobj, &info->sysfs_attr.attr,
-> +				     auxiliary_irqs_group.name);
-> +	xa_erase(&auxdev->irqs, irq);
-> +	kfree(info->sysfs_attr.attr.name);
-> +	kfree(info);
-> +}
-> +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_remove);
-> diff --git a/include/linux/auxiliary_bus.h b/include/linux/auxiliary_bus.h
-> index de21d9d24a95..96be140bd1ff 100644
-> --- a/include/linux/auxiliary_bus.h
-> +++ b/include/linux/auxiliary_bus.h
-> @@ -58,6 +58,7 @@
->   *       in
->   * @name: Match name found by the auxiliary device driver,
->   * @id: unique identitier if multiple devices of the same name are exported,
-> + * @irqs: irqs xarray contains irq indices which are used by the device,
->   *
->   * An auxiliary_device represents a part of its parent device's functionality.
->   * It is given a name that, combined with the registering drivers
-> @@ -138,7 +139,10 @@
->  struct auxiliary_device {
->  	struct device dev;
->  	const char *name;
-> +	struct xarray irqs;
-> +	struct mutex lock; /* Protects "irqs" directory creation */
-
-Protects it from what?
-
-
->  	u32 id;
-> +	u8 dir_exists:1;
-
-I don't think this is needed, but if it really is, just use a bool.
-
-
->  };
->  
->  /**
-> @@ -212,8 +216,24 @@ int auxiliary_device_init(struct auxiliary_device *auxdev);
->  int __auxiliary_device_add(struct auxiliary_device *auxdev, const char *modname);
->  #define auxiliary_device_add(auxdev) __auxiliary_device_add(auxdev, KBUILD_MODNAME)
->  
-> +#ifdef CONFIG_SYSFS
-> +int auxiliary_device_sysfs_irq_add(struct auxiliary_device *auxdev, int irq);
-> +void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev,
-> +				       int irq);
-
-You can use longer lines :)
-
-thanks,
-
-greg k-h
 
