@@ -1,188 +1,148 @@
-Return-Path: <netdev+bounces-104600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A29DA90D81A
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 18:04:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF33690D83C
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 18:08:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA3F11C23C09
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:04:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C1791F23DA1
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:08:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94601482C6;
-	Tue, 18 Jun 2024 16:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 468DB4C630;
+	Tue, 18 Jun 2024 16:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KTfrTS3d"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="BHt4dUg3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8B346450
-	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 16:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18DFF1CD26;
+	Tue, 18 Jun 2024 16:08:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718726691; cv=none; b=A3Qe77VQ8JAbrJI7kS4h3y9IIxO6r0nORkAT3HnwghRYiJnxtGnfcSb7Fb7m4EbjaWSwy1gH5k3wpVmsEy6uvOmuyw38QmvN9q0SS8w9wPBq5TlQbZgAMNFVYc6bX8Du8dRpqi1Y7kTexEzeDsj2s6qvvlfnw708bj5dNNcmYvE=
+	t=1718726891; cv=none; b=YGLBDLN5o9hqBreSSxYX3qMy0i1hcdGxKL28yjN8cvOoUqJNOEvh8/XqxfyJp/hn0RMrDgSauJFLfm5KxITn0OyrRg5UAyzwoOicZdL1M8IRMwlFON2dxX421kFwnypaUh/3BuOerM2NvZpP+UQ3K5kBP4w2Poxye8QI1r+rxVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718726691; c=relaxed/simple;
-	bh=GP0uR3tvQbzcrtWs6IScgA94dZLZ1PgMYu17zBOgD/E=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=hABKXzj0/goiURQ8FQAL/ay1fh6hVHiIBq8K/d1dyN4NnDaFnM+6ZH6HJlAPYWHy8f1dVF6BVcots2Z8OvE2cVpxAma2NXori3dmkY5i5K4xOE1J3dnrBsN4Z0PAKWsBLSVlxJO6kp2WXwPZU7GCdLzzaN3ycDBknNv948+HDcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KTfrTS3d; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718726689;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EkKajcuHyi0uetV3u4rjxeb0Qgka5tO9IJGy0qxthnw=;
-	b=KTfrTS3dxtzm1gLpEssXZSGiU31ZSHBJucFMmjigFyAZ5I6yIAUzDMyXi2UAQmaHtSNjep
-	kTYdXsaoGNVUyXQXQt0Hu6TuGWQwGaSxmmQGI+3Gpvl2c47mzr0VvuzIrsg5pnoADdvGlZ
-	+/2IUb/CYV8+eMgLRNfA9ymwffFtsVE=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-31-gL5KrjedPw-grVOatKz9IQ-1; Tue,
- 18 Jun 2024 12:04:42 -0400
-X-MC-Unique: gL5KrjedPw-grVOatKz9IQ-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 701BF19560BF;
-	Tue, 18 Jun 2024 16:04:40 +0000 (UTC)
-Received: from RHTRH0061144 (dhcp-17-72.bos.redhat.com [10.18.17.72])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 877C13000218;
-	Tue, 18 Jun 2024 16:04:38 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: netdev@vger.kernel.org
-Cc: dev@openvswitch.org,  Simon Horman <horms@kernel.org>,
-  linux-kernel@vger.kernel.org,  Stefano Brivio <sbrivio@redhat.com>,  Eric
- Dumazet <edumazet@google.com>,  linux-kselftest@vger.kernel.org,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Shuah Khan
- <shuah@kernel.org>,  "David S. Miller" <davem@davemloft.net>
-Subject: Re: [ovs-dev] [PATCH net-next 5/7] selftests: openvswitch: Support
- implicit ipv6 arguments.
-In-Reply-To: <20240617180218.1154326-6-aconole@redhat.com> (Aaron Conole's
-	message of "Mon, 17 Jun 2024 14:02:16 -0400")
-References: <20240617180218.1154326-1-aconole@redhat.com>
-	<20240617180218.1154326-6-aconole@redhat.com>
-Date: Tue, 18 Jun 2024 12:04:36 -0400
-Message-ID: <f7tr0cujkyz.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1718726891; c=relaxed/simple;
+	bh=zlIm1WzKbhNzUK7tcnez/bSSxuQpZcA+VINGnSx8DrQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WW1L7z0xn3My5wvx5NmScQ656gaAwQLXf8AV7II/lo/jxNEVpHGLQtNMpfOpML8oSgaG0DmGwD22YmV7W9o8f7+sc7z9dRObpkRKZH/RZbmayLO2d2yDMdXmjZ8X6UAlWZJPWukDlVmdcJ3dlLPpQDc0yUdhXZlRiFlHUpt2zjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=BHt4dUg3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10D1CC3277B;
+	Tue, 18 Jun 2024 16:08:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1718726889;
+	bh=zlIm1WzKbhNzUK7tcnez/bSSxuQpZcA+VINGnSx8DrQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BHt4dUg3tbNK71ZBewAGy/C6H730qgiamC6+fyFiy1kFiA6tCBt1OTuM5iiBK4r6C
+	 V/9q9RZMcjPlfScxuXZtzpKwNjz/pM2yIn5nXSbmcErqObJ3xCD2p3hGUGEm+j5fL1
+	 i1B0DRE6tT5SgYzzJBfkEvAlWkUABe15Yy1xtqaY=
+Date: Tue, 18 Jun 2024 18:08:06 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Shay Drory <shayd@nvidia.com>, rafael@kernel.org, ira.weiny@intel.com,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, leon@kernel.org,
+	tariqt@nvidia.com, Parav Pandit <parav@nvidia.com>,
+	pabeni@redhat.com, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, david.m.ertman@intel.com
+Subject: Re: [PATCH net-next v7 1/2] driver core: auxiliary bus: show
+ auxiliary device IRQs
+Message-ID: <2024061840-coping-rubbing-7af3@gregkh>
+References: <20240618150902.345881-1-shayd@nvidia.com>
+ <20240618150902.345881-2-shayd@nvidia.com>
+ <ca97ec5b-9b46-4456-bf5b-37136aa7f1bf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ca97ec5b-9b46-4456-bf5b-37136aa7f1bf@intel.com>
 
-Aaron Conole <aconole@redhat.com> writes:
+On Tue, Jun 18, 2024 at 05:47:15PM +0200, Przemek Kitszel wrote:
+> On 6/18/24 17:09, Shay Drory wrote:
+> > PCI subfunctions (SF) are anchored on the auxiliary bus. PCI physical
+> > and virtual functions are anchored on the PCI bus. The irq information
+> > of each such function is visible to users via sysfs directory "msi_irqs"
+> > containing files for each irq entry. However, for PCI SFs such
+> > information is unavailable. Due to this users have no visibility on IRQs
+> > used by the SFs.
+> > Secondly, an SF can be multi function device supporting rdma, netdevice
+> > and more. Without irq information at the bus level, the user is unable
+> > to view or use the affinity of the SF IRQs.
+> > 
+> > Hence to match to the equivalent PCI PFs and VFs, add "irqs" directory,
+> > for supporting auxiliary devices, containing file for each irq entry.
+> > 
+> > For example:
+> > $ ls /sys/bus/auxiliary/devices/mlx5_core.sf.1/irqs/
+> > 50  51  52  53  54  55  56  57  58
+> > 
+> > Reviewed-by: Parav Pandit <parav@nvidia.com>
+> > Signed-off-by: Shay Drory <shayd@nvidia.com>
+> > 
+> > ---
+> > v6-v7:
+> > - dynamically creating irqs directory when first irq file created (Greg)
+> > - removed irqs flag and simplified the dev_add() API (Greg)
+> > - move sysfs related new code to a new auxiliary_sysfs.c file (Greg)
+> 
+> [...]
+> 
+> > +static int auxiliary_irq_dir_prepare(struct auxiliary_device *auxdev)
+> > +{
+> > +	int ret = 0;
+> > +
+> > +	mutex_lock(&auxdev->lock);
+> > +	if (auxdev->dir_exists)
+> > +		goto unlock;
+> > +
+> > +	xa_init(&auxdev->irqs);
+> 
+> due to below error handling you could end up with calling xa_init()
+> twice (and this is a "library" code, so it does not matter how you
+> handle this error in the current sole user ;))
+> 
+> > +	ret = devm_device_add_group(&auxdev->dev, &auxiliary_irqs_group);
+> > +	if (!ret)
+> > +		auxdev->dir_exists = 1;
+> > +
+> > +unlock:
+> > +	mutex_unlock(&auxdev->lock);
+> > +	return ret;
+> > +}
+> > +
+> 
+> [...]
+> 
+> > --- a/include/linux/auxiliary_bus.h
+> > +++ b/include/linux/auxiliary_bus.h
+> > @@ -58,6 +58,7 @@
+> >    *       in
+> >    * @name: Match name found by the auxiliary device driver,
+> >    * @id: unique identitier if multiple devices of the same name are exported,
+> > + * @irqs: irqs xarray contains irq indices which are used by the device,
+> >    *
+> >    * An auxiliary_device represents a part of its parent device's functionality.
+> >    * It is given a name that, combined with the registering drivers
+> > @@ -138,7 +139,10 @@
+> >   struct auxiliary_device {
+> >   	struct device dev;
+> >   	const char *name;
+> > +	struct xarray irqs;
+> > +	struct mutex lock; /* Protects "irqs" directory creation */
+> >   	u32 id;
+> > +	u8 dir_exists:1;
+> 
+> nit: I would make it a bool, or `bool: 1` if you really want
 
-> The current iteration of IPv6 support requires explicit fields to be set
-> in addition to not properly support the actual IPv6 addresses properly.
-> With this change, make it so that the ipv6() bare option is usable to
-> create wildcarded flows to match broad swaths of ipv6 traffic.
->
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Tested-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Aaron Conole <aconole@redhat.com>
-> ---
->  .../selftests/net/openvswitch/ovs-dpctl.py    | 42 ++++++++++++-------
->  1 file changed, 27 insertions(+), 15 deletions(-)
->
-> diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> index 2f16df2fb16b..2062e7e6e99e 100644
-> --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> @@ -200,6 +200,18 @@ def convert_ipv4(data):
->  
->      return int(ipaddress.IPv4Address(ip)), int(ipaddress.IPv4Address(mask))
->  
-> +def convert_ipv6(data):
-> +    ip, _, mask = data.partition('/')
-> +
-> +    if not ip:
-> +        ip = mask = 0
-> +    elif not mask:
-> +        mask = 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'
-> +    elif mask.isdigit():
-> +        mask = ipaddress.IPv6Network("::/" + mask).hostmask
-> +
-> +    return ipaddress.IPv6Address(ip).packed, ipaddress.IPv6Address(mask).packed
-> +
->  def convert_int(size):
->      def convert_int_sized(data):
->          value, _, mask = data.partition('/')
-> @@ -941,21 +953,21 @@ class ovskey(nla):
->                  "src",
->                  "src",
->                  lambda x: str(ipaddress.IPv6Address(x)),
-> -                lambda x: int.from_bytes(x, "big"),
-> -                lambda x: ipaddress.IPv6Address(x),
-> +                lambda x: ipaddress.IPv6Address(x).packed if x else 0,
-> +                convert_ipv6,
->              ),
->              (
->                  "dst",
->                  "dst",
->                  lambda x: str(ipaddress.IPv6Address(x)),
-> -                lambda x: int.from_bytes(x, "big"),
-> -                lambda x: ipaddress.IPv6Address(x),
-> +                lambda x: ipaddress.IPv6Address(x).packed if x else 0,
-> +                convert_ipv6,
->              ),
-> -            ("label", "label", "%d", int),
-> -            ("proto", "proto", "%d", int),
-> -            ("tclass", "tclass", "%d", int),
-> -            ("hlimit", "hlimit", "%d", int),
-> -            ("frag", "frag", "%d", int),
-> +            ("label", "label", "%d", lambda x: int(x) if x else 0),
-> +            ("proto", "proto", "%d", lambda x: int(x) if x else 0),
-> +            ("tclass", "tclass", "%d", lambda x: int(x) if x else 0),
-> +            ("hlimit", "hlimit", "%d", lambda x: int(x) if x else 0),
-> +            ("frag", "frag", "%d", lambda x: int(x) if x else 0),
->          )
->  
->          def __init__(
-> @@ -1152,8 +1164,8 @@ class ovskey(nla):
->              (
->                  "target",
->                  "target",
-> -                lambda x: str(ipaddress.IPv6Address(x)),
-> -                lambda x: int.from_bytes(x, "big"),
-> +                lambda x: ipaddress.IPv6Address(x).packed,
+Why is this even needed?  It should "know" if the directory is there or
+not, it can always be looked up, right?
 
-This (and the following str() calls) shouldn't have been changed.  I'll
-send a v2.  Sorry about the noise.  It isn't visible in this test, but
-when doing some additional ipv6 test development for a future series, I
-caught it.
+thanks,
 
-> +                convert_ipv6,
->              ),
->              ("sll", "sll", macstr, lambda x: int.from_bytes(x, "big")),
->              ("tll", "tll", macstr, lambda x: int.from_bytes(x, "big")),
-> @@ -1237,14 +1249,14 @@ class ovskey(nla):
->              (
->                  "src",
->                  "src",
-> -                lambda x: str(ipaddress.IPv6Address(x)),
-> -                lambda x: int.from_bytes(x, "big", convertmac),
-> +                lambda x: ipaddress.IPv6Address(x).packed,
-> +                convert_ipv6,
->              ),
->              (
->                  "dst",
->                  "dst",
-> -                lambda x: str(ipaddress.IPv6Address(x)),
-> -                lambda x: int.from_bytes(x, "big"),
-> +                lambda x: ipaddress.IPv6Address(x).packed,
-> +                convert_ipv6,
->              ),
->              ("tp_src", "tp_src", "%d", int),
->              ("tp_dst", "tp_dst", "%d", int),
-
+greg k-h
 
