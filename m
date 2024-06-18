@@ -1,64 +1,60 @@
-Return-Path: <netdev+bounces-104281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D12590C015
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 02:08:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 156EC90C042
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 02:14:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 379A828198C
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 00:08:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBBBF1F22219
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 00:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 306C9A3F;
-	Tue, 18 Jun 2024 00:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17D117F8;
+	Tue, 18 Jun 2024 00:14:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VhfnAN3j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EqZCyrVZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01AA1A2D;
-	Tue, 18 Jun 2024 00:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9116917F3;
+	Tue, 18 Jun 2024 00:14:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718669281; cv=none; b=oS4gNyt+v3qZx7bP+ehvoG2g34Glo3t7ge8C22jylYLBjcLY6X7O/ycACfIJwhObVnfsdX0k2Wee1oyDjP++j/kEh+V0Jj8T0yx4jb5N7qvD1wPRYd1ierneY0P5yIrbHcn9IFSJey7ttt/xYNmMaQrbZWSWppi91lzajSCIOx4=
+	t=1718669672; cv=none; b=r6U1xq05EmwOS/U9y4OSKJKdHtWf+B2NsAc0yPsyui2vnwm8UD2ZGP7X5Df+CAdAYlR5m1ZTaOjvR5/Hj+18cbspZ/NJc99tUAOlJZhGDCREY9DeIUkzfZiQJZG2zPBYbcFV2aVnIixLy80CVBuTGboYO7eu89p9XTJ3ngBo/9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718669281; c=relaxed/simple;
-	bh=36CWnSggwu9XEgK+BEW2dfoLh8Wx1BkoZxBKpSE9AnU=;
+	s=arc-20240116; t=1718669672; c=relaxed/simple;
+	bh=AqCOcEd4ls31i1LUK6L8hUCY0cozFi8uvOkLyRI3fsI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DCB0EY/eKGMybx2MT50lDSXB/7IpNRqqyZqLDsNhzpHy3SnNrPW3bKOyt/IrkqR/AuAiLE+nkvT3M80PIeThY5wzrY1UpKElCzMYVwKdq5ORZ6olZ5EBPjY+N9BwuJZ0XCvIoP2tziQpHESwdA2PNhpEuuvorkcjATCCHE+QrVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VhfnAN3j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 332D4C2BD10;
-	Tue, 18 Jun 2024 00:08:00 +0000 (UTC)
+	 MIME-Version:Content-Type; b=EcvtZC3AGatWLbACBWjYUpq2UAKTpCa8sKQGYMY/1BzZ/u2vqvzSGBt0pfyDq+fQ8RqJk/iQnw6u+/QeCZ53dyYAoLZAo1XyXRoORWmppoQ2p41j/PWJvs1K28RPq/yg5HMjcUjI/YO4ooC9r87JGnQus5sghAzACXHfJYbAYfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EqZCyrVZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAD73C4AF48;
+	Tue, 18 Jun 2024 00:14:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718669280;
-	bh=36CWnSggwu9XEgK+BEW2dfoLh8Wx1BkoZxBKpSE9AnU=;
+	s=k20201202; t=1718669672;
+	bh=AqCOcEd4ls31i1LUK6L8hUCY0cozFi8uvOkLyRI3fsI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VhfnAN3jYTWFr8q1guxkDQZQanRe3Z5Dtz9Akt8z35c7726VUAR34bxW2eNrZZA76
-	 y2Yu+4A5MZbvkX5TtCNcH/L14PpuL58mOJsIiVAkTIThGPHzG5p6c4G6ZHQUP92uoa
-	 RwtHKCgiu4BUBNUEtbZyC5I10jm6BohMcAPD5W5bxYjviSfrULY4Esr/snW6B0uoSK
-	 7NXjSa+FRRh7OuYbK6m9DWFLCF7+4RqITigw6E8h3hINH/yxMNv5EaKIHhdOjEMwd2
-	 cOONREvLbO+4pBbmr724rrUjbWbaYqRzWaI6ddqN3/ISSxX4ADSUPppzKyEJzzhWh6
-	 cxdpPk4RHW0vA==
-Date: Mon, 17 Jun 2024 17:07:59 -0700
+	b=EqZCyrVZgYgqsUMwSSwtx7EqDU5vMEaRhInCp1Q0EFOD8csIBHGM9Zr8QvVL4YXWU
+	 7LICNb9CLVcQrH3Gly2FM45p6R9OErQZZRqklvA0/iEa81kgyG5AIbMg1FdumPsalj
+	 NyHVeKMw7xqIaTjnZM9EySLHGN1MczKhrzXUCoxxQHGEtt+lflkcgA7D0/c53KHrPn
+	 hCfI8Wz5fKgQC33/5Oy+6DD7KrG873bJwoytwSX20cdWj1sOdnHD8VjvKccZbVst65
+	 nN/ims8YxA/+5LWQNK/sViGuuUZ4j9YxFq1x5O+LII5qr+DIlPFdkwVvEhrvC1x1Oo
+	 Bp7SRacjfw4iw==
+Date: Mon, 17 Jun 2024 17:14:30 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Niklas =?UTF-8?B?U8O2ZGVybHVuZA==?=
- <niklas.soderlund+renesas@ragnatech.se>, Biju Das
- <biju.das.jz@bp.renesas.com>, Claudiu Beznea
- <claudiu.beznea.uj@bp.renesas.com>, Lad Prabhakar
- <prabhakar.mahadev-lad.rj@bp.renesas.com>, Mitsuhiro Kimura
- <mitsuhiro.kimura.kc@renesas.com>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH 1/2] net: ravb: Fix maximum MTU for GbEth
- devices
-Message-ID: <20240617170759.270f79f0@kernel.org>
-In-Reply-To: <20240615103038.973-2-paul.barker.ct@bp.renesas.com>
-References: <20240615103038.973-1-paul.barker.ct@bp.renesas.com>
-	<20240615103038.973-2-paul.barker.ct@bp.renesas.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jeff Johnson <quic_jjohnson@quicinc.com>, Jose Abreu
+ <Jose.Abreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] net: dwc-xlgmac: fix missing MODULE_DESCRIPTION()
+ warning
+Message-ID: <20240617171430.5db6dcd0@kernel.org>
+In-Reply-To: <ZnAYVU5AKG_tHjip@nanopsycho.orion>
+References: <20240616-md-hexagon-drivers-net-ethernet-synopsys-v1-1-55852b60aef8@quicinc.com>
+	<ZnAYVU5AKG_tHjip@nanopsycho.orion>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,16 +64,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 15 Jun 2024 11:30:37 +0100 Paul Barker wrote:
-> The datasheets for all SoCs using the GbEth IP specify a maximum
-> transmission frame size of 1.5 kByte. I've confirmed through internal
-> discussions that support for 1522 byte frames has been validated, which
-> allows us to support the default MTU of 1500 bytes after reserving space
-> for the Ethernet header, frame checksums and an optional VLAN tag.
+On Mon, 17 Jun 2024 13:04:53 +0200 Jiri Pirko wrote:
+> Looks okay. Missing "Fixes" tag though. Please add it and send v2.
+> Also, please make obvious what tree you target using "[PATCH net]"
+> prefix.
 
-
-But what's the user impact? If we send a bigger frame the IP will hang?
-Drop the packet? Something else?
-"Validated" can also mean "officially supported" sometimes vendors just
-say that to narrow down the test matrix :(
+I've been applying these to net-next lately, TBH.
+Judging by the number of these warnings still left in the tree we are
+the only ones who care.
 
