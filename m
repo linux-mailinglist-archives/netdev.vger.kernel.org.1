@@ -1,136 +1,81 @@
-Return-Path: <netdev+bounces-104420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE16090C740
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 12:39:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A923D90C787
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 12:46:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77F4AB24A07
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 10:39:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15AF3B223B5
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 10:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21911AF680;
-	Tue, 18 Jun 2024 08:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s8nh1Toq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4474014A62B;
+	Tue, 18 Jun 2024 09:00:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FCE1AED5C;
-	Tue, 18 Jun 2024 08:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9273019BBA
+	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 09:00:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718699924; cv=none; b=ZnvMuLLZVwgw73pWY+XHkHntTge441Me91UTYpGb+pi9WOj8G6kbZmL5Xzf+gOPP1gV3872c4q+Ymc2hUMo17XkbKq+58L31WXdRzPDlDCbHEaskez5fR2XOZQpfrx3NK7TUMW54YE/gyZxXKxvDm7inetg4kCp6CSS/V8dEvrU=
+	t=1718701218; cv=none; b=TvL4Yb9LRWPqvzEZ4E7x6DAkTplG1eFthRcqTP2Z044fQPLm2PeQxewqb4j5hFTE0Nw5enkZhUG6TLDAUjrbkcU01VtBJsDDiL23op0FO0zsofl+pGhrhBLjrw7Mi4POOOLEdTIFrAhm8iYFntmLqy4gCFmQ16x7eEaebxmtmHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718699924; c=relaxed/simple;
-	bh=lhKn/iZcd+W6zpv9cuUEp7iHIwGV3stG6432eKxVRKs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GbmPBISgK6tDL6Kg3GefsH6O/1okkVfWlS0n1URElQO6kfr+l3Ok9+paYDL7tGOnjy6lNe8eQsLOm1ohvAccp8i2GVvaMl2ezwWEPnaM4oYfwsjmCm4Oq4xvck23iqiQXab2gZfVmQ1Uc1y+KA1/kYzRhDEwJsEfmVkU39JcHfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s8nh1Toq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F439C3277B;
-	Tue, 18 Jun 2024 08:38:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718699924;
-	bh=lhKn/iZcd+W6zpv9cuUEp7iHIwGV3stG6432eKxVRKs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s8nh1ToqCAzLq0p+OLEM+9UGuEGu9/8SYhHz/FOiimJHoQWTjlvubZx5uzanlNlWM
-	 M1Y9Ppv7KjB/EsOIv/7ATTV0xQnwkKiL1Vo+4J2AlzQqbJihcgLMA3YXN5/E5J1rhb
-	 yKvpZWCIDtp1xBjeoFXV5Jreji8UfGUj0a0zOdAyZZWJD7Xz21+hXu4OrC3HwUh45Y
-	 ql+zZ0j92G7y1fcgF+t6a7kRuxAQGYxARpG9o6aqr+rGp9RGx0NtPsJU3wGS8NMp04
-	 bnRwv9g78xzwv4EBRweP/tXdXzoi4rqTcONxavuMia55nnPukX3sMTxSXm8UCWWs6t
-	 zLBnclV47dplw==
-Date: Tue, 18 Jun 2024 09:38:39 +0100
-From: Simon Horman <horms@kernel.org>
-To: Geetha sowjanya <gakula@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
-Subject: Re: [net-next PATCH v5 05/10] octeontx2-af: Add packet path between
- representor and VF
-Message-ID: <20240618083839.GE8447@kernel.org>
-References: <20240611162213.22213-1-gakula@marvell.com>
- <20240611162213.22213-6-gakula@marvell.com>
+	s=arc-20240116; t=1718701218; c=relaxed/simple;
+	bh=GvpPYD/v96UdvdfJ3klBoL51jQdI45sxX47cLWjgwlo=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=NPO5VLnvcDu4I0G1P5uURT7mR5O6EfEskJ4hDB9BkYH4zHuGCqYNocJ/0Y1RskpC9GSwYdx3+VSmszhhNC56bzC+Uh5H1vEcVEOGx1hLwGl2PUkkycBt7Xo5jt4A9FoJI3604u4X4dWRxQOn8REpGDnpmSNpp8YgdxpXlQzJY9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=52.59.177.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas52t1718700926t124t09752
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [183.159.97.141])
+X-QQ-SSF:00400000000000F0FVF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 15890126120200180271
+To: "'Hariprasad Kelam'" <hkelam@marvell.com>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<linux@armlinux.org.uk>,
+	<horms@kernel.org>,
+	<andrew@lunn.ch>,
+	<netdev@vger.kernel.org>
+Cc: <mengyuanlou@net-swift.com>
+References: <20240605020852.24144-1-jiawenwu@trustnetic.com> <20240605020852.24144-3-jiawenwu@trustnetic.com>  <PH0PR18MB44741630B62B890E39814445DEFA2@PH0PR18MB4474.namprd18.prod.outlook.com>
+In-Reply-To:  <PH0PR18MB44741630B62B890E39814445DEFA2@PH0PR18MB4474.namprd18.prod.outlook.com>
+Subject: RE: [PATCH net-next v2 2/3] net: txgbe: support Flow Director perfect filters
+Date: Tue, 18 Jun 2024 16:55:25 +0800
+Message-ID: <00d401dac15d$426bc7d0$c7435770$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240611162213.22213-6-gakula@marvell.com>
+Content-Type: text/plain;
+	charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQH0eqJcG+ogIoRI8v7BTXwUMbAV0QIsFs7TAYcJZQixfCsmIA==
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-On Tue, Jun 11, 2024 at 09:52:08PM +0530, Geetha sowjanya wrote:
-> Current HW, do not support in-built switch which will forward pkts
-> between representee and representor. When representor is put under
-> a bridge and pkts needs to be sent to representee, then pkts from
-> representor are sent on a HW internal loopback channel, which again
-> will be punted to ingress pkt parser. Now the rules that this patch
-> installs are the MCAM filters/rules which will match against these
-> pkts and forward them to representee.
-> The rules that this patch installs are for basic
-> representor <=> representee path similar to Tun/TAP between VM and
-> Host.
+> > +	/* determine if we need to drop or route the packet */
+> > +	if (fsp->ring_cookie == RX_CLS_FLOW_DISC)
+> > +		input->action = TXGBE_RDB_FDIR_DROP_QUEUE;
+> > +	else
+> > +		input->action = fsp->ring_cookie;
+> > +
+> > +	spin_lock(&txgbe->fdir_perfect_lock);
 > 
-> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+>  ethtool ops is already protected with rtnl_lock , which can be confirmed by calling ASSERT_RTNL().
+>  Why do we need a spin_lock here ?
 
-...
+When driver performs reset function, it needs to restore FDIR configuration, there is no rtnl_lock.
 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
 
-...
-
-> +void rvu_rep_update_rules(struct rvu *rvu, u16 pcifunc, bool ena)
-> +{
-> +	struct rvu_switch *rswitch = &rvu->rswitch;
-> +	struct npc_mcam *mcam = &rvu->hw->mcam;
-> +	u32 max = rswitch->used_entries;
-> +	int blkaddr;
-> +	u16 entry;
-> +
-> +	if (!rswitch->used_entries)
-> +		return;
-> +
-> +	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
-> +
-> +	if (blkaddr < 0)
-> +		return;
-> +
-> +	rvu_switch_enable_lbk_link(rvu, pcifunc, ena);
-> +	mutex_lock(&mcam->lock);
-> +	for (entry = 0; entry < max; entry++) {
-> +		if (rswitch->entry2pcifunc[entry] == pcifunc)
-> +			npc_enable_mcam_entry(rvu, mcam, blkaddr, entry, ena);
-> +	}
-> +	mutex_unlock(&mcam->lock);
-> +}
-> +
-> +int rvu_rep_pf_init(struct rvu *rvu)
-> +{
-> +	u16 pcifunc = rvu->rep_pcifunc;
-> +	struct rvu_pfvf *pfvf = rvu_get_pfvf(rvu, pcifunc);
-
-nit: It would be nice to maintain reverse xmas tree order - longest line to
-     shortest - for local variable declarations in this file.
-
-     Here, I think that could be (completely untested!):
-
-	u16 pcifunc = rvu->rep_pcifunc;
-	struct rvu_pfvf *pfvf;
-
-	pfvf = rvu_get_pfvf(rvu, pcifunc);
-
-     Edward Cree's tool is useful here:
-     https://github.com/ecree-solarflare/xmastree
-
-> +
-> +	set_bit(NIXLF_INITIALIZED, &pfvf->flags);
-> +	rvu_switch_enable_lbk_link(rvu, pcifunc, true);
-> +	rvu_rep_rx_vlan_cfg(rvu, pcifunc);
-> +	return 0;
-> +}
-
-...
 
