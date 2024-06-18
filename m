@@ -1,126 +1,163 @@
-Return-Path: <netdev+bounces-104526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8623690CF00
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 15:23:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3A1990CF3E
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 15:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95A8A1C227E7
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:23:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79AF21F21B64
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87CD91BE24F;
-	Tue, 18 Jun 2024 12:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F167515CD40;
+	Tue, 18 Jun 2024 12:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qW+ZRN0V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mq7FLMPA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7EC1BE24C;
-	Tue, 18 Jun 2024 12:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CABD050297;
+	Tue, 18 Jun 2024 12:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718714611; cv=none; b=VAzS6R6tZGoHmaqsPU+ngWXbTeFxVhHXU2b2AbKP4TCIJ108m0yCw0iqfceL0pmO+JQStlQ8pdCOuA5qZM/0ZzQhvPrHX4aAlg85V6C8CTa/TCRruIwGvUADW2SfSjOWpkwqAA+cQTzLci2pkrxxElzsVRT/L6gZxkHRBlvNEQ4=
+	t=1718714774; cv=none; b=oZYwIrAkLhFquqnjfLtyV171f0spf6558kz3aiQwO+WBiEYApY/mKC9kVni/EMl1XclMDnrUJjsYV5hg7TfdH844Lsw6P4bCvBk1t24Qjk1Lf7COVQa+qNM7WAF/3b1WZNwTVlJ29v8BJ7r7YB37ruRDjc+3o0gDlPaJeCNcj/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718714611; c=relaxed/simple;
-	bh=5omyRClCkTdS8MIQwGuerjGj7Gg1hN8AhaFWJi9Oszg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SqUWh2R0dH148y4nOLxkBLmu4tu16UF0vy8m1wWfJguKmFykdMEaDv6tuKGotTeKpiH9eBeMzXpkHpVj8MsV4peeQIYRQXp3U7AntzuowwKSZ2hxd7naQeWjtS8hUk0KTNwxE0tbhlQHAORVbUTqtZghCTvLZSIYPwBGwbsORBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qW+ZRN0V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 457E8C4AF1D;
-	Tue, 18 Jun 2024 12:43:30 +0000 (UTC)
+	s=arc-20240116; t=1718714774; c=relaxed/simple;
+	bh=QCngadtoE4VKjayI+GFG7V10hXE4SfjWwY3nE5aHu4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VlvdX0Jvumz/Ny8usK8cHMZVmLfJ9jye2+7vdlp3ueKYKbxr+b4FQkPqZnpmfrOyAhYsq7Wt4kitTsRoiu178ZJoIYza+/9q7Aq2vy9LI/FZv2OfF9skz8BREZs8O4tJDIbtbbN+LmT/UrLekCeKqJ4KlZ1PHJlWXDWjmnh4ZE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mq7FLMPA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F01DC3277B;
+	Tue, 18 Jun 2024 12:46:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718714611;
-	bh=5omyRClCkTdS8MIQwGuerjGj7Gg1hN8AhaFWJi9Oszg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qW+ZRN0V73cXmNfI7hG+ElTr0fJTLg1ZOCxRJrmyzN1wmVV7OJgscm9fo2ROtkzNA
-	 T4p6+Bq85rYm3UFT1JXxyoYinIvlIOptJed/Z24RmJS7CrxwACbO+1IpGUCB/Z59nn
-	 lMfa1GT6fvU2HxE13gDQbPg47v4B/F2ZymCw+6LjQgr77QY400DM0r3kreMwNgV/DH
-	 r04SJncB6f9eUzI1zCBq30+0sofSpTkS/oIx05KH5LBSaZ47jtjvB9LdOujxQXt3fJ
-	 z04lAEfmAHg1Rd1FqF9n/UZAjFe8Hwtd3pefD0evwF1Shl15Sls5RAbeMdc04KJtLF
-	 lU+/Zq8yAtqLg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 7/9] ila: block BH in ila_output()
-Date: Tue, 18 Jun 2024 08:43:13 -0400
-Message-ID: <20240618124318.3304798-7-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240618124318.3304798-1-sashal@kernel.org>
-References: <20240618124318.3304798-1-sashal@kernel.org>
+	s=k20201202; t=1718714774;
+	bh=QCngadtoE4VKjayI+GFG7V10hXE4SfjWwY3nE5aHu4g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mq7FLMPAaB1kzN+wisXx1EZf36Er4LGukxc2CkD8W1xxQC5ek4DwHSDpizxs7zzv4
+	 wiRnGjY2LW7ligSi51TsMwhtNuAaJXOVNdCPHqrhpRjoeh+rSNe1WW8rvGTZ3/7Op1
+	 WHzInCEBRfZ05Y4MiPB+JVk+OyliKIWRIcdORGNdtut2Xual8kDiStUfi0ixHHs72/
+	 Arn0IgRh1Aqj5JI77vR997T4H4XppmzEhXtd7qh8gcHxYBfvGxdiYTN0mwpgQ9Gze3
+	 +rz/q0bpPGQAMNZc220CId8+o8l4Ks5/Ovso1BCrdsNSOR9zBOL3Gi5ZRhpPg2aan2
+	 TifJ34hJv0qbg==
+Date: Tue, 18 Jun 2024 13:46:10 +0100
+From: Simon Horman <horms@kernel.org>
+To: nikita.shubin@maquefel.me
+Cc: Hartley Sweeten <hsweeten@visionengravers.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Arnd Bergmann <arnd@arndb.de>, Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH v10 17/38] net: cirrus: add DT support for Cirrus EP93xx
+Message-ID: <20240618124610.GN8447@kernel.org>
+References: <20240617-ep93xx-v10-0-662e640ed811@maquefel.me>
+ <20240617-ep93xx-v10-17-662e640ed811@maquefel.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.19.316
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240617-ep93xx-v10-17-662e640ed811@maquefel.me>
 
-From: Eric Dumazet <edumazet@google.com>
+On Mon, Jun 17, 2024 at 12:36:51PM +0300, Nikita Shubin via B4 Relay wrote:
+> From: Nikita Shubin <nikita.shubin@maquefel.me>
+> 
+> - add OF ID match table
+> - get phy_id from the device tree, as part of mdio
+> - copy_addr is now always used, as there is no SoC/board that aren't
+> - dropped platform header
+> 
+> Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
+> Tested-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-[ Upstream commit cf28ff8e4c02e1ffa850755288ac954b6ff0db8c ]
+Hi Nikita,
 
-As explained in commit 1378817486d6 ("tipc: block BH
-before using dst_cache"), net/core/dst_cache.c
-helpers need to be called with BH disabled.
+Some minor feedback from my side.
 
-ila_output() is called from lwtunnel_output()
-possibly from process context, and under rcu_read_lock().
+...
 
-We might be interrupted by a softirq, re-enter ila_output()
-and corrupt dst_cache data structures.
+> @@ -786,27 +766,47 @@ static void ep93xx_eth_remove(struct platform_device *pdev)
+>  
+>  static int ep93xx_eth_probe(struct platform_device *pdev)
+>  {
+> -	struct ep93xx_eth_data *data;
+>  	struct net_device *dev;
+>  	struct ep93xx_priv *ep;
+>  	struct resource *mem;
+> +	void __iomem *base_addr;
+> +	struct device_node *np;
+> +	u32 phy_id;
+>  	int irq;
+>  	int err;
 
-Fix the race by using local_bh_disable().
+nit: Please consider maintaining reverse xmas tree order - longest line
+     to shortest - for local variable declarations. As preferred in
+     Networking code.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Acked-by: Paolo Abeni <pabeni@redhat.com>
-Link: https://lore.kernel.org/r/20240531132636.2637995-5-edumazet@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/ipv6/ila/ila_lwt.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+     Edward Cree's tool can be of assistance here.
+     https://github.com/ecree-solarflare/xmastree
 
-diff --git a/net/ipv6/ila/ila_lwt.c b/net/ipv6/ila/ila_lwt.c
-index 3d56a2fb6f86f..c7630776bd8e8 100644
---- a/net/ipv6/ila/ila_lwt.c
-+++ b/net/ipv6/ila/ila_lwt.c
-@@ -58,7 +58,9 @@ static int ila_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 		return orig_dst->lwtstate->orig_output(net, sk, skb);
- 	}
- 
-+	local_bh_disable();
- 	dst = dst_cache_get(&ilwt->dst_cache);
-+	local_bh_enable();
- 	if (unlikely(!dst)) {
- 		struct ipv6hdr *ip6h = ipv6_hdr(skb);
- 		struct flowi6 fl6;
-@@ -86,8 +88,11 @@ static int ila_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 			goto drop;
- 		}
- 
--		if (ilwt->connected)
-+		if (ilwt->connected) {
-+			local_bh_disable();
- 			dst_cache_set_ip6(&ilwt->dst_cache, dst, &fl6.saddr);
-+			local_bh_enable();
-+		}
- 	}
- 
- 	skb_dst_set(skb, dst);
--- 
-2.43.0
+>  
+>  	if (pdev == NULL)
+>  		return -ENODEV;
+> -	data = dev_get_platdata(&pdev->dev);
+>  
+>  	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+>  	irq = platform_get_irq(pdev, 0);
+>  	if (!mem || irq < 0)
+>  		return -ENXIO;
+>  
+> -	dev = ep93xx_dev_alloc(data);
+> +	base_addr = ioremap(mem->start, resource_size(mem));
+> +	if (!base_addr)
+> +		return dev_err_probe(&pdev->dev, -EIO, "Failed to ioremap ethernet registers\n");
 
+nit: Please consider line-wrapping to limiting lines to 80 columns wide
+     where it can be trivially achieved, which seems to be the case here.
+     80 columns is still preferred for Networking code.
+
+     Flagged by checkpatch.pl --max-line-length=80
+
+> +
+> +	np = of_parse_phandle(pdev->dev.of_node, "phy-handle", 0);
+> +	if (!np)
+> +		return dev_err_probe(&pdev->dev, -ENODEV, "Please provide \"phy-handle\"\n");
+> +
+> +	err = of_property_read_u32(np, "reg", &phy_id);
+> +	of_node_put(np);
+> +	if (err)
+> +		return dev_err_probe(&pdev->dev, -ENOENT, "Failed to locate \"phy_id\"\n");
+> +
+> +	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
+>  	if (dev == NULL) {
+>  		err = -ENOMEM;
+>  		goto err_out;
+>  	}
+> +
+> +	eth_hw_addr_set(dev, base_addr + 0x50);
+
+base_addr is an __iomem address. As such I don't think it is correct
+to pass it (+ offset) to eth_hw_addr_set. Rather, I would expect base_addr
+to be read using a suitable iomem accessor, f.e. readl. And one possible
+solution would be to use readl to read the mac address into a buffer
+which is passed to eth_hw_addr_set.
+
+Flagged by Sparse.
+
+> +	dev->ethtool_ops = &ep93xx_ethtool_ops;
+> +	dev->netdev_ops = &ep93xx_netdev_ops;
+> +	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
+> +
+>  	ep = netdev_priv(dev);
+>  	ep->dev = dev;
+>  	SET_NETDEV_DEV(dev, &pdev->dev);
+
+...
 
