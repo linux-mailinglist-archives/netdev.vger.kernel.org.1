@@ -1,62 +1,65 @@
-Return-Path: <netdev+bounces-104523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7010090CEC9
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 15:20:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44D1190D095
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 15:35:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 261AC1F21ECF
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:20:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D09EB224E6
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD581BB6BE;
-	Tue, 18 Jun 2024 12:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0281BD4F6;
+	Tue, 18 Jun 2024 12:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qm6Y8Bpz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kzZvav1U"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5BA1BB6BA;
-	Tue, 18 Jun 2024 12:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B9F1BD4EB;
+	Tue, 18 Jun 2024 12:43:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718714592; cv=none; b=P4GnzmRgRzIHEOOaZjSyPUuQUuMS1bPAWWAK5d0kToKwNEDxNX3MQZBW+IZy5cFOanG9Iz4Yl2TAXANYfcM4zHlucUG5wTTh36za+6M08m4VYHIweklmVCl8MwgsJcdeHJM5w51YrY33pFq7YNP841pLaM062v739sfiPfUG4hk=
+	t=1718714606; cv=none; b=du4F9jeivdwL28RqpTI5y2hsXlGu6ZVSIoXK67IqDbc1u1Tz0QgDdkxSEGD9guEdX95Q9VZoSSw+zf3mw+/MkU9pz4l00ZKV5AUnVH02bsWWfkpjOR95Jiw4HjwEuMZy2sZyLaR/fihPTGaVKYU2A318JxeNmV8HNnq9wAHzPD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718714592; c=relaxed/simple;
-	bh=zo7vGdQmD/9WW6TxmkLYuuXaSiAwi6gfF0+dfbpj6Xo=;
+	s=arc-20240116; t=1718714606; c=relaxed/simple;
+	bh=OTSUrzPahfesJZjU7ENFWagfb5ufLIfZZtTBExb1V3A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UZr3/zi1jdtK599VbESpPpbpGorug5BlGEpxkZ4KXzh8TcMdYXCy0wKp8hzOP+LEcGoOr88WmKmCx+fommbdfKTVB9HnBx6g9YHATPlQ4YbIV36ONgKmOIHoH9OItjZ8VAxM2Yhtw3dl1HGSMsW6Hu+hSabc7h7raXAhRLIM4Xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qm6Y8Bpz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DCA4C4AF48;
-	Tue, 18 Jun 2024 12:43:11 +0000 (UTC)
+	 MIME-Version; b=r4q+0x4+ZiX7CNy4tnbc1rGEr0O2giJkF8/4PTlsbxKUI3D9bXqOucOLF/qsMnD1VwxiqfwUF3Go/MTPbjOZLcSQRK+UVFUo0DWzSIkR2v/7lCrrf2xP85ZzmF1jklh7GQ/8rHChnG6FI6NeC+Oytl2y1Ib3is1LD0l3HIe/oEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kzZvav1U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40AACC32786;
+	Tue, 18 Jun 2024 12:43:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718714592;
-	bh=zo7vGdQmD/9WW6TxmkLYuuXaSiAwi6gfF0+dfbpj6Xo=;
+	s=k20201202; t=1718714605;
+	bh=OTSUrzPahfesJZjU7ENFWagfb5ufLIfZZtTBExb1V3A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Qm6Y8Bpzoilj/zAN8qbrWCfojTFqHvO3uLvBRFtZL5t23F9GRytz/Nbh4UyYJoshr
-	 rmA8ncNynLpJFT1Poz9OQ8sNI0gydQc4tsC2UCtDBDOh1n+tzIiTHTKL1UurlAuLCs
-	 vlcESK01CvDg0gc+2DAVpZv/w/QRUXNKp7gZhy+TtzUaQk7hf6v+hCAu5c54ObdGh9
-	 EhSlfBsVyM+CEBJ05TUsvurS5Uq/naC63PurpZ7bO5QoXqNZA3QcQJCM45E/KbWLWF
-	 QZY+nM3Q9Qtw3lkB5IzIFecrJlUYcav/pwN6cGmKKixoySKd571iGBgHFPi//zNauk
-	 24CODnO05q7RQ==
+	b=kzZvav1UH9JG0WZdDMBiXzc6WbVABuJ9stOwRt+sG48OL1SLx8/su9rNFcDGc1Ue8
+	 dBHmL2uF6rt97vFfVxMxVZEwY3QPrtClbq7yQIIrTS7oRj4olzTwbeAHJGsOuyw1t0
+	 V0x96rBvMuf1BDTUnIScI0T1ExCaRKNyEn3DKpyidlqM2F2goOSCzzP3OfVrYffQhd
+	 wjZiJ/WXQebMGqp3POeLEo3dxSEFzAN6KXHibuSFh1nkwKJgHkH6VFD2QjYz4xJcJy
+	 M32DmIlD/ge22nkbDmMnt17ymqgllZnSTdm/TIs442HScyY70xiGZHC47wS4kqMYMZ
+	 2qpNI43tvn01A==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Nicolas Escande <nico.escande@gmail.com>,
+	Johannes Berg <johannes.berg@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
 	davem@davemloft.net,
-	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 7/9] ila: block BH in ila_output()
-Date: Tue, 18 Jun 2024 08:42:55 -0400
-Message-ID: <20240618124300.3304600-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 4/9] wifi: mac80211: mesh: init nonpeer_pm to active by default in mesh sdata
+Date: Tue, 18 Jun 2024 08:43:10 -0400
+Message-ID: <20240618124318.3304798-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240618124300.3304600-1-sashal@kernel.org>
-References: <20240618124300.3304600-1-sashal@kernel.org>
+In-Reply-To: <20240618124318.3304798-1-sashal@kernel.org>
+References: <20240618124318.3304798-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,61 +68,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.278
+X-stable-base: Linux 4.19.316
 Content-Transfer-Encoding: 8bit
 
-From: Eric Dumazet <edumazet@google.com>
+From: Nicolas Escande <nico.escande@gmail.com>
 
-[ Upstream commit cf28ff8e4c02e1ffa850755288ac954b6ff0db8c ]
+[ Upstream commit 6f6291f09a322c1c1578badac8072d049363f4e6 ]
 
-As explained in commit 1378817486d6 ("tipc: block BH
-before using dst_cache"), net/core/dst_cache.c
-helpers need to be called with BH disabled.
+With a ath9k device I can see that:
+	iw phy phy0 interface add mesh0 type mp
+	ip link set mesh0 up
+	iw dev mesh0 scan
 
-ila_output() is called from lwtunnel_output()
-possibly from process context, and under rcu_read_lock().
+Will start a scan with the Power Management bit set in the Frame Control Field.
+This is because we set this bit depending on the nonpeer_pm variable of the mesh
+iface sdata and when there are no active links on the interface it remains to
+NL80211_MESH_POWER_UNKNOWN.
 
-We might be interrupted by a softirq, re-enter ila_output()
-and corrupt dst_cache data structures.
+As soon as links starts to be established, it wil switch to
+NL80211_MESH_POWER_ACTIVE as it is the value set by befault on the per sta
+nonpeer_pm field.
+As we want no power save by default, (as expressed with the per sta ini values),
+lets init it to the expected default value of NL80211_MESH_POWER_ACTIVE.
 
-Fix the race by using local_bh_disable().
+Also please note that we cannot change the default value from userspace prior to
+establishing a link as using NL80211_CMD_SET_MESH_CONFIG will not work before
+NL80211_CMD_JOIN_MESH has been issued. So too late for our initial scan.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Acked-by: Paolo Abeni <pabeni@redhat.com>
-Link: https://lore.kernel.org/r/20240531132636.2637995-5-edumazet@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Nicolas Escande <nico.escande@gmail.com>
+Link: https://msgid.link/20240527141759.299411-1-nico.escande@gmail.com
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv6/ila/ila_lwt.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ net/mac80211/mesh.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/ipv6/ila/ila_lwt.c b/net/ipv6/ila/ila_lwt.c
-index 422dcc691f71c..6a6a30e82810d 100644
---- a/net/ipv6/ila/ila_lwt.c
-+++ b/net/ipv6/ila/ila_lwt.c
-@@ -58,7 +58,9 @@ static int ila_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 		return orig_dst->lwtstate->orig_output(net, sk, skb);
- 	}
- 
-+	local_bh_disable();
- 	dst = dst_cache_get(&ilwt->dst_cache);
-+	local_bh_enable();
- 	if (unlikely(!dst)) {
- 		struct ipv6hdr *ip6h = ipv6_hdr(skb);
- 		struct flowi6 fl6;
-@@ -86,8 +88,11 @@ static int ila_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 			goto drop;
- 		}
- 
--		if (ilwt->connected)
-+		if (ilwt->connected) {
-+			local_bh_disable();
- 			dst_cache_set_ip6(&ilwt->dst_cache, dst, &fl6.saddr);
-+			local_bh_enable();
-+		}
- 	}
- 
- 	skb_dst_set(skb, dst);
+diff --git a/net/mac80211/mesh.c b/net/mac80211/mesh.c
+index 3162f955f3ae2..c9a5271d9b59d 100644
+--- a/net/mac80211/mesh.c
++++ b/net/mac80211/mesh.c
+@@ -1454,6 +1454,7 @@ void ieee80211_mesh_init_sdata(struct ieee80211_sub_if_data *sdata)
+ 	ifmsh->last_preq = jiffies;
+ 	ifmsh->next_perr = jiffies;
+ 	ifmsh->csa_role = IEEE80211_MESH_CSA_ROLE_NONE;
++	ifmsh->nonpeer_pm = NL80211_MESH_POWER_ACTIVE;
+ 	/* Allocate all mesh structures when creating the first mesh interface. */
+ 	if (!mesh_allocated)
+ 		ieee80211s_init();
 -- 
 2.43.0
 
