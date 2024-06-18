@@ -1,238 +1,127 @@
-Return-Path: <netdev+bounces-104308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8283A90C18F
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 03:43:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC86C90C19F
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 03:50:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F05DFB22F30
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 01:43:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46EBDB22AC9
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 01:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3029615E9B;
-	Tue, 18 Jun 2024 01:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B86917740;
+	Tue, 18 Jun 2024 01:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sns5uOLC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="odVU79oE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0237910A16;
-	Tue, 18 Jun 2024 01:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59540E56A;
+	Tue, 18 Jun 2024 01:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718675014; cv=none; b=hMlCc9sS29JFqchVOgqwFZtI2NA+xeQU5SxlkuDgJtLvRd+1eGY7FrKTg1Zh4Rbypw+Q5MjJ6ZlNnH3QKuBtBMPEncaT8RhzoKZMeZqt+MqiIeZc48d8ITvCarnSTVfxHgZxVj2S40D4ZzFSVITv1rRtbO3Et83lQuzmOeAnQd8=
+	t=1718675429; cv=none; b=OOCqf6LKG6wz/3kUS/mR3rN+3gLwhoAnBayQAzFNyUJr2PAStvg8kjzjh+9pbPVVqLhgpA7Q3uE71wroh7Yruvqou5eC1t1dae2NMW293sRDVb9JOqTMWI/e+uRHf3HDZLWl8BTAK6Y7AhmioE/9tYofljsUETMWufml/ZZap3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718675014; c=relaxed/simple;
-	bh=lKZVylMEDQkBXztZ/GoU0xvg0FZppHHM24DQfAEF2UA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k2RAoiZIBqh+crXJeUXSTu+pK7nkqLpNpJddZ1vGmRzmEjEuSRYhKJhnIN5EQYy64vRaKvHpHec+B4PkJ0aJDyEtfIH3Pf2SxcaR0mK4iq64C243v1asbSihJxNYpor+uQpzitbAuiphLxpzlpIG0KtHFPTJWuYFsmAKfwVmvb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sns5uOLC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94245C2BD10;
-	Tue, 18 Jun 2024 01:43:32 +0000 (UTC)
+	s=arc-20240116; t=1718675429; c=relaxed/simple;
+	bh=PKpDxjQLVo6wtTTfpFPstcUJb+vLoicNbbWQdJIWqpA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ZXMvyR2auxm7hkMqH1IQG48AZKAGokB2x++yHMQzGGiBuRESbWh/fDmsNf69H42IvAM5cKNrfkWYJSGJfEG8ztn8EzKL2dIM1qjg344bWkTdbnp/XR/q+1rEJa/6LGadBpxNW/VEpjNT3qjDRefJ2rVw/ly7hJacTDEIXkGPOCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=odVU79oE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CA20FC3277B;
+	Tue, 18 Jun 2024 01:50:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718675013;
-	bh=lKZVylMEDQkBXztZ/GoU0xvg0FZppHHM24DQfAEF2UA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sns5uOLCBDXtFflQPRb8aI6UDSIcGHeKA44luZnmiuFjkvlwAVPuZ7xRpWqukrkO0
-	 hKdJfPQ6LPut2DVolR0sGSnhgCH9eYyQuHrKALPegSHOs0RBPuLsEynd7vig1h7qhC
-	 DCB08+wD/EEzIBk0Ut2LXxwCT71i9LHI8NFbEocoGAeezgBdRvR/bq7pOMTnKunJfY
-	 TTWv2nwYrmlAzEMe1tibmNSqDt770O+7NhT8koT35ZXfF59ZFL3dYVRNm25QGxKiVA
-	 dSSH2EALwv7RLRc4vE/o37kmYB10W3Ks3BsQr2eMFaWrNnCLY2yeXzRCgI5eNcDWBV
-	 /lwKRxqrbeofw==
-Date: Mon, 17 Jun 2024 18:43:31 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: Re: [PATCH net-next v15 13/14] net: ethtool: tsinfo: Add support
- for hwtstamp provider and get/set hwtstamp config
-Message-ID: <20240617184331.0ddfd08e@kernel.org>
-In-Reply-To: <20240612-feature_ptp_netnext-v15-13-b2a086257b63@bootlin.com>
-References: <20240612-feature_ptp_netnext-v15-0-b2a086257b63@bootlin.com>
-	<20240612-feature_ptp_netnext-v15-13-b2a086257b63@bootlin.com>
+	s=k20201202; t=1718675428;
+	bh=PKpDxjQLVo6wtTTfpFPstcUJb+vLoicNbbWQdJIWqpA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=odVU79oEmB45LzpwjCapeOqmNg9zX7LApAqwKJ+TSKGx+DzO0GqzDJe/2sU9RM3XO
+	 x7o9Vy+kX0gYMNLSa8zjIi9sY6WirU4SLrnjFUTSROn3vCnvnd9LDkBeO83WTOVmc5
+	 W7LR+GVhJbrJIsgo3otgsKIAU9t1FX1VcPBkXnHQ+4A5B5EbtIKYPlP4J07zvkL1mF
+	 Xp3vFFSPtfxmwO87761gt8cjkD/B14vP2thffGau10DYqpTYjzkJnfncRapN+X3jaQ
+	 E8oGUMW72XXctEN9gu7KmpYtO2QaqnrrtieGF7wnRaOdvBXHqFJRY6+5DsqWROGEYj
+	 Yqv2YnZv2785Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B8066C4166F;
+	Tue, 18 Jun 2024 01:50:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v15 00/14] net: Make timestamping selectable
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171867542874.561.14086778565538344175.git-patchwork-notify@kernel.org>
+Date: Tue, 18 Jun 2024 01:50:28 +0000
+References: <20240612-feature_ptp_netnext-v15-0-b2a086257b63@bootlin.com>
+In-Reply-To: <20240612-feature_ptp_netnext-v15-0-b2a086257b63@bootlin.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+ andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, radu-nicolae.pirea@oss.nxp.com,
+ j.vosburgh@gmail.com, andy@greyhouse.net, nicolas.ferre@microchip.com,
+ claudiu.beznea@tuxon.dev, willemdebruijn.kernel@gmail.com, corbet@lwn.net,
+ horatiu.vultur@microchip.com, UNGLinuxDriver@microchip.com, horms@kernel.org,
+ vladimir.oltean@nxp.com, thomas.petazzoni@bootlin.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, maxime.chevallier@bootlin.com,
+ rrameshbabu@nvidia.com, willemb@google.com, shannon.nelson@amd.com,
+ wintera@linux.ibm.com
 
-On Wed, 12 Jun 2024 17:04:13 +0200 Kory Maincent wrote:
-> Enhance 'get' command to retrieve tsinfo of hwtstamp providers within a
-> network topology and read current hwtstamp configuration.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 12 Jun 2024 17:04:00 +0200 you wrote:
+> Up until now, there was no way to let the user select the hardware
+> PTP provider at which time stamping occurs. The stack assumed that PHY time
+> stamping is always preferred, but some MAC/PHY combinations were buggy.
 > 
-> Introduce support for ETHTOOL_MSG_TSINFO_SET ethtool netlink socket to
-> configure hwtstamp of a PHC provider. Note that simultaneous hwtstamp
-> isn't supported; configuring a new one disables the previous setting.
+> This series updates the default MAC/PHY default timestamping and aims to
+> allow the user to select the desired hwtstamp provider administratively.
 > 
-> Also, add support for a specific dump command to retrieve all hwtstamp
-> providers within the network topology, with added functionality for
-> filtered dump to target a single interface.
+> [...]
 
-Could you split this up, a little bit? It's rather large for a core
-change.
+Here is the summary with links:
+  - [net-next,v15,01/14] net_tstamp: Add TIMESTAMPING SOFTWARE and HARDWARE mask
+    (no matching commit)
+  - [net-next,v15,02/14] net: Move dev_set_hwtstamp_phylib to net/core/dev.h
+    https://git.kernel.org/netdev/net-next/c/efb459303dd5
+  - [net-next,v15,03/14] net: Make dev_get_hwtstamp_phylib accessible
+    (no matching commit)
+  - [net-next,v15,04/14] net: Make net_hwtstamp_validate accessible
+    (no matching commit)
+  - [net-next,v15,05/14] net: Change the API of PHY default timestamp to MAC
+    (no matching commit)
+  - [net-next,v15,06/14] net: net_tstamp: Add unspec field to hwtstamp_source enumeration
+    (no matching commit)
+  - [net-next,v15,07/14] net: Add struct kernel_ethtool_ts_info
+    (no matching commit)
+  - [net-next,v15,08/14] ptp: Add phc source and helpers to register specific PTP clock or get information
+    (no matching commit)
+  - [net-next,v15,09/14] net: Add the possibility to support a selected hwtstamp in netdevice
+    (no matching commit)
+  - [net-next,v15,10/14] net: netdevsim: ptp_mock: Convert to netdev_ptp_clock_register
+    (no matching commit)
+  - [net-next,v15,11/14] net: macb: Convert to netdev_ptp_clock_register
+    (no matching commit)
+  - [net-next,v15,12/14] net: ptp: Move ptp_clock_index() to builtin symbol
+    (no matching commit)
+  - [net-next,v15,13/14] net: ethtool: tsinfo: Add support for hwtstamp provider and get/set hwtstamp config
+    (no matching commit)
+  - [net-next,v15,14/14] netlink: specs: tsinfo: Enhance netlink attributes and add a set command
+    (no matching commit)
 
->  Desired behavior is passed into the kernel and to a specific device by
-> -calling ioctl(SIOCSHWTSTAMP) with a pointer to a struct ifreq whose
-> -ifr_data points to a struct hwtstamp_config. The tx_type and
-> -rx_filter are hints to the driver what it is expected to do. If
-> -the requested fine-grained filtering for incoming packets is not
-> +calling the tsinfo netlink socket ETHTOOL_MSG_TSINFO_SET.
-> +The ETHTOOL_A_TSINFO_TX_TYPES, ETHTOOL_A_TSINFO_RX_FILTERS and
-> +ETHTOOL_A_TSINFO_HWTSTAMP_FLAGS netlink attributes are then used to set the
-> +struct hwtstamp_config accordingly.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-nit: EHTOOL_A* defines in `` `` quotes?
 
-> +		if (hwtstamp && ptp_clock_phydev(hwtstamp->ptp) == phydev) {
-> +			rcu_assign_pointer(dev->hwtstamp, NULL);
-> +			synchronize_rcu();
->  			kfree(hwtstamp);
-
-Could you add an rcu_head to this struct and use kfree_rcu()
-similarly later use an rcu call to do the dismantle?
-synchronize_rcu() can be slow.
-
-> +enum {
-> +	ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_UNSPEC,
-> +	ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_INDEX,		/* u32 */
-> +	ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_QUALIFIER,		/* u32 */
-> +
-> +	__ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_CNT,
-> +	ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_MAX = (__ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_CNT - 1)
-> +};
-> +
->  
-
-nit: double new line
-
-> +const struct nla_policy ethnl_tsinfo_get_policy[ETHTOOL_A_TSINFO_MAX + 1] = {
->  	[ETHTOOL_A_TSINFO_HEADER]		=
->  		NLA_POLICY_NESTED(ethnl_header_policy_stats),
-> +	[ETHTOOL_A_TSINFO_GHWTSTAMP] =
-> +		NLA_POLICY_MAX(NLA_U8, 1),
-
-I think this can be an NLA_FLAG, but TBH I'm also confused about 
-the semantics. Can you explain what it does from user perspective?
-
-> +	[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER] =
-> +		NLA_POLICY_NESTED(ethnl_tsinfo_hwtstamp_provider_policy),
->  };
->  
-> +static int tsinfo_parse_hwtstamp_provider(const struct nlattr *nest,
-> +					  struct hwtst_provider *hwtst,
-> +					  struct netlink_ext_ack *extack,
-> +					  bool *mod)
-> +{
-> +	struct nlattr *tb[ARRAY_SIZE(ethnl_tsinfo_hwtstamp_provider_policy)];
-
-Could you find a more sensible name for this policy?
-
-> +	int ret;
-> +
-> +	ret = nla_parse_nested(tb,
-> +			       ARRAY_SIZE(ethnl_tsinfo_hwtstamp_provider_policy) - 1,
-> +			       nest,
-> +			       ethnl_tsinfo_hwtstamp_provider_policy, extack);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	if (NL_REQ_ATTR_CHECK(extack, nest, tb, ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_INDEX) ||
-> +	    NL_REQ_ATTR_CHECK(extack, nest, tb, ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_QUALIFIER))
-
-nit: wrap at 80 chars, if you can, please
-
-> +		return -EINVAL;
-> +
-> +	ethnl_update_u32(&hwtst->index,
-> +			 tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_INDEX],
-> +			 mod);
-> +	ethnl_update_u32(&hwtst->qualifier,
-> +			 tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_QUALIFIER],
-> +			 mod);
-> +
-> +	return 0;
-> +}
-
->  static int tsinfo_prepare_data(const struct ethnl_req_info *req_base,
->  			       struct ethnl_reply_data *reply_base,
->  			       const struct genl_info *info)
->  {
->  	struct tsinfo_reply_data *data = TSINFO_REPDATA(reply_base);
-> +	struct tsinfo_req_info *req = TSINFO_REQINFO(req_base);
->  	struct net_device *dev = reply_base->dev;
->  	int ret;
->  
->  	ret = ethnl_ops_begin(dev);
->  	if (ret < 0)
->  		return ret;
-> +
-> +	if (req->get_hwtstamp) {
-> +		struct kernel_hwtstamp_config cfg = {};
-> +
-> +		if (!dev->netdev_ops->ndo_hwtstamp_get) {
-> +			ret = -EOPNOTSUPP;
-> +			goto out;
-> +		}
-> +
-> +		ret = dev_get_hwtstamp_phylib(dev, &cfg);
-> +		data->hwtst_config.tx_type = BIT(cfg.tx_type);
-> +		data->hwtst_config.rx_filter = BIT(cfg.rx_filter);
-> +		data->hwtst_config.flags = BIT(cfg.flags);
-> +		goto out;
-
-This is wrong AFAICT, everything up to this point was a nit pick ;)
-Please take a look at 89e281ebff72e6, I think you're reintroducing a
-form of the same bug. If ETHTOOL_FLAG_STATS was set, you gotta run stats
-init.
-
-Perhaps you can move the stats getting up, and turn this code into if
-/ else if / else, without the goto.
-
-> +int ethnl_tsinfo_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
-> +{
-> +	struct ethnl_tsinfo_dump_ctx *ctx = (void *)cb->ctx;
-> +	struct net *net = sock_net(skb->sk);
-> +	struct net_device *dev;
-> +	int ret = 0;
-> +
-> +	rtnl_lock();
-> +	if (ctx->req_info->base.dev) {
-> +		ret = ethnl_tsinfo_dump_one_dev(skb,
-> +						ctx->req_info->base.dev,
-> +						cb);
-> +	} else {
-> +		for_each_netdev_dump(net, dev, ctx->pos_ifindex) {
-> +			ret = ethnl_tsinfo_dump_one_dev(skb, dev, cb);
-> +			if (ret < 0 && ret != -EOPNOTSUPP)
-> +				break;
-> +			ctx->pos_phcindex = 0;
-> +		}
-> +	}
-> +	rtnl_unlock();
-> +
-> +	if (ret == -EMSGSIZE && skb->len)
-> +		return skb->len;
-> +	return ret;
-
-You can just return ret without the if converting to skb->len
-af_netlink will handle the EMSGSIZE errors in the same way.
 
