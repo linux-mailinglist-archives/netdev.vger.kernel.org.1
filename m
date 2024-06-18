@@ -1,50 +1,56 @@
-Return-Path: <netdev+bounces-104447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD30490C90A
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:21:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 079B990C91D
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:23:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EE712815BE
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:21:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A78B41F21841
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:23:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184D415B142;
-	Tue, 18 Jun 2024 10:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uT4f4Ii1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BC5B1386DD;
+	Tue, 18 Jun 2024 10:17:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FC313BC31;
-	Tue, 18 Jun 2024 10:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F90477104
+	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 10:17:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718705433; cv=none; b=K4C7Sndfsjmqbr53G92GLKiUS+hhG994j+rlmjP1cNmdIAAzwAAbWEqi1+uQJnYd7/EV/xcFEWwRV/BtG/OSAr8UcEhu06G9K4ZyBHzCOWofD0lOEnS+/MJ49OI7LkF6G7fxcmhwUyv3Bl0w4mkDFk7ufzOo2Yt0dTQkwW9+2Rs=
+	t=1718705874; cv=none; b=Am0zYdYyIXeXLyAymVJfv2dY6n/iVb/EdIOXYkHI97wG6QELTwsUfmx7D8Ni2+sUjx0C53ZnIhzcTp2cl1zwRjHQ9UVUf1oVl1lzZwW+ibfUo4MS6S2QbxxwTfV7lMW10+Q7DBKmE2sBVJZP3kREQlP/TZt2dSyCBPIfA+6Tg5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718705433; c=relaxed/simple;
-	bh=a7jB79oONKETKnADzdC0pB8BUr9yJfbstgM1k2AIKjA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NWOvfencx98yli12D3JttWWwMdBkbX1YufBTwZfpnTB+k5Cn7WBIhJA/VGjRkpRTiC7Opj0GLCWqnSzLkpACTA6DXcabgQ/+Vd5pNvPc4qpp+2AUiAm5thEqbyXAMKwUexw4CsWYvq0Q9wPwEHhbczyjqqRqX4O8fgSoul4sVVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uT4f4Ii1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6CEB7C4AF1D;
-	Tue, 18 Jun 2024 10:10:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718705432;
-	bh=a7jB79oONKETKnADzdC0pB8BUr9yJfbstgM1k2AIKjA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uT4f4Ii1ATHBM+fVZLNywfp7tD1l7orghJkVWL8BnUFAprG7yqOCNgT+7Tw8sF3xy
-	 jVMgHFVIcrRejjfOkERgkXGEbq1w335MvbzlqXtE8e2LInGUGEXGx0Yiw+Kib+8KVd
-	 SHrTa6N84fJ50/pvRezCaxJc8BVah13hEOmVsi8Ty3tCisGO0P+H9PZQW/rqSWOGpM
-	 5pTLYhlz4pzicexUZSPj9xKHZPFY/slkPPhT6pcHQpDckxh2v2jXk/oCn2VXlWlydk
-	 jeoe445rbma5GOJ9i9vM/X/gzwb8AVN35qWZ0u29HTZreeYX5w6YMDeZOkj+HEecyy
-	 AeHBzFfyCby8A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 507E3C4361C;
-	Tue, 18 Jun 2024 10:10:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1718705874; c=relaxed/simple;
+	bh=utcvrYsa6+Oxw4NEtLGU3yHRVBflsT53oPb8YA8qUso=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jaThmMW52VuXTHrabv4wB3wVHyq12E4cKV3JhFNg8UX72HCWGLR9K9WFtvQJYDTesr1Dsu4SGQZX33upKfbN02ZlLe88Eo6v9VqUK0nQxy+GSHI6D425BvcJrjlUlkUbqY17me+HMWqYKbRETdOH1vPAan25sDfBEIbNCNN6Er0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: bizesmtpsz9t1718705776tdh05l5
+X-QQ-Originating-IP: d+QOTMhYJRyW1F32Pd4TFcDAdXPNOlL4it2Hx602vvI=
+Received: from lap-jiawenwu.trustnetic.com ( [183.159.97.141])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 18 Jun 2024 18:16:13 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 6648041797492083366
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: davem@davemloft.net,
+	dumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew@lunn.ch,
+	rmk+kernel@armlinux.org.uk,
+	horms@kernel.org,
+	netdev@vger.kernel.org
+Cc: mengyuanlou@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v3 0/3] add flow director for txgbe
+Date: Tue, 18 Jun 2024 18:16:06 +0800
+Message-Id: <20240618101609.3580-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,49 +58,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net V5 0/3] net: lan743x: Fixes for multiple WOL related
- issues
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171870543232.18151.11499833236578491242.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Jun 2024 10:10:32 +0000
-References: <20240614171157.190871-1-Raju.Lakkaraju@microchip.com>
-In-Reply-To: <20240614171157.190871-1-Raju.Lakkaraju@microchip.com>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- linux-kernel@vger.kernel.org, bryan.whitehead@microchip.com, andrew@lunn.ch,
- linux@armlinux.org.uk, sbauer@blackbox.su, hmehrtens@maxlinear.com,
- lxu@maxlinear.com, hkallweit1@gmail.com, edumazet@google.com,
- pabeni@redhat.com, wojciech.drewek@intel.com, UNGLinuxDriver@microchip.com
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-Hello:
+Add flow director support for Wangxun 10Gb NICs.
 
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+v2 -> v3: https://lore.kernel.org/all/20240605020852.24144-1-jiawenwu@trustnetic.com/
+- Wrap the code at 80 chars where possible. (Jakub Kicinski)
+- Add function description address on kernel-doc. (Jakub Kicinski)
+- Correct return code. (Simon Horman)
+- Remove redundant size check. (Hariprasad Kelam)
 
-On Fri, 14 Jun 2024 22:41:54 +0530 you wrote:
-> This patch series implement the following fixes:
-> 1. Disable WOL upon resume in order to restore full data path operation
-> 2. Support WOL at both the PHY and MAC appropriately
-> 3. Remove interrupt mask clearing from config_init
-> 
-> Patch-3 was sent seperately earlier. Review comments in link:
-> https://lore.kernel.org/lkml/4a565d54-f468-4e32-8a2c-102c1203f72c@lunn.ch/T/
-> 
-> [...]
+v1 -> v2: https://lore.kernel.org/all/20240529093821.27108-1-jiawenwu@trustnetic.com/
+- Fix build warnings reported by kernel test robot.
 
-Here is the summary with links:
-  - [net,V5,1/3] net: lan743x: disable WOL upon resume to restore full data path operation
-    https://git.kernel.org/netdev/net/c/7725363936a8
-  - [net,V5,2/3] net: lan743x: Support WOL at both the PHY and MAC appropriately
-    https://git.kernel.org/netdev/net/c/8c248cd83601
-  - [net,V5,3/3] net: phy: mxl-gpy: Remove interrupt mask clearing from config_init
-    https://git.kernel.org/netdev/net/c/c44d3ffd85db
+Jiawen Wu (3):
+  net: txgbe: add FDIR ATR support
+  net: txgbe: support Flow Director perfect filters
+  net: txgbe: add FDIR info to ethtool ops
 
-You are awesome, thank you!
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   |  39 +-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  32 +-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.h    |   2 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  62 +-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.h   |   1 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  56 +-
+ drivers/net/ethernet/wangxun/txgbe/Makefile   |   1 +
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    | 427 ++++++++++++
+ .../net/ethernet/wangxun/txgbe/txgbe_fdir.c   | 643 ++++++++++++++++++
+ .../net/ethernet/wangxun/txgbe/txgbe_fdir.h   |  20 +
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  18 +
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   | 147 ++++
+ 12 files changed, 1436 insertions(+), 12 deletions(-)
+ create mode 100644 drivers/net/ethernet/wangxun/txgbe/txgbe_fdir.c
+ create mode 100644 drivers/net/ethernet/wangxun/txgbe/txgbe_fdir.h
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.27.0
 
 
