@@ -1,259 +1,113 @@
-Return-Path: <netdev+bounces-104344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FCBE90C362
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 08:17:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1F2A90C364
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 08:18:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21D541C22A5A
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 06:17:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B3F42844CB
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 06:18:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A77781C6A1;
-	Tue, 18 Jun 2024 06:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D23F1C2A3;
+	Tue, 18 Jun 2024 06:18:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="v9sAO9Vc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hnjzjFOT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6C81C2A3
-	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 06:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E79FC0E;
+	Tue, 18 Jun 2024 06:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718691473; cv=none; b=PT8gxGhddD1Ioq8JEsBr7byHaykX7c4OVGq2xGIrBjqOHMESjEtiPK9p/SgyAEgdBVimEtrSBvkPDfh6p6mUApbjUHy/P3mBQHsEH+zHTjyEhB4GWFtFCLksGbLOnwtNRoc8DlfdyYo7+tE/Ds0raEqqWjm0ZA4yh1MQFPj33rE=
+	t=1718691500; cv=none; b=DHGZy8fNcEtVyZxxn2YQHmIZb+zKXq2qDWOFB2YcdTe7qqnFlaIDqoqAIjegtlrnRo/nJ+XlFxjFb9CrFuiRe2eXJnFdmpXGNoc8IyA2H/Q7s+BJkId1LFp73Avd/mBY1KVwFY+Pjmzq9k3IV2Ik/rOfPPkl1Tc7Ptw8Bg6pB80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718691473; c=relaxed/simple;
-	bh=U8DqPi5nV6Ax8AwqbmEjNJacsVfQKL3n9p6yGWihwhw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R+X5AXY+Fd7BBA55leP7W8Nc8NukSSmc52taLNxOYnN08Q2H4qs4BsNp8L0C26XOJ/sHcVgnnJu3+Rj1MdBq7jsVGHBHy7K2Aikl0ZEFrAMnUL9VY1c6h5HD78h0SKz17OAJS5Otpk4WfX+96pW7qSjXFZch1S4BQXC4emaSjYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=v9sAO9Vc; arc=none smtp.client-ip=209.85.128.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-4217136a74dso43317345e9.2
-        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 23:17:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718691469; x=1719296269; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BX2tptrJJXy8ed3PziokxT4H9bzzrxMDT/j3fl102RY=;
-        b=v9sAO9VcKpHDhvvDaQnQT9oe3BK4AYj5qrxuAwiduzNsdm8GYIf11LXmyV1pCMBccz
-         TzXBgqwat6m6qr017LjqTLDfTqnqs4239xyBsLDGDMapVdK9myFbabTusRw3oO1vDlNJ
-         Ivoex83YmEKoaArh4HPD8ASeeO5nlVjieayL3xAKGIU7i29vc3EERARglq5lrz9Vstmc
-         bHZ+3Ej7b/+sOaRuT+u3WekjsPvRvwca9olNNRVq83HlFDH0sl0lI2OiP31mhnJiYSf8
-         fO5K4W4HJ9oOUUGuD8bdouMb5JZfl4gnukOYx/YZpIDy9kyHtgjtJ8AzjHq2eW8UZjTF
-         Cvzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718691469; x=1719296269;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BX2tptrJJXy8ed3PziokxT4H9bzzrxMDT/j3fl102RY=;
-        b=fdGjMvF0Xh7LIQZyFJneBANiEND5HlQ5amfA6wh9gg12LMPDju5ru6isxsWSxPKTzN
-         +Go+ymWwWBSSaKiVubKsOTFCQRoN54tqTPqGL6f2lXXg+p0fCtBiVpbhK2B+ie9+HAky
-         J1HyjYgiwjluE1baMJR8SCewjaEKbk6/qZE4embvQk3ujpoynBwPMcgLvSp/3lbNbKYM
-         cwo/foIrJk9nOwy4vOyVVeJXRvkkcLIlK48i0imA+og/z6boY3MldnUrIQS23vOalyrN
-         Dg3NCVxYDbHUf6WdQZ9Hz4cHc3BJ3yP+Z3d1j2gJdq8pw2VYJe7pTsRM+w8CjpKMiXat
-         EO0g==
-X-Forwarded-Encrypted: i=1; AJvYcCXRdKtbBA8JepAw5Nr/KDLeTUlIpjalsGsYdpnXDnF3yzyefGqEaLbHnZ0B1F0hpE8HdsQOYSdHTWQTTikORKJ21XNwNf2n
-X-Gm-Message-State: AOJu0YxWi7zWcWlGr3XGJsvsS+Ki0Ogww6Iz9nei+W85xNAzFrCVDO96
-	1E+ckut8e32XLYvRGkNEAOcfNa/JjQAng/1YF8kTSA+PfxTL7kFSjOuxFBfxUJA=
-X-Google-Smtp-Source: AGHT+IH6CM1gTzKj6FCjgNgVsgSvdy5aTYOz7Z2sRn55KttsjbBKGQZmRsym7bESsnvXwvEuZIzadg==
-X-Received: by 2002:a05:600c:1e20:b0:422:683b:df57 with SMTP id 5b1f17b1804b1-4230483097cmr81808715e9.21.1718691468481;
-        Mon, 17 Jun 2024 23:17:48 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422f6320c16sm179538615e9.38.2024.06.17.23.17.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 23:17:47 -0700 (PDT)
-Date: Tue, 18 Jun 2024 08:17:44 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Chengen Du <chengen.du@canonical.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	kaber@trash.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v8] af_packet: Handle outgoing VLAN packets without
- hardware offloading
-Message-ID: <ZnEmiIhs5K4ehcYH@nanopsycho.orion>
-References: <20240617054514.127961-1-chengen.du@canonical.com>
- <ZnAdiDjI_unrELB8@nanopsycho.orion>
- <6670898e1ca78_21d16f2946f@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1718691500; c=relaxed/simple;
+	bh=HkJdpsAULQR2xrRc3tq+4t135ZH+O+GnnLuAQ4wKgeg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fZ25m9IhISLz1n1bpTtup/MbBMdQSnKQErrNp6b7w5JNuTqNPzzsgcJgv9sClWL9ggVae5qIDiZDGfpKCI2BWs+9VaTlJsjyvBKHEzCful95JyUEIXDJhw9vWsaZwgDe1aPDjiMrKsf5ixEaywQKJQNL9sdOdvGNCYI2N5KEg0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hnjzjFOT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66393C3277B;
+	Tue, 18 Jun 2024 06:18:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718691499;
+	bh=HkJdpsAULQR2xrRc3tq+4t135ZH+O+GnnLuAQ4wKgeg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=hnjzjFOTje7evbA0tZ+lYt65js85/nJnvDSq4fXd6dD3Nygi4IfDXSnm37kjJBz6o
+	 R7g51qnuTfU5EKG9PyoMSggb5UMQ/AbNpoYN2m9CBh7IAr+/5j2WCmxBmdtTQAiJ7e
+	 /g0rQSVdbIuOqEn0gFXjq4mFrLxFWDtBUNlEJxynqNh4F5nl8SB2e/OVyBR+HyBTw1
+	 x19CHdA9KuVvQhXafanh1NP0c6HdUjoeqQ4eRs49Jz5+H6VQN+mFBcGPM29zlGYQ3O
+	 4tufcJrGtyDMCjli5MwyjaNv0u5B4+2rvzxyAp4P3b7S91MB1/Rd4bAUAlsvAVdxr0
+	 ZHCNJAJKO1Egw==
+Message-ID: <86512cfe-3359-4d2c-ab27-8b298f56f15f@kernel.org>
+Date: Tue, 18 Jun 2024 08:18:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6670898e1ca78_21d16f2946f@willemb.c.googlers.com.notmuch>
-
-Mon, Jun 17, 2024 at 09:07:58PM CEST, willemdebruijn.kernel@gmail.com wrote:
->Jiri Pirko wrote:
->> Mon, Jun 17, 2024 at 07:45:14AM CEST, chengen.du@canonical.com wrote:
->> >The issue initially stems from libpcap. The ethertype will be overwritten
->> >as the VLAN TPID if the network interface lacks hardware VLAN offloading.
->> >In the outbound packet path, if hardware VLAN offloading is unavailable,
->> >the VLAN tag is inserted into the payload but then cleared from the sk_buff
->> >struct. Consequently, this can lead to a false negative when checking for
->> >the presence of a VLAN tag, causing the packet sniffing outcome to lack
->> >VLAN tag information (i.e., TCI-TPID). As a result, the packet capturing
->> >tool may be unable to parse packets as expected.
->> >
->> >The TCI-TPID is missing because the prb_fill_vlan_info() function does not
->> >modify the tp_vlan_tci/tp_vlan_tpid values, as the information is in the
->> >payload and not in the sk_buff struct. The skb_vlan_tag_present() function
->> >only checks vlan_all in the sk_buff struct. In cooked mode, the L2 header
->> >is stripped, preventing the packet capturing tool from determining the
->> >correct TCI-TPID value. Additionally, the protocol in SLL is incorrect,
->> >which means the packet capturing tool cannot parse the L3 header correctly.
->> >
->> >Link: https://github.com/the-tcpdump-group/libpcap/issues/1105
->> >Link: https://lore.kernel.org/netdev/20240520070348.26725-1-chengen.du@canonical.com/T/#u
->> >Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspace")
->> >Cc: stable@vger.kernel.org
->> >Signed-off-by: Chengen Du <chengen.du@canonical.com>
->> >---
->> > net/packet/af_packet.c | 86 +++++++++++++++++++++++++++++++++++++++++-
->> > 1 file changed, 84 insertions(+), 2 deletions(-)
->> >
->> >diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
->> >index ea3ebc160e25..84e8884a77e3 100644
->> >--- a/net/packet/af_packet.c
->> >+++ b/net/packet/af_packet.c
->> >@@ -538,6 +538,61 @@ static void *packet_current_frame(struct packet_sock *po,
->> > 	return packet_lookup_frame(po, rb, rb->head, status);
->> > }
->> > 
->> >+static u16 vlan_get_tci(struct sk_buff *skb, struct net_device *dev)
->> >+{
->> >+	struct vlan_hdr vhdr, *vh;
->> >+	u8 *skb_orig_data = skb->data;
->> >+	int skb_orig_len = skb->len;
->> >+	unsigned int header_len;
->> >+
->> >+	if (!dev)
->> >+		return 0;
->> >+
->> >+	/* In the SOCK_DGRAM scenario, skb data starts at the network
->> >+	 * protocol, which is after the VLAN headers. The outer VLAN
->> >+	 * header is at the hard_header_len offset in non-variable
->> >+	 * length link layer headers. If it's a VLAN device, the
->> >+	 * min_header_len should be used to exclude the VLAN header
->> >+	 * size.
->> >+	 */
->> >+	if (dev->min_header_len == dev->hard_header_len)
->> >+		header_len = dev->hard_header_len;
->> >+	else if (is_vlan_dev(dev))
->> >+		header_len = dev->min_header_len;
->> >+	else
->> >+		return 0;
->> >+
->> >+	skb_push(skb, skb->data - skb_mac_header(skb));
->> >+	vh = skb_header_pointer(skb, header_len, sizeof(vhdr), &vhdr);
->> >+	if (skb_orig_data != skb->data) {
->> >+		skb->data = skb_orig_data;
->> >+		skb->len = skb_orig_len;
->> >+	}
->> >+	if (unlikely(!vh))
->> >+		return 0;
->> >+
->> >+	return ntohs(vh->h_vlan_TCI);
->> >+}
->> >+
->> >+static __be16 vlan_get_protocol_dgram(struct sk_buff *skb)
->> >+{
->> >+	__be16 proto = skb->protocol;
->> >+
->> >+	if (unlikely(eth_type_vlan(proto))) {
->> >+		u8 *skb_orig_data = skb->data;
->> >+		int skb_orig_len = skb->len;
->> >+
->> >+		skb_push(skb, skb->data - skb_mac_header(skb));
->> >+		proto = __vlan_get_protocol(skb, proto, NULL);
->> >+		if (skb_orig_data != skb->data) {
->> >+			skb->data = skb_orig_data;
->> >+			skb->len = skb_orig_len;
->> >+		}
->> >+	}
->> >+
->> >+	return proto;
->> >+}
->> >+
->> > static void prb_del_retire_blk_timer(struct tpacket_kbdq_core *pkc)
->> > {
->> > 	del_timer_sync(&pkc->retire_blk_timer);
->> >@@ -1007,10 +1062,16 @@ static void prb_clear_rxhash(struct tpacket_kbdq_core *pkc,
->> > static void prb_fill_vlan_info(struct tpacket_kbdq_core *pkc,
->> > 			struct tpacket3_hdr *ppd)
->> > {
->> >+	struct packet_sock *po = container_of(pkc, struct packet_sock, rx_ring.prb_bdqc);
->> >+
->> > 	if (skb_vlan_tag_present(pkc->skb)) {
->> > 		ppd->hv1.tp_vlan_tci = skb_vlan_tag_get(pkc->skb);
->> > 		ppd->hv1.tp_vlan_tpid = ntohs(pkc->skb->vlan_proto);
->> > 		ppd->tp_status = TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
->> >+	} else if (unlikely(po->sk.sk_type == SOCK_DGRAM && eth_type_vlan(pkc->skb->protocol))) {
->> >+		ppd->hv1.tp_vlan_tci = vlan_get_tci(pkc->skb, pkc->skb->dev);
->> >+		ppd->hv1.tp_vlan_tpid = ntohs(pkc->skb->protocol);
->> >+		ppd->tp_status = TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
->> > 	} else {
->> > 		ppd->hv1.tp_vlan_tci = 0;
->> > 		ppd->hv1.tp_vlan_tpid = 0;
->> >@@ -2428,6 +2489,10 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
->> > 			h.h2->tp_vlan_tci = skb_vlan_tag_get(skb);
->> > 			h.h2->tp_vlan_tpid = ntohs(skb->vlan_proto);
->> > 			status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
->> >+		} else if (unlikely(sk->sk_type == SOCK_DGRAM && eth_type_vlan(skb->protocol))) {
->> >+			h.h2->tp_vlan_tci = vlan_get_tci(skb, skb->dev);
->> >+			h.h2->tp_vlan_tpid = ntohs(skb->protocol);
->> >+			status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
->> > 		} else {
->> > 			h.h2->tp_vlan_tci = 0;
->> > 			h.h2->tp_vlan_tpid = 0;
->> >@@ -2457,7 +2522,8 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
->> > 	sll->sll_halen = dev_parse_header(skb, sll->sll_addr);
->> > 	sll->sll_family = AF_PACKET;
->> > 	sll->sll_hatype = dev->type;
->> >-	sll->sll_protocol = skb->protocol;
->> >+	sll->sll_protocol = (sk->sk_type == SOCK_DGRAM) ?
->> >+		vlan_get_protocol_dgram(skb) : skb->protocol;
->> > 	sll->sll_pkttype = skb->pkt_type;
->> > 	if (unlikely(packet_sock_flag(po, PACKET_SOCK_ORIGDEV)))
->> > 		sll->sll_ifindex = orig_dev->ifindex;
->> >@@ -3482,7 +3548,8 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->> > 		/* Original length was stored in sockaddr_ll fields */
->> > 		origlen = PACKET_SKB_CB(skb)->sa.origlen;
->> > 		sll->sll_family = AF_PACKET;
->> >-		sll->sll_protocol = skb->protocol;
->> >+		sll->sll_protocol = (sock->type == SOCK_DGRAM) ?
->> >+			vlan_get_protocol_dgram(skb) : skb->protocol;
->> > 	}
->> > 
->> > 	sock_recv_cmsgs(msg, sk, skb);
->> >@@ -3539,6 +3606,21 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->> > 			aux.tp_vlan_tci = skb_vlan_tag_get(skb);
->> > 			aux.tp_vlan_tpid = ntohs(skb->vlan_proto);
->> > 			aux.tp_status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
->> >+		} else if (unlikely(sock->type == SOCK_DGRAM && eth_type_vlan(skb->protocol))) {
->> 
->> I don't understand why this would be needed here. We spent quite a bit
->> of efford in the past to make sure vlan header is always stripped.
->> Could you fix that in tx path to fulfill the expectation?
->
->Doesn't that require NETIF_F_HW_VLAN_CTAG_TX?
->
->I also wondered whether we should just convert the skb for this case
->with skb_vlan_untag, to avoid needing new PF_PACKET logic to handle
->unstripped tags in the packet socket code. But it seems equally
->complex.
-
-Correct. skb_vlan_untag() as a preparation of skb before this function
-is called is exactly what I was suggesting.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 2/7] net: introduce sk_skb_reason_drop
+ function
+To: Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ David Ahern <dsahern@kernel.org>,
+ Abhishek Chauhan <quic_abchauha@quicinc.com>,
+ Mina Almasry <almasrymina@google.com>, Florian Westphal <fw@strlen.de>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ David Howells <dhowells@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Pavel Begunkov <asml.silence@gmail.com>, linux-kernel@vger.kernel.org,
+ kernel-team@cloudflare.com, Steven Rostedt <rostedt@goodmis.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Neil Horman <nhorman@tuxdriver.com>, linux-trace-kernel@vger.kernel.org,
+ Dan Carpenter <dan.carpenter@linaro.org>
+References: <cover.1718642328.git.yan@cloudflare.com>
+ <5610bfe554a02f92dd279fad839e65503902f710.1718642328.git.yan@cloudflare.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <5610bfe554a02f92dd279fad839e65503902f710.1718642328.git.yan@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
->
->Aside from this conversation whether we need to support this
->unstripped case at all, code LGTM.
+
+On 17/06/2024 20.09, Yan Zhai wrote:
+> Long used destructors kfree_skb and kfree_skb_reason do not pass
+> receiving socket to packet drop tracepoints trace_kfree_skb.
+> This makes it hard to track packet drops of a certain netns (container)
+> or a socket (user application).
+> 
+> The naming of these destructors are also not consistent with most sk/skb
+> operating functions, i.e. functions named "sk_xxx" or "skb_xxx".
+> Introduce a new functions sk_skb_reason_drop as drop-in replacement for
+> kfree_skb_reason on local receiving path. Callers can now pass receiving
+> sockets to the tracepoints.
+> 
+> kfree_skb and kfree_skb_reason are still usable but they are now just
+> inline helpers that call sk_skb_reason_drop.
+> 
+> Note it is not feasible to do the same to consume_skb. Packets not
+> dropped can flow through multiple receive handlers, and have multiple
+> receiving sockets. Leave it untouched for now.
+> 
+> Suggested-by: Eric Dumazet<edumazet@google.com>
+> Signed-off-by: Yan Zhai<yan@cloudflare.com>
+> ---
+> v1->v2: changes function names to be more consistent with common sk/skb
+> operations
+> ---
+>   include/linux/skbuff.h | 10 ++++++++--
+>   net/core/skbuff.c      | 22 ++++++++++++----------
+>   2 files changed, 20 insertions(+), 12 deletions(-)
+
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
