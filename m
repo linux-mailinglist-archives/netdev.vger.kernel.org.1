@@ -1,263 +1,217 @@
-Return-Path: <netdev+bounces-104630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80EC290DA76
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 19:21:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0493890DA96
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 19:26:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CA45284E96
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 17:21:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 191CC282EAC
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 17:26:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 375B013E050;
-	Tue, 18 Jun 2024 17:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6525F143C4D;
+	Tue, 18 Jun 2024 17:26:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="C4DDrVjt";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="J6gZIZw7";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="C4DDrVjt";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="J6gZIZw7"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Z7rrCZMQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BB1F481BA;
-	Tue, 18 Jun 2024 17:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 938BA13F016;
+	Tue, 18 Jun 2024 17:26:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718731307; cv=none; b=kaKkx/dK4PAV6mLvtnAxCIXoUWBEneJc3Am9VC6/n7cItv6GyNFPi/QxDhSftZB/PHPVaCIoC1OGASaVwmZ7nSNKTqV/Tuli2q/dQ/a6NzOTJTKpBvOdTjKW0gV4BhPzBso4en1VtoON1RAnEcdHv6howLeGJPPib84ClcSOmus=
+	t=1718731593; cv=none; b=NRYE6svK0nOspp6JJbBVzKmDCQCDERW1g07K6MGosXiHG8fy9OHQ9zE4NQhlahpwQRomEA2VHfadjJZ7VJItpnZXhCkLhxk2bHe284eK6exmGhG+/Qt/ddr77hy7IKfO3UtNComt71cfrGlJOkniyfhl5hf/HvtrS0S1Y18E9gI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718731307; c=relaxed/simple;
-	bh=XifnjRu7NHCCvC3YOJcDOtiopR+02JSKMWAo1x5MOE8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sUFHb/na9bzvFqHs3BCD4f04tyiZg1oXFsKDv/VD/A9wBzfrzhFht2wFHz/Ya1P5z7THFSJ47h03B6UltmcAvDA9WuAETEDGbDr41Da/U/smNEdYJQUNmJqeY3xyIrigV8H0kPAHi2yvnMDTxqqlrIym70i1UN/Kb73EvutRWlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=C4DDrVjt; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=J6gZIZw7; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=C4DDrVjt; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=J6gZIZw7; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 518681F793;
-	Tue, 18 Jun 2024 17:21:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1718731303; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=J1+5aJgyw3CtZTFBGmIikSQ36Vr1CyzpzCCXc9BE0+0=;
-	b=C4DDrVjtwmJ3KDJeqhHGK8csrlwsU7NnuesHyLfkX8JSEttQgImvCWEQ9l1znx9g3dgk5z
-	k9wE55uTE2jigf6J7iDjxVvshrg5C/vVTET1fuq8uTMbvJczRQC8pZvdGE01rvjJ9wLrfk
-	iHb6M+lEOAOcxOg3qyUjL2/YqpknTEk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1718731303;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=J1+5aJgyw3CtZTFBGmIikSQ36Vr1CyzpzCCXc9BE0+0=;
-	b=J6gZIZw7DoKFGxnccGFBb8q/RLi8SwlcQZm7My8/AlVWJot59WvQdDW+fEB/iLWfzO7Dfq
-	3Y9teTEbr+FzUQAg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1718731303; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=J1+5aJgyw3CtZTFBGmIikSQ36Vr1CyzpzCCXc9BE0+0=;
-	b=C4DDrVjtwmJ3KDJeqhHGK8csrlwsU7NnuesHyLfkX8JSEttQgImvCWEQ9l1znx9g3dgk5z
-	k9wE55uTE2jigf6J7iDjxVvshrg5C/vVTET1fuq8uTMbvJczRQC8pZvdGE01rvjJ9wLrfk
-	iHb6M+lEOAOcxOg3qyUjL2/YqpknTEk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1718731303;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=J1+5aJgyw3CtZTFBGmIikSQ36Vr1CyzpzCCXc9BE0+0=;
-	b=J6gZIZw7DoKFGxnccGFBb8q/RLi8SwlcQZm7My8/AlVWJot59WvQdDW+fEB/iLWfzO7Dfq
-	3Y9teTEbr+FzUQAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0CA2A1369F;
-	Tue, 18 Jun 2024 17:21:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id +OGHAifCcWbRKwAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Tue, 18 Jun 2024 17:21:43 +0000
-Message-ID: <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
-Date: Tue, 18 Jun 2024 19:21:42 +0200
+	s=arc-20240116; t=1718731593; c=relaxed/simple;
+	bh=tFb14QZSj03mGSULrT+zr8ST4fLQcL4rRqJPIDLg/TY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=rjYz/YXOMPSLkNUCctvgq5WgMD/tgQwmyDmVeBzxGZNhnXl6rDhANol8+h8SpEnlvwrybkdgtwbzFWpWVw8qn7yLtYVlsVU1rNcLWJIby0L6FR/2M2POukj65caAGTw23zBGM6BWUzQ3sf8iO55U3BzhcAQsd35qycfYgszjhuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Z7rrCZMQ; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45IG6mQf010117;
+	Tue, 18 Jun 2024 17:26:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=5uYQm68wObYLkcMKXj05LB
+	1j/UaqS+dBcVXsaPXz1jA=; b=Z7rrCZMQViXISVHTzUzBtpvKPSTdzh+1bLnX6c
+	4rBk3X1pRh8+Dy4jCN4LXRpzWyEILrutRWFXjX3XBj82VQtZihAjtenJwMCMCS7I
+	uGf4QnLM6haIdC6+Ksbr2MqJ+h5cH2wAk+IZfnMQu+zItuKHZuTxFxD5gQQkavdU
+	8LqMuW8oCOOewt+U1v2yFJPIqUf8vMA1eVMskrEKSf2TlKgWZf/PhOebyM3hMF5O
+	9vzCKrksFsaXAfO3x521YrKsrEEfkvAMQcoLz1r5BgimtihAeZUckOJJNMeDJNdU
+	l1rDwe0+Fuh+rPnFPxN9pgKEtvxcn65fNONjr//Zj6T8pWMQ==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yu6wa9e0y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 18 Jun 2024 17:26:23 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45IHQMXx025520
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 18 Jun 2024 17:26:22 GMT
+Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 18 Jun
+ 2024 10:26:21 -0700
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Date: Tue, 18 Jun 2024 10:26:20 -0700
+Subject: [PATCH net-next] net: amd: add missing MODULE_DESCRIPTION() macros
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Content-Language: en-US
-To: paulmck@kernel.org, Uladzislau Rezki <urezki@gmail.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, Jakub Kicinski <kuba@kernel.org>,
- Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
- kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
- linux-trace-kernel@vger.kernel.org,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, kvm@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
- wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
- ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
- Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
- Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
- linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- kasan-dev <kasan-dev@googlegroups.com>
-References: <Zmov7ZaL-54T9GiM@zx2c4.com> <Zmo9-YGraiCj5-MI@zx2c4.com>
- <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
- <Zmrkkel0Fo4_g75a@zx2c4.com> <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
- <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
- <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz> <ZnCDgdg1EH6V7w5d@pc636>
- <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz> <ZnFT1Czb8oRb0SE7@pc636>
- <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- EP+ylKVEKb0Q2A==
-In-Reply-To: <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Spam-Score: -8.29
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-8.29 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	RCVD_TLS_ALL(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[zx2c4.com,kernel.org,inria.fr,vger.kernel.org,lists.linux.dev,efficios.com,lists.ozlabs.org,linux.ibm.com,csgroup.eu,gmail.com,lists.zx2c4.com,suse.de,netapp.com,oracle.com,talpey.com,netfilter.org,googlegroups.com];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+Message-ID: <20240618-md-m68k-drivers-net-ethernet-amd-v1-1-50ee7a9ad50e@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIADvDcWYC/x2NwQrDIBBEfyXsuQsmDcH0V0oPJq51abVlNUEI+
+ fdqb/OYYd4BiYQpwa07QGjnxJ9Yob90sHoTn4RsK8OghlFNvcZgMUz6hVZ4J0kYKSNlT9KCqa1
+ S+urmxc6jG6HefIUcl7/iDm0UqWR41GYxiXARE1ffFG+OW8FgUiaB8/wB7zOxKZsAAAA=
+To: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>,
+        Jeff Johnson <quic_jjohnson@quicinc.com>
+X-Mailer: b4 0.14.0
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: Os99yBkyoUukyE54xR3teedXi1bL4xjM
+X-Proofpoint-ORIG-GUID: Os99yBkyoUukyE54xR3teedXi1bL4xjM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-18_02,2024-06-17_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 malwarescore=0 spamscore=0 clxscore=1015 bulkscore=0
+ mlxscore=0 mlxlogscore=966 phishscore=0 suspectscore=0 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406180129
 
-On 6/18/24 6:48 PM, Paul E. McKenney wrote:
-> On Tue, Jun 18, 2024 at 11:31:00AM +0200, Uladzislau Rezki wrote:
->> > On 6/17/24 8:42 PM, Uladzislau Rezki wrote:
->> > >> +
->> > >> +	s = container_of(work, struct kmem_cache, async_destroy_work);
->> > >> +
->> > >> +	// XXX use the real kmem_cache_free_barrier() or similar thing here
->> > > It implies that we need to introduce kfree_rcu_barrier(), a new API, which i
->> > > wanted to avoid initially.
->> > 
->> > I wanted to avoid new API or flags for kfree_rcu() users and this would
->> > be achieved. The barrier is used internally so I don't consider that an
->> > API to avoid. How difficult is the implementation is another question,
->> > depending on how the current batching works. Once (if) we have sheaves
->> > proven to work and move kfree_rcu() fully into SLUB, the barrier might
->> > also look different and hopefully easier. So maybe it's not worth to
->> > invest too much into that barrier and just go for the potentially
->> > longer, but easier to implement?
->> > 
->> Right. I agree here. If the cache is not empty, OK, we just defer the
->> work, even we can use a big 21 seconds delay, after that we just "warn"
->> if it is still not empty and leave it as it is, i.e. emit a warning and
->> we are done.
->> 
->> Destroying the cache is not something that must happen right away. 
-> 
-> OK, I have to ask...
-> 
-> Suppose that the cache is created and destroyed by a module and
-> init/cleanup time, respectively.  Suppose that this module is rmmod'ed
-> then very quickly insmod'ed.
-> 
-> Do we need to fail the insmod if the kmem_cache has not yet been fully
-> cleaned up?
+With ARCH=m68k, make allmodconfig && make W=1 C=1 reports:
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/net/ethernet/amd/a2065.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/net/ethernet/amd/ariadne.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/net/ethernet/amd/atarilance.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/net/ethernet/amd/hplance.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/net/ethernet/amd/7990.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/net/ethernet/amd/mvme147.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/net/ethernet/amd/sun3lance.o
 
-We don't have any such link between kmem_cache and module to detect that, so
-we would have to start tracking that. Probably not worth the trouble.
+Add the missing invocation of the MODULE_DESCRIPTION() macro to all
+files which have a MODULE_LICENSE().
 
->  If not, do we have two versions of the same kmem_cache in
-> /proc during the overlap time?
+This includes drivers/net/ethernet/amd/lance.c which, although it did
+not produce a warning with the m68k allmodconfig configuration, may
+cause this warning with other configurations.
 
-Hm could happen in /proc/slabinfo but without being harmful other than
-perhaps confusing someone. We could filter out the caches being destroyed
-trivially.
+Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+---
+ drivers/net/ethernet/amd/7990.c       | 1 +
+ drivers/net/ethernet/amd/a2065.c      | 1 +
+ drivers/net/ethernet/amd/ariadne.c    | 1 +
+ drivers/net/ethernet/amd/atarilance.c | 1 +
+ drivers/net/ethernet/amd/hplance.c    | 1 +
+ drivers/net/ethernet/amd/lance.c      | 1 +
+ drivers/net/ethernet/amd/mvme147.c    | 1 +
+ drivers/net/ethernet/amd/sun3lance.c  | 1 +
+ 8 files changed, 8 insertions(+)
 
-Sysfs and debugfs might be more problematic as I suppose directory names
-would clash. I'll have to check... might be even happening now when we do
-detect leaked objects and just leave the cache around... thanks for the
-question.
+diff --git a/drivers/net/ethernet/amd/7990.c b/drivers/net/ethernet/amd/7990.c
+index ef512cf89abf..27792a52b6cf 100644
+--- a/drivers/net/ethernet/amd/7990.c
++++ b/drivers/net/ethernet/amd/7990.c
+@@ -667,4 +667,5 @@ void lance_poll(struct net_device *dev)
+ EXPORT_SYMBOL_GPL(lance_poll);
+ #endif
+ 
++MODULE_DESCRIPTION("LANCE Ethernet IC generic routines");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/amd/a2065.c b/drivers/net/ethernet/amd/a2065.c
+index 68983b717145..1ca26a8c40eb 100644
+--- a/drivers/net/ethernet/amd/a2065.c
++++ b/drivers/net/ethernet/amd/a2065.c
+@@ -781,4 +781,5 @@ static void __exit a2065_cleanup_module(void)
+ module_init(a2065_init_module);
+ module_exit(a2065_cleanup_module);
+ 
++MODULE_DESCRIPTION("Commodore A2065 Ethernet driver");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/amd/ariadne.c b/drivers/net/ethernet/amd/ariadne.c
+index 38153e633231..fa201da567ed 100644
+--- a/drivers/net/ethernet/amd/ariadne.c
++++ b/drivers/net/ethernet/amd/ariadne.c
+@@ -790,4 +790,5 @@ static void __exit ariadne_cleanup_module(void)
+ module_init(ariadne_init_module);
+ module_exit(ariadne_cleanup_module);
+ 
++MODULE_DESCRIPTION("Ariadne Ethernet Driver");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/amd/atarilance.c b/drivers/net/ethernet/amd/atarilance.c
+index 751454d305c6..8c8cc7d0f42d 100644
+--- a/drivers/net/ethernet/amd/atarilance.c
++++ b/drivers/net/ethernet/amd/atarilance.c
+@@ -79,6 +79,7 @@ static int lance_debug = 1;
+ #endif
+ module_param(lance_debug, int, 0);
+ MODULE_PARM_DESC(lance_debug, "atarilance debug level (0-3)");
++MODULE_DESCRIPTION("Atari LANCE Ethernet driver");
+ MODULE_LICENSE("GPL");
+ 
+ /* Print debug messages on probing? */
+diff --git a/drivers/net/ethernet/amd/hplance.c b/drivers/net/ethernet/amd/hplance.c
+index 055fda11c572..df42294530cb 100644
+--- a/drivers/net/ethernet/amd/hplance.c
++++ b/drivers/net/ethernet/amd/hplance.c
+@@ -234,4 +234,5 @@ static void __exit hplance_cleanup_module(void)
+ module_init(hplance_init_module);
+ module_exit(hplance_cleanup_module);
+ 
++MODULE_DESCRIPTION("HP300 on-board LANCE Ethernet driver");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/amd/lance.c b/drivers/net/ethernet/amd/lance.c
+index 6cf38180cc01..b1e6620ad41d 100644
+--- a/drivers/net/ethernet/amd/lance.c
++++ b/drivers/net/ethernet/amd/lance.c
+@@ -385,6 +385,7 @@ static void __exit lance_cleanup_module(void)
+ }
+ module_exit(lance_cleanup_module);
+ #endif /* MODULE */
++MODULE_DESCRIPTION("AMD LANCE/PCnet Ethernet driver");
+ MODULE_LICENSE("GPL");
+ 
+ 
+diff --git a/drivers/net/ethernet/amd/mvme147.c b/drivers/net/ethernet/amd/mvme147.c
+index 410c7b67eba4..c156566c0906 100644
+--- a/drivers/net/ethernet/amd/mvme147.c
++++ b/drivers/net/ethernet/amd/mvme147.c
+@@ -178,6 +178,7 @@ static int m147lance_close(struct net_device *dev)
+ 	return 0;
+ }
+ 
++MODULE_DESCRIPTION("MVME147 LANCE Ethernet driver");
+ MODULE_LICENSE("GPL");
+ 
+ static struct net_device *dev_mvme147_lance;
+diff --git a/drivers/net/ethernet/amd/sun3lance.c b/drivers/net/ethernet/amd/sun3lance.c
+index 246f34c43765..c60df4a21158 100644
+--- a/drivers/net/ethernet/amd/sun3lance.c
++++ b/drivers/net/ethernet/amd/sun3lance.c
+@@ -74,6 +74,7 @@ static int lance_debug = 1;
+ #endif
+ module_param(lance_debug, int, 0);
+ MODULE_PARM_DESC(lance_debug, "SUN3 Lance debug level (0-3)");
++MODULE_DESCRIPTION("Sun3/Sun3x on-board LANCE Ethernet driver");
+ MODULE_LICENSE("GPL");
+ 
+ #define	DPRINTK(n,a) \
 
-> 							Thanx, Paul
-> 
->> > > Since you do it asynchronous can we just repeat
->> > > and wait until it a cache is furry freed?
->> > 
->> > The problem is we want to detect the cases when it's not fully freed
->> > because there was an actual read. So at some point we'd need to stop the
->> > repeats because we know there can no longer be any kfree_rcu()'s in
->> > flight since the kmem_cache_destroy() was called.
->> > 
->> Agree. As noted above, we can go with 21 seconds(as an example) interval
->> and just perform destroy(without repeating).
->> 
->> --
->> Uladzislau Rezki
+---
+base-commit: 6ba59ff4227927d3a8530fc2973b80e94b54d58f
+change-id: 20240618-md-m68k-drivers-net-ethernet-amd-0083f9bd94f4
 
 
