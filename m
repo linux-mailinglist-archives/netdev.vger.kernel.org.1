@@ -1,216 +1,198 @@
-Return-Path: <netdev+bounces-104401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 354A490C680
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 12:22:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5D2390C694
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 12:23:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EA101C21C70
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 10:22:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADE19283DAB
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 10:23:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE5718E761;
-	Tue, 18 Jun 2024 07:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 605A319D06B;
+	Tue, 18 Jun 2024 07:56:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="hLXdUplR"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="gXpXPLat"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D5B213DBBB
-	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 07:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079CD19CD1E;
+	Tue, 18 Jun 2024 07:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718697168; cv=none; b=i7dqJfFqTMxFm8qVXcg4uXz0EeFmC98tf5w3g9wBkXqNxkXFR7ziKbJLb35OS3idnNSMW6l5C4G3tP+xW/BNHnyRQHkgHCHpG2g7o1VTaZVUffBePHBB6CT6l1LH8V20VoLcbujXfud3nOmRf2UpQ+pvojeMywxmQWVJ+leBx4Y=
+	t=1718697409; cv=none; b=kT+jAwILqBIt1LFfadg5cOAVp8hYtM/GFONtW8ydaJYdj4CEbKElWRy58hVLtlDeC7a+wAbiTXY0isAVh86Xw4yy5yk86Bc4CBSLBevaYhaYuYQbxr8EWP3vPXEdIvQm1E7VfW4TYQw2KPbeJy4nvoBOneQr9KXGEFuun8ohe0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718697168; c=relaxed/simple;
-	bh=VNEo19Tc5MJTiO5fT03+bouUbfa/076D4b1voV/qyao=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oY63FUoVWy4qSBs0/4ioAtklsvjdFVyr3EyZ6UZWAcCfPGwkvAcdFpkK+Pkvidap/KwhLkXrQKw1vULZapFNFLnScJ8+3LH6fIdyC2l7RlJrRyD8xTqyTDk9LqIeVbQPZDMbz4yvHwQ1ApRzZQQCbImrlhJhED3yxQ+w+kqOEw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=hLXdUplR; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-356c4e926a3so4872701f8f.1
-        for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 00:52:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718697164; x=1719301964; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=/XI6WSwtia3EjF/qcHL88JwGq0UZpvShFE/yvYgKu4g=;
-        b=hLXdUplRKG6hQ98EXHm9puczUNI3uIU7emtA69ic+tItH+e4WEUALP/7QmyAf13+yh
-         cTOEEb6yjX7LOvKP5EiM7z/iTtgSyrRCTDeR65Wgo0awkEr88SmjHejoIUbMvG/AEXVI
-         /DJL9ZQCmJ6+9anrvfuot9jg30ndhTT3RnJQIU5nmT7NgQr19zT7W7lUiSasdSEisJ6i
-         M0f86bB/qNKJJf8F1T+K13AwdS9Qf0wml7eg3c92YAXN+qyEfYs39dsOXx2DVK3a/Gtp
-         xJ0mM6D2dp7IGOjhGOG9tQSrPYY62WfnBTPvayWt+xRaXmqGGHqyZXkAy3kj6/HEbIVe
-         WdHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718697164; x=1719301964;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/XI6WSwtia3EjF/qcHL88JwGq0UZpvShFE/yvYgKu4g=;
-        b=EH7rtMF0JYAsH+gaTCSuiUvy4obS99M7746ougkX5oq3A5qpfPL4vKxYvBc+NZEW9D
-         AtypujpQi6GNn08/YrYFNNY/YeEt+hz4feBTIyX8DoTkUExLhV4NtIiwQSy0f5VUsZPF
-         hoUI+0yqhg+kpALkTPz9QsZjPLTH0cM68RUpOsU9Nkgdq7B5dSVekF3yam6JxNqWEYBC
-         Z9qdIaTduM87sn+OvgE4WOXKsY8RcY7eTXNnZvpyUdn7VqkRwlpEzAA8Wa9chOrZ5DBT
-         qCEZ3gqcJtdH0mPNALve0OJ3s20og75rXhpXuxv8OXowy5j2VWPrKrAmZQ2lR7FeIDQU
-         vMgg==
-X-Gm-Message-State: AOJu0YxxoFoZKXJrEabEVzEy1GiXxTJCZHCa5eny1h3TS/e7LjmOXmMB
-	SwA59tyfMT2UWzQ41j0A5ietJLWtxbco2LkjrPLoUvDI6cV8Cn9jKTbsU89sREY=
-X-Google-Smtp-Source: AGHT+IF1XsFupWj3HhfJxQ7LjsEbbKSBNrBVVdNZN9TU3kkhg3a/RnyXA8WufdFDaI/EexvRvBDwRw==
-X-Received: by 2002:a5d:6903:0:b0:35f:209b:c10f with SMTP id ffacd0b85a97d-3607a782476mr8245733f8f.68.1718697164430;
-        Tue, 18 Jun 2024 00:52:44 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-360750f2263sm13700598f8f.83.2024.06.18.00.52.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jun 2024 00:52:43 -0700 (PDT)
-Date: Tue, 18 Jun 2024 09:52:40 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mst@redhat.com,
-	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, dave.taht@gmail.com,
-	kerneljasonxing@gmail.com, hengqi@linux.alibaba.com
-Subject: Re: [PATCH net-next v2] virtio_net: add support for Byte Queue Limits
-Message-ID: <ZnE8yKDl5O-UkBS_@nanopsycho.orion>
-References: <20240612170851.1004604-1-jiri@resnulli.us>
- <CACGkMEv-mO6Sus7_MkCR3B3QGukrig2e2KgBeVBcfOMU5uvo9g@mail.gmail.com>
- <Zm__WzuGEV8OdEKR@nanopsycho.orion>
- <CACGkMEt9Vokeh6n8DKdBcqLRKVEXvNzM+-Zwad5eeMHvOdxXPw@mail.gmail.com>
+	s=arc-20240116; t=1718697409; c=relaxed/simple;
+	bh=ybzDPZct3kMisKkIPn0ph1qCOMzqGKmgrYSQK7RV+SY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=f/SMNTUo5TVn2QnPegbRNMG/BZmgiZ3ItMJJBszi3NYjzspcZCXeOLyTLPzEmJzrlO/X8uQO3ofz0EZPVzE/U9BoB0geo3tSgcmKTYgAkI0Ckzert67eG/FiZHsYme4fp5f2SPbIVhVi9F6WZS4Dc4jd9/CNDlTpbHj0j4DQLzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=gXpXPLat; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1718697404; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=lmfTZV0Wf9DVPXWkATRb3kyJZ2IdEQMcVTNwe5f2deQ=;
+	b=gXpXPLatMa+FngN7gS+rotoB8MzknccVhE9tnaJ1YRazq3IyVrStQr2sJrJ01RgcPHP04QxBetIEP7UYwMmx0hVZLyPbp9ZOR89S21z+xO2tnKem3XlhhzRPMXalsWgZG30TFI68RffOCJwupHpYb4CtF9X4+ewFxsbo5JGebyU=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R761e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067109;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0W8jSG8r_1718697403;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W8jSG8r_1718697403)
+          by smtp.aliyun-inc.com;
+          Tue, 18 Jun 2024 15:56:43 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux.dev,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next v6 00/10] virtio-net: support AF_XDP zero copy
+Date: Tue, 18 Jun 2024 15:56:33 +0800
+Message-Id: <20240618075643.24867-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+X-Git-Hash: 8baa0af3684b
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEt9Vokeh6n8DKdBcqLRKVEXvNzM+-Zwad5eeMHvOdxXPw@mail.gmail.com>
 
-Tue, Jun 18, 2024 at 02:53:42AM CEST, jasowang@redhat.com wrote:
->On Mon, Jun 17, 2024 at 5:18 PM Jiri Pirko <jiri@resnulli.us> wrote:
->>
->> Mon, Jun 17, 2024 at 04:34:26AM CEST, jasowang@redhat.com wrote:
->> >On Thu, Jun 13, 2024 at 1:09 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> >>
->> >> From: Jiri Pirko <jiri@nvidia.com>
->> >>
->> >> Add support for Byte Queue Limits (BQL).
->> >>
->> >> Tested on qemu emulated virtio_net device with 1, 2 and 4 queues.
->> >> Tested with fq_codel and pfifo_fast. Super netperf with 50 threads is
->> >> running in background. Netperf TCP_RR results:
->> >>
->> >> NOBQL FQC 1q:  159.56  159.33  158.50  154.31    agv: 157.925
->> >> NOBQL FQC 2q:  184.64  184.96  174.73  174.15    agv: 179.62
->> >> NOBQL FQC 4q:  994.46  441.96  416.50  499.56    agv: 588.12
->> >> NOBQL PFF 1q:  148.68  148.92  145.95  149.48    agv: 148.2575
->> >> NOBQL PFF 2q:  171.86  171.20  170.42  169.42    agv: 170.725
->> >> NOBQL PFF 4q: 1505.23 1137.23 2488.70 3507.99    agv: 2159.7875
->> >>   BQL FQC 1q: 1332.80 1297.97 1351.41 1147.57    agv: 1282.4375
->> >>   BQL FQC 2q:  768.30  817.72  864.43  974.40    agv: 856.2125
->> >>   BQL FQC 4q:  945.66  942.68  878.51  822.82    agv: 897.4175
->> >>   BQL PFF 1q:  149.69  151.49  149.40  147.47    agv: 149.5125
->> >>   BQL PFF 2q: 2059.32  798.74 1844.12  381.80    agv: 1270.995
->> >>   BQL PFF 4q: 1871.98 4420.02 4916.59 13268.16   agv: 6119.1875
->> >>
->> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->> >> ---
->> >> v1->v2:
->> >> - moved netdev_tx_completed_queue() call into __free_old_xmit(),
->> >>   propagate use_napi flag to __free_old_xmit() and only call
->> >>   netdev_tx_completed_queue() in case it is true
->> >> - added forgotten call to netdev_tx_reset_queue()
->> >> - fixed stats for xdp packets
->> >> - fixed bql accounting when __free_old_xmit() is called from xdp path
->> >> - handle the !use_napi case in start_xmit() kick section
->> >> ---
->> >>  drivers/net/virtio_net.c | 50 +++++++++++++++++++++++++---------------
->> >>  1 file changed, 32 insertions(+), 18 deletions(-)
->> >>
->> >> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->> >> index 61a57d134544..5863c663ccab 100644
->> >> --- a/drivers/net/virtio_net.c
->> >> +++ b/drivers/net/virtio_net.c
->> >> @@ -84,7 +84,9 @@ struct virtnet_stat_desc {
->> >>
->> >>  struct virtnet_sq_free_stats {
->> >>         u64 packets;
->> >> +       u64 xdp_packets;
->> >>         u64 bytes;
->> >> +       u64 xdp_bytes;
->> >>  };
->> >>
->> >>  struct virtnet_sq_stats {
->> >> @@ -506,29 +508,33 @@ static struct xdp_frame *ptr_to_xdp(void *ptr)
->> >>         return (struct xdp_frame *)((unsigned long)ptr & ~VIRTIO_XDP_FLAG);
->> >>  }
->> >>
->> >> -static void __free_old_xmit(struct send_queue *sq, bool in_napi,
->> >> +static void __free_old_xmit(struct send_queue *sq, struct netdev_queue *txq,
->> >> +                           bool in_napi, bool use_napi,
->> >>                             struct virtnet_sq_free_stats *stats)
->> >>  {
->> >>         unsigned int len;
->> >>         void *ptr;
->> >>
->> >>         while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
->> >> -               ++stats->packets;
->> >> -
->> >>                 if (!is_xdp_frame(ptr)) {
->> >>                         struct sk_buff *skb = ptr;
->> >>
->> >>                         pr_debug("Sent skb %p\n", skb);
->> >>
->> >> +                       stats->packets++;
->> >>                         stats->bytes += skb->len;
->> >>                         napi_consume_skb(skb, in_napi);
->> >>                 } else {
->> >>                         struct xdp_frame *frame = ptr_to_xdp(ptr);
->> >>
->> >> -                       stats->bytes += xdp_get_frame_len(frame);
->> >> +                       stats->xdp_packets++;
->> >> +                       stats->xdp_bytes += xdp_get_frame_len(frame);
->> >>                         xdp_return_frame(frame);
->> >>                 }
->> >>         }
->> >> +       if (use_napi)
->> >> +               netdev_tx_completed_queue(txq, stats->packets, stats->bytes);
->> >> +
->> >>  }
->> >
->> >I wonder if this works correctly, for example NAPI could be enabled
->> >after queued but before sent. So __netdev_tx_sent_queue() is not
->> >called before.
->>
->> How is that possible? Napi weight can't change when link is up. Or am I
->> missing something?
->
->Something like this:
->
->1) packet were queued
->2) if down
->3) enable NAPI
->4) if up
->5) packet were sent
+v6:
+    1. start from supporting the rx zerocopy
 
-Gotcha, will try to fix. Thanks!
+v5:
+    1. fix the comments of last version
+        http://lore.kernel.org/all/20240611114147.31320-1-xuanzhuo@linux.alibaba.com
+v4:
+    1. remove the commits that introduce the independent directory
+    2. remove the supporting for the rx merge mode (for limit 15
+       commits of net-next). Let's start with the small mode.
+    3. merge some commits and remove some not important commits
+
+## AF_XDP
+
+XDP socket(AF_XDP) is an excellent bypass kernel network framework. The zero
+copy feature of xsk (XDP socket) needs to be supported by the driver. The
+performance of zero copy is very good. mlx5 and intel ixgbe already support
+this feature, This patch set allows virtio-net to support xsk's zerocopy xmit
+feature.
+
+At present, we have completed some preparation:
+
+1. vq-reset (virtio spec and kernel code)
+2. virtio-core premapped dma
+3. virtio-net xdp refactor
+
+So it is time for Virtio-Net to complete the support for the XDP Socket
+Zerocopy.
+
+Virtio-net can not increase the queue num at will, so xsk shares the queue with
+kernel.
+
+On the other hand, Virtio-Net does not support generate interrupt from driver
+manually, so when we wakeup tx xmit, we used some tips. If the CPU run by TX
+NAPI last time is other CPUs, use IPI to wake up NAPI on the remote CPU. If it
+is also the local CPU, then we wake up napi directly.
+
+This patch set includes some refactor to the virtio-net to let that to support
+AF_XDP.
+
+## performance
+
+ENV: Qemu with vhost-user(polling mode).
+Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
+
+### virtio PMD in guest with testpmd
+
+testpmd> show port stats all
+
+ ######################## NIC statistics for port 0 ########################
+ RX-packets: 19531092064 RX-missed: 0     RX-bytes: 1093741155584
+ RX-errors: 0
+ RX-nombuf: 0
+ TX-packets: 5959955552 TX-errors: 0     TX-bytes: 371030645664
 
 
->
->?
->
->Thanks
->
->>
->> >
->> >Thanks
->> >
->>
->
+ Throughput (since last show)
+ Rx-pps:   8861574     Rx-bps:  3969985208
+ Tx-pps:   8861493     Tx-bps:  3969962736
+ ############################################################################
+
+### AF_XDP PMD in guest with testpmd
+
+testpmd> show port stats all
+
+  ######################## NIC statistics for port 0  ########################
+  RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552712
+  RX-errors: 0
+  RX-nombuf:  0
+  TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438152
+
+  Throughput (since last show)
+  Rx-pps:      6333196          Rx-bps:   2837272088
+  Tx-pps:      6333227          Tx-bps:   2837285936
+  ############################################################################
+
+But AF_XDP consumes more CPU for tx and rx napi(100% and 86%).
+
+## maintain
+
+I am currently a reviewer for virtio-net. I commit to maintain AF_XDP support in
+virtio-net.
+
+Please review.
+
+Thanks.
+
+v3
+    1. virtio introduces helpers for virtio-net sq using premapped dma
+    2. xsk has more complete support for merge mode
+    3. fix some problems
+
+v2
+    1. wakeup uses the way of GVE. No send ipi to wakeup napi on remote cpu.
+    2. remove rcu. Because we synchronize all operat, so the rcu is not needed.
+    3. split the commit "move to virtio_net.h" in last patch set. Just move the
+       struct/api to header when we use them.
+    4. add comments for some code
+
+v1:
+    1. remove two virtio commits. Push this patchset to net-next
+    2. squash "virtio_net: virtnet_poll_tx support rescheduled" to xsk: support tx
+    3. fix some warnings
+
+
+
+
+
+
+Xuan Zhuo (10):
+  virtio_net: separate virtnet_rx_resize()
+  virtio_net: separate virtnet_tx_resize()
+  virtio_net: separate receive_buf
+  virtio_net: separate receive_mergeable
+  virtio_net: xsk: bind/unbind xsk for rx
+  virtio_net: xsk: support wakeup
+  virtio_net: xsk: rx: support fill with xsk buffer
+  virtio_net: xsk: rx: support recv small mode
+  virtio_net: xsk: rx: support recv merge mode
+  virtio_net: xsk: rx: free the unused xsk buffer
+
+ drivers/net/virtio_net.c | 699 +++++++++++++++++++++++++++++++++++----
+ 1 file changed, 628 insertions(+), 71 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
+
 
