@@ -1,92 +1,89 @@
-Return-Path: <netdev+bounces-104441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DBE190C870
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:08:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8EDB90C8A4
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:12:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3265283675
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:08:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61A871F20FA3
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:12:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44ED8158863;
-	Tue, 18 Jun 2024 09:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7000C1ACE7F;
+	Tue, 18 Jun 2024 09:56:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k1WJjSHB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YNt27QS4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DDAF205B0F;
-	Tue, 18 Jun 2024 09:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9A020A930;
+	Tue, 18 Jun 2024 09:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718704229; cv=none; b=YMTuXnQkTbUwkulwEGbqSONfZiKfS5LQDtV87RsBWVv5gh4RKg7wHOBbBt8dVFglhrvxj0t7VpwaCQlX5unH7qziv7ba/bGdqBlDDuQ19Kj2bo7wdfChu4Uzkgw/6ZgOGBzduwKNXG4qXrTqJSZ5y13Vw3gbqvtMzvnjmZfD7gw=
+	t=1718704577; cv=none; b=rwhPZUH0nZodYOfynYaLy7E2CqbwLTxmJ4pECJMjuo8syfpiUFjWFJOR9bqG6T8bsYkUhb9mA8qqNFk6Tign5o+4nAPsVSuFUFnKByEfotDR8Aqf1C14mkUmznZXr82p3xPxhVBHcDqc+c42J/raCZodd9gQGmZF3Ku0mADDSwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718704229; c=relaxed/simple;
-	bh=elONcxsWULUdEDPQ4LFBA+PJ3wyTRG1kyjBDnlyR1uc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Um/06ZkYD7PIQhH9JadMDuyuMvq2BpxnDReMi+n09DR4iHX09SQWA3aDUIjDwPuSPBgfo031NjpKzSHQY63Q5gIvNKtlLZcjeRGCAJEjzexE1zMj5uEL0IxfmFC7zOBWPk/+NtDgyJ9jP8tQUz22NIY+EXTF1+6fXWDZF2UaqnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k1WJjSHB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9FA9DC4AF1D;
-	Tue, 18 Jun 2024 09:50:28 +0000 (UTC)
+	s=arc-20240116; t=1718704577; c=relaxed/simple;
+	bh=KjFrD3x7om3gSIqL3pNxCEjKTXG59g1dkIyKmefkQlU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ewFGV/6nhkwdovik2nLGxY5BAPTAT0w5Ldl6DfGgWFCHAuFHoEN8ezpqzzygIHyCF1ieVShJhf3PLMq8oWV8HGw9GKugCPnNuRz89IocDuDTfVWbyG7kA3EHUzlcEy5HyBxW+R46YD0ftXOGjBk5wWOBWy1vHFmeV7ZasFfcIUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YNt27QS4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21AB1C4AF1A;
+	Tue, 18 Jun 2024 09:56:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718704228;
-	bh=elONcxsWULUdEDPQ4LFBA+PJ3wyTRG1kyjBDnlyR1uc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=k1WJjSHBe1oBJL7irtCrFkz+SBXSdY6qHHLQlMJvN4YoIxWE6FUL8NvW+lOWvrseu
-	 YEwM85LCucEfHvZayjEy41XpYPCs+xshsJoHnCwaM5GGU5YxOZdGvGq7Mabb06sB7R
-	 UjwytB2Q17NjVfq2qaWkdq+SFp5L6ST10OgZZEt0P9ptI8+1yU5Q0qbN2XL2Xnht2l
-	 4Ui5Q9fod1P+/BBG0+NV27X/kty4D6KLpq/CFeOnpc8JSrLOHHfAE2/pnLxox30r/e
-	 TMf7mOOKM/UFIalCB5D9OoGg3bPnhZGpTm8x2enb/esXYlK7sqto9FhKN24/XEzGck
-	 Un8L2X4CrBhOA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8F1D1D2D0F8;
-	Tue, 18 Jun 2024 09:50:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1718704576;
+	bh=KjFrD3x7om3gSIqL3pNxCEjKTXG59g1dkIyKmefkQlU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YNt27QS4sw4M6YYfzSPylnGv63F3Qqrd/RAWyAJGj4fx2OScnBYkYvlkTZDaJ3Yu5
+	 x0JoOA99zqVx6Uu1F/sux9O360tqk4se7RLtW4/Ek7jcKpH/tJsde84YLolhRahDJL
+	 PKsxU/zg2l21dIcDnae3V/CVqQdIEmN9JrQ2HECCW8dimE2kuLAdXlBTkSybDPD+jE
+	 xesC0DGTbbOK14iuNgR/lkmycBLC+CSPxMg3lZdIsdpy3CSoiqu3T9tzIftqIvEZej
+	 cRwDH8EzlLokxEdedE9vqP3Od6eQsorkBWDvC7bnLZ0KNg7LM9DMQWTb21hnfBqpZ4
+	 ibv9T2zZr62uw==
+Date: Tue, 18 Jun 2024 10:56:08 +0100
+From: Simon Horman <horms@kernel.org>
+To: Xiaolei Wang <xiaolei.wang@windriver.com>
+Cc: olteanv@gmail.com, linux@armlinux.org.uk, alexandre.torgue@foss.st.com,
+	andrew@lunn.ch, joabreu@synopsys.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com, wojciech.drewek@intel.com,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net v2 PATCH] net: stmmac: No need to calculate speed divider
+ when offload is disabled
+Message-ID: <20240618095608.GI8447@kernel.org>
+References: <20240617013922.1035854-1-xiaolei.wang@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] qca_spi: Make interrupt remembering atomic
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171870422858.6440.11410226713577880340.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Jun 2024 09:50:28 +0000
-References: <20240614145030.7781-1-wahrenst@gmx.net>
-In-Reply-To: <20240614145030.7781-1-wahrenst@gmx.net>
-To: Stefan Wahren <wahrenst@gmx.net>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, chf.fritz@googlemail.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240617013922.1035854-1-xiaolei.wang@windriver.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 14 Jun 2024 16:50:30 +0200 you wrote:
-> The whole mechanism to remember occurred SPI interrupts is not atomic,
-> which could lead to unexpected behavior. So fix this by using atomic bit
-> operations instead.
+On Mon, Jun 17, 2024 at 09:39:22AM +0800, Xiaolei Wang wrote:
+> commit be27b8965297 ("net: stmmac: replace priv->speed with
+> the portTransmitRate from the tc-cbs parameters") introduced
+> a problem. When deleting, it prompts "Invalid portTransmitRate
+> 0 (idleSlope - sendSlope)" and exits. Add judgment on cbs.enable.
+> Only when offload is enabled, speed divider needs to be calculated.
 > 
-> Fixes: 291ab06ecf67 ("net: qualcomm: new Ethernet over SPI driver for QCA7000")
-> Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+> Fixes: be27b8965297 ("net: stmmac: replace priv->speed with the portTransmitRate from the tc-cbs parameters")
+> Signed-off-by: Xiaolei Wang <xiaolei.wang@windriver.com>
+> ---
 > 
-> [...]
+> Change log:
+> 
+> v1:
+>     https://patchwork.kernel.org/project/netdevbpf/patch/20240614081916.764761-1-xiaolei.wang@windriver.com/
+> v2:
+>     When offload is disabled, ptr is initialized to 0
 
-Here is the summary with links:
-  - qca_spi: Make interrupt remembering atomic
-    https://git.kernel.org/netdev/net/c/2d7198278ece
+Thanks for the update.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
