@@ -1,125 +1,158 @@
-Return-Path: <netdev+bounces-104416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E89DE90C701
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 12:32:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 050AE90C70A
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 12:33:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 015C91C217C7
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 10:32:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C70EB237F8
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 10:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 086A51A3BDD;
-	Tue, 18 Jun 2024 08:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A64014E2C6;
+	Tue, 18 Jun 2024 08:21:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y8++fdDC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p1tDJ12o"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09F313A272;
-	Tue, 18 Jun 2024 08:18:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B1F14D6E5
+	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 08:21:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718698727; cv=none; b=W0knaFsfDMrSPe4vDk+R4HXZe84cE7GCv0omyYyMQNfgJbyZ5BCkV+np+xid5AEFG/qWGL6fJVBLQEYc0WuGdcyszUna/bE4zRmwPENks90+mdGySzBBHHBJ3CJf4STJRTrzqqRPv99pikjnIMizvqD1mJGyDM/nCmzJcFw9ZLY=
+	t=1718698919; cv=none; b=ghm0uDCwplLl149JKzgoYUcGGMkC5rBOZl9FhrzQb+BqEksWOV7krMzyrO/6Erd9JezMXzej4rAtRDqB899uJUN8BghalQn0o7dIiPf/oUbA4vbWQ/xMjnyYK03cwEY04uE2dGFaOnAb0qRKkJ7FhT+XwUzwbZTlufx8+IA5r6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718698727; c=relaxed/simple;
-	bh=cPCZEvw0UPMUPOeBUbgA27MdruCVrKhEgVI4A378S2w=;
+	s=arc-20240116; t=1718698919; c=relaxed/simple;
+	bh=BvRL7jZ8JiG3CMIXWuu3HjnL/HxvIXmz0SH8H8p9rDs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cU2IOGq5Wy6Fx3i3Euxfpy3oIAtrPDUIgVAe0xkDc+cY0uiKYtNoqU6SHshRfV3DFEZo+eztNhAC4YPGHaQqnjtzryM9kOOCfzW+SZMpeQkG9+SgCfdLewc8CYvQmksSIDAcWkx//QS82x3/zogdjmsBWFp1DkJKdqR1X/PRZ2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y8++fdDC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA194C3277B;
-	Tue, 18 Jun 2024 08:17:50 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=qHkf5SuPg0PLs01mrrh6KnbrGY1RG5mUvgHsgTELYhE+EMW9u6GrBVa4PEV9abn4w+oVRG6eQB2w9A+4U4G8QwIRTIFVWreft/LLaH8gmT/cSdt8KmZbxNpbF/jFYomv7hDzsolF5G+xYbrVPAGHTRKx8PjmPywGbGUC7QiPXcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p1tDJ12o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57774C4AF1D;
+	Tue, 18 Jun 2024 08:21:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718698727;
-	bh=cPCZEvw0UPMUPOeBUbgA27MdruCVrKhEgVI4A378S2w=;
+	s=k20201202; t=1718698919;
+	bh=BvRL7jZ8JiG3CMIXWuu3HjnL/HxvIXmz0SH8H8p9rDs=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Y8++fdDC9VKbFvwON83cjJWbBSxzD+ozwgTVDJOn8bCRpPdlumNUQoDviYy1fqGEt
-	 Jnj3xGjIdtDyr55A1y9e78uvdOqz4OFUW9tWtdrBmyg1Sz1Xgr0rQf+ac4k9sTkiCw
-	 dUOhYXHmUjjyfVtLNoaMrEAIaZi72/F1qDXpqukz9W+llt6ScFb0TwxHuOHMG0riUR
-	 rc8jmRtnG5OMszPoMWSesGHIBgtjH2/1pwezbQaCaCuU+zc59X3LPjmoQOJZUH5DrH
-	 i2SGAoQzZDXxpW/sVE6z9UZlqF23engkOpPuLasfs54hAmqDnL3xLVfd2l9YiXHcH5
-	 ruc+vvmjlN5mQ==
-Message-ID: <3f0fb527-ac58-4f73-b4f1-1e35bf064feb@kernel.org>
-Date: Tue, 18 Jun 2024 10:17:42 +0200
+	b=p1tDJ12oP47HGujgvRVoSlN8QyiBZp6bRCHbXRMqKS7U7C/kX3RzkwufiB6PBzv20
+	 wIZ1PYfbwW4G3Ypu01dqePhOHs84yVdtPwKsJMfE7/WE6zJKDL84kzSgsNslip4ftp
+	 ilaPShmGMY5rXCpyKnbkeua0xwnAHLqYPDgmTrdvhNErM6cUmS2md/gj3N3yE2xp+C
+	 NJ7Qpi5PUmgWkH78EOROrKNHCudGYCojetOc86AMAc2SHf5+6AImIS9piVSfg+IPtf
+	 Ycd1LDjBZXczw8gpYOyk0n91/b0s6ooDw+cb90RwBAhH2STa3VmGXBGCT/+jnetcql
+	 BpzlA2faYVZIw==
+Message-ID: <1a63f209-b1d4-4809-bc30-295a5cafa296@kernel.org>
+Date: Tue, 18 Jun 2024 10:21:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 net-next 15/15] net: Move per-CPU flush-lists to
- bpf_net_context on PREEMPT_RT.
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Daniel Bristot de Oliveira <bristot@kernel.org>,
- Boqun Feng <boqun.feng@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>,
- Eric Dumazet <edumazet@google.com>, Frederic Weisbecker
- <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
- Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
- =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Magnus Karlsson <magnus.karlsson@intel.com>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vu?=
- =?UTF-8?Q?sen?= <toke@redhat.com>, Yonghong Song <yonghong.song@linux.dev>,
- bpf@vger.kernel.org
-References: <20240618072526.379909-1-bigeasy@linutronix.de>
- <20240618072526.379909-16-bigeasy@linutronix.de>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20240618072526.379909-16-bigeasy@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [TEST] virtio tests need veth?
+Content-Language: en-GB
+To: Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20240617072614.75fe79e7@kernel.org>
+ <ZnEq3YxtVuwHdFqn@nanopsycho.orion> <ZnE0JaJgxw1Mw1aE@nanopsycho.orion>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <ZnE0JaJgxw1Mw1aE@nanopsycho.orion>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+Hi Jiri,
 
-
-On 18/06/2024 09.13, Sebastian Andrzej Siewior wrote:
-> The per-CPU flush lists, which are accessed from within the NAPI callback
-> (xdp_do_flush() for instance), are per-CPU. There are subject to the
-> same problem as struct bpf_redirect_info.
+On 18/06/2024 09:15, Jiri Pirko wrote:
+> Tue, Jun 18, 2024 at 08:36:13AM CEST, jiri@resnulli.us wrote:
+>> Mon, Jun 17, 2024 at 04:26:14PM CEST, kuba@kernel.org wrote:
+>>> Hi Jiri!
+>>>
+>>> I finally hooked up the virtio tests to NIPA.
+>>> Looks like they are missing CONFIG options?
+>>>
+>>> https://netdev-3.bots.linux.dev/vmksft-virtio/results/643761/1-basic-features-sh/stdout
+>>
+>> Checking that out. Apparently sole config is really missing.
+>> Also, looks like for some reason veth is used instead of virtio_net.
+>> Where do you run this command? Do you have 2 virtio_net interfaces
+>> looped back together on the system?
 > 
-> Add the per-CPU lists cpu_map_flush_list, dev_map_flush_list and
-> xskmap_map_flush_list to struct bpf_net_context. Add wrappers for the
-> access. The lists initialized on first usage (similar to
-> bpf_net_ctx_get_ri()).
-> 
-> Cc: "Björn Töpel"<bjorn@kernel.org>
-> Cc: Alexei Starovoitov<ast@kernel.org>
-> Cc: Andrii Nakryiko<andrii@kernel.org>
-> Cc: Eduard Zingerman<eddyz87@gmail.com>
-> Cc: Hao Luo<haoluo@google.com>
-> Cc: Jesper Dangaard Brouer<hawk@kernel.org>
-> Cc: Jiri Olsa<jolsa@kernel.org>
-> Cc: John Fastabend<john.fastabend@gmail.com>
-> Cc: Jonathan Lemon<jonathan.lemon@gmail.com>
-> Cc: KP Singh<kpsingh@kernel.org>
-> Cc: Maciej Fijalkowski<maciej.fijalkowski@intel.com>
-> Cc: Magnus Karlsson<magnus.karlsson@intel.com>
-> Cc: Martin KaFai Lau<martin.lau@linux.dev>
-> Cc: Song Liu<song@kernel.org>
-> Cc: Stanislav Fomichev<sdf@google.com>
-> Cc: Toke Høiland-Jørgensen<toke@redhat.com>
-> Cc: Yonghong Song<yonghong.song@linux.dev>
-> Cc:bpf@vger.kernel.org
-> Reviewed-by: Toke Høiland-Jørgensen<toke@redhat.com>
-> Signed-off-by: Sebastian Andrzej Siewior<bigeasy@linutronix.de>
+> I guess you have custom
+> tools/testing/selftests/net/forwarding/forwarding.config.
+> Can you send it here?
 
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+According to the logs from the parent directory [1], the "build/stdout"
+file shows that only this config file has been used:
 
-> ---
->   include/linux/filter.h | 42 ++++++++++++++++++++++++++++++++++++++++++
->   kernel/bpf/cpumap.c    | 19 +++----------------
->   kernel/bpf/devmap.c    | 11 +++--------
->   net/xdp/xsk.c          | 12 ++++--------
->   4 files changed, 52 insertions(+), 32 deletions(-)
+  tools/testing/selftests/drivers/net/virtio_net/config
+
+(see the 'vng -b' command)
+
+> CONFIG_NET_L3_MASTER_DEV=y
+> CONFIG_IPV6_MULTIPLE_TABLES=y
+> CONFIG_NET_VRF=m
+> CONFIG_BPF_SYSCALL=y
+> CONFIG_CGROUP_BPF=y
+> CONFIG_IPV6=y
+
+The "config" file from [1] seems to indicate that all these kconfig are
+missing, except the BPF ones.
+
+Note that if you want to check locally, virtme-ng helps to reproduce the
+issues reported by the CI, see [2].
+
+[1] https://netdev-3.bots.linux.dev/vmksft-virtio/results/643761/
+[2]
+https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
