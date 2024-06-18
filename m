@@ -1,52 +1,51 @@
-Return-Path: <netdev+bounces-104494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9E7190CBFB
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 14:40:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39BDE90CC18
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 14:43:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 274201F21E0A
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 12:40:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5ED2282C94
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 12:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C437157496;
-	Tue, 18 Jun 2024 12:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB81B15AD99;
+	Tue, 18 Jun 2024 12:37:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bS0NwdpC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oIDeiGBS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9AD157488;
-	Tue, 18 Jun 2024 12:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5A915AADA;
+	Tue, 18 Jun 2024 12:37:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718714203; cv=none; b=hPWACYR0a6AuABG4iOs0QzA24vzQt+YY8YaSvTcwe2jj29c8muTvO+Eh7fmJ56FIn3GoUWEr+qjmXHyvGglOVa+RPnNps7nfGeQTVh0S1y56ON9fxzq+1kEW3MJ6/T6hM1HXrt7uPTsVP5e1DrDUs57KeXsONqS5HckCwdc/zPY=
+	t=1718714231; cv=none; b=BncEqQD4QlAahKlL3BwhPTva1k9eHdWuh8TtOxuHVCnMrwyJovhVRghoZSv8v/IVJOrRX+os267ZNahhb/tuP7BeTFmz3RMS7ZFPNqzn1lyZarscssF9fYu1dXueT2yzMo9PMmSjJOjIkrho6VLVJOUy1o3D4L/V/Z3d6/CuUdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718714203; c=relaxed/simple;
-	bh=oyfPLtB9HMRQ+cVwiNdkByR8dPfrTbwqv/7ROVe+dtM=;
+	s=arc-20240116; t=1718714231; c=relaxed/simple;
+	bh=AoMOYJts6iFa6smswQkcJTJebyYx2dkh3weekdtPLJM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Cdc5cc1jaPd8vdXsWza63/02LHueT6N7PPnguzL5OQ6tv7Sh7uStMZIwAiI/raIP62pj8oZF2KNH+nmv/Hum+29jCoRwF3TJaiupLwOE+abwW/YYyuLsj+kJbCR7+1Sg7XKK742z0JEqzBj4g74mG2m6W9el8rSNlfDF56m8WoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bS0NwdpC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6349FC32786;
-	Tue, 18 Jun 2024 12:36:41 +0000 (UTC)
+	 MIME-Version; b=n/fFr1enzus8tnFK1aDF5PiKXnTOfK8J5zcKuoto/anvolpRT9hvqJNVNEl+rdsMq8dOvl/hdlrM8YncQ9CbJjE5jZxHyfwkFEE2OEPZuq51NtWuO+xFB6+rT678k0zMCNKVct0iCtErqqo5xAdNwWXX36jASKzzdx0t2c9VRAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oIDeiGBS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E184C4AF4D;
+	Tue, 18 Jun 2024 12:37:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718714202;
-	bh=oyfPLtB9HMRQ+cVwiNdkByR8dPfrTbwqv/7ROVe+dtM=;
+	s=k20201202; t=1718714231;
+	bh=AoMOYJts6iFa6smswQkcJTJebyYx2dkh3weekdtPLJM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bS0NwdpCPwqIbvpdoUDw+6CR2yHA660imAI3vtQXDG1pOYF944vDLozg0uIqoYBSl
-	 S7okgDQexOFIaKkjKOw8x83koSqySsdrE7MBlpZbmdNBDPBa5zgiohm3vU8eNrNH10
-	 OaraJQ9T6lnthANbrsAkUaSb6e20Tou+EHyiEWNienmZ/QXJud1JVtpc9Gv/V8KDLa
-	 hlPyHCyUQUNwuiGS+BLHmkIaBUOVTQbHY//+sof7hjJjjeDs/dA+OhnbyWuBPqAe9T
-	 v+BzIJpLHcv42vPdcjIacoOzvRkDWZudmKg9W/fBy5PjOgnntsqW5g15NU0Y4wl6FD
-	 5DRzylCSr0IxQ==
+	b=oIDeiGBShlPvwbWQnX/kssyQSdfI+LkKzkuc40HRkRFccKZ+6HLFlZxb0fx8i8XRK
+	 7fqojaaP/OHRH+KJf1txmGfaPEoRg7neChiC5U7E/y0pxmICIAKlvM2L8tKmms/fms
+	 bnAc5tQKN/6f860NAZzaZxLnN5QkR+yj6/P/tyiiaoMJdcapk/NpHDtFHEL/hzI7Re
+	 XgdAzYlChM6Uh+q7BmJ8CqeEotEd19imyF2U/e00QQsY/UzLYfJ6KNhJwz0k66j2cV
+	 dNqJU18lWZf4qZEEstpV8RNIe1/9m1Gd3n7MXJshfp8cR9CGSB0Njbb2FnFigufeXq
+	 piq46tjXrzISA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Ilan Peer <ilan.peer@intel.com>,
+Cc: Dmitry Antipov <dmantipov@yandex.ru>,
+	Johannes Berg <johannes.berg@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	johannes@sipsolutions.net,
 	davem@davemloft.net,
@@ -55,9 +54,9 @@ Cc: Johannes Berg <johannes.berg@intel.com>,
 	pabeni@redhat.com,
 	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.9 17/44] wifi: cfg80211: fix 6 GHz scan request building
-Date: Tue, 18 Jun 2024 08:34:58 -0400
-Message-ID: <20240618123611.3301370-17-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.9 24/44] wifi: mac80211: fix UBSAN noise in ieee80211_prep_hw_scan()
+Date: Tue, 18 Jun 2024 08:35:05 -0400
+Message-ID: <20240618123611.3301370-24-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240618123611.3301370-1-sashal@kernel.org>
 References: <20240618123611.3301370-1-sashal@kernel.org>
@@ -72,163 +71,78 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.9.5
 Content-Transfer-Encoding: 8bit
 
-From: Johannes Berg <johannes.berg@intel.com>
+From: Dmitry Antipov <dmantipov@yandex.ru>
 
-[ Upstream commit f7a8b10bfd614d7a9a16fbe80d28ead4f063cb00 ]
+[ Upstream commit 92ecbb3ac6f3fe8ae9edf3226c76aa17b6800699 ]
 
-The 6 GHz scan request struct allocated by cfg80211_scan_6ghz() is
-meant to be formed this way:
+When testing the previous patch with CONFIG_UBSAN_BOUNDS, I've
+noticed the following:
 
- [base struct][channels][ssids][6ghz_params]
+UBSAN: array-index-out-of-bounds in net/mac80211/scan.c:372:4
+index 0 is out of range for type 'struct ieee80211_channel *[]'
+CPU: 0 PID: 1435 Comm: wpa_supplicant Not tainted 6.9.0+ #1
+Hardware name: LENOVO 20UN005QRT/20UN005QRT <...BIOS details...>
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x2d/0x90
+ __ubsan_handle_out_of_bounds+0xe7/0x140
+ ? timerqueue_add+0x98/0xb0
+ ieee80211_prep_hw_scan+0x2db/0x480 [mac80211]
+ ? __kmalloc+0xe1/0x470
+ __ieee80211_start_scan+0x541/0x760 [mac80211]
+ rdev_scan+0x1f/0xe0 [cfg80211]
+ nl80211_trigger_scan+0x9b6/0xae0 [cfg80211]
+ ...<the rest is not too useful...>
 
-It is allocated with [channels] as the maximum number of channels
-supported by the driver in the 6 GHz band, since allocation is
-before knowing how many there will be.
+Since '__ieee80211_start_scan()' leaves 'hw_scan_req->req.n_channels'
+uninitialized, actual boundaries of 'hw_scan_req->req.channels' can't
+be checked in 'ieee80211_prep_hw_scan()'. Although an initialization
+of 'hw_scan_req->req.n_channels' introduces some confusion around
+allocated vs. used VLA members, this shouldn't be a problem since
+everything is correctly adjusted soon in 'ieee80211_prep_hw_scan()'.
 
-However, the inner pointers are set incorrectly: initially, the
-6 GHz scan parameters pointer is set:
+Cleanup 'kmalloc()' math in '__ieee80211_start_scan()' by using the
+convenient 'struct_size()' as well.
 
- [base struct][channels]
-                        ^ scan_6ghz_params
-
-and later the SSID pointer is set to the end of the actually
-_used_ channels.
-
- [base struct][channels]
-                  ^ ssids
-
-If many APs were to be discovered, and many channels used, and
-there were many SSIDs, then the SSIDs could overlap the 6 GHz
-parameters.
-
-Additionally, the request->ssids for most of the function points
-to the original request still (given the struct copy) but is used
-normally, which is confusing.
-
-Clear this up, by actually using the allocated space for 6 GHz
-parameters _after_ the SSIDs, and set up the SSIDs initially so
-they are used more clearly. Just like in nl80211.c, set them
-only if there actually are SSIDs though.
-
-Finally, also copy the elements (ie/ie_len) so they're part of
-the same request, not pointing to the old request.
-
-Co-developed-by: Miri Korenblit <miriam.rachel.korenblit@intel.com>
-Signed-off-by: Miri Korenblit <miriam.rachel.korenblit@intel.com>
-Reviewed-by: Ilan Peer <ilan.peer@intel.com>
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-Link: https://msgid.link/20240510113738.4190692ef4ee.I0cb19188be17a8abd029805e3373c0a7777c214c@changeid
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+Link: https://msgid.link/20240517153332.18271-2-dmantipov@yandex.ru
+[improve (imho) indentation a bit]
 Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/wireless/rdev-ops.h |  6 +++++-
- net/wireless/scan.c     | 47 +++++++++++++++++++++++++++--------------
- 2 files changed, 36 insertions(+), 17 deletions(-)
+ net/mac80211/scan.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/net/wireless/rdev-ops.h b/net/wireless/rdev-ops.h
-index 43897a5269b6a..755af47b88b91 100644
---- a/net/wireless/rdev-ops.h
-+++ b/net/wireless/rdev-ops.h
-@@ -2,7 +2,7 @@
- /*
-  * Portions of this file
-  * Copyright(c) 2016-2017 Intel Deutschland GmbH
-- * Copyright (C) 2018, 2021-2023 Intel Corporation
-+ * Copyright (C) 2018, 2021-2024 Intel Corporation
-  */
- #ifndef __CFG80211_RDEV_OPS
- #define __CFG80211_RDEV_OPS
-@@ -458,6 +458,10 @@ static inline int rdev_scan(struct cfg80211_registered_device *rdev,
- 			    struct cfg80211_scan_request *request)
- {
- 	int ret;
-+
-+	if (WARN_ON_ONCE(!request->n_ssids && request->ssids))
-+		return -EINVAL;
-+
- 	trace_rdev_scan(&rdev->wiphy, request);
- 	ret = rdev->ops->scan(&rdev->wiphy, request);
- 	trace_rdev_return_int(&rdev->wiphy, ret);
-diff --git a/net/wireless/scan.c b/net/wireless/scan.c
-index 9b0dbcd6cf79a..914fad87d3c32 100644
---- a/net/wireless/scan.c
-+++ b/net/wireless/scan.c
-@@ -812,6 +812,7 @@ static int cfg80211_scan_6ghz(struct cfg80211_registered_device *rdev)
- 	LIST_HEAD(coloc_ap_list);
- 	bool need_scan_psc = true;
- 	const struct ieee80211_sband_iftype_data *iftd;
-+	size_t size, offs_ssids, offs_6ghz_params, offs_ies;
+diff --git a/net/mac80211/scan.c b/net/mac80211/scan.c
+index 3da1c5c450358..8ecc4b710b0e6 100644
+--- a/net/mac80211/scan.c
++++ b/net/mac80211/scan.c
+@@ -744,15 +744,21 @@ static int __ieee80211_start_scan(struct ieee80211_sub_if_data *sdata,
+ 			local->hw_scan_ies_bufsize *= n_bands;
+ 		}
  
- 	rdev_req->scan_6ghz = true;
+-		local->hw_scan_req = kmalloc(
+-				sizeof(*local->hw_scan_req) +
+-				req->n_channels * sizeof(req->channels[0]) +
+-				local->hw_scan_ies_bufsize, GFP_KERNEL);
++		local->hw_scan_req = kmalloc(struct_size(local->hw_scan_req,
++							 req.channels,
++							 req->n_channels) +
++					     local->hw_scan_ies_bufsize,
++					     GFP_KERNEL);
+ 		if (!local->hw_scan_req)
+ 			return -ENOMEM;
  
-@@ -877,10 +878,15 @@ static int cfg80211_scan_6ghz(struct cfg80211_registered_device *rdev)
- 		spin_unlock_bh(&rdev->bss_lock);
- 	}
- 
--	request = kzalloc(struct_size(request, channels, n_channels) +
--			  sizeof(*request->scan_6ghz_params) * count +
--			  sizeof(*request->ssids) * rdev_req->n_ssids,
--			  GFP_KERNEL);
-+	size = struct_size(request, channels, n_channels);
-+	offs_ssids = size;
-+	size += sizeof(*request->ssids) * rdev_req->n_ssids;
-+	offs_6ghz_params = size;
-+	size += sizeof(*request->scan_6ghz_params) * count;
-+	offs_ies = size;
-+	size += rdev_req->ie_len;
-+
-+	request = kzalloc(size, GFP_KERNEL);
- 	if (!request) {
- 		cfg80211_free_coloc_ap_list(&coloc_ap_list);
- 		return -ENOMEM;
-@@ -888,8 +894,26 @@ static int cfg80211_scan_6ghz(struct cfg80211_registered_device *rdev)
- 
- 	*request = *rdev_req;
- 	request->n_channels = 0;
--	request->scan_6ghz_params =
--		(void *)&request->channels[n_channels];
-+	request->n_6ghz_params = 0;
-+	if (rdev_req->n_ssids) {
-+		/*
-+		 * Add the ssids from the parent scan request to the new
-+		 * scan request, so the driver would be able to use them
-+		 * in its probe requests to discover hidden APs on PSC
-+		 * channels.
+ 		local->hw_scan_req->req.ssids = req->ssids;
+ 		local->hw_scan_req->req.n_ssids = req->n_ssids;
++		/* None of the channels are actually set
++		 * up but let UBSAN know the boundaries.
 +		 */
-+		request->ssids = (void *)request + offs_ssids;
-+		memcpy(request->ssids, rdev_req->ssids,
-+		       sizeof(*request->ssids) * request->n_ssids);
-+	}
-+	request->scan_6ghz_params = (void *)request + offs_6ghz_params;
++		local->hw_scan_req->req.n_channels = req->n_channels;
 +
-+	if (rdev_req->ie_len) {
-+		void *ie = (void *)request + offs_ies;
-+
-+		memcpy(ie, rdev_req->ie, rdev_req->ie_len);
-+		request->ie = ie;
-+	}
- 
- 	/*
- 	 * PSC channels should not be scanned in case of direct scan with 1 SSID
-@@ -978,17 +1002,8 @@ static int cfg80211_scan_6ghz(struct cfg80211_registered_device *rdev)
- 
- 	if (request->n_channels) {
- 		struct cfg80211_scan_request *old = rdev->int_scan_req;
--		rdev->int_scan_req = request;
- 
--		/*
--		 * Add the ssids from the parent scan request to the new scan
--		 * request, so the driver would be able to use them in its
--		 * probe requests to discover hidden APs on PSC channels.
--		 */
--		request->ssids = (void *)&request->channels[request->n_channels];
--		request->n_ssids = rdev_req->n_ssids;
--		memcpy(request->ssids, rdev_req->ssids, sizeof(*request->ssids) *
--		       request->n_ssids);
-+		rdev->int_scan_req = request;
- 
- 		/*
- 		 * If this scan follows a previous scan, save the scan start
+ 		ies = (u8 *)local->hw_scan_req +
+ 			sizeof(*local->hw_scan_req) +
+ 			req->n_channels * sizeof(req->channels[0]);
 -- 
 2.43.0
 
