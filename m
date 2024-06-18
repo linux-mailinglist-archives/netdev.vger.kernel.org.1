@@ -1,462 +1,192 @@
-Return-Path: <netdev+bounces-104341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07B2A90C33A
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 07:52:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D99AE90C354
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 08:11:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78A5D1F227EA
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 05:52:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 754692844BC
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 06:11:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B368B3B295;
-	Tue, 18 Jun 2024 05:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3E5112B95;
+	Tue, 18 Jun 2024 06:11:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="ZSnd9bc9"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="WngEI+ij"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06858249EB
-	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 05:52:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 116EA81E;
+	Tue, 18 Jun 2024 06:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718689934; cv=none; b=j2pdQf7J876i/1xhTQnJ53pIsD/NnYMBtpmZynH1PSnx/qbfzNYdwvduPJh15JX9W9povZC88L7pBKgih79YWyCYjOap+okuj9oOjQ8q8POJ8krq0Dnu9QKHVI28atP9NnmWvz29KDAh/vc3hi4RidLeokaARkbOgg/u0nQUIhs=
+	t=1718691100; cv=none; b=fCytyWHluHdUYyzcjvjNdTO1AkyYYkh4eyF8yzkWypVJ3q48c24iblvFbzN5wv2aSMdl5Dzx+1CJbUfFVxtqfuJWQbVmMpfFlPZGyD2zPbsCID+9JUM6qImE4l8v5f0fqakTbxIuIXG6IfB/kGmfPlYU1vlj/UenKUsSsAa4M3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718689934; c=relaxed/simple;
-	bh=F3lDqlJ7UruJNej8FPihz5f6vW2cFoVTwFbYgUFboBc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p6eyGzBZxvqsjayBY1y/3Mx0ImRcAWGsaUUkdGq2JAOj4+Km79gPJjeyRwAYYN4rlQttD7finBjxCRfdBKjUPS5eYvNOvCyZxvdAT0ppj6JwVN6HXLyMbRt9Lx1fWbrPBu/EN3yIOjmmu4aa5zZC2tI2li+N+ifBTHZpDTjSGM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=ZSnd9bc9; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1f8395a530dso43687335ad.0
-        for <netdev@vger.kernel.org>; Mon, 17 Jun 2024 22:52:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1718689932; x=1719294732; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SaUyDmGQKozVhfyPY+cyzhojvOoZVxFyw5exrs8E7D8=;
-        b=ZSnd9bc9O1WmaQlOsfdfgmdTEtP1JDaWxS2Mw0b53SZXihUMHwvh5uGOtBlKPS6v58
-         pr7W0uNq7pbcOQ1hkBcV5TjE9OAW6tqR/ic80DjnxX/PNjqDkhVczk/pepkz+1h/7wcq
-         +k4YrD5rev95KGtLNwLhYQLDndeU61nLtI2VULXz5yfjQUsY1qtuSt7giGD4M6FuZAvC
-         1L8yeqjPcfa8FDsQdST6IyLq06IMrs/FiXO9XwNqoOBEod44KNQrECWf5eEGEHFs7S6d
-         wOVbarS6/r870V1CrCnkvmXJD8U4TJ/zNNCs//2z5MpuCI3laj8XoHX5bGwyTFAbp1vV
-         zXpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718689932; x=1719294732;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SaUyDmGQKozVhfyPY+cyzhojvOoZVxFyw5exrs8E7D8=;
-        b=iLxBkv0Ivv5GbsIJctjqiV75pftwF/mV0cZOqmq7FnlW1mkp84jFANM/A02kp64mEn
-         C1ceL1uqEYEF/Rk257lsnlq8bzjLFLx7gO46Z920ifKxjq87jXicAgr3xVxJ0i/k331u
-         dzWF1PBN2g1oRjqRycNDLSxQop2jgcXkO7R/q5g2+zqUp2TpiC/4RgKfrZRLWZIiqYxU
-         DJDII0/LWH6yD+D257w5qtzJMvvGG+No9OExkX08/8Gsm0OviBvCZagZWJJhix5BreXa
-         G+RRC1HHgMLpTWTpYnuWHMJTjc2217y2HSlMCKKWviUIT4sjDCIXIPgBdxMMh93wmheL
-         xXwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUur8xySLVBqqRvq2Rv/tzg6DT4Ihp9wTWldtktEkHH6meB6Z+q5R12NLyhPlK2ZGxD7hH6m3bLtAfVkvimCXFoZYiaFPIp
-X-Gm-Message-State: AOJu0Yw3HoZBkR/Zzi2kqd6aSkjEt1TxxSBuh4hkLZPsh1JhrMOrgxNd
-	1AQDd8sJ9oO8e9iGALwaRA6h6tlO0pBxuTYv6m1l4hDVp2a2gFGq9+rwNfo56JY=
-X-Google-Smtp-Source: AGHT+IE3ahTHqFvA3Vq5G4K8Qdqf5qFEQnoyclUJObhrgxP+RPIbTp+NTxSdf+4E4KqwMO9YN0RgEQ==
-X-Received: by 2002:a17:903:244a:b0:1f7:1821:77ad with SMTP id d9443c01a7336-1f8625ce77amr137565135ad.14.1718689932307;
-        Mon, 17 Jun 2024 22:52:12 -0700 (PDT)
-Received: from localhost (fwdproxy-prn-005.fbsv.net. [2a03:2880:ff:5::face:b00c])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f855f40f38sm88646455ad.277.2024.06.17.22.52.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 22:52:12 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: Michael Chan <michael.chan@broadcom.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Adrian Alvarado <adrian.alvarado@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v2 3/3] bnxt_en: implement netdev_queue_mgmt_ops
-Date: Mon, 17 Jun 2024 22:52:02 -0700
-Message-ID: <20240618055202.2530064-4-dw@davidwei.uk>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240618055202.2530064-1-dw@davidwei.uk>
-References: <20240618055202.2530064-1-dw@davidwei.uk>
+	s=arc-20240116; t=1718691100; c=relaxed/simple;
+	bh=kME9BdtvzC+4KF2BU+0JcBQkX5uvuN2MNShMq84mZBI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BobZxPtrsbuHefQdbuP+5NpgVxb0Pm9pTphsG70pE88/Ci/COK4hW0QnGzgJ27asmRTVMuUxR4CfNo9bHagNxgS1iQdPyak7iDI1KKxMO2HD7TxQaoDk+7HCl5eLa5fvj6TFS6LzD8/f/qyIZUEoTkmIFoSXlm9q6Eo9oMVRZ4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=WngEI+ij; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45HIkL2a017645;
+	Mon, 17 Jun 2024 23:11:31 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=CO/bmxZ8gDB4g2Hg2KtGgps+FXjnTZ/iMxrbvKGZ0xM=; b=Wng
+	EI+ijvWm08/NwejTHwzNJimcUUzn3/F73SL4Ms2HjKnZDldS5kY2n+5sBJgIE1DQ
+	0zm2O8f9jEpvijGBV8mPOBXqTnUU4cUoWloUFHe+/8868byoXwR6SvKrAu1izA+9
+	BjcflWmiJqdK73yXsZ+EkXnQFdogJ6ZGSWT1pjKLK9jvHRqtWw4pK5H8zCiQ1t9b
+	kP4mBMzcJhKuhLSxZ6FrLeNXWb+6qYamymkVOohM4rb+9ahWwk5sceIhbhndd/7A
+	4k02ZA1l1ZYAMUXy/xgkaPRWBTVp1Fr4Z6v/rEnPizxcvKm88zl9hHuhyCxjCZz8
+	NQFfeaW84ulS+evijJA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3ysafh8drv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 17 Jun 2024 23:11:30 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 17 Jun 2024 23:11:30 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 17 Jun 2024 23:11:30 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 7A96A3F706D;
+	Mon, 17 Jun 2024 23:11:25 -0700 (PDT)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: [net PATCH] octeontx2-pf: Fix linking objects into multiple modules
+Date: Tue, 18 Jun 2024 11:41:22 +0530
+Message-ID: <20240618061122.6628-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: lm4U5CH5WfhHlLydH643g_56zZn9gQxe
+X-Proofpoint-GUID: lm4U5CH5WfhHlLydH643g_56zZn9gQxe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-17_14,2024-06-17_01,2024-05-17_01
 
-Implement netdev_queue_mgmt_ops for bnxt added in [1].
+This patch fixes the below build warning messages that are
+caused due to linking same files to multiple modules by
+exporting the required symbols.
 
-Two bnxt_rx_ring_info structs are allocated to hold the new/old queue
-memory. Queue memory is copied from/to the main bp->rx_ring[idx]
-bnxt_rx_ring_info.
+"scripts/Makefile.build:244: drivers/net/ethernet/marvell/octeontx2/nic/Makefile:
+otx2_devlink.o is added to multiple modules: rvu_nicpf rvu_nicvf
 
-Queue memory is pre-allocated in bnxt_queue_mem_alloc() into a clone,
-and then copied into bp->rx_ring[idx] in bnxt_queue_mem_start().
+scripts/Makefile.build:244: drivers/net/ethernet/marvell/octeontx2/nic/Makefile:
+otx2_dcbnl.o is added to multiple modules: rvu_nicpf rvu_nicvf"
 
-Similarly, when bp->rx_ring[idx] is stopped its queue memory is copied
-into a clone, and then freed later in bnxt_queue_mem_free().
-
-I tested this patchset with netdev_rx_queue_restart(), including
-inducing errors in all places that returns an error code. In all cases,
-the queue is left in a good working state.
-
-Rx queues are stopped/started using bnxt_hwrm_vnic_update(), which only
-affects queues that are not in the default RSS context. This is
-different to the GVE that also implemented the queue API recently where
-arbitrary Rx queues can be stopped. Due to this limitation, all ndos
-returns EOPNOTSUPP if the queue is in the default RSS context.
-
-Thanks to Somnath for helping me with using bnxt_hwrm_vnic_update() to
-stop/start an Rx queue. With their permission I've added them as
-Acked-by.
-
-[1]: https://lore.kernel.org/netdev/20240501232549.1327174-2-shailend@google.com/
-
-Acked-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Signed-off-by: David Wei <dw@davidwei.uk>
+Fixes: 8e67558177f8 ("octeontx2-pf: PFC config support with DCBx").
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 304 ++++++++++++++++++++++
- 1 file changed, 304 insertions(+)
+ drivers/net/ethernet/marvell/octeontx2/nic/Makefile       | 3 +--
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c   | 7 +++++++
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c | 2 ++
+ 3 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index bbe37ea8e1ef..9bed899e0575 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -3997,6 +3997,62 @@ static int bnxt_alloc_cp_rings(struct bnxt *bp)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/Makefile b/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
+index 5664f768cb0c..64a97a0a10ed 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
+@@ -9,10 +9,9 @@ obj-$(CONFIG_OCTEONTX2_VF) += rvu_nicvf.o otx2_ptp.o
+ rvu_nicpf-y := otx2_pf.o otx2_common.o otx2_txrx.o otx2_ethtool.o \
+                otx2_flows.o otx2_tc.o cn10k.o otx2_dmac_flt.o \
+                otx2_devlink.o qos_sq.o qos.o
+-rvu_nicvf-y := otx2_vf.o otx2_devlink.o
++rvu_nicvf-y := otx2_vf.o
+ 
+ rvu_nicpf-$(CONFIG_DCB) += otx2_dcbnl.o
+-rvu_nicvf-$(CONFIG_DCB) += otx2_dcbnl.o
+ rvu_nicpf-$(CONFIG_MACSEC) += cn10k_macsec.o
+ 
+ ccflags-y += -I$(srctree)/drivers/net/ethernet/marvell/octeontx2/af
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
+index 28fb643d2917..aa01110f04a3 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
+@@ -54,6 +54,7 @@ int otx2_pfc_txschq_config(struct otx2_nic *pfvf)
+ 
  	return 0;
  }
++EXPORT_SYMBOL(otx2_pfc_txschq_config);
  
-+static void bnxt_init_rx_ring_struct(struct bnxt *bp,
-+				     struct bnxt_rx_ring_info *rxr)
-+{
-+	struct bnxt_ring_mem_info *rmem;
-+	struct bnxt_ring_struct *ring;
-+
-+	ring = &rxr->rx_ring_struct;
-+	rmem = &ring->ring_mem;
-+	rmem->nr_pages = bp->rx_nr_pages;
-+	rmem->page_size = HW_RXBD_RING_SIZE;
-+	rmem->pg_arr = (void **)rxr->rx_desc_ring;
-+	rmem->dma_arr = rxr->rx_desc_mapping;
-+	rmem->vmem_size = SW_RXBD_RING_SIZE * bp->rx_nr_pages;
-+	rmem->vmem = (void **)&rxr->rx_buf_ring;
-+
-+	ring = &rxr->rx_agg_ring_struct;
-+	rmem = &ring->ring_mem;
-+	rmem->nr_pages = bp->rx_agg_nr_pages;
-+	rmem->page_size = HW_RXBD_RING_SIZE;
-+	rmem->pg_arr = (void **)rxr->rx_agg_desc_ring;
-+	rmem->dma_arr = rxr->rx_agg_desc_mapping;
-+	rmem->vmem_size = SW_RXBD_AGG_RING_SIZE * bp->rx_agg_nr_pages;
-+	rmem->vmem = (void **)&rxr->rx_agg_ring;
-+}
-+
-+static void bnxt_reset_rx_ring_struct(struct bnxt *bp,
-+				      struct bnxt_rx_ring_info *rxr)
-+{
-+	struct bnxt_ring_mem_info *rmem;
-+	struct bnxt_ring_struct *ring;
-+	int i;
-+
-+	rxr->page_pool->p.napi = NULL;
-+	rxr->page_pool = NULL;
-+
-+	ring = &rxr->rx_ring_struct;
-+	rmem = &ring->ring_mem;
-+	rmem->pg_tbl = NULL;
-+	rmem->pg_tbl_map = 0;
-+	for (i = 0; i < rmem->nr_pages; i++) {
-+		rmem->pg_arr[i] = NULL;
-+		rmem->dma_arr[i] = 0;
-+	}
-+	*rmem->vmem = NULL;
-+
-+	ring = &rxr->rx_agg_ring_struct;
-+	rmem = &ring->ring_mem;
-+	rmem->pg_tbl = NULL;
-+	rmem->pg_tbl_map = 0;
-+	for (i = 0; i < rmem->nr_pages; i++) {
-+		rmem->pg_arr[i] = NULL;
-+		rmem->dma_arr[i] = 0;
-+	}
-+	*rmem->vmem = NULL;
-+}
-+
- static void bnxt_init_ring_struct(struct bnxt *bp)
+ static int otx2_pfc_txschq_alloc_one(struct otx2_nic *pfvf, u8 prio)
  {
- 	int i, j;
-@@ -14935,6 +14991,253 @@ static const struct netdev_stat_ops bnxt_stat_ops = {
- 	.get_base_stats		= bnxt_get_base_stats,
- };
+@@ -122,6 +123,7 @@ int otx2_pfc_txschq_alloc(struct otx2_nic *pfvf)
  
-+static int bnxt_alloc_rx_agg_bmap(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)
-+{
-+	u16 mem_size;
-+
-+	rxr->rx_agg_bmap_size = bp->rx_agg_ring_mask + 1;
-+	mem_size = rxr->rx_agg_bmap_size / 8;
-+	rxr->rx_agg_bmap = kzalloc(mem_size, GFP_KERNEL);
-+	if (!rxr->rx_agg_bmap)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
-+{
-+	struct bnxt_rx_ring_info *rxr, *clone;
-+	struct bnxt *bp = netdev_priv(dev);
-+	struct bnxt_ring_struct *ring;
-+	int rc;
-+
-+	if (bnxt_get_max_rss_ring(bp) >= idx)
-+		return -EOPNOTSUPP;
-+
-+	rxr = &bp->rx_ring[idx];
-+	clone = qmem;
-+	memcpy(clone, rxr, sizeof(*rxr));
-+	bnxt_init_rx_ring_struct(bp, clone);
-+	bnxt_reset_rx_ring_struct(bp, clone);
-+
-+	clone->rx_prod = 0;
-+	clone->rx_agg_prod = 0;
-+	clone->rx_sw_agg_prod = 0;
-+	clone->rx_next_cons = 0;
-+
-+	rc = bnxt_alloc_rx_page_pool(bp, clone, rxr->page_pool->p.nid);
-+	if (rc)
-+		return rc;
-+
-+	ring = &clone->rx_ring_struct;
-+	rc = bnxt_alloc_ring(bp, &ring->ring_mem);
-+	if (rc)
-+		goto err_free_rx_ring;
-+
-+	if (bp->flags & BNXT_FLAG_AGG_RINGS) {
-+		ring = &clone->rx_agg_ring_struct;
-+		rc = bnxt_alloc_ring(bp, &ring->ring_mem);
-+		if (rc)
-+			goto err_free_rx_agg_ring;
-+
-+		rc = bnxt_alloc_rx_agg_bmap(bp, clone);
-+		if (rc)
-+			goto err_free_rx_agg_ring;
-+	}
-+
-+	bnxt_init_one_rx_ring_rxbd(bp, clone);
-+	bnxt_init_one_rx_agg_ring_rxbd(bp, clone);
-+
-+	bnxt_alloc_one_rx_ring_skb(bp, clone, idx);
-+	if (bp->flags & BNXT_FLAG_AGG_RINGS)
-+		bnxt_alloc_one_rx_ring_page(bp, clone, idx);
-+
-+	return 0;
-+
-+err_free_rx_agg_ring:
-+	bnxt_free_ring(bp, &clone->rx_agg_ring_struct.ring_mem);
-+err_free_rx_ring:
-+	bnxt_free_ring(bp, &clone->rx_ring_struct.ring_mem);
-+	clone->page_pool->p.napi = NULL;
-+	page_pool_destroy(clone->page_pool);
-+	clone->page_pool = NULL;
-+	return rc;
-+}
-+
-+static void bnxt_queue_mem_free(struct net_device *dev, void *qmem)
-+{
-+	struct bnxt_rx_ring_info *rxr = qmem;
-+	struct bnxt *bp = netdev_priv(dev);
-+	struct bnxt_ring_struct *ring;
-+
-+	bnxt_free_one_rx_ring(bp, rxr);
-+	bnxt_free_one_rx_agg_ring(bp, rxr);
-+
-+	/* At this point, this NAPI instance has another page pool associated
-+	 * with it. Disconnect here before freeing the old page pool to avoid
-+	 * warnings.
-+	 */
-+	rxr->page_pool->p.napi = NULL;
-+	page_pool_destroy(rxr->page_pool);
-+	rxr->page_pool = NULL;
-+
-+	ring = &rxr->rx_ring_struct;
-+	bnxt_free_ring(bp, &ring->ring_mem);
-+
-+	ring = &rxr->rx_agg_ring_struct;
-+	bnxt_free_ring(bp, &ring->ring_mem);
-+
-+	kfree(rxr->rx_agg_bmap);
-+	rxr->rx_agg_bmap = NULL;
-+}
-+
-+static void bnxt_copy_rx_ring(struct bnxt *bp,
-+			      struct bnxt_rx_ring_info *dst,
-+			      struct bnxt_rx_ring_info *src)
-+{
-+	struct bnxt_ring_mem_info *dst_rmem, *src_rmem;
-+	struct bnxt_ring_struct *dst_ring, *src_ring;
-+	int i;
-+
-+	dst_ring = &dst->rx_ring_struct;
-+	dst_rmem = &dst_ring->ring_mem;
-+	src_ring = &src->rx_ring_struct;
-+	src_rmem = &src_ring->ring_mem;
-+
-+	WARN_ON(dst_rmem->nr_pages != src_rmem->nr_pages);
-+	WARN_ON(dst_rmem->page_size != src_rmem->page_size);
-+	WARN_ON(dst_rmem->flags != src_rmem->flags);
-+	WARN_ON(dst_rmem->depth != src_rmem->depth);
-+	WARN_ON(dst_rmem->vmem_size != src_rmem->vmem_size);
-+	WARN_ON(dst_rmem->ctx_mem != src_rmem->ctx_mem);
-+
-+	dst_rmem->pg_tbl = src_rmem->pg_tbl;
-+	dst_rmem->pg_tbl_map = src_rmem->pg_tbl_map;
-+	*dst_rmem->vmem = *src_rmem->vmem;
-+	for (i = 0; i < dst_rmem->nr_pages; i++) {
-+		dst_rmem->pg_arr[i] = src_rmem->pg_arr[i];
-+		dst_rmem->dma_arr[i] = src_rmem->dma_arr[i];
-+	}
-+
-+	if (!(bp->flags & BNXT_FLAG_AGG_RINGS))
-+		return;
-+
-+	dst_ring = &dst->rx_agg_ring_struct;
-+	dst_rmem = &dst_ring->ring_mem;
-+	src_ring = &src->rx_agg_ring_struct;
-+	src_rmem = &src_ring->ring_mem;
-+
-+	WARN_ON(dst_rmem->nr_pages != src_rmem->nr_pages);
-+	WARN_ON(dst_rmem->page_size != src_rmem->page_size);
-+	WARN_ON(dst_rmem->flags != src_rmem->flags);
-+	WARN_ON(dst_rmem->depth != src_rmem->depth);
-+	WARN_ON(dst_rmem->vmem_size != src_rmem->vmem_size);
-+	WARN_ON(dst_rmem->ctx_mem != src_rmem->ctx_mem);
-+	WARN_ON(dst->rx_agg_bmap_size != src->rx_agg_bmap_size);
-+
-+	dst_rmem->pg_tbl = src_rmem->pg_tbl;
-+	dst_rmem->pg_tbl_map = src_rmem->pg_tbl_map;
-+	*dst_rmem->vmem = *src_rmem->vmem;
-+	for (i = 0; i < dst_rmem->nr_pages; i++) {
-+		dst_rmem->pg_arr[i] = src_rmem->pg_arr[i];
-+		dst_rmem->dma_arr[i] = src_rmem->dma_arr[i];
-+	}
-+
-+	dst->rx_agg_bmap = src->rx_agg_bmap;
-+}
-+
-+static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
-+{
-+	struct bnxt *bp = netdev_priv(dev);
-+	struct bnxt_rx_ring_info *rxr, *clone;
-+	struct bnxt_cp_ring_info *cpr;
-+	struct bnxt_vnic_info *vnic;
-+	int rc;
-+
-+	if (bnxt_get_max_rss_ring(bp) >= idx)
-+		return -EOPNOTSUPP;
-+
-+	rxr = &bp->rx_ring[idx];
-+	clone = qmem;
-+
-+	rxr->rx_prod = clone->rx_prod;
-+	rxr->rx_agg_prod = clone->rx_agg_prod;
-+	rxr->rx_sw_agg_prod = clone->rx_sw_agg_prod;
-+	rxr->rx_next_cons = clone->rx_next_cons;
-+	rxr->page_pool = clone->page_pool;
-+
-+	bnxt_copy_rx_ring(bp, rxr, clone);
-+
-+	rc = bnxt_hwrm_rx_ring_alloc(bp, rxr);
-+	if (rc)
-+		return rc;
-+	rc = bnxt_hwrm_rx_agg_ring_alloc(bp, rxr);
-+	if (rc)
-+		goto err_free_hwrm_rx_ring;
-+
-+	bnxt_db_write(bp, &rxr->rx_db, rxr->rx_prod);
-+	if (bp->flags & BNXT_FLAG_AGG_RINGS)
-+		bnxt_db_write(bp, &rxr->rx_agg_db, rxr->rx_agg_prod);
-+
-+	napi_enable(&rxr->bnapi->napi);
-+
-+	vnic = &bp->vnic_info[BNXT_VNIC_NTUPLE];
-+	vnic->mru = bp->dev->mtu + ETH_HLEN + VLAN_HLEN;
-+	rc = bnxt_hwrm_vnic_update(bp, vnic,
-+				   VNIC_UPDATE_REQ_ENABLES_MRU_VALID);
-+	if (rc)
-+		goto err_free_hwrm_rx_agg_ring;
-+
-+	cpr = &rxr->bnapi->cp_ring;
-+	cpr->sw_stats->rx.rx_resets++;
-+
-+	return 0;
-+
-+err_free_hwrm_rx_agg_ring:
-+	napi_disable(&rxr->bnapi->napi);
-+	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
-+err_free_hwrm_rx_ring:
-+	bnxt_hwrm_rx_ring_free(bp, rxr, false);
-+	return rc;
-+}
-+
-+static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
-+{
-+	struct bnxt *bp = netdev_priv(dev);
-+	struct bnxt_rx_ring_info *rxr;
-+	struct bnxt_vnic_info *vnic;
-+	int rc;
-+
-+	if (bnxt_get_max_rss_ring(bp) >= idx)
-+		return -EOPNOTSUPP;
-+
-+	vnic = &bp->vnic_info[BNXT_VNIC_NTUPLE];
-+	vnic->mru = 0;
-+	rc = bnxt_hwrm_vnic_update(bp, vnic,
-+				   VNIC_UPDATE_REQ_ENABLES_MRU_VALID);
-+	if (rc)
-+		return rc;
-+
-+	rxr = &bp->rx_ring[idx];
-+	napi_disable(&rxr->bnapi->napi);
-+	bnxt_hwrm_rx_ring_free(bp, rxr, false);
-+	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
-+	rxr->rx_next_cons = 0;
-+
-+	memcpy(qmem, rxr, sizeof(*rxr));
-+	bnxt_init_rx_ring_struct(bp, qmem);
-+
-+	return 0;
-+}
-+
-+static const struct netdev_queue_mgmt_ops bnxt_queue_mgmt_ops = {
-+	.ndo_queue_mem_size	= sizeof(struct bnxt_rx_ring_info),
-+	.ndo_queue_mem_alloc	= bnxt_queue_mem_alloc,
-+	.ndo_queue_mem_free	= bnxt_queue_mem_free,
-+	.ndo_queue_start	= bnxt_queue_start,
-+	.ndo_queue_stop		= bnxt_queue_stop,
-+};
-+
- static void bnxt_remove_one(struct pci_dev *pdev)
+ 	return 0;
+ }
++EXPORT_SYMBOL(otx2_pfc_txschq_alloc);
+ 
+ static int otx2_pfc_txschq_stop_one(struct otx2_nic *pfvf, u8 prio)
  {
- 	struct net_device *dev = pci_get_drvdata(pdev);
-@@ -15400,6 +15703,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	dev->stat_ops = &bnxt_stat_ops;
- 	dev->watchdog_timeo = BNXT_TX_TIMEOUT;
- 	dev->ethtool_ops = &bnxt_ethtool_ops;
-+	dev->queue_mgmt_ops = &bnxt_queue_mgmt_ops;
- 	pci_set_drvdata(pdev, dev);
+@@ -260,6 +262,7 @@ int otx2_pfc_txschq_update(struct otx2_nic *pfvf)
  
- 	rc = bnxt_alloc_hwrm_resources(bp);
+ 	return 0;
+ }
++EXPORT_SYMBOL(otx2_pfc_txschq_update);
+ 
+ int otx2_pfc_txschq_stop(struct otx2_nic *pfvf)
+ {
+@@ -282,6 +285,7 @@ int otx2_pfc_txschq_stop(struct otx2_nic *pfvf)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL(otx2_pfc_txschq_stop);
+ 
+ int otx2_config_priority_flow_ctrl(struct otx2_nic *pfvf)
+ {
+@@ -321,6 +325,7 @@ int otx2_config_priority_flow_ctrl(struct otx2_nic *pfvf)
+ 	mutex_unlock(&pfvf->mbox.lock);
+ 	return err;
+ }
++EXPORT_SYMBOL(otx2_config_priority_flow_ctrl);
+ 
+ void otx2_update_bpid_in_rqctx(struct otx2_nic *pfvf, int vlan_prio, int qidx,
+ 			       bool pfc_enable)
+@@ -385,6 +390,7 @@ void otx2_update_bpid_in_rqctx(struct otx2_nic *pfvf, int vlan_prio, int qidx,
+ 			 "Updating BPIDs in CQ and Aura contexts of RQ%d failed with err %d\n",
+ 			 qidx, err);
+ }
++EXPORT_SYMBOL(otx2_update_bpid_in_rqctx);
+ 
+ static int otx2_dcbnl_ieee_getpfc(struct net_device *dev, struct ieee_pfc *pfc)
+ {
+@@ -472,3 +478,4 @@ int otx2_dcbnl_set_ops(struct net_device *dev)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL(otx2_dcbnl_set_ops);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
+index 99ddf31269d9..458d34a62e18 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
+@@ -113,6 +113,7 @@ int otx2_register_dl(struct otx2_nic *pfvf)
+ 	devlink_free(dl);
+ 	return err;
+ }
++EXPORT_SYMBOL(otx2_register_dl);
+ 
+ void otx2_unregister_dl(struct otx2_nic *pfvf)
+ {
+@@ -124,3 +125,4 @@ void otx2_unregister_dl(struct otx2_nic *pfvf)
+ 				  ARRAY_SIZE(otx2_dl_params));
+ 	devlink_free(dl);
+ }
++EXPORT_SYMBOL(otx2_unregister_dl);
 -- 
-2.43.0
+2.25.1
 
 
