@@ -1,289 +1,491 @@
-Return-Path: <netdev+bounces-104567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AFE790D567
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:37:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E936890D5AB
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 16:42:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FC5A1C22B33
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 14:37:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D3611F218A0
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 14:42:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B467D15CD74;
-	Tue, 18 Jun 2024 14:21:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE55A16DC3B;
+	Tue, 18 Jun 2024 14:27:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Db2nAFY6"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="kHoeutkq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D626115CD41
-	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 14:21:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718720487; cv=fail; b=J4g6J4HJ2+pRDQ03yrXLAHgrG0PHU5OUTosz/M+BNL8WC0hnv/fEnTKhZXebJL5Xjv4q0SGOYLhY2PjAASbHL5BdQ7NP+RfWi0GqnfXecpJwg8EPGglm7o4IYiWMhIxs12PvZGxakJR7ayOUxOMlob5OlUPlewOs9NZkCbThuSA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718720487; c=relaxed/simple;
-	bh=uRJTijeyD3uuT9X767fPcfZ4aqyNdmdSKmLgl2RqS4U=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Wp7tyqHbAzP9NEXIYEDJzv/LSXEhtQuI5jGXItiOdWhEjzcQR4iw3FWIa60Z1CICzIFcolrVXFB7Uxasdu7p6Ih9bqXInyhCZ1ty6CtWGDCLQ9vosUz5vSRKX4MQwdm+zYBudTnDnFCSRG7udBapyQJDD+J+WgU4V11X/G2QGcY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Db2nAFY6; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718720486; x=1750256486;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=uRJTijeyD3uuT9X767fPcfZ4aqyNdmdSKmLgl2RqS4U=;
-  b=Db2nAFY6DO++NF7aJgyngPQ5OzBsPWDEI3/wPRd/WhXMhjIxsi80uNOl
-   TENpJ1s2oEEgXbPCYvztlXj4FTh0V2zCy27L8es6jpVLr+7M0eHQDJTS3
-   SrQR4jNVgXmg3aO9CATLFuc8ud3G60MAu235SjvfJTRxpb6TAh7m4WDWC
-   Ds9qSygO3yaIc9ClweW6O7HXvMYYnQ9fqVnlO8eD3Ed8D5EVKDaPY2mcG
-   wketZmWe2ZXn6Dl0hl1gOlFcgRP1KpliSqZDLnEb38xz98A8EOWIQ/Qrf
-   7fIjOWq+5dKaQcsHtmMv4Bm31R7w4cQZaJkBb0AVYCaaADrXdyazhQ0oe
-   A==;
-X-CSE-ConnectionGUID: 9sSXSib4ScqNwBMW2wt4/w==
-X-CSE-MsgGUID: W6FslUTRRpymClxKQtC94g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11107"; a="33073204"
-X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
-   d="scan'208";a="33073204"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2024 07:21:26 -0700
-X-CSE-ConnectionGUID: sc3r57WWSnSJlARAw8yaMg==
-X-CSE-MsgGUID: 5iSSk4wLTrC2gC0omvht0w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
-   d="scan'208";a="72315589"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Jun 2024 07:21:25 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 18 Jun 2024 07:21:24 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 18 Jun 2024 07:21:24 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 18 Jun 2024 07:21:24 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.42) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 18 Jun 2024 07:21:24 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XD7IyneM9kDXEoFHFt+RTjpdQ8L7vqeEGkeur4Qtc2NHkMZHOu9SB1PX9sVT05lSNABf10nYucoL0itghRDNYcWChywAmFrE0bgqnk+uA/W8hj8ODmUf2TpCtteI4g9uGl0PLJ86VZjsA0g18iL8OQkhS+ih2YfCJHKPEGpSeMe7cEwaZab+LqdHWupfBZrDPeg526ALacZPqabNn9U0CiIfkUZsxTH2W1swIdQ7iN78ywOo6NSJ08LpOdlEDzNYK3OM+6e2Fb76abR4nUxXgwULgtLOGDBqEO5P0/mHOt7MMyYQe6vUiponSHs78zc201tXCXHoOUZYJjAvckXt6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uRJTijeyD3uuT9X767fPcfZ4aqyNdmdSKmLgl2RqS4U=;
- b=G1dO9RcR+yEIU7qTflYBkrMaVFGzLH/HoHyoRL6OaXVcT9pdmwIMjpDnMdiyvsvgst6kq8c2ND9MOl0f+o3ihuIIUh6gPCFutjy3ugVuO4PzmcNsc+zRvX15rLgXqsN1A6eX5j7fzZLBlTUcHj/PFzLkVZrz5ioC9h5iY8QRhoQBEZfkrXH9t6lpRBNCAWq+qoXIWF8NkzUR76gouvrV3VHsFDOwGbbjruTmRtfHhy8MI2gsyZbcB+okQBM3RYSATDFCNvQzqwcBsJihEv8g4FfzuNAfWfu5E1MyYV+A9EIdKNrh3LGu8iPsbiS5AdPz53fldqXd7CfAMzSGGbE68g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ0PR11MB5866.namprd11.prod.outlook.com (2603:10b6:a03:429::10)
- by SN7PR11MB7668.namprd11.prod.outlook.com (2603:10b6:806:341::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.29; Tue, 18 Jun
- 2024 14:21:22 +0000
-Received: from SJ0PR11MB5866.namprd11.prod.outlook.com
- ([fe80::265f:31c0:f775:c25b]) by SJ0PR11MB5866.namprd11.prod.outlook.com
- ([fe80::265f:31c0:f775:c25b%4]) with mapi id 15.20.7677.030; Tue, 18 Jun 2024
- 14:21:21 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kang, Kelvin"
-	<kelvin.kang@intel.com>, "Kubalewski, Arkadiusz"
-	<arkadiusz.kubalewski@intel.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net v4] i40e: fix hot issue NVM
- content is corrupted after nvmupdate
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v4] i40e: fix hot issue NVM
- content is corrupted after nvmupdate
-Thread-Index: AQHawYJreP4M0MfyHEWSeVxVtkBQwbHNicYAgAAGN5A=
-Date: Tue, 18 Jun 2024 14:21:21 +0000
-Message-ID: <SJ0PR11MB5866A55691B58852B19FAC5CE5CE2@SJ0PR11MB5866.namprd11.prod.outlook.com>
-References: <20240618132111.3193963-1-aleksandr.loktionov@intel.com>
- <07519e33-23e8-48b1-a445-c128b40e1c36@intel.com>
-In-Reply-To: <07519e33-23e8-48b1-a445-c128b40e1c36@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR11MB5866:EE_|SN7PR11MB7668:EE_
-x-ms-office365-filtering-correlation-id: ed1126ea-c181-4230-3fb5-08dc8fa1ed90
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230037|1800799021|376011|366013|38070700015;
-x-microsoft-antispam-message-info: =?utf-8?B?S04wLzA0UFRUM3pVRTEyT2Y1L0wyOWRwRmJRVmNpVVpHTG43b1B2WUJnOElp?=
- =?utf-8?B?WVhkZ0hvcDkrR1JKWGVGSzdVV3psaHdNRkNCQ3B6KzlaWkw5SU9ISHlDVnRM?=
- =?utf-8?B?d1VDSjYzR0hndGhnQW8zMFlLSkMwcUduVVQ2cGsweVI1SEIya2pncTByek5C?=
- =?utf-8?B?OG9KcHhOODl1bDVYRDhKa3VoOFEzU0c4NnhhZVBYNmgyMG4yZXp1T1lWY2R4?=
- =?utf-8?B?WDRUWEdQR3BtSmExWDlTUkdNMzlWeEFudjMwS040NzdKNXFiRTU0Mkdvc3hv?=
- =?utf-8?B?NndXbXdnb2N2ZmVuRk1mVFpyUjhJUWMzeUpCdFZ5SU4xbDV3WWlZazNtVWkv?=
- =?utf-8?B?WjVjUldlUWVYeWVzSHQzcmhOUnN4dTB6QWhuWVdxTVlRdTlNV0xhMVZTOVg4?=
- =?utf-8?B?U3E0SDBSRTFNcFZSQ2tiejdxOEVIN29scmlOSlBZRDBOZjMrcUpJei9kYzh0?=
- =?utf-8?B?L3BSbXhhWGpBdlNyYTBMZUZRUkpuVzdJRmF1dlZTZ3E4ZTNHNHNmdWNOSVQy?=
- =?utf-8?B?THJuOGdDWlhzQzZMUzZPQWJTY0MxbHlQZnRXRTRNUFJEZHBmVWdJa0hKRXRj?=
- =?utf-8?B?d3hvcGNyVDd2S0poK1pobEZmRGt2ait6QVBmYnEvYWVLazJ1L1VJckdLSzAv?=
- =?utf-8?B?Qk9OVmN5MWI0cEFkaVNOc2lHN1lwcm9hOGltbmVEMmhhNm5mNGZXaFduWFlH?=
- =?utf-8?B?SXF4YVhvMEx5TkprbzFMVERTcHFNZW9zSWV3b3ZycE1BNmJpSENBOUxzcCsz?=
- =?utf-8?B?ZFJZMnVTU05rZkNCQnVzWTBnZlpSSTZHYm5UWkkrbTd1OHhVSTVSLzlWUHdC?=
- =?utf-8?B?WkgzWWx6cHpxY2U1T2poVjlJbEl0aWtMUlpGQ2tvLy9XQ0gvZXJDb3RRalNz?=
- =?utf-8?B?MDYrS012Q0JaVHoxZXNPR3RNamxjbERIQ3prYXBoYUtrcGZKVTBBNHBaUDhr?=
- =?utf-8?B?NmVMUk8zNVU4SXowQS92aHRBWDRRbCtKNTM0RlVwbDdpTmFxSDhQSFhhbmY2?=
- =?utf-8?B?d0VhNkxXMnZKTm1QNHppWlJlaEEzbnNDY0FLOEFUaTlCeHFtZFpGbTg0bHA1?=
- =?utf-8?B?MXZEeFNoS3pORXpOcjBuMjRFUGpTTFRrcWhKS2swMXduRGE3M0RFMkNpbnp6?=
- =?utf-8?B?T0FJcUc4WUFWNFowYVNNVGJGS09SU3U3S2E1ZGRQaGFrMFM2L3l2cUFlZmQr?=
- =?utf-8?B?a3Uvb0ZhaFFUMmpWdDhodldqM0l1bnBPcTkwWjZFdVVyYUZJWnZyNlpHWXdQ?=
- =?utf-8?B?cDhCTEx1K2d1VFRyTXovVEQ1UGlvRTdsVlplRUpwSVZzQUZRQW54ZWtycElI?=
- =?utf-8?B?ZmRPNHkrazkrVlUwZWlTZ0FnSy9ack8xSlg2ZEZNN2NETTFiMEdKQ2Y0Q1dy?=
- =?utf-8?B?S2toaXRwUVZMWjBiYitlMGp4T0dpTkJFYms5WE9UZ0ZJWXdSNUlpVnRJWDk5?=
- =?utf-8?B?OTlrcUFXMDArRm05RlhrSlp3QlhoZ3lNd0FIZG9NTUhTRXZxeDV2WWFDOEkx?=
- =?utf-8?B?RG9FSEd3RjhyU1NSMnhTb3BWT0ozR3BqVThKK2w5T3dlSDk5TWtFQnRaNXBp?=
- =?utf-8?B?UUl4cXRTYm5yaUhpanluSlJxOWZUQWQvS3V5RWNnVUhsSjMycC9lb1kvbk5u?=
- =?utf-8?B?Z3NLeUFRVlQ1dEYvQytlUGM4cHM0Y0VhaU14Q1E2RlZKdGl2cG50Tjhpc29i?=
- =?utf-8?B?UGVzVnNMTXBKenBDOHI1UzhvdTdDaFZLUEkrbEl1KzdUWFlPQ0ttNVZobzVa?=
- =?utf-8?Q?gRScItTVrAT4171eqnhMo9V6CQ3rBAA2/nkhFOs?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5866.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(1800799021)(376011)(366013)(38070700015);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VkpGOVhwczBrcUJYdUZLTlEvaU9GSGJ4NXpkaHVoSWM4WTBJRytHWFBmclZn?=
- =?utf-8?B?S1JWOHFNaGV2UTZTbXNIRE9OTkRoeGlpN05QSEdzNXJMejFpTXl3NmdrQ0Jp?=
- =?utf-8?B?QndsR01HTDQxbERhWDFlaElDSzR2cTB3S0s1RDJSY0F1cUgzV3ozRHpZU0N5?=
- =?utf-8?B?ZDdDSDBKQlZKVVRYRGFUcGpYVW1wZHM5VGpGazhVVm5PQ3FNUVBveWs5SzNr?=
- =?utf-8?B?Ymdzd1VPUUwwQUw1RFJ3UXNjdnR0UzBHbXhLdUcySDRkcUVheDFVaEY5YjlB?=
- =?utf-8?B?U2RkQk9RVW9QdklrdkpjKyt4bkEvRFpHd2hQTGFUWkNoOGpWbU1rN3dVOGxR?=
- =?utf-8?B?UGZHbzIyQkt0dE9kQWorUGFBNjB1THdFWjlZYmRNZzFFRWVqdlFVS1I5ZW0v?=
- =?utf-8?B?a3RDWjhBNWI1NUJNaHZIczRjMHZSTjJyUGNRMEt0aFQyVWE0UFlwMkNmWjR5?=
- =?utf-8?B?QjhNalhPNjRERFZyaVJZUGp4aVdEWmlQUjY3SzdYTHN0QkEycEE5eCt0b282?=
- =?utf-8?B?YnJRRlVBWEVqTG9temdvN2dnOVhVRkkyaEl4NEd3V1llRmZKOWRycHFObVlC?=
- =?utf-8?B?a29SWHNEcUc3UXZnbTc0MmFSVVNQaUdxVTVTTDhyZlBPd1NVSjFIdmd2OUps?=
- =?utf-8?B?dXJXcmdvRHd0aFV5c2hvaXg5aHhORHVOY3dWWnVYRW1KUkNWOVcyU0NkbllM?=
- =?utf-8?B?czN4SWdIbkN5RkszdTFINXdYdVdCcEhNT21BendvOSt4anhqZW1IVlAyN2NU?=
- =?utf-8?B?ZXJmOGlyOUN6SnJtaXh1di9QeThHMjN6NVhwR3lrOTVaVHVkZ0pOSWlmZVF2?=
- =?utf-8?B?UWJZQ0pHQ2VnYmlIM0orL2ViQ0VJcDBhNXpaYWdHcm9CT2V3Ymo5S1hyUGFQ?=
- =?utf-8?B?amZ4Z2pvYkhDMUc5QmdmWllrVkQ0ZlptbThLcG9QWEFVZi9HZ1RoN3VQdjF3?=
- =?utf-8?B?MVdlM3JaMjBkWmpYMXdueUE1MHdnTW1WemR4enF1QS9XeUp4UVJBeVh3MWtQ?=
- =?utf-8?B?cGQ0YWVFcUs5bms3TTMwQTBkTy9TdUZVUDFncGRQd3ZIbGpKZWtxSDVqSTNQ?=
- =?utf-8?B?R3llOTNnUzJOMmdLN0tENVp5RVFtT0VkR3V2Ty8zMGUxcERsKzZQYUIzVmFn?=
- =?utf-8?B?dHFUcS9aVVpTY3RRVmdkQmlzbnVqZ0NLaFRlMTY0ejlzK05jMHdjL0MwVzRs?=
- =?utf-8?B?NlpQSUp6VVozQXdIeTIrZ1hYYVNMNmtmTUNkRVRlVGFqQUUzTWE2VjZRbU0x?=
- =?utf-8?B?UWRMa2Y5aTJsSGhDZHlMek5pSVJKaFNFc0ZYNXpqMElZVlZoNXVhcnVabjEy?=
- =?utf-8?B?aXpjOVBneStTQTJGWmtYRk5yS1MrU2g2a2VPaVBRMFBPRStyVHEwdUR0VHpX?=
- =?utf-8?B?SlJGS1RHakVIbnRkbkNWMkdnWXpkU1FkMFNXVlRWQzVTczV2UXd0TG9wbVg4?=
- =?utf-8?B?WHBLR1VkTU01WkpkUC9yUFRTaDkxaSszWmhIaHJlaUM5czNFWU9haVY2Nkx4?=
- =?utf-8?B?UTd5dCtqZy85ZW5JVS9ySnE3M0ZmalhSYUNEZzZ3U2ljMytvb2szdHJrUmIr?=
- =?utf-8?B?VlgvZkV6dlNoSUVhN0JkejdBNWp5Tm13akdEUWtXMGJWYnNQRk5FVlh4U3M3?=
- =?utf-8?B?cHdya1JCU0FwSCtTUWVmYTFCT3RHY251ekJTbVY5M0lSQ1BLZXgvMXFhanBo?=
- =?utf-8?B?dEhkZFUzeEFZNHJsSnlQWWptbW56dXBId0szQjIxcDNMR2NMZzRlTmdEczZy?=
- =?utf-8?B?WG5xOStUbHROYnQxRlZGWVVyeHY0OEJPaFl0eUZIVy9NSUhtUHFIWDZiakxK?=
- =?utf-8?B?U3lXWnVJd0RuY0VXZGwyS1d3Z3dGVExSZm1hSnpaYURvSGMwME1mRXg0OG1z?=
- =?utf-8?B?R3VucXdOSG1yK25jR1J5TnBUUTFKM1F6OE1zeENmWDRFVDhNWC8xT3NEdFZE?=
- =?utf-8?B?dEZGb3puY0hhbHZqWm04RERMRDhhZ0FDNldRa3FoLy9wMFo1UVhLOHhhWU91?=
- =?utf-8?B?Vm1KNjFnV1ZNUGJkaVRwSE1VRTg0RTNuL3ZSbmNuQjUxeCs3RXZNSkVhVE1o?=
- =?utf-8?B?MFFOdnczNFBvTnpaQUJrWkFTT29SY0tKSXB6bU9xZEloVnVoK0M3QStSOXo0?=
- =?utf-8?B?MTBnTXZTU3k3TjUxVkNEd0YxbWw1aXJzbXFHSDlsRFdDd25IN0t3WkpxT0tl?=
- =?utf-8?B?ZkE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A29318EFDB
+	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 14:27:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718720828; cv=none; b=JNQcuDW7ZFT+p7uX6K8rsd0ZbipKY0qYMykru5PGbjdOlvZy5anqzomLPho2udjXBx6eEPCgkCsa3KRijQJFQMY9+xP7ZFtqzkf7YR4zka1s1ef5Ix9Up3yOO79MsG++7WphEiQbzBH47+UaysxKkxAag44cdOw4sUJIhANJS9I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718720828; c=relaxed/simple;
+	bh=j6f6k89P/o+TXtECuGqkt/T2nXvYfh7dZZYPmRfqtSU=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=i7HKn/YS2fs1J54TKv4z6J9fBlG9gg/qlimlMBaVuMdT3d4xwUYZrvW+sEYOYZ+GTc9ZRDNTW3AT+9T9Cr/PGfIMn/c/6ErApOGk2NT6QU3JiQwQTEV8R5+XIywpneZlWu9eRL/jRgIveu6oVut+kKJCfrEFQJPZpa1PUjJqR+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=kHoeutkq; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1718720822; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=9hex085qX81oSlvsM3+d3NY5b0KiSOKjVLCylIWLvvQ=;
+	b=kHoeutkqb6L909YgmBQoqTqy3T7oFrx8tDEN7/7lT4hvURhd6AzZjNvPLMO1yaw5AUxy7T37XY8UyXyR7OX1gVByo2v/Z67TWC95LspxgeyiZKIaNmZb2xhq7Kq3eyl79YRfxcxPX39+O+7K6pNs0TKRLQfeGOuE/eX1iev+/os=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R551e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033068173054;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0W8kLtdH_1718720821;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W8kLtdH_1718720821)
+          by smtp.aliyun-inc.com;
+          Tue, 18 Jun 2024 22:27:02 +0800
+Message-ID: <1718720650.657001-1-hengqi@linux.alibaba.com>
+Subject: Re: [PATCH net-next v3 4/4] virtio_net: improve dim command request efficiency
+Date: Tue, 18 Jun 2024 22:24:10 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org,
+ virtualization@lists.linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20240606061446.127802-1-hengqi@linux.alibaba.com>
+ <20240606061446.127802-5-hengqi@linux.alibaba.com>
+ <CACGkMEuFJ=xeeBt9GiCLj8AeJg-u-JG4F9_+8vBoH4dhZ-z=3Q@mail.gmail.com>
+ <1718609268.7814527-9-hengqi@linux.alibaba.com>
+ <CACGkMEvdbUzxMKoz+=TO8C5H06TvdL-nFPpe8qd==5PiXRjpTA@mail.gmail.com>
+In-Reply-To: <CACGkMEvdbUzxMKoz+=TO8C5H06TvdL-nFPpe8qd==5PiXRjpTA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5866.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ed1126ea-c181-4230-3fb5-08dc8fa1ed90
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jun 2024 14:21:21.7410
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8OIObW6/hcEldgB27c2gX0DBVeg73On8HbW3c2VEn3Ax13IWSmoYPuaY7VuPG5nw/yqKeZm96hT9nb0wbNRx03//i7yBMxSHuosA9MbMZ04=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7668
-X-OriginatorOrg: intel.com
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogS2l0c3plbCwgUHJ6ZW15
-c2xhdyA8cHJ6ZW15c2xhdy5raXRzemVsQGludGVsLmNvbT4NCj4gU2VudDogVHVlc2RheSwgSnVu
-ZSAxOCwgMjAyNCAzOjUwIFBNDQo+IFRvOiBMb2t0aW9ub3YsIEFsZWtzYW5kciA8YWxla3NhbmRy
-Lmxva3Rpb25vdkBpbnRlbC5jb20+OyBOZ3V5ZW4sDQo+IEFudGhvbnkgTCA8YW50aG9ueS5sLm5n
-dXllbkBpbnRlbC5jb20+DQo+IENjOiBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBLYW5nLCBLZWx2
-aW4gPGtlbHZpbi5rYW5nQGludGVsLmNvbT47DQo+IEt1YmFsZXdza2ksIEFya2FkaXVzeiA8YXJr
-YWRpdXN6Lmt1YmFsZXdza2lAaW50ZWwuY29tPjsgaW50ZWwtd2lyZWQtDQo+IGxhbkBsaXN0cy5v
-c3Vvc2wub3JnDQo+IFN1YmplY3Q6IFJlOiBbSW50ZWwtd2lyZWQtbGFuXSBbUEFUQ0ggaXdsLW5l
-dCB2NF0gaTQwZTogZml4IGhvdCBpc3N1ZQ0KPiBOVk0gY29udGVudCBpcyBjb3JydXB0ZWQgYWZ0
-ZXIgbnZtdXBkYXRlDQo+IA0KPiBPbiA2LzE4LzI0IDE1OjIxLCBBbGVrc2FuZHIgTG9rdGlvbm92
-IHdyb3RlOg0KPiA+IFRoZSBidWcgYWZmZWN0cyB1c2VycyBvbmx5IGF0IHRoZSB0aW1lIHdoZW4g
-dGhleSB0cnkgdG8gdXBkYXRlIE5WTSwNCj4gPiBhbmQgb25seSBGL1cgdmVyc2lvbnMgdGhhdCBn
-ZW5lcmF0ZSBlcnJvcnMgd2hpbGUgbnZtdXBkYXRlLiBGb3INCj4gPiBleGFtcGxlLCBYNzEwREEy
-IHdpdGggMHg4MDAwRUNCNyBGL1cgaXMgYWZmZWN0ZWQsIGJ1dCB0aGVyZSBhcmUNCj4gcHJvYmFi
-bHkgbW9yZS4uLg0KPiA+DQo+ID4gQ29tbWFuZCBmb3IgcmVwcm9kdWN0aW9uIGlzIGp1c3QgTlZN
-IHVwZGF0ZToNCj4gPiAgIC4vbnZtdXBkYXRlNjQNCj4gDQo+IG52bXVwZGF0ZTY0IGlzIG5vdCBh
-biB1cHN0cmVhbSB0b29sLCBidXQgaXQncyBmaW5lIHRvIG1lbnRpb24gaXQgaGVyZSwNCj4gYXMg
-d2UgZG9uJ3QgaGF2ZSBhIGJldHRlciBhbHRlcm5hdGl2ZSBmb3IgaTQwZSBhcyBvZiBub3cNCj4g
-DQo+ID4NCj4gPiBJbiB0aGUgbG9nIGluc3RlYWQgb2Y6DQo+ID4gICBpNDBlX252bXVwZF9leGVj
-X2FxIGVyciBJNDBFX0VSUl9BRE1JTl9RVUVVRV9FUlJPUiBhcV9lcnINCj4gPiBJNDBFX0FRX1JD
-X0VOT01FTSkNCj4gPiBhcHBlYXJzOg0KPiA+ICAgaTQwZV9udm11cGRfZXhlY19hcSBlcnIgLUVJ
-TyBhcV9lcnIgSTQwRV9BUV9SQ19FTk9NRU0NCj4gPg0KPiA+IEJ1dCB0aGUgcHJvYmxlbWF0aWMg
-Y29kZSBkaWQgc2lsZW50bHkgY29udmVydCBFSU8gaW50byBFQUdBSU4gd2hpY2gNCj4gPiBmb3Jj
-ZWQgbnZtdXBkYXRlIHRvIGlnbm9yZSBFQUdBSU4gZXJyb3IgYW5kIHJldHJ5IHRoZSBzYW1lIG9w
-ZXJhdGlvbg0KPiB1bnRpbCB0aW1lb3V0Lg0KPiA+IFRoYXQncyB3aHkgTlZNIHVwZGF0ZSB0YWtl
-cyAyMCsgbWludXRlcyB0byBmaW5pc2ggd2l0aCB0aGUgZmFpbCBpbg0KPiB0aGUgZW5kLg0KPiAN
-Cj4gdGhpcyBwYXJhZ3JhcGggdGVsbHMgbW9yZSBhYm91dCBudm11cGRhdGUgdG9vbCBwcm9ibGVt
-cyB0aGF0IHRoZQ0KPiBkcml2ZXINCldoYXQgaXMgeW91ciBwcm9wb3NhbCBmb3IgaXQgZXhhY3Rs
-eT8NCg0KPiA+DQo+ID4gQWZ0ZXIgY29tbWl0IDIzMGYzZDUzYTU0NyAoImk0MGU6IHJlbW92ZSBp
-NDBlX3N0YXR1cyIpLCB3aGljaCBzaG91bGQNCj4gPiBvbmx5IHJlcGxhY2UgRi9XIHNwZWNpZmlj
-IGVycm9yIGNvZGVzIHdpdGggTGludXgga2VybmVsIGdlbmVyaWMsDQo+IA0KPiA+IGFsbCBFSU8g
-ZXJyb3JzDQo+ID4gc3VkZGVubHkgc3RhcnRlZCB0byBiZSBjb252ZXJ0ZWQgaW50byBFQUdBSU4N
-Cj4gDQo+IGFsbCBvciBqdXN0IHRoaXMgb25lIHRoYXQgeW91IGFyZSBmaXhpbmcgaGVyZT8NCkFs
-bCBlcnJvciBjb2RlcyBmcm9tIEZXIHdoaWNoIGV4YWN0bHkgSSdtIGZpeGluZyBvZiBjb3Vyc2Uu
-DQoNCj4gDQo+ID4gd2hpY2ggbGVhZHMgbnZtdXBkYXRlIHRvIHJldHJ5DQo+ID4gdW50aWwgaXQg
-dGltZW91dHMgYW5kIHNvbWV0aW1lcyBmYWlscyBhZnRlciBtb3JlIHRoYW4gMjAgbWludXRlcyBp
-bg0KPiA+IHRoZSBtaWRkbGUgb2YgTlZNIHVwZGF0ZSwgc28gTlZNIGJlY29tZXMgY29ycnVwdGVk
-Lg0KPiA+DQo+ID4gUmVtb3ZlIHdyb25nIEVJTyB0byBFR0FJTiBjb252ZXJzaW9uIGFuZCBwYXNz
-IGFsbCBlcnJvcnMgYXMgaXMuDQo+ID4NCj4gPiBGaXhlczogMjMwZjNkNTNhNTQ3ICgiaTQwZTog
-cmVtb3ZlIGk0MGVfc3RhdHVzIikNCj4gDQo+IFRoYXQgaXMgYSBwcm9wZXIgdGFnLCBhbmQgdGhl
-IGRlc2NyaXB0aW9uIG1ha2VzIGl0IGNsZWFyIHRoYXQgd2Ugd2FudA0KPiB0aGUgcGF0Y2ggZmlu
-YWxseSBhcHBsaWVkLCB0aGFuayB5b3UgZm9yIHRoZSBlZmZvcnRzIHRvIG1ha2UgaXQgd2VsbA0K
-PiBkZXNjcmliZWQuDQo+IA0KPiA+IENvLWRldmVsb3BlZC1ieTogS2VsdmluIEthbmcgPGtlbHZp
-bi5rYW5nQGludGVsLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBLZWx2aW4gS2FuZyA8a2Vsdmlu
-LmthbmdAaW50ZWwuY29tPg0KPiANCj4gdGhpcyAyIGxpbmUgcmVtb3ZhbCB3YXMgaW5kZWVkIGRl
-dmVsb3BlZCBieSB0d28gb2YgeW91Pw0KQXMgd3JpdHRlbiBhYm92ZSwgeWVzIG9mIGNvdXJzZS4N
-Cg0KPiA+IFJldmlld2VkLWJ5OiBBcmthZGl1c3ogS3ViYWxld3NraSA8YXJrYWRpdXN6Lmt1YmFs
-ZXdza2lAaW50ZWwuY29tPg0KPiA+IFNpZ25lZC1vZmYtYnk6IEFsZWtzYW5kciBMb2t0aW9ub3Yg
-PGFsZWtzYW5kci5sb2t0aW9ub3ZAaW50ZWwuY29tPg0KPiA+IC0tLQ0KPiA+IHYzLT52NCBjb21t
-aXQgbWVzc2FnZSB1cGRhdGUNCj4gDQo+IFBsZWFzZSBmaXggdGhlIHN1YmplY3QgbGluZSB0b28s
-IGl0J3Mgd2hhdCB3aWxsIGJlIHRoZSBtb3N0IGZyZXF1ZW50bHkNCj4gcmVhZCBwYXJ0IG9mIHlv
-dXIgd29yaywgYW5kIHdpdGggc3RheSBpbiBnaXQgZm9yIGRlY2FkZXMuIFlvdSBjb3VsZA0KPiB1
-c2U6DQo+IGk0MGU6IGZpeCB3cm9uZyBlcnJvciBjb2RlIHJlcGxhY2VtZW50DQo+IA0KVGhpcyBw
-YXRjaCBmaXhlcyB1cmdlbnQvaG90IGlzc3VlIHdpdGggTlZNIHVwZGF0ZSwgd2hpY2ggaXMgc3Rh
-dGVkIGluIHRoZQ0KdGl0bGUuIFdyb25nIGVycm9yIGNvbnZlcnNpb24gY29kZSBjb3VsZCBsZWFk
-IHRvIGRpZmZlcmVudCBzZXZlcml0eSBpc3N1ZXMuDQpGcm9tIG15IHBvaW50IGl0J3MgYmV0dGVy
-IHRvIG1lbnRpb24gaW4gdGhlIHRpdGxlIHRoZSBzZXJpb3VzIHByb2JsZW0gd2hpY2gNCnVzZXJz
-IG1lZXQvc2VlLCBhbSBJIHdyb25nPw0KDQo+IGFuZCBhZGQgbGluayBpbiBjaGFuZ2Vsb2cgc2Vj
-dGlvbjoNCj4gdjQ6DQo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL25ldGRldi8yMDI0MDYxODEz
-MjExMS4zMTkzOTYzLTEtDQo+IGFsZWtzYW5kci5sb2t0aW9ub3ZAaW50ZWwuY29tL1QvI3UNCj4g
-DQo+ID4gdjItPnYzIGNvbW1pdCBtZXNzZWdlIHR5cG9zDQo+ID4gdjEtPnYyIGNvbW1pdCBtZXNz
-YWdlIHVwZGF0ZQ0KPiA+IC0tLQ0KPiA+ICAgZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvaTQw
-ZS9pNDBlX2FkbWlucS5oIHwgNCAtLS0tDQo+ID4gICAxIGZpbGUgY2hhbmdlZCwgNCBkZWxldGlv
-bnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9pbnRlbC9p
-NDBlL2k0MGVfYWRtaW5xLmgNCj4gPiBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2k0MGUv
-aTQwZV9hZG1pbnEuaA0KPiA+IGluZGV4IGVlODZkMmMuLjU1YjViYjggMTAwNjQ0DQo+ID4gLS0t
-IGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvaTQwZS9pNDBlX2FkbWlucS5oDQo+ID4gKysr
-IGIvZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvaTQwZS9pNDBlX2FkbWlucS5oDQo+ID4gQEAg
-LTEwOSwxMCArMTA5LDYgQEAgc3RhdGljIGlubGluZSBpbnQgaTQwZV9hcV9yY190b19wb3NpeChp
-bnQNCj4gYXFfcmV0LCBpbnQgYXFfcmMpDQo+ID4gICAJCS1FRkJJRywgICAgICAvKiBJNDBFX0FR
-X1JDX0VGQklHICovDQo+ID4gICAJfTsNCj4gPg0KPiA+IC0JLyogYXFfcmMgaXMgaW52YWxpZCBp
-ZiBBUSB0aW1lZCBvdXQgKi8NCj4gPiAtCWlmIChhcV9yZXQgPT0gLUVJTykNCj4gPiAtCQlyZXR1
-cm4gLUVBR0FJTjsNCj4gPiAtDQo+ID4gICAJaWYgKCEoKHUzMilhcV9yYyA8IChzaXplb2YoYXFf
-dG9fcG9zaXgpIC8NCj4gc2l6ZW9mKChhcV90b19wb3NpeClbMF0pKSkpDQo+ID4gICAJCXJldHVy
-biAtRVJBTkdFOw0KPiA+DQoNCg==
+On Tue, 18 Jun 2024 09:29:48 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Mon, Jun 17, 2024 at 4:08=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.com=
+> wrote:
+> >
+> > On Mon, 17 Jun 2024 12:05:30 +0800, Jason Wang <jasowang@redhat.com> wr=
+ote:
+> > > On Thu, Jun 6, 2024 at 2:15=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.=
+com> wrote:
+> > > >
+> > > > Currently, control vq handles commands synchronously,
+> > > > leading to increased delays for dim commands during multi-queue
+> > > > VM configuration and directly impacting dim performance.
+> > > >
+> > > > To address this, we are shifting to asynchronous processing of
+> > > > ctrlq's dim commands.
+> > > >
+> > > > Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> > > > ---
+> > > >  drivers/net/virtio_net.c | 233 ++++++++++++++++++++++++++++++++++-=
+----
+> > > >  1 file changed, 208 insertions(+), 25 deletions(-)
+> > > >
+
+Hi Jason,
+
+I will incorporate your feedback and update the next version.
+
+Thanks
+
+> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > > index e59e12bb7601..0338528993ab 100644
+> > > > --- a/drivers/net/virtio_net.c
+> > > > +++ b/drivers/net/virtio_net.c
+> > > > @@ -376,6 +376,13 @@ struct control_buf {
+> > > >         struct completion completion;
+> > > >  };
+> > > >
+> > > > +struct virtnet_coal_node {
+> > > > +       struct control_buf ctrl;
+> > > > +       struct virtio_net_ctrl_coal_vq coal_vqs;
+> > > > +       bool is_coal_wait;
+> > > > +       struct list_head list;
+> > > > +};
+> > > > +
+> > > >  struct virtnet_info {
+> > > >         struct virtio_device *vdev;
+> > > >         struct virtqueue *cvq;
+> > > > @@ -420,6 +427,9 @@ struct virtnet_info {
+> > > >         /* Lock to protect the control VQ */
+> > > >         struct mutex cvq_lock;
+> > > >
+> > > > +       /* Work struct for acquisition of cvq processing results. */
+> > > > +       struct work_struct get_cvq;
+> > > > +
+> > > >         /* Host can handle any s/g split between our header and pac=
+ket data */
+> > > >         bool any_header_sg;
+> > > >
+> > > > @@ -464,6 +474,14 @@ struct virtnet_info {
+> > > >         struct virtnet_interrupt_coalesce intr_coal_tx;
+> > > >         struct virtnet_interrupt_coalesce intr_coal_rx;
+> > > >
+> > > > +       /* Free nodes used for concurrent delivery */
+> > > > +       struct mutex coal_free_lock;
+> > > > +       struct list_head coal_free_list;
+> > > > +
+> > > > +       /* Filled when there are no free nodes or cvq buffers */
+> > > > +       struct mutex coal_wait_lock;
+> > > > +       struct list_head coal_wait_list;
+> > > > +
+> > > >         unsigned long guest_offloads;
+> > > >         unsigned long guest_offloads_capable;
+> > > >
+> > > > @@ -670,7 +688,7 @@ static void virtnet_cvq_done(struct virtqueue *=
+cvq)
+> > > >  {
+> > > >         struct virtnet_info *vi =3D cvq->vdev->priv;
+> > > >
+> > > > -       complete(&vi->ctrl->completion);
+> > > > +       schedule_work(&vi->get_cvq);
+> > > >  }
+> > > >
+> > > >  static void skb_xmit_done(struct virtqueue *vq)
+> > > > @@ -2696,7 +2714,7 @@ static bool virtnet_send_command_reply(struct=
+ virtnet_info *vi,
+> > > >                                        struct scatterlist *in)
+> > > >  {
+> > > >         struct scatterlist *sgs[5], hdr, stat;
+> > > > -       u32 out_num =3D 0, tmp, in_num =3D 0;
+> > > > +       u32 out_num =3D 0, in_num =3D 0;
+> > > >         int ret;
+> > > >
+> > > >         /* Caller should know better */
+> > > > @@ -2730,14 +2748,14 @@ static bool virtnet_send_command_reply(stru=
+ct virtnet_info *vi,
+> > > >                 return false;
+> > > >         }
+> > > >
+> > > > -       if (unlikely(!virtqueue_kick(vi->cvq)))
+> > > > -               goto unlock;
+> > > > +       if (unlikely(!virtqueue_kick(vi->cvq))) {
+> > > > +               mutex_unlock(&vi->cvq_lock);
+> > > > +               return false;
+> > > > +       }
+> > > > +       mutex_unlock(&vi->cvq_lock);
+> > > >
+> > > > -       wait_for_completion(&vi->ctrl->completion);
+> > > > -       virtqueue_get_buf(vi->cvq, &tmp);
+> > > > +       wait_for_completion(&ctrl->completion);
+> > > >
+> > > > -unlock:
+> > > > -       mutex_unlock(&vi->cvq_lock);
+> > > >         return ctrl->status =3D=3D VIRTIO_NET_OK;
+> > > >  }
+> > > >
+> > > > @@ -2747,6 +2765,86 @@ static bool virtnet_send_command(struct virt=
+net_info *vi, u8 class, u8 cmd,
+> > > >         return virtnet_send_command_reply(vi, class, cmd, vi->ctrl,=
+ out, NULL);
+> > > >  }
+> > > >
+> > > > +static void virtnet_process_dim_cmd(struct virtnet_info *vi,
+> > > > +                                   struct virtnet_coal_node *node)
+> > > > +{
+> > > > +       u16 qnum =3D le16_to_cpu(node->coal_vqs.vqn) / 2;
+> > > > +
+> > > > +       mutex_lock(&vi->rq[qnum].dim_lock);
+> > > > +       vi->rq[qnum].intr_coal.max_usecs =3D
+> > > > +               le32_to_cpu(node->coal_vqs.coal.max_usecs);
+> > > > +       vi->rq[qnum].intr_coal.max_packets =3D
+> > > > +               le32_to_cpu(node->coal_vqs.coal.max_packets);
+> > > > +       vi->rq[qnum].dim.state =3D DIM_START_MEASURE;
+> > > > +       mutex_unlock(&vi->rq[qnum].dim_lock);
+> > > > +
+> > > > +       if (node->is_coal_wait) {
+> > > > +               mutex_lock(&vi->coal_wait_lock);
+> > > > +               list_del(&node->list);
+> > > > +               mutex_unlock(&vi->coal_wait_lock);
+> > > > +               kfree(node);
+> > > > +       } else {
+> > > > +               mutex_lock(&vi->coal_free_lock);
+> > > > +               list_add(&node->list, &vi->coal_free_list);
+> > > > +               mutex_unlock(&vi->coal_free_lock);
+> > > > +       }
+> > > > +}
+> > > > +
+> > > > +static int virtnet_add_dim_command(struct virtnet_info *vi,
+> > > > +                                  struct virtnet_coal_node *coal_n=
+ode)
+> > > > +{
+> > > > +       struct scatterlist sg;
+> > > > +       int ret;
+> > > > +
+> > > > +       sg_init_one(&sg, &coal_node->coal_vqs, sizeof(coal_node->co=
+al_vqs));
+> > > > +       ret =3D virtnet_send_command_reply(vi, VIRTIO_NET_CTRL_NOTF=
+_COAL,
+> > > > +                                        VIRTIO_NET_CTRL_NOTF_COAL_=
+VQ_SET,
+> > > > +                                        &coal_node->ctrl, &sg, NUL=
+L);
+> > > > +       if (!ret) {
+> > > > +               dev_warn(&vi->dev->dev,
+> > > > +                        "Failed to change coalescing params.\n");
+> > > > +               return ret;
+> > > > +       }
+> > > > +
+> > > > +       virtnet_process_dim_cmd(vi, coal_node);
+> > > > +
+> > > > +       return 0;
+> > > > +}
+> > > > +
+> > > > +static void virtnet_get_cvq_work(struct work_struct *work)
+> > > > +{
+> > > > +       struct virtnet_info *vi =3D
+> > > > +               container_of(work, struct virtnet_info, get_cvq);
+> > > > +       struct virtnet_coal_node *wait_coal;
+> > > > +       bool valid =3D false;
+> > > > +       unsigned int tmp;
+> > > > +       void *res;
+> > > > +
+> > > > +       mutex_lock(&vi->cvq_lock);
+> > > > +       while ((res =3D virtqueue_get_buf(vi->cvq, &tmp)) !=3D NULL=
+) {
+> > > > +               complete((struct completion *)res);
+> > > > +               valid =3D true;
+> > > > +       }
+> > > > +       mutex_unlock(&vi->cvq_lock);
+> > >
+> > > How could we synchronize with the device in this case?
+> > >
+> > > E.g what happens if the device finishes another buf here?
+> >
+> > That's a good question. I think we can solve it using the following sni=
+ppet?
+> >
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index e59e12bb7601..5dc3e1244016 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> >
+> > @@ -420,6 +427,12 @@ struct virtnet_info {
+> >         /* Lock to protect the control VQ */
+> >         struct mutex cvq_lock;
+> >
+> > +       /* Atomic to confirm whether the cvq work is scheduled. */
+> > +       atomic_t scheduled;
+> > +
+> > +       /* Work struct for acquisition of cvq processing results. */
+> > +       struct work_struct get_cvq;
+> > +
+> >
+> >
+> > @@ -670,7 +691,9 @@ static void virtnet_cvq_done(struct virtqueue *cvq)
+> >  {
+> >         struct virtnet_info *vi =3D cvq->vdev->priv;
+> >
+> > -       complete(&vi->ctrl->completion);
+> > +       virtqueue_disable_cb(cvq);
+> > +       if (!atomic_xchg(&vi->scheduled, 1))
+> > +               schedule_work(&vi->get_cvq);
+>=20
+> I think workqueue subsystem should already handle things like this.
+>=20
+> >  }
+> >
+> >
+> > +static void virtnet_get_cvq_work(struct work_struct *work)
+> > +{
+> > +       struct virtnet_info *vi =3D
+> > +               container_of(work, struct virtnet_info, get_cvq);
+> > +       struct virtnet_coal_node *wait_coal;
+> > +       bool valid =3D false;
+> > +       unsigned int tmp;
+> > +       void *res;
+> > +
+> > +       mutex_lock(&vi->cvq_lock);
+> > +       while ((res =3D virtqueue_get_buf(vi->cvq, &tmp)) !=3D NULL) {
+> > +               complete((struct completion *)res);
+> > +               valid =3D true;
+> > +       }
+> > +       mutex_unlock(&vi->cvq_lock);
+> > +
+> > +       atomic_set(&vi->scheduled, 0);
+> > +       virtqueue_enable_cb_prepare(vi->cvq);
+>=20
+> We have a brunch of examples in the current codes. Generally it should
+> be something like.
+>=20
+> again:
+>     disable_cb()
+>     while(get_buf());
+>     if (enable_cb())
+>         disable_cb()
+>         goto again;
+>=20
+> > +}
+> >
+> > >
+> > > > +
+> > > > +       if (!valid)
+> > > > +               return;
+> > > > +
+> > > > +       while (true) {
+> > > > +               wait_coal =3D NULL;
+> > > > +               mutex_lock(&vi->coal_wait_lock);
+> > > > +               if (!list_empty(&vi->coal_wait_list))
+> > > > +                       wait_coal =3D list_first_entry(&vi->coal_wa=
+it_list,
+> > > > +                                                    struct virtnet=
+_coal_node,
+> > > > +                                                    list);
+> > > > +               mutex_unlock(&vi->coal_wait_lock);
+> > > > +               if (wait_coal)
+> > > > +                       if (virtnet_add_dim_command(vi, wait_coal))
+> > > > +                               break;
+> > > > +               else
+> > > > +                       break;
+> > > > +       }
+> > >
+> > > This is still an ad-hoc optimization for dim in the general path here.
+> > >
+> > > Could we have a fn callback so for non dim it's just a completion and
+> > > for dim it would be a schedule_work()?
+> > >
+> >
+> > OK, I will try this.
+> >
+> > And how about this :
+> >
+> > +static void virtnet_cvq_work_sched(struct virtqueue *cvq)
+> > +{
+> > +       struct virtnet_info *vi =3D cvq->vdev->priv;
+> > +
+> > +       virtqueue_disable_cb(cvq);
+> > +       if (!atomic_xchg(&vi->scheduled, 1))
+> > +               schedule_work(&vi->get_cvq);
+> > +}
+> > +
+> >  static void virtnet_cvq_done(struct virtqueue *cvq)
+> >  {
+> >         struct virtnet_info *vi =3D cvq->vdev->priv;
+> > +       unsigned int tmp;
+> >
+> > +       virtqueue_get_buf(vi->cvq, &tmp);
+> >         complete(&vi->ctrl->completion);
+> >  }
+> >
+> > @@ -5318,7 +5472,11 @@ static int virtnet_find_vqs(struct virtnet_info =
+*vi)
+> >
+> >         /* Parameters for control virtqueue, if any */
+> >         if (vi->has_cvq) {
+> > -               callbacks[total_vqs - 1] =3D virtnet_cvq_done;
+> > +               if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_C=
+OAL))
+> > +                       callbacks[total_vqs - 1] =3D virtnet_cvq_work_s=
+ched;
+> > +               else
+> > +                       callbacks[total_vqs - 1] =3D virtnet_cvq_done;
+> > +
+> >                 names[total_vqs - 1] =3D "control";
+> >         }
+>=20
+> Just to clarify, I meant a callback function per control_buf. (I've
+> avoid touching virtqueue callback layers)
+>=20
+>=20
+> >
+> > > > +}
+> > > >  static int virtnet_set_mac_address(struct net_device *dev, void *p)
+> > > >  {
+> > > >         struct virtnet_info *vi =3D netdev_priv(dev);
+> > > > @@ -4398,35 +4496,73 @@ static int virtnet_send_notf_coal_vq_cmds(s=
+truct virtnet_info *vi,
+> > > >         return 0;
+> > > >  }
+> > > >
+> > > > +static void virtnet_put_wait_coal(struct virtnet_info *vi,
+> > > > +                                 struct receive_queue *rq,
+> > > > +                                 struct dim_cq_moder moder)
+> > > > +{
+> > > > +       struct virtnet_coal_node *wait_node;
+> > > > +
+> > > > +       wait_node =3D kzalloc(sizeof(*wait_node), GFP_KERNEL);
+> > > > +       if (!wait_node) {
+> > > > +               rq->dim.state =3D DIM_START_MEASURE;
+> > > > +               return;
+> > > > +       }
+> > > > +
+> > > > +       wait_node->is_coal_wait =3D true;
+> > > > +       wait_node->coal_vqs.vqn =3D cpu_to_le16(rxq2vq(rq - vi->rq)=
+);
+> > > > +       wait_node->coal_vqs.coal.max_usecs =3D cpu_to_le32(moder.us=
+ec);
+> > > > +       wait_node->coal_vqs.coal.max_packets =3D cpu_to_le32(moder.=
+pkts);
+> > > > +       mutex_lock(&vi->coal_wait_lock);
+> > > > +       list_add_tail(&wait_node->list, &vi->coal_wait_list);
+> > > > +       mutex_unlock(&vi->coal_wait_lock);
+> > > > +}
+> > > > +
+> > > >  static void virtnet_rx_dim_work(struct work_struct *work)
+> > > >  {
+> > > >         struct dim *dim =3D container_of(work, struct dim, work);
+> > > >         struct receive_queue *rq =3D container_of(dim,
+> > > >                         struct receive_queue, dim);
+> > > >         struct virtnet_info *vi =3D rq->vq->vdev->priv;
+> > > > -       struct net_device *dev =3D vi->dev;
+> > > > +       struct virtnet_coal_node *avail_coal;
+> > > >         struct dim_cq_moder update_moder;
+> > > > -       int qnum, err;
+> > > >
+> > > > -       qnum =3D rq - vi->rq;
+> > > > +       update_moder =3D net_dim_get_rx_moderation(dim->mode, dim->=
+profile_ix);
+> > > >
+> > > >         mutex_lock(&rq->dim_lock);
+> > > > -       if (!rq->dim_enabled)
+> > > > -               goto out;
+> > > > -
+> > > > -       update_moder =3D net_dim_get_rx_moderation(dim->mode, dim->=
+profile_ix);
+> > > > -       if (update_moder.usec !=3D rq->intr_coal.max_usecs ||
+> > > > -           update_moder.pkts !=3D rq->intr_coal.max_packets) {
+> > > > -               err =3D virtnet_send_rx_ctrl_coal_vq_cmd(vi, qnum,
+> > > > -                                                      update_moder=
+.usec,
+> > > > -                                                      update_moder=
+.pkts);
+> > > > -               if (err)
+> > > > -                       pr_debug("%s: Failed to send dim parameters=
+ on rxq%d\n",
+> > > > -                                dev->name, qnum);
+> > > > -               dim->state =3D DIM_START_MEASURE;
+> > > > +       if (!rq->dim_enabled ||
+> > > > +           (update_moder.usec =3D=3D rq->intr_coal.max_usecs &&
+> > > > +            update_moder.pkts =3D=3D rq->intr_coal.max_packets)) {
+> > > > +               rq->dim.state =3D DIM_START_MEASURE;
+> > > > +               mutex_unlock(&rq->dim_lock);
+> > > > +               return;
+> > > >         }
+> > > > -out:
+> > > >         mutex_unlock(&rq->dim_lock);
+> > > > +
+> > > > +       mutex_lock(&vi->cvq_lock);
+> > > > +       if (vi->cvq->num_free < 3) {
+> > > > +               virtnet_put_wait_coal(vi, rq, update_moder);
+> > > > +               mutex_unlock(&vi->cvq_lock);
+> > > > +               return;
+> > > > +       }
+> > >
+> > > Could we simply sleep instead of using a list here?
+> >
+> > Do you mean using a semaphore, or a waitqueue?
+>=20
+> I meant sleep and wait for more space.
+>=20
+> Thanks
+>=20
 
