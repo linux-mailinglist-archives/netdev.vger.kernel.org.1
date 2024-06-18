@@ -1,131 +1,107 @@
-Return-Path: <netdev+bounces-104470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B7E590CA19
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:46:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5393E90CAB0
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:57:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7DE21F21E4F
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:46:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF2E9B213FE
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 11:47:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E96219E816;
-	Tue, 18 Jun 2024 11:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA79E1990A8;
+	Tue, 18 Jun 2024 11:15:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VGTLobXg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h4bIjzSV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C044A19E800
-	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 11:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3E615A844;
+	Tue, 18 Jun 2024 11:15:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718709118; cv=none; b=iFQaXtzxvHHV0u242iKZ4RgfoYieWMTdD921PMXGXaetxOs1dsQrX/wnEu+GDET3T6g/YiVuknKMhltMJf1vRJuVZNv6zCUEW/9vKAqc6oq4hLoZqLH6yhaWzB+QfUOw+4IerrFXpTxy5Z0gySb7Ov5VzGavP9zd8dehY99LVo4=
+	t=1718709310; cv=none; b=P9fhfvjMlUadZmAt8Z/ZuAqTB2NOxm1hcFB5v/ICXQWl6wIajvxnGGU09+ewSg5mQYDpZV/CLloaL4jhchUDlMBwwtBK36t5fKwY3asvpIcsYmMCMHzJ81Zsth/qLiUL9FhhPrLDQUnZMIVa6XHTj6M4mUDdj6Ajrq/wo+Fwnfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718709118; c=relaxed/simple;
-	bh=W1S57mUzwRb0WhvoSUMHaVgIaS/dkU275Ia1XTEzjGc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IvqzPMJi5wH7ynZfYlNXWz+mDDdU8sJoOyAzd9/peknnRoSf5YtwR4UpiI62z9OYgBJmhwDAbl5q3rmEUEevdyV/4Usn741FlWZSATE1CKskPNNeMmo+nSwJifgYInn0KLaFUBBFC0ogp3dvnk3HCxUDK5OMV+sTyDZcU/aCwFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VGTLobXg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718709115;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=6G2IpcL5Lv+pMV37OGTdCWlYqMHUwgyGxJOKzgKAFVA=;
-	b=VGTLobXgcC376XP7Cv5AFMA3cgeyb/1dr9T/5kCQn3qVlyk+0HZzmm5jRTij0856cQVixT
-	6Bip/i0vdUTBaATGuchHdBJ/WALmZu5G+XncBdeJxjdWh4Hhuz+ZkGBDDrs0c5M5b+T+Iq
-	MVLa9eH5XJ6B1RsR3ieLY8B6R5p/yVw=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-606-CkCihvA6PTqmXOh9I8Qdmg-1; Tue,
- 18 Jun 2024 07:11:49 -0400
-X-MC-Unique: CkCihvA6PTqmXOh9I8Qdmg-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B9DE219560BE;
-	Tue, 18 Jun 2024 11:11:46 +0000 (UTC)
-Received: from swamp.redhat.com (unknown [10.45.224.22])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D80711955E74;
-	Tue, 18 Jun 2024 11:11:41 +0000 (UTC)
-From: Petr Oros <poros@redhat.com>
-To: netdev@vger.kernel.org
-Cc: ivecera@redhat.com,
-	przemyslaw.kitszel@intel.com,
-	horms@kernel.org,
-	Petr Oros <poros@redhat.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Joyner <eric.joyner@intel.com>,
-	Marcin Domagala <marcinx.domagala@intel.com>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net v3] ice: use proper macro for testing bit
-Date: Tue, 18 Jun 2024 13:11:19 +0200
-Message-ID: <20240618111119.721648-1-poros@redhat.com>
+	s=arc-20240116; t=1718709310; c=relaxed/simple;
+	bh=FhuwRLQO68CQIh1e4REGDMaFZVAy4zws0a+cKVmWB6E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uLJ+MLUHQYx//sX7rIyeOVhU0qgwAjmwAUu+5/GJxrrhTiHAGvKvB2JOni1DYk9F3UlZDRPMB5c9M/On3wrdA9xZv6Je+H81P2pDNHGE3+9WDkVlmkmSdDXbEyHQ3swbnk09eaDwQ5Z8L9zGgC2NyVPhMTksgdPD6A5wnzSL3CU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h4bIjzSV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27420C32786;
+	Tue, 18 Jun 2024 11:15:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718709310;
+	bh=FhuwRLQO68CQIh1e4REGDMaFZVAy4zws0a+cKVmWB6E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=h4bIjzSVPAu4fkvyJyB7moPqIUratKHa2oT88TgrlOFzik2cza/FWitwjT4vRm0kB
+	 CPUUKIDPQtGeT3fKthaJpQJAjPxRIC3qKjXUYAOm+vtUfYRQhXP1ya+N4mJh2cdcux
+	 o9ABxKD7i7hGruhZRyP2HFaQRn3EyPfn0Mog5Gm5XSX1HpSbmf1BuWqNnMnOsZ8tbG
+	 Vrf4oTcy1fbLlCfpTDl0uKeHjkePbLtIgRtjY6iFJzdTMIa5enrbAlZeVHshc8YQqb
+	 tvrClkZdjbX6k3bhnULszCBliCxN00ni5+Xzxngnb2oql6zxKgX6OkKmYs9VP6M3by
+	 xUZlSn8n2eupQ==
+Date: Tue, 18 Jun 2024 12:15:05 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] net: usb: ax88179_178a: improve link status logs
+Message-ID: <20240618111505.GA650324@kernel.org>
+References: <20240617103405.654567-1-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240617103405.654567-1-jtornosm@redhat.com>
 
-Do not use _test_bit() macro for testing bit. The proper macro for this
-is one without underline.
+On Mon, Jun 17, 2024 at 12:33:59PM +0200, Jose Ignacio Tornos Martinez wrote:
+> Avoid spurious link status logs that may ultimately be wrong; for example,
+> if the link is set to down with the cable plugged, then the cable is
+> unplugged and afer this the link is set to up, the last new log that is
+> appearing is incorrectly telling that the link is up.
+> 
+> In order to aovid errors, show link status logs after link_reset
+> processing, and in order to avoid spurious as much as possible, only show
+> the link loss when some link status change is detected.
+> 
+> cc: stable@vger.kernel.org
+> Fixes: e2ca90c276e1 ("ax88179_178a: ASIX AX88179_178A USB 3.0/2.0 to gigabit ethernet adapter driver")
+> Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+> ---
+>  drivers/net/usb/ax88179_178a.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
+> index c2fb736f78b2..60357796be99 100644
+> --- a/drivers/net/usb/ax88179_178a.c
+> +++ b/drivers/net/usb/ax88179_178a.c
+> @@ -326,7 +326,8 @@ static void ax88179_status(struct usbnet *dev, struct urb *urb)
+>  
+>  	if (netif_carrier_ok(dev->net) != link) {
+>  		usbnet_link_change(dev, link, 1);
+> -		netdev_info(dev->net, "ax88179 - Link status is: %d\n", link);
+> +		if (!link)
+> +			netdev_info(dev->net, "ax88179 - Link status is: %d\n", link);
 
-_test_bit() is what test_bit() was prior to const-optimization. It
-directly calls arch_test_bit(), i.e. the arch-specific implementation
-(or the generic one). It's strictly _internal_ and shouldn't be used
-anywhere outside the actual test_bit() macro.
+Sorry Jose,
 
-test_bit() is a wrapper which checks whether the bitmap and the bit
-number are compile-time constants and if so, it calls the optimized
-function which evaluates this call to a compile-time constant as well.
-If either of them is not a compile-time constant, it just calls _test_bit().
-test_bit() is the actual function to use anywhere in the kernel.
+one more nit I noticed after sending my previous email.
 
-IOW, calling _test_bit() avoids potential compile-time optimizations.
+The line above looks like it could be wrapped to <= 80 columns wide,
+which is still preferred for Networking code.
 
-The sensors is not a compile-time constant, thus most probably there
-are no object code changes before and after the patch.
-But anyway, we shouldn't call internal wrappers instead of
-the actual API.
+Flagged by checkpatch.pl --max-line-length=80
 
-Fixes: 4da71a77fc3b ("ice: read internal temperature sensor")
-Acked-by: Ivan Vecera <ivecera@redhat.com>
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Petr Oros <poros@redhat.com>
----
- drivers/net/ethernet/intel/ice/ice_hwmon.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>  	}
+>  }
+>  
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_hwmon.c b/drivers/net/ethernet/intel/ice/ice_hwmon.c
-index e4c2c1bff6c086..b7aa6812510a4f 100644
---- a/drivers/net/ethernet/intel/ice/ice_hwmon.c
-+++ b/drivers/net/ethernet/intel/ice/ice_hwmon.c
-@@ -96,7 +96,7 @@ static bool ice_is_internal_reading_supported(struct ice_pf *pf)
- 
- 	unsigned long sensors = pf->hw.dev_caps.supported_sensors;
- 
--	return _test_bit(ICE_SENSOR_SUPPORT_E810_INT_TEMP_BIT, &sensors);
-+	return test_bit(ICE_SENSOR_SUPPORT_E810_INT_TEMP_BIT, &sensors);
- };
- 
- void ice_hwmon_init(struct ice_pf *pf)
--- 
-2.44.2
-
+...
 
