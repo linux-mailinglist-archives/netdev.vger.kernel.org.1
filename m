@@ -1,88 +1,102 @@
-Return-Path: <netdev+bounces-104533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83F7090D1A3
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 15:44:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D40890D1E6
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 15:46:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B1A41C24095
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:44:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6EFDB23100
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D0111A2571;
-	Tue, 18 Jun 2024 13:12:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73AAC158DAA;
+	Tue, 18 Jun 2024 13:13:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="z5xt0w2v"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hEboPmiD"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B3D1A256C;
-	Tue, 18 Jun 2024 13:12:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85CF81A2FAB
+	for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 13:13:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718716342; cv=none; b=jK5n0xNmFhZnSEhttdFO917Hy7X796Fk+yLpvq+dvfexILAjSIF2O9dD2BwYTXl13wyh2ny5/x+zbciMquLJKFIYKhcPEjQQViWIEsVtIKJssjowCSh+lUVtld/JSTmX9LQS29U7owlPOITi4j1eaQSB9D7V+hYH/pRF6S8j4LQ=
+	t=1718716407; cv=none; b=DavuDhd5dR7QICOTpBGKqpkqqNrwksxR/4/ZtEPwidZPq3xMQDmeECd/+NCRMd7YScDAisweMHdjXqv8uSnQEnFSwoDK7uvQo87PsIiygWpwg/BsJnvA24IXEmuM6TOpjJFge8jVCUm5hgb27ORqPQ6XpXuF1IBggRXbmzBw0cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718716342; c=relaxed/simple;
-	bh=+WBtBaXJS8lGOL2imZ14JcqZkZGdXR8BOMRv4NDSygs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ura3WniSqQjGz7MYrtHtXIOaQXCEoSfwa3cstnGMuctpA3+qG7SbwbaQfTx4aaCPX3S5FcAVCvSRdD5vnjRJnPajN73JlISgdUYWxb510UK+vzNbXbi2C+BQ4sfJNYSlYuFfMSSJLMPp2RY9HgV49P0jCybKYYrNinLvr+sXo9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=z5xt0w2v; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=CQIqotw36tjk6fbxHqnuwmapbS+Ywwh5FqF8IZHzgVk=; b=z5
-	xt0w2vAaOs77BFE5Lph64xBPvF3cSOKvSY6x4yUY0L0zRxWcVwr/U80qfuPWmEzYrZB97OtmZEw8u
-	xA1mpj8KEamRoNfhQ6jHRByMh7z5TzFjQgBjP2zzF3bvZ7j6UsN2kuUfPnRZKFINfDHo/a51irrsO
-	JtQ0YUFNlQWLjZw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sJYct-000NUL-1Q; Tue, 18 Jun 2024 15:11:55 +0200
-Date: Tue, 18 Jun 2024 15:11:55 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next,v9] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-Message-ID: <7d4958cc-0fed-4f17-9e50-afb8cd836962@lunn.ch>
-References: <20240618090824.553018-1-niklas.soderlund+renesas@ragnatech.se>
+	s=arc-20240116; t=1718716407; c=relaxed/simple;
+	bh=3HBoWOKl6SbY13vd0tm05QnlOYhyCgkxJmDDKHhVy5E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bbJn//fARLVvtebd5udZ5inFPpYwCBNTJMjoKFL+cAPzLZOauZ7T6jafpz3HsXEECTO/Ufp+6lkQEW+emCdbE6xSmWej9SLIAsSgOi+NdPV/AQallQ4o99PAW6YzNupL/f4qwf9v4QGHouh60RQJeU207MpcP+uqb7nSmVSkumk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hEboPmiD; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718716406; x=1750252406;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3HBoWOKl6SbY13vd0tm05QnlOYhyCgkxJmDDKHhVy5E=;
+  b=hEboPmiDnffG1FgCTyuzgXt5mTTLQhdYNiTP/zvIEPHMdn4KAnYOXy1q
+   JzSk2rLAjGNreV31IYARYfKfyeoK8fT27TYGYxT28LzjmLR3UcQCJjtAr
+   24eqj/yJaQ5uNqA/smfgaiiQzmG7HrNn0fUrxJRqQO4jAabNyk7e7spJo
+   OowWLig6A8Ayakz5xSbksYODhW/fNs/44cxCCIhbIEksdjAMcAfaYyzMF
+   plwtuX5dEjLmAjH0bJoMBtufPnOLXhyHTQJgG0NDxtiFrAbNy+tz0bxD5
+   UmdA5EGOHMszfRrKJBRXP/M/1aFu/xO1tqkEtAahdlOw6yiUgCmZO9WZI
+   Q==;
+X-CSE-ConnectionGUID: 1Yg2c7gCQQGwDpicBQcsJA==
+X-CSE-MsgGUID: uiInnQEtSdSlizCH3WMY+Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11107"; a="15560407"
+X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
+   d="scan'208";a="15560407"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2024 06:13:26 -0700
+X-CSE-ConnectionGUID: 9v6sGu/GSGOdkRpxkHzzvw==
+X-CSE-MsgGUID: d1aG04vfRYyY1aKqWF4FkA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
+   d="scan'208";a="46668313"
+Received: from unknown (HELO localhost.igk.intel.com) ([10.211.13.141])
+  by orviesa004.jf.intel.com with ESMTP; 18 Jun 2024 06:13:24 -0700
+From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+Subject: [RFC PATCH iwl-next v1 0/4] Replace auxbus with ice_adapter in the PTP support code
+Date: Tue, 18 Jun 2024 15:12:04 +0200
+Message-ID: <20240618131208.6971-1-sergey.temerkhanov@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240618090824.553018-1-niklas.soderlund+renesas@ragnatech.se>
 
-On Tue, Jun 18, 2024 at 11:08:24AM +0200, Niklas Söderlund wrote:
-> Add initial support for Renesas Ethernet-TSN End-station device of R-Car
-> V4H. The Ethernet End-station can connect to an Ethernet network using a
-> 10 Mbps, 100 Mbps, or 1 Gbps full-duplex link via MII/GMII/RMII/RGMII.
-> Depending on the connected PHY.
-> 
-> The driver supports Rx checksum and offload and hardware timestamps.
-> 
-> While full power management and suspend/resume is not yet supported the
-> driver enables runtime PM in order to enable the module clock. While
-> explicit clock management using clk_enable() would suffice for the
-> supported SoC, the module could be reused on SoCs where the module is
-> part of a power domain.
-> 
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+This series replaces multiple aux buses and devices used in
+the PTP support code with struct ice_adapter holding the necessary
+shared data
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Patches 1,2 add convenience wrappers
+Patch 3 does the main refactoring
+Patch 4 finalizes the refactoring
 
-    Andrew
+Sergey Temerkhanov (4):
+  ice: Introduce ice_get_phy_model() wrapper
+  ice: Add ice_get_ctrl_ptp() wrapper to simplify the code
+  ice: Use ice_adapter for PTP shared data instead of auxdev
+  ice: Drop auxbus use for PTP to finalize ice_adapter move
+
+ drivers/net/ethernet/intel/ice/ice.h         |   5 +
+ drivers/net/ethernet/intel/ice/ice_adapter.c |   6 +
+ drivers/net/ethernet/intel/ice/ice_adapter.h |  21 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c     | 338 ++++---------------
+ drivers/net/ethernet/intel/ice/ice_ptp.h     |  24 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c  |  22 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h  |   5 +
+ 7 files changed, 111 insertions(+), 310 deletions(-)
+
+-- 
+2.43.0
+
 
