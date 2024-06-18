@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-104513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C9B490CD4A
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 15:10:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9F8990CD58
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 15:11:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 625B21C21C53
-	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:10:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74EE21F218A5
+	for <lists+netdev@lfdr.de>; Tue, 18 Jun 2024 13:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6D31AD3E7;
-	Tue, 18 Jun 2024 12:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975701AD9DE;
+	Tue, 18 Jun 2024 12:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HwOtBF7P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rq6ZNhSg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA2F13C801;
-	Tue, 18 Jun 2024 12:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E17D158D7A;
+	Tue, 18 Jun 2024 12:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718714515; cv=none; b=kx3zo/Suw/ehFQZh4uNcSaQn8hb1t4atWpPWiRf/T/zlBsyqVWx66T0qYIdS6m6Rdy+KBtqf4d4a2EOFzNGWdYS084Za8VbiumioRpbIsOIR7+sXTBjYrbJ+IlmLZdaFs3pOHivP0nnNzkkc1kibMDc32sSpvW3p96APCAiFvoU=
+	t=1718714527; cv=none; b=pb8Fae/4Yt3uHiJGIl06WT7LxaZSo5JF84Qmdn4VBgTDLAue2j8bcXZ8MsO4fqHsviJ2Db2Ma64ATEiPDAx2C4keNyPWPKHdOk+PRdREaWtvlMgwdYpRxblnPvxEgyrSp2tVCYJuccVSTt4flszI68f5UavZk9GLd6GAztl3dLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718714515; c=relaxed/simple;
-	bh=/Wi55a5hsYvtldVFwu4hzRH0299rWjheTH4KjtzzCzk=;
+	s=arc-20240116; t=1718714527; c=relaxed/simple;
+	bh=y7TGi+zhK1eGf7RQTbK6YVn663xvsLjgKDYD4L0nIP4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EI5ILJAooJcmFJDsCOdtlPZglW9+KE72UtkXQeyl/bFCvZXhkfQ/br7TIsCKCiyeiGUYHlEk/F9rZkij/4rBPjP+ptg3kFPAy1POhEYXPSPQTWa4xVbPYf/TS7VxD+M2XXaNU4vzlpp1LHx9PUNzwykIS+GRT1v234r7wOL90UQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HwOtBF7P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 202F6C4AF50;
-	Tue, 18 Jun 2024 12:41:54 +0000 (UTC)
+	 MIME-Version; b=C+bUVEyCtyU0sJY4qnIa7Xq9Lm//yEczTIGSYZ64+bpALQlhQhr6N6h+ILC4+pPZj6PNLbWYHYu4oCSrCSYAwk+/ZkzW/t2d5cbVZpwgQrZJ/Dg1gc4yS1YL5VItbnRicgDPv0CMtWXmJx/VQMuPUfR7P8eJ/jHCBCD1gN01Cb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rq6ZNhSg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC87FC4AF1D;
+	Tue, 18 Jun 2024 12:42:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718714515;
-	bh=/Wi55a5hsYvtldVFwu4hzRH0299rWjheTH4KjtzzCzk=;
+	s=k20201202; t=1718714527;
+	bh=y7TGi+zhK1eGf7RQTbK6YVn663xvsLjgKDYD4L0nIP4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HwOtBF7PlTYiabzFBgWf8VMrcfwsEvs/XwhLTTS9t7tjVNxSi+xZAKip5JjNzqKg8
-	 +SZlO7MpC9LWvrZSMM7cOMKk7Q8cjlq7FpK5rC7Opb5WmMta5mRFp5/4uuxlOzPi5a
-	 Yow0jgirmoDLOIWPH2UUjDxyB0gd9QDcJC8OZysyqfJ/2SHwkcmWrdFCeAzMnnQv1U
-	 AbPBPc3Y+9lt8sJ5b9IQoPNwoyQG6Tm1C30l+OeC11OsoHSxcJU/UWKU9kYBboIPrC
-	 FWZqHXDo4h9ng827zyRsmxwtl4QIOvgorkMsEz1mmHUf5qJtvsF9g6k9mPsBP4IdQS
-	 KXFew47nlimgg==
+	b=rq6ZNhSgtyuWhcIyhNPOacS0IBhFBJyHbObIvEXDcQU3BzjjJYiZK3+dES+xyY4RW
+	 eUbMYp1oYMaVUFIumLU54vl4JFwED9r4D5CQ1V2geWpnh0XLoKN+cr8q179xI1Hod5
+	 0SGaWgYKR8LCciTOxTmKSaKXGfmIf1muRwvXIr0jyE/msi3WYUy/3S9+1IW2NMXRLq
+	 7t33ig6EHYKxFBn/Sp/yvsRmlemJOrNqGaTTl0gVErTEir/ITyTV8l+TaSFRmpl6hv
+	 bPe6kHWW8FkrgXMzLXD+Y9K2FRzM6YIsac7vNTlRhCJcOpfK2OjNhGf18qiMY96r/L
+	 775y2J2Cp9tRA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>,
-	syzbot+8830db5d3593b5546d2e@syzkaller.appspotmail.com,
+Cc: Dmitry Antipov <dmantipov@yandex.ru>,
+	Johannes Berg <johannes.berg@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	johannes@sipsolutions.net,
 	davem@davemloft.net,
@@ -54,9 +54,9 @@ Cc: Johannes Berg <johannes.berg@intel.com>,
 	pabeni@redhat.com,
 	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 09/21] wifi: mac80211: handle tasklet frames before stopping
-Date: Tue, 18 Jun 2024 08:41:08 -0400
-Message-ID: <20240618124139.3303801-9-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 13/21] wifi: mac80211: fix UBSAN noise in ieee80211_prep_hw_scan()
+Date: Tue, 18 Jun 2024 08:41:12 -0400
+Message-ID: <20240618124139.3303801-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240618124139.3303801-1-sashal@kernel.org>
 References: <20240618124139.3303801-1-sashal@kernel.org>
@@ -71,81 +71,78 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.161
 Content-Transfer-Encoding: 8bit
 
-From: Johannes Berg <johannes.berg@intel.com>
+From: Dmitry Antipov <dmantipov@yandex.ru>
 
-[ Upstream commit 177c6ae9725d783f9e96f02593ce8fb2639be22f ]
+[ Upstream commit 92ecbb3ac6f3fe8ae9edf3226c76aa17b6800699 ]
 
-The code itself doesn't want to handle frames from the driver
-if it's already stopped, but if the tasklet was queued before
-and runs after the stop, then all bets are off. Flush queues
-before actually stopping, RX should be off at this point since
-all the interfaces are removed already, etc.
+When testing the previous patch with CONFIG_UBSAN_BOUNDS, I've
+noticed the following:
 
-Reported-by: syzbot+8830db5d3593b5546d2e@syzkaller.appspotmail.com
-Link: https://msgid.link/20240515135318.b05f11385c9a.I41c1b33a2e1814c3a7ef352cd7f2951b91785617@changeid
+UBSAN: array-index-out-of-bounds in net/mac80211/scan.c:372:4
+index 0 is out of range for type 'struct ieee80211_channel *[]'
+CPU: 0 PID: 1435 Comm: wpa_supplicant Not tainted 6.9.0+ #1
+Hardware name: LENOVO 20UN005QRT/20UN005QRT <...BIOS details...>
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x2d/0x90
+ __ubsan_handle_out_of_bounds+0xe7/0x140
+ ? timerqueue_add+0x98/0xb0
+ ieee80211_prep_hw_scan+0x2db/0x480 [mac80211]
+ ? __kmalloc+0xe1/0x470
+ __ieee80211_start_scan+0x541/0x760 [mac80211]
+ rdev_scan+0x1f/0xe0 [cfg80211]
+ nl80211_trigger_scan+0x9b6/0xae0 [cfg80211]
+ ...<the rest is not too useful...>
+
+Since '__ieee80211_start_scan()' leaves 'hw_scan_req->req.n_channels'
+uninitialized, actual boundaries of 'hw_scan_req->req.channels' can't
+be checked in 'ieee80211_prep_hw_scan()'. Although an initialization
+of 'hw_scan_req->req.n_channels' introduces some confusion around
+allocated vs. used VLA members, this shouldn't be a problem since
+everything is correctly adjusted soon in 'ieee80211_prep_hw_scan()'.
+
+Cleanup 'kmalloc()' math in '__ieee80211_start_scan()' by using the
+convenient 'struct_size()' as well.
+
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+Link: https://msgid.link/20240517153332.18271-2-dmantipov@yandex.ru
+[improve (imho) indentation a bit]
 Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/mac80211/ieee80211_i.h |  2 ++
- net/mac80211/main.c        | 10 ++++++++--
- net/mac80211/util.c        |  2 ++
- 3 files changed, 12 insertions(+), 2 deletions(-)
+ net/mac80211/scan.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
-index 03f8c8bdab765..03c238e68038b 100644
---- a/net/mac80211/ieee80211_i.h
-+++ b/net/mac80211/ieee80211_i.h
-@@ -1803,6 +1803,8 @@ void ieee80211_bss_info_change_notify(struct ieee80211_sub_if_data *sdata,
- void ieee80211_configure_filter(struct ieee80211_local *local);
- u32 ieee80211_reset_erp_info(struct ieee80211_sub_if_data *sdata);
+diff --git a/net/mac80211/scan.c b/net/mac80211/scan.c
+index e692a2487eb5d..3bf3dd4bafa54 100644
+--- a/net/mac80211/scan.c
++++ b/net/mac80211/scan.c
+@@ -729,15 +729,21 @@ static int __ieee80211_start_scan(struct ieee80211_sub_if_data *sdata,
+ 			local->hw_scan_ies_bufsize *= n_bands;
+ 		}
  
-+void ieee80211_handle_queued_frames(struct ieee80211_local *local);
+-		local->hw_scan_req = kmalloc(
+-				sizeof(*local->hw_scan_req) +
+-				req->n_channels * sizeof(req->channels[0]) +
+-				local->hw_scan_ies_bufsize, GFP_KERNEL);
++		local->hw_scan_req = kmalloc(struct_size(local->hw_scan_req,
++							 req.channels,
++							 req->n_channels) +
++					     local->hw_scan_ies_bufsize,
++					     GFP_KERNEL);
+ 		if (!local->hw_scan_req)
+ 			return -ENOMEM;
+ 
+ 		local->hw_scan_req->req.ssids = req->ssids;
+ 		local->hw_scan_req->req.n_ssids = req->n_ssids;
++		/* None of the channels are actually set
++		 * up but let UBSAN know the boundaries.
++		 */
++		local->hw_scan_req->req.n_channels = req->n_channels;
 +
- u64 ieee80211_mgmt_tx_cookie(struct ieee80211_local *local);
- int ieee80211_attach_ack_skb(struct ieee80211_local *local, struct sk_buff *skb,
- 			     u64 *cookie, gfp_t gfp);
-diff --git a/net/mac80211/main.c b/net/mac80211/main.c
-index 9617ff8e27147..7d62374fe727b 100644
---- a/net/mac80211/main.c
-+++ b/net/mac80211/main.c
-@@ -220,9 +220,8 @@ u32 ieee80211_reset_erp_info(struct ieee80211_sub_if_data *sdata)
- 	       BSS_CHANGED_ERP_SLOT;
- }
- 
--static void ieee80211_tasklet_handler(struct tasklet_struct *t)
-+void ieee80211_handle_queued_frames(struct ieee80211_local *local)
- {
--	struct ieee80211_local *local = from_tasklet(local, t, tasklet);
- 	struct sk_buff *skb;
- 
- 	while ((skb = skb_dequeue(&local->skb_queue)) ||
-@@ -247,6 +246,13 @@ static void ieee80211_tasklet_handler(struct tasklet_struct *t)
- 	}
- }
- 
-+static void ieee80211_tasklet_handler(struct tasklet_struct *t)
-+{
-+	struct ieee80211_local *local = from_tasklet(local, t, tasklet);
-+
-+	ieee80211_handle_queued_frames(local);
-+}
-+
- static void ieee80211_restart_work(struct work_struct *work)
- {
- 	struct ieee80211_local *local =
-diff --git a/net/mac80211/util.c b/net/mac80211/util.c
-index 354badd32793a..3d47c2dba39da 100644
---- a/net/mac80211/util.c
-+++ b/net/mac80211/util.c
-@@ -2146,6 +2146,8 @@ u32 ieee80211_sta_get_rates(struct ieee80211_sub_if_data *sdata,
- 
- void ieee80211_stop_device(struct ieee80211_local *local)
- {
-+	ieee80211_handle_queued_frames(local);
-+
- 	ieee80211_led_radio(local, false);
- 	ieee80211_mod_tpt_led_trig(local, 0, IEEE80211_TPT_LEDTRIG_FL_RADIO);
- 
+ 		ies = (u8 *)local->hw_scan_req +
+ 			sizeof(*local->hw_scan_req) +
+ 			req->n_channels * sizeof(req->channels[0]);
 -- 
 2.43.0
 
