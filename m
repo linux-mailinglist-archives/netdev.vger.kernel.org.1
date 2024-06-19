@@ -1,156 +1,266 @@
-Return-Path: <netdev+bounces-104870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5C1590EBD2
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 15:01:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34B8F90EB95
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:59:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04AC51C24AC9
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 13:01:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C7E5B218CB
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 12:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7E41474C3;
-	Wed, 19 Jun 2024 13:00:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="FfTuwSVt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410C71442F1;
+	Wed, 19 Jun 2024 12:58:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95380144307;
-	Wed, 19 Jun 2024 13:00:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A121B146016
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 12:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718802049; cv=none; b=gL8EKhhyqrMx2cdS3sJ5LNwyaOH/dy3enkVBf9WpE3PH0YSzX5l2fYXRNGTjKvAM7vBw0dwSC+F9cm+9fqptZhkzKsdc14+1+kSb/ouj6boxEWNA8Qun7rDaUVhU1ynTzsrMkiLK63bxPBxSqxG3fGQ1SjhMrV2ir//OY9YqR0c=
+	t=1718801917; cv=none; b=it14fUtgyNC00f60A9ib+PGHWLqv5m2o4whG4KXoYzZ8y9AM+GMBhwXUzZkbNjkeG0ZsR0f6OJLtddR4IHNJZ8XLZBpMoIaJnYPL2XU37/I6L7eLKtaFxTyyNz+JD8KNP1QrcCD45Z3w1ol1YssL2I5XMX/lpgyr/HPv+P/YWic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718802049; c=relaxed/simple;
-	bh=BKa/BZil4tJV9cfhHF1kyacuzAP7Gz0trqyfaSztpZ0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YxlETUA0Nv5DbCp+BUNI6ihqKEwSh9bUcrrbD2ivwN+OqhjjAopDhBnv9T5Fbp8FkoGZgxrRfvwJioB7//SjPpmu2lx1rb900Z/E6Jyf1mcbxTovo2lXEkxxSLAFq31fe9HTEsFTjt5ax3rjH5uNuc/sgerMkzb2NnURElYcAJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=FfTuwSVt; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45JCUgjH015592;
-	Wed, 19 Jun 2024 14:59:59 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	jwyneShirZyRnGXk/ujWIW15qBot5c+IWzpmXBsKWbg=; b=FfTuwSVtxZ3+gPrS
-	wl9xODgA+HaNcgLArvaqJwDCcH6SjBG/30PZSjgyBTmIy6uBchukTWhXAmiwy/f7
-	wO6jILno+w1UHhH7NpHC3Io6U7yL5CJYCfaQXRiqq5RWl7FviJXbKUYCVBuc9fMj
-	+JFQliu0scteEldqlXXQmKTo+2AkNaODZncxg5Go5wuva95h2L4SbIJbHidukbfl
-	f1IRqD6Vb/FC6hQqWpvJvYBzPmPTNsQZTkZRfXBZSyCFvyiLzLTF0sIFr23G4s0y
-	2XJTJsGZLSHzCg7uMWTVG9UQ58BJIeK9UKGR0rPhSMA4iv69smHeV+UfWTMwc9sk
-	IZWQ0A==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yuj9s39pe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Jun 2024 14:59:59 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 357EC4002D;
-	Wed, 19 Jun 2024 14:59:55 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 2DA9121862A;
-	Wed, 19 Jun 2024 14:58:31 +0200 (CEST)
-Received: from localhost (10.48.86.164) by SHFDAG1NODE2.st.com (10.75.129.70)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 19 Jun
- 2024 14:58:30 +0200
-From: Christophe Roullier <christophe.roullier@foss.st.com>
-To: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
-        Mark
- Brown <broonie@kernel.org>,
-        Christophe Roullier
-	<christophe.roullier@foss.st.com>,
-        Marek Vasut <marex@denx.de>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 3/3] arm64: dts: st: enable Ethernet2 on stm32mp257f-ev1 board
-Date: Wed, 19 Jun 2024 14:58:15 +0200
-Message-ID: <20240619125815.358207-4-christophe.roullier@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240619125815.358207-1-christophe.roullier@foss.st.com>
-References: <20240619125815.358207-1-christophe.roullier@foss.st.com>
+	s=arc-20240116; t=1718801917; c=relaxed/simple;
+	bh=Td4RSPOhcUtGKfLZuVFvKlDd57RTCWKooqCtwdBuB3s=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=cfRHuXqN6a1LeUKS6LyZb11uzp61STq5L2j74mcKbX5pDXgl4oHRu9b6hrbok4bpRg7YKfGlvgJTot1PvEeWxKd5ijOzZnqsKqnQBeHaj/iq3KJ5Qfgz+vpdSe5veMfZFqGu6G8VNdSCcfGiIqxArKMiIUbbA4CKn/U36Du8NYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 538CAE000A;
+	Wed, 19 Jun 2024 12:58:30 +0000 (UTC)
+Message-ID: <619f9212-fa90-44d2-9951-800523413c8d@ovn.org>
+Date: Wed, 19 Jun 2024 14:58:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: i.maximets@ovn.org, network dev <netdev@vger.kernel.org>,
+ dev@openvswitch.org, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, Davide Caratti <dcaratti@redhat.com>,
+ Florian Westphal <fw@strlen.de>, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Eric Dumazet <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ kuba@kernel.org, Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net,
+ Pablo Neira Ayuso <pablo@netfilter.org>, Aaron Conole <aconole@redhat.com>
+Subject: Re: [PATCH net-next 3/3] openvswitch: set IPS_CONFIRMED in tmpl
+ status only when commit is set in conntrack
+To: Xin Long <lucien.xin@gmail.com>
+References: <cover.1689541664.git.lucien.xin@gmail.com>
+ <cf477f4a26579e752465a5951c1d28ba109346e3.1689541664.git.lucien.xin@gmail.com>
+ <d35d01d9-83de-4862-85a7-574a6c4dc8f5@ovn.org>
+ <e90b291a-0e19-4b80-9738-5b769fcdcdfd@ovn.org>
+ <CADvbK_f9=smg+C7M3dWWj9nvv7Z7_jCLn=6m0OLhmF_V0AEFsg@mail.gmail.com>
+ <5a9886fd-cdd7-4aa2-880f-5664288d5f25@ovn.org>
+Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <5a9886fd-cdd7-4aa2-880f-5664288d5f25@ovn.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-19_02,2024-06-19_01,2024-05-17_01
+X-GND-Sasl: i.maximets@ovn.org
 
-ETHERNET2 instance is connected to Realtek PHY in RGMII mode
-Ethernet is SNSP IP with GMAC5 version.
+On 6/18/24 17:50, Ilya Maximets wrote:
+> On 6/18/24 16:58, Xin Long wrote:
+>> On Tue, Jun 18, 2024 at 7:34 AM Ilya Maximets <i.maximets@ovn.org> wrote:
+>>>
+>>> On 6/17/24 22:10, Ilya Maximets wrote:
+>>>> On 7/16/23 23:09, Xin Long wrote:
+>>>>> By not setting IPS_CONFIRMED in tmpl that allows the exp not to be removed
+>>>>> from the hashtable when lookup, we can simplify the exp processing code a
+>>>>> lot in openvswitch conntrack.
+>>>>>
+>>>>> Signed-off-by: Xin Long <lucien.xin@gmail.com>
+>>>>> ---
+>>>>>  net/openvswitch/conntrack.c | 78 +++++--------------------------------
+>>>>>  1 file changed, 10 insertions(+), 68 deletions(-)
+>>>>>
+>>>>> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
+>>>>> index 331730fd3580..fa955e892210 100644
+>>>>> --- a/net/openvswitch/conntrack.c
+>>>>> +++ b/net/openvswitch/conntrack.c
+>>>>> @@ -455,45 +455,6 @@ static int ovs_ct_handle_fragments(struct net *net, struct sw_flow_key *key,
+>>>>>      return 0;
+>>>>>  }
+>>>>>
+>>>>> -static struct nf_conntrack_expect *
+>>>>> -ovs_ct_expect_find(struct net *net, const struct nf_conntrack_zone *zone,
+>>>>> -               u16 proto, const struct sk_buff *skb)
+>>>>> -{
+>>>>> -    struct nf_conntrack_tuple tuple;
+>>>>> -    struct nf_conntrack_expect *exp;
+>>>>> -
+>>>>> -    if (!nf_ct_get_tuplepr(skb, skb_network_offset(skb), proto, net, &tuple))
+>>>>> -            return NULL;
+>>>>> -
+>>>>> -    exp = __nf_ct_expect_find(net, zone, &tuple);
+>>>>> -    if (exp) {
+>>>>> -            struct nf_conntrack_tuple_hash *h;
+>>>>> -
+>>>>> -            /* Delete existing conntrack entry, if it clashes with the
+>>>>> -             * expectation.  This can happen since conntrack ALGs do not
+>>>>> -             * check for clashes between (new) expectations and existing
+>>>>> -             * conntrack entries.  nf_conntrack_in() will check the
+>>>>> -             * expectations only if a conntrack entry can not be found,
+>>>>> -             * which can lead to OVS finding the expectation (here) in the
+>>>>> -             * init direction, but which will not be removed by the
+>>>>> -             * nf_conntrack_in() call, if a matching conntrack entry is
+>>>>> -             * found instead.  In this case all init direction packets
+>>>>> -             * would be reported as new related packets, while reply
+>>>>> -             * direction packets would be reported as un-related
+>>>>> -             * established packets.
+>>>>> -             */
+>>>>> -            h = nf_conntrack_find_get(net, zone, &tuple);
+>>>>> -            if (h) {
+>>>>> -                    struct nf_conn *ct = nf_ct_tuplehash_to_ctrack(h);
+>>>>> -
+>>>>> -                    nf_ct_delete(ct, 0, 0);
+>>>>> -                    nf_ct_put(ct);
+>>>>> -            }
+>>>>> -    }
+>>>>> -
+>>>>> -    return exp;
+>>>>> -}
+>>>>> -
+>>>>>  /* This replicates logic from nf_conntrack_core.c that is not exported. */
+>>>>>  static enum ip_conntrack_info
+>>>>>  ovs_ct_get_info(const struct nf_conntrack_tuple_hash *h)
+>>>>> @@ -852,36 +813,16 @@ static int ovs_ct_lookup(struct net *net, struct sw_flow_key *key,
+>>>>>                       const struct ovs_conntrack_info *info,
+>>>>>                       struct sk_buff *skb)
+>>>>>  {
+>>>>> -    struct nf_conntrack_expect *exp;
+>>>>> -
+>>>>> -    /* If we pass an expected packet through nf_conntrack_in() the
+>>>>> -     * expectation is typically removed, but the packet could still be
+>>>>> -     * lost in upcall processing.  To prevent this from happening we
+>>>>> -     * perform an explicit expectation lookup.  Expected connections are
+>>>>> -     * always new, and will be passed through conntrack only when they are
+>>>>> -     * committed, as it is OK to remove the expectation at that time.
+>>>>> -     */
+>>>>> -    exp = ovs_ct_expect_find(net, &info->zone, info->family, skb);
+>>>>> -    if (exp) {
+>>>>> -            u8 state;
+>>>>> -
+>>>>> -            /* NOTE: New connections are NATted and Helped only when
+>>>>> -             * committed, so we are not calling into NAT here.
+>>>>> -             */
+>>>>> -            state = OVS_CS_F_TRACKED | OVS_CS_F_NEW | OVS_CS_F_RELATED;
+>>>>> -            __ovs_ct_update_key(key, state, &info->zone, exp->master);
+>>>>
+>>>> Hi, Xin, others.
+>>>>
+>>>> Unfortunately, it seems like removal of this code broke the expected behavior.
+>>>> OVS in userspace expects that SYN packet of a new related FTP connection will
+>>>> get +new+rel+trk flags, but after this patch we're only getting +rel+trk and not
+>>>> new.  This is a problem because we need to commit this connection with the label
+>>>> and we do that for +new packets.  If we can't get +new packet we'll have to commit
+>>>> every single +rel+trk packet, which doesn't make a lot of sense.  And it's a
+>>>> significant behavior change regardless.
+>>>
+>>> Interestingly enough I see +new+rel+trk packets in cases without SNAT,
+>>> but we can only get +rel+trk in cases with SNAT.  So, this may be just
+>>> a generic conntrack bug somewhere.  At least the behavior seems fairly
+>>> inconsistent.
+>>>
+>> In nf_conntrack, IP_CT_RELATED and IP_CT_NEW do not exist at the same
+>> time. With this patch, we expect OVS_CS_F_RELATED and OVS_CS_F_NEW
+>> are set at the same time by ovs_ct_update_key() when this related ct
+>> is not confirmed.
+>>
+>> The check-kernel test of "FTP SNAT orig tuple" skiped on my env somehow:
+>>
+>> # make check-kernel
+>> 144: conntrack - FTP SNAT orig tuple   skipped (system-traffic.at:7295)
+>>
+>> Any idea why? or do you know any other testcase that expects +new+rel+trk
+>> but returns +rel+trk only?
+> 
+> You need to install lftp and pyftpdlib.  The pyftpdlib may only be available
+> via pip on some systems.
+> 
+>>
+>> Thanks.
+>>>>
+>>>> Could you, please, take a look?
+>>>>
+>>>> The issue can be reproduced by running check-kernel tests in OVS repo.
+>>>> 'FTP SNAT orig tuple' tests fail 100% of the time.
+>>>>
+>>>> Best regards, Ilya Maximets.
+>>>
+> 
 
-Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
----
- arch/arm64/boot/dts/st/stm32mp257f-ev1.dts | 24 ++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+Hmm.  After further investigation, it seems that the issue is not about ct state,
+but the ct label.  Before this commit we had information about both the original
+tuple of the parent connection and the mark/label of the parent connection:
 
-diff --git a/arch/arm64/boot/dts/st/stm32mp257f-ev1.dts b/arch/arm64/boot/dts/st/stm32mp257f-ev1.dts
-index 27b7360e5dba..058af3a51677 100644
---- a/arch/arm64/boot/dts/st/stm32mp257f-ev1.dts
-+++ b/arch/arm64/boot/dts/st/stm32mp257f-ev1.dts
-@@ -17,6 +17,7 @@ / {
- 	compatible = "st,stm32mp257f-ev1", "st,stm32mp257";
- 
- 	aliases {
-+		ethernet0 = &ethernet2;
- 		serial0 = &usart2;
- 	};
- 
-@@ -55,6 +56,29 @@ &arm_wdt {
- 	status = "okay";
- };
- 
-+&ethernet2 {
-+	pinctrl-names = "default", "sleep";
-+	pinctrl-0 = <&eth2_rgmii_pins_a>;
-+	pinctrl-1 = <&eth2_rgmii_sleep_pins_a>;
-+	max-speed = <1000>;
-+	phy-handle = <&phy0_eth2>;
-+	phy-mode = "rgmii-id";
-+	status = "okay";
-+
-+	mdio {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		compatible = "snps,dwmac-mdio";
-+		phy0_eth2: ethernet-phy@1 {
-+			compatible = "ethernet-phy-id001c.c916";
-+			reg = <1>;
-+			reset-assert-us = <10000>;
-+			reset-deassert-us = <300>;
-+			reset-gpios =  <&gpiog 6 GPIO_ACTIVE_LOW>;
-+		};
-+	};
-+};
-+
- &i2c2 {
- 	pinctrl-names = "default", "sleep";
- 	pinctrl-0 = <&i2c2_pins_a>;
--- 
-2.25.1
+system@ovs-system: miss upcall:
+recirc_id(0x2),dp_hash(0),skb_priority(0),in_port(3),skb_mark(0),ct_state(0x25),
+ct_zone(0x1),ct_mark(0),ct_label(0x4d2000000000000000000000001),
+ct_tuple4(src=10.1.1.1,dst=10.1.1.2,proto=6,tp_src=50648,tp_dst=21),
+eth(src=de:d9:f3:c8:5a:3a,dst=80:88:88:88:88:88),eth_type(0x0800),
+ipv4(src=10.1.1.2,dst=10.1.1.9,proto=6,tos=0,ttl=64,frag=no),
+tcp(src=57027,dst=38153),tcp_flags(syn)
 
+But after this change, we still have the original tuple of the parent connection,
+but the label is no longer in the flow key:
+
+system@ovs-system: miss upcall:
+recirc_id(0x2),dp_hash(0),skb_priority(0),in_port(3),skb_mark(0),ct_state(0x25),
+ct_zone(0x1),ct_mark(0),ct_label(0),
+ct_tuple4(src=10.1.1.1,dst=10.1.1.2,proto=6,tp_src=34668,tp_dst=21),
+eth(src=66:eb:74:c6:79:24,dst=80:88:88:88:88:88),eth_type(0x0800),
+ipv4(src=10.1.1.2,dst=10.1.1.9,proto=6,tos=0,ttl=64,frag=no),
+tcp(src=49529,dst=35459),tcp_flags(syn)
+
+ct_state(0x25) == +new+rel+trk
+
+Best regards, Ilya Maximets.
 
