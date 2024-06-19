@@ -1,147 +1,135 @@
-Return-Path: <netdev+bounces-105068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A755C90F89C
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 23:54:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DF7B90F8CE
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 00:09:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81E241C203DF
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 21:54:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 352571F212C0
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 22:09:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5AE8060A;
-	Wed, 19 Jun 2024 21:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A1D7F7D3;
+	Wed, 19 Jun 2024 22:09:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Evvl5HsW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dOlxI/gQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8610215AD93;
-	Wed, 19 Jun 2024 21:54:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7D178B4C
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 22:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718834080; cv=none; b=MUqd2VBCad6/Y8PlQDh9uA22jDKGUKzQf9OoRZqARz427KtAo3ITQ8+qoOpXNxxihptDUE8f6cnjishEHwou9YHoXT4vtZoDmPv2zHwiTpjyDdf4gAnBthb/P+hvm9NS5VH7N89mNoodB53v3dQjIiDvH/Yjdo78uGU8dnrS4dQ=
+	t=1718834940; cv=none; b=Gminz4KVTAgbTUf5jcOonoCknt/6NuuAb1kCmwxH21q47L8thuZgXVv6rirSsL22NiIvZJEmz93GBVBrgZlL1AUXKmEJPDiO9bcon/1VP8VPz60wmAy2IVOioR6uBKPdngBzWw3SnUWqEU85i8WZk/nwcyeotTvO+xqZpdtF8Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718834080; c=relaxed/simple;
-	bh=z6G5Uf6Iyi4WqQORTIjD0jB74Kt0ewnl52JlqEwRn2Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qzegLW5cQY2YNfCp06ij9oEG8U+M8fAWuqn4Ol7vCLkncGWwdD24Mgu8468yDDQl/ySbBYbaG4PXXQMYr1liXf06kRLcspAC8gBF9zI+l19FcGb2x9EIwb6kcoA0Q0NOQM+LLzc83mfvepJWNbMSExLj/2oo3mTMvyJeQA00zMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Evvl5HsW; arc=none smtp.client-ip=209.85.221.49
+	s=arc-20240116; t=1718834940; c=relaxed/simple;
+	bh=/pOQgw9kCGvw0wOH1Y2apYohmquBLKtpUQYEOhdkF/U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kzs1qYCsjmvLWbOxG+P6y49HFlHdNFkBZszvt7nCW7OEf38rxOrRVF8qp2gk1E1ogEaKdB3JBdt8CxpW7FhnTE1jZtLvvaa8SaEx9mlURxYgou77cBTElS2RD2/Z9HHBiIiI+shjap65DUCpR4Y2fhl1nGe1EyxG3WIQSeGaUco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dOlxI/gQ; arc=none smtp.client-ip=209.85.222.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3620ee2cdf7so177017f8f.3;
-        Wed, 19 Jun 2024 14:54:38 -0700 (PDT)
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-795482e114cso19435285a.1
+        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 15:08:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718834077; x=1719438877; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z6G5Uf6Iyi4WqQORTIjD0jB74Kt0ewnl52JlqEwRn2Y=;
-        b=Evvl5HsWywuMxsq0bCt46NDFWvp6UNp4mU3y9kZucC7KfhboKyAy3/gXhS1e7DMGOr
-         f6X9pwcJX2JLV5yiYOAUjeh6mv1Rp973TNjBSf++FHP7A93xBk/mIuo0DovbiEGQsi1n
-         7JXVMkSdyCJIocoCxXiuSIi0M1xHmJiJ5mSE2AKUtGNu+AEa4RGeUIh0+zY7mBQs8lNU
-         dx2GVZyBj2/u7cA9Rnalb/J7nEafaiVaP6LKKUkkt73PJ+7y6XsirbBPb8IjC+wsPkIP
-         NVzzb3v+0mXRku0A8UKsvXC+ZQcN8CqsD23t580x6enyTj5DvN8bWNQE/Fb78l4QquWJ
-         gSGg==
+        d=gmail.com; s=20230601; t=1718834937; x=1719439737; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=igD6hj6MmbdFND+MgPW7YgvErDPfhDh7tnCy7E0aVms=;
+        b=dOlxI/gQBpOI3PToZFl932sKDjfQ+SdsJyLk9fbnKtAmKQ+sQGTzZ27/BIDIeFTc/a
+         p2GeOp3c32JqtU4TcISQcEVT7d8M0Lhq44mXfwiFPQOAekadtOcOyueMi4zfZrPWM1u/
+         dRyajfJiqtnsXnxK4GQ1z0lv3lt++7WjY/yaDCXFq4PGhq9iB0qW2Ksmra/2jYE1OK0m
+         cWXv4ZL5bjzIweZFc7WY0hpjB+JpbiLmlqU0ACtcbVu/QK2bAAvAMotg2T+hXISkyTBj
+         8yuYHKCdu7RB1pW5bEH8BwTFX1dujDz53JOUbg/wdVO7hn6X7aDft6Z1laMv07F7i2Ib
+         Xebg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718834077; x=1719438877;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z6G5Uf6Iyi4WqQORTIjD0jB74Kt0ewnl52JlqEwRn2Y=;
-        b=pOqRN3Ar7r+0R8g8RV6rA2a/5JNMNSHQ5wAV5l/1aNGPUwhoLQ0QxbI2gUJcltypR3
-         yvxUdEON4ny7r4C5B6oEmKEAijUMsWbDJzUa/YKfeSkESXRNb7yoKq7yfoYdUfp572HS
-         qSoWOwL7hOsM8Ny2amFuXFo+NmzSsUpBgRVC3UVrFxhgd0XiLhVgnZGFmvjooPwYuuti
-         qwxGcGrteenkx4ukfDHr4Gt91CcEL0EEzx9jWosjJ9eauve9gpbAg/WjCxH5S5ypx8JD
-         8UFi5n8If72vSueYispZ3LqDNacmdPcFf1U2OlUntW4NwlEOm0sXsJJiB89fsAI1k9yc
-         dN2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV0j56c4u2AUfPwjb2jtvFzqQ6AWLtFiKcgA+lnHSCzG1OuhJlAQK3OQ+52n/wBliAsEKBDUe6RHOVPRe5uZe4qB9gubWFp4DUbi7/fs/6vEK+Dqy0lgpoB5RqsPy8hbZvxETfs
-X-Gm-Message-State: AOJu0YwamAh+dt3WV8JUP8d6rbQPxNnV+Mw7TpzH0sx3ffb6sx1oIDZe
-	8jPs+xk85RrwB6MqtRCC0gUK5aU591iVAoJ9lrYAT0tUSZowj8BV
-X-Google-Smtp-Source: AGHT+IFpU83wPBoQG7vdNoz5N9ED9k21NppCMsmGxa54FItrLhtOf3h5aGsmHXiFkiCuY6jjnhWxTQ==
-X-Received: by 2002:a5d:6384:0:b0:35e:4f42:6016 with SMTP id ffacd0b85a97d-36317b79039mr2554677f8f.30.1718834076612;
-        Wed, 19 Jun 2024 14:54:36 -0700 (PDT)
-Received: from skbuf ([188.25.55.166])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56ecd666sm701447466b.135.2024.06.19.14.54.34
+        d=1e100.net; s=20230601; t=1718834937; x=1719439737;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=igD6hj6MmbdFND+MgPW7YgvErDPfhDh7tnCy7E0aVms=;
+        b=tcPKGWR0OzGlg7fJRWizby/h2sVTacX3ElR+qkY2+jjQmufn/Zk/5lgcEUt6pnJ74L
+         L1JH6lEWimveDpZ4yLl6sFv+Sr1/3beq532NuDW6S8ZAEEQs6YyX1awTQfX9KRB+/1wF
+         h7y84Aoi0DZ8lO7GZw2HviHXK4gw28qMRPv58qSMA297cF1OmHUpLgwa2t3E50bceMVF
+         sDDSlyWh4XSE2nLVOC/d977f6wL/jm1FrkqWjfxdIal1hWuiREfDC7fNd44YpyPG6PDI
+         hfz63RhMV2ol2dQtzd/CuuAkjaCH4FeoO26ydwvf/Kx7t71p88W2zP8X00Q6wWBhX/Ec
+         nZdA==
+X-Gm-Message-State: AOJu0Yxhf04LbzjvmIJoY5iBoreB9E+wAdJflALq51iqkVX4l10AvM6j
+	j2W6USjRe0nFErcMbvEe5NAfuXtvAeWZMqDIODPEEYZy7V8+bq15cavzPQ==
+X-Google-Smtp-Source: AGHT+IFIBgB0MB8G5G1g9hxWUllH0Y7MeaUodCEI5Dn9xX7v78/rh4cu5m7ZdpJqOndO//PohtGcQw==
+X-Received: by 2002:a0c:e346:0:b0:6b0:6443:7fcb with SMTP id 6a1803df08f44-6b501e0bbebmr45336616d6.10.1718834937298;
+        Wed, 19 Jun 2024 15:08:57 -0700 (PDT)
+Received: from wsfd-netdev15.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b2a5c1ceadsm81849466d6.43.2024.06.19.15.08.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jun 2024 14:54:36 -0700 (PDT)
-Date: Thu, 20 Jun 2024 00:54:33 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	Casper Andersson <casper.casan@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH v2 net-next] net: dsa: Allow only up to two HSR HW
- offloaded ports for KSZ9477
-Message-ID: <20240619215433.6xpadwyvudtybd72@skbuf>
-References: <20240619134248.1228443-1-lukma@denx.de>
- <20240619134248.1228443-1-lukma@denx.de>
- <20240619144243.cp6ceembrxs27tfc@skbuf>
- <20240619171057.766c657b@wsk>
- <20240619154814.dvjcry7ahvtznfxb@skbuf>
+        Wed, 19 Jun 2024 15:08:57 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	dev@openvswitch.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pravin B Shelar <pshelar@ovn.org>,
+	Ilya Maximets <i.maximets@ovn.org>,
+	Aaron Conole <aconole@redhat.com>,
+	Florian Westphal <fw@strlen.de>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Subject: [PATCH net] openvswitch: get related ct labels from its master if it is not confirmed
+Date: Wed, 19 Jun 2024 18:08:56 -0400
+Message-ID: <48a6cd8c4f9c6bf6f0314d992d61c65b43cb3983.1718834936.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240619154814.dvjcry7ahvtznfxb@skbuf>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 19, 2024 at 06:48:14PM +0300, Vladimir Oltean wrote:
-> You would have to make hsr_portdev_setup() call something else rather
-> than netdev_upper_dev_link(), because that eats the "void *upper_info"
-> argument when calling __netdev_upper_dev_link(). Possibly create a new
-> netdev_upper_dev_link_info() ("link upper dev with extra info")
-> function, which only HSR calls with a new info structure. Then, the DSA
-> core has access to that and implicitly to the port type, and from there
-> on, you can apply the proper restriction.
+Ilya found a failure in running check-kernel tests with at_groups=144
+(144: conntrack - FTP SNAT orig tuple) in OVS repo. After his further
+investigation, the root cause is that the labels sent to userspace
+for related ct are incorrect.
 
-Yet another comment. TL;DR: I think we should also make HSR use
-netdev_master_upper_dev_link() anyway (as a separate change), and thus,
-no new API is needed, since that function is able to pass a void
-*upper_info already.
+The labels for unconfirmed related ct should use its master's labels.
+However, the changes made in commit 8c8b73320805 ("openvswitch: set
+IPS_CONFIRMED in tmpl status only when commit is set in conntrack")
+led to getting labels from this related ct.
 
-Explanation: "master" uppers are called like that because any lower
-interface can have only at most one. Bridge, team, bond, etc are all
-"master" uppers. So an interface cannot have 2 bridge uppers, or a team
-and a bond upper at the same time, etc. Compare this to regular upper
-interfaces like VLANs. You can have as many VLAN upper interfaces as you
-want (including if you already have a master upper interface).
+So fix it in ovs_ct_get_labels() by changing to copy labels from its
+master ct if it is a unconfirmed related ct. Note that there is no
+fix needed for ct->mark, as it was already copied from its master
+ct for related ct in init_conntrack().
 
-The point is that, AFAIU, the "master" upper restriction comes from the
-use of an rx_handler. You can't chain RX handlers, and a lower netdev
-can have a single one, so if the upper netdev uses an RX handler, it'd
-better make sure that no one else does, or it does but in a coordinated
-manner.
+Fixes: 8c8b73320805 ("openvswitch: set IPS_CONFIRMED in tmpl status only when commit is set in conntrack")
+Reported-by: Ilya Maximets <i.maximets@ovn.org>
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ net/openvswitch/conntrack.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Upper drivers like macvlan do use RX handlers, and are not "master"
-uppers nonetheless. This is not a contradiction in terms, because they
-take care to set up the RX handler of the lower interface only once.
+diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
+index 331730fd3580..920e802ff01e 100644
+--- a/net/openvswitch/conntrack.c
++++ b/net/openvswitch/conntrack.c
+@@ -167,8 +167,13 @@ static u32 ovs_ct_get_mark(const struct nf_conn *ct)
+ static void ovs_ct_get_labels(const struct nf_conn *ct,
+ 			      struct ovs_key_ct_labels *labels)
+ {
+-	struct nf_conn_labels *cl = ct ? nf_ct_labels_find(ct) : NULL;
++	struct nf_conn_labels *cl = NULL;
+ 
++	if (ct) {
++		if (ct->master && !nf_ct_is_confirmed(ct))
++			ct = ct->master;
++		cl = nf_ct_labels_find(ct);
++	}
+ 	if (cl)
+ 		memcpy(labels, cl->bits, OVS_CT_LABELS_LEN);
+ 	else
+-- 
+2.43.0
 
-HSR is not as careful, and uses an rx_handler very plainly, but also
-does not mark itself as a "master" upper. An attempt to put a physical
-interface under a HSR upper, and then under a second one (without
-removing it from the first one), would fail the second time around due
-to hsr_portdev_setup() -> netdev_rx_handler_register() ->
-netdev_is_rx_handler_busy() -> -EBUSY.
-
-Nor does that configuration appear to make too much sense to me, so you
-could mark HSR as master, in order for that second attempt to fail one
-step earlier: hsr_portdev_setup() -> netdev_master_upper_dev_link() ->
-__netdev_master_upper_dev_get() -> -EBUSY.
-
-With that in place, you also have free access now to the "upper_info"
-parameter, for what was discussed earlier to be propagated down.
 
