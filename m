@@ -1,125 +1,130 @@
-Return-Path: <netdev+bounces-105020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 907D590F72D
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 21:51:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D2C790F735
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 21:53:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AE6F1F22970
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 19:51:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 552D91F236C0
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 19:53:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1C477103;
-	Wed, 19 Jun 2024 19:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wykRAKO9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA27158A3B;
+	Wed, 19 Jun 2024 19:53:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA13F1876;
-	Wed, 19 Jun 2024 19:51:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5049C1876;
+	Wed, 19 Jun 2024 19:53:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.11.138.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718826694; cv=none; b=ub+cbq3qzhGA1xGd66f/MQmEFvPqj/k9J4l0zpFfmZL0TvjZwypZhThnNCiq6Xws8MKPJpA+FWKvZjcdlhBeKxd3RJQWSQQTMeJAOxhjskHl6nvq2d8tF62Ut2pU6qu326k2UUz10u8u+TjIo7S0pRM7TQCEbfRNrBr/YK3XwPg=
+	t=1718826783; cv=none; b=hZaCC5ZDy53/5yOYS/ZpIVRXGLZt01SRXaNVI4l1p4B6C06BuvZL0/K/2vR6IuE0G/s6EFLjIjQjb53ux2NIy2hwrWlsSbR4KYnnd3HZk96lXz0V98OmRWA2YJL43iEYIjyIXSCIR2Ju5S9OAMhuoChqKTvNtvqOXnGglcn240k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718826694; c=relaxed/simple;
-	bh=Zqm1vtW+ID7zxTGrE2BVFpmEo5FykJURlDkbPF8Y448=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tzEQApkEgkKTVMRxN+ikGm7mFDy2wq2C9IFFnIcGFLMpfvF6X3OKEhdNE1p2Y7IgYgWNbBBgmAwtEBwCWDwIsIwJbW/fBT97wVJM1snFh1UTOszeotCKS+6abpvTv5SsR0chrB3AeKBr/xUKClFfIP4kxyr2WCxlv3wAtZllDRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wykRAKO9; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=WnQdVdsbldNc+VO+2ej+8Ij/CjLH8t7u+69BlHcBJow=; b=wy
-	kRAKO9vKrjnz8H1Qso+72FuS2LpcBjC3qXjri4XnQgfwKy/G8smmugzkf+RXMAcXgQZCrs2u9Mvmk
-	GwDQH0IGVU3G0YetnxedN1jDAMkm8bsWJ7k4ycQCar76oRoOPFldxO8oVV1Y9chzE4GkHBELRTBiM
-	Xb4aDyh7xSFGETo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sK1Kq-000VKf-O5; Wed, 19 Jun 2024 21:51:12 +0200
-Date: Wed, 19 Jun 2024 21:51:12 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Vinod Koul <vkoul@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH net-next 1/8] net: phy: add support for overclocked SGMII
-Message-ID: <160b9abd-3972-449d-906d-71d12b2a0aeb@lunn.ch>
-References: <20240619184550.34524-1-brgl@bgdev.pl>
- <20240619184550.34524-2-brgl@bgdev.pl>
- <bedd74cb-ee1e-4f8d-86ee-021e5964f6e5@lunn.ch>
- <CAMRc=MeCcrvid=+KG-6Pe5_-u21PBJDdNCChVrib8zT+FUfPJw@mail.gmail.com>
+	s=arc-20240116; t=1718826783; c=relaxed/simple;
+	bh=hAa58ykzdUm4sWV2raSDGbF4KtGeoHp4ZJ5LE2Yj+2g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PRCFfllUQwzvX6qlLY7SmbYwtOaEfyLQCbReS2nNz9S7QSVQx5OIUxHuyOSfezqBc9bNu/pvtx9+Np9EgyZB5/7esPF56Jsbkt2ENV8aJvvlo76ve2cKC/8BUwlIC5Ghe6DgBlnBAqlnF/ZiQSdXph2m55O8v00Of/ouoACiC6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de; spf=pass smtp.mailfrom=sntech.de; arc=none smtp.client-ip=185.11.138.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sntech.de
+Received: from i5e8616dc.versanet.de ([94.134.22.220] helo=diego.localnet)
+	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <heiko@sntech.de>)
+	id 1sK1ML-0000cJ-Uc; Wed, 19 Jun 2024 21:52:45 +0200
+From: Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
+To: Johan Jonker <jbx6244@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 1/3] ARM: dts: rockchip: rk3xxx: fix emac node
+Date: Wed, 19 Jun 2024 21:52:44 +0200
+Message-ID: <24211354.RjEADstKbi@diego>
+In-Reply-To: <12f50bef-ba6e-4d96-8ced-08682c931da9@gmail.com>
+References:
+ <0b889b87-5442-4fd4-b26f-8d5d67695c77@gmail.com>
+ <12f50bef-ba6e-4d96-8ced-08682c931da9@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMRc=MeCcrvid=+KG-6Pe5_-u21PBJDdNCChVrib8zT+FUfPJw@mail.gmail.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jun 19, 2024 at 09:29:03PM +0200, Bartosz Golaszewski wrote:
-> On Wed, Jun 19, 2024 at 9:09 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > On Wed, Jun 19, 2024 at 08:45:42PM +0200, Bartosz Golaszewski wrote:
-> > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > >
-> > > The Aquantia AQR115C PHY supports the Overlocked SGMII mode. In order to
-> > > support it in the driver, extend the PHY core with the new mode bits and
-> > > pieces.
-> >
-> > Here we go again....
-> >
+Am Dienstag, 18. Juni 2024, 18:13:56 CEST schrieb Johan Jonker:
+> In the combined DT of rk3066a/rk3188 the emac node uses as place holder
+> the compatible string "snps,arc-emac". The last real user nSIM_700
+> of the "snps,arc-emac" compatible string in a driver was removed in 2019.
+> Rockchip emac nodes don't make use of this common fall back string.
+> In order to removed unused driver code replace this string with
+> "rockchip,rk3066-emac".
+> As we are there remove the blank lines and sort.
 > 
-> Admittedly I don't post to net very often and I assume there's a story
-> to this comment? Care to elaborate?
+> Signed-off-by: Johan Jonker <jbx6244@gmail.com>
 
-2.5G is a mess because vendors implemented it before the standard came
-out, in the form of 2500BaseX. They often did just what this seems to
-suggest, they overclocked CISCO SGMII.  But the in-band signalling
-SGMII uses cannot work at 2.5G, it makes no sense. So vendors disable
-the in-band signalling.
+Reviewed-by: Heiko Stuebner <heiko@sntech.de>
 
-What you likely end up with, is 2500BaseX, but without in-band
-signalling.
+I think this is fine going through the network tree together with the
+other two patches.
 
-Now, some real 2500BaseX devices require the peer to perform in-band
-signalling. Some will listen for the signalling a while, and if they
-hear nothing will go into some sort of fallback mode. Others can be
-told the peer does not support inband signalling, and so don't expect
-it.
 
-And then we have those which are overclocked SGMII which don't expect
-any signalling because SGMII signalling makes no sense at 2.5G.
+> ---
+> 
+> [PATCH 8/8] ARC: nSIM_700: remove unused network options
+> https://lore.kernel.org/all/20191023124417.5770-9-Eugeniy.Paltsev@synopsys.com/
+> ---
+>  arch/arm/boot/dts/rockchip/rk3066a.dtsi | 4 ----
+>  arch/arm/boot/dts/rockchip/rk3xxx.dtsi  | 7 ++-----
+>  2 files changed, 2 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/arm/boot/dts/rockchip/rk3066a.dtsi b/arch/arm/boot/dts/rockchip/rk3066a.dtsi
+> index 5e0750547ab5..3f6d49459734 100644
+> --- a/arch/arm/boot/dts/rockchip/rk3066a.dtsi
+> +++ b/arch/arm/boot/dts/rockchip/rk3066a.dtsi
+> @@ -896,7 +896,3 @@ &vpu {
+>  &wdt {
+>  	compatible = "rockchip,rk3066-wdt", "snps,dw-wdt";
+>  };
+> -
+> -&emac {
+> -	compatible = "rockchip,rk3066-emac";
+> -};
+> diff --git a/arch/arm/boot/dts/rockchip/rk3xxx.dtsi b/arch/arm/boot/dts/rockchip/rk3xxx.dtsi
+> index f37137f298d5..e6a78bcf9163 100644
+> --- a/arch/arm/boot/dts/rockchip/rk3xxx.dtsi
+> +++ b/arch/arm/boot/dts/rockchip/rk3xxx.dtsi
+> @@ -194,17 +194,14 @@ usb_host: usb@101c0000 {
+>  	};
+> 
+>  	emac: ethernet@10204000 {
+> -		compatible = "snps,arc-emac";
+> +		compatible = "rockchip,rk3066-emac";
+>  		reg = <0x10204000 0x3c>;
+>  		interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
+> -
+> -		rockchip,grf = <&grf>;
+> -
+>  		clocks = <&cru HCLK_EMAC>, <&cru SCLK_MAC>;
+>  		clock-names = "hclk", "macref";
+>  		max-speed = <100>;
+>  		phy-mode = "rmii";
+> -
+> +		rockchip,grf = <&grf>;
+>  		status = "disabled";
+>  	};
+> 
+> --
+> 2.39.2
+> 
+> 
 
-phylib supports out of band signalling, which is enough to make this
-work, so long as two peers will actually establish a link because they
-are sufficiently tolerant of what the other end is doing. Sometimes
-they need a hint. Russell King has been working on this mess, and i'm
-sure he will be along soon.
 
-What i expect will happen is you keep calling this 2500BaseX, without
-in band signalling. You can look back in the netdev mailling list for
-more details and those that have been here before you. It is always
-good to search the history, otherwise you are just going to repeat it.
 
-   Andrew
+
 
