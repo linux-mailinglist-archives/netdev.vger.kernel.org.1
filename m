@@ -1,139 +1,211 @@
-Return-Path: <netdev+bounces-104785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 522E590E5B9
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 10:35:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7523590E612
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 10:39:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CE911C209DD
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 08:35:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06E3A1F254D9
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 08:39:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D663A6F308;
-	Wed, 19 Jun 2024 08:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF857CF3E;
+	Wed, 19 Jun 2024 08:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dgw9dv2L"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/HvbnpD"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B6579945
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 08:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B7B79952
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 08:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718786098; cv=none; b=SkO+o53YRuKCQaqsjmfECCTXFDjKQo6WZyBndgJ4PJFWR2ulWxjVTz4l5N2mS7tWFjhfL0t97akb4QIO2KblgZgBc8LGiPsqutI8ZS5kTbr57kxfDk+isnuREO3xKKOh7HZhCwFM0z7SYCM8yTOOiJv9ENLr2/QixuhIbBFG4vg=
+	t=1718786391; cv=none; b=LuefzdL/4R22bOYP2eoGsKdbnqITEK5GvJStbQdNZhE2N5gNuvw0oqn51yZUveUnBxCsIVPBw5kuH53MG9W4TkeZ63TXBUlCO56ewRyyQKVBRxGvArRYLRPHB3EXzRMbaIuzkBP+5UpleJVz/1bhtcq5WQhB3Dbw+aYE31FLLbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718786098; c=relaxed/simple;
-	bh=k77wwIYfk4GFZNw66tp4JkI39o9Zc0+HKnCadVtNoG4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kSP1ewP94RRMdZJ/FXTMP5nLYY1a92WTO6cmlaGOlh9lPJlDdTD7PNUGx0CPB8MxPeZ4taa+KEclH11rFYvGbFFJ7wH+EoFjjGStbAQZa+y/uRrnv46/+4fSFnZiP7NkhFfmtxdg9XDUw+YxzqMLkvrshiFKVvXIhBOP1Q1Vn+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dgw9dv2L; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718786096;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7QorzhMTdYqM8xg9nGlxbgOsetEP7RIhSroBgawoQok=;
-	b=dgw9dv2LzOXRvP99NzBvNh5KftRx48YFMgFpVuP+yHSCbm75j35L+kWzW+7yUt04lwp2FU
-	Z1q1txmWS/uknL0YcutjEn6gQcb6AzZjR8Azy9stdoEPhWFP6Qte2shLJoSsH45EnL8WMK
-	8CJIm+/H/l4IqUslKGhuZ+yGuL16Q1A=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-674-rfWdGJ4DN5mEta29JMyqYg-1; Wed, 19 Jun 2024 04:34:54 -0400
-X-MC-Unique: rfWdGJ4DN5mEta29JMyqYg-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2ec3d6c2cf1so5369591fa.1
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 01:34:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718786092; x=1719390892;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1718786391; c=relaxed/simple;
+	bh=V1cIYjrBdLW8KIv3ONgB+ng/1ZHEgJK6ZjzzRqbTnFo=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Z44e3QUcIDD259wDAtZnfe7BCIzHZLDxTj5K2vGVrVfOrtQkDPR3hjgH8M635XhlZqms5shiLsh8QO18b2UuPEbXRVMRqUjWZ4Z329JRz11tmLxGMkMkyUvBxIVIz5e+k5wYuS0GOzbZMIkE2oMTzIqWDwyTdAlFJByIGNzxhds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c/HvbnpD; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-43fdb797ee2so30755041cf.3
+        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 01:39:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718786388; x=1719391188; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7QorzhMTdYqM8xg9nGlxbgOsetEP7RIhSroBgawoQok=;
-        b=r5scn4FPKZp/3r9xeU+S905XjdlB/9abxAqLxRDyc2X3PyTru/2iebBiushI/sBaFk
-         0nVg09eyCYFU8iIsWYkaXMNRURH/73mnV6I0qPjUI9ZbO8use54G6VewbLaH36xfiMWW
-         dDNnZP5beglSphq4TyYgn5Y9SFCF2KZfxgc+JLwacxmxTahtFbDAhmeVCJbxoYSow6rC
-         dFphwsbJx7OSq/181KZEXgobWJuQMs5NStClU424ngAj4M+U5R09BcSdBEPPRqNK4ijH
-         JB4b7F2K+VMUOK5wqJ4zOI6cOHF+uQopOGyCY1HOiDwZwvJdseE3djpxg4zlQIoBVmJy
-         tGWA==
-X-Forwarded-Encrypted: i=1; AJvYcCX2us6gACOiPVTe2J5XGNFuTKnkWaHOm25PdI+DD3zs4C35DYxY8g8RROLOUkrb2eIk6GUUALBmmo9rUHTJUT6w14cM4pkY
-X-Gm-Message-State: AOJu0YzwfowFFDy+2nRLIyntodOjv07JtttDjMjp/ItkYt/SyoTzGwFz
-	e1Ohs34DXMJ9X+QLmzE4Xzv6HseVfsjKPJ9XRefnz5OMOxUS9wzwrjlpZxp0+GlfQx+Q7+a9NCf
-	SZRHBHjqlWxTNYl+JCwSc7GDnhZDvhffpci/J61Ugb8lHHIUIFN4iYw==
-X-Received: by 2002:a2e:2c13:0:b0:2ea:e204:afc2 with SMTP id 38308e7fff4ca-2ec3ceb71ffmr13854591fa.12.1718786092662;
-        Wed, 19 Jun 2024 01:34:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6dGM5Ja1VGAOzdN1hQxZfOXjSTyTvg4DIiNH2Kw0m4EIQmBe70gslkXkc0676k76zPfXPTA==
-X-Received: by 2002:a2e:2c13:0:b0:2ea:e204:afc2 with SMTP id 38308e7fff4ca-2ec3ceb71ffmr13854371fa.12.1718786092175;
-        Wed, 19 Jun 2024 01:34:52 -0700 (PDT)
-Received: from redhat.com ([2.52.146.100])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422870e9681sm259166805e9.28.2024.06.19.01.34.50
+        bh=IZQbTDo+z2Hw2qiH8fazN8oLyUDrBMHU2DUGTSkxqnI=;
+        b=c/HvbnpDvT4eG6VmSBwqMpCJ4BQfxLDc53qTuvnENOYtJtHkthDmIYcB9msbeMLGDf
+         4AUWbgimO6R8OeUzec0Vhm+Y4jExZcmPnbzDe3MIP3/HJjLIYZ/Wsuhoxaqplsazdx5E
+         4TpgODdcsg9dO4CZV9hDyJPaJh1tx7DETFvCXo2VGJ+//UmlV6eNDvQ03fNqQt+vAnRG
+         7nI8bmzgn33CUbwjZxs19G7kxA7yV4uPOABPk/VLyn/jZPlTKwAwAP9PwBVkn44vWCT3
+         Toeo3P2rbDYHrmt35ADsOmrjas/koVrrOJEn8GiyJ+uwmdYya80eqC0xYji4Dhkz25lH
+         0c9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718786388; x=1719391188;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=IZQbTDo+z2Hw2qiH8fazN8oLyUDrBMHU2DUGTSkxqnI=;
+        b=VDpkXUJEj5+g8W8oaF991/Q476PLgYfJIXn1D6euTO+ImXpyUFYDyUTSZyseCfv7FQ
+         TYioJIJZ8Er6f4yTpq2iSPzUeMlEMn/iLtwuiddyB8HmZtyxbiFzpjOCFSpHoQqIPO2O
+         1PEGG9NJrCHdGR6eS3A6x7N7StwBGQ79lG5M7HFeyX67egjfuWSumb2khqFrkV79/wNQ
+         VlvUGINAQtBTO9zEZL7qsBxhbCm7MGWXRKj2bd+KRKruDjVkdQkkRbtmnE88FMEHv7lS
+         Sku/+x2JUlr3u1WrSNydUsIxAamjBgxHycK1KCc9nXq3IZNn6KqBDeR78hCFS+J1Y1kr
+         APrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV/cuV97gmp+KxLlAr6JIl/jo9SD8FKHuX2fpa7Fy/dWztkaK32u0IgsnlcTIFPeJ25wgNEX3J5fHkYybD8BHOJotEojndM
+X-Gm-Message-State: AOJu0Yz2RI0MLTOVti/YPOlunayxtLhN9Rj1IMDjeIsp3/ATspH3mBWn
+	qnZgNW00U5qF96OACa6fCDRvQTeEoqCls6Jw7rqlfK35w7XGLuEY
+X-Google-Smtp-Source: AGHT+IGPFimCy5tjSNnagV/wBzxVJQKY35P1TdpQseb3vn7zgqAdawN7L42BjxLcNHlJq/eWkEib5w==
+X-Received: by 2002:ac8:59c4:0:b0:43e:3d64:8c1 with SMTP id d75a77b69052e-444a7a717b7mr27401401cf.55.1718786388329;
+        Wed, 19 Jun 2024 01:39:48 -0700 (PDT)
+Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-441f2fcc404sm63249531cf.66.2024.06.19.01.39.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jun 2024 01:34:51 -0700 (PDT)
-Date: Wed, 19 Jun 2024 04:34:47 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Li RongQing <lirongqing@baidu.com>
-Cc: jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
-	hengqi@linux.alibaba.com, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] virtio_net: Use u64_stats_fetch_begin() for stats fetch
-Message-ID: <20240619043442-mutt-send-email-mst@kernel.org>
-References: <20240619025529.5264-1-lirongqing@baidu.com>
+        Wed, 19 Jun 2024 01:39:47 -0700 (PDT)
+Date: Wed, 19 Jun 2024 04:39:47 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: "Singhai, Anjali" <anjali.singhai@intel.com>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, 
+ "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, 
+ Boris Pismenny <borisp@nvidia.com>, 
+ "gal@nvidia.com" <gal@nvidia.com>, 
+ "cratiu@nvidia.com" <cratiu@nvidia.com>, 
+ "rrameshbabu@nvidia.com" <rrameshbabu@nvidia.com>, 
+ "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>, 
+ "tariqt@nvidia.com" <tariqt@nvidia.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, 
+ "Acharya, Arun Kumar" <arun.kumar.acharya@intel.com>
+Message-ID: <66729953651ba_2751bc294fa@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CO1PR11MB49939CBC31BC13472404094793CE2@CO1PR11MB4993.namprd11.prod.outlook.com>
+References: <CO1PR11MB49939CBC31BC13472404094793CE2@CO1PR11MB4993.namprd11.prod.outlook.com>
+Subject: Re: [RFC net-next 00/15] add basic PSP encryption for TCP connections
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240619025529.5264-1-lirongqing@baidu.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 19, 2024 at 10:55:29AM +0800, Li RongQing wrote:
-> This place is fetching the stats, so u64_stats_fetch_begin
-> and u64_stats_fetch_retry should be used
-> 
-> Fixes: 6208799553a8 ("virtio-net: support rx netdim")
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+Singhai, Anjali wrote:
+> =
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> In reference to this patch series
+> https://lore.kernel.org/netdev/20240510030435.120935-1-kuba@kernel.org/=
+#t
+> =
 
-> ---
->  drivers/net/virtio_net.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 61a57d1..b669e73 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2332,16 +2332,18 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
->  static void virtnet_rx_dim_update(struct virtnet_info *vi, struct receive_queue *rq)
->  {
->  	struct dim_sample cur_sample = {};
-> +	unsigned int start;
->  
->  	if (!rq->packets_in_napi)
->  		return;
->  
-> -	u64_stats_update_begin(&rq->stats.syncp);
-> -	dim_update_sample(rq->calls,
-> -			  u64_stats_read(&rq->stats.packets),
-> -			  u64_stats_read(&rq->stats.bytes),
-> -			  &cur_sample);
-> -	u64_stats_update_end(&rq->stats.syncp);
-> +	do {
-> +		start = u64_stats_fetch_begin(&rq->stats.syncp);
-> +		dim_update_sample(rq->calls,
-> +				u64_stats_read(&rq->stats.packets),
-> +				u64_stats_read(&rq->stats.bytes),
-> +				&cur_sample);
-> +	} while (u64_stats_fetch_retry(&rq->stats.syncp, start));
->  
->  	net_dim(&rq->dim, cur_sample);
->  	rq->packets_in_napi = 0;
-> -- 
-> 2.9.4
+> Thanks a lot  for the PSP crypto enabling patches in the kernel.
+> Some points that we noticed that could use some enhancements/fixes
+> =
+
+> 1. Why do we need =C2=A0ndo_op set_config() at device level which is se=
+tting only one version, instead the description above the psp_dev struct =
+which had a mask for enabled versions at a=C2=A0 device level is better a=
+nd device lets the stack know at psp_dev create time what all versions it=
+ is capable of.  Later on, version is negotiated with the peer and set pe=
+r session.
+> Even the Mellanox driver does not implement this set_config ndo_op. =
+
+> =C2=A0
+> 2. Where is the association_index/handle returned to the stack to be us=
+ed with the packet on TX by the driver and device? ( if an SADB is in use=
+ on Tx side in the device), what we understand from Mellanox driver is, i=
+ts not doing an SADB in TX in HW, but passing the key directly into the T=
+x descriptor? Is that right, but other devices may not support this and w=
+ill have an SADB on TX and this allowed as per PSP protocol. Of course on=
+ RX there is no SADB for any device.
+> In our device we have 2 options, =
+
+>              1. Using SADB on TX and just passing SA_Index in the descr=
+iptor (trade off between performance and memory. =
+
+>               As  passing key in descriptor makes for a much larger TX =
+descriptor which will have perf penalty.)
+>              2. Passing key in the descriptor.
+> =C2=A0             For us we need both these options, so please allow f=
+or enhancements.
+> =
+
+> 3. About the PSP and UDP header addition, why is the driver doing it? I=
+ guess it's because the SW equivalent for PSP support in the kernel does =
+not exist and just an offload for the device. Again in this case the assu=
+mption is either the driver does it or the device will do it.
+> Hope that is irrelevant for the stack. In our case most likely it will =
+be the device doing it.
+> =
+
+> 4. Why is the driver adding the PSP trailer? Hoping this is between the=
+ driver and the device, in our case it's the device that will add the tra=
+iler.
+
+This does not adhere to the spec:
+
+"An option must be provided that enables upper-level software to send pac=
+kets that are
+pre-formatted to include the headers required for PSP encapsulation. In t=
+his case, the
+NIC will modify the contents of the headers appropriately, apply
+encryption/authentication, and add the PSP trailer to the packet."
+
+https://raw.githubusercontent.com/google/psp/main/doc/PSP_Arch_Spec.pdf
+
+ =C2=A0
+> 5. Five way handshake, can this be optimized to 3 way?
+> Here is what we think is happening right now at the IKE level interacti=
+on for the two ends of the session, as PSP protocol does not define it bu=
+t based on the implementation this is what we gathered.
+>   Looks like its 5 way handshake that is happening with the session par=
+tner.
+>    For example two sides are called Tx session partner and RX session p=
+artner, just because TX initiates the session creation, of course it's a =
+full duplex session.
+>              1. TX session partner sends over sideband tls channel to t=
+he Rx session partner what all versions the TX can do based on caps learn=
+t from the device driver.
+>              2. The Rx session partner replies with what common version=
+s it can do back to TX session partner based on dev caps it learnt from t=
+he device.
+
+In practice in reasonably homogeneous hyperscale environments, this
+step can be skipped. To be in spec devices must support both 128b
+and 256b AES-GCM (and nothing else). It is an organizational choice
+which to deploy.
+
+>              3. Tx session partner tells the driver to generate a spi a=
+n session key for the rx side by specifying the version it wants to use f=
+or this session. And then sends to Rx session partner the spi and session=
+ key and version selected etc.
+>              4. The Rx session partner at its end then talks to its dri=
+ver to generate a spi an session key for the rx side by specifying the ve=
+rsion sent from TX session partner. And then sends to Tx session partner =
+the spi and session key and version selected etc. The RX session partner =
+also programs the session key and spi it received from TX session partner=
+ in HW in its Tx SADB (psp_assoc_add)
+>             5. Tx session partner programs the received SPI and session=
+ key in its HW in its Tx SADB (psp_assoc_add). When done it sends an ACK =
+back to Rx session partner that the session is ready.
+>  =
+
+> Should this be optimized to a  3 way handshake to allow for faster sess=
+ion setup? 1 and 3 and 2 and 4 could be combined in an intelligent way. A=
+gain may be there is already an optimized way to do 3 way handshake here =
+and the kernel-driver flow still looks the same.
+> =
+
+> Thanks
+> Anjali
+> =
+
+
 
 
