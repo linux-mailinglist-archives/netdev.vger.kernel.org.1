@@ -1,211 +1,174 @@
-Return-Path: <netdev+bounces-104794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7632390E681
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 11:07:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC87C90E689
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 11:08:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B9931C21530
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:07:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A7B2283508
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3FC6770F5;
-	Wed, 19 Jun 2024 09:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F31D7EF10;
+	Wed, 19 Jun 2024 09:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iGDonf6M"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YxUESXmH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86A52139CD
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 09:07:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE647BB15
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 09:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718788060; cv=none; b=EgtczkRd5yq0FZJ5CY2Lg7o8ae1/AoLCds4egMgwetAXmKgHilGfmFAlT+BPLG1l9YelyeqDrHMugv64ON+xyp5FQsk1DAayTMEgvqFiLy7eCAI1OOLzCfYD2/esEdMG3HfdnKaH6OGdSos+SpvQt8Yz2jePnsNhBqriV286Ofg=
+	t=1718788124; cv=none; b=kryLYlqdfuNfyushxjGBkQc2yPO89ws7WEHo6AqkxJC2Cj1xV46U4nDXg9QAftVhz6TBscnf4dhtNNrLS/hocmckLAjbLiV/PXxP6+oS8h2yCAG3OgNT3zdlF8ZkOtxKHiPokiAMX4tTtDae/0lni55kTshLoEgrJQNyaPH19oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718788060; c=relaxed/simple;
-	bh=NQVWWg76uzx9c7sOz2NReyLbKGOFOQCF4FoB84SLZls=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EqEkEtajMziw0BG1AsPgR8qBU9efHYiekvY8vT8TfcvH+TP49/5G2egt0HRB9zvB0C7MD0IhdhdLfgxXE07P8dWm2PV+g3zpHLsucK0ArLJ9AU58pItTFlxz/DpNa9ysliJlDpcsyNTwvIqKLbDcSn0ef/rM39011qNzoVP+UHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iGDonf6M; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-57d119fddd9so2994a12.1
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 02:07:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718788057; x=1719392857; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w040dDSggZKx2nZfSuhbq5UJxonhiqKtPHidmMpJCDg=;
-        b=iGDonf6MLJStjsLCV5m4q4NdrWnCPQcwMOMXyNBRsydT5jO1d68galnGmA9gGpqt/F
-         MOtP1oiWC25QneX9QVFl+KKtQK4n8uegDQc19Z0s8GEGytl3y1c2jtzbxDsrVckv8x32
-         rTQVJTmyUm/pp8dBGvFVTAuEDa5Q8radCItEWNEBnyWM+BX0EVefC8zvJhWK52m+pVN1
-         hU/FKd5rZHL98l/fJz8+b9m9+P40oWCNpmbC4OaqMfjZQQFAk4cOWCRZgquXGJO8TqPr
-         jLJ8CawMAGr4gSVhSrtMWuyvAXPO/eccY/KaAMJVsyn+u6j0pQHEFtjUa7VKVSdq3lTt
-         Y9uQ==
+	s=arc-20240116; t=1718788124; c=relaxed/simple;
+	bh=l5ExirGQyRAtIOk0NhDOS9E3Rwzt/v5G6frBd1Eto7s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gnu57kglWOd3p8ITg6OUARV22enlOZm9QZoSMB2uR5iGMsU69H5EoWK1rFoNx+YzH9b+VhoHMW0BnecrPIGiN5lLpAluXYEuiz3RatKJIAeecBoN0snyJoTOXx+mAK4WNekXFsd2TSMz73A3LXzBVDQysUTIsdiUhC1c71CAshU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YxUESXmH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718788121;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H6etdIHf+vLceRRGRQM9DwQ8BkpeTzkHdW5ywbuRdZ8=;
+	b=YxUESXmHoEKmvjteEhnW1RQ0Ii71b5H9qCKXN9LLlZUUFvnP6OoHo88kJYaLLVt87FJJA7
+	6+lOklSuX1Kfy8Y73Ocv4eYhKBpd8H0BGtzE9qEwAbQ9PiEUMvs6ITqGNPFjyWhGY7x+Dw
+	8yR/ihi71uBdvA6pFxW4hT8iz2eZ4BQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-478-wzWpIIZQMlKSgVaVjCYQfg-1; Wed, 19 Jun 2024 05:08:40 -0400
+X-MC-Unique: wzWpIIZQMlKSgVaVjCYQfg-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42120e123beso56504785e9.0
+        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 02:08:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718788057; x=1719392857;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w040dDSggZKx2nZfSuhbq5UJxonhiqKtPHidmMpJCDg=;
-        b=Vka1H+pcbKzpY6G0Wq7zdlmszr61OWWhDKzK0SV/o1XzlqD/AwZsgM8KlAFswYVqVI
-         b6jlXozJIALgfH8+HUBeV3CG6VfaOnVA7GnrGQLPQdSLsmbGx1gj9i2M1CttXqdDVwvx
-         9nZ6LC88E6MGqkWV5OX0lnmrWdMPgrOjutVJ3wXqwRR9sJI3VFs9/+xJpXG6+5RvXwyW
-         FGH9BmR8lkA/7UNQq08/I1yxQWYm2Cx0nru8MbXiq7D0EaAVkU5u71jFKoUbgjmzgJcz
-         4R2E7lhOwHvf/JqGJk9vgrZ09+1p1HGLPermbjuz+GigQouccaUpmmkVPZAsipczJGc1
-         Kt+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVbgBzf0bVlv98p4Skf0ERMGCsKFR74iKrndx+4lF3EayJeRPLF0zP7VerXdbaj+AFyKie4bCOb1YQ+rzX7xWqnS4sv91dP
-X-Gm-Message-State: AOJu0YyEgUZ8jW6Id0+04ewmvf6sLRk9WJE50s+4DQZy4CFaHKo07y/8
-	HwORXU4KfS4TZuUu2I6M/o09JqIFY5pQ8cZBgkgWnGcIuByiN0Kw+0IxgdmYtpQuJyxaAz2riO8
-	wM5hUv6zlp/GrMhHr7w+9FO6DsRbk3rx9czIs
-X-Google-Smtp-Source: AGHT+IElx942k2fjN+uRGV/WODZr3r0SpvBDEzr451hiqnQXMwt0fRXsF+AR2hfpZbUVs8vVoRsS/ioUtJlCWboGOAE=
-X-Received: by 2002:a05:6402:278f:b0:57c:d1dd:e645 with SMTP id
- 4fb4d7f45d1cf-57d0ec619f9mr96189a12.5.1718788056714; Wed, 19 Jun 2024
- 02:07:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718788119; x=1719392919;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H6etdIHf+vLceRRGRQM9DwQ8BkpeTzkHdW5ywbuRdZ8=;
+        b=NOoNh/Z9DOiU1LiiM4eH0jYze2nTgXuv80eZjx05vfo2yTDLEuDrTsnKJsmK9oKI/d
+         zhVMF02b7PS19a1BtqSnUMiOc8am9f3wWQW4o5MqSOzjI8BZUoHYVjweTT5bMpb99nTx
+         RBSC0haDlRgXTD0YacXFSfKQK5DnfLiWiGkadj0i+vSTotjgWuf7rmLRd3oV0cSMj77t
+         OxooJfHiZGajgrbZyqx6+DmCMgQO/8Ds3xPMrUjdgMg/bbddCjETaaaxfI4qaI/nFSj5
+         EKFW0zusfNUcZLOIxZmR32H26hr55EuOeyh6fq2KS/M+8MMdkPTE556EkIRh3vMZrBnK
+         G8JQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVqAPswyN+X25eyt92G12/VZ+GQO8P8VoLGmtd8k5UWl0O6FYnbARVifh8ISEH6909j312GQcC2CnhCtFF9/BMh43brvtlQ
+X-Gm-Message-State: AOJu0Yzy8F9Y/QJOiWcSV+Aedk63wVTKMjahzLh0L9XSkOovNGGhl7d6
+	tINEojM5TP70lQAfPU9X15OmPJwwSAe10C4xACKjfntG/njo0NkDcs4RWyc+2uriptKPsoGjHV6
+	WIkhehBjaLXfvUCcRYaMSGUZUoj2Nzqurpe3XQLA3270V2FA3H+jE9g==
+X-Received: by 2002:a05:600c:214c:b0:422:683b:df31 with SMTP id 5b1f17b1804b1-424750796a4mr16406165e9.7.1718788118661;
+        Wed, 19 Jun 2024 02:08:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEDmHDeUKSzvwFZloG+Wasg47pkCbBVp7dtO2iM2/FT/vYQ18GUuBHQi2kxayKUmsy2s8xgdg==
+X-Received: by 2002:a05:600c:214c:b0:422:683b:df31 with SMTP id 5b1f17b1804b1-424750796a4mr16405765e9.7.1718788117895;
+        Wed, 19 Jun 2024 02:08:37 -0700 (PDT)
+Received: from redhat.com ([2.52.146.100])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422870e9681sm260339195e9.28.2024.06.19.02.08.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jun 2024 02:08:37 -0700 (PDT)
+Date: Wed, 19 Jun 2024 05:08:32 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jani Nikula <jani.nikula@intel.com>
+Cc: Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Carlos Bilbao <carlos.bilbao.osdev@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	workflows@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	ksummit@lists.linux.dev
+Subject: Re: [PATCH 2/2] Documentation: best practices for using Link trailers
+Message-ID: <20240619050715-mutt-send-email-mst@kernel.org>
+References: <20240618-docs-patch-msgid-link-v1-0-30555f3f5ad4@linuxfoundation.org>
+ <20240618-docs-patch-msgid-link-v1-2-30555f3f5ad4@linuxfoundation.org>
+ <87r0ctfh93.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240615160800.250667-1-edumazet@google.com> <87sexbsvqj.fsf@toke.dk>
-In-Reply-To: <87sexbsvqj.fsf@toke.dk>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 19 Jun 2024 11:07:25 +0200
-Message-ID: <CANn89iK=9_oWemL+qoHcrPH=hWe49NKJr9=tuGQ2yMqXVNOaaw@mail.gmail.com>
-Subject: Re: [PATCH net] wifi: cfg80211: restrict NL80211_ATTR_TXQ_QUANTUM values
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87r0ctfh93.fsf@intel.com>
 
-On Mon, Jun 17, 2024 at 12:35=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rgensen <=
-toke@toke.dk> wrote:
->
-> Eric Dumazet <edumazet@google.com> writes:
->
-> > syzbot is able to trigger softlockups, setting NL80211_ATTR_TXQ_QUANTUM
-> > to 2^31.
+On Wed, Jun 19, 2024 at 11:50:48AM +0300, Jani Nikula wrote:
+> On Tue, 18 Jun 2024, Konstantin Ryabitsev <konstantin@linuxfoundation.org> wrote:
+> > Based on multiple conversations, most recently on the ksummit mailing
+> > list [1], add some best practices for using the Link trailer, such as:
 > >
-> > We had a similar issue in sch_fq, fixed with commit
-> > d9e15a273306 ("pkt_sched: fq: do not accept silly TCA_FQ_QUANTUM")
+> > - how to use markdown-like bracketed numbers in the commit message to
+> > indicate the corresponding link
+> > - when to use lore.kernel.org vs patch.msgid.link domains
 > >
-> > watchdog: BUG: soft lockup - CPU#1 stuck for 26s! [kworker/1:0:24]
-> > Modules linked in:
-> > irq event stamp: 131135
-> >  hardirqs last  enabled at (131134): [<ffff80008ae8778c>] __exit_to_ker=
-nel_mode arch/arm64/kernel/entry-common.c:85 [inline]
-> >  hardirqs last  enabled at (131134): [<ffff80008ae8778c>] exit_to_kerne=
-l_mode+0xdc/0x10c arch/arm64/kernel/entry-common.c:95
-> >  hardirqs last disabled at (131135): [<ffff80008ae85378>] __el1_irq arc=
-h/arm64/kernel/entry-common.c:533 [inline]
-> >  hardirqs last disabled at (131135): [<ffff80008ae85378>] el1_interrupt=
-+0x24/0x68 arch/arm64/kernel/entry-common.c:551
-> >  softirqs last  enabled at (125892): [<ffff80008907e82c>] neigh_hh_init=
- net/core/neighbour.c:1538 [inline]
-> >  softirqs last  enabled at (125892): [<ffff80008907e82c>] neigh_resolve=
-_output+0x268/0x658 net/core/neighbour.c:1553
-> >  softirqs last disabled at (125896): [<ffff80008904166c>] local_bh_disa=
-ble+0x10/0x34 include/linux/bottom_half.h:19
-> > CPU: 1 PID: 24 Comm: kworker/1:0 Not tainted 6.9.0-rc7-syzkaller-gfda56=
-95d692c #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS=
- Google 03/27/2024
-> > Workqueue: mld mld_ifc_work
-> > pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=3D--)
-> >  pc : __list_del include/linux/list.h:195 [inline]
-> >  pc : __list_del_entry include/linux/list.h:218 [inline]
-> >  pc : list_move_tail include/linux/list.h:310 [inline]
-> >  pc : fq_tin_dequeue include/net/fq_impl.h:112 [inline]
-> >  pc : ieee80211_tx_dequeue+0x6b8/0x3b4c net/mac80211/tx.c:3854
-> >  lr : __list_del_entry include/linux/list.h:218 [inline]
-> >  lr : list_move_tail include/linux/list.h:310 [inline]
-> >  lr : fq_tin_dequeue include/net/fq_impl.h:112 [inline]
-> >  lr : ieee80211_tx_dequeue+0x67c/0x3b4c net/mac80211/tx.c:3854
-> > sp : ffff800093d36700
-> > x29: ffff800093d36a60 x28: ffff800093d36960 x27: dfff800000000000
-> > x26: ffff0000d800ad50 x25: ffff0000d800abe0 x24: ffff0000d800abf0
-> > x23: ffff0000e0032468 x22: ffff0000e00324d4 x21: ffff0000d800abf0
-> > x20: ffff0000d800abf8 x19: ffff0000d800abf0 x18: ffff800093d363c0
-> > x17: 000000000000d476 x16: ffff8000805519dc x15: ffff7000127a6cc8
-> > x14: 1ffff000127a6cc8 x13: 0000000000000004 x12: ffffffffffffffff
-> > x11: ffff7000127a6cc8 x10: 0000000000ff0100 x9 : 0000000000000000
-> > x8 : 0000000000000000 x7 : 0000000000000000 x6 : 0000000000000000
-> > x5 : ffff80009287aa08 x4 : 0000000000000008 x3 : ffff80008034c7fc
-> > x2 : ffff0000e0032468 x1 : 00000000da0e46b8 x0 : ffff0000e0032470
-> > Call trace:
-> >   __list_del include/linux/list.h:195 [inline]
-> >   __list_del_entry include/linux/list.h:218 [inline]
-> >   list_move_tail include/linux/list.h:310 [inline]
-> >   fq_tin_dequeue include/net/fq_impl.h:112 [inline]
-> >   ieee80211_tx_dequeue+0x6b8/0x3b4c net/mac80211/tx.c:3854
-> >   wake_tx_push_queue net/mac80211/util.c:294 [inline]
-> >   ieee80211_handle_wake_tx_queue+0x118/0x274 net/mac80211/util.c:315
-> >   drv_wake_tx_queue net/mac80211/driver-ops.h:1350 [inline]
-> >   schedule_and_wake_txq net/mac80211/driver-ops.h:1357 [inline]
-> >   ieee80211_queue_skb+0x18e8/0x2244 net/mac80211/tx.c:1664
-> >   ieee80211_tx+0x260/0x400 net/mac80211/tx.c:1966
-> >   ieee80211_xmit+0x278/0x354 net/mac80211/tx.c:2062
-> >   __ieee80211_subif_start_xmit+0xab8/0x122c net/mac80211/tx.c:4338
-> >   ieee80211_subif_start_xmit+0xe0/0x438 net/mac80211/tx.c:4532
-> >   __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
-> >   netdev_start_xmit include/linux/netdevice.h:4917 [inline]
-> >   xmit_one net/core/dev.c:3531 [inline]
-> >   dev_hard_start_xmit+0x27c/0x938 net/core/dev.c:3547
-> >   __dev_queue_xmit+0x1678/0x33fc net/core/dev.c:4341
-> >   dev_queue_xmit include/linux/netdevice.h:3091 [inline]
-> >   neigh_resolve_output+0x558/0x658 net/core/neighbour.c:1563
-> >   neigh_output include/net/neighbour.h:542 [inline]
-> >   ip6_finish_output2+0x104c/0x1ee8 net/ipv6/ip6_output.c:137
-> >   ip6_finish_output+0x428/0x7a0 net/ipv6/ip6_output.c:222
-> >   NF_HOOK_COND include/linux/netfilter.h:303 [inline]
-> >   ip6_output+0x270/0x594 net/ipv6/ip6_output.c:243
-> >   dst_output include/net/dst.h:450 [inline]
-> >   NF_HOOK+0x160/0x4f0 include/linux/netfilter.h:314
-> >   mld_sendpack+0x7b4/0x10f4 net/ipv6/mcast.c:1818
-> >   mld_send_cr net/ipv6/mcast.c:2119 [inline]
-> >   mld_ifc_work+0x840/0xd0c net/ipv6/mcast.c:2650
-> >   process_one_work+0x7b8/0x15d4 kernel/workqueue.c:3267
-> >   process_scheduled_works kernel/workqueue.c:3348 [inline]
-> >   worker_thread+0x938/0xef4 kernel/workqueue.c:3429
-> >   kthread+0x288/0x310 kernel/kthread.c:388
-> >   ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-> >
-> > Fixes: 52539ca89f36 ("cfg80211: Expose TXQ stats and parameters to user=
-space")
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
->
-> Hmm, extraneous s-o-b? :)
->
+> > Cc: ksummit@lists.linux.dev
+> > Link: https://lore.kernel.org/20240617-arboreal-industrious-hedgehog-5b84ae@meerkat # [1]
+> > Signed-off-by: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
 > > ---
-> >  net/wireless/nl80211.c | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
+> >  Documentation/process/maintainer-tip.rst | 24 ++++++++++++++++++------
+> >  1 file changed, 18 insertions(+), 6 deletions(-)
 > >
-> > diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-> > index 3c0bca4238d357c01b6fe92bb0f2b2b8a2917725..72c7bf55858166b8fc12114=
-f090bf085d652db6b 100644
-> > --- a/net/wireless/nl80211.c
-> > +++ b/net/wireless/nl80211.c
-> > @@ -468,6 +468,10 @@ static const struct netlink_range_validation nl802=
-11_punct_bitmap_range =3D {
-> >       .max =3D 0xffff,
-> >  };
-> >
-> > +static const struct netlink_range_validation q_range =3D {
-> > +     .max =3D INT_MAX,
-> > +};
->
-> The corresponding fixes to sch_fq and fq_codel use a limit of 1<<20;
-> INT_MAX is a bit above that, won't that still lead to issues?
+> > diff --git a/Documentation/process/maintainer-tip.rst b/Documentation/process/maintainer-tip.rst
+> > index 64739968afa6..57ffa553c21e 100644
+> > --- a/Documentation/process/maintainer-tip.rst
+> > +++ b/Documentation/process/maintainer-tip.rst
+> > @@ -375,14 +375,26 @@ following tag ordering scheme:
+> >     For referring to an email on LKML or other kernel mailing lists,
+> >     please use the lore.kernel.org redirector URL::
+> >  
+> > -     https://lore.kernel.org/r/email-message@id
+> > +     Link: https://lore.kernel.org/email-message@id
+> >  
+> > -   The kernel.org redirector is considered a stable URL, unlike other email
+> > -   archives.
+> > +   This URL should be used when referring to relevant mailing list
+> > +   resources, related patch sets, or other notable discussion threads.
+> > +   A convenient way to associate Link trailers with the accompanying
+> > +   message is to use markdown-like bracketed notation, for example::
+> >  
+> > -   Maintainers will add a Link tag referencing the email of the patch
+> > -   submission when they apply a patch to the tip tree. This tag is useful
+> > -   for later reference and is also used for commit notifications.
+> > +     A similar approach was attempted before as part of a different
+> > +     effort [1], but the initial implementation caused too many
+> > +     regressions [2], so it was backed out and reimplemented.
+> > +
+> > +     Link: https://lore.kernel.org/some-msgid@here # [1]
+> > +     Link: https://bugzilla.example.org/bug/12345  # [2]
+> > +
+> > +   When using the ``Link:`` trailer to indicate the provenance of the
+> > +   patch, you should use the dedicated ``patch.msgid.link`` domain. This
+> > +   makes it possible for automated tooling to establish which link leads
+> > +   to the original patch submission. For example::
+> 
+> Mostly highlighting my own ignorance here, but s/provenance/origin/
+> would've felt more obvious to me, as a non-native speaker.
+> 
+> BR,
+> Jani.
 
-What kind of  issues do you envision ?
+Or even "origin (message id)" to be very explicit.
 
-I do not know what kind of aggregation level wireless will have in 2030.
+
+
+
+
+
+> 
+> > +
+> > +     Link: https://patch.msgid.link/patch-source-msgid@here
+> >  
+> >  Please do not use combined tags, e.g. ``Reported-and-tested-by``, as
+> >  they just complicate automated extraction of tags.
+> 
+> -- 
+> Jani Nikula, Intel
+
 
