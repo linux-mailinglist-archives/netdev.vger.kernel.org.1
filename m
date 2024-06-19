@@ -1,88 +1,89 @@
-Return-Path: <netdev+bounces-104931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7509190F2C8
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 17:47:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EFB790F2D3
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 17:48:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 627DB1C20ADE
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 15:47:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14D5D28599C
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 15:48:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18816155A5F;
-	Wed, 19 Jun 2024 15:42:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC94152796;
+	Wed, 19 Jun 2024 15:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FOdrZtS6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I1hCtMbX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5E415217B
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 15:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E17152524
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 15:43:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718811760; cv=none; b=QzS0Wo6KQCAMRoRsILw0SFaSSiSlyGtsequxz9kW79dcgViB4Zw/GjrM0SERS5uC524GDSdOnZ65fpDxKeTHuIqESuIa0atNXXcn0uS3AF1ZpPjdzvRED9ZS8esRB7PSuU2qrmHP6gqtV91ctWe7z2SaMZaqww/suhtufh2HC9g=
+	t=1718811840; cv=none; b=gyCKM3WXTOMR1n7yDns6v42eGt0sZqYBZwxn/VXxoE8+TLzu6aTBdYZXmriX/eFVq1mLXb4aBRJx0hlHWVDFhOoSvQLd+pJ3C7LjS3Mw2VpO8b3a7zeTRR6BsMHqbcJQ6ULsRMFMWBLMxviFaG7Y1SEIZ75Zco0QnAfkwQ2HUfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718811760; c=relaxed/simple;
-	bh=r3S0o9Uy+b0Ct4Au4E+urxDBNo11gsW0f6e+kbvt6Lg=;
+	s=arc-20240116; t=1718811840; c=relaxed/simple;
+	bh=gjIlVC0Qv56i7mNLzpX6QNyDh2wQBd29Qq8BecOvO84=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ww3HueWVMx1GlLjCHL25l4foBxbp8J+7NOvHEWc9hUo/conQAYQvjA55xTJI2/BAfwF2gFGBfln1hPIPK/+1UkRCu7Sln3ePALFMD+C7Mt2nyDDcEyynIz+goJN3KFYbA/BCzNnX0e3bFNP8YmHqFTxC+HN53jFGaNdVlb7z5a8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FOdrZtS6; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=V0jl80xlrwZd+AZdf494TNIM3Z8ytKQHoQhpX23QQQwQatQoWvm0FiPvADPmypi+hq1WGdKttXjhdgvRSNIHiqV7I6siPi8WWQcyloejZlf20uJXV1IRsr3OPUJcq0sIC2LB3ZON/+oVBYVr31bsPnXB0MOSrFeCOkJ6WjsEF3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I1hCtMbX; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718811757;
+	s=mimecast20190719; t=1718811838;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mWeCp7im8c0vN79ATol7MWl+xsx12ADLqXIpUJMFdcQ=;
-	b=FOdrZtS6OhNjn9zh1pR1htx96kLiM4LEQGmiEdLud0YmgThFBmpWjrwsZbsE2kSsmrSuEp
-	JB8UWW91QI1VfXchE7SIS5hPBwopCZkJf8kExjE2C+d0SwTs5gst2Up3vlKdEyJ49ATq5c
-	zlCh6AiWzHvU+tvV02nT5Upm+whZUXI=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=3fKPssBEwyag1A5CHcVe8reEUsaYqb5YQavo355OrZo=;
+	b=I1hCtMbXNHdeXpNSZ9TcW6wQ4oF4/GLnR4mh/44GiC7pQ/6Ed1joM2Ahy/tqrepP8QO9Gu
+	Py/Gd4mTWTpZzoh0WEw2s3/LtK46TQL9JYoPTtc8tUNzzEGs701TekhKQAC1dDJ5JWy6W4
+	zAz6Jv4xz+X8pR6vjwsP2Ec3Ko9Fld0=
+Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
+ [209.85.219.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-443-BsOf53UqNYmUqVSD0UyoYA-1; Wed, 19 Jun 2024 11:42:36 -0400
-X-MC-Unique: BsOf53UqNYmUqVSD0UyoYA-1
-Received: by mail-yb1-f197.google.com with SMTP id 3f1490d57ef6-dfb2fc8ca5dso11882191276.1
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 08:42:36 -0700 (PDT)
+ us-mta-74-SQPF_29fPyurEbXODOUOwA-1; Wed, 19 Jun 2024 11:43:57 -0400
+X-MC-Unique: SQPF_29fPyurEbXODOUOwA-1
+Received: by mail-yb1-f200.google.com with SMTP id 3f1490d57ef6-dfe44496da9so11886558276.0
+        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 08:43:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718811755; x=1719416555;
+        d=1e100.net; s=20230601; t=1718811836; x=1719416636;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mWeCp7im8c0vN79ATol7MWl+xsx12ADLqXIpUJMFdcQ=;
-        b=HdvNPdn7Rc5TnaKO+LyOue2/wwlj99/AeWi+hXlAmBBmChCIns4EiSHLee+by+skaK
-         a/FPk8HJDtCT6xumo4McgJTicybeOlZTMlZuLfXyGywnjoiO93qkkjMxPGmD5NZHo0D4
-         VBy03blCWFJIZzVr6ajJq/y71jA2se15+4vlvwwfO9wwERWYlK6LeaYzptsfVahWPdSv
-         3KCP6B5OayWIsz1879q+F4cT4yK658XNz+KPgqjIQtevPlrylCubIiHc9hb9iHz+J/yK
-         D9pAuDIR90J3nx2quc1sUSKSZ2BGMAdF3w6n9ZxR9Wzs3VCe0COD5PYEH3uehykBhUot
-         6VHA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFk8rtMo7PUio6AcQFpRZby6OMgnaHVPCYiUpWOneBhDG8RibZYNdRQE2Za8nNx68Uzspwk6T5CVcZBdT2Al6IWv9Ed3zX
-X-Gm-Message-State: AOJu0YzSn0uZf0UoUBFrEkNEL2xqqw7OfsA1GVhJGRQ4KchzBXOgXd4w
-	mqW/wC/oeQzVHt/Z78ZggI0+kdyplWdcvxorOCwEcK2O020s8dJw8E70udR7MYxMdbqXE6lFxPJ
-	3AhlwyvRyIZRdDC5W5cBpJ4BTmrxWeilXbcqbH7ZJgjpskYWhLFpLOS15Ti7CAqo7XRTFCWNZAL
-	dic8tO604MwEkjnkYceonSOYgzpdqm
-X-Received: by 2002:a25:5f48:0:b0:dfa:e6fc:f4f with SMTP id 3f1490d57ef6-e02be0ff385mr3237929276.3.1718811755576;
-        Wed, 19 Jun 2024 08:42:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHYFnJHqbL6C9lWb1iUUgLw7ce3DxBh86jcwt8SSK5e/nf2ez29b1wrV7XJN9GS5D+7kcL73Lq48K7ceY8ocnE=
-X-Received: by 2002:a25:5f48:0:b0:dfa:e6fc:f4f with SMTP id
- 3f1490d57ef6-e02be0ff385mr3237912276.3.1718811755205; Wed, 19 Jun 2024
- 08:42:35 -0700 (PDT)
+        bh=3fKPssBEwyag1A5CHcVe8reEUsaYqb5YQavo355OrZo=;
+        b=rOS2CwTA/YPQxm1exo8haTeps30AmTmI0GPPYjGWvPV8GAuWsI2S6vzVlQXTRoMxLl
+         lu5R6jIiCN8SFzt8N2D5b0jWTz8nP1bWZXR/ljN+WS5tWePxCQdFGyr3Npcgiknh8Gku
+         GWjM4MB+mIjcgUruJbSq0LzB6O0Y0Ke5y/1vonPc/MgcP5Mgsncg0Z8bSdBsRxZovi15
+         WhVbyawjDTdwFuAiYIlncr+hNxhLAYVm/KgCcD/YONZ+yl5u2CFLjTVgdHSFNxy8Cume
+         mqT9dMYLIw5EuMNioXT/C/MYspH1qzy0lww5iueZaMV2spqHhNo1B3wTjl6lmaJ063qz
+         E9tQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVIKNQPwgObYIAGqUrzrE1KYR+YI7d23GAwYmkwA7vGsWlznMTrh+tmasmuorlywSxGYW9JjtJQ/UnJfGit6U0dcb01gfuC
+X-Gm-Message-State: AOJu0Yz3pNd+UWTCUJnXgdqAYJAiZF6+2OoG+YVfjFuKWgF38exRVrzq
+	l+lLJviwVhOh9aali5wMJbAOr57G3jea0GMmF/EGPKn9ombOwcD4DV69XtogMIDQEUl0uJ5iCKu
+	KRNrBOPXqHkgROAJxcUydoBbZ6wRkEnGeyz4JDRK1piU33WF+z5K28Nev4YMWJQ1cM6//KyU64Y
+	K//P5TXd78yHYL+iehVDMw1WrM8gr7
+X-Received: by 2002:a25:ab90:0:b0:dff:3055:3c26 with SMTP id 3f1490d57ef6-e02be20b4b0mr3347989276.40.1718811836567;
+        Wed, 19 Jun 2024 08:43:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHuq/mg3ERM9FqZxfhIbhFa52BBDZJDga9awTj9rzgPpjCM8aGAm1pB6AklaTDW2TTBksgypWtCPQxl0ge9AZY=
+X-Received: by 2002:a25:ab90:0:b0:dff:3055:3c26 with SMTP id
+ 3f1490d57ef6-e02be20b4b0mr3347976276.40.1718811836245; Wed, 19 Jun 2024
+ 08:43:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240617-stage-vdpa-vq-precreate-v1-0-8c0483f0ca2a@nvidia.com> <20240617-stage-vdpa-vq-precreate-v1-16-8c0483f0ca2a@nvidia.com>
-In-Reply-To: <20240617-stage-vdpa-vq-precreate-v1-16-8c0483f0ca2a@nvidia.com>
+References: <20240617-stage-vdpa-vq-precreate-v1-0-8c0483f0ca2a@nvidia.com> <20240617-stage-vdpa-vq-precreate-v1-17-8c0483f0ca2a@nvidia.com>
+In-Reply-To: <20240617-stage-vdpa-vq-precreate-v1-17-8c0483f0ca2a@nvidia.com>
 From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Wed, 19 Jun 2024 17:41:58 +0200
-Message-ID: <CAJaqyWeoX8iPahvJutHi=r6UyB-z6gqp0QaYUyJz4GxNiORnfg@mail.gmail.com>
-Subject: Re: [PATCH vhost 16/23] vdpa/mlx5: Add error code for suspend/resume VQ
+Date: Wed, 19 Jun 2024 17:43:20 +0200
+Message-ID: <CAJaqyWc3HZpyMj_LVq5nmDaDSijxcXiHAXtjSQMSuS2bZQV-aQ@mail.gmail.com>
+Subject: Re: [PATCH vhost 17/23] vdpa/mlx5: Consolidate all VQ modify to Ready
+ to use resume_vq()
 To: Dragos Tatulea <dtatulea@nvidia.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
 	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Saeed Mahameed <saeedm@nvidia.com>, 
@@ -96,12 +97,14 @@ Content-Transfer-Encoding: quoted-printable
 On Mon, Jun 17, 2024 at 5:09=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
 > wrote:
 >
-> Instead of blindly calling suspend/resume_vqs(), make then return error
-> codes.
+> There are a few more places modifying the VQ to Ready directly. Let's
+> consolidate them into resume_vq().
 >
-> To keep compatibility, keep suspending or resuming VQs on error and
-> return the last error code. The assumption here is that the error code
-> would be the same.
+> The redundant warnings for resume_vq() errors can also be dropped.
+>
+> There is one special case that needs to be handled for virtio-vdpa:
+> the initialized flag must be set to true earlier in setup_vq() so that
+> resume_vq() doesn't return early.
 >
 > Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
 > Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
@@ -109,162 +112,75 @@ On Mon, Jun 17, 2024 at 5:09=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
 Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 
 > ---
->  drivers/vdpa/mlx5/net/mlx5_vnet.c | 77 +++++++++++++++++++++++++++------=
-------
->  1 file changed, 54 insertions(+), 23 deletions(-)
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c | 18 ++++++------------
+>  1 file changed, 6 insertions(+), 12 deletions(-)
 >
 > diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/ml=
 x5_vnet.c
-> index e4d68d2d0bb4..e3a82c43b44e 100644
+> index e3a82c43b44e..f5d5b25cdb01 100644
 > --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
 > +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> @@ -1526,71 +1526,102 @@ static int setup_vq(struct mlx5_vdpa_net *ndev,
->         return err;
->  }
->
-> -static void suspend_vq(struct mlx5_vdpa_net *ndev, struct mlx5_vdpa_virt=
-queue *mvq)
-> +static int suspend_vq(struct mlx5_vdpa_net *ndev, struct mlx5_vdpa_virtq=
-ueue *mvq)
->  {
->         struct mlx5_virtq_attr attr;
-> +       int err;
->
->         if (!mvq->initialized)
-> -               return;
-> +               return 0;
->
->         if (mvq->fw_state !=3D MLX5_VIRTIO_NET_Q_OBJECT_STATE_RDY)
-> -               return;
-> +               return 0;
->
-> -       if (modify_virtqueue_state(ndev, mvq, MLX5_VIRTIO_NET_Q_OBJECT_ST=
-ATE_SUSPEND))
-> -               mlx5_vdpa_warn(&ndev->mvdev, "modify to suspend failed\n"=
-);
-> +       err =3D modify_virtqueue_state(ndev, mvq, MLX5_VIRTIO_NET_Q_OBJEC=
-T_STATE_SUSPEND);
-> +       if (err) {
-> +               mlx5_vdpa_warn(&ndev->mvdev, "modify to suspend failed, e=
-rr: %d\n", err);
-> +               return err;
-> +       }
->
-> -       if (query_virtqueue(ndev, mvq, &attr)) {
-> -               mlx5_vdpa_warn(&ndev->mvdev, "failed to query virtqueue\n=
-");
-> -               return;
-> +       err =3D query_virtqueue(ndev, mvq, &attr);
-> +       if (err) {
-> +               mlx5_vdpa_warn(&ndev->mvdev, "failed to query virtqueue, =
-err: %d\n", err);
-> +               return err;
->         }
-> +
->         mvq->avail_idx =3D attr.available_index;
->         mvq->used_idx =3D attr.used_index;
-> +
-> +       return 0;
->  }
->
-> -static void suspend_vqs(struct mlx5_vdpa_net *ndev)
-> +static int suspend_vqs(struct mlx5_vdpa_net *ndev)
->  {
-> +       int err =3D 0;
->         int i;
->
-> -       for (i =3D 0; i < ndev->cur_num_vqs; i++)
-> -               suspend_vq(ndev, &ndev->vqs[i]);
-> +       for (i =3D 0; i < ndev->cur_num_vqs; i++) {
-> +               int local_err =3D suspend_vq(ndev, &ndev->vqs[i]);
-> +
-> +               err =3D local_err ? local_err : err;
-> +       }
-> +
-> +       return err;
->  }
->
-> -static void resume_vq(struct mlx5_vdpa_net *ndev, struct mlx5_vdpa_virtq=
-ueue *mvq)
+> @@ -160,6 +160,7 @@ static void free_fixed_resources(struct mlx5_vdpa_net=
+ *ndev);
+>  static void init_mvqs(struct mlx5_vdpa_net *ndev);
+>  static int setup_vq_resources(struct mlx5_vdpa_net *ndev, bool filled);
+>  static void teardown_vq_resources(struct mlx5_vdpa_net *ndev);
 > +static int resume_vq(struct mlx5_vdpa_net *ndev, struct mlx5_vdpa_virtqu=
-eue *mvq)
->  {
-> +       int err;
-> +
->         if (!mvq->initialized)
-> -               return;
-> +               return 0;
+eue *mvq);
 >
->         switch (mvq->fw_state) {
->         case MLX5_VIRTIO_NET_Q_OBJECT_STATE_INIT:
->                 /* Due to a FW quirk we need to modify the VQ fields firs=
-t then change state.
->                  * This should be fixed soon. After that, a single comman=
-d can be used.
->                  */
-> -               if (modify_virtqueue(ndev, mvq, 0))
-> +               err =3D modify_virtqueue(ndev, mvq, 0);
-> +               if (err) {
->                         mlx5_vdpa_warn(&ndev->mvdev,
-> -                               "modify vq properties failed for vq %u\n"=
-, mvq->index);
-> +                               "modify vq properties failed for vq %u, e=
-rr: %d\n",
-> +                               mvq->index, err);
-> +                       return err;
-> +               }
->                 break;
->         case MLX5_VIRTIO_NET_Q_OBJECT_STATE_SUSPEND:
->                 if (!is_resumable(ndev)) {
->                         mlx5_vdpa_warn(&ndev->mvdev, "vq %d is not resuma=
-ble\n", mvq->index);
-> -                       return;
-> +                       return -EINVAL;
->                 }
->                 break;
->         case MLX5_VIRTIO_NET_Q_OBJECT_STATE_RDY:
-> -               return;
-> +               return 0;
->         default:
->                 mlx5_vdpa_warn(&ndev->mvdev, "resume vq %u called from ba=
-d state %d\n",
->                                mvq->index, mvq->fw_state);
-> -               return;
-> +               return -EINVAL;
+>  static bool mlx5_vdpa_debug;
+>
+> @@ -1500,16 +1501,14 @@ static int setup_vq(struct mlx5_vdpa_net *ndev,
+>         if (err)
+>                 goto err_vq;
+>
+> +       mvq->initialized =3D true;
+> +
+>         if (mvq->ready) {
+> -               err =3D modify_virtqueue_state(ndev, mvq, MLX5_VIRTIO_NET=
+_Q_OBJECT_STATE_RDY);
+> -               if (err) {
+> -                       mlx5_vdpa_warn(&ndev->mvdev, "failed to modify to=
+ ready vq idx %d(%d)\n",
+> -                                      idx, err);
+> +               err =3D resume_vq(ndev, mvq);
+> +               if (err)
+>                         goto err_modify;
+> -               }
 >         }
 >
-> -       if (modify_virtqueue_state(ndev, mvq, MLX5_VIRTIO_NET_Q_OBJECT_ST=
-ATE_RDY))
-> -               mlx5_vdpa_warn(&ndev->mvdev, "modify to resume failed for=
- vq %u\n", mvq->index);
-> +       err =3D modify_virtqueue_state(ndev, mvq, MLX5_VIRTIO_NET_Q_OBJEC=
-T_STATE_RDY);
-> +       if (err)
-> +               mlx5_vdpa_warn(&ndev->mvdev, "modify to resume failed for=
- vq %u, err: %d\n",
-> +                              mvq->index, err);
-> +
-> +       return err;
+> -       mvq->initialized =3D true;
+>         return 0;
+>
+>  err_modify:
+> @@ -2422,7 +2421,6 @@ static void mlx5_vdpa_set_vq_ready(struct vdpa_devi=
+ce *vdev, u16 idx, bool ready
+>         struct mlx5_vdpa_dev *mvdev =3D to_mvdev(vdev);
+>         struct mlx5_vdpa_net *ndev =3D to_mlx5_vdpa_ndev(mvdev);
+>         struct mlx5_vdpa_virtqueue *mvq;
+> -       int err;
+>
+>         if (!mvdev->actual_features)
+>                 return;
+> @@ -2439,14 +2437,10 @@ static void mlx5_vdpa_set_vq_ready(struct vdpa_de=
+vice *vdev, u16 idx, bool ready
+>         if (!ready) {
+>                 suspend_vq(ndev, mvq);
+>         } else {
+> -               err =3D modify_virtqueue_state(ndev, mvq, MLX5_VIRTIO_NET=
+_Q_OBJECT_STATE_RDY);
+> -               if (err) {
+> -                       mlx5_vdpa_warn(mvdev, "modify VQ %d to ready fail=
+ed (%d)\n", idx, err);
+> +               if (resume_vq(ndev, mvq))
+>                         ready =3D false;
+> -               }
+>         }
+>
+> -
+>         mvq->ready =3D ready;
 >  }
 >
-> -static void resume_vqs(struct mlx5_vdpa_net *ndev)
-> +static int resume_vqs(struct mlx5_vdpa_net *ndev)
->  {
-> -       for (int i =3D 0; i < ndev->cur_num_vqs; i++)
-> -               resume_vq(ndev, &ndev->vqs[i]);
-> +       int err =3D 0;
-> +
-> +       for (int i =3D 0; i < ndev->cur_num_vqs; i++) {
-> +               int local_err =3D resume_vq(ndev, &ndev->vqs[i]);
-> +
-> +               err =3D local_err ? local_err : err;
-> +       }
-> +
-> +       return err;
->  }
->
->  static void teardown_vq(struct mlx5_vdpa_net *ndev, struct mlx5_vdpa_vir=
-tqueue *mvq)
 >
 > --
 > 2.45.1
