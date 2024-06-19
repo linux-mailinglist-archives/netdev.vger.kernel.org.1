@@ -1,336 +1,157 @@
-Return-Path: <netdev+bounces-104888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 659F890EFB4
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:08:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29EC690F003
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:16:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C53B0B243AE
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:08:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADDD3285A40
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:16:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C592F1514DE;
-	Wed, 19 Jun 2024 14:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E810A14A82;
+	Wed, 19 Jun 2024 14:16:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a9jaVW9I"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VEiUsVF8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF6215217B
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 14:07:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570D2125AC
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 14:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718806081; cv=none; b=Rer/gzivHsAy52rmysRXI4tc3HET6BMMdsQs/ht7yjFL8VqSWuuksLTXekx7c0Az1hlCIdBUolQdpSTPBlrjNQiUvH7R9xfjlLunbaC8Kfvv7aEK04cAdWVQozkQ/xYKxoQNCVSh1JyGQxQQ4Q6kuMHqlsl++8d7ykGcg9JO8NM=
+	t=1718806595; cv=none; b=Ok7aRIIT0GB6ErH9Z1hzSnwizc7Xg2us5+RxJvodwdDKoFKjeODZB7Hl0ThqkEv5emfPa2+uznw3YUC79sztd1tnFWiz0u9AH4nsRv64c1nVdZV5OuDMXxgH4qxFjuSxsuga+7k7bwlxD4SVegoS/p7RrDsfC4qmRbWuBIahRe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718806081; c=relaxed/simple;
-	bh=Q1p2iqZp42YK67bdypupYU/aUcMf52kYnDs2TSkcUCw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X2dnV6FnQmK6ieX6gPak18+JMN1gtWE8ylAEhbCy7HDUd0jpadfUKwTJPzJo5sGAhHTo0vLAF927EvG23bD5n6pcs4ZEKiO3WrW+Zb29hEzS5NOz32rAIqMtokI9fEVrz1D6uUBFaDPXnkdo9VLZx749oPAsnAAaOVi6PNAOtjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a9jaVW9I; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3737dc4a669so26718385ab.0
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 07:07:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718806079; x=1719410879; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MaT41GNFysed6i2xFhMEl7AEu7n3RvuUw38yuTNzdWI=;
-        b=a9jaVW9I9inisM6oCEyy/Y4aEYiAIbqNWknjhm18vAEqEaBeYG+g+70UCDFQRspFSB
-         jfG0K4nKFKRsriPty3/BZonniExSlJdkZN4R8DVtjUESm6cQm0BMHwyY+BMMhela6AH1
-         gvqSMA9cI10qayMP/EmB1sWAQpEeATllQcUQ52HhVkpIMu/tLnrmJiTX6/g5DXJImNtf
-         1Id9z4w3oX8CIR3h6Wi+rsNoLHrpSW2huLYcwKXLb3ejs8x5fWJWXjsZcPD2vNfDT2fb
-         0JJIS2CfXY+TB9ATfkuJrbb4owol5MpXffFD35VXGHIYEboa1Tug0BsP2PSykEf9avCm
-         ZZcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718806079; x=1719410879;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MaT41GNFysed6i2xFhMEl7AEu7n3RvuUw38yuTNzdWI=;
-        b=SQ2B/kWZGN7MaaZKxcsYMpPEMC/zFMtweGM+/6miN7CpkiW3mMYMVlnVQhU2eEGXe1
-         BphMBasozfp3oY887cef2V7CTXCjBV2YBbT+MO+mcaQWmcP/vQqaUSKI8VfGRdgTUMxM
-         M/AU54CLsmIv+ka7DlRFIXmm/kuwqW1m9C+mI86M12moZaxdYhxHHc/5o0UskvuGK/cw
-         YrHcECBTe6zVp93kTECkqmFTADvQZiQGmP2tcTUmfRIjf/rvWjTwawOkSCi0j6cgqqV1
-         UBvASy7HZ9VqoR/eUlAl0J4aN8/HBov72nsHUHaqELw8aNOeg6PLXRk362jpB3340JMH
-         2mtg==
-X-Gm-Message-State: AOJu0YykwzqDwLGGG+V43oTf6yTO7NA1Cn1Odgyfhgz7PGXvAc1w7AlL
-	ySQ9QC2xQQgsVroUu3tZoXj+QWshZWkoFewqkECeEHl2CdZvn4Ue562gTUQkwbZpj8kb07wapG0
-	8ODYOXnMRtULc7qxrtxMrOgyuwkE=
-X-Google-Smtp-Source: AGHT+IF1i/Sol9sPusH9tccIOTIZ9ylsJVyt8rVrzB1BAWCAgFZ3aL4k/E9o8l47RGzffdb6cdxGEngQyyXw8h8hwyg=
-X-Received: by 2002:a92:cdad:0:b0:376:24b1:174f with SMTP id
- e9e14a558f8ab-37624b11a42mr6390105ab.6.1718806078992; Wed, 19 Jun 2024
- 07:07:58 -0700 (PDT)
+	s=arc-20240116; t=1718806595; c=relaxed/simple;
+	bh=j8hnpKSgdsPwZhLgHwzSQMYWcXcujLvM0S2A4+l+rpk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AVxES4FlqqiCKqHcfkBu5EETkEHD8dyeiWFf63QTJt/bLpkNvm9PGEmfbsfV4nSpht/iSwD77c4FYK9m57+I8RKJ+/kX12d2TYZkGzB2Z1Ti2E54YuEFRlYMTdr+uK12s6VZVaWz50mxyZoTFCaeZSd0qPLUsXsM1M6YHEPUgmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VEiUsVF8; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: leon@kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718806591;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D7YB9+PQ0z1j6tWHwXjxGAjgSnoPcuX+AMvafJbdH/Y=;
+	b=VEiUsVF8H2cuXxGHYJXKR6rFCC6a1/RQ8mqASAwIwniKHLP05IqkvUzy9+HVAHseCmSwmS
+	IjkE0ZYFaN9tAk2tH1m3xpg+S/gKfrAlcENIrm624/D7xmsgNlkrhrHIs+aLbopn/9gFOF
+	C51OxOTobHtDWYLcTaTydtiYI9cwaWI=
+X-Envelope-To: syzbot+19ec7595e3aa1a45f623@syzkaller.appspotmail.com
+X-Envelope-To: jgg@ziepe.ca
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Envelope-To: linux-rdma@vger.kernel.org
+X-Envelope-To: netdev@vger.kernel.org
+X-Envelope-To: syzkaller-bugs@googlegroups.com
+Message-ID: <94d36dd5-313b-46b3-8d43-95016175d273@linux.dev>
+Date: Wed, 19 Jun 2024 22:16:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1689541664.git.lucien.xin@gmail.com> <cf477f4a26579e752465a5951c1d28ba109346e3.1689541664.git.lucien.xin@gmail.com>
- <d35d01d9-83de-4862-85a7-574a6c4dc8f5@ovn.org> <e90b291a-0e19-4b80-9738-5b769fcdcdfd@ovn.org>
- <CADvbK_f9=smg+C7M3dWWj9nvv7Z7_jCLn=6m0OLhmF_V0AEFsg@mail.gmail.com>
- <5a9886fd-cdd7-4aa2-880f-5664288d5f25@ovn.org> <619f9212-fa90-44d2-9951-800523413c8d@ovn.org>
-In-Reply-To: <619f9212-fa90-44d2-9951-800523413c8d@ovn.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 19 Jun 2024 10:07:47 -0400
-Message-ID: <CADvbK_cFvGT--MVJQ=tGa4bugJ5MeeVbbTqJwNw-Aa0Tf8ppiA@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] openvswitch: set IPS_CONFIRMED in tmpl
- status only when commit is set in conntrack
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: network dev <netdev@vger.kernel.org>, dev@openvswitch.org, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Davide Caratti <dcaratti@redhat.com>, Florian Westphal <fw@strlen.de>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Eric Dumazet <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>, kuba@kernel.org, 
-	Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, Aaron Conole <aconole@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [syzbot] [rdma?] WARNING in ib_uverbs_release_dev
+To: Leon Romanovsky <leon@kernel.org>,
+ syzbot <syzbot+19ec7595e3aa1a45f623@syzkaller.appspotmail.com>, jgg@ziepe.ca
+Cc: linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <000000000000057e4c061b386e23@google.com>
+ <20240619091557.GM4025@unreal>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20240619091557.GM4025@unreal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jun 19, 2024 at 8:58=E2=80=AFAM Ilya Maximets <i.maximets@ovn.org> =
-wrote:
->
-> On 6/18/24 17:50, Ilya Maximets wrote:
-> > On 6/18/24 16:58, Xin Long wrote:
-> >> On Tue, Jun 18, 2024 at 7:34=E2=80=AFAM Ilya Maximets <i.maximets@ovn.=
-org> wrote:
-> >>>
-> >>> On 6/17/24 22:10, Ilya Maximets wrote:
-> >>>> On 7/16/23 23:09, Xin Long wrote:
-> >>>>> By not setting IPS_CONFIRMED in tmpl that allows the exp not to be =
-removed
-> >>>>> from the hashtable when lookup, we can simplify the exp processing =
-code a
-> >>>>> lot in openvswitch conntrack.
-> >>>>>
-> >>>>> Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> >>>>> ---
-> >>>>>  net/openvswitch/conntrack.c | 78 +++++----------------------------=
-----
-> >>>>>  1 file changed, 10 insertions(+), 68 deletions(-)
-> >>>>>
-> >>>>> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrac=
-k.c
-> >>>>> index 331730fd3580..fa955e892210 100644
-> >>>>> --- a/net/openvswitch/conntrack.c
-> >>>>> +++ b/net/openvswitch/conntrack.c
-> >>>>> @@ -455,45 +455,6 @@ static int ovs_ct_handle_fragments(struct net =
-*net, struct sw_flow_key *key,
-> >>>>>      return 0;
-> >>>>>  }
-> >>>>>
-> >>>>> -static struct nf_conntrack_expect *
-> >>>>> -ovs_ct_expect_find(struct net *net, const struct nf_conntrack_zone=
- *zone,
-> >>>>> -               u16 proto, const struct sk_buff *skb)
-> >>>>> -{
-> >>>>> -    struct nf_conntrack_tuple tuple;
-> >>>>> -    struct nf_conntrack_expect *exp;
-> >>>>> -
-> >>>>> -    if (!nf_ct_get_tuplepr(skb, skb_network_offset(skb), proto, ne=
-t, &tuple))
-> >>>>> -            return NULL;
-> >>>>> -
-> >>>>> -    exp =3D __nf_ct_expect_find(net, zone, &tuple);
-> >>>>> -    if (exp) {
-> >>>>> -            struct nf_conntrack_tuple_hash *h;
-> >>>>> -
-> >>>>> -            /* Delete existing conntrack entry, if it clashes with=
- the
-> >>>>> -             * expectation.  This can happen since conntrack ALGs =
-do not
-> >>>>> -             * check for clashes between (new) expectations and ex=
-isting
-> >>>>> -             * conntrack entries.  nf_conntrack_in() will check th=
-e
-> >>>>> -             * expectations only if a conntrack entry can not be f=
-ound,
-> >>>>> -             * which can lead to OVS finding the expectation (here=
-) in the
-> >>>>> -             * init direction, but which will not be removed by th=
-e
-> >>>>> -             * nf_conntrack_in() call, if a matching conntrack ent=
-ry is
-> >>>>> -             * found instead.  In this case all init direction pac=
-kets
-> >>>>> -             * would be reported as new related packets, while rep=
-ly
-> >>>>> -             * direction packets would be reported as un-related
-> >>>>> -             * established packets.
-> >>>>> -             */
-> >>>>> -            h =3D nf_conntrack_find_get(net, zone, &tuple);
-> >>>>> -            if (h) {
-> >>>>> -                    struct nf_conn *ct =3D nf_ct_tuplehash_to_ctra=
-ck(h);
-> >>>>> -
-> >>>>> -                    nf_ct_delete(ct, 0, 0);
-> >>>>> -                    nf_ct_put(ct);
-> >>>>> -            }
-> >>>>> -    }
-> >>>>> -
-> >>>>> -    return exp;
-> >>>>> -}
-> >>>>> -
-> >>>>>  /* This replicates logic from nf_conntrack_core.c that is not expo=
-rted. */
-> >>>>>  static enum ip_conntrack_info
-> >>>>>  ovs_ct_get_info(const struct nf_conntrack_tuple_hash *h)
-> >>>>> @@ -852,36 +813,16 @@ static int ovs_ct_lookup(struct net *net, str=
-uct sw_flow_key *key,
-> >>>>>                       const struct ovs_conntrack_info *info,
-> >>>>>                       struct sk_buff *skb)
-> >>>>>  {
-> >>>>> -    struct nf_conntrack_expect *exp;
-> >>>>> -
-> >>>>> -    /* If we pass an expected packet through nf_conntrack_in() the
-> >>>>> -     * expectation is typically removed, but the packet could stil=
-l be
-> >>>>> -     * lost in upcall processing.  To prevent this from happening =
-we
-> >>>>> -     * perform an explicit expectation lookup.  Expected connectio=
-ns are
-> >>>>> -     * always new, and will be passed through conntrack only when =
-they are
-> >>>>> -     * committed, as it is OK to remove the expectation at that ti=
-me.
-> >>>>> -     */
-> >>>>> -    exp =3D ovs_ct_expect_find(net, &info->zone, info->family, skb=
-);
-> >>>>> -    if (exp) {
-> >>>>> -            u8 state;
-> >>>>> -
-> >>>>> -            /* NOTE: New connections are NATted and Helped only wh=
-en
-> >>>>> -             * committed, so we are not calling into NAT here.
-> >>>>> -             */
-> >>>>> -            state =3D OVS_CS_F_TRACKED | OVS_CS_F_NEW | OVS_CS_F_R=
-ELATED;
-> >>>>> -            __ovs_ct_update_key(key, state, &info->zone, exp->mast=
-er);
-> >>>>
-> >>>> Hi, Xin, others.
-> >>>>
-> >>>> Unfortunately, it seems like removal of this code broke the expected=
- behavior.
-> >>>> OVS in userspace expects that SYN packet of a new related FTP connec=
-tion will
-> >>>> get +new+rel+trk flags, but after this patch we're only getting +rel=
-+trk and not
-> >>>> new.  This is a problem because we need to commit this connection wi=
-th the label
-> >>>> and we do that for +new packets.  If we can't get +new packet we'll =
-have to commit
-> >>>> every single +rel+trk packet, which doesn't make a lot of sense.  An=
-d it's a
-> >>>> significant behavior change regardless.
-> >>>
-> >>> Interestingly enough I see +new+rel+trk packets in cases without SNAT=
-,
-> >>> but we can only get +rel+trk in cases with SNAT.  So, this may be jus=
-t
-> >>> a generic conntrack bug somewhere.  At least the behavior seems fairl=
-y
-> >>> inconsistent.
-> >>>
-> >> In nf_conntrack, IP_CT_RELATED and IP_CT_NEW do not exist at the same
-> >> time. With this patch, we expect OVS_CS_F_RELATED and OVS_CS_F_NEW
-> >> are set at the same time by ovs_ct_update_key() when this related ct
-> >> is not confirmed.
-> >>
-> >> The check-kernel test of "FTP SNAT orig tuple" skiped on my env someho=
-w:
-> >>
-> >> # make check-kernel
-> >> 144: conntrack - FTP SNAT orig tuple   skipped (system-traffic.at:7295=
-)
-> >>
-> >> Any idea why? or do you know any other testcase that expects +new+rel+=
-trk
-> >> but returns +rel+trk only?
-> >
-> > You need to install lftp and pyftpdlib.  The pyftpdlib may only be avai=
-lable
-> > via pip on some systems.
-> >
-> >>
-> >> Thanks.
-> >>>>
-> >>>> Could you, please, take a look?
-> >>>>
-> >>>> The issue can be reproduced by running check-kernel tests in OVS rep=
-o.
-> >>>> 'FTP SNAT orig tuple' tests fail 100% of the time.
-> >>>>
-> >>>> Best regards, Ilya Maximets.
-> >>>
-> >
->
-> Hmm.  After further investigation, it seems that the issue is not about c=
-t state,
-> but the ct label.  Before this commit we had information about both the o=
-riginal
-> tuple of the parent connection and the mark/label of the parent connectio=
-n:
->
-Make senses. Now I can see the difference after this commit.
-We will need a fix in __ovs_ct_update_key() to copy mark & label from
-ct->master for exp ct.
+在 2024/6/19 17:15, Leon Romanovsky 写道:
+> On Tue, Jun 18, 2024 at 11:37:18PM -0700, syzbot wrote:
+>> Hello,
+>>
+>> syzbot found the following issue on:
+>>
+>> HEAD commit:    2ccbdf43d5e7 Merge tag 'for-linus' of git://git.kernel.org..
+>> git tree:       upstream
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=179e93fe980000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=fa0ce06dcc735711
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=19ec7595e3aa1a45f623
+>> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+>>
+>> Unfortunately, I don't have any reproducer for this issue yet.
+>>
+>> Downloadable assets:
+>> disk image: https://storage.googleapis.com/syzbot-assets/27e64d7472ce/disk-2ccbdf43.raw.xz
+>> vmlinux: https://storage.googleapis.com/syzbot-assets/e1c494bb5c9c/vmlinux-2ccbdf43.xz
+>> kernel image: https://storage.googleapis.com/syzbot-assets/752498985a5e/bzImage-2ccbdf43.xz
+>>
+>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+>> Reported-by: syzbot+19ec7595e3aa1a45f623@syzkaller.appspotmail.com
+>>
+>> smc: removing ib device syz0
+>> ------------[ cut here ]------------
+>> WARNING: CPU: 0 PID: 51 at kernel/rcu/srcutree.c:653 cleanup_srcu_struct+0x404/0x4d0 kernel/rcu/srcutree.c:653
+>> Modules linked in:
+>> CPU: 0 PID: 51 Comm: kworker/u8:3 Not tainted 6.10.0-rc3-syzkaller-00044-g2ccbdf43d5e7 #0
+>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+>> Workqueue: ib-unreg-wq ib_unregister_work
+>> RIP: 0010:cleanup_srcu_struct+0x404/0x4d0 kernel/rcu/srcutree.c:653
+>> Code: 12 80 00 48 c7 03 00 00 00 00 48 83 c4 48 5b 41 5c 41 5d 41 5e 41 5f 5d e9 14 67 34 0a 90 0f 0b 90 eb e7 90 0f 0b 90 eb e1 90 <0f> 0b 90 eb db 90 0f 0b 90 eb 0a 90 0f 0b 90 eb 04 90 0f 0b 90 48
+>> RSP: 0018:ffffc90000bb7970 EFLAGS: 00010202
+>> RAX: 0000000000000001 RBX: ffff88802a1bc980 RCX: 0000000000000002
+>> RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffffe8ffffd74c58
+>> RBP: 0000000000000001 R08: ffffe8ffffd74c5f R09: 1ffffd1ffffae98b
+>> R10: dffffc0000000000 R11: fffff91ffffae98c R12: dffffc0000000000
+>> R13: ffff88802285b5f0 R14: ffff88802285b000 R15: ffff88802a1bc800
+>> FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> CR2: 00007fa3852cae10 CR3: 000000000e132000 CR4: 0000000000350ef0
+>> Call Trace:
+>>   <TASK>
+>>   ib_uverbs_release_dev+0x4e/0x80 drivers/infiniband/core/uverbs_main.c:136
+>>   device_release+0x9b/0x1c0
+>>   kobject_cleanup lib/kobject.c:689 [inline]
+>>   kobject_release lib/kobject.c:720 [inline]
+>>   kref_put include/linux/kref.h:65 [inline]
+>>   kobject_put+0x231/0x480 lib/kobject.c:737
+>>   remove_client_context+0xb9/0x1e0 drivers/infiniband/core/device.c:776
+>>   disable_device+0x13b/0x360 drivers/infiniband/core/device.c:1282
+>>   __ib_unregister_device+0x6d/0x170 drivers/infiniband/core/device.c:1475
+>>   ib_unregister_work+0x19/0x30 drivers/infiniband/core/device.c:1586
+>>   process_one_work kernel/workqueue.c:3231 [inline]
+>>   process_scheduled_works+0xa2e/0x1830 kernel/workqueue.c:3312
+>>   worker_thread+0x86d/0xd70 kernel/workqueue.c:3393
+>>   kthread+0x2f2/0x390 kernel/kthread.c:389
+>>   ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+>>   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+>>   </TASK>
+> 
+> I see that this is caused by call to ib_unregister_device_queued() as a
+> response to NETDEV_UNREGISTER event, but we don't flush anything before.
+> How can we be sure that ib_device is not used anymore?
 
-@@ -196,8 +196,8 @@ static void __ovs_ct_update_key(struct sw_flow_key
-*key, u8 state,
- {
-        key->ct_state =3D state;
-        key->ct_zone =3D zone->id;
--       key->ct.mark =3D ovs_ct_get_mark(ct);
--       ovs_ct_get_labels(ct, &key->ct.labels);
-+       key->ct.mark =3D 0;
-+       memset(&key->ct.labels, 0, OVS_CT_LABELS_LEN);
+Hi, Leon
 
-        if (ct) {
-                const struct nf_conntrack_tuple *orig;
-@@ -205,6 +205,8 @@ static void __ovs_ct_update_key(struct sw_flow_key
-*key, u8 state,
-                /* Use the master if we have one. */
-                if (ct->master)
-                        ct =3D ct->master;
-+               key->ct.mark =3D ovs_ct_get_mark(ct);
-+               ovs_ct_get_labels(ct, &key->ct.labels);
-                orig =3D &ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple;
+This is the console output:
 
-                /* IP version must match with the master connection. */
+https://syzkaller.appspot.com/x/log.txt?x=179e93fe980000
 
-We may need to run some regression tests for such a change.
+ From the above link, it seems that other devices or subsystems failed 
+firstly, then caused this call trace to appear. When other problem 
+occurred, the whole kernel system was in mess state.So it is not weird 
+that some problems occurred.
 
-Thanks.
+To be simple, the root cause is not in RDMA subsystem.
 
-> system@ovs-system: miss upcall:
-> recirc_id(0x2),dp_hash(0),skb_priority(0),in_port(3),skb_mark(0),ct_state=
-(0x25),
-> ct_zone(0x1),ct_mark(0),ct_label(0x4d2000000000000000000000001),
-> ct_tuple4(src=3D10.1.1.1,dst=3D10.1.1.2,proto=3D6,tp_src=3D50648,tp_dst=
-=3D21),
-> eth(src=3Dde:d9:f3:c8:5a:3a,dst=3D80:88:88:88:88:88),eth_type(0x0800),
-> ipv4(src=3D10.1.1.2,dst=3D10.1.1.9,proto=3D6,tos=3D0,ttl=3D64,frag=3Dno),
-> tcp(src=3D57027,dst=3D38153),tcp_flags(syn)
->
-> But after this change, we still have the original tuple of the parent con=
-nection,
-> but the label is no longer in the flow key:
->
-> system@ovs-system: miss upcall:
-> recirc_id(0x2),dp_hash(0),skb_priority(0),in_port(3),skb_mark(0),ct_state=
-(0x25),
-> ct_zone(0x1),ct_mark(0),ct_label(0),
-> ct_tuple4(src=3D10.1.1.1,dst=3D10.1.1.2,proto=3D6,tp_src=3D34668,tp_dst=
-=3D21),
-> eth(src=3D66:eb:74:c6:79:24,dst=3D80:88:88:88:88:88),eth_type(0x0800),
-> ipv4(src=3D10.1.1.2,dst=3D10.1.1.9,proto=3D6,tos=3D0,ttl=3D64,frag=3Dno),
-> tcp(src=3D49529,dst=3D35459),tcp_flags(syn)
->
-> ct_state(0x25) =3D=3D +new+rel+trk
->
-> Best regards, Ilya Maximets.
+I will continue to delve into this problem.
+
+Zhu Yanjun
+> 
+> Thanks
+
 
