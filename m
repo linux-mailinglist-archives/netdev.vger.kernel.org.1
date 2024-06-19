@@ -1,77 +1,78 @@
-Return-Path: <netdev+bounces-105042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF2C890F7CF
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 22:54:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC52490F7D1
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 22:54:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20484B24696
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 20:54:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75CEB285E55
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 20:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBB2115CD4B;
-	Wed, 19 Jun 2024 20:52:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5D4315B978;
+	Wed, 19 Jun 2024 20:52:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dIxsyE+Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fITiLM8j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D33915B978;
-	Wed, 19 Jun 2024 20:52:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49A415D5C9;
+	Wed, 19 Jun 2024 20:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718830375; cv=none; b=BesVILhcZcU3JqDoS6KDZuh1ydw3OWYAjw/qyBLRRgqYMkPO5G65brOvxrIen75K4swhbUX8QyNU59kigApb+cKcTMnPkPWS3Gxw/STrHZykXtge1Ne9vR3a6UCqcdjItukRKcUKE8Z6m6NX2UsHlkG8jrE45aZE7vPrEihw8Ew=
+	t=1718830379; cv=none; b=GCSWqdf3I5PpgadWagB9rmxNsAHrLsEfqWT3iZouBT4Ulb7eq5rduWmL5CNFw6SIT++Nwt1eck8WIVGZEqZremVRXjFAbk6yRTJSC5Ycgdke0ceiCtUKlSZTCsjqUtTDekpSXGr7LdyjD35b/3LOU6L+of0v2MAbn9c2lvvlrmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718830375; c=relaxed/simple;
-	bh=ryzr94jiDbxvn1UKYpCLAYrAd531lJHs0V4GlGi65kk=;
+	s=arc-20240116; t=1718830379; c=relaxed/simple;
+	bh=PVs/oBSPYLZtlVEy+yQlgnu2BJds3qC9/Uzfc51hjh4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eofmm+05xAhS/rzB0R7pjRcdbQrrHTXehoXGA6Zgnw4qBkFHL6iuXw3jwqtw7PsXqPNx/Qr17FTQrZ8VZqxJR3NxYgepta1iVbEY0/zVaTlBPpxGFV/1Svjags1X/NUyHyub0+ifXfIMCXfw9AVuanFr48TQcB3Qn2gvKg1pQiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dIxsyE+Y; arc=none smtp.client-ip=209.85.218.54
+	 MIME-Version; b=b1gSLegDN7xLu3MRP0wZ2UsHI+rbRbL9oD/mJJ0aEg1ubqXFk/wdExjy9WCcIBtxf0qjHd0tgGJRkivjMDLE3rxJap2CRM6eipVEc+jT3zIQ5ZGCie2yJNzeKu8ZEBJds7kQgPEpAASxR/+7ULcuG2PjWUKcazCm4CatpyhQEIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fITiLM8j; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a6f11a2d18aso16842666b.2;
-        Wed, 19 Jun 2024 13:52:53 -0700 (PDT)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a6fb507fef3so17053666b.2;
+        Wed, 19 Jun 2024 13:52:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718830372; x=1719435172; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1718830375; x=1719435175; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wM5Kz967B75V49PINKNVd0bROuq9raZP9aOqhcpiMs0=;
-        b=dIxsyE+Y6S91TaIGBy9BPmE5+QuHGhPScdDc1ultG/VabY8JktTCDNr4fXNdk3+IfT
-         qqhKLRvB0Qu0IsvTzzXXNml7u2iWj+BdRfNMq9ertpthYxL2ahc8MTC8l2zVBuqNEMZG
-         4d8RfCJv2g4qDJ4P2KhOgmJwQzPjD2j/gkVV1gfEiaxhMmPAsNOiJaAn7B8DZRw6zd2U
-         kyB31oiPRQyq7IA8FJsSxn+Qq5eYj6IEpAojV7PPi8wH4Cs2/L+NZHqLgZ5I3aFTp1zD
-         Vdt6SOXVt5ogbQj2gI+A44jkF9LMjHrdrvjaTM2jrREAFKDKHf/LAEL0yuTpf1tKg1T9
-         jycQ==
+        bh=8Vwg1gdM0zWT1wQvMXZKbfw4Um5Tz1dMCHe3knzq4kg=;
+        b=fITiLM8jJ7JnREDU8kYfBFtiBqiDfaJpTI3w18iWT4J8dpXl9wJZ73THkzq5SLmfxf
+         xVrIQt1JYnCoOqWG205SKw/IYr0BvYacAd+GK0W9SuJE1bNviRrLJq3rngpoxiauJnRs
+         cx6e3citabJmk6WNwvsMqqw51iab5s7iPTtzIaqtQQTcqpQJg168xFWH5v1UXbi1NDHj
+         rQT/c4vWpzASNygwhPpAq4r2SOP2renEjFlvaDqVwegTjhgO1pw9i0pS2cAJPTrdpZne
+         0h1sa4FEkOYCw1XEMUUz5GJ2YueZvJ6W5KBnGlTks2BKopI4JZoDpcftfJHqyqoTsPm4
+         FrtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718830372; x=1719435172;
+        d=1e100.net; s=20230601; t=1718830375; x=1719435175;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wM5Kz967B75V49PINKNVd0bROuq9raZP9aOqhcpiMs0=;
-        b=PQS6kr3AZajtAXvNAsNB27/aGLgdifpw0GIBECLMKgcpjop+8p2uKczPHBne+6xl3f
-         vOFR2zUn2WAu88QLBPbgZvmsWrykY3BU2WMf6KJZqG9Hn5vR7BOkLENFwlN6y610EcqX
-         GGzljQNxrHQYyckJTR2+unuAcdwBWFQlWkH4+t8nLqaecmNte8kXOnByC1+Tculql3KZ
-         8QtEEQrE1LFgFJhfW+XF5BOkOy/EIhPhDiE7yYjtUZ1MmmKe7+fHCGggybxD1MUifNK6
-         PxYmwCxUaeOHY9BWTnJ4SOsozCjxmJNO/2JD5L7JlB1TD8qimh3L7H8V/U2JV6a5Hy7Z
-         8tcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWo4iEC0Kv53PxCbTLPn3TrbCbWSCIYiJ3XWUyfnXjsyrekJ3yesH6RnNeVpU2U5Cl2BwRnQ67uQwUrQntKq3b/xv7cxIfNEa4s4+tO
-X-Gm-Message-State: AOJu0YyNepLMmQwvWGh4Zp9e4dHuJHCDFK1riaTQ8gzH+9E5BMHldSBn
-	BaUPrm5xxtTAVUgKrYciBqobxGfZzRofnWJBPKJROrXbN/5WB824LZHzTKdmsx4=
-X-Google-Smtp-Source: AGHT+IHTEln6tcijpMeQtzxrgdrOn6ihLv/cWdGfFQ0E+Pa7cJJ89T7t6a+fwmAvjwcubeRCFwm+GA==
-X-Received: by 2002:a17:907:31ca:b0:a6f:49b1:dec5 with SMTP id a640c23a62f3a-a6fab643faamr231874466b.46.1718830371954;
-        Wed, 19 Jun 2024 13:52:51 -0700 (PDT)
+        bh=8Vwg1gdM0zWT1wQvMXZKbfw4Um5Tz1dMCHe3knzq4kg=;
+        b=h2NCnO59L5yz9IFcn6P5Fe7PTLmLJp3s7o/DkYEE77fhwJdH1tKjfHEmR90tKeP7Uf
+         JwL9GMUdhVQBE4W+yX0uZnq+CMG+uK9+GHw/s3+CmO4ehs6s0660r1Q4REp1PD6hEXbF
+         ItjSmp2n7AAEIT4eAq5ABLVeahWNmnLSae4LUN9MOwit04WiuBLgWYS80hFsoeWxxokf
+         L2wIQBlSS1OvKEbKcbOFT6fQag5jsLduTWPD9F2AriK2MO1tcwMkWsj8j+jnd++JsOmI
+         pGGzMQhCkxEkOACrGS9UhG7YiEzTLS5/WSjhXn6feKH6jpVfZsVXBT0G9K/HKq6qkl5l
+         620g==
+X-Forwarded-Encrypted: i=1; AJvYcCVGhv4hWkz+WjOX1npcRYRIEdY81TRE1O9kupbxMvFBKzU5/QLcqaLpmWA6Xn+Q4supIegB1FwwCeoa7RtWPoIfBG6fUBEGp2WUlKkv
+X-Gm-Message-State: AOJu0YyUavG0HZRIHJIIueHAwtTa2eeBmjPgeHbgCqvt9hdx+8bAzF0L
+	+z0PHkz9+3LveP4CgLuVvSKDklt7EkfQSFmvsIWDf/CWJOnDNrNmWQhU1DA8qps=
+X-Google-Smtp-Source: AGHT+IF5plJI2+q2Hb/fCL0yLfO1jM0yFei3XbCBFM+wmMu7yfa4RU96hK0xIYpg1org/0X7ZqhNfQ==
+X-Received: by 2002:a17:906:7943:b0:a6f:51b3:cbbd with SMTP id a640c23a62f3a-a6fab608d8dmr272377866b.4.1718830375383;
+        Wed, 19 Jun 2024 13:52:55 -0700 (PDT)
 Received: from WBEC325.dom.lan ([185.188.71.122])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56db5b2fsm697329566b.47.2024.06.19.13.52.51
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56db5b2fsm697329566b.47.2024.06.19.13.52.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jun 2024 13:52:51 -0700 (PDT)
+        Wed, 19 Jun 2024 13:52:54 -0700 (PDT)
 From: Pawel Dembicki <paweldembicki@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Paolo Abeni <pabeni@redhat.com>,
 	Vladimir Oltean <vladimir.oltean@nxp.com>,
 	Pawel Dembicki <paweldembicki@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
 	Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <f.fainelli@gmail.com>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -83,9 +84,9 @@ Cc: Paolo Abeni <pabeni@redhat.com>,
 	UNGLinuxDriver@microchip.com,
 	Russell King <linux@armlinux.org.uk>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 05/12] net: dsa: tag_sja1105: prefer precise source port info on SJA1110 too
-Date: Wed, 19 Jun 2024 22:52:11 +0200
-Message-Id: <20240619205220.965844-6-paweldembicki@gmail.com>
+Subject: [PATCH net-next v2 06/12] net: dsa: tag_sja1105: refactor skb->dev assignment to dsa_tag_8021q_find_user()
+Date: Wed, 19 Jun 2024 22:52:12 +0200
+Message-Id: <20240619205220.965844-7-paweldembicki@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240619205220.965844-1-paweldembicki@gmail.com>
 References: <20240619205220.965844-1-paweldembicki@gmail.com>
@@ -99,48 +100,120 @@ Content-Transfer-Encoding: 8bit
 
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Now that dsa_8021q_rcv() handles better the case where we don't
-overwrite the precise source information if it comes from an external
-(non-tag_8021q) source, we can now unify the call sequence between
-sja1105_rcv() and sja1110_rcv().
+A new tagging protocol implementation based on tag_8021q is on the
+horizon, and it appears that it also has to open-code the complicated
+logic of finding a source port based on a VLAN header.
 
-This is a preparatory change for creating a higher-level wrapper for the
-entire sequence which will live in tag_8021q.
+Create a single dsa_tag_8021q_find_user() and make sja1105 call it.
 
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 ---
-v2, v1:
+v2,v1:
   - resend only
 ---
 Before patch series split:
 https://patchwork.kernel.org/project/netdevbpf/list/?series=841034&state=%2A&archive=both
-v8,v7,v6,v5:
+v8:
+  - resend only
+v7:
+  - added 'Reviewed-by' only
+v6, v5:
   - resend only
 v4:
-  - introduce patch and replace 'slave' with 'conduit' after rebase
+  - introduce patch and change from master to conduit and slave to user
 ---
- net/dsa/tag_sja1105.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ net/dsa/tag_8021q.c   | 19 ++++++++++++++++---
+ net/dsa/tag_8021q.h   |  5 +++--
+ net/dsa/tag_sja1105.c | 17 +++++------------
+ 3 files changed, 24 insertions(+), 17 deletions(-)
 
+diff --git a/net/dsa/tag_8021q.c b/net/dsa/tag_8021q.c
+index 332b0ae02645..454d36c84671 100644
+--- a/net/dsa/tag_8021q.c
++++ b/net/dsa/tag_8021q.c
+@@ -468,8 +468,8 @@ struct sk_buff *dsa_8021q_xmit(struct sk_buff *skb, struct net_device *netdev,
+ }
+ EXPORT_SYMBOL_GPL(dsa_8021q_xmit);
+ 
+-struct net_device *dsa_tag_8021q_find_port_by_vbid(struct net_device *conduit,
+-						   int vbid)
++static struct net_device *
++dsa_tag_8021q_find_port_by_vbid(struct net_device *conduit, int vbid)
+ {
+ 	struct dsa_port *cpu_dp = conduit->dsa_ptr;
+ 	struct dsa_switch_tree *dst = cpu_dp->dst;
+@@ -495,7 +495,20 @@ struct net_device *dsa_tag_8021q_find_port_by_vbid(struct net_device *conduit,
+ 
+ 	return NULL;
+ }
+-EXPORT_SYMBOL_GPL(dsa_tag_8021q_find_port_by_vbid);
++
++struct net_device *dsa_tag_8021q_find_user(struct net_device *conduit,
++					   int source_port, int switch_id,
++					   int vid, int vbid)
++{
++	/* Always prefer precise source port information, if available */
++	if (source_port != -1 && switch_id != -1)
++		return dsa_conduit_find_user(conduit, switch_id, source_port);
++	else if (vbid >= 1)
++		return dsa_tag_8021q_find_port_by_vbid(conduit, vbid);
++
++	return dsa_find_designated_bridge_port_by_vid(conduit, vid);
++}
++EXPORT_SYMBOL_GPL(dsa_tag_8021q_find_user);
+ 
+ /**
+  * dsa_8021q_rcv - Decode source information from tag_8021q header
+diff --git a/net/dsa/tag_8021q.h b/net/dsa/tag_8021q.h
+index 0c6671d7c1c2..27b8906f99ec 100644
+--- a/net/dsa/tag_8021q.h
++++ b/net/dsa/tag_8021q.h
+@@ -16,8 +16,9 @@ struct sk_buff *dsa_8021q_xmit(struct sk_buff *skb, struct net_device *netdev,
+ void dsa_8021q_rcv(struct sk_buff *skb, int *source_port, int *switch_id,
+ 		   int *vbid, int *vid);
+ 
+-struct net_device *dsa_tag_8021q_find_port_by_vbid(struct net_device *conduit,
+-						   int vbid);
++struct net_device *dsa_tag_8021q_find_user(struct net_device *conduit,
++					   int source_port, int switch_id,
++					   int vid, int vbid);
+ 
+ int dsa_switch_tag_8021q_vlan_add(struct dsa_switch *ds,
+ 				  struct dsa_notifier_tag_8021q_vlan_info *info);
 diff --git a/net/dsa/tag_sja1105.c b/net/dsa/tag_sja1105.c
-index 7639ccb94d35..35a6346549f2 100644
+index 35a6346549f2..3e902af7eea6 100644
 --- a/net/dsa/tag_sja1105.c
 +++ b/net/dsa/tag_sja1105.c
-@@ -652,12 +652,12 @@ static struct sk_buff *sja1110_rcv(struct sk_buff *skb,
+@@ -509,12 +509,8 @@ static struct sk_buff *sja1105_rcv(struct sk_buff *skb,
+ 		 */
+ 		return NULL;
+ 
+-	if (source_port != -1 && switch_id != -1)
+-		skb->dev = dsa_conduit_find_user(netdev, switch_id, source_port);
+-	else if (vbid >= 1)
+-		skb->dev = dsa_tag_8021q_find_port_by_vbid(netdev, vbid);
+-	else
+-		skb->dev = dsa_find_designated_bridge_port_by_vid(netdev, vid);
++	skb->dev = dsa_tag_8021q_find_user(netdev, source_port, switch_id,
++					   vid, vbid);
+ 	if (!skb->dev) {
+ 		netdev_warn(netdev, "Couldn't decode source port\n");
+ 		return NULL;
+@@ -652,12 +648,9 @@ static struct sk_buff *sja1110_rcv(struct sk_buff *skb,
  	if (likely(sja1105_skb_has_tag_8021q(skb)))
  		dsa_8021q_rcv(skb, &source_port, &switch_id, &vbid, &vid);
  
--	if (vbid >= 1)
-+	if (source_port != -1 && switch_id != -1)
-+		skb->dev = dsa_conduit_find_user(netdev, switch_id, source_port);
-+	else if (vbid >= 1)
- 		skb->dev = dsa_tag_8021q_find_port_by_vbid(netdev, vbid);
--	else if (source_port == -1 || switch_id == -1)
--		skb->dev = dsa_find_designated_bridge_port_by_vid(netdev, vid);
- 	else
+-	if (source_port != -1 && switch_id != -1)
 -		skb->dev = dsa_conduit_find_user(netdev, switch_id, source_port);
-+		skb->dev = dsa_find_designated_bridge_port_by_vid(netdev, vid);
+-	else if (vbid >= 1)
+-		skb->dev = dsa_tag_8021q_find_port_by_vbid(netdev, vbid);
+-	else
+-		skb->dev = dsa_find_designated_bridge_port_by_vid(netdev, vid);
++	skb->dev = dsa_tag_8021q_find_user(netdev, source_port, switch_id,
++					   vid, vbid);
++
  	if (!skb->dev) {
  		netdev_warn(netdev, "Couldn't decode source port\n");
  		return NULL;
