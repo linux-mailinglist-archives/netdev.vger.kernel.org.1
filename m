@@ -1,78 +1,89 @@
-Return-Path: <netdev+bounces-104894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34D2890F061
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:25:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB41090F067
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:27:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9C83B22292
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:25:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD3181C21534
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359EF18029;
-	Wed, 19 Jun 2024 14:25:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB89517C64;
+	Wed, 19 Jun 2024 14:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="DMiDZzF/"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QfMRxcTV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24A014A82;
-	Wed, 19 Jun 2024 14:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC303BA2F;
+	Wed, 19 Jun 2024 14:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718807101; cv=none; b=DaUHUP/qTygKfJbWbP0rs43/d4OS2AUCpsafvSgtJCFu7XNXIyCs9vrOUIuuELluT2sV6LndMwKuq87nlIpOVUX11tWOWUhIM8If4yey0J29ck9pPCVaz+QoPLjvnzJw492k4i1VNWntI7R7KFuV+F1k5M3H26ngBnG0vFuFWZU=
+	t=1718807260; cv=none; b=YEN451yyp/FQe/zlLvhfD1VoNb/NymnmU+GqED60otKthMwxuKnc3ojK5dBYZIBSEtLZ+NzDCjL3uq42FccbxXm2KJ7BIBoLgxSRH+aOKCbyFmaaYUuU5qe7EBDsU6BgRyupIxMhMwPHf/6t00DaRrwDQV2EhOYs1kL0a8pdzmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718807101; c=relaxed/simple;
-	bh=WvkEG/uPe0jWysivwqJcl5qLrdxOusJbcy3THLjtZ8Y=;
+	s=arc-20240116; t=1718807260; c=relaxed/simple;
+	bh=IkiduiijLkVgV/bSv5r8vwtQTPo5N92a3qp7G86Umqw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RSyGBKZv4OlXX+UwPtwrPH1miDSoq49MWrqGngsasGkESAjhk2B1vDfYAyNi4kKuuTKYGyDoIvinCtJo34GC/40c+8SLTMEVjuQ5R/M/npUWvfZu+pv800X3GVcYGs24TP4nvzi6hARi3bQaAVzirckRb/M7puRrqHFR7UMtdHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=DMiDZzF/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51C69C2BBFC;
-	Wed, 19 Jun 2024 14:25:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1718807100;
-	bh=WvkEG/uPe0jWysivwqJcl5qLrdxOusJbcy3THLjtZ8Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DMiDZzF/cHbKXI3Ymep+KbekpwAYyrbTph4jFMxkDcz8D47mNcQyPxQY9WCL7+Fst
-	 NaldX5rc2LaS3u4oHx0L6FDIeJ9/2MALougQTCrHXP3fERP08BVmK4n3I1AjN/uTDT
-	 Ltw6HtsUTCGJ5RnfNLpRz3fgqBSzj33rLaSpTBhs=
-Date: Wed, 19 Jun 2024 10:24:59 -0400
-From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, 
-	Carlos Bilbao <carlos.bilbao.osdev@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, workflows@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, ksummit@lists.linux.dev
-Subject: Re: [PATCH 2/2] Documentation: best practices for using Link trailers
-Message-ID: <20240619-nostalgic-collie-of-glory-d7eb6e@lemur>
-References: <20240618-docs-patch-msgid-link-v1-0-30555f3f5ad4@linuxfoundation.org>
- <20240618-docs-patch-msgid-link-v1-2-30555f3f5ad4@linuxfoundation.org>
- <20240619071251.GI4025@unreal>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oBS1ubPxXZZVeypygH7Cp8Z+UvjAJsxgf/WrJv1LL0He3+lzM/iyxspkcmCJU+eDVVCDCKEcaulLV8QrXQAgeIn58p0HOGHqC6RW18L3WzmYf9Zs5lXiD6hUhHlgq1vDDxg9cTmWCyUZ7W4jftVRWqh3xKZhopTJZtoJXElC0A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QfMRxcTV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=23ThqQ+vY+UW638OME0meTnsHSF60P7gNQHbZ6O+nQw=; b=QfMRxcTVMHIFQ/DOnlEv/sAwcB
+	gGIKs+hRi+h9+fn/Jbd45UrPvHFp7pyn4DfeX1QRzSXZNcHpqtZ+3k9qnhdRz5Lhz5i285wUQR69B
+	PRPxUlULQbI5p6lR1ms6P0fmvHNgQwjJTTzN/o0gls5atNL9uOEOmrzfQAOejPmdSw+s=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sJwHE-000TV0-Th; Wed, 19 Jun 2024 16:27:08 +0200
+Date: Wed, 19 Jun 2024 16:27:08 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Vladimir Oltean <olteanv@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Simon Horman <horms@kernel.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	"Ricardo B. Marliere" <ricardo@marliere.net>,
+	Casper Andersson <casper.casan@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH v2 net-next] net: dsa: Allow only up to two HSR HW
+ offloaded ports for KSZ9477
+Message-ID: <8ee63f71-9aea-431c-b289-8a353925d31a@lunn.ch>
+References: <20240619134248.1228443-1-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240619071251.GI4025@unreal>
+In-Reply-To: <20240619134248.1228443-1-lukma@denx.de>
 
-On Wed, Jun 19, 2024 at 10:12:51AM GMT, Leon Romanovsky wrote:
-> Default b4.linkmask points to https://msgid.link/ and not to https://patch.msgid.link/
+> +	/* KSZ9477 can only perform HSR offloading for up to two ports */
+> +	if (hweight8(dev->hsr_ports) >= 2) {
+> +		NL_SET_ERR_MSG_MOD(extack,
+> +				   "Cannot offload more than two ports - use software HSR");
 
-That's the default for the b4 project itself, though, not the global default.
+Bit of a nit pick. 'use' suggests it is a directive, you need to
+changing the configuration to make it work. 'using' would indicate
+nothing needs changing, it has decided to use software HSR for you.
 
-> https://git.kernel.org/pub/scm/utils/b4/b4.git/tree/.b4-config#n3
-> https://git.kernel.org/pub/scm/utils/b4/b4.git/tree/docs/config.rst#n46
-> 
-> It will be good to update the default value in b4 to point to the correct domain.
+Other than that:
 
-Once the series is accepted and becomes the official documentation, I will be
-happy to change the global default.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
--K
+    Andrew
 
