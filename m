@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-104706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5ED690E109
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF83490E108
 	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 03:00:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 101E02845B3
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 01:00:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3B5C2845B2
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 01:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A9963D0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CDC063A9;
 	Wed, 19 Jun 2024 01:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q28mxSu0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ibOp04Da"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98E05227;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9916524F;
 	Wed, 19 Jun 2024 01:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718758831; cv=none; b=NjVwMWyBU44N4fSlCRnvXgSWObplsd+JY0KbtoBia0ulZIdvMPXthD1A7VmN8dd1XyJj47pW4IlQDwM97+eBeSAQpVuwBC1Gow3dXOJUhxwlqCxQ7DS0NsOuAy4cva1gUYP9cz6qRJY+4VK/W2M9Aec7nygmXGVdPTJNkM0g/2c=
+	t=1718758830; cv=none; b=a8Z+nwqYj4IC0Pi91I21tR9iOts8vZZBS4Hm1/09l5D4r19BjbQFhCkXAI27jhJfmzNYR4J77u/mnut8hAC+74AkA+8BsoNxF41PBlJs5jIoFDACMzNeHBj6sUYkMDys7WFLrDhx+HAwuwhRS6LEoo6NS+XE0yeWaLpu1mE93PA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718758831; c=relaxed/simple;
-	bh=9iz1shUjtIxp8CXHC0W9frBjPasa9Dtmt+c5qjr6XYk=;
+	s=arc-20240116; t=1718758830; c=relaxed/simple;
+	bh=MznVFIDlLNIZKJVCdbNw94H9vpcVhR/eBfZkLRSfuME=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ePduKGNlaUx+j1KyNB28QJ43Wx2XqUZGNLjyPiR4jygjeuu/xfO+ItlabPlwGBqeGt7wFT5TiN2TEC7DszgD5OHADX23RjqSI6n76oNRY8iHZVTdcYxGNd9a4fZ1xZ0RnTJGqxrbMwFTarT/p+2OVWOjt5NtWLxIdYWaiu39w8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q28mxSu0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 49C47C3277B;
+	 In-Reply-To:To:Cc; b=t2SdWE+HMpaTjBbap6LvMtXQkQzl2R02yMcsf5TE4FAqhriNA6fK+Ee93kn3dbD1q+c7El0CocvbxUSUxxxsE3lul7B5n0Rzal60rcPL9heYdbBB4HNYYDVjhprozzpt8CLfJwkD8bZa+CXGaIkH1sBgG0WPnUky1Y6/PTHCGPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ibOp04Da; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5167DC4AF4D;
 	Wed, 19 Jun 2024 01:00:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718758830;
-	bh=9iz1shUjtIxp8CXHC0W9frBjPasa9Dtmt+c5qjr6XYk=;
+	bh=MznVFIDlLNIZKJVCdbNw94H9vpcVhR/eBfZkLRSfuME=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=q28mxSu0v/oU3mSmKYUkVpj6rfX9/Wg/KpaEFEq+yyqyMS2XRy0wGuHWaCOnz5kGv
-	 2kZspiZgbFsqk+dFCdh6FMeQ5X8BmFcW0cNFzIRUdlc20jieeR3CHoPqgtq8R/6Z4Q
-	 8cpHUJvCiNwJ0tJcEf4MlP+9dErkxeCli6LvVBsX+p+CQ0xYkefNVnLN/LYzzbGBGY
-	 V4Bga2oJvSXGO8TlC9tR3q9QeN/ikPhiaclj4YgR/agZXobUj2RMApolIMw+6MOpAX
-	 W1XQK/UVZirOozX/Ti7jLHvShU1cPc2k0JD6RJIuVjPcA9ejM5KVGxpkEWMzchvchN
-	 ZjMIXi68IzMww==
+	b=ibOp04DaxKqUDmngBASIhe5FIxeNtWrXGTJwdKDmHVEJ7dX8y5GSK1X9sT+AJum1P
+	 2JSQmVEgCxOa36g/OVJaMPYpZNjs92Td4hbNDOGedW8WsvYP4zD553bROTKtPpp/Bz
+	 g2qB+7R39mUPDlyAHU05qDXVntPE1ah9fX2MLTSbeRol/qHCgdzg1UxqJSW69w6zG9
+	 GqZVSao/fKLyOc3u2BjRCleQC4ok4T7Bz3/pRMauVG/aNqMDtmQ4izBMfWyyAJzJFV
+	 Nil9JFgGtgdfmTXShRj7p+XZBKqXPWEAw7SiYjNdVsYtJ/gmSLjBmN/LWenw5gtYNn
+	 urC3OGLN/TwaQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 248C4C43638;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 40754C4361C;
 	Wed, 19 Jun 2024 01:00:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,39 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 1/2] net: phy: dp83tg720: wake up PHYs in managed mode
+Subject: Re: [net v2 PATCH] net: stmmac: No need to calculate speed divider when
+ offload is disabled
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171875883013.1104.15419564260123669460.git-patchwork-notify@kernel.org>
+ <171875883025.1104.10779394765419858622.git-patchwork-notify@kernel.org>
 Date: Wed, 19 Jun 2024 01:00:30 +0000
-References: <20240614094516.1481231-1-o.rempel@pengutronix.de>
-In-Reply-To: <20240614094516.1481231-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+References: <20240617013922.1035854-1-xiaolei.wang@windriver.com>
+In-Reply-To: <20240617013922.1035854-1-xiaolei.wang@windriver.com>
+To: xiaolei wang <xiaolei.wang@windriver.com>
+Cc: horms@kernel.org, olteanv@gmail.com, linux@armlinux.org.uk,
+ alexandre.torgue@foss.st.com, andrew@lunn.ch, joabreu@synopsys.com,
  davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- stable@vger.kernel.org, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
+ mcoquelin.stm32@gmail.com, wojciech.drewek@intel.com, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 14 Jun 2024 11:45:15 +0200 you wrote:
-> In case this PHY is bootstrapped for managed mode, we need to manually
-> wake it. Otherwise no link will be detected.
+On Mon, 17 Jun 2024 09:39:22 +0800 you wrote:
+> commit be27b8965297 ("net: stmmac: replace priv->speed with
+> the portTransmitRate from the tc-cbs parameters") introduced
+> a problem. When deleting, it prompts "Invalid portTransmitRate
+> 0 (idleSlope - sendSlope)" and exits. Add judgment on cbs.enable.
+> Only when offload is enabled, speed divider needs to be calculated.
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: cb80ee2f9bee1 ("net: phy: Add support for the DP83TG720S Ethernet PHY")
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Fixes: be27b8965297 ("net: stmmac: replace priv->speed with the portTransmitRate from the tc-cbs parameters")
+> Signed-off-by: Xiaolei Wang <xiaolei.wang@windriver.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2,1/2] net: phy: dp83tg720: wake up PHYs in managed mode
-    https://git.kernel.org/netdev/net/c/cd6f12e173df
-  - [net,v2,2/2] net: phy: dp83tg720: get master/slave configuration in link down state
-    https://git.kernel.org/netdev/net/c/40a64cc96795
+  - [net,v2] net: stmmac: No need to calculate speed divider when offload is disabled
+    https://git.kernel.org/netdev/net/c/b8c43360f6e4
 
 You are awesome, thank you!
 -- 
