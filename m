@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-105001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58D3090F6B6
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 21:10:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B78EE90F6C3
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 21:11:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 163621C2441C
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 19:10:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50A4C28331F
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 19:11:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1058158A08;
-	Wed, 19 Jun 2024 19:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024D2158D62;
+	Wed, 19 Jun 2024 19:11:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aByW9sSs"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="s+OmkFGv"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F13B157E9F;
-	Wed, 19 Jun 2024 19:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78082158A30;
+	Wed, 19 Jun 2024 19:11:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718824201; cv=none; b=fmDHZO4uDl5+Ni8JPi7peN+FB9uoSEQIyCFG9T3B6kl6gyeEk3LQPOXC1mo1qM2KTLzFuWAl7+Cijl9oB4XUeSQwZS6bQBLAU/Wm1VLsgmgTdx7oRrHiKJjguMu9ZakGp7MLCYRWQ7VIF6mssYt9cB55yER4PpnBcmZZ0uKFir0=
+	t=1718824283; cv=none; b=mVy6MoPxAxsy6cv+9oBgm8+P76lPyq4nTEOdYi2PayAYi6102dbnut2/YJj4Yma0LGSe4uWoYOhaFOIGoHJI0Rt6faZkTWjUi7QgaC2OK+BA0y+I1rUw9irLJ7UVGrBLPEkMCQe1uZbYjW1nhaM8xdp9IYiAK8aiYRVtcpp/Rls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718824201; c=relaxed/simple;
-	bh=NdMdRSIZaqRkPqRkBKfM+32Ib6ThEAu5KVWXqnYiJN4=;
+	s=arc-20240116; t=1718824283; c=relaxed/simple;
+	bh=q9CTuYaVA8JdJfG+GYUKwjwsyZUSseRYlr+pEVGia88=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aBx2na/sXWHHYpTwYcRCJDRrkfAWO2N+ySNEo8oG76703MBdDI2/RCf1WdAYvenH3H9S4/RTqVxHG9acEIW2FzHv5Zu7HetlebBzftc4JkT9UBIsCbTXqjl1G7nz8nHtqKrPLXDwOPNwC73QIvhmcHg3cugn2+CwEvRSY3LHYZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aByW9sSs; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=GrkO46askz2VXXc+1gkAtGP7EJb1huQQsuadqZxgTsf7Ki2YC4d4ARF6s4fpZmRrwpHLNGVeNzdHc7I4wj0kf7I75vdvwWOnkaORSAtfLz2LA/PECKIXWE1UM8CJ4c13Au+tgfeA8jS1rig62+8plzsff7wG8OWOsONWzVkuSUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=s+OmkFGv; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=y1BHomwyxqkGQREWBC2VWmqAdICZq7/C7Gu+G9jbW0A=; b=aByW9sSsM8C3mrQKa/AT6y0ACr
-	jBx0kyhnZGNG6nrXxFJokvD0h6yfNdYhjKKn1vNxAHjM8kh/IKV6tA/qHLQLeVhAjOGF3kGXpwRwC
-	uPwaRoD8dKuvTnKtmcruhZkLNhnRirwwUcvCkdBnXRdCFfgbFiZNkjfN/sBFeJdrIJ/I=;
+	bh=cGhgbX/7wa0xH1idPALXZ3aIKbuKA2UZw6H9SqoiLcE=; b=s+OmkFGv2PRVvJ45DDzf+7ylh+
+	v2kCP8ua694et+3mN8QfwGWPRp1x+rher4lT05CM8rl/01lffoZmuVO/XBqatbcAUeMyaNogQ7u2V
+	ed9YPT3gjx+P8lejC+1Zz8+skgFfNrsR8Y8Xb8arnwCDVxocKadCpWOnKMeZhPOCT1Rk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sK0ge-000V5q-2t; Wed, 19 Jun 2024 21:09:40 +0200
-Date: Wed, 19 Jun 2024 21:09:40 +0200
+	id 1sK0i3-000V7I-Ey; Wed, 19 Jun 2024 21:11:07 +0200
+Date: Wed, 19 Jun 2024 21:11:07 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Bartosz Golaszewski <brgl@bgdev.pl>
 Cc: Vinod Koul <vkoul@kernel.org>,
@@ -58,10 +58,11 @@ Cc: Vinod Koul <vkoul@kernel.org>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH net-next 1/8] net: phy: add support for overclocked SGMII
-Message-ID: <bedd74cb-ee1e-4f8d-86ee-021e5964f6e5@lunn.ch>
+Subject: Re: [PATCH net-next 3/8] net: phy: aquantia: add missing include
+ guards
+Message-ID: <37747118-9c57-495b-b97f-9083dfc571a3@lunn.ch>
 References: <20240619184550.34524-1-brgl@bgdev.pl>
- <20240619184550.34524-2-brgl@bgdev.pl>
+ <20240619184550.34524-4-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,19 +71,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240619184550.34524-2-brgl@bgdev.pl>
+In-Reply-To: <20240619184550.34524-4-brgl@bgdev.pl>
 
-On Wed, Jun 19, 2024 at 08:45:42PM +0200, Bartosz Golaszewski wrote:
+On Wed, Jun 19, 2024 at 08:45:44PM +0200, Bartosz Golaszewski wrote:
 > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> The Aquantia AQR115C PHY supports the Overlocked SGMII mode. In order to
-> support it in the driver, extend the PHY core with the new mode bits and
-> pieces.
+> The header is missing the include guards so add them.
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Here we go again....
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Is this 2500BaseX but without inband signalling, since SGMII inband
-signalling makes no sense at 2.5G?
-
-	Andrew
+    Andrew
 
