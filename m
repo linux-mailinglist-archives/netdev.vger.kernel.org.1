@@ -1,107 +1,125 @@
-Return-Path: <netdev+bounces-105019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B264F90F71E
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 21:42:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 907D590F72D
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 21:51:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F6D32844B7
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 19:42:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AE6F1F22970
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 19:51:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF98158D8E;
-	Wed, 19 Jun 2024 19:42:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1C477103;
+	Wed, 19 Jun 2024 19:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mQ2whtI5"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wykRAKO9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60026156C6A;
-	Wed, 19 Jun 2024 19:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA13F1876;
+	Wed, 19 Jun 2024 19:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718826159; cv=none; b=paBuw7yK5rdfurjd7EDcDfMTdLgpCEnGDqUXraJim625s/HIj5Ul8+jXIeUBl4DeyFKenIBSmjr+2cWgzh8M2CR22fM5wpgWVKdw2xXQQULT+cjWSKJW+N4kQ24LFnDRwjRkwTIBno35PuFyvDTuOsbaOVVj+YaCDOebC9kHmic=
+	t=1718826694; cv=none; b=ub+cbq3qzhGA1xGd66f/MQmEFvPqj/k9J4l0zpFfmZL0TvjZwypZhThnNCiq6Xws8MKPJpA+FWKvZjcdlhBeKxd3RJQWSQQTMeJAOxhjskHl6nvq2d8tF62Ut2pU6qu326k2UUz10u8u+TjIo7S0pRM7TQCEbfRNrBr/YK3XwPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718826159; c=relaxed/simple;
-	bh=lQJgX2kqtpucEStoylm9bVUxglT3Ct/aEDAVENKWZwY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=vEFFHvKvmY1ZDEZjz4cRfrdbJoqDTFP5Bgsql39g9P3uHLRWXIq+h166mUzWcKj7ABzt8AfCGCyz3XvKmpx1KUxJP1USdcj7/2tjFKGtH9Cb0uCiGBR9Cj8jzZFNbtXL8giW+4spNkg7KfxEdhwtrNxkGB2KSZ2V0UKEjhabSHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mQ2whtI5; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4218008c613so1551715e9.2;
-        Wed, 19 Jun 2024 12:42:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718826157; x=1719430957; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1/mbiCPrwheVnyKx6Tn1g8ggM05xq8FHv37NW2n7TXw=;
-        b=mQ2whtI51oWtLJRn+bEoyoE8891+P91EIGuL4LezIYh3/0+v9AGVKa4g0hO6R535k+
-         bCuWkWCPRdho1/DkerVj1PRtDoPYMvWBV2B//8ObceCZKGVPaxC52eWR/lGjjU1D8Jse
-         CCQ1eGGBf2w+INaqxBj/Ur3CWoVfC5EGhq1mNJSyplEinq4QXWw83HaT7eGv2MpZu3F7
-         uPglPy2/iG3mG0YXxuPDHhlP+fRE3ZOoK4Z6RC4ppY99e+UL0E35yq140H/DFtSlLu3f
-         JdZQILagxapwQTLG2HhDvfAdKf1w1sp909Sx0EAw5E0QPGTlhELQf5DXgKh64Z2h+ypT
-         lpzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718826157; x=1719430957;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1/mbiCPrwheVnyKx6Tn1g8ggM05xq8FHv37NW2n7TXw=;
-        b=fjiCqk6+pFwx5s+8MJ2LXwGayPY/deTZLZItol3+3iRyStFKr/EcDgvzneMKc+6zsX
-         fE0JkdBbsJ1BewcGuf0DqVkkKU11lsW8LxbhraiyapHiP6KfQhQfZBC/s/STzSit2UWC
-         c+ovK1aNqkeP1/iftOhVp49RuUGFNxpFHITq+RluqarINpg2gT8Du0ERK6jIoTrldRU7
-         xYib1z6MtE8vXxjSeDOS35B0q8w5IasYZK6LL4tN+SEnGcShOMWdmAny/aNoEKpPTj5Z
-         OcSa/18pQ4QPAdLXmhbrJnvuV3qAI/ldeuz20iJ5wh16EBJ9x34DspOhVeBu+LYlbubv
-         UltA==
-X-Forwarded-Encrypted: i=1; AJvYcCXIicP9LcwSY7RXj/oSthqDqn60QNKufNquFqf15MtmnEI/Py2aE14mHpIlwgB2BpA3ttYnkOCJYyMHDzjPZs+0+AOt1mdvjGi6uuKTniznrQm1Vjhuy4RmR6wJte309DXl0oTd
-X-Gm-Message-State: AOJu0Yz5XJ3UqbDT2JEUlrcPAbeufTK2SoI0OkC7G5JQ+t0IiYMr1UV7
-	elVSuCffui7M9SFcvreZTz0qBDEVibQT0HB0mGBsMAPXdT33I6So
-X-Google-Smtp-Source: AGHT+IF2IxtLOJA3h18fOwP9xgKYFMBwoIc2Z3TKZGsCnjv0rzAia+DYIAtwysGmCydG9zU41wq9jw==
-X-Received: by 2002:a05:600c:2252:b0:424:798a:f808 with SMTP id 5b1f17b1804b1-424798afec4mr15726325e9.5.1718826156363;
-        Wed, 19 Jun 2024 12:42:36 -0700 (PDT)
-Received: from [192.168.0.5] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4247d1f6dbasm341025e9.43.2024.06.19.12.42.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Jun 2024 12:42:35 -0700 (PDT)
-Message-ID: <98ca94c3-d37c-4145-95a8-b2d9a36775c8@gmail.com>
-Date: Wed, 19 Jun 2024 22:43:10 +0300
+	s=arc-20240116; t=1718826694; c=relaxed/simple;
+	bh=Zqm1vtW+ID7zxTGrE2BVFpmEo5FykJURlDkbPF8Y448=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tzEQApkEgkKTVMRxN+ikGm7mFDy2wq2C9IFFnIcGFLMpfvF6X3OKEhdNE1p2Y7IgYgWNbBBgmAwtEBwCWDwIsIwJbW/fBT97wVJM1snFh1UTOszeotCKS+6abpvTv5SsR0chrB3AeKBr/xUKClFfIP4kxyr2WCxlv3wAtZllDRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wykRAKO9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=WnQdVdsbldNc+VO+2ej+8Ij/CjLH8t7u+69BlHcBJow=; b=wy
+	kRAKO9vKrjnz8H1Qso+72FuS2LpcBjC3qXjri4XnQgfwKy/G8smmugzkf+RXMAcXgQZCrs2u9Mvmk
+	GwDQH0IGVU3G0YetnxedN1jDAMkm8bsWJ7k4ycQCar76oRoOPFldxO8oVV1Y9chzE4GkHBELRTBiM
+	Xb4aDyh7xSFGETo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sK1Kq-000VKf-O5; Wed, 19 Jun 2024 21:51:12 +0200
+Date: Wed, 19 Jun 2024 21:51:12 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Vinod Koul <vkoul@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH net-next 1/8] net: phy: add support for overclocked SGMII
+Message-ID: <160b9abd-3972-449d-906d-71d12b2a0aeb@lunn.ch>
+References: <20240619184550.34524-1-brgl@bgdev.pl>
+ <20240619184550.34524-2-brgl@bgdev.pl>
+ <bedd74cb-ee1e-4f8d-86ee-021e5964f6e5@lunn.ch>
+ <CAMRc=MeCcrvid=+KG-6Pe5_-u21PBJDdNCChVrib8zT+FUfPJw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next v1] net: wwan: t7xx: Add debug port
-To: Jinjian Song <songjinjian@hotmail.com>
-Cc: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
- davem@davemloft.net, edumazet@google.com, haijun.liu@mediatek.com,
- jinjian.song@fibocom.com, johannes@sipsolutions.net, kuba@kernel.org,
- linux-kernel@vger.kernel.org, loic.poulain@linaro.org,
- m.chetan.kumar@linux.intel.com, netdev@vger.kernel.org, pabeni@redhat.com,
- ricardo.martinez@linux.intel.com
-References: <9f934dc7-bfd6-4f3f-a52c-a33f7a662cae@gmail.com>
- <SYBP282MB3528E219E1B7A579EE58A2B1BBCF2@SYBP282MB3528.AUSP282.PROD.OUTLOOK.COM>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <SYBP282MB3528E219E1B7A579EE58A2B1BBCF2@SYBP282MB3528.AUSP282.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMRc=MeCcrvid=+KG-6Pe5_-u21PBJDdNCChVrib8zT+FUfPJw@mail.gmail.com>
 
-Hello Jinjian,
+On Wed, Jun 19, 2024 at 09:29:03PM +0200, Bartosz Golaszewski wrote:
+> On Wed, Jun 19, 2024 at 9:09 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > On Wed, Jun 19, 2024 at 08:45:42PM +0200, Bartosz Golaszewski wrote:
+> > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > >
+> > > The Aquantia AQR115C PHY supports the Overlocked SGMII mode. In order to
+> > > support it in the driver, extend the PHY core with the new mode bits and
+> > > pieces.
+> >
+> > Here we go again....
+> >
+> 
+> Admittedly I don't post to net very often and I assume there's a story
+> to this comment? Care to elaborate?
 
-On 19.06.2024 13:23, Jinjian Song wrote:
-> I think I need add an ADB(Android Debug Bridge) port and a MIPC port
-> (debug for antenna tuner and noise profile) to WWAN.
+2.5G is a mess because vendors implemented it before the standard came
+out, in the form of 2500BaseX. They often did just what this seems to
+suggest, they overclocked CISCO SGMII.  But the in-band signalling
+SGMII uses cannot work at 2.5G, it makes no sense. So vendors disable
+the in-band signalling.
 
-Yep. For now it is a best option what we have. You can do this in a 
-similar way as you already introduced the fastboot port type. And a bit 
-of documentation would be a good option as already suggested by Jakub.
+What you likely end up with, is 2500BaseX, but without in-band
+signalling.
 
---
-Sergey
+Now, some real 2500BaseX devices require the peer to perform in-band
+signalling. Some will listen for the signalling a while, and if they
+hear nothing will go into some sort of fallback mode. Others can be
+told the peer does not support inband signalling, and so don't expect
+it.
+
+And then we have those which are overclocked SGMII which don't expect
+any signalling because SGMII signalling makes no sense at 2.5G.
+
+phylib supports out of band signalling, which is enough to make this
+work, so long as two peers will actually establish a link because they
+are sufficiently tolerant of what the other end is doing. Sometimes
+they need a hint. Russell King has been working on this mess, and i'm
+sure he will be along soon.
+
+What i expect will happen is you keep calling this 2500BaseX, without
+in band signalling. You can look back in the netdev mailling list for
+more details and those that have been here before you. It is always
+good to search the history, otherwise you are just going to repeat it.
+
+   Andrew
 
