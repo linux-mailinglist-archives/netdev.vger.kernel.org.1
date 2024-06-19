@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-104859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2609B90EAEA
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:23:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0F2290EAE9
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:23:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D339D1F24D86
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 12:23:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B741B26605
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 12:23:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8324A143757;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22655142E9E;
 	Wed, 19 Jun 2024 12:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UhUB9kh6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V1AOlkB5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52AB214373C;
-	Wed, 19 Jun 2024 12:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5BC113FD95;
+	Wed, 19 Jun 2024 12:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718799629; cv=none; b=d78OLdCZyvO9FD3hi2YGpRLEPl5Jh0LUq9Gv9bMRx1/do1q62g46snYJau/pFqP0cXoR50UZmA8wHVHhIcsJ0EtjVPqqHM96ZBTQQ8kheHgMV9lXzUBab9d3rc8qcvwl+KWqKztTxSolJ2QNIjsTz84wNUHBdWOutk+KKWsoNy4=
+	t=1718799629; cv=none; b=It+xAISMPa9FQh5EJqV+cfuXG79sG/EFCYXKKJKk/KTDDrJf3074iK2Yu1UbkL8uK4dzQixYM9BlN+l2BjGyVSoLPDK1PwbiFGwJqrRHXtHVFAACGZjpqvUDwuPBMAZjDm947T3BKo0YVvrrls3kwbkAO7KMttfuEggwOB7eSCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718799629; c=relaxed/simple;
-	bh=4GBBm4WNPljSNrgz6eD06a7GENpvd4uQxJij5l6zFIQ=;
+	bh=67uiRKjRxfjxp4Hfyr6l4u8S8EnHSg2ftC1VpGFi5OA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kqGHYu5Gn0hTyXvITYyWry85jVmy36ECCWshTMqRyCZ57H/ebRTJ9UAMUatZYHppqMCTctjuZMUsvL9vvvkbFMX4XpFhMzm4hahsM603r3T6JJK8Iq7ZddWV6qVR6XP3sNjLnaXNdUIoq4xiSFJOrO6BLdDL8nmi4MuyE4gMd+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UhUB9kh6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D9ED9C2BBFC;
+	 In-Reply-To:To:Cc; b=Af49ub6sHJ+0UarFx6cJky/0MEOfQit3a/k2Gz1vfloJaSiIjV0Eco+3fqsW2zrYBy5wEt1phRoZ1XB2FNuKh8fbgemSbwMz5vlgaMa44twEHiPTLrZ89UaxTog9qTnz/6lCpjId1xnvXMgcju1BRAUEs67wDcF0OnvIu/i3oGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V1AOlkB5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 61B9DC4AF49;
 	Wed, 19 Jun 2024 12:20:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718799628;
-	bh=4GBBm4WNPljSNrgz6eD06a7GENpvd4uQxJij5l6zFIQ=;
+	bh=67uiRKjRxfjxp4Hfyr6l4u8S8EnHSg2ftC1VpGFi5OA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UhUB9kh6ttUPx7czD1D6jwLnx8NLqHADgrv3ZvoItRGMi3a2BAFZ2WTDDgUOcmclO
-	 gsiiYwqZ7Rxw67eFPtreWsZBYkiBFy/I8cyonvHHBwCKBBDPff4fdvobey9gIB7Kwt
-	 9vghKIMwsJVdht3iLwKXC7xrfd6Q9VMMA/X6FGZDcydSYEMbLgEgHAiiVp0oyP3zll
-	 /arlulQwTwqGcq5MJYtt0NKLDGQ8SxWcUf+5oMiwl2x5BGHlfnvssxDpcRX0OHW4aH
-	 FahI8N8P9ijOS3U3+AayySrBM8raeU+R+CVZpTiCCLCCvKxiQahqvuSHgZdI/4nC1F
-	 yVK0sSmM00cpw==
+	b=V1AOlkB57E/hyTVOMzi98x5gGkiu5B77CC9Ne+zTj4t7ENRHrjz/j5x6phGH2Z0ku
+	 gqcZG4x8FkPncbvNSFeePYzAh9Ytwn07U+TG9HzsVWTT3IP5puWSpxj00bQJgQRy2K
+	 PlchVpt7x2NPsSS7bLvZdigcxz3s5Z3P/23eCUMXCa52+bYGzisYkuorKAYk4veCKi
+	 rsO/j3SFv9l5Pj6opP7wBY7/n+Cx3lD5v2kKdE9uO1gm4wPETGT0QIB0XvPdfdVS9h
+	 JK+gzf1XE0bAyVCRXvdkaYWzGmFxBpCU+ibGvyk8n7BQowDQdx7MyFkveubIR27Lce
+	 5ENSusS7BJU+w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CE0D2C4361A;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4D138C4361A;
 	Wed, 19 Jun 2024 12:20:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,45 +52,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 1/2] net: dsa: mt7530: factor out bridge
- join/leave logic
+Subject: Re: [PATCH v2] selftests: openvswitch: Set value to nla flags.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171879962883.21133.13473416587347020687.git-patchwork-notify@kernel.org>
+ <171879962830.21133.9093342001596634456.git-patchwork-notify@kernel.org>
 Date: Wed, 19 Jun 2024 12:20:28 +0000
-References: <15c28e5ed5fa02ca7904c71540e254617d571eb8.1718694181.git.mschiffer@universe-factory.net>
-In-Reply-To: <15c28e5ed5fa02ca7904c71540e254617d571eb8.1718694181.git.mschiffer@universe-factory.net>
-To: Matthias Schiffer <mschiffer@universe-factory.net>
-Cc: arinc.unal@arinc9.com, daniel@makrotopia.org, dqfext@gmail.com,
- sean.wang@mediatek.com, andrew@lunn.ch, f.fainelli@gmail.com,
- olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
+References: <20240618072922.218757-1-amorenoz@redhat.com>
+In-Reply-To: <20240618072922.218757-1-amorenoz@redhat.com>
+To: =?utf-8?q?Adri=C3=A1n_Moreno_=3Camorenoz=40redhat=2Ecom=3E?=@codeaurora.org
+Cc: netdev@vger.kernel.org, aconole@redhat.com, pshelar@ovn.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ shuah@kernel.org, dev@openvswitch.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Tue, 18 Jun 2024 09:17:12 +0200 you wrote:
-> As preparation for implementing bridge port isolation, move the logic to
-> add and remove bits in the port matrix into a new helper
-> mt7530_update_port_member(), which is called from
-> mt7530_port_bridge_join() and mt7530_port_bridge_leave().
+On Tue, 18 Jun 2024 09:29:21 +0200 you wrote:
+> Netlink flags, although they don't have payload at the netlink level,
+> are represented as having "True" as value in pyroute2.
 > 
-> Another part of the preparation is using dsa_port_offloads_bridge_dev()
-> instead of dsa_port_offloads_bridge() to check for bridge membership, as
-> we don't have a struct dsa_bridge in mt7530_port_bridge_flags().
+> Without it, trying to add a flow with a flag-type action (e.g: pop_vlan)
+> fails with the following traceback:
+> 
+> Traceback (most recent call last):
+>   File "[...]/ovs-dpctl.py", line 2498, in <module>
+>     sys.exit(main(sys.argv))
+>              ^^^^^^^^^^^^^^
+>   File "[...]/ovs-dpctl.py", line 2487, in main
+>     ovsflow.add_flow(rep["dpifindex"], flow)
+>   File "[...]/ovs-dpctl.py", line 2136, in add_flow
+>     reply = self.nlm_request(
+>             ^^^^^^^^^^^^^^^^^
+>   File "[...]/pyroute2/netlink/nlsocket.py", line 822, in nlm_request
+>     return tuple(self._genlm_request(*argv, **kwarg))
+>                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>   File "[...]/pyroute2/netlink/generic/__init__.py", line 126, in
+> nlm_request
+>     return tuple(super().nlm_request(*argv, **kwarg))
+>            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>   File "[...]/pyroute2/netlink/nlsocket.py", line 1124, in nlm_request
+>     self.put(msg, msg_type, msg_flags, msg_seq=msg_seq)
+>   File "[...]/pyroute2/netlink/nlsocket.py", line 389, in put
+>     self.sendto_gate(msg, addr)
+>   File "[...]/pyroute2/netlink/nlsocket.py", line 1056, in sendto_gate
+>     msg.encode()
+>   File "[...]/pyroute2/netlink/__init__.py", line 1245, in encode
+>     offset = self.encode_nlas(offset)
+>              ^^^^^^^^^^^^^^^^^^^^^^^^
+>   File "[...]/pyroute2/netlink/__init__.py", line 1560, in encode_nlas
+>     nla_instance.setvalue(cell[1])
+>   File "[...]/pyroute2/netlink/__init__.py", line 1265, in setvalue
+>     nlv.setvalue(nla_tuple[1])
+>                  ~~~~~~~~~^^^
+> IndexError: list index out of range
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/2] net: dsa: mt7530: factor out bridge join/leave logic
-    https://git.kernel.org/netdev/net-next/c/c25c961fc7f3
-  - [net-next,v3,2/2] net: dsa: mt7530: add support for bridge port isolation
-    https://git.kernel.org/netdev/net-next/c/3d49ee2127c2
+  - [v2] selftests: openvswitch: Set value to nla flags.
+    https://git.kernel.org/netdev/net/c/a8763466669d
 
 You are awesome, thank you!
 -- 
