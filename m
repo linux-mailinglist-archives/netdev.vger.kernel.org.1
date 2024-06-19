@@ -1,85 +1,95 @@
-Return-Path: <netdev+bounces-104831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5C6790E8F2
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 13:05:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82E2790E905
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 13:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45671284C34
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 11:05:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EE481C212F6
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 11:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE4F13A279;
-	Wed, 19 Jun 2024 11:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E966C82495;
+	Wed, 19 Jun 2024 11:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BQPoj8uq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GAm6EF6k"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E853D139D15;
-	Wed, 19 Jun 2024 11:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40C475817
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 11:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718795122; cv=none; b=fPm3xcAJWQQzN6TYZ8VS7BV8j5sU0prEv6cUr1tzxcB4VW6DQXJbGgLCMRPHtYOE0i1h+Sx9cNp9LOhLtLPbC2SZhkyyVx7BvH75sYfeLR1lVygrV6veiyECmZRA61NxNcO4SlgAJZWW4L1wcEHxdM+/C5gYdh7ReTvStqFylCE=
+	t=1718795429; cv=none; b=TbI1K913gM7SqsU2prVT8n3waodM/z2jLAKc8UAwhm+lbXWpP3vznPfbBjue9p/STAjwS4nTCAajSOXvP0BWk9b8AjquhxC+DvqvQn3o4EvbVpbbPjw+mrpHX1n5p/wPsMSq0fzcLbEG9xHdDPivHYXsND3VN/mC+fmQ4a6jt3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718795122; c=relaxed/simple;
-	bh=Uh5WmoLVL5Fngn5y6WjRvd07oh2JBAFi2uDL6j7S7uk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N69a4KT4nojE7h6ACxzuqMhowcNfg1UYXrz2U56A/JAiib5xFZmd3byXkaE2WKktU7TZcM3rwBvxcYILt+SJxcejfWY0fufqxp/ezQijoq8G0jWuCNy9/+DGC6zpPOyDBgkJYVmKm+AMre5WOjSp4TDpCOrcfQ4pVReAJASZffQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BQPoj8uq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BC1FC4AF49;
-	Wed, 19 Jun 2024 11:05:19 +0000 (UTC)
+	s=arc-20240116; t=1718795429; c=relaxed/simple;
+	bh=wKpejeYsyo3qvHm56DsCwlMqnSht5mSus9iVil1aqrY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=igFYUKF79n/mKvJh7t67Jf23qbPAzEb/91dc+9P9SXKz3osCWWzzMkAjmIR/BfBfWMMPoerOTZMakWpTPvnnwjbAKXhZFwRV8o5p21AKdr4yEfdBTILi0oswfz2DH80O23bvsFZAcwMlxCsoyPCzrsegSGSY3pV7F4c+zN/e56Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GAm6EF6k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 97DF7C4AF1A;
+	Wed, 19 Jun 2024 11:10:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718795121;
-	bh=Uh5WmoLVL5Fngn5y6WjRvd07oh2JBAFi2uDL6j7S7uk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BQPoj8uqFOmX5PAChvrpAjJx8vxT+JB0Dee4Kj9XAgefq/qX6wgxUuTRkbNGKTw5O
-	 yUDUxpLipNvJ4gYYRC4KVFF8JrHBwgjKvhO3lcwLAiPukcgiuODPWZDvPLjYVK/Q+z
-	 BSYthMfoQL7VGdCdURw3ZKdaHT8QMZ4fkXDOva2jjkjPSIguIBgTJmcD1OMkV5G1PP
-	 B3nrxGERj45M+O++MAFBgRU4Q8WlZ3X3cKsjCeB4+0oGmtjaBpk9Tp5GHvGLFHCqrZ
-	 G9QkwSdP0bKTG8XCwtbj2whIvWKF6GhEdInhkweJXyvWStCb6+t79OACdz+/qWaBzf
-	 ksBPSjf0tSXdQ==
-Date: Wed, 19 Jun 2024 12:05:17 +0100
-From: Simon Horman <horms@kernel.org>
-To: Geetha sowjanya <gakula@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
-Subject: Re: [net PATCH] octeontx2-pf: Fix linking objects into multiple
- modules
-Message-ID: <20240619110517.GC690967@kernel.org>
-References: <20240618061122.6628-1-gakula@marvell.com>
+	s=k20201202; t=1718795429;
+	bh=wKpejeYsyo3qvHm56DsCwlMqnSht5mSus9iVil1aqrY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GAm6EF6k+jk6Y5WEFpykYabUzAZZmJftwEtWxk4qTDzQYJca5FFYZnFiWJZH6rD0g
+	 rqDvLY4quO5iZI5qMTi7AC+7i9w4DdtQeyyOX3ebLX8FvEx2L/f6o/AuwH9FQHHAHg
+	 GiUB8pFHajHcLoXKXf3ssiWgJx3B4tcRJ/mAG/eJSfkj5YiBmRLZ6ji+PhsakQ4XdI
+	 4bscYs9l++/+OumOQ1N4x7HIYdcxvDHFvaSQUWI9s9IwkpbQ2kvf4TdRKqWvnO6fQ/
+	 t9HPU0SXLeRmGYTcGXrrx9l2P0Dh3HiSyCZJE5pNxlAHDKNV12HuhEoL+vTgY5nqoU
+	 z5G1GEWsjEzQQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 77884C4361A;
+	Wed, 19 Jun 2024 11:10:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240618061122.6628-1-gakula@marvell.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] octeontx2-pf: Add error handling to VLAN unoffload
+ handling
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171879542947.8917.3149188437526710433.git-patchwork-notify@kernel.org>
+Date: Wed, 19 Jun 2024 11:10:29 +0000
+References: <20240617-otx2-vlan-push-v1-1-5cf20a70570e@kernel.org>
+In-Reply-To: <20240617-otx2-vlan-push-v1-1-5cf20a70570e@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, sgoutham@marvell.com, gakula@marvell.com,
+ sbhatta@marvell.com, hkelam@marvell.com, naveenm@marvell.com,
+ netdev@vger.kernel.org
 
-On Tue, Jun 18, 2024 at 11:41:22AM +0530, Geetha sowjanya wrote:
-> This patch fixes the below build warning messages that are
-> caused due to linking same files to multiple modules by
-> exporting the required symbols.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Mon, 17 Jun 2024 17:50:26 +0100 you wrote:
+> otx2_sq_append_skb makes used of __vlan_hwaccel_push_inside()
+> to unoffload VLANs - push them from skb meta data into skb data.
+> However, it omitts a check for __vlan_hwaccel_push_inside()
+> returning NULL.
 > 
-> "scripts/Makefile.build:244: drivers/net/ethernet/marvell/octeontx2/nic/Makefile:
-> otx2_devlink.o is added to multiple modules: rvu_nicpf rvu_nicvf
+> Found by inspection based on [1] and [2].
+> Compile tested only.
 > 
-> scripts/Makefile.build:244: drivers/net/ethernet/marvell/octeontx2/nic/Makefile:
-> otx2_dcbnl.o is added to multiple modules: rvu_nicpf rvu_nicvf"
-> 
-> Fixes: 8e67558177f8 ("octeontx2-pf: PFC config support with DCBx").
-> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+> [...]
 
-Thanks Geetha,
+Here is the summary with links:
+  - [net] octeontx2-pf: Add error handling to VLAN unoffload handling
+    https://git.kernel.org/netdev/net/c/b95a4afe2def
 
-I checked and it does not seem to be possible to compile
-rvu_nicvf as a built-in and rvu_nicpf as a module,
-which was my only concern about this.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+
 
