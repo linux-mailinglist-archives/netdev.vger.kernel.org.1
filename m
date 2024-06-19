@@ -1,94 +1,77 @@
-Return-Path: <netdev+bounces-104795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC87C90E689
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 11:08:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 200AA90E691
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 11:10:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A7B2283508
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:08:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE41D1F21B1E
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:10:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F31D7EF10;
-	Wed, 19 Jun 2024 09:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC03D7E56C;
+	Wed, 19 Jun 2024 09:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YxUESXmH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="oX5LzuC2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE647BB15
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 09:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8457EEFF;
+	Wed, 19 Jun 2024 09:10:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718788124; cv=none; b=kryLYlqdfuNfyushxjGBkQc2yPO89ws7WEHo6AqkxJC2Cj1xV46U4nDXg9QAftVhz6TBscnf4dhtNNrLS/hocmckLAjbLiV/PXxP6+oS8h2yCAG3OgNT3zdlF8ZkOtxKHiPokiAMX4tTtDae/0lni55kTshLoEgrJQNyaPH19oY=
+	t=1718788212; cv=none; b=SbkOYmATvm48XoA5NYMpI2TLFTTcCLoaEqV70w65c4yxd+bPfSFJnqMxJw3P1MM5LKVZLDpuxXxnhenRQBYpPNwoSHiRGyyxv5TDXTgiGz17CSs7Bf3hUWEpeIxugL4NWzGF+uMniA216u/zteejEPEAxuG9HLLR/0VyqxuZfUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718788124; c=relaxed/simple;
-	bh=l5ExirGQyRAtIOk0NhDOS9E3Rwzt/v5G6frBd1Eto7s=;
+	s=arc-20240116; t=1718788212; c=relaxed/simple;
+	bh=j9QHuK1sZ1p2aIuDGVpmJ7JI6mmRW3HX761dvuCIG1w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gnu57kglWOd3p8ITg6OUARV22enlOZm9QZoSMB2uR5iGMsU69H5EoWK1rFoNx+YzH9b+VhoHMW0BnecrPIGiN5lLpAluXYEuiz3RatKJIAeecBoN0snyJoTOXx+mAK4WNekXFsd2TSMz73A3LXzBVDQysUTIsdiUhC1c71CAshU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YxUESXmH; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718788121;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H6etdIHf+vLceRRGRQM9DwQ8BkpeTzkHdW5ywbuRdZ8=;
-	b=YxUESXmHoEKmvjteEhnW1RQ0Ii71b5H9qCKXN9LLlZUUFvnP6OoHo88kJYaLLVt87FJJA7
-	6+lOklSuX1Kfy8Y73Ocv4eYhKBpd8H0BGtzE9qEwAbQ9PiEUMvs6ITqGNPFjyWhGY7x+Dw
-	8yR/ihi71uBdvA6pFxW4hT8iz2eZ4BQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-478-wzWpIIZQMlKSgVaVjCYQfg-1; Wed, 19 Jun 2024 05:08:40 -0400
-X-MC-Unique: wzWpIIZQMlKSgVaVjCYQfg-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42120e123beso56504785e9.0
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 02:08:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718788119; x=1719392919;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H6etdIHf+vLceRRGRQM9DwQ8BkpeTzkHdW5ywbuRdZ8=;
-        b=NOoNh/Z9DOiU1LiiM4eH0jYze2nTgXuv80eZjx05vfo2yTDLEuDrTsnKJsmK9oKI/d
-         zhVMF02b7PS19a1BtqSnUMiOc8am9f3wWQW4o5MqSOzjI8BZUoHYVjweTT5bMpb99nTx
-         RBSC0haDlRgXTD0YacXFSfKQK5DnfLiWiGkadj0i+vSTotjgWuf7rmLRd3oV0cSMj77t
-         OxooJfHiZGajgrbZyqx6+DmCMgQO/8Ds3xPMrUjdgMg/bbddCjETaaaxfI4qaI/nFSj5
-         EKFW0zusfNUcZLOIxZmR32H26hr55EuOeyh6fq2KS/M+8MMdkPTE556EkIRh3vMZrBnK
-         G8JQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVqAPswyN+X25eyt92G12/VZ+GQO8P8VoLGmtd8k5UWl0O6FYnbARVifh8ISEH6909j312GQcC2CnhCtFF9/BMh43brvtlQ
-X-Gm-Message-State: AOJu0Yzy8F9Y/QJOiWcSV+Aedk63wVTKMjahzLh0L9XSkOovNGGhl7d6
-	tINEojM5TP70lQAfPU9X15OmPJwwSAe10C4xACKjfntG/njo0NkDcs4RWyc+2uriptKPsoGjHV6
-	WIkhehBjaLXfvUCcRYaMSGUZUoj2Nzqurpe3XQLA3270V2FA3H+jE9g==
-X-Received: by 2002:a05:600c:214c:b0:422:683b:df31 with SMTP id 5b1f17b1804b1-424750796a4mr16406165e9.7.1718788118661;
-        Wed, 19 Jun 2024 02:08:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEDmHDeUKSzvwFZloG+Wasg47pkCbBVp7dtO2iM2/FT/vYQ18GUuBHQi2kxayKUmsy2s8xgdg==
-X-Received: by 2002:a05:600c:214c:b0:422:683b:df31 with SMTP id 5b1f17b1804b1-424750796a4mr16405765e9.7.1718788117895;
-        Wed, 19 Jun 2024 02:08:37 -0700 (PDT)
-Received: from redhat.com ([2.52.146.100])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422870e9681sm260339195e9.28.2024.06.19.02.08.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jun 2024 02:08:37 -0700 (PDT)
-Date: Wed, 19 Jun 2024 05:08:32 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jani Nikula <jani.nikula@intel.com>
-Cc: Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Carlos Bilbao <carlos.bilbao.osdev@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=nhnWwkaujn8eEvuwutjiF0t9ehIXl2RCugrudqhaj7tsUYNMGu/RlUgg0kDm5UxxPFvfrlVzjfCcpgtZ9xZZoVnLJn1liYUK2T88Dfuu7Qhlpd81rAp//wtz75qgPEkDKElwTIvMetjX29AiE3vvmz3T0eMo4KXCTnNAPFZqT48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=oX5LzuC2; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=XZPCE7bDbCBCJxvXyCnEG/PIPyH9SX836CQZUsB/9WE=; b=oX5LzuC2K6FLF5l89DJSwL40Iw
+	qRtT/Ti0Co6QpZ/PmYuNy93+M0pKDqqNhn93L1vV/WFvbEHF0zRZ2Uop2JUkJmSHKJwU0zsV/9Wdn
+	uZ+rIIwq4ob4+RhM0zLZqrGXu7ptaunWqZvePtiekwrIA8iS65EkpGc/xRB90Ezvjld+SA84W1r6v
+	hOa3ekJlt9Qgaoqy8qaq/ztMyOeo/S7jiF/jdjRYLCZhI3gF35BdS2Oj9QCfiaZ3ceZZKUWBISHuS
+	mPHk7G1G/oHlimw0qEkXW2MnCJW6GzTVDu/BGmCMwFCXt83iDNkiXSSp7AsPMgOyt8dyxEL/EThzt
+	2Te6fj7w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44894)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sJrKD-00083a-2i;
+	Wed, 19 Jun 2024 10:09:53 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sJrKE-0006dv-7S; Wed, 19 Jun 2024 10:09:54 +0100
+Date: Wed, 19 Jun 2024 10:09:53 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Sky Huang <SkyLake.Huang@mediatek.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	workflows@vger.kernel.org, linux-doc@vger.kernel.org,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
 	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	ksummit@lists.linux.dev
-Subject: Re: [PATCH 2/2] Documentation: best practices for using Link trailers
-Message-ID: <20240619050715-mutt-send-email-mst@kernel.org>
-References: <20240618-docs-patch-msgid-link-v1-0-30555f3f5ad4@linuxfoundation.org>
- <20240618-docs-patch-msgid-link-v1-2-30555f3f5ad4@linuxfoundation.org>
- <87r0ctfh93.fsf@intel.com>
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Steven Liu <Steven.Liu@mediatek.com>
+Subject: Re: [PATCH net-next v7 5/5] net: phy: add driver for built-in 2.5G
+ ethernet PHY on MT7988
+Message-ID: <ZnKgYSi81+JdAdhC@shell.armlinux.org.uk>
+References: <20240613104023.13044-1-SkyLake.Huang@mediatek.com>
+ <20240613104023.13044-6-SkyLake.Huang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,78 +80,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87r0ctfh93.fsf@intel.com>
+In-Reply-To: <20240613104023.13044-6-SkyLake.Huang@mediatek.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Jun 19, 2024 at 11:50:48AM +0300, Jani Nikula wrote:
-> On Tue, 18 Jun 2024, Konstantin Ryabitsev <konstantin@linuxfoundation.org> wrote:
-> > Based on multiple conversations, most recently on the ksummit mailing
-> > list [1], add some best practices for using the Link trailer, such as:
-> >
-> > - how to use markdown-like bracketed numbers in the commit message to
-> > indicate the corresponding link
-> > - when to use lore.kernel.org vs patch.msgid.link domains
-> >
-> > Cc: ksummit@lists.linux.dev
-> > Link: https://lore.kernel.org/20240617-arboreal-industrious-hedgehog-5b84ae@meerkat # [1]
-> > Signed-off-by: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-> > ---
-> >  Documentation/process/maintainer-tip.rst | 24 ++++++++++++++++++------
-> >  1 file changed, 18 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/Documentation/process/maintainer-tip.rst b/Documentation/process/maintainer-tip.rst
-> > index 64739968afa6..57ffa553c21e 100644
-> > --- a/Documentation/process/maintainer-tip.rst
-> > +++ b/Documentation/process/maintainer-tip.rst
-> > @@ -375,14 +375,26 @@ following tag ordering scheme:
-> >     For referring to an email on LKML or other kernel mailing lists,
-> >     please use the lore.kernel.org redirector URL::
-> >  
-> > -     https://lore.kernel.org/r/email-message@id
-> > +     Link: https://lore.kernel.org/email-message@id
-> >  
-> > -   The kernel.org redirector is considered a stable URL, unlike other email
-> > -   archives.
-> > +   This URL should be used when referring to relevant mailing list
-> > +   resources, related patch sets, or other notable discussion threads.
-> > +   A convenient way to associate Link trailers with the accompanying
-> > +   message is to use markdown-like bracketed notation, for example::
-> >  
-> > -   Maintainers will add a Link tag referencing the email of the patch
-> > -   submission when they apply a patch to the tip tree. This tag is useful
-> > -   for later reference and is also used for commit notifications.
-> > +     A similar approach was attempted before as part of a different
-> > +     effort [1], but the initial implementation caused too many
-> > +     regressions [2], so it was backed out and reimplemented.
-> > +
-> > +     Link: https://lore.kernel.org/some-msgid@here # [1]
-> > +     Link: https://bugzilla.example.org/bug/12345  # [2]
-> > +
-> > +   When using the ``Link:`` trailer to indicate the provenance of the
-> > +   patch, you should use the dedicated ``patch.msgid.link`` domain. This
-> > +   makes it possible for automated tooling to establish which link leads
-> > +   to the original patch submission. For example::
-> 
-> Mostly highlighting my own ignorance here, but s/provenance/origin/
-> would've felt more obvious to me, as a non-native speaker.
-> 
-> BR,
-> Jani.
+On Thu, Jun 13, 2024 at 06:40:23PM +0800, Sky Huang wrote:
+> +static const unsigned long supported_triggers =
+> +	(BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
+> +	 BIT(TRIGGER_NETDEV_LINK)        |
+> +	 BIT(TRIGGER_NETDEV_LINK_10)     |
+> +	 BIT(TRIGGER_NETDEV_LINK_100)    |
+> +	 BIT(TRIGGER_NETDEV_LINK_1000)   |
+> +	 BIT(TRIGGER_NETDEV_LINK_2500)   |
+> +	 BIT(TRIGGER_NETDEV_RX)          |
+> +	 BIT(TRIGGER_NETDEV_TX));
 
-Or even "origin (message id)" to be very explicit.
+Absolutely no need for the outer parens around this.
 
+type foo assignment-operator expr;
 
+There is no reason to ever put parens around expr in this kind of thing.
+assignment-operator are things like =, |=, &=, <<=, >>=, and so forth.
 
+Excessive parens detracts from readability, and leads to mistakes. If
+operator precedence is a worry, then knowing the common C precedence
+rules rather than littering code with extra parens would be good so
+that code can remain readable.
 
+> +static struct phy_driver mtk_gephy_driver[] = {
+> +	{
+> +		PHY_ID_MATCH_MODEL(MTK_2P5GPHY_ID_MT7988),
+> +		.name		= "MediaTek MT7988 2.5GbE PHY",
+> +		.probe		= mt798x_2p5ge_phy_probe,
+> +		.config_init	= mt798x_2p5ge_phy_config_init,
+> +		.config_aneg    = mt798x_2p5ge_phy_config_aneg,
+> +		.get_features	= mt798x_2p5ge_phy_get_features,
+> +		.read_status	= mt798x_2p5ge_phy_read_status,
+> +		.get_rate_matching	= mt798x_2p5ge_phy_get_rate_matching,
+> +		.suspend	= genphy_suspend,
+> +		.resume		= genphy_resume,
+> +		.read_page	= mtk_phy_read_page,
+> +		.write_page	= mtk_phy_write_page,
+> +		.led_blink_set	= mt798x_2p5ge_phy_led_blink_set,
+> +		.led_brightness_set = mt798x_2p5ge_phy_led_brightness_set,
+> +		.led_hw_is_supported = mt798x_2p5ge_phy_led_hw_is_supported,
+> +		.led_hw_control_get = mt798x_2p5ge_phy_led_hw_control_get,
+> +		.led_hw_control_set = mt798x_2p5ge_phy_led_hw_control_set,
 
+I don't see the point of trying to align some of these method
+declarators but not others. Consistency is important.
 
-> 
-> > +
-> > +     Link: https://patch.msgid.link/patch-source-msgid@here
-> >  
-> >  Please do not use combined tags, e.g. ``Reported-and-tested-by``, as
-> >  they just complicate automated extraction of tags.
-> 
-> -- 
-> Jani Nikula, Intel
+I know several PHY drivers do this, this will be because new methods
+with longer names have been added over time, and to reformat the
+tables of every driver would be noise. However, new implementations
+should at least make an effort to have consistency.
 
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
