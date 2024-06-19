@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-104806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05F5490E746
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 11:50:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3622490E747
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 11:50:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1B791F22A9F
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:50:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 447DB1C2153C
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCEB080C07;
-	Wed, 19 Jun 2024 09:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0289B81204;
+	Wed, 19 Jun 2024 09:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G1HX2Rq1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="csndO+5A"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E3D54784;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C244A7BB13;
 	Wed, 19 Jun 2024 09:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718790629; cv=none; b=bRLDUvnIX+nfP84zYDKGxZgJN2lJM8Bqie/lnrkhQR7e8atsG4JXb/Y+bTFUbwi3pziWSgdY1wrJS9MOuHbjhd0MJZFrGGx1BZMMslRHSCKYLl+bHn1o5oFjYauJ6k+zfVRywakmO/x8fIOgkWR+vn73U78eYwigJsbdrC6lPE8=
+	t=1718790629; cv=none; b=D/Xocon5E+8m98L2hwq53l02r8jbLACTrb8wJ/9bxg1hII7S+d8npH0zJj+JgKzRpIlVCEjf6nYB2JhoeL4pSkhLGiLa7rFOdstRuvVq8oh3xOUs1uT6NSehomUNkGxIC+ymPzmlr/p4NkC2mk/i2lbFm9BUOPNNapInHC6aEZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718790629; c=relaxed/simple;
-	bh=lVHQo/Rj8HhEKrJi1VW2exUVeazX3WH1N6budU1lWgk=;
+	bh=GlJMmIAEfpjewOs6ODwu8YfiHNryTzd+90PPz9YRuBo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BRqTtuU7QkPk8Ug/6qoTkkjqDQegVGCZh1qHrNvC1o/xDImYQLKH3PmDJxjf5SWxNUDvSilZtgv6TuJmokdQv+UF1LOL1vxGZ77DTptnVw2CnUsuIEsNRdO8eA30AdT2NNPZwOiVhsSwxc6jFW/ajc8vwjqnt/lOTkEs9CTxHNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1HX2Rq1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1C7E9C32786;
+	 In-Reply-To:To:Cc; b=Y3Fe+2TgkWCtI5izk+VlIRt8A1uLP6DXlz4S+EdOOHKPHH6sA81GEYaBBxp38itgnNlcktg6NgQ6EpPYe9ya4wmeTg5VE/QQITHSyWQXuKBk502LWFjTogZXD/3zpGYXGQOz8S6UyNmXAVa1iag0hu2JyxBFK2khTdjuqUUSu1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=csndO+5A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 54EC3C4AF51;
 	Wed, 19 Jun 2024 09:50:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718790629;
-	bh=lVHQo/Rj8HhEKrJi1VW2exUVeazX3WH1N6budU1lWgk=;
+	bh=GlJMmIAEfpjewOs6ODwu8YfiHNryTzd+90PPz9YRuBo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=G1HX2Rq1hevKUVDD04H7sH8UWhSq15z5mx62GD1m6IICziaFlfqIA7rwTgjDJ4PZL
-	 eqYlBTyLqXzgKydr7IMFwcstSBRLhLcZNxXXkMnPHQIYV4RCpgsNbaMTzfJ52R0o9P
-	 W2uwNNKP4MFrERBBTE6ran9RepX/2mLsdA2J/dKAf0jT2UjePrjKFgSwiPq/CqZ5oo
-	 t/SRYjIFGL1pZU/nOBQ/eXU2ytv7oisK3EiAQTxPTa5AGU6TNhYJaTSgmy/48bsHUi
-	 lZ8padfEH2dVGLz3Q3MbUb4fGjRDeWp/9R3ZEyBsi+KkbkwWhVfuBG+CLkweE5LiBq
-	 c9HmsNMQqNmpQ==
+	b=csndO+5A9Zb+DzdccpWSsMtUf9g2I6Tl0tneOGbluTlWZ2xwomIbSrPPTN4tg806z
+	 EJ8PggU9HFGszcssu8kdCMK58IPde2bCKMdAYMFnKhVkTl5f7xa+jZkCL2NI7cLjLC
+	 f0qA6btGKpt7gLZ7LekXAi7CllMZ0ATB+tMA8FijWxaoUQSeCs5EqqqLEYUzs3KZuD
+	 t98NqCBhLuaqpvJqp5yO+o73SHcMD4dGyoYXZkFrSpB8WK3olvlKwDq7Sn/CUQDhXM
+	 a/RGixzuZ/FhynN3AJSBPGE4r86iEfog9VEdQaSui99ZuzjMFDlGwdrCyBZVGah8v5
+	 ndNyIDglEj8TQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 05347C4361B;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4C011C4361B;
 	Wed, 19 Jun 2024 09:50:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: usb: ax88179_178a: improve reset check
+Subject: Re: [PATCH] rds:Simplify the allocation of slab caches
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171879062901.26288.8596567430830957012.git-patchwork-notify@kernel.org>
+ <171879062930.26288.9720056948729325015.git-patchwork-notify@kernel.org>
 Date: Wed, 19 Jun 2024 09:50:29 +0000
-References: <20240617102839.654316-1-jtornosm@redhat.com>
-In-Reply-To: <20240617102839.654316-1-jtornosm@redhat.com>
-To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+References: <20240617075435.110024-1-lihongfu@kylinos.cn>
+In-Reply-To: <20240617075435.110024-1-lihongfu@kylinos.cn>
+To: Hongfu Li <lihongfu@kylinos.cn>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org,
- yongqin.liu@linaro.org, a.miederhoefer@gmx.de, arne_f@ipfire.org
+ pabeni@redhat.com, allison.henderson@oracle.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Mon, 17 Jun 2024 12:28:21 +0200 you wrote:
-> After ecf848eb934b ("net: usb: ax88179_178a: fix link status when link is
-> set to down/up") to not reset from usbnet_open after the reset from
-> usbnet_probe at initialization stage to speed up this, some issues have
-> been reported.
+On Mon, 17 Jun 2024 15:54:35 +0800 you wrote:
+> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
+> to simplify the creation of SLAB caches.
 > 
-> It seems to happen that if the initialization is slower, and some time
-> passes between the probe operation and the open operation, the second reset
-> from open is necessary too to have the device working. The reason is that
-> if there is no activity with the phy, this is "disconnected".
-> 
-> [...]
+> Signed-off-by: Hongfu Li <lihongfu@kylinos.cn>
+> ---
+>  net/rds/tcp.c      | 4 +---
+>  net/rds/tcp_recv.c | 4 +---
+>  2 files changed, 2 insertions(+), 6 deletions(-)
 
 Here is the summary with links:
-  - net: usb: ax88179_178a: improve reset check
-    https://git.kernel.org/netdev/net/c/7be4cb7189f7
+  - rds:Simplify the allocation of slab caches
+    https://git.kernel.org/netdev/net-next/c/9f1f70dd8500
 
 You are awesome, thank you!
 -- 
