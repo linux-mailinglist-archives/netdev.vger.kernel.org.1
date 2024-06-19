@@ -1,90 +1,69 @@
-Return-Path: <netdev+bounces-104885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D8FB90EF78
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 15:54:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A563A90EF88
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 15:57:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCD8CB255A7
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 13:54:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BAD52820E5
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 13:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5AFC14EC79;
-	Wed, 19 Jun 2024 13:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6103A150996;
+	Wed, 19 Jun 2024 13:57:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dr3GV2WD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R/deu9Vx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A33F14EC60
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 13:54:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359BE2139CD;
+	Wed, 19 Jun 2024 13:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718805280; cv=none; b=P2ExSyL0f5hx8Zoh0do1f7QbJDZ3ob5zLBl17zGQEUWSWVl2i9d+cLiNWUXQfGqR4JhdTuvTDDEomlTCZlg8WDNYvwdGFjnzTfWaUADB+TZoKsoQyrbK9sqnB2thYdDM0BtrvR+n6sDYjsd/3tTeZWORuB08715Vgyvco241xRU=
+	t=1718805423; cv=none; b=py8kJOHxhL61N3UqByA0A7vRU+G39SHb6fEIETneu9CAWYd3aK3jevKeTIL1DLCsWBB4iweNHOU9FHN3cZ/LsUpzdS8aTQ4w/cTQYb0GB3gYbZDaAq04AK71mdBVkWWn2m38Y8MhFDvKDWF2RRPOoKzCBC4wpwj+I9z7wGgax2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718805280; c=relaxed/simple;
-	bh=uULrUp2XdmogMLrSqTrBAy9ErEQY1du4cURnaRxIxRI=;
+	s=arc-20240116; t=1718805423; c=relaxed/simple;
+	bh=TyaQfQKJsGMA8keYr1hp7wYXz2EM065ExSkm3viI+o0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P79zNk8UVlQ20tR1945X/Gs2JJBpQxauBnjpMQH0yUqeCG5Py/Zqu83RVTvznLykjffnGZZOZYPYM1rOlUxlpZbHxz7Y1MGDhgj3jJGFLbtgx07ocHEJjv1LU/iDgPGmlp/2fpQGJk5zjD+3iCAkl+/w/+mrrA7K+vTgsW5wSnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Dr3GV2WD; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a6f04afcce1so863675966b.2
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 06:54:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718805277; x=1719410077; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4/X1uyeKMm+LCTojyS0F0YrzqYsr5hKB4jznu/4UFt8=;
-        b=Dr3GV2WDhu+Oakvc9fi144SccNziLRxLThNP4Qx7A0aONjP0VtnxKsb1RFoI3mJlL3
-         n6tXBbVyuLZhTL6txHvCe8tNa/C+d2URoonemRNS96TH4o5UoJL+Tm8c4IelsHffWhom
-         Y9S2Sa1Bqgv9KvIvQPmNnIR2G/EKcHyWrqVSZ1dBst6ceZSAIsqHgVT3ZCptEnGw1s8a
-         987TvSWFgK758PXiVcV8H4ignvAsCdR6MT4+kFmm/VWSoT7YjywXU8ZvlLSWwgcI3Nhj
-         Im1dmT5spUnfO/VfGHAsA0BzmLPkFgC3+kzBxyhkXJ3SVd5K0cl4YVtj/mTqgoDayimN
-         7k/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718805277; x=1719410077;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4/X1uyeKMm+LCTojyS0F0YrzqYsr5hKB4jznu/4UFt8=;
-        b=qEiBJEVpQDz7HJHUQFROfahaUVi//lCKXNET7F+bQ6hXnVH//rlKhy8gEhK0IMeocZ
-         Jcjn9LNgxfIWBtK5lNOtJPUnQ3LIZK6g1syLqBlNe3wgJgSHC+7rGhuWurmaFW63cNeV
-         gTNmodrGpyj/U/1mc7+I70vDVRVVCtO1BuDYKOcJrse4tTBg3IYgOvw4wuKIyVGiMUq5
-         ShAiGOemuY8ghBtwRWvb53xLVRKMMMcYZHvXSztXchbrI6icSlUN2eHof6YVllpb+PnN
-         Pj+ngzrqZExuV3yt9RJ+sTi44UpHMd4vERNkfTqTCtnS7dmgMHpNf9VWK/Q74kQXW9UK
-         iQIg==
-X-Forwarded-Encrypted: i=1; AJvYcCWD0KEBAtxREDQ1q7bqsl9P1w9h0R+6D5CKdqTgU4NTpGcyOr4ua8KeehLLmoOuJFL5sdaBxaXAGAVEwKPZyBHd7qdRhO/e
-X-Gm-Message-State: AOJu0YzA3t+1rvgz6QLeY92FbT0gMy255DhmHbo8ep8LrVCPh6P84nul
-	m1GXAE4rSlx12YYNxagemjjwW0HkT/VXFIyn2GoX0gEML9ovk/DhB6pwBmvcPJU=
-X-Google-Smtp-Source: AGHT+IEoW9z9RL64fJJ6JJy+WiDYy6vtGgzuIi7TtyXXpU/XYPbgwsdqNS38T+1EnBxDOF0tEBmOZQ==
-X-Received: by 2002:a17:906:16ce:b0:a6f:cb3:55cc with SMTP id a640c23a62f3a-a6fab7d6d8emr139748966b.73.1718805277329;
-        Wed, 19 Jun 2024 06:54:37 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56fa67ecsm657146566b.215.2024.06.19.06.54.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jun 2024 06:54:37 -0700 (PDT)
-Date: Wed, 19 Jun 2024 16:54:33 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=kJIl99bJyJ7pjXDsMkizA783G0gCwd/Kato3RsqjpkRZVdQYopjhba7wlEcYgRFcXrMK3a3ASwZveitzKg9d7hv/lXLdWRf4iFIEDEZS0J0jspENhTlxoWIju93e/JZGFmgV5Srfr1UOodqA5aQay3tMid7vs4AbLtpCcqGqqd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R/deu9Vx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31722C4AF09;
+	Wed, 19 Jun 2024 13:56:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718805423;
+	bh=TyaQfQKJsGMA8keYr1hp7wYXz2EM065ExSkm3viI+o0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R/deu9VxpmCRDGd5dFsoRTcU1BnrqE6yXALbINS2b8zmXpVUYfA3YwgZq9EoaSDWR
+	 Sdix+N/JuEfjl+pj/iryCgzyKNHeExXb2Gcl72tfy4ykcOPO3rV9STDfdpwNW0LprM
+	 mOv4pWKLZOZbEZMgKiSXmDX8Z0bjIL6qzBo7lED7N9fNEVaQEXdj+pqlUHYQj5QNX1
+	 I/4sQFs9LPuL9ktiDy8px+KyQDdDjGZaj+yWEvsLUYJRr7gFY4LyujuXG1KnooPZZy
+	 j6a7/vvEgYszliFfX3Yzfbj6/NGLRk3UhuGw6hyMh7ipeYdiMLqCtfj0Qps2RBDrzE
+	 zhxLBVbgeanAw==
+Date: Wed, 19 Jun 2024 14:56:56 +0100
+From: Simon Horman <horms@kernel.org>
+To: Christophe Roullier <christophe.roullier@foss.st.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	Casper Andersson <casper.casan@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH v2 net-next] net: dsa: Allow only up to two HSR HW
- offloaded ports for KSZ9477
-Message-ID: <a213ea45-53fa-454d-8989-49dbab806313@moroto.mountain>
-References: <20240619134248.1228443-1-lukma@denx.de>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>, Marek Vasut <marex@denx.de>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next,PATCH v2 2/2] net: stmmac: dwmac-stm32: stm32: add
+ management of stm32mp25 for stm32
+Message-ID: <20240619135656.GG690967@kernel.org>
+References: <20240617154516.277205-1-christophe.roullier@foss.st.com>
+ <20240617154516.277205-3-christophe.roullier@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,13 +72,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240619134248.1228443-1-lukma@denx.de>
+In-Reply-To: <20240617154516.277205-3-christophe.roullier@foss.st.com>
 
-You went above and beyond.  Thanks so much! :)
+On Mon, Jun 17, 2024 at 05:45:16PM +0200, Christophe Roullier wrote:
+> Add Ethernet support for STM32MP25.
+> STM32MP25 is STM32 SOC with 2 GMACs instances.
+> GMAC IP version is SNPS 5.3x.
+> GMAC IP configure with 2 RX and 4 TX queue.
+> DMA HW capability register supported
+> RX Checksum Offload Engine supported
+> TX Checksum insertion supported
+> Wake-Up On Lan supported
+> TSO supported
+> 
+> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
 
-Reviewed-by: Dan Carpenter <dan.carpenter@linaro.org>
+The nit below notwithstanding, this looks good to me,
+and appears to address review of earlier versions.
 
-regards,
-dan carpenter
+Reviewed-by: Simon Horman <horms@kernel.org>
 
+> ---
+>  .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 77 ++++++++++++++++++-
+>  1 file changed, 74 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+
+...
+
+> @@ -365,6 +423,9 @@ static int stm32_dwmac_parse_data(struct stm32_dwmac *dwmac,
+>  		return err;
+>  	}
+>  
+> +	if (dwmac->ops->is_mp2)
+> +		return err;
+> +
+
+nit: As far as I understand things, the intention here is to return early,
+     rather than to return an error. And err will always be 0.
+     So it might be clearer to simply:
+
+		return 0;
+
+>  	dwmac->mode_mask = SYSCFG_MP1_ETH_MASK;
+>  	err = of_property_read_u32_index(np, "st,syscon", 2, &dwmac->mode_mask);
+>  	if (err) {
+
+...
 
