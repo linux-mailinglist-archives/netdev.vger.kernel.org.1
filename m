@@ -1,163 +1,122 @@
-Return-Path: <netdev+bounces-104787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8B8090E62C
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 10:42:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9866D90E63B
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 10:47:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E6C41F26128
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 08:42:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 373C52838FA
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 08:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B3B7BB15;
-	Wed, 19 Jun 2024 08:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16E3177113;
+	Wed, 19 Jun 2024 08:47:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Br6Zq1ys"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cP6DlWBA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8317B3E5
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 08:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0002139B1
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 08:47:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718786515; cv=none; b=kxry4qP+x07kMfHCRc8WBwAObNsRJzzFqlTTLG3NTO7R4If+2WTj4efTRSIAiaEz9hy9+KuL9iLqApz/VGueX/NswnvUmXQEcCdZ9QvEgR1Wp7R1EbZTOTsPHawMAW2GzWy2B1hW0TMsb0xjR3uTbKvGsFlVMm60rhC1WX0wizE=
+	t=1718786872; cv=none; b=dSNBwiX/2rzFvNi5DMlGlpRBWaQ4TNozil4rXo6hVnYdfF/Dh8eb9wFvzHZ+FmDjBtfHOZ2IMtJ5TzhxmCw8cEZtJKPqtWIpdLYtQroq05oNZgc0Sh+ZCmGk8utV7fqWG4NearZyho2ULBu7WeeTRWLa8XH8oZvG8KL0nj8ygrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718786515; c=relaxed/simple;
-	bh=rWeIOug2Ynbv6OTURHg7XDbCwxyQQJLoRG3mJeBPx7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uYZgBprrRNY38jTUNkXpF9bc41F8gfr+54EUqTi2UrO5oFnQbwdlG6bZglR7uXgU213QYBMHebuZrmkIJqODZ05OwyKMw9wflyQuP6BAm7RlZhjW0BTjNV4vF3PJJybjLVSR+uqltyYLxbdH59bE41glcgUOmktp3lnhzrPJX5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Br6Zq1ys; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718786513;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XdxpcAnJIttE7xF3rf60XtSKDuT7zxfz6ipOIlDZ/C4=;
-	b=Br6Zq1ysetmmB2Xe77gAQy1HGFLjbkZXczaO+2QCyXPU4CIyPgGYcvFRLuOtyUszodUYcB
-	Ik0jg/QPD+uTmqN4DhzI1Uj+NdAvK/791HB2+QbpQCMIVNG4RvV8nJx1vl1IW10kWvZjlt
-	qtGs6hYZcmx1cOpJXbOjiGr0X+RPACM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-595-IQ1M9xziOSGlqp5Z3EpuMA-1; Wed, 19 Jun 2024 04:41:51 -0400
-X-MC-Unique: IQ1M9xziOSGlqp5Z3EpuMA-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-362763f8d2eso674779f8f.3
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 01:41:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718786510; x=1719391310;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1718786872; c=relaxed/simple;
+	bh=gpAPP7Ae7Q26Ab2KPQ052rsRCOHoLSXC+n432g9Cfro=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=rMMu+Bd4Tlfs4jpr9VqfCJkhzJHZlopGEwbWGieSzlCUFQ1mQc+a/52H+nYip7lu0TrWGcrT90iXbQNpfms255iBOAY8EAL/LJdtO5BT6858G5mPRm5EYrIAucv+EvGY0hlBBtbN4D8IToXINBo1iUP55c9lOQHgl1URytf66PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cP6DlWBA; arc=none smtp.client-ip=209.85.167.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3d2472450d6so3371844b6e.3
+        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 01:47:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718786870; x=1719391670; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XdxpcAnJIttE7xF3rf60XtSKDuT7zxfz6ipOIlDZ/C4=;
-        b=mPQs/nSjTo/BsdqERzkFBtvhW3iyVRMuPWXF0YkIBsHFoG/sG1G266OaTSjSCltCIU
-         wH0/CNtokQi51Na+5GKfIT5O/WX9KS/w7p7jy/W900DayMU9Nuo4VGYndgh5ONF9/wGL
-         RjzbNVBJScpTaEol5c5L3bgWzCvjzWNOtdNHB8rXgBfP6gAs+YXSwV37cWqUBYCNfdUu
-         j8Vr4WbcWaj2ZXPrUsn1AtbECfQ6K7dxN1LFzCbMIMm6jq2OX19OqQTAZ88C2Y3v8dyg
-         +ir1nxmEM8E/iU3ayxxS9594jEqYuZdhteH7ZwbudIDc47Mpt1XKdGJvoKJ3lHG4M6xn
-         1bow==
-X-Forwarded-Encrypted: i=1; AJvYcCU9MQznb4iB4Skyd5lmpgwioWvSpkpspVGwPq+iPea9NODVyoC7VnlcH3wAeUaSt8v8C9zEWnNGurZaWk5bWXb3aA1qVCC4
-X-Gm-Message-State: AOJu0YxsgEsOCD+aR2ArkvmCuZUIgVpPufKQHkx3sTlHUbK2kMi0amrB
-	rZk56mQ1lGiiIru9a+JHyQr7UQCFZuHnBa/BopvfteN6d3+lmSWWXUA4quodbrriETBc+AbmQBE
-	PBjmB3aTHvdDoalim26Q4ZfhNhocU+lhJoAD/d5De9wItOTQo+LsfNw==
-X-Received: by 2002:a5d:408d:0:b0:360:7829:bb93 with SMTP id ffacd0b85a97d-363177a3a72mr1642380f8f.21.1718786509775;
-        Wed, 19 Jun 2024 01:41:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGmonG/1oENmgMotUOYhNKtoTPMrBWuRz2ayevhgGPlMbNtdCXnZPDcBQKyrmKw0SKJQvaQlg==
-X-Received: by 2002:a5d:408d:0:b0:360:7829:bb93 with SMTP id ffacd0b85a97d-363177a3a72mr1642352f8f.21.1718786509061;
-        Wed, 19 Jun 2024 01:41:49 -0700 (PDT)
-Received: from redhat.com ([2.52.146.100])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-363bd4668aasm730542f8f.48.2024.06.19.01.41.46
+        bh=Xj871OUKshSy/JnM7JEAIxc+O2BKOPQ5glvy5CkbSnk=;
+        b=cP6DlWBA8wBw9xJAg7piRXmPfaAuCJHKWqMub+BAHkZcp1G97pCcC5FRuRaxqx7Q6A
+         HyLrKMefZoezx4FWgPY9+BR8M41BDU6H9wGRpFz9hRcY8Q/uvNlGmV7W8/tOBKT4qAao
+         LVLwH0wFmKcIwShkKwjxkMlhjvFIUHWMogJJ1h64vd5jIH2md4xMMDxbCdYteZSSoUKG
+         6AJksybE1L0i9O/8HPzWBMnv77SoOt3lSK16VuExUtphItU4khWlK8K8QER5ezPgmgPZ
+         6Z0vh5UhF21qoSRu8CgYyLm0/uUp0IWOkmU1+smaKvnbTRPBCTX+ET9GTxGpcTriyJ2j
+         6ZiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718786870; x=1719391670;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Xj871OUKshSy/JnM7JEAIxc+O2BKOPQ5glvy5CkbSnk=;
+        b=VKgeMEf0tjIcQ0dYceyWSRdozdGxi8BewwzKb1YwwmGXwhTm3FsuXYzzulvwVDxT0i
+         ig7xIQCF/2cBgevNwS2yhcgBiWcyJ3oBao9FUuykyde1/ICbL17zKOhe3/IyRNjogaOq
+         zw9HZB28NQjODgVn1Av4AIc/JcYPdxJSvf7jZKVwVjMmpbyNwG5QdDVhOOej0PXFohls
+         eDG6FBpTO2mZjIrJtLOIKgoTKJnER1zedkKaT8pRQ15hYvZ1FzJ/+3etQtgI1ghzChVw
+         2Tp3UBhYWDAEoRZlM+OXa0PWiMJzVOUxOKamTcv+X7AZdF29zwfZ8cdDaE21vcrPqp2/
+         +/jA==
+X-Forwarded-Encrypted: i=1; AJvYcCXzBNq13Ai6urAoGOnN2E7pg3iFHi8qAu49c1DaquVpOQdn/CxUsxXrSRlB4hoif9JcSxyWrhfv/AHli2dHuqZ1HbmLOKRj
+X-Gm-Message-State: AOJu0YzFEeQ5j58hPeGxmyqdir3vyjXsz9wzp5LhXb+4uR+jEET8e8CR
+	z6SwL2PYdNajth8LLtfe3PH6A5BaVuxekcf9Enhx3op4Y6p2Tpt7
+X-Google-Smtp-Source: AGHT+IFF3iMx//x7Zv6JBwWAXY2bHeR4TCCyf6zNY4dfbTxUjLK7IsrVDX9U+6NL0gzsG46lb3J2nA==
+X-Received: by 2002:a05:6808:1290:b0:3d2:1523:8d85 with SMTP id 5614622812f47-3d51bb0aaf6mr2579218b6e.59.1718786867554;
+        Wed, 19 Jun 2024 01:47:47 -0700 (PDT)
+Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79a4da247fbsm322814085a.8.2024.06.19.01.47.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jun 2024 01:41:48 -0700 (PDT)
-Date: Wed, 19 Jun 2024 04:41:44 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Carlos Bilbao <carlos.bilbao.osdev@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	workflows@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	ksummit@lists.linux.dev
-Subject: Re: [PATCH 2/2] Documentation: best practices for using Link trailers
-Message-ID: <20240619043727-mutt-send-email-mst@kernel.org>
-References: <20240618-docs-patch-msgid-link-v1-0-30555f3f5ad4@linuxfoundation.org>
- <20240618-docs-patch-msgid-link-v1-2-30555f3f5ad4@linuxfoundation.org>
+        Wed, 19 Jun 2024 01:47:47 -0700 (PDT)
+Date: Wed, 19 Jun 2024 04:47:46 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ "Singhai, Anjali" <anjali.singhai@intel.com>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, 
+ "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, 
+ Boris Pismenny <borisp@nvidia.com>, 
+ "gal@nvidia.com" <gal@nvidia.com>, 
+ "cratiu@nvidia.com" <cratiu@nvidia.com>, 
+ "rrameshbabu@nvidia.com" <rrameshbabu@nvidia.com>, 
+ "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>, 
+ "tariqt@nvidia.com" <tariqt@nvidia.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, 
+ "Acharya, Arun Kumar" <arun.kumar.acharya@intel.com>
+Message-ID: <66729b32d6391_276353294be@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66729953651ba_2751bc294fa@willemb.c.googlers.com.notmuch>
+References: <CO1PR11MB49939CBC31BC13472404094793CE2@CO1PR11MB4993.namprd11.prod.outlook.com>
+ <66729953651ba_2751bc294fa@willemb.c.googlers.com.notmuch>
+Subject: Re: [RFC net-next 00/15] add basic PSP encryption for TCP connections
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240618-docs-patch-msgid-link-v1-2-30555f3f5ad4@linuxfoundation.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 18, 2024 at 12:42:11PM -0400, Konstantin Ryabitsev wrote:
-> Based on multiple conversations, most recently on the ksummit mailing
-> list [1], add some best practices for using the Link trailer, such as:
+> > 3. About the PSP and UDP header addition, why is the driver doing it? I guess it's because the SW equivalent for PSP support in the kernel does not exist and just an offload for the device. Again in this case the assumption is either the driver does it or the device will do it.
+> > Hope that is irrelevant for the stack. In our case most likely it will be the device doing it.
+> > 
+> > 4. Why is the driver adding the PSP trailer? Hoping this is between the driver and the device, in our case it's the device that will add the trailer.
 > 
-> - how to use markdown-like bracketed numbers in the commit message to
-> indicate the corresponding link
-> - when to use lore.kernel.org vs patch.msgid.link domains
+> This does not adhere to the spec:
 > 
-> Cc: ksummit@lists.linux.dev
-> Link: https://lore.kernel.org/20240617-arboreal-industrious-hedgehog-5b84ae@meerkat # [1]
-> Signed-off-by: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-> ---
->  Documentation/process/maintainer-tip.rst | 24 ++++++++++++++++++------
->  1 file changed, 18 insertions(+), 6 deletions(-)
+> "An option must be provided that enables upper-level software to send packets that are
+> pre-formatted to include the headers required for PSP encapsulation. In this case, the
+> NIC will modify the contents of the headers appropriately, apply
+> encryption/authentication, and add the PSP trailer to the packet."
 > 
-> diff --git a/Documentation/process/maintainer-tip.rst b/Documentation/process/maintainer-tip.rst
-> index 64739968afa6..57ffa553c21e 100644
-> --- a/Documentation/process/maintainer-tip.rst
-> +++ b/Documentation/process/maintainer-tip.rst
-> @@ -375,14 +375,26 @@ following tag ordering scheme:
->     For referring to an email on LKML or other kernel mailing lists,
->     please use the lore.kernel.org redirector URL::
->  
-> -     https://lore.kernel.org/r/email-message@id
-> +     Link: https://lore.kernel.org/email-message@id
->  
-> -   The kernel.org redirector is considered a stable URL, unlike other email
-> -   archives.
-> +   This URL should be used when referring to relevant mailing list
-> +   resources, related patch sets, or other notable discussion threads.
-> +   A convenient way to associate Link trailers with the accompanying
-> +   message is to use markdown-like bracketed notation, for example::
->  
-> -   Maintainers will add a Link tag referencing the email of the patch
-> -   submission when they apply a patch to the tip tree. This tag is useful
-> -   for later reference and is also used for commit notifications.
-> +     A similar approach was attempted before as part of a different
-> +     effort [1], but the initial implementation caused too many
-> +     regressions [2], so it was backed out and reimplemented.
-> +
-> +     Link: https://lore.kernel.org/some-msgid@here # [1]
-> +     Link: https://bugzilla.example.org/bug/12345  # [2]
-> +
-> +   When using the ``Link:`` trailer to indicate the provenance of the
-> +   patch, you should use the dedicated ``patch.msgid.link`` domain. This
-> +   makes it possible for automated tooling to establish which link leads
-> +   to the original patch submission. For example::
-> +
-> +     Link: https://patch.msgid.link/patch-source-msgid@here
->  
->  Please do not use combined tags, e.g. ``Reported-and-tested-by``, as
->  they just complicate automated extraction of tags.
+> https://raw.githubusercontent.com/google/psp/main/doc/PSP_Arch_Spec.pdf
 
-I don't really understand what this is saying.
-So when is msgid.link preferable to kernel.org?
-And when is kernel.org preferable to msgid?
+I responded to the wrong statement. This is in response to point 3.
 
-
-
-> -- 
-> 2.45.2
-> 
-
+In general, PSP can work in tunnel and transport mode. In transport
+mode, it is here assumed to be not transparent, but under control of
+the operating system. That inserts the outer encapsulation headers and
+prepares all fields as it sees fit. E.g., using the inner 4-tuple as
+entropy for the outer UDP source port, and selecting the right SPI.
 
