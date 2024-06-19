@@ -1,89 +1,88 @@
-Return-Path: <netdev+bounces-104895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB41090F067
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:27:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 223AF90F07D
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:29:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD3181C21534
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:27:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 230B61C22FB2
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB89517C64;
-	Wed, 19 Jun 2024 14:27:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52CB617C64;
+	Wed, 19 Jun 2024 14:29:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QfMRxcTV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mE/dpri4"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC303BA2F;
-	Wed, 19 Jun 2024 14:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E261DA4C;
+	Wed, 19 Jun 2024 14:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718807260; cv=none; b=YEN451yyp/FQe/zlLvhfD1VoNb/NymnmU+GqED60otKthMwxuKnc3ojK5dBYZIBSEtLZ+NzDCjL3uq42FccbxXm2KJ7BIBoLgxSRH+aOKCbyFmaaYUuU5qe7EBDsU6BgRyupIxMhMwPHf/6t00DaRrwDQV2EhOYs1kL0a8pdzmE=
+	t=1718807340; cv=none; b=IoZPJL9D48M3C/74Rz9/0GcIwCc0P84OWXy9wTSoZ2j7TUSEbKqXXThUTvWpqsmlrXPt8XDQ7GLEMESfeDB7kxxWKAun2arVs/TcrPlmNUjoLE/785tWjMrwbubZ0vcal+gKQ73PDgyz0p55AQCXOXv8n+sSUf9q/fLjC1+S3h4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718807260; c=relaxed/simple;
-	bh=IkiduiijLkVgV/bSv5r8vwtQTPo5N92a3qp7G86Umqw=;
+	s=arc-20240116; t=1718807340; c=relaxed/simple;
+	bh=Poc5rpuHca8sqVhG+OgCRFs9bBMhZr30XdnyFXPvbJs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oBS1ubPxXZZVeypygH7Cp8Z+UvjAJsxgf/WrJv1LL0He3+lzM/iyxspkcmCJU+eDVVCDCKEcaulLV8QrXQAgeIn58p0HOGHqC6RW18L3WzmYf9Zs5lXiD6hUhHlgq1vDDxg9cTmWCyUZ7W4jftVRWqh3xKZhopTJZtoJXElC0A8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QfMRxcTV; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=23ThqQ+vY+UW638OME0meTnsHSF60P7gNQHbZ6O+nQw=; b=QfMRxcTVMHIFQ/DOnlEv/sAwcB
-	gGIKs+hRi+h9+fn/Jbd45UrPvHFp7pyn4DfeX1QRzSXZNcHpqtZ+3k9qnhdRz5Lhz5i285wUQR69B
-	PRPxUlULQbI5p6lR1ms6P0fmvHNgQwjJTTzN/o0gls5atNL9uOEOmrzfQAOejPmdSw+s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sJwHE-000TV0-Th; Wed, 19 Jun 2024 16:27:08 +0200
-Date: Wed, 19 Jun 2024 16:27:08 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	Casper Andersson <casper.casan@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH v2 net-next] net: dsa: Allow only up to two HSR HW
- offloaded ports for KSZ9477
-Message-ID: <8ee63f71-9aea-431c-b289-8a353925d31a@lunn.ch>
-References: <20240619134248.1228443-1-lukma@denx.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XflxnzptuJtHtEGgx9urYYEBSl9ol0A0uUTy1+JExt6O0J+V8KeAfSVPh0ZdB0SIJW9jl+VaUJHn5iiG/M+MqnAFil13fyrtKe3yXkjXisxLxZ/sFG2Ewogfx+guwTWKccu9EenCu97FRyX7lSPYRL8J6O54TTS9b/Y3hwXS6EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mE/dpri4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A2F9C2BBFC;
+	Wed, 19 Jun 2024 14:28:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718807339;
+	bh=Poc5rpuHca8sqVhG+OgCRFs9bBMhZr30XdnyFXPvbJs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mE/dpri4FFGjujei9AvSpsV6rBgfsKiuJaffWqLFgXGfMo2vpUTXAsnC7slV5REmS
+	 s1nKWDGcQzlM5jyUm1MITiR+icb0n16QuTzHv4VyDZigOlmOHL7gBOTW2anr/XHhJE
+	 wkT8hnsh5SGlaIqEwP6xTOhWFfZu6NxrWp0wkQfxAr5bXgZ2yHWGx9Olqm4ERI3dwo
+	 kH5pxJfO270e5fuj1K4/bSSZi0fJ774JaIoIk/PxGjwGwjhLCjj2xLIkOu9ftgOx6+
+	 F10lCyhQ8NXI2ATYaEHb+v3biyJSSK/coFGze1X5xM6vgvCzKdnKds4D2LE7lNtfNe
+	 yylnqT84vf7Vg==
+Date: Wed, 19 Jun 2024 10:28:58 -0400
+From: Sasha Levin <sashal@kernel.org>
+To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
+Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	Eric Woudstra <ericwouds@gmail.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>, linux@armlinux.org.uk,
+	andrew@lunn.ch, hkallweit1@gmail.com, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 6.9 12/35] net: sfp: add quirk for another
+ multigig RollBall transceiver
+Message-ID: <ZnLrKjb3cwqASKX9@sashalap>
+References: <20240527141214.3844331-1-sashal@kernel.org>
+ <20240527141214.3844331-12-sashal@kernel.org>
+ <20240527165441.2c5516c9@dellmb>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20240619134248.1228443-1-lukma@denx.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240527165441.2c5516c9@dellmb>
 
-> +	/* KSZ9477 can only perform HSR offloading for up to two ports */
-> +	if (hweight8(dev->hsr_ports) >= 2) {
-> +		NL_SET_ERR_MSG_MOD(extack,
-> +				   "Cannot offload more than two ports - use software HSR");
+On Mon, May 27, 2024 at 04:54:41PM +0200, Marek Behún wrote:
+>Sasha,
+>
+>This requires the whole series from which it came:
+>
+>  https://lore.kernel.org/netdev/20240409073016.367771-1-ericwouds@gmail.com/
+>
+>It was merged in
+>  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c31bd5b6ff6f70f016e66c0617e0b91fd7aafca4
+>
+>I don't think this can be easily applied to older kernels, the series
+>has some dependencies.
 
-Bit of a nit pick. 'use' suggests it is a directive, you need to
-changing the configuration to make it work. 'using' would indicate
-nothing needs changing, it has decided to use software HSR for you.
+I'll drop it, thanks!
 
-Other than that:
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+-- 
+Thanks,
+Sasha
 
