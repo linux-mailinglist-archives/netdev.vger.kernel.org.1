@@ -1,67 +1,94 @@
-Return-Path: <netdev+bounces-105067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26F2E90F874
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 23:25:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A755C90F89C
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 23:54:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6E8A1F226F2
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 21:25:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81E241C203DF
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 21:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA8C7E57F;
-	Wed, 19 Jun 2024 21:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5AE8060A;
+	Wed, 19 Jun 2024 21:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vsVQp8ce"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Evvl5HsW"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8C179B84;
-	Wed, 19 Jun 2024 21:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8610215AD93;
+	Wed, 19 Jun 2024 21:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718832313; cv=none; b=cK0aU61tiQET8XYL7D8iXBxqB9EcanfUrLU8ODP4tfN+xmOwlOAI8yEekwhn7IRiBYPE3/SOvIrfKvGiFFEHcC3N0jzOtjJBn1A4TwlUwNU3K9TMEAluqxDhLsUTWDVTjSom437mcm/8diwYjpKi4vm/WOc3URtEDMv0g4oHbdI=
+	t=1718834080; cv=none; b=MUqd2VBCad6/Y8PlQDh9uA22jDKGUKzQf9OoRZqARz427KtAo3ITQ8+qoOpXNxxihptDUE8f6cnjishEHwou9YHoXT4vtZoDmPv2zHwiTpjyDdf4gAnBthb/P+hvm9NS5VH7N89mNoodB53v3dQjIiDvH/Yjdo78uGU8dnrS4dQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718832313; c=relaxed/simple;
-	bh=TAvvtiq8bL4uTtuxbdWSEO3ha5qcXdAyR/EzvToChWw=;
+	s=arc-20240116; t=1718834080; c=relaxed/simple;
+	bh=z6G5Uf6Iyi4WqQORTIjD0jB74Kt0ewnl52JlqEwRn2Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ITCtlkDqNOAMNeyRSQ8YRfqQq3r7xXq8/BO+S4ZgD0sYXJY1VFDVk8Y3E9FpmJO9VZfRaEvp85wWK2QER8zyLNboekIBUIgHGgvmlh3vO0GDsgl/MBEK7/E+blzRA0HBFA+N7FSCcSL2CnK/OgmYOp33wGcB2elImAfbLoYxYyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vsVQp8ce; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ngxBG/bIsZr8BWoqUSJWfqlx+hcMMjTRBj5upmUnUxg=; b=vsVQp8ceCVF/O5bAaR/NpJT9E2
-	X7vN8PsIt+9x/gfvT7v77+LZUHkE1C+lY3+LnXpiIF+SF8shQwu+JoZS/om34rUgdRcaxOKocIk7U
-	pV3Wa6xzHL+WUaI+V3T0G1r5Tb5vV8aMdkri8eh8iA/KJ/HKFqckswbD3jV4Ok5Cp31E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sK2nQ-000VjL-9b; Wed, 19 Jun 2024 23:24:48 +0200
-Date: Wed, 19 Jun 2024 23:24:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Vinod Koul <vkoul@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH net-next 4/8] net: phy: aquantia: add support for aqr115c
-Message-ID: <b0b03680-9842-49ce-badd-5f9826fdc3fa@lunn.ch>
-References: <20240619184550.34524-1-brgl@bgdev.pl>
- <20240619184550.34524-5-brgl@bgdev.pl>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qzegLW5cQY2YNfCp06ij9oEG8U+M8fAWuqn4Ol7vCLkncGWwdD24Mgu8468yDDQl/ySbBYbaG4PXXQMYr1liXf06kRLcspAC8gBF9zI+l19FcGb2x9EIwb6kcoA0Q0NOQM+LLzc83mfvepJWNbMSExLj/2oo3mTMvyJeQA00zMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Evvl5HsW; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3620ee2cdf7so177017f8f.3;
+        Wed, 19 Jun 2024 14:54:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718834077; x=1719438877; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=z6G5Uf6Iyi4WqQORTIjD0jB74Kt0ewnl52JlqEwRn2Y=;
+        b=Evvl5HsWywuMxsq0bCt46NDFWvp6UNp4mU3y9kZucC7KfhboKyAy3/gXhS1e7DMGOr
+         f6X9pwcJX2JLV5yiYOAUjeh6mv1Rp973TNjBSf++FHP7A93xBk/mIuo0DovbiEGQsi1n
+         7JXVMkSdyCJIocoCxXiuSIi0M1xHmJiJ5mSE2AKUtGNu+AEa4RGeUIh0+zY7mBQs8lNU
+         dx2GVZyBj2/u7cA9Rnalb/J7nEafaiVaP6LKKUkkt73PJ+7y6XsirbBPb8IjC+wsPkIP
+         NVzzb3v+0mXRku0A8UKsvXC+ZQcN8CqsD23t580x6enyTj5DvN8bWNQE/Fb78l4QquWJ
+         gSGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718834077; x=1719438877;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z6G5Uf6Iyi4WqQORTIjD0jB74Kt0ewnl52JlqEwRn2Y=;
+        b=pOqRN3Ar7r+0R8g8RV6rA2a/5JNMNSHQ5wAV5l/1aNGPUwhoLQ0QxbI2gUJcltypR3
+         yvxUdEON4ny7r4C5B6oEmKEAijUMsWbDJzUa/YKfeSkESXRNb7yoKq7yfoYdUfp572HS
+         qSoWOwL7hOsM8Ny2amFuXFo+NmzSsUpBgRVC3UVrFxhgd0XiLhVgnZGFmvjooPwYuuti
+         qwxGcGrteenkx4ukfDHr4Gt91CcEL0EEzx9jWosjJ9eauve9gpbAg/WjCxH5S5ypx8JD
+         8UFi5n8If72vSueYispZ3LqDNacmdPcFf1U2OlUntW4NwlEOm0sXsJJiB89fsAI1k9yc
+         dN2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV0j56c4u2AUfPwjb2jtvFzqQ6AWLtFiKcgA+lnHSCzG1OuhJlAQK3OQ+52n/wBliAsEKBDUe6RHOVPRe5uZe4qB9gubWFp4DUbi7/fs/6vEK+Dqy0lgpoB5RqsPy8hbZvxETfs
+X-Gm-Message-State: AOJu0YwamAh+dt3WV8JUP8d6rbQPxNnV+Mw7TpzH0sx3ffb6sx1oIDZe
+	8jPs+xk85RrwB6MqtRCC0gUK5aU591iVAoJ9lrYAT0tUSZowj8BV
+X-Google-Smtp-Source: AGHT+IFpU83wPBoQG7vdNoz5N9ED9k21NppCMsmGxa54FItrLhtOf3h5aGsmHXiFkiCuY6jjnhWxTQ==
+X-Received: by 2002:a5d:6384:0:b0:35e:4f42:6016 with SMTP id ffacd0b85a97d-36317b79039mr2554677f8f.30.1718834076612;
+        Wed, 19 Jun 2024 14:54:36 -0700 (PDT)
+Received: from skbuf ([188.25.55.166])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56ecd666sm701447466b.135.2024.06.19.14.54.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jun 2024 14:54:36 -0700 (PDT)
+Date: Thu, 20 Jun 2024 00:54:33 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Simon Horman <horms@kernel.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	"Ricardo B. Marliere" <ricardo@marliere.net>,
+	Casper Andersson <casper.casan@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH v2 net-next] net: dsa: Allow only up to two HSR HW
+ offloaded ports for KSZ9477
+Message-ID: <20240619215433.6xpadwyvudtybd72@skbuf>
+References: <20240619134248.1228443-1-lukma@denx.de>
+ <20240619134248.1228443-1-lukma@denx.de>
+ <20240619144243.cp6ceembrxs27tfc@skbuf>
+ <20240619171057.766c657b@wsk>
+ <20240619154814.dvjcry7ahvtznfxb@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,24 +97,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240619184550.34524-5-brgl@bgdev.pl>
+In-Reply-To: <20240619154814.dvjcry7ahvtznfxb@skbuf>
 
->  	case MDIO_PHYXS_VEND_IF_STATUS_TYPE_OCSGMII:
-> -		phydev->interface = PHY_INTERFACE_MODE_2500BASEX;
-> +		phydev->interface = PHY_INTERFACE_MODE_OCSGMII;
->  		break;
+On Wed, Jun 19, 2024 at 06:48:14PM +0300, Vladimir Oltean wrote:
+> You would have to make hsr_portdev_setup() call something else rather
+> than netdev_upper_dev_link(), because that eats the "void *upper_info"
+> argument when calling __netdev_upper_dev_link(). Possibly create a new
+> netdev_upper_dev_link_info() ("link upper dev with extra info")
+> function, which only HSR calls with a new info structure. Then, the DSA
+> core has access to that and implicitly to the port type, and from there
+> on, you can apply the proper restriction.
 
-O.K. Given Russells reply, what happens if you skip this hunk, don't
-add PHY_INTERFACE_MODE_OCSGMII but use PHY_INTERFACE_MODE_2500BASEX,
-and change the MAC driver as needed. Given this here, it seems likely
-somebody else is using MDIO_PHYXS_VEND_IF_STATUS_TYPE_OCSGMII as
-PHY_INTERFACE_MODE_2500BASEX, so i expect it will work.
+Yet another comment. TL;DR: I think we should also make HSR use
+netdev_master_upper_dev_link() anyway (as a separate change), and thus,
+no new API is needed, since that function is able to pass a void
+*upper_info already.
 
-Adding PHY_INTERFACE_MODE_OCSGMII is a UAPI addition, since it becomes
-possible to pass it in phy-mode in DT. That means, it is hard to
-remove later, if Russell ever finds the time to finish his patches,
-and PHY_INTERFACE_MODE_OCSGMII is not needed. So if we can avoid
-adding it, we should.
+Explanation: "master" uppers are called like that because any lower
+interface can have only at most one. Bridge, team, bond, etc are all
+"master" uppers. So an interface cannot have 2 bridge uppers, or a team
+and a bond upper at the same time, etc. Compare this to regular upper
+interfaces like VLANs. You can have as many VLAN upper interfaces as you
+want (including if you already have a master upper interface).
 
-       Andrew
+The point is that, AFAIU, the "master" upper restriction comes from the
+use of an rx_handler. You can't chain RX handlers, and a lower netdev
+can have a single one, so if the upper netdev uses an RX handler, it'd
+better make sure that no one else does, or it does but in a coordinated
+manner.
+
+Upper drivers like macvlan do use RX handlers, and are not "master"
+uppers nonetheless. This is not a contradiction in terms, because they
+take care to set up the RX handler of the lower interface only once.
+
+HSR is not as careful, and uses an rx_handler very plainly, but also
+does not mark itself as a "master" upper. An attempt to put a physical
+interface under a HSR upper, and then under a second one (without
+removing it from the first one), would fail the second time around due
+to hsr_portdev_setup() -> netdev_rx_handler_register() ->
+netdev_is_rx_handler_busy() -> -EBUSY.
+
+Nor does that configuration appear to make too much sense to me, so you
+could mark HSR as master, in order for that second attempt to fail one
+step earlier: hsr_portdev_setup() -> netdev_master_upper_dev_link() ->
+__netdev_master_upper_dev_get() -> -EBUSY.
+
+With that in place, you also have free access now to the "upper_info"
+parameter, for what was discussed earlier to be propagated down.
 
