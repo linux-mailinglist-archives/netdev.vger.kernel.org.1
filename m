@@ -1,142 +1,119 @@
-Return-Path: <netdev+bounces-104981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 202B890F5F6
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 20:22:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BDAA90F5FB
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 20:24:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9455283769
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 18:22:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C2F3283A52
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 18:24:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4C1157486;
-	Wed, 19 Jun 2024 18:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149F3157496;
+	Wed, 19 Jun 2024 18:24:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jNz2uIhO"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="DZJ3+jX6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBCD615252C
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 18:22:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D3C15252C;
+	Wed, 19 Jun 2024 18:24:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718821353; cv=none; b=tulpvBLL/Qv1xLzkHPLMNWF7Aqpi9fSaaxQ6NAOegoJCOnseMQgNPdwibeHcN4Flwtx4BnhMulu5PFRH5+or81SkF+bav02q6FcoWPc9rexm4Alm856omvGP5s2SHmmb8OxSHwadVyDTpayWc+lE1LCxP8V+IjOOKSMAV89bPSA=
+	t=1718821471; cv=none; b=EXMfmgVAABytzwT/XmzbzVtY3jwVBNlHFDzPA9U6x+x9mxYaN2Pq6pyuQohjB+vsqwvM2A+yJJcjEAClBZvToh7ylXITaXaZzvb39DCtDQy2ek03jnaU+J+af6TUE6VrMy0onxR6ZqSNcZSp0zY+o44fJBJEN/U21AaIJXmUY78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718821353; c=relaxed/simple;
-	bh=8cxl/UJtNrpMm+vU+XluCrTn7u8uioSFI0ie5YJ3Dp8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=bDDMOXvD2yFs6rEXWvXz4P5QbSV0Y5vAxLhOGQNnsNnWHVdQGAF932QhoJc/8K026vMzfODY1mBVET78njRyq8OzGzA6YiZBoySr+klwtlBe2mZrZ+hFGi7uteZQYYZHEcFq57uLXoBt0QdypPwwhIY+tYCYLA2OuUCbOdRVcs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jNz2uIhO; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45J9Q62O001142;
-	Wed, 19 Jun 2024 18:22:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	v4HWOrkGSkHal9yRzbee7Zczs5GfrothUA5hOODjDmc=; b=jNz2uIhOL6Vv+AMk
-	AjahYxj7AERA6eFfi0g1bwXyuhDsLn8gfBPBlF+LC/wB7JTLWoUUejMD1d+TyDF7
-	MjtV/5pkIL0JdwXvF/b3CVbenpZ8AGbHKPipthgZ9+6UyzyEQPRVb6qJqKSnAZ2O
-	rCVGg2+Bx2VDQIbu64VtzICknCrRbYSvOW8Xtou++9tHM9gyjb948stYOmSmcYWC
-	zOD4VG8xM1IU8WKm2AAkWee/XwxYdQo/mPj6TUV5hksD5Yh+dT0EQl161FBoCDil
-	jizxhzRLqjbOmAVp9lHt/VpwSdHNfftRvvCG6YTcQvpmdubg6Rw/UuaCftNw50YT
-	wFVv/w==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yuja2ag1e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Jun 2024 18:22:21 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45JIMK32025703
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Jun 2024 18:22:20 GMT
-Received: from [10.81.24.74] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 19 Jun
- 2024 11:22:20 -0700
-Message-ID: <2fa05695-faf9-45ce-95de-f49a6749b828@quicinc.com>
-Date: Wed, 19 Jun 2024 11:22:19 -0700
+	s=arc-20240116; t=1718821471; c=relaxed/simple;
+	bh=WXfIrwlChwS80aFk2yEGtJGX56O7hDX0YtQHgupFXUw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EYtZWayDuBDP6+p3EKrSGXQSGu8joiCBIHvnblgr18G69DYpIb47ddkMBJkdxP64dsma2PCxgZKou8NvfiOzyLePDw14oW94kjS2LAsWEsOu1/NFs60JsGuyuCwHaiNw4BfEYlHKP1T39v7pbqBJ/ciKoUIJjf3DG5A19sA4As4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=DZJ3+jX6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 158C8C2BBFC;
+	Wed, 19 Jun 2024 18:24:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1718821470;
+	bh=WXfIrwlChwS80aFk2yEGtJGX56O7hDX0YtQHgupFXUw=;
+	h=From:Subject:Date:To:Cc:From;
+	b=DZJ3+jX6at0yY/Rs+jaFikAilrW5+FqTBzKxBZaeJiijRmymkwSKkHzrKuObx0bnk
+	 aSfdpHlV7czoNlyKpfg4q6R2AFVVFy24cJHp2vKlEOj7N4URLmURca9gLlAz+tzHVa
+	 Ee/WDQ7QHb9JWuPYr3H8yxgVPD7shErAzJxbhYag=
+From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Subject: [PATCH v2 0/2] Documentation: update information for mailing lists
+Date: Wed, 19 Jun 2024 14:24:05 -0400
+Message-Id: <20240619-docs-patch-msgid-link-v2-0-72dd272bfe37@linuxfoundation.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH ipsec-next v4 08/18] xfrm: iptfs: add new iptfs xfrm mode
- impl
-To: Christian Hopps <chopps@chopps.org>, <devel@linux-ipsec.org>
-CC: Steffen Klassert <steffen.klassert@secunet.com>, <netdev@vger.kernel.org>,
-        Christian Hopps <chopps@labn.net>
-References: <20240617205316.939774-1-chopps@chopps.org>
- <20240617205316.939774-9-chopps@chopps.org>
-Content-Language: en-US
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <20240617205316.939774-9-chopps@chopps.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: CT4D--q8_wGvLj2_CDF33jRM2J-lFYus
-X-Proofpoint-ORIG-GUID: CT4D--q8_wGvLj2_CDF33jRM2J-lFYus
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-19_02,2024-06-19_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=999 suspectscore=0 clxscore=1011 impostorscore=0
- malwarescore=0 mlxscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0
- phishscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406190138
+X-B4-Tracking: v=1; b=H4sIAEUic2YC/4WOTQ7CIBSEr9K8tc9AC0RdeQ/TBeGnfVGhgbapa
+ bi72Au4/CaZb2aH7BK5DLdmh+RWyhRDhfbUgBl1GBySrQwtawVT/II2moyTns2I7zyQxReFJ6q
+ r4kxIyZVjULtTcp62w/voK4+U55g+x8zKf+k/48qRYceklL7zUltxr/Gy+bgEq+f68hzTAH0p5
+ Qu+gZy2xAAAAA==
+To: Jonathan Corbet <corbet@lwn.net>, 
+ Carlos Bilbao <carlos.bilbao.osdev@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: workflows@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Konstantin Ryabitsev <konstantin@linuxfoundation.org>, 
+ Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev
+X-Mailer: b4 0.14.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1864;
+ i=konstantin@linuxfoundation.org; h=from:subject:message-id;
+ bh=WXfIrwlChwS80aFk2yEGtJGX56O7hDX0YtQHgupFXUw=;
+ b=owGbwMvMwCW27YjM47CUmTmMp9WSGNKKlaI3TNH+83zVqRz5rxKCi/bEHd5abfRxr/jvt1and
+ wVrlUff6ChlYRDjYpAVU2Qp2xe7KajwoYdceo8pzBxWJpAhDFycAjCRZ9cZ/kfMOuo/82TJgcsT
+ 3p/OS9u09sKBDzsSP2+MyZt1tP3Zi+WTGBkaM6+Fce3srWcK38OZ88poufjEu+7mL0/OFJQVDpy
+ +PI0fAA==
+X-Developer-Key: i=konstantin@linuxfoundation.org; a=openpgp;
+ fpr=DE0E66E32F1FDD0902666B96E63EDCA9329DD07E
 
-On 6/17/24 13:53, Christian Hopps wrote:
-> From: Christian Hopps <chopps@labn.net>
-> 
-> Add a new xfrm mode implementing AggFrag/IP-TFS from RFC9347.
-> 
-> This utilizes the new xfrm_mode_cbs to implement demand-driven IP-TFS
-> functionality. This functionality can be used to increase bandwidth
-> utilization through small packet aggregation, as well as help solve PMTU
-> issues through it's efficient use of fragmentation.
-> 
->    Link: https://www.rfc-editor.org/rfc/rfc9347.txt
-> 
-> Multiple commits follow to build the functionality into xfrm_iptfs.c
-> 
-> Signed-off-by: Christian Hopps <chopps@labn.net>
-> ---
->   net/xfrm/Makefile     |   1 +
->   net/xfrm/xfrm_iptfs.c | 225 ++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 226 insertions(+)
->   create mode 100644 net/xfrm/xfrm_iptfs.c
-> 
-> diff --git a/net/xfrm/Makefile b/net/xfrm/Makefile
-> index 547cec77ba03..cd6520d4d777 100644
-> --- a/net/xfrm/Makefile
-> +++ b/net/xfrm/Makefile
-> @@ -20,5 +20,6 @@ obj-$(CONFIG_XFRM_USER) += xfrm_user.o
->   obj-$(CONFIG_XFRM_USER_COMPAT) += xfrm_compat.o
->   obj-$(CONFIG_XFRM_IPCOMP) += xfrm_ipcomp.o
->   obj-$(CONFIG_XFRM_INTERFACE) += xfrm_interface.o
-> +obj-$(CONFIG_XFRM_IPTFS) += xfrm_iptfs.o
->   obj-$(CONFIG_XFRM_ESPINTCP) += espintcp.o
->   obj-$(CONFIG_DEBUG_INFO_BTF) += xfrm_state_bpf.o
-> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-> new file mode 100644
-> index 000000000000..e7b5546e1f6a
-> --- /dev/null
-> +++ b/net/xfrm/xfrm_iptfs.c
-> @@ -0,0 +1,225 @@
-> +// SPDX-License-Identifier: GPL-2.0
-...
+There have been some important changes to the mailing lists hosted at
+kernel.org, most importantly that vger.kernel.org was migrated from
+majordomo+zmailer to mlmmj and is now being served from the unified
+mailing list platform called "subspace" [1].
 
-> +module_init(xfrm_iptfs_init);
-> +module_exit(xfrm_iptfs_fini);
-> +MODULE_LICENSE("GPL");
+This series updates many links pointing at obsolete locations, but also
+makes the following changes:
 
-missing MODULE_DESCRIPTION() which will cause a warning with make W=1
+- drops the recommendation to use /r/ subpaths in lore.kernel.org links
+(it has been unnecessary for a number of years)
+- adds some detail on how to reference specific Link trailers from
+inside the commit message
+
+Some of these changes are the result of discussions on the ksummit
+mailing list [2].
+
+Link: https://subspace.kernel.org # [1]
+Link: https://lore.kernel.org/20240617-arboreal-industrious-hedgehog-5b84ae@meerkat/ # [2]
+Signed-off-by: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+---
+Changes in v2:
+- Minor wording changes to text and commit messages based on feedback.
+- Link to v1: https://lore.kernel.org/r/20240618-docs-patch-msgid-link-v1-0-30555f3f5ad4@linuxfoundation.org
+
+---
+Konstantin Ryabitsev (2):
+      Documentation: fix links to mailing list services
+      Documentation: best practices for using Link trailers
+
+ Documentation/process/2.Process.rst          |  8 ++++----
+ Documentation/process/howto.rst              | 10 +++++-----
+ Documentation/process/kernel-docs.rst        |  5 ++---
+ Documentation/process/maintainer-netdev.rst  |  5 ++---
+ Documentation/process/maintainer-tip.rst     | 30 ++++++++++++++++++++--------
+ Documentation/process/submitting-patches.rst | 15 +++++---------
+ 6 files changed, 40 insertions(+), 33 deletions(-)
+---
+base-commit: 6ba59ff4227927d3a8530fc2973b80e94b54d58f
+change-id: 20240618-docs-patch-msgid-link-6961045516e0
+
+Best regards,
+-- 
+Konstantin Ryabitsev <konstantin@linuxfoundation.org>
 
 
