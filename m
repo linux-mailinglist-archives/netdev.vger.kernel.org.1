@@ -1,113 +1,180 @@
-Return-Path: <netdev+bounces-104861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E0390EB2E
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:34:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1038790EB23
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:31:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00091B242D1
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 12:34:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 478F1B24EBA
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 12:31:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0FC01422A2;
-	Wed, 19 Jun 2024 12:34:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266E013B290;
+	Wed, 19 Jun 2024 12:31:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="bkHwnVA/"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="lZxOR0wF"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5486375817;
-	Wed, 19 Jun 2024 12:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFFE7F484;
+	Wed, 19 Jun 2024 12:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718800441; cv=none; b=dZkRw9AeV2h0oXPnwQGE98cKHaWxZFp6I3KM0QJG9ffQVXc005Do+QoPuRYSie2TNpCDu2nJa/HE7GnY79tPqV/x/l3BYaJ3bEMAFjvKQJXqXzo3z84ee9oZRLgLVFHPKtltNkQ3lWZbP1CQxwR60Ls710GraCOz3TkFYUZLwMI=
+	t=1718800291; cv=none; b=UPB0VVOXMfkH6EuAom4t+yDE2L7jX1p7vbk44FprnpIdWChRESiRAXJO71+PYUewDLqYf6QwIPR4DPiwfA+Y1AQPAMlPgxqYaNi9oB3HTX5bTg7Ex8dXe+09IPpjj6D8LWG3BgxvDN3C+aOh4Y/bmrkMDgWsq2Z4xp214W96plk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718800441; c=relaxed/simple;
-	bh=oZTdbaFdEYV2+FSHyINXBUqdfGmskBcopBMD9x6R3WI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YTS5QqTdKB6M3p8PLKoabGNNXaBP5awB5z2XnEL1xWBLmjElsQiNP1NytI9GdtJVsc6am8xw15i/0UXcd+56qxXfr73SQ+rLL28Md0mruaFPwmaqzV3OYehPI5uhjokulqoDnYOTrLVF5DK4Wt9Y6P/0EHDpBtoAUpRxfJX5YSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=bkHwnVA/; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 8242DA079B;
-	Wed, 19 Jun 2024 14:33:49 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=mail; bh=A/xFYTay0pnar7l4hfW8U3TeHM5unFOL8UEUrRriS+g=; b=
-	bkHwnVA/DZXBq4/4XR7vU7yjDzepxjwnDLnfrhBZnFRYuIaFWIa1FfCpVulYDpcJ
-	DWyB8qcYccVnvv/Z/JxF8qq/NXWPFNTxFfYmAf06SMhKE8KrTokcWq+uHNE1jwam
-	UhIe6XO5YGX1Leeu/+cEEENzF2wCa3s7T25k9koVY8njdoGsSPHi0ru2dLue7EuH
-	NIHOpDKP4H7oYUbpOkudNVlvOvHAwZjF1IxTdrK/00XfrF325GGtLJZEeWEdGCJZ
-	8iwz7GhJzhc6iQLy+mTHU2EYFlP/9mAvAXacjJELnQm/ZdTNjD/OklyvfIy3wB3b
-	3oQcEPqXJau7k614Vxu3xB4xW9R7OiRNkt76MHw1Zeu63fEZcVbbwEJ/4hVKxHC9
-	laZKqpTWWregEJrpyPZBhRp8RBMWT5ZwVbuivEE69n8CkoctIZ/6dJpjq5AB+JMq
-	Os+ouXQ8XmOMP4LqknHRjq5/yEg2dF4D1JKr+PDvZuAKooE+E5ONvZUCRdMjFqV8
-	omimp/yuNE/LPyYKsgJ+1WvpxxuuaPMUYOF2cxLsKh7vcStbKbNbdpb743E7Tw4L
-	7FNTKuPJDXUnORFNEFvsmBUbFDXJn9syWOK7Pr1V1zKfUQ4G0GpoPBd/DJvEpEeY
-	Jp07wnu42XVqtGVEIe5DmSNduuSizEoKzw9LymVlX5c=
-From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>
-To: Frank Li <Frank.Li@freescale.com>, "David S. Miller"
-	<davem@davemloft.net>, <imx@lists.linux.dev>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>, "Richard
- Cochran" <richardcochran@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Wei Fang
-	<wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH resubmit 3] net: fec: Fix FEC_ECR_EN1588 being cleared on link-down
-Date: Wed, 19 Jun 2024 14:31:11 +0200
-Message-ID: <20240619123111.2798142-1-csokas.bence@prolan.hu>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1718800291; c=relaxed/simple;
+	bh=wpMOkSoPBVIQ3ZosCdP2tRyslpQaJDB9yAagwaWj1xQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CYCO65GdX4g70xieZs9fovUnfd7EmKSNuXvXF+mH6yli3+4ngv17GINPOA/IZoXWR6gBkj0HDeSpfTHfGM2BH4GnnewPcBhQSuetj5w9QHq/li83413ZaAofedXbVPAPDNZp7Pi1gVr/IQdPv8n2j3iXEPYsfyPi8t7PzTrvODw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=lZxOR0wF; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1718800285; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=B5RdL+8cB/GSNge3uIMvi0Jzb3nSy+m4P9mjkS+8pFk=;
+	b=lZxOR0wFsEHkZPk9z7sYLJwIGZW+Vecin50dwXczyEb3HhMGdFCDbr5LyZQpe4iG2vVkuj8YebDnXrr1ycoWD9/IXcDu6/WEMY2njvrWntJnRuNWKoyJzrQ6eji/1xXJI2P1ZoAcGkfbMcwsEsFTUhYxE1zrQsqA/kNgeUFnKzs=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W8oFJ7S_1718800283;
+Received: from 30.221.146.77(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W8oFJ7S_1718800283)
+          by smtp.aliyun-inc.com;
+          Wed, 19 Jun 2024 20:31:24 +0800
+Message-ID: <c9446790-9bac-4541-919b-0af396349c59@linux.alibaba.com>
+Date: Wed, 19 Jun 2024 20:31:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1718800428;VERSION=7972;MC=877467776;ID=563504;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
-X-ESET-Antispam: OK
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2945A129576D7D61
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] net: do not leave a dangling sk pointer, when
+ socket creation fails
+To: Ignat Korchagin <ignat@cloudflare.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Florent Revest <revest@chromium.org>, kernel-team@cloudflare.com,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, stable@vger.kernel.org
+References: <20240617210205.67311-1-ignat@cloudflare.com>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <20240617210205.67311-1-ignat@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-FEC_ECR_EN1588 bit gets cleared after MAC reset in `fec_stop()`, which
-makes all 1588 functionality shut down, and all the extended registers
-disappear, on link-down, making the adapter fall back to compatibility
-"dumb mode". However, some functionality needs to be retained (e.g. PPS)
-even without link.
 
-Fixes: 6605b730c061 ("FEC: Add time stamping code and a PTP hardware clock")
-Cc: Richard Cochran <richardcochran@gmail.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Link: https://lore.kernel.org/netdev/5fa9fadc-a89d-467a-aae9-c65469ff5fe1@lunn.ch/
-Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
----
- drivers/net/ethernet/freescale/fec_main.c | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index 881ece735dcf..fb19295529a2 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -1361,6 +1361,12 @@ fec_stop(struct net_device *ndev)
- 		writel(FEC_ECR_ETHEREN, fep->hwp + FEC_ECNTRL);
- 		writel(rmii_mode, fep->hwp + FEC_R_CNTRL);
- 	}
-+
-+	if (fep->bufdesc_ex) {
-+		val = readl(fep->hwp + FEC_ECNTRL);
-+		val |= FEC_ECR_EN1588;
-+		writel(val, fep->hwp + FEC_ECNTRL);
-+	}
- }
- 
- static void
--- 
-2.34.1
+On 6/18/24 5:02 AM, Ignat Korchagin wrote:
+> It is possible to trigger a use-after-free by:
+>    * attaching an fentry probe to __sock_release() and the probe calling the
+>      bpf_get_socket_cookie() helper
+>    * running traceroute -I 1.1.1.1 on a freshly booted VM
+>
+> A KASAN enabled kernel will log something like below (decoded and stripped):
+> ==================================================================
+> BUG: KASAN: slab-use-after-free in __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
+> Read of size 8 at addr ffff888007110dd8 by task traceroute/299
+>
+> CPU: 2 PID: 299 Comm: traceroute Tainted: G            E      6.10.0-rc2+ #2
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+> Call Trace:
+>   <TASK>
+> dump_stack_lvl (lib/dump_stack.c:117 (discriminator 1))
+> print_report (mm/kasan/report.c:378 mm/kasan/report.c:488)
+> ? __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
+> kasan_report (mm/kasan/report.c:603)
+> ? __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
+> kasan_check_range (mm/kasan/generic.c:183 mm/kasan/generic.c:189)
+> __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
+> bpf_get_socket_ptr_cookie (./arch/x86/include/asm/preempt.h:94 ./include/linux/sock_diag.h:42 net/core/filter.c:5094 net/core/filter.c:5092)
+> bpf_prog_875642cf11f1d139___sock_release+0x6e/0x8e
+> bpf_trampoline_6442506592+0x47/0xaf
+> __sock_release (net/socket.c:652)
+> __sock_create (net/socket.c:1601)
+> ...
+> Allocated by task 299 on cpu 2 at 78.328492s:
+> kasan_save_stack (mm/kasan/common.c:48)
+> kasan_save_track (mm/kasan/common.c:68)
+> __kasan_slab_alloc (mm/kasan/common.c:312 mm/kasan/common.c:338)
+> kmem_cache_alloc_noprof (mm/slub.c:3941 mm/slub.c:4000 mm/slub.c:4007)
+> sk_prot_alloc (net/core/sock.c:2075)
+> sk_alloc (net/core/sock.c:2134)
+> inet_create (net/ipv4/af_inet.c:327 net/ipv4/af_inet.c:252)
+> __sock_create (net/socket.c:1572)
+> __sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
+> __x64_sys_socket (net/socket.c:1718)
+> do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+> entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+>
+> Freed by task 299 on cpu 2 at 78.328502s:
+> kasan_save_stack (mm/kasan/common.c:48)
+> kasan_save_track (mm/kasan/common.c:68)
+> kasan_save_free_info (mm/kasan/generic.c:582)
+> poison_slab_object (mm/kasan/common.c:242)
+> __kasan_slab_free (mm/kasan/common.c:256)
+> kmem_cache_free (mm/slub.c:4437 mm/slub.c:4511)
+> __sk_destruct (net/core/sock.c:2117 net/core/sock.c:2208)
+> inet_create (net/ipv4/af_inet.c:397 net/ipv4/af_inet.c:252)
+> __sock_create (net/socket.c:1572)
+> __sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
+> __x64_sys_socket (net/socket.c:1718)
+> do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+> entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+>
+> Fix this by clearing the struct socket reference in sk_common_release() to cover
+> all protocol families create functions, which may already attached the
+> reference to the sk object with sock_init_data().
+>
+> Fixes: c5dbb89fc2ac ("bpf: Expose bpf_get_socket_cookie to tracing programs")
+> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+> Cc: stable@vger.kernel.org
+> Link: https://lore.kernel.org/netdev/20240613194047.36478-1-kuniyu@amazon.com/T/
+> ---
+> Changes in v3:
+>    * re-added KASAN repro steps to the commit message (somehow stripped in v2)
+>    * stripped timestamps and thread id from the KASAN splat
+>    * removed comment from the code (commit message should be enough)
+>
+> Changes in v2:
+>    * moved the NULL-ing of the socket reference to sk_common_release() (as
+>      suggested by Kuniyuki Iwashima)
+>    * trimmed down the KASAN report in the commit message to show only relevant
+>      info
+>
+>   net/core/sock.c | 3 +++
+>   1 file changed, 3 insertions(+)
+>
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 8629f9aecf91..100e975073ca 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -3742,6 +3742,9 @@ void sk_common_release(struct sock *sk)
+>   
+>   	sk->sk_prot->unhash(sk);
+>   
+> +	if (sk->sk_socket)
+> +		sk->sk_socket->sk = NULL;
+> +
+>   	/*
+>   	 * In this point socket cannot receive new packets, but it is possible
+>   	 * that some packets are in flight because some CPU runs receiver and
+
+Reviewed-by: D. Wythe <alibuda@linux.alibaba.com>
+
+
+A small tip:
+
+It seems that you might have missed CCing some maintainers, using
+scripts/get_maintainer.pl "Your patch" can help you avoid this issue
+again.
+
+
+D. Wythe
+
 
 
 
