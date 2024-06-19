@@ -1,128 +1,112 @@
-Return-Path: <netdev+bounces-104799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09AEF90E6A2
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 11:16:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2107890E6D3
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 11:22:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC9C52835BB
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:16:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFDD51F2152F
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4865D7F490;
-	Wed, 19 Jun 2024 09:16:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pGZIrx7I"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A3637FBB4;
+	Wed, 19 Jun 2024 09:22:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F8F1869;
-	Wed, 19 Jun 2024 09:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A9979DC7
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 09:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718788563; cv=none; b=ZMEZaDk4z4YKhVM8wLeuKRxUZ9ma/nqex4ko0KmIhcChSgirpz9JxxiFMFX+5dUAPePQhrs+DHLywWdKNja7ZsPt4mNNUF4TOUkwSAyu6PX1bVFGes8N/iK6QlZ151SH6oGkv9dURRnU+KMn1sm8HBhkd6E9vM/ZeTztnd2Ue+Y=
+	t=1718788941; cv=none; b=oTB8jED84ZKOjf9JG0sRYwdEM2028fmixzVmVSek0wMhmpUt8Ih1em5FOyF0N7Sy3FFXP4XDrDSVrsM4QMJPEsxRKaIM2hNlEje3LQ57RgSyBTzqO1wQl/DdGtxbrjB78G+pZcJ0802qG/F55+zYpr9NDk7gX4b0Qo6d0Z9FRBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718788563; c=relaxed/simple;
-	bh=5rI/dFrzsUqaLUt8JrqSdOI5dNvwE7OblGdrys9bbbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r5T8wsr1sKpfCCYQCC8tpnOqiStwH+URWVJbK9yZCYVz7jwLPg/PknXrSqT0wKf4kOiOyj9IyoqlDSdI8acOG5PlE5eNK8WYCKGZIyiGgowaIR4BBZ+xNhoCJvsrG+veWnc2UhR//HE3t1cdv2ln1G/slSafknfSXdeZIDmK4GI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pGZIrx7I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F312C32786;
-	Wed, 19 Jun 2024 09:16:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718788562;
-	bh=5rI/dFrzsUqaLUt8JrqSdOI5dNvwE7OblGdrys9bbbc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pGZIrx7IlbzyvOqcjXG9ki0emtFYuW4mgBOrYQTyANOxtv/1KFF9SxOXPhD+za3Mj
-	 T1NWxO272unRBz+RVcb9stYD5qe9ewd+HM+j1VL/iZ+bQDWjUCrkIfRFdpclLkOV/5
-	 Q5SmeSaqFDpMnOu02BJpHY3/QWYrMayLvd8c3mEIQ1qLLkqwxtigqz5xbJmMWsPouB
-	 2nZ2xrsKmgIQZcXRi6ViK5nfpuzeCcOSYB2tg4Oo06FEET7xy5s+wyvSMErjWX0aB6
-	 4M2IOdLj12FSz/8y3OqclbWXm3akf03yEXxriOeCYLVAqwSqPYnwU1AIwhSPPujTys
-	 lzSLIMY9unQew==
-Date: Wed, 19 Jun 2024 12:15:57 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: syzbot <syzbot+19ec7595e3aa1a45f623@syzkaller.appspotmail.com>,
-	jgg@ziepe.ca
-Cc: linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [rdma?] WARNING in ib_uverbs_release_dev
-Message-ID: <20240619091557.GM4025@unreal>
-References: <000000000000057e4c061b386e23@google.com>
+	s=arc-20240116; t=1718788941; c=relaxed/simple;
+	bh=Ssh4FL8rF5cQZRcv5OFI6cJooHEaM1fnEEOA7VAOc8s=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=CxKleYD7Nb2PBJEwzjyK66p8b5t6M7GqK0y0jKGchfOaEPw3xjV1CjCOXpU21qMVbcru8S/gehpXQJX5HjFvw7p86IMkN4fPRIsCrvNqnZ8t2ByQ4DsWWpiN9+TkwKbDW+F0oUA/BwXoG/YbM9RSdJxZ5v5ULxMLsSSJ/NxoEv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-115-rSI3uHCePwmmyKNt5F40lA-1; Wed, 19 Jun 2024 10:22:10 +0100
+X-MC-Unique: rSI3uHCePwmmyKNt5F40lA-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 19 Jun
+ 2024 10:21:35 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Wed, 19 Jun 2024 10:21:35 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Simon Horman' <horms@kernel.org>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>
+CC: Aaron Conole <aconole@redhat.com>, Adrian Moreno <amorenoz@redhat.com>,
+	Pravin B Shelar <pshelar@ovn.org>, Shuah Khan <shuah@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "dev@openvswitch.org"
+	<dev@openvswitch.org>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>
+Subject: RE: [PATCH net] selftests: openvswitch: Use bash as interpreter
+Thread-Topic: [PATCH net] selftests: openvswitch: Use bash as interpreter
+Thread-Index: AQHawKLiJAFnY1V1Jkm3NW1AGN/wlLHO0HXA
+Date: Wed, 19 Jun 2024 09:21:35 +0000
+Message-ID: <6084a57c191543568e6ec1828ec0efe4@AcuMS.aculab.com>
+References: <20240617-ovs-selftest-bash-v1-1-7ae6ccd3617b@kernel.org>
+ <594b79b7-452c-488f-8a7f-4ee95698bff2@intel.com>
+ <20240617103337.GQ8447@kernel.org>
+In-Reply-To: <20240617103337.GQ8447@kernel.org>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000000000000057e4c061b386e23@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 18, 2024 at 11:37:18PM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    2ccbdf43d5e7 Merge tag 'for-linus' of git://git.kernel.org..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=179e93fe980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=fa0ce06dcc735711
-> dashboard link: https://syzkaller.appspot.com/bug?extid=19ec7595e3aa1a45f623
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/27e64d7472ce/disk-2ccbdf43.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/e1c494bb5c9c/vmlinux-2ccbdf43.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/752498985a5e/bzImage-2ccbdf43.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+19ec7595e3aa1a45f623@syzkaller.appspotmail.com
-> 
-> smc: removing ib device syz0
-> ------------[ cut here ]------------
-> WARNING: CPU: 0 PID: 51 at kernel/rcu/srcutree.c:653 cleanup_srcu_struct+0x404/0x4d0 kernel/rcu/srcutree.c:653
-> Modules linked in:
-> CPU: 0 PID: 51 Comm: kworker/u8:3 Not tainted 6.10.0-rc3-syzkaller-00044-g2ccbdf43d5e7 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-> Workqueue: ib-unreg-wq ib_unregister_work
-> RIP: 0010:cleanup_srcu_struct+0x404/0x4d0 kernel/rcu/srcutree.c:653
-> Code: 12 80 00 48 c7 03 00 00 00 00 48 83 c4 48 5b 41 5c 41 5d 41 5e 41 5f 5d e9 14 67 34 0a 90 0f 0b 90 eb e7 90 0f 0b 90 eb e1 90 <0f> 0b 90 eb db 90 0f 0b 90 eb 0a 90 0f 0b 90 eb 04 90 0f 0b 90 48
-> RSP: 0018:ffffc90000bb7970 EFLAGS: 00010202
-> RAX: 0000000000000001 RBX: ffff88802a1bc980 RCX: 0000000000000002
-> RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffffe8ffffd74c58
-> RBP: 0000000000000001 R08: ffffe8ffffd74c5f R09: 1ffffd1ffffae98b
-> R10: dffffc0000000000 R11: fffff91ffffae98c R12: dffffc0000000000
-> R13: ffff88802285b5f0 R14: ffff88802285b000 R15: ffff88802a1bc800
-> FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007fa3852cae10 CR3: 000000000e132000 CR4: 0000000000350ef0
-> Call Trace:
->  <TASK>
->  ib_uverbs_release_dev+0x4e/0x80 drivers/infiniband/core/uverbs_main.c:136
->  device_release+0x9b/0x1c0
->  kobject_cleanup lib/kobject.c:689 [inline]
->  kobject_release lib/kobject.c:720 [inline]
->  kref_put include/linux/kref.h:65 [inline]
->  kobject_put+0x231/0x480 lib/kobject.c:737
->  remove_client_context+0xb9/0x1e0 drivers/infiniband/core/device.c:776
->  disable_device+0x13b/0x360 drivers/infiniband/core/device.c:1282
->  __ib_unregister_device+0x6d/0x170 drivers/infiniband/core/device.c:1475
->  ib_unregister_work+0x19/0x30 drivers/infiniband/core/device.c:1586
->  process_one_work kernel/workqueue.c:3231 [inline]
->  process_scheduled_works+0xa2e/0x1830 kernel/workqueue.c:3312
->  worker_thread+0x86d/0xd70 kernel/workqueue.c:3393
->  kthread+0x2f2/0x390 kernel/kthread.c:389
->  ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
->  </TASK>
+From: Simon Horman
+> Sent: 17 June 2024 11:34
+...
+> > sidenote: I like very much the idea to use the least powerful tool, lik=
+e
+> > sh vs bash, awk vs gawk, but it breaks when we forget what is outside o=
+f
+> > the scope of the former/standard.
+> > Perhaps for shell, we could convert all the selftests at once?
+>=20
+> Thanks,
+>=20
+> Now that you mention it, I have the same feelings.
+>=20
+> Do we ever expect to use the minimal tools, when other
+> parts of the test suite depend on the enhanced ones?
 
-I see that this is caused by call to ib_unregister_device_queued() as a
-response to NETDEV_UNREGISTER event, but we don't flush anything before.
-How can we be sure that ib_device is not used anymore?
+Certainly trying to avoid bash-isms seems like a good idea.
+Especially in scripts where it isn't really that hard.
+OTOH avoiding posix features (so the script will run on a traditional SYSV =
+/bin/sh)
+is probably excessive.
 
-Thanks
+I'd use "${foo%"${foo#?}"}" to get the first character without bash-isms.
+But, IIRC, one version of ash/dash made a 'pig's breakfast' of the nested
+pattern match.
+(Most syntax highlighters don't get the quoting right either...)
+
+=09David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
+
 
