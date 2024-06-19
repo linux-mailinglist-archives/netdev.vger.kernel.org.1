@@ -1,432 +1,379 @@
-Return-Path: <netdev+bounces-104736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF38590E365
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 08:29:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70F5F90E37A
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 08:33:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3E8B1C21F81
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 06:29:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF046B2298B
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 06:33:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03FAA6F2F9;
-	Wed, 19 Jun 2024 06:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 409BD6F079;
+	Wed, 19 Jun 2024 06:33:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="g6Wenazv"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="t5KElNKv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2057.outbound.protection.outlook.com [40.107.96.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619C36F06D
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 06:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718778579; cv=none; b=HZsk6evPeAD3w/opWyQ+u6DOFQ1JTSWTOnAtxnMhEbzYTbEqVZXl/nG+AaN5WvXwsOvCyaXzMMl10geKEGVddHuX0UbV06oxEzcDBSDNJ6qVOQuJ+clkj6KyQ9w/QTslKAL/C4uUmib9l4pMOHO4XbJuNMEoLixZqOfpa9YdB0M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718778579; c=relaxed/simple;
-	bh=p3WfwHopJDPv9BMsXKCzu/0yWbk/IcdVEDEhuBpVKpQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uQn/E+wnKA3eiQS+9m5X9Ky6twoABqOzvnawzE9LEHRKZfjpB36G5QAmqBK1yEz7Ot+aXbgkyve2chhzazl5YSe3oWI/CbZ015fdd4/BTy2W/5wd5rMYI8Z2Nr7DxGxYFBg94/nAAb0i3gLlu2lI7nExCvyyH/qK+sSmGRKPwXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=g6Wenazv; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-70436048c25so4875232b3a.0
-        for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 23:29:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1718778577; x=1719383377; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xYCNpZJlos2u8B+J7soHvzd9OZgog9HhyfRHnjgq7rk=;
-        b=g6Wenazv/6rKPjpNx5nWP1mWQeAu9UbHr8nmRG7AOzSCTxwJHFIzJpBB1DDZ1eRngy
-         qaVSePjJ5TiACvCWjiaJTaSK2BoD4eAoPXgB6A9zE+pRc7SJEPS0kNqBs07KjvYRCGVJ
-         20nDqtKHZsLHyU0P6K2+rtE9sDinYA+uB7lqxrCZ2sjKMoW1l2Z7gERKGGHh6EpYYUqD
-         NzLjk8y1IXH0Ubf3Tsri8UitzpWdxalxJTM/FNH+X4qI68jlnKS45JDqBX+kPNW7IYkG
-         xN4FSNCvgWlMlGD2W6mkU/O10i4B60M13fcDvEZ/sgZbY8SbAYncwyxW05Rq2t0J1DSP
-         ypWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718778577; x=1719383377;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xYCNpZJlos2u8B+J7soHvzd9OZgog9HhyfRHnjgq7rk=;
-        b=qQgwalz05eYFhUR2sdO4ekbhxd9sJLFFKklkjH2bNRbFLxZN5cLZMLoXljEVkgMpOt
-         tU367AvQ+TxmQo99HZWZy3BH3Ad1GTv1j/RfDk7BR2pV+OPKKNuMtm0zkdWUTq+1Dm0u
-         d/shpYEto10Hp6eoNjjjZfTOcxKL22El3NVlH6D+xepwPg0fsjFdED4PT9pfBRIZcROw
-         KPgdntUDNAN5YSxSzQcPDre1TxTCzBq60Mk6llsBF7dj4C2SXkpFMsbPj4cyNdZVXmBO
-         eQw6Xwr0PazRmoQmzlePUSuMCcmwEITP1z6h/rjkKWkuheV2LNz2dKrfrkzU4RKoCLZW
-         3Weg==
-X-Forwarded-Encrypted: i=1; AJvYcCWgYAx4gcMHLeM//wCB1dTlSzzZK1gB+1wiCuuVaHVwh4JfhSDCwHJ1PKAtMSvSnpz/Ti7p7+ir1fpQ/q/D0zxR2ClRD+Px
-X-Gm-Message-State: AOJu0YytpHXG0e14+a5jNkqZUimLAJZ40WiKbBfJ2+jBffwomOGyhE+n
-	6FMok4TNXgoza5YUHtK4b9PMS5SIUWvlz6wFDq9faHGCmuvRIxsytLH5J9ZwFk4=
-X-Google-Smtp-Source: AGHT+IH5CkYdOKYK9BGhrPry9K8lLtrSuWb7TyncaYOviyz0hmNE4ok10mneoes2PJCj7swb3qW1qg==
-X-Received: by 2002:a05:6a00:c8f:b0:705:c0a1:61c9 with SMTP id d2e1a72fcca58-7062c0d198bmr1571269b3a.9.1718778577467;
-        Tue, 18 Jun 2024 23:29:37 -0700 (PDT)
-Received: from localhost (fwdproxy-prn-011.fbsv.net. [2a03:2880:ff:b::face:b00c])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-705ccb4a927sm9963426b3a.103.2024.06.18.23.29.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jun 2024 23:29:37 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: Michael Chan <michael.chan@broadcom.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Adrian Alvarado <adrian.alvarado@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v3 2/2] bnxt_en: implement netdev_queue_mgmt_ops
-Date: Tue, 18 Jun 2024 23:29:31 -0700
-Message-ID: <20240619062931.19435-3-dw@davidwei.uk>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240619062931.19435-1-dw@davidwei.uk>
-References: <20240619062931.19435-1-dw@davidwei.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A381E529;
+	Wed, 19 Jun 2024 06:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718778820; cv=fail; b=t71Z9TRYVA7YLpU4R0dE3GZLtYv1HYR0EiJ4aZttg3SJE0NBvaYgeIpSCYjb8Jda58cLSR0En3sTO2sT35vQ2go9WoU9KuyIAEcXiS/2ibTScRxz2P/STzuD4lMK2NWABCkhO9AD5EZBu7G+51p6QmxVSzPeB/uqGRZUvdPC1pg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718778820; c=relaxed/simple;
+	bh=yB/ficxIiYYR5+spx4Cn5Y3sGRSeIQTtUASPHsY0NiQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=kSD5z35elyeZMGXMcEtzyByEjiIlRu6lew758xZB9a0Yukfa/KenG+2TM3XKiPvBt52KYPEBSOYfOf9IGiIXEl87b+s3VgweSxCQqkjuQcd1q8P3pP8gX+ei4wjcbMt0l+kr/sFz86SoA54/BU2dZakvUpk8GqlNWOPJ7eLXARw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=t5KElNKv; arc=fail smtp.client-ip=40.107.96.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=H9IaQhnMpd/CRYJNrZOmCScn8e3/soQc6j77KqPNT9nAFh3AXZwdT0sdWKb1Dwzvq/FRHgvj7qrWqSJsGPHD+z1HID81v+VJkFpKu9kifRYRkAkJ//wP8DTB6ywvZZ+kfCeppHh1X/fT/VF2XIeXgwkNm92zz/oo36Ila22zdPbahdgLPGwf0RCwjhYwr2DOMhQz4Vqf+CMQUAv1Ans/UhnrBGz2FBoVkY+S/yyVspaxgNfoI0W9mkIv29/Y6B3aEJG7db4mK9+Q8oeb+KcxKTBi825HXY/oUAWj28YAOsCQY/azNG5ATQdy43UtWG7Erc5Y+hqNZlZROpvsCGWLig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2JjwV5eRSETzEfU5fuxVLTrrFLeZi+4tDsNSCPC6LW4=;
+ b=Lio2/aGwU0LAu+28iqEa0/vQ4AlJWkpDlqoT7APuutDAqFsmMmnOdoIewrnG50uZ/Gt0yo0WWQXg9SaP+8snylZ1RIwcue3ffADApoaW4Lwai31FX55mYmHv+KrNwiOWJ4U125furEdpeqOp0bqPJavhTpDkoaSJFcfs5KcoMWM8knf8DLGbComD1pvwWwExLMz+oglq1eB0lcyjZKxjy6ySLNoM2lUkwb54YgOX01/qvKMnYPfpvCIXaHwHbHGB2d8Iq8WlkL+Iwf6S/Ti3zZWWtlcvPXoH/LiE13ZeSA8dzX/aGJG+QceBpzxW/xHBdzQtRzPqcSH+1DfX9DkGZw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=linuxfoundation.org
+ smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2JjwV5eRSETzEfU5fuxVLTrrFLeZi+4tDsNSCPC6LW4=;
+ b=t5KElNKva/VDO543DMrAjVkUuYvl3GD4JAWLGQi/SIZI1JX0RQubOq3SNR6pNUl4mROQp92hgFECM2to4KbRPNPrGCSaGh4yH1FTsVrZO/C9oVsae6Zi3BXRHtIZePcukEy4XGmfTyJn5N2vnaO6JI8HHgobo5Gr3eHUBtjlDg0CXcg/xEv5Px7qBP03zxsQygDT8DELvf6p++FSja234Y/BjefkOMbOBjTLpsMKruo8QCY8rcBaXVweHGprEK48tJ9jzvuzRikucM/UX3Kv0MrtIUrznWVc5HJJRNLdgP0J1g2DMrbUvGTd3L3owJTmXDDQXFmrFmyPXVX8ajOOaA==
+Received: from CH2PR07CA0027.namprd07.prod.outlook.com (2603:10b6:610:20::40)
+ by DM4PR12MB7741.namprd12.prod.outlook.com (2603:10b6:8:103::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31; Wed, 19 Jun
+ 2024 06:33:35 +0000
+Received: from CH1PEPF0000AD77.namprd04.prod.outlook.com
+ (2603:10b6:610:20:cafe::d3) by CH2PR07CA0027.outlook.office365.com
+ (2603:10b6:610:20::40) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.32 via Frontend
+ Transport; Wed, 19 Jun 2024 06:33:35 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH1PEPF0000AD77.mail.protection.outlook.com (10.167.244.55) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7677.15 via Frontend Transport; Wed, 19 Jun 2024 06:33:34 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 18 Jun
+ 2024 23:33:21 -0700
+Received: from [172.27.63.78] (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 18 Jun
+ 2024 23:33:16 -0700
+Message-ID: <21f7e9b8-00aa-4e1f-a769-9606834a234b@nvidia.com>
+Date: Wed, 19 Jun 2024 09:33:12 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 1/2] driver core: auxiliary bus: show
+ auxiliary device IRQs
+To: Greg KH <gregkh@linuxfoundation.org>
+CC: <netdev@vger.kernel.org>, <pabeni@redhat.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <edumazet@google.com>, <david.m.ertman@intel.com>,
+	<rafael@kernel.org>, <ira.weiny@intel.com>, <linux-rdma@vger.kernel.org>,
+	<leon@kernel.org>, <tariqt@nvidia.com>, Parav Pandit <parav@nvidia.com>
+References: <20240618150902.345881-1-shayd@nvidia.com>
+ <20240618150902.345881-2-shayd@nvidia.com>
+ <2024061849-cupped-throwback-4fee@gregkh>
+Content-Language: en-US
+From: Shay Drori <shayd@nvidia.com>
+In-Reply-To: <2024061849-cupped-throwback-4fee@gregkh>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD77:EE_|DM4PR12MB7741:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5e80c4c4-d6b5-48d7-1773-08dc9029bee1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230037|7416011|1800799021|36860700010|376011|82310400023;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?K1k5Kzl5VGNUcmJ6ZWl5NU81TWNZZlI1T0dxTDBRYXdsWm5qTFJneC9vaEor?=
+ =?utf-8?B?SkRQNEhXNXVKblFlRGtYY24yTStKQ2t6c2RIWjU5MC9sVzQ2c2tNZUZkWnZQ?=
+ =?utf-8?B?Q2dIanNPalovc0k4R3hHdi9oa0s1MEpOdHloVTNYTjB6RmNFdWVBYlJhazQy?=
+ =?utf-8?B?TWdqOHRBVDhScmQ3bExGbG16K1dMaXZzV21rQ1Zmeng2ODRIL0dpWWY3VG9D?=
+ =?utf-8?B?L1FnelFzNjlhbndHamRJR3ZDMVBGWTRVUEY5U2VSUzB2QlJqalMxclptMmFu?=
+ =?utf-8?B?cVhWMFg0SlNOVkJGUWJUcldoaUowak1MNUdOQ0JEZ0laanJHS2FEOHhaQmpO?=
+ =?utf-8?B?dUwrREorZDNKTk95TnJ3eC9BaTcwYzRMY1NJRFA5bjJld1U4RmRlVllTRU14?=
+ =?utf-8?B?bUVFczlRZnQ1Z0VLSDN1YVNLOERpMWZ5NjdyOXh3cGdIaGF1MUxzRTlwSzEy?=
+ =?utf-8?B?T3VlVkJ1dEJTV2YvQnlqNFo3MGc0dmp3L0xLaCt5RFJhWW9ZU2hVRCtLR2M5?=
+ =?utf-8?B?SmtrcklGY1BDdk04VyttZ0RqWVcwSjNsczdSRVlBWjV2NVpqamdubkIyNGc3?=
+ =?utf-8?B?TmY0MHBqLzVFZlRwc0FtQS8wb3QxYmtOOTRDQnFFZXJ3bnBONFRQdElwRkwx?=
+ =?utf-8?B?ZGxsblRxek5RdHErYVJZUitaLzlNKzhJVTB0YkNpVUZlaGVhK3RvSzhtVkJy?=
+ =?utf-8?B?LzBUY29YVEpRTk1Jd1RmMDRLQmtLLytlSWVlWFZvc1lYREowRjZUUnV5Z0FB?=
+ =?utf-8?B?eno5V1FMM3JrYkRScXl1WlJkbVd4U3RqbndyWVRtQjN3NXRhNXREY2VwMHEz?=
+ =?utf-8?B?NXJJTmZPN0gzWEJGa25DT1B4K25IV1EzT0VUb3Q5aGplcHpibENJUmJ0NGU4?=
+ =?utf-8?B?ZHQxYjBOMVcxdjE5SlVVUDBsa1hlQm5PeWpQZXZoTHRXV2NESEdlVE5Ndm5s?=
+ =?utf-8?B?K29Oek5mN1J2YkpYZUhhOTd5SEtrV05xMU1ZVUpoa2dwRjZPRWo0anNXZHBR?=
+ =?utf-8?B?Z3ROaC9jUjNQVkZvYVNVUnZETkxyVzRtdWFoelBxWlB4M3hVMmM4Tm1hM0J5?=
+ =?utf-8?B?dkx0bzFkL2taV0w2dzZFZDF3MmxVaEwwaitCZjgvSjEvajhxSmVRYklnNk8w?=
+ =?utf-8?B?OGdrcWZsTE5kNlB0RFlyTStKckx6WVhpS21NamJuT2hqcXdYVlRxb04vYmtw?=
+ =?utf-8?B?YlpoVzVINlJNRVBpaElWMzNmQmJEV01UVzdIM3owKzJlakhIWXJQd0xhMlF4?=
+ =?utf-8?B?M3R3NHhCb0x1all3VUMyc0JvclJTY1FoZnFDeDgvRVQ5b1U4VWFZeDZLeWpu?=
+ =?utf-8?B?cVJ0blhub2ZuN3RLS3d5dW53dGE2MWdVU0dUTXVkNFFhVkZlWG4wMDBtN3My?=
+ =?utf-8?B?YnNxbXE1VXhlWFFVQVRzcDBlNHlDbUdnOGt4Vk5jbThUcnVDMEtDZTc0QlN0?=
+ =?utf-8?B?a1JueGp6MlZRT211RVRTUGNYbVh6ZDJSV1ZPaTFyRUhlUlJJd0JZT1ZTbXEy?=
+ =?utf-8?B?VUNHcHJabEVXTnBGRENUY3VFQTl3aXV4K0VRalo2aXVvRjZ6MDlPUU1RU1ZD?=
+ =?utf-8?B?YW5UNDVFclE4VHRYVC8rYjdzNnJLekFoNDIxeXZidFNWWHVnY25Va1V2eEtx?=
+ =?utf-8?B?c0p2d0JKaHB4eGpXdVF2ckY1NHhEdmtGenQ2MFFaVUNJb2VWVVg4Q3pxUzFr?=
+ =?utf-8?B?aStPZ0RiNjZKakZOcGpMQ0VnMzBWY0xEK2pHbUdBbjVKMG1VOXpDT3dDbERS?=
+ =?utf-8?B?ZGV0ZWNFZWVBUGVldldJYlhWU0VMM3IwazNFSTdINlpuRSsvcEYwaFJ6QWdi?=
+ =?utf-8?B?a0FGMyt4ZUQ5OHV4N0dYZ0ZhK0NrVmhIZThML0x2Yjg1cmJCalpuNE5XV3Fj?=
+ =?utf-8?B?UDRjTFhCUFhoQnhKVXdFek5jM1AycXdmL3VhMDYySUlRUXc9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230037)(7416011)(1800799021)(36860700010)(376011)(82310400023);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2024 06:33:34.8843
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5e80c4c4-d6b5-48d7-1773-08dc9029bee1
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000AD77.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7741
 
-Implement netdev_queue_mgmt_ops for bnxt added in [1].
 
-Two bnxt_rx_ring_info structs are allocated to hold the new/old queue
-memory. Queue memory is copied from/to the main bp->rx_ring[idx]
-bnxt_rx_ring_info.
 
-Queue memory is pre-allocated in bnxt_queue_mem_alloc() into a clone,
-and then copied into bp->rx_ring[idx] in bnxt_queue_mem_start().
+On 18/06/2024 19:13, Greg KH wrote:
+> External email: Use caution opening links or attachments
+> 
+> 
+> On Tue, Jun 18, 2024 at 06:09:01PM +0300, Shay Drory wrote:
+>> diff --git a/drivers/base/auxiliary_sysfs.c b/drivers/base/auxiliary_sysfs.c
+>> new file mode 100644
+>> index 000000000000..3f112fd26e72
+>> --- /dev/null
+>> +++ b/drivers/base/auxiliary_sysfs.c
+>> @@ -0,0 +1,110 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES
+>> + */
+>> +
+>> +#include <linux/auxiliary_bus.h>
+>> +#include <linux/slab.h>
+>> +
+>> +struct auxiliary_irq_info {
+>> +     struct device_attribute sysfs_attr;
+>> +};
+>> +
+>> +static struct attribute *auxiliary_irq_attrs[] = {
+>> +     NULL
+>> +};
+>> +
+>> +static const struct attribute_group auxiliary_irqs_group = {
+>> +     .name = "irqs",
+>> +     .attrs = auxiliary_irq_attrs,
+>> +};
+>> +
+>> +static int auxiliary_irq_dir_prepare(struct auxiliary_device *auxdev)
+>> +{
+>> +     int ret = 0;
+>> +
+>> +     mutex_lock(&auxdev->lock);
+>> +     if (auxdev->dir_exists)
+>> +             goto unlock;
+> 
+> You do know about cleanup.h, right?  Please use it.
+> 
+> But what exactly are you trying to protect here?  How will you race and
+> add two irqs at the same time?  Driver probe is always single threaded,
+> so what would be calling this at the same time from multiple places?
 
-Similarly, when bp->rx_ring[idx] is stopped its queue memory is copied
-into a clone, and then freed later in bnxt_queue_mem_free().
 
-I tested this patchset with netdev_rx_queue_restart(), including
-inducing errors in all places that returns an error code. In all cases,
-the queue is left in a good working state.
+mlx5 driver requests IRQs on demand for PCI PF, VF, SFs.
+And it occurs from multiple threads, hence we need to protect it.
 
-Rx queues are created/destroyed using bnxt_hwrm_rx_ring_alloc() and
-bnxt_hwrm_rx_ring_free(), which issue HWRM_RING_ALLOC and HWRM_RING_FREE
-commands respectively to the firmware. By the time a HWRM_RING_FREE
-response is received, there won't be any more completions from that
-queue.
 
-Thanks to Somnath for helping me with this patch. With their permission
-I've added them as Acked-by.
+> 
+> 
+>> +
+>> +     xa_init(&auxdev->irqs);
+>> +     ret = devm_device_add_group(&auxdev->dev, &auxiliary_irqs_group);
+>> +     if (!ret)
+>> +             auxdev->dir_exists = 1;
+>> +
+>> +unlock:
+>> +     mutex_unlock(&auxdev->lock);
+>> +     return ret;
+>> +}
+>> +
+>> +/**
+>> + * auxiliary_device_sysfs_irq_add - add a sysfs entry for the given IRQ
+>> + * @auxdev: auxiliary bus device to add the sysfs entry.
+>> + * @irq: The associated interrupt number.
+>> + *
+>> + * This function should be called after auxiliary device have successfully
+>> + * received the irq.
+>> + *
+>> + * Return: zero on success or an error code on failure.
+>> + */
+>> +int auxiliary_device_sysfs_irq_add(struct auxiliary_device *auxdev, int irq)
+>> +{
+>> +     struct device *dev = &auxdev->dev;
+>> +     struct auxiliary_irq_info *info;
+>> +     int ret;
+>> +
+>> +     ret = auxiliary_irq_dir_prepare(auxdev);
+>> +     if (ret)
+>> +             return ret;
+>> +
+>> +     info = kzalloc(sizeof(*info), GFP_KERNEL);
+>> +     if (!info)
+>> +             return -ENOMEM;
+>> +
+>> +     sysfs_attr_init(&info->sysfs_attr.attr);
+>> +     info->sysfs_attr.attr.name = kasprintf(GFP_KERNEL, "%d", irq);
+>> +     if (!info->sysfs_attr.attr.name) {
+>> +             ret = -ENOMEM;
+>> +             goto name_err;
+>> +     }
+>> +
+>> +     ret = xa_insert(&auxdev->irqs, irq, info, GFP_KERNEL);
+> 
+> So no lock happening here, either use it always, or not at all?
 
-[1]: https://lore.kernel.org/netdev/20240501232549.1327174-2-shailend@google.com/
 
-Acked-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 275 ++++++++++++++++++++++
- 1 file changed, 275 insertions(+)
+the lock is only needed to protect the group (directory) creation, which
+will be used by all the IRQs of this auxdev.
+parallel calls to this API will always be with different IRQs, which
+means each IRQ have a unique index.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 9e8d5cc32f16..259fbe709a8b 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -3997,6 +3997,62 @@ static int bnxt_alloc_cp_rings(struct bnxt *bp)
- 	return 0;
- }
- 
-+static void bnxt_init_rx_ring_struct(struct bnxt *bp,
-+				     struct bnxt_rx_ring_info *rxr)
-+{
-+	struct bnxt_ring_mem_info *rmem;
-+	struct bnxt_ring_struct *ring;
-+
-+	ring = &rxr->rx_ring_struct;
-+	rmem = &ring->ring_mem;
-+	rmem->nr_pages = bp->rx_nr_pages;
-+	rmem->page_size = HW_RXBD_RING_SIZE;
-+	rmem->pg_arr = (void **)rxr->rx_desc_ring;
-+	rmem->dma_arr = rxr->rx_desc_mapping;
-+	rmem->vmem_size = SW_RXBD_RING_SIZE * bp->rx_nr_pages;
-+	rmem->vmem = (void **)&rxr->rx_buf_ring;
-+
-+	ring = &rxr->rx_agg_ring_struct;
-+	rmem = &ring->ring_mem;
-+	rmem->nr_pages = bp->rx_agg_nr_pages;
-+	rmem->page_size = HW_RXBD_RING_SIZE;
-+	rmem->pg_arr = (void **)rxr->rx_agg_desc_ring;
-+	rmem->dma_arr = rxr->rx_agg_desc_mapping;
-+	rmem->vmem_size = SW_RXBD_AGG_RING_SIZE * bp->rx_agg_nr_pages;
-+	rmem->vmem = (void **)&rxr->rx_agg_ring;
-+}
-+
-+static void bnxt_reset_rx_ring_struct(struct bnxt *bp,
-+				      struct bnxt_rx_ring_info *rxr)
-+{
-+	struct bnxt_ring_mem_info *rmem;
-+	struct bnxt_ring_struct *ring;
-+	int i;
-+
-+	rxr->page_pool->p.napi = NULL;
-+	rxr->page_pool = NULL;
-+
-+	ring = &rxr->rx_ring_struct;
-+	rmem = &ring->ring_mem;
-+	rmem->pg_tbl = NULL;
-+	rmem->pg_tbl_map = 0;
-+	for (i = 0; i < rmem->nr_pages; i++) {
-+		rmem->pg_arr[i] = NULL;
-+		rmem->dma_arr[i] = 0;
-+	}
-+	*rmem->vmem = NULL;
-+
-+	ring = &rxr->rx_agg_ring_struct;
-+	rmem = &ring->ring_mem;
-+	rmem->pg_tbl = NULL;
-+	rmem->pg_tbl_map = 0;
-+	for (i = 0; i < rmem->nr_pages; i++) {
-+		rmem->pg_arr[i] = NULL;
-+		rmem->dma_arr[i] = 0;
-+	}
-+	*rmem->vmem = NULL;
-+}
-+
- static void bnxt_init_ring_struct(struct bnxt *bp)
- {
- 	int i, j;
-@@ -14914,6 +14970,224 @@ static const struct netdev_stat_ops bnxt_stat_ops = {
- 	.get_base_stats		= bnxt_get_base_stats,
- };
- 
-+static int bnxt_alloc_rx_agg_bmap(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)
-+{
-+	u16 mem_size;
-+
-+	rxr->rx_agg_bmap_size = bp->rx_agg_ring_mask + 1;
-+	mem_size = rxr->rx_agg_bmap_size / 8;
-+	rxr->rx_agg_bmap = kzalloc(mem_size, GFP_KERNEL);
-+	if (!rxr->rx_agg_bmap)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
-+{
-+	struct bnxt_rx_ring_info *rxr, *clone;
-+	struct bnxt *bp = netdev_priv(dev);
-+	struct bnxt_ring_struct *ring;
-+	int rc;
-+
-+	rxr = &bp->rx_ring[idx];
-+	clone = qmem;
-+	memcpy(clone, rxr, sizeof(*rxr));
-+	bnxt_init_rx_ring_struct(bp, clone);
-+	bnxt_reset_rx_ring_struct(bp, clone);
-+
-+	clone->rx_prod = 0;
-+	clone->rx_agg_prod = 0;
-+	clone->rx_sw_agg_prod = 0;
-+	clone->rx_next_cons = 0;
-+
-+	rc = bnxt_alloc_rx_page_pool(bp, clone, rxr->page_pool->p.nid);
-+	if (rc)
-+		return rc;
-+
-+	ring = &clone->rx_ring_struct;
-+	rc = bnxt_alloc_ring(bp, &ring->ring_mem);
-+	if (rc)
-+		goto err_free_rx_ring;
-+
-+	if (bp->flags & BNXT_FLAG_AGG_RINGS) {
-+		ring = &clone->rx_agg_ring_struct;
-+		rc = bnxt_alloc_ring(bp, &ring->ring_mem);
-+		if (rc)
-+			goto err_free_rx_agg_ring;
-+
-+		rc = bnxt_alloc_rx_agg_bmap(bp, clone);
-+		if (rc)
-+			goto err_free_rx_agg_ring;
-+	}
-+
-+	bnxt_init_one_rx_ring_rxbd(bp, clone);
-+	bnxt_init_one_rx_agg_ring_rxbd(bp, clone);
-+
-+	bnxt_alloc_one_rx_ring_skb(bp, clone, idx);
-+	if (bp->flags & BNXT_FLAG_AGG_RINGS)
-+		bnxt_alloc_one_rx_ring_page(bp, clone, idx);
-+
-+	return 0;
-+
-+err_free_rx_agg_ring:
-+	bnxt_free_ring(bp, &clone->rx_agg_ring_struct.ring_mem);
-+err_free_rx_ring:
-+	bnxt_free_ring(bp, &clone->rx_ring_struct.ring_mem);
-+	clone->page_pool->p.napi = NULL;
-+	page_pool_destroy(clone->page_pool);
-+	clone->page_pool = NULL;
-+	return rc;
-+}
-+
-+static void bnxt_queue_mem_free(struct net_device *dev, void *qmem)
-+{
-+	struct bnxt_rx_ring_info *rxr = qmem;
-+	struct bnxt *bp = netdev_priv(dev);
-+	struct bnxt_ring_struct *ring;
-+
-+	bnxt_free_one_rx_ring(bp, rxr);
-+	bnxt_free_one_rx_agg_ring(bp, rxr);
-+
-+	/* At this point, this NAPI instance has another page pool associated
-+	 * with it. Disconnect here before freeing the old page pool to avoid
-+	 * warnings.
-+	 */
-+	rxr->page_pool->p.napi = NULL;
-+	page_pool_destroy(rxr->page_pool);
-+	rxr->page_pool = NULL;
-+
-+	ring = &rxr->rx_ring_struct;
-+	bnxt_free_ring(bp, &ring->ring_mem);
-+
-+	ring = &rxr->rx_agg_ring_struct;
-+	bnxt_free_ring(bp, &ring->ring_mem);
-+
-+	kfree(rxr->rx_agg_bmap);
-+	rxr->rx_agg_bmap = NULL;
-+}
-+
-+static void bnxt_copy_rx_ring(struct bnxt *bp,
-+			      struct bnxt_rx_ring_info *dst,
-+			      struct bnxt_rx_ring_info *src)
-+{
-+	struct bnxt_ring_mem_info *dst_rmem, *src_rmem;
-+	struct bnxt_ring_struct *dst_ring, *src_ring;
-+	int i;
-+
-+	dst_ring = &dst->rx_ring_struct;
-+	dst_rmem = &dst_ring->ring_mem;
-+	src_ring = &src->rx_ring_struct;
-+	src_rmem = &src_ring->ring_mem;
-+
-+	WARN_ON(dst_rmem->nr_pages != src_rmem->nr_pages);
-+	WARN_ON(dst_rmem->page_size != src_rmem->page_size);
-+	WARN_ON(dst_rmem->flags != src_rmem->flags);
-+	WARN_ON(dst_rmem->depth != src_rmem->depth);
-+	WARN_ON(dst_rmem->vmem_size != src_rmem->vmem_size);
-+	WARN_ON(dst_rmem->ctx_mem != src_rmem->ctx_mem);
-+
-+	dst_rmem->pg_tbl = src_rmem->pg_tbl;
-+	dst_rmem->pg_tbl_map = src_rmem->pg_tbl_map;
-+	*dst_rmem->vmem = *src_rmem->vmem;
-+	for (i = 0; i < dst_rmem->nr_pages; i++) {
-+		dst_rmem->pg_arr[i] = src_rmem->pg_arr[i];
-+		dst_rmem->dma_arr[i] = src_rmem->dma_arr[i];
-+	}
-+
-+	if (!(bp->flags & BNXT_FLAG_AGG_RINGS))
-+		return;
-+
-+	dst_ring = &dst->rx_agg_ring_struct;
-+	dst_rmem = &dst_ring->ring_mem;
-+	src_ring = &src->rx_agg_ring_struct;
-+	src_rmem = &src_ring->ring_mem;
-+
-+	WARN_ON(dst_rmem->nr_pages != src_rmem->nr_pages);
-+	WARN_ON(dst_rmem->page_size != src_rmem->page_size);
-+	WARN_ON(dst_rmem->flags != src_rmem->flags);
-+	WARN_ON(dst_rmem->depth != src_rmem->depth);
-+	WARN_ON(dst_rmem->vmem_size != src_rmem->vmem_size);
-+	WARN_ON(dst_rmem->ctx_mem != src_rmem->ctx_mem);
-+	WARN_ON(dst->rx_agg_bmap_size != src->rx_agg_bmap_size);
-+
-+	dst_rmem->pg_tbl = src_rmem->pg_tbl;
-+	dst_rmem->pg_tbl_map = src_rmem->pg_tbl_map;
-+	*dst_rmem->vmem = *src_rmem->vmem;
-+	for (i = 0; i < dst_rmem->nr_pages; i++) {
-+		dst_rmem->pg_arr[i] = src_rmem->pg_arr[i];
-+		dst_rmem->dma_arr[i] = src_rmem->dma_arr[i];
-+	}
-+
-+	dst->rx_agg_bmap = src->rx_agg_bmap;
-+}
-+
-+static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
-+{
-+	struct bnxt *bp = netdev_priv(dev);
-+	struct bnxt_rx_ring_info *rxr, *clone;
-+	struct bnxt_cp_ring_info *cpr;
-+	int rc;
-+
-+	rxr = &bp->rx_ring[idx];
-+	clone = qmem;
-+
-+	rxr->rx_prod = clone->rx_prod;
-+	rxr->rx_agg_prod = clone->rx_agg_prod;
-+	rxr->rx_sw_agg_prod = clone->rx_sw_agg_prod;
-+	rxr->rx_next_cons = clone->rx_next_cons;
-+	rxr->page_pool = clone->page_pool;
-+
-+	bnxt_copy_rx_ring(bp, rxr, clone);
-+
-+	rc = bnxt_hwrm_rx_ring_alloc(bp, rxr);
-+	if (rc)
-+		return rc;
-+	rc = bnxt_hwrm_rx_agg_ring_alloc(bp, rxr);
-+	if (rc)
-+		goto err_free_hwrm_rx_ring;
-+
-+	bnxt_db_write(bp, &rxr->rx_db, rxr->rx_prod);
-+	if (bp->flags & BNXT_FLAG_AGG_RINGS)
-+		bnxt_db_write(bp, &rxr->rx_agg_db, rxr->rx_agg_prod);
-+
-+	napi_enable(&rxr->bnapi->napi);
-+
-+	cpr = &rxr->bnapi->cp_ring;
-+	cpr->sw_stats->rx.rx_resets++;
-+
-+	return 0;
-+
-+err_free_hwrm_rx_ring:
-+	bnxt_hwrm_rx_ring_free(bp, rxr, false);
-+	return rc;
-+}
-+
-+static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
-+{
-+	struct bnxt *bp = netdev_priv(dev);
-+	struct bnxt_rx_ring_info *rxr;
-+
-+	rxr = &bp->rx_ring[idx];
-+	napi_disable(&rxr->bnapi->napi);
-+	bnxt_hwrm_rx_ring_free(bp, rxr, false);
-+	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
-+	rxr->rx_next_cons = 0;
-+
-+	memcpy(qmem, rxr, sizeof(*rxr));
-+	bnxt_init_rx_ring_struct(bp, qmem);
-+
-+	return 0;
-+}
-+
-+static const struct netdev_queue_mgmt_ops bnxt_queue_mgmt_ops = {
-+	.ndo_queue_mem_size	= sizeof(struct bnxt_rx_ring_info),
-+	.ndo_queue_mem_alloc	= bnxt_queue_mem_alloc,
-+	.ndo_queue_mem_free	= bnxt_queue_mem_free,
-+	.ndo_queue_start	= bnxt_queue_start,
-+	.ndo_queue_stop		= bnxt_queue_stop,
-+};
-+
- static void bnxt_remove_one(struct pci_dev *pdev)
- {
- 	struct net_device *dev = pci_get_drvdata(pdev);
-@@ -15379,6 +15653,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	dev->stat_ops = &bnxt_stat_ops;
- 	dev->watchdog_timeo = BNXT_TX_TIMEOUT;
- 	dev->ethtool_ops = &bnxt_ethtool_ops;
-+	dev->queue_mgmt_ops = &bnxt_queue_mgmt_ops;
- 	pci_set_drvdata(pdev, dev);
- 
- 	rc = bnxt_alloc_hwrm_resources(bp);
--- 
-2.43.0
 
+> 
+> 
+>> +     if (ret)
+>> +             goto auxdev_xa_err;
+>> +
+>> +     ret = sysfs_add_file_to_group(&dev->kobj, &info->sysfs_attr.attr,
+>> +                                   auxiliary_irqs_group.name);
+> 
+> You do know that you are never going to see these files from the
+> userspace library tools that watch sysfs, right?  libudev will never see
+> them as you are adding them AFTER the device is created.
+> 
+> So, because of that, who is really going to use these files?
+
+
+To learn about the interrupt mapping of the SF IRQs.
+
+
+> 
+> 
+>> +     if (ret)
+>> +             goto sysfs_add_err;
+>> +
+>> +     return 0;
+>> +
+>> +sysfs_add_err:
+>> +     xa_erase(&auxdev->irqs, irq);
+>> +auxdev_xa_err:
+>> +     kfree(info->sysfs_attr.attr.name);
+>> +name_err:
+>> +     kfree(info);
+> 
+> Again, cleanup.h is your friend.
+> 
+>> +     return ret;
+>> +}
+>> +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_add);
+>> +
+>> +/**
+>> + * auxiliary_device_sysfs_irq_remove - remove a sysfs entry for the given IRQ
+>> + * @auxdev: auxiliary bus device to add the sysfs entry.
+>> + * @irq: the IRQ to remove.
+>> + *
+>> + * This function should be called to remove an IRQ sysfs entry.
+>> + */
+>> +void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev, int irq)
+>> +{
+>> +     struct auxiliary_irq_info *info = xa_load(&auxdev->irqs, irq);
+>> +     struct device *dev = &auxdev->dev;
+>> +
+>> +     sysfs_remove_file_from_group(&dev->kobj, &info->sysfs_attr.attr,
+>> +                                  auxiliary_irqs_group.name);
+>> +     xa_erase(&auxdev->irqs, irq);
+>> +     kfree(info->sysfs_attr.attr.name);
+>> +     kfree(info);
+>> +}
+>> +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_remove);
+>> diff --git a/include/linux/auxiliary_bus.h b/include/linux/auxiliary_bus.h
+>> index de21d9d24a95..96be140bd1ff 100644
+>> --- a/include/linux/auxiliary_bus.h
+>> +++ b/include/linux/auxiliary_bus.h
+>> @@ -58,6 +58,7 @@
+>>    *       in
+>>    * @name: Match name found by the auxiliary device driver,
+>>    * @id: unique identitier if multiple devices of the same name are exported,
+>> + * @irqs: irqs xarray contains irq indices which are used by the device,
+>>    *
+>>    * An auxiliary_device represents a part of its parent device's functionality.
+>>    * It is given a name that, combined with the registering drivers
+>> @@ -138,7 +139,10 @@
+>>   struct auxiliary_device {
+>>        struct device dev;
+>>        const char *name;
+>> +     struct xarray irqs;
+>> +     struct mutex lock; /* Protects "irqs" directory creation */
+> 
+> Protects it from what?
+
+please look the answer above
+
+> 
+> 
+>>        u32 id;
+>> +     u8 dir_exists:1;
+> 
+> I don't think this is needed, but if it really is, just use a bool.
+
+
+If you know of an API that query whether a specific group is exists on
+some device, can you please share it with me?
+I came out empty when I looked for one :(
+
+
+> 
+> 
+>>   };
+>>
+>>   /**
+>> @@ -212,8 +216,24 @@ int auxiliary_device_init(struct auxiliary_device *auxdev);
+>>   int __auxiliary_device_add(struct auxiliary_device *auxdev, const char *modname);
+>>   #define auxiliary_device_add(auxdev) __auxiliary_device_add(auxdev, KBUILD_MODNAME)
+>>
+>> +#ifdef CONFIG_SYSFS
+>> +int auxiliary_device_sysfs_irq_add(struct auxiliary_device *auxdev, int irq);
+>> +void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev,
+>> +                                    int irq);
+> 
+> You can use longer lines :)
+> 
+> thanks,
+> 
+> greg k-h
 
