@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-104696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7652E90E0EE
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 02:34:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 135B590E0EF
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 02:34:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 032221F230ED
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 00:34:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A9891F22EEF
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 00:34:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D30046BF;
-	Wed, 19 Jun 2024 00:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5230A4A00;
+	Wed, 19 Jun 2024 00:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="TydnOyY4"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="nsX30z4w"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2067.outbound.protection.outlook.com [40.107.96.67])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2041.outbound.protection.outlook.com [40.107.102.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A3CC6112
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 00:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39EF6FC1
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 00:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718757233; cv=fail; b=ipTGeJh/fFVHttRjUDWxSuoq44LMtWnQ7s1woyEVgwFAhgFsidz4QeFfjgWVsFUgs2nYu1zxt8oamUgNTtTmEONEx/XWiMWbfjiKGFbnhZ2Yyxi/S0ex5g3P3Ofd90AhcFJ8ALGpiG+F/9F5lxzzWl6IyWC+34pP3P+qh1OtFlQ=
+	t=1718757236; cv=fail; b=LpGtdmR8sbalfIu8W4dXapByT4raljsqLqNmUrny+kRNSTWgYbaoEE475ps8cUVnC887qFPvozBBR9GK+T4b1QpUWrNc42EoUTDDTMu9rK+oGTd8DIFu7V6KQAUlJHtyF1choUYSyEnkgtm24dEAz6CepfCaZtm/bGxG/JS4WQ8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718757233; c=relaxed/simple;
-	bh=7IqtFTmFTUpqvwNZkWvfb1NGykkvuiTh1P8w1Kop328=;
+	s=arc-20240116; t=1718757236; c=relaxed/simple;
+	bh=EK8NBMtehx796JNFT4BMFCWvkrCk4ApaYnZuFMWNU0M=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kW8R0f6qezuOhVHWnMaRnnJ4SdWJvM6UuzWUcJmjD781XJ+yRgEoqNyZ2p30ooBatdvo7bnQYJBwMDfSQg+bp/Ai/3DZYnhK42/kGcMa0drTRmnkG6K1SLZoG6caSLUfrwhfcP8jvZ2H8y9qQiQtPeG1y4+wi4ULNTUrpxu4tz4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=TydnOyY4; arc=fail smtp.client-ip=40.107.96.67
+	 MIME-Version:Content-Type; b=p7g53eDs1g+EIYpG1km19Qs5+J5cMCXS+Zrja8dGcPcbhHeCZLD6Soxp0yfZRUmIOHNbTClQtEX14ihbs+hGH+17dioELFBG0E45oj1yqQk8ROl4GY6l0c5idwMQK0c13Stku5XGDCFt3xGl264LRCIKt4O6vF/L6iE5C1CsnrM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=nsX30z4w; arc=fail smtp.client-ip=40.107.102.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iYW+tQ3prTTg8ulXpm144pKD+sXeIQ7CdlLR35GqDQhkMqiM7vZ2BlCFv3FeSLT1Jz0sJhE2kvpCis3mUG38n/Vt0RHdFucBSl9O6yzk9ZvNH4lWpnD4uIEwKrS7l7HXj1QOVaEoh9Xkk4XzHkHJwJY0+C4hGrXnyIPkGCYfpvAtJZ7EO/FReufe+e3rT5n/DcGU5os2KzCFy+/erpO69jLlaTqRtIkKzeuvfvFNFQ3C9xfBJfya6M8D19b0BwjlrMIyNyuwF/Tc+rlW2optXNlrsVfp2Ser0jB6TsOKgg8jMbThkbJF0ad0kzVxlxOi4prfsAsEzMGSWh/ej8/xog==
+ b=X0TRdskX5lHwGmmH+A+SAw7lbcd0zKkA94xbssBflXqvKxNgfHoarYdNZOUZwS4RIMSEpK0SCZPl5g8+FWWHY5mqXtVi8tRfZIYKrrYnCXXypy6trwtDcAvEL5WDc7XFTdx7YT48U2YJDHwYx/2dK9TXQ0a/CTgXw6KCgtDbHAmCRM5u5OONdJt7KTj+7gsCu4/Z/egribQB5u8++TgXARHJpdelwiOrCkEccICSBeZjM0AYZXjcwUpEgafW54fdKnzhRLCxfA6gjxz/h4zx+Y/+wLi2ImRy1ZZmA0imxma7mq3R+Bb2PkUt0vB7ntkJ2LYx+7mHngfP1yKsPqfV+A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UkXPci90f9gUI8GIm5oSooMxWEVWBEzxbpWePUS2GK0=;
- b=Q0F9tMb81wUBGqxTXj37xswVxq4uP0VzXjxsd8eorhS41t82EL8ZWLQO+Bf29ZSKWI5w3jqYzIRPVo4URw5PA/dVcfh4rAq0RnT3ipHNOBGEcoau9z6TO0fiFw9jO6mMhim9xmL1mVlu7LJfHL/wT8iBY3ew4oNz+BNQQ1VCXoj/+p1yy+qNNhyAHlZzIIfe8l1md/WdzH5FlUmgPfIZMV1juTG6BtTvI9enpVBlpocnno2aT2TO0zgEMhuoT7M/dsC+iruUh2Er8bqZotvy2/+A5cK1ZHb/1SOCxe24udYiXGmcFoi127twLKzw0qjttLrBToJv/TCmFZpidZYPdQ==
+ bh=IIVJDtq+alQMPYx31dQmMQcxz/NcYVN+rkfuHRJYuwk=;
+ b=Gww9Ik5H9HVR1ktSPwh4HKaBb59l/z0hjD9aSIGqRBAfge5yNagmDJ4v74hDZyCMr8FbxP81KkR3hxMEPrSnVfYsM+xeBLYge2fXL20tJ93b3DMLPFDgZLekRNgc+Oxtz1/17bm+zzYbg2fgG+nb4Ye/zygDU7zgaDw6IWAJl/n3fq46rEkBmAecUImsghTAcZayuM9n5mHtHfdTTIkgG3FgDCtExl5pDj5xn58pcbIc158iMGMdRelMy+VX4Dc7LTr+B18/eqK7eH6deghxU+fjh7JqkAdqEASqY4iKWm2I5ht4qa+xoAz9clbnKwyQaoejQTdOGvH/opDttnU/QQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UkXPci90f9gUI8GIm5oSooMxWEVWBEzxbpWePUS2GK0=;
- b=TydnOyY4Fwsu4I633wDVNC1eLomXx+cqG1FQ44iMMVs5YyI5pQe9pzOmtiT8aXOSsuiKFCu9oHC6B6oiv66cczfxylpsRPPasHyOklYXNbXgXwGl5sPVXxykHDsm+BjDIxM4/CoKfjf4ALVF7JuQ7EowjEyoJY+Z9RQHEONGGGk=
-Received: from PH7PR17CA0045.namprd17.prod.outlook.com (2603:10b6:510:323::10)
- by CY8PR12MB7756.namprd12.prod.outlook.com (2603:10b6:930:85::19) with
+ bh=IIVJDtq+alQMPYx31dQmMQcxz/NcYVN+rkfuHRJYuwk=;
+ b=nsX30z4wu/ojo2+9oebiODLEzrL+t1Rnfshpt/BEnbkKF3ko0Pl/UUb7m8F3k7VGj3UbKCwo+QyWdIjPF9bCjVkB4r5YchiCJdqvIbN+6nvWOLrmIA7fBzUCp7i9ViuKdnZg7t34xJ6/BgZxHJEGgnUzWpTKWcxMjEpOBCicYiw=
+Received: from PH7P220CA0103.NAMP220.PROD.OUTLOOK.COM (2603:10b6:510:32d::29)
+ by SA3PR12MB9130.namprd12.prod.outlook.com (2603:10b6:806:37f::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31; Wed, 19 Jun
- 2024 00:33:49 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.32; Wed, 19 Jun
+ 2024 00:33:52 +0000
 Received: from CY4PEPF0000EE32.namprd05.prod.outlook.com
- (2603:10b6:510:323:cafe::ab) by PH7PR17CA0045.outlook.office365.com
- (2603:10b6:510:323::10) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:510:32d:cafe::48) by PH7P220CA0103.outlook.office365.com
+ (2603:10b6:510:32d::29) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.32 via Frontend
- Transport; Wed, 19 Jun 2024 00:33:49 +0000
+ Transport; Wed, 19 Jun 2024 00:33:50 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,20 +65,20 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CY4PEPF0000EE32.mail.protection.outlook.com (10.167.242.38) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7677.15 via Frontend Transport; Wed, 19 Jun 2024 00:33:49 +0000
+ 15.20.7677.15 via Frontend Transport; Wed, 19 Jun 2024 00:33:50 +0000
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 18 Jun
- 2024 19:33:46 -0500
+ 2024 19:33:47 -0500
 From: Shannon Nelson <shannon.nelson@amd.com>
 To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>, <David.Laight@ACULAB.COM>,
 	<andrew@lunn.ch>
 CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
 	<shannon.nelson@amd.com>
-Subject: [PATCH v2 net-next 4/8] ionic: add work item for missed-doorbell check
-Date: Tue, 18 Jun 2024 17:32:53 -0700
-Message-ID: <20240619003257.6138-5-shannon.nelson@amd.com>
+Subject: [PATCH v2 net-next 5/8] ionic: add per-queue napi_schedule for doorbell check
+Date: Tue, 18 Jun 2024 17:32:54 -0700
+Message-ID: <20240619003257.6138-6-shannon.nelson@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240619003257.6138-1-shannon.nelson@amd.com>
 References: <20240619003257.6138-1-shannon.nelson@amd.com>
@@ -93,224 +93,156 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE32:EE_|CY8PR12MB7756:EE_
-X-MS-Office365-Filtering-Correlation-Id: de98d07e-fb5b-4915-70f6-08dc8ff77cc2
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE32:EE_|SA3PR12MB9130:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5affa8d3-519f-462d-2eb5-08dc8ff77d62
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230037|36860700010|376011|1800799021|82310400023;
+	BCL:0;ARA:13230037|1800799021|376011|82310400023|36860700010;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?buyihoEVtFjE+cU7lMpisuCu6skBCxDB9H71FDegddJEXIMVBarbILmfNmdX?=
- =?us-ascii?Q?lrEsrgU0oV1hEp34PmbZ8wyKmi5Meap9BJEoN3b9hhKeUB3YYgYw+4IiWGfD?=
- =?us-ascii?Q?y/U5auiZCVYUbMcPO4heKZeibZk76EJ9+Wk1IjvKkO0W8Qx5JRBBYsha6P6p?=
- =?us-ascii?Q?eubAvT2gKXqFtNcQ7H5T9F79THUWSMhbJ3MO1fDwTJNUoGb+/yb2CWGaMDnT?=
- =?us-ascii?Q?Pv1ghnpSBKz4y/OnLMzreZynSUgBqTpZE/ww549r2cdDu7Iy2PIl1b0NuTsH?=
- =?us-ascii?Q?cq26sYvmtBz6u42n8PBw1KFYTY1SD0jP6Vk8ATIGLGIM6AE82k0VjX5kSxYY?=
- =?us-ascii?Q?MtJvNbfki8Wh+hkoPGW1hL8iz0ka2MVl3aWldFfAI0brozHQKBE1D2dsLUuB?=
- =?us-ascii?Q?P3kubxPJiitc0uEsgridRJ5gfr226apIljWUqnIgkmSeahGn8DFLCwBVezxO?=
- =?us-ascii?Q?HYWs7Ia+MXchvqdXq4gA7XyGBf2Lwytv7zAY+n8VHVjndw7z0a1ahwHJYS//?=
- =?us-ascii?Q?nig16+hoafeId5iJ1qGkO+yI/N9GqkxqxE9sysirkb/o5QYqUbmDHXceHd7K?=
- =?us-ascii?Q?C5bA5yCPCkOvkeVxp9aKgiHAVC0R2EVoA7ovNq5jgorP004J61TzfVwmKziK?=
- =?us-ascii?Q?allqXibyAhUabzaC+xwlJH4fz3LKcgTeaIanaJFCqakjeNAvBlQKj5IUh2sk?=
- =?us-ascii?Q?yfEvkMYUuWchVoklZtfORVZj1vlVTpzoGvzot0wnOimmol2T2AyLbYnAKwQ+?=
- =?us-ascii?Q?owt9N31yZ5zERFJcS2AVHOLjqnQ9qSsN+4v4r8lYkkpncA0VkfLrLiYoLOfh?=
- =?us-ascii?Q?ygcaKAprIQdpTx65W2bkfv7sEsjpHxc131MjjXKk2M2FJxS5lZUkKN/RFhfb?=
- =?us-ascii?Q?Gfp/1gbBA8/a02YmrsSYj5mJREGJMkgODlPkHn+KjFGBewjmjN2inXYDQHN7?=
- =?us-ascii?Q?ojDem2kZKac0urbo2s1ikkPugQwKiHzBuJ6r0WPVf1vzHNPu3Jk9GuZxVyqk?=
- =?us-ascii?Q?ttILaeWXTgBoSJbNEaFC52lLPovvYC0lHVxqifmCTC4uW5oTLVZFLXWUEuN7?=
- =?us-ascii?Q?qvBelZnnscweKO9PyLxh6ruZZ29zPUjqSWUU7B+LBBmYB0sfpc8Gn/4LCpev?=
- =?us-ascii?Q?RDPJ7H4j0SfBD3i/KxxrQDrVsbjpJf7hbylgDftg93xZ9XUqZ29EN7pEwAbM?=
- =?us-ascii?Q?oG5lNNA/KMwbFuu869zdTsRuMYsTKeTlh2Yn4Betvc2eexIZvQcaJXiIIa0U?=
- =?us-ascii?Q?4fhdGewn94kAU5MznfYQdR7i5gIkPSN/ti71ESruRbxD75KSoS+E+Wo/CGqE?=
- =?us-ascii?Q?eBRqi/FuY/edWnYCRgCICnsj81yW54Y0w5/zlKP7DPjrQ6B8hzAIKOQuChtn?=
- =?us-ascii?Q?LtCoBTcw1zUenkBc7ALSxNQTxDCNMUegRR244zwIf6I5mo13UQ=3D=3D?=
+	=?us-ascii?Q?6r3Qglp0zIaWmI31nh5sKhuD+ahFn+m1fB7Uw3amGrfETPU84LaNGPN04O0/?=
+ =?us-ascii?Q?L+KasgLwt1AeRwso8ZnwSWQS1UvwjqUxmKxmQb4FOaxVtUJbc+i4w7lCIxT8?=
+ =?us-ascii?Q?oKVHbRkcOAkQ1MjoDz1R23akUnu3GvNU4UyYXCxYYFZOVIa2fJsPPI87yey7?=
+ =?us-ascii?Q?HzLiIVLuMqhbyHwoAzXHsJ9jAk7VRN3Hptn7syr6h+Fln3FVkOZo/0QYI80Y?=
+ =?us-ascii?Q?zjoUIkt1KJSGdR8pFKrJJcIC7U7jbqfXKktlX6f51yYDNbf1udWcLw8Apiz5?=
+ =?us-ascii?Q?ow0JWFTcTpCElJUOTOTGCcnh7wUrRMciTvZpzEDuCdC5XE1Efu53F83KoK1K?=
+ =?us-ascii?Q?V1SWhRhbgDhLsn47icaVIswr3ivbrfZh3cteA8tMDAVCWrpcLXUtHmEoqqSL?=
+ =?us-ascii?Q?+crngE/TgediBLcuNZxfAbuyvWeego/kJcSmOGLKTKIizBiVNU4gBVzu4tdg?=
+ =?us-ascii?Q?1vmxpRUyly0IJkZEhV7dvpeLOYI9iLbTV33TTaCDdApV+sJABpdLNEkIDyAX?=
+ =?us-ascii?Q?8X0/3Z52s8F6BrUniHM1EKrMwuN+BUGL3nLAdrSu9cCE2cHWHuhAmdYt0tI6?=
+ =?us-ascii?Q?p/nXumgFpkC2f0dKcBeal50NT76YzMFe87HnagnzSTPQynsDFcwPa2MLolFK?=
+ =?us-ascii?Q?RU8TduLgVGmf2lGRZMknNyJy4k1WAdy3DWcilnxud0W2MiPr0ob9oIwQMrWk?=
+ =?us-ascii?Q?MJXf2JZWPLCTtc/aN9e06di0cLiciH1MdC7h4MfbxUPclU4+oocmWA8nEspM?=
+ =?us-ascii?Q?907kFQyIIi1FlXalYOti5xxaIJjNJS1YLahW9svNzvU5ifjHGiIXwEAPux2c?=
+ =?us-ascii?Q?e/4QqX/Xcx8WJb3ipwIrIA3S24UdRXAwbsPShQOhrTfQTS50LPZOXHwwu10Q?=
+ =?us-ascii?Q?HlsrEoZuwNVa75dZ92NSCJXpioMDbWusQLRtx77q2VS+zhA0bk5ExoD2i1j3?=
+ =?us-ascii?Q?NvMJurR0kLzmDY9rzEvB3XVafwOwIZ5BmghpFBEYTWaUGdVwZabr3y3tT78H?=
+ =?us-ascii?Q?rhSNG9iJsAwmOL0YbRzIw+cx73pUD0kLu9My2AHuxKU+F1cCvR9bGHu0hWVI?=
+ =?us-ascii?Q?dZfxprKONko8Jh5jExUzJBFX5BgUAls7+RybOh7ew7ItmtXEqKwGcNtu4xAF?=
+ =?us-ascii?Q?QaaPsTevmHxC4aHrp2ww3VQmY6Bx+OFz3rXBHX6WAZ3TsO8uAql29ExAmD6X?=
+ =?us-ascii?Q?3Ouihym/9xtVhlrbjAyrq7fsV7/TqX5TpgJrDHZe7mmBAN6235DUwQ33R5/3?=
+ =?us-ascii?Q?iSf8LjPUV7m0dL+Jh8kvaytXedZdAjRETkTd4INKbEeW/G/3BvKn1lec60Tn?=
+ =?us-ascii?Q?4eXu934XwNKv9z/gzcY5CgidczvLsyEMTs4gGYiiNqJjQoykptFjHEKG03ia?=
+ =?us-ascii?Q?zpLTefc1FFIwIRsjTiyKoVwjatdDvMaNWuclLs9I3EnDKtOxSg=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(36860700010)(376011)(1800799021)(82310400023);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(1800799021)(376011)(82310400023)(36860700010);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2024 00:33:49.1329
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2024 00:33:50.1798
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: de98d07e-fb5b-4915-70f6-08dc8ff77cc2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5affa8d3-519f-462d-2eb5-08dc8ff77d62
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	CY4PEPF0000EE32.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7756
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9130
 
-Add the first queued work for checking on the missed doorbell.
-This is a delayed work item that reschedules itself every cycle
-starting at probe.
+Add a work item for each queue that will be run on the queue's
+preferred cpu and will schedule another napi.  This napi is
+run in case the device missed a doorbell and didn't process
+a packet.  This is a problem for the Elba asic that happens
+very rarely.
 
 Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 ---
- drivers/net/ethernet/pensando/ionic/ionic.h   |  1 +
- .../ethernet/pensando/ionic/ionic_bus_pci.c   |  2 +
- .../net/ethernet/pensando/ionic/ionic_dev.c   | 66 +++++++++++++++++++
- .../net/ethernet/pensando/ionic/ionic_dev.h   |  3 +-
- .../net/ethernet/pensando/ionic/ionic_lif.c   |  2 +
- 5 files changed, 73 insertions(+), 1 deletion(-)
+ .../net/ethernet/pensando/ionic/ionic_dev.c   | 23 +++++++++++++++++--
+ .../net/ethernet/pensando/ionic/ionic_dev.h   |  1 +
+ .../net/ethernet/pensando/ionic/ionic_lif.c   |  2 ++
+ .../net/ethernet/pensando/ionic/ionic_lif.h   |  1 +
+ 4 files changed, 25 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic.h b/drivers/net/ethernet/pensando/ionic/ionic.h
-index df29c977a702..106ee5b2ceff 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic.h
-+++ b/drivers/net/ethernet/pensando/ionic/ionic.h
-@@ -56,6 +56,7 @@ struct ionic {
- 	unsigned int nintrs;
- 	DECLARE_BITMAP(intrs, IONIC_INTR_CTRL_REGS_MAX);
- 	cpumask_var_t *affinity_masks;
-+	struct delayed_work doorbell_check_dwork;
- 	struct work_struct nb_work;
- 	struct notifier_block nb;
- 	struct rw_semaphore vf_op_lock;	/* lock for VF operations */
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-index a7146d50f814..f362e76756df 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-@@ -377,6 +377,7 @@ static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	mod_timer(&ionic->watchdog_timer,
- 		  round_jiffies(jiffies + ionic->watchdog_period));
-+	ionic_queue_doorbell_check(ionic, IONIC_NAPI_DEADLINE);
- 
- 	return 0;
- 
-@@ -411,6 +412,7 @@ static void ionic_remove(struct pci_dev *pdev)
- 		if (test_and_clear_bit(IONIC_LIF_F_FW_RESET, ionic->lif->state))
- 			set_bit(IONIC_LIF_F_FW_STOPPING, ionic->lif->state);
- 
-+		cancel_delayed_work_sync(&ionic->doorbell_check_dwork);
- 		ionic_lif_unregister(ionic->lif);
- 		ionic_devlink_unregister(ionic);
- 		ionic_lif_deinit(ionic->lif);
 diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.c b/drivers/net/ethernet/pensando/ionic/ionic_dev.c
-index 342863fd0b16..5d5990e7376e 100644
+index 5d5990e7376e..56e7c120d492 100644
 --- a/drivers/net/ethernet/pensando/ionic/ionic_dev.c
 +++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.c
-@@ -47,6 +47,61 @@ static void ionic_watchdog_cb(struct timer_list *t)
- 	}
+@@ -54,6 +54,13 @@ static void ionic_napi_schedule_do_softirq(struct napi_struct *napi)
+ 	local_bh_enable();
  }
  
-+static void ionic_napi_schedule_do_softirq(struct napi_struct *napi)
++void ionic_doorbell_napi_work(struct work_struct *work)
 +{
-+	local_bh_disable();
-+	napi_schedule(napi);
-+	local_bh_enable();
++	struct ionic_qcq *qcq = container_of(work, struct ionic_qcq,
++					     doorbell_napi_work);
++	ionic_napi_schedule_do_softirq(&qcq->napi);
 +}
 +
-+static int ionic_get_preferred_cpu(struct ionic *ionic,
-+				   struct ionic_intr_info *intr)
+ static int ionic_get_preferred_cpu(struct ionic *ionic,
+ 				   struct ionic_intr_info *intr)
+ {
+@@ -66,6 +73,18 @@ static int ionic_get_preferred_cpu(struct ionic *ionic,
+ 	return cpu;
+ }
+ 
++static void ionic_queue_dbell_napi_work(struct ionic *ionic,
++					struct ionic_qcq *qcq)
 +{
 +	int cpu;
 +
-+	cpu = cpumask_first_and(*intr->affinity_mask, cpu_online_mask);
-+	if (cpu >= nr_cpu_ids)
-+		cpu = cpumask_local_spread(0, dev_to_node(ionic->dev));
-+
-+	return cpu;
-+}
-+
-+static void ionic_doorbell_check_dwork(struct work_struct *work)
-+{
-+	struct ionic *ionic = container_of(work, struct ionic,
-+					   doorbell_check_dwork.work);
-+	struct ionic_lif *lif = ionic->lif;
-+
-+	mutex_lock(&lif->queue_lock);
-+
-+	if (test_bit(IONIC_LIF_F_FW_STOPPING, lif->state) ||
-+	    test_bit(IONIC_LIF_F_FW_RESET, lif->state)) {
-+		mutex_unlock(&lif->queue_lock);
++	if (!(qcq->flags & IONIC_QCQ_F_INTR))
 +		return;
-+	}
 +
-+	ionic_napi_schedule_do_softirq(&lif->adminqcq->napi);
-+
-+	if (test_bit(IONIC_LIF_F_UP, lif->state)) {
-+		int i;
-+
-+		for (i = 0; i < lif->nxqs; i++) {
-+			ionic_napi_schedule_do_softirq(&lif->txqcqs[i]->napi);
-+			ionic_napi_schedule_do_softirq(&lif->rxqcqs[i]->napi);
-+		}
-+
-+		if (lif->hwstamp_txq &&
-+		    lif->hwstamp_txq->flags & IONIC_QCQ_F_INTR)
-+			ionic_napi_schedule_do_softirq(&lif->hwstamp_txq->napi);
-+		if (lif->hwstamp_rxq &&
-+		    lif->hwstamp_rxq->flags & IONIC_QCQ_F_INTR)
-+			ionic_napi_schedule_do_softirq(&lif->hwstamp_rxq->napi);
-+	}
-+	mutex_unlock(&lif->queue_lock);
-+
-+	ionic_queue_doorbell_check(ionic, IONIC_NAPI_DEADLINE);
++	cpu = ionic_get_preferred_cpu(ionic, &qcq->intr);
++	queue_work_on(cpu, ionic->wq, &qcq->doorbell_napi_work);
 +}
 +
- static int ionic_watchdog_init(struct ionic *ionic)
+ static void ionic_doorbell_check_dwork(struct work_struct *work)
  {
- 	struct ionic_dev *idev = &ionic->idev;
-@@ -70,10 +125,21 @@ static int ionic_watchdog_init(struct ionic *ionic)
- 		dev_err(ionic->dev, "alloc_workqueue failed");
- 		return -ENOMEM;
- 	}
-+	INIT_DELAYED_WORK(&ionic->doorbell_check_dwork,
-+			  ionic_doorbell_check_dwork);
+ 	struct ionic *ionic = container_of(work, struct ionic,
+@@ -86,8 +105,8 @@ static void ionic_doorbell_check_dwork(struct work_struct *work)
+ 		int i;
  
- 	return 0;
- }
+ 		for (i = 0; i < lif->nxqs; i++) {
+-			ionic_napi_schedule_do_softirq(&lif->txqcqs[i]->napi);
+-			ionic_napi_schedule_do_softirq(&lif->rxqcqs[i]->napi);
++			ionic_queue_dbell_napi_work(ionic, lif->txqcqs[i]);
++			ionic_queue_dbell_napi_work(ionic, lif->rxqcqs[i]);
+ 		}
  
-+void ionic_queue_doorbell_check(struct ionic *ionic, int delay)
-+{
-+	int cpu;
-+
-+	cpu = ionic_get_preferred_cpu(ionic, &ionic->lif->adminqcq->intr);
-+	queue_delayed_work_on(cpu, ionic->wq, &ionic->doorbell_check_dwork,
-+			      delay);
-+}
-+
- void ionic_init_devinfo(struct ionic *ionic)
- {
- 	struct ionic_dev *idev = &ionic->idev;
+ 		if (lif->hwstamp_txq &&
 diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.h b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-index 7dbd3b8b0e36..d87e6020cfb1 100644
+index d87e6020cfb1..92f16b6c5662 100644
 --- a/drivers/net/ethernet/pensando/ionic/ionic_dev.h
 +++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-@@ -28,7 +28,7 @@
- #define IONIC_DEV_INFO_REG_COUNT	32
- #define IONIC_DEV_CMD_REG_COUNT		32
- 
--#define IONIC_NAPI_DEADLINE		(HZ / 200)	/* 5ms */
-+#define IONIC_NAPI_DEADLINE		(HZ)		/* 1 sec */
- #define IONIC_ADMIN_DOORBELL_DEADLINE	(HZ / 2)	/* 500ms */
- #define IONIC_TX_DOORBELL_DEADLINE	(HZ / 100)	/* 10ms */
- #define IONIC_RX_MIN_DOORBELL_DEADLINE	(HZ / 100)	/* 10ms */
 @@ -386,6 +386,7 @@ bool ionic_q_is_posted(struct ionic_queue *q, unsigned int pos);
  
  int ionic_heartbeat_check(struct ionic *ionic);
  bool ionic_is_fw_running(struct ionic_dev *idev);
-+void ionic_queue_doorbell_check(struct ionic *ionic, int delay);
++void ionic_doorbell_napi_work(struct work_struct *work);
+ void ionic_queue_doorbell_check(struct ionic *ionic, int delay);
  
  bool ionic_adminq_poke_doorbell(struct ionic_queue *q);
- bool ionic_txq_poke_doorbell(struct ionic_queue *q);
 diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-index cd12107f66d7..42a587d14d01 100644
+index 42a587d14d01..d7abfbe05f2b 100644
 --- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
 +++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-@@ -1191,6 +1191,7 @@ static int ionic_adminq_napi(struct napi_struct *napi, int budget)
- 	if (lif->adminqcq && lif->adminqcq->flags & IONIC_QCQ_F_INITED)
- 		a_work = ionic_cq_service(&lif->adminqcq->cq, budget,
- 					  ionic_adminq_service, NULL, NULL);
-+
- 	spin_unlock_irqrestore(&lif->adminq_lock, irqflags);
+@@ -344,6 +344,7 @@ static int ionic_qcq_disable(struct ionic_lif *lif, struct ionic_qcq *qcq, int f
+ 	if (qcq->flags & IONIC_QCQ_F_INTR) {
+ 		struct ionic_dev *idev = &lif->ionic->idev;
  
- 	if (lif->hwstamp_rxq)
-@@ -3406,6 +3407,7 @@ int ionic_restart_lif(struct ionic_lif *lif)
- 	clear_bit(IONIC_LIF_F_FW_RESET, lif->state);
- 	ionic_link_status_check_request(lif, CAN_SLEEP);
- 	netif_device_attach(lif->netdev);
-+	ionic_queue_doorbell_check(ionic, IONIC_NAPI_DEADLINE);
++		cancel_work_sync(&qcq->doorbell_napi_work);
+ 		cancel_work_sync(&qcq->dim.work);
+ 		ionic_intr_mask(idev->intr_ctrl, qcq->intr.index,
+ 				IONIC_INTR_MASK_SET);
+@@ -690,6 +691,7 @@ static int ionic_qcq_alloc(struct ionic_lif *lif, unsigned int type,
  
- 	return 0;
+ 	INIT_WORK(&new->dim.work, ionic_dim_work);
+ 	new->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_CQE;
++	INIT_WORK(&new->doorbell_napi_work, ionic_doorbell_napi_work);
+ 
+ 	*qcq = new;
+ 
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.h b/drivers/net/ethernet/pensando/ionic/ionic_lif.h
+index e4a5ae70793e..40b28d0b858f 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_lif.h
++++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.h
+@@ -88,6 +88,7 @@ struct ionic_qcq {
+ 	struct ionic_cq cq;
+ 	struct napi_struct napi;
+ 	struct ionic_intr_info intr;
++	struct work_struct doorbell_napi_work;
+ 	struct dentry *dentry;
+ };
  
 -- 
 2.17.1
