@@ -1,131 +1,124 @@
-Return-Path: <netdev+bounces-104686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41F0E90E07C
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 02:11:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9536090E084
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 02:13:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC7B61F2285A
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 00:11:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9BC21C2129D
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 00:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874F5628;
-	Wed, 19 Jun 2024 00:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43505193;
+	Wed, 19 Jun 2024 00:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="NWj8tTXj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C51196
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 00:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A404EC5;
+	Wed, 19 Jun 2024 00:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718755882; cv=none; b=ElNzRiafTIMXyaYz4oiz/pdct5SqDGY8Et4SlKn5QEqQytU16UL8lr2EZDbQhLDAFumuOdgKjdAEepfKqXnmsVsxh+8wXgAlCYBoyMurSEzZj2bxkAVAFjSMXKFUXGxUrj4PYDTZvojCGZnfLBeH/hlVwYZOuwL1Ol3Llbxpg/Q=
+	t=1718756020; cv=none; b=hNirP53TH+DY/VSpq0D9Ev3Q06pDrGe2+mCPIYXwHXChESodudSxx+P1wj4/Qg50wjcObXrbVyjvwOMUnXX7DDEBkKCYLx1wZvP79QZNOVqd4MP8U2HN5/D5ZAtAgDkAh5amiIXGUEVLfO6pO2GuA5D/DIeiS1Ild1kUR/ZJzlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718755882; c=relaxed/simple;
-	bh=zUk4PJQj040+altTZQi2P9xGOdiRD/LpLPND1/EIfQE=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Se6NnpUNZj6zItNrEteKht5fwFpL7G1N0mihSPNIih4NPWsKqmweml1TZbHnQ3YCy/fH0vCFe1gul+/oYSXSt0BqNtQ3U5NglY5Nszkb1hTlaS9Cmig4SMErDTAAGQWL5vCyiPjIJ3PmPWDBXjQ7oRkbTFaGCwgvc72rYrGDziw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-7e91ad684e4so806999339f.2
-        for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 17:11:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718755880; x=1719360680;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EXevxKNM8dWqLihLY7avM1/no8pefWJwTC3rupvj+TI=;
-        b=HCEELChEl1Dv+TACNaV20HkbAxxNFhtnqYuUpnJ559Apvp1p+J45aMhYUcnYa9wQ61
-         PgpiuqplRHgESHYuvdUvp++b3o6Y9ubhdnej/hrh4Qg9MUsK9alfCYRSRfkiDmAsWRHF
-         qBBrN7l/xrAZrq0wU76T4oo+dYBO9GDC6pIE9NujeqVUZjdPJe2OtFs+rIQ2Sg2Rwjy6
-         t/w0aOCvjTWI4rdRrWgb5LUaFaEZrTJp2YsX35+PE+IwAZAd010ZxvRtwH9QMIM0L6Ws
-         /CW+tc0R83ASWuOuNxh+JdH+gf1h3lavF6s/rgg3VzmAi5OsHtad0PEaHhmhHLzebzGW
-         EBEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW7tNKqS6JkXlx4ZEKSzHVVZ5W3bV1saE/STk35piqbBR606m5jkBS3eTmTR7ysnAYKunZojyb8WS1hdevPWYukMZeyRG2R
-X-Gm-Message-State: AOJu0YzyCuOkO+rfVhKdsEDBvxrNaqxOARkHdCQLuAbDCGEgZ99ojpGs
-	2RZeE1UKNrOrBZT1YmjaytpmSawIih6qXcg0aZPQBGkvgV6Ik1OgHs3je+pElonPZlcIfIPrL+F
-	0rTp4OTlJ65SWxLeuVAd8Cipr4MS8zdMSm8FEGjF1igegq1JVUi2IK4s=
-X-Google-Smtp-Source: AGHT+IFHaOVDQCA7cLz/diVjEC310AujbXQfgMqkJKgZXogK4WkdNQ3r+IwuHk/Nn//3yAdo/EWp8nQiCEwifxVbQ02O5y7z2sMT
+	s=arc-20240116; t=1718756020; c=relaxed/simple;
+	bh=nCyR+FF46pdp2WHubBl4TFE4rTAqrIiTJSaS8RfSrEc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Bvc1vs97fakot9rhrEGW4N+qaug266hqf1CDKn19PvqYbmTMR9pB783hGX9oMMwVbUv+w3eIKdKDhcMm2k3EVEDXsQRxysvYUI0+g96rBm2ddfMdlMaUicywuWqTxB1v164dNseNjWbRiVjTrOSBNK9otXwPqEPDpeknWkwarxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=NWj8tTXj; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1718756018; x=1750292018;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=nCyR+FF46pdp2WHubBl4TFE4rTAqrIiTJSaS8RfSrEc=;
+  b=NWj8tTXjN8rB8h1IR53uMdqg4QbMaNsbdscI8vQSbjtwxKEgdTz6WCxC
+   8dSd93yrhH/axyodA+CzJWfdGl82HbGXkxllkFNYlvGxMvrW4A+7IUyoJ
+   nScRNuhWYYyVrXaUw7kUHl3wdXlLkl/Cx39A0N85lZCtziw7EoG1zjEVl
+   KfmpjoeHOu7vJcgxXAwPcb1JYzL3QYsKoFT7lo50hbSTjSSnPSEv+IUBk
+   C4ZW1p8dAMm/MesTX41rOZwEhIMuTZR3yTobrpSgSCuKJpwG7olhEBJs+
+   APuoQMie3ZyyYxAP+QHD7vEyaRUZObpXEpz+wcMwIgZy1KQ8geGloi9lm
+   Q==;
+X-CSE-ConnectionGUID: RCjaWn5qSgKWprKYp1rnmA==
+X-CSE-MsgGUID: KnrOr0d8R5u8x7/pB7vSEQ==
+X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
+   d="scan'208";a="28148942"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Jun 2024 17:13:31 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 18 Jun 2024 17:13:10 -0700
+Received: from hat-linux.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Tue, 18 Jun 2024 17:13:09 -0700
+From: <Tristram.Ha@microchip.com>
+To: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vivien Didelot <vivien.didelot@gmail.com>, Florian Fainelli
+	<f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Tristram Ha
+	<tristram.ha@microchip.com>
+Subject: [PATCH v1 net] net: dsa: microchip: fix initial port flush problem
+Date: Tue, 18 Jun 2024 17:16:42 -0700
+Message-ID: <1718756202-2731-1-git-send-email-Tristram.Ha@microchip.com>
+X-Mailer: git-send-email 1.9.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:890c:b0:4b9:ad20:521d with SMTP id
- 8926c6da1cb9f-4b9ad205468mr30266173.1.1718755880145; Tue, 18 Jun 2024
- 17:11:20 -0700 (PDT)
-Date: Tue, 18 Jun 2024 17:11:20 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b123a6061b33099c@google.com>
-Subject: [syzbot] [netfilter?] net-next test error: WARNING: suspicious RCU
- usage in corrupted
-From: syzbot <syzbot+6c048081aec46ad4ddf5@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	kadlec@netfilter.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
-	pablo@netfilter.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-Hello,
+From: Tristram Ha <tristram.ha@microchip.com>
 
-syzbot found the following issue on:
+The very first flush in any port will flush all learned addresses in all
+ports.  This can be observed by unplugging the cable from one port while
+additional ports are connected and dumping the fdb entries.
 
-HEAD commit:    4314175af496 Merge branch 'net-smc-IPPROTO_SMC'
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=14f4852e980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7266aeba025a54a4
-dashboard link: https://syzkaller.appspot.com/bug?extid=6c048081aec46ad4ddf5
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+This problem is caused by the initially wrong value programmed to the
+REG_SW_LUE_CTRL_1 register.  Setting SW_FLUSH_STP_TABLE and
+SW_FLUSH_MSTP_TABLE bits does not have an immediate effect.  It is when
+ksz9477_flush_dyn_mac_table() is called then the SW_FLUSH_STP_TABLE bit
+takes effect and flushes all learned entries.  After that call both bits
+are reset and so the next port flush will not cause such problem again.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/48b3722e2009/disk-4314175a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2297abec79e7/vmlinux-4314175a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1e99b4419b68/bzImage-4314175a.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6c048081aec46ad4ddf5@syzkaller.appspotmail.com
-
-=============================
-WARNING: suspicious RCU usage
-6.10.0-rc3-syzkaller-00696-g4314175af496 #0 Not tainted
------------------------------
-net/netfilter/ipset/ip_set_core.c:1200 suspicious rcu_dereference_protected() usage!
-
-other info that might help us debug this:
-
-
-rcu_scheduler_active = 2, debug_locks = 1
-3 locks held by kworker/u8:3/51:
- #0: ffff888015edd948 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3206 [inline]
- #0: ffff888015edd948 ((wq_completion)netns){+.+.}-{0:0}, at: process_scheduled_works+0x90a/0x1830 kernel/workqueue.c:3312
- #1: ffffc90000bb7d00 (net_cleanup_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3207 [inline]
- #1: ffffc90000bb7d00 (net_cleanup_work){+.+.}-{0:0}, at: process_scheduled_works+0x945/0x1830 kernel/workqueue.c:3312
- #2: ffffffff8f5db650 (pernet_ops_rwsem){++++}-{3:3}, at: cleanup_net+0x16a/0xcc0 net/core/net_namespace.c:594
-
-stack backtrace:
-CPU: 0 PID: 51 Comm
-
-
+Fixes: b987e98e50ab ("dsa: add DSA switch driver for Microchip KSZ9477")
+Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+v1
+ - explain how the 2 extra bits affect the flushing operation
+ - write directly to disable the default SW_FWD_MCAST_SRC_ADDR bit and so
+   no need to read the register first
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+ drivers/net/dsa/microchip/ksz9477.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+index f8ad7833f5d9..2231128eef8b 100644
+--- a/drivers/net/dsa/microchip/ksz9477.c
++++ b/drivers/net/dsa/microchip/ksz9477.c
+@@ -355,10 +355,8 @@ int ksz9477_reset_switch(struct ksz_device *dev)
+ 			   SPI_AUTO_EDGE_DETECTION, 0);
+ 
+ 	/* default configuration */
+-	ksz_read8(dev, REG_SW_LUE_CTRL_1, &data8);
+-	data8 = SW_AGING_ENABLE | SW_LINK_AUTO_AGING |
+-	      SW_SRC_ADDR_FILTER | SW_FLUSH_STP_TABLE | SW_FLUSH_MSTP_TABLE;
+-	ksz_write8(dev, REG_SW_LUE_CTRL_1, data8);
++	ksz_write8(dev, REG_SW_LUE_CTRL_1,
++		   SW_AGING_ENABLE | SW_LINK_AUTO_AGING | SW_SRC_ADDR_FILTER);
+ 
+ 	/* disable interrupts */
+ 	ksz_write32(dev, REG_SW_INT_MASK__4, SWITCH_INT_MASK);
+-- 
+2.34.1
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
