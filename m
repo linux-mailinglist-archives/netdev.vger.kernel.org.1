@@ -1,214 +1,259 @@
-Return-Path: <netdev+bounces-104774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60B1090E4E6
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:51:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5806C90E51A
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 10:01:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 512001C21740
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 07:51:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBACA1F256DF
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 08:01:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E47878C62;
-	Wed, 19 Jun 2024 07:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C7E78C93;
+	Wed, 19 Jun 2024 08:01:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hvMH57nL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oEz5JBLp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A171BF50
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 07:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718783481; cv=none; b=BWHXvfNTti3nK5iemDRwEozoe+nNE9sI+4pCZx1yoTWsViZ7TccTf99sxfc5sj/uDAO2FyVrqFZCRnYJBI1404nyO64gaIRA2mwV9pWMJZ0CdwF3zYxKRY42XEJLhdeRD/R/+AkKMOHj/ig1CCKimLxcA+kgD10Guv/7wZPiIFw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718783481; c=relaxed/simple;
-	bh=SakDkSaznJ42+rNLU6g9ncLYcfpB/RFNYeC3yICgVuo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZGh0TZnIxOV/ZXlOB9s/ULSYaQad+rbubIxoEHFIFT2L379e5QXpU4W2vTnu2MWBCNSSYBsh02leQVgV3lk1NwLRLIwiNq8R4hgiwfIJNjX+i9R6DMVV0iI2EVGEuaunVqxsIFZcSuDRhIzr1aDqVF3l05yTGs7pjdIBpi40QUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hvMH57nL; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718783478;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=54l/bQWI1DZeSh0ObKloGm/WQfpdPpAWrREcvojyFcI=;
-	b=hvMH57nLIp2rWF5HJ+TInYi8fGgzQELZIGusiMs6YHh81uFUzgKosxGmrtoegSybtsjSmM
-	PRp9S7nN2kEiz92eSG1i4VjqVvE34I1GOzUoOgw13wayfP37ES+1E5zdEF5JJUagYM7M0z
-	e1ryN9MTyZ3TI+BrFmSpLf6shTlSZPs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-43-ayWqMRUHOfaSntwUjUKIsg-1; Wed, 19 Jun 2024 03:51:16 -0400
-X-MC-Unique: ayWqMRUHOfaSntwUjUKIsg-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-363542774e1so387262f8f.2
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 00:51:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718783475; x=1719388275;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=54l/bQWI1DZeSh0ObKloGm/WQfpdPpAWrREcvojyFcI=;
-        b=XODkOJUdRdXs4QVADZxHqS3ikOkCha6qDxA0VkpITykzFHEpvo6OXRox/B/ZJn/HaJ
-         O59CWcaMdUG5POkeKWj3QdoFbTFAGCWvvnJVm24UYTrHm4q8CCB8iFAUWzDN8vPHxTFi
-         iWN+FVm/VFnkcBELAci4d0jg1V/I33N2Bo8cYnJAJlNh50wU/NLgYk4JAz/jjqCr+Lvl
-         zdUQs1tDl7tihPTYS2zAl+6mnnpIlBABUvv1SqU/hZkn3BE2HCtmMJhP7htmI22lSedo
-         nDqJVbUOedG5k9OXVxbH2HlmpyuJTVhOpH9zZ8hid+V0Ga4R2pK6zsln4arvtsBfkZ2W
-         g3pQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXCF42Vw09y2miCsFr9HaHBtdoKsc57cJBxpelqDlOpxdLyKWxh1BGDYh+ZEjLMNwLnttsB3kPbh28K6p5Fmp245ub/psXl
-X-Gm-Message-State: AOJu0YzxCP79aRDGMG1JlX16z9389KKh8cYMmdkA6UmfPS55xeWVAJK8
-	jPsSm2aiqVm09CBYmLu7HA+I2wDt77z6OLLoY+AgJD1P+XtyN1RIzCp5co2lTSrkt05b51cGGMz
-	eFF44NUilLElvvwMHKYWyaQIJ83h1iTKWPf8nb6QG6Tetckioiouz5g==
-X-Received: by 2002:a5d:4d4e:0:b0:360:711b:114f with SMTP id ffacd0b85a97d-363170ed43fmr1677413f8f.5.1718783474582;
-        Wed, 19 Jun 2024 00:51:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGgshaVs3GIEzhy3LqFFVEKzd78LiEjfe2e4rzHd9MLxQKBApInQuCqxm9Tqj4WTUduoEdJkQ==
-X-Received: by 2002:a5d:4d4e:0:b0:360:711b:114f with SMTP id ffacd0b85a97d-363170ed43fmr1677368f8f.5.1718783473735;
-        Wed, 19 Jun 2024 00:51:13 -0700 (PDT)
-Received: from redhat.com ([2.52.146.100])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36302e474e8sm2130125f8f.37.2024.06.19.00.51.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jun 2024 00:51:13 -0700 (PDT)
-Date: Wed, 19 Jun 2024 03:51:08 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Denis Arefev <arefev@swemel.ru>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	lvc-project@linuxtesting.org
-Subject: Re: [PATCH v2] net: missing check virtio
-Message-ID: <20240619035015-mutt-send-email-mst@kernel.org>
-References: <20240613095448.27118-1-arefev@swemel.ru>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A124D78C7D;
+	Wed, 19 Jun 2024 08:01:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718784088; cv=fail; b=vF8hlDhHnZzOfZAwwfIMsY9hSrHtOqqpTfiJ/vY9uW5P9GKWg6TfcqFHFmeOJzCu5YStIdCeVltpvcV7dJmHAZxHUh1RG1aTsU1bL1cUPaYkugMyqquWVANpXYgCsOziilzGtX0fQ3sbLjpWma6+dDeepRYrK5n7j8afb2XLCsc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718784088; c=relaxed/simple;
+	bh=kadJ2Kqx99nugocQt01yv//grNQNHu9XxObDDK74dxk=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=riG9wtrlJP0eFlzcDuCgT6Zw5Mysy4O8VQpMSmXlLVA75tU6QcfaoJwSgX6dNehN8aq06HSPiNo12mz20rh+mbYstKTiWciWKxwysnVsm5SqnxtFRh8z+CgOgOhUQyuhJhxJ6HEDKdD6M+VG2kiYE2g8V2EgKfLEiKlsdBIDaFM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oEz5JBLp; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718784087; x=1750320087;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=kadJ2Kqx99nugocQt01yv//grNQNHu9XxObDDK74dxk=;
+  b=oEz5JBLpj/MZDwK1pE+VbemhNYwHdkzwIbIAFCeaMLHDlXx8JYZGaN62
+   dCjzeaCzu4IzTeTUKx5XuOROwbsarrHJNBcLPH6fazaTQqTwXgwwyrxi6
+   U6evePo1rlW5uZZiheT7Jp2j9v7jmjhow7CPnwOediEU7OzIe4Eda2HnE
+   CG2LvFpwxUcEuY8qFWKWHrgxuCN3dImsjQoPGZ8r1Z2lN/DK2LJFsvlOb
+   3QNWepbHB02B8cu12VFc1NLDxPE3NnIoYXzCMchs27ns1dPYUiFSnx+Bc
+   +k74SevTE8dz3IteT1m6g0C3QP4V526vhvc4Xvv3j1dkz9mWERPwe6t+Q
+   A==;
+X-CSE-ConnectionGUID: pGEW5CIkScmhHCeqNsNmww==
+X-CSE-MsgGUID: AOUPAXVITKu1sUxWS3ylww==
+X-IronPort-AV: E=McAfee;i="6700,10204,11107"; a="26300239"
+X-IronPort-AV: E=Sophos;i="6.08,249,1712646000"; 
+   d="scan'208";a="26300239"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2024 01:01:26 -0700
+X-CSE-ConnectionGUID: nNFdFqRrRUam72kpaNo1wQ==
+X-CSE-MsgGUID: BBFZS9VCSpC0Vb1xEmy40g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,249,1712646000"; 
+   d="scan'208";a="46774803"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Jun 2024 01:01:25 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 19 Jun 2024 01:01:25 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 19 Jun 2024 01:01:25 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.41) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 19 Jun 2024 01:01:24 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JeV0Zvy0Wm0ub92DWXGh4rYHb/t3TEB8kUUBHF8RfbatNPvQmkQ04syw7fHtFidl5+RwAe3yJ7pOjZk1ZMeA5mXWaVqSrRAT8hJFDfsDm/SkZkQMXphZHyjXNYLEcszoFe76tp+FwdgwV5YBzIGal0Ry/IrURxaWjehay15ILGDz3LEackNVWxSWRCxBSpXBzgVe/Ytmrku+KWmTg4OZUx2rEZu7Rxk/OEMGp56pBBqs4N2RP2B133kxiqsGBhb03f7Nf/QxTLho5p2DXypWy4NqR24e2akD8HzrMG0Eslnka0d9GYHPQ7ZFtlqYjHe+/754+8aPczmIzhiF5QCq6Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Wk8lhTh+cQvurg+Uku9fvnM3SNrttcc7Vm2/HJJeLsk=;
+ b=eO2dgKfNMOZn2vK8/yjDVHZp2zc5s2Nx2yJ+5is+7qiuam6fnNcyUrtIpBT2AjYY4Ji5cONC7R0/ZLtUa1EzGeD84WbV4UHDHOoEwOUKgeHxgZn1a+UJCtBc081DJl1OKuEJ0pbB2yZovHMdDQyOu+JEu7Vae3GZb2Rq8ik5tx/1wbF4VQ9i0kFhZnqvgYPGC44LJD8KDHtN5LTPB+qmKt22K8IaVBYrHFMlXm9lIX4RTMJI05VicH3v+VtlMfE1+q8E8ueqN/8u7Jp86l1ymyAzHPt5dWw9QFAP9VrJzEyCAgFn8/kPlGEKtXtZKbRVEhaYuLRUrNOVqvA+x3B2NQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by DM4PR11MB6478.namprd11.prod.outlook.com (2603:10b6:8:89::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31; Wed, 19 Jun
+ 2024 08:01:18 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.7698.017; Wed, 19 Jun 2024
+ 08:01:17 +0000
+Message-ID: <95549a6e-b2db-42d9-af94-dbc5e5ddcf5d@intel.com>
+Date: Wed, 19 Jun 2024 10:01:11 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 09/15] net: hbl_en: add habanalabs Ethernet driver
+To: Omer Shpigelman <oshpigelman@habana.ai>, Andrew Lunn <andrew@lunn.ch>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"ogabbay@kernel.org" <ogabbay@kernel.org>, Zvika Yehudai <zyehudai@habana.ai>
+References: <20240613082208.1439968-1-oshpigelman@habana.ai>
+ <20240613082208.1439968-10-oshpigelman@habana.ai>
+ <10902044-fb02-4328-bf88-0b386ee51c78@lunn.ch>
+ <bddb69c3-511b-4385-a67d-903e910a8b51@habana.ai>
+ <621d4891-36d7-48c6-bdd8-2f3ca06a23f6@lunn.ch>
+ <45e35940-c8fc-4f6c-8429-e6681a48b889@habana.ai>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <45e35940-c8fc-4f6c-8429-e6681a48b889@habana.ai>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR0502CA0028.eurprd05.prod.outlook.com
+ (2603:10a6:803:1::41) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240613095448.27118-1-arefev@swemel.ru>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|DM4PR11MB6478:EE_
+X-MS-Office365-Filtering-Correlation-Id: e3286c87-4d84-48c4-d613-08dc9035ffb7
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230037|366013|1800799021|376011;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?YVRLWUxUN0YxRHpSQ2JQQW0zT01mMWlrMjZZZVpDY01wZUNzd3dGK0x5d3F5?=
+ =?utf-8?B?MEJHczFsT3hqWFFVMFFhb0x2TGEzQmpLUHl5TzA0djNZUGtlNS9tNE5kMExv?=
+ =?utf-8?B?WUgxN1NGK3RNQXFFS1VLS3RkcFprTEVRTzcveFV6MmFyUHZGRVFFa0ZpOEtO?=
+ =?utf-8?B?S1hubFRUeTA5SE9PTDN4b21UZytEVDkyblQxa2MrWjBtU1pnalJDSnBuTGRw?=
+ =?utf-8?B?L3o5elJsZ0xCUFFxem1hS3gxcjVBaG5NbjQwS3Q4WWRXbU1NRTlMZVFzMTN5?=
+ =?utf-8?B?SGVPWXhGak5nMTliWU8vY3BGQmphSExjNjNkWnlrSC9pYkFQaFpWcCs1ZjB2?=
+ =?utf-8?B?QWs5M2crWkp1a1ZhMlU3UDhPTStubE1DV3BvVnBXVTJzVFl0L1JBUmJ4VFFS?=
+ =?utf-8?B?WG9oak40bnFHMHFTK0xlaC9mQWtVR2x2ejZ3a0xwbkF2eW10ZGZQTDhBM05s?=
+ =?utf-8?B?UDU5cTJWYVhkTkpka3MyOXpyOWRFOXNPMjNELzZpUVhGYlZlS3BpUGNSbENZ?=
+ =?utf-8?B?VEFkVUVUbTB4MWNLZmI4TFZiUEdQNnQzeEpwWk96MU9NeFJyRGRuY00rYVFE?=
+ =?utf-8?B?OURjTmw5VVNicDc5UEc1dmY1dFhPOWxCV1B1VS9LRnJLNTB0Q1lSY3ZoYzRt?=
+ =?utf-8?B?LzBhU0RwdUNCVW93ZFJkMjdDUzUwYkM4dFdubU9FV3NXdHMzMzBWdUVybjRi?=
+ =?utf-8?B?dWgvRkRYNW8vOHZXMW14SVo4bUdRNUFyVDZXbDFuVER6QTVqd2Y0RUNyK01C?=
+ =?utf-8?B?OHlHZk82TXZDSVc5SWRGRmtTVWlDYXFibVB1R2M5NE9VQjJlRTc3aTN4QzF6?=
+ =?utf-8?B?OC9sS0l0cWxWRE94V0dtZ01vakI5cVhiVEhMeUFtNTBrT2FZSWNzbTlkckN1?=
+ =?utf-8?B?dFdqb1orZGtYVFlWeXl5MzExankrcjRxVFVhSWJQUGc0Q01BZWtGQlFQRGpu?=
+ =?utf-8?B?QjZGQjZHMEJFaWp0NjR3Ym1qbXRTakMwTU5tZmJOQzNqRmNNNGYyRmEzNUNU?=
+ =?utf-8?B?aDRLTXpORXN0dFNOZFllTHloWnhqOXhHb0NVMWVFTGZ3eGtJRm9YWE9GM2tl?=
+ =?utf-8?B?V1ZsdE1aclNXRERyeFZveFhtTmVsWVlLeHZmMUdWanExOHlJMFJvbnlLNU9H?=
+ =?utf-8?B?WWFuT25sRzQ4U1crNndzV3c2Szhvd3hhZHZZdm0vMlZwVlhEUEpKMnpOOWVh?=
+ =?utf-8?B?eUpsbEJsOUw5aGQ5Um1PUXRuUjFvU0xvSG5mLzJUUklCeW9remU5NzZtTENF?=
+ =?utf-8?B?Q240MnhEblRJaDRnaVAvWmpTMHJZMEswelBRbGRIQ0ZrY2FMVER1b2lEM21B?=
+ =?utf-8?B?VEQ2anlRcG8vcVB2and2dUh4M2xraU9aU3YyMnhvZldMU2xrcXpMR0lKamJ0?=
+ =?utf-8?B?N1ZORTFZQko2ZnRacXpHYi9JMklIOVdmRHQvRG5rWTdOSWZpOTNrbW81bmpu?=
+ =?utf-8?B?dkJVcmpBSkoveHFZQXZMamVwclpnRTN2THJKb1cyZlJVbjRtZHRtQTdLY25B?=
+ =?utf-8?B?QURhbTJDY0hUbFdXeEIzTzRwdmZFYnp2UkFXdHZmY2xOaFR3MnpDZGJWWlp1?=
+ =?utf-8?B?RFRVWU9WWTZMN0xoWk0xUXJPQks5eWRXZ3ZyTDU0M2FaTUNZN24vaXNwMDA3?=
+ =?utf-8?B?YUxTQjNCUjMyU2pBeFU4WGMzU1pjeXRTektLSmdwMzNwRkFtSTIxLzVaT3pu?=
+ =?utf-8?B?MlVQWWEyR29teVlXajRHZitrTEYvWndoTGJCTExucUNRNmp2T0tvWGM4ODZu?=
+ =?utf-8?Q?yzpv8QXaDIM53uyDE2HwG5EWUMjq9uGx9M20ppF?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(1800799021)(376011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Z1RteUpDcFJrb1lsODcxWlp4cnJJcUlVRGliTGdURzhxdjBwVEQxMS9maEpp?=
+ =?utf-8?B?eDZld3JkSCs5Q0IrcndYSjhqQ1lBd3pmUW1CNXhYWG03d0RQVnRJamdQaVpv?=
+ =?utf-8?B?aFJaeXFHSVVXUTFCM09ROXlXSTVhQUkxbUxRSEtwWnNzRWhVQXUrK3lGYStC?=
+ =?utf-8?B?d0tVSnFIQ3k0YVYyV2FYc2ZwY3NxUzJUUXA2am43NUQ3QnljYWUwSkpNajQ3?=
+ =?utf-8?B?ZDBHY3MxOEpoTlA2WGxQVjQ0SEJiNUZzN09FY09JQ09FTU5GbkZpMzVjbVFu?=
+ =?utf-8?B?Y1dtRkltK05vUlVrRHoxMGNkOHJVcHNGS0FTWVRnVkFNU25jbHlSWCs4aFMx?=
+ =?utf-8?B?NnFVRU9VeHB0b0dsV0daWTJQRmp4TjhGa0oyeDFZYXNBWTRWTlI2ZDBJQ0U5?=
+ =?utf-8?B?MDUxemZlaXlDRkR5QXVTUGYzcFMvaVdxVjRySlNSV2VkZEIwR2NiNk85ZzQ5?=
+ =?utf-8?B?c05HbEtyNCtkMnpZeHB6ZDhTc3UxbjB1clRYMjI2T1ZMRVNuVU5jYTNreVQ5?=
+ =?utf-8?B?clFhWVk0bWx1cUthOTc5YzB0MEx4NDdRRTlWdVF4NUthMGkrZkRXMTVsQU5E?=
+ =?utf-8?B?ZzNqYjJpMUc2VnFSNThQb0M2amFkS25Wa1BNU3JseXhiOGEwZ1dVR3RGTUQy?=
+ =?utf-8?B?cmFxV2dMU0dqc0oxMWROdXJRTXNSTjBEYnFHRjBodzNEQXV6a0NBdXRKQVgv?=
+ =?utf-8?B?VkxHZktKSEtmTXFmMiszbUg4VjNKbk15VXBlT2NLRHBSanNSck41SzN4dkhU?=
+ =?utf-8?B?eGFWUkNtSFVEUm1uQUk0RzJhdU0yTXg2UEdPakxSNko2ZmRuMlN2RGRYZ0Fu?=
+ =?utf-8?B?cklNTEZUZWlLR0RiQU52Y2ZYYklMK0Q4azh5TnJwRmhoK2k3SG1vZjN1VzRJ?=
+ =?utf-8?B?bXZ3WUZta2tpQTNFOGRNTkhaQ1h3NnNLbDlOZkZaOFZmQi9rRnBUNE9yWVEv?=
+ =?utf-8?B?Mzh6Sld1VUpaTVNJT2VPTUJ2MVo5Z3NmSnUwejBqVWcwOE9JK2xhNEh1Q3Fu?=
+ =?utf-8?B?WUNzdzZxa29MUFExUmMrd1BPdEU1R1hvNk9tRGZWTi9kVEl2MnMyQUhISlZS?=
+ =?utf-8?B?Vk43Zk44WG5yQStNTUhFSiszcVg1QjgxckhJRkVHcDRQZWtGRzV0VlNsaWYr?=
+ =?utf-8?B?MmN5OSsvTWk3WlFGRTF4VEZadE5BeTlUMk9EWWZPTDVyR05NQkpFUkszSGln?=
+ =?utf-8?B?WHFzdDFqVWxFUjE2ZVhreUN5YXRQeHczeXJSY2MvWG1Rd3FCci9CN1BQckda?=
+ =?utf-8?B?dEhsTS8raUEyL0xQeUNDNEZhdFZKWTEwSSt2SUNwVURrQy9OTEhoK1E1TDZ3?=
+ =?utf-8?B?a1BIY0cxS3J2VElSVTVEclp1UXlPWlFKbXo4QmhGekZDSHFtNFJNYVo0T2Nu?=
+ =?utf-8?B?YWZYYUpGRHRlLzRIb0dHMVdZYkdLQTFjTnh0TDBzSWlWRnlPMUZVZUdFQmdW?=
+ =?utf-8?B?Nnp0YlU4NSsxN2FqM0Zidjdvbm82QXVOZFJESkpUcEtCUU5DcWZFVWJoQWtn?=
+ =?utf-8?B?M1FUWFdnYlY2dklDRHBDZkxVOVlRN2Y4ZHNOaFA0V0xhUXBOZkpEWVhlZDFL?=
+ =?utf-8?B?QXdpL1ZmU1YwK1EvTWc0ak1IZXE5WW9kT0VtY2lqa3gxZlc5TWZyQWNpWnY2?=
+ =?utf-8?B?VEdUejVKZ3AvYll2andkSUJjdDhHQVRNdGpWNmNzbEl1SEhsWk1NSVA4TEcz?=
+ =?utf-8?B?dTNtZENMaGxZbVRYbVZ5amZIeEV2bHlLRklOSVFkeHRkZm0xZUxpUyszd0hW?=
+ =?utf-8?B?czFWemZEd2kyUlJhSG5IdmFTMk5SNHdHbU51NHkrRFdLZkZ4YU1LaEppaVRt?=
+ =?utf-8?B?QmJ4OFZPa2xjRTcyc3k0RnMxS3Q3Y05UbTY3R093OEM1V0lUMGVqTVpJOGZn?=
+ =?utf-8?B?RzM5b0QrSUVvU0YwTWxUc3NLMTNpWjdzaXdFVFpualk5eFZMVFVncGpPaUh5?=
+ =?utf-8?B?T2R2R3VOUVFIYXloQ1F3WEdLY0FoWFdKVW91RGNzdm1mVVdiai8wb2dmN1A2?=
+ =?utf-8?B?RVh4Q3FuSWZTU0NaNVJUWldVY1VmeHlZYnc2aVpBelR0UU5tOGZjbmkvd0tu?=
+ =?utf-8?B?SjA4SFNCZUNkL1NYcXlZS1hlOUsrSXRUUGpSSGdyZTVOVTl4OW1MMExmdWlu?=
+ =?utf-8?B?NDM4VzJXQkxCVUNEdUtIYlZXbkFTb25SNEhHWUJRdkxXZDdsOHN3OHFzc2JR?=
+ =?utf-8?B?UlE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e3286c87-4d84-48c4-d613-08dc9035ffb7
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2024 08:01:17.8588
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mLMwASCIqL762kt20VZvxMGWSg7CpqbWr+Dz79VEOU8CnY+VemIgaqs8ESuQd+VpQVUiI6HiuQa1kD27JruDvqkKmuUiLzvJCLCTT2fSNJk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6478
+X-OriginatorOrg: intel.com
 
-On Thu, Jun 13, 2024 at 12:54:48PM +0300, Denis Arefev wrote:
-> Two missing check in virtio_net_hdr_to_skb() allowed syzbot
-> to crash kernels again
+On 6/19/24 09:16, Omer Shpigelman wrote:
+> On 6/18/24 17:19, Andrew Lunn wrote:
+
+[...]
+
+>>>>> +module_param(poll_enable, bool, 0444);
+>>>>> +MODULE_PARM_DESC(poll_enable,
+>>>>> +              "Enable Rx polling rather than IRQ + NAPI (0 = no, 1 = yes, default: no)");
+>>>>
+>>>> Module parameters are not liked. This probably needs to go away.
+>>>>
+>>>
+>>> I see that various vendors under net/ethernet/* use module parameters.
+>>> Can't we add another one?
+>>
+>> Look at the history of those module parameters. Do you see many added
+>> in the last year? 5 years?
+>>
 > 
-> 1. After the skb_segment function the buffer may become non-linear
-> (nr_frags != 0), but since the SKBTX_SHARED_FRAG flag is not set anywhere
-> the __skb_linearize function will not be executed, then the buffer will
-> remain non-linear. Then the condition (offset >= skb_headlen(skb))
-> becomes true, which causes WARN_ON_ONCE in skb_checksum_help.
+> I didn't check that prior to my submit. Regarding this "no new module
+> parameters allowed" rule, is that documented anywhere? if not, is that the
+> common practice? not to try to do something that was not done recently?
+> how "recently" is defined?
+> I just want to clarify this because it's hard to handle these submissions
+> when we write some code based on existing examples but then we are
+> rejected because "we don't do that here anymore".
+> I want to avoid future cases of this mismatch.
 > 
-> 2. The struct sk_buff and struct virtio_net_hdr members must be
-> mathematically related.
-> (gso_size) must be greater than (needed) otherwise WARN_ON_ONCE.
-> (remainder) must be greater than (needed) otherwise WARN_ON_ONCE.
-> (remainder) may be 0 if division is without remainder.
-> 
-> offset+2 (4191) > skb_headlen() (1116)
-> WARNING: CPU: 1 PID: 5084 at net/core/dev.c:3303 skb_checksum_help+0x5e2/0x740 net/core/dev.c:3303
-> Modules linked in:
-> CPU: 1 PID: 5084 Comm: syz-executor336 Not tainted 6.7.0-rc3-syzkaller-00014-gdf60cee26a2e #0
-> Hardware name: Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-> RIP: 0010:skb_checksum_help+0x5e2/0x740 net/core/dev.c:3303
-> Code: 89 e8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 52 01 00 00 44 89 e2 2b 53 74 4c 89 ee 48 c7 c7 40 57 e9 8b e8 af 8f dd f8 90 <0f> 0b 90 90 e9 87 fe ff ff e8 40 0f 6e f9 e9 4b fa ff ff 48 89 ef
-> RSP: 0018:ffffc90003a9f338 EFLAGS: 00010286
-> RAX: 0000000000000000 RBX: ffff888025125780 RCX: ffffffff814db209
-> RDX: ffff888015393b80 RSI: ffffffff814db216 RDI: 0000000000000001
-> RBP: ffff8880251257f4 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000001 R12: 000000000000045c
-> R13: 000000000000105f R14: ffff8880251257f0 R15: 000000000000105d
-> FS:  0000555555c24380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 000000002000f000 CR3: 0000000023151000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  ip_do_fragment+0xa1b/0x18b0 net/ipv4/ip_output.c:777
->  ip_fragment.constprop.0+0x161/0x230 net/ipv4/ip_output.c:584
->  ip_finish_output_gso net/ipv4/ip_output.c:286 [inline]
->  __ip_finish_output net/ipv4/ip_output.c:308 [inline]
->  __ip_finish_output+0x49c/0x650 net/ipv4/ip_output.c:295
->  ip_finish_output+0x31/0x310 net/ipv4/ip_output.c:323
->  NF_HOOK_COND include/linux/netfilter.h:303 [inline]
->  ip_output+0x13b/0x2a0 net/ipv4/ip_output.c:433
->  dst_output include/net/dst.h:451 [inline]
->  ip_local_out+0xaf/0x1a0 net/ipv4/ip_output.c:129
->  iptunnel_xmit+0x5b4/0x9b0 net/ipv4/ip_tunnel_core.c:82
->  ipip6_tunnel_xmit net/ipv6/sit.c:1034 [inline]
->  sit_tunnel_xmit+0xed2/0x28f0 net/ipv6/sit.c:1076
->  __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
->  netdev_start_xmit include/linux/netdevice.h:4954 [inline]
->  xmit_one net/core/dev.c:3545 [inline]
->  dev_hard_start_xmit+0x13d/0x6d0 net/core/dev.c:3561
->  __dev_queue_xmit+0x7c1/0x3d60 net/core/dev.c:4346
->  dev_queue_xmit include/linux/netdevice.h:3134 [inline]
->  packet_xmit+0x257/0x380 net/packet/af_packet.c:276
->  packet_snd net/packet/af_packet.c:3087 [inline]
->  packet_sendmsg+0x24ca/0x5240 net/packet/af_packet.c:3119
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  __sock_sendmsg+0xd5/0x180 net/socket.c:745
->  __sys_sendto+0x255/0x340 net/socket.c:2190
->  __do_sys_sendto net/socket.c:2202 [inline]
->  __se_sys_sendto net/socket.c:2198 [inline]
->  __x64_sys_sendto+0xe0/0x1b0 net/socket.c:2198
->  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
->  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
->  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-> 
-> Found by Linux Verification Center (linuxtesting.org) with Syzkaller
-> 
-> Signed-off-by: Denis Arefev <arefev@swemel.ru>
-> ---
->  V1 -> V2: incorrect type in argument 2
->  include/linux/virtio_net.h | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-> index 4dfa9b69ca8d..d1d7825318c3 100644
-> --- a/include/linux/virtio_net.h
-> +++ b/include/linux/virtio_net.h
-> @@ -56,6 +56,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
->  	unsigned int thlen = 0;
->  	unsigned int p_off = 0;
->  	unsigned int ip_proto;
-> +	u64 ret, remainder, gso_size;
->  
->  	if (hdr->gso_type != VIRTIO_NET_HDR_GSO_NONE) {
->  		switch (hdr->gso_type & ~VIRTIO_NET_HDR_GSO_ECN) {
-> @@ -98,6 +99,16 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
->  		u32 off = __virtio16_to_cpu(little_endian, hdr->csum_offset);
->  		u32 needed = start + max_t(u32, thlen, off + sizeof(__sum16));
->  
-> +		if (hdr->gso_size) {
-> +			gso_size = __virtio16_to_cpu(little_endian, hdr->gso_size);
-> +			ret = div64_u64_rem(skb->len, gso_size, &remainder);
-> +			if (!(ret && (hdr->gso_size > needed) &&
-> +						((remainder > needed) || (remainder == 0)))) {
-> +				return -EINVAL;
-> +			}
 
+best way is to read netdev ML, that way you will learn what interfaces
+are frowned upon and which are outright banned, sometimes you could
+judge yourself knowing which interfaces are most developed recently
 
-Could you please add some comments explaining the logic here?
+in this module params example - they were introduced to allow init phase
+configuration of the device, that could not be postponed, what in the
+general case sounds like a workaround; hardest cases include huge swaths
+of (physical continuous) memory to be allocated, but for that there are
+now device tree binding solutions; more typical cases for networking are
+resolved via devlink reload
 
-And do we really need u64 math? All the values here are 32 bit ATM ...
+devlink parms are also the thing that should be used as a default for
+new parameters, the best if given parameter is not driver specific quirk
 
-
-
-
-> +			skb_shinfo(skb)->tx_flags |= SKBFL_SHARED_FRAG;
-> +		}
-> +
->  		if (!pskb_may_pull(skb, needed))
->  			return -EINVAL;
->  
-> -- 
-> 2.25.1
-
+poll_enable sounds like something that should be a common param,
+but you have to better describe what you mean there
+(see napi_poll(), "Enable Rx polling" would mean to use that as default,
+do you mean busy polling or what?)
 
