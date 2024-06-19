@@ -1,182 +1,86 @@
-Return-Path: <netdev+bounces-104767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCF7990E47D
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:29:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CB9990E48B
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:32:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D9761F2564E
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 07:29:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBADE282154
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 07:32:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0849A78276;
-	Wed, 19 Jun 2024 07:26:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653A976025;
+	Wed, 19 Jun 2024 07:32:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i9F9mTwX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EHgHq/CA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A7B74BE0
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 07:26:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FED5558BC
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 07:32:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718781993; cv=none; b=d1z3SRXSCxhM8vbmzr6tYCDTwEWrsHX4FgtUKrllX+SGn80JvSp5jtOVhsGfem6XxcfxmGCpdyL3/nzvqtScOIubx8KjaawkWVzIX5C60+A+AYUvfa6jFSPHYkAvK7uuamaiVfTzb5oUQGSFg3pl8RJcBft4I6X0DQ4aUHrWkCI=
+	t=1718782343; cv=none; b=Fop5E9dH6dUhd2t6+vTphyoRN0iRzDPp3bv3dM9HISWzMVWE7i8uPQRwka9VlrPIlxQLWpwOi24S7VhqcbgdmIUeMCWJeBAMQsktC8N6hpA6wfgq5q5h9JuvEbn5jLbpjSSoxTArOdAW+lOgmvTo7GJc6wVj7vKm0jV/i6N5924=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718781993; c=relaxed/simple;
-	bh=4gdQjgz1DaGKapVycwD2csURuJEY5zmqSO9sCCv7ETA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n/dyAC4j3AT82Tca8bpmE9xbK6VMUG3M67WkSGWyJjDgAN7Py3eRkXzVu6Vkm0uRSFbaa4sEfdUjwIeUh4UlzN37TFhFliUKzyRi3e2ujh/RQHRZ9jdpd8dDaJSS/2s794I0D57QaTi+o8PJ3JQ7olW0pMCFJ+qMLBNBG3d/QEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i9F9mTwX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718781991;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FgbWbQVfihAnM12MewtnW5ZWjWRwpeKC35/dzxHgaNM=;
-	b=i9F9mTwXuRcqTbXzcC/LQN/+uE3WtifZA4gzVCA3ledxIqPV+wB4Ab004YWQL+1Rlk2CCb
-	pOd6CP9xseuIU7ZSoDTtaAKeZ4lP2OjylJjErTipinTXspRRWkWJ2VNO7O2fZT7DD1g+KL
-	LcDymvwTi6B6MEn6SZnXYVnSKL6IgV4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-125-LE0l-pu2PyWasozjOjibQw-1; Wed, 19 Jun 2024 03:26:29 -0400
-X-MC-Unique: LE0l-pu2PyWasozjOjibQw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42120e123beso55851545e9.0
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 00:26:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718781988; x=1719386788;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FgbWbQVfihAnM12MewtnW5ZWjWRwpeKC35/dzxHgaNM=;
-        b=Ij2+vhDP2/MLM5wyVrQfXm7xnYYTztrY5UqCCXXvIgGz6YQ++4O9zx/LH2prY21JW1
-         jDPVqBI8fuAOS0mInKh6tm+2hq0UQ/kg5KRRiXfMw6ky/kVfDoTBpRlaQ9z1RJzm/IWG
-         ym2UTxWSaQGrJYCQtBw7TyM5/pVQtK/4LbTiX60/y/yyDEPxAUaytO8rprU4u6Oa09Zw
-         RmcMc8Jeiyy8XrSsYoEdYsLOabrL37hXQcKfJ14LASZkwq+Pme6CCXQplO3q7NSwX4wL
-         C5K8Mc+YOODBSTKhcsV4uZb/OeypPrZdWamg7b4UaFELtPZOjbaf5vcgrrN9IBEZLXRd
-         wFLw==
-X-Gm-Message-State: AOJu0YxN58Ekq19B0dzQTZxhYPfWq4nTI1UjzL7YgDHc393wkNml2SAw
-	WNzVpWiU31GOAZCqBg9BH/cIBGH4l5GLbEac0iD6qQslPL/76YLwfQgAj57/sxqkRr0mEP+19xH
-	b9YT0hDcYd2HhK36l6OOy4s5SE0mIaQogbF0v86A94d9P1ZZJdSq/PA==
-X-Received: by 2002:a05:600c:5107:b0:424:760d:75b8 with SMTP id 5b1f17b1804b1-424760d766bmr10331805e9.8.1718781988289;
-        Wed, 19 Jun 2024 00:26:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG19bffvewKAsHvQ49KXnt1AnJ/r5s1KJCeOSQfTJk0Bf4Gs13z0uqyapeiyh3DeSyFNOhZFg==
-X-Received: by 2002:a05:600c:5107:b0:424:760d:75b8 with SMTP id 5b1f17b1804b1-424760d766bmr10331455e9.8.1718781987725;
-        Wed, 19 Jun 2024 00:26:27 -0700 (PDT)
-Received: from redhat.com ([2.52.146.100])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42286eef9ccsm251709785e9.5.2024.06.19.00.26.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jun 2024 00:26:27 -0700 (PDT)
-Date: Wed, 19 Jun 2024 03:26:22 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, dave.taht@gmail.com,
-	kerneljasonxing@gmail.com, hengqi@linux.alibaba.com
-Subject: Re: [PATCH net-next v3] virtio_net: add support for Byte Queue Limits
-Message-ID: <20240619014938-mutt-send-email-mst@kernel.org>
-References: <20240618144456.1688998-1-jiri@resnulli.us>
- <20240618140326-mutt-send-email-mst@kernel.org>
- <ZnJwbKmy923yye0t@nanopsycho.orion>
+	s=arc-20240116; t=1718782343; c=relaxed/simple;
+	bh=xtIQIbQ+KGo4Vw9g5D1MEwAWD18eZLeyaWwNhV1nibg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hrIvf7SeYa9ldn1nz2mkG1y87p86oeY1+nTbs9toZZhx0k2Q3470K867mwItpltcfKghHv0UVpXV4wZPe7Ri6UGSjCoJhx6xeGXM3GycfZRNv6hIbaBF+qsmlgfah4FClzgYT1x1x0CKzdRfItoqeG+azVmqA+o1j1KJRX3RhE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EHgHq/CA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21477C2BBFC;
+	Wed, 19 Jun 2024 07:32:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718782342;
+	bh=xtIQIbQ+KGo4Vw9g5D1MEwAWD18eZLeyaWwNhV1nibg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EHgHq/CAG25Yawuf6k7YMP4rExzbSTDJJDOXlcPb/bb0GNZbCa5eXQ4VCw0AKI3oE
+	 /DOw529jYFSEZSIHKAgNZ+r2LpHl6PDPjzNmksZghdALYJgruULd6Fh79kZUFn8FfT
+	 udXJDHH1K2CdIxuXd5919QKHNrGVLLM11pmJPBHqPZIr6u5gB7uXABvEuXU+SNQwir
+	 Pq2b9JKR5SEotPvzfVG3pmZSN3BjIbfQG8vP1b10VaYObq7FIpbUaMcCRa00E3JxIW
+	 fcKYRz+Y57kzX16W/M6EClPpvsmrOp1iJYMiN7W4e1RT2IDZNEIUKe14OwVbukPzVj
+	 QToZ1F8/j62oA==
+Date: Wed, 19 Jun 2024 09:32:18 +0200
+From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+To: Peter Rashleigh <prashleigh@questertangent.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: dsa: mv88e6xxx maps all VLANs to the same FID
+Message-ID: <20240619093218.155065ef@dellmb>
+In-Reply-To: <b22a2986512849b7887943e5850fa03b@questertangent.com>
+References: <b22a2986512849b7887943e5850fa03b@questertangent.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZnJwbKmy923yye0t@nanopsycho.orion>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 19, 2024 at 07:45:16AM +0200, Jiri Pirko wrote:
-> Tue, Jun 18, 2024 at 08:18:12PM CEST, mst@redhat.com wrote:
-> >This looks like a sensible way to do this.
-> >Yet something to improve:
-> >
-> >
-> >On Tue, Jun 18, 2024 at 04:44:56PM +0200, Jiri Pirko wrote:
-> >> From: Jiri Pirko <jiri@nvidia.com>
-> >> 
-> 
-> [...]
-> 
-> 
-> >> +static void __free_old_xmit(struct send_queue *sq, struct netdev_queue *txq,
-> >> +			    bool in_napi, struct virtnet_sq_free_stats *stats)
-> >>  {
-> >>  	unsigned int len;
-> >>  	void *ptr;
-> >>  
-> >>  	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
-> >> -		++stats->packets;
-> >> -
-> >>  		if (!is_xdp_frame(ptr)) {
-> >> -			struct sk_buff *skb = ptr;
-> >> +			struct sk_buff *skb = ptr_to_skb(ptr);
-> >>  
-> >>  			pr_debug("Sent skb %p\n", skb);
-> >>  
-> >> -			stats->bytes += skb->len;
-> >> +			if (is_orphan_skb(ptr)) {
-> >> +				stats->packets++;
-> >> +				stats->bytes += skb->len;
-> >> +			} else {
-> >> +				stats->napi_packets++;
-> >> +				stats->napi_bytes += skb->len;
-> >> +			}
-> >>  			napi_consume_skb(skb, in_napi);
-> >>  		} else {
-> >>  			struct xdp_frame *frame = ptr_to_xdp(ptr);
-> >>  
-> >> +			stats->packets++;
-> >>  			stats->bytes += xdp_get_frame_len(frame);
-> >>  			xdp_return_frame(frame);
-> >>  		}
-> >>  	}
-> >> +	netdev_tx_completed_queue(txq, stats->napi_packets, stats->napi_bytes);
-> >
-> >Are you sure it's right? You are completing larger and larger
-> >number of bytes and packets each time.
-> 
-> Not sure I get you. __free_old_xmit() is always called with stats
-> zeroed. So this is just sum-up of one queue completion run.
-> I don't see how this could become "larger and larger number" as you
-> describe.
+On Tue, 18 Jun 2024 15:24:08 -0700
+Peter Rashleigh <prashleigh@questertangent.com> wrote:
 
-Oh. Right of course. Worth a comment maybe? Just to make sure
-we remember not to call __free_old_xmit twice in a row
-without reinitializing stats.
-Or move the initialization into __free_old_xmit to make it
-self-contained ..
-WDYT?
+> Hello all,
+> 
+> I've discovered what suspect to be a bug in the mv88e6xxx driver. I'm curious if anyone else has run into this behavior and might be able to suggest a way forward (or can tell me what I'm doing wrong).
+> 
+> I'm developing a custom networking product that has three Marvell 88E6361 switches connected via DSA to a Marvell CPU running on a custom buildroot Linux (version 6.1.53) like this:
+> [CPU]---[Switch 0]---[Switch 1]---[Switch 2]
+> 
+> The product uses a mix of bridged and standalone ports, spread across the three switches.
+> 
+> The problem I'm having is that all VLANs (both for bridged and standalone ports) are using the same FID. I've found that mv88e6xxx_atu_new() always sets FID=0 even if there are already standalone ports or other VLANs using that FID. The problem seems to be with the getNext operation called from mv88e6xxx_vtu_walk().
+> 
+> The VTU Walk function sets VID=0xfff and then runs mv88e6xxx_g1_vtu_getnext(), but the switch does not respond as expected. Instead of returning the lowest valid VID, the register value (Global 1 reg 0x06) is 0x2fff, suggesting that the switch has reached the end of the second VTU page rather than starting from zero. This seems to conflict with what the Marvell datasheet describes, but I haven't come up with a better explanation so far.
+> 
+> Any suggestions are greatly appreciated.
 
-> 
-> >
-> >For example as won't this eventually trigger this inside dql_completed:
-> >
-> >        BUG_ON(count > num_queued - dql->num_completed);
-> 
-> Nope, I don't see how we can hit it. Do not complete anything else
-> in addition to what was started in xmit(). Am I missing something?
-> 
-> 
-> >
-> >?
-> >
-> >
-> >If I am right the perf testing has to be redone with this fixed ...
-> >
-> >
-> >>  }
-> >>  
-> 
-> [...]
+This is known limitation of the current version of the driver.
 
+I started working on this FID separation in order to support
+multi-CPU DSA on mv88e6xxx.
+
+Marek
 
