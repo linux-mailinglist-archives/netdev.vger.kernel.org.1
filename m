@@ -1,112 +1,142 @@
-Return-Path: <netdev+bounces-104839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABBE090EA0B
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 13:50:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1873890EA40
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 13:59:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B88971C2136C
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 11:50:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C4E1282BAA
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 11:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2CD213D532;
-	Wed, 19 Jun 2024 11:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9401A13DDC9;
+	Wed, 19 Jun 2024 11:59:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WvmZUOLe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hIov5lXw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9F21386B4;
-	Wed, 19 Jun 2024 11:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02ED13212E
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 11:59:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718797831; cv=none; b=nba/o8RefybDBj7tcOg6LsUxrS+tdUfoF2CinUw5UfGL1jgYoIUo2jm02vC2jcGWX3ZiJ8xwZD7rQWBeduIDuDhK9iJTRDakX6JtfDS9iuOEiHBDyakDPMS9C5n3VBG/o9j+dldDeEJ3XQFOt04GIx43BJqTCpj5+25RjKPu9WI=
+	t=1718798385; cv=none; b=UAV9SF0vr/q4kRZqVjQzP37p56ul7cZOPcDWnpN+w4qRGdZmxtHxx1ltq9BmJnID5zlf6A6X5G2PDDX02bkcZGDtaj7HA3CCMHYbqq5/OGFn+A3UVQEQfXHs8q4cB+H1fV2Ovcwfgv/N3u67Otx3VmqjRX+0p3tkwrrcWsn+E9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718797831; c=relaxed/simple;
-	bh=WBAY54eGwt1loIBs6Hp8ejKwZhZ0eB+pAKKRU6vShMo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aNgQ5eSMEop5JAiK1MOuLiyF2ckY47qARyIyFZ+y1kLIx383WS0mi8QdWYAT1giK6k1mdfuBNZu+Wbmnzho30/+Tzcz3Uiat8A1chnCIQe51tGbLoArsKockv2XLpXgZg9hESXjy4Laory99qwcorUewK0Bbjxp51Yqn0+TY648=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WvmZUOLe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 50136C4AF1A;
-	Wed, 19 Jun 2024 11:50:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718797831;
-	bh=WBAY54eGwt1loIBs6Hp8ejKwZhZ0eB+pAKKRU6vShMo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WvmZUOLeb3qYVRlGvndMx20KcKoEOaFqXvUOuRtiiHPgzZse+YYSpMGK9uYt7zlCm
-	 YF+qBY0on/1wGD/yh2CdK6q0TnYco2ZJTxJA5LY1OVBmwWft/GlKbVIcoFgui9uJ1W
-	 VL65GxS1+FGSFsFpBdaKpEbac6Qnu46lj7ERSUhtAiBvJsgqz0MMnagXDBWXrbqk5n
-	 svP7MfKjjQTOcseNUNy3+85tSbIrf/crPsLbEnFFWTmX2HeWguhhOhxOsrmbRtjmqH
-	 5t9rDEz+svIM3EttXUhP9aaWMV4nG9GZ5thJe4Eoc8+f+HnijsMMCFXb5mRTzu/fDG
-	 XE5OAq4B5fL6w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3B1DEC4361A;
-	Wed, 19 Jun 2024 11:50:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1718798385; c=relaxed/simple;
+	bh=5i/ufGEXGZM+asXvViRV7VJUiWQz5Z4h2JWJfaYbOs0=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=eN/JYgN1+3on25rpDsxu1z+bI6DcgteHgREepj7vpWko0C1im6ecZe90IAlPhWGnLce6hF+lttye6+RNSc6n6hTYMT+CxmM6VG5c813qnGgmkhKqApwM1L05XyAlMnaGnlKYlP0XoGB5U2c5/W08iHf7m6spa8pLS767qqlHmrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hIov5lXw; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4217990f997so46904885e9.2
+        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 04:59:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718798382; x=1719403182; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vvg4vGG0NNCH7mnLi58lkwASaYMo6neAVgHZyfchLqY=;
+        b=hIov5lXwwled0piFG1TMGPxZ2A0Py0fb1ucOGBgz0QOvW3IfFm1GhLAzSWrjmxf4ZS
+         bwqTrs8e2tomIVe4R3ghPvpT1s8P/K1ou08cX6nsNzYG0cHs5+ZkDEzYR6KZWQ4f5wqr
+         4vyq1TKbCKPhjxNBnCj2xkgC6FrGIhQJt07wfBR6vR1ocTVt7I1Phek0PDHpm2nsspUt
+         124RTQgMropI2xY6Q2LvOjw/MRhdegA7z8UPg7G1rv/BlpQkkPLGHH7TnMW1ISyB+Ezr
+         jWzBwtou38AGyAyMyMegLCkOzB920KJ04iNR/ynGjlwKhCAGXSFGqrgd4zaCbj5Hk5wj
+         uxXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718798382; x=1719403182;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vvg4vGG0NNCH7mnLi58lkwASaYMo6neAVgHZyfchLqY=;
+        b=Wv1mdlQQxVAKkC0/RlSchk1XwkkvN6wx9WgHV7bcI5OKc6wZDpELXHowbbUi5Ds82L
+         XPcAsMvK66rebFl2oVhAJ/EeHuFhSYx6UPiEiPbKc7jmWUCys2BGRiQQpxhH3dvxzc5b
+         856DgfrzJTo5ZcxckI0/syEn1ItXF0HrgFIQTqKuf+0sbQfLkKcCv7BKyibV5eu4YBVO
+         RQ6szrPXIWNAeaaypKaP6Xpaqvci+ZyaUrANZz4xlbA+jfsZw8UK+wRuu5fX9cHsZ+C8
+         KZ82ZwxxEewQYEoKOgtbWH4FuJgZVP2ceWwsrMFcAcKhwRhc0kt43mH0B8FmdpbTvJAI
+         TsZw==
+X-Gm-Message-State: AOJu0YzGExAo/HXbthyAp6Xi1pBPjKGWO/nequ5FA5+MZUqH/RVYagfw
+	2yP3bkO85hDrS1ZXufT/G9ZTtXe81OBWrsKuD9ulz8qjMsccgnBr
+X-Google-Smtp-Source: AGHT+IGFYKB0stBBhearch7GBt2XkbprkLsDvGhS0htFufQYuPX/v8MMmmoBuSjtCmymCbGJteE8eQ==
+X-Received: by 2002:a05:600c:49a3:b0:421:2202:1cd1 with SMTP id 5b1f17b1804b1-42475296c55mr14584245e9.25.1718798381957;
+        Wed, 19 Jun 2024 04:59:41 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422f2f30925sm229384975e9.0.2024.06.19.04.59.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Jun 2024 04:59:41 -0700 (PDT)
+Subject: Re: [PATCH v5 net-next 3/7] net: ethtool: record custom RSS contexts
+ in the XArray
+To: David Wei <dw@davidwei.uk>, edward.cree@amd.com,
+ linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, habetsm.xilinx@gmail.com,
+ sudheer.mogilappagari@intel.com, jdamato@fastly.com, mw@semihalf.com,
+ linux@armlinux.org.uk, sgoutham@marvell.com, gakula@marvell.com,
+ sbhatta@marvell.com, hkelam@marvell.com, saeedm@nvidia.com, leon@kernel.org,
+ jacob.e.keller@intel.com, andrew@lunn.ch, ahmed.zaki@intel.com
+References: <cover.1718750586.git.ecree.xilinx@gmail.com>
+ <889f665fc8a0943de4aeaaa4278298a9eba8df84.1718750587.git.ecree.xilinx@gmail.com>
+ <6d697584-d860-4ee2-a2de-cbfca81600b2@davidwei.uk>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <f14b14e1-1dfb-1769-88c9-856dc3c96c37@gmail.com>
+Date: Wed, 19 Jun 2024 12:59:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/7] net: pass receive socket to drop tracepoint
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171879783123.2748.515065113481168194.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Jun 2024 11:50:31 +0000
-References: <cover.1718642328.git.yan@cloudflare.com>
-In-Reply-To: <cover.1718642328.git.yan@cloudflare.com>
-To: Yan Zhai <yan@cloudflare.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org,
- quic_abchauha@quicinc.com, almasrymina@google.com, fw@strlen.de,
- aleksander.lobakin@intel.com, dhowells@redhat.com, jiri@resnulli.us,
- daniel@iogearbox.net, bigeasy@linutronix.de, lorenzo@kernel.org,
- asml.silence@gmail.com, linux-kernel@vger.kernel.org,
- kernel-team@cloudflare.com, hawk@kernel.org, rostedt@goodmis.org,
- mhiramat@kernel.org, mathieu.desnoyers@efficios.com, nhorman@tuxdriver.com,
- linux-trace-kernel@vger.kernel.org, dan.carpenter@linaro.org
+In-Reply-To: <6d697584-d860-4ee2-a2de-cbfca81600b2@davidwei.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Mon, 17 Jun 2024 11:09:00 -0700 you wrote:
-> We set up our production packet drop monitoring around the kfree_skb
-> tracepoint. While this tracepoint is extremely valuable for diagnosing
-> critical problems, it also has some limitation with drops on the local
-> receive path: this tracepoint can only inspect the dropped skb itself,
-> but such skb might not carry enough information to:
+On 19/06/2024 01:46, David Wei wrote:
+> On 2024-06-18 15:44, edward.cree@amd.com wrote:
+>> From: Edward Cree <ecree.xilinx@gmail.com>
+>>
+>> Since drivers are still choosing the context IDs, we have to force the
+>>  XArray to use the ID they've chosen rather than picking one ourselves,
+>>  and handle the case where they give us an ID that's already in use.
+>>
+>> Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
+>> ---
+>>  include/linux/ethtool.h | 14 ++++++++
+>>  net/ethtool/ioctl.c     | 74 ++++++++++++++++++++++++++++++++++++++++-
+>>  2 files changed, 87 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+>> index a68b83a6d61f..5bef46fdcb94 100644
+>> --- a/include/linux/ethtool.h
+>> +++ b/include/linux/ethtool.h
+>> @@ -199,6 +199,17 @@ static inline u8 *ethtool_rxfh_context_key(struct ethtool_rxfh_context *ctx)
+>>  	return (u8 *)(ethtool_rxfh_context_indir(ctx) + ctx->indir_size);
+>>  }
+>>  
+>> +static inline size_t ethtool_rxfh_context_size(u32 indir_size, u32 key_size,
+>> +					       u16 priv_size)
+>> +{
+>> +	size_t indir_bytes = array_size(indir_size, sizeof(u32));
+>> +	size_t flex_len;
+>> +
+>> +	flex_len = size_add(size_add(indir_bytes, key_size),
+>> +			    ALIGN(priv_size, sizeof(u32)));
+>> +	return struct_size((struct ethtool_rxfh_context *)0, data, flex_len);
 > 
-> 1. determine in which netns/container this skb gets dropped
-> 2. determine by which socket/service this skb oughts to be received
-> 
-> [...]
+> ctx->data is [ priv | indir_tbl | key ] but only priv and indir_tbl are
+> aligned to sizeof(u32). Why does key not need to be aligned?
 
-Here is the summary with links:
-  - [net-next,v5,1/7] net: add rx_sk to trace_kfree_skb
-    https://git.kernel.org/netdev/net-next/c/c53795d48ee8
-  - [net-next,v5,2/7] net: introduce sk_skb_reason_drop function
-    https://git.kernel.org/netdev/net-next/c/ba8de796baf4
-  - [net-next,v5,3/7] ping: use sk_skb_reason_drop to free rx packets
-    https://git.kernel.org/netdev/net-next/c/7467de17635f
-  - [net-next,v5,4/7] net: raw: use sk_skb_reason_drop to free rx packets
-    https://git.kernel.org/netdev/net-next/c/ce9a2424e9da
-  - [net-next,v5,5/7] tcp: use sk_skb_reason_drop to free rx packets
-    https://git.kernel.org/netdev/net-next/c/46a02aa35752
-  - [net-next,v5,6/7] udp: use sk_skb_reason_drop to free rx packets
-    https://git.kernel.org/netdev/net-next/c/fc0cc9248843
-  - [net-next,v5,7/7] af_packet: use sk_skb_reason_drop to free rx packets
-    https://git.kernel.org/netdev/net-next/c/e2e7d78d9a25
+Because it's a u8[], whereas indir_tbl is a u32[].
+(And priv is aligned to sizeof(void *), so that drivers can put
+ whatever struct they like there and have proper alignment.)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> Is it guaranteed to be 40 bytes?
 
+Not AFAIK, though that certainly is a popular size.
 
+-ed
 
