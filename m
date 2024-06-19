@@ -1,141 +1,115 @@
-Return-Path: <netdev+bounces-104883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2023890EF43
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 15:43:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EF0490EF77
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 15:54:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD14B1F22923
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 13:43:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16DDBB25359
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 13:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4521A13DDC0;
-	Wed, 19 Jun 2024 13:43:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="W/lMsG15"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDCB614EC6E;
+	Wed, 19 Jun 2024 13:54:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC941E492;
-	Wed, 19 Jun 2024 13:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361C714B970
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 13:54:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718804607; cv=none; b=nY6owUUYBCJ6UdynjMvFWxYGGuvPPS1gj1hQEFqWFUn5cv7G+cR8S/U1V8bAz2bJ7vNwmWIpzR38+K9sM6YtetPSj/kN/sKMylMu8kd6LrH4i2EF78oAkY3x+Z7kJZOfII81A8NOp6/Oh8elTD4Z8gHnEarU0tCGY7sUcsSLMxY=
+	t=1718805267; cv=none; b=VOFiPMfOLetXROv03Cmgxa7UUHLmn5f2IH2wQbQ7ZayqdLYamWD4ZAfhocF2hW/1Ax79B7pRBn4OWYW3uJTbEYZ2X0heQucpjFba2xA5z7LV2Q6tbdohNxhBrNe7n+YkCfCOsFoe035RkNMcuyToSgiFHswMun293iRvhI9Kjro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718804607; c=relaxed/simple;
-	bh=dUSlc6Lg5vWg8y4LNfZgdjLzNa2vJIlTrGtGI9EZzdM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BjZt/iJGTwg6+GNJ/Sh957cdAEiaMU2qwt3Y/V/w0ccuCKaaQZX4nRUC9sr35ukNyPu7an8kJ7n2t6LhG9gKB+5pWMiqAhcx2BajR6BKCbm7TEJteHm0nGHOSacLAyofUgo2jmvqapEWWg89O32xgSTi/EfeeritHiU6SXv0NwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=W/lMsG15; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 4722E8839C;
-	Wed, 19 Jun 2024 15:43:14 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1718804595;
-	bh=LxutYi9m1J9PLpwUyDonpTyGQDOBfl75a2yDTGQqVDY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=W/lMsG15BMmpqQYBrjjOOXHzK/ljzRuZaZV9LWCpGOWLSA6MRLHyMAwN2yRoaZx8p
-	 8SlcIVuLfTHY1cSZwsqIMALmsDWmgM5dV3W3go7qtYuA1tf/FxSA3pZPvuMzjOc4s3
-	 P9dBD/s218dI9X70EcgOkzZeG8czoRI6GxXY8wCSKozKKsXQy5d0PfYLCk2kFdZ1DK
-	 kJhScT7v5Mr4l6jgbVEk21g9wdkfpGH20xD+5YcFI7CrMB54WWe0EzfQ8TvUc1eZla
-	 ovnl6pqzC9j6FLfS04dn2JNlAwsBYr04V7VGvoLkX+F5ZjeNYB/Ov0H5aHrdv3uyD9
-	 ywTVU78zkMYfw==
-From: Lukasz Majewski <lukma@denx.de>
-To: Vladimir Oltean <olteanv@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	Casper Andersson <casper.casan@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH v2 net-next] net: dsa: Allow only up to two HSR HW offloaded ports for KSZ9477
-Date: Wed, 19 Jun 2024 15:42:48 +0200
-Message-Id: <20240619134248.1228443-1-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1718805267; c=relaxed/simple;
+	bh=jmV7wlVNy3gdHxYJ4O+6sHOivhoFVOQVYUx2t3ExHFc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GPeQUmb+xx3l8A3Y34AhP8bWtY3iO4wXrukB7959rfFSvT8z03aMrNwJyy9nd7dbXzO0NsDdJeHeoWB6ZCCO6Yt0ec/7WRvbeIRe7d1EGIjeP70DzS6NIPfOvMwEhcyyOnlsAQMrHvmD5qbVDoLyH3QM/WaZViS3+npLed6gr3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3632e0f80e5so61994f8f.0
+        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 06:54:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718805264; x=1719410064;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ib3UUGzH7Y2fj72LrSFDKI4abJQLfpbgmiV7twXb3j4=;
+        b=UZqbivEojFkygRVyJcvByRG/8AGSR3Z0asoAOhXOveYWZJSI703tbdBtQnzLVhlRtr
+         DE7CCbB1oYKf3RhMbGxbpdq1vDCQ9yHNPjofbgisrpc8Yh/ogwy3tDr9VnkdP0T+V35d
+         jedCpKJgdOExwYeMDrQuqEP4WZYbeIXv+bBp2jl0EQomsawtmG2Qe94HTJMalMONwvzY
+         +JMulppV9xN8jb6sSgOlFl/v1PJzPqfM7AL5GMEWfC+vxcC+51G9JuE0vJG2IUYMHUgd
+         uq09wa2p0fbxncPfEn/NLLGLptepdht3Tj/7gViPuOZKFEnSw+Wa7edrwHWBOow7lqMI
+         ILGA==
+X-Forwarded-Encrypted: i=1; AJvYcCWDX591lDmPOm0ByCiWKjRDqAESJYT1W8uJFnihF8YEwElyzFgjZxsszb4Ce+mJ/bxmbe1/twNjsm2FCAFYPT3wqIgECLP2
+X-Gm-Message-State: AOJu0YzvFO6uVPyEbbgn8+GgFBDjdeQifKBJ1GmVxG8QnS2NzqoimKA6
+	rU/kcwfGqmxF/Ae89VffYN4c4GNDzFoxFSsRfHD/vkN5CE6n5ojA
+X-Google-Smtp-Source: AGHT+IFP0JVbw8oCUaY2m/r2Te+YabVW4Kq5267se4cPey7g9f+4kqK1W7B2HQCoQ3czy1TJAoQvtw==
+X-Received: by 2002:a05:6000:1f86:b0:360:8490:74d with SMTP id ffacd0b85a97d-36319990f76mr1809255f8f.5.1718805264252;
+        Wed, 19 Jun 2024 06:54:24 -0700 (PDT)
+Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422874de5d5sm268509615e9.33.2024.06.19.06.54.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Jun 2024 06:54:23 -0700 (PDT)
+Message-ID: <0aaaeabc-6f65-4e5d-bdb1-aa124ed08e8b@grimberg.me>
+Date: Wed, 19 Jun 2024 16:54:22 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: micro-optimize skb_datagram_iter
+To: David Howells <dhowells@redhat.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Matthew Wilcox <willy@infradead.org>,
+ kernel test robot <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
+ lkp@intel.com, netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>
+References: <20240617095852.66c96be9@kernel.org>
+ <202406161539.b5ff7b20-oliver.sang@intel.com>
+ <4937ffd4-f30a-4bdb-9166-6aebb19ca950@grimberg.me>
+ <Zm9fju2J6vBvl-E0@casper.infradead.org>
+ <033294ee-e6e6-4dca-b60c-019cb72a6857@grimberg.me>
+ <407790.1718801177@warthog.procyon.org.uk>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <407790.1718801177@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The KSZ9477 allows HSR in-HW offloading for any of two selected ports.
-This patch adds check if one tries to use more than two ports with
-HSR offloading enabled.
 
-The problem is with RedBox configuration (HSR-SAN) - when configuring:
-ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 interlink lan3 \
-	supervision 45 version 1
 
-The lan1 (port0) and lan2 (port1) are correctly configured as ports, which
-can use HSR offloading on ksz9477.
+On 19/06/2024 15:46, David Howells wrote:
+> Jakub Kicinski <kuba@kernel.org> wrote:
+>
+>> On Mon, 17 Jun 2024 09:29:53 +0300 Sagi Grimberg wrote:
+>>>> Probably because kmap() returns page_address() for non-highmem pages
+>>>> while kmap_local_page() actually returns a kmap address:
+>>>>
+>>>>           if (!IS_ENABLED(CONFIG_DEBUG_KMAP_LOCAL_FORCE_MAP) && !PageHighMem(page))
+>>>>                   return page_address(page);
+>>>>           return __kmap_local_pfn_prot(page_to_pfn(page), prot);
+>>>>
+>>>> so if skb frags are always lowmem (are they?) this is a false positive.
+>>> AFAIR these buffers are coming from the RX ring, so they should be
+>>> coming from a page_frag_cache,
+>>> so I want to say always low memory?
+>>>
+>>>> if they can be highmem, then you've uncovered a bug that nobody's
+>>>> noticed because nobody's testing on 32-bit any more.
+>>> Not sure, Jakub? Eric?
+>> My uneducated guess would be that until recent(ish) sendpage rework
+>> from David Howells all high mem pages would have been single pages.
+> Um.  I touched the Tx side, not the Rx side.
+>
+> I also don't know whether all high mem pages would be single pages.  I'll have
+> to defer that one to the MM folks.
 
-However, when we do already have two bits set in hsr_ports, we need to
-return (-ENOTSUPP), so the interlink port (lan3) would be used with
-SW based HSR RedBox support.
+What prevents from gro to expand frags from crossing PAGE_SIZE?
 
-Otherwise, I do see some strange network behavior, as some HSR frames are
-visible on non-HSR network and vice versa.
-
-This causes the switch connected to interlink port (lan3) to drop frames
-and no communication is possible.
-
-Moreover, conceptually - the interlink (i.e. HSR-SAN port - lan3/port2)
-shall be only supported in software as it is also possible to use ksz9477
-with only SW based HSR (i.e. port0/1 -> hsr0 with offloading, port2 ->
-HSR-SAN/interlink, port4/5 -> hsr1 with SW based HSR).
-
-Fixes: 5055cccfc2d1 ("net: hsr: Provide RedBox support (HSR-SAN)")
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
-
----
-Changes for v2:
-- Add more verbose description with Fixes: tag
-- Check the condition earlier and remove extra check if SoC is ksz9477
-- Add comment in the source code file
----
- drivers/net/dsa/microchip/ksz_common.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 2818e24e2a51..72bb419e34b0 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -3906,6 +3906,13 @@ static int ksz_hsr_join(struct dsa_switch *ds, int port, struct net_device *hsr,
- 		return -EOPNOTSUPP;
- 	}
- 
-+	/* KSZ9477 can only perform HSR offloading for up to two ports */
-+	if (hweight8(dev->hsr_ports) >= 2) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Cannot offload more than two ports - use software HSR");
-+		return -EOPNOTSUPP;
-+	}
-+
- 	/* Self MAC address filtering, to avoid frames traversing
- 	 * the HSR ring more than once.
- 	 */
--- 
-2.20.1
-
+btw, at least from the code in skb_gro_receive() it appears that 
+page_address() is called directly,
+which suggest that these netmem pages are lowmem?
 
