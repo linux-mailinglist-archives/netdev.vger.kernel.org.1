@@ -1,291 +1,315 @@
-Return-Path: <netdev+bounces-104743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 128F890E3A8
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 08:45:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3911390E3FC
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:05:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE2E11C21276
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 06:45:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A8F91C240DD
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 07:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 448256F2FB;
-	Wed, 19 Jun 2024 06:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="lZxkk/X2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B0B74076;
+	Wed, 19 Jun 2024 07:05:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1653057CA6;
-	Wed, 19 Jun 2024 06:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBAED74062;
+	Wed, 19 Jun 2024 07:05:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718779507; cv=none; b=uuCUyYFiUzfyo+vwNzHjMW0LDPaJRSbl/nqqH7UYVyVpwfVU2H4FEW9M/1kozoe7eRon/0K+g+5PvDZlTUs08oKRP69pEnHp331GWBatp3j4S8q+76R2YdRerThKI5v0TDZs9A/BdxegFidH/DPMYqvT9WiypPQPltzLWP4jv9Q=
+	t=1718780739; cv=none; b=eg78WOsxulXs8rQJFlKC2J7L9EUiZF4wpAgBunbIzncjtR0AeIiBM4GtGxJQ0w+GCZRjsANUGAaUinWJL7nUiCey215JVAq4+QvFhFQlOGG1kCfR+tQMS+wXnxIIohFuKkbNPMQhabwNeTQvX7UgcCNLKW6ncanFsHIu7+rqbfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718779507; c=relaxed/simple;
-	bh=wrr20MYlmJISLBZ479QlSzHWiXSvqajc/N4FejGC6KA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mRMKLvHHmA6zK3hNIZqvkcoUzZ3H6NKpSmLnuAn9h9dZC2/UIHc0oA2K8gXPzQhYqhUk+sjNMqVo3mqJ/vYf6OQodjXuqKVzPxoI8Noh1umjLCkqrxFyMeleTc2cr8KOOOzO8xyb3tMts9yFHYWV1hlSVCIqf+msXz7p5S/Vuss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=lZxkk/X2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4E71C2BBFC;
-	Wed, 19 Jun 2024 06:45:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1718779506;
-	bh=wrr20MYlmJISLBZ479QlSzHWiXSvqajc/N4FejGC6KA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lZxkk/X2t6o2mOv0en5iHcSA2iE9lZIzB19u2GMP7o3dDN79r0B9ISqeXXR3g59rz
-	 uSYkvEgLQrMLOXxR1mID/iVjJs2lajdu2crb+01NmLmua8X4qNjMc+4bMetgMRUWWw
-	 CSWeHRHK5Ju0W+YwRpuJno/NXEHDBIJD73NyNt8c=
-Date: Wed, 19 Jun 2024 08:45:03 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Shay Drori <shayd@nvidia.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	kuba@kernel.org, edumazet@google.com, david.m.ertman@intel.com,
-	rafael@kernel.org, ira.weiny@intel.com, linux-rdma@vger.kernel.org,
-	leon@kernel.org, tariqt@nvidia.com, Parav Pandit <parav@nvidia.com>
-Subject: Re: [PATCH net-next v7 1/2] driver core: auxiliary bus: show
- auxiliary device IRQs
-Message-ID: <2024061903-brutishly-hamper-af47@gregkh>
-References: <20240618150902.345881-1-shayd@nvidia.com>
- <20240618150902.345881-2-shayd@nvidia.com>
- <2024061849-cupped-throwback-4fee@gregkh>
- <21f7e9b8-00aa-4e1f-a769-9606834a234b@nvidia.com>
+	s=arc-20240116; t=1718780739; c=relaxed/simple;
+	bh=vLxu3OkivXxxVVRVE1Q0z6iD753lqUyM5EL3Hr3aS3Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RtsjtKKuq4r2IJY7+OSw7DWIWPplSya0oAC7bW4ZMKMyBc0p7gPS8j1nYITQseSG36Pg7db9qDfMomnxoV21b8ND/KTCr5fM5pB3fOI4Kn9emlOuy/s9HODSqQ9HeY9g86oIg3mAbiGvY2mBZh6omu0noyMeC4cBwQwu0edmGKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: d07e09bc2e0811ef9305a59a3cc225df-20240619
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:35f24287-7864-4234-86c4-6d70ba1bc597,IP:20,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:5
+X-CID-INFO: VERSION:1.1.38,REQID:35f24287-7864-4234-86c4-6d70ba1bc597,IP:20,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:5
+X-CID-META: VersionHash:82c5f88,CLOUDID:41f3b6aba82db87615039219a6aad05c,BulkI
+	D:240617193145NAFL2O91,BulkQuantity:2,Recheck:0,SF:66|24|17|19|44|64|102,T
+	C:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:40,QS:nil,BEC:nil,
+	COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: d07e09bc2e0811ef9305a59a3cc225df-20240619
+Received: from node2.com.cn [(39.156.73.10)] by mailgw.kylinos.cn
+	(envelope-from <luoxuanqiang@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1811458425; Wed, 19 Jun 2024 14:54:46 +0800
+Received: from node2.com.cn (localhost [127.0.0.1])
+	by node2.com.cn (NSMail) with SMTP id 18E77B80758A;
+	Wed, 19 Jun 2024 14:54:46 +0800 (CST)
+X-ns-mid: postfix-667280B5-9150993
+Received: from [10.42.12.252] (unknown [10.42.12.252])
+	by node2.com.cn (NSMail) with ESMTPA id 37A2DB80758A;
+	Wed, 19 Jun 2024 06:54:41 +0000 (UTC)
+Message-ID: <f1e13509-9544-0fa5-4cb4-520c068bde6a@kylinos.cn>
+Date: Wed, 19 Jun 2024 14:54:15 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <21f7e9b8-00aa-4e1f-a769-9606834a234b@nvidia.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH net v3] Fix race for duplicate reqsk on identical SYN
+Content-Language: en-US
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alexandre.ferrieux@orange.com, davem@davemloft.net, dccp@vger.kernel.org,
+ dsahern@kernel.org, edumazet@google.com, fw@strlen.de, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
+References: <20240617075640.207570-1-luoxuanqiang@kylinos.cn>
+ <20240617175907.60655-1-kuniyu@amazon.com>
+From: luoxuanqiang <luoxuanqiang@kylinos.cn>
+In-Reply-To: <20240617175907.60655-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 19, 2024 at 09:33:12AM +0300, Shay Drori wrote:
-> 
-> 
-> On 18/06/2024 19:13, Greg KH wrote:
-> > External email: Use caution opening links or attachments
-> > 
-> > 
-> > On Tue, Jun 18, 2024 at 06:09:01PM +0300, Shay Drory wrote:
-> > > diff --git a/drivers/base/auxiliary_sysfs.c b/drivers/base/auxiliary_sysfs.c
-> > > new file mode 100644
-> > > index 000000000000..3f112fd26e72
-> > > --- /dev/null
-> > > +++ b/drivers/base/auxiliary_sysfs.c
-> > > @@ -0,0 +1,110 @@
-> > > +// SPDX-License-Identifier: GPL-2.0
-> > > +/*
-> > > + * Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES
-> > > + */
-> > > +
-> > > +#include <linux/auxiliary_bus.h>
-> > > +#include <linux/slab.h>
-> > > +
-> > > +struct auxiliary_irq_info {
-> > > +     struct device_attribute sysfs_attr;
-> > > +};
-> > > +
-> > > +static struct attribute *auxiliary_irq_attrs[] = {
-> > > +     NULL
-> > > +};
-> > > +
-> > > +static const struct attribute_group auxiliary_irqs_group = {
-> > > +     .name = "irqs",
-> > > +     .attrs = auxiliary_irq_attrs,
-> > > +};
-> > > +
-> > > +static int auxiliary_irq_dir_prepare(struct auxiliary_device *auxdev)
-> > > +{
-> > > +     int ret = 0;
-> > > +
-> > > +     mutex_lock(&auxdev->lock);
-> > > +     if (auxdev->dir_exists)
-> > > +             goto unlock;
-> > 
-> > You do know about cleanup.h, right?  Please use it.
-> > 
-> > But what exactly are you trying to protect here?  How will you race and
-> > add two irqs at the same time?  Driver probe is always single threaded,
-> > so what would be calling this at the same time from multiple places?
-> 
-> 
-> mlx5 driver requests IRQs on demand for PCI PF, VF, SFs.
-> And it occurs from multiple threads, hence we need to protect it.
 
-How are irqs asked for, for the same device, from multiple threads?
-What threads exactly?  What is causing these irqs to be asked for?
+=E5=9C=A8 2024/6/18 01:59, Kuniyuki Iwashima =E5=86=99=E9=81=93:
+> From: luoxuanqiang <luoxuanqiang@kylinos.cn>
+> Date: Mon, 17 Jun 2024 15:56:40 +0800
+>> When bonding is configured in BOND_MODE_BROADCAST mode, if two identic=
+al
+>> SYN packets are received at the same time and processed on different C=
+PUs,
+>> it can potentially create the same sk (sock) but two different reqsk
+>> (request_sock) in tcp_conn_request().
+>>
+>> These two different reqsk will respond with two SYNACK packets, and si=
+nce
+>> the generation of the seq (ISN) incorporates a timestamp, the final tw=
+o
+>> SYNACK packets will have different seq values.
+>>
+>> The consequence is that when the Client receives and replies with an A=
+CK
+>> to the earlier SYNACK packet, we will reset(RST) it.
+>>
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> This behavior is consistently reproducible in my local setup,
+>> which comprises:
+>>
+>>                    | NETA1 ------ NETB1 |
+>> PC_A --- bond --- |                    | --- bond --- PC_B
+>>                    | NETA2 ------ NETB2 |
+>>
+>> - PC_A is the Server and has two network cards, NETA1 and NETA2. I hav=
+e
+>>    bonded these two cards using BOND_MODE_BROADCAST mode and configure=
+d
+>>    them to be handled by different CPU.
+>>
+>> - PC_B is the Client, also equipped with two network cards, NETB1 and
+>>    NETB2, which are also bonded and configured in BOND_MODE_BROADCAST =
+mode.
+>>
+>> If the client attempts a TCP connection to the server, it might encoun=
+ter
+>> a failure. Capturing packets from the server side reveals:
+>>
+>> 10.10.10.10.45182 > localhost: Flags [S], seq 320236027,
+>> 10.10.10.10.45182 > localhost: Flags [S], seq 320236027,
+>> localhost > 10.10.10.10.45182: Flags [S.], seq 2967855116,
+>> localhost > 10.10.10.10.45182: Flags [S.], seq 2967855123, <=3D=3D
+>> 10.10.10.10.45182 > localhost: Flags [.], ack 4294967290,
+>> 10.10.10.10.45182 > localhost: Flags [.], ack 4294967290,
+>> localhost > 10.10.10.10.45182: Flags [R], seq 2967855117, <=3D=3D
+>> localhost > 10.10.10.10.45182: Flags [R], seq 2967855117,
+>>
+>> Two SYNACKs with different seq numbers are sent by localhost,
+>> resulting in an anomaly.
+>>
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> The attempted solution is as follows:
+>> In the tcp_conn_request(), while inserting reqsk into the ehash table,
+>> it also checks if an entry already exists. If found, it avoids
+>> reinsertion and releases it.
+>>
+>> Simultaneously, In the reqsk_queue_hash_req(), the start of the
+>> req->rsk_timer is adjusted to be after successful insertion.
+>>
+>> Signed-off-by: luoxuanqiang <luoxuanqiang@kylinos.cn>
+>> ---
+>>   include/net/inet_connection_sock.h |  4 ++--
+>>   net/dccp/ipv4.c                    |  2 +-
+>>   net/dccp/ipv6.c                    |  2 +-
+>>   net/ipv4/inet_connection_sock.c    | 19 +++++++++++++------
+>>   net/ipv4/tcp_input.c               |  9 ++++++++-
+>>   5 files changed, 25 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/include/net/inet_connection_sock.h b/include/net/inet_con=
+nection_sock.h
+>> index 7d6b1254c92d..8ebab6220dbc 100644
+>> --- a/include/net/inet_connection_sock.h
+>> +++ b/include/net/inet_connection_sock.h
+>> @@ -263,8 +263,8 @@ struct dst_entry *inet_csk_route_child_sock(const =
+struct sock *sk,
+>>   struct sock *inet_csk_reqsk_queue_add(struct sock *sk,
+>>   				      struct request_sock *req,
+>>   				      struct sock *child);
+>> -void inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_so=
+ck *req,
+>> -				   unsigned long timeout);
+>> +bool inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_so=
+ck *req,
+>> +				   unsigned long timeout, bool *found_dup_sk);
+>>   struct sock *inet_csk_complete_hashdance(struct sock *sk, struct soc=
+k *child,
+>>   					 struct request_sock *req,
+>>   					 bool own_req);
+>> diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
+>> index ff41bd6f99c3..13aafdeb9205 100644
+>> --- a/net/dccp/ipv4.c
+>> +++ b/net/dccp/ipv4.c
+>> @@ -657,7 +657,7 @@ int dccp_v4_conn_request(struct sock *sk, struct s=
+k_buff *skb)
+>>   	if (dccp_v4_send_response(sk, req))
+>>   		goto drop_and_free;
+>>  =20
+>> -	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT);
+>> +	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT, NULL);
+>>   	reqsk_put(req);
+>>   	return 0;
+>>  =20
+>> diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
+>> index 85f4b8fdbe5e..493cdb12ce2b 100644
+>> --- a/net/dccp/ipv6.c
+>> +++ b/net/dccp/ipv6.c
+>> @@ -400,7 +400,7 @@ static int dccp_v6_conn_request(struct sock *sk, s=
+truct sk_buff *skb)
+>>   	if (dccp_v6_send_response(sk, req))
+>>   		goto drop_and_free;
+>>  =20
+>> -	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT);
+>> +	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT, NULL);
+>>   	reqsk_put(req);
+>>   	return 0;
+>>  =20
+>> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connectio=
+n_sock.c
+>> index d81f74ce0f02..2fa9b33ae26a 100644
+>> --- a/net/ipv4/inet_connection_sock.c
+>> +++ b/net/ipv4/inet_connection_sock.c
+>> @@ -1122,25 +1122,32 @@ static void reqsk_timer_handler(struct timer_l=
+ist *t)
+>>   	inet_csk_reqsk_queue_drop_and_put(oreq->rsk_listener, oreq);
+>>   }
+>>  =20
+>> -static void reqsk_queue_hash_req(struct request_sock *req,
+>> -				 unsigned long timeout)
+>> +static bool reqsk_queue_hash_req(struct request_sock *req,
+>> +				 unsigned long timeout, bool *found_dup_sk)
+>>   {
+> Given any changes here in reqsk_queue_hash_req() conflicts with 4.19
+> (oldest stable) and DCCP does not check found_dup_sk, you can define
+> found_dup_sk here, then you need not touch DCCP at all.
 
-But ok, that's fine, if you want to do this, then properly protect the
-allocation, don't just half-protect it like you did here :(
+Apologies for not fully understanding your advice. If we cannot modify
+the content of reqsk_queue_hash_req() and should avoid touching the DCCP
+part, it seems the issue requires reworking some interfaces. Specifically=
+:
 
-> > > +
-> > > +     xa_init(&auxdev->irqs);
-> > > +     ret = devm_device_add_group(&auxdev->dev, &auxiliary_irqs_group);
-> > > +     if (!ret)
-> > > +             auxdev->dir_exists = 1;
-> > > +
-> > > +unlock:
-> > > +     mutex_unlock(&auxdev->lock);
-> > > +     return ret;
-> > > +}
-> > > +
-> > > +/**
-> > > + * auxiliary_device_sysfs_irq_add - add a sysfs entry for the given IRQ
-> > > + * @auxdev: auxiliary bus device to add the sysfs entry.
-> > > + * @irq: The associated interrupt number.
-> > > + *
-> > > + * This function should be called after auxiliary device have successfully
-> > > + * received the irq.
-> > > + *
-> > > + * Return: zero on success or an error code on failure.
-> > > + */
-> > > +int auxiliary_device_sysfs_irq_add(struct auxiliary_device *auxdev, int irq)
-> > > +{
-> > > +     struct device *dev = &auxdev->dev;
-> > > +     struct auxiliary_irq_info *info;
-> > > +     int ret;
-> > > +
-> > > +     ret = auxiliary_irq_dir_prepare(auxdev);
-> > > +     if (ret)
-> > > +             return ret;
-> > > +
-> > > +     info = kzalloc(sizeof(*info), GFP_KERNEL);
-> > > +     if (!info)
-> > > +             return -ENOMEM;
-> > > +
-> > > +     sysfs_attr_init(&info->sysfs_attr.attr);
-> > > +     info->sysfs_attr.attr.name = kasprintf(GFP_KERNEL, "%d", irq);
-> > > +     if (!info->sysfs_attr.attr.name) {
-> > > +             ret = -ENOMEM;
-> > > +             goto name_err;
-> > > +     }
-> > > +
-> > > +     ret = xa_insert(&auxdev->irqs, irq, info, GFP_KERNEL);
-> > 
-> > So no lock happening here, either use it always, or not at all?
-> 
-> 
-> the lock is only needed to protect the group (directory) creation, which
-> will be used by all the IRQs of this auxdev.
-> parallel calls to this API will always be with different IRQs, which
-> means each IRQ have a unique index.
+The call flow to add reqsk to ehash is as follows:
 
-You are inserting into the sysfs group at the same time?  You are
-calling xa_insert() at the same time?  Is that protected with some
-internal lock?  If so, this needs to be documented a bunch here.
+tcp_conn_request()
 
-Allocating irqs is NOT a fast path, just grab a lock and do it right
-please, don't make us constantly have to stare at the code to ensure it
-is correct.
+dccp_v4(6)_conn_request()
 
-> > > +     if (ret)
-> > > +             goto auxdev_xa_err;
-> > > +
-> > > +     ret = sysfs_add_file_to_group(&dev->kobj, &info->sysfs_attr.attr,
-> > > +                                   auxiliary_irqs_group.name);
-> > 
-> > You do know that you are never going to see these files from the
-> > userspace library tools that watch sysfs, right?  libudev will never see
-> > them as you are adding them AFTER the device is created.
-> > 
-> > So, because of that, who is really going to use these files?
-> 
-> To learn about the interrupt mapping of the SF IRQs.
+ =C2=A0=C2=A0=C2=A0 -> inet_csk_reqsk_queue_hash_add()
 
-Who is going to "learn"?  Again, you are creating files that our
-userspace tools will miss, so what userspace tools are going to be able
-to learn anything here?
+ =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 -> reqsk_queue_hash_req()
 
-This is strongly implying that all of this is just a debugging aid.  So
-please, put this in debugfs where that type of thing belongs.
+ =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 -> inet_ehash_i=
+nsert()
 
-> > > +     if (ret)
-> > > +             goto sysfs_add_err;
-> > > +
-> > > +     return 0;
-> > > +
-> > > +sysfs_add_err:
-> > > +     xa_erase(&auxdev->irqs, irq);
-> > > +auxdev_xa_err:
-> > > +     kfree(info->sysfs_attr.attr.name);
-> > > +name_err:
-> > > +     kfree(info);
-> > 
-> > Again, cleanup.h is your friend.
-> > 
-> > > +     return ret;
-> > > +}
-> > > +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_add);
-> > > +
-> > > +/**
-> > > + * auxiliary_device_sysfs_irq_remove - remove a sysfs entry for the given IRQ
-> > > + * @auxdev: auxiliary bus device to add the sysfs entry.
-> > > + * @irq: the IRQ to remove.
-> > > + *
-> > > + * This function should be called to remove an IRQ sysfs entry.
-> > > + */
-> > > +void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev, int irq)
-> > > +{
-> > > +     struct auxiliary_irq_info *info = xa_load(&auxdev->irqs, irq);
-> > > +     struct device *dev = &auxdev->dev;
-> > > +
-> > > +     sysfs_remove_file_from_group(&dev->kobj, &info->sysfs_attr.attr,
-> > > +                                  auxiliary_irqs_group.name);
-> > > +     xa_erase(&auxdev->irqs, irq);
-> > > +     kfree(info->sysfs_attr.attr.name);
-> > > +     kfree(info);
-> > > +}
-> > > +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_remove);
-> > > diff --git a/include/linux/auxiliary_bus.h b/include/linux/auxiliary_bus.h
-> > > index de21d9d24a95..96be140bd1ff 100644
-> > > --- a/include/linux/auxiliary_bus.h
-> > > +++ b/include/linux/auxiliary_bus.h
-> > > @@ -58,6 +58,7 @@
-> > >    *       in
-> > >    * @name: Match name found by the auxiliary device driver,
-> > >    * @id: unique identitier if multiple devices of the same name are exported,
-> > > + * @irqs: irqs xarray contains irq indices which are used by the device,
-> > >    *
-> > >    * An auxiliary_device represents a part of its parent device's functionality.
-> > >    * It is given a name that, combined with the registering drivers
-> > > @@ -138,7 +139,10 @@
-> > >   struct auxiliary_device {
-> > >        struct device dev;
-> > >        const char *name;
-> > > +     struct xarray irqs;
-> > > +     struct mutex lock; /* Protects "irqs" directory creation */
-> > 
-> > Protects it from what?
-> 
-> please look the answer above
+tcp_conn_request() needs to call the same interface inet_csk_reqsk_queue_=
+hash_add()
+as dccp_v4(6)_conn_request(), but the critical section for installation c=
+heck and
+insertion into ehash is within inet_ehash_insert().
+If reqsk_queue_hash_req() should not be modified, then we need to rewrite
+the interfaces to distinguish them. I don't see how redefining found_dup_=
+sk
+alone can resolve this conflict point. I may be lacking a more holistic
+perspective on this matter. I sincerely hope to receive further guidance
+from you. Thanks! ORZ
 
-You need to document it here.  Or somewhere.  Don't rely on an email
-thread from 10 years ago for when you look at this in 10 years and
-wonder what is going on...
-
-> > >        u32 id;
-> > > +     u8 dir_exists:1;
-> > 
-> > I don't think this is needed, but if it really is, just use a bool.
-> 
-> 
-> If you know of an API that query whether a specific group is exists on
-> some device, can you please share it with me?
-> I came out empty when I looked for one :(
-
-Normally sysfs groups are NOT created this way at all.  Oh wait, they
-can be now, why not use the new feature where a group is created by the
-core but only exposed if an attribute is added there?
-
-Will that work here?  See commit d87c295f599c ("sysfs: Introduce a
-mechanism to hide static attribute_groups") for details.  That should
-solve the issue of trying to figure out if the directory is present or
-not logic.
-
-thanks,
-
-greg k-h
+>
+>> +	if (!inet_ehash_insert(req_to_sk(req), NULL, found_dup_sk))
+>> +		return false;
+>> +
+>> +	/* The timer needs to be setup after a successful insertion. */
+>>   	timer_setup(&req->rsk_timer, reqsk_timer_handler, TIMER_PINNED);
+>>   	mod_timer(&req->rsk_timer, jiffies + timeout);
+>>  =20
+>> -	inet_ehash_insert(req_to_sk(req), NULL, NULL);
+>>   	/* before letting lookups find us, make sure all req fields
+>>   	 * are committed to memory and refcnt initialized.
+>>   	 */
+>>   	smp_wmb();
+>>   	refcount_set(&req->rsk_refcnt, 2 + 1);
+>> +	return true;
+>>   }
+>>  =20
+>> -void inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_so=
+ck *req,
+>> -				   unsigned long timeout)
+>> +bool inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_so=
+ck *req,
+>> +				   unsigned long timeout, bool *found_dup_sk)
+>>   {
+>> -	reqsk_queue_hash_req(req, timeout);
+>> +	if (!reqsk_queue_hash_req(req, timeout, found_dup_sk))
+>> +		return false;
+>> +
+>>   	inet_csk_reqsk_queue_added(sk);
+>> +	return true;
+>>   }
+>>   EXPORT_SYMBOL_GPL(inet_csk_reqsk_queue_hash_add);
+>>  =20
+>> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+>> index 9c04a9c8be9d..e006c374f781 100644
+>> --- a/net/ipv4/tcp_input.c
+>> +++ b/net/ipv4/tcp_input.c
+>> @@ -7255,8 +7255,15 @@ int tcp_conn_request(struct request_sock_ops *r=
+sk_ops,
+>>   	} else {
+>>   		tcp_rsk(req)->tfo_listener =3D false;
+>>   		if (!want_cookie) {
+>> +			bool found_dup_sk =3D false;
+>> +
+>>   			req->timeout =3D tcp_timeout_init((struct sock *)req);
+>> -			inet_csk_reqsk_queue_hash_add(sk, req, req->timeout);
+>> +			if (unlikely(!inet_csk_reqsk_queue_hash_add(sk, req, req->timeout,
+>> +								    &found_dup_sk))) {
+>> +				reqsk_free(req);
+>> +				return 0;
+>> +			}
+>> +
+>>   		}
+>>   		af_ops->send_synack(sk, dst, &fl, req, &foc,
+>>   				    !want_cookie ? TCP_SYNACK_NORMAL :
+>> --=20
+>> 2.25.1
 
