@@ -1,124 +1,100 @@
-Return-Path: <netdev+bounces-104858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0F2290EAE9
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:23:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 270DA90EB46
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:40:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B741B26605
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 12:23:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C79291F2154E
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 12:40:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22655142E9E;
-	Wed, 19 Jun 2024 12:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADBAB142E7C;
+	Wed, 19 Jun 2024 12:40:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V1AOlkB5"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="kse1DJd6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-bc09.mail.infomaniak.ch (smtp-bc09.mail.infomaniak.ch [45.157.188.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5BC113FD95;
-	Wed, 19 Jun 2024 12:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59FC01422A2
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 12:40:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718799629; cv=none; b=It+xAISMPa9FQh5EJqV+cfuXG79sG/EFCYXKKJKk/KTDDrJf3074iK2Yu1UbkL8uK4dzQixYM9BlN+l2BjGyVSoLPDK1PwbiFGwJqrRHXtHVFAACGZjpqvUDwuPBMAZjDm947T3BKo0YVvrrls3kwbkAO7KMttfuEggwOB7eSCk=
+	t=1718800849; cv=none; b=Rj/TghCkSu2ruFfGSNjGKlaY3cl4qG5ds/Q+gzIAvFkF5hcbG+5fZCV0Qm7Pox9jN8xZyqh0sAXIP4YPtg0JD0n3RD4eF58NO2/E9HBecMjiDX1VVoTtaFYpkAoGvt7AUFzbcXFjt9VDBDkIA1z2GjGyKSp+26PNZ0x11NQo3Ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718799629; c=relaxed/simple;
-	bh=67uiRKjRxfjxp4Hfyr6l4u8S8EnHSg2ftC1VpGFi5OA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Af49ub6sHJ+0UarFx6cJky/0MEOfQit3a/k2Gz1vfloJaSiIjV0Eco+3fqsW2zrYBy5wEt1phRoZ1XB2FNuKh8fbgemSbwMz5vlgaMa44twEHiPTLrZ89UaxTog9qTnz/6lCpjId1xnvXMgcju1BRAUEs67wDcF0OnvIu/i3oGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V1AOlkB5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 61B9DC4AF49;
-	Wed, 19 Jun 2024 12:20:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718799628;
-	bh=67uiRKjRxfjxp4Hfyr6l4u8S8EnHSg2ftC1VpGFi5OA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=V1AOlkB57E/hyTVOMzi98x5gGkiu5B77CC9Ne+zTj4t7ENRHrjz/j5x6phGH2Z0ku
-	 gqcZG4x8FkPncbvNSFeePYzAh9Ytwn07U+TG9HzsVWTT3IP5puWSpxj00bQJgQRy2K
-	 PlchVpt7x2NPsSS7bLvZdigcxz3s5Z3P/23eCUMXCa52+bYGzisYkuorKAYk4veCKi
-	 rsO/j3SFv9l5Pj6opP7wBY7/n+Cx3lD5v2kKdE9uO1gm4wPETGT0QIB0XvPdfdVS9h
-	 JK+gzf1XE0bAyVCRXvdkaYWzGmFxBpCU+ibGvyk8n7BQowDQdx7MyFkveubIR27Lce
-	 5ENSusS7BJU+w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4D138C4361A;
-	Wed, 19 Jun 2024 12:20:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1718800849; c=relaxed/simple;
+	bh=iRzRkhC7mOr7ZJObwyEv3ES0cCDVf+Ys2poGj4OidJM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A+ppqZxgLL9/M6qyQX9Okh1rRBol0xUXNYICuP5M8T8s14qoW8CQIZc9Af3S7p1u4l+QeOqMvcBQ/u1+rKvpAzyn9y7wJ7q762W+XC6pK67opZiBIWHi+OVIYY4JRVlvSb4wPqZc3bhXD6Y35qw8psZvftU2rpaSLgenMpFrOgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=kse1DJd6; arc=none smtp.client-ip=45.157.188.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4W42lg6hxxzTHn;
+	Wed, 19 Jun 2024 14:21:03 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1718799663;
+	bh=PQ601hDuUwdQDnx1OcRhwP3RgxnS3Y8QYve13EQlPvI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kse1DJd6ezfZTW0pnaPMppMrWpDjkMH9DbGejESeOQnE0ocJfB2fDROt84meTKgmh
+	 K0bJ0vQibZ5LTsqpGPqtkSbi2cN3oa3InzbrocWXq4ePopyaOYEQi6DfSym5GBeOTY
+	 SUf7U96yfzBJkkuAL0QZa772Hh1E/3WT/IJl8kN0=
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4W42lf6mr8zmLy;
+	Wed, 19 Jun 2024 14:21:02 +0200 (CEST)
+Date: Wed, 19 Jun 2024 14:20:58 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
+Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
+	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>
+Subject: Re: [PATCH 0/2] Forbid illegitimate binding via listen(2)
+Message-ID: <20240619.wii8Chaesh7t@digikod.net>
+References: <20240408094747.1761850-1-ivanov.mikhail1@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] selftests: openvswitch: Set value to nla flags.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171879962830.21133.9093342001596634456.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Jun 2024 12:20:28 +0000
-References: <20240618072922.218757-1-amorenoz@redhat.com>
-In-Reply-To: <20240618072922.218757-1-amorenoz@redhat.com>
-To: =?utf-8?q?Adri=C3=A1n_Moreno_=3Camorenoz=40redhat=2Ecom=3E?=@codeaurora.org
-Cc: netdev@vger.kernel.org, aconole@redhat.com, pshelar@ovn.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- shuah@kernel.org, dev@openvswitch.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240408094747.1761850-1-ivanov.mikhail1@huawei-partners.com>
+X-Infomaniak-Routing: alpha
 
-Hello:
+Could you please send a v2 for this patch? I'd like this issue to be
+fixed, especially before any other Landlock feature get merged.
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Tue, 18 Jun 2024 09:29:21 +0200 you wrote:
-> Netlink flags, although they don't have payload at the netlink level,
-> are represented as having "True" as value in pyroute2.
+On Mon, Apr 08, 2024 at 05:47:45PM +0800, Ivanov Mikhail wrote:
+> listen(2) can be called without explicit bind(2) call. For a TCP socket
+> it would result in assigning random port(in some range) to this socket
+> by the kernel. If Landlock sandbox supports LANDLOCK_ACCESS_NET_BIND_TCP,
+> this may lead to implicit access to a prohibited (by Landlock sandbox)
+> port. Malicious sandboxed process can accidentally impersonate a
+> legitimate server process (if listen(2) assigns it a server port number).
 > 
-> Without it, trying to add a flow with a flag-type action (e.g: pop_vlan)
-> fails with the following traceback:
+> Patch adds hook on socket_listen() that prevents such scenario by checking
+> LANDLOCK_ACCESS_NET_BIND_TCP access for port 0.
 > 
-> Traceback (most recent call last):
->   File "[...]/ovs-dpctl.py", line 2498, in <module>
->     sys.exit(main(sys.argv))
->              ^^^^^^^^^^^^^^
->   File "[...]/ovs-dpctl.py", line 2487, in main
->     ovsflow.add_flow(rep["dpifindex"], flow)
->   File "[...]/ovs-dpctl.py", line 2136, in add_flow
->     reply = self.nlm_request(
->             ^^^^^^^^^^^^^^^^^
->   File "[...]/pyroute2/netlink/nlsocket.py", line 822, in nlm_request
->     return tuple(self._genlm_request(*argv, **kwarg))
->                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->   File "[...]/pyroute2/netlink/generic/__init__.py", line 126, in
-> nlm_request
->     return tuple(super().nlm_request(*argv, **kwarg))
->            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->   File "[...]/pyroute2/netlink/nlsocket.py", line 1124, in nlm_request
->     self.put(msg, msg_type, msg_flags, msg_seq=msg_seq)
->   File "[...]/pyroute2/netlink/nlsocket.py", line 389, in put
->     self.sendto_gate(msg, addr)
->   File "[...]/pyroute2/netlink/nlsocket.py", line 1056, in sendto_gate
->     msg.encode()
->   File "[...]/pyroute2/netlink/__init__.py", line 1245, in encode
->     offset = self.encode_nlas(offset)
->              ^^^^^^^^^^^^^^^^^^^^^^^^
->   File "[...]/pyroute2/netlink/__init__.py", line 1560, in encode_nlas
->     nla_instance.setvalue(cell[1])
->   File "[...]/pyroute2/netlink/__init__.py", line 1265, in setvalue
->     nlv.setvalue(nla_tuple[1])
->                  ~~~~~~~~~^^^
-> IndexError: list index out of range
+> Few tests were added to cover this case.
 > 
-> [...]
-
-Here is the summary with links:
-  - [v2] selftests: openvswitch: Set value to nla flags.
-    https://git.kernel.org/netdev/net/c/a8763466669d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> Code coverage(gcov):
+> * security/landlock:
+> lines......: 94.5% (745 of 788 lines)
+> functions..: 97.1% (100 of 103 functions)
+> 
+> Ivanov Mikhail (2):
+>   landlock: Add hook on socket_listen()
+>   selftests/landlock: Create 'listen_zero', 'deny_listen_zero' tests
+> 
+>  security/landlock/net.c                     | 104 +++++++++++++++++---
+>  tools/testing/selftests/landlock/net_test.c |  89 +++++++++++++++++
+>  2 files changed, 177 insertions(+), 16 deletions(-)
+> 
+> -- 
+> 2.34.1
+> 
+> 
 
