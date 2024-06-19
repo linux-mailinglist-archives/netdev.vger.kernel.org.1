@@ -1,208 +1,467 @@
-Return-Path: <netdev+bounces-105049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22B8090F7DD
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 22:56:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6903090F7E3
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 22:57:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 197AE1C22A45
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 20:56:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D5AE1C21B11
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 20:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F97A1662ED;
-	Wed, 19 Jun 2024 20:53:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BAzCVFfz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CB9615A84A;
+	Wed, 19 Jun 2024 20:56:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C70015B124;
-	Wed, 19 Jun 2024 20:53:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DFED15ADAD;
+	Wed, 19 Jun 2024 20:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718830399; cv=none; b=PLpxcsE0ZUl8beTiGSNaPA1fvwX5l+x9IAThLkNfWOiF9kQKNQyythPX1U2rXWaxPxUYG0gUuvD20DW/TYHsCjESjKBPiPlW77SGKlP6GqpF1zywyJhiUAtuG3kEljITHrhaj21SNyEyuD3bdid2GcXd5M9LDxNghtm6xRHZBb4=
+	t=1718830607; cv=none; b=epALisNoyOCJ1aqlUtIH8YFclV6icZjT2Q6T28rZdNkfHlbJ0cJcCpF4I9aLOLaDBZvazUWZyPKov/b/ZL78lsa4C4StOPSMTaII8rK1kB1k98UZk5+UpWnvRLY5aOKgHIh2og6c5BWnwjbIY8gLJmtaNZEer7KGyc/0EJVmseg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718830399; c=relaxed/simple;
-	bh=RaADqzyGVgATxjkyrCGLr59ecKKEBBDwXHF88bT0AM8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=F7f7D3rAPHoXclbXPCZjsNUmsOHZvW3zL20fEsE7yt2K4m8raOCZJULPUe43dM8di18jA2fTHMGM32Nz6reyItMojZv6TNJnOITzThIbkZj8V7fqIXOmFUz+3RrQc107bJsA6TiFz2xf9U00MRxYg+S6mjVVt5hEwlmI3Go+ZoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BAzCVFfz; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a6f85f82ffeso17376466b.0;
-        Wed, 19 Jun 2024 13:53:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718830395; x=1719435195; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xoMonN5KTGsTAI06z21/CRk7gcVlzV6jDkZYPNRbNuM=;
-        b=BAzCVFfzFtXhGVT0K+aUA3nOBZVflixIGbH1VzjbaSExEkLJAck8QvRlFaIPuOu/aB
-         xshy3t8D6w3QS18aJ258F/QCJzy8P6lwk33Ho4gHB6OjOLFr6/nbzqLb+MypN6y8SCaR
-         aHhYuqgwNAvcHVQFnnk3EC05fanilzn+YkQEbVcr4nQETtxBr8cPT5LBGMq7PfCyWo1r
-         dpHMHcXZy9u189VzM+efznpQYKNKtuOHZ/yKHm2HFGwwXmxqPEzYqkGCzIf9V33+mpTQ
-         r/6jAvnBV/z71qTmW6MIqcXRqqtKxAlni4zIQCl0TPC5tGri4KVXHNFzfBzIYC4DLDnn
-         HScg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718830395; x=1719435195;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xoMonN5KTGsTAI06z21/CRk7gcVlzV6jDkZYPNRbNuM=;
-        b=ofEiv1YRPECBHphjUc31NQGjU+Lzn0a/pmLGgpKV5JRKlF+ABI+mJiGYjofIvg/2LF
-         wsHARslWjuxvWOdRSXuNIoGnOD51Za0OK0bUEp4A+ZzN8UCKAqAtxRxKA/NevOXUKDhI
-         vMY6DU64H4n7RHHjg0ZyS3L53CyufD3/WgRWgHVVxdRO6JNtwaAcrXhDQnAiqAlDiilJ
-         V7N+hKXhfD2YYu2SV2HcYqegHxFUY/XGYd0W6uM6AtOAspsV3FW5DTM+Rwpjde4wy0Cv
-         OMajHB3W+h9K9iWH2Fz/A7gZ2YDCCx8ExbjAs1V9LE4kNe/EAixa3scsZdyUK/BfxzO2
-         Ul2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXDtj9jj3td9ImPhR9ESAYBjIWzuSVa0jlsDSO4UhF1tywWpjOo6YMOskrHarJa0avxbuoFoUll4ke/ZAau+EjXBccxbWvXAtRIOaKg
-X-Gm-Message-State: AOJu0Yw9yNYBXYzwbDt+gq15oEhqZcYGdOaXYcpsbg3gLYExnQO6G+2f
-	kElAHq77zUfVo8XvQc+RmQu2iMSf9frULsjSU9hEeylYmNN+NRM9OQPoNRO/Vuk=
-X-Google-Smtp-Source: AGHT+IEXILH/Tq7bqav/jGPzVjS1HnrVKhCXc5prH+gFx0OUY5ZvV9Y41L0pcmcVKUPdVUo7XV42/w==
-X-Received: by 2002:a17:906:3c48:b0:a69:13a2:4f6e with SMTP id a640c23a62f3a-a6fab7d6d0emr203187266b.74.1718830395383;
-        Wed, 19 Jun 2024 13:53:15 -0700 (PDT)
-Received: from WBEC325.dom.lan ([185.188.71.122])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56db5b2fsm697329566b.47.2024.06.19.13.53.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jun 2024 13:53:15 -0700 (PDT)
-From: Pawel Dembicki <paweldembicki@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	Pawel Dembicki <paweldembicki@gmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com,
-	Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 12/12] net: dsa: vsc73xx: start treating the BR_LEARNING flag
-Date: Wed, 19 Jun 2024 22:52:18 +0200
-Message-Id: <20240619205220.965844-13-paweldembicki@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240619205220.965844-1-paweldembicki@gmail.com>
-References: <20240619205220.965844-1-paweldembicki@gmail.com>
+	s=arc-20240116; t=1718830607; c=relaxed/simple;
+	bh=RbHILGgqTOzxBSGFt0UjE1I6Oz3QOjgCxwDtOqUyDTY=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=M7Pst2P2MYNcAqgDeIEE+U+5eJxf4+utwIf0Q14oj39oowqq1jMwxqRSnV6TaEed3+IeRnaz1WrT0crC/uRlO+MBMh0oSCfwWWdnUzFlJTB7GArXcJBY5qFvBbnL1fbRPiLfYdgAdqog2zUo/mWeNbowmFT2tkqLA4vExOui4Wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 732E5E0002;
+	Wed, 19 Jun 2024 20:56:40 +0000 (UTC)
+Message-ID: <8ca7dd7d-1528-4b5c-bdc6-33ee530d3ea9@ovn.org>
+Date: Wed, 19 Jun 2024 22:56:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: i.maximets@ovn.org, netdev@vger.kernel.org, aconole@redhat.com,
+ echaudro@redhat.com, horms@kernel.org, dev@openvswitch.org,
+ Pravin B Shelar <pshelar@ovn.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 7/9] net: openvswitch: do not notify drops
+ inside sample
+To: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
+References: <20240603185647.2310748-1-amorenoz@redhat.com>
+ <20240603185647.2310748-8-amorenoz@redhat.com>
+ <8624ccf8-e9e2-4a95-a25c-7d3166bb3256@ovn.org>
+ <f8050877-1728-4723-acb8-8a8ab7674470@ovn.org>
+ <CAG=2xmPAwvCR4ky0cu7Yai29v3H592-ATXtNkhsNJ-vTwR4BVw@mail.gmail.com>
+ <5f293bac-4117-4f93-8d3f-636d6ce236a4@ovn.org>
+ <CAG=2xmPbpvYGy1rAkcLsK6PFxCx3bmZyXKX5RTag8XZBTxMZdg@mail.gmail.com>
+ <5c369615-1774-4dc5-87fc-d96ce3421ff8@ovn.org>
+ <CAG=2xmNWXjocXk6FXfvxjOeKgB0BQsEdXvFRm6OoqHKs88OmTw@mail.gmail.com>
+ <9ef1ec07-2345-4176-bc7a-ab7e011484b0@ovn.org>
+ <CAG=2xmPW1Du3ahvwjarHaXMiXe2qr2G-wH9z8Sv7qKQK9t9nTA@mail.gmail.com>
+Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <CAG=2xmPW1Du3ahvwjarHaXMiXe2qr2G-wH9z8Sv7qKQK9t9nTA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: i.maximets@ovn.org
 
-This patch implements .port_pre_bridge_flags() and .port_bridge_flags(),
-which are required for properly treating the BR_LEARNING flag. Also,
-.port_stp_state_set() is tweaked and now disables learning for standalone
-ports.
+On 6/19/24 22:40, Adrián Moreno wrote:
+> On Wed, Jun 19, 2024 at 08:21:02PM GMT, Ilya Maximets wrote:
+>> On 6/19/24 08:35, Adrián Moreno wrote:
+>>> On Tue, Jun 18, 2024 at 05:44:05PM GMT, Ilya Maximets wrote:
+>>>> On 6/18/24 12:50, Adrián Moreno wrote:
+>>>>> On Tue, Jun 18, 2024 at 12:22:23PM GMT, Ilya Maximets wrote:
+>>>>>> On 6/18/24 09:00, Adrián Moreno wrote:
+>>>>>>> On Mon, Jun 17, 2024 at 02:10:37PM GMT, Ilya Maximets wrote:
+>>>>>>>> On 6/17/24 13:55, Ilya Maximets wrote:
+>>>>>>>>> On 6/3/24 20:56, Adrian Moreno wrote:
+>>>>>>>>>> The OVS_ACTION_ATTR_SAMPLE action is, in essence,
+>>>>>>>>>> observability-oriented.
+>>>>>>>>>>
+>>>>>>>>>> Apart from some corner case in which it's used a replacement of clone()
+>>>>>>>>>> for old kernels, it's really only used for sFlow, IPFIX and now,
+>>>>>>>>>> local emit_sample.
+>>>>>>>>>>
+>>>>>>>>>> With this in mind, it doesn't make much sense to report
+>>>>>>>>>> OVS_DROP_LAST_ACTION inside sample actions.
+>>>>>>>>>>
+>>>>>>>>>> For instance, if the flow:
+>>>>>>>>>>
+>>>>>>>>>>   actions:sample(..,emit_sample(..)),2
+>>>>>>>>>>
+>>>>>>>>>> triggers a OVS_DROP_LAST_ACTION skb drop event, it would be extremely
+>>>>>>>>>> confusing for users since the packet did reach its destination.
+>>>>>>>>>>
+>>>>>>>>>> This patch makes internal action execution silently consume the skb
+>>>>>>>>>> instead of notifying a drop for this case.
+>>>>>>>>>>
+>>>>>>>>>> Unfortunately, this patch does not remove all potential sources of
+>>>>>>>>>> confusion since, if the sample action itself is the last action, e.g:
+>>>>>>>>>>
+>>>>>>>>>>     actions:sample(..,emit_sample(..))
+>>>>>>>>>>
+>>>>>>>>>> we actually _should_ generate a OVS_DROP_LAST_ACTION event, but we aren't.
+>>>>>>>>>>
+>>>>>>>>>> Sadly, this case is difficult to solve without breaking the
+>>>>>>>>>> optimization by which the skb is not cloned on last sample actions.
+>>>>>>>>>> But, given explicit drop actions are now supported, OVS can just add one
+>>>>>>>>>> after the last sample() and rewrite the flow as:
+>>>>>>>>>>
+>>>>>>>>>>     actions:sample(..,emit_sample(..)),drop
+>>>>>>>>>>
+>>>>>>>>>> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+>>>>>>>>>> ---
+>>>>>>>>>>  net/openvswitch/actions.c | 13 +++++++++++--
+>>>>>>>>>>  1 file changed, 11 insertions(+), 2 deletions(-)
+>>>>>>>>>>
+>>>>>>>>>> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+>>>>>>>>>> index 33f6d93ba5e4..54fc1abcff95 100644
+>>>>>>>>>> --- a/net/openvswitch/actions.c
+>>>>>>>>>> +++ b/net/openvswitch/actions.c
+>>>>>>>>>> @@ -82,6 +82,15 @@ static struct action_fifo __percpu *action_fifos;
+>>>>>>>>>>  static struct action_flow_keys __percpu *flow_keys;
+>>>>>>>>>>  static DEFINE_PER_CPU(int, exec_actions_level);
+>>>>>>>>>>
+>>>>>>>>>> +static inline void ovs_drop_skb_last_action(struct sk_buff *skb)
+>>>>>>>>>> +{
+>>>>>>>>>> +	/* Do not emit packet drops inside sample(). */
+>>>>>>>>>> +	if (OVS_CB(skb)->probability)
+>>>>>>>>>> +		consume_skb(skb);
+>>>>>>>>>> +	else
+>>>>>>>>>> +		ovs_kfree_skb_reason(skb, OVS_DROP_LAST_ACTION);
+>>>>>>>>>> +}
+>>>>>>>>>> +
+>>>>>>>>>>  /* Make a clone of the 'key', using the pre-allocated percpu 'flow_keys'
+>>>>>>>>>>   * space. Return NULL if out of key spaces.
+>>>>>>>>>>   */
+>>>>>>>>>> @@ -1061,7 +1070,7 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
+>>>>>>>>>>  	if ((arg->probability != U32_MAX) &&
+>>>>>>>>>>  	    (!arg->probability || get_random_u32() > arg->probability)) {
+>>>>>>>>>>  		if (last)
+>>>>>>>>>> -			ovs_kfree_skb_reason(skb, OVS_DROP_LAST_ACTION);
+>>>>>>>>>> +			ovs_drop_skb_last_action(skb);
+>>>>>>>>
+>>>>>>>> Always consuming the skb at this point makes sense, since having smaple()
+>>>>>>>> as a last action is a reasonable thing to have.  But this looks more like
+>>>>>>>> a fix for the original drop reason patch set.
+>>>>>>>>
+>>>>>>>
+>>>>>>> I don't think consuming the skb at this point makes sense. It was very
+>>>>>>> intentionally changed to a drop since a very common use-case for
+>>>>>>> sampling is drop-sampling, i.e: replacing an empty action list (that
+>>>>>>> triggers OVS_DROP_LAST_ACTION) with a sample(emit_sample()). Ideally,
+>>>>>>> that replacement should not have any effect on the number of
+>>>>>>> OVS_DROP_LAST_ACTION being reported as the packets are being treated in
+>>>>>>> the same way (only observed in one case).
+>>>>>>>
+>>>>>>>
+>>>>>>>>>>  		return 0;
+>>>>>>>>>>  	}
+>>>>>>>>>>
+>>>>>>>>>> @@ -1579,7 +1588,7 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
+>>>>>>>>>>  		}
+>>>>>>>>>>  	}
+>>>>>>>>>>
+>>>>>>>>>> -	ovs_kfree_skb_reason(skb, OVS_DROP_LAST_ACTION);
+>>>>>>>>>> +	ovs_drop_skb_last_action(skb);
+>>>>>>>>>
+>>>>>>>>> I don't think I agree with this one.  If we have a sample() action with
+>>>>>>>>> a lot of different actions inside and we reached the end while the last
+>>>>>>>>> action didn't consume the skb, then we should report that.  E.g.
+>>>>>>>>> "sample(emit_sample(),push_vlan(),set(eth())),2"  should report that the
+>>>>>>>>> cloned skb was dropped.  "sample(push_vlan(),emit_sample())" should not.
+>>>>>>>>>
+>>>>>>>
+>>>>>>> What is the use case for such action list? Having an action branch
+>>>>>>> executed randomly doesn't make sense to me if it's not some
+>>>>>>> observability thing (which IMHO should not trigger drops).
+>>>>>>
+>>>>>> It is exactly my point.  A list of actions that doesn't end is some sort
+>>>>>> of a terminal action (output, drop, etc) does not make a lot of sense and
+>>>>>> hence should be signaled as an unexpected drop, so users can re-check the
+>>>>>> pipeline in case they missed the terminal action somehow.
+>>>>>>
+>>>>>>>
+>>>>>>>>> The only actions that are actually consuming the skb are "output",
+>>>>>>>>> "userspace", "recirc" and now "emit_sample".  "output" and "recirc" are
+>>>>>>>>> consuming the skb "naturally" by stealing it when it is the last action.
+>>>>>>>>> "userspace" has an explicit check to consume the skb if it is the last
+>>>>>>>>> action.  "emit_sample" should have the similar check.  It should likely
+>>>>>>>>> be added at the point of action introduction instead of having a separate
+>>>>>>>>> patch.
+>>>>>>>>>
+>>>>>>>
+>>>>>>> Unlinke "output", "recirc", "userspace", etc. with emit_sample the
+>>>>>>> packet does not continue it's way through the datapath.
+>>>>>>
+>>>>>> After "output" the packet leaves the datapath too, i.e. does not continue
+>>>>>> it's way through OVS datapath.
+>>>>>>
+>>>>>
+>>>>> I meant a broader concept of "datapath". The packet continues. For the
+>>>>> userspace action this is true only for the CONTROLLER ofp action but
+>>>>> since the datapath does not know which action it's implementing, we
+>>>>> cannot do better.
+>>>>
+>>>> It's not only controller() action.  Packets can be brought to userspace
+>>>> for various reason including just an explicit ask to execute some actions
+>>>> in userspace.  In any case the packet sent to userspace kind of reached its
+>>>> destination and it's not the "datapath drops the packet" situation.
+>>>>
+>>>>>
+>>>>>>>
+>>>>>>> It would be very confusing if OVS starts monitoring drops and adds a bunch
+>>>>>>> of flows such as "actions:emit_sample()" and suddently it stops reporting such
+>>>>>>> drops via standard kfree_skb_reason. Packets _are_ being dropped here,
+>>>>>>> we are just observing them.
+>>>>>>
+>>>>>> This might make sense from the higher logic in user space application, but
+>>>>>> it doesn't from the datapath perspective.  And also, if the user adds the
+>>>>>> 'emit_sample' action for drop monitring, they already know where to find
+>>>>>> packet samples, they don't need to use tools like dropwatch anymore.
+>>>>>> This packet is not dropped from the datapath perspective, it is sampled.
+>>>>>>
+>>>>>>>
+>>>>>>> And if we change emit_sample to trigger a drop if it's the last action,
+>>>>>>> then "sample(50%, emit_sample()),2" will trigger a drop half of the times
+>>>>>>> which is also terribly confusing.
+>>>>>>
+>>>>>> If emit_sample is the last action, then skb should be consumed silently.
+>>>>>> The same as for "output" and "userspace".
+>>>>>>
+>>>>>>>
+>>>>>>> I think we should try to be clear and informative with what we
+>>>>>>> _actually_ drop and not require the user that is just running
+>>>>>>> "dropwatch" to understand the internals of the OVS module.
+>>>>>>
+>>>>>> If someone is already using sampling to watch their packet drops, why would
+>>>>>> they use dropwatch?
+>>>>>>
+>>>>>>>
+>>>>>>> So if you don't want to accept the "observational" nature of sample(),
+>>>>>>> the only other solution that does not bring even more confusion to OVS
+>>>>>>> drops would be to have userspace add explicit drop actions. WDYT?
+>>>>>>>
+>>>>>>
+>>>>>> These are not drops from the datapath perspective.  Users can add explicit
+>>>>>> drop actions if they want to, but I'm really not sure why they would do that
+>>>>>> if they are already capturing all these packets in psample, sFlow or IPFIX.
+>>>>>
+>>>>> Because there is not a single "user". Tools and systems can be built on
+>>>>> top of tracepoints and samples and they might not be coordinated between
+>>>>> them. Some observability application can be always enabled and doing
+>>>>> constant network monitoring or statistics while other lower level tools
+>>>>> can be run at certain moments to troubleshoot issues.
+>>>>>
+>>>>> In order to run dropwatch in a node you don't need to have rights to
+>>>>> access the OpenFlow controller and ask it to change the OpenFlow rules
+>>>>> or else dropwatch simply will not show actual packet drops.
+>>>>
+>>>> The point is that these are not drops in this scenario.  The packet was
+>>>> delivered to its destination and hence should not be reported as dropped.
+>>>> In the observability use-case that you're describing even OpenFlow layer
+>>>> in OVS doesn't know if these supposed to be treated as packet drops for
+>>>> the user or if these are just samples with the sampling being the only
+>>>> intended destination.  For OpenFlow and OVS userspace components these
+>>>> two scenarios are indistinguishable.  Only the OpenFlow controller knows
+>>>> that these rules were put in place because it was an ACL created by some
+>>>> user or tool.  And since OVS in user space can't make such a distinction,
+>>>> kernel can't make it either, and so shouldn't guess what the user two
+>>>> levels of abstraction higher up meant.
+>>>>
+>>>>>
+>>>>> To me it seems obvious that drop sampling (via emit_sample) "includes"
+>>>>> drop reporting via emit_sample. In both cases you get the packet
+>>>>> headers, but in one case you also get OFP controller metadata. Now even
+>>>>> if there is a system that uses both, does it make sense to push to them
+>>>>> the responsibility of dealing with them being mutually exclusive?
+>>>>>
+>>>>> I think this makes debugging OVS datapath unnecessarily obscure when we
+>>>>> know the packet is actually being dropped intentionally by OVS.
+>>>>
+>>>> I don't think we know that we're in a drop sampling scenario.  We don't
+>>>> have enough information even in OVS userspace to tell.
+>>>>
+>>>> And having different behavior between "userspace" and "emit_sample" in
+>>>> the kernel may cause even more confusion, because now two ways of sampling
+>>>> packets will result in packets showing up in dropwatch in one case, but
+>>>> not in the other.
+>>>>
+>>>>>
+>>>>> What's the problem with having OVS write the following?
+>>>>>     "sample(50%, emit_sample()),drop(0)"
+>>>>
+>>>> It's a valid sequence of actions, but we shouldn't guess what the end
+>>>> user meant by putting those actions into the kernel.  If we see such a
+>>>> sequence in the kernel, then we should report an explicit drop.  If
+>>>> there was only the "sample(50%, emit_sample())" then we should simply
+>>>> consume the skb as it reached its destination in the psample.
+>>>>
+>>>> For the question if OVS in user space should put explicit drop action
+>>>> while preparing to emit sample, this doesn't sound reasonable for the
+>>>> same reason - OVS in user space doesn't know what the intention was of
+>>>> the user or tool that put the sampling action into OpenFlow pipeline.
+>>>>
+>>>
+>>> I don't see it that way. The spec says that packets whose action sets
+>>> (the result of classification) have no output action and no group action
+>>> must be dropped. Even if OFP sample action is an extension, I don't see
+>>> it invalidating that semantics.
+>>> So, IMHO, OVS does know that a flow that is just sampled is a drop.
+>>
+>> This applies to "action sets", but most users are actually using "action
+>> lists" supplied via "Apply-actions" OF instruction and the action sets
+>> always remain empty.  So, from the OF perspective, strictly speaking, we
+>> are dropping every single packet.  So, this is not a good analogy.
+>>
+>>>
+>>>> I actually became more confused about what are we arguing about.
+>>>> To recap:
+>>>>
+>>>>                                      This patch     My proposal
+>>>>
+>>>> 1. emit_sample() is the last            consume        consume
+>>>>     inside the sample()
+>>>>
+>>>> 2. the end of the action list           consume        drop
+>>>>     inside the sample()
+>>>>
+>>>> 3. emit_sample() is the last            drop           consume
+>>>>     outside the sample()
+>>>>
+>>>> 4. the end of the action list           drop           drop
+>>>>     outside the sample()
+>>>>
+>>>> 5. sample() is the last action          consume        consume
+>>>>     and probability failed
+>>>>
+>>>>
+>>>> I don't think cases 1 and 3 should differ, i.e. the behavior should
+>>>> be the same regardless of emit_sample() being inside or outside of
+>>>> the sample().  As a side point, OVS in user space will omit the 100%
+>>>> rate sample() action and will just list inner actions instead.  This
+>>>> means that 100% probability sampling will generate drops and 99% will
+>>>> not.  Doesn't sound right.
+>>>>
+>>>
+>>> That's what I was refering to in the commit message, we still OVS to
+>>> write:
+>>>     actions:sample(..,emit_sample(..)),drop
+>>>
+>>>> Case 2 should likely never happen, but I'd like to see a drop reported
+>>>> if that ever happens, because it is not a meaningful list of actions.
+>>>>
+>>>> Best regards, Ilya Maximets.
+>>>>
+>>>
+>>> I think we could drop this patch if we agree that OVS could write
+>>> explicit drops when it knows the packet is being dropped and sampled
+>>> (the action only has OFP sample actions).
+>>>
+>>> The drop could be placed inside the odp sample action to avoid
+>>> breaking the clone optimization:
+>>>     actions:sample(50%, actions(emit_sample(),drop)))
+>>>
+>>> or outside if the sample itself is optimized out:
+>>>     actions:emit_sample(),drop
+>>>
+>>> IIUC, if we don't do that, we are saying that sampling is incompatible
+>>> with decent drop reporting via kfree_skb infrastructure used by tools
+>>> like dropwatch or retis (among many others). And I think that is
+>>> unnecessarily and deliberately making OVS datapath more difficult to
+>>> troubleshoot.
+>>
+>> This makes some sense, so let's ensure that semantics is consistent
+>> within the kernel and discuss how to make the tools happy from the
+>> user space perspective.
+>>
+>> But we shouldn't simply drop this patch, we still need to consume the
+>> skb after emit_sample() when it is the last action.  The same as we
+>> do for the userpsace() action.  Though it should be done at the point
+>> of the action introduction.  Having both actions consistent will allow
+>> us to solve the observability problem for both in the same way by
+>> adding explicit drop actions from user space.
+> 
+> OK. I'll resend the series dropping this patch (and consuming the skb
+> apropriately).
 
-Disabling learning for standalone ports is required to avoid situations
-where one port sees traffic originating from another, which could cause
-packet drops.
+Thanks!
 
-Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-Acked-by: Linus Walleij <linus.walleij@linaro.org>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
----
-v2,v1:
-  - resend only
----
-Before patch series split:
-https://patchwork.kernel.org/project/netdevbpf/list/?series=841034&state=%2A&archive=both
-v8:
-  - resend only
-v7:
-  - added 'Acked-by' and 'Reviewed-by' and improve  commit message
-v6:
-  - fix arranging local variables in reverse xmas tree order
-v5:
-  - introduce patch
----
- drivers/net/dsa/vitesse-vsc73xx-core.c | 41 ++++++++++++++++++++++----
- 1 file changed, 35 insertions(+), 6 deletions(-)
+> 
+>>
+>> On a side note:
+>> I wonder if probability-induced drop needs a separate reason... i.e.
+>> it could have been consumed by emit_smaple()/userspace() but wasn't.
+>>
+> 
+> You mean in sample action "get_random_u32() > arg->probability"?
+> It only makes sense to drop it if the last action so currently uses
+> OVS_DROP_LAST_ACTION.
 
-diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
-index 6606bfdf58b0..11660f1d7cbe 100644
---- a/drivers/net/dsa/vitesse-vsc73xx-core.c
-+++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
-@@ -1581,6 +1581,31 @@ static int vsc73xx_tag_8021q_vlan_del(struct dsa_switch *ds, int port, u16 vid)
- 	return vsc73xx_update_vlan_table(vsc, port, vid, false);
- }
- 
-+static int vsc73xx_port_pre_bridge_flags(struct dsa_switch *ds, int port,
-+					 struct switchdev_brport_flags flags,
-+					 struct netlink_ext_ack *extack)
-+{
-+	if (flags.mask & ~BR_LEARNING)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static int vsc73xx_port_bridge_flags(struct dsa_switch *ds, int port,
-+				     struct switchdev_brport_flags flags,
-+				     struct netlink_ext_ack *extack)
-+{
-+	if (flags.mask & BR_LEARNING) {
-+		u32 val = flags.val & BR_LEARNING ? BIT(port) : 0;
-+		struct vsc73xx *vsc = ds->priv;
-+
-+		return vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
-+					   VSC73XX_LEARNMASK, BIT(port), val);
-+	}
-+
-+	return 0;
-+}
-+
- static int vsc73xx_port_setup(struct dsa_switch *ds, int port)
- {
- 	struct vsc73xx_portinfo *portinfo;
-@@ -1655,19 +1680,21 @@ static void vsc73xx_refresh_fwd_map(struct dsa_switch *ds, int port, u8 state)
- static void vsc73xx_port_stp_state_set(struct dsa_switch *ds, int port,
- 				       u8 state)
- {
-+	struct dsa_port *dp = dsa_to_port(ds, port);
- 	struct vsc73xx *vsc = ds->priv;
--	u32 val;
-+	u32 val = 0;
-+
-+	if (state == BR_STATE_LEARNING || state == BR_STATE_FORWARDING)
-+		val = dp->learning ? BIT(port) : 0;
-+
-+	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
-+			    VSC73XX_LEARNMASK, BIT(port), val);
- 
- 	val = (state == BR_STATE_BLOCKING || state == BR_STATE_DISABLED) ?
- 	      0 : BIT(port);
- 	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
- 			    VSC73XX_RECVMASK, BIT(port), val);
- 
--	val = (state == BR_STATE_LEARNING || state == BR_STATE_FORWARDING) ?
--	      BIT(port) : 0;
--	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
--			    VSC73XX_LEARNMASK, BIT(port), val);
--
- 	/* CPU Port should always forward packets when user ports are forwarding
- 	 * so let's configure it from other ports only.
- 	 */
-@@ -1693,6 +1720,8 @@ static const struct dsa_switch_ops vsc73xx_ds_ops = {
- 	.port_setup = vsc73xx_port_setup,
- 	.port_enable = vsc73xx_port_enable,
- 	.port_disable = vsc73xx_port_disable,
-+	.port_pre_bridge_flags = vsc73xx_port_pre_bridge_flags,
-+	.port_bridge_flags = vsc73xx_port_bridge_flags,
- 	.port_bridge_join = dsa_tag_8021q_bridge_join,
- 	.port_bridge_leave = dsa_tag_8021q_bridge_leave,
- 	.port_change_mtu = vsc73xx_change_mtu,
--- 
-2.34.1
+Sure, but, for example:
+  actions:sample(50%,userspace())
+In 50% cases we will consume the skb, in 50% we will report a LAST_ACTION
+drop.  Looks a little inconsistent.  That's why I was saying that always
+consuming on probability check failure is a sane option.  But if we have
+  actions:sample(50%,userspace(),drop)
+Then reporting a drop makes more sense.  So, I was thinking that maybe the
+LAST_ACTION is just not the right drop reason to report.  e.g. something
+like OVS_DROP_SAMPLE_PROBABILITY may be more appropriate to report in both
+cases.
+
+Anyways, this is only kind of related to this set and may be a separate
+change if we decide it is needed.
+
+> 
+>> Best regards, Ilya Maximets.
+>>
+> 
+> Thanks for the great discussion.
+> Adrián
+> 
 
 
