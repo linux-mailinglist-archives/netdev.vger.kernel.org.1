@@ -1,409 +1,377 @@
-Return-Path: <netdev+bounces-104825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 829DF90E8A7
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 12:52:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ED1D90E8B0
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 12:53:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDF82B211DB
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 10:52:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F6B41F23D79
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 10:53:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D720512FF83;
-	Wed, 19 Jun 2024 10:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CtDpb8Q5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A356132100;
+	Wed, 19 Jun 2024 10:53:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A95C880C09;
-	Wed, 19 Jun 2024 10:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1309130AFC;
+	Wed, 19 Jun 2024 10:53:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718794345; cv=none; b=CB3zieowgZqcvHXKqT/IydWJGiO+N3YRbMzoSFSjgnr9hqnPFMi5VD50EdpPlnmx8ZC95E51DQs0EZOvoVFNjuxHqGFzsRf4tPqMgWZmhY3FizL3MSE5ixd5lUpWjt/odu1PpTqUH9vdLvypsSTY6qMM2IzkALdUJMAZKq6z1DY=
+	t=1718794405; cv=none; b=iLv/3S8mvO+ANFixTSPsY9WJmcxnSGp6fXQkBN03VpyWxhW12itIhMUkX+Hd61U1Xwx+OOJ57yGuytTHsDNhEP8kBMwudNj5dzEwhNe/iK9mLcuWwUob5j0ZVow32jrE5CX5cfgtykYuurQ987NgNN6e15INUIWJvfGcn7fBD/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718794345; c=relaxed/simple;
-	bh=vSTwOnkpOhjoLPdYXhsbyxycs4+sgyR1OWKUT+yuANg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h+zOBIuw0vRFKW8Xj4Jttwui1ToTlzzUFxJgVK/CIOCZVIoxgZmMjk5+bXqrvSatAimI8BW/f+xIYTVnN7dTmJJAEYjL0jaJGxK9yPjSU9jvS9V4DYcVZjy3T+7MZQetMhu6Qv5lQ/gCh41FZvnJGdcp8j7r+Stohgj3aV2MqvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CtDpb8Q5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74E1DC2BBFC;
-	Wed, 19 Jun 2024 10:52:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718794345;
-	bh=vSTwOnkpOhjoLPdYXhsbyxycs4+sgyR1OWKUT+yuANg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CtDpb8Q5lHuHaZ7f9f8roz12g1h3DQNFWWqxZGyjAAf4b9z6g7zLjhIPXuLxXWU3m
-	 IW5VTcS8iESaT0h8QBsq59Lq2yHtioePjg7bFGuw+TLiCeJrGNf3MBzizu6shUm6Xe
-	 hrlFioBpc9T7JD/DH3AxNa5eogB0KF7lztKKZJWTWxfc2ZQCzXfaXa9wQ9uOVccnDf
-	 QGJomdvHrpGizBCOy/itPCvicbmfp9GNrnoxAJf5SDwAfmVZjefznHDICaL3klChWa
-	 oCcE9PH8NF/cVIknlJl3unJT97G6Ezf/7oVoUAxYOjeNDLNckWXEPzLflVu45vHs0/
-	 nkZovwRM6i6jQ==
-Date: Wed, 19 Jun 2024 13:52:19 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Omer Shpigelman <oshpigelman@habana.ai>
-Cc: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"ogabbay@kernel.org" <ogabbay@kernel.org>,
-	Zvika Yehudai <zyehudai@habana.ai>
-Subject: Re: [PATCH 11/15] RDMA/hbl: add habanalabs RDMA driver
-Message-ID: <20240619105219.GO4025@unreal>
-References: <20240613082208.1439968-1-oshpigelman@habana.ai>
- <20240613082208.1439968-12-oshpigelman@habana.ai>
- <20240613191828.GJ4966@unreal>
- <fbb34afa-8a38-4124-9384-9b858ce2c4e5@habana.ai>
- <20240617190429.GB4025@unreal>
- <461bf44e-fd2f-4c8b-bc41-48d48e5a7fcb@habana.ai>
- <20240618125842.GG4025@unreal>
- <b4bda963-7026-4037-83e6-de74728569bd@habana.ai>
+	s=arc-20240116; t=1718794405; c=relaxed/simple;
+	bh=sj7WKJ5fqC0zVpVwonHRFdc48YVp6lzQ8MrHOhRe4xE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XdldH6Rq0uOR4rT9XZjmED27cQpULD76DehpgDAEPPxH0bWgTnM4DIGo9yFiPXvHYLtLbTQkFRIV/i7Mv6l9cgVIswk3XrjV38HV7jAd930LiVis+cPMjQyMOYo2ifcBPcKbD82U7K1TM4wNnECGvW2cOj8IFz71eHedyTwhzwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57cfe600cbeso2126965a12.2;
+        Wed, 19 Jun 2024 03:53:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718794402; x=1719399202;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aRytunszZ2d4/jmfqMXzXaoXNtfg13+bV4d+9oWIJLg=;
+        b=ox/yBdAjUoKXUN+Vj6ghv+RFvHHKRI8XCGwPmZpeZk2VbPG781+YjyuyP7+4Io1Q0M
+         yG7iZc+FhjuiCygJcE8fTTIWEqjs6RKHj1ulevj66/MLCSABomRLKslUTUE0jtHfWm8N
+         QU/12A21LqWxtJsApsbaJIYz2UlssNqsuWq96sRb7g6pWznDdHVVZ1GMleAbTd0TAraJ
+         wL4vIRWgkJVfjly0QwEb8MORxuLNnY5FKEcqqjgVWrN8jJl/GqsLdPLo67eyAT5HwfBe
+         Y8F4c4YE40phEhVXZ6+yJUbc0taXUX+Sim14yPsnoxO1xwkXr+9dh3v549pSOUBkr9Mz
+         W53A==
+X-Forwarded-Encrypted: i=1; AJvYcCVIYuKNh0VsYTqR9RQqksTD5b3bXAJAwneP6is7mpLxSJ/GGXNEbGjIunNNgrnGA3vGTefHLWxlznnrLh5Sh8VIQCCfUXBDWydFScLMG8nUJGaZDtNHSgBPwc43lQoLFQJuv+tSbTFq6XMCdPQ=
+X-Gm-Message-State: AOJu0YxDUSYzQJTSiEQ+dQ1vVRLX+vO85HEBhYq4tngpQRA37AXDdJ+Q
+	GPxZFgQtx477A5WFOCDZDMR2T9UM13gzqfMAzq9m0ukrpsmU6feN
+X-Google-Smtp-Source: AGHT+IGs40e0v0xwiZKkwqArbTtU8Vs/CA9z1vpO8BTcKH7zsIqXHWbf+9UbaMtSUbwYUeDkQq3Mpg==
+X-Received: by 2002:a50:8d14:0:b0:57c:78fb:1a32 with SMTP id 4fb4d7f45d1cf-57d07e82ab3mr1131409a12.19.1718794401920;
+        Wed, 19 Jun 2024 03:53:21 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cd26b423asm5013118a12.76.2024.06.19.03.53.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jun 2024 03:53:21 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: kvalo@kernel.org,
+	linux-wireless@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Felix Fietkau <nbd@nbd.name>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Ryder Lee <ryder.lee@mediatek.com>,
+	Shayne Chen <shayne.chen@mediatek.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: netdev@vger.kernel.org,
+	horms@kernel.org,
+	kees@kernel.org,
+	Bo Jiao <Bo.Jiao@mediatek.com>,
+	Alexander Couzens <lynxis@fe80.eu>,
+	Deren Wu <deren.wu@mediatek.com>,
+	Ming Yen Hsieh <mingyen.hsieh@mediatek.com>,
+	Leon Yen <leon.yen@mediatek.com>,
+	Quan Zhou <quan.zhou@mediatek.com>,
+	Ingo Rohloff <lundril@gmx.de>,
+	Sujuan Chen <sujuan.chen@mediatek.com>,
+	Peter Chiu <chui-hao.chiu@mediatek.com>,
+	StanleyYP Wang <StanleyYP.Wang@mediatek.com>,
+	Benjamin Lin <benjamin-jw.lin@mediatek.com>,
+	linux-kernel@vger.kernel.org (open list:ARM/Mediatek SoC support),
+	linux-arm-kernel@lists.infradead.org (moderated list:ARM/Mediatek SoC support),
+	linux-mediatek@lists.infradead.org (moderated list:ARM/Mediatek SoC support)
+Subject: [PATCH net-next v2] wifi: mt76: un-embedd netdev from mt76_dev
+Date: Wed, 19 Jun 2024 03:52:36 -0700
+Message-ID: <20240619105311.3144908-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b4bda963-7026-4037-83e6-de74728569bd@habana.ai>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 19, 2024 at 09:27:54AM +0000, Omer Shpigelman wrote:
-> On 6/18/24 15:58, Leon Romanovsky wrote:
-> > On Tue, Jun 18, 2024 at 11:08:34AM +0000, Omer Shpigelman wrote:
-> >> On 6/17/24 22:04, Leon Romanovsky wrote:
-> >>> [Some people who received this message don't often get email from leon@kernel.org. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
-> >>>
-> >>> On Mon, Jun 17, 2024 at 05:43:49PM +0000, Omer Shpigelman wrote:
-> >>>> On 6/13/24 22:18, Leon Romanovsky wrote:
-> >>>>> [Some people who received this message don't often get email from leon@kernel.org. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
-> >>>>>
-> >>>>> On Thu, Jun 13, 2024 at 11:22:04AM +0300, Omer Shpigelman wrote:
-> >>>>>> Add an RDMA driver of Gaudi ASICs family for AI scaling.
-> >>>>>> The driver itself is agnostic to the ASIC in action, it operates according
-> >>>>>> to the capabilities that were passed on device initialization.
-> >>>>>> The device is initialized by the hbl_cn driver via auxiliary bus.
-> >>>>>> The driver also supports QP resource tracking and port/device HW counters.
-> >>>>>>
-> >>>>>> Signed-off-by: Omer Shpigelman <oshpigelman@habana.ai>
-> >>>>>> Co-developed-by: Abhilash K V <kvabhilash@habana.ai>
-> >>>>>> Signed-off-by: Abhilash K V <kvabhilash@habana.ai>
-> >>>>>> Co-developed-by: Andrey Agranovich <aagranovich@habana.ai>
-> >>>>>> Signed-off-by: Andrey Agranovich <aagranovich@habana.ai>
-> >>>>>> Co-developed-by: Bharat Jauhari <bjauhari@habana.ai>
-> >>>>>> Signed-off-by: Bharat Jauhari <bjauhari@habana.ai>
-> >>>>>> Co-developed-by: David Meriin <dmeriin@habana.ai>
-> >>>>>> Signed-off-by: David Meriin <dmeriin@habana.ai>
-> >>>>>> Co-developed-by: Sagiv Ozeri <sozeri@habana.ai>
-> >>>>>> Signed-off-by: Sagiv Ozeri <sozeri@habana.ai>
-> >>>>>> Co-developed-by: Zvika Yehudai <zyehudai@habana.ai>
-> >>>>>> Signed-off-by: Zvika Yehudai <zyehudai@habana.ai>
-> >>>>>
-> >>>>> I afraid that you misinterpreted the "Co-developed-by" tag. All these
-> >>>>> people are probably touch the code and not actually sit together at
-> >>>>> the same room and write the code together. So, please remove the
-> >>>>> extensive "Co-developed-by" tags.
-> >>>>>
-> >>>>> It is not full review yet, but simple pass-by-comments.
-> >>>>>
-> >>>>
-> >>>> Actually except of two, all of the mentioned persons sat in the same room
-> >>>> and developed the code together.
-> >>>> The remaining two are located on a different site (but also together).
-> >>>> Isn't that what "Co-developed-by" tag for?
-> >>>> I wanted to give them credit for writing the code but I can remove if it's
-> >>>> not common.
-> >>>
-> >>> Signed-off-by will be enough to give them credit.
-> >>>
-> >>
-> >> Ok, good enough.
-> >>
-> >>>>
-> >>>>>> ---
-> >>>>>>  MAINTAINERS                              |   10 +
-> >>>>>>  drivers/infiniband/Kconfig               |    1 +
-> >>>>>>  drivers/infiniband/hw/Makefile           |    1 +
-> >>>>>>  drivers/infiniband/hw/hbl/Kconfig        |   17 +
-> >>>>>>  drivers/infiniband/hw/hbl/Makefile       |    8 +
-> >>>>>>  drivers/infiniband/hw/hbl/hbl.h          |  326 +++
-> >>>>>>  drivers/infiniband/hw/hbl/hbl_main.c     |  478 ++++
-> >>>>>>  drivers/infiniband/hw/hbl/hbl_verbs.c    | 2686 ++++++++++++++++++++++
-> >>>>>>  include/uapi/rdma/hbl-abi.h              |  204 ++
-> >>>>>>  include/uapi/rdma/hbl_user_ioctl_cmds.h  |   66 +
-> >>>>>>  include/uapi/rdma/hbl_user_ioctl_verbs.h |  106 +
-> >>>>>>  include/uapi/rdma/ib_user_ioctl_verbs.h  |    1 +
-> >>>>>>  12 files changed, 3904 insertions(+)
-> >>>>>>  create mode 100644 drivers/infiniband/hw/hbl/Kconfig
-> >>>>>>  create mode 100644 drivers/infiniband/hw/hbl/Makefile
-> >>>>>>  create mode 100644 drivers/infiniband/hw/hbl/hbl.h
-> >>>>>>  create mode 100644 drivers/infiniband/hw/hbl/hbl_main.c
-> >>>>>>  create mode 100644 drivers/infiniband/hw/hbl/hbl_verbs.c
-> >>>>>>  create mode 100644 include/uapi/rdma/hbl-abi.h
-> >>>>>>  create mode 100644 include/uapi/rdma/hbl_user_ioctl_cmds.h
-> >>>>>>  create mode 100644 include/uapi/rdma/hbl_user_ioctl_verbs.h
-> >>>>>
-> >>>>> <...>
-> >>>>>
-> >>>>>> +#define hbl_ibdev_emerg(ibdev, format, ...)  ibdev_emerg(ibdev, format, ##__VA_ARGS__)
-> >>>>>> +#define hbl_ibdev_alert(ibdev, format, ...)  ibdev_alert(ibdev, format, ##__VA_ARGS__)
-> >>>>>> +#define hbl_ibdev_crit(ibdev, format, ...)   ibdev_crit(ibdev, format, ##__VA_ARGS__)
-> >>>>>> +#define hbl_ibdev_err(ibdev, format, ...)    ibdev_err(ibdev, format, ##__VA_ARGS__)
-> >>>>>> +#define hbl_ibdev_warn(ibdev, format, ...)   ibdev_warn(ibdev, format, ##__VA_ARGS__)
-> >>>>>> +#define hbl_ibdev_notice(ibdev, format, ...) ibdev_notice(ibdev, format, ##__VA_ARGS__)
-> >>>>>> +#define hbl_ibdev_info(ibdev, format, ...)   ibdev_info(ibdev, format, ##__VA_ARGS__)
-> >>>>>> +#define hbl_ibdev_dbg(ibdev, format, ...)    ibdev_dbg(ibdev, format, ##__VA_ARGS__)
-> >>>>>> +
-> >>>>>> +#define hbl_ibdev_emerg_ratelimited(ibdev, fmt, ...)         \
-> >>>>>> +     ibdev_emerg_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >>>>>> +#define hbl_ibdev_alert_ratelimited(ibdev, fmt, ...)         \
-> >>>>>> +     ibdev_alert_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >>>>>> +#define hbl_ibdev_crit_ratelimited(ibdev, fmt, ...)          \
-> >>>>>> +     ibdev_crit_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >>>>>> +#define hbl_ibdev_err_ratelimited(ibdev, fmt, ...)           \
-> >>>>>> +     ibdev_err_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >>>>>> +#define hbl_ibdev_warn_ratelimited(ibdev, fmt, ...)          \
-> >>>>>> +     ibdev_warn_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >>>>>> +#define hbl_ibdev_notice_ratelimited(ibdev, fmt, ...)                \
-> >>>>>> +     ibdev_notice_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >>>>>> +#define hbl_ibdev_info_ratelimited(ibdev, fmt, ...)          \
-> >>>>>> +     ibdev_info_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >>>>>> +#define hbl_ibdev_dbg_ratelimited(ibdev, fmt, ...)           \
-> >>>>>> +     ibdev_dbg_ratelimited(ibdev, fmt, ##__VA_ARGS__)
-> >>>>>> +
-> >>>>>
-> >>>>> Please don't redefine the existing macros. Just use the existing ones.
-> >>>>>
-> >>>>>
-> >>>>> <...>
-> >>>>>
-> >>>>
-> >>>> That's a leftover from some debug code. I'll remove.
-> >>>>
-> >>>>>> +     if (hbl_ib_match_netdev(ibdev, netdev))
-> >>>>>> +             ib_port = hbl_to_ib_port_num(hdev, netdev->dev_port);
-> >>>>>> +     else
-> >>>>>> +             return NOTIFY_DONE;
-> >>>>>
-> >>>>> It is not kernel coding style. Please write:
-> >>>>> if (!hbl_ib_match_netdev(ibdev, netdev))
-> >>>>>     return NOTIFY_DONE;
-> >>>>>
-> >>>>> ib_port = hbl_to_ib_port_num(hdev, netdev->dev_port);
-> >>>>>
-> >>>>
-> >>>> I'll fix the code, thanks.
-> >>>>
-> >>>>>> +
-> >>>>>
-> >>>>> <...>
-> >>>>>
-> >>>>>> +static int hbl_ib_probe(struct auxiliary_device *adev, const struct auxiliary_device_id *id)
-> >>>>>> +{
-> >>>>>> +     struct hbl_aux_dev *aux_dev = container_of(adev, struct hbl_aux_dev, adev);
-> >>>>>> +     struct hbl_ib_aux_ops *aux_ops = aux_dev->aux_ops;
-> >>>>>> +     struct hbl_ib_device *hdev;
-> >>>>>> +     ktime_t timeout;
-> >>>>>> +     int rc;
-> >>>>>> +
-> >>>>>> +     rc = hdev_init(aux_dev);
-> >>>>>> +     if (rc) {
-> >>>>>> +             dev_err(&aux_dev->adev.dev, "Failed to init hdev\n");
-> >>>>>> +             return -EIO;
-> >>>>>> +     }
-> >>>>>> +
-> >>>>>> +     hdev = aux_dev->priv;
-> >>>>>> +
-> >>>>>> +     /* don't allow module unloading while it is attached */
-> >>>>>> +     if (!try_module_get(THIS_MODULE)) {
-> >>>>>
-> >>>>> This part makes wonder, what are you trying to do here? What doesn't work for you
-> >>>>> in standard driver core and module load mechanism?
-> >>>>>
-> >>>>
-> >>>> Before auxiliary bus was introduced, we used EXPORT_SYMBOLs for inter
-> >>>> driver communication. That incremented the refcount of the used module so
-> >>>> it couldn't be removed while it is in use.
-> >>>> Auxiliary bus usage doesn't increment the used module refcount and hence
-> >>>> the used module can be removed while it is in use and that's something
-> >>>> we don't want to allow.
-> >>>> We could solve it by some global locking or in_use atomic but the most
-> >>>> simple and clean way is just to increment the used module refcount on
-> >>>> auxiliary device probe and decrement it on auxiliary device removal.
-> >>>
-> >>> No, you was supposed to continue to use EXPORT_SYMBOLs and don't
-> >>> invent auxiliary ops structure (this is why you lost module
-> >>> reference counting).
-> >>>
-> >>
-> >> Sorry, but according to the auxiliary bus doc, a domain-specific ops
-> >> structure can be used.
-> >> We followed the usage example described at drivers/base/auxiliary.c.
-> >> What am I missing? 
-> > 
-> > Being the one who implemented auxiliary bus in the kernel and converted
-> > number of drivers to use it, I strongly recommend do NOT follow the example
-> > provided there.
-> > 
-> > So you are missing "best practice", and "best practice" is to use
-> > EXPORT_SYMBOLs and rely on module reference counting.
-> >
-> 
-> It is not just the usage example but also the general feature doc before
-> it:
-> "The generic behavior can be extended and specialized as needed by
-> encapsulating an auxiliary_device within other domain-specific structures
-> and the use of .ops callbacks."
-> It is also mentioned there that the ops structure are used for specific
-> auxiliary device operations while EXPORT_SYMBOLs should be used for common
-> infrastrucure the parent driver exposes:
-> "Note that ops are intended as a way to augment instance behavior within a
-> class of auxiliary devices, it is not the mechanism for exporting common
-> infrastructure from the parent."
-> All of our ops callbacks are meant to provide functionality related to the
-> auxiliary device, they are not just general/common infrastructure.
+Embedding net_device into structures prohibits the usage of flexible
+arrays in the net_device structure. For more details, see the discussion
+at [1].
 
-Of course they are common, otherwise why did you put them in common code?
-For example, you have callbacks to lock and unlock internal HW access,
-how is it not common?
+Un-embed the net_devices from struct mt76_dev by converting them
+into pointers, and allocating them dynamically. Use the leverage
+alloc_netdev_dummy() to allocate the net_device object at
+mt76_dma_init().
 
-> 
-> Why do we have this doc if we should ignore it? why wasn't the doc
-> modified according to the "best practice" you described? the doc is
-> misleading.
+The free of the device occurs at mt76_dma_cleanup().
 
-Because this is how upstream kernel development works. We are trying to
-come to the agreement and get the best solution for the problem. Sometimes,
-the outcome of the discussion is not "the best solution", but "good
-enough". This doc can be served as an example. Everyone involved in the
-development of auxbus and later usage of it, were focused on implementation,
-documentation was good enough as it didn't limit anyone who actually
-used it.
+Link: https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/ [1]
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
 
-> 
-> Adding gregkh here as he requested the auxiliary bus feature IIRC.
-> Greg - isn't the doc legit? should EXPORT_SYMBOLs necessarily be used
-> together with auxiliary bus rather than ops structure?
+Changelog:
+ * v2:
+	- Renamed mt76_from_netdev() to mt76_priv(), and returns a
+	  void pointer instead of struct mt76_dev, avoiding the cast
+	  later, as suggested by Simon Horman.
 
-This is not what you are doing here. You completely ditched EXPORT_SYMBOLs
-and reinvented module reference counting which overcomplicated the code
-just to avoid using standard kernel mechanism.
+ drivers/net/wireless/mediatek/mt76/debugfs.c  |  6 ++--
+ drivers/net/wireless/mediatek/mt76/dma.c      | 31 +++++++++++++++----
+ drivers/net/wireless/mediatek/mt76/dma.h      |  9 ++++++
+ drivers/net/wireless/mediatek/mt76/mt76.h     |  4 +--
+ .../net/wireless/mediatek/mt76/mt7603/dma.c   |  2 +-
+ .../net/wireless/mediatek/mt76/mt7615/dma.c   |  6 ++--
+ .../net/wireless/mediatek/mt76/mt76x02_mmio.c |  2 +-
+ .../net/wireless/mediatek/mt76/mt7915/dma.c   |  2 +-
+ .../net/wireless/mediatek/mt76/mt7921/pci.c   |  2 +-
+ .../net/wireless/mediatek/mt76/mt7925/pci.c   |  2 +-
+ .../net/wireless/mediatek/mt76/mt792x_dma.c   |  2 +-
+ .../net/wireless/mediatek/mt76/mt7996/dma.c   |  2 +-
+ 12 files changed, 49 insertions(+), 21 deletions(-)
 
-> As we saw it, auxiliary bus gives us the flexibility to choose which
-> modules will be loaded while EXPORT_SYMBOLs enforces the dependencies
-> which might not be needed in some cases.
->  
-> >> Moreover, we'd like to support the mode where the IB or the ETH driver is
-> >> not loaded at all. But this cannot be achieved if we use EXPORT_SYMBOLs
-> >> exclusively for inter driver communication.
-> > 
-> > It is not true and not how the kernel works. You can perfectly load core
-> > driver without IB and ETH, at some extent this is how mlx5 driver works.
-> > 
-> 
-> mlx5 IB driver doesn't export any symbol that is used by the core driver,
-> that's why the core driver can be loaded without the IB driver (althought
-> you'll get circular dependency if you would export).
+diff --git a/drivers/net/wireless/mediatek/mt76/debugfs.c b/drivers/net/wireless/mediatek/mt76/debugfs.c
+index ae83be572b94..b6a2746c187d 100644
+--- a/drivers/net/wireless/mediatek/mt76/debugfs.c
++++ b/drivers/net/wireless/mediatek/mt76/debugfs.c
+@@ -33,8 +33,8 @@ mt76_napi_threaded_set(void *data, u64 val)
+ 	if (!mt76_is_mmio(dev))
+ 		return -EOPNOTSUPP;
+ 
+-	if (dev->napi_dev.threaded != val)
+-		return dev_set_threaded(&dev->napi_dev, val);
++	if (dev->napi_dev->threaded != val)
++		return dev_set_threaded(dev->napi_dev, val);
+ 
+ 	return 0;
+ }
+@@ -44,7 +44,7 @@ mt76_napi_threaded_get(void *data, u64 *val)
+ {
+ 	struct mt76_dev *dev = data;
+ 
+-	*val = dev->napi_dev.threaded;
++	*val = dev->napi_dev->threaded;
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/wireless/mediatek/mt76/dma.c b/drivers/net/wireless/mediatek/mt76/dma.c
+index f4f88c444e21..5f46d6daeaa7 100644
+--- a/drivers/net/wireless/mediatek/mt76/dma.c
++++ b/drivers/net/wireless/mediatek/mt76/dma.c
+@@ -916,7 +916,7 @@ int mt76_dma_rx_poll(struct napi_struct *napi, int budget)
+ 	struct mt76_dev *dev;
+ 	int qid, done = 0, cur;
+ 
+-	dev = container_of(napi->dev, struct mt76_dev, napi_dev);
++	dev = mt76_priv(napi->dev);
+ 	qid = napi - dev->napi;
+ 
+ 	rcu_read_lock();
+@@ -940,18 +940,35 @@ static int
+ mt76_dma_init(struct mt76_dev *dev,
+ 	      int (*poll)(struct napi_struct *napi, int budget))
+ {
++	struct mt76_dev **priv;
+ 	int i;
+ 
+-	init_dummy_netdev(&dev->napi_dev);
+-	init_dummy_netdev(&dev->tx_napi_dev);
+-	snprintf(dev->napi_dev.name, sizeof(dev->napi_dev.name), "%s",
++	dev->napi_dev = alloc_netdev_dummy(sizeof(struct mt76_dev *));
++	if (!dev->napi_dev)
++		return -ENOMEM;
++
++	/* napi_dev private data points to mt76_dev parent, so, mt76_dev
++	 * can be retrieved given napi_dev
++	 */
++	priv = netdev_priv(dev->napi_dev);
++	*priv = dev;
++
++	dev->tx_napi_dev = alloc_netdev_dummy(sizeof(struct mt76_dev *));
++	if (!dev->tx_napi_dev) {
++		free_netdev(dev->napi_dev);
++		return -ENOMEM;
++	}
++	priv = netdev_priv(dev->tx_napi_dev);
++	*priv = dev;
++
++	snprintf(dev->napi_dev->name, sizeof(dev->napi_dev->name), "%s",
+ 		 wiphy_name(dev->hw->wiphy));
+-	dev->napi_dev.threaded = 1;
++	dev->napi_dev->threaded = 1;
+ 	init_completion(&dev->mmio.wed_reset);
+ 	init_completion(&dev->mmio.wed_reset_complete);
+ 
+ 	mt76_for_each_q_rx(dev, i) {
+-		netif_napi_add(&dev->napi_dev, &dev->napi[i], poll);
++		netif_napi_add(dev->napi_dev, &dev->napi[i], poll);
+ 		mt76_dma_rx_fill(dev, &dev->q_rx[i], false);
+ 		napi_enable(&dev->napi[i]);
+ 	}
+@@ -1019,5 +1036,7 @@ void mt76_dma_cleanup(struct mt76_dev *dev)
+ 
+ 	mt76_free_pending_txwi(dev);
+ 	mt76_free_pending_rxwi(dev);
++	free_netdev(dev->napi_dev);
++	free_netdev(dev->tx_napi_dev);
+ }
+ EXPORT_SYMBOL_GPL(mt76_dma_cleanup);
+diff --git a/drivers/net/wireless/mediatek/mt76/dma.h b/drivers/net/wireless/mediatek/mt76/dma.h
+index 1de5a2b20f74..e3ddc7a83757 100644
+--- a/drivers/net/wireless/mediatek/mt76/dma.h
++++ b/drivers/net/wireless/mediatek/mt76/dma.h
+@@ -116,4 +116,13 @@ mt76_dma_should_drop_buf(bool *drop, u32 ctrl, u32 buf1, u32 info)
+ 	}
+ }
+ 
++static inline void *mt76_priv(struct net_device *dev)
++{
++	struct mt76_dev **priv;
++
++	priv = netdev_priv(dev);
++
++	return *priv;
++}
++
+ #endif
+diff --git a/drivers/net/wireless/mediatek/mt76/mt76.h b/drivers/net/wireless/mediatek/mt76/mt76.h
+index 11b9f22ca7f3..15f83b5adac7 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt76.h
++++ b/drivers/net/wireless/mediatek/mt76/mt76.h
+@@ -831,8 +831,8 @@ struct mt76_dev {
+ 
+ 	struct mt76_mcu mcu;
+ 
+-	struct net_device napi_dev;
+-	struct net_device tx_napi_dev;
++	struct net_device *napi_dev;
++	struct net_device *tx_napi_dev;
+ 	spinlock_t rx_lock;
+ 	struct napi_struct napi[__MT_RXQ_MAX];
+ 	struct sk_buff_head rx_skb[__MT_RXQ_MAX];
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7603/dma.c b/drivers/net/wireless/mediatek/mt76/mt7603/dma.c
+index 14304b063715..ea017f22fff2 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7603/dma.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7603/dma.c
+@@ -242,7 +242,7 @@ int mt7603_dma_init(struct mt7603_dev *dev)
+ 	if (ret)
+ 		return ret;
+ 
+-	netif_napi_add_tx(&dev->mt76.tx_napi_dev, &dev->mt76.tx_napi,
++	netif_napi_add_tx(dev->mt76.tx_napi_dev, &dev->mt76.tx_napi,
+ 			  mt7603_poll_tx);
+ 	napi_enable(&dev->mt76.tx_napi);
+ 
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7615/dma.c b/drivers/net/wireless/mediatek/mt76/mt7615/dma.c
+index e7135b2f1742..bcf7864312d7 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7615/dma.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7615/dma.c
+@@ -67,7 +67,7 @@ static int mt7615_poll_tx(struct napi_struct *napi, int budget)
+ {
+ 	struct mt7615_dev *dev;
+ 
+-	dev = container_of(napi, struct mt7615_dev, mt76.tx_napi);
++	dev = mt76_priv(napi->dev);
+ 	if (!mt76_connac_pm_ref(&dev->mphy, &dev->pm)) {
+ 		napi_complete(napi);
+ 		queue_work(dev->mt76.wq, &dev->pm.wake_work);
+@@ -89,7 +89,7 @@ static int mt7615_poll_rx(struct napi_struct *napi, int budget)
+ 	struct mt7615_dev *dev;
+ 	int done;
+ 
+-	dev = container_of(napi->dev, struct mt7615_dev, mt76.napi_dev);
++	dev = mt76_priv(napi->dev);
+ 
+ 	if (!mt76_connac_pm_ref(&dev->mphy, &dev->pm)) {
+ 		napi_complete(napi);
+@@ -282,7 +282,7 @@ int mt7615_dma_init(struct mt7615_dev *dev)
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	netif_napi_add_tx(&dev->mt76.tx_napi_dev, &dev->mt76.tx_napi,
++	netif_napi_add_tx(dev->mt76.tx_napi_dev, &dev->mt76.tx_napi,
+ 			  mt7615_poll_tx);
+ 	napi_enable(&dev->mt76.tx_napi);
+ 
+diff --git a/drivers/net/wireless/mediatek/mt76/mt76x02_mmio.c b/drivers/net/wireless/mediatek/mt76/mt76x02_mmio.c
+index e5ad635d3c56..35b7ebc2c9c6 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt76x02_mmio.c
++++ b/drivers/net/wireless/mediatek/mt76/mt76x02_mmio.c
+@@ -239,7 +239,7 @@ int mt76x02_dma_init(struct mt76x02_dev *dev)
+ 	if (ret)
+ 		return ret;
+ 
+-	netif_napi_add_tx(&dev->mt76.tx_napi_dev, &dev->mt76.tx_napi,
++	netif_napi_add_tx(dev->mt76.tx_napi_dev, &dev->mt76.tx_napi,
+ 			  mt76x02_poll_tx);
+ 	napi_enable(&dev->mt76.tx_napi);
+ 
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7915/dma.c b/drivers/net/wireless/mediatek/mt76/mt7915/dma.c
+index 0baa82c8df5a..0c62272fe7d0 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7915/dma.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7915/dma.c
+@@ -578,7 +578,7 @@ int mt7915_dma_init(struct mt7915_dev *dev, struct mt7915_phy *phy2)
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	netif_napi_add_tx(&dev->mt76.tx_napi_dev, &dev->mt76.tx_napi,
++	netif_napi_add_tx(dev->mt76.tx_napi_dev, &dev->mt76.tx_napi,
+ 			  mt7915_poll_tx);
+ 	napi_enable(&dev->mt76.tx_napi);
+ 
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7921/pci.c b/drivers/net/wireless/mediatek/mt76/mt7921/pci.c
+index f768e9389ac6..e75e7b6d3aaf 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7921/pci.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7921/pci.c
+@@ -219,7 +219,7 @@ static int mt7921_dma_init(struct mt792x_dev *dev)
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	netif_napi_add_tx(&dev->mt76.tx_napi_dev, &dev->mt76.tx_napi,
++	netif_napi_add_tx(dev->mt76.tx_napi_dev, &dev->mt76.tx_napi,
+ 			  mt792x_poll_tx);
+ 	napi_enable(&dev->mt76.tx_napi);
+ 
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7925/pci.c b/drivers/net/wireless/mediatek/mt76/mt7925/pci.c
+index 07b74d492ce1..577574fb7a1e 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7925/pci.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7925/pci.c
+@@ -254,7 +254,7 @@ static int mt7925_dma_init(struct mt792x_dev *dev)
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	netif_napi_add_tx(&dev->mt76.tx_napi_dev, &dev->mt76.tx_napi,
++	netif_napi_add_tx(dev->mt76.tx_napi_dev, &dev->mt76.tx_napi,
+ 			  mt792x_poll_tx);
+ 	napi_enable(&dev->mt76.tx_napi);
+ 
+diff --git a/drivers/net/wireless/mediatek/mt76/mt792x_dma.c b/drivers/net/wireless/mediatek/mt76/mt792x_dma.c
+index 5cc2d59b774a..6f9db782338e 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt792x_dma.c
++++ b/drivers/net/wireless/mediatek/mt76/mt792x_dma.c
+@@ -340,7 +340,7 @@ int mt792x_poll_rx(struct napi_struct *napi, int budget)
+ 	struct mt792x_dev *dev;
+ 	int done;
+ 
+-	dev = container_of(napi->dev, struct mt792x_dev, mt76.napi_dev);
++	dev = mt76_priv(napi->dev);
+ 
+ 	if (!mt76_connac_pm_ref(&dev->mphy, &dev->pm)) {
+ 		napi_complete(napi);
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7996/dma.c b/drivers/net/wireless/mediatek/mt76/mt7996/dma.c
+index 73e633d0d700..69a7d9b2e38b 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7996/dma.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7996/dma.c
+@@ -641,7 +641,7 @@ int mt7996_dma_init(struct mt7996_dev *dev)
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	netif_napi_add_tx(&dev->mt76.tx_napi_dev, &dev->mt76.tx_napi,
++	netif_napi_add_tx(dev->mt76.tx_napi_dev, &dev->mt76.tx_napi,
+ 			  mt7996_poll_tx);
+ 	napi_enable(&dev->mt76.tx_napi);
+ 
+-- 
+2.43.0
 
-Yes, IB and ETH drivers are "users" of core driver. As RDMA maintainer,
-I'm reluctant to accept code that exports symbols from IB drivers to
-other subsystems. We have drivers/infiniband/core/ for that.
-
-> If relying on exported symbols only, then our IB and ETH drivers will need
-> to export symbols too because the core driver accesses them post probing.
-
-So you should fix your core driver. This is exactly what auxbus model
-proposes.
-
-> Hence we won't be able to load the core driver without both of them (or
-> loading anything due to circular dependency).
-> Unless we'll use dynamic symbol lookup and I don't think that's your
-> intention.
-
-No it is not.
-
-> 
-> >>
-> >>>>
-> >>>>>> +             dev_err(hdev->dev, "Failed to increment %s module refcount\n",
-> >>>>>> +                     module_name(THIS_MODULE));
-> >>>>>> +             rc = -EIO;
-> >>>>>> +             goto module_get_err;
-> >>>>>> +     }
-> >>>>>> +
-> >>>>>> +     timeout = ktime_add_ms(ktime_get(), hdev->pending_reset_long_timeout * MSEC_PER_SEC);
-> >>>>>> +     while (1) {
-> >>>>>> +             aux_ops->hw_access_lock(aux_dev);
-> >>>>>> +
-> >>>>>> +             /* if the device is operational, proceed to actual init while holding the lock in
-> >>>>>> +              * order to prevent concurrent hard reset
-> >>>>>> +              */
-> >>>>>> +             if (aux_ops->device_operational(aux_dev))
-> >>>>>> +                     break;
-> >>>>>> +
-> >>>>>> +             aux_ops->hw_access_unlock(aux_dev);
-> >>>>>> +
-> >>>>>> +             if (ktime_compare(ktime_get(), timeout) > 0) {
-> >>>>>> +                     dev_err(hdev->dev, "Timeout while waiting for hard reset to finish\n");
-> >>>>>> +                     rc = -EBUSY;
-> >>>>>> +                     goto timeout_err;
-> >>>>>> +             }
-> >>>>>> +
-> >>>>>> +             dev_notice_once(hdev->dev, "Waiting for hard reset to finish before probing IB\n");
-> >>>>>> +
-> >>>>>> +             msleep_interruptible(MSEC_PER_SEC);
-> >>>>>> +     }
-> >>>>>
-> >>>>> The code above is unexpected.
-> >>>>>
-> >>>>
-> >>>> We have no control on when the user insmod the IB driver.
-> >>>
-> >>> It is not true, this is controlled through module dependencies
-> >>> mechanism.
-> >>>
-> >>
-> >> Yeah, if we would use EXPORT_SYMBOLs for inter driver communication but
-> >> we don't.
-> > 
-> > So please use it and don't add complexity where it is not needed.
-> > 
-> >>
-> >>>> As a result it is possible that the IB auxiliary device will be probed
-> >>>> while the compute device is under reset (due to some HW error).
-> >>>
-> >>> No, it is not possible. If you structure your driver right.
-> >>>
-> >>
-> >> Again, it is not possible if we would use EXPORT_SYMBOLs.
-> >> Please let me know if we misunderstood something because AFAIU we followed
-> >> the auxiliary bus doc usage example.
-> > 
-> > It is better to follow actual drivers that use auxiliary bus and see how
-> > they implemented it and not rely on examples in the documentation.
-> > 
-> 
-> But isn't that what the doc for? to explain the guidelines? and it's not
-> that there is a big red note there of "this example should not be taken as
-> is, please look at your subsystem guidelines".
-
-At the beginning that doc was located in Documentation/ folder and no one
-really cared about it. After moving from Documentation/ to drivers/base/auxiliary.c,
-it became more visible, but still no one relied on it. You are first one
-who read.
-
-There is no subsystem rules here. Everyone relied on EXPORT_SYMBOLs and didn't
-use ops structure. Kernel is evolving project, there is no need to find a rule
-for everything.
-
-Thanks
-
-> 
-> > Thanks
-> > 
-> >>
-> >>> Thanks
 
