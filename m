@@ -1,97 +1,112 @@
-Return-Path: <netdev+bounces-104724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 764C890E217
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 05:54:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 771F690E221
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 06:04:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EAF01F23854
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 03:54:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B751B20F5B
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 04:03:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEBAF2B9D9;
-	Wed, 19 Jun 2024 03:54:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99768288DB;
+	Wed, 19 Jun 2024 04:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="etw4oHKS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AGJCH2WY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A54A2139D3;
-	Wed, 19 Jun 2024 03:54:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 363E41E878
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 04:03:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718769258; cv=none; b=fbjfZNv4eGtvEjgiXwtydtVJZ2LKBU8KzOt2lHZ6YmBetEqJL/Wv7vBLL6/zAg9LonAntpFrW8e9jSyoxzpB1laU4ViV+5bES6tfku3hiV1r4bRdxuywtB00d9X9CawUJCqi6V43dv84B11Bo2HgJfuL8aFmHw0CcVrII88HP+Q=
+	t=1718769834; cv=none; b=fRsp7mFh4sGTRw8DxI59jLA/3BHiJlA0C69IZn0Kx5+bSf9zksQWmzW5ZRrv2wEV+HQCd5N0lFWZTJD+GPp6SeF2yN245j1I+sowqFS/Ttt9nbNDxx4eicukb/XYghYrUvPIjnp3K+M49vP8KFiGAyvtwN8CzVhCvHG15jLEkXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718769258; c=relaxed/simple;
-	bh=/oSabxE/ch5IEDlTL+1hrIBJeZ/HOsHpZKFA4WnW2sU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cP/ge5v4B5NkgBBqfSYZ7S+cyDWBgHKo8Ei+lg4O7GPKXbxL0gav2Ei1MAlgR2gj2/lUt115VoTuFhnTCLlzaXv/rdxvfq0vR/ezhzZgv2DMaaXqTqy/kVjWMYDV66d7Lv6Glk9JCkGKqFqDXp7BB3qMSetiZ2QAyxT1n45HYgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=etw4oHKS; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1718769247; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=zpCVvcHtd67Za3x/M3or94oTHaNa/owvso3OqIt3FBw=;
-	b=etw4oHKSIcxwVQV7wFoArE1EP0RDeHFTI9uOh05QPMVmZQbneUyayi6I03vwYgH3QGkGO84RD3Z1ZKgvSedWZXLqqNoUM+MOkJc3tlWwtZv+LXhj+PO9i1fp11Ox/cxZ7w+LpzBlscGY/mA3bYv2/8F7P+vED7/ZDqcC4xzHOAk=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R881e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033068173054;MF=jiapeng.chong@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W8mhgUN_1718769237;
-Received: from localhost(mailfrom:jiapeng.chong@linux.alibaba.com fp:SMTPD_---0W8mhgUN_1718769237)
-          by smtp.aliyun-inc.com;
-          Wed, 19 Jun 2024 11:54:07 +0800
-From: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-To: saeedm@nvidia.com
-Cc: leon@kernel.org,
-	tariqt@nvidia.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
-	Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH] net/mlx5: Lag, Remove NULL check before dev_{put, hold}
-Date: Wed, 19 Jun 2024 11:53:57 +0800
-Message-Id: <20240619035357.45567-1-jiapeng.chong@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+	s=arc-20240116; t=1718769834; c=relaxed/simple;
+	bh=d7BuDkYUlW8grqejeVbbEVp8beTOMu1zgJrd8pW+pFE=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=OuiQGUWQIC6FYEk4XEGv3IgC0KUumNfXnskk4fWE6wDnTjhivbQjMWgrcZPgUzRAWxYvy9c58fmM00bPYDruq/Nj+6eOPQB6rNK6dNpnFycMMm8poIJDgFWPItbqmWNl6o/eWPWNRUEbv5lTD1GUA0Fj/ubXr138mW1vSujYDE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AGJCH2WY; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3745eb24ffaso3438755ab.1
+        for <netdev@vger.kernel.org>; Tue, 18 Jun 2024 21:03:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718769832; x=1719374632; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=htPLG3WbVpAyRnKsDn3tVziFDj/r62+rDzXEW04s2II=;
+        b=AGJCH2WYdn20lhtsXMLBJQD5DsMzNni/0ye2eQIQKIM0dZBrz301T9HCpja8KD02mA
+         Q2jt6GbsQWdoYfkacSvo525zEmKAO2DLBVEcJLHrJ0nc/fLYcfFzmOQZQORW/7Yl87ZE
+         1bHM/Ym7OnbwvYvTOU+cnngGeN0tq93TL/8lR0WwBsfzyLh17zlJpFFqVRNXjSS/qwtR
+         ZzggM6R5yNZi80bNDUgKZ52aVQiYRdRumtdyLgF8BWhPDJrhKKJXitxSSqc0K6DKAWdw
+         6oktNqNtOziGQvieE+gn5Phkmvml686f9Rx41sDL2vAQ6zBNoC0c5vvk9oo38Lw5Zo+T
+         hIMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718769832; x=1719374632;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=htPLG3WbVpAyRnKsDn3tVziFDj/r62+rDzXEW04s2II=;
+        b=X3t9kQ1hiJYwnaDKeXMLQ3SX9UyNIhXtteScGR73LFitJU7duIQyfqh6wCCGIZoJe9
+         b58mlwtFUzkeZNxFz6w33N8RwUFh/JL2x/8CmKBsM6WF9xKeLSOrp5wlhIZ6+Ic8Ppp+
+         /1iJ3eS8vBLPpk2ACNu7sJhG8TJI9cy0V78L89o1gHCrFzU1YnGMYvOL+ClE0BmDmt+A
+         6V78HZBtv/ahcWOKYJWvjyDMhfxDLL2VttQlVoJu1mEDDhgr5Me1XKB9CFc+uc8pl16t
+         /h3w+8rqb56C2mA7MGPwosFr8BS2+Nu1iFzdx0g/NHy7QzRaV9OEn8yWnoiMApBuqCzT
+         deSg==
+X-Forwarded-Encrypted: i=1; AJvYcCUmYmpgNfC0aF/jYi8YBOrBSsnXH5w7IqJ/t5GuZXhgJqbeyrwI1GQiGfUEE1gO10DRynQw9bJguk5WG6MXb4W1uwm9ZV/8
+X-Gm-Message-State: AOJu0YyDvEWD0fEBhey5LaYMBeBDszW9/XCOIEycEhlKyJEcdGRResEh
+	AEwgDoh1cD8SEgXoyNyiEuXvS3A5xDy8XQIPDJ/1zf2G8qzdz/aj
+X-Google-Smtp-Source: AGHT+IGU0t0ARiOzT7OJOHXc5Ylc/q1kHwDg3hNN6agkzOIT3Ejo0fBmyodYRSJsydG4NshZ2DGMSg==
+X-Received: by 2002:a92:d5d2:0:b0:375:a48d:fdad with SMTP id e9e14a558f8ab-3761d70ecc1mr13647555ab.3.1718769832276;
+        Tue, 18 Jun 2024 21:03:52 -0700 (PDT)
+Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-70a88cef31bsm3636762a12.56.2024.06.18.21.03.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jun 2024 21:03:52 -0700 (PDT)
+Date: Wed, 19 Jun 2024 13:03:37 +0900 (JST)
+Message-Id: <20240619.130337.398996009719520372.fujita.tomonori@gmail.com>
+To: kuba@kernel.org
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
+ horms@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
+ linux@armlinux.org.uk, hfdevel@gmx.net, naveenm@marvell.com,
+ jdamato@fastly.com
+Subject: Re: [PATCH net-next v11 5/7] net: tn40xx: add basic Rx handling
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <20240618185210.3a7a5715@kernel.org>
+References: <20240618051608.95208-1-fujita.tomonori@gmail.com>
+	<20240618051608.95208-6-fujita.tomonori@gmail.com>
+	<20240618185210.3a7a5715@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-The call netdev_{put, hold} of dev_{put, hold} will check NULL, so there
-is no need to check before using dev_{put, hold}, remove it to silence
-the warning:
+On Tue, 18 Jun 2024 18:52:10 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-./drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c:1518:2-10: WARNING: NULL check before dev_{put, hold} functions is not needed.
+> On Tue, 18 Jun 2024 14:16:06 +0900 FUJITA Tomonori wrote:
+>> +		skb = napi_build_skb(page_address(dm->page), PAGE_SIZE);
+>> +		if (!skb) {
+>> +			netdev_err(priv->ndev, "napi_build_skb() failed\n");
+> 
+> memory pressure happens a lot in real world scenarios,
+> allocations will fail, and you don't want to spam the logs
+> in such cases.
+>
+> In general prints on the datapath can easily turn into a DoS vector.
+> You're better off using appropriate statistics (here struct
+> netdev_queue_stats_rx :: alloc_fail)
 
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=9361
-Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Removed prints on the datapath.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
-index d0871c46b8c5..a2fd9a84f877 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
-@@ -1514,8 +1514,7 @@ struct net_device *mlx5_lag_get_roce_netdev(struct mlx5_core_dev *dev)
- 	} else {
- 		ndev = ldev->pf[MLX5_LAG_P1].netdev;
- 	}
--	if (ndev)
--		dev_hold(ndev);
-+	dev_hold(ndev);
- 
- unlock:
- 	spin_unlock_irqrestore(&lag_lock, flags);
--- 
-2.20.1.7.g153144c
-
+I'll add supporting get_queue_stats_tx/rx to the to-do list after
+merged.
 
