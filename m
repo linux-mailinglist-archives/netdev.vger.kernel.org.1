@@ -1,63 +1,67 @@
-Return-Path: <netdev+bounces-105065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C3F390F86C
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 23:20:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 26F2E90F874
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 23:25:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DCAC1F21454
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 21:20:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6E8A1F226F2
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 21:25:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DE9F78C6D;
-	Wed, 19 Jun 2024 21:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA8C7E57F;
+	Wed, 19 Jun 2024 21:25:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vsVQp8ce"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2E81D52B
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 21:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8C179B84;
+	Wed, 19 Jun 2024 21:25:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718832039; cv=none; b=rk9GpyOBwvvwhKK/ZABnZKNPVEprI2B2KoV8lrpjjo+P/J1WK5HK0hqwqP4zOIilCx0WCHmk+OaDJd9qJcz0J+vVepirs9FGUe2t8lOXMhNag3fwqU/peMfCjMxRw/tBz5Toytl1aVDPDYplLzrQ0Rx2aRuW2PRKeCVZrmYSVDE=
+	t=1718832313; cv=none; b=cK0aU61tiQET8XYL7D8iXBxqB9EcanfUrLU8ODP4tfN+xmOwlOAI8yEekwhn7IRiBYPE3/SOvIrfKvGiFFEHcC3N0jzOtjJBn1A4TwlUwNU3K9TMEAluqxDhLsUTWDVTjSom437mcm/8diwYjpKi4vm/WOc3URtEDMv0g4oHbdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718832039; c=relaxed/simple;
-	bh=3c+/iB98ztOoFHDjZBRZz5BQm+jz9vmvDHuS4m8eXAY=;
+	s=arc-20240116; t=1718832313; c=relaxed/simple;
+	bh=TAvvtiq8bL4uTtuxbdWSEO3ha5qcXdAyR/EzvToChWw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HNsYu9zhFijGNGKA/8+c7iLUmEiBsHUbaj01QwU5fVGhQFiu3KIA1aKXYWD9y26Yp5ug+wylirXHXvGsiTwHKij6rrkSw9ukmNNXBJcczXqYlkqT1qbPae5QTPr9Mm+VrkcKG4sF8ZfkmDhK47xDqe4qGGlm8XKG4IcWmILr5BQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1sK2jG-0002wn-11; Wed, 19 Jun 2024 23:20:30 +0200
-Date: Wed, 19 Jun 2024 23:20:30 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: Florian Westphal <fw@strlen.de>, Ilya Maximets <i.maximets@ovn.org>,
-	network dev <netdev@vger.kernel.org>, dev@openvswitch.org,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>, Davide Caratti <dcaratti@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ITCtlkDqNOAMNeyRSQ8YRfqQq3r7xXq8/BO+S4ZgD0sYXJY1VFDVk8Y3E9FpmJO9VZfRaEvp85wWK2QER8zyLNboekIBUIgHGgvmlh3vO0GDsgl/MBEK7/E+blzRA0HBFA+N7FSCcSL2CnK/OgmYOp33wGcB2elImAfbLoYxYyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vsVQp8ce; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ngxBG/bIsZr8BWoqUSJWfqlx+hcMMjTRBj5upmUnUxg=; b=vsVQp8ceCVF/O5bAaR/NpJT9E2
+	X7vN8PsIt+9x/gfvT7v77+LZUHkE1C+lY3+LnXpiIF+SF8shQwu+JoZS/om34rUgdRcaxOKocIk7U
+	pV3Wa6xzHL+WUaI+V3T0G1r5Tb5vV8aMdkri8eh8iA/KJ/HKFqckswbD3jV4Ok5Cp31E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sK2nQ-000VjL-9b; Wed, 19 Jun 2024 23:24:48 +0200
+Date: Wed, 19 Jun 2024 23:24:48 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Vinod Koul <vkoul@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, kuba@kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Aaron Conole <aconole@redhat.com>
-Subject: Re: [PATCH net-next 3/3] openvswitch: set IPS_CONFIRMED in tmpl
- status only when commit is set in conntrack
-Message-ID: <20240619212030.GB1513@breakpoint.cc>
-References: <d35d01d9-83de-4862-85a7-574a6c4dc8f5@ovn.org>
- <e90b291a-0e19-4b80-9738-5b769fcdcdfd@ovn.org>
- <CADvbK_f9=smg+C7M3dWWj9nvv7Z7_jCLn=6m0OLhmF_V0AEFsg@mail.gmail.com>
- <5a9886fd-cdd7-4aa2-880f-5664288d5f25@ovn.org>
- <619f9212-fa90-44d2-9951-800523413c8d@ovn.org>
- <CADvbK_cFvGT--MVJQ=tGa4bugJ5MeeVbbTqJwNw-Aa0Tf8ppiA@mail.gmail.com>
- <e42d36d5-1395-4276-a3ed-5b914bb9d9d0@ovn.org>
- <CADvbK_dWpZd6RyqRdiHvWP9SrG1Otfi4h5Ae=yhErLc+DhLkaw@mail.gmail.com>
- <20240619201959.GA1513@breakpoint.cc>
- <CADvbK_dAB3iHmM=nkbxGJca2c_1J-NK3R4241b3RAvV8Q9Q+QQ@mail.gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH net-next 4/8] net: phy: aquantia: add support for aqr115c
+Message-ID: <b0b03680-9842-49ce-badd-5f9826fdc3fa@lunn.ch>
+References: <20240619184550.34524-1-brgl@bgdev.pl>
+ <20240619184550.34524-5-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,31 +70,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CADvbK_dAB3iHmM=nkbxGJca2c_1J-NK3R4241b3RAvV8Q9Q+QQ@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20240619184550.34524-5-brgl@bgdev.pl>
 
-Xin Long <lucien.xin@gmail.com> wrote:
-> Got it, I will fix this in ovs.
+>  	case MDIO_PHYXS_VEND_IF_STATUS_TYPE_OCSGMII:
+> -		phydev->interface = PHY_INTERFACE_MODE_2500BASEX;
+> +		phydev->interface = PHY_INTERFACE_MODE_OCSGMII;
+>  		break;
 
-Thanks!
+O.K. Given Russells reply, what happens if you skip this hunk, don't
+add PHY_INTERFACE_MODE_OCSGMII but use PHY_INTERFACE_MODE_2500BASEX,
+and change the MAC driver as needed. Given this here, it seems likely
+somebody else is using MDIO_PHYXS_VEND_IF_STATUS_TYPE_OCSGMII as
+PHY_INTERFACE_MODE_2500BASEX, so i expect it will work.
 
-I don't want to throw more work at you, but since you are
-already working on ovs+conntrack:
+Adding PHY_INTERFACE_MODE_OCSGMII is a UAPI addition, since it becomes
+possible to pass it in phy-mode in DT. That means, it is hard to
+remove later, if Russell ever finds the time to finish his patches,
+and PHY_INTERFACE_MODE_OCSGMII is not needed. So if we can avoid
+adding it, we should.
 
-ovs_ct_init() is bad, as this runs unconditionally.
-
-modprobe openvswitch -> conntrack becomes active in all
-existing and future namespaces.
-
-Conntrack is slow, we should avoid this behaviour.
-
-ovs_ct_limit_init() should be called only when the feature is
-configured (the problematic call is nf_conncount_init, as that
-turns on connection tracking, the kmalloc etc is fine).
-
-Likewise, nf_connlabels_get() should only be called when
-labels are added/configured, not at the start.
-
-I resolved this for tc in 70f06c115bcc but it seems i never
-got around to fix it for ovs.
+       Andrew
 
