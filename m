@@ -1,153 +1,168 @@
-Return-Path: <netdev+bounces-104876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B42290EE69
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 15:28:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A531790EE78
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 15:29:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DF771F21837
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 13:28:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE5831C24AA0
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 13:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B58C14B963;
-	Wed, 19 Jun 2024 13:28:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7CFB14B967;
+	Wed, 19 Jun 2024 13:28:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="a2Zw825w";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="a2Zw825w"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="n6rxkgXi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5276A14373E;
-	Wed, 19 Jun 2024 13:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F45146016;
+	Wed, 19 Jun 2024 13:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718803704; cv=none; b=TCOTIDAoMvp8CfAjO6JNhhYgZkB0xeu1jAxF7ny20FEuPChYEQMmJUsc2+SpUsOSRUhS0ymQhg7NB8P85zFBYJmxhNX7fufL1rp0wyhwaMcW13HLmZmlrfmU5Jfk0dxiy/ZSEBj2JGKk9giMa2OqdajAeIHSXK0n58Qdrxntcoo=
+	t=1718803729; cv=none; b=SX8ufe3bZN8cE8LGkO2jDNoo1HnnBBcR5gV2L5jVZoeJv46HPopZfqybqRoMujF5nZSzxAhwSmKmxloxZA84a9e7cxHskeJh7DXqmVO2YAeLBRnL/bLTEjZaHx5j9EV90lOMr/Nu2DM0GKktfswhPCPPK+qFqSI36WvwOQVLLlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718803704; c=relaxed/simple;
-	bh=23ifTE2BbLszVOYk+nDmzGkUuLpyFuSdy9xfyKOZ0kM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KWn3OP656yBiKcMRPD9XncQ8Tul6tKHyzV9Dm4q4rX6UVV/XTy7M4wdU6x8E7unG05lSUL6fI88iD+F+gGNrpV9MXzqzMJ805uYMth38++s9sHyUm7W1ggkp8hgQtfa5O65z5fabP+8SCt1rf1nrYjS8dHIRhcK6JFW93d8oA5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=a2Zw825w; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=a2Zw825w; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 4FE9821AB5;
-	Wed, 19 Jun 2024 13:28:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1718803700; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=4JsY+EPtMaRXfnzJxvSEnU0R09HA9SC8CtDxtOIu5Dg=;
-	b=a2Zw825wwynfuNcrk2V0Q4dBCa1m8mr0kGF06U6s72kCaNa5CyA5IVW9NeYl1rbq/sIjvV
-	LN7knV0tstiTjhQZ1wV8VRMduQwEjbMMTvw+xvp6zLBVnLdDnYbx1jIOljdByYw+CvSrcn
-	Blzo8qwN3VlUML6AlfI2R3mMAajBAYE=
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.com header.s=susede1 header.b=a2Zw825w
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1718803700; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=4JsY+EPtMaRXfnzJxvSEnU0R09HA9SC8CtDxtOIu5Dg=;
-	b=a2Zw825wwynfuNcrk2V0Q4dBCa1m8mr0kGF06U6s72kCaNa5CyA5IVW9NeYl1rbq/sIjvV
-	LN7knV0tstiTjhQZ1wV8VRMduQwEjbMMTvw+xvp6zLBVnLdDnYbx1jIOljdByYw+CvSrcn
-	Blzo8qwN3VlUML6AlfI2R3mMAajBAYE=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D75CE13ABD;
-	Wed, 19 Jun 2024 13:28:19 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 98Q2MvPccmZ4egAAD6G6ig
-	(envelope-from <oneukum@suse.com>); Wed, 19 Jun 2024 13:28:19 +0000
-From: Oliver Neukum <oneukum@suse.com>
-To: petkan@nucleusys.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Oliver Neukum <oneukum@suse.com>,
-	syzbot+5186630949e3c55f0799@syzkaller.appspotmail.com
-Subject: [PATCH net] net: usb: rtl8150 fix unintiatilzed variables in rtl8150_get_link_ksettings
-Date: Wed, 19 Jun 2024 15:28:03 +0200
-Message-ID: <20240619132816.11526-1-oneukum@suse.com>
-X-Mailer: git-send-email 2.45.1
+	s=arc-20240116; t=1718803729; c=relaxed/simple;
+	bh=IbU9H+DWKuJetppSWilqM1RixdWQASTCpKWygS68koc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gl8VyiaViVhDQ0Pbq0/7AbQPAl1vdYz6jAAdjwjcHbTLXy1GxNm/61fg8iTAIUtpsjp7CBrT2b7a1dXHjgEwi96hh+RxgKILqZtn5S6/9N61YzpEzjzerTsnUfTvM/BQULz2Vl5g7LxxLU1wGzDSKwWApZJlGBi7LGKw2WZmMpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=n6rxkgXi; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45J1tRoI009538;
+	Wed, 19 Jun 2024 13:28:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type
+	:content-transfer-encoding; s=corp-2023-11-20; bh=XqDJjEiAlVyJHw
+	kCLkG1pOnpC+qIkFOEq7vg5dbf2KI=; b=n6rxkgXipv/rLIUTrS8e7bxvz+rc51
+	rIUx/H0BEsaMOGOtFI3AtT77IC4h2lsf8xOf75Kk4AMvB+pZJy2wbWTa8P60Gm9e
+	Stu1m6PVndUSLvqeVsMsMOrZJDmWM2I+gKbo3cTSGix2C9HCAiCAmRsKcfGfOTDY
+	QrgAf4Y8RCilShs02Y9ul70/h4bVFoyElTjb+hLwIxnDTDgcUrWfwqgBVqIe6vI1
+	QgHI4vieJ3M0UOcyTw33ToucxAQleTb5V6Z8/LgqLZGPtK5e/veVHlSKyhhLlMPq
+	mP68KNYYuKhc/aDLqJktPIEju18vlKcIJ6yRh9GD60bbtQILChWwgaCA==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3yuja0h8ux-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 19 Jun 2024 13:28:35 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 45JCPXv7034789;
+	Wed, 19 Jun 2024 13:28:35 GMT
+Received: from aakhoje-ol.in.oracle.com (dhcp-10-191-198-68.vpn.oracle.com [10.191.198.68])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3ys1d9jejw-1;
+	Wed, 19 Jun 2024 13:28:34 +0000
+From: Anand Khoje <anand.a.khoje@oracle.com>
+To: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Cc: saeedm@mellanox.com, leon@kernel.org, tariqt@nvidia.com,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        davem@davemloft.net
+Subject: [PATCH v4] net/mlx5: Reclaim max 50K pages at once
+Date: Wed, 19 Jun 2024 18:58:27 +0530
+Message-ID: <20240619132827.51306-1-anand.a.khoje@oracle.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.49 / 50.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	DWL_DNSWL_LOW(-1.00)[suse.com:dkim];
-	MID_CONTAINS_FROM(1.00)[];
-	BAYES_HAM(-0.98)[86.98%];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[5186630949e3c55f0799];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.com:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
-X-Spamd-Bar: /
-X-Rspamd-Queue-Id: 4FE9821AB5
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -0.49
-X-Spam-Level: 
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-19_02,2024-06-19_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=0
+ malwarescore=0 phishscore=0 spamscore=0 mlxscore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2406190101
+X-Proofpoint-ORIG-GUID: 5eObyzq1y0ZJDWpVf6dAqeL73j464ly0
+X-Proofpoint-GUID: 5eObyzq1y0ZJDWpVf6dAqeL73j464ly0
 
-This functions retrieves values by passing a pointer. As the function
-that retrieves them can fail before touching the pointers, the variables
-must be initialized.
+In non FLR context, at times CX-5 requests release of ~8 million FW pages.
+This needs humongous number of cmd mailboxes, which to be released once
+the pages are reclaimed. Release of humongous number of cmd mailboxes is
+consuming cpu time running into many seconds. Which with non preemptible
+kernels is leading to critical process starving on that cpu’s RQ.
+To alleviate this, this change restricts the total number of pages
+a worker will try to reclaim maximum 50K pages in one go.
+The limit 50K is aligned with the current firmware capacity/limit of
+releasing 50K pages at once per MLX5_CMD_OP_MANAGE_PAGES + MLX5_PAGES_TAKE
+device command.
 
-Reported-by: syzbot+5186630949e3c55f0799@syzkaller.appspotmail.com
-Signed-off-by: Oliver Neukum <oneukum@suse.com>
+Our tests have shown significant benefit of this change in terms of
+time consumed by dma_pool_free().
+During a test where an event was raised by HCA
+to release 1.3 Million pages, following observations were made:
+
+- Without this change:
+Number of mailbox messages allocated was around 20K, to accommodate
+the DMA addresses of 1.3 million pages.
+The average time spent by dma_pool_free() to free the DMA pool is between
+16 usec to 32 usec.
+           value  ------------- Distribution ------------- count
+             256 |                                         0
+             512 |@                                        287
+            1024 |@@@                                      1332
+            2048 |@                                        656
+            4096 |@@@@@                                    2599
+            8192 |@@@@@@@@@@                               4755
+           16384 |@@@@@@@@@@@@@@@                          7545
+           32768 |@@@@@                                    2501
+           65536 |                                         0
+
+- With this change:
+Number of mailbox messages allocated was around 800; this was to
+accommodate DMA addresses of only 50K pages.
+The average time spent by dma_pool_free() to free the DMA pool in this case
+lies between 1 usec to 2 usec.
+           value  ------------- Distribution ------------- count
+             256 |                                         0
+             512 |@@@@@@@@@@@@@@@@@@                       346
+            1024 |@@@@@@@@@@@@@@@@@@@@@@                   435
+            2048 |                                         0
+            4096 |                                         0
+            8192 |                                         1
+           16384 |                                         0
+
+Signed-off-by: Anand Khoje <anand.a.khoje@oracle.com>
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/net/usb/rtl8150.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Changes in v4:
+  - Fixed a nit in patch subject.
+---
+ drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
-index 97afd7335d86..01a3b2417a54 100644
---- a/drivers/net/usb/rtl8150.c
-+++ b/drivers/net/usb/rtl8150.c
-@@ -778,7 +778,8 @@ static int rtl8150_get_link_ksettings(struct net_device *netdev,
- 				      struct ethtool_link_ksettings *ecmd)
- {
- 	rtl8150_t *dev = netdev_priv(netdev);
--	short lpa, bmcr;
-+	short lpa = 0;
-+	short bmcr = 0;
- 	u32 supported;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
+index dcf58ef..06eee3a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
+@@ -608,6 +608,7 @@ enum {
+ 	RELEASE_ALL_PAGES_MASK = 0x4000,
+ };
  
- 	supported = (SUPPORTED_10baseT_Half |
++#define MAX_RECLAIM_NPAGES -50000
+ static int req_pages_handler(struct notifier_block *nb,
+ 			     unsigned long type, void *data)
+ {
+@@ -639,9 +640,13 @@ static int req_pages_handler(struct notifier_block *nb,
+ 
+ 	req->dev = dev;
+ 	req->func_id = func_id;
+-	req->npages = npages;
+ 	req->ec_function = ec_function;
+ 	req->release_all = release_all;
++	if (npages < MAX_RECLAIM_NPAGES)
++		req->npages = MAX_RECLAIM_NPAGES;
++	else
++		req->npages = npages;
++
+ 	INIT_WORK(&req->work, pages_work_handler);
+ 	queue_work(dev->priv.pg_wq, &req->work);
+ 	return NOTIFY_OK;
 -- 
-2.45.1
+1.8.3.1
 
 
