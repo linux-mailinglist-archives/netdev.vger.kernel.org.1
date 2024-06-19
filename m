@@ -1,125 +1,202 @@
-Return-Path: <netdev+bounces-104936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2407590F396
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 18:04:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B98790F3AC
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 18:07:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B273328152E
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:04:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3C8B1C22129
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:07:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE021514C6;
-	Wed, 19 Jun 2024 15:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A7A31514ED;
+	Wed, 19 Jun 2024 16:05:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="faxPgzzD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jq1Qxr6x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D437111AA;
-	Wed, 19 Jun 2024 15:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438D414F9FD
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 16:05:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718812775; cv=none; b=neA/EhzOGqlWEgO1IZ25Ll9bmNasjTEv0Txb0bANyUgBljgrtMIlRvkT8Ffbw20XPBkCdeR0bn6LgeADMkrfJSTrW9ErbjWclE2iWb9n9clgJjP3ZVsu3tj+APVcNt8upVP4AyaKZFdmzMuAhvFgpKGiXeubgxKR/wyvIEuTuiI=
+	t=1718813103; cv=none; b=S03OFgdEerYrcXgL94jPMyrRH8E32dbfoMUtTtrBOPYwgfQ50jRFvUM7Ag3W5LAFZ8t56g6DhJvmmxuZghYgBEhICJ8Rn6E8L+doyuImNQSGWGgQc8+jmrNlRTayPpmIt06mZkqXriwK0HomdWYRKVinq8kd5hjgGm0RTKzxXXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718812775; c=relaxed/simple;
-	bh=wxs+ur9+J8MZZSzMQc5JdvlOGOmrAYK2wljAKjbMBfA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ivJIBDck7O6kaKHEO4K50ZKPljdDU+7JRNRrAjrTiO9VtOgHXJcVA6rKWYgrA19tlDPj8GBk9VVfuaRxRQZmqIVUZ2ROepbZucxGuxhQ+3tRTAA9Fr3kPc5xNwwp804lrmMA3fMkOdNa3IlojO0dQkr1G4Ux/UDkLB1DcMa4w3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=faxPgzzD; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-57d1679ee6eso796265a12.1;
-        Wed, 19 Jun 2024 08:59:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718812772; x=1719417572; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wxs+ur9+J8MZZSzMQc5JdvlOGOmrAYK2wljAKjbMBfA=;
-        b=faxPgzzDfEnlE3m8+hPAQH8Sl+W8N0nUgY9bY5stUoz7OYKeKV7W6014zXOAm/hkVv
-         RIbjSyFKRJcZy+7hRwRjQgVm0PWjbLUGxOzw85cZCOnZgYkj2REfoXzg2sX18NOOzY8B
-         pNyfDVlizOuZuvJgdiWb2eZ+qZppJE4e/jbCPWfeS17/FNdpmp+ZOgAl1lqjbpOZwfpF
-         7ZKcJf+amogmZssUCgHHUHet/FFFnSvEdbtSRmK5Tu3W5hjTbyjX7onL8cDvzTHeNrd9
-         VA0/fZhWkXvvKJlocfrALnre0TpCcbKjvzOEipn6//VNSuBPXU/udIFXebd9tuU3ZlaA
-         DQrw==
+	s=arc-20240116; t=1718813103; c=relaxed/simple;
+	bh=Zk8KBM+kAiD+53BnHbeYt1t9uy6ihq6v5ohcl+/8Gdk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZRjTpU/3oiintgp4+/ILE64lUHqiceOagub+FJ/TmNYMlV82YwTVFFG2iqW1WakxCfZjH+RS1HJ0Vip/ezk3tf9T9nKKkGoyMZ3dzL2yGqeo1G4hlfvwYTn3FS5v4BsfJc3QBnVbhVkpFQaj2+fFDRINiat/83Y1zCtjcYtXp9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jq1Qxr6x; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718813100;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6qMRpfuI0FN17k1qQZ97/BIgCWj0BU7d5gGDLL6iE0E=;
+	b=Jq1Qxr6x890ioy8Q+bCJQ541OP1UllCeZItOZe0st1AV4TYbYJQ1XwwXu0tiiWWriywlNx
+	J0nk0/J9NdUkO9qy2mpuJ5Yx0WKDkxeTfMapC9wgHntmWRZBe6VjJP8G+cpkKklXHTd/ZG
+	JUauBi5rtaYAteBl0RbFO714b5h1VY0=
+Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
+ [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-472-sGohUfvKNOGPFEs5a-5P2A-1; Wed, 19 Jun 2024 12:04:59 -0400
+X-MC-Unique: sGohUfvKNOGPFEs5a-5P2A-1
+Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-63bf1d3fb2dso1248177b3.1
+        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 09:04:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718812772; x=1719417572;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wxs+ur9+J8MZZSzMQc5JdvlOGOmrAYK2wljAKjbMBfA=;
-        b=cYTtULUmRH156yqLtraCUzu6tAXCtd+4SisJAW0eqONWi5KtLaiMyYF593fJxgfH58
-         WOKgLWfMB5emsRVHIgK9beyiDDrMtLicohIkigCMVlcPBR936PsRDlZuiMjmTECYG9nN
-         xaFTYvwcLKg3yhBlwE9uo2HdKM3PikJ321tvjxHa77Za063TeNcGSYDqZM6aNBVED1K4
-         isiwKlYBJIZYfkl42Vztw/98KSsKxKRfVnW714j+ed2WDU+R0agwJeFdaO2AIQ+774XV
-         1JuF00dvpfo2fCDKW4fORhexN+7YnaMT3eQ9UAjOw5LnaE4JbJp2cDOzzmvveN1MTtnq
-         8IvA==
-X-Forwarded-Encrypted: i=1; AJvYcCUNDHU3iJ1q6Qik/aKdZJPrLQgoSqoauozh3g7i58FycsjSVRGjbsx+n9dfzRnSsi/30pvy6wlbMkpHPseTD8G4iu24EgaLE8EGK8pD+dAqFsGp46nclA8+beZ4FHrZ0TAMofcw
-X-Gm-Message-State: AOJu0YwyVumzaXvPetpdPrE7jTWtQH9QsdZq9W7bDr5ZS//KPzUonRJM
-	FBKu8ebITlmTgrn9nM9ctxinvdVf6jfjpAigCS8u1Bl+qFVekjWG
-X-Google-Smtp-Source: AGHT+IFwiQl8gIU3T1jvSVIO0jUG+gbHoSBIa5n8WNL5c8DtlDKdIO8yoYHXyE6rnmwc0Yc+Q3YIUA==
-X-Received: by 2002:a17:906:4903:b0:a6e:ab8b:aff4 with SMTP id a640c23a62f3a-a6f94e1f998mr356843066b.13.1718812771445;
-        Wed, 19 Jun 2024 08:59:31 -0700 (PDT)
-Received: from skbuf ([188.25.55.166])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56fa6a1esm675359166b.216.2024.06.19.08.59.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jun 2024 08:59:30 -0700 (PDT)
-Date: Wed, 19 Jun 2024 18:59:28 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	Casper Andersson <casper.casan@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH v2 net-next] net: dsa: Allow only up to two HSR HW
- offloaded ports for KSZ9477
-Message-ID: <20240619155928.wmivi4lckjq54t3w@skbuf>
-References: <20240619134248.1228443-1-lukma@denx.de>
- <20240619134248.1228443-1-lukma@denx.de>
- <20240619144243.cp6ceembrxs27tfc@skbuf>
- <20240619171057.766c657b@wsk>
- <20240619154814.dvjcry7ahvtznfxb@skbuf>
+        d=1e100.net; s=20230601; t=1718813098; x=1719417898;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6qMRpfuI0FN17k1qQZ97/BIgCWj0BU7d5gGDLL6iE0E=;
+        b=bJU2tqvdt7WBB12d6NOX8T68XC1ScPr/5tXBvMrCrAoQHWZorGpnz1+Gfm4YrFAkF/
+         Yc/2dSvBNmHNPFftEhRnUkZlMvyu8zhRcAv3xt3GNP0bdUv83cyl7ZcbuwrLbJ1Z4JIF
+         s7uvZJrpKLVV+RbHMyInUlzOLE+EK09qt7tsS76YdB4GZpQotNamCATjBLYHJiJK7d+6
+         ZrriADcaAO6MiexDFdCEf+M9gUPEbCre6TRZ2gK2nPC323yj/GOA0kjaRiLvvH3uGREW
+         1LfyoruxrrO8ENS5vHl7t35JPxEk0GPjWbMWkRcOKTdjp/qsOJZDopIQfn25lm3gI4OS
+         lSCA==
+X-Forwarded-Encrypted: i=1; AJvYcCXDHQoaxaZnME3JA4GubaI3bMFMfzsVfgbltfPH9g+DwBBzIQwL0maMXMz6aj1pTrb/1qk4qXFovWXa1YhiJgiOx9Y5AGIM
+X-Gm-Message-State: AOJu0YyYrFXQ+A4bImz4W3301MS6ODW8lESqsIG5NnyCRzSycKRDrUQB
+	lc1ykayuW4ywwZO934zwJqOGBn57IYbkUUYjP3KcK5GcOSnkxQZazuU+tEu76d0BUMcDMg8yaMz
+	j0IZshB3Y/TU+f6CTQHOId01wzshJI07sbmZYOkuE7LAtfdBn5Be8w8QGmnDpx7pax1wGBcusPL
+	HrWD0rGE5DYFJFIPOe4kQzqlyv3Lrl
+X-Received: by 2002:a0d:c3c3:0:b0:618:2381:2404 with SMTP id 00721157ae682-63a8ffca0cdmr31982897b3.44.1718813098379;
+        Wed, 19 Jun 2024 09:04:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGOi0Bbuup1rjSY4QNqBeZr45d0/SLJoglpZcqMwzRQ4d442scS4ePsVvRRAEIzgBBpB2IayrTUCHF5plE2VAk=
+X-Received: by 2002:a0d:c3c3:0:b0:618:2381:2404 with SMTP id
+ 00721157ae682-63a8ffca0cdmr31982517b3.44.1718813098007; Wed, 19 Jun 2024
+ 09:04:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240619154814.dvjcry7ahvtznfxb@skbuf>
+References: <20240617-stage-vdpa-vq-precreate-v1-0-8c0483f0ca2a@nvidia.com> <20240617-stage-vdpa-vq-precreate-v1-21-8c0483f0ca2a@nvidia.com>
+In-Reply-To: <20240617-stage-vdpa-vq-precreate-v1-21-8c0483f0ca2a@nvidia.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Wed, 19 Jun 2024 18:04:21 +0200
+Message-ID: <CAJaqyWc75+ccqXUPa4GfwZsbCp+4Q49Vw6Vnsu+n1BXDdLi5Dw@mail.gmail.com>
+Subject: Re: [PATCH vhost 21/23] vdpa/mlx5: Re-create HW VQs under certain conditions
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Si-Wei Liu <si-wei.liu@oracle.com>, 
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
+	Cosmin Ratiu <cratiu@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 19, 2024 at 06:48:14PM +0300, Vladimir Oltean wrote:
-> Granted, this isn't an actual functional problem, but given that you
-> are fixing a newly developed feature for net-next, and that this is API
-> that gets progressively harder to change as more devices implement
-> offloads, I would expect a more obvious signaling mechanism to exist
-> for this, and now seems a good time to do it, rather than opting for the
-> most minimal fix.
+On Mon, Jun 17, 2024 at 5:09=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+> There are a few conditions under which the hardware VQs need a full
+> teardown and setup:
+>
+> - VQ size changed to something else than default value. Hardware VQ size
+>   modification is not supported.
+>
+> - User turns off certain device features: mergeable buffers, checksum
+>   virtio 1.0 compliance. In these cases, the TIR and RQT need to be
+>   re-created.
+>
+> Add a needs_teardown configuration variable and set it when detecting
+> the above scenarios. On next DRIVER_OK, the resources will be torn down
+> first.
+>
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
 
-Actually I'm not even so sure about this basic fact, that it isn't a
-functional problem already.
+Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 
-xrs700x_hsr_join() has explicit checks for port 1 and 2. Obviously it
-expects those ports to be ring ports.
+> ---
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c | 15 +++++++++++++++
+>  drivers/vdpa/mlx5/net/mlx5_vnet.h |  1 +
+>  2 files changed, 16 insertions(+)
+>
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/ml=
+x5_vnet.c
+> index b2836fd3d1dd..d80d6b47da61 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> @@ -2390,6 +2390,7 @@ static void mlx5_vdpa_set_vq_num(struct vdpa_device=
+ *vdev, u16 idx, u32 num)
+>          }
+>
+>         mvq =3D &ndev->vqs[idx];
+> +       ndev->needs_teardown =3D num !=3D mvq->num_ent;
+>         mvq->num_ent =3D num;
+>  }
+>
+> @@ -2800,6 +2801,7 @@ static int mlx5_vdpa_set_driver_features(struct vdp=
+a_device *vdev, u64 features)
+>         struct mlx5_vdpa_dev *mvdev =3D to_mvdev(vdev);
+>         struct mlx5_vdpa_net *ndev =3D to_mlx5_vdpa_ndev(mvdev);
+>         u64 old_features =3D mvdev->actual_features;
+> +       u64 diff_features;
+>         int err;
+>
+>         print_features(mvdev, features, true);
+> @@ -2822,6 +2824,14 @@ static int mlx5_vdpa_set_driver_features(struct vd=
+pa_device *vdev, u64 features)
+>                 }
+>         }
+>
+> +       /* When below features diverge from initial device features, VQs =
+need a full teardown. */
+> +#define NEEDS_TEARDOWN_MASK (BIT_ULL(VIRTIO_NET_F_MRG_RXBUF) | \
+> +                            BIT_ULL(VIRTIO_NET_F_CSUM) | \
+> +                            BIT_ULL(VIRTIO_F_VERSION_1))
+> +
+> +       diff_features =3D mvdev->mlx_features ^ mvdev->actual_features;
+> +       ndev->needs_teardown =3D !!(diff_features & NEEDS_TEARDOWN_MASK);
+> +
+>         update_cvq_info(mvdev);
+>         return err;
+>  }
+> @@ -3038,6 +3048,7 @@ static void teardown_vq_resources(struct mlx5_vdpa_=
+net *ndev)
+>         destroy_rqt(ndev);
+>         teardown_virtqueues(ndev);
+>         ndev->setup =3D false;
+> +       ndev->needs_teardown =3D false;
+>  }
+>
+>  static int setup_cvq_vring(struct mlx5_vdpa_dev *mvdev)
+> @@ -3078,6 +3089,10 @@ static void mlx5_vdpa_set_status(struct vdpa_devic=
+e *vdev, u8 status)
+>                                 goto err_setup;
+>                         }
+>                         register_link_notifier(ndev);
+> +
+> +                       if (ndev->needs_teardown)
+> +                               teardown_vq_resources(ndev);
+> +
+>                         if (ndev->setup) {
+>                                 err =3D resume_vqs(ndev);
+>                                 if (err) {
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.h b/drivers/vdpa/mlx5/net/ml=
+x5_vnet.h
+> index 2ada29767cc5..da7318f82d2a 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.h
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.h
+> @@ -56,6 +56,7 @@ struct mlx5_vdpa_net {
+>         struct dentry *rx_dent;
+>         struct dentry *rx_table_dent;
+>         bool setup;
+> +       bool needs_teardown;
+>         u32 cur_num_vqs;
+>         u32 rqt_size;
+>         u16 default_queue_size;
+>
+> --
+> 2.45.1
+>
 
-But if you configure from user space ports 0 and 1 to be ring ports,
-and port 2 to be an interlink port, the kernel will accept that
-configuration. It will return -EOPNOTSUPP for port 0, falling back to
-software mode for the first ring port, then accept offload for ring
-ports 1 and 2. But it doesn't match what user space requested, because
-port 2 should be interlink...
-
-I think you really should pass the port type down to drivers and reject
-offloading interlink ports...
 
