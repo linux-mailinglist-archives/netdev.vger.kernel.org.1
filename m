@@ -1,159 +1,213 @@
-Return-Path: <netdev+bounces-105003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA03690F6C9
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 21:15:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45CD190F697
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 20:59:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 768671F21563
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 19:15:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 283C81C2419D
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 18:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EBD4158A08;
-	Wed, 19 Jun 2024 19:15:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1360915886C;
+	Wed, 19 Jun 2024 18:59:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Cd0+vLiX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L5dLTt8O"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED3D353398;
-	Wed, 19 Jun 2024 19:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2913F15746A;
+	Wed, 19 Jun 2024 18:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718824514; cv=none; b=tswks0PsKuQZ31kfoppyX200qCppZMnLhvLftcs4AjCBp2TX41GhT20BGXXDCJvWECRByx2s94T2aNdkrxV1OCOp/v/KjDNyI1T23CxJYYj8iW5A7EDQl/+xE9PpLQOy7lOMF+HnS2utYpsb0vIeRKMi5FBd5nGgu4QestIb1+8=
+	t=1718823579; cv=none; b=hXy3EhIpi4an/DUdR8jTJJiyEOo0gXcV8KyZXsQBuhmtdelgGo0pg0vhRk/osAcoR2OAQsadF0ZoGjauG51W1yQLuKseklXUCARoPT5kUOob+43+TA0GOuyxSrD+IQn4+wmhu83DkRkHKDV5snr5kWI/sqWAD412pcLZ0WxyJso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718824514; c=relaxed/simple;
-	bh=i1O+8SuJRlMo4HLcHbCW/vbpdUEkEZ114ilGvFd19Ic=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RZ5GnmGTrhymODJgW2IZlC7b8sYXigAs8QVl6tOptr4sbyN6FJTcB7iGhauvYy2BInYli7U2PJhEC/Be2VUDJ402nVYV5xBuD9knodiTSdDwx6pUSQAIkfgIC2VzeBBFbwMpIliqmcO9k5xNlk7IW9LktBv173ZYTBkDVIALRUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Cd0+vLiX; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 5B74C80E9A;
-	Wed, 19 Jun 2024 21:15:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1718824509;
-	bh=2sBQZJl5GOkXP3lCyMuq4jH0kmltgWo/xNkz+SDOjYI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Cd0+vLiXuXd7IoP6GMpUo+GrIyTzbVea4Xu335PLbu6D/Yc6LFvWzly2fNYHc2m7H
-	 Yjm4LrPiwU9KJS83HZrpsHUmgj3lqqh2NXA5snyQ1JjTP5n25zXtJ5EocpLmiVIThs
-	 eq5FKj01f6LceN/HxDjcERepanO7x6UHBgxsAx3R3Klda7ISxU3p1/IOqY/Qmf3Kv7
-	 I+9sMR+27WkqjXBz/iogHaDdF7kJscPA2KOoa/tQE+LPe9N3gLDuccEFce9BMB739+
-	 0IolR48QcLxw5NVvYI4vq70puRptIKievYIdjcqTARywnZFdy5chlQjqSf7okigfay
-	 CTMqyLUAZYn5A==
-Message-ID: <b760c6ba-36aa-4486-891a-c40a8cac7c1b@denx.de>
-Date: Wed, 19 Jun 2024 20:56:40 +0200
+	s=arc-20240116; t=1718823579; c=relaxed/simple;
+	bh=AbDCZR6rtnoVh3Q+LWHr4xNPU33oG6JRD0p+ibkqUTw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DKEZ6bcCp3RaVGc+avtq4j7/UsXmuHbs5xEE2Si6t3lOQQ74w/d12/6vvkLorsKqCw/h5H+JQqce9q44wzoHs58A9+JJ7dxS/AW4shN2B+qIGsAA8OvXNHgo6U6B5LNs9AneZnaeLebTxKcyLshN2PGXbGX4IEKPrW/Si1Lnsx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L5dLTt8O; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2e95a75a90eso690141fa.2;
+        Wed, 19 Jun 2024 11:59:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718823576; x=1719428376; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZenQCaH+ZdCQPpWoM19NHpqEacZDxEuvdit/MjorSCI=;
+        b=L5dLTt8OMpfdQiO8gop/jHjbqtUXVZDBH5pG+b5uRrYuYDlo3ZThleSwoCMdNiRZzI
+         KKqLDTjRUNYPipCiuVZwKXOAdDmfYD+4L2Mw/vl868M0OF0KVzntUajTJDPVpLYXx6Uy
+         8TX0/qGtYz0hMlBziVV+iK87ctFaCcWtdeypLZDJX/pEthhvc39dGZjcvpjgihp+l6QP
+         0uVhE2VJeljr81ZiFQIVmqnj+xwYLgnjMwVglsZzwVsQ+W+1xveEENhz2qu5wu4kXMdz
+         Pi6o8cNTVNpiVAZTe7wWPDQFodb59cpzmq9ZYDCd4JcjpLc/MbAYMxP8v6O8qNMfZVJG
+         G99g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718823576; x=1719428376;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZenQCaH+ZdCQPpWoM19NHpqEacZDxEuvdit/MjorSCI=;
+        b=QQF6IUn2aG2iOtAuDIqDEg66u3ihUHvPfq8Q6IhmFeKxiBirex3+H3XXPbyJ6VX+Wz
+         p8SCEaOZu3h1KAqUUJydwJIT9vgExyx/pXlGFHFd3NbKTDRrR6sixeZWLvLn1GkQPjR7
+         sqDfL/Zr6pgssQbjg5hRPqfSTxHK/bXhbPYM/LO4YjedYKeZbz6T07cG4F9KfwrspCCk
+         nNmIkP2tM88UE5kQzAaS1xen8N6KYetUsqGbLG+k25VniU0UnZsfOKpKgmfrmJlQXk8H
+         b98eoK3dhNvNBwIatI5ocfdyTGbFyys1x5XI8g4/5+dWyxdUKiOZ0CKDEq83CQeNsQEj
+         hEbA==
+X-Forwarded-Encrypted: i=1; AJvYcCWjzH0Nb88eWzy+/x8UFBqQekZOqn6AmK2kKq7o8wnnXWTvg3f7rL95h9EN9Vs08M27BOVke7R5TedzVKZPO9GpFkbdZYKDnEIsR1H3oO9g+EJ6L8w8YKl2gm3yVyCRmAuG5OURov1HSnB6h9D9uiRQ8rFWoN0J44hQM5K5gwWMoWoODVaiR1hdC2iA6ldbyL4YNL60RanTXTPF9SEfFxXuwg==
+X-Gm-Message-State: AOJu0Ywdx+NRwjT3GcwPRq9scf98FkiARMYbnTEAqQkUQE6jyVKELtp/
+	8tIbGlFwzvCEtxi8QXRBBYZZ2NaTd60trJ5GAjb7m2YP5Ahkfvtu7RAUIfc0Z/wOk2qqiMmLHsu
+	aBnrVjPobLr5Z2NUNOh5KEmFGNbrx+cu/
+X-Google-Smtp-Source: AGHT+IGoHkVG4a4nmBiilF1j+3f6y8TethA+TK0xS0ef6S14rvGX0+Quf84zWgVHRtxJEOPdCpZRjTkzuZNWpcTihEo=
+X-Received: by 2002:a2e:989a:0:b0:2ec:21cc:ca6f with SMTP id
+ 38308e7fff4ca-2ec3ce94139mr19700521fa.17.1718823576005; Wed, 19 Jun 2024
+ 11:59:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,PATCH 2/2] net: stmmac: dwmac-stm32: stm32: add
- management of stm32mp25 for stm32
-To: Christophe ROULLIER <christophe.roullier@foss.st.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Richard Cochran <richardcochran@gmail.com>, Jose Abreu
- <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20240614130812.72425-1-christophe.roullier@foss.st.com>
- <20240614130812.72425-3-christophe.roullier@foss.st.com>
- <4c2f1bac-4957-4814-bf62-816340bd9ff6@denx.de>
- <09010b02-fb55-4c4b-9d0c-36bd0b370dc8@foss.st.com>
- <39d35f6d-4f82-43af-883b-a574b8a67a1a@denx.de>
- <8c3f1696-d67c-4960-ad3a-90461c896aa5@foss.st.com>
- <3dee3c8a-12f0-42bd-acdf-8008da795467@denx.de>
- <aee3f6d2-6a44-4de6-9348-f83c4107188f@foss.st.com>
- <c74f393d-7d0a-4a34-8e72-553ccf273a41@denx.de>
- <01e435a5-3a69-49a5-9d5e-ab9af0a2af7b@foss.st.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <01e435a5-3a69-49a5-9d5e-ab9af0a2af7b@foss.st.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+References: <20240612075829.18241-1-brgl@bgdev.pl> <CABBYNZLrwgj848w97GP+ijybt-yU8yMNnW5UWhb2y5Zq6b5H9A@mail.gmail.com>
+ <CAMRc=Mdb31YGUUXRWACnx55JawayFaRjEPYSdjOCMrYr5xDYag@mail.gmail.com>
+ <CABBYNZLPv3zk_UX67yPetQKWiQ-g+Dv9ZjZydhwG3jfaeV+48w@mail.gmail.com>
+ <CAMRc=Mdsw5c_BDwUwP2Ss4Bogz-d+waZVd8LLaZ5oyc9dWS2Qg@mail.gmail.com> <CAMRc=Mf2koxQH8Pw--6g5O3FTFn_qcyfwTVQjUqxwJ5qW1nzjw@mail.gmail.com>
+In-Reply-To: <CAMRc=Mf2koxQH8Pw--6g5O3FTFn_qcyfwTVQjUqxwJ5qW1nzjw@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 19 Jun 2024 14:59:23 -0400
+Message-ID: <CABBYNZ+7SrLSDeCLF0WDM01prRgAEHMD=9mhu5MfWOuGwoAkNQ@mail.gmail.com>
+Subject: Re: [GIT PULL] Immutable tag between the Bluetooth and pwrseq
+ branches for v6.11-rc1
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/19/24 5:40 PM, Christophe ROULLIER wrote:
-> 
-> On 6/19/24 15:14, Marek Vasut wrote:
->> On 6/19/24 9:41 AM, Christophe ROULLIER wrote:
->>
->> Hi,
->>
->>>>>>>>> +static int stm32mp2_configure_syscfg(struct 
->>>>>>>>> plat_stmmacenet_data *plat_dat)
->>>>>>>>> +{
->>>>>>>>> +    struct stm32_dwmac *dwmac = plat_dat->bsp_priv;
->>>>>>>>> +    u32 reg = dwmac->mode_reg;
->>>>>>>>> +    int val = 0;
->>>>>>>>> +
->>>>>>>>> +    switch (plat_dat->mac_interface) {
->>>>>>>>> +    case PHY_INTERFACE_MODE_MII:
->>>>>>>>> +        break;
->>>>>>>>
->>>>>>>> dwmac->enable_eth_ck does not apply to MII mode ? Why ?
->>>>>>>
->>>>>>> It is like MP1 and MP13, nothing to set in syscfg register for 
->>>>>>> case MII mode wo crystal.
->>>>>>
->>>>>> Have a look at STM32MP15xx RM0436 Figure 83. Peripheral clock 
->>>>>> distribution for Ethernet.
->>>>>>
->>>>>> If RCC (top-left corner of the figure) generates 25 MHz MII clock 
->>>>>> (yellow line) on eth_clk_fb (top-right corner), can I set 
->>>>>> ETH_REF_CLK_SEL to position '1' and ETH_SEL[2] to '0' and feed ETH 
->>>>>> (right side) clk_rx_i input with 25 MHz clock that way ?
->>>>>>
->>>>>> I seems like this should be possible, at least theoretically. Can 
->>>>>> you check with the hardware/silicon people ?
->>>>> No it is not possible (it will work if speed (and frequency) is 
->>>>> fixed 25Mhz=100Mbps, but for speed 10Mbps (2,5MHz) it will not work.
->>>>
->>>> Could the pll4_p_ck or pll3_q_ck generate either 25 MHz or 2.5 MHz 
->>>> as needed in that case ? Then it would work, right ?
->>>
->>> Yes you can set frequency you want for pll4 or pll3, if you set 25MHz 
->>> and auto-negotiation of speed is 100Mbps it should work (pad ETH_CK 
->>> of 25MHz clock the PHY and eth_clk_fb set to 25MHz for clk_RX)
->>>
->>> but if autoneg of speed is 10Mbps, then 2.5MHz is needed for clk_RX 
->>> (you will provide 25Mhz)
->>
->> What if:
->>
->> - Aneg is 10 Mbps
->> - PLL4_P_CK/PLL3_Q_CK = 2.5 MHz
->> - ETH_REF_CLK_SEL = 1
->> - ETH_SEL[2] = 0
->>
->> ?
->>
->> Then, clk_rx_i is 2.5 MHz, right ?
-> Yes that right
->>
->> Does this configuration work ?
-> For me no, because PHY Ethernet Oscillator/cristal need in PAD 25Mhz or 
-> 50Mhz, I think it is does not work if oscillator frequency provided is 
-> 2.5MHz (To my knowledge there is no Ethernet PHY which have oscillator 
-> working to 2.5MHz)
+Hi Bartosz,
 
-Would it work if the PHY had a dedicated Xtal , while the clocking of 
-the MAC was done using RCC ?
+On Wed, Jun 19, 2024 at 3:35=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.pl>=
+ wrote:
+>
+> On Wed, Jun 12, 2024 at 5:00=E2=80=AFPM Bartosz Golaszewski <brgl@bgdev.p=
+l> wrote:
+> >
+> > On Wed, Jun 12, 2024 at 4:54=E2=80=AFPM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Bartosz,
+> > >
+> > > On Wed, Jun 12, 2024 at 10:45=E2=80=AFAM Bartosz Golaszewski <brgl@bg=
+dev.pl> wrote:
+> > > >
+> > > > On Wed, Jun 12, 2024 at 4:43=E2=80=AFPM Luiz Augusto von Dentz
+> > > > <luiz.dentz@gmail.com> wrote:
+> > > > >
+> > > > > Hi Bartosz,
+> > > > >
+> > > > > On Wed, Jun 12, 2024 at 3:59=E2=80=AFAM Bartosz Golaszewski <brgl=
+@bgdev.pl> wrote:
+> > > > > >
+> > > > > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > > > > >
+> > > > > > Hi Marcel, Luiz,
+> > > > > >
+> > > > > > Please pull the following power sequencing changes into the Blu=
+etooth tree
+> > > > > > before applying the hci_qca patches I sent separately.
+> > > > > >
+> > > > > > Link: https://lore.kernel.org/linux-kernel/20240605174713.GA767=
+261@bhelgaas/T/
+> > > > > >
+> > > > > > The following changes since commit 83a7eefedc9b56fe7bfeff13b6c7=
+356688ffa670:
+> > > > > >
+> > > > > >   Linux 6.10-rc3 (2024-06-09 14:19:43 -0700)
+> > > > > >
+> > > > > > are available in the Git repository at:
+> > > > > >
+> > > > > >   git://git.kernel.org/pub/scm/linux/kernel/git/brgl/linux.git =
+tags/pwrseq-initial-for-v6.11
+> > > > > >
+> > > > > > for you to fetch changes up to 2f1630f437dff20d02e4b3f07e836f42=
+869128dd:
+> > > > > >
+> > > > > >   power: pwrseq: add a driver for the PMU module on the QCom WC=
+N chipsets (2024-06-12 09:20:13 +0200)
+> > > > > >
+> > > > > > ---------------------------------------------------------------=
+-
+> > > > > > Initial implementation of the power sequencing subsystem for li=
+nux v6.11
+> > > > > >
+> > > > > > ---------------------------------------------------------------=
+-
+> > > > > > Bartosz Golaszewski (2):
+> > > > > >       power: sequencing: implement the pwrseq core
+> > > > > >       power: pwrseq: add a driver for the PMU module on the QCo=
+m WCN chipsets
+> > > > >
+> > > > > Is this intended to go via bluetooth-next or it is just because i=
+t is
+> > > > > a dependency of another set? You could perhaps send another set
+> > > > > including these changes to avoid having CI failing to compile.
+> > > > >
+> > > >
+> > > > No, the pwrseq stuff is intended to go through its own pwrseq tree
+> > > > hence the PR. We cannot have these commits in next twice.
+> > >
+> > > Not following you here, why can't we have these commits on different
+> > > next trees? If that is the case how can we apply the bluetooth
+> > > specific ones without causing build regressions?
+> > >
+> >
+> > We can't have the same commits twice with different hashes in next
+> > because Stephen Rothwell will yell at us both.
+> >
+> > Just pull the tag I provided and then apply the Bluetooth specific
+> > changes I sent on top of it. When sending to Linus Torvalds/David
+> > Miller (not sure how your tree gets upstream) mention that you pulled
+> > in the pwrseq changes in your PR cover letter.
+
+By pull the tag you mean using merge commits to merge the trees and
+not rebase, doesn't that lock us down to only doing merge commits
+rather than rebases later on? I have never used merge commits before.
+There is some documentation around it that suggests not to use merges:
+
+'While merges from downstream are common and unremarkable, merges from
+other trees tend to be a red flag when it comes time to push a branch
+upstream. Such merges need to be carefully thought about and well
+justified, or there=E2=80=99s a good chance that a subsequent pull request
+will be rejected.'
+https://docs.kernel.org/maintainer/rebasing-and-merging.html#merging-from-s=
+ibling-or-upstream-trees
+
+But then looking forward in that documentation it says:
+
+'Another reason for doing merges of upstream or another subsystem tree
+is to resolve dependencies. These dependency issues do happen at
+times, and sometimes a cross-merge with another tree is the best way
+to resolve them; as always, in such situations, the merge commit
+should explain why the merge has been done. Take a moment to do it
+right; people will read those changelogs.'
+
+So I guess that is the reason we want to merge the trees, but what I'm
+really looking forward to is for the 'proper' commands and commit
+message to use to make sure we don't have problems in the future.
+
+> > Bart
+>
+> Gentle ping.
+>
+> Bart
+
+
+
+--=20
+Luiz Augusto von Dentz
 
