@@ -1,211 +1,163 @@
-Return-Path: <netdev+bounces-104786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7523590E612
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 10:39:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D8B8090E62C
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 10:42:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06E3A1F254D9
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 08:39:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E6C41F26128
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 08:42:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF857CF3E;
-	Wed, 19 Jun 2024 08:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B3B7BB15;
+	Wed, 19 Jun 2024 08:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/HvbnpD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Br6Zq1ys"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B7B79952
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 08:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8317B3E5
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 08:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718786391; cv=none; b=LuefzdL/4R22bOYP2eoGsKdbnqITEK5GvJStbQdNZhE2N5gNuvw0oqn51yZUveUnBxCsIVPBw5kuH53MG9W4TkeZ63TXBUlCO56ewRyyQKVBRxGvArRYLRPHB3EXzRMbaIuzkBP+5UpleJVz/1bhtcq5WQhB3Dbw+aYE31FLLbU=
+	t=1718786515; cv=none; b=kxry4qP+x07kMfHCRc8WBwAObNsRJzzFqlTTLG3NTO7R4If+2WTj4efTRSIAiaEz9hy9+KuL9iLqApz/VGueX/NswnvUmXQEcCdZ9QvEgR1Wp7R1EbZTOTsPHawMAW2GzWy2B1hW0TMsb0xjR3uTbKvGsFlVMm60rhC1WX0wizE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718786391; c=relaxed/simple;
-	bh=V1cIYjrBdLW8KIv3ONgB+ng/1ZHEgJK6ZjzzRqbTnFo=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Z44e3QUcIDD259wDAtZnfe7BCIzHZLDxTj5K2vGVrVfOrtQkDPR3hjgH8M635XhlZqms5shiLsh8QO18b2UuPEbXRVMRqUjWZ4Z329JRz11tmLxGMkMkyUvBxIVIz5e+k5wYuS0GOzbZMIkE2oMTzIqWDwyTdAlFJByIGNzxhds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c/HvbnpD; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-43fdb797ee2so30755041cf.3
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 01:39:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718786388; x=1719391188; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IZQbTDo+z2Hw2qiH8fazN8oLyUDrBMHU2DUGTSkxqnI=;
-        b=c/HvbnpDvT4eG6VmSBwqMpCJ4BQfxLDc53qTuvnENOYtJtHkthDmIYcB9msbeMLGDf
-         4AUWbgimO6R8OeUzec0Vhm+Y4jExZcmPnbzDe3MIP3/HJjLIYZ/Wsuhoxaqplsazdx5E
-         4TpgODdcsg9dO4CZV9hDyJPaJh1tx7DETFvCXo2VGJ+//UmlV6eNDvQ03fNqQt+vAnRG
-         7nI8bmzgn33CUbwjZxs19G7kxA7yV4uPOABPk/VLyn/jZPlTKwAwAP9PwBVkn44vWCT3
-         Toeo3P2rbDYHrmt35ADsOmrjas/koVrrOJEn8GiyJ+uwmdYya80eqC0xYji4Dhkz25lH
-         0c9Q==
+	s=arc-20240116; t=1718786515; c=relaxed/simple;
+	bh=rWeIOug2Ynbv6OTURHg7XDbCwxyQQJLoRG3mJeBPx7s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uYZgBprrRNY38jTUNkXpF9bc41F8gfr+54EUqTi2UrO5oFnQbwdlG6bZglR7uXgU213QYBMHebuZrmkIJqODZ05OwyKMw9wflyQuP6BAm7RlZhjW0BTjNV4vF3PJJybjLVSR+uqltyYLxbdH59bE41glcgUOmktp3lnhzrPJX5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Br6Zq1ys; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718786513;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XdxpcAnJIttE7xF3rf60XtSKDuT7zxfz6ipOIlDZ/C4=;
+	b=Br6Zq1ysetmmB2Xe77gAQy1HGFLjbkZXczaO+2QCyXPU4CIyPgGYcvFRLuOtyUszodUYcB
+	Ik0jg/QPD+uTmqN4DhzI1Uj+NdAvK/791HB2+QbpQCMIVNG4RvV8nJx1vl1IW10kWvZjlt
+	qtGs6hYZcmx1cOpJXbOjiGr0X+RPACM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-595-IQ1M9xziOSGlqp5Z3EpuMA-1; Wed, 19 Jun 2024 04:41:51 -0400
+X-MC-Unique: IQ1M9xziOSGlqp5Z3EpuMA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-362763f8d2eso674779f8f.3
+        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 01:41:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718786388; x=1719391188;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=IZQbTDo+z2Hw2qiH8fazN8oLyUDrBMHU2DUGTSkxqnI=;
-        b=VDpkXUJEj5+g8W8oaF991/Q476PLgYfJIXn1D6euTO+ImXpyUFYDyUTSZyseCfv7FQ
-         TYioJIJZ8Er6f4yTpq2iSPzUeMlEMn/iLtwuiddyB8HmZtyxbiFzpjOCFSpHoQqIPO2O
-         1PEGG9NJrCHdGR6eS3A6x7N7StwBGQ79lG5M7HFeyX67egjfuWSumb2khqFrkV79/wNQ
-         VlvUGINAQtBTO9zEZL7qsBxhbCm7MGWXRKj2bd+KRKruDjVkdQkkRbtmnE88FMEHv7lS
-         Sku/+x2JUlr3u1WrSNydUsIxAamjBgxHycK1KCc9nXq3IZNn6KqBDeR78hCFS+J1Y1kr
-         APrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV/cuV97gmp+KxLlAr6JIl/jo9SD8FKHuX2fpa7Fy/dWztkaK32u0IgsnlcTIFPeJ25wgNEX3J5fHkYybD8BHOJotEojndM
-X-Gm-Message-State: AOJu0Yz2RI0MLTOVti/YPOlunayxtLhN9Rj1IMDjeIsp3/ATspH3mBWn
-	qnZgNW00U5qF96OACa6fCDRvQTeEoqCls6Jw7rqlfK35w7XGLuEY
-X-Google-Smtp-Source: AGHT+IGPFimCy5tjSNnagV/wBzxVJQKY35P1TdpQseb3vn7zgqAdawN7L42BjxLcNHlJq/eWkEib5w==
-X-Received: by 2002:ac8:59c4:0:b0:43e:3d64:8c1 with SMTP id d75a77b69052e-444a7a717b7mr27401401cf.55.1718786388329;
-        Wed, 19 Jun 2024 01:39:48 -0700 (PDT)
-Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-441f2fcc404sm63249531cf.66.2024.06.19.01.39.47
+        d=1e100.net; s=20230601; t=1718786510; x=1719391310;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XdxpcAnJIttE7xF3rf60XtSKDuT7zxfz6ipOIlDZ/C4=;
+        b=mPQs/nSjTo/BsdqERzkFBtvhW3iyVRMuPWXF0YkIBsHFoG/sG1G266OaTSjSCltCIU
+         wH0/CNtokQi51Na+5GKfIT5O/WX9KS/w7p7jy/W900DayMU9Nuo4VGYndgh5ONF9/wGL
+         RjzbNVBJScpTaEol5c5L3bgWzCvjzWNOtdNHB8rXgBfP6gAs+YXSwV37cWqUBYCNfdUu
+         j8Vr4WbcWaj2ZXPrUsn1AtbECfQ6K7dxN1LFzCbMIMm6jq2OX19OqQTAZ88C2Y3v8dyg
+         +ir1nxmEM8E/iU3ayxxS9594jEqYuZdhteH7ZwbudIDc47Mpt1XKdGJvoKJ3lHG4M6xn
+         1bow==
+X-Forwarded-Encrypted: i=1; AJvYcCU9MQznb4iB4Skyd5lmpgwioWvSpkpspVGwPq+iPea9NODVyoC7VnlcH3wAeUaSt8v8C9zEWnNGurZaWk5bWXb3aA1qVCC4
+X-Gm-Message-State: AOJu0YxsgEsOCD+aR2ArkvmCuZUIgVpPufKQHkx3sTlHUbK2kMi0amrB
+	rZk56mQ1lGiiIru9a+JHyQr7UQCFZuHnBa/BopvfteN6d3+lmSWWXUA4quodbrriETBc+AbmQBE
+	PBjmB3aTHvdDoalim26Q4ZfhNhocU+lhJoAD/d5De9wItOTQo+LsfNw==
+X-Received: by 2002:a5d:408d:0:b0:360:7829:bb93 with SMTP id ffacd0b85a97d-363177a3a72mr1642380f8f.21.1718786509775;
+        Wed, 19 Jun 2024 01:41:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGmonG/1oENmgMotUOYhNKtoTPMrBWuRz2ayevhgGPlMbNtdCXnZPDcBQKyrmKw0SKJQvaQlg==
+X-Received: by 2002:a5d:408d:0:b0:360:7829:bb93 with SMTP id ffacd0b85a97d-363177a3a72mr1642352f8f.21.1718786509061;
+        Wed, 19 Jun 2024 01:41:49 -0700 (PDT)
+Received: from redhat.com ([2.52.146.100])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-363bd4668aasm730542f8f.48.2024.06.19.01.41.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jun 2024 01:39:47 -0700 (PDT)
-Date: Wed, 19 Jun 2024 04:39:47 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: "Singhai, Anjali" <anjali.singhai@intel.com>, 
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, 
- "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, 
- Boris Pismenny <borisp@nvidia.com>, 
- "gal@nvidia.com" <gal@nvidia.com>, 
- "cratiu@nvidia.com" <cratiu@nvidia.com>, 
- "rrameshbabu@nvidia.com" <rrameshbabu@nvidia.com>, 
- "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>, 
- "tariqt@nvidia.com" <tariqt@nvidia.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, 
- "Acharya, Arun Kumar" <arun.kumar.acharya@intel.com>
-Message-ID: <66729953651ba_2751bc294fa@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CO1PR11MB49939CBC31BC13472404094793CE2@CO1PR11MB4993.namprd11.prod.outlook.com>
-References: <CO1PR11MB49939CBC31BC13472404094793CE2@CO1PR11MB4993.namprd11.prod.outlook.com>
-Subject: Re: [RFC net-next 00/15] add basic PSP encryption for TCP connections
+        Wed, 19 Jun 2024 01:41:48 -0700 (PDT)
+Date: Wed, 19 Jun 2024 04:41:44 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+	Carlos Bilbao <carlos.bilbao.osdev@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	workflows@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	ksummit@lists.linux.dev
+Subject: Re: [PATCH 2/2] Documentation: best practices for using Link trailers
+Message-ID: <20240619043727-mutt-send-email-mst@kernel.org>
+References: <20240618-docs-patch-msgid-link-v1-0-30555f3f5ad4@linuxfoundation.org>
+ <20240618-docs-patch-msgid-link-v1-2-30555f3f5ad4@linuxfoundation.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240618-docs-patch-msgid-link-v1-2-30555f3f5ad4@linuxfoundation.org>
 
-Singhai, Anjali wrote:
-> =
+On Tue, Jun 18, 2024 at 12:42:11PM -0400, Konstantin Ryabitsev wrote:
+> Based on multiple conversations, most recently on the ksummit mailing
+> list [1], add some best practices for using the Link trailer, such as:
+> 
+> - how to use markdown-like bracketed numbers in the commit message to
+> indicate the corresponding link
+> - when to use lore.kernel.org vs patch.msgid.link domains
+> 
+> Cc: ksummit@lists.linux.dev
+> Link: https://lore.kernel.org/20240617-arboreal-industrious-hedgehog-5b84ae@meerkat # [1]
+> Signed-off-by: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+> ---
+>  Documentation/process/maintainer-tip.rst | 24 ++++++++++++++++++------
+>  1 file changed, 18 insertions(+), 6 deletions(-)
+> 
+> diff --git a/Documentation/process/maintainer-tip.rst b/Documentation/process/maintainer-tip.rst
+> index 64739968afa6..57ffa553c21e 100644
+> --- a/Documentation/process/maintainer-tip.rst
+> +++ b/Documentation/process/maintainer-tip.rst
+> @@ -375,14 +375,26 @@ following tag ordering scheme:
+>     For referring to an email on LKML or other kernel mailing lists,
+>     please use the lore.kernel.org redirector URL::
+>  
+> -     https://lore.kernel.org/r/email-message@id
+> +     Link: https://lore.kernel.org/email-message@id
+>  
+> -   The kernel.org redirector is considered a stable URL, unlike other email
+> -   archives.
+> +   This URL should be used when referring to relevant mailing list
+> +   resources, related patch sets, or other notable discussion threads.
+> +   A convenient way to associate Link trailers with the accompanying
+> +   message is to use markdown-like bracketed notation, for example::
+>  
+> -   Maintainers will add a Link tag referencing the email of the patch
+> -   submission when they apply a patch to the tip tree. This tag is useful
+> -   for later reference and is also used for commit notifications.
+> +     A similar approach was attempted before as part of a different
+> +     effort [1], but the initial implementation caused too many
+> +     regressions [2], so it was backed out and reimplemented.
+> +
+> +     Link: https://lore.kernel.org/some-msgid@here # [1]
+> +     Link: https://bugzilla.example.org/bug/12345  # [2]
+> +
+> +   When using the ``Link:`` trailer to indicate the provenance of the
+> +   patch, you should use the dedicated ``patch.msgid.link`` domain. This
+> +   makes it possible for automated tooling to establish which link leads
+> +   to the original patch submission. For example::
+> +
+> +     Link: https://patch.msgid.link/patch-source-msgid@here
+>  
+>  Please do not use combined tags, e.g. ``Reported-and-tested-by``, as
+>  they just complicate automated extraction of tags.
 
-> In reference to this patch series
-> https://lore.kernel.org/netdev/20240510030435.120935-1-kuba@kernel.org/=
-#t
-> =
-
-> Thanks a lot  for the PSP crypto enabling patches in the kernel.
-> Some points that we noticed that could use some enhancements/fixes
-> =
-
-> 1. Why do we need =C2=A0ndo_op set_config() at device level which is se=
-tting only one version, instead the description above the psp_dev struct =
-which had a mask for enabled versions at a=C2=A0 device level is better a=
-nd device lets the stack know at psp_dev create time what all versions it=
- is capable of.  Later on, version is negotiated with the peer and set pe=
-r session.
-> Even the Mellanox driver does not implement this set_config ndo_op. =
-
-> =C2=A0
-> 2. Where is the association_index/handle returned to the stack to be us=
-ed with the packet on TX by the driver and device? ( if an SADB is in use=
- on Tx side in the device), what we understand from Mellanox driver is, i=
-ts not doing an SADB in TX in HW, but passing the key directly into the T=
-x descriptor? Is that right, but other devices may not support this and w=
-ill have an SADB on TX and this allowed as per PSP protocol. Of course on=
- RX there is no SADB for any device.
-> In our device we have 2 options, =
-
->              1. Using SADB on TX and just passing SA_Index in the descr=
-iptor (trade off between performance and memory. =
-
->               As  passing key in descriptor makes for a much larger TX =
-descriptor which will have perf penalty.)
->              2. Passing key in the descriptor.
-> =C2=A0             For us we need both these options, so please allow f=
-or enhancements.
-> =
-
-> 3. About the PSP and UDP header addition, why is the driver doing it? I=
- guess it's because the SW equivalent for PSP support in the kernel does =
-not exist and just an offload for the device. Again in this case the assu=
-mption is either the driver does it or the device will do it.
-> Hope that is irrelevant for the stack. In our case most likely it will =
-be the device doing it.
-> =
-
-> 4. Why is the driver adding the PSP trailer? Hoping this is between the=
- driver and the device, in our case it's the device that will add the tra=
-iler.
-
-This does not adhere to the spec:
-
-"An option must be provided that enables upper-level software to send pac=
-kets that are
-pre-formatted to include the headers required for PSP encapsulation. In t=
-his case, the
-NIC will modify the contents of the headers appropriately, apply
-encryption/authentication, and add the PSP trailer to the packet."
-
-https://raw.githubusercontent.com/google/psp/main/doc/PSP_Arch_Spec.pdf
-
- =C2=A0
-> 5. Five way handshake, can this be optimized to 3 way?
-> Here is what we think is happening right now at the IKE level interacti=
-on for the two ends of the session, as PSP protocol does not define it bu=
-t based on the implementation this is what we gathered.
->   Looks like its 5 way handshake that is happening with the session par=
-tner.
->    For example two sides are called Tx session partner and RX session p=
-artner, just because TX initiates the session creation, of course it's a =
-full duplex session.
->              1. TX session partner sends over sideband tls channel to t=
-he Rx session partner what all versions the TX can do based on caps learn=
-t from the device driver.
->              2. The Rx session partner replies with what common version=
-s it can do back to TX session partner based on dev caps it learnt from t=
-he device.
-
-In practice in reasonably homogeneous hyperscale environments, this
-step can be skipped. To be in spec devices must support both 128b
-and 256b AES-GCM (and nothing else). It is an organizational choice
-which to deploy.
-
->              3. Tx session partner tells the driver to generate a spi a=
-n session key for the rx side by specifying the version it wants to use f=
-or this session. And then sends to Rx session partner the spi and session=
- key and version selected etc.
->              4. The Rx session partner at its end then talks to its dri=
-ver to generate a spi an session key for the rx side by specifying the ve=
-rsion sent from TX session partner. And then sends to Tx session partner =
-the spi and session key and version selected etc. The RX session partner =
-also programs the session key and spi it received from TX session partner=
- in HW in its Tx SADB (psp_assoc_add)
->             5. Tx session partner programs the received SPI and session=
- key in its HW in its Tx SADB (psp_assoc_add). When done it sends an ACK =
-back to Rx session partner that the session is ready.
->  =
-
-> Should this be optimized to a  3 way handshake to allow for faster sess=
-ion setup? 1 and 3 and 2 and 4 could be combined in an intelligent way. A=
-gain may be there is already an optimized way to do 3 way handshake here =
-and the kernel-driver flow still looks the same.
-> =
-
-> Thanks
-> Anjali
-> =
+I don't really understand what this is saying.
+So when is msgid.link preferable to kernel.org?
+And when is kernel.org preferable to msgid?
 
 
+
+> -- 
+> 2.45.2
+> 
 
 
