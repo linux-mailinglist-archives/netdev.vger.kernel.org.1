@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-104913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 319C090F1A1
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 17:04:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3429790F19B
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 17:04:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 380AA1C21F8F
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 15:04:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACE2D282EC9
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 15:04:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAAA414F9E5;
-	Wed, 19 Jun 2024 15:04:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E2037711E;
+	Wed, 19 Jun 2024 15:04:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="TwdzMNuM"
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="pu2X/f3/"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2062.outbound.protection.outlook.com [40.107.249.62])
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2069.outbound.protection.outlook.com [40.107.247.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EF56FA8;
-	Wed, 19 Jun 2024 15:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A378A2E832;
+	Wed, 19 Jun 2024 15:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.247.69
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718809473; cv=fail; b=m/XcUmOMOTPC8ybTTw4gpHg+rkvVb754JBhjOnqlDSTVaslDGzPj5gHU/TDMwsvp4BZoAEhnd+q+oOIRcrtaOxkHu1igge8SmeeVLchTg2bozJFv1icsa0vs1B8MsS9xl1dwFW0qvKzzDL5WnH9cyOngCrt+9UApMWUsfld2KnE=
+	t=1718809472; cv=fail; b=fI220NwD7vUxic+lC88qskB2qd5q1nkJZo/7+8FjBeGBawDRfPmWvoO0SLjmup9QxhG54nTM1rjI5B0+v9+9wnuYzK3El2KD3sNVuALQCzftuVLbbMO+Mv3YTTPj2v5W2+V7hrdhL9kdaQfPWSKtpPdgriNf3IUqcecxKmC/Z0M=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718809473; c=relaxed/simple;
-	bh=j5RHiRyDn4YoqPGIS5EwO1SiAI/OzzoJY2unS/fydVo=;
+	s=arc-20240116; t=1718809472; c=relaxed/simple;
+	bh=cwMzZ2m1dn0C9rY/2h0EsG+79CnYazYIlygrMQT/FSA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ho1GsUD5TMgsKWQUBcvi5KIimFm/wnKiVa3S/9KYwxVkJ2t+5IFkisDVz0r8GR8Vw4YOE3dkQi1UY81KfCbmFqTO2YSx+5/8WU6wgCqI3fm1xOCIi2HvLctu6XlBZjCBqrmkqWTZu0PdZe0PRY4FYpQcLbddvashsTM7UGpGI08=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=2n.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=TwdzMNuM; arc=fail smtp.client-ip=40.107.249.62
+	 MIME-Version:Content-Type; b=urJQqft5hZhXtqkLDSQAS3cwBm7YcxZjlA9RrOE74DXodSjJ24tolGdzUBsu9SCcYRSkBYLCRYR4elPo7xxZ6R7kVC4IzENX2XKJxEg6/1801Ip9m+XACueMG34KDNNFTWrmelLmE+T8YVTx0c4rPBpasZ73r3HdQ4bNoSW4bX4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=2n.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=pu2X/f3/; arc=fail smtp.client-ip=40.107.247.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=2n.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CMW6yw86iypx95K5IA50wzrYQTtcDNCfWiZBJbULt5Zci52rHStoC6m4OAoqMd7oJLC15JwIYMZTHIf7OQHWfGn4opoEqvXl+NhFRZR4fZwYu+pACf71Q9afQM1CzrVa+vYSWUZ3yxaDq5wAue1Th4KOj0T+Py0qZfDfh0fPbL3cibVJfXaUoTBE3TrW8+ltqIFulqWxkHU5jGI+uec4sOWtZ/BqWWegbT4iXjhNMcgraH0YWvVfvt8fXa0zKu/VZebPtlQyou8ZcpK+eugPiu5+JxH9DEBvOw4xgR70rrtCUBuW5kImuHH8LFwWBKs4V0TQyfU0VpQ79LJm59U9cw==
+ b=eO+74UnhS39wdC+RPaplgrmwL7zQkByYzNCUcds2+0AFAX3AtbhyRx2WLAT7zIrwVhwXessg70ipYAgLG8gqSH72r6bpexcjx4rjxgpSSpBCXkeN44C3fzcH9iWpO3wr1sRciT4rcVtDokzBQbr8OYmnqsMzXQWH8IhAiyQT83hyIjzvIwzQ2SbAKBD1NOpEJngbj7juV71v8RdEQ2GhZp8LQ/3wVK1yr1OdFcDfls58cfU2C2j3p8u2aYWsJbFldz2GtU76uDSJGlp1U3Big15H6Q3YTD/aa8vP1otFD4EX2LXq7LEAXoviB82O1XJmpLxmlK42NqlTrNp+BAOh9Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Kv95kUZfkB4FCQmhFRaDpXNt1sq/C5LMLkeRE0SgiJA=;
- b=hQB96VJnclPA7uZYzmP3HQ+IRM6JDYOfAEioQdZv92VQf/mqie/TBL2gBDr+cb/fMsyySU4ormeTeOwj1Q1vfcmqSxwNGe//rO9lqx63PzK97c18Q9JjvyAvYGtl/W0slWRjV6v5mG3Bx+ZyUlGtCD+qVFZcaHziUrpidJnF1OAYE/pA0PEt3daOY9q+gJsRA/uQ2wuzD6My62e9uFOyRYIYVcbzs/Qr4/fpQOSQI4alF8b0MS++bRKlm0B9ZhODTLF63LhmcBXh/qXx0DbR9fXuyH447lxs2BscjGD2aI6UciLzwfmDh/I/RTv/Cv7YcIZfFBij1ND9L+UfrPu9mw==
+ bh=sN2dOLLQhedQOncCwIWhdfCtJiOCA4UAEPCcB7/T4m4=;
+ b=b/vQT8hlHUbD1vTkP6rSZ77W4yhZ9VHjGus8S6RGBPbm9tHBQvUtQOYV5yA2dVmeb3S8CeRoKt/yYsfbclfqcffHUIlOXze8BuiN/XTeScpodv8OTjWbFoudXcZCr5R9/cT1EYDX80dJywaDJy8ywwe4dYBRHsqc+Q9HFscOFLan78+mg9wlbc7dL1ymy4dB3xteoKbJncE6zM041AzjFApPNk3X+wq/TDeRaUc9ompL9UBxnGU9mnfW42n91T0znE7UJZUaID9ASyBVuoOTomJR8KjbNESyaTuk5tpa9NAIMOatwyqpoeUOzaPCE3+CPqgBcsBRPq5SwiryRYZV5g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  195.60.68.100) smtp.rcpttodomain=broadcom.com smtp.mailfrom=2n.com;
  dmarc=fail (p=none sp=none pct=100) action=none header.from=axis.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Kv95kUZfkB4FCQmhFRaDpXNt1sq/C5LMLkeRE0SgiJA=;
- b=TwdzMNuM/zH8a03dC2ObST1KsT71VuldV48Utjyr7hVWojeKq+OzcGYWEv+IlyXvtbxntL06sWSW8jqoNM1uM/muOn/9nZ7o7CTTARr6Gj6QC9ynJlQPuea8ee890E0sV3iWCNunk/CFDHjKFnPzQ/roLjliuktgfdz5dk4urhk=
-Received: from AM0PR02CA0222.eurprd02.prod.outlook.com (2603:10a6:20b:28f::29)
- by AS8PR02MB6677.eurprd02.prod.outlook.com (2603:10a6:20b:25a::16) with
+ bh=sN2dOLLQhedQOncCwIWhdfCtJiOCA4UAEPCcB7/T4m4=;
+ b=pu2X/f3/1yyI1Kks1trZBxOa+4ms6vZYxOmwQ0soYWqflOHL0jWwT8Bh705IesHaxHFT65oW+ym2I89b8jI4soP34WAls7ba//JhSJbWxhTkv940iaGlfHkh/7+nKxbgL1hb3DNbJi8qB/yyV/804B87npQGlNAHmSqusJcFGck=
+Received: from AM0PR02CA0201.eurprd02.prod.outlook.com (2603:10a6:20b:28f::8)
+ by AS8PR02MB6775.eurprd02.prod.outlook.com (2603:10a6:20b:23b::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31; Wed, 19 Jun
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.19; Wed, 19 Jun
  2024 15:04:26 +0000
 Received: from AM4PEPF00027A64.eurprd04.prod.outlook.com
- (2603:10a6:20b:28f:cafe::64) by AM0PR02CA0222.outlook.office365.com
- (2603:10a6:20b:28f::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.32 via Frontend
+ (2603:10a6:20b:28f:cafe::38) by AM0PR02CA0201.outlook.office365.com
+ (2603:10a6:20b:28f::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31 via Frontend
  Transport; Wed, 19 Jun 2024 15:04:26 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 195.60.68.100)
  smtp.mailfrom=2n.com; dkim=none (message not signed) header.d=none;dmarc=fail
@@ -78,9 +78,9 @@ To: <florian.fainelli@broadcom.com>, <bcm-kernel-feedback-list@broadcom.com>,
 	<conor+dt@kernel.org>
 CC: <kamilh@axis.com>, <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: [PATCH v8 2/4] net: phy: bcm54811: Add LRE registers definitions
-Date: Wed, 19 Jun 2024 17:03:57 +0200
-Message-ID: <20240619150359.311459-3-kamilh@axis.com>
+Subject: [PATCH v8 3/4] dt-bindings: ethernet-phy: add optional brr-mode flag
+Date: Wed, 19 Jun 2024 17:03:58 +0200
+Message-ID: <20240619150359.311459-4-kamilh@axis.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240619150359.311459-1-kamilh@axis.com>
 References: <20240619150359.311459-1-kamilh@axis.com>
@@ -96,174 +96,94 @@ X-ClientProxiedBy: se-mail02w.axis.com (10.20.40.8) To se-mail01w.axis.com
  (10.20.40.7)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM4PEPF00027A64:EE_|AS8PR02MB6677:EE_
-X-MS-Office365-Filtering-Correlation-Id: 96904915-9def-42ba-8070-08dc90711ca0
+X-MS-TrafficTypeDiagnostic: AM4PEPF00027A64:EE_|AS8PR02MB6775:EE_
+X-MS-Office365-Filtering-Correlation-Id: 762aa0ae-42ab-44f6-a603-08dc90711cc6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230037|36860700010|376011|7416011|1800799021|82310400023|921017;
+	BCL:0;ARA:13230037|376011|7416011|82310400023|1800799021|36860700010|921017;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?a1F5RjJIR21VckpwbGRFZThQTjRHWVRiY2EyQnFkbXZ1eC9TKzY1OWdmMTFQ?=
- =?utf-8?B?a1lHbmVFQzM0cGF1aHVjRDVROEFYK0R3Ymx4K3YwKzRaUU4zdS9vUFB3Mmxj?=
- =?utf-8?B?aU9nYUZCVzJRb3hEZEZXWnpZblkyMlpSUEFlbVkwVVpDL2IrTEE1ckI0aC9R?=
- =?utf-8?B?QmFacSsvanV6dGhCUG9kak1DditZYlMyanp4azZXeEpJQnFzamJqTWczLzQv?=
- =?utf-8?B?ZDNqM3F3RStyMDRHL2UwTE9qMER3bXlUMnE3UitpUjVIZXJEd0tiMWVuU01H?=
- =?utf-8?B?RVp4V2lUM0VaSXVUcWxUYmcwbWxXTlBUWFBwM25LQW5kVUIrVzNhL01aeEx0?=
- =?utf-8?B?bXJFVVZFYTdLMmxtemZCZGZkWTZYSmVrdVFuc1NKWkY2SlZuQWJqdWh0M2Y5?=
- =?utf-8?B?QXhPSXV1R2xCWThzcDVkOWVyS1JEQU1OM0hBV2RLbVBnNkpqREIxWjhsNkhQ?=
- =?utf-8?B?U2NweU80WEllVXdXNm1BREhLUzlydWdDc2RBdmg0dFZHUmM4d2I2aWNWNCtO?=
- =?utf-8?B?WVU0RmNUaU1xd1M3L2c0V09NUWNWZmdzNjBJZCtmdnQzTi9md0t3TS8yVzNq?=
- =?utf-8?B?SGFNWWVma1BZMk1mcENoUTYvZDA5OTlQWHFvb1BMWHRkeE1WNkRxV1VwY1RL?=
- =?utf-8?B?SlVzSGkydjhnTzJGTmFhQUZMWmc2TU1ldmJkL0RBZHdGOU9XS0t0Q1lpYnVo?=
- =?utf-8?B?M1FhTFlkNVFNSkVRNXdkMFpjNittUGRIVHMydkJ0Nng1eUk2cVVyRDlvQk56?=
- =?utf-8?B?dGx0bzZtWHNUMUswdHVVSld5a3hiR25VS1AwaC9UM0dQUDgzcXlpYmF5cEd4?=
- =?utf-8?B?QWZaT281MlQrR1A2TkpyTE1aTWJISURwbzFJUVZrOVJWUlV4cXFLWXdqQk9F?=
- =?utf-8?B?QXoza3BLOFFqV0JhUWdBeWJPc1F0TGIvNHpMdjZjcTZENFM0UHdMekN0aU5j?=
- =?utf-8?B?Y3dTOVdJMTdjOEF5aEZDb0RBUWxvaWxmcmZCbmlTaFk3M0U3b2VTUGZ4NU14?=
- =?utf-8?B?T3dMek9RQTJCQzloblVEbzlNYWR3Rms2OTc0UnJGVzJEYWZEMU9HYURsQkhI?=
- =?utf-8?B?SndmNXBYZytOMlpSTmp1QkZDRHdxWUFIa2w5ZTNxOSszTk5aNnhjbENlR0V1?=
- =?utf-8?B?TzU0TnpDVVdSUmhMajN1ck9DTHBYMHFyUk1MTkplSkYyeG9GODVKdjNmZE5F?=
- =?utf-8?B?eWlkVnRPSm1CMVpHZU5pK3BPRGJ1amk3MVVGWjRCYXMzRUd4KzRsNmVkV1Nz?=
- =?utf-8?B?eUpQTGhNd0VaTzBxa3BHdFVPdnlnNlA4NmxtSjlSYTJQaE9iT08wbE52MlBr?=
- =?utf-8?B?bTQ5bDM2OTlsaFhqUGMvZUlnVW01eUtRaVd1ckkwUGZSc0dCUWhhVDh1dE1X?=
- =?utf-8?B?L3QwS3BEUERIdjk2czZBWDN3cVdvSkE3QVY3THpSVFpCR2k5Z0lYSW1VNC9I?=
- =?utf-8?B?RklmUEMrK2xhMmN1b3VCSnFNYWIyS1FMc1lYNDJ3RVhFdnY4dmw3SFF4RHhI?=
- =?utf-8?B?NlJ3RHVjZ3hGQkNVYmhJT3BITVZzZHRjL1c0a3c1RHFNbVE4bytuKzhrTHJL?=
- =?utf-8?B?UEpQeW9HQkxYeEtCTithNzFpSjdIWFNzWHpHVTZMbDVvckhlY3o1Y2J1RlpG?=
- =?utf-8?B?K1RsdkpuMDBuaHRreXpCdTkwemxINzJ3ZzdJZHpiTnp6bzRCaVVWWjhZbEdx?=
- =?utf-8?B?ZGRIR0xUTWl0R0xhRzFUWWxKaWEyYkVDYVVCclAza3Nqckc4QnBuNDZ3LzNX?=
- =?utf-8?B?b1czdDN5WGFrenNyenlCL1hPRkt4eFFGYWx0ak9XaFlPd0ZWOFBueThhYUU4?=
- =?utf-8?B?bVREOHdBb3ZhbDJEeURZM2dSaWJRUHJwUGhLYTZpVzVST1VTdlhNNEZGdkk2?=
- =?utf-8?B?MWI2dm5FVmZnekFGSUllWk1lU3ZDUEkxRWRvL1VzTjFmVWtKdEpqOUl1WVNx?=
- =?utf-8?Q?hOACvOXsp7Q=3D?=
+	=?utf-8?B?WlBEMWl3dzAvZEtScEhkdTVvR3FJOXlFaGl3em55eHR6eERUeWFXUmtqUkRs?=
+ =?utf-8?B?VS9YLzczUDVsR3NtamdUdmVLc1hQTXU0SEVGOHRwSnloOFpHdGpGaE5LaFJ3?=
+ =?utf-8?B?ZkVNekJoeC9nUlVnanBuSWFoK2JQakxDNStrdERrd2Vpa2NTV1VqenJCZzdY?=
+ =?utf-8?B?VWtSa2tyc0tIUW5hekJqQWQrRXNIUlRNbFBNWWNBSVdoWXRpZUJiblJYV3U0?=
+ =?utf-8?B?elB3MW9RZE5tK0JSNFdtR0d6TzJwMTZ5UDJiMUpMNDMxRFpjV083Ry9nUi9Q?=
+ =?utf-8?B?Q1h6cTlCeVdMdk8rYXV6MXZzYm9iRUxXL3VwakRGOTlIMjZlUEkvY0txd2Fv?=
+ =?utf-8?B?dU1XZmxqb1B5anNnRmJ4OUZKYzdJclQrZ0p1emNadWRFOUJjUmtEUkowYWU3?=
+ =?utf-8?B?M1FqL2hrb0pmbHkwLzdmeUF0aUhnUWpRMVJlanBDV3Q1MnpyUHFFaUthc2to?=
+ =?utf-8?B?VzJLTDh5TW0xcnRscUJ0SXdMcG5aeWtsdm1YOGE0ZUE0U1hhOFFBMlQ2L1FP?=
+ =?utf-8?B?VnpidjhIcCtGSy9EWTBSc1F5ellFaVpmOWhtbUpzc0R1LzVLSXNaWFBRRG5o?=
+ =?utf-8?B?SFhBbERHb2llOW84VlVBbC9aNzdzYm9PZFM0MWIwVDRINDVTT3NFNlJ5ZzhB?=
+ =?utf-8?B?dFFKZEREWUludUpzbGNBTmtJOElLTnMxL28rS2hNWEp3dldmVDBMU0NoWmVi?=
+ =?utf-8?B?bGx0QVVmVnhJc0FtbjFEVEh0T282TTFiSE43STVEVXE4WXVDdStLcjZOa0tr?=
+ =?utf-8?B?Vm9yQjNCRWZpdnh1WnluY3ZnSTZCVUVVVkNjQURQSUNRZytESmxOR1psRWhO?=
+ =?utf-8?B?VHpMdUphcmwyb1dwemZRVC9hR045b2psRTNTempidmJlYnFYODBDM2FRQktV?=
+ =?utf-8?B?d3lWSEY1SzlhRFBncjNrazZDQTRGSlEwMDlSWExXVXlSa0VnNGhFNVUxTTNV?=
+ =?utf-8?B?d25lR2psZlEzc0tKTmg3cURKZTRvUmVGY2lkTFV6WHVoMzJWQWVIUmd3L2lD?=
+ =?utf-8?B?cUVnUjFWMnBIbWpUSEtWZS9PMVFhVnVJRlNIY0JsSWpxMmhZcStLNTJjOUta?=
+ =?utf-8?B?SEZGOHdVTFdicHltbmFmQXc1WDlGeFZJRjY5YXRjcnBJRkhnejdpSmNlYVVZ?=
+ =?utf-8?B?ZXNrUVVYZng4R3pRZURJT2NkeWcrZDRZcHpoMGJnZWhjb2RPWnJ4NFAzK3VB?=
+ =?utf-8?B?c1FpNk5aTUFaMWp1ODcvZHY0U3dDNVRaNVhGMlBMZ0dsZmJ0cHoyQkgreW9G?=
+ =?utf-8?B?dmV4TkJ4Rk51c2c1YW5hS1RyWThaOVh3YVFiUjBOWlA4WW1JZnFHakUwWjJl?=
+ =?utf-8?B?V29HYWtQWXdtNlRueCtSMGRNaXdpRWZCNm1qQ3BEZmY5Z0xJNHhrUjRmNE02?=
+ =?utf-8?B?NmVyd1E1bkV0VUxGZVZtM3lQajcvVzFvT2grWUNzOUxNZHpYV0N5M28wSU9V?=
+ =?utf-8?B?eEpZSkk5b1hKMHBUVGZ6RzNoSkRQVnNyRFEvNmQ0UGJOSUc5cFhlVUZ2Y0o1?=
+ =?utf-8?B?eC9DWktnRWZSYjNOMHRERUNFdjQ1UDY0THBPZGFHK3laQzBDdk9qejRPa0wr?=
+ =?utf-8?B?V2svbzh1bURxV1pCU0ZtL1FDeVk0b0NVeTBEL3RHRzh4SFNYaTJDUDVjVFNB?=
+ =?utf-8?B?MWdQL3paN3d5RzZSYzBGVHBGOHdmdHZ5aVU5Ni9DbjE1OEpmRW1qL05WU1FM?=
+ =?utf-8?B?eWJyZWJsWW9weXR5bnZMUDcvQjlnbE1sY3BzOHJseVcwZnFra2tmRi9NSE84?=
+ =?utf-8?B?SnRiYkk1S21wVWcrTW5oTy84UThXWTFjaHlRNVRGckx2OWRFY2U0UnlDMDNt?=
+ =?utf-8?B?OUpRcnp3eDNyeE5jZUk5WlJUL1hYakZZdzcwQ1ZjMHltZDUyY0l1cVAwZWdM?=
+ =?utf-8?B?b3RuWVNsSmhSY3BZcnFCMC8zUWtYeHpwbzJZaWdwQlJZOEhuc1NvTXQvRVRK?=
+ =?utf-8?Q?FGqetR/B5gU=3D?=
 X-Forefront-Antispam-Report:
-	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(36860700010)(376011)(7416011)(1800799021)(82310400023)(921017);DIR:OUT;SFP:1101;
+	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(376011)(7416011)(82310400023)(1800799021)(36860700010)(921017);DIR:OUT;SFP:1101;
 X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2024 15:04:26.5440
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2024 15:04:26.7940
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96904915-9def-42ba-8070-08dc90711ca0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 762aa0ae-42ab-44f6-a603-08dc90711cc6
 X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	AM4PEPF00027A64.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR02MB6677
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR02MB6775
 
-Add the definitions of LRE registers for Broadcom BCM5481x PHY
+There is a group of PHY chips supporting BroadR-Reach link modes in
+a manner allowing for more or less identical register usage as standard
+Clause 22 PHY.
+These chips support standard Ethernet link modes as well, however, the
+circuitry is mutually exclusive and cannot be auto-detected.
+The link modes in question are 100Base-T1 as defined in IEEE802.3bw,
+based on Broadcom's 1BR-100 link mode, and newly defined 10Base-T1BRR
+(1BR-10 in Broadcom documents).
+
+Add optional brr-mode flag to switch the PHY to BroadR-Reach mode.
 
 Signed-off-by: Kamil Horák - 2N <kamilh@axis.com>
 ---
- include/linux/brcmphy.h | 89 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 89 insertions(+)
+ Documentation/devicetree/bindings/net/ethernet-phy.yaml | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/include/linux/brcmphy.h b/include/linux/brcmphy.h
-index 1394ba302367..ae39c33e4086 100644
---- a/include/linux/brcmphy.h
-+++ b/include/linux/brcmphy.h
-@@ -270,6 +270,86 @@
- #define BCM5482_SSD_SGMII_SLAVE		0x15	/* SGMII Slave Register */
- #define BCM5482_SSD_SGMII_SLAVE_EN	0x0002	/* Slave mode enable */
- #define BCM5482_SSD_SGMII_SLAVE_AD	0x0001	/* Slave auto-detection */
-+#define BCM5482_SSD_SGMII_SLAVE_AD	0x0001	/* Slave auto-detection */
-+
-+/* BroadR-Reach LRE Registers. */
-+#define MII_BCM54XX_LRECR		0x00	/* LRE Control Register                    */
-+#define MII_BCM54XX_LRESR		0x01	/* LRE Status Register                     */
-+#define MII_BCM54XX_LREPHYSID1		0x02	/* LRE PHYS ID 1                           */
-+#define MII_BCM54XX_LREPHYSID2		0x03	/* LRE PHYS ID 2                           */
-+#define MII_BCM54XX_LREANAA		0x04	/* LDS Auto-Negotiation Advertised Ability */
-+#define MII_BCM54XX_LREANAC		0x05	/* LDS Auto-Negotiation Advertised Control */
-+#define MII_BCM54XX_LREANPT		0x06	/* LDS Ability Next Page Transmit          */
-+#define MII_BCM54XX_LRELPA		0x07	/* LDS Link Partner Ability                */
-+#define MII_BCM54XX_LRELPNPM		0x08	/* LDS Link Partner Next Page Message      */
-+#define MII_BCM54XX_LRELPNPC		0x09	/* LDS Link Partner Next Page Control      */
-+#define MII_BCM54XX_LRELDSE		0x0a	/* LDS Expansion Register                  */
-+#define MII_BCM54XX_LREES		0x0f	/* LRE Extended Status                     */
-+
-+/* LRE control register. */
-+#define LRECR_RESET			0x8000	/* Reset to default state      */
-+#define LRECR_LOOPBACK			0x4000	/* Internal Loopback           */
-+#define LRECR_LDSRES			0x2000	/* Restart LDS Process         */
-+#define LRECR_LDSEN			0x1000	/* LDS Enable                  */
-+#define LRECR_PDOWN			0x0800	/* Enable low power state      */
-+#define LRECR_ISOLATE			0x0400	/* Isolate data paths from MII */
-+#define LRECR_SPEED100			0x0200	/* Select 100 Mbps             */
-+#define LRECR_SPEED10			0x0000	/* Select 10 Mbps              */
-+#define LRECR_4PAIRS			0x0020	/* Select 4 Pairs              */
-+#define LRECR_2PAIRS			0x0010	/* Select 2 Pairs              */
-+#define LRECR_1PAIR			0x0000	/* Select 1 Pair               */
-+#define LRECR_MASTER			0x0008	/* Force Master when LDS disabled */
-+#define LRECR_SLAVE			0x0000	/* Force Slave when LDS disabled  */
-+
-+/* LRE status register. */
-+#define LRESR_100_1PAIR			0x2000	/* Can do 100Mbps 1 Pair       */
-+#define LRESR_100_4PAIR			0x1000	/* Can do 100Mbps 4 Pairs      */
-+#define LRESR_100_2PAIR			0x0800	/* Can do 100Mbps 2 Pairs      */
-+#define LRESR_10_2PAIR			0x0400	/* Can do 10Mbps 2 Pairs       */
-+#define LRESR_10_1PAIR			0x0200	/* Can do 10Mbps 1 Pair        */
-+#define LRESR_ESTATEN			0x0100	/* Extended Status in R15      */
-+#define LRESR_RESV			0x0080	/* Unused...                   */
-+#define LRESR_MFPS			0x0040	/* Can suppress Management Frames Preamble */
-+#define LRESR_LDSCOMPLETE		0x0020	/* LDS Auto-negotiation complete */
-+#define LRESR_8023			0x0010	/* Has IEEE 802.3 Support      */
-+#define LRESR_LDSABILITY		0x0008	/* LDS auto-negotiation capable */
-+#define LRESR_LSTATUS			0x0004	/* Link status                 */
-+#define LRESR_JCD			0x0002	/* Jabber detected             */
-+#define LRESR_ERCAP			0x0001	/* Ext-reg capability          */
-+
-+/* LDS Auto-Negotiation Advertised Ability. */
-+#define LREANAA_PAUSE_ASYM		0x8000	/* Can pause asymmetrically    */
-+#define LREANAA_PAUSE			0x4000	/* Can pause                   */
-+#define LREANAA_100_1PAIR		0x0020	/* Can do 100Mbps 1 Pair       */
-+#define LREANAA_100_4PAIR		0x0010	/* Can do 100Mbps 4 Pair       */
-+#define LREANAA_100_2PAIR		0x0008	/* Can do 100Mbps 2 Pair       */
-+#define LREANAA_10_2PAIR		0x0004	/* Can do 10Mbps 2 Pair        */
-+#define LREANAA_10_1PAIR		0x0002	/* Can do 10Mbps 1 Pair        */
-+
-+#define LRE_ADVERTISE_FULL		(LREANAA_100_1PAIR | LREANAA_100_4PAIR | \
-+					 LREANAA_100_2PAIR | LREANAA_10_2PAIR | \
-+					 LREANAA_10_1PAIR)
-+
-+#define LRE_ADVERTISE_ALL		LRE_ADVERTISE_FULL
-+
-+/* LDS Link Partner Ability. */
-+#define LRELPA_PAUSE_ASYM		0x8000	/* Supports asymmetric pause   */
-+#define LRELPA_PAUSE			0x4000	/* Supports pause capability   */
-+#define LRELPA_100_1PAIR		0x0020	/* 100Mbps 1 Pair capable      */
-+#define LRELPA_100_4PAIR		0x0010	/* 100Mbps 4 Pair capable      */
-+#define LRELPA_100_2PAIR		0x0008	/* 100Mbps 2 Pair capable      */
-+#define LRELPA_10_2PAIR			0x0004	/* 10Mbps 2 Pair capable       */
-+#define LRELPA_10_1PAIR			0x0002	/* 10Mbps 1 Pair capable       */
-+
-+/* LDS Expansion register. */
-+#define LDSE_DOWNGRADE			0x8000	/* Can do LDS Speed Downgrade  */
-+#define LDSE_MASTER			0x4000	/* Master / Slave              */
-+#define LDSE_PAIRS_MASK			0x3000	/* Pair Count Mask             */
-+#define LDSE_PAIRS_SHIFT		12
-+#define LDSE_4PAIRS			(2 << LDSE_PAIRS_SHIFT)	/* 4 Pairs Connection */
-+#define LDSE_2PAIRS			(1 << LDSE_PAIRS_SHIFT)	/* 2 Pairs Connection */
-+#define LDSE_1PAIR			(0 << LDSE_PAIRS_SHIFT)	/* 1 Pair  Connection */
-+#define LDSE_CABLEN_MASK		0x0FFF	/* Cable Length Mask           */
+diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+index 8fb2a6ee7e5b..0353ef98f2e1 100644
+--- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
++++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+@@ -93,6 +93,13 @@ properties:
+       the turn around line low at end of the control phase of the
+       MDIO transaction.
  
- /* BCM54810 Registers */
- #define BCM54810_EXP_BROADREACH_LRE_MISC_CTL	(MII_BCM54XX_EXP_SEL_ER + 0x90)
-@@ -277,6 +357,15 @@
- #define BCM54810_SHD_CLK_CTL			0x3
- #define BCM54810_SHD_CLK_CTL_GTXCLK_EN		(1 << 9)
- 
-+/* BCM54811 Registers */
-+#define BCM54811_EXP_BROADREACH_LRE_OVERLAY_CTL	(MII_BCM54XX_EXP_SEL_ER + 0x9A)
-+/* Access Control Override Enable */
-+#define BCM54811_EXP_BROADREACH_LRE_OVERLAY_CTL_EN		BIT(15)
-+/* Access Control Override Value */
-+#define BCM54811_EXP_BROADREACH_LRE_OVERLAY_CTL_OVERRIDE_VAL	BIT(14)
-+/* Access Control Value */
-+#define BCM54811_EXP_BROADREACH_LRE_OVERLAY_CTL_VAL		BIT(13)
++  brr-mode:
++    $ref: /schemas/types.yaml#/definitions/flag
++    description:
++      Request the PHY to operate in BroadR-Reach mode. This means the
++      PHY will use the BroadR-Reach protocol to communicate with the other
++      end of the link, including LDS auto-negotiation if applicable.
 +
- /* BCM54612E Registers */
- #define BCM54612E_EXP_SPARE0		(MII_BCM54XX_EXP_SEL_ETC + 0x34)
- #define BCM54612E_LED4_CLK125OUT_EN	(1 << 1)
+   clocks:
+     maxItems: 1
+     description:
 -- 
 2.39.2
 
