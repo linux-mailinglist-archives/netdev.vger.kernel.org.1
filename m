@@ -1,161 +1,109 @@
-Return-Path: <netdev+bounces-104773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0810990E4C6
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:43:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 507BE90E4C3
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:43:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74B861F26527
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 07:43:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B88F228681A
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 07:43:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC089770F0;
-	Wed, 19 Jun 2024 07:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1CF770ED;
+	Wed, 19 Jun 2024 07:43:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="bQYIK2BV"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="O9NfQard"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A536473514;
-	Wed, 19 Jun 2024 07:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9645073514
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 07:43:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718783013; cv=none; b=Q8Yq0vrY1tb1FxNoyKwoLDu4bv07TPsiV4KcNR5FjG2dp2l9YSTmHMAufJ+K9XXCBQyakz22H5ikt7mHy2ZPy5+9xgtnmRd36WzFHObYpVasV/z/5xjatZB1UKcnqf6Uj4O4a+4n4J+bwrb2YxJsEx21xU35BsreHLiy7xjU2Us=
+	t=1718782991; cv=none; b=oHGc/P433Fgn/nKRyPLhxZyM0vSebANV9cW9omSu94GL/BSqoNW24H2AxgGh2Ij65t23AW77CjT+Y8AO7/QEO/YMmyla/JvVnCGcTvnPG/FkmOx77VVpa4rILaapJTcaolDOzXBvHuku1E/IaRepJuYtKqY/Bh5r4V0E7Wa2SEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718783013; c=relaxed/simple;
-	bh=Kk0tvkTiO2T3b876bdyv7dDPKT0iSXVPQDtbWjD4hA0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=UNlGJRx30w08sRVb/s4i15Vb7gmjmVDBO8k8cAE29UklDzEuohkUEsCuG1S0zRaawUTNIdj+m9pDNcYESlHSDM3O8RuEVVo58hdSr1y56FxyX8BjG1s+ly2njiK3oHx7ShlRVtC1BxVC6d/2Mbi/RUS3y5AUReW92G1AS3uarIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=bQYIK2BV; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45J7QKhf006854;
-	Wed, 19 Jun 2024 09:43:01 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	di+SFQRmDgPvKMWT6Avy9+LOTjR2HwG3kwmIyd/HWss=; b=bQYIK2BVaJri3TYl
-	Mx9sEnwEywh9t7P2P9uEBpVr9z0M2NJ8+BqVkU4DX3Yd0O4nuuiuiN/gbbsujcmz
-	PFJMEPSU1RyqjHdHjVrOQl6Wi/nwyh6rpyhcZ1+ojawgwQ2NSXo+9LoumV7TaG+n
-	kPuvrorX22uMVDsct3j7jaW9F+qOeCdYWylExJKWRhE4vJs/K3lv4aqWVUkbG0yI
-	CSL1HfPRS9vRRPN5CJIwwiO/m6g45zD8TQ2qHY9O9hOEBHIwhQcTwdBHqWtYLYH5
-	DpIjOLBgrNUc1P0abkwJ53f7R1W9NL4JGDbt0yfTxlKjeqjKx3onsE/EWHlABaz3
-	4crI/Q==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yuj9t1u0k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Jun 2024 09:43:00 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 9017D40048;
-	Wed, 19 Jun 2024 09:42:54 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id C3253210F6D;
-	Wed, 19 Jun 2024 09:41:42 +0200 (CEST)
-Received: from [10.48.86.164] (10.48.86.164) by SHFDAG1NODE2.st.com
- (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 19 Jun
- 2024 09:41:39 +0200
-Message-ID: <aee3f6d2-6a44-4de6-9348-f83c4107188f@foss.st.com>
-Date: Wed, 19 Jun 2024 09:41:38 +0200
+	s=arc-20240116; t=1718782991; c=relaxed/simple;
+	bh=CWFYCLr1S9tlTDsXwd82PYiyX9o/sFArGzlmRlQeeQM=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=EcRRm5UbHwSAfuYlcj77cVKAawLw6fhZzKzO5PhObgTdLTa9TXq+2fWpNCfgbK8GHpD2L6j0x67E+i1mRHZ2I3/dXqc+kxeBxDCb/+AB6XEpPKNe4ch22Qxlywzqi0j2JEn5BAV98Mn20kBwUDbYUkRlIDVlgm5ltHc1cAo0kOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=O9NfQard; arc=none smtp.client-ip=115.124.30.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1718782981; h=Message-ID:Subject:Date:From:To;
+	bh=wCgw5wclWH6p97tsJn6yIeHJSR+uCtIF69aE5YHRmqQ=;
+	b=O9NfQardvUIqHTHXVFipwL8zB6XiCC1OgVUFWWkzgM7TgwY7m+KsQLTQXL8Ap60NQJTRcDUBhVtmm6N/rVhohd8g78/Q3rBZWCR2F4Ne96eZAlfy+jkCL8BlWv8b1XdcvXSnpXToXKAf9wfTbh6s4Z/i3mX3mybHw1g5bTAkGsE=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0W8nS15P_1718782979;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W8nS15P_1718782979)
+          by smtp.aliyun-inc.com;
+          Wed, 19 Jun 2024 15:43:00 +0800
+Message-ID: <1718782933.7258735-3-hengqi@linux.alibaba.com>
+Subject: Re: [PATCH] virtio_net: Use u64_stats_fetch_begin() for stats fetch
+Date: Wed, 19 Jun 2024 15:42:13 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: Li RongQing <lirongqing@baidu.com>
+Cc: Li RongQing <lirongqing@baidu.com>,
+ mst@redhat.com,
+ jasowang@redhat.com,
+ xuanzhuo@linux.alibaba.com,
+ eperezma@redhat.com,
+ virtualization@lists.linux.dev,
+ netdev@vger.kernel.org
+References: <20240619025529.5264-1-lirongqing@baidu.com>
+In-Reply-To: <20240619025529.5264-1-lirongqing@baidu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,PATCH 2/2] net: stmmac: dwmac-stm32: stm32: add
- management of stm32mp25 for stm32
-To: Marek Vasut <marex@denx.de>, "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        Liam Girdwood
-	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20240614130812.72425-1-christophe.roullier@foss.st.com>
- <20240614130812.72425-3-christophe.roullier@foss.st.com>
- <4c2f1bac-4957-4814-bf62-816340bd9ff6@denx.de>
- <09010b02-fb55-4c4b-9d0c-36bd0b370dc8@foss.st.com>
- <39d35f6d-4f82-43af-883b-a574b8a67a1a@denx.de>
- <8c3f1696-d67c-4960-ad3a-90461c896aa5@foss.st.com>
- <3dee3c8a-12f0-42bd-acdf-8008da795467@denx.de>
-Content-Language: en-US
-From: Christophe ROULLIER <christophe.roullier@foss.st.com>
-In-Reply-To: <3dee3c8a-12f0-42bd-acdf-8008da795467@denx.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-19_02,2024-06-17_01,2024-05-17_01
 
-Hi Marek,
+On Wed, 19 Jun 2024 10:55:29 +0800, Li RongQing <lirongqing@baidu.com> wrote:
+> This place is fetching the stats, so u64_stats_fetch_begin
+> and u64_stats_fetch_retry should be used
 
-On 6/18/24 17:00, Marek Vasut wrote:
-> On 6/18/24 11:09 AM, Christophe ROULLIER wrote:
->
-> Hi,
->
->>>>>> +static int stm32mp2_configure_syscfg(struct plat_stmmacenet_data 
->>>>>> *plat_dat)
->>>>>> +{
->>>>>> +    struct stm32_dwmac *dwmac = plat_dat->bsp_priv;
->>>>>> +    u32 reg = dwmac->mode_reg;
->>>>>> +    int val = 0;
->>>>>> +
->>>>>> +    switch (plat_dat->mac_interface) {
->>>>>> +    case PHY_INTERFACE_MODE_MII:
->>>>>> +        break;
->>>>>
->>>>> dwmac->enable_eth_ck does not apply to MII mode ? Why ?
->>>>
->>>> It is like MP1 and MP13, nothing to set in syscfg register for case 
->>>> MII mode wo crystal.
->>>
->>> Have a look at STM32MP15xx RM0436 Figure 83. Peripheral clock 
->>> distribution for Ethernet.
->>>
->>> If RCC (top-left corner of the figure) generates 25 MHz MII clock 
->>> (yellow line) on eth_clk_fb (top-right corner), can I set 
->>> ETH_REF_CLK_SEL to position '1' and ETH_SEL[2] to '0' and feed ETH 
->>> (right side) clk_rx_i input with 25 MHz clock that way ?
->>>
->>> I seems like this should be possible, at least theoretically. Can 
->>> you check with the hardware/silicon people ?
->> No it is not possible (it will work if speed (and frequency) is fixed 
->> 25Mhz=100Mbps, but for speed 10Mbps (2,5MHz) it will not work.
->
-> Could the pll4_p_ck or pll3_q_ck generate either 25 MHz or 2.5 MHz as 
-> needed in that case ? Then it would work, right ?
+Reviewed-by: Heng Qi <hengqi@linux.alibaba.com>
 
-Yes you can set frequency you want for pll4 or pll3, if you set 25MHz 
-and auto-negotiation of speed is 100Mbps it should work (pad ETH_CK of 
-25MHz clock the PHY and eth_clk_fb set to 25MHz for clk_RX)
+Thanks!
 
-but if autoneg of speed is 10Mbps, then 2.5MHz is needed for clk_RX (you 
-will provide 25Mhz). For RMII case, frequency from pll (eth_clk_fb) is 
-automatically adjust in function of speed value, thanks to diviser /2, 
-/20 with mac_speed_o.
-
->
->> (you can see than diviser are only for RMII mode)
->
-> Do you refer to /2 and /20 dividers to the left of mac_speed_o[0] ?
+> 
+> Fixes: 6208799553a8 ("virtio-net: support rx netdim")
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> ---
+>  drivers/net/virtio_net.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 61a57d1..b669e73 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -2332,16 +2332,18 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
+>  static void virtnet_rx_dim_update(struct virtnet_info *vi, struct receive_queue *rq)
+>  {
+>  	struct dim_sample cur_sample = {};
+> +	unsigned int start;
+>  
+>  	if (!rq->packets_in_napi)
+>  		return;
+>  
+> -	u64_stats_update_begin(&rq->stats.syncp);
+> -	dim_update_sample(rq->calls,
+> -			  u64_stats_read(&rq->stats.packets),
+> -			  u64_stats_read(&rq->stats.bytes),
+> -			  &cur_sample);
+> -	u64_stats_update_end(&rq->stats.syncp);
+> +	do {
+> +		start = u64_stats_fetch_begin(&rq->stats.syncp);
+> +		dim_update_sample(rq->calls,
+> +				u64_stats_read(&rq->stats.packets),
+> +				u64_stats_read(&rq->stats.bytes),
+> +				&cur_sample);
+> +	} while (u64_stats_fetch_retry(&rq->stats.syncp, start));
+>  
+>  	net_dim(&rq->dim, cur_sample);
+>  	rq->packets_in_napi = 0;
+> -- 
+> 2.9.4
+> 
 
