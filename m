@@ -1,134 +1,136 @@
-Return-Path: <netdev+bounces-104951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A296190F453
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 18:42:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23D2490F456
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 18:42:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C42CB22021
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:42:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0B95283E16
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:42:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF22C154C0F;
-	Wed, 19 Jun 2024 16:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F35CA156220;
+	Wed, 19 Jun 2024 16:40:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FM/6aQCr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R+lVsXx2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F4103153BF0
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 16:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEDD7155A5B
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 16:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718815201; cv=none; b=oVJS6s3KCoBpBNR3Nv6hPMTirPL+bVGJO0PKBsGq1nmJmgfwkMtM/Br0cG3tsadJ68IZPpup5P9L5GoKWUIW3Me92gfzgF4JGRmLQuLKlttSU728puZIE96gyMymMS0LJmtuI0QIAYRPUafstpxPe3i2LrgezzhXk7w8KTvoUI8=
+	t=1718815234; cv=none; b=W/wJISB8yTAe5CnTzrwirTkdbBQFMitiZmPQSbBqTWhLnH3FI8UBRFkfFVuEt4Nebt4JvDrpVkU91pKxRzmglFu9h6x7gG1mNSKsGjJ8fBoRXvbDgJvP3a187tnD66GkomEnboH9+L327ymtGID0cXHXpLr0FMW8aDA/WiW3xRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718815201; c=relaxed/simple;
-	bh=TLxDuDULv7mvnSpOlUw3zxuVhjTlDVDDw8EewhZA5MU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=McFryQqKKnxXMleQbxKBy+b81I49zUYTQuvMu0VGeFIwV/ns5SERRhpTEXIQvQ5p6Oq+qWi47kMh7gm5wTGzCfG4qy8bR+Bb1D4ivKsVno519sBmkydtx+s5GOgePAQJpgngbkbAOy885qMsji8MuOMffmoRMQVyZpfme5xxR+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FM/6aQCr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718815199;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P60Z+qqKP/gxhy1fal8KOowFEF1s+YzH3edKw1gHlyU=;
-	b=FM/6aQCrgoL8qshur8rleJ3Qhz5i3MmMhcg1Rv7t2D4p8wear3fyrMXeAjOW9KjwdrnWew
-	Iz9LCpkgCFJdNdaBsyx7sh265A9WFZEJ0bjuMBUb8+nzzRn1wYcEXvWkV8a+9yjOn80gU6
-	6WakzzfrrFDAW+mNrYosX99OuAN/xrw=
-Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
- [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-150-ru5skUhvPjykTA3oDMQ6yQ-1; Wed, 19 Jun 2024 12:39:58 -0400
-X-MC-Unique: ru5skUhvPjykTA3oDMQ6yQ-1
-Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-63bf1d3fb2dso1964957b3.1
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 09:39:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718815197; x=1719419997;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P60Z+qqKP/gxhy1fal8KOowFEF1s+YzH3edKw1gHlyU=;
-        b=kmiyev2TNoiQIYD1LdbJYGGJmodB4tlAGhP7FZleH6z5wJ/c3WNXcCklhKUDOd85q6
-         oFArXv8pE/UsfJ0+HV4q3S3aNuzZ/CNV4tdb8C2o4XsARPkR0TT/kt+2Exf7f0Kg1sxh
-         NwR4VtC5OcNb0AqiJr1XTP3N+6PwNa1vW4VKYPaJGUyP8ntVIyPJoy9bo1z8UVZZEt85
-         obSLbPdi7J3x2WwXvilToUi5QevelWYTK2o0d9wFLqSi7m0gGbuVDvcygk5RVH0Bqp/m
-         CaENZribCbD/5NAJTnD9wkm/g/uWFo/lFLM/OwPIvWFiNebK+craMi3bHVEFE9oYAtrD
-         IU+A==
-X-Forwarded-Encrypted: i=1; AJvYcCWNln5sThmmVH91HDib5B0e9nK8pxLhZWlvsdjVJH4rj/mhYEeNaa/t8UL7UFINUNNjRb7+TNInWKrr1P295jnAl+CAcQ73
-X-Gm-Message-State: AOJu0YzXUW0446SkasF0Jd/ikm371wF9DI2k2hB/+4VGX1w1i85wK77n
-	87B/z7bMBRugcO7PiUrVKH+ZEpOnpf/XfwpmjqCs2kEWApCigSXw8Cgefri506esL+dGylxuW9S
-	uafNdIuGyLkND4G+5p8YmKJ+UvMnHHaGERZ1HO7/fE1OJIRcMyfIRnR0wM08AafOOOTELuN5fqV
-	simE/8IFVGuE5QRkxJJGb7i69ajZsJNVaY9dxfZVM=
-X-Received: by 2002:a05:690c:94d:b0:61a:b038:6d34 with SMTP id 00721157ae682-63a8e4bb5a1mr33219897b3.24.1718815197196;
-        Wed, 19 Jun 2024 09:39:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHOXaEuiFH0ecGWxfyNYKYA47piELvowHtDpjSC86sl6JvY/gqFtoIQ2677PkimEVq0gbLNOWpWdslhce2oYP0=
-X-Received: by 2002:a05:690c:94d:b0:61a:b038:6d34 with SMTP id
- 00721157ae682-63a8e4bb5a1mr33219687b3.24.1718815196917; Wed, 19 Jun 2024
- 09:39:56 -0700 (PDT)
+	s=arc-20240116; t=1718815234; c=relaxed/simple;
+	bh=WiLlLBvmqm2nG+tSOKaMxsR1LfIbZPqnHSXTtDsVPdY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kuQQwrB2AkfJNLiN4C5zxP7ybDkV1toWYKOlEfrCCL3/E7VJE5vgY+IwYEAXOFFmmXFJilnK5jW+x6sZrUS9EDN1X86e6Sv9i3cuUDX3qT6CXBjHp1by5BraB947Vt+0TSyg4aT5sIE8gOPW6WGK6WMnN4ANvCbeUt2XHvbDwDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R+lVsXx2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12B75C2BBFC;
+	Wed, 19 Jun 2024 16:40:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718815234;
+	bh=WiLlLBvmqm2nG+tSOKaMxsR1LfIbZPqnHSXTtDsVPdY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R+lVsXx2w8ziK9fO9ZTjiSESUTh0JRsezGDN+Ij3X248Z9GcnF6zFBBJZAjtacIjY
+	 u1ObTWLZ6FIA3cKEVRJGmQWt9S/imwNy7lYfUk177sVOxucMC/TPTU5K1DHUnks3cY
+	 jHADDm4d7Z6dDC9m0/dwIVEeJ18hGky7OfIx7bU9Zmn3hnkeO4QhIcXZUdKyghMorp
+	 YRF6XmEKTxreQyqTuvDCM5Bqn/vUxWayGujlxKkcbFQyF3SCuekS7a2odSJbazq6gm
+	 wZr5rrWgpwZvGewcuhNTG/f5AuER5/Oba5Y7d/lpRSZtQOYAHaT5pLGhNQBZVU2qP/
+	 X4M/J7aFV3BBA==
+Date: Wed, 19 Jun 2024 17:40:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: Karol Kolacinski <karol.kolacinski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH iwl-net 2/3] ice: Don't process extts if PTP is disabled
+Message-ID: <20240619164030.GJ690967@kernel.org>
+References: <20240618104310.1429515-1-karol.kolacinski@intel.com>
+ <20240618104310.1429515-3-karol.kolacinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240617-stage-vdpa-vq-precreate-v1-0-8c0483f0ca2a@nvidia.com> <20240617-stage-vdpa-vq-precreate-v1-23-8c0483f0ca2a@nvidia.com>
-In-Reply-To: <20240617-stage-vdpa-vq-precreate-v1-23-8c0483f0ca2a@nvidia.com>
-From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Wed, 19 Jun 2024 18:39:20 +0200
-Message-ID: <CAJaqyWc+bmWVU8Lu40bhxEatJ5y1f3n=AD2_UborSRa+Bf495g@mail.gmail.com>
-Subject: Re: [PATCH vhost 23/23] vdpa/mlx5: Don't enable non-active VQs in .set_vq_ready()
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Si-Wei Liu <si-wei.liu@oracle.com>, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
-	Cosmin Ratiu <cratiu@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240618104310.1429515-3-karol.kolacinski@intel.com>
 
-On Mon, Jun 17, 2024 at 5:09=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
-> wrote:
->
-> VQ indices in the range [cur_num_qps, max_vqs) represent queues that
-> have not yet been activated. .set_vq_ready should not activate these
-> VQs.
->
-> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+On Tue, Jun 18, 2024 at 12:41:37PM +0200, Karol Kolacinski wrote:
+> From: Jacob Keller <jacob.e.keller@intel.com>
+> 
+> The ice_ptp_extts_event() function can race with ice_ptp_release() and
+> result in a NULL pointer dereference which leads to a kernel panic.
+> 
+> Panic occurs because the ice_ptp_extts_event() function calls
+> ptp_clock_event() with a NULL pointer. The ice driver has already
+> released the PTP clock by the time the interrupt for the next external
+> timestamp event occurs.
+> 
+> To fix this, modify the ice_ptp_extts_event() function to check the
+> PTP state and bail early if PTP is not ready. To ensure that the IRQ
+> sees the state change, call synchronize_irq() before removing the PTP
+> clock.
 
-Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+Hi Karol and Jacob,
 
+After pf->ptp.state is set in ptp_clock_event(),
+ice_ptp_disable_all_extts() is called which in turn calls
+synchronize_irq(). Which I assume is what the last sentence above refers
+to. But the way it is worded it sounds like a call to synchronize_irq() is
+being added by this patch, which is not the case.
+
+I suppose it is not a big deal, but this did confuse me.
+So perhaps the wording could be enhanced?
+
+> Another potential fix would be to ensure that all the GPIO configuration
+> gets disabled during release of the driver. This is currently not
+> trivial as each device family has its own set of configuration which is
+> not shared across all devices. In addition, only some of the device
+> families use the pin configuration interface. For now, relying on the
+> state flag is the simpler solution.
+> 
+> Fixes: 172db5f91d5f ("ice: add support for auxiliary input/output pins")
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 > ---
->  drivers/vdpa/mlx5/net/mlx5_vnet.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/ml=
-x5_vnet.c
-> index 1a5ee0d2b47f..a969a7f105a6 100644
-> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> @@ -1575,6 +1575,9 @@ static int resume_vq(struct mlx5_vdpa_net *ndev, st=
-ruct mlx5_vdpa_virtqueue *mvq
->         if (!mvq->initialized)
->                 return 0;
->
-> +       if (mvq->index >=3D ndev->cur_num_vqs)
-> +               return 0;
+>  drivers/net/ethernet/intel/ice/ice_ptp.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> index 30f1f910e6d9..b952cad42f92 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> @@ -1559,6 +1559,10 @@ void ice_ptp_extts_event(struct ice_pf *pf)
+>  	u8 chan, tmr_idx;
+>  	u32 hi, lo;
+>  
+> +	/* Don't process timestamp events if PTP is not ready */
+> +	if (pf->ptp.state != ICE_PTP_READY)
+> +		return;
 > +
->         switch (mvq->fw_state) {
->         case MLX5_VIRTIO_NET_Q_OBJECT_STATE_INIT:
->                 /* Due to a FW quirk we need to modify the VQ fields firs=
-t then change state.
->
-> --
-> 2.45.1
->
+>  	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
+>  	/* Event time is captured by one of the two matched registers
+>  	 *      GLTSYN_EVNT_L: 32 LSB of sampled time event
+> @@ -1573,10 +1577,8 @@ void ice_ptp_extts_event(struct ice_pf *pf)
+>  			event.timestamp = (((u64)hi) << 32) | lo;
+>  			event.type = PTP_CLOCK_EXTTS;
+>  			event.index = chan;
+> -
+> -			/* Fire event */
+> -			ptp_clock_event(pf->ptp.clock, &event);
+>  			pf->ptp.ext_ts_irq &= ~(1 << chan);
+> +			ptp_clock_event(pf->ptp.clock, &event);
+>  		}
+>  	}
+>  }
 
+I'm also confused (often, TBH!) as to how the last hunk of this
+patch relates to the problem at hand.
 
