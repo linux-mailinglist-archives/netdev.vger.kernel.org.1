@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-104737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50C2190E378
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 08:33:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F75890E391
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 08:36:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC6E5B218A6
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 06:33:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82CD8B2111E
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 06:36:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8106D6A8D2;
-	Wed, 19 Jun 2024 06:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB246F319;
+	Wed, 19 Jun 2024 06:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hgGZKGgz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UJNscaX0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C76B1E529;
-	Wed, 19 Jun 2024 06:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752066F315;
+	Wed, 19 Jun 2024 06:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718778813; cv=none; b=lkqVCjTX/C0xhSWoODv9jWiaHmdd9//1AkNUNjZOoulviswmBDUd528/LYw+MEo/LdnNQUyO/t7TnJhDnH0KcKCRqOu99kopbyfsrzaza1kiQj9z/7r5+0S/mVAJCmw/I9m1e9ZPzmEdp161goONBrP8xg46Nup8lPYpAdAWFdo=
+	t=1718778910; cv=none; b=ijundILy3YkmMyQbN6/3vVi5Ey6yIVuK/89eC+GmzHsJMcmoMJ5bp6iShkV4CuN3AYwD0wU2eVQ9jG6xoYOwtd9284mrWjrLZ4KZVl7D+ZpspyPWVrBFQb6J+hK4UM7oppAjK0XL9pPQ9e4+jBFEgQtAzKmr2Cq/8YlPNeJqnZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718778813; c=relaxed/simple;
-	bh=L6nini8FklPI83xiJdm6J/GoYxo5hy8hsC4dL0eDQsY=;
+	s=arc-20240116; t=1718778910; c=relaxed/simple;
+	bh=UDqcr8PsQ5epcKbuV5qSLh/aCNPCwA9b1ki+GensfqY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nNNeKLI4fR+FVOM8JECwkja8HV72/vLT23QG8bc2pF5dbTQUjLpBGqbxCpji+pcQ/w/X5qXbGcH0/cuSuF+S8oHpbFwBzLrNl0xdKqkX8SxtFsWBeWwKaJywdBbZE1hpmpMHWNLcVIMV7fRuwsf1kZYkOabWfNFbKYJfoE1iqE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hgGZKGgz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2E04C2BBFC;
-	Wed, 19 Jun 2024 06:33:27 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=r6rf1Y7+tLYTAK6HMUCfVkQJtEGJEfxCOngZgojo09ZocvU5WDH1inI9zQlEymxsj0mBLi5llMiTRznbmuoE6+jG/vPQGdge8RfevlJM3tSdjNajuejGfYMBPH5Qkk6ETHcNuIH/No99ZNMUWU2g908VuUI+9ElMkM60Tq69hF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UJNscaX0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 155AAC2BBFC;
+	Wed, 19 Jun 2024 06:35:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718778812;
-	bh=L6nini8FklPI83xiJdm6J/GoYxo5hy8hsC4dL0eDQsY=;
+	s=k20201202; t=1718778910;
+	bh=UDqcr8PsQ5epcKbuV5qSLh/aCNPCwA9b1ki+GensfqY=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hgGZKGgzof8EaKGNSe3jRlKUAMp55iGyR8XPEh11l6nQVqAr4RqdkVX89Y+JCLgGb
-	 8QMm5+CORC0mAbQ1E41dg5A1mzaD+u9y5qz0Hn7rKCf+uLP7gCCRTV9RErvW4QENGt
-	 I9eF0tQttRacld6/zdv95KLznuVxlhJWvjaOT79BjVuIn9raEmsWTHqBO/Uj2svQ3l
-	 F2mKnXM1SmPUYR0Hjr6ISDkJ3s0IlQNmqxYLTOpVIK5pkKu4uM4caK2j+5n6AthQbF
-	 9UHofu13aQjK/bjjZxxgKl9dEPEg+MAd2uF0n/XRcORPLdWBqwEFNxoYt88dEsVl2v
-	 ShafbszTnOdwQ==
-Message-ID: <ad5acbf2-b787-42a0-9c6a-998772f25398@kernel.org>
-Date: Wed, 19 Jun 2024 08:33:25 +0200
+	b=UJNscaX02fXkkgISd7PVEF9pJRuhG/hnRJtxHswIZBsqIzODDbBxm1b9QgFwjr/96
+	 bZvIRBfeGJLznjWkjtYobfcOcWPT35xVhLc8EgY4jbbUcydSi+NjCOCp4pBhGBLYCF
+	 p2mi1cyHchK3jaWI0W7ZReXJD1TVu5n9Ut6KHqUqzTt+XQZpkmVE4ZtXG3rD4CQgQh
+	 RJlCnQ9oSar8YSJQr+GDB3IV5dR8SzxliEOCRKBUWBKpL4kCh0R1hp89y9Ea83rQH7
+	 Dx/OiQzkKr1JSkpVGQTMUB9b3e/PnTGIWQJnSVpDOO+wNSFeoLf4xSRhvzpGn23cpg
+	 V2hoiHvSLpXgA==
+Message-ID: <fd9fea0a-c5ff-46ca-af12-7729f78f3768@kernel.org>
+Date: Wed, 19 Jun 2024 08:35:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,7 +50,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] dt-bindings: ptp: Convert ptp-qoirq to yaml format
+Subject: Re: [PATCH v2 2/2] dt-bindings: net: Convert fsl-fman to yaml
 To: Frank Li <Frank.Li@nxp.com>, Yangbo Lu <yangbo.lu@nxp.com>,
  Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
  Conor Dooley <conor+dt@kernel.org>,
@@ -61,7 +61,7 @@ To: Frank Li <Frank.Li@nxp.com>, Yangbo Lu <yangbo.lu@nxp.com>,
 Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, imx@lists.linux.dev
 References: <20240618-ls_fman-v2-0-f00a82623d8e@nxp.com>
- <20240618-ls_fman-v2-1-f00a82623d8e@nxp.com>
+ <20240618-ls_fman-v2-2-f00a82623d8e@nxp.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -107,33 +107,26 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240618-ls_fman-v2-1-f00a82623d8e@nxp.com>
+In-Reply-To: <20240618-ls_fman-v2-2-f00a82623d8e@nxp.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 18/06/2024 23:53, Frank Li wrote:
-> Convert ptp-qoirq from txt to yaml format.
+> Convert fsl-fman from txt to yaml format and split it fsl,fman.yam,
+> fsl,fman-port.yaml, fsl-muram.yaml, fsl-mdio.yaml.
 > 
-> Additional change:
-> - Fixed example interrupts proptery. Need only 1 irq by check MPC8313 spec.
-> - Move Reference clock context under clk,sel.
-> - Interrupts is not required property.
-> - Use low case for hex value.
-> - Check reference manual of MPC8313, p1010 and so on, which dts use more
-> than 1 irqs. Only 1 irq for each ptp device. Check driver code
-> (drivers/ptp/ptp_qoriq.c) and only 1 irq used. So original description is
-> wrong.
-> - Remove comments for compatible string.
+> Addition changes:
+> fsl,fman.yaml:
+>   - Fixed interrupts in example.
+>   - Fixed ethernet@e8000 miss } in example.
+>   - ptp-timer add label in example.
+>   - Ref to new fsl,fman*.yaml.
+>   - Reorder property in example.
+>   - Keep only one example.
+>   - Add const for #address-cells and #size-cells.
+>   - Use defined interrupt type.
+>   - ptp example use node name phc.
 > 
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> 
-> ---
-> Change from v1 to v2:
-> - fix make refcheckdocs warning
-> - Use low case for hex value
-> - Remove comments for compatible string.
-> - Only 1 irq
-
 
 Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
