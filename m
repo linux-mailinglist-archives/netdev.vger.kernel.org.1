@@ -1,240 +1,73 @@
-Return-Path: <netdev+bounces-104898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A57F90F0CD
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:37:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87CC690F0D2
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:37:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3C5F2825DE
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:37:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 298042856C4
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:37:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381B814388C;
-	Wed, 19 Jun 2024 14:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC791CAB1;
+	Wed, 19 Jun 2024 14:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="b9O34ENC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X68VFpeo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823A613E043
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 14:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312331EA6F;
+	Wed, 19 Jun 2024 14:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718807701; cv=none; b=nmUk4iR7FWstTatO5kDldqQ8O0kBLIfhdLJIg6DvRkWyAbySKWr7HHrcpq/QgmnWisQqPvkYX1cWRMum/orqXN0w+ayM1+EPw+gsz94L2D8Fhh0XzC0siFxPUP4F9eqdFGB8OAUbQBPSvFXPX9jSCgguqCbOSsad0NNKLIsksVQ=
+	t=1718807781; cv=none; b=BZV07+gPDfoX7xJf2hYr1jRS1DALnW7IFhDcv4onWb7NSlDBy25FWqHnVzPh68kJgAKfACH/slITdNVWSn5GDB54FYzcXkeCuAb00nIlxSSkzR5iY7PUwBz6c8liNxBRQUwBKCxXgjTXjVub9nLPV+YgJhGScQj0H8zcKs0Lqb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718807701; c=relaxed/simple;
-	bh=tbtlwvSwL3aX9bxxDynzolT137S68gmPIdL/KYBMujw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Nj2pewmnxwV3PqvnZ65A4B8EXIDcZj36BO7efXNL3VwHXTKLQ/p4F0C3RCundcXS0778vNEfPVDebbHBLtTTH+T5tl5vlAH2Co53UL566T0PIgtgRRxcmL4pZYNteKL8xESGAsle3TByqwKNxE758bFDNAS2uyXLlVl97rmNynE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=b9O34ENC; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2c7ab3d2c87so1129030a91.0
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 07:34:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1718807699; x=1719412499; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Iu2kBEJm52y7ucCiR3IOZoS+GHwsfCoaalsy10r4ffs=;
-        b=b9O34ENCe9rVPbr43Yn5sP/N1qerS4eUN1wp9bIJoma9F4T8WUaz2TzSwd4pQDzQjo
-         hF4G/Blb9Ymu6UFk96aklsenyuHF0ADLSH6FHVN6fPwChh1fpa1MUMOTyl0VCS418riX
-         Gzg9E6lsq7H+QZRFJBljNhYOAfLA1452Qu6t/z8qigahnOPYggYREV80mglN4kO2Fn//
-         XG71cPbIlf7PT49GXDTzjxK9hsO5GCs3Be3kKAlDM3nWhjkePv/TC295hKsy2KdFQtJe
-         l/oj0kdpfJtqx9dNRGolDCxgsqp65JYOR8u83ZVyBaHZsoLdDEsF28LecJ6dQDHz0HJx
-         TLmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718807699; x=1719412499;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Iu2kBEJm52y7ucCiR3IOZoS+GHwsfCoaalsy10r4ffs=;
-        b=JRPlWvCzhlkby/bYthMFX4k7evvLRRW9yroBHolgQI1kY1w2sw6ZfjPjz/j53xce8q
-         tByhkMW4UCZXvFo0yxAarV3IDQXw3kpOhA8VSU9jImg61uqYZ3vUmj5F38Lfp0XV7f8w
-         c8g7SpMbIb2tKfgT114w9hpl/7X57FvIRVG5dOy4D1rO/v2DHaoip4ULeCWjaax5p+ku
-         JTc5Fi4jrreVTOx5kxFblF7kwqUFJFdDf1wQ0iTap60HTT+ePiYyeLpYICWDE+C9JTxx
-         XdUwAjgAcj5efEvkay3G3sJy2lE7TnrknScCqFt9PCz2d/ESexpWdTIt/FJ4ubVoO1F5
-         4V8A==
-X-Forwarded-Encrypted: i=1; AJvYcCUWYSJRg+Mc9hkyD5wXBk2rYNVUPt1IsNA1Y0iBzm2SZuMDnBYfSFO9NU9Th5xJ2hVvWMby4Nd1XFephEoOYgS1yL8EEKSH
-X-Gm-Message-State: AOJu0Yxd55IvNXkgo+K5P0iwLy4eO6BX9giZaF5H5qISowfLruRuvBtc
-	5SyDtlRUXueaPjHQci0ztenbGUrMmLfNU1nZQ0lmUXiL7IXGH0NQpXQCzBzyKvPFvdDAiWRXnYk
-	ZPCyuJeyHlCIRs1+ZKN/9LOtExCIeGFIn6ZJYWQ==
-X-Google-Smtp-Source: AGHT+IEIdyucDkMb4dp00FdFOGNmZrYK7rBk1lwc8JYDLA6H6z1Y/drDGuijCKNPSi3sxW1+K/gmN2H6UPJ6ePwzQBQ=
-X-Received: by 2002:a17:90a:e28e:b0:2c2:f6c1:4d87 with SMTP id
- 98e67ed59e1d1-2c7b5cc9ff5mr2731728a91.20.1718807698718; Wed, 19 Jun 2024
- 07:34:58 -0700 (PDT)
+	s=arc-20240116; t=1718807781; c=relaxed/simple;
+	bh=bFBs88j6/FfxqMPUWR0eu9qIf6QcyLZBSdZq42JetGQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QphwYj0VweF1iNS0I+2KUPqbfvwhbCrE6FjvRYnpUI1/57NrgpCoCbfGmOq5+KJmX8e16x7+QKd0MgzqJS0yBBz3Nu6eZRSn3gK/s/gldstuZoNNCynbOBZdefKKhHHg9j1d1BmdBuym4qI3NBFQZtrtPT40nbX1pl1XtNz3mnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X68VFpeo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 031C3C2BBFC;
+	Wed, 19 Jun 2024 14:36:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718807780;
+	bh=bFBs88j6/FfxqMPUWR0eu9qIf6QcyLZBSdZq42JetGQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=X68VFpeof3xbyemn/bu2+GrJJ/FU1pqNFkDTRbruK6hX0qUwq0rqCT3LFB2rR874G
+	 EsqFvQHTgEuwNx9I6v5VwMLkqm9O4CwrJA3IiGhIknXVf7klXQ8qTK1N1rmWLMlXpZ
+	 4eRBjqWR5P2dx/+repYnT6wQw3mfE+d0UHUgivXl1mno+Ai7TQ8gmqbby+DS48381H
+	 7wmUsOzwkdJSS37spKUNves4ObAzEUTUDNbf6eycL/24ALZ4KFTpbZWwBxIa4OlA1N
+	 lnU/ApYIhvD6OHS7iXN+utKo6avHbQBxGuYh7li2svfWyoC4/oOZHgqpfvJUu4haNj
+	 Pv8CpKSBh3/Iw==
+Date: Wed, 19 Jun 2024 07:36:18 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Abaci Robot <abaci@linux.alibaba.com>
+Subject: Re: [PATCH] net/mlx5: Lag, Remove NULL check before dev_{put, hold}
+Message-ID: <20240619073618.67ac1ca9@kernel.org>
+In-Reply-To: <20240619035357.45567-1-jiapeng.chong@linux.alibaba.com>
+References: <20240619035357.45567-1-jiapeng.chong@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240617210205.67311-1-ignat@cloudflare.com> <c9446790-9bac-4541-919b-0af396349c59@linux.alibaba.com>
- <CALrw=nGSf49VnRVy--b5qSM7_rSRyDBUFe_t8taFs2tmRP2QTw@mail.gmail.com>
-In-Reply-To: <CALrw=nGSf49VnRVy--b5qSM7_rSRyDBUFe_t8taFs2tmRP2QTw@mail.gmail.com>
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Wed, 19 Jun 2024 15:34:47 +0100
-Message-ID: <CALrw=nESVt0g4k4AvSkF3yfqDDMDnGGsHavonxHMoEaBrigQPw@mail.gmail.com>
-Subject: Re: [PATCH net v3] net: do not leave a dangling sk pointer, when
- socket creation fails
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Florent Revest <revest@chromium.org>, kernel-team@cloudflare.com, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 19, 2024 at 2:08=E2=80=AFPM Ignat Korchagin <ignat@cloudflare.c=
-om> wrote:
->
-> On Wed, Jun 19, 2024 at 1:31=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.c=
-om> wrote:
-> >
-> >
-> >
-> > On 6/18/24 5:02 AM, Ignat Korchagin wrote:
-> > > It is possible to trigger a use-after-free by:
-> > >    * attaching an fentry probe to __sock_release() and the probe call=
-ing the
-> > >      bpf_get_socket_cookie() helper
-> > >    * running traceroute -I 1.1.1.1 on a freshly booted VM
-> > >
-> > > A KASAN enabled kernel will log something like below (decoded and str=
-ipped):
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > BUG: KASAN: slab-use-after-free in __sock_gen_cookie (./arch/x86/incl=
-ude/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583=
- ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
-> > > Read of size 8 at addr ffff888007110dd8 by task traceroute/299
-> > >
-> > > CPU: 2 PID: 299 Comm: traceroute Tainted: G            E      6.10.0-=
-rc2+ #2
-> > > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-de=
-bian-1.16.2-1 04/01/2014
-> > > Call Trace:
-> > >   <TASK>
-> > > dump_stack_lvl (lib/dump_stack.c:117 (discriminator 1))
-> > > print_report (mm/kasan/report.c:378 mm/kasan/report.c:488)
-> > > ? __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./includ=
-e/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-in=
-strumented.h:1611 net/core/sock_diag.c:29)
-> > > kasan_report (mm/kasan/report.c:603)
-> > > ? __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./includ=
-e/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-in=
-strumented.h:1611 net/core/sock_diag.c:29)
-> > > kasan_check_range (mm/kasan/generic.c:183 mm/kasan/generic.c:189)
-> > > __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/=
-linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-inst=
-rumented.h:1611 net/core/sock_diag.c:29)
-> > > bpf_get_socket_ptr_cookie (./arch/x86/include/asm/preempt.h:94 ./incl=
-ude/linux/sock_diag.h:42 net/core/filter.c:5094 net/core/filter.c:5092)
-> > > bpf_prog_875642cf11f1d139___sock_release+0x6e/0x8e
-> > > bpf_trampoline_6442506592+0x47/0xaf
-> > > __sock_release (net/socket.c:652)
-> > > __sock_create (net/socket.c:1601)
-> > > ...
-> > > Allocated by task 299 on cpu 2 at 78.328492s:
-> > > kasan_save_stack (mm/kasan/common.c:48)
-> > > kasan_save_track (mm/kasan/common.c:68)
-> > > __kasan_slab_alloc (mm/kasan/common.c:312 mm/kasan/common.c:338)
-> > > kmem_cache_alloc_noprof (mm/slub.c:3941 mm/slub.c:4000 mm/slub.c:4007=
-)
-> > > sk_prot_alloc (net/core/sock.c:2075)
-> > > sk_alloc (net/core/sock.c:2134)
-> > > inet_create (net/ipv4/af_inet.c:327 net/ipv4/af_inet.c:252)
-> > > __sock_create (net/socket.c:1572)
-> > > __sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
-> > > __x64_sys_socket (net/socket.c:1718)
-> > > do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
-> > > entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-> > >
-> > > Freed by task 299 on cpu 2 at 78.328502s:
-> > > kasan_save_stack (mm/kasan/common.c:48)
-> > > kasan_save_track (mm/kasan/common.c:68)
-> > > kasan_save_free_info (mm/kasan/generic.c:582)
-> > > poison_slab_object (mm/kasan/common.c:242)
-> > > __kasan_slab_free (mm/kasan/common.c:256)
-> > > kmem_cache_free (mm/slub.c:4437 mm/slub.c:4511)
-> > > __sk_destruct (net/core/sock.c:2117 net/core/sock.c:2208)
-> > > inet_create (net/ipv4/af_inet.c:397 net/ipv4/af_inet.c:252)
-> > > __sock_create (net/socket.c:1572)
-> > > __sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
-> > > __x64_sys_socket (net/socket.c:1718)
-> > > do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
-> > > entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-> > >
-> > > Fix this by clearing the struct socket reference in sk_common_release=
-() to cover
-> > > all protocol families create functions, which may already attached th=
-e
-> > > reference to the sk object with sock_init_data().
-> > >
-> > > Fixes: c5dbb89fc2ac ("bpf: Expose bpf_get_socket_cookie to tracing pr=
-ograms")
-> > > Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > > Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
-> > > Cc: stable@vger.kernel.org
-> > > Link: https://lore.kernel.org/netdev/20240613194047.36478-1-kuniyu@am=
-azon.com/T/
-> > > ---
-> > > Changes in v3:
-> > >    * re-added KASAN repro steps to the commit message (somehow stripp=
-ed in v2)
-> > >    * stripped timestamps and thread id from the KASAN splat
-> > >    * removed comment from the code (commit message should be enough)
-> > >
-> > > Changes in v2:
-> > >    * moved the NULL-ing of the socket reference to sk_common_release(=
-) (as
-> > >      suggested by Kuniyuki Iwashima)
-> > >    * trimmed down the KASAN report in the commit message to show only=
- relevant
-> > >      info
-> > >
-> > >   net/core/sock.c | 3 +++
-> > >   1 file changed, 3 insertions(+)
-> > >
-> > > diff --git a/net/core/sock.c b/net/core/sock.c
-> > > index 8629f9aecf91..100e975073ca 100644
-> > > --- a/net/core/sock.c
-> > > +++ b/net/core/sock.c
-> > > @@ -3742,6 +3742,9 @@ void sk_common_release(struct sock *sk)
-> > >
-> > >       sk->sk_prot->unhash(sk);
-> > >
-> > > +     if (sk->sk_socket)
-> > > +             sk->sk_socket->sk =3D NULL;
-> > > +
-> > >       /*
-> > >        * In this point socket cannot receive new packets, but it is p=
-ossible
-> > >        * that some packets are in flight because some CPU runs receiv=
-er and
-> >
-> > Reviewed-by: D. Wythe <alibuda@linux.alibaba.com>
-> >
-> >
-> > A small tip:
-> >
-> > It seems that you might have missed CCing some maintainers, using
-> > scripts/get_maintainer.pl "Your patch" can help you avoid this issue
-> > again.
->
-> Thanks. I did scripts/get_maintainer.pl <file I'm modifying>. Not sure
-> if it is different.
+On Wed, 19 Jun 2024 11:53:57 +0800 Jiapeng Chong wrote:
+> The call netdev_{put, hold} of dev_{put, hold} will check NULL
 
-My bad: it is different or I actually forgot to re-run it, because
-v2/v3 modifies a different file.
+s/of/or/
 
-> >
-> > D. Wythe
-> >
-> >
-> >
+if you're touching this why not convert to netdev_hold() at the same
+time?
+-- 
+pw-bot: au
 
