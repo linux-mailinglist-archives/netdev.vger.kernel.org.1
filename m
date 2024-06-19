@@ -1,97 +1,206 @@
-Return-Path: <netdev+bounces-104705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF83490E108
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 03:00:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F69F90E11C
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 03:05:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3B5C2845B2
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 01:00:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEE8C1F22571
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 01:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CDC063A9;
-	Wed, 19 Jun 2024 01:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68318524F;
+	Wed, 19 Jun 2024 01:05:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ibOp04Da"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D6juFcrZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9916524F;
-	Wed, 19 Jun 2024 01:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F574C74;
+	Wed, 19 Jun 2024 01:05:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718758830; cv=none; b=a8Z+nwqYj4IC0Pi91I21tR9iOts8vZZBS4Hm1/09l5D4r19BjbQFhCkXAI27jhJfmzNYR4J77u/mnut8hAC+74AkA+8BsoNxF41PBlJs5jIoFDACMzNeHBj6sUYkMDys7WFLrDhx+HAwuwhRS6LEoo6NS+XE0yeWaLpu1mE93PA=
+	t=1718759125; cv=none; b=Yx5Pqf2Pj1DwYDGBa10iRNW2+d7CVHI+9rneRc7j9gMr6KTSolIcqeOit/vQJDOcOQhImJQkA1E1FkPAnFHazM4UcLII7P0gtmuywbOcG0yrRt584N1Xr8jf+fG9HvraKp3R9cbUY5a6wTNT/wgWFpZhZTK0Ob+juBSWZ+M736A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718758830; c=relaxed/simple;
-	bh=MznVFIDlLNIZKJVCdbNw94H9vpcVhR/eBfZkLRSfuME=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=t2SdWE+HMpaTjBbap6LvMtXQkQzl2R02yMcsf5TE4FAqhriNA6fK+Ee93kn3dbD1q+c7El0CocvbxUSUxxxsE3lul7B5n0Rzal60rcPL9heYdbBB4HNYYDVjhprozzpt8CLfJwkD8bZa+CXGaIkH1sBgG0WPnUky1Y6/PTHCGPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ibOp04Da; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5167DC4AF4D;
-	Wed, 19 Jun 2024 01:00:30 +0000 (UTC)
+	s=arc-20240116; t=1718759125; c=relaxed/simple;
+	bh=oOwrSvqZA58QNXbz37EYUQNh/FRgOZd5JWpDRpBpFsQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=M4+0dWXJfivi5jwsFkjmvXnMGKQcWF9URFpunu9zCX67cNjFoBIVN2RZh3y+gxGyYNopAyDErFGIVxwvaOzSIcTdEbyf7tzT/J858EX28sSaKn8LKsxUW5VUSpXyC60DrYqqK3CCfqAUteYzrKKuQrIordS1QALN1lCuPzlcJds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D6juFcrZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0675CC3277B;
+	Wed, 19 Jun 2024 01:05:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718758830;
-	bh=MznVFIDlLNIZKJVCdbNw94H9vpcVhR/eBfZkLRSfuME=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ibOp04DaxKqUDmngBASIhe5FIxeNtWrXGTJwdKDmHVEJ7dX8y5GSK1X9sT+AJum1P
-	 2JSQmVEgCxOa36g/OVJaMPYpZNjs92Td4hbNDOGedW8WsvYP4zD553bROTKtPpp/Bz
-	 g2qB+7R39mUPDlyAHU05qDXVntPE1ah9fX2MLTSbeRol/qHCgdzg1UxqJSW69w6zG9
-	 GqZVSao/fKLyOc3u2BjRCleQC4ok4T7Bz3/pRMauVG/aNqMDtmQ4izBMfWyyAJzJFV
-	 Nil9JFgGtgdfmTXShRj7p+XZBKqXPWEAw7SiYjNdVsYtJ/gmSLjBmN/LWenw5gtYNn
-	 urC3OGLN/TwaQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 40754C4361C;
-	Wed, 19 Jun 2024 01:00:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1718759124;
+	bh=oOwrSvqZA58QNXbz37EYUQNh/FRgOZd5JWpDRpBpFsQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=D6juFcrZeckxyYzrDwyOrjYbnhm5eMydGFWnZJaRm43kUEgrX/u+/3wGYt/VGhzcG
+	 PLGl4jY0CzIQnfunOoWppYWZn4khA0IDyXgfZY4pWBqlSyTPszR5wHLVK2X1QfuIdZ
+	 ekA+NwnPwXdD9ehGHh6qGjzlAtfuf3K6JYUOpSNc9BMSHCUX5LtToeq1ctvtv6kghN
+	 /pDxGYpq9vQ6ZZzgEgB0qBydfFvROaW30wOhAu27jaKJm0+7jdxbPGWhrd8xw44qvS
+	 SyT/VnUEEQmEVzIJUEuB2j8DdMy1gPDf8x5t71qMqZpNTVbPOg+07Rpv0pfoTBM7an
+	 2yG7Cn8XRzp7A==
+Date: Tue, 18 Jun 2024 18:05:23 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kamil =?UTF-8?B?SG9yw6Fr?= - 2N <kamilh@axis.com>
+Cc: <florian.fainelli@broadcom.com>,
+ <bcm-kernel-feedback-list@broadcom.com>, <andrew@lunn.ch>,
+ <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
+ <edumazet@google.com>, <pabeni@redhat.com>, <robh@kernel.org>,
+ <krzk+dt@kernel.org>, <conor+dt@kernel.org>, <netdev@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v7 4/4] net: phy: bcm-phy-lib: Implement BroadR-Reach
+ link modes
+Message-ID: <20240618180523.47ce876f@kernel.org>
+In-Reply-To: <20240617113841.3694934-5-kamilh@axis.com>
+References: <20240617113841.3694934-1-kamilh@axis.com>
+	<20240617113841.3694934-5-kamilh@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net v2 PATCH] net: stmmac: No need to calculate speed divider when
- offload is disabled
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171875883025.1104.10779394765419858622.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Jun 2024 01:00:30 +0000
-References: <20240617013922.1035854-1-xiaolei.wang@windriver.com>
-In-Reply-To: <20240617013922.1035854-1-xiaolei.wang@windriver.com>
-To: xiaolei wang <xiaolei.wang@windriver.com>
-Cc: horms@kernel.org, olteanv@gmail.com, linux@armlinux.org.uk,
- alexandre.torgue@foss.st.com, andrew@lunn.ch, joabreu@synopsys.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, wojciech.drewek@intel.com, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Mon, 17 Jun 2024 13:38:41 +0200 Kamil Hor=C3=A1k - 2N wrote:
+> Implement single-pair BroadR-Reach modes on bcm5481x PHY by Broadcom.
+> Create set of functions alternative to IEEE 802.3 to handle configuration
+> of these modes on compatible Broadcom PHYs.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Some nit picks below, but please don't repost until next week.
+Sorry for the delay but it's vacation season, I think some of
+the key folks are currently AFK :(
 
-On Mon, 17 Jun 2024 09:39:22 +0800 you wrote:
-> commit be27b8965297 ("net: stmmac: replace priv->speed with
-> the portTransmitRate from the tc-cbs parameters") introduced
-> a problem. When deleting, it prompts "Invalid portTransmitRate
-> 0 (idleSlope - sendSlope)" and exits. Add judgment on cbs.enable.
-> Only when offload is enabled, speed divider needs to be calculated.
-> 
-> Fixes: be27b8965297 ("net: stmmac: replace priv->speed with the portTransmitRate from the tc-cbs parameters")
-> Signed-off-by: Xiaolei Wang <xiaolei.wang@windriver.com>
-> 
-> [...]
+> + * bcm_config_lre_advert - sanitize and advertise Long-Distance Signaling
+> + *  auto-negotiation parameters
+> + * @phydev: target phy_device struct
+> + * @return: 0 if the PHY's advertisement hasn't changed, < 0 on error,
+> + *          > 0 if it has changed
 
-Here is the summary with links:
-  - [net,v2] net: stmmac: No need to calculate speed divider when offload is disabled
-    https://git.kernel.org/netdev/net/c/b8c43360f6e4
+ * Return: 0 if the PHY
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+no @ and after the description
 
+> + *
+> + * Description: Writes MII_BCM54XX_LREANAA with the appropriate values,
 
+Please don't prefix the description with the word "description"..
+
+> + *   after sanitizing the values to make sure we only advertise
+> + *   what is supported.
+> + */
+> +int bcm_config_lre_advert(struct phy_device *phydev)
+> +{
+> +	int err;
+> +	u32 adv;
+> +
+> +	/* Only allow advertising what this PHY supports */
+> +	linkmode_and(phydev->advertising, phydev->advertising,
+> +		     phydev->supported);
+> +
+> +	adv =3D bcm_linkmode_adv_to_lre_adv_t(phydev->advertising);
+> +
+> +	/* Setup BroadR-Reach mode advertisement */
+> +	err =3D phy_modify_changed(phydev, MII_BCM54XX_LREANAA,
+> +				 LRE_ADVERTISE_ALL | LREANAA_PAUSE |
+> +				 LREANAA_PAUSE_ASYM, adv);
+> +
+> +	if (err < 0)
+> +		return err;
+> +
+> +	return err;
+
+You can return phy_modify_changed(... directly, no need for err
+
+> +}
+> +EXPORT_SYMBOL_GPL(bcm_config_lre_advert);
+> +
+>  MODULE_DESCRIPTION("Broadcom PHY Library");
+>  MODULE_LICENSE("GPL v2");
+>  MODULE_AUTHOR("Broadcom Corporation");
+> diff --git a/drivers/net/phy/bcm-phy-lib.h b/drivers/net/phy/bcm-phy-lib.h
+> index b52189e45a84..fecdd66ad736 100644
+> --- a/drivers/net/phy/bcm-phy-lib.h
+> +++ b/drivers/net/phy/bcm-phy-lib.h
+> @@ -121,4 +121,8 @@ irqreturn_t bcm_phy_wol_isr(int irq, void *dev_id);
+>  int bcm_phy_led_brightness_set(struct phy_device *phydev,
+>  			       u8 index, enum led_brightness value);
+> =20
+> +int bcm_setup_master_slave(struct phy_device *phydev);
+> +int bcm_config_lre_aneg(struct phy_device *phydev, bool changed);
+> +int bcm_config_lre_advert(struct phy_device *phydev);
+> +
+>  #endif /* _LINUX_BCM_PHY_LIB_H */
+> diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
+> index 370e4ed45098..5e590c8f82c4 100644
+> --- a/drivers/net/phy/broadcom.c
+> +++ b/drivers/net/phy/broadcom.c
+> @@ -5,6 +5,9 @@
+>   *	Broadcom BCM5411, BCM5421 and BCM5461 Gigabit Ethernet
+>   *	transceivers.
+>   *
+> + *	Broadcom BCM54810, BCM54811 BroadR-Reach transceivers.
+> + *
+> + *
+
+double new line
+
+>   *	Copyright (c) 2006  Maciej W. Rozycki
+>   *
+>   *	Inspired by code written by Amy Fong.
+> @@ -553,18 +556,97 @@ static int bcm54810_write_mmd(struct phy_device *ph=
+ydev, int devnum, u16 regnum,
+>  	return -EOPNOTSUPP;
+>  }
+> =20
+> -static int bcm54811_config_init(struct phy_device *phydev)
+> +static int bcm5481x_get_brrmode(struct phy_device *phydev, u8 *data)
+>  {
+> -	int err, reg;
+> +	int reg;
+> =20
+> -	/* Disable BroadR-Reach function. */
+>  	reg =3D bcm_phy_read_exp(phydev, BCM54810_EXP_BROADREACH_LRE_MISC_CTL);
+> -	reg &=3D ~BCM54810_EXP_BROADREACH_LRE_MISC_CTL_EN;
+> -	err =3D bcm_phy_write_exp(phydev, BCM54810_EXP_BROADREACH_LRE_MISC_CTL,
+> -				reg);
+> -	if (err < 0)
+> +
+> +	*data =3D (reg & BCM54810_EXP_BROADREACH_LRE_MISC_CTL_EN) ? 1 : 0;
+> +
+> +	return 0;
+> +}
+> +
+> +static int bcm54811_read_abilities(struct phy_device *phydev)
+> +{
+> +	static const int modes_array[] =3D { ETHTOOL_LINK_MODE_100baseT1_Full_B=
+IT,
+> +					   ETHTOOL_LINK_MODE_10baseT1BRR_Full_BIT,
+> +					   ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+> +					   ETHTOOL_LINK_MODE_1000baseX_Full_BIT,
+> +					   ETHTOOL_LINK_MODE_1000baseT_Half_BIT,
+> +					   ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+> +					   ETHTOOL_LINK_MODE_100baseT_Half_BIT,
+> +					   ETHTOOL_LINK_MODE_10baseT_Full_BIT,
+> +					   ETHTOOL_LINK_MODE_10baseT_Half_BIT };
+
+This is more normal formatting for the kernel:
+
+	static const int modes_array[] =3D {
+		ETHTOOL_LINK_MODE_100baseT1_Full_BIT,
+		ETHTOOL_LINK_MODE_10baseT1BRR_Full_BIT,
+
+please try to avoid going over 80 characters
+
+> +static int bcm54811_config_init(struct phy_device *phydev)
+> +{
+> +	int err, reg;
+> +	bool brr =3D false;
+> +	struct device_node *np =3D phydev->mdio.dev.of_node;
+
+order variable declaration lines longest to shortest,=20
+AKA reverse xmas tree
 
