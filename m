@@ -1,236 +1,202 @@
-Return-Path: <netdev+bounces-105017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90B7C90F70C
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 21:35:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C041C90F700
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 21:34:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15E351F256F2
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 19:35:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46DCA1F22AC2
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 19:34:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F4B15B96E;
-	Wed, 19 Jun 2024 19:34:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B576158D82;
+	Wed, 19 Jun 2024 19:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="inQXRDYO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ILO1WzP4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F90B15B0EC
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 19:33:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119016F2FA;
+	Wed, 19 Jun 2024 19:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718825641; cv=none; b=W8kvWTnB2qXYGFU6KJTG7/5+uNN3a4BYrSsBT6XKXrZj4NsgjeLYhoPAfe80pNNsyEfpKsVby91aC8zDSt1P76dWesa2TNIr7m7aJkXe1dhm54rQFHXXCCH1Ae4XsxUEAhcDz9ITb0Dn8S+steu52uzOUdQRsE6eF4GcalxXHLo=
+	t=1718825638; cv=none; b=OV7gI63qa+uOqAygtKwUZGlw/vRESEW2JXhC9kivFBFw5dLW+8vClVhJ5uHxi2HkVw9Tum2tYMWduNRJNAVTjKFD0L2hyoOVL5AaH5fpRNVJqtpvInJS0OlziOq55fGubtUtiv35tfBo1RGaV+3aPjwhzOkavOmJdnmhf5ydOGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718825641; c=relaxed/simple;
-	bh=nJhUYmrgF8khp038rH7E0vBosSYGyEPbRCtSDy5hfRk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l66emza6mnuSXs1CO3WNJGuH/5FCUhSK1bg8hOVFKEC/YaDue5esuNq9hZm6Pfi75rEuaCUW8Un5vOTvrAcKqnG4JVXlPHj7wAKB8npgt7ZdzngiLgyfpaj6cRbSF4js5akqeGtiKqZzHmql41Kil10gQ1yKcsWhVqQ73K+q8Nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=inQXRDYO; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-52bc121fb1eso164745e87.1
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 12:33:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1718825638; x=1719430438; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2rGUjDMYzm7lFpUwAY5iZvI8fijhYwMrH7RYSZjeZEU=;
-        b=inQXRDYOFIhYsrTKtCMzRobUh+zh/GvRqecGnewBpBFbeXmF3OXBvXKXCvSxQ62wHX
-         7JKQKoGfW33UrMopeFE4oia2NC4F0hyGnjxqbV+6ev+rr05GEr6TSkaH805CgQaI1J+V
-         m5P+TBDbMkJV9gps3Um/4iX/obTU+oFDmnBlFNLZk+goHrNy/KbLkZ13IFp5t08v4ZBf
-         jjkNmn2Tdb+ekmcD0cBjqybQe0RwpMJagA5Kwog/hV9OquKiZx5SbXGKCaICmI0sA4eW
-         DEA2lLPTr3VARUFENgRVXF1GYZWREZnJ+AE9csuw0KOTOAzBBN/DKXQ1bnkF4QSWir6x
-         YCrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718825638; x=1719430438;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2rGUjDMYzm7lFpUwAY5iZvI8fijhYwMrH7RYSZjeZEU=;
-        b=TFHMyEaa02mHAQnBSlUeAjbZy2tNZhVNp0dJXEmmXGYna+FM8V4NlB4JBLICtyk9b9
-         1Dq+acHiIz8nwZVthwFiVTr/y5rkYyRo2yqi0Vu/3he7BZ0BrXoY+fJQ81NdTPpnf8PS
-         SEOCNhFtgI6BCiz53B4shkN08sdz0pYUo4lijVwWJGHIbzXbdhyxOrpK3VqSnm3zHtgR
-         Ej5ewWiXfmgjKaceyDWPp+pqavVg49johQHe63wYUKHd3vmQG60+109Iu4NPsfYai6V0
-         NyDnnMJh/LaptLk/dgytiRwQ99NtJB3AzFkIaahdajUOZGs73If/vuQMmlTNyKReHsdJ
-         8stQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX5/L1NZQA4OhCbh/TwqwwsBY/3BW9r7KiFIeQBHDrfOE0p8YjMmDkNOhXA65otb5Q+vVCbmKoSmxZdQ0PXlkVS1uifJPLu
-X-Gm-Message-State: AOJu0YxSf7FURCmS5QmjAL+e/mb0jKkgXFZokau8/Q0/m3Vcrmv4pjkK
-	Fn9BFwUZldT1mrF0VA6iXSamoRyBSRfPq4WCKmPV+TIfJTBPp7irh0cfcut5uNzOio8T3r4k2ov
-	5cBUthEhYJ37kQIY5GQqg7N7o2O7f/LscwpTlDQ==
-X-Google-Smtp-Source: AGHT+IE91ezuO/TQwQfm8V42ORY0PMsANSYBITfPybm0WqpQNZwrx4Oib/yIen6E1DuqgRrLDQH+dcE2vHWlSPILDjI=
-X-Received: by 2002:a05:6512:489a:b0:52c:c9b6:8f4e with SMTP id
- 2adb3069b0e04-52ccaa5a0a0mr2136538e87.59.1718825637613; Wed, 19 Jun 2024
- 12:33:57 -0700 (PDT)
+	s=arc-20240116; t=1718825638; c=relaxed/simple;
+	bh=rCuC147fYmDtvDKRsay/TPMA580R1cV0CqcWtYXITNQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Z9qrtVS/PN6malXyMg5BVgck35w7p0K7UqHoOoUmmuzgb3cWATAlz5X3tMBMcps6N7VBze3WcUyQxmnz6fjBSWLmsNUhB1UxlBZ8k3Vg4jCMhXY4dZeK0uhWWVArBR0m5o0ouX8OQkNAvJVEfk2lujwCLSib6L6uvA21Xjq9rVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ILO1WzP4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A06EDC4AF07;
+	Wed, 19 Jun 2024 19:33:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718825637;
+	bh=rCuC147fYmDtvDKRsay/TPMA580R1cV0CqcWtYXITNQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ILO1WzP4rJTLoTLKi4PkpSpRq9c5N/PhEDFECsHrTkFl1QACtTgY+rJW9KMm4BWfx
+	 /E4qKMwezvvz+vg0/xBy8DkaLMirjNY6DuvEAfzF2+sBMQLTLA5cMSZ/W/CfJJEAbS
+	 WuiHIBRkicBOUlJ3X1Lvb3A9rWr5/XErJC7b+sD4RTGU/0uI+YAWz6sH7lE4zuAR+n
+	 WGk6zFz30g/B+bCG1RkJTnzwa7GFQVzMGWyDq8WkdWb0BjIUgCz/WqATwqEber5h5O
+	 w7ddILFyb2XPdJZeq+xblfZYvcVGdxlwsFY0CyaVcF1UEcfwLVrsaZ3o5egseJAO7k
+	 sfzRLblD7QKRA==
+From: Kees Cook <kees@kernel.org>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Kees Cook <kees@kernel.org>,
+	"GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
+	Christoph Lameter <cl@linux.com>,
+	Pekka Enberg <penberg@kernel.org>,
+	David Rientjes <rientjes@google.com>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+	jvoisin <julien.voisin@dustri.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+	Xiu Jianfeng <xiujianfeng@huawei.com>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Jann Horn <jannh@google.com>,
+	Matteo Rizzo <matteorizzo@google.com>,
+	Thomas Graf <tgraf@suug.ch>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-hardening@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v5 0/6] slab: Introduce dedicated bucket allocator
+Date: Wed, 19 Jun 2024 12:33:48 -0700
+Message-Id: <20240619192131.do.115-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240612075829.18241-1-brgl@bgdev.pl> <CABBYNZLrwgj848w97GP+ijybt-yU8yMNnW5UWhb2y5Zq6b5H9A@mail.gmail.com>
- <CAMRc=Mdb31YGUUXRWACnx55JawayFaRjEPYSdjOCMrYr5xDYag@mail.gmail.com>
- <CABBYNZLPv3zk_UX67yPetQKWiQ-g+Dv9ZjZydhwG3jfaeV+48w@mail.gmail.com>
- <CAMRc=Mdsw5c_BDwUwP2Ss4Bogz-d+waZVd8LLaZ5oyc9dWS2Qg@mail.gmail.com>
- <CAMRc=Mf2koxQH8Pw--6g5O3FTFn_qcyfwTVQjUqxwJ5qW1nzjw@mail.gmail.com> <CABBYNZ+7SrLSDeCLF0WDM01prRgAEHMD=9mhu5MfWOuGwoAkNQ@mail.gmail.com>
-In-Reply-To: <CABBYNZ+7SrLSDeCLF0WDM01prRgAEHMD=9mhu5MfWOuGwoAkNQ@mail.gmail.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Wed, 19 Jun 2024 21:33:46 +0200
-Message-ID: <CAMRc=MdozeAzWJCSrDdxVBZ=fwP2yn_j-KZaTDT2Dp7YjKP8-g@mail.gmail.com>
-Subject: Re: [GIT PULL] Immutable tag between the Bluetooth and pwrseq
- branches for v6.11-rc1
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6065; i=kees@kernel.org; h=from:subject:message-id; bh=rCuC147fYmDtvDKRsay/TPMA580R1cV0CqcWtYXITNQ=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBmczKhRgUdrjMlqp+DXoOV1DQo8UHBJkd/m+b/9 E8XxeZuB7SJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZnMyoQAKCRCJcvTf3G3A JoY1D/4ylvVu7defFNoTvkPBIvUnSotH37+jE2Ii4yHqdGyXcw6IxVKniJ6wiQJ5Hcj5qavdAEe lewv2kVY5lA69EKPpEsuZ53pH6M0ywnmh0Qb6ojBTpj/aPKB3WyY2fYhOKicNcxWw/k1tpvhj/V aII8Z5yaqizEuEkjjghQn5yERDk9UZEUGWwcNbentM4KmRkuB9e5qJTlSb5/JJP2UrlG4VwOyzX vr+L/sMNfqC9C/PbJwAuhu17HpcPzH4lt8BrhYYYSU+rM35ObCB+GLbsvVhy//bYGMjyZPqNtuh aeQ7o6d53Bjs/mB3T2AgGaDY1Ht3zj+5w+2ABdEELpsHIL8bTt3Vqak9zs/Lcr+iMfhG+5XSZMb 4ZXDYrTuRuidL3wNp88Rg2XGfSs/9tIfsYhPpbJ8nHVHxVelXIkTTYr0vE1aQFkSMLzn9IyDIiL NSFpEnzewhfDGAytMEN8A7LvexYaHs6pvr1uk++G4d9BVL+pl2ThEKmajJHacX6X7xS7iVqhkrR regafqOdddTgSthM4B4oYCBH00MJAsZzPxBzYdIb4IROOPQmGLNhfxIYqEfSLu+ZDhDJ9okiMbZ yxa3uQCfjfYg2IL9lA71NQwl8SuVKd+f4s6s4ww+hEBCDZDngM5cDR7AtXEdyYz4ELy4tcdeDUb +mYf33wGGRTVv
+ Fg==
+X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 19, 2024 at 8:59=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Bartosz,
->
-> On Wed, Jun 19, 2024 at 3:35=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.p=
-l> wrote:
-> >
-> > On Wed, Jun 12, 2024 at 5:00=E2=80=AFPM Bartosz Golaszewski <brgl@bgdev=
-.pl> wrote:
-> > >
-> > > On Wed, Jun 12, 2024 at 4:54=E2=80=AFPM Luiz Augusto von Dentz
-> > > <luiz.dentz@gmail.com> wrote:
-> > > >
-> > > > Hi Bartosz,
-> > > >
-> > > > On Wed, Jun 12, 2024 at 10:45=E2=80=AFAM Bartosz Golaszewski <brgl@=
-bgdev.pl> wrote:
-> > > > >
-> > > > > On Wed, Jun 12, 2024 at 4:43=E2=80=AFPM Luiz Augusto von Dentz
-> > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > >
-> > > > > > Hi Bartosz,
-> > > > > >
-> > > > > > On Wed, Jun 12, 2024 at 3:59=E2=80=AFAM Bartosz Golaszewski <br=
-gl@bgdev.pl> wrote:
-> > > > > > >
-> > > > > > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > > > > > >
-> > > > > > > Hi Marcel, Luiz,
-> > > > > > >
-> > > > > > > Please pull the following power sequencing changes into the B=
-luetooth tree
-> > > > > > > before applying the hci_qca patches I sent separately.
-> > > > > > >
-> > > > > > > Link: https://lore.kernel.org/linux-kernel/20240605174713.GA7=
-67261@bhelgaas/T/
-> > > > > > >
-> > > > > > > The following changes since commit 83a7eefedc9b56fe7bfeff13b6=
-c7356688ffa670:
-> > > > > > >
-> > > > > > >   Linux 6.10-rc3 (2024-06-09 14:19:43 -0700)
-> > > > > > >
-> > > > > > > are available in the Git repository at:
-> > > > > > >
-> > > > > > >   git://git.kernel.org/pub/scm/linux/kernel/git/brgl/linux.gi=
-t tags/pwrseq-initial-for-v6.11
-> > > > > > >
-> > > > > > > for you to fetch changes up to 2f1630f437dff20d02e4b3f07e836f=
-42869128dd:
-> > > > > > >
-> > > > > > >   power: pwrseq: add a driver for the PMU module on the QCom =
-WCN chipsets (2024-06-12 09:20:13 +0200)
-> > > > > > >
-> > > > > > > -------------------------------------------------------------=
----
-> > > > > > > Initial implementation of the power sequencing subsystem for =
-linux v6.11
-> > > > > > >
-> > > > > > > -------------------------------------------------------------=
----
-> > > > > > > Bartosz Golaszewski (2):
-> > > > > > >       power: sequencing: implement the pwrseq core
-> > > > > > >       power: pwrseq: add a driver for the PMU module on the Q=
-Com WCN chipsets
-> > > > > >
-> > > > > > Is this intended to go via bluetooth-next or it is just because=
- it is
-> > > > > > a dependency of another set? You could perhaps send another set
-> > > > > > including these changes to avoid having CI failing to compile.
-> > > > > >
-> > > > >
-> > > > > No, the pwrseq stuff is intended to go through its own pwrseq tre=
-e
-> > > > > hence the PR. We cannot have these commits in next twice.
-> > > >
-> > > > Not following you here, why can't we have these commits on differen=
-t
-> > > > next trees? If that is the case how can we apply the bluetooth
-> > > > specific ones without causing build regressions?
-> > > >
-> > >
-> > > We can't have the same commits twice with different hashes in next
-> > > because Stephen Rothwell will yell at us both.
-> > >
-> > > Just pull the tag I provided and then apply the Bluetooth specific
-> > > changes I sent on top of it. When sending to Linus Torvalds/David
-> > > Miller (not sure how your tree gets upstream) mention that you pulled
-> > > in the pwrseq changes in your PR cover letter.
->
-> By pull the tag you mean using merge commits to merge the trees and
-> not rebase, doesn't that lock us down to only doing merge commits
-> rather than rebases later on? I have never used merge commits before.
-> There is some documentation around it that suggests not to use merges:
->
-> 'While merges from downstream are common and unremarkable, merges from
-> other trees tend to be a red flag when it comes time to push a branch
-> upstream. Such merges need to be carefully thought about and well
-> justified, or there=E2=80=99s a good chance that a subsequent pull reques=
-t
-> will be rejected.'
-> https://docs.kernel.org/maintainer/rebasing-and-merging.html#merging-from=
--sibling-or-upstream-trees
->
-> But then looking forward in that documentation it says:
->
-> 'Another reason for doing merges of upstream or another subsystem tree
-> is to resolve dependencies. These dependency issues do happen at
-> times, and sometimes a cross-merge with another tree is the best way
-> to resolve them; as always, in such situations, the merge commit
-> should explain why the merge has been done. Take a moment to do it
-> right; people will read those changelogs.'
->
-> So I guess that is the reason we want to merge the trees, but what I'm
-> really looking forward to is for the 'proper' commands and commit
-> message to use to make sure we don't have problems in the future.
->
+Hi,
 
-You shouldn't really need to rebase your branch very often anyway.
-This is really for special cases. But even then you can always use:
-`git rebase --rebase-merges` to keep the merge commits.
+ v5:
+  - Use vbabka's macros for optional arguments (thank you! I added a
+    Co-developed-by and S-o-b)
+  - Do not make Kconfig "default y", but recommend that it be enabled (vbabka)
+  - Do not check for NULL before kmem_cache_destroy() on error path (horms)
+  - Adjust size/bucket argument ordering on slab_alloc()
+  - Make sure kmem_buckets cache itself is SLAB_NO_MERGE
+  - Do not include "_noprof" in kern-doc (it is redundant)
+  - Fix kern-doc argument ordering
+ v4: https://lore.kernel.org/lkml/20240531191304.it.853-kees@kernel.org/
+ v3: https://lore.kernel.org/lkml/20240424213019.make.366-kees@kernel.org/
+ v2: https://lore.kernel.org/lkml/20240305100933.it.923-kees@kernel.org/
+ v1: https://lore.kernel.org/lkml/20240304184252.work.496-kees@kernel.org/
 
-The commands you want to run are:
+For the cover letter, I'm repeating the commit log for patch 4 here,
+which has additional clarifications and rationale since v2:
 
-git pull git://git.kernel.org/pub/scm/linux/kernel/git/brgl/linux.git
-tags/pwrseq-initial-for-v6.11
-git am or b4 shazam on the patches targeting the Bluetooth subsystem
-git push
+    Dedicated caches are available for fixed size allocations via
+    kmem_cache_alloc(), but for dynamically sized allocations there is only
+    the global kmalloc API's set of buckets available. This means it isn't
+    possible to separate specific sets of dynamically sized allocations into
+    a separate collection of caches.
+    
+    This leads to a use-after-free exploitation weakness in the Linux
+    kernel since many heap memory spraying/grooming attacks depend on using
+    userspace-controllable dynamically sized allocations to collide with
+    fixed size allocations that end up in same cache.
+    
+    While CONFIG_RANDOM_KMALLOC_CACHES provides a probabilistic defense
+    against these kinds of "type confusion" attacks, including for fixed
+    same-size heap objects, we can create a complementary deterministic
+    defense for dynamically sized allocations that are directly user
+    controlled. Addressing these cases is limited in scope, so isolation these
+    kinds of interfaces will not become an unbounded game of whack-a-mole. For
+    example, pass through memdup_user(), making isolation there very
+    effective.
+    
+    In order to isolate user-controllable sized allocations from system
+    allocations, introduce kmem_buckets_create(), which behaves like
+    kmem_cache_create(). Introduce kmem_buckets_alloc(), which behaves like
+    kmem_cache_alloc(). Introduce kmem_buckets_alloc_track_caller() for
+    where caller tracking is needed. Introduce kmem_buckets_valloc() for
+    cases where vmalloc callback is needed.
+    
+    Allows for confining allocations to a dedicated set of sized caches
+    (which have the same layout as the kmalloc caches).
+    
+    This can also be used in the future to extend codetag allocation
+    annotations to implement per-caller allocation cache isolation[1] even
+    for dynamic allocations.
+    
+    Memory allocation pinning[2] is still needed to plug the Use-After-Free
+    cross-allocator weakness, but that is an existing and separate issue
+    which is complementary to this improvement. Development continues for
+    that feature via the SLAB_VIRTUAL[3] series (which could also provide
+    guard pages -- another complementary improvement).
+    
+    Link: https://lore.kernel.org/lkml/202402211449.401382D2AF@keescook [1]
+    Link: https://googleprojectzero.blogspot.com/2021/10/how-simple-linux-kernel-memory.html [2]
+    Link: https://lore.kernel.org/lkml/20230915105933.495735-1-matteorizzo@google.com/ [3]
 
-That's really it, there's not much else to it.
+After the core implementation are 2 patches that cover the most heavily
+abused "repeat offenders" used in exploits. Repeating those details here:
 
-Bart
+    The msg subsystem is a common target for exploiting[1][2][3][4][5][6]
+    use-after-free type confusion flaws in the kernel for both read and
+    write primitives. Avoid having a user-controlled size cache share the
+    global kmalloc allocator by using a separate set of kmalloc buckets.
 
-> > > Bart
-> >
-> > Gentle ping.
-> >
-> > Bart
->
->
->
-> --
-> Luiz Augusto von Dentz
+    
+    Link: https://blog.hacktivesecurity.com/index.php/2022/06/13/linux-kernel-exploit-development-1day-case-study/ [1]
+    Link: https://hardenedvault.net/blog/2022-11-13-msg_msg-recon-mitigation-ved/ [2]
+    Link: https://www.willsroot.io/2021/08/corctf-2021-fire-of-salvation-writeup.html [3]
+    Link: https://a13xp0p0v.github.io/2021/02/09/CVE-2021-26708.html [4]
+    Link: https://google.github.io/security-research/pocs/linux/cve-2021-22555/writeup.html [5]
+    Link: https://zplin.me/papers/ELOISE.pdf [6]
+    Link: https://syst3mfailure.io/wall-of-perdition/ [7]
+
+    Both memdup_user() and vmemdup_user() handle allocations that are
+    regularly used for exploiting use-after-free type confusion flaws in
+    the kernel (e.g. prctl() PR_SET_VMA_ANON_NAME[1] and setxattr[2][3][4]
+    respectively).
+    
+    Since both are designed for contents coming from userspace, it allows
+    for userspace-controlled allocation sizes. Use a dedicated set of kmalloc
+    buckets so these allocations do not share caches with the global kmalloc
+    buckets.
+    
+    Link: https://starlabs.sg/blog/2023/07-prctl-anon_vma_name-an-amusing-heap-spray/ [1]
+    Link: https://duasynt.com/blog/linux-kernel-heap-spray [2]
+    Link: https://etenal.me/archives/1336 [3]
+    Link: https://github.com/a13xp0p0v/kernel-hack-drill/blob/master/drill_exploit_uaf.c [4]
+
+Thanks!
+
+-Kees
+
+
+Kees Cook (6):
+  mm/slab: Introduce kmem_buckets typedef
+  mm/slab: Plumb kmem_buckets into __do_kmalloc_node()
+  mm/slab: Introduce kvmalloc_buckets_node() that can take kmem_buckets
+    argument
+  mm/slab: Introduce kmem_buckets_create() and family
+  ipc, msg: Use dedicated slab buckets for alloc_msg()
+  mm/util: Use dedicated slab buckets for memdup_user()
+
+ include/linux/slab.h | 49 +++++++++++++++++++++-----
+ ipc/msgutil.c        | 13 ++++++-
+ mm/Kconfig           | 16 +++++++++
+ mm/slab.h            |  6 ++--
+ mm/slab_common.c     | 83 ++++++++++++++++++++++++++++++++++++++++++--
+ mm/slub.c            | 20 +++++------
+ mm/util.c            | 23 ++++++++----
+ 7 files changed, 180 insertions(+), 30 deletions(-)
+
+-- 
+2.34.1
+
 
