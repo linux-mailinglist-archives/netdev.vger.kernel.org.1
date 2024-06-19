@@ -1,277 +1,240 @@
-Return-Path: <netdev+bounces-104899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C23790F0D0
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:37:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A57F90F0CD
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:37:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D816B217F0
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:37:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3C5F2825DE
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:37:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A8F815098D;
-	Wed, 19 Jun 2024 14:35:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381B814388C;
+	Wed, 19 Jun 2024 14:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S88QT2Lb"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="b9O34ENC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5974715098C
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 14:35:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718807743; cv=fail; b=G1wpC+W1ayCA8rwvRpOMZ7rQ1NhjbMkc3FB0nx6yYqp2zzx9CUEv9rVXTNIRsWMCV7/xFEzvz6tjK6yX6HWf3EkebwYwn4WqbWyyGwE7qHt4sCcdnPEuPhYCiEfsgSTYqmJiUQUK+BvEapWPZ1jd2h0GL0Gpep39ry5OhYSXtL4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718807743; c=relaxed/simple;
-	bh=YLSXGnSxPxHQGaUX1GU1hpIHejlTYz6eR3TslNd+OO8=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=hO/M4izxuVjSr14fFp/N0A5XDfSTgBeqGKCOXiIIjsrvpDHgeYNtGvmOp/jYlHczckxDcLh6BPhrjLwLp8GsB5vXreYyHM4HdLmigUTH1Y9zjNC5E9rtPpXtVa2/SrmrK5YGfplL8pRJxTNoE7TNLixTvdc8ycbk5xEKid0fNkU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S88QT2Lb; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718807741; x=1750343741;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=YLSXGnSxPxHQGaUX1GU1hpIHejlTYz6eR3TslNd+OO8=;
-  b=S88QT2LbXt7wDV4dTHPkIz2M4gKt3ND8TVQJzMy8HM+1lT31OHfuv7JA
-   h7u/5Z5Chx9cZaXvRTau5hWZzyKzmSacSPWHQz3WrCJNxFDHN6h+6rn7z
-   QK3QSQbbiMQMd1Q7pHr7YtfU7/BzKR+9L9PTRQADligGi+qQEkBhEwVva
-   cdiptP/uEwlnKUQNL9Qz+vdUR23TlMYZoZpPQ1ocudE77SiGvVqTvPiY7
-   /frAViKjTr9v9LatsxKh6BR+jFWkFmdgUnUe6Tc3Xhl6bvyERzVa1C9OP
-   NySzWtFycFwgzExsCy2Sx0V7iU8ZfAcdgCynIvqd0YEk4I2EcwtU6Tx2z
-   Q==;
-X-CSE-ConnectionGUID: ocLEOqd5RMmoXQJVewuODA==
-X-CSE-MsgGUID: SSchCWCSRFG4Ouq1+r82VQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11108"; a="15983208"
-X-IronPort-AV: E=Sophos;i="6.08,250,1712646000"; 
-   d="scan'208";a="15983208"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2024 07:35:41 -0700
-X-CSE-ConnectionGUID: YYu+BTtyTmWhwg7Bukr9uQ==
-X-CSE-MsgGUID: PQmzItmpT+G+PIXF7dboBQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,250,1712646000"; 
-   d="scan'208";a="41892723"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Jun 2024 07:35:40 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 19 Jun 2024 07:35:39 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 19 Jun 2024 07:35:39 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.40) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 19 Jun 2024 07:35:39 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TYyAetTLIVtCOE9syMqY557F5tY2zD3GzKPfvtFOdpdjuoxRSrIstZhlZId11eDgBDOh0vZ9H7h7/p1m3GamAqtr61IZvG4OzDb0CQArze4D+qmzKcZ+wC4whrEQjQQB3Y5G35z2stYtMbzYiHk7fQErH9n77J8xO1QbTq/KqxDgf8B9A7zjjXAXtVi4+mj2fALn2cuzAnhXCcZHUQC9KCSonASSggukGtym/hJLJ+eA/eG3PKu+YmJiLoEyssZ2aAvWKsg2WRfopfuNNNkadO7gTI4zwxrKZ9wtlWsBpMYo0BeGJHPy1z2mDUa/aRcqtr7j433Bxx9Bgo7ZumSaPA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H2/4VLNJAGc65W1HcD+tke5w0gdxBIOeomOlREX4TVI=;
- b=T4/Ww+/wuDF3a/4DvTcm1G16IMx0SD6dqhuobIreN8u0hi3Mh5aM1yAQrgpTJs0zW/TOE5kObn70sGX88mzG+D6VXGR5N+9E94HVlc+sc0IlQhMcYyGqtBbePjcZJXxrLEU/M/UxTikcKrPCGg0LJiHLAaMGnFuW4isGIrINa8WD5oPgwTXHV4jI9Zw3Y6bb0tA3XOLp9LZStjQqpQMbO9JQMyRsx47nWWW9FgaBi9caUIzPQJKWa0zooCygFLmx5QZgrcvbX3f4Kv2+7khU2bFsK55SlrKvgZtj4QtpXCX8e0S4b/yde6nEL5jURViy84uwiheGGb4oyudGV1++yw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by DM4PR11MB6167.namprd11.prod.outlook.com (2603:10b6:8:ac::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Wed, 19 Jun
- 2024 14:35:31 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.7677.030; Wed, 19 Jun 2024
- 14:35:31 +0000
-Message-ID: <f98cf542-ca67-43e4-8a26-a809294cd1d8@intel.com>
-Date: Wed, 19 Jun 2024 16:34:15 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next 3/6] ice: Simplify bitmap
- setting in adding recipe
-To: Marcin Szycik <marcin.szycik@linux.intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<przemyslaw.kitszel@intel.com>, <michal.swiatkowski@linux.intel.com>
-References: <20240618141157.1881093-1-marcin.szycik@linux.intel.com>
- <20240618141157.1881093-4-marcin.szycik@linux.intel.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20240618141157.1881093-4-marcin.szycik@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MI2P293CA0001.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:45::14) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823A613E043
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 14:34:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718807701; cv=none; b=nmUk4iR7FWstTatO5kDldqQ8O0kBLIfhdLJIg6DvRkWyAbySKWr7HHrcpq/QgmnWisQqPvkYX1cWRMum/orqXN0w+ayM1+EPw+gsz94L2D8Fhh0XzC0siFxPUP4F9eqdFGB8OAUbQBPSvFXPX9jSCgguqCbOSsad0NNKLIsksVQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718807701; c=relaxed/simple;
+	bh=tbtlwvSwL3aX9bxxDynzolT137S68gmPIdL/KYBMujw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Nj2pewmnxwV3PqvnZ65A4B8EXIDcZj36BO7efXNL3VwHXTKLQ/p4F0C3RCundcXS0778vNEfPVDebbHBLtTTH+T5tl5vlAH2Co53UL566T0PIgtgRRxcmL4pZYNteKL8xESGAsle3TByqwKNxE758bFDNAS2uyXLlVl97rmNynE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=b9O34ENC; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2c7ab3d2c87so1129030a91.0
+        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 07:34:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1718807699; x=1719412499; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Iu2kBEJm52y7ucCiR3IOZoS+GHwsfCoaalsy10r4ffs=;
+        b=b9O34ENCe9rVPbr43Yn5sP/N1qerS4eUN1wp9bIJoma9F4T8WUaz2TzSwd4pQDzQjo
+         hF4G/Blb9Ymu6UFk96aklsenyuHF0ADLSH6FHVN6fPwChh1fpa1MUMOTyl0VCS418riX
+         Gzg9E6lsq7H+QZRFJBljNhYOAfLA1452Qu6t/z8qigahnOPYggYREV80mglN4kO2Fn//
+         XG71cPbIlf7PT49GXDTzjxK9hsO5GCs3Be3kKAlDM3nWhjkePv/TC295hKsy2KdFQtJe
+         l/oj0kdpfJtqx9dNRGolDCxgsqp65JYOR8u83ZVyBaHZsoLdDEsF28LecJ6dQDHz0HJx
+         TLmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718807699; x=1719412499;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Iu2kBEJm52y7ucCiR3IOZoS+GHwsfCoaalsy10r4ffs=;
+        b=JRPlWvCzhlkby/bYthMFX4k7evvLRRW9yroBHolgQI1kY1w2sw6ZfjPjz/j53xce8q
+         tByhkMW4UCZXvFo0yxAarV3IDQXw3kpOhA8VSU9jImg61uqYZ3vUmj5F38Lfp0XV7f8w
+         c8g7SpMbIb2tKfgT114w9hpl/7X57FvIRVG5dOy4D1rO/v2DHaoip4ULeCWjaax5p+ku
+         JTc5Fi4jrreVTOx5kxFblF7kwqUFJFdDf1wQ0iTap60HTT+ePiYyeLpYICWDE+C9JTxx
+         XdUwAjgAcj5efEvkay3G3sJy2lE7TnrknScCqFt9PCz2d/ESexpWdTIt/FJ4ubVoO1F5
+         4V8A==
+X-Forwarded-Encrypted: i=1; AJvYcCUWYSJRg+Mc9hkyD5wXBk2rYNVUPt1IsNA1Y0iBzm2SZuMDnBYfSFO9NU9Th5xJ2hVvWMby4Nd1XFephEoOYgS1yL8EEKSH
+X-Gm-Message-State: AOJu0Yxd55IvNXkgo+K5P0iwLy4eO6BX9giZaF5H5qISowfLruRuvBtc
+	5SyDtlRUXueaPjHQci0ztenbGUrMmLfNU1nZQ0lmUXiL7IXGH0NQpXQCzBzyKvPFvdDAiWRXnYk
+	ZPCyuJeyHlCIRs1+ZKN/9LOtExCIeGFIn6ZJYWQ==
+X-Google-Smtp-Source: AGHT+IEIdyucDkMb4dp00FdFOGNmZrYK7rBk1lwc8JYDLA6H6z1Y/drDGuijCKNPSi3sxW1+K/gmN2H6UPJ6ePwzQBQ=
+X-Received: by 2002:a17:90a:e28e:b0:2c2:f6c1:4d87 with SMTP id
+ 98e67ed59e1d1-2c7b5cc9ff5mr2731728a91.20.1718807698718; Wed, 19 Jun 2024
+ 07:34:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|DM4PR11MB6167:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6a3300c3-517e-4dae-d46b-08dc906d127b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230037|366013|376011|1800799021;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?WTVyeHc0Zk01T0tuZ01ZTVRFWVh0Y1AzV1drbWpXVzR3RUcrRWx6WUFLeGpJ?=
- =?utf-8?B?dmkwaml2RW5iSDJ2bTN1VmlNMGRoSk9DaVpwekRiVmoxQUd2eGswRTFDbG9V?=
- =?utf-8?B?ZkhmWStVVnVzTHR6dytHVXBrWkNDQmluamJ0NDhYNGNoczFiRkhUWm5ZSlY2?=
- =?utf-8?B?eTR0WS95UTBxVEErcE9kVzJwQWFDYjhyU2hoWVR6cmh2M0VJTDFUNUE3Qzhu?=
- =?utf-8?B?OThsNHA2ZEVtbG8va3djRndwZFdRQ3dIWWlEcHNiNjg5Z1l0blAvdXkzZ1dC?=
- =?utf-8?B?Sm1JRDVYNzJ0aHBLZ3hzMTIzOFhYWVZOenN5WmthbW4vV3pMZUpmTS9lZmdp?=
- =?utf-8?B?a3luZThXNmFPUjJNTkh1RFpCeS9oY0lENDhYOFlwNzUvaHJoenlGN2g3d3Ry?=
- =?utf-8?B?UjkzV2g5czVyd0hBLzluN2ZrM2JCV2ExS0V5WVhWSUcrMUhkU3J5S1BaaXR1?=
- =?utf-8?B?UU9zU3NyVG56SElDczJqWGZ4aER4SDRKOXEwbXArYmZ1Rko1SSs1QmRyUTlP?=
- =?utf-8?B?V0toZGEzUW9SaGtrdXJLK3U3VzZnc3ViQmk4TXBVVktPeGVrN0ppWDVNMUpU?=
- =?utf-8?B?SXkyV2pFOS8zWDg2MHlpZCs3K1FmWWNMc05nU1cyOHh2T0hTRlZvMjdNU01K?=
- =?utf-8?B?c0crN2tuTUE5NHZhRXJKRDgvNTZFVTFob2piQXhKK1FheHZlODBYMWRBTEhT?=
- =?utf-8?B?bkJnK2xXQ0ZrWndlY2lCU2NvMWREUE1Qb002WExnWkRCQ2IwNllEdWR0S0Q4?=
- =?utf-8?B?bk15ZWFYaHdqVk03QTFKbDhVdzNmRHRtQ1ZkMzRGNjdKMUNmVlhMUW5CT0Rz?=
- =?utf-8?B?MjZIT2hjczBLdlhHWEpkRGE0dWFCcFR5QW5DOU5hOEtESG1pYU54SVlPSnhm?=
- =?utf-8?B?YVRseGlqMVBtNGFESUFiTkRkZkVpYTRBL2R0cHkyZ0xNSk9jeVo2QlpPdERs?=
- =?utf-8?B?THVvdVI5UEdWRlFYU2J6emZRM1RCM05CbW5Rc3hGK25JdlhxQ3hSOVZZRXdv?=
- =?utf-8?B?aVArWERxRU1KYUtIeVc3MThjYlJZZzhMYWNZYU9kYURpTFV6TDJ1c2c0UTM2?=
- =?utf-8?B?dTFHYkhmK2Uzek9PTUhFL241c1FQc0tBQWNQUFR4SFN3SHhvcitKK3BPZFl3?=
- =?utf-8?B?TkVOaUwwS29mNXdxL2VSN3dyWm42RXZnbzRyS3h2bCtZcDdIaU11YnRYTGdq?=
- =?utf-8?B?aXQ1aFptMnRnY3puV0tTb3o1QlM3YzJ1YnYxV0x3emJDVXo2Q0xxUTFOMmQ1?=
- =?utf-8?B?YVo3cEVXNlR4VUY4NXhlMjhoenR6c0owOWdTZUJtM0FRckFXeFFvM1ZMODJC?=
- =?utf-8?B?cUU3Qnh0bjdIRjluell6RWVNMjlpbFQ2WVM0dmxGU1g4ci9ubTZnTVRPMkgv?=
- =?utf-8?B?Vm1ZM0ZTNjNrVzVZTGZoZXNtYkpPZExqWEd1b1lXK1FVdkh3YUtJRVN6eHVm?=
- =?utf-8?B?RDM3c3Z5Ym9zUDVxb2NESEFGczFmOHRXcTRNSC9KVkNNZ3FwSWh6Wk9aZHQ5?=
- =?utf-8?B?WklocEFmRjVnREtDeVFWdVpYSE9NVUpOSmhocDgzV243TXlkN09VWjNhbHVu?=
- =?utf-8?B?VnBZa2JNTlQ0QURCRitQQjh0a2lwNExoYzB6cVBFMkl2MThlbEJlQm9IY245?=
- =?utf-8?B?Szl1cFNSY2M4emI2RWRwckhmdmUxTjBnbFhFQXgzQ04xVjB3YlNockRjemdh?=
- =?utf-8?B?Z0hYUXdaZ3lQMFhPb01qeHRMNWNTaC9iczgzYTg3dk9tcDRjZjJYb1VmUnBR?=
- =?utf-8?Q?B6NUx7dyjo0UBijQfIxpoT3Y1vOiwoB0ZNoxfUE?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(376011)(1800799021);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eWdyaVZTZ2RKVlhYOWJxQUM5Wm82elprWitoK0FQZ2dDY092Qk9QTWw5YWZz?=
- =?utf-8?B?djAzV21uenZ5K0RCRmcwVHBlZU1lWEtDb3BrcGdFUTh4bWJtbE9qQ0dzWDhF?=
- =?utf-8?B?MlBjUFJ4NWZJb3ZyeVczR3ROYmxNbGJzQ2d2VDd3UzVJZmRGc0tFTVp0cUhD?=
- =?utf-8?B?elRtWDgvL25oK0tLRlR1Z1YzV2tOcU1VUWkxM0FseFpoZ0o3cndFRDdRZHd3?=
- =?utf-8?B?SmFaSGhUZURKSVFCdHNYcXdmRHhFYmltM3ZBYTVaZUhwS0MyQ1FOcUNSOTBZ?=
- =?utf-8?B?YnN3dHVPZjFLSWNINC9BT0REUnlRVGtBbjRra1BEcVhJODh4RitjYUVsRFYr?=
- =?utf-8?B?dVgyK1A4YUdXdFpJWlIyTFNhQk5XaE80R2U3eGhORDRTaFlCOEZ1M2lVTmRB?=
- =?utf-8?B?NDFVWW54eGdDZlQ4anZBTVd5Sm9KZU91QVpCVXdMZEFYNDhWVnRiN2F6RmtJ?=
- =?utf-8?B?YWhWa1F6R011c1ZYcThRbGVUY01UTjZLM1h3VDdoc2JTSDk1eVpNRXJvU2Zr?=
- =?utf-8?B?RXNnRkZydC9tZkxIbjNsOXJ6NVFES0FFNmRTNnZkQmtycEtsQW8yaStNQ04r?=
- =?utf-8?B?QlFoRmExWjFndCtBLzFaQ04yank1ZXJtSlBwTUVJMzhXS294UXNUVWpEbkpx?=
- =?utf-8?B?T2tRTTd4N1cxc1hmUjJVbDNBcHQ1aXhTa0ZsY3lSdEdVWThYNVo3REdKSDJ2?=
- =?utf-8?B?VUlqeWczb2JCUFRuTjNiM29sUkl6UkFXMXFHenUxSnllNmdxT2g1OU9TN251?=
- =?utf-8?B?NDJPNDdUQlNFK1IyR3dYYnhDMGszOXFKcmo0WjJIVURKckg2VVdJMlRIWHBv?=
- =?utf-8?B?eW5nZ21KaHdsTDRRdkZCcDRPeUx4WkpnUHNYZEc1M3JhOFVoSnBzVXprYUlm?=
- =?utf-8?B?UHNHZWpxNkxkaVB3QzhGeGJzN1RLZ3JVMFNqajdlYlU3WER1VW9neW5zUVpx?=
- =?utf-8?B?U1U3WW5nSThmaUJUTmxtank3UkdURjZFQStjQVdDTlAvZkdTL0Z6eU5uanFm?=
- =?utf-8?B?Y3pTU0VsMzcxVEx0UnF4Vzh3SFlFMWM4cUdqRzQrQzJNcHVkQUdvSTd5cFU5?=
- =?utf-8?B?bFR0QnZiNUxPRlcrOGtLRkZCUEJDWjZKL011TFhyVU1RVW5tbkNCbkV2dVUy?=
- =?utf-8?B?eUZnNWd6cXA4NlNmb3lZWHJKaDV5UXRGZk1OdmVvRkdrYUEvbmRmQ2FrU2JX?=
- =?utf-8?B?SnNnUXF4VXZNYlcwUTBIaVM5K0lyQWJ4SjNEVGIvd29VYTdpTSs5UzM2UUpy?=
- =?utf-8?B?SG5XSVh6Y2hwS21hb0NkTWQ5RzA5amRwU3Nsa1BLaVVkbTdkaThjMTY1a3FE?=
- =?utf-8?B?V2JDQWpobXFzODluWllGK0dqaHJ2d0haalNWN01OdE5QOXNPMTNMdEhPOCsz?=
- =?utf-8?B?dWZ2ZFZNMkdhNVR1aHVybFJuNUovZm1WSUtNZ2pVT2kvdDFMUk1VemVSSjU0?=
- =?utf-8?B?UHVyTTQyTFFneDJQUjZJaWlQS1lYZThjTUZNV09jaG5zSi8rSURCY1FpSVgw?=
- =?utf-8?B?RDFEWU4zV29vc1FVV3o2WWFJR0VJZlJkVHIyV3Iyb3BEVHIyTXI3ZXNkejh2?=
- =?utf-8?B?N3NuR1g3bkxFZFNVdnF3WGpsOFVNalpjNldOV0N0UVlsdW9RR0VRZ1pqWURB?=
- =?utf-8?B?OWs1MGlraDNqdXFveTI2K2dmeC9QL1haOHRWeWlyZktYRm1EUThqdzJGS2xK?=
- =?utf-8?B?Y1FNblA0K0lHUENNMGc1aDJJUC8yemwwYjJKMFBYNFJvZFdzK3kwZDAwTjdX?=
- =?utf-8?B?cU5xb1B4Z3BleHZ1ZXFtUWdtRWY2cUZBV0I0UVU5YmdJQkhJWW1rY1FEMUxs?=
- =?utf-8?B?Mk04NEJkci9CcE15eXdncFBGdFJDNFNwWUkvZkI2NmRvbW9XeXMweEVyTkpK?=
- =?utf-8?B?dWFxVThBTWs4MDVsRUprVFcvbjQ2b0dNbmF1WE5yR0ZUWEd2UFJUa0pJSjJI?=
- =?utf-8?B?dERrME5nYlA3UDFFOGFJVHE3bkc2R0hQWDU0eWF2aHB5eTNqK29yQkNGVjdP?=
- =?utf-8?B?R1ZXUzJmMzZLUGFkMVlGMlBBbjZ3VHZQSndNaFhNb0VaR2hQZmxUZVh6LzdE?=
- =?utf-8?B?aElaZmN2c0FueitzMlYwN3dRdjV1M3BTL3NjQmZRZXdGZlJla0E4Q2thVkhk?=
- =?utf-8?B?Vk5DeEJhQUJkLzMvUXV3aU90VGE3RzFJWmxjaTg3UHdZaGE2MDNCc0FyQnpL?=
- =?utf-8?B?Q1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6a3300c3-517e-4dae-d46b-08dc906d127b
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2024 14:35:31.8141
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AWLzKJZYGMLf91sDkInbec4NTR/jpAeMwruO4ap2ay8XoUuZo1YAYYkCy95GstYZh12cPen0breTYK1mO6PnWOmMROnFkFS57uPziEuQLOI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6167
-X-OriginatorOrg: intel.com
+References: <20240617210205.67311-1-ignat@cloudflare.com> <c9446790-9bac-4541-919b-0af396349c59@linux.alibaba.com>
+ <CALrw=nGSf49VnRVy--b5qSM7_rSRyDBUFe_t8taFs2tmRP2QTw@mail.gmail.com>
+In-Reply-To: <CALrw=nGSf49VnRVy--b5qSM7_rSRyDBUFe_t8taFs2tmRP2QTw@mail.gmail.com>
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Wed, 19 Jun 2024 15:34:47 +0100
+Message-ID: <CALrw=nESVt0g4k4AvSkF3yfqDDMDnGGsHavonxHMoEaBrigQPw@mail.gmail.com>
+Subject: Re: [PATCH net v3] net: do not leave a dangling sk pointer, when
+ socket creation fails
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Florent Revest <revest@chromium.org>, kernel-team@cloudflare.com, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Marcin Szycik <marcin.szycik@linux.intel.com>
-Date: Tue, 18 Jun 2024 16:11:54 +0200
+On Wed, Jun 19, 2024 at 2:08=E2=80=AFPM Ignat Korchagin <ignat@cloudflare.c=
+om> wrote:
+>
+> On Wed, Jun 19, 2024 at 1:31=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.c=
+om> wrote:
+> >
+> >
+> >
+> > On 6/18/24 5:02 AM, Ignat Korchagin wrote:
+> > > It is possible to trigger a use-after-free by:
+> > >    * attaching an fentry probe to __sock_release() and the probe call=
+ing the
+> > >      bpf_get_socket_cookie() helper
+> > >    * running traceroute -I 1.1.1.1 on a freshly booted VM
+> > >
+> > > A KASAN enabled kernel will log something like below (decoded and str=
+ipped):
+> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > BUG: KASAN: slab-use-after-free in __sock_gen_cookie (./arch/x86/incl=
+ude/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583=
+ ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
+> > > Read of size 8 at addr ffff888007110dd8 by task traceroute/299
+> > >
+> > > CPU: 2 PID: 299 Comm: traceroute Tainted: G            E      6.10.0-=
+rc2+ #2
+> > > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-de=
+bian-1.16.2-1 04/01/2014
+> > > Call Trace:
+> > >   <TASK>
+> > > dump_stack_lvl (lib/dump_stack.c:117 (discriminator 1))
+> > > print_report (mm/kasan/report.c:378 mm/kasan/report.c:488)
+> > > ? __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./includ=
+e/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-in=
+strumented.h:1611 net/core/sock_diag.c:29)
+> > > kasan_report (mm/kasan/report.c:603)
+> > > ? __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./includ=
+e/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-in=
+strumented.h:1611 net/core/sock_diag.c:29)
+> > > kasan_check_range (mm/kasan/generic.c:183 mm/kasan/generic.c:189)
+> > > __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/=
+linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-inst=
+rumented.h:1611 net/core/sock_diag.c:29)
+> > > bpf_get_socket_ptr_cookie (./arch/x86/include/asm/preempt.h:94 ./incl=
+ude/linux/sock_diag.h:42 net/core/filter.c:5094 net/core/filter.c:5092)
+> > > bpf_prog_875642cf11f1d139___sock_release+0x6e/0x8e
+> > > bpf_trampoline_6442506592+0x47/0xaf
+> > > __sock_release (net/socket.c:652)
+> > > __sock_create (net/socket.c:1601)
+> > > ...
+> > > Allocated by task 299 on cpu 2 at 78.328492s:
+> > > kasan_save_stack (mm/kasan/common.c:48)
+> > > kasan_save_track (mm/kasan/common.c:68)
+> > > __kasan_slab_alloc (mm/kasan/common.c:312 mm/kasan/common.c:338)
+> > > kmem_cache_alloc_noprof (mm/slub.c:3941 mm/slub.c:4000 mm/slub.c:4007=
+)
+> > > sk_prot_alloc (net/core/sock.c:2075)
+> > > sk_alloc (net/core/sock.c:2134)
+> > > inet_create (net/ipv4/af_inet.c:327 net/ipv4/af_inet.c:252)
+> > > __sock_create (net/socket.c:1572)
+> > > __sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
+> > > __x64_sys_socket (net/socket.c:1718)
+> > > do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+> > > entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+> > >
+> > > Freed by task 299 on cpu 2 at 78.328502s:
+> > > kasan_save_stack (mm/kasan/common.c:48)
+> > > kasan_save_track (mm/kasan/common.c:68)
+> > > kasan_save_free_info (mm/kasan/generic.c:582)
+> > > poison_slab_object (mm/kasan/common.c:242)
+> > > __kasan_slab_free (mm/kasan/common.c:256)
+> > > kmem_cache_free (mm/slub.c:4437 mm/slub.c:4511)
+> > > __sk_destruct (net/core/sock.c:2117 net/core/sock.c:2208)
+> > > inet_create (net/ipv4/af_inet.c:397 net/ipv4/af_inet.c:252)
+> > > __sock_create (net/socket.c:1572)
+> > > __sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
+> > > __x64_sys_socket (net/socket.c:1718)
+> > > do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+> > > entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+> > >
+> > > Fix this by clearing the struct socket reference in sk_common_release=
+() to cover
+> > > all protocol families create functions, which may already attached th=
+e
+> > > reference to the sk object with sock_init_data().
+> > >
+> > > Fixes: c5dbb89fc2ac ("bpf: Expose bpf_get_socket_cookie to tracing pr=
+ograms")
+> > > Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > > Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+> > > Cc: stable@vger.kernel.org
+> > > Link: https://lore.kernel.org/netdev/20240613194047.36478-1-kuniyu@am=
+azon.com/T/
+> > > ---
+> > > Changes in v3:
+> > >    * re-added KASAN repro steps to the commit message (somehow stripp=
+ed in v2)
+> > >    * stripped timestamps and thread id from the KASAN splat
+> > >    * removed comment from the code (commit message should be enough)
+> > >
+> > > Changes in v2:
+> > >    * moved the NULL-ing of the socket reference to sk_common_release(=
+) (as
+> > >      suggested by Kuniyuki Iwashima)
+> > >    * trimmed down the KASAN report in the commit message to show only=
+ relevant
+> > >      info
+> > >
+> > >   net/core/sock.c | 3 +++
+> > >   1 file changed, 3 insertions(+)
+> > >
+> > > diff --git a/net/core/sock.c b/net/core/sock.c
+> > > index 8629f9aecf91..100e975073ca 100644
+> > > --- a/net/core/sock.c
+> > > +++ b/net/core/sock.c
+> > > @@ -3742,6 +3742,9 @@ void sk_common_release(struct sock *sk)
+> > >
+> > >       sk->sk_prot->unhash(sk);
+> > >
+> > > +     if (sk->sk_socket)
+> > > +             sk->sk_socket->sk =3D NULL;
+> > > +
+> > >       /*
+> > >        * In this point socket cannot receive new packets, but it is p=
+ossible
+> > >        * that some packets are in flight because some CPU runs receiv=
+er and
+> >
+> > Reviewed-by: D. Wythe <alibuda@linux.alibaba.com>
+> >
+> >
+> > A small tip:
+> >
+> > It seems that you might have missed CCing some maintainers, using
+> > scripts/get_maintainer.pl "Your patch" can help you avoid this issue
+> > again.
+>
+> Thanks. I did scripts/get_maintainer.pl <file I'm modifying>. Not sure
+> if it is different.
 
-> From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> 
-> Remove unnecessary size checks when copying bitmaps in ice_add_sw_recipe()
-> and replace them with compile time assert. Check if the bitmaps are equal
-> size, as they are copied both ways.
-> 
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Co-developed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_switch.c | 24 ++++++++-------------
->  1 file changed, 9 insertions(+), 15 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
-> index da065512889d..2f67fbb73fd1 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_switch.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_switch.c
-> @@ -5067,6 +5067,10 @@ ice_find_free_recp_res_idx(struct ice_hw *hw, const unsigned long *profiles,
->  	return (u16)bitmap_weight(free_idx, ICE_MAX_FV_WORDS);
->  }
->  
-> +/* For memcpy in ice_add_sw_recipe. */
-> +static_assert(sizeof(((struct ice_aqc_recipe_data_elem *)0)->recipe_bitmap) ==
-> +	      sizeof(((struct ice_sw_recipe *)0)->r_bitmap));
+My bad: it is different or I actually forgot to re-run it, because
+v2/v3 modifies a different file.
 
-sizeof_field(struct ice_aqc_recipe_data_elem, recipe_bitmap) etc.
-
-> +
->  /**
->   * ice_add_sw_recipe - function to call AQ calls to create switch recipe
->   * @hw: pointer to hardware structure
-> @@ -5187,13 +5191,9 @@ ice_add_sw_recipe(struct ice_hw *hw, struct ice_sw_recipe *rm,
->  		rm->root_rid = buf[0].recipe_indx;
->  		set_bit(buf[0].recipe_indx, rm->r_bitmap);
->  		buf[0].content.rid = rm->root_rid | ICE_AQ_RECIPE_ID_IS_ROOT;
-> -		if (sizeof(buf[0].recipe_bitmap) >= sizeof(rm->r_bitmap)) {
-> -			memcpy(buf[0].recipe_bitmap, rm->r_bitmap,
-> -			       sizeof(buf[0].recipe_bitmap));
-> -		} else {
-> -			status = -EINVAL;
-> -			goto err_unroll;
-> -		}
-> +		memcpy(buf[0].recipe_bitmap, rm->r_bitmap,
-> +		       sizeof(buf[0].recipe_bitmap));
-> +
->  		/* Applicable only for ROOT_RECIPE, set the fwd_priority for
->  		 * the recipe which is getting created if specified
->  		 * by user. Usually any advanced switch filter, which results
-> @@ -5256,14 +5256,8 @@ ice_add_sw_recipe(struct ice_hw *hw, struct ice_sw_recipe *rm,
->  			set_bit(entry->rid, rm->r_bitmap);
->  		}
->  		list_add(&last_chain_entry->l_entry, &rm->rg_list);
-> -		if (sizeof(buf[recps].recipe_bitmap) >=
-> -		    sizeof(rm->r_bitmap)) {
-> -			memcpy(buf[recps].recipe_bitmap, rm->r_bitmap,
-> -			       sizeof(buf[recps].recipe_bitmap));
-> -		} else {
-> -			status = -EINVAL;
-> -			goto err_unroll;
-> -		}
-> +		memcpy(buf[recps].recipe_bitmap, rm->r_bitmap,
-> +		       sizeof(buf[recps].recipe_bitmap));
->  		content->act_ctrl_fwd_priority = rm->priority;
->  
->  		recps++;
-
-Thanks,
-Olek
+> >
+> > D. Wythe
+> >
+> >
+> >
 
