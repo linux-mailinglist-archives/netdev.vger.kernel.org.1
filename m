@@ -1,93 +1,173 @@
-Return-Path: <netdev+bounces-104807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3622490E747
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 11:50:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B38B390E75A
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 11:52:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 447DB1C2153C
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:50:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37AF51F22B35
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 09:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0289B81204;
-	Wed, 19 Jun 2024 09:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE16A8248D;
+	Wed, 19 Jun 2024 09:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="csndO+5A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PJCVKjSI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C244A7BB13;
-	Wed, 19 Jun 2024 09:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108CB81AA3;
+	Wed, 19 Jun 2024 09:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718790629; cv=none; b=D/Xocon5E+8m98L2hwq53l02r8jbLACTrb8wJ/9bxg1hII7S+d8npH0zJj+JgKzRpIlVCEjf6nYB2JhoeL4pSkhLGiLa7rFOdstRuvVq8oh3xOUs1uT6NSehomUNkGxIC+ymPzmlr/p4NkC2mk/i2lbFm9BUOPNNapInHC6aEZc=
+	t=1718790726; cv=none; b=smPO346rzSsV2Hu6Htlqkak6ReWBlTUBYjy5Ag8X5TPsF0VwGZaEBEfPwIrOUOkC/dmqBIpQuQDuNiby9ax+ipchIid+PNlcgcwyfgnke+a9/zxa3xfgTUA8OQORbt+/PmqRPHWVzGtFJ8HTNuARlRzZQ6CbesACTQSi2hHh/O8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718790629; c=relaxed/simple;
-	bh=GlJMmIAEfpjewOs6ODwu8YfiHNryTzd+90PPz9YRuBo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Y3Fe+2TgkWCtI5izk+VlIRt8A1uLP6DXlz4S+EdOOHKPHH6sA81GEYaBBxp38itgnNlcktg6NgQ6EpPYe9ya4wmeTg5VE/QQITHSyWQXuKBk502LWFjTogZXD/3zpGYXGQOz8S6UyNmXAVa1iag0hu2JyxBFK2khTdjuqUUSu1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=csndO+5A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 54EC3C4AF51;
-	Wed, 19 Jun 2024 09:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718790629;
-	bh=GlJMmIAEfpjewOs6ODwu8YfiHNryTzd+90PPz9YRuBo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=csndO+5A9Zb+DzdccpWSsMtUf9g2I6Tl0tneOGbluTlWZ2xwomIbSrPPTN4tg806z
-	 EJ8PggU9HFGszcssu8kdCMK58IPde2bCKMdAYMFnKhVkTl5f7xa+jZkCL2NI7cLjLC
-	 f0qA6btGKpt7gLZ7LekXAi7CllMZ0ATB+tMA8FijWxaoUQSeCs5EqqqLEYUzs3KZuD
-	 t98NqCBhLuaqpvJqp5yO+o73SHcMD4dGyoYXZkFrSpB8WK3olvlKwDq7Sn/CUQDhXM
-	 a/RGixzuZ/FhynN3AJSBPGE4r86iEfog9VEdQaSui99ZuzjMFDlGwdrCyBZVGah8v5
-	 ndNyIDglEj8TQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4C011C4361B;
-	Wed, 19 Jun 2024 09:50:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1718790726; c=relaxed/simple;
+	bh=QNo5k1Xit7gstpENqR9hmPgsoLViG3k55hI7buVxfMU=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hRg4k6lt/RQcKt353SXPxLf/pusfkOSgKsBGb/WaauQYNws0u98KygXoDy/mXHIkcT9Afl0Y4pjkka+iJkit/CATLHdzylPjCswcILdrNuNeWRuQkjflnLMhbW02d4rdtv96OW4BD1MVYBqJzICjftLxN5HZTXb2GD7it9xyyh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PJCVKjSI; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2ec0f3b9bb8so46987921fa.1;
+        Wed, 19 Jun 2024 02:52:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718790723; x=1719395523; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TY+TzI4NVOZe+bVmXFpZLf0ZfiG9DoMpTrEztVoxeCc=;
+        b=PJCVKjSI0llDw6J0/7YYIhUHlgxCIeHhZeBPWHvb2Iap9+UWdiM9oL7hqliWSWB+ZI
+         ZNbiARqhAtrLKbcG9CUfQF0Glc0u7AuA7cotYN6sPUvxMNXKH/nGprdQ++Pab+g4Rp11
+         o9Ln5K20t2FQp5VVp+/70TJT/ocmFdIyfBY4p7Og7d/4RTDBKhoBY3kCYTnO/Z90G1xK
+         dXlRUTFBnsZcXfS0XaJZw2HLksTm1Er8OH3kGHMUv0O+RVchjNjTk+4RLizRZDLMOeST
+         ZWAjY3BUEYCOXBL38K0ebCJSuUkXek3zeZModbf5CbnORpLA1C9EhVRmeNAvEl0fChjZ
+         x8Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718790723; x=1719395523;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TY+TzI4NVOZe+bVmXFpZLf0ZfiG9DoMpTrEztVoxeCc=;
+        b=u2frX3ctfX5QB0/GUXP8u4kztIE6Mu/NzT5io8cvJQCACyvfxdkOnOnAh1C7qs+una
+         LzEEXJBgxZW/ZmzusAjA1CZ+thIEOckX7MUVNQ1N9EZ8xTgKJFUG4hD0Ct196pqSsYNn
+         sdhPamlVBeta6Ph7txxOTs/IvUk1h514izN21CK+XLe1+uMaeIffTtx/7djXUZhIgD1S
+         DALoOX4SWqIfq54MIR2sCN303hDN3DSD6V8s5joSmpTTVJFEVkxUmjBEONX6nvWvlJ7E
+         REe7c4fDBG8Ndd2BoPslSm3YlWkyqvyC4l66JRBWTnlY3px6J9e5vZOfz66soXO9eXyD
+         78gg==
+X-Forwarded-Encrypted: i=1; AJvYcCXt087gQy52lvVoKJ5FFTKKzdiB9rz6PrGRf3GvbHmxYWXM5Inz1+MiUYqia0fSFduM5Aj0IDBnRl6v7Hotbu5O0hLTLXOeu8mNKTjWwCrxd8bbV8uOG+7exzWWQpG6APVp4dyzde9F2LQpTc7L+ylq2UW/nWbB5aEJcbzggmUbHoPOZz38ZXA9Tk7OpdyErmbGVNbo54sV72mPXqboMohDyKpkpJo2ElTHJM5xZiWDyj5H2rtSsGEV/LL/+rn9f46ueAsyZC1Lfr1owLMv6pG2TB718s4WwesMPEvlFkVe1zRP6WmVshWl2Wl8KfYEq0DO0bRu8zKlrNzjswdJDlKfPDAltodJnxjoB00du/WKHHtd1yDUndv2gJ1/vmJ2tkUH82hRk+z3/oOk0r2/tzy/Li0Wh4Agj0LZrc9b/0gDe4pAVTOeiM0E7ZUjTA==
+X-Gm-Message-State: AOJu0YyshtbobD9fp0f4Ark7RGWWXxC+xC0jk1WKeadUIrenmREXVYy1
+	vAuzJSqU+gTkzUMzYqItUmRR8e1QnU2YggsmvrusIq3njlwgMdju
+X-Google-Smtp-Source: AGHT+IH2q3ZanpQKJz2uH0N6Dyx/XhlIdcK364i+Te6PyIoIECi/nqcQmDGItl1tQkSP50785isBNw==
+X-Received: by 2002:a2e:9cc6:0:b0:2eb:e365:f191 with SMTP id 38308e7fff4ca-2ec3ce93f99mr14054151fa.15.1718790722749;
+        Wed, 19 Jun 2024 02:52:02 -0700 (PDT)
+Received: from pc636 (host-90-233-216-238.mobileonline.telia.com. [90.233.216.238])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ec05c06068sm19506721fa.35.2024.06.19.02.52.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jun 2024 02:52:02 -0700 (PDT)
+From: Uladzislau Rezki <urezki@gmail.com>
+X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
+Date: Wed, 19 Jun 2024 11:51:58 +0200
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Uladzislau Rezki <urezki@gmail.com>, Vlastimil Babka <vbabka@suse.cz>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	kasan-dev <kasan-dev@googlegroups.com>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <ZnKqPqlPD3Rl04DZ@pc636>
+References: <Zmo9-YGraiCj5-MI@zx2c4.com>
+ <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
+ <Zmrkkel0Fo4_g75a@zx2c4.com>
+ <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
+ <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
+ <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz>
+ <ZnCDgdg1EH6V7w5d@pc636>
+ <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
+ <ZnFT1Czb8oRb0SE7@pc636>
+ <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] rds:Simplify the allocation of slab caches
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171879062930.26288.9720056948729325015.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Jun 2024 09:50:29 +0000
-References: <20240617075435.110024-1-lihongfu@kylinos.cn>
-In-Reply-To: <20240617075435.110024-1-lihongfu@kylinos.cn>
-To: Hongfu Li <lihongfu@kylinos.cn>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, allison.henderson@oracle.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Mon, 17 Jun 2024 15:54:35 +0800 you wrote:
-> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-> to simplify the creation of SLAB caches.
+On Tue, Jun 18, 2024 at 09:48:49AM -0700, Paul E. McKenney wrote:
+> On Tue, Jun 18, 2024 at 11:31:00AM +0200, Uladzislau Rezki wrote:
+> > > On 6/17/24 8:42 PM, Uladzislau Rezki wrote:
+> > > >> +
+> > > >> +	s = container_of(work, struct kmem_cache, async_destroy_work);
+> > > >> +
+> > > >> +	// XXX use the real kmem_cache_free_barrier() or similar thing here
+> > > > It implies that we need to introduce kfree_rcu_barrier(), a new API, which i
+> > > > wanted to avoid initially.
+> > > 
+> > > I wanted to avoid new API or flags for kfree_rcu() users and this would
+> > > be achieved. The barrier is used internally so I don't consider that an
+> > > API to avoid. How difficult is the implementation is another question,
+> > > depending on how the current batching works. Once (if) we have sheaves
+> > > proven to work and move kfree_rcu() fully into SLUB, the barrier might
+> > > also look different and hopefully easier. So maybe it's not worth to
+> > > invest too much into that barrier and just go for the potentially
+> > > longer, but easier to implement?
+> > > 
+> > Right. I agree here. If the cache is not empty, OK, we just defer the
+> > work, even we can use a big 21 seconds delay, after that we just "warn"
+> > if it is still not empty and leave it as it is, i.e. emit a warning and
+> > we are done.
+> > 
+> > Destroying the cache is not something that must happen right away. 
 > 
-> Signed-off-by: Hongfu Li <lihongfu@kylinos.cn>
-> ---
->  net/rds/tcp.c      | 4 +---
->  net/rds/tcp_recv.c | 4 +---
->  2 files changed, 2 insertions(+), 6 deletions(-)
+> OK, I have to ask...
+> 
+> Suppose that the cache is created and destroyed by a module and
+> init/cleanup time, respectively.  Suppose that this module is rmmod'ed
+> then very quickly insmod'ed.
+> 
+> Do we need to fail the insmod if the kmem_cache has not yet been fully
+> cleaned up?  If not, do we have two versions of the same kmem_cache in
+> /proc during the overlap time?
+> 
+No fail :) If same cache is created several times, its s->refcount gets
+increased, so, it does not create two entries in the "slabinfo". But i
+agree that your point is good! We need to be carefully with removing and
+simultaneous creating.
 
-Here is the summary with links:
-  - rds:Simplify the allocation of slab caches
-    https://git.kernel.org/netdev/net-next/c/9f1f70dd8500
+From the first glance, there is a refcounter and a global "slab_mutex"
+which is used to protect a critical section. Destroying is almost fully
+protected(as noted above, by a global mutex) with one exception, it is:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+static void kmem_cache_release(struct kmem_cache *s)
+{
+	if (slab_state >= FULL) {
+		sysfs_slab_unlink(s);
+		sysfs_slab_release(s);
+	} else {
+		slab_kmem_cache_release(s);
+	}
+}
 
+this one can race, IMO.
 
+--
+Uladzislau Rezki
 
