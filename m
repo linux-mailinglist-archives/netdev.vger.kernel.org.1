@@ -1,147 +1,138 @@
-Return-Path: <netdev+bounces-104904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-104905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F14490F14E
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:53:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E91890F156
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 16:54:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BD411C2437D
-	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:53:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15C0E1F20F09
+	for <lists+netdev@lfdr.de>; Wed, 19 Jun 2024 14:54:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3F81EEFC;
-	Wed, 19 Jun 2024 14:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1AC15279A;
+	Wed, 19 Jun 2024 14:52:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oEgPTwi+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mAk59eCQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98C51D545
-	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 14:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DD2152E0C
+	for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 14:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718808665; cv=none; b=Zoois7XlEwLvjxHklqXMF1+z4RWs0npAiC8bXqcP0xrhIvqvfcx0a7dF8YNV4ENYF2UYq5yvAktR63VogpyhE0SvIcpcEyu6eQNSiJwv4oRYWo/bi0S5AKLmMIlRnuStJ6u83aIMpJ2y6gL/1PBYjMS8qaXmsd1e43D/m2N+s0E=
+	t=1718808734; cv=none; b=D9VlexDkqkzEGk7xmDszMDj2N309ofIpx7ci5VQv37NTWtmlnwmBPdj1fYVF8/RfSASABTDYuIWvIuhvpTm0wRMM1LbWJNg+fbv3vRRISIGAXYxazdAgyoWcIC7k2aexNqWMs0T6nc/dOuekBhxL7Tbs7IHaqPnTNWSo8Dd0DI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718808665; c=relaxed/simple;
-	bh=VKf6L13I7DomE2QDfI8uOtwauSiOSDNSIDkz7wtYYXc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J4MgcvP1J29KZoK+64GztrHe6AlM23SDJWiutCjacCO4dTiCRDRSHwK46aEwYk2/b9bfpWHemJOCivz9gsmyWEKKlOcYrDk31AN/nsV8wPgHz9EUweS3LG9J8H9zw2fbnUkJlsnGOuivZsJP9t0PAaHGx9s2e43rCuonmjcfZPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oEgPTwi+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 833C5C2BBFC;
-	Wed, 19 Jun 2024 14:51:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718808665;
-	bh=VKf6L13I7DomE2QDfI8uOtwauSiOSDNSIDkz7wtYYXc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oEgPTwi+3NDL6/ekMiWK0c+SYapeMxzJ9+ExkT81Bi7U+byTZLOX1MQcUBthtFlOf
-	 GYybqqS0vK5LY8czeFMcXYxc+IWHyYHAOI/v6YDpgCkRWGaAUjU/HQ6XWFWtCHjffE
-	 z61wLnljqRISs7e9qm1CihGEp0rEJX1LcneeFLvE0wjP/X2xpW8b2k/6pmyEKrdiUy
-	 c1NYMPmo9eF6psU2AhBJbRSQUQr9Lih5L0dCA3OlZIooQXgo209zk28d0ln52QQcRG
-	 PM3O8EcuopakeDkSXAyF2dOxH+7ZMpijTx76Bg1ntqRS6YLxSpKDnvGmhP1xmgTixv
-	 2ABBNfVcZb84A==
-Date: Wed, 19 Jun 2024 15:51:01 +0100
-From: Simon Horman <horms@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
-	mlxsw@nvidia.com, Amit Cohen <amcohen@nvidia.com>
-Subject: Re: [PATCH net 3/3] mlxsw: spectrum_buffers: Fix memory corruptions
- on Spectrum-4 systems
-Message-ID: <20240619145101.GI690967@kernel.org>
-References: <cover.1718641468.git.petrm@nvidia.com>
- <fefa63964bccd39495490d6974df1cc25e68ce21.1718641468.git.petrm@nvidia.com>
+	s=arc-20240116; t=1718808734; c=relaxed/simple;
+	bh=BuOiOKK5aDLx1DsgEYlG7WpZ+q5oJLQJBOiGxO38KCQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jNlGNUKNgbDuUJMJ4Q1QASjMi6NP4Yjdj6kXS7Qjyd91CbmYIGmK2jxyP6GY0ZGHwLv2p60cyf34PfYGE+fNWs4Ev2C6corczKVxzWJ8vBGp2hSAoiDtzjVwvCEduxgc+TuobMGs4R9fN2mHzN7CBgMdHlm1ZnUk9ZtS9UB5S5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mAk59eCQ; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-57d119fddd9so8451a12.1
+        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 07:52:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718808731; x=1719413531; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UCq/+wTbdRe/MBrO3RZS+P/9P4jtjVOkuULaPB8CHj0=;
+        b=mAk59eCQoAlcbu8O7zjzmyFslO9rYOq7Uz0Uf9pAsytJM6gLaZUpxLhnRTNCWoa2xf
+         F1JM/Hi9t17+gaxVekceDqXrsitRsG+/bcDfiIhsIaZ/J9KVxD3Eamb8kEhreIjclqxc
+         yZDFHO2yIhfXmIaEhkWBKfN31bLzTgfDhHIdy89slXk23Ey7PiUFQH0fdq/BTP3yGI4B
+         uEij21p2Mg76jyz0kuXzMJJevMzaEAHS9oEdMHRy2ZGCEHLcuTVd+Oupl7WVru346p1O
+         VdDWG/rv1kLs3wqn92UwWjeBJQN1nhL1TYxuGKLJybZ7puVUH3nDDtwi/1eLB7zr1HPO
+         rbkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718808731; x=1719413531;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UCq/+wTbdRe/MBrO3RZS+P/9P4jtjVOkuULaPB8CHj0=;
+        b=Pp/81bI4WM6l1wVF7ElE3UnSDlPsPsJW2azlRSKTd4Umw8moPmPt1QavnEmGVHofnc
+         9LjYp+owIGZHwHLFvxucJn4E3xsfvKBXTxUzAMAlFtes7fv/gTwN+Ms7FnZ53nj6MmT2
+         7/+Zkz94PZ62G+mlEPVpgpScdS55li8/CxvgsT0Qjy32lx3Rf1cnuCiQII3H6IFandzK
+         Iseap6QTmD+91NS/rzaiOYRfYKbbtPuVJ3kEpSyRE4E95x/+Svpffn2M4op0VQHCMjf6
+         0K2h9uDpAsiWz/fliNvVEBt725hL4PmNjzx8qfNX6VHBKv+lGxpANvBGUaMehmsDHJnA
+         hEZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV+07NX4egYq5H94ckeMHnhJb01hZ+2u20iGPUZ5FvHdFGGrWUEFo1sg6wjVa+LXORqDCj7D69pCukCLy9wTDEWXFA0T/mQ
+X-Gm-Message-State: AOJu0YzhqPIcHGIIGycuEZKknhwlaCiHtWswVT3PZFSTYJ6WV3kRGpB+
+	3g0tnrM4n+wKYcWsL5Fs61mPXhu8gliOI8olxLNf6CFKmJsimBSJb1pFIeF7A7C4MxdrAOYqhMO
+	zijvx+xoGC/RGhUZryN+Ex4yKhdJHeHAd3SMJ
+X-Google-Smtp-Source: AGHT+IHeayQHdHc6ZlcrLi4grq50zw8dS0xUR0Buy/Wkr87vPElkshOw/Vlf/GrEiL6XwjjfhqWLGmem7XSf+8s7Xxo=
+X-Received: by 2002:a05:6402:4304:b0:57c:b80b:b2f4 with SMTP id
+ 4fb4d7f45d1cf-57d0d6d1871mr206239a12.6.1718808727028; Wed, 19 Jun 2024
+ 07:52:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fefa63964bccd39495490d6974df1cc25e68ce21.1718641468.git.petrm@nvidia.com>
+References: <20240617095852.66c96be9@kernel.org> <202406161539.b5ff7b20-oliver.sang@intel.com>
+ <4937ffd4-f30a-4bdb-9166-6aebb19ca950@grimberg.me> <Zm9fju2J6vBvl-E0@casper.infradead.org>
+ <033294ee-e6e6-4dca-b60c-019cb72a6857@grimberg.me> <407790.1718801177@warthog.procyon.org.uk>
+ <0aaaeabc-6f65-4e5d-bdb1-aa124ed08e8b@grimberg.me>
+In-Reply-To: <0aaaeabc-6f65-4e5d-bdb1-aa124ed08e8b@grimberg.me>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 19 Jun 2024 16:51:56 +0200
+Message-ID: <CANn89iLQ+9GYYn0pQpueFP+aYHnoWhqZSws6t6VCNoxs8pwL7w@mail.gmail.com>
+Subject: Re: [PATCH] net: micro-optimize skb_datagram_iter
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: David Howells <dhowells@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Matthew Wilcox <willy@infradead.org>, kernel test robot <oliver.sang@intel.com>, oe-lkp@lists.linux.dev, 
+	lkp@intel.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 17, 2024 at 06:56:02PM +0200, Petr Machata wrote:
-> From: Ido Schimmel <idosch@nvidia.com>
-> 
-> The following two shared buffer operations make use of the Shared Buffer
-> Status Register (SBSR):
-> 
->  # devlink sb occupancy snapshot pci/0000:01:00.0
->  # devlink sb occupancy clearmax pci/0000:01:00.0
-> 
-> The register has two masks of 256 bits to denote on which ingress /
-> egress ports the register should operate on. Spectrum-4 has more than
-> 256 ports, so the register was extended by cited commit with a new
-> 'port_page' field.
-> 
-> However, when filling the register's payload, the driver specifies the
-> ports as absolute numbers and not relative to the first port of the port
-> page, resulting in memory corruptions [1].
-> 
-> Fix by specifying the ports relative to the first port of the port page.
-> 
-> [1]
-> BUG: KASAN: slab-use-after-free in mlxsw_sp_sb_occ_snapshot+0xb6d/0xbc0
-> Read of size 1 at addr ffff8881068cb00f by task devlink/1566
-> [...]
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0xc6/0x120
->  print_report+0xce/0x670
->  kasan_report+0xd7/0x110
->  mlxsw_sp_sb_occ_snapshot+0xb6d/0xbc0
->  mlxsw_devlink_sb_occ_snapshot+0x75/0xb0
->  devlink_nl_sb_occ_snapshot_doit+0x1f9/0x2a0
->  genl_family_rcv_msg_doit+0x20c/0x300
->  genl_rcv_msg+0x567/0x800
->  netlink_rcv_skb+0x170/0x450
->  genl_rcv+0x2d/0x40
->  netlink_unicast+0x547/0x830
->  netlink_sendmsg+0x8d4/0xdb0
->  __sys_sendto+0x49b/0x510
->  __x64_sys_sendto+0xe5/0x1c0
->  do_syscall_64+0xc1/0x1d0
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> [...]
-> Allocated by task 1:
->  kasan_save_stack+0x33/0x60
->  kasan_save_track+0x14/0x30
->  __kasan_kmalloc+0x8f/0xa0
->  copy_verifier_state+0xbc2/0xfb0
->  do_check_common+0x2c51/0xc7e0
->  bpf_check+0x5107/0x9960
->  bpf_prog_load+0xf0e/0x2690
->  __sys_bpf+0x1a61/0x49d0
->  __x64_sys_bpf+0x7d/0xc0
->  do_syscall_64+0xc1/0x1d0
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> Freed by task 1:
->  kasan_save_stack+0x33/0x60
->  kasan_save_track+0x14/0x30
->  kasan_save_free_info+0x3b/0x60
->  poison_slab_object+0x109/0x170
->  __kasan_slab_free+0x14/0x30
->  kfree+0xca/0x2b0
->  free_verifier_state+0xce/0x270
->  do_check_common+0x4828/0xc7e0
->  bpf_check+0x5107/0x9960
->  bpf_prog_load+0xf0e/0x2690
->  __sys_bpf+0x1a61/0x49d0
->  __x64_sys_bpf+0x7d/0xc0
->  do_syscall_64+0xc1/0x1d0
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> Fixes: f8538aec88b4 ("mlxsw: Add support for more than 256 ports in SBSR register")
-> Cc: Amit Cohen <amcohen@nvidia.com>
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> Reviewed-by: Petr Machata <petrm@nvidia.com>
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
+On Wed, Jun 19, 2024 at 3:54=E2=80=AFPM Sagi Grimberg <sagi@grimberg.me> wr=
+ote:
+>
+>
+>
+> On 19/06/2024 15:46, David Howells wrote:
+> > Jakub Kicinski <kuba@kernel.org> wrote:
+> >
+> >> On Mon, 17 Jun 2024 09:29:53 +0300 Sagi Grimberg wrote:
+> >>>> Probably because kmap() returns page_address() for non-highmem pages
+> >>>> while kmap_local_page() actually returns a kmap address:
+> >>>>
+> >>>>           if (!IS_ENABLED(CONFIG_DEBUG_KMAP_LOCAL_FORCE_MAP) && !Pag=
+eHighMem(page))
+> >>>>                   return page_address(page);
+> >>>>           return __kmap_local_pfn_prot(page_to_pfn(page), prot);
+> >>>>
+> >>>> so if skb frags are always lowmem (are they?) this is a false positi=
+ve.
+> >>> AFAIR these buffers are coming from the RX ring, so they should be
+> >>> coming from a page_frag_cache,
+> >>> so I want to say always low memory?
+> >>>
+> >>>> if they can be highmem, then you've uncovered a bug that nobody's
+> >>>> noticed because nobody's testing on 32-bit any more.
+> >>> Not sure, Jakub? Eric?
+> >> My uneducated guess would be that until recent(ish) sendpage rework
+> >> from David Howells all high mem pages would have been single pages.
+> > Um.  I touched the Tx side, not the Rx side.
+> >
+> > I also don't know whether all high mem pages would be single pages.  I'=
+ll have
+> > to defer that one to the MM folks.
+>
+> What prevents from gro to expand frags from crossing PAGE_SIZE?
+>
+> btw, at least from the code in skb_gro_receive() it appears that
+> page_address() is called directly,
+> which suggest that these netmem pages are lowmem?
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+GRO should only be fed with lowmem pages.
 
+But the trace involves af_unix, not GRO ?
+
+I guess that with splice games, it is possible to add high order pages to s=
+kbs.
+
+I think skb_frag_foreach_page() could be used to fix this issue.
 
