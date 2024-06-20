@@ -1,252 +1,233 @@
-Return-Path: <netdev+bounces-105257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55FC3910443
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:33:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4927910410
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:29:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A32E9283B9D
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:33:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BAF11F2111F
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:29:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78D31AC44B;
-	Thu, 20 Jun 2024 12:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8BCB1AD401;
+	Thu, 20 Jun 2024 12:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jW4vK1w1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hA3vsHWM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A33F1AD401
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 12:32:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E121AD3F6;
+	Thu, 20 Jun 2024 12:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718886727; cv=none; b=YQGJIktYbO0jwYoRF6YfQ/pupluRzXtMBdM2ocfDjBBrlNqYGBAC6SS+0ZZqmZsCYAg6IS8gtn2c3CLOPLduHbvxfBwcO+EgDfmCbUzeZ+MRbdGD3fCqWOKjt/v2jZMMgEVwKu/gtQRJArgCZSm2QKQG0qDCJL5UeGEAPPVTI5E=
+	t=1718886503; cv=none; b=mxOtytLyNsqWczOH2reO/MB+ISAI4FRnVljksTuGf/GvWZ8HRWfQ93aOLsBtv7OCEGoU404slR6uuWgNZZYaS3IgEnyns8ZvHS7QwXuuEkymQtz9BXsIFKFQHpxmTDMCWuPGmAURQ3AnS+e/a04A3GSmn9mylG4Sd5m47bFhRug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718886727; c=relaxed/simple;
-	bh=CsC8tWKXWqigv3FVjEzJq+a5FzgW/cwLvdxnWJJxKRs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Kp0ndypo/K7BEHE6Oj9Nj6AZd+SEKIUz51Xj0dn9JFLosH2Ad0eS7ApulqhwdUS1o32lbXD5MwDguzdfs05wPHa1SQdHxCwHyZCzB7Pg1vvWbncdGGN0kHjD3bs/A3CYCA0fFz9W01HBg4H/XUS2mVgtFJoIRGtENKifzrIt3SM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jW4vK1w1; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718886723; x=1750422723;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=CsC8tWKXWqigv3FVjEzJq+a5FzgW/cwLvdxnWJJxKRs=;
-  b=jW4vK1w1J5Ry079aRo/VfWt/8vrwgV+nwIgeB+f9TfUctPYVndf7HN10
-   QHAEoU5l+pu5cBMO2dtkCvsGOd75yBcC1BNDRvb1tQaqd2gbFkwmf4vnO
-   gqTHGIuWPMEPj7QygkEcrYScvWLKBRTNsYvyC3H4nCLWBRpjrM1nNDe8Q
-   gd2SeaqQ+O+XrcmgQ13d7phHE2kJNaupnLDw0XrMJ+GZdrBAGMqgPwGUI
-   OWofHux7ppe0OBrKA3TaQ7brtA8pAmYOHRkI0djuxA8y+bY0ozBTlJVZ+
-   DVgl95ZkRf8ONN5ou8bD2oqFKSRliXCf/naLFzv9mJq7FgarD9njLf0df
-   Q==;
-X-CSE-ConnectionGUID: HgEjkX/kT1Ka4bhQNApq7Q==
-X-CSE-MsgGUID: kTmMsIYNQE+cgVbIElZaHQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11108"; a="41262899"
-X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
-   d="scan'208";a="41262899"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 05:32:03 -0700
-X-CSE-ConnectionGUID: 0SV54oEYR6W+xBguuGE6RA==
-X-CSE-MsgGUID: X+5R44lOTO+kH1QVh2jnEw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
-   d="scan'208";a="79712963"
-Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
-  by orviesa001.jf.intel.com with ESMTP; 20 Jun 2024 05:32:01 -0700
-From: Karol Kolacinski <karol.kolacinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v2 iwl-net 3/3] ice: Reject pin requests with unsupported flags
-Date: Thu, 20 Jun 2024 14:27:10 +0200
-Message-ID: <20240620123141.1582255-4-karol.kolacinski@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240620123141.1582255-1-karol.kolacinski@intel.com>
-References: <20240620123141.1582255-1-karol.kolacinski@intel.com>
+	s=arc-20240116; t=1718886503; c=relaxed/simple;
+	bh=6JVxjcSSQVPV7Gv95eTpy/Ya3pQAu/jeYNvFD4eoLl4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T/E417FfpLYvI9apicdo4/KYdiS7bvHjfnwKJHxJ/ncl2/wajOG/bEnaMZKkXG4T9tuzFnnW9B4k3FZhEXk9Q70IvSycvWTiXfUPf9rd5ZVO8vUqz0G6g53NECapcpfyBn61eupWsw+O3nsoF97ToRiyyqWLpmSyFOwJ48EGSAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hA3vsHWM; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a63359aaacaso118855966b.1;
+        Thu, 20 Jun 2024 05:28:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718886500; x=1719491300; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WtInD33nzpSK44s1JnnPRYoHH/jmvVeTud7sO01t4nE=;
+        b=hA3vsHWMQJGwuLxtNQhrA5GiYEjqyb50D+1hxyly5qvg7n7toBK09RBiZizN+vZaUu
+         n3HT0j44WIaCCj3nquLBkILy0aG7etBNCtv2kjUHUyRKD31RtAwNc/qYD2tuBOmfcU+z
+         hg6MPukLdRFsWLUXMbYjLXteA5g2vsgejC2bVBx6qhEBPHwUluriotPxdYm0PXJfWsXT
+         t6R6/Vya3x1R6mGDmA7CzGLIyjkbX4mCweJ19JF/eTWf/I9Swuhlf0XTzOI0FfMcR7oh
+         3Okpi3s3c4rbwVIkLisL0NjH9Kzl2pU5KIvUzFe0NBdQthV2kYDsr7OAyGBm3Zxg1Fiv
+         LMdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718886500; x=1719491300;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WtInD33nzpSK44s1JnnPRYoHH/jmvVeTud7sO01t4nE=;
+        b=Ttd/Z+7Ck1vgeMmbXOBZS854vxanncWM8IVdDz34+UYZ6pxwgFyz0yf6ItwuPqkIJR
+         7ftwBrfCXHn5LLRJNv8Ti/kU4VAc5HvsqXe9O+QnzuEs0LP3q9S7GHSkFbMyow09DfZ8
+         PUlGNltHPLYENZdjb13HfEwHi6ewSzEHmpOmZUYs33JPreFT00N5XERavhFtQB0k3yJU
+         P+DYS3Uxw/rQKAIXp1LrLYlEIJ/wpKuvcDxAYpjwxoCiyHORzvMZiutWFXjYHY6/pMhs
+         ycBFhkDTbCfsUD04o7Wh8I7il7h85r3+vKAL6t7KT8zfrqYBSt379boN5SZ6i4ai92uH
+         KYEw==
+X-Forwarded-Encrypted: i=1; AJvYcCV927q97AYn9hFDhWzMbN2zxR/XPEqjPwaY5z/T8JilUidAfbPAxcgSGL7fCVPOVFddRsb9kHhj0n6Vlq+RNbjwT7oiFVCQOLLJ1loj
+X-Gm-Message-State: AOJu0YyCLMrGgRtwxRV/N4Z5J3Sb2/zjKVvdm+fYsXJ58rB89yxbLRld
+	KsxnItaJBpDDhHLUVPGfl12ViLIq3dOYpf4vUpseUJIHLaubHP+O
+X-Google-Smtp-Source: AGHT+IF4Qyldbfqw1/idXFcHIfvvHaJ2Zwuw1GprSCSOvGAc+FldFLbpqFOpoKNrZx0X2P2i7E5bGA==
+X-Received: by 2002:a17:906:c2cc:b0:a6f:6029:998f with SMTP id a640c23a62f3a-a6fab64510emr297906666b.46.1718886500037;
+        Thu, 20 Jun 2024 05:28:20 -0700 (PDT)
+Received: from skbuf ([188.25.55.166])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56f4177csm759386866b.162.2024.06.20.05.28.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jun 2024 05:28:19 -0700 (PDT)
+Date: Thu, 20 Jun 2024 15:28:16 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 04/12] net: dsa: tag_sja1105: absorb entire
+ sja1105_vlan_rcv() into dsa_8021q_rcv()
+Message-ID: <20240620122816.qho2hq7i4eakpnbc@skbuf>
+References: <20240619205220.965844-1-paweldembicki@gmail.com>
+ <20240619205220.965844-5-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240619205220.965844-5-paweldembicki@gmail.com>
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+On Wed, Jun 19, 2024 at 10:52:10PM +0200, Pawel Dembicki wrote:
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> 
+> tag_sja1105 has a wrapper over dsa_8021q_rcv(): sja1105_vlan_rcv(),
+> which determines whether the packet came from a bridge with
+> vlan_filtering=1 (the case resolved via
+> dsa_find_designated_bridge_port_by_vid()), or if it contains a tag_8021q
+> header.
+> 
+> Looking at a new tagger implementation for vsc73xx, based also on
+> tag_8021q, it is becoming clear that the logic is needed there as well.
+> So instead of forcing each tagger to wrap around dsa_8021q_rcv(), let's
+> merge the logic into the core.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> ---
+> v2,v1:
+>   - resend only
+> ---
+> Before patch series split:
+> https://patchwork.kernel.org/project/netdevbpf/list/?series=841034&state=%2A&archive=both
+> v8, v7, v6:
+>   - resend only
+> v5:
+>   - add missing SoB
+> v4:
+>   - introduced patch
+> ---
+>  net/dsa/tag_8021q.c        | 34 ++++++++++++++++++++++++++++------
+>  net/dsa/tag_8021q.h        |  2 +-
+>  net/dsa/tag_ocelot_8021q.c |  2 +-
+>  net/dsa/tag_sja1105.c      | 32 ++++----------------------------
+>  4 files changed, 34 insertions(+), 36 deletions(-)
+> 
+> diff --git a/net/dsa/tag_8021q.c b/net/dsa/tag_8021q.c
+> index 3cb0293793a5..332b0ae02645 100644
+> --- a/net/dsa/tag_8021q.c
+> +++ b/net/dsa/tag_8021q.c
+> @@ -507,27 +507,39 @@ EXPORT_SYMBOL_GPL(dsa_tag_8021q_find_port_by_vbid);
+>   * @vbid: pointer to storage for imprecise bridge ID. Must be pre-initialized
+>   *	with -1. If a positive value is returned, the source_port and switch_id
+>   *	are invalid.
+> + * @vid: pointer to storage for original VID, in case tag_8021q decoding failed.
+> + *
+> + * If the packet has a tag_8021q header, decode it and set @source_port,
+> + * @switch_id and @vbid, and strip the header. Otherwise set @vid and keep the
+> + * header in the hwaccel area of the packet.
+>   */
+>  void dsa_8021q_rcv(struct sk_buff *skb, int *source_port, int *switch_id,
+> -		   int *vbid)
+> +		   int *vbid, int *vid)
+>  {
+>  	int tmp_source_port, tmp_switch_id, tmp_vbid;
+> -	u16 vid, tci;
+> +	__be16 vlan_proto;
+> +	u16 tmp_vid, tci;
+>  
+>  	if (skb_vlan_tag_present(skb)) {
+> +		vlan_proto = skb->vlan_proto;
+>  		tci = skb_vlan_tag_get(skb);
+>  		__vlan_hwaccel_clear_tag(skb);
+>  	} else {
+> +		struct vlan_ethhdr *hdr = vlan_eth_hdr(skb);
+> +
+> +		vlan_proto = hdr->h_vlan_proto;
+>  		skb_push_rcsum(skb, ETH_HLEN);
+>  		__skb_vlan_pop(skb, &tci);
+>  		skb_pull_rcsum(skb, ETH_HLEN);
+>  	}
+>  
+> -	vid = tci & VLAN_VID_MASK;
+> +	tmp_vid = tci & VLAN_VID_MASK;
+> +	if (!vid_is_dsa_8021q(tmp_vid))
+> +		goto not_tag_8021q;
 
-The driver receives requests for configuring pins via the .enable
-callback of the PTP clock object. These requests come into the driver
-with flags which modify the requested behavior from userspace. Current
-implementation in ice does not reject flags that it doesn't support.
-This causes the driver to incorrectly apply requests with such flags as
-PTP_PEROUT_DUTY_CYCLE, or any future flags added by the kernel which it
-is not yet aware of.
+I think this may be more clearly expressed linearly, without a goto.
 
-Fix this by properly validating flags in both ice_ptp_cfg_perout and
-ice_ptp_cfg_extts. Ensure that we check by bit-wise negating supported
-flags rather than just checking and rejecting known un-supported flags.
-This is preferable, as it ensures better compatibility with future
-kernels.
+	if (!vid_is_dsa_8021q(tmp_vid)) {
+		/* Not a tag_8021q frame, so return the VID to the
+		 * caller for further processing, and put the tag back
+		 */
+		if (vid)
+			*vid = tmp_vid;
 
-Fixes: 172db5f91d5f ("ice: add support for auxiliary input/output pins")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
----
-V1 -> V2: adjusted indentation and added NULL config pointer check
+		__vlan_hwaccel_put_tag(skb, vlan_proto, tci);
 
- drivers/net/ethernet/intel/ice/ice_ptp.c | 38 ++++++++++++++----------
- drivers/net/ethernet/intel/ice/ice_ptp.h |  1 +
- 2 files changed, 23 insertions(+), 16 deletions(-)
+		return;
+	}
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 0500ced1adf8..163b312c7cbc 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -1593,14 +1593,23 @@ void ice_ptp_extts_event(struct ice_pf *pf)
-  * @store: If set to true, the values will be stored
-  *
-  * Configure an external timestamp event on the requested channel.
-+ *
-+ * Return: 0 on success, -EOPNOTUSPP on unsupported flags
-  */
--static void ice_ptp_cfg_extts(struct ice_pf *pf, unsigned int chan,
--			      struct ice_extts_channel *config, bool store)
-+static int ice_ptp_cfg_extts(struct ice_pf *pf, unsigned int chan,
-+			     struct ice_extts_channel *config, bool store)
- {
- 	u32 func, aux_reg, gpio_reg, irq_reg;
- 	struct ice_hw *hw = &pf->hw;
- 	u8 tmr_idx;
- 
-+	/* Reject requests with unsupported flags */
-+	if (config->flags & ~(PTP_ENABLE_FEATURE |
-+			      PTP_RISING_EDGE |
-+			      PTP_FALLING_EDGE |
-+			      PTP_STRICT_FLAGS))
-+		return -EOPNOTSUPP;
-+
- 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
- 
- 	irq_reg = rd32(hw, PFINT_OICR_ENA);
-@@ -1641,6 +1650,8 @@ static void ice_ptp_cfg_extts(struct ice_pf *pf, unsigned int chan,
- 
- 	if (store)
- 		memcpy(&pf->ptp.extts_channels[chan], config, sizeof(*config));
-+
-+	return 0;
- }
- 
- /**
-@@ -1699,6 +1710,9 @@ static int ice_ptp_cfg_clkout(struct ice_pf *pf, unsigned int chan,
- 	u32 func, val, gpio_pin;
- 	u8 tmr_idx;
- 
-+	if (config && config->flags & ~PTP_PEROUT_PHASE)
-+		return -EOPNOTSUPP;
-+
- 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
- 
- 	/* 0. Reset mode & out_en in AUX_OUT */
-@@ -1838,7 +1852,6 @@ ice_ptp_gpio_enable_e810(struct ptp_clock_info *info,
- 	bool sma_pres = false;
- 	unsigned int chan;
- 	u32 gpio_pin;
--	int err;
- 
- 	if (ice_is_feature_supported(pf, ICE_F_SMA_CTRL))
- 		sma_pres = true;
-@@ -1867,14 +1880,14 @@ ice_ptp_gpio_enable_e810(struct ptp_clock_info *info,
- 			clk_cfg.gpio_pin = chan;
- 		}
- 
-+		clk_cfg.flags = rq->perout.flags;
- 		clk_cfg.period = ((rq->perout.period.sec * NSEC_PER_SEC) +
- 				   rq->perout.period.nsec);
- 		clk_cfg.start_time = ((rq->perout.start.sec * NSEC_PER_SEC) +
- 				       rq->perout.start.nsec);
- 		clk_cfg.ena = !!on;
- 
--		err = ice_ptp_cfg_clkout(pf, chan, &clk_cfg, true);
--		break;
-+		return ice_ptp_cfg_clkout(pf, chan, &clk_cfg, true);
- 	}
- 	case PTP_CLK_REQ_EXTTS:
- 	{
-@@ -1899,14 +1912,11 @@ ice_ptp_gpio_enable_e810(struct ptp_clock_info *info,
- 		extts_cfg.gpio_pin = gpio_pin;
- 		extts_cfg.ena = !!on;
- 
--		ice_ptp_cfg_extts(pf, chan, &extts_cfg, true);
--		return 0;
-+		return ice_ptp_cfg_extts(pf, chan, &extts_cfg, true);
- 	}
- 	default:
- 		return -EOPNOTSUPP;
- 	}
--
--	return err;
- }
- 
- /**
-@@ -1919,19 +1929,18 @@ static int ice_ptp_gpio_enable_e823(struct ptp_clock_info *info,
- 				    struct ptp_clock_request *rq, int on)
- {
- 	struct ice_pf *pf = ptp_info_to_pf(info);
--	int err;
- 
- 	switch (rq->type) {
- 	case PTP_CLK_REQ_PPS:
- 	{
- 		struct ice_perout_channel clk_cfg = {};
- 
-+		clk_cfg.flags = rq->perout.flags;
- 		clk_cfg.gpio_pin = PPS_PIN_INDEX;
- 		clk_cfg.period = NSEC_PER_SEC;
- 		clk_cfg.ena = !!on;
- 
--		err = ice_ptp_cfg_clkout(pf, PPS_CLK_GEN_CHAN, &clk_cfg, true);
--		break;
-+		return ice_ptp_cfg_clkout(pf, PPS_CLK_GEN_CHAN, &clk_cfg, true);
- 	}
- 	case PTP_CLK_REQ_EXTTS:
- 	{
-@@ -1941,14 +1950,11 @@ static int ice_ptp_gpio_enable_e823(struct ptp_clock_info *info,
- 		extts_cfg.gpio_pin = TIME_SYNC_PIN_INDEX;
- 		extts_cfg.ena = !!on;
- 
--		ice_ptp_cfg_extts(pf, rq->extts.index, &extts_cfg, true);
--		return 0;
-+		return ice_ptp_cfg_extts(pf, rq->extts.index, &extts_cfg, true);
- 	}
- 	default:
- 		return -EOPNOTSUPP;
- 	}
--
--	return err;
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
-index f1171cdd93c8..e2af9749061c 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
-@@ -29,6 +29,7 @@ enum ice_ptp_pin_e810t {
- struct ice_perout_channel {
- 	bool ena;
- 	u32 gpio_pin;
-+	u32 flags;
- 	u64 period;
- 	u64 start_time;
- };
--- 
-2.43.0
+>  
+> -	tmp_source_port = dsa_8021q_rx_source_port(vid);
+> -	tmp_switch_id = dsa_8021q_rx_switch_id(vid);
+> -	tmp_vbid = dsa_tag_8021q_rx_vbid(vid);
+> +	tmp_source_port = dsa_8021q_rx_source_port(tmp_vid);
+> +	tmp_switch_id = dsa_8021q_rx_switch_id(tmp_vid);
+> +	tmp_vbid = dsa_tag_8021q_rx_vbid(tmp_vid);
+>  
+>  	/* Precise source port information is unknown when receiving from a
+>  	 * VLAN-unaware bridging domain, and tmp_source_port and tmp_switch_id
+> @@ -546,5 +558,15 @@ void dsa_8021q_rcv(struct sk_buff *skb, int *source_port, int *switch_id,
+>  		*vbid = tmp_vbid;
+>  
+>  	skb->priority = (tci & VLAN_PRIO_MASK) >> VLAN_PRIO_SHIFT;
+> +	return;
+> +
+> +not_tag_8021q:
+> +	if (vid)
+> +		*vid = tmp_vid;
+> +	if (vbid)
+> +		*vbid = -1;
 
+Thinking more about it, I don't think this is needed (hence it is
+missing in my rewritten snippet above). I mean, *vbid is already
+initialized with -1 (it's a requirement also specified in the
+kernel-doc) and we haven't changed it.
+
+> +
+> +	/* Put the tag back */
+> +	__vlan_hwaccel_put_tag(skb, vlan_proto, tci);
+>  }
+>  EXPORT_SYMBOL_GPL(dsa_8021q_rcv);
+> diff --git a/net/dsa/tag_8021q.h b/net/dsa/tag_8021q.h
+> index 41f7167ac520..0c6671d7c1c2 100644
+> --- a/net/dsa/tag_8021q.h
+> +++ b/net/dsa/tag_8021q.h
+> @@ -14,7 +14,7 @@ struct sk_buff *dsa_8021q_xmit(struct sk_buff *skb, struct net_device *netdev,
+>  			       u16 tpid, u16 tci);
+>  
+>  void dsa_8021q_rcv(struct sk_buff *skb, int *source_port, int *switch_id,
+> -		   int *vbid);
+> +		   int *vbid, int *vid);
+>  
+>  struct net_device *dsa_tag_8021q_find_port_by_vbid(struct net_device *conduit,
+>  						   int vbid);
 
