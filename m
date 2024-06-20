@@ -1,112 +1,135 @@
-Return-Path: <netdev+bounces-105139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B099A90FCD1
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:37:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DCED90FCDB
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:40:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3CE41C237A6
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 06:37:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFA491C21BA2
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 06:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB7903B2A2;
-	Thu, 20 Jun 2024 06:37:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462CD3BBF1;
+	Thu, 20 Jun 2024 06:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I7RcozC1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VxWnHD2B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 515E811CA1
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 06:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2283BBC9
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 06:40:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718865451; cv=none; b=ZLd2v+c5VFcolbrF+ynFhi6FVpA/cE8PqKFfjbsOLHONb7Zu9dORrvSEbkek0P5zR0rXDb8dzuGQ9W4Q6+cxGMxLr1fEqpdmEFyRVXwgTW/fj9oZIiO0b55Z2PtPig80hrQUTVpCRqcgLEA/mMuTAQ4+yMaizSMuZ45Tt2uT4uU=
+	t=1718865641; cv=none; b=QtvVT9oE7ccROzltGHASDVOBGMNyFKjHvI90+aBgAcqjD/F9sUxqntsOl8c7D+Q8w3kIOh/vDS4Dyd/xXRfhZFOvMIlGTfNGwUZhBvCYBj+WiuxxKAfjwXe1PYeJWuIz+132i4pMNZ6/yxPl0YFNvN6yFCUPM5uX40P7heeLMGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718865451; c=relaxed/simple;
-	bh=rOLHd1YxVG8D9uSHJC6UT+rQKSOC8uixPMR6QVeFq2I=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=nSGU1/MPIOB3V0Wjr78Iif/JC2xb7RCLGVEyjfNsD40RUGmrZQ8wN2M0gRKvmdMCc0sUb8IzZxW37emZFLaW+u+u8SrEGLPinUwDikK9k5y2eN/9WbaUvh2LMCgRwK4Ij48l1L4VxtoA9qAVjguETl1KTQVavFKH4GFPgxhPaXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I7RcozC1; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-421a1b834acso5032665e9.3
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 23:37:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718865449; x=1719470249; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YVKKZjPIeTPBpzw0RGLHThVhNhA0wk9KLXZTLPxQPCA=;
-        b=I7RcozC1XOtqrJm4IpGydVi6FFagMd18J1OnyjEJQf6Q56ma1h37kiVWW6UQzFdhpW
-         OB7IVr5HFP3mdXbJKJpw/ki4ZtD0mOIx4ZytABGxWorUo9YE77bNbi8Pj5tHyTfnCLfw
-         GNClYpLjM0Kwq5T3Sdze3egksmq8KdFTZk9hxk7ZozClZih58JlvEBN2KQOjROD2FAFw
-         5UEUUaYrWcMag21+s8b4Hk6rRuZ6/H1AV91d+i7puJjMI8Tvdk4VtRMKHdsYb79geuJL
-         depdFGVYSdsrSdaBO+IUm3ZlZ4b27+Qmhfl+v8bFbVfWakktDKFyq57ztykywHAOgMO4
-         vJ3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718865449; x=1719470249;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YVKKZjPIeTPBpzw0RGLHThVhNhA0wk9KLXZTLPxQPCA=;
-        b=OJYm/lz60VdFpVCeK882hAb0bQRQsTBs/4UXeSZdg+Jephjv+g2gkBbzFn+oLMd8Wi
-         TqjjBTQFuwO5Qb+gglR5ShntTp+23qRaUeeQUZ4Wrtx6WGxXM8eXr+vJzgfDdTmPGDVN
-         h/Ry4tNIX7pKO4Zpwf0kmGoYYkZeFUdbAugWr2WzHIKqE7VMpQNcSrHG4hcOb7qYE2I/
-         Y3rrk1VWXSaRkm0QCdqAGgbzTdBdYDuWmy+Ie6GgaaQHl5eXwIFtR6tQDxHy2mhzLRLc
-         W13JXhV9XMLVuSCcUksB5892P3+v0TnUOPKbOLJRcllBvrle49LJK825iYk5bSm5s9FE
-         LvUA==
-X-Forwarded-Encrypted: i=1; AJvYcCXv8eJHsSvIdgBwaF2ScQHkmWiC58lZ+s5HcCrGUI7xHVTw1M+oA4y7JWRTjiJQhguUlsKpxh1555GZSRZU8Y271BSI13Rh
-X-Gm-Message-State: AOJu0YwCYCT+aKyCRVL5nck1dzco/prYT8m387+WsonwDLycQ2dsrJmX
-	0HsmyY2Rr7FR4l6jrk7HXjTIMhRi+PSvWmGxbloTr8o3FMZrBW5v
-X-Google-Smtp-Source: AGHT+IFINaEtgLaAdA3xCU2wcCf/tuGSYa7Md1gprzOtt5FrFMoAgsAXQ5BspQ92JeBlP8vg++/0oQ==
-X-Received: by 2002:a05:600c:4896:b0:421:d8d4:75e3 with SMTP id 5b1f17b1804b1-4247529bcd9mr25099825e9.40.1718865448492;
-        Wed, 19 Jun 2024 23:37:28 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4247d0b8de5sm13573485e9.10.2024.06.19.23.37.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Jun 2024 23:37:28 -0700 (PDT)
-Subject: Re: [PATCH v6 net-next 3/9] net: ethtool: record custom RSS contexts
- in the XArray
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, edward.cree@amd.com
-Cc: linux-net-drivers@amd.com, netdev@vger.kernel.org,
- habetsm.xilinx@gmail.com, sudheer.mogilappagari@intel.com,
- jdamato@fastly.com, mw@semihalf.com, linux@armlinux.org.uk,
- sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
- hkelam@marvell.com, saeedm@nvidia.com, leon@kernel.org,
- jacob.e.keller@intel.com, andrew@lunn.ch, ahmed.zaki@intel.com,
- davem@davemloft.net, kuba@kernel.org, edumazet@google.com, pabeni@redhat.com
-References: <cover.1718862049.git.ecree.xilinx@gmail.com>
- <e5b4739cd6b2d3324b5c639fa9006f94fc03c255.1718862050.git.ecree.xilinx@gmail.com>
- <ca867437-1533-49d6-a25b-6058e2ee0635@intel.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <08a85083-8c61-8ca5-e860-2b051c043229@gmail.com>
-Date: Thu, 20 Jun 2024 07:37:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1718865641; c=relaxed/simple;
+	bh=HGIUdK74KQ1gCGAEZoHH0bCMvkFSbrAsO+df+QMfBiY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d5/KDUHm23yz/D7t1LrGLTnkL3nBXCDquXFv2WsbLTyrmXOxWRPT2McSs7BlKSwX2lN8yhiZs4twnEu1G7XohcLUwCB158PhXh6wnakK6nh78h+ChbGaJbkOfDhwcR5M/tGKE8Ip1+cAWLZ4CnNT91z0iC0oOlenENc0VIw5F+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VxWnHD2B; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718865640; x=1750401640;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HGIUdK74KQ1gCGAEZoHH0bCMvkFSbrAsO+df+QMfBiY=;
+  b=VxWnHD2BM1yA1iSWJz+2RkysJWQpsZxbqqs7p3S5fYpnKic9YiWCVJZI
+   KL7s7Ohkivy8MbH4sHMohIBQRowwXWcfBqiRlXTn9nw3mJb/u57Hg8dtS
+   ALmOiXTvYf7LXuiM81MpDdfcMOZErkxwBupFEGNdefdhzMmoFb/JAek6g
+   /FeEJpUkx6uvLMqabW0xx2F7L6qNiB57DfcDHn8CwYg7h/XxKH5ce+Fo4
+   r9Hg52rpaeyfYochPmE+7vuzUOFWdbklg/pvH870IGHSEphGqBQn6Fvcc
+   CI08gNxkMv1BQZmkWVWzYGljsZ+w42oyt5oACD2O0+s3ow37mb6DwyF7S
+   Q==;
+X-CSE-ConnectionGUID: Vv2MJGSHR1ChesumyGk82g==
+X-CSE-MsgGUID: saj15dm8TEq/a4UgXsGoiA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11108"; a="15962749"
+X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
+   d="scan'208";a="15962749"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2024 23:40:39 -0700
+X-CSE-ConnectionGUID: pyan0ASjQpC+QPVR7chFXg==
+X-CSE-MsgGUID: jRYMQxTHQ3qD3wFmesO+1Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
+   d="scan'208";a="79615107"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 19 Jun 2024 23:40:37 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sKBTG-0007Oe-1Q;
+	Thu, 20 Jun 2024 06:40:34 +0000
+Date: Thu, 20 Jun 2024 14:40:03 +0800
+From: kernel test robot <lkp@intel.com>
+To: Heng Qi <hengqi@linux.alibaba.com>, netdev@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: oe-kbuild-all@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v4 5/5] virtio_net: improve dim command request
+ efficiency
+Message-ID: <202406201437.JuUEpbZL-lkp@intel.com>
+References: <20240619161908.82348-6-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ca867437-1533-49d6-a25b-6058e2ee0635@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240619161908.82348-6-hengqi@linux.alibaba.com>
 
-On 20/06/2024 07:32, Przemek Kitszel wrote:
-> On 6/20/24 07:47, edward.cree@amd.com wrote:
->> From: Edward Cree <ecree.xilinx@gmail.com>
->>
->> Since drivers are still choosing the context IDs, we have to force the
->>   XArray to use the ID they've chosen rather than picking one ourselves,
->>   and handle the case where they give us an ID that's already in use.
-> 
-> Q: This is a new API, perhaps you could force adopters to convert to
-> not choosing ID and switching to allocated one?
+Hi Heng,
 
-Yes, that's exactly what the next patch (#4) does, when it introduces
- the new API.
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Heng-Qi/virtio_net-passing-control_buf-explicitly/20240620-002212
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240619161908.82348-6-hengqi%40linux.alibaba.com
+patch subject: [PATCH net-next v4 5/5] virtio_net: improve dim command request efficiency
+config: x86_64-rhel-8.3 (https://download.01.org/0day-ci/archive/20240620/202406201437.JuUEpbZL-lkp@intel.com/config)
+compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240620/202406201437.JuUEpbZL-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406201437.JuUEpbZL-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/virtio_net.c: In function 'virtnet_wait_command_response':
+>> drivers/net/virtio_net.c:2771:22: warning: unused variable 'tmp' [-Wunused-variable]
+    2771 |         unsigned int tmp;
+         |                      ^~~
+
+
+vim +/tmp +2771 drivers/net/virtio_net.c
+
+2bef89a476bb44 Heng Qi   2024-06-20  2767  
+2bef89a476bb44 Heng Qi   2024-06-20  2768  static bool virtnet_wait_command_response(struct virtnet_info *vi,
+2bef89a476bb44 Heng Qi   2024-06-20  2769  					  struct control_buf *ctrl)
+2bef89a476bb44 Heng Qi   2024-06-20  2770  {
+2bef89a476bb44 Heng Qi   2024-06-20 @2771  	unsigned int tmp;
+2bef89a476bb44 Heng Qi   2024-06-20  2772  	bool ok;
+40cbfc37075a2a Amos Kong 2013-01-21  2773  
+ff0de8d3002c75 Heng Qi   2024-06-20  2774  	wait_for_completion(&ctrl->completion);
+40cbfc37075a2a Amos Kong 2013-01-21  2775  
+74b2bc860d5cb5 Heng Qi   2024-06-20  2776  	ok = ctrl->status == VIRTIO_NET_OK;
+30636258a7c917 Heng Qi   2024-05-30  2777  	return ok;
+40cbfc37075a2a Amos Kong 2013-01-21  2778  }
+40cbfc37075a2a Amos Kong 2013-01-21  2779  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
