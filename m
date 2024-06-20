@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-105389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 534C5910EF9
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 19:38:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9F62910F02
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 19:39:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86A891C23174
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 17:38:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09A8F1C2394B
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 17:39:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440D41BE223;
-	Thu, 20 Jun 2024 17:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE9D1BE86F;
+	Thu, 20 Jun 2024 17:32:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N1jvMVSe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ISCjx5K1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FB01BE235
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 17:32:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57BC91B5813
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 17:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718904763; cv=none; b=ATbjIOul3lWAw3wCTuDECJSLjuJSwrxoKJNgJ+tK6mi+Rvd3/Mwe5NBVwUEATAbWXu15N4ypeW1jrwEZoKy5HGj6H2/FKz7Osv+AyVYfYGxYhiULHwgpjEd+vRkOWp02IHMp827xkDEWu2LDMPIuVJtbCmWSEeZrNnYfe/VBCdc=
+	t=1718904772; cv=none; b=W4Wy0JsmwUuOX3W4VUtQIbSWKbfvAbtKXy+0/rv/PuXf2y1ipggXcnZRgJN8oseOnCc144xDtEWg8Cpp//lW9WH5g8kUQH4W4zM3qR3TgjSPE2ud6XdNKBn0QdWgLCfbvZSAFtB2rOIbKZ0lvEe58xz4+v3/dTdRRZjmqnZD2r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718904763; c=relaxed/simple;
-	bh=UU66NIKmR3/AcyHFflQMiPfJAl5pzAbcR3WIVJJqFGI=;
+	s=arc-20240116; t=1718904772; c=relaxed/simple;
+	bh=++FZtOyTYIJI/XEHDGIcpQZYCcY6q8jpP5Q3welVLhg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rlt7vbg79os6y7bR2qVamBGgqwwVDOvVQpNkoulpQkUATnzMmZIaXLrBAnpka6xdkTNbZpp8Lxj6MfBWxxsFPnXPJiXlG7/jsKVKrbhRSw37BPgk2ahOLwycN40sUGPa91uS2aiYPZG51B7p6WuBE1kezNhy1NAHKd/8pSEnGAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N1jvMVSe; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=VPo2Yd8hqODlrjEd6gzzYkLG3SoNqSfumwVq3w2HZ4tJ7UJpNveqp2AoH6ID6KmfT5hqElNU+Ks4Q4JmOAV7Nb45rsCO7DUafctCXfuVWqqKXjzlu83PjVhlsi6gacL5r9zvJ8oAMg59zHMkcNGR6BkrGYfSCaDUNmZwO0cj8Bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ISCjx5K1; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718904760;
+	s=mimecast20190719; t=1718904770;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fBEsJ0JBnkoJ2efzkpyXGTGqwkO8a4ye4BCeFPtv9T0=;
-	b=N1jvMVSejR5tqFovZZwysxDQXiYEh1GCxXl7EFICin7keAmmcuyykBjwJGVpVak8hL36uC
-	PLqzUO0UbKoByLbiS8H5sW82FGCS4psmfD1tjiaiIYGmYorfBqjF7dW7STs42tGc4bUyn7
-	NLSK4MpJO+OcYz9kADhQZ0k+RyYqcXo=
+	bh=h+6UwHgWPCU3as5VcBuF/bmsEb6ZpHwJQoR4UTelMjE=;
+	b=ISCjx5K1F32kRlPUCY9xldaYemA3LnRbHwKVuk4CNmgX+v+VaBbxHh0I+FmxCAtu7F8/yU
+	QyNRiF7bIQ7n5RomV7tcsmL3f5OHhVm0lrXZalQjCKgO387uWNEtlOLeFADAJZOB78C/x3
+	ciX54sMsZDLuFwoXnHrZsQt7sYTs6Sk=
 Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-663-cjerBB3ZN4CST4QI6Rz8_g-1; Thu,
- 20 Jun 2024 13:32:36 -0400
-X-MC-Unique: cjerBB3ZN4CST4QI6Rz8_g-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-360-6nmBBFraPjiFkZ70vE544A-1; Thu,
+ 20 Jun 2024 13:32:45 -0400
+X-MC-Unique: 6nmBBFraPjiFkZ70vE544A-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3704619560BE;
-	Thu, 20 Jun 2024 17:32:32 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B7B2E19560A0;
+	Thu, 20 Jun 2024 17:32:40 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.39.195.156])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C96C319560AE;
-	Thu, 20 Jun 2024 17:32:25 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C0BA41956052;
+	Thu, 20 Jun 2024 17:32:33 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>,
 	Steve French <smfrench@gmail.com>,
@@ -81,10 +81,11 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Steve French <sfrench@samba.org>
-Subject: [PATCH 05/17] netfs: Record contention stats for writeback lock
-Date: Thu, 20 Jun 2024 18:31:23 +0100
-Message-ID: <20240620173137.610345-6-dhowells@redhat.com>
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>
+Subject: [PATCH 06/17] 9p: Enable multipage folios
+Date: Thu, 20 Jun 2024 18:31:24 +0100
+Message-ID: <20240620173137.610345-7-dhowells@redhat.com>
 In-Reply-To: <20240620173137.610345-1-dhowells@redhat.com>
 References: <20240620173137.610345-1-dhowells@redhat.com>
 Precedence: bulk
@@ -94,82 +95,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Record statistics for contention upon the writeback serialisation lock that
-prevents racing writeback calls from causing each other to interleave their
-writebacks.  These can be viewed in /proc/fs/netfs/stats on the WbLock line,
-with skip=N indicating the number of non-SYNC writebacks skipped and wait=N
-indicating the number of SYNC writebacks that waited.
+Enable support for multipage folios on the 9P filesystem.  This is all
+handled through netfslib and is already enabled on AFS and CIFS also.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Eric Van Hensbergen <ericvh@kernel.org>
+cc: Latchesar Ionkov <lucho@ionkov.net>
+cc: Dominique Martinet <asmadeus@codewreck.org>
+cc: Christian Schoenebeck <linux_oss@crudebyte.com>
 cc: Jeff Layton <jlayton@kernel.org>
-cc: Steve French <sfrench@samba.org>
-cc: netfs@lists.linux.dev
+cc: Matthew Wilcox <willy@infradead.org>
+cc: v9fs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
+cc: linux-mm@kvack.org
 ---
- fs/netfs/internal.h    |  2 ++
- fs/netfs/stats.c       |  5 +++++
- fs/netfs/write_issue.c | 10 +++++++---
- 3 files changed, 14 insertions(+), 3 deletions(-)
+ fs/9p/vfs_inode.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index 95e281a8af78..42443d99967d 100644
---- a/fs/netfs/internal.h
-+++ b/fs/netfs/internal.h
-@@ -126,6 +126,8 @@ extern atomic_t netfs_n_wh_upload_failed;
- extern atomic_t netfs_n_wh_write;
- extern atomic_t netfs_n_wh_write_done;
- extern atomic_t netfs_n_wh_write_failed;
-+extern atomic_t netfs_n_wb_lock_skip;
-+extern atomic_t netfs_n_wb_lock_wait;
+diff --git a/fs/9p/vfs_inode.c b/fs/9p/vfs_inode.c
+index fd72fc38c8f5..effb3aa1f3ed 100644
+--- a/fs/9p/vfs_inode.c
++++ b/fs/9p/vfs_inode.c
+@@ -295,6 +295,7 @@ int v9fs_init_inode(struct v9fs_session_info *v9ses,
+ 			inode->i_op = &v9fs_file_inode_operations;
+ 			inode->i_fop = &v9fs_file_operations;
+ 		}
++		mapping_set_large_folios(inode->i_mapping);
  
- int netfs_stats_show(struct seq_file *m, void *v);
- 
-diff --git a/fs/netfs/stats.c b/fs/netfs/stats.c
-index 95ed2d2623a8..5fe1c396e24f 100644
---- a/fs/netfs/stats.c
-+++ b/fs/netfs/stats.c
-@@ -39,6 +39,8 @@ atomic_t netfs_n_wh_upload_failed;
- atomic_t netfs_n_wh_write;
- atomic_t netfs_n_wh_write_done;
- atomic_t netfs_n_wh_write_failed;
-+atomic_t netfs_n_wb_lock_skip;
-+atomic_t netfs_n_wb_lock_wait;
- 
- int netfs_stats_show(struct seq_file *m, void *v)
- {
-@@ -78,6 +80,9 @@ int netfs_stats_show(struct seq_file *m, void *v)
- 		   atomic_read(&netfs_n_rh_rreq),
- 		   atomic_read(&netfs_n_rh_sreq),
- 		   atomic_read(&netfs_n_wh_wstream_conflict));
-+	seq_printf(m, "WbLock : skip=%u wait=%u\n",
-+		   atomic_read(&netfs_n_wb_lock_skip),
-+		   atomic_read(&netfs_n_wb_lock_wait));
- 	return fscache_stats_show(m);
- }
- EXPORT_SYMBOL(netfs_stats_show);
-diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
-index ec6cf8707fb0..cd3ddf07ab49 100644
---- a/fs/netfs/write_issue.c
-+++ b/fs/netfs/write_issue.c
-@@ -502,10 +502,14 @@ int netfs_writepages(struct address_space *mapping,
- 	struct folio *folio;
- 	int error = 0;
- 
--	if (wbc->sync_mode == WB_SYNC_ALL)
-+	if (!mutex_trylock(&ictx->wb_lock)) {
-+		if (wbc->sync_mode == WB_SYNC_NONE) {
-+			netfs_stat(&netfs_n_wb_lock_skip);
-+			return 0;
-+		}
-+		netfs_stat(&netfs_n_wb_lock_wait);
- 		mutex_lock(&ictx->wb_lock);
--	else if (!mutex_trylock(&ictx->wb_lock))
--		return 0;
-+	}
- 
- 	/* Need the first folio to be able to set up the op. */
- 	folio = writeback_iter(mapping, wbc, NULL, &error);
+ 		break;
+ 	case S_IFLNK:
 
 
