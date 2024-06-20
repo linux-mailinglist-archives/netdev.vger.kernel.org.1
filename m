@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-105126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F7A890FC4F
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 07:48:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E50F090FC50
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 07:49:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D27C1C23025
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 05:48:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8A151C23594
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 05:49:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CBB33BBC9;
-	Thu, 20 Jun 2024 05:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2FC3987D;
+	Thu, 20 Jun 2024 05:48:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="k4BfiLiW"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="UgZCXFPi"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2087.outbound.protection.outlook.com [40.107.220.87])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2059.outbound.protection.outlook.com [40.107.92.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0973138DC8
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 05:48:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5962E3BB50
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 05:48:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.59
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718862507; cv=fail; b=QiDG5uxnTw/f1ZLoYSyQijpd4fQ86x/ET4gyrQucZmaMFVr6tZmfUyvFZw0Kz0lOk+M5BA9dTUwVoyKCmZ8rcTedGaAyziyNIw0CWhkJIOAE36Mr9EYVub3qFrbx4Mtl+o0zCx+0jXlV9oqE3Gy6yKAs/l5fKONkcNErj367B+E=
+	t=1718862508; cv=fail; b=BEjjQv8iVXhplLmvcAYk6qtu73t9rYr2iS0MApqGScZtBg6UvTad9iCccAMnB7/uIyTy3Ce10CKwxzVj8hznEyXOAuUTI2KU2KCY562k2luonDyM0pOQYK70TxbQmegGajZDp6/cu7ETQsna72qzaSfQFf47pdKm6C/gp8qqG+8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718862507; c=relaxed/simple;
-	bh=S58Z2DTtHqc/MWVZC/Flg4+hJICVreKJDq8ffgdVjHQ=;
+	s=arc-20240116; t=1718862508; c=relaxed/simple;
+	bh=MVqFKwMuVbg1p1f133R9KZyczZ2dOPADbP9FY0KFgxI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YxMdM7cmInWSg+p0sDvFyfHKCywUk9D9ck84b5B0zwMvjkSeMv+z5FLSl3PAX1uCk/de8Mfz8Fr5K5fZjx2LohiDQ0nQoh0tqcCo58ZjMbhzFEe0EowhCFSRPuL4cy/IrMCMTL5/lG7yYPSVas8dd0kVJBXAZnUCcOqLsl5Wfo8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=k4BfiLiW; arc=fail smtp.client-ip=40.107.220.87
+	 MIME-Version:Content-Type; b=RsaRfMB4mcbnBuq6Hqpul4YOLcxZI3KIUUaw74b3pq7w6YD1DQdM9c0s0Prwv5b1GRUmMOubVomE7VTFUS04VlHghM3OY4b+XDViW+MlgstKZKCEt3LaEIdMEgH5t/hgEDH75qwo6CMvxGUSVmY+D3Rs7iDiIee+XBy2ZSwTbWI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=UgZCXFPi; arc=fail smtp.client-ip=40.107.92.59
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NzP4t3SZlvzxqLvMsug4KMl9+DlShFV/IPLFTEDPNCk59qeK8ugSFabPuMuOy5qgpB4NHhJVWoEI/dmrbpsy9i7edCgwakHCy6D6ufhf4S9W67M8JIiaK6GFYCkNsDded7CvtXfsANeVf8VzUSMesOjKZghJqrdjdphSGlkgDfeJlL6an3yp705nqrgLFOxarhlKvULzprh+tC3qISudBSh5jNaI8djUXQ9rayOIgKhGxMhsu5baPNG8do8thgXEGWhULYGEYYSVCYRX8aJZoWVsvDAWDYY7goPZRFgq+P7ZbqY+qoJrzrXrngOsaOB/o4sKfoVR64pBh2skKezKDg==
+ b=E1vf6aK3Mx4GVqUy37LpirjJwAwBjJqWJ1kqyF0NLYRBCXOcKtaw7Mcmk1C6Yzzb8k1M4zYywQjVtOX46nNxV2Te+KGX48h6TCN3atHa1HzYf734RvueC5FWMKBjd8BumRLmOgGqRVOeQmH6krBCLUGv15mi4B7ktwu8JK0yKdj9jUW8lIR9XMLikAc/tqDDOIeZUvN/H4vDj97TLV8vpD2MS54khPb9LcowPk3omGFYYQozTIL1Idc1L40pjlhw+MsAfg2toRa1NymLqsMxPSg20WJ4WzLbr0D8j0+nps0TVfHZqPRedsmctG4YB6fspsnmwfrYkgt1jVxm+50OLg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oqnrldJ2BlsKBOUSZzoSu/NhWcRyR9zFWqDLZ6YraNs=;
- b=ncuOvBxLrokUImK4uKsorKpOMg3bMocjbjJAStJxSVhoUohvi0i2XsVHdNkCCbhx/I1OZXUc8m9l/2tl2E2fRFAEB+CYTlhaSQ5PpxwmdSL5GlI/5j7Iul8Fpi7w8gUbwyq1o7waWC394JI+lqom04TUSfblSehlWbJXSfDApJ8IRCSHiQXvBjdDduWzsm+3Zj7NXDATJOMsuRg2n6eHyE5Q95EkAaALQnBUf6TwGcgBwFCz0hV4Q6M4uLUZWCD6l6qgrBEJl+Vj8wSZDkoQimdhYtqkvW7mGltjjFtEtpzijZYnEIQA18PfA4e9Ane/2OXo8ZilYZn8KP+TKWROkw==
+ bh=icFCc05ET0EWxPmpOG2nMouyuNc46mfQpKKUpaY6ZtQ=;
+ b=doQNIkJAojDciVVQgd833WfJp6yVucNFhKCI9GeiFv+R6L83576k+KsSG4DQV37Q6NWp2DAAv8Cp3k5ROs6pdZ0bQqanpQtQRk1bAPJmPgdzN9ITkZjqI50QM1MBrXzvmc965kg7us1TssM3BWBLLrLSoDJ1N1ou6vPEE3l2ue4GhPS/sInwqYjLN9nIUq2fi/WBwwu9cGOzqY0ZDtLM/5v8n2N4iLbRNBtQwyo5p6BaH6qmfg+DcY7qT37yRdTzojSWyJjiqMM2gdBAOOMu/PhdaV/mWuVc7XeOmD15cWzxl1C0sDisiF+FEGoD44mKV3e51zw3RwKPlVZdRXnlIw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oqnrldJ2BlsKBOUSZzoSu/NhWcRyR9zFWqDLZ6YraNs=;
- b=k4BfiLiWJjVX0WLezJBEVzHO2fvMS+dYM9YYYE+lhz4vVuwmYNZ6MpL76eZVPdMDVc92ad07goUb67GRrpxmYlX9IgAFBbSqxTBq+M/ueUjsdPI0C0kGICa4F8CwdC1l5W5eZOljwux3/VWSmZnh26lL8P9D9/TFIi4PB88oX2I=
-Received: from SJ0PR03CA0109.namprd03.prod.outlook.com (2603:10b6:a03:333::24)
- by DM4PR12MB6064.namprd12.prod.outlook.com (2603:10b6:8:af::12) with
+ bh=icFCc05ET0EWxPmpOG2nMouyuNc46mfQpKKUpaY6ZtQ=;
+ b=UgZCXFPi3/h1/cFQ4GBJILIf9ibO1zoid7qYVJLEGK7MP+AdZwHhoXW0AGHtkVeojWTkEuLy1GF3hUWK42AhPf3OQQhSrFAupwMdEloFAakM9gbDyzLreqz1BHBqL43w/f4z7ak0lL01c9HhhSeGRP3k0vCTJpEG4ZPkyb77Ez0=
+Received: from SJ0PR05CA0180.namprd05.prod.outlook.com (2603:10b6:a03:339::35)
+ by DS0PR12MB6487.namprd12.prod.outlook.com (2603:10b6:8:c4::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.19; Thu, 20 Jun
- 2024 05:48:21 +0000
-Received: from SJ1PEPF00001CDD.namprd05.prod.outlook.com
- (2603:10b6:a03:333:cafe::6d) by SJ0PR03CA0109.outlook.office365.com
- (2603:10b6:a03:333::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.34 via Frontend
- Transport; Thu, 20 Jun 2024 05:48:21 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.21; Thu, 20 Jun
+ 2024 05:48:24 +0000
+Received: from SJ1PEPF00001CDE.namprd05.prod.outlook.com
+ (2603:10b6:a03:339:cafe::de) by SJ0PR05CA0180.outlook.office365.com
+ (2603:10b6:a03:339::35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.33 via Frontend
+ Transport; Thu, 20 Jun 2024 05:48:23 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,17 +63,17 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF00001CDD.mail.protection.outlook.com (10.167.242.5) with Microsoft
+ SJ1PEPF00001CDE.mail.protection.outlook.com (10.167.242.6) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7677.15 via Frontend Transport; Thu, 20 Jun 2024 05:48:21 +0000
+ 15.20.7677.15 via Frontend Transport; Thu, 20 Jun 2024 05:48:23 +0000
 Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 20 Jun
- 2024 00:48:20 -0500
+ 2024 00:48:22 -0500
 Received: from xcbecree42x.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39 via Frontend
- Transport; Thu, 20 Jun 2024 00:48:17 -0500
+ Transport; Thu, 20 Jun 2024 00:48:20 -0500
 From: <edward.cree@amd.com>
 To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>
@@ -83,9 +83,9 @@ CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>,
 	<sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
 	<hkelam@marvell.com>, <saeedm@nvidia.com>, <leon@kernel.org>,
 	<jacob.e.keller@intel.com>, <andrew@lunn.ch>, <ahmed.zaki@intel.com>
-Subject: [PATCH v6 net-next 8/9] net: ethtool: use the tracking array for get_rxfh on custom RSS contexts
-Date: Thu, 20 Jun 2024 06:47:11 +0100
-Message-ID: <2f024e0b6d32880ff443c4e880af16ec2b5e456a.1718862050.git.ecree.xilinx@gmail.com>
+Subject: [PATCH v6 net-next 9/9] sfc: remove get_rxfh_context dead code
+Date: Thu, 20 Jun 2024 06:47:12 +0100
+Message-ID: <382dbfb2d2469c19beb01ffce3377b7f3158c3fd.1718862050.git.ecree.xilinx@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <cover.1718862049.git.ecree.xilinx@gmail.com>
 References: <cover.1718862049.git.ecree.xilinx@gmail.com>
@@ -101,103 +101,114 @@ Received-SPF: None (SATLEXMB04.amd.com: edward.cree@amd.com does not designate
  permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDD:EE_|DM4PR12MB6064:EE_
-X-MS-Office365-Filtering-Correlation-Id: ce5aa72a-a41d-422f-d71d-08dc90ec97d1
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDE:EE_|DS0PR12MB6487:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3e644aae-943d-49a5-261e-08dc90ec994b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230037|7416011|376011|36860700010|82310400023|1800799021;
+	BCL:0;ARA:13230037|1800799021|82310400023|376011|36860700010|7416011;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?o0uJAhR2U0bZDQDIpTJXTYSBYhbR4td9hzUEZww/5pTnYCg1/60m03VLd6Vr?=
- =?us-ascii?Q?BqzBlvBrdYdWZpCHzDF0E7jFItWUu1df0P54ajSwZ/E3T2fMeJUjM+fQgIRM?=
- =?us-ascii?Q?2L4fNIsNETkvyNpqPCM/hA8TJESOwSL71cSEF7Nspz286aoZ2chtU9TqXfGA?=
- =?us-ascii?Q?2ZyONfB5QFaqNJ2SHMRLCMTD4Votmqk2GTLdt16ikZeRuqxdM+6W1orHAazL?=
- =?us-ascii?Q?FUvCYuwsSHNv2iFRT15thm9oI2lwC3q/xiqlhP9ojQz1qk/Ep8ipg/6hnEW3?=
- =?us-ascii?Q?fIUCDN/p1ZUwNhp+ZfrtQDNHo+vl8A7whoUDYl5FZZb+jJG2IF/iSMfSEuEk?=
- =?us-ascii?Q?LvDXSHmQ0DZDs1h8yE1WNivziL62SO6g6g/6KT6LkmHmTcULiyazaY4rC5/K?=
- =?us-ascii?Q?I3S72SRkXh953yVy3rqo/V17aEjg8+HMS8oIaNfrL8BpJyC0HEvd0PXXaIPZ?=
- =?us-ascii?Q?o+QSSc/d5e6cnhogwttyt36pwPsUn0o3arrgZOJT7O6Fqfz9t1j5DJBnB3vP?=
- =?us-ascii?Q?099TqPoCRJ5kVxofUqXsSqzPTsiomA/54uMJKAZb4HMGyV8qP3df0HYw3VY6?=
- =?us-ascii?Q?Q7NCFNiOEn5MTiKVAdZdLFPJEX1cQSYheR50Hue9Yv/jt1Y4AYFn3HSF/hYt?=
- =?us-ascii?Q?xJTWKhtENbe8F0sjVOuUqzcGcxnXQTvKlf6AHkQZGEVGBX/cFudTOixH68mS?=
- =?us-ascii?Q?kNcqFFmPm4bsQ5tOwlxfRJlSzCPVUpnMqyVxdOARrSfZd9wGHUO6QPAo6/is?=
- =?us-ascii?Q?BKJhqo2AUD0ueKsyleolsG/x+WR/4bRh68Txlr+ey4jhB6+hUcqwnKPbu8Uv?=
- =?us-ascii?Q?QUxRk84wg6y6qAqn70cCcuArIxwJN5CgTTxyuP4GtQwIpMJAuSTR0C9sfVyG?=
- =?us-ascii?Q?4yf8EGVh+5+wMrsF/cN5ywrNM3X14pHJjHGJURGoLqPpP25jtJX7WdAmQ0MZ?=
- =?us-ascii?Q?+dTHo5AzQ6QLMZKy9Dtw0zH9RMZ0+lT5xzCpk+8oLYfg6z+MviOBVguYW8qg?=
- =?us-ascii?Q?XwZoSa0+tPZ+Gm5o71GpfCzM/oFOsaeYWcRp2VfFDjSfceJA3SIPp2onC/ib?=
- =?us-ascii?Q?d/tsXffIvRDedNTfflPdna+r5Wk5zV1/3ervoCp0LHEKaSi8em+UMXFO63g+?=
- =?us-ascii?Q?LSm2DICYuaWExAZ4AjQ+fpgq5i7H7pKPNHcP9akHyK6+Iz817bfbB6qmO28I?=
- =?us-ascii?Q?lRcnVGvp+e5yT2kLLmgMI4TNHxiMu3jl7LUkodBFBU+xKIAbRbCCotHGYhsj?=
- =?us-ascii?Q?zPbISwvT8P3y9/mbCBPZDEVWt10YQg0KvbAxoDrN0m+sCqtcd3XEeHwvCl+r?=
- =?us-ascii?Q?RJ4x0ZxHcB6/34WDVsIoqlECmwYT55eEnMGt1xziQWrb16V8fOoaYl9FJjAF?=
- =?us-ascii?Q?67sKmIgPE4/XejHuM95Zrv8RzJoAmJnzMAzhbpbzfD81OGDcIQ=3D=3D?=
+	=?us-ascii?Q?gy/7sPEzLned9Z8HPmyd4M1dG6uXrEY8ww1LGtl1G3qIH4lVBsYlvaZ8mN4i?=
+ =?us-ascii?Q?WQSH6JA0Scm2K9CoZEj2cTeZ9xYEdD2ZozSdCpI+wNPD7gpfdiZPGv0il+2v?=
+ =?us-ascii?Q?dwZ0hT4HI+/ZHcKQlkH0aoUu50Oz1lr/NyEXyD+EdpyziCXgU29CQtGcWDcY?=
+ =?us-ascii?Q?nVO+77RWc6JrcqfcDPnStLqk83X/A6esJQlQerYIip7Vz6h8qgRO/eAYJSny?=
+ =?us-ascii?Q?gvJp2hxPIEJ28yQqniuaceA4YEl0bvwUHf6z1wSch/8HEGgFXhwyawv1wYu1?=
+ =?us-ascii?Q?OOaEtOhL3m9IYo4USNn68GNDVk/tzbKoKPJOdUb3O8qlP5MKwJ8REw7N2CME?=
+ =?us-ascii?Q?FQ5ggeJ5SHVo0+rgSuZXQ8reGcqw1RcCHZIJPTz4s7mw6H93UvuDY2XOCMkw?=
+ =?us-ascii?Q?EIH4Gacve0oOfUYn3/MjCPw1d+Zq+9EpSJ/hcPrc6SqTiiCYf3y8u7YQiaT3?=
+ =?us-ascii?Q?ahqO5aVwyboUwywyKHkWjCxvW9v9H1TMcNIzzDUbiyOmc6tCh0O8fdmfBpw+?=
+ =?us-ascii?Q?pmw9QiULdzbtpgRh9RLCK9jQ8/dN9pjjRvPq+ULhMx32FdqzF7wm0oFwnOKR?=
+ =?us-ascii?Q?eF25lVXT+cCYANY4CIvVHKUtpw09Aplz120m1SJ23eqLedrzDTNPXKTx2uBg?=
+ =?us-ascii?Q?xf0kV98vQoGdMCYvKwS8AlOIfR3zV7ncQZ/SnVebf15Lev4ozCHEoVSzt16V?=
+ =?us-ascii?Q?fHJf4cakIyX6Csu1wNZyR00zOjwCg4xoprpClmDpwRZ/CTL1+dAvFrSWiNPv?=
+ =?us-ascii?Q?PzMBAZi6uFdKFfu9G953kvzFlyI1DeONqrzSmWkG6IKGz2MlJnjmQGllOJfw?=
+ =?us-ascii?Q?bl8gFpuw5DVmkLsIh2wdZtIWecdnC7jB9sOcNfvueJh57lAtBy1D/tA6hMd4?=
+ =?us-ascii?Q?hsGMKw9SCRzXtIdQq3soQJUPNY19zmG6ESAg6yBiap219h4p56FfrcrQLJyN?=
+ =?us-ascii?Q?eEV4u0FVOEvbAsoOG2YyG26qX6qeG4hQkHZZ3pSgipQIHEYF4QaZPN+v2mFe?=
+ =?us-ascii?Q?ojAp359bWd+Vy0XwKh6YkTzE6XBbHy0hVULYHBn1OvgypYDHLlCPsKYpdpjz?=
+ =?us-ascii?Q?7faJZNhWcw2t8NJGji6R8l0CxIK5OzLdonSQ13VcsfWl4vYjDWnsWU4rMzei?=
+ =?us-ascii?Q?HIAq8pOn5CWj8iB8uKMVPfQGORzpbtXAEMtfD8J5RnVpt9JPQ9bUXufBk5DS?=
+ =?us-ascii?Q?IzoHjz6P64ixDKaao5APg6AgaEpoXKozn2wCm06SyXVmkkY72e2fEbeJKfks?=
+ =?us-ascii?Q?M9nqZbwnsKulA31G7wePD3anzYiPoOJwMnGoqVo4wkg52ObcvtaEEmiSDKy+?=
+ =?us-ascii?Q?mXK/59yGllLa2+6D3x6erB1RN4RjsdHRZwyB0QGfhXYtDfiioKNrV2zcQg7j?=
+ =?us-ascii?Q?quUZC57XwFx6s40QEYtGt6Uff4qAPXGi/hT3om7l8XMj51SKTQ=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(7416011)(376011)(36860700010)(82310400023)(1800799021);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(1800799021)(82310400023)(376011)(36860700010)(7416011);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2024 05:48:21.2154
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2024 05:48:23.6882
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce5aa72a-a41d-422f-d71d-08dc90ec97d1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3e644aae-943d-49a5-261e-08dc90ec994b
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CDD.namprd05.prod.outlook.com
+	SJ1PEPF00001CDE.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6064
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6487
 
 From: Edward Cree <ecree.xilinx@gmail.com>
 
-On 'ethtool -x' with rss_context != 0, instead of calling the driver to
- read the RSS settings for the context, just get the settings from the
- rss_ctx xarray, and return them to the user with no driver involvement.
+The core now always satisfies 'ethtool -x context nonzero' from its own
+ tracking, so our lookup code for that case is never called.  Remove it.
 
 Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 ---
- net/ethtool/ioctl.c | 25 ++++++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/sfc/ethtool_common.c | 38 ++---------------------
+ 1 file changed, 2 insertions(+), 36 deletions(-)
 
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 9d2d677770db..ac562ee3662e 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -1199,6 +1199,7 @@ static noinline_for_stack int ethtool_get_rxfh(struct net_device *dev,
- 	const struct ethtool_ops *ops = dev->ethtool_ops;
- 	struct ethtool_rxfh_param rxfh_dev = {};
- 	u32 user_indir_size, user_key_size;
-+	struct ethtool_rxfh_context *ctx;
- 	struct ethtool_rxfh rxfh;
- 	u32 indir_bytes;
- 	u8 *rss_config;
-@@ -1246,11 +1247,25 @@ static noinline_for_stack int ethtool_get_rxfh(struct net_device *dev,
- 	if (user_key_size)
- 		rxfh_dev.key = rss_config + indir_bytes;
+diff --git a/drivers/net/ethernet/sfc/ethtool_common.c b/drivers/net/ethernet/sfc/ethtool_common.c
+index 0a8d2c9ffce6..6ded44b86052 100644
+--- a/drivers/net/ethernet/sfc/ethtool_common.c
++++ b/drivers/net/ethernet/sfc/ethtool_common.c
+@@ -1163,48 +1163,14 @@ u32 efx_ethtool_get_rxfh_key_size(struct net_device *net_dev)
+ 	return efx->type->rx_hash_key_size;
+ }
  
--	rxfh_dev.rss_context = rxfh.rss_context;
+-static int efx_ethtool_get_rxfh_context(struct net_device *net_dev,
+-					struct ethtool_rxfh_param *rxfh)
+-{
+-	struct efx_nic *efx = efx_netdev_priv(net_dev);
+-	struct efx_rss_context_priv *ctx_priv;
+-	struct efx_rss_context ctx;
+-	int rc = 0;
 -
--	ret = dev->ethtool_ops->get_rxfh(dev, &rxfh_dev);
--	if (ret)
--		goto out;
-+	if (rxfh.rss_context) {
-+		ctx = xa_load(&dev->ethtool->rss_ctx, rxfh.rss_context);
-+		if (!ctx) {
-+			ret = -ENOENT;
-+			goto out;
-+		}
-+		if (rxfh_dev.indir)
-+			memcpy(rxfh_dev.indir, ethtool_rxfh_context_indir(ctx),
-+			       indir_bytes);
-+		if (rxfh_dev.key)
-+			memcpy(rxfh_dev.key, ethtool_rxfh_context_key(ctx),
-+			       user_key_size);
-+		rxfh_dev.hfunc = ctx->hfunc;
-+		rxfh_dev.input_xfrm = ctx->input_xfrm;
-+	} else {
-+		ret = dev->ethtool_ops->get_rxfh(dev, &rxfh_dev);
-+		if (ret)
-+			goto out;
-+	}
+-	if (!efx->type->rx_pull_rss_context_config)
+-		return -EOPNOTSUPP;
+-
+-	mutex_lock(&net_dev->ethtool->rss_lock);
+-	ctx_priv = efx_find_rss_context_entry(efx, rxfh->rss_context);
+-	if (!ctx_priv) {
+-		rc = -ENOENT;
+-		goto out_unlock;
+-	}
+-	ctx.priv = *ctx_priv;
+-	rc = efx->type->rx_pull_rss_context_config(efx, &ctx);
+-	if (rc)
+-		goto out_unlock;
+-
+-	rxfh->hfunc = ETH_RSS_HASH_TOP;
+-	if (rxfh->indir)
+-		memcpy(rxfh->indir, ctx.rx_indir_table,
+-		       sizeof(ctx.rx_indir_table));
+-	if (rxfh->key)
+-		memcpy(rxfh->key, ctx.rx_hash_key,
+-		       efx->type->rx_hash_key_size);
+-out_unlock:
+-	mutex_unlock(&net_dev->ethtool->rss_lock);
+-	return rc;
+-}
+-
+ int efx_ethtool_get_rxfh(struct net_device *net_dev,
+ 			 struct ethtool_rxfh_param *rxfh)
+ {
+ 	struct efx_nic *efx = efx_netdev_priv(net_dev);
+ 	int rc;
  
- 	if (copy_to_user(useraddr + offsetof(struct ethtool_rxfh, hfunc),
- 			 &rxfh_dev.hfunc, sizeof(rxfh.hfunc))) {
+-	if (rxfh->rss_context)
+-		return efx_ethtool_get_rxfh_context(net_dev, rxfh);
++	if (rxfh->rss_context) /* core should never call us for these */
++		return -EINVAL;
+ 
+ 	rc = efx->type->rx_pull_rss_config(efx);
+ 	if (rc)
 
