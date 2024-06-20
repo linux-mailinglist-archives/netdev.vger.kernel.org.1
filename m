@@ -1,59 +1,64 @@
-Return-Path: <netdev+bounces-105103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F18990FAF8
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 03:30:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF55590FAFC
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 03:35:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D8621F212C2
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 01:30:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D8BB2837D8
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 01:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0FE469D;
-	Thu, 20 Jun 2024 01:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3580101F7;
+	Thu, 20 Jun 2024 01:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W/Qx6Y5u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QlvHl+h3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE964184F
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 01:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7352113ACC;
+	Thu, 20 Jun 2024 01:35:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718847037; cv=none; b=nEmfzqGwe3nX4L5BM4syRiN7yLL5H5C4C5/cOJO30xRi3f9cjysFZ/8nW/LXJwBvHwpkXlaaCWgVabGVp/ztyw0C7fr84F0+mQtLSN1BygYIEWwDdmLyDTgOtEVrPmETnj8NR1XgfIZZdSux6D7y0WsKX52eVPz6fkTiIyvZ4yk=
+	t=1718847303; cv=none; b=cVjluA7QZlK9XKcdDukY83nLjFWjVAABxNRnCPJMkytYPZma+0uzZ0K0DSmLT2HWU9xOfenW0K6CMgZt3lELrEQcZ8fBzwM2GTlPfn29gST1QwiO+X0YnNogJTCP9+qB89ZdRUyD9/NBIjDUS3UFMmRhZcTTYxUKSpaPTMBtGQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718847037; c=relaxed/simple;
-	bh=rYbChGLlVvPgG0egHfWaWLROG/xd7JRNvksBGYQxxwM=;
+	s=arc-20240116; t=1718847303; c=relaxed/simple;
+	bh=9ktI4LPNXVV+BQFvLQmZDXGh7ooxfS0m2y049M5iUe4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C1t5EasDs0fjwZtzVQcPP1o5Lna7JLcKTIk9egsPzhZweO9Sxvz6wNsEkB6WNGA/lyIfUuZT4H3Amc+uG3Dphhn06k27oWbczmNAd9srXgRGKaEjUXJdIbF8vBhyCB65EPFvN4VRhWCkCK6ZnDviyjDkKLKqbMLIWWHNIYrSjmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W/Qx6Y5u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC1CDC2BBFC;
-	Thu, 20 Jun 2024 01:30:36 +0000 (UTC)
+	 MIME-Version:Content-Type; b=EIrvjUIjsTqNDyFQDjEd655EdW/nZJe4/VmbrN2N4k0WSzntywLXznfrRsPP15pQAnQDR5olFavKcE0HbnC8iZK6DKR80OqKrqQCucWcJfwbd74U0oCJKLiBSo+vyxHt7NzbaDhRlMiBKPU3D+y/3O6avm9fqw87k1R8RlNLWVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QlvHl+h3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E92DC2BBFC;
+	Thu, 20 Jun 2024 01:35:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718847037;
-	bh=rYbChGLlVvPgG0egHfWaWLROG/xd7JRNvksBGYQxxwM=;
+	s=k20201202; t=1718847302;
+	bh=9ktI4LPNXVV+BQFvLQmZDXGh7ooxfS0m2y049M5iUe4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W/Qx6Y5uOUoVEmavtf3sP9gBcFJYZkildVhz+H8ScI59H93EPMcyJZUqLyu5O+Akw
-	 kflFL6m8CrS6U9KdHmq6bQMo0oRlrwxuJizsKHcMiGVMI34q6OWgsDIwItueVe1cK3
-	 7hi4+63r/yB+EjjRvjXOgtSIIgrsvdvWwuZah6VbY9FFh9QW2iXNcF5qO1yQmqqmux
-	 dbyieeHlHdQw1oKTb52+ul2ysy0Bd86fdMtavcpt1W7Yo3qTVdfsUIg8RFhO0Mh8Ri
-	 jvXOuXlWQWAUImT0y2zcNzHQvcACMgZNKfSNsz38J7b5X+wzO+R+lL1ykJa2etEdUJ
-	 behkGunnHseYg==
-Date: Wed, 19 Jun 2024 18:30:35 -0700
+	b=QlvHl+h3S4kAdh2OalGsSF6vU99rkNTv1Y7HE+GK5SDlYZPDrV9sAVCnVr1PEUsGn
+	 laD9RxCHbPdSJq5om6f1W4SiGrGwvhb3JetTZU6LjLypjilWPRADnQjdfbx7CcBVDh
+	 POFsxlP8hycgOp5IiT3LE1uM22GF5D90LxV3g0fVVzmycsSFnrqnTFGjkPjeUZkPuo
+	 00YHo3ohCef1WC/YRPCBJc8p9IrLJ9DpQ56SMo8L0jQdmarIHBuEGfWiNFgB1Ixy7O
+	 WBNvUv1YpHvTBXw1rMfW2brTG4E/RZwIuhH6tR6EJRc1NdGM051SjvD5Msl1h8mxcP
+	 2Iee6ouGdyWGA==
+Date: Wed, 19 Jun 2024 18:35:00 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Shannon Nelson <shannon.nelson@amd.com>
+To: Danielle Ratson <danieller@nvidia.com>
 Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
- <pabeni@redhat.com>, <David.Laight@ACULAB.COM>, <andrew@lunn.ch>,
- <brett.creeley@amd.com>, <drivers@pensando.io>
-Subject: Re: [PATCH v2 net-next 2/8] ionic: Keep interrupt affinity up to
- date
-Message-ID: <20240619183035.51ec1beb@kernel.org>
-In-Reply-To: <20240619174317.6ca8a401@kernel.org>
-References: <20240619003257.6138-1-shannon.nelson@amd.com>
-	<20240619003257.6138-3-shannon.nelson@amd.com>
-	<20240619174317.6ca8a401@kernel.org>
+ <pabeni@redhat.com>, <corbet@lwn.net>, <linux@armlinux.org.uk>,
+ <sdf@google.com>, <kory.maincent@bootlin.com>,
+ <maxime.chevallier@bootlin.com>, <vladimir.oltean@nxp.com>,
+ <przemyslaw.kitszel@intel.com>, <ahmed.zaki@intel.com>,
+ <richardcochran@gmail.com>, <shayagr@amazon.com>,
+ <paul.greenwalt@intel.com>, <jiri@resnulli.us>,
+ <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <mlxsw@nvidia.com>, <idosch@nvidia.com>, <petrm@nvidia.com>
+Subject: Re: [PATCH net-next v6 9/9] ethtool: Add ability to flash
+ transceiver modules' firmware
+Message-ID: <20240619183500.5635a7a1@kernel.org>
+In-Reply-To: <20240619121727.3643161-10-danieller@nvidia.com>
+References: <20240619121727.3643161-1-danieller@nvidia.com>
+	<20240619121727.3643161-10-danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,12 +68,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 19 Jun 2024 17:43:17 -0700 Jakub Kicinski wrote:
-> On Tue, 18 Jun 2024 17:32:51 -0700 Shannon Nelson wrote:
-> > +	if (!affinity_masks)
-> > +		return	-ENOMEM;  
-> 
-> There's a tab here instead of a space
+On Wed, 19 Jun 2024 15:17:27 +0300 Danielle Ratson wrote:
+> +	switch (sk_priv->type) {
+> +	case ETHTOOL_SOCK_TYPE_MODULE_FW_FLASH:
+> +		ethnl_module_fw_flash_sock_destroy(sk_priv);
+> +	default:
+> +		break;
 
-The rest looks good, I'll fix when applying.
+The compilers are nit picking on this:
+
+net/ethtool/netlink.c:57:2: warning: unannotated fall-through between switch labels [-Wimplicit-fallthrough]
+   57 |         default:
+      |         ^
+net/ethtool/netlink.c:57:2: note: insert 'break;' to avoid fall-through
+   57 |         default:
+      |         ^
+-- 
+pw-bot: cr
 
