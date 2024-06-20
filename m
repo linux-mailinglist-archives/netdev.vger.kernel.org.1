@@ -1,113 +1,115 @@
-Return-Path: <netdev+bounces-105253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C614891043D
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:32:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61B7B910446
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:33:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CFDD1F21E72
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:32:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEC23283E20
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439751AC79C;
-	Thu, 20 Jun 2024 12:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B39001AD481;
+	Thu, 20 Jun 2024 12:32:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="lh5FwdeX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m3+pY5FR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B68B1AC42F
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 12:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078AD8175E;
+	Thu, 20 Jun 2024 12:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718886718; cv=none; b=LjjdKKKBL/o6H6pIJwVIuyfoepR4FNE20d2mMjXsnUklRKV60H0fMpGrnKUyEWff9Jd2RC7+kWeq7/Rghl67/4LA3IBytx+lZBmZiv6PZoLbXwJ1MqSj7G/EwW2wdeFQObn1Y5dBSDvR7QdK/xzY2xXLPkUNkeY8SrbFiG5XPzM=
+	t=1718886729; cv=none; b=KDRuZXPPlpPW7S4qTXcIGP7AOWKF11Itazbfsq5VIBINDAdTuXUVJEtpd++/VlD/yNyqBJ8tfNgdopLzx0f6hDJEY5PMNr1N2ZoPySnWWcUe7+NJC62BtnRNIf9vx0nnMOsYdqSNmKPZxBfsIiRr50F/OE6JQcMQgMUSaUFV1uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718886718; c=relaxed/simple;
-	bh=jCb6yC3LV7RS1SBbrETONCjgbXRTz+kthAeBoPZk3uE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k3wSM0xV3IZw66pt3l0jAKoC7K6nq9SOjU8Q87hroS+PpFBahqu0a8IMfE7mF0HJudvlL1FY+ekJeXZ4ExfJwAi5xyJUa6jy7cDKG2K9KdlSyAmN6GYLJnQkoVc2KhQmRzzlNunBOVt+6hpVBNO5xM9l9E9pgTSKEQyXx0SekLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=lh5FwdeX; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-52cc129c78fso770257e87.2
-        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 05:31:56 -0700 (PDT)
+	s=arc-20240116; t=1718886729; c=relaxed/simple;
+	bh=nKaXpPpSof8n4UB3UcwIjy4Jm8TuBE2JLXnXoTHOECQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C9ACqm6IeJCPBMxmga9lmSrffxE2x5wycjOdbBf6ShrL14eCn1HJsDJCWPS1kwO0RLK9o9yjGf3F4EUo2TGW9PH5jGNY8vjFYtrpDCDf7LEUyZ/75uosW5gbGdBKNWznr+ft782kmKKttWXv5qA9Ml2ZqO4mWUpeDnZfcoJA9es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m3+pY5FR; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-57d07673185so724421a12.1;
+        Thu, 20 Jun 2024 05:32:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1718886715; x=1719491515; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jCb6yC3LV7RS1SBbrETONCjgbXRTz+kthAeBoPZk3uE=;
-        b=lh5FwdeXYRte/hibWQKRwvHpAFYIEi4E9KdPKeus3b/NANRah3MN0ZsjBIWtkeZVh0
-         UtqMe/7gnUesKVU+fpcfpH1NdMZhbwC0GoHk/ufJj+ZiF01CPmlYhqXuKCUVHBVtdQiT
-         upTOX59tCycNV1phIJ1oeMjyveovrCUrBZokEp9V6CClnJO5C1T66xMihFPSmiFWGlDC
-         QDEfZaY6xEltKwoTSJGwGYesnt79Ti5Wjyf0U68wNTCEP58fmdr5Wis9G8rz4rqF0bl3
-         f/aOqzQKDncGmcnJ3Z2wuORCcNOFdBtZ+ByexrEqci5BjwCbDJfFcY15TnZcD8cRf2ic
-         clXQ==
+        d=gmail.com; s=20230601; t=1718886726; x=1719491526; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1cv9eGCvUmyf1AIeDWQRmRRnMZ9YQ2SloM3Dv5t7XOk=;
+        b=m3+pY5FRX9skjX/gxgRQLX6TRwxblIia+anESG9r46Q9h1P23wqprTvagWqPL7TNdS
+         f2rQ7NALjvhTLJuX+r1Nb13qjd6jAlZRJ/sWek4v5E0UVYwyMVMXjoBWmBBC+WOUtxCK
+         Y95cnDHlrkKgSGhiyAIxEw2kXTygG3kbp9nE8HHu5Mf+47VH/tJBGqu6KjV49RWyiBip
+         H3fDrMvOG5b6r3G/KDcwFyM4n1AgRSC88KuJ9TjNaZJKua9k0fiMN3JJsY6j0en15pQ1
+         zxDq6FfNOIxXF80oVllMNyuayRIJQ/x/b1qLP0CX0kQ/fGAIH39KKQoV4Y6RKd4/W2B5
+         3tPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718886715; x=1719491515;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jCb6yC3LV7RS1SBbrETONCjgbXRTz+kthAeBoPZk3uE=;
-        b=vhWaSHYZg7tMo/LlrgXPNB9Ldv1O+ldHeOn7ace2NLK0HbairTpfz/Ct7SRAYbKM2G
-         nMxYzjaIJA2hx6nadtK2EbqFVv5moDeQlOH/9VlscgS49OKp/dIA4qDWsDxoMukVSHpU
-         uxSt7tnvTAA9Rx7Gfe3pya9II/XOimervy3lQoKDo8pLhiaXR7Zi3KmMpnZR2+SCx2LY
-         3oq5FoGCNzAoTtVwbt4QxphFIql5tKHAITb/5Mxea4QtW9TTm2WNFCrIBfLKCuBsOsf/
-         5Wv3AYNRGZDyKwahpokYcFIFoyd/0Zg7mgEBAflXoDKOhYpBgJL3CiHvzw0q2cEXw687
-         IwvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXUIFkZQxH6ip3X25BoI/IXzkuayZugFSb4YbnTu35jmxOrT+Fp/jVGI2Hht+zAi7B8DUM8WoP9KX27UShQLNV4PoWCK2MI
-X-Gm-Message-State: AOJu0Yx3DX5MujH6b1tHme3WZoQT/SOD9YoU4minz1b2k3BOpKpyK2nT
-	z3tZQF6+efxCKO+5auXCU9hhq96q2+0R3cUr6NK9626GSaZNbJ5IFN/lf6jt898BEToSe2S35Cj
-	wC/PEc0lrd++ZOxLpPhEoid7E4Q/tw9wAatMWKw==
-X-Google-Smtp-Source: AGHT+IFEBqVhz8d0V1M1pa0KZH9RCnVL/MBWmCY5jwSJkoCnbHQgQ/4ArnXiI+p5/MiLtoJrmvDlZdKPBbVkobzIYGE=
-X-Received: by 2002:a05:6512:1242:b0:52c:8837:718a with SMTP id
- 2adb3069b0e04-52ccaa918b4mr4529720e87.43.1718886714538; Thu, 20 Jun 2024
- 05:31:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718886726; x=1719491526;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1cv9eGCvUmyf1AIeDWQRmRRnMZ9YQ2SloM3Dv5t7XOk=;
+        b=BlXwn8Zf9lXD3JD0EHlTv8qYBYvuiZRB9IpIAK0zmSXfhtvoBTV+aDGV//zlcVA55l
+         zLOVMPWmcVWfmiLTjCgyi38rQu15ATTnRVDnWa+DlMW2w5MDp8lVhadAqMaUQFSyu/pj
+         ZZoQAP4fhRdg6hZ/paxEACOlEXvo38oRhiGIOZ9s+KHy8iF/Gjltj8i6NAaxY2MThaaZ
+         8abkChH9gnlDEBZaJJP24S3Kjq5J7mdd05RL4LwlJyNxD7jRbJu0yFLDvnJeAC7Rf4U/
+         Vccvx/DOSNX2wqZCIgFX0YQTj0V9u7/SHKS6krwueEqcbrN/LQ6UXXuY/1JTRqMV4WRQ
+         Rq0g==
+X-Forwarded-Encrypted: i=1; AJvYcCUB5SQnMD8Zo1qffo8zXy82KVYNcmxCylgLlvWGl8APNJlf7xZsh/jSJkfrqNxJF71o/ZairbO4tY6OJvWLN+6mBWVmkKSFQHgCnDvd
+X-Gm-Message-State: AOJu0YyLEinheyI8G6TKz61VsprUPKhSudmeuL4Mv2EIRqkxxqkDX6ht
+	Zz1PcRaegJQq/SMGcrylpiaWyYEwimfoH0tW+eY8UiO8d0tah7vU
+X-Google-Smtp-Source: AGHT+IGOis2MTWAcNxzECbjNi1bwQ7BFdytUq5/xg5cCjRjc9EZNqKgrFl3s1BK+59GcmJ+JlcfS0g==
+X-Received: by 2002:a50:9b5d:0:b0:57d:353:ae21 with SMTP id 4fb4d7f45d1cf-57d07eabec3mr3535513a12.30.1718886725847;
+        Thu, 20 Jun 2024 05:32:05 -0700 (PDT)
+Received: from skbuf ([188.25.55.166])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57d17d9471fsm1340167a12.52.2024.06.20.05.32.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jun 2024 05:32:05 -0700 (PDT)
+Date: Thu, 20 Jun 2024 15:32:02 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 10/12] net: dsa: prepare
+ 'dsa_tag_8021q_bridge_join' for standalone use
+Message-ID: <20240620123202.ygpoflgzqq5mipvz@skbuf>
+References: <20240619205220.965844-1-paweldembicki@gmail.com>
+ <20240619205220.965844-1-paweldembicki@gmail.com>
+ <20240619205220.965844-11-paweldembicki@gmail.com>
+ <20240619205220.965844-11-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240619184550.34524-1-brgl@bgdev.pl> <20240619184550.34524-9-brgl@bgdev.pl>
- <ZnQLED/C3Opeim5q@shell.armlinux.org.uk> <ZnQPnrfoia/njFFZ@shell.armlinux.org.uk>
-In-Reply-To: <ZnQPnrfoia/njFFZ@shell.armlinux.org.uk>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 20 Jun 2024 14:31:42 +0200
-Message-ID: <CAMRc=MeNGQBMZFg3FTtcFzVKU4xMpnm0BxsAgs+++sFDpU9t_g@mail.gmail.com>
-Subject: Re: [PATCH net-next 8/8] net: stmmac: qcom-ethqos: add a DMA-reset
- quirk for sa8775p-ride-r3
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Vinod Koul <vkoul@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240619205220.965844-11-paweldembicki@gmail.com>
+ <20240619205220.965844-11-paweldembicki@gmail.com>
 
-On Thu, Jun 20, 2024 at 1:16=E2=80=AFPM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> On Thu, Jun 20, 2024 at 11:57:20AM +0100, Russell King (Oracle) wrote:
-> > I don't have time to go through stmmac and make any suggestions (sorry)
-> > so I can only to say NAK to this change.
->
-> Also... where is the cover message? I don't have it, so I don't have the
-> context behind your patch series - and I haven't received all the
-> patches either.
->
+On Wed, Jun 19, 2024 at 10:52:16PM +0200, Pawel Dembicki wrote:
+> The 'dsa_tag_8021q_bridge_join' could be used as a generic implementation
+> of the 'ds->ops->port_bridge_join()' function. However, it is necessary
+> to synchronize their arguments.
+> 
+> This patch also moves the 'tx_fwd_offload' flag configuration line into
+> 'dsa_tag_8021q_bridge_join' body. Currently, every (sja1105) driver sets
+> it, and the future vsc73xx implementation will also need it for
+> simplification.
+> 
+> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> ---
 
-It's in lore alright:
-https://lore.kernel.org/netdev/20240619184550.34524-1-brgl@bgdev.pl/
-
-You were in TO for all the patches (as evident from lore) so maybe spam fol=
-der?
-
-Bart
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
