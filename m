@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-105420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39A749111CA
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 21:07:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C999911155
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 20:51:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A56BB230F8
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 18:50:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E64A41F212F5
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 18:51:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FB71B5821;
-	Thu, 20 Jun 2024 18:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649BC1B4C34;
+	Thu, 20 Jun 2024 18:46:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t1Ksv8W/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uK+JbPGH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073C01B3F0F;
-	Thu, 20 Jun 2024 18:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345481B3731;
+	Thu, 20 Jun 2024 18:46:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718908906; cv=none; b=PaKbVm+tnXkY/FNWth1mFOzRKVUugd/0SRIx1r3T95EStI3pdZH0F8aiNXHLaC0jFF+zxwKz5U6xxhsUv4x+LCmGO8BquDSmmHgfZMiTe4838HucMkO1psyR084bMmwm6V73fOVlTVaN6iTXIJ+bUHAh2evfJ5B/ArlzGaP8Opc=
+	t=1718909203; cv=none; b=nGLwwT2uK7b/2SRa7M8QXH1lufZcy49/pexOY0UCTi7lzSHsNxMdGcfyTBCp+Zs5fYNuGFr1dXCXVyKF1+dB8MmDVSDrisO9o4dIhXQaKSoPSnycVWdi7aUQAUXPShTsD3hDFa4sFmPvkzT8BxofOSev7uC9f6pa4jFNRswsf6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718908906; c=relaxed/simple;
-	bh=a0OvAmDcT+HUsVh7NHWlsxuonu7EIGyjpP5cNmXaiJM=;
+	s=arc-20240116; t=1718909203; c=relaxed/simple;
+	bh=I3joilslbsTLNhXOXgFwVeASkXdC28bcARNwfLKI8vY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hvyw9r2h1EYmRi9r1dS+YSCIKTEUuQl/frcN7Gtjl/m2meppuQ8RTKJUsC9zdNYvCDY5IJfwD6GaPuimPATp727qXzk/s/KWO7++DmZxCAjwIAubE5IMTEnteV5wd6Icuj8CZeHkUZ8YsS43iAuTwYL7z8hoVj1usg5QmkaPR9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t1Ksv8W/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 815A3C2BD10;
-	Thu, 20 Jun 2024 18:41:45 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=TX6Gxbjv4i4MgiaplJcqyeAozLEYu2l85dpAGmYfgyOh4JlnBPTU/gdA3vPpEcuclneH7L4PoG3c8jD5JPOF3Le5xZ1AFCCFsjKEGHSKqoVxJbo5AJV+z0VFVx+G5zS+JKszIUsJxmGgtqfgL/qMYsew22fjlZ61Xkc4ue4fD8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uK+JbPGH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4DA0C2BD10;
+	Thu, 20 Jun 2024 18:46:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718908905;
-	bh=a0OvAmDcT+HUsVh7NHWlsxuonu7EIGyjpP5cNmXaiJM=;
+	s=k20201202; t=1718909202;
+	bh=I3joilslbsTLNhXOXgFwVeASkXdC28bcARNwfLKI8vY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=t1Ksv8W/rEtx6NZTGvA4yhN3GLcpoOPuO4kh/j/guKM4DuzWnsmxz0sETH+GZprW9
-	 e95FrUmpaiWUZmYvTJYQSqr+cf6phCzKLhux981lvX1eOfjqE9/ON1wlrOs7DGh9px
-	 e4Lz67fjNMKx3gi7VppJ1f4cHqkROxLzOHRB6QOR3sHw959Tkv9agzhyYxKeaBM05o
-	 cYejZYgHWSRwXAYeajNNJFIe+VB/GAsvJ2LTUb1rW4YiQvlsVUKNKnhpmCcEEAblyB
-	 TQf3z0puGRC85s7ZxlkPZv2pnSoQOdzsSAUJ6/6NUpocNDLK8PzUsRACgxqG+NAumZ
-	 Pc4/grSmZr17Q==
-Date: Thu, 20 Jun 2024 11:41:45 -0700
+	b=uK+JbPGHAN8r05cRgDkZQTsmELs6UZrtg2JBK9smm3uLdlJWaL4l8aS7al4jNu+KH
+	 /arX2rg8N8O+LOODJDJpA4nAiXuxMMUW6iA4EVO4/ycET4EkJgK/mk+60vIHHQ5yHS
+	 hLptnexYsErWkzpNLBnPe1HzGVCqUa5vrp2wILiLY3mQCVw8e2SV2KAkTvOcr5/OQi
+	 ByPyQKnQ/3VCumQRaojNgAwFL9ARtQzSFzh7a4rmVhdqno8D9OHj+R+rxGWkY7zrmT
+	 vGOSOUhoQYBJfCnvP65Ry+c2yGG55UMEI3PLXUCSGOu47ziiF1T6VQhMgkVBClpw6W
+	 ECXKB8H5QyJqw==
+Date: Thu, 20 Jun 2024 11:46:42 -0700
 From: Kees Cook <kees@kernel.org>
 To: Vlastimil Babka <vbabka@suse.cz>
 Cc: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
@@ -62,10 +62,11 @@ Cc: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
 	linux-hardening@vger.kernel.org, netdev@vger.kernel.org
 Subject: Re: [PATCH v5 2/6] mm/slab: Plumb kmem_buckets into
  __do_kmalloc_node()
-Message-ID: <202406201138.97812F8D48@keescook>
+Message-ID: <202406201144.289A1A14@keescook>
 References: <20240619192131.do.115-kees@kernel.org>
  <20240619193357.1333772-2-kees@kernel.org>
  <7f122473-3d36-401d-8df4-02d981949f00@suse.cz>
+ <88954479-01a3-4bbe-8558-1a71b11503f8@suse.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,79 +75,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7f122473-3d36-401d-8df4-02d981949f00@suse.cz>
+In-Reply-To: <88954479-01a3-4bbe-8558-1a71b11503f8@suse.cz>
 
-On Thu, Jun 20, 2024 at 03:08:32PM +0200, Vlastimil Babka wrote:
-> On 6/19/24 9:33 PM, Kees Cook wrote:
-> > Introduce CONFIG_SLAB_BUCKETS which provides the infrastructure to
-> > support separated kmalloc buckets (in the following kmem_buckets_create()
-> > patches and future codetag-based separation). Since this will provide
-> > a mitigation for a very common case of exploits, enable it by default.
+On Thu, Jun 20, 2024 at 03:37:31PM +0200, Vlastimil Babka wrote:
+> On 6/20/24 3:08 PM, Vlastimil Babka wrote:
+> > On 6/19/24 9:33 PM, Kees Cook wrote:
+> > I was wondering why I don't see the buckets in slabinfo and turns out it was
+> > SLAB_MERGE_DEFAULT. It would probably make sense for SLAB_MERGE_DEFAULT to
+> > depends on !SLAB_BUCKETS now as the merging defeats the purpose, wdyt?
 > 
-> No longer "enable it by default".
+> Hm I might have been just blind, can see them there now. Anyway it probably
+> doesn't make much sense to have SLAB_BUCKETS and/or RANDOM_KMALLOC_CACHES
+> together with SLAB_MERGE_DEFAULT?
 
-Whoops! Yes, thank you.
+It's already handled so that the _other_ caches can still be merged if
+people want it. See new_kmalloc_cache():
 
-> 
-> > 
-> > To be able to choose which buckets to allocate from, make the buckets
-> > available to the internal kmalloc interfaces by adding them as the
-> > first argument, rather than depending on the buckets being chosen from
-> 
-> second argument now
-
-Fixed.
-
-> 
-> > the fixed set of global buckets. Where the bucket is not available,
-> > pass NULL, which means "use the default system kmalloc bucket set"
-> > (the prior existing behavior), as implemented in kmalloc_slab().
-> > 
-> > To avoid adding the extra argument when !CONFIG_SLAB_BUCKETS, only the
-> > top-level macros and static inlines use the buckets argument (where
-> > they are stripped out and compiled out respectively). The actual extern
-> > functions can then been built without the argument, and the internals
-> > fall back to the global kmalloc buckets unconditionally.
-> 
-> Also describes the previous implementation and not the new one?
-
-I think this still describes the implementation: the macros are doing
-this work now. I wanted to explain in the commit log why the "static
-inline"s still have explicit arguments (they will vanish during
-inlining), as they are needed to detect the need for the using the
-global buckets.
-
-> > --- a/mm/Kconfig
-> > +++ b/mm/Kconfig
-> > @@ -273,6 +273,22 @@ config SLAB_FREELIST_HARDENED
-> >  	  sacrifices to harden the kernel slab allocator against common
-> >  	  freelist exploit methods.
-> >  
-> > +config SLAB_BUCKETS
-> > +	bool "Support allocation from separate kmalloc buckets"
-> > +	depends on !SLUB_TINY
-> > +	help
-> > +	  Kernel heap attacks frequently depend on being able to create
-> > +	  specifically-sized allocations with user-controlled contents
-> > +	  that will be allocated into the same kmalloc bucket as a
-> > +	  target object. To avoid sharing these allocation buckets,
-> > +	  provide an explicitly separated set of buckets to be used for
-> > +	  user-controlled allocations. This may very slightly increase
-> > +	  memory fragmentation, though in practice it's only a handful
-> > +	  of extra pages since the bulk of user-controlled allocations
-> > +	  are relatively long-lived.
-> > +
-> > +	  If unsure, say Y.
-> 
-> I was wondering why I don't see the buckets in slabinfo and turns out it was
-> SLAB_MERGE_DEFAULT. It would probably make sense for SLAB_MERGE_DEFAULT to
-> depends on !SLAB_BUCKETS now as the merging defeats the purpose, wdyt?
-
-You mention this was a misunderstanding in the next email, but just to
-reply here: I explicitly use SLAB_NO_MERGE, so if it ever DOES become
-invisible, then yes, that would be unexpected!
-
-Thanks for the review!
+#ifdef CONFIG_RANDOM_KMALLOC_CACHES
+        if (type >= KMALLOC_RANDOM_START && type <= KMALLOC_RANDOM_END)
+                flags |= SLAB_NO_MERGE;
+#endif
 
 -- 
 Kees Cook
