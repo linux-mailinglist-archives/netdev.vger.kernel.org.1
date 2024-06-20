@@ -1,94 +1,143 @@
-Return-Path: <netdev+bounces-105448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E56191134B
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 22:35:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 353E89114D8
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 23:41:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F4DA1F21D44
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 20:35:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89EE8B21DBF
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 21:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230E250A62;
-	Thu, 20 Jun 2024 20:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEFDD80605;
+	Thu, 20 Jun 2024 21:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="h2seSato"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Gokl7aVG"
 X-Original-To: netdev@vger.kernel.org
-Received: from submarine.notk.org (62-210-214-84.rev.poneytelecom.eu [62.210.214.84])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD0555880;
-	Thu, 20 Jun 2024 20:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0DA67B3FE
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 21:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718915727; cv=none; b=M7f3Jv67ZT1YigwqOkIqS/OmIUCZJSku/W7piXL2AAHi6qbl9nULQcoKgbaGyEWnwb/JSxbhLTxKhPdc1SPa2j/o2XI/wGWDE8KrF213pNc7jQABCQDfvb2hrj3oR1MQ3G1n5muz28WMX4rnfTU1dieJ9Ux50Dz9WRWXA430Rrw=
+	t=1718919690; cv=none; b=sB9bLnVVViEzO4wawI6J/KwF1qLk8O15Ugi4AYfJgmkcIQd5aej9WBdYMXCYMcmMb9g4Fz+suIiebjMiUn0lzjls7pdIGWFcu9LePRswkjLYYizn+RBPYmBl0jA3Zxqqg1w6ewfh2tAcXxhCMwyiJ5lJ9Tak4Ny0UMO8fdY5J/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718915727; c=relaxed/simple;
-	bh=rY6eGqJ75wEmGu1HgeNvbS4fJ9EDXfDA5wrtzZT6MjI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sN85Nz/t2T5VP9AGGPpC63OHtDlA+/IZYAaUevHidnT3AvOpC4Q08z7WjdoFLAzGyPyEtHoKq5GAERHAPakJu/T5OoMzHAgPNt1Br4JSz50VPlMlIEI0tHnOAKNg20BejX4QZ0CoSxiLaop++MreoPq98ezkCRK761D596v7rrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=h2seSato; arc=none smtp.client-ip=62.210.214.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
-Received: from gaia.codewreck.org (localhost [127.0.0.1])
-	by submarine.notk.org (Postfix) with ESMTPS id CB8F014C2DD;
-	Thu, 20 Jun 2024 22:35:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
-	s=2; t=1718915715;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UaFyOqx3Wna3PHffZA3lbOwaWZobih6I6zyfeyta8vg=;
-	b=h2seSatoOQGsC1oNd084UzbsoydUhd9vEuvTIVA67+KxCi+z8q0IS0pjF2KDpOyEXXn6xC
-	V5F5tFKch54wcT/63BHhocLiZ4AACqT7Li3GdqjRb9Uoce/o9dTPxiHGE3wZwgzlrvpbcq
-	r+1Z8DInjQu2mvVXoWl5Vtyzy4YtD5CUQZ+l8QQu5f6ZIOEm7+irf9TT9TglH+VFtK9Bf0
-	bUxiZ+0w0EPSZyZ4qOyV46FOnADlcelQ9/eQBgzAH5dQg48/EYTHDT1P+dqnsewYmXODfm
-	X8KMzeUD8xxj/M3UhmTOhPXsiVwITjND5inF4G6cZ4fpaCqg3uxxlbubVPnIGw==
-Received: from localhost (gaia.codewreck.org [local])
-	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 9c0e7542;
-	Thu, 20 Jun 2024 20:35:04 +0000 (UTC)
-Date: Fri, 21 Jun 2024 05:34:49 +0900
-From: Dominique Martinet <asmadeus@codewreck.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>
-Subject: Re: [PATCH 06/17] 9p: Enable multipage folios
-Message-ID: <ZnSSaeLo8dY7cu3W@codewreck.org>
-References: <20240620173137.610345-1-dhowells@redhat.com>
- <20240620173137.610345-7-dhowells@redhat.com>
+	s=arc-20240116; t=1718919690; c=relaxed/simple;
+	bh=QnnL26dOUAqeQf9zptzGTmYg/Rb9IZnVj7E1rjhJZz4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ubfd+YWSb42KBtGH1WNOKI9uQtsyrdffOH0tAYt4SMKYC1LJ3v06u2UG+vhjxCTI1dyHzPQqcvuRmik/DsTJbjJcv+vMdA+sCq9BxNEn4LDfJdAoJNVL9Engyd8fBnQmtcpDzV0OvXReNoq8kXiuTThb1Yc9z37N8xViOtRdTgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Gokl7aVG; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1sKOVn-003C5E-Dk; Thu, 20 Jun 2024 22:36:03 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=59TvHWSFE50VsiuZO6ZXvmcCceoNEBExf2TcKujTM1A=; b=Gokl7aVGfGoKva+RRjqlf+5yER
+	XZadCePxg7ynaHBak0oJVywWPqcmJEKFMenkas4qcPlLnC8hAulbKL5G0+kE2q74PvluCcuRXu+I/
+	K8k2mLG64xttKicz0mm8rpmZsIbvuUA5wZOrC6odp7rYomGo9UzaannU5+lr1kasAwnUoDiqfN+7K
+	pdDRfJJF2nKI36fIdZJaoOf8MFJLehlcGSAQyrwxENgSlNuEiYeKGXiQ+D32gssVEOJUMTQ3NvScw
+	q7mOoaL4em+nhKTlX1yDvthA2OF9LT6uWUBEWvi0sWcmdEWaLcZerC63Ps1cj+h95/D54o5TBDl+c
+	66JE5b+A==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1sKOVm-0008TL-Ir; Thu, 20 Jun 2024 22:36:02 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1sKOVh-000skJ-7k; Thu, 20 Jun 2024 22:35:57 +0200
+Message-ID: <b29d7ead-6e2c-4a52-9a0a-56892e0015b6@rbox.co>
+Date: Thu, 20 Jun 2024 22:35:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240620173137.610345-7-dhowells@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net 01/15] af_unix: Set sk->sk_state under
+ unix_state_lock() for truly disconencted peer.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: cong.wang@bytedance.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
+ pabeni@redhat.com
+References: <17997c8f-bba1-4597-85c7-5d76de63a7a7@rbox.co>
+ <20240619191930.99009-1-kuniyu@amazon.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20240619191930.99009-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-David Howells wrote on Thu, Jun 20, 2024 at 06:31:24PM +0100:
-> Enable support for multipage folios on the 9P filesystem.  This is all
-> handled through netfslib and is already enabled on AFS and CIFS also.
+On 6/19/24 21:19, Kuniyuki Iwashima wrote:
+> From: Michal Luczaj <mhal@rbox.co>
+> Date: Wed, 19 Jun 2024 20:14:48 +0200
+>> On 6/17/24 20:21, Kuniyuki Iwashima wrote:
+>>> From: Michal Luczaj <mhal@rbox.co>
+>>> Date: Mon, 17 Jun 2024 01:28:52 +0200
+>>>> (...)
+>>>> Another AF_UNIX sockmap issue is with OOB. When OOB packet is sent, skb is
+>>>> added to recv queue, but also u->oob_skb is set. Here's the problem: when
+>>>> this skb goes through bpf_sk_redirect_map() and is moved between socks,
+>>>> oob_skb remains set on the original sock.
+>>>
+>>> Good catch!
+>>>
+>>>>
+>>>> [   23.688994] WARNING: CPU: 2 PID: 993 at net/unix/garbage.c:351 unix_collect_queue+0x6c/0xb0
+>>>> [   23.689019] CPU: 2 PID: 993 Comm: kworker/u32:13 Not tainted 6.10.0-rc2+ #137
+>>>> [   23.689021] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
+>>>> [   23.689024] Workqueue: events_unbound __unix_gc
+>>>> [   23.689027] RIP: 0010:unix_collect_queue+0x6c/0xb0
+>>>>
+>>>> I wanted to write a patch, but then I realized I'm not sure what's the
+>>>> expected behaviour. Should the oob_skb setting follow to the skb's new sock
+>>>> or should it be dropped (similarly to what is happening today with
+>>>> scm_fp_list, i.e. redirect strips inflights)?
+>>>
+>>> The former will require large refactoring as we need to check if the
+>>> redirect happens for BPF_F_INGRESS and if the redirected sk is also
+>>> SOCK_STREAM etc.
+>>>
+>>> So, I'd go with the latter.  Probably we can check if skb is u->oob_skb
+>>> and drop OOB data and retry next in unix_stream_read_skb(), and forbid
+>>> MSG_OOB in unix_bpf_recvmsg().
+>>> (...)
+>>
+>> Yeah, sounds reasonable. I'm just not sure I understand the retry part. For
+>> each skb_queue_tail() there's one ->sk_data_ready() (which does
+>> ->read_skb()). Why bother with a retry?
+> 
+> Exactly.
+> 
+> 
+>>
+>> This is what I was thinking:
+>>
+> 
+> When you post it, please make sure to CC bpf@ and sockmap maintainers too.
 
-Since this is fairly unrelated to the other patches let's take this
-through the 9p tree as well - I'll run some quick tests to verify writes
-go from 4k to something larger and it doesn't blow up immediately and
-push it out for 6.11
+Done: https://lore.kernel.org/netdev/20240620203009.2610301-1-mhal@rbox.co/
+Thanks!
 
--- 
-Dominique Martinet | Asmadeus
+In fact, should I try to document those not-so-obvious OOB/sockmap
+interaction? And speaking of documentation, an astute reader noted that
+`man unix` is lying:
+
+  Sockets API
+       ...
+       UNIX domain sockets do not support the transmission of out-of-band
+       data (the MSG_OOB flag for send(2) and recv(2)).
+
+  NOTES
+       ...
+       UNIX domain stream sockets do not support the notion of out-of-band
+       data.
+
 
