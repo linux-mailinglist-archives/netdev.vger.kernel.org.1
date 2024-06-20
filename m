@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-105286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F03A79105F8
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 15:30:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7519C9105F9
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 15:30:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C7D7B254A4
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 13:30:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5E64B254FA
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 13:30:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1ADB1AE09E;
-	Thu, 20 Jun 2024 13:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D9591B0131;
+	Thu, 20 Jun 2024 13:27:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Iu+BhHR+";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="viOBfUUz"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="XNa4GuHh";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="jT4KPXDZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F631AD4B2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48FAD1AD4B4;
 	Thu, 20 Jun 2024 13:27:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718890054; cv=none; b=jXOW72iwuqSFPIR9I3CZZUAbCXa6fL/gsWGmbZy9bHAMUt4sBZB5Z4BRwdC8NIdc1Fjn7TRZDJjowA4KAfflO8b54LmL7bssFREKPKa9KJ+o7Fv/dp8evAmvD6m8oa7BiqnURPE9l9ctVFS2YPhX40Rxaz/uPuG8SHH3BHBYzCs=
+	t=1718890055; cv=none; b=cdKPk76irtZBlOfHdYpawPTRak1KxCr73bpxBco6jCG/JnTFKgkRyHOHh8e7fElz84oRYF5+fm9RA4zpHUUWx5k8dq5Se01RBXERxK5RJ20ZxocDFTpAmC+/49p4374yZpAzpq29zRlwHwJJZRO8cJDYH1JMj91Jlt/S75albQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718890054; c=relaxed/simple;
-	bh=QtDo2HGf/L9ZrehLlTcmQLPQAAZesi1sG/KKDX+fAmQ=;
+	s=arc-20240116; t=1718890055; c=relaxed/simple;
+	bh=TUaiPkkM8WJf7rKO603nNckjg49+kh9f/OI9R0157YE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NQH2yhNPXmowGRAb6kcnpfp+vx9c6SionuOcf6FvyQVfllgKfBnEpCcQ9gp4nWsWSrwDl7aRrV+HLzZ++zdY02K6lUczpA7DN3KfzxIb4XWqNrQa5C8hxO+HB+XrG6JACNV+AfscEdh4hig/h0z4Lf9beznDf1oiyxrSSjlExzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Iu+BhHR+; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=viOBfUUz; arc=none smtp.client-ip=193.142.43.55
+	 MIME-Version; b=BEXR7sTRkhlRCLZKgb30KNXBzQdo+ZFdVlDHVMna3DC2mVktDoRR8zrEbLkrfDF1lhVK/RUjzN2j14cl+56XXqNi3GvjNf1tSx2a8Rj1pU5Tvpd5xIt6M7Lu0VPiH+om+EE5YlhAO6pM1firicoUEEar6yAG8KgmYTgaGf+kPy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=XNa4GuHh; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=jT4KPXDZ; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1718890050;
+	s=2020; t=1718890051;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tfO9IgURCOa8OwNF0E1ITtjXLEOyfn4YupkCPqbnlWQ=;
-	b=Iu+BhHR+exSVGuq/KMmF/Dbbc1HOfqaV3pDO2MeW2207Uxwq9mOl5qRJH/eEQmnz5fsMEO
-	ouIJENjS5V2JTMx2s0wx6veaJ4+2qBZM84OnCsDzf0Mts+kAoiwxGvN//Sl4oLEq3oixPg
-	CCVV4uKLfL2pRylXYub4EfAgGTsFVD5DwEI26eVrHeyqvU5B3S+zpCYhK7qz3SA9wXj879
-	6Uii07zAGZM5tUbkshq3ENk8WJTKhRHdPkHdFliEZ7p24GmVWzj6+zauDbP6eddkC3bs3o
-	7EnWVwZFr1EAMR27na7OIWMACflekUZKzGOdOdUl6abICPgj86ZEPxxrXEa7Gw==
+	bh=QYWIfeqNspAVknrPforo5Z5uQh9q0Xi+NKd9xdScEZI=;
+	b=XNa4GuHhLFSUwkuwk/0MuKgJRCvVvBZpS+mEi/0gKtAqMywpvPLg5S+h5Ilo4yqw/Luf/X
+	K/b2H+t++vVtvJ60NgZrA1bWwX5D0GpidYc/L0/Zr/kgdcD47nqsikCRUFMZARYTYBJOlg
+	PDa0KGUEd2jIQr6ZyCcK5ZJJammy10BZ/sxAB/rvCwM6mjfOW/Pocqty58KBuig1uH3dLf
+	53FOW6f7AchEq0iSHqC70vLT5qt6KV33Y5Y8A38N1eEPlhskAma35J26gMb63pbKF2CznK
+	WCPzHQ89k0CrLH8mN3WcwFiJGXeNan7MWFvANAifxmCeAwiHs1Hd+msRGN+KZw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1718890050;
+	s=2020e; t=1718890051;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tfO9IgURCOa8OwNF0E1ITtjXLEOyfn4YupkCPqbnlWQ=;
-	b=viOBfUUz6Inq0vWV+pee4amjwEtJKZexqFS3ZUkr6dzWCjfn3aT1WRHBLAb9z+osGuz2n6
-	s9A+l5gF0jJ4+ADw==
+	bh=QYWIfeqNspAVknrPforo5Z5uQh9q0Xi+NKd9xdScEZI=;
+	b=jT4KPXDZe44bQ9hvZ6q1TwegY8ADVqSOlATplVq32iOM5cbUM0gwYm0dKDYLe+CirH2h19
+	ysibj4eLa7giO5CQ==
 To: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -70,9 +70,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Waiman Long <longman@redhat.com>,
 	Will Deacon <will@kernel.org>,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH v9 net-next 03/15] net: Use __napi_alloc_frag_align() instead of open coding it.
-Date: Thu, 20 Jun 2024 15:21:53 +0200
-Message-ID: <20240620132727.660738-4-bigeasy@linutronix.de>
+Subject: [PATCH v9 net-next 04/15] net: Use nested-BH locking for napi_alloc_cache.
+Date: Thu, 20 Jun 2024 15:21:54 +0200
+Message-ID: <20240620132727.660738-5-bigeasy@linutronix.de>
 In-Reply-To: <20240620132727.660738-1-bigeasy@linutronix.de>
 References: <20240620132727.660738-1-bigeasy@linutronix.de>
 Precedence: bulk
@@ -83,45 +83,139 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The else condition within __netdev_alloc_frag_align() is an open coded
-__napi_alloc_frag_align().
+napi_alloc_cache is a per-CPU variable and relies on disabled BH for its
+locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
+this data structure requires explicit locking.
 
-Use __napi_alloc_frag_align() instead of open coding it.
-Move fragsz assignment before page_frag_alloc_align() invocation because
-__napi_alloc_frag_align() also contains this statement.
+Add a local_lock_t to the data structure and use local_lock_nested_bh()
+for locking. This change adds only lockdep coverage and does not alter
+the functional behaviour for !PREEMPT_RT.
 
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
- net/core/skbuff.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ net/core/skbuff.c | 29 ++++++++++++++++++++++++-----
+ 1 file changed, 24 insertions(+), 5 deletions(-)
 
 diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 2315c088e91d0..1b52f69ad05e2 100644
+index 1b52f69ad05e2..eb9a7e65b5c81 100644
 --- a/net/core/skbuff.c
 +++ b/net/core/skbuff.c
-@@ -318,19 +318,15 @@ void *__netdev_alloc_frag_align(unsigned int fragsz, =
-unsigned int align_mask)
+@@ -277,6 +277,7 @@ static void *page_frag_alloc_1k(struct page_frag_1k *nc=
+, gfp_t gfp_mask)
+ #endif
+=20
+ struct napi_alloc_cache {
++	local_lock_t bh_lock;
+ 	struct page_frag_cache page;
+ 	struct page_frag_1k page_small;
+ 	unsigned int skb_count;
+@@ -284,7 +285,9 @@ struct napi_alloc_cache {
+ };
+=20
+ static DEFINE_PER_CPU(struct page_frag_cache, netdev_alloc_cache);
+-static DEFINE_PER_CPU(struct napi_alloc_cache, napi_alloc_cache);
++static DEFINE_PER_CPU(struct napi_alloc_cache, napi_alloc_cache) =3D {
++	.bh_lock =3D INIT_LOCAL_LOCK(bh_lock),
++};
+=20
+ /* Double check that napi_get_frags() allocates skbs with
+  * skb->head being backed by slab, not a page fragment.
+@@ -306,11 +309,16 @@ void napi_get_frags_check(struct napi_struct *napi)
+ void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_mask)
  {
- 	void *data;
+ 	struct napi_alloc_cache *nc =3D this_cpu_ptr(&napi_alloc_cache);
++	void *data;
 =20
--	fragsz =3D SKB_DATA_ALIGN(fragsz);
- 	if (in_hardirq() || irqs_disabled()) {
- 		struct page_frag_cache *nc =3D this_cpu_ptr(&netdev_alloc_cache);
+ 	fragsz =3D SKB_DATA_ALIGN(fragsz);
 =20
-+		fragsz =3D SKB_DATA_ALIGN(fragsz);
- 		data =3D __page_frag_alloc_align(nc, fragsz, GFP_ATOMIC,
- 					       align_mask);
+-	return __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC,
++	local_lock_nested_bh(&napi_alloc_cache.bh_lock);
++	data =3D __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC,
+ 				       align_mask);
++	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
++	return data;
++
+ }
+ EXPORT_SYMBOL(__napi_alloc_frag_align);
+=20
+@@ -338,16 +346,20 @@ static struct sk_buff *napi_skb_cache_get(void)
+ 	struct napi_alloc_cache *nc =3D this_cpu_ptr(&napi_alloc_cache);
+ 	struct sk_buff *skb;
+=20
++	local_lock_nested_bh(&napi_alloc_cache.bh_lock);
+ 	if (unlikely(!nc->skb_count)) {
+ 		nc->skb_count =3D kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
+ 						      GFP_ATOMIC,
+ 						      NAPI_SKB_CACHE_BULK,
+ 						      nc->skb_cache);
+-		if (unlikely(!nc->skb_count))
++		if (unlikely(!nc->skb_count)) {
++			local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
+ 			return NULL;
++		}
+ 	}
+=20
+ 	skb =3D nc->skb_cache[--nc->skb_count];
++	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
+ 	kasan_mempool_unpoison_object(skb, kmem_cache_size(net_hotdata.skbuff_cac=
+he));
+=20
+ 	return skb;
+@@ -740,9 +752,13 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *=
+dev, unsigned int len,
+ 		pfmemalloc =3D nc->pfmemalloc;
  	} else {
--		struct napi_alloc_cache *nc;
--
  		local_bh_disable();
--		nc =3D this_cpu_ptr(&napi_alloc_cache);
--		data =3D __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC,
--					       align_mask);
-+		data =3D __napi_alloc_frag_align(fragsz, align_mask);
++		local_lock_nested_bh(&napi_alloc_cache.bh_lock);
++
+ 		nc =3D this_cpu_ptr(&napi_alloc_cache.page);
+ 		data =3D page_frag_alloc(nc, len, gfp_mask);
+ 		pfmemalloc =3D nc->pfmemalloc;
++
++		local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
  		local_bh_enable();
  	}
- 	return data;
+=20
+@@ -806,11 +822,11 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *na=
+pi, unsigned int len)
+ 		goto skb_success;
+ 	}
+=20
+-	nc =3D this_cpu_ptr(&napi_alloc_cache);
+-
+ 	if (sk_memalloc_socks())
+ 		gfp_mask |=3D __GFP_MEMALLOC;
+=20
++	local_lock_nested_bh(&napi_alloc_cache.bh_lock);
++	nc =3D this_cpu_ptr(&napi_alloc_cache);
+ 	if (NAPI_HAS_SMALL_PAGE_FRAG && len <=3D SKB_WITH_OVERHEAD(1024)) {
+ 		/* we are artificially inflating the allocation size, but
+ 		 * that is not as bad as it may look like, as:
+@@ -832,6 +848,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi=
+, unsigned int len)
+ 		data =3D page_frag_alloc(&nc->page, len, gfp_mask);
+ 		pfmemalloc =3D nc->page.pfmemalloc;
+ 	}
++	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
+=20
+ 	if (unlikely(!data))
+ 		return NULL;
+@@ -1431,6 +1448,7 @@ static void napi_skb_cache_put(struct sk_buff *skb)
+ 	if (!kasan_mempool_poison_object(skb))
+ 		return;
+=20
++	local_lock_nested_bh(&napi_alloc_cache.bh_lock);
+ 	nc->skb_cache[nc->skb_count++] =3D skb;
+=20
+ 	if (unlikely(nc->skb_count =3D=3D NAPI_SKB_CACHE_SIZE)) {
+@@ -1442,6 +1460,7 @@ static void napi_skb_cache_put(struct sk_buff *skb)
+ 				     nc->skb_cache + NAPI_SKB_CACHE_HALF);
+ 		nc->skb_count =3D NAPI_SKB_CACHE_HALF;
+ 	}
++	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
+ }
+=20
+ void __napi_kfree_skb(struct sk_buff *skb, enum skb_drop_reason reason)
 --=20
 2.45.2
 
