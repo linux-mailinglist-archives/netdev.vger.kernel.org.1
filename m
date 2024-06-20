@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-105124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DDEC90FC4D
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 07:48:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C23390FC4E
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 07:48:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434D01C21102
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 05:48:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A0A7282490
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 05:48:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A90D738385;
-	Thu, 20 Jun 2024 05:48:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5432E2C1A2;
+	Thu, 20 Jun 2024 05:48:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="OJRZdYbS"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lQWHwsbj"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2075.outbound.protection.outlook.com [40.107.93.75])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2056.outbound.protection.outlook.com [40.107.243.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D805E381DE
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 05:48:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEAE381DE
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 05:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.56
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718862500; cv=fail; b=K8+wkb/074/YxN5vwC68o1einp/GNtNpX2MdhCif6fzPo8SBFJat6sclaHZfU4OJUd21QfJ9WxCuCbI3Zg9izVmtn2jIBHY4XTVVwiIdSOyaJKEZ5YQxfKw39/YhghRfokLakouXueNQSTlsEb+OXfuusU+KCe7fcYT+rB228T8=
+	t=1718862506; cv=fail; b=QanTNqLLRAfHGAuYPqMKNkQM+DTQvMGNXfR95As7+JXTGnOAb25c3UNj43DS18PVfMV/rw1QFysGv1otXHTeBu1ecP8yQrZUwQLtuooC852h/4GsxUMaxi4iqNxhtW8Kjp1fTDhMkofiC0QtgqS37X5u2VsNRCiHzArLlndb5zk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718862500; c=relaxed/simple;
-	bh=K2lbEuHcgFmq46cQqGh/D0XHvl/WsPue3D7qyWPfiPA=;
+	s=arc-20240116; t=1718862506; c=relaxed/simple;
+	bh=eWypaym2s8orOMUBXf/FghP6jb79VJJdmruEKD6tWUg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I0O9ICV0+izYRGr1K/pUkgwauQTigS/Cou55e0kqGwiVV3pBHRmsmLvs/bqCv6JoZboNasMpGhBl/p1i/c08VkThd98xDTELlQb3oX2uOnmGH8wBhRb+xaWaz+JiL6zqssqEaMJLAFRcenIYiBgXhuzXb9YerEHAd+XBU2Pg1ro=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=OJRZdYbS; arc=fail smtp.client-ip=40.107.93.75
+	 MIME-Version:Content-Type; b=XEU6qFCNBepKhVq9/u7dsG+qt6uNqjmj3ktDoO47/DrGbUlpRqLVmMZbLQdJ8fxdVynuTzxN2OmFPB/SVwIswLZB6RcwPxJXp/PAecB0P1agrrOyhV7rGgalBT1LhgNBMj7C7prSttoy28TsYHMfpESp2+T7aeGtIJIAYdYrwEw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=lQWHwsbj; arc=fail smtp.client-ip=40.107.243.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MAf4nNSosxedPKiQy5OVVf+iug4yv8tNNgzlEmE0BQPdvhwVFtjF8lQUXOJN8fApyRJhgteO8MOATsO0L1CCUl1youFlN9prycncPfTnwjLcPZQgzQOTLc8xDUF4sIt7sxtOzAl0l2apankKtTCtn86H+DIPb/oZXdvOHBK3QJcIJiddYexwyRZTxVZDPJ0G8NcU7ykmr7riQb/iTUNHpbMX3PCHFIjFHc3zVM9Vf6IwOqBeyv1dZvGDcedAwV04w5LyA1x2OyQh2AY6PbF0B5vR7lD1LdNhHLr9mqBslvoR4BgzX1owHv04ST2TADic5ryhZ6AOsDTse3YwnsL17A==
+ b=OjWLg0OF7ePI3ul7Mr3kyaMfNiaG/44hwC2Zdn+Jn8SiwUu/ihEhRMRzMzrJinTv6OGfPMVtMbU2pXZiesPui/bpBzk1UaPLcTGrZrhzJwocgJXggQpo8jAyx+KOVHfWd+55II0zQ+oeGKy+4dSZXXwiTexnMBCyf3FHUemFXXd2AJtEa1aEIBbO4+eavcYWDUVZYQus3myOtb1xXrIgHxiYzlAOxdBvo2elL+nsGOayFVVd3D7xZSlu9qofb8y3WqnjHbeFY2Z3lfmv3cdWwCbaib2nz/tGCwBmPy9N81tA87qA1Gvw5tAkVGix9LYO1J6PWHZHefT9UBOGZQQMTQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xl2O1y5Fp85cOgybWxSQrtQD9aT3utB2CiihAy+Sp60=;
- b=WeBb2vzEs8PMSRzAl5smZnzb/7ZuxMs+Nofsr5kCYBerarqZBv4ThLpRKJHD3N8u9YjUjLVKXrrqtV9gqCtBV0o0HTlw7uO1G6tOUIL0QL4AxxLx3370JIc4AqM92mLitFQr7f5jIKotCPNcSTABqJBFUlHxnYI9Kzy4Bsn5DI+CXh0V8cDJ3MTM7k0M2tsKVrP0Z42UiTIPc7oaG2MTr9565WnvrBY0sG3ID+fpGQrBdQfZMort+wB/bETL+eUxyZ45iwr5Vk8YJ5F7Ge+pkBtW/kITluYXAzBD6NnSJh68tCOhaaPNJzjqr2e6EIqcuNL47awWA7vPcmoJZZVCBw==
+ bh=dFq57EWAndgbrx6514onzvsi0JD7kTNtlRoPzCGnB80=;
+ b=eOO63ZLsQE8bvIIC6VjmwpOH1aTcepXxhtLRN4r5PVQOC85ba1cxxn3KcZd49LWe/pRuu8kFeBfxVLurkb36EShU+PVHKE3p4lWsY8TXNPgzVNdPaTvQVOTwHqZ+PC58YRgX9KF9wkE2hH/8dUJx2+7figTrzVIZyqEgu8ZAAfTccq3DL2SpI0zgSnSK+raYp7cmsNtCXdBCEAh70e3/ix43VPv+fC4rWRym4b1nFBO/76y65HQOiiSCtcTrgal1Se8jIuSQmu4aV8BN7TXY5Bysk6gD9benUrhzfJ6h/sWQtOos6gSzSlBaAOF93PN5vzogmazOyHt3VxKHJPpeSQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xl2O1y5Fp85cOgybWxSQrtQD9aT3utB2CiihAy+Sp60=;
- b=OJRZdYbSzfXYtOkBlBWpQbsS5lDtjLFHbltzR7NHvr1NqZWC7Ke2zEQehUdnFWeePlAcRjvSYcV3RLv6+uEWVggS9ximEr/Zd8vvbWv0SB/6N4vaIb/BTuLx4Uv1dvV8NlMrYqfFkLBsXn/ajritjoqEjPm82YKARBTkSZrU16I=
-Received: from SJ0PR05CA0039.namprd05.prod.outlook.com (2603:10b6:a03:33f::14)
- by MW6PR12MB8758.namprd12.prod.outlook.com (2603:10b6:303:23d::18) with
+ bh=dFq57EWAndgbrx6514onzvsi0JD7kTNtlRoPzCGnB80=;
+ b=lQWHwsbjE75zpsDvBQp+yiOxyTjIwMTZsZETioF3ibznHblNDgrk9FSK3NqIyIBWcdrrzpADIpUleoH6HZcz1D7k3ET+NueuSLMu5lXcIV95I+c4KiOc0Ld76zdQ98xDqqbmRrA1pj4M6i/cG8BXHND+Rje5ji/6t8cEYMEPmdk=
+Received: from SJ0PR03CA0097.namprd03.prod.outlook.com (2603:10b6:a03:333::12)
+ by BL1PR12MB5851.namprd12.prod.outlook.com (2603:10b6:208:396::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.32; Thu, 20 Jun
- 2024 05:48:16 +0000
-Received: from SJ1PEPF00001CE0.namprd05.prod.outlook.com
- (2603:10b6:a03:33f:cafe::10) by SJ0PR05CA0039.outlook.office365.com
- (2603:10b6:a03:33f::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31 via Frontend
- Transport; Thu, 20 Jun 2024 05:48:16 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Thu, 20 Jun
+ 2024 05:48:19 +0000
+Received: from SJ1PEPF00001CDD.namprd05.prod.outlook.com
+ (2603:10b6:a03:333:cafe::23) by SJ0PR03CA0097.outlook.office365.com
+ (2603:10b6:a03:333::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.33 via Frontend
+ Transport; Thu, 20 Jun 2024 05:48:18 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,17 +63,17 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF00001CE0.mail.protection.outlook.com (10.167.242.8) with Microsoft
+ SJ1PEPF00001CDD.mail.protection.outlook.com (10.167.242.5) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7677.15 via Frontend Transport; Thu, 20 Jun 2024 05:48:16 +0000
+ 15.20.7677.15 via Frontend Transport; Thu, 20 Jun 2024 05:48:18 +0000
 Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 20 Jun
- 2024 00:48:14 -0500
+ 2024 00:48:17 -0500
 Received: from xcbecree42x.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39 via Frontend
- Transport; Thu, 20 Jun 2024 00:48:12 -0500
+ Transport; Thu, 20 Jun 2024 00:48:15 -0500
 From: <edward.cree@amd.com>
 To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>
@@ -83,9 +83,9 @@ CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>,
 	<sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
 	<hkelam@marvell.com>, <saeedm@nvidia.com>, <leon@kernel.org>,
 	<jacob.e.keller@intel.com>, <andrew@lunn.ch>, <ahmed.zaki@intel.com>
-Subject: [PATCH v6 net-next 6/9] net: ethtool: add a mutex protecting RSS contexts
-Date: Thu, 20 Jun 2024 06:47:09 +0100
-Message-ID: <6781c564c4629c2ed9c201ab7b67296baddfded2.1718862050.git.ecree.xilinx@gmail.com>
+Subject: [PATCH v6 net-next 7/9] sfc: use new rxfh_context API
+Date: Thu, 20 Jun 2024 06:47:10 +0100
+Message-ID: <a7f5fe2c7f9c54cf44fcaf29c8ebe2ebb2c83ae4.1718862050.git.ecree.xilinx@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <cover.1718862049.git.ecree.xilinx@gmail.com>
 References: <cover.1718862049.git.ecree.xilinx@gmail.com>
@@ -101,150 +101,1014 @@ Received-SPF: None (SATLEXMB04.amd.com: edward.cree@amd.com does not designate
  permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE0:EE_|MW6PR12MB8758:EE_
-X-MS-Office365-Filtering-Correlation-Id: f4e3f356-ce2a-432f-53da-08dc90ec94b9
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDD:EE_|BL1PR12MB5851:EE_
+X-MS-Office365-Filtering-Correlation-Id: 247389db-6bf8-46bf-5f5d-08dc90ec9654
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230037|7416011|1800799021|376011|36860700010|82310400023;
+	BCL:0;ARA:13230037|7416011|376011|1800799021|36860700010|82310400023;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?k65RwiD8ZLVmtzjLPDXLy4oWzSgAP6/rBoVMnoab/YU5b5H83oIp/LmIogZs?=
- =?us-ascii?Q?s3EdbxUr2FdaHaH9n7ttiCeipiJxh5WIpzaglTnE3zoyxyXvYNYaFKr+fVij?=
- =?us-ascii?Q?8gwEyoFf9MmY7mypnZYdmbov2myXupf1cSWq/zdR9F5TnSL/RNct/u9ukEjc?=
- =?us-ascii?Q?3wDhqUWjxR+wpVVx9DQPn3E0fHmYjd+f8vwT7dzSEbesHrmNOqzvVuvMMC0i?=
- =?us-ascii?Q?/TE1ieNZHdbksAderI6iFUUXkPBMYEfG22uE37smKIpisKao9GwhC+6v7sWt?=
- =?us-ascii?Q?14lUCkiDi3i1jWBp81jlQSMQk//sJs6uK4WvJws37/d7O8KiTJtC06vzdwO+?=
- =?us-ascii?Q?+o16EevV0zo7X9jOMGhs1L3sehaPgRlLm1eUHvpSRBMT47H99AGeCznAaPt6?=
- =?us-ascii?Q?jPiQgtVomi3TSa/PU+bwPAOEguoPGxPTnieZWsB02PcX2nOMhoyyOQBxXsZE?=
- =?us-ascii?Q?ZQFZtuL8iUsnll6AT7y/poMn0gAqUOqgclVXphNoXHzyCm69OQXbkS+DJIkB?=
- =?us-ascii?Q?K/RUaO2/nwUSBp/oxAnADYmo3YqrxArUmANxTpKZWOeELl01zk5mZcefS0YX?=
- =?us-ascii?Q?uivm9n5xHj2UOIRojbTrQcvt89fsh+kH7tljbszOxkX84NQkdHnE/llMtRHw?=
- =?us-ascii?Q?P5+3V4sDwOylfUo7pjuzLN6vu2GZo5yN1YTXxG7SuOB9CUoEBYNyNPTZWBpC?=
- =?us-ascii?Q?tOJwGa7cPO7aj4TC7KH7HGqe2mUKe9yMJjxAIIocKuvkhVm0TH8laCWETg/y?=
- =?us-ascii?Q?ZG/v8cC37xbagEh+DUAPGACysYmafJOTFX5EPJM44sHy+30tvUjOaG6OT0rM?=
- =?us-ascii?Q?gU0sijtVrDFW9Hl2XlE+NtPB5F2O6af3vHY0Snxabq3KCuWrmC3JkBFMVP7L?=
- =?us-ascii?Q?gEyTf/EfBltIvypdylqc1VVLo9/zwtTjA5TGF4cGZNDRxTqu8/1ULll1xiPU?=
- =?us-ascii?Q?MKvltYbfPRbg/JD4Yfj1xHG5LIVjctzHauOTR8OlbPulAKnpExVzuayB0jbU?=
- =?us-ascii?Q?IJnWWmz0p86OnK4g6yrTyCBw/6q1t32p9xwG9lfXQv9d+TkvWivtcLKlO4Ch?=
- =?us-ascii?Q?LEhumKN7OdFNc93m0DmDJZzLTMUy/+02t0z5wm1K5+sfeMpA3ez3CPHQ1s/f?=
- =?us-ascii?Q?qq032BbxE82qIFHOJvO7FjKdhTmjv9eSDNx1xy4WE//ZQCpaJFOsJuaCiUFh?=
- =?us-ascii?Q?5qTsciAjlVVwtOuxnOiXx8RmFjZ6Rhj4TBv25NRE6yj54U5+rQc+kefy4JzJ?=
- =?us-ascii?Q?JpaUl55Pg4TxPJ2NJ+ul/oI2fYRaD7evWoVmjYdu87fiYpgyDjlxrz+YGoTA?=
- =?us-ascii?Q?1/1QmIXz7yI8Ni/zAIrBgAAB7PaLyOhB/xu9DbO0Hj3/3wgvNJ9bknVlkVd9?=
- =?us-ascii?Q?x5HVZ53nKzkcmwQDr5bv5Ho7mywVEnlh5GsnitLwxKKnWr7Odw=3D=3D?=
+	=?us-ascii?Q?YdwFCBjBNl0TYnLtwcZmUBfU7gkO+9EhGpTVi4lip3jzY+5PO+bS6IgwuxLE?=
+ =?us-ascii?Q?QT3kPesT1XxJcKAcu4RY93+YrfGIOsgcHIAr1mgWNnfm1l1fCO7QDh9KDK4Y?=
+ =?us-ascii?Q?yyeA3AOjR9bMZdsFEh1au+ZKqJnlIkJogd2FaZT2bwQ/C2AGetqYnpxzPpcO?=
+ =?us-ascii?Q?7Fm1NKNRk54jaeXBcykv9q8Cd7IjKwtSAi2o31ZWUv/mQwUoGRFjOAarN6ab?=
+ =?us-ascii?Q?0zjHEjWS74hTwBvpDeWrC7cBlc3l6xbsSZmIQPTCORy/11TawXd7DUYZPvut?=
+ =?us-ascii?Q?GzxUQymDQiUeDhOgKHhdXKJScB2VCW0uXIeYs5vSBPWeABi5G1wfVvYEL/Sl?=
+ =?us-ascii?Q?2+ihwvmmB5Tf90r+Oc4rF1Ne22SjAjG7LM3V4hNV9trO1wblVJL6+icAKO1V?=
+ =?us-ascii?Q?dXm8VMQmXt+ro9wsiAd522sluwV4epSMNtDU/a85WXtC+ozDDGOmHFpvFcX9?=
+ =?us-ascii?Q?K8vCrxiuLILmIJp17w7XrqlO/fLNIPTZZGtZsskEY8zh9lUsfH/ObX2ClyN9?=
+ =?us-ascii?Q?70vCbuf/c/NdAM7cl0la7iMscbQ/umCtLwi/H/MuN5c+1HMgFTLCGMJuNTQ4?=
+ =?us-ascii?Q?wxQXhvVtBno/debD+UmXeLkh9JmWTzFJItnVJJaiQUOzwZjTD7Uv57+/pTZN?=
+ =?us-ascii?Q?K3PvYOjb8wQIqaMvTJgzPbvtqbtvSoTiyygz7FzIau7Hjmcq/gOMCsWYPxbB?=
+ =?us-ascii?Q?k+1Gu56X0E1iHTf10wTWNbBgyXuHSSClzKKegVxS2y7QzSitmbwJ+JDaUpry?=
+ =?us-ascii?Q?4yJ96vX3PEAZsPYWNOVelSF3McFxIEneLNRzFr4LjqKI656QssAqtcdk+qs+?=
+ =?us-ascii?Q?PXMNwM+X/rFs33kEqfroDok6PcJylWLFcfl0KyH6VK5eRB79O2bjJOAsIcjS?=
+ =?us-ascii?Q?EIbO+jhi+ESSYPm9l/PuBXDWIlIOHqrHUhYYWGOR5uRp4qvxSJuGXMLvh2Bg?=
+ =?us-ascii?Q?jyKYmSMAwt1wjlMqfc/OnsF5NadSFKrpqAlNI0AoJrkvcQ4mWdtnY3vkFZys?=
+ =?us-ascii?Q?dTQ8w0ub/VhdwzN9xx2UDFAaf8C8RUpTRDlNMhOY6G/MjjgNSqKW73TL9nuk?=
+ =?us-ascii?Q?zA84+kDI40n4QpHY0hguPRyP7Yz39sG1PrypoGqZJLFyZc323r9cEvo8Dkfl?=
+ =?us-ascii?Q?gz7jhJDtKdtjExzrz6JvMxop2UpBFKzTx18ep+rBYCtHd1llaVq2KWmj3gcl?=
+ =?us-ascii?Q?7uTCthveMa2FHChKAGWX60DSyUR35/FqS7w52mf7H3piP2qJ2nSY4CHZjlvd?=
+ =?us-ascii?Q?Df7RO3f2Osn8Q+cC3rWfas96AZLFjFbWWMbH9iwFqm3VzE/lBS4NQMU5DATI?=
+ =?us-ascii?Q?RmtfK0DiZUyuyFrzu763zFbgZWihS52N7S+I9RXxJVKbuy2FK7jRaSNMrxBu?=
+ =?us-ascii?Q?0NGy3d72mZCLVUmbe5prkrwmlIBss/G28FMsCm4Y4nwTuIqD8Q=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(7416011)(1800799021)(376011)(36860700010)(82310400023);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(7416011)(376011)(1800799021)(36860700010)(82310400023);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2024 05:48:16.0216
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2024 05:48:18.7155
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4e3f356-ce2a-432f-53da-08dc90ec94b9
+X-MS-Exchange-CrossTenant-Network-Message-Id: 247389db-6bf8-46bf-5f5d-08dc90ec9654
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE0.namprd05.prod.outlook.com
+	SJ1PEPF00001CDD.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8758
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5851
 
 From: Edward Cree <ecree.xilinx@gmail.com>
 
-While this is not needed to serialise the ethtool entry points (which
- are all under RTNL), drivers may have cause to asynchronously access
- dev->ethtool->rss_ctx; taking dev->ethtool->rss_lock allows them to
- do this safely without needing to take the RTNL.
+The core is now responsible for allocating IDs and a memory region for
+ us to store our state (struct efx_rss_context_priv), so we no longer
+ need efx_alloc_rss_context_entry() and friends.
+Since the contexts are now maintained by the core, use the core's lock
+ (net_dev->ethtool->rss_lock), rather than our own mutex (efx->rss_lock),
+ to serialise access against changes; and remove the now-unused
+ efx->rss_lock from struct efx_nic.
 
 Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 ---
- include/linux/ethtool.h | 3 +++
- net/core/dev.c          | 5 +++++
- net/ethtool/ioctl.c     | 7 +++++++
- 3 files changed, 15 insertions(+)
+ drivers/net/ethernet/sfc/ef10.c           |   2 +-
+ drivers/net/ethernet/sfc/ef100_ethtool.c  |   4 +
+ drivers/net/ethernet/sfc/efx.c            |   2 +-
+ drivers/net/ethernet/sfc/efx.h            |   2 +-
+ drivers/net/ethernet/sfc/efx_common.c     |  10 +-
+ drivers/net/ethernet/sfc/ethtool.c        |   4 +
+ drivers/net/ethernet/sfc/ethtool_common.c | 152 ++++++++++++----------
+ drivers/net/ethernet/sfc/ethtool_common.h |  12 ++
+ drivers/net/ethernet/sfc/mcdi_filters.c   | 135 ++++++++++---------
+ drivers/net/ethernet/sfc/mcdi_filters.h   |   8 +-
+ drivers/net/ethernet/sfc/net_driver.h     |  28 ++--
+ drivers/net/ethernet/sfc/rx_common.c      |  64 ++-------
+ drivers/net/ethernet/sfc/rx_common.h      |   8 +-
+ 13 files changed, 212 insertions(+), 219 deletions(-)
 
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index f8688e77ca62..0d27e13952ad 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -1098,10 +1098,13 @@ int ethtool_virtdev_set_link_ksettings(struct net_device *dev,
- /**
-  * struct ethtool_netdev_state - per-netdevice state for ethtool features
-  * @rss_ctx:		XArray of custom RSS contexts
-+ * @rss_lock:		Protects entries in @rss_ctx.  May be taken from
-+ *			within RTNL.
-  * @wol_enabled:	Wake-on-LAN is enabled
-  */
- struct ethtool_netdev_state {
- 	struct xarray		rss_ctx;
-+	struct mutex		rss_lock;
- 	unsigned		wol_enabled:1;
- };
+diff --git a/drivers/net/ethernet/sfc/ef10.c b/drivers/net/ethernet/sfc/ef10.c
+index 8fa6c0e9195b..7d69302ffa0a 100644
+--- a/drivers/net/ethernet/sfc/ef10.c
++++ b/drivers/net/ethernet/sfc/ef10.c
+@@ -1396,7 +1396,7 @@ static void efx_ef10_table_reset_mc_allocations(struct efx_nic *efx)
+ 	efx_mcdi_filter_table_reset_mc_allocations(efx);
+ 	nic_data->must_restore_piobufs = true;
+ 	efx_ef10_forget_old_piobufs(efx);
+-	efx->rss_context.context_id = EFX_MCDI_RSS_CONTEXT_INVALID;
++	efx->rss_context.priv.context_id = EFX_MCDI_RSS_CONTEXT_INVALID;
  
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 9ca9424ea8b1..4cd988b8a74a 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -10287,6 +10287,7 @@ int register_netdevice(struct net_device *dev)
+ 	/* Driver-created vswitches and vports must be re-created */
+ 	nic_data->must_probe_vswitching = true;
+diff --git a/drivers/net/ethernet/sfc/ef100_ethtool.c b/drivers/net/ethernet/sfc/ef100_ethtool.c
+index cf55202b3a7b..896ffca4aee2 100644
+--- a/drivers/net/ethernet/sfc/ef100_ethtool.c
++++ b/drivers/net/ethernet/sfc/ef100_ethtool.c
+@@ -59,8 +59,12 @@ const struct ethtool_ops ef100_ethtool_ops = {
  
- 	/* rss ctx ID 0 is reserved for the default context, start from 1 */
- 	xa_init_flags(&dev->ethtool->rss_ctx, XA_FLAGS_ALLOC1);
-+	mutex_init(&dev->ethtool->rss_lock);
+ 	.get_rxfh_indir_size	= efx_ethtool_get_rxfh_indir_size,
+ 	.get_rxfh_key_size	= efx_ethtool_get_rxfh_key_size,
++	.rxfh_priv_size		= sizeof(struct efx_rss_context_priv),
+ 	.get_rxfh		= efx_ethtool_get_rxfh,
+ 	.set_rxfh		= efx_ethtool_set_rxfh,
++	.create_rxfh_context	= efx_ethtool_create_rxfh_context,
++	.modify_rxfh_context	= efx_ethtool_modify_rxfh_context,
++	.remove_rxfh_context	= efx_ethtool_remove_rxfh_context,
  
- 	spin_lock_init(&dev->addr_list_lock);
- 	netdev_set_addr_lockdep_class(dev);
-@@ -11192,6 +11193,7 @@ static void netdev_rss_contexts_free(struct net_device *dev)
- 	struct ethtool_rxfh_context *ctx;
- 	unsigned long context;
+ 	.get_module_info	= efx_ethtool_get_module_info,
+ 	.get_module_eeprom	= efx_ethtool_get_module_eeprom,
+diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
+index e9d9de8e648a..6f1a01ded7d4 100644
+--- a/drivers/net/ethernet/sfc/efx.c
++++ b/drivers/net/ethernet/sfc/efx.c
+@@ -299,7 +299,7 @@ static int efx_probe_nic(struct efx_nic *efx)
+ 	if (efx->n_channels > 1)
+ 		netdev_rss_key_fill(efx->rss_context.rx_hash_key,
+ 				    sizeof(efx->rss_context.rx_hash_key));
+-	efx_set_default_rx_indir_table(efx, &efx->rss_context);
++	efx_set_default_rx_indir_table(efx, efx->rss_context.rx_indir_table);
  
-+	mutex_lock(&dev->ethtool->rss_lock);
- 	xa_for_each(&dev->ethtool->rss_ctx, context, ctx) {
- 		struct ethtool_rxfh_param rxfh;
- 
-@@ -11211,6 +11213,7 @@ static void netdev_rss_contexts_free(struct net_device *dev)
- 		kfree(ctx);
- 	}
- 	xa_destroy(&dev->ethtool->rss_ctx);
-+	mutex_unlock(&dev->ethtool->rss_lock);
+ 	/* Initialise the interrupt moderation settings */
+ 	efx->irq_mod_step_us = DIV_ROUND_UP(efx->timer_quantum_ns, 1000);
+diff --git a/drivers/net/ethernet/sfc/efx.h b/drivers/net/ethernet/sfc/efx.h
+index 48d3623735ba..7a6cab883d66 100644
+--- a/drivers/net/ethernet/sfc/efx.h
++++ b/drivers/net/ethernet/sfc/efx.h
+@@ -158,7 +158,7 @@ static inline s32 efx_filter_get_rx_ids(struct efx_nic *efx,
  }
  
- /**
-@@ -11323,6 +11326,8 @@ void unregister_netdevice_many_notify(struct list_head *head,
- 		if (dev->netdev_ops->ndo_uninit)
- 			dev->netdev_ops->ndo_uninit(dev);
+ /* RSS contexts */
+-static inline bool efx_rss_active(struct efx_rss_context *ctx)
++static inline bool efx_rss_active(struct efx_rss_context_priv *ctx)
+ {
+ 	return ctx->context_id != EFX_MCDI_RSS_CONTEXT_INVALID;
+ }
+diff --git a/drivers/net/ethernet/sfc/efx_common.c b/drivers/net/ethernet/sfc/efx_common.c
+index 4ebd5ae23eca..13cf647051af 100644
+--- a/drivers/net/ethernet/sfc/efx_common.c
++++ b/drivers/net/ethernet/sfc/efx_common.c
+@@ -714,7 +714,7 @@ void efx_reset_down(struct efx_nic *efx, enum reset_type method)
  
-+		mutex_destroy(&dev->ethtool->rss_lock);
+ 	mutex_lock(&efx->mac_lock);
+ 	down_write(&efx->filter_sem);
+-	mutex_lock(&efx->rss_lock);
++	mutex_lock(&efx->net_dev->ethtool->rss_lock);
+ 	efx->type->fini(efx);
+ }
+ 
+@@ -777,7 +777,7 @@ int efx_reset_up(struct efx_nic *efx, enum reset_type method, bool ok)
+ 
+ 	if (efx->type->rx_restore_rss_contexts)
+ 		efx->type->rx_restore_rss_contexts(efx);
+-	mutex_unlock(&efx->rss_lock);
++	mutex_unlock(&efx->net_dev->ethtool->rss_lock);
+ 	efx->type->filter_table_restore(efx);
+ 	up_write(&efx->filter_sem);
+ 
+@@ -793,7 +793,7 @@ int efx_reset_up(struct efx_nic *efx, enum reset_type method, bool ok)
+ fail:
+ 	efx->port_initialized = false;
+ 
+-	mutex_unlock(&efx->rss_lock);
++	mutex_unlock(&efx->net_dev->ethtool->rss_lock);
+ 	up_write(&efx->filter_sem);
+ 	mutex_unlock(&efx->mac_lock);
+ 
+@@ -1000,9 +1000,7 @@ int efx_init_struct(struct efx_nic *efx, struct pci_dev *pci_dev)
+ 		efx->type->rx_hash_offset - efx->type->rx_prefix_size;
+ 	efx->rx_packet_ts_offset =
+ 		efx->type->rx_ts_offset - efx->type->rx_prefix_size;
+-	INIT_LIST_HEAD(&efx->rss_context.list);
+-	efx->rss_context.context_id = EFX_MCDI_RSS_CONTEXT_INVALID;
+-	mutex_init(&efx->rss_lock);
++	efx->rss_context.priv.context_id = EFX_MCDI_RSS_CONTEXT_INVALID;
+ 	efx->vport_id = EVB_PORT_ID_ASSIGNED;
+ 	spin_lock_init(&efx->stats_lock);
+ 	efx->vi_stride = EFX_DEFAULT_VI_STRIDE;
+diff --git a/drivers/net/ethernet/sfc/ethtool.c b/drivers/net/ethernet/sfc/ethtool.c
+index 37c69c8d90b1..0f5c68b8bab7 100644
+--- a/drivers/net/ethernet/sfc/ethtool.c
++++ b/drivers/net/ethernet/sfc/ethtool.c
+@@ -268,8 +268,12 @@ const struct ethtool_ops efx_ethtool_ops = {
+ 	.set_rxnfc		= efx_ethtool_set_rxnfc,
+ 	.get_rxfh_indir_size	= efx_ethtool_get_rxfh_indir_size,
+ 	.get_rxfh_key_size	= efx_ethtool_get_rxfh_key_size,
++	.rxfh_priv_size		= sizeof(struct efx_rss_context_priv),
+ 	.get_rxfh		= efx_ethtool_get_rxfh,
+ 	.set_rxfh		= efx_ethtool_set_rxfh,
++	.create_rxfh_context	= efx_ethtool_create_rxfh_context,
++	.modify_rxfh_context	= efx_ethtool_modify_rxfh_context,
++	.remove_rxfh_context	= efx_ethtool_remove_rxfh_context,
+ 	.get_ts_info		= efx_ethtool_get_ts_info,
+ 	.get_module_info	= efx_ethtool_get_module_info,
+ 	.get_module_eeprom	= efx_ethtool_get_module_eeprom,
+diff --git a/drivers/net/ethernet/sfc/ethtool_common.c b/drivers/net/ethernet/sfc/ethtool_common.c
+index 7d5e5db4eac5..0a8d2c9ffce6 100644
+--- a/drivers/net/ethernet/sfc/ethtool_common.c
++++ b/drivers/net/ethernet/sfc/ethtool_common.c
+@@ -820,10 +820,10 @@ int efx_ethtool_get_rxnfc(struct net_device *net_dev,
+ 		return 0;
+ 
+ 	case ETHTOOL_GRXFH: {
+-		struct efx_rss_context *ctx = &efx->rss_context;
++		struct efx_rss_context_priv *ctx = &efx->rss_context.priv;
+ 		__u64 data;
+ 
+-		mutex_lock(&efx->rss_lock);
++		mutex_lock(&net_dev->ethtool->rss_lock);
+ 		if (info->flow_type & FLOW_RSS && info->rss_context) {
+ 			ctx = efx_find_rss_context_entry(efx, info->rss_context);
+ 			if (!ctx) {
+@@ -864,7 +864,7 @@ int efx_ethtool_get_rxnfc(struct net_device *net_dev,
+ out_setdata_unlock:
+ 		info->data = data;
+ out_unlock:
+-		mutex_unlock(&efx->rss_lock);
++		mutex_unlock(&net_dev->ethtool->rss_lock);
+ 		return rc;
+ 	}
+ 
+@@ -1167,31 +1167,33 @@ static int efx_ethtool_get_rxfh_context(struct net_device *net_dev,
+ 					struct ethtool_rxfh_param *rxfh)
+ {
+ 	struct efx_nic *efx = efx_netdev_priv(net_dev);
+-	struct efx_rss_context *ctx;
++	struct efx_rss_context_priv *ctx_priv;
++	struct efx_rss_context ctx;
+ 	int rc = 0;
+ 
+ 	if (!efx->type->rx_pull_rss_context_config)
+ 		return -EOPNOTSUPP;
+ 
+-	mutex_lock(&efx->rss_lock);
+-	ctx = efx_find_rss_context_entry(efx, rxfh->rss_context);
+-	if (!ctx) {
++	mutex_lock(&net_dev->ethtool->rss_lock);
++	ctx_priv = efx_find_rss_context_entry(efx, rxfh->rss_context);
++	if (!ctx_priv) {
+ 		rc = -ENOENT;
+ 		goto out_unlock;
+ 	}
+-	rc = efx->type->rx_pull_rss_context_config(efx, ctx);
++	ctx.priv = *ctx_priv;
++	rc = efx->type->rx_pull_rss_context_config(efx, &ctx);
+ 	if (rc)
+ 		goto out_unlock;
+ 
+ 	rxfh->hfunc = ETH_RSS_HASH_TOP;
+ 	if (rxfh->indir)
+-		memcpy(rxfh->indir, ctx->rx_indir_table,
+-		       sizeof(ctx->rx_indir_table));
++		memcpy(rxfh->indir, ctx.rx_indir_table,
++		       sizeof(ctx.rx_indir_table));
+ 	if (rxfh->key)
+-		memcpy(rxfh->key, ctx->rx_hash_key,
++		memcpy(rxfh->key, ctx.rx_hash_key,
+ 		       efx->type->rx_hash_key_size);
+ out_unlock:
+-	mutex_unlock(&efx->rss_lock);
++	mutex_unlock(&net_dev->ethtool->rss_lock);
+ 	return rc;
+ }
+ 
+@@ -1218,68 +1220,85 @@ int efx_ethtool_get_rxfh(struct net_device *net_dev,
+ 	return 0;
+ }
+ 
+-static int efx_ethtool_set_rxfh_context(struct net_device *net_dev,
+-					struct ethtool_rxfh_param *rxfh,
+-					struct netlink_ext_ack *extack)
++int efx_ethtool_modify_rxfh_context(struct net_device *net_dev,
++				    struct ethtool_rxfh_context *ctx,
++				    const struct ethtool_rxfh_param *rxfh,
++				    struct netlink_ext_ack *extack)
+ {
+ 	struct efx_nic *efx = efx_netdev_priv(net_dev);
+-	u32 *rss_context = &rxfh->rss_context;
+-	struct efx_rss_context *ctx;
+-	u32 *indir = rxfh->indir;
+-	bool allocated = false;
+-	u8 *key = rxfh->key;
+-	int rc;
++	struct efx_rss_context_priv *priv;
++	const u32 *indir = rxfh->indir;
++	const u8 *key = rxfh->key;
+ 
+-	if (!efx->type->rx_push_rss_context_config)
++	if (!efx->type->rx_push_rss_context_config) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "NIC type does not support custom contexts");
+ 		return -EOPNOTSUPP;
+-
+-	mutex_lock(&efx->rss_lock);
+-
+-	if (*rss_context == ETH_RXFH_CONTEXT_ALLOC) {
+-		if (rxfh->rss_delete) {
+-			/* alloc + delete == Nothing to do */
+-			rc = -EINVAL;
+-			goto out_unlock;
+-		}
+-		ctx = efx_alloc_rss_context_entry(efx);
+-		if (!ctx) {
+-			rc = -ENOMEM;
+-			goto out_unlock;
+-		}
+-		ctx->context_id = EFX_MCDI_RSS_CONTEXT_INVALID;
+-		/* Initialise indir table and key to defaults */
+-		efx_set_default_rx_indir_table(efx, ctx);
+-		netdev_rss_key_fill(ctx->rx_hash_key, sizeof(ctx->rx_hash_key));
+-		allocated = true;
+-	} else {
+-		ctx = efx_find_rss_context_entry(efx, *rss_context);
+-		if (!ctx) {
+-			rc = -ENOENT;
+-			goto out_unlock;
+-		}
+ 	}
+-
+-	if (rxfh->rss_delete) {
+-		/* delete this context */
+-		rc = efx->type->rx_push_rss_context_config(efx, ctx, NULL, NULL);
+-		if (!rc)
+-			efx_free_rss_context_entry(ctx);
+-		goto out_unlock;
++	/* Hash function is Toeplitz, cannot be changed */
++	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
++	    rxfh->hfunc != ETH_RSS_HASH_TOP) {
++		NL_SET_ERR_MSG_MOD(extack, "Only Toeplitz hash is supported");
++		return -EOPNOTSUPP;
+ 	}
+ 
++	priv = ethtool_rxfh_context_priv(ctx);
 +
- 		if (skb)
- 			rtmsg_ifinfo_send(skb, dev, GFP_KERNEL, portid, nlh);
+ 	if (!key)
+-		key = ctx->rx_hash_key;
++		key = ethtool_rxfh_context_key(ctx);
+ 	if (!indir)
+-		indir = ctx->rx_indir_table;
++		indir = ethtool_rxfh_context_indir(ctx);
  
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 244e565e1365..9d2d677770db 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -1282,6 +1282,7 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
- 	struct netlink_ext_ack *extack = NULL;
- 	struct ethtool_rxnfc rx_rings;
- 	struct ethtool_rxfh rxfh;
-+	bool locked = false; /* dev->ethtool->rss_lock taken */
- 	u32 indir_bytes = 0;
- 	bool create = false;
- 	u8 *rss_config;
-@@ -1377,6 +1378,10 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+-	rc = efx->type->rx_push_rss_context_config(efx, ctx, indir, key);
+-	if (rc && allocated)
+-		efx_free_rss_context_entry(ctx);
+-	else
+-		*rss_context = ctx->user_id;
+-out_unlock:
+-	mutex_unlock(&efx->rss_lock);
+-	return rc;
++	return efx->type->rx_push_rss_context_config(efx, priv, indir, key,
++						     false);
++}
++
++int efx_ethtool_create_rxfh_context(struct net_device *net_dev,
++				    struct ethtool_rxfh_context *ctx,
++				    const struct ethtool_rxfh_param *rxfh,
++				    struct netlink_ext_ack *extack)
++{
++	struct efx_nic *efx = efx_netdev_priv(net_dev);
++	struct efx_rss_context_priv *priv;
++
++	priv = ethtool_rxfh_context_priv(ctx);
++
++	priv->context_id = EFX_MCDI_RSS_CONTEXT_INVALID;
++	priv->rx_hash_udp_4tuple = false;
++	/* Generate default indir table and/or key if not specified.
++	 * We use ctx as a place to store these; this is fine because
++	 * we're doing a create, so if we fail then the ctx will just
++	 * be deleted.
++	 */
++	if (!rxfh->indir)
++		efx_set_default_rx_indir_table(efx, ethtool_rxfh_context_indir(ctx));
++	if (!rxfh->key)
++		netdev_rss_key_fill(ethtool_rxfh_context_key(ctx),
++				    ctx->key_size);
++	if (rxfh->hfunc == ETH_RSS_HASH_NO_CHANGE)
++		ctx->hfunc = ETH_RSS_HASH_TOP;
++	if (rxfh->input_xfrm == RXH_XFRM_NO_CHANGE)
++		ctx->input_xfrm = 0;
++	return efx_ethtool_modify_rxfh_context(net_dev, ctx, rxfh, extack);
++}
++
++int efx_ethtool_remove_rxfh_context(struct net_device *net_dev,
++				    struct ethtool_rxfh_context *ctx,
++				    u32 rss_context,
++				    struct netlink_ext_ack *extack)
++{
++	struct efx_nic *efx = efx_netdev_priv(net_dev);
++	struct efx_rss_context_priv *priv;
++
++	if (!efx->type->rx_push_rss_context_config) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "NIC type does not support custom contexts");
++		return -EOPNOTSUPP;
++	}
++
++	priv = ethtool_rxfh_context_priv(ctx);
++	return efx->type->rx_push_rss_context_config(efx, priv, NULL, NULL,
++						     true);
+ }
+ 
+ int efx_ethtool_set_rxfh(struct net_device *net_dev,
+@@ -1295,8 +1314,9 @@ int efx_ethtool_set_rxfh(struct net_device *net_dev,
+ 	    rxfh->hfunc != ETH_RSS_HASH_TOP)
+ 		return -EOPNOTSUPP;
+ 
+-	if (rxfh->rss_context)
+-		return efx_ethtool_set_rxfh_context(net_dev, rxfh, extack);
++	/* Custom contexts should use new API */
++	if (WARN_ON_ONCE(rxfh->rss_context))
++		return -EIO;
+ 
+ 	if (!indir && !key)
+ 		return 0;
+diff --git a/drivers/net/ethernet/sfc/ethtool_common.h b/drivers/net/ethernet/sfc/ethtool_common.h
+index a680e5980213..fc52e891637d 100644
+--- a/drivers/net/ethernet/sfc/ethtool_common.h
++++ b/drivers/net/ethernet/sfc/ethtool_common.h
+@@ -49,6 +49,18 @@ int efx_ethtool_get_rxfh(struct net_device *net_dev,
+ int efx_ethtool_set_rxfh(struct net_device *net_dev,
+ 			 struct ethtool_rxfh_param *rxfh,
+ 			 struct netlink_ext_ack *extack);
++int efx_ethtool_create_rxfh_context(struct net_device *net_dev,
++				    struct ethtool_rxfh_context *ctx,
++				    const struct ethtool_rxfh_param *rxfh,
++				    struct netlink_ext_ack *extack);
++int efx_ethtool_modify_rxfh_context(struct net_device *net_dev,
++				    struct ethtool_rxfh_context *ctx,
++				    const struct ethtool_rxfh_param *rxfh,
++				    struct netlink_ext_ack *extack);
++int efx_ethtool_remove_rxfh_context(struct net_device *net_dev,
++				    struct ethtool_rxfh_context *ctx,
++				    u32 rss_context,
++				    struct netlink_ext_ack *extack);
+ int efx_ethtool_reset(struct net_device *net_dev, u32 *flags);
+ int efx_ethtool_get_module_eeprom(struct net_device *net_dev,
+ 				  struct ethtool_eeprom *ee,
+diff --git a/drivers/net/ethernet/sfc/mcdi_filters.c b/drivers/net/ethernet/sfc/mcdi_filters.c
+index 4ff6586116ee..6ef96292909a 100644
+--- a/drivers/net/ethernet/sfc/mcdi_filters.c
++++ b/drivers/net/ethernet/sfc/mcdi_filters.c
+@@ -194,7 +194,7 @@ efx_mcdi_filter_push_prep_set_match_fields(struct efx_nic *efx,
+ static void efx_mcdi_filter_push_prep(struct efx_nic *efx,
+ 				      const struct efx_filter_spec *spec,
+ 				      efx_dword_t *inbuf, u64 handle,
+-				      struct efx_rss_context *ctx,
++				      struct efx_rss_context_priv *ctx,
+ 				      bool replacing)
+ {
+ 	u32 flags = spec->flags;
+@@ -245,7 +245,7 @@ static void efx_mcdi_filter_push_prep(struct efx_nic *efx,
+ 
+ static int efx_mcdi_filter_push(struct efx_nic *efx,
+ 				const struct efx_filter_spec *spec, u64 *handle,
+-				struct efx_rss_context *ctx, bool replacing)
++				struct efx_rss_context_priv *ctx, bool replacing)
+ {
+ 	MCDI_DECLARE_BUF(inbuf, MC_CMD_FILTER_OP_EXT_IN_LEN);
+ 	MCDI_DECLARE_BUF(outbuf, MC_CMD_FILTER_OP_EXT_OUT_LEN);
+@@ -345,9 +345,9 @@ static s32 efx_mcdi_filter_insert_locked(struct efx_nic *efx,
+ 					 bool replace_equal)
+ {
+ 	DECLARE_BITMAP(mc_rem_map, EFX_EF10_FILTER_SEARCH_LIMIT);
++	struct efx_rss_context_priv *ctx = NULL;
+ 	struct efx_mcdi_filter_table *table;
+ 	struct efx_filter_spec *saved_spec;
+-	struct efx_rss_context *ctx = NULL;
+ 	unsigned int match_pri, hash;
+ 	unsigned int priv_flags;
+ 	bool rss_locked = false;
+@@ -380,12 +380,12 @@ static s32 efx_mcdi_filter_insert_locked(struct efx_nic *efx,
+ 		bitmap_zero(mc_rem_map, EFX_EF10_FILTER_SEARCH_LIMIT);
+ 
+ 	if (spec->flags & EFX_FILTER_FLAG_RX_RSS) {
+-		mutex_lock(&efx->rss_lock);
++		mutex_lock(&efx->net_dev->ethtool->rss_lock);
+ 		rss_locked = true;
+ 		if (spec->rss_context)
+ 			ctx = efx_find_rss_context_entry(efx, spec->rss_context);
+ 		else
+-			ctx = &efx->rss_context;
++			ctx = &efx->rss_context.priv;
+ 		if (!ctx) {
+ 			rc = -ENOENT;
+ 			goto out_unlock;
+@@ -548,7 +548,7 @@ static s32 efx_mcdi_filter_insert_locked(struct efx_nic *efx,
+ 
+ out_unlock:
+ 	if (rss_locked)
+-		mutex_unlock(&efx->rss_lock);
++		mutex_unlock(&efx->net_dev->ethtool->rss_lock);
+ 	up_write(&table->lock);
+ 	return rc;
+ }
+@@ -611,13 +611,13 @@ static int efx_mcdi_filter_remove_internal(struct efx_nic *efx,
+ 
+ 		new_spec.priority = EFX_FILTER_PRI_AUTO;
+ 		new_spec.flags = (EFX_FILTER_FLAG_RX |
+-				  (efx_rss_active(&efx->rss_context) ?
++				  (efx_rss_active(&efx->rss_context.priv) ?
+ 				   EFX_FILTER_FLAG_RX_RSS : 0));
+ 		new_spec.dmaq_id = 0;
+ 		new_spec.rss_context = 0;
+ 		rc = efx_mcdi_filter_push(efx, &new_spec,
+ 					  &table->entry[filter_idx].handle,
+-					  &efx->rss_context,
++					  &efx->rss_context.priv,
+ 					  true);
+ 
+ 		if (rc == 0)
+@@ -764,7 +764,7 @@ static int efx_mcdi_filter_insert_addr_list(struct efx_nic *efx,
+ 		ids = vlan->uc;
+ 	}
+ 
+-	filter_flags = efx_rss_active(&efx->rss_context) ? EFX_FILTER_FLAG_RX_RSS : 0;
++	filter_flags = efx_rss_active(&efx->rss_context.priv) ? EFX_FILTER_FLAG_RX_RSS : 0;
+ 
+ 	/* Insert/renew filters */
+ 	for (i = 0; i < addr_count; i++) {
+@@ -833,7 +833,7 @@ static int efx_mcdi_filter_insert_def(struct efx_nic *efx,
+ 	int rc;
+ 	u16 *id;
+ 
+-	filter_flags = efx_rss_active(&efx->rss_context) ? EFX_FILTER_FLAG_RX_RSS : 0;
++	filter_flags = efx_rss_active(&efx->rss_context.priv) ? EFX_FILTER_FLAG_RX_RSS : 0;
+ 
+ 	efx_filter_init_rx(&spec, EFX_FILTER_PRI_AUTO, filter_flags, 0);
+ 
+@@ -1375,8 +1375,8 @@ void efx_mcdi_filter_table_restore(struct efx_nic *efx)
+ 	struct efx_mcdi_filter_table *table = efx->filter_state;
+ 	unsigned int invalid_filters = 0, failed = 0;
+ 	struct efx_mcdi_filter_vlan *vlan;
++	struct efx_rss_context_priv *ctx;
+ 	struct efx_filter_spec *spec;
+-	struct efx_rss_context *ctx;
+ 	unsigned int filter_idx;
+ 	u32 mcdi_flags;
+ 	int match_pri;
+@@ -1388,7 +1388,7 @@ void efx_mcdi_filter_table_restore(struct efx_nic *efx)
+ 		return;
+ 
+ 	down_write(&table->lock);
+-	mutex_lock(&efx->rss_lock);
++	mutex_lock(&efx->net_dev->ethtool->rss_lock);
+ 
+ 	for (filter_idx = 0; filter_idx < EFX_MCDI_FILTER_TBL_ROWS; filter_idx++) {
+ 		spec = efx_mcdi_filter_entry_spec(table, filter_idx);
+@@ -1407,7 +1407,7 @@ void efx_mcdi_filter_table_restore(struct efx_nic *efx)
+ 		if (spec->rss_context)
+ 			ctx = efx_find_rss_context_entry(efx, spec->rss_context);
+ 		else
+-			ctx = &efx->rss_context;
++			ctx = &efx->rss_context.priv;
+ 		if (spec->flags & EFX_FILTER_FLAG_RX_RSS) {
+ 			if (!ctx) {
+ 				netif_warn(efx, drv, efx->net_dev,
+@@ -1444,7 +1444,7 @@ void efx_mcdi_filter_table_restore(struct efx_nic *efx)
  		}
  	}
  
-+	if (rxfh.rss_context) {
-+		mutex_lock(&dev->ethtool->rss_lock);
-+		locked = true;
-+	}
- 	if (create) {
- 		if (rxfh_dev.rss_delete) {
- 			ret = -EINVAL;
-@@ -1492,6 +1497,8 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+-	mutex_unlock(&efx->rss_lock);
++	mutex_unlock(&efx->net_dev->ethtool->rss_lock);
+ 	up_write(&table->lock);
+ 
+ 	/*
+@@ -1861,7 +1861,8 @@ bool efx_mcdi_filter_rfs_expire_one(struct efx_nic *efx, u32 flow_id,
+ 					 RSS_MODE_HASH_ADDRS << MC_CMD_RSS_CONTEXT_GET_FLAGS_OUT_UDP_IPV6_RSS_MODE_LBN |\
+ 					 RSS_MODE_HASH_ADDRS << MC_CMD_RSS_CONTEXT_GET_FLAGS_OUT_OTHER_IPV6_RSS_MODE_LBN)
+ 
+-int efx_mcdi_get_rss_context_flags(struct efx_nic *efx, u32 context, u32 *flags)
++static int efx_mcdi_get_rss_context_flags(struct efx_nic *efx, u32 context,
++					  u32 *flags)
+ {
+ 	/*
+ 	 * Firmware had a bug (sfc bug 61952) where it would not actually
+@@ -1909,8 +1910,8 @@ int efx_mcdi_get_rss_context_flags(struct efx_nic *efx, u32 context, u32 *flags)
+  * Defaults are 4-tuple for TCP and 2-tuple for UDP and other-IP, so we
+  * just need to set the UDP ports flags (for both IP versions).
+  */
+-void efx_mcdi_set_rss_context_flags(struct efx_nic *efx,
+-				    struct efx_rss_context *ctx)
++static void efx_mcdi_set_rss_context_flags(struct efx_nic *efx,
++					   struct efx_rss_context_priv *ctx)
+ {
+ 	MCDI_DECLARE_BUF(inbuf, MC_CMD_RSS_CONTEXT_SET_FLAGS_IN_LEN);
+ 	u32 flags;
+@@ -1931,7 +1932,7 @@ void efx_mcdi_set_rss_context_flags(struct efx_nic *efx,
+ }
+ 
+ static int efx_mcdi_filter_alloc_rss_context(struct efx_nic *efx, bool exclusive,
+-					     struct efx_rss_context *ctx,
++					     struct efx_rss_context_priv *ctx,
+ 					     unsigned *context_size)
+ {
+ 	MCDI_DECLARE_BUF(inbuf, MC_CMD_RSS_CONTEXT_ALLOC_IN_LEN);
+@@ -2032,25 +2033,26 @@ void efx_mcdi_rx_free_indir_table(struct efx_nic *efx)
+ {
+ 	int rc;
+ 
+-	if (efx->rss_context.context_id != EFX_MCDI_RSS_CONTEXT_INVALID) {
+-		rc = efx_mcdi_filter_free_rss_context(efx, efx->rss_context.context_id);
++	if (efx->rss_context.priv.context_id != EFX_MCDI_RSS_CONTEXT_INVALID) {
++		rc = efx_mcdi_filter_free_rss_context(efx, efx->rss_context.priv.context_id);
+ 		WARN_ON(rc != 0);
+ 	}
+-	efx->rss_context.context_id = EFX_MCDI_RSS_CONTEXT_INVALID;
++	efx->rss_context.priv.context_id = EFX_MCDI_RSS_CONTEXT_INVALID;
+ }
+ 
+ static int efx_mcdi_filter_rx_push_shared_rss_config(struct efx_nic *efx,
+ 					      unsigned *context_size)
+ {
+ 	struct efx_mcdi_filter_table *table = efx->filter_state;
+-	int rc = efx_mcdi_filter_alloc_rss_context(efx, false, &efx->rss_context,
+-					    context_size);
++	int rc = efx_mcdi_filter_alloc_rss_context(efx, false,
++						   &efx->rss_context.priv,
++						   context_size);
+ 
+ 	if (rc != 0)
+ 		return rc;
+ 
+ 	table->rx_rss_context_exclusive = false;
+-	efx_set_default_rx_indir_table(efx, &efx->rss_context);
++	efx_set_default_rx_indir_table(efx, efx->rss_context.rx_indir_table);
+ 	return 0;
+ }
+ 
+@@ -2058,26 +2060,27 @@ static int efx_mcdi_filter_rx_push_exclusive_rss_config(struct efx_nic *efx,
+ 						 const u32 *rx_indir_table,
+ 						 const u8 *key)
+ {
++	u32 old_rx_rss_context = efx->rss_context.priv.context_id;
+ 	struct efx_mcdi_filter_table *table = efx->filter_state;
+-	u32 old_rx_rss_context = efx->rss_context.context_id;
+ 	int rc;
+ 
+-	if (efx->rss_context.context_id == EFX_MCDI_RSS_CONTEXT_INVALID ||
++	if (efx->rss_context.priv.context_id == EFX_MCDI_RSS_CONTEXT_INVALID ||
+ 	    !table->rx_rss_context_exclusive) {
+-		rc = efx_mcdi_filter_alloc_rss_context(efx, true, &efx->rss_context,
+-						NULL);
++		rc = efx_mcdi_filter_alloc_rss_context(efx, true,
++						       &efx->rss_context.priv,
++						       NULL);
+ 		if (rc == -EOPNOTSUPP)
+ 			return rc;
+ 		else if (rc != 0)
+ 			goto fail1;
  	}
  
- out:
-+	if (locked)
-+		mutex_unlock(&dev->ethtool->rss_lock);
- 	kfree(rss_config);
- 	return ret;
+-	rc = efx_mcdi_filter_populate_rss_table(efx, efx->rss_context.context_id,
+-					 rx_indir_table, key);
++	rc = efx_mcdi_filter_populate_rss_table(efx, efx->rss_context.priv.context_id,
++						rx_indir_table, key);
+ 	if (rc != 0)
+ 		goto fail2;
+ 
+-	if (efx->rss_context.context_id != old_rx_rss_context &&
++	if (efx->rss_context.priv.context_id != old_rx_rss_context &&
+ 	    old_rx_rss_context != EFX_MCDI_RSS_CONTEXT_INVALID)
+ 		WARN_ON(efx_mcdi_filter_free_rss_context(efx, old_rx_rss_context) != 0);
+ 	table->rx_rss_context_exclusive = true;
+@@ -2091,9 +2094,9 @@ static int efx_mcdi_filter_rx_push_exclusive_rss_config(struct efx_nic *efx,
+ 	return 0;
+ 
+ fail2:
+-	if (old_rx_rss_context != efx->rss_context.context_id) {
+-		WARN_ON(efx_mcdi_filter_free_rss_context(efx, efx->rss_context.context_id) != 0);
+-		efx->rss_context.context_id = old_rx_rss_context;
++	if (old_rx_rss_context != efx->rss_context.priv.context_id) {
++		WARN_ON(efx_mcdi_filter_free_rss_context(efx, efx->rss_context.priv.context_id) != 0);
++		efx->rss_context.priv.context_id = old_rx_rss_context;
+ 	}
+ fail1:
+ 	netif_err(efx, hw, efx->net_dev, "%s: failed rc=%d\n", __func__, rc);
+@@ -2101,33 +2104,28 @@ static int efx_mcdi_filter_rx_push_exclusive_rss_config(struct efx_nic *efx,
  }
+ 
+ int efx_mcdi_rx_push_rss_context_config(struct efx_nic *efx,
+-					struct efx_rss_context *ctx,
++					struct efx_rss_context_priv *ctx,
+ 					const u32 *rx_indir_table,
+-					const u8 *key)
++					const u8 *key, bool delete)
+ {
+ 	int rc;
+ 
+-	WARN_ON(!mutex_is_locked(&efx->rss_lock));
++	WARN_ON(!mutex_is_locked(&efx->net_dev->ethtool->rss_lock));
+ 
+ 	if (ctx->context_id == EFX_MCDI_RSS_CONTEXT_INVALID) {
++		if (delete)
++			/* already wasn't in HW, nothing to do */
++			return 0;
+ 		rc = efx_mcdi_filter_alloc_rss_context(efx, true, ctx, NULL);
+ 		if (rc)
+ 			return rc;
+ 	}
+ 
+-	if (!rx_indir_table) /* Delete this context */
++	if (delete) /* Delete this context */
+ 		return efx_mcdi_filter_free_rss_context(efx, ctx->context_id);
+ 
+-	rc = efx_mcdi_filter_populate_rss_table(efx, ctx->context_id,
+-					 rx_indir_table, key);
+-	if (rc)
+-		return rc;
+-
+-	memcpy(ctx->rx_indir_table, rx_indir_table,
+-	       sizeof(efx->rss_context.rx_indir_table));
+-	memcpy(ctx->rx_hash_key, key, efx->type->rx_hash_key_size);
+-
+-	return 0;
++	return efx_mcdi_filter_populate_rss_table(efx, ctx->context_id,
++						  rx_indir_table, key);
+ }
+ 
+ int efx_mcdi_rx_pull_rss_context_config(struct efx_nic *efx,
+@@ -2139,16 +2137,16 @@ int efx_mcdi_rx_pull_rss_context_config(struct efx_nic *efx,
+ 	size_t outlen;
+ 	int rc, i;
+ 
+-	WARN_ON(!mutex_is_locked(&efx->rss_lock));
++	WARN_ON(!mutex_is_locked(&efx->net_dev->ethtool->rss_lock));
+ 
+ 	BUILD_BUG_ON(MC_CMD_RSS_CONTEXT_GET_TABLE_IN_LEN !=
+ 		     MC_CMD_RSS_CONTEXT_GET_KEY_IN_LEN);
+ 
+-	if (ctx->context_id == EFX_MCDI_RSS_CONTEXT_INVALID)
++	if (ctx->priv.context_id == EFX_MCDI_RSS_CONTEXT_INVALID)
+ 		return -ENOENT;
+ 
+ 	MCDI_SET_DWORD(inbuf, RSS_CONTEXT_GET_TABLE_IN_RSS_CONTEXT_ID,
+-		       ctx->context_id);
++		       ctx->priv.context_id);
+ 	BUILD_BUG_ON(ARRAY_SIZE(ctx->rx_indir_table) !=
+ 		     MC_CMD_RSS_CONTEXT_GET_TABLE_OUT_INDIRECTION_TABLE_LEN);
+ 	rc = efx_mcdi_rpc(efx, MC_CMD_RSS_CONTEXT_GET_TABLE, inbuf, sizeof(inbuf),
+@@ -2164,7 +2162,7 @@ int efx_mcdi_rx_pull_rss_context_config(struct efx_nic *efx,
+ 				RSS_CONTEXT_GET_TABLE_OUT_INDIRECTION_TABLE)[i];
+ 
+ 	MCDI_SET_DWORD(inbuf, RSS_CONTEXT_GET_KEY_IN_RSS_CONTEXT_ID,
+-		       ctx->context_id);
++		       ctx->priv.context_id);
+ 	BUILD_BUG_ON(ARRAY_SIZE(ctx->rx_hash_key) !=
+ 		     MC_CMD_RSS_CONTEXT_SET_KEY_IN_TOEPLITZ_KEY_LEN);
+ 	rc = efx_mcdi_rpc(efx, MC_CMD_RSS_CONTEXT_GET_KEY, inbuf, sizeof(inbuf),
+@@ -2186,35 +2184,42 @@ int efx_mcdi_rx_pull_rss_config(struct efx_nic *efx)
+ {
+ 	int rc;
+ 
+-	mutex_lock(&efx->rss_lock);
++	mutex_lock(&efx->net_dev->ethtool->rss_lock);
+ 	rc = efx_mcdi_rx_pull_rss_context_config(efx, &efx->rss_context);
+-	mutex_unlock(&efx->rss_lock);
++	mutex_unlock(&efx->net_dev->ethtool->rss_lock);
+ 	return rc;
+ }
+ 
+ void efx_mcdi_rx_restore_rss_contexts(struct efx_nic *efx)
+ {
+ 	struct efx_mcdi_filter_table *table = efx->filter_state;
+-	struct efx_rss_context *ctx;
++	struct ethtool_rxfh_context *ctx;
++	unsigned long context;
+ 	int rc;
+ 
+-	WARN_ON(!mutex_is_locked(&efx->rss_lock));
++	WARN_ON(!mutex_is_locked(&efx->net_dev->ethtool->rss_lock));
+ 
+ 	if (!table->must_restore_rss_contexts)
+ 		return;
+ 
+-	list_for_each_entry(ctx, &efx->rss_context.list, list) {
++	xa_for_each(&efx->net_dev->ethtool->rss_ctx, context, ctx) {
++		struct efx_rss_context_priv *priv;
++		u32 *indir;
++		u8 *key;
++
++		priv = ethtool_rxfh_context_priv(ctx);
+ 		/* previous NIC RSS context is gone */
+-		ctx->context_id = EFX_MCDI_RSS_CONTEXT_INVALID;
++		priv->context_id = EFX_MCDI_RSS_CONTEXT_INVALID;
+ 		/* so try to allocate a new one */
+-		rc = efx_mcdi_rx_push_rss_context_config(efx, ctx,
+-							 ctx->rx_indir_table,
+-							 ctx->rx_hash_key);
++		indir = ethtool_rxfh_context_indir(ctx);
++		key = ethtool_rxfh_context_key(ctx);
++		rc = efx_mcdi_rx_push_rss_context_config(efx, priv, indir, key,
++							 false);
+ 		if (rc)
+ 			netif_warn(efx, probe, efx->net_dev,
+-				   "failed to restore RSS context %u, rc=%d"
++				   "failed to restore RSS context %lu, rc=%d"
+ 				   "; RSS filters may fail to be applied\n",
+-				   ctx->user_id, rc);
++				   context, rc);
+ 	}
+ 	table->must_restore_rss_contexts = false;
+ }
+@@ -2276,7 +2281,7 @@ int efx_mcdi_vf_rx_push_rss_config(struct efx_nic *efx, bool user,
+ {
+ 	if (user)
+ 		return -EOPNOTSUPP;
+-	if (efx->rss_context.context_id != EFX_MCDI_RSS_CONTEXT_INVALID)
++	if (efx->rss_context.priv.context_id != EFX_MCDI_RSS_CONTEXT_INVALID)
+ 		return 0;
+ 	return efx_mcdi_filter_rx_push_shared_rss_config(efx, NULL);
+ }
+@@ -2295,7 +2300,7 @@ int efx_mcdi_push_default_indir_table(struct efx_nic *efx,
+ 
+ 	efx_mcdi_rx_free_indir_table(efx);
+ 	if (rss_spread > 1) {
+-		efx_set_default_rx_indir_table(efx, &efx->rss_context);
++		efx_set_default_rx_indir_table(efx, efx->rss_context.rx_indir_table);
+ 		rc = efx->type->rx_push_rss_config(efx, false,
+ 				   efx->rss_context.rx_indir_table, NULL);
+ 	}
+diff --git a/drivers/net/ethernet/sfc/mcdi_filters.h b/drivers/net/ethernet/sfc/mcdi_filters.h
+index c0d6558b9fd2..11b9f87ed9e1 100644
+--- a/drivers/net/ethernet/sfc/mcdi_filters.h
++++ b/drivers/net/ethernet/sfc/mcdi_filters.h
+@@ -145,9 +145,9 @@ void efx_mcdi_filter_del_vlan(struct efx_nic *efx, u16 vid);
+ 
+ void efx_mcdi_rx_free_indir_table(struct efx_nic *efx);
+ int efx_mcdi_rx_push_rss_context_config(struct efx_nic *efx,
+-					struct efx_rss_context *ctx,
++					struct efx_rss_context_priv *ctx,
+ 					const u32 *rx_indir_table,
+-					const u8 *key);
++					const u8 *key, bool delete);
+ int efx_mcdi_pf_rx_push_rss_config(struct efx_nic *efx, bool user,
+ 				   const u32 *rx_indir_table,
+ 				   const u8 *key);
+@@ -161,10 +161,6 @@ int efx_mcdi_push_default_indir_table(struct efx_nic *efx,
+ int efx_mcdi_rx_pull_rss_config(struct efx_nic *efx);
+ int efx_mcdi_rx_pull_rss_context_config(struct efx_nic *efx,
+ 					struct efx_rss_context *ctx);
+-int efx_mcdi_get_rss_context_flags(struct efx_nic *efx, u32 context,
+-				   u32 *flags);
+-void efx_mcdi_set_rss_context_flags(struct efx_nic *efx,
+-				    struct efx_rss_context *ctx);
+ void efx_mcdi_rx_restore_rss_contexts(struct efx_nic *efx);
+ 
+ static inline void efx_mcdi_update_rx_scatter(struct efx_nic *efx)
+diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
+index f2dd7feb0e0c..b85c51cbe7f9 100644
+--- a/drivers/net/ethernet/sfc/net_driver.h
++++ b/drivers/net/ethernet/sfc/net_driver.h
+@@ -737,21 +737,24 @@ struct vfdi_status;
+ /* The reserved RSS context value */
+ #define EFX_MCDI_RSS_CONTEXT_INVALID	0xffffffff
+ /**
+- * struct efx_rss_context - A user-defined RSS context for filtering
+- * @list: node of linked list on which this struct is stored
++ * struct efx_rss_context_priv - driver private data for an RSS context
+  * @context_id: the RSS_CONTEXT_ID returned by MC firmware, or
+  *	%EFX_MCDI_RSS_CONTEXT_INVALID if this context is not present on the NIC.
+- *	For Siena, 0 if RSS is active, else %EFX_MCDI_RSS_CONTEXT_INVALID.
+- * @user_id: the rss_context ID exposed to userspace over ethtool.
+  * @rx_hash_udp_4tuple: UDP 4-tuple hashing enabled
++ */
++struct efx_rss_context_priv {
++	u32 context_id;
++	bool rx_hash_udp_4tuple;
++};
++
++/**
++ * struct efx_rss_context - an RSS context
++ * @priv: hardware-specific state
+  * @rx_hash_key: Toeplitz hash key for this RSS context
+  * @indir_table: Indirection table for this RSS context
+  */
+ struct efx_rss_context {
+-	struct list_head list;
+-	u32 context_id;
+-	u32 user_id;
+-	bool rx_hash_udp_4tuple;
++	struct efx_rss_context_priv priv;
+ 	u8 rx_hash_key[40];
+ 	u32 rx_indir_table[128];
+ };
+@@ -883,9 +886,7 @@ struct efx_mae;
+  * @rx_packet_ts_offset: Offset of timestamp from start of packet data
+  *	(valid only if channel->sync_timestamps_enabled; always negative)
+  * @rx_scatter: Scatter mode enabled for receives
+- * @rss_context: Main RSS context.  Its @list member is the head of the list of
+- *	RSS contexts created by user requests
+- * @rss_lock: Protects custom RSS context software state in @rss_context.list
++ * @rss_context: Main RSS context.
+  * @vport_id: The function's vport ID, only relevant for PFs
+  * @int_error_count: Number of internal errors seen recently
+  * @int_error_expire: Time at which error count will be expired
+@@ -1052,7 +1053,6 @@ struct efx_nic {
+ 	int rx_packet_ts_offset;
+ 	bool rx_scatter;
+ 	struct efx_rss_context rss_context;
+-	struct mutex rss_lock;
+ 	u32 vport_id;
+ 
+ 	unsigned int_error_count;
+@@ -1416,9 +1416,9 @@ struct efx_nic_type {
+ 				  const u32 *rx_indir_table, const u8 *key);
+ 	int (*rx_pull_rss_config)(struct efx_nic *efx);
+ 	int (*rx_push_rss_context_config)(struct efx_nic *efx,
+-					  struct efx_rss_context *ctx,
++					  struct efx_rss_context_priv *ctx,
+ 					  const u32 *rx_indir_table,
+-					  const u8 *key);
++					  const u8 *key, bool delete);
+ 	int (*rx_pull_rss_context_config)(struct efx_nic *efx,
+ 					  struct efx_rss_context *ctx);
+ 	void (*rx_restore_rss_contexts)(struct efx_nic *efx);
+diff --git a/drivers/net/ethernet/sfc/rx_common.c b/drivers/net/ethernet/sfc/rx_common.c
+index dcd901eccfc8..0b7dc75c40f9 100644
+--- a/drivers/net/ethernet/sfc/rx_common.c
++++ b/drivers/net/ethernet/sfc/rx_common.c
+@@ -557,69 +557,25 @@ efx_rx_packet_gro(struct efx_channel *channel, struct efx_rx_buffer *rx_buf,
+ 	napi_gro_frags(napi);
+ }
+ 
+-/* RSS contexts.  We're using linked lists and crappy O(n) algorithms, because
+- * (a) this is an infrequent control-plane operation and (b) n is small (max 64)
+- */
+-struct efx_rss_context *efx_alloc_rss_context_entry(struct efx_nic *efx)
++struct efx_rss_context_priv *efx_find_rss_context_entry(struct efx_nic *efx,
++							u32 id)
+ {
+-	struct list_head *head = &efx->rss_context.list;
+-	struct efx_rss_context *ctx, *new;
+-	u32 id = 1; /* Don't use zero, that refers to the master RSS context */
+-
+-	WARN_ON(!mutex_is_locked(&efx->rss_lock));
++	struct ethtool_rxfh_context *ctx;
+ 
+-	/* Search for first gap in the numbering */
+-	list_for_each_entry(ctx, head, list) {
+-		if (ctx->user_id != id)
+-			break;
+-		id++;
+-		/* Check for wrap.  If this happens, we have nearly 2^32
+-		 * allocated RSS contexts, which seems unlikely.
+-		 */
+-		if (WARN_ON_ONCE(!id))
+-			return NULL;
+-	}
++	WARN_ON(!mutex_is_locked(&efx->net_dev->ethtool->rss_lock));
+ 
+-	/* Create the new entry */
+-	new = kmalloc(sizeof(*new), GFP_KERNEL);
+-	if (!new)
++	ctx = xa_load(&efx->net_dev->ethtool->rss_ctx, id);
++	if (!ctx)
+ 		return NULL;
+-	new->context_id = EFX_MCDI_RSS_CONTEXT_INVALID;
+-	new->rx_hash_udp_4tuple = false;
+-
+-	/* Insert the new entry into the gap */
+-	new->user_id = id;
+-	list_add_tail(&new->list, &ctx->list);
+-	return new;
+-}
+-
+-struct efx_rss_context *efx_find_rss_context_entry(struct efx_nic *efx, u32 id)
+-{
+-	struct list_head *head = &efx->rss_context.list;
+-	struct efx_rss_context *ctx;
+-
+-	WARN_ON(!mutex_is_locked(&efx->rss_lock));
+-
+-	list_for_each_entry(ctx, head, list)
+-		if (ctx->user_id == id)
+-			return ctx;
+-	return NULL;
+-}
+-
+-void efx_free_rss_context_entry(struct efx_rss_context *ctx)
+-{
+-	list_del(&ctx->list);
+-	kfree(ctx);
++	return ethtool_rxfh_context_priv(ctx);
+ }
+ 
+-void efx_set_default_rx_indir_table(struct efx_nic *efx,
+-				    struct efx_rss_context *ctx)
++void efx_set_default_rx_indir_table(struct efx_nic *efx, u32 *indir)
+ {
+ 	size_t i;
+ 
+-	for (i = 0; i < ARRAY_SIZE(ctx->rx_indir_table); i++)
+-		ctx->rx_indir_table[i] =
+-			ethtool_rxfh_indir_default(i, efx->rss_spread);
++	for (i = 0; i < ARRAY_SIZE(efx->rss_context.rx_indir_table); i++)
++		indir[i] = ethtool_rxfh_indir_default(i, efx->rss_spread);
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/sfc/rx_common.h b/drivers/net/ethernet/sfc/rx_common.h
+index fbd2769307f9..75fa84192362 100644
+--- a/drivers/net/ethernet/sfc/rx_common.h
++++ b/drivers/net/ethernet/sfc/rx_common.h
+@@ -84,11 +84,9 @@ void
+ efx_rx_packet_gro(struct efx_channel *channel, struct efx_rx_buffer *rx_buf,
+ 		  unsigned int n_frags, u8 *eh, __wsum csum);
+ 
+-struct efx_rss_context *efx_alloc_rss_context_entry(struct efx_nic *efx);
+-struct efx_rss_context *efx_find_rss_context_entry(struct efx_nic *efx, u32 id);
+-void efx_free_rss_context_entry(struct efx_rss_context *ctx);
+-void efx_set_default_rx_indir_table(struct efx_nic *efx,
+-				    struct efx_rss_context *ctx);
++struct efx_rss_context_priv *efx_find_rss_context_entry(struct efx_nic *efx,
++							u32 id);
++void efx_set_default_rx_indir_table(struct efx_nic *efx, u32 *indir);
+ 
+ bool efx_filter_is_mc_recipient(const struct efx_filter_spec *spec);
+ bool efx_filter_spec_equal(const struct efx_filter_spec *left,
 
