@@ -1,135 +1,168 @@
-Return-Path: <netdev+bounces-105134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5CCE90FC97
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:14:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BADCE90FCA3
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:25:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3BEDB21866
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 06:14:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 869651C2144E
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 06:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2638639AEB;
-	Thu, 20 Jun 2024 06:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EZwmi56H"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 493DF381BB;
+	Thu, 20 Jun 2024 06:25:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A4737E
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 06:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED2C1946F
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 06:25:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718864065; cv=none; b=cpk1GzzEJn9Dkc54cqda6Zy1Qb5rutVzlTg+NPlUNAg0F9hddyH0f+BB3CoNdcBoJG8hqkpZy6ppg7rBNBKlDSTPklg6iQCwCdWviClA638Y31/qOpVIsSop5GLhCMxGuEfraHDypCIOORR7bAoZwXenAYRkY/ABOlzWnUXpzY4=
+	t=1718864722; cv=none; b=WROrZjroenBoghdG8d11DPyT7eN/kxG1RJjBc9vtsdjGs0tduiiGgczmzesuR3GDRkmZb+pZ7ck6lvggiAO4epTJqYGgpod25HxHKReeTApjZWDT6zklK2gl42dRzy21BJu8IoZ/X2xtvKln6WpURL8B5BWJT0fKFUcdbnC0gZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718864065; c=relaxed/simple;
-	bh=y7Mjpj/GzFil3EtdPxLv+ZNzPIFYBEdlTDZdRTWo6bY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=smY9RykRHHHJBhVM+tpQUc56+an/5WeaV5g/6Oj2QZSkerPxvfr1P3pK7eU5385105/Ery+JiBkhV//W3a69nRgMC3ECfL40k4Lf8m7+VxxZlA171MwSe9N0poePPklSsj1ftokeoJHTGjZkIUCfZ1JN4bV4HmSXPHJ1XPxT5Yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EZwmi56H; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718864062;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oiTn9eBnc2xaUqrsy4JPHqQwAM2LMekPATvkB/1t99U=;
-	b=EZwmi56H9nIA0DMz7mGl1tLu28EHDlhS3y4IKBmup9KQEtFh1JtTEwo/GUJxZGEeYcH19X
-	6M2dEwvtUskkMYWC9N20FmKbtj959mTsWnfbHkW9/P04hUkw6X8WzaY6N79jALjldfypAN
-	xf7+0PYG0C+pg6SNzX8SLJmai6HitpU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-163-APvggWKFOgeeJyX-mYJVWQ-1; Thu, 20 Jun 2024 02:14:20 -0400
-X-MC-Unique: APvggWKFOgeeJyX-mYJVWQ-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-36250205842so800671f8f.1
-        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 23:14:20 -0700 (PDT)
+	s=arc-20240116; t=1718864722; c=relaxed/simple;
+	bh=6Ls4XYrTe5Xr7nKooWf65gclYifriyDk8xedY6uwVXY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=MH2zjLbEJp9tUdtF3XWM7MeXcvWNreyH70itn9hBV69Dle8CaoEvjh5Zr9KGssecw6MrNKssq3zeEgAGgqgjCJGnV9xJ7C36iYuCG+ByD2sPdqK1Z5IsOMenQ7SJp9NWtLM7BMuOSbxc+IpUY2ohoqRufIcUuNCcVrKtPJpk8YA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3737b3ee909so6395875ab.2
+        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 23:25:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718864059; x=1719468859;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oiTn9eBnc2xaUqrsy4JPHqQwAM2LMekPATvkB/1t99U=;
-        b=MalDRV34v6XURnZhFSfyZNT1b5lMI5/qqgn6JhDqkZW6hOPj1ynlca1a5HyGz1Z4FC
-         +xcizx65wXs1gPGQQswVHF5Ll5IiwpHfjBuDcBNxhxKxXrXw30lqmDnCWKaD6MmbnDwW
-         c/uzkLwmFYqDqwz+tKC/NzR4R1mkb0WwTzRRUdiM4fGxqD1sZnZBnl8NYBGAkSEqNmGc
-         sQ9VA71lPe2eCVAGxxgO2yzMQzK9q+16dizP2oa3f7vKeqW3ggnyGNl7qkKf0I15XdLN
-         oU7n5iq3JC0AQN6+wx+nLOyraXGPhwxTUlg3nPBSN+vx40GCk/R56DrMcCrTsB3eI8Wc
-         2/XA==
-X-Forwarded-Encrypted: i=1; AJvYcCVARJ0ISlePQuD+klSI0Ie9jvr9tIC4/c66hCHA5PEk+/XaG2haMF+rSTqY76+x5SIReLGQvHDlRp1mSzD/ffhMDr42X2Z/
-X-Gm-Message-State: AOJu0Yyk/SFGYUu0y0f7YjwrB/V9TUvGo03PEHMrKUNTpcDygf2fdtkE
-	HoYRI0swGqQi7p03vfZ5gNu2YKfzjb/dqlP7fhJafsN4rU4E76k3DP6v4MHuabVGMx8ahAwLfiZ
-	Caq1rqECMcQ4YQpFjfDoflko3qx/DeGGZXW9aCiJxKPfhQdoRQn7/Wc+4oVhEqqel1+49CO0Vd1
-	C14lDRYaevh0oZyomz9YRE+P/2BY0V
-X-Received: by 2002:a05:600c:458e:b0:421:347a:f0a6 with SMTP id 5b1f17b1804b1-4246f56d293mr69412435e9.3.1718864059441;
-        Wed, 19 Jun 2024 23:14:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFrEIvCnPMZaJwLe3hkoFCWNMEj76Qf3eeg2phFe3gxqIMqjUEOM1rEKZDIA0PorTtHFwQnwb5aZj1dyjKKBn8=
-X-Received: by 2002:a05:600c:458e:b0:421:347a:f0a6 with SMTP id
- 5b1f17b1804b1-4246f56d293mr69412205e9.3.1718864058794; Wed, 19 Jun 2024
- 23:14:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718864720; x=1719469520;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9AkqDmFbOYmP7G8PlT0VReaJo1PdTS/f1hBoRWmc/Xs=;
+        b=GTW3hoLEKTHj63zBiYNpkuTb2lQ2iKrehASZloeXeJ/j8YQRpr8/moX0pLJlE45Wa8
+         MedslYXVG6Z8a0w5Djg9ellocWsasx+vAKMNSuImRKWEqcAiglWhEmm6x9e9IUunfF4U
+         s8A64JfkEqK7M6eyRpaKA8TbLPnVXssLxm3mPnxwgCyS/HF1I22slFgJD+wDsrxx7Frm
+         7wapFPP88ZkRAfoJDG5xLMeXfnmCTXnWRE5qFQtFSNP/PKUjLJKXriR0db3D5Is+AxiZ
+         9TbrKMHAmgHwVgnrfmyLt5A0uHwnnZ5MgXrWd1GGy3KzEAD6dnFTkFIuMFqjweVph3KN
+         nEJw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/irLkmD3N8+PhpF7Lb2xM9/U4OBnKfs74i4zEDkoRnGBZAyEeQ1U8UZSVGQlfbYNDBDz7tXgPs/XEucsjWvH9GPzCUT2O
+X-Gm-Message-State: AOJu0YzJTRMwsepgOYq4qcQaxOZheyGv0ZIDQknZDc7n7fNbQLtXhbKq
+	Q9n3SKuz7by7kmeS2dWDuJVrlnKW7ejIgyE35+1Dhn+DrTZNl83QRtoUHaKYi4z61Uz67/6/QLd
+	ukOTgzi15yblTBMJ1g8/0dDgg4JD2hxC5UAJ0UDenA/Sz40fse3os5Kk=
+X-Google-Smtp-Source: AGHT+IElMrpy4IljIE819J4nSDomF7NiLzLJce/SlkO3ussCk682pBZZZOBr5+0JsjnyjbFLiGBg3hQR7Oa4vl3KnbY8VGA0TfEm
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240618131208.6971-1-sergey.temerkhanov@intel.com> <20240618131208.6971-4-sergey.temerkhanov@intel.com>
-In-Reply-To: <20240618131208.6971-4-sergey.temerkhanov@intel.com>
-From: Michal Schmidt <mschmidt@redhat.com>
-Date: Thu, 20 Jun 2024 08:14:07 +0200
-Message-ID: <CADEbmW327YjOjkbb5p8KmyL=sXJbD-MaVBS5XT1uHCSg2ZNBLw@mail.gmail.com>
-Subject: Re: [RFC PATCH iwl-next v1 3/4] ice: Use ice_adapter for PTP shared
- data instead of auxdev
-To: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+X-Received: by 2002:a05:6e02:1c85:b0:374:70ae:e86e with SMTP id
+ e9e14a558f8ab-3761d77047amr2864395ab.6.1718864719966; Wed, 19 Jun 2024
+ 23:25:19 -0700 (PDT)
+Date: Wed, 19 Jun 2024 23:25:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000d0237061b4c6108@google.com>
+Subject: [syzbot] [rdma?] WARNING in gid_table_release_one
+From: syzbot <syzbot+a35b4afb1f00c45977d0@syzkaller.appspotmail.com>
+To: jgg@ziepe.ca, leon@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 18, 2024 at 3:59=E2=80=AFPM Sergey Temerkhanov
-<sergey.temerkhanov@intel.com> wrote:
-> - Use struct ice_adapter to hold shared PTP data and control PTP
-> related actions instead of auxbus. This allows significant code
-> simplification and faster access to the container fields used in
-> the PTP support code.
->
-> - Move the PTP port list to the ice_adapter container to simplify
-> the code and avoid race conditions which could occur due to the
-> synchronous nature of the initialization/access and
-> certain memory saving can be achieved by moving PTP data into
-> the ice_adapter itself.
->
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-[...]
->  /**
->   * struct ice_adapter - PCI adapter resources shared across PFs
->   * @ptp_gltsyn_time_lock: Spinlock protecting access to the GLTSYN_TIME
->   *                        register of the PTP clock.
->   * @refcount: Reference count. struct ice_pf objects hold the references=
-.
-> + * @ctrl_pf: Control PF of the adapter
->   */
->  struct ice_adapter {
->         /* For access to the GLTSYN_TIME register */
->         spinlock_t ptp_gltsyn_time_lock;
-> -
->         refcount_t refcount;
-> +
-> +       struct ice_pf *ctrl_pf;
-> +       struct ice_port_list ports;
->  };
+Hello,
 
-A minor nitpick about grouping of the members in this structure:
-"refcount" is special. It tracks the lifetime of the ice_adapter
-structure itself and it is accessed only from ice_adapter.c. The other
-members are the useful payload. So I would suggest keeping "refcount"
-as either the last or the first struct member.
+syzbot found the following issue on:
 
-Michal
+HEAD commit:    a957267fa7e9 Add linux-next specific files for 20240611
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=15a085de980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9a880e96898e79f8
+dashboard link: https://syzkaller.appspot.com/bug?extid=a35b4afb1f00c45977d0
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6451759a606b/disk-a957267f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7f635dbe5b8a/vmlinux-a957267f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/33eafd1b8aec/bzImage-a957267f.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a35b4afb1f00c45977d0@syzkaller.appspotmail.com
+
+infiniband syz1: ib_query_port failed (-19)
+infiniband syz1: Couldn't set up InfiniBand P_Key/GID cache
+------------[ cut here ]------------
+GID entry ref leak for dev syz1 index 0 ref=1
+WARNING: CPU: 1 PID: 12182 at drivers/infiniband/core/cache.c:809 release_gid_table drivers/infiniband/core/cache.c:806 [inline]
+WARNING: CPU: 1 PID: 12182 at drivers/infiniband/core/cache.c:809 gid_table_release_one+0x33f/0x4d0 drivers/infiniband/core/cache.c:886
+Modules linked in:
+CPU: 1 PID: 12182 Comm: syz-executor.2 Not tainted 6.10.0-rc3-next-20240611-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+RIP: 0010:release_gid_table drivers/infiniband/core/cache.c:806 [inline]
+RIP: 0010:gid_table_release_one+0x33f/0x4d0 drivers/infiniband/core/cache.c:886
+Code: 03 48 b9 00 00 00 00 00 fc ff df 0f b6 04 08 84 c0 75 3e 41 8b 0c 24 48 c7 c7 40 2b a7 8c 48 89 de 44 89 fa e8 e2 2b d0 f8 90 <0f> 0b 90 90 e9 d3 fe ff ff 44 89 e9 80 e1 07 80 c1 03 38 c1 0f 8c
+RSP: 0018:ffffc9000301efe8 EFLAGS: 00010246
+RAX: 5c9e4656a81bd600 RBX: ffff88802919e6a0 RCX: 0000000000040000
+RDX: ffffc90003581000 RSI: 000000000003b835 RDI: 000000000003b836
+RBP: ffff8880294ed0d8 R08: ffffffff81552c42 R09: fffffbfff1c39b10
+R10: dffffc0000000000 R11: fffffbfff1c39b10 R12: ffff88801a3b7d00
+R13: ffff8880294ed000 R14: 1ffff1100529da1b R15: 0000000000000000
+FS:  00007fe09bba36c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b32824000 CR3: 0000000060abc000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ib_device_release+0xd0/0x1b0 drivers/infiniband/core/device.c:498
+ device_release+0x99/0x1c0
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x22f/0x480 lib/kobject.c:737
+ rxe_net_add+0x93/0xd0 drivers/infiniband/sw/rxe/rxe_net.c:543
+ rxe_newlink+0xde/0x1a0 drivers/infiniband/sw/rxe/rxe.c:197
+ nldev_newlink+0x5d0/0x640 drivers/infiniband/core/nldev.c:1778
+ rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:239 [inline]
+ rdma_nl_rcv+0x6dd/0x9e0 drivers/infiniband/core/netlink.c:259
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1357
+ netlink_sendmsg+0x8db/0xcb0 net/netlink/af_netlink.c:1901
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2585
+ ___sys_sendmsg net/socket.c:2639 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2668
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fe09ae7cea9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fe09bba30c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fe09afb3f80 RCX: 00007fe09ae7cea9
+RDX: 0000000000000000 RSI: 00000000200002c0 RDI: 0000000000000005
+RBP: 00007fe09aeebff4 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007fe09afb3f80 R15: 00007ffc7e55f608
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
