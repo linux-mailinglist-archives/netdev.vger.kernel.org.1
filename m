@@ -1,112 +1,145 @@
-Return-Path: <netdev+bounces-105158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A1F490FEA5
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:20:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B99290FEA8
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:21:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2963A1F2146F
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:20:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 142F42865CB
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:21:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4EBB190694;
-	Thu, 20 Jun 2024 08:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52F8E17C7BE;
+	Thu, 20 Jun 2024 08:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="XMBjNsFH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SQ9WIhte"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E234917C238
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 08:20:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C417F5B05E
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 08:21:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718871623; cv=none; b=s2890liplCXkrxvo7eVMcCn0c39nY/90Ee+u43jCLa1ozexoLLadixuRvkgXaRWx7jLw5qw3O9cBzujCua0iroCdeiNLfv5Ox4ESywltIPJkoAf0+FqWDrwvYIzGaSjHEgSLzOISKIjAND4E9MrKvyLOU33kzb4AqIvF4gtppks=
+	t=1718871679; cv=none; b=YR4pYlLEuv6nnCLu9qSO+0YpK6JoNK4OWV5Q+oXjCObsS8qnsTt8bFYDbLZb7VV9HFGXJsZAZFb2L9rODhp9BHDc2T1aqBgMJl96/69O0OGdq1I34qjX+FmHcugSpGvvdaOBcJT8zux9kYo6EGBJUhyFRMrcLyjhywYu8UQB+zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718871623; c=relaxed/simple;
-	bh=B7yX7rbJbYr/mTm0lEL9vuk9v/WQvi74pV0s5CSPcDg=;
+	s=arc-20240116; t=1718871679; c=relaxed/simple;
+	bh=/n3uJxZGHDBrLN6/BzeZ/X4SdYonmAdhMRnGu+C5EYc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qDjvtq4CXGD3rNQeGrGQymzAkfZKvHFbCiLkLLpKy5+U0xGWJgtB8z/HBiuKio2LvnVG7ALjAqBC2STd4+2588cQm0AM9hoD8wwetGGnAwSimy3Hq1WTcUqj5F/uCj08zVV+DkE3pw2zNzyrCTQ4u9G9R2YO4xwPZtK3C0U96VM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=XMBjNsFH; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-52bc121fb1eso649023e87.1
-        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 01:20:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1718871620; x=1719476420; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B7yX7rbJbYr/mTm0lEL9vuk9v/WQvi74pV0s5CSPcDg=;
-        b=XMBjNsFHBUenumwD5DnIx1adUHvzgD616LxC82BGFmHLRvyX35B74Az9RK5fsvjJ1T
-         T0+O7u8w2IiieexySugHQxyCmglq20KE8kAMzZh5VT8apQsVbQ2J37+y0gIgvc17UULw
-         VtDUXyQkiP+51ZEWdS78HuGoYlbnjjPEXy+Uy5EWG0oSPL6VaIuxuT+8Phj5LenD6wKQ
-         JQNrKBjYehQNMVfpLxwISSb+Zyu4RIyTX+FE/z111yNEi+nGeIjs7N1IQUM7d+5LNsWP
-         MNSf9am8EwviAG2UKxNmaj78uYqdnttvXQXaigJxnvLEWYVWpNrZ5P0kH7hb3efpjrqX
-         DsQQ==
+	 To:Cc:Content-Type; b=c0HRpzOM/wlk7MHEpcWYWEaEQjqEWliUwPEVkKHVI3XGjdlw2gb0GRwvNrvHYOFt8poIf6am/5PmdRjn3Fnn81CZk1kEad0uti7v6MF7YqgeanL69wh3H+683E5N//Xlkir9iWF0Ubf8agFdI3SQU7AETLwQTdJInTG1N+N+ZgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SQ9WIhte; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718871676;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UOPoZ6lA6/IZ64IgHqSK6o73AoMp8QIpZ9FSfSUbtuk=;
+	b=SQ9WIhteZARClOgr/U8ueOaJv4OZeMhHIsBTvLGrGOmbWyFozlT5pRGXEefEQ2k/L1umEC
+	C6XzFggWRe2A3GvyMZYYCqAdaU/W5PcEs08xk80eZfN1yYhKbN1gPpLeOGVEtX6Zpfb9bQ
+	QgsZVAMmb3jUGYuZ2dtE0lA3CL4qWzA=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-180-nS3_VypXNzyXPq4VjfkNIw-1; Thu, 20 Jun 2024 04:21:15 -0400
+X-MC-Unique: nS3_VypXNzyXPq4VjfkNIw-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2c79f32200aso786443a91.1
+        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 01:21:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718871620; x=1719476420;
+        d=1e100.net; s=20230601; t=1718871674; x=1719476474;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=B7yX7rbJbYr/mTm0lEL9vuk9v/WQvi74pV0s5CSPcDg=;
-        b=VgmvRfYcmtoF8e0ORcOLaJkz+gZ2t7Xh3DyOgbi3NejfFx4Ln8Kj8XetkDf8TFkh2g
-         ZoGJSWy0G8KpXkEzz4Wwff6D6t2pk1W5XrCCEc7o7pEKlZiqPapoE3VErRO2t49Kps/r
-         ipo3tEc8ph25XHvCBIZWDs3KDJLnV3xq4hP525rgO7RYjT+sTrZ71ZV6xxSWpmGbNJD2
-         44dq61XEFkVhlQY1hz+TwnPqZENJycWLDXKRRaxIgeFlD3AKtnTddsjNMxWX8S2XcH4M
-         QnUDYTuNEWORN1J12GOY7DHagNaRDArg4bPCPghYi9qbOyu+dJzDjeusPoQuYS+Od3db
-         nbIg==
-X-Forwarded-Encrypted: i=1; AJvYcCXWyLRNKhkXVdK4lbaGDh3AxtVy8UP18eL/hS/rGq10D2S1ewX7E6Z+v1MmjCj/mwx6SS6kC/8ew45eSZUCBlypu2XcxPrV
-X-Gm-Message-State: AOJu0Yyw6xo534Xi8n4BuxOjVTy+/HSYuEIpX/29idEJNkeQ3nXLb7fu
-	EG7Yq6hKimCFIcMVzwWv4N4iKMTw5StlBF6nZrowazA6N8rLnlPKDCXMrQmqx+nkTfvbU/kdHUN
-	w4LUkhb85qSySBtQfxGt3XlROyvcdVa7hvV6mPg==
-X-Google-Smtp-Source: AGHT+IEmop4fSjADk7pSWeD8ON7nqhqCNYoCXWB9xXRFCphWhGBBKaZ3FTBp7MgrIlYFop2ThtyzgoBlAbqZbHjT0uk=
-X-Received: by 2002:a05:6512:1182:b0:52c:86d6:e8d7 with SMTP id
- 2adb3069b0e04-52ccaa2d4a3mr2435101e87.13.1718871620038; Thu, 20 Jun 2024
- 01:20:20 -0700 (PDT)
+        bh=UOPoZ6lA6/IZ64IgHqSK6o73AoMp8QIpZ9FSfSUbtuk=;
+        b=RwCdOzGIaXURu6oN+SqLNvMT9sGIiCjiH7v9A2RlhHvodeDncHqh+EeB55Z72dVRWh
+         K4hgGN9DszHC0UqKH5ZK82Jd+1pEvvrxZlNbC2k3tPlRkHxnDPznugcItZsLPmHhzeP8
+         8azpBcgj95OcVldUHwHBKPILa6c9+AldGkpA4NNNmHmaJxJN2Gr4aRRk/3ZIXB4KL5bd
+         teX9fFFnyBi6csPSO6ErrUstef9OhvWQPHtC1VGWNXHoiu7wBpwvfH93/NIFC+Xm4mgG
+         cor9T7BSEBLV4W+j0UJbXeJMkbaRvDAWmPwsQmVuHE7TgEitBBJWg5vSI528Lfi4SylG
+         1AbA==
+X-Forwarded-Encrypted: i=1; AJvYcCWi0+wDBQFphansCIOnsKeHZo7mzkkAvPEDJI5SH2kTDDceN4L8K+lDCqpSIphBS+PThSIp9a0OAGIc2wRv9kqS34QfSPzO
+X-Gm-Message-State: AOJu0Yxkz+ILfoOaXW/mPmBVyRNTGHfJwFkNXIITcvmA++jvkAQ8BA06
+	FM3oJBEnPYKN2Cex+GMqyhcT7cVJpXCKJ0XU/93FpRgacgSRU3WsD/j2UrUhsj/SCC/wxk+0oal
+	z81OndoAiMNBbwJrve6NlcSSiYRDb0uKorL92PytIvXugZaY12qxnQN9S/s8hFRNnBWIzk76gHs
+	0ZPuGSeVSOwnKGfXFGeVWv2aw8IMTz
+X-Received: by 2002:a17:90a:e00e:b0:2c2:c61f:e09 with SMTP id 98e67ed59e1d1-2c7b5c8ab04mr4856702a91.20.1718871673980;
+        Thu, 20 Jun 2024 01:21:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEELXLOS9maMM8/VKYz9vtsvs8uB8tfK91+qINgt4JeMnX/Yop4+S/SdYYQlGJlokc9zzzowtkPFO6a1HfYlMg=
+X-Received: by 2002:a17:90a:e00e:b0:2c2:c61f:e09 with SMTP id
+ 98e67ed59e1d1-2c7b5c8ab04mr4856685a91.20.1718871673621; Thu, 20 Jun 2024
+ 01:21:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240619184550.34524-1-brgl@bgdev.pl> <20240619184550.34524-9-brgl@bgdev.pl>
- <f4af7cb3-d139-4820-8923-c90f28cca998@lunn.ch>
-In-Reply-To: <f4af7cb3-d139-4820-8923-c90f28cca998@lunn.ch>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 20 Jun 2024 10:20:08 +0200
-Message-ID: <CAMRc=MeP9o2n8AqHYNZMno5gFA94DnQCoHupYiofQLLw03bL6A@mail.gmail.com>
-Subject: Re: [PATCH net-next 8/8] net: stmmac: qcom-ethqos: add a DMA-reset
- quirk for sa8775p-ride-r3
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vinod Koul <vkoul@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240619161908.82348-1-hengqi@linux.alibaba.com>
+ <20240619161908.82348-3-hengqi@linux.alibaba.com> <20240619171708-mutt-send-email-mst@kernel.org>
+ <1718868555.2701075-5-hengqi@linux.alibaba.com>
+In-Reply-To: <1718868555.2701075-5-hengqi@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 20 Jun 2024 16:21:02 +0800
+Message-ID: <CACGkMEv8jnnO=S3LYW00ypwHfM3Tzt42iuASG_d4FAAk60zoLg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 2/5] virtio_net: enable irq for the control vq
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, virtualization@lists.linux.dev, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 19, 2024 at 9:33=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+On Thu, Jun 20, 2024 at 3:35=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.com> =
+wrote:
 >
-> On Wed, Jun 19, 2024 at 08:45:49PM +0200, Bartosz Golaszewski wrote:
-> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> On Wed, 19 Jun 2024 17:19:12 -0400, "Michael S. Tsirkin" <mst@redhat.com>=
+ wrote:
+> > On Thu, Jun 20, 2024 at 12:19:05AM +0800, Heng Qi wrote:
+> > > @@ -5312,7 +5315,7 @@ static int virtnet_find_vqs(struct virtnet_info=
+ *vi)
+> > >
+> > >     /* Parameters for control virtqueue, if any */
+> > >     if (vi->has_cvq) {
+> > > -           callbacks[total_vqs - 1] =3D NULL;
+> > > +           callbacks[total_vqs - 1] =3D virtnet_cvq_done;
+> > >             names[total_vqs - 1] =3D "control";
+> > >     }
+> > >
 > >
-> > On sa8775p-ride the RX clocks from the AQR115C PHY are not available at
-> > the time of the DMA reset so we need to loop TX clocks to RX and then
-> > disable loopback after link-up. Use the provided callbacks to do it for
-> > this board.
+> > If the # of MSIX vectors is exactly for data path VQs,
+> > this will cause irq sharing between VQs which will degrade
+> > performance significantly.
+> >
+
+Why do we need to care about buggy management? I think libvirt has
+been teached to use 2N+2 since the introduction of the multiqueue[1].
+
+> > So no, you can not just do it unconditionally.
+> >
+> > The correct fix probably requires virtio core/API extensions.
 >
-> How does this differ to ethqos_clks_config()?
+> If the introduction of cvq irq causes interrupts to become shared, then
+> ctrlq need to fall back to polling mode and keep the status quo.
+
+Having to path sounds a burden.
+
+>
+> Thanks.
 >
 
-I'm not sure I understand the question. This function is called at
-probe/remove and suspend/resume. It's not linked to the issue solved
-here.
 
-Bart
+Thanks
+
+[1] https://www.linux-kvm.org/page/Multiqueue
+
+> >
+> > --
+> > MST
+> >
+>
+
 
