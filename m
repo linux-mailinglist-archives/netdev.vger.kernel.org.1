@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-105427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C9A89111F3
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 21:15:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB7D2911202
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 21:21:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D7281C2228E
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 19:15:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85C90285939
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 19:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31001B4C52;
-	Thu, 20 Jun 2024 19:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20ACC1B4C3D;
+	Thu, 20 Jun 2024 19:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GTRU5+to"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ci1WlA6n"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C131B47C1;
-	Thu, 20 Jun 2024 19:14:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FDE11B47C1;
+	Thu, 20 Jun 2024 19:21:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718910880; cv=none; b=F4sV91iHVpdUXepuEzUFY0rErnFQGsif7fXV3NNtdWj2ifJmnAVolGHfoOEeWe9glbhm0vS0aQyFhzVVBZlIEgE2JOLdmtTbMB/GiAmhWIyfcYTVbcIXpIrqq0UB2xw0y4NuHOXowRdozV2en6A9jTGVpsMbeaXxIh0428hsO6s=
+	t=1718911279; cv=none; b=QofxMG+75JGbr5b6JU1drbN2BPavlLtz+yLp+xeIHnCTI9tTcSDy1+/Yv/hyw/BOEk6iBhOeDZB9Vx8Jb4izsztsA3UlZFv8b2Fa/ZrBFUP5kKrKMtoV6Fi51/Fo/Ny2yIzh6BQsyguTtcFtKjmcKcZY3bkQktcfzPlw3lbVLUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718910880; c=relaxed/simple;
-	bh=JqKuhxuOfiKP/ZmD0E10286le4lRBg5B2jJTJETya8Q=;
+	s=arc-20240116; t=1718911279; c=relaxed/simple;
+	bh=8epgr/RvrTLRKPmIB/Afb8y7LeJFhLANO06COiwITpU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KGTE7MECjjS87OJuVAITcJfnaa8uMayg9CZMi8mkuCtszUnhU6of1VTGIWUvistSJl/5htqsKbyihdk7O+N+wN55557eyV7Lou7pTikVTiETVip+BZvTW+LaT8C+4+GE+jQoficSWkJaPimdoKTuHCC4awwA/akNsHzZVFPyjps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GTRU5+to; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=aYao2pevnGAhCEUYXcz7lGDAV8kXij9fSjh+mGeVRd77gmrpeOcq0eye6JmDmZ6ECXxlaEVt5qcf4ohom38uU5NSJXBi5dgUHIUZguBuvSf0sXGxgqDbx6FZccyKUhA9K1Df3Rbx9Ad/Aoxvflq/Fd+Eqt0LupA9G7rp08+pES4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ci1WlA6n; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,33 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GtUiKMS+JogD7d3VokqpWsqamEr3QnRsE46YsJrX/0o=; b=GTRU5+to0kKy1NAX4h4nyUFaZ6
-	jHdJh1WGaW6/adsVToEIo0B3tkHPVcSm1Dk+NLBYCa+QwOQqCEHobDiYS2pEgMbvbB7wJly6vlod+
-	sHB79KMKRc9abEw6vVPCyQedSikAivG/UC00Pnvy/Hdr0/nTDai8TwiLOgRnLWvcMq58=;
+	bh=SnzxQ3G5O1MZLAjWeXdj4aotnAk4rfp6Vz3kFyLSsa0=; b=ci1WlA6nYinmBy2cyOkwYwtGvE
+	nviN9i66TLjfrSFi5xsI4a4i2pC7zgzBIt7Fu9GmU4qR4mI/Hiz6Epwha/jkg5FsbsfkgLv7s8ldT
+	kbH0FwU49T/BgGIPYO2IQvNPr+GuFAjJrM2kPf/RLg34qihtaU6vnJ73twlZevx32N54=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sKNEu-000bKe-I4; Thu, 20 Jun 2024 21:14:32 +0200
-Date: Thu, 20 Jun 2024 21:14:32 +0200
+	id 1sKNLA-000bLe-TH; Thu, 20 Jun 2024 21:21:00 +0200
+Date: Thu, 20 Jun 2024 21:21:00 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Omer Shpigelman <oshpigelman@habana.ai>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"ogabbay@kernel.org" <ogabbay@kernel.org>,
-	Zvika Yehudai <zyehudai@habana.ai>
-Subject: Re: [PATCH 09/15] net: hbl_en: add habanalabs Ethernet driver
-Message-ID: <9d459e01-6171-4a1a-855c-f56813ea9e0f@lunn.ch>
-References: <20240613082208.1439968-1-oshpigelman@habana.ai>
- <20240613082208.1439968-10-oshpigelman@habana.ai>
- <10902044-fb02-4328-bf88-0b386ee51c78@lunn.ch>
- <bddb69c3-511b-4385-a67d-903e910a8b51@habana.ai>
- <621d4891-36d7-48c6-bdd8-2f3ca06a23f6@lunn.ch>
- <45e35940-c8fc-4f6c-8429-e6681a48b889@habana.ai>
- <20240619082104.2dcdcd86@kernel.org>
- <5cb11774-a710-4edc-a55c-c529b0114ca4@habana.ai>
- <20240620065135.116d8edf@kernel.org>
+To: Furong Xu <0x1207@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH net-next v1] net: stmmac: init more plat members from DT
+Message-ID: <54024796-bdf8-4b28-9189-3fa23cff52cf@lunn.ch>
+References: <20240620064004.573280-1-0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,23 +66,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240620065135.116d8edf@kernel.org>
+In-Reply-To: <20240620064004.573280-1-0x1207@gmail.com>
 
-On Thu, Jun 20, 2024 at 06:51:35AM -0700, Jakub Kicinski wrote:
-> On Thu, 20 Jun 2024 08:43:34 +0000 Omer Shpigelman wrote:
-> > > You support 400G, you really need to give the user the ability
-> > > to access higher pages.  
-> > 
-> > Actually the 200G and 400G modes in the ethtool code should be removed
-> > from this patch set. They are not relevant for Gaudi2. I'll fix it in the
-> > next version.
-> 
-> How do your customers / users check SFP diagnostics?
- 
-And perform firmware upgrade of the SFPs?
+On Thu, Jun 20, 2024 at 02:40:04PM +0800, Furong Xu wrote:
+> A new option to init some useful members of plat_stmmacenet_data from DT.
 
-https://lore.kernel.org/netdev/20240619121727.3643161-7-danieller@nvidia.com/T/
+Are these documented in the binding?
 
-	Andrew
+Also, do you have a .dts file which makes use of these. We don't like
+to add things unless there is a user.
 
+    Andrew
+
+---
+pw-bot: cr
 
