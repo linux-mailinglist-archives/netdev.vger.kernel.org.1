@@ -1,140 +1,301 @@
-Return-Path: <netdev+bounces-105141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D31AF90FCE2
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:41:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A05B990FCF6
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:47:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70DC528558E
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 06:41:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFA5A282395
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 06:47:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED5C40858;
-	Thu, 20 Jun 2024 06:41:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 586012E631;
+	Thu, 20 Jun 2024 06:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m4/+uca+"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="zQ2SdBtE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFB540848;
-	Thu, 20 Jun 2024 06:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34D012E78
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 06:47:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718865661; cv=none; b=at7bhvoCDWO9tgqaJxHs/HYzt5b95DE63MFEAOcuWg7a6ODvtqh8vfQTygy4e3UAB0RAxaEIhS4oonGH/n9+o/lriJHoQQObpqZyYqqW0f/BcBr6Rv1rOrbK6MSMmlHAtCSU249bsMKh9twu6Pg9VCUpcMihJrCMRWdjaJOqEvs=
+	t=1718866057; cv=none; b=aTgZSvQMl/f2f4Vf26TIDe9yS1SMg9tDrWyzbo+/lMo3q8uVedq8a4wL4xD1hayUrBiGXqhdPqnwvme88yesrBoT7Osw6YitD26Wn78pITg8uM0IGpUTEN1pP8jqy3B/0WG9uJFLm0EgMgGihbd9yCKIIk6a2oUeeNdOq9f1m1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718865661; c=relaxed/simple;
-	bh=UzzGZvEE5qzqnyqLhkrTBSAmBpUlFkIi/FE1mJkkpJ0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GpKu7lJH25TNj7sFmxpgrDpVJXphqXFQhswxL4poLFQ0qUFBh1Ugpy+6/l5AbWqPfQJCr37D0wc3QNVvenqG6U0UKvJl42ick7y3TfgkL2P2fZc57tFsmbAZruMHE8fKdk+sJMNJWKEbSNJbw+9RGXtQV1WGjUu3ndU+TZuQz6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m4/+uca+; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2bfffa3c748so485945a91.3;
-        Wed, 19 Jun 2024 23:40:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718865659; x=1719470459; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dj4QZeFx+AVC51p11hlg4kzbDA2elF0sWu+Rp1qJlwA=;
-        b=m4/+uca+AsSkt+BVHgBimm7KSElcOqANLihePTNielo5FZ0d9s5hbpRRN5nHcBuymj
-         p5pfrYRGa03XsSn8eIG85PhEs3e3TxgZez2THKDQFL4h01kDvz9BthfZIT4pn+Prcp9c
-         eQ7PWKXnDqlBnB6jiHo7fcwfkhCEv0ph1nbQRRdCec4DHpRcrVbY+obgihPzafMPXRsb
-         DTWqBhfGxLRWeN90l7RNosipbSEDCQTe7sGX4dXJOLwIdHYXbwVdj+gJrJDSHhLWneN3
-         K/2KODzptlfO/QbKby7vYDbyzWYid2AZDW7bJ0w7Og/3uNcr2FYBOm4Wj7FmNHIjHmKr
-         K/zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718865659; x=1719470459;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Dj4QZeFx+AVC51p11hlg4kzbDA2elF0sWu+Rp1qJlwA=;
-        b=IxhTxfJlSngvWUZMM77Z78ipuUa7yyfhVZb7417oKrkkPnUOJ0pTSxvSQOZPQnMCaW
-         JY+ORA9vcViNafkbOcPwN+0U9OVMoMSHB3yFrG5xEQdH3HbH1UMZR2uEqPZervBURaJG
-         tvYE7z6z+YSoZmFa0fRkPQRm9lnJcVQR99c3wJYM8JVemqGrV+a2p+bPjojQV/YaL1+F
-         Wczadj2WV71+DF4959Mugz+dwgkiXGHIuJUYTaGrJBvOyKaUmFtX2j6NPCpuHkrWpGn0
-         UDrTvsVCuL5Iyl37hFjwp4eAcS7LQAxT7FPY7mB19AjJbJJfrPDf0JhhaThU12stfuTO
-         5b3A==
-X-Forwarded-Encrypted: i=1; AJvYcCXpmkVo2KM4FPVZL0s4XLmwH90+t4QI18RIJOraHZN5hqFWPcBi0Ri2koElGD7IVqbvw/u8QAQGBf8/6Bi11Op8SlR4wGQFlk2hqPkZ
-X-Gm-Message-State: AOJu0YwGWhSrvVETK7x6k9Kw0RhbKEAn54bmVIrXuaOb8IK0iLgGULrw
-	scH/msDNxdNReUbrv35TCF426OjxsaNOteTQSmDF9PZihYVBM90M
-X-Google-Smtp-Source: AGHT+IFNC7FgO9HSN1gJ1UcHOVjndxJnOiiessKD+THr8O0UlSmH6s/UeMfmg86hakwBC98pUI/Xuw==
-X-Received: by 2002:a17:90a:ea92:b0:2c4:b300:1b4c with SMTP id 98e67ed59e1d1-2c7b5cc49f5mr4163646a91.24.1718865659045;
-        Wed, 19 Jun 2024 23:40:59 -0700 (PDT)
-Received: from localhost.localdomain ([129.146.253.192])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2c7e50f7c90sm862442a91.9.2024.06.19.23.40.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jun 2024 23:40:58 -0700 (PDT)
-From: Furong Xu <0x1207@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	xfr@outlook.com,
-	rock.xu@nio.com,
-	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net-next v1] net: stmmac: init more plat members from DT
-Date: Thu, 20 Jun 2024 14:40:04 +0800
-Message-Id: <20240620064004.573280-1-0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1718866057; c=relaxed/simple;
+	bh=mLr50IOf/Ie09oDWbUwASpD27MHunGsFHRTi+5Pv9iE=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Lg0x3TFt7UjHzCpPiL4J3ilJArcaKDQcoGjWf8VPxOtbtYOXL1KkdBWVfFO4+Rh26t7SY6GVETUPMWqH/sSCCRlIOwkDTFHjpi/dz49WF7Q8ZVZeGU+G+uYLZiNHzvYG0eA2vW6382W9a95lSLbUqoFpdB+O8yJMFSnR5+5ZT6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=zQ2SdBtE; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 60ECC207AC;
+	Thu, 20 Jun 2024 08:47:26 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id P9sohFXktxIi; Thu, 20 Jun 2024 08:47:25 +0200 (CEST)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 936832067F;
+	Thu, 20 Jun 2024 08:47:25 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 936832067F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1718866045;
+	bh=M12VV0o/eJ9/v3YhFZiXQ4vD4nWHGrOeCy3BLNbxXEE=;
+	h=Date:From:To:Subject:From;
+	b=zQ2SdBtEopZ2x8Q0Vfdyw+qnrSsYh1wdM6mSVtTv6SyR3pIwgtC2hncfv3YzTY6/Z
+	 Haf78wx83Tm4vjp8M7bNYoe4EhTAmvAym0JNiH1C8GYiWC/IrBEyNdxoSBb/uYrV4v
+	 YpIwrhqsUjLsnlsGN7ZnG4Mmx+c/rnvYouF5gcdgljW1tGG5zN1NkQ1VRxyU63VdxA
+	 uEcxdQIVRBSWbmr3TZHdafjQOiBHxm+uOcZ4Ep1ATIhn6CFevgUlVVEFZmjHKZLWHE
+	 0UaIwB9rtchlOzfWYpSUaxcbsSTCaoGnMqyjbQV8G/xCvt5OgQ33oed/pwR9DLmc1u
+	 ZtWz3RBdQ/+8A==
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+	by mailout2.secunet.com (Postfix) with ESMTP id 86D5D80004A;
+	Thu, 20 Jun 2024 08:47:25 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 20 Jun 2024 08:47:25 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 20 Jun
+ 2024 08:47:24 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 9EE393180390; Thu, 20 Jun 2024 08:47:24 +0200 (CEST)
+Date: Thu, 20 Jun 2024 08:47:24 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Jianbo Liu <jianbol@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+	<netdev@vger.kernel.org>
+Subject: [PATCH v2 ipsec] xfrm: Fix unregister netdevice hang on hardware
+ offload.
+Message-ID: <ZnPQfG3qsSkAW2VM@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-A new option to init some useful members of plat_stmmacenet_data from DT.
+When offloading xfrm states to hardware, the offloading
+device is attached to the skbs secpath. If a skb is free
+is deferred, an unregister netdevice hangs because the
+netdevice is still refcounted.
 
-Signed-off-by: Furong Xu <0x1207@gmail.com>
+Fix this by removing the netdevice from the xfrm states
+when the netdevice is unregistered. To find all xfrm states
+that need to be cleared we add another list where skbs
+linked to that are unlinked from the lists (deleted)
+but not yet freed.
+
+Changes in v2:
+
+- Fix build with CONFIG_XFRM_OFFLOAD disabled.
+- Fix two typos in the commit message.
+
+Fixes: d77e38e612a0 ("xfrm: Add an IPsec hardware offloading API")
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ include/net/xfrm.h    | 36 +++++++------------------
+ net/xfrm/xfrm_state.c | 61 +++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 69 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 54797edc9b38..b86cfb2570ab 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -497,6 +497,8 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 77ebf5bcf0b9..7d4c2235252c 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -178,7 +178,10 @@ struct xfrm_state {
+ 		struct hlist_node	gclist;
+ 		struct hlist_node	bydst;
+ 	};
+-	struct hlist_node	bysrc;
++	union {
++		struct hlist_node	dev_gclist;
++		struct hlist_node	bysrc;
++	};
+ 	struct hlist_node	byspi;
+ 	struct hlist_node	byseq;
  
- 	of_property_read_u32(np, "rx-fifo-depth", &plat->rx_fifo_size);
+@@ -1588,7 +1591,7 @@ void xfrm_state_update_stats(struct net *net);
+ static inline void xfrm_dev_state_update_stats(struct xfrm_state *x)
+ {
+ 	struct xfrm_dev_offload *xdo = &x->xso;
+-	struct net_device *dev = xdo->dev;
++	struct net_device *dev = READ_ONCE(xdo->dev);
  
-+	of_property_read_u32(np, "host-dma-width", &plat->host_dma_width);
+ 	if (dev && dev->xfrmdev_ops &&
+ 	    dev->xfrmdev_ops->xdo_dev_state_update_stats)
+@@ -1946,13 +1949,16 @@ int xfrm_dev_policy_add(struct net *net, struct xfrm_policy *xp,
+ 			struct xfrm_user_offload *xuo, u8 dir,
+ 			struct netlink_ext_ack *extack);
+ bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x);
++void xfrm_dev_state_delete(struct xfrm_state *x);
++void xfrm_dev_state_free(struct xfrm_state *x);
+ 
+ static inline void xfrm_dev_state_advance_esn(struct xfrm_state *x)
+ {
+ 	struct xfrm_dev_offload *xso = &x->xso;
++	struct net_device *dev = READ_ONCE(xso->dev);
+ 
+-	if (xso->dev && xso->dev->xfrmdev_ops->xdo_dev_state_advance_esn)
+-		xso->dev->xfrmdev_ops->xdo_dev_state_advance_esn(x);
++	if (dev && dev->xfrmdev_ops->xdo_dev_state_advance_esn)
++		dev->xfrmdev_ops->xdo_dev_state_advance_esn(x);
+ }
+ 
+ static inline bool xfrm_dst_offload_ok(struct dst_entry *dst)
+@@ -1973,28 +1979,6 @@ static inline bool xfrm_dst_offload_ok(struct dst_entry *dst)
+ 	return false;
+ }
+ 
+-static inline void xfrm_dev_state_delete(struct xfrm_state *x)
+-{
+-	struct xfrm_dev_offload *xso = &x->xso;
+-
+-	if (xso->dev)
+-		xso->dev->xfrmdev_ops->xdo_dev_state_delete(x);
+-}
+-
+-static inline void xfrm_dev_state_free(struct xfrm_state *x)
+-{
+-	struct xfrm_dev_offload *xso = &x->xso;
+-	struct net_device *dev = xso->dev;
+-
+-	if (dev && dev->xfrmdev_ops) {
+-		if (dev->xfrmdev_ops->xdo_dev_state_free)
+-			dev->xfrmdev_ops->xdo_dev_state_free(x);
+-		xso->dev = NULL;
+-		xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
+-		netdev_put(dev, &xso->dev_tracker);
+-	}
+-}
+-
+ static inline void xfrm_dev_policy_delete(struct xfrm_policy *x)
+ {
+ 	struct xfrm_dev_offload *xdo = &x->xdo;
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 649bb739df0d..d531d2a1fae2 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -49,6 +49,7 @@ static struct kmem_cache *xfrm_state_cache __ro_after_init;
+ 
+ static DECLARE_WORK(xfrm_state_gc_work, xfrm_state_gc_task);
+ static HLIST_HEAD(xfrm_state_gc_list);
++static HLIST_HEAD(xfrm_state_dev_gc_list);
+ 
+ static inline bool xfrm_state_hold_rcu(struct xfrm_state __rcu *x)
+ {
+@@ -214,6 +215,7 @@ static DEFINE_SPINLOCK(xfrm_state_afinfo_lock);
+ static struct xfrm_state_afinfo __rcu *xfrm_state_afinfo[NPROTO];
+ 
+ static DEFINE_SPINLOCK(xfrm_state_gc_lock);
++static DEFINE_SPINLOCK(xfrm_state_dev_gc_lock);
+ 
+ int __xfrm_state_delete(struct xfrm_state *x);
+ 
+@@ -683,6 +685,40 @@ struct xfrm_state *xfrm_state_alloc(struct net *net)
+ }
+ EXPORT_SYMBOL(xfrm_state_alloc);
+ 
++#ifdef CONFIG_XFRM_OFFLOAD
++void xfrm_dev_state_delete(struct xfrm_state *x)
++{
++	struct xfrm_dev_offload *xso = &x->xso;
++	struct net_device *dev = READ_ONCE(xso->dev);
 +
- 	plat->force_sf_dma_mode =
- 		of_property_read_bool(np, "snps,force_sf_dma_mode");
++	if (dev) {
++		dev->xfrmdev_ops->xdo_dev_state_delete(x);
++		spin_lock_bh(&xfrm_state_dev_gc_lock);
++		hlist_add_head(&x->dev_gclist, &xfrm_state_dev_gc_list);
++		spin_unlock_bh(&xfrm_state_dev_gc_lock);
++	}
++}
++
++void xfrm_dev_state_free(struct xfrm_state *x)
++{
++	struct xfrm_dev_offload *xso = &x->xso;
++	struct net_device *dev = READ_ONCE(xso->dev);
++
++	if (dev && dev->xfrmdev_ops) {
++		spin_lock_bh(&xfrm_state_dev_gc_lock);
++		if (!hlist_unhashed(&x->dev_gclist))
++			hlist_del(&x->dev_gclist);
++		spin_unlock_bh(&xfrm_state_dev_gc_lock);
++
++		if (dev->xfrmdev_ops->xdo_dev_state_free)
++			dev->xfrmdev_ops->xdo_dev_state_free(x);
++		WRITE_ONCE(xso->dev, NULL);
++		xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
++		netdev_put(dev, &xso->dev_tracker);
++	}
++}
++#endif
++
+ void __xfrm_state_destroy(struct xfrm_state *x, bool sync)
+ {
+ 	WARN_ON(x->km.state != XFRM_STATE_DEAD);
+@@ -848,6 +884,9 @@ EXPORT_SYMBOL(xfrm_state_flush);
  
-@@ -561,6 +563,8 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 		plat->pmt = 1;
- 		if (of_property_read_bool(np, "snps,tso"))
- 			plat->flags |= STMMAC_FLAG_TSO_EN;
-+		if (of_property_read_bool(np, "snps,no-sph"))
-+			plat->flags |= STMMAC_FLAG_SPH_DISABLE;
- 	}
+ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_valid)
+ {
++	struct xfrm_state *x;
++	struct hlist_node *tmp;
++	struct xfrm_dev_offload *xso;
+ 	int i, err = 0, cnt = 0;
  
- 	if (of_device_is_compatible(np, "snps,dwmac-3.610") ||
-@@ -573,8 +577,11 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 	if (of_device_is_compatible(np, "snps,dwxgmac")) {
- 		plat->has_xgmac = 1;
- 		plat->pmt = 1;
-+		of_property_read_u32(np, "max-frame-size", &plat->maxmtu);
- 		if (of_property_read_bool(np, "snps,tso"))
- 			plat->flags |= STMMAC_FLAG_TSO_EN;
-+		if (of_property_read_bool(np, "snps,no-sph"))
-+			plat->flags |= STMMAC_FLAG_SPH_DISABLE;
- 	}
+ 	spin_lock_bh(&net->xfrm.xfrm_state_lock);
+@@ -857,8 +896,6 @@ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_vali
  
- 	dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*dma_cfg),
+ 	err = -ESRCH;
+ 	for (i = 0; i <= net->xfrm.state_hmask; i++) {
+-		struct xfrm_state *x;
+-		struct xfrm_dev_offload *xso;
+ restart:
+ 		hlist_for_each_entry(x, net->xfrm.state_bydst+i, bydst) {
+ 			xso = &x->xso;
+@@ -868,6 +905,8 @@ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_vali
+ 				spin_unlock_bh(&net->xfrm.xfrm_state_lock);
+ 
+ 				err = xfrm_state_delete(x);
++				xfrm_dev_state_free(x);
++
+ 				xfrm_audit_state_delete(x, err ? 0 : 1,
+ 							task_valid);
+ 				xfrm_state_put(x);
+@@ -884,6 +923,24 @@ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_vali
+ 
+ out:
+ 	spin_unlock_bh(&net->xfrm.xfrm_state_lock);
++
++	spin_lock_bh(&xfrm_state_dev_gc_lock);
++restart_gc:
++	hlist_for_each_entry_safe(x, tmp, &xfrm_state_dev_gc_list, dev_gclist) {
++		xso = &x->xso;
++
++		if (xso->dev == dev) {
++			spin_unlock_bh(&xfrm_state_dev_gc_lock);
++			xfrm_dev_state_free(x);
++			spin_lock_bh(&xfrm_state_dev_gc_lock);
++			goto restart_gc;
++		}
++
++	}
++	spin_unlock_bh(&xfrm_state_dev_gc_lock);
++
++	xfrm_flush_gc();
++
+ 	return err;
+ }
+ EXPORT_SYMBOL(xfrm_dev_state_flush);
 -- 
 2.34.1
 
