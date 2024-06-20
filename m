@@ -1,158 +1,98 @@
-Return-Path: <netdev+bounces-105250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C37F89103EA
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:27:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09832910440
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:33:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDB861C20AED
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:27:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 756A7B22631
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3660D1AC43A;
-	Thu, 20 Jun 2024 12:27:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18AA1AD3E7;
+	Thu, 20 Jun 2024 12:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E7GTITrW"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF76A1AC436
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 12:27:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573F51ACE64
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 12:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718886449; cv=none; b=D0RBAZ7RxdUHCzYpEJQX2WJodP2V+B3pSXeA/XqVHlHKRdNFLvsdfopG7KnQd9/yzU6Bwzj+2R/iDQS3bfagcyT1UMmw0oph9pH9R/pA+a3aGyUau/cz9WnhH2RCBsVgATLdkkeFBPHFP4PRR8qHv+MZeOFqDV1PQcGeUySYd6g=
+	t=1718886720; cv=none; b=llzRDDDnFicVkUboh7YgpUD6U9Cmd1Oz+fnZr9cAM3GDym7+uqmPNVxbwT61i1FAXpnkpWpnl7epEkslTj+rXZtrvtao6e1kZTMICEJf9PEbwvVAjhHqXwS9Geg30bnVY5CyyxlcsfCEqmpj5DG5Wv3bpD/AAAy1UJWn7APm50s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718886449; c=relaxed/simple;
-	bh=Wu2LgFnOmJBZ5ujdas2D9HWZy81C/aJPRhzDhrICV3s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XPTi5Cl7yX7XWYDi3f9sT7yGR7QxmMlTJ2N/QHFw48mepV5vj06mCdz1WO3iUI6+nzQouFfaNyUW9SnCuwoIacEkJP3hpk0KC1cfNvLNHq82pm8EEgezHwh0JccCt7A/JsiGbQV+DR8DhiliRIsv7EpOlQyFt3V9Wsd0f+BQiUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sKGsT-0005bi-Ro; Thu, 20 Jun 2024 14:26:57 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sKGsR-003hQC-Hd; Thu, 20 Jun 2024 14:26:55 +0200
-Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 2E3912ED9D2;
-	Thu, 20 Jun 2024 12:26:55 +0000 (UTC)
-Date: Thu, 20 Jun 2024 14:26:55 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Markus Schneider-Pargmann <msp@baylibre.com>
-Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>, 
-	Vibhore Vardhan <vibhore@ti.com>, Kevin Hilman <khilman@baylibre.com>, Dhruva Gole <d-gole@ti.com>, 
-	Martin =?utf-8?Q?Hundeb=C3=B8ll?= <martin@geanix.com>, Simon Horman <horms@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 3/7] can: m_can: Map WoL to device_set_wakeup_enable
-Message-ID: <20240620-magnificent-antique-pogona-4c81e8-mkl@pengutronix.de>
-References: <20240523075347.1282395-1-msp@baylibre.com>
- <20240523075347.1282395-4-msp@baylibre.com>
+	s=arc-20240116; t=1718886720; c=relaxed/simple;
+	bh=CjX02a42qzAYbrtxKmG4UYbxovrRtFRFcsvg/03UgSo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g1+q1lS+YYHpI5gSPY0xpjAK1/rHntHYjCYZkL8ltQ3itE0cxYWKjaLlyElG1JxyRqIo5wsX6q8CDsJpfYZlzjM1IqR/EEopmqXf9jToo1SmJsl/lqexiCTqWbx5e5WXcdk23BSmI/hJ22rj+uEVWD+5NlMSQy8U2uttkYPrOeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E7GTITrW; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718886718; x=1750422718;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=CjX02a42qzAYbrtxKmG4UYbxovrRtFRFcsvg/03UgSo=;
+  b=E7GTITrWB+9KhVOGa3DVfZndKn7mRmb9JQryCJqADeZh0cze0yFwMvkX
+   zR5SrFtixBR6/bUr5wwWIXhj1WFJEYBhP9yuP5zzJ8T3E1jhdv4xeQDYd
+   Q6hxunuWY6uqL1HYCGGiKHy3pRtlBtfdGAQm+zXkjR86NdzYlAN+o6miA
+   lQ11JhyvMWB3nlNfNK6kekuZ5T8S552USpkrNuYmfi1W3gajik4ffweB2
+   spjdcqwtew8b1XvnYjGYGbAw/5D1rzeMFy9RW/i6Ho1MQiax7pBVkHRa+
+   Al1ypS/kOSQl1VyQrKZJ/JrxkYiJYLL3XGSPjJOl+uzZadBVjYbjwWvOQ
+   w==;
+X-CSE-ConnectionGUID: rJbStYMsT+6QSavM0gFwHw==
+X-CSE-MsgGUID: qB0e/obCQeOMjTnlmFN9hQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11108"; a="41262880"
+X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
+   d="scan'208";a="41262880"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 05:31:57 -0700
+X-CSE-ConnectionGUID: OjPo6sKYTqq6EcAx9D03iQ==
+X-CSE-MsgGUID: u8QhCwbjS+GUWpaGLsl/fw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
+   d="scan'208";a="79712939"
+Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
+  by orviesa001.jf.intel.com with ESMTP; 20 Jun 2024 05:31:56 -0700
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: [PATCH v2 iwl-net 0/3] ice: Fix incorrect input/output pin behavior
+Date: Thu, 20 Jun 2024 14:27:07 +0200
+Message-ID: <20240620123141.1582255-1-karol.kolacinski@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="rfzr2icf65wjmr2w"
-Content-Disposition: inline
-In-Reply-To: <20240523075347.1282395-4-msp@baylibre.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
+This patch series fixes incorrect external timestamps handling, which
+may result in kernel crashes or not requested extts/perout behavior.
 
---rfzr2icf65wjmr2w
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Jacob Keller (2):
+  ice: Don't process extts if PTP is disabled
+  ice: Reject pin requests with unsupported flags
 
-On 23.05.2024 09:53:43, Markus Schneider-Pargmann wrote:
-> In some devices the pins of the m_can module can act as a wakeup source.
-> This patch helps do that by connecting the PHY_WAKE WoL option to
-> device_set_wakeup_enable. By marking this device as being wakeup
-> enabled, this setting can be used by platform code to decide which
-> sleep or poweroff mode to use.
->=20
-> Also this prepares the driver for the next patch in which the pinctrl
-> settings are changed depending on the desired wakeup source.
->=20
-> Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
-> ---
->  drivers/net/can/m_can/m_can.c | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
->=20
-> diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-> index 14b231c4d7ec..80964e403a5e 100644
-> --- a/drivers/net/can/m_can/m_can.c
-> +++ b/drivers/net/can/m_can/m_can.c
-> @@ -2129,6 +2129,26 @@ static int m_can_set_coalesce(struct net_device *d=
-ev,
->  	return 0;
->  }
-> =20
-> +static void m_can_get_wol(struct net_device *dev, struct ethtool_wolinfo=
- *wol)
-> +{
-> +	struct m_can_classdev *cdev =3D netdev_priv(dev);
-> +
-> +	wol->supported =3D device_can_wakeup(cdev->dev) ? WAKE_PHY : 0;
-> +	wol->wolopts =3D device_may_wakeup(cdev->dev) ? WAKE_PHY : 0;
-> +}
-> +
-> +static int m_can_set_wol(struct net_device *dev, struct ethtool_wolinfo =
-*wol)
-> +{
-> +	struct m_can_classdev *cdev =3D netdev_priv(dev);
-> +
-> +	if ((wol->wolopts & WAKE_PHY) !=3D wol->wolopts)
-> +		return -EINVAL;
-> +
-> +	device_set_wakeup_enable(cdev->dev, !!wol->wolopts & WAKE_PHY);
+Milena Olech (1):
+  ice: Fix improper extts handling
 
-Can you please add error handling here? Same for the modifications in
-the next patch.
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 132 +++++++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_ptp.h |   9 ++
+ 2 files changed, 111 insertions(+), 30 deletions(-)
 
-regards,
-Marc
+V1 -> V2: Fixed typos and other formatting issues in all patches
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+base-commit: 0a8975e20f25bb2f5edb28d883dc715802231e71
+-- 
+2.43.0
 
---rfzr2icf65wjmr2w
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmZ0IAwACgkQKDiiPnot
-vG/QlQf9EPQ0rJoEUiln6+rSd3vSElag0DNfhQ7x8gu+ZyGkuhdE4925LpTJzASr
-yubguF2fXnNcV9m+ituFtCiPmiJUGGPSvjel1E6mbddwOj0U4AdKkPeYrX5BcIj8
-UeLfRT9zMXBW7EYVU3XB/NKb7ap4Hk2luw7Rbgbn7fEtiKfjjE+toy4NmZR4S2r5
-XVqt+ACdjGObgsYxG1D7GkGCFGjZxdwN1lF3/Ik0J7jE4dYmkSBcBX7c3/bo/q8M
-yexqV0USpIq4kQqpJWTTe6rS2tNUiZZ7xr8bpbxBJGCXHVpY8wGoRrNytdnZgLTQ
-PrnmRCrDcNH0Rauay9xHkVTPNXoOTQ==
-=UzvE
------END PGP SIGNATURE-----
-
---rfzr2icf65wjmr2w--
 
