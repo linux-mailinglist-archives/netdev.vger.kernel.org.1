@@ -1,61 +1,65 @@
-Return-Path: <netdev+bounces-105372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AE33910DAE
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 18:55:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 622C9910DF3
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 19:02:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B8281C2092D
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 16:55:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DF452840C6
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 17:02:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64ED11B3F14;
-	Thu, 20 Jun 2024 16:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68EDD1B29C3;
+	Thu, 20 Jun 2024 17:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DyJDeUbX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6qp7Koe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DC01B3723
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 16:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA451AF6A1;
+	Thu, 20 Jun 2024 17:02:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718902484; cv=none; b=B2jzS6pXgezaJjL8ySEdQa97V86/+jQ2J82eRBxxWAAG3URmw9hhN2oeTcGrYWxD4PZWLvWZUTYEa2UZr6Xi4QtjCnEj8UbQtXFcZAoicVX2ZLtcinKnjUkFNxtiUBb8aoCiRdXZFxBLjQitJtXquehgw+sgcf3dsi+n6g3yK+I=
+	t=1718902961; cv=none; b=M0AGgOwqA/Jh/y2dQybtNUM8MtJSYIWllQLTWx2U4uzBJ96FOgNPyJ7qfaGsNK3YsEh3Cr7El+rO9EI9Ed2QDtO4n2P7ZOjPxa4952/pwexSQvAxwLqsGNeTifa7zobSQDsEB8r+s8teC6SZCGInwM3DnFMPATTxLsvmjyVgAyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718902484; c=relaxed/simple;
-	bh=8hM1D0x7jh1m7mKcWw9zgf9F6+LPw0LMDdXyH+Evroo=;
+	s=arc-20240116; t=1718902961; c=relaxed/simple;
+	bh=bwJ1YENtAarquyAe2FkBNTz+MTY6Iif2pm1iV8RXTZ4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nie6x2j5sh5mxPRrGL6j5xu7MKWy2Yjw4jyCMJ1QQNT5V0g5mLuKcXENb7myxtSzrb8V1yd/Di4Lq14qnnx9yzYwScdcoOU7U7QKaFkE+8PwnN2V2PUDsiA8CICxwATJ7T0YqSnop0YmnvKvK33VUDmw09qnpqS0DmbDYAwVwLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DyJDeUbX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55BF7C4AF09;
-	Thu, 20 Jun 2024 16:54:41 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=f3C/f9iWK5qCUefnW5grCKpwz26BWKT3GPrW4kQ+tR8QImZjxGZJCvaKu0EE4FMg/hn6zF7qHYA2QoqHfdkyuUVuXXfFHIZIvckvtPBy6x72G7pDMjHs9IXMl7AOCVcow/WMccMqxM1Qh0HVEV+XQRCrIFdjzkZB5dshiE7p27U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6qp7Koe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A171DC2BD10;
+	Thu, 20 Jun 2024 17:02:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718902483;
-	bh=8hM1D0x7jh1m7mKcWw9zgf9F6+LPw0LMDdXyH+Evroo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DyJDeUbXZ+nN7+9ceqOt6fzJQn578wRR9d2dqsPtTzhPQ21uwUJ3Bo4bzGkg402sp
-	 uQU3ggUri5Gz05HSQNwy6YG9ybJ7QZal237EDkCVK6J5uwDuCsDIJTtZ4v+CmPv2zZ
-	 OAq/ee3MWl9aBKbyUHhJIG/qrpqE9PdoMNPIk1LtcjcTAxNNorcSgixYoHhmCZ86VA
-	 TxYepi6r2VNy1DI9lBPkpJP81rnjVaK2x9UomEvY19xHAgXNGCR5v5sY+21dLdZKr7
-	 Lwyj5W7XpOD/4qyARlOl+3gTjR3kk+l4+vorTt6e9O0ljfy+RCXKay51xzd36ZH1/E
-	 UVvOzdwwMUQow==
-Date: Thu, 20 Jun 2024 17:54:39 +0100
-From: Simon Horman <horms@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: Michael Chan <michael.chan@broadcom.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Adrian Alvarado <adrian.alvarado@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>, netdev@vger.kernel.org,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v3 2/2] bnxt_en: implement netdev_queue_mgmt_ops
-Message-ID: <20240620165439.GN959333@kernel.org>
-References: <20240619062931.19435-1-dw@davidwei.uk>
- <20240619062931.19435-3-dw@davidwei.uk>
+	s=k20201202; t=1718902960;
+	bh=bwJ1YENtAarquyAe2FkBNTz+MTY6Iif2pm1iV8RXTZ4=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=T6qp7KoeqbY2YVHJUtcAyUAsnIE632b7bsoNqFMWmw/WlKKvfuJ05dNYpXICtz20S
+	 V3LsDtC587hP0tbGKb6sVkXIPM+yhjxOLapXZUV7QQONpOgisD+99KRUbKVLbgmi4E
+	 pVYfZdYPLoAMLLGiFiXPLvMPlftiMRRwtLTj7PtB8SoRdt98t0EbWGLY5vq3uVHZXa
+	 RCZzVqHam4NR2GlqWRK+vYotqTbOrnRBZP7Csx99dZf7+hvfsgeLXepWA+cEhW9fLs
+	 TiWrioscjup9g3ZHu4JZyu94R7Ic9bltPPilzERF9EISYN51283oeEyyiCaq8m3JxX
+	 TDRBVjfiNqPpQ==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 3AAC7CE0B67; Thu, 20 Jun 2024 10:02:40 -0700 (PDT)
+Date: Thu, 20 Jun 2024 10:02:40 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	rcu@vger.kernel.org
+Subject: Re: [TEST] TCP MD5 vs kmemleak
+Message-ID: <37d3ca22-2dac-4088-94f5-54a07403dd27@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <20240617072451.1403e1d2@kernel.org>
+ <CAJwJo6ZjhLLSiBUntdGT8a6-d5pjdXyVv9AAQ3Yx1W01Nq=dwg@mail.gmail.com>
+ <20240618074037.66789717@kernel.org>
+ <fae8f7191d50797a435936d41f08df9c83a9d092.camel@redhat.com>
+ <ee5a9d15-deaf-40c9-a559-bbc0f11fbe76@paulmck-laptop>
+ <20240618100210.16c028e1@kernel.org>
+ <53632733-ef55-496b-8980-27213da1ac05@paulmck-laptop>
+ <CAJwJo6bnh_2=Bg7jajQ3qJAErMegDjp0F-aQP7yCENf_zBiTaw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,39 +68,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240619062931.19435-3-dw@davidwei.uk>
+In-Reply-To: <CAJwJo6bnh_2=Bg7jajQ3qJAErMegDjp0F-aQP7yCENf_zBiTaw@mail.gmail.com>
 
-On Tue, Jun 18, 2024 at 11:29:31PM -0700, David Wei wrote:
-> Implement netdev_queue_mgmt_ops for bnxt added in [1].
+On Wed, Jun 19, 2024 at 01:33:36AM +0100, Dmitry Safonov wrote:
+> On Tue, 18 Jun 2024 at 18:47, Paul E. McKenney <paulmck@kernel.org> wrote:
+> >
+> > On Tue, Jun 18, 2024 at 10:02:10AM -0700, Jakub Kicinski wrote:
+> > > On Tue, 18 Jun 2024 09:42:35 -0700 Paul E. McKenney wrote:
+> [..]
+> > >
+> > > Dmitry mentioned this commit, too, but we use the same config for MPTCP
+> > > tests, and while we repro TCP AO failures quite frequently, mptcp
+> > > doesn't seem to have failed once.
+> [..]
+> > >
+> > > To be clear I think Dmitry was suspecting kfree_rcu(), he mentioned
+> > > call_rcu() as something he was expecting to have a similar issue but
+> > > it in fact appeared immune.
+> >
+> > Whew!!!  ;-)
 > 
-> Two bnxt_rx_ring_info structs are allocated to hold the new/old queue
-> memory. Queue memory is copied from/to the main bp->rx_ring[idx]
-> bnxt_rx_ring_info.
-> 
-> Queue memory is pre-allocated in bnxt_queue_mem_alloc() into a clone,
-> and then copied into bp->rx_ring[idx] in bnxt_queue_mem_start().
-> 
-> Similarly, when bp->rx_ring[idx] is stopped its queue memory is copied
-> into a clone, and then freed later in bnxt_queue_mem_free().
-> 
-> I tested this patchset with netdev_rx_queue_restart(), including
-> inducing errors in all places that returns an error code. In all cases,
-> the queue is left in a good working state.
-> 
-> Rx queues are created/destroyed using bnxt_hwrm_rx_ring_alloc() and
-> bnxt_hwrm_rx_ring_free(), which issue HWRM_RING_ALLOC and HWRM_RING_FREE
-> commands respectively to the firmware. By the time a HWRM_RING_FREE
-> response is received, there won't be any more completions from that
-> queue.
-> 
-> Thanks to Somnath for helping me with this patch. With their permission
-> I've added them as Acked-by.
-> 
-> [1]: https://lore.kernel.org/netdev/20240501232549.1327174-2-shailend@google.com/
-> 
-> Acked-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
+> I'm sorry guys, that was me being inadequate.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+I know that feeling!
 
+> That's a real issue, rather than a false-positive:
+> https://lore.kernel.org/netdev/20240619-tcp-ao-required-leak-v1-1-6408f3c94247@gmail.com/
+
+So we need call_rcu() to mark memory flowing through it?  If so, we
+need help from callers of call_rcu() in the case where more than one
+object is being freed.
+
+							Thanx, Paul
 
