@@ -1,227 +1,330 @@
-Return-Path: <netdev+bounces-105129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFB4190FC53
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 07:49:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0918C90FC5C
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 07:54:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D391D1C23751
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 05:49:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81F592861C7
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 05:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B626364DC;
-	Thu, 20 Jun 2024 05:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17511B974;
+	Thu, 20 Jun 2024 05:54:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="1ZAxqLwh";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="luBhSNOn"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="wWmm48Rw"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130B522EED;
-	Thu, 20 Jun 2024 05:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.154.123
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718862559; cv=fail; b=NuQcExFliptp1si0oNt1+iJeOPZ1Y5xEaPNZThT97S9UQgp2J/5VJxVI8w81LJ1l/hmQIhM5p1aMCkGhKZfvgt295Oukk9HqidC4aKuaxzmhJ4p7K6P0oqb0CrbvTqSFezJjfAZIKZrEAELyla74lQ4HH92cP71QVORokTo1mp4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718862559; c=relaxed/simple;
-	bh=Ed94cFAbEilIprkInsxNDMwehZNvz+jst5FDUbUY8f0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=MUvVIh/t8/eae7km2gs+hAclLMezaH+KW0pHaRsGffuuX9eg5FmyMXnHBPU07ck5yaGaN9R7hocP4a9XHAFjpgvYdR68Ufne7RegbFkwV87UmyIQWSPx/Wl1BrUFuloSsISj1I6bTsZBLNA+N3lBtSL3wm7Z6pPS1/mX07RfpWs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=1ZAxqLwh; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=luBhSNOn; arc=fail smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1718862557; x=1750398557;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=Ed94cFAbEilIprkInsxNDMwehZNvz+jst5FDUbUY8f0=;
-  b=1ZAxqLwhHR3BK67/XFLgZu9CeVV8mrXHl1jBFpcSJF40ajBQ5dFe+V6+
-   +bretGup6skdVEXwVr83TERxQcEMAclvvr6htS42KWidHORL3aJcgO2TL
-   D8K+k18N8i6RAkr+JgmaZZlJ9byn73+3pGU9pi5j0j1qrrs+LPRTEFAba
-   3T9p5qgKkuW2tnKZv5OmO1/ya//tv6kxion94gZ10/3j4GGnG3QO/V/76
-   6emolTvPb21WDLJFFgdZNoL/OA73uJlYpg5Xjd96JeHgxaHOpRRWgmHWe
-   y/cmUL+cMDQ46ExkgnwbfkFH+JOLVMMkJsw/V0U51VSYYG5j+1zaTeFWr
-   g==;
-X-CSE-ConnectionGUID: l9zaDWOaTnmRX4FJbGh5cQ==
-X-CSE-MsgGUID: LrYwA51UTT+uGHHh4q8ZtQ==
-X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
-   d="scan'208";a="28902851"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Jun 2024 22:49:09 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 19 Jun 2024 22:48:36 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 19 Jun 2024 22:48:35 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=I9iku1jHQyfYwkaDahrwf3sJtGC/g2+WfH7l5XtFoVKeXDg9jxeRBs/EzSBcO4b1s0rQSAFgyTVBk3CKL2kdl8TiahZ0ltJtV+ljAHZImWDdq3gWyyn7uYCqRkQtpPNGo7nlseUoL/wegHpZFCueLjJJG9TyaMUfElUd9bFx9VPaOvKJE0jFCTPNuFBmIhWh6BVM5/UEjOQbaRLmH/rF2oDb0asxDoiX/xZFNZqBqhzLsLydbS5mBQ6tK3tCxAxSlOE3Jf/d6v5bhJCLtDLaReVrjapP8vL4nZQKrboF8+gu32RWMXQQ1gsLbgaY97iJD+391fKssz6MI9Ht8krqOw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ed94cFAbEilIprkInsxNDMwehZNvz+jst5FDUbUY8f0=;
- b=mU362Yhe9KQHCN4+oCE5n1o3d+/U0Q2F5G9cO3Xxr9y6DeqdPwOX4PTWba8Cdt4vcxeyCEkQ6sgIeP4otjm2CzjhSf71sG0lFZmwVQb66Q7RN4+N9r2yk14X7ne4AlmgfXtVGy5wfqcYc+5wQZzb9dryx0O8q238TanHE1lqchMDbuVh0PE0WSN1A+utxul1OFvZJ7ZJCYW8GVBSullVHXSsjhEOOH+dEriVKNMzPzMmVpmtqscYFUArdFZitGOnX3rXex9XN8Kj7eTyy79IraDgaf3YywHFQnl0eTbuXfz2tD3PAwe+czRKC2x20E3zcYkuV3BHv63c/4TOnBsnOQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ed94cFAbEilIprkInsxNDMwehZNvz+jst5FDUbUY8f0=;
- b=luBhSNOncWN5ZATB0l6E67dm+1+gZvVBAAKpzrlrzi2RyqsJwxxkNAGUvOGH+g0aIvzxOfOZvtol9X6i/ga9SzzrGGP3BDZo7IBfE4AkCMnyICy1PzP8zrnKlEIY7YNL/tMZyow/OJdB+RQ95Rk3TDa56sgaK1CyyKg96CDmpHz4BY8Sa2QTsBzDVc6gnaSeq3JIHgZaBOztDkAbAib3bxiw7I8y4/ANqCdY5KkXxxHb+CcJpnTSqPtPeYW0fupsF3GfEjmPcFqI3Z62fBjsPqHTYgGMU4K1Lke/hyUp8k7ZsTcT2n6527DTkThlT5b8905H+UvD0qToYNEu8AOipQ==
-Received: from DS0PR11MB7481.namprd11.prod.outlook.com (2603:10b6:8:14b::16)
- by PH7PR11MB7025.namprd11.prod.outlook.com (2603:10b6:510:208::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.19; Thu, 20 Jun
- 2024 05:48:31 +0000
-Received: from DS0PR11MB7481.namprd11.prod.outlook.com
- ([fe80::3a8a:2d38:64c0:cc4f]) by DS0PR11MB7481.namprd11.prod.outlook.com
- ([fe80::3a8a:2d38:64c0:cc4f%5]) with mapi id 15.20.7677.030; Thu, 20 Jun 2024
- 05:48:31 +0000
-From: <Rengarajan.S@microchip.com>
-To: <andrew@lunn.ch>
-CC: <linux-usb@vger.kernel.org>, <davem@davemloft.net>,
-	<Woojung.Huh@microchip.com>, <linux-kernel@vger.kernel.org>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <edumazet@google.com>,
-	<UNGLinuxDriver@microchip.com>, <kuba@kernel.org>
-Subject: Re: [PATCH net-next v1] lan78xx: lan7801 MAC support with lan8841
-Thread-Topic: [PATCH net-next v1] lan78xx: lan7801 MAC support with lan8841
-Thread-Index: AQHau+QKS3/WRMWFLkKW/F+crLJ6w7HGLayAgAoFDAA=
-Date: Thu, 20 Jun 2024 05:48:31 +0000
-Message-ID: <06a180e5c21761c53c18dd208c9ea756570dd142.camel@microchip.com>
-References: <20240611094233.865234-1-rengarajan.s@microchip.com>
-	 <6eec7a37-13d0-4451-9b32-4b031c942aa1@lunn.ch>
-In-Reply-To: <6eec7a37-13d0-4451-9b32-4b031c942aa1@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7481:EE_|PH7PR11MB7025:EE_
-x-ms-office365-filtering-correlation-id: 67333875-f1c6-4406-6fc6-08dc90ec9e0a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230037|366013|1800799021|376011|38070700015;
-x-microsoft-antispam-message-info: =?utf-8?B?MWR1NENJQWxSc1dZUlgxN0RMMUJzenNoWTd0bUNqRDhMQm5kc1BGWEkwbTF1?=
- =?utf-8?B?c3k0MGxhRVJkSGg3MnQzVHBNc0JST1VUNzF5NkE5L3VYWmM5R2Q0dzJxWFdY?=
- =?utf-8?B?L2ZaeWkrNE01N2RFUDhOS2xGenJteWlWVDYwV1ZQTmw5NlgzYVozSEoyanl5?=
- =?utf-8?B?MHMxS1N6aXI5SXVCNElZV0g2d1FFWGhwaG50RytoWTVDY3VEcHQ2Z05FZmwy?=
- =?utf-8?B?elN5b3cwN3ZGcmgvbjlZTFEwQjNveTBtYW5qczdoOWJYN3Y4ekV0dWRJeUUy?=
- =?utf-8?B?VGZyYVRPTjVhRnpHVithd0lBRDZMaEl2cG1XVHU3T0pJU2hUdkgreWFlRHhl?=
- =?utf-8?B?aUpjandZRTUyOFAzWU0yQ0QvSHlkYnNJblAycTk3VGdFSktUbVh6LzlpTFhE?=
- =?utf-8?B?Q3A1cCtKZ0VWOXBVcm9yY29oZU9URnhDK2lNVFJwdmVJbitaVC8rY1BPMitU?=
- =?utf-8?B?VTlReXBjeStFY1BqN1NkUFcvN1ZKQUdZcUdZeXRVZk83aTJ4ZTN0Q1ZoTWxJ?=
- =?utf-8?B?cHNjSUpvTmpuQS9ZaUR3azVkZml0N3hRZkRCRmRQbUNtZTd3RjkrbFhJd1lV?=
- =?utf-8?B?M0lFZmU4cHQrTVJnVTR5ZVJaQzBiUFVHaHJ3U2NRRGplVytQOTEwSmVXaW5y?=
- =?utf-8?B?cFVLUytaNWJTYWNDVFBjNmdNMk1mamsvSzlXb21sWjN3SFZtM3JUYWtrU3Ev?=
- =?utf-8?B?cDdNTTR2QitzL1daOHBsUzJXRWkyMW0xcGtVbC9tWjB5bXZHRXYxUXB5dHhP?=
- =?utf-8?B?Z1g5WXZaY2NhM0FycVpHb3l2SjUwVlJqb2l0dldDY05GRlZFRnhIN2IxWFpL?=
- =?utf-8?B?ZlBQbVBSUlZlOEJYK0VZdkZoSVF4eDJkSlMya05zSVpnMXI3eHYxV2FOelRv?=
- =?utf-8?B?b1NHaFlMSFY0TUl6bitQUERYc2J6UnBIU1pWWHdadk5QWTRzT2pyTjhxODFr?=
- =?utf-8?B?Q240czJ0aEd2VlYvVmJuOThkR20wMVhua2xHZXJNYWEzRC9XV1JXOWpabVBn?=
- =?utf-8?B?ZHA0WXY5RzBKWENySW9Pb0JicEpQQ1BQaUV3dmZlZ3dVT0hTMFVCUXpJSGFl?=
- =?utf-8?B?UXpRdlRIdS9SdmRDWklVTUM1eTc3dVZOLzFXUmtWQ1J2R0ZtSHRJUTZKSjBx?=
- =?utf-8?B?NHNZeGsrdGZGRUx5MzU0MkNUT052UGxkSW5OMGdPY2JVZHVEdGRXazJLeEtz?=
- =?utf-8?B?eFpjY1NUb2NZVjdGd293bnhSSzhraTk5N2l1bDJMZXRyQkc2MlhSTmU1Q29B?=
- =?utf-8?B?cXFqSWNiYWphcEVLM2hERVlWMWdKcVpoZG1scU1MVVZVS21uT0dlaHNXWkdU?=
- =?utf-8?B?NTJibGJZN2VKckkyNTJHeXFQa3VIZ21QdGZCVHp5MHFVdFFnajBKL3d3TW5y?=
- =?utf-8?B?UVZBTzRlODczeXlJaEh4alVlZ3I1WkduTjdXaCtUbjlhUUg2enNwUHNEY2Jo?=
- =?utf-8?B?ZmdkTDlIS1c0ZmJ0eWQ5MERYdHM5OGI4RWRzcmFTWnY0T3lmOGFKWFh5ajVC?=
- =?utf-8?B?N1MrcWJmUkxjMk94RjlwM0hXaHIrVnErNXcyK3R4VHlMeFl6ZHdwR0pNL0Fo?=
- =?utf-8?B?RWY3aDZUQndqMzJiU25hRlhITzVudjY0M0tFZEdSaS9ZOEsvSi95c0t3bGZ4?=
- =?utf-8?B?UzNuVUhkdUtKcEtwRGxUaGcyekdVUE9PVExNZThoT1dBRWF3eUYvdjZuWkFF?=
- =?utf-8?B?d0o0SVVpWGpmRU9MRm5tTkNla3RvaFVaOFgwVkZEdFVPdEd6V3VVazBRK3R4?=
- =?utf-8?B?ZnMyditoeW43S3dKdURVekkrdmhJaFMyT2NtbHlEc3N1VWpySGRBekd2ek01?=
- =?utf-8?Q?o9PLLBzuzCpFoViQ/jFPdpENSIk9W9/R1DYYY=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7481.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(1800799021)(376011)(38070700015);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RzVueEl0RkhZcTRGZFYrSjVJQmhLNFVZOW5RZDdiVUhHYmxsNG5PMVYvZjF1?=
- =?utf-8?B?T04za05KcE1iYWJkbUNaMXYyYW1qMVVpT1h2alROcktscGthdFNLUVRPYWFD?=
- =?utf-8?B?dXNHa3VKR1FJWjZ3TnRIcVBLck00NUdKcWZ2Vk04S28yZ0lmQ2tSU3gxVVg5?=
- =?utf-8?B?VGx6QWluWG96Z1VuejhaeTgvWFBleUFXS0lBb3FvQnJ6Zm81Z0FlN3RERUVr?=
- =?utf-8?B?ZmYzUnQ5KzlUL3V0YkRwbVNMdmV6cElSY2p2V2t0ZGxKZ0JnUzFsbDZEZ25s?=
- =?utf-8?B?dzI5NzFBSkVpMVFJTVVWS0hiNUVJTUtwMVBHUjJCcTVMRnpmc0h0dFBHQ1pv?=
- =?utf-8?B?cFRqSWJtZGI3c0V4MFVpdjNJd1NRRzZMWUpOZk94SEV5dlZURkJkeUpvK1B4?=
- =?utf-8?B?Q1QycFBXOStFNW9HSVUzbGdxNnY0dUdPM0hPNk1NeVlYYTg5dmFuMTlFVVh5?=
- =?utf-8?B?eGMxRkE4dk16WFl5Z2syWi9yVGM2cVVuWVBkeXlYeWdpOXo0M1IyamM2S29U?=
- =?utf-8?B?TzdwcUFZNWpNaGNmRlVrNm5BcDdnQjFMSG0yM2RSOStOWWFwUk1OeCtNVFhC?=
- =?utf-8?B?eVNKQWxYZFdkWVFNcUVoOWNpVVdwV1YwTDU4SXNDMGgxWG5ZQjg5eTF0TGky?=
- =?utf-8?B?RmZzajU2L3FsU2VUMktQS2dXcDBuN09xejJXV0k4VllxTVl0MFZHVlVVTFE0?=
- =?utf-8?B?c3dkcWdydXptTjYxdXpiZE9RMnhPTjIybXd0YXhHc2EwUjArRTJka1kxVkV5?=
- =?utf-8?B?ZDMvekpYSjUzL1ErZUhuR0lsbjBvU0hUeVVnZFdTT0tlSW8za3hKVW9DSDNH?=
- =?utf-8?B?N0hORGNpelg1djlxOTRpMXBuNzQ3Y0FnTmRHdktvSnByUXRMU3NXdWtwL2Nw?=
- =?utf-8?B?ZWdmM2cyNGtvek9pMFhKY0tYTVhDcC9DMmVEbzYycnlRRzFzNzk2eE5yZ3Bk?=
- =?utf-8?B?aHV2L29YMFhRVzVtS0Y0VzBmclRyc3c3djcwYXVzZFFaM3R2YlJrb0pvMFdU?=
- =?utf-8?B?NTJWL2ovcVRuS2ZReUQvM3FTOEdjVllyN1psM2lNRGRiUkZ5aVM2WWE1ZEYx?=
- =?utf-8?B?VFN6K05RZVZLd3R4S25sMkdBd1V6a1JkUm8vbitjdEUxYjNWZXBxREQxczhz?=
- =?utf-8?B?OGNYazNtSm9STGhGaEhGbHVodTBLRzc4eUhnVE44TlFrK05oRlpDb1l2SzRH?=
- =?utf-8?B?TnBtOXdLcFJSUkF0NHE2UHdPSlRDaWY1ZUM3WGRJRmlJNS9WMkYvTW5XUTBT?=
- =?utf-8?B?RFc3anZqanpKQlc5UHk3cm1xK2lPejFNTkh6ckIxTzFOV2xzSkhmV1o1MVF1?=
- =?utf-8?B?eU9zRm1ZQlJhQS9FSHA0aklPNmEvQ2ExeFNUN1ZpWmY0OTY2VkNMY3FEYXg5?=
- =?utf-8?B?SWVVVGIwRGZaRy9KMDZZbzhVU0NiUmRpNjBjMzZqMTRBNmV3OHJtQXdaZHRv?=
- =?utf-8?B?RWhEWmlPU01qOU5kVm1JVTJHc2czQVAvek1HVERmU0wyNmFobTNERUM4ZHp6?=
- =?utf-8?B?YU94dUtmVTVHYWFZVWI5R2sxMmNtcVBVZGpmdk1Db0JnSVk3dG9ZRWFIckZl?=
- =?utf-8?B?SXc4QVp3Q09yM001aEZKY0VzNG1pMll4YkhOS213QmU0K0RjSVVUY3NISXdV?=
- =?utf-8?B?Z2F1eGlUZjV5OGJFMHVWRzUvYjdHY2FvTGl3bVJFdjFHRW02NXB3eDRMeEJX?=
- =?utf-8?B?TUxRLzgzSEtiUVdqWUpHSEhZNE9qNWU0bkxlRE8yRlpsbVJ0YVA4SlZXOGFx?=
- =?utf-8?B?d2Rtbmd4MjIwNWFsb1d3WHNzTTRQZlh1VFJFWFBnYjlyZnVhRWtDcVFQTVU0?=
- =?utf-8?B?NjdmU2dTREFyOEFaa0FYNG0ybWp3NDY5Q1M5SHo3ZmtPUnI2YzdYNW00K3ZK?=
- =?utf-8?B?dzY1WmZ3VkZWeXY2dTNYZkFWR3EyamQwU2Q0cDl4bjF3ZG10VlRpeEtOUG5y?=
- =?utf-8?B?OUxjVnZYb0VnYWd6aVlqT0lrRzdKR1ZsSlAvYlpEUkZMS0dhYno0M1VxNkY3?=
- =?utf-8?B?TXpzbyt2T1ZLTGNMOXNZQW1WQ1k5M3gyakN5UHFsU3JyU2U1dFNWWEhSc3p0?=
- =?utf-8?B?OVgxelNFbTExWkVxL2lqWUw2d3B3aVFIWjJnTmNNY2syYlpHbm5zb1ppVG5O?=
- =?utf-8?B?WVVybWt5L29OZS9qTDhuS09JZ05PYWdybHVXYklyeTBGUFFiMnlHMUpHRmZO?=
- =?utf-8?B?K2c9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8F44B457B854AB48AD6348502BFA2B2D@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2774538385
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 05:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718862870; cv=none; b=TTduGaAK07hMdtAZisf1lytdeRh6FZbNYjPrnRKg2izqjYWau204mcWQX8kVm9mAHUH/unMsFm4IqXEzzEiBzkYEl3GutMTOC8UN/LmIE1pp/jsfeuCaa6POYld5i3HIIN3yILthZq0qP8a1L0BlOr81++4tRYcKfcNooeasQ6k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718862870; c=relaxed/simple;
+	bh=t7roCUb8NL8OIpO+y5voJGSHJkTpKan65ePPQ0HDiec=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dPhuipmOiKj1AjAb6uAa1au3XVwm6ihIS1OmmucBOYmw3AgF25snXd82kgiq0oQzR/JR3cMg2eRL/NeOeIbuO4mvmwT9n1+eMnKaziboPQmbde5ET8IZWZ5crwolM+AeR6EgShqPRFTE2ss7akUi4Q3Dk5evmTfhngDwlNV1xYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=wWmm48Rw; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 50EB63F6B7
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 05:54:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1718862864;
+	bh=DkefC6FKpDoZpklVVtSL6j5J+R1cwOLFzUu97GzrjUs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=wWmm48Rwf7jbEfeCvJbzJ7UwqCXVjiQ1Nd2NykO8UjbOrNPJzOlysMJ2XvCL5iDXi
+	 +m1EFPE4HMNUcQ7MeOhJwQXWASm6B2RmmlKAVH1XVMHF6kNgFlGq3O0bTS2DgAHeK8
+	 BjnAtP1KnXiMdxgmSdEwayVfS0QtuOpXd3OoC3uoCqczmz4BoaMEh+tbUeJc29YJ4Y
+	 Yb5LFjH2c2DZQ3z9NxzEbKr6qf9JjsWjpUnceu/t3DPo7PWTDBaRw4rKRrzk43zBd4
+	 yokgL8W+f+FQdEPqOfxGwFA+tv+U0H6gH1OzAbjVMcP6MgdA4gfUtruYWRYqcgY3br
+	 YFJdA0caCJh5A==
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a6fad35a585so19343866b.1
+        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 22:54:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718862860; x=1719467660;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DkefC6FKpDoZpklVVtSL6j5J+R1cwOLFzUu97GzrjUs=;
+        b=cBkoZI9wNzFTn5b2IEbGSKeaFc3fypimzRobNjLHqBTY5bZmtvtJrou6303Q7o1uzx
+         KIWP9+jmZWsck5MwnN0xUyLjm+QQe/fu/q+BwYDY2z38UyHNv3WshwA+kXVJq0PveBr6
+         ZCRAWhQmjdfeupnG2eNtCv/PFBnnPHjBnjkM3jPZFM95KzI1aaA8KAeZU7AWUO5dDuBj
+         04LbfDuWK7LgygFnsBeGwxf99SMd073rZQ7FUnTG9wEX01oj0KyEwGPJlqpbWZXkeUv+
+         XqBEUuad9meo+nxiQw5N/D9/lm0soHqNGk6PKVMtBWFGfhBep7pUrBsSdsTOtrHu9yKq
+         Nl6A==
+X-Forwarded-Encrypted: i=1; AJvYcCVL2Zo9qswsSMh6wbgamTA6NIAKFPvGuFvX7SGh2NvmewK/Fe10d82btAHRSS3oz8w96nZkzx0H6oJfaQLD8LGb4WGMDLln
+X-Gm-Message-State: AOJu0Yzn2nLGp14rDR/MjEjQwUjnw6AqLMmuGnY0MbaJ8Fu4yeoEdXjT
+	z1WK5o1D6ugkArBZWuFtlRSdXJe2H8XW9P8coiyKwi2ritwhKXuUcIiqG4EPx6I7EqbrmbkPgoD
+	p4kF980GzvEad/8tLnXNaeusOW2PUOAB8i4uaSURdm8pBwhUXiCCWz6TlyekcmNXv7NZLbF6zHE
+	ibHzP5o4YY6pAI94iMconVu2YZQrBG7T9GzkM/PC+x14hIDpnmEXXdzBI=
+X-Received: by 2002:a17:906:1955:b0:a6e:7e1f:2eae with SMTP id a640c23a62f3a-a6fab7cd5b9mr221052566b.74.1718862859850;
+        Wed, 19 Jun 2024 22:54:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFiGNH7yWi3buIhSPFEz3CYpRHWU1yVWjtaacA6tdTXXNjUUqN7P7LGQ1UWguM+qQD6vhyeMpl2lRUQ6Q+nKtA=
+X-Received: by 2002:a17:906:1955:b0:a6e:7e1f:2eae with SMTP id
+ a640c23a62f3a-a6fab7cd5b9mr221051166b.74.1718862859314; Wed, 19 Jun 2024
+ 22:54:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7481.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 67333875-f1c6-4406-6fc6-08dc90ec9e0a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jun 2024 05:48:31.7872
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: aesCgpGoUWv/Hfm43bOgntQVa9x1UxRQSHseuMyBaLrgyRyVAuikilRmWQH2KLU31KCh/9nGaXDWkPZQaE/iDQuAlr4GSAdw+/KCkRyjMN4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7025
+References: <20240617054514.127961-1-chengen.du@canonical.com>
+ <ZnAdiDjI_unrELB8@nanopsycho.orion> <6670898e1ca78_21d16f2946f@willemb.c.googlers.com.notmuch>
+ <ZnEmiIhs5K4ehcYH@nanopsycho.orion> <66715247c147c_23a4e7294a7@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66715247c147c_23a4e7294a7@willemb.c.googlers.com.notmuch>
+From: Chengen Du <chengen.du@canonical.com>
+Date: Thu, 20 Jun 2024 13:54:08 +0800
+Message-ID: <CAPza5qfQtPZ-UPF97CG+zEwoQunbzg8F8kX0Q1y5Fzt4Zoc=4w@mail.gmail.com>
+Subject: Re: [PATCH v8] af_packet: Handle outgoing VLAN packets without
+ hardware offloading
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, kaber@trash.net, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-SGkgQW5kcmV3LA0KDQpBcG9sb2dpZXMgZm9yIHRoZSBkZWxheSBpbiByZXBseS4gVGhhbmtzIGZv
-ciByZXZpZXdpbmcgdGhlIHBhdGNoLg0KUGxlYXNlIGZpbmQgbXkgY29tbWVudHMgaW5saW5lLg0K
-DQpPbiBUaHUsIDIwMjQtMDYtMTMgYXQgMjI6NDYgKzAyMDAsIEFuZHJldyBMdW5uIHdyb3RlOg0K
-PiBFWFRFUk5BTCBFTUFJTDogRG8gbm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVudHMg
-dW5sZXNzIHlvdQ0KPiBrbm93IHRoZSBjb250ZW50IGlzIHNhZmUNCj4gDQo+IE9uIFR1ZSwgSnVu
-IDExLCAyMDI0IGF0IDAzOjEyOjMzUE0gKzA1MzAsIFJlbmdhcmFqYW4gUyB3cm90ZToNCj4gPiBB
-ZGQgbGFuNzgwMSBNQUMgb25seSBzdXBwb3J0IHdpdGggbGFuODg0MS4gVGhlIFBIWSBmaXh1cCBp
-cw0KPiA+IHJlZ2lzdGVyZWQNCj4gPiBmb3IgbGFuODg0MSBhbmQgdGhlIGluaXRpYWxpemF0aW9u
-cyBhcmUgZG9uZSB1c2luZyBsYW44ODM1X2ZpeHVwDQo+ID4gc2luY2UNCj4gPiB0aGUgcmVnaXN0
-ZXIgY29uZmlncyBhcmUgc2ltaWxhciBmb3IgYm90aCBsYW5uODg0MSBhbmQgbGFuODgzNS4NCj4g
-DQo+IFdoYXQgZXhhY3RseSBkb2VzIHRoaXMgZml4dXAgZG8/DQoNCkZpeHVwIHJlbGF0ZWQgdG8g
-dGhlIHBoeSBoYW5kbGUgYW5kIG1hbmFnZSB0aGUgY29uZmlndXJhdGlvbiBhbmQgc3RhdHVzDQpy
-ZWdpc3RlcnMgb2YgYSBwYXJ0aWN1bGFyIHBoeS4gSW4gdGhpcyBwYXRjaCBpdCBpcyB1c2VkIHRv
-IGhhbmRsZSB0aGUNCmNvbmZpZ3VyYXRpb24gcmVnaXN0ZXJzIG9mIExBTjg4NDEgd2hpY2ggYXJl
-IHNpbWlsYXIgdG8gcmVnaXN0ZXJzIGluDQpMQU44ODM1Lg0KDQo+IA0KPiBMb29raW5nIGF0IGl0
-LCB3aGF0IHByb3RlY3RzIGl0IGZyb20gYmVpbmcgdXNlZCBvbiBzb21lIG90aGVyIGRldmljZQ0K
-PiB3aGljaCBhbHNvIGhhcHBlbnMgdG8gdXNlIHRoZSBzYW1lIFBIWT8gSXMgdGhlcmUgc29tZXRo
-aW5nIHRvDQo+IGd1YXJhbnRlZToNCj4gDQo+IHN0cnVjdCBsYW43OHh4X25ldCAqZGV2ID0gbmV0
-ZGV2X3ByaXYocGh5ZGV2LT5hdHRhY2hlZF9kZXYpOw0KPiANCj4gcmVhbGx5IGlzIGEgbGFuNzh4
-eF9uZXQgKiA/DQoNCkluIHRoaXMgY2FzZSBmaXh1cCBpcyBjYWxsZWQgdGhyb3VnaCBsYW43OHh4
-IG9ubHkgd2hlbiBpbnRlcmZhY2luZyB0aGUNCnBoeSB3aXRoIGxhbjc4eHggTUFDLiBTaW5jZSB0
-aGlzIHdpbGwgbm90IGJlIGNhbGxlZCBvbiBpbnRlcmZhY2luZyB3aXRoDQpvdGhlciBkZXZpY2Vz
-LCBpdCBwcmV2ZW50cyB0aGVtIGZyb20gYWNjZXNzaW5nIHRoZSByZWdpc3RlcnMuDQo=
+On Tue, Jun 18, 2024 at 5:24=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jiri Pirko wrote:
+> > Mon, Jun 17, 2024 at 09:07:58PM CEST, willemdebruijn.kernel@gmail.com w=
+rote:
+> > >Jiri Pirko wrote:
+> > >> Mon, Jun 17, 2024 at 07:45:14AM CEST, chengen.du@canonical.com wrote=
+:
+> > >> >The issue initially stems from libpcap. The ethertype will be overw=
+ritten
+> > >> >as the VLAN TPID if the network interface lacks hardware VLAN offlo=
+ading.
+> > >> >In the outbound packet path, if hardware VLAN offloading is unavail=
+able,
+> > >> >the VLAN tag is inserted into the payload but then cleared from the=
+ sk_buff
+> > >> >struct. Consequently, this can lead to a false negative when checki=
+ng for
+> > >> >the presence of a VLAN tag, causing the packet sniffing outcome to =
+lack
+> > >> >VLAN tag information (i.e., TCI-TPID). As a result, the packet capt=
+uring
+> > >> >tool may be unable to parse packets as expected.
+> > >> >
+> > >> >The TCI-TPID is missing because the prb_fill_vlan_info() function d=
+oes not
+> > >> >modify the tp_vlan_tci/tp_vlan_tpid values, as the information is i=
+n the
+> > >> >payload and not in the sk_buff struct. The skb_vlan_tag_present() f=
+unction
+> > >> >only checks vlan_all in the sk_buff struct. In cooked mode, the L2 =
+header
+> > >> >is stripped, preventing the packet capturing tool from determining =
+the
+> > >> >correct TCI-TPID value. Additionally, the protocol in SLL is incorr=
+ect,
+> > >> >which means the packet capturing tool cannot parse the L3 header co=
+rrectly.
+> > >> >
+> > >> >Link: https://github.com/the-tcpdump-group/libpcap/issues/1105
+> > >> >Link: https://lore.kernel.org/netdev/20240520070348.26725-1-chengen=
+.du@canonical.com/T/#u
+> > >> >Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspace")
+> > >> >Cc: stable@vger.kernel.org
+> > >> >Signed-off-by: Chengen Du <chengen.du@canonical.com>
+> > >> >---
+> > >> > net/packet/af_packet.c | 86 ++++++++++++++++++++++++++++++++++++++=
++++-
+> > >> > 1 file changed, 84 insertions(+), 2 deletions(-)
+> > >> >
+> > >> >diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> > >> >index ea3ebc160e25..84e8884a77e3 100644
+> > >> >--- a/net/packet/af_packet.c
+> > >> >+++ b/net/packet/af_packet.c
+> > >> >@@ -538,6 +538,61 @@ static void *packet_current_frame(struct packe=
+t_sock *po,
+> > >> >  return packet_lookup_frame(po, rb, rb->head, status);
+> > >> > }
+> > >> >
+> > >> >+static u16 vlan_get_tci(struct sk_buff *skb, struct net_device *de=
+v)
+> > >> >+{
+> > >> >+ struct vlan_hdr vhdr, *vh;
+> > >> >+ u8 *skb_orig_data =3D skb->data;
+> > >> >+ int skb_orig_len =3D skb->len;
+> > >> >+ unsigned int header_len;
+> > >> >+
+> > >> >+ if (!dev)
+> > >> >+         return 0;
+> > >> >+
+> > >> >+ /* In the SOCK_DGRAM scenario, skb data starts at the network
+> > >> >+  * protocol, which is after the VLAN headers. The outer VLAN
+> > >> >+  * header is at the hard_header_len offset in non-variable
+> > >> >+  * length link layer headers. If it's a VLAN device, the
+> > >> >+  * min_header_len should be used to exclude the VLAN header
+> > >> >+  * size.
+> > >> >+  */
+> > >> >+ if (dev->min_header_len =3D=3D dev->hard_header_len)
+> > >> >+         header_len =3D dev->hard_header_len;
+> > >> >+ else if (is_vlan_dev(dev))
+> > >> >+         header_len =3D dev->min_header_len;
+> > >> >+ else
+> > >> >+         return 0;
+> > >> >+
+> > >> >+ skb_push(skb, skb->data - skb_mac_header(skb));
+> > >> >+ vh =3D skb_header_pointer(skb, header_len, sizeof(vhdr), &vhdr);
+> > >> >+ if (skb_orig_data !=3D skb->data) {
+> > >> >+         skb->data =3D skb_orig_data;
+> > >> >+         skb->len =3D skb_orig_len;
+> > >> >+ }
+> > >> >+ if (unlikely(!vh))
+> > >> >+         return 0;
+> > >> >+
+> > >> >+ return ntohs(vh->h_vlan_TCI);
+> > >> >+}
+> > >> >+
+> > >> >+static __be16 vlan_get_protocol_dgram(struct sk_buff *skb)
+> > >> >+{
+> > >> >+ __be16 proto =3D skb->protocol;
+> > >> >+
+> > >> >+ if (unlikely(eth_type_vlan(proto))) {
+> > >> >+         u8 *skb_orig_data =3D skb->data;
+> > >> >+         int skb_orig_len =3D skb->len;
+> > >> >+
+> > >> >+         skb_push(skb, skb->data - skb_mac_header(skb));
+> > >> >+         proto =3D __vlan_get_protocol(skb, proto, NULL);
+> > >> >+         if (skb_orig_data !=3D skb->data) {
+> > >> >+                 skb->data =3D skb_orig_data;
+> > >> >+                 skb->len =3D skb_orig_len;
+> > >> >+         }
+> > >> >+ }
+> > >> >+
+> > >> >+ return proto;
+> > >> >+}
+> > >> >+
+> > >> > static void prb_del_retire_blk_timer(struct tpacket_kbdq_core *pkc=
+)
+> > >> > {
+> > >> >  del_timer_sync(&pkc->retire_blk_timer);
+> > >> >@@ -1007,10 +1062,16 @@ static void prb_clear_rxhash(struct tpacket=
+_kbdq_core *pkc,
+> > >> > static void prb_fill_vlan_info(struct tpacket_kbdq_core *pkc,
+> > >> >                  struct tpacket3_hdr *ppd)
+> > >> > {
+> > >> >+ struct packet_sock *po =3D container_of(pkc, struct packet_sock, =
+rx_ring.prb_bdqc);
+> > >> >+
+> > >> >  if (skb_vlan_tag_present(pkc->skb)) {
+> > >> >          ppd->hv1.tp_vlan_tci =3D skb_vlan_tag_get(pkc->skb);
+> > >> >          ppd->hv1.tp_vlan_tpid =3D ntohs(pkc->skb->vlan_proto);
+> > >> >          ppd->tp_status =3D TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_=
+TPID_VALID;
+> > >> >+ } else if (unlikely(po->sk.sk_type =3D=3D SOCK_DGRAM && eth_type_=
+vlan(pkc->skb->protocol))) {
+> > >> >+         ppd->hv1.tp_vlan_tci =3D vlan_get_tci(pkc->skb, pkc->skb-=
+>dev);
+> > >> >+         ppd->hv1.tp_vlan_tpid =3D ntohs(pkc->skb->protocol);
+> > >> >+         ppd->tp_status =3D TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_=
+TPID_VALID;
+> > >> >  } else {
+> > >> >          ppd->hv1.tp_vlan_tci =3D 0;
+> > >> >          ppd->hv1.tp_vlan_tpid =3D 0;
+> > >> >@@ -2428,6 +2489,10 @@ static int tpacket_rcv(struct sk_buff *skb, =
+struct net_device *dev,
+> > >> >                  h.h2->tp_vlan_tci =3D skb_vlan_tag_get(skb);
+> > >> >                  h.h2->tp_vlan_tpid =3D ntohs(skb->vlan_proto);
+> > >> >                  status |=3D TP_STATUS_VLAN_VALID | TP_STATUS_VLAN=
+_TPID_VALID;
+> > >> >+         } else if (unlikely(sk->sk_type =3D=3D SOCK_DGRAM && eth_=
+type_vlan(skb->protocol))) {
+> > >> >+                 h.h2->tp_vlan_tci =3D vlan_get_tci(skb, skb->dev)=
+;
+> > >> >+                 h.h2->tp_vlan_tpid =3D ntohs(skb->protocol);
+> > >> >+                 status |=3D TP_STATUS_VLAN_VALID | TP_STATUS_VLAN=
+_TPID_VALID;
+> > >> >          } else {
+> > >> >                  h.h2->tp_vlan_tci =3D 0;
+> > >> >                  h.h2->tp_vlan_tpid =3D 0;
+> > >> >@@ -2457,7 +2522,8 @@ static int tpacket_rcv(struct sk_buff *skb, s=
+truct net_device *dev,
+> > >> >  sll->sll_halen =3D dev_parse_header(skb, sll->sll_addr);
+> > >> >  sll->sll_family =3D AF_PACKET;
+> > >> >  sll->sll_hatype =3D dev->type;
+> > >> >- sll->sll_protocol =3D skb->protocol;
+> > >> >+ sll->sll_protocol =3D (sk->sk_type =3D=3D SOCK_DGRAM) ?
+> > >> >+         vlan_get_protocol_dgram(skb) : skb->protocol;
+> > >> >  sll->sll_pkttype =3D skb->pkt_type;
+> > >> >  if (unlikely(packet_sock_flag(po, PACKET_SOCK_ORIGDEV)))
+> > >> >          sll->sll_ifindex =3D orig_dev->ifindex;
+> > >> >@@ -3482,7 +3548,8 @@ static int packet_recvmsg(struct socket *sock=
+, struct msghdr *msg, size_t len,
+> > >> >          /* Original length was stored in sockaddr_ll fields */
+> > >> >          origlen =3D PACKET_SKB_CB(skb)->sa.origlen;
+> > >> >          sll->sll_family =3D AF_PACKET;
+> > >> >-         sll->sll_protocol =3D skb->protocol;
+> > >> >+         sll->sll_protocol =3D (sock->type =3D=3D SOCK_DGRAM) ?
+> > >> >+                 vlan_get_protocol_dgram(skb) : skb->protocol;
+> > >> >  }
+> > >> >
+> > >> >  sock_recv_cmsgs(msg, sk, skb);
+> > >> >@@ -3539,6 +3606,21 @@ static int packet_recvmsg(struct socket *soc=
+k, struct msghdr *msg, size_t len,
+> > >> >                  aux.tp_vlan_tci =3D skb_vlan_tag_get(skb);
+> > >> >                  aux.tp_vlan_tpid =3D ntohs(skb->vlan_proto);
+> > >> >                  aux.tp_status |=3D TP_STATUS_VLAN_VALID | TP_STAT=
+US_VLAN_TPID_VALID;
+> > >> >+         } else if (unlikely(sock->type =3D=3D SOCK_DGRAM && eth_t=
+ype_vlan(skb->protocol))) {
+> > >>
+> > >> I don't understand why this would be needed here. We spent quite a b=
+it
+> > >> of efford in the past to make sure vlan header is always stripped.
+> > >> Could you fix that in tx path to fulfill the expectation?
+> > >
+> > >Doesn't that require NETIF_F_HW_VLAN_CTAG_TX?
+> > >
+> > >I also wondered whether we should just convert the skb for this case
+> > >with skb_vlan_untag, to avoid needing new PF_PACKET logic to handle
+> > >unstripped tags in the packet socket code. But it seems equally
+> > >complex.
+> >
+> > Correct. skb_vlan_untag() as a preparation of skb before this function
+> > is called is exactly what I was suggesting.
+>
+> It's not necessarily simpler, as that function expects skb->data to
+> point to the (outer) VLAN header.
+>
+> It will pull that one, but not any subsequent ones.
+>
+> SOCK_DGRAM expects skb->data to point to the network layer header.
+> And we only want to make this change for SOCK_DGRAM and if auxdata is
+> requested.
+>
+> Not sure that it will be simpler. But worth a look at least.
+
+Thank you for your suggestion.
+
+I have analyzed the code and considered a feasible approach. We could
+call skb_vlan_untag() in packet_rcv before pushing skb into
+sk->sk_receive_queue. We would also need to determine if auxdata is
+required to maintain performance, which might cause the logic of
+judging PACKET_SOCK_AUXDATA to be spread across both the packet_rcv()
+and packet_recvmsg() functions.
+
+The skb_vlan_untag() function handles VLANs in a more comprehensive
+way, but it seems to have a greater performance impact compared to our
+current approach.
+
+As I am not an expert in this domain, I might have overlooked some
+important aspects. I would appreciate it if you could share your
+thoughts on this decision.
 
