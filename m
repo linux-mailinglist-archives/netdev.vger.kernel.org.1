@@ -1,127 +1,179 @@
-Return-Path: <netdev+bounces-105184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAA5E91008F
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 11:41:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18FE7910092
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 11:41:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B6E0282B44
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 09:41:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DE7BB224FB
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 09:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9907A176FA1;
-	Thu, 20 Jun 2024 09:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254DE1A4F0C;
+	Thu, 20 Jun 2024 09:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZpxDWJGg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gC9io6Vr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84DE1A4F07
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 09:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0C21802E;
+	Thu, 20 Jun 2024 09:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718876439; cv=none; b=RJjbhupaCcmZ/8Xp/FpzenaKKtuVuonG1zdFeb0/21G93YgfwVGLfi9ExikixobOHWAVIuy8m3edyT1/iV1deIWtdiMfLun6uRAsKBzsPkpLjvtnyaIDruIUea6xFsB3Wc2RTOYuLOVj6G69ZUw1x3LNtmKASNKL+zTX7/6bZME=
+	t=1718876458; cv=none; b=qt8VjbxZ1Hc13BkU9pcqCr+GZ1XzKBuiwBQkYqW6utC/pQQe7BD1jL8ZwLr16AmCsrdHbeUSkGAH9DOok92fOQrBtyaHNSKxkoYwrl5bi0fvyrEMykMe3ubR1e6S7H5VT5Ki9J7Qo9/s8PMI7/7r6BX8uB6iY7Gt1auvI3xR5bY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718876439; c=relaxed/simple;
-	bh=KIfNt1QGxmQOwjeFJlqkiQWGjyux5g2qZqevxXwvfOg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KWPJrGYM2mFK9N47f7JS9NF3g26tn4rwcnAHGNr9FtKHpY4UvlDwo4JD+dORem2QAgL+CmudDK6sJgj2PZ8V05ISXkjIm5ayCrOrJkRuZJQEKi+Idv1wvJn9b11uEdiFjooT8ZpCt+ueZV97GGmG6SVza+seWGOi6xo1JQz2IoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZpxDWJGg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718876436;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=FCDnNrLNWMU9Vh2OS+L9tNbUggsEdetIwOwbT/RVGNc=;
-	b=ZpxDWJGgRIFoFDEoLkm0CkBqV3vES7E6q1K2Rm6jnkTRFu0PxdGaLNE8wwr3i7eOUpsvsS
-	pc34qNdftyxjvBvZ9oOj8gV95RT9O36pcMRVd5ayPNgkMF5cDvERq5Hf+XOBnJYVJkwJ4M
-	eJ4c6PDjinB8ON0Bzxsy3OMHgzPLB5k=
-Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
- [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-632-gPNAHeNTPpu7TilBlNw5bg-1; Thu, 20 Jun 2024 05:40:34 -0400
-X-MC-Unique: gPNAHeNTPpu7TilBlNw5bg-1
-Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-48c4755a70cso102819137.2
-        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 02:40:34 -0700 (PDT)
+	s=arc-20240116; t=1718876458; c=relaxed/simple;
+	bh=iA23UnyppenpynP4WXQAzISgZINqp+rlmvESOUk8KoI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VY3v+WZtkoOC2ji3hhmzB4YD39Tff8cnmR4gaqey8tFoPcIQZhLALc+qcF7d+S/uSc/EvOyqe+Ja8DxzZS37FTsfNqViFj/9DfpbWZBXW27PJbqGEfTbfvIoH1UFC2YO02R7WrGyRb1c+edurIkqzWDH53mLrIwHmWTzlMwi4w4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gC9io6Vr; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a6fb696d2e5so71403466b.3;
+        Thu, 20 Jun 2024 02:40:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718876454; x=1719481254; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5eV7X9tsGjM8wqUROWjyFBARy0GsDsOCdgk3VvKppSk=;
+        b=gC9io6VruOoIUL5I9tq3eH44ls0djK5iQxoPAdbEG+04t0CP5vmM0S8hPpAKwoq5jA
+         44GEIzsEI+H2x+EtZ3B1UHgmDBzcvIzIVFyJjuUUdUwuNAmEo7b/I1WVLMhlfZgRLu/+
+         uGeqjdQya9sWlAX4DpJT2rVD7ZnsI33xfKk8Ex8xLEzKBSupNP55JgTfNsSVFVOpZ0CW
+         qlFcycM9/aG4Adc28UUwCYVLqiBNStW9FH+h9EAnNKbdksbjF0P9zL//2VOQ0BGuTcEl
+         eqbInyEkTUPzAz9E9AsEm5ffwbWBiVCvZjx1xjyejxewZO2Ik0ETaZSaJjV+/CgI7hnw
+         byUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718876434; x=1719481234;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FCDnNrLNWMU9Vh2OS+L9tNbUggsEdetIwOwbT/RVGNc=;
-        b=LhmfEn/TJtiigoW8Bzyoc9E7kW054uGObqtGn8B4pqum1EjIzEEYNCd+LWsh916GCz
-         wqcx47eNXg9NObpeJ0f+it9OrgxzV9dzI0UQp5hZZBGIYaR7LRG0yhWpE4x8/tK2P3z7
-         q4GQNB5m8n7X01aTAWRgcH/MCBanXz0uCBWZpHm6B2LO3jjVtp2UtHuEBVHQhK965XFf
-         QI6uCvoThEKNhI7POddmXKAJODD3G12PygJhbItg6BGKPG5j15b51MdBuAY55Gqk2D0k
-         Y4yd7neeuIM3WwT3Bm9q+esTov3O6eGWYTJHQHFJyse9PMRbdcQ9SUMV4ulH+Zsmc7MO
-         JckA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+U6yGSfqikc/2lf3QVP2TFtAOWaxRqyB71tMkxs519eUqygCV55l4W7OaZX0LBsgn+3zbL9sCW6froWbTlW1LLOi/ZN5l
-X-Gm-Message-State: AOJu0YxpE2A/dMpAQrjUTNyybFr4W4Kwh/02wzMLcHeD752QrxQpt2zV
-	OmAYUuwG4FQ52zzw4NZlXWG8p9thYq3QyX3QjJ1LrRPkHEiHUHy0FfOLDbO/soqhhOwdQDD5z8O
-	LW1A0o4vf5QY8R/qSwxntKT2Z7MbzUEGfZKvwme6Dtrhj4J8k8ufbfA==
-X-Received: by 2002:a05:6122:169e:b0:4ec:ef7d:b99 with SMTP id 71dfb90a1353d-4ef2758261dmr5309672e0c.0.1718876434023;
-        Thu, 20 Jun 2024 02:40:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF8Ab5SLuThw6qjDLtLVmsa3Zt97I1LGYDQyFLZBxUB+r++2dRTz4kaLK25T58o3pLboLH2fA==
-X-Received: by 2002:a05:6122:169e:b0:4ec:ef7d:b99 with SMTP id 71dfb90a1353d-4ef2758261dmr5309666e0c.0.1718876433698;
-        Thu, 20 Jun 2024 02:40:33 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b0b7:b110::f71])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-798aaedbf4esm680868485a.38.2024.06.20.02.40.32
+        d=1e100.net; s=20230601; t=1718876454; x=1719481254;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5eV7X9tsGjM8wqUROWjyFBARy0GsDsOCdgk3VvKppSk=;
+        b=mMHiqD27DrXslRjaHOaRrK/ryGGXBYmvdHAyeA/WcvtaR2pxu2DhTD6arL6SaZP1uH
+         ZB4EWzmUR7qB4Wgjlin6IYCe8s5jDpos8RgMibSnGfzd68Av7EyoIEPHEXFJpS6rc21R
+         JoeeK2jkd5eh3NZZgZ/TL+hCVq+6E9ULhN+mUYHL66pNamSXRVv0s8wMcvJ/uIe8xutB
+         5Q+iPY1f9XaZ6zH9zbwqVrtCANU5IjEb2zmVZVc2XtheGA83rzJx2N2JXKLu5hG2NejY
+         5n0OmUpoIEyO70HxwQYEsDT/Op37jbIiaQHh0e9TxJG5XS97jT0vi3f5u6YP/QDcoHvl
+         gCTA==
+X-Forwarded-Encrypted: i=1; AJvYcCUBnh2q5j+6hA/nYIzTTHW4NWTca+9ROSw+OHsYN5BDIhnSJGFsaKpN9hXGZlLGh7fDxJUxzZ3VCOJO9x3ZWVH/osjgUed5Swiq4o3db1RYCWLdKPsY60EliCRErvq2TmzqwXYF
+X-Gm-Message-State: AOJu0YxZzAIeWk4iboNaqJ99AldleMEpo1akkvbd7OqFE7GES9NrnxFn
+	qKIS30eUDXCFydXaPq63on/d70WL3AFnfOggSH5EEblLAdbaJ+mf
+X-Google-Smtp-Source: AGHT+IFFL13Uj0dIQY5oe0enFoaWcUgb0f4dQ5OO4ieWFcPuCWbwtxt0nKq1k8eBJo7kF2FECpZPLg==
+X-Received: by 2002:a17:907:9405:b0:a6f:5c1a:c9a6 with SMTP id a640c23a62f3a-a6fab77a20fmr329753966b.62.1718876453944;
+        Thu, 20 Jun 2024 02:40:53 -0700 (PDT)
+Received: from skbuf ([188.25.55.166])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56f99e0csm748270366b.194.2024.06.20.02.40.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jun 2024 02:40:33 -0700 (PDT)
-Message-ID: <3d0635da6ea9b3a6445c5e6751ec0cfd024a08e1.camel@redhat.com>
-Subject: Re: [PATCH net 4/5] selftests: add selftest for the SRv6 End.DX4
- behavior with netfilter
-From: Paolo Abeni <pabeni@redhat.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org, 
-	edumazet@google.com, fw@strlen.de
-Date: Thu, 20 Jun 2024 11:40:30 +0200
-In-Reply-To: <20240619170537.2846-5-pablo@netfilter.org>
-References: <20240619170537.2846-1-pablo@netfilter.org>
-	 <20240619170537.2846-5-pablo@netfilter.org>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        Thu, 20 Jun 2024 02:40:53 -0700 (PDT)
+Date: Thu, 20 Jun 2024 12:40:50 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Tristram.Ha@microchip.com
+Cc: Arun.Ramadoss@microchip.com, Woojung.Huh@microchip.com, andrew@lunn.ch,
+	vivien.didelot@gmail.com, f.fainelli@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 net] net: dsa: microchip: fix wrong register write
+ when masking interrupt
+Message-ID: <20240620094050.qz543iyd252nrxqg@skbuf>
+References: <1717119553-3441-1-git-send-email-Tristram.Ha@microchip.com>
+ <20240602141524.iap3b6w2dxilwzjg@skbuf>
+ <BYAPR11MB3558B815C8FE0A9E28365EC4ECCE2@BYAPR11MB3558.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BYAPR11MB3558B815C8FE0A9E28365EC4ECCE2@BYAPR11MB3558.namprd11.prod.outlook.com>
 
-On Wed, 2024-06-19 at 19:05 +0200, Pablo Neira Ayuso wrote:
-> +setup_hs()
-> +{
-> +	local hs=3D$1
-> +	local rt=3D$2
-> +	local tid=3D$3
-> +	local hsname=3Dhs-${hs}
-> +	local rtname=3Drt-${rt}
-> +	local rtveth=3Dveth-t${tid}
-> +
-> +	# set the networking for the host
-> +	ip netns add ${hsname}
+On Tue, Jun 18, 2024 at 11:55:22PM +0000, Tristram.Ha@microchip.com wrote:
+> > Subject: Re: [PATCH v1 net] net: dsa: microchip: fix wrong register write when
+> > masking interrupt
+> > 
+> > EXTERNAL EMAIL: Do not click links or open attachments unless you know the content
+> > is safe
+> > 
+> > On Thu, May 30, 2024 at 06:39:13PM -0700, Tristram.Ha@microchip.com wrote:
+> > > From: Tristram Ha <tristram.ha@microchip.com>
+> > >
+> > > Initially the macro REG_SW_PORT_INT_MASK__4 is defined as 0x001C in
+> > > ksz9477_reg.h and REG_PORT_INT_MASK is defined as 0x#01F.  Because the
+> > > global and port interrupt handling is about the same the new
+> > > REG_SW_PORT_INT_MASK__1 is defined as 0x1F in ksz_common.h.  This works
+> > > as only the least significant bits have effect.  As a result the 32-bit
+> > > write needs to be changed to 8-bit.
+> > >
+> > > Fixes: e1add7dd6183 ("net: dsa: microchip: use common irq routines for girq and pirq")
+> > > Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+> > > ---
+> > > v1
+> > >  - clarify the reason to change the code
+> > 
+> > After v1 comes v2.
+> 
+> I thought the initial version starts at index 0?
 
-Side note for a possible follow-up (_not_ intended to block this
-PR!!!):
+Nope - you can cross-check with other posts on the list. Both RFCs and
+normal patch submissions on the same topic start from v1 (either
+explicitly specified or not) and increment for each submitted version,
+regardless of whether RFC or not (the first proper submission after 3
+RFC iterations is a v4).
 
-If you leverage setup_ns() from lib.sh, you can reduce a bit the code
-duplication, and the script will avoid any possible netns name
-conflict.
+> > >
+> > >  drivers/net/dsa/microchip/ksz_common.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/drivers/net/dsa/microchip/ksz_common.c
+> > b/drivers/net/dsa/microchip/ksz_common.c
+> > > index 1e0085cd9a9a..3ad0879b00cd 100644
+> > > --- a/drivers/net/dsa/microchip/ksz_common.c
+> > > +++ b/drivers/net/dsa/microchip/ksz_common.c
+> > > @@ -2185,7 +2185,7 @@ static void ksz_irq_bus_sync_unlock(struct irq_data *d)
+> > >       struct ksz_device *dev = kirq->dev;
+> > >       int ret;
+> > >
+> > > -     ret = ksz_write32(dev, kirq->reg_mask, kirq->masked);
+> > > +     ret = ksz_write8(dev, kirq->reg_mask, kirq->masked);
+> > >       if (ret)
+> > >               dev_err(dev->dev, "failed to change IRQ mask\n");
+> > >
+> > > --
+> > > 2.34.1
+> > >
+> > 
+> > What is the user-visible functional impact of the 32-bit access? Justify
+> > why this is a bug worth sending to stable kernels please.
+> > 
+> > FWIW, struct ksz_irq operates on 16-bit registers.
+> 
+> As explained before the initial code uses register 0x1C but now it is
+> changed to 0x1F.
+> 
+> See the real operating code if not modified:
+> 
+> ret = ksz_write32(dev, 0x1F, 0x0000007F);
+> 
+> The original code looks like this:
+> 
+> ret = ksz_write32(dev, 0x1C, 0x0000007F);
+> 
+> BTW, all other KSZ switches except KSZ9897/KSZ9893 and LAN937X families
+> use only 8-bit access.
+> 
 
-The same for the following test.
+So you're saying that the original code made a 32-bit access to address
+0x1c (aka byte-wise accesses to 0x1c, 0x1d, 0x1e, 0x1f) and then the
+blamed commit changed the address of the 32-bit access to 0x1f (aka
+misaligned byte-wise accesses to 0x1f, 0x20, 0x21, 0x22), leading to a
+failure to mask the correct IRQ? And that only the byte-wise access to
+0x1f is actually required, so instead of restoring the 32-bit access to
+address 0x1c as would be expected from a trivial fix, we can just
+perform an 8-bit write to 0x1f directly?
 
-Cheers,
-
-Paolo
-
+Sorry, but if this is the case, it isn't clear at all from the commit
+message and later explanations, at least it isn't to me.
 
