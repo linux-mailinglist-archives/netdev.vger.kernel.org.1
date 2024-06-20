@@ -1,95 +1,95 @@
-Return-Path: <netdev+bounces-105450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFFEB911391
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 22:43:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFFC7911393
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 22:44:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E132C1C21E0A
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 20:43:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D6DAB21257
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 20:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83DAF5820E;
-	Thu, 20 Jun 2024 20:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321675915A;
+	Thu, 20 Jun 2024 20:44:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="fuCr0SYX";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="UsfMtp10";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="fuCr0SYX";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="UsfMtp10"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="hX4U8HkZ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="cRZoRbFf";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="hX4U8HkZ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="cRZoRbFf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D69A4AEE6;
-	Thu, 20 Jun 2024 20:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DED558AC3;
+	Thu, 20 Jun 2024 20:44:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718916224; cv=none; b=FHrQZyrC4QKwF50SlJPOlLFSs80uEEZq2c+LFk0l/dALRF8VNFy8ajLPyG68DmYecoXBtAq5A5rZT0IzHwUcN7L+7tN72A5IHusJyZcMvjv32r6gUBAO5pC/Ow5sNsoNFBf14Ml/G+U1s9NftkHGTOlrbXoz3A104Hu6f+nr5L0=
+	t=1718916261; cv=none; b=eMfBoFgaygXqVo4oV7r2HC0rV7d2IuKZWaJgL/AXIQwxIFtG+BzFALd2+Di5JaA841YqHKDK7HH5Ol1qVfGxt5iKhspIikuLnZX+/8wv55+LqV+m075t77ylAgSmUAUWZ6JFcwCqkn5sDp2IFlAT62QW1a7q7fyRZUKDy7RBIOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718916224; c=relaxed/simple;
-	bh=Sk3Ol574i05BMsJ0rTy9Al+cX+fh7mnZLA+IErAXAh4=;
+	s=arc-20240116; t=1718916261; c=relaxed/simple;
+	bh=xXQTpVzYBNvy25s5i1obYh6COrSTZIOxW16ZWs81j+4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SJ7AZVgdDgtXZ6b46GEOra18fSu99FsJHGGXoPCZqM7OiyZxqDjejSflzqIUO1G/SFhHNsVTmGy2Cnh1gA3fgMF1wtZ8IpKo/jW8kbdQPFA34ze08UA0+vVLgcd+2DZltMovS+jBF4PwVQ2kfp0d+8Z/e8/KqEXUMa4K7NTS/MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=fuCr0SYX; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=UsfMtp10; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=fuCr0SYX; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=UsfMtp10; arc=none smtp.client-ip=195.135.223.131
+	 In-Reply-To:Content-Type; b=m6GqdIQ9GNyfQgQHq7STqrZG/1lDM0ITX3MJggXKUVsLO+c+i1jYcY28RjSbJVo1DEfKVCQOPGiAuTrPV9eymQ4HurQ6SXBHp1MX2lCvFx47evjFdatu42d+Ax6oIo6ajJMRor4VLrUIw+UyCAa32YA90IfGLNBiDxOYGT/3yWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=hX4U8HkZ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=cRZoRbFf; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=hX4U8HkZ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=cRZoRbFf; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 0B9EF1F8AE;
-	Thu, 20 Jun 2024 20:43:40 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 2B60A21AD7;
+	Thu, 20 Jun 2024 20:44:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1718916220; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1718916257; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=dtdhoDy5X08iAzsBrNjIiWgyFvWsn8frUsqTYTZbp7c=;
-	b=fuCr0SYXpo472rtTfAzxFD1OBcNiU/2GqD4qjkVWWqirLoTtX1sOYys5kML/tnfcpSqlRm
-	b3NM4W9jhAbBTyLtwQEUJ9BRRfC+8oxvyWAVV0VmbiOCIz3PMyWQaY4Ce0hdw4z+bhmNpc
-	SxFxAxXwsqfx5w8hdgQ7xmw0viOwvZw=
+	bh=UUY3ZboMLKJz1TS6iQDuB4Vm9DuxvmRHXybUstnJPdw=;
+	b=hX4U8HkZSlBtaV/yZ/8e4outtpguZjKgiHnQXLTArjuFSiE7PizO2Elrm7QuJxjuQjmWnO
+	fK9FIKMKFHtnWDyfN1tI6wwB+PjCXVwi/O7r5yykws10zuHLncT58EBfrlesc1i8e98UOe
+	+styDjZg8zvJh/67hft9h/gm3PvNV6U=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1718916220;
+	s=susede2_ed25519; t=1718916257;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=dtdhoDy5X08iAzsBrNjIiWgyFvWsn8frUsqTYTZbp7c=;
-	b=UsfMtp103yC/YhK9irEMQXuz0XkRl/tV8D2r7sMMCIGKYww2cKtN5nOOWSrkim/bNTtqKj
-	LnSaHbjqaO+w7CAg==
-Authentication-Results: smtp-out2.suse.de;
+	bh=UUY3ZboMLKJz1TS6iQDuB4Vm9DuxvmRHXybUstnJPdw=;
+	b=cRZoRbFfeYVejp0bZ3QNHndIWWctZQrOueKJQ6IqaSc6avropICd0xZKPS/aW55rDGpCvi
+	OIa4RIq60FGnGaCQ==
+Authentication-Results: smtp-out1.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1718916220; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1718916257; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=dtdhoDy5X08iAzsBrNjIiWgyFvWsn8frUsqTYTZbp7c=;
-	b=fuCr0SYXpo472rtTfAzxFD1OBcNiU/2GqD4qjkVWWqirLoTtX1sOYys5kML/tnfcpSqlRm
-	b3NM4W9jhAbBTyLtwQEUJ9BRRfC+8oxvyWAVV0VmbiOCIz3PMyWQaY4Ce0hdw4z+bhmNpc
-	SxFxAxXwsqfx5w8hdgQ7xmw0viOwvZw=
+	bh=UUY3ZboMLKJz1TS6iQDuB4Vm9DuxvmRHXybUstnJPdw=;
+	b=hX4U8HkZSlBtaV/yZ/8e4outtpguZjKgiHnQXLTArjuFSiE7PizO2Elrm7QuJxjuQjmWnO
+	fK9FIKMKFHtnWDyfN1tI6wwB+PjCXVwi/O7r5yykws10zuHLncT58EBfrlesc1i8e98UOe
+	+styDjZg8zvJh/67hft9h/gm3PvNV6U=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1718916220;
+	s=susede2_ed25519; t=1718916257;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=dtdhoDy5X08iAzsBrNjIiWgyFvWsn8frUsqTYTZbp7c=;
-	b=UsfMtp103yC/YhK9irEMQXuz0XkRl/tV8D2r7sMMCIGKYww2cKtN5nOOWSrkim/bNTtqKj
-	LnSaHbjqaO+w7CAg==
+	bh=UUY3ZboMLKJz1TS6iQDuB4Vm9DuxvmRHXybUstnJPdw=;
+	b=cRZoRbFfeYVejp0bZ3QNHndIWWctZQrOueKJQ6IqaSc6avropICd0xZKPS/aW55rDGpCvi
+	OIa4RIq60FGnGaCQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CDCC31369F;
-	Thu, 20 Jun 2024 20:43:39 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E87831369F;
+	Thu, 20 Jun 2024 20:44:16 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 90qPMXuUdGbnVQAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Thu, 20 Jun 2024 20:43:39 +0000
-Message-ID: <1917c5a5-62af-4017-8cd0-80446d9f35d3@suse.cz>
-Date: Thu, 20 Jun 2024 22:43:39 +0200
+	id E2FcOKCUdGYRVgAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Thu, 20 Jun 2024 20:44:16 +0000
+Message-ID: <e42cb34b-f482-4232-81e3-4dab8a171d34@suse.cz>
+Date: Thu, 20 Jun 2024 22:44:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,8 +97,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 4/6] mm/slab: Introduce kmem_buckets_create() and
- family
+Subject: Re: [PATCH v5 2/6] mm/slab: Plumb kmem_buckets into
+ __do_kmalloc_node()
 Content-Language: en-US
 To: Kees Cook <kees@kernel.org>
 Cc: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
@@ -111,12 +111,12 @@ Cc: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
  Kent Overstreet <kent.overstreet@linux.dev>, Jann Horn <jannh@google.com>,
  Matteo Rizzo <matteorizzo@google.com>, Thomas Graf <tgraf@suug.ch>,
  Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, linux-hardening@vger.kernel.org, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org
+ linux-mm@kvack.org, linux-hardening@vger.kernel.org, netdev@vger.kernel.org
 References: <20240619192131.do.115-kees@kernel.org>
- <20240619193357.1333772-4-kees@kernel.org>
- <cc301463-da43-4991-b001-d92521384253@suse.cz>
- <202406201147.8152CECFF@keescook>
+ <20240619193357.1333772-2-kees@kernel.org>
+ <7f122473-3d36-401d-8df4-02d981949f00@suse.cz>
+ <88954479-01a3-4bbe-8558-1a71b11503f8@suse.cz>
+ <202406201144.289A1A14@keescook>
 From: Vlastimil Babka <vbabka@suse.cz>
 Autocrypt: addr=vbabka@suse.cz; keydata=
  xsFNBFZdmxYBEADsw/SiUSjB0dM+vSh95UkgcHjzEVBlby/Fg+g42O7LAEkCYXi/vvq31JTB
@@ -157,12 +157,9 @@ Autocrypt: addr=vbabka@suse.cz; keydata=
  w9XOLH1IIWh7RURU7G1iOfEfmImFeC3cbbS73LQEFGe1urxvIH5K/7vX+FkNcr9ujwWuPE9b
  1C2o4i/yZPLXIVy387EjA6GZMqvQUFuSTs/GeBcv0NjIQi8867H3uLjz+mQy63fAitsDwLmR
  EP+ylKVEKb0Q2A==
-In-Reply-To: <202406201147.8152CECFF@keescook>
+In-Reply-To: <202406201144.289A1A14@keescook>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Score: -2.79
-X-Spam-Level: 
-X-Spam-Flag: NO
 X-Spamd-Result: default: False [-2.79 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -181,54 +178,34 @@ X-Spamd-Result: default: False [-2.79 / 50.00];
 	FUZZY_BLOCKED(0.00)[rspamd.com];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_CC(0.00)[huaweicloud.com,linux.com,kernel.org,google.com,lge.com,dustri.org,linux-foundation.org,linux.dev,gmail.com,huawei.com,suug.ch,gondor.apana.org.au,vger.kernel.org,kvack.org];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	FROM_EQ_ENVFROM(0.00)[];
 	RCVD_COUNT_TWO(0.00)[2];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
 	TO_DN_SOME(0.00)[]
+X-Spam-Flag: NO
+X-Spam-Score: -2.79
+X-Spam-Level: 
 
-On 6/20/24 8:54 PM, Kees Cook wrote:
-> On Thu, Jun 20, 2024 at 03:56:27PM +0200, Vlastimil Babka wrote:
->> > @@ -549,6 +549,11 @@ void *kmem_cache_alloc_lru_noprof(struct kmem_cache *s, struct list_lru *lru,
->> >  
->> >  void kmem_cache_free(struct kmem_cache *s, void *objp);
->> >  
->> > +kmem_buckets *kmem_buckets_create(const char *name, unsigned int align,
->> > +				  slab_flags_t flags,
->> > +				  unsigned int useroffset, unsigned int usersize,
->> > +				  void (*ctor)(void *));
+On 6/20/24 8:46 PM, Kees Cook wrote:
+> On Thu, Jun 20, 2024 at 03:37:31PM +0200, Vlastimil Babka wrote:
+>> On 6/20/24 3:08 PM, Vlastimil Babka wrote:
+>> > On 6/19/24 9:33 PM, Kees Cook wrote:
+>> > I was wondering why I don't see the buckets in slabinfo and turns out it was
+>> > SLAB_MERGE_DEFAULT. It would probably make sense for SLAB_MERGE_DEFAULT to
+>> > depends on !SLAB_BUCKETS now as the merging defeats the purpose, wdyt?
 >> 
->> I'd drop the ctor, I can't imagine how it would be used with variable-sized
->> allocations.
+>> Hm I might have been just blind, can see them there now. Anyway it probably
+>> doesn't make much sense to have SLAB_BUCKETS and/or RANDOM_KMALLOC_CACHES
+>> together with SLAB_MERGE_DEFAULT?
 > 
-> I've kept it because for "kmalloc wrapper" APIs, e.g. devm_kmalloc(),
-> there is some "housekeeping" that gets done explicitly right now that I
-> think would be better served by using a ctor in the future. These APIs
-> are variable-sized, but have a fixed size header, so they have a
-> "minimum size" that the ctor can still operate on, etc.
+> It's already handled so that the _other_ caches can still be merged if
+> people want it. See new_kmalloc_cache():
 > 
->> Probably also "align" doesn't make much sense since we're just
->> copying the kmalloc cache sizes and its implicit alignment of any
->> power-of-two allocations.
-> 
-> Yeah, that's probably true. I kept it since I wanted to mirror
-> kmem_cache_create() to make this API more familiar looking.
+> #ifdef CONFIG_RANDOM_KMALLOC_CACHES
+>         if (type >= KMALLOC_RANDOM_START && type <= KMALLOC_RANDOM_END)
+>                 flags |= SLAB_NO_MERGE;
+> #endif
 
-Rust people were asking about kmalloc alignment (but I forgot the details)
-so maybe this could be useful for them? CC rust-for-linux.
-
->> I don't think any current kmalloc user would
->> suddenly need either of those as you convert it to buckets, and definitely
->> not any user converted automatically by the code tagging.
-> 
-> Right, it's not needed for either the explicit users nor the future
-> automatic users. But since these arguments are available internally,
-> there seems to be future utility,  it's not fast path, and it made things
-> feel like the existing API, I'd kind of like to keep it.
-> 
-> But all that said, if you really don't want it, then sure I can drop
-> those arguments. Adding them back in the future shouldn't be too
-> much churn.
-
-I guess we can keep it then.
+OK
 
