@@ -1,143 +1,220 @@
-Return-Path: <netdev+bounces-105208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA2BF910203
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:58:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 804C5910208
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:58:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C25CB21F10
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:57:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 479A51C208E8
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:58:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E941A8C2E;
-	Thu, 20 Jun 2024 10:57:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2745515A49F;
+	Thu, 20 Jun 2024 10:58:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gqnnX1Vh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iNy/z8da"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0482D15A49F;
-	Thu, 20 Jun 2024 10:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E223BBF5
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 10:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718881072; cv=none; b=NkTkcrxfp9SubQTqIexUvqy5rRWF5QwgwgyoijhDmxix4lEp2vnm4TC7C+4cpj91l1+8JvT3uLG0WA7j3n73esu/Kxx5lixSgXsdEP/hjSrgOkalL/fbDXlBoD8hz0j4pfjLNoqL4E1Dfr/9EvegrgIfTjBwZJRGsNJExH/47Yc=
+	t=1718881118; cv=none; b=QURoMuaJqpYZBl+A/W+wq1lF2VJKqUp7OKhvhpnZ7G5TMDeeWR5KNSzfrmses/BeoZCICWuZ5aZuG7hi8P0MAm33e1nlzy4oNiFBYWCYerNwxiGp6Y4qGO2p9CtohGA6pBKlkRCW8c6wHpS+vbHz+JVt2rg1b8RLVqicom+qfYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718881072; c=relaxed/simple;
-	bh=ryPeJySBmmVSDjWpYuz6jKygUByAWjhbdVd6q0mftxw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HFcH2e/4dj/KvIXri97k9rUGKh5RbMEmaFvhT/wQvc7hilWX93dXzAvTAqldnGSIcxayDmFGn+sWJXgRb4bpupoRI+MCEGUZBhVDgN3FexhaE+1WTrWff8JcXsjVkGowxfjv7npixq7l/h/OZeud3E3N49ZeofEY5DPb73jSLx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gqnnX1Vh; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=JL1dgGAqb9hLYRxS4TGWl0ExqWTdbEg1InyHIVddSDI=; b=gqnnX1Vh1PSSDC8IoumrXSiDNV
-	AVnNoRLO4X+4HrAt2e2Gk1SGD1rZvPiYN4vL8sl53pOY2Mvy1UvxA/RpV1NGVTbEppKDnCSZ6bg5b
-	lcLIhcWGa44XjZ9mv/nwTxCn+9Th8080Ftd4hCf+mh+k/wgZ/dWXlUkyDpOYRhnUy7HLYf6j/pZny
-	pZKq8ceRbSzUcwvXH9UvQuej7sm3O74ttio97QoiEHDHqTAZHz4qpvzYAZJhL8NIEmoWP6OW54Dof
-	0AzkkSmiUkq1exokIMAdtHpah6zkJEw0a+O7GTq+6cDPrLc3RDRSZOHHUMn+hZoLn0nf+RUGDzDJ9
-	VOhZoe4g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:32904)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sKFTm-0001cl-2i;
-	Thu, 20 Jun 2024 11:57:22 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sKFTk-0007ba-Gl; Thu, 20 Jun 2024 11:57:20 +0100
-Date: Thu, 20 Jun 2024 11:57:20 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Vinod Koul <vkoul@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH net-next 8/8] net: stmmac: qcom-ethqos: add a DMA-reset
- quirk for sa8775p-ride-r3
-Message-ID: <ZnQLED/C3Opeim5q@shell.armlinux.org.uk>
-References: <20240619184550.34524-1-brgl@bgdev.pl>
- <20240619184550.34524-9-brgl@bgdev.pl>
+	s=arc-20240116; t=1718881118; c=relaxed/simple;
+	bh=FoUdsNUpPXCF3NWfQYEuRmWJ4v+PXTfG14TYQ511a3U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kvMv7+I9GpjHuiwGkiYIJLpMImFS4aw+fnMyQGKELYlqTf33xqfsoY63iDPf7km//pNclMMiwt4B6b/MSc3gHmi1RXwyGUypaZLD5ujLTgxX7BQFo30MiKWvv9t5mek9+ZKBINpWmAq2DOHd4ohq3T6KWcA9A0FfylmZVuLr974=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iNy/z8da; arc=none smtp.client-ip=209.85.167.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3d35f1dfda2so357887b6e.3
+        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 03:58:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718881115; x=1719485915; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bPn1X48wjcIxA95LYBJxQRxyt11kb9I3EwWwDedgJXA=;
+        b=iNy/z8daiVa/s5YcfU43RdkYmnjUStJiO1cVsutmPSWl4rAFiMKmb98TidVIq0QQr2
+         cs/B6eOMtinQj53yOL5bW453DLg7MpyvvBUqRLRsnF2XLeoUKEjaRWNJPQ0rnUfKEREW
+         f+VeZ/nq5oo9Fh2HMhhW3EDFt4MzmXQwcQfgWiLfgnxTJwUVxrBwGPTvGaau+zdzGtvs
+         0/te8/2u/1upQp4EEi/Zbrzr8xCUrmwEuMiXZXRTZsDEql2jcOxYRfnCf6qDqelqjPWx
+         bJ68o1vxHVk1COpzW5UqaDA68BGCIsc4YH/UT5/0FQ5XwGWq3tOvFrTby/wd1lN5k+Rx
+         PFvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718881115; x=1719485915;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bPn1X48wjcIxA95LYBJxQRxyt11kb9I3EwWwDedgJXA=;
+        b=q28gGaBBPfAcb99I5FSLZZUe72roc/wkslRch8Ufi9TXsA287Ktqi7LRmYrgaX1A/8
+         KnhpGR9/fwMxIFj1SMn9J0cdUUOj7I+Zd1x2nu2Y1bePE/ONQmi8um2SI8EUh9Uo7jS3
+         I255ALTu6HygTk3o5XxSreKJBbVw1v9nJHJMVPJdzeEf64Id1/xe5OztfFjdWXxFN729
+         F8+85tvs4XMbVKhXZ7RAD4XF1SP0RgieOcvFUI5240IWzr3XETwMF4E4sV9xYejHTm99
+         AHkamQ7vpUjhIb9oh5Cm2THjwQCisoTbVsdI5NmYP0oGqSP4srCBB6P/2I4Z8UIUh2ja
+         t/tw==
+X-Forwarded-Encrypted: i=1; AJvYcCVJ0DPp/gKTCqa6jnWWAVF0c2Cx4V+eTA2znYrTlQlRZbrna9HMNKEYiEhd3yH/N9jO4+9N+Fzdp7TeftCddTwjVJ8oOPBs
+X-Gm-Message-State: AOJu0YwQRemlmpZCSPizYiuYPul6s1Ui3N1XoJogcDafcWrXPoSDA9kM
+	VgH/RWXXnKqDv0zJp80PXxtpFKYElu+iTBtazzxXfTO9tVOW0sRL
+X-Google-Smtp-Source: AGHT+IFUAmnqJwFYWDkJVLRNCRSWuQ+G98buLoZGOyua44x4jtn4ogSOtladHI+m+wyd90yhf6waaA==
+X-Received: by 2002:a05:6871:3a23:b0:254:94a4:35d0 with SMTP id 586e51a60fabf-25c94d5ae1cmr5247032fac.48.1718881115460;
+        Thu, 20 Jun 2024 03:58:35 -0700 (PDT)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-705ccb4a830sm12070396b3a.128.2024.06.20.03.58.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jun 2024 03:58:34 -0700 (PDT)
+From: Taehee Yoo <ap420073@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	shannon.nelson@amd.com,
+	brett.creeley@amd.com,
+	drivers@pensando.io,
+	netdev@vger.kernel.org
+Cc: ap420073@gmail.com,
+	jacob.e.keller@intel.com
+Subject: [PATCH net v2] ionic: fix kernel panic due to multi-buffer handling
+Date: Thu, 20 Jun 2024 10:58:08 +0000
+Message-Id: <20240620105808.3496993-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240619184550.34524-9-brgl@bgdev.pl>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 19, 2024 at 08:45:49PM +0200, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> On sa8775p-ride the RX clocks from the AQR115C PHY are not available at
-> the time of the DMA reset so we need to loop TX clocks to RX and then
-> disable loopback after link-up. Use the provided callbacks to do it for
-> this board.
+Currently, the ionic_run_xdp() doesn't handle multi-buffer packets
+properly for XDP_TX and XDP_REDIRECT.
+When a jumbo frame is received, the ionic_run_xdp() first makes xdp
+frame with all necessary pages in the rx descriptor.
+And if the action is either XDP_TX or XDP_REDIRECT, it should unmap
+dma-mapping and reset page pointer to NULL for all pages, not only the
+first page.
+But it doesn't for SG pages. So, SG pages unexpectedly will be reused.
+It eventually causes kernel panic.
 
-If you're using true Cisco SGMII, there are _no_ clocks transferred
-between the PHY and PCS/MAC. There are two balanced pairs of data
-lines and that is all - one for transmit and one for receive. So this
-explanation doesn't make sense to me.
+Oops: general protection fault, probably for non-canonical address 0x504f4e4dbebc64ff: 0000 [#1] PREEMPT SMP NOPTI
+CPU: 3 PID: 0 Comm: swapper/3 Not tainted 6.10.0-rc3+ #25
+RIP: 0010:xdp_return_frame+0x42/0x90
+Code: 01 75 12 5b 4c 89 e6 5d 31 c9 41 5c 31 d2 41 5d e9 73 fd ff ff 44 8b 6b 20 0f b7 43 0a 49 81 ed 68 01 00 00 49 29 c5 49 01 fd <41> 80 7d0
+RSP: 0018:ffff99d00122ce08 EFLAGS: 00010202
+RAX: 0000000000005453 RBX: ffff8d325f904000 RCX: 0000000000000001
+RDX: 00000000670e1000 RSI: 000000011f90d000 RDI: 504f4e4d4c4b4a49
+RBP: ffff99d003907740 R08: 0000000000000000 R09: 0000000000000000
+R10: 000000011f90d000 R11: 0000000000000000 R12: ffff8d325f904010
+R13: 504f4e4dbebc64fd R14: ffff8d3242b070c8 R15: ffff99d0039077c0
+FS:  0000000000000000(0000) GS:ffff8d399f780000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f41f6c85e38 CR3: 000000037ac30000 CR4: 00000000007506f0
+PKRU: 55555554
+Call Trace:
+ <IRQ>
+ ? die_addr+0x33/0x90
+ ? exc_general_protection+0x251/0x2f0
+ ? asm_exc_general_protection+0x22/0x30
+ ? xdp_return_frame+0x42/0x90
+ ionic_tx_clean+0x211/0x280 [ionic 15881354510e6a9c655c59c54812b319ed2cd015]
+ ionic_tx_cq_service+0xd3/0x210 [ionic 15881354510e6a9c655c59c54812b319ed2cd015]
+ ionic_txrx_napi+0x41/0x1b0 [ionic 15881354510e6a9c655c59c54812b319ed2cd015]
+ __napi_poll.constprop.0+0x29/0x1b0
+ net_rx_action+0x2c4/0x350
+ handle_softirqs+0xf4/0x320
+ irq_exit_rcu+0x78/0xa0
+ common_interrupt+0x77/0x90
 
-> +static void qcom_ethqos_set_serdes_loopback(struct qcom_ethqos *ethqos,
-> +					    bool enable)
-> +{
-> +	rgmii_updatel(ethqos,
-> +		      SGMII_PHY_CNTRL1_SGMII_TX_TO_RX_LOOPBACK_EN,
-> +		      enable ? SGMII_PHY_CNTRL1_SGMII_TX_TO_RX_LOOPBACK_EN : 0,
-> +		      EMAC_WRAPPER_SGMII_PHY_CNTRL1);
-> +}
-> +
-> +static void qcom_ethqos_open(struct net_device *pdev, void *priv)
-> +{
-> +	struct qcom_ethqos *ethqos = priv;
-> +
-> +	qcom_ethqos_set_serdes_loopback(ethqos, true);
-> +}
-> +
-> +static void qcom_ethqos_link_up(struct net_device *ndev, void *priv)
-> +{
-> +	struct qcom_ethqos *ethqos = priv;
-> +
-> +	qcom_ethqos_set_serdes_loopback(ethqos, false);
-> +}
-> +
+Fixes: 5377805dc1c0 ("ionic: implement xdp frags support")
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+---
 
-So you enable loopback at open time, and disable it when the link comes
-up. This breaks inband signalling (should stmmac ever use that) because
-enabling loopback prevents the PHY sending the SGMII result to the PCS
-to indicate that the link has come up... thus phylink won't call
-mac_link_up().
+v2:
+ - Use ionic_xdp_rx_put_bufs() instead of open code.
 
-So no, I really hate this proposed change.
+ .../net/ethernet/pensando/ionic/ionic_txrx.c  | 27 ++++++++++++-------
+ 1 file changed, 18 insertions(+), 9 deletions(-)
 
-What I think would be better is if there were hooks at the appropriate
-places to handle the lack of clock over _just_ the period that it needs
-to be handled, rather than hacking the driver as this proposal does,
-abusing platform callbacks because there's nothing better.
-
-I don't have time to go through stmmac and make any suggestions (sorry)
-so I can only to say NAK to this change.
-
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+index 2427610f4306..aed7d9cbce03 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+@@ -480,6 +480,20 @@ int ionic_xdp_xmit(struct net_device *netdev, int n,
+ 	return nxmit;
+ }
+ 
++static void ionic_xdp_rx_put_bufs(struct ionic_queue *q,
++				  struct ionic_buf_info *buf_info,
++				  int nbufs)
++{
++	int i;
++
++	for (i = 0; i < nbufs; i++) {
++		dma_unmap_page(q->dev, buf_info->dma_addr,
++			       IONIC_PAGE_SIZE, DMA_FROM_DEVICE);
++		buf_info->page = NULL;
++		buf_info++;
++	}
++}
++
+ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
+ 			  struct net_device *netdev,
+ 			  struct bpf_prog *xdp_prog,
+@@ -493,6 +507,7 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
+ 	struct netdev_queue *nq;
+ 	struct xdp_frame *xdpf;
+ 	int remain_len;
++	int nbufs = 1;
+ 	int frag_len;
+ 	int err = 0;
+ 
+@@ -542,6 +557,7 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
+ 			if (page_is_pfmemalloc(bi->page))
+ 				xdp_buff_set_frag_pfmemalloc(&xdp_buf);
+ 		} while (remain_len > 0);
++		nbufs += sinfo->nr_frags;
+ 	}
+ 
+ 	xdp_action = bpf_prog_run_xdp(xdp_prog, &xdp_buf);
+@@ -574,9 +590,6 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
+ 			goto out_xdp_abort;
+ 		}
+ 
+-		dma_unmap_page(rxq->dev, buf_info->dma_addr,
+-			       IONIC_PAGE_SIZE, DMA_FROM_DEVICE);
+-
+ 		err = ionic_xdp_post_frame(txq, xdpf, XDP_TX,
+ 					   buf_info->page,
+ 					   buf_info->page_offset,
+@@ -586,23 +599,19 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
+ 			netdev_dbg(netdev, "tx ionic_xdp_post_frame err %d\n", err);
+ 			goto out_xdp_abort;
+ 		}
+-		buf_info->page = NULL;
++		ionic_xdp_rx_put_bufs(rxq, buf_info, nbufs);
+ 		stats->xdp_tx++;
+ 
+ 		/* the Tx completion will free the buffers */
+ 		break;
+ 
+ 	case XDP_REDIRECT:
+-		/* unmap the pages before handing them to a different device */
+-		dma_unmap_page(rxq->dev, buf_info->dma_addr,
+-			       IONIC_PAGE_SIZE, DMA_FROM_DEVICE);
+-
+ 		err = xdp_do_redirect(netdev, &xdp_buf, xdp_prog);
+ 		if (err) {
+ 			netdev_dbg(netdev, "xdp_do_redirect err %d\n", err);
+ 			goto out_xdp_abort;
+ 		}
+-		buf_info->page = NULL;
++		ionic_xdp_rx_put_bufs(rxq, buf_info, nbufs);
+ 		rxq->xdp_flush = true;
+ 		stats->xdp_redirect++;
+ 		break;
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.34.1
+
 
