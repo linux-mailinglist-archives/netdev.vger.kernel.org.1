@@ -1,164 +1,126 @@
-Return-Path: <netdev+bounces-105413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 389FC911033
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 20:09:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C420A911021
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 20:07:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E36EB288FB5
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 18:09:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB1D91C253CD
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 18:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A2A1D0559;
-	Thu, 20 Jun 2024 17:58:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B71E1CE0A3;
+	Thu, 20 Jun 2024 17:58:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEus66wz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QGTitOBr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9861BA899;
-	Thu, 20 Jun 2024 17:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49C81CE090
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 17:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718906338; cv=none; b=Dc8Tla66NiZShYo3jO94oDGiCBj2A3hJXkc5xoTNDKmtiFOxF0XmJi7ijagWXZXPCHyLanvidyqyY3MPakG7alFlrKPs8g2rWU+d67SQrvAZdihNEuQ/VRqtHTLo+xOdrVGam9ddn1QwE+NykdLrxJk5n9xXJ0M+bvp7W4QwJAs=
+	t=1718906315; cv=none; b=MpQhL+tJC+XQ+lP2NlVqmkDm7IzgMca/dq5H6qvZ7xcB5waJcxIaaOK2w1g6tBNTojx5zcbWeb56nMoJllxNOSiDKPJHP6wCgSn4v9bjZ60YYFeu2iZ/4WfKC0QiwWvw0nz4JdZSQC+vjtJktSB13Iww5K1vBpMYfoLDYglC3pY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718906338; c=relaxed/simple;
-	bh=ywt5jQ7AnfZyxoNrW7FHAEolpYpDtzMcqsRhreJJnKI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tbqe6TOxm5luTdJduiv/USd+K5Xgx82rsdD18ejVhPq/Bcv46EKRARJx/UvmLYvSmL1zZEs8YgH2JmTYeMAGp388MmejwXYhFz5wFHCTDFdyj/t5XeRGjz7MXx3jI73knoOLojCqdygsioErNz/HQXXO51bvzxp4P5a0keoEduw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dEus66wz; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1718906315; c=relaxed/simple;
+	bh=S1KcLm7Zv13q0r+n0Ksp7Y2uOshbKfSOmBDJamvWTqM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Fx3pWAzbwIIhoHfSkAcImhIzELOCCAwyAZzbbrjDCIHhQAMyYLT3rhUDq8N/Vb4i82HKfpHD2avGGxCgY2XXETcX2JOFmnCEBhgj1ThdO+lvR038ovgZBxZMj6ZX1VVWZppkQqvhKRWtGgy1acDyeXwgL0oTS23IRrQGb0krdX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QGTitOBr; arc=none smtp.client-ip=209.85.161.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1f9de13d6baso4405965ad.2;
-        Thu, 20 Jun 2024 10:58:56 -0700 (PDT)
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5b97539a4a5so619818eaf.2
+        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 10:58:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718906336; x=1719511136; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1718906313; x=1719511113; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GsYMR7W/oLrUdYReWrdeZFpoa0VAudVSEYOx4NZUcFc=;
-        b=dEus66wzbWLc6RKjs0qC7OoUuC5V6/s/atRec+t6lUIXOFRzMd8T/eqcN81nPbsjDY
-         mIRVwZiKVCaElOkuzU8ptFn1SLvpxrs0ld5rmZLAC5MfsT5CwPTpGqG2lzGaIYz0Q8HE
-         WUMkBghlOH4JinHau8u7O0Ngoa8IGdJpFewZ4/zbT8ALhvW0K3bqkbKwB+AcOK3YTDnp
-         rs+UmyxUkWpe+MS6WwWRlFa3N/wBsPtXJtcvVkLPvuEHE0pJke7YiTmHoLkBGQ5FT5pN
-         buqbL9TILLHJWoTs2gCFkvfsXls4w/bnWvgN+DJWWkjflPUfQZ5yhI7cawuKCD27SQbn
-         D+Rg==
+        bh=8Qt+TjDJ2lfVF6UvdmPORTcwXh0Z8eZesPuok0k1krw=;
+        b=QGTitOBrmWlqQfEt1z/tWRIP9TnMcb4ibHZcy5HCE5g/2KPXRN630dtPZFWdjglydQ
+         3JIRkOWIdqyTu+qARJcTlKFEcvkjIk+hXm6R/+LAPwEtybGWE73X3td5O1yrNG8rXaiy
+         W695QMpf0iFb47jw0pvz+Ynb9PD3uDsrJWP967Cc0V2CsxEFkMtfUagPIle75YkmdNB+
+         ep6hIGMNf3ee8J3ZUlnPGW26jcBlpZiQVNg0zhZunxXG09krOMXb59OS/xaaYsx7aUsq
+         HnO2tOtIDpTtk5s8rnmg6I3KpGX8EGdALlQQmOjwyWJQWLbHbBWUiBdDTiRn247/jA98
+         JoaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718906336; x=1719511136;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GsYMR7W/oLrUdYReWrdeZFpoa0VAudVSEYOx4NZUcFc=;
-        b=XpLnJUFZ12lyS/evw3swl/z0EoaYLIAQe9Uq1uem/XrCFIcg2WzCkpYy0Hp+5WXRyC
-         4H6nm+kuTu/F51C+WFjV7NTiU0/r9XFCbOoGya+WCDNhQtLm4OBREsPDYjSAGM6VEGNR
-         WO5vqcEEYbAe8YjrWNvvjgVWvccs30hm/V/vk4w82G3Unbj1WV6Nj2LW6jP2o+kxe+H9
-         MtUUOHtP5oA0LbixVUMwkjDPhAIxkA5XnZt8cqKoiNi4TMnN+yXcXkG26Hu3mYeQ453A
-         hB4/tHlTTkJ72++CSONZZAXqpg0li0V4j9qzuY8oIwKQPw2RGCwXTH6I0GDxRz8gGOch
-         tqAA==
-X-Forwarded-Encrypted: i=1; AJvYcCW/SGolH4yNufbE03jgZV53WU708Czwqn5hgTBMZ0tzpmPZewSX7KlUGGzKJGaRuDdhVncbJBFvXFThEN0jgbj+g4MKQ+NC
-X-Gm-Message-State: AOJu0YwOiPruEIGEnCX+at4LGQhwrmGAl9FiZhmKdE7TGmHEGi3+W5Qk
-	bjt4sacaxVYxk6lOP+dSTYAE0QstB3Ml5GrNTnvPSqYOfO0XOcHmMd0dOQ5egyE=
-X-Google-Smtp-Source: AGHT+IEcVgYYT890Ph3UgqxZ7WCGlaQv51dFbcwu7r/mkJrr17cMFG1OvZ8xQ71txPYDVC9RQU4wXg==
-X-Received: by 2002:a17:902:f64c:b0:1f7:38a2:f1e6 with SMTP id d9443c01a7336-1f9aa473e72mr69121615ad.43.1718906336023;
-        Thu, 20 Jun 2024 10:58:56 -0700 (PDT)
-Received: from localhost ([216.228.127.128])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9b5b7a994sm35821215ad.177.2024.06.20.10.58.54
+        d=1e100.net; s=20230601; t=1718906313; x=1719511113;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8Qt+TjDJ2lfVF6UvdmPORTcwXh0Z8eZesPuok0k1krw=;
+        b=AWG+HXtWrTESLcO2h8qXT0JQ0Yw5q6ZGUjz22WPSMSVqEWY3wFPTvJ8IRPDO948f3a
+         FBXZ+HEI6/AlUQ2j+Lmu/GKeN6sGwmvs/rKC5TyXDqwQRcReuoAEwYoUeShpt+mt+GVL
+         3VS73vPqsu2dlk14GV79wEATDsnoZnHqcKlFNqOOTxk+lFXrlZgtGL9Psd87YipR5ABD
+         r8rZceVqaCOrw0LUfVEe5zYV5qRLn5aROQHcdKV8GfxVqu2aEMjsD9cJ4yGmT1Uhe1P3
+         tk5gbghNQ1gMvcWJPVuDAEvThZERhRolG6ReeGoh+SizA3nQ8tlNWzjR7Ha3mkUe/2dI
+         Jrzw==
+X-Forwarded-Encrypted: i=1; AJvYcCXNlb7R3Xoa34Oxott+7c61i6o/9StjnRF0T7nmjE9+e4uu8HbiJPERmTh/jsWw81YHYhVRMR2aVLrRJzmTS8oga4PLMISN
+X-Gm-Message-State: AOJu0YwN3wDS9QJE/bK3legzB+3lJt/x1TpKR8vrFU/JKW6GdV5EVxPV
+	iJM+N8f9eJDMZFMM+30sQYqVWmZGlpSnIUIgetzDvJ0QzhR2BM4Y
+X-Google-Smtp-Source: AGHT+IFP+lNQtz4n8GymDb2cDFZREJxOf3Mfg6Hm6K/AZ6A9vU4yBDrLY89JNgs1la7y3ffGDH3T5Q==
+X-Received: by 2002:a05:6358:61cc:b0:1a1:fa43:1cd0 with SMTP id e5c5f4694b2df-1a1fd6828cfmr720725155d.29.1718906312743;
+        Thu, 20 Jun 2024 10:58:32 -0700 (PDT)
+Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-798bb9b7d87sm707864685a.24.2024.06.20.10.58.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jun 2024 10:58:55 -0700 (PDT)
-From: Yury Norov <yury.norov@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	Michael Chan <michael.chan@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: Yury Norov <yury.norov@gmail.com>,
-	Alexey Klimov <alexey.klimov@linaro.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Jan Kara <jack@suse.cz>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: [PATCH v4 38/40] wifi: mac80211: drop locking around ntp_fltr_bmap
-Date: Thu, 20 Jun 2024 10:57:01 -0700
-Message-ID: <20240620175703.605111-39-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240620175703.605111-1-yury.norov@gmail.com>
-References: <20240620175703.605111-1-yury.norov@gmail.com>
+        Thu, 20 Jun 2024 10:58:32 -0700 (PDT)
+Date: Thu, 20 Jun 2024 13:58:32 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Ziwei Xiao <ziweixiao@google.com>, 
+ Praveen Kaligineedi <pkaligineedi@google.com>, 
+ Harshitha Ramamurthy <hramamurthy@google.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Jeroen de Borst <jeroendb@google.com>, 
+ Shailend Chand <shailend@google.com>, 
+ netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com, 
+ Eric Dumazet <edumazet@google.com>
+Message-ID: <66746dc815aa6_2bed872947b@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240620114711.777046-1-edumazet@google.com>
+References: <20240620114711.777046-1-edumazet@google.com>
+Subject: Re: [PATCH net-next 0/6] net: ethtool: reduce RTNL pressure in
+ dev_ethtool()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-The driver operates on individual bits of the bitmap. Now that we have
-atomic find_and_set_bit() helper, we can move the map manipulation out
-of ntp_fltr_lock-protected area.
+Eric Dumazet wrote:
+> This series is inspired by Jakub feedback for one gve patch :
+> 
+> https://lore.kernel.org/lkml/20240614192721.02700256@kernel.org/
+> 
+> Refactor dev_ethtool() and start to implement parallel operations.
+> 
+> Eric Dumazet (6):
+>   net: ethtool: grab a netdev reference in dev_ethtool()
+>   net: ethtool: add dev_ethtool_cap_check()
+>   net: ethtool: perform pm duties outside of rtnl lock
+>   net: ethtool: call ethtool_get_one_feature() without RTNL
+>   net: ethtool: implement lockless ETHTOOL_GFLAGS
+>   net: ethtool: add the ability to run ethtool_[gs]et_rxnfc() without
+>     RTNL
+> 
+>  include/linux/ethtool.h |   2 +
+>  net/core/dev.c          |  10 +--
+>  net/ethtool/ioctl.c     | 159 ++++++++++++++++++++++++----------------
+>  3 files changed, 101 insertions(+), 70 deletions(-)
 
-Signed-off-by: Yury Norov <yury.norov@gmail.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index c437ca1c0fd3..5f4c3449570d 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -51,6 +51,7 @@
- #include <linux/bitmap.h>
- #include <linux/cpu_rmap.h>
- #include <linux/cpumask.h>
-+#include <linux/find_atomic.h>
- #include <net/pkt_cls.h>
- #include <net/page_pool/helpers.h>
- #include <linux/align.h>
-@@ -5616,17 +5617,16 @@ static int bnxt_init_l2_filter(struct bnxt *bp, struct bnxt_l2_filter *fltr,
- 			       struct bnxt_l2_key *key, u32 idx)
- {
- 	struct hlist_head *head;
-+	int bit_id;
- 
- 	ether_addr_copy(fltr->l2_key.dst_mac_addr, key->dst_mac_addr);
- 	fltr->l2_key.vlan = key->vlan;
- 	fltr->base.type = BNXT_FLTR_TYPE_L2;
- 	if (fltr->base.flags) {
--		int bit_id;
--
--		bit_id = bitmap_find_free_region(bp->ntp_fltr_bmap,
--						 bp->max_fltr, 0);
--		if (bit_id < 0)
-+		bit_id = find_and_set_bit(bp->ntp_fltr_bmap, bp->max_fltr);
-+		if (bit_id >= bp->max_fltr)
- 			return -ENOMEM;
-+
- 		fltr->base.sw_id = (u16)bit_id;
- 		bp->ntp_fltr_count++;
- 	}
-@@ -14396,13 +14396,11 @@ int bnxt_insert_ntp_filter(struct bnxt *bp, struct bnxt_ntuple_filter *fltr,
- 	struct hlist_head *head;
- 	int bit_id;
- 
--	spin_lock_bh(&bp->ntp_fltr_lock);
--	bit_id = bitmap_find_free_region(bp->ntp_fltr_bmap, bp->max_fltr, 0);
--	if (bit_id < 0) {
--		spin_unlock_bh(&bp->ntp_fltr_lock);
-+	bit_id = find_and_set_bit(bp->ntp_fltr_bmap, bp->max_fltr);
-+	if (bit_id >= bp->max_fltr)
- 		return -ENOMEM;
--	}
- 
-+	spin_lock_bh(&bp->ntp_fltr_lock);
- 	fltr->base.sw_id = (u16)bit_id;
- 	fltr->base.type = BNXT_FLTR_TYPE_NTUPLE;
- 	fltr->base.flags |= BNXT_ACT_RING_DST;
--- 
-2.43.0
+Thanks Eric!
 
+One small comment in the ethtool_ops field, but not important.
 
