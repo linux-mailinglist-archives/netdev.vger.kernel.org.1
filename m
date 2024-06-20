@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-105256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3331910442
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:33:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55FC3910443
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:33:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D55CB23C0C
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:33:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A32E9283B9D
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B391AD400;
-	Thu, 20 Jun 2024 12:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78D31AC44B;
+	Thu, 20 Jun 2024 12:32:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OdA5MB2C"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jW4vK1w1"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 443881AD3F2
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 12:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A33F1AD401
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 12:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718886723; cv=none; b=JJ70Xk/27RqJcrQA9xdzDp3EbbhPtPbiL7mjgkSaxkxcD5qd7gHLQokO3pNt3jgu5D7KhvXhbdTitwlMpEjC0vv8ug6aWT03Lsj65Bz3mSsh0IYlMfVjx/+7J2VKmvixvCI5hdlGifWC7XChSCjFgSSuTCPgkZW+IjCBYOJXcLs=
+	t=1718886727; cv=none; b=YQGJIktYbO0jwYoRF6YfQ/pupluRzXtMBdM2ocfDjBBrlNqYGBAC6SS+0ZZqmZsCYAg6IS8gtn2c3CLOPLduHbvxfBwcO+EgDfmCbUzeZ+MRbdGD3fCqWOKjt/v2jZMMgEVwKu/gtQRJArgCZSm2QKQG0qDCJL5UeGEAPPVTI5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718886723; c=relaxed/simple;
-	bh=PMLnNOEM3hY2pdDZ57EQrF3YgMbUMNWJSiQ68f2BKxo=;
+	s=arc-20240116; t=1718886727; c=relaxed/simple;
+	bh=CsC8tWKXWqigv3FVjEzJq+a5FzgW/cwLvdxnWJJxKRs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fzb1XGwZUWqy9GLTPelc0jkPXDUkMOFvjCizN0jeOB8N8z5sxwsfdr/yIW6APW1gKnOqI292iZ3Fam75XXLIEHHPvSYvhBxvsID4hDRUBtZdbx5pjWR4izX50TDNyUCakysEW9BNz2zAUo2I27AhYOa15B0LH4OR3G+2nryPuw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OdA5MB2C; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=Kp0ndypo/K7BEHE6Oj9Nj6AZd+SEKIUz51Xj0dn9JFLosH2Ad0eS7ApulqhwdUS1o32lbXD5MwDguzdfs05wPHa1SQdHxCwHyZCzB7Pg1vvWbncdGGN0kHjD3bs/A3CYCA0fFz9W01HBg4H/XUS2mVgtFJoIRGtENKifzrIt3SM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jW4vK1w1; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718886721; x=1750422721;
+  t=1718886723; x=1750422723;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=PMLnNOEM3hY2pdDZ57EQrF3YgMbUMNWJSiQ68f2BKxo=;
-  b=OdA5MB2CZEdlHMC1WDbH0Qii/7dIK5x5RAsO7boxhzEbLfM2Iup6+mn/
-   adlc5qpaiR+JtUaRFt/I38wnP/+oL4K3LeLNWU+qrD87OM1vL34Bv/Rnq
-   BNilZDceGViPNVfk79nhm8YFq7GbI9xGLydHgEIkc60ltsPmx9wuBPKBR
-   CY0+4nt3ML4Neam4IySMEY7zbad9UaXIJNd8rq84ETCK0k0Atb4aurnjO
-   zEPoX0iM8G3EyUHZtUo/hhckgA9ecg2APBDrxrBwgG7HbTHgTzWKGyuRH
-   x1FBS4qLUWTlIpdm/s58sx6vDgqXUr416JSe473yYgFR1NHoYTpxRvbHO
-   w==;
-X-CSE-ConnectionGUID: lH22QWViTMiR0v4N9HNB8Q==
-X-CSE-MsgGUID: a0xI3Jx5QJWlgF+Qmi3Qgw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11108"; a="41262889"
+  bh=CsC8tWKXWqigv3FVjEzJq+a5FzgW/cwLvdxnWJJxKRs=;
+  b=jW4vK1w1J5Ry079aRo/VfWt/8vrwgV+nwIgeB+f9TfUctPYVndf7HN10
+   QHAEoU5l+pu5cBMO2dtkCvsGOd75yBcC1BNDRvb1tQaqd2gbFkwmf4vnO
+   gqTHGIuWPMEPj7QygkEcrYScvWLKBRTNsYvyC3H4nCLWBRpjrM1nNDe8Q
+   gd2SeaqQ+O+XrcmgQ13d7phHE2kJNaupnLDw0XrMJ+GZdrBAGMqgPwGUI
+   OWofHux7ppe0OBrKA3TaQ7brtA8pAmYOHRkI0djuxA8y+bY0ozBTlJVZ+
+   DVgl95ZkRf8ONN5ou8bD2oqFKSRliXCf/naLFzv9mJq7FgarD9njLf0df
+   Q==;
+X-CSE-ConnectionGUID: HgEjkX/kT1Ka4bhQNApq7Q==
+X-CSE-MsgGUID: kTmMsIYNQE+cgVbIElZaHQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11108"; a="41262899"
 X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
-   d="scan'208";a="41262889"
+   d="scan'208";a="41262899"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 05:32:01 -0700
-X-CSE-ConnectionGUID: WwrAAiU+Sn6erMW+RB5PHA==
-X-CSE-MsgGUID: Kf4xHDCCS0qOJqkYll4eQg==
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 05:32:03 -0700
+X-CSE-ConnectionGUID: 0SV54oEYR6W+xBguuGE6RA==
+X-CSE-MsgGUID: X+5R44lOTO+kH1QVh2jnEw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
-   d="scan'208";a="79712953"
+   d="scan'208";a="79712963"
 Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
-  by orviesa001.jf.intel.com with ESMTP; 20 Jun 2024 05:31:59 -0700
+  by orviesa001.jf.intel.com with ESMTP; 20 Jun 2024 05:32:01 -0700
 From: Karol Kolacinski <karol.kolacinski@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -65,9 +65,9 @@ Cc: netdev@vger.kernel.org,
 	przemyslaw.kitszel@intel.com,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v2 iwl-net 2/3] ice: Don't process extts if PTP is disabled
-Date: Thu, 20 Jun 2024 14:27:09 +0200
-Message-ID: <20240620123141.1582255-3-karol.kolacinski@intel.com>
+Subject: [PATCH v2 iwl-net 3/3] ice: Reject pin requests with unsupported flags
+Date: Thu, 20 Jun 2024 14:27:10 +0200
+Message-ID: <20240620123141.1582255-4-karol.kolacinski@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240620123141.1582255-1-karol.kolacinski@intel.com>
 References: <20240620123141.1582255-1-karol.kolacinski@intel.com>
@@ -81,42 +81,171 @@ Content-Transfer-Encoding: 8bit
 
 From: Jacob Keller <jacob.e.keller@intel.com>
 
-The ice_ptp_extts_event() function can race with ice_ptp_release() and
-result in a NULL pointer dereference which leads to a kernel panic.
+The driver receives requests for configuring pins via the .enable
+callback of the PTP clock object. These requests come into the driver
+with flags which modify the requested behavior from userspace. Current
+implementation in ice does not reject flags that it doesn't support.
+This causes the driver to incorrectly apply requests with such flags as
+PTP_PEROUT_DUTY_CYCLE, or any future flags added by the kernel which it
+is not yet aware of.
 
-Panic occurs because the ice_ptp_extts_event() function calls
-ptp_clock_event() with a NULL pointer. The ice driver has already
-released the PTP clock by the time the interrupt for the next external
-timestamp event occurs.
-
-To fix this, modify the ice_ptp_extts_event() function to check the
-PTP state and bail early if PTP is not ready.
+Fix this by properly validating flags in both ice_ptp_cfg_perout and
+ice_ptp_cfg_extts. Ensure that we check by bit-wise negating supported
+flags rather than just checking and rejecting known un-supported flags.
+This is preferable, as it ensures better compatibility with future
+kernels.
 
 Fixes: 172db5f91d5f ("ice: add support for auxiliary input/output pins")
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 ---
-V1 -> V2: removed unnecessary hunk of code and adjusted commit message
+V1 -> V2: adjusted indentation and added NULL config pointer check
 
- drivers/net/ethernet/intel/ice/ice_ptp.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 38 ++++++++++++++----------
+ drivers/net/ethernet/intel/ice/ice_ptp.h |  1 +
+ 2 files changed, 23 insertions(+), 16 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index d8ff9f26010c..0500ced1adf8 100644
+index 0500ced1adf8..163b312c7cbc 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -1559,6 +1559,10 @@ void ice_ptp_extts_event(struct ice_pf *pf)
- 	u8 chan, tmr_idx;
- 	u32 hi, lo;
+@@ -1593,14 +1593,23 @@ void ice_ptp_extts_event(struct ice_pf *pf)
+  * @store: If set to true, the values will be stored
+  *
+  * Configure an external timestamp event on the requested channel.
++ *
++ * Return: 0 on success, -EOPNOTUSPP on unsupported flags
+  */
+-static void ice_ptp_cfg_extts(struct ice_pf *pf, unsigned int chan,
+-			      struct ice_extts_channel *config, bool store)
++static int ice_ptp_cfg_extts(struct ice_pf *pf, unsigned int chan,
++			     struct ice_extts_channel *config, bool store)
+ {
+ 	u32 func, aux_reg, gpio_reg, irq_reg;
+ 	struct ice_hw *hw = &pf->hw;
+ 	u8 tmr_idx;
  
-+	/* Don't process timestamp events if PTP is not ready */
-+	if (pf->ptp.state != ICE_PTP_READY)
-+		return;
++	/* Reject requests with unsupported flags */
++	if (config->flags & ~(PTP_ENABLE_FEATURE |
++			      PTP_RISING_EDGE |
++			      PTP_FALLING_EDGE |
++			      PTP_STRICT_FLAGS))
++		return -EOPNOTSUPP;
 +
  	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
- 	/* Event time is captured by one of the two matched registers
- 	 *      GLTSYN_EVNT_L: 32 LSB of sampled time event
+ 
+ 	irq_reg = rd32(hw, PFINT_OICR_ENA);
+@@ -1641,6 +1650,8 @@ static void ice_ptp_cfg_extts(struct ice_pf *pf, unsigned int chan,
+ 
+ 	if (store)
+ 		memcpy(&pf->ptp.extts_channels[chan], config, sizeof(*config));
++
++	return 0;
+ }
+ 
+ /**
+@@ -1699,6 +1710,9 @@ static int ice_ptp_cfg_clkout(struct ice_pf *pf, unsigned int chan,
+ 	u32 func, val, gpio_pin;
+ 	u8 tmr_idx;
+ 
++	if (config && config->flags & ~PTP_PEROUT_PHASE)
++		return -EOPNOTSUPP;
++
+ 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
+ 
+ 	/* 0. Reset mode & out_en in AUX_OUT */
+@@ -1838,7 +1852,6 @@ ice_ptp_gpio_enable_e810(struct ptp_clock_info *info,
+ 	bool sma_pres = false;
+ 	unsigned int chan;
+ 	u32 gpio_pin;
+-	int err;
+ 
+ 	if (ice_is_feature_supported(pf, ICE_F_SMA_CTRL))
+ 		sma_pres = true;
+@@ -1867,14 +1880,14 @@ ice_ptp_gpio_enable_e810(struct ptp_clock_info *info,
+ 			clk_cfg.gpio_pin = chan;
+ 		}
+ 
++		clk_cfg.flags = rq->perout.flags;
+ 		clk_cfg.period = ((rq->perout.period.sec * NSEC_PER_SEC) +
+ 				   rq->perout.period.nsec);
+ 		clk_cfg.start_time = ((rq->perout.start.sec * NSEC_PER_SEC) +
+ 				       rq->perout.start.nsec);
+ 		clk_cfg.ena = !!on;
+ 
+-		err = ice_ptp_cfg_clkout(pf, chan, &clk_cfg, true);
+-		break;
++		return ice_ptp_cfg_clkout(pf, chan, &clk_cfg, true);
+ 	}
+ 	case PTP_CLK_REQ_EXTTS:
+ 	{
+@@ -1899,14 +1912,11 @@ ice_ptp_gpio_enable_e810(struct ptp_clock_info *info,
+ 		extts_cfg.gpio_pin = gpio_pin;
+ 		extts_cfg.ena = !!on;
+ 
+-		ice_ptp_cfg_extts(pf, chan, &extts_cfg, true);
+-		return 0;
++		return ice_ptp_cfg_extts(pf, chan, &extts_cfg, true);
+ 	}
+ 	default:
+ 		return -EOPNOTSUPP;
+ 	}
+-
+-	return err;
+ }
+ 
+ /**
+@@ -1919,19 +1929,18 @@ static int ice_ptp_gpio_enable_e823(struct ptp_clock_info *info,
+ 				    struct ptp_clock_request *rq, int on)
+ {
+ 	struct ice_pf *pf = ptp_info_to_pf(info);
+-	int err;
+ 
+ 	switch (rq->type) {
+ 	case PTP_CLK_REQ_PPS:
+ 	{
+ 		struct ice_perout_channel clk_cfg = {};
+ 
++		clk_cfg.flags = rq->perout.flags;
+ 		clk_cfg.gpio_pin = PPS_PIN_INDEX;
+ 		clk_cfg.period = NSEC_PER_SEC;
+ 		clk_cfg.ena = !!on;
+ 
+-		err = ice_ptp_cfg_clkout(pf, PPS_CLK_GEN_CHAN, &clk_cfg, true);
+-		break;
++		return ice_ptp_cfg_clkout(pf, PPS_CLK_GEN_CHAN, &clk_cfg, true);
+ 	}
+ 	case PTP_CLK_REQ_EXTTS:
+ 	{
+@@ -1941,14 +1950,11 @@ static int ice_ptp_gpio_enable_e823(struct ptp_clock_info *info,
+ 		extts_cfg.gpio_pin = TIME_SYNC_PIN_INDEX;
+ 		extts_cfg.ena = !!on;
+ 
+-		ice_ptp_cfg_extts(pf, rq->extts.index, &extts_cfg, true);
+-		return 0;
++		return ice_ptp_cfg_extts(pf, rq->extts.index, &extts_cfg, true);
+ 	}
+ 	default:
+ 		return -EOPNOTSUPP;
+ 	}
+-
+-	return err;
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
+index f1171cdd93c8..e2af9749061c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
+@@ -29,6 +29,7 @@ enum ice_ptp_pin_e810t {
+ struct ice_perout_channel {
+ 	bool ena;
+ 	u32 gpio_pin;
++	u32 flags;
+ 	u64 period;
+ 	u64 start_time;
+ };
 -- 
 2.43.0
 
