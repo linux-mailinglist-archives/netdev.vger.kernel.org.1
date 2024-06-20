@@ -1,173 +1,194 @@
-Return-Path: <netdev+bounces-105155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97E6090FE20
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 09:59:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FA8291005E
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 11:30:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 253DBB21398
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 07:59:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5551B20E93
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 09:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F2E150279;
-	Thu, 20 Jun 2024 07:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17CBE199EBA;
+	Thu, 20 Jun 2024 09:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="wuz8FPLd"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="sOtNOmYZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-190c.mail.infomaniak.ch (smtp-190c.mail.infomaniak.ch [185.125.25.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D7C482C8;
-	Thu, 20 Jun 2024 07:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6970C1802E
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 09:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718870366; cv=none; b=q8UBHfX33epPK8GjKwmX6ItAZqkOTEJjGej302zkxmGnzMUeayt0jEAjsyMyr4gYkWk/fHckAFEzcEDfgswQVA0Bw7UifsM63o4FONOic9hCFDEUwyfURAoKwwH111KrD91kDW7FhU4syUtSc+l+4802csuGpzJfcyLGHRRYP7k=
+	t=1718875846; cv=none; b=QZAy8DuVlWLcNfZPyanLTpcRiCtBN0/oMv2jrOgAZJbKb6IVtQZ05pP2M4Tfz7Wu+YdmO/IqKdsLw6U3W78VvOJN50WZVoA57NMMhDuTktAKewW/61sDMaibFgW3AJzbtVuK2b2/FLExiuvcnDI4OhCtMSJvz9dqmZtg4V8YLKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718870366; c=relaxed/simple;
-	bh=dzzZTbj+3nIanx4kJLX9W85fpB4mfwv7gZtKTDcQpZU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ov+fR1fgG2gOOqJi2AohjeMmMFd55NPHMscLXtM9ZfkZNMA4UxT9No9y9uMi+jgO3Mwpkg8jOgHU33/zFQs3o5nG0QBNKCCYxmHTFg3ZlJJ6FMB5zdMkg9khEjHzS1wpXNm2MgWvoUJ5IDUvALuEatb+mcfHX/s9Rj45JzLL1g4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=wuz8FPLd; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 722BA87C69;
-	Thu, 20 Jun 2024 09:59:21 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1718870362;
-	bh=KTkD1fNt44Ouv47/6lXydN4bYu7m2SKRrnp+lNDnGMI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=wuz8FPLdkeIjHVNt2YruCxFp52hbgip6+fywecLYmmsgDB4P7t4TwKykiPsn5jgd+
-	 yYhzPCDDU+vrjlTapVYJXLjd7GGOvmF0U+tI1JFDQvENKoTngyvy7TcrillsFOAoEq
-	 EVP/G9gPdjYdQuDVaCYBAK2GsE4LB2rwAOr2InXqu2wZfJsGyXWAxMla8ncNzgyWaq
-	 6zCCcWBccBD70trEmjpcWQojIgOkeXyyYqIU2V9TiMUR3LGXw2LNo7JWjGAr9Gfirx
-	 JzvmYFdjxr3GYjn52U4pYEvIkStTnGxEwHcZxmeI76IhFybz3Wu4FoOiE1yzYhiyv/
-	 4qpq3UYMpryDg==
-Date: Thu, 20 Jun 2024 09:59:20 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "David S. Miller"
- <davem@davemloft.net>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Tristram.Ha@microchip.com, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Simon Horman <horms@kernel.org>, Dan Carpenter
- <dan.carpenter@linaro.org>, "Ricardo B. Marliere" <ricardo@marliere.net>,
- Casper Andersson <casper.casan@gmail.com>, linux-kernel@vger.kernel.org,
- Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH v2 net-next] net: dsa: Allow only up to two HSR HW
- offloaded ports for KSZ9477
-Message-ID: <20240620095920.6035022d@wsk>
-In-Reply-To: <20240619155928.wmivi4lckjq54t3w@skbuf>
-References: <20240619134248.1228443-1-lukma@denx.de>
-	<20240619134248.1228443-1-lukma@denx.de>
-	<20240619144243.cp6ceembrxs27tfc@skbuf>
-	<20240619171057.766c657b@wsk>
-	<20240619154814.dvjcry7ahvtznfxb@skbuf>
-	<20240619155928.wmivi4lckjq54t3w@skbuf>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1718875846; c=relaxed/simple;
+	bh=FyjNm/I3kq/pP/dapIPg9gsHpP1PzC710dtt7pmzUKY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UNCf5XHUCbXXwpvLdKt82TEvlw7/t4PFYj8TrfiEuuO9KK44YxjrnovF46LHu/gW8JqBhjZR16vfI8pccGY7776GpBs47P6TGLK3QtxZlvakz9Ln4nox6Z+fZNvpi2WtUHcDWWhyWc4xsNEbTBzczFu7dh4feERqwtT1IWUX3cU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=sOtNOmYZ; arc=none smtp.client-ip=185.125.25.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4W4Xwr6kjdz8pT;
+	Thu, 20 Jun 2024 10:00:44 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1718870444;
+	bh=W/NUAL6voE5A4pFcJSHOLM46v6kGmeT8h3EcYwb3KUc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sOtNOmYZHEhT5EIB2V7KL7iSkDlMWcmlXneHp9D4RSJGbbkFF01kDHHlU3rEP3MqK
+	 db2AHQ+1PdQ3sARwOOndydYhkRuqDzzz0lu9vjn3Zis9aLshwsvhTNB4T4MNzlnX7h
+	 tVG6xTX3hNIg1t4k/xOjCkXRQ4pckdidlfeyTPvk=
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4W4Xwk3bNHzMhc;
+	Thu, 20 Jun 2024 10:00:38 +0200 (CEST)
+Date: Thu, 20 Jun 2024 10:00:36 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
+	Eric Dumazet <edumazet@google.com>
+Cc: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>, 
+	willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, linux-security-module@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Subject: Re: [PATCH 1/2] landlock: Add hook on socket_listen()
+Message-ID: <20240620.teeFoot6gaeX@digikod.net>
+References: <20240408094747.1761850-1-ivanov.mikhail1@huawei-partners.com>
+ <20240408094747.1761850-2-ivanov.mikhail1@huawei-partners.com>
+ <20240425.Soot5eNeexol@digikod.net>
+ <a18333c0-4efc-dcf4-a219-ec46480352b1@huawei-partners.com>
+ <ZnMr30kSCGME16rO@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/bJVD9HQ4bWNjw6GY_e=zb/k";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZnMr30kSCGME16rO@google.com>
+X-Infomaniak-Routing: alpha
 
---Sig_/bJVD9HQ4bWNjw6GY_e=zb/k
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Wed, Jun 19, 2024 at 09:05:03PM +0200, Günther Noack wrote:
+> I agree with Mickaël's comment: this seems like an important fix.
+> 
+> Mostly for completeness: I played with the "socket type" patch set in a "TCP
+> server" example, where *all* possible operations are restricted with Landlock,
+> including the ones from the "socket type" patch set V2 with the little fix we
+> discussed.
+> 
+>  - socket()
+>  - bind()
+>  - enforce a landlock ruleset restricting:
+>    - file system access
+>    - all TCP bind and connect
+>    - socket creation
+>  - listen()
+>  - accept()
+> 
+> From the connection handler (which would be the place where an attacker can
+> usually provide input), it is now still possible to bind a socket due to this
+> problem.  The steps are:
+> 
+>   1) connect() on client_fd with AF_UNSPEC to disassociate the client FD
+>   2) listen() on the client_fd
+> 
+> This succeeds and it listens on an ephemeral port.
+> 
+> The code is at [1], if you are interested.
+> 
+> [1] https://github.com/gnoack/landlock-examples/blob/main/tcpserver.c
+> 
+> 
+> On Mon, May 13, 2024 at 03:15:50PM +0300, Ivanov Mikhail wrote:
+> > 4/30/2024 4:36 PM, Mickaël Salaün wrote:
+> > > On Mon, Apr 08, 2024 at 05:47:46PM +0800, Ivanov Mikhail wrote:
+> > > > Make hook for socket_listen(). It will check that the socket protocol is
+> > > > TCP, and if the socket's local port number is 0 (which means,
+> > > > that listen(2) was called without any previous bind(2) call),
+> > > > then listen(2) call will be legitimate only if there is a rule for bind(2)
+> > > > allowing binding to port 0 (or if LANDLOCK_ACCESS_NET_BIND_TCP is not
+> > > > supported by the sandbox).
+> > > 
+> > > Thanks for this patch and sorry for the late full review.  The code is
+> > > good overall.
+> > > 
+> > > We should either consider this patch as a fix or add a new flag/access
+> > > right to Landlock syscalls for compatibility reason.  I think this
+> > > should be a fix.  Calling listen(2) without a previous call to bind(2)
+> > > is a corner case that we should properly handle.  The commit message
+> > > should make that explicit and highlight the goal of the patch: first
+> > > explain why, and then how.
+> > 
+> > Yeap, this is fix-patch. I have covered motivation and proposed solution
+> > in cover letter. Do you have any suggestions on how i can improve this?
+> 
+> Without wanting to turn around the direction of this code review now, I am still
+> slightly concerned about the assymetry of this special case being implemented
+> for listen() but not for connect().
+> 
+> The reason is this: My colleague Mr. B. recently pointed out to me that you can
+> also do a bind() on a socket before a connect(!). The steps are:
+> 
+> * create socket with socket()
+> * bind() to a local port 9090
+> * connect() to a remote port 8080
+> 
+> This gives you a connection between ports 9090 and 8080.
 
-Hi Vladimir,
+Yes, this should not be an issue, but something to keep in mind.
 
-> On Wed, Jun 19, 2024 at 06:48:14PM +0300, Vladimir Oltean wrote:
-> > Granted, this isn't an actual functional problem, but given that you
-> > are fixing a newly developed feature for net-next, and that this is
-> > API that gets progressively harder to change as more devices
-> > implement offloads, I would expect a more obvious signaling
-> > mechanism to exist for this, and now seems a good time to do it,
-> > rather than opting for the most minimal fix. =20
->=20
-> Actually I'm not even so sure about this basic fact, that it isn't a
-> functional problem already.
->=20
-> xrs700x_hsr_join() has explicit checks for port 1 and 2. Obviously it
-> expects those ports to be ring ports.
+> 
+> A regular connect() without an explicit bind() is of course the more usual
+> scenario.  In that case, we are also using up ("implicitly binding") one of the
+> ephemeral ports.
+> 
+> It seems that, with respect to the port binding, listen() and connect() work
+> quite similarly then?  This being considered, maybe it *is* the listen()
+> operation on a port which we should be restricting, and not bind()?
 
-Yes.
+I agree that we should be able to control listen according to the binded
+port, see https://github.com/landlock-lsm/linux/issues/15
+In a nutshell, the LANDLOCK_ACCESS_NET_LISTEN_TCP should make more sense
+for most use cases, but I think LANDLOCK_ACCESS_NET_BIND_TCP is also
+useful to limit opened (well-known) ports and port spoofing.
 
->=20
-> But if you configure from user space ports 0 and 1 to be ring ports,
-> and port 2 to be an interlink port, the kernel will accept that
-> configuration.=20
+> 
+> With some luck, that would then also free us from having to implement the
+> check_tcp_socket_can_listen() logic, which is seemingly emulating logic from
+> elsewhere in the kernel?
 
-Yes.
+An alternative could be to only use LANDLOCK_ACCESS_NET_BIND_TCP for
+explicit binding (i.e. current state, but with appropriate
+documentation), and delegate to LANDLOCK_ACCESS_NET_LISTEN_TCP the
+control of binding with listen(2).  That should free us from
+implementing check_tcp_socket_can_listen().  The rationale would be that
+a malicious sandboxed process could not explicitly bind to a
+well-specified port, but only to a range of dedicated random ports (the
+same range use for auto-binding with connect).  That could also help
+developers by staying close to the kernel syscall ABI (principle of
+least astonishment).
 
-> It will return -EOPNOTSUPP for port 0,=20
+> 
+> (I am by far not an expert in Linux networking, so I'll put this out for
+> consideration and will happily stand corrected if I am misunderstanding
+> something.  Maybe someone with more networking background can chime in?)
 
-This comment is for xrs700x_hsr_join()?
+That would be good indeed.  Netfilter or network folks? Eric?
 
-For the ksz_hsr_join() we do explicitly check for the KSZ9477_CHIP_ID.
-
-I do regard this fix as a ksz9477 specific one, as there are some
-issues (IMHO - this is the "unexpected behaviour" case for this IC) when
-we add interlink to SoC VLAN.
-
-I don't understand why you bring up xrs700x case here? Is it to get a
-"broader context"?
-
-> falling back to
-> software mode for the first ring port, then accept offload for ring
-> ports 1 and 2. But it doesn't match what user space requested, because
-> port 2 should be interlink...
-
-Please correct me if I'm wrong, but this seems to not be the case for
-ksz9477 - as I stated in the other mail - the ordering is correct (I've
-checked it).
-
->=20
-> I think you really should pass the port type down to drivers and
-> reject offloading interlink ports...
-
-As stated above - IMHO I do provide a fix for this particular IC
-(KSZ9477). With xrs700x we do have fixed ports supporting HSR (port
-1,2), so there is no other choice. As a result the HSR Interlink would
-be supporting only SW emulation.
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/bJVD9HQ4bWNjw6GY_e=zb/k
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmZz4VgACgkQAR8vZIA0
-zr2kawgAwwaDitXI7l/t+aUeXBWcTmg89+6VWM7pz2V3qhSCY/+umdf6Wun5pwZd
-KBHfXjbVsKAOczCEa24Urq6jVJoopHZGk7H3VzkCDaBWKkCKtaOhwvYxS2rU2Q99
-/+lMpBipwzW6DoalZbalssP2ipsElfzPOV3fCfJTZ1LkY9lu0jHZfbUWx0BwZzgd
-tHnFyp8mXi1VUP6RKpn+bu1lACMOG6C2Vbbnio16pFP9kZonDGFAk7Yb81De31AW
-KBuXBME+Ebw8DCSc3a/V09ORYwmCntZKpS85037lOxnUNnn/qh0fd97z5ihvlTTZ
-mneGGFFo3XJq1eLBGyFiSqp+5vnUTw==
-=SFKE
------END PGP SIGNATURE-----
-
---Sig_/bJVD9HQ4bWNjw6GY_e=zb/k--
+> 
+> 
+> > > > +		/* Socket is alredy binded to some port. */
+> > > 
+> > > This kind of spelling issue can be found by scripts/checkpatch.pl
+> > 
+> > will be fixed
+> 
+> P.S. there are two typos here, the obvious one in "alredy",
+> but also the passive of "to bind" is "bound", not "binded".
+> (That is also mis-spelled in a few more places I think.)
+> 
+> —Günther
+> 
 
