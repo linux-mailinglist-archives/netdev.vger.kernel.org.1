@@ -1,65 +1,62 @@
-Return-Path: <netdev+bounces-105364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA817910D10
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 18:35:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64D26910D51
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 18:41:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FEC41F21168
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 16:35:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 952D0286EDD
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 16:41:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059D91B47A4;
-	Thu, 20 Jun 2024 16:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9931B1420;
+	Thu, 20 Jun 2024 16:41:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fpcDoxmh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BjPJZ7a+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C991A1B1500;
-	Thu, 20 Jun 2024 16:30:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C781AD4B9;
+	Thu, 20 Jun 2024 16:41:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718901053; cv=none; b=qL9e0wquftXALdv9DLNwGBaS6RtGd5xDcH7vIh/F0IDEhl3LxETCB034gKqwFmfREnf2KrJhfe8JEZdaeISqgXFutTH40minDsoK7fmEPv7A2HA5OxaNHUkJhAODFfgdz4OvleHkXO7svT3eMT8bsIkwdcu2DmdtGsM74Vrz70Y=
+	t=1718901709; cv=none; b=ugLqtmNV4p1eHnLEIULF1R0D8vTyhdZlMxcKf/OlsDBq8p0TImzsbyyb7J3mPxEPv/idlPBx9qyY040cKNDQa5P8WIJIITwFL0/zVYvXOXYXlP2wYbTNxEwm3Ki/sXJWWasWuDK7SuNBB96APK9vtNl3H7uW7LLhiLSoyTAKR3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718901053; c=relaxed/simple;
-	bh=+u20+PzQw0ydTGvhxZkg0M/CZ1MW4ZV07QKlmdkZH9c=;
+	s=arc-20240116; t=1718901709; c=relaxed/simple;
+	bh=JbcfIOO5HqOQfYsdak5ItbpLoQQ6woDUCr1zHls2zpc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GIeqKThDF5IpxBtQ9qFYV9vN+qx715BvSL2rG4vITxAhrgNHaVSsJfYejCP0aknvQ5ToCX+dvv3WTyAmEzSZ2Q57KXxih55YHKWR4hGNKfK8Uhb2IVUyFV6mWuzsv1giz1JXrlqLdtGn1/byb+yMqhrKYZqREZa7FucU4e4kI+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fpcDoxmh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B15EC2BD10;
-	Thu, 20 Jun 2024 16:30:50 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=QEODgi4SVZ4cAqZeGLrHxT9WMuPKmeHgYHZ9SGdaJADPnF4NorDn/bOnvygMJmnLjnhWdo6X+SMvrWY0LlJzYhZAuLu21+tIIVjxNwlP5WgxfZALa4UPKTPPdQeoLTV7SlO1MeB6XmsUnE26qeJMrE7AVHtzP+wAvL0OkcVFpD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BjPJZ7a+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBF95C2BD10;
+	Thu, 20 Jun 2024 16:41:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718901053;
-	bh=+u20+PzQw0ydTGvhxZkg0M/CZ1MW4ZV07QKlmdkZH9c=;
+	s=k20201202; t=1718901709;
+	bh=JbcfIOO5HqOQfYsdak5ItbpLoQQ6woDUCr1zHls2zpc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fpcDoxmhms7zCAojcmv/RYq8amuLtl7ctEBD7zQhfbjW7+P8jmXqkou3HRrlVlZb7
-	 qYze12R0q8VIC64JI2zqHYNHsKkTWq5FDGrl8aZADPgnv4scthWEesv3iVgNjopql8
-	 KjHezkm5GuBt5xFg30ugfxRRImANN6sWHEAf0KXygq1ydZmdZ+9rBnbcrFOT6nMOoc
-	 j7Pf5kBzBYriCkkIuGAcfwiPeLYN59qvgvCua5fa56a5zX7iDDkL9QGgm+5hsw5yfi
-	 QLEqJNvH3RUjLyJcUQAFLiXUZgI9M2wj9DdxqjNPeeZuHj7YMSmhbwHzhh6qWY3Aof
-	 NGLV5yR/cROXQ==
-Date: Thu, 20 Jun 2024 17:30:48 +0100
+	b=BjPJZ7a+4rnATZyDn2NDQG5PEIpapGxvOa3AftMhhDUWH9FV5KkRjwyYpicPKO4tu
+	 uCtc1RLALs+nAboIpnk2hziGg2Uw7DSdP08oOJk0lx38nJry96QgMcDVmQsqTAiruB
+	 jN5vtzrHwTL003vZHDXmF67BOb4tjZtYidfxeNdbwnPkZDymYeyeLXwQwsjBKn3n9h
+	 Dos8W2geWIZbgu30MHms8WzRO8vgZ9gGrPKKzOLpKcCbRLJUMWYbweXnTbTf1Omdo8
+	 /+QCgPrcFMIq2oBnuY+KMZWQPadAiJrwGSdD0rrqqDDlQjkqjf6b4I8ZsytoobrKz0
+	 Ju7ABqk0DesLA==
+Date: Thu, 20 Jun 2024 17:41:43 +0100
 From: Simon Horman <horms@kernel.org>
-To: "Nemanov, Michael" <michael.nemanov@ti.com>
-Cc: Sabeeh Khan <sabeeh-khan@ti.com>, Kalle Valo <kvalo@kernel.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-wireless@vger.kernel.org,
+To: "Karumanchi, Vineeth" <vineeth.karumanchi@amd.com>
+Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	linux@armlinux.org.uk, vadim.fedorenko@linux.dev, andrew@lunn.ch,
 	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 11/17] wifi: cc33xx: Add init.c, init.h
-Message-ID: <20240620163048.GK959333@kernel.org>
-References: <20240609182102.2950457-1-michael.nemanov@ti.com>
- <20240609182102.2950457-12-michael.nemanov@ti.com>
- <20240615085133.GA234885@kernel.org>
- <8dbb30be-3c0c-43c9-8f7a-dbfeeca3837e@ti.com>
+	linux-kernel@vger.kernel.org, git@amd.com
+Subject: Re: [PATCH net-next v6 3/4] net: macb: Add ARP support to WOL
+Message-ID: <20240620164143.GL959333@kernel.org>
+References: <20240617070413.2291511-1-vineeth.karumanchi@amd.com>
+ <20240617070413.2291511-4-vineeth.karumanchi@amd.com>
+ <20240618105659.GL8447@kernel.org>
+ <616a10c5-9c72-4221-a181-6251e808b9b8@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,77 +65,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8dbb30be-3c0c-43c9-8f7a-dbfeeca3837e@ti.com>
+In-Reply-To: <616a10c5-9c72-4221-a181-6251e808b9b8@amd.com>
 
-On Thu, Jun 20, 2024 at 11:40:31AM +0300, Nemanov, Michael wrote:
-> On 6/15/2024 11:51 AM, Simon Horman wrote:
-> ...
+Hi Vineeth,
+
+On Thu, Jun 20, 2024 at 09:29:01PM +0530, Karumanchi, Vineeth wrote:
+> Hi Simon,
 > 
+> On 6/18/2024 4:26 PM, Simon Horman wrote:
+> > On Mon, Jun 17, 2024 at 12:34:12PM +0530, Vineeth Karumanchi wrote:
+
+...
+
+> > > @@ -5290,6 +5289,14 @@ static int __maybe_unused macb_suspend(struct device *dev)
+> > >   		macb_writel(bp, TSR, -1);
+> > >   		macb_writel(bp, RSR, -1);
+> > > +		tmp = (bp->wolopts & WAKE_MAGIC) ? MACB_BIT(MAG) : 0;
+> > > +		if (bp->wolopts & WAKE_ARP) {
+> > > +			tmp |= MACB_BIT(ARP);
+> > > +			/* write IP address into register */
+> > > +			tmp |= MACB_BFEXT(IP,
+> > > +					 (__force u32)(cpu_to_be32p((uint32_t *)&ifa->ifa_local)));
 > > 
-> > Hi Michael,
+> > Hi Vineeth and Harini,
 > > 
-> > allmodconfig builds on x86_64 with gcc-13 flag the following:
+> > I guess I must be reading this wrong, beause I am confused
+> > by the intent of the endeness handling above.
 > > 
-> > In file included from ./include/linux/string.h:374,
-> >                   from ./include/linux/bitmap.h:13,
-> >                   from ./include/linux/cpumask.h:13,
-> >                   from ./arch/x86/include/asm/paravirt.h:21,
-> >                   from ./arch/x86/include/asm/irqflags.h:60,
-> >                   from ./include/linux/irqflags.h:18,
-> >                   from ./include/linux/spinlock.h:59,
-> >                   from ./include/linux/mmzone.h:8,
-> >                   from ./include/linux/gfp.h:7,
-> >                   from ./include/linux/firmware.h:8,
-> >                   from drivers/net/wireless/ti/cc33xx/init.c:6:
-> > In function 'fortify_memcpy_chk',
-> >      inlined from 'cc33xx_init_vif_specific' at drivers/net/wireless/ti/cc33xx/init.c:156:2:
-> > ./include/linux/fortify-string.h:580:25: warning: call to '__read_overflow2_field' declared with attribute warning: detected read beyond size of field (2nd parameter); maybe use struct_group()? [-Wattribute-warning]
-> >    580 |                         __read_overflow2_field(q_size_field, size);
-> >        |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > In function 'fortify_memcpy_chk',
-> >      inlined from 'cc33xx_init_vif_specific' at drivers/net/wireless/ti/cc33xx/init.c:157:2:
-> > ./include/linux/fortify-string.h:580:25: warning: call to '__read_overflow2_field' declared with attribute warning: detected read beyond size of field (2nd parameter); maybe use struct_group()? [-Wattribute-warning]
-> >    580 |                         __read_overflow2_field(q_size_field, size);
-> >        |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >    CC [M]  drivers/net/wireless/ti/cc33xx/rx.o
+> > * ifa->ifa_local is a 32-bit big-endian value
 > > 
-> > I believe that this is because the destination for each of the two memcpy()
-> > calls immediately above is too narrow - 1 structure wide instead of 4 or 8.
+> > * It's address is cast to a 32-bit host-endian pointer
 > > 
-> > I think this can be resolved by either using:
-> > 1. struct_group in .../cc33xx/conf.h:struct conf_tx_settings
-> >     to wrap ac_conf0 ... ac_conf3, and separately tid_conf0 ... tid_conf7.
-> > 2. Using arrays for ac_conf and tid_conf in
-> >     .../cc33xx/conf.h:struct conf_tx_settings, in which case perhaps
-> >     .../wlcore/conf.h:struct conf_tx_settings can be reused somehow
-> >     (I did not check closely)?
+> >    nit: I think u32 would be preferable to uint32_t; this is kernel code.
+> > 
+> > * The value at this address is then converted to a host byte order value.
+> > 
+> >    nit: Why is cpu_to_be32p() used here instead of the more commonly used
+> >         cpu_to_be32() ?
+> > 
+> >    More importantly, why is a host byte order value being converted from
+> >    big-endian to host byte order?
+> > 
+> > * The value returned by cpu_to_be32p, which is big-endian, because
+> >    that is what that function does, is then cast to host-byte order.
+> > 
+> > 
+> > So overall we have:
+> > 
+> > 1. Cast from big endian to host byte order
+> > 2. Conversion from host byte order to big endian
+> >     (a bytes-swap on litte endian hosts; no-op on big endian hosts)
+> > 3. Cast from big endian to host byte oder
+> > 
+> > All three of these steps seem to warrant explanation.
+> > And the combination is confusing to say the least.
 > > 
 > 
-> Thank you for checking. I agree this code should be rewritten so it is more
-> clear and w/o any warnings. Will fix.
+> tmp |= MACB_BFEXT(IP, be32_to_cpu(ifa->ifa_local));
 > 
-> I was unsuccessful reproducing the warning on my end. Tried with GCC 13.2.0
-> (ARCH=x86_64, allmodconfig) and Arm GNU Toolchain 13.2 (ARCH=arm,
-> allmodconfig) and only got errors in scan.c which I assume you refer to
-> below (will also be fixed).
-
-Hi Michael,
-
-I tried this again with GCC 13.2.0 on x86_64 with allmodconfig.
-And I was able to see this with a W=1 (make W=1) build.
-
-I don't think it is an important detail, but for reference,
-I am using the compiler here, on an x86_64 host.
-https://mirrors.edge.kernel.org/pub/tools/crosstool/
-
-> > Similar errors are flagged elsewhere in this series.
-> > Please take a look at allmodconfig builds and make sure
-> > no warnings are introduced.
-> > 
-> > Lastly, more related to the series as a whole than this patch in
-> > particular, please consider running checkpatch.pl --codespell
+> The above snippet will address above points.
+> Consider the ip address is : 11.11.70.78
 > 
-> Sure, will add checkpatch.pl --codespell to my tests.
+> 1. ifa->ifa_local : returns be32 -> 0x4E460b0b
+> 2. be32_to_cpu(ifa->ifa_local) : converts be32 to host byte order u32:
+> 0x0b0b464e
+> 
+> There are no sparse errors as well.
+> I will make the change, please let me know your suggestions/thoughts.
 
-Great, thanks.
+Thanks for your response, your proposal looks good to me.
+
 
