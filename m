@@ -1,145 +1,131 @@
-Return-Path: <netdev+bounces-105153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADD5E90FDF8
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 09:45:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 172EA90FE19
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 09:57:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3ACAF1F254DE
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 07:45:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0E7A1F23A2D
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 07:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6DF5101A;
-	Thu, 20 Jun 2024 07:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E5A050279;
+	Thu, 20 Jun 2024 07:57:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="azluMy3i"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="bzPZ+SsJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C7B4D8BA
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 07:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381774CDE0;
+	Thu, 20 Jun 2024 07:57:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718869504; cv=none; b=F2y5vknVnSNiAJTmDSjJP/NbHEmQh1u4p7EfDS0qxTReqYLLrzsgzJNW9d3IpXvF/01u0/NKeoLGQoRHSyONNVV0zclaQ/wchuQfPuRH321kODttMH9mX6mWVJ2v4T8eCZrt4JB4RCFgozL4Ekhko+Xs0hH38YXosIuGGxX5Fck=
+	t=1718870260; cv=none; b=N98r40+/ktxT1pWRiKrPuEDbZvxxmLumFSXMmR62QV2briWwssTcD5oe8rRNAsTnYuCDgBJby4eG15l8EuhIiXebkReywA092XmWOHyxaT7d0GyLgxRxfQyKVMHpTJWH1Q3BYbx/8tR6vS3419dN+tgQB7F9prJfI1YS/SCYv9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718869504; c=relaxed/simple;
-	bh=jriSfG3yE8FF/6EIGZsE4m9KeLD7WIHU7POZs2Y87aM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=RT0kS4VHwMGQ0Zl9iudgLQLIkezz+W5efNadgspCe3vTToaM0TSlTWlJhKDre++Q8cnj0bpRqHz/MOWkHb+63eGGYnQ2ppMeyaeAzBYWiQ+FnV001At08ob8xiq55LFPx+M0sKo0vBQqjjUp3kmG517TN2hv4pbqAJx57vAxDw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=azluMy3i; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718869501;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=FLGfD3eNgl/6ZqS6Hg5LlUxNxxeA+GusPPmU/ACDKiU=;
-	b=azluMy3ibVS44ghDQrrEvRlKvKrikLzf/M6soZZb/pxettcmioxqEMFNXnCfxeAdgM9/ZK
-	UktWIMAWGUD/WClsGwTbgMiNxly9eab10ILbmDIBzoFq9dHgwz+g5jM1WTpdfGkh8jcaI5
-	Cq+/ibL3tuJyBWT1tSZAC+FMJZ3U5UU=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-333-k-_HPqnWPpm_NKbw6TWHUw-1; Thu, 20 Jun 2024 03:44:59 -0400
-X-MC-Unique: k-_HPqnWPpm_NKbw6TWHUw-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a6fb670da30so20619866b.2
-        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 00:44:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718869498; x=1719474298;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FLGfD3eNgl/6ZqS6Hg5LlUxNxxeA+GusPPmU/ACDKiU=;
-        b=RzISZBGxOpH4u/OSLoEBt/TiQ01VjG7W37h6n9v0dG3lGxQPy6IG1Z6IFyA2WwqRnh
-         CFVwcLRi0xqN80xhCwkasQlmBdS0c04PKVNvu8QbLK1vu8yatHO3FvWKIX+7ioZZm+Kp
-         9WLMEKlIZQLflKFa/8ASVJ201hcCI7d9nD4YktmXGJgugUrsXzh2XZRtKGE0KSK+BKb3
-         xb84V87D3oOmQvo0z0ZOmAE5irxh5iha5sz6U3WT2x6XEblhwcIMZ1wngziHWHWmmmsR
-         7zxM+F84SXHBcFxtZXffaxZQaynuOnWzFgquwwkrQxr3zb/z6anBzWU3DFR3+dhL3alN
-         XxVA==
-X-Forwarded-Encrypted: i=1; AJvYcCVDgMEhcfEnhmB3Ww4s9OqhpABKZuReT0FS1GMyYaeEJxX8cLjV+RRjXyiO9+0X1RmOPmdDXRJB/4fgIC/tndODA5nv/gbi
-X-Gm-Message-State: AOJu0Yx335Z2WEC6h64WXVLdUWX9ka6puqInzp/TYHNL5yMUoU+Hqj8+
-	xN5fIs6gR0H4AEzSvy2pIkrPwTBBNVw0xuuUx4CVsBA4Vz6aeLpiDMe6EXB2pmMV01SviZ1Mq7U
-	O80JbyFIKYiMp401Uht5Qi4HDpGOIMbSzrd2zl97EIhFtvSvLpX/hmg==
-X-Received: by 2002:a17:906:3944:b0:a6f:4a42:1976 with SMTP id a640c23a62f3a-a6fab648b2amr244125366b.37.1718869498246;
-        Thu, 20 Jun 2024 00:44:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG7rXUumkKpuJQU4WxiFQxdfftMFik/0/wxkymNN3g+4BHNw8Xis8UnHK3Oq+VbGL1wV+yXGQ==
-X-Received: by 2002:a17:906:3944:b0:a6f:4a42:1976 with SMTP id a640c23a62f3a-a6fab648b2amr244123466b.37.1718869497562;
-        Thu, 20 Jun 2024 00:44:57 -0700 (PDT)
-Received: from redhat.com ([2.52.146.100])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f9b3feb7esm181368366b.172.2024.06.20.00.44.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jun 2024 00:44:56 -0700 (PDT)
-Date: Thu, 20 Jun 2024 03:44:53 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	Jiri Pirko <jiri@resnulli.us>
-Subject: [PATCH net-next] net: virtio: unify code to init stats
-Message-ID: <fb91a4ec2224c36adda854314940304d708d59ef.1718869408.git.mst@redhat.com>
+	s=arc-20240116; t=1718870260; c=relaxed/simple;
+	bh=36ksXXCoUERjDciqyomYjJO46lVtpFe9wPdrAkpcBis=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bD/NzCv0p0JWyQ5PJka+B/EGPxKBFI4sJeKG2zGRqne8cTXthKLdhUEmKMG63l6NICqllRA7UdFoH0FGb3S+B70uuLiEY4Pnd8n3otyqnovzzYDNbmGhz7vhLHEw5yCy2vUWj+ShJ8c7kDfvLYObq6JvLTdCllBTTa5jucWfTYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=bzPZ+SsJ; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1718870259; x=1750406259;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=36ksXXCoUERjDciqyomYjJO46lVtpFe9wPdrAkpcBis=;
+  b=bzPZ+SsJ1jJkDw6xwdmlSQ+/nanJvrZmwDV7qeVAbWJDRqCJ+oiKlmIC
+   0nyvfoPn8s9gAzP974G13nC2Vj5V0ShKtZsBqoFnlcDiA1f2e98FVi5DH
+   1y1g6I9DrfnLnKGYGTdOPzEwZPQg7bkQCLGHb1LlxSZ+TzjPPXwmnF2Yp
+   HQ0/QDMvFqJjiwq/xX4fUUouehyf3QJiJrwNpfbHD3dyekh/IP+059i8n
+   TMGGXBNVpS8vCfksP6zW3Tf1xEZ/98o+9AAFdmkwNkVTxYG8+VFnqKzXs
+   uPE5TVQ38OJTBeBGh/CWDraK15JyWuul+VmHIfM1a2oOheVxpg/rn6WS/
+   A==;
+X-CSE-ConnectionGUID: 0IakRMRFTkalAgulpU58WA==
+X-CSE-MsgGUID: Zp8ATRj5TgmP6rT6IGHEBg==
+X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
+   d="asc'?scan'208";a="28280635"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Jun 2024 00:57:37 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 20 Jun 2024 00:57:21 -0700
+Received: from wendy (10.10.85.11) by chn-vm-ex04.mchp-main.com (10.10.85.152)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
+ Transport; Thu, 20 Jun 2024 00:57:18 -0700
+Date: Thu, 20 Jun 2024 08:56:59 +0100
+From: Conor Dooley <conor.dooley@microchip.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Kamil =?iso-8859-1?Q?Hor=E1k?= - 2N <kamilh@axis.com>, Conor Dooley
+	<conor@kernel.org>, <florian.fainelli@broadcom.com>,
+	<bcm-kernel-feedback-list@broadcom.com>, <andrew@lunn.ch>,
+	<hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
+	<edumazet@google.com>, <pabeni@redhat.com>, <robh@kernel.org>,
+	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v8 3/4] dt-bindings: ethernet-phy: add optional brr-mode
+ flag
+Message-ID: <20240620-eskimo-banana-7b90cddfd9c3@wendy>
+References: <20240619150359.311459-1-kamilh@axis.com>
+ <20240619150359.311459-4-kamilh@axis.com>
+ <20240619-plow-audacity-8ee9d98a005e@spud>
+ <20240619163803.6ba73ec5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="V6XhR9n98oENxy/Y"
 Content-Disposition: inline
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+In-Reply-To: <20240619163803.6ba73ec5@kernel.org>
 
-Moving initialization of stats structure into
-__free_old_xmit reduces the code size slightly.
-It also makes it clearer that this function shouldn't
-be called multiple times on the same stats struct.
+--V6XhR9n98oENxy/Y
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
+On Wed, Jun 19, 2024 at 04:38:03PM -0700, Jakub Kicinski wrote:
+> On Wed, 19 Jun 2024 18:36:16 +0100 Conor Dooley wrote:
+> > > Signed-off-by: Kamil Hor=E1k - 2N <kamilh@axis.com> =20
+> >=20
+> > Please fix your SoB and from addresses via your gitconfig as I told you
+> > to in response to the off-list mail you sent me. You also dropped my Ack
+> > without an explanation, why?
+>=20
+> +1, possibly repeating what Conor already said but the common
+> format if 2N is your employer or sponsor of the work would be:
 
-Especially important now that Jiri's patch for BQL has been merged.
-Lightly tested.
+The explanation I was given was that Axis is the parent company of
+2N.
 
- drivers/net/virtio_net.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+>   Signed-off-by: Kamil Hor=E1k (2N) <kamilh@axis.com> =20
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 283b34d50296..c2ce8de340f7 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -383,6 +383,8 @@ static void __free_old_xmit(struct send_queue *sq, bool in_napi,
- 	unsigned int len;
- 	void *ptr;
- 
-+	stats->bytes = stats->packets = 0;
-+
- 	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
- 		++stats->packets;
- 
-@@ -828,7 +830,7 @@ static void virtnet_rq_unmap_free_buf(struct virtqueue *vq, void *buf)
- 
- static void free_old_xmit(struct send_queue *sq, bool in_napi)
- {
--	struct virtnet_sq_free_stats stats = {0};
-+	struct virtnet_sq_free_stats stats;
- 
- 	__free_old_xmit(sq, in_napi, &stats);
- 
-@@ -979,7 +981,7 @@ static int virtnet_xdp_xmit(struct net_device *dev,
- 			    int n, struct xdp_frame **frames, u32 flags)
- {
- 	struct virtnet_info *vi = netdev_priv(dev);
--	struct virtnet_sq_free_stats stats = {0};
-+	struct virtnet_sq_free_stats stats;
- 	struct receive_queue *rq = vi->rq;
- 	struct bpf_prog *xdp_prog;
- 	struct send_queue *sq;
--- 
-MST
+> --=20
+> pw-bot: cr
 
+BTW Jakub, am I able to interact with the pw-bot, or is that limited to
+maintainers/senior netdev reviewers? Been curious about that for a
+while..
+
+--V6XhR9n98oENxy/Y
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZnPgvwAKCRB4tDGHoIJi
+0rIOAPwOpz7uD4Wx4/+KNK7iRAV0YSft1SA0VMjBuPsib5LhSgD+KwLQ/s3HGXbp
+ubQwIM6/G6JafosTasrGN1m2W4UAywA=
+=q30j
+-----END PGP SIGNATURE-----
+
+--V6XhR9n98oENxy/Y--
 
