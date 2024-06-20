@@ -1,72 +1,69 @@
-Return-Path: <netdev+bounces-105199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1458191017E
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:30:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9059B910182
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:33:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86A1E1F22CAF
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:30:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 106C4282510
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:33:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8404E1A8C3C;
-	Thu, 20 Jun 2024 10:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311631A8C3B;
+	Thu, 20 Jun 2024 10:33:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="w0iJlI7J"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="HyAMYTS+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47AEF2594
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 10:30:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C822594
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 10:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718879437; cv=none; b=i6dsqzQHQgBQKXzTVXaDdgx6navxoW7mThWPhamVH3fqGH4ACzm/hn03hXULyw+a8lOvF9cwylvZVJn3svL9axWcdRhMvwJ2Osb6HtRLHM7rqXL8fO8mmeeZDOSNg4Hz3VY+zFJ0i0NDU4QlpEzPn3mnQDy8Udb5jMCszpLAUhI=
+	t=1718879612; cv=none; b=hxIP3zoHfODq9LuxKtWhez1BSjpS/sSNyFJcTzI/q0qaYBJfgJN7cOGNjPxZYskfFWT7HMnUMlAfzvdldfoHTm5ARQlhCRAY7BhEL1F/DTdvicRdXT96ZQZbpSQ59BlPCauWjDOekwG6vo+L6lYxbTr7+NfV//kudT59Oa3QQqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718879437; c=relaxed/simple;
-	bh=2D/iL0Q2ySweIZGMHrLEe0KAXbueMD07zdGi1lt1iwI=;
+	s=arc-20240116; t=1718879612; c=relaxed/simple;
+	bh=lwjRdInxaz+BwwfNopbOTAclyOjdeOWa2bzPsTLxyzU=;
 	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=F7UKsO+F75JPOeTvc4GGf7mzygj1GlkbZTzBC5t19mULdtzDgu4bgeCIp1WfdJUNvnssjGYr5cjmP1UgOLv8gBFDX99vAwUOfjkvHcSKM8AwWY0elYdSioktFV0l0uG1ZBbDxaf0XC1Dtsp+iWFLD/HefcRUQ3+a0yVKqb7BClE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=w0iJlI7J; arc=none smtp.client-ip=115.124.30.130
+	 Content-Type; b=MTPcuexS79xP7Ts3YctR2BaXeE8+rrpFSZYaTrE7r8vJqn81RuH9y+gnugbOQ5EDfxj0Dm1fPUkv3VnEdKO4mio5hq8PU2dVk2mDnCvAJpRimKbQm7++P3pw5i6e4Xn8bhz6knueyk9Gfu7UW6WOa1gvecgUkXtjp4iXpEYEyf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=HyAMYTS+; arc=none smtp.client-ip=115.124.30.112
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1718879431; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=hznL4qRtkLoJ00kZQbZiQGJGcI1lnS4wfII1MEePJws=;
-	b=w0iJlI7JkvIwK6nyezN4suPvEEpANL3cc2dQPz5DYmk6QHyLHtWJJA10KJNl1R4iTlEMvm7ve3R0nDmHcJG6ewnxWyHO6ve5+WvzpM5LtFHjCU1X4KGEy3KKsi8VpF7lB7LPlQitpZdPx1A+xEPsOuCJibCbvUzz0Pg3tYNVugM=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0W8sCZPV_1718879430;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W8sCZPV_1718879430)
+	t=1718879607; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=Mga/fS+X7ChpebY6EN4dcVxyUcm7HRc2D3toPbZ37ig=;
+	b=HyAMYTS+F7AYBIZpg907+cdtpJkmrYR1/4lUJdGdQSuQbZWkmkh14OirTnt0vJKqwq8bst5eB+KUpJluYKZ/xOvXiNO+Nk9j2jNaKvkmp9jj8a3nrE44qOkHIxHHbKvaFYzu5sqD27mYewxek0TWLGH+usyALsSktLegQYoo0RY=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R881e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045075189;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0W8s9a-Z_1718879606;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W8s9a-Z_1718879606)
           by smtp.aliyun-inc.com;
-          Thu, 20 Jun 2024 18:30:31 +0800
-Message-ID: <1718879236.1007793-10-hengqi@linux.alibaba.com>
-Subject: Re: [PATCH 2/2] virtio_net: fixing XDP for fully checksummed packets handling
-Date: Thu, 20 Jun 2024 18:27:16 +0800
+          Thu, 20 Jun 2024 18:33:26 +0800
+Message-ID: <1718879494.952194-11-hengqi@linux.alibaba.com>
+Subject: Re: [PATCH net-next v4 2/5] virtio_net: enable irq for the control vq
+Date: Thu, 20 Jun 2024 18:31:34 +0800
 From: Heng Qi <hengqi@linux.alibaba.com>
 To: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Jason Wang <jasowang@redhat.com>,
  netdev@vger.kernel.org,
  virtualization@lists.linux.dev,
- Thomas Huth <thuth@linux.vnet.ibm.com>,
  Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
  =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Eric Dumazet <edumazet@google.com>,
  "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>
-References: <20240617131524.63662-1-hengqi@linux.alibaba.com>
- <20240617131524.63662-3-hengqi@linux.alibaba.com>
- <CACGkMEvj8fvXkCxDFQ1-Cyq5DL=axEf1Ch1zVnuQUNQy6Wjn+g@mail.gmail.com>
- <1718680517.8370645-12-hengqi@linux.alibaba.com>
- <CACGkMEsa3AsPkweqS0-BEjSw5sKW_XM669HVSN_eX7-8KVG8tQ@mail.gmail.com>
- <1718875728.9338605-7-hengqi@linux.alibaba.com>
- <20240620061710-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240620061710-mutt-send-email-mst@kernel.org>
+ Paolo Abeni <pabeni@redhat.com>
+References: <20240619161908.82348-1-hengqi@linux.alibaba.com>
+ <20240619161908.82348-3-hengqi@linux.alibaba.com>
+ <20240619171708-mutt-send-email-mst@kernel.org>
+ <1718868555.2701075-5-hengqi@linux.alibaba.com>
+ <CACGkMEv8jnnO=S3LYW00ypwHfM3Tzt42iuASG_d4FAAk60zoLg@mail.gmail.com>
+ <CACGkMEtryWEbe-07-7GWyntGN+f-sL+uS0ozN0Oc6aMemmsYEw@mail.gmail.com>
+ <1718877195.0503237-9-hengqi@linux.alibaba.com>
+ <20240620060816-mutt-send-email-mst@kernel.org>
+ <20240620061109-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240620061109-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -75,197 +72,119 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-On Thu, 20 Jun 2024 06:19:01 -0400, "Michael S. Tsirkin" <mst@redhat.com> w=
+On Thu, 20 Jun 2024 06:11:40 -0400, "Michael S. Tsirkin" <mst@redhat.com> w=
 rote:
-> On Thu, Jun 20, 2024 at 05:28:48PM +0800, Heng Qi wrote:
-> > On Thu, 20 Jun 2024 16:33:35 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Tue, Jun 18, 2024 at 11:17=E2=80=AFAM Heng Qi <hengqi@linux.alibab=
-a.com> wrote:
-> > > >
-> > > > On Tue, 18 Jun 2024 11:10:26 +0800, Jason Wang <jasowang@redhat.com=
-> wrote:
-> > > > > On Mon, Jun 17, 2024 at 9:15=E2=80=AFPM Heng Qi <hengqi@linux.ali=
+> On Thu, Jun 20, 2024 at 06:10:51AM -0400, Michael S. Tsirkin wrote:
+> > On Thu, Jun 20, 2024 at 05:53:15PM +0800, Heng Qi wrote:
+> > > On Thu, 20 Jun 2024 16:26:05 +0800, Jason Wang <jasowang@redhat.com> =
+wrote:
+> > > > On Thu, Jun 20, 2024 at 4:21=E2=80=AFPM Jason Wang <jasowang@redhat=
+.com> wrote:
+> > > > >
+> > > > > On Thu, Jun 20, 2024 at 3:35=E2=80=AFPM Heng Qi <hengqi@linux.ali=
 baba.com> wrote:
 > > > > > >
-> > > > > > The XDP program can't correctly handle partially checksummed
-> > > > > > packets, but works fine with fully checksummed packets.
+> > > > > > On Wed, 19 Jun 2024 17:19:12 -0400, "Michael S. Tsirkin" <mst@r=
+edhat.com> wrote:
+> > > > > > > On Thu, Jun 20, 2024 at 12:19:05AM +0800, Heng Qi wrote:
+> > > > > > > > @@ -5312,7 +5315,7 @@ static int virtnet_find_vqs(struct vi=
+rtnet_info *vi)
+> > > > > > > >
+> > > > > > > >     /* Parameters for control virtqueue, if any */
+> > > > > > > >     if (vi->has_cvq) {
+> > > > > > > > -           callbacks[total_vqs - 1] =3D NULL;
+> > > > > > > > +           callbacks[total_vqs - 1] =3D virtnet_cvq_done;
+> > > > > > > >             names[total_vqs - 1] =3D "control";
+> > > > > > > >     }
+> > > > > > > >
+> > > > > > >
+> > > > > > > If the # of MSIX vectors is exactly for data path VQs,
+> > > > > > > this will cause irq sharing between VQs which will degrade
+> > > > > > > performance significantly.
+> > > > > > >
 > > > > >
-> > > > > Not sure this is ture, if I was not wrong, XDP can try to calcula=
-te checksum.
-> > > >
-> > > > XDP's interface serves a full checksum,
+> > > > > Why do we need to care about buggy management? I think libvirt has
+> > > > > been teached to use 2N+2 since the introduction of the multiqueue=
+[1].
+> > > >=20
+> > > > And Qemu can calculate it correctly automatically since:
+> > > >=20
+> > > > commit 51a81a2118df0c70988f00d61647da9e298483a4
+> > > > Author: Jason Wang <jasowang@redhat.com>
+> > > > Date:   Mon Mar 8 12:49:19 2021 +0800
+> > > >=20
+> > > >     virtio-net: calculating proper msix vectors on init
+> > > >=20
+> > > >     Currently, the default msix vectors for virtio-net-pci is 3 whi=
+ch is
+> > > >     obvious not suitable for multiqueue guest, so we depends on the=
+ user
+> > > >     or management tools to pass a correct vectors parameter. In fac=
+t, we
+> > > >     can simplifying this by calculating the number of vectors on re=
+alize.
+> > > >=20
+> > > >     Consider we have N queues, the number of vectors needed is 2*N =
++ 2
+> > > >     (#queue pairs + plus one config interrupt and control vq). We d=
+idn't
+> > > >     check whether or not host support control vq because it was add=
+ed
+> > > >     unconditionally by qemu to avoid breaking legacy guests such as=
+ Minix.
+> > > >=20
+> > > >     Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com
+> > > >     Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > >     Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > >     Signed-off-by: Jason Wang <jasowang@redhat.com>
 > > >=20
-> > > What do you mean by "serve" here? I mean, XDP can calculate the
-> > > checksum and fill it in the packet by itself.
+> > > Yes, devices designed according to the spec need to reserve an interr=
+upt
+> > > vector for ctrlq. So, Michael, do we want to be compatible with buggy=
+ devices?
 > > >=20
+> > > Thanks.
 > >=20
-> > Yes, XDP can parse and calculate checksums for all packets.
-> > However, the bpf_csum_diff and bpf_l4_csum_replace APIs provided by XDP=
- assume
-> > that the packets being processed are fully checksumed packets. That is,
-> > after the XDP program modified the packets, the incremental checksum ca=
-n be
-> > calculated (for example, samples/bpf/tcbpf1_kern.c, samples/bpf/test_lw=
-t_bpf.c).
-> >=20
-> > Therefore, partially checksummed packets cannot be processed normally i=
-n these
-> > examples and need to be discarded.
-> >=20
-> > > > and this is why we disabled the
-> > > > offloading of VIRTIO_NET_F_GUEST_CSUM when loading XDP.
-> > >=20
-> > > If we trust the device to disable VIRTIO_NET_F_GUEST_CSUM, any reason
-> > > to check VIRTIO_NET_HDR_F_NEEDS_CSUM again in the receive path?
-> >=20
-> > There doesn't seem to be a mandatory constraint in the spec that device=
-s that
-> > haven't negotiated VIRTIO_NET_F_GUEST_CSUM cannot set NEEDS_CSUM bit, s=
-o I check this.
-> >=20
-> > Thanks.
+> > These aren't buggy, the spec allows this. So don't fail, but
+> > I'm fine with using polling if not enough vectors.
 >=20
-> The spec says:
->=20
-> \item If the VIRTIO_NET_F_GUEST_CSUM feature was negotiated, the
->   VIRTIO_NET_HDR_F_NEEDS_CSUM bit in \field{flags} can be
->   set: if so, the packet checksum at offset \field{csum_offset}=20
->   from \field{csum_start} and any preceding checksums
->   have been validated.  The checksum on the packet is incomplete and
->   if bit VIRTIO_NET_HDR_F_RSC_INFO is not set in \field{flags},
->   then \field{csum_start} and \field{csum_offset} indicate how to calcula=
-te it
->   (see Packet Transmission point 1).
->=20
->=20
-> So yes, NEEDS_CSUM without VIRTIO_NET_F_GUEST_CSUM is at best undefined.
-> Please do not try to use it unless VIRTIO_NET_F_GUEST_CSUM is set.
+> sharing with config interrupt is easier code-wise though, FWIW -
+> we don't need to maintain two code-paths.
 
-I've seen it before, but thought something like
- "The device MUST NOT set the NEEDS_CSUM bit if GUEST_CSUM has not been neg=
-otiated"
-would be clearer.
-
-Furthermore, it is still possible for a malicious device to set the bit.
+Yes, it works well - config change irq is used less before - and will not f=
+ail.
 
 Thanks.
 
 >=20
-> And if you want to be flexible, ignore it unless VIRTIO_NET_F_GUEST_CSUM
-> has been negotiated.
->=20
->=20
->=20
->=20
->=20
-> > >=20
-> > > >
-> > > > Thanks.
-> > >=20
-> > > Thanks
-> > >=20
-> > > >
+> > > >=20
+> > > > Thanks
+> > > >=20
+> > > > >
+> > > > > > > So no, you can not just do it unconditionally.
+> > > > > > >
+> > > > > > > The correct fix probably requires virtio core/API extensions.
+> > > > > >
+> > > > > > If the introduction of cvq irq causes interrupts to become shar=
+ed, then
+> > > > > > ctrlq need to fall back to polling mode and keep the status quo.
+> > > > >
+> > > > > Having to path sounds a burden.
+> > > > >
+> > > > > >
+> > > > > > Thanks.
+> > > > > >
+> > > > >
 > > > > >
 > > > > > Thanks
 > > > > >
-> > > > > > If the
-> > > > > > device has already validated fully checksummed packets, then
-> > > > > > the driver doesn't need to re-validate them, saving CPU resourc=
-es.
-> > > > > >
-> > > > > > Additionally, the driver does not drop all partially checksummed
-> > > > > > packets when VIRTIO_NET_F_GUEST_CSUM is not negotiated. This is
-> > > > > > not a bug, as the driver has always done this.
-> > > > > >
-> > > > > > Fixes: 436c9453a1ac ("virtio-net: keep vnet header zeroed after=
- processing XDP")
-> > > > > > Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-> > > > > > ---
-> > > > > >  drivers/net/virtio_net.c | 20 +++++++++++++++++++-
-> > > > > >  1 file changed, 19 insertions(+), 1 deletion(-)
-> > > > > >
-> > > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > > > index aa70a7ed8072..ea10db9a09fa 100644
-> > > > > > --- a/drivers/net/virtio_net.c
-> > > > > > +++ b/drivers/net/virtio_net.c
-> > > > > > @@ -1360,6 +1360,10 @@ static struct sk_buff *receive_small_xdp=
-(struct net_device *dev,
-> > > > > >         if (unlikely(hdr->hdr.gso_type))
-> > > > > >                 goto err_xdp;
-> > > > > >
-> > > > > > +       /* Partially checksummed packets must be dropped. */
-> > > > > > +       if (unlikely(hdr->hdr.flags & VIRTIO_NET_HDR_F_NEEDS_CS=
-UM))
-> > > > > > +               goto err_xdp;
-> > > > > > +
-> > > > > >         buflen =3D SKB_DATA_ALIGN(GOOD_PACKET_LEN + headroom) +
-> > > > > >                 SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> > > > > >
-> > > > > > @@ -1677,6 +1681,10 @@ static void *mergeable_xdp_get_buf(struc=
-t virtnet_info *vi,
-> > > > > >         if (unlikely(hdr->hdr.gso_type))
-> > > > > >                 return NULL;
-> > > > > >
-> > > > > > +       /* Partially checksummed packets must be dropped. */
-> > > > > > +       if (unlikely(hdr->hdr.flags & VIRTIO_NET_HDR_F_NEEDS_CS=
-UM))
-> > > > > > +               return NULL;
-> > > > > > +
-> > > > > >         /* Now XDP core assumes frag size is PAGE_SIZE, but buf=
-fers
-> > > > > >          * with headroom may add hole in truesize, which
-> > > > > >          * make their length exceed PAGE_SIZE. So we disabled t=
-he
-> > > > > > @@ -1943,6 +1951,7 @@ static void receive_buf(struct virtnet_in=
-fo *vi, struct receive_queue *rq,
-> > > > > >         struct net_device *dev =3D vi->dev;
-> > > > > >         struct sk_buff *skb;
-> > > > > >         struct virtio_net_common_hdr *hdr;
-> > > > > > +       u8 flags;
-> > > > > >
-> > > > > >         if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
-> > > > > >                 pr_debug("%s: short packet %i\n", dev->name, le=
-n);
-> > > > > > @@ -1951,6 +1960,15 @@ static void receive_buf(struct virtnet_i=
-nfo *vi, struct receive_queue *rq,
-> > > > > >                 return;
-> > > > > >         }
-> > > > > >
-> > > > > > +       /* 1. Save the flags early, as the XDP program might ov=
-erwrite them.
-> > > > > > +        * These flags ensure packets marked as VIRTIO_NET_HDR_=
-F_DATA_VALID
-> > > > > > +        * stay valid after XDP processing.
-> > > > > > +        * 2. XDP doesn't work with partially checksummed packe=
-ts (refer to
-> > > > > > +        * virtnet_xdp_set()), so packets marked as
-> > > > > > +        * VIRTIO_NET_HDR_F_NEEDS_CSUM get dropped during XDP p=
-rocessing.
-> > > > > > +        */
-> > > > > > +       flags =3D ((struct virtio_net_common_hdr *)buf)->hdr.fl=
-ags;
-> > > > > > +
-> > > > > >         if (vi->mergeable_rx_bufs)
-> > > > > >                 skb =3D receive_mergeable(dev, vi, rq, buf, ctx=
-, len, xdp_xmit,
-> > > > > >                                         stats);
-> > > > > > @@ -1966,7 +1984,7 @@ static void receive_buf(struct virtnet_in=
-fo *vi, struct receive_queue *rq,
-> > > > > >         if (dev->features & NETIF_F_RXHASH && vi->has_rss_hash_=
-report)
-> > > > > >                 virtio_skb_set_hash(&hdr->hash_v1_hdr, skb);
-> > > > > >
-> > > > > > -       if (hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VALID)
-> > > > > > +       if (flags & VIRTIO_NET_HDR_F_DATA_VALID)
-> > > > > >                 skb->ip_summed =3D CHECKSUM_UNNECESSARY;
-> > > > > >
-> > > > > >         if (virtio_net_hdr_to_skb(skb, &hdr->hdr,
-> > > > > > --
-> > > > > > 2.32.0.3.g01195cf9f
-> > > > > >
+> > > > > [1] https://www.linux-kvm.org/page/Multiqueue
 > > > > >
-> > > >
-> > >=20
+> > > > > > >
+> > > > > > > --
+> > > > > > > MST
+> > > > > > >
+> > > > > >
+> > > >=20
 >=20
 
