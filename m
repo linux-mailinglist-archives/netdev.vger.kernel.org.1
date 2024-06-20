@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-105098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4146B90FA64
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 02:40:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1587D90FA62
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 02:40:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E878C282BC6
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 00:40:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C117F1F224F6
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 00:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579DC3FC2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DCA51859;
 	Thu, 20 Jun 2024 00:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KTx3R+oO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WR3EBx0R"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC191879;
-	Thu, 20 Jun 2024 00:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20AC80B;
+	Thu, 20 Jun 2024 00:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718844028; cv=none; b=XP09UqHvRytXJvf5odi1V3/hBo9CJu+lV0ANZ0b6KLJNu446nGaAE2ZxVEWj5qB5wxiyFmu1DW9+B4DQguc1OeQa1rRT6WRAx78QmA/2HQBSLUa97qhfQsJU0XBogRRqIIaMYeIsiisGUfaV4dCfkCW3+EPKe8BuqDT2BECxz4c=
+	t=1718844028; cv=none; b=jg5WlAvNEN8ySIio9tOwGjQCKtPTuzkJ2AQKCm+UOSpkgJNkkhtTolaHWTmY3cf83Swh3EMMTjTqjbCwlHu/NTn8+6lRuBXOkdW62hJ7ZJ3zwvvssOl1QBepH+RRIF5KHc1qocIAL3gJlKbi9mmVn7sPV4ysfiQhQQejkv/rQf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718844028; c=relaxed/simple;
-	bh=rvuOXytVc6G50Are3ibBW4kTJbx0ikOESipcZe7p9+s=;
+	bh=VGowrL8cYgVEENvmronnkfAFOEL6EiN0TiLkISUVStk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RkktIQkgv3y6Gv5d84GBU7x5gWHrtKetq86kwPRDwWmvKj/BF3kGBeS209kW5cwo7BtXMsEjWq5wjG4ely/IP5OTmg165IAx8SpcRPwAEuE2MNXiCMD4hMFioshTxgkqx4hJYdrBK0cRJZk63obrdHx+FvTqvRs1LuVenYr3P9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KTx3R+oO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 03ED8C4AF09;
-	Thu, 20 Jun 2024 00:40:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=WaaVMUnV2gQd+ZoPHKG5xKMiIJJMw3H7HA8/6ydKkOjnXO4/TGQTumBRmv3NDv+JiOT7AOVQ2R2SKVlYUzE53hTW/ofIJF4yVdTGSUesgmqb3wMAKm4zm3c88FXqZWEe6ob1/MbQ5wSL/emRH+G68SsxAWF+5B4ATw/TjRnn1Ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WR3EBx0R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7EE0BC4AF07;
+	Thu, 20 Jun 2024 00:40:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718844028;
-	bh=rvuOXytVc6G50Are3ibBW4kTJbx0ikOESipcZe7p9+s=;
+	s=k20201202; t=1718844027;
+	bh=VGowrL8cYgVEENvmronnkfAFOEL6EiN0TiLkISUVStk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KTx3R+oOTBOlFuJTdRJ3ZNG8cUlP6noUMOanePwmaP+4dG8XdSdfspL87MJPRM/Fb
-	 pWcEUMHAZBwv9pyZpHQp989LPDx76OmI2FuIkR6lomXBcFUSiX1IJKGuWi4lWTFo6Z
-	 lHK4JHKxho+khsxAlae2mQVfmGRQIqyUQHS8Qj02e2JGRFrcCfIxYH3I+8n8VqhPix
-	 YR1JhthgT7nCnZEv57S8MsIAjiUrR+XvIEUQo2YBunM6LqSlRrTUUJOknfTcvYHEJV
-	 tqVr8/3QWpA5ot39Sxvflxa6CdR4/LKlKQTHCJvkOE0SHG0RE7WopTTp/c+XchhPU8
-	 sMo7ktFk0uiZg==
+	b=WR3EBx0RoSfo/yR0FjH7DKRfg7oZxc1JDXdkPeInpJPfvX92yTmMen+UdzQgfLBFv
+	 E+m1adsgFhwf/5ZMllbmaxTsH0gCF9TshAK/VKQrK0u+UpCeVbwBETwQDMZXRJvXhu
+	 /UpmQ6SNJD2MgA4ur9XI6CJEpi+SPbLgceekNszSuWi7CqADoEWCgLmnmO76GONbWn
+	 gVOQunGMcyUbkSBuv37pEshFnRWXKEpDC+8FJ4mIw0I5rYQZQLT2zEvB/9dQ0WlSNp
+	 jpR0jkmHzR8dDuCjSjOTE84hmCPr/OHsZsZzjXFH6IGejbVI4A5qzqml+BYP/YIAJq
+	 BVxr9AuCqyUIQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EEC75E7C4C6;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 66BFAE7C4C5;
 	Thu, 20 Jun 2024 00:40:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,39 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] virtio_net: add support for Byte Queue Limits
+Subject: Re: [PATCH net] net/tcp_ao: Don't leak ao_info on error-path
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171884402797.27924.17653832264207985916.git-patchwork-notify@kernel.org>
+ <171884402741.27924.10755874580274732970.git-patchwork-notify@kernel.org>
 Date: Thu, 20 Jun 2024 00:40:27 +0000
-References: <20240618144456.1688998-1-jiri@resnulli.us>
-In-Reply-To: <20240618144456.1688998-1-jiri@resnulli.us>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mst@redhat.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- dave.taht@gmail.com, kerneljasonxing@gmail.com, hengqi@linux.alibaba.com
+References: <20240619-tcp-ao-required-leak-v1-1-6408f3c94247@gmail.com>
+In-Reply-To: <20240619-tcp-ao-required-leak-v1-1-6408f3c94247@gmail.com>
+To: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
+Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, 0x7f454c46@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 18 Jun 2024 16:44:56 +0200 you wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
+On Wed, 19 Jun 2024 01:29:04 +0100 you wrote:
+> From: Dmitry Safonov <0x7f454c46@gmail.com>
 > 
-> Add support for Byte Queue Limits (BQL).
+> It seems I introduced it together with TCP_AO_CMDF_AO_REQUIRED, on
+> version 5 [1] of TCP-AO patches. Quite frustrative that having all these
+> selftests that I've written, running kmemtest & kcov was always in todo.
 > 
-> Tested on qemu emulated virtio_net device with 1, 2 and 4 queues.
-> Tested with fq_codel and pfifo_fast. Super netperf with 50 threads is
-> running in background. Netperf TCP_RR results:
+> [1]: https://lore.kernel.org/netdev/20230215183335.800122-5-dima@arista.com/
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3] virtio_net: add support for Byte Queue Limits
-    https://git.kernel.org/netdev/net-next/c/c8bd1f7f3e61
+  - [net] net/tcp_ao: Don't leak ao_info on error-path
+    https://git.kernel.org/netdev/net/c/f9ae84890428
 
 You are awesome, thank you!
 -- 
