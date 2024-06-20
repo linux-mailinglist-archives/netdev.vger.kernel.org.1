@@ -1,122 +1,143 @@
-Return-Path: <netdev+bounces-105209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BE03910205
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:58:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA2BF910203
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:58:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B15321F22042
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:58:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C25CB21F10
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:57:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52D9E1AAE0F;
-	Thu, 20 Jun 2024 10:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E941A8C2E;
+	Thu, 20 Jun 2024 10:57:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="AtrpU8f9"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gqnnX1Vh"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB0915A49F;
-	Thu, 20 Jun 2024 10:58:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0482D15A49F;
+	Thu, 20 Jun 2024 10:57:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718881087; cv=none; b=FX/fEThPSDdSAgpIEDkV6Rceor9DknI5aLroq9dzX/ygAkhKZS7AXIlYrmOjeHbr9ZWtrWCF8WtF24FytOm86luMH5J8nEPldbAm+f6wENC4OA9v6actzHHDztpwfurVk4x2M/nPa8kM4vlLCgfKP9njc0GgKqw2A1rGb7YlKVY=
+	t=1718881072; cv=none; b=NkTkcrxfp9SubQTqIexUvqy5rRWF5QwgwgyoijhDmxix4lEp2vnm4TC7C+4cpj91l1+8JvT3uLG0WA7j3n73esu/Kxx5lixSgXsdEP/hjSrgOkalL/fbDXlBoD8hz0j4pfjLNoqL4E1Dfr/9EvegrgIfTjBwZJRGsNJExH/47Yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718881087; c=relaxed/simple;
-	bh=kIqNZT7Y/2I214ckOZtVCOZwMUmxnwADE+Z6ZC7k6ek=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=e3mB9XjmJzZtO33NeZwVAAiu+zsko5plkn199fe71dgowfoK14QiIjRTKGUY+11ijqLtD3Ik1AJ8UcdwGNcz1Ytm4davC4F7OniuFD09vLbm7foSqEsAaohh0mTqAQ0iKGDvlr3XQEC+HmIJOZXgWUBLgavPuxhAVK4ysBfb6t4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=AtrpU8f9; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1718881082; h=Message-ID:Subject:Date:From:To;
-	bh=a3c1ylxFN5nTy1Dk8OE874gV7bmy1Q7+61Aj0oQTYXs=;
-	b=AtrpU8f9LEP7ZL5BQMH71OP3a9dtnAX0uGtTwmhsptf+ZTyj7bJiJUQIbRzTv74jEWnVjTK2cxQH+VnhrZy80O6PQ0IOD/iMnUU2bh8bucJKzHIXx0QeALCazitD9JYTMXLwxA4st7V+tccncYN0W0uK6KOljeuuk0Ax6VvPslk=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R241e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033068164191;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W8s8bOx_1718881081;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W8s8bOx_1718881081)
-          by smtp.aliyun-inc.com;
-          Thu, 20 Jun 2024 18:58:01 +0800
-Message-ID: <1718881025.1145291-5-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v6 09/10] virtio_net: xsk: rx: support recv merge mode
-Date: Thu, 20 Jun 2024 18:57:05 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240618075643.24867-1-xuanzhuo@linux.alibaba.com>
- <20240618075643.24867-10-xuanzhuo@linux.alibaba.com>
- <b3fc84d24bce9ab2997a414cc84ae7e12ba87987.camel@redhat.com>
-In-Reply-To: <b3fc84d24bce9ab2997a414cc84ae7e12ba87987.camel@redhat.com>
+	s=arc-20240116; t=1718881072; c=relaxed/simple;
+	bh=ryPeJySBmmVSDjWpYuz6jKygUByAWjhbdVd6q0mftxw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HFcH2e/4dj/KvIXri97k9rUGKh5RbMEmaFvhT/wQvc7hilWX93dXzAvTAqldnGSIcxayDmFGn+sWJXgRb4bpupoRI+MCEGUZBhVDgN3FexhaE+1WTrWff8JcXsjVkGowxfjv7npixq7l/h/OZeud3E3N49ZeofEY5DPb73jSLx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gqnnX1Vh; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=JL1dgGAqb9hLYRxS4TGWl0ExqWTdbEg1InyHIVddSDI=; b=gqnnX1Vh1PSSDC8IoumrXSiDNV
+	AVnNoRLO4X+4HrAt2e2Gk1SGD1rZvPiYN4vL8sl53pOY2Mvy1UvxA/RpV1NGVTbEppKDnCSZ6bg5b
+	lcLIhcWGa44XjZ9mv/nwTxCn+9Th8080Ftd4hCf+mh+k/wgZ/dWXlUkyDpOYRhnUy7HLYf6j/pZny
+	pZKq8ceRbSzUcwvXH9UvQuej7sm3O74ttio97QoiEHDHqTAZHz4qpvzYAZJhL8NIEmoWP6OW54Dof
+	0AzkkSmiUkq1exokIMAdtHpah6zkJEw0a+O7GTq+6cDPrLc3RDRSZOHHUMn+hZoLn0nf+RUGDzDJ9
+	VOhZoe4g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:32904)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sKFTm-0001cl-2i;
+	Thu, 20 Jun 2024 11:57:22 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sKFTk-0007ba-Gl; Thu, 20 Jun 2024 11:57:20 +0100
+Date: Thu, 20 Jun 2024 11:57:20 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Vinod Koul <vkoul@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH net-next 8/8] net: stmmac: qcom-ethqos: add a DMA-reset
+ quirk for sa8775p-ride-r3
+Message-ID: <ZnQLED/C3Opeim5q@shell.armlinux.org.uk>
+References: <20240619184550.34524-1-brgl@bgdev.pl>
+ <20240619184550.34524-9-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240619184550.34524-9-brgl@bgdev.pl>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, 20 Jun 2024 12:37:43 +0200, Paolo Abeni <pabeni@redhat.com> wrote:
-> On Tue, 2024-06-18 at 15:56 +0800, Xuan Zhuo wrote:
-> > Support AF-XDP for merge mode.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio_net.c | 139 +++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 139 insertions(+)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 06608d696e2e..cfa106aa8039 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -504,6 +504,10 @@ static int virtnet_xdp_handler(struct bpf_prog *xdp_prog, struct xdp_buff *xdp,
-> >  			       struct net_device *dev,
-> >  			       unsigned int *xdp_xmit,
-> >  			       struct virtnet_rq_stats *stats);
-> > +static struct sk_buff *virtnet_skb_append_frag(struct sk_buff *head_skb,
-> > +					       struct sk_buff *curr_skb,
-> > +					       struct page *page, void *buf,
-> > +					       int len, int truesize);
-> >
-> >  static bool is_xdp_frame(void *ptr)
-> >  {
-> > @@ -1128,6 +1132,139 @@ static struct sk_buff *virtnet_receive_xsk_small(struct net_device *dev, struct
-> >  	}
-> >  }
-> >
-> > +static void xsk_drop_follow_bufs(struct net_device *dev,
-> > +				 struct receive_queue *rq,
-> > +				 u32 num_buf,
-> > +				 struct virtnet_rq_stats *stats)
-> > +{
-> > +	struct xdp_buff *xdp;
-> > +	u32 len;
-> > +
-> > +	while (num_buf-- > 1) {
->
-> Why do you skip the last buffer? I thought it should be dropped, too?!?
+On Wed, Jun 19, 2024 at 08:45:49PM +0200, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> On sa8775p-ride the RX clocks from the AQR115C PHY are not available at
+> the time of the DMA reset so we need to loop TX clocks to RX and then
+> disable loopback after link-up. Use the provided callbacks to do it for
+> this board.
 
+If you're using true Cisco SGMII, there are _no_ clocks transferred
+between the PHY and PCS/MAC. There are two balanced pairs of data
+lines and that is all - one for transmit and one for receive. So this
+explanation doesn't make sense to me.
 
-Here, we just need to drop the follow bufs (num_buf - 1). The first one have be
-dropped.
+> +static void qcom_ethqos_set_serdes_loopback(struct qcom_ethqos *ethqos,
+> +					    bool enable)
+> +{
+> +	rgmii_updatel(ethqos,
+> +		      SGMII_PHY_CNTRL1_SGMII_TX_TO_RX_LOOPBACK_EN,
+> +		      enable ? SGMII_PHY_CNTRL1_SGMII_TX_TO_RX_LOOPBACK_EN : 0,
+> +		      EMAC_WRAPPER_SGMII_PHY_CNTRL1);
+> +}
+> +
+> +static void qcom_ethqos_open(struct net_device *pdev, void *priv)
+> +{
+> +	struct qcom_ethqos *ethqos = priv;
+> +
+> +	qcom_ethqos_set_serdes_loopback(ethqos, true);
+> +}
+> +
+> +static void qcom_ethqos_link_up(struct net_device *ndev, void *priv)
+> +{
+> +	struct qcom_ethqos *ethqos = priv;
+> +
+> +	qcom_ethqos_set_serdes_loopback(ethqos, false);
+> +}
+> +
 
-Thanks.
+So you enable loopback at open time, and disable it when the link comes
+up. This breaks inband signalling (should stmmac ever use that) because
+enabling loopback prevents the PHY sending the SGMII result to the PCS
+to indicate that the link has come up... thus phylink won't call
+mac_link_up().
 
+So no, I really hate this proposed change.
 
->
-> Thanks!
->
-> Paolo
->
+What I think would be better is if there were hooks at the appropriate
+places to handle the lack of clock over _just_ the period that it needs
+to be handled, rather than hacking the driver as this proposal does,
+abusing platform callbacks because there's nothing better.
+
+I don't have time to go through stmmac and make any suggestions (sorry)
+so I can only to say NAK to this change.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
