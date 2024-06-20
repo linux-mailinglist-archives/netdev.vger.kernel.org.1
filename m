@@ -1,135 +1,141 @@
-Return-Path: <netdev+bounces-105140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DCED90FCDB
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:40:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D31AF90FCE2
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:41:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFA491C21BA2
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 06:40:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70DC528558E
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 06:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462CD3BBF1;
-	Thu, 20 Jun 2024 06:40:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED5C40858;
+	Thu, 20 Jun 2024 06:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VxWnHD2B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m4/+uca+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2283BBC9
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 06:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFB540848;
+	Thu, 20 Jun 2024 06:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718865641; cv=none; b=QtvVT9oE7ccROzltGHASDVOBGMNyFKjHvI90+aBgAcqjD/F9sUxqntsOl8c7D+Q8w3kIOh/vDS4Dyd/xXRfhZFOvMIlGTfNGwUZhBvCYBj+WiuxxKAfjwXe1PYeJWuIz+132i4pMNZ6/yxPl0YFNvN6yFCUPM5uX40P7heeLMGE=
+	t=1718865661; cv=none; b=at7bhvoCDWO9tgqaJxHs/HYzt5b95DE63MFEAOcuWg7a6ODvtqh8vfQTygy4e3UAB0RAxaEIhS4oonGH/n9+o/lriJHoQQObpqZyYqqW0f/BcBr6Rv1rOrbK6MSMmlHAtCSU249bsMKh9twu6Pg9VCUpcMihJrCMRWdjaJOqEvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718865641; c=relaxed/simple;
-	bh=HGIUdK74KQ1gCGAEZoHH0bCMvkFSbrAsO+df+QMfBiY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d5/KDUHm23yz/D7t1LrGLTnkL3nBXCDquXFv2WsbLTyrmXOxWRPT2McSs7BlKSwX2lN8yhiZs4twnEu1G7XohcLUwCB158PhXh6wnakK6nh78h+ChbGaJbkOfDhwcR5M/tGKE8Ip1+cAWLZ4CnNT91z0iC0oOlenENc0VIw5F+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VxWnHD2B; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718865640; x=1750401640;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=HGIUdK74KQ1gCGAEZoHH0bCMvkFSbrAsO+df+QMfBiY=;
-  b=VxWnHD2BM1yA1iSWJz+2RkysJWQpsZxbqqs7p3S5fYpnKic9YiWCVJZI
-   KL7s7Ohkivy8MbH4sHMohIBQRowwXWcfBqiRlXTn9nw3mJb/u57Hg8dtS
-   ALmOiXTvYf7LXuiM81MpDdfcMOZErkxwBupFEGNdefdhzMmoFb/JAek6g
-   /FeEJpUkx6uvLMqabW0xx2F7L6qNiB57DfcDHn8CwYg7h/XxKH5ce+Fo4
-   r9Hg52rpaeyfYochPmE+7vuzUOFWdbklg/pvH870IGHSEphGqBQn6Fvcc
-   CI08gNxkMv1BQZmkWVWzYGljsZ+w42oyt5oACD2O0+s3ow37mb6DwyF7S
-   Q==;
-X-CSE-ConnectionGUID: Vv2MJGSHR1ChesumyGk82g==
-X-CSE-MsgGUID: saj15dm8TEq/a4UgXsGoiA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11108"; a="15962749"
-X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
-   d="scan'208";a="15962749"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2024 23:40:39 -0700
-X-CSE-ConnectionGUID: pyan0ASjQpC+QPVR7chFXg==
-X-CSE-MsgGUID: jRYMQxTHQ3qD3wFmesO+1Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
-   d="scan'208";a="79615107"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 19 Jun 2024 23:40:37 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sKBTG-0007Oe-1Q;
-	Thu, 20 Jun 2024 06:40:34 +0000
-Date: Thu, 20 Jun 2024 14:40:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: Heng Qi <hengqi@linux.alibaba.com>, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev
-Cc: oe-kbuild-all@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	s=arc-20240116; t=1718865661; c=relaxed/simple;
+	bh=UzzGZvEE5qzqnyqLhkrTBSAmBpUlFkIi/FE1mJkkpJ0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GpKu7lJH25TNj7sFmxpgrDpVJXphqXFQhswxL4poLFQ0qUFBh1Ugpy+6/l5AbWqPfQJCr37D0wc3QNVvenqG6U0UKvJl42ick7y3TfgkL2P2fZc57tFsmbAZruMHE8fKdk+sJMNJWKEbSNJbw+9RGXtQV1WGjUu3ndU+TZuQz6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m4/+uca+; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2bfffa3c748so485945a91.3;
+        Wed, 19 Jun 2024 23:40:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718865659; x=1719470459; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dj4QZeFx+AVC51p11hlg4kzbDA2elF0sWu+Rp1qJlwA=;
+        b=m4/+uca+AsSkt+BVHgBimm7KSElcOqANLihePTNielo5FZ0d9s5hbpRRN5nHcBuymj
+         p5pfrYRGa03XsSn8eIG85PhEs3e3TxgZez2THKDQFL4h01kDvz9BthfZIT4pn+Prcp9c
+         eQ7PWKXnDqlBnB6jiHo7fcwfkhCEv0ph1nbQRRdCec4DHpRcrVbY+obgihPzafMPXRsb
+         DTWqBhfGxLRWeN90l7RNosipbSEDCQTe7sGX4dXJOLwIdHYXbwVdj+gJrJDSHhLWneN3
+         K/2KODzptlfO/QbKby7vYDbyzWYid2AZDW7bJ0w7Og/3uNcr2FYBOm4Wj7FmNHIjHmKr
+         K/zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718865659; x=1719470459;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Dj4QZeFx+AVC51p11hlg4kzbDA2elF0sWu+Rp1qJlwA=;
+        b=IxhTxfJlSngvWUZMM77Z78ipuUa7yyfhVZb7417oKrkkPnUOJ0pTSxvSQOZPQnMCaW
+         JY+ORA9vcViNafkbOcPwN+0U9OVMoMSHB3yFrG5xEQdH3HbH1UMZR2uEqPZervBURaJG
+         tvYE7z6z+YSoZmFa0fRkPQRm9lnJcVQR99c3wJYM8JVemqGrV+a2p+bPjojQV/YaL1+F
+         Wczadj2WV71+DF4959Mugz+dwgkiXGHIuJUYTaGrJBvOyKaUmFtX2j6NPCpuHkrWpGn0
+         UDrTvsVCuL5Iyl37hFjwp4eAcS7LQAxT7FPY7mB19AjJbJJfrPDf0JhhaThU12stfuTO
+         5b3A==
+X-Forwarded-Encrypted: i=1; AJvYcCXpmkVo2KM4FPVZL0s4XLmwH90+t4QI18RIJOraHZN5hqFWPcBi0Ri2koElGD7IVqbvw/u8QAQGBf8/6Bi11Op8SlR4wGQFlk2hqPkZ
+X-Gm-Message-State: AOJu0YwGWhSrvVETK7x6k9Kw0RhbKEAn54bmVIrXuaOb8IK0iLgGULrw
+	scH/msDNxdNReUbrv35TCF426OjxsaNOteTQSmDF9PZihYVBM90M
+X-Google-Smtp-Source: AGHT+IFNC7FgO9HSN1gJ1UcHOVjndxJnOiiessKD+THr8O0UlSmH6s/UeMfmg86hakwBC98pUI/Xuw==
+X-Received: by 2002:a17:90a:ea92:b0:2c4:b300:1b4c with SMTP id 98e67ed59e1d1-2c7b5cc49f5mr4163646a91.24.1718865659045;
+        Wed, 19 Jun 2024 23:40:59 -0700 (PDT)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2c7e50f7c90sm862442a91.9.2024.06.19.23.40.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jun 2024 23:40:58 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v4 5/5] virtio_net: improve dim command request
- efficiency
-Message-ID: <202406201437.JuUEpbZL-lkp@intel.com>
-References: <20240619161908.82348-6-hengqi@linux.alibaba.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	xfr@outlook.com,
+	rock.xu@nio.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v1] net: stmmac: init more plat members from DT
+Date: Thu, 20 Jun 2024 14:40:04 +0800
+Message-Id: <20240620064004.573280-1-0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240619161908.82348-6-hengqi@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Heng,
+A new option to init some useful members of plat_stmmacenet_data from DT.
 
-kernel test robot noticed the following build warnings:
+Signed-off-by: Furong Xu <0x1207@gmail.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Heng-Qi/virtio_net-passing-control_buf-explicitly/20240620-002212
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240619161908.82348-6-hengqi%40linux.alibaba.com
-patch subject: [PATCH net-next v4 5/5] virtio_net: improve dim command request efficiency
-config: x86_64-rhel-8.3 (https://download.01.org/0day-ci/archive/20240620/202406201437.JuUEpbZL-lkp@intel.com/config)
-compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240620/202406201437.JuUEpbZL-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202406201437.JuUEpbZL-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/net/virtio_net.c: In function 'virtnet_wait_command_response':
->> drivers/net/virtio_net.c:2771:22: warning: unused variable 'tmp' [-Wunused-variable]
-    2771 |         unsigned int tmp;
-         |                      ^~~
-
-
-vim +/tmp +2771 drivers/net/virtio_net.c
-
-2bef89a476bb44 Heng Qi   2024-06-20  2767  
-2bef89a476bb44 Heng Qi   2024-06-20  2768  static bool virtnet_wait_command_response(struct virtnet_info *vi,
-2bef89a476bb44 Heng Qi   2024-06-20  2769  					  struct control_buf *ctrl)
-2bef89a476bb44 Heng Qi   2024-06-20  2770  {
-2bef89a476bb44 Heng Qi   2024-06-20 @2771  	unsigned int tmp;
-2bef89a476bb44 Heng Qi   2024-06-20  2772  	bool ok;
-40cbfc37075a2a Amos Kong 2013-01-21  2773  
-ff0de8d3002c75 Heng Qi   2024-06-20  2774  	wait_for_completion(&ctrl->completion);
-40cbfc37075a2a Amos Kong 2013-01-21  2775  
-74b2bc860d5cb5 Heng Qi   2024-06-20  2776  	ok = ctrl->status == VIRTIO_NET_OK;
-30636258a7c917 Heng Qi   2024-05-30  2777  	return ok;
-40cbfc37075a2a Amos Kong 2013-01-21  2778  }
-40cbfc37075a2a Amos Kong 2013-01-21  2779  
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 54797edc9b38..b86cfb2570ab 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -497,6 +497,8 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 
+ 	of_property_read_u32(np, "rx-fifo-depth", &plat->rx_fifo_size);
+ 
++	of_property_read_u32(np, "host-dma-width", &plat->host_dma_width);
++
+ 	plat->force_sf_dma_mode =
+ 		of_property_read_bool(np, "snps,force_sf_dma_mode");
+ 
+@@ -561,6 +563,8 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 		plat->pmt = 1;
+ 		if (of_property_read_bool(np, "snps,tso"))
+ 			plat->flags |= STMMAC_FLAG_TSO_EN;
++		if (of_property_read_bool(np, "snps,no-sph"))
++			plat->flags |= STMMAC_FLAG_SPH_DISABLE;
+ 	}
+ 
+ 	if (of_device_is_compatible(np, "snps,dwmac-3.610") ||
+@@ -573,8 +577,11 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 	if (of_device_is_compatible(np, "snps,dwxgmac")) {
+ 		plat->has_xgmac = 1;
+ 		plat->pmt = 1;
++		of_property_read_u32(np, "max-frame-size", &plat->maxmtu);
+ 		if (of_property_read_bool(np, "snps,tso"))
+ 			plat->flags |= STMMAC_FLAG_TSO_EN;
++		if (of_property_read_bool(np, "snps,no-sph"))
++			plat->flags |= STMMAC_FLAG_SPH_DISABLE;
+ 	}
+ 
+ 	dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*dma_cfg),
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.34.1
+
 
