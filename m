@@ -1,220 +1,223 @@
-Return-Path: <netdev+bounces-105368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FD21910D6E
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 18:45:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB3FF910B47
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 18:08:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21C76B26F28
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 16:44:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8155C288588
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 16:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599071B150D;
-	Thu, 20 Jun 2024 16:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 519F01B14E6;
+	Thu, 20 Jun 2024 16:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="qI5Ef4E7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PpAXIaJE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1641B1509
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 16:43:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718901808; cv=none; b=kBdvSRPWNPk3hOEZPppcT+YPEm0/jiTwCCKTDl7ox4BL/juy0w8Oyc2xvyfJiWIjKepXjwkLQ2NSGEowKd0nMhre7aG9gEUjni31gAnCdDar+SmAumyVJQkJzTuT9dfIEKzI+VVAKKBseC6ophlyzFM215AKBw9KE/TJYIucDoE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718901808; c=relaxed/simple;
-	bh=w0O4MJAbcUJYRoLptbk3bfA6SyPgrDXAQHMZZDms4iw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AKyBUxupdWkZZOpLCzuk30tfc9Dy47lMKwos45pLv0MnIjy8eHR5f4n14JWUMUaJ19rHi2vKPjeZX2W4NfIC5Lr56vnFdIWnqSnF9GxZogU/MLE0+GeA0iKBUa4jmnLBJ6tNHlK3D+dhawEby0DOKuNNb63UZY57mLl1yIyztmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=qI5Ef4E7; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com [209.85.208.71])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 7377C3FE26
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 16:43:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1718901800;
-	bh=Iv5yHHTF6kNz7NmO2DfLiCh76upALsMsvMH1lBE+Y4A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type;
-	b=qI5Ef4E7Wm2Qn3TKTD2VhpxJ+0LRBHRMV7iwuXgAsYryI0VBoRPdSjLcPR1F76peZ
-	 P9oN37AA5cbZ2yllPnUBLnq5t+0z6rUyPCm4SuXI+6IGwB4gvWwXpn+vzdoidganLF
-	 QDqf3o5H2p3bk/II0W1sFzpdkc8268djXIKgK5FcC7VBgzkb7TaKKC/tK5jNrrAA5C
-	 K5jwfNZQMLF2/NP56d8YVmntsK1KQ87BtzMS9eE03wT1GKQXwUwbwKlaGKgN5Rb7zc
-	 oH1AMpGGnRjylcshPPnzKzOQ5u4WPDeEIZk9C2ldFRxJDeJDdG67V8qy7yKz/rQDwO
-	 vayUdA5SOr5oQ==
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-57c93227bbeso628807a12.3
-        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 09:43:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718901800; x=1719506600;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Iv5yHHTF6kNz7NmO2DfLiCh76upALsMsvMH1lBE+Y4A=;
-        b=XKV+LprpUExzrlAGPcbb7J/ISq6kCqnhcO5ltfB4abvYUC5AVHNZa3LFRVlEF6r/s0
-         66O0P9t4RpoZerplEX/ZipIJ6u35wRZWUhgvQDt+Tnyq2JN/3oEe7r/rtXzsCIzE0+Rj
-         LqJIDQ3GyJpTDev/s3zy9ln/4V2v7qmyFmdSPG3y/2BZ7stkOFakypTQCc0gP+MpsOXx
-         eDTCOCUQyPL00hp9om/HuNBVmzlVfxFmcNgJVPh7ep5YdusNj97ZJmpmyy0NY2/oJr0f
-         enJbK14NTGNprbCk8LR5EHz2zPOL2du2UJt/T3/U/pRwxJpRRhXQU+WTkGh1F6QKajUl
-         SHXg==
-X-Gm-Message-State: AOJu0Yx1NCuD2XImBeNoB8Gct4tkDnVCS6GGx5/SkPSi43ck8la6VwC+
-	QpTOgVTHyR+9p2VU79Jx9wWeeQ95UsY/TrK8qaAkqyrizaA7TikECsGx/BQkMQ8jTthI5EDRuxi
-	7WkNqp8mzILFiQjvo/hkMOanhaM5LxNxSOVqyMUj8tMz/HSXvINXH0xPmArt/vVk7loTLsw==
-X-Received: by 2002:a05:600c:45cf:b0:424:745d:f27f with SMTP id 5b1f17b1804b1-4247529ca74mr41175035e9.37.1718895587016;
-        Thu, 20 Jun 2024 07:59:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH+a5qhfriM35fdp5TpS87N2pOujvdZdJenKkoquwLscnAQp963+R3LOzJiWNi2fupXmQWwRg==
-X-Received: by 2002:a05:600c:45cf:b0:424:745d:f27f with SMTP id 5b1f17b1804b1-4247529ca74mr41174845e9.37.1718895586620;
-        Thu, 20 Jun 2024 07:59:46 -0700 (PDT)
-Received: from [192.168.1.126] ([213.204.117.183])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4247d0c54d9sm29503065e9.28.2024.06.20.07.59.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jun 2024 07:59:46 -0700 (PDT)
-Message-ID: <1fee07fd-3beb-4201-9575-5ad630386e2f@canonical.com>
-Date: Thu, 20 Jun 2024 17:59:42 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A381174ED4
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 16:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718899676; cv=fail; b=hVkF+Ad0QYKhi/Q6pmHL9GvpHNt1TzE9ZM1msb/zquAx17UB6nRFjr/K5DQ/oKbZDL2iuvBGalCneqExgPSyc068z3ni/MmJg8InvwEdUswFeKh5b4Bud5SuImxViZNY99V8iJirud/eyYGlnAXpM56YQhUgOH0xlJb5aHfIb2k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718899676; c=relaxed/simple;
+	bh=QQG28QZfGmUMKHSzGpNajqrheHRTmERRYAb23vAvNtA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=OBiWnzuEeOfmY9X37Gk+rwcJtiuvt/cf3T3beSNwh+FawNmeETVw0ZjR6C+AXzOswZkDIH5MB2Wibb7hBLrbydyi57VT62GhP7gPjF6Eg1hMVNl7UN05AEyikUmOVyIpBw7CyiP4S2o/Gs2pcVCl6NEiXtMcSV/ZJjSf67juoVA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PpAXIaJE; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718899675; x=1750435675;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=QQG28QZfGmUMKHSzGpNajqrheHRTmERRYAb23vAvNtA=;
+  b=PpAXIaJEi6XDyP3tFEZnRHce58ej3gD8twST7nVW5qoHbJegX4WDyBh5
+   wGwsOEAKlOiVT/POtyaDkxtwQhH24Y4/bkmaF3ase6QubUt68DKTVUB90
+   dfVVVlhhCmmjSE6T8KlgGDKtzbZOldHrEX4tvmpDcyVS2uTHcRPkHFoDU
+   jIzuhANUqUvHgZE2LDCJR3boZdlPXhxE1r1w6cUGPUOnzsdIOBBF/siqE
+   gf4VDHBM2OiVt9l6mlVOHOWypz/l050jCcX1AzNeSOgZYUkjSdGaKZY4Z
+   gZ2MVfbqByD6KkBSJh9qb4rmlFezN5ktV2DrCAz5Utxr91Q09Phnxes3I
+   g==;
+X-CSE-ConnectionGUID: Nj8RPF8JS/2UHkEspMMUew==
+X-CSE-MsgGUID: MIfjS4F8QIKf9iC1jxXgcw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11109"; a="15725981"
+X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
+   d="scan'208";a="15725981"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 09:07:54 -0700
+X-CSE-ConnectionGUID: MRdjMVirTXigQiLLnL+U5g==
+X-CSE-MsgGUID: 6+bgIMfRTPuqwBGDIkWHAQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
+   d="scan'208";a="42750121"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Jun 2024 09:07:53 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 20 Jun 2024 09:07:53 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 20 Jun 2024 09:07:53 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 20 Jun 2024 09:07:53 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mN71CfMb0KQdobK6hwt/O7ECt0YOnv3qnKiQ1pQ546q7zIV2FrkOaz9XsiMy6pqWyXIdPdBCOs+lHMyqO+A0K7VETvSfxO+4jge2r6kYnSoB/UI7/fPhe+kcptsCpmVf9FgwBN7mStzi7AFYufjSf4kwU0Y8jo1yRl5WmFkhV/y62j5tAQPKQdIBp/0mm8E33yUtcunNPSB3TiG3b+m0gHNP3Bur1utIKeg6ZmxI2D6XMzKKr2GnoN/i5o3A6Xb19BuNyXypASjuJc+0rVk891lQjNBXCPJIRcBbNLmB67g9DLNi6RVTh3j9xRGkIVvIO9d5B+12nZIDlceGU7A5EA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PK4eM985J/vh8hQW/tvALolR1vex57qj3H3aq7KBhCA=;
+ b=aaJHLiQMyOhQJnsBG7Wo1WyWndDuXb2M04rKcO2CVE+HrgsWjeEgXaeDSDujVBnlw9SYgrQ3R7XD/LZ+6OuGrAiyNOhubKLkM8LS4vjfGIzmxI8FQCz9J+Samc/iJrr4ieB+1NlAWJ36YJwJowifPkzxKS2x9Xbld3NByMDInLDqKi1uVdUp3FC8eGBzGsvrdLjVTn8i0+Wzw7B2gzMoF8DEpnC/HvCAeJiTTJg+qsqNvk2FBmSPfFddoz/7OFwnSfWsc2d2iH8ZVgNNd7dPhbDlybyucbWaej0gU3Lts6I7wCeWlB56ZyB9EMrUsA+D8UyevJs52NU+Ho62R0gYrA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
+ by DM6PR11MB4738.namprd11.prod.outlook.com (2603:10b6:5:2a3::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.21; Thu, 20 Jun
+ 2024 16:07:47 +0000
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::23a7:1661:19d4:c1ab]) by BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::23a7:1661:19d4:c1ab%3]) with mapi id 15.20.7698.020; Thu, 20 Jun 2024
+ 16:07:47 +0000
+Message-ID: <9eedb260-3bb0-4f06-1243-02cd5dd337e4@intel.com>
+Date: Thu, 20 Jun 2024 09:07:42 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH iwl-next] igc: Get rid of spurious interrupts
+To: Kurt Kanzenbach <kurt@linutronix.de>, Jesse Brandeburg
+	<jesse.brandeburg@intel.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Vinicius Costa Gomes
+	<vinicius.gomes@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>
+References: <20240611-igc_irq-v1-1-49763284cb57@linutronix.de>
+ <87r0cry974.fsf@kurt.kurt.home>
+Content-Language: en-US
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <87r0cry974.fsf@kurt.kurt.home>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR03CA0014.namprd03.prod.outlook.com
+ (2603:10b6:a02:a8::27) To BL3PR11MB6435.namprd11.prod.outlook.com
+ (2603:10b6:208:3bb::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] bnx2x: Fix multiple UBSAN
- array-index-out-of-bounds
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org
-References: <20240612154449.173663-1-ghadi.rahme@canonical.com>
- <20240613074857.66597de9@kernel.org>
-Content-Language: en-US
-From: Ghadi Rahme <ghadi.rahme@canonical.com>
-In-Reply-To: <20240613074857.66597de9@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|DM6PR11MB4738:EE_
+X-MS-Office365-Filtering-Correlation-Id: 475f4b68-aafa-443c-4cd4-08dc91432052
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230037|1800799021|376011|366013;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?TE9YSU82QThtMTVCMWRFeE9EbzBiMk8vRTg2YnhhV2IxbHRwRkJ5YjlOSFgr?=
+ =?utf-8?B?bGNXMHROWnB5RVo1S29rVEdtODNpVjBiV0xQQ3dSSkNwT3d1K0lndkVXdUZq?=
+ =?utf-8?B?VnZjcmljTzlmNnR1ZURSWGQxam1uWmhEQ29YVXp5SU5TTFZpc1N3cFpoUjBH?=
+ =?utf-8?B?enRGbkNjMmgzY01GU3dIWGZPNFJWWjBCdWZlbHp0ZHVMN1pTODBUWnpTcmIy?=
+ =?utf-8?B?bnliRStNaTJORENrN1hlT0dyeS9HQVZaMlRMQy9yYTNSeVlDdHBSa09IZ1NU?=
+ =?utf-8?B?ZWRhd3RUemoxR3FNQXduMENNdnorNFVDZWpsZWVqQVhNK2tOS1hWSWZRMnFR?=
+ =?utf-8?B?bW81ZklYSW0yNUdRK3o3NGN3RlUyUitRZm12NmpEUHVGUjMzaFQ0RDBYditz?=
+ =?utf-8?B?MU5GNFpEYlB0VjhXcm9hYXRTRmVXMS90RGx4amtKZ3lyMWtSZDQyV2xQT095?=
+ =?utf-8?B?V0duSHBSUG9SNW5yRSs1QUZFaEplNFhOaHZuUW1adU5lWVFnL1BXWWJNVmhm?=
+ =?utf-8?B?eXZVbXRkZkxvMUEvTks3VTVDZCtndmdrTW5aMDl2dHJCU0d3Vkg3OEsxQ0Fx?=
+ =?utf-8?B?V0xkLzhUNlg1RG9KRUZkUm8wMXY5Q25xb0Q5bUFSNkdHaDFsRngzcmRJRHFP?=
+ =?utf-8?B?SGYvME5QOWRHTCsvUmY5c3RneHZ3dG1SQk9qVFlkV0V4S0hkOVR1NGg0M1Mx?=
+ =?utf-8?B?bEZqUEYyb1JzZTBGMDRvQjIzR2xwK2JPR3cvTXFraWp2Q0U1NE1zU2Y1Q3d6?=
+ =?utf-8?B?SGNQVHd5aVo0aUlqanM1UVdDci9tL3FQbmVaV1lMQTZ4VjFUbGhvcWJwQ09Y?=
+ =?utf-8?B?MENSbGlKdzQrcXlNQXRpNnZzbUp5VHc3SlNJWjJjNms4K1JvUGs2dWgzVEdw?=
+ =?utf-8?B?dHFNUXZBTHZRZ2JzQURsUC93eTNxcG9BQllrSFpLWDY0UE5vd254WkpjcFBT?=
+ =?utf-8?B?MHZWNkhyclc5MTRQUEdtQmtLajIvckplWStsQVg3YkxvSXZxUTVxOTBvVk8w?=
+ =?utf-8?B?QmczZnVhV3pBZno4UXZ4RGJHakNoMnFPZzJYbXBOR0ZVTStyRVdZN0RMaTFk?=
+ =?utf-8?B?Z0dLdFB0dzlOV1RBb0dWUURUbFVDdFpaZUwwbUc0cEIvVnhWdFQrN2sybkhJ?=
+ =?utf-8?B?bVlLNXkydWxOSFZOZm9ucm1hWmdMYXdxZG5lZlhpVjhudkJIR0E4M1dPcG9Z?=
+ =?utf-8?B?WEdHdHB5RWJBWjZZcG1CSG5GMURMd041N3dDUllCdXpmWk9Rck93UHE4d0lh?=
+ =?utf-8?B?TUJrN3hEQnJvWTlIcmJWdUJldmxlNjFWNlB5UytsNjEvYWZ3d0Q4enNrSkZR?=
+ =?utf-8?B?TjFpZW1QRUZTSHl5QnNFSWs1NThXZHY3RWZzNDhEVksvQThvUzcwVlhsY2tY?=
+ =?utf-8?B?dzVtQjZwdFV2UFJISUZuWEgxUHRHMVNsN1lkZFdwUkFCWE82b3ExaWZBa2R6?=
+ =?utf-8?B?UmhoaU5obitGTE5Zb1I5U3FCOUdMUUM4czMydVZvMkMrQ1BWV1JXb28vbGFo?=
+ =?utf-8?B?Vnh1Zm1HT3YrV0I0OFlUNkN6NDYvQ0VITTd5TGhyKzZUM2NoMUxUMldGeUhK?=
+ =?utf-8?B?WHd6TG5YcjU0cVI0RWhOc0UwVy85elJ0dHQ0anpLeEVmYzJtT09uNHhiemhI?=
+ =?utf-8?B?RGRIZ0IrQzhWSElMZ3JpQWU3UWdxV1JTdWZiSUpYc3pHVWN2S0FaV2lManVR?=
+ =?utf-8?B?cjIxb1JiOXhtUVV0NDVlM0JoSklmRHJnb0w3SUlwTzNhL0Z5WG0xTGlaVkpF?=
+ =?utf-8?Q?RntGLsZKjvy2OuJJRuEr3SW6a/0NtnJx7Mhw0dv?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(1800799021)(376011)(366013);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?b0tBVVJaM2hreHUwbWN5VXRFbklQMFRETUZ2bmJPeTJCRk53cjdRSUd1QTFs?=
+ =?utf-8?B?WWMvRW9TcFA5NTUzRWFhc2gwWkJYMWFkRVRNdk5tSEh2ZXhJVUE3QzNJWUVs?=
+ =?utf-8?B?cmw1MFFPeWlONWpBZ0xROVpNaGdVYllwdVdQTk95M3QySmhTck9DT09mVHEv?=
+ =?utf-8?B?REQrVXNObmxyN29Eak5IeWxGbzlTUngxQ0VIS0YrY0k4OXllTFB1cEF2TVk5?=
+ =?utf-8?B?T2JnSUYxdnBQNzBpQ1pWOWtOWU5DS2ZKd01Rck9pRzhKZDBMeDAxR2Y1b2Ew?=
+ =?utf-8?B?a2xaSmVKWFh1NWp6eTA1bUdjWENrcTcrdDVCdldYS1hoNUYzVmZxVlJ2Smsx?=
+ =?utf-8?B?WjJjblBmZ0VjZ2IyZ0ExZFdBT29PaFJNb0tObHZmVm55YVB2OVFVZXhJSmJL?=
+ =?utf-8?B?UmpNaktDemxZcHVlc2xUbjFiaFl6dDQ1ZzlyaG1oQjdOWU1XeHkyY2RuZFdk?=
+ =?utf-8?B?RkNNNDFVdmhpS1JVbitWSURmUVFkLy9SNWxtTEpKRllQM056TjN2ZFd0S1pn?=
+ =?utf-8?B?WjIwSnhlK0tNaUhIQTJBdWtrTitscFZkZXE3M0FObGh6Uzg1MTkxZHdlL25s?=
+ =?utf-8?B?N1hPQTdvOHJ3d3JvTlpaVGE2cnY5WlhnUFpjTXF5bDFscVVjbGJPNzV4dWoz?=
+ =?utf-8?B?SXpFQzcya3NDc1U4LzlWbjhURlMxb05DejBmMFdoZ1ZCWU5QVEpvL2hsVy9v?=
+ =?utf-8?B?aHZ2eUIvZkJhQzN4SUthTThlcy9UMy9hbHBobEdsNHZURm5ZZHlVWHVtd2ZK?=
+ =?utf-8?B?RnVmc1BsU0JWVzg5WlY4ZkJDclh0bjRTaEJHOGtraS9iOUxyWXRnV2d5Wkpu?=
+ =?utf-8?B?Mm5hZmxoY3lCN0hrQThNRnBoaG1oV0hSZEs0dUkxbEtVMW9SNzBqZXAxcmhI?=
+ =?utf-8?B?NUhLdXdZYmE0TjU4VzIxcUdGWUpSSmZ6a3ZEZ0ZVZW9xbXdxUjkwTDhrTG13?=
+ =?utf-8?B?Sm9XRGgyYm4xNXZNdm95MVFoQlZyYU90QlFzQ0EvbFdUcU01cGx5bUpYVnI0?=
+ =?utf-8?B?ZDR1T2J5Rm9SQkVycEJtMVJJaitPTTZzQXkzcW5iQVQvQUhpU1Fjd0kxV0JK?=
+ =?utf-8?B?aW5yMVNZQTNGVEx0NnlERlpPcFRUanNVS2U5SXB3Nll6RzhPU1RiWm5TUHd5?=
+ =?utf-8?B?VDlhdEdzRnBNMU91SUZzTVhoTmprSStQYU9qYzUxZmVDa2dyNTlTRnk2ZHJS?=
+ =?utf-8?B?UCt0OVYzZzR3SnY2bnlsZi84cldYcnNuaUhtQm96V3l2aEFjT1lnMkJZbXdZ?=
+ =?utf-8?B?clE5Q3lBZkNPY21nVmRJdFBiVTI5S2lLS0pudWZ5YXpWMnNtbUszaHdMdzdO?=
+ =?utf-8?B?RzkwVTc3dlU0czVhcXlLL0lvVFBjUHZQRG9xMlVnd0V4RXZSelN5QXY2eGFz?=
+ =?utf-8?B?eVh6eUI2RmwraTllNCs0VEFKN0FOZGxtWGcyMDI4cmVTbW4wWXZ0a1kxekZq?=
+ =?utf-8?B?bFVMZ2lDVzNlODkwV3ZrREpLZzg5WEUza2trZ2xOekc5VVd0U0JnS21mTncv?=
+ =?utf-8?B?NEwvMStLbWpwa1c0dlBnYmpBdHA3NnFiSW9WVG1yOXpNVWJ4eGdqODBZbnp5?=
+ =?utf-8?B?RHYxWnF3SlM2Z2FsN214ZTExbldQMXRrak9JZnNtOGZ2a2dYS3I2ZEN3UkVH?=
+ =?utf-8?B?bGM4eVhqMzJkSnBhKy82ZlF6MklKbS9nSjg2NG5KOSt1amdMbStQNmlFcFJo?=
+ =?utf-8?B?allKNXorZ3BNMlhlYnJjeUR6WFdIUVVlWGM5b2lMeEFxaUhldklJVXdsS1Vv?=
+ =?utf-8?B?THZibmM4Y3RrVjREcFpzODAzeWR1VnlxdmJScDFGNEs2NG5MRDJLN1pLR2NM?=
+ =?utf-8?B?NEpXRjdBcUw0SzBqWWN3b2hobEp3UlpHT0J3TWVmcEVBT0ZKL1F1T01nZk1F?=
+ =?utf-8?B?MDgvMjlVWmtZU3dMekV0VzI2SXdydWJOUzlQcUFacXBVYWZOalE5UVY5ZWFw?=
+ =?utf-8?B?V0pXbjAyZzI3bTI2UTdxcTAwZmYyeTZQY3ZrMFZTNThTcE5SWHNPUFZ4Qklk?=
+ =?utf-8?B?UlRPekd3Q3lJL2NRZ0Z0L0s5UEtIb0dIK1dUQmJRUnZCV1RESjBlRGkyTFpI?=
+ =?utf-8?B?NEtZZEhnU0NSV3NSbWxqcG9TN0pLMWxhWmdJbXJVWTRyZW9VeEpBSUZxMHpP?=
+ =?utf-8?B?aVQ3c0lUa3hNa01LRmtBTURMSUUxSWR1ZkZobk14THZMRDJOa1o1djB4SFZY?=
+ =?utf-8?B?d0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 475f4b68-aafa-443c-4cd4-08dc91432052
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2024 16:07:47.2626
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FiuMZBZKe5Vf5AdBeldejH1fA3R+OSH8lpgKs/L6akUQJEyZSauICHYjsKDPqlrL7JdaPAkmRrMi8Pi0I/7yXecTzKPrs6eSKMK2kwMz9VY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4738
+X-OriginatorOrg: intel.com
 
 
-On 13/06/2024 17:48, Jakub Kicinski wrote:
-> On Wed, 12 Jun 2024 18:44:49 +0300 Ghadi Elie Rahme wrote:
->> Fix UBSAN warnings that occur when using a system with 32 physical
->> cpu cores or more, or when the user defines a number of Ethernet
->> queues greater than or equal to FP_SB_MAX_E1x using the num_queues
->> module parameter.
->>
->> The value of the maximum number of Ethernet queues should be limited
->> to FP_SB_MAX_E1x in case FCOE is disabled or to [FP_SB_MAX_E1x-1] if
->> enabled to avoid out of bounds reads and writes.
-> You're just describing what the code does, not providing extra
-> context...
 
-Apologies for the lack of explanation.
+On 6/20/2024 7:34 AM, Kurt Kanzenbach wrote:
+> 
+> Can you drop this patch from your queue, please? I've found one issue
+> with this if the number of queues is reconfigured e.g., with 'ethtool -L
+> combined 1'. The number of vectors is not necessarily the number of rx
+> rings. I'll update this patch and sent v2.
 
-Currently there is a read/write out of bounds that occurs on the array
-"struct stats_query_entry query" present inside the "bnx2x_fw_stats_req"
-struct in "drivers/net/ethernet/broadcom/bnx2x/bnx2x.h".
-Looking at the definition of the "struct stats_query_entry query" array:
+Sure thing. Patch dropped.
 
-struct stats_query_entry query[FP_SB_MAX_E1x+
-         BNX2X_FIRST_QUEUE_QUERY_IDX];
-
-FP_SB_MAX_E1x is defined as the maximum number of fast path interrupts and
-has a value of 16, while BNX2X_FIRST_QUEUE_QUERY_IDX has a value of 3
-meaning the array has a total size of 19.
-Since accesses to "struct stats_query_entry query" are offset-ted by
-BNX2X_FIRST_QUEUE_QUERY_IDX, that means that the total number of Ethernet
-queues should not exceed FP_SB_MAX_E1x (16). However one of these queues
-is reserved for FCOE and thus the number of Ethernet queues should be set
-to [FP_SB_MAX_E1x -1] (15) if FCOE is enabled or [FP_SB_MAX_E1x] (16) if
-it is not.
-
-This is also described in a comment in the source code in
-drivers/net/ethernet/broadcom/bnx2x/bnx2x.h just above the Macro definition
-of FP_SB_MAX_E1x. Below is the part of this explanation that it important
-for this patch
-
-/*
-  * The total number of L2 queues, MSIX vectors and HW contexts (CIDs) is
-  * control by the number of fast-path status blocks supported by the
-  * device (HW/FW). Each fast-path status block (FP-SB) aka non-default
-  * status block represents an independent interrupts context that can
-  * serve a regular L2 networking queue. However special L2 queues such
-  * as the FCoE queue do not require a FP-SB and other components like
-  * the CNIC may consume FP-SB reducing the number of possible L2 queues
-  *
-  * If the maximum number of FP-SB available is X then:
-  * a. If CNIC is supported it consumes 1 FP-SB thus the max number of
-  *    regular L2 queues is Y=X-1
-  * b. In MF mode the actual number of L2 queues is Y= (X-1/MF_factor)
-  * c. If the FCoE L2 queue is supported the actual number of L2 queues
-  *    is Y+1
-  * d. The number of irqs (MSIX vectors) is either Y+1 (one extra for
-  *    slow-path interrupts) or Y+2 if CNIC is supported (one additional
-  *    FP interrupt context for the CNIC).
-  * e. The number of HW context (CID count) is always X or X+1 if FCoE
-  *    L2 queue is supported. The cid for the FCoE L2 queue is always X.
-  */
-
-Looking at the commits when the E2 support was added, it was originally
-using the E1x parameters [f2e0899f0f27 (bnx2x: Add 57712 support)]. Where
-FP_SB_MAX_E2 was set to 16 the same as E1x. Since I do not have access to
-the datasheets of these devices I had to guess based on the previous work
-done on the driver what would be the safest way to fix this array overflow.
-Thus I decided to go with how things were done before, which is to limit
-the E2 to using the same number of queues as E1x. This patch accomplishes
-that.
-
-However I also had another solution which made more sense to me but I had
-no way to tell if it would be safe. The other solution was to increase the
-size of the stats_query_entry query array to be large enough to fit the
-number of queues supported by E2. This would mean that the new definition
-would look like the following:
-
-struct stats_query_entry query[FP_SB_MAX_E2+
-         BNX2X_FIRST_QUEUE_QUERY_IDX];
-
-I have tested this approach and it worked fine so I am more comfortable now
-changing the patch an sending in a v3 undoing the changes in v2 and simply
-increasing the array size. I believe now that using FP_SB_MAX_E1x instead
-of FP_SB_MAX_E2 to define the array size might have been an oversight when
-updating the driver to take full advantage of the E2 after it was just
-limiting itself to the capabilities of an E1x.
-
->
->> Fixes: 7d0445d66a76 ("bnx2x: clamp num_queues to prevent passing a negative value")
-> Sure this is not more recent, netif_get_num_default_rss_queues()
-> used to always return 8.
-The value of the number of queues can be defined by the kernel or the
-user, which is why I used the commit that I did for the Fixes tag
-because it is the job of the clamp to make sure both these values are
-in check. Setting the Fixes tag to when netif_get_num_default_rss_queues()
-was changed ignores the fact that the user value can be out of bounds.
->> Signed-off-by: Ghadi Elie Rahme <ghadi.rahme@canonical.com>
->> Cc: stable@vger.kernel.org
->>   drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c | 7 ++++++-
->>   1 file changed, 6 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
->> index a8e07e51418f..c895dd680cf8 100644
->> --- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
->> +++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
->> @@ -66,7 +66,12 @@ static int bnx2x_calc_num_queues(struct bnx2x *bp)
->>   	if (is_kdump_kernel())
->>   		nq = 1;
->>   
->> -	nq = clamp(nq, 1, BNX2X_MAX_QUEUES(bp));
->> +	int max_nq = FP_SB_MAX_E1x - 1;
-> please don't mix declarations and code
->
->> +	if (NO_FCOE(bp))
->> +		max_nq = FP_SB_MAX_E1x;
-> you really need to explain somewhere why you're hardcoding E1x
-> constants while at a glance the driver also supports E2.
-> Also why is BNX2X_MAX_QUEUES() higher than the number of queues?
-> Isn't that the bug?
-The reason I did not patch BNX2X_MAX_QUEUES() is because the macro is
-working as expected by returning the actual number of queues that can be
-handled by a NIC using an E2/E1x chip. It was the driver that was not able
-to handle the maximum an E2 NIC can take.
+Thanks,
+Tony
 
