@@ -1,156 +1,195 @@
-Return-Path: <netdev+bounces-105377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE248910E5B
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 19:22:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F2C3910E52
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 19:19:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 025E4B21976
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 17:22:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCE7A283445
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 17:19:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C231ABCB1;
-	Thu, 20 Jun 2024 17:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A5BA1B3F06;
+	Thu, 20 Jun 2024 17:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="onNLPtUC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D46971A4F1D
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 17:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4DC1B374B;
+	Thu, 20 Jun 2024 17:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718904137; cv=none; b=Ucr1ul1XrVoTMptXQugMCHuUh+a1DpokhTQyzuoXH6AfyorIE0MykyBT2s+Zi60FN8rMw8hYbsQcSN9WoaDY9HZEZuscfCmv1/1If3V9QyA3TkzwnuNvriVN8p54QSln3w6UgizhuyvH5aY2A0YKqB4WI4+fW0OfL6qg2ONxFeY=
+	t=1718903975; cv=none; b=Ng0yEV+Y4q4vl4lqf/Ys82H8lfuOBvl93PzAoLg0B1PvWjDcgM3aPPmrH9F0eGauHd22RgLttNigDLv7SxzpInwjHMS7q7tfFpgsQ+SYzueqqLzqe/qKD3adWEGY8QeA7eA8EEEGWiyzAYUOPfdjgb+DFy24KTmFMwLon9JDcuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718904137; c=relaxed/simple;
-	bh=fflhweBhVf0+v8RzWg0NhrF2/RMV4BYoVW6DE3gBikI=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=SWrHRnryNMnC9YrdXjtv96XWdSIq8WkgxN1/dJ4SVmik96Kv++R2ihvBul4BpPmXHVwyNncjdsL7z1W0vvE3FSMVZd01RPkN9kDSFWCybfgBaoKpFi0M+qiuJ3pnOnZwnyZkUQwEzk8eIkBfr1zgsHxQUvq8YTBXFa3Y7Np7CeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.178.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
-Received: from relay9-d.mail.gandi.net (unknown [217.70.183.199])
-	by mslow1.mail.gandi.net (Postfix) with ESMTP id 764D1C1DAE
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 17:14:27 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6DCDEFF804;
-	Thu, 20 Jun 2024 17:14:18 +0000 (UTC)
-Message-ID: <89ce2aef-6ec4-4ab1-b180-f390188170f7@ovn.org>
-Date: Thu, 20 Jun 2024 19:14:17 +0200
+	s=arc-20240116; t=1718903975; c=relaxed/simple;
+	bh=GAfVT4AxRK3tUvGJYFqrB3IEvTnoxM7J6n25c18LEpo=;
+	h=Date:From:To:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JI23ccRfC8nk6BhAY3wSgIR5EooyzvFq4YFEtWJVcmaOJ6bXbgADOa70u88UWQTVyQ02KJ3vITaqkHUWEeXszXbrkU65VtTi8Pr40be88CbLd7Osg21MAFH07LZhY04S3zCaR1n1nFqyBjnmWxeyzvu6MQSbDwWfLh1xa4R6ktA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=onNLPtUC; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4996940002;
+	Thu, 20 Jun 2024 17:19:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1718903968;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6HKwLFpOQJzhN2+bpXmHjR3V9//mN4V0ElrLJbo8UOo=;
+	b=onNLPtUC8hcLlTUZP2ijmtuTvPuCiZXtx4goHw82layaODRfq6Sxhms5AqfW/+tASAF5NB
+	BdvEXZbn0qev8NHoDoGzbhcagb83Wnm1sxwKgGccr2hCSY+yT+T7BCAF8Qj7e3t1550TTc
+	qfy6z1i7Raurhx78cG16fjYN9PXbteuzONUQduhXpJqh9jhiGVWiXe1jJ6SieBwmMglT0D
+	1Sqt81uFySKMA6xANHzjHtcKuF1dQPtq+O0vaQww+dOm3+xBgOV1IDPOtP2H5meHQNXwCZ
+	j4CxDegBAA/pDn7gWnH26osDI0Acq8GheckEUgownkF6icLtkTu2dVc1HFjtNg==
+Date: Thu, 20 Jun 2024 19:19:23 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>, Simon Horman
+ <horms@kernel.org>, Sai Krishna Gajula <saikrishnag@marvell.com>, Thomas
+ Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lee Jones
+ <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Horatiu Vultur
+ <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Saravana Kannan <saravanak@google.com>, Bjorn
+ Helgaas <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>, Lars
+ Povlsen <lars.povlsen@microchip.com>, Steen Hegelund
+ <Steen.Hegelund@microchip.com>, Daniel Machon
+ <daniel.machon@microchip.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Allan
+ Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli
+ <luca.ceresoli@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 18/19] mfd: Add support for LAN966x PCI device
+Message-ID: <20240620191923.3d62c128@bootlin.com>
+In-Reply-To: <20240620184309.6d1a29a1@bootlin.com>
+References: <20240527161450.326615-1-herve.codina@bootlin.com>
+	<20240527161450.326615-19-herve.codina@bootlin.com>
+	<ZmDJi__Ilp7zd-yJ@surfacebook.localdomain>
+	<20240620175646.24455efb@bootlin.com>
+	<CAHp75VdDkv-dxWa60=OLfXAQ8T5CkFiKALbDHaVVKQOK3gJehA@mail.gmail.com>
+	<20240620184309.6d1a29a1@bootlin.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, davem@davemloft.net, kuba@kernel.org,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Pravin B Shelar <pshelar@ovn.org>, Aaron Conole <aconole@redhat.com>,
- Florian Westphal <fw@strlen.de>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Subject: Re: [PATCH net] openvswitch: get related ct labels from its master if
- it is not confirmed
-To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
- dev@openvswitch.org
-References: <48a6cd8c4f9c6bf6f0314d992d61c65b43cb3983.1718834936.git.lucien.xin@gmail.com>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <48a6cd8c4f9c6bf6f0314d992d61c65b43cb3983.1718834936.git.lucien.xin@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: i.maximets@ovn.org
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-On 6/20/24 00:08, Xin Long wrote:
-> Ilya found a failure in running check-kernel tests with at_groups=144
-> (144: conntrack - FTP SNAT orig tuple) in OVS repo. After his further
-> investigation, the root cause is that the labels sent to userspace
-> for related ct are incorrect.
-> 
-> The labels for unconfirmed related ct should use its master's labels.
-> However, the changes made in commit 8c8b73320805 ("openvswitch: set
-> IPS_CONFIRMED in tmpl status only when commit is set in conntrack")
-> led to getting labels from this related ct.
-> 
-> So fix it in ovs_ct_get_labels() by changing to copy labels from its
-> master ct if it is a unconfirmed related ct. Note that there is no
-> fix needed for ct->mark, as it was already copied from its master
-> ct for related ct in init_conntrack().
-> 
-> Fixes: 8c8b73320805 ("openvswitch: set IPS_CONFIRMED in tmpl status only when commit is set in conntrack")
-> Reported-by: Ilya Maximets <i.maximets@ovn.org>
-> Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> ---
->  net/openvswitch/conntrack.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
-> index 331730fd3580..920e802ff01e 100644
-> --- a/net/openvswitch/conntrack.c
-> +++ b/net/openvswitch/conntrack.c
-> @@ -167,8 +167,13 @@ static u32 ovs_ct_get_mark(const struct nf_conn *ct)
->  static void ovs_ct_get_labels(const struct nf_conn *ct,
->  			      struct ovs_key_ct_labels *labels)
->  {
-> -	struct nf_conn_labels *cl = ct ? nf_ct_labels_find(ct) : NULL;
-> +	struct nf_conn_labels *cl = NULL;
->  
-> +	if (ct) {
-> +		if (ct->master && !nf_ct_is_confirmed(ct))
-> +			ct = ct->master;
-> +		cl = nf_ct_labels_find(ct);
-> +	}
->  	if (cl)
->  		memcpy(labels, cl->bits, OVS_CT_LABELS_LEN);
->  	else
+Hi Andy,
 
-Thanks, Xin!  LGTM.
+On Thu, 20 Jun 2024 18:43:09 +0200
+Herve Codina <herve.codina@bootlin.com> wrote:
 
-Tested with OVS testsuite and it works fine.  Also re-checked OVN
-system tests and they also work as expected.
+> My bad, I wrongly answered first in private.
+> I already eesend my answers with people in Cc
+> 
+> Now, this is the Andy's your reply.
+> 
+> Sorry for this mistake.
+> 
+> Herve
+> 
+> On Thu, 20 Jun 2024 18:07:16 +0200
+> Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
+> 
+> > On Thu, Jun 20, 2024 at 5:56 PM Herve Codina <herve.codina@bootlin.com> wrote:  
+> > > On Wed, 5 Jun 2024 23:24:43 +0300
+> > > Andy Shevchenko <andy.shevchenko@gmail.com> wrote:    
+> > > > Mon, May 27, 2024 at 06:14:45PM +0200, Herve Codina kirjoitti:    
+> > 
+> > ...
+> >   
+> > > > > +   if (!dev->of_node) {
+> > > > > +           dev_err(dev, "Missing of_node for device\n");
+> > > > > +           return -EINVAL;
+> > > > > +   }    
+> > > >
+> > > > Why do you need this? The code you have in _create_intr_ctrl() will take care
+> > > > already for this case.    
+> > >
+> > > The code in _create_intr_ctrl checks for fwnode and not an of_node.
+> > >
+> > > The check here is to ensure that an of_node is available as it will be use
+> > > for DT overlay loading.    
+> > 
+> > So, what exactly do you want to check? fwnode check covers this.
+> >   
+> > > I will keep the check here and use dev_of_node() instead of dev->of_node.    
+> > 
+> > It needs to be well justified as from a coding point of view this is a
+> > duplication.
 
-Reviewed-by: Ilya Maximets <i.maximets@ovn.org>
-Tested-by: Ilya Maximets <i.maximets@ovn.org>
+On DT based system, if a fwnode is set it is an of_node.
+On ACPI, if a fwnode is set is is an acpi_node.
+
+The core PCI, when it successfully creates the DT node for a device
+(CONFIG_PCI_DYNAMIC_OF_NODES) set the of_node of this device.
+So we can have a device with:
+ - fwnode from ACPI
+ - of_node from core PCI creation
+
+This driver needs the of_node to load the overlay.
+Even if the core PCI cannot create a DT node for the PCI device right
+now, I don't expect this LAN855x PCI driver updated when the core PCI
+is able to create this PCI device DT node.
+
+> > 
+> > ...
+> >   
+> > > > > +   pci_set_master(pdev);    
+> > > >
+> > > > You don't use MSI, what is this for?    
+> > >
+> > > DMA related.
+> > > Allows the PCI device to be master on the bus and so initiate transactions.
+> > >
+> > > Did I misunderstood ?    
+> > 
+> > So, you mean that the PCI device may initiate DMA transactions and
+> > they are not related to MSI, correct?
+
+That's my understanding.
+Right now, the internal LAN966x DMA controller is not used but it will be
+used in a near future.
+
+> > 
+> > ...
+> >   
+> > > > > +static struct pci_device_id lan966x_pci_ids[] = {
+> > > > > +   { PCI_DEVICE(0x1055, 0x9660) },    
+> > > >
+> > > > Don't you have VENDOR_ID defined somewhere?    
+> > >
+> > > No and 0x1055 is taken by PCI_VENDOR_ID_EFAR in pci-ids.h
+> > > but SMSC acquired EFAR late 1990's and MCHP acquired SMSC in 2012
+> > > https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/microchip/lan743x_main.h#L851
+> > >
+> > > I will patch pci-ids.h to create:
+> > >   #define PCI_VENDOR_ID_SMSC PCI_VENDOR_ID_EFAR
+> > >   #define PCI_VENDOR_ID_MCHP PCI_VENDOR_ID_SMSC
+> > > As part of this patch, I will update lan743x_main.h to remove its own #define
+> > >
+> > > And use PCI_VENDOR_ID_MCHP in this series.    
+> > 
+> > Okay, but I don't think (but I haven't checked) we have something like
+> > this ever done there. In any case it's up to Bjorn how to implement
+> > this.
+
+Right, I wait for Bjorn reply before changing anything.
+
+Best regards,
+Hervé
 
