@@ -1,140 +1,136 @@
-Return-Path: <netdev+bounces-105348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 715D69108A6
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 16:41:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98FA49108B1
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 16:44:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D4F4B22B73
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:41:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 491A61F23A7E
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A5B1AE086;
-	Thu, 20 Jun 2024 14:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1082719B3E1;
+	Thu, 20 Jun 2024 14:44:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J3y5KnY5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g+w2N4id"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583591AB535;
-	Thu, 20 Jun 2024 14:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CBFD42ABA;
+	Thu, 20 Jun 2024 14:44:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718894479; cv=none; b=qzjWkzitSEXQP+78L1KSPdsnPN7rjppioPwBkgl2WvRks9IsgYygrFHoaAJoEYSdvPYP+dGNGZYYaFkgU7yFktQvSfL6e2xW4yB6QsopFes9ffpNYt1aJfePGAXtbEOZFU2bhbACxL1DY/yCBCBAVpPWFfEB9fvhsjZ3sdYVWiU=
+	t=1718894690; cv=none; b=GHf0V2BGcmH7jSMA1AKX+IjDniwWQXkL9+ZvPMAZiEum96xi9u+H2elH2J2z/e8fz7jZs0o9j3xl5uQaheaCNn/8sxXWhdkF660LNWYGltWBRJS5WOAlmanEXjIQGslyceTRatGaJpf4OBhucw9UKKxJOHRxj3jUQE4diD96SHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718894479; c=relaxed/simple;
-	bh=5ScJcEVT9hBda7ysTACD45tqpz9ZSLw8J/lH+rGCEh0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eqjfRthoPjGlcedXt1jPyAp8AXjhaw30SQFJPs19yOvqhNoTmwB5j6JC0DY+dV/J/0dx9M2IwHo26RsbixqCSmqCdrp+60M1InOBLy3iuTZZiqv6eFaLfwu6XYB8XS+nZvdtSns8ySyyQjpSKSPGj89M/I+VbCnDQniANKXJ+n4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J3y5KnY5; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718894477; x=1750430477;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5ScJcEVT9hBda7ysTACD45tqpz9ZSLw8J/lH+rGCEh0=;
-  b=J3y5KnY58lHxtJRL0pqM5SYmyltXYOv8jQiTEewuf5EXkq+OEq/c+Z4Q
-   UNuLpTO8DQUW9ouLxGp7i8HDLSct14FRRwBgYFciNgD2CNDYpuAkqx8PV
-   uzgAAjhjXF21MPriD0FJy/Y4Y2mOCyBrW4J4R1MQzIhbDQ9Jc6PtTWsTo
-   7XIEHYP8B4Nr9wbdmAhdKgiXqB9thIZP0u5EgDH9UKFl1wDa1E/8Up4k4
-   64A9MMopoRqZpty7Jbpd6q+RwzUJSr9Tnzq6vKShIQ4CdyvIFjHzXsVsr
-   thMfwcZFzNs6YB8S7QGSPNWN/XQI6qrsqy6ytTbDEaFZVOq9V8OC1Liuk
-   A==;
-X-CSE-ConnectionGUID: Y0sGUAxjT5K3NTT+T5eezA==
-X-CSE-MsgGUID: 3VPEZ4W4Q7m/5mHRMcHHdQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11108"; a="33415610"
-X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
-   d="scan'208";a="33415610"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 07:41:10 -0700
-X-CSE-ConnectionGUID: F04vPV/tToidaLxiCN1z4w==
-X-CSE-MsgGUID: bTefi67oRq2jOEwZb0FxVQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
-   d="scan'208";a="73000408"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 20 Jun 2024 07:41:07 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sKIyG-0007gK-2k;
-	Thu, 20 Jun 2024 14:41:04 +0000
-Date: Thu, 20 Jun 2024 22:40:28 +0800
-From: kernel test robot <lkp@intel.com>
-To: Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] net: dsa: mv88e6xxx: Add FID map cache
-Message-ID: <202406202033.cdjd66Gh-lkp@intel.com>
-References: <20240620002826.213013-1-aryan.srivastava@alliedtelesis.co.nz>
+	s=arc-20240116; t=1718894690; c=relaxed/simple;
+	bh=8iQO6Emy2tRVwzuEDA/kchE+iTXyfAsBpVBTDwQk+20=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hplbC0UUBL3/tin7r6Dpp2qSmdAOoUvjjA5H+SNuUQilZyycM3bZvWvOe5O2jo9PqXX87wuTjiHXNJhF3TtoIwWUk4az453AKe6fvE1YzrIa9fF+paDu9F1SyGONyPU4NYh4cFLELLx7rYRFh6HXfgG4ucYGizqzmsGOrQMMdY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g+w2N4id; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2eaafda3b5cso10445211fa.3;
+        Thu, 20 Jun 2024 07:44:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718894686; x=1719499486; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6LKx+R33v9q2HX/fanb0Z4m7vD2boYqK/YJS3URbx8w=;
+        b=g+w2N4idUT2fjibYIvPzATzVGv+EesjbgxcSouwmvwa2soD9yX1Th5JM+jkt5Vx9P/
+         6Dk/lwUcT3DV1KUQAtoLmJPOGfKhazv0C2EQngwzL0/NttgvubYuRJuVn4Dwk/ByPEqN
+         ISVEA1le0aOn/IilW1IpFPZZ0CUaDuEBjRLwqnqpkHJccxJhrTbhTtoD6KwjIiV8MiVO
+         YoqJb1kJQShMXc6vyadp51iHNPrwj2sa+zkfxeWLn39s3+65tEQmLgo/I+5NvTGIto3j
+         OPk568TVUw/jUpi8UHOcuS/o3oZNj07M8pNYcMzb9GCX/mJlfm4D/cUVRGMWy/cHV7/6
+         u7QQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718894686; x=1719499486;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6LKx+R33v9q2HX/fanb0Z4m7vD2boYqK/YJS3URbx8w=;
+        b=SJy2xO3iR/iWu4LpMRYfLdoZkm9+dQVnVcvuKiCao0A9tiBw6Q6XfaU3c8eqjY2L5D
+         ZYIbfY0SH5dwctqtG9hT6o7PY5mMJHfSqhLD5EYMdcQJWb5/cyvd8XmwrlFsAOFrDhFg
+         LBUn+cM1s8USgVFQdUH1obbR0Jx4AYJcUCUfjmSeydfRTaTN/7UuJ7nL2//PKLMyjGpF
+         qCbAMom1HCtBOkEOpx3DuWAggdJLXiR/1oPHfMVjfAQ+IBncvKxnNw3toBtpuoInhut0
+         eUGDexXzSZ7EBx6iBZpH1Z6n3QyBfdUCUlF6bi8GtypZmvhQpGZsdpsUaydTayLiWNmE
+         YpZg==
+X-Forwarded-Encrypted: i=1; AJvYcCVEvuG6LThhci4Kr4Xg1BGI+hs2Kdp+Ys8disLiVDvzfzWdofNaAbx5M22Te+jjrK/RnMlAzVENotiqqhxcfr4/cVm7U79kmy/HZwXA5bQc1DSjHc8rx8W5tdLsObc8f+BV8v8CTdaAvl0dQvHSKYBu81O3hmZ5FkWla3ewPTb7gLqJfmQbhgGfZrU2T/j7nnFBzFd8MSXK0O1XWQ+bph3OWA==
+X-Gm-Message-State: AOJu0Yxiq/3NabxVTzi8VayyY5jUk2PD2iTbc4FlQ0OwvkS+4YtBQH+U
+	R6boXMMuqbmanpCxjaXkcskHnTTOc7gH4UyO0OWdsEmjruoFTUSk9+akrWWcSu7GBbnctyR7GP8
+	XhoYpx/kg11kXoNN/t6wqfy+7qBhPaA==
+X-Google-Smtp-Source: AGHT+IFGt5VFR6NbS7vC8yOPohi01Zz2iGk0PJPFzYYvy0RDy+DrDiBt0qqDTV3QQD7ZUMTNRB5WaHWxcskX5F6+xKY=
+X-Received: by 2002:a2e:8086:0:b0:2eb:ed3a:9c65 with SMTP id
+ 38308e7fff4ca-2ec3ceb6b04mr34150741fa.15.1718894686390; Thu, 20 Jun 2024
+ 07:44:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240620002826.213013-1-aryan.srivastava@alliedtelesis.co.nz>
+References: <20240612075829.18241-1-brgl@bgdev.pl> <171889385052.4585.15983645082672209436.git-patchwork-notify@kernel.org>
+ <8d6af7e2-76f8-4daa-a751-a1abe29af103@kernel.org>
+In-Reply-To: <8d6af7e2-76f8-4daa-a751-a1abe29af103@kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 20 Jun 2024 10:44:33 -0400
+Message-ID: <CABBYNZJ5z91HExR-dkwrEPoF1pEGbkAP0X6tpftEGz-kd7vdsw@mail.gmail.com>
+Subject: Re: [GIT PULL] Immutable tag between the Bluetooth and pwrseq
+ branches for v6.11-rc1
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: patchwork-bot+bluetooth@kernel.org, Bartosz Golaszewski <brgl@bgdev.pl>, marcel@holtmann.org, 
+	krzk+dt@kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bartosz.golaszewski@linaro.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Aryan,
+Hi Krzysztof,
 
-kernel test robot noticed the following build warnings:
+On Thu, Jun 20, 2024 at 10:35=E2=80=AFAM Krzysztof Kozlowski <krzk@kernel.o=
+rg> wrote:
+>
+> On 20/06/2024 16:30, patchwork-bot+bluetooth@kernel.org wrote:
+> > Hello:
+> >
+> > This pull request was applied to bluetooth/bluetooth-next.git (master)
+> > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+> >
+> > On Wed, 12 Jun 2024 09:58:29 +0200 you wrote:
+> >> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >>
+> >> Hi Marcel, Luiz,
+> >>
+> >> Please pull the following power sequencing changes into the Bluetooth =
+tree
+> >> before applying the hci_qca patches I sent separately.
+> >>
+> >> [...]
+> >
+> > Here is the summary with links:
+> >   - [GIT,PULL] Immutable tag between the Bluetooth and pwrseq branches =
+for v6.11-rc1
+> >     https://git.kernel.org/bluetooth/bluetooth-next/c/4c318a2187f8
+>
+>
+> Luiz,
+>
+> This pulls looks wrong. Are you sure you have correct base? The diffstat
+> suggests you are merging into rc2, not rc3. This will be confusing in
+> merge commit. It is much safer, including possible feedback from Linus,
+> if you use exactly the same base.
 
-[auto build test WARNING on net-next/main]
-[also build test WARNING on net/main linus/master v6.10-rc4 next-20240619]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+So you are saying I need to rebase? I usually only rebase when it
+comes the time to do a pull-request using net-next as a base since
+that is where bluetooth-next normally lands.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Aryan-Srivastava/net-dsa-mv88e6xxx-Add-FID-map-cache/20240620-083100
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240620002826.213013-1-aryan.srivastava%40alliedtelesis.co.nz
-patch subject: [PATCH v1] net: dsa: mv88e6xxx: Add FID map cache
-config: arm-randconfig-003-20240620 (https://download.01.org/0day-ci/archive/20240620/202406202033.cdjd66Gh-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240620/202406202033.cdjd66Gh-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202406202033.cdjd66Gh-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/net/dsa/mv88e6xxx/chip.c: In function 'mv88e6xxx_atu_new':
->> drivers/net/dsa/mv88e6xxx/chip.c:1960:13: warning: unused variable 'err' [-Wunused-variable]
-    1960 |         int err;
-         |             ^~~
+> Best regards,
+> Krzysztof
+>
 
 
-vim +/err +1960 drivers/net/dsa/mv88e6xxx/chip.c
-
-  1957	
-  1958	static int mv88e6xxx_atu_new(struct mv88e6xxx_chip *chip, u16 *fid)
-  1959	{
-> 1960		int err;
-  1961	
-  1962		*fid = find_first_zero_bit(chip->fid_bitmap, MV88E6XXX_N_FID);
-  1963		if (unlikely(*fid >= mv88e6xxx_num_databases(chip)))
-  1964			return -ENOSPC;
-  1965	
-  1966		/* Clear the database */
-  1967		return mv88e6xxx_g1_atu_flush(chip, *fid, true);
-  1968	}
-  1969	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--=20
+Luiz Augusto von Dentz
 
