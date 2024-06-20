@@ -1,252 +1,132 @@
-Return-Path: <netdev+bounces-105277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2801991057D
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 15:11:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B093F9105AB
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 15:19:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C844B2451D
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 13:11:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F574286588
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 13:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4CFD1AD499;
-	Thu, 20 Jun 2024 13:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE3741ACE93;
+	Thu, 20 Jun 2024 13:19:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2OufAtCY";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Jc+vu0x9";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2OufAtCY";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Jc+vu0x9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V0+qvCb1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68DB1AD491;
-	Thu, 20 Jun 2024 13:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E5C01ACE65
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 13:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718888916; cv=none; b=f+oY4IMH6KXTjuDsRTOAx9iLVRR44J5uOZM9EJPi2f4Sap1GdC++JR3rkCl/ftuLYT2Gy27wnehYVz8Cw1FuSLacmnLxWTRtt42nthv3aJyzd2uTtRjOrrt+IKHaiT81NHFWng1pJlrdaEQzTq6cM63uFl5YBm2Hlf70rV0R0K8=
+	t=1718889572; cv=none; b=kOpSK8vSC1482b4O8+PHLI2ujhNz3lNmW+2eMpUm1ula1A6YncKPp9SWffzIAff7MY7VtWOyKN1W8BIphoG2T43xGQg8YFe8wiLHAi0HMbg3S10UJH9+W3fuH2x1uZVgVHydqLX/JyfAqzxroe5Vua4JZ4IjO3KSIysfmIV+XkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718888916; c=relaxed/simple;
-	bh=dBQz6S40WDeiGeupeskerJqcI40jAXRtHx6QdmXFSrg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WKoPXj/VbPz1rkSdqEZiskH5+aiyxecREHyivEhy9R8z/g5CNl/a1bcsXeS5ngG1qee05yYW9MELx6rQqdryqcCR2q1MR9wnuq45qEYynfJhIQDFGfGBLm3PtMoiqIsW5MkZSw8LOf+8vbdqO9jma7Q/745sx0B7DSBbdQZU5E0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2OufAtCY; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Jc+vu0x9; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2OufAtCY; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Jc+vu0x9; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 172E921A82;
-	Thu, 20 Jun 2024 13:08:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1718888913; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1718889572; c=relaxed/simple;
+	bh=BV1WLhE4C8cxKsCUyQftaONKUO7BupTFwyuw+2FphCw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=rhn9MzIy4eyu+dcMIY8YJmHlC2fOoTlIbdOmMvqptpyeOQGYcwBlFAT+FY0J4gEhrKW4zoDzlk+2fuJAn88rmEmEX3iJ+WFFGpk/wVaDRKwPcnmpJfSss1JKQXMxdbOOsfk+JZaQtXmQOeGgA4uAQ8bvXAbU7PkSDY8SLGiP/cY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V0+qvCb1; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718889570;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=0rJovHGmssGPw0RKMhyX09OgLWhw/Ce/UFsR3Y5KGD4=;
-	b=2OufAtCYaPNrkEXe5Tpw0zaEwbltYXnjclLQMilfSSXB68xLTaaNPR+XGO/7nLEncduMTw
-	+2xci/SuvjZm49NY8uEJYiWm5Cx/QvvSlRNOjjRTYjm+HurgEPwgtKwnn23t+WudZarvR+
-	He33pzKWD0rr4IxF2vIsc5mX10smiLE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1718888913;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=0rJovHGmssGPw0RKMhyX09OgLWhw/Ce/UFsR3Y5KGD4=;
-	b=Jc+vu0x9mzR2O9rn9v9FzoXKwuH30ek9Az09Yd26XR24I/ncOmB4mgkStrHmsPgD0Dz8Ox
-	o3efBBYF7y/SqHDQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=2OufAtCY;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=Jc+vu0x9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1718888913; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=0rJovHGmssGPw0RKMhyX09OgLWhw/Ce/UFsR3Y5KGD4=;
-	b=2OufAtCYaPNrkEXe5Tpw0zaEwbltYXnjclLQMilfSSXB68xLTaaNPR+XGO/7nLEncduMTw
-	+2xci/SuvjZm49NY8uEJYiWm5Cx/QvvSlRNOjjRTYjm+HurgEPwgtKwnn23t+WudZarvR+
-	He33pzKWD0rr4IxF2vIsc5mX10smiLE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1718888913;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=0rJovHGmssGPw0RKMhyX09OgLWhw/Ce/UFsR3Y5KGD4=;
-	b=Jc+vu0x9mzR2O9rn9v9FzoXKwuH30ek9Az09Yd26XR24I/ncOmB4mgkStrHmsPgD0Dz8Ox
-	o3efBBYF7y/SqHDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C50251369F;
-	Thu, 20 Jun 2024 13:08:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 5k+/L9ApdGbNQwAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Thu, 20 Jun 2024 13:08:32 +0000
-Message-ID: <7f122473-3d36-401d-8df4-02d981949f00@suse.cz>
-Date: Thu, 20 Jun 2024 15:08:32 +0200
+	bh=AsRP5r0fpvpmEsH04gNv9kKaqCwtAkKfmqkVYvY6dLE=;
+	b=V0+qvCb1rfAn2B4bglLa0k+cOgclGO6V/nQOVKIfSypvKjqXPbXp3BGHgoITQQT045NjQ4
+	v1RCNApk+K7bMd+JLxGEZ55l207Dti3o3bWKUjed+GlqZ8JrzxODJDcfJTOBF0Ql6kD46s
+	FFbxDumR9GxqKebWTpOu4GewhAoMcj8=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-345-eVbchQ2dMue7Wq2z347GVw-1; Thu, 20 Jun 2024 09:19:29 -0400
+X-MC-Unique: eVbchQ2dMue7Wq2z347GVw-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6b50433ada9so2910846d6.3
+        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 06:19:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718889568; x=1719494368;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AsRP5r0fpvpmEsH04gNv9kKaqCwtAkKfmqkVYvY6dLE=;
+        b=OjyC9xNhkD6PVdan0t7rtfPrtvGlEGE+/8nJ0MT9dud7wE+pqZwrFgj1/OeFv9And0
+         WM5FxxWXuUeC63SByyWNe3XMe4DwZ1l4a6FkRe8IonUC2a8zAWNLJB4mChPoef94ApJl
+         icyIjXEr/GvAd7v7tdzE0XIEAgPHsZg8loM2iW2KIqz7lTXQNUuHLzxPglzisMqC8htH
+         c7ugcR5BowBxCxi7/5EGsrwwdlbJkEDWceWwsqsdpF+/3pWkVo2cb3cpWLjqy4Mfc6QW
+         JhuA/XYKn0zyDrQw46zAFoEGFDcjVcRFh5hSNgKrYJH0uFVNDM1KzkpqdAo0Q8fvHwAl
+         A1zA==
+X-Forwarded-Encrypted: i=1; AJvYcCX6W68Eftm1oW1Bep0Di5VmtNfgPxHckj6wNw219R1f9gSIZw2qi8NqgJO3u3q6WlQZWOBT0+obtvh+9c+f9ZmFIJo8TAve
+X-Gm-Message-State: AOJu0YxLDwP3GKMcminxi/SBxOzTNJ5kCcBN/doj8swwj6P8B48b+zjB
+	EJK9tER5naHa+b3sNGJorbQXQ4/KF6IXO4UA+vGfx1Y83vpT8+t7rfBFHzgKRjY24Y8AtD/KxsU
+	hxlnSSm2+V6wIBIau1c5DY+/kEdrCfe/RuOuMz07RlqqPI5eCc6OR5A==
+X-Received: by 2002:ad4:5dc6:0:b0:6b2:ae54:7c88 with SMTP id 6a1803df08f44-6b501e23be1mr56594596d6.2.1718889568424;
+        Thu, 20 Jun 2024 06:19:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEJiGXq7iC/KBqjz9TGNj1mG2OAhFM3Jo0oxe+pfu0GBa+zaF9kGf1NuOpnQDyqcPzmYgDJZw==
+X-Received: by 2002:ad4:5dc6:0:b0:6b2:ae54:7c88 with SMTP id 6a1803df08f44-6b501e23be1mr56594336d6.2.1718889567978;
+        Thu, 20 Jun 2024 06:19:27 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b0b7:b110::f71])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b5033f8a0esm19772146d6.134.2024.06.20.06.19.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jun 2024 06:19:27 -0700 (PDT)
+Message-ID: <7d208e8c8bb577cfc790fd24cf990684020ee7c5.camel@redhat.com>
+Subject: Re: [PATCH v1 2/3] net: ethernet: arc: remove emac_arc driver
+From: Paolo Abeni <pabeni@redhat.com>
+To: Johan Jonker <jbx6244@gmail.com>, heiko@sntech.de
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ robh@kernel.org,  krzk+dt@kernel.org, conor+dt@kernel.org,
+ netdev@vger.kernel.org,  devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org,  linux-rockchip@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+Date: Thu, 20 Jun 2024 15:19:24 +0200
+In-Reply-To: <10d8576f-a5da-4445-b841-98ceb338da0d@gmail.com>
+References: <0b889b87-5442-4fd4-b26f-8d5d67695c77@gmail.com>
+	 <10d8576f-a5da-4445-b841-98ceb338da0d@gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 2/6] mm/slab: Plumb kmem_buckets into
- __do_kmalloc_node()
-Content-Language: en-US
-To: Kees Cook <kees@kernel.org>
-Cc: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
- Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>,
- David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>,
- jvoisin <julien.voisin@dustri.org>, Andrew Morton
- <akpm@linux-foundation.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Hyeonggon Yoo <42.hyeyoo@gmail.com>, Xiu Jianfeng <xiujianfeng@huawei.com>,
- Suren Baghdasaryan <surenb@google.com>,
- Kent Overstreet <kent.overstreet@linux.dev>, Jann Horn <jannh@google.com>,
- Matteo Rizzo <matteorizzo@google.com>, Thomas Graf <tgraf@suug.ch>,
- Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, linux-hardening@vger.kernel.org, netdev@vger.kernel.org
-References: <20240619192131.do.115-kees@kernel.org>
- <20240619193357.1333772-2-kees@kernel.org>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- EP+ylKVEKb0Q2A==
-In-Reply-To: <20240619193357.1333772-2-kees@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 172E921A82
-X-Spam-Score: -3.00
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-3.00 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_TLS_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[huaweicloud.com,linux.com,kernel.org,google.com,lge.com,dustri.org,linux-foundation.org,linux.dev,gmail.com,huawei.com,suug.ch,gondor.apana.org.au,vger.kernel.org,kvack.org];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	DWL_DNSWL_BLOCKED(0.00)[suse.cz:dkim];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim]
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 
-On 6/19/24 9:33 PM, Kees Cook wrote:
-> Introduce CONFIG_SLAB_BUCKETS which provides the infrastructure to
-> support separated kmalloc buckets (in the following kmem_buckets_create()
-> patches and future codetag-based separation). Since this will provide
-> a mitigation for a very common case of exploits, enable it by default.
+On Tue, 2024-06-18 at 18:14 +0200, Johan Jonker wrote:
+> The last real user nSIM_700 of the "snps,arc-emac" compatible string in
+> a driver was removed in 2019. The use of this string in the combined DT o=
+f
+> rk3066a/rk3188 as place holder has also been replaced, so
+> remove emac_arc.c to clean up some code.
+>=20
+> Signed-off-by: Johan Jonker <jbx6244@gmail.com>
+> ---
+>=20
+> [PATCH 8/8] ARC: nSIM_700: remove unused network options
+> https://lore.kernel.org/all/20191023124417.5770-9-Eugeniy.Paltsev@synopsy=
+s.com/
+> ---
+>  drivers/net/ethernet/arc/Kconfig    | 10 ----
+>  drivers/net/ethernet/arc/Makefile   |  1 -
+>  drivers/net/ethernet/arc/emac_arc.c | 88 -----------------------------
+>  3 files changed, 99 deletions(-)
+>  delete mode 100644 drivers/net/ethernet/arc/emac_arc.c
 
-No longer "enable it by default".
+AFAICS this depends on the previous DT patch, which in turn should go
+via the arm tree.
 
-> 
-> To be able to choose which buckets to allocate from, make the buckets
-> available to the internal kmalloc interfaces by adding them as the
-> first argument, rather than depending on the buckets being chosen from
+Perhaps the whole series should go via the arm tree?
 
-second argument now
+In such case:
 
-> the fixed set of global buckets. Where the bucket is not available,
-> pass NULL, which means "use the default system kmalloc bucket set"
-> (the prior existing behavior), as implemented in kmalloc_slab().
-> 
-> To avoid adding the extra argument when !CONFIG_SLAB_BUCKETS, only the
-> top-level macros and static inlines use the buckets argument (where
-> they are stripped out and compiled out respectively). The actual extern
-> functions can then been built without the argument, and the internals
-> fall back to the global kmalloc buckets unconditionally.
-
-Also describes the previous implementation and not the new one?
-
-> --- a/mm/Kconfig
-> +++ b/mm/Kconfig
-> @@ -273,6 +273,22 @@ config SLAB_FREELIST_HARDENED
->  	  sacrifices to harden the kernel slab allocator against common
->  	  freelist exploit methods.
->  
-> +config SLAB_BUCKETS
-> +	bool "Support allocation from separate kmalloc buckets"
-> +	depends on !SLUB_TINY
-> +	help
-> +	  Kernel heap attacks frequently depend on being able to create
-> +	  specifically-sized allocations with user-controlled contents
-> +	  that will be allocated into the same kmalloc bucket as a
-> +	  target object. To avoid sharing these allocation buckets,
-> +	  provide an explicitly separated set of buckets to be used for
-> +	  user-controlled allocations. This may very slightly increase
-> +	  memory fragmentation, though in practice it's only a handful
-> +	  of extra pages since the bulk of user-controlled allocations
-> +	  are relatively long-lived.
-> +
-> +	  If unsure, say Y.
-
-I was wondering why I don't see the buckets in slabinfo and turns out it was
-SLAB_MERGE_DEFAULT. It would probably make sense for SLAB_MERGE_DEFAULT to
-depends on !SLAB_BUCKETS now as the merging defeats the purpose, wdyt?
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
 
