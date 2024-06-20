@@ -1,195 +1,105 @@
-Return-Path: <netdev+bounces-105375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F2C3910E52
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 19:19:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE00A910E55
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 19:20:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCE7A283445
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 17:19:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ABB42833D6
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 17:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A5BA1B3F06;
-	Thu, 20 Jun 2024 17:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3D81B3754;
+	Thu, 20 Jun 2024 17:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="onNLPtUC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qLpIgkFR"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4DC1B374B;
-	Thu, 20 Jun 2024 17:19:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43CE61ABCB1;
+	Thu, 20 Jun 2024 17:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718903975; cv=none; b=Ng0yEV+Y4q4vl4lqf/Ys82H8lfuOBvl93PzAoLg0B1PvWjDcgM3aPPmrH9F0eGauHd22RgLttNigDLv7SxzpInwjHMS7q7tfFpgsQ+SYzueqqLzqe/qKD3adWEGY8QeA7eA8EEEGWiyzAYUOPfdjgb+DFy24KTmFMwLon9JDcuk=
+	t=1718903999; cv=none; b=rbDTusabzMXBQeN4L5d2S1JRzgysI6rygMvTL14DZmYW3ipl+xZKTNNynE2CCkfdWSGKHuVSr1QpjNDngYT6FVe/LeqIWBiGJd+UKLpNc6pCI+9EIZelLyXN6gqmBpvh7UX81tX1Sp9BfnnvtG2k32jArzpnhb2rlWed3aarTAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718903975; c=relaxed/simple;
-	bh=GAfVT4AxRK3tUvGJYFqrB3IEvTnoxM7J6n25c18LEpo=;
-	h=Date:From:To:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JI23ccRfC8nk6BhAY3wSgIR5EooyzvFq4YFEtWJVcmaOJ6bXbgADOa70u88UWQTVyQ02KJ3vITaqkHUWEeXszXbrkU65VtTi8Pr40be88CbLd7Osg21MAFH07LZhY04S3zCaR1n1nFqyBjnmWxeyzvu6MQSbDwWfLh1xa4R6ktA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=onNLPtUC; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4996940002;
-	Thu, 20 Jun 2024 17:19:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1718903968;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6HKwLFpOQJzhN2+bpXmHjR3V9//mN4V0ElrLJbo8UOo=;
-	b=onNLPtUC8hcLlTUZP2ijmtuTvPuCiZXtx4goHw82layaODRfq6Sxhms5AqfW/+tASAF5NB
-	BdvEXZbn0qev8NHoDoGzbhcagb83Wnm1sxwKgGccr2hCSY+yT+T7BCAF8Qj7e3t1550TTc
-	qfy6z1i7Raurhx78cG16fjYN9PXbteuzONUQduhXpJqh9jhiGVWiXe1jJ6SieBwmMglT0D
-	1Sqt81uFySKMA6xANHzjHtcKuF1dQPtq+O0vaQww+dOm3+xBgOV1IDPOtP2H5meHQNXwCZ
-	j4CxDegBAA/pDn7gWnH26osDI0Acq8GheckEUgownkF6icLtkTu2dVc1HFjtNg==
-Date: Thu, 20 Jun 2024 19:19:23 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Andy Shevchenko <andy.shevchenko@gmail.com>, Simon Horman
- <horms@kernel.org>, Sai Krishna Gajula <saikrishnag@marvell.com>, Thomas
- Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lee Jones
- <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Horatiu Vultur
- <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Saravana Kannan <saravanak@google.com>, Bjorn
- Helgaas <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>, Lars
- Povlsen <lars.povlsen@microchip.com>, Steen Hegelund
- <Steen.Hegelund@microchip.com>, Daniel Machon
- <daniel.machon@microchip.com>, Alexandre Belloni
- <alexandre.belloni@bootlin.com>, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Allan
- Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli
- <luca.ceresoli@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 18/19] mfd: Add support for LAN966x PCI device
-Message-ID: <20240620191923.3d62c128@bootlin.com>
-In-Reply-To: <20240620184309.6d1a29a1@bootlin.com>
-References: <20240527161450.326615-1-herve.codina@bootlin.com>
-	<20240527161450.326615-19-herve.codina@bootlin.com>
-	<ZmDJi__Ilp7zd-yJ@surfacebook.localdomain>
-	<20240620175646.24455efb@bootlin.com>
-	<CAHp75VdDkv-dxWa60=OLfXAQ8T5CkFiKALbDHaVVKQOK3gJehA@mail.gmail.com>
-	<20240620184309.6d1a29a1@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1718903999; c=relaxed/simple;
+	bh=0EITIsqCJubudjU1im913x1NvRsb6Pperj0ae9Q9IyY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FU+C58x+YPJGUxj9m21n8Ly31xp6f1ha+2NnPSALrBoJh3aXVXJsiilF61c1Ew+9+weuF/hYeO/YAtpCKTH5GGcazPq7zu+nN5rNyXCEXV9Jst76qpew87SF+G8Sj9CqgjTvOa2WlyCghvEoRcb8kGvOViww33Gi1pr7KuWWeRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qLpIgkFR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0176DC2BD10;
+	Thu, 20 Jun 2024 17:19:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718903998;
+	bh=0EITIsqCJubudjU1im913x1NvRsb6Pperj0ae9Q9IyY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qLpIgkFReZvp3j40kOfUVwQGHXaTIeS3AMOoheI7XTX6TumouC+XX3vNgNYwFVfne
+	 WkTAj/VyMueaQdhIPiL4/dCMZC9eoQ/AmzZzTegVtVuWETd/+YLWEz4+TD2Fjm5Gu5
+	 pE8cTc+y2rjjNXVBpDYb1+L2Y+87x/6ezY+XiNcbxi8oPyypU4HYs5+9nerwx0yGHn
+	 1AMgu0Mi47mD5o1DIDOuilphEj+WMRSGmJA6OxZu+YpSCDJOpfhg3HoBP4/YB2kzWX
+	 V7aMDINbybSuZWpRRuu3sTSfAixoB28YYAf+LYn3oicANIdmQBzkSu+wlEzbCWgHXE
+	 8aU4Qo/1wduqw==
+Date: Thu, 20 Jun 2024 18:19:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kvalo@kernel.org, linux-wireless@vger.kernel.org, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com,
+	Felix Fietkau <nbd@nbd.name>, Lorenzo Bianconi <lorenzo@kernel.org>,
+	Ryder Lee <ryder.lee@mediatek.com>,
+	Shayne Chen <shayne.chen@mediatek.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, kees@kernel.org,
+	Bo Jiao <Bo.Jiao@mediatek.com>, Alexander Couzens <lynxis@fe80.eu>,
+	Deren Wu <deren.wu@mediatek.com>,
+	Ming Yen Hsieh <mingyen.hsieh@mediatek.com>,
+	Leon Yen <leon.yen@mediatek.com>,
+	Quan Zhou <quan.zhou@mediatek.com>, Ingo Rohloff <lundril@gmx.de>,
+	Sujuan Chen <sujuan.chen@mediatek.com>,
+	Peter Chiu <chui-hao.chiu@mediatek.com>,
+	StanleyYP Wang <StanleyYP.Wang@mediatek.com>,
+	Benjamin Lin <benjamin-jw.lin@mediatek.com>,
+	"open list:ARM/Mediatek SoC support" <linux-kernel@vger.kernel.org>,
+	"moderated list:ARM/Mediatek SoC support" <linux-arm-kernel@lists.infradead.org>,
+	"moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>
+Subject: Re: [PATCH net-next v2] wifi: mt76: un-embedd netdev from mt76_dev
+Message-ID: <20240620171950.GO959333@kernel.org>
+References: <20240619105311.3144908-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240619105311.3144908-1-leitao@debian.org>
 
-Hi Andy,
-
-On Thu, 20 Jun 2024 18:43:09 +0200
-Herve Codina <herve.codina@bootlin.com> wrote:
-
-> My bad, I wrongly answered first in private.
-> I already eesend my answers with people in Cc
+On Wed, Jun 19, 2024 at 03:52:36AM -0700, Breno Leitao wrote:
+> Embedding net_device into structures prohibits the usage of flexible
+> arrays in the net_device structure. For more details, see the discussion
+> at [1].
 > 
-> Now, this is the Andy's your reply.
+> Un-embed the net_devices from struct mt76_dev by converting them
+> into pointers, and allocating them dynamically. Use the leverage
+> alloc_netdev_dummy() to allocate the net_device object at
+> mt76_dma_init().
 > 
-> Sorry for this mistake.
+> The free of the device occurs at mt76_dma_cleanup().
 > 
-> Herve
+> Link: https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/ [1]
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
 > 
-> On Thu, 20 Jun 2024 18:07:16 +0200
-> Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
-> 
-> > On Thu, Jun 20, 2024 at 5:56 PM Herve Codina <herve.codina@bootlin.com> wrote:  
-> > > On Wed, 5 Jun 2024 23:24:43 +0300
-> > > Andy Shevchenko <andy.shevchenko@gmail.com> wrote:    
-> > > > Mon, May 27, 2024 at 06:14:45PM +0200, Herve Codina kirjoitti:    
-> > 
-> > ...
-> >   
-> > > > > +   if (!dev->of_node) {
-> > > > > +           dev_err(dev, "Missing of_node for device\n");
-> > > > > +           return -EINVAL;
-> > > > > +   }    
-> > > >
-> > > > Why do you need this? The code you have in _create_intr_ctrl() will take care
-> > > > already for this case.    
-> > >
-> > > The code in _create_intr_ctrl checks for fwnode and not an of_node.
-> > >
-> > > The check here is to ensure that an of_node is available as it will be use
-> > > for DT overlay loading.    
-> > 
-> > So, what exactly do you want to check? fwnode check covers this.
-> >   
-> > > I will keep the check here and use dev_of_node() instead of dev->of_node.    
-> > 
-> > It needs to be well justified as from a coding point of view this is a
-> > duplication.
+> Changelog:
+>  * v2:
+> 	- Renamed mt76_from_netdev() to mt76_priv(), and returns a
+> 	  void pointer instead of struct mt76_dev, avoiding the cast
+> 	  later, as suggested by Simon Horman.
 
-On DT based system, if a fwnode is set it is an of_node.
-On ACPI, if a fwnode is set is is an acpi_node.
-
-The core PCI, when it successfully creates the DT node for a device
-(CONFIG_PCI_DYNAMIC_OF_NODES) set the of_node of this device.
-So we can have a device with:
- - fwnode from ACPI
- - of_node from core PCI creation
-
-This driver needs the of_node to load the overlay.
-Even if the core PCI cannot create a DT node for the PCI device right
-now, I don't expect this LAN855x PCI driver updated when the core PCI
-is able to create this PCI device DT node.
-
-> > 
-> > ...
-> >   
-> > > > > +   pci_set_master(pdev);    
-> > > >
-> > > > You don't use MSI, what is this for?    
-> > >
-> > > DMA related.
-> > > Allows the PCI device to be master on the bus and so initiate transactions.
-> > >
-> > > Did I misunderstood ?    
-> > 
-> > So, you mean that the PCI device may initiate DMA transactions and
-> > they are not related to MSI, correct?
-
-That's my understanding.
-Right now, the internal LAN966x DMA controller is not used but it will be
-used in a near future.
-
-> > 
-> > ...
-> >   
-> > > > > +static struct pci_device_id lan966x_pci_ids[] = {
-> > > > > +   { PCI_DEVICE(0x1055, 0x9660) },    
-> > > >
-> > > > Don't you have VENDOR_ID defined somewhere?    
-> > >
-> > > No and 0x1055 is taken by PCI_VENDOR_ID_EFAR in pci-ids.h
-> > > but SMSC acquired EFAR late 1990's and MCHP acquired SMSC in 2012
-> > > https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/microchip/lan743x_main.h#L851
-> > >
-> > > I will patch pci-ids.h to create:
-> > >   #define PCI_VENDOR_ID_SMSC PCI_VENDOR_ID_EFAR
-> > >   #define PCI_VENDOR_ID_MCHP PCI_VENDOR_ID_SMSC
-> > > As part of this patch, I will update lan743x_main.h to remove its own #define
-> > >
-> > > And use PCI_VENDOR_ID_MCHP in this series.    
-> > 
-> > Okay, but I don't think (but I haven't checked) we have something like
-> > this ever done there. In any case it's up to Bjorn how to implement
-> > this.
-
-Right, I wait for Bjorn reply before changing anything.
-
-Best regards,
-Hervé
+Thanks for the update, it looks good to me.
 
