@@ -1,153 +1,169 @@
-Return-Path: <netdev+bounces-105173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E88490FF67
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:50:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D037890FF99
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:55:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D30911F218A7
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:50:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F2FF28172A
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7BC519DF64;
-	Thu, 20 Jun 2024 08:47:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895191A8C0D;
+	Thu, 20 Jun 2024 08:52:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="zBeTL7N0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y8nO+F8W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3092619AD6B
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 08:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5BE3D994;
+	Thu, 20 Jun 2024 08:52:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718873275; cv=none; b=Fn43UNaytnzvFFz6ibhepWvMdWi/tkjQBOEeor7buGFlSysnPIUqzyIhF4hmPM67cbDUYZsvvA5LJVBAfE1zxqmOdzvgC3lRzE3gZzRkR5mH/E1FXHl8ehCBSkAyDKBube/t7M23gQW7Ko24+sWKrCSaLIYPJFywiiElB9qdPyw=
+	t=1718873560; cv=none; b=aQ8zinRtLxFin7//pcymwFHprkpxR/QBhNZ+3jReeAtgj/MPeOrA+eFZE1kqrwP+7PdDFqlRbw0jUeL5dMfotA6/PvDK4COR4fgESuVjDfxm8mYghDfw8Gq24OREDZ04pprApLUA3ro9xpJPteceKKuuuAOuNhN3Y/zAeQ5zTTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718873275; c=relaxed/simple;
-	bh=pu4cUJlHDM2IE/LsL3x7JELUsHAoOtPHfYJ82Jszo2c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dFWy8fod8phRNWGrtvP2MKVLcaAfmE+e/RMwk1YxwbI8RXSBNQU7OGrLlcpvoUFl9Zz+fveFtmx2thPcJXoFqVQH7U0R4HRTuNS46OcG4KqFELrDs6XFw5OkR7O9qv3fdeq1FqtGT/rzf1B/KN3ljqj5sMS1BHI7tpuPjknfCbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=zBeTL7N0; arc=none smtp.client-ip=209.85.167.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3d2469e797fso323962b6e.0
-        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 01:47:53 -0700 (PDT)
+	s=arc-20240116; t=1718873560; c=relaxed/simple;
+	bh=cfW8+iR+f2HC19SB2sEKjqX8/oAWZeHnmAqWL+6fR1E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MnqaE4HwmGSP5FLZasTPllbzpmAXJj7y6Q3nfvvgSW+Oi3d0Y1NjImJ1at3gp1mrh0thF/8owaagOF7WVC0l0smdbMZ22zYvovrdLlOUjohO3NSoDSiHYeKgLGNAMr0QE/NOc5ODRPanYcs6IhRLwFXZ1E5yRGv0YqjujATvMHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y8nO+F8W; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-7152e097461so53525a12.1;
+        Thu, 20 Jun 2024 01:52:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1718873273; x=1719478073; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MzUjMgiYrV3CjZ2nfvpVdoNGlwFyp/ogee2pVUj67CY=;
-        b=zBeTL7N0IBmN0SG1wz33HowNOiByo4GEy3EOcBHpFV2ommeqlUCzwfjV2u2suGlgVl
-         8NknIHe7/niLNRRf1m63+aeCNTNVTKv4svzF8+wq78vt4idSW2zymmbJeOVmcR25k17X
-         OOK3oA6JWWE9Ohjd0yv1rxSlBh2ErLmmATTJ07L8PzUY3ZKLViJqcL1191h2Dn6dXPYa
-         gOIP9QSgo9MHPcoeyt7zJGLWqClu+oNfhzxrUrfml17ePLLY2KYNmjNZgV17Q5+jts3O
-         tkBHnSbNiUUNQayDV0xnXsSbJWxpncFIVuAUVRSM/C9XJ2cNhzQiQPhILfxPjsBfArbB
-         52yw==
+        d=gmail.com; s=20230601; t=1718873558; x=1719478358; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eB/cLhg3WSWwUi9V50hFyuG/XhsXVW1cGn/by2rdEtI=;
+        b=Y8nO+F8WTmmsoOdoDKGIo6imj1qjy3R8whP4UNXIeWcrRygKQsNM6S5tUUNnGPnvh8
+         hruxhPGka9DPRXsRTHWVZM7ViHdpoFuk7ydfmx7SX8rBAWP664DquL8Vld0rnpnzJZpS
+         G2Jy0n7HZsxMvvfyWfVcGHv/M+4JA67DhZG/foJhJmIikCBuHNVObtXFEmIXWcCCYeCO
+         pSf6tVcKZcTuw1GuFyP6b4o+5sSvEN9l+ab0erC63rbgzacLCccxsp9zw4PW0xuJKKDA
+         dfnGc3r+qypsatQsEqI/XL2TObP2ogc2h+I9pdWVIjlPOUuTihw7L7/LT2Tta/Ok5SpJ
+         HoHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718873273; x=1719478073;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MzUjMgiYrV3CjZ2nfvpVdoNGlwFyp/ogee2pVUj67CY=;
-        b=Z/w490Oh3cb5zf3F2jqQcIDEUwAB+cK6j5lipWdbzQCNPcf2FT2B9sxMvHvqubO5rD
-         4BG5I/mQEx1EcV17G24npvdfn1wWgQivQfSDRPsl59QHEO8TMOEfvtyHOs5779koWDRM
-         5+Fz/SY96Yk/Dhb2LwjJbtckVlUXGiLZ6HM6qoYBOiIHWmFJqNPvUJxFsWa1ln5CRDMS
-         UvobUXLvP00MafnUQCRWz+j6U+nDwHXaHyOzFTlQ+0gJr1XSyAxSSU6zJNTrrS1SOMk3
-         sahoyuHnWfJxPM9uhIPb7ES2PlPw6owP+fb64W0cjDNSEYiZcQVPTqkl85X1vgC5aknx
-         6fqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWcGdABCFS+pXQT8/vFkLDHEvOWvaAonyK2ro0ifuUVUfeRosxDLOXlIgYSxlmLZ7uzwLMMpUkDYR+oYSWMTQ8vZyvRBRCa
-X-Gm-Message-State: AOJu0Ywsg70FCiQDt3KoSRIi59pL3CqNUEBtA4XbWFzLMOvETRL0H84o
-	DNbFZRgoSqhKcxwVm5eUmo+ZOJbo9AzKXisUBRSWP+0XJG2YKFuoHW1GJsFFvE8=
-X-Google-Smtp-Source: AGHT+IGbKrol+0UZuYIBxj0w4VnVCxhSca3aoiAcZM78STe77M1ZCPClsmLZtJGsXsSB5GaJ+OtQaA==
-X-Received: by 2002:a05:6808:130c:b0:3d2:2fb5:b477 with SMTP id 5614622812f47-3d51b5d7b41mr2417341b6e.9.1718873273154;
-        Thu, 20 Jun 2024 01:47:53 -0700 (PDT)
-Received: from [10.11.11.3] ([91.235.68.88])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3d247605ffdsm2413992b6e.20.2024.06.20.01.47.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jun 2024 01:47:52 -0700 (PDT)
-Message-ID: <1b9fd871-e34a-4a7d-b1d3-4f3fd8858fa3@blackwall.org>
-Date: Thu, 20 Jun 2024 11:47:46 +0300
+        d=1e100.net; s=20230601; t=1718873558; x=1719478358;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eB/cLhg3WSWwUi9V50hFyuG/XhsXVW1cGn/by2rdEtI=;
+        b=Sq3lKYe/dmcYkLOqxPeuGmGxH9s8o7JDk4uLcQgadWlAIga5j1sXE9Pu6OR4xjKRw9
+         HrtgZYXb6VKuXGeibYEEMvA+Z8/WDB5zTO7KIxnnbWQbS2bkva78/UsDY8kG64Dd34/o
+         PANz6uVvDLHScQ/AsmzlG6f13ZS67HOrObdstgDzwBa4RLMO3jp+KdyTkZRgGp8/8F07
+         4cwqL69bMW2wIAkGHEBFL1xL9sfq8OPVwbe/DJmb8E+z7OfLDHgJtkQpevOthLQxQB0i
+         1bf2UWIeWN/w+0Qpb7nUaZZWe5X1phI9TEw/fXxJarMNp2ZT2QG0LR8liw9HcJLZF4cN
+         TXkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXPSpnulV9OQCLu0RrR5L3CttJDwJiqqrlRvd+/4QrTG7YRYi4YhHWUop52wzOOUAiSXd62DS0AhUNihSLOhnEtVNcPY0kn5DOBadd6
+X-Gm-Message-State: AOJu0YwxtiRUsrTh4M+DBLiooujpi6HoE160FDumWsR68ztEdGRWZPJP
+	KUA5eFbzfWoXW+PfC/aE/QAenpAUWsycp6ccYYxOLU6fukytxZFq
+X-Google-Smtp-Source: AGHT+IEmKmHEsNjSGrqpoUKBQw6eg+ckhuujPTMdS+oAOp1CeIUP6o8hfE4wARCQsHOeFNPFZkI2zg==
+X-Received: by 2002:a17:90a:f281:b0:2c4:f32c:6b with SMTP id 98e67ed59e1d1-2c7b3ba85abmr7335661a91.19.1718873557978;
+        Thu, 20 Jun 2024 01:52:37 -0700 (PDT)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2c7e4ff8affsm1133215a91.11.2024.06.20.01.52.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jun 2024 01:52:37 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	xfr@outlook.com,
+	rock.xu@nio.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v1] net: stmmac: xgmac: increase length limit of descriptor ring
+Date: Thu, 20 Jun 2024 16:52:00 +0800
+Message-Id: <20240620085200.583709-1-0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] bonding: 3ad: send rtnl ifinfo notify when mux
- state changed
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek
- <andy@greyhouse.net>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
- Amit Cohen <amcohen@nvidia.com>
-References: <20240620061053.1116077-1-liuhangbin@gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20240620061053.1116077-1-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 6/20/24 09:10, Hangbin Liu wrote:
-> Currently, administrators need to retrieve LACP mux state changes from
-> the kernel DEBUG log using netdev_dbg and slave_dbg macros. To simplify
-> this process, let's send the ifinfo notification whenever the mux state
-> changes. This will enable users to directly access and monitor this
-> information using the ip monitor command.
-> 
-> To achieve this, add a new enum NETDEV_LACP_STATE_CHANGE in netdev_cmd.
-> 
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
-> 
-> After this patch, we can see the following info with `ip -d monitor link`
-> 
-> 7: veth1@if6: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc noqueue master bond0 state UP group default
->     link/ether 02:0a:04:c2:d6:21 brd ff:ff:ff:ff:ff:ff link-netns b promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
->     veth
->     bond_slave state BACKUP mii_status UP ... ad_aggregator_id 1 ad_actor_oper_port_state 143 ad_actor_oper_port_state_str <active,short_timeout,aggregating,in_sync,expired> ad_partner_oper_port_state 55 ad_partner_oper_port_state_str <active,short_timeout,aggregating,collecting,distributing> ...
-> 7: veth1@if6: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc noqueue master bond0 state UP group default
->     link/ether 02:0a:04:c2:d6:21 brd ff:ff:ff:ff:ff:ff link-netns b promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
->     veth
->     bond_slave state ACTIVE mii_status UP ... ad_aggregator_id 1 ad_actor_oper_port_state 79 ad_actor_oper_port_state_str <active,short_timeout,aggregating,in_sync,defaulted> ad_partner_oper_port_state 1 ad_partner_oper_port_state_str <active> ...
-> 7: veth1@if6: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc noqueue master bond0 state UP group default
->     link/ether 02:0a:04:c2:d6:21 brd ff:ff:ff:ff:ff:ff link-netns b promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
->     veth
->     bond_slave state ACTIVE mii_status UP ... ad_aggregator_id 1 ad_actor_oper_port_state 63 ad_actor_oper_port_state_str <active,short_timeout,aggregating,in_sync,collecting,distributing> ad_partner_oper_port_state 63 ad_partner_oper_port_state_str <active,short_timeout,aggregating,in_sync,collecting,distributing> ...
-> 
-> ---
->  drivers/net/bonding/bond_3ad.c | 2 ++
->  include/linux/netdevice.h      | 1 +
->  net/core/dev.c                 | 2 +-
->  net/core/rtnetlink.c           | 1 +
->  4 files changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-> index c6807e473ab7..bcd8b16173f2 100644
-> --- a/drivers/net/bonding/bond_3ad.c
-> +++ b/drivers/net/bonding/bond_3ad.c
-> @@ -1185,6 +1185,8 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
->  		default:
->  			break;
->  		}
-> +
-> +		call_netdevice_notifiers(NETDEV_LACP_STATE_CHANGE, port->slave->dev);
->  	}
+DWXGMAC CORE supports a ring length of 65536 descriptors, bump max length
+from 1024 to 65536
 
-This will cause sleeping while atomic because
-ad_mux_machine() is called in atomic context (both rcu and bond mode
-spinlock held with bh disabled) in bond_3ad_state_machine_handler().
+Signed-off-by: Furong Xu <0x1207@gmail.com>
+---
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  2 ++
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  | 24 +++++++++++++++----
+ 2 files changed, 22 insertions(+), 4 deletions(-)
 
-Minor (and rather more personal pref) I'd split the addition of the new
-event and adding its first user (bond) for separate review.
-
-Cheers,
- Nik
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+index 6a2c7d22df1e..264f4f876c74 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+@@ -11,6 +11,8 @@
+ 
+ /* Misc */
+ #define XGMAC_JUMBO_LEN			16368
++#define XGMAC_DMA_MAX_TX_SIZE		65536
++#define XGMAC_DMA_MAX_RX_SIZE		65536
+ 
+ /* MAC Registers */
+ #define XGMAC_TX_CONFIG			0x00000000
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+index 18468c0228f0..3ae465c5a712 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+@@ -491,9 +491,16 @@ static void stmmac_get_ringparam(struct net_device *netdev,
+ 				 struct netlink_ext_ack *extack)
+ {
+ 	struct stmmac_priv *priv = netdev_priv(netdev);
++	u32 dma_max_rx_size = DMA_MAX_RX_SIZE;
++	u32 dma_max_tx_size = DMA_MAX_TX_SIZE;
+ 
+-	ring->rx_max_pending = DMA_MAX_RX_SIZE;
+-	ring->tx_max_pending = DMA_MAX_TX_SIZE;
++	if (priv->plat->has_xgmac) {
++		dma_max_rx_size = XGMAC_DMA_MAX_RX_SIZE;
++		dma_max_tx_size = XGMAC_DMA_MAX_TX_SIZE;
++	}
++
++	ring->rx_max_pending = dma_max_rx_size;
++	ring->tx_max_pending = dma_max_tx_size;
+ 	ring->rx_pending = priv->dma_conf.dma_rx_size;
+ 	ring->tx_pending = priv->dma_conf.dma_tx_size;
+ }
+@@ -503,12 +510,21 @@ static int stmmac_set_ringparam(struct net_device *netdev,
+ 				struct kernel_ethtool_ringparam *kernel_ring,
+ 				struct netlink_ext_ack *extack)
+ {
++	struct stmmac_priv *priv = netdev_priv(netdev);
++	u32 dma_max_rx_size = DMA_MAX_RX_SIZE;
++	u32 dma_max_tx_size = DMA_MAX_TX_SIZE;
++
++	if (priv->plat->has_xgmac) {
++		dma_max_rx_size = XGMAC_DMA_MAX_RX_SIZE;
++		dma_max_tx_size = XGMAC_DMA_MAX_TX_SIZE;
++	}
++
+ 	if (ring->rx_mini_pending || ring->rx_jumbo_pending ||
+ 	    ring->rx_pending < DMA_MIN_RX_SIZE ||
+-	    ring->rx_pending > DMA_MAX_RX_SIZE ||
++	    ring->rx_pending > dma_max_rx_size ||
+ 	    !is_power_of_2(ring->rx_pending) ||
+ 	    ring->tx_pending < DMA_MIN_TX_SIZE ||
+-	    ring->tx_pending > DMA_MAX_TX_SIZE ||
++	    ring->tx_pending > dma_max_tx_size ||
+ 	    !is_power_of_2(ring->tx_pending))
+ 		return -EINVAL;
+ 
+-- 
+2.34.1
 
 
