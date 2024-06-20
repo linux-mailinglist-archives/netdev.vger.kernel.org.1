@@ -1,148 +1,125 @@
-Return-Path: <netdev+bounces-105356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 781909109D6
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 17:27:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBBCF910A19
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 17:39:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 326B82820A8
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 15:27:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AF541C22150
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 15:39:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40572158DCE;
-	Thu, 20 Jun 2024 15:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73BCF1B1406;
+	Thu, 20 Jun 2024 15:39:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mVmfqjoF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kpSVrxW7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0821AED46
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 15:27:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A791B0125;
+	Thu, 20 Jun 2024 15:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718897259; cv=none; b=Z5AFhXry7Xgs0L9/PfBmZZ49GGcw75nj1t+fsPBNeVqxI7gosedB/aI4X+Xu1lOn8riXzmjsJzBpLc2G4nW3GWOKuYIf4je9l6nX74sPPMDncyf+zGSrD+JCUiW06dEli0XvbqqHrIDHbEKJ95y+qfa8fsRipIKqWMNn80yzguw=
+	t=1718897950; cv=none; b=P/8ZltntZkj204oBk4nTkmQZWmv7LBcU4jCgXPPgODm8PM3VLhp3Pb/FGt3vXLytNOZsvN6MZ5yOuSyHL/sqcZxUw9TvhsxIFOyjT+KMpZW2V/iL8QkYOBq88uCXUMQvsxVDVosfHBsMP5CIzB8U7910V2zkSkCAfon9SG/0JuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718897259; c=relaxed/simple;
-	bh=MpFakcow3PkSbqhHhn3NzhQLiCBT20uhaAyMOVuV/S8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Fuu/MHfVsSa1qppbxPwE3kr/EKLZVUOl5n0iKo/0XW+f1E+qJUVg51E8UtG3Fpsd/Em2JYGtebDdsFElzI/obHERhfd40PKgcEgsU8FzrSWQ+GPEbIWyXRaQI1ieVvCLzc0cBAtY4AECYpcZz9qDq6zFygwWPaVNHbAvyk+gFv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=mVmfqjoF; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45KFQSke012331
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 15:27:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=pp1; bh=M3x/fNov4Q5Al
-	NCFcjoPBVtSyft+Tgz0KJ0g5bElVlI=; b=mVmfqjoF1rj0qtNDGNV4Yq6m4zKTy
-	HokM1jLF56aXbEdhFvmEW+Aey9norDWZK5HeTU0fVwMx5iCvCH/WCeiKFVAisJ1i
-	VvotmOcGf63bJQmNX7Aho0Lq3AVbYtUw20bHdkTiK0f3wxHcHt+/fqA6or/z9Yxx
-	tiC0gGtuZ2Ci1F3cqKsxUl9jp+ZDT0LnIeHhfCDHqLiUtvC1xUrj9RffCU6Bu8tw
-	xLxttZmXSh6ANKlmBMy9i4rvvZXug4yFrwip8Vicuh1EuOum3PThst7p6wyZtMeD
-	nJ4MdDJ76zW42aXHDb04gTzxoEXHQC8t35RsgYrhbD2/E5OEa8n8k6IBg==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yvpneg30c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 15:27:36 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45KEacGj009422
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 15:23:40 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ysqgn72qt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 15:23:40 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45KFNZfk42664534
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 20 Jun 2024 15:23:37 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 66D9A58063;
-	Thu, 20 Jun 2024 15:23:35 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D17BF58068;
-	Thu, 20 Jun 2024 15:23:34 +0000 (GMT)
-Received: from tinkpad.ibmuc.com (unknown [9.61.39.25])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 20 Jun 2024 15:23:34 +0000 (GMT)
-From: Nick Child <nnac123@linux.ibm.com>
-To: netdev@vger.kernel.org
-Cc: nick.child@ibm.com, haren@linux.ibm.com, ricklind@us.ibm.com,
-        Nick Child <nnac123@linux.ibm.com>
-Subject: [PATCH net 2/2] ibmvnic: Free any outstanding tx skbs during scrq reset
-Date: Thu, 20 Jun 2024 10:23:12 -0500
-Message-Id: <20240620152312.1032323-3-nnac123@linux.ibm.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240620152312.1032323-1-nnac123@linux.ibm.com>
-References: <20240620152312.1032323-1-nnac123@linux.ibm.com>
+	s=arc-20240116; t=1718897950; c=relaxed/simple;
+	bh=YMJ5rg+LstDIy8JSldCpspn3ZdW7vTZ+L5dwUQKY7Bk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lmgD/HJRNF7A/F0oUrvqY3N6Rrl9+/0Ng/DmgQTe3w/uaueywSFtRucjWfHO+dR3r5mn9YR3YqktVvNlWKg9mnoB5B1hI9MGGtUVvBupnRWlqfk56c4+4UPFKuYVnj5le4g4ltXSLLIltFraqReOx0+z6CFHBzOfCdrlAsDv6FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kpSVrxW7; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57d0eca877cso1183271a12.2;
+        Thu, 20 Jun 2024 08:39:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718897947; x=1719502747; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bEZnmjNFKC4uie8fSpDDUfBNfzyWC2aExQeYe8P7A8c=;
+        b=kpSVrxW7y50q1lS+MbT39loX/IPgeBDmhWtJwsv5gnLeK8Mhy8Qb5q/dXgB0ygnT+Q
+         WZ+eCx8yF0wAGNdiehw57UDF3lX9jsYnG9et0ECIPrQr81woE+bJ04jzgaQqC14VqYGB
+         KHWgRueYGkWYcIhe5UkDD7V4u5BeflHd8E+9+thGAKrglNxudkDsoAYfWfyIcVdt+AV+
+         5nOI2Oobv4NmKy/pdG0ZKVW4zP/TJCuxYzTMBJ4OOUlvT93HxUGeWiT8gD5Slm/u5GmW
+         m4Q04LMe3ATyYoAyNGF4kgxwifcFi1STaky2wCbp5QJLbWYCCcX2Q4UOhHc5YH46mTIS
+         09Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718897947; x=1719502747;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bEZnmjNFKC4uie8fSpDDUfBNfzyWC2aExQeYe8P7A8c=;
+        b=crjLaKjkxL1df6F/QehfzAd9bWBF14mS9tCRIqjTl/Pt7eUkLkICfwGg/Rz7fm1ttw
+         scsz5oVJAKUpnu5mMdjSOapXzAbA/i3Un9Esboi/ttVdaiAzhrIBtHgHgv3+1ZTPvKG4
+         ge8Cg/oynTvMC6btolh3GLWDdW9hfFcscF5MsDRnyUV8V0ibm5H/Jvig3564bN7xSBQa
+         j9pqjsIYbxSmJkTj2GsOSydMP0EkHE6xKdim+jNyXjdwbyqfmc++Z1I83wxvWsSfESxs
+         LxBdaiM9xZQ3YQxTrg8eHQPctCRtBARJttc5lDhpMfPBSZ/WDj7VhSEhXbDmOC+/RWEc
+         1YGg==
+X-Forwarded-Encrypted: i=1; AJvYcCWsh5RnMje9j5YoqGWR13OBECLFjS22pppEFe2nMZdDrHGYeYhO/N7bSsH1U6MzVejmDQ0VcLe2FjytV5AX3gLQvmSnb08/Yln+GgES
+X-Gm-Message-State: AOJu0Yz88XlvAdrCe30icGmi2IYFhOAKlrNimETSkUSqT0JKWKh3NUh8
+	27zxt1XFkUsEcpN3+KZkRvSqqdt/CyHm66dRae9SM2S0/7Xz5gmS
+X-Google-Smtp-Source: AGHT+IFA98MSuyfBmi+dvaSL2Ri0kd08hpOT64n1FXIbWWmXEsW0KBOi+ncjA8nQvB7i6TvKKoYv4w==
+X-Received: by 2002:a17:907:c086:b0:a6f:b687:1ee3 with SMTP id a640c23a62f3a-a6fb687211dmr333086266b.1.1718897946474;
+        Thu, 20 Jun 2024 08:39:06 -0700 (PDT)
+Received: from skbuf ([188.25.55.166])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f5731cf4csm772363866b.188.2024.06.20.08.39.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jun 2024 08:39:05 -0700 (PDT)
+Date: Thu, 20 Jun 2024 18:39:03 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 03/12] net: dsa: tag_sja1105: absorb logic
+ for not overwriting precise info into dsa_8021q_rcv()
+Message-ID: <20240620153903.pxagjityrvff7e7x@skbuf>
+References: <20240619205220.965844-1-paweldembicki@gmail.com>
+ <20240619205220.965844-1-paweldembicki@gmail.com>
+ <20240619205220.965844-4-paweldembicki@gmail.com>
+ <20240619205220.965844-4-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: JDT0LstHQHk4lfDqpuxGePwl_I9MZyQh
-X-Proofpoint-ORIG-GUID: JDT0LstHQHk4lfDqpuxGePwl_I9MZyQh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-20_07,2024-06-20_04,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
- spamscore=0 mlxscore=0 phishscore=0 priorityscore=1501 adultscore=0
- lowpriorityscore=0 suspectscore=0 malwarescore=0 bulkscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406200111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240619205220.965844-4-paweldembicki@gmail.com>
+ <20240619205220.965844-4-paweldembicki@gmail.com>
 
-There are 2 types of outstanding tx skb's:
-Type 1: Packets that are sitting in the drivers ind_buff that are
-waiting to be batch sent to the NIC. During a device reset, these are
-freed with a call to ibmvnic_tx_scrq_clean_buffer()
-Type 2: Packets that have been sent to the NIC and are awaiting a TX
-completion IRQ. These are free'd during a reset with a call to
-clean_tx_pools()
+On Wed, Jun 19, 2024 at 10:52:09PM +0200, Pawel Dembicki wrote:
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> 
+> In both sja1105_rcv() and sja1110_rcv(), we may have precise source port
+> information coming from parallel hardware mechanisms, in addition to the
+> tag_8021q header.
+> 
+> Only sja1105_rcv() has extra logic to not overwrite that precise info
+> with what's present in the VLAN tag. This is because sja1110_rcv() gets
+> by, by having a reversed set of checks when assigning skb->dev. When the
+> source port is imprecise (vbid >=1), source_port and switch_id will be
+> set to zeroes by dsa_8021q_rcv(), which might be problematic. But by
+> checking for vbid >= 1 first, sja1110_rcv() fends that off.
+> 
+> We would like to make more code common between sja1105_rcv() and
+> sja1110_rcv(), and for that, we need to make sure that sja1110_rcv()
+> also goes through the precise source port preservation logic.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> ---
 
-During any reset which requires us to free the tx irq, ensure that the
-Type 2 skb references are freed. Since the irq is released, it is
-impossible for the NIC to inform of any completions.
-
-Furthermore, later in the reset process is a call to init_tx_pools()
-which marks every entry in the tx pool as free (ie not outstanding).
-So if the driver is to make a call to init_tx_pools(), it must first
-be sure that the tx pool is empty of skb references.
-
-This issue was discovered by observing the following in the logs during
-EEH testing:
-	TX free map points to untracked skb (tso_pool 0 idx=4)
-	TX free map points to untracked skb (tso_pool 0 idx=5)
-	TX free map points to untracked skb (tso_pool 1 idx=36)
-
-Fixes: 65d6470d139a ("ibmvnic: clean pending indirect buffs during reset")
-Signed-off-by: Nick Child <nnac123@linux.ibm.com>
----
- drivers/net/ethernet/ibm/ibmvnic.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-index 887d92a88403..23ebeb143987 100644
---- a/drivers/net/ethernet/ibm/ibmvnic.c
-+++ b/drivers/net/ethernet/ibm/ibmvnic.c
-@@ -4073,6 +4073,12 @@ static void release_sub_crqs(struct ibmvnic_adapter *adapter, bool do_h_free)
- 		adapter->num_active_tx_scrqs = 0;
- 	}
- 
-+	/* Clean any remaining outstanding SKBs
-+	 * we freed the irq so we won't be hearing
-+	 * from them
-+	 */
-+	clean_tx_pools(adapter);
-+
- 	if (adapter->rx_scrq) {
- 		for (i = 0; i < adapter->num_active_rx_scrqs; i++) {
- 			if (!adapter->rx_scrq[i])
--- 
-2.39.3
-
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Tested-by: Vladimir Oltean <olteanv@gmail.com>
 
