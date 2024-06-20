@@ -1,194 +1,118 @@
-Return-Path: <netdev+bounces-105182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FA8291005E
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 11:30:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DCA690FE61
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:11:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5551B20E93
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 09:30:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 818F31C22593
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17CBE199EBA;
-	Thu, 20 Jun 2024 09:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56849172BAB;
+	Thu, 20 Jun 2024 08:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="sOtNOmYZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B04LW5PG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-190c.mail.infomaniak.ch (smtp-190c.mail.infomaniak.ch [185.125.25.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6970C1802E
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 09:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A088B17109F
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 08:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718875846; cv=none; b=QZAy8DuVlWLcNfZPyanLTpcRiCtBN0/oMv2jrOgAZJbKb6IVtQZ05pP2M4Tfz7Wu+YdmO/IqKdsLw6U3W78VvOJN50WZVoA57NMMhDuTktAKewW/61sDMaibFgW3AJzbtVuK2b2/FLExiuvcnDI4OhCtMSJvz9dqmZtg4V8YLKA=
+	t=1718871095; cv=none; b=h1w9MshMksZsw/if7h1o756XLNQBBFq+z7N43JDqiXh1X/fVERsUDJv3gVNbcA2Pv0tq36xiAyJTWg71nkZ97Pvu0irLPhQk7v3bE/2fejJvkBSRZkHADp51/kjM94nFW/9NKcyauRPc77l4cfg59/dSGXJB525r0bR87lqtdPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718875846; c=relaxed/simple;
-	bh=FyjNm/I3kq/pP/dapIPg9gsHpP1PzC710dtt7pmzUKY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UNCf5XHUCbXXwpvLdKt82TEvlw7/t4PFYj8TrfiEuuO9KK44YxjrnovF46LHu/gW8JqBhjZR16vfI8pccGY7776GpBs47P6TGLK3QtxZlvakz9Ln4nox6Z+fZNvpi2WtUHcDWWhyWc4xsNEbTBzczFu7dh4feERqwtT1IWUX3cU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=sOtNOmYZ; arc=none smtp.client-ip=185.125.25.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4W4Xwr6kjdz8pT;
-	Thu, 20 Jun 2024 10:00:44 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1718870444;
-	bh=W/NUAL6voE5A4pFcJSHOLM46v6kGmeT8h3EcYwb3KUc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sOtNOmYZHEhT5EIB2V7KL7iSkDlMWcmlXneHp9D4RSJGbbkFF01kDHHlU3rEP3MqK
-	 db2AHQ+1PdQ3sARwOOndydYhkRuqDzzz0lu9vjn3Zis9aLshwsvhTNB4T4MNzlnX7h
-	 tVG6xTX3hNIg1t4k/xOjCkXRQ4pckdidlfeyTPvk=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4W4Xwk3bNHzMhc;
-	Thu, 20 Jun 2024 10:00:38 +0200 (CEST)
-Date: Thu, 20 Jun 2024 10:00:36 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
-	Eric Dumazet <edumazet@google.com>
-Cc: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>, 
-	willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, linux-security-module@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Subject: Re: [PATCH 1/2] landlock: Add hook on socket_listen()
-Message-ID: <20240620.teeFoot6gaeX@digikod.net>
-References: <20240408094747.1761850-1-ivanov.mikhail1@huawei-partners.com>
- <20240408094747.1761850-2-ivanov.mikhail1@huawei-partners.com>
- <20240425.Soot5eNeexol@digikod.net>
- <a18333c0-4efc-dcf4-a219-ec46480352b1@huawei-partners.com>
- <ZnMr30kSCGME16rO@google.com>
+	s=arc-20240116; t=1718871095; c=relaxed/simple;
+	bh=nkQ7gtmDXqC+tb5FPDsHBsceHRMcNng98BGyS80PcMI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eaPR4dDFS+FU1NruFo4uF+FjC1hABGZoyFtP5w/8e/3cMDk/Qwu6K9qUPRglXNeLNVOpG/sA18JtP8bDqMDkd0gHvv/uLmI4cJ4aKJSx2yP4yrqGGHqNvg8m1DlmN5r03SO2kQTYhSAV+DV9WaPoQgHt6JpLkTwjZuvSSaOfqfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B04LW5PG; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-422f7c7af49so135225e9.0
+        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 01:11:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718871092; x=1719475892; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=icwhTlmqewMfriTKSk9UemtNjHdNfz3zVniYSN/LKQs=;
+        b=B04LW5PG1vYGy9SJ3+3ayU1qrPRLaDzuXLD6VlDJC1ZRyqN8GJT1v0tm3Xia7ymzuB
+         58LkMzfr+gVddqfXAhbO6VIg5tIK37SSjtpwHjhFgUJhE+d/n6JbmlHYuyICGwmuuLor
+         F0spW6R+ux62L9yA6+ky5yuYTkV6yzoHzOieoF+gzrJeLZL5q4guuEShd5dFLTEUr9CV
+         CZ6wjHEBAIT8cvhjtxLGIA0DKZmsH0MxZRXRJp/wY06Xzf8dEdPxlG/6iw8jyUJNrIuN
+         2XRr+nRJga/F4IpW6EWNWoab5zoVm8Bg6za2xOnlk//2nmcTzv/RipYjHt0/U9gqKkYx
+         mb5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718871092; x=1719475892;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=icwhTlmqewMfriTKSk9UemtNjHdNfz3zVniYSN/LKQs=;
+        b=kDYJ8ZuswKzr0tTVdS1JdW8P79Fh25b9F+eLQY+ABXdSfOmU/SQATJOUMHXYqj73kE
+         6N8Nv2uD4xvIU7D3iny/mODtxhANqBfgcht2SRkxuiN7bv5ZcYIs8FtC+T5q10lHLWgU
+         zZM7qepKXwjIrKy5HBuaSze0KtGXzvm+1YJ8wpALGIY/YFRcE7VgjXWamNQlzk+anTi/
+         BlySiGL8qDCaxyu4aRnT6WixS8YQvrPoFLoYEHNkxRsdePmp1y9GWSVBegWyTqNlzhMP
+         SxvwSBRzbrqU4C+D2lHNboKJd9AVCEkCSWIMnM9ZPPYe6NgF9sQSoqbH6p3nWrETPRiM
+         XDPw==
+X-Forwarded-Encrypted: i=1; AJvYcCWBGJ4mApM9H9qAXOJvCLC5VJ2TWQbkbcQOgSpD45ExtB/Xpit6rIhokTezZovKy/Y1hiA5M1z0sGwPuacOq6wQTdQRwYFz
+X-Gm-Message-State: AOJu0Yz62NU0AR5zwRK+MsYSi1onBEn9kjS8+joAiTM6Z0IhtAfQcjy3
+	EkNUpLlnfoIaE70QCSRTNDlgH22VhIep2br5bJ/K7SGYg4jiBuhqGjO7Y2zOeL/CklGjNR54rmR
+	5ZGKpV3Ua4ET5xYgQFVU1xeFeR79CsDt8Z4cd
+X-Google-Smtp-Source: AGHT+IGZ0CZ4SxmeACPkWHCN+VwcMJt6V+5VQ4ov5E7/TmnG7pnoVfGftx12IHholKiEs22h4tmuQzch5JO7xwUQ0MM=
+X-Received: by 2002:a05:600c:6990:b0:41a:444b:e1d9 with SMTP id
+ 5b1f17b1804b1-424758fd363mr3162855e9.4.1718871091558; Thu, 20 Jun 2024
+ 01:11:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZnMr30kSCGME16rO@google.com>
-X-Infomaniak-Routing: alpha
+References: <20240618215313.29631-1-michael.chan@broadcom.com>
+ <20240618215313.29631-3-michael.chan@broadcom.com> <20240619171301.6fefef59@kernel.org>
+In-Reply-To: <20240619171301.6fefef59@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 20 Jun 2024 10:11:17 +0200
+Message-ID: <CANn89iJNF76m675MVz0f1eOjkGwGohj7jPBds6X061wz3dkO4w@mail.gmail.com>
+Subject: Re: [PATCH net 2/3] bnxt_en: Set TSO max segs on devices with limits
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net, netdev@vger.kernel.org, 
+	pabeni@redhat.com, pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com, 
+	Ajit Khaparde <ajit.khaparde@broadcom.com>, Somnath Kotur <somnath.kotur@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 19, 2024 at 09:05:03PM +0200, Günther Noack wrote:
-> I agree with Mickaël's comment: this seems like an important fix.
-> 
-> Mostly for completeness: I played with the "socket type" patch set in a "TCP
-> server" example, where *all* possible operations are restricted with Landlock,
-> including the ones from the "socket type" patch set V2 with the little fix we
-> discussed.
-> 
->  - socket()
->  - bind()
->  - enforce a landlock ruleset restricting:
->    - file system access
->    - all TCP bind and connect
->    - socket creation
->  - listen()
->  - accept()
-> 
-> From the connection handler (which would be the place where an attacker can
-> usually provide input), it is now still possible to bind a socket due to this
-> problem.  The steps are:
-> 
->   1) connect() on client_fd with AF_UNSPEC to disassociate the client FD
->   2) listen() on the client_fd
-> 
-> This succeeds and it listens on an ephemeral port.
-> 
-> The code is at [1], if you are interested.
-> 
-> [1] https://github.com/gnoack/landlock-examples/blob/main/tcpserver.c
-> 
-> 
-> On Mon, May 13, 2024 at 03:15:50PM +0300, Ivanov Mikhail wrote:
-> > 4/30/2024 4:36 PM, Mickaël Salaün wrote:
-> > > On Mon, Apr 08, 2024 at 05:47:46PM +0800, Ivanov Mikhail wrote:
-> > > > Make hook for socket_listen(). It will check that the socket protocol is
-> > > > TCP, and if the socket's local port number is 0 (which means,
-> > > > that listen(2) was called without any previous bind(2) call),
-> > > > then listen(2) call will be legitimate only if there is a rule for bind(2)
-> > > > allowing binding to port 0 (or if LANDLOCK_ACCESS_NET_BIND_TCP is not
-> > > > supported by the sandbox).
-> > > 
-> > > Thanks for this patch and sorry for the late full review.  The code is
-> > > good overall.
-> > > 
-> > > We should either consider this patch as a fix or add a new flag/access
-> > > right to Landlock syscalls for compatibility reason.  I think this
-> > > should be a fix.  Calling listen(2) without a previous call to bind(2)
-> > > is a corner case that we should properly handle.  The commit message
-> > > should make that explicit and highlight the goal of the patch: first
-> > > explain why, and then how.
-> > 
-> > Yeap, this is fix-patch. I have covered motivation and proposed solution
-> > in cover letter. Do you have any suggestions on how i can improve this?
-> 
-> Without wanting to turn around the direction of this code review now, I am still
-> slightly concerned about the assymetry of this special case being implemented
-> for listen() but not for connect().
-> 
-> The reason is this: My colleague Mr. B. recently pointed out to me that you can
-> also do a bind() on a socket before a connect(!). The steps are:
-> 
-> * create socket with socket()
-> * bind() to a local port 9090
-> * connect() to a remote port 8080
-> 
-> This gives you a connection between ports 9090 and 8080.
+On Thu, Jun 20, 2024 at 2:13=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 18 Jun 2024 14:53:12 -0700 Michael Chan wrote:
+> > Firmware will now advertise a non-zero TSO max segments if the
+> > device has a limit.  0 means no limit.  The latest 5760X chip
+> > (early revs) has a limit of 2047 that cannot be exceeded.  If
+> > exceeded, the chip will send out just a small number of segments.
+>
+> If we're only going to see 0 or 2047 pulling in the FW interface update
+> and depending on newer FW version isn't a great way to fix this, IMHO.
+>
+> TCP has min MSS of 500+ bytes, so 2k segments gives us 1MB LSO at min
+> legitimate segment size, right? So this is really just a protection
+> against bugs in the TCP stack, letting MSS slide below 100.
+>
 
-Yes, this should not be an issue, but something to keep in mind.
+TCP default MSS is 536 (if no MSS attribute  is present in SYN or
+SYNACK packets)
 
-> 
-> A regular connect() without an explicit bind() is of course the more usual
-> scenario.  In that case, we are also using up ("implicitly binding") one of the
-> ephemeral ports.
-> 
-> It seems that, with respect to the port binding, listen() and connect() work
-> quite similarly then?  This being considered, maybe it *is* the listen()
-> operation on a port which we should be restricting, and not bind()?
+But the minimal payload size per segment is 8
 
-I agree that we should be able to control listen according to the binded
-port, see https://github.com/landlock-lsm/linux/issues/15
-In a nutshell, the LANDLOCK_ACCESS_NET_LISTEN_TCP should make more sense
-for most use cases, but I think LANDLOCK_ACCESS_NET_BIND_TCP is also
-useful to limit opened (well-known) ports and port spoofing.
+#define TCP_MIN_SND_MSS                48
+#define TCP_MIN_GSO_SIZE       (TCP_MIN_SND_MSS - MAX_TCP_OPTION_SPACE)
 
-> 
-> With some luck, that would then also free us from having to implement the
-> check_tcp_socket_can_listen() logic, which is seemingly emulating logic from
-> elsewhere in the kernel?
 
-An alternative could be to only use LANDLOCK_ACCESS_NET_BIND_TCP for
-explicit binding (i.e. current state, but with appropriate
-documentation), and delegate to LANDLOCK_ACCESS_NET_LISTEN_TCP the
-control of binding with listen(2).  That should free us from
-implementing check_tcp_socket_can_listen().  The rationale would be that
-a malicious sandboxed process could not explicitly bind to a
-well-specified port, but only to a range of dedicated random ports (the
-same range use for auto-binding with connect).  That could also help
-developers by staying close to the kernel syscall ABI (principle of
-least astonishment).
-
-> 
-> (I am by far not an expert in Linux networking, so I'll put this out for
-> consideration and will happily stand corrected if I am misunderstanding
-> something.  Maybe someone with more networking background can chime in?)
-
-That would be good indeed.  Netfilter or network folks? Eric?
-
-> 
-> 
-> > > > +		/* Socket is alredy binded to some port. */
-> > > 
-> > > This kind of spelling issue can be found by scripts/checkpatch.pl
-> > 
-> > will be fixed
-> 
-> P.S. there are two typos here, the obvious one in "alredy",
-> but also the passive of "to bind" is "bound", not "binded".
-> (That is also mis-spelled in a few more places I think.)
-> 
-> —Günther
-> 
+> For a fix I'd just hardcode this to 2047 or even just 1k, and pull in
+> the new FW interface to make it configurable in net-next.
+> --
+> pw-bot: cr
 
