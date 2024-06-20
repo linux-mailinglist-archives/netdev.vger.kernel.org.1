@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-105471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5355D911530
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 23:56:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81318911573
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 00:12:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6617B20AF1
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 21:56:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F43D1F2468E
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 22:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029327E107;
-	Thu, 20 Jun 2024 21:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDE1E8626C;
+	Thu, 20 Jun 2024 22:12:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="BG9nirxj"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="D92K22+l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C7E59148
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 21:56:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E23823DC;
+	Thu, 20 Jun 2024 22:12:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718920591; cv=none; b=tNyJ6/jTOPpGKzDfJazhGj+IXAKjvy9ERsOMLFEVpJ8bdjGEaxuHSDWeg5JBmYtXLk8jhJsCj+aObE4WVACmjIvF8RL819i/am0TH06IVjvOIxcpZp4xH01nqBesaid+Dc1JUqLTeu/+58cvfhvvoODdObcswhv4Ts5+6thZmCM=
+	t=1718921569; cv=none; b=LOxGsLTA2bWeqH0uxQ8jaXMyC70I6KincpLHfOcPn/8LTeNT3yeqDNYrRF+BxEow+is19/7mOwbqTI9TfNeTY57EpBjmNN5OMFZaUxXEIDorcnx/JYlFeBORWyinJMeJSFKogdk20rKjVsDXQ0NhhULegMgBpMIZgienPnqkoTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718920591; c=relaxed/simple;
-	bh=qKhJBX/BtRyi65D2ZuVq8rZkDyU22r8/pcXDJNxGpkk=;
+	s=arc-20240116; t=1718921569; c=relaxed/simple;
+	bh=McFdFhFys/PJszK340ZE1UMzKFHFFTT446F3mihA0Fo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fzSIP/KRk5PfVI09Jsdm7p8Gp6JGoUBgxsvsamFZF0hsnzlFcSzZanW78JM8bKf9g1PxLeLV2iGGB9owYLH68FX7uwhqDxrBdaffoDAUFV6Z1Kh9Tk8girjPIbpGw4am/FBpWGeoq6/WqVD/7RqLGEoFaNDWBZQ2qog7Iju+CbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=BG9nirxj; arc=none smtp.client-ip=99.78.197.217
+	 MIME-Version:Content-Type; b=R5uPcufdJ9vVLWx4oqlrsxDDhVeyhS/DKa5Dhthaf3mRaVCzXdCJfvWB6+RsnTH4ZUJyvTzeM/EIEf4QlmqsJsmKmkMM5ER0ni1+klchKXd1D7t01oWZRsrXIG+IckarXeWYvJ+449XAFmqKBG1YJEIGAv4OdE//2u0uUF0h7gY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=D92K22+l; arc=none smtp.client-ip=99.78.197.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1718920591; x=1750456591;
+  t=1718921568; x=1750457568;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Y6z0qCNYxhDWMtwZY6M3tKIAReDAKXeMyRgKTgq/p+s=;
-  b=BG9nirxjQo0ttih2VNq+diE+BIrtnY44QrIkoHdXdbdvgbFd/QrLlzHa
-   dKhhLcSOtGsDT0hzkyO3ZpDVR8eqKO0Wi5LULMxM5wBsZUl52BryQsWJs
-   9VzoE0vM4LBg/rioPnvOXcFapndEhz839MQnhf/1QDqz4tTuUKNWFGnaV
+  bh=dJth7/j4c4y/GYGXwpBRMUEd9u4X+uJ0ya7Z4iQmPfs=;
+  b=D92K22+lr0N9wb4az5xmKvoZP+AlLGfeqqE1l7HOC66WjQxHeXT+/oAc
+   o835pBsISkEim75X9b8mzCWo+vkDjYffq763s9tooLeg08DeNDw1In96/
+   A7HuzCsrvcB2sa2PEBS/AQVmFbuDn8IzBP2J/CBV6RGKWE6O6OEsSpv9f
    o=;
 X-IronPort-AV: E=Sophos;i="6.08,252,1712620800"; 
-   d="scan'208";a="303646017"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 21:56:28 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:48043]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.4.208:2525] with esmtp (Farcaster)
- id b13ad04a-4411-4022-bb5d-57d8d1a77309; Thu, 20 Jun 2024 21:56:28 +0000 (UTC)
-X-Farcaster-Flow-ID: b13ad04a-4411-4022-bb5d-57d8d1a77309
+   d="scan'208";a="98307744"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 22:12:39 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:58362]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.10.32:2525] with esmtp (Farcaster)
+ id 5bd8988a-0bff-4c7f-bcc8-35ac088a9125; Thu, 20 Jun 2024 22:12:38 +0000 (UTC)
+X-Farcaster-Flow-ID: 5bd8988a-0bff-4c7f-bcc8-35ac088a9125
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Thu, 20 Jun 2024 21:56:27 +0000
+ 15.2.1258.34; Thu, 20 Jun 2024 22:12:34 +0000
 Received: from 88665a182662.ant.amazon.com.com (10.187.171.36) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Thu, 20 Jun 2024 21:56:25 +0000
+ 15.2.1258.34; Thu, 20 Jun 2024 22:12:32 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: <mhal@rbox.co>
-CC: <cong.wang@bytedance.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v2 net 01/15] af_unix: Set sk->sk_state under unix_state_lock() for truly disconencted peer.
-Date: Thu, 20 Jun 2024 14:56:16 -0700
-Message-ID: <20240620215616.64048-1-kuniyu@amazon.com>
+CC: <bpf@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<jakub@cloudflare.com>, <john.fastabend@gmail.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net] af_unix: Disable MSG_OOB handling for sockets in sockmap/sockhash
+Date: Thu, 20 Jun 2024 15:12:23 -0700
+Message-ID: <20240620221223.66096-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <b29d7ead-6e2c-4a52-9a0a-56892e0015b6@rbox.co>
-References: <b29d7ead-6e2c-4a52-9a0a-56892e0015b6@rbox.co>
+In-Reply-To: <20240620203009.2610301-1-mhal@rbox.co>
+References: <20240620203009.2610301-1-mhal@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,72 +76,121 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWA002.ant.amazon.com (10.13.139.53) To
+X-ClientProxiedBy: EX19D044UWB001.ant.amazon.com (10.13.139.171) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
+Sorry for not mentioning this before, but could you replace "net" with
+"bpf" in Subject and rebase the patch on bpf.git so that we can trigger
+the patchwork's CI ?
+
+https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git
+
+
 From: Michal Luczaj <mhal@rbox.co>
-Date: Thu, 20 Jun 2024 22:35:55 +0200
-> In fact, should I try to document those not-so-obvious OOB/sockmap
-> interaction? And speaking of documentation, an astute reader noted that
-> `man unix` is lying:
+Date: Thu, 20 Jun 2024 22:20:05 +0200
+> AF_UNIX socket tracks the most recent OOB packet (in its receive queue)
+> with an `oob_skb` pointer. BPF redirecting does not account for that: when
+> an OOB packet is moved between sockets, `oob_skb` is left outdated. This
+> results in a single skb that may be accessed from two different sockets.
+> 
+> Take the easy way out: silently drop MSG_OOB data targeting any socket that
+> is in a sockmap or a sockhash. Note that such silent drop is akin to the
+> fate of redirected skb's scm_fp_list (SCM_RIGHTS, SCM_CREDENTIALS).
+> 
+> For symmetry, forbid MSG_OOB in unix_bpf_recvmsg().
+> 
+> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Fixes: 314001f0bf92 ("af_unix: Add OOB support")
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
+>  net/unix/af_unix.c  | 30 +++++++++++++++++++++++++++++-
+>  net/unix/unix_bpf.c |  3 +++
+>  2 files changed, 32 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 5e695a9a609c..3a55d075f199 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -2653,10 +2653,38 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
+>  
+>  static int unix_stream_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
+>  {
+> +	struct unix_sock *u = unix_sk(sk);
+> +	struct sk_buff *skb;
+> +	int err;
+> +
+>  	if (unlikely(READ_ONCE(sk->sk_state) != TCP_ESTABLISHED))
+>  		return -ENOTCONN;
+>  
+> -	return unix_read_skb(sk, recv_actor);
+> +	mutex_lock(&u->iolock);
+> +	skb = skb_recv_datagram(sk, MSG_DONTWAIT, &err);
 
-At least I wouldn't update man until we can say AF_UNIX MSG_OOB handling
-is stable enough; the behaviour is not compliant with TCP now.
+	mutex_unlock(&u->iolock);
 
-While rewriting the oob test thoroughly, I found few more weird behaviours,
-and patches will follow.
+I think we can drop mutex here as the skb is already unlinked
+and no receiver can touch it.
 
-For example:
+and the below part can be like the following not to slow down
+the common case:
 
-  >>> from socket import *
-  >>> c1, c2 = socketpair(AF_UNIX)
-  >>> c1.send(b'hello', MSG_OOB)
-  5
-  >>> c1.send(b'world')
-  5
-  >>> c2.recv(10)
-  b'hell'
-  >>> c2.recv(1, MSG_OOB)
-  b'o'
-  >>> c2.setblocking(False)  # This causes -EAGAIN even with available data
-  >>> c2.recv(5)
-  Traceback (most recent call last):
-    File "<stdin>", line 1, in <module>
-  BlockingIOError: [Errno 11] Resource temporarily unavailable
-  >>> c2.recv(5)
-  b'world'
+	if (!skb)
+		return err;
+
+> +
+> +#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
+> +	if (skb) {
+
+	if (unlikely(skb == READ_ONCE(u->oob_skb))) {
 
 
-And we need
+> +		bool drop = false;
+> +
+> +		spin_lock(&sk->sk_receive_queue.lock);
+> +		if (skb == u->oob_skb) {
 
----8<---
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 5e695a9a609c..2875a7ce1887 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -2614,9 +2614,20 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
- 	struct unix_sock *u = unix_sk(sk);
- 
- 	if (!unix_skb_len(skb) && !(flags & MSG_PEEK)) {
--		skb_unlink(skb, &sk->sk_receive_queue);
--		consume_skb(skb);
--		skb = NULL;
-+		struct sk_buff *unlinked_skb = skb;
-+
-+		spin_lock(&sk->sk_receive_queue.lock);
-+
-+		__skb_unlink(skb, &sk->sk_receive_queue);
-+
-+		if (copied)
-+			skb = NULL;
-+		else
-+			skb = skb_peek(&sk->sk_receive_queue);
-+
-+		spin_unlock(&sk->sk_receive_queue.lock);
-+
-+		consume_skb(unlinked_skb);
- 	} else {
- 		struct sk_buff *unlinked_skb = NULL;
- 
----8<---
+		if (likely(skb == u->oob_skb)) {
+
+> +			WRITE_ONCE(u->oob_skb, NULL);
+> +			drop = true;
+> +		}
+> +		spin_unlock(&sk->sk_receive_queue.lock);
+> +
+> +		if (drop) {
+> +			WARN_ON_ONCE(skb_unref(skb));
+> +			kfree_skb(skb);
+> +			skb = NULL;
+> +			err = -EAGAIN;
+			return -EAGAIN;
+
+> +		}
+> +	}
+> +#endif
+
+	return recv_actor(sk, skb);
+
+Thanks!
+
+> +
+> +	mutex_unlock(&u->iolock);
+> +	return skb ? recv_actor(sk, skb) : err;
+>  }
+>  
+>  static int unix_stream_read_generic(struct unix_stream_read_state *state,
+> diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
+> index bd84785bf8d6..bca2d86ba97d 100644
+> --- a/net/unix/unix_bpf.c
+> +++ b/net/unix/unix_bpf.c
+> @@ -54,6 +54,9 @@ static int unix_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+>  	struct sk_psock *psock;
+>  	int copied;
+>  
+> +	if (flags & MSG_OOB)
+> +		return -EOPNOTSUPP;
+> +
+>  	if (!len)
+>  		return 0;
+>  
+> -- 
+> 2.45.1
 
