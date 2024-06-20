@@ -1,336 +1,354 @@
-Return-Path: <netdev+bounces-105361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 014E0910C03
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 18:20:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B1107910C1D
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 18:23:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 250971C2314B
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 16:20:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE4C31C208BE
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 16:23:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1103A1B3736;
-	Thu, 20 Jun 2024 16:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02431B29B6;
+	Thu, 20 Jun 2024 16:23:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bfv6mNz/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jW8l+4Qq"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDEA1B14F1;
-	Thu, 20 Jun 2024 16:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83CE1CD3D;
+	Thu, 20 Jun 2024 16:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718900368; cv=none; b=oLCMoskJfa9/UMlvQZqVfQUx4OKrM6WLFX06tNP5UAs0A5ikj+M1U2kbiWO+3wj7Kd/CTV+q27BMoKFeb0K/zKETCuDfQ37Id3yRmzXsxGquod8crs+duHGbDvvQYatoRha51gFTlOjEjhiwP2EMAN3y52QHiDIHPtOJUJcUij0=
+	t=1718900614; cv=none; b=DXB3wzdlPefLlntfZVYO9qmLbtQqGDO9Vfz8QK1aqFOPXBdjTJv4rOEsp5dpvmB9WkhoxvfuytDBZahP0cXuZVB9g4qPo2xKvuWHA3TLb+CVP3MAnswGz9jnO/DklCR49w7HzdxGBcRxxFG93pxTI5CUfQ6Qnex31GdnR18e3tg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718900368; c=relaxed/simple;
-	bh=Es12sheN2y5RU4QdYWGl6BsUJmW7oPdTpSxGocmAOBc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mRRK9hAeRWcxBCajSfxi46vOROwwNJ/oXXryS1LhGoyMUkQQ09SwP8E6+89aDeW0Z7m/rXBc8NPeAGtwKGt+suhlfbBCk1IyP1rxnElSp3oNPKX+onksQl5ZxB2f8e8DGJXeyvklvLXpvPHwSmzItIWETfiPKUae51ahFqMoLvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=bfv6mNz/; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Es12sheN2y5RU4QdYWGl6BsUJmW7oPdTpSxGocmAOBc=; b=bfv6mNz/fhutHdX5xNiEDQFm5/
-	/ou0E8SM4rlMzPL505IA9eahOqWm+67GxIWyPVImT2AbTXMnsfB8+FMWMaQQTl64g6OjH5lAKfvju
-	RIRdFl/JcfbT4r94mZY6a2X65MCnCkGmvGdygP4dKnSmDzS3Isq3EUgPfp++/S1RR8w5DHEaBnZva
-	cTunK9bAGLSxeZLi9urUVt5qgfPdsupyzz41sFUelHcW04/fJnJ+37V9D7R0J5ZufrDRBDIR80dDd
-	vdR0mtxmJlAluzVroYvL16MJJ803WiPCV7TKgZ6sB4+62PwHaUGRbr1AmQVGUOOwsu+idJ2PnRiMY
-	L/kO1Q1Q==;
-Received: from [2001:8b0:10b:5:e421:dd18:8da5:9cf5] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sKKVF-00000006F9u-2JSE;
-	Thu, 20 Jun 2024 16:19:13 +0000
-Message-ID: <db594efd5a5774748a9ef07cc86741f5a677bdbf.camel@infradead.org>
-Subject: Re: [RFC PATCH v3 0/7] Add virtio_rtc module and related changes
-From: David Woodhouse <dwmw2@infradead.org>
-To: Peter Hilber <peter.hilber@opensynergy.com>,
- linux-kernel@vger.kernel.org,  virtualization@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org,  linux-rtc@vger.kernel.org, "Ridoux,
- Julien" <ridouxj@amazon.com>,  virtio-dev@lists.linux.dev
-Cc: "Christopher S. Hall" <christopher.s.hall@intel.com>, Jason Wang
- <jasowang@redhat.com>, John Stultz <jstultz@google.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, Richard Cochran
- <richardcochran@gmail.com>, Stephen Boyd <sboyd@kernel.org>, Thomas
- Gleixner <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marc
- Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Daniel
- Lezcano <daniel.lezcano@linaro.org>, Alessandro Zummo
- <a.zummo@towertech.it>,  Alexandre Belloni <alexandre.belloni@bootlin.com>
-Date: Thu, 20 Jun 2024 17:19:12 +0100
-In-Reply-To: <671a784b-234f-4be6-80bf-5135e257ed40@opensynergy.com>
-References: <20231218073849.35294-1-peter.hilber@opensynergy.com>
-	 <684eac07834699889fdb67be4cee09319c994a42.camel@infradead.org>
-	 <671a784b-234f-4be6-80bf-5135e257ed40@opensynergy.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-LGyZ84kc62+QqOi2YXV1"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1718900614; c=relaxed/simple;
+	bh=cA6xfkPCA7PV7l7TkuYNFtjd8vwJZYn9Cq2GBBMIa9Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tij0+4n6Utll9YI4amXDdmBS6Oyg/dyIYyuYPO6LJNSE8ystoQRbln+d5chYZxtIC5dGADXi8N3EA71lhSlZeyUMxN8l62c7NTB1exzpOiNYgwH0uWa+TX+iMRAEEzsgTRKwZbzyJ2zn/UWE8m7vvzTU/0hkGrq3J+0N9hXAHr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jW8l+4Qq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8179C2BD10;
+	Thu, 20 Jun 2024 16:23:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718900614;
+	bh=cA6xfkPCA7PV7l7TkuYNFtjd8vwJZYn9Cq2GBBMIa9Y=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jW8l+4QqdYz41zrgkWVoXXMzEYTqoMMfLowBT6TRr4sth6chTVMZKOiUnsV/dlQRo
+	 3U7BALa+BVXoUB5BfV9/6IHZklGl5of7D7q9P+cIVTcAydArnqGwEpOwTZfrt0HImy
+	 gUpR/a3f3xuz8b2jK7S5KKAcnmm2pn0agod1LHA0asMoNPlUlQiuNqCEgj1fOzpu/a
+	 Z3yfo9EfuJy3QD1pjdgJMb6wh0lZGIgcgYiRX9siwIdTsUvcbkyAKR4zTIaB7+i6zp
+	 z421+QBvSyaKSn8VfHje+o0h+y+PiE47t0893bx733EitbeKCm6OEOzulMg81sCn+w
+	 hjQNjQ8ZSqleg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking for v6.10-rc5
+Date: Thu, 20 Jun 2024 09:23:33 -0700
+Message-ID: <20240620162333.2386649-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+Hi Linus!
 
---=-LGyZ84kc62+QqOi2YXV1
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Happy summer solstice! The line count is a bit inflated by a selftest
+and update to a driver's FW interface header, in reality the PR is
+slightly below average for us. We are expecting one driver fix from
+Intel, but there are no big known issues.
 
-On Thu, 2024-06-20 at 14:37 +0200, Peter Hilber wrote:
-> Changing virtio-dev address to the new one. The discussion might also be
-> relevant for virtio-comment, but it is discouraged to forward it to both.
+The following changes since commit d20f6b3d747c36889b7ce75ee369182af3decb6b:
 
-I will happily take it to whichever forum you think is most
-appropriate. (And you have my permission to direct replies to whichever
-you choose.)
+  Merge tag 'net-6.10-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-06-13 11:11:53 -0700)
 
-> On 15.06.24 10:40, David Woodhouse wrote:
-> > As discussed before, I don't think it makes sense to design a new high-
-> > precision virtual clock which only gets it right *most* of the time. We
-> > absolutely need to address the issue of live migration.
- ...
-> > Here's a first attempt at defining such a memory structure. For now
-> > I've done it as a "vmclock" ACPI device based loosely on vmgenid, but I
-> > think it makes most sense for this to be part of the virtio_rtc spec.
-> > Ultimately it doesn't matter *how* the guest finds the memory region.
->=20
-> This looks sensible to me. I also think it would be possible to adapt thi=
-s for
-> the virtio-rtc spec. The proposal also supports some other use cases whic=
-h are
-> not in the virtio-rtc RFC spec v4 [2], notably vDSO-style clock reading, =
-and
-> others such as indication of a past leap second.
+are available in the Git repository at:
 
-Right. The vDSO-style clock reading is key to solving the live
-migration problem.
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.10-rc5
 
-The other key thing this adds is the error bounds, which some
-applications care deeply about. I've been working with the team that
-owns ClockBound on that part: https://github.com/aws/clock-bound
+for you to fetch changes up to fba383985354e83474f95f36d7c65feb75dba19d:
 
-> Compared to the virtio-rtc RFC spec v4 [2], this proposal does not seem t=
-o
-> support leap second smearing.=C2=A0
+  net: usb: rtl8150 fix unintiatilzed variables in rtl8150_get_link_ksettings (2024-06-20 07:15:17 -0700)
 
-That's kind of intentional. Leap second smearing should be considered
-the *antithesis* of precise time. Anyone who wants a monotonic realtime
-clock should be using the POSIX CLOCK_TAI.
+----------------------------------------------------------------
+Including fixes from wireless, bpf and netfilter.
 
-Part of my motivation for fixing the LM problem is because some
-financial institutions can incur significant penalties for putting
-inaccurate timestamps on transactions =E2=80=94 even the disruption caused =
-by
-live migration is enough to trigger that. So deliberately lying to them
-about what the UTC time is, by up to a second in either direction, is
-not necessarily in their best interest.
+Current release - regressions:
 
-As you noted, this proposal does expose leap seconds in the recent
-past, which is all that's needed to allow a guest to generate a smeared
-clock *from* the accurate clock that is provided through this
-mechanism.
+ - ipv6: bring NLM_DONE out to a separate recv() again
 
-(Knowledge of past leap seconds is needed because in some modes,
-smearing adjustments continue for some hours *afte* the leap second
-should have occurred. So the NTP style of leap indicator isn't
-sufficient).
+Current release - new code bugs:
 
-> Also, it would be helpful to allow indicating
-> when some of the fields are not valid (such as leapsecond_counter_value,
-> leapsecond_tai_time, tai_offset_sec, utc_time_maxerror_picosec, ...).
+ - wifi: cfg80211: wext: set ssids=NULL for passive scans via old wext API
 
-Right. For some of those the answer can just be 'zero means invalid',
-for the max error, perhaps MAX_UINT64. But we should definitely make
-that explicit.
+Previous releases - regressions:
 
-I'm also not entirely sure I understood Julien's insistence that we
-include the leapsecond_counter_value as *well* as the
-leapsecond_tai_time. It seems to me that the implementation would have
-to recalculate that every time the frequency is adjusted.=20
+ - wifi: mac80211: fix monitor channel setting with chanctx emulation
+   (probably most awaited of the fixes in this PR, tracked by Thorsten)
 
-For some of those fields, I was expecting a certain amount of
-bikeshedding to occur and figured it was better to post an early straw
-man and solicit feedback.
+ - usb: ax88179_178a: bring back reset on init, if PHY is disconnected
 
-> Do you have plans to contribute this to the Virtio specification and Linu=
-x
-> driver implementation?
+ - bpf: fix UML x86_64 compile failure with BPF
 
-Yes, absolutely. For now I've implemented it in the Linux guest=C2=B9 and i=
-n
-QEMU=C2=B2 as an ACPI device modelled on vmgenid, but I'd love *not* to hav=
-e
-to do that, and just to do it based on virtio instead.
+ - bpf: avoid splat in pskb_pull_reason(), sanity check added can be hit
+   with malicious BPF
 
-=C2=B9 https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/=
-vmclock
-=C2=B2 https://git.infradead.org/users/dwmw2/qemu.git/shortlog/refs/heads/v=
-mclock
+ - eth: mvpp2: use slab_build_skb() for packets in slab, driver was
+   missed during API refactoring
 
+ - wifi: iwlwifi: add missing unlock of mvm mutex
 
-> > +static const struct ptp_clock_info ptp_vmclock_info =3D {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.owner=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D THIS_MODULE,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.max_adj=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D 0,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.n_ext_ts=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=3D 0,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.n_pins=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D 0,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.pps=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D 0,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.adjfine=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D ptp_vmclock_adjfine,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.adjtime=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D ptp_vmclock_adjtime,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.gettime64=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=3D ptp_vmclock_gettime,
->=20
-> Should implement .gettimex64 instead.
+Previous releases - always broken:
 
-Ack, thanks. I'll go play with that.
+ - ipv6: add a number of missing null-checks for in6_dev_get(), in case
+   IPv6 disabling races with the datapath
 
->=20
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Counter frequency, and er=
-ror margin. Units of (second >> 64) */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint64_t counter_period_frac=
-_sec;
->=20
-> AFAIU this might limit the precision in case of high counter frequencies.
-> Could the unit be aligned to the expected frequency band of counters?
+ - bpf: fix reg_set_min_max corruption of fake_reg
 
-This field indicates the period of a single tick, in units of 1>>64 of
-a second. That's about 5.4e-20 seconds, or 54 zeptoseconds?=20
+ - sched: act_ct: add netns as part of the key of tcf_ct_flow_table
 
-Can you walk me through a calculation where you believe that level of
-precision is insufficient?
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-I guess the precision matters if the structure isn't updated for a long
-period of time, and the delta between the current counter and the
-snapshot is high? That's a *lot* of 54 zeptosecondses? But you really
-would need a *lot* of them before you care? And if nobody's been
-calibrating your counter for that long, surely you have bigger worries?
+----------------------------------------------------------------
+Adrian Moreno (1):
+      selftests: openvswitch: Set value to nla flags.
 
-Am I missing something there?
+Aryan Srivastava (1):
+      net: mvpp2: use slab_build_skb for oversized frames
 
+Ayala Beker (1):
+      wifi: iwlwifi: scan: correctly check if PSC listen period is needed
 
---=-LGyZ84kc62+QqOi2YXV1
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+Dan Carpenter (1):
+      ptp: fix integer overflow in max_vclocks_store
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwNjIwMTYxOTEyWjAvBgkqhkiG9w0BCQQxIgQgRwgsvTZD
-Yl05/GRrSaGKa7FiAB8sVwP2d8wnaSYGgwowgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBqSVFhJCyRAhcrBsrnkUmIw2EXfteeRiw6
-nw0ezRN6zA1AbBXIm5lRVJQb9HlA4xtduqXEwwit60Xd2pjvgH50MZeLDUO5gHB9n+Xs7jMdXSBk
-FKYGsUYeEM+luTpmfNirx1aih41nXHnScFya7FSDliYVcDtf0HyEdXzSBqAUjgPY49nXBZZx9ZXX
-nR9FJOX+O1ZNsVpcZ0dDDn8sTw9oAiw3VzNggjiKmjlB4clvRUUykb8knNE364D2PXUhBxtf2drQ
-nPGXH7YfczxiUTwvGLSHQeRkxc1wSfVkSBhFpeTcpXpQvKUvhNR3LNzoTQHb/FYSS5CGtUJ+l17L
-DWN3phTXB/FiCyClCEtnctruuCaSjpSFl1riaV0Q4Jxwp3uIDSWhIDk4BysM/Mz1MwWyYF5kCGnP
-s2+payt+I5vtE4uTwK+S4Xmi8NWGE8sw9bSWM/DCbOmGRMndRXQsoN0SDomhZzcjCOutjgxJGM4E
-P24L3AWx7VsEFC5A8sBIvhLqEZL6JmaDeavV4jEbSVnfJj4AuBIlW8+XqA6mwzeJ9Ty6Fegnw6lT
-Do0D3f/IfaAHRqOgIjmeO2Pn27dpQl++8lq01NpgMg31o0HKdb2Z5PIrlYLrgvoOcxQwplRwOLcG
-OnR6mdFLO58ycwe3K28HXCf5tYv8YhiSCFik950fTQAAAAAAAA==
+Daniel Borkmann (3):
+      bpf: Fix reg_set_min_max corruption of fake_reg
+      bpf: Reduce stack consumption in check_stack_write_fixed_off
+      selftests/bpf: Add test coverage for reg_set_min_max handling
 
+David Ruth (1):
+      net/sched: act_api: fix possible infinite loop in tcf_idr_check_alloc()
 
---=-LGyZ84kc62+QqOi2YXV1--
+David S. Miller (1):
+      Merge branch 'virtio_net-csum-xdp-fixes'
+
+Dmitry Antipov (1):
+      wifi: cfg80211: wext: add extra SIOCSIWSCAN data check
+
+Dmitry Safonov (1):
+      net/tcp_ao: Don't leak ao_info on error-path
+
+En-Wei Wu (1):
+      ice: avoid IRQ collision to fix init failure on ACPI S3 resume
+
+Eric Dumazet (4):
+      tcp: clear tp->retrans_stamp in tcp_rcv_fastopen_synack()
+      ipv6: prevent possible NULL deref in fib6_nh_init()
+      ipv6: prevent possible NULL dereference in rt6_probe()
+      xfrm6: check ip6_dst_idev() return value in xfrm6_get_saddr()
+
+Florian Westphal (1):
+      bpf: Avoid splat in pskb_pull_reason
+
+Gavrilov Ilia (1):
+      netrom: Fix a memory leak in nr_heartbeat_expiry()
+
+Geetha sowjanya (1):
+      octeontx2-pf: Fix linking objects into multiple modules
+
+Heng Qi (2):
+      virtio_net: checksum offloading handling fix
+      virtio_net: fixing XDP for fully checksummed packets handling
+
+Ignat Korchagin (1):
+      net: do not leave a dangling sk pointer, when socket creation fails
+
+Jakub Kicinski (6):
+      Merge tag 'wireless-2024-06-14' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
+      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
+      netdev-genl: fix error codes when outputting XDP features
+      Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+      ipv6: bring NLM_DONE out to a separate recv() again
+      Merge branch 'bnxt_en-bug-fixes-for-net'
+
+Jianguo Wu (4):
+      seg6: fix parameter passing when calling NF_HOOK() in End.DX4 and End.DX6 behaviors
+      netfilter: move the sysctl nf_hooks_lwtunnel into the netfilter core
+      selftests: add selftest for the SRv6 End.DX4 behavior with netfilter
+      selftests: add selftest for the SRv6 End.DX6 behavior with netfilter
+
+Jiri Pirko (1):
+      selftests: virtio_net: add forgotten config options
+
+Johannes Berg (2):
+      wifi: cfg80211: wext: set ssids=NULL for passive scans
+      wifi: mac80211: fix monitor channel with chanctx emulation
+
+Jose Ignacio Tornos Martinez (1):
+      net: usb: ax88179_178a: improve reset check
+
+Jozsef Kadlecsik (1):
+      netfilter: ipset: Fix suspicious rcu_dereference_protected()
+
+Kenton Groombridge (1):
+      wifi: mac80211: Avoid address calculations via out of bounds array indexing
+
+Maciej Żenczykowski (1):
+      bpf: fix UML x86_64 compile failure
+
+Marcin Szycik (1):
+      ice: Fix VSI list rule with ICE_SW_LKUP_LAST type
+
+Matthieu Baerts (NGI0) (1):
+      selftests: mptcp: userspace_pm: fixed subtest names
+
+Michael Chan (2):
+      bnxt_en: Update firmware interface to 1.10.3.44
+      bnxt_en: Set TSO max segs on devices with limits
+
+Oleksij Rempel (3):
+      net: phy: dp83tg720: wake up PHYs in managed mode
+      net: phy: dp83tg720: get master/slave configuration in link down state
+      net: stmmac: Assign configured channel value to EXTTS event
+
+Oliver Neukum (1):
+      net: usb: rtl8150 fix unintiatilzed variables in rtl8150_get_link_ksettings
+
+Ondrej Mosnacek (2):
+      cipso: fix total option length computation
+      cipso: make cipso_v4_skbuff_delattr() fully remove the CIPSO options
+
+Paolo Abeni (2):
+      Merge branch 'net-lan743x-fixes-for-multiple-wol-related-issues'
+      Merge tag 'nf-24-06-19' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+
+Paul Greenwalt (1):
+      ice: fix 200G link speed message log
+
+Pavan Chebbi (1):
+      bnxt_en: Restore PTP tx_avail count in case of skb_pad() error
+
+Raju Lakkaraju (3):
+      net: lan743x: disable WOL upon resume to restore full data path operation
+      net: lan743x: Support WOL at both the PHY and MAC appropriately
+      net: phy: mxl-gpy: Remove interrupt mask clearing from config_init
+
+Remi Pommarel (1):
+      wifi: mac80211: Recalc offload when monitor stop
+
+Shaul Triebitz (2):
+      wifi: iwlwifi: mvm: unlock mvm mutex
+      wifi: iwlwifi: mvm: fix ROC version check
+
+Simon Horman (2):
+      selftests: openvswitch: Use bash as interpreter
+      octeontx2-pf: Add error handling to VLAN unoffload handling
+
+Stanislav Fomichev (1):
+      MAINTAINERS: mailmap: Update Stanislav's email address
+
+Stefan Wahren (1):
+      qca_spi: Make interrupt remembering atomic
+
+Tony Ambardar (2):
+      compiler_types.h: Define __retain for __attribute__((__retain__))
+      bpf: Harden __bpf_kfunc tag against linker kfunc removal
+
+Wojciech Drewek (1):
+      ice: implement AQ download pkg retry
+
+Xiaolei Wang (1):
+      net: stmmac: No need to calculate speed divider when offload is disabled
+
+Xin Long (2):
+      tipc: force a dst refcount before doing decryption
+      sched: act_ct: add netns into the key of tcf_ct_flow_table
+
+Yue Haibing (1):
+      netns: Make get_net_ns() handle zero refcount net
+
+ .mailmap                                           |   1 +
+ MAINTAINERS                                        |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c          |   8 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h          |   1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h      | 311 +++++++++++--------
+ drivers/net/ethernet/intel/ice/ice_ddp.c           |  23 +-
+ drivers/net/ethernet/intel/ice/ice_main.c          |  10 +-
+ drivers/net/ethernet/intel/ice/ice_switch.c        |   6 +-
+ drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c    |   5 +-
+ .../net/ethernet/marvell/octeontx2/nic/Makefile    |   3 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_dcbnl.c    |   7 +
+ .../ethernet/marvell/octeontx2/nic/otx2_devlink.c  |   2 +
+ .../net/ethernet/marvell/octeontx2/nic/otx2_txrx.c |   5 +-
+ drivers/net/ethernet/microchip/lan743x_ethtool.c   |  44 ++-
+ drivers/net/ethernet/microchip/lan743x_main.c      |  48 ++-
+ drivers/net/ethernet/microchip/lan743x_main.h      |  28 ++
+ drivers/net/ethernet/qualcomm/qca_debug.c          |   6 +-
+ drivers/net/ethernet/qualcomm/qca_spi.c            |  16 +-
+ drivers/net/ethernet/qualcomm/qca_spi.h            |   3 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c  |   6 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c    |  40 +--
+ drivers/net/phy/dp83tg720.c                        |  38 ++-
+ drivers/net/phy/mxl-gpy.c                          |  58 ++--
+ drivers/net/usb/ax88179_178a.c                     |  18 +-
+ drivers/net/usb/rtl8150.c                          |   3 +-
+ drivers/net/virtio_net.c                           |  32 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c  |   2 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/scan.c      |   2 +-
+ .../net/wireless/intel/iwlwifi/mvm/time-event.c    |   2 +
+ drivers/ptp/ptp_sysfs.c                            |   3 +-
+ include/linux/bpf_verifier.h                       |   2 +
+ include/linux/btf.h                                |   2 +-
+ include/linux/compiler_types.h                     |  23 ++
+ include/net/netns/netfilter.h                      |   3 +
+ kernel/bpf/verifier.c                              |  25 +-
+ net/core/filter.c                                  |   5 +
+ net/core/net_namespace.c                           |   9 +-
+ net/core/netdev-genl.c                             |  16 +-
+ net/core/sock.c                                    |   3 +
+ net/ipv4/cipso_ipv4.c                              |  75 +++--
+ net/ipv4/tcp_ao.c                                  |   6 +-
+ net/ipv4/tcp_input.c                               |   1 +
+ net/ipv6/ip6_fib.c                                 |   3 +-
+ net/ipv6/route.c                                   |   4 +-
+ net/ipv6/seg6_local.c                              |   8 +-
+ net/ipv6/xfrm6_policy.c                            |   8 +-
+ net/mac80211/driver-ops.c                          |  17 ++
+ net/mac80211/iface.c                               |  22 +-
+ net/mac80211/scan.c                                |  17 +-
+ net/mac80211/util.c                                |   2 +-
+ net/netfilter/core.c                               |  13 +-
+ net/netfilter/ipset/ip_set_core.c                  |  11 +-
+ net/netfilter/nf_conntrack_standalone.c            |  15 -
+ net/netfilter/nf_hooks_lwtunnel.c                  |  67 ++++
+ net/netfilter/nf_internals.h                       |   6 +
+ net/netrom/nr_timer.c                              |   3 +-
+ net/sched/act_api.c                                |   3 +-
+ net/sched/act_ct.c                                 |  16 +-
+ net/tipc/node.c                                    |   1 +
+ net/wireless/scan.c                                |  12 +-
+ tools/testing/selftests/bpf/prog_tests/verifier.c  |   2 +
+ .../selftests/bpf/progs/verifier_or_jmp32_k.c      |  41 +++
+ .../selftests/drivers/net/virtio_net/config        |   8 +-
+ tools/testing/selftests/net/Makefile               |   2 +
+ tools/testing/selftests/net/config                 |   2 +
+ tools/testing/selftests/net/mptcp/userspace_pm.sh  |  46 +--
+ .../selftests/net/openvswitch/openvswitch.sh       |   2 +-
+ .../testing/selftests/net/openvswitch/ovs-dpctl.py |   2 +-
+ .../selftests/net/srv6_end_dx4_netfilter_test.sh   | 335 ++++++++++++++++++++
+ .../selftests/net/srv6_end_dx6_netfilter_test.sh   | 340 +++++++++++++++++++++
+ 70 files changed, 1558 insertions(+), 353 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/verifier_or_jmp32_k.c
+ create mode 100755 tools/testing/selftests/net/srv6_end_dx4_netfilter_test.sh
+ create mode 100755 tools/testing/selftests/net/srv6_end_dx6_netfilter_test.sh
 
