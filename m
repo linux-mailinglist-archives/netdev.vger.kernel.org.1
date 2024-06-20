@@ -1,378 +1,265 @@
-Return-Path: <netdev+bounces-105108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C067990FB5D
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 04:38:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E99A990FB89
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 05:10:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2B8F1C210F6
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 02:38:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBA961C20DF2
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 03:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4B21B815;
-	Thu, 20 Jun 2024 02:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6EB01D556;
+	Thu, 20 Jun 2024 03:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="KtSofEPs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2097.outbound.protection.outlook.com [40.107.94.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A65FEEAA;
-	Thu, 20 Jun 2024 02:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718851133; cv=none; b=AQPN0bPGj3NTayb/0rRrPITiXu9+8ojE8EfM6cHShDb+C9TVFNEbMPY6VTWmNHNrtICF9YNJmqIoc/Bg6bljQ4nFsOK1f1W3okZPJOPFGq6P47t33RHo6/QgsC1hZnC+NV3rhDeBM1J/nXj6Rq+H8wxOgMXWYPkOEGyEqLp3j1w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718851133; c=relaxed/simple;
-	bh=B7kk+ArUVy5WisUWkgQ3m7VLkjJN0kLTezMHfWzRdjg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XIA4BVhW+trB5L0gtdKZzHmv2kXuw51YVY0bJyWbst3nV8wAqMT+w+UGeMBKvUDCWYQTdfw8eZ6g9YQFrTo1jUIQAiaYz1WNvNRRO72RPaEpqLk7GwlMj3ROIxMwarFc9mLIeS3L4BiO4q7noz5jt7Avwr35/QAAPLoLuPoRKug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 3462f8fc2eae11ef9305a59a3cc225df-20240620
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.38,REQID:1adc44dd-143f-44f7-b80c-5fbe19ef8201,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-5
-X-CID-INFO: VERSION:1.1.38,REQID:1adc44dd-143f-44f7-b80c-5fbe19ef8201,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:82c5f88,CLOUDID:2bbeb71af9b247c81bc9092abf2313b2,BulkI
-	D:240617193145NAFL2O91,BulkQuantity:4,Recheck:0,SF:64|66|24|17|19|44|102,T
-	C:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:40,QS:nil,BEC:nil,
-	COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR
-X-UUID: 3462f8fc2eae11ef9305a59a3cc225df-20240620
-Received: from node2.com.cn [(39.156.73.10)] by mailgw.kylinos.cn
-	(envelope-from <luoxuanqiang@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 743928336; Thu, 20 Jun 2024 10:38:40 +0800
-Received: from node2.com.cn (localhost [127.0.0.1])
-	by node2.com.cn (NSMail) with SMTP id 8037AB80758A;
-	Thu, 20 Jun 2024 10:38:40 +0800 (CST)
-X-ns-mid: postfix-66739630-42236785
-Received: from [10.42.12.252] (unknown [10.42.12.252])
-	by node2.com.cn (NSMail) with ESMTPA id 18EFEB80758A;
-	Thu, 20 Jun 2024 02:38:37 +0000 (UTC)
-Message-ID: <2f96ebeb-f366-fda1-f6d6-88ff2637c7cd@kylinos.cn>
-Date: Thu, 20 Jun 2024 10:38:36 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC8151D52C;
+	Thu, 20 Jun 2024 03:10:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.97
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718853026; cv=fail; b=tnvh7Jvijco6ga/ZLV16O+Sn1lZsvW+/A7u6Kk6ftTjKrxs54gnxny8JFov64RS/m+GQfpl59FgvozTH0/LXb6hjOVs39pjj5k7+nAL6oHmNkeGTfFD5ucx8MTwBr6rOh7OLiorTEFiLCwnHZGlwyezFdZKYxrubN5VIqr+0UnU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718853026; c=relaxed/simple;
+	bh=+7l0fXg83Ytly7/OT7WvnM3YAMDxcxRIPE3aZRBDJd8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=aqwsj7QSRbl+crOo3Y6KpVFXkTRaQtrZioO3t5AvPWjiujwthI4pvmPnrL/thBTJiGAtSTXvuuK5OsWK089zODW+6LHFyK0VwPvUd/X05JUKpSb1QamSkDwcemYtb65xaYP2NAqhawaf6evcOqxYhY2DBdE9I40bGxsmSvKRigs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=KtSofEPs reason="key not found in DNS"; arc=fail smtp.client-ip=40.107.94.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CwcymbGxP/lDCK4ojZdldQJ+OHkZRQGhcd7FUOn8sXitGqhzQYcViflnH0NTQy5JykxtoBr1oKrgdwYE0aEgsau/PiGrhKgfbg3xZtst5+dPEY15k5z0UavggOLRxMpes6meunK1izVpSgmWTi6vhrxqMQQSJDYrt0+M3nfwBUnjSBn29lcbXXo4d3lm4VUu6cL7GetPTCA3E/5dTwocGq7M3HzIqqZWvyeAWMP2dkJ5jAo4HQgOPOm1SWivS9lL2qmzfmAcdb8ZoYQqCpmAlDILbAgSSNA+eo5ftB5609b1VKLoHZTmwmlyjNP9PgQNPkhMLyyOu+el0gc3lemc1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+pThxDCkzMK+IfSq9+cVdr+3JZaQQEtObL9Hd50UW5o=;
+ b=NKqlXZP6IpImjG7G/fEsTe880Q6ZEpzMi4YsO09Cp3gXE/PDIS8wNh27mybt4UXp6ZCKTwxOUMzDWw/DZCm7NLZnZpens8Enfygk4AgQij+Zp9yqHwaBonXOTFpKYW04Ydw2OIs+QHQ8umUyHvPTJGYLQf5qMrvbdbRpIHSriDU6FUlVQgn4/8EQR7zxutQGUwKI76/Jm+7GVjgM+Z7mvljl1VgwQs7GODMFNwPOljjp9WSDvet9Et0CzyIRdgjYOASZbKuWSNhSKclIWn0vDmc5a+ZXPTiTF5rxa9tNsO5PLBnfIriRmUI4UYHPZW6pXJkFqo9TjrqUdpRi6Ay42A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=amperemail.onmicrosoft.com; dkim=pass
+ header.d=amperemail.onmicrosoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+pThxDCkzMK+IfSq9+cVdr+3JZaQQEtObL9Hd50UW5o=;
+ b=KtSofEPsk2QJynCu4WmTQ0ffzvIDVk+lrT7F5OeoAOgZjpvrggkEZ/PzkRmQhojBmvPHu0TwM2cR6nGaUtdqrH5uRT0NC9CmqA8qr6mLKJNSvpzZLgKXevGd7IUVjzKIj5xHjozxEZab600ebKBVig+PRQMMFGt8STOBb5p/qEk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
+Received: from SA0PR01MB6171.prod.exchangelabs.com (2603:10b6:806:e5::16) by
+ SN7PR01MB8066.prod.exchangelabs.com (2603:10b6:806:359::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7633.36; Thu, 20 Jun 2024 03:10:22 +0000
+Received: from SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d]) by SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d%7]) with mapi id 15.20.7698.017; Thu, 20 Jun 2024
+ 03:10:22 +0000
+Message-ID: <8922781d-5f12-4590-af41-b17d83836d19@amperemail.onmicrosoft.com>
+Date: Wed, 19 Jun 2024 23:10:18 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/3] MCTP over PCC
+To: admiyo@os.amperecomputing.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240513173546.679061-1-admiyo@os.amperecomputing.com>
+ <20240619200552.119080-1-admiyo@os.amperecomputing.com>
+Content-Language: en-US
+From: Adam Young <admiyo@amperemail.onmicrosoft.com>
+In-Reply-To: <20240619200552.119080-1-admiyo@os.amperecomputing.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SJ0PR05CA0070.namprd05.prod.outlook.com
+ (2603:10b6:a03:332::15) To SA0PR01MB6171.prod.exchangelabs.com
+ (2603:10b6:806:e5::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH net v3] Fix race for duplicate reqsk on identical SYN
-Content-Language: en-US
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: alexandre.ferrieux@orange.com, davem@davemloft.net, dccp@vger.kernel.org,
- dsahern@kernel.org, edumazet@google.com, fw@strlen.de, kuba@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
-References: <f1e13509-9544-0fa5-4cb4-520c068bde6a@kylinos.cn>
- <20240619195313.9962-1-kuniyu@amazon.com>
-From: luoxuanqiang <luoxuanqiang@kylinos.cn>
-In-Reply-To: <20240619195313.9962-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA0PR01MB6171:EE_|SN7PR01MB8066:EE_
+X-MS-Office365-Filtering-Correlation-Id: a6cbb5bf-b98d-4c0d-a2c2-08dc90d685a1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230037|366013|1800799021|376011;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WmtOMjBRQktrdXhiRE5VVGpCOW50VGpyWFQ5ZksxMjA2WjZUa0tpZWFjWEJh?=
+ =?utf-8?B?VzdFaXNZUXEzWHpVZ3FBRytFL1pDS1J6ajc0dGtsa1duTldrazk1YWxlR29r?=
+ =?utf-8?B?UE9jd3RyMDd4cTBWOFh4SW0rMk9vT0RPSWRJVE5vWWVDODhlM3dhaDBTNmcw?=
+ =?utf-8?B?by90aGE1dlJOOUI5ZnBMQ1ZuWDZiUmdtNzlPaG9XZ0VidHNYdU9vU3l4OWJL?=
+ =?utf-8?B?SWRZdTEzOEFGQzB4WWxVZkVCV0FPbjJ4VmI2YVVmakhsbThGRW9qRXUxL0x5?=
+ =?utf-8?B?U0psdzFDNFJrMTBVRnZJK052aGFtTjVBVWQwc3JIYlV3WE5CeEdyd016RUJF?=
+ =?utf-8?B?M05NazFhSU8yc1dDNFpKcnY3OVJ1TTdGcXRaNVdCWHYwOEJTaFhodjl3N3FF?=
+ =?utf-8?B?VXdqTlFOQVU5RmFUMEVrSmFyV3ZvcDRzbERYekFxam5lT1RQQXREV2IwNEVo?=
+ =?utf-8?B?YklIOEVVWklSN2o0d1EzbzREdFZqUWJZUjFqZzlBaUg0UXB2dDNoeWV4T09N?=
+ =?utf-8?B?Zys5RXhFeDY0QnRsM011eXoyNWJzZitzYnRLaDFRV2pBL2QxdHlxZ1ZTMkFp?=
+ =?utf-8?B?RjliRFNXbWRhaXVvaEZnK1lmcTBlbU0yL00vcWVTcHlFdzlWekRPMDBRMzBu?=
+ =?utf-8?B?RHVUTElpZGVVbmpxR2MyRzJPTWwvaWY1M3JqWTkzYTZyZnVHalh3NHFZTXBz?=
+ =?utf-8?B?UUhVVStCc2JXRXQ0elJpSFE2Sk15VGlWMFZRUG5JYUl5L2FXa29TTEdQN0Va?=
+ =?utf-8?B?Y21lVlZoaG5RMGo5elZnVVVKRklqd3Z4dTlsTWVLVW9hVkVGWmU4NzFSK1FF?=
+ =?utf-8?B?TGFicG5ZU2hFUG1vNEtiL3lpcGhON0IvcG1rTGVKQTZFNEFGY0ZSVFZydHRl?=
+ =?utf-8?B?Y0xHaGhqUnZXeFdhY2EyZ2R6Rjg5bmUraTgvL1BGdE5TMXZvMlFLM2xqL2xr?=
+ =?utf-8?B?WTgwSnd2ZWRwNUcwVXFqbDd3OElTaHJEL1VPWC85NDZJdHM1UERNZGZNelhs?=
+ =?utf-8?B?WnpHUnBrb29vYkwvcUUxQUxKdmhHUzg4bWp1L2lhTThsYThCRkZIQ1c1S3VC?=
+ =?utf-8?B?T3JJYVBCam9Rdm5kZ2k0VjZsMXdYaVZpK01HSWxPdU5vdS90eUk5NzBCRTd1?=
+ =?utf-8?B?Qi9LT0d0alVUQmQ5b25iUERWWk5ObGVpeFh4UHRvNEZPNFFhYXdjbGRiQjVK?=
+ =?utf-8?B?Qm5hMGdjd2FjdDloKzFGczNlbldFQzhSOVJpOUJ1WTRra2lKVlk3M0dlY2Vv?=
+ =?utf-8?B?TFN0RHBKNjhCaElrV0FWNVplZ1ZPeHQ2VHBiV2NJNUdaVUhQVHpxNWlwQml6?=
+ =?utf-8?B?dHNYWGxGaURvQnI4OFJFaXI2eDljeUkxUXVLRWFIU0g0cGpjeWlhOGN0TE9O?=
+ =?utf-8?B?MkRoSjhuRzJzUEdRRWNkVlFNUkxPc1pGTExDQVlIQkJoWnN0a2ZZSTk2Mkl3?=
+ =?utf-8?B?RjNHZEw0S1ljWGJkWUo2WHZLWDlVaXIzYmRpWEtoOExrOHJJR2YvVVUxVDVO?=
+ =?utf-8?B?bWVGaEFQWkx6Rkt0T1BiZVZ1U040V1BBOXhFNzlHRmFndDVmNG8wWjdSaWdZ?=
+ =?utf-8?B?aGFzRFVwY3cwMHcreDJ0V1ZKZUMvWW5MclBPdnBmZ3VkOVZPeWxiY09TNnFH?=
+ =?utf-8?B?MVJGVDdWUVlhYVZ1VmF2dkNweElLRWpia0M3QXlaU2NKNGxHWGd5cGxzZ0ph?=
+ =?utf-8?B?MzVTb1BkMm1vOGhNNlRaWGJYWk1FOVVZZktDcnlIV0JJYnV5eFVwc0x6KzJj?=
+ =?utf-8?Q?OozDDziDVC1psSDtmqmV9fjE5DRtYrtJSRSTzdH?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR01MB6171.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(1800799021)(376011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UVJtWm5uZVN0a3hzTHdRU0NUd1hDWldaSE0ycEQ3NzVURkZGRGIrSU1IVU5Y?=
+ =?utf-8?B?empmTDJxS1VzQ09VaDBQV3YvYzZ2UlRFWWdQMHFRZ3RtTXU0aGsyUnpjRmFq?=
+ =?utf-8?B?Wit6WGQwMVY1NXlubFFjMnpRd0Z5WFZZTHo2ZjhrQ3p1S2dEc0g1WlZHcStR?=
+ =?utf-8?B?VzNic1JMc1VMSTREbCtMbVYyREhmRHNrdFF6aWp3dmZMZlJuSnI5RUFhSm5V?=
+ =?utf-8?B?Y2s0VHBNNUFaTTNtdU1BMElXZFZna3M4Ym9jWTQ5akZVSlZENkVsbEgzSmtN?=
+ =?utf-8?B?cENLbUZCYlpQaDlsbEl5ajI0WTlSYzYrWlAyUm9kWEdqVXA3M2tTcjFRcitG?=
+ =?utf-8?B?Y3BZemxoK05JNmdtVlFZUHJXTTF0NUVmenJ5cFNLclQyRWJnanB2YnFsazNF?=
+ =?utf-8?B?YlJPbnBGaWZhUFVyRnJ5WDYvaDJWMmxmRGNNa1ZjdGMxS2Jjb2M5RkRFdGVK?=
+ =?utf-8?B?ZkZTd1JoTStFaDdTRWVsSTB1YTZKUWhSNmtqUExQbEhtd3loY2dUL0FhTm9M?=
+ =?utf-8?B?N3FiaWMrSWo3NTNLQ0p6YlBlc1l3WDNqeWthcWFBVDFkNytzMEJzNHdQRm9q?=
+ =?utf-8?B?b1JKclNOalZLdmdFbDNFR3kzZENGNzFtWnpmSHdYa3FMMHFCdkRhTzFTWmNi?=
+ =?utf-8?B?RmtqSnl6S2d6L0VOVThaQ0Q4R205MUVrSHh2RzhOMmoxQmJiRXQ2SUEwUFZ3?=
+ =?utf-8?B?a1h1ZFVVT2RIcy9MN3pDanE1WURwRFZvQ2xOZ01KSW1SajJGSlJmU2h5T2Jo?=
+ =?utf-8?B?NFJKMEFmTFlhV2Y1T2RoNnBxY29JbVNiazg0enBML1kzZHBxdHFZalZnMlNH?=
+ =?utf-8?B?V1EzRk9MalljRkVxVHpkZGVHdWozQnVnZWF2WXVKdk82dUU3RkJnaGs5N1pt?=
+ =?utf-8?B?Rkl2VCtnUVdoOTFzSTlOOHRENlhtdldjVVRhRE1XTUtiVUpnZTBnYldXdHBp?=
+ =?utf-8?B?VU1XT2MzcDF5Q2NINkd3eDBvVTRhc09MNlVsdE4raE8xTDZSREVTemp3MFNq?=
+ =?utf-8?B?eFM5TFB3TG5rOEkrOGVvZmErMDVKS1JoVktJTy90d1hIOGpCbXZNcVBla1I3?=
+ =?utf-8?B?WGY2Z05tZnZDMlZqNlcxSVpJdFZnczhaUE9wZ2xKMG9Yck5XTXRSL3ZlTnVi?=
+ =?utf-8?B?blNMOHgxVVBIcjNreTFaTnVJWk9wUHh4Y2hyc3Z1T3IveDZzajNTdFVOSkhu?=
+ =?utf-8?B?aHMzcWdoRTJaOWNNVENrd2R3ejdVOUtDajVBSUx2Y1NMQmdoVkpwa1JlS2JX?=
+ =?utf-8?B?b0VNNHlmQVdNYVRNdFRvZGdpZzAvTzRVMmIzRS9yNk4zdTgyeHArd2ZoY2FB?=
+ =?utf-8?B?eGkwbzNIdmRFTUdOL1kyM1Rlak1ST2FtcFlzZGs5eWVVSnNwRU4xOUJLNUdz?=
+ =?utf-8?B?b1kvdk1TcE4vKzc0anN2K1BNc0hOK3lpZXd0RjRWSTZoZUVUcGtWUXVlU2xw?=
+ =?utf-8?B?bE9XMkRDUFh2RVowREdUOWpBZEdvMXVSdE03UW1oSDQvNXVRZ2l3RmRZeXVT?=
+ =?utf-8?B?SEMySmxKOHg5aE5kUjBNUmxrcmtVSHhDUkJrMHdGMjBQSEI5QnV4NXR6ejE5?=
+ =?utf-8?B?ZGxWTzU1dW9KZkJTb29QVEpveGhQcjJjQllVYWQrTkc1a1FuNGkxdnlPN2x0?=
+ =?utf-8?B?ck1JTERVVXdrVnpOWGJsYWQ4bHRVeGdOYmNURElsZTVCU0FTcDRSNkpuVnc5?=
+ =?utf-8?B?WjJxK08wMnFyYnl2MTl1RzY5ODljNkI0VnZ2NEovU21lTkt5aFdDTXdUUGND?=
+ =?utf-8?B?dEp1TE5XYmdPOThCN1pvaUN5K2dscHVHVnpHV3c1cHFLdFliaCszTGpFNEFl?=
+ =?utf-8?B?YjFiejBUck5aLzJ3Ny9IdklJYVl5SjBkK3NkczJ5dS9ub0dOTUxmck5MbGk2?=
+ =?utf-8?B?YWFpaXAzdVlmU2t2QU9CZ29OTllsZlFxRGNTdG9CcUVnOGo2cC91Vmx4RjdG?=
+ =?utf-8?B?RTdWbHN0L0hjNjhNVjhDcGE3V2RoNnhkN0pzY0ViS0UrUlU4dklXYklteGhG?=
+ =?utf-8?B?RVdnbGhhT3ErSEdtd2lxRWl5K3p6Q3YzVTdWaUppQ2VSc1lheUZpdDd1Tlhw?=
+ =?utf-8?B?cDRjVmkwLzJhWVZrSUNWR1Q4SFpkZ1dEelJjMWxIa0I2cFE5SWpBZXcxRzdX?=
+ =?utf-8?B?V2gwYVFnV1NpNTVlMVB4Skp5N1VCTGt1MmhkRkgxenUrdU9OOVAvMDRqaW1l?=
+ =?utf-8?B?dEtueTNEZjNEeWN4bFRBVVVBcjIxTU9sTVhBSFI5QjNwTHRDcHIrazBPNW9J?=
+ =?utf-8?Q?4BLpclvFACsRsfyeRfMKW/GJA24CdDVII3MBZJR6nc=3D?=
+X-OriginatorOrg: amperemail.onmicrosoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a6cbb5bf-b98d-4c0d-a2c2-08dc90d685a1
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR01MB6171.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2024 03:10:22.0020
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bV2j/lU8238tET6Z3k0VBndPVf6bxexXyahZbAJxvCWx0cLXkdJe34BlX9cAOoMoEm7YCaq3FoYOoExP7qZUkf0pTM7TPPAoYN4XD/Wx5UEjagKRSvVugEt68omvTlgZ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR01MB8066
 
+Apologies.  I just saw that there was more feedback on the previous 
+patchset.  I am addressing that now.
 
-=E5=9C=A8 2024/6/20 03:53, Kuniyuki Iwashima =E5=86=99=E9=81=93:
-> From: luoxuanqiang <luoxuanqiang@kylinos.cn>
-> Date: Wed, 19 Jun 2024 14:54:15 +0800
->> =E5=9C=A8 2024/6/18 01:59, Kuniyuki Iwashima =E5=86=99=E9=81=93:
->>> From: luoxuanqiang <luoxuanqiang@kylinos.cn>
->>> Date: Mon, 17 Jun 2024 15:56:40 +0800
->>>> When bonding is configured in BOND_MODE_BROADCAST mode, if two ident=
-ical
->>>> SYN packets are received at the same time and processed on different=
- CPUs,
->>>> it can potentially create the same sk (sock) but two different reqsk
->>>> (request_sock) in tcp_conn_request().
->>>>
->>>> These two different reqsk will respond with two SYNACK packets, and =
-since
->>>> the generation of the seq (ISN) incorporates a timestamp, the final =
-two
->>>> SYNACK packets will have different seq values.
->>>>
->>>> The consequence is that when the Client receives and replies with an=
- ACK
->>>> to the earlier SYNACK packet, we will reset(RST) it.
->>>>
->>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>>>
->>>> This behavior is consistently reproducible in my local setup,
->>>> which comprises:
->>>>
->>>>                     | NETA1 ------ NETB1 |
->>>> PC_A --- bond --- |                    | --- bond --- PC_B
->>>>                     | NETA2 ------ NETB2 |
->>>>
->>>> - PC_A is the Server and has two network cards, NETA1 and NETA2. I h=
-ave
->>>>     bonded these two cards using BOND_MODE_BROADCAST mode and config=
-ured
->>>>     them to be handled by different CPU.
->>>>
->>>> - PC_B is the Client, also equipped with two network cards, NETB1 an=
-d
->>>>     NETB2, which are also bonded and configured in BOND_MODE_BROADCA=
-ST mode.
->>>>
->>>> If the client attempts a TCP connection to the server, it might enco=
-unter
->>>> a failure. Capturing packets from the server side reveals:
->>>>
->>>> 10.10.10.10.45182 > localhost: Flags [S], seq 320236027,
->>>> 10.10.10.10.45182 > localhost: Flags [S], seq 320236027,
->>>> localhost > 10.10.10.10.45182: Flags [S.], seq 2967855116,
->>>> localhost > 10.10.10.10.45182: Flags [S.], seq 2967855123, <=3D=3D
->>>> 10.10.10.10.45182 > localhost: Flags [.], ack 4294967290,
->>>> 10.10.10.10.45182 > localhost: Flags [.], ack 4294967290,
->>>> localhost > 10.10.10.10.45182: Flags [R], seq 2967855117, <=3D=3D
->>>> localhost > 10.10.10.10.45182: Flags [R], seq 2967855117,
->>>>
->>>> Two SYNACKs with different seq numbers are sent by localhost,
->>>> resulting in an anomaly.
->>>>
->>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>>>
->>>> The attempted solution is as follows:
->>>> In the tcp_conn_request(), while inserting reqsk into the ehash tabl=
-e,
->>>> it also checks if an entry already exists. If found, it avoids
->>>> reinsertion and releases it.
->>>>
->>>> Simultaneously, In the reqsk_queue_hash_req(), the start of the
->>>> req->rsk_timer is adjusted to be after successful insertion.
->>>>
->>>> Signed-off-by: luoxuanqiang <luoxuanqiang@kylinos.cn>
->>>> ---
->>>>    include/net/inet_connection_sock.h |  4 ++--
->>>>    net/dccp/ipv4.c                    |  2 +-
->>>>    net/dccp/ipv6.c                    |  2 +-
->>>>    net/ipv4/inet_connection_sock.c    | 19 +++++++++++++------
->>>>    net/ipv4/tcp_input.c               |  9 ++++++++-
->>>>    5 files changed, 25 insertions(+), 11 deletions(-)
->>>>
->>>> diff --git a/include/net/inet_connection_sock.h b/include/net/inet_c=
-onnection_sock.h
->>>> index 7d6b1254c92d..8ebab6220dbc 100644
->>>> --- a/include/net/inet_connection_sock.h
->>>> +++ b/include/net/inet_connection_sock.h
->>>> @@ -263,8 +263,8 @@ struct dst_entry *inet_csk_route_child_sock(cons=
-t struct sock *sk,
->>>>    struct sock *inet_csk_reqsk_queue_add(struct sock *sk,
->>>>    				      struct request_sock *req,
->>>>    				      struct sock *child);
->>>> -void inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_=
-sock *req,
->>>> -				   unsigned long timeout);
->>>> +bool inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_=
-sock *req,
->>>> +				   unsigned long timeout, bool *found_dup_sk);
->>>>    struct sock *inet_csk_complete_hashdance(struct sock *sk, struct =
-sock *child,
->>>>    					 struct request_sock *req,
->>>>    					 bool own_req);
->>>> diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
->>>> index ff41bd6f99c3..13aafdeb9205 100644
->>>> --- a/net/dccp/ipv4.c
->>>> +++ b/net/dccp/ipv4.c
->>>> @@ -657,7 +657,7 @@ int dccp_v4_conn_request(struct sock *sk, struct=
- sk_buff *skb)
->>>>    	if (dccp_v4_send_response(sk, req))
->>>>    		goto drop_and_free;
->>>>   =20
->>>> -	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT);
->>>> +	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT, NULL);
->>>>    	reqsk_put(req);
->>>>    	return 0;
->>>>   =20
->>>> diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
->>>> index 85f4b8fdbe5e..493cdb12ce2b 100644
->>>> --- a/net/dccp/ipv6.c
->>>> +++ b/net/dccp/ipv6.c
->>>> @@ -400,7 +400,7 @@ static int dccp_v6_conn_request(struct sock *sk,=
- struct sk_buff *skb)
->>>>    	if (dccp_v6_send_response(sk, req))
->>>>    		goto drop_and_free;
->>>>   =20
->>>> -	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT);
->>>> +	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT, NULL);
->>>>    	reqsk_put(req);
->>>>    	return 0;
->>>>   =20
->>>> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connect=
-ion_sock.c
->>>> index d81f74ce0f02..2fa9b33ae26a 100644
->>>> --- a/net/ipv4/inet_connection_sock.c
->>>> +++ b/net/ipv4/inet_connection_sock.c
->>>> @@ -1122,25 +1122,32 @@ static void reqsk_timer_handler(struct timer=
-_list *t)
->>>>    	inet_csk_reqsk_queue_drop_and_put(oreq->rsk_listener, oreq);
->>>>    }
->>>>   =20
->>>> -static void reqsk_queue_hash_req(struct request_sock *req,
->>>> -				 unsigned long timeout)
->>>> +static bool reqsk_queue_hash_req(struct request_sock *req,
->>>> +				 unsigned long timeout, bool *found_dup_sk)
->>>>    {
->>> Given any changes here in reqsk_queue_hash_req() conflicts with 4.19
->>> (oldest stable) and DCCP does not check found_dup_sk, you can define
->>> found_dup_sk here, then you need not touch DCCP at all.
->> Apologies for not fully understanding your advice. If we cannot modify
->> the content of reqsk_queue_hash_req() and should avoid touching the DC=
-CP
->> part, it seems the issue requires reworking some interfaces. Specifica=
-lly:
->>
->> The call flow to add reqsk to ehash is as follows:
->>
->> tcp_conn_request()
->>
->> dccp_v4(6)_conn_request()
->>
->>       -> inet_csk_reqsk_queue_hash_add()
->>
->>           -> reqsk_queue_hash_req()
->>
->>               -> inet_ehash_insert()
->>
->> tcp_conn_request() needs to call the same interface inet_csk_reqsk_que=
-ue_hash_add()
->> as dccp_v4(6)_conn_request(), but the critical section for installatio=
-n check and
->> insertion into ehash is within inet_ehash_insert().
->> If reqsk_queue_hash_req() should not be modified, then we need to rewr=
-ite
->> the interfaces to distinguish them. I don't see how redefining found_d=
-up_sk
->> alone can resolve this conflict point.
-> I just said we cannot avoid conflict so suggested avoiding found_dup_sk
-> in inet_csk_reqsk_queue_hash_add().
+On 6/19/24 16:05, admiyo@os.amperecomputing.com wrote:
+> From: Adam Young <admiyo@os.amperecomputing.com>
 >
-> But I finally ended up modifying DCCP because we return before setting
-> refcnt.
+> This series adds support for the Management Control Transport Protocol (MCTP)
+> over the Platform Communication Channel (PCC) mechanism.
 >
-> ---8<---
-> diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
-> index ff41bd6f99c3..b2a8aed35eb0 100644
-> --- a/net/dccp/ipv4.c
-> +++ b/net/dccp/ipv4.c
-> @@ -657,8 +657,11 @@ int dccp_v4_conn_request(struct sock *sk, struct s=
-k_buff *skb)
->   	if (dccp_v4_send_response(sk, req))
->   		goto drop_and_free;
->  =20
-> -	inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT);
-> -	reqsk_put(req);
-> +	if (unlikely(inet_csk_reqsk_queue_hash_add(sk, req, DCCP_TIMEOUT_INIT=
-)))
-> +		reqsk_free(req);
-> +	else
-> +		reqsk_put(req);
-> +
->   	return 0;
->  =20
->   drop_and_free:
-> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection=
-_sock.c
-> index d81f74ce0f02..7dd6892b10b9 100644
-> --- a/net/ipv4/inet_connection_sock.c
-> +++ b/net/ipv4/inet_connection_sock.c
-> @@ -1122,25 +1122,33 @@ static void reqsk_timer_handler(struct timer_li=
-st *t)
->   	inet_csk_reqsk_queue_drop_and_put(oreq->rsk_listener, oreq);
->   }
->  =20
-> -static void reqsk_queue_hash_req(struct request_sock *req,
-> +static bool reqsk_queue_hash_req(struct request_sock *req,
->   				 unsigned long timeout)
->   {
-> +	bool found_dup_sk;
-> +
-> +	if (!inet_ehash_insert(req_to_sk(req), NULL, &found_dup_sk))
-> +		return false;
-> +
->   	timer_setup(&req->rsk_timer, reqsk_timer_handler, TIMER_PINNED);
->   	mod_timer(&req->rsk_timer, jiffies + timeout);
->  =20
-> -	inet_ehash_insert(req_to_sk(req), NULL, NULL);
->   	/* before letting lookups find us, make sure all req fields
->   	 * are committed to memory and refcnt initialized.
->   	 */
->   	smp_wmb();
->   	refcount_set(&req->rsk_refcnt, 2 + 1);
-> +	return true;
->   }
->  =20
-> -void inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_soc=
-k *req,
-> +bool inet_csk_reqsk_queue_hash_add(struct sock *sk, struct request_soc=
-k *req,
->   				   unsigned long timeout)
->   {
-> -	reqsk_queue_hash_req(req, timeout);
-> +	if (!reqsk_queue_hash_req(req, timeout))
-> +		return false;
-> +
->   	inet_csk_reqsk_queue_added(sk);
-> +	return true;
->   }
->   EXPORT_SYMBOL_GPL(inet_csk_reqsk_queue_hash_add);
->  =20
-> ---8<---
-
-Thank you for your patient explanation. I understand
-your point and will send out the V4 version, looking
-forward to your review.
-
-Also, I'd like to confirm a detail with you. For the DCCP part, is it
-  sufficient to simply call reqsk_free() for the return value, or should
-we use goto drop_and_free? The different return values here will
-determine whether a reset is sent, and I lack a comprehensive
-understanding of DCCP. so could you please help me confirm this
-from a higher-level perspective?
-
-diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
-index ff41bd6f99c3..5926159a6f20 100644
---- a/net/dccp/ipv4.c
-+++ b/net/dccp/ipv4.c
-@@ -657,8 +657,11 @@ int dccp_v4_conn_request(struct sock *sk, struct sk_=
-buff *skb)
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (dccp_v4_send_response(sk,=
- req))
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 goto drop_and_free;
- =20
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 inet_csk_reqsk_queue_hash_add(sk, r=
-eq, DCCP_TIMEOUT_INIT);
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reqsk_put(req);
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (unlikely(!inet_csk_reqsk_queue_=
-hash_add(sk, req, DCCP_TIMEOUT_INIT)))
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 reqsk_free(req);=C2=A0=C2=A0=C2=A0 // or=C2=A0 goto drop_and=
-_free:=C2=A0=C2=A0 <=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 reqsk_put(req);
-+
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
- =20
-drop_and_free:
- =C2=A0=C2=A0 =C2=A0reqsk_free(req);
-drop:
- =C2=A0=C2=A0 =C2=A0__DCCP_INC_STATS(DCCP_MIB_ATTEMPTFAILS);
- =C2=A0=C2=A0 =C2=A0return -1;
-}
-
+> MCTP defines a communication model intended to
+> facilitate communication between Management controllers
+> and other management controllers, and between Management
+> controllers and management devices
+>
+> PCC is a mechanism for communication between components within
+> the  Platform.  It is a composed of shared memory regions,
+> interrupt registers, and status registers.
+>
+> The MCTP over PCC driver makes use of two PCC channels. For
+> sending messages, it uses a Type 3 channel, and for receiving
+> messages it uses the paired Type 4 channel.  The device
+> and corresponding channels are specified via ACPI.
+>
+> The first patch in the series implements a mechanism to allow the driver
+> to indicate whether an ACK should be sent back to the caller
+> after processing the interrupt.  This is an optional feature in
+> the PCC code, but has been made explicitly required in another driver.
+> The implementation here maintains the backwards compatibility of that
+> driver.
+>
+> The second patch in the series is the required change from ACPICA
+> code that will be imported into the Linux kernel when synchronized
+> with the ACPICA repository. It ahs already merged there and will
+> be merged in as is.  It is included here so that the patch series
+> can run and be tested prior to that merge.
+>
+> Changes in V3
+> - removed unused header
+> - removed spurious space
+> - removed spurious semis after functiomns
+> - removed null assignment for init
+> - remove redundant set of device on skb
+> - tabify constant declarations
+> - added  rtnl_link_stats64 function
+> - set MTU to minimum to start
+> - clean up logic on driver removal
+> - remove cast on void * assignment
+> - call cleanup function directly
+> - check received length before allocating skb
+> - introduce symbolic constatn for ACK FLAG MASK
+> - symbolic constant for PCC header flag.
+> - Add namespace ID to PCC magic
+> - replaced readls with copy from io of PCC header
+>
+> Changes in V2
+>
+> - All Variable Declarations are in reverse Xmass Tree Format
+> - All Checkpatch Warnings Are Fixed
+> - Removed Dead code
+> - Added packet tx/rx stats
+> - Removed network physical address.  This is still in
+>    disucssion in the spec, and will be added once there
+>    is consensus. The protocol can be used with out it.
+>    This also lead to the removal of the Big Endian
+>    conversions.
+> - Avoided using non volatile pointers in copy to and from io space
+> - Reorderd the patches to put the ACK check for the PCC Mailbox
+>    as a pre-requisite.  The corresponding change for the MCTP
+>    driver has been inlined in the main patch.
+> - Replaced magic numbers with constants, fixed typos, and other
+>    minor changes from code review.
+>
+> Code Review Change not made
+>
+> - Did not change the module init unload function to use the
+>    ACPI equivalent as they do not remove all devices prior
+>    to unload, leading to dangling references and seg faults.
+>
+> Adam Young (3):
+>    mctp pcc: Check before sending MCTP PCC response ACK
+>    mctp pcc: Allow PCC Data Type in MCTP resource.
+>    mctp pcc: Implement MCTP over PCC Transport
+>
+>   drivers/acpi/acpica/rsaddr.c |   2 +-
+>   drivers/mailbox/pcc.c        |   5 +-
+>   drivers/net/mctp/Kconfig     |  13 ++
+>   drivers/net/mctp/Makefile    |   1 +
+>   drivers/net/mctp/mctp-pcc.c  | 373 +++++++++++++++++++++++++++++++++++
+>   include/acpi/pcc.h           |   1 +
+>   6 files changed, 393 insertions(+), 2 deletions(-)
+>   create mode 100644 drivers/net/mctp/mctp-pcc.c
+>
 
