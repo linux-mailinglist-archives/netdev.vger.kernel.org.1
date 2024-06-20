@@ -1,71 +1,72 @@
-Return-Path: <netdev+bounces-105473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5161911580
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 00:19:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 981AD911582
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 00:19:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2069B20F1A
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 22:19:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B72D01C22B0A
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 22:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D987E799;
-	Thu, 20 Jun 2024 22:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8971714291E;
+	Thu, 20 Jun 2024 22:19:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="dkTMPl2Z"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="XRsIm6Xs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6300455880
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 22:19:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B2413F43B
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 22:19:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718921952; cv=none; b=n1IfFib6n5Sqo2eAYZJASC3e1OcZ4SBD2CEFwOIg/PRjhhDk50BBqALZHXkkYWlgZFJr2FBh/NYod9XksYQLO/TWmBlEZkDU6/Et17GB8i/YeSlQpYxW34Bt6Nn0AadF9vDrkys/+tKrMcB2VucWquT+vJbuu9n2r+OhoQL4Vlg=
+	t=1718921956; cv=none; b=tYmjoU72JvgiqNDMAsg82DL2iXUUdpdbLejiyrZTywoaQk4bjHJe7i4dkEnOgELrTMsYPA1I8UkA5OVROCBEJsapBiB5zJsZnqoEX+LdGdb08dU8lHl2rPQ3HpO5iozIHuVwvMWUvZDmOtw8FCFuQv7QU1ygN5wLLBHk6Om8s1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718921952; c=relaxed/simple;
-	bh=EgLIeqznyOPTSJ5z6m8OsrbxN79BJFzPw3f2c5ZHDRc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=nmlm36KP9rzY3YYboUJG8Se8ldga8XHyLsyLcfMftZsO2ftyJ06bk5e6UIIpbLylwwN7TOL7OIH1cgB0k7XIiK1S41a90wISUZfGoZfS0GW9WkY4pNG0QgMJ4rb27wZTzT4hE2er5+9nHQCICFRgQrRZcTh1H1y5FmiIozw+OXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=dkTMPl2Z; arc=none smtp.client-ip=209.85.161.54
+	s=arc-20240116; t=1718921956; c=relaxed/simple;
+	bh=pHtp0uDmiO5wfmdzU4s/C08CnF5M0OpaIo5ctXGQv8c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DR0+XmUNbenCMgvLUSEGOC4J1aTsolNROIHXL9tMfzg7sshYgAaeGM+rQ7ztbIEkfyk6F1O8+Jl+IBm2zS+EumD99afXw26GfkZxPZHhM1wWFB26U4eJmEH1lucq/JSEu3SH1yy728sAARM3D2QIqlkSlZZ7OVj3vLNxrMUJ6m4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=XRsIm6Xs; arc=none smtp.client-ip=209.85.219.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5bae81effd1so730141eaf.2
-        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 15:19:11 -0700 (PDT)
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6b4ff803ef2so7203206d6.0
+        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 15:19:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1718921950; x=1719526750; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8CXkaBTtnkZYe8FKNmQUlJrq+bqc8/5T0kpTwXzA8v4=;
-        b=dkTMPl2Z/CHsXCT1RFEvERm/SacDhS9UhhfyPiA+SX8bjFfZUqd8VubfZTNDMioK6/
-         t+5Ud3iY/Hsbf66HuOsxKyKK3GEnHIdOQerWDjRFwxzH74lTfBCMUZHJYT9aYHkTTc7d
-         VJLIdTBUwiXyraea4QQskcRv+l56VRq6rZOKQAOY7enPcBwHZWly4BF3Naqc1tvB3e69
-         pVuY9Ze/0Fc+RN4BWjml+sJsSPC0q3clnkekV8YW9BWfTarhEcmFT0YeFcn6+2ExhvX+
-         OxtSXWCjOnRHyqcQbmwaRadmo8ISoNveiuH4ZKEQuEbvWW4jiCCS1s4/dkkq1gXZKKfR
-         ScwA==
+        d=cloudflare.com; s=google09082023; t=1718921953; x=1719526753; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vglLIcmqkxz9MKZSitoSYTZWttEKNgPr+WI84+LeUZI=;
+        b=XRsIm6Xsv3Zj1Pbacr6FN7Dgm4G6ld4o9nCkBVLeY9TFzcRGT4P3H2tUCHogztmCOi
+         IL66xY5ji2VeX+6CUQ9GWSZB1GMAvPD8tVdOJts9T2OIjyDDqnC2vNc7yWhgTltsIV4L
+         WTkjjQXQCO33TnccciNhaJfPAK+fYMLjB5iBLlEJgQXoeM1D/mOlw1srf99Dk8BqLJqx
+         v+uW2rlYD6i2qfpa+yIrLIZYcCq1wduFR04QJ9DrZCB6paLlOi/0WkMKkJ2Uhn51avul
+         uizcKvjcg23BvEFP/2aem2cMrvzhpnbLt02fZ17ChIvqQXdSu1wfMdVI8nxPCQ+2PtzK
+         vRmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718921950; x=1719526750;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8CXkaBTtnkZYe8FKNmQUlJrq+bqc8/5T0kpTwXzA8v4=;
-        b=qmKZ/aKKtetgjeM6E20WcD1u7ZyKDO5FEZ+ZVACZSPLwj0OqbtUqib34FUr+DcAUdv
-         lu1BQNCT5Mtmm4CY3Y82JemJVO0EeGtRWwMKL9ScqWuprwqKm+IdoeB3vziqteHZ+AjP
-         1UqhEGVPGKcY+J6Tv1YndKShstJmZVRurhAczzKAELB9fdaUHzpe8eJ5o2mcSxtx84HM
-         sr7One8kgOkhHw3MeFW7lg/3mZ/c7F2nXw1jOUX8/u6aLMzoLL5aOakyiosJ2hSh2D0k
-         ++qMC1GIGEEMKmD5QQ/ly6BQdrB7U0XJ5dduCca9hr8OMogmAoneIbA4loIS7vHig8jS
-         h9hQ==
-X-Gm-Message-State: AOJu0YwPeUy0M4OO5Co0Qnct6TJP+CpZYw725n9ZWe7Ja8kPE272Hi/9
-	Y01MnRjRG0VM5t7e4SYnLMjJSLY4pDBplUwKlzfbNbDsxW/s0gV6gQFymncTGQoVhZWIL3LlEb+
-	+
-X-Google-Smtp-Source: AGHT+IEn/e1JCoI6n9QjJCApJJIiV/04yUlZRh2THSU//mSCMbMWyTjDtNzzp65OpwjNG+jObfWH4Q==
-X-Received: by 2002:a05:6358:5e08:b0:19f:3a23:880 with SMTP id e5c5f4694b2df-1a1fd5259e3mr837090755d.23.1718921949881;
-        Thu, 20 Jun 2024 15:19:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718921953; x=1719526753;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vglLIcmqkxz9MKZSitoSYTZWttEKNgPr+WI84+LeUZI=;
+        b=pKzw/PrLFwV9Jj5vYYK+edlJbdro1wlJ/qi9OzYM8kTgIDqMr31H/NJd73sZqBNZ9k
+         P2a0Q5K2aSAy9lIyFuKQ8G3xe2WYtM8UcF57TK4+KWyH0LfTNOLA6V/0TFeE4dBtkO6h
+         u4VJZ4QpJtrSvKum+cXcsqNvzatzfnIrykr+WLdsHuPAbz19mYiKUo37QhXhT7+6kUSm
+         lELeAVjNThikPlVWS8S+4jOx70d9ubMygdrT3Xo/PEhZughdJCcnswLv7wVkQbpULRvs
+         IsWpO0NOLb56+yUrEAvACsR6eSUML5DMwyu6ie9v5MoLE13ZPEU10ZmePhEzuY34emAt
+         FKew==
+X-Gm-Message-State: AOJu0YwnNi0fK0WMwGu9gM7/9F3kHjciIEV7cTNPuG4Q3rcFyYTDvNfl
+	NL/Appx47CruXdHVnFtEqXD/zEGWeDr7ab3BqA2wEPvAhxog1Drj9X2/F940Qo5UlYW4fCtOAFe
+	bq5M=
+X-Google-Smtp-Source: AGHT+IEVgAA7E+oyYVF7rzTogs/p51VHdVu9fF5exJ0i6vUUWb2pWCPpmU7B1QKXSrEbD2j41c1bAQ==
+X-Received: by 2002:a05:6214:a68:b0:6b2:e201:a366 with SMTP id 6a1803df08f44-6b501e63d52mr73822526d6.39.1718921953538;
+        Thu, 20 Jun 2024 15:19:13 -0700 (PDT)
 Received: from debian.debian ([2a09:bac5:7a49:19cd::292:40])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79bce8b1297sm17704285a.43.2024.06.20.15.19.08
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b51ef30dadsm806786d6.77.2024.06.20.15.19.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jun 2024 15:19:09 -0700 (PDT)
-Date: Thu, 20 Jun 2024 15:19:07 -0700
+        Thu, 20 Jun 2024 15:19:12 -0700 (PDT)
+Date: Thu, 20 Jun 2024 15:19:10 -0700
 From: Yan Zhai <yan@cloudflare.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -75,9 +76,25 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Daniel Borkmann <daniel@iogearbox.net>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
 	John Fastabend <john.fastabend@gmail.com>,
-	linux-kernel@vger.kernel.org, yan@cloudflare.com
-Subject: [RFC net-next 0/9] xdp: allow disable GRO per packet by XDP
-Message-ID: <cover.1718919473.git.yan@cloudflare.com>
+	Willem de Bruijn <willemb@google.com>,
+	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
+	Mina Almasry <almasrymina@google.com>,
+	Abhishek Chauhan <quic_abchauha@quicinc.com>,
+	David Howells <dhowells@redhat.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	David Ahern <dsahern@kernel.org>,
+	Richard Gobert <richardbgobert@gmail.com>,
+	Antoine Tenart <atenart@kernel.org>, Yan Zhai <yan@cloudflare.com>,
+	Felix Fietkau <nbd@nbd.name>,
+	Soheil Hassas Yeganeh <soheil@google.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [RFC net-next 1/9] skb: introduce gro_disabled bit
+Message-ID: <b8c183a24285c2ab30c51622f4f9eff8f7a4752f.1718919473.git.yan@cloudflare.com>
+References: <cover.1718919473.git.yan@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,6 +103,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cover.1718919473.git.yan@cloudflare.com>
 
 Software GRO is currently controlled by a single switch, i.e.
 
@@ -106,64 +124,132 @@ On the other hand, not all the traffic through this device needs double
 encapsulation. But we have to turn off GRO completely for any ingress
 device as a result.
 
-A natural approach to make this more flexible is to use XDP to control
-GRO behavior. But current semantic gap between XDP buffer/frame and socket
-buffer requires some new primitives.
+Introduce a bit on skb so that GRO engine can be notified to skip GRO on
+this skb, rather than having to be 0-or-1 for all traffic.
 
-This change set proposes a control bit gro_disabled on skbs to determine
-if GRO should work on an skb or not. To manipulate this bit, we
-introduce a new XDP kfunc bpf_xdp_disable_gro as well as generic helpers
-xdp_frame/buff_fixup_skb_offloading.
+Signed-off-by: Yan Zhai <yan@cloudflare.com>
+---
+ include/linux/netdevice.h |  9 +++++++--
+ include/linux/skbuff.h    | 10 ++++++++++
+ net/Kconfig               | 10 ++++++++++
+ net/core/gro.c            |  2 +-
+ net/core/gro_cells.c      |  2 +-
+ net/core/skbuff.c         |  4 ++++
+ 6 files changed, 33 insertions(+), 4 deletions(-)
 
-The expected working flow is that:
-* XDP program examines packets and can call bpf_xdp_disable_gro to
-  disable GRO on a packet
-* Device drivers need to call xdp_buff_fixup_skb_offloading (or
-  equivalent version for xdp_frame), to check if skb->gro_disabled
-  needs to be set.
-* The kernel will elide GRO later if this bit is used.
-
-Initially we only modified a few drivers for demonstration purpose. The
-driver side changes is optional and also incremental depending on
-vendors' agenda. Any suggestions are welcome!
-
-Jesper Dangaard Brouer (1):
-  mlx5: move xdp_buff scope one level up
-
-Yan Zhai (8):
-  skb: introduce gro_disabled bit
-  xdp: add XDP_FLAGS_GRO_DISABLED flag
-  xdp: implement bpf_xdp_disable_gro kfunc
-  bnxt: apply XDP offloading fixup when building skb
-  ice: apply XDP offloading fixup when building skb
-  veth: apply XDP offloading fixup when building skb
-  mlx5: apply XDP offloading fixup when building skb
-  bpf: selftests: test disabling GRO by XDP
-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   4 +
- drivers/net/ethernet/intel/ice/ice_txrx.c     |   2 +
- drivers/net/ethernet/intel/ice/ice_xsk.c      |   6 +-
- drivers/net/ethernet/mellanox/mlx5/core/en.h  |   6 +-
- .../ethernet/mellanox/mlx5/core/en/xsk/rx.c   |  10 +-
- .../ethernet/mellanox/mlx5/core/en/xsk/rx.h   |   6 +-
- .../net/ethernet/mellanox/mlx5/core/en_rx.c   | 117 ++++++++++-------
- drivers/net/veth.c                            |   4 +
- include/linux/netdevice.h                     |   9 +-
- include/linux/skbuff.h                        |  10 ++
- include/net/xdp.h                             |  38 +++++-
- include/net/xdp_sock_drv.h                    |   2 +-
- net/Kconfig                                   |  10 ++
- net/core/gro.c                                |   2 +-
- net/core/gro_cells.c                          |   2 +-
- net/core/skbuff.c                             |   4 +
- net/core/xdp.c                                |  27 +++-
- tools/testing/selftests/bpf/config            |   1 +
- .../selftests/bpf/prog_tests/xdp_offloading.c | 122 ++++++++++++++++++
- .../selftests/bpf/progs/xdp_offloading.c      |  50 +++++++
- 20 files changed, 369 insertions(+), 63 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/xdp_offloading.c
- create mode 100644 tools/testing/selftests/bpf/progs/xdp_offloading.c
-
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index c83b390191d4..2ca0870b1221 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2415,11 +2415,16 @@ struct net_device {
+ 	((dev)->devlink_port = (port));				\
+ })
+ 
+-static inline bool netif_elide_gro(const struct net_device *dev)
++static inline bool netif_elide_gro(const struct sk_buff *skb)
+ {
+-	if (!(dev->features & NETIF_F_GRO) || dev->xdp_prog)
++	if (!(skb->dev->features & NETIF_F_GRO) || skb->dev->xdp_prog)
+ 		return true;
++
++#ifdef CONFIG_SKB_GRO_CONTROL
++	return skb->gro_disabled;
++#else
+ 	return false;
++#endif
+ }
+ 
+ #define	NETDEV_ALIGN		32
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index f4cda3fbdb75..48b10ece95b5 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -1008,6 +1008,9 @@ struct sk_buff {
+ #if IS_ENABLED(CONFIG_IP_SCTP)
+ 	__u8			csum_not_inet:1;
+ #endif
++#ifdef CONFIG_SKB_GRO_CONTROL
++	__u8			gro_disabled:1;
++#endif
+ 
+ #if defined(CONFIG_NET_SCHED) || defined(CONFIG_NET_XGRESS)
+ 	__u16			tc_index;	/* traffic control index */
+@@ -1215,6 +1218,13 @@ static inline bool skb_wifi_acked_valid(const struct sk_buff *skb)
+ #endif
+ }
+ 
++static inline void skb_disable_gro(struct sk_buff *skb)
++{
++#ifdef CONFIG_SKB_GRO_CONTROL
++	skb->gro_disabled = 1;
++#endif
++}
++
+ /**
+  * skb_unref - decrement the skb's reference count
+  * @skb: buffer
+diff --git a/net/Kconfig b/net/Kconfig
+index 9fe65fa26e48..47d1ee92df15 100644
+--- a/net/Kconfig
++++ b/net/Kconfig
+@@ -289,6 +289,16 @@ config MAX_SKB_FRAGS
+ 	  and in drivers using build_skb().
+ 	  If unsure, say 17.
+ 
++config SKB_GRO_CONTROL
++	bool "allow disable GRO on per-packet basis"
++	default y
++	help
++	  By default GRO can only be enabled or disabled per network device.
++	  This can be cumbersome for certain scenarios.
++	  Toggling this option will allow disabling GRO for selected packets,
++	  e.g. by XDP programs, so that it is more flexibile.
++	  Extra overhead should be minimal.
++
+ config RPS
+ 	bool "Receive packet steering"
+ 	depends on SMP && SYSFS
+diff --git a/net/core/gro.c b/net/core/gro.c
+index b3b43de1a650..46232a0d1983 100644
+--- a/net/core/gro.c
++++ b/net/core/gro.c
+@@ -476,7 +476,7 @@ static enum gro_result dev_gro_receive(struct napi_struct *napi, struct sk_buff
+ 	enum gro_result ret;
+ 	int same_flow;
+ 
+-	if (netif_elide_gro(skb->dev))
++	if (netif_elide_gro(skb))
+ 		goto normal;
+ 
+ 	gro_list_prepare(&gro_list->list, skb);
+diff --git a/net/core/gro_cells.c b/net/core/gro_cells.c
+index ff8e5b64bf6b..1bf15783300f 100644
+--- a/net/core/gro_cells.c
++++ b/net/core/gro_cells.c
+@@ -20,7 +20,7 @@ int gro_cells_receive(struct gro_cells *gcells, struct sk_buff *skb)
+ 	if (unlikely(!(dev->flags & IFF_UP)))
+ 		goto drop;
+ 
+-	if (!gcells->cells || skb_cloned(skb) || netif_elide_gro(dev)) {
++	if (!gcells->cells || skb_cloned(skb) || netif_elide_gro(skb)) {
+ 		res = netif_rx(skb);
+ 		goto unlock;
+ 	}
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 2315c088e91d..82bd297921c1 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -6030,6 +6030,10 @@ void skb_scrub_packet(struct sk_buff *skb, bool xnet)
+ 	ipvs_reset(skb);
+ 	skb->mark = 0;
+ 	skb_clear_tstamp(skb);
++#ifdef CONFIG_SKB_GRO_CONTROL
++	/* hand back GRO control to next netns */
++	skb->gro_disabled = 0;
++#endif
+ }
+ EXPORT_SYMBOL_GPL(skb_scrub_packet);
+ 
 -- 
 2.30.2
 
