@@ -1,160 +1,153 @@
-Return-Path: <netdev+bounces-105172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C57490FF62
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:50:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E88490FF67
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:50:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32FF31F21619
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:50:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D30911F218A7
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB7DF19EEBB;
-	Thu, 20 Jun 2024 08:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7BC519DF64;
+	Thu, 20 Jun 2024 08:47:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="zBeTL7N0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166C119B3F3
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 08:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3092619AD6B
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 08:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718873247; cv=none; b=hIoNxZ74JUhNBsexHsCrx6jmduKC29MGxEwMu0EzVk3NJLkctTxerKSUvOAyBXLNivbVExfQ3Ui8cY9RMcC5/JOH3uZbuhuSnOt+vxgcKqqEgWl6tuvEES+fEaoEA82E4EGyKNDV4qYBDHYgn24uXLxf709o7h9z4AWxfHv9q+M=
+	t=1718873275; cv=none; b=Fn43UNaytnzvFFz6ibhepWvMdWi/tkjQBOEeor7buGFlSysnPIUqzyIhF4hmPM67cbDUYZsvvA5LJVBAfE1zxqmOdzvgC3lRzE3gZzRkR5mH/E1FXHl8ehCBSkAyDKBube/t7M23gQW7Ko24+sWKrCSaLIYPJFywiiElB9qdPyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718873247; c=relaxed/simple;
-	bh=4ajyZXdaNZf5EZcN3QttERkpTghR9wLhMoW6fjeTTLE=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=sWu893We5UIHALz2qye5ibCxzmioMjPUkjSjTZrSaeI+RYB9bUgRxbus85gUIe5ADF22Scmv7hDUhhT2f0ojykBKdVZchg7T/0ICJ3xefq8jye52LvbMEcn1h0dW5tdJZSdiheR8LSnHQAPUri+g2+uCMnUTldA6LD8NQqE3JhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3760aaa46a4so8506135ab.3
-        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 01:47:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718873245; x=1719478045;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1718873275; c=relaxed/simple;
+	bh=pu4cUJlHDM2IE/LsL3x7JELUsHAoOtPHfYJ82Jszo2c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dFWy8fod8phRNWGrtvP2MKVLcaAfmE+e/RMwk1YxwbI8RXSBNQU7OGrLlcpvoUFl9Zz+fveFtmx2thPcJXoFqVQH7U0R4HRTuNS46OcG4KqFELrDs6XFw5OkR7O9qv3fdeq1FqtGT/rzf1B/KN3ljqj5sMS1BHI7tpuPjknfCbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=zBeTL7N0; arc=none smtp.client-ip=209.85.167.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3d2469e797fso323962b6e.0
+        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 01:47:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1718873273; x=1719478073; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=95se0OHnag9kJGTphSgvBACh2aH/NzEMdmcamMkWJW0=;
-        b=BRdHaEpW0bbwTL3illglwkUX/pDU/h3ykXeZmlcAmC+miBXEUqP2DZENjUcrWrNY47
-         DGA7wEAwXMquZMm18Q6MmLNojFguA3/L/oKVSt+3TYUf+dWewSO8vbdle+Sd3vQtRP1D
-         vtBUKs8JBEKx1AQ/TLxR3mNRic/i7OcOenretZ3I3O4w/A/5OBsNixlmBdcR25Q26vKr
-         B861lANCBRpWrvNXqGue0l5zbjiibh0+J/pj7t6yZ7laAvh7DtaQ3tZ8ZjEdK2jp1Nm1
-         6aC7ixU4Bsu6/XHWAk7FjwiM3XepJPU4C67xyS14bSoBVpnicRq5b8ohChxBWY3hNqVO
-         md3g==
-X-Forwarded-Encrypted: i=1; AJvYcCUvyjL/s780hezl24o1VV58ggJZI3P38PGb3sRsjRIKeN0LVRWOq82+UK+Wc9ZSAawpRSvVElOo90h+FxAmgZu80Guqj6Nk
-X-Gm-Message-State: AOJu0Yxi74V+5T6YkCSrOZ5d/K23SKK5XogYV4Ox1p8ILGg6k0yHNpVO
-	Z2+0MLcBOIdI20CgwSLqTTOoAvi7NJ+wRzsIj2dHHbz3TYf928vFNE/bK5o2D74y406qQi9Q/eN
-	BWeCq0snsAttgAipQJYdJRd03WKqA4rNDOMtUE0mL2CGbpVENT660VLo=
-X-Google-Smtp-Source: AGHT+IHhn7wtUM2trPcm2DW8Mf8U9tvwkndqInLjrjTlkXvxpjQaZZ07systtO9nwxLdfJGeUmCI+eqdqe8Q4D/7zXVPQtr3AGe6
+        bh=MzUjMgiYrV3CjZ2nfvpVdoNGlwFyp/ogee2pVUj67CY=;
+        b=zBeTL7N0IBmN0SG1wz33HowNOiByo4GEy3EOcBHpFV2ommeqlUCzwfjV2u2suGlgVl
+         8NknIHe7/niLNRRf1m63+aeCNTNVTKv4svzF8+wq78vt4idSW2zymmbJeOVmcR25k17X
+         OOK3oA6JWWE9Ohjd0yv1rxSlBh2ErLmmATTJ07L8PzUY3ZKLViJqcL1191h2Dn6dXPYa
+         gOIP9QSgo9MHPcoeyt7zJGLWqClu+oNfhzxrUrfml17ePLLY2KYNmjNZgV17Q5+jts3O
+         tkBHnSbNiUUNQayDV0xnXsSbJWxpncFIVuAUVRSM/C9XJ2cNhzQiQPhILfxPjsBfArbB
+         52yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718873273; x=1719478073;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MzUjMgiYrV3CjZ2nfvpVdoNGlwFyp/ogee2pVUj67CY=;
+        b=Z/w490Oh3cb5zf3F2jqQcIDEUwAB+cK6j5lipWdbzQCNPcf2FT2B9sxMvHvqubO5rD
+         4BG5I/mQEx1EcV17G24npvdfn1wWgQivQfSDRPsl59QHEO8TMOEfvtyHOs5779koWDRM
+         5+Fz/SY96Yk/Dhb2LwjJbtckVlUXGiLZ6HM6qoYBOiIHWmFJqNPvUJxFsWa1ln5CRDMS
+         UvobUXLvP00MafnUQCRWz+j6U+nDwHXaHyOzFTlQ+0gJr1XSyAxSSU6zJNTrrS1SOMk3
+         sahoyuHnWfJxPM9uhIPb7ES2PlPw6owP+fb64W0cjDNSEYiZcQVPTqkl85X1vgC5aknx
+         6fqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWcGdABCFS+pXQT8/vFkLDHEvOWvaAonyK2ro0ifuUVUfeRosxDLOXlIgYSxlmLZ7uzwLMMpUkDYR+oYSWMTQ8vZyvRBRCa
+X-Gm-Message-State: AOJu0Ywsg70FCiQDt3KoSRIi59pL3CqNUEBtA4XbWFzLMOvETRL0H84o
+	DNbFZRgoSqhKcxwVm5eUmo+ZOJbo9AzKXisUBRSWP+0XJG2YKFuoHW1GJsFFvE8=
+X-Google-Smtp-Source: AGHT+IGbKrol+0UZuYIBxj0w4VnVCxhSca3aoiAcZM78STe77M1ZCPClsmLZtJGsXsSB5GaJ+OtQaA==
+X-Received: by 2002:a05:6808:130c:b0:3d2:2fb5:b477 with SMTP id 5614622812f47-3d51b5d7b41mr2417341b6e.9.1718873273154;
+        Thu, 20 Jun 2024 01:47:53 -0700 (PDT)
+Received: from [10.11.11.3] ([91.235.68.88])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3d247605ffdsm2413992b6e.20.2024.06.20.01.47.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Jun 2024 01:47:52 -0700 (PDT)
+Message-ID: <1b9fd871-e34a-4a7d-b1d3-4f3fd8858fa3@blackwall.org>
+Date: Thu, 20 Jun 2024 11:47:46 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c563:0:b0:376:24b1:1746 with SMTP id
- e9e14a558f8ab-37624b11ac6mr1791235ab.3.1718873245203; Thu, 20 Jun 2024
- 01:47:25 -0700 (PDT)
-Date: Thu, 20 Jun 2024 01:47:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000031ce3a061b4e5d79@google.com>
-Subject: [syzbot] [wireless?] INFO: task hung in cfg80211_dfs_channels_update_work
- (7)
-From: syzbot <syzbot+4f955b33340810d6c105@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] bonding: 3ad: send rtnl ifinfo notify when mux
+ state changed
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek
+ <andy@greyhouse.net>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+ Amit Cohen <amcohen@nvidia.com>
+References: <20240620061053.1116077-1-liuhangbin@gmail.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20240620061053.1116077-1-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 6/20/24 09:10, Hangbin Liu wrote:
+> Currently, administrators need to retrieve LACP mux state changes from
+> the kernel DEBUG log using netdev_dbg and slave_dbg macros. To simplify
+> this process, let's send the ifinfo notification whenever the mux state
+> changes. This will enable users to directly access and monitor this
+> information using the ip monitor command.
+> 
+> To achieve this, add a new enum NETDEV_LACP_STATE_CHANGE in netdev_cmd.
+> 
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+> 
+> After this patch, we can see the following info with `ip -d monitor link`
+> 
+> 7: veth1@if6: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc noqueue master bond0 state UP group default
+>     link/ether 02:0a:04:c2:d6:21 brd ff:ff:ff:ff:ff:ff link-netns b promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
+>     veth
+>     bond_slave state BACKUP mii_status UP ... ad_aggregator_id 1 ad_actor_oper_port_state 143 ad_actor_oper_port_state_str <active,short_timeout,aggregating,in_sync,expired> ad_partner_oper_port_state 55 ad_partner_oper_port_state_str <active,short_timeout,aggregating,collecting,distributing> ...
+> 7: veth1@if6: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc noqueue master bond0 state UP group default
+>     link/ether 02:0a:04:c2:d6:21 brd ff:ff:ff:ff:ff:ff link-netns b promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
+>     veth
+>     bond_slave state ACTIVE mii_status UP ... ad_aggregator_id 1 ad_actor_oper_port_state 79 ad_actor_oper_port_state_str <active,short_timeout,aggregating,in_sync,defaulted> ad_partner_oper_port_state 1 ad_partner_oper_port_state_str <active> ...
+> 7: veth1@if6: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc noqueue master bond0 state UP group default
+>     link/ether 02:0a:04:c2:d6:21 brd ff:ff:ff:ff:ff:ff link-netns b promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
+>     veth
+>     bond_slave state ACTIVE mii_status UP ... ad_aggregator_id 1 ad_actor_oper_port_state 63 ad_actor_oper_port_state_str <active,short_timeout,aggregating,in_sync,collecting,distributing> ad_partner_oper_port_state 63 ad_partner_oper_port_state_str <active,short_timeout,aggregating,in_sync,collecting,distributing> ...
+> 
+> ---
+>  drivers/net/bonding/bond_3ad.c | 2 ++
+>  include/linux/netdevice.h      | 1 +
+>  net/core/dev.c                 | 2 +-
+>  net/core/rtnetlink.c           | 1 +
+>  4 files changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
+> index c6807e473ab7..bcd8b16173f2 100644
+> --- a/drivers/net/bonding/bond_3ad.c
+> +++ b/drivers/net/bonding/bond_3ad.c
+> @@ -1185,6 +1185,8 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
+>  		default:
+>  			break;
+>  		}
+> +
+> +		call_netdevice_notifiers(NETDEV_LACP_STATE_CHANGE, port->slave->dev);
+>  	}
 
-syzbot found the following issue on:
+This will cause sleeping while atomic because
+ad_mux_machine() is called in atomic context (both rcu and bond mode
+spinlock held with bh disabled) in bond_3ad_state_machine_handler().
 
-HEAD commit:    2ccbdf43d5e7 Merge tag 'for-linus' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16519dde980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fa0ce06dcc735711
-dashboard link: https://syzkaller.appspot.com/bug?extid=4f955b33340810d6c105
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Minor (and rather more personal pref) I'd split the addition of the new
+event and adding its first user (bond) for separate review.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Cheers,
+ Nik
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/27e64d7472ce/disk-2ccbdf43.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e1c494bb5c9c/vmlinux-2ccbdf43.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/752498985a5e/bzImage-2ccbdf43.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4f955b33340810d6c105@syzkaller.appspotmail.com
-
-INFO: task kworker/u8:4:61 blocked for more than 143 seconds.
-      Not tainted 6.10.0-rc3-syzkaller-00044-g2ccbdf43d5e7 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u8:4    state:D stack:21872 pid:61    tgid:61    ppid:2      flags:0x00004000
-Workqueue: cfg80211 cfg80211_dfs_channels_update_work
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0x17e8/0x4a20 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6837
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
- cfg80211_dfs_channels_update_work+0xbf/0x610 net/wireless/mlme.c:1021
- process_one_work kernel/workqueue.c:3231 [inline]
- process_scheduled_works+0xa2e/0x1830 kernel/workqueue.c:3312
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3393
- kthread+0x2f2/0x390 kernel/kthread.c:389
- ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-INFO: task syz-executor.3:7040 blocked for more than 143 seconds.
-      Not tainted 6.10.0-rc3-syzkaller-00044-g2ccbdf43d5e7 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.3  state:D stack:25456 pid:7040  tgid:7035  ppid:5121   flags:0x00004006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0x17e8/0x4a20 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6837
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
- netlink_dump+0x5d3/0xe50 net/netlink/af_netlink.c:2336
- __netlink_dump_start+0x59d/0x780 net/netlink/af_netlink.c:2454
- netlink_dump_start include/linux/netlink.h:340 [inline]
- rtnetlink_dump_start net/core/rtnetlink.c:6524 [inline]
- rtnetlink_rcv_msg+0xda2/0x1180 net/core/rtnetlink.c:6591
- netlink_rcv_skb+0x1e5/0x430 net/netlink/af_netlink.c:2564
- netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
- netlink_unicast+0x7ec/0x980 net/netlink/af_netlink.c:1361
- netlink_sendmsg+0x8db/0xcb0 net/netlink/af_netlink.c:1905
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x223/0x270 net/socket.c:745
- ____sys_sendmsg+0x525/0x7d0 net/socket.c:2585
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
