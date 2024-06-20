@@ -1,64 +1,50 @@
-Return-Path: <netdev+bounces-105191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 508FC9100ED
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 11:58:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C3CA9100FB
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:00:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B855AB20D51
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 09:58:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 275E0283AC1
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F06E91A4F1F;
-	Thu, 20 Jun 2024 09:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE0615AD99;
+	Thu, 20 Jun 2024 10:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZdQzlxBY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Taiu59EE"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0CE250288;
-	Thu, 20 Jun 2024 09:58:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0EB7E58C;
+	Thu, 20 Jun 2024 10:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718877493; cv=none; b=GmO+OEnBFfpoGsQy7FDsSDWx/CLBjmq7TyGBdlXtqKSWLJur6PAOn3Xr4pee1xbyHZxxPyh+PdUD2Wufg5BcGff2qr6DsMbCIPSOCbK6pGMJ0RAYA0fRdkeiQGbDYJ4nbc1hbGS3NHkbL2YOf0O68tlV+1EvG6qM7PiOaCHcP2A=
+	t=1718877629; cv=none; b=XkDcUJNjPg44wgW0bXeSo/kP3ekqcnS7G3ljBylBliMBlzq+6Z5xivw5O3IHZnFxNjgQrJsh/R46zT23v5SzFT6ISvP2rdXoJXVkxnSlRsmCeHijIVcv+xJ5Pl2Va7UXOOn1ZF/d3zU1KcGw9h0gwgEGwQ8tMWXnesw2p7gr35k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718877493; c=relaxed/simple;
-	bh=/5H0W6bpzr/xWhXo2uhsjMtRPyGadwTtdkaBlFBjGAE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hvfuepSj8Fz1rpSn/n1J3jOrO0uTmFtCoDase3+nCw2czbCag/RKNoEPGZxKdnGxM0uW+l0dmS6bteaIHwUrPcg5L5WOEtN96mYy9wUS56PpXEcz771gKLD6BjtCTrkxKhHeF+N4aAPOc2FI8lvyBabi5taaDrxSpdECzZMQZmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZdQzlxBY; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B17D14000F;
-	Thu, 20 Jun 2024 09:58:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1718877483;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=4TKdOT/QJ+8CsEXFGrsw+K9KP2TGcydZi7LEpJK+X3E=;
-	b=ZdQzlxBYx8G+CVIeNAuIX/YEYMZhhsaSCExXfuLZ/X72ldsAX/7+bj00Y7zCvUceOGHtc2
-	wcZ1064qqwTJw/IhVuXUuKPpyhcKlCjSiUV2cPYcjqcvP0BJkYu6fkoSVKYl00z61QMU7R
-	5Vto2f1x3bHrBzMy6hQX/QByxRQDPRGYc4oAeo2ikWmfFPoDkqgc3bSTz9Hkz1u7Y8En3G
-	ziYU8VaWCiMMECi+yTsSm+gPP0z71hrgFkxpwJ5o+HaLb7rwrSKHYdI8gFyzuUxuQWm6Sc
-	eHRrstwFEf6xFzWRHSxjb/5hv1p+34miSnRjsXab8+WkI21gqkJdBEvSROpX+Q==
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	"Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: kernel test robot <lkp@intel.com>,
-	thomas.petazzoni@bootlin.com,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net] net: pse-pd: Kconfig: Fix missing firmware loader config select
-Date: Thu, 20 Jun 2024 11:57:50 +0200
-Message-Id: <20240620095751.1911278-1-kory.maincent@bootlin.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1718877629; c=relaxed/simple;
+	bh=Sn3yo7fsGwZ7f2bMch8DHKgTTPUFU1zv/B2Yp9k8OEE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pUobnm/NsZTNl4qy/pPxloMG/E9ZZ9Ymq+s+pYqC8AiYQJRP/wBHu5pr5tP2jivwCgRCMMWjFUAcsSVwErHHHmah8q5juh0xNuVijaYaZzU5/OaVSa7uIoeK4SPFWJ2r4VtBbMLGde5EoQZqMQkQ2NhDXiYKDhlFU/qtgtwXX+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Taiu59EE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 31785C32786;
+	Thu, 20 Jun 2024 10:00:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718877629;
+	bh=Sn3yo7fsGwZ7f2bMch8DHKgTTPUFU1zv/B2Yp9k8OEE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Taiu59EEl3ONkEwTdfzlu0hfKrQkRzIS/s8r4eIFXGc1Z1fLdQiAaKuL2s7jxs51k
+	 8ogqBVaScc0Ob1gPjHEAiVkGSEdP40VKOUw1AGdJVjcRDWhxY8Rmalk6sGeBy+EWIk
+	 fP4ldjcfNmLCkeG3kIpGpzu5s/ySJK/XBEXV/WfgRvUppGDN1alCaxtlylGoAljydv
+	 xcfF3esHqBG96pkXyY2GFuJlH93UAPbEuqxolGU82/HbcHcDmuUSl6YAY2Fu3ltzkw
+	 k7tdKU7a82Sm8jVwU5FeNGsmYKcGDoV54fzgItLl2Rkz8FSFY8SfHRFpGKrut/zG4/
+	 trE0llIibHDUg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 17A4AC39563;
+	Thu, 20 Jun 2024 10:00:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,33 +52,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: kory.maincent@bootlin.com
+Subject: Re: [PATCH net v1 1/1] net: stmmac: Assign configured channel value to
+ EXTTS event
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171887762909.4048.5111003780557112091.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Jun 2024 10:00:29 +0000
+References: <20240618073821.619751-1-o.rempel@pengutronix.de>
+In-Reply-To: <20240618073821.619751-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, stable@vger.kernel.org, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ richardcochran@gmail.com, tee.min.tan@intel.com,
+ vee.khee.wong@linux.intel.com
 
-Selecting FW_UPLOAD is not sufficient as it allows the firmware loader
-API to be built as a module alongside the pd692x0 driver built as builtin.
-Add select FW_LOADER to fix this issue.
+Hello:
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202406200632.hSChnX0g-lkp@intel.com/
-Fixes: 9a9938451890 ("net: pse-pd: Add PD692x0 PSE controller driver")
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
- drivers/net/pse-pd/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/drivers/net/pse-pd/Kconfig b/drivers/net/pse-pd/Kconfig
-index 577ea904b3d9..7fab916a7f46 100644
---- a/drivers/net/pse-pd/Kconfig
-+++ b/drivers/net/pse-pd/Kconfig
-@@ -23,6 +23,7 @@ config PSE_REGULATOR
- config PSE_PD692X0
- 	tristate "PD692X0 PSE controller"
- 	depends on I2C
-+	select FW_LOADER
- 	select FW_UPLOAD
- 	help
- 	  This module provides support for PD692x0 regulator based Ethernet
+On Tue, 18 Jun 2024 09:38:21 +0200 you wrote:
+> Assign the configured channel value to the EXTTS event in the timestamp
+> interrupt handler. Without assigning the correct channel, applications
+> like ts2phc will refuse to accept the event, resulting in errors such
+> as:
+> ...
+> ts2phc[656.834]: config item end1.ts2phc.pin_index is 0
+> ts2phc[656.834]: config item end1.ts2phc.channel is 3
+> ts2phc[656.834]: config item end1.ts2phc.extts_polarity is 2
+> ts2phc[656.834]: config item end1.ts2phc.extts_correction is 0
+> ...
+> ts2phc[656.862]: extts on unexpected channel
+> ts2phc[658.141]: extts on unexpected channel
+> ts2phc[659.140]: extts on unexpected channel
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v1,1/1] net: stmmac: Assign configured channel value to EXTTS event
+    https://git.kernel.org/netdev/net/c/8851346912a1
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
