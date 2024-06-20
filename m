@@ -1,746 +1,277 @@
-Return-Path: <netdev+bounces-105466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E69891140F
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 23:05:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE26F9114B0
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 23:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2451F1F2285F
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 21:05:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 422B51F27926
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 21:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E87577116;
-	Thu, 20 Jun 2024 21:05:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E53774BF0;
+	Thu, 20 Jun 2024 21:32:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P8plwu20"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gu3mAz7F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7779C3A1CD;
-	Thu, 20 Jun 2024 21:05:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718917541; cv=none; b=SavAnyth4Wq3VM2xutbkJQPAD6FDWmzIhoLt8WVBJEg1m2o6zm7uJ6KjOrByvxbY4WedpE3JnGjNB5dIYy9uzmpK9/jT7wWnt6QPxs/0XNcgrjWo5AKb5KQ5r5D4nd5c6rHTiGv63rQS8j4n9mwe/iwbcPW23O4mWFuWBbDIhvU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718917541; c=relaxed/simple;
-	bh=xm45bYqOQQOVNUKToopnMPsmqi45fgnJ2Vh9u3ZgX4I=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Yrrk/07lDWfHEB8cUvanr2eQ98tFPmg/Mnei4PQwB5/4+2ROawTjDQqtRfTp497Jf7/6QPOWXiXxgXqutnj7Zdlv/R3hPdMiViNKaz1bsxtKbXQvl66isosjcVGYfFbWSE3mr1P+/JBCJW2dpEW3WzijtJ3sULUf9q9j+be/mSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P8plwu20; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1f44b45d6abso11210705ad.0;
-        Thu, 20 Jun 2024 14:05:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718917538; x=1719522338; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=i2466Dce19cj2BQ3ZpJsopSXNqEq+bcueHyYljZ/i3A=;
-        b=P8plwu20HwxUDyle09M+1VKT/FvZk05xTT62SeTmywbb6hPZzBntC7clJIx7cBORor
-         h86AMi+gbGCDO5fc85GP5wgEezbcRnYMXJxoUtMGwp3nhoZNHiye1SXvUVi1NX2cxSUv
-         T2YiPYx5fhkzPG/Jli5vyBnCENXEoZ9km1DOWpLP4ROqG6x9SfMrI1wcDhpCKkHFyHF7
-         WsmUKWNP7pfckTY1AZQKHVAxCTOWetuzBkAhK9ePKVAJjoXJnipiTZjKBkBY1QAl6zu+
-         oMc7rvnwnCwP4cNJh7USxR3/Af9leACzHk7qHYps4IDCjcRSTbDnTdSqQw9KZYh+9ZSf
-         Xb1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718917538; x=1719522338;
-        h=content-disposition:mime-version:message-id:subject:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i2466Dce19cj2BQ3ZpJsopSXNqEq+bcueHyYljZ/i3A=;
-        b=ajcP3lY6ZqF2XyZbmIE4DkebEmKwtROxDQLUF0oLFNUIrfSziFPEyMGgUqNw9KNgix
-         dntM6MXTwKKiiNwTMyRckEZkinJlhorzQi2QDnox/V1C+gtpd9wNYbBHXAEkXJUQSFWc
-         GUEkRQBtHGBvzQ/wkKaJRXBCW7QZd4QOil0wy6hNm7bP8mEvLG7mnCfcMDS2VMgHH9BT
-         WihA1g8vzT7bZ6LAJgUa9soaqRv2mlTJPc9JeO4ouk2ykfNKhOcwwb8kDdXTaF8Cwrf+
-         e9LT5B8jjE7XzNNlz1WCJnuJ97HsLtKaaf5PNhwyHR8vSwhO6Dw+IqmqwszCyBfZbIQK
-         c3hA==
-X-Forwarded-Encrypted: i=1; AJvYcCVclGE6pl6G4M9tAppyj0kAZFHlrycNjrUCSWH8xueVKprK4nSLb4dIFYyGyQYxzdhXi+TPjtL4zvhFHhUVTb8w6EPyqhtp/j9cb+p/TBBKJP9o1YRuAXYoSLl7HqhKn59HyK5eU81j3JdJfzj+XREuihwTzOaoI1/wmfypRxXCMPLJfHEHPc2bJ7y1
-X-Gm-Message-State: AOJu0Yx+Dfn+pWPQkp5cTCqJd8/rkmHKzrdaLlUvO/TWHc2VEUjo9HUD
-	hW8p4CRJ9mbVvrMQdvAQA457e/6tCXKzmt+YhpFiuiw7Q2zPW8LA
-X-Google-Smtp-Source: AGHT+IFq4lLdYW2Bs2UyXEWrzoqFVWFUUhHHWF6w7rCNHC+Mfi0UpE17wGNTme4jXIc3V1sonRT1rA==
-X-Received: by 2002:a17:902:e544:b0:1f7:414:d67d with SMTP id d9443c01a7336-1f9aa466120mr76918275ad.63.1718917537247;
-        Thu, 20 Jun 2024 14:05:37 -0700 (PDT)
-Received: from tahera-OptiPlex-5000 ([136.159.49.123])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb8c8960sm533085ad.227.2024.06.20.14.05.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jun 2024 14:05:36 -0700 (PDT)
-Date: Thu, 20 Jun 2024 15:05:34 -0600
-From: Tahera Fahimi <fahimitahera@gmail.com>
-To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Jann Horn <jannh@google.com>, outreachy@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH v5] landlock: Add abstract unix socket connect restriction
-Message-ID: <ZnSZnhGBiprI6FRk@tahera-OptiPlex-5000>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD3859148
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 21:32:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718919140; cv=fail; b=gk1bZNxRUBixQ4HMSZd84S2r6ZRFIN6lflHgTwhfKUCT9wVEbgc51CbBvrkXFs3Q6q8brxY/XHEc1SaBOLeS+8CQsJMHrPFWfvJ+SqIcTyK+6IqMdovlEfQ04yeo/tk+FJPxKVJJH3RQqNE+pKojtOT8V2jkCxpP8M2L+zSTUOM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718919140; c=relaxed/simple;
+	bh=aI4cMs2AvesYh/ION3Kct4SzPJbR7lkuf3eHcqzVRnM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=YGjGDoSFaKRrzaoFMemnPnGp7cKuus/UDv+ul/L2/GrMGz8IkfykAyzpTGlv9MWOBy9UIlzbEWlG5eDY8oMVXZtIU8MgGIyp4enZtg3FtcCJ2CNVqXrdE2jsE6Gdbypj9meJeNxA+Aq9QoR8p87d/EO91ZkTmBTBrwoPr+WdlK4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gu3mAz7F; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718919139; x=1750455139;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=aI4cMs2AvesYh/ION3Kct4SzPJbR7lkuf3eHcqzVRnM=;
+  b=Gu3mAz7Fb9NXJMnIZCOEIsTlpDnxavY65kH2/q4OvATjhuTAloGyOcV8
+   K8BLT7Q3oV7lHHoTKVx9nkfGetwNphtq3aAEKRiud+4FfXHvdpYEiVtXO
+   kjEnupcMgPqaANOsTzRVYy/wYrjxrae9EEEqbDwMKT7F4R5aYVBnZVQE0
+   AwowrFH7fIdUo5iN1Ry+a16JqpuU4B+m+mPp0GkwCDY4Hh/O9oCRlHO7y
+   zJ/YV8AILm4R/Hd9ksRtqjLlnnmkqwbOnUO3dHENoXbeFMHB8T8+XnPnU
+   9kcv93KCWtaohrJXwRiH8COhRZgk8UnL5AXeKa7rbxlhmEefzPwaVyEfv
+   g==;
+X-CSE-ConnectionGUID: TDqA425WQduYUBV4K0cNiQ==
+X-CSE-MsgGUID: tWqWdMtJT3OZgPc623eslw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11109"; a="18843375"
+X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
+   d="scan'208";a="18843375"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 14:32:18 -0700
+X-CSE-ConnectionGUID: 8oTaE3LtTmehWjVwMZX8+A==
+X-CSE-MsgGUID: IrR7FlghRvqeUW0xF8Z4cg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
+   d="scan'208";a="42838278"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Jun 2024 14:32:18 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 20 Jun 2024 14:32:17 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 20 Jun 2024 14:32:17 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 20 Jun 2024 14:32:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BYXefVBE2oMahRM3zfDWGmONoG+dWmCSB9x+9BH3qxuDbiRMByJ5j3Jt25QlBN8i3/T44Jw8WxBPX0LoXYHMkUbrQVHSREdxajjSFYTEJOlrIQ2gx63gPTSGqIJL3eiiYGgazSb553fU20b/mlrfcluCZIrkqIpm+hxwjliK08LDE733uBicsz0D7SUi2DxaZIjdwX7QTVnVlFG6Lpqp/l3+I+gY/uroXtoL7DapYwUjsNOzPv8qCgWqjySFKiHGsm8AYkXzqav31d7iAPKsGJViDr5d5F85v4QgwxJq4YSO9zOFcfymA1IaAnP6KzpMAGUsa13LjrH/jFm3cTv3NQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aI4cMs2AvesYh/ION3Kct4SzPJbR7lkuf3eHcqzVRnM=;
+ b=kssHoTdlIu+6CwUIr/+rAs9n/vHBaNbgyy5KAE5f0PdHNL3TJE17ML/9wMvyKoPvqX4VE3s4u7anVhhEgcogErywYIkrYmRgn3BsMKgD0Eyys3GmgGTq23Lk9zfDZM0Sa/doSumUxYXCgIcdjCe0zbK76rR3JDi94skYpl5pdYoHsV7Xh8XkidCV+/OuCpGsfHH5Z9L+ddTV9DDPEV36t45xdvm4ecZ213BbM5jD02doQsCjG3rmRhPEZB9BbnteUQsh3COjanOp8vHRMzxaQ89CK4SQoqVUqVdXoV0GNFHvOHrIUQz9lXDi5D3XyX+RerUyk3raCHkxXstPvM5mYg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CO1PR11MB4993.namprd11.prod.outlook.com (2603:10b6:303:6c::23)
+ by PH7PR11MB8251.namprd11.prod.outlook.com (2603:10b6:510:1a9::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31; Thu, 20 Jun
+ 2024 21:32:15 +0000
+Received: from CO1PR11MB4993.namprd11.prod.outlook.com
+ ([fe80::92:1a96:2225:77be]) by CO1PR11MB4993.namprd11.prod.outlook.com
+ ([fe80::92:1a96:2225:77be%6]) with mapi id 15.20.7677.030; Thu, 20 Jun 2024
+ 21:32:14 +0000
+From: "Singhai, Anjali" <anjali.singhai@intel.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: Paolo Abeni <pabeni@redhat.com>, Boris Pismenny <borisp@nvidia.com>,
+	"gal@nvidia.com" <gal@nvidia.com>, "cratiu@nvidia.com" <cratiu@nvidia.com>,
+	"rrameshbabu@nvidia.com" <rrameshbabu@nvidia.com>,
+	"steffen.klassert@secunet.com" <steffen.klassert@secunet.com>,
+	"tariqt@nvidia.com" <tariqt@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>, "Acharya, Arun Kumar"
+	<arun.kumar.acharya@intel.com>
+Subject: RE: [RFC net-next 00/15] add basic PSP encryption for TCP connections
+Thread-Topic: [RFC net-next 00/15] add basic PSP encryption for TCP
+ connections
+Thread-Index: AdrB1/ByhY5vhdaNSxq8hQ6vCeqC9QATE02AAEx36mA=
+Date: Thu, 20 Jun 2024 21:32:14 +0000
+Message-ID: <CO1PR11MB49939F947A63E4A5F8C5246A93C82@CO1PR11MB4993.namprd11.prod.outlook.com>
+References: <CO1PR11MB49939CBC31BC13472404094793CE2@CO1PR11MB4993.namprd11.prod.outlook.com>
+ <66729953651ba_2751bc294fa@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66729953651ba_2751bc294fa@willemb.c.googlers.com.notmuch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CO1PR11MB4993:EE_|PH7PR11MB8251:EE_
+x-ms-office365-filtering-correlation-id: 309fbfb3-25b2-4410-0faf-08dc91707411
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230037|376011|7416011|1800799021|366013|38070700015;
+x-microsoft-antispam-message-info: =?utf-8?B?S3lTYmh4b3l1MHZJOFh2NlZTcjhDeWNDQzhlMG40S3l2NGlMUlB1ZWt4bm9q?=
+ =?utf-8?B?blprTW92cWc5eGlDSnZQTXFuMzM2czlMODJBdjMyUEM4a1NBSnAyV0lXSHBn?=
+ =?utf-8?B?VUpFc1JmKzFzQmtldDd6TGl4MHpsUmltMGozaDgrM1Fhc0ZJM3plVmw5dStK?=
+ =?utf-8?B?cTdSZC96ZFVoRk5PVjVhNlREdHI2TDhjUDVBWS96YStvNGlyWlJYVXpuOEQ5?=
+ =?utf-8?B?d1BmZmpvM0VQUUlTdXh6bGNUYnNDMFpZanMrTFFuRmo1bzFoK1VyaHZlbHRu?=
+ =?utf-8?B?VEVSS0RPWXU1MEVnSHZLbGRVUzI5VG1tZmZtL2ZxaTlDeGZCUXV5bm9qZE83?=
+ =?utf-8?B?SEk1SFhVNVhsWjhTVHFxblRiU3VNNFhXa3lnZGdOY3FMOXh0Sk5JZDd5NTFh?=
+ =?utf-8?B?NWYrU1h0QTBXQjRwcUpNVExLeXdHRG1FWjBSUDBPOUJ6eTNCUURGVlMwQnpJ?=
+ =?utf-8?B?dG0zQ2o4c2d2VnJObGEvYmo2Y2FZRGxFdXFRRHdKV0xjRGc0M2V6aUtic3Bj?=
+ =?utf-8?B?cGRKSDFRMHdhQ1VSU0N0UzU1bUg0MHNyZjdnK01ZYlJJRUdGYytHdTYvcElJ?=
+ =?utf-8?B?TU1oRnFabDVzaVBLc2lwbU0wZERQdnFwY1F2ai8rUUFqblRzQjlQMzQxV29i?=
+ =?utf-8?B?aWxITGMzQ09xSlBkWDYranF1Qm0xcW15OHhtZHhxTlRyMm1laHhyaTd1amlC?=
+ =?utf-8?B?VWYydmZSdE5abWJmRDA4OU1rSDB0dDU4V3Y0YXZvUTlDYjhpMU5tRHVxNmlL?=
+ =?utf-8?B?U0hveGU3SXhyODhiVFhMUE0yeHhVSnBYTlJKNDFKU3ZoNUREQkswU1JRUlQv?=
+ =?utf-8?B?MGdjNURwd3BDVlVLalkxbHNBQ0IzSzlrYzE1azNta3FxeGUwUkhpRklHMCtE?=
+ =?utf-8?B?OFQxSjZzdnh3dlNUZWhaOHdmc2RydWZkS0RSb2x6ZW5VRTV1YkZEU29WcnQw?=
+ =?utf-8?B?S3dQZ1V1RHIrUDN1bDBjNDNSNVhoZzVtTkxBeVg4Z3dxVkk3QUg5NnhEM1J2?=
+ =?utf-8?B?NkdiK2JXUWpxWHhWT205cUk3WHpJVmJHRThseXhya2hpQnFOQ2hPQVZvc25V?=
+ =?utf-8?B?cWF3bVZhbEpKNGZxbk9TZkxYQVMzazVlemFyQTZBVjUyZ2NwcnJqd0hnRW1s?=
+ =?utf-8?B?bzZpSnZrS3pCQ2grSE5mWHpyMXRaS0FPVUFOQU1QajBBbFJudms2T2VOdGNW?=
+ =?utf-8?B?ZlFsTmltM2VreE9Td09FWHN2UTNFOGxmRFlZR0tIRVREdUVNeHhBRGVqNk5J?=
+ =?utf-8?B?T2xtTGNZZEV2V1FlQ0hyOXNQRk9NUG85SkNvNUYyajlFUEJkekljMkgwYXU3?=
+ =?utf-8?B?OVpwS1J1TUV6RzhVMFZIQjN1RVZRQWZuY0tjV0JCRVFHM2VRMFpLRENpQWtU?=
+ =?utf-8?B?ejM1YmIrS0JieWoyN1FSNk4yU25aWWltcWFveTFEUkFUamIwaVVQZnhxK1dm?=
+ =?utf-8?B?dXM1UEJEWkQybWVOeHNvUkx6ZmszenJaU3ZiaHUzM2Q5MjZDdE9tUzcyWHUy?=
+ =?utf-8?B?T1VwSGdoaFhJZGc4MEpPVXVyYXlPck9FTWRmenlNOG9UMnZZbjh5M0poWFo2?=
+ =?utf-8?B?RTFuUkRHVUhJOHpsSVN4aU45cEhwTFc0VFlJdUthTnRNcVhEYTJseTJJNTdZ?=
+ =?utf-8?B?K2lOSHhmbTNTUERNWHd4dXN5SDZMeFE4dyt2b1Q0SHZtaFRvUmQ1NXNIaVZt?=
+ =?utf-8?B?b05PRmxOQWlSZ1VHUVJzeVNBdWc5cjF5Mjg5LzMvMDlRa2JQQUNhalRyNEZY?=
+ =?utf-8?Q?ZvEwi99y5qC1yXI7242Et0CKXCgIot0odhT2h2m?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4993.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(376011)(7416011)(1800799021)(366013)(38070700015);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?SVdTcWlyUUxrVS91YnkvM2NyWjJpVm50bmVqc1o2MTFWelpnYlJKVE1ETnVE?=
+ =?utf-8?B?dzVrQkhJTmlCQ2gzSnhkUUhhc2J5bllIZ2N6ZFlzZjZLSFhXaVN5MnNoR29N?=
+ =?utf-8?B?a0lnbVFSSzdQN1dsb2tIN1lpS0UxY3FXc0VSRUFMbTFIS294Mmx0Mi83QWlO?=
+ =?utf-8?B?R1huUjg2NkthMi9KWjg0b2lJUUYva282eGd6Z1lwNi9Nc0E2MWpXanpxSndQ?=
+ =?utf-8?B?ZlZ6L2ZjanhVTFZnUE4xZk5LNDM4V1Ava0tqQXFQS2dCL1BSV2R2Nk80cWFO?=
+ =?utf-8?B?YzJMc0RnVk5QcnRnNFdpbSt3ejZjNG9CV0hYREx0QmRzK3k1R2U1MmpJUEtj?=
+ =?utf-8?B?NHJ2dGRRK2ZKSXhZY2t1NWlWL3FoekFaZHI0cEdwQ3FCL3czcTV1WStWNTJD?=
+ =?utf-8?B?bGU3cWpnNHpKRk9ZbzIxU282VmdWN3JGeFlGNEx3RGw3ZVIxOTFhdjVycjBx?=
+ =?utf-8?B?eXZhQXF0RnBJSHh5YWk0Nk4wUnlNQ3VzUzExdVdyYlNCcjRpS1huTTlVQ3dB?=
+ =?utf-8?B?M2x5UFF1V1hwa2QrdURjTWVYdmxBaUFBSGRRSUFJVVpESVVTZFV0T29HRUVH?=
+ =?utf-8?B?cUZEd2h3THRjNG1VcEh4RGFmWWFsa05ZZTRGQjR3M1NjNXo2RUxoNFFQb1hB?=
+ =?utf-8?B?SzVMNVlxQzFRRzcwcWt6cHBQUlNXdXI0dlR4VmJ3ME9kbnRWd01MUTd5VllT?=
+ =?utf-8?B?SG9tN2pPaHlZalRPSXNpQTlMS1I5Vkt3WllOMTVjZDMza0hkNERnTExCLzlG?=
+ =?utf-8?B?T0FWVHR1bzhlWTgvT3UwdjNqS0lDTElMYnNwcW9uL3NaM0hla3pTUHFuN0pZ?=
+ =?utf-8?B?NDhDQ3NCcit2QzBlYW15S3pnV3pXZnlXeGNvZjZWZjZ2K21YWkRZdkx4L1pt?=
+ =?utf-8?B?Z3ZJcVR2UmRwck45UWFDeDJaYTVuZU1qOFM2Q1R2Q2Zla3QyOE5PQ3JxMDFB?=
+ =?utf-8?B?c2E3bHdiSXh6YlV6WTZaSko4eDFZZ2dMV0F0ZHRseDl3S2IwbTh5OTMxQkhH?=
+ =?utf-8?B?M2NIV2ZQN2NsRWdaRUhtUzFadHhJNmRybzJtTjlrQ1pkUzNXMHdBQ2ZXWmFr?=
+ =?utf-8?B?bmp4c2txZU9rc2t3ZXh4US9GSjRMMkQ5V3J5bzJqWnNNM080MEdzWU9kM213?=
+ =?utf-8?B?cFRtTytTa0EzRFFnZ3pnYXZUNCtybGFTMGd6UVlxaE9HMUpOUU1VTGt0TlFj?=
+ =?utf-8?B?N21OODRlYU80clcwY0hKTnhDazBsRFBoSU9pR3hiZjU0Ri8yd0lHRVB2RDF0?=
+ =?utf-8?B?RTlHNmwxRjBSM3VOR0J5ZkNzTmpHSHJCMUU0RGtzVHVMZDk3Rnh1OHV0R2tL?=
+ =?utf-8?B?Y2RiVVlRUFppKzVzWlJ6TmZJTTdjVVY1cC9sblV2VEdwOU5qWmNObWtyU1ZK?=
+ =?utf-8?B?SHNYcllMWlpWQmF0eXpYQzJYTUdaRnJwak5UYk16ZTIvZFhkZUNSVUtKYmJB?=
+ =?utf-8?B?TXJOVVZMWlgxYjcxSHBIdTVxeWdJT2xBR28wVkFQSHExeEw2K3pLcUhJdVk3?=
+ =?utf-8?B?R3lpeUY0ZzFVZmxGY0tBelNEY3hsTkUvWUpzTGc2aFR2NUxNSDBWc3JTaU1l?=
+ =?utf-8?B?ZjBlNlNxS2xlOG1jWGgwNWtJWmk3dFlHcUJqMG41ZnBJOG82ay9oUmpuRjBT?=
+ =?utf-8?B?WXkxOW5MSEZWM2hKUndzMm51Sm9UWjJ4bzF6bWtqRkVpWnVMT0UreG9BNXV4?=
+ =?utf-8?B?UkR0RlNDU2pLWUI4RFpYTzZ6Mlc3SWVpQkxURTFuVjdlcUpPa2I1aUE4dmxo?=
+ =?utf-8?B?NHNpalNUeFdORzRvbkpGTE5Qd2szQWl1bjhYaWFoWUlyRHJSWWpOeE1SZkFI?=
+ =?utf-8?B?V0IwNUZhYStZTktWdjlJZmlkT2I2ZWJqTm0xZ2Myc0ZYTk1NQ1NIcVpPWWtI?=
+ =?utf-8?B?TzcwSk9hVktoRWk5ejdmaEhwc3NEWFRmWmlJREN0bmV4dGZJRDJTMkpRY1FC?=
+ =?utf-8?B?cGFMSklHZUQzamtRRkk2QkZzUDcybWdKZ1NjVDAvZXkzRTloNWxoVktIVmlC?=
+ =?utf-8?B?d081ZVQ5S2ZDbHF1ZXdvOWtjR2p5VmNHVVB0NWpFenNxTG8zYi9jV3lKL2th?=
+ =?utf-8?B?NVc3WlJTQVRVZERoTzRkRjRZbUw2SmgvZXdLdWQ3a2hvUnk4dk81TW1qV1dI?=
+ =?utf-8?Q?ztpUVTR6Qw5X5ISnNyxKVQrjv?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4993.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 309fbfb3-25b2-4410-0faf-08dc91707411
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jun 2024 21:32:14.9393
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: P5J60KG9/l4kkb3nDgFeczVm9LBMHbWJAu1N324c701OVTM+Kv1qIjJPF+64+5x/O6zjaUHCK/Mb4wjADgwuiz6lHQdpnf9NKEEl/6ouE70=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8251
+X-OriginatorOrg: intel.com
 
-Abstract unix sockets are used for local inter-process communications
-without on a filesystem. Currently a sandboxed process can connect to a
-socket outside of the sandboxed environment, since landlock has no
-restriction for connecting to a unix socket in the abstract namespace.
-Access to such sockets for a sandboxed process should be scoped the same
-way ptrace is limited.
-
-Because of compatibility reasons and since landlock should be flexible,
-we extend the user space interface by adding a new "scoped" field. This
-field optionally contains a "LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET" to
-specify that the ruleset will deny any connection from within the
-sandbox to its parents(i.e. any parent sandbox or non-sandbox processes)
-
-Closes: https://github.com/landlock-lsm/linux/issues/7
-Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
-
--------
-V4: Added abstract unix socket scoping tests
-V3: Added "scoped" field to landlock_ruleset_attr
-V2: Remove wrapper functions
-
--------
-
-Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
----
- include/uapi/linux/landlock.h                 |  27 ++
- security/landlock/limits.h                    |   3 +
- security/landlock/ruleset.c                   |  12 +-
- security/landlock/ruleset.h                   |  27 +-
- security/landlock/syscalls.c                  |  13 +-
- security/landlock/task.c                      |  95 +++++++
- .../testing/selftests/landlock/ptrace_test.c  | 261 ++++++++++++++++++
- 7 files changed, 430 insertions(+), 8 deletions(-)
-
-diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
-index 68625e728f43..1eb459afcb3b 100644
---- a/include/uapi/linux/landlock.h
-+++ b/include/uapi/linux/landlock.h
-@@ -37,6 +37,11 @@ struct landlock_ruleset_attr {
- 	 * rule explicitly allow them.
- 	 */
- 	__u64 handled_access_net;
-+	/**
-+	 * scoped: Bitmask of actions (cf. `Scope access flags`_)
-+	 * which are confined to only affect the current Landlock domain.
-+	 */
-+	__u64 scoped;
- };
- 
- /*
-@@ -266,4 +271,26 @@ struct landlock_net_port_attr {
- #define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
- #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
- /* clang-format on */
-+
-+/**
-+ * DOC: scope
-+ *
-+ * .scoped attribute handles a set of restrictions on kernel IPCs through
-+ * the following flags.
-+ *
-+ * Scope access flags
-+ * ~~~~~~~~~~~~~~~~~~~~
-+ * 
-+ * These flags enable to restrict a sandboxed process from a set of IPC 
-+ * actions. Setting a flag in a landlock domain will isolate the Landlock
-+ *  domain to forbid connections to resources outside the domain.
-+ *
-+ * IPCs with scoped actions:
-+ * - %LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET: Restrict a sandbox process to
-+ *   connect to a process outside of the sandbox domain through abstract
-+ *   unix sockets. 
-+ */
-+/* clang-format off */
-+#define LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET		(1ULL << 0)
-+/* clang-format on*/
- #endif /* _UAPI_LINUX_LANDLOCK_H */
-diff --git a/security/landlock/limits.h b/security/landlock/limits.h
-index 4eb643077a2a..eb01d0fb2165 100644
---- a/security/landlock/limits.h
-+++ b/security/landlock/limits.h
-@@ -26,6 +26,9 @@
- #define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
- #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
- 
-+#define LANDLOCK_LAST_SCOPE		LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET
-+#define LANDLOCK_MASK_SCOPE		((LANDLOCK_LAST_SCOPE << 1) - 1)
-+#define LANDLOCK_NUM_SCOPE		__const_hweight64(LANDLOCK_MASK_SCOPE)
- /* clang-format on */
- 
- #endif /* _SECURITY_LANDLOCK_LIMITS_H */
-diff --git a/security/landlock/ruleset.c b/security/landlock/ruleset.c
-index 6ff232f58618..3b3844574326 100644
---- a/security/landlock/ruleset.c
-+++ b/security/landlock/ruleset.c
-@@ -52,12 +52,13 @@ static struct landlock_ruleset *create_ruleset(const u32 num_layers)
- 
- struct landlock_ruleset *
- landlock_create_ruleset(const access_mask_t fs_access_mask,
--			const access_mask_t net_access_mask)
-+			const access_mask_t net_access_mask,
-+			const access_mask_t scope_mask)
- {
- 	struct landlock_ruleset *new_ruleset;
- 
- 	/* Informs about useless ruleset. */
--	if (!fs_access_mask && !net_access_mask)
-+	if (!fs_access_mask && !net_access_mask && !scope_mask)
- 		return ERR_PTR(-ENOMSG);
- 	new_ruleset = create_ruleset(1);
- 	if (IS_ERR(new_ruleset))
-@@ -66,6 +67,8 @@ landlock_create_ruleset(const access_mask_t fs_access_mask,
- 		landlock_add_fs_access_mask(new_ruleset, fs_access_mask, 0);
- 	if (net_access_mask)
- 		landlock_add_net_access_mask(new_ruleset, net_access_mask, 0);
-+	if (scope_mask)
-+		landlock_add_scope_mask(new_ruleset, scope_mask, 0);
- 	return new_ruleset;
- }
- 
-@@ -311,7 +314,7 @@ static void put_hierarchy(struct landlock_hierarchy *hierarchy)
- {
- 	while (hierarchy && refcount_dec_and_test(&hierarchy->usage)) {
- 		const struct landlock_hierarchy *const freeme = hierarchy;
--
-+		
- 		hierarchy = hierarchy->parent;
- 		kfree(freeme);
- 	}
-@@ -472,6 +475,7 @@ static int inherit_ruleset(struct landlock_ruleset *const parent,
- 	}
- 	get_hierarchy(parent->hierarchy);
- 	child->hierarchy->parent = parent->hierarchy;
-+	child->hierarchy->curr_ruleset = child;
- 
- out_unlock:
- 	mutex_unlock(&parent->lock);
-@@ -571,7 +575,7 @@ landlock_merge_ruleset(struct landlock_ruleset *const parent,
- 	err = merge_ruleset(new_dom, ruleset);
- 	if (err)
- 		goto out_put_dom;
--
-+	new_dom->hierarchy->curr_ruleset = new_dom;
- 	return new_dom;
- 
- out_put_dom:
-diff --git a/security/landlock/ruleset.h b/security/landlock/ruleset.h
-index 0f1b5b4c8f6b..39cb313812dc 100644
---- a/security/landlock/ruleset.h
-+++ b/security/landlock/ruleset.h
-@@ -35,6 +35,8 @@ typedef u16 access_mask_t;
- static_assert(BITS_PER_TYPE(access_mask_t) >= LANDLOCK_NUM_ACCESS_FS);
- /* Makes sure all network access rights can be stored. */
- static_assert(BITS_PER_TYPE(access_mask_t) >= LANDLOCK_NUM_ACCESS_NET);
-+/* Makes sure all scoped rights can be stored*/
-+static_assert(BITS_PER_TYPE(access_mask_t) >= LANDLOCK_NUM_SCOPE);
- /* Makes sure for_each_set_bit() and for_each_clear_bit() calls are OK. */
- static_assert(sizeof(unsigned long) >= sizeof(access_mask_t));
- 
-@@ -42,6 +44,7 @@ static_assert(sizeof(unsigned long) >= sizeof(access_mask_t));
- struct access_masks {
- 	access_mask_t fs : LANDLOCK_NUM_ACCESS_FS;
- 	access_mask_t net : LANDLOCK_NUM_ACCESS_NET;
-+	access_mask_t scoped : LANDLOCK_NUM_SCOPE;
- };
- 
- typedef u16 layer_mask_t;
-@@ -150,6 +153,10 @@ struct landlock_hierarchy {
- 	 * domain.
- 	 */
- 	refcount_t usage;
-+	/**
-+	 * @curr_ruleset: a pointer back to the current ruleset
-+	 */
-+	struct landlock_ruleset *curr_ruleset;
- };
- 
- /**
-@@ -233,7 +240,8 @@ struct landlock_ruleset {
- 
- struct landlock_ruleset *
- landlock_create_ruleset(const access_mask_t access_mask_fs,
--			const access_mask_t access_mask_net);
-+			const access_mask_t access_mask_net,
-+			const access_mask_t scope_mask);
- 
- void landlock_put_ruleset(struct landlock_ruleset *const ruleset);
- void landlock_put_ruleset_deferred(struct landlock_ruleset *const ruleset);
-@@ -280,6 +288,16 @@ landlock_add_net_access_mask(struct landlock_ruleset *const ruleset,
- 	ruleset->access_masks[layer_level].net |= net_mask;
- }
- 
-+static inline void
-+landlock_add_scope_mask(struct landlock_ruleset *const ruleset,
-+			const access_mask_t scope_mask, const u16 layer_level)
-+{
-+	access_mask_t scoped_mask = scope_mask & LANDLOCK_MASK_SCOPE;
-+
-+	WARN_ON_ONCE(scope_mask != scoped_mask);
-+	ruleset->access_masks[layer_level].scoped |= scoped_mask;
-+}
-+
- static inline access_mask_t
- landlock_get_raw_fs_access_mask(const struct landlock_ruleset *const ruleset,
- 				const u16 layer_level)
-@@ -303,6 +321,13 @@ landlock_get_net_access_mask(const struct landlock_ruleset *const ruleset,
- 	return ruleset->access_masks[layer_level].net;
- }
- 
-+static inline access_mask_t
-+landlock_get_scope_mask(const struct landlock_ruleset *const ruleset,
-+			const u16 layer_level)
-+{
-+	return ruleset->access_masks[layer_level].scoped;
-+}
-+
- bool landlock_unmask_layers(const struct landlock_rule *const rule,
- 			    const access_mask_t access_request,
- 			    layer_mask_t (*const layer_masks)[],
-diff --git a/security/landlock/syscalls.c b/security/landlock/syscalls.c
-index 03b470f5a85a..6b5a97a199d9 100644
---- a/security/landlock/syscalls.c
-+++ b/security/landlock/syscalls.c
-@@ -97,8 +97,9 @@ static void build_check_abi(void)
- 	 */
- 	ruleset_size = sizeof(ruleset_attr.handled_access_fs);
- 	ruleset_size += sizeof(ruleset_attr.handled_access_net);
-+	ruleset_size += sizeof(ruleset_attr.scoped);
- 	BUILD_BUG_ON(sizeof(ruleset_attr) != ruleset_size);
--	BUILD_BUG_ON(sizeof(ruleset_attr) != 16);
-+	BUILD_BUG_ON(sizeof(ruleset_attr) != 24);
- 
- 	path_beneath_size = sizeof(path_beneath_attr.allowed_access);
- 	path_beneath_size += sizeof(path_beneath_attr.parent_fd);
-@@ -170,7 +171,7 @@ static const struct file_operations ruleset_fops = {
-  * Possible returned errors are:
-  *
-  * - %EOPNOTSUPP: Landlock is supported by the kernel but disabled at boot time;
-- * - %EINVAL: unknown @flags, or unknown access, or too small @size;
-+ * - %EINVAL: unknown @flags, or unknown access, or uknown scope, or too small @size;
-  * - %E2BIG or %EFAULT: @attr or @size inconsistencies;
-  * - %ENOMSG: empty &landlock_ruleset_attr.handled_access_fs.
-  */
-@@ -212,10 +213,16 @@ SYSCALL_DEFINE3(landlock_create_ruleset,
- 	if ((ruleset_attr.handled_access_net | LANDLOCK_MASK_ACCESS_NET) !=
- 	    LANDLOCK_MASK_ACCESS_NET)
- 		return -EINVAL;
-+	
-+	/* Checks IPC scoping content (and 32-bits cast). */
-+	if ((ruleset_attr.scoped | LANDLOCK_MASK_SCOPE) !=
-+	    LANDLOCK_MASK_SCOPE)
-+		return -EINVAL;
- 
- 	/* Checks arguments and transforms to kernel struct. */
- 	ruleset = landlock_create_ruleset(ruleset_attr.handled_access_fs,
--					  ruleset_attr.handled_access_net);
-+					  ruleset_attr.handled_access_net,
-+					  ruleset_attr.scoped);
- 	if (IS_ERR(ruleset))
- 		return PTR_ERR(ruleset);
- 
-diff --git a/security/landlock/task.c b/security/landlock/task.c
-index 849f5123610b..dfaeb5694181 100644
---- a/security/landlock/task.c
-+++ b/security/landlock/task.c
-@@ -13,6 +13,8 @@
- #include <linux/lsm_hooks.h>
- #include <linux/rcupdate.h>
- #include <linux/sched.h>
-+#include <net/sock.h>
-+#include <net/af_unix.h>
- 
- #include "common.h"
- #include "cred.h"
-@@ -108,9 +110,102 @@ static int hook_ptrace_traceme(struct task_struct *const parent)
- 	return task_ptrace(parent, current);
- }
- 
-+static access_mask_t
-+get_scoped_accesses(const struct landlock_ruleset *const domain)
-+{
-+	access_mask_t access_dom = 0;
-+	size_t layer_level;
-+
-+	for (layer_level = 0; layer_level < domain->num_layers; layer_level++)
-+		access_dom |= landlock_get_scope_mask(domain, layer_level);
-+	return access_dom;
-+}
-+
-+/**
-+ * optional_domain_scope - Checks domain ordering for scoped unix sockets
-+ *
-+ * @client: client domain.
-+ * @server: Potential child of @client.
-+ *
-+ * Checks if the @client domain is less or equal to (i.e. an ancestor, which
-+ * means a subset of) the @server domain.
-+ * Same as domain_scope_le, only for optional scoping unix sockets.
-+ */
-+static bool optional_domain_scope(const struct landlock_ruleset *const client,
-+				  const struct landlock_ruleset *const server)
-+{
-+	const struct landlock_hierarchy *walker;
-+	access_mask_t scoped;
-+
-+	if (!client)
-+		return true;
-+
-+	/* quick return if server does not have domain */
-+	if (!server)
-+		return false;
-+
-+	for (walker = server->hierarchy; walker; walker = walker->parent) {
-+		scoped = get_scoped_accesses(walker->curr_ruleset);
-+		if (walker == client->hierarchy)
-+			/* @client is in the scoped hierarchy of @server. */
-+			return true;
-+		if (scoped)
-+			/* There is a node between client and server that is scoped */
-+			return false;
-+	}
-+	/* There is no relationship between @parent and @child. */
-+	return false;
-+}
-+
-+static bool sock_is_scoped(struct sock *const other)
-+{
-+	bool is_scoped = true;
-+	const struct landlock_ruleset *dom_other;
-+	const struct landlock_ruleset *const dom =
-+		landlock_get_current_domain();
-+
-+	/* quick return if there is no domain or .scoped is not set */
-+	if (!dom || !get_scoped_accesses(dom))
-+		return true;
-+
-+	/* the credentials will not change */
-+	lockdep_assert_held(&unix_sk(other)->lock);
-+	if (other->sk_type != SOCK_DGRAM) {
-+		dom_other = landlock_cred(other->sk_peer_cred)->domain;
-+	} else {
-+		dom_other =
-+			landlock_cred(other->sk_socket->file->f_cred)->domain;
-+	}
-+	is_scoped = optional_domain_scope(dom, dom_other);
-+	return is_scoped;
-+}
-+
-+static int hook_unix_stream_connect(struct sock *const sock,
-+				    struct sock *const other,
-+				    struct sock *const newsk)
-+{
-+	if (sock_is_scoped(other))
-+		return 0;
-+
-+	return -EPERM;
-+}
-+
-+static int hook_unix_may_send(struct socket *const sock,
-+			      struct socket *const other)
-+{
-+	pr_warn("XXX %s:%d sock->file:%p other->file:%p\n", __func__, __LINE__,
-+		sock->file, other->file);
-+	if (sock_is_scoped(other->sk))
-+		return 0;
-+
-+	return -EPERM;
-+}
-+
- static struct security_hook_list landlock_hooks[] __ro_after_init = {
- 	LSM_HOOK_INIT(ptrace_access_check, hook_ptrace_access_check),
- 	LSM_HOOK_INIT(ptrace_traceme, hook_ptrace_traceme),
-+	LSM_HOOK_INIT(unix_stream_connect, hook_unix_stream_connect),
-+	LSM_HOOK_INIT(unix_may_send, hook_unix_may_send),
- };
- 
- __init void landlock_add_task_hooks(void)
-diff --git a/tools/testing/selftests/landlock/ptrace_test.c b/tools/testing/selftests/landlock/ptrace_test.c
-index a19db4d0b3bd..73eddf08907e 100644
---- a/tools/testing/selftests/landlock/ptrace_test.c
-+++ b/tools/testing/selftests/landlock/ptrace_test.c
-@@ -17,6 +17,10 @@
- #include <sys/wait.h>
- #include <unistd.h>
- 
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+#include <stddef.h>
-+
- #include "common.h"
- 
- /* Copied from security/yama/yama_lsm.c */
-@@ -436,4 +440,261 @@ TEST_F(hierarchy, trace)
- 		_metadata->exit_code = KSFT_FAIL;
- }
- 
-+static void create_unix_domain(struct __test_metadata *const _metadata)
-+{
-+	int ruleset_fd;
-+	const struct landlock_ruleset_attr ruleset_attr = {
-+		.scoped = LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET,
-+	};
-+
-+	ruleset_fd =
-+		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
-+	EXPECT_LE(0, ruleset_fd)
-+	{
-+		TH_LOG("Failed to create a ruleset: %s", strerror(errno));
-+	}
-+	enforce_ruleset(_metadata, ruleset_fd);
-+	EXPECT_EQ(0, close(ruleset_fd));
-+}
-+
-+/* clang-format off */
-+FIXTURE(unix_socket)
-+{
-+	int server, client;
-+};
-+/* clang-format on */
-+
-+FIXTURE_VARIANT(unix_socket)
-+{
-+	int type;
-+	bool domain_both;
-+	bool domain_parent;
-+	bool domain_child;
-+	bool connect_to_parent;
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(unix_socket, allow_without_domain) {
-+	/* clang-format on */
-+	.type = SOCK_STREAM,	   .domain_both = false,
-+	.domain_parent = false,	   .domain_child = false,
-+	.connect_to_parent = true,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(unix_socket, deny_child_connection_with_domain) {
-+	/* clang-format on */
-+	.type = SOCK_STREAM,  .domain_both = false,	 .domain_parent = false,
-+	.domain_child = true, .connect_to_parent = true,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(unix_socket, allow_child_connection_and_parent_domain) {
-+	/* clang-format on */
-+	.type = SOCK_STREAM,   .domain_both = false,	  .domain_parent = true,
-+	.domain_child = false, .connect_to_parent = true,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(unix_socket, deny_parent_connection_with_domain) {
-+	/* clang-format on */
-+	.type = SOCK_STREAM,	    .domain_both = false,
-+	.domain_parent = true,	    .domain_child = false,
-+	.connect_to_parent = false,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(unix_socket, allow_parent_connection_without_domain) {
-+	/* clang-format on */
-+	.type = SOCK_STREAM,	    .domain_both = false,
-+	.domain_parent = false,	    .domain_child = false,
-+	.connect_to_parent = false,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(unix_socket, allow_parent_connection_with_sibling_domain) {
-+	/* clang-format on */
-+	.type = SOCK_STREAM,	    .domain_both = true,
-+	.domain_parent = false,	    .domain_child = false,
-+	.connect_to_parent = false,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(unix_socket, dgrm_allow_without_domain) {
-+	/* clang-format on */
-+	.type = SOCK_DGRAM,	   .domain_both = false,
-+	.domain_parent = false,	   .domain_child = false,
-+	.connect_to_parent = true,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(unix_socket, dgrm_deny_child_connection_with_domain) {
-+	/* clang-format on */
-+	.type = SOCK_DGRAM,   .domain_both = false,	 .domain_parent = false,
-+	.domain_child = true, .connect_to_parent = true,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(unix_socket, dgrm_allow_child_with_sibling_domain) {
-+	/* clang-format on */
-+	.type = SOCK_DGRAM,	   .domain_both = true,
-+	.domain_parent = false,	   .domain_child = false,
-+	.connect_to_parent = true,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(unix_socket, dgrm_deny_parent_connection_with_domain) {
-+	/* clang-format on */
-+	.type = SOCK_DGRAM,	    .domain_both = false,
-+	.domain_parent = true,	    .domain_child = false,
-+	.connect_to_parent = false,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(unix_socket, dgrm_allow_parent_connection_with_child_domain) {
-+	/* clang-format on */
-+	.type = SOCK_DGRAM,	    .domain_both = false,
-+	.domain_parent = false,	    .domain_child = true,
-+	.connect_to_parent = false,
-+};
-+
-+FIXTURE_SETUP(unix_socket)
-+{
-+}
-+
-+FIXTURE_TEARDOWN(unix_socket)
-+{
-+	close(self->server);
-+	close(self->client);
-+}
-+
-+/* Test UNIX_STREAM_CONNECT for parent and child. */
-+TEST_F(unix_socket, abstract_unix_socket)
-+{
-+	int status;
-+	pid_t child;
-+	socklen_t addrlen;
-+	int sock_len = 5;
-+	struct sockaddr_un addr = {
-+		.sun_family = AF_UNIX,
-+	};
-+	const char sun_path[8] = "\0test";
-+	bool can_connect_to_parent, can_connect_to_child;
-+	int err;
-+	int pipe_child[2], pipe_parent[2];
-+	char buf_parent;
-+	/*
-+         * can_connect_to_child is true if a parent process can connect to its
-+         * child process. The parent process is not isolated from the child
-+	 * with a dedicated Landlock domain.
-+         */
-+	can_connect_to_child = !variant->domain_parent;
-+	/*
-+         * can_connect_to_parent is true if a child process can connect to its parent
-+         * process. This depends on the child process is not isolated from
-+	 * the parent with a dedicated Landlock domain.
-+         */
-+	can_connect_to_parent = !variant->domain_child;
-+
-+	ASSERT_EQ(0, pipe2(pipe_child, O_CLOEXEC));
-+	ASSERT_EQ(0, pipe2(pipe_parent, O_CLOEXEC));
-+	if (variant->domain_both) {
-+		create_unix_domain(_metadata);
-+		if (!__test_passed(_metadata))
-+			return;
-+	}
-+
-+	addrlen = offsetof(struct sockaddr_un, sun_path) + sock_len;
-+	memcpy(&addr.sun_path, sun_path, sock_len);
-+
-+	child = fork();
-+	ASSERT_LE(0, child);
-+	if (child == 0) {
-+		int child_ret;
-+		char buf_child;
-+
-+		ASSERT_EQ(0, close(pipe_parent[1]));
-+		ASSERT_EQ(0, close(pipe_child[0]));
-+		if (variant->domain_child)
-+			create_unix_domain(_metadata);
-+
-+		/* Waits for the parent to be in a domain, if any. */
-+		ASSERT_EQ(1, read(pipe_parent[0], &buf_child, 1));
-+
-+		/* create a socket for child process */
-+		if (variant->connect_to_parent) {
-+			self->client = socket(AF_UNIX, variant->type, 0);
-+			ASSERT_NE(-1, self->client);
-+
-+			ASSERT_EQ(1, read(pipe_parent[0], &buf_child, 1));
-+			child_ret = connect(self->client,
-+					    (struct sockaddr *)&addr, addrlen);
-+			if (can_connect_to_parent) {
-+				EXPECT_EQ(0, child_ret);
-+			} else {
-+				EXPECT_EQ(-1, child_ret);
-+				EXPECT_EQ(EPERM, errno);
-+			}
-+		} else {
-+			/* child process should create a listening socket */
-+			self->server = socket(AF_UNIX, variant->type, 0);
-+			ASSERT_NE(-1, self->server);
-+
-+			ASSERT_EQ(0, bind(self->server,
-+					  (struct sockaddr *)&addr, addrlen));
-+			if (variant->type == SOCK_STREAM) {
-+				err = listen(self->server, 32);
-+				ASSERT_EQ(0, err);
-+			}
-+			/* signal to parent that child is listening */
-+			ASSERT_EQ(1, write(pipe_child[1], ".", 1));
-+			/* wait to connect */
-+			ASSERT_EQ(1, read(pipe_parent[0], &buf_child, 1));
-+		}
-+		_exit(_metadata->exit_code);
-+		return;
-+	}
-+
-+	ASSERT_EQ(0, close(pipe_child[1]));
-+	ASSERT_EQ(0, close(pipe_parent[0]));
-+
-+	if (variant->domain_parent)
-+		create_unix_domain(_metadata);
-+
-+	/* Signals that the parent is in a domain, if any. */
-+	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
-+
-+	if (!variant->connect_to_parent) {
-+		self->client = socket(AF_UNIX, variant->type, 0);
-+		ASSERT_NE(-1, self->client);
-+		/* Waits for the child to listen */
-+		ASSERT_EQ(1, read(pipe_child[0], &buf_parent, 1));
-+		err = connect(self->client, (struct sockaddr *)&addr, addrlen);
-+		if (can_connect_to_child) {
-+			EXPECT_EQ(0, err);
-+		} else {
-+			EXPECT_EQ(-1, err);
-+			EXPECT_EQ(EPERM, errno);
-+		}
-+		ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
-+	} else {
-+		self->server = socket(AF_UNIX, variant->type, 0);
-+		ASSERT_NE(-1, self->server);
-+		ASSERT_EQ(0, bind(self->server, (struct sockaddr *)&addr,
-+				  addrlen));
-+		if (variant->type == SOCK_STREAM) {
-+			err = listen(self->server, 32);
-+			ASSERT_EQ(0, err);
-+		}
-+		/* signal to child that parent is listening */
-+		ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
-+	}
-+
-+	ASSERT_EQ(child, waitpid(child, &status, 0));
-+
-+	if (WIFSIGNALED(status) || !WIFEXITED(status) ||
-+	    WEXITSTATUS(status) != EXIT_SUCCESS)
-+		_metadata->exit_code = KSFT_FAIL;
-+}
-+
- TEST_HARNESS_MAIN
--- 
-2.34.1
-
+DQo+ID4gMS4gV2h5IGRvIHdlIG5lZWQgwqBuZG9fb3Agc2V0X2NvbmZpZygpIGF0IGRldmljZSBs
+ZXZlbCB3aGljaCBpcyBzZXR0aW5nIG9ubHkgb25lIHZlcnNpb24sIGluc3RlYWQgdGhlIGRlc2Ny
+aXB0aW9uIGFib3ZlIHRoZSBwc3BfZGV2IHN0cnVjdCB3aGljaCBoYWQgYSBtYXNrIGZvciBlbmFi
+bGVkIHZlcnNpb25zIGF0IGHCoCBkZXZpY2UgbGV2ZWwgaXMgYmV0dGVyIGFuZCBkZXZpY2UgbGV0
+cyB0aGUgc3RhY2sga25vdyBhdCBwc3BfZGV2IGNyZWF0ZSB0aW1lIHdoYXQgYWxsIHZlcnNpb25z
+IGl0IGlzIGNhcGFibGUgb2YuICBMYXRlciBvbiwgdmVyc2lvbiBpcyBuZWdvdGlhdGVkIHdpdGgg
+dGhlIHBlZXIgYW5kIHNldCBwZXIgc2Vzc2lvbi4NCj4gPiBFdmVuIHRoZSBNZWxsYW5veCBkcml2
+ZXIgZG9lcyBub3QgaW1wbGVtZW50IHRoaXMgc2V0X2NvbmZpZyBuZG9fb3AuIA0KPiDCoD4NCkNh
+biB5b3Ugb3IgS3ViYSBjb21tZW50IG9uIHRoaXM/DQoNCj4gPiAyLiBXaGVyZSBpcyB0aGUgYXNz
+b2NpYXRpb25faW5kZXgvaGFuZGxlIHJldHVybmVkIHRvIHRoZSBzdGFjayB0byBiZSB1c2VkIHdp
+dGggdGhlIHBhY2tldCBvbiBUWCBieSB0aGUgZHJpdmVyIGFuZCBkZXZpY2U/ICggaWYgYW4gU0FE
+QiBpcyBpbiB1c2Ugb24gVHggc2lkZSBpbiB0aGUgZGV2aWNlKSwgd2hhdCB3ZSB1bmRlcnN0YW5k
+IGZyb20gTWVsbGFub3ggZHJpdmVyIGlzLCBpdHMgbm90IGRvaW5nIGFuIFNBREIgaW4gVFggaW4g
+SFcsIGJ1dCBwYXNzaW5nIHRoZSBrZXkgZGlyZWN0bHkgaW50byB0aGUgVHggZGVzY3JpcHRvcj8g
+SXMgdGhhdCByaWdodCwgYnV0IG90aGVyIGRldmljZXMgbWF5IG5vdCBzdXBwb3J0IHRoaXMgYW5k
+IHdpbGwgaGF2ZSBhbiBTQURCIG9uIFRYIGFuZCB0aGlzIGFsbG93ZWQgYXMgcGVyIFBTUCBwcm90
+b2NvbC4gT2YgY291cnNlIG9uIFJYIHRoZXJlIGlzIG5vIFNBREIgZm9yIGFueSBkZXZpY2UuDQo+
+ID4gSW4gb3VyIGRldmljZSB3ZSBoYXZlIDIgb3B0aW9ucywgDQo+ID4gICAgICAgICAgICAgMS4g
+VXNpbmcgU0FEQiBvbiBUWCBhbmQganVzdCBwYXNzaW5nIFNBX0luZGV4IGluIHRoZSBkZXNjcmlw
+dG9yICh0cmFkZSBvZmYgYmV0d2VlbiBwZXJmb3JtYW5jZSBhbmQgbWVtb3J5LiANCj4gPiAgICAg
+ICAgICAgICBBcyAgcGFzc2luZyBrZXkgaW4gZGVzY3JpcHRvciBtYWtlcyBmb3IgYSBtdWNoIGxh
+cmdlciBUWCBkZXNjcmlwdG9yIHdoaWNoIHdpbGwgaGF2ZSBwZXJmIHBlbmFsdHkuKQ0KPiA+ICAg
+ICAgICAgICAgMi4gUGFzc2luZyBrZXkgaW4gdGhlIGRlc2NyaXB0b3IuDQo+ID4gICAgICAgICAg
+ICAgRm9yIHVzIHdlIG5lZWQgYm90aCB0aGVzZSBvcHRpb25zLCBzbyBwbGVhc2UgYWxsb3cgZm9y
+IGVuaGFuY2VtZW50cy4NCj4gPg0KQ2FuIHlvdSBvciBLdWJhIGNvbW1lbnQgb24gdGhpcz8gVGhp
+cyBpcyBjcml0aWNhbCwgYWxzbyBpbiB0aGUgZmFzdCBwYXRoLCBza2IgbmVlZHMgdG8gY2Fycnkg
+dGhlIFNBX2luZGV4L2hhbmRsZSAobGlrZSB0aGUgdGxzIGNhc2UpIGluc3RlYWQgb2YgdGhlIGtl
+eSBvciBib3RoIHNvIHRoYXQgZWl0aGVyIG1ldGhvZCBjYW4gYmUgdXNlZCBieSB0aGUgZGV2aWNl
+IGRyaXZlci9kZXZpY2UuDQoNCj4gPiAzLiBBYm91dCB0aGUgUFNQIGFuZCBVRFAgaGVhZGVyIGFk
+ZGl0aW9uLCB3aHkgaXMgdGhlIGRyaXZlciBkb2luZyBpdD8gSSBndWVzcyBpdCdzIGJlY2F1c2Ug
+dGhlIFNXIGVxdWl2YWxlbnQgZm9yIFBTUCBzdXBwb3J0IGluIHRoZSBrZXJuZWwgZG9lcyBub3Qg
+ZXhpc3QgYW5kIGp1c3QgYW4gb2ZmbG9hZCBmb3IgdGhlIGRldmljZS4gQWdhaW4gaW4gdGhpcyBj
+YXNlIHRoZSBhc3N1bXB0aW9uIGlzIGVpdGhlciB0aGUgZHJpdmVyIGRvZXMgaXQgb3IgdGhlIGRl
+dmljZSB3aWxsIGRvIGl0Lg0KPiA+IEhvcGUgdGhhdCBpcyBpcnJlbGV2YW50IGZvciB0aGUgc3Rh
+Y2suIEluIG91ciBjYXNlIG1vc3QgbGlrZWx5IGl0IHdpbGwgYmUgdGhlIGRldmljZSBkb2luZyBp
+dC4NCj4gPiANCg0KPiBUaGlzIGRvZXMgbm90IGFkaGVyZSB0byB0aGUgc3BlYzoNCg0KPiAiQW4g
+b3B0aW9uIG11c3QgYmUgcHJvdmlkZWQgdGhhdCBlbmFibGVzIHVwcGVyLWxldmVsIHNvZnR3YXJl
+IHRvIHNlbmQgcGFja2V0cyB0aGF0IGFyZSBwcmUtZm9ybWF0dGVkIHRvIGluY2x1ZGUgdGhlIGhl
+YWRlcnMgcmVxdWlyZWQgZm9yIFBTUCBlbmNhcHN1bGF0aW9uLiBJbiB0aGlzIGNhc2UsIHRoZSBO
+SUMgd2lsbCBtb2RpZnkgdGhlIGNvbnRlbnRzIG9mIHRoZSBoZWFkZXJzIGFwcHJvcHJpYXRlbHks
+IGFwcGx5IGVuY3J5cHRpb24vYXV0aGVudGljYXRpb24sIGFuZCBhZGQgdGhlIFBTUCB0cmFpbGVy
+IHRvIHRoZSBwYWNrZXQuIg0KDQo+IGh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9n
+b29nbGUvcHNwL21haW4vZG9jL1BTUF9BcmNoX1NwZWMucGRmDQoNClllcyBJIGd1ZXNzIHRoaXMg
+aXMganVzdCB0cmFuc3BvcnQgbW9kZSBhbmQgbm90IHR1bm5lbCBtb2RlIGluIHdoaWNoIHRoZSBk
+ZXZpY2UgYWRkcyB0aGUgaGVhZGVyLiBTbyBhZ3JlZWQsIGl0IHNob3VsZCBiZSB1cHBlci1sZXZl
+bCBzb2Z0d2FyZSB0aGF0IHNob3VsZCBhZGQgdGhpcywgYnV0IGFnYWluIG5vdCB0aGUgZHJpdmVy
+IGFzIHRoaXMgaXMgcHJvdG9jb2wgc3BlY2lmaWMgYW5kIG5vdCBkZXZpY2Ugc3BlY2lmaWMgYW5k
+IGFsbCBkZXZpY2VzIHVzaW5nIGEgIGNvbW1vbiBjb2RlIHdvdWxkIGJlIHRoZSByaWdodCB0aGlu
+Zy4NCg0KPiA+IDQuIFdoeSBpcyB0aGUgZHJpdmVyIGFkZGluZyB0aGUgUFNQIHRyYWlsZXI/IEhv
+cGluZyB0aGlzIGlzIGJldHdlZW4gdGhlIGRyaXZlciBhbmQgdGhlIGRldmljZSwgaW4gb3VyIGNh
+c2UgaXQncyB0aGUgZGV2aWNlIHRoYXQgd2lsbCBhZGQgdGhlIHRyYWlsZXIuDQoNClRoaXMgZm9y
+IHN1cmUgaXMgYnkgZGV2aWNlIG9yIGRyaXZlciwgaWRlYWxseSB0aGUgZGV2aWNlLiBQbGVhc2Ug
+Y29tbWVudC4NCg0KQSBmZXcgbW9yZSBvcGVucyB0aGF0IHdlIG5vdGljZWQgbGF0ZXINCg0KMS4g
+S2V5IHJvdGF0aW9uIHNob3VsZCBiZSB0cmlnZ2VyZWQgZnJvbSB0aGUgZGV2aWNlIGFzIGEgbWFz
+dGVyIGtleSBpbiB0aGUgZGV2aWNlIGNhbiBiZSBzaGFyZWQgaW4gYSB2aXJ0dWFsaXplZCBlbnZp
+cm9ubWVudCBieSBtYW55IGludGVyZmFjZXMgd2hpY2ggd291bGQgbWVhbiBvbmx5IHRoZSBkZXZp
+Y2UgY2FuIGRlY2lkZSBiYXNlZCBvbiB0aGUgZm9sbG93aW5nIHdoZW4gdG8gdHJpZ2dlciB0aGUg
+a2V5IHJvdGF0aW9uIA0KCTEuIFRpbWUgb3V0IGNhbm5vdCBiZSBpbmRlcGVuZGVudCBmb3IgZWFj
+aCBJS0UgYnV0IGF0IGEgZGV2aWNlIGxldmVsIGNvbmZpZ3VyYXRpb24uDQoJMi4gIFNQSSByb2xs
+IG92ZXIsIHRoZSBTUEkgZG9tYWluIGlzIGFnYWluIHNoYXJlZCB3aXRoIG11bHRpcGxlIEludGVy
+ZmFjZXMgdGhhdCBzaGFyZSB0aGUgbWFzdGVyIGtleSBhbmQgb25seSB0aGUgZGV2aWNlIGNhbiB0
+cmlnZ2VyIHRoZSByb3RhdGlvbiB3aGVuIHRoaXMgaGFwcGVucy4NCg0KQXBhcnQgZnJvbSB0aGlz
+LCBpbiBhIHZpcnR1YWxpemVkIGVudmlyb25tZW50LCBhIHRyaWdnZXIgZnJvbSB0b3AgKElLRSBk
+b3duIHRvIGRldmljZSkgdG8gcm90YXRlIHRoZSBtYXN0ZXIga2V5IGNhbiBjYXVzZSB1bm5lY2Vz
+c2FyeSBzaWRlIGVmZmVjdHMgdG8gb3RoZXIgaW50ZXJmYWNlcyB0aGF0IGNhbiBiZSBjb25zaWRl
+cmVkIG1hbGljaW91cy4NCg0KQW5qYWxpICAJDQrCoA0KDQoNCg==
 
