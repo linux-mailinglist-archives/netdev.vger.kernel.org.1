@@ -1,628 +1,207 @@
-Return-Path: <netdev+bounces-105235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8E4F91038C
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:00:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF50091038E
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:00:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21F8E1F21DE3
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:00:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D40E28141E
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63D28176255;
-	Thu, 20 Jun 2024 11:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92AAE15535A;
+	Thu, 20 Jun 2024 12:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kbPphemy"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="oCHa+B7n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2829F170826;
-	Thu, 20 Jun 2024 11:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFAC13BBF5;
+	Thu, 20 Jun 2024 12:00:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718884799; cv=none; b=ffQOrL5golHcLHm3XPGzWQIzsshnqbYkZTznJOwKSCJWvAa16Nl1Z2ulPljgH18iHqDLVaq4cRLVNbfY0Bm1KbhsFLlae3MfU1ykvrtCFGU9RJPwoSSWK7VoJJUpOLm/rUbvc9i4CvqYxqq0DrqDAKEyPty9g9CJYQ30WqGNCrU=
+	t=1718884850; cv=none; b=MreW8/qCl1enawpPM4i+Gpr1y1nXRo6YIJgMAle1KObW0t7QPOdnCOu9iM7ig6KSIphMxRntkvlmWrWmddY9z2WGxzPd7kvKkK0JNNDYwdgjJItwsbJxWBOL3oxwCnisXOhYOoPG6xUb6xJcg9b3rNJrESFR19TmAVVLul49XiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718884799; c=relaxed/simple;
-	bh=mMAyT118f4/SPrlUHPCnF5f1pdscHUbd4F1/9PWE/18=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EZjWTnqP3blyLqyul2to/Oxe8w1US1wyiL4g5uJPU/7KYR3apn0JjPrK7/hLVO+RGRU357RIvgL9AlJbnfn25up2MZUXhAvFWp4yzNNhtXAR19e/Uq1BvEpbCgTzSo9v4ZWwUzh8CSXSslKw9oexQfhuCHex4R5a9cBEcDBAUiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kbPphemy; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a6f176c5c10so90747866b.2;
-        Thu, 20 Jun 2024 04:59:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718884795; x=1719489595; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=42CxBGdJ0osIF5zKhGnhoo5w2tPCyrYUZdNSZCktvaQ=;
-        b=kbPphemyol6ory2MzEz1+2gHYC5s6pdP8SBhAnz9k8NpZjheoC95CNZb4F585Lzxsf
-         hPjo0To/1Owudo92SnNrNmetBuZqp8wWnaj75QMofK1j8fC9coRVHBFGMMdBvhDXeVTy
-         boaYol2ggQhar6J158Mj5ygOWprBPPFutU+gNApX9PRonDET5hi2Yfb0QpAHXyy3uhJ/
-         Jkp5faHQrZNaYaNYQ7x8JQsCIp26XOx2b40XaijbItHqi/nI5MKBDMQqSmW0kJ7Pweo9
-         OBSkUMTEOL1BXSykMkBl0JX5RstnK84JElV6wOsCo46xvQ56HJbmXRELpk3QPL0kcVIk
-         ZbSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718884795; x=1719489595;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=42CxBGdJ0osIF5zKhGnhoo5w2tPCyrYUZdNSZCktvaQ=;
-        b=WpW/zeNguVDo87pddbTYO/m4duG4cl9DH8p0/MMzqxb2j0jvhwgLiOZ0Iii9LLluh0
-         z8UTOAj/kDMe7R/5RtaLRd3QkDcAMB9kmOeu+OSb1pYYlYt/1e4p0F5bDWXKvxUNjDFp
-         2JUuH0FgwBE8r0shZxI8BDasHu9d9lvQzlOq1mOgB7mzx2sOqR0sDS0lUQhPB1960yop
-         gdTD9+bh1o2nUVl1Ubf7TCgUUk7SvkrT1jXZdhQf8dOQ+Yd1h/+jyekOsdPUqHl5vmUr
-         5iQawBDwYkVWj9EUYjnLnAq3GVPtuAn7N7wJ9tdNW2RrFzBSIBVZEurNI4ssJjZaaL17
-         aJvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVeJCsdmFic4yDfLkxWpjvTemHh+mNN1zzqySIC2uf31HszJto5g8ocpBwn1Arn+sx6ro+L6g2KOInbu/gqAKV3NUZ/RiW/i6ANRhKj
-X-Gm-Message-State: AOJu0YyOfXhO36bkUm0It2w1ghzjICy0eDYmeScxHX+tCMffxBSB/rvd
-	5k0VDn3bP/eZSmL4rK749Q7n3PU3pXEd3fQ/Hy5YQBLjQ3tZeKvd
-X-Google-Smtp-Source: AGHT+IH8cVHYscLefxIcEJuggnNxve65uQtNHTATNzJQbkd2CLkgy6BzKvjkgT+q137lRK6cHvNTMA==
-X-Received: by 2002:a17:906:f902:b0:a6e:feb5:148e with SMTP id a640c23a62f3a-a6fab6171f0mr312135566b.27.1718884794846;
-        Thu, 20 Jun 2024 04:59:54 -0700 (PDT)
-Received: from skbuf ([188.25.55.166])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f6be36a5fsm604795366b.58.2024.06.20.04.59.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jun 2024 04:59:54 -0700 (PDT)
-Date: Thu, 20 Jun 2024 14:59:51 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 02/12] net: dsa: vsc73xx: Add vlan filtering
-Message-ID: <20240620115951.3awsf7yt66t32buf@skbuf>
-References: <20240619205220.965844-1-paweldembicki@gmail.com>
- <20240619205220.965844-3-paweldembicki@gmail.com>
+	s=arc-20240116; t=1718884850; c=relaxed/simple;
+	bh=masVgiEVrY3nzXZveTAjwT+Gixs2tnPiRl/I6A32EvI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=c1ImFmGVRmmcf+WN4u3ituZkIAf4du3p8ir+cUIZ88UW2nRiylU3+VlyJBBl0cJ4FS5MmXhPQ3l7Q8a5nNLzmXaKqXA6Ou+m43x/pinBFUaspoPsOG/V+lCcAO2hIE0OesjEJ6sl7Cd+xHXkQUJpXa0s5KMWojULQYBoj8RLXFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=oCHa+B7n; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id F0446883A6;
+	Thu, 20 Jun 2024 14:00:45 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1718884846;
+	bh=smox0b1pxt1sHNNDz739cx9CLIz4NaHSGdjVt/vZXh8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oCHa+B7ny7edSSXyRh6+OhhOEMfHwONRcQpCrfdUILB5JQPj9SsoHTKBaRiOYOSX3
+	 gM+9mJJ3E9bi7AW8mpyp7tkhzusC0KvUIAA4b4yTyj+6yvhgvucXLBTLKp1DaGwAb2
+	 2PmOHp8g7Ct+BHjmQG9XUvZ2izB8YkNsB55GbfkHdyG2NSVgYYzdWtjmZFmWwxwJ3l
+	 OJmlnXvPBD7UzKYCXdEt5aINlgJ7CDG7oIy+LxsaMlNxnwfzZ8luRxIK0jgwi20UXN
+	 iS0KYq4O3v4wAbhVDTCC78biEt7Pq9gG8YibzjDKL1kK9p/sXQH0aniYQvLSGdDrKf
+	 6IQg3TTRARACA==
+Date: Thu, 20 Jun 2024 14:00:44 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Tristram.Ha@microchip.com, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>, Simon Horman <horms@kernel.org>, Dan Carpenter
+ <dan.carpenter@linaro.org>, "Ricardo B. Marliere" <ricardo@marliere.net>,
+ Casper Andersson <casper.casan@gmail.com>, linux-kernel@vger.kernel.org,
+ Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH v2 net-next] net: dsa: Allow only up to two HSR HW
+ offloaded ports for KSZ9477
+Message-ID: <20240620140044.07191e24@wsk>
+In-Reply-To: <20240620090210.drop6jwh7e5qw556@skbuf>
+References: <20240619134248.1228443-1-lukma@denx.de>
+	<20240619134248.1228443-1-lukma@denx.de>
+	<20240619144243.cp6ceembrxs27tfc@skbuf>
+	<20240619171057.766c657b@wsk>
+	<20240619154814.dvjcry7ahvtznfxb@skbuf>
+	<20240619155928.wmivi4lckjq54t3w@skbuf>
+	<20240620095920.6035022d@wsk>
+	<20240620090210.drop6jwh7e5qw556@skbuf>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240619205220.965844-3-paweldembicki@gmail.com>
+Content-Type: multipart/signed; boundary="Sig_/bpKHthVch+friIY0bUGyhl5";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Wed, Jun 19, 2024 at 10:52:08PM +0200, Pawel Dembicki wrote:
-> This patch implements VLAN filtering for the vsc73xx driver.
-> 
-> After starting VLAN filtering, the switch is reconfigured from QinQ to
-> a simple VLAN aware mode. This is required because VSC73XX chips do not
-> support inner VLAN tag filtering.
-> 
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-> ---
-> v2:
->   - removed not needed INIT_LIST_HEAD
->   - fix vsc73xx_vlan removing procedure
->   - fix code spell
->   - handle return codes from 'vsc73xx_vlan_commit*' functions
->   - move 'vsc73xx_vlan_commit*' call from port_setup to port_enable to
->     avoid unused port configuration
-> v1:
->   - refactored pvid, untagged and vlan filter configuration
->   - fix typo
->   - simplification
+--Sig_/bpKHthVch+friIY0bUGyhl5
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for the changes. This is much simpler for my mind to process.
-Hopefully you won't mind a few nitpicks below.
+Hi Vladimir,
 
-> +static int vsc73xx_set_vlan_conf(struct vsc73xx *vsc, int port,
-> +				 enum vsc73xx_port_vlan_conf port_vlan_conf)
-> +{
-> +	u32 val = 0;
-> +	int ret;
-> +
-> +	if (port_vlan_conf == VSC73XX_VLAN_IGNORE)
-> +		val = VSC73XX_CAT_VLAN_MISC_VLAN_TCI_IGNORE_ENA |
-> +		      VSC73XX_CAT_VLAN_MISC_VLAN_KEEP_TAG_ENA;
-> +
-> +	ret = vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-> +				  VSC73XX_CAT_VLAN_MISC,
-> +				  VSC73XX_CAT_VLAN_MISC_VLAN_TCI_IGNORE_ENA |
-> +				  VSC73XX_CAT_VLAN_MISC_VLAN_KEEP_TAG_ENA, val);
-> +	if (ret)
-> +		return ret;
-> +
-> +	val = (port_vlan_conf == VSC73XX_VLAN_FILTER) ?
-> +	      VSC73XX_TXUPDCFG_TX_INSERT_TAG : 0;
-> +
-> +	return vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-> +				   VSC73XX_TXUPDCFG,
-> +				   VSC73XX_TXUPDCFG_TX_INSERT_TAG, val);
-> +}
-> +
-> +static int vsc73xx_vlan_commit_conf(struct vsc73xx *vsc, int port)
+> On Thu, Jun 20, 2024 at 09:59:20AM +0200, Lukasz Majewski wrote:
+> > > It will return -EOPNOTSUPP for port 0,  =20
+> >=20
+> > This comment is for xrs700x_hsr_join()? =20
+>=20
+> Yes.
+>=20
+> > For the ksz_hsr_join() we do explicitly check for the
+> > KSZ9477_CHIP_ID.
+> >=20
+> > I do regard this fix as a ksz9477 specific one, as there are some
+> > issues (IMHO - this is the "unexpected behaviour" case for this IC)
+> > when we add interlink to SoC VLAN.
+> >=20
+> > I don't understand why you bring up xrs700x case here? Is it to get
+> > a "broader context"? =20
+>=20
+> You have the Fixes: tag set to a HSR driver change, the fix to which
+> you provide in an offloading device driver. What I'm trying to tell
+> you is to look around and see that KSZ9477 is not the only one which
+> is confused by the addition of an interlink port.
 
-Could you please add a kernel-doc stating what is the logical input and
-output of this routine? Something like:
+As of now - the HSR interlink was tested with hsr_redbox.sh script with
+QEMU setup and with KSZ9477 IC with and without offloading enabled.
 
-/**
- * vsc73xx_vlan_commit_conf - Update VLAN configuration of a port
- * @vsc: Switch private data structure
- * @port: Port index on which to operate
- *
- * Update the VLAN behavior of a port to make sure that when it is under
- * a VLAN filtering bridge, the port is either filtering with tag
- * preservation, or filtering with all VLANs egress-untagged. Otherwise,
- * the port ignores VLAN tags from packets and applies the port-based
- * VID.
- *
- * Must be called when changes are made to:
- * - the bridge VLAN filtering state of the port
- * - the number or attributes of VLANs from the bridge VLAN table,
- *   while the port is currently VLAN-aware
- */
+> So is XRS700X, yet
+> for another reason.
+>=20
+> > > falling back to
+> > > software mode for the first ring port, then accept offload for
+> > > ring ports 1 and 2. But it doesn't match what user space
+> > > requested, because port 2 should be interlink... =20
+> >=20
+> > Please correct me if I'm wrong, but this seems to not be the case
+> > for ksz9477 - as I stated in the other mail - the ordering is
+> > correct (I've checked it). =20
+>=20
+> I was never claiming it to be about KSZ9477.
 
-> +{
-> +	enum vsc73xx_port_vlan_conf port_vlan_conf = VSC73XX_VLAN_IGNORE;
-> +	struct dsa_port *dp = dsa_to_port(vsc->ds, port);
-> +
-> +	if (port == CPU_PORT) {
-> +		port_vlan_conf = VSC73XX_VLAN_FILTER;
-> +	} else if (dsa_port_is_vlan_filtering(dp)) {
-> +		struct vsc73xx_vlan_summary summary;
-> +
-> +		port_vlan_conf = VSC73XX_VLAN_FILTER;
-> +
-> +		vsc73xx_bridge_vlan_summary(vsc, port, &summary, VLAN_N_VID);
-> +		if (summary.num_tagged == 0)
-> +			port_vlan_conf = VSC73XX_VLAN_FILTER_UNTAG_ALL;
-> +	}
-> +
-> +	return vsc73xx_set_vlan_conf(vsc, port, port_vlan_conf);
-> +}
-> +
-> +static int
-> +vsc73xx_vlan_change_untagged(struct vsc73xx *vsc, int port, u16 vid, bool set)
-> +{
-> +	u32 val = 0;
-> +
-> +	if (set)
-> +		val = VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_ENA |
-> +		      ((vid << VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_SHIFT) &
-> +		       VSC73XX_TXUPDCFG_TX_UNTAGGED_VID);
-> +
-> +	return vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-> +				   VSC73XX_TXUPDCFG,
-> +				   VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_ENA |
-> +				   VSC73XX_TXUPDCFG_TX_UNTAGGED_VID, val);
-> +}
-> +
-> +static int vsc73xx_vlan_commit_untagged(struct vsc73xx *vsc, int port)
+Ok.
 
-/**
- * vsc73xx_vlan_commit_untagged - Update native VLAN of a port
- * @vsc: Switch private data structure
- * @port: Port index on which to operate
- *
- * Update the native VLAN of a port (the one VLAN which is transmitted
- * as egress-tagged on a trunk port).
- *
- * TODO: I need to figure out more about the implementation :)
- */
+>=20
+> > > I think you really should pass the port type down to drivers and
+> > > reject offloading interlink ports... =20
+> >=20
+> > As stated above - IMHO I do provide a fix for this particular IC
+> > (KSZ9477). With xrs700x we do have fixed ports supporting HSR (port
+> > 1,2), so there is no other choice. As a result the HSR Interlink
+> > would be supporting only SW emulation. =20
+>=20
+> But there is another choice, and I think I've already explained it.
+>=20
+>         HSR_PT_SLAVE_A    HSR_PT_SLAVE_B      HSR_PT_INTERLINK
+>  ----------------------------------------------------------------
+>  user
+>  space        0                 1                   2
+>  requests
+>  ----------------------------------------------------------------
+>  XRS700X
+>  driver       1                 2                   -
+>  understands
+>=20
+> I am bringing this as an argument for the fact that you should pass
+> the port type explicitly from HSR to the offload, and use it
+> throughout the offloading drivers. The hweight(ports) >=3D 2 happens to
+> work for KSZ9477,
 
-> +{
-> +	struct vsc73xx_portinfo *portinfo = &vsc->portinfo[port];
-> +	bool valid = portinfo->untagged_tag_8021q_configured;
-> +	struct dsa_port *dp = dsa_to_port(vsc->ds, port);
-> +	u16 vid = portinfo->untagged_tag_8021q;
+And hence it is added to ksz_hsr_join() function, which for now only
+checks if we use this particular IC.
 
-Question: when tag_8021q is active and the port is VSC73XX_VLAN_IGNORE,
-does the untagged_tag_8021q VID matter at all?
+> but IMO misidentifies the problem as having to do
+> with the number of ports rather than the port type.
 
-> +
-> +	if (dsa_port_is_vlan_filtering(dp)) {
+In general I do understand your concerns - however, as I've stated this
+patch fixes oddity of the KSZ9477. I can test it with it.
 
-If not, wouldn't it be better to just return early and do nothing
-if !dsa_port_is_vlan_filtering(dp)?
+> Because of this,
+> a largely similar issue introduced by the same blamed commit but in
+> XRS700X is left unaddressed and unidentified (the fixed ports check
+> which is already present masks the fact that it's not really about
+> the ports, but their type, which must still be checked, otherwise the
+> driver has no idea what HSR wants from it).
 
-> +		struct vsc73xx_vlan_summary summary;
-> +
-> +		vsc73xx_bridge_vlan_summary(vsc, port, &summary, VLAN_N_VID);
-> +
-> +		if (summary.num_untagged > 1)
-> +			/* Port must untag all vlans in that case.
-> +			 * No need to commit untagged config change.
-> +			 */
-> +			return 0;
-> +
-> +		valid = (summary.num_untagged == 1);
-> +		if (valid)
-> +			vid = vsc73xx_find_first_vlan_untagged(vsc, port);
-> +	}
-> +
-> +	return vsc73xx_vlan_change_untagged(vsc, port, vid, valid);
-> +}
-> +
-> +static int
-> +vsc73xx_vlan_change_pvid(struct vsc73xx *vsc, int port, u16 vid, bool set)
-> +{
-> +	u32 val = 0;
-> +	int ret;
-> +
-> +	val = set ? 0 : VSC73XX_CAT_DROP_UNTAGGED_ENA;
-> +
-> +	ret = vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-> +				  VSC73XX_CAT_DROP,
-> +				  VSC73XX_CAT_DROP_UNTAGGED_ENA, val);
-> +	if (!set || ret)
-> +		return ret;
-> +
-> +	return vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-> +				   VSC73XX_CAT_PORT_VLAN,
-> +				   VSC73XX_CAT_PORT_VLAN_VLAN_VID,
-> +				   vid & VSC73XX_CAT_PORT_VLAN_VLAN_VID);
-> +}
-> +
+To keep it short: I do see your point, but I believe that it is out of
+the scope for this particular patch.
 
-/**
- * vsc73xx_vlan_commit_pvid - Update port-based default VLAN of a port
- * @vsc: Switch private data structure
- * @port: Port index on which to operate
- *
- * Update the PVID of a port so that it follows either the bridge PVID
- * configuration, when the bridge is currently VLAN-aware, or the PVID
- * from tag_8021q, when the port is standalone or under a VLAN-unaware
- * bridge. A port with no PVID drops all untagged and VID 0 tagged
- * traffic.
- *
- * Must be called when changes are made to:
- * - the bridge VLAN filtering state of the port
- * - the number or attributes of VLANs from the bridge VLAN table,
- *   while the port is currently VLAN-aware
- */
 
-> +static int vsc73xx_vlan_commit_pvid(struct vsc73xx *vsc, int port)
-> +{
-> +	struct vsc73xx_portinfo *portinfo = &vsc->portinfo[port];
-> +	bool valid = portinfo->pvid_tag_8021q_configured;
-> +	struct dsa_port *dp = dsa_to_port(vsc->ds, port);
-> +	u16 vid = portinfo->pvid_tag_8021q;
-> +
-> +	if (dsa_port_is_vlan_filtering(dp)) {
-> +		vid = portinfo->pvid_vlan_filtering;
-> +		valid = portinfo->pvid_vlan_filtering_configured;
-> +	}
-> +
-> +	return vsc73xx_vlan_change_pvid(vsc, port, vid, valid);
-> +}
-> +
->  static int vsc73xx_port_enable(struct dsa_switch *ds, int port,
->  			       struct phy_device *phy)
->  {
->  	struct vsc73xx *vsc = ds->priv;
-> +	int ret;
->  
->  	dev_info(vsc->dev, "enable port %d\n", port);
->  	vsc73xx_init_port(vsc, port);
->  
-> -	return 0;
-> +	ret = vsc73xx_vlan_commit_untagged(vsc, port);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = vsc73xx_vlan_commit_pvid(vsc, port);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return vsc73xx_vlan_commit_conf(vsc, port);
->  }
->  
->  static void vsc73xx_port_disable(struct dsa_switch *ds, int port)
-> @@ -1032,6 +1361,184 @@ static void vsc73xx_phylink_get_caps(struct dsa_switch *dsa, int port,
->  	config->mac_capabilities = MAC_SYM_PAUSE | MAC_10 | MAC_100 | MAC_1000;
->  }
->  
-> +static int
-> +vsc73xx_port_vlan_filtering(struct dsa_switch *ds, int port,
-> +			    bool vlan_filtering, struct netlink_ext_ack *extack)
-> +{
-> +	struct vsc73xx *vsc = ds->priv;
-> +	int ret;
-> +
-> +	/* The commit to hardware processed below is required because vsc73xx
-> +	 * is using tag_8021q. When vlan_filtering is disabled, tag_8021q uses
-> +	 * pvid/untagged vlans for port recognition. The values configured for
-> +	 * vlans and pvid/untagged states are stored in portinfo structure.
-> +	 * When vlan_filtering is enabled, we need to restore pvid/untagged from
-> +	 * portinfo structure. Analogous routine is processed when
-> +	 * vlan_filtering is disabled, but values used for tag_8021q are
-> +	 * restored.
-> +	 */
-> +	ret = vsc73xx_vlan_commit_untagged(vsc, port);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = vsc73xx_vlan_commit_pvid(vsc, port);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return vsc73xx_vlan_commit_conf(vsc, port);
+Best regards,
 
-Could you please group these 3 calls together in a separate subroutine,
-like vsc73xx_port_update_vlan(), and just call that? The pattern is
-repeated in a number of places.
+Lukasz Majewski
 
-> +}
-> +
-> +static int vsc73xx_port_vlan_add(struct dsa_switch *ds, int port,
-> +				 const struct switchdev_obj_port_vlan *vlan,
-> +				 struct netlink_ext_ack *extack)
-> +{
-> +	bool untagged = vlan->flags & BRIDGE_VLAN_INFO_UNTAGGED;
-> +	bool pvid = vlan->flags & BRIDGE_VLAN_INFO_PVID;
-> +	struct dsa_port *dp = dsa_to_port(ds, port);
-> +	struct vsc73xx_bridge_vlan *vsc73xx_vlan;
-> +	struct vsc73xx_vlan_summary summary;
-> +	struct vsc73xx_portinfo *portinfo;
-> +	struct vsc73xx *vsc = ds->priv;
-> +	bool commit_to_hardware;
-> +	int ret = 0;
-> +
-> +	/* Be sure to deny alterations to the configuration done by tag_8021q.
-> +	 */
-> +	if (vid_is_dsa_8021q(vlan->vid)) {
-> +		NL_SET_ERR_MSG_MOD(extack,
-> +				   "Range 3072-4095 reserved for dsa_8021q operation");
-> +		return -EBUSY;
-> +	}
-> +
-> +	/* The processed vlan->vid is excluded from the search because the VLAN
-> +	 * can be re-added with a different set of flags, so it's easiest to
-> +	 * ignore its old flags from the VLAN database software copy.
-> +	 */
-> +	vsc73xx_bridge_vlan_summary(vsc, port, &summary, vlan->vid);
-> +
-> +	/* VSC73XX allow only three untagged states: none, one or all */
+--
 
-allows
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
 
-> +	if ((untagged && summary.num_tagged > 0 && summary.num_untagged > 0) ||
-> +	    (!untagged && summary.num_untagged > 1)) {
-> +		NL_SET_ERR_MSG_MOD(extack,
-> +				   "Port can have only none, one or all untagged vlan");
-> +		return -EBUSY;
-> +	}
-> +
-> +	vsc73xx_vlan = vsc73xx_bridge_vlan_find(vsc, vlan->vid);
-> +
-> +	if (!vsc73xx_vlan) {
-> +		vsc73xx_vlan = kzalloc(sizeof(*vsc73xx_vlan), GFP_KERNEL);
-> +		if (!vsc73xx_vlan)
-> +			return -ENOMEM;
-> +
-> +		vsc73xx_vlan->vid = vlan->vid;
-> +		vsc73xx_vlan->portmask = 0;
-> +		vsc73xx_vlan->untagged = 0;
+--Sig_/bpKHthVch+friIY0bUGyhl5
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-kzalloc gives you 0-initialized memory, so "portmask" and "untagged" are
-already 0.
+-----BEGIN PGP SIGNATURE-----
 
-> +
-> +		list_add_tail(&vsc73xx_vlan->list, &vsc->vlans);
-> +	}
-> +
-> +	/* CPU port must be always tagged because port separation is based on
-> +	 * tag_8021q.
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmZ0GewACgkQAR8vZIA0
+zr3HvQf/TwesLD4OLVnDP3iNXGXpc7JnWrOCDsZKTJz97a+2E05U31gZMPduitTa
+w3Ek2cw7SmmFe2DRWNf0mA73sc879gtOOHW+84ZTV68qbvIk5V0kKjoLYNXODcp9
+AknRCfbjO/X9tjG6wn/p7c0/P4/L5B9cLYoaRZkBmxDxB1xXfDoFstMJPlJcMaZ7
+w/9l52XVqhg/0eVVDXgJHBJo1iy/7Tzzi3zgoKA3azrotZXa/xRpli2SDVyzlPaY
+rOiRlRhjZxKJ8qhz6TtCCuQprKLwEVPVGNHta9MSqw3guqQ8dFSUBKqDEaCuuX7I
+rWu+Wl6pKcAqxzzOlqzKzFUpcbU55w==
+=uJPp
+-----END PGP SIGNATURE-----
 
-I would say "source port identification" rather than separation.
-
-> +	 */
-> +	if (port == CPU_PORT)
-> +		goto update_vlan_table;
-> +
-> +	vsc73xx_vlan->portmask |= BIT(port);
-> +
-> +	if (untagged)
-> +		vsc73xx_vlan->untagged |= BIT(port);
-> +	else
-> +		vsc73xx_vlan->untagged &= ~BIT(port);
-> +
-> +	portinfo = &vsc->portinfo[port];
-> +
-> +	if (pvid) {
-> +		portinfo->pvid_vlan_filtering_configured = true;
-> +		portinfo->pvid_vlan_filtering = vlan->vid;
-> +	} else if (portinfo->pvid_vlan_filtering_configured &&
-> +		   portinfo->pvid_vlan_filtering == vlan->vid) {
-> +		portinfo->pvid_vlan_filtering_configured = false;
-> +	}
-> +
-> +	commit_to_hardware = !vsc73xx_tag_8021q_active(dp);
-> +	if (commit_to_hardware) {
-> +		ret = vsc73xx_vlan_commit_untagged(vsc, port);
-> +		if (ret)
-> +			goto err;
-> +
-> +		ret = vsc73xx_vlan_commit_pvid(vsc, port);
-> +		if (ret)
-> +			goto err;
-> +
-> +		ret =  vsc73xx_vlan_commit_conf(vsc, port);
-> +		if (ret)
-> +			goto err;
-> +	}
-> +
-> +update_vlan_table:
-> +	ret = vsc73xx_update_vlan_table(vsc, port, vlan->vid, true);
-> +	if (!ret)
-> +		return 0;
-> +err:
-> +	vsc73xx_bridge_vlan_remove_port(vsc73xx_vlan, port);
-> +	return ret;
-> +}
-> +
-> +static int vsc73xx_port_vlan_del(struct dsa_switch *ds, int port,
-> +				 const struct switchdev_obj_port_vlan *vlan)
-> +{
-> +	struct vsc73xx_bridge_vlan *vsc73xx_vlan;
-> +	struct vsc73xx_portinfo *portinfo;
-> +	struct vsc73xx *vsc = ds->priv;
-> +	bool commit_to_hardware;
-> +	int ret;
-> +
-> +	ret = vsc73xx_update_vlan_table(vsc, port, vlan->vid, false);
-> +	if (ret)
-> +		return ret;
-> +
-> +	portinfo = &vsc->portinfo[port];
-> +
-> +	if (portinfo->pvid_vlan_filtering_configured &&
-> +	    portinfo->pvid_vlan_filtering == vlan->vid)
-> +		portinfo->pvid_vlan_filtering_configured = false;
-> +
-> +	vsc73xx_vlan = vsc73xx_bridge_vlan_find(vsc, vlan->vid);
-> +
-> +	if (vsc73xx_vlan)
-> +		vsc73xx_bridge_vlan_remove_port(vsc73xx_vlan, port);
-> +
-> +	commit_to_hardware = !vsc73xx_tag_8021q_active(dsa_to_port(ds, port));
-> +	if (commit_to_hardware) {
-> +		ret = vsc73xx_vlan_commit_untagged(vsc, port);
-> +		if (ret)
-> +			return ret;
-> +
-> +		ret = vsc73xx_vlan_commit_pvid(vsc, port);
-> +		if (ret)
-> +			return ret;
-> +
-> +		return vsc73xx_vlan_commit_conf(vsc, port);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int vsc73xx_port_setup(struct dsa_switch *ds, int port)
-> +{
-> +	struct vsc73xx_portinfo *portinfo;
-> +	struct vsc73xx *vsc = ds->priv;
-> +
-> +	portinfo = &vsc->portinfo[port];
-> +
-> +	portinfo->pvid_vlan_filtering_configured = false;
-> +	portinfo->pvid_tag_8021q_configured = false;
-> +	portinfo->untagged_tag_8021q_configured = false;
-
-Initialization with 0, false etc isn't really needed. Not worth adding a
-DSA callback for no useful action.
-
-> +
-> +	return 0;
-> +}
-> +
->  static void vsc73xx_refresh_fwd_map(struct dsa_switch *ds, int port, u8 state)
->  {
->  	struct dsa_port *other_dp, *dp = dsa_to_port(ds, port);
-> @@ -1126,11 +1633,15 @@ static const struct dsa_switch_ops vsc73xx_ds_ops = {
->  	.get_strings = vsc73xx_get_strings,
->  	.get_ethtool_stats = vsc73xx_get_ethtool_stats,
->  	.get_sset_count = vsc73xx_get_sset_count,
-> +	.port_setup = vsc73xx_port_setup,
->  	.port_enable = vsc73xx_port_enable,
->  	.port_disable = vsc73xx_port_disable,
->  	.port_change_mtu = vsc73xx_change_mtu,
->  	.port_max_mtu = vsc73xx_get_max_mtu,
->  	.port_stp_state_set = vsc73xx_port_stp_state_set,
-> +	.port_vlan_filtering = vsc73xx_port_vlan_filtering,
-> +	.port_vlan_add = vsc73xx_port_vlan_add,
-> +	.port_vlan_del = vsc73xx_port_vlan_del,
->  	.phylink_get_caps = vsc73xx_phylink_get_caps,
->  };
->  
-> diff --git a/drivers/net/dsa/vitesse-vsc73xx.h b/drivers/net/dsa/vitesse-vsc73xx.h
-> index 2997f7e108b1..3c7586868e1b 100644
-> --- a/drivers/net/dsa/vitesse-vsc73xx.h
-> +++ b/drivers/net/dsa/vitesse-vsc73xx.h
-> @@ -14,6 +14,27 @@
->   */
->  #define VSC73XX_MAX_NUM_PORTS	8
->  
-> +/**
-> + * struct vsc73xx_portinfo - port data structure: contains storage data
-> + * @pvid_vlan_filtering_configured: imforms if port have configured pvid in vlan
-> + *	filtering mode
-> + * @pvid_vlan_filtering: pvid vlan number used in vlan filtering mode
-> + * @pvid_tag_8021q_configured: imforms if port have configured pvid in tag_8021q
-> + *	mode
-> + * @pvid_tag_8021q: pvid vlan number used in tag_8021q mode
-> + * @untagged_tag_8021q_configured: imforms if port have configured untagged vlan
-> + *	in tag_8021q mode
-> + * @untagged_tag_8021q: untagged vlan number used in tag_8021q mode
-> + */
-
-s/imforms/informs/
-s/port have/port has/
-
-> +struct vsc73xx_portinfo {
-> +	bool		pvid_vlan_filtering_configured;
-> +	u16		pvid_vlan_filtering;
-> +	bool		pvid_tag_8021q_configured;
-> +	u16		pvid_tag_8021q;
-> +	bool		untagged_tag_8021q_configured;
-> +	u16		untagged_tag_8021q;
-> +};
-> +
-
-I think it may be more economical to put all u16 elements first, then
-all bool elements. Pahole should be able to tell.
-
->  /**
->   * struct vsc73xx - VSC73xx state container: main data structure
->   * @dev: The device pointer
-> @@ -25,6 +46,10 @@
->   * @addr: MAC address used in flow control frames
->   * @ops: Structure with hardware-dependent operations
->   * @priv: Pointer to the configuration interface structure
-> + * @portinfo: Storage table portinfo structructures
-> + * @vlans: List of configured vlans. Contains port mask and untagged status of
-> + *	every vlan configured in port vlan operation. It doesn't cover tag_8021q
-> + *	vlans.
->   */
->  struct vsc73xx {
->  	struct device			*dev;
-> @@ -35,6 +60,8 @@ struct vsc73xx {
->  	u8				addr[ETH_ALEN];
->  	const struct vsc73xx_ops	*ops;
->  	void				*priv;
-> +	struct vsc73xx_portinfo		portinfo[VSC73XX_MAX_NUM_PORTS];
-> +	struct list_head		vlans;
->  };
->  
->  /**
-> @@ -49,6 +76,21 @@ struct vsc73xx_ops {
->  		     u32 val);
->  };
->  
-> +/**
-> + * struct vsc73xx_bridge_vlan - VSC73xx driver structure which keeps vlan
-> + *	database copy
-> + * @vid: VLAN number
-> + * @portmask: each bit represents one port
-> + * @untagged: each bit represents one port configured with @vid untagged
-> + * @list: list structure
-> + */
-> +struct vsc73xx_bridge_vlan {
-> +	u16 vid;
-> +	u8 portmask;
-> +	u8 untagged;
-> +	struct list_head list;
-> +};
-> +
->  int vsc73xx_is_addr_valid(u8 block, u8 subblock);
->  int vsc73xx_probe(struct vsc73xx *vsc);
->  void vsc73xx_remove(struct vsc73xx *vsc);
-> -- 
-> 2.34.1
-> 
+--Sig_/bpKHthVch+friIY0bUGyhl5--
 
