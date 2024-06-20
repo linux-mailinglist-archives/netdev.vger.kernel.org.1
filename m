@@ -1,86 +1,108 @@
-Return-Path: <netdev+bounces-105105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD74790FB01
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 03:39:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09CD190FB04
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 03:40:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 787091C20CB2
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 01:39:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5FBC1F2211F
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 01:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B45E012E48;
-	Thu, 20 Jun 2024 01:39:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9134112E78;
+	Thu, 20 Jun 2024 01:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LNgwAmor"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j0H2GOt5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F74D51A;
-	Thu, 20 Jun 2024 01:39:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1A3BA46
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 01:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718847585; cv=none; b=eryYe+aEZg/U9UF0ozY3UJBZHYIiBNx2qVF3lMFQoiSrT3bmaBW9buQd5YrxykUQW/RiSDpuI6O60/iFUafsg4LasFGPIzvrihdTHpqr2SBpkX9TOWOc+aPrWe8XnV+YgWxKL74E+eTmbjoe0KN+etoEsssdNogmIFpaBJQF82I=
+	t=1718847631; cv=none; b=QT9k3AQcydFIKa3AYz9omFNUo/p+p5aKdOS8sovWF1ctnUTKDOvU2E7mrv8kO9D0UK8diLrmMLD+bu4yAeUBAjPRyl9qnv1NdsxGVQp44IttkAXPOPXblBRAskZDZPNyzrtTFP2dC+HQvfR1N2YUw68Wrhr9U3PneQMZwfm7/js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718847585; c=relaxed/simple;
-	bh=Y16cf8bppWGlJW5soeE5je+uBCreX9gIBX/IOlPwges=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KaOO6HWGVNuR3uq+coJ/6cfsiw54R3rJl/qbE0uNtqIcmVoNp3+70hAg8/KQubiTdpsFLCERBs0gVnPGvQRLAClrwWtkBC9MVY/nfQCCHodEyf95Yd1mSapbDMXdmKSBuXJ/EV/hF4yVBun44EFG7NBH50BzPgh2SFCowuKKtao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LNgwAmor; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55053C2BBFC;
-	Thu, 20 Jun 2024 01:39:44 +0000 (UTC)
+	s=arc-20240116; t=1718847631; c=relaxed/simple;
+	bh=JtQEV4FF3Q4SO0aRxgNU9rE+I2vw5jrE3DIIn0m2doY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ClesvlMMzmKTcnlfTKtIA1mk8Vfy0AyIhzb8tDoC9HqidGefHp4UrwEp7uTJeqNHWoD+BqEVV3Daltoti7KwN8+RAoQNaP4pWkmU1u5/KhTlBpiwOxB5NuaT+3T62K+9hJZL1bioLCRct423+gZnV2qAa7a+9oMBr14Y0fjc5eU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j0H2GOt5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C7C1BC4AF09;
+	Thu, 20 Jun 2024 01:40:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718847585;
-	bh=Y16cf8bppWGlJW5soeE5je+uBCreX9gIBX/IOlPwges=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LNgwAmorZKykbw4+WYpd/8W5FDH4WEbSPcnmzabYgW1YgmCax/v2HQ4IqyyCGZ9m9
-	 NnVCvyQXJ5GqO/WkGP8dcmqT7XeJtwawiR/OfJ7JkUkFI0TxLeA0Y4z27MvKPnVdmT
-	 2FO4T52Z7+tYh3M2KTh8adOVrCIsN4d68CvnSI+hFTrPhxJm+i635mAB5sEMx0nG6e
-	 B4jJD2adFrchM8+5pxQaUXb5ady9BDn/ZXItzcnIY+MQxf9739HUgNDbskvtCfEv7r
-	 DnDBwaJfMKGG/ad3HCevKpt64hIzZMfG1TlXLPpZEgTZPEBOXN6hZSeZY7fjx8QORn
-	 npMZ8TjiqYMeQ==
-Date: Wed, 19 Jun 2024 18:39:43 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
- horms@kernel.org, i.maximets@ovn.org, dev@openvswitch.org, Donald Hunter
- <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Pravin B
- Shelar <pshelar@ovn.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 05/10] net: openvswitch: add emit_sample
- action
-Message-ID: <20240619183943.5a41f009@kernel.org>
-In-Reply-To: <20240619210023.982698-6-amorenoz@redhat.com>
-References: <20240619210023.982698-1-amorenoz@redhat.com>
-	<20240619210023.982698-6-amorenoz@redhat.com>
+	s=k20201202; t=1718847630;
+	bh=JtQEV4FF3Q4SO0aRxgNU9rE+I2vw5jrE3DIIn0m2doY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=j0H2GOt5wM4CSPTKVAa01R+bOPy+EQsjmuwjsK5Q6f0F68PJ+vUZ1u/S+I1ewJLKG
+	 yuizuw76llitV+z8s8GHrTvRID5mig9rj6PyiFV78cVsJqp9gh0xIcZLpp34zpZTVP
+	 HSytOtfSNq/gK6cPV3Bp99Zoq2cZfTeQVTwTBqyS6xzFac+5CjXm8CXcRKm5G+PaFE
+	 5uouxvqQ7+MISkn1Ppn/HPQxOBq4dch0oFN8GEV6uyyCOxK/LEAPNG3c21YAqZ8VON
+	 JSq+KSb+9JeJsx4CNDWmYmXDmJrE/E5zi8B6fyS0dg7/gXsLTnCFpWoqkXcEQveR2B
+	 2U9ZB6/q62g6g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A4918E7C4C5;
+	Thu, 20 Jun 2024 01:40:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net-next 0/8] ionic: rework fix for doorbell miss
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171884763066.25211.4340482488422043694.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Jun 2024 01:40:30 +0000
+References: <20240619003257.6138-1-shannon.nelson@amd.com>
+In-Reply-To: <20240619003257.6138-1-shannon.nelson@amd.com>
+To: Nelson@codeaurora.org, Shannon <shannon.nelson@amd.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, David.Laight@ACULAB.COM,
+ andrew@lunn.ch, brett.creeley@amd.com, drivers@pensando.io
 
-On Wed, 19 Jun 2024 23:00:06 +0200 Adrian Moreno wrote:
-> +	OVS_EMIT_SAMPLE_ATTR_UNPSEC,
+Hello:
 
-Are you using this one? Looking closely I presume not, since it's
-misspelled ;) You can assign = 1 to GROUP, no need to name the value
-for 0.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +	OVS_EMIT_SAMPLE_ATTR_GROUP,	/* u32 number. */
-> +	OVS_EMIT_SAMPLE_ATTR_COOKIE,	/* Optional, user specified cookie. */
-> +	__OVS_EMIT_SAMPLE_ATTR_MAX
+On Tue, 18 Jun 2024 17:32:49 -0700 you wrote:
+> A latency test in a scaled out setting (many VMs with many queues)
+> has uncovered an issue with our missed doorbell fix from
+> commit b69585bfcece ("ionic: missed doorbell workaround")
+> 
+> As a refresher, the Elba ASIC has an issue where once in a blue
+> moon it might miss/drop a queue doorbell notification from
+> the driver.  This can result in Tx timeouts and potential Rx
+> buffer misses.
+> 
+> [...]
 
-kdoc is complaining that __OVS_EMIT_SAMPLE_ATTR_MAX is not documented.
-You can add:
+Here is the summary with links:
+  - [v2,net-next,1/8] ionic: remove missed doorbell per-queue timer
+    https://git.kernel.org/netdev/net-next/c/4aaa49a282ad
+  - [v2,net-next,2/8] ionic: Keep interrupt affinity up to date
+    https://git.kernel.org/netdev/net-next/c/d458d4b4fd43
+  - [v2,net-next,3/8] ionic: add private workqueue per-device
+    https://git.kernel.org/netdev/net-next/c/9e25450da700
+  - [v2,net-next,4/8] ionic: add work item for missed-doorbell check
+    https://git.kernel.org/netdev/net-next/c/4ded136c78f8
+  - [v2,net-next,5/8] ionic: add per-queue napi_schedule for doorbell check
+    https://git.kernel.org/netdev/net-next/c/d7f9bc685918
+  - [v2,net-next,6/8] ionic: check for queue deadline in doorbell_napi_work
+    https://git.kernel.org/netdev/net-next/c/55a3982ec721
+  - [v2,net-next,7/8] ionic: Use an u16 for rx_copybreak
+    https://git.kernel.org/netdev/net-next/c/f703d56c0305
+  - [v2,net-next,8/8] ionic: Only run the doorbell workaround for certain asic_type
+    https://git.kernel.org/netdev/net-next/c/da0262c2c931
 
-	/* private: */
-
-before, take a look at include/uapi/linux/netdev.h for example.
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
