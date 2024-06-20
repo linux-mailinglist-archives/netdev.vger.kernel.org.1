@@ -1,160 +1,149 @@
-Return-Path: <netdev+bounces-105435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9291911227
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 21:32:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41473911228
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 21:32:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72B9D1F2574E
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 19:32:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4046CB21861
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 19:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9C51B581D;
-	Thu, 20 Jun 2024 19:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EFBB1B5821;
+	Thu, 20 Jun 2024 19:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="H047bh8a"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FUI6f0C1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0381B4C3D
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 19:32:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB6D1B47A7
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 19:30:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718911952; cv=none; b=b3y6PItcmELd9sfqvFchYlWnJ8qwzAl2D29ifq1gDbLnQEKXqD9KFl0e24Ic8wkTcJaW7pOHDXYtRTxQWkxaRTJasoW6K7/2BhbsZ63qV79JiAx4UO/Xik/K8zuNlngH872ChaMkqNrIdWVq1zAR6iMMkmXJaQIoM+2DhAARvOo=
+	t=1718911818; cv=none; b=AsJzQ5KQ1rzCm2palnlpQmgkKrMVhPwo2yzIxaNO4/2HIcDm3+mml5YfaLndtuLT8+a/xnuKduaDAG/w/yutFi9NBC+2undArIzDHfPYgfQUic6esoQ47ZmMRZyy2isXQHVq1Y+B3gDTndLQlN6U55lgPtFvky2+djGaTyCeWc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718911952; c=relaxed/simple;
-	bh=LMJhwXKqZKwDoZfSA47gsl66tl0ZA7Fm/pP5alDoprs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rb0lgJlsDjad6dyEakItZroQu7mjqfFboPmeiaL4wcSELW1Vg+ncVUb2mtxptHmV2EI5+wPGxEgv7vLmZ/LQXvRtGgng4VsAQs1L+WlO220Q2AmGSA39nKn6ct1IVA/hXvrQCjvhIRWkpcw7b7exQ3ZpQMtosK8qrFO8Hq5Xd2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=H047bh8a; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-52bc274f438so1642581e87.0
-        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 12:32:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1718911949; x=1719516749; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rxmltmQrKwAluprbf/AG1nvFIcYg57/7dnDwU0ucSDg=;
-        b=H047bh8ax45Q2gAfM81KItKM8qza1QtlddUHtmOuck5FjiqvnVZifERn1w7/WAlY3A
-         7iFK4kv7w4IonKohkkuj2A+jnkswD0v0bLIKzh9Fom8yNUD2rqUW8bqbfHKpJIigGJm1
-         DFhvHSi5wx0A3BosLln7MNHWPUKlbxAqMqWeQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718911949; x=1719516749;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rxmltmQrKwAluprbf/AG1nvFIcYg57/7dnDwU0ucSDg=;
-        b=rb3k/pU3GWp1CdxL9NLlrdsrQImhctdsuL9v/1XHYQ9a+r2zSMMyHvaS7UCFuvZRJh
-         g1PEdZAOJvCd3hkxHqW/acuTzl0rRbGu13gDOOA/jWR65Q6OdzaFpAMbVsOikMQMB/q3
-         ZOcETp8rXGaeLHW+vCHiTjp55Wxf+SmM2u48F/SeWKtromGU09QWVe3Ec6YiUIEXDGfR
-         48STqS1WqkElF3sj5zvp7PZplFWkpBt7GEIWDD8vtx9wmtc2t/hTLkhvXR6rJ2UfCIKY
-         fl3uyiO5DlvZ38EFqw38W8FUFCxvNAXRd6AOCdAHZsAY5ZXKx6fuXfsgTd9CueTMY6lH
-         M9ig==
-X-Forwarded-Encrypted: i=1; AJvYcCVaHpj16VgiM05ZZEGMQf10yYU8en7njqDIQaqWuVbK9Cj1cgNWBw3W5qTNvNn8IblRVxwHBiz3wEwqtGqFJ35EbEx3fuD+
-X-Gm-Message-State: AOJu0Yyd1VTrPBk5hBX0q2xOqFFPPtu5KUyPjuPnqC6tLeXW1GJ1iUH7
-	naGsmvZyP7HC2VLa2uex85xp0HBXOeyhQ9HjEUgotuwWHZpgPWkON+CIjmuvu7NO95xNbpey1ND
-	sDR/P2isF
-X-Google-Smtp-Source: AGHT+IGoWy2hrIiEka8qRA9sKmvUFRp/tOJlY9mimORx7fsScn53Ee72VZzLc3kZ+WgzCr9O6+KoLA==
-X-Received: by 2002:a05:6512:3da7:b0:52c:6d10:3ae4 with SMTP id 2adb3069b0e04-52ccaa59529mr5040983e87.2.1718911949188;
-        Thu, 20 Jun 2024 12:32:29 -0700 (PDT)
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com. [209.85.221.47])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb72ce08bsm9970987a12.1.2024.06.20.12.32.28
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jun 2024 12:32:28 -0700 (PDT)
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-364b2f92388so874034f8f.2
-        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 12:32:28 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVLn+0DInqbQ0DjOJpr6iOYIKtbva18jcP7nkOCykJ1W8YM3VlQNX4rXsT26JkPlRkV2twttIEYguOMueFH6PnewwqIZDJ4
-X-Received: by 2002:a5d:6152:0:b0:35f:308a:cab0 with SMTP id
- ffacd0b85a97d-363170ecbe5mr4379764f8f.13.1718911595412; Thu, 20 Jun 2024
- 12:26:35 -0700 (PDT)
+	s=arc-20240116; t=1718911818; c=relaxed/simple;
+	bh=Qt/f001x8Q0vKKDBE7TSU1xOBp1sWnrsaYRgABuCTXM=;
+	h=From:In-Reply-To:References:Cc:Subject:MIME-Version:Content-Type:
+	 Date:Message-ID; b=fqVAyDfUH7n9Lr7JeyZrI9jOeQMu+CfQht6sLdfNqQVb+okwgnkfYj5CX6VTW7zaGZhcsgOhpQu4pyCw22onO7x6tNK7BEV6JrlUcOljeztmNUq0Y6YkSx9bIwcyZbO0JjGrP9/8jHlgtoXeV691LVC66wETgt+aHYsG1zJJSYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FUI6f0C1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718911815;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uwdtAySFtKK2OLXgT+61d7SC+sWlPRojSuQ75KtZ2Nc=;
+	b=FUI6f0C1BlKurJ5u9Si4G8BSEO5GQDvIZpusJ8HiYN0vZuXOebgc6SmMNIc01W+W40zj62
+	tOU66ulr3j1V6ukmdvzKoUHkFLRWsDo+lViUDQ7NO+kIE+ASkPI84BD8qHiy0onWml0du9
+	+KdVUrgPhD/sq0Tb0hysolJ9J7im+Ic=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-124-A6ZZI-hHP42woi_qbb99ZA-1; Thu,
+ 20 Jun 2024 15:30:13 -0400
+X-MC-Unique: A6ZZI-hHP42woi_qbb99ZA-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 81A401956088;
+	Thu, 20 Jun 2024 19:30:08 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.195.156])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5E2001956087;
+	Thu, 20 Jun 2024 19:30:01 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240620173137.610345-10-dhowells@redhat.com>
+References: <20240620173137.610345-10-dhowells@redhat.com> <20240620173137.610345-1-dhowells@redhat.com>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Jeff Layton <jlayton@kernel.org>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+    linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 09/17] cifs: Defer read completion
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240620175703.605111-1-yury.norov@gmail.com> <CAHk-=wiUTXC452qbypG3jW6XCZGfc8d-iehSavxn5JkQ=sv0zA@mail.gmail.com>
- <ZnR1tQN01kN97G_F@yury-ThinkPad>
-In-Reply-To: <ZnR1tQN01kN97G_F@yury-ThinkPad>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 20 Jun 2024 12:26:18 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjv-DkukaKb7f04WezyPjRERp=xfxv34j5fA8cDQ_JudA@mail.gmail.com>
-Message-ID: <CAHk-=wjv-DkukaKb7f04WezyPjRERp=xfxv34j5fA8cDQ_JudA@mail.gmail.com>
-Subject: Re: [PATCH v4 00/40] lib/find: add atomic find_bit() primitives
-To: Yury Norov <yury.norov@gmail.com>
-Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	"H. Peter Anvin" <hpa@zytor.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
-	Akinobu Mita <akinobu.mita@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Borislav Petkov <bp@alien8.de>, Chaitanya Kulkarni <kch@nvidia.com>, 
-	Christian Brauner <brauner@kernel.org>, Damien Le Moal <damien.lemoal@opensource.wdc.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, David Disseldorp <ddiss@suse.de>, 
-	Edward Cree <ecree.xilinx@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	Fenghua Yu <fenghua.yu@intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gregory Greenman <gregory.greenman@intel.com>, 
-	Hans Verkuil <hverkuil@xs4all.nl>, Hans de Goede <hdegoede@redhat.com>, 
-	Hugh Dickins <hughd@google.com>, Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jaroslav Kysela <perex@perex.cz>, Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>, 
-	Jiri Pirko <jiri@resnulli.us>, Jiri Slaby <jirislaby@kernel.org>, Kalle Valo <kvalo@kernel.org>, 
-	Karsten Graul <kgraul@linux.ibm.com>, Karsten Keil <isdn@linux-pingi.de>, 
-	Kees Cook <keescook@chromium.org>, Leon Romanovsky <leon@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Martin Habets <habetsm.xilinx@gmail.com>, 
-	Mauro Carvalho Chehab <mchehab@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Michal Simek <monstr@monstr.eu>, 
-	Nicholas Piggin <npiggin@gmail.com>, Oliver Neukum <oneukum@suse.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ping-Ke Shih <pkshih@realtek.com>, Rich Felker <dalias@libc.org>, Rob Herring <robh@kernel.org>, 
-	Robin Murphy <robin.murphy@arm.com>, Sean Christopherson <seanjc@google.com>, 
-	Shuai Xue <xueshuai@linux.alibaba.com>, Stanislaw Gruszka <stf_xl@wp.pl>, 
-	Steven Rostedt <rostedt@goodmis.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Thomas Gleixner <tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
-	Will Deacon <will@kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, 
-	GR-QLogic-Storage-Upstream@marvell.com, alsa-devel@alsa-project.org, 
-	ath10k@lists.infradead.org, dmaengine@vger.kernel.org, iommu@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	linux-m68k@lists.linux-m68k.org, linux-media@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-net-drivers@amd.com, 
-	linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-serial@vger.kernel.org, linux-sh@vger.kernel.org, 
-	linux-sound@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	mpi3mr-linuxdrv.pdl@broadcom.com, netdev@vger.kernel.org, 
-	sparclinux@vger.kernel.org, x86@kernel.org, 
-	Alexey Klimov <alexey.klimov@linaro.org>, Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>, 
-	Matthew Wilcox <willy@infradead.org>, Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>, 
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Sergey Shtylyov <s.shtylyov@omp.ru>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <612370.1718911800.1@warthog.procyon.org.uk>
+Date: Thu, 20 Jun 2024 20:30:00 +0100
+Message-ID: <612371.1718911800@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Thu, 20 Jun 2024 at 11:32, Yury Norov <yury.norov@gmail.com> wrote:
->
-> Is that in master already? I didn't get any email, and I can't find
-> anything related in the master branch.
+Oops - a bit of debugging code had got left in this patch and I forgot to
+fill out the description.  Updated patch attached.
 
-It's 5d272dd1b343 ("cpumask: limit FORCE_NR_CPUS to just the UP case").
+David
+---
+cifs: Defer read completion
 
-> > New rule: before you send some optimization, you need to have NUMBERS.
->
-> I tried to underline that it's not a performance optimization at my
-> best.
+Defer read completion from the I/O thread to the cifsiod thread so as not
+to slow down the I/O thread.  This restores the behaviour of v6.9.
 
-If it's not about performance, then it damn well shouldn't be 90%
-inline functions in a header file.
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Paulo Alcantara <pc@manguebit.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cifs@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+---
+ fs/smb/client/smb2pdu.c |   15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-If it's a helper function, it needs to be a real function elsewhere. Not this:
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 38a06e8a0f90..e213cecd5094 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -4484,6 +4484,16 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
+ 	return rc;
+ }
+ 
++static void smb2_readv_worker(struct work_struct *work)
++{
++	struct cifs_io_subrequest *rdata =
++		container_of(work, struct cifs_io_subrequest, subreq.work);
++
++	netfs_subreq_terminated(&rdata->subreq,
++				(rdata->result == 0 || rdata->result == -EAGAIN) ?
++				rdata->got_bytes : rdata->result, true);
++}
++
+ static void
+ smb2_readv_callback(struct mid_q_entry *mid)
+ {
+@@ -4578,9 +4588,8 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 			rdata->result = 0;
+ 	}
+ 	rdata->credits.value = 0;
+-	netfs_subreq_terminated(&rdata->subreq,
+-				(rdata->result == 0 || rdata->result == -EAGAIN) ?
+-				rdata->got_bytes : rdata->result, true);
++	INIT_WORK(&rdata->subreq.work, smb2_readv_worker);
++	queue_work(cifsiod_wq, &rdata->subreq.work);
+ 	release_mid(mid);
+ 	add_credits(server, &credits, 0);
+ }
 
- include/linux/find_atomic.h                  | 324 +++++++++++++++++++
-
-because either performance really matters, in which case you need to
-show profiles, or performance doesn't matter, in which case it damn
-well shouldn't have special cases for small bitsets that double the
-size of the code.
-
-              Linus
 
