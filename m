@@ -1,158 +1,271 @@
-Return-Path: <netdev+bounces-105198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86E3B910155
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:20:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1458191017E
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:30:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FACF1C20CAA
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:20:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86A1E1F22CAF
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177921A8C27;
-	Thu, 20 Jun 2024 10:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8404E1A8C3C;
+	Thu, 20 Jun 2024 10:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NuEdRUhm"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="w0iJlI7J"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949E54DA00
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 10:20:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47AEF2594
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 10:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718878852; cv=none; b=aoSYuHcZry8dC+lZ0dhM/+qVKO+Sdw97mPpet96ByuqTegtjfZX1ZFZk/G3/SZj9dxsd9itQbg9e2SBnLxMA1E+HgmYuv+87cfF9NbDnoYGpea/tQMpDJYaDI9yRAUFWhG29jDVBYHKqIfLc/qqjqen1Yn5R/ShrVzw6prF+oFg=
+	t=1718879437; cv=none; b=i6dsqzQHQgBQKXzTVXaDdgx6navxoW7mThWPhamVH3fqGH4ACzm/hn03hXULyw+a8lOvF9cwylvZVJn3svL9axWcdRhMvwJ2Osb6HtRLHM7rqXL8fO8mmeeZDOSNg4Hz3VY+zFJ0i0NDU4QlpEzPn3mnQDy8Udb5jMCszpLAUhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718878852; c=relaxed/simple;
-	bh=yHiNLBf2HaTYaG+JKche1uFg/Nl1mBxro+Ev0gfNwNg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Dk0ARlKGrm+X9w+eiB3+gQgDrTO7V5cjxqCzY6TJYMd1vzXvrWXCDjFQ6H26kfVEmYyA1xUGigFvSeWhlRa92pAUzxKX+9gecroUgj8MJIsAI3Pszniu3b0CtXEYlIiKIvjrHFLRWcMF5OG0NKJXFFvLKnJ9gxXiB5J9kZTEmCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NuEdRUhm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718878849;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=doeZzZgMg0C1MhSn62H08XIInC3nAwcvpGw3Aktx0Zk=;
-	b=NuEdRUhmLF45bJCy1/FCSm1bajZhMwF3Pm/EsIVmP87IP36u5DTsdLGP0wmV4vWQKRz+up
-	Um8PRTyycQhQy2xweXF5uO2/Wa+Qxc2QQD9LwkL0J2f5PkObmif4Bz1P9IAr5I2DoNwUzu
-	0Bi0rTEwjMc2BrhrM2wrySLtY7L6xao=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-550-8mu2q2kHMJ6QpcSzMSboeg-1; Thu, 20 Jun 2024 06:20:48 -0400
-X-MC-Unique: 8mu2q2kHMJ6QpcSzMSboeg-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4218118d1efso1244435e9.2
-        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 03:20:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718878847; x=1719483647;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=doeZzZgMg0C1MhSn62H08XIInC3nAwcvpGw3Aktx0Zk=;
-        b=jDLolkyu0Ma3YkOdjqHwDAXQ18CtPRA9JPqUEwIPh1r7j7eJXrI+wMEgJ1CWKCEbXH
-         31DwQe+/9pp7D1c4l/Wq7PdbjgR7OILxB5eavTweFdcxQFCtvsLUXJTBzbCkfSZvnaeQ
-         7sENQBgeqhXuaLsKYISGJ1I/7BRPPiDgzggdWPH0bP7cdozlS7j4gfcWoFMlZF45LLad
-         pUTM9c/16pJQcTo/8n2ncOjRsO01chQIis/ik0ktoM32q0kXZBRgsnWqV381ntW+R5DJ
-         TAjKIhGHXOmQZftrUxsI7AKFoPI5aJyLPprFPF/KKNNcQupTBuRu6YTYZc+p6nlrCAXW
-         BvDg==
-X-Forwarded-Encrypted: i=1; AJvYcCVcBbPTxqKKiCOVsRPtlSYuBp3g5nIBgwqu0p8Lt7crd2CNmJW0lmN/K+DAAV3qYi5WsJqpuro5JG0QX/SSKmW/oeCBft7A
-X-Gm-Message-State: AOJu0Yw+ayDeIntqDv6ILslI7fDEVbm4aNw342y/bEgonu9ZJBsTAcKx
-	uEzPs2AoMEwiQJmgFnczjcgtNso3ncCv6DidKgZLSMdEC6+2h70dpvoCg45zyTzvTumsXrhVGAf
-	rMija7Mdptnrctpdb/XxuhmnR5Qv9EsuZLPZKWnxTR3x4ISCQ2GhNRA==
-X-Received: by 2002:a05:600c:511d:b0:423:445:4aad with SMTP id 5b1f17b1804b1-42475016e88mr35681375e9.0.1718878846927;
-        Thu, 20 Jun 2024 03:20:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFV4/Rcl9kCDoWNGsxPLqkw/FELky+0wJBIrIbAGOmhEFKuOljMvUlHhojAQKG12CMNKPEYRw==
-X-Received: by 2002:a05:600c:511d:b0:423:445:4aad with SMTP id 5b1f17b1804b1-42475016e88mr35681245e9.0.1718878846575;
-        Thu, 20 Jun 2024 03:20:46 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b0b7:b110::f71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4247d208e08sm20779235e9.35.2024.06.20.03.20.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jun 2024 03:20:46 -0700 (PDT)
-Message-ID: <3554649e61063491cc3a04222c7dff68d46c2f99.camel@redhat.com>
-Subject: Re: [PATCH net-next v6 07/10] virtio_net: xsk: rx: support fill
- with xsk buffer
-From: Paolo Abeni <pabeni@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-  Eugenio =?ISO-8859-1?Q?P=E9rez?= <eperezma@redhat.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>,  virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-Date: Thu, 20 Jun 2024 12:20:44 +0200
-In-Reply-To: <20240618075643.24867-8-xuanzhuo@linux.alibaba.com>
-References: <20240618075643.24867-1-xuanzhuo@linux.alibaba.com>
-	 <20240618075643.24867-8-xuanzhuo@linux.alibaba.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+	s=arc-20240116; t=1718879437; c=relaxed/simple;
+	bh=2D/iL0Q2ySweIZGMHrLEe0KAXbueMD07zdGi1lt1iwI=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=F7UKsO+F75JPOeTvc4GGf7mzygj1GlkbZTzBC5t19mULdtzDgu4bgeCIp1WfdJUNvnssjGYr5cjmP1UgOLv8gBFDX99vAwUOfjkvHcSKM8AwWY0elYdSioktFV0l0uG1ZBbDxaf0XC1Dtsp+iWFLD/HefcRUQ3+a0yVKqb7BClE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=w0iJlI7J; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1718879431; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=hznL4qRtkLoJ00kZQbZiQGJGcI1lnS4wfII1MEePJws=;
+	b=w0iJlI7JkvIwK6nyezN4suPvEEpANL3cc2dQPz5DYmk6QHyLHtWJJA10KJNl1R4iTlEMvm7ve3R0nDmHcJG6ewnxWyHO6ve5+WvzpM5LtFHjCU1X4KGEy3KKsi8VpF7lB7LPlQitpZdPx1A+xEPsOuCJibCbvUzz0Pg3tYNVugM=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0W8sCZPV_1718879430;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W8sCZPV_1718879430)
+          by smtp.aliyun-inc.com;
+          Thu, 20 Jun 2024 18:30:31 +0800
+Message-ID: <1718879236.1007793-10-hengqi@linux.alibaba.com>
+Subject: Re: [PATCH 2/2] virtio_net: fixing XDP for fully checksummed packets handling
+Date: Thu, 20 Jun 2024 18:27:16 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+ netdev@vger.kernel.org,
+ virtualization@lists.linux.dev,
+ Thomas Huth <thuth@linux.vnet.ibm.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>
+References: <20240617131524.63662-1-hengqi@linux.alibaba.com>
+ <20240617131524.63662-3-hengqi@linux.alibaba.com>
+ <CACGkMEvj8fvXkCxDFQ1-Cyq5DL=axEf1Ch1zVnuQUNQy6Wjn+g@mail.gmail.com>
+ <1718680517.8370645-12-hengqi@linux.alibaba.com>
+ <CACGkMEsa3AsPkweqS0-BEjSw5sKW_XM669HVSN_eX7-8KVG8tQ@mail.gmail.com>
+ <1718875728.9338605-7-hengqi@linux.alibaba.com>
+ <20240620061710-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240620061710-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
 
-Hi,
+On Thu, 20 Jun 2024 06:19:01 -0400, "Michael S. Tsirkin" <mst@redhat.com> w=
+rote:
+> On Thu, Jun 20, 2024 at 05:28:48PM +0800, Heng Qi wrote:
+> > On Thu, 20 Jun 2024 16:33:35 +0800, Jason Wang <jasowang@redhat.com> wr=
+ote:
+> > > On Tue, Jun 18, 2024 at 11:17=E2=80=AFAM Heng Qi <hengqi@linux.alibab=
+a.com> wrote:
+> > > >
+> > > > On Tue, 18 Jun 2024 11:10:26 +0800, Jason Wang <jasowang@redhat.com=
+> wrote:
+> > > > > On Mon, Jun 17, 2024 at 9:15=E2=80=AFPM Heng Qi <hengqi@linux.ali=
+baba.com> wrote:
+> > > > > >
+> > > > > > The XDP program can't correctly handle partially checksummed
+> > > > > > packets, but works fine with fully checksummed packets.
+> > > > >
+> > > > > Not sure this is ture, if I was not wrong, XDP can try to calcula=
+te checksum.
+> > > >
+> > > > XDP's interface serves a full checksum,
+> > >=20
+> > > What do you mean by "serve" here? I mean, XDP can calculate the
+> > > checksum and fill it in the packet by itself.
+> > >=20
+> >=20
+> > Yes, XDP can parse and calculate checksums for all packets.
+> > However, the bpf_csum_diff and bpf_l4_csum_replace APIs provided by XDP=
+ assume
+> > that the packets being processed are fully checksumed packets. That is,
+> > after the XDP program modified the packets, the incremental checksum ca=
+n be
+> > calculated (for example, samples/bpf/tcbpf1_kern.c, samples/bpf/test_lw=
+t_bpf.c).
+> >=20
+> > Therefore, partially checksummed packets cannot be processed normally i=
+n these
+> > examples and need to be discarded.
+> >=20
+> > > > and this is why we disabled the
+> > > > offloading of VIRTIO_NET_F_GUEST_CSUM when loading XDP.
+> > >=20
+> > > If we trust the device to disable VIRTIO_NET_F_GUEST_CSUM, any reason
+> > > to check VIRTIO_NET_HDR_F_NEEDS_CSUM again in the receive path?
+> >=20
+> > There doesn't seem to be a mandatory constraint in the spec that device=
+s that
+> > haven't negotiated VIRTIO_NET_F_GUEST_CSUM cannot set NEEDS_CSUM bit, s=
+o I check this.
+> >=20
+> > Thanks.
+>=20
+> The spec says:
+>=20
+> \item If the VIRTIO_NET_F_GUEST_CSUM feature was negotiated, the
+>   VIRTIO_NET_HDR_F_NEEDS_CSUM bit in \field{flags} can be
+>   set: if so, the packet checksum at offset \field{csum_offset}=20
+>   from \field{csum_start} and any preceding checksums
+>   have been validated.  The checksum on the packet is incomplete and
+>   if bit VIRTIO_NET_HDR_F_RSC_INFO is not set in \field{flags},
+>   then \field{csum_start} and \field{csum_offset} indicate how to calcula=
+te it
+>   (see Packet Transmission point 1).
+>=20
+>=20
+> So yes, NEEDS_CSUM without VIRTIO_NET_F_GUEST_CSUM is at best undefined.
+> Please do not try to use it unless VIRTIO_NET_F_GUEST_CSUM is set.
 
-On Tue, 2024-06-18 at 15:56 +0800, Xuan Zhuo wrote:
-> @@ -1032,6 +1034,53 @@ static void check_sq_full_and_disable(struct virtn=
-et_info *vi,
->  	}
->  }
-> =20
-> +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32 len=
-)
-> +{
-> +	sg->dma_address =3D addr;
-> +	sg->length =3D len;
-> +}
-> +
-> +static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct recei=
-ve_queue *rq,
-> +				   struct xsk_buff_pool *pool, gfp_t gfp)
-> +{
-> +	struct xdp_buff **xsk_buffs;
-> +	dma_addr_t addr;
-> +	u32 len, i;
-> +	int err =3D 0;
+I've seen it before, but thought something like
+ "The device MUST NOT set the NEEDS_CSUM bit if GUEST_CSUM has not been neg=
+otiated"
+would be clearer.
 
-Minor nit: the reverse xmas tree order is based on the full line len,
-should be:
-	int err =3D 0;
-	u32 len, i;
+Furthermore, it is still possible for a malicious device to set the bit.
 
-[...]
-> @@ -2226,6 +2281,7 @@ static bool try_fill_recv(struct virtnet_info *vi, =
-struct receive_queue *rq,
->  		u64_stats_update_end_irqrestore(&rq->stats.syncp, flags);
->  	}
-> =20
-> +	oom =3D err =3D=3D -ENOMEM;
->  	return !oom;
+Thanks.
 
-Minor nit: 'oom' is used only in the above to lines. You could drop
-such variable and just:
-	return err !=3D -ENOMEM;
-
-Please _do not_ repost just for the above, but please include such
-changes if you should repost for other reasons.
-
-Also try to include a detailed changelog in each patch after the tag
-area and a '---' separator, it will simplify the review process.
-
-Thanks,
-
-Paolo
-
+>=20
+> And if you want to be flexible, ignore it unless VIRTIO_NET_F_GUEST_CSUM
+> has been negotiated.
+>=20
+>=20
+>=20
+>=20
+>=20
+> > >=20
+> > > >
+> > > > Thanks.
+> > >=20
+> > > Thanks
+> > >=20
+> > > >
+> > > > >
+> > > > > Thanks
+> > > > >
+> > > > > > If the
+> > > > > > device has already validated fully checksummed packets, then
+> > > > > > the driver doesn't need to re-validate them, saving CPU resourc=
+es.
+> > > > > >
+> > > > > > Additionally, the driver does not drop all partially checksummed
+> > > > > > packets when VIRTIO_NET_F_GUEST_CSUM is not negotiated. This is
+> > > > > > not a bug, as the driver has always done this.
+> > > > > >
+> > > > > > Fixes: 436c9453a1ac ("virtio-net: keep vnet header zeroed after=
+ processing XDP")
+> > > > > > Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> > > > > > ---
+> > > > > >  drivers/net/virtio_net.c | 20 +++++++++++++++++++-
+> > > > > >  1 file changed, 19 insertions(+), 1 deletion(-)
+> > > > > >
+> > > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > > > > index aa70a7ed8072..ea10db9a09fa 100644
+> > > > > > --- a/drivers/net/virtio_net.c
+> > > > > > +++ b/drivers/net/virtio_net.c
+> > > > > > @@ -1360,6 +1360,10 @@ static struct sk_buff *receive_small_xdp=
+(struct net_device *dev,
+> > > > > >         if (unlikely(hdr->hdr.gso_type))
+> > > > > >                 goto err_xdp;
+> > > > > >
+> > > > > > +       /* Partially checksummed packets must be dropped. */
+> > > > > > +       if (unlikely(hdr->hdr.flags & VIRTIO_NET_HDR_F_NEEDS_CS=
+UM))
+> > > > > > +               goto err_xdp;
+> > > > > > +
+> > > > > >         buflen =3D SKB_DATA_ALIGN(GOOD_PACKET_LEN + headroom) +
+> > > > > >                 SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+> > > > > >
+> > > > > > @@ -1677,6 +1681,10 @@ static void *mergeable_xdp_get_buf(struc=
+t virtnet_info *vi,
+> > > > > >         if (unlikely(hdr->hdr.gso_type))
+> > > > > >                 return NULL;
+> > > > > >
+> > > > > > +       /* Partially checksummed packets must be dropped. */
+> > > > > > +       if (unlikely(hdr->hdr.flags & VIRTIO_NET_HDR_F_NEEDS_CS=
+UM))
+> > > > > > +               return NULL;
+> > > > > > +
+> > > > > >         /* Now XDP core assumes frag size is PAGE_SIZE, but buf=
+fers
+> > > > > >          * with headroom may add hole in truesize, which
+> > > > > >          * make their length exceed PAGE_SIZE. So we disabled t=
+he
+> > > > > > @@ -1943,6 +1951,7 @@ static void receive_buf(struct virtnet_in=
+fo *vi, struct receive_queue *rq,
+> > > > > >         struct net_device *dev =3D vi->dev;
+> > > > > >         struct sk_buff *skb;
+> > > > > >         struct virtio_net_common_hdr *hdr;
+> > > > > > +       u8 flags;
+> > > > > >
+> > > > > >         if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
+> > > > > >                 pr_debug("%s: short packet %i\n", dev->name, le=
+n);
+> > > > > > @@ -1951,6 +1960,15 @@ static void receive_buf(struct virtnet_i=
+nfo *vi, struct receive_queue *rq,
+> > > > > >                 return;
+> > > > > >         }
+> > > > > >
+> > > > > > +       /* 1. Save the flags early, as the XDP program might ov=
+erwrite them.
+> > > > > > +        * These flags ensure packets marked as VIRTIO_NET_HDR_=
+F_DATA_VALID
+> > > > > > +        * stay valid after XDP processing.
+> > > > > > +        * 2. XDP doesn't work with partially checksummed packe=
+ts (refer to
+> > > > > > +        * virtnet_xdp_set()), so packets marked as
+> > > > > > +        * VIRTIO_NET_HDR_F_NEEDS_CSUM get dropped during XDP p=
+rocessing.
+> > > > > > +        */
+> > > > > > +       flags =3D ((struct virtio_net_common_hdr *)buf)->hdr.fl=
+ags;
+> > > > > > +
+> > > > > >         if (vi->mergeable_rx_bufs)
+> > > > > >                 skb =3D receive_mergeable(dev, vi, rq, buf, ctx=
+, len, xdp_xmit,
+> > > > > >                                         stats);
+> > > > > > @@ -1966,7 +1984,7 @@ static void receive_buf(struct virtnet_in=
+fo *vi, struct receive_queue *rq,
+> > > > > >         if (dev->features & NETIF_F_RXHASH && vi->has_rss_hash_=
+report)
+> > > > > >                 virtio_skb_set_hash(&hdr->hash_v1_hdr, skb);
+> > > > > >
+> > > > > > -       if (hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VALID)
+> > > > > > +       if (flags & VIRTIO_NET_HDR_F_DATA_VALID)
+> > > > > >                 skb->ip_summed =3D CHECKSUM_UNNECESSARY;
+> > > > > >
+> > > > > >         if (virtio_net_hdr_to_skb(skb, &hdr->hdr,
+> > > > > > --
+> > > > > > 2.32.0.3.g01195cf9f
+> > > > > >
+> > > > >
+> > > >
+> > >=20
+>=20
 
