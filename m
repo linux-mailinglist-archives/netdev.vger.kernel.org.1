@@ -1,142 +1,176 @@
-Return-Path: <netdev+bounces-105346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31676910887
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 16:35:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EBCE91089F
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 16:39:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB7DD2844AD
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:35:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F9B11C20431
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C6D1AD3F9;
-	Thu, 20 Jun 2024 14:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FBC11AE089;
+	Thu, 20 Jun 2024 14:39:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pWw+JMX/"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="HA4/QOVJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3141ACE9C;
-	Thu, 20 Jun 2024 14:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31E51AE0B6
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 14:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718894122; cv=none; b=kS4EJjQ+Yvjprseh0NyryC5uuRxy6rCkQR7YwFdYNKisltomrcxmKNgDL450AhB918Sv4ltm7XEsdxhB5osMaHexvXJWu4lRPI4M05W08RD7IIgmhQMAJxQA9ylwKaQ4k4w0yYoYhiNXdXlFVEuAFwHw1Dg48nZeQ0yAy+Qydj8=
+	t=1718894365; cv=none; b=tISh86rYZvmLtL3k0U3BJWDPD/8BiVEdewd57aSNwILKkoQqCg0WVNc6wTZVePAhSyWGbOumAzOteJGkGyTet5RJTGCeaSpKVUZPWRsLJe5EjuTCZph/Y+vVVw7uCNzlXfSryg1PNxb8cdkxzcwf5xKxAUITDGe+Y6DAfzsnTwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718894122; c=relaxed/simple;
-	bh=npqeh05ryDsyIjjm50F0c9LzhQy62vbv2Gkiq4GYZ/0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mqJO3AwzoI9fQHzYIC/pihYwRf/RTIGwRdEcaiua3bczp4AoI9KHVPTym2KAMRCW6itmOCPriBxHzkJ0Pd13xxHmUm2F2e9FffhhHpCBzFphOisruFkp0h6flVv+fufM+GpQUzKSJfE5VJF4UTBuMtWEYnzmab0PqORydbpykpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pWw+JMX/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5D83C2BD10;
-	Thu, 20 Jun 2024 14:35:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718894122;
-	bh=npqeh05ryDsyIjjm50F0c9LzhQy62vbv2Gkiq4GYZ/0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pWw+JMX/pZBbZERiMYq8jt3mLMHCNeyw2n+rsNU8yzEc1RmCWw7SL5IklwlwDvLyy
-	 CcpvEsCvzu/nuxvROzR45QPxqjZ5WRnuTE9Dv/2lc7T0+nx/tbSl4O9bFlDXVJrgyw
-	 nwuTpvrvfzG9UNGZloYjIX90dsxygDKlOq1MgyKy28fg3pzxGc1RC2iGsjWetEoHzX
-	 9ogBU6Je4NnmbnXz/Y8Eb15JTQ6RddyLShb/mu7w617r9GdQh4fFVIFVgeJiUlYe70
-	 /N7Sfisn8kBZj0nYGRkRJrQS/HL3p1xCyPUOlmHzvCdypvawyYWLwFQHsQoIi7oLV6
-	 GxTNCa6u5JOiA==
-Message-ID: <8d6af7e2-76f8-4daa-a751-a1abe29af103@kernel.org>
-Date: Thu, 20 Jun 2024 16:35:16 +0200
+	s=arc-20240116; t=1718894365; c=relaxed/simple;
+	bh=I8JAbpL3PqkA/EkE72QMuFZnLHqtF83qkStDr0N4H38=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o2qci7gf8OHN7AUplPvxOBdebgz+ib6xNkUkTJ1XqagBT79OQq4FpqWmpJ47wczO4zY3YnsMl4kyG3TcCUJJtnqNVM1p15uthkl1BWyZoxwofb55St+HRNXEnLcy12BxVaP/OqXPvzF0gLM/3qRevQDQv26+tk+CIRM3awsfLLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=HA4/QOVJ; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-63bd10df78dso8879357b3.2
+        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 07:39:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1718894363; x=1719499163; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YBK8rutGei3y8cl5HYXKe7qhfX+aGQujhf+KTCzTbro=;
+        b=HA4/QOVJhCSuIjxhHGMenVwGHuMWqYunItGJc8sb63ixofqq8A9s1+G2RvYweY9zje
+         7V1MYceEPpJ3qdMy2p6IsAz9nATk2XHbroU+Y+hrf8ZOdnwET6FcBBhDLGQcfSjJThGk
+         8wlVSHF054gBpEv5byI9DUHSBb8tfFWNcK4MuC7yM7ivNGH2vpsOjH2iupaIXcMmapj5
+         TBwES1/weqpv52t4ruz21mXu5LM0ljeRyWQMkFiK3ySm/bYRPbr6wu/jLXXWoo68DLUu
+         XDPta4XG+/PkWtXho7uqiSSZqonjUgyykEhUUooPiXBMmXio1DmqdsQq0rXh1kR6ctOJ
+         WlNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718894363; x=1719499163;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YBK8rutGei3y8cl5HYXKe7qhfX+aGQujhf+KTCzTbro=;
+        b=IFlOW0BX95iSTeKHiRg5KLExOKOtAIkq6NpAtN46inZQJXkwqgzB8m125+rjd7G2MG
+         OOgyEaWuxnt7o9d/gAiTTn3wa0mVaQFxynahJQ7+fA7d2WmPLStmm4Adj0Rb8fVEYL7B
+         KrZeX8GLz/eG/+R61pkUlHe8DPOam6OWTZKQ+Brj8HRxwbn+L+p1Je6ifDb//1FaXbVq
+         kW7i29DYbh5DZORLWofWbIt2+4T0TJkTl8y7YAEym6ycTdTAG8tXNdJ17cYo6Y5jTMa3
+         OFP8UqJWaUmALnos7A+vDrTFCpH3mPoqbOkkOz4Pe7niyMTlqdfZhj5ZIcf8ZE0hq9b0
+         kPdQ==
+X-Gm-Message-State: AOJu0Yw64k/gJoaJY47RE0yl38Lfs6f4tBsLWIYIluYmjDb2z3JksrJf
+	NS8aMxJZXRUGRTAam+SuDVthPfPape8+e3kWMxrGnQPdvL2+v7U5HByWz3DVviBsvv1eCRLfxFg
+	zUrlCiiBBXh0TuqrIbEXCWVFQ54rVUZl2dkRP
+X-Google-Smtp-Source: AGHT+IFWgVeHFD7xuaYmPthmiJaG3UnzIljalYgp8EGE74ka/RrztYjjeEXPQRf0wFwWOPTmWpmdEgPzHxWlrrcllWI=
+X-Received: by 2002:a25:ab46:0:b0:e02:b888:79ae with SMTP id
+ 3f1490d57ef6-e02be22851bmr5225111276.62.1718894362774; Thu, 20 Jun 2024
+ 07:39:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] Immutable tag between the Bluetooth and pwrseq
- branches for v6.11-rc1
-To: patchwork-bot+bluetooth@kernel.org, Bartosz Golaszewski <brgl@bgdev.pl>,
- luiz.dentz@gmail.com
-Cc: marcel@holtmann.org, krzk+dt@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, bartosz.golaszewski@linaro.org
-References: <20240612075829.18241-1-brgl@bgdev.pl>
- <171889385052.4585.15983645082672209436.git-patchwork-notify@kernel.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <171889385052.4585.15983645082672209436.git-patchwork-notify@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240607160753.1787105-1-omosnace@redhat.com> <171834962895.31068.8051988032320283876.git-patchwork-notify@kernel.org>
+ <CAHC9VhSRUW5hQNmXUGt2zd8hQUFB0wuXh=yZqAzH7t+erzqRKQ@mail.gmail.com>
+ <1902e638728.28a7.85c95baa4474aabc7814e68940a78392@paul-moore.com> <CAFqZXNsQQMxS=nVWmvUbepDL5NaXk679pNUTJqe8sKjB6yLyhg@mail.gmail.com>
+In-Reply-To: <CAFqZXNsQQMxS=nVWmvUbepDL5NaXk679pNUTJqe8sKjB6yLyhg@mail.gmail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Thu, 20 Jun 2024 10:39:11 -0400
+Message-ID: <CAHC9VhTwFyMhYK448gBpwO7M4bEBCOq-f=-ztn1vro9nQU9v0A@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] cipso: make cipso_v4_skbuff_delattr() fully remove
+ the CIPSO options
+To: Ondrej Mosnacek <omosnace@redhat.com>
+Cc: netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	patchwork-bot+netdevbpf@kernel.org, selinux@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 20/06/2024 16:30, patchwork-bot+bluetooth@kernel.org wrote:
-> Hello:
-> 
-> This pull request was applied to bluetooth/bluetooth-next.git (master)
-> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> 
-> On Wed, 12 Jun 2024 09:58:29 +0200 you wrote:
->> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->>
->> Hi Marcel, Luiz,
->>
->> Please pull the following power sequencing changes into the Bluetooth tree
->> before applying the hci_qca patches I sent separately.
->>
->> [...]
-> 
-> Here is the summary with links:
->   - [GIT,PULL] Immutable tag between the Bluetooth and pwrseq branches for v6.11-rc1
->     https://git.kernel.org/bluetooth/bluetooth-next/c/4c318a2187f8
+On Thu, Jun 20, 2024 at 6:03=E2=80=AFAM Ondrej Mosnacek <omosnace@redhat.co=
+m> wrote:
+> On Wed, Jun 19, 2024 at 4:46=E2=80=AFAM Paul Moore <paul@paul-moore.com> =
+wrote:
+> > On June 14, 2024 11:08:41 AM Paul Moore <paul@paul-moore.com> wrote:
+> > > On Fri, Jun 14, 2024 at 3:20=E2=80=AFAM <patchwork-bot+netdevbpf@kern=
+el.org> wrote:
+> > >>
+> > >> Hello:
+> > >>
+> > >> This series was applied to netdev/net.git (main)
+> > >> by David S. Miller <davem@davemloft.net>:
+> > >
+> > > Welp, that was premature based on the testing requests in the other
+> > > thread, but what's done is done.
+> > >
+> > > Ondrej, please accelerate the testing if possible as this patchset no=
+w
+> > > in the netdev tree and it would be good to know if it need a fix or
+> > > reverting before the next merge window.
+> >
+> > Ondrej, can you confirm that you are currently working on testing this
+> > patchset as requested?
 
+[NOTE: adding SELinux list as a FYI for potential breakage in upcoming kern=
+els]
 
-Luiz,
+> Not really... I tried some more to get cloud-init to work on FreeBSD,
+> but still no luck...
 
-This pulls looks wrong. Are you sure you have correct base? The diffstat
-suggests you are merging into rc2, not rc3. This will be confusing in
-merge commit. It is much safer, including possible feedback from Linus,
-if you use exactly the same base.
+As mentioned previously, if you aren't able to fit the testing into
+your automated framework, you'll need to do some manual testing to
+verify the patches.
 
-Best regards,
-Krzysztof
+> Anyway, I still don't see why I should waste my
+> time on testing this scenario, since you didn't provide any credible
+> hypothesis on why/what should break there.
 
+I did share my concern about changes in packet length across the
+network path and an uncertainty about how different clients might
+react.  While you tested with Linux based systems, I requested that
+you test with at least one non-Linux client to help verify that things
+are handled properly.
+
+Perhaps you don't view that concern as credible, but it is something
+I'm worried about as a common use case is for non-Linux clients to
+connect over an unlabeled, single label/level network to a Linux
+gateway which then routes traffic over different networks, some with
+explicit labeling.
+
+If you don't believe that testing this is important Ondrej, trust
+those who have worked with a number of users who have deployed these
+types of systems that this is important.
+
+> Convince me that there is a
+> valid concern and I will be much more willing to put more effort into
+> it.
+
+I've shared my concerns with you, both in previous threads and now in
+this thread.  This really shouldn't be about convincing you to do The
+Right Thing and verify that your patch doesn't break existing users,
+it should be about you wanting to do The Right Thing so your work
+doesn't break the kernel.
+
+> You see something there that I don't, and I'd like to see and
+> understand it, too. Let's turn it from *your* concern to *our* concern
+> (or lack of it) and then the cooperation will work better.
+
+It's not about you or I, it's about all of the users who rely on this
+functionality and not wanting to break things for them.
+
+Test your patches Ondrej, if you don't you'll find me increasingly
+reluctant to accept anything from you in any of the trees I look
+after.
+
+> BTW, I was also surprised that David merged the patches quietly like
+> this. I don't know if he didn't see your comments or if he knowingly
+> dismissed them...
+
+I've seen DaveM do this before, but as Jakub has been the one pulling
+the labeled networking patches after my ACK I thought DaveM was no
+longer doing that type of work.  My guess based on previous experience
+is that DaveM didn't see any comments on your latest patchset - as we
+were still discussing things in the previous thread - but only DaveM
+can comment on that, and it really isn't very important at this point.
+
+--=20
+paul-moore.com
 
