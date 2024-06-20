@@ -1,425 +1,227 @@
-Return-Path: <netdev+bounces-105128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB29690FC51
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 07:49:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFB4190FC53
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 07:49:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69AB91F22F5D
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 05:49:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D391D1C23751
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 05:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A1F381BE;
-	Thu, 20 Jun 2024 05:48:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B626364DC;
+	Thu, 20 Jun 2024 05:49:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Y5wHqaeB"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="1ZAxqLwh";
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="luBhSNOn"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2059.outbound.protection.outlook.com [40.107.236.59])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9BE81B974;
-	Thu, 20 Jun 2024 05:48:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130B522EED;
+	Thu, 20 Jun 2024 05:49:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.154.123
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718862537; cv=fail; b=GIMjolU9JlQoMgKg4XxA92+ScS6N7FVcmLTOkEXnze9Sj5wP5KyhA8iVkJMY9X0jhnI2FAtYdnuwmjeJU48d+HwTLy1htBRvVyQ6df6CeCZsa4pVtJcxJKNOcRnDPZ7w9gnD39hv30roWv2wcjDO0Z4zJFH3BSQcjHzWEpHkYW0=
+	t=1718862559; cv=fail; b=NuQcExFliptp1si0oNt1+iJeOPZ1Y5xEaPNZThT97S9UQgp2J/5VJxVI8w81LJ1l/hmQIhM5p1aMCkGhKZfvgt295Oukk9HqidC4aKuaxzmhJ4p7K6P0oqb0CrbvTqSFezJjfAZIKZrEAELyla74lQ4HH92cP71QVORokTo1mp4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718862537; c=relaxed/simple;
-	bh=SksYTpKFgQzRA5+5B2Mf5I3C70aaK5N2I/LRelAEyDo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=k806S0yyxRnZyvZm+Ak5GkPnNa2gVaGyudPclex2EfkYphoc60BbSyun4NwU/O0EQmMf05LdU35xBHTu59b0ev5k3/8Eq5RKiS3P4VYASfOO2fNvYVtPNynqOBebVAYxTIdhmqPAFUqbaeS8EnwA0Vh/f10kaYCQp0v7tGXI298=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Y5wHqaeB; arc=fail smtp.client-ip=40.107.236.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1718862559; c=relaxed/simple;
+	bh=Ed94cFAbEilIprkInsxNDMwehZNvz+jst5FDUbUY8f0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=MUvVIh/t8/eae7km2gs+hAclLMezaH+KW0pHaRsGffuuX9eg5FmyMXnHBPU07ck5yaGaN9R7hocP4a9XHAFjpgvYdR68Ufne7RegbFkwV87UmyIQWSPx/Wl1BrUFuloSsISj1I6bTsZBLNA+N3lBtSL3wm7Z6pPS1/mX07RfpWs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=1ZAxqLwh; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=luBhSNOn; arc=fail smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1718862557; x=1750398557;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=Ed94cFAbEilIprkInsxNDMwehZNvz+jst5FDUbUY8f0=;
+  b=1ZAxqLwhHR3BK67/XFLgZu9CeVV8mrXHl1jBFpcSJF40ajBQ5dFe+V6+
+   +bretGup6skdVEXwVr83TERxQcEMAclvvr6htS42KWidHORL3aJcgO2TL
+   D8K+k18N8i6RAkr+JgmaZZlJ9byn73+3pGU9pi5j0j1qrrs+LPRTEFAba
+   3T9p5qgKkuW2tnKZv5OmO1/ya//tv6kxion94gZ10/3j4GGnG3QO/V/76
+   6emolTvPb21WDLJFFgdZNoL/OA73uJlYpg5Xjd96JeHgxaHOpRRWgmHWe
+   y/cmUL+cMDQ46ExkgnwbfkFH+JOLVMMkJsw/V0U51VSYYG5j+1zaTeFWr
+   g==;
+X-CSE-ConnectionGUID: l9zaDWOaTnmRX4FJbGh5cQ==
+X-CSE-MsgGUID: LrYwA51UTT+uGHHh4q8ZtQ==
+X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
+   d="scan'208";a="28902851"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Jun 2024 22:49:09 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 19 Jun 2024 22:48:36 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (10.10.215.250)
+ by email.microchip.com (10.10.87.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 19 Jun 2024 22:48:35 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OQYnOxH4iUhkUwG7/EVxVPMh/L3b6eoJqRAvW8MXt4NPihUO5d+fIXVR0NlS4YM3vrYdEJCdJL1NnWqIDagc50jweIM+SkVk5WgfzI7TbCfCh1agpkKLcTWPqsbf3CfFtFLRWTGGM1fH1K7UyATqXnVgOtvGYZpX51eoLOFhg50qHdSMe0YBmgtfSZT6rXX0dHtHeqovtMDIqMtdKP1CKJxdhU75jHf2SQZTGzhZ4/ab3fRCOtmlbc26Vl1gW/1oUwaMXz1pczumdOVxezkvtQCyNO0CwQctVeYzNkvWDgtVchrNtT0uL0b6hSC0pyDIOyHiyLP6iqIfTcH8mtAbVQ==
+ b=I9iku1jHQyfYwkaDahrwf3sJtGC/g2+WfH7l5XtFoVKeXDg9jxeRBs/EzSBcO4b1s0rQSAFgyTVBk3CKL2kdl8TiahZ0ltJtV+ljAHZImWDdq3gWyyn7uYCqRkQtpPNGo7nlseUoL/wegHpZFCueLjJJG9TyaMUfElUd9bFx9VPaOvKJE0jFCTPNuFBmIhWh6BVM5/UEjOQbaRLmH/rF2oDb0asxDoiX/xZFNZqBqhzLsLydbS5mBQ6tK3tCxAxSlOE3Jf/d6v5bhJCLtDLaReVrjapP8vL4nZQKrboF8+gu32RWMXQQ1gsLbgaY97iJD+391fKssz6MI9Ht8krqOw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VBnBDrG/IUO1d7zS9wEPxFsf8CmDBMD5wCGemmKjgmY=;
- b=ao12sstnNbSa/322yzV9J5/irBmJGld08sIcWsWlT9nEnKVhZno3eTe3cn303JytTQ25z46W2GQ5TpXj1iT+ahYEiRfJ70xeRY0wQXKxpeXjf0lJv/F/GfgvXy94UdtiCOE+3hBHURZD/6zQEhyXnlSDqPmm4vxN0xYH1zXrhdZJdjs5JEsBjdEXibjl2nPt9exlPyLafOjnsGmF2YKgGPxA0rm6HYzjY4Vg4HzcaoDdKFAmrqDSEqvvEgXn+A9e/HMKtjwytyM0JQPPA6vQuEtVO5zSd9IRHCwK4YZbtVnFR0XMyPG+8932CrsvbLdgE6Yp/46xXLhKIpQfDqFLQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=linuxfoundation.org
- smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=Ed94cFAbEilIprkInsxNDMwehZNvz+jst5FDUbUY8f0=;
+ b=mU362Yhe9KQHCN4+oCE5n1o3d+/U0Q2F5G9cO3Xxr9y6DeqdPwOX4PTWba8Cdt4vcxeyCEkQ6sgIeP4otjm2CzjhSf71sG0lFZmwVQb66Q7RN4+N9r2yk14X7ne4AlmgfXtVGy5wfqcYc+5wQZzb9dryx0O8q238TanHE1lqchMDbuVh0PE0WSN1A+utxul1OFvZJ7ZJCYW8GVBSullVHXSsjhEOOH+dEriVKNMzPzMmVpmtqscYFUArdFZitGOnX3rXex9XN8Kj7eTyy79IraDgaf3YywHFQnl0eTbuXfz2tD3PAwe+czRKC2x20E3zcYkuV3BHv63c/4TOnBsnOQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VBnBDrG/IUO1d7zS9wEPxFsf8CmDBMD5wCGemmKjgmY=;
- b=Y5wHqaeBeaTSihN02I82IcA+HeDVh0n50s+vQ5iFe9Eam43JBxSz0nrk9TMIv99Qq0D8EqnXJgpPU/7kUpCAhzNUkGG/6ihXO4HKc5D7mvFpi2m4Ke7mLYLg3yrUVHehUVJYBI+YBpd7VI5PPIWkUb/VCE3UjaS2q0d2JnFIc7zPHTb7g9fuOXeITH5SYiGidQZTvfsEdvHN12l5bAR1aUOFFaRUmIg5xFDEpVGISRk886Y++BW2Py8NCoJ+6bWE47jY+9at9x7Uab/CVPS8zFHMs1JIUDs1EUDlbdBtDl08JkJ3b3VOfYsNoUiC+phi/9rtb7EgTmDuc102Ll1aEQ==
-Received: from SJ0PR13CA0049.namprd13.prod.outlook.com (2603:10b6:a03:2c2::24)
- by SJ1PR12MB6313.namprd12.prod.outlook.com (2603:10b6:a03:458::18) with
+ bh=Ed94cFAbEilIprkInsxNDMwehZNvz+jst5FDUbUY8f0=;
+ b=luBhSNOncWN5ZATB0l6E67dm+1+gZvVBAAKpzrlrzi2RyqsJwxxkNAGUvOGH+g0aIvzxOfOZvtol9X6i/ga9SzzrGGP3BDZo7IBfE4AkCMnyICy1PzP8zrnKlEIY7YNL/tMZyow/OJdB+RQ95Rk3TDa56sgaK1CyyKg96CDmpHz4BY8Sa2QTsBzDVc6gnaSeq3JIHgZaBOztDkAbAib3bxiw7I8y4/ANqCdY5KkXxxHb+CcJpnTSqPtPeYW0fupsF3GfEjmPcFqI3Z62fBjsPqHTYgGMU4K1Lke/hyUp8k7ZsTcT2n6527DTkThlT5b8905H+UvD0qToYNEu8AOipQ==
+Received: from DS0PR11MB7481.namprd11.prod.outlook.com (2603:10b6:8:14b::16)
+ by PH7PR11MB7025.namprd11.prod.outlook.com (2603:10b6:510:208::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31; Thu, 20 Jun
- 2024 05:48:52 +0000
-Received: from MWH0EPF000971E8.namprd02.prod.outlook.com
- (2603:10b6:a03:2c2:cafe::59) by SJ0PR13CA0049.outlook.office365.com
- (2603:10b6:a03:2c2::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31 via Frontend
- Transport; Thu, 20 Jun 2024 05:48:52 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- MWH0EPF000971E8.mail.protection.outlook.com (10.167.243.68) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7677.15 via Frontend Transport; Thu, 20 Jun 2024 05:48:51 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 19 Jun
- 2024 22:48:34 -0700
-Received: from [172.27.63.78] (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 19 Jun
- 2024 22:48:06 -0700
-Message-ID: <38bba039-aa2e-42fc-aae1-26d131cf081b@nvidia.com>
-Date: Thu, 20 Jun 2024 08:47:51 +0300
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.19; Thu, 20 Jun
+ 2024 05:48:31 +0000
+Received: from DS0PR11MB7481.namprd11.prod.outlook.com
+ ([fe80::3a8a:2d38:64c0:cc4f]) by DS0PR11MB7481.namprd11.prod.outlook.com
+ ([fe80::3a8a:2d38:64c0:cc4f%5]) with mapi id 15.20.7677.030; Thu, 20 Jun 2024
+ 05:48:31 +0000
+From: <Rengarajan.S@microchip.com>
+To: <andrew@lunn.ch>
+CC: <linux-usb@vger.kernel.org>, <davem@davemloft.net>,
+	<Woojung.Huh@microchip.com>, <linux-kernel@vger.kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<UNGLinuxDriver@microchip.com>, <kuba@kernel.org>
+Subject: Re: [PATCH net-next v1] lan78xx: lan7801 MAC support with lan8841
+Thread-Topic: [PATCH net-next v1] lan78xx: lan7801 MAC support with lan8841
+Thread-Index: AQHau+QKS3/WRMWFLkKW/F+crLJ6w7HGLayAgAoFDAA=
+Date: Thu, 20 Jun 2024 05:48:31 +0000
+Message-ID: <06a180e5c21761c53c18dd208c9ea756570dd142.camel@microchip.com>
+References: <20240611094233.865234-1-rengarajan.s@microchip.com>
+	 <6eec7a37-13d0-4451-9b32-4b031c942aa1@lunn.ch>
+In-Reply-To: <6eec7a37-13d0-4451-9b32-4b031c942aa1@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7481:EE_|PH7PR11MB7025:EE_
+x-ms-office365-filtering-correlation-id: 67333875-f1c6-4406-6fc6-08dc90ec9e0a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230037|366013|1800799021|376011|38070700015;
+x-microsoft-antispam-message-info: =?utf-8?B?MWR1NENJQWxSc1dZUlgxN0RMMUJzenNoWTd0bUNqRDhMQm5kc1BGWEkwbTF1?=
+ =?utf-8?B?c3k0MGxhRVJkSGg3MnQzVHBNc0JST1VUNzF5NkE5L3VYWmM5R2Q0dzJxWFdY?=
+ =?utf-8?B?L2ZaeWkrNE01N2RFUDhOS2xGenJteWlWVDYwV1ZQTmw5NlgzYVozSEoyanl5?=
+ =?utf-8?B?MHMxS1N6aXI5SXVCNElZV0g2d1FFWGhwaG50RytoWTVDY3VEcHQ2Z05FZmwy?=
+ =?utf-8?B?elN5b3cwN3ZGcmgvbjlZTFEwQjNveTBtYW5qczdoOWJYN3Y4ekV0dWRJeUUy?=
+ =?utf-8?B?VGZyYVRPTjVhRnpHVithd0lBRDZMaEl2cG1XVHU3T0pJU2hUdkgreWFlRHhl?=
+ =?utf-8?B?aUpjandZRTUyOFAzWU0yQ0QvSHlkYnNJblAycTk3VGdFSktUbVh6LzlpTFhE?=
+ =?utf-8?B?Q3A1cCtKZ0VWOXBVcm9yY29oZU9URnhDK2lNVFJwdmVJbitaVC8rY1BPMitU?=
+ =?utf-8?B?VTlReXBjeStFY1BqN1NkUFcvN1ZKQUdZcUdZeXRVZk83aTJ4ZTN0Q1ZoTWxJ?=
+ =?utf-8?B?cHNjSUpvTmpuQS9ZaUR3azVkZml0N3hRZkRCRmRQbUNtZTd3RjkrbFhJd1lV?=
+ =?utf-8?B?M0lFZmU4cHQrTVJnVTR5ZVJaQzBiUFVHaHJ3U2NRRGplVytQOTEwSmVXaW5y?=
+ =?utf-8?B?cFVLUytaNWJTYWNDVFBjNmdNMk1mamsvSzlXb21sWjN3SFZtM3JUYWtrU3Ev?=
+ =?utf-8?B?cDdNTTR2QitzL1daOHBsUzJXRWkyMW0xcGtVbC9tWjB5bXZHRXYxUXB5dHhP?=
+ =?utf-8?B?Z1g5WXZaY2NhM0FycVpHb3l2SjUwVlJqb2l0dldDY05GRlZFRnhIN2IxWFpL?=
+ =?utf-8?B?ZlBQbVBSUlZlOEJYK0VZdkZoSVF4eDJkSlMya05zSVpnMXI3eHYxV2FOelRv?=
+ =?utf-8?B?b1NHaFlMSFY0TUl6bitQUERYc2J6UnBIU1pWWHdadk5QWTRzT2pyTjhxODFr?=
+ =?utf-8?B?Q240czJ0aEd2VlYvVmJuOThkR20wMVhua2xHZXJNYWEzRC9XV1JXOWpabVBn?=
+ =?utf-8?B?ZHA0WXY5RzBKWENySW9Pb0JicEpQQ1BQaUV3dmZlZ3dVT0hTMFVCUXpJSGFl?=
+ =?utf-8?B?UXpRdlRIdS9SdmRDWklVTUM1eTc3dVZOLzFXUmtWQ1J2R0ZtSHRJUTZKSjBx?=
+ =?utf-8?B?NHNZeGsrdGZGRUx5MzU0MkNUT052UGxkSW5OMGdPY2JVZHVEdGRXazJLeEtz?=
+ =?utf-8?B?eFpjY1NUb2NZVjdGd293bnhSSzhraTk5N2l1bDJMZXRyQkc2MlhSTmU1Q29B?=
+ =?utf-8?B?cXFqSWNiYWphcEVLM2hERVlWMWdKcVpoZG1scU1MVVZVS21uT0dlaHNXWkdU?=
+ =?utf-8?B?NTJibGJZN2VKckkyNTJHeXFQa3VIZ21QdGZCVHp5MHFVdFFnajBKL3d3TW5y?=
+ =?utf-8?B?UVZBTzRlODczeXlJaEh4alVlZ3I1WkduTjdXaCtUbjlhUUg2enNwUHNEY2Jo?=
+ =?utf-8?B?ZmdkTDlIS1c0ZmJ0eWQ5MERYdHM5OGI4RWRzcmFTWnY0T3lmOGFKWFh5ajVC?=
+ =?utf-8?B?N1MrcWJmUkxjMk94RjlwM0hXaHIrVnErNXcyK3R4VHlMeFl6ZHdwR0pNL0Fo?=
+ =?utf-8?B?RWY3aDZUQndqMzJiU25hRlhITzVudjY0M0tFZEdSaS9ZOEsvSi95c0t3bGZ4?=
+ =?utf-8?B?UzNuVUhkdUtKcEtwRGxUaGcyekdVUE9PVExNZThoT1dBRWF3eUYvdjZuWkFF?=
+ =?utf-8?B?d0o0SVVpWGpmRU9MRm5tTkNla3RvaFVaOFgwVkZEdFVPdEd6V3VVazBRK3R4?=
+ =?utf-8?B?ZnMyditoeW43S3dKdURVekkrdmhJaFMyT2NtbHlEc3N1VWpySGRBekd2ek01?=
+ =?utf-8?Q?o9PLLBzuzCpFoViQ/jFPdpENSIk9W9/R1DYYY=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7481.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(1800799021)(376011)(38070700015);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RzVueEl0RkhZcTRGZFYrSjVJQmhLNFVZOW5RZDdiVUhHYmxsNG5PMVYvZjF1?=
+ =?utf-8?B?T04za05KcE1iYWJkbUNaMXYyYW1qMVVpT1h2alROcktscGthdFNLUVRPYWFD?=
+ =?utf-8?B?dXNHa3VKR1FJWjZ3TnRIcVBLck00NUdKcWZ2Vk04S28yZ0lmQ2tSU3gxVVg5?=
+ =?utf-8?B?VGx6QWluWG96Z1VuejhaeTgvWFBleUFXS0lBb3FvQnJ6Zm81Z0FlN3RERUVr?=
+ =?utf-8?B?ZmYzUnQ5KzlUL3V0YkRwbVNMdmV6cElSY2p2V2t0ZGxKZ0JnUzFsbDZEZ25s?=
+ =?utf-8?B?dzI5NzFBSkVpMVFJTVVWS0hiNUVJTUtwMVBHUjJCcTVMRnpmc0h0dFBHQ1pv?=
+ =?utf-8?B?cFRqSWJtZGI3c0V4MFVpdjNJd1NRRzZMWUpOZk94SEV5dlZURkJkeUpvK1B4?=
+ =?utf-8?B?Q1QycFBXOStFNW9HSVUzbGdxNnY0dUdPM0hPNk1NeVlYYTg5dmFuMTlFVVh5?=
+ =?utf-8?B?eGMxRkE4dk16WFl5Z2syWi9yVGM2cVVuWVBkeXlYeWdpOXo0M1IyamM2S29U?=
+ =?utf-8?B?TzdwcUFZNWpNaGNmRlVrNm5BcDdnQjFMSG0yM2RSOStOWWFwUk1OeCtNVFhC?=
+ =?utf-8?B?eVNKQWxYZFdkWVFNcUVoOWNpVVdwV1YwTDU4SXNDMGgxWG5ZQjg5eTF0TGky?=
+ =?utf-8?B?RmZzajU2L3FsU2VUMktQS2dXcDBuN09xejJXV0k4VllxTVl0MFZHVlVVTFE0?=
+ =?utf-8?B?c3dkcWdydXptTjYxdXpiZE9RMnhPTjIybXd0YXhHc2EwUjArRTJka1kxVkV5?=
+ =?utf-8?B?ZDMvekpYSjUzL1ErZUhuR0lsbjBvU0hUeVVnZFdTT0tlSW8za3hKVW9DSDNH?=
+ =?utf-8?B?N0hORGNpelg1djlxOTRpMXBuNzQ3Y0FnTmRHdktvSnByUXRMU3NXdWtwL2Nw?=
+ =?utf-8?B?ZWdmM2cyNGtvek9pMFhKY0tYTVhDcC9DMmVEbzYycnlRRzFzNzk2eE5yZ3Bk?=
+ =?utf-8?B?aHV2L29YMFhRVzVtS0Y0VzBmclRyc3c3djcwYXVzZFFaM3R2YlJrb0pvMFdU?=
+ =?utf-8?B?NTJWL2ovcVRuS2ZReUQvM3FTOEdjVllyN1psM2lNRGRiUkZ5aVM2WWE1ZEYx?=
+ =?utf-8?B?VFN6K05RZVZLd3R4S25sMkdBd1V6a1JkUm8vbitjdEUxYjNWZXBxREQxczhz?=
+ =?utf-8?B?OGNYazNtSm9STGhGaEhGbHVodTBLRzc4eUhnVE44TlFrK05oRlpDb1l2SzRH?=
+ =?utf-8?B?TnBtOXdLcFJSUkF0NHE2UHdPSlRDaWY1ZUM3WGRJRmlJNS9WMkYvTW5XUTBT?=
+ =?utf-8?B?RFc3anZqanpKQlc5UHk3cm1xK2lPejFNTkh6ckIxTzFOV2xzSkhmV1o1MVF1?=
+ =?utf-8?B?eU9zRm1ZQlJhQS9FSHA0aklPNmEvQ2ExeFNUN1ZpWmY0OTY2VkNMY3FEYXg5?=
+ =?utf-8?B?SWVVVGIwRGZaRy9KMDZZbzhVU0NiUmRpNjBjMzZqMTRBNmV3OHJtQXdaZHRv?=
+ =?utf-8?B?RWhEWmlPU01qOU5kVm1JVTJHc2czQVAvek1HVERmU0wyNmFobTNERUM4ZHp6?=
+ =?utf-8?B?YU94dUtmVTVHYWFZVWI5R2sxMmNtcVBVZGpmdk1Db0JnSVk3dG9ZRWFIckZl?=
+ =?utf-8?B?SXc4QVp3Q09yM001aEZKY0VzNG1pMll4YkhOS213QmU0K0RjSVVUY3NISXdV?=
+ =?utf-8?B?Z2F1eGlUZjV5OGJFMHVWRzUvYjdHY2FvTGl3bVJFdjFHRW02NXB3eDRMeEJX?=
+ =?utf-8?B?TUxRLzgzSEtiUVdqWUpHSEhZNE9qNWU0bkxlRE8yRlpsbVJ0YVA4SlZXOGFx?=
+ =?utf-8?B?d2Rtbmd4MjIwNWFsb1d3WHNzTTRQZlh1VFJFWFBnYjlyZnVhRWtDcVFQTVU0?=
+ =?utf-8?B?NjdmU2dTREFyOEFaa0FYNG0ybWp3NDY5Q1M5SHo3ZmtPUnI2YzdYNW00K3ZK?=
+ =?utf-8?B?dzY1WmZ3VkZWeXY2dTNYZkFWR3EyamQwU2Q0cDl4bjF3ZG10VlRpeEtOUG5y?=
+ =?utf-8?B?OUxjVnZYb0VnYWd6aVlqT0lrRzdKR1ZsSlAvYlpEUkZMS0dhYno0M1VxNkY3?=
+ =?utf-8?B?TXpzbyt2T1ZLTGNMOXNZQW1WQ1k5M3gyakN5UHFsU3JyU2U1dFNWWEhSc3p0?=
+ =?utf-8?B?OVgxelNFbTExWkVxL2lqWUw2d3B3aVFIWjJnTmNNY2syYlpHbm5zb1ppVG5O?=
+ =?utf-8?B?WVVybWt5L29OZS9qTDhuS09JZ05PYWdybHVXYklyeTBGUFFiMnlHMUpHRmZO?=
+ =?utf-8?B?K2c9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8F44B457B854AB48AD6348502BFA2B2D@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 1/2] driver core: auxiliary bus: show
- auxiliary device IRQs
-To: Greg KH <gregkh@linuxfoundation.org>
-CC: <netdev@vger.kernel.org>, <pabeni@redhat.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <edumazet@google.com>, <david.m.ertman@intel.com>,
-	<rafael@kernel.org>, <ira.weiny@intel.com>, <linux-rdma@vger.kernel.org>,
-	<leon@kernel.org>, <tariqt@nvidia.com>, Parav Pandit <parav@nvidia.com>
-References: <20240618150902.345881-1-shayd@nvidia.com>
- <20240618150902.345881-2-shayd@nvidia.com>
- <2024061849-cupped-throwback-4fee@gregkh>
- <21f7e9b8-00aa-4e1f-a769-9606834a234b@nvidia.com>
- <2024061903-brutishly-hamper-af47@gregkh>
-Content-Language: en-US
-From: Shay Drori <shayd@nvidia.com>
-In-Reply-To: <2024061903-brutishly-hamper-af47@gregkh>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000971E8:EE_|SJ1PR12MB6313:EE_
-X-MS-Office365-Filtering-Correlation-Id: 699853ea-14b7-45ac-c095-08dc90ecaa19
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230037|376011|7416011|82310400023|1800799021|36860700010;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Z1E5dldBSjJvK3BTV1IwN0F4eUpsSENFZDZLVW9uS3lqajlXaWNpQ3IxT0lG?=
- =?utf-8?B?MGJROHM5bE9BM0NRWk8vdEsreDQ0Z0phMWpBZXhUMmU2dW1oMHNXTUZGbFdL?=
- =?utf-8?B?b1c5UmtZa2xyN1czOEhtZVhLVVNhZUdnZ002REVwWmZ2OTdvRVY2ZVR6Ymhl?=
- =?utf-8?B?QXRpN2JyQld0ZktjeHVud0FHb0FMOGJFQnZXOW43aHd4aE5PRkVpenAwbWxh?=
- =?utf-8?B?cnAzUXN1dlREZnNqZ0FsVnd4SmtuTzNlc1pCTWttbkpUd0grbUcyYnBRQ3dO?=
- =?utf-8?B?NXgzNjZieURrZUVLRi9QSlRXWjVrdVphL0ViQ09nK25pS3dsOVlIM2pDd0c5?=
- =?utf-8?B?QWcrTG1CT1JubERzclpoSk5wMWlxTkVIVENtcFYvNFE4NDVSeEZQaWRLUzJz?=
- =?utf-8?B?dmJTZi8wWUVqa3g3a3pKL1FpRGtXOXZYSTIweWdYOWVSWVRoa3BDNWIrdFRh?=
- =?utf-8?B?djN0NlhvS0lWZ2w5SG04K1JQRXBZUytEVlFMODNwOXh6Q3c1OHNvWU11R1hY?=
- =?utf-8?B?bDhtWEJjL1FpdzVBQVp3UkU3S0RPNlFFZUMrN3ZGNWxNSGN1RkRsdGptcE1v?=
- =?utf-8?B?V0k1dzZjbWY1VU1lQUNUaGNFSzRGUURGNk1nTDZvYnRqWDNaNWhoQzNWZUIy?=
- =?utf-8?B?aGZia2FIY2EybmZZMlRuakM0bis5VTZEMnIxWFZWU09YaDBiRjlHdllDVm5K?=
- =?utf-8?B?c25Ub3FJcCtrUlVuOG4rVXdYWklZbDhkcisyWGlibGM5blRPMlNvdDB5bzJ5?=
- =?utf-8?B?WE53dFpIV09uMjlsUXgzdmZGak1WT21pbzFGUUc4L1BqYysyMVpLdXRSTS9M?=
- =?utf-8?B?dkl5MFRBU1VDZTVnS2ZiRUNkd21jZTVpbXp1WG1pSXpmajVSU0xaSnlXNE9w?=
- =?utf-8?B?TkVaZ1lMdm10Tlk2TFBldGtZUVo3MkpXL1BPZmdHMGxvZ05oK1NYL3lYaXZ6?=
- =?utf-8?B?TElTTEdQMy9zaWltOW4wdXhsNjBKbGc1S3BRaXE4VHBNeVpNcys3c3YzR2hL?=
- =?utf-8?B?anYzc3ZMaTZVdlp3bE4vSkMvcGRUU2hCd3RQQ25iQllCM1lxTHUyVkEyUXd0?=
- =?utf-8?B?RTV1WGR4VDl3L1R0UFVDN2JteWx6bDZkZ3NCWEtVVnlMZCttb1lZMytEUDA4?=
- =?utf-8?B?MGdZdlNCK08xUi9LQTNvbGJXUENNWUZBLy9OMks2QU96Q1g3MzZjK0ZIckJQ?=
- =?utf-8?B?eDhSemc4N241R2ZVOXkrN05GU3BicVl6MzJzUVdnZ3Q0WHF2WnpWZHRJTkk4?=
- =?utf-8?B?czNGMmRFOHcyZlNEUmVVM1RBdGJhUVVyZkNIdUtGcFV2MUdPU0ROalpLb3dw?=
- =?utf-8?B?QzAxTkNmYUdnUjNRYXc1c3hjTkdZSWIzczVmNXpsZGdTQVBwYmovb044TDFy?=
- =?utf-8?B?MlFlTXVyanJLVzhhUVpDQ0Myd3JFM0l6aHpHSTRENlNUQ1FJb3RHMHNuSFNQ?=
- =?utf-8?B?dUtBYkh5SGo0MUh2NU5PWEo3NjZYTHlubEk0bXhvZXVzS3I1SjZraTJWUUx3?=
- =?utf-8?B?Ri9IL1dLUTB4U0Z6ek5QNXFUbzBYdDNUVkgvbmFhU3lFbk9QUE5FWWUyblJu?=
- =?utf-8?B?dURZMWJuK3FUSUlSL0JQZkl2azF6WTkvc24rTzYyZDlPR3hIMTBuSGYzTzNM?=
- =?utf-8?B?Ukx4SU5QRk42aVpZZy90ejJWV2hlZnFZZ2g2UXlPaVBWZlJMZHI4MnJTNEJx?=
- =?utf-8?B?K0ZDSGtFRUlMK0ZkbVMva1F2WStZY0ZsZUwwYW1QM2UzTUF5Z2F5bXpwZmkv?=
- =?utf-8?B?NkZwZjRiS1l4aGQ1WWFodWM5T0xhVDQxL20yWUpGeERJYm5XWkxBZXU0eUI4?=
- =?utf-8?B?K044SnpZVHl1Wlc2MmFaMTNjTDFQc1d0NFppUndUOHVJUElHOE1YM0FtVVQ0?=
- =?utf-8?B?Z0F1Zm0rNnRvM2RKaEFoNkt6ZnJxTTJEVFcyKzFodmQyUkE9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230037)(376011)(7416011)(82310400023)(1800799021)(36860700010);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2024 05:48:51.9482
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7481.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 67333875-f1c6-4406-6fc6-08dc90ec9e0a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jun 2024 05:48:31.7872
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 699853ea-14b7-45ac-c095-08dc90ecaa19
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000971E8.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6313
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: aesCgpGoUWv/Hfm43bOgntQVa9x1UxRQSHseuMyBaLrgyRyVAuikilRmWQH2KLU31KCh/9nGaXDWkPZQaE/iDQuAlr4GSAdw+/KCkRyjMN4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7025
 
-
-
-On 19/06/2024 9:45, Greg KH wrote:
-> External email: Use caution opening links or attachments
-> 
-> 
-> On Wed, Jun 19, 2024 at 09:33:12AM +0300, Shay Drori wrote:
->>
->>
->> On 18/06/2024 19:13, Greg KH wrote:
->>> External email: Use caution opening links or attachments
->>>
->>>
->>> On Tue, Jun 18, 2024 at 06:09:01PM +0300, Shay Drory wrote:
->>>> diff --git a/drivers/base/auxiliary_sysfs.c b/drivers/base/auxiliary_sysfs.c
->>>> new file mode 100644
->>>> index 000000000000..3f112fd26e72
->>>> --- /dev/null
->>>> +++ b/drivers/base/auxiliary_sysfs.c
->>>> @@ -0,0 +1,110 @@
->>>> +// SPDX-License-Identifier: GPL-2.0
->>>> +/*
->>>> + * Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES
->>>> + */
->>>> +
->>>> +#include <linux/auxiliary_bus.h>
->>>> +#include <linux/slab.h>
->>>> +
->>>> +struct auxiliary_irq_info {
->>>> +     struct device_attribute sysfs_attr;
->>>> +};
->>>> +
->>>> +static struct attribute *auxiliary_irq_attrs[] = {
->>>> +     NULL
->>>> +};
->>>> +
->>>> +static const struct attribute_group auxiliary_irqs_group = {
->>>> +     .name = "irqs",
->>>> +     .attrs = auxiliary_irq_attrs,
->>>> +};
->>>> +
->>>> +static int auxiliary_irq_dir_prepare(struct auxiliary_device *auxdev)
->>>> +{
->>>> +     int ret = 0;
->>>> +
->>>> +     mutex_lock(&auxdev->lock);
->>>> +     if (auxdev->dir_exists)
->>>> +             goto unlock;
->>>
->>> You do know about cleanup.h, right?  Please use it.
->>>
->>> But what exactly are you trying to protect here?  How will you race and
->>> add two irqs at the same time?  Driver probe is always single threaded,
->>> so what would be calling this at the same time from multiple places?
->>
->>
->> mlx5 driver requests IRQs on demand for PCI PF, VF, SFs.
->> And it occurs from multiple threads, hence we need to protect it.
-> 
-> How are irqs asked for, for the same device, from multiple threads?
-> What threads exactly?  What is causing these irqs to be asked for?
-> 
-> But ok, that's fine, if you want to do this, then properly protect the
-> allocation, don't just half-protect it like you did here :(
-
-
-Thanks for the comment, will protect all the allocations
-
-> 
->>>> +
->>>> +     xa_init(&auxdev->irqs);
->>>> +     ret = devm_device_add_group(&auxdev->dev, &auxiliary_irqs_group);
->>>> +     if (!ret)
->>>> +             auxdev->dir_exists = 1;
->>>> +
->>>> +unlock:
->>>> +     mutex_unlock(&auxdev->lock);
->>>> +     return ret;
->>>> +}
->>>> +
->>>> +/**
->>>> + * auxiliary_device_sysfs_irq_add - add a sysfs entry for the given IRQ
->>>> + * @auxdev: auxiliary bus device to add the sysfs entry.
->>>> + * @irq: The associated interrupt number.
->>>> + *
->>>> + * This function should be called after auxiliary device have successfully
->>>> + * received the irq.
->>>> + *
->>>> + * Return: zero on success or an error code on failure.
->>>> + */
->>>> +int auxiliary_device_sysfs_irq_add(struct auxiliary_device *auxdev, int irq)
->>>> +{
->>>> +     struct device *dev = &auxdev->dev;
->>>> +     struct auxiliary_irq_info *info;
->>>> +     int ret;
->>>> +
->>>> +     ret = auxiliary_irq_dir_prepare(auxdev);
->>>> +     if (ret)
->>>> +             return ret;
->>>> +
->>>> +     info = kzalloc(sizeof(*info), GFP_KERNEL);
->>>> +     if (!info)
->>>> +             return -ENOMEM;
->>>> +
->>>> +     sysfs_attr_init(&info->sysfs_attr.attr);
->>>> +     info->sysfs_attr.attr.name = kasprintf(GFP_KERNEL, "%d", irq);
->>>> +     if (!info->sysfs_attr.attr.name) {
->>>> +             ret = -ENOMEM;
->>>> +             goto name_err;
->>>> +     }
->>>> +
->>>> +     ret = xa_insert(&auxdev->irqs, irq, info, GFP_KERNEL);
->>>
->>> So no lock happening here, either use it always, or not at all?
->>
->>
->> the lock is only needed to protect the group (directory) creation, which
->> will be used by all the IRQs of this auxdev.
->> parallel calls to this API will always be with different IRQs, which
->> means each IRQ have a unique index.
-> 
-> You are inserting into the sysfs group at the same time?  You are
-> calling xa_insert() at the same time?  Is that protected with some
-> internal lock?  If so, this needs to be documented a bunch here.
-> 
-> Allocating irqs is NOT a fast path, just grab a lock and do it right
-> please, don't make us constantly have to stare at the code to ensure it
-> is correct.
-
-
-like I said above, I will protect all the allocations
-
-
-> 
->>>> +     if (ret)
->>>> +             goto auxdev_xa_err;
->>>> +
->>>> +     ret = sysfs_add_file_to_group(&dev->kobj, &info->sysfs_attr.attr,
->>>> +                                   auxiliary_irqs_group.name);
->>>
->>> You do know that you are never going to see these files from the
->>> userspace library tools that watch sysfs, right?  libudev will never see
->>> them as you are adding them AFTER the device is created.
->>>
->>> So, because of that, who is really going to use these files?
->>
->> To learn about the interrupt mapping of the SF IRQs.
-> 
-> Who is going to "learn"?  Again, you are creating files that our
-> userspace tools will miss, so what userspace tools are going to be able
-> to learn anything here?
-> 
-> This is strongly implying that all of this is just a debugging aid.  So
-> please, put this in debugfs where that type of thing belongs.
-
-
-It is certainly a debugging aid as I described in the commit log.
-But it is one of the purpose.
-The motivation was clear but probably I should have better written.
-The irq affinity setting code [1] needs to read the irqs number of the
-device.
-Tools like irqbalance [1] are using the sysfs.
-And one should be able to do the same for the PCI SF too.
-They cannot rely on the debugfs.
-
-[1] 
-https://github.com/Irqbalance/irqbalance/blob/ba44a683cdfaa688e89e0d887952032766fb89aa/classify.c#L631
-
-
-> 
->>>> +     if (ret)
->>>> +             goto sysfs_add_err;
->>>> +
->>>> +     return 0;
->>>> +
->>>> +sysfs_add_err:
->>>> +     xa_erase(&auxdev->irqs, irq);
->>>> +auxdev_xa_err:
->>>> +     kfree(info->sysfs_attr.attr.name);
->>>> +name_err:
->>>> +     kfree(info);
->>>
->>> Again, cleanup.h is your friend.
->>>
->>>> +     return ret;
->>>> +}
->>>> +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_add);
->>>> +
->>>> +/**
->>>> + * auxiliary_device_sysfs_irq_remove - remove a sysfs entry for the given IRQ
->>>> + * @auxdev: auxiliary bus device to add the sysfs entry.
->>>> + * @irq: the IRQ to remove.
->>>> + *
->>>> + * This function should be called to remove an IRQ sysfs entry.
->>>> + */
->>>> +void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev, int irq)
->>>> +{
->>>> +     struct auxiliary_irq_info *info = xa_load(&auxdev->irqs, irq);
->>>> +     struct device *dev = &auxdev->dev;
->>>> +
->>>> +     sysfs_remove_file_from_group(&dev->kobj, &info->sysfs_attr.attr,
->>>> +                                  auxiliary_irqs_group.name);
->>>> +     xa_erase(&auxdev->irqs, irq);
->>>> +     kfree(info->sysfs_attr.attr.name);
->>>> +     kfree(info);
->>>> +}
->>>> +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_remove);
->>>> diff --git a/include/linux/auxiliary_bus.h b/include/linux/auxiliary_bus.h
->>>> index de21d9d24a95..96be140bd1ff 100644
->>>> --- a/include/linux/auxiliary_bus.h
->>>> +++ b/include/linux/auxiliary_bus.h
->>>> @@ -58,6 +58,7 @@
->>>>     *       in
->>>>     * @name: Match name found by the auxiliary device driver,
->>>>     * @id: unique identitier if multiple devices of the same name are exported,
->>>> + * @irqs: irqs xarray contains irq indices which are used by the device,
->>>>     *
->>>>     * An auxiliary_device represents a part of its parent device's functionality.
->>>>     * It is given a name that, combined with the registering drivers
->>>> @@ -138,7 +139,10 @@
->>>>    struct auxiliary_device {
->>>>         struct device dev;
->>>>         const char *name;
->>>> +     struct xarray irqs;
->>>> +     struct mutex lock; /* Protects "irqs" directory creation */
->>>
->>> Protects it from what?
->>
->> please look the answer above
-> 
-> You need to document it here.  Or somewhere.  Don't rely on an email
-> thread from 10 years ago for when you look at this in 10 years and
-> wonder what is going on...
-
-Thanks, I will document it better in next version
-
-> 
->>>>         u32 id;
->>>> +     u8 dir_exists:1;
->>>
->>> I don't think this is needed, but if it really is, just use a bool.
->>
->>
->> If you know of an API that query whether a specific group is exists on
->> some device, can you please share it with me?
->> I came out empty when I looked for one :(
-> 
-> Normally sysfs groups are NOT created this way at all.  Oh wait, they
-> can be now, why not use the new feature where a group is created by the
-> core but only exposed if an attribute is added there?
-> 
-> Will that work here?  See commit d87c295f599c ("sysfs: Introduce a
-> mechanism to hide static attribute_groups") for details.  That should
-> solve the issue of trying to figure out if the directory is present or
-> not logic.
-
-
-thank for the suggestion:)
-will give it a shoot
-
-> 
-> thanks,
-> 
-> greg k-h
+SGkgQW5kcmV3LA0KDQpBcG9sb2dpZXMgZm9yIHRoZSBkZWxheSBpbiByZXBseS4gVGhhbmtzIGZv
+ciByZXZpZXdpbmcgdGhlIHBhdGNoLg0KUGxlYXNlIGZpbmQgbXkgY29tbWVudHMgaW5saW5lLg0K
+DQpPbiBUaHUsIDIwMjQtMDYtMTMgYXQgMjI6NDYgKzAyMDAsIEFuZHJldyBMdW5uIHdyb3RlOg0K
+PiBFWFRFUk5BTCBFTUFJTDogRG8gbm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVudHMg
+dW5sZXNzIHlvdQ0KPiBrbm93IHRoZSBjb250ZW50IGlzIHNhZmUNCj4gDQo+IE9uIFR1ZSwgSnVu
+IDExLCAyMDI0IGF0IDAzOjEyOjMzUE0gKzA1MzAsIFJlbmdhcmFqYW4gUyB3cm90ZToNCj4gPiBB
+ZGQgbGFuNzgwMSBNQUMgb25seSBzdXBwb3J0IHdpdGggbGFuODg0MS4gVGhlIFBIWSBmaXh1cCBp
+cw0KPiA+IHJlZ2lzdGVyZWQNCj4gPiBmb3IgbGFuODg0MSBhbmQgdGhlIGluaXRpYWxpemF0aW9u
+cyBhcmUgZG9uZSB1c2luZyBsYW44ODM1X2ZpeHVwDQo+ID4gc2luY2UNCj4gPiB0aGUgcmVnaXN0
+ZXIgY29uZmlncyBhcmUgc2ltaWxhciBmb3IgYm90aCBsYW5uODg0MSBhbmQgbGFuODgzNS4NCj4g
+DQo+IFdoYXQgZXhhY3RseSBkb2VzIHRoaXMgZml4dXAgZG8/DQoNCkZpeHVwIHJlbGF0ZWQgdG8g
+dGhlIHBoeSBoYW5kbGUgYW5kIG1hbmFnZSB0aGUgY29uZmlndXJhdGlvbiBhbmQgc3RhdHVzDQpy
+ZWdpc3RlcnMgb2YgYSBwYXJ0aWN1bGFyIHBoeS4gSW4gdGhpcyBwYXRjaCBpdCBpcyB1c2VkIHRv
+IGhhbmRsZSB0aGUNCmNvbmZpZ3VyYXRpb24gcmVnaXN0ZXJzIG9mIExBTjg4NDEgd2hpY2ggYXJl
+IHNpbWlsYXIgdG8gcmVnaXN0ZXJzIGluDQpMQU44ODM1Lg0KDQo+IA0KPiBMb29raW5nIGF0IGl0
+LCB3aGF0IHByb3RlY3RzIGl0IGZyb20gYmVpbmcgdXNlZCBvbiBzb21lIG90aGVyIGRldmljZQ0K
+PiB3aGljaCBhbHNvIGhhcHBlbnMgdG8gdXNlIHRoZSBzYW1lIFBIWT8gSXMgdGhlcmUgc29tZXRo
+aW5nIHRvDQo+IGd1YXJhbnRlZToNCj4gDQo+IHN0cnVjdCBsYW43OHh4X25ldCAqZGV2ID0gbmV0
+ZGV2X3ByaXYocGh5ZGV2LT5hdHRhY2hlZF9kZXYpOw0KPiANCj4gcmVhbGx5IGlzIGEgbGFuNzh4
+eF9uZXQgKiA/DQoNCkluIHRoaXMgY2FzZSBmaXh1cCBpcyBjYWxsZWQgdGhyb3VnaCBsYW43OHh4
+IG9ubHkgd2hlbiBpbnRlcmZhY2luZyB0aGUNCnBoeSB3aXRoIGxhbjc4eHggTUFDLiBTaW5jZSB0
+aGlzIHdpbGwgbm90IGJlIGNhbGxlZCBvbiBpbnRlcmZhY2luZyB3aXRoDQpvdGhlciBkZXZpY2Vz
+LCBpdCBwcmV2ZW50cyB0aGVtIGZyb20gYWNjZXNzaW5nIHRoZSByZWdpc3RlcnMuDQo=
 
