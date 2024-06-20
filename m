@@ -1,302 +1,198 @@
-Return-Path: <netdev+bounces-105142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A05B990FCF6
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:47:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CEC090FD0E
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:51:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFA5A282395
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 06:47:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E9962866AD
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 06:51:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 586012E631;
-	Thu, 20 Jun 2024 06:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D651C4175A;
+	Thu, 20 Jun 2024 06:50:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="zQ2SdBtE"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="TBtVar1x"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34D012E78
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 06:47:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E8640862
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 06:50:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718866057; cv=none; b=aTgZSvQMl/f2f4Vf26TIDe9yS1SMg9tDrWyzbo+/lMo3q8uVedq8a4wL4xD1hayUrBiGXqhdPqnwvme88yesrBoT7Osw6YitD26Wn78pITg8uM0IGpUTEN1pP8jqy3B/0WG9uJFLm0EgMgGihbd9yCKIIk6a2oUeeNdOq9f1m1E=
+	t=1718866258; cv=none; b=aptT0AYRgEUkPOSww/o1IJ3AmqdFaCcFMipgQONQWMZx/3mqQ1S5P03PSG4p9IRcvoT9gvuHeBoU20VxNXGfPn6bhZPaCu8Z9jQsFBgla/CdbGbJ5ZBcNReeWKh3WYOZ6p+jkvh+o2OO8fiL5xbqG5Uyx/iVllAEOvw08zOEVwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718866057; c=relaxed/simple;
-	bh=mLr50IOf/Ie09oDWbUwASpD27MHunGsFHRTi+5Pv9iE=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Lg0x3TFt7UjHzCpPiL4J3ilJArcaKDQcoGjWf8VPxOtbtYOXL1KkdBWVfFO4+Rh26t7SY6GVETUPMWqH/sSCCRlIOwkDTFHjpi/dz49WF7Q8ZVZeGU+G+uYLZiNHzvYG0eA2vW6382W9a95lSLbUqoFpdB+O8yJMFSnR5+5ZT6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=zQ2SdBtE; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 60ECC207AC;
-	Thu, 20 Jun 2024 08:47:26 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id P9sohFXktxIi; Thu, 20 Jun 2024 08:47:25 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 936832067F;
-	Thu, 20 Jun 2024 08:47:25 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 936832067F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1718866045;
-	bh=M12VV0o/eJ9/v3YhFZiXQ4vD4nWHGrOeCy3BLNbxXEE=;
-	h=Date:From:To:Subject:From;
-	b=zQ2SdBtEopZ2x8Q0Vfdyw+qnrSsYh1wdM6mSVtTv6SyR3pIwgtC2hncfv3YzTY6/Z
-	 Haf78wx83Tm4vjp8M7bNYoe4EhTAmvAym0JNiH1C8GYiWC/IrBEyNdxoSBb/uYrV4v
-	 YpIwrhqsUjLsnlsGN7ZnG4Mmx+c/rnvYouF5gcdgljW1tGG5zN1NkQ1VRxyU63VdxA
-	 uEcxdQIVRBSWbmr3TZHdafjQOiBHxm+uOcZ4Ep1ATIhn6CFevgUlVVEFZmjHKZLWHE
-	 0UaIwB9rtchlOzfWYpSUaxcbsSTCaoGnMqyjbQV8G/xCvt5OgQ33oed/pwR9DLmc1u
-	 ZtWz3RBdQ/+8A==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 86D5D80004A;
-	Thu, 20 Jun 2024 08:47:25 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 20 Jun 2024 08:47:25 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 20 Jun
- 2024 08:47:24 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 9EE393180390; Thu, 20 Jun 2024 08:47:24 +0200 (CEST)
-Date: Thu, 20 Jun 2024 08:47:24 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Jianbo Liu <jianbol@nvidia.com>, Eric Dumazet <edumazet@google.com>,
-	<netdev@vger.kernel.org>
-Subject: [PATCH v2 ipsec] xfrm: Fix unregister netdevice hang on hardware
- offload.
-Message-ID: <ZnPQfG3qsSkAW2VM@gauss3.secunet.de>
+	s=arc-20240116; t=1718866258; c=relaxed/simple;
+	bh=4/QfhtUiYe+gszmb/4tQrNX9jSzYsJfKAXBnvzHUJRM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RIFd4PyXwRlIoJ2qRmKQHneH+l5OK/GeSd8/9V7O4lOrR4dVAo72OoimLAmdXUxqzCosso9DvxH3/Xkhz3oH8US2x6H81kXftIhhKvlZpSu24uibCGdjqEOC3U8vYqvFJUbSNAAJKOX+5mZxJepBqVGl2ayHXk4u1rg7AIsUOTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=TBtVar1x; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-57d1d614049so532698a12.1
+        for <netdev@vger.kernel.org>; Wed, 19 Jun 2024 23:50:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1718866255; x=1719471055; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=YtXE/PSihJfxdLYPxzSkAcTJqQbO/JQAoGr5lNbAwiA=;
+        b=TBtVar1x+TcRLo8OsruDoLYjOwlz9kFAZZEjdMyuVoaesZ+WjWj+pfILxt96MymEzI
+         Q8KbxHlNPDtQHzxQMlNyGLWWXEX9aATmIu7A7WdX0hshLl9VMC+Rw42AkRBMTU4j1ajq
+         EAJgv4uel01H2GKWaRrYQM0hD83ybD/J41+tg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718866255; x=1719471055;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YtXE/PSihJfxdLYPxzSkAcTJqQbO/JQAoGr5lNbAwiA=;
+        b=h27XbYTT8R6pWQRCt3CnYJZRCuKW0GedsI03vUx6PKXkRediVFPm89rwgLoar5ccNd
+         wmgWUO4fCldnNd5pZjPvR8k8No+m8Bofj6eK6xHXuoebBOqBFvvyKBQvYNI1YrERwiD4
+         tbUmaLN5Uv+9yaFm9NxfTG57X7PP02gQvt3wL9x3nL7EKt45h+69gEmsSdpzFVJ/UKAl
+         OSHceasKTH1W/nTM2Rc6Dn0QI+jd832GH6CqZFMccizznlizkB2Sbr8OiV9BlY7hMw7W
+         63dZzBWgO5hu2uDde8UsCsJWm6id/8JuixiqRqXC8ijzq/lypmDXXgJszm1iBzWOG0mQ
+         hGNw==
+X-Forwarded-Encrypted: i=1; AJvYcCXWQhUGLTcnf0lsNoBvdi+BFZCbwbw0mu7SqRPRkcswbXw9b6w0N1fTKp0zQipCMOnQy18KMLA9JoEdh30i1fxe9lxcqCeg
+X-Gm-Message-State: AOJu0Yy4Mt+ebt+nNofVkZAvcK9pKricLhFukcmsZ372Ii/7brbtXjRM
+	28vR/+SW4ZHBWT74cFcvkbJkItEl+WpH6OlJVb/cmZqy8DrSIhPBjick2einZ2rbwVicfHzN3NA
+	rY7kV5mjgtsw2RIgHwBwXbP1BWj12wPwYD0EI
+X-Google-Smtp-Source: AGHT+IEQVbnBJTuL6SfNTn9jUJkJimYEUcaa1etdCpHaBYidbEYzfQjroKLLa3myq7j+V1/3IIldOUn+LEqSH+CEu8M=
+X-Received: by 2002:a50:9b42:0:b0:57d:2138:d114 with SMTP id
+ 4fb4d7f45d1cf-57d2148141cmr766125a12.15.1718866254918; Wed, 19 Jun 2024
+ 23:50:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+References: <20240618215313.29631-1-michael.chan@broadcom.com>
+ <20240618215313.29631-3-michael.chan@broadcom.com> <20240619171301.6fefef59@kernel.org>
+In-Reply-To: <20240619171301.6fefef59@kernel.org>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Wed, 19 Jun 2024 23:50:42 -0700
+Message-ID: <CACKFLin56WqRqSsg=ku4=_8sCbQFYrHLhhc27_quqHhHRTZzuA@mail.gmail.com>
+Subject: Re: [PATCH net 2/3] bnxt_en: Set TSO max segs on devices with limits
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com, 
+	Ajit Khaparde <ajit.khaparde@broadcom.com>, Somnath Kotur <somnath.kotur@broadcom.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000094e265061b4cbc82"
 
-When offloading xfrm states to hardware, the offloading
-device is attached to the skbs secpath. If a skb is free
-is deferred, an unregister netdevice hangs because the
-netdevice is still refcounted.
+--00000000000094e265061b4cbc82
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fix this by removing the netdevice from the xfrm states
-when the netdevice is unregistered. To find all xfrm states
-that need to be cleared we add another list where skbs
-linked to that are unlinked from the lists (deleted)
-but not yet freed.
+On Wed, Jun 19, 2024 at 5:13=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 18 Jun 2024 14:53:12 -0700 Michael Chan wrote:
+> > Firmware will now advertise a non-zero TSO max segments if the
+> > device has a limit.  0 means no limit.  The latest 5760X chip
+> > (early revs) has a limit of 2047 that cannot be exceeded.  If
+> > exceeded, the chip will send out just a small number of segments.
+>
+> If we're only going to see 0 or 2047 pulling in the FW interface update
+> and depending on newer FW version isn't a great way to fix this, IMHO.
+>
 
-Changes in v2:
+This issue only affects the newest chip which just started production
+and the production FW has this updated interface.
 
-- Fix build with CONFIG_XFRM_OFFLOAD disabled.
-- Fix two typos in the commit message.
+> TCP has min MSS of 500+ bytes, so 2k segments gives us 1MB LSO at min
+> legitimate segment size, right? So this is really just a protection
+> against bugs in the TCP stack, letting MSS slide below 100.
 
-Fixes: d77e38e612a0 ("xfrm: Add an IPsec hardware offloading API")
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- include/net/xfrm.h    | 36 +++++++------------------
- net/xfrm/xfrm_state.c | 61 +++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 69 insertions(+), 28 deletions(-)
+That's true for Big TCP, but what about UDP GSO?  Can UDP GSO exceed
+2k segments?
 
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 77ebf5bcf0b9..7d4c2235252c 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -178,7 +178,10 @@ struct xfrm_state {
- 		struct hlist_node	gclist;
- 		struct hlist_node	bydst;
- 	};
--	struct hlist_node	bysrc;
-+	union {
-+		struct hlist_node	dev_gclist;
-+		struct hlist_node	bysrc;
-+	};
- 	struct hlist_node	byspi;
- 	struct hlist_node	byseq;
- 
-@@ -1588,7 +1591,7 @@ void xfrm_state_update_stats(struct net *net);
- static inline void xfrm_dev_state_update_stats(struct xfrm_state *x)
- {
- 	struct xfrm_dev_offload *xdo = &x->xso;
--	struct net_device *dev = xdo->dev;
-+	struct net_device *dev = READ_ONCE(xdo->dev);
- 
- 	if (dev && dev->xfrmdev_ops &&
- 	    dev->xfrmdev_ops->xdo_dev_state_update_stats)
-@@ -1946,13 +1949,16 @@ int xfrm_dev_policy_add(struct net *net, struct xfrm_policy *xp,
- 			struct xfrm_user_offload *xuo, u8 dir,
- 			struct netlink_ext_ack *extack);
- bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x);
-+void xfrm_dev_state_delete(struct xfrm_state *x);
-+void xfrm_dev_state_free(struct xfrm_state *x);
- 
- static inline void xfrm_dev_state_advance_esn(struct xfrm_state *x)
- {
- 	struct xfrm_dev_offload *xso = &x->xso;
-+	struct net_device *dev = READ_ONCE(xso->dev);
- 
--	if (xso->dev && xso->dev->xfrmdev_ops->xdo_dev_state_advance_esn)
--		xso->dev->xfrmdev_ops->xdo_dev_state_advance_esn(x);
-+	if (dev && dev->xfrmdev_ops->xdo_dev_state_advance_esn)
-+		dev->xfrmdev_ops->xdo_dev_state_advance_esn(x);
- }
- 
- static inline bool xfrm_dst_offload_ok(struct dst_entry *dst)
-@@ -1973,28 +1979,6 @@ static inline bool xfrm_dst_offload_ok(struct dst_entry *dst)
- 	return false;
- }
- 
--static inline void xfrm_dev_state_delete(struct xfrm_state *x)
--{
--	struct xfrm_dev_offload *xso = &x->xso;
--
--	if (xso->dev)
--		xso->dev->xfrmdev_ops->xdo_dev_state_delete(x);
--}
--
--static inline void xfrm_dev_state_free(struct xfrm_state *x)
--{
--	struct xfrm_dev_offload *xso = &x->xso;
--	struct net_device *dev = xso->dev;
--
--	if (dev && dev->xfrmdev_ops) {
--		if (dev->xfrmdev_ops->xdo_dev_state_free)
--			dev->xfrmdev_ops->xdo_dev_state_free(x);
--		xso->dev = NULL;
--		xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
--		netdev_put(dev, &xso->dev_tracker);
--	}
--}
--
- static inline void xfrm_dev_policy_delete(struct xfrm_policy *x)
- {
- 	struct xfrm_dev_offload *xdo = &x->xdo;
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 649bb739df0d..d531d2a1fae2 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -49,6 +49,7 @@ static struct kmem_cache *xfrm_state_cache __ro_after_init;
- 
- static DECLARE_WORK(xfrm_state_gc_work, xfrm_state_gc_task);
- static HLIST_HEAD(xfrm_state_gc_list);
-+static HLIST_HEAD(xfrm_state_dev_gc_list);
- 
- static inline bool xfrm_state_hold_rcu(struct xfrm_state __rcu *x)
- {
-@@ -214,6 +215,7 @@ static DEFINE_SPINLOCK(xfrm_state_afinfo_lock);
- static struct xfrm_state_afinfo __rcu *xfrm_state_afinfo[NPROTO];
- 
- static DEFINE_SPINLOCK(xfrm_state_gc_lock);
-+static DEFINE_SPINLOCK(xfrm_state_dev_gc_lock);
- 
- int __xfrm_state_delete(struct xfrm_state *x);
- 
-@@ -683,6 +685,40 @@ struct xfrm_state *xfrm_state_alloc(struct net *net)
- }
- EXPORT_SYMBOL(xfrm_state_alloc);
- 
-+#ifdef CONFIG_XFRM_OFFLOAD
-+void xfrm_dev_state_delete(struct xfrm_state *x)
-+{
-+	struct xfrm_dev_offload *xso = &x->xso;
-+	struct net_device *dev = READ_ONCE(xso->dev);
-+
-+	if (dev) {
-+		dev->xfrmdev_ops->xdo_dev_state_delete(x);
-+		spin_lock_bh(&xfrm_state_dev_gc_lock);
-+		hlist_add_head(&x->dev_gclist, &xfrm_state_dev_gc_list);
-+		spin_unlock_bh(&xfrm_state_dev_gc_lock);
-+	}
-+}
-+
-+void xfrm_dev_state_free(struct xfrm_state *x)
-+{
-+	struct xfrm_dev_offload *xso = &x->xso;
-+	struct net_device *dev = READ_ONCE(xso->dev);
-+
-+	if (dev && dev->xfrmdev_ops) {
-+		spin_lock_bh(&xfrm_state_dev_gc_lock);
-+		if (!hlist_unhashed(&x->dev_gclist))
-+			hlist_del(&x->dev_gclist);
-+		spin_unlock_bh(&xfrm_state_dev_gc_lock);
-+
-+		if (dev->xfrmdev_ops->xdo_dev_state_free)
-+			dev->xfrmdev_ops->xdo_dev_state_free(x);
-+		WRITE_ONCE(xso->dev, NULL);
-+		xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
-+		netdev_put(dev, &xso->dev_tracker);
-+	}
-+}
-+#endif
-+
- void __xfrm_state_destroy(struct xfrm_state *x, bool sync)
- {
- 	WARN_ON(x->km.state != XFRM_STATE_DEAD);
-@@ -848,6 +884,9 @@ EXPORT_SYMBOL(xfrm_state_flush);
- 
- int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_valid)
- {
-+	struct xfrm_state *x;
-+	struct hlist_node *tmp;
-+	struct xfrm_dev_offload *xso;
- 	int i, err = 0, cnt = 0;
- 
- 	spin_lock_bh(&net->xfrm.xfrm_state_lock);
-@@ -857,8 +896,6 @@ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_vali
- 
- 	err = -ESRCH;
- 	for (i = 0; i <= net->xfrm.state_hmask; i++) {
--		struct xfrm_state *x;
--		struct xfrm_dev_offload *xso;
- restart:
- 		hlist_for_each_entry(x, net->xfrm.state_bydst+i, bydst) {
- 			xso = &x->xso;
-@@ -868,6 +905,8 @@ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_vali
- 				spin_unlock_bh(&net->xfrm.xfrm_state_lock);
- 
- 				err = xfrm_state_delete(x);
-+				xfrm_dev_state_free(x);
-+
- 				xfrm_audit_state_delete(x, err ? 0 : 1,
- 							task_valid);
- 				xfrm_state_put(x);
-@@ -884,6 +923,24 @@ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_vali
- 
- out:
- 	spin_unlock_bh(&net->xfrm.xfrm_state_lock);
-+
-+	spin_lock_bh(&xfrm_state_dev_gc_lock);
-+restart_gc:
-+	hlist_for_each_entry_safe(x, tmp, &xfrm_state_dev_gc_list, dev_gclist) {
-+		xso = &x->xso;
-+
-+		if (xso->dev == dev) {
-+			spin_unlock_bh(&xfrm_state_dev_gc_lock);
-+			xfrm_dev_state_free(x);
-+			spin_lock_bh(&xfrm_state_dev_gc_lock);
-+			goto restart_gc;
-+		}
-+
-+	}
-+	spin_unlock_bh(&xfrm_state_dev_gc_lock);
-+
-+	xfrm_flush_gc();
-+
- 	return err;
- }
- EXPORT_SYMBOL(xfrm_dev_state_flush);
--- 
-2.34.1
+>
+> For a fix I'd just hardcode this to 2047 or even just 1k, and pull in
+> the new FW interface to make it configurable in net-next.
+> --
+> pw-bot: cr
 
+--00000000000094e265061b4cbc82
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGi/7Sy9tD55lLQrKoQVOMipTJ4RyFR7
+a8D4sUmjk4JZMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDYy
+MDA2NTA1NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQBzfs7p7Q0BXXOC/yLi2Wmt2PJG7fgxaz6SK9OJ+yVeA/cIWvwl
+GOnr8qFXSWoM+Lh2gmbswt7z9wZvtuwuhemSY1Kmq4AeHUC5ua3D+UtIDuiHBfV58i+tUNZXaIJ/
+co6uLIlAQxvWm0Rfhtc7nsAFrSXI66gp4XnPjEx8b1n9BlpJylgy/kmJVWQMUOqwLU7V4hA930HP
+ANW8aKIdvYdW6DrdGiJa7byZt6Fi31mV86bgH7nva+ScHO+LcAbKhJ2Q8sjCKIY5TlvJdZ6p39pk
+1XDMbaOfrpFq1k29QeIX3z5G0t7Q+QpZHQKOM2ljbY2UGVSQUZ9mFNkyhhxT8/Y8
+--00000000000094e265061b4cbc82--
 
