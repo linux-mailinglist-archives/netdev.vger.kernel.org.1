@@ -1,152 +1,154 @@
-Return-Path: <netdev+bounces-105166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EFA990FF08
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:38:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E8DF90FF13
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 10:41:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CE33283B19
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:38:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E498282EBF
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 08:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CEF619B3F3;
-	Thu, 20 Jun 2024 08:37:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F39619924B;
+	Thu, 20 Jun 2024 08:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TMY4jLIf"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="w2VnSADv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2FA19B3D7
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 08:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061633A1AC;
+	Thu, 20 Jun 2024 08:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718872673; cv=none; b=TBO1CiJVGQzn9yFkUt9eXWcXJBjARLRpviJiK+ZJMkJypKEyHAmOu3Le6qREGgsTz7liYOLBlm7bV4ih3ljOeuFw/XMff/bK+O731Nn4wEzxzZN5erDYMu8VFX05ohPI8exFye7QhKxdShzYcTMvkssrC0oE5jqYWRxqQ7ylNoM=
+	t=1718872855; cv=none; b=RveszTmCZZ6p9HTFnL2QGF9bHLNid90B26JGmWIJWjL+iy8Sxr6bZF/2cWJZa1xHW3TDvyCqIx2569deR6tPaWCm1h+pw/H9ObdDES0WmXXT2s2QtvjUazkHfM6ujDP8lFq38pHFyuvvT9Klq8/UXbeSLu6LT+6eLRJMgt1zvgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718872673; c=relaxed/simple;
-	bh=bPdIpzcTTvLFCUgmLkJzuvuzlJSVU3NMUPwui9LPBWc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BVoRMg0kMGpqkB4lZtnwz0Nb9UsuLKIe1o5oUVPIBINm5cANo2nEEA7D3XKLIp5o1E2WxDO6bEgn9Wx3K2nlVcCyERTBAKmhcEAnhshsJ23A9jzUDFZGz9SJO5f9GmSHmB2OI1+GsH3uE8+rfj31ukj9qGV8w/VXPkxJVnBIgtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TMY4jLIf; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718872671;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+DiWfvytz7+zAvxiDWnyDm8IkadAMsfzl6Hj18xLwCY=;
-	b=TMY4jLIf3BLH35UVMY5DWhCEEjlOcVPbetHpI1WgQthNGTmqg/hkxQsLhle8adz71P6bie
-	L5gg7l6bTa0DSOAcnttFtm+ka10IxE/IzYGqvhKDwMkZyNZrxd8uTD+4B6J7YJZ2vy+62W
-	+xHX6u48iYg1crgNUlXsPTKQNLcdGNg=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-649-o5K3D0K-PBm1mIa7aYz_QA-1; Thu, 20 Jun 2024 04:37:49 -0400
-X-MC-Unique: o5K3D0K-PBm1mIa7aYz_QA-1
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2c7316658ccso739434a91.3
-        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 01:37:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718872668; x=1719477468;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+DiWfvytz7+zAvxiDWnyDm8IkadAMsfzl6Hj18xLwCY=;
-        b=mykqdIOO7WOqfikofdeM3SbQgtvbuc9bleV6UkY0LI72n8YfGXAthUM3PtmCA/ApyG
-         uoAFBu2A1r77Z6U7MwPmEx4iWaBDKKeK6qO3BKk3LVcLATu2UOZ474e1/PbOBw/xv5Ch
-         QcZK48pK2HIBVuoWVSfYI4TNPpRWynHYnO9KPAgoAjHZAnjJZt/LBW/4Ksbo24Mg7WHB
-         fGTokA6bCjOskHJLRXMof3T4h012qrPQSKHI52Zxn+vWyNbwEmBpRwlEhifVU4KKVZTu
-         1XUqkXSos0NhhmCpsYJQNoI9/X33ZZU0MlTdg+nHJmwQUv0kpFC0qZBhk//BB4bjncky
-         zL0w==
-X-Forwarded-Encrypted: i=1; AJvYcCXxzq3HsEqOKcj3niPp/EetxbzWKyP6cAtcsfQgQ3MWg+LxQODn3QdnIcs6a6UpaN+PUrRygHtK5fIbVb0NGSq2njq4vaIB
-X-Gm-Message-State: AOJu0YzpkqPo0vUX8+PntNV+v3JxeuEa5zPE5h75ANiHGoH67y1UftR7
-	ce8ffFP2z//tAcSCAzSRJ2VmMjMLxdx3SMOlznz13YJYpXpFay/GnCzskp+3p3tRSSmY85/iNPc
-	eLlCICwNgcijfzcz44kC/NG2qQzgVhN16/JJTN9adpN6qIuEezgSYm2OOqE2mEcAX6yp4YzfxuF
-	sHGhNS2rIA+bgTWfXkTdVD+Rpy/1IK5tdvkILL
-X-Received: by 2002:a17:90b:97:b0:2c4:aa3d:f1e8 with SMTP id 98e67ed59e1d1-2c7b5b06d60mr4701796a91.14.1718872668039;
-        Thu, 20 Jun 2024 01:37:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHvcQbwZkBFWFg/wUVEago0naLsiGLej0AP5gvBK9V6HQqUy/HV6RVsNb52ScnI/bw0YjoaVa4aCEvkfIZRIC4=
-X-Received: by 2002:a17:90b:97:b0:2c4:aa3d:f1e8 with SMTP id
- 98e67ed59e1d1-2c7b5b06d60mr4701774a91.14.1718872667609; Thu, 20 Jun 2024
- 01:37:47 -0700 (PDT)
+	s=arc-20240116; t=1718872855; c=relaxed/simple;
+	bh=T9c/AzwULmtVSuRIh4jy995d8pfVUHRZXM6im43OF3k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=CTK0eUB4sh0WeOI+jcdo12JxJY5WApNZvJpBLVRRErpXOJfsYC0ALhHOOm56RJVpjjV6MQEfZbScmxmUboAln1Nvm+thcM5l4ezgoKPzSujCbSkcBnQozs3jxc/Ma4EAJhQbsaG+84dp9smB+sOYX5X6NQABoQ+Rt6EU3I/BsQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=w2VnSADv; arc=none smtp.client-ip=198.47.19.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 45K8eZCe008471;
+	Thu, 20 Jun 2024 03:40:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1718872835;
+	bh=fZ9aXf7RFumbeOarN7U1Qbe0conyNks+EiRAd8ZfoNU=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=w2VnSADv40EhC0cSx2hIWyLrE+4n5g5arwnVz9rCAq0JJaAhw3oVeR0MgGcf2vd95
+	 ebYVsf93/zIVXq7w9sLexb91PfRWYqqwGyeK2tI603FLQApjZgeC1UlsBSMUuJOV3u
+	 EkP3/q25hHrd7h1UlP5ByVi0ASxSk/H21MGd8pZ8=
+Received: from DLEE101.ent.ti.com (dlee101.ent.ti.com [157.170.170.31])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 45K8eZUJ058461
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 20 Jun 2024 03:40:35 -0500
+Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE101.ent.ti.com
+ (157.170.170.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 20
+ Jun 2024 03:40:34 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 20 Jun 2024 03:40:34 -0500
+Received: from [137.167.6.231] (lt5cg1094w5k.dhcp.ti.com [137.167.6.231])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 45K8eVmq108104;
+	Thu, 20 Jun 2024 03:40:32 -0500
+Message-ID: <8dbb30be-3c0c-43c9-8f7a-dbfeeca3837e@ti.com>
+Date: Thu, 20 Jun 2024 11:40:31 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240619161908.82348-1-hengqi@linux.alibaba.com>
- <20240619161908.82348-3-hengqi@linux.alibaba.com> <20240619171708-mutt-send-email-mst@kernel.org>
- <1718868555.2701075-5-hengqi@linux.alibaba.com> <20240620034602-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240620034602-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 20 Jun 2024 16:37:35 +0800
-Message-ID: <CACGkMEsCQOKyzR9tjkN=iTiqmcHeOOmuFKKcL2rLA1ENYYN02g@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 2/5] virtio_net: enable irq for the control vq
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Heng Qi <hengqi@linux.alibaba.com>, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 11/17] wifi: cc33xx: Add init.c, init.h
+To: Simon Horman <horms@kernel.org>
+CC: Sabeeh Khan <sabeeh-khan@ti.com>, Kalle Valo <kvalo@kernel.org>,
+        Johannes
+ Berg <johannes.berg@intel.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, <linux-wireless@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20240609182102.2950457-1-michael.nemanov@ti.com>
+ <20240609182102.2950457-12-michael.nemanov@ti.com>
+ <20240615085133.GA234885@kernel.org>
+Content-Language: en-US
+From: "Nemanov, Michael" <michael.nemanov@ti.com>
+In-Reply-To: <20240615085133.GA234885@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Thu, Jun 20, 2024 at 4:32=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> On Thu, Jun 20, 2024 at 03:29:15PM +0800, Heng Qi wrote:
-> > On Wed, 19 Jun 2024 17:19:12 -0400, "Michael S. Tsirkin" <mst@redhat.co=
-m> wrote:
-> > > On Thu, Jun 20, 2024 at 12:19:05AM +0800, Heng Qi wrote:
-> > > > @@ -5312,7 +5315,7 @@ static int virtnet_find_vqs(struct virtnet_in=
-fo *vi)
-> > > >
-> > > >   /* Parameters for control virtqueue, if any */
-> > > >   if (vi->has_cvq) {
-> > > > -         callbacks[total_vqs - 1] =3D NULL;
-> > > > +         callbacks[total_vqs - 1] =3D virtnet_cvq_done;
-> > > >           names[total_vqs - 1] =3D "control";
-> > > >   }
-> > > >
-> > >
-> > > If the # of MSIX vectors is exactly for data path VQs,
-> > > this will cause irq sharing between VQs which will degrade
-> > > performance significantly.
-> > >
-> > > So no, you can not just do it unconditionally.
-> > >
-> > > The correct fix probably requires virtio core/API extensions.
-> >
-> > If the introduction of cvq irq causes interrupts to become shared, then
-> > ctrlq need to fall back to polling mode and keep the status quo.
-> >
-> > Thanks.
->
-> I don't see that in the code.
->
-> I guess we'll need more info in find vqs about what can and what can't sh=
-are irqs?
-> Sharing between ctrl vq and config irq can also be an option.
+On 6/15/2024 11:51 AM, Simon Horman wrote:
+...
 
-One way is to allow the driver to specify the group of virtqueues. So
-the core can request irq per group instead of pre vq. I used to post a
-series like this about 10 years ago (but fail to find it).
+> 
+> Hi Michael,
+> 
+> allmodconfig builds on x86_64 with gcc-13 flag the following:
+> 
+> In file included from ./include/linux/string.h:374,
+>                   from ./include/linux/bitmap.h:13,
+>                   from ./include/linux/cpumask.h:13,
+>                   from ./arch/x86/include/asm/paravirt.h:21,
+>                   from ./arch/x86/include/asm/irqflags.h:60,
+>                   from ./include/linux/irqflags.h:18,
+>                   from ./include/linux/spinlock.h:59,
+>                   from ./include/linux/mmzone.h:8,
+>                   from ./include/linux/gfp.h:7,
+>                   from ./include/linux/firmware.h:8,
+>                   from drivers/net/wireless/ti/cc33xx/init.c:6:
+> In function 'fortify_memcpy_chk',
+>      inlined from 'cc33xx_init_vif_specific' at drivers/net/wireless/ti/cc33xx/init.c:156:2:
+> ./include/linux/fortify-string.h:580:25: warning: call to '__read_overflow2_field' declared with attribute warning: detected read beyond size of field (2nd parameter); maybe use struct_group()? [-Wattribute-warning]
+>    580 |                         __read_overflow2_field(q_size_field, size);
+>        |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> In function 'fortify_memcpy_chk',
+>      inlined from 'cc33xx_init_vif_specific' at drivers/net/wireless/ti/cc33xx/init.c:157:2:
+> ./include/linux/fortify-string.h:580:25: warning: call to '__read_overflow2_field' declared with attribute warning: detected read beyond size of field (2nd parameter); maybe use struct_group()? [-Wattribute-warning]
+>    580 |                         __read_overflow2_field(q_size_field, size);
+>        |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>    CC [M]  drivers/net/wireless/ti/cc33xx/rx.o
+> 
+> I believe that this is because the destination for each of the two memcpy()
+> calls immediately above is too narrow - 1 structure wide instead of 4 or 8.
+> 
+> I think this can be resolved by either using:
+> 1. struct_group in .../cc33xx/conf.h:struct conf_tx_settings
+>     to wrap ac_conf0 ... ac_conf3, and separately tid_conf0 ... tid_conf7.
+> 2. Using arrays for ac_conf and tid_conf in
+>     .../cc33xx/conf.h:struct conf_tx_settings, in which case perhaps
+>     .../wlcore/conf.h:struct conf_tx_settings can be reused somehow
+>     (I did not check closely)?
+> 
 
-It might also help for the case for NAPI.
+Thank you for checking. I agree this code should be rewritten so it is 
+more clear and w/o any warnings. Will fix.
 
-Thanks
+I was unsuccessful reproducing the warning on my end. Tried with GCC 
+13.2.0 (ARCH=x86_64, allmodconfig) and Arm GNU Toolchain 13.2 (ARCH=arm, 
+allmodconfig) and only got errors in scan.c which I assume you refer to 
+below (will also be fixed).
 
->
->
->
->
-> > >
-> > > --
-> > > MST
-> > >
->
+> 
+> Similar errors are flagged elsewhere in this series.
+> Please take a look at allmodconfig builds and make sure
+> no warnings are introduced.
+> 
+> Lastly, more related to the series as a whole than this patch in
+> particular, please consider running checkpatch.pl --codespell
 
+Sure, will add checkpatch.pl --codespell to my tests.
+
+Michael.
 
