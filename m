@@ -1,102 +1,144 @@
-Return-Path: <netdev+bounces-105186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02A3F9100CC
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 11:50:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 629189100CE
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 11:52:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A304B23DAE
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 09:50:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEB1BB20C20
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 09:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADCEC1A4F20;
-	Thu, 20 Jun 2024 09:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9811A4F2B;
+	Thu, 20 Jun 2024 09:52:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ty2qyrsI"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Icekwg7Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864592594;
-	Thu, 20 Jun 2024 09:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D0C2594;
+	Thu, 20 Jun 2024 09:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718877031; cv=none; b=mLnvQR6e1RyKePMgYsaccNPTCfEcJo9eXzkRC8PNHemeRpPLLCjMh26wUurbtNmioW4SzL/6wIpyJmczqAby7Wme52Ljkt3zt/wdUh+c6ToP/HbbrsyRFz4GQzOVIGW1EUKb2mG+AvB2HlgKdzXlG9C8xKjW+V7h+5bx9/x3JiQ=
+	t=1718877158; cv=none; b=j/dA9j7iLMaQI9INTWk8dB9NY55rxl48KZpcnMW26WNcaAcXIT+woM3EhFWw2LNJ6LWbr1tQdGoOIM0hVJ3BnDbaCULocgjLXSF2rD+to1usfatotMXxQfMh7JMhLgtVqgdWUVUTROa3M9RdXvCguOtu+lNKb7HiGqvhqDiRGb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718877031; c=relaxed/simple;
-	bh=QM4AWPRAmU66BJkQ2o3/X9nt9L9MzrenZv8eHQz1Ieo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=A9O3DEfDQmlvhlBSa0yghgwQlFZ7377IvsXrZuY4IG+RG6cagMTgbYEWEDc+CGp8PuDEHGfglheMxriRsVPrInmj9SbBpKAdz9nzkAqbuDyVOvTMG/obxBAYaJF5GjFad5LHWlzvKTe+evBv3v0fXvEi9CKksQkqu1GA1v0vWiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ty2qyrsI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D16C1C32786;
-	Thu, 20 Jun 2024 09:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718877029;
-	bh=QM4AWPRAmU66BJkQ2o3/X9nt9L9MzrenZv8eHQz1Ieo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Ty2qyrsIm+QruKBzN6FAeYgNuIcg3DpW4/wwh637AjZJsPIJPPhULIdKCE1BcRPsu
-	 5D8s61CalOpkaSyurXfgdHjg8xuuaOLwYr4u00OBgxXt+sp6N+e1z1XNrbwWcEA1eR
-	 6ng/SVVot3/sw7rT+m+PRRJt2OkY3Dj8WTG5T0o5uOMUCjDmd0k+zIooLxBBk6vVal
-	 iHzRYIl3U8+buHyrRHdXVGWA23vesKhPZp6SK/5BhgLDc/u1ma1+Cgorc6UlEA8hwI
-	 dzZPAJNQlEh8BYgOXugrDkcXBUoX59/RC9qc9Rkk8vqPrjVGMDfR/d9g0h1l8/vVfu
-	 p4wMHAVyLuYwQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BDE90C4361B;
-	Thu, 20 Jun 2024 09:50:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1718877158; c=relaxed/simple;
+	bh=O5gMPGPkxSae++PznbV3SBuEKQM+ZxUENKrJ/Rj5XRc=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=R7qSiANTpFnYJ/dez9HRLw5GlXNIkgi4UgUO54yIHFU6BWne8iraak4jPbyp6f+GAe870KBajcsR8sO2nWtjefZ+0MM5OcX41025c+cPx8N+rJthCULR3Rin+eSqj9wLUbkd8Nq7ynW73wIJeszPQGQ8UJjTxk0hECHtddNCFuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Icekwg7Q; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=kDuOXpS1n4BVbEWa1fJAOI7m+pURA+so01GB3GqC8ds=; b=Icekwg7Qh53xQWg219hStV3Fqv
+	kUhwzxLTVlNc9d4wMZA9hLGgBntdrCrpbEUn6/4RyZw7l11ugzSr/DUT+h5VFnYAk9KWsMZI/zUdk
+	n6foR2/xTisrJn219W9So9HbFw9CC9nLliyAnMK6WUjYHxlymHpT9LbLghRA1nXh17/fvFv+PJ33z
+	FmOeSJZIAu0zUmkBK0eczPSEV3dtpPWzLoLnyLx9OC+5OhE6upLlwmkVBJU4cb+YTz+wxou16oDvq
+	63JVEL0/RMDptKV0neL8ntzY/jjQmdFJ0zNP9u8lZt+TI64qi6dBl+/yJwO3jzLxH4MKtdliuC5yd
+	WUt2wzxQ==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sKESu-0001Sn-IP; Thu, 20 Jun 2024 11:52:24 +0200
+Received: from [178.197.248.18] (helo=linux.home)
+	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sKESt-0001zP-29;
+	Thu, 20 Jun 2024 11:52:23 +0200
+Subject: Re: XDP Performance Regression in recent kernel versions
+To: =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Sebastiano Miano <mianosebastiano@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: saeedm@nvidia.com, tariqt@nvidia.com, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, Samuel Dobron <sdobron@redhat.com>,
+ netdev@vger.kernel.org
+References: <CAMENy5pb8ea+piKLg5q5yRTMZacQqYWAoVLE1FE9WhQPq92E0g@mail.gmail.com>
+ <5b64c89f-4127-4e8f-b795-3cec8e7350b4@kernel.org> <87wmmkn3mq.fsf@toke.dk>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <ff571dcf-0375-6684-b188-5c1278cd50ce@iogearbox.net>
+Date: Thu, 20 Jun 2024 11:52:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <87wmmkn3mq.fsf@toke.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/5] netfilter: ipset: Fix suspicious
- rcu_dereference_protected()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171887702977.31092.1392589394885079396.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Jun 2024 09:50:29 +0000
-References: <20240619170537.2846-2-pablo@netfilter.org>
-In-Reply-To: <20240619170537.2846-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27312/Thu Jun 20 10:34:55 2024)
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
-
-On Wed, 19 Jun 2024 19:05:33 +0200 you wrote:
-> From: Jozsef Kadlecsik <kadlec@netfilter.org>
+On 6/19/24 9:17 PM, Toke Høiland-Jørgensen wrote:
+> Jesper Dangaard Brouer <hawk@kernel.org> writes:
+>> On 18/06/2024 17.28, Sebastiano Miano wrote:
+>>> I have been conducting some basic experiments with XDP and have
+>>> observed a significant performance regression in recent kernel
+>>> versions compared to v5.15.
+>>>
+>>> My setup is the following:
+>>> - Hardware: Two machines connected back-to-back with 100G Mellanox
+>>> ConnectX-6 Dx.
+>>> - DUT: 2x16 core Intel(R) Xeon(R) Silver 4314 CPU @ 2.40GHz.
+>>> - Software: xdp-bench program from [1] running on the DUT in both DROP
+>>> and TX modes.
+>>> - Traffic generator: Pktgen-DPDK sending traffic with a single 64B UDP
+>>> flow at ~130Mpps.
+>>> - Tests: Single core, HT disabled
+>>>
+>>> Results:
+>>>
+>>> Kernel version |-------| XDP_DROP |--------|   XDP_TX  |
+>>> 5.15                      30Mpps               16.1Mpps
+>>> 6.2                       21.3Mpps             14.1Mpps
+>>> 6.5                       19.9Mpps              8.6Mpps
+>>> bpf-next (6.10-rc2)       22.1Mpps              9.2Mpps
+>>>
+>>
+>> Around when I left Red Hat there were a project with [LNST] that used
+>> xdp-bench for tracking and finding regressions like this.
+>>
+>> Perhaps Toke can enlighten us, if that project have caught similar
+>> regressions?
+>>
+>> [LNST] https://github.com/LNST-project/lnst
 > 
-> When destroying all sets, we are either in pernet exit phase or
-> are executing a "destroy all sets command" from userspace. The latter
-> was taken into account in ip_set_dereference() (nfnetlink mutex is held),
-> but the former was not. The patch adds the required check to
-> rcu_dereference_protected() in ip_set_dereference().
-> 
-> [...]
+> Yes, actually, we have! Here's the bugzilla for it:
+> https://bugzilla.redhat.com/show_bug.cgi?id=2270408
 
-Here is the summary with links:
-  - [net,1/5] netfilter: ipset: Fix suspicious rcu_dereference_protected()
-    https://git.kernel.org/netdev/net/c/8ecd06277a76
-  - [net,2/5] seg6: fix parameter passing when calling NF_HOOK() in End.DX4 and End.DX6 behaviors
-    https://git.kernel.org/netdev/net/c/9a3bc8d16e0a
-  - [net,3/5] netfilter: move the sysctl nf_hooks_lwtunnel into the netfilter core
-    https://git.kernel.org/netdev/net/c/a2225e0250c5
-  - [net,4/5] selftests: add selftest for the SRv6 End.DX4 behavior with netfilter
-    https://git.kernel.org/netdev/net/c/72e50ef99431
-  - [net,5/5] selftests: add selftest for the SRv6 End.DX6 behavior with netfilter
-    https://git.kernel.org/netdev/net/c/221200ffeb06
+ > We compared performance of ELN and RHEL9 candidate kernels and noticed significant
+ > drop in XDP drop [1] on mlx5 (25G).
+ >
+ > On any rhel9 candidate kernel we are able to drop 19-20M pkts/sec but on an ELN
+ > kernels, we are reaching just 15M pkts/sec (CPU utillization remains the same -
+ > around 100%).
+ >
+ > We don't see such regression on ixgbe or i40e.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+It looks like this is known since March, was this ever reported to Nvidia back
+then? :/
 
+Given XDP is in the critical path for many in production, we should think about
+regular performance reporting for the different vendors for each released kernel,
+similar to here [0].
 
+Out of curiosity, @Saeed: Is Nvidia internally regularly assessing XDP perf for mlx5
+as part of QA? (Probably not, but I thought I'd ask.)
+
+Thanks,
+Daniel
+
+   [0] http://core.dpdk.org/perf-reports/
 
