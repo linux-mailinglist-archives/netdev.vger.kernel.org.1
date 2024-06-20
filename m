@@ -1,156 +1,94 @@
-Return-Path: <netdev+bounces-105447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEFB591133E
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 22:32:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E56191134B
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 22:35:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AD9E1F23102
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 20:32:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F4DA1F21D44
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 20:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E92D954FA2;
-	Thu, 20 Jun 2024 20:32:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230E250A62;
+	Thu, 20 Jun 2024 20:35:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="YMINZB/e"
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="h2seSato"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 328AB3D0C5
-	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 20:32:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+Received: from submarine.notk.org (62-210-214-84.rev.poneytelecom.eu [62.210.214.84])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD0555880;
+	Thu, 20 Jun 2024 20:35:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718915566; cv=none; b=CV2Ox/QnFicum7IotaRftRzjarw6h2JkksxXZQRjvE3uAkNE+KBIdBfv/caOd0gfNgwVAp6IIFs2BmUhjyRgQcZqJSJ+4OTXIP1x3hXHXcBoFWCKq8QI3fxI/WHnAf6XEYLfY6cEmzB731Vs+Pkouq+qDTktPIRu0Q53uXwrQww=
+	t=1718915727; cv=none; b=M7f3Jv67ZT1YigwqOkIqS/OmIUCZJSku/W7piXL2AAHi6qbl9nULQcoKgbaGyEWnwb/JSxbhLTxKhPdc1SPa2j/o2XI/wGWDE8KrF213pNc7jQABCQDfvb2hrj3oR1MQ3G1n5muz28WMX4rnfTU1dieJ9Ux50Dz9WRWXA430Rrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718915566; c=relaxed/simple;
-	bh=xe0CLiytQL+w07wMVqUc1rJS0v+e/Ti6ErqFWmVCp7I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QgZgLlZlRqL48QMKUVfUk7hJ8B1NXNn/8AkUn4Ez1zu3X6ctaKyBtVfmqJ+YbfteX6K0fCKLI1dWCDiXi4JT7ppm2aq3CVrGJmxK2TEXKkavnm3SATDqhP3RbywR+0pU37horUGaGd4+/CQcWDC0Wo48ucB8VJW0PssYslSb7c8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=YMINZB/e; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a6265d3ba8fso134153866b.0
-        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 13:32:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1718915563; x=1719520363; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=w6VZWpwlG7GhpGptpxtkhZuBw3s+vrw3bJ0KsbwAf6c=;
-        b=YMINZB/eEu+De6JwrbrhyIqfeSeXlQlazz7Pmbk9pjm76D6aUg4AjB7nZRDrFO7RDq
-         goWL9rm76KAd8vdY3WzN+gCTVIVis7+R3dC8z483bTC3VXVTZ2d01+xXE19/0ZHhQ9ht
-         Gd5UP8c2rF78XGXkqUpJeQkbJNgbMEK0no/yA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718915563; x=1719520363;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w6VZWpwlG7GhpGptpxtkhZuBw3s+vrw3bJ0KsbwAf6c=;
-        b=E81DE4aLBfbo4ejakAiUpaLeasJ16ZsSHhiZZYZeKHk1kaWykT80zXWoQkkqh0rsYc
-         XvRr6uxQMGl0HzfeDPGeUTd7SLwPf2SLbiJXJ4HxNFU/2oXzhhuQbELigvzRfuHEfb6E
-         eIbb1Vu3m3IhbOxv6wcXJJFxiH4Z937IvNrGg1PbdlkNme/vkCvaDwicpF6PJ5TPEnbF
-         PLQyyhzgzWeGhQKwc3E/SeyoJEs7cpZfZmqOdHuY5ipSXO9B7Tr07IgggfuEwizPumWY
-         QxjOR5nwUa3NN0okeedTLFHrBYTM2rlYIqOSlIYfXI9HYFL+cCTNEX6G4Vpg2NNdceqL
-         idrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX6xnfNKKwUPkBJqM6lum9fILIPttQJEqrEuSEueEHUjIq6q8UrIGljBLcnzoFRKRNAXHk87zGyG0os94nsHzksWrpHuGxz
-X-Gm-Message-State: AOJu0YzkTBEXDEtxkirUiSTOBw+S4h6zyWazr+uaWZaW0Owk1Aeb/QFF
-	LuTNzQcWw45qiq6DPE5yWw/uw1mFJVOY2Csz+XLwnfD2J9757OpzivA2u/WTvpa6BtTVHatY9d5
-	LiFPevNom
-X-Google-Smtp-Source: AGHT+IGUMLGqr3p9G0Kjm2l3U72gd4Fre5dsdiVDuOcCj0srqT50Akc3oscJpGbHhahsfu5F9+86eQ==
-X-Received: by 2002:a17:906:3793:b0:a6c:7181:4ffe with SMTP id a640c23a62f3a-a6fab7cd5admr332105266b.66.1718915563359;
-        Thu, 20 Jun 2024 13:32:43 -0700 (PDT)
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com. [209.85.128.44])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6fcf54942dsm7364766b.137.2024.06.20.13.32.42
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jun 2024 13:32:42 -0700 (PDT)
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-421b9068274so13167435e9.1
-        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 13:32:42 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWBJcuK0UEGKT1smNl87OrMYeqbuHbF/hgwTNcEDlVbPIcaR5P5vUdjzCYCdyaupxAYpE6NVguuwb4SIxhhfHBgfQF7d1pi
-X-Received: by 2002:a17:906:1348:b0:a6e:2a67:7899 with SMTP id
- a640c23a62f3a-a6fab63aaabmr312193466b.35.1718915542284; Thu, 20 Jun 2024
- 13:32:22 -0700 (PDT)
+	s=arc-20240116; t=1718915727; c=relaxed/simple;
+	bh=rY6eGqJ75wEmGu1HgeNvbS4fJ9EDXfDA5wrtzZT6MjI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sN85Nz/t2T5VP9AGGPpC63OHtDlA+/IZYAaUevHidnT3AvOpC4Q08z7WjdoFLAzGyPyEtHoKq5GAERHAPakJu/T5OoMzHAgPNt1Br4JSz50VPlMlIEI0tHnOAKNg20BejX4QZ0CoSxiLaop++MreoPq98ezkCRK761D596v7rrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=h2seSato; arc=none smtp.client-ip=62.210.214.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
+Received: from gaia.codewreck.org (localhost [127.0.0.1])
+	by submarine.notk.org (Postfix) with ESMTPS id CB8F014C2DD;
+	Thu, 20 Jun 2024 22:35:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
+	s=2; t=1718915715;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UaFyOqx3Wna3PHffZA3lbOwaWZobih6I6zyfeyta8vg=;
+	b=h2seSatoOQGsC1oNd084UzbsoydUhd9vEuvTIVA67+KxCi+z8q0IS0pjF2KDpOyEXXn6xC
+	V5F5tFKch54wcT/63BHhocLiZ4AACqT7Li3GdqjRb9Uoce/o9dTPxiHGE3wZwgzlrvpbcq
+	r+1Z8DInjQu2mvVXoWl5Vtyzy4YtD5CUQZ+l8QQu5f6ZIOEm7+irf9TT9TglH+VFtK9Bf0
+	bUxiZ+0w0EPSZyZ4qOyV46FOnADlcelQ9/eQBgzAH5dQg48/EYTHDT1P+dqnsewYmXODfm
+	X8KMzeUD8xxj/M3UhmTOhPXsiVwITjND5inF4G6cZ4fpaCqg3uxxlbubVPnIGw==
+Received: from localhost (gaia.codewreck.org [local])
+	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 9c0e7542;
+	Thu, 20 Jun 2024 20:35:04 +0000 (UTC)
+Date: Fri, 21 Jun 2024 05:34:49 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>,
+	Steve French <smfrench@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>
+Subject: Re: [PATCH 06/17] 9p: Enable multipage folios
+Message-ID: <ZnSSaeLo8dY7cu3W@codewreck.org>
+References: <20240620173137.610345-1-dhowells@redhat.com>
+ <20240620173137.610345-7-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240620175703.605111-1-yury.norov@gmail.com> <CAHk-=wiUTXC452qbypG3jW6XCZGfc8d-iehSavxn5JkQ=sv0zA@mail.gmail.com>
- <ZnR1tQN01kN97G_F@yury-ThinkPad> <CAHk-=wjv-DkukaKb7f04WezyPjRERp=xfxv34j5fA8cDQ_JudA@mail.gmail.com>
- <ZnSPBFW5wL0D0b86@yury-ThinkPad>
-In-Reply-To: <ZnSPBFW5wL0D0b86@yury-ThinkPad>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 20 Jun 2024 13:32:05 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wi2R7-jyoOw27Svf1PmfDFQgBWVAH3DP5CXO+JF-BeFZA@mail.gmail.com>
-Message-ID: <CAHk-=wi2R7-jyoOw27Svf1PmfDFQgBWVAH3DP5CXO+JF-BeFZA@mail.gmail.com>
-Subject: Re: [PATCH v4 00/40] lib/find: add atomic find_bit() primitives
-To: Yury Norov <yury.norov@gmail.com>
-Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	"H. Peter Anvin" <hpa@zytor.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
-	Akinobu Mita <akinobu.mita@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Borislav Petkov <bp@alien8.de>, Chaitanya Kulkarni <kch@nvidia.com>, 
-	Christian Brauner <brauner@kernel.org>, Damien Le Moal <damien.lemoal@opensource.wdc.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, David Disseldorp <ddiss@suse.de>, 
-	Edward Cree <ecree.xilinx@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	Fenghua Yu <fenghua.yu@intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gregory Greenman <gregory.greenman@intel.com>, 
-	Hans Verkuil <hverkuil@xs4all.nl>, Hans de Goede <hdegoede@redhat.com>, 
-	Hugh Dickins <hughd@google.com>, Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jaroslav Kysela <perex@perex.cz>, Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>, 
-	Jiri Pirko <jiri@resnulli.us>, Jiri Slaby <jirislaby@kernel.org>, Kalle Valo <kvalo@kernel.org>, 
-	Karsten Graul <kgraul@linux.ibm.com>, Karsten Keil <isdn@linux-pingi.de>, 
-	Kees Cook <keescook@chromium.org>, Leon Romanovsky <leon@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Martin Habets <habetsm.xilinx@gmail.com>, 
-	Mauro Carvalho Chehab <mchehab@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Michal Simek <monstr@monstr.eu>, 
-	Nicholas Piggin <npiggin@gmail.com>, Oliver Neukum <oneukum@suse.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ping-Ke Shih <pkshih@realtek.com>, Rich Felker <dalias@libc.org>, Rob Herring <robh@kernel.org>, 
-	Robin Murphy <robin.murphy@arm.com>, Sean Christopherson <seanjc@google.com>, 
-	Shuai Xue <xueshuai@linux.alibaba.com>, Stanislaw Gruszka <stf_xl@wp.pl>, 
-	Steven Rostedt <rostedt@goodmis.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Thomas Gleixner <tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
-	Will Deacon <will@kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, 
-	GR-QLogic-Storage-Upstream@marvell.com, alsa-devel@alsa-project.org, 
-	ath10k@lists.infradead.org, dmaengine@vger.kernel.org, iommu@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	linux-m68k@lists.linux-m68k.org, linux-media@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-net-drivers@amd.com, 
-	linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-serial@vger.kernel.org, linux-sh@vger.kernel.org, 
-	linux-sound@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	mpi3mr-linuxdrv.pdl@broadcom.com, netdev@vger.kernel.org, 
-	sparclinux@vger.kernel.org, x86@kernel.org, 
-	Alexey Klimov <alexey.klimov@linaro.org>, Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>, 
-	Matthew Wilcox <willy@infradead.org>, Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>, 
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Sergey Shtylyov <s.shtylyov@omp.ru>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240620173137.610345-7-dhowells@redhat.com>
 
-On Thu, 20 Jun 2024 at 13:20, Yury Norov <yury.norov@gmail.com> wrote:
->
-> FORCE_NR_CPUS helped to generate a better code for me back then. I'll
-> check again against the current kernel.
+David Howells wrote on Thu, Jun 20, 2024 at 06:31:24PM +0100:
+> Enable support for multipage folios on the 9P filesystem.  This is all
+> handled through netfslib and is already enabled on AFS and CIFS also.
 
-Of _course_ it generates better code.
+Since this is fairly unrelated to the other patches let's take this
+through the 9p tree as well - I'll run some quick tests to verify writes
+go from 4k to something larger and it doesn't blow up immediately and
+push it out for 6.11
 
-But when "better code" is a source of bugs, and isn't actually useful
-in general, it's not better, is it.
-
-> The 5d272dd1b343 is wrong. Limiting FORCE_NR_CPUS to UP case makes no
-> sense because in UP case nr_cpu_ids is already a compile-time macro:
-
-Yury, I'm very aware. That was obviously intentional. the whole point
-of the commit is to just disable the the whole thing as useless and
-problematic.
-
-I could have just ripped it out entirely. I ended up doing a one-liner instead.
-
-                Linus
+-- 
+Dominique Martinet | Asmadeus
 
