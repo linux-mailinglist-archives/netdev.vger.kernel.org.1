@@ -1,99 +1,154 @@
-Return-Path: <netdev+bounces-105246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA06C9103D1
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:14:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63E9B9103DD
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:21:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54396B20C53
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:14:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 156B31F21C1D
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:21:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86DBE1AAE2E;
-	Thu, 20 Jun 2024 12:13:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7C/bGWl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B16571AC420;
+	Thu, 20 Jun 2024 12:21:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB5A1A8C02;
-	Thu, 20 Jun 2024 12:13:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E8B81AB530
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 12:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718885637; cv=none; b=iOIE63zxk7yV1Kra8LcM1YphZlt4n3SLrkEwsSrl9J5yF9CwNB93jwtHwbBcn1OuGhTWTAFUZPZWazk4BNEh2VSk/C4OxRtpsmzpymwyMBEWxw5hfXq+GnmWlKtG6BbHmajXopj8VQPXA4VBaKjFBhzUB5BHbJnYriYM+ulUyTw=
+	t=1718886073; cv=none; b=RgnlTZV9D6LOP8wzTQf/TgYN6DWKRiKNwE8IdJSpmKeIMoJuxNVRJHecDQZaTvE5AHlvgOdoHL/jqf7gKDqEbq8bMF3qBwKodfYZCwB5NbixVZ5uibLTE74zbta5ghrl2w+3I/QUnJoWnipJtYJpqTwwxTfCLsSDN0JtwyGdFVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718885637; c=relaxed/simple;
-	bh=Cv5FkU6Zt3NNmsmaF8RguZIxIrGhmnpzKJznIXzUnNU=;
+	s=arc-20240116; t=1718886073; c=relaxed/simple;
+	bh=pDLcbdt48mR4rRqS0d+K99sMBmIQnr8vwVop5yMPZ/g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gquLcRAZ3bB9c1fXuAPQw65p3HKfdehNP71kzsfLflauifI+LbjyITgVyWVwI7Y3PrJk717r73FfGxBybWQAAe9Z1YgIBuWFEqmYNWLB0gEGDwBiQCKBKuWwpjXqZSdI1TpQhwx9S/XXBrLj/JXNLlzKXXNd7LvhHr/KVRfwJjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X7C/bGWl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16DB8C2BD10;
-	Thu, 20 Jun 2024 12:13:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718885636;
-	bh=Cv5FkU6Zt3NNmsmaF8RguZIxIrGhmnpzKJznIXzUnNU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=X7C/bGWll6J0ZRCVhLxYf34LFpkGOMS32G9IwveTpUxXI3pCqVsJaxqMXM27dl6ET
-	 RR6hMfntiAqW/bxCwDSwaTkc8r4f/DQVPJoN9lAoETVRcLecqdyLg+POiAs3ppfxFR
-	 ZTvYj5idUnWYI4TCTKdoDqVkIc6aoONbwolUNOOfQmTv4svTaBu7lyobiK/430/9CE
-	 R9cuQW1yihN0Ze5syzphFh3CwtFkFJUiAo7eN4keP8e+sW8eNsEO5hLn18alOa9uBH
-	 7CTzY30BXopeotbcovVguF6tBgpNS9XOkoDoz9qzT5hCijHUTDh1+8MoibqFY+CSXH
-	 CEI50R7UGK8YA==
-Date: Thu, 20 Jun 2024 13:13:48 +0100
-From: Simon Horman <horms@kernel.org>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Brett Creeley <bcreeley@amd.com>,
-	Ratheesh Kannoth <rkannoth@marvell.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Tal Gilboa <talgi@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Paul Greenwalt <paul.greenwalt@intel.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>, justinstitt@google.com,
-	donald.hunter@gmail.com,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Pawel Dembicki <paweldembicki@gmail.com>
-Subject: Re: [PATCH RESEND net-next v14 5/5] virtio-net: support dim profile
- fine-tuning
-Message-ID: <20240620121348.GE959333@kernel.org>
-References: <20240618025644.25754-1-hengqi@linux.alibaba.com>
- <20240618025644.25754-6-hengqi@linux.alibaba.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jXMzot5uU3TwwdlEMUpoadd6W8FKjIoFcbkhASKTNDrIIonMT969ltASHwLj4zC47UI2mo38qJGHilBEBoB4+Rvn8Zz5iL2PR5tXjZy2P3gxWZuYGszLMDGE7NF+vF/q04L0HFavMyfLYj4CNLrfjmvilCn/YSBQqLqOnycmobY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sKGmd-0005Iq-GU; Thu, 20 Jun 2024 14:20:55 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sKGmb-003hPJ-Ie; Thu, 20 Jun 2024 14:20:53 +0200
+Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 41E2D2ED9C4;
+	Thu, 20 Jun 2024 12:20:53 +0000 (UTC)
+Date: Thu, 20 Jun 2024 14:20:53 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Thomas Kopp <thomas.kopp@microchip.com>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] can: hi311x: simplify with
+ spi_get_device_match_data()
+Message-ID: <20240620-imaginary-sepia-gibbon-048a32-mkl@pengutronix.de>
+References: <20240606142424.129709-1-krzysztof.kozlowski@linaro.org>
+ <CAMZ6RqKCWzzbd-P7rOMEryd=31pdD_PJJvtQFYcmS+wAf8q+CQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="klzengf2dxnhd3i4"
 Content-Disposition: inline
-In-Reply-To: <20240618025644.25754-6-hengqi@linux.alibaba.com>
+In-Reply-To: <CAMZ6RqKCWzzbd-P7rOMEryd=31pdD_PJJvtQFYcmS+wAf8q+CQ@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Jun 18, 2024 at 10:56:44AM +0800, Heng Qi wrote:
-> Virtio-net has different types of back-end device implementations.
-> In order to effectively optimize the dim library's gains for different
-> device implementations, let's use the new interface params to
-> initialize and query dim results from a customized profile list.
-> 
-> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+--klzengf2dxnhd3i4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On 07.06.2024 12:26:13, Vincent MAILHOL wrote:
+> Hi Krzysztof,
+>=20
+> On Thu. 6 Jun. 2024 =C3=A0 23:24, Krzysztof Kozlowski
+> <krzysztof.kozlowski@linaro.org> wrote:
+> > Use spi_get_device_match_data() helper to simplify a bit the driver.
+>=20
+> Thanks for this clean up.
+>=20
+> > Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> > ---
+> >  drivers/net/can/spi/hi311x.c | 7 +------
+> >  1 file changed, 1 insertion(+), 6 deletions(-)
+> >
+> > diff --git a/drivers/net/can/spi/hi311x.c b/drivers/net/can/spi/hi311x.c
+> > index e1b8533a602e..5d2c80f05611 100644
+> > --- a/drivers/net/can/spi/hi311x.c
+> > +++ b/drivers/net/can/spi/hi311x.c
+> > @@ -830,7 +830,6 @@ static int hi3110_can_probe(struct spi_device *spi)
+> >         struct device *dev =3D &spi->dev;
+> >         struct net_device *net;
+> >         struct hi3110_priv *priv;
+> > -       const void *match;
+> >         struct clk *clk;
+> >         u32 freq;
+> >         int ret;
+> > @@ -874,11 +873,7 @@ static int hi3110_can_probe(struct spi_device *spi)
+> >                 CAN_CTRLMODE_LISTENONLY |
+> >                 CAN_CTRLMODE_BERR_REPORTING;
+> >
+> > -       match =3D device_get_match_data(dev);
+> > -       if (match)
+> > -               priv->model =3D (enum hi3110_model)(uintptr_t)match;
+> > -       else
+> > -               priv->model =3D spi_get_device_id(spi)->driver_data;
+> > +       priv->model =3D (enum hi3110_model)spi_get_device_match_data(sp=
+i);
+>=20
+> Here, you are dropping the (uintptr_t) cast. Casting a pointer to an
+> enum type can trigger a zealous -Wvoid-pointer-to-enum-cast clang
+> warning, and the (uintptr_t) cast is the defacto standard to silence
+> such warnings, thus the double (enum hi3110_model)(uintptr_t) cast in
+> the initial version.
+
+I've re-added the intermediate cast to uintptr_t while applying.
+
+Thanks,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--klzengf2dxnhd3i4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmZ0HqIACgkQKDiiPnot
+vG87Lwf9EzzimSKKSgtFXoq2HO8VnuxBP+DjBq8rr0kvKOmwRNIqSF872gMkSwFI
+iLjNLKkfnxe3IwGAdk7lzRG/iyk6IUul/pNk/WD1ZUY9TAF7Rm0RxIlGnDTFFxuE
+pF3JlzBMTyv+p8e2Yqslkuvx9UIHKdVX0bfglLfyVDnVrfZjHtuS7fDNSNbtRiNJ
+2MxXMnjT+seoCKodHScZksNVilcjR6F0ieR2J40vZo+ihsTpuziYiZ4/z7qUQgS0
+3MChr23NDRvSQdMuh48jp8l8k6r3eWi5lgF+Ps0mKruHXMZk3xMWXh/kjuWSxHsZ
+fXhR9WjSzF0IsAfUUVBopTc4TMvlhw==
+=U3TR
+-----END PGP SIGNATURE-----
+
+--klzengf2dxnhd3i4--
 
