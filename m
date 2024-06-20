@@ -1,115 +1,113 @@
-Return-Path: <netdev+bounces-105252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D24C591042B
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:31:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C614891043D
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 14:32:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDE6F1C20E67
-	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:31:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CFDD1F21E72
+	for <lists+netdev@lfdr.de>; Thu, 20 Jun 2024 12:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 161981AC770;
-	Thu, 20 Jun 2024 12:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439751AC79C;
+	Thu, 20 Jun 2024 12:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DSbry0ec"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="lh5FwdeX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC641AC229;
-	Thu, 20 Jun 2024 12:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B68B1AC42F
+	for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 12:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718886575; cv=none; b=YQqatdgdw5S+/j5cgKWSyjyUpH3icJpe60a3PGcOnGUgwqQ2fXvGEqfM4BH17BFV+S/AiHc1Qd5bRNhOr8ldHLpPD0yrd3B+2fO89Gy3u1bi9zrD3zTo8/XEbufxr48aMWCxbari3O69qGuuexMpK3wkpaT3AILI7gx2Y3R/JmU=
+	t=1718886718; cv=none; b=LjjdKKKBL/o6H6pIJwVIuyfoepR4FNE20d2mMjXsnUklRKV60H0fMpGrnKUyEWff9Jd2RC7+kWeq7/Rghl67/4LA3IBytx+lZBmZiv6PZoLbXwJ1MqSj7G/EwW2wdeFQObn1Y5dBSDvR7QdK/xzY2xXLPkUNkeY8SrbFiG5XPzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718886575; c=relaxed/simple;
-	bh=ibC0N7fxSpSAAhPJAwhOTFvUbcqn9SqOfy80AyMA53M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MPOR2cOaSyhS0LZLrRUPXOls2TW9fAzvuRCYY1Z0CJc9kbuSmsBDzxFojHGqp/zNplSJydhFPb/Ot1RVJ+KtOY+Lv7jwct7KAiIIvF4QCHQuV9ZE21k7OpbKSCxMIItwP+69OOS/jpal5pX+Bl++2jcfF9ZsGDWXmmpcpWqxxVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DSbry0ec; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a6f177b78dcso87593666b.1;
-        Thu, 20 Jun 2024 05:29:33 -0700 (PDT)
+	s=arc-20240116; t=1718886718; c=relaxed/simple;
+	bh=jCb6yC3LV7RS1SBbrETONCjgbXRTz+kthAeBoPZk3uE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k3wSM0xV3IZw66pt3l0jAKoC7K6nq9SOjU8Q87hroS+PpFBahqu0a8IMfE7mF0HJudvlL1FY+ekJeXZ4ExfJwAi5xyJUa6jy7cDKG2K9KdlSyAmN6GYLJnQkoVc2KhQmRzzlNunBOVt+6hpVBNO5xM9l9E9pgTSKEQyXx0SekLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=lh5FwdeX; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-52cc129c78fso770257e87.2
+        for <netdev@vger.kernel.org>; Thu, 20 Jun 2024 05:31:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718886571; x=1719491371; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7JY+P5MQtBDn+YB4D/IW/nR3xzmRxBb9d5dLTB5FBko=;
-        b=DSbry0eceB7XyuyO/cp4FCQOx+bWokdWOUXf1Qu+y37PM1WbW7tpZF5bCcjEjl638H
-         ntTOwKIyzden/tr3/r8+ZNM3DLyNcm74b7XjRhNvY4a+VhBetf/RXKxesrfQarEDJi4l
-         yqgK2tIQpve9FUcQt7Csrmv3/zvG9xCiG+VmxSY0c+ybRLeCP1HIGoJsgjoVe5De+dVr
-         2PrUIhB+VbNJWci8hNuLoH4JCl4QURWhTRJDu9M7jmR7qY3vgj2wsTqvmzA+9ApVKENC
-         1L6JQuKikfYP5uyKStwv4oihBPXJho2lzwEDQjZExMXy1IDvcs8VCYfl4WfQEeIz+fad
-         +MrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718886572; x=1719491372;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1718886715; x=1719491515; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7JY+P5MQtBDn+YB4D/IW/nR3xzmRxBb9d5dLTB5FBko=;
-        b=EDGZ8noUMmfsxFSYPFuXBsQEEpOm5AFcmdSCeTuZKL+GlGkEbAsx5cNvzPm+ll0Lcp
-         RKsoNmj2Q+0R8F0v6UYWxTBw79rUnSYT8S1h3LtOHqSY215wEXv7MeQTgBRbpREt85iE
-         bHm2lYf2wrRj7SvmnjIE8B5NAtXwzPft2evcVD8cZeJf7CESsT71gZ1hL4c2qDEs0aqn
-         035Iwrm7s35X3WLH4AEWlzk1z4268z4xWV89nrkWWWFC7IsFzQZ94F+e6nqSX9HXr5Xx
-         2iBORAbplMH77hh9pfQRsy1doLxCdU12uim2dRQ5K9HODBLnGqQeBuonOdFAN2IRMvlc
-         bJHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV03z2u489UEGmBOB8QZH/i8GsOzA5tngaqrZlv2cqMjJioIxxBr+sRu/uLUdZseoZWRm4dvBauUHvxs8NbuRfgPaojxmW3J1kSiiyl
-X-Gm-Message-State: AOJu0YwevnGMNT2MpIXtn8uuEOYILDKqxWHrNUFWHQZbNWcMmjmQ7iIg
-	Ua67DysAUNALkbgN2xeNQLjO2gpKX/hV5B9GWIG85fWjZOnnp0PA
-X-Google-Smtp-Source: AGHT+IEbbn1htXoG3AL6WdhY6qa5YPWuh5xJr6b7zTna2jFp7Md/ENX++Wbq3F/XQFRZB4A99DmQgQ==
-X-Received: by 2002:a17:907:cbc4:b0:a6f:ae08:2ce6 with SMTP id a640c23a62f3a-a6fae0830cemr244512766b.68.1718886571472;
-        Thu, 20 Jun 2024 05:29:31 -0700 (PDT)
-Received: from skbuf ([188.25.55.166])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f5f8f6eb3sm711995566b.143.2024.06.20.05.29.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jun 2024 05:29:30 -0700 (PDT)
-Date: Thu, 20 Jun 2024 15:29:28 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 09/12] net: dsa: Define max num of bridges in
- tag8021q implementation
-Message-ID: <20240620122928.nbxshrh2jd5wnfis@skbuf>
-References: <20240619205220.965844-1-paweldembicki@gmail.com>
- <20240619205220.965844-1-paweldembicki@gmail.com>
- <20240619205220.965844-10-paweldembicki@gmail.com>
- <20240619205220.965844-10-paweldembicki@gmail.com>
+        bh=jCb6yC3LV7RS1SBbrETONCjgbXRTz+kthAeBoPZk3uE=;
+        b=lh5FwdeXYRte/hibWQKRwvHpAFYIEi4E9KdPKeus3b/NANRah3MN0ZsjBIWtkeZVh0
+         UtqMe/7gnUesKVU+fpcfpH1NdMZhbwC0GoHk/ufJj+ZiF01CPmlYhqXuKCUVHBVtdQiT
+         upTOX59tCycNV1phIJ1oeMjyveovrCUrBZokEp9V6CClnJO5C1T66xMihFPSmiFWGlDC
+         QDEfZaY6xEltKwoTSJGwGYesnt79Ti5Wjyf0U68wNTCEP58fmdr5Wis9G8rz4rqF0bl3
+         f/aOqzQKDncGmcnJ3Z2wuORCcNOFdBtZ+ByexrEqci5BjwCbDJfFcY15TnZcD8cRf2ic
+         clXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718886715; x=1719491515;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jCb6yC3LV7RS1SBbrETONCjgbXRTz+kthAeBoPZk3uE=;
+        b=vhWaSHYZg7tMo/LlrgXPNB9Ldv1O+ldHeOn7ace2NLK0HbairTpfz/Ct7SRAYbKM2G
+         nMxYzjaIJA2hx6nadtK2EbqFVv5moDeQlOH/9VlscgS49OKp/dIA4qDWsDxoMukVSHpU
+         uxSt7tnvTAA9Rx7Gfe3pya9II/XOimervy3lQoKDo8pLhiaXR7Zi3KmMpnZR2+SCx2LY
+         3oq5FoGCNzAoTtVwbt4QxphFIql5tKHAITb/5Mxea4QtW9TTm2WNFCrIBfLKCuBsOsf/
+         5Wv3AYNRGZDyKwahpokYcFIFoyd/0Zg7mgEBAflXoDKOhYpBgJL3CiHvzw0q2cEXw687
+         IwvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXUIFkZQxH6ip3X25BoI/IXzkuayZugFSb4YbnTu35jmxOrT+Fp/jVGI2Hht+zAi7B8DUM8WoP9KX27UShQLNV4PoWCK2MI
+X-Gm-Message-State: AOJu0Yx3DX5MujH6b1tHme3WZoQT/SOD9YoU4minz1b2k3BOpKpyK2nT
+	z3tZQF6+efxCKO+5auXCU9hhq96q2+0R3cUr6NK9626GSaZNbJ5IFN/lf6jt898BEToSe2S35Cj
+	wC/PEc0lrd++ZOxLpPhEoid7E4Q/tw9wAatMWKw==
+X-Google-Smtp-Source: AGHT+IFEBqVhz8d0V1M1pa0KZH9RCnVL/MBWmCY5jwSJkoCnbHQgQ/4ArnXiI+p5/MiLtoJrmvDlZdKPBbVkobzIYGE=
+X-Received: by 2002:a05:6512:1242:b0:52c:8837:718a with SMTP id
+ 2adb3069b0e04-52ccaa918b4mr4529720e87.43.1718886714538; Thu, 20 Jun 2024
+ 05:31:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240619205220.965844-10-paweldembicki@gmail.com>
- <20240619205220.965844-10-paweldembicki@gmail.com>
+References: <20240619184550.34524-1-brgl@bgdev.pl> <20240619184550.34524-9-brgl@bgdev.pl>
+ <ZnQLED/C3Opeim5q@shell.armlinux.org.uk> <ZnQPnrfoia/njFFZ@shell.armlinux.org.uk>
+In-Reply-To: <ZnQPnrfoia/njFFZ@shell.armlinux.org.uk>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Thu, 20 Jun 2024 14:31:42 +0200
+Message-ID: <CAMRc=MeNGQBMZFg3FTtcFzVKU4xMpnm0BxsAgs+++sFDpU9t_g@mail.gmail.com>
+Subject: Re: [PATCH net-next 8/8] net: stmmac: qcom-ethqos: add a DMA-reset
+ quirk for sa8775p-ride-r3
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Vinod Koul <vkoul@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 19, 2024 at 10:52:15PM +0200, Pawel Dembicki wrote:
-> Max number of bridges in tag8021q implementation is strictly limited
-> by VBID size: 3 bits. But zero is reserved and only 7 values can be used.
-> 
-> This patch adds define which describe maximum possible value.
-> 
-> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
+On Thu, Jun 20, 2024 at 1:16=E2=80=AFPM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Thu, Jun 20, 2024 at 11:57:20AM +0100, Russell King (Oracle) wrote:
+> > I don't have time to go through stmmac and make any suggestions (sorry)
+> > so I can only to say NAK to this change.
+>
+> Also... where is the cover message? I don't have it, so I don't have the
+> context behind your patch series - and I haven't received all the
+> patches either.
+>
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+It's in lore alright:
+https://lore.kernel.org/netdev/20240619184550.34524-1-brgl@bgdev.pl/
+
+You were in TO for all the patches (as evident from lore) so maybe spam fol=
+der?
+
+Bart
 
