@@ -1,189 +1,118 @@
-Return-Path: <netdev+bounces-105799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADC25912DCB
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 21:23:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5562C912DF1
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 21:37:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CDBB1F23693
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 19:23:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8563D1C2114E
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 19:37:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD0417B40B;
-	Fri, 21 Jun 2024 19:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64B1417B4F5;
+	Fri, 21 Jun 2024 19:37:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="knUtvkap"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="l+/JC+M+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9ACC4644C;
-	Fri, 21 Jun 2024 19:22:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E8784A32;
+	Fri, 21 Jun 2024 19:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718997774; cv=none; b=Yq+m3i0A08df3LLUTgxEwElT2PIqwt3hPY2gMgFvlWycLtp3fFrtcd3qtNd+u5GeyI4KzP8HhT1qDKH4tp/UmURw0n99lt97/TL8GMf49X9e5gVqIMh4WnXud+pPXbDUChtPhdSHzjZnWN+cwJtb3ygVcuI4aGQpBdORB/gEz94=
+	t=1718998661; cv=none; b=gvzOMUMUndBd7PqP4grd0gZfQa7wJL4dORS5cAtdULsudwsiHjntGahaOJGp6okWe1esMem3Tuk04Omr4WeySAvoGCFqs1kU0zMNzsDwf+1fILvBZiQQrOV9UfiLICAl3T3tHgEDrvE5yKHH8YSOsOsQ4RJ0TMDGB0QRV5WWEzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718997774; c=relaxed/simple;
-	bh=kVfwHw0X+MRE2b6MToDFxTZX1GClbgp+mTNAT10Q+AM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=elxz8EcHzPYkxZTnUD5jbD6wtCKz9gWJI3OSUlyQvgWdITZW0G2gAMG+WNdyvC4IdZagsrMKED4nIhn8LDxdo1VFZJGn+q8TU7Q1HVjypo7J63YKAi2abNZqR4FvA2iosI45DzJN15wRTK4ZgoRpUKCSdh3Zzbxzm1cBFELkmME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=knUtvkap; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45LEfp2C017423;
-	Fri, 21 Jun 2024 19:22:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	DYGuW9hZ5KvCtpEK3M7nZ6w4VGSOYf5QmEUMubHKFNs=; b=knUtvkapsX/H//d4
-	xdH3RO+45PhSVcWwoWKMzHmWOpUkEQcnzdD63N6vgGUdHhonAQ2hIkR1vLmgWVdU
-	P/E0dWrP9sySs+wElBgigoe9e9fRQuIn5SjYHSJxP2pQyxX+APmYl8RHCdX7MkDh
-	PogXCsYcbIrPW4JlTJzz32Gbk6/c53dmJ3Cg9hDGhAat7jH9ejihglWV0C2qQuz4
-	8CGwIMlPXsYub6kD5u5pKSu6JPWsBF+Y3M3QWFxMQQOXvDMNog+xnGqdn5zEm27w
-	rU1l12UI+Z0P/ZgwmmPphGzPS0tXQPfYqMN/14fS8ac6JQ5Q1Zpyr8ijj24c86w5
-	MsG05w==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yvrkrbgkp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Jun 2024 19:22:17 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45LJMFB1014392
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Jun 2024 19:22:15 GMT
-Received: from [10.110.25.219] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 21 Jun
- 2024 12:22:06 -0700
-Message-ID: <b075e5a8-ca75-49cc-84d6-84e28bc38eee@quicinc.com>
-Date: Fri, 21 Jun 2024 12:22:04 -0700
+	s=arc-20240116; t=1718998661; c=relaxed/simple;
+	bh=sTdM4/wJgWIz32F7RmoaSOOm13k88VVlhyEn7r2d0Pk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gcwyexyiycdvv6m7D4BMhZT//AFoRJZJnam9HpzWLT67wPcS0LiKCXCjhPZf9HKzHHrkpaJsCrmimTzrFV8aMU68YKqfbVYr3arYU2QjLGdUGiFDrm7hoKH9wld+QVUkcVOYpumIlYNHjAjabnE2Cn7Q7+WW1BbGh1vEn1ORY98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=l+/JC+M+; arc=none smtp.client-ip=45.89.224.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 89995120009;
+	Fri, 21 Jun 2024 22:37:28 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 89995120009
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1718998648;
+	bh=QEP9tVC7IJrIs6z3JIp7IhpStzLXbWBfPUokHOf8CCA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=l+/JC+M+jZzqnwL+juNzZitz2gGjfw5LAFeeDM2jHB924rP5Eh862bY8M6h7XBOOB
+	 0I/q2tVCGPlTGtGCvfVSwYqBI5foWAJRVivlXy0WSghii9j4dvVjdI6R48xfUKdoGV
+	 +mJ1IlapX5cU1E/333GBoZUb66rOtxTBWsJOjAT6xkROUzJh0LPH3EWN6yb0femwBU
+	 S6rdwCh7cO4vuzWB4fEufMBp0Qe3LNJEagOAMN026pBDpTe2PpbovWjrn9wN/Uuk32
+	 GIP7w8CMSrpHd76YSr13mQZc3Q9nIO4dp7ssNCF9ZvIoVLLoZPj4NColmeguCDFKgZ
+	 StGZW9G2xvSOw==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Fri, 21 Jun 2024 22:37:28 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 21 Jun 2024 22:37:27 +0300
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
+Subject: [RFC PATCH v1 0/2] virtio/vsock: some updates for deferred credit update
+Date: Fri, 21 Jun 2024 22:25:39 +0300
+Message-ID: <20240621192541.2082657-1-avkrasnov@salutedevices.com>
+X-Mailer: git-send-email 2.35.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] net: stmmac: Add interconnect support in qcom-ethqos
- driver
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Vinod Koul <vkoul@kernel.org>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Russell King <linux@armlinux.org.uk>, "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>, <kernel@quicinc.com>,
-        Andrew Halaney <ahalaney@redhat.com>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>
-References: <20240619-icc_bw_voting_from_ethqos-v1-0-6112948b825e@quicinc.com>
- <20240619-icc_bw_voting_from_ethqos-v1-1-6112948b825e@quicinc.com>
- <159700cc-f46c-4f70-82aa-972ba6e904ca@lunn.ch>
-Content-Language: en-US
-From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-In-Reply-To: <159700cc-f46c-4f70-82aa-972ba6e904ca@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 1re7hUvRsS133zJQqD0NClBIcVsEo0Wl
-X-Proofpoint-GUID: 1re7hUvRsS133zJQqD0NClBIcVsEo0Wl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-21_10,2024-06-21_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1011
- priorityscore=1501 mlxscore=0 mlxlogscore=999 phishscore=0 impostorscore=0
- adultscore=0 bulkscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
- definitions=main-2406210141
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 186064 [Jun 21 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 20 0.3.20 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;smtp.sberdevices.ru:7.1.1,5.0.1;100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/06/21 16:35:00 #25651590
+X-KSMG-AntiVirus-Status: Clean, skipped
 
+This patchset contains:
+0001 - patch which reworks deferred credit update. Pls see commit message,
+       it contains full description of this problem.
 
+0002 - test which uses vsockmon interface, and checks that deferred
+       credit update works as expected by parsing raw packets.
 
-On 6/19/2024 4:13 PM, Andrew Lunn wrote:
-> On Wed, Jun 19, 2024 at 03:41:29PM -0700, Sagar Cheluvegowda wrote:
->> Add interconnect support in qcom-ethqos driver to vote for bus
->> bandwidth based on the current speed of the driver.
->> This change adds support for two different paths - one from ethernet
->> to DDR and the other from Apps to ethernet.
-> 
-> What do you mean by Apps?
-> Apps means application processor.
+Arseniy Krasnov (2):
+  virtio/vsock: rework deferred credit update logic
+  vsock/test: add test for deferred credit update
 
->> Vote from each interconnect client is aggregated and the on-chip
->> interconnect hardware is configured to the most appropriate
->> bandwidth profile.
->>
->> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
->> ---
->>  .../net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c   | 19 +++++++++++++++++++
->>  1 file changed, 19 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> index e254b21fdb59..682e68f37dbd 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> @@ -7,6 +7,7 @@
->>  #include <linux/platform_device.h>
->>  #include <linux/phy.h>
->>  #include <linux/phy/phy.h>
->> +#include <linux/interconnect.h>
-> 
-> If you look at these includes, you should notice they are
-> alphabetical.
-> Agreed, let me update it in v2 of this series.
->> +static void ethqos_set_icc_bw(struct qcom_ethqos *ethqos, unsigned int speed)
->> +{
->> +	icc_set_bw(ethqos->axi_icc_path, Mbps_to_icc(speed), Mbps_to_icc(speed));
->> +	icc_set_bw(ethqos->ahb_icc_path, Mbps_to_icc(speed), Mbps_to_icc(speed));
->> +}
->> +
->>  static void ethqos_fix_mac_speed(void *priv, unsigned int speed, unsigned int mode)
->>  {
->>  	struct qcom_ethqos *ethqos = priv;
->>  
->>  	ethqos->speed = speed;
->>  	ethqos_update_link_clk(ethqos, speed);
->> +	ethqos_set_icc_bw(ethqos, speed);
->>  	ethqos_configure(ethqos);
->>  }
->>  
->> @@ -813,6 +824,14 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->>  		return dev_err_probe(dev, PTR_ERR(ethqos->link_clk),
->>  				     "Failed to get link_clk\n");
->>  
->> +	ethqos->axi_icc_path = devm_of_icc_get(dev, "axi_icc_path");
->> +	if (IS_ERR(ethqos->axi_icc_path))
->> +		return PTR_ERR(ethqos->axi_icc_path);
->> +
->> +	ethqos->ahb_icc_path = devm_of_icc_get(dev, "ahb_icc_path");
->> +	if (IS_ERR(ethqos->axi_icc_path))
->> +		return PTR_ERR(ethqos->axi_icc_path);
->> +
-> 
-> This all looks pretty generic. Any reason why this is just in the
-> Qualcomm device, and not at a higher level so it could be used for all
-> stmmac devices if the needed properties are found in DT?
-> 
->        Andrew
-ICC is a software framework to access the NOC bus topology of the
-system, all though "axi" and "ahb" buses seem generic but the 
-topologies of these NOC's are specific to the vendors of synopsys chipset hence
-this framework might not be applicable to all the vendors of stmmac driver.
+ include/linux/virtio_vsock.h            |   1 +
+ net/vmw_vsock/virtio_transport_common.c |   8 +-
+ tools/testing/vsock/.gitignore          |   1 +
+ tools/testing/vsock/Makefile            |   2 +
+ tools/testing/vsock/virtio_vsock_test.c | 369 ++++++++++++++++++++++++
+ 5 files changed, 376 insertions(+), 5 deletions(-)
+ create mode 100644 tools/testing/vsock/virtio_vsock_test.c
 
-	Sagar
+-- 
+2.25.1
+
 
