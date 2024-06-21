@@ -1,100 +1,126 @@
-Return-Path: <netdev+bounces-105518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71BF89118CC
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 04:40:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAF299118FE
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 05:26:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D07D9B20EB5
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 02:40:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CECC2B21F76
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 03:26:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B9584DFE;
-	Fri, 21 Jun 2024 02:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 368EB86131;
+	Fri, 21 Jun 2024 03:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="seacLH7m"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="nd6HCeTf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC17A7E799;
-	Fri, 21 Jun 2024 02:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.219])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A3D3197;
+	Fri, 21 Jun 2024 03:26:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718937627; cv=none; b=RW2gJSRnfwdYHf04zJzrkTfTkssyl3ynBuNtad6UstOI5qNKzPTRi1np7CZsWtERDGgl2YvB5aYPgsW8IiaXOKQDE2eNme5euziOZF4wy+kPkpmDNtsvVqRdii0tJby5xS+yuq7CLhTTyfIF9jI6qM7nE3aQpUgHbgo3wBSHqQM=
+	t=1718940392; cv=none; b=iUT5Gz0u3ccNBPOGUpRX6cYxgEAr8oorAX2CJhwhA8UbQkL3EFj/MuFsNI3VfD2SO1q7lqkdXV673FkllixPI18/lXVyxX0Rl7QxgDSCLwpv26maT2tF0bo3N3pJ8prbRrWXvre3Xs4QJSFtuRvS4QQzybS4mZviC10JTaFKpd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718937627; c=relaxed/simple;
-	bh=xJZIYVbUP0t+JbPBKaSKgjcIw13Hyj2UtyKRDIikHCo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=r9iZlqiciIa3KFBCU+87vqGSYGwMfDXGYXOkKr/CR18GhHyXW/7ieyZShPElur4A7AZ8xvWefttp+QJIEPYmj/qwhF8pKeWdTxQwiOVJeOWRjidGV+RGKYEqGvwJ6b54OfuZchTZzUETc8BDxdMBe2USVkKxgOoOALqTYXF73KA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=seacLH7m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 46E7BC4AF07;
-	Fri, 21 Jun 2024 02:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718937627;
-	bh=xJZIYVbUP0t+JbPBKaSKgjcIw13Hyj2UtyKRDIikHCo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=seacLH7mXRCeWEugfPHXgqH3FDxgKL/ZBcE5P5twXfe8bjpEJbm6uKpmzFVJLbbBM
-	 lLovx3vZYBm5po2rBJuh9cA+w4AJL+o0D6nfBG0zmxwvrhvMUtugPAe5VVGo0HC/Jj
-	 +W4lb1zGsCi0nz/tQLxo62bKIUBTT1VwICL73o5Zv7x85IvlOjYIEuQyaigFxN7UEV
-	 4xu1ALI9KFRxT2xKimDmdWYb89uN5Lmkyy/1RDituR3XO0cRQcIHXca+wWtDxxjtsq
-	 rJo1r8XE0c5vAXV3flJ7pIS0daYeBFqFQDkxO8doLeEatNSkS3r5Ud7q5dXy+S9DX6
-	 FvfnCQ9nRMhAA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3545CE7C4C8;
-	Fri, 21 Jun 2024 02:40:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1718940392; c=relaxed/simple;
+	bh=vMWTWeQ8yQS1mpLRBhYhJ7DiJfhYh9N2PlX1oHWDMOA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=OcKzG9uU9YPxqB3Z8Os4Tc/m4NPBtGAPR0Xei9cN3yFI1r/mfkUD4YDlOjoQipRMVA1BVXfDpq4zVleyprbvy+l8Emb9g+EKSxOB3DudrT5rce9wPuCLh5QOuo8A4ktREDkeV1kfala8tkzn2IPoVThLQgPDg97A3okGf1BqRus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=nd6HCeTf reason="signature verification failed"; arc=none smtp.client-ip=45.254.50.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=Fo88QUrNuP7FNnqZTa22w81geRP5wEvUU2/XeQwG2es=; b=n
+	d6HCeTf6QiASWhaY0ImjRdDTGScSDlGz7xhjT/z1nJCz0tEFKHykXb6XArxtTkpz
+	iaWH2gOjWcIY3hr2NQD1HE+aGR+2nxRFZvfrtIRGjAhsK8in8acdx3fTTRwxvOoS
+	1PRDmJ4sOsoM436vXqjS6IRbbE3h0zeX40rSrWZa+k=
+Received: from slark_xiao$163.com ( [223.104.68.12] ) by
+ ajax-webmail-wmsvr-40-116 (Coremail) ; Fri, 21 Jun 2024 11:10:21 +0800
+ (CST)
+Date: Fri, 21 Jun 2024 11:10:21 +0800 (CST)
+From: "Slark Xiao" <slark_xiao@163.com>
+To: "Sergey Ryazanov" <ryazanov.s.a@gmail.com>
+Cc: manivannan.sadhasivam@linaro.org, loic.poulain@linaro.org, 
+	johannes@sipsolutions.net, quic_jhugo@quicinc.com, 
+	netdev@vger.kernel.org, mhi@lists.linux.dev, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re:Re: [PATCH v2 2/2] net: wwan: mhi: make default data link id
+ configurable
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20230109(dcb5de15)
+ Copyright (c) 2002-2024 www.mailtech.cn 163com
+In-Reply-To: <0b24c10f-1c20-4bd1-958b-dbf89cb28792@gmail.com>
+References: <20240612093941.359904-1-slark_xiao@163.com>
+ <0b24c10f-1c20-4bd1-958b-dbf89cb28792@gmail.com>
+X-NTES-SC: AL_Qu2aCvWYtkwp5ymcbekfmk0SheY6UMayv/4v1IZSPZ98jD3p3QcLX3NqG1LaysKhCzCnijG+azJw1u9ZWrBoQqwXkG7PRbh5R2RojK6tJeC24g==
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net] net: dsa: microchip: fix initial port flush problem
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171893762721.9082.9601801186482901167.git-patchwork-notify@kernel.org>
-Date: Fri, 21 Jun 2024 02:40:27 +0000
-References: <1718756202-2731-1-git-send-email-Tristram.Ha@microchip.com>
-In-Reply-To: <1718756202-2731-1-git-send-email-Tristram.Ha@microchip.com>
-To:  <Tristram.Ha@microchip.com>
-Cc: woojung.huh@microchip.com, andrew@lunn.ch, vivien.didelot@gmail.com,
- f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, tristram.ha@microchip.com
+Message-ID: <269323e2.35a6.19038c60d00.Coremail.slark_xiao@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:_____wD3v9Ae73RmTI90AA--.7927W
+X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbiNQoFZGV4IM2ADQACsh
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 18 Jun 2024 17:16:42 -0700 you wrote:
-> From: Tristram Ha <tristram.ha@microchip.com>
-> 
-> The very first flush in any port will flush all learned addresses in all
-> ports.  This can be observed by unplugging the cable from one port while
-> additional ports are connected and dumping the fdb entries.
-> 
-> This problem is caused by the initially wrong value programmed to the
-> REG_SW_LUE_CTRL_1 register.  Setting SW_FLUSH_STP_TABLE and
-> SW_FLUSH_MSTP_TABLE bits does not have an immediate effect.  It is when
-> ksz9477_flush_dyn_mac_table() is called then the SW_FLUSH_STP_TABLE bit
-> takes effect and flushes all learned entries.  After that call both bits
-> are reset and so the next port flush will not cause such problem again.
-> 
-> [...]
-
-Here is the summary with links:
-  - [v1,net] net: dsa: microchip: fix initial port flush problem
-    https://git.kernel.org/netdev/net/c/ad53f5f54f35
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+CgoKCgoKCgoKQXQgMjAyNC0wNi0xMyAwNTo1NDowMywgIlNlcmdleSBSeWF6YW5vdiIgPHJ5YXph
+bm92LnMuYUBnbWFpbC5jb20+IHdyb3RlOgo+SGVsbG8gU2xhcmssIE1hbml2YW5uYW4sCj4KPk9u
+IDEyLjA2LjIwMjQgMTI6MzksIFNsYXJrIFhpYW8gd3JvdGU6Cj4+IEZvciBTRFg3MiBNQklNIGRl
+dmljZSwgaXQgc3RhcnRzIGRhdGEgbXV4IGlkIGZyb20gMTEyIGluc3RlYWQgb2YgMC4KPj4gVGhp
+cyB3b3VsZCBsZWFkIHRvIGRldmljZSBjYW4ndCBwaW5nIG91dHNpZGUgc3VjY2Vzc2Z1bGx5Lgo+
+PiBBbHNvIE1CSU0gc2lkZSB3b3VsZCByZXBvcnQgImJhZCBwYWNrZXQgc2Vzc2lvbiAoMTEyKSIu
+Cj4+IFNvIHdlIGFkZCBhIGxpbmsgaWQgZGVmYXVsdCB2YWx1ZSBmb3IgdGhlc2UgU0RYNzIgcHJv
+ZHVjdHMgd2hpY2gKPj4gd29ya3MgaW4gTUJJTSBtb2RlLgo+Cj5UaGUgcGF0Y2ggaXRzZWxmIGxv
+b2tzIGdvb2QgdG8gbWUgZXhjZXB0IGEgdGlueSBuaXRwaWNrIChzZWUgYmVsb3cpLiAKPk1lYW53
+aGlsZSwgSSBjYW4gbm90IHVuZGVyc3RhbmQgd2hlbiB3ZSBzaG91bGQgbWVyZ2UgaXQuIER1cmlu
+ZyB0aGUgVjEgCj5kaXNjdXNzaW9uLCBJdCB3YXMgbWVudGlvbmVkIHRoYXQgd2UgbmVlZCB0aGlz
+IGNoYW5nZSBzcGVjaWZpY2FsbHkgZm9yIAo+Rm94Y29ubiBTRFg3MiBtb2RlbS4gV2l0aG91dCBh
+bnkgYWN0dWFsIHVzZXJzIHRoZSBjb25maWd1cmFibGUgZGVmYXVsdCAKPmRhdGEgbGluayBpZCBp
+cyBhIGRlYWQgY29kZS4KPgo+QWNjb3JkaW5nIHRvIHRoZSBBUk0gTVNNIHBhdGNod29yayBbMV0s
+IHRoZSBtYWluIEZveGNvbm4gU0RYNzIgCj5pbnRyb2R1Y2luZyBwYXRjaCBpcyAoYSkgbm90IHll
+dCBtZXJnZWQsIChiKSBubyBtb3JlIGFwcGxpY2FibGUuIFNvLCBhcyAKPmZhciBhcyBJIHVuZGVy
+c3RhbmQsIGl0IHNob3VsZCBiZSByZXNlbmQuIEluIHRoaXMgY29udGV4dCwgYSBiZXN0IHdheSB0
+byAKPm1lcmdlIHRoZSBtb2RlbSBzdXBwb3J0IGlzIHRvIHByZXBlbmQgdGhlIG1vZGVtIGludHJv
+ZHVjdGlvbiBwYXRjaCB3aXRoIAo+dGhlc2UgY2hhbmdlcyBmb3JtaW5nIGEgc2VyaWVzOgo+MS8z
+OiBidXM6IG1oaTogaG9zdDogSW1wb3J0IG11eF9pZCBpdGVtCj4yLzM6IG5ldDogd3dhbjogbWhp
+OiBtYWtlIGRlZmF1bHQgZGF0YSBsaW5rIGlkIGNvbmZpZ3VyYWJsZQo+My8zOiBidXM6IG1oaTog
+aG9zdDogQWRkIEZveGNvbm4gU0RYNzIgcmVsYXRlZCBzdXBwb3J0Cj4KPkFuZCBtZXJnZSB0aGUg
+c2VyaWVzIGFzIHdob2xlLCB3aGVuIGV2ZXJ5dGhpbmcgd2lsbCBiZSByZWFkeS4gVGhpcyB3aWxs
+IAo+aGVscCB1cyB0byBhdm9pZCBwYXJ0aWFsbHkgbWVyZ2VkIHdvcmsgYW5kIHdpbGwga2VlcCB0
+aGUgbW9kZW0gc3VwcG9ydCAKPmludHJvZHVjdGlvbiBjbGVhci4KPgoKWWVzLCBjdXJyZW50bHkg
+dGhlc2UgMyBwYXRjaGVzIHdvdWxkIGJlIG1lcmdlZCBieSBNYW5pIGF0IHRoZSBzYW1lIHRpbWUu
+ClNvIEkgdGhpbmsgdGhlcmUgaXMgbm8gYnVpbGQgZmFpbHVyZSByaXNrLgoKPk1hbml2YW5uYW4s
+IGNvdWxkIHlvdSBzaGFyZSB0aGUgbWFpbiBbMV0gRm94Y29ubiBTRFg3MiBpbnRyb2R1Y3Rpb24g
+Cj5wYXRjaCBzdGF0dXMsIGFuZCB5b3VyIHRob3VnaHRzIHJlZ2FyZGluZyB0aGUgbWVyZ2luZyBw
+cm9jZXNzPwoKV2Ugd2VyZSBkaXNjdXNzaW5nIGFub3RoZXIgcGF0Y2ggaW4gbGFzdCB3ZWVrcy4g
+QW5kIHdlIHN0aWxsIGhhdmUgbm90CnJlYWNoZWQgYSBjb25zZW5zdXMuIExldCdzIGZvY3VzIG9u
+IHRoYXQgcGF0Y2ggZmlyc3RseS4KQW5kIE1hbmksIHBsZWFzZSBsZXQgdXMga25vdyBhYm91dCB0
+aGUgbWVyZ2luZyBwcm9jZXNzIHNpbmNlIHRoZSBuZXcKbWVyZ2Ugd2luZG93IGlzIG9wZW4gb3Ig
+d2lsbCBvcGVuIHNvb24/CgpUaGFua3MKPgo+Cj4xLiAKPmh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5l
+bC5vcmcvcHJvamVjdC9saW51eC1hcm0tbXNtL3BhdGNoLzIwMjQwNTIwMDcwNjMzLjMwODkxMy0x
+LXNsYXJrX3hpYW9AMTYzLmNvbS8KPgo+PiBTaWduZWQtb2ZmLWJ5OiBTbGFyayBYaWFvIDxzbGFy
+a194aWFvQDE2My5jb20+Cj4+IC0tLQo+PiAgIGRyaXZlcnMvbmV0L3d3YW4vbWhpX3d3YW5fbWJp
+bS5jIHwgMyArKy0KPj4gICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCAxIGRlbGV0
+aW9uKC0pCj4+IAo+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvd3dhbi9taGlfd3dhbl9tYmlt
+LmMgYi9kcml2ZXJzL25ldC93d2FuL21oaV93d2FuX21iaW0uYwo+PiBpbmRleCAzZjcyYWU5NDNi
+MjkuLmM3MzFmZTIwODE0ZiAxMDA2NDQKPj4gLS0tIGEvZHJpdmVycy9uZXQvd3dhbi9taGlfd3dh
+bl9tYmltLmMKPj4gKysrIGIvZHJpdmVycy9uZXQvd3dhbi9taGlfd3dhbl9tYmltLmMKPj4gQEAg
+LTYxOCw3ICs2MTgsOCBAQCBzdGF0aWMgaW50IG1oaV9tYmltX3Byb2JlKHN0cnVjdCBtaGlfZGV2
+aWNlICptaGlfZGV2LCBjb25zdCBzdHJ1Y3QgbWhpX2RldmljZV9pZAo+PiAgIAltYmltLT5yeF9x
+dWV1ZV9zeiA9IG1oaV9nZXRfZnJlZV9kZXNjX2NvdW50KG1oaV9kZXYsIERNQV9GUk9NX0RFVklD
+RSk7Cj4+ICAgCj4+ICAgCS8qIFJlZ2lzdGVyIHd3YW4gbGluayBvcHMgd2l0aCBNSEkgY29udHJv
+bGxlciByZXByZXNlbnRpbmcgV1dBTiBpbnN0YW5jZSAqLwo+PiAtCXJldHVybiB3d2FuX3JlZ2lz
+dGVyX29wcygmY250cmwtPm1oaV9kZXYtPmRldiwgJm1oaV9tYmltX3d3YW5fb3BzLCBtYmltLCAw
+KTsKPj4gKwlyZXR1cm4gd3dhbl9yZWdpc3Rlcl9vcHMoJmNudHJsLT5taGlfZGV2LT5kZXYsICZt
+aGlfbWJpbV93d2FuX29wcywgbWJpbSwKPj4gKwkJbWhpX2Rldi0+bWhpX2NudHJsLT5saW5rX2lk
+KTsKPgo+SnVzdCBhIG5pdHBpY2suIFRoZSBzZWNvbmQgbGluZSBoYWQgYmV0dGVyIGJlIGFsaWdu
+ZWQgd2l0aCB0aGUgb3BlbmluZyAKPmJyYWNrZXQ6Cj4KPnJldHVybiB3d2FuX3JlZ2lzdGVyX29w
+cygmY250cmwtPi4uLgo+ICAgICAgICAgICAgICAgICAgICAgICAgICBtaGlfZGV2LT4uLi4KPgo+
+PiAgIH0KPj4gICAKPj4gICBzdGF0aWMgdm9pZCBtaGlfbWJpbV9yZW1vdmUoc3RydWN0IG1oaV9k
+ZXZpY2UgKm1oaV9kZXYpCj4KPi0tCj5TZXJnZXkK
 
