@@ -1,129 +1,82 @@
-Return-Path: <netdev+bounces-105750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B5EE912A40
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 17:34:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 072FE912A49
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 17:34:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C92A1C2581B
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:34:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE10E1F2827B
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:34:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2647C086;
-	Fri, 21 Jun 2024 15:34:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 115107BAF7;
+	Fri, 21 Jun 2024 15:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="dMR8juBi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwSAHeL4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04433757F8
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 15:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3D8C122;
+	Fri, 21 Jun 2024 15:34:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718984062; cv=none; b=YtB2Pg3OoTqmX0TYhG+xFn6c2KczqH4Trx3NnHGydwvfXCblR7wBVWygDY/D/MysuvYJg3Eu2hcTRgODXTdsa5jsSy1RBFaDfNejzJjBjHI35G7oEkup4SJQRpf0b50QfhxL5fyfWF/bnkHdhS0+8ZPzKHNX8H0Yx5vFiSX1fG0=
+	t=1718984087; cv=none; b=h583fQruxD1JtCpEO3+YGWMzgF+lYDE3dWGT+m6RAw6IT2cXklzhxPCeJ/sN0VaPFu4tzrwkDOexVY1m1Aercjk6KfXokyKL/zg93SzeUEsMynjEBJ7u4UtnAE4EGFQEhXOmS70oCn1nlHcGGMba2OpPE31y//+kJJ8EIhk/ZMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718984062; c=relaxed/simple;
-	bh=7BVrpORkcBqP2dT5WJ8y/6uqH33UciLP1pUJUesNWxM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N1x1m4dLw3K18gzUEgZhcPvLK/HGflTnY20x01zvHRW/X9LtFo6+svokiL/vtP5EtV27BQlZC/HAc+NbhlRzhUOPggtj64D4ZBJSIzfEimZxE44iFqOzF7Lp51puOyjdo8N8dJpRuEOpVwxFM7X3xh6YxmDTSgUCz8SC7aZxq+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=dMR8juBi; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a6265d3ba8fso227387666b.0
-        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 08:34:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1718984059; x=1719588859; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=DA7SWPRLXcST+Xc+dDz/AkjKFIf/1VqV1Qjkx7u2MTI=;
-        b=dMR8juBiATC8rDlAot0OgQYlyKpeh49SeOG+cmeKaYxmMICVgq9IkfjcLousij5J0q
-         2Ub4KuRrQB5SU80050jn36uR6SOaJ+N67g88PDcFKodTcEIIW7RR/tbSO9sbhdrfqDK+
-         NS+XPRPeofoY2cSkuYdujogIcVN+IsuuAlqOPe3dTLXo7qp9mI0OgcO1uClvRc/7M5vq
-         o6GBrLXDivZtuUQncavf2Zqc4seASGaj+uogv7OCnIPfVr/wt3szpqkcGbTg1sFBlZVO
-         KfoZQGA0VvmNZzywtfbbN2+y9ihhM2MrMSpPy3pB/nqLVeehOzoHp6oAN2+uEFqE1Jwf
-         OCbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718984059; x=1719588859;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DA7SWPRLXcST+Xc+dDz/AkjKFIf/1VqV1Qjkx7u2MTI=;
-        b=UQrtQNc0eQSCBS1VJZUdECOuDK55a8ICJzHOgzHaFwA/cDtI+JxgpEbzDZviXD6oA3
-         /oSavM/9mJ1A0cvnrSPs3CRmWdFLl8WbwZKrM7TpLV5O+2lHMz7teZI3dNGtXNs3eqIJ
-         TznxFdPMDNbXELPMq7rNTnDHTj0jAEHgaxXvIl/X93enDM0CHB0Qo+Jl1sZJemfW+Aqd
-         qNVWabBE5z41KRKuj6DAD6OZJeZzLcz70wZvZ5jzOoWnBvpcsQgLG76wuGeTl2nIfLcH
-         Xt2o99FwtQMxKbbRUVJZLt1xmJgiLxEiGInJNgJLf9XNfwUx5722sBmVpDd8oeazWeHw
-         k5mg==
-X-Gm-Message-State: AOJu0YytbpH+YKiBM1cvbAABnPC8ofqC27wrbpw1DJHlTWQkUph0sWE7
-	EnZyjLin066wT64mYTPsNqFjfZl4qWvfaarpq6ANf2SUFJfegE9ffjkcyWqUlcsXfQVb4aym21c
-	JNiBLtSYUfUkK6N23ZDP/8jx0EQMsLQ70C4vmqw==
-X-Google-Smtp-Source: AGHT+IFelAbcXvIcTJONWEgNkYFPnbf9VtHPK2SF57Y6Pp8Jls6KOYI5Jfb52Fhrp461oy2MjvD2G93eYtYsdGMJHNY=
-X-Received: by 2002:a17:907:d043:b0:a6f:96ac:3436 with SMTP id
- a640c23a62f3a-a6fab602e81mr540464366b.11.1718984059371; Fri, 21 Jun 2024
- 08:34:19 -0700 (PDT)
+	s=arc-20240116; t=1718984087; c=relaxed/simple;
+	bh=nANfWiueD/Itjl7rh+lhEuAxaRNh1SANMp+CpGnt9nU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jkGa/09028Y/G6y4VHXPEI4SbptijU2yBprfvo+iNUd6HDZ+WDDb7eA1T+YKjIS4ICk6a4eP4kF1xmYPI/KFhp1IljvvMSaa/m50RRcuVBl4m+ikLHCef7PSvq40U23LKGsZA4SSOZveJTQOuChMboZ4kIvXZoWnRvuOhM0DjJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwSAHeL4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 270A9C4DDF1;
+	Fri, 21 Jun 2024 15:34:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718984086;
+	bh=nANfWiueD/Itjl7rh+lhEuAxaRNh1SANMp+CpGnt9nU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dwSAHeL4okZuG/sNbIPMk+LMxabfp3vZSQDKSYhh/1l3uVHvZ256sxGqlsDDzH/ys
+	 AweZPMAPO/yMUa84lmTNM6K8RW7VxLmDHIfEtHyl8NikzHF/Id5dyLuIt1fE9Vaehm
+	 ClwVeEMxcGU3PfP4LbcWaZj5/TjtAfuMDTL2uKelZ2NdVpYUkFXLb5GQZkQO0hd6vs
+	 2vr9o8BVe7qGQopQedvQAwRNd/tcdSeSrvYcqR6eaBlvGZQ+pQp7bvZnDIfuj0GIoK
+	 Nbj7J6uNPRro5QRNCM9073CTIZz2idQt4ri9QYJUM0MEnkauW4LwMQThWO8lbWd80x
+	 tVUhR8bN6kxVg==
+Date: Fri, 21 Jun 2024 08:34:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+Cc: Huai-Yuan Liu <qq810974084@gmail.com>, "jes@trained-monkey.org"
+ <jes@trained-monkey.org>, "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "linux-hippi@sunsite.dk" <linux-hippi@sunsite.dk>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "baijiaju1990@gmail.com" <baijiaju1990@gmail.com>
+Subject: Re: [PATCH V2] hippi: fix possible buffer overflow caused by bad
+ DMA value in rr_start_xmit()
+Message-ID: <20240621083445.34d805d2@kernel.org>
+In-Reply-To: <BY3PR18MB47379D136DE21EDB8C1741CAC6C92@BY3PR18MB4737.namprd18.prod.outlook.com>
+References: <20240620122311.424811-1-qq810974084@gmail.com>
+	<BY3PR18MB47379D136DE21EDB8C1741CAC6C92@BY3PR18MB4737.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1718919473.git.yan@cloudflare.com> <b8c183a24285c2ab30c51622f4f9eff8f7a4752f.1718919473.git.yan@cloudflare.com>
- <66756ed3f2192_2e64f929491@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66756ed3f2192_2e64f929491@willemb.c.googlers.com.notmuch>
-From: Yan Zhai <yan@cloudflare.com>
-Date: Fri, 21 Jun 2024 10:34:08 -0500
-Message-ID: <CAO3-Pbp8frVM-i6NKkmyNOFrqqW=g58rK8m4vfdWbiSHHdQBsg@mail.gmail.com>
-Subject: Re: [RFC net-next 1/9] skb: introduce gro_disabled bit
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Willem de Bruijn <willemb@google.com>, Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, 
-	Mina Almasry <almasrymina@google.com>, Abhishek Chauhan <quic_abchauha@quicinc.com>, 
-	David Howells <dhowells@redhat.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	David Ahern <dsahern@kernel.org>, Richard Gobert <richardbgobert@gmail.com>, 
-	Antoine Tenart <atenart@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
-	Soheil Hassas Yeganeh <soheil@google.com>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> > -static inline bool netif_elide_gro(const struct net_device *dev)
-> > +static inline bool netif_elide_gro(const struct sk_buff *skb)
-> >  {
-> > -     if (!(dev->features & NETIF_F_GRO) || dev->xdp_prog)
-> > +     if (!(skb->dev->features & NETIF_F_GRO) || skb->dev->xdp_prog)
-> >               return true;
-> > +
-> > +#ifdef CONFIG_SKB_GRO_CONTROL
-> > +     return skb->gro_disabled;
-> > +#else
-> >       return false;
-> > +#endif
->
-> Yet more branches in the hot path.
->
-> Compile time configurability does not help, as that will be
-> enabled by distros.
->
-> For a fairly niche use case. Where functionality of GRO already
-> works. So just a performance for a very rare case at the cost of a
-> regression in the common case. A small regression perhaps, but death
-> by a thousand cuts.
->
+On Fri, 21 Jun 2024 05:11:41 +0000 Sunil Kovvuri Goutham wrote:
+> >+	if (index >= TX_RING_ENTRIES) {
+> >+		netdev_err(dev, "invalid index value %02x\n", index);  
+> 
+> Much better would be to use netif_msg_tx_err which can be
+> enabled/disabled instead of dumping on console, which would be
+> annoying if there are many errors.
 
-I share your concern on operating on this hotpath. Will a
-static_branch + sysctl make it less aggressive? Speaking of
-performance, I'd hope this can give us more control so we can achieve
-the best of two worlds: for TCP and some UDP traffic, we can enable
-GRO, while for some other classes that we know GRO does no good or
-even harm, let's disable GRO to save more cycles. The key observation
-is that developers may already know which traffic is blessed by GRO,
-but lack a way to realize it.
+Doesn't it require ethtool to be changed tho? This driver doesn't have
+any ethtool ops AFAICT. I'd go for netdev_err_once().
 
-best
-Yan
+But more importantly, I think you should stop the queue before
+returning BUSY.
 
