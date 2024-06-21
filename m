@@ -1,62 +1,59 @@
-Return-Path: <netdev+bounces-105751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 072FE912A49
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 17:34:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1610F912A58
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 17:37:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE10E1F2827B
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:34:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7643E2810DC
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 115107BAF7;
-	Fri, 21 Jun 2024 15:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 140A77C09E;
+	Fri, 21 Jun 2024 15:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwSAHeL4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q6zz2Whd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3D8C122;
-	Fri, 21 Jun 2024 15:34:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD5FF17554;
+	Fri, 21 Jun 2024 15:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718984087; cv=none; b=h583fQruxD1JtCpEO3+YGWMzgF+lYDE3dWGT+m6RAw6IT2cXklzhxPCeJ/sN0VaPFu4tzrwkDOexVY1m1Aercjk6KfXokyKL/zg93SzeUEsMynjEBJ7u4UtnAE4EGFQEhXOmS70oCn1nlHcGGMba2OpPE31y//+kJJ8EIhk/ZMw=
+	t=1718984222; cv=none; b=PFEVRnOYvSOgNo36cJp/zqPkF+2EES5/OvscEsfB3xtySBkS35cqsecBk1XUN2vJ6nKALgCP31nN28u0XC9R+FfLdRNKjOAmNGsMrM5FBDV827/08DqYcqiae06izJfxj3UQdbJWrnZKHzehA1rMO4GqyYdB5tmcsMJ/SOSt6bE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718984087; c=relaxed/simple;
-	bh=nANfWiueD/Itjl7rh+lhEuAxaRNh1SANMp+CpGnt9nU=;
+	s=arc-20240116; t=1718984222; c=relaxed/simple;
+	bh=atpQZY8aOiTofjKL69fhtdxjNndjMkw9O1BEs9zt1pY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jkGa/09028Y/G6y4VHXPEI4SbptijU2yBprfvo+iNUd6HDZ+WDDb7eA1T+YKjIS4ICk6a4eP4kF1xmYPI/KFhp1IljvvMSaa/m50RRcuVBl4m+ikLHCef7PSvq40U23LKGsZA4SSOZveJTQOuChMboZ4kIvXZoWnRvuOhM0DjJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwSAHeL4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 270A9C4DDF1;
-	Fri, 21 Jun 2024 15:34:46 +0000 (UTC)
+	 MIME-Version:Content-Type; b=gmBHxqAz3eKeZ7VckjbI5lqCz/niiCOUcZV8rVqpFXKOt/PR9frZcv9CPZIv1b8+Nec0xJiPPspVBgl270pc1mIqqm8jzNo5VoOgAekMJZCH/uI4afJbKtWab8x1COuyfYy5G7CI8yV2FSmrcOWxTZTCl6k9mB3nswUfBodQzOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q6zz2Whd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7796C2BBFC;
+	Fri, 21 Jun 2024 15:37:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718984086;
-	bh=nANfWiueD/Itjl7rh+lhEuAxaRNh1SANMp+CpGnt9nU=;
+	s=k20201202; t=1718984221;
+	bh=atpQZY8aOiTofjKL69fhtdxjNndjMkw9O1BEs9zt1pY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dwSAHeL4okZuG/sNbIPMk+LMxabfp3vZSQDKSYhh/1l3uVHvZ256sxGqlsDDzH/ys
-	 AweZPMAPO/yMUa84lmTNM6K8RW7VxLmDHIfEtHyl8NikzHF/Id5dyLuIt1fE9Vaehm
-	 ClwVeEMxcGU3PfP4LbcWaZj5/TjtAfuMDTL2uKelZ2NdVpYUkFXLb5GQZkQO0hd6vs
-	 2vr9o8BVe7qGQopQedvQAwRNd/tcdSeSrvYcqR6eaBlvGZQ+pQp7bvZnDIfuj0GIoK
-	 Nbj7J6uNPRro5QRNCM9073CTIZz2idQt4ri9QYJUM0MEnkauW4LwMQThWO8lbWd80x
-	 tVUhR8bN6kxVg==
-Date: Fri, 21 Jun 2024 08:34:45 -0700
+	b=Q6zz2WhdwH7/OdlhSG29KjrnN2W6FKS1z8+FSjGm77tisG2nX9MESqEwnOVRKJ9kX
+	 GrLtD84WaApIfsif2wKzcUZQELo4/13RnWt82T06Lx7wNfjS2cMafehpKm6MeRrSfU
+	 dd2FO9vMdmKIJdd+v8xLYTS/KLYxazaDGf8lMlA14LajbRcvefaVN6GreDiyMVBPpg
+	 4XvH1NX7g7ufBfOee23HiSDOEOaU/UkWCQMUjId250BS9fhuksnPMofEKFmdwUfewJ
+	 sczFITfpKq0deS3RjkX1PadlFAlcw5XTJqFcIu7aix7sCUp0KaN/vSBJGZmJ6PgHa1
+	 i8E8/jJtv8gSA==
+Date: Fri, 21 Jun 2024 08:37:00 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Sunil Kovvuri Goutham <sgoutham@marvell.com>
-Cc: Huai-Yuan Liu <qq810974084@gmail.com>, "jes@trained-monkey.org"
- <jes@trained-monkey.org>, "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "linux-hippi@sunsite.dk" <linux-hippi@sunsite.dk>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "baijiaju1990@gmail.com" <baijiaju1990@gmail.com>
-Subject: Re: [PATCH V2] hippi: fix possible buffer overflow caused by bad
- DMA value in rr_start_xmit()
-Message-ID: <20240621083445.34d805d2@kernel.org>
-In-Reply-To: <BY3PR18MB47379D136DE21EDB8C1741CAC6C92@BY3PR18MB4737.namprd18.prod.outlook.com>
-References: <20240620122311.424811-1-qq810974084@gmail.com>
-	<BY3PR18MB47379D136DE21EDB8C1741CAC6C92@BY3PR18MB4737.namprd18.prod.outlook.com>
+To: netdev@vger.kernel.org
+Cc: Johan Jonker <jbx6244@gmail.com>, heiko@sntech.de, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 0/3] cleanup arc emac
+Message-ID: <20240621083700.4d3981b7@kernel.org>
+In-Reply-To: <171896102978.12983.298145904993537431.git-patchwork-notify@kernel.org>
+References: <0b889b87-5442-4fd4-b26f-8d5d67695c77@gmail.com>
+	<171896102978.12983.298145904993537431.git-patchwork-notify@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,17 +63,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 21 Jun 2024 05:11:41 +0000 Sunil Kovvuri Goutham wrote:
-> >+	if (index >= TX_RING_ENTRIES) {
-> >+		netdev_err(dev, "invalid index value %02x\n", index);  
-> 
-> Much better would be to use netif_msg_tx_err which can be
-> enabled/disabled instead of dumping on console, which would be
-> annoying if there are many errors.
+On Fri, 21 Jun 2024 09:10:29 +0000 patchwork-bot+netdevbpf@kernel.org
+wrote:
+>   - [v1,1/3] ARM: dts: rockchip: rk3xxx: fix emac node
+>     (no matching commit)
+>   - [v1,2/3] net: ethernet: arc: remove emac_arc driver
+>     (no matching commit)
+>   - [v1,3/3] dt-bindings: net: remove arc_emac.txt
+>     https://git.kernel.org/netdev/net-next/c/8a3913c8e05b
 
-Doesn't it require ethtool to be changed tho? This driver doesn't have
-any ethtool ops AFAICT. I'd go for netdev_err_once().
-
-But more importantly, I think you should stop the queue before
-returning BUSY.
+FTR - all of the patches were applied.
 
