@@ -1,238 +1,311 @@
-Return-Path: <netdev+bounces-105723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88B3791278F
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:23:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 804BD912794
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:24:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E38C01F2255A
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 14:23:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3731028C78F
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 14:24:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168511D54B;
-	Fri, 21 Jun 2024 14:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1FEF208A1;
+	Fri, 21 Jun 2024 14:24:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EnRhiSya"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="RR/viPRd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903A8EAE1
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 14:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718979783; cv=fail; b=jpUwRKqAymH0/URirPuhe4EqVF6H++Lg6XsHYnkiC+xa7XOOWlNrGQ1PnckYtDY+fJsTRvX3fqqSbaaLquKwXo1akkP4yyvEuOmPTLvjo/PJjnbpRRWwAvVJ7cbXJCEj4vYzkGXb44JX65UpBe33VrK7dgNnQnukbNVOKIGIz8s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718979783; c=relaxed/simple;
-	bh=x7hv95cZPxVIFjrqXZZRT6+UKXlZErykwp4Tc1mb87c=;
-	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Ogbv9QbQ+3gIJLTd7Xfu7YEuI/T/no1ykzpiiYKEgu8xsa+zcLSXGKWj/oeX4W1xpXYaAaXnso+ga8tEuCW50PncQeSlmW+nT4KtpmtzhD7MPO7KzyZr81w/sTcRp16kQpaKRyvGRLtiyb9Ghf3gC3wkHx3EE9I6oYVjVCbpa8g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EnRhiSya; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718979780; x=1750515780;
-  h=message-id:date:subject:from:to:cc:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=x7hv95cZPxVIFjrqXZZRT6+UKXlZErykwp4Tc1mb87c=;
-  b=EnRhiSyax401x+5oAe/okeXG9H6nQImAcaSohWrdXF+wvDlzXtOM1V9Z
-   pYbk5XKNVRBK4GoksRedxrF8hJmKUtHjNKL9Jl0iLsJJpnEyDnI6OlVX1
-   OhPWnFi5k52/w12UJlkD3RTR7wpnIwpCzqrXRiDntEJY0IAAg4byEMBLW
-   gQtS1cErJ4lH/I+f+hCLU3vLk9SyTY/S+V2qzYlpZVj8d/kue0oObKFB8
-   B7KVkO5FDf1ctl4Ts0AgOVsoieIVf3Go862FIXS4pj/TVhjcLi0ReHZl1
-   bmAsWrIzXkAb1LHM/jYIk9Cs095LvQ7TtBx2XYSmpTHWI46gHhEAIi9L4
-   Q==;
-X-CSE-ConnectionGUID: Vx761037TlWh4yrANfi/lg==
-X-CSE-MsgGUID: 6AvRJWgnRpm4f39rxkCNCw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11110"; a="15988954"
-X-IronPort-AV: E=Sophos;i="6.08,254,1712646000"; 
-   d="scan'208";a="15988954"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2024 07:23:00 -0700
-X-CSE-ConnectionGUID: UQSLqrR1TPGezaHDOobD/Q==
-X-CSE-MsgGUID: PLYfq9JiQW6jGgucUmN2bA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,254,1712646000"; 
-   d="scan'208";a="42428509"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Jun 2024 07:23:00 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 21 Jun 2024 07:22:59 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 21 Jun 2024 07:22:58 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Fri, 21 Jun 2024 07:22:58 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 21 Jun 2024 07:22:58 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dInzG2qt5THOu6c91dGONwafF0ikGzJR7OUVshc6UVPz5ofULhY1QW6rX0IyBA/fLdvqG75JdZmSlDPoFgJZqfrwxxAzKAzMag7hq1G3f/3OwSq34OGGhTBDwrB6k8ledKDOo++Fiw2275kr8xpWyUKwtP4yYFZ67Gs9HndKQVMShHAFpuVyR5uGK/rMnlpm8lehN3hWI/6qXgZORN9EkMYQZgNOaZwtzhD3huq+N1UIzXnhUPqqxuEvd9VFoY8pMSGk/EQ+VSIiwN4I/6IX17bv4m62QYG8Dxx7/NkaPKxBy+xgNoBDKn9L6TMdaAt/X66+en7QEAwNUCsIHQOufg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Xt+Q3LZdisgrtATkrpKkxrwj/ZXuECfc2mlz4y4SrKU=;
- b=UihpeYgVGZFBUYi/tJ8InQSW/D0Sz21DwGXir7pidqxvZbUTvA1Aci7RfB6j3YhzFvxCdKLsulrh0tDwS0O97F/lYJnM9DdSWriUdzXDEnnPanvJwwxQYTLpq7u4cLA1WywWJmvUOZbNkVMepp/F1bNomQmQJnqn4+IZZsVvgbEOwzIaNNL8i6vWQ7A3KNXFlYuxDda9xpca1B8e7yEQ+qBJEeZz88jdCQt9yascTipVWgS+jn11qfCzThht2utpGJeE28W53OPbBiUQ5a9TmHrmxEhgwZTTh+4WA8x5EuOzDxI/dmMLV6B161gtmQqGST75/eWEt0+vH6ATg0x4Yw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by LV3PR11MB8767.namprd11.prod.outlook.com (2603:10b6:408:215::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.21; Fri, 21 Jun
- 2024 14:22:51 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.7698.020; Fri, 21 Jun 2024
- 14:22:51 +0000
-Message-ID: <af7d5e43-b4ac-43f2-aa13-305c024b3ae8@intel.com>
-Date: Fri, 21 Jun 2024 16:21:18 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v7 09/12] iavf: refactor
- iavf_clean_rx_irq to support legacy and flex descriptors
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: <intel-wired-lan@lists.osuosl.org>
-CC: Jacob Keller <jacob.e.keller@intel.com>, Wojciech Drewek
-	<wojciech.drewek@intel.com>, <netdev@vger.kernel.org>, Mateusz Polchlopek
-	<mateusz.polchlopek@intel.com>
-References: <20240604131400.13655-1-mateusz.polchlopek@intel.com>
- <20240604131400.13655-10-mateusz.polchlopek@intel.com>
- <94cf16ed-709b-4cab-9325-52670db25902@intel.com>
- <0d40e3fb-c76a-42c9-a9c0-bdb0f4c8e015@intel.com>
- <f9689f4f-885b-46ee-af63-d4775cacd43e@intel.com>
-Content-Language: en-US
-In-Reply-To: <f9689f4f-885b-46ee-af63-d4775cacd43e@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DUZPR01CA0326.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4ba::25) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0741C6AF
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 14:24:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718979889; cv=none; b=XNQLmkYVxUjqD8aBr89dVLG6mmmEe39x7ogUm2Cn/AHuTlPvrJHzJxSBYNdrD9D9ywEQC2/g9Ad6OddWanGyEA7hvha1nQMwPLpHEguGrpLrWfZcW8gyZf0Vv4mARAPndAbQHXADnoG/LeSsuKX6RPonA5KwSn9x1AFedhg9ivA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718979889; c=relaxed/simple;
+	bh=lZJXdwBAegA51ddHVpcl7yCINGbPBw3CLbtY3DhzlKI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bPBGnM1ARq2Wz/sj0prLj+FFw3lvLWHq0dIGjFga+kSRQKcKZqr60uvw62l1+6JTutC4Wpv6W78CDZSEfyAO1k2miqGQ+vQscuuklXO7pzhzKKHx3cCl+LNtR7H0ydHluzLSD1TAF4Sk4Y3/BDoiGF/rsoc+5k8bcg//ffZkNbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=RR/viPRd; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7041e39a5beso1676599b3a.3
+        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 07:24:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1718979886; x=1719584686; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=f465gzpp4FYXFa5Jc2lq0JYqayZbFWyLX/GgY6Y+YRg=;
+        b=RR/viPRdYs2XDqO5DZCJ3DERO7qMECA8yKGjn4+lHmbzvAE3F5coFhW70MjDj4kC8S
+         u/MG/wYMC2Uq6e3g1bJVcIoOIkmHsiET5Zy21q2TFD/XKEiKUlxU4kroQHCi75+njKQf
+         fOZy1BJveONz7cft6v4ep1gyrQWlKnLj93mC60/1bm3ajq0IL0+LeduHgIOBEMGn6Geh
+         WF08BHjbRuLFEs0wCfZ8aZ0iNVFGHWus8GIQ2gcBQgQUCB6lDaRIVWhV4odIrZtSg8lW
+         mM5N2w5uTX184J9V6Xn1LTHqfqOEd/Vm5tIXSQ810XI8B6DzNAOa6gutznvrC90BdAF0
+         xytg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718979886; x=1719584686;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=f465gzpp4FYXFa5Jc2lq0JYqayZbFWyLX/GgY6Y+YRg=;
+        b=HIC6+E6xn2YEqD35hGNGuIt24N7VAvB+6JxwC3+9xZdppNBMJEjOkkQn5PN2N5S/va
+         90okvAoxIcuERNqh6JdNZ+Fy4zJt50MmuzFE0JAvlmiq7c6rNWBW2VWz8cHKEF2QGRcG
+         O0noj2hGem3TatzNUBkiLo8sMUbdYpdjK6/WtAp0ZVWgBNeRKhs/SREY7BtO3VgY5pei
+         j+VT15MPy4/ZFVYziVp48r5DlkwBPeuHu7HUWqjy5aW9rNnegsIvPVaZ1do/tbLOYh4t
+         wPn0AxjbQ3R6tvBeJP5eh0c29RWABsJbItbIHpix19cyuMXDLBwdWat/puGmm7zMiemn
+         uHvA==
+X-Forwarded-Encrypted: i=1; AJvYcCVmkIdUjVju4rHxSw+untlnzt2N1+fUJDCMVIoevAtBB2SUq7x+fjWlN2IuGjXBQ/quQVNfHkcVfzguesRq4U1QVqh5m4E2
+X-Gm-Message-State: AOJu0YzUG8BNd55YRiUh6nkFVB1ILtbDeLyQwT4drF+J6hvAl5+0ua8+
+	VB95ncpvlGwbVS7+FVyiBJ/YW6XUECCxic7NxxHCwfYJfIBaYPIBNi/UmfC0rQ==
+X-Google-Smtp-Source: AGHT+IGFkahb2mi+s70o0GUs+qOKuAFaqBNMUF6yfNZ9vXvzACbalIb7sN++Na238r1ddj5jvmtNbg==
+X-Received: by 2002:a05:6a20:1b14:b0:1bc:e05d:37d9 with SMTP id adf61e73a8af0-1bce05d387dmr1205285637.19.1718979886185;
+        Fri, 21 Jun 2024 07:24:46 -0700 (PDT)
+Received: from ?IPV6:2804:14d:5c5e:44fb:85f8:f9fb:f0d7:f10a? ([2804:14d:5c5e:44fb:85f8:f9fb:f0d7:f10a])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb3c5ed2sm14601515ad.155.2024.06.21.07.24.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jun 2024 07:24:45 -0700 (PDT)
+Message-ID: <f2ff57c9-1c10-429f-8739-39743bf58daf@mojatatu.com>
+Date: Fri, 21 Jun 2024 11:24:37 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|LV3PR11MB8767:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8acd42ff-c0a5-4a26-8681-08dc91fda1df
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230037|1800799021|366013|376011;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?RGZHSTZnK0pKMUZTRmtqaHZ4WlE1ZXA1RTFHTkJBdkV4TnlFanVKOVJOcnds?=
- =?utf-8?B?UWVWTzlzYy81MVEyNGc5Kzk3MWgwUml3a0NoWThWMm02d3JGVHFYSVZDRmEv?=
- =?utf-8?B?R1ViaDV1Wnp3eDdrc0JlVWNPbk4yWkNxZ1lEU2cxbEtwTmVoWkVjTjIrQ1pL?=
- =?utf-8?B?ajVXUDloSUdJKzJQM1dzVldvY2llQ01FM2FkSU5vSjBFeDVSV2dNTFdObDVp?=
- =?utf-8?B?T2toUHpJclZVS0VoVVhZcHJKL1pIK0NKWWc5aHJuMGJ5MFIvbGF2Nm0rSi9k?=
- =?utf-8?B?Nm9lRmp0QlEyaFlFT081WHVGM2VtK09KdUVIdStKcG93UkFONWZNWDhKaWNt?=
- =?utf-8?B?b2ZKRU4rNVE5SGN4MWNwbDlQNE1TZytxWHBQRE1QNWVnNVlVa0JxMlVMM3hC?=
- =?utf-8?B?UW5TakcyY2JrN1BNa3Fyc3NSa1o5Slp3VUZTdUw0bkxQWWdPOGd3SzBicE1y?=
- =?utf-8?B?dEowNTJWWm00Y0dIS2Uxb3VRU08wSFdrd3VhNFFlenBkK0VpWnlNVFNObFE5?=
- =?utf-8?B?eEFvNnVXTkY2V3psREhWcjJKSmhLRTMwRzhiVFBudDQwNGZaeXlvL09IUVF6?=
- =?utf-8?B?RXpqNXc1dTgzVXM4NmdGZm5meEdVSjJnQTdzKzRmY09nbzlxYlhHWGRuelow?=
- =?utf-8?B?MDhsZzh3WVNMVTE0WUNJbTlyd3Nvdm0vTFdTUHNsbzVsckdWK1dmdWRzK1kw?=
- =?utf-8?B?S0wwNnh2NGJhWmhrNGE0Mm0rK2Q4TjE1T1ZXQ09CY0tsODdNa0FSVmRPQyt6?=
- =?utf-8?B?Q3NUT1NuaEwxU2p4SUQrUHMzbE1GZytCZlhFS0xIVDJlSE91ai9MU28reTdP?=
- =?utf-8?B?dDROc3RoRUZvWEtHc1Bndk4xcW1JbGxpNVRSbGY4cHVObjR2R2NMNExGM1Mz?=
- =?utf-8?B?azRTUG1Bc2ZjK21mVUUzR3JLK2k3YWYvRUZMY0g5ZTZQQ2pYMVRJUDc2Y091?=
- =?utf-8?B?MjhrYm42OTJDbW1ncU8vaFdQQWRXQjNpT205TFArc1VmY1JVK3J1bmxiNlBN?=
- =?utf-8?B?MmFsMzUxa2h5aUsyQVN6Sk9SYUoxUE5XZ2todUhrV1RqYjloTG1EVGV2NHBM?=
- =?utf-8?B?Qm9uTFBmTVEyeGpQcmw4NXFxdm1GSHh3SzF2aTV3a0RLQlpMVUdTR2FQZms4?=
- =?utf-8?B?TWc2VGphV3Izczk4YVpJZlJUVWg1c3ZaWkRaYy91akpvRzQ4WHBLMjA0TVhC?=
- =?utf-8?B?bHFveTZESGtHVWJKRVdNeVVKeG8xYTlkeEJZOXN5djFWTnc2UjNJby84aTdX?=
- =?utf-8?B?bjNTYWFITjJzc0JPQ2RFUWdodEg4ZDBqS3B5b0tPeXliT0NxOS94OCtqWVMx?=
- =?utf-8?B?a21IaWJVQkJ1Z0xVRXFoQzVIKzFKS2EvU2xzV0pYek5yOVZaNzV2ZXI3Y29z?=
- =?utf-8?B?dXhZN0NKc09Fc0VxTjdYNnNuZEU0QjlFV2FDSVNHODRaMjFaVVFmZDlXYitW?=
- =?utf-8?B?MFRRbExZSG9UUHVBcVBNOFRmZjNBbjhrdnFFZUdqOXVPM2dTMXp1VlZLRmQ0?=
- =?utf-8?B?bDk3dnRsRmo1RXhRd3h1Nno2OHNnditSL1ZCL3BFNlQ2bS92bTF3bU5uUUtx?=
- =?utf-8?B?cUlpY2s5VGF2ZTEvdVZJV0R3cDZkdFEwQzFsMG1Ec2hjb0hjc1lVMWZIMmpP?=
- =?utf-8?B?MDBZaVJrTERlSmRzRFdITVBrK21PQnQzOStBeS85dUxCU1hlM252Vnd1Zllz?=
- =?utf-8?B?YkR5cFBsVUFvc2VQZUNORVFlcFZDS05KLzZwcmR2MlAxSzdvSGdmOHdEWEhN?=
- =?utf-8?Q?kCX5k8xlOJbmA6nYs3bIqbMTGvUq780r5V3EgPm?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(1800799021)(366013)(376011);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eXB3U1IxdWNXQ3B1R0l5MDNZN051dEZNc0laUmNnWFRjYWVyWDJ2eG9kOGFK?=
- =?utf-8?B?Q09jb2c3dmRSR2hoMWx2eGpHNTFHYTE0MlhVRlRCSGs3SW05NWEvZXJWYUJM?=
- =?utf-8?B?VU5wWUIrZkI2ZEVFRnprM2N2RzJySzkrRUJ2N05nRmhRQmNvMVoxSml1RTJM?=
- =?utf-8?B?aldZL1JJY09KNEUvZ2xuejdFRXNLR3RGdHRwR0hzdzArSE9INUtwN3hPUkJn?=
- =?utf-8?B?VDU2V0tJTkRJSVRKWEZDU3dQbmw4TU5KTXBaVExvb3psMkdLQktwMHZXK2sv?=
- =?utf-8?B?N0tPeW5vVHc2TnBFNE9FRTlMY1k5Nzh5Wks4UHEvTi85ZWJscWwzc3FyS3p3?=
- =?utf-8?B?ejlWbm5EaFlpajFqbHNTV0dKSVhzbEVJQzdRTHhMUFlGakpOR1VEN1MrWDFy?=
- =?utf-8?B?ZXFoOU1rT1VydEZRNFdudUZUYVdKS2xSSXlZY1lDelZYUnM1MGNhbThQUC9o?=
- =?utf-8?B?MXZQNW5VYmxISTMzQzlHRm53SElWcTZQNWJyRXhzRHJiQ0tueFNRelF4c2gr?=
- =?utf-8?B?Qi9tYWJUdHl2MEhzQ3U2SmFzbzZrUFEwd0RPVkdhMGZCK0JJQU5lYTAzSDhY?=
- =?utf-8?B?ZllMeTQ1ajFSUVY4VXdZTGpGYXlKdlJYbk13ZUFhZTlvRzQvN3MzdFVYWDdS?=
- =?utf-8?B?WDJpVXN2K1lERnVRQlZ1bXp0NDF6U21HWFdrY0haaFFRQlJ5QlVkenY5RzFW?=
- =?utf-8?B?M0tJdEVPOS93YVRobmVDYURQb0tyeU4vUFBuU3ppMlNRZURncVlFYzNFUWVk?=
- =?utf-8?B?ZUtia3dPaDcyOElnd1NXRkUvN2poUTRjQSsya2lOVEVzSWx6U21OaGF4TjZi?=
- =?utf-8?B?L2QxbnM5WGRvSGJyeHVvcUwweFBDT0F5RDF6THJwMmJrek04ZFF6NUNwbkQ2?=
- =?utf-8?B?amtMM3R1OVpiTldFZ1NkbDErZUJnd2lOellXaVl2a3E2aHh0TUFEUlRCQldV?=
- =?utf-8?B?MXBocGdJWm9tYnJUZlhvanVrVWV5a0FCT0RZV1BIN29ydGt1M1FDdFRDckpz?=
- =?utf-8?B?RTF4RzJrRXl2QmJJRm9kRnplVTQ0OE9oeUtaeTZYRVpvdG4yQVlmRlJidmJn?=
- =?utf-8?B?bzlSMnZtVG1PTFN3TFFrRllOLzBmWjYxSDV0Z2wzbUZzQkc3a2pMakxjMmo3?=
- =?utf-8?B?SHV0djhMZWNlWFZNVUJ2eGwyeTVkamdudVo1OEt2UTdmcndkNG1BUkYyeVly?=
- =?utf-8?B?TzI0YjlFMEFTWDRMZ2F6cEVWTkxYQXJVc2RSS0htY3BmM0lXVnkvZ2djRHZk?=
- =?utf-8?B?cWtUNHM4RUNYNjIxYW9qOUtYWGo3Mk1CenlxL3MvSDdnMFpHWVYwWnVFMEtU?=
- =?utf-8?B?L09hdU1jbTkwelZtOFI4L09TYUZIeVRtcjhVS21TVGJNZEFQY3o4RjFVbjFS?=
- =?utf-8?B?V2UzaWpTc05UeGEvTCtoYkowS2cxR0tHUFh6ZUhwM2hsTE84ZE5nOG92ckg4?=
- =?utf-8?B?em0ybks3cWhtUDZnTVZBYXJ6K245dW5XcUNDMXcxSElOSmNUL0NMWnJzendS?=
- =?utf-8?B?ZVNoM0JoZGd0YmJyMmhJQWE5WXBscjc5WFVjQUJBLytaejhqcnA5TTA2MHUz?=
- =?utf-8?B?clJwMTVraG1mdEFUa0p1MmF1aFdTWmViYmlRakpGWHpWcjVDcUk2T1ZaZzVW?=
- =?utf-8?B?QjJ3dWx5VG9DVVEzM013VzV5QkxzYnZza01KYWwvc0VTMkZ3Z01HUTlYajEv?=
- =?utf-8?B?bnpzM0VvSkFlNU9QSTBGTjBVSFhzLzI0cmsrVVhZUDlNcWpOVjVjNVBKbjg5?=
- =?utf-8?B?NFRyQVhONmViVEYvQnZpUEsraGtvRmJqTStEK1IzVWZRN2NNaDgxOHFpVU02?=
- =?utf-8?B?WTdGeE9wditGMCt1K0RpZHpidE5TdW1Rb1lJaFRZV0oyY0liOUJ2bkNkWFJG?=
- =?utf-8?B?RDhjNzhJYTRLaW40ZVBLWlIwUTgyQ0EwaFdSZXh0emRtNHVBeFA5UEZJdm5p?=
- =?utf-8?B?elNuaHJXZTFkclFPT0tqS0FHQmdqNWRTV0JPUG11ZmIvaUFnV3JMNjFLbGl1?=
- =?utf-8?B?NHorTDlHa3NUWWY2UUxhQzFMZ05oYjU3TzFSRE1rMzYxajBRSTZ0RHRNZDlS?=
- =?utf-8?B?QmFIem0vY21WMFFudVY1SjR2SklEdTJ1UUZkeUdKem52THJBNUVtR1gvZzl0?=
- =?utf-8?B?dnNFZzl0TWJVL3NDQURGUkwvbjN0cmt5ajZYNEhLalpSY0FnYld4d0xudzdt?=
- =?utf-8?B?OGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8acd42ff-c0a5-4a26-8681-08dc91fda1df
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2024 14:22:51.0670
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aDOEmo6AqD3yUW0l40Chdh+Mq8dgwXf6f0kPTnmR0VxxxuEQ/+v8OtIaodnvR6iM2yKWwZe+0DtA94UsXFYJv1IgsSAHzEvPjWiZQneRfj0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8767
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] qdisc: fix NULL pointer dereference in
+ perf_trace_qdisc_reset()
+To: yskelg@gmail.com, Steven Rostedt <rostedt@goodmis.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Takashi Iwai <tiwai@suse.de>, "David S. Miller" <davem@davemloft.net>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Taehee Yoo <ap420073@gmail.com>, Austin Kim <austindh.kim@gmail.com>,
+ shjy180909@gmail.com, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ pbuk5246@gmail.com
+References: <20240621114551.2061-3-yskelg@gmail.com>
+Content-Language: en-US
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <20240621114551.2061-3-yskelg@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Date: Wed, 12 Jun 2024 14:33:17 +0200
-
-> From: Jacob Keller <jacob.e.keller@intel.com>
-> Date: Tue, 11 Jun 2024 13:52:57 -0700
+On 21/06/2024 08:45, yskelg@gmail.com wrote:
+> From: Yunseong Kim <yskelg@gmail.com>
 > 
->>
->>
->> On 6/11/2024 4:47 AM, Alexander Lobakin wrote:
->>> From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
->>> Date: Tue,  4 Jun 2024 09:13:57 -0400
->>>
->>>> From: Jacob Keller <jacob.e.keller@intel.com>
->>>>
->>>> Using VIRTCHNL_VF_OFFLOAD_FLEX_DESC, the iAVF driver is capable of
->>>> negotiating to enable the advanced flexible descriptor layout. Add the
->>>> flexible NIC layout (RXDID=2) as a member of the Rx descriptor union.
+> In the TRACE_EVENT(qdisc_reset) NULL dereference occurred from
+> 
+>   qdisc->dev_queue->dev <NULL> ->name
+> 
+> This situation simulated from bunch of veths and Bluetooth dis/reconnection.
+> 
+> During qdisc initialization, qdisc was being set to noop_queue.
+> In veth_init_queue, the initial tx_num was reduced back to one,
+> causing the qdisc reset to be called with noop, which led to the kernel panic.
+> 
+> I think this will happen on the kernel version.
+>   Linux kernel version ≥ v6.7.10, ≥ v6.8 ≥ v6.9 and 6.10
 
-[...]
+You should tag your patch for the net tree
 
-Why is this taken into the next queue if I asked for changes and there's
-v8 in development?
+> 
+> This occurred from 51270d573a8d. I think this patch is absolutely
+> necessary. Previously, It was showing not intended string value of name.
+Add a 'Fixes:' tag with this commit
 
-Thanks,
-Olek
+> 
+> I've reproduced 3 time from my fedora 40 Debug Kernel with any other module
+> and patched.
+> 
+> version: 6.10.0-0.rc2.20240608gitdc772f8237f9.29.fc41.aarch64+debug
+> 
+> [ 5287.164555] veth0_vlan: left promiscuous mode
+> [ 5287.164929] veth1_macvtap: left promiscuous mode
+> [ 5287.164950] veth0_macvtap: left promiscuous mode
+> [ 5287.164983] veth1_vlan: left promiscuous mode
+> [ 5287.165008] veth0_vlan: left promiscuous mode
+> [ 5287.165450] veth1_macvtap: left promiscuous mode
+> [ 5287.165472] veth0_macvtap: left promiscuous mode
+> [ 5287.165502] veth1_vlan: left promiscuous mode
+> …
+> [ 5297.598240] bridge0: port 2(bridge_slave_1) entered blocking state
+> [ 5297.598262] bridge0: port 2(bridge_slave_1) entered forwarding state
+> [ 5297.598296] bridge0: port 1(bridge_slave_0) entered blocking state
+> [ 5297.598313] bridge0: port 1(bridge_slave_0) entered forwarding state
+> [ 5297.616090] 8021q: adding VLAN 0 to HW filter on device bond0
+> [ 5297.620405] bridge0: port 1(bridge_slave_0) entered disabled state
+> [ 5297.620730] bridge0: port 2(bridge_slave_1) entered disabled state
+> [ 5297.627247] 8021q: adding VLAN 0 to HW filter on device team0
+> [ 5297.629636] bridge0: port 1(bridge_slave_0) entered blocking state
+> …
+> [ 5298.002798] bridge_slave_0: left promiscuous mode
+> [ 5298.002869] bridge0: port 1(bridge_slave_0) entered disabled state
+> [ 5298.309444] bond0 (unregistering): (slave bond_slave_0): Releasing backup interface
+> [ 5298.315206] bond0 (unregistering): (slave bond_slave_1): Releasing backup interface
+> [ 5298.320207] bond0 (unregistering): Released all slaves
+> [ 5298.354296] hsr_slave_0: left promiscuous mode
+> [ 5298.360750] hsr_slave_1: left promiscuous mode
+> [ 5298.374889] veth1_macvtap: left promiscuous mode
+> [ 5298.374931] veth0_macvtap: left promiscuous mode
+> [ 5298.374988] veth1_vlan: left promiscuous mode
+> [ 5298.375024] veth0_vlan: left promiscuous mode
+> [ 5299.109741] team0 (unregistering): Port device team_slave_1 removed
+> [ 5299.185870] team0 (unregistering): Port device team_slave_0 removed
+> …
+> [ 5300.155443] Bluetooth: hci3: unexpected cc 0x0c03 length: 249 > 1
+> [ 5300.155724] Bluetooth: hci3: unexpected cc 0x1003 length: 249 > 9
+> [ 5300.155988] Bluetooth: hci3: unexpected cc 0x1001 length: 249 > 9
+> ….
+> [ 5301.075531] team0: Port device team_slave_1 added
+> [ 5301.085515] bridge0: port 1(bridge_slave_0) entered blocking state
+> [ 5301.085531] bridge0: port 1(bridge_slave_0) entered disabled state
+> [ 5301.085588] bridge_slave_0: entered allmulticast mode
+> [ 5301.085800] bridge_slave_0: entered promiscuous mode
+> [ 5301.095617] bridge0: port 1(bridge_slave_0) entered blocking state
+> [ 5301.095633] bridge0: port 1(bridge_slave_0) entered disabled state
+> …
+> [ 5301.149734] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+> [ 5301.173234] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+> [ 5301.180517] bond0: (slave bond_slave_1): Enslaving as an active interface with an up link
+> [ 5301.193481] hsr_slave_0: entered promiscuous mode
+> [ 5301.204425] hsr_slave_1: entered promiscuous mode
+> [ 5301.210172] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+> [ 5301.210185] Cannot create hsr debugfs directory
+> [ 5301.224061] bond0: (slave bond_slave_1): Enslaving as an active interface with an up link
+> [ 5301.246901] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+> [ 5301.255934] team0: Port device team_slave_0 added
+> [ 5301.256480] team0: Port device team_slave_1 added
+> [ 5301.256948] team0: Port device team_slave_0 added
+> …
+> [ 5301.435928] hsr_slave_0: entered promiscuous mode
+> [ 5301.446029] hsr_slave_1: entered promiscuous mode
+> [ 5301.455872] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+> [ 5301.455884] Cannot create hsr debugfs directory
+> [ 5301.502664] hsr_slave_0: entered promiscuous mode
+> [ 5301.513675] hsr_slave_1: entered promiscuous mode
+> [ 5301.526155] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+> [ 5301.526164] Cannot create hsr debugfs directory
+> [ 5301.563662] hsr_slave_0: entered promiscuous mode
+> [ 5301.576129] hsr_slave_1: entered promiscuous mode
+> [ 5301.580259] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+> [ 5301.580270] Cannot create hsr debugfs directory
+> [ 5301.590269] 8021q: adding VLAN 0 to HW filter on device bond0
+> 
+> [ 5301.595872] KASAN: null-ptr-deref in range [0x0000000000000130-0x0000000000000137]
+> [ 5301.595877] Mem abort info:
+> [ 5301.595881]   ESR = 0x0000000096000006
+> [ 5301.595885]   EC = 0x25: DABT (current EL), IL = 32 bits
+> [ 5301.595889]   SET = 0, FnV = 0
+> [ 5301.595893]   EA = 0, S1PTW = 0
+> [ 5301.595896]   FSC = 0x06: level 2 translation fault
+> [ 5301.595900] Data abort info:
+> [ 5301.595903]   ISV = 0, ISS = 0x00000006, ISS2 = 0x00000000
+> [ 5301.595907]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+> [ 5301.595911]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+> [ 5301.595915] [dfff800000000026] address between user and kernel address ranges
+> [ 5301.595971] Internal error: Oops: 0000000096000006 [#1] SMP
+> …
+> [ 5301.596076] CPU: 2 PID: 102769 Comm:
+> syz-executor.3 Kdump: loaded Tainted:
+>   G        W         -------  ---  6.10.0-0.rc2.20240608gitdc772f8237f9.29.fc41.aarch64+debug #1
+> [ 5301.596080] Hardware name: VMware, Inc. VMware20,1/VBSA,
+>   BIOS VMW201.00V.21805430.BA64.2305221830 05/22/2023
+> [ 5301.596082] pstate: 01400005 (nzcv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+> [ 5301.596085] pc : strnlen+0x40/0x88
+> [ 5301.596114] lr : trace_event_get_offsets_qdisc_reset+0x6c/0x2b0
+> [ 5301.596124] sp : ffff8000beef6b40
+> [ 5301.596126] x29: ffff8000beef6b40 x28: dfff800000000000 x27: 0000000000000001
+> [ 5301.596131] x26: 6de1800082c62bd0 x25: 1ffff000110aa9e0 x24: ffff800088554f00
+> [ 5301.596136] x23: ffff800088554ec0 x22: 0000000000000130 x21: 0000000000000140
+> [ 5301.596140] x20: dfff800000000000 x19: ffff8000beef6c60 x18: ffff7000115106d8
+> [ 5301.596143] x17: ffff800121bad000 x16: ffff800080020000 x15: 0000000000000006
+> [ 5301.596147] x14: 0000000000000002 x13: ffff0001f3ed8d14 x12: ffff700017ddeda5
+> [ 5301.596151] x11: 1ffff00017ddeda4 x10: ffff700017ddeda4 x9 : ffff800082cc5eec
+> [ 5301.596155] x8 : 0000000000000004 x7 : 00000000f1f1f1f1 x6 : 00000000f2f2f200
+> [ 5301.596158] x5 : 00000000f3f3f3f3 x4 : ffff700017dded80 x3 : 00000000f204f1f1
+> [ 5301.596162] x2 : 0000000000000026 x1 : 0000000000000000 x0 : 0000000000000130
+> [ 5301.596166] Call trace:
+> [ 5301.596175]  strnlen+0x40/0x88
+> [ 5301.596179]  trace_event_get_offsets_qdisc_reset+0x6c/0x2b0
+> [ 5301.596182]  perf_trace_qdisc_reset+0xb0/0x538
+> [ 5301.596184]  __traceiter_qdisc_reset+0x68/0xc0
+> [ 5301.596188]  qdisc_reset+0x43c/0x5e8
+> [ 5301.596190]  netif_set_real_num_tx_queues+0x288/0x770
+> [ 5301.596194]  veth_init_queues+0xfc/0x130 [veth]
+> [ 5301.596198]  veth_newlink+0x45c/0x850 [veth]
+> [ 5301.596202]  rtnl_newlink_create+0x2c8/0x798
+> [ 5301.596205]  __rtnl_newlink+0x92c/0xb60
+> [ 5301.596208]  rtnl_newlink+0xd8/0x130
+> [ 5301.596211]  rtnetlink_rcv_msg+0x2e0/0x890
+> [ 5301.596214]  netlink_rcv_skb+0x1c4/0x380
+> [ 5301.596225]  rtnetlink_rcv+0x20/0x38
+> [ 5301.596227]  netlink_unicast+0x3c8/0x640
+> [ 5301.596231]  netlink_sendmsg+0x658/0xa60
+> [ 5301.596234]  __sock_sendmsg+0xd0/0x180
+> [ 5301.596243]  __sys_sendto+0x1c0/0x280
+> [ 5301.596246]  __arm64_sys_sendto+0xc8/0x150
+> [ 5301.596249]  invoke_syscall+0xdc/0x268
+> [ 5301.596256]  el0_svc_common.constprop.0+0x16c/0x240
+> [ 5301.596259]  do_el0_svc+0x48/0x68
+> [ 5301.596261]  el0_svc+0x50/0x188
+> [ 5301.596265]  el0t_64_sync_handler+0x120/0x130
+> [ 5301.596268]  el0t_64_sync+0x194/0x198
+> [ 5301.596272] Code: eb15001f 54000120 d343fc02 12000801 (38f46842)
+> [ 5301.596285] SMP: stopping secondary CPUs
+> [ 5301.597053] Starting crashdump kernel...
+> [ 5301.597057] Bye!
+> 
+> Yeoreum and I use two fuzzing tool simultaneously.
+> 
+> One process with syz-executor : https://github.com/google/syzkaller
+> 
+>   $ ./syz-execprog -executor=./syz-executor -repeat=1 -sandbox=setuid \
+>      -enable=none -collide=false log1
+> 
+> The other process with perf fuzzer:
+>   https://github.com/deater/perf_event_tests/tree/master/fuzzer
+> 
+>   $ perf_event_tests/fuzzer/perf_fuzzer
+> 
+> Yeoreum and I don't know if the patch we wrote will fix the underlying cause,
+> but we think that priority is to prevent kernel panic happening.
+> So, we're sending this patch.
+> 
+> I can attach a sys-execprog's executing program, kernel dump and dmesg
+> if someone need it, but I'm not sure how to safely attach large vmcore with vmlinux.
+
+The syzkaller program + C reproducer is usually enough, please make it 
+visible somewhere
+
+> 
+> Signed-off-by: Yunseong Kim <yskelg@gmail.com>, Yeoreum Yun <yeoreum.yun@arm.com>
+
+Should be two SoB tags
+
+> ---
+>   include/trace/events/qdisc.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
+> index f1b5e816e7e5..170b51fbe47a 100644
+> --- a/include/trace/events/qdisc.h
+> +++ b/include/trace/events/qdisc.h
+> @@ -81,7 +81,7 @@ TRACE_EVENT(qdisc_reset,
+>   	TP_ARGS(q),
+>   
+>   	TP_STRUCT__entry(
+> -		__string(	dev,		qdisc_dev(q)->name	)
+> +		__string(dev, qdisc_dev(q) ? qdisc_dev(q)->name : "noop_queue")
+>   		__string(	kind,		q->ops->id		)
+>   		__field(	u32,		parent			)
+>   		__field(	u32,		handle			)
+
 
