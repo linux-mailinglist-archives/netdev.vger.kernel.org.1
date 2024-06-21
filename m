@@ -1,190 +1,114 @@
-Return-Path: <netdev+bounces-105725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D4619127C2
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:30:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE9979127E5
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD82428BAAF
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 14:30:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27BE31C2632B
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 14:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B40023769;
-	Fri, 21 Jun 2024 14:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7550C2BD05;
+	Fri, 21 Jun 2024 14:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="G2riJ6mm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Th9ikI8M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6A1208C4
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 14:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CCC21360;
+	Fri, 21 Jun 2024 14:32:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718980204; cv=none; b=QmReqyGTPXBjHNnN01KXRc+BkBHNceBm6zppPq49w8GgcfUhvWx4CgoVDHrBTViRWmjL458LqluiO5ecNRqCd4z2W/O+svlvd3sFC2V76q4WYUq/q1V4xIN6CFkK1lskIPRE760h+BIxhwrNvCYnur4poP9W1Q16awlrhpQZLYk=
+	t=1718980378; cv=none; b=bD1QVZmspPzdxhNLJb/4ZQsw4ZUagK3IboeyQv7aiHJFQmHvX6YBOJXpsKJIwCTnH0wA2GWvFWkNGp5hNrqcTBIuG0ZIturxgNratg5o1+REGHYujrlkh4CFOHt6+M2SjyLtVV4C9o2fSac/ZXfCHd/BUpXW2Tv9xd6zpIBCsUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718980204; c=relaxed/simple;
-	bh=74XNNsrGcyt42W0i4MGFAN1ASfBc1WU+Wx8RPbhBId0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RPKHIQpdEE25sKEi9huJ4D/SFAGllBpJdcOXRYJENgfmKNwsrnA798WwHUyXh+eQwRBtgM3srvTIBWOLr6u8edrx8KcVJ57pzQtWPxOvBgjpshAUd+OUcehAqZJyrbEjN4ggpWkfc2y4jLAaNC9fXg8PrptzPq/GhER2jk2hrGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=G2riJ6mm; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-57d21b1c8efso2207271a12.3
-        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 07:30:02 -0700 (PDT)
+	s=arc-20240116; t=1718980378; c=relaxed/simple;
+	bh=y2udidGE9+3qrr4xwze+WwFEM6tINY0kQsOUc9cRJ8E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XM9r/4E712far3ZptenhPXs3bIa7D4GNjcicdvFqFcQTMnFK5S8D26/h9yY9ByBT8IFR6nU8JSDSo7frxMBey5dlCCyyrWp6noIGUwcNZcI9Oaev7/KZZA15dA6Iqn5ZcO0yGC4IEYLlPo6L1EvbJonEub2EY7c9Kq0oQ643IZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Th9ikI8M; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57cbc66a0a6so335420a12.1;
+        Fri, 21 Jun 2024 07:32:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1718980201; x=1719585001; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ne9VJpx8ATDhafgirOBTQVVX5apXj+MyTTRFOBCHPQI=;
-        b=G2riJ6mm83GI9hpvQ1ed6E3z1bAbY4V7dQde1ZnuiOP8gVTFLnV4hUSbkOCeKUGGzw
-         nKXNQDpabIsBHnUU9w8HTmxwh4ZBI5uNl7kPoptYXgm6Qb2d+/0Z3zTecIO9PGezlyvP
-         bNsMjYi58JVupyl/5NvNzfNcldHBLGGegAAXeaLWBvuSwLK8+VKzaMm6Y5bTFHGWTA6+
-         MpELz/t/tRJrah/6KM95zNpK9xeQtZ9m7dhrktL1nxIs68eZc2MuRwdfgzQoUq9JnqCq
-         oip+9sYRa252b5j2WlrC/LqVi+CcXh6V3iBLoiJXGzScQh6Pachbjv6Bq/go4O344F4Q
-         jCMg==
+        d=gmail.com; s=20230601; t=1718980375; x=1719585175; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bz2rrC9ZL5I956xjZlq5E9/RRfsNS0hX1EdfLss5p84=;
+        b=Th9ikI8MeKdcV3m5EkgITjgidu6nxGtUgNlRhzKonsywpMPYOZ+DdhxhdmiaDz3p0k
+         0xGBvW1zwa1sseHtRoHVCbzeZiEYavBtnjtUNymB8s1+Njk/qXmwHkfpgTvPYP4V5ZRr
+         MdAnzdayMcmkPb16ISOvqYSpzajH8lLBGZkAneHogQTU9CpHfalvkJKwtAgKKReAEGWW
+         7X74HA4jyzz77119PEcW030YXlmO4a+d/iYnkY4lSJ+v3Du1TtBe14xY60TcDNacaGJT
+         vUfeITTBtLO3URwYNU+g5mnknLS/prYF1cv6+E/lBUGQDf8G39rtWmyyaHGAI5EHhuVI
+         95AA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718980201; x=1719585001;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ne9VJpx8ATDhafgirOBTQVVX5apXj+MyTTRFOBCHPQI=;
-        b=hOSBBDHRNu4xVeB4ND2zsxYRQL8N9Zt8wPAHAbacsEHOwxJaXFMWhsmZyo9hjIJMn4
-         y8BGjEJn6B9esbNCV7fDPHbXxnhtMZQfNISPtlHNrPhCFEg6fB/ZcuCV0Ce9CKmRhhVZ
-         L6HG92VsFiuYYG4H9hTxh3C134v1qa/lxoxCNnFMQVUIzEVD3VQvUVSIGGQrlM4NtXq4
-         eBRGMMxvwuSs8OD82yVC7uNq93s7YC0oZ0rRQtpxNzM4XREpcs9dXBUxxLO7JKjbc9W/
-         YqlAw/aAFwaRQ9LwL7Y61+y1ML50DMU2+zmDLP7VDw+Svas3Jq1Ri37bAFn4nU0XHLga
-         0hFQ==
-X-Gm-Message-State: AOJu0YxfO+KkCrEpl6afwYGLr/pBYh7L9fNNc7AQk7JI9dU+gsZrdqVP
-	Cas1LYpYeossUVsKp5cX1MM1ANiC/LSQ2daxdBxuIh9G4xJizm5VlfLbt75TmD4p1pYN2HlDj7I
-	l35e+oC2ZvFZvr8dldHvYyqaIiI76i+K84g3fYQ==
-X-Google-Smtp-Source: AGHT+IHSOppKzSm+kjtySl83Xy2s0lY1tdgWQ/xnbihr5ZcC5awX/1jregyRR8ecqABG8aV7I3my61NvkLz1w0cvTgQ=
-X-Received: by 2002:a50:d699:0:b0:579:ca97:da1b with SMTP id
- 4fb4d7f45d1cf-57d07e0d427mr5079082a12.6.1718980200824; Fri, 21 Jun 2024
- 07:30:00 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718980375; x=1719585175;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bz2rrC9ZL5I956xjZlq5E9/RRfsNS0hX1EdfLss5p84=;
+        b=FckHNUhE1+ie5moM9IqXbtG5khu1ZWBs7146M2XDYRLV4QMlpimsbOjD4+INhWmOG3
+         GvYpBH1jn0AUpUoMcu6FMWOfSRDf5E+uAERNqpMh/M9HC4w5Ov8aYNRH7Xq54qyidVGJ
+         3gdXtc3RVKp9jstp/F67ZepkNnnpZxKCiMaCCq4/G3S29YxLSP7Y5fTFKAiO4DbZ6Hh9
+         KI2pwDGepClE1QZbNWrtQl0tGcwgdcEox8aLRThCwL39W13ZsCrXDTZOT7iLxUQbfdhy
+         mAxmw/XRCDRHndAmVA4VMGc4BcwadZIAWvJ52qCILSM07KNSek8IKx9uRG1tbUHImdnG
+         C/uw==
+X-Forwarded-Encrypted: i=1; AJvYcCUgYfUE4JXTc1U1QjCpQogUNnJSWg8B74SAZAMTKShd4si0aiM1WsNJkIcHbF7M1tYukCU1f1J/rhC9UOoVUyD5iTFnojxSriEFeSqO
+X-Gm-Message-State: AOJu0YzqbXaXjbI5x5mUojOYaAtcrTd+VJyhrgDPXYrG68JCQigFRI/S
+	Qtur/kufAFbkUaUWO8602X8ue5zZ1oEGPGHiIBuVDUzrXFH2HFO2
+X-Google-Smtp-Source: AGHT+IGS8AR5Fn/djK91tTlDQrcYmUhnQO2DQVytIhnhISToCyjjKJZZHOONQ9w8rlaNNWohTEXVUw==
+X-Received: by 2002:a05:6402:165a:b0:57d:1d0a:fc91 with SMTP id 4fb4d7f45d1cf-57d3e03feccmr14176a12.10.1718980374864;
+        Fri, 21 Jun 2024 07:32:54 -0700 (PDT)
+Received: from skbuf ([188.25.55.166])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57d303da378sm1003108a12.18.2024.06.21.07.32.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jun 2024 07:32:54 -0700 (PDT)
+Date: Fri, 21 Jun 2024 17:32:51 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 04/12] net: dsa: tag_sja1105: absorb entire
+ sja1105_vlan_rcv() into dsa_8021q_rcv()
+Message-ID: <20240621143251.nnt6ynruwsnhyc4g@skbuf>
+References: <20240619205220.965844-1-paweldembicki@gmail.com>
+ <20240619205220.965844-5-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1718919473.git.yan@cloudflare.com> <b8c183a24285c2ab30c51622f4f9eff8f7a4752f.1718919473.git.yan@cloudflare.com>
- <a1c983cdb95bdd44385dae29ca7451da16a70c98.camel@redhat.com>
-In-Reply-To: <a1c983cdb95bdd44385dae29ca7451da16a70c98.camel@redhat.com>
-From: Yan Zhai <yan@cloudflare.com>
-Date: Fri, 21 Jun 2024 09:29:49 -0500
-Message-ID: <CAO3-Pboc_r-owOxkZcD9Tyo4MD0ey9bBJj827R+o_NnMMkF2Ow@mail.gmail.com>
-Subject: Re: [RFC net-next 1/9] skb: introduce gro_disabled bit
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Willem de Bruijn <willemb@google.com>, Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, 
-	Mina Almasry <almasrymina@google.com>, Abhishek Chauhan <quic_abchauha@quicinc.com>, 
-	David Howells <dhowells@redhat.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	David Ahern <dsahern@kernel.org>, Richard Gobert <richardbgobert@gmail.com>, 
-	Antoine Tenart <atenart@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
-	Soheil Hassas Yeganeh <soheil@google.com>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240619205220.965844-5-paweldembicki@gmail.com>
 
-On Fri, Jun 21, 2024 at 4:49=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On Thu, 2024-06-20 at 15:19 -0700, Yan Zhai wrote:
-> > Software GRO is currently controlled by a single switch, i.e.
-> >
-> >   ethtool -K dev gro on|off
-> >
-> > However, this is not always desired. When GRO is enabled, even if the
-> > kernel cannot GRO certain traffic, it has to run through the GRO receiv=
-e
-> > handlers with no benefit.
-> >
-> > There are also scenarios that turning off GRO is a requirement. For
-> > example, our production environment has a scenario that a TC egress hoo=
-k
-> > may add multiple encapsulation headers to forwarded skbs for load
-> > balancing and isolation purpose. The encapsulation is implemented via
-> > BPF. But the problem arises then: there is no way to properly offload a
-> > double-encapsulated packet, since skb only has network_header and
-> > inner_network_header to track one layer of encapsulation, but not two.
-> > On the other hand, not all the traffic through this device needs double
-> > encapsulation. But we have to turn off GRO completely for any ingress
-> > device as a result.
-> >
-> > Introduce a bit on skb so that GRO engine can be notified to skip GRO o=
-n
-> > this skb, rather than having to be 0-or-1 for all traffic.
-> >
-> > Signed-off-by: Yan Zhai <yan@cloudflare.com>
-> > ---
-> >  include/linux/netdevice.h |  9 +++++++--
-> >  include/linux/skbuff.h    | 10 ++++++++++
-> >  net/Kconfig               | 10 ++++++++++
-> >  net/core/gro.c            |  2 +-
-> >  net/core/gro_cells.c      |  2 +-
-> >  net/core/skbuff.c         |  4 ++++
-> >  6 files changed, 33 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > index c83b390191d4..2ca0870b1221 100644
-> > --- a/include/linux/netdevice.h
-> > +++ b/include/linux/netdevice.h
-> > @@ -2415,11 +2415,16 @@ struct net_device {
-> >       ((dev)->devlink_port =3D (port));                         \
-> >  })
-> >
-> > -static inline bool netif_elide_gro(const struct net_device *dev)
-> > +static inline bool netif_elide_gro(const struct sk_buff *skb)
-> >  {
-> > -     if (!(dev->features & NETIF_F_GRO) || dev->xdp_prog)
-> > +     if (!(skb->dev->features & NETIF_F_GRO) || skb->dev->xdp_prog)
-> >               return true;
-> > +
-> > +#ifdef CONFIG_SKB_GRO_CONTROL
-> > +     return skb->gro_disabled;
-> > +#else
-> >       return false;
-> > +#endif
->
-> This will generate OoO if the gro_disabled is flipped in the middle of
-> a stream.
->
-> Assuming the above is fine for your use case (I think it's _not_ in
-> general), you could get the same result without an additional costly
-> bit in sk_buff.
+On Wed, Jun 19, 2024 at 10:52:10PM +0200, Pawel Dembicki wrote:
+> +not_tag_8021q:
+> +	if (vid)
+> +		*vid = tmp_vid;
+> +	if (vbid)
+> +		*vbid = -1;
 
-Calling it per-packet control seems inaccurate here, the motivation is
-to give users the ability to control per-flow behaviors. OoO is indeed
-a consequence if users don't do it correctly.
+I can confirm that the vbid assignment isn't needed here.
 
->
-> Let xdp_frame_fixup_skb_offloading() return a bool - e.g. 'true' when
-> gro should be avoided - and let the NIC driver call netif_receive_skb()
-> instead of the gro rx hook for such packet.
->
-For rx on a single device, directly calling netif_receive_skb is
-reasonable. For tunnel receivers it is kinda inconsistent IMHO. For
-example, we terminate GRE tunnels in a netns, and it is necessary to
-disable GRO on both the entering veth device and also the GRE tunnel
-to shutdown GRO. That's why I'd hope to use a bit of skb, to be
-consistent within the same netns. Let me add a bit more context to
-clarify why we think this is necessary in another thread.
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Tested-by: Vladimir Oltean <olteanv@gmail.com>
 
-best,
-Yan
-
-> All in all the approach implemented in this series does not look worthy
-> to me.
->
-> Thanks,
->
-> Paolo
->
+> +
+> +	/* Put the tag back */
+> +	__vlan_hwaccel_put_tag(skb, vlan_proto, tci);
+>  }
 
