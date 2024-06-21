@@ -1,84 +1,159 @@
-Return-Path: <netdev+bounces-105813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 903F0912FA5
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 23:37:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 045E4913038
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 00:20:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB266B21828
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 21:37:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6072DB26093
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 22:20:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EE017C226;
-	Fri, 21 Jun 2024 21:37:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D650680C03;
+	Fri, 21 Jun 2024 22:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="znN+MfEU"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="eaJoWhoq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic310-31.consmr.mail.ne1.yahoo.com (sonic310-31.consmr.mail.ne1.yahoo.com [66.163.186.212])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659D9208C4;
-	Fri, 21 Jun 2024 21:37:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164EA36127
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 22:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.186.212
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719005832; cv=none; b=TuWpleDry3w1zsF+45J1PRJh2vODZ0jwus4GPfIv26zrdcMO+WFe92TvlpD1NgFEq59z9x+uzwVN7qDWLecfsQ4RHN/GK3We5S3iZYhHsXVKpjm4tn2LCMU1iW4eGHmvgCq3sBjowfBnSS9Nh3IfiC0APuu8YogpVSVzFdBJ6H0=
+	t=1719008445; cv=none; b=dKghHH+c1iLfsmdR37iectjerYXDz1iNgP8jWNthA4lj8Y2YSl/ax+pT03BylstdDb8eoeKEyHifMIv86u5n6N+Pawq/ddTLXfdrqLLyhIFGdLhOZfqHzVCY67JQjNPtntSYsQ1Rk6p6nF2oI+gdkwWQJ5HmXPo64QMS7D/llMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719005832; c=relaxed/simple;
-	bh=HqB7/AiiMRvyE1Jtm5iJcbfxhyhyihsPuCco+kkArsg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fkBhvflch6ocxljAR/zKSFeNBGD4kGo1zBQtn2sU9uSxLIsbDzfCHW7SYKN72Xyklji7HQOrqUQBKsAVLBoDxs3K0dRp88CJBS/cJ0eEyaUYMymFGs6bON5RWWejUlFcvKn0WiCJPuPOM5lmehq5L9aglhUk9bTto/B9Hsn/1S8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=znN+MfEU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABBB3C2BBFC;
-	Fri, 21 Jun 2024 21:37:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1719005831;
-	bh=HqB7/AiiMRvyE1Jtm5iJcbfxhyhyihsPuCco+kkArsg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=znN+MfEU4yTVh3qkQUN8MlWRuNI/dIs1ZQ/kTFRfl0JsI1fsVJ/j//iDo29ZvPb5+
-	 J1J3fAxZurEhKzfuN2gssGCiefy5/5dFZrm8Va7B8A5ESC/I5pfLCg9sVgWPa2LXyF
-	 cNd0SArSL9CmDCfo9pO6lacTxqQEjHH6dn4iWTrk=
-Date: Fri, 21 Jun 2024 17:37:10 -0400
-From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-To: Kees Cook <kees@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, 
-	Carlos Bilbao <carlos.bilbao.osdev@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, workflows@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, ksummit@lists.linux.dev
-Subject: Re: [PATCH v2 2/2] Documentation: best practices for using Link
- trailers
-Message-ID: <20240621-amorphous-topaz-cormorant-cc2ddb@lemur>
-References: <20240619-docs-patch-msgid-link-v2-0-72dd272bfe37@linuxfoundation.org>
- <20240619-docs-patch-msgid-link-v2-2-72dd272bfe37@linuxfoundation.org>
- <202406211355.4AF91C2@keescook>
+	s=arc-20240116; t=1719008445; c=relaxed/simple;
+	bh=/3OUXbxbh4HVBBwvgsX+pbK2kz+8OtQOGQtbeuGta1o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=drWCVjHos+w9B47WLN9AcevCYxhwW2q1GkuQ0tih3B2SDqHdot4405EGXAZyAl9wcZv0r1vIV0wVxGj+EK5bTY0w/lS7kjd8olt6ElY/FezyLfxr2t+VamFeR8g9Si0gj8izWBpNsLmjXq2M9EojRO3FjA6C7KdmmZsFMWuq1Cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=eaJoWhoq; arc=none smtp.client-ip=66.163.186.212
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1719008443; bh=W93MUuqF8YI2qTC2EngAWFfgxbIWTzpfO4cxB6FzZ44=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=eaJoWhoqBXMVllfmA75k+JsLZlPd0TsN1wQwYQ2RbAQd+A5YxINPuev95vgvqh7G0qsb0tGIwnaf7a5dec5CuYV4UtK9vbxR6AYvqbn1dhmPKDnEvr4mFfZkkJLQgjhfeIOB3alaYzs3/NuOWhHjvwTNOC8m4llglOOcwTu8JuGpOoR+Gwtl7qe5GTrPQBi/eGNlSOzZxn3yqkIoIAQoixofXz9K9BCICJTXjF8WHG68veocfcq+3NUgdSdQxmadNoXEeeJ5Z+uJ/z3jRnozxq29fCp4JA7efpoVubcek4uF9nPz649BpcgxLgB/RVsPCSKQLP1aNjyobp7HSor4jw==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1719008443; bh=8pDr9k/Pi/rDVlxxCgm86Wt7MkI52wXLUCH7VWFere+=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=pjV5klm8gXAGU1EyeYxfyrVwKt9Ay/8ArsUGVj9xT178ismJb/lEKgQFF0XGXlNQ5KOqPEJbEKjcKW+mpQm1NZqF0PVN8TopG5IHRXHEeOsKunXEHPd4CMeCmI+a/J2L//7x4pPaMPluVa3UV2m02XcfRHkua8jEAw0R72FqhbKTHbdWueRZlhPqutD2prJS5W7oRmhXFqm+h215nmVlch099O5DSXuF/TU9+4yPiJc336zOR2xyRElOOTA/zVB+1HzOxSOMwUw6WRBMks+oKsoUl4Cj9ZB4SPQ9JWIZV68SUXSERpkNiR85IJF1WqCgjqizW9Pc4ZZG3xzKPQkfwA==
+X-YMail-OSG: xHIJgvYVM1l_e5pHrqiy_yh8PxQUmnnZNw03DwldaoYhvIGtjxoRyA1hUkbJVF2
+ SyOTADNPwKlhsH4_83zkPIKbRq.Q0DDQVZXhiAYJiSXcCpI4pkxrfdfI3vWbH_etfKHXhHTVjZSE
+ HA9zfNysDePb7ZPyH_ti6YBa2UBkPKPpnnvew_UvKOdqFRm71QQRYfAegjLsmc9dSBpn_3HWkfhq
+ 2x0HKa_ysth7HW2P1UYkZvIszKuYDsub_iF_rSh8nYr65Q1fDLOSK9UpkwRw1a12c3eFmJlbg0gG
+ Ps.qhuEdAr69Y3LbxLYIrKwm1QmlWSyFaCxW4GRYkAmyhSzc8GD..EoXavTvvE8fvz8AAOZYWO2Q
+ o3oiK8stAertTzEtGqR0VWSFo1XxCDtA2Im6C9LiZ99jz75WJ.24MDm1a5yBTXJFqFBe0p13NiRI
+ laAyoDkDOk1F11Zw.0bvEP5UrWMudvqUqBMOcoVmVQHQCeUBz8ignD9gGW8tWJmNH5YIn9OL1EAC
+ sLK6kt9hL_Pg00d2R.TgEfim0FuBicqwA1PecLiM4YD_llWpfGSbZ1LIDtys8G2TXmDsA52XupJx
+ PMZjxcX8z7U_Z4l19e7ijxZrDfSkg02CsUczSeAbhYVo.NUZLs_Rb6nmI.15KZLAmHmqd_xQlpSE
+ HmNNwR.v7AxvawVtBWhMpYm4Fien70j10RRBAXyJ3xDHBseTIV7f_f1eAJzEQfKRtHy1jSFI_5O6
+ 9W4ox2yyxPEAeIyvRTDJ3DpJXsE_QCHuPUaY23.mIkOVS6vbqAUc6Jes1P2vRpSC2fto3GRdtTCt
+ BuaJOI1owyBSFNasUaLZb3jT1bVk.4EKVT2a56pf.sHQCSbSxXgGi6aJ0BJffqA2gp_i8u1oSZ3f
+ 6N.WKA.hUb2iRQ7lBTIaV.2JXAVAuRJdP0_rCTSyDr443NZTQ_GHzuY3STxDEXNsHP2BX2lIa2JT
+ UPUwrhHrgTQGt40I8FtCXt0fPc.do3fDAEvnbMj3yd5kzy34.U2DukQcJ3ykWDIRnZKgwaQBFlbT
+ 2SPn6B6Yfte1JmW9oVQBt6Bcr0eQv.Jwsjrus0mnWb1DVqrjLzOZuLMlwC3u0oxqaRTJfpvyZcQD
+ k_bAPui8HfxrlGg_yH.wqVeDrUAvUUuOv66uKwagBp2Eyl_eVayXfj3f2RzP2xxd8enU.owi.whw
+ 4j1OiGmAUtbNINy3mzjjRpaIQoFuR577yzUkFvYzKka61bZN61J_YbfDuPhwUlBePngWeWdasony
+ XyvXRR9ac5F2y3agMebnLJSGv0E0n1RJurZ12HYCGD_mRUNfVTw_vyGNYReqT.7d32FalsrkhXNM
+ YE7X70zZYy.QvxBzsj9hBywvB1wAn131GV3nDNvyu03jd9V32qpkMJUAeZ2O0s36i_sjiky2RBnE
+ IR9_V9wk3p3jbdJ7umKG0BtTNjwHO2yc.K1TxmSmTGg.YyAgWznGK4qarj.5z_LAWmyAVyNnpFVI
+ EUIeRBnK.jdm.oeBa_etlm.RFulscNElPDHZJaIfhlqoxSiSf0pApy_vsW756ibuOUjqt9RIaFfy
+ FiaURzn6l_1w4u6FvRoYbgGCOW1tSciD3ceLtTOCX_0Az.et8w67gzyvtLQ9wApkF8Pru3jCYO3U
+ SqnGkd1jqaq.D.BWNalIaF3QkpLZor5mF09f1GiHTJTmQLzRtdMbbmXBF6cDdoHhmBSgAFBWvScq
+ b.DzMpIcEfNHzmK.O17slhHyZ_jfQFXwhAIJAbifTkTVWxx.PwMVxHWIpeLuhEukWJgfAF8Off20
+ VCejX_LNPVoO5MDUVNnB.UeFvWep7en17N7Y6GMQ3jmJWoF7EUmjPdDrF.JPqiWCXfeksdI5Cwfx
+ oKAkT7Eci3JBKS0SDAE9z3tItrRYpvceo37.dySQuLtrLhJa0ImT69QsKnCtTEo95RjTqcDKLJL0
+ dxMhgkNhQdt3.dTjhhaQdvRTgawMLhdFz5vaILGYncO00Zy03VhwmPwkoaYJG2GlPcd.flgMobOs
+ 3tsHIk32BxbadWd5a5QpKTxIP9VT4cScMqPZr0iu.ikEYWkmxj15JdbnXchSsW7B_J_QDOGtprtl
+ bKecFPJEE5a1OCuLLQKrB1xulpgMCgz24Ns60rT13dXBf4iSvPUG_fruCb1xupgZhY4HVVIHS0uD
+ SHd1H0ZWEvi9xgJFapzZbp_zTk1SpF3cNUx3FPJc6.k7Y2YYZ2rba22bJEOwnDg5Y6dpidlYfXBz
+ YOknam3R1lChQ7W0ePQWNYxezpArxdnk8PnmZkKVtSmrwCXzeAxdoz3O1wLXzb.2IT3Ln8viyS9w
+ -
+X-Sonic-MF: <casey@schaufler-ca.com>
+X-Sonic-ID: 40e448d0-786a-4711-84b1-e00c610a0ba3
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic310.consmr.mail.ne1.yahoo.com with HTTP; Fri, 21 Jun 2024 22:20:43 +0000
+Received: by hermes--production-gq1-5b4c49485c-75jqb (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID fa3be147b3108ab3bb88dd26f261d3a7;
+          Fri, 21 Jun 2024 22:00:25 +0000 (UTC)
+Message-ID: <2cddc480-f911-44e3-b415-33e0cec2964c@schaufler-ca.com>
+Date: Fri, 21 Jun 2024 15:00:22 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <202406211355.4AF91C2@keescook>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC] LSM, net: Add SO_PEERCONTEXT for peer LSM data
+To: Paul Moore <paul@paul-moore.com>
+Cc: LSM List <linux-security-module@vger.kernel.org>, netdev@vger.kernel.org,
+ linux-api@vger.kernel.org,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+ Casey Schaufler <casey@schaufler-ca.com>
+References: <763db426-6f60-4d36-b3f9-b316008889f7@schaufler-ca.com>
+ <83ef6981a29c441b58b525e9292c866a@paul-moore.com>
+ <c59a4954-913b-4672-b502-21aa683d7cdb@schaufler-ca.com>
+ <CAHC9VhRjbWuFeprjNP3r7tU27cW6bEZytWq-3XTjzoN7Ki-zzQ@mail.gmail.com>
+Content-Language: en-US
+From: Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <CAHC9VhRjbWuFeprjNP3r7tU27cW6bEZytWq-3XTjzoN7Ki-zzQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Mailer: WebService/1.1.22407 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-On Fri, Jun 21, 2024 at 02:07:44PM GMT, Kees Cook wrote:
-> On Wed, Jun 19, 2024 at 02:24:07PM -0400, Konstantin Ryabitsev wrote:
-> > +   This URL should be used when referring to relevant mailing list
-> > +   topics, related patch sets, or other notable discussion threads.
-> > +   A convenient way to associate ``Link:`` trailers with the commit
-> > +   message is to use markdown-like bracketed notation, for example::
-> > ...
-> > +     Link: https://lore.kernel.org/some-msgid@here # [1]
-> > +     Link: https://bugzilla.example.org/bug/12345  # [2]
-> 
-> Why are we adding the extra "# " characters? The vast majority of
-> existing Link tags don't do this:
+On 6/21/2024 12:41 PM, Paul Moore wrote:
+> On Fri, Jun 21, 2024 at 12:06 PM Casey Schaufler <casey@schaufler-ca.com> wrote:
+>> On 6/20/2024 2:05 PM, Paul Moore wrote:
+>>> On May 13, 2024 Casey Schaufler <casey@schaufler-ca.com> wrote:
+> ..
+>
+>>>> +/**
+>>>> + * security_socket_getpeerctx_stream() - Get the remote peer label
+>>>> + * @sock: socket
+>>>> + * @optval: destination buffer
+>>>> + * @optlen: size of peer label copied into the buffer
+>>>> + * @len: maximum size of the destination buffer
+>>>> + *
+>>>> + * This hook allows the security module to provide peer socket security state
+>>>> + * for unix or connected tcp sockets to userspace via getsockopt
+>>>> + * SO_GETPEERCONTEXT.  For tcp sockets this can be meaningful if the socket
+>>>> + * is associated with an ipsec SA.
+>>>> + *
+>>>> + * Return: Returns 0 if all is well, otherwise, typical getsockopt return
+>>>> + *         values.
+>>>> + */
+>>>> +int security_socket_getpeerctx_stream(struct socket *sock, sockptr_t optval,
+>>>> +                                  sockptr_t optlen, unsigned int len)
+>>>> +{
+>>>> +    struct security_hook_list *hp;
+>>>> +
+>>>> +    hlist_for_each_entry(hp, &security_hook_heads.socket_getpeerctx_stream,
+>>>> +                         list)
+>>>> +            return hp->hook.socket_getpeerctx_stream(sock, optval, optlen,
+>>>> +                                                     len);
+>>>> +
+>>>> +    return LSM_RET_DEFAULT(socket_getpeerctx_stream);
+>>>> +}
+>>> Don't we need the same magic that we have in security_getselfattr() to
+>>> handle the multi-LSM case?
+>> Yes. I would like to move this ahead independently of the multi-LSM support.
+>> Putting the multi-LSM magic in is unnecessary and rather pointless until then.
+> Starting with the LSM syscalls, I want any new user visible API that
+> can support multiple LSMs to have support for multiple LSMs.  Yes, the
+> setselfattr API doesn't support multiple LSMs, but that is because we
+> agreed there was never going to be a way to safely support that usage.
+> In this particular case, that same argument does not apply, we could
+> have multiple LSMs returning a socket's network peer information (even
+> if we don't currently see that), so let's make sure our API supports
+> it from the start.
 
-That's just convention. In general, the hash separates the trailer from the
-comment:
+OK. I'll put that in v2 as well.
 
-    Trailer-name: actual-trailer-body # comment
+>
+> Unrelated to the above, it would also be good to datagram support as a
+> patch 2/2 thing in a future version of this patchset.  Please be
+> careful not to carry over the mistakes we made with SCM_SECURITY (see
+> the GH discussion linked below).
 
--K
+That's "in my queue". I didn't want to spend time on it until I got
+feedback on this one.
+
+>
+> * https://github.com/SELinuxProject/selinux-kernel/issues/24
+>
 
