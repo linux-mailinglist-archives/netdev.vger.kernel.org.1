@@ -1,76 +1,80 @@
-Return-Path: <netdev+bounces-105782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F727912D50
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 20:40:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57BCB912D4F
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 20:40:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1F07B22789
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 18:40:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE1A01F2176F
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 18:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0580217A934;
-	Fri, 21 Jun 2024 18:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89E51684AA;
+	Fri, 21 Jun 2024 18:40:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NVfFIBou"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvvVw2pN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B373116631C
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 18:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F26C8820
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 18:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718995211; cv=none; b=FhLxNxz6QE8KzTDSXg7/k4cyMznJMw/DGofZu186sWh8jQdMSUpME0Ll6T+8raMarZ3lW/ieUb4CSBLLflfkB1pgN2GROpt4gd5IaJVCe3OQaVvecP4mgFLOhvNXzWqYIvA/VvtX4oUTTPik/Oy2KoNRzqYBpQJQNeFzxeDXgyA=
+	t=1718995211; cv=none; b=dwILw3t/VW09Z3swhRMud2OvBfQOwMZdjyVEQshHPXr2OA3Ud2ljn9rXwaG1ytMoN8S4WKkyfdNGLLF/7mvXGPodoQ8cmm8q/TSxgkFMAkQ7JOIroo+Nd3qbs8CrdsammvXu4a7DPMnfQkjCwSZhRxlr3r8w8aG9oEyVSzDQwVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718995211; c=relaxed/simple;
-	bh=rApctIhVi7cdAOhEyqi+uhU0WgA1lcXErGhYm2mePr0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eTefD9E3kJs0dq4d5c9ChC3csGYvWRlMznc3MNEpmp2wbArSRfMwtTecwG4j6ADIKq3SUd7wI1LeGDt/KkXy7O4VVcZme9c0YQ2TbIDOuz6exRrjmeYJpgX9YWRQhU4JSJRGAKU8h6T2wMLIFBK7Ih4pyrgXI9C9oqZ/gbfRtrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NVfFIBou; arc=none smtp.client-ip=209.85.161.53
+	bh=KdYeKBr4GE3XLiqNm9PoEa7iY9lF/A9jXufuvajDY0Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=IdGIHIqjBFxHB4CN9XnjRXl7gO1Nd59Cg6gHhih91wbVrX/eeiWRHeENfhLKNzWLgNhoClEleriUz1w/9kv4z/dJyaLPemv0vbEuRDGutWGZREwDFdIKSLGL8RwCm6JcY+G4F3kcSnFvfkyfxrIVhyXYGCBro9rysEvXJloWMIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dvvVw2pN; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5c1b27e0a34so1097252eaf.2
-        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 11:40:06 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-70664eaa14aso32511b3a.0
+        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 11:40:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718995205; x=1719600005; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3/GH/FDXuyfNhUERuFE3PVy696MmJwbOJjjtZC6JyQ0=;
-        b=NVfFIBoujkKO2EbkaPQqI4F/pueRhYHwfQ1czyuV6Kop0JVfPGyNG8cLKmx7kXj2As
-         EK47Nq8s8fcOWhHNymqeu5h++dVi5s6IYMRLQLgDnohuFkaOLOQPT256swtEBWF5OTeq
-         FB0Ses58Ns1R516MUrg3UeHGcT0j8CtdXuZACoZ0tII3nxPJVM9bRLaO3akOBizRIgaE
-         TGvCRcmOhFpA5QQNSbHGsiERvSbClxytgDOmWDB46FGUHZhcrm71L/Eq5eOloNzFB15J
-         TD6BlHAzx7o28Zx/so6/HuiZXPrAW2zMxj6JPEkfYENbENTP7bsBvjXjp23bHvng3fd7
-         dDUA==
+        d=gmail.com; s=20230601; t=1718995209; x=1719600009; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6P3Gdc0qfrmDJeJXUl6nP3lBuuq2/4cAEsXf9G6JMHY=;
+        b=dvvVw2pNXL8FYa46lhJlAJlC+I/dKhBMUuZuIhtU/rD5f8qXdA7LoTjX+1WMyoES5R
+         MsNuGy4LPg+5cQyVj8ZjZP8O5heLSK1l0UDZU0y5qkc6F17MmI655q/7mmBFre21yp/B
+         2a/bU5XwOP+tBk6Zu+lepf4kpYzUWMn9MIKx0t1wUeeYlllvMfWlM7zSuqZ4UEb0xBVI
+         BR1haV5d9nS3GzFCPielgYzk+dleJc6DFEp1sFmbbhVhNpEkVA7dCgj6RQTUoe+ostmG
+         xfO6egrlVrUq4Tn9VQA6wsN1Tkm6D11r5Bo/343JBSh5SHX8zhd69rNsmyUuNzdHzlrz
+         +wMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718995205; x=1719600005;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3/GH/FDXuyfNhUERuFE3PVy696MmJwbOJjjtZC6JyQ0=;
-        b=AcXUsgXybJLKr4Pr7gnhnIWZ7GOjEMxnUz4Bs+Mr23UdSKBQRDSIXmhgiLp9ytf/S1
-         X/REakWxV20vGSwIOir6Q/dC8kih4EKboQ3L47hoYzc2zcGzRHM0Xr+6ETIAIevTobbW
-         9ypJS8d9HhOE73w3iXL7HscTTyh0bpriOX0/UfOabFCtS/iclvVPOp2SsT4Mrrq6B4ZF
-         3d67ndSOKjll17CaCXFgQ0e+rpmjkEQxwq1+Xea3KDXf4bVV4nfcjIJExytC2oDmvlGB
-         bJ4CXCUIVo5ILVWFK/3Dk6jSU/3RYGiYHUCD71+31mruwV+h0BxdSA0EhV3Ada84IDu4
-         EywA==
-X-Gm-Message-State: AOJu0YzLx/4iptT/zD2DXRDAcJ3IT2eEgz7U9UBNXF28NAFwEnQut1pF
-	Q6mZ1pXZ0/xzqkGIeu/zmaWTiEPq4pN9ztCSskY9hBzVYaDqsf+2QkyfCw==
-X-Google-Smtp-Source: AGHT+IEz1SBhnLCXZVt1JbJLummokJyDTqmrS5cJ7fn7kY03Xac8ItvSw2aNuZFoiiObc4BtX+f/Tw==
-X-Received: by 2002:a05:6358:6f19:b0:19f:3ee1:d1b1 with SMTP id e5c5f4694b2df-1a1fd60ba91mr1003914655d.31.1718995204588;
-        Fri, 21 Jun 2024 11:40:04 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718995209; x=1719600009;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6P3Gdc0qfrmDJeJXUl6nP3lBuuq2/4cAEsXf9G6JMHY=;
+        b=QQlFxRhewa/Y6zTexHZKxaYE2+W2Zz3UEOyBn62ooTJ2MVQ+hysCBA4uiU1nmPyMBi
+         A7SCKA3vujSjwhX6ohrEoBPLMjPB75RmsAr8CKlEph5N/NegYupNjp/b78rC+s57KuFC
+         wweC5cAXbS8RglfHM1059PJHbFwWjzeTppNwuEktGANkBh1Ghb0gr+1EVCLCwCcd5BFG
+         kOwYmGbvzE3ZugbO2i3QIvy9UyIuMVdikk5pPWjoszlJ1mLk7ADwGvjfTicyFjX3jEQe
+         UlAuUBWjKSb5RSCZxW+wuJo7pq386AVrK+wfZn1yxUGWKINCh1Iq5CCzuMkYZPVLxJg5
+         jfxQ==
+X-Gm-Message-State: AOJu0Yw1BDQeHV7HdoY/GD3GnVjrB5A3ASjVFsPex6kFjRlU0uQShZ2B
+	hXcMa0jHOKTpTqs6dsE01dE/ID1cX0Xvzf5NFIyTSvxSWCg1j03obiHXDQ==
+X-Google-Smtp-Source: AGHT+IFbIKXN5a1z73zw7UaGiDxe2V+RM1hIsn2p0D/nwx2DRSQyLdE0qlSuE0SZ3HWLhEX9PhXSuA==
+X-Received: by 2002:a05:6a20:6702:b0:1b2:b3a5:22b2 with SMTP id adf61e73a8af0-1bcbb6abebdmr8873886637.60.1718995208856;
+        Fri, 21 Jun 2024 11:40:08 -0700 (PDT)
 Received: from apais-devbox.. ([2001:569:766d:6500:fb4e:6cf3:3ec6:9292])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-716b3ee8c95sm1443984a12.31.2024.06.21.11.40.03
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-716b3ee8c95sm1443984a12.31.2024.06.21.11.40.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jun 2024 11:40:03 -0700 (PDT)
+        Fri, 21 Jun 2024 11:40:08 -0700 (PDT)
 From: Allen Pais <allen.lkml@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Allen Pais <allen.lkml@gmail.com>
-Subject: [PATCH 00/15] ethernet: Convert from tasklet to BH workqueue
-Date: Fri, 21 Jun 2024 11:39:32 -0700
-Message-Id: <20240621183947.4105278-1-allen.lkml@gmail.com>
+Subject: [PATCH 01/15] net: alteon: Convert tasklet API to new bottom half workqueue mechanism
+Date: Fri, 21 Jun 2024 11:39:33 -0700
+Message-Id: <20240621183947.4105278-2-allen.lkml@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240621183947.4105278-1-allen.lkml@gmail.com>
+References: <20240621183947.4105278-1-allen.lkml@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,95 +83,146 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The only generic interface to execute asynchronously in the BH context is
-tasklet; however, it's marked deprecated and has some design flaws. To
-replace tasklets, BH workqueue support was recently added. A BH workqueue
-behaves similarly to regular workqueues except that the queued work items
-are executed in the BH context.
+Migrate tasklet APIs to the new bottom half workqueue mechanism. It
+replaces all occurrences of tasklet usage with the appropriate workqueue
+APIs throughout the alteon driver. This transition ensures compatibility
+with the latest design and enhances performance.
 
-This patch converts a few drivers in drivers/ethernet/* from tasklet
-to BH workqueue. The next set will be sent out after the next -rc is
-out.
+Signed-off-by: Allen Pais <allen.lkml@gmail.com>
+---
+ drivers/net/ethernet/alteon/acenic.c | 26 +++++++++++++-------------
+ drivers/net/ethernet/alteon/acenic.h |  8 ++++----
+ 2 files changed, 17 insertions(+), 17 deletions(-)
 
-This series is based on 
-commit a6ec08beec9e ("Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net")
-
-First version converting all the drivers can be found at:
-https://lore.kernel.org/all/20240507190111.16710
--2-apais@linux.microsoft.com/
-
-
-Allen Pais (15):
-  net: alteon: Convert tasklet API to new bottom half workqueue
-    mechanism
-  net: xgbe: Convert tasklet API to new bottom half workqueue mechanism
-  net: cnic: Convert tasklet API to new bottom half workqueue mechanism
-  net: macb: Convert tasklet API to new bottom half workqueue mechanism
-  net: cavium/liquidio: Convert tasklet API to new bottom half workqueue
-    mechanism
-  net: octeon: Convert tasklet API to new bottom half workqueue
-    mechanism
-  net: thunderx: Convert tasklet API to new bottom half workqueue
-    mechanism
-  net: chelsio: Convert tasklet API to new bottom half workqueue
-    mechanism
-  net: sundance: Convert tasklet API to new bottom half workqueue
-    mechanism
-  net: hinic: Convert tasklet API to new bottom half workqueue mechanism
-  net: ehea: Convert tasklet API to new bottom half workqueue mechanism
-  net: ibmvnic: Convert tasklet API to new bottom half workqueue
-    mechanism
-  net: jme: Convert tasklet API to new bottom half workqueue mechanism
-  net: marvell: Convert tasklet API to new bottom half workqueue
-    mechanism
-  net: mtk-wed: Convert tasklet API to new bottom half workqueue
-    mechanism
-
- drivers/net/ethernet/alteon/acenic.c          | 26 +++----
- drivers/net/ethernet/alteon/acenic.h          |  8 +--
- drivers/net/ethernet/amd/xgbe/xgbe-drv.c      | 30 ++++----
- drivers/net/ethernet/amd/xgbe/xgbe-i2c.c      | 16 ++---
- drivers/net/ethernet/amd/xgbe/xgbe-mdio.c     | 16 ++---
- drivers/net/ethernet/amd/xgbe/xgbe-pci.c      |  4 +-
- drivers/net/ethernet/amd/xgbe/xgbe.h          | 10 +--
- drivers/net/ethernet/broadcom/cnic.c          | 19 ++---
- drivers/net/ethernet/broadcom/cnic.h          |  2 +-
- drivers/net/ethernet/cadence/macb.h           |  3 +-
- drivers/net/ethernet/cadence/macb_main.c      | 10 +--
- .../net/ethernet/cavium/liquidio/lio_core.c   |  4 +-
- .../net/ethernet/cavium/liquidio/lio_main.c   | 24 +++----
- .../ethernet/cavium/liquidio/lio_vf_main.c    | 10 +--
- .../ethernet/cavium/liquidio/octeon_droq.c    |  4 +-
- .../ethernet/cavium/liquidio/octeon_main.h    |  4 +-
- .../net/ethernet/cavium/octeon/octeon_mgmt.c  | 13 ++--
- drivers/net/ethernet/cavium/thunder/nic.h     |  5 +-
- .../net/ethernet/cavium/thunder/nicvf_main.c  | 24 +++----
- .../ethernet/cavium/thunder/nicvf_queues.c    |  4 +-
- .../ethernet/cavium/thunder/nicvf_queues.h    |  2 +-
- drivers/net/ethernet/chelsio/cxgb/sge.c       | 19 ++---
- drivers/net/ethernet/chelsio/cxgb4/cxgb4.h    |  9 +--
- .../net/ethernet/chelsio/cxgb4/cxgb4_main.c   |  2 +-
- .../ethernet/chelsio/cxgb4/cxgb4_tc_mqprio.c  |  4 +-
- .../net/ethernet/chelsio/cxgb4/cxgb4_uld.c    |  2 +-
- drivers/net/ethernet/chelsio/cxgb4/sge.c      | 40 +++++------
- drivers/net/ethernet/chelsio/cxgb4vf/sge.c    |  6 +-
- drivers/net/ethernet/dlink/sundance.c         | 41 +++++------
- .../net/ethernet/huawei/hinic/hinic_hw_cmdq.c |  2 +-
- .../net/ethernet/huawei/hinic/hinic_hw_eqs.c  | 17 +++--
- .../net/ethernet/huawei/hinic/hinic_hw_eqs.h  |  2 +-
- drivers/net/ethernet/ibm/ehea/ehea.h          |  3 +-
- drivers/net/ethernet/ibm/ehea/ehea_main.c     | 14 ++--
- drivers/net/ethernet/ibm/ibmvnic.c            | 24 +++----
- drivers/net/ethernet/ibm/ibmvnic.h            |  2 +-
- drivers/net/ethernet/jme.c                    | 72 +++++++++----------
- drivers/net/ethernet/jme.h                    |  8 +--
- .../net/ethernet/marvell/mvpp2/mvpp2_main.c   |  4 +-
- drivers/net/ethernet/marvell/skge.c           | 12 ++--
- drivers/net/ethernet/marvell/skge.h           |  3 +-
- drivers/net/ethernet/mediatek/mtk_wed_wo.c    | 12 ++--
- drivers/net/ethernet/mediatek/mtk_wed_wo.h    |  3 +-
- 43 files changed, 273 insertions(+), 266 deletions(-)
-
+diff --git a/drivers/net/ethernet/alteon/acenic.c b/drivers/net/ethernet/alteon/acenic.c
+index 3d8ac63132fb..9e6f91df2ba0 100644
+--- a/drivers/net/ethernet/alteon/acenic.c
++++ b/drivers/net/ethernet/alteon/acenic.c
+@@ -1560,9 +1560,9 @@ static void ace_watchdog(struct net_device *data, unsigned int txqueue)
+ }
+ 
+ 
+-static void ace_tasklet(struct tasklet_struct *t)
++static void ace_bh_work(struct work_struct *work)
+ {
+-	struct ace_private *ap = from_tasklet(ap, t, ace_tasklet);
++	struct ace_private *ap = from_work(ap, work, ace_bh_work);
+ 	struct net_device *dev = ap->ndev;
+ 	int cur_size;
+ 
+@@ -1595,7 +1595,7 @@ static void ace_tasklet(struct tasklet_struct *t)
+ #endif
+ 		ace_load_jumbo_rx_ring(dev, RX_JUMBO_SIZE - cur_size);
+ 	}
+-	ap->tasklet_pending = 0;
++	ap->bh_work_pending = 0;
+ }
+ 
+ 
+@@ -1617,7 +1617,7 @@ static void ace_dump_trace(struct ace_private *ap)
+  *
+  * Loading rings is safe without holding the spin lock since this is
+  * done only before the device is enabled, thus no interrupts are
+- * generated and by the interrupt handler/tasklet handler.
++ * generated and by the interrupt handler/bh handler.
+  */
+ static void ace_load_std_rx_ring(struct net_device *dev, int nr_bufs)
+ {
+@@ -2160,7 +2160,7 @@ static irqreturn_t ace_interrupt(int irq, void *dev_id)
+ 	 */
+ 	if (netif_running(dev)) {
+ 		int cur_size;
+-		int run_tasklet = 0;
++		int run_bh_work = 0;
+ 
+ 		cur_size = atomic_read(&ap->cur_rx_bufs);
+ 		if (cur_size < RX_LOW_STD_THRES) {
+@@ -2172,7 +2172,7 @@ static irqreturn_t ace_interrupt(int irq, void *dev_id)
+ 				ace_load_std_rx_ring(dev,
+ 						     RX_RING_SIZE - cur_size);
+ 			} else
+-				run_tasklet = 1;
++				run_bh_work = 1;
+ 		}
+ 
+ 		if (!ACE_IS_TIGON_I(ap)) {
+@@ -2188,7 +2188,7 @@ static irqreturn_t ace_interrupt(int irq, void *dev_id)
+ 					ace_load_mini_rx_ring(dev,
+ 							      RX_MINI_SIZE - cur_size);
+ 				} else
+-					run_tasklet = 1;
++					run_bh_work = 1;
+ 			}
+ 		}
+ 
+@@ -2205,12 +2205,12 @@ static irqreturn_t ace_interrupt(int irq, void *dev_id)
+ 					ace_load_jumbo_rx_ring(dev,
+ 							       RX_JUMBO_SIZE - cur_size);
+ 				} else
+-					run_tasklet = 1;
++					run_bh_work = 1;
+ 			}
+ 		}
+-		if (run_tasklet && !ap->tasklet_pending) {
+-			ap->tasklet_pending = 1;
+-			tasklet_schedule(&ap->ace_tasklet);
++		if (run_bh_work && !ap->bh_work_pending) {
++			ap->bh_work_pending = 1;
++			queue_work(system_bh_wq, &ap->ace_bh_work);
+ 		}
+ 	}
+ 
+@@ -2267,7 +2267,7 @@ static int ace_open(struct net_device *dev)
+ 	/*
+ 	 * Setup the bottom half rx ring refill handler
+ 	 */
+-	tasklet_setup(&ap->ace_tasklet, ace_tasklet);
++	INIT_WORK(&ap->ace_bh_work, ace_bh_work);
+ 	return 0;
+ }
+ 
+@@ -2301,7 +2301,7 @@ static int ace_close(struct net_device *dev)
+ 	cmd.idx = 0;
+ 	ace_issue_cmd(regs, &cmd);
+ 
+-	tasklet_kill(&ap->ace_tasklet);
++	cancel_work_sync(&ap->ace_bh_work);
+ 
+ 	/*
+ 	 * Make sure one CPU is not processing packets while
+diff --git a/drivers/net/ethernet/alteon/acenic.h b/drivers/net/ethernet/alteon/acenic.h
+index ca5ce0cbbad1..0e45a97b9c9b 100644
+--- a/drivers/net/ethernet/alteon/acenic.h
++++ b/drivers/net/ethernet/alteon/acenic.h
+@@ -2,7 +2,7 @@
+ #ifndef _ACENIC_H_
+ #define _ACENIC_H_
+ #include <linux/interrupt.h>
+-
++#include <linux/workqueue.h>
+ 
+ /*
+  * Generate TX index update each time, when TX ring is closed.
+@@ -667,8 +667,8 @@ struct ace_private
+ 	struct rx_desc		*rx_mini_ring;
+ 	struct rx_desc		*rx_return_ring;
+ 
+-	int			tasklet_pending, jumbo;
+-	struct tasklet_struct	ace_tasklet;
++	int			bh_work_pending, jumbo;
++	struct work_struct	ace_bh_work;
+ 
+ 	struct event		*evt_ring;
+ 
+@@ -776,7 +776,7 @@ static int ace_open(struct net_device *dev);
+ static netdev_tx_t ace_start_xmit(struct sk_buff *skb,
+ 				  struct net_device *dev);
+ static int ace_close(struct net_device *dev);
+-static void ace_tasklet(struct tasklet_struct *t);
++static void ace_bh_work(struct work_struct *work);
+ static void ace_dump_trace(struct ace_private *ap);
+ static void ace_set_multicast_list(struct net_device *dev);
+ static int ace_change_mtu(struct net_device *dev, int new_mtu);
 -- 
 2.34.1
 
