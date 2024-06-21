@@ -1,189 +1,241 @@
-Return-Path: <netdev+bounces-105779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26A07912CE9
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 20:04:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9378E912CEF
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 20:06:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49A461C22C00
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 18:04:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49A8928423F
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 18:06:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77156178CE8;
-	Fri, 21 Jun 2024 18:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35398178CEA;
+	Fri, 21 Jun 2024 18:06:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JD1fpuHM"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="YGHI9Wrr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp-190e.mail.infomaniak.ch (smtp-190e.mail.infomaniak.ch [185.125.25.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8532F178CCA
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 18:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB18178CCF
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 18:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718993091; cv=none; b=OP/o/D+/HbHq5OdvGLNR5VGshEBxED0HF37XY1baQI7bGP1CyMacHw8gMMzjTlab7WZewjfHqweoHqQWfbKWEs6kPCupKG6ha0LunMkxZBfO9TIuiYNFrJx9A6goDzzlLmEMqdhA5W9dROnGpJ9Sx77LvIpl0fnvc5Q6EE7FSSA=
+	t=1718993188; cv=none; b=UtaqpIt3smUKfTK4OjKQXC4thdJszT3ySpI90w1pOFLvPx0hSsrhNsnZE6PhRtgdKV03H8rJoVLtbZv0o+rVBNHvDKmVeqRSoLbNv6uYYOc0x1KPPOtabWAja5xz36Wz+ouJsvmZpw/FokLMh/vzxWon/NNQwHMPEUQ71DGoUwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718993091; c=relaxed/simple;
-	bh=zcg7PMw2+sFn9Qhk21DKHJTKPGv7tCKSJiQaWBwhaWw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TPYbFVkxU2VXH+CzYjx3iB7c3bIQggDArLnHkrmw1TLIRSnIQVIBXuCn/tTBP51Hki9g+0bAdYQSqHDPz2jf4H/eKkyknNG3Q6MmDq0ZQ4DctmVeVrswaWd6hkn7HcwrnlqcTt47NOg0E3U3VdFMz6BaH/sGvtZfsvD6C2Dw76Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JD1fpuHM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718993088;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V8nqRTAoVGOXxJJfyF4qzkCCRC+CK1bQkjWb0hfNjRc=;
-	b=JD1fpuHMDZVhxsH63iBIWdCzao/hms3/ETjnGCkCKxOEe4ijBSFt83rb8jHsXZWo/Xrn/Q
-	YUjbO5gYw3ssnyN404NCKZwj2u/93RCLCA0k2STsCpU2xYkSJrmNlT081w+UyC52+aI4OC
-	buP1a0twQMWp4ksYsosUGFIVsELtrt0=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-Ivk34vB7OkeVDQ7i64zuBw-1; Fri, 21 Jun 2024 14:04:47 -0400
-X-MC-Unique: Ivk34vB7OkeVDQ7i64zuBw-1
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-440647edfeaso26584801cf.3
-        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 11:04:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718993086; x=1719597886;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V8nqRTAoVGOXxJJfyF4qzkCCRC+CK1bQkjWb0hfNjRc=;
-        b=DtrV5tc7YPuvC4PUtoq6oU5jeoimpauMAFcecXEp6nvpDYNWuXNE1eStT+vA7exRjd
-         wxkyV6cYLwXCvk12AXmL6k706zo/rxU0uVhczCrYTpZgMhOuq//oBhxO/q95CeLfdQsw
-         xULqzig7nPZBKPntVmBTmy0wPENmrpq/rawUoalU8Svxan3r/InXvfUBhWlwdbwJRUQF
-         e4SMpZPA3Pq23HkdQvNgHP33OzBOnTXUp4UqBw69cf/dfR3BK9I07LPHc7k2lkW0pri0
-         vQVRdT2/HeI7w5beP0VZ49D5oLug6/Y9qOZZa1B69m7Qf1kPrDP348hM/HuJZtOJNExe
-         LBwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUpK0xYqhqbOk9EvCni4u4UOT1rWlqdIl48Z9PXGqqp0BIj0vlUCN6omNPjgWZhQFfY3xyEoJHj+VAQLp5r1W7xc3Wp5pgm
-X-Gm-Message-State: AOJu0Yzy9a2PZBXkrF8Yp+Ok28TENQAmPDcB30Zi569oa8JIzpTFltu2
-	6Nv5do1LMpO2dPotNYq6Xvzw/Po9kvt/CEwV4fd27cVhrMf0fukBpSjXukno4SPO8g9kTHemMqE
-	SBSgd0Wcg2gzYZ+SvTZv8OE6Kbep9ELBiy/psosUZvxiZbi5oMH2u+w==
-X-Received: by 2002:a05:622a:1342:b0:43e:3d8b:b6b9 with SMTP id d75a77b69052e-444a7a4635fmr92854841cf.44.1718993086465;
-        Fri, 21 Jun 2024 11:04:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHJYcrTfuWlubeaxHUWAGUC9XfxejCL0fcoKM+mxJ0zr+uD9bnM2UGYpm8YYp2RVsBQQrd1GA==
-X-Received: by 2002:a05:622a:1342:b0:43e:3d8b:b6b9 with SMTP id d75a77b69052e-444a7a4635fmr92854511cf.44.1718993085894;
-        Fri, 21 Jun 2024 11:04:45 -0700 (PDT)
-Received: from x1gen2nano ([2600:1700:1ff0:d0e0::13])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-444c2c5ea11sm13380121cf.81.2024.06.21.11.04.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jun 2024 11:04:45 -0700 (PDT)
-Date: Fri, 21 Jun 2024 13:04:43 -0500
-From: Andrew Halaney <ahalaney@redhat.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Bartosz Golaszewski <brgl@bgdev.pl>, 
-	Vinod Koul <vkoul@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH net-next 1/8] net: phy: add support for overclocked SGMII
-Message-ID: <osdpdpp44qkfx3varu4iulec3d3azwj7y7rccma7yopui3d7da@2km3uhan7umg>
-References: <20240619184550.34524-1-brgl@bgdev.pl>
- <20240619184550.34524-2-brgl@bgdev.pl>
- <bedd74cb-ee1e-4f8d-86ee-021e5964f6e5@lunn.ch>
- <CAMRc=MeCcrvid=+KG-6Pe5_-u21PBJDdNCChVrib8zT+FUfPJw@mail.gmail.com>
- <160b9abd-3972-449d-906d-71d12b2a0aeb@lunn.ch>
- <ZnNIib8GEpvAOlGd@shell.armlinux.org.uk>
- <4ts2ab5vwf7gnwqd557z62ozjdbl3kf7d64qfc6rjhuokav3th@brhzlsrpggk6>
+	s=arc-20240116; t=1718993188; c=relaxed/simple;
+	bh=G1+LMnVYjuipUm7A53Qs1WbYqgdsKBtjjKsWuTWGXxE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uCAbRocPUjN8QWevZOwkjfmem4vAt2SyCI7YmGJLNL11V4/+wo62aI9O0GZXddsMnxNg/97iCprE775bNZ9COPLcB3UAQaJTyUNNmulmqfeJwluNoYvWxeLolIDvncKybbu1XIL2pxD88kgTK+SIdvfAZN8DZClfDg8lX/cZk7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=YGHI9Wrr; arc=none smtp.client-ip=185.125.25.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4W5QK92v4LzPFs;
+	Fri, 21 Jun 2024 20:06:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1718993181;
+	bh=6zm24rznEW9/wKRnfzUKzbrn4dwriuF/US2vViMaVSs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=YGHI9WrrckgcP33dYfqWS92FX0inLWuu+RUeMrATGaGmqr0ZLJEmXUP5nzRBmZFO3
+	 oZgAMU7R1BZVI1eiDu10BPeRfpEMMoGqryfFh+swMp9vuDfSF7r/llDi9vQBdjzoy+
+	 vQLJSzdOS1bwkzNSzTEY1GnLCtyuIFjZlmTxJgqg=
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4W5QK65KCbzQTy;
+	Fri, 21 Jun 2024 20:06:18 +0200 (CEST)
+From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
+To: Christian Brauner <brauner@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kees Cook <keescook@chromium.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Mark Brown <broonie@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Shengyu Li <shengyu.li.evgeny@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Shuah Khan <skhan@linuxfoundation.org>
+Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Brendan Higgins <brendanhiggins@google.com>,
+	David Gow <davidgow@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	Ron Economos <re@w6rz.net>,
+	Ronald Warsow <rwarsow@gmx.de>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Will Drewry <wad@chromium.org>,
+	kernel test robot <oliver.sang@intel.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH v1] selftests/harness: Fix tests timeout and race condition
+Date: Fri, 21 Jun 2024 20:06:05 +0200
+Message-ID: <20240621180605.834676-1-mic@digikod.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4ts2ab5vwf7gnwqd557z62ozjdbl3kf7d64qfc6rjhuokav3th@brhzlsrpggk6>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
 
-On Thu, Jun 20, 2024 at 02:42:41PM GMT, Andrew Halaney wrote:
-> On Wed, Jun 19, 2024 at 10:07:21PM GMT, Russell King (Oracle) wrote:
-> > On Wed, Jun 19, 2024 at 09:51:12PM +0200, Andrew Lunn wrote:
-> > > phylib supports out of band signalling, which is enough to make this
-> > > work, so long as two peers will actually establish a link because they
-> > > are sufficiently tolerant of what the other end is doing. Sometimes
-> > > they need a hint. Russell King has been working on this mess, and i'm
-> > > sure he will be along soon.
-> > 
-> > ... and I'm rolling my eyes, wondering whether I will get time to
-> > finish the code that I started any time soon. I'll note that the more
-> > hacky code we end up merging, the harder it will become to solve this
-> > problem (and we already have several differing behaviours merged with
-> > 2500base-X already.)
-> > 
-> > > What i expect will happen is you keep calling this 2500BaseX, without
-> > > in band signalling. You can look back in the netdev mailling list for
-> > > more details and those that have been here before you. It is always
-> > > good to search the history, otherwise you are just going to repeat it.
-> > 
-> > That's where things start getting sticky, because at the moment,
-> > phylink expects 2500base-X to be like 1000base-X, and be a media
-> > interface mode rather than a MAC-to-PHY interface mode. This is partly
-> > what my patches will address if I can get around to finishing them -
-> > but at this point I really do not know when that will be.
-> > 
-> > I still have the high priority work problem that I'm actively involved
-> > with. I may have three weeks holiday at the start of July (and I really
-> > need it right now!) Then, there's possibly quite a lot of down time in
-> > August because I'm having early cataract ops which will substantially
-> > change my eye sight. There's two possible outcomes from that. The best
-> > case is that in just over two weeks after the first op, I'll be able to
-> > read the screen without glasses. The worst case is that I have to wait
-> > a further two to three weeks to see my optometrist (assuming he has
-> > availability), and then wait for replacement lenses to be made up,
-> > fitted and the new glasses sent.
-> > 
-> > So, I'm only finding the occasional time to be able to look at
-> > mainline stuff, and I don't see that changing very much until maybe
-> > September.
-> > 
-> > At this point, I think we may as well give up and let people do
-> > whatever they want to do with 2500base-X (which is basically what we're
-> > already doing), and when they have compatibility problems... well...
-> > really not much we can do about that, and it will be way too late to
-> > try and sort the mess out.
-> 
-> I hope your holiday and operation go well Russell.
-> 
-> Pardon my ignorance, but I know of quite a few things you have in flight
-> and because of that I'm not entirely sure what specific patches you're
-> referring to above. Have those hit the list? I know you're cleaning
-> up stmmac's phylink/pcs usage, but I'm thinking that this is outside of
-> that series. Thanks in advance for helping me understand all that's in
-> progress around this mess of a topic!
+We cannot use CLONE_VFORK because we also need to wait for the timeout
+signal.
 
-Nevermind my question, I was talking a little about this today with respect to a
-Renesas board as well (can't escape it it seems) and in going through
-our convos I found: https://lore.kernel.org/netdev/ZlNi11AsdDpKM6AM@shell.armlinux.org.uk/
+Restore tests timeout by using the original fork() call in __run_test()
+but also in __TEST_F_IMPL().  Also fix a race condition when waiting for
+the test child process.
 
-    """
-    I do have some work-in-progress patches that attempt to sort this out
-    in phylink and identify incompatible situations.
+Because test metadata are shared between test processes, only the
+parent process must set the test PID (child).  Otherwise, t->pid may be
+set to zero, leading to inconsistent error cases:
 
-    See http://git.armlinux.org.uk/cgit/linux-arm.git/log/?h=net-queue
+  #  RUN           layout1.rule_on_mountpoint ...
+  # rule_on_mountpoint: Test ended in some other way [127]
+  #            OK  layout1.rule_on_mountpoint
+  ok 20 layout1.rule_on_mountpoint
 
-    commits (I think)...
+As safeguards, initialize the "status" variable with a valid exit code,
+and handle unknown test exits as errors.
 
-    net: phylink: clean up phylink_resolve()
+The use of fork() introduces a new race condition in landlock/fs_test.c
+which seems to be specific to hostfs bind mounts, but I haven't found
+the root cause and it's difficult to trigger.  I'll try to fix it with
+another patch.
 
-    to:
+Cc: Christian Brauner <brauner@kernel.org>
+Cc: Günther Noack <gnoack@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Mark Brown <broonie@kernel.org>
+Cc: Shuah Khan <shuah@kernel.org>
+Cc: Will Drewry <wad@chromium.org>
+Cc: stable@vger.kernel.org
+Closes: https://lore.kernel.org/r/9341d4db-5e21-418c-bf9e-9ae2da7877e1@sirena.org.uk
+Fixes: a86f18903db9 ("selftests/harness: Fix interleaved scheduling leading to race conditions")
+Fixes: 24cf65a62266 ("selftests/harness: Share _metadata between forked processes")
+Signed-off-by: Mickaël Salaün <mic@digikod.net>
+Link: https://lore.kernel.org/r/20240621180605.834676-1-mic@digikod.net
+---
+ tools/testing/selftests/kselftest_harness.h | 43 ++++++++++++---------
+ 1 file changed, 24 insertions(+), 19 deletions(-)
 
-    net: phylink: switch to MLO_AN_PHY when PCS uses outband
+diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
+index b634969cbb6f..40723a6a083f 100644
+--- a/tools/testing/selftests/kselftest_harness.h
++++ b/tools/testing/selftests/kselftest_harness.h
+@@ -66,8 +66,6 @@
+ #include <sys/wait.h>
+ #include <unistd.h>
+ #include <setjmp.h>
+-#include <syscall.h>
+-#include <linux/sched.h>
+ 
+ #include "kselftest.h"
+ 
+@@ -82,17 +80,6 @@
+ #  define TH_LOG_ENABLED 1
+ #endif
+ 
+-/* Wait for the child process to end but without sharing memory mapping. */
+-static inline pid_t clone3_vfork(void)
+-{
+-	struct clone_args args = {
+-		.flags = CLONE_VFORK,
+-		.exit_signal = SIGCHLD,
+-	};
+-
+-	return syscall(__NR_clone3, &args, sizeof(args));
+-}
+-
+ /**
+  * TH_LOG()
+  *
+@@ -437,7 +424,7 @@ static inline pid_t clone3_vfork(void)
+ 		} \
+ 		if (setjmp(_metadata->env) == 0) { \
+ 			/* _metadata and potentially self are shared with all forks. */ \
+-			child = clone3_vfork(); \
++			child = fork(); \
+ 			if (child == 0) { \
+ 				fixture_name##_setup(_metadata, self, variant->data); \
+ 				/* Let setup failure terminate early. */ \
+@@ -1016,7 +1003,14 @@ void __wait_for_test(struct __test_metadata *t)
+ 		.sa_flags = SA_SIGINFO,
+ 	};
+ 	struct sigaction saved_action;
+-	int status;
++	/*
++	 * Sets status so that WIFEXITED(status) returns true and
++	 * WEXITSTATUS(status) returns KSFT_FAIL.  This safe default value
++	 * should never be evaluated because of the waitpid(2) check and
++	 * SIGALRM handling.
++	 */
++	int status = KSFT_FAIL << 8;
++	int child;
+ 
+ 	if (sigaction(SIGALRM, &action, &saved_action)) {
+ 		t->exit_code = KSFT_FAIL;
+@@ -1028,7 +1022,15 @@ void __wait_for_test(struct __test_metadata *t)
+ 	__active_test = t;
+ 	t->timed_out = false;
+ 	alarm(t->timeout);
+-	waitpid(t->pid, &status, 0);
++	child = waitpid(t->pid, &status, 0);
++	if (child == -1 && errno != EINTR) {
++		t->exit_code = KSFT_FAIL;
++		fprintf(TH_LOG_STREAM,
++			"# %s: Failed to wait for PID %d (errno: %d)\n",
++			t->name, t->pid, errno);
++		return;
++	}
++
+ 	alarm(0);
+ 	if (sigaction(SIGALRM, &saved_action, NULL)) {
+ 		t->exit_code = KSFT_FAIL;
+@@ -1083,6 +1085,7 @@ void __wait_for_test(struct __test_metadata *t)
+ 				WTERMSIG(status));
+ 		}
+ 	} else {
++		t->exit_code = KSFT_FAIL;
+ 		fprintf(TH_LOG_STREAM,
+ 			"# %s: Test ended in some other way [%u]\n",
+ 			t->name,
+@@ -1218,6 +1221,7 @@ void __run_test(struct __fixture_metadata *f,
+ 	struct __test_xfail *xfail;
+ 	char test_name[1024];
+ 	const char *diagnostic;
++	int child;
+ 
+ 	/* reset test struct */
+ 	t->exit_code = KSFT_PASS;
+@@ -1236,15 +1240,16 @@ void __run_test(struct __fixture_metadata *f,
+ 	fflush(stdout);
+ 	fflush(stderr);
+ 
+-	t->pid = clone3_vfork();
+-	if (t->pid < 0) {
++	child = fork();
++	if (child < 0) {
+ 		ksft_print_msg("ERROR SPAWNING TEST CHILD\n");
+ 		t->exit_code = KSFT_FAIL;
+-	} else if (t->pid == 0) {
++	} else if (child == 0) {
+ 		setpgrp();
+ 		t->fn(t, variant);
+ 		_exit(t->exit_code);
+ 	} else {
++		t->pid = child;
+ 		__wait_for_test(t);
+ 	}
+ 	ksft_print_msg("         %4s  %s\n",
 
-    and since I'm converting stmmac's hacky PCS that bypasses phylink to
-    a real phylink_pcs, the ethqos code as it stands presents a blocker
-    because of this issue. So, I'm intending to post a series in the next
-    few days (after the bank holiday) and will definitely need to be
-    tested on ethqos hardware.
-    """
-
-Thanks,
-Andrew
+base-commit: 83a7eefedc9b56fe7bfeff13b6c7356688ffa670
+-- 
+2.45.2
 
 
