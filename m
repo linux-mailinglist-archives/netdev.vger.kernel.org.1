@@ -1,57 +1,56 @@
-Return-Path: <netdev+bounces-105666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DC649122FE
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 13:06:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85EB39123BC
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 13:33:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E29D1C20E0D
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 11:06:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B7341F2635B
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 11:33:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19451171E54;
-	Fri, 21 Jun 2024 11:06:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pI5hU0/q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D893F175543;
+	Fri, 21 Jun 2024 11:32:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from norbury.hmeau.com (helcar.hmeau.com [216.24.177.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DA782D72
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 11:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8B0173321;
+	Fri, 21 Jun 2024 11:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.24.177.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718968015; cv=none; b=iBB9VzpvBvBpgZykh2UGUyg986qXbBbJXQ0OklpcwSV/X3HVp4lLjJFFq20s6RAMTrh8FtXh5KE6Kom6LQ5I5VK719Ohsbzp2gF//EawCPYmhi2KZO+AFd5NLFUFKO4mDdtQV29bC2YX9sZXMNQxZkY50d/sOC6ySUeq4nJZyFQ=
+	t=1718969530; cv=none; b=H3ypqoBBsT/H/TNrSrd2tFvE/A+HuNB2J6mME8vMf5oHDR3w79Lz8910m7pjh5hAYgKZeS7Q0DkteC73LTxqACIBpJL8kJXA4AABk3US1I5sojoH4pixEu2jEwbcKnfbBxUIByvndok2yOs7dOAzDI4HePjdU0YzPMM4xcsvx4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718968015; c=relaxed/simple;
-	bh=6VOAciI3l+lpalhgYuIvKrw2Wbjh2tnPecABFpzuD/E=;
+	s=arc-20240116; t=1718969530; c=relaxed/simple;
+	bh=IFn0xI/FU94BtSpvj/fHU7p0Jdyham+E3Hxv3IwEHok=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hYUvSlQAbmDxGkyc7nD1aOSqRw0F/XHiIRUqoISlYx2Kz8il/2XUJnrTZe4tTFOYEGClNCQv7IyOhWq6zpczfoeEznmNLeYPaOgqVYghD5PBTa013zbOGomcUMOYRrc/cLy2q1eyszy1c98lI1DzDKsPSQhbvixN162gLO7XLBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pI5hU0/q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D57AC2BBFC;
-	Fri, 21 Jun 2024 11:06:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718968014;
-	bh=6VOAciI3l+lpalhgYuIvKrw2Wbjh2tnPecABFpzuD/E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pI5hU0/qek0JNpnsfeIWGei/QbXZSFmzVHNgw+nWh/xMNN5kk4WOY8cZXvNUB+xE6
-	 O1hhlc5Q1kSrUaeDgmeUIWhaVDpb/0BveGx6YjFiaXG8KF+fdGueA8XpzP0Dhv86QH
-	 u/aX2c8yPQqCBf+XYiPkrm8trKOQDLCPTd7sDmuYGwN0pO9yDOsh/WM84kx2ZKqNOV
-	 P1dZ1ij8V5cxIUo/KrSToaMJgDo3sRGag5O6bN5RJBOAogw3V7DBKDLl0h2rSbdUVU
-	 ejlKlK2cQ8tzX+a/+/AznFfNvNmXA288hbjZ3ivGbP+k13fZv6hJiV0ml1i5XswyVB
-	 OYpvIyHAczQ0Q==
-Date: Fri, 21 Jun 2024 12:06:50 +0100
-From: Simon Horman <horms@kernel.org>
-To: Karol Kolacinski <karol.kolacinski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [PATCH v2 iwl-net 2/3] ice: Don't process extts if PTP is
- disabled
-Message-ID: <20240621110650.GB1098275@kernel.org>
-References: <20240620123141.1582255-1-karol.kolacinski@intel.com>
- <20240620123141.1582255-3-karol.kolacinski@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=iq93ZV6UjA6z4HoNSpugRG0X2ll58wST1DNIwSLHIMkXRjMd5QCw+jbWYGfh382fSLdSoXVtKI6PhHGESJMCjhoUiZXg3Okin7JiYMRR56qLzVhAjYFw0QxjENSwyqkjmENFiYijK4iCt3O1ILziizLyhd045C+ZN1mw+O+C9mI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=216.24.177.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+	by norbury.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1sKc6u-002dUc-26;
+	Fri, 21 Jun 2024 21:07:17 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Jun 2024 21:07:16 +1000
+Date: Fri, 21 Jun 2024 21:07:16 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Nick Desaulniers <ndesaulniers@google.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Yabin Cui <yabinc@google.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH] Fix initializing a static union variable
+Message-ID: <ZnVe5JBIBGoOrk5w@gondor.apana.org.au>
+References: <20240620181736.1270455-1-yabinc@google.com>
+ <CAKwvOd=ZKS9LbJExCp8vrV9kLDE_Ew+mRcFH5-sYRW_2=sBiig@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,31 +59,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240620123141.1582255-3-karol.kolacinski@intel.com>
+In-Reply-To: <CAKwvOd=ZKS9LbJExCp8vrV9kLDE_Ew+mRcFH5-sYRW_2=sBiig@mail.gmail.com>
 
-On Thu, Jun 20, 2024 at 02:27:09PM +0200, Karol Kolacinski wrote:
-> From: Jacob Keller <jacob.e.keller@intel.com>
-> 
-> The ice_ptp_extts_event() function can race with ice_ptp_release() and
-> result in a NULL pointer dereference which leads to a kernel panic.
-> 
-> Panic occurs because the ice_ptp_extts_event() function calls
-> ptp_clock_event() with a NULL pointer. The ice driver has already
-> released the PTP clock by the time the interrupt for the next external
-> timestamp event occurs.
-> 
-> To fix this, modify the ice_ptp_extts_event() function to check the
-> PTP state and bail early if PTP is not ready.
-> 
-> Fixes: 172db5f91d5f ("ice: add support for auxiliary input/output pins")
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> ---
-> V1 -> V2: removed unnecessary hunk of code and adjusted commit message
+On Thu, Jun 20, 2024 at 12:31:46PM -0700, Nick Desaulniers wrote:
+>
+> Can you also please (find or) file a bug against clang about this? A
+> compiler diagnostic would be very very helpful here, since `= {};` is
+> such a common idiom.
 
-Thanks for the update.
+This idiom is used throughout the kernel.  If we decide that it
+isn't safe to use then we should change the kernel as a whole rather
+than the one spot that happens to have been identified.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Alternatively the buggy compiler should be banned until it's fixed.
 
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
