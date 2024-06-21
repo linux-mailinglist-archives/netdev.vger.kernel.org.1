@@ -1,311 +1,190 @@
-Return-Path: <netdev+bounces-105724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 804BD912794
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:24:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D4619127C2
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:30:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3731028C78F
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 14:24:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD82428BAAF
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 14:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1FEF208A1;
-	Fri, 21 Jun 2024 14:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B40023769;
+	Fri, 21 Jun 2024 14:30:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="RR/viPRd"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="G2riJ6mm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0741C6AF
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 14:24:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6A1208C4
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 14:30:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718979889; cv=none; b=XNQLmkYVxUjqD8aBr89dVLG6mmmEe39x7ogUm2Cn/AHuTlPvrJHzJxSBYNdrD9D9ywEQC2/g9Ad6OddWanGyEA7hvha1nQMwPLpHEguGrpLrWfZcW8gyZf0Vv4mARAPndAbQHXADnoG/LeSsuKX6RPonA5KwSn9x1AFedhg9ivA=
+	t=1718980204; cv=none; b=QmReqyGTPXBjHNnN01KXRc+BkBHNceBm6zppPq49w8GgcfUhvWx4CgoVDHrBTViRWmjL458LqluiO5ecNRqCd4z2W/O+svlvd3sFC2V76q4WYUq/q1V4xIN6CFkK1lskIPRE760h+BIxhwrNvCYnur4poP9W1Q16awlrhpQZLYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718979889; c=relaxed/simple;
-	bh=lZJXdwBAegA51ddHVpcl7yCINGbPBw3CLbtY3DhzlKI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bPBGnM1ARq2Wz/sj0prLj+FFw3lvLWHq0dIGjFga+kSRQKcKZqr60uvw62l1+6JTutC4Wpv6W78CDZSEfyAO1k2miqGQ+vQscuuklXO7pzhzKKHx3cCl+LNtR7H0ydHluzLSD1TAF4Sk4Y3/BDoiGF/rsoc+5k8bcg//ffZkNbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=RR/viPRd; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7041e39a5beso1676599b3a.3
-        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 07:24:46 -0700 (PDT)
+	s=arc-20240116; t=1718980204; c=relaxed/simple;
+	bh=74XNNsrGcyt42W0i4MGFAN1ASfBc1WU+Wx8RPbhBId0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RPKHIQpdEE25sKEi9huJ4D/SFAGllBpJdcOXRYJENgfmKNwsrnA798WwHUyXh+eQwRBtgM3srvTIBWOLr6u8edrx8KcVJ57pzQtWPxOvBgjpshAUd+OUcehAqZJyrbEjN4ggpWkfc2y4jLAaNC9fXg8PrptzPq/GhER2jk2hrGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=G2riJ6mm; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-57d21b1c8efso2207271a12.3
+        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 07:30:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1718979886; x=1719584686; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=f465gzpp4FYXFa5Jc2lq0JYqayZbFWyLX/GgY6Y+YRg=;
-        b=RR/viPRdYs2XDqO5DZCJ3DERO7qMECA8yKGjn4+lHmbzvAE3F5coFhW70MjDj4kC8S
-         u/MG/wYMC2Uq6e3g1bJVcIoOIkmHsiET5Zy21q2TFD/XKEiKUlxU4kroQHCi75+njKQf
-         fOZy1BJveONz7cft6v4ep1gyrQWlKnLj93mC60/1bm3ajq0IL0+LeduHgIOBEMGn6Geh
-         WF08BHjbRuLFEs0wCfZ8aZ0iNVFGHWus8GIQ2gcBQgQUCB6lDaRIVWhV4odIrZtSg8lW
-         mM5N2w5uTX184J9V6Xn1LTHqfqOEd/Vm5tIXSQ810XI8B6DzNAOa6gutznvrC90BdAF0
-         xytg==
+        d=cloudflare.com; s=google09082023; t=1718980201; x=1719585001; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ne9VJpx8ATDhafgirOBTQVVX5apXj+MyTTRFOBCHPQI=;
+        b=G2riJ6mm83GI9hpvQ1ed6E3z1bAbY4V7dQde1ZnuiOP8gVTFLnV4hUSbkOCeKUGGzw
+         nKXNQDpabIsBHnUU9w8HTmxwh4ZBI5uNl7kPoptYXgm6Qb2d+/0Z3zTecIO9PGezlyvP
+         bNsMjYi58JVupyl/5NvNzfNcldHBLGGegAAXeaLWBvuSwLK8+VKzaMm6Y5bTFHGWTA6+
+         MpELz/t/tRJrah/6KM95zNpK9xeQtZ9m7dhrktL1nxIs68eZc2MuRwdfgzQoUq9JnqCq
+         oip+9sYRa252b5j2WlrC/LqVi+CcXh6V3iBLoiJXGzScQh6Pachbjv6Bq/go4O344F4Q
+         jCMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718979886; x=1719584686;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f465gzpp4FYXFa5Jc2lq0JYqayZbFWyLX/GgY6Y+YRg=;
-        b=HIC6+E6xn2YEqD35hGNGuIt24N7VAvB+6JxwC3+9xZdppNBMJEjOkkQn5PN2N5S/va
-         90okvAoxIcuERNqh6JdNZ+Fy4zJt50MmuzFE0JAvlmiq7c6rNWBW2VWz8cHKEF2QGRcG
-         O0noj2hGem3TatzNUBkiLo8sMUbdYpdjK6/WtAp0ZVWgBNeRKhs/SREY7BtO3VgY5pei
-         j+VT15MPy4/ZFVYziVp48r5DlkwBPeuHu7HUWqjy5aW9rNnegsIvPVaZ1do/tbLOYh4t
-         wPn0AxjbQ3R6tvBeJP5eh0c29RWABsJbItbIHpix19cyuMXDLBwdWat/puGmm7zMiemn
-         uHvA==
-X-Forwarded-Encrypted: i=1; AJvYcCVmkIdUjVju4rHxSw+untlnzt2N1+fUJDCMVIoevAtBB2SUq7x+fjWlN2IuGjXBQ/quQVNfHkcVfzguesRq4U1QVqh5m4E2
-X-Gm-Message-State: AOJu0YzUG8BNd55YRiUh6nkFVB1ILtbDeLyQwT4drF+J6hvAl5+0ua8+
-	VB95ncpvlGwbVS7+FVyiBJ/YW6XUECCxic7NxxHCwfYJfIBaYPIBNi/UmfC0rQ==
-X-Google-Smtp-Source: AGHT+IGFkahb2mi+s70o0GUs+qOKuAFaqBNMUF6yfNZ9vXvzACbalIb7sN++Na238r1ddj5jvmtNbg==
-X-Received: by 2002:a05:6a20:1b14:b0:1bc:e05d:37d9 with SMTP id adf61e73a8af0-1bce05d387dmr1205285637.19.1718979886185;
-        Fri, 21 Jun 2024 07:24:46 -0700 (PDT)
-Received: from ?IPV6:2804:14d:5c5e:44fb:85f8:f9fb:f0d7:f10a? ([2804:14d:5c5e:44fb:85f8:f9fb:f0d7:f10a])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb3c5ed2sm14601515ad.155.2024.06.21.07.24.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Jun 2024 07:24:45 -0700 (PDT)
-Message-ID: <f2ff57c9-1c10-429f-8739-39743bf58daf@mojatatu.com>
-Date: Fri, 21 Jun 2024 11:24:37 -0300
+        d=1e100.net; s=20230601; t=1718980201; x=1719585001;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ne9VJpx8ATDhafgirOBTQVVX5apXj+MyTTRFOBCHPQI=;
+        b=hOSBBDHRNu4xVeB4ND2zsxYRQL8N9Zt8wPAHAbacsEHOwxJaXFMWhsmZyo9hjIJMn4
+         y8BGjEJn6B9esbNCV7fDPHbXxnhtMZQfNISPtlHNrPhCFEg6fB/ZcuCV0Ce9CKmRhhVZ
+         L6HG92VsFiuYYG4H9hTxh3C134v1qa/lxoxCNnFMQVUIzEVD3VQvUVSIGGQrlM4NtXq4
+         eBRGMMxvwuSs8OD82yVC7uNq93s7YC0oZ0rRQtpxNzM4XREpcs9dXBUxxLO7JKjbc9W/
+         YqlAw/aAFwaRQ9LwL7Y61+y1ML50DMU2+zmDLP7VDw+Svas3Jq1Ri37bAFn4nU0XHLga
+         0hFQ==
+X-Gm-Message-State: AOJu0YxfO+KkCrEpl6afwYGLr/pBYh7L9fNNc7AQk7JI9dU+gsZrdqVP
+	Cas1LYpYeossUVsKp5cX1MM1ANiC/LSQ2daxdBxuIh9G4xJizm5VlfLbt75TmD4p1pYN2HlDj7I
+	l35e+oC2ZvFZvr8dldHvYyqaIiI76i+K84g3fYQ==
+X-Google-Smtp-Source: AGHT+IHSOppKzSm+kjtySl83Xy2s0lY1tdgWQ/xnbihr5ZcC5awX/1jregyRR8ecqABG8aV7I3my61NvkLz1w0cvTgQ=
+X-Received: by 2002:a50:d699:0:b0:579:ca97:da1b with SMTP id
+ 4fb4d7f45d1cf-57d07e0d427mr5079082a12.6.1718980200824; Fri, 21 Jun 2024
+ 07:30:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] qdisc: fix NULL pointer dereference in
- perf_trace_qdisc_reset()
-To: yskelg@gmail.com, Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Takashi Iwai <tiwai@suse.de>, "David S. Miller" <davem@davemloft.net>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Taehee Yoo <ap420073@gmail.com>, Austin Kim <austindh.kim@gmail.com>,
- shjy180909@gmail.com, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
- pbuk5246@gmail.com
-References: <20240621114551.2061-3-yskelg@gmail.com>
-Content-Language: en-US
-From: Pedro Tammela <pctammela@mojatatu.com>
-In-Reply-To: <20240621114551.2061-3-yskelg@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <cover.1718919473.git.yan@cloudflare.com> <b8c183a24285c2ab30c51622f4f9eff8f7a4752f.1718919473.git.yan@cloudflare.com>
+ <a1c983cdb95bdd44385dae29ca7451da16a70c98.camel@redhat.com>
+In-Reply-To: <a1c983cdb95bdd44385dae29ca7451da16a70c98.camel@redhat.com>
+From: Yan Zhai <yan@cloudflare.com>
+Date: Fri, 21 Jun 2024 09:29:49 -0500
+Message-ID: <CAO3-Pboc_r-owOxkZcD9Tyo4MD0ey9bBJj827R+o_NnMMkF2Ow@mail.gmail.com>
+Subject: Re: [RFC net-next 1/9] skb: introduce gro_disabled bit
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Willem de Bruijn <willemb@google.com>, Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, 
+	Mina Almasry <almasrymina@google.com>, Abhishek Chauhan <quic_abchauha@quicinc.com>, 
+	David Howells <dhowells@redhat.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	David Ahern <dsahern@kernel.org>, Richard Gobert <richardbgobert@gmail.com>, 
+	Antoine Tenart <atenart@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
+	Soheil Hassas Yeganeh <soheil@google.com>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 21/06/2024 08:45, yskelg@gmail.com wrote:
-> From: Yunseong Kim <yskelg@gmail.com>
-> 
-> In the TRACE_EVENT(qdisc_reset) NULL dereference occurred from
-> 
->   qdisc->dev_queue->dev <NULL> ->name
-> 
-> This situation simulated from bunch of veths and Bluetooth dis/reconnection.
-> 
-> During qdisc initialization, qdisc was being set to noop_queue.
-> In veth_init_queue, the initial tx_num was reduced back to one,
-> causing the qdisc reset to be called with noop, which led to the kernel panic.
-> 
-> I think this will happen on the kernel version.
->   Linux kernel version ≥ v6.7.10, ≥ v6.8 ≥ v6.9 and 6.10
+On Fri, Jun 21, 2024 at 4:49=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On Thu, 2024-06-20 at 15:19 -0700, Yan Zhai wrote:
+> > Software GRO is currently controlled by a single switch, i.e.
+> >
+> >   ethtool -K dev gro on|off
+> >
+> > However, this is not always desired. When GRO is enabled, even if the
+> > kernel cannot GRO certain traffic, it has to run through the GRO receiv=
+e
+> > handlers with no benefit.
+> >
+> > There are also scenarios that turning off GRO is a requirement. For
+> > example, our production environment has a scenario that a TC egress hoo=
+k
+> > may add multiple encapsulation headers to forwarded skbs for load
+> > balancing and isolation purpose. The encapsulation is implemented via
+> > BPF. But the problem arises then: there is no way to properly offload a
+> > double-encapsulated packet, since skb only has network_header and
+> > inner_network_header to track one layer of encapsulation, but not two.
+> > On the other hand, not all the traffic through this device needs double
+> > encapsulation. But we have to turn off GRO completely for any ingress
+> > device as a result.
+> >
+> > Introduce a bit on skb so that GRO engine can be notified to skip GRO o=
+n
+> > this skb, rather than having to be 0-or-1 for all traffic.
+> >
+> > Signed-off-by: Yan Zhai <yan@cloudflare.com>
+> > ---
+> >  include/linux/netdevice.h |  9 +++++++--
+> >  include/linux/skbuff.h    | 10 ++++++++++
+> >  net/Kconfig               | 10 ++++++++++
+> >  net/core/gro.c            |  2 +-
+> >  net/core/gro_cells.c      |  2 +-
+> >  net/core/skbuff.c         |  4 ++++
+> >  6 files changed, 33 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > index c83b390191d4..2ca0870b1221 100644
+> > --- a/include/linux/netdevice.h
+> > +++ b/include/linux/netdevice.h
+> > @@ -2415,11 +2415,16 @@ struct net_device {
+> >       ((dev)->devlink_port =3D (port));                         \
+> >  })
+> >
+> > -static inline bool netif_elide_gro(const struct net_device *dev)
+> > +static inline bool netif_elide_gro(const struct sk_buff *skb)
+> >  {
+> > -     if (!(dev->features & NETIF_F_GRO) || dev->xdp_prog)
+> > +     if (!(skb->dev->features & NETIF_F_GRO) || skb->dev->xdp_prog)
+> >               return true;
+> > +
+> > +#ifdef CONFIG_SKB_GRO_CONTROL
+> > +     return skb->gro_disabled;
+> > +#else
+> >       return false;
+> > +#endif
+>
+> This will generate OoO if the gro_disabled is flipped in the middle of
+> a stream.
+>
+> Assuming the above is fine for your use case (I think it's _not_ in
+> general), you could get the same result without an additional costly
+> bit in sk_buff.
 
-You should tag your patch for the net tree
+Calling it per-packet control seems inaccurate here, the motivation is
+to give users the ability to control per-flow behaviors. OoO is indeed
+a consequence if users don't do it correctly.
 
-> 
-> This occurred from 51270d573a8d. I think this patch is absolutely
-> necessary. Previously, It was showing not intended string value of name.
-Add a 'Fixes:' tag with this commit
+>
+> Let xdp_frame_fixup_skb_offloading() return a bool - e.g. 'true' when
+> gro should be avoided - and let the NIC driver call netif_receive_skb()
+> instead of the gro rx hook for such packet.
+>
+For rx on a single device, directly calling netif_receive_skb is
+reasonable. For tunnel receivers it is kinda inconsistent IMHO. For
+example, we terminate GRE tunnels in a netns, and it is necessary to
+disable GRO on both the entering veth device and also the GRE tunnel
+to shutdown GRO. That's why I'd hope to use a bit of skb, to be
+consistent within the same netns. Let me add a bit more context to
+clarify why we think this is necessary in another thread.
 
-> 
-> I've reproduced 3 time from my fedora 40 Debug Kernel with any other module
-> and patched.
-> 
-> version: 6.10.0-0.rc2.20240608gitdc772f8237f9.29.fc41.aarch64+debug
-> 
-> [ 5287.164555] veth0_vlan: left promiscuous mode
-> [ 5287.164929] veth1_macvtap: left promiscuous mode
-> [ 5287.164950] veth0_macvtap: left promiscuous mode
-> [ 5287.164983] veth1_vlan: left promiscuous mode
-> [ 5287.165008] veth0_vlan: left promiscuous mode
-> [ 5287.165450] veth1_macvtap: left promiscuous mode
-> [ 5287.165472] veth0_macvtap: left promiscuous mode
-> [ 5287.165502] veth1_vlan: left promiscuous mode
-> …
-> [ 5297.598240] bridge0: port 2(bridge_slave_1) entered blocking state
-> [ 5297.598262] bridge0: port 2(bridge_slave_1) entered forwarding state
-> [ 5297.598296] bridge0: port 1(bridge_slave_0) entered blocking state
-> [ 5297.598313] bridge0: port 1(bridge_slave_0) entered forwarding state
-> [ 5297.616090] 8021q: adding VLAN 0 to HW filter on device bond0
-> [ 5297.620405] bridge0: port 1(bridge_slave_0) entered disabled state
-> [ 5297.620730] bridge0: port 2(bridge_slave_1) entered disabled state
-> [ 5297.627247] 8021q: adding VLAN 0 to HW filter on device team0
-> [ 5297.629636] bridge0: port 1(bridge_slave_0) entered blocking state
-> …
-> [ 5298.002798] bridge_slave_0: left promiscuous mode
-> [ 5298.002869] bridge0: port 1(bridge_slave_0) entered disabled state
-> [ 5298.309444] bond0 (unregistering): (slave bond_slave_0): Releasing backup interface
-> [ 5298.315206] bond0 (unregistering): (slave bond_slave_1): Releasing backup interface
-> [ 5298.320207] bond0 (unregistering): Released all slaves
-> [ 5298.354296] hsr_slave_0: left promiscuous mode
-> [ 5298.360750] hsr_slave_1: left promiscuous mode
-> [ 5298.374889] veth1_macvtap: left promiscuous mode
-> [ 5298.374931] veth0_macvtap: left promiscuous mode
-> [ 5298.374988] veth1_vlan: left promiscuous mode
-> [ 5298.375024] veth0_vlan: left promiscuous mode
-> [ 5299.109741] team0 (unregistering): Port device team_slave_1 removed
-> [ 5299.185870] team0 (unregistering): Port device team_slave_0 removed
-> …
-> [ 5300.155443] Bluetooth: hci3: unexpected cc 0x0c03 length: 249 > 1
-> [ 5300.155724] Bluetooth: hci3: unexpected cc 0x1003 length: 249 > 9
-> [ 5300.155988] Bluetooth: hci3: unexpected cc 0x1001 length: 249 > 9
-> ….
-> [ 5301.075531] team0: Port device team_slave_1 added
-> [ 5301.085515] bridge0: port 1(bridge_slave_0) entered blocking state
-> [ 5301.085531] bridge0: port 1(bridge_slave_0) entered disabled state
-> [ 5301.085588] bridge_slave_0: entered allmulticast mode
-> [ 5301.085800] bridge_slave_0: entered promiscuous mode
-> [ 5301.095617] bridge0: port 1(bridge_slave_0) entered blocking state
-> [ 5301.095633] bridge0: port 1(bridge_slave_0) entered disabled state
-> …
-> [ 5301.149734] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
-> [ 5301.173234] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
-> [ 5301.180517] bond0: (slave bond_slave_1): Enslaving as an active interface with an up link
-> [ 5301.193481] hsr_slave_0: entered promiscuous mode
-> [ 5301.204425] hsr_slave_1: entered promiscuous mode
-> [ 5301.210172] debugfs: Directory 'hsr0' with parent 'hsr' already present!
-> [ 5301.210185] Cannot create hsr debugfs directory
-> [ 5301.224061] bond0: (slave bond_slave_1): Enslaving as an active interface with an up link
-> [ 5301.246901] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
-> [ 5301.255934] team0: Port device team_slave_0 added
-> [ 5301.256480] team0: Port device team_slave_1 added
-> [ 5301.256948] team0: Port device team_slave_0 added
-> …
-> [ 5301.435928] hsr_slave_0: entered promiscuous mode
-> [ 5301.446029] hsr_slave_1: entered promiscuous mode
-> [ 5301.455872] debugfs: Directory 'hsr0' with parent 'hsr' already present!
-> [ 5301.455884] Cannot create hsr debugfs directory
-> [ 5301.502664] hsr_slave_0: entered promiscuous mode
-> [ 5301.513675] hsr_slave_1: entered promiscuous mode
-> [ 5301.526155] debugfs: Directory 'hsr0' with parent 'hsr' already present!
-> [ 5301.526164] Cannot create hsr debugfs directory
-> [ 5301.563662] hsr_slave_0: entered promiscuous mode
-> [ 5301.576129] hsr_slave_1: entered promiscuous mode
-> [ 5301.580259] debugfs: Directory 'hsr0' with parent 'hsr' already present!
-> [ 5301.580270] Cannot create hsr debugfs directory
-> [ 5301.590269] 8021q: adding VLAN 0 to HW filter on device bond0
-> 
-> [ 5301.595872] KASAN: null-ptr-deref in range [0x0000000000000130-0x0000000000000137]
-> [ 5301.595877] Mem abort info:
-> [ 5301.595881]   ESR = 0x0000000096000006
-> [ 5301.595885]   EC = 0x25: DABT (current EL), IL = 32 bits
-> [ 5301.595889]   SET = 0, FnV = 0
-> [ 5301.595893]   EA = 0, S1PTW = 0
-> [ 5301.595896]   FSC = 0x06: level 2 translation fault
-> [ 5301.595900] Data abort info:
-> [ 5301.595903]   ISV = 0, ISS = 0x00000006, ISS2 = 0x00000000
-> [ 5301.595907]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
-> [ 5301.595911]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-> [ 5301.595915] [dfff800000000026] address between user and kernel address ranges
-> [ 5301.595971] Internal error: Oops: 0000000096000006 [#1] SMP
-> …
-> [ 5301.596076] CPU: 2 PID: 102769 Comm:
-> syz-executor.3 Kdump: loaded Tainted:
->   G        W         -------  ---  6.10.0-0.rc2.20240608gitdc772f8237f9.29.fc41.aarch64+debug #1
-> [ 5301.596080] Hardware name: VMware, Inc. VMware20,1/VBSA,
->   BIOS VMW201.00V.21805430.BA64.2305221830 05/22/2023
-> [ 5301.596082] pstate: 01400005 (nzcv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
-> [ 5301.596085] pc : strnlen+0x40/0x88
-> [ 5301.596114] lr : trace_event_get_offsets_qdisc_reset+0x6c/0x2b0
-> [ 5301.596124] sp : ffff8000beef6b40
-> [ 5301.596126] x29: ffff8000beef6b40 x28: dfff800000000000 x27: 0000000000000001
-> [ 5301.596131] x26: 6de1800082c62bd0 x25: 1ffff000110aa9e0 x24: ffff800088554f00
-> [ 5301.596136] x23: ffff800088554ec0 x22: 0000000000000130 x21: 0000000000000140
-> [ 5301.596140] x20: dfff800000000000 x19: ffff8000beef6c60 x18: ffff7000115106d8
-> [ 5301.596143] x17: ffff800121bad000 x16: ffff800080020000 x15: 0000000000000006
-> [ 5301.596147] x14: 0000000000000002 x13: ffff0001f3ed8d14 x12: ffff700017ddeda5
-> [ 5301.596151] x11: 1ffff00017ddeda4 x10: ffff700017ddeda4 x9 : ffff800082cc5eec
-> [ 5301.596155] x8 : 0000000000000004 x7 : 00000000f1f1f1f1 x6 : 00000000f2f2f200
-> [ 5301.596158] x5 : 00000000f3f3f3f3 x4 : ffff700017dded80 x3 : 00000000f204f1f1
-> [ 5301.596162] x2 : 0000000000000026 x1 : 0000000000000000 x0 : 0000000000000130
-> [ 5301.596166] Call trace:
-> [ 5301.596175]  strnlen+0x40/0x88
-> [ 5301.596179]  trace_event_get_offsets_qdisc_reset+0x6c/0x2b0
-> [ 5301.596182]  perf_trace_qdisc_reset+0xb0/0x538
-> [ 5301.596184]  __traceiter_qdisc_reset+0x68/0xc0
-> [ 5301.596188]  qdisc_reset+0x43c/0x5e8
-> [ 5301.596190]  netif_set_real_num_tx_queues+0x288/0x770
-> [ 5301.596194]  veth_init_queues+0xfc/0x130 [veth]
-> [ 5301.596198]  veth_newlink+0x45c/0x850 [veth]
-> [ 5301.596202]  rtnl_newlink_create+0x2c8/0x798
-> [ 5301.596205]  __rtnl_newlink+0x92c/0xb60
-> [ 5301.596208]  rtnl_newlink+0xd8/0x130
-> [ 5301.596211]  rtnetlink_rcv_msg+0x2e0/0x890
-> [ 5301.596214]  netlink_rcv_skb+0x1c4/0x380
-> [ 5301.596225]  rtnetlink_rcv+0x20/0x38
-> [ 5301.596227]  netlink_unicast+0x3c8/0x640
-> [ 5301.596231]  netlink_sendmsg+0x658/0xa60
-> [ 5301.596234]  __sock_sendmsg+0xd0/0x180
-> [ 5301.596243]  __sys_sendto+0x1c0/0x280
-> [ 5301.596246]  __arm64_sys_sendto+0xc8/0x150
-> [ 5301.596249]  invoke_syscall+0xdc/0x268
-> [ 5301.596256]  el0_svc_common.constprop.0+0x16c/0x240
-> [ 5301.596259]  do_el0_svc+0x48/0x68
-> [ 5301.596261]  el0_svc+0x50/0x188
-> [ 5301.596265]  el0t_64_sync_handler+0x120/0x130
-> [ 5301.596268]  el0t_64_sync+0x194/0x198
-> [ 5301.596272] Code: eb15001f 54000120 d343fc02 12000801 (38f46842)
-> [ 5301.596285] SMP: stopping secondary CPUs
-> [ 5301.597053] Starting crashdump kernel...
-> [ 5301.597057] Bye!
-> 
-> Yeoreum and I use two fuzzing tool simultaneously.
-> 
-> One process with syz-executor : https://github.com/google/syzkaller
-> 
->   $ ./syz-execprog -executor=./syz-executor -repeat=1 -sandbox=setuid \
->      -enable=none -collide=false log1
-> 
-> The other process with perf fuzzer:
->   https://github.com/deater/perf_event_tests/tree/master/fuzzer
-> 
->   $ perf_event_tests/fuzzer/perf_fuzzer
-> 
-> Yeoreum and I don't know if the patch we wrote will fix the underlying cause,
-> but we think that priority is to prevent kernel panic happening.
-> So, we're sending this patch.
-> 
-> I can attach a sys-execprog's executing program, kernel dump and dmesg
-> if someone need it, but I'm not sure how to safely attach large vmcore with vmlinux.
+best,
+Yan
 
-The syzkaller program + C reproducer is usually enough, please make it 
-visible somewhere
-
-> 
-> Signed-off-by: Yunseong Kim <yskelg@gmail.com>, Yeoreum Yun <yeoreum.yun@arm.com>
-
-Should be two SoB tags
-
-> ---
->   include/trace/events/qdisc.h | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
-> index f1b5e816e7e5..170b51fbe47a 100644
-> --- a/include/trace/events/qdisc.h
-> +++ b/include/trace/events/qdisc.h
-> @@ -81,7 +81,7 @@ TRACE_EVENT(qdisc_reset,
->   	TP_ARGS(q),
->   
->   	TP_STRUCT__entry(
-> -		__string(	dev,		qdisc_dev(q)->name	)
-> +		__string(dev, qdisc_dev(q) ? qdisc_dev(q)->name : "noop_queue")
->   		__string(	kind,		q->ops->id		)
->   		__field(	u32,		parent			)
->   		__field(	u32,		handle			)
-
+> All in all the approach implemented in this series does not look worthy
+> to me.
+>
+> Thanks,
+>
+> Paolo
+>
 
