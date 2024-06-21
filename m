@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-105623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21FB291212C
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 11:49:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43E1691215C
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 11:57:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9318E1F26573
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 09:49:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 338BC1C213F9
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 09:57:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6030316F85B;
-	Fri, 21 Jun 2024 09:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F62C16F859;
+	Fri, 21 Jun 2024 09:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MvDkQ4dy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WlQboi5z"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ADC216F27A
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 09:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EBF16F84B
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 09:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718963373; cv=none; b=tLJNriC3lr0A103VfWKmeNweuGN44EQ4zvfYrdMb/S0cKltVXLQg6aO58bELkWwa0VGS/B215dJqPwdbN4AqDvIjA9O9IYOVGPc2EyF7qM/IgZiYP+AGRAe2TYG9KoAr5R4M44cumaq+cO7KNHUnsqs5+UjeLQ/Uq+PrICHEhWY=
+	t=1718963832; cv=none; b=aqfTrAe1eF98yNS6XR3posQ9uOjaVMib53BnyHOKto9S8yRiV4Jc9s8xkx+0uUmNtkaB7zJN5vCqxFJ+O2pFPXE3ArUJ0y8PfkH+WM9xlgJr++0bWFQBwfy7g6GeSZijUj79omWrh4kHQH6gI3tN2KGUW2KrfChIk4TUCbrQvhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718963373; c=relaxed/simple;
-	bh=5XUVWX/2+5ahyhYTtBJduwq6+JE3ihhtWrDhK7/d8zA=;
+	s=arc-20240116; t=1718963832; c=relaxed/simple;
+	bh=iJFRdWNKQ4fd8heDLgL5aLx6gHg1HzLoAys/N863UD0=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=fwnkksFItl0aRXq9zpJyfWnzTZuzGbB0xQ6XT8jCKmoLiWznQVseI963YIMfvcx8iAML9ZWN3pTUUna5Kg91vPx+UnEoLlobjcxNjFjf7BOdS7rqyseySFpuDpH0SjRQC1KWjkzrKhZJsF0bshOS5vE8A/AEHVRIo+6qr1jIdZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MvDkQ4dy; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:MIME-Version; b=Z5058m+qeXXrMXLLo5r+TwkhGWeF732b6NtiPZfc2EUOCd9LsgjhZpynYz2kNQc31Aa5vrvx8kyhKjPwtJ+lF2hf2YqPbKS0miJnDy2DjJ4Rnr+Y9CIqT+mVXLI5URzeOKel+XjwH2F79+AbmDZIHBN49Ykq3kTe0QR97knhpG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WlQboi5z; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718963370;
+	s=mimecast20190719; t=1718963830;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=T84pkPxoOVF7+EbEjV+8MHWS6p9zQoo8JNnRS5sf/gM=;
-	b=MvDkQ4dyXQQNDpXvyYEwE70KIm7a3Ydiod8Na346Fn8RMjG4A9a2eI9Sil2xGOSploEtga
-	H/OMR7TZ0rfS9WSl4DlJOq/XRbM8IELCwooT6n1l4hiFa89L6CwGEqA+G+19Erf3fF6bLq
-	1/PKPanOrkCj/7lbw1n6NMfJhpKMMFE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=38G26vSnP45XuOy+Bej3ZUMTBwKAbH0lYjkgTUmXBPk=;
+	b=WlQboi5zJtYDRYAjIYpLKOMxpcz6R6vmzsTkkLCQJ5dynCa6sNLUagh9W0FRSHnJYUxZXh
+	O/Lbqd3zvIsUX8mj+zjTND5ZfJ1WUS6htocobt6qqfCdgxMNM8+H6nI9hZH4gnEJjRBKmZ
+	YGeIJK6qST1KZmHTJ6u+1ugYR5UNXqs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-426-WByeyHD2MlKAaIbPTw3m4w-1; Fri, 21 Jun 2024 05:49:29 -0400
-X-MC-Unique: WByeyHD2MlKAaIbPTw3m4w-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3658fcaf608so99324f8f.3
-        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 02:49:29 -0700 (PDT)
+ us-mta-624-SwSmiQHqP1CPAzHZmmaEhQ-1; Fri, 21 Jun 2024 05:57:08 -0400
+X-MC-Unique: SwSmiQHqP1CPAzHZmmaEhQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4217f4b7355so2840785e9.3
+        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 02:57:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718963368; x=1719568168;
+        d=1e100.net; s=20230601; t=1718963827; x=1719568627;
         h=mime-version:user-agent:content-transfer-encoding:autocrypt
          :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T84pkPxoOVF7+EbEjV+8MHWS6p9zQoo8JNnRS5sf/gM=;
-        b=MdZf/L0+3ElS06lQoco20oNcFleynQVLNNady32xPRIwhmkrfJxDnynLy4C2QNxXSQ
-         +rjUOiYN6fhplEiABPtuasKGS61pj68d8AsffmdWmlg1FUtkdyBMwrkbLQzxFdTexvm+
-         zOxQHqBXfrWUAnDsFaTqc5sB+YRnC6WShFVmRUknnj9Lo1Hs+P0TUK6YBRKhLCKuMOHn
-         OBAehqDpH3IApNfNPUa6FjWQeDudnJCfyPjOB08m5cWRBwzFnR/Z3siq8x5uwnvkJtJR
-         FqLzkiDpu1bqnklhMnspDfLwibAnpfQ6lb0mTdxa2jaHYcV5nkjjAdRS1L9S6SGGs6uJ
-         YF5w==
-X-Forwarded-Encrypted: i=1; AJvYcCUkILoIc/oAVS1ount5biams918nrqoK1SZuPcGiisndoT6d4Jb/okYziFqekrZormW/FfDymclRjRzk3Nm3kO9GyowAesB
-X-Gm-Message-State: AOJu0Yzvh241emxu1SM8ayUifmjMDfW0nL+YEDSU5AG8dCF8GO+ng6VV
-	oDhaTuXfSZTx0YVGWSWxaZLc32y/zDEIkBzML2/JzLFzq2lb2EN4r6YakIX1UkbfJPIQNphKNrL
-	6AYSQu4HruuDontBjnjtAW61yiXR5PCLISQ3c898T7zD3yYcc5QmkpQ==
-X-Received: by 2002:a05:6000:18a2:b0:362:1322:affc with SMTP id ffacd0b85a97d-3631998fb44mr6557130f8f.5.1718963367978;
-        Fri, 21 Jun 2024 02:49:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG13B6ru48yXs3LfLtUM5S/5oxVo2hDzIyhqBvGMis2Kdbj45jbmJgKjpz4JCOx31aj2AzMag==
-X-Received: by 2002:a05:6000:18a2:b0:362:1322:affc with SMTP id ffacd0b85a97d-3631998fb44mr6557100f8f.5.1718963367495;
-        Fri, 21 Jun 2024 02:49:27 -0700 (PDT)
+        bh=38G26vSnP45XuOy+Bej3ZUMTBwKAbH0lYjkgTUmXBPk=;
+        b=l47C1H4bXOrQztQzxicxUwgTRhVU/dMtEE5zU/uFSIHu7y4OIm3yqy9y2EEKq0lIPq
+         LvFzv5eVSf8U1MvEm9de1L/uiJGMLzPYMmtwvTXWB9gjYugs5OwCd6EcAghCdJ31yT4j
+         jk5e2pF7yhvp4AfSMfV0LyAVyK1dcIgayKgpbJaie7mPZHQttThIjiKDqJpkxv2NQat4
+         iug4cw0H41N8lIdaneU+T1dk5r4k8CbXqa81+vRAS3qYkzRqkFFiWZbJP+P03ACIrcH6
+         WWKCASGZqzgGRogdZ2y+8J5qeAk2L7i/aO9OR96BO0GAPPuo7Jey1dR07CcgwG76loOL
+         WiTg==
+X-Forwarded-Encrypted: i=1; AJvYcCWOU2Y+m6hASrL2jxun3L080drjPklfkk9pYxjvTKD+uou0s+A/s1f/Tlpjz3RoiVWm6RMZQ5+jjDo+ZBLzR8T1HZskuX4C
+X-Gm-Message-State: AOJu0YwmH1aWkt4Xx7nq+EALqjcGXTCRJzHBdNQU78uC3H6RvamzAP/B
+	Zk56dxP1ZaLRuPjm5OkBGjirP5/ryt99ylXhJUqO8yON0D4MXUINawSUHDvpg75JTeqw/6W+Bqu
+	+nUfuHaMuYPhpG28EEDfM9Nhnus/zbj+ZseAmlgP1c6DuhBvVF8/58A==
+X-Received: by 2002:a05:600c:1d09:b0:422:2f06:92d1 with SMTP id 5b1f17b1804b1-42475296800mr55210005e9.2.1718963827304;
+        Fri, 21 Jun 2024 02:57:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGhCv4S3sqOUeoRHbQvJ7ysqB82xo4PjfMVMg1twnOU2B6QkdHWGk0NERGdplcS8IdL7Ckg4w==
+X-Received: by 2002:a05:600c:1d09:b0:422:2f06:92d1 with SMTP id 5b1f17b1804b1-42475296800mr55209745e9.2.1718963826895;
+        Fri, 21 Jun 2024 02:57:06 -0700 (PDT)
 Received: from gerbillo.redhat.com ([2a0d:3341:b08b:6910:937c:803f:4309:91d0])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3663a2f694asm1227044f8f.77.2024.06.21.02.49.25
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4247d0be841sm56250535e9.20.2024.06.21.02.57.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jun 2024 02:49:27 -0700 (PDT)
-Message-ID: <a1c983cdb95bdd44385dae29ca7451da16a70c98.camel@redhat.com>
+        Fri, 21 Jun 2024 02:57:06 -0700 (PDT)
+Message-ID: <2081388d3e05e1e6324d81524c6496006058bbb9.camel@redhat.com>
 Subject: Re: [RFC net-next 1/9] skb: introduce gro_disabled bit
 From: Paolo Abeni <pabeni@redhat.com>
 To: Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org
@@ -91,7 +91,7 @@ Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
  Pavel Begunkov <asml.silence@gmail.com>, Lorenzo Bianconi
  <lorenzo@kernel.org>, Thomas =?ISO-8859-1?Q?Wei=DFschuh?=
  <linux@weissschuh.net>,  linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Date: Fri, 21 Jun 2024 11:49:24 +0200
+Date: Fri, 21 Jun 2024 11:57:04 +0200
 In-Reply-To: <b8c183a24285c2ab30c51622f4f9eff8f7a4752f.1718919473.git.yan@cloudflare.com>
 References: <cover.1718919473.git.yan@cloudflare.com>
 	 <b8c183a24285c2ab30c51622f4f9eff8f7a4752f.1718919473.git.yan@cloudflare.com>
@@ -128,56 +128,19 @@ On Thu, 2024-06-20 at 15:19 -0700, Yan Zhai wrote:
 > On the other hand, not all the traffic through this device needs double
 > encapsulation. But we have to turn off GRO completely for any ingress
 > device as a result.
->=20
-> Introduce a bit on skb so that GRO engine can be notified to skip GRO on
-> this skb, rather than having to be 0-or-1 for all traffic.
->=20
-> Signed-off-by: Yan Zhai <yan@cloudflare.com>
-> ---
->  include/linux/netdevice.h |  9 +++++++--
->  include/linux/skbuff.h    | 10 ++++++++++
->  net/Kconfig               | 10 ++++++++++
->  net/core/gro.c            |  2 +-
->  net/core/gro_cells.c      |  2 +-
->  net/core/skbuff.c         |  4 ++++
->  6 files changed, 33 insertions(+), 4 deletions(-)
->=20
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index c83b390191d4..2ca0870b1221 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -2415,11 +2415,16 @@ struct net_device {
->  	((dev)->devlink_port =3D (port));				\
->  })
-> =20
-> -static inline bool netif_elide_gro(const struct net_device *dev)
-> +static inline bool netif_elide_gro(const struct sk_buff *skb)
->  {
-> -	if (!(dev->features & NETIF_F_GRO) || dev->xdp_prog)
-> +	if (!(skb->dev->features & NETIF_F_GRO) || skb->dev->xdp_prog)
->  		return true;
-> +
-> +#ifdef CONFIG_SKB_GRO_CONTROL
-> +	return skb->gro_disabled;
-> +#else
->  	return false;
-> +#endif
 
-This will generate OoO if the gro_disabled is flipped in the middle of
-a stream.
+Could you please add more details WRT this last statement?=C2=A0I'm unsure
+if I understand your problem. My guess is as follow:
 
-Assuming the above is fine for your use case (I think it's _not_ in
-general), you could get the same result without an additional costly
-bit in sk_buff.
+Your device receive some traffic, GRO and forward it, and the multiple
+encapsulation can happen on such forwarded traffic (since I can't find
+almost none of the above your message is mainly a wild guess).
 
-Let xdp_frame_fixup_skb_offloading() return a bool - e.g. 'true' when
-gro should be avoided - and let the NIC driver call netif_receive_skb()
-instead of the gro rx hook for such packet.
+Assuming I guessed correctly, I think you could solve the problem with
+no kernel changes: redirect the to-be-tunneled traffic to some virtual
+device and all TX offload on top of it and let the encap happen there.
 
-All in all the approach implemented in this series does not look worthy
-to me.
-
-Thanks,
+Cheers,
 
 Paolo
 
