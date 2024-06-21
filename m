@@ -1,219 +1,162 @@
-Return-Path: <netdev+bounces-105562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17C04911C52
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 08:58:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D52FB911CAE
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 09:21:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C08EC2879A5
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 06:57:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12C991C215D6
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 07:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C2416D9AC;
-	Fri, 21 Jun 2024 06:56:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93FB312D74E;
+	Fri, 21 Jun 2024 07:21:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="QpaK5tTT";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="HZaLFCuE"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="L8cUOmTZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2081.outbound.protection.outlook.com [40.107.95.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2053D16D9A5
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 06:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718952997; cv=none; b=i/lZOjAs9KS0EStVRWmveTXYpf4orMVo0v69zJ7YaQf+XesCLF412N7MTjgyPX9+zZ4ziWdXtZOYLoGJO906VWMtUwP1DE5kIOH/3JjYbNcOI0YuWwuxVX1ih/M9J6qNxZZg/5ZVDxr8jDlkv/ZZaBmZqwzhBvEiNRaUGLybaWA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718952997; c=relaxed/simple;
-	bh=DSEXwJvkBR4IDfqA68G68GzFO3ZBZFt7wuK/GAeARgU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=cLHEN6zbqlOVdEAjotMIXCF+k9PB6QubimsOxDlyza9gK37PV8UMscq+uIfkLyz5AawPvCIZYa1F6AsMOCH4huZTL4xHqnYlPN2lvOYCAPZ9/H6vvFzlHNbS2MF0DO2KHjd1HWvzVHEnPiikTkXYoU8IjZ7SCnO/aYqLOh77t/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=QpaK5tTT; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=HZaLFCuE; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1718952992;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=eWY++QvyVNOoG9vfoKeofa89OaimjRobo2XRmBqpW38=;
-	b=QpaK5tTTH6sBC46fUlzjmH8XJEGGlekiCHyqV9UgxACWGpfyZROxzYtNylsIXre84OFlac
-	JmUFJwCjttmd8gYYQxCQ/a48weFctZ45DT/j7xLnNAgU2G9eeTEhTJS2CTSNARsQzhZhRs
-	xCMrOfCw7yGSkdtkEWpF/QxN+ENT+wYOjCt6kY1PEbNm1aFi//RkB3BLVSVNRo06akFxxT
-	eZ8J3vooaYnW5pnAY7wf8jZNKzLld72ZwGChA9m9Lpuq2rsTFMNRga4US8Myc3q4XjM7aG
-	/v7KzaHPMYnuHWqKeXlcinPX1z9iFjAL3g7NECVou8ipt0BNMWOTglQ1q/wC0w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1718952992;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=eWY++QvyVNOoG9vfoKeofa89OaimjRobo2XRmBqpW38=;
-	b=HZaLFCuEb8UyRoOAMDxG4uh887b9vkc+1Qvi1TCg5m57QQw32zCcJ45YSAFNvAf9JpzEpB
-	WMxAsq7FzDjwVVBg==
-Date: Fri, 21 Jun 2024 08:56:30 +0200
-Subject: [PATCH iwl-next v2] igc: Get rid of spurious interrupts
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45693C2F
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 07:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718954488; cv=fail; b=CiYSJkdbMJeI2RHCrb+/n2whasab2B/egAYlH+6Lr6kEroqGnt6Q7biP96SBSdKV8McODWcljMpUJyGKZHtcozfywDlCDR5XqTjyaJeEDdCyV3Cn6Y7TxjYqDZDbGHtX6bQwr/TCJwNk8C79WdyqNeoxSJCQJdvm22Zpj16Ytnw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718954488; c=relaxed/simple;
+	bh=cTxhkH+66cbuV1ZMYRRVwiVi8e1GW/TCll2lRcfsGYc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Kl8phnSawduRmtIYOR3oBvnEbZWfH7+23F7dv/4YN+AYiYEWCM8jpTydAhfBe7O3qGM44GGIx3rToPDL+DjoiUsrs739e+OSyKHj0KdhvywyRyTcHjTpUYL0BFQxvr0eTL4u2ijy3UnweBqMeTufB9B4n4ISuclnr4sd+ewoHBw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=L8cUOmTZ; arc=fail smtp.client-ip=40.107.95.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ghKwmrbwhXfQGjN1984k8tHaQtYf3ULzqUcG445rIaQ6XvbX/pyJWqHcRzGaEBWW58yfEP9I2tYpQC7Nxn6IffajsyLUKjKtHmDziWpIrcW3Xf7qB6B8sk6Nk0bm+nZlL5NYh12Sy40QQm8pk2Pc4+LQkPolJnUNS5+eRVLARubTjKmwej5VOl1gMrYjnJSlNT7MWHBMTkMt1lbNmY0d/xoKwyCEZ40NCmV6WvX1y2YRr5zMi9KkaKJma4LxtCaHjCke8LfDuH7FDSBgsji5r+LfLiWCruLE6jCXh3zCTW061eEfKCjZK//Mb5RBZJF63LOiM3BLBoqpL9h58m1PPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=npPYuHTJ8iSm2H9w3FSUrVaAcSSYWyEIyQbBr3EqH90=;
+ b=UhXbjvdnw49BcCHV0p2L+gjqulZNKdILx87GuHroeNZa2o3Ff1NSkp4QLUQm0tpRwjIgepaNbJzrXAcGOVi077IBYDIbhS+vY2KkuzXw1W1YOo9S4seM69SnDHy9f/VbPTc8z2T2YuK5/YgSduca3PJemdJW0+BVQggwwSpCtGI6mfJu6I7dGoc8Qv61/EQE6tXyJDvcZp5L/43OYoNXfEEX0H5IwLYO0tdfjRtyShnqhqYmKvCkm51U4R10ykZ/F6VFt3+GeP+RLUqKU83K7J9RfaBFvO4FGhWE3wY+zF6R1Y5S5u4LNEKcnsUByM1YpdKA/gdvUs0jaTA4buKr3A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=npPYuHTJ8iSm2H9w3FSUrVaAcSSYWyEIyQbBr3EqH90=;
+ b=L8cUOmTZv+RiDhsjT3rQ7eVtYTLt5pdo7T3H5uGFqldDQlnSjF+ms4FU4YpfGdLTbCAhvuO3cBwUemehrR9CaqRGxaQvnw/EdfULOSqjkPHMmjQfpePT4GO22gZinf5E2zAXgebP9DX2HZuBaMQH9VLsgsdIKysO5Inj1V22AsVS4+5fGovAIBGJpOKzSijaO7dasNBlo13kgWNrrFvq3hhbjuwh+KdNvI12xaUmj9NIAJlTkr47pP5aa75vP1xqEIh8tlzIlqhzXmHfSVpb26G14HTzBAo91pFxSTQYVebsn0uciutMBxJqd5VGIZvQgr/ToaOCegSRYBoxA/MYrQ==
+Received: from CH2PR07CA0015.namprd07.prod.outlook.com (2603:10b6:610:20::28)
+ by MN0PR12MB5859.namprd12.prod.outlook.com (2603:10b6:208:37a::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.35; Fri, 21 Jun
+ 2024 07:21:24 +0000
+Received: from CH3PEPF00000014.namprd21.prod.outlook.com
+ (2603:10b6:610:20:cafe::27) by CH2PR07CA0015.outlook.office365.com
+ (2603:10b6:610:20::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.36 via Frontend
+ Transport; Fri, 21 Jun 2024 07:21:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CH3PEPF00000014.mail.protection.outlook.com (10.167.244.119) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7719.0 via Frontend Transport; Fri, 21 Jun 2024 07:21:23 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 21 Jun
+ 2024 00:21:15 -0700
+Received: from yaviefel.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 21 Jun
+ 2024 00:21:11 -0700
+From: Petr Machata <petrm@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>
+CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	<mlxsw@nvidia.com>
+Subject: [PATCH net v3 0/2] mlxsw: Fixes
+Date: Fri, 21 Jun 2024 09:19:12 +0200
+Message-ID: <cover.1718954012.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240611-igc_irq-v2-1-c63e413c45c4@linutronix.de>
-X-B4-Tracking: v=1; b=H4sIAB0kdWYC/2WNyw6CMBAAf8Xs2RpakYcn/8MQ0y4rbIJFtxUxh
- H8XuHqczCQzQSBhCnDeTSA0cODeL2D2O8DW+oYU1wuDSUyaZForbvDG8lKIqLFwmBVlAkvtbCD
- lxHps1/5hQyRZxVPozuO2uAJ/OuVpjFAtpuUQe/lu70Fv/m8zaKVVWubZ0RQpulN+6di/o/Sex
- 0NNUM3z/ANhrAl6xQAAAA==
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>, 
- Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
- Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
- Kurt Kanzenbach <kurt@linutronix.de>
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4534; i=kurt@linutronix.de;
- h=from:subject:message-id; bh=DSEXwJvkBR4IDfqA68G68GzFO3ZBZFt7wuK/GAeARgU=;
- b=owEBbQKS/ZANAwAKAcGT0fKqRnOCAcsmYgBmdSQfTpNhpH4vgaMPXzX6tdhtfknw4NIbp030l
- LVhbWUON3+JAjMEAAEKAB0WIQS8ub+yyMN909/bWZLBk9HyqkZzggUCZnUkHwAKCRDBk9HyqkZz
- gqD5D/9lXqtEvFmmVOYqKKp/Qbrx396LGCK6Wl7dkQ/S01jF+MYb47j7LaXp74sdRQI9e456F+R
- uR1rYwu7NSBey3JBzKEV8nrknp/urOLP8QEJJwBKSusNZN3mFICfbWcqKcxIKoV5DaBIyCrm1Gr
- /C0X8zmceridqL7T7p1yJCuoZbMWklGhRdPVWaI1lEHBYR2R91X0scptqss9hpR64r/pijY6KCv
- PKEMPWiqdlmZWIBOnCI9kpdJCNJlhzHS4mTaGrmL39Si0YMD2zBku8N0blq8wycMNrQGsH8LfnU
- OTa/WStMIxBob3gD1foR+8lHVuUn5CUEm2hBFzq7vQPvtF1EdjXwQ1p+z8w8HLj0vC6ecy4HkZH
- LOIi4x/y1evlwYdb/kFVdtobJEd2SIBrJjlxKgeo0I8o9eeltSotCOH44d88HBOpfuA5/e1Vz4N
- Z7ZrxRsazLArusKIY/3HgoGhq3wJHaZeqa//iJ0OnXRsIdXTcMy2pdSOtchCwntBLLz+EukrqiL
- BQfagyMaFrQaxdpnYxt34/ivOgqLLO2sVP92ndaqzc4xC6k04ISB/cc7eFvsbfMZzowTUtA6ASe
- oOKuFDKbMi3Uu1KyvsbKrrfEST5aWSoYM2BeF52TABin+kuqyZpgF6jyfOTskpEN1B5HYt9brEi
- ABsALT22KkxBY3g==
-X-Developer-Key: i=kurt@linutronix.de; a=openpgp;
- fpr=BCB9BFB2C8C37DD3DFDB5992C193D1F2AA467382
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PEPF00000014:EE_|MN0PR12MB5859:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2b10d413-4e45-42ea-6b86-08dc91c2c1ab
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230037|82310400023|1800799021|376011|36860700010;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?QN3CPhhUTGyY7/hqiL3e5tgBg5bkNt9wYp56d6HopQRU/ePlB7R7KsYp0Jls?=
+ =?us-ascii?Q?6JzfQJPsBvvmOQ6NU3E0vDSY5au3m8WOkIkHdbH7wjheAjGw5QEaZ7jYDXjQ?=
+ =?us-ascii?Q?wXvu7vPpavrVhyog8vDgxxR56n4BoOJAUTu0BqGrceDJYPuF6QnqrzRBVkSS?=
+ =?us-ascii?Q?7y0/xGpECGrCoJA1Mt9qnmcZuyWEQxhR0jtRR8iHAYPLK/lJPSVg2QYgRce6?=
+ =?us-ascii?Q?NhnC1uwqKfL3YdMuEVxAYJZZ8aL2YwoMI86jGiKn/AyX/gBDxqC5IriqhzRV?=
+ =?us-ascii?Q?651mfIHfPmsFtm+S3bdcB4Ri4OPr9INZILS44VjO/PW0wjmLZ/TbonGJbBmG?=
+ =?us-ascii?Q?12RNd6twyJNdWUt39BRlOLmUkFl683SgiKqs2dlDImLK2H6rROnhyOtFyfiS?=
+ =?us-ascii?Q?Ax+v5xEHD9qncu0n2+sro32lpZNV5yjHzk4S4vAQpvFDruXtOKySLGzl6i1A?=
+ =?us-ascii?Q?zQzUNIUBO1NJe53xE90NgKmRarQYmkIgxq0HXQyIZd4yJ5LV8g8CgAMRulSX?=
+ =?us-ascii?Q?jxoDdYqfzn4gIwFR+qvv7ZvzJzDdaoeFeQTpbamGSG26WMhiD5HsVfroW+z+?=
+ =?us-ascii?Q?cSNWcsoI6MMj+7HgsAWe9sSewM6QCI1Tth34AIHgW+33Cbt+tjhGJhamFjn4?=
+ =?us-ascii?Q?Oo9rXM7MfVGDzbc729HNpuhIvnspSfLGfd7LjtydXJL7xRCfEmO/hAv8ZzUt?=
+ =?us-ascii?Q?Pla9oRawABZ5eESrSOkKLwceuG2MYm+E8bDOH2ObWF3JNB+io1P8KE66jcKS?=
+ =?us-ascii?Q?dyLHGlP9aUQCyzvveKXUGQdte2cLkKyJsgdLKcXpFI7MI08iYpQR/EB1456B?=
+ =?us-ascii?Q?wLd0uTodTB2o7UNp5x7J3ClcGTKIOkAYG20C/3y/LBA6Y3PVeDa7BGu8TLbx?=
+ =?us-ascii?Q?UfKib7rvqcF3jfQSmpQEMqyiWDW0EHF9PTNGL9QbYdpEYPeuBcecN8XJqlXB?=
+ =?us-ascii?Q?jab15aoBB93LW43cqWXc/PDOmG8AG9S9w2I2i94Jra1AtwuKBt3XCY8oEpNX?=
+ =?us-ascii?Q?OYmSn7X3W/W8CWQjQfJLplhm/sB4SB7u0XT4P9Q7W+zCXk8GSUaJPBqNSY3U?=
+ =?us-ascii?Q?ZTTZQqVJnqODRIwhwP6XGuX/lPYwdduXs19Afpy9Nt4e2C8mNJHGIBPlRAIv?=
+ =?us-ascii?Q?94AUyGYRuJUSmcGvLDAPIkA15UaIudzttPrOr5b0E66W1hajAafWO3gqclZz?=
+ =?us-ascii?Q?d3SWAmqATNCq8Xlfx6JAm4J89sEs8smCRQs+N+PK95pmqxSnt4MH9pOw4W7J?=
+ =?us-ascii?Q?Crfqy0SO5rqHLKQKaBWJxgbVoEOufrX5qIzt9Kt1NI6A+pBaSoIrfmkQhDBP?=
+ =?us-ascii?Q?g6GrZYtYhuPNZarZZV0lWV9nF2FB/x5/QprbaHyl3MM1T4wJCSTm1cnPvb2o?=
+ =?us-ascii?Q?5NR+wtxF1V6hzDqzs4lJjPaiG7Fuql98JEwJG2chsLw3mYvTqA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230037)(82310400023)(1800799021)(376011)(36860700010);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2024 07:21:23.7437
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2b10d413-4e45-42ea-6b86-08dc91c2c1ab
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH3PEPF00000014.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5859
 
-When running the igc with XDP/ZC in busy polling mode with deferral of hard
-interrupts, interrupts still happen from time to time. That is caused by
-the igc task watchdog which triggers Rx interrupts periodically.
+This patchset fixes an issue with mlxsw driver initialization, and a
+memory corruption issue in shared buffer occupancy handling.
 
-That mechanism has been introduced to overcome skb/memory allocation
-failures [1]. So the Rx clean functions stop processing the Rx ring in case
-of such failure. The task watchdog triggers Rx interrupts periodically in
-the hope that memory became available in the mean time.
+v3:
+- Drop the core thermal fix, it's not relevant anymore.
 
-The current behavior is undesirable for real time applications, because the
-driver induced Rx interrupts trigger also the softirq processing. However,
-all real time packets should be processed by the application which uses the
-busy polling method.
+Ido Schimmel (2):
+  mlxsw: pci: Fix driver initialization with Spectrum-4
+  mlxsw: spectrum_buffers: Fix memory corruptions on Spectrum-4 systems
 
-Therefore, only trigger the Rx interrupts in case of real allocation
-failures. Introduce a new flag for signaling that condition.
+ drivers/net/ethernet/mellanox/mlxsw/pci.c     | 18 ++++++++++++++---
+ drivers/net/ethernet/mellanox/mlxsw/reg.h     |  2 ++
+ .../mellanox/mlxsw/spectrum_buffers.c         | 20 +++++++++++++------
+ 3 files changed, 31 insertions(+), 9 deletions(-)
 
-[1] - https://git.kernel.org/pub/scm/linux/kernel/git/tglx/history.git/commit/?id=3be507547e6177e5c808544bd6a2efa2c7f1d436
-
-Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
----
-Changes in v2:
-- Index Rx rings correctly
-- Link to v1: https://lore.kernel.org/r/20240611-igc_irq-v1-1-49763284cb57@linutronix.de
----
- drivers/net/ethernet/intel/igc/igc.h      |  1 +
- drivers/net/ethernet/intel/igc/igc_main.c | 30 ++++++++++++++++++++++++++----
- 2 files changed, 27 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-index 8b14c029eda1..7bfe5030e2c0 100644
---- a/drivers/net/ethernet/intel/igc/igc.h
-+++ b/drivers/net/ethernet/intel/igc/igc.h
-@@ -682,6 +682,7 @@ enum igc_ring_flags_t {
- 	IGC_RING_FLAG_TX_DETECT_HANG,
- 	IGC_RING_FLAG_AF_XDP_ZC,
- 	IGC_RING_FLAG_TX_HWTSTAMP,
-+	IGC_RING_FLAG_RX_ALLOC_FAILED,
- };
- 
- #define ring_uses_large_buffer(ring) \
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 87b655b839c1..850ef6b8b202 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -2192,6 +2192,7 @@ static bool igc_alloc_mapped_page(struct igc_ring *rx_ring,
- 	page = dev_alloc_pages(igc_rx_pg_order(rx_ring));
- 	if (unlikely(!page)) {
- 		rx_ring->rx_stats.alloc_failed++;
-+		set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
- 		return false;
- 	}
- 
-@@ -2208,6 +2209,7 @@ static bool igc_alloc_mapped_page(struct igc_ring *rx_ring,
- 		__free_page(page);
- 
- 		rx_ring->rx_stats.alloc_failed++;
-+		set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
- 		return false;
- 	}
- 
-@@ -2659,6 +2661,7 @@ static int igc_clean_rx_irq(struct igc_q_vector *q_vector, const int budget)
- 		if (!skb) {
- 			rx_ring->rx_stats.alloc_failed++;
- 			rx_buffer->pagecnt_bias++;
-+			set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
- 			break;
- 		}
- 
-@@ -2739,6 +2742,7 @@ static void igc_dispatch_skb_zc(struct igc_q_vector *q_vector,
- 	skb = igc_construct_skb_zc(ring, xdp);
- 	if (!skb) {
- 		ring->rx_stats.alloc_failed++;
-+		set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &ring->flags);
- 		return;
- 	}
- 
-@@ -5811,11 +5815,29 @@ static void igc_watchdog_task(struct work_struct *work)
- 	if (adapter->flags & IGC_FLAG_HAS_MSIX) {
- 		u32 eics = 0;
- 
--		for (i = 0; i < adapter->num_q_vectors; i++)
--			eics |= adapter->q_vector[i]->eims_value;
--		wr32(IGC_EICS, eics);
-+		for (i = 0; i < adapter->num_q_vectors; i++) {
-+			struct igc_q_vector *q_vector = adapter->q_vector[i];
-+			struct igc_ring *rx_ring;
-+
-+			if (!q_vector->rx.ring)
-+				continue;
-+
-+			rx_ring = adapter->rx_ring[q_vector->rx.ring->queue_index];
-+
-+			if (test_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags)) {
-+				eics |= q_vector->eims_value;
-+				clear_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
-+			}
-+		}
-+		if (eics)
-+			wr32(IGC_EICS, eics);
- 	} else {
--		wr32(IGC_ICS, IGC_ICS_RXDMT0);
-+		struct igc_ring *rx_ring = adapter->rx_ring[0];
-+
-+		if (test_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags)) {
-+			clear_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
-+			wr32(IGC_ICS, IGC_ICS_RXDMT0);
-+		}
- 	}
- 
- 	igc_ptp_tx_hang(adapter);
-
----
-base-commit: a6ec08beec9ea93f342d6daeac922208709694dc
-change-id: 20240611-igc_irq-ccc1c8bc6890
-
-Best regards,
 -- 
-Kurt Kanzenbach <kurt@linutronix.de>
+2.45.0
 
 
