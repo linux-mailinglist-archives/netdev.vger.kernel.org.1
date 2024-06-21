@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-105618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A3AF912056
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 11:20:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56C65912053
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 11:20:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B0531C217D6
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 09:20:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2F742866C6
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 09:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3094E16E883;
-	Fri, 21 Jun 2024 09:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7EC016E868;
+	Fri, 21 Jun 2024 09:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hwPxV1gL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nPgnqq6c"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021F916E86F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBE616C698;
 	Fri, 21 Jun 2024 09:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718961632; cv=none; b=aIeOZXtHqBe5fuoYFP3AOJZGfK1c7rvETKNgfFl5RxUCi2vSYHYj9KOI+1ahILAzCWk772Fj/VyzFY0HJRFu9oyh1paPENjBDtJqHR/9WFY6ypAI7b7pA+z32jP6tDot/ptkoEuLudpw96qcvbhhEKpcIQRBUB6Rop2yDrLkyZQ=
+	t=1718961631; cv=none; b=LCKj8v2vq/RDQ38Gnxil5DlAOHhfPXCJtBoL0BqkuF5dlDOkqqv2+aNfuIqzsdWyjsalqo3ov/BtH93NNM7gwI76kIIr2rKya9ZxgTM/e1G/Pe9H3oz0buJH86DfUj2vkFPr8S1M6WyfLtfwUhnPjbjEASnZVIJ8DKoD6+dc9dE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718961632; c=relaxed/simple;
-	bh=DdfBUSruCOMmVc04SJP9LQBray58f2G8GWiu7++ObGY=;
+	s=arc-20240116; t=1718961631; c=relaxed/simple;
+	bh=vBQWRT2wP4bg9M6s6w4e8SNp2T0cQMPyhytWfXzHk/8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gPwji1nrMuH5aOTSmj/ENrY9FK3cOuOiU6dZqhB3qcCqHLFi3Y6/fNCCQVFrhti0u+3viEjlSUExlzA3Mu0SSPfefO8W/VfSaTI9+gwoANg558KpzpX1QssQY3TWUOMXZi2+z42KR4VAAmDcnp7PY/LIoMlltP3P5uFDFPR9+TQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hwPxV1gL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 88ED2C4AF11;
+	 In-Reply-To:To:Cc; b=LrItC59RkTW98GCCX551SpMKEma3xLbiWcgIcqwNIUMLLXxFyc5yuhZQSF1Qn76JfzM4pfPR7Cjy6CuB1CcDYXPax7bOEc1CCOvPqVvYDVr3ShffsN62+E9KYw0tkg0ZS2P7XaOHIBwrJcyPQdyk6OC86ZLorf/jRKCMJOFnvuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nPgnqq6c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 842BCC4AF0D;
 	Fri, 21 Jun 2024 09:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718961631;
-	bh=DdfBUSruCOMmVc04SJP9LQBray58f2G8GWiu7++ObGY=;
+	bh=vBQWRT2wP4bg9M6s6w4e8SNp2T0cQMPyhytWfXzHk/8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hwPxV1gLc8S89t1n0Hk+M6QQuEbWSuBecMPD5HTs4oSSCRvBg6voSgWT7Mw3AJuuF
-	 xOVuyKdMB0d+pqVm1ZG/z1U+NN9bOAA48tJivS1eQup/Hi3zEESK95m5jHC9HFumRJ
-	 SmUWrTIf2P5RPVI5Slec0SJcB5dcXveJRrOXfTA/bXpDSG/BEd0j3JdFpG8ZkdgrFu
-	 w7tmotBE1cVMQmtIJJjQpOwvuuMlzdjbN0kX/mrkGt7qGK1q/8l26amztkK53BZDHj
-	 4k6+2H1W/cP0gUcWqFlJzCDYj85ApcTmY4ViS8WfDvrpkzKLUg19XWO2Vq7bc0aN6j
-	 vYLipJPpSFN8Q==
+	b=nPgnqq6cuj4rY4NguE/TA/z6QEwSpkq3eGqspgFzqF6FAzglrXytAKnb6vU2hD1kH
+	 Vz59G23gQcwkLw/dyCaj6BQWXmyE8DpyJ/kXNH5lSZhiy4gCtDRmsaIge+D7oL11Dz
+	 iagNFCS5SE0dcXF+QN52aF17rP/BhMTzp4PYAKsKzmBLi1s8DUVpiC2eU31tlD8VW+
+	 bXyiti1JNwS8cU91qSysIBZCbSioCTnaI4pibqdI7Cb2SuOh87wcn+okane0fdpaUQ
+	 sw2Ifad1zkBW0BldRDYDGHntmrt7fdr+swHf54svDKZefJdjgxjf3ZAzWFGLsRR5LU
+	 2EIlvvra4yNRA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 78D4FCF3B9C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6FA0FCF3B99;
 	Fri, 21 Jun 2024 09:20:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,44 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH resubmit 3] net: fec: Fix FEC_ECR_EN1588 being cleared on
- link-down
+Subject: Re: [PATCH net-next v2] docs: net: document guidance of implementing the
+ SR-IOV NDOs
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171896163149.20195.11694633975704847703.git-patchwork-notify@kernel.org>
+ <171896163145.20195.12684798696627871748.git-patchwork-notify@kernel.org>
 Date: Fri, 21 Jun 2024 09:20:31 +0000
-References: <20240619123111.2798142-1-csokas.bence@prolan.hu>
-In-Reply-To: <20240619123111.2798142-1-csokas.bence@prolan.hu>
-To: =?utf-8?b?Q3PDs2vDoXMgQmVuY2UgPGNzb2thcy5iZW5jZUBwcm9sYW4uaHU+?=@codeaurora.org
-Cc: Frank.Li@freescale.com, davem@davemloft.net, imx@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- richardcochran@gmail.com, andrew@lunn.ch, wei.fang@nxp.com,
- shenwei.wang@nxp.com, xiaoning.wang@nxp.com, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
+References: <20240620002741.1029936-1-kuba@kernel.org>
+In-Reply-To: <20240620002741.1029936-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, corbet@lwn.net, rdunlap@infradead.org,
+ linux-doc@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Wed, 19 Jun 2024 14:31:11 +0200 you wrote:
-> FEC_ECR_EN1588 bit gets cleared after MAC reset in `fec_stop()`, which
-> makes all 1588 functionality shut down, and all the extended registers
-> disappear, on link-down, making the adapter fall back to compatibility
-> "dumb mode". However, some functionality needs to be retained (e.g. PPS)
-> even without link.
+On Wed, 19 Jun 2024 17:27:41 -0700 you wrote:
+> New drivers were prevented from adding ndo_set_vf_* callbacks
+> over the last few years. This was expected to result in broader
+> switchdev adoption, but seems to have had little effect.
 > 
-> Fixes: 6605b730c061 ("FEC: Add time stamping code and a PTP hardware clock")
-> Cc: Richard Cochran <richardcochran@gmail.com>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Link: https://lore.kernel.org/netdev/5fa9fadc-a89d-467a-aae9-c65469ff5fe1@lunn.ch/
-> Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
+> Based on recent netdev meeting there is broad support for allowing
+> adding those ops.
 > 
 > [...]
 
 Here is the summary with links:
-  - [resubmit,3] net: fec: Fix FEC_ECR_EN1588 being cleared on link-down
-    https://git.kernel.org/netdev/net-next/c/c32fe1986f27
+  - [net-next,v2] docs: net: document guidance of implementing the SR-IOV NDOs
+    https://git.kernel.org/netdev/net-next/c/4558645d139c
 
 You are awesome, thank you!
 -- 
