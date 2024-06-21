@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-105678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75AF69123B3
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03ED99123B2
 	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 13:32:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89AE91C252E1
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 11:32:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B355528BBBD
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 11:32:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31FB3174EC9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31F70173357;
 	Fri, 21 Jun 2024 11:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hzFk2nLb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eL4A/A4J"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0908617334D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090F2173354;
 	Fri, 21 Jun 2024 11:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718969431; cv=none; b=G8sz1O8Umjlwp34zOQ51cr+/WjgSiVffTEjBQiSQcwIIXbdjKE6O7MnM7zR2cHGPyiGVHtMtvqJ+ialzJfV5tSatywDh+611hPEA+/e1j1TIp5ck4oYQWXE+Qecx9ArInoaITqIiIKExwEY5smkGNrqcI6f9lWTntL4VfxJaU4g=
+	t=1718969431; cv=none; b=AG8BxwgWtL6pyxljXwAMVMvVtiTBDKjTX3jO5aTtMlo7lHQKzDET/qp4pArv6cPK9XYHqAsmmixxJEKw/+OqvYNmKIrZDDzAFRMe/lssPftKzZabSC0dGiloj0cqDIadrTc4l8UxWNHDQlTy3T688dakc4mChz06voB9CJaSifo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718969431; c=relaxed/simple;
-	bh=FO4/dxAKydbdqDeemb4ezHvY8sH16n9WUcoY8tuP6qo=;
+	bh=vV9wCK9hoYqqOcklrFgBuYYByRX11AIgQ1XylLrlNsA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kipew2Rb4utYkdYsuGZG2fKIbWZJ6vpyouLXIstG/ZdVWK2TopaDpDe0EBcpFa4/hmbY3wmsfU39UO5gQu930Si6qmhAsgr6S5WuvWkHtoC8PxbZh06ISy5J/FOU/wB7IsWiwp/JpErGBdWXPJeov6PfmWmhjfsjx7iCM6qgL7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hzFk2nLb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7A08BC2BBFC;
+	 In-Reply-To:To:Cc; b=u5Dt4Q0Fw3gz0PKbSOSaVtOzTDNWOTTjC1rcNAt4KWznQGIYBDvOXpgSYO/ppzAEed6QX3lb1OvGibpGp1s4513KVTJXEkmXdkPS8XAFICj0mdW4Z+LvnD2pYfFoCHeXnT3sxczD946loFQIBRyD9j71ZAey6/Ch9I/BWMOvP1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eL4A/A4J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 882A4C4AF08;
 	Fri, 21 Jun 2024 11:30:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718969430;
-	bh=FO4/dxAKydbdqDeemb4ezHvY8sH16n9WUcoY8tuP6qo=;
+	bh=vV9wCK9hoYqqOcklrFgBuYYByRX11AIgQ1XylLrlNsA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hzFk2nLbwmRD7zavmhKfSdQ8R/3n3qtRBX+Wgen5uzmhURUyHbwRpmBjtI0rCgvZT
-	 sphzCyuIPMvfFjgIIdNpeCBEghVU5iKttVYkzNu4Q+1KwjawjXSnfadGA3eTBMJ9Qx
-	 VYgoaloDgFPf826Y4Dh2UIpbrRHVyoAKyV4dxk5ZKCVoNa+nU389U9aBvQ5j9nqaKr
-	 ConhM5O5r32ZvazUuPwLifDuFX/l2Kn9yhbvWWWjUzL04J1XXAwzxBP55NNmhx7EBO
-	 X3wsrXTwzDIxjlUR4YYpEB5lelidcdK/+M2yIFGLgwr8N/XpHCFiJlxCXGB/TByUSO
-	 jFSpOASRMHdTw==
+	b=eL4A/A4JE8aRIwjStROYhp1X9S5BXkdOnIY0vkeqKrDCJXd7rpdp4HEWZkkEjSsFo
+	 TezOKuZVovDIp/njWUE7t1b2KcRavJSAzHZXMEN0jyVC+SACzKwObnZfr9fyHuCFoJ
+	 qKQ4RPCGjCTwjNcxeojSHikAcP3Ihs1yraE97B0No8LjeePhKrS8EYWtoXnLZk3KYi
+	 aX1kD1Dr5dy6g2kYvJmzU7ErgminHHBlmEfTocoUluq3SAQlWjKUwIM/PXBiyaRi4F
+	 EhvIoNCY9EDhUZzQfy/rxtlz/YBhSU3n+05OXfJOkyc0I6FXhaDLp3X9WX/tX8LIF8
+	 xdsKSl1Lh+yIA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6952EC4332D;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 71EB5CF3B9B;
 	Fri, 21 Jun 2024 11:30:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next,v10] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
+Subject: Re: [PATCH net-next 0/3] net: dsa: qca8k: cleanup and port isolation
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171896943042.2605.16261464240413345553.git-patchwork-notify@kernel.org>
+ <171896943046.2605.7186195507093229147.git-patchwork-notify@kernel.org>
 Date: Fri, 21 Jun 2024 11:30:30 +0000
-References: <20240620182219.2654517-1-niklas.soderlund+renesas@ragnatech.se>
-In-Reply-To: <20240620182219.2654517-1-niklas.soderlund+renesas@ragnatech.se>
-To: =?utf-8?q?Niklas_S=C3=B6derlund_=3Cniklas=2Esoderlund+renesas=40ragnatech=2E?=@codeaurora.org,
-	=?utf-8?q?se=3E?=@codeaurora.org
-Cc: yoshihiro.shimoda.uh@renesas.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+References: <cover.1718899575.git.mschiffer@universe-factory.net>
+In-Reply-To: <cover.1718899575.git.mschiffer@universe-factory.net>
+To: Matthias Schiffer <mschiffer@universe-factory.net>
+Cc: andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ansuelsmth@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 20 Jun 2024 20:22:19 +0200 you wrote:
-> Add initial support for Renesas Ethernet-TSN End-station device of R-Car
-> V4H. The Ethernet End-station can connect to an Ethernet network using a
-> 10 Mbps, 100 Mbps, or 1 Gbps full-duplex link via MII/GMII/RMII/RGMII.
-> Depending on the connected PHY.
+On Thu, 20 Jun 2024 19:25:47 +0200 you wrote:
+> A small cleanup patch, and basically the same changes that were just
+> accepted for mt7530 to implement port isolation.
 > 
-> The driver supports Rx checksum and offload and hardware timestamps.
+> Matthias Schiffer (3):
+>   net: dsa: qca8k: do not write port mask twice in bridge join/leave
+>   net: dsa: qca8k: factor out bridge join/leave logic
+>   net: dsa: qca8k: add support for bridge port isolation
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v10] net: ethernet: rtsn: Add support for Renesas Ethernet-TSN
-    https://git.kernel.org/netdev/net-next/c/b0d3969d2b4d
+  - [net-next,1/3] net: dsa: qca8k: do not write port mask twice in bridge join/leave
+    https://git.kernel.org/netdev/net-next/c/e85d3e6fea05
+  - [net-next,2/3] net: dsa: qca8k: factor out bridge join/leave logic
+    https://git.kernel.org/netdev/net-next/c/412e1775f413
+  - [net-next,3/3] net: dsa: qca8k: add support for bridge port isolation
+    https://git.kernel.org/netdev/net-next/c/422b64025ec1
 
 You are awesome, thank you!
 -- 
