@@ -1,117 +1,107 @@
-Return-Path: <netdev+bounces-105500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA8A791184F
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 04:11:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBD84911850
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 04:11:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8758A1F22763
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 02:11:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75F27283FB1
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 02:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDBC88287D;
-	Fri, 21 Jun 2024 02:11:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A91582891;
+	Fri, 21 Jun 2024 02:11:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="H4fVa/em"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cmC2vWes"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3910E537FF
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 02:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6655B2904
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 02:11:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718935875; cv=none; b=T5tmnevY7WgSz8o5hJs0KrR3XJlSXGZIqK4yv6Fn3LeGQfWiS+YZ1YvGFWbpwUecleNywV8na9NS0yhzaeJNZHLxSd5FVSXlqaQl5Dzw+l6s+zXjzHNsO7Wb59w6RF+FV9+UUAOPyATSvVYYS1P56ijCJ/L1TUpqlyW+RbZa1+E=
+	t=1718935910; cv=none; b=Pzf01BCqbZ5Z49zoM00zrHJRDflrPfHKDByhubCu/5FBcS/r9kwQWzY4wgBtV0S1NMtvOOIKzLXXUuABMgoVRUSWUhXhmtt1T6q61HzTudIymKV4b/H25oKZs/hUjyNoonc+BvuYCLugnVmILFB3TzAcdObGVnn6PGqI2/ycdB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718935875; c=relaxed/simple;
-	bh=d7GTPID4LNAa9Ts0EYINdsejFk7hvzCgGYvvqJ9EyRs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hO+9f0tX8D6zUVQlH5Q/ylTfBNOfGVrQp4hbp7evJO60afb3+0PN3fS+NdkQqVGsvLlLwYb/y/905pLiZRafTOUTlkj9bpbjMiOICiitN9HX1GczITCAFa+ZUkTfwEKihx221zJNPOsuHyo4hIrRL9aKcDaX19ynIXDoGoPXo9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=H4fVa/em; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1718935874; x=1750471874;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=pMawBHNfoZxxPVXvcuDJEJAkjT4wlyyJ9bFL0oWxndg=;
-  b=H4fVa/emHuD1De1JUVF0j3nFoeKYdKZGS4drPJWqb3hesZXw0i2e35g/
-   2aBrM9inFqnbWu6LpiU3elCkTApqIIjfmtvpNLn7xUTUtXaquAJkmNhJI
-   hS2mhILC6ZPPtkZQNEwD7wKmXBZrLG1rUTMXDZZUyfFfAVIUIBi60CglU
-   0=;
-X-IronPort-AV: E=Sophos;i="6.08,253,1712620800"; 
-   d="scan'208";a="734382643"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2024 02:11:08 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:37361]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.33.47:2525] with esmtp (Farcaster)
- id f9d14ee6-342f-49c6-8127-fe3d07b81543; Fri, 21 Jun 2024 02:11:07 +0000 (UTC)
-X-Farcaster-Flow-ID: f9d14ee6-342f-49c6-8127-fe3d07b81543
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 21 Jun 2024 02:11:07 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.36) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 21 Jun 2024 02:11:04 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net] selftest: af_unix: Add Kconfig file.
-Date: Thu, 20 Jun 2024 19:10:51 -0700
-Message-ID: <20240621021051.85197-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1718935910; c=relaxed/simple;
+	bh=/ddf1z+uFkysFZT1lAWh3i8QxvxpBEf1hviYmtzVWUU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JGY7BRgPU8Naji8eo8OWP5ILMzflZLjueky09LyhOgFeLLIcSc2nzH9XgzMFHYpJX5390VXIeXjzlcQr2LgzDEl9DBxWqWTjgXJ9z7MhzHZ6b+33grWkAjaZyvQ6M91dEzZxo0VdAANx3E8JYvvcAYJeTLsTDnlsz67pRvGX/DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cmC2vWes; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54BEDC2BD10;
+	Fri, 21 Jun 2024 02:11:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718935909;
+	bh=/ddf1z+uFkysFZT1lAWh3i8QxvxpBEf1hviYmtzVWUU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cmC2vWesk7tQ7Duojw2ELxw3dau5bBzkNWrYEwektg0RGwKRgv3i2DOEC6935fXm0
+	 Rh/PN/NXgy8iH9Z4epJ2po/1smG9VIHBQ+2NyEARK02MSpINFPWcPpLo0p0GgG48vy
+	 Hu0npPNWayZ/XgrcpgOP7iNsQtXU4llPlpVxbYm4hZtFGTuSFsb5j6cITcNHHtIkML
+	 t6nFwDLtOO8YI9LbWfgUHLRPdEoWfjb1oL1k5g4TF4wJdMbAUVfMciJWpkoNYSgfNp
+	 lhid8/SKO2B/qWgmoqOwbfZRGEy352/N95sInFxABJ4BoEJsMDf9u/W36W6uEg1GrS
+	 2HUambGtGlwbw==
+Date: Thu, 20 Jun 2024 19:11:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Ziwei Xiao
+ <ziweixiao@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>, Willem de Bruijn
+ <willemb@google.com>, Jeroen de Borst <jeroendb@google.com>, Shailend Chand
+ <shailend@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next 3/6] net: ethtool: perform pm duties outside of
+ rtnl lock
+Message-ID: <20240620191148.26fc09ac@kernel.org>
+In-Reply-To: <48ac02dc-001e-48e3-ba87-8c4397bf7430@lunn.ch>
+References: <20240620114711.777046-1-edumazet@google.com>
+	<20240620114711.777046-4-edumazet@google.com>
+	<20240620172235.6e6fd7a5@kernel.org>
+	<48ac02dc-001e-48e3-ba87-8c4397bf7430@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA004.ant.amazon.com (10.13.139.9) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-diag_uid selftest failed on NIPA where the received nlmsg_type is
-NLMSG_ERROR [0] because CONFIG_UNIX_DIAG is not set [1] by default
-and sock_diag_lock_handler() failed to load the module.
+On Fri, 21 Jun 2024 02:59:54 +0200 Andrew Lunn wrote:
+> > I also keep wondering whether we shouldn't use this as an opportunity
+> > to introduce a "netdev instance lock". I think you mentioned we should
+> > move away from rtnl for locking ethtool and ndos since most drivers
+> > don't care at all about global state. Doing that is a huge project, 
+> > but maybe this is where we start?  
+> 
+> Is there much benefit to the average system?
+> 
+> Embedded systems typically have 1 or 2 netdevs. Laptops, desktops and
+> the like have one, maybe two netdevs. VMs typically have one netdev.
+> So we are talking about high end switches with lots of ports and
+> servers hosting lots of VMs. So of the around 500 netdev drivers we
+> have, only maybe a dozen drivers would benefit?
+> 
+> It seems unlikely those 500 drivers will be reviewed and declared safe
+> to not take RTNL. So maybe a better way forward is that struct
+> ethtool_ops gains a flag indicating its ops can be called without
+> first talking RTNL. Somebody can then look at those dozen drivers, and
+> we leave the other 490 alone and don't need to worry about
+> regressions.
 
-  # # Starting 2 tests from 2 test cases.
-  # #  RUN           diag_uid.uid.1 ...
-  # # diag_uid.c:159:1:Expected nlh->nlmsg_type (2) == SOCK_DIAG_BY_FAMILY (20)
-  # # 1: Test terminated by assertion
-  # #          FAIL  diag_uid.uid.1
-  # not ok 1 diag_uid.uid.1
+Right, we still need an opt in.
 
-Let's add all AF_UNIX Kconfig to the config file under af_unix dir
-so that NIPA consumes it.
+My question is more whether we should offer an opt out from rtnl_lock,
+and beyond that driver is on its own (which reviewing the driver code
+- I believe will end pretty badly), or to also offer a per-netdev
+instance lock. Give the drivers a choice:
+ - rtnl
+ - netdev_lock(dev)
+ - (my least preferred) nothing.
 
-Fixes: ac011361bd4f ("af_unix: Add test for sock_diag and UDIAG_SHOW_UID.")
-Link: https://netdev-3.bots.linux.dev/vmksft-net/results/644841/104-diag-uid/stdout [0]
-Link: https://netdev-3.bots.linux.dev/vmksft-net/results/644841/config [1]
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Closes: https://lore.kernel.org/netdev/20240617073033.0cbb829d@kernel.org/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- tools/testing/selftests/net/af_unix/config | 3 +++
- 1 file changed, 3 insertions(+)
- create mode 100644 tools/testing/selftests/net/af_unix/config
-
-diff --git a/tools/testing/selftests/net/af_unix/config b/tools/testing/selftests/net/af_unix/config
-new file mode 100644
-index 000000000000..37368567768c
---- /dev/null
-+++ b/tools/testing/selftests/net/af_unix/config
-@@ -0,0 +1,3 @@
-+CONFIG_UNIX=y
-+CONFIG_AF_UNIX_OOB=y
-+CONFIG_UNIX_DIAG=m
--- 
-2.30.2
-
+The netdev lock would also be useful for things like napi and queue
+stats, RSS contexts, and whatever else we add for drivers in the core.
+For NAPI / queue info via netlink we currently require rtnl_lock,
+taking a global lock to access a couple of per-netdevs structs feels
+quite wasteful :(
 
