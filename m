@@ -1,105 +1,93 @@
-Return-Path: <netdev+bounces-105568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A31F911D48
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 09:48:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D6B3911DB2
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:02:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C299F1F22C86
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 07:48:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 550AC286D9E
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 08:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D410916C876;
-	Fri, 21 Jun 2024 07:48:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1FF178CF1;
+	Fri, 21 Jun 2024 07:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="nDHehLuQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YBX/6Fyd"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DC87E58D;
-	Fri, 21 Jun 2024 07:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47E0178367
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 07:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718956116; cv=none; b=sC4QwySbqJnvRdWBfrGklA0NkjevNGo/R2Xb5SHqu1Ds184Hc0zB3TvNVEcBQPelT3oDsOp/IYXDWf4ZNfb2ow3vAN/ZkYZ03junGObzi3fpeqBIM8WF1/9JK+U3lh0l4GX/Qpziw/PK7dp88NFidRcEeAfj0U3nAA5eIxnadHE=
+	t=1718956471; cv=none; b=UjKJeMPyZueXH94J7GpE6gEJA9dIP6Jp0WLnQ6xJ4G4KerVcQ1GLN/k2lMJJIfHIkScA8AOdcaY+40YmIWUAFMSJVpPBf2F19K/9RIJ30J5syaliI7TnOt+BGXmPpYDKXhhxw3+EOYKoIxqzRlAJ+bA/+MikVLp9xTd+7UzTS3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718956116; c=relaxed/simple;
-	bh=+EhfIqDCxvAn5pgilOswqS+omcw5oGDRGBmQLYWykCo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=fyCtoXDyJOhpAVVQGnrjHZHz5ZurRu7oFSX+MVV7ovamWPPnncIYZK4E3gUv3zC+r8OGQnBCguvsQ8U/6i6N6iO5gQ0rMTlpXNZAcRRkGlPpPRiIpVH7WTfq+z4/EFVwQNngoKYJ5i9cYPOkvGsnDJzbVrqlt7AJFO1t5MfV01c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=nDHehLuQ; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 4B13CA0796;
-	Fri, 21 Jun 2024 09:48:24 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=mail; bh=OB0z767zdZiUMHyqre9h
-	c5AMqLSuctfCp1/ZdkYsUxU=; b=nDHehLuQ8zSJZvveTYE1uUR/3yUw+67dLpnb
-	mcU3XOmobcoP5xXN2vxGRMAh8EF2MQ3R+R69OPcj5BbzCGEu9T3iDbZbJTZTBUf7
-	8QKmNf/Hy1S7wurNWqH2czXfp2JX3TYIiVgmsPN7XXXtANir7nRqJLrXauwHZ1u+
-	Xg1ESDEorrem66Lmp6WDKuBaPG1OKFiTGxSke7SRcjNiE1Th0kKKk6Yw62COmnZV
-	C7kkPVDn/uwHsOmdixuKbhR4mipBoopaxNIwuWxfLNrUgl8yG03z5nTS5ID7fJ5A
-	U/0rD+ywxCtfTXgT4kliiPFLGWy3eiSnFn0nM5kNcIWv+O/E4Ur0Vi5JPP9c2Hi2
-	1iaHGZD/mCRgL9L+jJplzwqolLtKI7paISpQmyS7cy4ToEk5+oHwuOKRvNxH2K44
-	TuhhZYnf8yMvZc2wDWoVfLuZhFK731qkGcSe2Fe7n+gIH06iWrDKIAx//2LI0bpc
-	/9CATeZr9vdAKQ/zhjXo+uvQrIwReB9/Po7D9Mr9V0AmCyzagBt2O8GxV/+EOEP+
-	sQ/rFw9aSRKnhpt8dSB+FV5WW+jgSixk3akBEhjcDXJtROLoDvhwTIohDBZLXVMF
-	Kng/TNt6UDVcTposUYp4fbHx10l+5S7cmGYjq30LuhHfZ8Jn9hNDkx/TVOt3lFS3
-	FFlUlzE=
-Message-ID: <f216c0b9-3d0d-4d4c-aa33-ba02b0722052@prolan.hu>
-Date: Fri, 21 Jun 2024 09:48:23 +0200
+	s=arc-20240116; t=1718956471; c=relaxed/simple;
+	bh=b9KM8dzf7dW2K9SiAyjPCtcC+FVi0XacVojqZ2RlJ6Y=;
+	h=In-Reply-To:References:To:Cc:Subject:MIME-Version:Content-Type:
+	 From:Date:Message-ID; b=Yp502t8N3OO3Go3mZY/Dm4E62oXVTX2OI8yBv8Tw6gmlRqFsa70P0xWmQtHdm8uNviKzu6uydh3Nyro0+SxEA0C3z/dq89QuOqADOILJkWCUDdn+x7SIHDonvHRNoA7Y0MITxUVmIhiMwJJ7rI5S5nvohz477BpzIZd2M9L+StY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YBX/6Fyd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718956468;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oDP0Ze6rJBHjNUlj9cWtihXVpgdyu03o5dDG7lNl2Ko=;
+	b=YBX/6FydK+ZbyZ4VMUIISjcAqKYstgBdWodGYJmxBKlGcQkd4AaaGcIKrEFbMhc0OxhwkR
+	cjAnwi7zaSTRG+1veHuQjfyQ6DRLJ9IcIm3t75WxXLMcxU4AJd3RJUN712KwCjb6uZ+hJy
+	gkyBoTxusVCdLfO9Nxbsbov0mOy73rk=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-683-bYVENPH9MUSKny0J4Y60Xg-1; Fri,
+ 21 Jun 2024 03:54:23 -0400
+X-MC-Unique: bYVENPH9MUSKny0J4Y60Xg-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8C7B119560A5;
+	Fri, 21 Jun 2024 07:54:21 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.111])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E8F6B1956048;
+	Fri, 21 Jun 2024 07:54:18 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+In-Reply-To: <CANn89iLQ+9GYYn0pQpueFP+aYHnoWhqZSws6t6VCNoxs8pwL7w@mail.gmail.com>
+References: <CANn89iLQ+9GYYn0pQpueFP+aYHnoWhqZSws6t6VCNoxs8pwL7w@mail.gmail.com> <20240617095852.66c96be9@kernel.org> <202406161539.b5ff7b20-oliver.sang@intel.com> <4937ffd4-f30a-4bdb-9166-6aebb19ca950@grimberg.me> <Zm9fju2J6vBvl-E0@casper.infradead.org> <033294ee-e6e6-4dca-b60c-019cb72a6857@grimberg.me> <407790.1718801177@warthog.procyon.org.uk> <0aaaeabc-6f65-4e5d-bdb1-aa124ed08e8b@grimberg.me>
+To: Eric Dumazet <edumazet@google.com>
+Cc: dhowells@redhat.com, Sagi Grimberg <sagi@grimberg.me>,
+    Jakub Kicinski <kuba@kernel.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    kernel test robot <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
+    lkp@intel.com, netdev@vger.kernel.org
+Subject: Re: [PATCH] net: micro-optimize skb_datagram_iter
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 resub 1/2] net: include: mii: Refactor: Define LPA_* in
- terms of ADVERTISE_*
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Vladimir Oltean
-	<olteanv@gmail.com>, <trivial@kernel.org>, Heiner Kallweit
-	<hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-References: <20240619124622.2798613-1-csokas.bence@prolan.hu>
- <c82256a5-6385-4205-ba74-ab102396abb6@lunn.ch>
-Content-Language: en-US
-From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
-In-Reply-To: <c82256a5-6385-4205-ba74-ab102396abb6@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
- ATLAS.intranet.prolan.hu (10.254.0.229)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2945A129576C7567
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <117594.1718956419.1@warthog.procyon.org.uk>
+From: David Howells <dhowells@redhat.com>
+Date: Fri, 21 Jun 2024 08:54:17 +0100
+Message-ID: <117689.1718956457@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hi
+Eric Dumazet <edumazet@google.com> wrote:
 
-On 6/20/24 21:07, Andrew Lunn wrote:
-> On Wed, Jun 19, 2024 at 02:46:22PM +0200, Csókás, Bence wrote:
->> Ethernet specification mandates that these bits will be equal.
->> To reduce the amount of magix hex'es in the code, just define
->> them in terms of each other.
-> 
-> I have a quick email exchange with other PHY maintainers, and we
-> agree. We will reject these changes, they are just churn and bring no
-> real benefit.
-> 
-> NACK
-> 
->      Andrew
-> 
+> But the trace involves af_unix, not GRO ?
 
-The benefit is that I don't have to constantly convert between "n-th bit 
-set" (which is how virtually all datasheets, specifications, 
-documentation etc. represent MII bits) and these hex values. In most 
-places in the kernel, register bits are already represented with BIT() 
-et al., so why not here?
+Ah.  splice()/vmsplice() can feed multipage folios into the socket.  Possibly
+those can be in highmem.
 
-Bence
+David
 
 
