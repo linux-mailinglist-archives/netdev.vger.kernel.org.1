@@ -1,242 +1,302 @@
-Return-Path: <netdev+bounces-105681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58C80912451
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 13:48:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 215BD912492
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 13:58:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EE6A281A6B
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 11:48:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F8D41F2202D
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 11:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5828717A906;
-	Fri, 21 Jun 2024 11:46:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F83A175543;
+	Fri, 21 Jun 2024 11:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="OC48s/QQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A0QnqC0P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E4D175554;
-	Fri, 21 Jun 2024 11:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718970378; cv=fail; b=qhneWj9KLrUgxliiK4VDrYQputnr88co0A1Guruzc+qLPEKEk3TG8VQhCVqFfk/GnYnPYpdaqvBY+ZaKUC3DzD0mno3SI1n6qND09AJoIaom0fpVjpKNOTqqeioYQ9Hji0hoBfTwu1J31HrmnzC4tyHqlEMA9oF6vuRL34Pm+4I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718970378; c=relaxed/simple;
-	bh=BoASb7XpOyInGNF9sLYWtFGpAMp63KM0OHRH0bIOidk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=MFFulsRjVzsM/Fx8X6dL/0b9KvPOdoUnFjbL4vHGWmy37ylpYAH7Q1txCu7U3Y4LmuelYmZrl9iiKJkG54Qtg7ULkNUC8EBFWPml1Qt9uje6MtlBOmp156UgQoI2RXugl+lWTy9uYk/efwF13YxuzSz+6Ie97rdE/EZ2Gj+dJDM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=OC48s/QQ; arc=fail smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45L9Le4Q008837;
-	Fri, 21 Jun 2024 04:45:32 -0700
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2169.outbound.protection.outlook.com [104.47.57.169])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3yw6t80c1p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Jun 2024 04:45:31 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H5FZfeFwyNRoSN+heMaYsU8iJZrrXD51QL7RDldAOR+r7/ehJcwsifdTQdraUbI/0Kxpear7Ku0z/FLyzij0eUgCyh79CMy79DjmbkJi2tWar1yf4UcANiPPlJZDPCx+WeUnCttXudU9wN3zaWEaJtl8jVnhy7kXbPJ4NuXHIn5UN7hkNuNqpW+6ZkrsWRb+DhqEQh5ipz6BNEUzwWe8o9P95D8WJ0eyiJoQrm5luyyMIXQdwfbcH+S7o2OIaoeXmYXe4T/tF+e2N4V0m06gyceWz3W22FrTYDnskNx8A7QI98UQwrVNmraqOhRsuTaOwzauP3SfMGvOj4DXcj0adg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iZyzYS3ppXa3qzU1Uq8p8IpypH29zvHCAk8erq8Zp6o=;
- b=jqKjfrn9dhOEgzz1JhkkM+6gvLyC+Ee8Bf004FsSQp+iR79p3tHaJBCPEetLYDO3TuUwUtomiKyIXXKyktjWtTd572iB4tzTYI6EJGHxBRkbNPxLPWzCT4PJ7UTGuNVc4P8jC1Knd2TDgJz0iadAumbtrb+qFgC2+abwmNyQwTkjKM19GG72jcv/GZEk2GfLfaXwl38L0RngMnhOMLOaTcp0ih2IZvkfLPcWknHqinKZJo5VkUcTpxjtpY4q55aeOYk2GKqSa4KuMjGyW0+g8lHiiYPmXV+LwKptcY+BxtcFGTk9YA2VcLF9mdI+5t3idjmrxOvyOHZy+qV0gCc5rA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iZyzYS3ppXa3qzU1Uq8p8IpypH29zvHCAk8erq8Zp6o=;
- b=OC48s/QQ7A/0hmYoXCNrAZUxdAKqTtpWRJ415FgPRxbHZ7OvQP5Dht2/x7k1XPLSf+qKKhxuX1VmyECq5wbgI9jZ5WsVR0H6HBAwFqOgyf7EIA9s0yiAONkrAJoVVusuIRtEnxSItV/rTB7bkxuIYsqLPnHRp5UvMSnxSCZsK80=
-Received: from BY3PR18MB4737.namprd18.prod.outlook.com (2603:10b6:a03:3c8::7)
- by DM8PR18MB4502.namprd18.prod.outlook.com (2603:10b6:8:3b::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7698.21; Fri, 21 Jun 2024 11:45:29 +0000
-Received: from BY3PR18MB4737.namprd18.prod.outlook.com
- ([fe80::1598:abb8:3973:da4e]) by BY3PR18MB4737.namprd18.prod.outlook.com
- ([fe80::1598:abb8:3973:da4e%5]) with mapi id 15.20.7698.020; Fri, 21 Jun 2024
- 11:45:28 +0000
-From: Sunil Kovvuri Goutham <sgoutham@marvell.com>
-To: Allen Pais <allen.lkml@gmail.com>, "kuba@kernel.org" <kuba@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-CC: "jes@trained-monkey.org" <jes@trained-monkey.org>,
-        "kda@linux-powerpc.org"
-	<kda@linux-powerpc.org>,
-        "cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
-        "dougmill@linux.ibm.com" <dougmill@linux.ibm.com>,
-        "npiggin@gmail.com"
-	<npiggin@gmail.com>,
-        "christophe.leroy@csgroup.eu"
-	<christophe.leroy@csgroup.eu>,
-        "aneesh.kumar@kernel.org"
-	<aneesh.kumar@kernel.org>,
-        "naveen.n.rao@linux.ibm.com"
-	<naveen.n.rao@linux.ibm.com>,
-        "nnac123@linux.ibm.com"
-	<nnac123@linux.ibm.com>,
-        "tlfalcon@linux.ibm.com" <tlfalcon@linux.ibm.com>,
-        "cooldavid@cooldavid.org" <cooldavid@cooldavid.org>,
-        "marcin.s.wojtas@gmail.com" <marcin.s.wojtas@gmail.com>,
-        Mirko Lindner
-	<mlindner@marvell.com>,
-        "stephen@networkplumber.org"
-	<stephen@networkplumber.org>,
-        "nbd@nbd.name" <nbd@nbd.name>,
-        "sean.wang@mediatek.com" <sean.wang@mediatek.com>,
-        "Mark-MC.Lee@mediatek.com"
-	<Mark-MC.Lee@mediatek.com>,
-        "lorenzo@kernel.org" <lorenzo@kernel.org>,
-        "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-        "angelogioacchino.delregno@collabora.com"
-	<angelogioacchino.delregno@collabora.com>,
-        "borisp@nvidia.com"
-	<borisp@nvidia.com>,
-        "bryan.whitehead@microchip.com"
-	<bryan.whitehead@microchip.com>,
-        "UNGLinuxDriver@microchip.com"
-	<UNGLinuxDriver@microchip.com>,
-        "louis.peens@corigine.com"
-	<louis.peens@corigine.com>,
-        "richardcochran@gmail.com"
-	<richardcochran@gmail.com>,
-        "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "linux-acenic@sunsite.dk"
-	<linux-acenic@sunsite.dk>,
-        "linux-net-drivers@amd.com"
-	<linux-net-drivers@amd.com>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE:  [PATCH 05/15] net: cavium/liquidio: Convert tasklet API to new
- bottom half workqueue mechanism
-Thread-Topic: [PATCH 05/15] net: cavium/liquidio: Convert tasklet API to new
- bottom half workqueue mechanism
-Thread-Index: AQHaw9CD4nPzgxz4+U6quzdtzgriow==
-Date: Fri, 21 Jun 2024 11:45:28 +0000
-Message-ID: 
- <BY3PR18MB473714180BFCD502E76112FCC6C92@BY3PR18MB4737.namprd18.prod.outlook.com>
-References: <20240621050525.3720069-1-allen.lkml@gmail.com>
- <20240621050525.3720069-6-allen.lkml@gmail.com>
-In-Reply-To: <20240621050525.3720069-6-allen.lkml@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BY3PR18MB4737:EE_|DM8PR18MB4502:EE_
-x-ms-office365-filtering-correlation-id: 491cdb6c-071e-4ee7-43e6-08dc91e7a5c4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: 
- BCL:0;ARA:13230037|376011|1800799021|7416011|366013|38070700015;
-x-microsoft-antispam-message-info: 
- =?us-ascii?Q?KGYwRcOdqNp5EM40w2MyYWWcPNRj0apMKpBE8cuSyszjImBuLZ12iSylZUSA?=
- =?us-ascii?Q?9fw6LoHZkA8yboacf2dxcKDIhH14nTHZFoH8lxBtchdKqL9R8khthAsk0jLZ?=
- =?us-ascii?Q?TQWKq/Ddx44PAGrLLnOVPA+UWQMw40KZEfWV0dl92zIJkUdFOKzW/uJ5RBTa?=
- =?us-ascii?Q?3TIdvOX8wJkAsZi5saMsGKynYoS/69+HBdPgJYjO/6hvLWL2rP+ihJ3Qniwd?=
- =?us-ascii?Q?6VIRogcPK5cU0HKkmk5CcyOp7dePu8j5KqiasO2glkgACHGoTqAa7gbWQVeO?=
- =?us-ascii?Q?/sdr8PTRQaDP/kBxF3/WiQknqyoo5jiQwYwBh4u87dZDJ9ca0PvTnhMldv/I?=
- =?us-ascii?Q?jRr5rmKHtE7KBSfEsUllbjNzOCysevkIy8ruOZIbWyVbdi5FWt/hwdl9P2Bt?=
- =?us-ascii?Q?+TPLkpFMvtdGhIBlJqQgqiVa0TBQQIfru8w4quPiMyN7+UmHjzedQ/4wtq1f?=
- =?us-ascii?Q?OqeOT80Q/jcX96yXf4H+BkzAHTM+GQoTRMo8gTFq1cGqUUxW0BsrvNO5dXpe?=
- =?us-ascii?Q?W1FUGcGhUOSdC+NmRXwr+mwhGNnMsWuDEdENrFfAV0o7v0s9K77D1oinckdI?=
- =?us-ascii?Q?XUhvsxLelgGzTZP/oY72SuNueQRI/fawIw/HgiK5Xvb/NhM5Sx5GJZFS28iq?=
- =?us-ascii?Q?od1tNo+lxMVKO+pA5Mt0Oa6HIoEqNu2mqvKyjB+VwkrjgONk9fs+HnYQor03?=
- =?us-ascii?Q?u1EPBGPa5Z6c3jDnqhd3ZWX0j32vmHuW9bBy6gofytZ215DgBD2hjG0p34UA?=
- =?us-ascii?Q?1c9+bRYCB/OWTf/3rj5NxI6+wfjuftOcwCkSU+KpeVsE4mxLEsrNrnzokB1X?=
- =?us-ascii?Q?7JiG1MjA2cFSzvnnXDMf/2OPuufa7uZ5VTdxJQI1BONHMN41PvLlYzkugUCK?=
- =?us-ascii?Q?FdrSmETEXefDniWrgq9mzhR8ZBGBRRvEELecM7LPgfW+je06K5AzH9xpvhYT?=
- =?us-ascii?Q?UYuQjDpYQidUKcsYNh3clRHb+VCwNKMePcvKTiGUzZusMW0Hl865lWePbDjw?=
- =?us-ascii?Q?rrwBcD/jOFqkk4nGrl4f0m8GqIXOCxyHK2kl1UPszwU2lDVywlVz987p+O/0?=
- =?us-ascii?Q?Spcq2Eq51AE+S6sHLcC3nCi6cJ0I4GtN/QQHDaLZEEEMf6MfaOZRI6UrGyF3?=
- =?us-ascii?Q?YoA1oJS+z/FciCqSrTfxLPRY4G0k29ctJmOCqLMydbQoE262p9UyNb6ceviJ?=
- =?us-ascii?Q?81EjGj1Qx8ZgtCtzSWijzc3mkqBACBK8tBA8ynsDmpuHrH2ViQQWlNos0iIp?=
- =?us-ascii?Q?V2X2phxcSwk9EnW8dSgLDouTa0t3jOzu8Ebw7Vb9BjJIxhv9g/GeuoAT7RVr?=
- =?us-ascii?Q?HhZAQQ3+QPKmiPG3nL+y+jtz0Llzhzazr8SPnfMAB9oHEBEvq7AFscFxgiux?=
- =?us-ascii?Q?mk40ZBg=3D?=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR18MB4737.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(376011)(1800799021)(7416011)(366013)(38070700015);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?inz/IkSBZ6Zevrcg3OaS93LrpYxVDJda3/YdN8FdcdXYXQFPOwRHrO1l23Kf?=
- =?us-ascii?Q?iOEjFceaHmeMLqDTowFHuTPZKz0+3S+sDe2GBFA2U38pgBdaCev5JnGJ2Dy8?=
- =?us-ascii?Q?XO1fz+9SJAUka85x3DiBRro4lAtswpoFSltmhMKbP2/4coUiZq0MTxLNEQft?=
- =?us-ascii?Q?ECOE7zDgni0m8PFHCLKh/luyu6JsiCAo794JAFU7PGuZH3+xWvWztZhWx5XH?=
- =?us-ascii?Q?uuyNHrXE3gY3O3VTg+rohGax/bRTKyh7h/7gqHm4kY7Gtpsds7ijJ/ztWcV/?=
- =?us-ascii?Q?3d6MCSX7jaCPuGEVEmYd1lhp2OkhBydFnQk0UUKVSw4KxaAkAMQryRz3922N?=
- =?us-ascii?Q?EBdu2TcA1ayK650PhIbFh622zP6IW+20EGfK/dub5YPgpiYFfOMN78qQ/L7l?=
- =?us-ascii?Q?JssHePKTH1VBJY6/JK4z2c6mfRM/uqdNOCLeoTJITPSemmi5rKhPDBgDh+N8?=
- =?us-ascii?Q?bmz46mXOWCqwBYt/LiX2Eu8kL7apdl5NthNaPPRZc82Hja57tKebmOT2z7m3?=
- =?us-ascii?Q?DqQ7mJHZZ9uf/uxGQLiEpX0KHrQ0TZ1cYUs9fCNWObs72WbI7Ea7WWaVXLaV?=
- =?us-ascii?Q?8JDIyiTG8CU86xF0BlqEuH8rnjSyQ7YROwln3H9FjyEN1mfzWhyWrX4+IoYP?=
- =?us-ascii?Q?s8iX6xyNIQZ1ko4pKz6hCzYGf5tVAeB0bWsu9a3HJmnlOXCVUIY6YEFR9fjR?=
- =?us-ascii?Q?6NBJ7+LPPQyPNcjB5SKkEPQ58Lgcd3dd/31mxU9FqdJZdyvbdIM7G7LM8FNc?=
- =?us-ascii?Q?nV8MBim5gILMXIqS45ThQ+A6JSOU8BvwvodOzrfH+eM6vOBGypvzXvV2hA8j?=
- =?us-ascii?Q?h4u+/BeSCpL+CJKNHyM/1/VN/tiryoPIzbxSATJud75PpIuIZhNJX5/Hgj7t?=
- =?us-ascii?Q?9H7DOBCFQjtmz3Kr+j+zZj0nv38fAXWrDEi3/bMguDd44/21lq06/5NyAP88?=
- =?us-ascii?Q?NfP8koO9hSGRuFwigdO96/lv2X3YeRV1m3qA7w0fAoiHUmb9P6ufCbaaWZDp?=
- =?us-ascii?Q?urMthqssmeYnGX/aSOkY+2PWZoYrykcS+aC+wm2nXy0EaWXQxu0TuEIm0FFd?=
- =?us-ascii?Q?Fza0cFqcIILGCWAdQqxhXkRphla2+nSQ7YIuAz0SFquP7awoMksqhHd0IGmq?=
- =?us-ascii?Q?13R7f4euwXHcPZA3lYc2dzRQ7PnwzCUfD3K58Rs2D4kEJC9u/c/zBFH7cwwD?=
- =?us-ascii?Q?vxxhkhkIQRclFHjlvsZcrfksOK2wPcifkNidcZffb8GiD2mOoMw2zFPz3XYI?=
- =?us-ascii?Q?JNxIouSW+6RI+EII7IP2BGa6NLvERTJ4msSc+xPbshRefInQCOY8IIJdWswr?=
- =?us-ascii?Q?V+pLG9A2CQieYYbrjzDB1bEYa0+CsAKqfMrrX6NmVo8qzVmcc3zMuGuumG+K?=
- =?us-ascii?Q?sRlZGVigLocH+yihL18QDLv1bfmdpnTkLqT7xo1uAxugzhRIa4MpdDIhW0fx?=
- =?us-ascii?Q?+ySgYmwAYbIMGjmjSVXccICWIqtf57Fn9oBKkBFOaMPpcOtN1GpaND2Ahge6?=
- =?us-ascii?Q?2ybWD0qnfyXQkr5sBYvndx/Wvtal83BtbpnJD3tO5LSCqa13Ge8KpJimKOnf?=
- =?us-ascii?Q?yQH+RXxaoGGe8iPzp6H+kuu5ZeNA8phfaJ9pqLJS?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BEB13D615;
+	Fri, 21 Jun 2024 11:57:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718971070; cv=none; b=ES+KFHKcp5B7yjvHRYbIvpreFACk59RQv057APtuOLiHmtvN3fbsFTZkWWsqCm1wnQYxVpeH931/Uii2XxK1J/9tgf76o40aDBUkJ2pc8fLZ14V6I39tUFF1KmzB6p2SdqRnXfvFaM0E0xhCxK6hO5RSS0qSD05iRbFEmgc0/Gk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718971070; c=relaxed/simple;
+	bh=hV1XeB0qHLlasshRRuq1n2r3p9eHOIw0XxXtW79Qjos=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dO8vkMySDIHhqWslp9JWOuSQIrTJxZF6w81VXeqLdPYP4cK5bHRJ1DNeQAY7uBOxLm1RW4U5a8DyeW0Ik+WHLF+BnMHi7WuI6GPueH+8+Fmzjl3Dg+UWW+nm0kfD285N3Y1eEDZbodpg8nY4FAy3BGPf32WoRyWEv/YJaBBYDcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A0QnqC0P; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-70435f4c330so1669416b3a.1;
+        Fri, 21 Jun 2024 04:57:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718971068; x=1719575868; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VwcCCitswlmhc0myZxyyFlNFmtB3pm0TdlezWgja2Gc=;
+        b=A0QnqC0PEvza6m2301ZxAej8Pgxu9X5qQMO36o7h+nbsu5nXYmsa38T1UOnwXCeEeY
+         iDO55Bh/C38p2iyDHxMRd1rYQGZiDcSjmMFc+97tWPzxVJJL0wBRsVBLVgdmi227dbYs
+         ulrOwtg5GnbEpdjCsjiy1qwx7Nh5YcE788C3QryGDtcR1Gb1YqgbDOH2m99+aDAbuuLV
+         vtOAg+WyXdWK8bXhoTi432KpWbFHOOVxpqGUsHNK12f7iUiktKx4XWDTPvQcK6vhD1k1
+         MOWIB/O3JuOJrrMK+gBALEDe5HmhD6/351otoFx+r4AS0+9cJ4LQYrq0H43Jf+nvYavr
+         RPow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718971068; x=1719575868;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VwcCCitswlmhc0myZxyyFlNFmtB3pm0TdlezWgja2Gc=;
+        b=E/XUQXLBxrwXBgmfjTwRsJWZoltCDhonqlX8Wdz43iU2cCNBBGyf6+/kAXyWfxNcjm
+         jOxaktBxrxTcn2eZtZ8e/um9tcX0oO37BV1vZkwbfkKXAseNuoIkaCLGClYkhbvldOJq
+         P3Uggcl6NiLCLTeAh3OT5drtv7RBvhCWUHyc2SMwifekGsTfUdDzHwMH3xH5EY+HLGop
+         1xm0Maew9Y3vOF2ZcMai3giFMzVK6HRG+uiRCjBY8kTqg9z4HC67N2tvCGqo5cbsFTc7
+         FG8wEopgjOnvDtz7sXYMFdR+51iKvFxmKBlyvZxkWFV+bpgDNl1Pf5hKFOcNveDrAezc
+         VXAA==
+X-Forwarded-Encrypted: i=1; AJvYcCV6tDKGMPNkpKSJb1/DNYQ6Q+LGxYBfLV2LvJujaNZayOwgt/b1KwnvgL//NxsqOjUwdiOi5ITsF8QVZVsoHWutoVa4Vzs8QV8UFGOc5zWMA3ImQnTrT8GEqMlJqhilbcVKX5iH5n9xgqwUqB7waHa20F8HMCEX0jDMSVEXCITkom38rCqptOow
+X-Gm-Message-State: AOJu0YwoV9VUEiLzrdsoMc97lytH0+8vwVXdIeSJe+GJYa2ghoTwv/ZM
+	FNhbJY920HZAarUjezYwl0mcVPsYVXTErDImoQPSxSEgOds1zvWUwR4mIQ==
+X-Google-Smtp-Source: AGHT+IFI7dLBgAeTfCezoa4aJ7eKeccel53p7g5dFPqqk8Lev2POmLQ4IdMVtX+586PWqAg9PjskJA==
+X-Received: by 2002:a05:6a20:a987:b0:1bc:db71:3a2b with SMTP id adf61e73a8af0-1bcdb713cbamr1964102637.1.1718971068208;
+        Fri, 21 Jun 2024 04:57:48 -0700 (PDT)
+Received: from localhost.localdomain ([118.32.98.101])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9ebbb5dabsm12366555ad.273.2024.06.21.04.57.43
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Fri, 21 Jun 2024 04:57:47 -0700 (PDT)
+From: yskelg@gmail.com
+To: Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Takashi Iwai <tiwai@suse.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Taehee Yoo <ap420073@gmail.com>,
+	Austin Kim <austindh.kim@gmail.com>,
+	shjy180909@gmail.com,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pbuk5246@gmail.com,
+	Yunseong Kim <yskelg@gmail.com>
+Subject: [PATCH] qdisc: fix NULL pointer dereference in perf_trace_qdisc_reset()
+Date: Fri, 21 Jun 2024 20:45:49 +0900
+Message-ID: <20240621114551.2061-3-yskelg@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY3PR18MB4737.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 491cdb6c-071e-4ee7-43e6-08dc91e7a5c4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jun 2024 11:45:28.4000
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: X37oq65ZjM7zfTzFVVNw064ZrKeS7m9050P31R3awLRWI94PFwzfBP5r+tTtv1Mdhrp0Ol3Bg2b5qDyyvCUg5Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR18MB4502
-X-Proofpoint-GUID: 5kzzFU-x69O1OMf-uYFgKQIjOtYIyWmB
-X-Proofpoint-ORIG-GUID: 5kzzFU-x69O1OMf-uYFgKQIjOtYIyWmB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-21_04,2024-06-21_01,2024-05-17_01
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+From: Yunseong Kim <yskelg@gmail.com>
 
->Migrate tasklet APIs to the new bottom half workqueue mechanism. It replac=
-es all
->occurrences of tasklet usage with the appropriate workqueue APIs throughou=
-t the
->cavium/liquidio driver. This transition ensures compatibility with the lat=
-est design
->and enhances performance.
->
->Signed-off-by: Allen Pais <allen.lkml@gmail.com>
->---
-> .../net/ethernet/cavium/liquidio/lio_core.c   |  4 ++--
-> .../net/ethernet/cavium/liquidio/lio_main.c   | 24 +++++++++----------
-> .../ethernet/cavium/liquidio/lio_vf_main.c    | 10 ++++----
-> .../ethernet/cavium/liquidio/octeon_droq.c    |  4 ++--
-> .../ethernet/cavium/liquidio/octeon_main.h    |  4 ++--
-> 5 files changed, 23 insertions(+), 23 deletions(-)
->
+In the TRACE_EVENT(qdisc_reset) NULL dereference occurred from
 
-LGTM
-Reviewed-by: Sunil Goutham <sgoutham@marvell.com>
+ qdisc->dev_queue->dev <NULL> ->name
+
+This situation simulated from bunch of veths and Bluetooth dis/reconnection.
+
+During qdisc initialization, qdisc was being set to noop_queue.
+In veth_init_queue, the initial tx_num was reduced back to one,
+causing the qdisc reset to be called with noop, which led to the kernel panic.
+
+I think this will happen on the kernel version.
+ Linux kernel version ≥ v6.7.10, ≥ v6.8 ≥ v6.9 and 6.10
+
+This occurred from 51270d573a8d. I think this patch is absolutely 
+necessary. Previously, It was showing not intended string value of name.
+
+I've reproduced 3 time from my fedora 40 Debug Kernel with any other module 
+and patched.
+
+version: 6.10.0-0.rc2.20240608gitdc772f8237f9.29.fc41.aarch64+debug
+
+[ 5287.164555] veth0_vlan: left promiscuous mode
+[ 5287.164929] veth1_macvtap: left promiscuous mode
+[ 5287.164950] veth0_macvtap: left promiscuous mode
+[ 5287.164983] veth1_vlan: left promiscuous mode
+[ 5287.165008] veth0_vlan: left promiscuous mode
+[ 5287.165450] veth1_macvtap: left promiscuous mode
+[ 5287.165472] veth0_macvtap: left promiscuous mode
+[ 5287.165502] veth1_vlan: left promiscuous mode
+…
+[ 5297.598240] bridge0: port 2(bridge_slave_1) entered blocking state
+[ 5297.598262] bridge0: port 2(bridge_slave_1) entered forwarding state
+[ 5297.598296] bridge0: port 1(bridge_slave_0) entered blocking state
+[ 5297.598313] bridge0: port 1(bridge_slave_0) entered forwarding state
+[ 5297.616090] 8021q: adding VLAN 0 to HW filter on device bond0
+[ 5297.620405] bridge0: port 1(bridge_slave_0) entered disabled state
+[ 5297.620730] bridge0: port 2(bridge_slave_1) entered disabled state
+[ 5297.627247] 8021q: adding VLAN 0 to HW filter on device team0
+[ 5297.629636] bridge0: port 1(bridge_slave_0) entered blocking state
+…
+[ 5298.002798] bridge_slave_0: left promiscuous mode
+[ 5298.002869] bridge0: port 1(bridge_slave_0) entered disabled state
+[ 5298.309444] bond0 (unregistering): (slave bond_slave_0): Releasing backup interface
+[ 5298.315206] bond0 (unregistering): (slave bond_slave_1): Releasing backup interface
+[ 5298.320207] bond0 (unregistering): Released all slaves
+[ 5298.354296] hsr_slave_0: left promiscuous mode
+[ 5298.360750] hsr_slave_1: left promiscuous mode
+[ 5298.374889] veth1_macvtap: left promiscuous mode
+[ 5298.374931] veth0_macvtap: left promiscuous mode
+[ 5298.374988] veth1_vlan: left promiscuous mode
+[ 5298.375024] veth0_vlan: left promiscuous mode
+[ 5299.109741] team0 (unregistering): Port device team_slave_1 removed
+[ 5299.185870] team0 (unregistering): Port device team_slave_0 removed
+…
+[ 5300.155443] Bluetooth: hci3: unexpected cc 0x0c03 length: 249 > 1
+[ 5300.155724] Bluetooth: hci3: unexpected cc 0x1003 length: 249 > 9
+[ 5300.155988] Bluetooth: hci3: unexpected cc 0x1001 length: 249 > 9
+….
+[ 5301.075531] team0: Port device team_slave_1 added
+[ 5301.085515] bridge0: port 1(bridge_slave_0) entered blocking state
+[ 5301.085531] bridge0: port 1(bridge_slave_0) entered disabled state
+[ 5301.085588] bridge_slave_0: entered allmulticast mode
+[ 5301.085800] bridge_slave_0: entered promiscuous mode
+[ 5301.095617] bridge0: port 1(bridge_slave_0) entered blocking state
+[ 5301.095633] bridge0: port 1(bridge_slave_0) entered disabled state
+…
+[ 5301.149734] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+[ 5301.173234] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+[ 5301.180517] bond0: (slave bond_slave_1): Enslaving as an active interface with an up link
+[ 5301.193481] hsr_slave_0: entered promiscuous mode
+[ 5301.204425] hsr_slave_1: entered promiscuous mode
+[ 5301.210172] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+[ 5301.210185] Cannot create hsr debugfs directory
+[ 5301.224061] bond0: (slave bond_slave_1): Enslaving as an active interface with an up link
+[ 5301.246901] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+[ 5301.255934] team0: Port device team_slave_0 added
+[ 5301.256480] team0: Port device team_slave_1 added
+[ 5301.256948] team0: Port device team_slave_0 added
+…
+[ 5301.435928] hsr_slave_0: entered promiscuous mode
+[ 5301.446029] hsr_slave_1: entered promiscuous mode
+[ 5301.455872] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+[ 5301.455884] Cannot create hsr debugfs directory
+[ 5301.502664] hsr_slave_0: entered promiscuous mode
+[ 5301.513675] hsr_slave_1: entered promiscuous mode
+[ 5301.526155] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+[ 5301.526164] Cannot create hsr debugfs directory
+[ 5301.563662] hsr_slave_0: entered promiscuous mode
+[ 5301.576129] hsr_slave_1: entered promiscuous mode
+[ 5301.580259] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+[ 5301.580270] Cannot create hsr debugfs directory
+[ 5301.590269] 8021q: adding VLAN 0 to HW filter on device bond0
+
+[ 5301.595872] KASAN: null-ptr-deref in range [0x0000000000000130-0x0000000000000137]
+[ 5301.595877] Mem abort info:
+[ 5301.595881]   ESR = 0x0000000096000006
+[ 5301.595885]   EC = 0x25: DABT (current EL), IL = 32 bits
+[ 5301.595889]   SET = 0, FnV = 0
+[ 5301.595893]   EA = 0, S1PTW = 0
+[ 5301.595896]   FSC = 0x06: level 2 translation fault
+[ 5301.595900] Data abort info:
+[ 5301.595903]   ISV = 0, ISS = 0x00000006, ISS2 = 0x00000000
+[ 5301.595907]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+[ 5301.595911]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+[ 5301.595915] [dfff800000000026] address between user and kernel address ranges
+[ 5301.595971] Internal error: Oops: 0000000096000006 [#1] SMP
+…
+[ 5301.596076] CPU: 2 PID: 102769 Comm:
+syz-executor.3 Kdump: loaded Tainted:
+ G        W         -------  ---  6.10.0-0.rc2.20240608gitdc772f8237f9.29.fc41.aarch64+debug #1
+[ 5301.596080] Hardware name: VMware, Inc. VMware20,1/VBSA,
+ BIOS VMW201.00V.21805430.BA64.2305221830 05/22/2023
+[ 5301.596082] pstate: 01400005 (nzcv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+[ 5301.596085] pc : strnlen+0x40/0x88
+[ 5301.596114] lr : trace_event_get_offsets_qdisc_reset+0x6c/0x2b0
+[ 5301.596124] sp : ffff8000beef6b40
+[ 5301.596126] x29: ffff8000beef6b40 x28: dfff800000000000 x27: 0000000000000001
+[ 5301.596131] x26: 6de1800082c62bd0 x25: 1ffff000110aa9e0 x24: ffff800088554f00
+[ 5301.596136] x23: ffff800088554ec0 x22: 0000000000000130 x21: 0000000000000140
+[ 5301.596140] x20: dfff800000000000 x19: ffff8000beef6c60 x18: ffff7000115106d8
+[ 5301.596143] x17: ffff800121bad000 x16: ffff800080020000 x15: 0000000000000006
+[ 5301.596147] x14: 0000000000000002 x13: ffff0001f3ed8d14 x12: ffff700017ddeda5
+[ 5301.596151] x11: 1ffff00017ddeda4 x10: ffff700017ddeda4 x9 : ffff800082cc5eec
+[ 5301.596155] x8 : 0000000000000004 x7 : 00000000f1f1f1f1 x6 : 00000000f2f2f200
+[ 5301.596158] x5 : 00000000f3f3f3f3 x4 : ffff700017dded80 x3 : 00000000f204f1f1
+[ 5301.596162] x2 : 0000000000000026 x1 : 0000000000000000 x0 : 0000000000000130
+[ 5301.596166] Call trace:
+[ 5301.596175]  strnlen+0x40/0x88
+[ 5301.596179]  trace_event_get_offsets_qdisc_reset+0x6c/0x2b0
+[ 5301.596182]  perf_trace_qdisc_reset+0xb0/0x538
+[ 5301.596184]  __traceiter_qdisc_reset+0x68/0xc0
+[ 5301.596188]  qdisc_reset+0x43c/0x5e8
+[ 5301.596190]  netif_set_real_num_tx_queues+0x288/0x770
+[ 5301.596194]  veth_init_queues+0xfc/0x130 [veth]
+[ 5301.596198]  veth_newlink+0x45c/0x850 [veth]
+[ 5301.596202]  rtnl_newlink_create+0x2c8/0x798
+[ 5301.596205]  __rtnl_newlink+0x92c/0xb60
+[ 5301.596208]  rtnl_newlink+0xd8/0x130
+[ 5301.596211]  rtnetlink_rcv_msg+0x2e0/0x890
+[ 5301.596214]  netlink_rcv_skb+0x1c4/0x380
+[ 5301.596225]  rtnetlink_rcv+0x20/0x38
+[ 5301.596227]  netlink_unicast+0x3c8/0x640
+[ 5301.596231]  netlink_sendmsg+0x658/0xa60
+[ 5301.596234]  __sock_sendmsg+0xd0/0x180
+[ 5301.596243]  __sys_sendto+0x1c0/0x280
+[ 5301.596246]  __arm64_sys_sendto+0xc8/0x150
+[ 5301.596249]  invoke_syscall+0xdc/0x268
+[ 5301.596256]  el0_svc_common.constprop.0+0x16c/0x240
+[ 5301.596259]  do_el0_svc+0x48/0x68
+[ 5301.596261]  el0_svc+0x50/0x188
+[ 5301.596265]  el0t_64_sync_handler+0x120/0x130
+[ 5301.596268]  el0t_64_sync+0x194/0x198
+[ 5301.596272] Code: eb15001f 54000120 d343fc02 12000801 (38f46842) 
+[ 5301.596285] SMP: stopping secondary CPUs
+[ 5301.597053] Starting crashdump kernel...
+[ 5301.597057] Bye!
+
+Yeoreum and I use two fuzzing tool simultaneously.
+
+One process with syz-executor : https://github.com/google/syzkaller
+
+ $ ./syz-execprog -executor=./syz-executor -repeat=1 -sandbox=setuid \
+    -enable=none -collide=false log1
+
+The other process with perf fuzzer:
+ https://github.com/deater/perf_event_tests/tree/master/fuzzer
+
+ $ perf_event_tests/fuzzer/perf_fuzzer
+
+Yeoreum and I don't know if the patch we wrote will fix the underlying cause,
+but we think that priority is to prevent kernel panic happening.
+So, we're sending this patch.
+
+I can attach a sys-execprog's executing program, kernel dump and dmesg
+if someone need it, but I'm not sure how to safely attach large vmcore with vmlinux.
+
+Signed-off-by: Yunseong Kim <yskelg@gmail.com>, Yeoreum Yun <yeoreum.yun@arm.com>
+---
+ include/trace/events/qdisc.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
+index f1b5e816e7e5..170b51fbe47a 100644
+--- a/include/trace/events/qdisc.h
++++ b/include/trace/events/qdisc.h
+@@ -81,7 +81,7 @@ TRACE_EVENT(qdisc_reset,
+ 	TP_ARGS(q),
+ 
+ 	TP_STRUCT__entry(
+-		__string(	dev,		qdisc_dev(q)->name	)
++		__string(dev, qdisc_dev(q) ? qdisc_dev(q)->name : "noop_queue")
+ 		__string(	kind,		q->ops->id		)
+ 		__field(	u32,		parent			)
+ 		__field(	u32,		handle			)
+-- 
+2.45.2
+
 
