@@ -1,199 +1,140 @@
-Return-Path: <netdev+bounces-105754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8851D912A8F
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 17:45:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2407912AB8
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 17:56:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E68B2868E7
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:45:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C9351F2117B
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017A415AACD;
-	Fri, 21 Jun 2024 15:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB9615F303;
+	Fri, 21 Jun 2024 15:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XuG/A2u9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FVIkg+be"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3569415A85C;
-	Fri, 21 Jun 2024 15:45:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2CA757F8;
+	Fri, 21 Jun 2024 15:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718984745; cv=none; b=BDe3PGT4hDvmE/42QgJuWE9Y4KLLLLRQigqER28d2/LVcaAWsgkzPSEfKvcRdLpc3TE6cz6aFfyK53FZGXoJMj4Q3hJRr21xyFmTeXolso3e7Tdn557HwUFxM7uV9F0IzMNlT3kJs/O2vjjTfwcFFzHuc8RzGT8EVcOlDic7TgA=
+	t=1718985362; cv=none; b=FAqQsQNsKJTDI93q5COV0Mt9WMvSRzbfOxO5r1TOToHBaodLCRDS2avoYT+LgVgB9turtVJyp5EPlvo3ZG7o+f4XNB+2uiegDn4KCNe9lWEvzUawDvMg1hsW5L9i6sU8radLWvIW9ycTreAT60fgFz2OhWi7yH1U3v/SM4BTkr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718984745; c=relaxed/simple;
-	bh=HOSCZ2vrhvGoFP2iw1Ql/Hz/mDzmyBgbdC959qExCDk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kE+KO56hhwx8mv0s3QBGzllCZtHVjBhRnFF6WMCvC9LyNwd8IsVFj7h4mrEeihi2/tjQINipJF6neUbU2VKqdcdbTlBbiNvhLEIQODEf82ANmH8fbFj5T799dI6QT3mHfFdjr6YWKbqRgnuLEY6gHsMabFe4GFuPQS3NWZ5neI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XuG/A2u9; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a6f21ff4e6dso302754366b.3;
-        Fri, 21 Jun 2024 08:45:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718984742; x=1719589542; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p4CvXaD0p8juFHM/mj9mpOHYuq+vuwl0xPPEP0shwFI=;
-        b=XuG/A2u9OpJtRpPAM5mP7DY2cdn+s7cd7jq28VaTgI2un7In6lh6Z4mbdte580yI98
-         70Grq8EJjXkLFfTONjSn/GOz3Pic1ejLZzF4r3OW4IrCRDOb9dsP2eHtV6ORHbdFRSdm
-         /Z1izixViC4T10HqMKBQvZ8sZtuTjuV/DVqYcNjE2xMRz81bGEJFM1d8TUmCSMYvuLRi
-         aodVgmaK42d9B/5MbMbg+LScbsmE4nbWTw5fbwbSG+/sH4V+TBxnAwMLdUiijTK16DZn
-         RX+obBfORID0lFpxKSXpH/9HzGXR/lYmARMAQZruq6aWPzZyq0JkX9GxCDkCkTDnoVqf
-         5uYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718984742; x=1719589542;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=p4CvXaD0p8juFHM/mj9mpOHYuq+vuwl0xPPEP0shwFI=;
-        b=WIXnDV6FMcnQ9PJNpsLMlSiG7jZz7k9+4lVkT4cJcR+rcAjdalIAR8IfqrzlVtqjJi
-         NAMeiiiHtBjs1zbaHMXMKHPBxMnnI93V6K2tJ1oLTQSyd9aw9UP4GEKeKIr2fuouDExY
-         1h3Nd4xwuCFdEEdbLC5IZciGVlCWhdGJuAHWUUYPI/pZJag7ulnJBoK2vDfzwc+Uo8QS
-         kA0JcTMNUYvA+m8OtFRpbAU9A6GkIePGKSWjs60eyiw82fcX/PXQFmW+2PLI15zULxgA
-         /faVgSddHZjP9MxoH2qLfweUQCQ0nOiKpedocHVdzzb8BcEF8MJvol1+mqVPCOkksH1G
-         dE4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVTH7ozIHaxrtH7yHjnYm90dvbnOjBUVv2xSPj/ibVTYywH6wV2oUN95ntxNG4Q5itRlnOx/hrlngU28hBjgH+m65AYQjUKFIREPdVsm9I3N3pFUz2Ka8/WmDADj6yiVNcFt+bGud8Y3nPGwPi2taWNFk0IJ2Y3RjhonscUN0P1kHp6L50VWsRZtzj5E0OgphiY3OaWmbVTmymiVA==
-X-Gm-Message-State: AOJu0Yz0rPReYIt/0vVAU6rSciVLIeBclft/rODZpus3t+XJQPVnLml3
-	0R8tGgGBqerIA8O94QJv2v5Krc1m3ITqaGtCbC8rFrXTc889vSGOO34WH4ocpyaIe0mLmVeAjif
-	Iwx/glhhXBGOwq3yQEnWdnAYH6wc=
-X-Google-Smtp-Source: AGHT+IGQG2/pFic6ghI58imlJHEBDuzmWT1uMrn79oh0Id6ZdT6X4Yy9HwZWFVL2JJuDF6fSk19Bw5MO37t5DdaeuQk=
-X-Received: by 2002:a17:907:7a94:b0:a6f:b58f:ae3c with SMTP id
- a640c23a62f3a-a6fb58fba03mr436111266b.26.1718984742083; Fri, 21 Jun 2024
- 08:45:42 -0700 (PDT)
+	s=arc-20240116; t=1718985362; c=relaxed/simple;
+	bh=Snn796INTt72RBeUt8uePOrvUHDAmT55jeQwCK7Wtbg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X9ufky7YyEfw0BesYVri6KPXVHGD5ykCr2ODRZkNxpZUAeaIbSMAXX8dNU75o2jWlSa/xrvQimzZftvi587awbHOdeUe8vVk6qBl/XUV+KSl4uGmV6WXJLQ+9qV4hkIuVniICwJf+H5uYRqc+zSbyP8l6Q0P+m/tJ5heTQGv7/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FVIkg+be; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ABA8C2BBFC;
+	Fri, 21 Jun 2024 15:56:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718985362;
+	bh=Snn796INTt72RBeUt8uePOrvUHDAmT55jeQwCK7Wtbg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FVIkg+beoVZ1j0a93xJTvx+onPSSLeZEJERLyZ9DOoqlk32OpmfeW/gm7diyrZopA
+	 92vj+9+pI5wxWo8yCWRC6DKG8A3reo2QhmWXwfnsucocLe5ZdiKB+kkkyL6wRzR7SR
+	 x7GT99IWD9FiOFRGhl1/3hj1gRKlevyuN530nP6dOw+pOzoFl7Sk1IoYA6hKUG982o
+	 ic02KtfJCsSpFaqZm8zf50ARYOi6+AD79+/1DINfpfaqG5Vw2QtVwqjitr4DQtaA2j
+	 H2ArHYitZ6+X9Zp9iRWm1PrpPMnMBvNifzgyaBTfSGw6njONpi/9uhrQ8qLvnISRzY
+	 daSQCYVFVlrbg==
+Date: Fri, 21 Jun 2024 08:56:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: Re: [PATCH net-next v15 13/14] net: ethtool: tsinfo: Add support
+ for hwtstamp provider and get/set hwtstamp config
+Message-ID: <20240621085600.5b7aa934@kernel.org>
+In-Reply-To: <20240621105408.6dda7a0e@kmaincent-XPS-13-7390>
+References: <20240612-feature_ptp_netnext-v15-0-b2a086257b63@bootlin.com>
+	<20240612-feature_ptp_netnext-v15-13-b2a086257b63@bootlin.com>
+	<20240617184331.0ddfd08e@kernel.org>
+	<20240621105408.6dda7a0e@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240527161450.326615-1-herve.codina@bootlin.com>
- <20240527161450.326615-19-herve.codina@bootlin.com> <ZmDJi__Ilp7zd-yJ@surfacebook.localdomain>
- <20240620175646.24455efb@bootlin.com> <CAHp75VdDkv-dxWa60=OLfXAQ8T5CkFiKALbDHaVVKQOK3gJehA@mail.gmail.com>
- <20240620184309.6d1a29a1@bootlin.com> <20240620191923.3d62c128@bootlin.com>
-In-Reply-To: <20240620191923.3d62c128@bootlin.com>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Fri, 21 Jun 2024 17:45:05 +0200
-Message-ID: <CAHp75VdeoNXRTmMoK-S6qecU1nOQWDZVONeHU+imFiwcTxe8xg@mail.gmail.com>
-Subject: Re: [PATCH v2 18/19] mfd: Add support for LAN966x PCI device
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: Simon Horman <horms@kernel.org>, Sai Krishna Gajula <saikrishnag@marvell.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lee Jones <lee@kernel.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Horatiu Vultur <horatiu.vultur@microchip.com>, 
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Saravana Kannan <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, Lars Povlsen <lars.povlsen@microchip.com>, 
-	Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon <daniel.machon@microchip.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, linux-kernel@vger.kernel.org, 
-	devicetree@vger.kernel.org, netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Allan Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli <luca.ceresoli@bootlin.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 20, 2024 at 7:19=E2=80=AFPM Herve Codina <herve.codina@bootlin.=
-com> wrote:
-> On Thu, 20 Jun 2024 18:43:09 +0200
-> Herve Codina <herve.codina@bootlin.com> wrote:
-> > On Thu, 20 Jun 2024 18:07:16 +0200
-> > Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
-> > > On Thu, Jun 20, 2024 at 5:56=E2=80=AFPM Herve Codina <herve.codina@bo=
-otlin.com> wrote:
-> > > > On Wed, 5 Jun 2024 23:24:43 +0300
-> > > > Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
-> > > > > Mon, May 27, 2024 at 06:14:45PM +0200, Herve Codina kirjoitti:
+On Fri, 21 Jun 2024 10:54:08 +0200 Kory Maincent wrote:
+> > > +const struct nla_policy ethnl_tsinfo_get_policy[ETHTOOL_A_TSINFO_MAX=
+ + 1]
+> > > =3D { [ETHTOOL_A_TSINFO_HEADER]		=3D
+> > >  		NLA_POLICY_NESTED(ethnl_header_policy_stats),
+> > > +	[ETHTOOL_A_TSINFO_GHWTSTAMP] =3D
+> > > +		NLA_POLICY_MAX(NLA_U8, 1),   =20
+> >=20
+> > I think this can be an NLA_FLAG, but TBH I'm also confused about=20
+> > the semantics. Can you explain what it does from user perspective? =20
+>=20
+> As I described it in the documentation it replaces SIOCGHWTSTAMP:
+> "Any process can read the actual configuration by requesting tsinfo netli=
+nk
+> socket ETHTOOL_MSG_TSINFO_GET with ETHTOOL_MSG_TSINFO_GHWTSTAMP netlink
+> attribute set.
+>=20
+> The legacy usage is to pass this structure to ioctl(SIOCGHWTSTAMP) in the=
+      =20
+> same way as the ioctl(SIOCSHWTSTAMP).  However, this has not been impleme=
+nted  =20
+> in all drivers."
 
-...
+I did see the words, just didn't get the meaning :> Couple of years
+from now hopefully newcomers won't even know ioctls exited, and
+therefore what they did. From the user perspective the gist AFAIU is
+that instead of *supported* we'll return what's currently *configured*.
 
-> > > > > > +   if (!dev->of_node) {
-> > > > > > +           dev_err(dev, "Missing of_node for device\n");
-> > > > > > +           return -EINVAL;
-> > > > > > +   }
-> > > > >
-> > > > > Why do you need this? The code you have in _create_intr_ctrl() wi=
-ll take care
-> > > > > already for this case.
-> > > >
-> > > > The code in _create_intr_ctrl checks for fwnode and not an of_node.
-> > > >
-> > > > The check here is to ensure that an of_node is available as it will=
- be use
-> > > > for DT overlay loading.
-> > >
-> > > So, what exactly do you want to check? fwnode check covers this.
-> > >
-> > > > I will keep the check here and use dev_of_node() instead of dev->of=
-_node.
-> > >
-> > > It needs to be well justified as from a coding point of view this is =
-a
-> > > duplication.
->
-> On DT based system, if a fwnode is set it is an of_node.
-> On ACPI, if a fwnode is set is is an acpi_node.
->
-> The core PCI, when it successfully creates the DT node for a device
-> (CONFIG_PCI_DYNAMIC_OF_NODES) set the of_node of this device.
-> So we can have a device with:
->  - fwnode from ACPI
->  - of_node from core PCI creation
+This feels a little bit too much like a muxed operation for me :(
+Can we create a separate commands for TSCONFIG_GET / _SET ?
+Granted it will be higher LOC, but hopefully cleaner ?
+Or we can add the configured as completely new attrs, but changing
+meaning of existing attrs based on a request flag.. =F0=9F=99=82=E2=80=8D=
+=E2=86=94=EF=B8=8F=EF=B8=8F
 
-Does PCI device creation not set fwnode?
+> > > +	[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER] =3D
+> > > +		NLA_POLICY_NESTED(ethnl_tsinfo_hwtstamp_provider_policy),
+> > >  };
+> > > =20
+> > > +static int tsinfo_parse_hwtstamp_provider(const struct nlattr *nest,
+> > > +					  struct hwtst_provider *hwtst,
+> > > +					  struct netlink_ext_ack *extack,
+> > > +					  bool *mod)
+> > > +{
+> > > +	struct nlattr
+> > > *tb[ARRAY_SIZE(ethnl_tsinfo_hwtstamp_provider_policy)];   =20
+> >=20
+> > Could you find a more sensible name for this policy? =20
+>=20
+> I am not a naming expert but "hwtstamp_provider" is the struct name I hav=
+e used
+> to describe hwtstamp index + qualifier and the prefix of the netlink nest=
+ed
+> attribute, so IMHO it fits well.
+> Have you another proposition to clarify what you would expect?
 
-> This driver needs the of_node to load the overlay.
-> Even if the core PCI cannot create a DT node for the PCI device right
-> now, I don't expect this LAN855x PCI driver updated when the core PCI
-> is able to create this PCI device DT node.
-
-If it's really needed, I think the correct call here is is_of_node()
-to show exactly why it's not a duplication. It also needs a comment on
-top of this call.
-
-...
-
-> > > > > > +static struct pci_device_id lan966x_pci_ids[] =3D {
-> > > > > > +   { PCI_DEVICE(0x1055, 0x9660) },
-> > > > >
-> > > > > Don't you have VENDOR_ID defined somewhere?
-> > > >
-> > > > No and 0x1055 is taken by PCI_VENDOR_ID_EFAR in pci-ids.h
-> > > > but SMSC acquired EFAR late 1990's and MCHP acquired SMSC in 2012
-> > > > https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet=
-/microchip/lan743x_main.h#L851
-> > > >
-> > > > I will patch pci-ids.h to create:
-> > > >   #define PCI_VENDOR_ID_SMSC PCI_VENDOR_ID_EFAR
-> > > >   #define PCI_VENDOR_ID_MCHP PCI_VENDOR_ID_SMSC
-> > > > As part of this patch, I will update lan743x_main.h to remove its o=
-wn #define
-> > > >
-> > > > And use PCI_VENDOR_ID_MCHP in this series.
-> > >
-> > > Okay, but I don't think (but I haven't checked) we have something lik=
-e
-> > > this ever done there. In any case it's up to Bjorn how to implement
-> > > this.
->
-> Right, I wait for Bjorn reply before changing anything.
-
-But we already have the vendor ID with the same value. Even if the
-company was acquired, the old ID still may be used. In that case an
-update on PCI IDs can go in a separate change justifying it. In any
-case, I would really want to hear from Bjorn on this and if nothing
-happens, to use the existing vendor ID for now to speed up the series
-to be reviewed/processed.
-
-
---=20
-With Best Regards,
-Andy Shevchenko
+Oh, I just meant that it's way to long. I know y'all youngsters use
+IDEs but I have it on good authority that there's still people in
+this community who use text editors they wrote themselves, and those
+lack auto-completion.. It's good to be more concise.
 
