@@ -1,168 +1,118 @@
-Return-Path: <netdev+bounces-105707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 504E291254B
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 14:29:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FAA491254F
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 14:31:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 730DC1C21401
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:29:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B2BF1F21C00
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 912F2153819;
-	Fri, 21 Jun 2024 12:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB2CC14F135;
+	Fri, 21 Jun 2024 12:30:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="Aezo5WTP"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FOChEhXl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA7E1534FC;
-	Fri, 21 Jun 2024 12:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0555E219F9;
+	Fri, 21 Jun 2024 12:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718972952; cv=none; b=VOryFNFhA0OdjcgalAtDL/4pitS31s/JJnTLiEIF+DS8k363RlJMhGhcooVFHX+HooSHI168YhjA5i+oxQorvNv5+h+7mStHjrjy0WHDzTc35mTRuu6oLE6gAH8SawlrjaSKMn+Uq9Ijxh5pGVkK4pDaTf0SOVbICjZdiegHVB8=
+	t=1718973055; cv=none; b=oSj1yDzacpFQakqQPEDbjrLraJqU2sLtS7A0GCY2KAydPZNJ7ROwxK3wCoj6gbry0buGqaD0On/HqjMi705r3H2CRN+TL0SGZvhRuEZNU4gBEM33uGBwASdZeZr2BJ7oDRzPfrT+cPjGx9gju3WKlUgdD0JCTg6vPBi3c265sE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718972952; c=relaxed/simple;
-	bh=k7hCeb8BUHuN+IoFyvzUrvlpPhOJfUOKtoiFp/9raVY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rVJ4vxYtsyqHPnoEEE4hvJQDJTBHamHFy6CQJJB5HJ+1QflFISnK5/SMkIz2XFOfamoSNmrGpWfE6UVKVQfMY4XTzRngJYk4woHL9p0OMvg+17yB1IgFCTJ2pqr1Q4hVpMW8aXuLOCrgrNaqFIDX+OzpMy4G60nhjKwVZTQI8Wk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=Aezo5WTP; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: da21c1302fc911ef99dc3f8fac2c3230-20240621
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=vaRahnf6HvtLueonuL1iOLmCm5bgf+4n+aOc5u6IpV8=;
-	b=Aezo5WTPC+GQxMdyo1S36Ug4yjiS2g3sobc6tn9mTpur5ctd/ZxAM4cG9CKwQtazXtUqEWb24vRKyO13k5NONH6/jWwEIhZmRGeTsXYtKGBdZE0xaD5HSKRIgE81e6VyfXYyIRy5RhF0rN0zqSjgaal0m/MuTtVPRafPL6T9/KE=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.39,REQID:13657857-5b3d-4925-8cf0-ac050ce2e657,IP:0,U
-	RL:0,TC:0,Content:-20,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-20
-X-CID-META: VersionHash:393d96e,CLOUDID:85c6df88-8d4f-477b-89d2-1e3bdbef96d1,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:1,EDM:-3,IP:nil,U
-	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
-	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: da21c1302fc911ef99dc3f8fac2c3230-20240621
-Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw02.mediatek.com
-	(envelope-from <skylake.huang@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1826468925; Fri, 21 Jun 2024 20:29:06 +0800
-Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- MTKMBS14N2.mediatek.inc (172.21.101.76) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 21 Jun 2024 20:29:04 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Fri, 21 Jun 2024 20:29:04 +0800
-From: Sky Huang <SkyLake.Huang@mediatek.com>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Daniel Golle
-	<daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>, SkyLake Huang
-	<SkyLake.Huang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
-CC: Steven Liu <Steven.Liu@mediatek.com>, SkyLake.Huang
-	<skylake.huang@mediatek.com>
-Subject: [PATCH net-next v8 13/13] net: phy: mediatek: Remove unnecessary outer parens of "supported_triggers" var
-Date: Fri, 21 Jun 2024 20:20:45 +0800
-Message-ID: <20240621122045.30732-14-SkyLake.Huang@mediatek.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20240621122045.30732-1-SkyLake.Huang@mediatek.com>
-References: <20240621122045.30732-1-SkyLake.Huang@mediatek.com>
+	s=arc-20240116; t=1718973055; c=relaxed/simple;
+	bh=MDf/S7p9nxc7jxIb4VHeMj74saNKIvIpDEbm4gVOuPE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fsgG5MxOwdM0BeLQIuGbS8QbHO/YIroTrhj08K8rGdKxPjyj4f+M91jWnpaUa60hbVSZnmRbECp5p42OkhJH2nJsu1FZEpQqBnPAWs+uIQI8zZ4/GMuh1OocJBWyD8RhFkahT+HpF5ofpWTRw1QVGMAqqDpvUkL6fGthFvKQXAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FOChEhXl; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=2qIXFrmiML0W+NIuVWwtNy9ypBaWgCdJ6JhYw4WxT+c=; b=FOChEhXl/kUHw8ezMzLSyhvkAq
+	00m2SlvQC3yodPkRjKTawrWAEJVxet5KG81Du9E4Ih553hkJlXUn0b7xTbJTxapZtro8roqsj/rvJ
+	qjvdboYA8veyR2G21DGJ2l/omqXcgBubbVkTzutB24E72VKV7tuZXt7kTAcSrRy2njCzTFOk+u+Z6
+	paam7ODO5+Bac4vCjYf0c6fN38MxstxK4wmYWq02EXaeRHf+B0EHCocW2dgD9TD0MrISrlnl9MOdl
+	Of7Emrocfnwk1ZWbXyEf2ykJVRqcet+tIXDh/mSNqr/6l7a64tn59vFhGqAdISh2V2hGZOp84WVGD
+	icz/H05g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47448)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sKdPb-0003us-0J;
+	Fri, 21 Jun 2024 13:30:39 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sKdPd-00007R-JP; Fri, 21 Jun 2024 13:30:41 +0100
+Date: Fri, 21 Jun 2024 13:30:41 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: =?iso-8859-1?B?Q3Pza+Fz?= Bence <csokas.bence@prolan.hu>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
+	trivial@kernel.org, Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH v2 resub 1/2] net: include: mii: Refactor: Define LPA_*
+ in terms of ADVERTISE_*
+Message-ID: <ZnVycQASAhN2Shfu@shell.armlinux.org.uk>
+References: <20240619124622.2798613-1-csokas.bence@prolan.hu>
+ <c82256a5-6385-4205-ba74-ab102396abb6@lunn.ch>
+ <f216c0b9-3d0d-4d4c-aa33-ba02b0722052@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-AS-Result: No-10--3.009600-8.000000
-X-TMASE-MatchedRID: BIV06Js6OJN00I3rWKbGqx+WEMjoO9WWTJDl9FKHbrkKogmGusPLbx8+
-	XHETeZCzky2SP4enkne5cURAloITPh8TzIzimOwPC24oEZ6SpSmb4wHqRpnaDv2+yxuUhyIMgJA
-	8qGaptLPShjii885JA4vplMkCs/9/iZH4SxuZVKyUPItSaAwao61fEoqpp7DACF9ypY+Mx5JZKM
-	ggZKh680ma3zYT97IFAYfQIAUhBayZvmCbKVb49sZL6x5U/HridGByp+zdaDg=
-X-TM-AS-User-Approved-Sender: No
-X-TM-AS-User-Blocked-Sender: No
-X-TMASE-Result: 10--3.009600-8.000000
-X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-SNTS-SMTP:
-	D1749B019A7B2828F5F206AC65DCFED23103E55B87D2E39D248FA145F544E7402000:8
-X-MTK: N
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f216c0b9-3d0d-4d4c-aa33-ba02b0722052@prolan.hu>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: "SkyLake.Huang" <skylake.huang@mediatek.com>
+On Fri, Jun 21, 2024 at 09:48:23AM +0200, Csókás Bence wrote:
+> Hi
+> 
+> On 6/20/24 21:07, Andrew Lunn wrote:
+> > On Wed, Jun 19, 2024 at 02:46:22PM +0200, Csókás, Bence wrote:
+> > > Ethernet specification mandates that these bits will be equal.
+> > > To reduce the amount of magix hex'es in the code, just define
+> > > them in terms of each other.
+> > 
+> > I have a quick email exchange with other PHY maintainers, and we
+> > agree. We will reject these changes, they are just churn and bring no
+> > real benefit.
+> > 
+> > NACK
+> > 
+> >      Andrew
+> > 
+> 
+> The benefit is that I don't have to constantly convert between "n-th bit
+> set" (which is how virtually all datasheets, specifications, documentation
+> etc. represent MII bits) and these hex values. In most places in the kernel,
+> register bits are already represented with BIT() et al., so why not here?
 
-This patch removes unnecessary outer parens of "supported_triggers" vars
-in mtk-ge.c & mtk-ge-soc.c to improve readability.
+These are user API files, you can't use BIT() here (BIT() isn't defined
+for userspace header files.) Next, these are 'int's not 'longs' so
+using BIT() or _BITUL() could cause warnings - plus it changes the
+type of these definitions not only for kernel space but also user space.
+Thus, it's an API change.
 
-Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
----
- drivers/net/phy/mediatek/mtk-ge-soc.c | 16 ++++++++--------
- drivers/net/phy/mediatek/mtk-ge.c     | 16 ++++++++--------
- 2 files changed, 16 insertions(+), 16 deletions(-)
+So no, we're not making changes to make this "more readable" at the
+expense of breaking the kernel's UAPI.
 
-diff --git a/drivers/net/phy/mediatek/mtk-ge-soc.c b/drivers/net/phy/mediatek/mtk-ge-soc.c
-index fc33729..ff469c4 100644
---- a/drivers/net/phy/mediatek/mtk-ge-soc.c
-+++ b/drivers/net/phy/mediatek/mtk-ge-soc.c
-@@ -1229,14 +1229,14 @@ static int mt798x_phy_led_brightness_set(struct phy_device *phydev,
- }
- 
- static const unsigned long supported_triggers =
--	(BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
--	 BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
--	 BIT(TRIGGER_NETDEV_LINK)        |
--	 BIT(TRIGGER_NETDEV_LINK_10)     |
--	 BIT(TRIGGER_NETDEV_LINK_100)    |
--	 BIT(TRIGGER_NETDEV_LINK_1000)   |
--	 BIT(TRIGGER_NETDEV_RX)          |
--	 BIT(TRIGGER_NETDEV_TX));
-+	BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
-+	BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
-+	BIT(TRIGGER_NETDEV_LINK)        |
-+	BIT(TRIGGER_NETDEV_LINK_10)     |
-+	BIT(TRIGGER_NETDEV_LINK_100)    |
-+	BIT(TRIGGER_NETDEV_LINK_1000)   |
-+	BIT(TRIGGER_NETDEV_RX)          |
-+	BIT(TRIGGER_NETDEV_TX);
- 
- static int mt798x_phy_led_hw_is_supported(struct phy_device *phydev, u8 index,
- 					  unsigned long rules)
-diff --git a/drivers/net/phy/mediatek/mtk-ge.c b/drivers/net/phy/mediatek/mtk-ge.c
-index 07b5b22..235fee5 100644
---- a/drivers/net/phy/mediatek/mtk-ge.c
-+++ b/drivers/net/phy/mediatek/mtk-ge.c
-@@ -157,14 +157,14 @@ static int mt753x_phy_led_brightness_set(struct phy_device *phydev,
- }
- 
- static const unsigned long supported_triggers =
--	(BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
--	 BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
--	 BIT(TRIGGER_NETDEV_LINK)        |
--	 BIT(TRIGGER_NETDEV_LINK_10)     |
--	 BIT(TRIGGER_NETDEV_LINK_100)    |
--	 BIT(TRIGGER_NETDEV_LINK_1000)   |
--	 BIT(TRIGGER_NETDEV_RX)          |
--	 BIT(TRIGGER_NETDEV_TX));
-+	BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
-+	BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
-+	BIT(TRIGGER_NETDEV_LINK)        |
-+	BIT(TRIGGER_NETDEV_LINK_10)     |
-+	BIT(TRIGGER_NETDEV_LINK_100)    |
-+	BIT(TRIGGER_NETDEV_LINK_1000)   |
-+	BIT(TRIGGER_NETDEV_RX)          |
-+	BIT(TRIGGER_NETDEV_TX);
- 
- static int mt753x_phy_led_hw_is_supported(struct phy_device *phydev, u8 index,
- 					  unsigned long rules)
+Just get used to working with hex numbers like most of us had to do
+before BIT() was added to the kernel... it's not difficult, each hex
+digit is after all four binary bits. It's not like it's decimal.
+
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
