@@ -1,365 +1,197 @@
-Return-Path: <netdev+bounces-105638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D54799121F1
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:16:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9517D9121DB
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:13:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03B761C20CDC
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:16:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B58B41C23406
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5118174EC6;
-	Fri, 21 Jun 2024 10:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369C6175540;
+	Fri, 21 Jun 2024 10:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iAU6ESyu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YUJf3q/r"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CAB17A93C
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 10:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8EB173357
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 10:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718964749; cv=none; b=nDBe5a5TdJ73xZv4jpyZ7y1+JcGkjmwlO2i2Yhwy6wUVb+JCHrT3ikcIGojBH0F0mjOv+KA6royjccnu1Kp3MFYJNnvBoYigfjlcSh2uajLDNjzVNL7oHZba2+d9GZ1tSgRRgnW7pXJFd37I1H4Uu8hTZKFgLuTlkqXhAxrD6r0=
+	t=1718964708; cv=none; b=pbddBF7ynrXQWn9q7btm1i5sfTw2KUYMmQ3oO2Tw209qyI0FdaWSFKQ/O7vZjVB4wgiAqRgVTJc8jYLLPdnAyZ4F6EXi7pxZSB59x6eyCkiGLgeF0pVPLaXt6aIQQUs8/HjiP4NksTC8BKPlbkkZtnGPz1iaFTZlcL73dB75x4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718964749; c=relaxed/simple;
-	bh=lrQmBWHEgRZGt3qqWfvkr5wwYpPfCkU6W0Xy+X29MQQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b/36/QkwaZPS5hOlgB3DGWAN6eZXywdepFbcT+buBxDiMiusmihadfg8FWr9Chk9CjwWXmpucmpd4rs6h6wId16PIJLgRsaiYxOrRCKIv97/VMJ3pKTuyjbZESxX63Gdlzvk43K5fayGFvgmpy/Dlv8UpxhIR5VSgi8alLnhBNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iAU6ESyu; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1718964708; c=relaxed/simple;
+	bh=ds+n2Z/vTLu6ylFJUoh8rET4QMBEzAe0PVAxicLEPKE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F+OlOrRDGToS72/YxS+U0kMQzx9RjGGhN0AChbsady/FiTtKXORjdR+0qyT18BWtCc9jZL1ZwumFuT8uKZTbc+6I+8mProfPc5sa7yZw+qocF45+92iDPc65uaBIe6fP1WpPBDbykaLyS3guR4p8BhtRb9A4DEgBtfQhp8c/lgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YUJf3q/r; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718964746;
+	s=mimecast20190719; t=1718964705;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=pTJUxCKffkBrzqCPEFK7LRAjyE3x2giL24jMT6+yDtE=;
-	b=iAU6ESyuiWk2aLheOXoQ0LelwPXYN4yG1x5ZtGtqBOZi1gbVe9CZdrSQmAfQyKF3oIXIRN
-	gEu5528WRbvhbhy81vAQSV4oIu6RnEkrdTXWG8SK9u7YzzRJGDZaCqa/Jv170OXa+As1Xb
-	u5an0UxhSxp60fxidEClTSXJXRSWvD4=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-257-bGiFjcPUNM-D6UlEUelAIQ-1; Fri,
- 21 Jun 2024 06:12:23 -0400
-X-MC-Unique: bGiFjcPUNM-D6UlEUelAIQ-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 514241956051;
-	Fri, 21 Jun 2024 10:12:21 +0000 (UTC)
-Received: from antares.redhat.com (unknown [10.39.193.189])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 54C551956048;
-	Fri, 21 Jun 2024 10:12:17 +0000 (UTC)
-From: Adrian Moreno <amorenoz@redhat.com>
-To: netdev@vger.kernel.org
-Cc: aconole@redhat.com,
-	echaudro@redhat.com,
-	horms@kernel.org,
-	i.maximets@ovn.org,
-	dev@openvswitch.org,
-	Adrian Moreno <amorenoz@redhat.com>,
-	Pravin B Shelar <pshelar@ovn.org>,
+	bh=eJBYOdOKQ4Gn1xLmpzv4Yqfj+G7XSh7zQ28K1xrcg3U=;
+	b=YUJf3q/r6NtVIVNMiAgIQpQFaVnfPU0c7AvtR7yP5Cn6iuHnCxAa0wpUBmpmezFlQ2k0g6
+	eeLj+WgMSxvC66QW2u7MbWO1/w0kIDr70NsVBscqpsTh4sMSwAgxjcN0/+kday2Lp1KlNN
+	UuWE7KAR/HdkyPO98AbsqBWv9QhP8/Q=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-280-1XLcxpblMICB_8ES4tjcnA-1; Fri, 21 Jun 2024 06:11:44 -0400
+X-MC-Unique: 1XLcxpblMICB_8ES4tjcnA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3580f213373so1112281f8f.3
+        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 03:11:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718964703; x=1719569503;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eJBYOdOKQ4Gn1xLmpzv4Yqfj+G7XSh7zQ28K1xrcg3U=;
+        b=W2SIgGYG2Xqtj996UOZqy6BfUYUymWHRBmJqlL4aHbnHXjswAgZxXwOkdGhHWQPPls
+         n/4k+X+Xv4sCLBj5l/+N9upbWyvYG6q5khyqjYWAFvlNIXFCIRLx7wKrYAuljPgEaobZ
+         5O/09nYFxSw1En2gBXHgU0RLT6+Qf4sRZJcpJKmX5/v137l0IXJbo8cvyxV35S7iEvE6
+         k4SbNlPkyd1OE0GAWUn9XR0F3L7JHwAx+xgUhovJpnSEusZOJyeQNPIUISnGPm6+sHgb
+         z7wL2M7xeEQThpPy9BOcfoN00tcrLcDrkSQ1aNnP1IrX5ZA9sZX2zKuQm0YKomRbQPG4
+         hjpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXuhNpsaBxEZaEhf9+EM0Vy5TJDnYWRx0aNsraqU4dhlm430tWeCYJLQs379J879akPwTE3G/B7GMdiPCwLWSi25PlRAZ35
+X-Gm-Message-State: AOJu0Yzx5vn3/eG3K+H3h823Wjg9n0sWMI0X8aH0kEMWJ+yrA01EZ5/q
+	7q9Q5PVLMk1RwcR6njfcF6EQvDInPflAlcyvxcPY3UYtTUxGNobWFampZXdzjzzkrFYoi3SLBib
+	oUhmNYWMn9oZ8mTH6WKK2fZgytJgRDPf0Lj4fphuqSJolwcNq2/Frog==
+X-Received: by 2002:adf:9789:0:b0:361:d3ec:1031 with SMTP id ffacd0b85a97d-36317b7d4e1mr5447622f8f.31.1718964702930;
+        Fri, 21 Jun 2024 03:11:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHPWCjAxrrMaIGHIIhSa52v8fFT1APP2qrYVpvKzDzGgYOJQWUZ0ImF+bd9M5CAG4wk9RK8Yw==
+X-Received: by 2002:adf:9789:0:b0:361:d3ec:1031 with SMTP id ffacd0b85a97d-36317b7d4e1mr5447579f8f.31.1718964701948;
+        Fri, 21 Jun 2024 03:11:41 -0700 (PDT)
+Received: from localhost ([2a01:e11:1007:ea0:8374:5c74:dd98:a7b2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-366383f6722sm1291316f8f.24.2024.06.21.03.11.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jun 2024 03:11:41 -0700 (PDT)
+Date: Fri, 21 Jun 2024 12:11:40 +0200
+From: Davide Caratti <dcaratti@redhat.com>
+To: =?iso-8859-1?Q?Asbj=F8rn_Sloth_T=F8nnesen?= <ast@fiberby.net>
+Cc: Ilya Maximets <i.maximets@ovn.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 10/10] selftests: openvswitch: add emit_sample test
-Date: Fri, 21 Jun 2024 12:11:02 +0200
-Message-ID: <20240621101113.2185308-11-amorenoz@redhat.com>
-In-Reply-To: <20240621101113.2185308-1-amorenoz@redhat.com>
-References: <20240621101113.2185308-1-amorenoz@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH net-next 2/9] net/sched: cls_flower: prepare
+ fl_{set,dump}_key_flags() for ENC_FLAGS
+Message-ID: <ZnVR3LsBSvfRyTDD@dcaratti.users.ipa.redhat.com>
+References: <20240611235355.177667-1-ast@fiberby.net>
+ <20240611235355.177667-3-ast@fiberby.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <20240611235355.177667-3-ast@fiberby.net>
 
-Add a test to verify sampling packets via psample works.
+hello Asbjørn,
 
-In order to do that, create a subcommand in ovs-dpctl.py to listen to
-on the psample multicast group and print samples.
+some update on this work: I tested your patch after adapting iproute2
+bits (e.g. using TCA_FLOWER_KEY_FLAGS_TUNNEL_<CSUM|DONT_FRAGMENT|OAM|CRIT>
 
-Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
----
- .../selftests/net/openvswitch/openvswitch.sh  | 110 +++++++++++++++++-
- .../selftests/net/openvswitch/ovs-dpctl.py    |  73 +++++++++++-
- 2 files changed, 177 insertions(+), 6 deletions(-)
+from
 
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index 15bca0708717..a07530ff13ca 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -20,7 +20,8 @@ tests="
- 	nat_related_v4				ip4-nat-related: ICMP related matches work with SNAT
- 	netlink_checks				ovsnl: validate netlink attrs and settings
- 	upcall_interfaces			ovs: test the upcall interfaces
--	drop_reason				drop: test drop reasons are emitted"
-+	drop_reason				drop: test drop reasons are emitted
-+	emit_sample 				emit_sample: Sampling packets with psample"
+https://lore.kernel.org/netdev/20240611235355.177667-2-ast@fiberby.net/
+
+Now: functional tests on TCA_FLOWER_KEY_ENC_FLAGS systematically fail. I must
+admit that I didn't complete 100% of the analysis, but IMO there is at least an
+endianness problem here. See below:
+
+On Tue, Jun 11, 2024 at 11:53:35PM +0000, Asbjørn Sloth Tønnesen wrote:
+> Prepare fl_set_key_flags/fl_dump_key_flags() for use with
+> TCA_FLOWER_KEY_ENC_FLAGS{,_MASK}.
+> 
+> This patch adds an encap argument, similar to fl_set_key_ip/
+> fl_dump_key_ip(), and determine the flower keys based on the
+> encap argument, and use them in the rest of the two functions.
+> 
+> Since these functions are so far, only called with encap set false,
+> then there is no functional change.
+> 
+> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+> ---
+>  net/sched/cls_flower.c | 40 ++++++++++++++++++++++++++++++----------
+>  1 file changed, 30 insertions(+), 10 deletions(-)
+> 
+> diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+> index eef570c577ac7..6a5cecfd95619 100644
+> --- a/net/sched/cls_flower.c
+> +++ b/net/sched/cls_flower.c
+> @@ -1166,19 +1166,28 @@ static void fl_set_key_flag(u32 flower_key, u32 flower_mask,
+>  	}
+>  }
+>  
+> -static int fl_set_key_flags(struct nlattr **tb, u32 *flags_key,
+> +static int fl_set_key_flags(struct nlattr **tb, bool encap, u32 *flags_key,
+>  			    u32 *flags_mask, struct netlink_ext_ack *extack)
+>  {
+> +	int fl_key, fl_mask;
+>  	u32 key, mask;
+>  
+> +	if (encap) {
+> +		fl_key = TCA_FLOWER_KEY_ENC_FLAGS;
+> +		fl_mask = TCA_FLOWER_KEY_ENC_FLAGS_MASK;
+> +	} else {
+> +		fl_key = TCA_FLOWER_KEY_FLAGS;
+> +		fl_mask = TCA_FLOWER_KEY_FLAGS_MASK;
+> +	}
+> +
+>  	/* mask is mandatory for flags */
+> -	if (!tb[TCA_FLOWER_KEY_FLAGS_MASK]) {
+> +	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, fl_mask)) {
+>  		NL_SET_ERR_MSG(extack, "Missing flags mask");
+>  		return -EINVAL;
+>  	}
+>  
+> -	key = be32_to_cpu(nla_get_be32(tb[TCA_FLOWER_KEY_FLAGS]));
+> -	mask = be32_to_cpu(nla_get_be32(tb[TCA_FLOWER_KEY_FLAGS_MASK]));
+> +	key = be32_to_cpu(nla_get_be32(tb[fl_key]));
+> +	mask = be32_to_cpu(nla_get_be32(tb[fl_mask]));
+
+
+I think that (at least) the above hunk is wrong - or at least, it is a
+functional discontinuity that causes failure in my test. While the
+previous bitmask storing tunnel control flags was in host byte ordering,
+the information on IP fragmentation are stored in network byte ordering.
+
+So, if we want to use this enum
+
+--- a/include/uapi/linux/pkt_cls.h
++++ b/include/uapi/linux/pkt_cls.h
+@@ -677,6 +677,11 @@ enum {
+ enum {
+ 	TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT = (1 << 0),
+ 	TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST = (1 << 1),
++	/* FLOW_DIS_ENCAPSULATION (1 << 2) is not exposed to userspace */
++	TCA_FLOWER_KEY_FLAGS_TUNNEL_CSUM = (1 << 3),
++	TCA_FLOWER_KEY_FLAGS_TUNNEL_DONT_FRAGMENT = (1 << 4),
++	TCA_FLOWER_KEY_FLAGS_TUNNEL_OAM = (1 << 5),
++	TCA_FLOWER_KEY_FLAGS_TUNNEL_CRIT_OPT = (1 << 6),
+ };
  
- info() {
-     [ $VERBOSE = 0 ] || echo $*
-@@ -102,12 +103,21 @@ ovs_netns_spawn_daemon() {
- 	shift
- 	netns=$1
- 	shift
--	info "spawning cmd: $*"
--	ip netns exec $netns $*  >> $ovs_dir/stdout  2>> $ovs_dir/stderr &
-+	if [ "$netns" == "_default" ]; then
-+		$*  >> $ovs_dir/stdout  2>> $ovs_dir/stderr &
-+	else
-+		ip netns exec $netns $*  >> $ovs_dir/stdout  2>> $ovs_dir/stderr &
-+	fi
- 	pid=$!
- 	ovs_sbx "$sbx" on_exit "kill -TERM $pid 2>/dev/null"
- }
- 
-+ovs_spawn_daemon() {
-+	sbx=$1
-+	shift
-+	ovs_netns_spawn_daemon $sbx "_default" $*
-+}
-+
- ovs_add_netns_and_veths () {
- 	info "Adding netns attached: sbx:$1 dp:$2 {$3, $4, $5}"
- 	ovs_sbx "$1" ip netns add "$3" || return 1
-@@ -170,6 +180,19 @@ ovs_drop_reason_count()
- 	return `echo "$perf_output" | grep "$pattern" | wc -l`
- }
- 
-+ovs_test_flow_fails () {
-+	ERR_MSG="Flow actions may not be safe on all matching packets"
-+
-+	PRE_TEST=$(dmesg | grep -c "${ERR_MSG}")
-+	ovs_add_flow $@ &> /dev/null $@ && return 1
-+	POST_TEST=$(dmesg | grep -c "${ERR_MSG}")
-+
-+	if [ "$PRE_TEST" == "$POST_TEST" ]; then
-+		return 1
-+	fi
-+	return 0
-+}
-+
- usage() {
- 	echo
- 	echo "$0 [OPTIONS] [TEST]..."
-@@ -184,6 +207,87 @@ usage() {
- 	exit 1
- }
- 
-+
-+# emit_sample test
-+# - use emit_sample to observe packets
-+test_emit_sample() {
-+	sbx_add "test_emit_sample" || return $?
-+
-+	# Add a datapath with per-vport dispatching.
-+	ovs_add_dp "test_emit_sample" emit_sample -V 2:1 || return 1
-+
-+	info "create namespaces"
-+	ovs_add_netns_and_veths "test_emit_sample" "emit_sample" \
-+		client c0 c1 172.31.110.10/24 -u || return 1
-+	ovs_add_netns_and_veths "test_emit_sample" "emit_sample" \
-+		server s0 s1 172.31.110.20/24 -u || return 1
-+
-+	# Check if emit_sample actions can be configured.
-+	ovs_add_flow "test_emit_sample" emit_sample \
-+	'in_port(1),eth(),eth_type(0x0806),arp()' 'emit_sample(group=1)'
-+	if [ $? == 1 ]; then
-+		info "no support for emit_sample - skipping"
-+		ovs_exit_sig
-+		return $ksft_skip
-+	fi
-+
-+	ovs_del_flows "test_emit_sample" emit_sample
-+
-+	# Allow ARP
-+	ovs_add_flow "test_emit_sample" emit_sample \
-+		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
-+	ovs_add_flow "test_emit_sample" emit_sample \
-+		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
-+
-+	# Test action verification.
-+	OLDIFS=$IFS
-+	IFS='*'
-+	min_key='in_port(1),eth(),eth_type(0x0800),ipv4()'
-+	for testcase in \
-+		"cookie to large"*"emit_sample(group=1,cookie=1615141312111009080706050403020100)" \
-+		"no group with cookie"*"emit_sample(cookie=abcd)" \
-+		"no group"*"sample()";
-+	do
-+		set -- $testcase;
-+		ovs_test_flow_fails "test_emit_sample" emit_sample $min_key $2
-+		if [ $? == 1 ]; then
-+			info "failed - $1"
-+			return 1
-+		fi
-+	done
-+	IFS=$OLDIFS
-+
-+	# Sample first 14 bytes of all traffic.
-+	ovs_add_flow "test_emit_sample" emit_sample \
-+	"in_port(1),eth(),eth_type(0x0800),ipv4(src=172.31.110.10,proto=1),icmp()" "trunc(14),emit_sample(group=1,cookie=c0ffee),2"
-+
-+	# Sample all traffic. In this case, use a sample() action with both
-+	# emit_sample and an upcall emulating simultaneous local sampling and
-+	# sFlow / IPFIX.
-+	nlpid=$(grep -E "listening on upcall packet handler" $ovs_dir/s0.out | cut -d ":" -f 2 | tr -d ' ')
-+	ovs_add_flow "test_emit_sample" emit_sample \
-+	"in_port(2),eth(),eth_type(0x0800),ipv4(src=172.31.110.20,proto=1),icmp()" "sample(sample=100%,actions(emit_sample(group=2,cookie=eeff0c),userspace(pid=${nlpid},userdata=eeff0c))),1"
-+
-+	# Record emit_sample data.
-+	ovs_spawn_daemon "test_emit_sample" python3 $ovs_base/ovs-dpctl.py psample
-+
-+	# Send a single ping.
-+	sleep 1
-+	ovs_sbx "test_emit_sample" ip netns exec client ping -I c1 172.31.110.20 -c 1 || return 1
-+	sleep 1
-+
-+	# We should have received one userspace action upcall and 2 psample packets.
-+	grep -E "userspace action command" $ovs_dir/s0.out >/dev/null 2>&1 || return 1
-+
-+	# client -> server samples should only contain the first 14 bytes of the packet.
-+	grep -E "rate:4294967295,group:1,cookie:c0ffee data:[0-9a-f]{28}$" \
-+			 $ovs_dir/stdout >/dev/null 2>&1 || return 1
-+	grep -E "rate:4294967295,group:2,cookie:eeff0c" \
-+			 $ovs_dir/stdout >/dev/null 2>&1 || return 1
-+
-+	return 0
-+}
-+
- # drop_reason test
- # - drop packets and verify the right drop reason is reported
- test_drop_reason() {
-diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-index a3c26ddac42f..24e696d7371b 100644
---- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-+++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -27,8 +27,10 @@ try:
-     from pyroute2.netlink import genlmsg
-     from pyroute2.netlink import nla
-     from pyroute2.netlink import nlmsg_atoms
-+    from pyroute2.netlink.event import EventSocket
-     from pyroute2.netlink.exceptions import NetlinkError
-     from pyroute2.netlink.generic import GenericNetlinkSocket
-+    from pyroute2.netlink.nlsocket import Marshal
-     import pyroute2
- 
- except ModuleNotFoundError:
-@@ -2211,10 +2213,70 @@ class OvsFlow(GenericNetlinkSocket):
-         print("MISS upcall[%d/%s]: %s" % (seq, pktpres, keystr), flush=True)
- 
-     def execute(self, packetmsg):
--        print("userspace execute command")
-+        print("userspace execute command", flush=True)
- 
-     def action(self, packetmsg):
--        print("userspace action command")
-+        print("userspace action command", flush=True)
-+
-+
-+class psample_sample(genlmsg):
-+    nla_map = (
-+        ("PSAMPLE_ATTR_IIFINDEX", "none"),
-+        ("PSAMPLE_ATTR_OIFINDEX", "none"),
-+        ("PSAMPLE_ATTR_ORIGSIZE", "none"),
-+        ("PSAMPLE_ATTR_SAMPLE_GROUP", "uint32"),
-+        ("PSAMPLE_ATTR_GROUP_SEQ", "none"),
-+        ("PSAMPLE_ATTR_SAMPLE_RATE", "uint32"),
-+        ("PSAMPLE_ATTR_DATA", "array(uint8)"),
-+        ("PSAMPLE_ATTR_GROUP_REFCOUNT", "none"),
-+        ("PSAMPLE_ATTR_TUNNEL", "none"),
-+        ("PSAMPLE_ATTR_PAD", "none"),
-+        ("PSAMPLE_ATTR_OUT_TC", "none"),
-+        ("PSAMPLE_ATTR_OUT_TC_OCC", "none"),
-+        ("PSAMPLE_ATTR_LATENCY", "none"),
-+        ("PSAMPLE_ATTR_TIMESTAMP", "none"),
-+        ("PSAMPLE_ATTR_PROTO", "none"),
-+        ("PSAMPLE_ATTR_USER_COOKIE", "array(uint8)"),
-+    )
-+
-+    def dpstr(self):
-+        fields = []
-+        data = ""
-+        for (attr, value) in self["attrs"]:
-+            if attr == "PSAMPLE_ATTR_SAMPLE_GROUP":
-+                fields.append("group:%d" % value)
-+            if attr == "PSAMPLE_ATTR_SAMPLE_RATE":
-+                fields.append("rate:%d" % value)
-+            if attr == "PSAMPLE_ATTR_USER_COOKIE":
-+                value = "".join(format(x, "02x") for x in value)
-+                fields.append("cookie:%s" % value)
-+            if attr == "PSAMPLE_ATTR_DATA" and len(value) > 0:
-+                data = "data:%s" % "".join(format(x, "02x") for x in value)
-+
-+        return ("%s %s" % (",".join(fields), data)).strip()
-+
-+
-+class psample_msg(Marshal):
-+    PSAMPLE_CMD_SAMPLE = 0
-+    PSAMPLE_CMD_GET_GROUP = 1
-+    PSAMPLE_CMD_NEW_GROUP = 2
-+    PSAMPLE_CMD_DEL_GROUP = 3
-+    PSAMPLE_CMD_SET_FILTER = 4
-+    msg_map = {PSAMPLE_CMD_SAMPLE: psample_sample}
-+
-+
-+class Psample(EventSocket):
-+    genl_family = "psample"
-+    mcast_groups = ["packets"]
-+    marshal_class = psample_msg
-+
-+    def read_samples(self):
-+        while True:
-+            try:
-+                for msg in self.get():
-+                    print(msg.dpstr(), flush=True)
-+            except NetlinkError as ne:
-+                raise ne
- 
- 
- def print_ovsdp_full(dp_lookup_rep, ifindex, ndb=NDB(), vpl=OvsVport()):
-@@ -2274,7 +2336,7 @@ def main(argv):
-         help="Increment 'verbose' output counter.",
-         default=0,
-     )
--    subparsers = parser.add_subparsers()
-+    subparsers = parser.add_subparsers(dest="subcommand")
- 
-     showdpcmd = subparsers.add_parser("show")
-     showdpcmd.add_argument(
-@@ -2331,6 +2393,8 @@ def main(argv):
-     delfscmd = subparsers.add_parser("del-flows")
-     delfscmd.add_argument("flsbr", help="Datapath name")
- 
-+    subparsers.add_parser("psample")
-+
-     args = parser.parse_args()
- 
-     if args.verbose > 0:
-@@ -2345,6 +2409,9 @@ def main(argv):
- 
-     sys.setrecursionlimit(100000)
- 
-+    if args.subcommand == "psample":
-+        Psample().read_samples()
-+
-     if hasattr(args, "showdp"):
-         found = False
-         for iface in ndb.interfaces:
+consistently, we should keep using network byte ordering for
+TCA_FLOWER_KEY_FLAGS_TUNNEL_* flags (for a reason that I don't understand,
+because metadata are not transmitted on wire. But maybe I'm missing something).
+
+Shall I convert iproute2 to flip those bits like it happens for
+TCA_FLOWER_KEY_FLAGS ? thanks!
+
 -- 
-2.45.1
+davide
 
 
