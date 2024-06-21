@@ -1,170 +1,128 @@
-Return-Path: <netdev+bounces-105532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B70A091197A
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 06:33:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9A1C911990
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 06:37:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E89FBB23AA5
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 04:33:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25CC71C211FD
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 04:37:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FD04127B57;
-	Fri, 21 Jun 2024 04:33:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F54412CD89;
+	Fri, 21 Jun 2024 04:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TYP+UunB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k505hdpz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCAB0EBE
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 04:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E53EBE;
+	Fri, 21 Jun 2024 04:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718944400; cv=none; b=mIGaXxoT4tCUlSEgsGa4ExODc91FTD+5jKw5XgcmV3z2BnKKTAizSEDeFPeNc0E2XiZQ7i8bX1y1D5eqi0e06MBYwMI/381GhaPFEFx7/3ON1wF6KaCpMOZM0u8h8TW+U2oTYKmXOkhQko4mLQMLB7nNwgeFNCNjpIDLIXTLcjo=
+	t=1718944669; cv=none; b=DiAZlAqCkAaEYAEjamGyEGuqKFCwAdYCza6cq3aMtCj2tJt0x90PMO7Tebispe/xGwJAL+26451oxhOqqVGFeJ1c3o4w44erGVc25Rx3ru2UCDc7ro44bCOpliNHiDSVz++7cCekqEXfi1n0/z2k0RIKfdL/uy44KST8Gr2sMTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718944400; c=relaxed/simple;
-	bh=kZMB1YVWSak8ImEcfDH3eBwm6zBqZaDvpEvvowcYei8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b0B9k0kT1Sb8HyzocFfGstSWhsX9FQhj8o/iiKXcaDgBb0lUCaDJSJ+pyS9JiWTFE6FyEqNbPtXbsD6DZ+R1ohYBtC5rwOQuQSi6LTZ9L3M+9jNeElTfGSJ5x4y6pH/AOc0p+AzNOZwsN2Aql/RUWmD3OgPAFb0+gAvzkk4J8iI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TYP+UunB; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718944399; x=1750480399;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kZMB1YVWSak8ImEcfDH3eBwm6zBqZaDvpEvvowcYei8=;
-  b=TYP+UunByL0jPmmJvSaFUqY8zX/ojMg5+3H7akeYNHrTFNTd1s3d1iXM
-   xzULeq9DhKkNUk04/8neLQYXHyOKOgFrxrtVf4IMxFxczN4XoUkHIA8O2
-   yTbRo5O+SC7bVQQF0zmz6xZ1nic+S3IHTK1uSMrnsDaFHrFcGLkbm/2x6
-   P/183NLcYCjRKqmOiwT2P1rSfvmDl1IeFpJmXq9kAIWB2NAygDYWWpPWR
-   eGTD5pMG3IhP4vQRlbU1WmVY1yF4n+/Zbiq36YQLlYijpIaSJ9kuA9aEs
-   XvJGJxuN3GTUESeR+hfV2qhz8+DC83lGjDjmPnk3wDL8E07LvMAbxjABW
-   w==;
-X-CSE-ConnectionGUID: Ir5l8Hz4QGW51UNTCiCHow==
-X-CSE-MsgGUID: ut5D9HkDQSe09AnIzTXdew==
-X-IronPort-AV: E=McAfee;i="6700,10204,11109"; a="16079978"
-X-IronPort-AV: E=Sophos;i="6.08,253,1712646000"; 
-   d="scan'208";a="16079978"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 21:33:18 -0700
-X-CSE-ConnectionGUID: iNVrNyrnQeqhSfcDMYu0/w==
-X-CSE-MsgGUID: 3PWE9hVRQhaF4pYOe4z1Mw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,253,1712646000"; 
-   d="scan'208";a="42917840"
-Received: from mev-dev.igk.intel.com (HELO mev-dev) ([10.237.112.144])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 21:33:15 -0700
-Date: Fri, 21 Jun 2024 06:32:10 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Simon Horman <horms@kernel.org>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com, jiri@nvidia.com,
-	mateusz.polchlopek@intel.com, shayd@nvidia.com, kuba@kernel.org
-Subject: Re: [iwl-next v3 4/4] ice: update representor when VSI is ready
-Message-ID: <ZnUCSoXc8GyCOm2I@mev-dev>
-References: <20240610074434.1962735-1-michal.swiatkowski@linux.intel.com>
- <20240610074434.1962735-5-michal.swiatkowski@linux.intel.com>
- <20240614124716.GN8447@kernel.org>
+	s=arc-20240116; t=1718944669; c=relaxed/simple;
+	bh=dtuG/8FVyfxt6cdJEnSMBi5db48doHCJHLe3KcIUws4=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=MzAyKaSYGUf0IAof7bHeLrbbhNGJmwW285PHeh7PdJD6MZtdxViy7uMA8le8edjt2iaO9x9xsGG/puKUVeuqJpmPfzHDp2F3KoAEml5ETSmGm2nKWetHiGL/bRNswcLsn+3+sPbRj0M/ZTm09A1pt9j8pOicFkQ0CJwcDgQIKbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k505hdpz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 216A4C2BBFC;
+	Fri, 21 Jun 2024 04:37:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718944668;
+	bh=dtuG/8FVyfxt6cdJEnSMBi5db48doHCJHLe3KcIUws4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=k505hdpzwMMojH9wRfDeKs5BlNmsCDhP4RZMfHss9GZvJxLyRPPFXiUgVFptQKDL5
+	 S5gsaSJiKe4LG3AqF7BLkgArN2fQ6qmD9TPovctggZUcd3SKbL9/4LgiQ6RebmHXx8
+	 Sa6lkZ4xCYaOuzo7Zws7B8aGMz8VF6yVl5HZS3oaFEGqgpml4yS2vYF6N/jfvJPDIj
+	 4wIEtSyU5vQLJwGLXsMqM/tqNHAvajbwv14JxtQRT0slq+fIxjIz53UIWoTOFHUheC
+	 qn8EFjVtrHKjnNWfmNSVO6/Cns8JaNBbD/GTXf78g5DeCI791W20rOIkGVStMEvPqS
+	 TWkLY4TaxbGVQ==
+Date: Fri, 21 Jun 2024 13:37:42 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: Yafang Shao <laoar.shao@gmail.com>
+Cc: torvalds@linux-foundation.org, ebiederm@xmission.com,
+ alexei.starovoitov@gmail.com, rostedt@goodmis.org, catalin.marinas@arm.com,
+ akpm@linux-foundation.org, penguin-kernel@i-love.sakura.ne.jp,
+ linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org,
+ linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
+ bpf@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Subject: Re: [PATCH v3 09/11] tracing: Replace strncpy() with
+ __get_task_comm()
+Message-Id: <20240621133742.6692d3bda4faafab878f197d@kernel.org>
+In-Reply-To: <20240621022959.9124-10-laoar.shao@gmail.com>
+References: <20240621022959.9124-1-laoar.shao@gmail.com>
+	<20240621022959.9124-10-laoar.shao@gmail.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240614124716.GN8447@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 14, 2024 at 01:47:16PM +0100, Simon Horman wrote:
-> On Mon, Jun 10, 2024 at 09:44:34AM +0200, Michal Swiatkowski wrote:
-> > In case of reset of VF VSI can be reallocated. To handle this case it
-> > should be properly updated.
-> > 
-> > Reload representor as vsi->vsi_num can be different than the one stored
-> > when representor was created.
-> > 
-> > Instead of only changing antispoof do whole VSI configuration for
-> > eswitch.
-> > 
-> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+On Fri, 21 Jun 2024 10:29:57 +0800
+Yafang Shao <laoar.shao@gmail.com> wrote:
+
+> Using __get_task_comm() to read the task comm ensures that the name is
+> always NUL-terminated, regardless of the source string. This approach also
+> facilitates future extensions to the task comm.
+
+Good catch! Looks good to me.
+
+Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+
+Thank you,
+
 > 
-> Thanks Michal,
+> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
+> Cc: Steven Rostedt <rostedt@goodmis.org>
+> Cc: Masami Hiramatsu <mhiramat@kernel.org>
+> Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+> ---
+>  kernel/trace/trace.c             | 2 +-
+>  kernel/trace/trace_events_hist.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> My comment below notwithstanding, this looks good to me.
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> 
-> > ---
-> >  drivers/net/ethernet/intel/ice/ice_eswitch.c | 21 +++++++++++++-------
-> >  drivers/net/ethernet/intel/ice/ice_eswitch.h |  4 ++--
-> >  drivers/net/ethernet/intel/ice/ice_vf_lib.c  |  2 +-
-> >  3 files changed, 17 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-> > index 3f73f46111fc..4f539b1c7781 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-> > @@ -178,16 +178,16 @@ void ice_eswitch_decfg_vsi(struct ice_vsi *vsi, const u8 *mac)
-> >   * @repr_id: representor ID
-> >   * @vsi: VSI for which port representor is configured
-> >   */
-> > -void ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi)
-> > +void ice_eswitch_update_repr(unsigned long *repr_id, struct ice_vsi *vsi)
-> >  {
-> >  	struct ice_pf *pf = vsi->back;
-> >  	struct ice_repr *repr;
-> > -	int ret;
-> > +	int err;
-> >  
-> >  	if (!ice_is_switchdev_running(pf))
-> >  		return;
-> >  
-> > -	repr = xa_load(&pf->eswitch.reprs, repr_id);
-> > +	repr = xa_load(&pf->eswitch.reprs, *repr_id);
-> >  	if (!repr)
-> >  		return;
-> >  
-> > @@ -197,12 +197,19 @@ void ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi)
-> >  	if (repr->br_port)
-> >  		repr->br_port->vsi = vsi;
-> >  
-> > -	ret = ice_vsi_update_security(vsi, ice_vsi_ctx_clear_antispoof);
-> > -	if (ret) {
-> > -		ice_fltr_add_mac_and_broadcast(vsi, repr->parent_mac,
-> > -					       ICE_FWD_TO_VSI);
-> > +	err = ice_eswitch_cfg_vsi(vsi, repr->parent_mac);
-> > +	if (err)
-> >  		dev_err(ice_pf_to_dev(pf), "Failed to update VSI of port representor %d",
-> >  			repr->id);
-> > +
-> > +	/* The VSI number is different, reload the PR with new id */
-> > +	if (repr->id != vsi->vsi_num) {
-> > +		xa_erase(&pf->eswitch.reprs, repr->id);
-> > +		repr->id = vsi->vsi_num;
-> > +		if (xa_insert(&pf->eswitch.reprs, repr->id, repr, GFP_KERNEL))
-> > +			dev_err(ice_pf_to_dev(pf), "Failed to reload port representor %d",
-> > +				repr->id);
-> > +		*repr_id = repr->id;
-> >  	}
-> >  }
-> 
-> FWIIW, I think it would be nicer if ice_eswitch_decfg_vsi returned
-> the repr_id rather than passing repr_id by reference. This is because,
-> in general, I think it's nicer to reduce side-effects of functions.
+> diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
+> index 578a49ff5c32..ce94a86154a2 100644
+> --- a/kernel/trace/trace.c
+> +++ b/kernel/trace/trace.c
+> @@ -1907,7 +1907,7 @@ __update_max_tr(struct trace_array *tr, struct task_struct *tsk, int cpu)
+>  	max_data->critical_start = data->critical_start;
+>  	max_data->critical_end = data->critical_end;
+>  
+> -	strncpy(max_data->comm, tsk->comm, TASK_COMM_LEN);
+> +	__get_task_comm(max_data->comm, TASK_COMM_LEN, tsk);
+>  	max_data->pid = tsk->pid;
+>  	/*
+>  	 * If tsk == current, then use current_uid(), as that does not use
+> diff --git a/kernel/trace/trace_events_hist.c b/kernel/trace/trace_events_hist.c
+> index 6ece1308d36a..721d4758a79f 100644
+> --- a/kernel/trace/trace_events_hist.c
+> +++ b/kernel/trace/trace_events_hist.c
+> @@ -1599,7 +1599,7 @@ static inline void save_comm(char *comm, struct task_struct *task)
+>  		return;
+>  	}
+>  
+> -	strncpy(comm, task->comm, TASK_COMM_LEN);
+> +	__get_task_comm(comm, TASK_COMM_LEN, task);
+>  }
+>  
+>  static void hist_elt_data_free(struct hist_elt_data *elt_data)
+> -- 
+> 2.39.1
 > 
 
-I wanted to change repr->id and the vf (or sf) repr id in the same
-place. But in general I agree with your comment.
 
-Thanks,
-Michal
-
-> ...
+-- 
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
 
