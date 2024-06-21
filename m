@@ -1,197 +1,196 @@
-Return-Path: <netdev+bounces-105630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9517D9121DB
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:13:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF514912200
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:17:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B58B41C23406
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:13:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE12B1C20643
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:17:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369C6175540;
-	Fri, 21 Jun 2024 10:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE01171E62;
+	Fri, 21 Jun 2024 10:14:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YUJf3q/r"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="p3OEOol8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8EB173357
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 10:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104DC16DECA;
+	Fri, 21 Jun 2024 10:14:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718964708; cv=none; b=pbddBF7ynrXQWn9q7btm1i5sfTw2KUYMmQ3oO2Tw209qyI0FdaWSFKQ/O7vZjVB4wgiAqRgVTJc8jYLLPdnAyZ4F6EXi7pxZSB59x6eyCkiGLgeF0pVPLaXt6aIQQUs8/HjiP4NksTC8BKPlbkkZtnGPz1iaFTZlcL73dB75x4g=
+	t=1718964846; cv=none; b=uE/OTqqkH2AkClFu4fX1tfA6gZIXIEbow1ufpAy53IBNa4G3869db5BL/1i3ZU5ZXP/e/hZtU6NnaAoXIGxwXiaIhNPwUdip4ezh9N9PKxA8QIZIfBmLNcRoFTz4Zbr8VFJsiGTwiDzQfdXa+HH1V/oblE3y5Ods4pWC9fmKcI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718964708; c=relaxed/simple;
-	bh=ds+n2Z/vTLu6ylFJUoh8rET4QMBEzAe0PVAxicLEPKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F+OlOrRDGToS72/YxS+U0kMQzx9RjGGhN0AChbsady/FiTtKXORjdR+0qyT18BWtCc9jZL1ZwumFuT8uKZTbc+6I+8mProfPc5sa7yZw+qocF45+92iDPc65uaBIe6fP1WpPBDbykaLyS3guR4p8BhtRb9A4DEgBtfQhp8c/lgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YUJf3q/r; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718964705;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eJBYOdOKQ4Gn1xLmpzv4Yqfj+G7XSh7zQ28K1xrcg3U=;
-	b=YUJf3q/r6NtVIVNMiAgIQpQFaVnfPU0c7AvtR7yP5Cn6iuHnCxAa0wpUBmpmezFlQ2k0g6
-	eeLj+WgMSxvC66QW2u7MbWO1/w0kIDr70NsVBscqpsTh4sMSwAgxjcN0/+kday2Lp1KlNN
-	UuWE7KAR/HdkyPO98AbsqBWv9QhP8/Q=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-280-1XLcxpblMICB_8ES4tjcnA-1; Fri, 21 Jun 2024 06:11:44 -0400
-X-MC-Unique: 1XLcxpblMICB_8ES4tjcnA-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3580f213373so1112281f8f.3
-        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 03:11:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718964703; x=1719569503;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eJBYOdOKQ4Gn1xLmpzv4Yqfj+G7XSh7zQ28K1xrcg3U=;
-        b=W2SIgGYG2Xqtj996UOZqy6BfUYUymWHRBmJqlL4aHbnHXjswAgZxXwOkdGhHWQPPls
-         n/4k+X+Xv4sCLBj5l/+N9upbWyvYG6q5khyqjYWAFvlNIXFCIRLx7wKrYAuljPgEaobZ
-         5O/09nYFxSw1En2gBXHgU0RLT6+Qf4sRZJcpJKmX5/v137l0IXJbo8cvyxV35S7iEvE6
-         k4SbNlPkyd1OE0GAWUn9XR0F3L7JHwAx+xgUhovJpnSEusZOJyeQNPIUISnGPm6+sHgb
-         z7wL2M7xeEQThpPy9BOcfoN00tcrLcDrkSQ1aNnP1IrX5ZA9sZX2zKuQm0YKomRbQPG4
-         hjpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXuhNpsaBxEZaEhf9+EM0Vy5TJDnYWRx0aNsraqU4dhlm430tWeCYJLQs379J879akPwTE3G/B7GMdiPCwLWSi25PlRAZ35
-X-Gm-Message-State: AOJu0Yzx5vn3/eG3K+H3h823Wjg9n0sWMI0X8aH0kEMWJ+yrA01EZ5/q
-	7q9Q5PVLMk1RwcR6njfcF6EQvDInPflAlcyvxcPY3UYtTUxGNobWFampZXdzjzzkrFYoi3SLBib
-	oUhmNYWMn9oZ8mTH6WKK2fZgytJgRDPf0Lj4fphuqSJolwcNq2/Frog==
-X-Received: by 2002:adf:9789:0:b0:361:d3ec:1031 with SMTP id ffacd0b85a97d-36317b7d4e1mr5447622f8f.31.1718964702930;
-        Fri, 21 Jun 2024 03:11:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHPWCjAxrrMaIGHIIhSa52v8fFT1APP2qrYVpvKzDzGgYOJQWUZ0ImF+bd9M5CAG4wk9RK8Yw==
-X-Received: by 2002:adf:9789:0:b0:361:d3ec:1031 with SMTP id ffacd0b85a97d-36317b7d4e1mr5447579f8f.31.1718964701948;
-        Fri, 21 Jun 2024 03:11:41 -0700 (PDT)
-Received: from localhost ([2a01:e11:1007:ea0:8374:5c74:dd98:a7b2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-366383f6722sm1291316f8f.24.2024.06.21.03.11.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jun 2024 03:11:41 -0700 (PDT)
-Date: Fri, 21 Jun 2024 12:11:40 +0200
-From: Davide Caratti <dcaratti@redhat.com>
-To: =?iso-8859-1?Q?Asbj=F8rn_Sloth_T=F8nnesen?= <ast@fiberby.net>
-Cc: Ilya Maximets <i.maximets@ovn.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1718964846; c=relaxed/simple;
+	bh=H+iVrQ6EShMIb5pA0DE0fQxdrFQTOtSDbaixzspfdYM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Vc1A097XIex6+oETa1LgwOei2rwHjEgHQJfqWbg4K1D0TaIKt1BZAeYxVs/oizQLE15uyFlGHr+LK+YpkSg4f0Zjtw1JcQozs3h2zTjmdYFr2pd/RanzqAnFV9hzT4Ly86FtVUe82Trhh1nGEFaKmT98hXMl9DE3xPlluCvOj0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=p3OEOol8; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1718964835; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=06bRi18a2rHKR+TMi3cUkFCw+ljlSnrFlCaSX6QTHNU=;
+	b=p3OEOol8ewES2fWN6tqHoedw+HxyMKjNXm4i0qWQVCy21Y2ishWgDJ48QnhmfW7dZF4KssbivW03nvIHd144hOGezeh+H9lsjUlzJ0rg+EljqoQqxfTfi9p2z6q7WQ/pQ+FfqHDo6RV6gUrGkHL2q/pXIwrUFNa9hQSkWyjom8Q=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045046011;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=31;SR=0;TI=SMTPD_---0W8w4rvH_1718964833;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W8w4rvH_1718964833)
+          by smtp.aliyun-inc.com;
+          Fri, 21 Jun 2024 18:13:54 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: netdev@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH net-next 2/9] net/sched: cls_flower: prepare
- fl_{set,dump}_key_flags() for ENC_FLAGS
-Message-ID: <ZnVR3LsBSvfRyTDD@dcaratti.users.ipa.redhat.com>
-References: <20240611235355.177667-1-ast@fiberby.net>
- <20240611235355.177667-3-ast@fiberby.net>
+	Jason Wang <jasowang@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Brett Creeley <bcreeley@amd.com>,
+	Ratheesh Kannoth <rkannoth@marvell.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Tal Gilboa <talgi@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Paul Greenwalt <paul.greenwalt@intel.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	justinstitt@google.com,
+	donald.hunter@gmail.com,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	awel Dembicki <paweldembicki@gmail.com>
+Subject: [PATCH net-next v15 0/5] ethtool: provide the dim profile fine-tuning channel
+Date: Fri, 21 Jun 2024 18:13:48 +0800
+Message-Id: <20240621101353.107425-1-hengqi@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240611235355.177667-3-ast@fiberby.net>
 
-hello Asbjørn,
+The NetDIM library provides excellent acceleration for many modern
+network cards. However, the default profiles of DIM limits its maximum
+capabilities for different NICs, so providing a way which the NIC can
+be custom configured is necessary.
 
-some update on this work: I tested your patch after adapting iproute2
-bits (e.g. using TCA_FLOWER_KEY_FLAGS_TUNNEL_<CSUM|DONT_FRAGMENT|OAM|CRIT>
+Currently, the way is based on the commonly used "ethtool -C".
 
-from
+For example,
+on the server side, the virtio-net NIC with rx dim enabled has 8
+queues and runs nginx.
+The client uses the following command to send traffic to the server:
+  ./wrk http://server_ip:80 -c 64 -t 5 -d 30
 
-https://lore.kernel.org/netdev/20240611235355.177667-2-ast@fiberby.net/
+Then adjust the default rx-profile for server dim to
 
-Now: functional tests on TCA_FLOWER_KEY_ENC_FLAGS systematically fail. I must
-admit that I didn't complete 100% of the analysis, but IMO there is at least an
-endianness problem here. See below:
+  {.usec =   1, .pkts = 256, .comps = n/a,},
+  {.usec =   8, .pkts = 256, .comps = n/a,},
+  {.usec =  30, .pkts = 256, .comps = n/a,},
+  {.usec =  64, .pkts = 256, .comps = n/a,},
+  {.usec = 128, .pkts = 256, .comps = n/a,}
 
-On Tue, Jun 11, 2024 at 11:53:35PM +0000, Asbjørn Sloth Tønnesen wrote:
-> Prepare fl_set_key_flags/fl_dump_key_flags() for use with
-> TCA_FLOWER_KEY_ENC_FLAGS{,_MASK}.
-> 
-> This patch adds an encap argument, similar to fl_set_key_ip/
-> fl_dump_key_ip(), and determine the flower keys based on the
-> encap argument, and use them in the rest of the two functions.
-> 
-> Since these functions are so far, only called with encap set false,
-> then there is no functional change.
-> 
-> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
-> ---
->  net/sched/cls_flower.c | 40 ++++++++++++++++++++++++++++++----------
->  1 file changed, 30 insertions(+), 10 deletions(-)
-> 
-> diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-> index eef570c577ac7..6a5cecfd95619 100644
-> --- a/net/sched/cls_flower.c
-> +++ b/net/sched/cls_flower.c
-> @@ -1166,19 +1166,28 @@ static void fl_set_key_flag(u32 flower_key, u32 flower_mask,
->  	}
->  }
->  
-> -static int fl_set_key_flags(struct nlattr **tb, u32 *flags_key,
-> +static int fl_set_key_flags(struct nlattr **tb, bool encap, u32 *flags_key,
->  			    u32 *flags_mask, struct netlink_ext_ack *extack)
->  {
-> +	int fl_key, fl_mask;
->  	u32 key, mask;
->  
-> +	if (encap) {
-> +		fl_key = TCA_FLOWER_KEY_ENC_FLAGS;
-> +		fl_mask = TCA_FLOWER_KEY_ENC_FLAGS_MASK;
-> +	} else {
-> +		fl_key = TCA_FLOWER_KEY_FLAGS;
-> +		fl_mask = TCA_FLOWER_KEY_FLAGS_MASK;
-> +	}
-> +
->  	/* mask is mandatory for flags */
-> -	if (!tb[TCA_FLOWER_KEY_FLAGS_MASK]) {
-> +	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, fl_mask)) {
->  		NL_SET_ERR_MSG(extack, "Missing flags mask");
->  		return -EINVAL;
->  	}
->  
-> -	key = be32_to_cpu(nla_get_be32(tb[TCA_FLOWER_KEY_FLAGS]));
-> -	mask = be32_to_cpu(nla_get_be32(tb[TCA_FLOWER_KEY_FLAGS_MASK]));
-> +	key = be32_to_cpu(nla_get_be32(tb[fl_key]));
-> +	mask = be32_to_cpu(nla_get_be32(tb[fl_mask]));
+The server PPS is improved by 20%+.
 
+Please review, thank you very much!
 
-I think that (at least) the above hunk is wrong - or at least, it is a
-functional discontinuity that causes failure in my test. While the
-previous bitmask storing tunnel control flags was in host byte ordering,
-the information on IP fragmentation are stored in network byte ordering.
+Changelog
+=====
+v14->v15:
+  - Modify the mod bit and add some hints.
 
-So, if we want to use this enum
+Jakub feedback: Use RESEND to refresh the review queue.
 
---- a/include/uapi/linux/pkt_cls.h
-+++ b/include/uapi/linux/pkt_cls.h
-@@ -677,6 +677,11 @@ enum {
- enum {
- 	TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT = (1 << 0),
- 	TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST = (1 << 1),
-+	/* FLOW_DIS_ENCAPSULATION (1 << 2) is not exposed to userspace */
-+	TCA_FLOWER_KEY_FLAGS_TUNNEL_CSUM = (1 << 3),
-+	TCA_FLOWER_KEY_FLAGS_TUNNEL_DONT_FRAGMENT = (1 << 4),
-+	TCA_FLOWER_KEY_FLAGS_TUNNEL_OAM = (1 << 5),
-+	TCA_FLOWER_KEY_FLAGS_TUNNEL_CRIT_OPT = (1 << 6),
- };
- 
-consistently, we should keep using network byte ordering for
-TCA_FLOWER_KEY_FLAGS_TUNNEL_* flags (for a reason that I don't understand,
-because metadata are not transmitted on wire. But maybe I'm missing something).
+v13->v14:
+  - Make DIMLIB dependent on NET (patch 2/5).
 
-Shall I convert iproute2 to flip those bits like it happens for
-TCA_FLOWER_KEY_FLAGS ? thanks!
+v12->v13:
+  - Rebase net-next to fix the one-line conflict.
+  - Update tiny comments.
+  - Config ETHTOOL_NETLINK to select DIMLIB.
+
+v11->v12:
+  - Remove the use of IS_ENABLED(DIMLIB).
+  - Update Simon's htmldoc hint.
+
+v10->v11:
+  - Fix and clean up some issues from Kuba, thanks.
+  - Rebase net-next/main
+
+v9->v10:
+  - Collect dim related flags/mode/work into one place.
+  - Use rx_profile + tx_profile instead of four profiles.
+  - Add several helps.
+  - Update commit logs.
+
+v8->v9:
+  - Fix the compilation error of conflicting names of rx_profile in
+    dim.h and ice driver: in dim.h, rx_profile is replaced with
+    dim_rx_profile. So does tx_profile.
+
+v7->v8:
+  - Use kmemdup() instead of kzalloc()/memcpy() in dev_dim_profile_init().
+
+v6->v7:
+  - A new wrapper struct pointer is used in struct net_device.
+  - Add IS_ENABLED(CONFIG_DIMLIB) to avoid compiler warnings.
+  - Profile fields changed from u16 to u32.
+
+v5->v6:
+  - Place the profile in netdevice to bypass the driver.
+    The interaction code of ethtool <-> kernel has not changed at all,
+    only the interaction part of kernel <-> driver has changed.
+
+v4->v5:
+  - Update some snippets from Kuba.
+
+v3->v4:
+  - Some tiny updates and patch 1 only add a new comment.
+
+v2->v3:
+  - Break up the attributes to avoid the use of raw c structs.
+  - Use per-device profile instead of global profile in the driver.
+
+v1->v2:
+  - Use ethtool tool instead of net-sysfs.
+
+Heng Qi (5):
+  linux/dim: move useful macros to .h file
+  dim: make DIMLIB dependent on NET
+  ethtool: provide customized dim profile management
+  dim: add new interfaces for initialization and getting results
+  virtio-net: support dim profile fine-tuning
+
+ Documentation/netlink/specs/ethtool.yaml     |  31 +++
+ Documentation/networking/ethtool-netlink.rst |   8 +
+ Documentation/networking/net_dim.rst         |  42 +++
+ drivers/net/virtio_net.c                     |  54 +++-
+ drivers/soc/fsl/Kconfig                      |   2 +-
+ include/linux/dim.h                          | 113 ++++++++
+ include/linux/ethtool.h                      |   4 +-
+ include/linux/netdevice.h                    |   3 +
+ include/uapi/linux/ethtool_netlink.h         |  22 ++
+ lib/Kconfig                                  |   1 +
+ lib/dim/net_dim.c                            | 144 +++++++++-
+ net/Kconfig                                  |   1 +
+ net/ethtool/coalesce.c                       | 273 ++++++++++++++++++-
+ 13 files changed, 681 insertions(+), 17 deletions(-)
 
 -- 
-davide
+2.32.0.3.g01195cf9f
 
 
