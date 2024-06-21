@@ -1,49 +1,55 @@
-Return-Path: <netdev+bounces-105733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E75912842
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:45:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA0C1912846
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:45:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EC9E1C20B15
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 14:45:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E7A11F26885
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 14:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DDC3208CE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88AF3A1C9;
 	Fri, 21 Jun 2024 14:45:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5535B2940F
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 14:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF8F72BAE3;
+	Fri, 21 Jun 2024 14:45:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718981123; cv=none; b=gG5CwAcZWxotqY4uj0t9HUT+oeCTJRb28ZbwgCj4ke00lMoe/Aginzo/+B/cL7VRehR9oAVeBPHW7llJsYszfeEqLnh4zyAOB7hl1ha9Qpin1NLtlnt2gToXbdXtpLCd95NqiD0Whqj1MFS76WEAH1x6bEcSwuyd+XDoazRESiA=
+	t=1718981123; cv=none; b=io7op13h5R8cbzAIsqWXPjbl+wJMinpTT5AvjjnlrtVJaxpngaJnlOdYSec25ALMR6SKODWGid0ROV8bJCFovGb85WdnssI+oVq1o8lURVm0ija+Qc2Rs5BQ62/qRfyIo7TdLBjkAuAiIHRhPssiWpCEancqCAextgyVU4wyC90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718981123; c=relaxed/simple;
-	bh=kt4kSbiRFJ4bY0GKilYy95w5JquD0kEyOtnNFE/A95A=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Alk0SGqgeZw666dcAUnex8piRABqmBU4iuP/92AWBpflcM84rBSPgVvhjdx3QmJJ81rQqVkTJQ7U5pPN07du6C3XEVRuoPItAIluQoqC2AYi2mXeicxofBw6wKnvvacuS+t/bVXAI1vy1XRcy1f/MYiodHCawwUu3d/ek6GHSTI=
+	bh=PL1DWzfxRnKA/W1x4Mg5aQiRnC6uKW5MiTt4rRk4UMc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=I1QPYI5UwgUPfkNwhLoiMtOgn3+U0LpKh3WLeRdil5/qr8yHNT5l1mv38I1y/USaaS12P83CGxJ3SiC3huVF6xeecVyJWU3Q1lRKrtJ/dmn8MjKbKZK8MvgWXm35nalC0GMxalayCMpPvPEw5ZKHayll0blkCxuGmDPxAvCamZE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; arc=none smtp.client-ip=23.88.38.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
-Received: from kero.packetmixer.de (p200300C5970FcFD871714591023Aa0Cd.dip0.t-ipconnect.de [IPv6:2003:c5:970f:cfd8:7171:4591:23a:a0cd])
+Received: from kero.packetmixer.de (p200300c5970FCfd871714591023aA0cD.dip0.t-ipconnect.de [IPv6:2003:c5:970f:cfd8:7171:4591:23a:a0cd])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.simonwunderlich.de (Postfix) with ESMTPSA id 3D1A8FA131;
+	by mail.simonwunderlich.de (Postfix) with ESMTPSA id B531EFA132;
 	Fri, 21 Jun 2024 16:39:22 +0200 (CEST)
 From: Simon Wunderlich <sw@simonwunderlich.de>
 To: davem@davemloft.net,
 	kuba@kernel.org
 Cc: netdev@vger.kernel.org,
 	b.a.t.m.a.n@lists.open-mesh.org,
+	Sven Eckelmann <sven@narfation.org>,
+	stable@vger.kernel.org,
+	=?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>,
 	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH 0/2] pull request for net: batman-adv 2024-06-21
-Date: Fri, 21 Jun 2024 16:39:13 +0200
-Message-Id: <20240621143915.49137-1-sw@simonwunderlich.de>
+Subject: [PATCH 1/2] batman-adv: Don't accept TT entries for out-of-spec VIDs
+Date: Fri, 21 Jun 2024 16:39:14 +0200
+Message-Id: <20240621143915.49137-2-sw@simonwunderlich.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240621143915.49137-1-sw@simonwunderlich.de>
+References: <20240621143915.49137-1-sw@simonwunderlich.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,43 +59,90 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi David, hi Jakub,
+From: Sven Eckelmann <sven@narfation.org>
 
-here are two bugfixes for batman-adv which we would like to have integrated into net.
+The internal handling of VLAN IDs in batman-adv is only specified for
+following encodings:
 
-Please pull or let me know of any problem!
+* VLAN is used
+  - bit 15 is 1
+  - bit 11 - bit 0 is the VLAN ID (0-4095)
+  - remaining bits are 0
+* No VLAN is used
+  - bit 15 is 0
+  - remaining bits are 0
 
-Thank you,
-      Simon
+batman-adv was only preparing new translation table entries (based on its
+soft interface information) using this encoding format. But the receive
+path was never checking if entries in the roam or TT TVLVs were also
+following this encoding.
 
-The following changes since commit 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0:
+It was therefore possible to create more than the expected maximum of 4096
++ 1 entries in the originator VLAN list. Simply by setting the "remaining
+bits" to "random" values in corresponding TVLV.
 
-  Linux 6.10-rc1 (2024-05-26 15:20:12 -0700)
+Cc: stable@vger.kernel.org
+Fixes: 7ea7b4a14275 ("batman-adv: make the TT CRC logic VLAN specific")
+Reported-by: Linus Lüssing <linus.luessing@c0d3.blue>
+Signed-off-by: Sven Eckelmann <sven@narfation.org>
+Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
+---
+ net/batman-adv/originator.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-are available in the Git repository at:
+diff --git a/net/batman-adv/originator.c b/net/batman-adv/originator.c
+index ac74f6ead62d..8f6dd2c6ee41 100644
+--- a/net/batman-adv/originator.c
++++ b/net/batman-adv/originator.c
+@@ -12,6 +12,7 @@
+ #include <linux/errno.h>
+ #include <linux/etherdevice.h>
+ #include <linux/gfp.h>
++#include <linux/if_vlan.h>
+ #include <linux/jiffies.h>
+ #include <linux/kref.h>
+ #include <linux/list.h>
+@@ -131,6 +132,29 @@ batadv_orig_node_vlan_get(struct batadv_orig_node *orig_node,
+ 	return vlan;
+ }
+ 
++/**
++ * batadv_vlan_id_valid() - check if vlan id is in valid batman-adv encoding
++ * @vid: the VLAN identifier
++ *
++ * Return: true when either no vlan is set or if VLAN is in correct range,
++ *  false otherwise
++ */
++static bool batadv_vlan_id_valid(unsigned short vid)
++{
++	unsigned short non_vlan = vid & ~(BATADV_VLAN_HAS_TAG | VLAN_VID_MASK);
++
++	if (vid == 0)
++		return true;
++
++	if (!(vid & BATADV_VLAN_HAS_TAG))
++		return false;
++
++	if (non_vlan)
++		return false;
++
++	return true;
++}
++
+ /**
+  * batadv_orig_node_vlan_new() - search and possibly create an orig_node_vlan
+  *  object
+@@ -149,6 +173,9 @@ batadv_orig_node_vlan_new(struct batadv_orig_node *orig_node,
+ {
+ 	struct batadv_orig_node_vlan *vlan;
+ 
++	if (!batadv_vlan_id_valid(vid))
++		return NULL;
++
+ 	spin_lock_bh(&orig_node->vlan_list_lock);
+ 
+ 	/* first look if an object for this vid already exists */
+-- 
+2.39.2
 
-  git://git.open-mesh.org/linux-merge.git tags/batadv-net-pullrequest-20240621
-
-for you to fetch changes up to 6bfff3582416b2f809e6b08c6e9d57b18086bdbd:
-
-  Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks" (2024-06-12 20:18:00 +0200)
-
-----------------------------------------------------------------
-Here are some batman-adv bugfixes:
-
-- Don't accept TT entries for out-of-spec VIDs, by Sven Eckelmann
-
-- Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only
-  callbacks", by Linus Lüssing
-
-----------------------------------------------------------------
-Linus Lüssing (1):
-      Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-
-Sven Eckelmann (1):
-      batman-adv: Don't accept TT entries for out-of-spec VIDs
-
- net/batman-adv/originator.c        | 27 ++++++++++++++++++++++
- net/batman-adv/translation-table.c | 47 +++++++++++++++++++++++++++++++++++---
- 2 files changed, 71 insertions(+), 3 deletions(-)
 
