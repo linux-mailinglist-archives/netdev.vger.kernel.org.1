@@ -1,301 +1,128 @@
-Return-Path: <netdev+bounces-105759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E026912AE1
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 18:07:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA708912AF0
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 18:09:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9026C1C25276
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:07:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 947A51F27CCB
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 166F215F40C;
-	Fri, 21 Jun 2024 16:07:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08E8515FA6A;
+	Fri, 21 Jun 2024 16:08:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="qXSVxcs+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GqVLsA7Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic316-26.consmr.mail.ne1.yahoo.com (sonic316-26.consmr.mail.ne1.yahoo.com [66.163.187.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4585028C
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 16:06:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.187.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B9ED15F40C
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 16:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718986021; cv=none; b=CvxdDPZz8vr0sOSMWIevwwAimSVXgqfOMIb9H8UBcJCQU+3Bi4GKUhQvYfhUJ5hriF6yLseXt9cBaYRvbCYdZhz/NBCsRPpB57KK1mAuXPDZT15Zh9tOjNFY8wCJSx4XmedVTpC4dohe+WakQENwVagMW7dmfMt93t5AW4NZD5k=
+	t=1718986108; cv=none; b=ONyxD/LGjUjizS6ZMsznAnD5XNKQOy0NYv9hd1PcGAxrAHqAlwH5qkDkm+2q+jfcw1hps6plCa90rh35X2O2hWVlF6ktZ/5Q7rPV3cVomzCHdl7AP39eThn26iFOD4ursnU4rlOvAGnKfEyKdIu0AIwV5TRd3YlenicYDC8fuXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718986021; c=relaxed/simple;
-	bh=4JXEbivYBcsxYTgIWZVnh5SdG3somsUbAFEAVWYGAQQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=g7b1/LvHuxEaoYkD+thevUtgMClcCHYztFs9+GnhlTe4Tg0EmAVsQ7K9N5BwF04jwUTPdO1GVT7xn/W4TxZJwYeJc8pNrIoOmL7ReCPmPo7gMIvikPxgtAzsHW6luU3D9Al7nW5MGxVNr1zPGqU6H/MSusYsGti6nYmqf1WV28E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=qXSVxcs+; arc=none smtp.client-ip=66.163.187.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1718986018; bh=OUlshDAGcf4r9tpcl9XAZhSVZg2AM0tLoTIMQEFIi2o=; h=Date:Subject:To:References:From:In-Reply-To:From:Subject:Reply-To; b=qXSVxcs+GtEjbZ0d5k+4l2SAnxGZ90p8r7pSM+sPQh0gwiWK7oGOPt5A/djfgiWq3axN8FuWsOFcEd4VoiiaLQjnrZnE4KpF0HL3p4wcQEQVLCfR//kRrNPfMqeWmQ6UnqotKJJguw532wrh9Htx/3jxi0q1bNTIx9oOVTzal8v3Y46/Sp7Dmwct4LWKvmvBYPp8H4P53BoRpBRCZdFn7YAHCAjTjOqhMXYkS/3XL0UlEm648T/Wa2QxsDyguB2hpqCTlQiiAHDKG+iQ3tj4lmX0SlcPy4XxfQuCy0nv4ohAkCMZeKFwE7YiSNFUZYpcL4BkZJ4JLKPeSepJJkngYA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1718986018; bh=UhRdylbyR4htXfQ3ksARAjZ+RHaqucn3VSCr8yka/PI=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=k5vdivu9A40A7njFYrRvHuSrHcq6MDFQ4uOP6lf2zpAcGjgw7pbMhMkq/HUOtB5VS8MnXBXxMRID1MmG1I/ovptzCojf3kq7Ezuyl/J7Znr59053iXGSIuLhlwgnBzjK6uSvzWP+rdq+0rQK4qcdEtV+eYvWjVkAQ3ZE21tUIhHh3CLGjdiQflS60u3lhE0P+rmdun1cnfbZ3zV48B/YSTwtfnX011aBu0YPsPBI5q42CI9YZkBph6y5tmuK+9R63bQeKz5HFlsZHdKmCPk72Xu7lDSYVuIscWiHynOig52r4A8UCxB3ntfSlXFiPQQShdGWW8ekfDG1PMSpJPhztQ==
-X-YMail-OSG: UOgmaHYVM1l.B2Lrwvs9KpB9HMayDYjTI.v_pcGE.wyV8yJdV__a0iUF6w8M_ZQ
- 9DjlRcCmrDJAhwYa_DkAW._pe1YFEAdBPbisx6IBljY6jPDBVytM15A3b9y_ICOOf6Y2gQyZZQEG
- vbd2Ra5Z5dETlmzIeIem5nfBDxGPXM1pS9AQQLiG8TTrc9bp1D8vFoxjewkEv.hgn.vFmLHmFiOk
- F690WplsukRvEIs6ORdxhnao6.LAE601yD5uRlvFI0F2xivoOQxcfl7IkyeelamXEfWJXhJqi0mt
- m5X6mp56a_Gh3YoMT2OP.MUPl5qWpfqu_pvLuaYwF4QfB87ApZ7_J3Q7AQJPNoMwqcS6y7Ns2dge
- 9i3gRXrET3MvwMizhVvjrhr05YyzZqyypfOdvxvWi5fNLqHE8vLbTqWHjC3LPIinledP0Oizg8iC
- ej3v0aVoGCou.qFqoLnLLKEzpkrVPxC1g826XwPCOLCde4QgW1JcNCAO0Lm7S7DnqJUgI7AeQsir
- .E3QINU30eyLN27Xw_crEpXNJaGkBuGXMPMebwXz7T2yVOgXBVarAoLG9EjeO.icxB.4Km9yQi4r
- _SieKbYMH1vuLQxciuDMp_O7_Jo.hodJyD8LlL9JPw38l43TUDCTvJpsSL7hy9s036PLrBveClYF
- eDbEtIVfEb4YJTf9ElyIrvYOKiNDU61pA4waE0vaA.a6036kUAQi4rjqszjaEG73uKevvXLuut9U
- RSbOb6PAMSdPFZI9nu2SzqKUTs7gDFAWYcekbebo_fbyy6Rb4ryZkDLaUEM.pRYDBYihY6tCnEjP
- mcbJ0v21C1a4JlKj6h6.ts6rWqiXZDU7OHKxyAmK9pT.E0iYVloph6MPEUEwwHnOJf08eZUHvcWB
- ON._nTJNBbw10Je5FWqkz77Ca8_2kgcBTrSkCsmzeziJpPTpqIKZMLSD9rh67uIqajVByCXKKcFp
- 5xeHHXNHYLdWiZMhyi2C3lFunwBdK6JQPqLq62hA0D9PwH19C1QSTGg1J7OZehcMEYkrvKm35Cey
- 6GlqyiC7W2AT0a5bGyotkT6hrwpyyUuINqiYBcC1zWbpqoZXi3Eom_jNBVTpwvwJfPopb2QNoOJ8
- 64qDnw2fj93bG9Lc27MP9W6MKLW3QpRe8HcX6GOC._NfQthkrcwjkgTLHfPGWEKCChwlRvqgBSNY
- b_qOYv_tqcePaCCtN.tus.xdI7qVNoGRS_LcqH3hqbGf1oBzQXDIc1sgypqGoCs62Vr1a0F2YEf1
- MX3DjJH6pp2jarQG2BgP1jrHWzNyCdwHPZdwA7zM9NKn5T8BW18OwsAm7ziVT1vebnbkW_hlmXFx
- lA9ERpKKBEB7AYpH2B2.343nl2pJ7jnrLGV3hCkf4i6J8Q0TRF68_lfwSQ0a1lglJsDxXC_qPmXd
- BQuc0YZ79q2QNaUvSYM.aCsKnovkTLoXfuGhYX_.fIktvZYhSkydkUZc56t1F1PAuCb4rC2jGkjp
- rpngP_51S0IuaTBR5XtdzSzVupHco63RcaAS0Zu3iGqf8s24Ku4mdnAATcX1BtEvohK0dIxPuEos
- oitPQJMCvG_BN4pZSQDGuyhVAeYm.GM1fLquHub6fQrb4wvqIssazbb58JiN.NUU2ESj1.RGllLx
- z1IOcg_QAymfklby7q8FFoOZ_fRuL38bHX95Vfhxc6jbcQpr9akYcAq76U4dPRrevo7zalZ0xgdN
- rMYxWlGZvQfuhRBvZbIGgAhPxQwqnMjJd9N9SWpC93I9g1S5QAWQvYCR48IdbRZRWNZJETdn76AK
- pThh8UpEzWYOxyaxKVPfDzIPm92kp_lUyxV4Sb_QpFrLsYqrYRbYvcMjg6HDAP7DC1YEs811wqad
- ayFe7IrbomLVkvRjQskGjt65kVsBUd3alLX6iNZ_aUA48kmGeKlF5jUw0iatgnj358cIaarUO7dC
- YUwZawNqdEQyEdFmqagmEoCCIjSdL9q2Na8c7Lg0fmDEUYo4yt606buaBldxbgivtrlQbq1.hdbR
- f_5IFiDe66qpM9V1PoWMwKKgcHNGHYBIrx_6m2bfiBKZ.QtA5tUnk.UI_ejS4Q3rFyiMwqKl9vji
- eAPYIl1sRp4Javo.3VcYbK1N82X1vfOUJ4gR9ovSbF4TDICFRC5qbgyoLKvwwHWuk5WrgbJ2nxAw
- 2gKVpMPJW70ZUXk_ZeRrzcExGs11R5z6s9SSOimuV0UIwXSGTVqKh5pMN6.kaYV8O6iaBejXCMK8
- G3i3Cjsw2qH1R5rpPQF4n7h6WTVs0EZfhJjG.1s8kSan7AdOlq_Xtt42lX6y2STwOtAWH
-X-Sonic-MF: <casey@schaufler-ca.com>
-X-Sonic-ID: 63602443-7919-45b5-95cb-a0501af045f3
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic316.consmr.mail.ne1.yahoo.com with HTTP; Fri, 21 Jun 2024 16:06:58 +0000
-Received: by hermes--production-gq1-5b4c49485c-4rmzt (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID a6ae495510b30a623b4b0801ff5ab356;
-          Fri, 21 Jun 2024 16:06:55 +0000 (UTC)
-Message-ID: <c59a4954-913b-4672-b502-21aa683d7cdb@schaufler-ca.com>
-Date: Fri, 21 Jun 2024 09:06:53 -0700
+	s=arc-20240116; t=1718986108; c=relaxed/simple;
+	bh=8jOc0OqzwpS0iyLZTn63cpatsiJm1NyC3N3cCRCfVfo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vF4XNSdzy8jp8NVuDgKBuntI/V9NoAyK0f7glfwmtYb5AGYtW0BBosL5kD/pQ6vzGysGD4EzKvK+WcVCeDRNFSsjKqcxejM9InvoOOy4ErfKCO6Cy5putbTYSG94g0NrmNvekLBvMcxhLh7D0Hdh/NXL3qY9HROEPVJMiWRESnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GqVLsA7Q; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718986107; x=1750522107;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8jOc0OqzwpS0iyLZTn63cpatsiJm1NyC3N3cCRCfVfo=;
+  b=GqVLsA7QXrIRayXDif8ROHdIe+UKXSX62xd2XzXb0peto/ujD9LxGLG8
+   Il9wHdv1MWzDjXiWm+fe6mGY0zE/U7RL7kS4ixyWFrVIIGEt4+3kGlvqi
+   9eGpm+Gy5Arwa/R+BaU2av6r1XyTWETEDtbO8SY3LCeTSuzf86Qkup3sk
+   q48eX6Vh8IBymldGfny6Cx9OAcsX1emeo/iQxqsfH6ZVZn7QyWEA01MJX
+   Q8K6UMgzLJw3B59X6etikCR8/cOW9nOfaQC5TLkG4EEgBHWfNou6NKrly
+   uGjKCZoAQZW71QxSjSb4576bo3zPcpRstCLbWsMMMCFm/aXyzwVMdDqwK
+   w==;
+X-CSE-ConnectionGUID: rDSpQwbbS4uFwZmDw7Tdfg==
+X-CSE-MsgGUID: obWdnPAvQeKSaicNPKHO8g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11110"; a="19801396"
+X-IronPort-AV: E=Sophos;i="6.08,255,1712646000"; 
+   d="scan'208";a="19801396"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2024 09:08:26 -0700
+X-CSE-ConnectionGUID: jNBpswm9RBii83Ya1+wjFA==
+X-CSE-MsgGUID: O36Zk70pQCCHQswL5eUF7Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,255,1712646000"; 
+   d="scan'208";a="47149795"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa004.fm.intel.com with ESMTP; 21 Jun 2024 09:08:26 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	michal.swiatkowski@linux.intel.com
+Subject: [PATCH net-next 0/4][pull request] ice: prepare representor for SF support
+Date: Fri, 21 Jun 2024 09:08:13 -0700
+Message-ID: <20240621160820.3394806-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC] LSM, net: Add SO_PEERCONTEXT for peer LSM data
-To: Paul Moore <paul@paul-moore.com>,
- LSM List <linux-security-module@vger.kernel.org>, netdev@vger.kernel.org,
- linux-api@vger.kernel.org,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- Casey Schaufler <casey@schaufler-ca.com>
-References: <763db426-6f60-4d36-b3f9-b316008889f7@schaufler-ca.com>
- <83ef6981a29c441b58b525e9292c866a@paul-moore.com>
-Content-Language: en-US
-From: Casey Schaufler <casey@schaufler-ca.com>
-In-Reply-To: <83ef6981a29c441b58b525e9292c866a@paul-moore.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.22407 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+Content-Transfer-Encoding: 8bit
 
-On 6/20/2024 2:05 PM, Paul Moore wrote:
-> On May 13, 2024 Casey Schaufler <casey@schaufler-ca.com> wrote:
->> We recently introduced system calls to access process attributes that
->> are used by Linux Security Modules (LSM). An important aspect of these
->> system calls is that they provide the LSM attribute data in a format
->> that identifies the LSM to which the data applies. Another aspect is that
->> it can be used to provide multiple instances of the attribute for the
->> case where more than one LSM supplies the attribute.
->>
->> We wish to take advantage of this format for data about network peers.
->> The existing mechanism, SO_PEERSEC, provides peer security data as a
->> text string. This is sufficient when the LSM providing the information
->> is known by the user of SO_PEERSEC, and there is only one LSM providing
->> the information. It fails, however, if the user does not know which
->> LSM is providing the information.
->>
->> Discussions about extending SO_PEERSEC to accomodate either the new
-> Spelling nitpick -> "accommodate" :)
+Michal Swiatkowski says:
 
-Thanks.
+This is a series to prepare port representor for supporting also
+subfunctions. We need correct devlink locking and the possibility to
+update parent VSI after port representor is created.
 
->> format or some other encoding scheme invariably lead to the conclusion
->> that doing so would lead to tears. Hence, we introduce SO_PEERCONTEXT
->> which uses the same API data as the LSM system calls.
->>
->> Signed-off-by: Casey Schaufler <casey@schaufler-ca.com>
->> ---
->>  arch/alpha/include/uapi/asm/socket.h  |  1 +
->>  arch/mips/include/uapi/asm/socket.h   |  1 +
->>  arch/parisc/include/uapi/asm/socket.h |  1 +
->>  arch/sparc/include/uapi/asm/socket.h  |  1 +
->>  include/linux/lsm_hook_defs.h         |  2 +
->>  include/linux/security.h              | 18 ++++++++
->>  include/uapi/asm-generic/socket.h     |  1 +
->>  net/core/sock.c                       |  4 ++
->>  security/apparmor/lsm.c               | 39 ++++++++++++++++
->>  security/security.c                   | 86 +++++++++++++++++++++++++++++++++++
->>  security/selinux/hooks.c              | 35 ++++++++++++++
->>  security/smack/smack_lsm.c            | 25 ++++++++++
->>  12 files changed, 214 insertions(+)
-> ..
->
->> diff --git a/include/uapi/asm-generic/socket.h b/include/uapi/asm-generic/socket.h
->> index 8ce8a39a1e5f..e0166ff53670 100644
->> --- a/include/uapi/asm-generic/socket.h
->> +++ b/include/uapi/asm-generic/socket.h
->> @@ -134,6 +134,7 @@
->>  
->>  #define SO_PASSPIDFD		76
->>  #define SO_PEERPIDFD		77
->> +#define SO_PEERCONTEXT		78
-> Bikeshed time ... how about SO_PEERLSMCTX since we are returning a
-> lsm_ctx struct?
+Refactor how devlink lock is taken to suite the subfunction use case.
 
-Sure.
+VSI configuration needs to be done after port representor is created.
+Port representor needs only allocated VSI. It doesn't need to be
+configured before.
 
+VSI needs to be reconfigured when update function is called.
 
->> diff --git a/security/security.c b/security/security.c
->> index e387614cb054..fd4919c28e8f 100644
->> --- a/security/security.c
->> +++ b/security/security.c
->> @@ -874,6 +874,64 @@ int lsm_fill_user_ctx(struct lsm_ctx __user *uctx, u32 *uctx_len,
->>  	return rc;
->>  }
->>  
->> +/**
->> + * lsm_fill_socket_ctx - Fill a socket lsm_ctx structure
->> + * @optval: a socket LSM context to be filled
->> + * @optlen: uctx size
-> "@optlen: @optval size"
+The code for this patchset was split from (too big) patchset [1].
 
-Thank you.
+[1] https://lore.kernel.org/netdev/20240213072724.77275-1-michal.swiatkowski@linux.intel.com/
+---
+Originally from https://lore.kernel.org/netdev/20240605-next-2024-06-03-intel-next-batch-v2-0-39c23963fa78@intel.com/
+Changes:
+- delete ice_repr_get_by_vsi() from header
+- rephrase commit message in moving devlink locking
 
+The following are changes since commit 3226607302ca5a74dee6f1c817580c713ef9d0dd:
+  selftests: net: change shebang to bash in amt.sh
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
 
->> + * @val: the new LSM context value
->> + * @val_len: the size of the new LSM context value
->> + * @id: LSM id
->> + * @flags: LSM defined flags
->> + *
->> + * Fill all of the fields in a lsm_ctx structure.  If @optval is NULL
->> + * simply calculate the required size to output via @optlen and return
->> + * success.
->> + *
->> + * Returns 0 on success, -E2BIG if userspace buffer is not large enough,
->> + * -EFAULT on a copyout error, -ENOMEM if memory can't be allocated.
->> + */
->> +int lsm_fill_socket_ctx(sockptr_t optval, sockptr_t optlen, void *val,
->> +			size_t val_len, u64 id, u64 flags)
->> +{
->> +	struct lsm_ctx *nctx = NULL;
->> +	unsigned int nctx_len;
->> +	int loptlen;
-> u32?
+Michal Swiatkowski (4):
+  ice: store representor ID in bridge port
+  ice: move devlink locking outside the port creation
+  ice: move VSI configuration outside repr setup
+  ice: update representor when VSI is ready
 
-Probably. I'll revise in line with your comment below.
+ .../net/ethernet/intel/ice/devlink/devlink.c  |  2 -
+ .../ethernet/intel/ice/devlink/devlink_port.c |  4 +-
+ drivers/net/ethernet/intel/ice/ice_eswitch.c  | 85 +++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_eswitch.h  | 14 ++-
+ .../net/ethernet/intel/ice/ice_eswitch_br.c   |  4 +-
+ .../net/ethernet/intel/ice/ice_eswitch_br.h   |  1 +
+ drivers/net/ethernet/intel/ice/ice_repr.c     | 16 ++--
+ drivers/net/ethernet/intel/ice/ice_repr.h     |  3 +-
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c   |  2 +-
+ 9 files changed, 90 insertions(+), 41 deletions(-)
 
->> +	int rc = 0;
->> +
->> +	if (copy_from_sockptr(&loptlen, optlen, sizeof(int)))
->> +		return -EFAULT;
-> It seems the current guidance prefers copy_safe_from_sockptr(), see
-> the note in include/linux/sockptr.h.
-
-Always a good idea to follow guidance.
-
->> +	nctx_len = ALIGN(struct_size(nctx, ctx, val_len), sizeof(void *));
->> +	if (nctx_len > loptlen && !sockptr_is_null(optval))
->> +		rc = -E2BIG;
-> Why do we care if @optval is NULL or not?  We are in a -E2BIG state,
-> we're not copying anything into @optval anyway.  In fact, why are we
-> doing the @rc check below?  Do it here like we do in lsm_fill_user_ctx().
->
->   if (nctx_len > loptlen) {
->     rc = -E2BIG;
->     goto out;
->   }
-
-That's a bit sloppy on my part. I'll clean it up.
-
-
->> +	/* no buffer - return success/0 and set @uctx_len to the req size */
-> "... set @opt_len ... "
-
-Yes.
-
->> +	if (sockptr_is_null(optval) || rc)
->> +		goto out;
-> Do the @rc check above, not here.
->
->> +	nctx = kzalloc(nctx_len, GFP_KERNEL);
->> +	if (!nctx) {
->> +		rc = -ENOMEM;
->> +		goto out;
->> +	}
->> +	nctx->id = id;
->> +	nctx->flags = flags;
->> +	nctx->len = nctx_len;
->> +	nctx->ctx_len = val_len;
->> +	memcpy(nctx->ctx, val, val_len);
->> +
->> +	if (copy_to_sockptr(optval, nctx, nctx_len))
->> +		rc = -EFAULT;
-> This is always going to copy to the start of @optval which means we
-> are going to keep overwriting previous values in the multi-LSM case.
-
-The multiple LSM case isn't handled in this version. I don't want this
-patch to depend on multiple LSM support.
-
-> I think we likely want copy_to_sockptr_offset(), or similar.  See my
-> comment in security_socket_getpeerctx_stream().
->
->> +	kfree(nctx);
->> +out:
->> +	if (copy_to_sockptr(optlen, &nctx_len, sizeof(int)))
->> +		rc = -EFAULT;
->> +
->> +	return rc;
->> +}
->> +
->> +
->>  /*
->>   * The default value of the LSM hook is defined in linux/lsm_hook_defs.h and
->>   * can be accessed with:
->> @@ -4743,6 +4801,34 @@ int security_socket_getpeersec_stream(struct socket *sock, sockptr_t optval,
->>  	return LSM_RET_DEFAULT(socket_getpeersec_stream);
->>  }
->>  
->> +/**
->> + * security_socket_getpeerctx_stream() - Get the remote peer label
->> + * @sock: socket
->> + * @optval: destination buffer
->> + * @optlen: size of peer label copied into the buffer
->> + * @len: maximum size of the destination buffer
->> + *
->> + * This hook allows the security module to provide peer socket security state
->> + * for unix or connected tcp sockets to userspace via getsockopt
->> + * SO_GETPEERCONTEXT.  For tcp sockets this can be meaningful if the socket
->> + * is associated with an ipsec SA.
->> + *
->> + * Return: Returns 0 if all is well, otherwise, typical getsockopt return
->> + *         values.
->> + */
->> +int security_socket_getpeerctx_stream(struct socket *sock, sockptr_t optval,
->> +				      sockptr_t optlen, unsigned int len)
->> +{
->> +	struct security_hook_list *hp;
->> +
->> +	hlist_for_each_entry(hp, &security_hook_heads.socket_getpeerctx_stream,
->> +			     list)
->> +		return hp->hook.socket_getpeerctx_stream(sock, optval, optlen,
->> +							 len);
->> +
->> +	return LSM_RET_DEFAULT(socket_getpeerctx_stream);
->> +}
-> Don't we need the same magic that we have in security_getselfattr() to
-> handle the multi-LSM case?
-
-Yes. I would like to move this ahead independently of the multi-LSM support.
-Putting the multi-LSM magic in is unnecessary and rather pointless until then.
-
-> --
-> paul-moore.com
-
-Thank you for the review. Expect v2 before very long.
+-- 
+2.41.0
 
 
