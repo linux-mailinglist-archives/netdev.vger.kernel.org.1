@@ -1,109 +1,170 @@
-Return-Path: <netdev+bounces-105768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0960D912B54
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 18:29:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D315912B84
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 18:39:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1996289254
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:29:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17A4F28ACF9
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:39:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420F115FCFE;
-	Fri, 21 Jun 2024 16:29:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA6F160785;
+	Fri, 21 Jun 2024 16:39:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kdhJHB5p"
+	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="VtXeSSY9"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A02E215FA65;
-	Fri, 21 Jun 2024 16:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D253415F412
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 16:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718987362; cv=none; b=kH9DFOMYTP7Pqb/BXvFNeYom/jf1p1lt3oONk3camdziuDN89dtFkbGQEBqJ1j+mo2FSV+jbi0pL6sbUV1TriybjEkLFUALbrnLqdnPPm8zEMP7BjusuPu/xjzPQ/4nzMil9hdbWDtpFMsq3UBKV5YVABinqKf7ZdtIk/+4V7aY=
+	t=1718987973; cv=none; b=rldxTtACOVp8iGNzNFsBeCtZD751k+ZyMVoaovqF63xHCZ81JYJX8vPaP4L37GBknL5DBFs2Jc8b1MmxQCqSMuwwkeRl6te2H0h5oY70slZ0viSKuw9t9QteuGzOL9ccXWR4+Ynpznj5TrtKz4qdOmRj6gvaJpOZIlymwdOFh+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718987362; c=relaxed/simple;
-	bh=FxBvFuYD5hrFQUJN1N4ag6bR5iXAGaCbxNaZ9XTQDaU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HXBOFcxPcB2+4+SPEmSh4JGp0BuA+on1IFedsXRH+MnFd0mb1tCz1kIGD/RPLxulfWIcYV/h5w6Pm1Ir5pO2j92mUsF0LM6hnJNiuG6mHSHM73L4AG3i3MGsGGxiQ2sc2FrAelf8AtMNAlVb3VXZlWRGMEB0p6hgQNdon2dYXPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kdhJHB5p; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id AEB1C40002;
-	Fri, 21 Jun 2024 16:29:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1718987357;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uQ7LpcaHTzpOkXr2f3P+YAPN8LFusCgiYt9CIVPUBcM=;
-	b=kdhJHB5pfJ5sAzuClexAuSKbl187w6QgZy/6lkn+jF/idI7zV3PA3KHX8MZHtrUHyfERq5
-	r9y5c4z7uGUGryIDzFGw3y96QZT0egTJtsM/9P6WIMKH6jXzisa/Bx+zTb9a/hkKvva2bv
-	o9gQrpBluVw1piVLuG8fNQTTdlb9/57kYnZkfX8/oIIorzZBEoF9nYktJoN2Odef6ZD/hl
-	MPYOIUkFNn67hyQDi+uya8+OfORPh+KqgCPhYK3PUa0PDHoMugenior0lmvTDDXFXMwp8m
-	2utCBxeUbKat0amNlXKmkF1cJC7b32WboX7EbjJwSfy2/vG+EH4F6FNaQdOFmg==
-Date: Fri, 21 Jun 2024 18:29:15 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Dent Project
- <dentproject@linuxfoundation.org>, kernel@pengutronix.de,
- UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v3 1/7] net: ethtool: pse-pd: Expand C33 PSE
- status with class, power and extended state
-Message-ID: <20240621182915.3efd9ccf@kmaincent-XPS-13-7390>
-In-Reply-To: <ZnCUrUm69gmbGWQq@pengutronix.de>
-References: <20240614-feature_poe_power_cap-v3-0-a26784e78311@bootlin.com>
-	<20240614-feature_poe_power_cap-v3-1-a26784e78311@bootlin.com>
-	<Zm15fP1Sudot33H5@pengutronix.de>
-	<20240617154712.76fa490a@kmaincent-XPS-13-7390>
-	<ZnCUrUm69gmbGWQq@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1718987973; c=relaxed/simple;
+	bh=UlgFUywd2WSEjSU6xsxYFHFG7CT7Xep9ROempUMO7/k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aOKmn2G5ftMiKtX20Nz0S6rdFTX7JYGS9HTuamQPgzROOJ0/cfFPD63NabyOq0HYUku2oxVq4Kpowr9U5XqDkEZIWe1Mv8nWNdMQF4mk4szSUC8YL58stwVIZiXdAy6sS+jLiuiS4YphAqJnlJGgoyWh835x0zYhEi0aXbZWQ4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=VtXeSSY9; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2eb1cd51e05so2801821fa.3
+        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 09:39:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google; t=1718987969; x=1719592769; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=d+B4q6j7rnOa8lY5YGMu4l7DUBInPDPw5kUdlNxco7g=;
+        b=VtXeSSY9ptdv08DJDTJ2WKmFOBfvm36uqqpB1SXvyXSjnyBwyR/YSRClM3Fekc5PEb
+         dd8gQNWD9nZJ9TDZN2xK7sOY6Ng+93H+bPR3vwYwyztHQIRZ7VsPi0IMubPX9azpw0gj
+         56RGX+N8Cg63P3IsX1jP8xeP/0Sw8vR5VG9e8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718987969; x=1719592769;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d+B4q6j7rnOa8lY5YGMu4l7DUBInPDPw5kUdlNxco7g=;
+        b=CmiwgLCqrVTo6hjxGqdayEpqIZyTPxd7/UlI9SDJHmW0LST+4OWYrB3BzLTsJpA/p1
+         gKaFMUXtidT6sxh7uXKbYpkDg+kRuvlP6Jhar0Lg8tQFWPocB7ExX2+BPPDwmh1elRym
+         HOVKUf7hSYnUtH35lCvQ/n1MefSAgLGTF2dWaEpuV7KVbXLAIkatVVFGQQH/ECRPlf12
+         03iZL3Y3J/B6pBMDJdmY+fMDi1RJxDp6pifF8feHe+6pfe84NhfTpGFCIGMHo8CeplE9
+         F6G4+x2qygn5SPd4Fj31irZ/swOVZiKK6eQUtIBFS3armQp33MLgEw/GoTSGvuiXHdFc
+         bniw==
+X-Forwarded-Encrypted: i=1; AJvYcCXJb5HGtx5XUujOYqwrxxbw4fHuy1Q6c2lt0Q2hLZoYQ0+prgvFGrRIILAApyPpMN2hzFUK8LoRkHKOrQzxRcjaE/Y+dmSh
+X-Gm-Message-State: AOJu0Ywveyo1y+ExgakqnsLAZvPxwONs7qcHf9WQ5BTu7Ehr/olDjQQU
+	PAn0qEZfkaHAhNr4ntvESTx90DFnFbTGLtSWmElf7dcN3a26OhrKuc4TzWwiUqs=
+X-Google-Smtp-Source: AGHT+IG0ddJjXBlSpbVZD4r9/H9u00KEsN82L79oP/i1sXbnFlr8kZL72WUFKn7R6WiFRcw1OhTvRw==
+X-Received: by 2002:a05:651c:1a12:b0:2ec:5365:34d3 with SMTP id 38308e7fff4ca-2ec53653746mr3909701fa.1.1718987968916;
+        Fri, 21 Jun 2024 09:39:28 -0700 (PDT)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3663a8c8960sm2247234f8f.100.2024.06.21.09.39.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jun 2024 09:39:28 -0700 (PDT)
+Date: Fri, 21 Jun 2024 18:39:26 +0200
+From: Daniel Vetter <daniel@ffwll.ch>
+To: Yafang Shao <laoar.shao@gmail.com>
+Cc: torvalds@linux-foundation.org, ebiederm@xmission.com,
+	alexei.starovoitov@gmail.com, rostedt@goodmis.org,
+	catalin.marinas@arm.com, akpm@linux-foundation.org,
+	penguin-kernel@i-love.sakura.ne.jp, linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	audit@vger.kernel.org, linux-security-module@vger.kernel.org,
+	selinux@vger.kernel.org, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>
+Subject: Re: [PATCH v3 11/11] drm: Replace strcpy() with __get_task_comm()
+Message-ID: <ZnWsvvRUonTmZG5h@phenom.ffwll.local>
+Mail-Followup-To: Yafang Shao <laoar.shao@gmail.com>,
+	torvalds@linux-foundation.org, ebiederm@xmission.com,
+	alexei.starovoitov@gmail.com, rostedt@goodmis.org,
+	catalin.marinas@arm.com, akpm@linux-foundation.org,
+	penguin-kernel@i-love.sakura.ne.jp, linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	audit@vger.kernel.org, linux-security-module@vger.kernel.org,
+	selinux@vger.kernel.org, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>
+References: <20240621022959.9124-1-laoar.shao@gmail.com>
+ <20240621022959.9124-12-laoar.shao@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240621022959.9124-12-laoar.shao@gmail.com>
+X-Operating-System: Linux phenom 6.8.9-amd64 
 
-On Mon, 17 Jun 2024 21:55:25 +0200
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+On Fri, Jun 21, 2024 at 10:29:59AM +0800, Yafang Shao wrote:
+> To prevent erros from occurring when the src string is longer than the
+> dst string in strcpy(), we should use __get_task_comm() instead. This
+> approach also facilitates future extensions to the task comm.
+> 
+> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
+> Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+> Cc: Maxime Ripard <mripard@kernel.org>
+> Cc: Thomas Zimmermann <tzimmermann@suse.de>
+> Cc: David Airlie <airlied@gmail.com>
+> Cc: Daniel Vetter <daniel@ffwll.ch>
 
-> On Mon, Jun 17, 2024 at 03:47:12PM +0200, Kory Maincent wrote:
->  [...] =20
-> >=20
-> > Mmh not really indeed, maybe we can put it in error_condition substate?=
- =20
->=20
-> I'm not sure how this error can help user, if even we do not understand
-> what is says. May be map everything what is not clear right not to
-> unsupported error value. This give us some time to communicate with
-> vendor and prevent us from making pointless UAPi?
+I guess the entire series will go in through a dedicated pull or some
+other tree, so
 
-Is it ok for you if I use this substate for unsupported value:
-ETHTOOL_C33_PSE_EXT_SUBSTATE_ERROR_CONDITION_UNKNOWN_PORT_STATUS
-or do you prefer another one.
+Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
 
-> > Should I put it under MPS substate then? =20
->=20
-> If my understand is correct, then yes. Can you test it? Do you have PD
-> with adjustable load?
+for merging through whatever non-drm tree makes most sense for this.
 
-Yes I will test it.
+Cheers, Sima
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+> ---
+>  drivers/gpu/drm/drm_framebuffer.c     | 2 +-
+>  drivers/gpu/drm/i915/i915_gpu_error.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/gpu/drm/drm_framebuffer.c b/drivers/gpu/drm/drm_framebuffer.c
+> index 888aadb6a4ac..25262b07ffaf 100644
+> --- a/drivers/gpu/drm/drm_framebuffer.c
+> +++ b/drivers/gpu/drm/drm_framebuffer.c
+> @@ -868,7 +868,7 @@ int drm_framebuffer_init(struct drm_device *dev, struct drm_framebuffer *fb,
+>  	INIT_LIST_HEAD(&fb->filp_head);
+>  
+>  	fb->funcs = funcs;
+> -	strcpy(fb->comm, current->comm);
+> +	__get_task_comm(fb->comm, sizeof(fb->comm), current);
+>  
+>  	ret = __drm_mode_object_add(dev, &fb->base, DRM_MODE_OBJECT_FB,
+>  				    false, drm_framebuffer_free);
+> diff --git a/drivers/gpu/drm/i915/i915_gpu_error.c b/drivers/gpu/drm/i915/i915_gpu_error.c
+> index 625b3c024540..b2c16a53bd24 100644
+> --- a/drivers/gpu/drm/i915/i915_gpu_error.c
+> +++ b/drivers/gpu/drm/i915/i915_gpu_error.c
+> @@ -1411,7 +1411,7 @@ static bool record_context(struct i915_gem_context_coredump *e,
+>  	rcu_read_lock();
+>  	task = pid_task(ctx->pid, PIDTYPE_PID);
+>  	if (task) {
+> -		strcpy(e->comm, task->comm);
+> +		__get_task_comm(e->comm, sizeof(e->comm), task);
+>  		e->pid = task->pid;
+>  	}
+>  	rcu_read_unlock();
+> -- 
+> 2.39.1
+> 
+
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
 
