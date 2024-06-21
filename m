@@ -1,336 +1,161 @@
-Return-Path: <netdev+bounces-105594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E390911E4F
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:15:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEBA0911ED1
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:31:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1387B23C84
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 08:15:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 691A6281EE2
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 08:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E77716C869;
-	Fri, 21 Jun 2024 08:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079F916D4FA;
+	Fri, 21 Jun 2024 08:31:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723C884A3B
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 08:11:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D15A18E20
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 08:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718957474; cv=none; b=IYIyAXZXAUZHvE+dpbLiBK9z9Qk2ogWY7AXm1tPM+jnvUVglU19aDFMcumrcgW4SIga/86Xryc3fJ3LeZsiv23vINvYlIQCVnYkgJV0PUqwO/QKEzVLO9D5mjV86CEdqRqgZzXv3YDiUJRtUZ38TIyyMY8dnh7Ez53FsS+W/wHc=
+	t=1718958666; cv=none; b=lGO3tnYtPeqcrc6XMyQf67b+Z8ykC//LDwFCoYwHFBhqu8xHAfcoLtpY0qqyiCER0wKQcHeO9DQGg7Lm9esWn315uK/lKVvXMlq+WtcQKyMeWPKomc9Wrgdth8ZFH1EOXY89ejgeeRRyp5tz1UmXs5EtMkCKzfYeIn6UkaWfPhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718957474; c=relaxed/simple;
-	bh=UVRUugxCi2rz0GMCUXW8NRovMUywxDQcmrx7X8f2WtE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LRpmQkWqd0V0/2o3szQ7CB+XVhr2vDiHrVin1iiy6VQjw2fa7unOaEb8PCi3MHUaJvO3pagvsmBZwGhU/eAQy4MqfrHt7I2Nh4ZD2PElPMkstRW8MaXKG3Gm9iuCbHrQqB8kLReojO38cH260JJmXrQJ5WHEJUn8THqho4gFrGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.206.16.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtp80t1718957402tsmp13zy
-X-QQ-Originating-IP: YA9FwO2Eic/F18HK6FyR5uVczgyyuiWUMULn3TWr8EY=
-Received: from lap-jiawenwu.trustnetic.com ( [115.200.224.151])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 21 Jun 2024 16:09:59 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 13975059555697223853
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	andrew@lunn.ch,
-	netdev@vger.kernel.org
-Cc: mengyuanlou@net-swift.com,
-	duanqiangwen@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net] net: txgbe: fix MSI and INTx interrupts
-Date: Fri, 21 Jun 2024 16:09:51 +0800
-Message-Id: <20240621080951.14368-1-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
+	s=arc-20240116; t=1718958666; c=relaxed/simple;
+	bh=9HB9jO47qBfvaobMoLyouqx97fk8WIHZYuDazEmliqA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hqnrtnB5IlnSy+9piDeiyOZtSNqRlHAvZqI3u098Md6N7LZVJqoDLTsGQCtwyvn1f/R/Exe1Bzydl50RjBWJl9t/aS+NrfJyXN+fMqOKAE2vJMUMczfTyM55zbwTOsaW+uACTIYfaspaBOkBeQu0iUjx6Y+oJTS1TzCugPX5Gqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sKZfX-0000GX-0u; Fri, 21 Jun 2024 10:30:51 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sKZfV-003tol-Uz; Fri, 21 Jun 2024 10:30:50 +0200
+Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id AB4312EE56E;
+	Fri, 21 Jun 2024 08:30:49 +0000 (UTC)
+Date: Fri, 21 Jun 2024 10:30:49 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Thomas Kopp <thomas.kopp@microchip.com>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] can: hi311x: simplify with
+ spi_get_device_match_data()
+Message-ID: <20240621-camouflaged-yak-from-vega-6ef4f6-mkl@pengutronix.de>
+References: <20240606142424.129709-1-krzysztof.kozlowski@linaro.org>
+ <CAMZ6RqKCWzzbd-P7rOMEryd=31pdD_PJJvtQFYcmS+wAf8q+CQ@mail.gmail.com>
+ <20240620-imaginary-sepia-gibbon-048a32-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="3fzhuwpr2zgg6io2"
+Content-Disposition: inline
+In-Reply-To: <20240620-imaginary-sepia-gibbon-048a32-mkl@pengutronix.de>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-When using MSI or INTx interrupts, request_irq() for pdev->irq will
-conflict with request_threaded_irq() for txgbe->misc.irq, to cause
-system crash.
 
-Fixes: aefd013624a1 ("net: txgbe: use irq_domain for interrupt controller")
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  13 +-
- .../net/ethernet/wangxun/txgbe/txgbe_irq.c    | 122 +++++++-----------
- .../net/ethernet/wangxun/txgbe/txgbe_irq.h    |   2 +-
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   3 +-
- 4 files changed, 59 insertions(+), 81 deletions(-)
+--3fzhuwpr2zgg6io2
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index 68bde91b67a0..f098758893b3 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -1686,6 +1686,7 @@ static int wx_set_interrupt_capability(struct wx *wx)
- 	}
- 
- 	pdev->irq = pci_irq_vector(pdev, 0);
-+	wx->num_q_vectors = 1;
- 
- 	return 0;
- }
-@@ -1996,7 +1997,8 @@ void wx_free_irq(struct wx *wx)
- 	int vector;
- 
- 	if (!(pdev->msix_enabled)) {
--		free_irq(pdev->irq, wx);
-+		if (wx->mac.type == wx_mac_em)
-+			free_irq(pdev->irq, wx);
- 		return;
- 	}
- 
-@@ -2026,6 +2028,9 @@ int wx_setup_isb_resources(struct wx *wx)
- {
- 	struct pci_dev *pdev = wx->pdev;
- 
-+	if (wx->isb_mem)
-+		return 0;
-+
- 	wx->isb_mem = dma_alloc_coherent(&pdev->dev,
- 					 sizeof(u32) * 4,
- 					 &wx->isb_dma,
-@@ -2049,6 +2054,9 @@ void wx_free_isb_resources(struct wx *wx)
- {
- 	struct pci_dev *pdev = wx->pdev;
- 
-+	if (!wx->isb_mem)
-+		return;
-+
- 	dma_free_coherent(&pdev->dev, sizeof(u32) * 4,
- 			  wx->isb_mem, wx->isb_dma);
- 	wx->isb_mem = NULL;
-@@ -2385,7 +2393,8 @@ static void wx_free_all_tx_resources(struct wx *wx)
- 
- void wx_free_resources(struct wx *wx)
- {
--	wx_free_isb_resources(wx);
-+	if (wx->mac.type == wx_mac_em)
-+		wx_free_isb_resources(wx);
- 	wx_free_all_rx_resources(wx);
- 	wx_free_all_tx_resources(wx);
- }
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-index b3e3605d1edb..15e0fef02aac 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-@@ -27,57 +27,19 @@ void txgbe_irq_enable(struct wx *wx, bool queues)
- }
- 
- /**
-- * txgbe_intr - msi/legacy mode Interrupt Handler
-- * @irq: interrupt number
-- * @data: pointer to a network interface device structure
-- **/
--static irqreturn_t txgbe_intr(int __always_unused irq, void *data)
--{
--	struct wx_q_vector *q_vector;
--	struct wx *wx  = data;
--	struct pci_dev *pdev;
--	u32 eicr;
--
--	q_vector = wx->q_vector[0];
--	pdev = wx->pdev;
--
--	eicr = wx_misc_isb(wx, WX_ISB_VEC0);
--	if (!eicr) {
--		/* shared interrupt alert!
--		 * the interrupt that we masked before the ICR read.
--		 */
--		if (netif_running(wx->netdev))
--			txgbe_irq_enable(wx, true);
--		return IRQ_NONE;        /* Not our interrupt */
--	}
--	wx->isb_mem[WX_ISB_VEC0] = 0;
--	if (!(pdev->msi_enabled))
--		wr32(wx, WX_PX_INTA, 1);
--
--	wx->isb_mem[WX_ISB_MISC] = 0;
--	/* would disable interrupts here but it is auto disabled */
--	napi_schedule_irqoff(&q_vector->napi);
--
--	/* re-enable link(maybe) and non-queue interrupts, no flush.
--	 * txgbe_poll will re-enable the queue interrupts
--	 */
--	if (netif_running(wx->netdev))
--		txgbe_irq_enable(wx, false);
--
--	return IRQ_HANDLED;
--}
--
--/**
-- * txgbe_request_msix_irqs - Initialize MSI-X interrupts
-+ * txgbe_request_queue_irqs - Initialize MSI-X queue interrupts
-  * @wx: board private structure
-  *
-- * Allocate MSI-X vectors and request interrupts from the kernel.
-+ * Allocate MSI-X queue vectors and request interrupts from the kernel.
-  **/
--static int txgbe_request_msix_irqs(struct wx *wx)
-+int txgbe_request_queue_irqs(struct wx *wx)
- {
- 	struct net_device *netdev = wx->netdev;
- 	int vector, err;
- 
-+	if (!wx->pdev->msix_enabled)
-+		return 0;
-+
- 	for (vector = 0; vector < wx->num_q_vectors; vector++) {
- 		struct wx_q_vector *q_vector = wx->q_vector[vector];
- 		struct msix_entry *entry = &wx->msix_q_entries[vector];
-@@ -110,34 +72,6 @@ static int txgbe_request_msix_irqs(struct wx *wx)
- 	return err;
- }
- 
--/**
-- * txgbe_request_irq - initialize interrupts
-- * @wx: board private structure
-- *
-- * Attempt to configure interrupts using the best available
-- * capabilities of the hardware and kernel.
-- **/
--int txgbe_request_irq(struct wx *wx)
--{
--	struct net_device *netdev = wx->netdev;
--	struct pci_dev *pdev = wx->pdev;
--	int err;
--
--	if (pdev->msix_enabled)
--		err = txgbe_request_msix_irqs(wx);
--	else if (pdev->msi_enabled)
--		err = request_irq(wx->pdev->irq, &txgbe_intr, 0,
--				  netdev->name, wx);
--	else
--		err = request_irq(wx->pdev->irq, &txgbe_intr, IRQF_SHARED,
--				  netdev->name, wx);
--
--	if (err)
--		wx_err(wx, "request_irq failed, Error %d\n", err);
--
--	return err;
--}
--
- static int txgbe_request_gpio_irq(struct txgbe *txgbe)
- {
- 	txgbe->gpio_irq = irq_find_mapping(txgbe->misc.domain, TXGBE_IRQ_GPIO);
-@@ -177,6 +111,36 @@ static const struct irq_domain_ops txgbe_misc_irq_domain_ops = {
- };
- 
- static irqreturn_t txgbe_misc_irq_handle(int irq, void *data)
-+{
-+	struct wx_q_vector *q_vector;
-+	struct txgbe *txgbe = data;
-+	struct wx *wx = txgbe->wx;
-+	u32 eicr;
-+
-+	if (wx->pdev->msix_enabled)
-+		return IRQ_WAKE_THREAD;
-+
-+	eicr = wx_misc_isb(wx, WX_ISB_VEC0);
-+	if (!eicr) {
-+		/* shared interrupt alert!
-+		 * the interrupt that we masked before the ICR read.
-+		 */
-+		if (netif_running(wx->netdev))
-+			txgbe_irq_enable(wx, true);
-+		return IRQ_NONE;        /* Not our interrupt */
-+	}
-+	wx->isb_mem[WX_ISB_VEC0] = 0;
-+	if (!(wx->pdev->msi_enabled))
-+		wr32(wx, WX_PX_INTA, 1);
-+
-+	/* would disable interrupts here but it is auto disabled */
-+	q_vector = wx->q_vector[0];
-+	napi_schedule_irqoff(&q_vector->napi);
-+
-+	return IRQ_WAKE_THREAD;
-+}
-+
-+static irqreturn_t txgbe_misc_irq_thread_fn(int irq, void *data)
- {
- 	struct txgbe *txgbe = data;
- 	struct wx *wx = txgbe->wx;
-@@ -223,6 +187,7 @@ void txgbe_free_misc_irq(struct txgbe *txgbe)
- 
- int txgbe_setup_misc_irq(struct txgbe *txgbe)
- {
-+	unsigned long flags = IRQF_ONESHOT;
- 	struct wx *wx = txgbe->wx;
- 	int hwirq, err;
- 
-@@ -236,14 +201,17 @@ int txgbe_setup_misc_irq(struct txgbe *txgbe)
- 		irq_create_mapping(txgbe->misc.domain, hwirq);
- 
- 	txgbe->misc.chip = txgbe_irq_chip;
--	if (wx->pdev->msix_enabled)
-+	if (wx->pdev->msix_enabled) {
- 		txgbe->misc.irq = wx->msix_entry->vector;
--	else
-+	} else {
- 		txgbe->misc.irq = wx->pdev->irq;
-+		if (!wx->pdev->msi_enabled)
-+			flags |= IRQF_SHARED;
-+	}
- 
--	err = request_threaded_irq(txgbe->misc.irq, NULL,
--				   txgbe_misc_irq_handle,
--				   IRQF_ONESHOT,
-+	err = request_threaded_irq(txgbe->misc.irq, txgbe_misc_irq_handle,
-+				   txgbe_misc_irq_thread_fn,
-+				   flags,
- 				   wx->netdev->name, txgbe);
- 	if (err)
- 		goto del_misc_irq;
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.h
-index b77945e7a0f2..e6285b94625e 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.h
-@@ -2,6 +2,6 @@
- /* Copyright (c) 2015 - 2024 Beijing WangXun Technology Co., Ltd. */
- 
- void txgbe_irq_enable(struct wx *wx, bool queues);
--int txgbe_request_irq(struct wx *wx);
-+int txgbe_request_queue_irqs(struct wx *wx);
- void txgbe_free_misc_irq(struct txgbe *txgbe);
- int txgbe_setup_misc_irq(struct txgbe *txgbe);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 8c7a74981b90..92c1fae826d0 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -294,7 +294,7 @@ static int txgbe_open(struct net_device *netdev)
- 
- 	wx_configure(wx);
- 
--	err = txgbe_request_irq(wx);
-+	err = txgbe_request_queue_irqs(wx);
- 	if (err)
- 		goto err_free_isb;
- 
-@@ -729,6 +729,7 @@ static void txgbe_remove(struct pci_dev *pdev)
- 
- 	txgbe_remove_phy(txgbe);
- 	txgbe_free_misc_irq(txgbe);
-+	wx_free_isb_resources(wx);
- 
- 	pci_release_selected_regions(pdev,
- 				     pci_select_bars(pdev, IORESOURCE_MEM));
--- 
-2.27.0
+On 20.06.2024 14:20:53, Marc Kleine-Budde wrote:
+> On 07.06.2024 12:26:13, Vincent MAILHOL wrote:
+> > Hi Krzysztof,
+> >=20
+> > On Thu. 6 Jun. 2024 =C3=A0 23:24, Krzysztof Kozlowski
+> > <krzysztof.kozlowski@linaro.org> wrote:
+> > > Use spi_get_device_match_data() helper to simplify a bit the driver.
+> >=20
+> > Thanks for this clean up.
+> >=20
+> > > Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> > > ---
+> > >  drivers/net/can/spi/hi311x.c | 7 +------
+> > >  1 file changed, 1 insertion(+), 6 deletions(-)
+> > >
+> > > diff --git a/drivers/net/can/spi/hi311x.c b/drivers/net/can/spi/hi311=
+x.c
+> > > index e1b8533a602e..5d2c80f05611 100644
+> > > --- a/drivers/net/can/spi/hi311x.c
+> > > +++ b/drivers/net/can/spi/hi311x.c
+> > > @@ -830,7 +830,6 @@ static int hi3110_can_probe(struct spi_device *sp=
+i)
+> > >         struct device *dev =3D &spi->dev;
+> > >         struct net_device *net;
+> > >         struct hi3110_priv *priv;
+> > > -       const void *match;
+> > >         struct clk *clk;
+> > >         u32 freq;
+> > >         int ret;
+> > > @@ -874,11 +873,7 @@ static int hi3110_can_probe(struct spi_device *s=
+pi)
+> > >                 CAN_CTRLMODE_LISTENONLY |
+> > >                 CAN_CTRLMODE_BERR_REPORTING;
+> > >
+> > > -       match =3D device_get_match_data(dev);
+> > > -       if (match)
+> > > -               priv->model =3D (enum hi3110_model)(uintptr_t)match;
+> > > -       else
+> > > -               priv->model =3D spi_get_device_id(spi)->driver_data;
+> > > +       priv->model =3D (enum hi3110_model)spi_get_device_match_data(=
+spi);
+> >=20
+> > Here, you are dropping the (uintptr_t) cast. Casting a pointer to an
+> > enum type can trigger a zealous -Wvoid-pointer-to-enum-cast clang
+> > warning, and the (uintptr_t) cast is the defacto standard to silence
+> > such warnings, thus the double (enum hi3110_model)(uintptr_t) cast in
+> > the initial version.
+>=20
+> I've re-added the intermediate cast to uintptr_t while applying.
 
+Applied to linux-can-next.
+
+Thanks,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--3fzhuwpr2zgg6io2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmZ1OjYACgkQKDiiPnot
+vG/mvAf/UQfjSS72xhzUs9lqPAYliU4GWM5QC3Mcs01H58Ix9759WcwalU3xHBt1
+PjAmmq3Z8ZPKa9RMw/THr4CJNw4FYgxmLSlwqem5YmHAy0PnfkqxwfhH7SNJqmnR
+pxzA+0J1RdjEGmRtLeYNDnYFoxSMsxcvRnHtyslizFiwsrt0nMAxRih605msWm8i
+E+KsAuObomJAXHB7t57t/64qf0ifsE9K8qlFdLkBEH1z99QyOSqO6uyHOB1X48jd
+Czl/yX2QCpq+kyRzX9i+GsZ+YeU0IEjzU1Tm4hSN2HiR4MHcaW0sWFwxAFbeJXsP
+zcAs+cO2b/Mk1Q8+fK0ncI0oaf4M4Q==
+=PrVV
+-----END PGP SIGNATURE-----
+
+--3fzhuwpr2zgg6io2--
 
