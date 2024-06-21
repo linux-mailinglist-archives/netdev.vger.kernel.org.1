@@ -1,124 +1,119 @@
-Return-Path: <netdev+bounces-105598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0908F911ED8
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:33:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B938911ED9
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:33:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39CA91C22C7B
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 08:33:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4811280551
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 08:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 958E116D9AD;
-	Fri, 21 Jun 2024 08:32:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7631B15A49F;
+	Fri, 21 Jun 2024 08:32:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PqWcslt9"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6685416D4EF
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 08:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C560116C876
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 08:32:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718958768; cv=none; b=VNavdHgybi4fNHkD624issz9Q+GyOCWZOkGh+O7xXHUznBCtSods/5kd00Zt0sIDUmHYHXxJr6y7CLIzFE0bGp91U/wPFWvF9F+KKd+RgwbYQNwIGJiDCbo4tJxFI9gnDs4CIwNTJCd3DX41fjP4F3VwVpa8ha3KIHC6nIsV4Ps=
+	t=1718958779; cv=none; b=gOAxxEzxyQprz+hS9HPThgDQLzseow8t4ERIcF7a5gmpOd0RUi/1aXKoMciTPviPI+qCkFMpUKT84jgHI0bOUOy7Mp4Xu13uo/D+OjadwIaf6ITQX/J09Ttimw6AUCKVgEC80yuCk6YRfycA9axKkbxfmkOGICLxog9XXU7TxAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718958768; c=relaxed/simple;
-	bh=daS9aJZhTJcgfHTDrztn2JUHLiLIJqNzJdBuv8HUVGk=;
+	s=arc-20240116; t=1718958779; c=relaxed/simple;
+	bh=tG3znAHJZM4syAITgmLtvLwPZFfOlDJ4SI8GkZB4rtk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tu8+QUJ/qFKOoEVrqekhdAgCkP7rvBbND28A5sRvR5EQVQCuPep7cnT/v7HozKsqhYxvzBRebpeI4o0PlQ7psGC8tPSC7WgIMgtsGCooiIGj3Xl74KzHQJLh5gbIAYQhsnDI9sDsTCAPn09VDxBn3lfRCMTKBXXpwAsuekIWAY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sKZh8-0000Pr-Gp; Fri, 21 Jun 2024 10:32:30 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sKZh7-003ttA-3V; Fri, 21 Jun 2024 10:32:29 +0200
-Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id CFC342EE57F;
-	Fri, 21 Jun 2024 08:32:28 +0000 (UTC)
-Date: Fri, 21 Jun 2024 10:32:28 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Martin =?utf-8?Q?Hundeb=C3=B8ll?= <martin@geanix.com>
-Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Markus Schneider-Pargmann <msp@baylibre.com>, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] can: m_can: don't enable transceiver when probing
-Message-ID: <20240621-magic-slick-tarsier-5c4d86-mkl@pengutronix.de>
-References: <20240607105210.155435-1-martin@geanix.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=joD3v037zNUqmhH0nTO94tEA6B0Oxw3RWanAC8wjQY8p9XYIo0IzZ4Mjph0x6z2FEbcA0JejJsquBiZz9di+iLpdoXrtlsbfJN6OzLouZsEim8GxpPPRXJGug+58LUzJNhm+vOYgUvA9iVfUjvnFO26sXtJdC2melNYrQXwTuus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PqWcslt9; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-36279cf6414so1418977f8f.3
+        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 01:32:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718958776; x=1719563576; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PsQqZfmZnF7G5pXEgIPTwwy6YUhi81BmkWZvX7no8rA=;
+        b=PqWcslt9qJIutVX75EcX5GZgGbcnEq650dk1N7pq+sQUy303O8yRmnPokJH4KO7wdu
+         OeNxQAoVDe0kyf9PhTmXT6nq9dOCzDJNkGOgSzrkLe1mFc3LayV6rh39g2VUL+m60AHY
+         xw4aihTDB2cYciCJ+Cdvva2IUITXouwtEG2fiiUgM/CSDw8HNqObroXoEsnEojzLyOLw
+         bFBMnwjrF8f3BX+zL5LASx6VGXCMtB1oMBkvoVwU8OJCU+EovqPsPJxKdxKrlh1KPhkr
+         owBjA7v5zdBKt3WxFugXwmXCpzhwm8bhAbrhImJjTCis1LihUu++KeZqy8gcnbwnvGvb
+         s8mA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718958776; x=1719563576;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PsQqZfmZnF7G5pXEgIPTwwy6YUhi81BmkWZvX7no8rA=;
+        b=X518nLhwwQ/V5cmhOAah10umxkpi2d4ecG5LBvkPiks0DlK+OonxcTtZfUv2hNWHB0
+         XHSlLB+KXQSSDG7ZFdQsElJIHCZMufGn7LRPvucGI4FYZAAcL1BhNvn1dwBfRY3x3mHI
+         fYWGEgzP+ajsJLqTCFEa+/9kYJ5PLjILLCQ3K7QMJXRwsHx1TaMiFIgJcrd3FUv8Mmku
+         ISzbvQdlp6fWJxFw1viLoyxDV0xO8DM45V/vE1bSNkt+Un5v5C6NzMncG6s29P3xSkEh
+         I3R/8TPuz74LXqnDIvdvyIB/4rUXrxkXRjQ313DUzvkO50IiXkRW7nvRBOAmnUNfxfm3
+         rBNQ==
+X-Gm-Message-State: AOJu0YyDmqvkGrb5mLDegDWZ7gzbjkEjWT4L2pKC6GPLfxekJNEFjooA
+	rmL/I2tiU8ldG3a3hgOZeXTXSnbJyK6uUsk3JHVLV3mBT3KHz2eE
+X-Google-Smtp-Source: AGHT+IHhKDaRZLGVoI9kOxCogvbN7IO+pGCZVe1/ZUc2jibYg5czElZ/zSUDB9+G1Xnjdd6WriAD/w==
+X-Received: by 2002:adf:e443:0:b0:362:9888:c37 with SMTP id ffacd0b85a97d-36317b82b6emr5423426f8f.35.1718958775726;
+        Fri, 21 Jun 2024 01:32:55 -0700 (PDT)
+Received: from localhost ([81.168.73.77])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36676e11337sm713462f8f.1.2024.06.21.01.32.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jun 2024 01:32:55 -0700 (PDT)
+Date: Fri, 21 Jun 2024 09:32:54 +0100
+From: Martin Habets <habetsm.xilinx@gmail.com>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com, brett.creeley@amd.com,
+	drivers@pensando.io
+Subject: Re: [PATCH net] net: remove drivers@pensando.io from MAINTAINERS
+Message-ID: <20240621083154.GA40356@gmail.com>
+Mail-Followup-To: Shannon Nelson <shannon.nelson@amd.com>,
+	netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com, brett.creeley@amd.com,
+	drivers@pensando.io
+References: <20240620215257.34275-1-shannon.nelson@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="dr4sgbc4ol5qlmml"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240607105210.155435-1-martin@geanix.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20240620215257.34275-1-shannon.nelson@amd.com>
 
+On Thu, Jun 20, 2024 at 02:52:57PM -0700, Shannon Nelson wrote:
+> Our corporate overlords have been changing the domains around
+> again and this mailing list has gone away.
+> 
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 
---dr4sgbc4ol5qlmml
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
 
-On 07.06.2024 12:52:08, Martin Hundeb=C3=B8ll wrote:
-> The m_can driver sets and clears the CCCR.INIT bit during probe (both
-> when testing the NON-ISO bit, and when configuring the chip). After
-> clearing the CCCR.INIT bit, the transceiver enters normal mode, where it
-> affects the CAN bus (i.e. it ACKs frames). This can cause troubles when
-> the m_can node is only used for monitoring the bus, as one cannot setup
-> listen-only mode before the device is probed.
->=20
-> Rework the probe flow, so that the CCCR.INIT bit is only cleared when
-> upping the device. First, the tcan4x5x driver is changed to stay in
-> standby mode during/after probe. This in turn requires changes when
-> setting bits in the CCCR register, as its CSR and CSA bits are always
-> high in standby mode.
->=20
-> Signed-off-by: Martin Hundeb=C3=B8ll <martin@geanix.com>
-
-Applied to linux-can-next.
-
-Thanks,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---dr4sgbc4ol5qlmml
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmZ1OpkACgkQKDiiPnot
-vG/4TAgAmLUazXAa8AZVzXY39Anxi7BZb29Xo7lZfvw3pNPLCdv9kxblG6K/R0GB
-XFZ8q1VJzmNohbONojvo8ybg2/qzI1Tg4TmrMMpjFivcw2qpGGx4ltM4DUCccT3Y
-+JxdtVwqKx+rJM4aNgXxfSsdlAlGv7lX5EW0RUY5zb9Y60ENEwqe9UCrWKRR04p8
-1JhOG9Dv4PBaXsvOBn2ZmRIg39F6lbl3A6z1qFHQw6KV2T5voMpFGrgvpcAntwVJ
-mihMhm0sMPOEqEKQ30SoKVs87Vyt1Vb7ym/0KGusEFGY9plmfw5P2rreOKLFmMkJ
-VhwjsniE10gXIuenWguXkAPVQLEfLw==
-=kv+C
------END PGP SIGNATURE-----
-
---dr4sgbc4ol5qlmml--
+> ---
+>  MAINTAINERS | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 10ecbf192ebb..1139b1240225 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -17532,7 +17532,6 @@ F:	include/linux/peci.h
+>  PENSANDO ETHERNET DRIVERS
+>  M:	Shannon Nelson <shannon.nelson@amd.com>
+>  M:	Brett Creeley <brett.creeley@amd.com>
+> -M:	drivers@pensando.io
+>  L:	netdev@vger.kernel.org
+>  S:	Supported
+>  F:	Documentation/networking/device_drivers/ethernet/pensando/ionic.rst
+> -- 
+> 2.17.1
+> 
 
