@@ -1,168 +1,175 @@
-Return-Path: <netdev+bounces-105714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA1A7912675
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:13:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13CEF912632
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:00:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFD07B21496
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 13:13:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C077728AABF
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 13:00:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29803155325;
-	Fri, 21 Jun 2024 13:13:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F13C15531C;
+	Fri, 21 Jun 2024 12:59:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="WweC6dPU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sPDyeK4C"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A07915444C;
-	Fri, 21 Jun 2024 13:13:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7989215444C
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 12:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718975616; cv=none; b=h3zPKd3KZYl4ESdqwUZVgMRwoLq4C5UVxAULJSlTB+9dj7UHYlfSFa3ImHL0696yXyD+TRLE3lNY2+pCeBdPizKVeXB9XNUWsEZf8CM9rE96O8vfVwAUYv1hfA652fn/t+i79w9na9ZM7R6Ivff+hVeoFvbw0x1vcGE9W1eSuGc=
+	t=1718974784; cv=none; b=aWWlA3JjHL7m73U8dZzCXPm7H7HAiMm+A9h9ZQH5YTTdlZ758FSE5QNn0ZxQBM3FPykS208n6AQ8zAeMZY4j4yX7dgNsKWo82gRRdWQTrEqZkSl0WQXkRx73ydXJ+rBe9FHDH9RI5rJG0HPIS0UhV3qC8ewW/jSMtyTZ3quLTOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718975616; c=relaxed/simple;
-	bh=WQsisy3R83VOdcBN5ISga9KLt1DhdQDaVlt49Nw2AZE=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=aSefwhVd0rNGhuinUqMUrUFSLtArN477fDcYsSZNJnFLOCltZsZ7CEfiJt7Ywhx+FoeS9pg6gtz4Tp3FMKBHmWid6C7I8CP9DpbaVvRH13ZfpjU6euIcElKU2UwRJ/4aZjP2S9WM/OwsgRD+D0DTbAN3UEsAjKuEJSb2QAB3x6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=WweC6dPU; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=b29xoMgpaZYss8C1W6FlfyXZaKncrRZNVZcstAF/Ncg=; b=WweC6dPUYHi8DEVygI3BSkBQmQ
-	Ae7doyUsfR9TzH6E1g77VsjyTNxEYnc0nDKgESK1+avBGUYJz9RRo3yxsk2lZBbrVyp5ZzAHLTOOt
-	WC5dLrl4TLmItYcrp1oQ3shB3jZCmoo45ZyT2C+BXSqoSraTgs1fuWJh1+X4u/MqYoVNtmrnRW0VP
-	ANCq0ruG86bxmleHhW6s4BqhtRhwomsYZAMdRM3osz/Y/TTjoTJn3cHn2q4QuvQ0SqrBH3aibM7NP
-	oEnLSzpI7FlrXZAU1za2Ixd48OJ2PGCA/0b4SncUWvLFM4p6L1ixyc8a+7TDnYyQraZGgaZNkxP3P
-	DxMpAong==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sKdg7-0003iB-W7; Fri, 21 Jun 2024 14:47:44 +0200
-Received: from [178.197.248.18] (helo=linux.home)
-	by sslproxy02.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sKdg7-000Kcg-0M;
-	Fri, 21 Jun 2024 14:47:42 +0200
-Subject: Re: [RFC net-next 1/9] skb: introduce gro_disabled bit
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Willem de Bruijn <willemb@google.com>, Simon Horman <horms@kernel.org>,
- Florian Westphal <fw@strlen.de>, Mina Almasry <almasrymina@google.com>,
- Abhishek Chauhan <quic_abchauha@quicinc.com>,
- David Howells <dhowells@redhat.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- David Ahern <dsahern@kernel.org>, Richard Gobert <richardbgobert@gmail.com>,
- Antoine Tenart <atenart@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- Soheil Hassas Yeganeh <soheil@google.com>,
- Pavel Begunkov <asml.silence@gmail.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- =?UTF-8?Q?Thomas_Wei=c3=9fschuh?= <linux@weissschuh.net>,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <cover.1718919473.git.yan@cloudflare.com>
- <b8c183a24285c2ab30c51622f4f9eff8f7a4752f.1718919473.git.yan@cloudflare.com>
- <66756ed3f2192_2e64f929491@willemb.c.googlers.com.notmuch>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <44ac34f6-c78e-16dd-14da-15d729fecb5b@iogearbox.net>
-Date: Fri, 21 Jun 2024 14:47:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1718974784; c=relaxed/simple;
+	bh=RQZU1MuYAm2lr4cI0F5mPSRJBUBEkLfT22Ka5vxkmak=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y0cSni2COpEOeRtVchPAjHATF+ZPYGXe7vDbjySZ15S9NYFS3W/cRoAySZ9HXywrwpuebar9UlmbZ1waKOdci0bDPIKAMwKqyFV7p8IZiFTIDkFgAFXXBICMSk82MG/UmQKv0h13obsTqbYBedNiNrqvIS8vAxLmEa0vxq9quWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sPDyeK4C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB0FAC4AF09;
+	Fri, 21 Jun 2024 12:59:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718974784;
+	bh=RQZU1MuYAm2lr4cI0F5mPSRJBUBEkLfT22Ka5vxkmak=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sPDyeK4CPnftzjJ0crm4owGVDnzpI+u5LHugndhEZkUwXI0JPWqv2td4bJXcqjwTk
+	 RWT3a9jRwy3GMwrIvw6mQ0nRBabCFPXn4JIm2b/F0RptxTn6MggKc1TMhnMvZ98GKh
+	 UzKb1iEpSCugkd2rjlZTV5Hs0rl07V9iINZ4VBQLA9T8pG/d1mugDR0zqsNo/ZtWeq
+	 SAFwZGlRTe9A+Yt+F3alzHEHkWUJkZ+afueGVfmpjeClVL+c7wygIiSAJzpXyA/EUy
+	 wZ2c0HGM+eLg6LURslNnlBfGcSc4Up6xPIstWrr0cH/rgRwgaejh3okM3DIuabIBmz
+	 vgLqj9Fa/LQ5w==
+Date: Fri, 21 Jun 2024 13:59:40 +0100
+From: Simon Horman <horms@kernel.org>
+To: James Chapman <jchapman@katalix.com>
+Cc: netdev@vger.kernel.org, gnault@redhat.com, samuel.thibault@ens-lyon.org,
+	ridge.kennedy@alliedtelesis.co.nz
+Subject: Re: [PATCH net-next 2/8] l2tp: store l2tpv3 sessions in per-net IDR
+Message-ID: <20240621125940.GE1098275@kernel.org>
+References: <cover.1718877398.git.jchapman@katalix.com>
+ <22cdf8d419a6757be449cbeb5b69203d3bb3d2dd.1718877398.git.jchapman@katalix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <66756ed3f2192_2e64f929491@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27313/Fri Jun 21 10:28:08 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <22cdf8d419a6757be449cbeb5b69203d3bb3d2dd.1718877398.git.jchapman@katalix.com>
 
-On 6/21/24 2:15 PM, Willem de Bruijn wrote:
-> Yan Zhai wrote:
->> Software GRO is currently controlled by a single switch, i.e.
->>
->>    ethtool -K dev gro on|off
->>
->> However, this is not always desired. When GRO is enabled, even if the
->> kernel cannot GRO certain traffic, it has to run through the GRO receive
->> handlers with no benefit.
->>
->> There are also scenarios that turning off GRO is a requirement. For
->> example, our production environment has a scenario that a TC egress hook
->> may add multiple encapsulation headers to forwarded skbs for load
->> balancing and isolation purpose. The encapsulation is implemented via
->> BPF. But the problem arises then: there is no way to properly offload a
->> double-encapsulated packet, since skb only has network_header and
->> inner_network_header to track one layer of encapsulation, but not two.
->> On the other hand, not all the traffic through this device needs double
->> encapsulation. But we have to turn off GRO completely for any ingress
->> device as a result.
->>
->> Introduce a bit on skb so that GRO engine can be notified to skip GRO on
->> this skb, rather than having to be 0-or-1 for all traffic.
->>
->> Signed-off-by: Yan Zhai <yan@cloudflare.com>
->> ---
->>   include/linux/netdevice.h |  9 +++++++--
->>   include/linux/skbuff.h    | 10 ++++++++++
->>   net/Kconfig               | 10 ++++++++++
->>   net/core/gro.c            |  2 +-
->>   net/core/gro_cells.c      |  2 +-
->>   net/core/skbuff.c         |  4 ++++
->>   6 files changed, 33 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
->> index c83b390191d4..2ca0870b1221 100644
->> --- a/include/linux/netdevice.h
->> +++ b/include/linux/netdevice.h
->> @@ -2415,11 +2415,16 @@ struct net_device {
->>   	((dev)->devlink_port = (port));				\
->>   })
->>   
->> -static inline bool netif_elide_gro(const struct net_device *dev)
->> +static inline bool netif_elide_gro(const struct sk_buff *skb)
->>   {
->> -	if (!(dev->features & NETIF_F_GRO) || dev->xdp_prog)
->> +	if (!(skb->dev->features & NETIF_F_GRO) || skb->dev->xdp_prog)
->>   		return true;
->> +
->> +#ifdef CONFIG_SKB_GRO_CONTROL
->> +	return skb->gro_disabled;
->> +#else
->>   	return false;
->> +#endif
+On Thu, Jun 20, 2024 at 12:22:38PM +0100, James Chapman wrote:
+> L2TPv3 sessions are currently held in one of two fixed-size hash
+> lists: either a per-net hashlist (IP-encap), or a per-tunnel hashlist
+> (UDP-encap), keyed by the L2TPv3 32-bit session_id.
 > 
-> Yet more branches in the hot path.
+> In order to lookup L2TPv3 sessions in UDP-encap tunnels efficiently
+> without finding the tunnel first via sk_user_data, UDP sessions are
+> now kept in a per-net session list, keyed by session ID. Convert the
+> existing per-net hashlist to use an IDR for better performance when
+> there are many sessions and have L2TPv3 UDP sessions use the same IDR.
 > 
-> Compile time configurability does not help, as that will be
-> enabled by distros.
+> Although the L2TPv3 RFC states that the session ID alone identifies
+> the session, our implementation has allowed the same session ID to be
+> used in different L2TP UDP tunnels. To retain support for this, a new
+> per-net session hashtable is used, keyed by the sock and session
+> ID. If on creating a new session, a session already exists with that
+> ID in the IDR, the colliding sessions are added to the new hashtable
+> and the existing IDR entry is flagged. When looking up sessions, the
+> approach is to first check the IDR and if no unflagged match is found,
+> check the new hashtable. The sock is made available to session getters
+> where session ID collisions are to be considered. In this way, the new
+> hashtable is used only for session ID collisions so can be kept small.
 > 
-> For a fairly niche use case. Where functionality of GRO already
-> works. So just a performance for a very rare case at the cost of a
-> regression in the common case. A small regression perhaps, but death
-> by a thousand cuts.
+> For managing session removal, we need a list of colliding sessions
+> matching a given ID in order to update or remove the IDR entry of the
+> ID. This is necessary to detect session ID collisions when future
+> sessions are created. The list head is allocated on first collision
+> of a given ID and refcounted.
+> 
+> Signed-off-by: James Chapman <jchapman@katalix.com>
+> Reviewed-by: Tom Parkin <tparkin@katalix.com>
 
-Mentioning it here b/c it perhaps fits in this context, longer time ago
-there was the idea mentioned to have BPF operating as GRO engine which
-might also help to reduce attack surface by only having to handle packets
-of interest for the concrete production use case. Perhaps here meta data
-buffer could be used to pass a notification from XDP to exit early w/o
-aggregation.
+...
+
+> @@ -358,39 +460,45 @@ int l2tp_session_register(struct l2tp_session *session,
+>  		}
+>  
+>  	if (tunnel->version == L2TP_HDR_VER_3) {
+> -		pn = l2tp_pernet(tunnel->l2tp_net);
+> -		g_head = l2tp_session_id_hash_2(pn, session->session_id);
+> -
+> -		spin_lock_bh(&pn->l2tp_session_hlist_lock);
+> -
+> +		session_key = session->session_id;
+> +		spin_lock_bh(&pn->l2tp_session_idr_lock);
+> +		err = idr_alloc_u32(&pn->l2tp_v3_session_idr, NULL,
+> +				    &session_key, session_key, GFP_ATOMIC);
+>  		/* IP encap expects session IDs to be globally unique, while
+> -		 * UDP encap doesn't.
+> +		 * UDP encap doesn't. This isn't per the RFC, which says that
+> +		 * sessions are identified only by the session ID, but is to
+> +		 * support existing userspace which depends on it.
+>  		 */
+> -		hlist_for_each_entry(session_walk, g_head, global_hlist)
+> -			if (session_walk->session_id == session->session_id &&
+> -			    (session_walk->tunnel->encap == L2TP_ENCAPTYPE_IP ||
+> -			     tunnel->encap == L2TP_ENCAPTYPE_IP)) {
+> -				err = -EEXIST;
+> -				goto err_tlock_pnlock;
+> -			}
+> +		if (err == -ENOSPC && tunnel->encap == L2TP_ENCAPTYPE_UDP) {
+> +			struct l2tp_session *session2;
+>  
+> -		l2tp_tunnel_inc_refcount(tunnel);
+> -		hlist_add_head_rcu(&session->global_hlist, g_head);
+> -
+> -		spin_unlock_bh(&pn->l2tp_session_hlist_lock);
+> -	} else {
+> -		l2tp_tunnel_inc_refcount(tunnel);
+> +			session2 = idr_find(&pn->l2tp_v3_session_idr,
+> +					    session_key);
+> +			err = l2tp_session_collision_add(pn, session, session2);
+> +		}
+> +		spin_unlock_bh(&pn->l2tp_session_idr_lock);
+> +		if (err == -ENOSPC)
+> +			err = -EEXIST;
+>  	}
+>  
+
+Hi James,
+
+I believe that when the if condition above is false, then err will be
+uninitialised here.
+
+If so, as this series seems to have been applied,
+could you provide a follow-up to address this?
+
+> +	if (err)
+> +		goto err_tlock;
+> +
+> +	l2tp_tunnel_inc_refcount(tunnel);
+> +
+>  	hlist_add_head_rcu(&session->hlist, head);
+>  	spin_unlock_bh(&tunnel->hlist_lock);
+>  
+> +	if (tunnel->version == L2TP_HDR_VER_3) {
+> +		spin_lock_bh(&pn->l2tp_session_idr_lock);
+> +		idr_replace(&pn->l2tp_v3_session_idr, session, session_key);
+> +		spin_unlock_bh(&pn->l2tp_session_idr_lock);
+> +	}
+> +
+>  	trace_register_session(session);
+>  
+>  	return 0;
+>  
+> -err_tlock_pnlock:
+> -	spin_unlock_bh(&pn->l2tp_session_hlist_lock);
+>  err_tlock:
+>  	spin_unlock_bh(&tunnel->hlist_lock);
+>  
+
+...
 
