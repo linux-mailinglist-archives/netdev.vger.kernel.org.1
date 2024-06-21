@@ -1,118 +1,158 @@
-Return-Path: <netdev+bounces-105708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FAA491254F
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 14:31:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 03FFF91258C
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 14:37:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B2BF1F21C00
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:31:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0AAB1F24504
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:37:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB2CC14F135;
-	Fri, 21 Jun 2024 12:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C469C1553B9;
+	Fri, 21 Jun 2024 12:35:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FOChEhXl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JBdmyQhq"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0555E219F9;
-	Fri, 21 Jun 2024 12:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6F61553BF
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 12:35:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718973055; cv=none; b=oSj1yDzacpFQakqQPEDbjrLraJqU2sLtS7A0GCY2KAydPZNJ7ROwxK3wCoj6gbry0buGqaD0On/HqjMi705r3H2CRN+TL0SGZvhRuEZNU4gBEM33uGBwASdZeZr2BJ7oDRzPfrT+cPjGx9gju3WKlUgdD0JCTg6vPBi3c265sE8=
+	t=1718973324; cv=none; b=F7TgqMkjoFXhYmqJm/fUHoR3fiTvPp9lChh+wKvHmngsh2itsy2zy9w1jJ7Rz3z/KOYAQFIMZBO4uQHiaBsMVdKBsTRd+XdwT8phfQcW53zNpwmWtVHwl2NkoaBYzDMjZfX8kBTExhjb4pwaDytFOVVivXRjnqoS7MVOLD9LcFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718973055; c=relaxed/simple;
-	bh=MDf/S7p9nxc7jxIb4VHeMj74saNKIvIpDEbm4gVOuPE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fsgG5MxOwdM0BeLQIuGbS8QbHO/YIroTrhj08K8rGdKxPjyj4f+M91jWnpaUa60hbVSZnmRbECp5p42OkhJH2nJsu1FZEpQqBnPAWs+uIQI8zZ4/GMuh1OocJBWyD8RhFkahT+HpF5ofpWTRw1QVGMAqqDpvUkL6fGthFvKQXAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FOChEhXl; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=2qIXFrmiML0W+NIuVWwtNy9ypBaWgCdJ6JhYw4WxT+c=; b=FOChEhXl/kUHw8ezMzLSyhvkAq
-	00m2SlvQC3yodPkRjKTawrWAEJVxet5KG81Du9E4Ih553hkJlXUn0b7xTbJTxapZtro8roqsj/rvJ
-	qjvdboYA8veyR2G21DGJ2l/omqXcgBubbVkTzutB24E72VKV7tuZXt7kTAcSrRy2njCzTFOk+u+Z6
-	paam7ODO5+Bac4vCjYf0c6fN38MxstxK4wmYWq02EXaeRHf+B0EHCocW2dgD9TD0MrISrlnl9MOdl
-	Of7Emrocfnwk1ZWbXyEf2ykJVRqcet+tIXDh/mSNqr/6l7a64tn59vFhGqAdISh2V2hGZOp84WVGD
-	icz/H05g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47448)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sKdPb-0003us-0J;
-	Fri, 21 Jun 2024 13:30:39 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sKdPd-00007R-JP; Fri, 21 Jun 2024 13:30:41 +0100
-Date: Fri, 21 Jun 2024 13:30:41 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: =?iso-8859-1?B?Q3Pza+Fz?= Bence <csokas.bence@prolan.hu>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
-	trivial@kernel.org, Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH v2 resub 1/2] net: include: mii: Refactor: Define LPA_*
- in terms of ADVERTISE_*
-Message-ID: <ZnVycQASAhN2Shfu@shell.armlinux.org.uk>
-References: <20240619124622.2798613-1-csokas.bence@prolan.hu>
- <c82256a5-6385-4205-ba74-ab102396abb6@lunn.ch>
- <f216c0b9-3d0d-4d4c-aa33-ba02b0722052@prolan.hu>
+	s=arc-20240116; t=1718973324; c=relaxed/simple;
+	bh=F1ll4sOIvCBXD+ONg7YMytT6dGxSUcFFkrx7rbA2UqE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GRJqZnH6pBZzma8ZH8rxohGAnb771xLgpLuQwuTbHfWpoVC1CzoIjOSUt0SNhdEKxF9wew7iTE8J6oG26ef3OpIpC4aCcAclb4hjkHjQAjumT03ILFvTtXkzqxaI+pYTUqrU8xBLwf+ojYQdhjhud+i46fWLbh3DpW7AYJNhE5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JBdmyQhq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718973322;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DUOo6pncrLLfVNELGwFTwFChqLBk3YLyQi1FlWq0WU8=;
+	b=JBdmyQhqysWnsm48Y9usOGtgoB5QjhywOuSWqrF6qHrRzuTeNffogSHne1IcH8CvjhX+u/
+	nWAeZG7j4wk932QAjAR3HHAzO5/GkmuSV7ZYaBkKuobQ6HeKCa04L9k8r4DcFc+DT8e88j
+	eM3dUHTK2igYrUm+LTAihen5sTlbo68=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-672-FqgoZRxVMmuYt1esVy2mgQ-1; Fri, 21 Jun 2024 08:35:19 -0400
+X-MC-Unique: FqgoZRxVMmuYt1esVy2mgQ-1
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-63c88ec6b76so33616047b3.2
+        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 05:35:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718973318; x=1719578118;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DUOo6pncrLLfVNELGwFTwFChqLBk3YLyQi1FlWq0WU8=;
+        b=mpj4PUrLfGchIbFIlkx2Q7z2SbMwwYhh2/KB1mTWXTIADetbB23zcHyjCHKqyfAfMs
+         ylguDV4yJCZBg+oi8+OQm7a9Fd1pxYotQCSYkazGXYWb8xAwzYb2fEMaYEdsZ+/UMZTH
+         qPNTmGwf/vhNxDZBytgS/flVeVYd04RXYvvhqIKsoAvq4I7NJa9oVN23GmkWc2EEp7FY
+         8jXPwu/z+HfhI4iNMBD9vUiaFMuBWKl05gQ9MLSB+WI3fi6yLrq0k0ZrYtWWulV9C1vv
+         bcs4hNBg3dGd8wWBB3LB8IO+g5VLUbClWL8gMjAVA437Y8KqVICqF6F5a69+JirKNs3U
+         9/Ow==
+X-Forwarded-Encrypted: i=1; AJvYcCVbp2j8Ij5d5ZDbDSEoXbhIGPIsgfOkR9604640q+jsAGy5fnVkSDSdHj+ChujBEzBA38QP46TQ8xSHwx30Lj8d4cPnNTF/
+X-Gm-Message-State: AOJu0Yx4kkdMCvVsTaHGYJ4gAxuOkd0Z4k2XYamAn0K/kGVqDiSak7SG
+	cX5tVRNHvKAUnUfjF15U00x/pGJoJNIBvPhNMaUxBYUucDWiVNUxo6OTVkFnsnpFlb+hXOJf80P
+	vRY2qFfEvH96ccKmQwTwRDUtImIIbWehDXjIUfpgecp4Qs+8lM+DxvFzhhFxMs2nM6kSbwy767Q
+	xzp6v8CQZ6S7f6TN5JGzrkTha7lMjx
+X-Received: by 2002:a81:7282:0:b0:615:8c1:d7ec with SMTP id 00721157ae682-63a8f5243f4mr82320807b3.33.1718973318122;
+        Fri, 21 Jun 2024 05:35:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGg4AV3dsomq7cAZlPOVhXZ/8jwkZGHBKMxRoERWq1isJ0a7oog8UYUJOo3PkY6knHJsv8OaMe5ENGVL/P/agU=
+X-Received: by 2002:a81:7282:0:b0:615:8c1:d7ec with SMTP id
+ 00721157ae682-63a8f5243f4mr82320627b3.33.1718973317776; Fri, 21 Jun 2024
+ 05:35:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f216c0b9-3d0d-4d4c-aa33-ba02b0722052@prolan.hu>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <CAMENy5pb8ea+piKLg5q5yRTMZacQqYWAoVLE1FE9WhQPq92E0g@mail.gmail.com>
+ <5b64c89f-4127-4e8f-b795-3cec8e7350b4@kernel.org> <87wmmkn3mq.fsf@toke.dk> <ff571dcf-0375-6684-b188-5c1278cd50ce@iogearbox.net>
+In-Reply-To: <ff571dcf-0375-6684-b188-5c1278cd50ce@iogearbox.net>
+From: Samuel Dobron <sdobron@redhat.com>
+Date: Fri, 21 Jun 2024 14:35:06 +0200
+Message-ID: <CA+h3auMq5vnoyRLvJainG-AFA6f=ivRmu6RjKU4cBv_go975tw@mail.gmail.com>
+Subject: Re: XDP Performance Regression in recent kernel versions
+To: Daniel Borkmann <daniel@iogearbox.net>, hawk@kernel.org
+Cc: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Sebastiano Miano <mianosebastiano@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	saeedm@nvidia.com, tariqt@nvidia.com, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Jun 21, 2024 at 09:48:23AM +0200, Csókás Bence wrote:
-> Hi
-> 
-> On 6/20/24 21:07, Andrew Lunn wrote:
-> > On Wed, Jun 19, 2024 at 02:46:22PM +0200, Csókás, Bence wrote:
-> > > Ethernet specification mandates that these bits will be equal.
-> > > To reduce the amount of magix hex'es in the code, just define
-> > > them in terms of each other.
-> > 
-> > I have a quick email exchange with other PHY maintainers, and we
-> > agree. We will reject these changes, they are just churn and bring no
-> > real benefit.
-> > 
-> > NACK
-> > 
-> >      Andrew
-> > 
-> 
-> The benefit is that I don't have to constantly convert between "n-th bit
-> set" (which is how virtually all datasheets, specifications, documentation
-> etc. represent MII bits) and these hex values. In most places in the kernel,
-> register bits are already represented with BIT() et al., so why not here?
+Hey all,
 
-These are user API files, you can't use BIT() here (BIT() isn't defined
-for userspace header files.) Next, these are 'int's not 'longs' so
-using BIT() or _BITUL() could cause warnings - plus it changes the
-type of these definitions not only for kernel space but also user space.
-Thus, it's an API change.
+Yeah, we do tests for ELN kernels [1] on a regular basis. Since
+~January of this year.
 
-So no, we're not making changes to make this "more readable" at the
-expense of breaking the kernel's UAPI.
+As already mentioned, mlx5 is the only driver affected by this regression.
+Unfortunately, I think Jesper is actually hitting 2 regressions we noticed,
+the one already mentioned by Toke, another one [0] has been reported
+in early February.
+Btw. issue mentioned by Toke has been moved to Jira, see [5].
 
-Just get used to working with hex numbers like most of us had to do
-before BIT() was added to the kernel... it's not difficult, each hex
-digit is after all four binary bits. It's not like it's decimal.
+Not sure all of you are able to see the content of [0], Jira says it's
+RH-confidental.
+So, I am not sure how much I can share without being fired :D. Anyway,
+affected kernels have been released a while ago, so anyone can find it
+on its own.
+Basically, we detected 5% regression on XDP_DROP+mlx5 (currently, we
+don't have data for any other XDP mode) in kernel-5.14 compared to
+previous builds.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+From tests history, I can see (most likely) the same improvement
+on 6.10rc2 (from 15Mpps to 17-18Mpps), so I'd say 20% drop has been
+(partially) fixed?
+
+For earlier 6.10. kernels we don't have data due to [3] (there is regression on
+XDP_DROP as well, but I believe it's turbo-boost issue, as I mentioned
+in issue).
+So if you want to run tests on 6.10. please see [3].
+
+Summary XDP_DROP+mlx5@25G:
+kernel       pps
+<5.14        20.5M        baseline
+>=5.14      19M           [0]
+<6.4          19-20M      baseline for ELN kernels
+>=6.4        15M           [4 and 5] (mentioned by Toke)
+>=6.10      ???            [3]
+>=6.10rc2 17M-18M
+
+
+> It looks like this is known since March, was this ever reported to Nvidia back
+> then? :/
+
+Not sure if that's a question for me, I was told, filling an issue in
+Bugzilla/Jira is where
+our competences end. Who is supposed to report it to them?
+
+> Given XDP is in the critical path for many in production, we should think about
+> regular performance reporting for the different vendors for each released kernel,
+> similar to here [0].
+
+I think this might be the part of upstream kernel testing with LNST?
+Maybe Jesper
+knows more about that? Until then, I think, I can let you know about
+new regressions we catch.
+
+Thanks,
+Sam.
+
+[0] https://issues.redhat.com/browse/RHEL-24054
+[1] https://koji.fedoraproject.org/koji/search?terms=kernel-%5Cd.*eln*&type=build&match=regexp
+[2] https://koji.fedoraproject.org/koji/buildinfo?buildID=2469107
+[3] https://bugzilla.redhat.com/show_bug.cgi?id=2282969
+[4] https://bugzilla.redhat.com/show_bug.cgi?id=2270408
+[5] https://issues.redhat.com/browse/RHEL-24054
+
 
