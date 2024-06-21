@@ -1,93 +1,145 @@
-Return-Path: <netdev+bounces-105519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4350A9118EB
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 05:12:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E76369118FB
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 05:17:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E04181F22EA4
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 03:12:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64E791F23B85
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 03:17:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1431B8528F;
-	Fri, 21 Jun 2024 03:12:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02825839F3;
+	Fri, 21 Jun 2024 03:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PbsVJysu"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="CUhEEb2D"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2BF13207;
-	Fri, 21 Jun 2024 03:12:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.220])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71569197;
+	Fri, 21 Jun 2024 03:17:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718939574; cv=none; b=acb4Bgd21TWdNxye/6wWcRouyQsgH2NGUM9XTpPkDBJjeNNp9bSxNYJKTWp59KNwp7I/LPYQvi8PkB4Lxuw8KIFRSZwPOT68GM+78LpJECmriXwzDd7HmsVAnwfUEljK8Vl6SKJeuWZI6QndhSRw0Rd7waaJddGX2yqlJIqf29I=
+	t=1718939862; cv=none; b=iOj4Om4YgrS86OC9+XDQhCJUcNO+nqs26gjKG5dJWkJLwlbLZdxvnX6G0ktotdJcmu51smi9aV5NPK6q7ysmCppR7H6mXBApyU3MENeaIcddYu7ggwQvfwQEzEjCA4sMThUlg02BEmMl3HiKDs/1WiuFerKAXpqpdnUmXVP807k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718939574; c=relaxed/simple;
-	bh=uCSUHcTauHBP6zOn6YHuV7MpFi2lKxVbRouK6xsPz4Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DXgmF7VbjD1NgqbVvUhCcKWLYJPGBltw8XDCfTX/sz0lmnSfGGkBAfEaZlbj7BbeaKzBPnrdNSRTFfsFcWNs1qCCKuCZcw+G/M+XmS/UilBI9UJCTnKMNqx9H2ljFgR+wXPpajvBigmslx+/NHgK+SwNaC09uAARCQ2IIByANsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PbsVJysu; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=WO33cNTPn9NUUeGGOkVxo3S92qWrXCg9qOPXQk9jSr0=; b=PbsVJysujVOHC+yOLzuwpAi3ei
-	kTz4cujpB9sVSjqxrx9NKMH9EhttayUvRNN0/ZRe7iIFVr+iBK61p3IsPS1G1DsTohPGqWuk3re4a
-	YfJhVyLlnH0ufsUZvlfJmzTfE+cdg1GcHdq2eSmNoTJixDxcDUxXHmYdkH2Bus/2KlKs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sKUhP-000cmD-QD; Fri, 21 Jun 2024 05:12:27 +0200
-Date: Fri, 21 Jun 2024 05:12:27 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Serge Semin <fancer.lancer@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	xfr@outlook.com, rock.xu@nio.com
-Subject: Re: [PATCH net-next v1] net: stmmac: xgmac: increase length limit of
- descriptor ring
-Message-ID: <788c2744-e1c0-4338-9b86-9119d31841f1@lunn.ch>
-References: <20240620085200.583709-1-0x1207@gmail.com>
- <e3yzigcfbbkowias54nijvejc36hbcvfgjgbodycka3kfoqqek@46gktho2hwwt>
- <20240621102627.000060d6@gmail.com>
+	s=arc-20240116; t=1718939862; c=relaxed/simple;
+	bh=zLIJ2NUYDCtAiU8SbwxgK3XmrucsiNa/tzwKEMuF0oo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=ZuW5DZ7+IgL13cfgB50+a0G7EkYr+sA84gw1rC3hBKH9Y0F9OwR5O5OvNwZbMgEJ6LWQxI5MsORrJ9Hli+XtTp6+x5GD/bodcszZDdoUS2UcEsa9qpCPoUx/c0jP38ULUnVGMIXCFaMr95hO/1ankgx5ZqZxJRd95PtXA8RKrEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=CUhEEb2D reason="signature verification failed"; arc=none smtp.client-ip=45.254.50.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=wr4I4iNRseCiBnqESPfc1AXICjmoXcqm2f1JWm2tHvQ=; b=C
+	UhEEb2DQtJ429uxHuVbHCnihtRRmva4OcgObpg33whxZp+XrRVKhnpqgcyaytslT
+	XANcZ/Ef4jbeVhyeaXD0JJFUiLYVgs9T+2bO6Y0DTZITQBCHXSX+ocq/bYrhEsIk
+	N4VW2YNfHLsBJbwZT2Yj6YE/xs+j/xTuyJgwe2crAE=
+Received: from slark_xiao$163.com ( [223.104.68.12] ) by
+ ajax-webmail-wmsvr-40-116 (Coremail) ; Fri, 21 Jun 2024 11:17:16 +0800
+ (CST)
+Date: Fri, 21 Jun 2024 11:17:16 +0800 (CST)
+From: "Slark Xiao" <slark_xiao@163.com>
+To: "Jeffrey Hugo" <quic_jhugo@quicinc.com>
+Cc: "Loic Poulain" <loic.poulain@linaro.org>, 
+	"Manivannan Sadhasivam" <manivannan.sadhasivam@linaro.org>, 
+	ryazanov.s.a@gmail.com, johannes@sipsolutions.net, 
+	netdev@vger.kernel.org, mhi@lists.linux.dev, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re:Re: [PATCH v2 1/2] bus: mhi: host: Import mux_id item
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20230109(dcb5de15)
+ Copyright (c) 2002-2024 www.mailtech.cn 163com
+In-Reply-To: <c275ee49-ac59-058c-7482-c8a92338e7a2@quicinc.com>
+References: <20240612093842.359805-1-slark_xiao@163.com>
+ <20240612094609.GA58302@thinkpad>
+ <87aecf24-cdbb-70d2-a3d1-8d1cacf18401@quicinc.com>
+ <20240612145147.GB58302@thinkpad>
+ <CAMZdPi-6GPWkj-wu4_mRucRBWXR03eYXu4vgbjtcns6mr0Yk9A@mail.gmail.com>
+ <c275ee49-ac59-058c-7482-c8a92338e7a2@quicinc.com>
+X-NTES-SC: AL_Qu2aCvWYtkAo4CSdYOkfmk0SheY6UMayv/4v1IZSPZ98jD3p3QcLX3NqG1LaysKhCzCnijG+azJw1u9ZWrBoQqwXnIaFbSPXG9inUBy1S+wRxg==
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240621102627.000060d6@gmail.com>
+Message-ID: <5055db15.37d8.19038cc602c.Coremail.slark_xiao@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:_____wD3_yu88HRmswUPAA--.46727W
+X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbiNQoFZGV4IM2ADQAEsn
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-> Heavy incoming traffic on some heavy load system, the max 1024 limit defined
-> by DMA_MAX_RX_SIZE in drivers/net/ethernet/stmicro/stmmac/common.h is too
-> few to achieve high throughput for XGMAC.
-> With this patch, ethtool can set a new length than 1024
-
-Please include some benchmark results to show the improvement.
-
-But at some point, more buffers don't help you. If you are
-consistently overloaded, you will still overflow the buffers.  So you
-might want to look at where is the bottleneck and how do you
-prioritise processing packets over whatever else is loading the
-system.
-
-Maybe this would help, if the bus is the problem:
-
-https://www.spinics.net/lists/netdev/msg1006370.html
-
-	Andrew
+CkF0IDIwMjQtMDYtMTQgMjI6MzE6MDMsICJKZWZmcmV5IEh1Z28iIDxxdWljX2podWdvQHF1aWNp
+bmMuY29tPiB3cm90ZToKPk9uIDYvMTQvMjAyNCA0OjE3IEFNLCBMb2ljIFBvdWxhaW4gd3JvdGU6
+Cj4+IE9uIFdlZCwgMTIgSnVuIDIwMjQgYXQgMTY6NTEsIE1hbml2YW5uYW4gU2FkaGFzaXZhbQo+
+PiA8bWFuaXZhbm5hbi5zYWRoYXNpdmFtQGxpbmFyby5vcmc+IHdyb3RlOgo+Pj4KPj4+IE9uIFdl
+ZCwgSnVuIDEyLCAyMDI0IGF0IDA4OjE5OjEzQU0gLTA2MDAsIEplZmZyZXkgSHVnbyB3cm90ZToK
+Pj4+PiBPbiA2LzEyLzIwMjQgMzo0NiBBTSwgTWFuaXZhbm5hbiBTYWRoYXNpdmFtIHdyb3RlOgo+
+Pj4+PiBPbiBXZWQsIEp1biAxMiwgMjAyNCBhdCAwNTozODo0MlBNICswODAwLCBTbGFyayBYaWFv
+IHdyb3RlOgo+Pj4+Pgo+Pj4+PiBTdWJqZWN0IGNvdWxkIGJlIGltcHJvdmVkOgo+Pj4+Pgo+Pj4+
+PiBidXM6IG1oaTogaG9zdDogQWRkIGNvbmZpZ3VyYWJsZSBtdXhfaWQgZm9yIE1CSU0gbW9kZQo+
+Pj4+Pgo+Pj4+Pj4gRm9yIFNEWDcyIE1CSU0gbW9kZSwgaXQgc3RhcnRzIGRhdGEgbXV4IGlkIGZy
+b20gMTEyIGluc3RlYWQgb2YgMC4KPj4+Pj4+IFRoaXMgd291bGQgbGVhZCB0byBkZXZpY2UgY2Fu
+J3QgcGluZyBvdXRzaWRlIHN1Y2Nlc3NmdWxseS4KPj4+Pj4+IEFsc28gTUJJTSBzaWRlIHdvdWxk
+IHJlcG9ydCAiYmFkIHBhY2tldCBzZXNzaW9uICgxMTIpIi4KPj4+Pj4+IFNvIHdlIGFkZCBhIGRl
+ZmF1bHQgbXV4X2lkIHZhbHVlIGZvciBTRFg3Mi4gQW5kIHRoaXMgdmFsdWUKPj4+Pj4+IHdvdWxk
+IGJlIHRyYW5zZmVycmVkIHRvIHd3YW4gbWJpbSBzaWRlLgo+Pj4+Pj4KPj4+Pj4+IFNpZ25lZC1v
+ZmYtYnk6IFNsYXJrIFhpYW8gPHNsYXJrX3hpYW9AMTYzLmNvbT4KPj4+Pj4+IC0tLQo+Pj4+Pj4g
+ICAgZHJpdmVycy9idXMvbWhpL2hvc3QvcGNpX2dlbmVyaWMuYyB8IDMgKysrCj4+Pj4+PiAgICBp
+bmNsdWRlL2xpbnV4L21oaS5oICAgICAgICAgICAgICAgIHwgMiArKwo+Pj4+Pj4gICAgMiBmaWxl
+cyBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKykKPj4+Pj4+Cj4+Pj4+PiBkaWZmIC0tZ2l0IGEvZHJp
+dmVycy9idXMvbWhpL2hvc3QvcGNpX2dlbmVyaWMuYyBiL2RyaXZlcnMvYnVzL21oaS9ob3N0L3Bj
+aV9nZW5lcmljLmMKPj4+Pj4+IGluZGV4IDBiNDgzYzdjNzZhMS4uOWU5YWRmODMyMGQyIDEwMDY0
+NAo+Pj4+Pj4gLS0tIGEvZHJpdmVycy9idXMvbWhpL2hvc3QvcGNpX2dlbmVyaWMuYwo+Pj4+Pj4g
+KysrIGIvZHJpdmVycy9idXMvbWhpL2hvc3QvcGNpX2dlbmVyaWMuYwo+Pj4+Pj4gQEAgLTUzLDYg
+KzUzLDcgQEAgc3RydWN0IG1oaV9wY2lfZGV2X2luZm8gewo+Pj4+Pj4gICAgICAgICAgICB1bnNp
+Z25lZCBpbnQgZG1hX2RhdGFfd2lkdGg7Cj4+Pj4+PiAgICAgICAgICAgIHVuc2lnbmVkIGludCBt
+cnVfZGVmYXVsdDsKPj4+Pj4+ICAgICAgICAgICAgYm9vbCBzaWRlYmFuZF93YWtlOwo+Pj4+Pj4g
+KyB1bnNpZ25lZCBpbnQgbXV4X2lkOwo+Pj4+Pj4gICAgfTsKPj4+Pj4+ICAgICNkZWZpbmUgTUhJ
+X0NIQU5ORUxfQ09ORklHX1VMKGNoX251bSwgY2hfbmFtZSwgZWxfY291bnQsIGV2X3JpbmcpIFwK
+Pj4+Pj4+IEBAIC00NjksNiArNDcwLDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBtaGlfcGNpX2Rl
+dl9pbmZvIG1oaV9mb3hjb25uX3NkeDcyX2luZm8gPSB7Cj4+Pj4+PiAgICAgICAgICAgIC5kbWFf
+ZGF0YV93aWR0aCA9IDMyLAo+Pj4+Pj4gICAgICAgICAgICAubXJ1X2RlZmF1bHQgPSAzMjc2OCwK
+Pj4+Pj4+ICAgICAgICAgICAgLnNpZGViYW5kX3dha2UgPSBmYWxzZSwKPj4+Pj4+ICsgLm11eF9p
+ZCA9IDExMiwKPj4+Pj4+ICAgIH07Cj4+Pj4+PiAgICBzdGF0aWMgY29uc3Qgc3RydWN0IG1oaV9j
+aGFubmVsX2NvbmZpZyBtaGlfbXYzeF9jaGFubmVsc1tdID0gewo+Pj4+Pj4gQEAgLTEwMzUsNiAr
+MTAzNyw3IEBAIHN0YXRpYyBpbnQgbWhpX3BjaV9wcm9iZShzdHJ1Y3QgcGNpX2RldiAqcGRldiwg
+Y29uc3Qgc3RydWN0IHBjaV9kZXZpY2VfaWQgKmlkKQo+Pj4+Pj4gICAgICAgICAgICBtaGlfY250
+cmwtPnJ1bnRpbWVfZ2V0ID0gbWhpX3BjaV9ydW50aW1lX2dldDsKPj4+Pj4+ICAgICAgICAgICAg
+bWhpX2NudHJsLT5ydW50aW1lX3B1dCA9IG1oaV9wY2lfcnVudGltZV9wdXQ7Cj4+Pj4+PiAgICAg
+ICAgICAgIG1oaV9jbnRybC0+bXJ1ID0gaW5mby0+bXJ1X2RlZmF1bHQ7Cj4+Pj4+PiArIG1oaV9j
+bnRybC0+bGlua19pZCA9IGluZm8tPm11eF9pZDsKPj4+Pj4KPj4+Pj4gQWdhaW4sICdsaW5rX2lk
+JyBpcyBqdXN0IGEgV1dBTiB0ZXJtLiBVc2UgJ211eF9pZCcgaGVyZSBhbHNvLgo+Pj4+Cj4+Pj4g
+RG9lcyB0aGlzIHJlYWxseSBiZWxvbmcgaW4gTUhJPyAgSWYgdGhpcyB3YXMgRFQsIEkgZG9uJ3Qg
+dGhpbmsgd2Ugd291bGQgcHV0Cj4+Pj4gdGhpcyB2YWx1ZSBpbiBEVCwgYnV0IHJhdGhlciBoYXZl
+IHRoZSBkcml2ZXIgKE1CSU0pIGRldGVjdCB0aGUgZGV2aWNlIGFuZAo+Pj4+IGNvZGUgaW4gdGhl
+IHJlcXVpcmVkIHZhbHVlLgo+Pj4+Cj4+Pgo+Pj4gSSBiZWxpZXZlIHRoaXMgaXMgYSBtb2RlbSB2
+YWx1ZSByYXRoZXIgdGhhbiBNSEkuIEJ1dCBJIHdhcyBPSyB3aXRoIGtlZXBpbmcgaXQgaW4KPj4+
+IE1ISSBkcml2ZXIgc2luY2Ugd2Uga2luZCBvZiBrZWVwIG1vZGVtIHNwZWNpZmljIGNvbmZpZy4K
+Pj4+Cj4+PiBCdXQgaWYgV1dBTiBjYW4gZGV0ZWN0IHRoZSBkZXZpY2UgYW5kIGFwcGx5IHRoZSBj
+b25maWcsIEknbSBhbGwgb3ZlciBpdC4KPj4gCj4+IFRoYXQgd291bGQgcmVxdWlyZSBhdCBsZWFz
+dCBzb21lIGluZm9ybWF0aW9uIGZyb20gdGhlIE1ISSBidXMgZm9yIHRoZQo+PiBNQklNIGRyaXZl
+cgo+PiB0byBtYWtlIGEgZGVjaXNpb24sIHN1Y2ggYXMgYSBnZW5lcmljIGRldmljZSBJRCwgb3Ig
+cXVpcmsgZmxhZ3MuLi4KPgo+SSBkb24ndCBzZWUgd2h5Lgo+Cj5UaGUgInNpbXBsZSIgd2F5IHRv
+IGRvIGl0IHdvdWxkIGJlIHRvIGhhdmUgdGhlIGNvbnRyb2xsZXIgZGVmaW5lIGEgCj5kaWZmZXJl
+bnQgY2hhbm5lbCBuYW1lLCBhbmQgdGhlbiBoYXZlIHRoZSBNQklNIGRyaXZlciBwcm9iZSBvbiB0
+aGF0LiAKPlRoZSBNQklNIGRyaXZlciBjb3VsZCBhdHRhY2ggZHJpdmVyIGRhdGEgc2F5aW5nIHRo
+YXQgaXQgbmVlZHMgdG8gaGF2ZSBhIAo+c3BlY2lmaWMgbXV4X2lkLgo+Cj5Pciwgd2l0aCB6ZXJv
+IE1ISS9Db250cm9sbGVyIGNoYW5nZXMsIHRoZSBNQklNIGRyaXZlciBjb3VsZCBwYXJzZSB0aGUg
+Cj5taGlfZGV2aWNlIHN0cnVjdCwgZ2V0IHRvIHRoZSBzdHJ1Y3QgZGV2aWNlLCBmb3IgdGhlIHVu
+ZGVybHlpbmcgZGV2aWNlLCAKPmFuZCBleHRyYWN0IHRoZSBQQ0llIERldmljZSBJRCBhbmQgbWF0
+Y2ggdGhhdCB0byBhIHdoaXRlIGxpc3Qgb2Yga25vd24gCj5kZXZpY2VzIHRoYXQgbmVlZCB0aGlz
+IHByb3BlcnR5Lgo+Cj5JIGd1ZXNzIGlmIHRoZSBjb250cm9sbGVyIGNvdWxkIGF0dGFjaCBhIHBy
+aXZhdGUgdm9pZCAqIHRvIHRoZSAKPm1oaV9kZXZpY2UgdGhhdCBpcyBvcGFxdWUgdG8gTUhJLCBi
+dXQgYWxsb3dzIE1CSU0gdG8gbWFrZSBhIGRlY2lzaW9uLCAKPnRoYXQgd291bGQgYmUgb2suICBT
+dWNoIGEgbWVjaGFuaXNtIHdvdWxkIGJlIGdlbmVyaWMsIGFuZCBleHRlbnNpYmxlIHRvIAo+b3Ro
+ZXIgdXNlY2FzZXMgb2YgdGhlIHNhbWUgImNsYXNzIi4KPgo+LUplZmYKCkhpIGd1eXMsClRoaXMg
+cGF0Y2ggbWFpbmx5IHJlZmVyIHRvIHRoZSBmZWF0dXJlIG9mIG1ydSBzZXR0aW5nIGJldHdlZW4g
+bWhpIGFuZCB3d2FuIHNpZGUuCldlIHJhbnNmZXIgdGhpcyB2YWx1ZSB0byB3d2FuIHNpZGUgaWYg
+d2UgZGVmaW5lIGl0IGluIG1oaSBzaWRlLCBvdGhlcndpc2UgYSBkZWZhdWx0CnZhbHVlIHdvdWxk
+IGJlIHVzZWQgaW4gd3dhbiBzaWRlLiBXaHkgZG9uJ3Qgd2UganVzdCBhbGlnbiB3aXRoIHRoYXQ/
+CgpUaGFua3MKCg==
 
