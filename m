@@ -1,108 +1,126 @@
-Return-Path: <netdev+bounces-105711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BAA4912647
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:02:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AF37912659
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:08:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CF961C25657
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 13:02:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8735B20F17
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 13:06:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62867158D82;
-	Fri, 21 Jun 2024 13:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE40F142620;
+	Fri, 21 Jun 2024 13:05:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SwyOJWIy"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="VJo2Zis7"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E528156675;
-	Fri, 21 Jun 2024 13:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786A0376E4
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 13:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718974871; cv=none; b=EviaBB7mg4vKIzPBRFsShxnE5Z1vS1o4jedGSXfdjWxm+Hz/A/tejiHE+OLix1iRgLU8OqNw7FoKJSWEkB9ux5qvsgyYDz3AgVwdh7zmxp4kqpuS+lP6thzs5SvoZakiAaJdNicKWAIA79qxL86Rds7UI2ut19Tu6fAT8NaODho=
+	t=1718975154; cv=none; b=ChsoEr+y7PptG70AuILNWreMq2o1nle1tTgMPzWDLmwHbMVQBh6/Pj9sT5mcNtP5Lu+pR8IGEataiFiB6tSzkXp6VxZkPIC6bAE11GM3fuFKpkmhqhfFmyjy6r0VKvxyYTUx+jm5Lq3iDtMRaUUaUmrMhxu36vH+AgVbXeBVa00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718974871; c=relaxed/simple;
-	bh=DivwwDalS9XSi6C+Pb7Pl0M5dldZfkKIe329gjGE23s=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ehRwrfuhMVfU7m6cX5KO0hFKyGKpQRrnQnqpzB5qPPCSRcoIXWia0Bv2DogxSs/ZUrSb/+EcgzWucuPN21dPlLOAaCXtZXa99VYIX/aHIMJGB71T8Ali/AzLyOOiOH2WfPQRmKkaw1wIObykEg2ozi2a96bi5Na5mdbs+VOPQjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SwyOJWIy; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D5A171BF208;
-	Fri, 21 Jun 2024 13:01:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1718974865;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=JKBsx/vZr3c1Dk+2ljEwKIlxwbOaxR4usnVKt0CKk70=;
-	b=SwyOJWIyQP0ivTGXPSGy3ugNE23qswHSOBJiXRSLdlZm5lOnk4Mf0X8wPIzdkpPXr7A/pa
-	HWqh7dB6byidsg8ZR1HAgvYb1SfzkmEbwnytPnhVXEuTPwEQyKu24H16YBikLZzB47e7y9
-	VhHd2L0DrK4pkGvjGOMDhh/FIb94NU0vnTpo2SgNsNzQXvkoqN8LvCUZXW2Y/plUErMang
-	Wdrt0TjVNrLSt6ZMo8EMIusIOXK5Zd2oBmqvV6oIZii8eP+YEb7TrlPWHVfngX5WDp5h9z
-	qw2UagBKwmkEoa95UTcC5QpuEXGBQw3pPy1a8hBGPJd1Pq0ss+nj9NdTnMbJ8w==
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>,
-	"Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	thomas.petazzoni@bootlin.com,
-	Donald Hunter <donald.hunter@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net] netlink: specs: Fix pse-set command attributes
-Date: Fri, 21 Jun 2024 15:00:59 +0200
-Message-Id: <20240621130059.2147307-1-kory.maincent@bootlin.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1718975154; c=relaxed/simple;
+	bh=Yb7Yvj1YgzjQRwDXPO286zPR/Ef3eehL0+s0q76BX5g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K5sIAZv+skGV0D8oxgFjUnEXPgqNLRALznNaSTeabVmPXIleaVoTflnFZTwZQx9vcY0TAQX3ZFckOs2JZo+Csm9MHXZDP6Q9XhE9eO6IS/7ykRqEpMTgCoQa5y2Ylp2qnrvfq9csAvl+bBTqhewaKG3prbRxMkGYA1d/1wkT8jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=VJo2Zis7; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-797a7f9b52eso152247185a.2
+        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 06:05:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1718975144; x=1719579944; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VJK2yOT9FIqROi+Egt9eFviTEDPEGVADU23Q3cHDMEA=;
+        b=VJo2Zis7OHeDdQery+XSM6+89CsaIHOdoNWIoaXvacR/m/bpMrHYC2MhUkaTCADJV6
+         lUI6cShb+vlIAR1rJYjV8MgYMx8O8iqZvaMxyNZ2scBbTLzbhdXg8aZr9jtOBBB8dcTK
+         35MGvFkneuimZSa4sECZpUpaMdRIl+gO1g4y9NLcmjRsBLnfyWiAR91An/3+k+TfSNjl
+         s7h/eht5fvWH2Iy0CFQw2MIiEgX4DfTtnhyaaEE1NBKFdfhpj2DU7z4+Yn5GCMRKaLpR
+         qNf/O3FwNiKOQ+FuVtBs03AENdCSJf1FaZW39UpSpxGR+kQ5iYB6T1N1cAzlgDuyYoMO
+         AgsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718975144; x=1719579944;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VJK2yOT9FIqROi+Egt9eFviTEDPEGVADU23Q3cHDMEA=;
+        b=jcfEAx/t4zISYHeRYMWrNDpiMQqWsr88XaCJ+26nAT2gQecnz2s/Ia4wPF9Zx2xb3w
+         yy48JED+pYYxgmhN9dpCKYL5Y3ERcVAIHGNMkceW/gR5eA1U8vPUSG8q62mNRcvFiKEy
+         oIVHwUXFvnuCXS6lQAiyLChFfjy8/V2hqp0pVCT/bc2uO/vzWidJf5mviC0FLowbHvtM
+         mVwJuzFu87Ctywbeght9FhZZHbPnsbJ/m4S2D2/DzN93t4dshD84U172qZLXvetB6w2M
+         SA1u1WPlh53Mztd8It26eJMeUBfpkJvgqEZovs6YumIop83oDR6+WizDOSDa/Na2MlqM
+         MRHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVH2e3A1OdAjF25RzqrCYa4CliMyaN4n3M9cKnWuQ+Cbbci0ahCdyCQuc9ihMZPrbY9zTVixVNQ+5Z/Yc0jgZarb5zbeTSh
+X-Gm-Message-State: AOJu0YxwKTbcXknIUP3EX3kIt/tM5oxjsu6sNRdGIfI+vglpoMmxaj+5
+	Hp1Qu0SJOw9f5Jt6dcwP7u2l8bLnZrA3fgN1FdxS5cbXibr9OHvUFcWiIhEn7uU=
+X-Google-Smtp-Source: AGHT+IGC6sZXSWKAGPHY/uyr89DZ9iZnRZxdRUjwa1W19Nf+VKCN9pvnvkoUjMCqTg/1PhtYsBAS3A==
+X-Received: by 2002:ad4:5508:0:b0:6b2:9e65:2246 with SMTP id 6a1803df08f44-6b501e0a68emr84339226d6.1.1718975144122;
+        Fri, 21 Jun 2024 06:05:44 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b51ef678ebsm8545166d6.132.2024.06.21.06.05.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jun 2024 06:05:43 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1sKdxW-00HUFW-GK;
+	Fri, 21 Jun 2024 10:05:42 -0300
+Date: Fri, 21 Jun 2024 10:05:42 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: syzbot <syzbot+a35b4afb1f00c45977d0@syzkaller.appspotmail.com>
+Cc: leon@kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [rdma?] WARNING in gid_table_release_one
+Message-ID: <20240621130542.GQ791043@ziepe.ca>
+References: <0000000000000d0237061b4c6108@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0000000000000d0237061b4c6108@google.com>
 
-Not all PSE attributes are used for the pse-set netlink command.
-Select only the ones used by ethtool.
+On Wed, Jun 19, 2024 at 11:25:19PM -0700, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    a957267fa7e9 Add linux-next specific files for 20240611
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=15a085de980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=9a880e96898e79f8
+> dashboard link: https://syzkaller.appspot.com/bug?extid=a35b4afb1f00c45977d0
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/6451759a606b/disk-a957267f.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/7f635dbe5b8a/vmlinux-a957267f.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/33eafd1b8aec/bzImage-a957267f.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+a35b4afb1f00c45977d0@syzkaller.appspotmail.com
+> 
+> infiniband syz1: ib_query_port failed (-19)
+> infiniband syz1: Couldn't set up InfiniBand P_Key/GID cache
+> ------------[ cut here ]------------
+> GID entry ref leak for dev syz1 index 0 ref=1
+> WARNING: CPU: 1 PID: 12182 at drivers/infiniband/core/cache.c:809 release_gid_table drivers/infiniband/core/cache.c:806 [inline]
+> WARNING: CPU: 1 PID: 12182 at drivers/infiniband/core/cache.c:809 gid_table_release_one+0x33f/0x4d0 drivers/infiniband/core/cache.c:886
+> Modules linked in:
 
-Fixes: f8586411e40e ("netlink: specs: Expand the pse netlink command with PoE interface")
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
- Documentation/netlink/specs/ethtool.yaml | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Oh look, we changed a dev_err to a WARN_ON and syzkaller immediately
+reports that there is some kind of memory leaking bug in rxe :\
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 00dc61358be8..4510e8d1adcb 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -1603,7 +1603,7 @@ operations:
-           attributes:
-             - header
-         reply:
--          attributes: &pse
-+          attributes:
-             - header
-             - podl-pse-admin-state
-             - podl-pse-admin-control
-@@ -1620,7 +1620,10 @@ operations:
- 
-       do:
-         request:
--          attributes: *pse
-+          attributes:
-+            - header
-+            - podl-pse-admin-control
-+            - c33-pse-admin-control
-     -
-       name: rss-get
-       doc: Get RSS params.
--- 
-2.34.1
-
+Jason
 
