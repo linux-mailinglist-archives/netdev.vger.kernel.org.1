@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-105804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05B62912E37
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 22:02:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A56AC912E69
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 22:20:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 365C41C2174C
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 20:02:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D58231C21012
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 20:20:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5490E16C84B;
-	Fri, 21 Jun 2024 20:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF5216849B;
+	Fri, 21 Jun 2024 20:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cCHqmixM"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Z54p/2Jp"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABF612BE9E;
-	Fri, 21 Jun 2024 20:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816C1156F2E
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 20:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719000135; cv=none; b=CDu67GMwuS2kxlbPimonz8Jew4KefSbHb7v//QO3bJ3j26wnyN3JRSy2XIja2lEanj88+KF9hvVj6QMF1fgPa5V7wDIUNq5xJ/eT6nLWzvPQNmRMwRIBbnJmwWKU6wW11RuYILLO76dzQODm5pbZ6k0G+FKN2XLxIoTYDhDeprg=
+	t=1719001202; cv=none; b=B80vNfbtOscoUKHq7QKWRG49dpMiV1wEqFfeAVUjXyrtEw6GC7ppfy/ffELrqAyuzapbxjr1fc73G6ykt6bbHsS/KHcWmR7TOnrfu/XLy6i0o2eA2DW1XU+HiYv13yFyveKmprfjvAqMZndx1+qe2tJTZfrGFhK9W8m6RgUQBw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719000135; c=relaxed/simple;
-	bh=Xt/toiP6N6asKpHif/mH1NLQU7AmC74j3JURpixHmuw=;
+	s=arc-20240116; t=1719001202; c=relaxed/simple;
+	bh=bZN0IhRVI02xHvZjdoaBe9yK4aixo/GeHqSUKPuTuuE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U0fzXC0Z8GscaTftwwqU3yjW6YwjIAK0kGXz9M552l8wJ+kIn/zLlVYcreDCmdZqz7Doh+fuQ+LEKemDJ16e0DmES/LF12rJVlMdZMFta8i5vjYqKkKtDehQUd/JuHaZRQjuYhjRU5z65bDMamNBcZfoicncCxdoHD/IXXsG9EA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cCHqmixM; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=WNV1ezhv0+ADUJNVu4w3hpQoyv+zUogyNlxZh2+TWHQqEFZGoxUGuvMyztRp+imZ5erFWa/ygCPc1OLNSLXLKQWy0gGnsoxBHRD86tM7plhENINSzqoShKGVut6IyI/UuOWN+4ifORoPJ5SJgpsfDd/CGbrnsyRfKr3uk4uHtaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Z54p/2Jp; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,37 +36,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+4uY3EQUbz0DrVfaPCZ2jsnH9YO74ydeFMqnW6Tj1Qs=; b=cCHqmixMNx4mQ7o42wyenotfxy
-	c9qb686CtVOYMbo/OVFYYDOrwJvABI5XTPxGcgzjGxPU6/LlCloNzMZY15Wrve0IFPJIUj+G+P+FY
-	pmFH8HDn0UIA0tb4uR+lQr3tmffQwCKdeGfQVwc3w4rNk8RWnGKPuij8cyqhqstS+owE=;
+	bh=rtQolWAVt290fkCNZrZaV/A+RMU7zVq2j/xIedg8JZ4=; b=Z54p/2JpMwSiPhKSOzRfjBDkvE
+	a6V3m64F8ekTJuAtPJAAly774MBirCmGVWBXQfZ/rZHwBBryCPdiufLdyqr0SPfYDvU/ICpch2pvg
+	uGu3N+y1OudYxSLUZUBmpCS5lDbwQ5oCP4ZkQtKYWLCsvPKPbiNrsAFC63a7803f6IWk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sKkS3-000hIR-QR; Fri, 21 Jun 2024 22:01:39 +0200
-Date: Fri, 21 Jun 2024 22:01:39 +0200
+	id 1sKkjl-000hLU-6F; Fri, 21 Jun 2024 22:19:57 +0200
+Date: Fri, 21 Jun 2024 22:19:57 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, kernel@quicinc.com,
-	Andrew Halaney <ahalaney@redhat.com>, linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH 1/3] net: stmmac: Add interconnect support in qcom-ethqos
- driver
-Message-ID: <b5096113-de85-485e-a226-a8112b3d5490@lunn.ch>
-References: <20240619-icc_bw_voting_from_ethqos-v1-0-6112948b825e@quicinc.com>
- <20240619-icc_bw_voting_from_ethqos-v1-1-6112948b825e@quicinc.com>
- <159700cc-f46c-4f70-82aa-972ba6e904ca@lunn.ch>
- <b075e5a8-ca75-49cc-84d6-84e28bc38eee@quicinc.com>
+To: Allen Pais <allen.lkml@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH 14/15] net: marvell: Convert tasklet API to new bottom
+ half workqueue mechanism
+Message-ID: <e96a54d2-5908-4277-871b-3ab532482ea1@lunn.ch>
+References: <20240621183947.4105278-1-allen.lkml@gmail.com>
+ <20240621183947.4105278-15-allen.lkml@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,25 +59,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b075e5a8-ca75-49cc-84d6-84e28bc38eee@quicinc.com>
+In-Reply-To: <20240621183947.4105278-15-allen.lkml@gmail.com>
 
-> > This all looks pretty generic. Any reason why this is just in the
-> > Qualcomm device, and not at a higher level so it could be used for all
-> > stmmac devices if the needed properties are found in DT?
-> > 
-> >        Andrew
-> ICC is a software framework to access the NOC bus topology of the
-> system, all though "axi" and "ahb" buses seem generic but the 
-> topologies of these NOC's are specific to the vendors of synopsys chipset hence
-> this framework might not be applicable to all the vendors of stmmac driver.
+On Fri, Jun 21, 2024 at 11:39:46AM -0700, Allen Pais wrote:
+> Migrate tasklet APIs to the new bottom half workqueue mechanism. It
+> replaces all occurrences of tasklet usage with the appropriate workqueue
+> APIs throughout the marvell driver.
 
-There are however a number of SoCs using synopsys IP. Am i right in
-says they could all make use of this? Do we really want them to one by
-one copy/paste what you have here to other vendor specific parts of
-stmmac?
+drivers. You are modifying two here.
 
-This code looks in DT. If there are no properties in DT, it does
-nothing. So in general it should be safe, right?
+> diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> index 671368d2c77e..47fe71a8f57e 100644
+> --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> @@ -2628,9 +2628,7 @@ static u32 mvpp2_txq_desc_csum(int l3_offs, __be16 l3_proto,
+>   * The number of sent descriptors is returned.
+>   * Per-thread access
+>   *
+> - * Called only from mvpp2_txq_done(), called from mvpp2_tx()
+> - * (migration disabled) and from the TX completion tasklet (migration
+> - * disabled) so using smp_processor_id() is OK.
+> + * Called only from mvpp2_txq_done().
 
-	 Andrew
+I've not followed the development of the bottom half workqueue
+mechanism. I assume the documented assumption is still true? If so,
+please could you reword it as appropriate, rather than delete it.
+
+Thanks
+	Andrew
+	
+    Andrew
+
+---
+pw-bot: cr
 
