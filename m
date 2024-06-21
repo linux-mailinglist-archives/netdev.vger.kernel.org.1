@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-105760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA708912AF0
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 18:09:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3576912AF1
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 18:09:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 947A51F27CCB
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:09:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E352D1C222C6
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08E8515FA6A;
-	Fri, 21 Jun 2024 16:08:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E2B71662F0;
+	Fri, 21 Jun 2024 16:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GqVLsA7Q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YGzXXVBo"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B9ED15F40C
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 16:08:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E4D15FA77
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 16:08:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718986108; cv=none; b=ONyxD/LGjUjizS6ZMsznAnD5XNKQOy0NYv9hd1PcGAxrAHqAlwH5qkDkm+2q+jfcw1hps6plCa90rh35X2O2hWVlF6ktZ/5Q7rPV3cVomzCHdl7AP39eThn26iFOD4ursnU4rlOvAGnKfEyKdIu0AIwV5TRd3YlenicYDC8fuXM=
+	t=1718986110; cv=none; b=Mz1yQnfO5MrT3VzNtXJFV72Ycep7A8m1Qme6hxYMcsIStzG1SvKunhvNPtBm57oUz3CBdZ++m4iHs0RlfJxAZylGBNH0xoKzqbWOvaUVu0hwYDwXL0OvFlogPCZukAK6JV05oT15Fg961ZrYJIFAgd9gAKmQaLKzkBhulRYkvZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718986108; c=relaxed/simple;
-	bh=8jOc0OqzwpS0iyLZTn63cpatsiJm1NyC3N3cCRCfVfo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vF4XNSdzy8jp8NVuDgKBuntI/V9NoAyK0f7glfwmtYb5AGYtW0BBosL5kD/pQ6vzGysGD4EzKvK+WcVCeDRNFSsjKqcxejM9InvoOOy4ErfKCO6Cy5putbTYSG94g0NrmNvekLBvMcxhLh7D0Hdh/NXL3qY9HROEPVJMiWRESnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GqVLsA7Q; arc=none smtp.client-ip=198.175.65.15
+	s=arc-20240116; t=1718986110; c=relaxed/simple;
+	bh=jkQS3w1J+PHU+PKmLuHy+rzY/m1nnelk8ZAolmFhTrQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=r6V6ytKXB3NT8b6H+9LVUMiXG44yl5FziIG4cDpwscPWWaUdQbgfQ3iWrz2lIALmtdtJFrmLp9zqiUJ0FX97pQAJQd0Sq04/eCISc/36dA/x8NtnRRIi5f3ly89Azy2Gy2JVzDeVGlBqzJLQR1Qi37cCfLAHALq4/E6ZJDGReOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YGzXXVBo; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718986107; x=1750522107;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=8jOc0OqzwpS0iyLZTn63cpatsiJm1NyC3N3cCRCfVfo=;
-  b=GqVLsA7QXrIRayXDif8ROHdIe+UKXSX62xd2XzXb0peto/ujD9LxGLG8
-   Il9wHdv1MWzDjXiWm+fe6mGY0zE/U7RL7kS4ixyWFrVIIGEt4+3kGlvqi
-   9eGpm+Gy5Arwa/R+BaU2av6r1XyTWETEDtbO8SY3LCeTSuzf86Qkup3sk
-   q48eX6Vh8IBymldGfny6Cx9OAcsX1emeo/iQxqsfH6ZVZn7QyWEA01MJX
-   Q8K6UMgzLJw3B59X6etikCR8/cOW9nOfaQC5TLkG4EEgBHWfNou6NKrly
-   uGjKCZoAQZW71QxSjSb4576bo3zPcpRstCLbWsMMMCFm/aXyzwVMdDqwK
-   w==;
-X-CSE-ConnectionGUID: rDSpQwbbS4uFwZmDw7Tdfg==
-X-CSE-MsgGUID: obWdnPAvQeKSaicNPKHO8g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11110"; a="19801396"
+  t=1718986108; x=1750522108;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=jkQS3w1J+PHU+PKmLuHy+rzY/m1nnelk8ZAolmFhTrQ=;
+  b=YGzXXVBoqRSKhSlEfUQXZ5Ror8CaZUr6zDueuWurObKVRlvxuyDyEm5+
+   CCGqOHA+arKh/6iwsqdL0jVFBGKHAAHNzhAJSR4Z2h0k3NrpuBifBCyJL
+   c7OkDToLLKtE5LJz2yk6ySBW+LcNkujfMOTd/B8oeEQypNtapbjJIBKIK
+   EU60qdHm+eOg78RdFOeTG8/G0/vOxacXE68KbRV3ktwMan2U+OEgWbuhj
+   A8Fp1+XsAI3SLrRNFjMwHuMG0X4ZMev3HlaOJo6vFXwQDvvBN5MlURrLq
+   GYPyHHqoYN9D7QaVJyfRwwcTelUSewHgJWDQlYiWjqmjKs4VWRf1Fzx4u
+   Q==;
+X-CSE-ConnectionGUID: dPB688QkSqKqXSu70i6bJw==
+X-CSE-MsgGUID: 9lSC35kBRIiSe0oKb/HsvQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11110"; a="19801400"
 X-IronPort-AV: E=Sophos;i="6.08,255,1712646000"; 
-   d="scan'208";a="19801396"
+   d="scan'208";a="19801400"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2024 09:08:26 -0700
-X-CSE-ConnectionGUID: jNBpswm9RBii83Ya1+wjFA==
-X-CSE-MsgGUID: O36Zk70pQCCHQswL5eUF7Q==
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2024 09:08:27 -0700
+X-CSE-ConnectionGUID: PpN5mS1JQrazFyPD7Nthvg==
+X-CSE-MsgGUID: OpUy7L/BQNWqMBlezH9rSA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,255,1712646000"; 
-   d="scan'208";a="47149795"
+   d="scan'208";a="47149799"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa004.fm.intel.com with ESMTP; 21 Jun 2024 09:08:26 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -63,12 +64,17 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	michal.swiatkowski@linux.intel.com
-Subject: [PATCH net-next 0/4][pull request] ice: prepare representor for SF support
-Date: Fri, 21 Jun 2024 09:08:13 -0700
-Message-ID: <20240621160820.3394806-1-anthony.l.nguyen@intel.com>
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	anthony.l.nguyen@intel.com,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
+Subject: [PATCH net-next 1/4] ice: store representor ID in bridge port
+Date: Fri, 21 Jun 2024 09:08:14 -0700
+Message-ID: <20240621160820.3394806-2-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20240621160820.3394806-1-anthony.l.nguyen@intel.com>
+References: <20240621160820.3394806-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,51 +83,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Michal Swiatkowski says:
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-This is a series to prepare port representor for supporting also
-subfunctions. We need correct devlink locking and the possibility to
-update parent VSI after port representor is created.
+It is used to get representor structure during cleaning.
 
-Refactor how devlink lock is taken to suite the subfunction use case.
-
-VSI configuration needs to be done after port representor is created.
-Port representor needs only allocated VSI. It doesn't need to be
-configured before.
-
-VSI needs to be reconfigured when update function is called.
-
-The code for this patchset was split from (too big) patchset [1].
-
-[1] https://lore.kernel.org/netdev/20240213072724.77275-1-michal.swiatkowski@linux.intel.com/
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
-Originally from https://lore.kernel.org/netdev/20240605-next-2024-06-03-intel-next-batch-v2-0-39c23963fa78@intel.com/
-Changes:
-- delete ice_repr_get_by_vsi() from header
-- rephrase commit message in moving devlink locking
+ drivers/net/ethernet/intel/ice/ice_eswitch_br.c | 4 +++-
+ drivers/net/ethernet/intel/ice/ice_eswitch_br.h | 1 +
+ drivers/net/ethernet/intel/ice/ice_repr.c       | 7 ++-----
+ drivers/net/ethernet/intel/ice/ice_repr.h       | 3 +--
+ 4 files changed, 7 insertions(+), 8 deletions(-)
 
-The following are changes since commit 3226607302ca5a74dee6f1c817580c713ef9d0dd:
-  selftests: net: change shebang to bash in amt.sh
-and are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
-
-Michal Swiatkowski (4):
-  ice: store representor ID in bridge port
-  ice: move devlink locking outside the port creation
-  ice: move VSI configuration outside repr setup
-  ice: update representor when VSI is ready
-
- .../net/ethernet/intel/ice/devlink/devlink.c  |  2 -
- .../ethernet/intel/ice/devlink/devlink_port.c |  4 +-
- drivers/net/ethernet/intel/ice/ice_eswitch.c  | 85 +++++++++++++------
- drivers/net/ethernet/intel/ice/ice_eswitch.h  | 14 ++-
- .../net/ethernet/intel/ice/ice_eswitch_br.c   |  4 +-
- .../net/ethernet/intel/ice/ice_eswitch_br.h   |  1 +
- drivers/net/ethernet/intel/ice/ice_repr.c     | 16 ++--
- drivers/net/ethernet/intel/ice/ice_repr.h     |  3 +-
- drivers/net/ethernet/intel/ice/ice_vf_lib.c   |  2 +-
- 9 files changed, 90 insertions(+), 41 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
+index ac5beecd028b..f5aceb32bf4d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
+@@ -896,7 +896,8 @@ ice_eswitch_br_port_deinit(struct ice_esw_br *bridge,
+ 	if (br_port->type == ICE_ESWITCH_BR_UPLINK_PORT && vsi->back) {
+ 		vsi->back->br_port = NULL;
+ 	} else {
+-		struct ice_repr *repr = ice_repr_get_by_vsi(vsi);
++		struct ice_repr *repr =
++			ice_repr_get(vsi->back, br_port->repr_id);
+ 
+ 		if (repr)
+ 			repr->br_port = NULL;
+@@ -937,6 +938,7 @@ ice_eswitch_br_vf_repr_port_init(struct ice_esw_br *bridge,
+ 	br_port->vsi = repr->src_vsi;
+ 	br_port->vsi_idx = br_port->vsi->idx;
+ 	br_port->type = ICE_ESWITCH_BR_VF_REPR_PORT;
++	br_port->repr_id = repr->id;
+ 	repr->br_port = br_port;
+ 
+ 	err = xa_insert(&bridge->ports, br_port->vsi_idx, br_port, GFP_KERNEL);
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch_br.h b/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
+index 85a8fadb2928..c15c7344d7f8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
+@@ -46,6 +46,7 @@ struct ice_esw_br_port {
+ 	enum ice_esw_br_port_type type;
+ 	u16 vsi_idx;
+ 	u16 pvid;
++	u32 repr_id;
+ 	struct xarray vlans;
+ };
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_repr.c b/drivers/net/ethernet/intel/ice/ice_repr.c
+index d367f4c66dcd..fe83f305cc7d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_repr.c
++++ b/drivers/net/ethernet/intel/ice/ice_repr.c
+@@ -415,12 +415,9 @@ struct ice_repr *ice_repr_add_vf(struct ice_vf *vf)
+ 	return ERR_PTR(err);
+ }
+ 
+-struct ice_repr *ice_repr_get_by_vsi(struct ice_vsi *vsi)
++struct ice_repr *ice_repr_get(struct ice_pf *pf, u32 id)
+ {
+-	if (!vsi->vf)
+-		return NULL;
+-
+-	return xa_load(&vsi->back->eswitch.reprs, vsi->vf->repr_id);
++	return xa_load(&pf->eswitch.reprs, id);
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_repr.h b/drivers/net/ethernet/intel/ice/ice_repr.h
+index cff730b15ca0..488661b2900b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_repr.h
++++ b/drivers/net/ethernet/intel/ice/ice_repr.h
+@@ -35,9 +35,8 @@ void ice_repr_stop_tx_queues(struct ice_repr *repr);
+ struct ice_repr *ice_netdev_to_repr(const struct net_device *netdev);
+ bool ice_is_port_repr_netdev(const struct net_device *netdev);
+ 
+-struct ice_repr *ice_repr_get_by_vsi(struct ice_vsi *vsi);
+-
+ void ice_repr_inc_tx_stats(struct ice_repr *repr, unsigned int len,
+ 			   int xmit_status);
+ void ice_repr_inc_rx_stats(struct net_device *netdev, unsigned int len);
++struct ice_repr *ice_repr_get(struct ice_pf *pf, u32 id);
+ #endif
 -- 
 2.41.0
 
