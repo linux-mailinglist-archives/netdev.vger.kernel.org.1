@@ -1,159 +1,131 @@
-Return-Path: <netdev+bounces-105814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 045E4913038
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 00:20:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62453913054
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 00:32:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6072DB26093
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 22:20:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1B781F240EB
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 22:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D650680C03;
-	Fri, 21 Jun 2024 22:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAFE1155306;
+	Fri, 21 Jun 2024 22:32:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="eaJoWhoq"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Sy2OGDDG"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic310-31.consmr.mail.ne1.yahoo.com (sonic310-31.consmr.mail.ne1.yahoo.com [66.163.186.212])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164EA36127
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 22:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.186.212
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67448208C4;
+	Fri, 21 Jun 2024 22:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719008445; cv=none; b=dKghHH+c1iLfsmdR37iectjerYXDz1iNgP8jWNthA4lj8Y2YSl/ax+pT03BylstdDb8eoeKEyHifMIv86u5n6N+Pawq/ddTLXfdrqLLyhIFGdLhOZfqHzVCY67JQjNPtntSYsQ1Rk6p6nF2oI+gdkwWQJ5HmXPo64QMS7D/llMw=
+	t=1719009128; cv=none; b=lFl3aQXpH3u9D62onmeMeqEV5dulRSOqmJQabwMd4Z0IlApDwR+W+IKPJABNnGYRIZyS1xXEcdbV6/ChMp0VJRCMJ2SzvwzdiTcU2uG2iiCMc8TNBd+b6KyB4wBHNS6ePl/t7zyKNl+G1NGqIqIV12f4LPHvBncQEe2maFW44Cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719008445; c=relaxed/simple;
-	bh=/3OUXbxbh4HVBBwvgsX+pbK2kz+8OtQOGQtbeuGta1o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=drWCVjHos+w9B47WLN9AcevCYxhwW2q1GkuQ0tih3B2SDqHdot4405EGXAZyAl9wcZv0r1vIV0wVxGj+EK5bTY0w/lS7kjd8olt6ElY/FezyLfxr2t+VamFeR8g9Si0gj8izWBpNsLmjXq2M9EojRO3FjA6C7KdmmZsFMWuq1Cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=eaJoWhoq; arc=none smtp.client-ip=66.163.186.212
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1719008443; bh=W93MUuqF8YI2qTC2EngAWFfgxbIWTzpfO4cxB6FzZ44=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=eaJoWhoqBXMVllfmA75k+JsLZlPd0TsN1wQwYQ2RbAQd+A5YxINPuev95vgvqh7G0qsb0tGIwnaf7a5dec5CuYV4UtK9vbxR6AYvqbn1dhmPKDnEvr4mFfZkkJLQgjhfeIOB3alaYzs3/NuOWhHjvwTNOC8m4llglOOcwTu8JuGpOoR+Gwtl7qe5GTrPQBi/eGNlSOzZxn3yqkIoIAQoixofXz9K9BCICJTXjF8WHG68veocfcq+3NUgdSdQxmadNoXEeeJ5Z+uJ/z3jRnozxq29fCp4JA7efpoVubcek4uF9nPz649BpcgxLgB/RVsPCSKQLP1aNjyobp7HSor4jw==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1719008443; bh=8pDr9k/Pi/rDVlxxCgm86Wt7MkI52wXLUCH7VWFere+=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=pjV5klm8gXAGU1EyeYxfyrVwKt9Ay/8ArsUGVj9xT178ismJb/lEKgQFF0XGXlNQ5KOqPEJbEKjcKW+mpQm1NZqF0PVN8TopG5IHRXHEeOsKunXEHPd4CMeCmI+a/J2L//7x4pPaMPluVa3UV2m02XcfRHkua8jEAw0R72FqhbKTHbdWueRZlhPqutD2prJS5W7oRmhXFqm+h215nmVlch099O5DSXuF/TU9+4yPiJc336zOR2xyRElOOTA/zVB+1HzOxSOMwUw6WRBMks+oKsoUl4Cj9ZB4SPQ9JWIZV68SUXSERpkNiR85IJF1WqCgjqizW9Pc4ZZG3xzKPQkfwA==
-X-YMail-OSG: xHIJgvYVM1l_e5pHrqiy_yh8PxQUmnnZNw03DwldaoYhvIGtjxoRyA1hUkbJVF2
- SyOTADNPwKlhsH4_83zkPIKbRq.Q0DDQVZXhiAYJiSXcCpI4pkxrfdfI3vWbH_etfKHXhHTVjZSE
- HA9zfNysDePb7ZPyH_ti6YBa2UBkPKPpnnvew_UvKOdqFRm71QQRYfAegjLsmc9dSBpn_3HWkfhq
- 2x0HKa_ysth7HW2P1UYkZvIszKuYDsub_iF_rSh8nYr65Q1fDLOSK9UpkwRw1a12c3eFmJlbg0gG
- Ps.qhuEdAr69Y3LbxLYIrKwm1QmlWSyFaCxW4GRYkAmyhSzc8GD..EoXavTvvE8fvz8AAOZYWO2Q
- o3oiK8stAertTzEtGqR0VWSFo1XxCDtA2Im6C9LiZ99jz75WJ.24MDm1a5yBTXJFqFBe0p13NiRI
- laAyoDkDOk1F11Zw.0bvEP5UrWMudvqUqBMOcoVmVQHQCeUBz8ignD9gGW8tWJmNH5YIn9OL1EAC
- sLK6kt9hL_Pg00d2R.TgEfim0FuBicqwA1PecLiM4YD_llWpfGSbZ1LIDtys8G2TXmDsA52XupJx
- PMZjxcX8z7U_Z4l19e7ijxZrDfSkg02CsUczSeAbhYVo.NUZLs_Rb6nmI.15KZLAmHmqd_xQlpSE
- HmNNwR.v7AxvawVtBWhMpYm4Fien70j10RRBAXyJ3xDHBseTIV7f_f1eAJzEQfKRtHy1jSFI_5O6
- 9W4ox2yyxPEAeIyvRTDJ3DpJXsE_QCHuPUaY23.mIkOVS6vbqAUc6Jes1P2vRpSC2fto3GRdtTCt
- BuaJOI1owyBSFNasUaLZb3jT1bVk.4EKVT2a56pf.sHQCSbSxXgGi6aJ0BJffqA2gp_i8u1oSZ3f
- 6N.WKA.hUb2iRQ7lBTIaV.2JXAVAuRJdP0_rCTSyDr443NZTQ_GHzuY3STxDEXNsHP2BX2lIa2JT
- UPUwrhHrgTQGt40I8FtCXt0fPc.do3fDAEvnbMj3yd5kzy34.U2DukQcJ3ykWDIRnZKgwaQBFlbT
- 2SPn6B6Yfte1JmW9oVQBt6Bcr0eQv.Jwsjrus0mnWb1DVqrjLzOZuLMlwC3u0oxqaRTJfpvyZcQD
- k_bAPui8HfxrlGg_yH.wqVeDrUAvUUuOv66uKwagBp2Eyl_eVayXfj3f2RzP2xxd8enU.owi.whw
- 4j1OiGmAUtbNINy3mzjjRpaIQoFuR577yzUkFvYzKka61bZN61J_YbfDuPhwUlBePngWeWdasony
- XyvXRR9ac5F2y3agMebnLJSGv0E0n1RJurZ12HYCGD_mRUNfVTw_vyGNYReqT.7d32FalsrkhXNM
- YE7X70zZYy.QvxBzsj9hBywvB1wAn131GV3nDNvyu03jd9V32qpkMJUAeZ2O0s36i_sjiky2RBnE
- IR9_V9wk3p3jbdJ7umKG0BtTNjwHO2yc.K1TxmSmTGg.YyAgWznGK4qarj.5z_LAWmyAVyNnpFVI
- EUIeRBnK.jdm.oeBa_etlm.RFulscNElPDHZJaIfhlqoxSiSf0pApy_vsW756ibuOUjqt9RIaFfy
- FiaURzn6l_1w4u6FvRoYbgGCOW1tSciD3ceLtTOCX_0Az.et8w67gzyvtLQ9wApkF8Pru3jCYO3U
- SqnGkd1jqaq.D.BWNalIaF3QkpLZor5mF09f1GiHTJTmQLzRtdMbbmXBF6cDdoHhmBSgAFBWvScq
- b.DzMpIcEfNHzmK.O17slhHyZ_jfQFXwhAIJAbifTkTVWxx.PwMVxHWIpeLuhEukWJgfAF8Off20
- VCejX_LNPVoO5MDUVNnB.UeFvWep7en17N7Y6GMQ3jmJWoF7EUmjPdDrF.JPqiWCXfeksdI5Cwfx
- oKAkT7Eci3JBKS0SDAE9z3tItrRYpvceo37.dySQuLtrLhJa0ImT69QsKnCtTEo95RjTqcDKLJL0
- dxMhgkNhQdt3.dTjhhaQdvRTgawMLhdFz5vaILGYncO00Zy03VhwmPwkoaYJG2GlPcd.flgMobOs
- 3tsHIk32BxbadWd5a5QpKTxIP9VT4cScMqPZr0iu.ikEYWkmxj15JdbnXchSsW7B_J_QDOGtprtl
- bKecFPJEE5a1OCuLLQKrB1xulpgMCgz24Ns60rT13dXBf4iSvPUG_fruCb1xupgZhY4HVVIHS0uD
- SHd1H0ZWEvi9xgJFapzZbp_zTk1SpF3cNUx3FPJc6.k7Y2YYZ2rba22bJEOwnDg5Y6dpidlYfXBz
- YOknam3R1lChQ7W0ePQWNYxezpArxdnk8PnmZkKVtSmrwCXzeAxdoz3O1wLXzb.2IT3Ln8viyS9w
- -
-X-Sonic-MF: <casey@schaufler-ca.com>
-X-Sonic-ID: 40e448d0-786a-4711-84b1-e00c610a0ba3
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic310.consmr.mail.ne1.yahoo.com with HTTP; Fri, 21 Jun 2024 22:20:43 +0000
-Received: by hermes--production-gq1-5b4c49485c-75jqb (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID fa3be147b3108ab3bb88dd26f261d3a7;
-          Fri, 21 Jun 2024 22:00:25 +0000 (UTC)
-Message-ID: <2cddc480-f911-44e3-b415-33e0cec2964c@schaufler-ca.com>
-Date: Fri, 21 Jun 2024 15:00:22 -0700
+	s=arc-20240116; t=1719009128; c=relaxed/simple;
+	bh=QeaV/gigR1FI9RZaEuLwvoMRHp+ehS5UqWHrv0g8cio=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eXn+i7ZWwWyexzvTDKoZZpaZuHAqGIp1PsDEtMPPv9sZpOF2cSCH7Lpu273g/kSDbuNkW0+KWQ/HSecVCRZ7mY5Vmx9J9RnqVe2EX/uoJlKcQL8FAaZFBPIj0Phtu/RbExAuzDvpSQ65soDNTnxH8oVkYaaDuv6S4lhprpf74vY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Sy2OGDDG; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1719009126; x=1750545126;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=QeaV/gigR1FI9RZaEuLwvoMRHp+ehS5UqWHrv0g8cio=;
+  b=Sy2OGDDGnTllCiHgQ4C12bImzeB4/gY68fWJc/zd60nZ8IZBD6NoV3h3
+   TnOkbnja7KsxR9J3EQL4Zf2/sKY2z6yij9oR7/+hlhdxpHSG7JOwKKc6A
+   xcopGUO3zzcKd2aO/+ykFe8q71x9RTkGgbwl9GnYCYYiK9j7vtqJB7DDA
+   vdr/WXJ1f1OHmKozNatT6ryRZVJvaKCIhhowHZezcPc3/Vxo3Hw53de7P
+   pGzuHvatu/JfA6lVF2EPIz0+vUFrzO1TPW9K0WPOYoVV7jEVH3cQaL062
+   kwv8yXes+04Np4jHKyfo7dPmGAgNlG4H+l+IhGZDHol9TXVzGj4eQc99r
+   g==;
+X-CSE-ConnectionGUID: iMm8jkvNTRuUQTWGawN5rA==
+X-CSE-MsgGUID: HPkZBEfsTq64Sz/5N2j+hg==
+X-IronPort-AV: E=Sophos;i="6.08,256,1712646000"; 
+   d="scan'208";a="28992499"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Jun 2024 15:31:03 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 21 Jun 2024 15:30:46 -0700
+Received: from hat-linux.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Fri, 21 Jun 2024 15:30:46 -0700
+From: <Tristram.Ha@microchip.com>
+To: Arun Ramadoss <arun.ramadoss@microchip.com>, Woojung Huh
+	<woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>, Vivien Didelot
+	<vivien.didelot@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>,
+	"Vladimir Oltean" <olteanv@gmail.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Tristram Ha
+	<tristram.ha@microchip.com>
+Subject: [PATCH v3 net] net: dsa: microchip: fix wrong register write when masking interrupt
+Date: Fri, 21 Jun 2024 15:34:22 -0700
+Message-ID: <1719009262-2948-1-git-send-email-Tristram.Ha@microchip.com>
+X-Mailer: git-send-email 1.9.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC] LSM, net: Add SO_PEERCONTEXT for peer LSM data
-To: Paul Moore <paul@paul-moore.com>
-Cc: LSM List <linux-security-module@vger.kernel.org>, netdev@vger.kernel.org,
- linux-api@vger.kernel.org,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- Casey Schaufler <casey@schaufler-ca.com>
-References: <763db426-6f60-4d36-b3f9-b316008889f7@schaufler-ca.com>
- <83ef6981a29c441b58b525e9292c866a@paul-moore.com>
- <c59a4954-913b-4672-b502-21aa683d7cdb@schaufler-ca.com>
- <CAHC9VhRjbWuFeprjNP3r7tU27cW6bEZytWq-3XTjzoN7Ki-zzQ@mail.gmail.com>
-Content-Language: en-US
-From: Casey Schaufler <casey@schaufler-ca.com>
-In-Reply-To: <CAHC9VhRjbWuFeprjNP3r7tU27cW6bEZytWq-3XTjzoN7Ki-zzQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Mailer: WebService/1.1.22407 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+Content-Type: text/plain
 
-On 6/21/2024 12:41 PM, Paul Moore wrote:
-> On Fri, Jun 21, 2024 at 12:06 PM Casey Schaufler <casey@schaufler-ca.com> wrote:
->> On 6/20/2024 2:05 PM, Paul Moore wrote:
->>> On May 13, 2024 Casey Schaufler <casey@schaufler-ca.com> wrote:
-> ..
->
->>>> +/**
->>>> + * security_socket_getpeerctx_stream() - Get the remote peer label
->>>> + * @sock: socket
->>>> + * @optval: destination buffer
->>>> + * @optlen: size of peer label copied into the buffer
->>>> + * @len: maximum size of the destination buffer
->>>> + *
->>>> + * This hook allows the security module to provide peer socket security state
->>>> + * for unix or connected tcp sockets to userspace via getsockopt
->>>> + * SO_GETPEERCONTEXT.  For tcp sockets this can be meaningful if the socket
->>>> + * is associated with an ipsec SA.
->>>> + *
->>>> + * Return: Returns 0 if all is well, otherwise, typical getsockopt return
->>>> + *         values.
->>>> + */
->>>> +int security_socket_getpeerctx_stream(struct socket *sock, sockptr_t optval,
->>>> +                                  sockptr_t optlen, unsigned int len)
->>>> +{
->>>> +    struct security_hook_list *hp;
->>>> +
->>>> +    hlist_for_each_entry(hp, &security_hook_heads.socket_getpeerctx_stream,
->>>> +                         list)
->>>> +            return hp->hook.socket_getpeerctx_stream(sock, optval, optlen,
->>>> +                                                     len);
->>>> +
->>>> +    return LSM_RET_DEFAULT(socket_getpeerctx_stream);
->>>> +}
->>> Don't we need the same magic that we have in security_getselfattr() to
->>> handle the multi-LSM case?
->> Yes. I would like to move this ahead independently of the multi-LSM support.
->> Putting the multi-LSM magic in is unnecessary and rather pointless until then.
-> Starting with the LSM syscalls, I want any new user visible API that
-> can support multiple LSMs to have support for multiple LSMs.  Yes, the
-> setselfattr API doesn't support multiple LSMs, but that is because we
-> agreed there was never going to be a way to safely support that usage.
-> In this particular case, that same argument does not apply, we could
-> have multiple LSMs returning a socket's network peer information (even
-> if we don't currently see that), so let's make sure our API supports
-> it from the start.
+From: Tristram Ha <tristram.ha@microchip.com>
 
-OK. I'll put that in v2 as well.
+The switch global port interrupt mask, REG_SW_PORT_INT_MASK__4, is
+defined as 0x001C in ksz9477_reg.h.  The designers used 32-bit value in
+anticipation for increase of port count in future product but currently
+the maximum port count is 7 and the effective value is 0x7F in register
+0x001F.  Each port has its own interrupt mask and is defined as 0x#01F.
+It uses only 4 bits for different interrupts.
 
->
-> Unrelated to the above, it would also be good to datagram support as a
-> patch 2/2 thing in a future version of this patchset.  Please be
-> careful not to carry over the mistakes we made with SCM_SECURITY (see
-> the GH discussion linked below).
+The developer who implemented the current interrupt mechanism in the
+switch driver noticed there are similarities between the mechanism to
+mask port interrupts in global interrupt and individual interrupts in
+each port and so used the same code to handle these interrupts.  He
+updated the code to use the new macro REG_SW_PORT_INT_MASK__1 which is
+defined as 0x1F in ksz_common.h but he forgot to update the 32-bit write
+to 8-bit as now the mask registers are 0x1F and 0x#01F.
 
-That's "in my queue". I didn't want to spend time on it until I got
-feedback on this one.
+In addition all KSZ switches other than the KSZ9897/KSZ9893 and LAN937X
+families use only 8-bit access and so this common code will eventually
+be changed to accommodate them.
 
->
-> * https://github.com/SELinuxProject/selinux-kernel/issues/24
->
+Fixes: e1add7dd6183 ("net: dsa: microchip: use common irq routines for girq and pirq")
+Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+---
+v3
+ - bump the number for third submission
+ - provide the full explanation of modifying the code
+
+v1
+ - clarify the reason to change the code
+
+ drivers/net/dsa/microchip/ksz_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 1e0085cd9a9a..3ad0879b00cd 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2185,7 +2185,7 @@ static void ksz_irq_bus_sync_unlock(struct irq_data *d)
+ 	struct ksz_device *dev = kirq->dev;
+ 	int ret;
+ 
+-	ret = ksz_write32(dev, kirq->reg_mask, kirq->masked);
++	ret = ksz_write8(dev, kirq->reg_mask, kirq->masked);
+ 	if (ret)
+ 		dev_err(dev->dev, "failed to change IRQ mask\n");
+ 
+-- 
+2.34.1
+
 
