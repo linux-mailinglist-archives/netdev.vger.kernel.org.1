@@ -1,266 +1,149 @@
-Return-Path: <netdev+bounces-105797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72046912D83
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 20:49:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0637F912D88
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 20:49:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2E2A1F22D38
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 18:49:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CCE1B237F5
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 18:49:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF7C17B51D;
-	Fri, 21 Jun 2024 18:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21B817B4F1;
+	Fri, 21 Jun 2024 18:49:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ep4qjsFk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dcpUiTfj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD06B169AE2
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 18:48:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E4A179957;
+	Fri, 21 Jun 2024 18:49:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718995729; cv=none; b=KaBX3bJChgY2/uT3z0CTpbMpQTtO0T+IBMslOFwRVGdOuc/KgI5vD6rxDsh5lqMotTB9SwtUthOj+2uGotVpujhQtfJg+NX4jEXp4NdAHUtRxc3g4amqAXZO4kLDgRrusnFQffveplqKVu2XJPxgLMJ06d4+2iE1tKjMPzoo+aY=
+	t=1718995765; cv=none; b=r2SE1JjRTq8Nn0OTP0u3QAhhTsR7jRUMAziOrnAybEpi73eRx9OyZNqJcX1zJKOjjFYEiEZcRZiNi6/YSSIlagdMoeSBIreDA/3s7oC1KCeJwP4QI0PRGV8iAHfiOFjHrQDr8kZeUzCytRGtZwhGwJXxF8Kws0JVDhi2h9o4ngQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718995729; c=relaxed/simple;
-	bh=OSlxMUbH1cjP63rf/i9A5OnYZ1MoT2re527p17lrMmg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NQ5iZ0Ri90uYzp/rtUP45CGihwlA/gd1IbeZqS0O/eMLWGe7nolwxCHdw6no53+ze6Dubdy/m3550PaeyGURgXSD2I4d12DQvwbTGuL7eRdW1oI062GA6HVnlmHH8+gdU4NMAa85yw1Xw1jTWLfDI+R3eSd/l0Lx1C4J+nhBL+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ep4qjsFk; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a6f0e153eddso300909066b.0
-        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 11:48:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718995724; x=1719600524; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zlvzkk98R2AMG0Z6R+7nntNyc9a9ODPBi8r4EwCvbRQ=;
-        b=ep4qjsFklEFqpVJUKWocum5m/Io13lGRq4EdyZT2oV2jz2VRFNLFt8t0MBi0IBPJnr
-         jTAkMIfj2nMJb/FnGlSYVFbFSKkwzFxEsH401JxThJZJ4Q1OqDVTYTun8UGcgBg4BXLD
-         pDtpH/J7194OprEHFUy1tgWVSqfPoP9Qcw2wzPPgoS6znpxnWW2RYg3Ik481uFXByHur
-         8t1R8AucQu05yVQZxgfYqKr31+T+yw8tdIwe74GztkEsz3utwTPtu9muIve8NgwRtL9l
-         Wd4wCdN9Kn3pLEt0YBYb1lBp5zl9qLpVPm1rqI4Zhjhc4VMoBaxUKeleB9XZx9PLURO9
-         2QOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718995724; x=1719600524;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zlvzkk98R2AMG0Z6R+7nntNyc9a9ODPBi8r4EwCvbRQ=;
-        b=BMWrpVRQ9eGUHv40UYkw/9fcQsqn6eBsl6e0o4Wl1WqX0IeqGLuvC56Of126acXuIH
-         AuTGSlTUWgE1j/MoNj3+32ky0f1vlrHfwEP/A1XJQtea/H/K3PrrBueNLqv9e538URSz
-         TK/q93JVpMB+mSAxWEPK0PLFN/7Hix70OQ4Fsl82XROTfKHFmIJbZLuN9p5ZXuIYTT8y
-         ubl3h/DJvbAzhtqXK4xqvwuYDQ+7EKUmR8Bd/f6at52u80PtfZCUPjaAFq4tOHu1gMPU
-         r9q+JEQ/nYveWD5Sl3fN21JRd6+Jn3dsrcLp/o3RA9pD2EO/EpyXHgx3u/xsDobNsEu5
-         uYpw==
-X-Gm-Message-State: AOJu0YyxOTxUJb1gcrrbfqlaQRh7B8GjWFZgA1tto3AVRLz3mp7iliUk
-	54G+eaqqakgammWslWX9daDj3PsuhP1fQUw1cz3k3LjxxjB3TXPSTzLG7JA2FY/ED+kEB3NWp61
-	sZWia8eRle1aQan7yx1rhtv+pILb7N2SwWZCNcfmRJbL1fmpDZmi3/pD/vA==
-X-Google-Smtp-Source: AGHT+IFB0A55nMGApv5jFWmOQotPDfRzqqPIQ74RIyN5NL9KIVshccHHA4pJlBegEvYv4fDuzVclwWQ3R4BpwgBCJ4w=
-X-Received: by 2002:a17:907:a644:b0:a6f:b60c:2c08 with SMTP id
- a640c23a62f3a-a6fb60c2f79mr565339266b.24.1718995723769; Fri, 21 Jun 2024
- 11:48:43 -0700 (PDT)
+	s=arc-20240116; t=1718995765; c=relaxed/simple;
+	bh=H/7KJb3Hymr1bKAoWOE4wiwISddzEhYEUB2Cpn7f+Ag=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=aZYm/JoYtfAKsDK7D8Grz/KrICrVO4t5qgvvYQ5V4y1U1cEU+t5yvSnOfkAgpucJV9XXrXSGRSWcz41Iq1mUhxhoENEM6pufP05dV4YzXkxnTYO+mb4PDiFvykJq5FBA2SdzV5mlqsnu9PiY/eJuQryNsihKBD1d66Awgx+Dpyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dcpUiTfj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6002C2BBFC;
+	Fri, 21 Jun 2024 18:49:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718995765;
+	bh=H/7KJb3Hymr1bKAoWOE4wiwISddzEhYEUB2Cpn7f+Ag=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=dcpUiTfj0pZj8c9YnwxOVMJKgC183M8l4XD3bZKdRLAHBOa7QLAQ2dXK1BEXCuQNq
+	 kMQSxeZsDzahW34rhdDVxY1GWkssuw98Ekh37+4w35obX2lbQazn/8Yu/rSaZuKwgr
+	 iN1ulmzWHCXe66KikX/r72y+IVu3zRSmNHbr+d+qmBQA6Wk7+Jh/IimR3iOeIgGUSb
+	 2K023F37o+dgCPwG4gzdRGBmx+l9DvcRCzNd4KN82/NT6njH7xHI8uFhcfhaV1Fvx2
+	 M4nRoZP7Fd+AtL4hX8mcKUeI8EYaKYtfuVOFNE2ZmcHzTYo2HBppxQFy4HC2IadRAN
+	 R2oqIwo/a4xSg==
+Date: Fri, 21 Jun 2024 13:49:23 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Herve Codina <herve.codina@bootlin.com>,
+	Simon Horman <horms@kernel.org>,
+	Sai Krishna Gajula <saikrishnag@marvell.com>,
+	Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 18/19] mfd: Add support for LAN966x PCI device
+Message-ID: <20240621184923.GA1398370@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240613013557.1169171-1-almasrymina@google.com>
- <20240613013557.1169171-7-almasrymina@google.com> <439590d4-0f05-4f5e-80ec-e7fdf214e307@gmail.com>
-In-Reply-To: <439590d4-0f05-4f5e-80ec-e7fdf214e307@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 21 Jun 2024 11:48:30 -0700
-Message-ID: <CAHS8izNr4x6SW0oY_VJDPZOsrBQEAyJO1qVJQbu8VNJQMtX9Sg@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 06/13] page_pool: devmem support
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Sergey Shtylyov <s.shtylyov@omp.ru>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, linux-mm@kvack.org, 
-	Matthew Wilcox <willy@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHp75VdeoNXRTmMoK-S6qecU1nOQWDZVONeHU+imFiwcTxe8xg@mail.gmail.com>
 
-On Mon, Jun 17, 2024 at 7:17=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> On 6/13/24 02:35, Mina Almasry wrote:
-> > Convert netmem to be a union of struct page and struct netmem. Overload
-> > the LSB of struct netmem* to indicate that it's a net_iov, otherwise
-> > it's a page.
-> >
-> > Currently these entries in struct page are rented by the page_pool and
-> > used exclusively by the net stack:
-> >
-> > struct {
-> >       unsigned long pp_magic;
-> >       struct page_pool *pp;
-> >       unsigned long _pp_mapping_pad;
-> >       unsigned long dma_addr;
-> >       atomic_long_t pp_ref_count;
-> > };
-> >
-> > Mirror these (and only these) entries into struct net_iov and implement
-> > netmem helpers that can access these common fields regardless of
-> > whether the underlying type is page or net_iov.
-> >
-> > Implement checks for net_iov in netmem helpers which delegate to mm
-> > APIs, to ensure net_iov are never passed to the mm stack.
-> >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
->
-> Apart from small comments below
->
-> Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
->
->
-> > ---
-> >   include/net/netmem.h            | 137 ++++++++++++++++++++++++++++++-=
--
-> >   include/net/page_pool/helpers.h |  25 +++---
-> >   net/core/devmem.c               |   3 +
-> >   net/core/page_pool.c            |  26 +++---
-> >   net/core/skbuff.c               |  22 +++--
-> >   5 files changed, 168 insertions(+), 45 deletions(-)
-> >
-> > diff --git a/include/net/netmem.h b/include/net/netmem.h
-> > index 664df8325ece5..35ad237fdf29e 100644
-> > --- a/include/net/netmem.h
-> > +++ b/include/net/netmem.h
-> ...
-> > -/* Converting from page to netmem is always safe, because a page can a=
-lways be
-> > - * a netmem.
-> > - */
-> >   static inline netmem_ref page_to_netmem(struct page *page)
-> >   {
-> >       return (__force netmem_ref)page;
-> > @@ -68,17 +107,103 @@ static inline netmem_ref page_to_netmem(struct pa=
-ge *page)
-> >
-> >   static inline int netmem_ref_count(netmem_ref netmem)
-> >   {
-> > +     /* The non-pp refcount of net_iov is always 1. On net_iov, we onl=
-y
-> > +      * support pp refcounting which uses the pp_ref_count field.
-> > +      */
-> > +     if (netmem_is_net_iov(netmem))
-> > +             return 1;
-> > +
-> >       return page_ref_count(netmem_to_page(netmem));
-> >   }
-> >
-> >   static inline unsigned long netmem_to_pfn(netmem_ref netmem)
-> >   {
-> > +     if (netmem_is_net_iov(netmem))
-> > +             return 0;
->
-> IIRC 0 is a valid pfn. Not much of a concern since it's
-> used only for tracing, but might make sense to pass some
-> invalid pfn if there is one
->
+On Fri, Jun 21, 2024 at 05:45:05PM +0200, Andy Shevchenko wrote:
+> On Thu, Jun 20, 2024 at 7:19 PM Herve Codina <herve.codina@bootlin.com> wrote:
+> > On Thu, 20 Jun 2024 18:43:09 +0200
+> > Herve Codina <herve.codina@bootlin.com> wrote:
+> > > On Thu, 20 Jun 2024 18:07:16 +0200
+> > > Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
+> > > > On Thu, Jun 20, 2024 at 5:56 PM Herve Codina <herve.codina@bootlin.com> wrote:
+> > > > > On Wed, 5 Jun 2024 23:24:43 +0300
+> > > > > Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
+> > > > > > Mon, May 27, 2024 at 06:14:45PM +0200, Herve Codina kirjoitti:
 
-AFAIU all non-negative pfns are technically valid pfns if the machine
-is big enough.
-
-I could have this function return long long instead of unsigned long
-so I can return a negative number for errors, and then cast to
-unsigned long when I figure out it's actually a pfn. Seemed like such
-a hassle especially since the call site is just tracing that I figured
-it's not that worth it.
-
-> > +
-> >       return page_to_pfn(netmem_to_page(netmem));
-> >   }
+> > > > > > > +static struct pci_device_id lan966x_pci_ids[] = {
+> > > > > > > +   { PCI_DEVICE(0x1055, 0x9660) },
+> > > > > >
+> > > > > > Don't you have VENDOR_ID defined somewhere?
+> > > > >
+> > > > > No and 0x1055 is taken by PCI_VENDOR_ID_EFAR in pci-ids.h
+> > > > > but SMSC acquired EFAR late 1990's and MCHP acquired SMSC in 2012
+> > > > > https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/microchip/lan743x_main.h#L851
+> > > > >
+> > > > > I will patch pci-ids.h to create:
+> > > > >   #define PCI_VENDOR_ID_SMSC PCI_VENDOR_ID_EFAR
+> > > > >   #define PCI_VENDOR_ID_MCHP PCI_VENDOR_ID_SMSC
+> > > > > As part of this patch, I will update lan743x_main.h to remove its own #define
+> > > > >
+> > > > > And use PCI_VENDOR_ID_MCHP in this series.
+> > > >
+> > > > Okay, but I don't think (but I haven't checked) we have something like
+> > > > this ever done there. In any case it's up to Bjorn how to implement
+> > > > this.
 > >
-> ...
-> >   static inline netmem_ref netmem_compound_head(netmem_ref netmem)
-> >   {
-> > +     /* niov are never compounded */
-> > +     if (netmem_is_net_iov(netmem))
-> > +             return netmem;
-> > +
-> >       return page_to_netmem(compound_head(netmem_to_page(netmem)));
-> >   }
-> >
-> > +static inline void *netmem_address(netmem_ref netmem)
->
-> I don't think it's used anywhere, do I miss it?
->
+> > Right, I wait for Bjorn reply before changing anything.
+> 
+> But we already have the vendor ID with the same value. Even if the
+> company was acquired, the old ID still may be used. In that case an
+> update on PCI IDs can go in a separate change justifying it. In any
+> case, I would really want to hear from Bjorn on this and if nothing
+> happens, to use the existing vendor ID for now to speed up the series
+> to be reviewed/processed.
 
-Ah, It's used by the GVE devmem implementation:
-https://github.com/mina/linux/commit/da89baa81873d457cbf7b49ee6b4f0d66855b2=
-05
+We have "#define PCI_VENDOR_ID_EFAR 0x1055" in pci_ids.h, but
+https://pcisig.com/membership/member-companies?combine=1055 shows no
+results, so it *looks* like EFAR/SMSC/MCHP are currently squatting on
+that ID without it being officially assigned.
 
-I could leave it out of this patch, then add it with the follow up GVE
-devmem implementation, but I figured almost for sure drivers are going
-to need this eventually, and it's small, so just put it here.
+I think MCHP needs to register 0x1055 with the PCI-SIG
+(administration@pcisig.com) if it wants to continue using it.
+The vendor is responsible for managing the Device ID space, so this
+registration includes the burden of tracking all the Device IDs that
+were assigned by EFAR and SMSC and now MCHP so there are no conflicts.
 
-> > +{
-> > +     if (netmem_is_net_iov(netmem))
-> > +             return NULL;
-> > +
-> > +     return page_address(netmem_to_page(netmem));
-> > +}
-> > +
-> ...
-> > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> > index a5957d3359762..1152e3547795a 100644
-> > --- a/net/core/page_pool.c
-> > +++ b/net/core/page_pool.c
-> > @@ -26,6 +26,8 @@
-> ...
-> >
-> >   /* If the page refcnt =3D=3D 1, this will try to recycle the page.
-> > @@ -714,7 +713,7 @@ __page_pool_put_page(struct page_pool *pool, netmem=
-_ref netmem,
-> >        * refcnt =3D=3D 1 means page_pool owns page, and can recycle it.
-> >        *
-> >        * page is NOT reusable when allocated when system is under
-> > -      * some pressure. (page_is_pfmemalloc)
-> > +      * some pressure. (page_pool_page_is_pfmemalloc)
->
-> There is no page_pool_page_is_pfmemalloc()
->
+I don't want to change the existing PCI_VENDOR_ID_EFAR, and I also
+don't want to add a PCI_VENDOR_ID_MCHP for 0x1055 until that ID has
+been registered with the PCI-SIG.
 
-Thanks done. I implemented most of your other comments on all the
-patches btw. I'm only responding to the ones I didn't apply for
-various reasons. Thanks for the review!
+So I propose that you use PCI_VENDOR_ID_EFAR for now, and if/when MCHP
+registers 0x1055 with PCI-SIG so it is unambiguously owned by MCHP, we
+can add "#define PCI_VENDOR_ID_MCHP PCI_VENDOR_ID_EFAR" or similar.
+As Andy points out, this would be a separate logical change in its own
+patch.
 
-
---=20
-Thanks,
-Mina
+Bjorn
 
