@@ -1,192 +1,219 @@
-Return-Path: <netdev+bounces-105764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34A9A912AF4
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 18:09:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A499D912B09
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 18:13:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B208D1F27EFE
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:09:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94802B24DEE
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 16:13:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15EFC167DB5;
-	Fri, 21 Jun 2024 16:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BBB615FA7F;
+	Fri, 21 Jun 2024 16:12:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L0EIVZ4/"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="WNz3epab"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7891662F6
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 16:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD4D10A39
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 16:12:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718986112; cv=none; b=CW+xHcsR0KBaidYUEBJ0BLCzqHvG+LxKvKQ9E9wmau6+kMrgYCCnRLPtDMo4lPXTnzefcmHEwmtGj1oBq3spQQWEuEBdbjbuCy7HBjVFXKrcAEMEMheHYct9GXGOVgP3njfJSj3l5vhucYT77bp9oC15DNzHM1rPDe2FZB0XkHQ=
+	t=1718986377; cv=none; b=m6d1mQ1BHpxk4SCwM4h6DssyyNW3fw74+LNfth/y5RsNYPuyMMVu/pHi7qI3qapHDDcLBUHP1lnP8/A5uL6wtEknlStbX9vJI2ldYijTWq3i5ohQsOUFklVzPBKT/hYa2aG+ifywoqDRXDco8JrBKRxtqSmJ94cD0K/9fOymoio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718986112; c=relaxed/simple;
-	bh=RLJ98cauh4ihSAhpM4t8QV5f65++vWXTHtxYQQp8ybk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JUGqyt63HnaEmkqKlSsudKUSlrxL5BZZzpl4FJaBykrr2DTbw69xxOO2ikqoivituCg+/Ek/mwIt2+qcObLTIyWD4E38oHO3u6f5yPyfz/4CC4t+gutZY2IiY8sEVJtBoHkFvQp1Sl+uP/TS4kvxo47dn5CXmo/Q5zyuiCjlMkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L0EIVZ4/; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718986110; x=1750522110;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=RLJ98cauh4ihSAhpM4t8QV5f65++vWXTHtxYQQp8ybk=;
-  b=L0EIVZ4/RgHIxC7jovsaBWD9/Enagl5FuBiXA5lq/AhlKp+pL3Twi3pB
-   UiQlLJD+YSQgrlOiWNPhYZZryHNQKBEjiXwAJlF7eDGxpkZlBd85EfR8L
-   GwC3v8jg+l3rfPU3nbFduApkuUh69VXkkJixzCi5+QOaA0Vpee4xQqFXW
-   G5fyy07p23fEYd20jlzc28jhomq4aeyFW1eEvUbg5vOiA6LaaxmTZp9rx
-   vLtctf7wYFrjrpYwBaylML4yxdFBS3hiLioYUD1C1+0hMUrLeuF1W1qfF
-   MmWgplr/Zd6RmaZJI4lzPxcQKRdZNOyvcnSDlm5e5IvGpzWkH29tNgc/j
-   g==;
-X-CSE-ConnectionGUID: sf7+OK3YRi2dhVGDq8qIvw==
-X-CSE-MsgGUID: dY0OeFTXSDuABlo4+zl9jA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11110"; a="19801421"
-X-IronPort-AV: E=Sophos;i="6.08,255,1712646000"; 
-   d="scan'208";a="19801421"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2024 09:08:28 -0700
-X-CSE-ConnectionGUID: Sq7FKzW0QiirbNMU2YkOeA==
-X-CSE-MsgGUID: Cut0MjErQ7ehkwNz6vcYpA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,255,1712646000"; 
-   d="scan'208";a="47149813"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa004.fm.intel.com with ESMTP; 21 Jun 2024 09:08:27 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	anthony.l.nguyen@intel.com,
-	Simon Horman <horms@kernel.org>,
-	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
-Subject: [PATCH net-next 4/4] ice: update representor when VSI is ready
-Date: Fri, 21 Jun 2024 09:08:17 -0700
-Message-ID: <20240621160820.3394806-5-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240621160820.3394806-1-anthony.l.nguyen@intel.com>
-References: <20240621160820.3394806-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1718986377; c=relaxed/simple;
+	bh=jWlOoYuVaoLS+56u4GNV8VdQktFIi2pVchKpOlGoiw0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oDUna0FX8SoqZKRPOgNkt8gwJTj5B6UhSV6SoSRQHN6ybba4h2ZKfkf5UWejKVCxlQcFC+mnIsEN3Y5VHEqG2tcLDEkpf9jsYGasxGW9uFmtIEHkDrc3SosRSHarR02fK8MlUWp/F9tUp4oBUFq14UdOSrdQmdhhN9ULXOeGBzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=WNz3epab; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-57cd26347d3so2336595a12.1
+        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 09:12:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1718986374; x=1719591174; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y0zYMWy18YNNETi7e8eQDmKjdjVWK9tOu69sXy0qbaU=;
+        b=WNz3epabe8jtWysPqdeHzNbiO785PVmdJbPIJR9cY+lIKloSzUnXzGfO8F9Tcuio3j
+         x5XZ3Ms3qGMWbDZz9Bag2bV0Xlr5puMzdXxob8/o7dsFWfQ50BrG3wZ9rhcvGrcU8LnN
+         uyIjJuV2l6fC1mLSNAfi4a4SXwBbiXZWw4gZE11vzzyBaKqUZ9ySxDl4toaLMlg6kydk
+         wlWpmfjVWD08Q5IIIXNa8nkRaQdBTj2z/F9+69zI8ieWW7cd+XJhtHzhUPg4HEmSKMN+
+         deK0JNe7tHJ/9/1D89C6OlKywmx5dxhqr/8y67kn0WAhmcbW2LT6GT5P2Y/bzq2u9GxX
+         B5Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718986374; x=1719591174;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=y0zYMWy18YNNETi7e8eQDmKjdjVWK9tOu69sXy0qbaU=;
+        b=wejMzr6Vz85J9q/66Otb4eU1/a+bmzCT7hzkYF8Nf9zJfXVFhpYGye/Ysfmv2JhNzT
+         2nJkAuRcvftlutfPYxbNgxtlJTYtmf7i2T+/5qyRANhCSKWVL+7MYdOvm9ldOedx/C7G
+         PMZOF50HcdxO5IpHP4v4rObGkT+ecT+c23PGRXTW8BDTd94NHD3rcUW0RwR6i2Op0HeP
+         esnJckv1cC5c9rTO2as4YBjfLjKXe6GnYuC2zwCC9wiVvR2LLCx1Y5r0uBMrPPCdP/VL
+         UCDy70jfL6Gg0OdXz0eBU5j3o0wC6c7qZvlIvUZvb8x7VoRI6vrSqCypqYhqF08OZ2St
+         YWDQ==
+X-Gm-Message-State: AOJu0Yz1yUYgjm4sncxe+VX3pD4TmcwbD1TjnbxnP62+Kumofe6YIBOs
+	UpfPudRPYqeVydzjf1zi93DsVBoOIPiYSe1Bd+h1jN60QOj+zag2DJBozt5t4UmyPNcr7WAH7Tj
+	+dpj7zfJ8Y1p4yNn8VgXP8+QisZclXEv1V94xaQ==
+X-Google-Smtp-Source: AGHT+IF7ObXHDh6mLXvGuKl49qYAnntiqa3n0WDZ6sIU1vmldDPL6jOhnwAlmJHdvCTF05jpm/342x1EYcFV1AmFL8w=
+X-Received: by 2002:a50:d74a:0:b0:57d:669:cafb with SMTP id
+ 4fb4d7f45d1cf-57d07ebf2abmr5129115a12.40.1718986373992; Fri, 21 Jun 2024
+ 09:12:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1718919473.git.yan@cloudflare.com> <39f5cbdfaa67e3319bce64ee8e4e5585b9e0c11e.1718919473.git.yan@cloudflare.com>
+ <7ce408ff-77e1-4d7b-8b4a-5ce5e16397dc@intel.com>
+In-Reply-To: <7ce408ff-77e1-4d7b-8b4a-5ce5e16397dc@intel.com>
+From: Yan Zhai <yan@cloudflare.com>
+Date: Fri, 21 Jun 2024 11:12:42 -0500
+Message-ID: <CAO3-PbqxuvZwz0edh-OYiGv57LbKJtUh64QCvDoz9c8XqkeHdw@mail.gmail.com>
+Subject: Re: [RFC net-next 2/9] xdp: add XDP_FLAGS_GRO_DISABLED flag
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+On Fri, Jun 21, 2024 at 4:17=E2=80=AFAM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> From: Yan Zhai <yan@cloudflare.com>
+> Date: Thu, 20 Jun 2024 15:19:13 -0700
+>
+> > Allow XDP program to set XDP_FLAGS_GRO_DISABLED flag in xdp_buff and
+> > xdp_frame, and disable GRO when building an sk_buff if this flag is set=
+.
+> >
+> > Signed-off-by: Yan Zhai <yan@cloudflare.com>
+> > ---
+> >  include/net/xdp.h | 38 +++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 37 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/net/xdp.h b/include/net/xdp.h
+> > index e6770dd40c91..cc3bce8817b0 100644
+> > --- a/include/net/xdp.h
+> > +++ b/include/net/xdp.h
+> > @@ -75,6 +75,7 @@ enum xdp_buff_flags {
+> >       XDP_FLAGS_FRAGS_PF_MEMALLOC     =3D BIT(1), /* xdp paged memory i=
+s under
+> >                                                  * pressure
+> >                                                  */
+> > +     XDP_FLAGS_GRO_DISABLED          =3D BIT(2), /* GRO disabled */
+>
+> There should be tabs, not spaces.
+>
+> >  };
+> >
+> >  struct xdp_buff {
+> > @@ -113,12 +114,35 @@ static __always_inline void xdp_buff_set_frag_pfm=
+emalloc(struct xdp_buff *xdp)
+> >       xdp->flags |=3D XDP_FLAGS_FRAGS_PF_MEMALLOC;
+> >  }
+> >
+> > +static __always_inline void xdp_buff_disable_gro(struct xdp_buff *xdp)
+> > +{
+> > +     xdp->flags |=3D XDP_FLAGS_GRO_DISABLED;
+> > +}
+> > +
+> > +static __always_inline bool xdp_buff_gro_disabled(struct xdp_buff *xdp=
+)
+> > +{
+> > +     return !!(xdp->flags & XDP_FLAGS_GRO_DISABLED);
+> > +}
+> > +
+> > +static __always_inline void
+> > +xdp_buff_fixup_skb_offloading(struct xdp_buff *xdp, struct sk_buff *sk=
+b)
+> > +{
+> > +     if (xdp_buff_gro_disabled(xdp))
+> > +             skb_disable_gro(skb);
+> > +}
+>
+> I don't think this should be named "fixup". "propagate", "update",
+> "promote", ...?
+>
+> Maybe `if` is not needed here?
+>
+>         skb->gro_disabled =3D xdp_buff_gro_disabled(xdp)
+>
+> ?
+>
+I called it fixup mainly considering current skb fields could be set
+incorrectly (or maybe not?) For example when XDP load balances
+traffic, it could encap and send from server A to server B, but that
+means HW on B may have no good way to calculate the actual flow
+hash/csum. The original values could be read from A and sent within
+the encapsulation header, so that B can use this value to "fixup" the
+things.
 
-In case of reset of VF VSI can be reallocated. To handle this case it
-should be properly updated.
+But tbh, I am never good at naming, it's too hard for a non-native
+speaker sometimes... So I am very open on what to use if majority of
+the participants like it :D
 
-Reload representor as vsi->vsi_num can be different than the one stored
-when representor was created.
+The if is still needed since I added a control config to wrap that bit.
 
-Instead of only changing antispoof do whole VSI configuration for
-eswitch.
+best
+Yan
 
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_eswitch.c | 21 +++++++++++++-------
- drivers/net/ethernet/intel/ice/ice_eswitch.h |  4 ++--
- drivers/net/ethernet/intel/ice/ice_vf_lib.c  |  2 +-
- 3 files changed, 17 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index 3f73f46111fc..4f539b1c7781 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -178,16 +178,16 @@ void ice_eswitch_decfg_vsi(struct ice_vsi *vsi, const u8 *mac)
-  * @repr_id: representor ID
-  * @vsi: VSI for which port representor is configured
-  */
--void ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi)
-+void ice_eswitch_update_repr(unsigned long *repr_id, struct ice_vsi *vsi)
- {
- 	struct ice_pf *pf = vsi->back;
- 	struct ice_repr *repr;
--	int ret;
-+	int err;
- 
- 	if (!ice_is_switchdev_running(pf))
- 		return;
- 
--	repr = xa_load(&pf->eswitch.reprs, repr_id);
-+	repr = xa_load(&pf->eswitch.reprs, *repr_id);
- 	if (!repr)
- 		return;
- 
-@@ -197,12 +197,19 @@ void ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi)
- 	if (repr->br_port)
- 		repr->br_port->vsi = vsi;
- 
--	ret = ice_vsi_update_security(vsi, ice_vsi_ctx_clear_antispoof);
--	if (ret) {
--		ice_fltr_add_mac_and_broadcast(vsi, repr->parent_mac,
--					       ICE_FWD_TO_VSI);
-+	err = ice_eswitch_cfg_vsi(vsi, repr->parent_mac);
-+	if (err)
- 		dev_err(ice_pf_to_dev(pf), "Failed to update VSI of port representor %d",
- 			repr->id);
-+
-+	/* The VSI number is different, reload the PR with new id */
-+	if (repr->id != vsi->vsi_num) {
-+		xa_erase(&pf->eswitch.reprs, repr->id);
-+		repr->id = vsi->vsi_num;
-+		if (xa_insert(&pf->eswitch.reprs, repr->id, repr, GFP_KERNEL))
-+			dev_err(ice_pf_to_dev(pf), "Failed to reload port representor %d",
-+				repr->id);
-+		*repr_id = repr->id;
- 	}
- }
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.h b/drivers/net/ethernet/intel/ice/ice_eswitch.h
-index 9a25606e9740..09194d514f9b 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.h
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.h
-@@ -18,7 +18,7 @@ ice_eswitch_mode_set(struct devlink *devlink, u16 mode,
- 		     struct netlink_ext_ack *extack);
- bool ice_is_eswitch_mode_switchdev(struct ice_pf *pf);
- 
--void ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi);
-+void ice_eswitch_update_repr(unsigned long *repr_id, struct ice_vsi *vsi);
- 
- void ice_eswitch_stop_all_tx_queues(struct ice_pf *pf);
- 
-@@ -47,7 +47,7 @@ ice_eswitch_set_target_vsi(struct sk_buff *skb,
- 			   struct ice_tx_offload_params *off) { }
- 
- static inline void
--ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi) { }
-+ice_eswitch_update_repr(unsigned long *repr_id, struct ice_vsi *vsi) { }
- 
- static inline int ice_eswitch_configure(struct ice_pf *pf)
- {
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-index 48a8d462d76a..5635e9da2212 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-@@ -948,7 +948,7 @@ int ice_reset_vf(struct ice_vf *vf, u32 flags)
- 		goto out_unlock;
- 	}
- 
--	ice_eswitch_update_repr(vf->repr_id, vsi);
-+	ice_eswitch_update_repr(&vf->repr_id, vsi);
- 
- 	/* if the VF has been reset allow it to come up again */
- 	ice_mbx_clear_malvf(&vf->mbx_info);
--- 
-2.41.0
-
+> > +
+> > +static __always_inline void
+> > +xdp_init_buff_minimal(struct xdp_buff *xdp)
+> > +{
+> > +     xdp->flags =3D 0;
+> > +}
+>
+> "xdp_buff_clear_flags"?
+>
+> > +
+> >  static __always_inline void
+> >  xdp_init_buff(struct xdp_buff *xdp, u32 frame_sz, struct xdp_rxq_info =
+*rxq)
+> >  {
+> >       xdp->frame_sz =3D frame_sz;
+> >       xdp->rxq =3D rxq;
+> > -     xdp->flags =3D 0;
+> > +     xdp_init_buff_minimal(xdp);
+> >  }
+> >
+> >  static __always_inline void
+> > @@ -187,6 +211,18 @@ static __always_inline bool xdp_frame_is_frag_pfme=
+malloc(struct xdp_frame *frame
+> >       return !!(frame->flags & XDP_FLAGS_FRAGS_PF_MEMALLOC);
+> >  }
+> >
+> > +static __always_inline bool xdp_frame_gro_disabled(struct xdp_frame *f=
+rame)
+> > +{
+> > +     return !!(frame->flags & XDP_FLAGS_GRO_DISABLED);
+> > +}
+> > +
+> > +static __always_inline void
+> > +xdp_frame_fixup_skb_offloading(struct xdp_frame *frame, struct sk_buff=
+ *skb)
+> > +{
+> > +     if (xdp_frame_gro_disabled(frame))
+> > +             skb_disable_gro(skb);
+> > +}
+>
+> (same)
+>
+> > +
+> >  #define XDP_BULK_QUEUE_SIZE  16
+> >  struct xdp_frame_bulk {
+> >       int count;
+>
+> Thanks,
+> Olek
 
