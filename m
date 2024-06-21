@@ -1,299 +1,441 @@
-Return-Path: <netdev+bounces-105565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD788911CB0
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 09:21:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 140F4911CB7
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 09:26:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73684282FBA
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 07:21:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F620B20D5A
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 07:26:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78970169AF7;
-	Fri, 21 Jun 2024 07:21:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31ABA16B396;
+	Fri, 21 Jun 2024 07:26:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="M7hLhzhM"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="KxhzcPRA";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="FVAdq1iQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2084.outbound.protection.outlook.com [40.107.220.84])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120483C2F
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 07:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.84
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718954498; cv=fail; b=ej/diyOOBr1o7hptxt67eFO82MCYm8TfWGTgTrEsOpAeBWK348EIA7x0YzMDfxnlnCd/KZnjqw+TT1fC2zYvA8qBIBUQGQnX5OoBFQ3cdV/7lKPrkwroGtv/7w2HGr9Gnwd5JQvLinkjLD2gTYKKK/CZfSraf21TpN0Fr/I4lqs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718954498; c=relaxed/simple;
-	bh=sIVCunZM7ezZafn26lxIwE55WBmHyN0o3Jq3GvHSLCM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H3MIENNmSuLruOdcExYIjoXUINbwoYScY+WpvWPlA/tEVLsFcis0VtTyS0i49nxUD6bYteL+xkdQZFjfdpZjMLb0WX5VSJUB3bOfINhk01SqpHpGPd64itTx/2ewwiw/oGD71f1xU/uGTqD3jQZN9QCgKTOI8PsudKv83CElkI0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=M7hLhzhM; arc=fail smtp.client-ip=40.107.220.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Kbh8JWnH3pFgDCuxYH72u/wRQuBVeDaNyTDCzw2sQwDACWylTA3EBnIrEwiF4+YYkTcMEAXZ9+Ezj/80QRUvhWoKs5s4yk7WJVPrhFH50sY3ud5aYeJBaO438szbro62TCXk/quYtq6T79yF3sJGRHQ+4pcRwluzezlHGHNb6pZ0/J1Ivc6HPlzZWBBUjC0gSD9Hhwdr10MjXVx5aAbMOWGwxJjihXVsh8aU5Yj+ZL06fzG9iOKSnaReozvgkU3vtZVwirO+h+vxl3FfyKq5YTqQSPsSGUNlCJ43D3eIJWEHX3Ma3ikRcrb9AGtkyl2H32Iz7dfzfNjuJfQG7ledQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EkpNpvAFchb2KZh1e7kuTukO9rbEXO+xowb2qVwTmz0=;
- b=DjSGp4sKJrS+iDAhogllklOfHir5t4Y5fTpBrIo+djRO5bz1FMpdzax1b//sgtZ/8lr4R07/o7kcVKlmCnkblbD/QeidGrzj2kk1MnCFayNr4coe5as9Pl/XtbpkbpK6Qd9+W5CJ3I8j5DCNSxaukK02Blbx/YOOWAPQeEzDxJZk3NFUXAGgJkHoiFky+wBxrb1XbvbMBBLRcqJT6fv1v1nE7/+7r5atL1fQpnODoGVtcKH1lVfeUuctpJiB6fHnx9S5iwPZp7m+r4eo+FhGpFQmVks1Jgae8TZYcbXMG41ielGOhR3HAC02QJx9Dk1UoO6hMgR6NszF1K+XOlI2GA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EkpNpvAFchb2KZh1e7kuTukO9rbEXO+xowb2qVwTmz0=;
- b=M7hLhzhM47xvk+QqAY35UbeQEnaa4bBIYFigzz10J0sbudLdSmdT+GFfOpMAHRnE9l8GX+/lQa7giVUpPoxDZwNn+VbT6WCnsoKEsYyqCzXwZyN4q5JJdWG7iQd4j+W2zHoGZnskxBWvh4FnxhF6FfYvcTSqduI7QRykS6dKfKu9rO/S0C3Z5Fj2U0jjt7CCXkeUeat1ydE1/W5wlvV9u/ezusDwO15hdHUv8/e4+nElRjx5hhnLKUgNdvglJGUsLSN83DfTc0BCOEDgccUnH7xTqoLA9kNO2KhtbMXZKeiXPNjZ3WYZI/IeoM75CVuEjF1rRZVWgzawMto9Qoe3cg==
-Received: from SA9PR10CA0012.namprd10.prod.outlook.com (2603:10b6:806:a7::17)
- by DM4PR12MB6160.namprd12.prod.outlook.com (2603:10b6:8:a7::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.19; Fri, 21 Jun
- 2024 07:21:31 +0000
-Received: from SA2PEPF000015CA.namprd03.prod.outlook.com
- (2603:10b6:806:a7:cafe::e3) by SA9PR10CA0012.outlook.office365.com
- (2603:10b6:806:a7::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.33 via Frontend
- Transport; Fri, 21 Jun 2024 07:21:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SA2PEPF000015CA.mail.protection.outlook.com (10.167.241.200) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7677.15 via Frontend Transport; Fri, 21 Jun 2024 07:21:30 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 21 Jun
- 2024 00:21:24 -0700
-Received: from yaviefel.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 21 Jun
- 2024 00:21:20 -0700
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	<mlxsw@nvidia.com>, Simon Horman <horms@kernel.org>
-Subject: [PATCH net v3 2/2] mlxsw: spectrum_buffers: Fix memory corruptions on Spectrum-4 systems
-Date: Fri, 21 Jun 2024 09:19:14 +0200
-Message-ID: <fdaa3ade0f9478b3004311112624f782d3e8c44d.1718954012.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <cover.1718954012.git.petrm@nvidia.com>
-References: <cover.1718954012.git.petrm@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3B67E58D
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 07:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718954761; cv=none; b=FANBoOO4VSQI0rRdwzh3RLwDRnWbpJjlAkn81FvhAYWHN4NXrdIXv0OUjYS9b3UEMpbD+naVaLwGxYyzb6bywsNKjeubH0j8GEWOM/YA+5mV1Fq2hCN7Mpg1yU1IB2/yUmYi7Mff57DmxAROGRFqDoPTNA0d/+7LrLN84NfaiLg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718954761; c=relaxed/simple;
+	bh=keJGhzIL/wTU/BvrBynL8CCNPOv41zq8DR3sI+W5IVs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=fH35VzsT/7N8IaW+2rUYJcOHbp9UsQyJLI4ae98B/JxqA6tsynarqi6145aQspu05vLuY+UTgt/o9ClkigGO7a1IQB7rvr9y8aS1NGn0CSUHkTuYm7FwRFs0+T3v3Ox2abxyrRpnkvbHmQ9k9K4l9/fyFXj4IdKV8Ig1WJSikD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=KxhzcPRA; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=FVAdq1iQ; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1718954757;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=fndjrFQvXKLJni/8XYY27o3KJ/r6FPFf4i2JICzHSXU=;
+	b=KxhzcPRASVBJ6fN3H/7xWTeh5ulTv9iJwvlyhuAhQqfkZ2SGwonFZdafGlnZWQcVGwbJb3
+	njIn6rvR8RNY60e/3EXOmcX6dxlEVvo7bA4H0SUarKGjs8TLQG6J2tUcs6I9WicQT0tL+5
+	ZKH75sCeAAUqlzMc9mQ81TefUnXoMnODEP4zHFXewz12DXZpcUMoWNbwf2Pz7RtXn3xaF2
+	fUDVq+wKQd2aVdMd5k3MV4IGfn9BBXt/Dlo1CidxTzyNrz9b7caJvltWlfT+htdeyn3Udc
+	siHgHFRR/P5mLXml5OSgKU0oGFhjnsVLPJwXeT9RkNLhGmq/7+OW3Psvl1YYUw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1718954757;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=fndjrFQvXKLJni/8XYY27o3KJ/r6FPFf4i2JICzHSXU=;
+	b=FVAdq1iQlgmxbL2NBqK1fjNNKBeM57ZdVcHC2c0ah1vUuitVMRG4MAg+KEmL1EsYs7oCsC
+	FA/+8B/oLrQv0ACw==
+Date: Fri, 21 Jun 2024 09:25:55 +0200
+Subject: [PATCH iwl-next v3] igc: Add MQPRIO offload support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF000015CA:EE_|DM4PR12MB6160:EE_
-X-MS-Office365-Filtering-Correlation-Id: dfa37d2c-5e87-45fe-9904-08dc91c2c59a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230037|82310400023|1800799021|376011|36860700010;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?gqaHoX1U1vxdHwaFIt07I/kuhw8OnH7iZ1ey6IC33ymtmC0TS+s1AjKdQYF5?=
- =?us-ascii?Q?9ewa4YWAeQE5gSUnabeHvTaqf2vZ9W6xT9p2HarfJh8IBQSoWCTMf9dUNX9p?=
- =?us-ascii?Q?wnwXPIRNV7703q2WupxTHzJF9+cuFANapCGa/CB4ftfWdHuE6iN7oIXrfYWy?=
- =?us-ascii?Q?nI90vcGOwDJy4qlyAzF+rljJtj5BZvoY57ZFoO3VRJZ+r8AqlNHgEEiWriwY?=
- =?us-ascii?Q?hNRyC2w/v0Jl45OhFK0HHT+gDyjquWq9psUPO/XSj1on8jtt91QCqZbRLvOC?=
- =?us-ascii?Q?VAEo5xun9nELSWaJmnabE2t5aRzmM5+KdtWcoi5iEGnPqChyLmeUkVaTA/y2?=
- =?us-ascii?Q?jipaZxNfy/40iWspu5YWEN6+bP2QFW9wN+rDJsamvY1UI6+A7Xli09ry0wY0?=
- =?us-ascii?Q?EQUK1rWxwaQJ+X29qWXb8UPj2AaFAgmx4Oil/NNxGywlxw878i8N1wTqdYUc?=
- =?us-ascii?Q?L7i7PPqD4Tjh4xhKI4d/Gibp+vRmT0imAqq7xOHZNb4MJiXwKT9UPm1ZqaEM?=
- =?us-ascii?Q?NmIdhUwpHjkSi2yj7rn14DUu2PQKHSftz0veTKRPT5C+/iJ3Gr/oIfE+mWRF?=
- =?us-ascii?Q?YhXfUcktfI2gUP7dDeLnSwhOGQpDc9XCaULFSIkVekNLUe35eVLvYk+TnMAc?=
- =?us-ascii?Q?jdogTuhphkOx2qEmrCV3PGwL4wlNOKAoTEfQqWoKEfasusZROELXdzoQEKeR?=
- =?us-ascii?Q?P0eIBX1fvVQnJP5aLaeEZzO9qcFS+CIe1JCp/fLSuIcOY8SGnCcoHJbCUTUe?=
- =?us-ascii?Q?9u7x/kGwPRt/MlDdLvvlOl8NfwI2P4YS+RWX/Hcx5TKjprp1NWSQ1DDQx91a?=
- =?us-ascii?Q?2Fwrzm6WQbJeGw4amu88p+lq8t24eUu6oF/GdANDcQwkrHWd0JrvL4AjYiWg?=
- =?us-ascii?Q?FDEhBw1Q28oSfTXAF3ddID/pdqyRrf6mbcR44YcCQC2uLLXY2+tjqo4Bc+54?=
- =?us-ascii?Q?6cu09uatlRnagXzxcwrkNh353i42GWZNJQ9GLnoPODFgKsbypaQqwjBhepEC?=
- =?us-ascii?Q?7dUzGTdsKlAw605jrV5B/EJ8WN2UT2WeeGOwMd9iLgvZ9fDoLsU9wcb4ZS59?=
- =?us-ascii?Q?yAi5jvNU/dsoeo4KgjfU06jRyX+Envoc5zyIVICcYoeQct0EJzDo1wkyB4Pb?=
- =?us-ascii?Q?2QFtcsFpxhKsddZxh/P4E9m3M2M2/ekTPQK90qoDMOPfdd3sZLfSE1mNKQoK?=
- =?us-ascii?Q?i1hzfS6wtkfDBZphvfsze1vjzO4NfQ7Q0RI+Do7KqaRZ3pWndC1sKvYLq3IZ?=
- =?us-ascii?Q?NVEImeYiJ2+A2PUeU64g0Gesp5CIjS2kxZjO0CiJ7yZ7BR7s+uyiIpa4IhQM?=
- =?us-ascii?Q?6K8CV01K/59pnqZJ0t4d5Ne5xYmuhAdQw7WZCyQOrX819LWHbcr0gPo9Fskq?=
- =?us-ascii?Q?eMlz2L1nq1Mp28FqNq5IpwrsL2pby5dQNWyVzp2nIUxQIO+pIg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230037)(82310400023)(1800799021)(376011)(36860700010);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2024 07:21:30.3756
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: dfa37d2c-5e87-45fe-9904-08dc91c2c59a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF000015CA.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6160
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240212-igc_mqprio-v3-1-261f5bb99a2a@linutronix.de>
+X-B4-Tracking: v=1; b=H4sIAAIrdWYC/3WNyw6CMBQFf4V0bU1b3q78D2NMC1e4CbTY1ooh/
+ LuFpdHlyWTOLMSBRXDklCzEQkCHRseRHhLS9FJ3QLGNmwgmMia4oNg1t/ExWTSUpXWRM8YKLio
+ SBSUdUGWlbvpNGaXzYDcwWbjjvFcuBF8D1TB7co2kR+eNfe/5wHf+qxQ45bSU0Na5KtOiVecB9
+ dNbo3E+trBfBfFfF1HPq7IWGRSKV823vq7rBwuVaEMKAQAA
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>, 
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ "shenjian (K)" <shenjian15@huawei.com>, Simon Horman <horms@kernel.org>, 
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ Kurt Kanzenbach <kurt@linutronix.de>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=11682; i=kurt@linutronix.de;
+ h=from:subject:message-id; bh=keJGhzIL/wTU/BvrBynL8CCNPOv41zq8DR3sI+W5IVs=;
+ b=owEBbQKS/ZANAwAKAcGT0fKqRnOCAcsmYgBmdSsEp1eE6/NTvIs8tUaSYVRdz2gRktXxbNkbg
+ 40NOhU/7BWJAjMEAAEKAB0WIQS8ub+yyMN909/bWZLBk9HyqkZzggUCZnUrBAAKCRDBk9HyqkZz
+ gnEsD/9A/K7+5Wuim/TbZQGGL5d3epDXMq063Zu0dAj9B//9LY8eoYmj+CJ1kfNEkZ8eiZUUKOi
+ CSj6EnFzNOxle+mOOAVvV7kmTLxJxFebZBRl9kHN0Z1rJBXPEfhkbzhw8wFYIr32SVQQFHrkjkS
+ YnjTVVYtGN2A05f5z5L1JpUtm5wsKqz4Rc1ZVFW9uRTdMp0QOEmt39e+Ce8yMAi5g1yYcbxfKup
+ vzY2RmvSysGNT+mKadvSU5Mzkd4ipy3BPNfUL7D48wujPfnLm4GznVGVeceBFzyBlstLsgCIhno
+ 02j7Z3ybzatIpyPnN91tWlKJU0IKMBNOINGn1+urN/YI5iwfxs3TP8XS+VB/iKTtQBfK5pn/UxM
+ VsSbhQn3DfhXTyUvhKtFQHeKgaFBeK7SJ7nrxmD7OjIYe4kv2Ae9ugUfbPcW69C8Ku/tk9Yp45n
+ A/dgyNTa/rMBcGxYZPImpoMng4N9XCIbkcLjrQesk6fmxmLI1sSb7WrzID2dCbMQ0lJviG65INS
+ EHPhmWHyiIxwTWhU1840unpL4wbfr+0qkAiYaKhe9JFrL5ijiGdiT0RWZyuaWaXftKWLiOnsr12
+ vAcA6nueOYQ219UH1oTuyMLZrjDGXW60a4DGgoMqQATrtWyzMuJqc6dNGM1FhdAB/OVyYsmBI5N
+ TkGfQt/nZrOUbcQ==
+X-Developer-Key: i=kurt@linutronix.de; a=openpgp;
+ fpr=BCB9BFB2C8C37DD3DFDB5992C193D1F2AA467382
 
-From: Ido Schimmel <idosch@nvidia.com>
+Add support for offloading MQPRIO. The hardware has four priorities as well
+as four queues. Each queue must be a assigned with a unique priority.
 
-The following two shared buffer operations make use of the Shared Buffer
-Status Register (SBSR):
+However, the priorities are only considered in TSN Tx mode. There are two
+TSN Tx modes. In case of MQPRIO the Qbv capability is not required.
+Therefore, use the legacy TSN Tx mode, which performs strict priority
+arbitration.
 
- # devlink sb occupancy snapshot pci/0000:01:00.0
- # devlink sb occupancy clearmax pci/0000:01:00.0
+Example for mqprio with hardware offload:
 
-The register has two masks of 256 bits to denote on which ingress /
-egress ports the register should operate on. Spectrum-4 has more than
-256 ports, so the register was extended by cited commit with a new
-'port_page' field.
+|tc qdisc replace dev ${INTERFACE} handle 100 parent root mqprio num_tc 4 \
+|   map 0 0 0 0 0 1 2 3 0 0 0 0 0 0 0 0 \
+|   queues 1@0 1@1 1@2 1@3 \
+|   hw 1
 
-However, when filling the register's payload, the driver specifies the
-ports as absolute numbers and not relative to the first port of the port
-page, resulting in memory corruptions [1].
+The mqprio Qdisc also allows to configure the `preemptible_tcs'. However,
+frame preemption is not supported yet.
 
-Fix by specifying the ports relative to the first port of the port page.
+Tested on Intel i225 and implemented by following data sheet section 7.5.2,
+Transmit Scheduling.
 
-[1]
-BUG: KASAN: slab-use-after-free in mlxsw_sp_sb_occ_snapshot+0xb6d/0xbc0
-Read of size 1 at addr ffff8881068cb00f by task devlink/1566
-[...]
-Call Trace:
- <TASK>
- dump_stack_lvl+0xc6/0x120
- print_report+0xce/0x670
- kasan_report+0xd7/0x110
- mlxsw_sp_sb_occ_snapshot+0xb6d/0xbc0
- mlxsw_devlink_sb_occ_snapshot+0x75/0xb0
- devlink_nl_sb_occ_snapshot_doit+0x1f9/0x2a0
- genl_family_rcv_msg_doit+0x20c/0x300
- genl_rcv_msg+0x567/0x800
- netlink_rcv_skb+0x170/0x450
- genl_rcv+0x2d/0x40
- netlink_unicast+0x547/0x830
- netlink_sendmsg+0x8d4/0xdb0
- __sys_sendto+0x49b/0x510
- __x64_sys_sendto+0xe5/0x1c0
- do_syscall_64+0xc1/0x1d0
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[...]
-Allocated by task 1:
- kasan_save_stack+0x33/0x60
- kasan_save_track+0x14/0x30
- __kasan_kmalloc+0x8f/0xa0
- copy_verifier_state+0xbc2/0xfb0
- do_check_common+0x2c51/0xc7e0
- bpf_check+0x5107/0x9960
- bpf_prog_load+0xf0e/0x2690
- __sys_bpf+0x1a61/0x49d0
- __x64_sys_bpf+0x7d/0xc0
- do_syscall_64+0xc1/0x1d0
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 1:
- kasan_save_stack+0x33/0x60
- kasan_save_track+0x14/0x30
- kasan_save_free_info+0x3b/0x60
- poison_slab_object+0x109/0x170
- __kasan_slab_free+0x14/0x30
- kfree+0xca/0x2b0
- free_verifier_state+0xce/0x270
- do_check_common+0x4828/0xc7e0
- bpf_check+0x5107/0x9960
- bpf_prog_load+0xf0e/0x2690
- __sys_bpf+0x1a61/0x49d0
- __x64_sys_bpf+0x7d/0xc0
- do_syscall_64+0xc1/0x1d0
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Fixes: f8538aec88b4 ("mlxsw: Add support for more than 256 ports in SBSR register")
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-Reviewed-by: Petr Machata <petrm@nvidia.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Petr Machata <petrm@nvidia.com>
+Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
 ---
- .../mellanox/mlxsw/spectrum_buffers.c         | 20 +++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+Changes in v3:
+- Use FIELD_PREP for Tx ARB (Simon)
+- Add helper for Tx ARB configuration (Simon)
+- Limit ethtool_set_channels when mqprio is enabled (Jian)
+- Link to v2: https://lore.kernel.org/r/20240212-igc_mqprio-v2-1-587924e6b18c@linutronix.de
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_buffers.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_buffers.c
-index 1b9ed393fbd4..2c0cfa79d138 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_buffers.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_buffers.c
-@@ -1611,8 +1611,8 @@ static void mlxsw_sp_sb_sr_occ_query_cb(struct mlxsw_core *mlxsw_core,
- int mlxsw_sp_sb_occ_snapshot(struct mlxsw_core *mlxsw_core,
- 			     unsigned int sb_index)
- {
-+	u16 local_port, local_port_1, first_local_port, last_local_port;
- 	struct mlxsw_sp *mlxsw_sp = mlxsw_core_driver_priv(mlxsw_core);
--	u16 local_port, local_port_1, last_local_port;
- 	struct mlxsw_sp_sb_sr_occ_query_cb_ctx cb_ctx;
- 	u8 masked_count, current_page = 0;
- 	unsigned long cb_priv = 0;
-@@ -1632,6 +1632,7 @@ int mlxsw_sp_sb_occ_snapshot(struct mlxsw_core *mlxsw_core,
- 	masked_count = 0;
- 	mlxsw_reg_sbsr_pack(sbsr_pl, false);
- 	mlxsw_reg_sbsr_port_page_set(sbsr_pl, current_page);
-+	first_local_port = current_page * MLXSW_REG_SBSR_NUM_PORTS_IN_PAGE;
- 	last_local_port = current_page * MLXSW_REG_SBSR_NUM_PORTS_IN_PAGE +
- 			  MLXSW_REG_SBSR_NUM_PORTS_IN_PAGE - 1;
+Changes in v2:
+- Improve changelog (Paul Menzel)
+- Link to v1: https://lore.kernel.org/r/20240212-igc_mqprio-v1-1-7aed95b736db@linutronix.de
+---
+ drivers/net/ethernet/intel/igc/igc.h         | 10 +++-
+ drivers/net/ethernet/intel/igc/igc_defines.h | 11 +++++
+ drivers/net/ethernet/intel/igc/igc_ethtool.c |  4 ++
+ drivers/net/ethernet/intel/igc/igc_main.c    | 69 +++++++++++++++++++++++++++
+ drivers/net/ethernet/intel/igc/igc_regs.h    |  2 +
+ drivers/net/ethernet/intel/igc/igc_tsn.c     | 70 +++++++++++++++++++++++++++-
+ 6 files changed, 163 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+index 8b14c029eda1..b31cd2d7120d 100644
+--- a/drivers/net/ethernet/intel/igc/igc.h
++++ b/drivers/net/ethernet/intel/igc/igc.h
+@@ -260,6 +260,10 @@ struct igc_adapter {
+ 	 */
+ 	spinlock_t qbv_tx_lock;
  
-@@ -1649,9 +1650,12 @@ int mlxsw_sp_sb_occ_snapshot(struct mlxsw_core *mlxsw_core,
- 		if (local_port != MLXSW_PORT_CPU_PORT) {
- 			/* Ingress quotas are not supported for the CPU port */
- 			mlxsw_reg_sbsr_ingress_port_mask_set(sbsr_pl,
--							     local_port, 1);
-+							     local_port - first_local_port,
-+							     1);
- 		}
--		mlxsw_reg_sbsr_egress_port_mask_set(sbsr_pl, local_port, 1);
-+		mlxsw_reg_sbsr_egress_port_mask_set(sbsr_pl,
-+						    local_port - first_local_port,
-+						    1);
- 		for (i = 0; i < mlxsw_sp->sb_vals->pool_count; i++) {
- 			err = mlxsw_sp_sb_pm_occ_query(mlxsw_sp, local_port, i,
- 						       &bulk_list);
-@@ -1688,7 +1692,7 @@ int mlxsw_sp_sb_occ_max_clear(struct mlxsw_core *mlxsw_core,
- 			      unsigned int sb_index)
- {
- 	struct mlxsw_sp *mlxsw_sp = mlxsw_core_driver_priv(mlxsw_core);
--	u16 local_port, last_local_port;
-+	u16 local_port, first_local_port, last_local_port;
- 	LIST_HEAD(bulk_list);
- 	unsigned int masked_count;
- 	u8 current_page = 0;
-@@ -1706,6 +1710,7 @@ int mlxsw_sp_sb_occ_max_clear(struct mlxsw_core *mlxsw_core,
- 	masked_count = 0;
- 	mlxsw_reg_sbsr_pack(sbsr_pl, true);
- 	mlxsw_reg_sbsr_port_page_set(sbsr_pl, current_page);
-+	first_local_port = current_page * MLXSW_REG_SBSR_NUM_PORTS_IN_PAGE;
- 	last_local_port = current_page * MLXSW_REG_SBSR_NUM_PORTS_IN_PAGE +
- 			  MLXSW_REG_SBSR_NUM_PORTS_IN_PAGE - 1;
++	bool strict_priority_enable;
++	u8 num_tc;
++	u16 queue_per_tc[IGC_MAX_TX_QUEUES];
++
+ 	/* OS defined structs */
+ 	struct pci_dev *pdev;
+ 	/* lock for statistics */
+@@ -383,9 +387,11 @@ extern char igc_driver_name[];
+ #define IGC_FLAG_RX_LEGACY		BIT(16)
+ #define IGC_FLAG_TSN_QBV_ENABLED	BIT(17)
+ #define IGC_FLAG_TSN_QAV_ENABLED	BIT(18)
++#define IGC_FLAG_TSN_LEGACY_ENABLED	BIT(19)
  
-@@ -1723,9 +1728,12 @@ int mlxsw_sp_sb_occ_max_clear(struct mlxsw_core *mlxsw_core,
- 		if (local_port != MLXSW_PORT_CPU_PORT) {
- 			/* Ingress quotas are not supported for the CPU port */
- 			mlxsw_reg_sbsr_ingress_port_mask_set(sbsr_pl,
--							     local_port, 1);
-+							     local_port - first_local_port,
-+							     1);
- 		}
--		mlxsw_reg_sbsr_egress_port_mask_set(sbsr_pl, local_port, 1);
-+		mlxsw_reg_sbsr_egress_port_mask_set(sbsr_pl,
-+						    local_port - first_local_port,
-+						    1);
- 		for (i = 0; i < mlxsw_sp->sb_vals->pool_count; i++) {
- 			err = mlxsw_sp_sb_pm_occ_clear(mlxsw_sp, local_port, i,
- 						       &bulk_list);
+-#define IGC_FLAG_TSN_ANY_ENABLED \
+-	(IGC_FLAG_TSN_QBV_ENABLED | IGC_FLAG_TSN_QAV_ENABLED)
++#define IGC_FLAG_TSN_ANY_ENABLED				\
++	(IGC_FLAG_TSN_QBV_ENABLED | IGC_FLAG_TSN_QAV_ENABLED |	\
++	 IGC_FLAG_TSN_LEGACY_ENABLED)
+ 
+ #define IGC_FLAG_RSS_FIELD_IPV4_UDP	BIT(6)
+ #define IGC_FLAG_RSS_FIELD_IPV6_UDP	BIT(7)
+diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
+index 5f92b3c7c3d4..58f6631bfdd5 100644
+--- a/drivers/net/ethernet/intel/igc/igc_defines.h
++++ b/drivers/net/ethernet/intel/igc/igc_defines.h
+@@ -4,6 +4,8 @@
+ #ifndef _IGC_DEFINES_H_
+ #define _IGC_DEFINES_H_
+ 
++#include <linux/bitfield.h>
++
+ /* Number of Transmit and Receive Descriptors must be a multiple of 8 */
+ #define REQ_TX_DESCRIPTOR_MULTIPLE	8
+ #define REQ_RX_DESCRIPTOR_MULTIPLE	8
+@@ -547,6 +549,15 @@
+ 
+ #define IGC_MAX_SR_QUEUES		2
+ 
++#define IGC_TXARB_TXQ_PRIO_0_MASK	GENMASK(1, 0)
++#define IGC_TXARB_TXQ_PRIO_1_MASK	GENMASK(3, 2)
++#define IGC_TXARB_TXQ_PRIO_2_MASK	GENMASK(5, 4)
++#define IGC_TXARB_TXQ_PRIO_3_MASK	GENMASK(7, 6)
++#define IGC_TXARB_TXQ_PRIO_0(x)		FIELD_PREP(IGC_TXARB_TXQ_PRIO_0_MASK, (x))
++#define IGC_TXARB_TXQ_PRIO_1(x)		FIELD_PREP(IGC_TXARB_TXQ_PRIO_1_MASK, (x))
++#define IGC_TXARB_TXQ_PRIO_2(x)		FIELD_PREP(IGC_TXARB_TXQ_PRIO_2_MASK, (x))
++#define IGC_TXARB_TXQ_PRIO_3(x)		FIELD_PREP(IGC_TXARB_TXQ_PRIO_3_MASK, (x))
++
+ /* Receive Checksum Control */
+ #define IGC_RXCSUM_CRCOFL	0x00000800   /* CRC32 offload enable */
+ #define IGC_RXCSUM_PCSD		0x00002000   /* packet checksum disabled */
+diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+index 0cd2bd695db1..d436472f3388 100644
+--- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
++++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+@@ -1540,6 +1540,10 @@ static int igc_ethtool_set_channels(struct net_device *netdev,
+ 	if (ch->other_count != NON_Q_VECTORS)
+ 		return -EINVAL;
+ 
++	/* Do not allow channel reconfiguration when mqprio is enabled */
++	if (adapter->strict_priority_enable)
++		return -EINVAL;
++
+ 	/* Verify the number of channels doesn't exceed hw limits */
+ 	max_combined = igc_get_max_rss_queues(adapter);
+ 	if (count > max_combined)
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 87b655b839c1..7a027ef96e93 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -6514,6 +6514,13 @@ static int igc_tc_query_caps(struct igc_adapter *adapter,
+ 	struct igc_hw *hw = &adapter->hw;
+ 
+ 	switch (base->type) {
++	case TC_SETUP_QDISC_MQPRIO: {
++		struct tc_mqprio_caps *caps = base->caps;
++
++		caps->validate_queue_counts = true;
++
++		return 0;
++	}
+ 	case TC_SETUP_QDISC_TAPRIO: {
+ 		struct tc_taprio_caps *caps = base->caps;
+ 
+@@ -6531,6 +6538,65 @@ static int igc_tc_query_caps(struct igc_adapter *adapter,
+ 	}
+ }
+ 
++static void igc_save_mqprio_params(struct igc_adapter *adapter, u8 num_tc,
++				   u16 *offset)
++{
++	int i;
++
++	adapter->strict_priority_enable = true;
++	adapter->num_tc = num_tc;
++
++	for (i = 0; i < num_tc; i++)
++		adapter->queue_per_tc[i] = offset[i];
++}
++
++static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
++				 struct tc_mqprio_qopt_offload *mqprio)
++{
++	struct igc_hw *hw = &adapter->hw;
++	int i;
++
++	if (hw->mac.type != igc_i225)
++		return -EOPNOTSUPP;
++
++	if (!mqprio->qopt.num_tc) {
++		adapter->strict_priority_enable = false;
++		goto apply;
++	}
++
++	/* There are as many TCs as Tx queues. */
++	if (mqprio->qopt.num_tc != adapter->num_tx_queues) {
++		NL_SET_ERR_MSG_FMT_MOD(mqprio->extack,
++				       "Only %d traffic classes supported",
++				       adapter->num_tx_queues);
++		return -EOPNOTSUPP;
++	}
++
++	/* Only one queue per TC is supported. */
++	for (i = 0; i < mqprio->qopt.num_tc; i++) {
++		if (mqprio->qopt.count[i] != 1) {
++			NL_SET_ERR_MSG_MOD(mqprio->extack,
++					   "Only one queue per TC supported");
++			return -EOPNOTSUPP;
++		}
++	}
++
++	/* Preemption is not supported yet. */
++	if (mqprio->preemptible_tcs) {
++		NL_SET_ERR_MSG_MOD(mqprio->extack,
++				   "Preemption is not supported yet");
++		return -EOPNOTSUPP;
++	}
++
++	igc_save_mqprio_params(adapter, mqprio->qopt.num_tc,
++			       mqprio->qopt.offset);
++
++	mqprio->qopt.hw = TC_MQPRIO_HW_OFFLOAD_TCS;
++
++apply:
++	return igc_tsn_offload_apply(adapter);
++}
++
+ static int igc_setup_tc(struct net_device *dev, enum tc_setup_type type,
+ 			void *type_data)
+ {
+@@ -6550,6 +6616,9 @@ static int igc_setup_tc(struct net_device *dev, enum tc_setup_type type,
+ 	case TC_SETUP_QDISC_CBS:
+ 		return igc_tsn_enable_cbs(adapter, type_data);
+ 
++	case TC_SETUP_QDISC_MQPRIO:
++		return igc_tsn_enable_mqprio(adapter, type_data);
++
+ 	default:
+ 		return -EOPNOTSUPP;
+ 	}
+diff --git a/drivers/net/ethernet/intel/igc/igc_regs.h b/drivers/net/ethernet/intel/igc/igc_regs.h
+index e5b893fc5b66..c83c723f7c7e 100644
+--- a/drivers/net/ethernet/intel/igc/igc_regs.h
++++ b/drivers/net/ethernet/intel/igc/igc_regs.h
+@@ -238,6 +238,8 @@
+ #define IGC_TQAVCC(_n)		(0x3004 + ((_n) * 0x40))
+ #define IGC_TQAVHC(_n)		(0x300C + ((_n) * 0x40))
+ 
++#define IGC_TXARB		0x3354 /* Tx Arbitration Control TxARB - RW */
++
+ /* System Time Registers */
+ #define IGC_SYSTIML	0x0B600  /* System time register Low - RO */
+ #define IGC_SYSTIMH	0x0B604  /* System time register High - RO */
+diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
+index 22cefb1eeedf..5222323b2478 100644
+--- a/drivers/net/ethernet/intel/igc/igc_tsn.c
++++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
+@@ -46,6 +46,9 @@ static unsigned int igc_tsn_new_flags(struct igc_adapter *adapter)
+ 	if (is_cbs_enabled(adapter))
+ 		new_flags |= IGC_FLAG_TSN_QAV_ENABLED;
+ 
++	if (adapter->strict_priority_enable)
++		new_flags |= IGC_FLAG_TSN_LEGACY_ENABLED;
++
+ 	return new_flags;
+ }
+ 
+@@ -78,11 +81,32 @@ void igc_tsn_adjust_txtime_offset(struct igc_adapter *adapter)
+ 	wr32(IGC_GTXOFFSET, txoffset);
+ }
+ 
++static void igc_tsn_tx_arb(struct igc_adapter *adapter, u16 *queue_per_tc)
++{
++	struct igc_hw *hw = &adapter->hw;
++	u32 txarb;
++
++	txarb = rd32(IGC_TXARB);
++
++	txarb &= ~(IGC_TXARB_TXQ_PRIO_0_MASK |
++		   IGC_TXARB_TXQ_PRIO_1_MASK |
++		   IGC_TXARB_TXQ_PRIO_2_MASK |
++		   IGC_TXARB_TXQ_PRIO_3_MASK);
++
++	txarb |= IGC_TXARB_TXQ_PRIO_0(queue_per_tc[3]);
++	txarb |= IGC_TXARB_TXQ_PRIO_1(queue_per_tc[2]);
++	txarb |= IGC_TXARB_TXQ_PRIO_2(queue_per_tc[1]);
++	txarb |= IGC_TXARB_TXQ_PRIO_3(queue_per_tc[0]);
++
++	wr32(IGC_TXARB, txarb);
++}
++
+ /* Returns the TSN specific registers to their default values after
+  * the adapter is reset.
+  */
+ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
+ {
++	u16 queue_per_tc[4] = { 3, 2, 1, 0 };
+ 	struct igc_hw *hw = &adapter->hw;
+ 	u32 tqavctrl;
+ 	int i;
+@@ -106,7 +130,16 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
+ 	wr32(IGC_QBVCYCLET_S, 0);
+ 	wr32(IGC_QBVCYCLET, NSEC_PER_SEC);
+ 
++	/* Reset mqprio TC configuration. */
++	netdev_reset_tc(adapter->netdev);
++
++	/* Restore the default Tx arbitration: Priority 0 has the highest
++	 * priority and is assigned to queue 0 and so on and so forth.
++	 */
++	igc_tsn_tx_arb(adapter, queue_per_tc);
++
+ 	adapter->flags &= ~IGC_FLAG_TSN_QBV_ENABLED;
++	adapter->flags &= ~IGC_FLAG_TSN_LEGACY_ENABLED;
+ 
+ 	return 0;
+ }
+@@ -123,6 +156,40 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
+ 	wr32(IGC_DTXMXPKTSZ, IGC_DTXMXPKTSZ_TSN);
+ 	wr32(IGC_TXPBS, IGC_TXPBSIZE_TSN);
+ 
++	if (adapter->strict_priority_enable) {
++		int err;
++
++		err = netdev_set_num_tc(adapter->netdev, adapter->num_tc);
++		if (err)
++			return err;
++
++		for (i = 0; i < adapter->num_tc; i++) {
++			err = netdev_set_tc_queue(adapter->netdev, i, 1,
++						  adapter->queue_per_tc[i]);
++			if (err)
++				return err;
++		}
++
++		/* In case the card is configured with less than four queues. */
++		for (; i < IGC_MAX_TX_QUEUES; i++)
++			adapter->queue_per_tc[i] = i;
++
++		/* Configure queue priorities according to the user provided
++		 * mapping.
++		 */
++		igc_tsn_tx_arb(adapter, adapter->queue_per_tc);
++
++		/* Enable legacy TSN mode which will do strict priority without
++		 * any other TSN features.
++		 */
++		tqavctrl = rd32(IGC_TQAVCTRL);
++		tqavctrl |= IGC_TQAVCTRL_TRANSMIT_MODE_TSN;
++		tqavctrl &= ~IGC_TQAVCTRL_ENHANCED_QAV;
++		wr32(IGC_TQAVCTRL, tqavctrl);
++
++		return 0;
++	}
++
+ 	for (i = 0; i < adapter->num_tx_queues; i++) {
+ 		struct igc_ring *ring = adapter->tx_ring[i];
+ 		u32 txqctl = 0;
+@@ -339,7 +406,8 @@ int igc_tsn_offload_apply(struct igc_adapter *adapter)
+ 	 * cannot be changed dynamically. Require reset the adapter.
+ 	 */
+ 	if (netif_running(adapter->netdev) &&
+-	    (igc_is_device_id_i225(hw) || !adapter->qbv_count)) {
++	    (igc_is_device_id_i225(hw) || !adapter->qbv_count ||
++	     !adapter->strict_priority_enable)) {
+ 		schedule_work(&adapter->reset_task);
+ 		return 0;
+ 	}
+
+---
+base-commit: a6ec08beec9ea93f342d6daeac922208709694dc
+change-id: 20240212-igc_mqprio-039650006128
+
+Best regards,
 -- 
-2.45.0
+Kurt Kanzenbach <kurt@linutronix.de>
 
 
