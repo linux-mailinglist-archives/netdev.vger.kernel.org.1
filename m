@@ -1,275 +1,120 @@
-Return-Path: <netdev+bounces-105693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18E909124FF
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 14:18:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBAED9124B8
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 14:05:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84533281FAA
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:18:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5259289A34
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:05:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A18114F9F9;
-	Fri, 21 Jun 2024 12:17:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E261172794;
+	Fri, 21 Jun 2024 12:05:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R6quf9Pv"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE62150984
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 12:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29265171E5F
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 12:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718972271; cv=none; b=Ot3SdmnheLMYXV2ZQN5joFMrCJJqJZx0wDC8mBtYRdx/90OnbkOCo3cqNNBVkMexItu89vyQeD+gmJMAYn5rkoOBMXGi5ERDnMM6fntDvEhURxRWR5OCIydU6E3dYWm01DzLNl7lAsGVWAPaniuuvnUhhBphbzLy75lseh3Jug8=
+	t=1718971513; cv=none; b=eKPON6HTbInfIkTqv1rbH4+0EsccGZ6x9nej8W4m/OtRypWZizoZZUHS5fhCwHIMWf86H5IUAiE7AKSXAutmpbh+uZuFvPSnMfokyxpfclLaQ/6rITAvTflCtmvm9KBcZtkXP+C+/XwzeLcf1smBj5LPny8r5QGsMV0Btj3x/C4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718972271; c=relaxed/simple;
-	bh=1BM9HMqZj1L5kWAlp/tOQpnkoY14cWxaf8hX5igo8vc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LaFfyHNYXIXSMCL9odMwJJnVBpRzOzZZUTOQJ0CpVKSghLbkWPQE4oWvvng/8p4mJbcAHOneKzo5C4U4w4u78v/CXwXAlNaI3zBJ55xPZs8S5nddmP6YJ1uyNXOQFRJLeePAgO2ifiDC11DteVpzFA2Hc3I/jOIcnl1neiaHr7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sKdD8-0002Rx-Ra
-	for netdev@vger.kernel.org; Fri, 21 Jun 2024 14:17:46 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sKdD8-003wG4-53
-	for netdev@vger.kernel.org; Fri, 21 Jun 2024 14:17:46 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id C78FE2EE83C
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 12:17:45 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 450F82EE810;
-	Fri, 21 Jun 2024 12:17:43 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 6fd26949;
-	Fri, 21 Jun 2024 12:17:42 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Vitor Soares <vitor.soares@toradex.com>,
-	stable@vger.kernel.org,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net 5/5] can: mcp251xfd: fix infinite loop when xmit fails
-Date: Fri, 21 Jun 2024 13:23:40 +0200
-Message-ID: <20240621121739.434355-6-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240621121739.434355-1-mkl@pengutronix.de>
-References: <20240621121739.434355-1-mkl@pengutronix.de>
+	s=arc-20240116; t=1718971513; c=relaxed/simple;
+	bh=cWmRkFC9lz58Kvf89bPTfY2V9NlM/c7e5Z/+ec0yfJw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=lca+u54lAC60YNiMyHRDDgBJNFWEmh4u+iuhNza6TKtZ0hD//bi6VoJzRW/hOLF0g4hb3zJpd7sbuU+fsHt7O99Km0XppEqhsS62yiv5ZYcl2Vuc19C9kVlcCEDBHmcBVmexQfh1Xx5gAAv5UiqtQjEBRN+us49BwYSwc0JbSDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R6quf9Pv; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-440609dd118so8665401cf.1
+        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 05:05:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718971511; x=1719576311; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VKy8fLfjLp3Tc8D+Yc0B+JXmTfdjQyB1jh0It/7tIt8=;
+        b=R6quf9PvqkK7JJpHJ5OA71KufL4y+SM29ay+hFRZ2idfgu50Xy3GGAnuVKT2NndFgH
+         cgiBKBKziGhA086OZmT+3CR7dK6Zu/YbB5GsbXRSyUK8UNS0+ik8pg5/Fsq7FV35bLTg
+         Yh54OqDb6nLpKmTtplYu9QY2JomyNWhmdGPRfQpKU/k1zNuPMxrxXyYhXPVeTaqV2WAz
+         o6fa+os4sqi/VteKBrzfKcwOi9p1cGLQoZqdRJ6CI2c00ZxK4jI+qOqjl8CZvksnb4r2
+         SJaFw6joioj6gy+FCZNgsX4LUUZyArsHzwxCtF8n6n3T5DC+BGBnJBU8LD9wnJbNDgn6
+         yAHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718971511; x=1719576311;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=VKy8fLfjLp3Tc8D+Yc0B+JXmTfdjQyB1jh0It/7tIt8=;
+        b=vXIvwV9mw5F0loDxam5AspipgCDQ2LAthxTiNJNBAollqmC61eNwscb6PjD4fro8yg
+         602kwYjpuQKWTJBHurIU+78KoVnpUEQJ0lbUyfsO6Bpc8eEgSaNR2ti47KEjaxKK16Us
+         hU7YIoX41+DETaVrNBLzP3jOFalZ6ybIDjV3rvEKf/ZQ6F1yVbDBlRMaCm8VLVkylOO1
+         oDUGmS0KokUVMfL+pVHWnxszqjgKL7qUA+CTTa/VvBBBf69nzPP3FFTB8qmBqijGqfuX
+         Z71MFfe2ImOKXt97fcyLCxIZfLpEcw2MHn1BG/t/7jOcxi4KYULR2Ykyjj1XQxlILS3l
+         xmfw==
+X-Forwarded-Encrypted: i=1; AJvYcCWSFkbodMFTX8BKmP6spMUbPVAZUXCFmjbztJ5WVD4+/S3FGycNyvWYPFK+P6UYuVudStO29ky+Up6eP/Hs8sfSd0lqws8P
+X-Gm-Message-State: AOJu0YxGDsNxHrCGnA+b/aNGgOyVjRQX+X6IopZpalq6f1TADGDlG3OZ
+	+ZDbQow84obaFAcnrfJCHumkncJxQ+8QImS5KmKUC1edotupOZuP
+X-Google-Smtp-Source: AGHT+IHk9ofcgT/z5y59gzDNZDwBjp6YDZSVftaMw7MyjYKbTiABaoAc1B+gP1yctzFUB2/ED1BPmg==
+X-Received: by 2002:ac8:5d86:0:b0:440:f54d:1bac with SMTP id d75a77b69052e-444a79c1857mr88096591cf.16.1718971510851;
+        Fri, 21 Jun 2024 05:05:10 -0700 (PDT)
+Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-444c2b36822sm10405141cf.18.2024.06.21.05.05.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jun 2024 05:05:10 -0700 (PDT)
+Date: Fri, 21 Jun 2024 08:05:10 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: "Singhai, Anjali" <anjali.singhai@intel.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, 
+ Boris Pismenny <borisp@nvidia.com>, 
+ "gal@nvidia.com" <gal@nvidia.com>, 
+ "cratiu@nvidia.com" <cratiu@nvidia.com>, 
+ "rrameshbabu@nvidia.com" <rrameshbabu@nvidia.com>, 
+ "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>, 
+ "tariqt@nvidia.com" <tariqt@nvidia.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, 
+ "Acharya, Arun Kumar" <arun.kumar.acharya@intel.com>
+Message-ID: <66756c7626a34_2e038a294de@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CO1PR11MB49939F947A63E4A5F8C5246A93C82@CO1PR11MB4993.namprd11.prod.outlook.com>
+References: <CO1PR11MB49939CBC31BC13472404094793CE2@CO1PR11MB4993.namprd11.prod.outlook.com>
+ <66729953651ba_2751bc294fa@willemb.c.googlers.com.notmuch>
+ <CO1PR11MB49939F947A63E4A5F8C5246A93C82@CO1PR11MB4993.namprd11.prod.outlook.com>
+Subject: RE: [RFC net-next 00/15] add basic PSP encryption for TCP connections
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-From: Vitor Soares <vitor.soares@toradex.com>
+> > > 4. Why is the driver adding the PSP trailer? Hoping this is between the driver and the device, in our case it's the device that will add the trailer.
+> 
+> This for sure is by device or driver, ideally the device. Please comment.
 
-When the mcp251xfd_start_xmit() function fails, the driver stops
-processing messages, and the interrupt routine does not return,
-running indefinitely even after killing the running application.
+Whether it is driver or device is a device specific implementation detail?
 
-Error messages:
-[  441.298819] mcp251xfd spi2.0 can0: ERROR in mcp251xfd_start_xmit: -16
-[  441.306498] mcp251xfd spi2.0 can0: Transmit Event FIFO buffer not empty. (seq=0x000017c7, tef_tail=0x000017cf, tef_head=0x000017d0, tx_head=0x000017d3).
-... and repeat forever.
+> A few more opens that we noticed later
+> 
+> 1. Key rotation should be triggered from the device as a master key in the device can be shared in a virtualized environment by many interfaces which would mean only the device can decide based on the following when to trigger the key rotation 
+> 	1. Time out cannot be independent for each IKE but at a device level configuration.
+> 	2.  SPI roll over, the SPI domain is again shared with multiple Interfaces that share the master key and only the device can trigger the rotation when this happens.
+> 
+> Apart from this, in a virtualized environment, a trigger from top (IKE down to device) to rotate the master key can cause unnecessary side effects to other interfaces that can be considered malicious.
 
-The issue can be triggered when multiple devices share the same SPI
-interface. And there is concurrent access to the bus.
+It is possible to designate a privileged interface that is allowed to
+request a key rotation. This should be supported.
 
-The problem occurs because tx_ring->head increments even if
-mcp251xfd_start_xmit() fails. Consequently, the driver skips one TX
-package while still expecting a response in
-mcp251xfd_handle_tefif_one().
-
-Resolve the issue by starting a workqueue to write the tx obj
-synchronously if err = -EBUSY. In case of another error, decrement
-tx_ring->head, remove skb from the echo stack, and drop the message.
-
-Fixes: 55e5b97f003e ("can: mcp25xxfd: add driver for Microchip MCP25xxFD SPI CAN")
-Cc: stable@vger.kernel.org
-Signed-off-by: Vitor Soares <vitor.soares@toradex.com>
-Link: https://lore.kernel.org/all/20240517134355.770777-1-ivitro@gmail.com
-[mkl: use more imperative wording in patch description]
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- .../net/can/spi/mcp251xfd/mcp251xfd-core.c    | 14 ++++-
- drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c  | 55 ++++++++++++++++---
- drivers/net/can/spi/mcp251xfd/mcp251xfd.h     |  5 ++
- 3 files changed, 65 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-index 1d9057dc44f2..bf1589aef1fc 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-@@ -1618,11 +1618,20 @@ static int mcp251xfd_open(struct net_device *ndev)
- 	clear_bit(MCP251XFD_FLAGS_DOWN, priv->flags);
- 	can_rx_offload_enable(&priv->offload);
- 
-+	priv->wq = alloc_ordered_workqueue("%s-mcp251xfd_wq",
-+					   WQ_FREEZABLE | WQ_MEM_RECLAIM,
-+					   dev_name(&spi->dev));
-+	if (!priv->wq) {
-+		err = -ENOMEM;
-+		goto out_can_rx_offload_disable;
-+	}
-+	INIT_WORK(&priv->tx_work, mcp251xfd_tx_obj_write_sync);
-+
- 	err = request_threaded_irq(spi->irq, NULL, mcp251xfd_irq,
- 				   IRQF_SHARED | IRQF_ONESHOT,
- 				   dev_name(&spi->dev), priv);
- 	if (err)
--		goto out_can_rx_offload_disable;
-+		goto out_destroy_workqueue;
- 
- 	err = mcp251xfd_chip_interrupts_enable(priv);
- 	if (err)
-@@ -1634,6 +1643,8 @@ static int mcp251xfd_open(struct net_device *ndev)
- 
-  out_free_irq:
- 	free_irq(spi->irq, priv);
-+ out_destroy_workqueue:
-+	destroy_workqueue(priv->wq);
-  out_can_rx_offload_disable:
- 	can_rx_offload_disable(&priv->offload);
- 	set_bit(MCP251XFD_FLAGS_DOWN, priv->flags);
-@@ -1661,6 +1672,7 @@ static int mcp251xfd_stop(struct net_device *ndev)
- 	hrtimer_cancel(&priv->tx_irq_timer);
- 	mcp251xfd_chip_interrupts_disable(priv);
- 	free_irq(ndev->irq, priv);
-+	destroy_workqueue(priv->wq);
- 	can_rx_offload_disable(&priv->offload);
- 	mcp251xfd_timestamp_stop(priv);
- 	mcp251xfd_chip_stop(priv, CAN_STATE_STOPPED);
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
-index 160528d3cc26..b1de8052a45c 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
-@@ -131,6 +131,39 @@ mcp251xfd_tx_obj_from_skb(const struct mcp251xfd_priv *priv,
- 	tx_obj->xfer[0].len = len;
- }
- 
-+static void mcp251xfd_tx_failure_drop(const struct mcp251xfd_priv *priv,
-+				      struct mcp251xfd_tx_ring *tx_ring,
-+				      int err)
-+{
-+	struct net_device *ndev = priv->ndev;
-+	struct net_device_stats *stats = &ndev->stats;
-+	unsigned int frame_len = 0;
-+	u8 tx_head;
-+
-+	tx_ring->head--;
-+	stats->tx_dropped++;
-+	tx_head = mcp251xfd_get_tx_head(tx_ring);
-+	can_free_echo_skb(ndev, tx_head, &frame_len);
-+	netdev_completed_queue(ndev, 1, frame_len);
-+	netif_wake_queue(ndev);
-+
-+	if (net_ratelimit())
-+		netdev_err(priv->ndev, "ERROR in %s: %d\n", __func__, err);
-+}
-+
-+void mcp251xfd_tx_obj_write_sync(struct work_struct *work)
-+{
-+	struct mcp251xfd_priv *priv = container_of(work, struct mcp251xfd_priv,
-+						   tx_work);
-+	struct mcp251xfd_tx_obj *tx_obj = priv->tx_work_obj;
-+	struct mcp251xfd_tx_ring *tx_ring = priv->tx;
-+	int err;
-+
-+	err = spi_sync(priv->spi, &tx_obj->msg);
-+	if (err)
-+		mcp251xfd_tx_failure_drop(priv, tx_ring, err);
-+}
-+
- static int mcp251xfd_tx_obj_write(const struct mcp251xfd_priv *priv,
- 				  struct mcp251xfd_tx_obj *tx_obj)
- {
-@@ -162,6 +195,11 @@ static bool mcp251xfd_tx_busy(const struct mcp251xfd_priv *priv,
- 	return false;
- }
- 
-+static bool mcp251xfd_work_busy(struct work_struct *work)
-+{
-+	return work_busy(work);
-+}
-+
- netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
- 				 struct net_device *ndev)
- {
-@@ -175,7 +213,8 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
- 	if (can_dev_dropped_skb(ndev, skb))
- 		return NETDEV_TX_OK;
- 
--	if (mcp251xfd_tx_busy(priv, tx_ring))
-+	if (mcp251xfd_tx_busy(priv, tx_ring) ||
-+	    mcp251xfd_work_busy(&priv->tx_work))
- 		return NETDEV_TX_BUSY;
- 
- 	tx_obj = mcp251xfd_get_tx_obj_next(tx_ring);
-@@ -193,13 +232,13 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
- 		netdev_sent_queue(priv->ndev, frame_len);
- 
- 	err = mcp251xfd_tx_obj_write(priv, tx_obj);
--	if (err)
--		goto out_err;
--
--	return NETDEV_TX_OK;
--
-- out_err:
--	netdev_err(priv->ndev, "ERROR in %s: %d\n", __func__, err);
-+	if (err == -EBUSY) {
-+		netif_stop_queue(ndev);
-+		priv->tx_work_obj = tx_obj;
-+		queue_work(priv->wq, &priv->tx_work);
-+	} else if (err) {
-+		mcp251xfd_tx_failure_drop(priv, tx_ring, err);
-+	}
- 
- 	return NETDEV_TX_OK;
- }
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd.h b/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
-index 24510b3b8020..b35bfebd23f2 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
-@@ -633,6 +633,10 @@ struct mcp251xfd_priv {
- 	struct mcp251xfd_rx_ring *rx[MCP251XFD_FIFO_RX_NUM];
- 	struct mcp251xfd_tx_ring tx[MCP251XFD_FIFO_TX_NUM];
- 
-+	struct workqueue_struct *wq;
-+	struct work_struct tx_work;
-+	struct mcp251xfd_tx_obj *tx_work_obj;
-+
- 	DECLARE_BITMAP(flags, __MCP251XFD_FLAGS_SIZE__);
- 
- 	u8 rx_ring_num;
-@@ -952,6 +956,7 @@ void mcp251xfd_skb_set_timestamp(const struct mcp251xfd_priv *priv,
- void mcp251xfd_timestamp_init(struct mcp251xfd_priv *priv);
- void mcp251xfd_timestamp_stop(struct mcp251xfd_priv *priv);
- 
-+void mcp251xfd_tx_obj_write_sync(struct work_struct *work);
- netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
- 				 struct net_device *ndev);
- 
--- 
-2.43.0
-
-
+For IDPF whether a driver is authorized to request a rotation can be
+part of capability negotiation.
 
