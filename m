@@ -1,93 +1,203 @@
-Return-Path: <netdev+bounces-105569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D6B3911DB2
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:02:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F0DD911E03
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:10:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 550AC286D9E
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 08:02:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56136280BEE
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 08:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1FF178CF1;
-	Fri, 21 Jun 2024 07:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YBX/6Fyd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2064017106A;
+	Fri, 21 Jun 2024 08:02:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47E0178367
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 07:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B3216D33D
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 08:02:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718956471; cv=none; b=UjKJeMPyZueXH94J7GpE6gEJA9dIP6Jp0WLnQ6xJ4G4KerVcQ1GLN/k2lMJJIfHIkScA8AOdcaY+40YmIWUAFMSJVpPBf2F19K/9RIJ30J5syaliI7TnOt+BGXmPpYDKXhhxw3+EOYKoIxqzRlAJ+bA/+MikVLp9xTd+7UzTS3w=
+	t=1718956931; cv=none; b=Umrkq1l/qxz7mSXZeg7cvIGUc2Ayv0Tu2Xc8mOtOPxS+wBAMnUGLGZArunGoIfqRQLcMk4cp5LEzCjRhNmbDx+P73qBdGdiXnx+Po71jAHKwk4RXEkWKw1BJ5irWnEsUESAvkRogKSAwG3EufYrBxuTL/Glh4rOU57hsTfxDCj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718956471; c=relaxed/simple;
-	bh=b9KM8dzf7dW2K9SiAyjPCtcC+FVi0XacVojqZ2RlJ6Y=;
-	h=In-Reply-To:References:To:Cc:Subject:MIME-Version:Content-Type:
-	 From:Date:Message-ID; b=Yp502t8N3OO3Go3mZY/Dm4E62oXVTX2OI8yBv8Tw6gmlRqFsa70P0xWmQtHdm8uNviKzu6uydh3Nyro0+SxEA0C3z/dq89QuOqADOILJkWCUDdn+x7SIHDonvHRNoA7Y0MITxUVmIhiMwJJ7rI5S5nvohz477BpzIZd2M9L+StY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YBX/6Fyd; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718956468;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oDP0Ze6rJBHjNUlj9cWtihXVpgdyu03o5dDG7lNl2Ko=;
-	b=YBX/6FydK+ZbyZ4VMUIISjcAqKYstgBdWodGYJmxBKlGcQkd4AaaGcIKrEFbMhc0OxhwkR
-	cjAnwi7zaSTRG+1veHuQjfyQ6DRLJ9IcIm3t75WxXLMcxU4AJd3RJUN712KwCjb6uZ+hJy
-	gkyBoTxusVCdLfO9Nxbsbov0mOy73rk=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-683-bYVENPH9MUSKny0J4Y60Xg-1; Fri,
- 21 Jun 2024 03:54:23 -0400
-X-MC-Unique: bYVENPH9MUSKny0J4Y60Xg-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	s=arc-20240116; t=1718956931; c=relaxed/simple;
+	bh=cuTRdAbv5pmD6MDftPmn2b5bpw9AlY/dg/AiR2JBElo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dTF9DPic6j0dGn3Y25ovDqballVVHWT+xTP5p5c4A4JIN53pUaN5QpkHE0gA04VFznD+mCXv4k8uAhhDHMnNey2hs7totSFRZL+H4HAfYrYFpDkzLm5JNLIR1U9J74rttNEaIzmo1hnXuVT2GJO7BkUEQMLbjmQ6CUM8iB7gWgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sKZDg-0003w0-Ku
+	for netdev@vger.kernel.org; Fri, 21 Jun 2024 10:02:04 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sKZDg-003tFb-4j
+	for netdev@vger.kernel.org; Fri, 21 Jun 2024 10:02:04 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id CFADA2EE3B1
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 08:02:03 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8C7B119560A5;
-	Fri, 21 Jun 2024 07:54:21 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.111])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E8F6B1956048;
-	Fri, 21 Jun 2024 07:54:18 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-In-Reply-To: <CANn89iLQ+9GYYn0pQpueFP+aYHnoWhqZSws6t6VCNoxs8pwL7w@mail.gmail.com>
-References: <CANn89iLQ+9GYYn0pQpueFP+aYHnoWhqZSws6t6VCNoxs8pwL7w@mail.gmail.com> <20240617095852.66c96be9@kernel.org> <202406161539.b5ff7b20-oliver.sang@intel.com> <4937ffd4-f30a-4bdb-9166-6aebb19ca950@grimberg.me> <Zm9fju2J6vBvl-E0@casper.infradead.org> <033294ee-e6e6-4dca-b60c-019cb72a6857@grimberg.me> <407790.1718801177@warthog.procyon.org.uk> <0aaaeabc-6f65-4e5d-bdb1-aa124ed08e8b@grimberg.me>
-To: Eric Dumazet <edumazet@google.com>
-Cc: dhowells@redhat.com, Sagi Grimberg <sagi@grimberg.me>,
-    Jakub Kicinski <kuba@kernel.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    kernel test robot <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
-    lkp@intel.com, netdev@vger.kernel.org
-Subject: Re: [PATCH] net: micro-optimize skb_datagram_iter
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id ACC872EE38C;
+	Fri, 21 Jun 2024 08:02:02 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 6343a23b;
+	Fri, 21 Jun 2024 08:02:02 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net-next 0/24] pull-request: can-next 2024-06-21
+Date: Fri, 21 Jun 2024 09:48:20 +0200
+Message-ID: <20240621080201.305471-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <117594.1718956419.1@warthog.procyon.org.uk>
-From: David Howells <dhowells@redhat.com>
-Date: Fri, 21 Jun 2024 08:54:17 +0100
-Message-ID: <117689.1718956457@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Eric Dumazet <edumazet@google.com> wrote:
+Hello netdev-team,
 
-> But the trace involves af_unix, not GRO ?
+this is a pull request of 24 patches for net-next/master.
 
-Ah.  splice()/vmsplice() can feed multipage folios into the socket.  Possibly
-those can be in highmem.
+The first 2 patches are by Andy Shevchenko, one cleans up the includes
+in the mcp251x driver, the other one updates the sja100 plx_pci driver
+to make use of predefines PCI subvendor ID.
 
-David
+Mans Rullgard's patch cleans up the Kconfig help text of for the slcan
+driver.
+
+Oliver Hartkopp provides a patch to update the documentation, which
+removes the ISO 15675-2 specification version where possible.
+
+The next 2 patches are by Harini T and update the documentation of the
+xilinx_can driver.
+
+Francesco Valla provides documentation for the ISO 15765-2 protocol.
+
+A patch by Dr. David Alan Gilbert removes an unused struct from the
+mscan driver.
+
+12 patches are by Martin Jocic. The first three add support for 3 new
+devices to the kvaser_usb driver. The remaining 9 first clean up the
+kvaser_pciefd driver, and then add support for MSI.
+
+Krzysztof Kozlowski contributes 3 patches simplifies the CAN SPI
+drivers by making use of spi_get_device_match_data().
+
+The last patch is by Martin Hundebøll, which reworks the m_can driver
+to not enable the CAN transceiver during probe.
+
+regards,
+Marc
+
+---
+
+The following changes since commit 7e8fcb815432e68897dbbc2c4213e546ac40f49c:
+
+  Merge branch 'ionic-rework-fix-for-doorbell-miss' (2024-06-19 18:31:49 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git tags/linux-can-next-for-6.11-20240621
+
+for you to fetch changes up to cd5a46ce6fa62abedd7740e4bd9f3d82041210ee:
+
+  can: m_can: don't enable transceiver when probing (2024-06-21 09:47:24 +0200)
+
+----------------------------------------------------------------
+linux-can-next-for-6.11-20240621
+
+----------------------------------------------------------------
+Andy Shevchenko (2):
+      can: mcp251x: Fix up includes
+      can: sja1000: plx_pci: Reuse predefined CTI subvendor ID
+
+Dr. David Alan Gilbert (1):
+      can: mscan: remove unused struct 'mscan_state'
+
+Francesco Valla (1):
+      Documentation: networking: document ISO 15765-2
+
+Harini T (2):
+      dt-bindings: can: xilinx_can: Modify the title to indicate CAN and CANFD controllers are supported
+      can: xilinx_can: Document driver description to list all supported IPs
+
+Krzysztof Kozlowski (3):
+      can: hi311x: simplify with spi_get_device_match_data()
+      can: mcp251x: simplify with spi_get_device_match_data()
+      can: mcp251xfd: simplify with spi_get_device_match_data()
+
+Mans Rullgard (1):
+      can: Kconfig: remove obsolete help text for slcan
+
+Marc Kleine-Budde (6):
+      Merge patch series "can: xilinx_can: Document driver description to list all supported IPs"
+      Merge patch "Documentation: networking: document ISO 15765-2"
+      Merge patch series "can: kvaser_usb: Add support for three new devices"
+      Merge patch series "can: kvaser_pciefd: Minor improvements and cleanups"
+      Merge patch series "can: kvaser_pciefd: Support MSI interrupts"
+      Merge patch series "can: hi311x: simplify with spi_get_device_match_data()"
+
+Martin Hundebøll (1):
+      can: m_can: don't enable transceiver when probing
+
+Martin Jocic (12):
+      can: kvaser_usb: Add support for Vining 800
+      can: kvaser_usb: Add support for Kvaser USBcan Pro 5xCAN
+      can: kvaser_usb: Add support for Kvaser Mini PCIe 1xCAN
+      can: kvaser_pciefd: Group #defines together
+      can: kvaser_pciefd: Skip redundant NULL pointer check in ISR
+      can: kvaser_pciefd: Remove unnecessary comment
+      can: kvaser_pciefd: Add inline
+      can: kvaser_pciefd: Add unlikely
+      can: kvaser_pciefd: Rename board_irq to pci_irq
+      can: kvaser_pciefd: Change name of return code variable
+      can: kvaser_pciefd: Move reset of DMA RX buffers to the end of the ISR
+      can: kvaser_pciefd: Add MSI interrupts
+
+Oliver Hartkopp (1):
+      can: isotp: remove ISO 15675-2 specification version where possible
+
+ .../devicetree/bindings/net/can/xilinx,can.yaml    |   2 +-
+ Documentation/networking/index.rst                 |   1 +
+ Documentation/networking/iso15765-2.rst            | 386 +++++++++++++++++++++
+ MAINTAINERS                                        |   1 +
+ drivers/net/can/Kconfig                            |   5 +-
+ drivers/net/can/kvaser_pciefd.c                    | 137 ++++----
+ drivers/net/can/m_can/m_can.c                      | 165 +++++----
+ drivers/net/can/m_can/tcan4x5x-core.c              |  13 +-
+ drivers/net/can/mscan/mscan.c                      |   6 -
+ drivers/net/can/sja1000/plx_pci.c                  |   3 +-
+ drivers/net/can/spi/hi311x.c                       |   7 +-
+ drivers/net/can/spi/mcp251x.c                      |  11 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c     |   9 +-
+ drivers/net/can/usb/Kconfig                        |   3 +
+ drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c   |   9 +
+ drivers/net/can/xilinx_can.c                       |   2 +-
+ include/uapi/linux/can/isotp.h                     |   2 +-
+ net/can/Kconfig                                    |  11 +-
+ net/can/isotp.c                                    |  11 +-
+ 19 files changed, 612 insertions(+), 172 deletions(-)
+ create mode 100644 Documentation/networking/iso15765-2.rst
 
 
