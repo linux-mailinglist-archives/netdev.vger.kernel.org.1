@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-105650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DD3191226D
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:30:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C12991226E
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB1351F22555
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:30:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C0BF1C23C8E
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E5616D4CA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB43171675;
 	Fri, 21 Jun 2024 10:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rCDzunaT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kfcm2llt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289EC82D72;
-	Fri, 21 Jun 2024 10:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76109171662;
+	Fri, 21 Jun 2024 10:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718965828; cv=none; b=U+3jWhDdXV0kPDVLHuKDi66YGc7JyIPegBRXfBGRlG0MVqVvGo0rnpOnpkYvFDzvz24o60E3yGQXuKJC8kw1GHEQ4Au69niS3sG/6xvfY06NmX2XYxYst9Gn7FiBQ+Bkacu0a4nKs8lCd7DCvCg5ggG3zNZ1laqDMi7p0b9s4Js=
+	t=1718965828; cv=none; b=N4xCgAFIcy1u2XDEIjls260fXOnxHGp2GYlFvDm5/VjiUnnv9hWfCeGgSBwHGcrBuJbat1Q03Ub0kEGySNqJh3muA0Hp0rhi0q7kjZGdyvEDyXa+ZJd0ebtlbrHXyB377xjf024YE7zFHa+ViWuW+q+fa3rUG1v+m5RhQOOJeZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718965828; c=relaxed/simple;
-	bh=B752BNIYio6k0ixN7OxVpVPWptHW5T/k1iw9vIoklR0=;
+	bh=ilLsJgqvd/4EUF4UNwCkjfwmpf5eLoUqxw8U7NjMprM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=E5sqwN0P5vgh1h/U056I3kHLw7ysp6nTRT/h6tXQpTn3J2LWiO+jKDptwsGPefLsqu+qJrmLpzBBsEJG3uzrSHCnp/RJoWzU73Cu4H03Bl3J2nI2Y4QJAdFI6rgqDIsG0FKQKmVFH9HTBRVJJN6Yggr3jtVdzpRLI1tpfA5JAdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rCDzunaT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D1F2AC4AF0A;
-	Fri, 21 Jun 2024 10:30:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=L6jNCWp0A33zuMUjYv10VaqsdybPUYXymnh6LNa5dwBz9mfsdrBlYoYvSASpjcT0O0wW86CudRLt3hyP1UFewwQrFUtOXq57TjpJXSy6t44BVv5muh+TQuURlFbh/LCGlXSuYmeVq44gK3NOdGxarAL+nGaC30ihyQ/w+4lBpqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kfcm2llt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 21B19C4AF0F;
+	Fri, 21 Jun 2024 10:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718965827;
-	bh=B752BNIYio6k0ixN7OxVpVPWptHW5T/k1iw9vIoklR0=;
+	s=k20201202; t=1718965828;
+	bh=ilLsJgqvd/4EUF4UNwCkjfwmpf5eLoUqxw8U7NjMprM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rCDzunaTmNxMHxYirml77GfBiWvjELwFaBc7UIpvWpiGvbP32Zrl/tkEkN4uN2nB9
-	 hXKpkuQwCFn8w1dirs0nr72fijIDDTUHFWfkFsJUEl/8MnEbP8aX9IW+D5aJsEZ0Vm
-	 OBJC3DZvv/TFiS+nSAYgzanxQRpMNfW8Zi7zJXAEmLEBIkQCMntLyjxCZQaHLSYZso
-	 I4sjwr4ZCK+bLZwkRrXVLVtf4Q9ig34MSPmycuaMD1ttq5vGoy/MJ7LN03Zzq3bHVr
-	 d78Nw49PsJxrkSYL1FndsynlgyXRebbcErhJoR5U/MEaJXEOUPyaVKQwDv4Qr2/B55
-	 os3HFuLD74nbQ==
+	b=kfcm2lltr0Wgx6KuPSyF9ZT+kUXf7Bjtmv0C9jMhSlh5RCDpi+UELwKfwEtJqQ2kH
+	 cX7NkL5dhRidbQX0DqwZ/GH/a/fT9fMwk/wZoqWG11TX7FPFbbaLTfyqOfMJQ04eV6
+	 t6AZawREOMO9broocb6exy66g5GJLKTSiHFzaKkRbxKsNwEmCjz9cF/43x00t7JF0r
+	 I1eQphqtBfcFjz83nsnjq236cfCFqAJGhfH6DYQUlIDsxKx5HwTh9fawQaey40HAXC
+	 XPx8rRYJSbbP0ItZ11nZlhH9/eY1udyj9tYgaHDuI2CRIE6E0Ndc3jCcH3US5132fN
+	 at+JwmeYbcR0g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C286BC4332D;
-	Fri, 21 Jun 2024 10:30:27 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 15F2FCF3B97;
+	Fri, 21 Jun 2024 10:30:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,35 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v0] net: mvpp2: fill-in dev_port attribute
+Subject: Re: [net-next PATCH v4] octeontx2-pf: Add ucast filter count
+ configurability via devlink.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171896582779.421.10046577492424882330.git-patchwork-notify@kernel.org>
-Date: Fri, 21 Jun 2024 10:30:27 +0000
-References: <20240620041202.3306780-1-aryan.srivastava@alliedtelesis.co.nz>
-In-Reply-To: <20240620041202.3306780-1-aryan.srivastava@alliedtelesis.co.nz>
-To: Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>
-Cc: kuba@kernel.org, marcin.s.wojtas@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <171896582808.421.9486570187185667040.git-patchwork-notify@kernel.org>
+Date: Fri, 21 Jun 2024 10:30:28 +0000
+References: <20240620085949.1328937-1-saikrishnag@marvell.com>
+In-Reply-To: <20240620085949.1328937-1-saikrishnag@marvell.com>
+To: Sai Krishna <saikrishnag@marvell.com>
+Cc: jacob.e.keller@intel.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, sgoutham@marvell.com, gakula@marvell.com,
+ hkelam@marvell.com, sbhatta@marvell.com, horms@kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 20 Jun 2024 16:12:02 +1200 you wrote:
-> Fill this in so user-space can identify multiple ports on the same CP
-> unit.
+On Thu, 20 Jun 2024 14:29:49 +0530 you wrote:
+> The existing method of reserving unicast filter count leads to wasted
+> MCAM entries if the functionality is not used or fewer entries are used.
+> Furthermore, the amount of MCAM entries differs amongst Octeon SoCs.
+> We implemented a means to adjust the UC filter count via devlink,
+> allowing for better use of MCAM entries across Netdev apps.
 > 
-> Signed-off-by: Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>
-> ---
->  drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 1 +
->  1 file changed, 1 insertion(+)
+> commands:
+> 
+> [...]
 
 Here is the summary with links:
-  - [v0] net: mvpp2: fill-in dev_port attribute
-    https://git.kernel.org/netdev/net/c/00418d5530ca
+  - [net-next,v4] octeontx2-pf: Add ucast filter count configurability via devlink.
+    https://git.kernel.org/netdev/net-next/c/39c469188b6d
 
 You are awesome, thank you!
 -- 
