@@ -1,167 +1,98 @@
-Return-Path: <netdev+bounces-105745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7C25912940
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 17:17:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6081E91294D
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 17:19:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 243601F23FC1
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:17:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 182151F21025
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B91B75804;
-	Fri, 21 Jun 2024 15:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E93FD482FA;
+	Fri, 21 Jun 2024 15:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="XUzZP5xl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tY06G2OA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906416A8DB
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 15:17:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D9228DB3
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 15:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718983037; cv=none; b=T+CQYTX+cGPwpimzd0BFHB7pd4e/YCQMpLK/qglUZ5mRtkEurHxmVs54UJQqxHtqu0LdNuDXAcdhrrYf4H4t9mxn79uQ7ydhyQJZH/7L1NyVmBjb96i4ZZMeUv9Hr+3SEzIdvs6a8V8SE9qaMjsxeYqFH196hr3gVJWnrHLjQgo=
+	t=1718983147; cv=none; b=pPaJxmxKkXXhAuU1TmxfzwDo82wf4F8SD3fGLm5ImcoOVLXzT6l+cOrnfbdr4Y7pLsL0mMNoNzCgsHofSYvMjE/DhspmIdCEh8AcB6Z293LneoDiGr3+gxGKzxbPgCj5RZDdkJdllWtC3JojKh9m1U9d48OjBbJjJ5dtOLDrlpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718983037; c=relaxed/simple;
-	bh=Q0K8wveLDtQ5rqIrCYq9H6yuQqmRsmPrm11leJJmngg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Mo5AXpUT3e47C3CblUAPkVUIApDgP35ER3dnktx6mgGTQ+7Nix6oCs+JcnlkS57NlrT0JG0iUpNgoYuVQleZZJd/WPiVM9o4VuIZ6QH1Qek8pAOqpa6auaFxqSjB7LBvGXIqerLkW3d6pbeZCzNekSmrypk8tTzCVQLptA6aU/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=XUzZP5xl; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a6ef8bf500dso230427766b.0
-        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 08:17:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1718983034; x=1719587834; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eVdWsH/CebZrv81hSvkbbEEBVG7k1A0KP1jmRZJ7hOw=;
-        b=XUzZP5xl+VveWv9uFbsZWkuJOR+KtaLgLdZNjTofo+jiS6TlH1OStVc+1ANAAK2Fmx
-         JrQCv9HD74WWCgwAXjYPLurXCJgihEPpuIdffHWFME9QiYYCIeSvMPAr4TgppgIvTnvi
-         TmwVF+5tLTyyvkNoDHPb8vnCoVXE0G0he1qjlS3xyqcbuFJyfTldmcrcgLJlU51h0TQi
-         Ihl2MNgcNawhHf4JfcDeXT3qyrEK+/HsJJdjKo55pKBqWNV3AZhRh1gUXMRuaSs6DuP8
-         Wtdt2BvKpB9wjrGGRh3wuOb0kudSQPNepWNNIyOOJZ8a61p3K7m84S4OdN17If896J6J
-         5cQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718983034; x=1719587834;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eVdWsH/CebZrv81hSvkbbEEBVG7k1A0KP1jmRZJ7hOw=;
-        b=djsIAYGVCmmdwKTYsTHp7nhv4IKuepnS2UwHKUOzxJBTl2cxMVhRl+GJNoSHYyK9nh
-         uXKL6j6ZW2kDV77Hzki1LUrq4jaA9gSUGi8qhARlo7Nwo7pvhMYGuSfujbn+aIHvSuj3
-         q3njyLn552z4VoXCtj1hGT58bhaQIq+wirMrAswtU5cZEZA2m/87r0DsHkTER0/kGdTd
-         LjArVRHNbhGKDsEZIbEB90pX2JZQocbcOmg3hYrVD/bF3vCATXWy9UUVm69/bb4FA544
-         X9D0DW5UiCRkacuiCO4p5Hc85Bri/SPBBhzw8t0tKm8kGrDzA4WE6pbzgj8MhZhVksQi
-         pBxQ==
-X-Gm-Message-State: AOJu0YzFZ9A2tchXCDwon3bQj3F/O12tPVQt4ipWzBfrMT7xzT3xqhde
-	ZoYbugecZL9P3KBSjjzmUFo1Mre3KWEwmDnLHP6kNKTIz9v8oy1QBV7eQVy9150xrccyBity6Vk
-	YgSSjvJ6EglE62NHAN1nWA8zUsSx9kg/axlLyGA==
-X-Google-Smtp-Source: AGHT+IHtoStFABY+6/Ct10yo+DluObSiNmm2iazrXX4v4aPFp4/k1VH8xzcmISmR1LM13gr6PkVkt+hHTcQEdX7ujLg=
-X-Received: by 2002:a17:906:af0c:b0:a6f:1025:8dd6 with SMTP id
- a640c23a62f3a-a6fab7d0484mr549596266b.71.1718983033870; Fri, 21 Jun 2024
- 08:17:13 -0700 (PDT)
+	s=arc-20240116; t=1718983147; c=relaxed/simple;
+	bh=wz+afc2gxKrziS3ZUul6umAmjb7muSe9xZNGZ7ywM2E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L562TtqkcJXNz3JeznslNOkshd5BVaLLSaSdAhq27KkwKC8yZapMMRjZ3M7IPHa+L7TbF46Hp0SsR55Hu3fHp6xfmtJLPbCsI47o6KogJ2NbZGAgOqC+UKvbgOzVi7ZrDIUOgVBHMySagkQ4cSxG5kbw/UroOnPmlYU4TiwHqzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tY06G2OA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54ABEC2BBFC;
+	Fri, 21 Jun 2024 15:19:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718983147;
+	bh=wz+afc2gxKrziS3ZUul6umAmjb7muSe9xZNGZ7ywM2E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tY06G2OASrzs8kEe5BsGpDHwIESNucLOyE0qmxeJ8fdqn7+j0HG3QrPmLMvbTnWTS
+	 WWqWAh0GB128zt05VV0qHYz2DtHY37mKR/kePXLUCkb6Jtuamxb8Or2pndeKmih///
+	 SSgozPxFQR9Szwx9thZtSgXvAB3ano0Qu2DDNVrWSCszxFksPqKa8f0xFnerUkZ18c
+	 P8OX5K19M+pze3xjs4zlXFyuQKqnrAsCwPp2IkRNGb1F4FIBa4M4+Cksw3wJAXl4ew
+	 89ozUsNnj7jUyQxDuqt8n89ytTbEQZDKClYwRo3aqBqRqY9+dAJy/Fhb/HF5sWx10Z
+	 YjhgwyCmDISOg==
+Date: Fri, 21 Jun 2024 08:19:06 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>
+Subject: Re: Netlink specs, help dealing with nested array
+Message-ID: <20240621081906.0466c431@kernel.org>
+In-Reply-To: <20240621161543.42617bef@kmaincent-XPS-13-7390>
+References: <20240621161543.42617bef@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1718919473.git.yan@cloudflare.com> <b8c183a24285c2ab30c51622f4f9eff8f7a4752f.1718919473.git.yan@cloudflare.com>
- <2081388d3e05e1e6324d81524c6496006058bbb9.camel@redhat.com>
-In-Reply-To: <2081388d3e05e1e6324d81524c6496006058bbb9.camel@redhat.com>
-From: Yan Zhai <yan@cloudflare.com>
-Date: Fri, 21 Jun 2024 10:17:02 -0500
-Message-ID: <CAO3-Pbo_gNVP4qcEGNJe-RmPBy7CgFZab+dwwv2MyFiJRg9_fA@mail.gmail.com>
-Subject: Re: [RFC net-next 1/9] skb: introduce gro_disabled bit
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Willem de Bruijn <willemb@google.com>, Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, 
-	Mina Almasry <almasrymina@google.com>, Abhishek Chauhan <quic_abchauha@quicinc.com>, 
-	David Howells <dhowells@redhat.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	David Ahern <dsahern@kernel.org>, Richard Gobert <richardbgobert@gmail.com>, 
-	Antoine Tenart <atenart@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
-	Soheil Hassas Yeganeh <soheil@google.com>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 21, 2024 at 4:57=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On Thu, 2024-06-20 at 15:19 -0700, Yan Zhai wrote:
-> > Software GRO is currently controlled by a single switch, i.e.
-> >
-> >   ethtool -K dev gro on|off
-> >
-> > However, this is not always desired. When GRO is enabled, even if the
-> > kernel cannot GRO certain traffic, it has to run through the GRO receiv=
-e
-> > handlers with no benefit.
-> >
-> > There are also scenarios that turning off GRO is a requirement. For
-> > example, our production environment has a scenario that a TC egress hoo=
-k
-> > may add multiple encapsulation headers to forwarded skbs for load
-> > balancing and isolation purpose. The encapsulation is implemented via
-> > BPF. But the problem arises then: there is no way to properly offload a
-> > double-encapsulated packet, since skb only has network_header and
-> > inner_network_header to track one layer of encapsulation, but not two.
-> > On the other hand, not all the traffic through this device needs double
-> > encapsulation. But we have to turn off GRO completely for any ingress
-> > device as a result.
->
-> Could you please add more details WRT this last statement? I'm unsure
-> if I understand your problem. My guess is as follow:
->
-> Your device receive some traffic, GRO and forward it, and the multiple
-> encapsulation can happen on such forwarded traffic (since I can't find
-> almost none of the above your message is mainly a wild guess).
->
-> Assuming I guessed correctly, I think you could solve the problem with
-> no kernel changes: redirect the to-be-tunneled traffic to some virtual
-> device and all TX offload on top of it and let the encap happen there.
->
-Let's say we have a netns to implement network functions like
-DoS/IDS/Load balancing for IP traffic. The netns has a single veth
-entrance/exit, and a bunch of ip tunnels, GRE/XFRM, to receive and
-tunnel traffic from customer's private sites. Some of such traffic
-could be encapsulated to reach services outside of the netns (but on
-the same server), for example, customers may also want to use our
-CDN/Caching functionality. The complication here is that we might have
-to further tunnel traffic to another data center, because the routing
-is asymmetric so we can receive client traffic from US but the
-response may come back to our EU data center, and in order to do
-layer4/layer7 service, we have to make sure those land on the same
-server.
+On Fri, 21 Jun 2024 16:15:43 +0200 Kory Maincent wrote:
+> Hello Jakub, Donald or other ynl experts,
+> 
+> I have an issue dealing with a nested array.
+> 
+> Here is my current netlink spec and ethtool patches:
+> https://termbin.com/gbyx
+> https://termbin.com/b325
+> 
+> Here is the error I got:
+> https://termbin.com/c7b1
+> 
+> I am trying to investigate what goes wrong with ynl but I still don't know.
+> If someone have an idea of what is going wrong with ynl or my specs it would be
+> lovely! 
 
-It is true that a device like a veth pair or even netkit could allow
-the kernel segment GRO packets for us. But this does not sound
-actually right in terms of design: if we know already some packet path
-should not be GRO-ed, can we enforce this rather than having to
-aggregate it then chop it down soon after? For our specific case
-though, it also becomes a headache for analytics and customer rules
-that rely on ingress device name, we probably need to pair each tunnel
-with such a virtual device. There could be hundreds of ipsec tunnels,
-and that seems to be a substantial overhead for both data path and
-control plane management.
+You're (correctly) formatting your data as a basic multi-attr.
+Instead of:
 
-To make this a bit more general, what I'd like to introduce here is:
-when we know GRO is either problematic or simply not useful (like to
-some UDP traffic), can we have more control toggle to skip it?
++        name: c33-pse-pw-limit-ranges
++        name-prefix: ethtool-a-
++        type: indexed-array
++        sub-type: nest
++        nested-attributes: c33-pse-pw-limit
 
-thanks
-Yan
+use:
 
-> Cheers,
->
-> Paolo
->
++        name: c33-pse-pw-limit-ranges
++        name-prefix: ethtool-a-
++        type: nest
++        multi-attr: true
++        nested-attributes: c33-pse-pw-limit
+
+The indexed array is described here:
+https://docs.kernel.org/next/userspace-api/netlink/genetlink-legacy.html#indexed-array
+it has an extra layer of nesting, which uses the index in the array 
+as the type of the attribute.
 
