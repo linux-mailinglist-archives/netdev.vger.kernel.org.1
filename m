@@ -1,304 +1,157 @@
-Return-Path: <netdev+bounces-105661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64B049122D9
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:55:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C69A9122E3
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:59:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0B4CB21419
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:55:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99B5B1C20F2E
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:59:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB30D171E54;
-	Fri, 21 Jun 2024 10:54:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41E5171E4B;
+	Fri, 21 Jun 2024 10:59:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N2tZ03n6"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="tl1V2JbR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F2A171679;
-	Fri, 21 Jun 2024 10:54:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718967293; cv=fail; b=hZ7PhuLBxT9X9QSes7EuMXFBdZZA+EqI0OXPdQtiefM5atLzdEOCR7L5n/sQqaqAsX7IkChd+DPJfFxsklZVuSg2StTr4mKUWL3D17BMApX3Lal4MDDavCuh68uDhPDsnCPuHbbMVqayawBaoBhlvc2qfF7G1liQ+UfwkWNDwq8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718967293; c=relaxed/simple;
-	bh=/4rSgQc5gFhAJpw8/5WR7Ht4lps7Kh4Lj4oMO3ZHZEs=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=eg8swCcwHh6R1S/ajZcKcfwTz9QZ3M5dZi8Ka7JCpPbMruropA51yoQ4pBQYmql4oU5PmwiziI3wzOAe/SciQIKvd9YqDTX5gRVSQNonfmBKJ2KzS3IPiQ+QyjH+OmIdZNdiE8Ee+rJsyXHjQrBRU9Z7ZG3/WBKbZWESWNV+lYg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N2tZ03n6; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718967292; x=1750503292;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=/4rSgQc5gFhAJpw8/5WR7Ht4lps7Kh4Lj4oMO3ZHZEs=;
-  b=N2tZ03n6+JqqPQub19GzHYdu2afN79lmuwX56saLr4kD68YOsMbRHVVs
-   LmzVLVprXylEmcxZosdtE/sUMkigU/4w1ye/N6cpRHqBYm8urPZEZ6J0d
-   Rt+g409JjpaenwznU7/XpRylDoBe9dvYyTQ+QC28GuvuKTJTA9JxyXUOg
-   rg8Vyh68c7rKIjR/b1CPWSQB1z661ISruE2cNV9wwbn7YMh0TECxbRizo
-   PnBcC0nT8XtQ3tg+xCsMoTPBHOyb813sjWrCA0cl/X9VuitmpmWYrarvv
-   sT9d25/QssfP5gevUH7A8n7A9jH/y7tVLni3y4afP6tWUAr475XnDMdak
-   w==;
-X-CSE-ConnectionGUID: ffng+XtbRYqrcTarSV52fg==
-X-CSE-MsgGUID: bqaNXSkFQBeYCqoEptRWww==
-X-IronPort-AV: E=McAfee;i="6700,10204,11109"; a="15827673"
-X-IronPort-AV: E=Sophos;i="6.08,254,1712646000"; 
-   d="scan'208";a="15827673"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2024 03:54:51 -0700
-X-CSE-ConnectionGUID: 4XhbnGm7TkGGP3HMXqq29g==
-X-CSE-MsgGUID: /KaunSz8SGi68ZWeHlaYAQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,254,1712646000"; 
-   d="scan'208";a="73770507"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Jun 2024 03:54:51 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 21 Jun 2024 03:54:45 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 21 Jun 2024 03:54:44 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Fri, 21 Jun 2024 03:54:44 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.172)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 21 Jun 2024 03:54:44 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iwNrJadli0dJBSxeXTXUjLpOqHq53ydTyI5METYNzfmpBNotOcVAtlnkCgAlYN9z7Zn6vw6He4DRLZatOg+XAyaEsow1wVHwUb+tyHUjrpdSFlZPoLOq6D31/vmbkYNZKYPpjiDceuV0DXwH6tzDe28X9/t5e3J3dXxbCM6wOk0f1gerxCSYnq6uSrLZmzlc7u0Ix63liL97DIV8jgsDeG6nyKG3F1iguhGEzlLsUHCk1C3gRde1H/qCiwHvFdKGNGahk1uwLK13fGTdHDRuAR3z3lbrsK/Cb6mM2DBVx/jJQLxlE4Donilz0Mk/665rAp1/zV/RZWcn5GFPDrYDLQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cnoqhN9yN650XPya0Rgg0eQjomNJINjcyJi+xZLRUso=;
- b=E2oomgnK3QzpRQU9ecxOdsELU+T29qGx4byp6a9RSpxzvSZ8v/9+OmCGUtseqSOFeGPI2HXnlDH8QfVBJy+ZwWeAoyYSYeGfSyhdJ0f7SFOBuzG8XNstkfbIa2dNCkbAu/m3EyoVEVSHgMjfZuyw6T5vRHMopt7VN+ysw/11IDcXMGqGPE8LrQ1sMUnzn2faqv2x21824vt8w+vwcxU9M4KoGI+VdhKQuTz4u1mOWgtnHsYSFr09HMw1c4yWxO7arx2R6Bc72unE2Af9nrOIrAXrfs2JUYa4z58OJHUchj1jmI+Yz5M1QaXV5F/qxjbN6QdtOULdonRk1nmr+s/MsQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by SN7PR11MB8028.namprd11.prod.outlook.com (2603:10b6:806:2df::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.21; Fri, 21 Jun
- 2024 10:54:42 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::4bea:b8f6:b86f:6942]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::4bea:b8f6:b86f:6942%5]) with mapi id 15.20.7677.030; Fri, 21 Jun 2024
- 10:54:42 +0000
-Message-ID: <b9481bf5-c36e-45da-a718-0c7a254ff3d9@intel.com>
-Date: Fri, 21 Jun 2024 12:54:34 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] net: dsa: qca8k: add support for bridge port
- isolation
-To: Matthias Schiffer <mschiffer@universe-factory.net>, Andrew Lunn
-	<andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
-	<olteanv@gmail.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Christian Marangi <ansuelsmth@gmail.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <cover.1718899575.git.mschiffer@universe-factory.net>
- <78b4bbb3644e1fabae9cc53501d0842ccd1a1c5d.1718899575.git.mschiffer@universe-factory.net>
-Content-Language: en-US
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <78b4bbb3644e1fabae9cc53501d0842ccd1a1c5d.1718899575.git.mschiffer@universe-factory.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1PR04CA0113.eurprd04.prod.outlook.com
- (2603:10a6:803:64::48) To MW4PR11MB5776.namprd11.prod.outlook.com
- (2603:10b6:303:183::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16AE374416
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 10:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718967546; cv=none; b=MsxzwugkM3kule/FWprlf75FeXhhLt4cJSfK0Z5zfKYik9Jwxiux0OuK75HUVZUEir/pCrgsFuhcRp+AfGMvTiNYrsDzpYtNV/awOiCM4VRZe/qN5kYYq6cX0HWy7nmhGqYUVRzhNARvcmfG8eVld+g44+lL2a1uqeEbvubAqBw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718967546; c=relaxed/simple;
+	bh=UbcHEehOhY6Kaaw7gEASkLbxyOslwmbGjY9Xl51wmKI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ibVILyA7s6RfJEolOYi1VQ3Fa60g+H94MtwpL0EwecJu+IixoHg9RQhMwB9HCTg5k5P2ICkYccDN8/0VmHgn16O+M/6vAqk7CrX2wopUEDCDzDXg0CXR3g19EqqrxqB4/9D8T/1poUwOmpBqulT0UL+U3JH9HsXSVZsEbif+Dl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=tl1V2JbR; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-57d1012e52fso2107352a12.3
+        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 03:59:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1718967543; x=1719572343; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Uz5XAGtC4s4uJKJAGGTmFHpkVxyO1Ao8Cp4QAP+oyTY=;
+        b=tl1V2JbRHq4tvpAKpt+BO80Pe3j8xnpKYRrTfo/qfPkKPVZLgGDQ0KKenO+uEofQ3K
+         QiuoQK6w0JYBnEiRewb4h51JUADxOI2nbjl09ILKGazuO489EmbXVH6xVpKBlsK9K0es
+         EdPt0/L9Co0B54pIo+ptZnHR1kIguF8lBheGELcWx4uYLkeiULQzVKtZ2V963uCgdLJX
+         03tY2CogqPnC6t0GPNsoDflFMJDOiDvHXItUrIbJRDHMt2JItOYDlnQogGwlxGtrSwON
+         ReAdiLUirqP1m4zMPCu9I7IfQFZt0S37wWtpQ1joa+Bp2Xm/et5TTzrg1lo0sX6H50MX
+         xvlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718967543; x=1719572343;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Uz5XAGtC4s4uJKJAGGTmFHpkVxyO1Ao8Cp4QAP+oyTY=;
+        b=FYWyETt3kV0RuwkJrIKo/eefnIaLK1ueawDyl8N8WTi8pj9Tmj8UWjsIBqSBLNrehG
+         m2aP2SDVWS82eaFi0yrTC+K3vuHFqD4Sxe5ZV/IGC8Xw4zOSLD8yNxdJtDp0A3LdGxMq
+         N8V0VqNji/cib6LYAYap1yWcJEuvq+plzSt2g2XSZsPcHw0/aujRDPeAZjoTYMlJTXtM
+         DBn15JB7sq9vgwFojR50jY2btnjFYOv/4Duz3SfEt4jybg6Dj7L7J1M/98sDiKUy4BIy
+         uwCqNse0jY2nuBaNJrUGULHpzVI21SxQB055UPprcmMAvpUXRZ3ihJlHFkj7ckG4sf6Z
+         yp/w==
+X-Gm-Message-State: AOJu0YwRPsu/Tb0L6QNpJILB94KNFerPFwB4czVAevCUaMGmIHmKJLR0
+	VCOgACrH9BUD5h225+SCc9LqxuaxOcQYTE3KI2lb4NVzQal5Od30JvZ/KsMT7qU=
+X-Google-Smtp-Source: AGHT+IEZ0k+0qF1h/P+C2B2ZK+g35UyEcl3vgxcQt+qeFkbV6tACGreDkSeqm4hcJF6BB/jOgQeGdw==
+X-Received: by 2002:a17:907:c209:b0:a6f:467d:19ec with SMTP id a640c23a62f3a-a6fab613cafmr615195366b.18.1718967543018;
+        Fri, 21 Jun 2024 03:59:03 -0700 (PDT)
+Received: from [192.168.118.62] ([46.211.252.191])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6fcf48b4d2sm71922866b.73.2024.06.21.03.58.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jun 2024 03:59:02 -0700 (PDT)
+Message-ID: <0c2211fc-0a24-46fa-b143-357d826af6c1@blackwall.org>
+Date: Fri, 21 Jun 2024 13:58:54 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|SN7PR11MB8028:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2606b90d-12ae-432a-15fa-08dc91e08e2b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230037|1800799021|366013|7416011|376011;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?dDJHcmlQbVU4K1BnYTlHK0NPNXVqbE5KVUNpL2NoMG9tbU5XMnlMN0p6QXpk?=
- =?utf-8?B?QnlUaVNhcWE1WkZ3eVhkdVM0dU9PRGZxU1RBLzJwbmxWTndHU3FVa1FXUDFM?=
- =?utf-8?B?bnVQMUsvRjFXZW5aRTB1VDVKbnpqMXFHUDBUcUZtTTlyOGZmWmVGRjh5bURH?=
- =?utf-8?B?TDl4RmJ4NnJZeFRHVk53MGlGdjdoS0VrUkQyTCtRWjdpWFc2TE0xc1lzWHU0?=
- =?utf-8?B?OW0wYnMwNmVlUzVUemFpWklzVlhlMGdiR1JuZmVLd3FTTWhDa2krOG45ZFM3?=
- =?utf-8?B?czNsOVU4NzBPWWh6RklueWhDamErSkVqQjBGbWdFVFVuWmlGZXUwYlVYUVpp?=
- =?utf-8?B?WThXM25ZWlRDc2thby94ZFRmSGgzODY2Yjd6eHkvMmZ3WEpIUi84NjJhOXFV?=
- =?utf-8?B?NDhjL0Y5RG9BSGh1cWI2MUhsNnFPNmFxMmE2N1k1UVorbVNiTzdwZTJxbkVH?=
- =?utf-8?B?UjBBVWdGSElPV1NRU0wvbFJlUjdmWDFnMUprY3pESXJVclFRK0ZkMDBmZTY1?=
- =?utf-8?B?WFYyN3o0RlpsWGtXVUxkVEpENGZ1OWlCK3lKS3N2aFdkdXV4dDBJb3VPN1Q0?=
- =?utf-8?B?YzY3dE1zb09YR3JIMXRib0JtNFRrTjRYWnZMU0VCZHhmWnVuZTE1dThJQ2JP?=
- =?utf-8?B?Qk1BVGh3TDU4aE8vY1pYR2J6NDJUcFZ3dnk0MHRQTnltMURZUWo3cDRrVzRU?=
- =?utf-8?B?OXJVYWtkVVdpRmphcWoxNWwxbENqcmdQTG9JT0pXRk10TGlVd2NxeGJVOVFS?=
- =?utf-8?B?V3lBZFRPSnlVc0lueGtXaVV6L29XcHlCZ25nU2g3SXluRG1UY0s3Rmw1S1or?=
- =?utf-8?B?dnF5dzJLWlhXZW9kWlNNMUJsSW5sOEYzZlJtTUFBZW1HS013a2ROdG1xcHBH?=
- =?utf-8?B?YkVOaUMxdUVIRU5TeENwdkZlcDFJYkI4OElDR0NNWTBpZUc5SnFJSjVURFpN?=
- =?utf-8?B?VHFlcFN3S0I5S1d6MHRWS25mekZ6WTdDSG5adHQ2QWtnUlNVSXEzeDZQVGYw?=
- =?utf-8?B?NEpOZFFRdVpHdWNIdm5HWTNqU0VVb25vZzY3MU5PVHhUWWFqVnk2b3dWdWtV?=
- =?utf-8?B?cXBJQmFidGNxVVlldUt4cHFBRWxkaWVmUVFyWlJpUUVPT0lTNE9KQXIxc2Nx?=
- =?utf-8?B?Qy9qbnlUT2xuOEU5ZXVVNXVMSVhyWENHYVRFS0Q1dXdVTmQ0ZENIcGdsUjZq?=
- =?utf-8?B?dE5xTHJkSHBTUSt4V0lrQXlWSzR1b0hRQWFDMXg4RlFmdlo1dVNqY1UvcGlj?=
- =?utf-8?B?NCttQWR4NGs1cENycXJ4SFBoYVhkSUV4SVdJTDZNblBSME0xanZTZVhwQWNw?=
- =?utf-8?B?U0hGNE9vMXFMekVtM1MvR1dCM0M1VlJhTkFJNlpuRlVkKy84VjJSa3M0aGJ2?=
- =?utf-8?B?OGw5Z0JrZDlEU1dZRXo2ajhNR1d3Z3VOc0Ixak81Y0pWcGxXTnV6MGQ5eGtn?=
- =?utf-8?B?Zmd4ZkJGK2dTZzZBR2grL3pDeVB0ZmJBVUQvUk1CMkdPZ21aRVF1Mm5KSlRE?=
- =?utf-8?B?am8waHQ3Rk1yUWtYa0VpY1NIMllBemNEK1VSR0I5bkV4MzhDMWNDdy8rRXkw?=
- =?utf-8?B?c3BjNjFLS0tPWEYyU2c4ZXU4aVpUU2NydWVzTEs2bEJHVkN4cXJtU1FmWUFa?=
- =?utf-8?B?RWpPNnlESXNQNU93QkZRdVhXOUdnMDM1OTI2YzFCS3lQUEpwQnBocTMwb2pY?=
- =?utf-8?B?TnZGZTN5U2xBcnBnME0vZlA2NzYvSFgrRXUzbkdWR0xOY2pZL0lsWUMyWG1v?=
- =?utf-8?Q?KXnCcpGEc/kjg1jgQjgOdjg2lvWjNpCi6QwDZ1n?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(1800799021)(366013)(7416011)(376011);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WDB4NlBDQ2VZdkRDbzdOTGRDczlVUExtM2UvVGxITTZoVkN0ZkVEOTZLTWVL?=
- =?utf-8?B?d3VlLzluRlh0Q2FmSTZxZUlxZ0FQeENvaXhKUUtCbVF0TEVOZUlVcDZ0MXdu?=
- =?utf-8?B?UE52Ym96T3BGNnJQWTJNVE9LY3cxTXNLM2V1NVMxd2FxdjhGUk90VzQ1VzdR?=
- =?utf-8?B?R2dlOVdzV3A1MW9WenZ3aEJUUEE3aEpQQkhzaWtWNWszNy95eGpKQkk2VUtw?=
- =?utf-8?B?cjZpMFVQL0RLdk10SmxpL0RSVy9VU201MU9paWY3amhIUVdRRCswNzQ2c1Az?=
- =?utf-8?B?RTZIMDkzUm84cHVnYjYwZWUxdXlZV3ZJRTlmOTZrTExvdFUwYzBCdHlNanZ4?=
- =?utf-8?B?b3ZGK05JU3BFTmN3SjExbjRqTWphS0huQ3gxMGMrZXE5UnVGRStRZUhvWDdv?=
- =?utf-8?B?a3d6YU9pNVdyVkhNU1hpSmVJZ1l4VnBnTWlaRTgzODJDTFRiV2RkYzVlVmhp?=
- =?utf-8?B?OVpkdGk4QXI0ZXkxcmlqU09DMVVjbTBQcnN5Mk9kTDZrdHVlbStIMnJHTllo?=
- =?utf-8?B?UGxiNUlnWjhEUzJsV3JESjY0NW1iQmxaQTA4ZXpMVXZXbmZuVkdOWk9RU0JB?=
- =?utf-8?B?SzQrZWJGd1VqVHhsblpFOGVyczBQc2tRWFpMd2JmMXlKOVdaeitOYTJGcGVH?=
- =?utf-8?B?ck5jVUtyWEVSazhIazhRbXp6SjM3UENWZkMwUHhkTmg2Y1djM0t4a1hxMm5D?=
- =?utf-8?B?UEdkUjBmNHNrTTN4K3hhS0YxSFE3bFJJc1lLMFR4YnVjTDdqNnJXb3dBT2ps?=
- =?utf-8?B?aEcyM2doZUlZeGNvM0Z5MlhwMytvSTBHUFZsR3YrS21SREdXeGppQ3YvbFV6?=
- =?utf-8?B?dTlsUWxFdzVKUjBQTnZLNkVkcnhVei9LZjdUMTNuQXQ3dkI4cm5PUTh2UzNV?=
- =?utf-8?B?TE5aWFdwTUJiODFtM0hSNUZ6OVJtbkk5VGFRMmZxdy9tQXVCcEl6Qk9ITmxI?=
- =?utf-8?B?RDRhSUIwYUhtaE81YkliaTdiSDZnazNlTU1WaWo0SDlXWWxNZWROOHA0SWE4?=
- =?utf-8?B?eGtLSGlsUHFmaTYraUplT0xYbmdwYXZ4OEhXYUJlVkFrOEFPT3NHS01TZktp?=
- =?utf-8?B?bi80anpneHFaNi95WUZjWXdXMjVablljREhZbkVVMTJKbVMwR1dNb3ZrWHlP?=
- =?utf-8?B?WmJOK3p2c0JEZEc4NmNIcEJXV0JqRUFuQnZaK0ZVWHBDbWQ5eW95emdNdzJj?=
- =?utf-8?B?dmxBeG1jSk5WVU9VTHpXdC9jaXc2RjcxRGpDdnJ4MXVYV044N3pjQmhBMnRN?=
- =?utf-8?B?N1QvRTJER2tBRlRWYlVwcWlUOXBwQ1RQVDBHQmNFMjlFYWpYeFBBTllSUyt1?=
- =?utf-8?B?c0dzaWN2bXplWnB0ODZMVVh4aStac0tEakJxeCtHRFFPbDlpc1pDOVYxU0ds?=
- =?utf-8?B?cWpQWGhEc0lVcmMwOGsvVjFZa3B0QWo3bWNzb2Y2c1RaOWU0S3hISEVpcmlV?=
- =?utf-8?B?SlNHZW9PTDU4K2ptUHNIaG9YMUM4K1gvTXc2cjlhcUh5U2o5YXA3VWpZL3A0?=
- =?utf-8?B?cFQrTjU2M1NaeUlhTHdiWTQrcDR0eVFaSE5pelFaaHpOWGs0QXU0NDdTSWc0?=
- =?utf-8?B?M0hMTE5uZmdrUnZKenhRcnFWbFNoTVEwT3NYNWRaUGJzOGl5bXlLa3FBQjBl?=
- =?utf-8?B?MzJxT1V2QTVWTldvM0VjZmdtYUs0OFBzUmRXa1Z1Sk1OSGZtMDRUTVJIOHFO?=
- =?utf-8?B?K0ttRGN1MDRUUXdZQTVUSU1jSlFKNFVDRVJhV1lodWlZRGN0VUJJeHNwOVZX?=
- =?utf-8?B?d2I5cEIydzVHenZXbHNyYVhvYW5SdTBOSElUL2lLeUs1VnNFSzBhdVBuRU1R?=
- =?utf-8?B?UWY3UTFsM210UHhCeHZoYWJPUUJwaVNlallFb25zNUxkSk9XL3ZwVjBKckhF?=
- =?utf-8?B?K1lKd1NkZVRJYWZWdXVXNjBLQ2RldUN2UWd5VmdUYlRZNE9iYTNjZTZLdE5R?=
- =?utf-8?B?YlRkaktQNFROWkdKZElmZTJvWkRkZ0NEL1FIL1NRMmY4SWZkd1VhQ3AzVzRl?=
- =?utf-8?B?RlR6MHF6MlB3enFrUW02SFVYbUxITnEyb2NBOGxxTzhUdlB3bFZhaTRpQjhk?=
- =?utf-8?B?TCtTZzBBaUU3eWs5VWVkUDJRZGp0UEJiSCtGYnlKZGNUakVoY0lSNnNhdkdp?=
- =?utf-8?B?aTJMVWVUQklORDJFejczZmk4dGpXdDBTUTZWZmQxWk5YOUVld2FJdUJCV3lK?=
- =?utf-8?B?S2c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2606b90d-12ae-432a-15fa-08dc91e08e2b
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2024 10:54:42.5976
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PHbKJyAe4qO5lJTQyA53XPAnbXieafx812CHuYqDqdH777RdCV/dGF7m5C8vL97y7tAcJNOSnrNSdOm3XQC3ed8TQkwh+VyJkzl99NXJxG0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB8028
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] bonding: 3ad: send rtnl ifinfo notify when mux
+ state changed
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
+ Andy Gospodarek <andy@greyhouse.net>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+ Amit Cohen <amcohen@nvidia.com>
+References: <20240620061053.1116077-1-liuhangbin@gmail.com>
+ <1b9fd871-e34a-4a7d-b1d3-4f3fd8858fa3@blackwall.org>
+ <ZnPxoFXHKQ5dAq5K@Laptop-X1>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <ZnPxoFXHKQ5dAq5K@Laptop-X1>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On 20.06.2024 19:25, Matthias Schiffer wrote:
-> Remove a pair of ports from the port matrix when both ports have the
-> isolated flag set.
+On 6/20/24 12:08, Hangbin Liu wrote:
+> Hi Nikolay,
+> On Thu, Jun 20, 2024 at 11:47:46AM +0300, Nikolay Aleksandrov wrote:
+>> On 6/20/24 09:10, Hangbin Liu wrote:
+>>> Currently, administrators need to retrieve LACP mux state changes from
+>>> the kernel DEBUG log using netdev_dbg and slave_dbg macros. To simplify
+>>> this process, let's send the ifinfo notification whenever the mux state
+>>> changes. This will enable users to directly access and monitor this
+>>> information using the ip monitor command.
+>>>
+>>> To achieve this, add a new enum NETDEV_LACP_STATE_CHANGE in netdev_cmd.
+>>>
+>>> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+>>> ---
+>>>  drivers/net/bonding/bond_3ad.c | 2 ++
+>>>  include/linux/netdevice.h      | 1 +
+>>>  net/core/dev.c                 | 2 +-
+>>>  net/core/rtnetlink.c           | 1 +
+>>>  4 files changed, 5 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
+>>> index c6807e473ab7..bcd8b16173f2 100644
+>>> --- a/drivers/net/bonding/bond_3ad.c
+>>> +++ b/drivers/net/bonding/bond_3ad.c
+>>> @@ -1185,6 +1185,8 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
+>>>  		default:
+>>>  			break;
+>>>  		}
+>>> +
+>>> +		call_netdevice_notifiers(NETDEV_LACP_STATE_CHANGE, port->slave->dev);
+>>>  	}
+>>
+>> This will cause sleeping while atomic because
+>> ad_mux_machine() is called in atomic context (both rcu and bond mode
+>> spinlock held with bh disabled) in bond_3ad_state_machine_handler().
 > 
-> Signed-off-by: Matthias Schiffer <mschiffer@universe-factory.net>
-> ---
-
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-
->  drivers/net/dsa/qca/qca8k-common.c | 22 ++++++++++++++++++++--
->  drivers/net/dsa/qca/qca8k.h        |  1 +
->  2 files changed, 21 insertions(+), 2 deletions(-)
+> Ah, that's why we call the bond_slave_state_notify() after spin_unlock_bh()?
+> Where can I check if call_netdevice_notifiers() would sleep? So I can avoid
+> this error next time.
 > 
-> diff --git a/drivers/net/dsa/qca/qca8k-common.c b/drivers/net/dsa/qca/qca8k-common.c
-> index 09108fa99dbe..560c74c4ac3d 100644
-> --- a/drivers/net/dsa/qca/qca8k-common.c
-> +++ b/drivers/net/dsa/qca/qca8k-common.c
-> @@ -618,6 +618,7 @@ static int qca8k_update_port_member(struct qca8k_priv *priv, int port,
->  				    const struct net_device *bridge_dev,
->  				    bool join)
->  {
-> +	bool isolated = !!(priv->port_isolated_map & BIT(port)), other_isolated;
->  	struct dsa_port *dp = dsa_to_port(priv->ds, port), *other_dp;
->  	u32 port_mask = BIT(dp->cpu_dp->index);
->  	int i, ret;
-> @@ -632,10 +633,12 @@ static int qca8k_update_port_member(struct qca8k_priv *priv, int port,
->  		if (!dsa_port_offloads_bridge_dev(other_dp, bridge_dev))
->  			continue;
->  
-> +		other_isolated = !!(priv->port_isolated_map & BIT(i));
-> +
->  		/* Add/remove this port to/from the portvlan mask of the other
->  		 * ports in the bridge
->  		 */
-> -		if (join) {
-> +		if (join && !(isolated && other_isolated)) {
->  			port_mask |= BIT(i);
->  			ret = regmap_set_bits(priv->regmap,
->  					      QCA8K_PORT_LOOKUP_CTRL(i),
-> @@ -661,7 +664,7 @@ int qca8k_port_pre_bridge_flags(struct dsa_switch *ds, int port,
->  				struct switchdev_brport_flags flags,
->  				struct netlink_ext_ack *extack)
->  {
-> -	if (flags.mask & ~BR_LEARNING)
-> +	if (flags.mask & ~(BR_LEARNING | BR_ISOLATED))
->  		return -EINVAL;
->  
->  	return 0;
-> @@ -671,6 +674,7 @@ int qca8k_port_bridge_flags(struct dsa_switch *ds, int port,
->  			    struct switchdev_brport_flags flags,
->  			    struct netlink_ext_ack *extack)
->  {
-> +	struct qca8k_priv *priv = ds->priv;
->  	int ret;
->  
->  	if (flags.mask & BR_LEARNING) {
-> @@ -680,6 +684,20 @@ int qca8k_port_bridge_flags(struct dsa_switch *ds, int port,
->  			return ret;
->  	}
->  
-> +	if (flags.mask & BR_ISOLATED) {
-> +		struct dsa_port *dp = dsa_to_port(ds, port);
-> +		struct net_device *bridge_dev = dsa_port_bridge_dev_get(dp);
-> +
-> +		if (flags.val & BR_ISOLATED)
-> +			priv->port_isolated_map |= BIT(port);
-> +		else
-> +			priv->port_isolated_map &= ~BIT(port);
-> +
-> +		ret = qca8k_update_port_member(priv, port, bridge_dev, true);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
->  	return 0;
->  }
->  
-> diff --git a/drivers/net/dsa/qca/qca8k.h b/drivers/net/dsa/qca/qca8k.h
-> index 2184d8d2d5a9..3664a2e2f1f6 100644
-> --- a/drivers/net/dsa/qca/qca8k.h
-> +++ b/drivers/net/dsa/qca/qca8k.h
-> @@ -451,6 +451,7 @@ struct qca8k_priv {
->  	 * Bit 1: port enabled. Bit 0: port disabled.
->  	 */
->  	u8 port_enabled_map;
-> +	u8 port_isolated_map;
->  	struct qca8k_ports_config ports_config;
->  	struct regmap *regmap;
->  	struct mii_bus *bus;
+>> Minor (and rather more personal pref) I'd split the addition of the new
+>> event and adding its first user (bond) for separate review.
+> 
+> Hmm, with out using call_netdevice_notifiers(). How about just call
+> rtmsg_ifinfo() or rtmsg_ifinfo_event() directly?
+> 
+> Thanks
+> Hangbin
+
+Yep, I think that would be fine (w/ GFP_ATOMIC of course, if under the
+locks).
+Excuse me for the late response, have been having connectivity
+issues the past few days.
+
+Cheers,
+ Nik
+
+
+
 
