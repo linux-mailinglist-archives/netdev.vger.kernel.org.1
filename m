@@ -1,128 +1,198 @@
-Return-Path: <netdev+bounces-105533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9A1C911990
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 06:37:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 804B79119D9
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 06:57:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25CC71C211FD
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 04:37:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A32CF1C213B5
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 04:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F54412CD89;
-	Fri, 21 Jun 2024 04:37:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9288C12D1EB;
+	Fri, 21 Jun 2024 04:57:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k505hdpz"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="JX46NLHk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2083.outbound.protection.outlook.com [40.107.237.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E53EBE;
-	Fri, 21 Jun 2024 04:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718944669; cv=none; b=DiAZlAqCkAaEYAEjamGyEGuqKFCwAdYCza6cq3aMtCj2tJt0x90PMO7Tebispe/xGwJAL+26451oxhOqqVGFeJ1c3o4w44erGVc25Rx3ru2UCDc7ro44bCOpliNHiDSVz++7cCekqEXfi1n0/z2k0RIKfdL/uy44KST8Gr2sMTI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718944669; c=relaxed/simple;
-	bh=dtuG/8FVyfxt6cdJEnSMBi5db48doHCJHLe3KcIUws4=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=MzAyKaSYGUf0IAof7bHeLrbbhNGJmwW285PHeh7PdJD6MZtdxViy7uMA8le8edjt2iaO9x9xsGG/puKUVeuqJpmPfzHDp2F3KoAEml5ETSmGm2nKWetHiGL/bRNswcLsn+3+sPbRj0M/ZTm09A1pt9j8pOicFkQ0CJwcDgQIKbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k505hdpz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 216A4C2BBFC;
-	Fri, 21 Jun 2024 04:37:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718944668;
-	bh=dtuG/8FVyfxt6cdJEnSMBi5db48doHCJHLe3KcIUws4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=k505hdpzwMMojH9wRfDeKs5BlNmsCDhP4RZMfHss9GZvJxLyRPPFXiUgVFptQKDL5
-	 S5gsaSJiKe4LG3AqF7BLkgArN2fQ6qmD9TPovctggZUcd3SKbL9/4LgiQ6RebmHXx8
-	 Sa6lkZ4xCYaOuzo7Zws7B8aGMz8VF6yVl5HZS3oaFEGqgpml4yS2vYF6N/jfvJPDIj
-	 4wIEtSyU5vQLJwGLXsMqM/tqNHAvajbwv14JxtQRT0slq+fIxjIz53UIWoTOFHUheC
-	 qn8EFjVtrHKjnNWfmNSVO6/Cns8JaNBbD/GTXf78g5DeCI791W20rOIkGVStMEvPqS
-	 TWkLY4TaxbGVQ==
-Date: Fri, 21 Jun 2024 13:37:42 +0900
-From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: torvalds@linux-foundation.org, ebiederm@xmission.com,
- alexei.starovoitov@gmail.com, rostedt@goodmis.org, catalin.marinas@arm.com,
- akpm@linux-foundation.org, penguin-kernel@i-love.sakura.ne.jp,
- linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org,
- linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
- bpf@vger.kernel.org, netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org, Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Subject: Re: [PATCH v3 09/11] tracing: Replace strncpy() with
- __get_task_comm()
-Message-Id: <20240621133742.6692d3bda4faafab878f197d@kernel.org>
-In-Reply-To: <20240621022959.9124-10-laoar.shao@gmail.com>
-References: <20240621022959.9124-1-laoar.shao@gmail.com>
-	<20240621022959.9124-10-laoar.shao@gmail.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B803CEA4;
+	Fri, 21 Jun 2024 04:57:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.83
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718945869; cv=fail; b=Ol5uIU1vKavhy93ts07iELg8rCJRpS5e+fly1O3VGCy9/dUCUN6O0OoOI1DZ4KNGZy6Mhxhk2+H+4RK+C4Zq5sePP5P8lpeGQfAbypob8vf9zrr6dUQlHxHn1AgnhLXw5SDyuMJu6cERLnh3GPRkIyWLIsqKSwVgNQjaBRhwSRk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718945869; c=relaxed/simple;
+	bh=1rW0NQIPlnhrNMgVe5psvTjJUzgIiPbxqgAroMC3Rv0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=s+Q5lTVbvjjKuSXYs0KoKUj0gitbQrIa+gkHlMw8JlPdmOBiX75p5pd7ieUXMtb7/irF1vwq3Ef30YgqjyLiM0N3HU66ufor7UDJYa/mFnrurQtXa9njYv/THo2ti2kOPm5dPnKmJR932K8mpWKBfeDXaKcDqzCvV3PDsWuBpVk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=JX46NLHk; arc=fail smtp.client-ip=40.107.237.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Kcd+LHGl3o23BGGmin2BZjky/frfG4ep5v5ffaJaBVYiZ4y1buQXOJ8EEY26mZA8+ugRQSsFGRniRQhzOsjdMGZ2PV/hnx2Rnbb9/FZZ023jeIcFs35qgHpXphynKutgtMfhVpKyVsGiNqAvuIuiao4ZUlJlR1pn0rM8EUzy7y4VHlMgNbVLk2dRfsWZj8GP/IFzm6LTtWyQmYNp9zPSbCW6wdKOCiEOLmbaq343c7Qtvp5V/6mioD2m86Aa00SD7jCC3ynGSAge0jpX1zdWApGqEdFKt/rTUith0zhz70y/0vFIB8/FEHpfd7qz+75ZTTTRKEq8O4UUA8iCquQU/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2JQe7GkGGdNGHjO8VwLZlIC1PtkwbAy1ivUb1RUlCOE=;
+ b=NYXFBwvFOVpiRmzOPtucQcf3r/xCpjMMuD8q5mUeBJnyVvRjVYnyqBRAcSgy31gGpOUHERVBCHH0yxgCdvvKCgfls9QbFqWcZMbvu5prFhIR4yztK+Mqvea6ZITY+gp0sXY8Ndqm2NsUDbsN2R+SYo11VCTFHXDPXhXvci+YNU5D3+gdo3AoFv7SdTJBb05dfNYFiqYETklMuQv0FSWX8ljeBUYBPCvngBzA30gHCle5kb9fXSY3yJcYi02p/Afo36rGi4M/bbVGSgXiNiv63zohS33duJnwf/vrdofF+88aD7ugOBmyhk5iZzJ38jFYwZrVsVtBzhd5lGLY5MAMIw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=microchip.com smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2JQe7GkGGdNGHjO8VwLZlIC1PtkwbAy1ivUb1RUlCOE=;
+ b=JX46NLHkAYSxt8h5bAUinFbZaD6dihqMtXYtaZqw/bk3Je8EWVQ6BhI30dnFXoCw0/Zr2GAcMbzkiXp995Gsv550SuEIWjJi07ZuyxaHGf66KHCxYW1+7+guzUEa1NUn8vlb5xyI5j6FqNMYUYw/9YKQ7VCB1NCRSRME2xpsp8c=
+Received: from MN2PR05CA0053.namprd05.prod.outlook.com (2603:10b6:208:236::22)
+ by SN7PR12MB7345.namprd12.prod.outlook.com (2603:10b6:806:298::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.21; Fri, 21 Jun
+ 2024 04:57:42 +0000
+Received: from BL6PEPF0001AB4B.namprd04.prod.outlook.com
+ (2603:10b6:208:236:cafe::13) by MN2PR05CA0053.outlook.office365.com
+ (2603:10b6:208:236::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.33 via Frontend
+ Transport; Fri, 21 Jun 2024 04:57:42 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL6PEPF0001AB4B.mail.protection.outlook.com (10.167.242.69) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7677.15 via Frontend Transport; Fri, 21 Jun 2024 04:57:41 +0000
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 20 Jun
+ 2024 23:57:40 -0500
+Received: from xhdvineethc40.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
+ Transport; Thu, 20 Jun 2024 23:57:36 -0500
+From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+To: <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<linux@armlinux.org.uk>, <vadim.fedorenko@linux.dev>, <andrew@lunn.ch>
+CC: <vineeth.karumanchi@amd.com>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <git@amd.com>
+Subject: [PATCH net-next v7 0/4] net: macb: WOL enhancements
+Date: Fri, 21 Jun 2024 10:27:31 +0530
+Message-ID: <20240621045735.3031357-1-vineeth.karumanchi@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+Received-SPF: None (SATLEXMB04.amd.com: vineeth.karumanchi@amd.com does not
+ designate permitted sender hosts)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB4B:EE_|SN7PR12MB7345:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4244be6-90d5-4c46-9d28-08dc91aeae8b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230037|1800799021|82310400023|7416011|376011|36860700010|921017;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?CbD9Q7wWn3zomJcOaLkyxkGBjRVLPmnmd8IflGTUU0KD2O1bp6pfWMNX66JQ?=
+ =?us-ascii?Q?8yt9BIJuE2T6DQG1GXcunSdyvP1IXqm86oPV2jXModcTMXNW6TivCzS+8Gry?=
+ =?us-ascii?Q?8l9sXFv9/5gMyYmPLtkqFUXp+vQ2KyHtXeSrCieSak5ka+c2gjv2IyJOx2u3?=
+ =?us-ascii?Q?I4Nzg533JkNAgZpBXtbrHu05UNE3d7g24qh0SXWo50DMS0zDy+i4eX1RijTv?=
+ =?us-ascii?Q?dwb9RLgukuAvU2hxHzCx3zUhe7ElBtfQrIOavJISj4tK0AG1BH7bWnVkX3Gz?=
+ =?us-ascii?Q?WUh5DA+yh5ryu/O4AikcZMfDGKVxtFAIlT8rdNcHkeHjPdi7S72kKVcoz37u?=
+ =?us-ascii?Q?hXtdTNVix0FivtTKSbXrtwifD7ntYg3al2Um+VyWARA/7Tvf+tqUgfiApfxU?=
+ =?us-ascii?Q?taPvojSIRG9xoNCIqIYW2+ZlNLLCqpUm3iFsVfqjL7HaPaJzuzMvyhEcanms?=
+ =?us-ascii?Q?jNaUyvpak0mhL+ihFKFBXdfXjyFpBWOd/+wEsKYAPC6bMJQjk579iYqvlSLQ?=
+ =?us-ascii?Q?kshTLgAG8qA3Y3s/u27YMlbmM9h+l/lK/bOp9MdsiqqV3CiKpTcFyo9DsQtj?=
+ =?us-ascii?Q?LRZonGB7nJFOVR0/hpbLebSEZ0S8B4gZoCDhmUJLIL++9RbrVseS7DQfG44F?=
+ =?us-ascii?Q?ZdTDRLIbsLSIhEu8QL1qlnDQPW9Thvl75qwJFLRHW5jlWnv4GK7y0o6jzHY2?=
+ =?us-ascii?Q?uxYNfHlThkUg05gAakLEE3R6HXWvZPujz/yXyF6JGs30Vfr/7DJ6E1w1TPNV?=
+ =?us-ascii?Q?RAiW4W4AbQT19/kRvJFwpdx7zRacLjYhEAdOw+Us9MjYVT/tvEak7/w2LREM?=
+ =?us-ascii?Q?C7AhuXiAxShyVbYq0Kz+QacCRL/kS1zegMm2L+wfS4C5Wp+SAIN7F0o9cOsQ?=
+ =?us-ascii?Q?dEmWkKv2BFyY7/NRwlD24DD52l1i0NHIDbUAdECzxR6S8rOMVnzaaASOhUpz?=
+ =?us-ascii?Q?M3r32vkJeRHrdwFghY/UOagK1MYrMY9GiB0/bRqRMlHtR13oca55s2ifaHDt?=
+ =?us-ascii?Q?qF3NvYlOmr1dKTrZ3WFeeYQRWYa2whlATi7N1zPo65BupHRI+nXPJksHa8pL?=
+ =?us-ascii?Q?c80hKxwLt7KZ7knlFQS9yveqj4pjjFMMfKOOab1w+s3M/K8x8AOJxJcl2klT?=
+ =?us-ascii?Q?kScqqq9w96VPfo0Nh7nh//0W6fjbYcDdosWXbaf4Auqy4c7+5NprSCExPpUe?=
+ =?us-ascii?Q?7OEFqLlD4OrGACxzqQLPxdev9WY0RGPWjO9lrsRyD7SCa6IQxoQ3/mRdVzTE?=
+ =?us-ascii?Q?zHAhaSWgURlFGSMBnRi23b8Rq9MoXIjfrvlnnbiy2Vq9IxOZKcwzmLX7UMlw?=
+ =?us-ascii?Q?qGvLwWgEiHdLsFyo5/dv5HAMr/zaJ2yCn3R1uAQMbAmSoCXXFSLru7Y7HMxT?=
+ =?us-ascii?Q?li+f9FA2Am5bpYW1cq3o7JuZz5Ir?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(1800799021)(82310400023)(7416011)(376011)(36860700010)(921017);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2024 04:57:41.7865
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4244be6-90d5-4c46-9d28-08dc91aeae8b
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB4B.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7345
 
-On Fri, 21 Jun 2024 10:29:57 +0800
-Yafang Shao <laoar.shao@gmail.com> wrote:
+- Add provisioning for queue tie-off and queue disable during suspend.
+- Add support for ARP packet types to WoL.
+- Advertise WoL attributes by default.
+- Extend MACB supported WoL modes to the PHY supported WoL modes.
+- Deprecate magic-packet property.
 
-> Using __get_task_comm() to read the task comm ensures that the name is
-> always NUL-terminated, regardless of the source string. This approach also
-> facilitates future extensions to the task comm.
+Changes in V7:
+- change cpu_to_be32p() to be32_to_cpu(), eliminating unneeded conversions.
 
-Good catch! Looks good to me.
+Changes in V6:
+- Use rcu_access_pointer() instead of rcu_dereference()
+- Add conditional check on __in_dev_get_rcu() return pointer
+v6 link : https://lore.kernel.org/netdev/20240617070413.2291511-1-vineeth.karumanchi@amd.com/
 
-Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+Changes in V5:
+- Update comment and error message.
+v5 link : https://lore.kernel.org/netdev/20240611162827.887162-1-vineeth.karumanchi@amd.com/
 
-Thank you,
+Changes in V4:
+- Extend MACB supported wol modes to the PHY supported modes.
+- Drop previous ACK from v2 series on 4/4 patch for further review.
+v4 link : https://lore.kernel.org/lkml/20240610053936.622237-1-vineeth.karumanchi@amd.com/
 
-> 
-> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-> Cc: Steven Rostedt <rostedt@goodmis.org>
-> Cc: Masami Hiramatsu <mhiramat@kernel.org>
-> Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-> ---
->  kernel/trace/trace.c             | 2 +-
->  kernel/trace/trace_events_hist.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
-> index 578a49ff5c32..ce94a86154a2 100644
-> --- a/kernel/trace/trace.c
-> +++ b/kernel/trace/trace.c
-> @@ -1907,7 +1907,7 @@ __update_max_tr(struct trace_array *tr, struct task_struct *tsk, int cpu)
->  	max_data->critical_start = data->critical_start;
->  	max_data->critical_end = data->critical_end;
->  
-> -	strncpy(max_data->comm, tsk->comm, TASK_COMM_LEN);
-> +	__get_task_comm(max_data->comm, TASK_COMM_LEN, tsk);
->  	max_data->pid = tsk->pid;
->  	/*
->  	 * If tsk == current, then use current_uid(), as that does not use
-> diff --git a/kernel/trace/trace_events_hist.c b/kernel/trace/trace_events_hist.c
-> index 6ece1308d36a..721d4758a79f 100644
-> --- a/kernel/trace/trace_events_hist.c
-> +++ b/kernel/trace/trace_events_hist.c
-> @@ -1599,7 +1599,7 @@ static inline void save_comm(char *comm, struct task_struct *task)
->  		return;
->  	}
->  
-> -	strncpy(comm, task->comm, TASK_COMM_LEN);
-> +	__get_task_comm(comm, TASK_COMM_LEN, task);
->  }
->  
->  static void hist_elt_data_free(struct hist_elt_data *elt_data)
-> -- 
-> 2.39.1
-> 
+Changes in V3:
+- Advertise WOL by default.
+- Drop previous ACK for further review.
+v3 link : https://lore.kernel.org/netdev/20240605102457.4050539-1-vineeth.karumanchi@amd.com/
 
+Changes in v2:
+- Re-implement WOL using CAPS instead of device-tree attribute.
+- Deprecate device-tree "magic-packet" property.
+- Sorted CAPS values.
+- New Bit fields inline with existing implementation.
+- Optimize code.
+- Fix sparse warnings.
+- Addressed minor review comments.
+v2 link : https://lore.kernel.org/netdev/20240222153848.2374782-1-vineeth.karumanchi@amd.com/
+
+v1 link : https://lore.kernel.org/lkml/20240130104845.3995341-1-vineeth.karumanchi@amd.com/#t
+
+Vineeth Karumanchi (4):
+  net: macb: queue tie-off or disable during WOL suspend
+  net: macb: Enable queue disable
+  net: macb: Add ARP support to WOL
+  dt-bindings: net: cdns,macb: Deprecate magic-packet property
+
+ .../devicetree/bindings/net/cdns,macb.yaml    |   1 +
+ drivers/net/ethernet/cadence/macb.h           |   8 ++
+ drivers/net/ethernet/cadence/macb_main.c      | 121 +++++++++++++-----
+ 3 files changed, 100 insertions(+), 30 deletions(-)
 
 -- 
-Masami Hiramatsu (Google) <mhiramat@kernel.org>
+2.34.1
+
 
