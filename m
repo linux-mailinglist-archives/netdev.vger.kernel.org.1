@@ -1,95 +1,101 @@
-Return-Path: <netdev+bounces-105522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5A9B911903
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 05:30:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BFBA911914
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 05:39:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EE06284340
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 03:30:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08EEBB22679
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 03:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF29129A7E;
-	Fri, 21 Jun 2024 03:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AED7D12C465;
+	Fri, 21 Jun 2024 03:39:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WYExPkhz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gXBBK6rs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343F1127B57;
-	Fri, 21 Jun 2024 03:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C13312BF23;
+	Fri, 21 Jun 2024 03:39:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718940629; cv=none; b=ZndGG4LsLHDttPmg+vgcCnUK6683/X/tfNqe/7KK5eWqimY3hIa9qnvlvszZf/ly0dwHkJmz06J72V8/Pm9h1vRTL5W//FFQlBszW9S0ix7sZfwY4kPREL7XnzPikj36st3oTF6kzz89Z4V2bGH8/KxRQxa9g80CCUxY/ymZhTQ=
+	t=1718941161; cv=none; b=Da0MsmIJ84VISU5EGOUX9OdJpE8HjPcDdk3Zb5Uzny47SKJF0rLAv707C15uLbARv5ZCUMZJ71ouk6ssai3fQtMXccl0CrVKTKLh/fpQu/n8tlsDz02a0qXieYUBiICfBg4vl2sgf2d0odhkyrxaghjr1kV+qMKOxfamOBt2GRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718940629; c=relaxed/simple;
-	bh=4igYeq9AhDffzOuooujPnWPIYLV5UN9rJkXkaVNxy4Y=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pZ2y1nPsAFOmpGkNVl7OYilOtVnk50wdU+W4ER+iP6cuox8+6Dk9ovpk31Ixz7LI/JutVZ/2R94VPFyDIpCk092tvSzojJKt+j8edS4O1ifII38pTD487NRyzz0KzOHuGv3UvWIhwUPHjsMga9QQ+M47C0/tDoe2i650yyMBpnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WYExPkhz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B1425C4AF07;
-	Fri, 21 Jun 2024 03:30:28 +0000 (UTC)
+	s=arc-20240116; t=1718941161; c=relaxed/simple;
+	bh=O2mjlvH6POTe7UflFnHi0jmr3UYZSQa9RjWHwGlsbrE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FDq/xq7rr82l0AuAZVtTxNwxFA7dgqfyB6T4VqDsK/VW7MWvnQ367qWunvQNTdJf0+rECCBg6fNYbrJQFcaTJinpE9EnRC4pepw/rjqs5gJerYsqE0M4tvb7BO4M321vsnif8hoKyc+0JiYEMDQNpseHbtZi2kRseyOWyD68I7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gXBBK6rs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6EF9C2BBFC;
+	Fri, 21 Jun 2024 03:39:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718940628;
-	bh=4igYeq9AhDffzOuooujPnWPIYLV5UN9rJkXkaVNxy4Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WYExPkhz59XvGZklX917Akgqfp6D+1+Lq+KfwV2VOFbaRjKexkMzb7QxuxuzX8bYT
-	 D+XrZ+upqLw2550LidgGzUR8kOhDhiCBDDKe4zKzVBiB7r50K4+atnVrut9/BMgizD
-	 8Ztsfzg07JukntP0JrEpPhSgwx/qqB7FZpBv4Opm7CkJsQ7pADiltqzI6J2bqnaRvI
-	 V6LRPKYEKCZxGZVEt0e9ymkkJ9ITrp0AH01Opy2lw2kz5rY3rF33rInC+097IZ2VVM
-	 2cfPWigZDdzyfX5/Pe5J9JSJSnx+fvTQnlVWOZGZvN896FJzF5IaU5ajukcZaH8Gsu
-	 jGU+G57t6iqBQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9F888E7C4C5;
-	Fri, 21 Jun 2024 03:30:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1718941161;
+	bh=O2mjlvH6POTe7UflFnHi0jmr3UYZSQa9RjWHwGlsbrE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gXBBK6rsrzqoIc35nPQsRFsZZrHOcCqFZ1duUbyKqNPzCD032JyJr04UH3rHlVGeA
+	 RsYKWZLdCZxWoamB2PYLWxvT4YjDavw49CF+Hm087FRvDVTMenPX2Bccc7okOQwjjS
+	 2xIhaMadAZ7YidSd/23v3WJiM+2ymqXRpir/lcSgc3DQPowR4LHMR70qYxBCqZTn4s
+	 4pp66v/TxOt6hz7Pcf97pCyNOboKCM8m6QIn4LUWjRHHxwra1yeUi2A6660EVDDpIP
+	 yHI0PqR0sJ2z+WZl0rxir9s1IiX2+fQvJar3LKzysETDZwHpxha8MbGn21S9BSKVVj
+	 CNPq28WF1Be0A==
+Date: Thu, 20 Jun 2024 20:39:18 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, "David S .
+ Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric
+ Dumazet <edumazet@google.com>, Jason Wang <jasowang@redhat.com>, "Michael S
+ . Tsirkin" <mst@redhat.com>, Brett Creeley <bcreeley@amd.com>, Ratheesh
+ Kannoth <rkannoth@marvell.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Tal
+ Gilboa <talgi@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
+ linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Jiri Pirko <jiri@resnulli.us>, Paul
+ Greenwalt <paul.greenwalt@intel.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Kory Maincent
+ <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
+ justinstitt@google.com, donald.hunter@gmail.com, Eugenio =?UTF-8?B?UMOp?=
+ =?UTF-8?B?cmV6?= <eperezma@redhat.com>, Andrew Morton
+ <akpm@linux-foundation.org>, Dragos Tatulea <dtatulea@nvidia.com>, Rahul
+ Rameshbabu <rrameshbabu@nvidia.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ awel Dembicki <paweldembicki@gmail.com>
+Subject: Re: [PATCH RESEND net-next v14 3/5] ethtool: provide customized dim
+ profile management
+Message-ID: <20240620203918.407185c9@kernel.org>
+In-Reply-To: <20240618025644.25754-4-hengqi@linux.alibaba.com>
+References: <20240618025644.25754-1-hengqi@linux.alibaba.com>
+	<20240618025644.25754-4-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: stmmac: unexport stmmac_pltfr_init/exit()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171894062864.32761.4672204591779196223.git-patchwork-notify@kernel.org>
-Date: Fri, 21 Jun 2024 03:30:28 +0000
-References: <20240619140119.26777-1-brgl@bgdev.pl>
-In-Reply-To: <20240619140119.26777-1-brgl@bgdev.pl>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- bartosz.golaszewski@linaro.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 18 Jun 2024 10:56:42 +0800 Heng Qi wrote:
+> +	if (dev->irq_moder && dev->irq_moder->profile_flags & DIM_PROFILE_RX) {
+> +		ret = ethnl_update_profile(dev, &dev->irq_moder->rx_profile,
+> +					   tb[ETHTOOL_A_COALESCE_RX_PROFILE],
+> +					   info->extack);
+> +		if (ret < 0)
+> +			return ret;
+> +	}
+> +
+> +	if (dev->irq_moder && dev->irq_moder->profile_flags & DIM_PROFILE_TX) {
+> +		ret = ethnl_update_profile(dev, &dev->irq_moder->tx_profile,
+> +					   tb[ETHTOOL_A_COALESCE_TX_PROFILE],
+> +					   info->extack);
+> +		if (ret < 0)
+> +			return ret;
+> +	}
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 19 Jun 2024 16:01:19 +0200 you wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> These functions are only used within the compilation unit they're defined
-> in so there's no reason to export them.
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] net: stmmac: unexport stmmac_pltfr_init/exit()
-    https://git.kernel.org/netdev/net-next/c/d21a103b612c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+One last thing - you're missing updating the &mod bit.
+When any of the settings were change mod should be set
+to true so that we send a notification to user space,
+that the settings have been modified.
 
