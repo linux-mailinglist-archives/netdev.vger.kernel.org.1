@@ -1,209 +1,95 @@
-Return-Path: <netdev+bounces-105715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15326912697
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:24:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66CBE9126B8
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEA0E28348D
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 13:23:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 985851C25C69
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 13:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E0C155C9F;
-	Fri, 21 Jun 2024 13:23:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F3A15BB;
+	Fri, 21 Jun 2024 13:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="bjtyj2p4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gVvC5KnN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB99F15575C
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 13:23:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD057E8
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 13:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718976233; cv=none; b=bbehAy/9+6zLvVt/HgcMlI/90r1xk4TPqMfwDpiQigGupXR4Qk6iSFQ062jftBpUNVC/G9G1ZQk/p8YMoyRLybh78a6cvvC/esbeEFKsseWd8KXaU87B2cbJsE4BERn5w/6wtLvlfolBwMGAbOa+TjvI7jW1Y+cWnjDnnIuX2/c=
+	t=1718976632; cv=none; b=hElo0xU34ekRU9ABnub2eMJu913LYrf9IGKRjRwEInR+ZXUMdlFKNncKuOUzuspASCnH+e+XP/YyUuuatFPVZwdaaUTQ2xOUtcnx/fyZ3RngDATIiEK3trz1aqcleGib3HJ0iJEwg5VogxTdX+EMftdFJISeEqAj+82B7lO7UVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718976233; c=relaxed/simple;
-	bh=wQtusHT7PTHfNhISON3c4fk/0f68+/Mcm3emwcz0W2Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=im1NuolE5boMgBd3lvqLb4bNAtNdn3NS3MIpcHZAr+Nk4BtdhMQWghBKKkVrLawd6Wblq9U6xiaKvzYJ5/5DOUxmiJDVkoWyFZ4Z3EuwPRxzCuO87cwTkYpmLDqu/wAD8Mdbp524lKdN3L4qmXObbu29fCZTnStiypG45CC0YFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=bjtyj2p4; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-52cd87277d8so494161e87.2
-        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 06:23:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1718976229; x=1719581029; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Lh6DHy5f3eoMV1E961uZI87Rq1n/gY0n/fr9bCAQrdo=;
-        b=bjtyj2p4U32GeMDYPSUWmtE2chTbi1v+y5UfIGQC9LEUpC/OkUlilX5eOFlWPjKkF2
-         qGe2Q+8jPSNTYIRSXG62GOsDi+9yNmRjVL1O4136JvCl8YCVbSJmMiDn0iyE48QF+noj
-         pNXmYpbCubSyKA/c8TV0D4sg1tw2fB1XAG0PChFXO1DR863DYtqrGl/uIFqlLVSpw2XD
-         7wFFJ7AJdLdvFSUYayx5g+q8kYUwqmnSx6u+f8T3NdMv42+yEaRWhWiWs0NZcPQwrJ9z
-         0gunHamNuRjqeEvfoiC00FK96wfDMMJUaAV0APR2FVMtD2VMV69wLgtapdkgfAKz6Ry2
-         jacQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718976229; x=1719581029;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Lh6DHy5f3eoMV1E961uZI87Rq1n/gY0n/fr9bCAQrdo=;
-        b=iFm4BGQ8sQ/2N1cqi+f1HF6CLzM7dqtWxE0IKnan2AiYdsGWTvHh5+fZKMVgsPBx2s
-         AA4X1MhLTAcYV0KwiCcJT9EzXv0UNelLLQ+nAnagXlA3TGcpJzW0/+xvYyrL2aHHMxkx
-         8EFA8C0qMvGGsez/74QSL5Lw4is+qMxZms+BR/PcmQvWUMbFkWTKUVIEVgVpWSGd4RkD
-         e9WvJ6FoG5QsZI5+P1rp+f2pqr9z3HmrbcuHTTcsaAHajQQ2ycv/DZzyT3B2xk60KG/C
-         j33mtCrIsSbYdF8rDom3nUa8LxY1NHjt5rP5LrFcYIg6EMScbQ7sjQ2Uw1Wf/HtNh5nU
-         ajnA==
-X-Forwarded-Encrypted: i=1; AJvYcCXOdGM53iKB48JY54jpHSGjJKIeLfCG8od1exhcX2r2o3QwWPIXTJoZVfn0gzISKD40zS4ToRzJTeg53PWJKp97YA2o4GXV
-X-Gm-Message-State: AOJu0YzN0L4wntNY0H32n2mILLxt5ajAz7oAa71KrIAboqRVfPIQIkqZ
-	S5dDIvGwEFW8Xv3M7TeHY4wOjpNqhW7FoOdl5+BjmFqBRlgHE35ygqSC/Xxhu2mvRVAy8JrXVaJ
-	gtQq5ThqR5z//HGGqNFK0Ls+R+z1QUzfBGE0mmg==
-X-Google-Smtp-Source: AGHT+IG5Y1gn2ekPnM1m7JqqJu9Ttsj5bBzwQpCQM5QC3ClAcEetDkpxMFp8GreL0i+Q2R/FLHudf9Yf2q2tQ+uH6IQ=
-X-Received: by 2002:ac2:5e91:0:b0:52c:b199:940b with SMTP id
- 2adb3069b0e04-52ccaa62a3emr5131441e87.32.1718976228569; Fri, 21 Jun 2024
- 06:23:48 -0700 (PDT)
+	s=arc-20240116; t=1718976632; c=relaxed/simple;
+	bh=kg+9JK/vkgG3/A+SORg8QftL3nPMwNlVjUiPmtyMuj0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MKanRYf1FMCwZ+TiQaWr0h1iSi4F5ytLhNvZj9bT9gbs4UjeeHgBNZCHpkHa/m3cuoPznqcQSmzP8KTSxfikq/QMg0/y9W/Je1H42vsIf/A6O68JTeypvaQpf5VEq4qu4cSf53rfEYB3O2smuQrWO1Ve9sOWfGwsGvHUjgroiBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gVvC5KnN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D2B6BC4AF08;
+	Fri, 21 Jun 2024 13:30:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718976631;
+	bh=kg+9JK/vkgG3/A+SORg8QftL3nPMwNlVjUiPmtyMuj0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gVvC5KnNyb674T5JY1q60FCYM2aB8B0tVuVc9AjDhgur83cDPqGSquW8HbdRy13M6
+	 2q7S3uDcjucJzmQ5Lhu5veJ1KBbDxfkVC4im/AxnfLBa5fJ5JRQBxR6ii1BVYft+UH
+	 SFtenamkL3FG7pfKRfrqH2HsgrEOffddLoCgGgzKp6+LrUitO9D0l/67eH4hBCTDRB
+	 CXeb3aLYHj5J0cOi42kpuFlYRxGKFxyYxCnF3zjx0heSR7ypSiU/5CDVyal04S+z4+
+	 U4rz/v7og6qlcEcrAizwT8zhmbMulEaJ2emC+/KQWzHJXhEl9bDKV/WQgckQXKl3Cz
+	 wCRC4nrs5S63w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C05FCE7C4C5;
+	Fri, 21 Jun 2024 13:30:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240605123850.24857-1-brgl@bgdev.pl> <171889385036.4585.6482250630135606154.git-patchwork-notify@kernel.org>
- <0b144517-4cc5-4c23-be57-d6f5323690ec@163.com> <CAMRc=Mf2C4ywa+wQ6pcq5RtehQD00dDhzvS6sDcD8tAn=UypUA@mail.gmail.com>
- <33c7587b-83a4-4be7-b00a-d30874df8c22@163.com>
-In-Reply-To: <33c7587b-83a4-4be7-b00a-d30874df8c22@163.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Fri, 21 Jun 2024 15:23:37 +0200
-Message-ID: <CAMRc=Me8h-L6mbmOfHce9FF8Koh4_fp=cWAeWrQAj-ukxBOL2g@mail.gmail.com>
-Subject: Re: [PATCH v9 0/2] pwrseq: introduce the subsystem and first driver
-To: Lk Sii <lk_sii@163.com>, marcel@holtmann.org, luiz.dentz@gmail.com
-Cc: patchwork-bot+bluetooth@kernel.org, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, 
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, kvalo@kernel.org, 
-	andersson@kernel.org, konrad.dybcio@linaro.org, lgirdwood@gmail.com, 
-	broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, 
-	bhelgaas@google.com, saravanak@google.com, geert+renesas@glider.be, 
-	arnd@arndb.de, neil.armstrong@linaro.org, m.szyprowski@samsung.com, 
-	elder@linaro.org, srinivas.kandagatla@linaro.org, gregkh@linuxfoundation.org, 
-	abel.vesa@linaro.org, mani@kernel.org, lukas@wunner.de, 
-	dmitry.baryshkov@linaro.org, amit.pundir@linaro.org, wuxilin123@gmail.com, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
-	linux-pm@vger.kernel.org, bartosz.golaszewski@linaro.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 net] selftest: af_unix: Add Kconfig file.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171897663177.12212.16201811914121991414.git-patchwork-notify@kernel.org>
+Date: Fri, 21 Jun 2024 13:30:31 +0000
+References: <20240621021051.85197-1-kuniyu@amazon.com>
+In-Reply-To: <20240621021051.85197-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kuni1840@gmail.com, netdev@vger.kernel.org
 
-On Fri, Jun 21, 2024 at 11:04=E2=80=AFAM Lk Sii <lk_sii@163.com> wrote:
->
-> On 2024/6/21 14:36, Bartosz Golaszewski wrote:
-> > On Fri, Jun 21, 2024 at 3:14=E2=80=AFAM Lk Sii <lk_sii@163.com> wrote:
-> >>
-> >>
-> >>
-> >> On 2024/6/20 22:30, patchwork-bot+bluetooth@kernel.org wrote:
-> >>> Hello:
-> >>>
-> >>> This series was applied to bluetooth/bluetooth-next.git (master)
-> >>> by Bartosz Golaszewski <bartosz.golaszewski@linaro.org>:
-> >>>
-> >> Hi luiz,
-> >>
-> >> i am curious why Bartosz is able to merge his changes into bluetooth
-> >> development tree bluetooth-next directly.
-> >>
-> >
-> > This conversation is getting progressively worse...
-> >
-> >> 1)
-> >> his changes should belong to *POWER* scope instead of *Bluetooth*
-> >> obviously, however, there are *NOT* any SOB tag from either power and
-> >> bluetooth maintainer. these changes currently only have below Acked-by
-> >> and Signed-off-by tags:
-> >>
-> >> Acked-by: Krzysztof Kozlowski <krzk@kernel.org>
-> >> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >>
-> >
-> > It's a new subsystem that has been discussed and reviewed for months
-> > and thoroughly tested. Please refer to the cover letter under v8
-> > linked in this thread. It's not related to power-management or
-> > power-supply, it's its own thing but IMO the best place to put it is
-> > under drivers/power/. And I will maintain it.
-> >
-> >> 2)
-> >> his changes have not merged into linus mainline tree yet.
-> >>
-> >
-> > This is why they are in next! They are scheduled to go in during the
-> > upcoming merge window. But since changes belong in multiple trees, we
-> > need a cross-tree merge.
-> >
-> >> 3)
-> >> perhaps, it is safer to pull his changes from linus mainline tree when
-> >> merged than to merge into bluetooth-next firstly.
-> >>
-> >
-> > It's not safer at all, why would spending less time in next be safer?
-> >
-> it seems this patch serial(new subsystem) does not depend on bluetooth
-> and also does not belong to bluetooth subsystem, but have been contained
-> by tip of bluetooth tree.
->
+Hello:
 
-It's the other way around: bluetooth changes (namely the hci_qca
-driver) depend on the power sequencing changes.
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> why not follow below merging produce?
-> 1) you send this patch serials to Linus to merge within linus mainline tr=
-ee
-> 2) luiz then pull your changes from linus mainline tree.
->
+On Thu, 20 Jun 2024 19:10:51 -0700 you wrote:
+> diag_uid selftest failed on NIPA where the received nlmsg_type is
+> NLMSG_ERROR [0] because CONFIG_UNIX_DIAG is not set [1] by default
+> and sock_diag_lock_handler() failed to load the module.
+> 
+>   # # Starting 2 tests from 2 test cases.
+>   # #  RUN           diag_uid.uid.1 ...
+>   # # diag_uid.c:159:1:Expected nlh->nlmsg_type (2) == SOCK_DIAG_BY_FAMILY (20)
+>   # # 1: Test terminated by assertion
+>   # #          FAIL  diag_uid.uid.1
+>   # not ok 1 diag_uid.uid.1
+> 
+> [...]
 
-I explained this in my previous email. Why would you want these
-changes to needlessly wait for another release cycle? It makes no
-sense. It's just a regular cross-tree merge like hundreds that are
-performed every release.
+Here is the summary with links:
+  - [v1,net] selftest: af_unix: Add Kconfig file.
+    https://git.kernel.org/netdev/net/c/11b006d6896c
 
-> >>> On Wed,  5 Jun 2024 14:38:48 +0200 you wrote:
-> >>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >>>>
-> >>>> Hi!
-> >>>>
-> >>>> These are the power sequencing patches sent separately after some
-> >>>> improvements suggested by Bjorn Helgaas. I intend to pick them up in=
-to a
-> >>>> new branch and maintain the subsystem from now on. I then plan to
-> >>>> provide an immutable tag to the Bluetooth and PCI subsystems so that=
- the
-> >>>> rest of the C changes can be applied. This new branch will then be
-> >>>> directly sent to Linus Torvalds for the next merge window.
-> >>>>
-> >>>> [...]
-> >>>
-> >>> Here is the summary with links:
-> >>>   - [v9,1/2] power: sequencing: implement the pwrseq core
-> >>>     https://git.kernel.org/bluetooth/bluetooth-next/c/249ebf3f65f8
-> >>>   - [v9,2/2] power: pwrseq: add a driver for the PMU module on the QC=
-om WCN chipsets
-> >>>     https://git.kernel.org/bluetooth/bluetooth-next/c/2f1630f437df
-> >>>
-> >>> You are awesome, thank you!
-> >>
-> >
-> > Why are you top-posting anyway?
-> >
-> it is caused by my bad mail client settings. thanks for reminder.
-> > Bart
->
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Luiz, Marcel: Am I wasting my time with this person? Is this another
-Markus Elfring and I unknowingly got pulled into a nonsensical
-argument?
 
-Bart
 
