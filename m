@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-105633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A0C49121E1
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:14:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 422059121E4
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 12:14:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDEAA1F28B99
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:14:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F1ECB22DD8
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 10:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC181173331;
-	Fri, 21 Jun 2024 10:12:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AA4B176AD5;
+	Fri, 21 Jun 2024 10:12:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WkRAOPrY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FMDbhA7Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABAD172BDC
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 10:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7456B176ABD
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 10:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718964723; cv=none; b=Ril8NUttE3pfRkVJIgCx5rf9faRihSVycqH6hjTXg7/RTmJTwWVMy9HxEZZKi+/HSNEGinxitPyOSbFO1LadILGh+yW2SbODvDtdvLObpEctlLPgtdQOONEp14pX5L79vrWsw3v1a75n9/B2ONX6X6j+bMMRKIYpzL1onXdfIJ0=
+	t=1718964727; cv=none; b=Gz4V+BrddLx6lAzkTDk5G5idCTnZGZZkaKRQYlW7yM8I+m7U469+HWvcFmM0ZBZuBTTAJv3+dxWDIK5PiBfpc8Q9Uy7tMUMt2EE8jqMU2rhwYLXCuoUiFLRNykLXtYonYt044YwCsP2hLrROaRm20Kg4c9nEI0tUNfvSTwXHOrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718964723; c=relaxed/simple;
-	bh=MBy7MbKcaMmlZtolk1qmvg52y1Dp0SLBQxkYIw7Dn+s=;
+	s=arc-20240116; t=1718964727; c=relaxed/simple;
+	bh=TLgXOsnbMBfw+qAM9TZ7UDAPmwpdBqEG2mHftoCbV6M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=coLus5Eu2tW3XywUqNgXhyDCJ3O2pc6fMDJeqBh00FIrWM48p0o+tweNG2EBor+pdVN9Nf9W6xRzKlJdrQP5zqeACIJAmGcdPMl/GWsNlBEKL5FzZkmyb/1FPgmYofAL4A0mMPNe8KStuXLHFNL04T64RJcLETsqGhuX1UyQths=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WkRAOPrY; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=He9rO8fCEILrtmNcbgnwFeBQrFvPzaIEMbxFlOb0hQnoSSWurzyDUHPw4BIlaCUb+4uXOwN62J7QeW6G5G49pf+e+cIJ238gxcq5rIvr/0LpN1SZl6QWt6tVSKYxJKec9/RxNZRuCAt6jTGXpbebs+RvKoLoZSZB8Zmg435EMSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FMDbhA7Y; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718964721;
+	s=mimecast20190719; t=1718964725;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=++IGiPgKZqzgTdH1SlfPcZMAcPTpcgeG6gGJsr+p7fE=;
-	b=WkRAOPrYAyBC6lUbwS+gOmfPqVi8rvTgevTcbmjYsZiH2MeLJQAbQLYuVeE03XFB27Td7v
-	fyASOllzY0NWi3quz+CQY3qfzcfbEnyYCELyuw27Sa+aWNk1y9K2aQs/osY/j1absFGMfK
-	EUtMSfTXF/cdneOexRLsIU7ZDWaQD+c=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=G4tsbBCQ/TpcXkk8fqlOC0aI9jmHAnBjEbttrU1YB00=;
+	b=FMDbhA7Yfqi5uU32CTx5H+xI6qC0wx3AitJe1CtDmtTrPI6ECABhWR3hvhcZqfVqT/+P+N
+	IyEw8htq9P6DONlYW/GdLPOUL1rYyWabTC6GPLuQZytUNlqMsxnZzmZU2o9Nu+aLo5Gnq6
+	pL+MvAKPME2iWCUHF4UNAegOfgBtxK4=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-605-7htj8x5SP0OZk3ZepR7F7A-1; Fri,
- 21 Jun 2024 06:11:57 -0400
-X-MC-Unique: 7htj8x5SP0OZk3ZepR7F7A-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-362-_qZ2qVkWNWKHJkLBOamWnA-1; Fri,
+ 21 Jun 2024 06:12:02 -0400
+X-MC-Unique: _qZ2qVkWNWKHJkLBOamWnA-1
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C9A1519560B7;
-	Fri, 21 Jun 2024 10:11:55 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9BB3B1956096;
+	Fri, 21 Jun 2024 10:12:00 +0000 (UTC)
 Received: from antares.redhat.com (unknown [10.39.193.189])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 561061956048;
-	Fri, 21 Jun 2024 10:11:51 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BDD801956048;
+	Fri, 21 Jun 2024 10:11:56 +0000 (UTC)
 From: Adrian Moreno <amorenoz@redhat.com>
 To: netdev@vger.kernel.org
 Cc: aconole@redhat.com,
@@ -64,16 +64,15 @@ Cc: aconole@redhat.com,
 	i.maximets@ovn.org,
 	dev@openvswitch.org,
 	Adrian Moreno <amorenoz@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+	Pravin B Shelar <pshelar@ovn.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Pravin B Shelar <pshelar@ovn.org>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 05/10] net: openvswitch: add emit_sample action
-Date: Fri, 21 Jun 2024 12:10:57 +0200
-Message-ID: <20240621101113.2185308-6-amorenoz@redhat.com>
+Subject: [PATCH net-next v4 06/10] net: openvswitch: store sampling probability in cb.
+Date: Fri, 21 Jun 2024 12:10:58 +0200
+Message-ID: <20240621101113.2185308-7-amorenoz@redhat.com>
 In-Reply-To: <20240621101113.2185308-1-amorenoz@redhat.com>
 References: <20240621101113.2185308-1-amorenoz@redhat.com>
 Precedence: bulk
@@ -85,266 +84,126 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Add support for a new action: emit_sample.
+When a packet sample is observed, the sampling rate that was used is
+important to estimate the real frequency of such event.
 
-This action accepts a u32 group id and a variable-length cookie and uses
-the psample multicast group to make the packet available for
-observability.
-
-The maximum length of the user-defined cookie is set to 16, same as
-tc_cookie, to discourage using cookies that will not be offloadable.
+Store the probability of the parent sample action in the skb's cb area
+and use it in emit_sample to pass it down to psample.
 
 Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 ---
- Documentation/netlink/specs/ovs_flow.yaml | 17 +++++++++
- include/uapi/linux/openvswitch.h          | 28 ++++++++++++++
- net/openvswitch/Kconfig                   |  1 +
- net/openvswitch/actions.c                 | 45 +++++++++++++++++++++++
- net/openvswitch/flow_netlink.c            | 33 ++++++++++++++++-
- 5 files changed, 123 insertions(+), 1 deletion(-)
+ include/uapi/linux/openvswitch.h |  3 ++-
+ net/openvswitch/actions.c        | 20 +++++++++++++++++---
+ net/openvswitch/datapath.h       |  3 +++
+ net/openvswitch/vport.c          |  1 +
+ 4 files changed, 23 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/netlink/specs/ovs_flow.yaml b/Documentation/netlink/specs/ovs_flow.yaml
-index 4fdfc6b5cae9..a7ab5593a24f 100644
---- a/Documentation/netlink/specs/ovs_flow.yaml
-+++ b/Documentation/netlink/specs/ovs_flow.yaml
-@@ -727,6 +727,12 @@ attribute-sets:
-         name: dec-ttl
-         type: nest
-         nested-attributes: dec-ttl-attrs
-+      -
-+        name: emit-sample
-+        type: nest
-+        nested-attributes: emit-sample-attrs
-+        doc: |
-+          Sends a packet sample to psample for external observation.
-   -
-     name: tunnel-key-attrs
-     enum-name: ovs-tunnel-key-attr
-@@ -938,6 +944,17 @@ attribute-sets:
-       -
-         name: gbp
-         type: u32
-+  -
-+    name: emit-sample-attrs
-+    enum-name: ovs-emit-sample-attr
-+    name-prefix: ovs-emit-sample-attr-
-+    attributes:
-+      -
-+        name: group
-+        type: u32
-+      -
-+        name: cookie
-+        type: binary
- 
- operations:
-   name-prefix: ovs-flow-cmd-
 diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
-index efc82c318fa2..8cfa1b3f6b06 100644
+index 8cfa1b3f6b06..823f22be1fcc 100644
 --- a/include/uapi/linux/openvswitch.h
 +++ b/include/uapi/linux/openvswitch.h
-@@ -914,6 +914,31 @@ struct check_pkt_len_arg {
- };
- #endif
- 
-+#define OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE 16
-+/**
-+ * enum ovs_emit_sample_attr - Attributes for %OVS_ACTION_ATTR_EMIT_SAMPLE
-+ * action.
-+ *
-+ * @OVS_EMIT_SAMPLE_ATTR_GROUP: 32-bit number to identify the source of the
-+ * sample.
-+ * @OVS_EMIT_SAMPLE_ATTR_COOKIE: A variable-length binary cookie that contains
-+ * user-defined metadata. The maximum length is OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE
-+ * bytes.
-+ *
-+ * Sends the packet to the psample multicast group with the specified group and
-+ * cookie. It is possible to combine this action with the
-+ * %OVS_ACTION_ATTR_TRUNC action to limit the size of the packet being emitted.
-+ */
-+enum ovs_emit_sample_attr {
-+	OVS_EMIT_SAMPLE_ATTR_GROUP = 1,	/* u32 number. */
-+	OVS_EMIT_SAMPLE_ATTR_COOKIE,	/* Optional, user specified cookie. */
-+
-+	/* private: */
-+	__OVS_EMIT_SAMPLE_ATTR_MAX
-+};
-+
-+#define OVS_EMIT_SAMPLE_ATTR_MAX (__OVS_EMIT_SAMPLE_ATTR_MAX - 1)
-+
- /**
-  * enum ovs_action_attr - Action types.
+@@ -649,7 +649,8 @@ enum ovs_flow_attr {
+  * Actions are passed as nested attributes.
   *
-@@ -966,6 +991,8 @@ struct check_pkt_len_arg {
-  * of l3 tunnel flag in the tun_flags field of OVS_ACTION_ATTR_ADD_MPLS
-  * argument.
-  * @OVS_ACTION_ATTR_DROP: Explicit drop action.
-+ * @OVS_ACTION_ATTR_EMIT_SAMPLE: Send a sample of the packet to external
-+ * observers via psample.
-  *
-  * Only a single header can be set with a single %OVS_ACTION_ATTR_SET.  Not all
-  * fields within a header are modifiable, e.g. the IPv4 protocol and fragment
-@@ -1004,6 +1031,7 @@ enum ovs_action_attr {
- 	OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
- 	OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
- 	OVS_ACTION_ATTR_DROP,         /* u32 error code. */
-+	OVS_ACTION_ATTR_EMIT_SAMPLE,  /* Nested OVS_EMIT_SAMPLE_ATTR_*. */
- 
- 	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
- 				       * from userspace. */
-diff --git a/net/openvswitch/Kconfig b/net/openvswitch/Kconfig
-index 29a7081858cd..2535f3f9f462 100644
---- a/net/openvswitch/Kconfig
-+++ b/net/openvswitch/Kconfig
-@@ -10,6 +10,7 @@ config OPENVSWITCH
- 		   (NF_CONNTRACK && ((!NF_DEFRAG_IPV6 || NF_DEFRAG_IPV6) && \
- 				     (!NF_NAT || NF_NAT) && \
- 				     (!NETFILTER_CONNCOUNT || NETFILTER_CONNCOUNT)))
-+	depends on PSAMPLE || !PSAMPLE
- 	select LIBCRC32C
- 	select MPLS
- 	select NET_MPLS_GSO
+  * Executes the specified actions with the given probability on a per-packet
+- * basis.
++ * basis. Nested actions will be able to access the probability value of the
++ * parent @OVS_ACTION_ATTR_SAMPLE.
+  */
+ enum ovs_sample_attr {
+ 	OVS_SAMPLE_ATTR_UNSPEC,
 diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index 964225580824..1f555cbba312 100644
+index 1f555cbba312..85a2ff91379b 100644
 --- a/net/openvswitch/actions.c
 +++ b/net/openvswitch/actions.c
-@@ -24,6 +24,11 @@
- #include <net/checksum.h>
- #include <net/dsfield.h>
- #include <net/mpls.h>
-+
-+#if IS_ENABLED(CONFIG_PSAMPLE)
-+#include <net/psample.h>
-+#endif
-+
- #include <net/sctp/checksum.h>
- 
- #include "datapath.h"
-@@ -1299,6 +1304,37 @@ static int execute_dec_ttl(struct sk_buff *skb, struct sw_flow_key *key)
- 	return 0;
- }
- 
-+static void execute_emit_sample(struct datapath *dp, struct sk_buff *skb,
-+				const struct sw_flow_key *key,
-+				const struct nlattr *attr)
-+{
-+#if IS_ENABLED(CONFIG_PSAMPLE)
-+	struct psample_group psample_group = {};
-+	struct psample_metadata md = {};
-+	const struct nlattr *a;
-+	int rem;
-+
-+	nla_for_each_attr(a, nla_data(attr), nla_len(attr), rem) {
-+		switch (nla_type(a)) {
-+		case OVS_EMIT_SAMPLE_ATTR_GROUP:
-+			psample_group.group_num = nla_get_u32(a);
-+			break;
-+
-+		case OVS_EMIT_SAMPLE_ATTR_COOKIE:
-+			md.user_cookie = nla_data(a);
-+			md.user_cookie_len = nla_len(a);
-+			break;
-+		}
-+	}
-+
-+	psample_group.net = ovs_dp_get_net(dp);
-+	md.in_ifindex = OVS_CB(skb)->input_vport->dev->ifindex;
-+	md.trunc_size = skb->len - OVS_CB(skb)->cutlen;
-+
-+	psample_sample_packet(&psample_group, skb, 0, &md);
-+#endif
-+}
-+
- /* Execute a list of actions against 'skb'. */
- static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
- 			      struct sw_flow_key *key,
-@@ -1502,6 +1538,15 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
- 			ovs_kfree_skb_reason(skb, reason);
- 			return 0;
- 		}
-+
-+		case OVS_ACTION_ATTR_EMIT_SAMPLE:
-+			execute_emit_sample(dp, skb, key, a);
-+			OVS_CB(skb)->cutlen = 0;
-+			if (nla_is_last(a, rem)) {
-+				consume_skb(skb);
-+				return 0;
-+			}
-+			break;
- 		}
- 
- 		if (unlikely(err)) {
-diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
-index f224d9bcea5e..29c8cdc44433 100644
---- a/net/openvswitch/flow_netlink.c
-+++ b/net/openvswitch/flow_netlink.c
-@@ -64,6 +64,7 @@ static bool actions_may_change_flow(const struct nlattr *actions)
- 		case OVS_ACTION_ATTR_TRUNC:
- 		case OVS_ACTION_ATTR_USERSPACE:
- 		case OVS_ACTION_ATTR_DROP:
-+		case OVS_ACTION_ATTR_EMIT_SAMPLE:
- 			break;
- 
- 		case OVS_ACTION_ATTR_CT:
-@@ -2409,7 +2410,7 @@ static void ovs_nla_free_nested_actions(const struct nlattr *actions, int len)
- 	/* Whenever new actions are added, the need to update this
- 	 * function should be considered.
- 	 */
--	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 24);
-+	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 25);
- 
- 	if (!actions)
- 		return;
-@@ -3157,6 +3158,29 @@ static int validate_and_copy_check_pkt_len(struct net *net,
- 	return 0;
- }
- 
-+static int validate_emit_sample(const struct nlattr *attr)
-+{
-+	static const struct nla_policy policy[OVS_EMIT_SAMPLE_ATTR_MAX + 1] = {
-+		[OVS_EMIT_SAMPLE_ATTR_GROUP] = { .type = NLA_U32 },
-+		[OVS_EMIT_SAMPLE_ATTR_COOKIE] = {
-+			.type = NLA_BINARY,
-+			.len = OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE,
-+		},
-+	};
-+	struct nlattr *a[OVS_EMIT_SAMPLE_ATTR_MAX + 1];
+@@ -1048,12 +1048,15 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
+ 	struct nlattr *sample_arg;
+ 	int rem = nla_len(attr);
+ 	const struct sample_arg *arg;
++	u32 init_probability;
+ 	bool clone_flow_key;
 +	int err;
-+
-+	if (!IS_ENABLED(CONFIG_PSAMPLE))
-+		return -EOPNOTSUPP;
-+
-+	err = nla_parse_nested(a, OVS_EMIT_SAMPLE_ATTR_MAX, attr, policy,
-+			       NULL);
-+	if (err)
-+		return err;
-+
-+	return a[OVS_EMIT_SAMPLE_ATTR_GROUP] ? 0 : -EINVAL;
-+}
-+
- static int copy_action(const struct nlattr *from,
- 		       struct sw_flow_actions **sfa, bool log)
- {
-@@ -3212,6 +3236,7 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
- 			[OVS_ACTION_ATTR_ADD_MPLS] = sizeof(struct ovs_action_add_mpls),
- 			[OVS_ACTION_ATTR_DEC_TTL] = (u32)-1,
- 			[OVS_ACTION_ATTR_DROP] = sizeof(u32),
-+			[OVS_ACTION_ATTR_EMIT_SAMPLE] = (u32)-1,
- 		};
- 		const struct ovs_action_push_vlan *vlan;
- 		int type = nla_type(a);
-@@ -3490,6 +3515,12 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
- 				return -EINVAL;
- 			break;
  
-+		case OVS_ACTION_ATTR_EMIT_SAMPLE:
-+			err = validate_emit_sample(a);
-+			if (err)
-+				return err;
-+			break;
+ 	/* The first action is always 'OVS_SAMPLE_ATTR_ARG'. */
+ 	sample_arg = nla_data(attr);
+ 	arg = nla_data(sample_arg);
+ 	actions = nla_next(sample_arg, &rem);
++	init_probability = OVS_CB(skb)->probability;
+ 
+ 	if ((arg->probability != U32_MAX) &&
+ 	    (!arg->probability || get_random_u32() > arg->probability)) {
+@@ -1062,9 +1065,16 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
+ 		return 0;
+ 	}
+ 
++	OVS_CB(skb)->probability = arg->probability;
 +
- 		default:
- 			OVS_NLERR(log, "Unknown Action type %d", type);
- 			return -EINVAL;
+ 	clone_flow_key = !arg->exec;
+-	return clone_execute(dp, skb, key, 0, actions, rem, last,
+-			     clone_flow_key);
++	err = clone_execute(dp, skb, key, 0, actions, rem, last,
++			    clone_flow_key);
++
++	if (!last)
++		OVS_CB(skb)->probability = init_probability;
++
++	return err;
+ }
+ 
+ /* When 'last' is true, clone() should always consume the 'skb'.
+@@ -1312,6 +1322,7 @@ static void execute_emit_sample(struct datapath *dp, struct sk_buff *skb,
+ 	struct psample_group psample_group = {};
+ 	struct psample_metadata md = {};
+ 	const struct nlattr *a;
++	u32 rate;
+ 	int rem;
+ 
+ 	nla_for_each_attr(a, nla_data(attr), nla_len(attr), rem) {
+@@ -1330,8 +1341,11 @@ static void execute_emit_sample(struct datapath *dp, struct sk_buff *skb,
+ 	psample_group.net = ovs_dp_get_net(dp);
+ 	md.in_ifindex = OVS_CB(skb)->input_vport->dev->ifindex;
+ 	md.trunc_size = skb->len - OVS_CB(skb)->cutlen;
++	md.rate_as_probability = 1;
++
++	rate = OVS_CB(skb)->probability ? OVS_CB(skb)->probability : U32_MAX;
+ 
+-	psample_sample_packet(&psample_group, skb, 0, &md);
++	psample_sample_packet(&psample_group, skb, rate, &md);
+ #endif
+ }
+ 
+diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
+index 0cd29971a907..9ca6231ea647 100644
+--- a/net/openvswitch/datapath.h
++++ b/net/openvswitch/datapath.h
+@@ -115,12 +115,15 @@ struct datapath {
+  * fragmented.
+  * @acts_origlen: The netlink size of the flow actions applied to this skb.
+  * @cutlen: The number of bytes from the packet end to be removed.
++ * @probability: The sampling probability that was applied to this skb; 0 means
++ * no sampling has occurred; U32_MAX means 100% probability.
+  */
+ struct ovs_skb_cb {
+ 	struct vport		*input_vport;
+ 	u16			mru;
+ 	u16			acts_origlen;
+ 	u32			cutlen;
++	u32			probability;
+ };
+ #define OVS_CB(skb) ((struct ovs_skb_cb *)(skb)->cb)
+ 
+diff --git a/net/openvswitch/vport.c b/net/openvswitch/vport.c
+index 972ae01a70f7..8732f6e51ae5 100644
+--- a/net/openvswitch/vport.c
++++ b/net/openvswitch/vport.c
+@@ -500,6 +500,7 @@ int ovs_vport_receive(struct vport *vport, struct sk_buff *skb,
+ 	OVS_CB(skb)->input_vport = vport;
+ 	OVS_CB(skb)->mru = 0;
+ 	OVS_CB(skb)->cutlen = 0;
++	OVS_CB(skb)->probability = 0;
+ 	if (unlikely(dev_net(skb->dev) != ovs_dp_get_net(vport->dp))) {
+ 		u32 mark;
+ 
 -- 
 2.45.1
 
