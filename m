@@ -1,95 +1,129 @@
-Return-Path: <netdev+bounces-105749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55EF6912A3D
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 17:33:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B5EE912A40
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 17:34:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 119B32884A8
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:33:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C92A1C2581B
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:34:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E327581B;
-	Fri, 21 Jun 2024 15:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2647C086;
+	Fri, 21 Jun 2024 15:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="J8aZzq+O"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="dMR8juBi"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662CB20DF7;
-	Fri, 21 Jun 2024 15:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04433757F8
+	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 15:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718984033; cv=none; b=R6mqW2F15zyS8pfuJLRsxnsM49GyF1m3EwUVAyIoANAWuVf4CcbY2qhNQ5YeY+WsoD/zI7xjNk0yBaGCG0zc2ClYsUAmzzgGcDJ7nUzq3W2lDpB4v9sBlZ7c3LE2hU9BSRooed3YxJOkuMgL16S0p+2zbwEz1e4AFoTwpw3A/mk=
+	t=1718984062; cv=none; b=YtB2Pg3OoTqmX0TYhG+xFn6c2KczqH4Trx3NnHGydwvfXCblR7wBVWygDY/D/MysuvYJg3Eu2hcTRgODXTdsa5jsSy1RBFaDfNejzJjBjHI35G7oEkup4SJQRpf0b50QfhxL5fyfWF/bnkHdhS0+8ZPzKHNX8H0Yx5vFiSX1fG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718984033; c=relaxed/simple;
-	bh=7mXAeMzch9AGvRNeWIaKiUA2sxNdQSVqpCwOnMEYjrc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UXm1RqrP6lyqNW/d3H18940WaKGn7wXzfsgIRCXXvISTRoa/sS3Z8qiiGjN8Vr+D2zpLgcKuc5nG22B/Zda3VQdvOqd9xHhFSuQ81sPe8T/Rk7KRjsLrvvAJHx2+14gcDyF+8vNcOKvrKlGT3zu0WizAiUEcFDYlHGo6IQSysSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=J8aZzq+O; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9Y6negZVZePySlebIwaToYMdqW9+ah2eSR4eJJzPrvo=; b=J8aZzq+OXu0RL24rErzEnS1FDi
-	I73XkOMYZGGvEhGnfqi4Mvbeqe0S0Ia3YzVmdG2T5D1neiS31c1dFDbV1lyDrfzUhgpqyNS76cVku
-	u8LgtXxd3H+OS0uIzQmCjaWcg90e1HNp3gFeQ/HkndduyMy3GJ4CN518V/zXrFT//OUo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sKgGo-000gLU-Bv; Fri, 21 Jun 2024 17:33:46 +0200
-Date: Fri, 21 Jun 2024 17:33:46 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Omer Shpigelman <oshpigelman@habana.ai>
-Cc: Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"ogabbay@kernel.org" <ogabbay@kernel.org>,
-	Zvika Yehudai <zyehudai@habana.ai>
-Subject: Re: [PATCH 06/15] net: hbl_cn: debugfs support
-Message-ID: <060ac3a6-bbac-400c-bfd9-cb1a32c653b4@lunn.ch>
-References: <20240613082208.1439968-1-oshpigelman@habana.ai>
- <20240613082208.1439968-7-oshpigelman@habana.ai>
- <BY3PR18MB473757A4F450A2F5C115D5A9C6CF2@BY3PR18MB4737.namprd18.prod.outlook.com>
- <ac16e551-b8d6-4ca7-9e3c-f2e8de613947@habana.ai>
+	s=arc-20240116; t=1718984062; c=relaxed/simple;
+	bh=7BVrpORkcBqP2dT5WJ8y/6uqH33UciLP1pUJUesNWxM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N1x1m4dLw3K18gzUEgZhcPvLK/HGflTnY20x01zvHRW/X9LtFo6+svokiL/vtP5EtV27BQlZC/HAc+NbhlRzhUOPggtj64D4ZBJSIzfEimZxE44iFqOzF7Lp51puOyjdo8N8dJpRuEOpVwxFM7X3xh6YxmDTSgUCz8SC7aZxq+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=dMR8juBi; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a6265d3ba8fso227387666b.0
+        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 08:34:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1718984059; x=1719588859; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=DA7SWPRLXcST+Xc+dDz/AkjKFIf/1VqV1Qjkx7u2MTI=;
+        b=dMR8juBiATC8rDlAot0OgQYlyKpeh49SeOG+cmeKaYxmMICVgq9IkfjcLousij5J0q
+         2Ub4KuRrQB5SU80050jn36uR6SOaJ+N67g88PDcFKodTcEIIW7RR/tbSO9sbhdrfqDK+
+         NS+XPRPeofoY2cSkuYdujogIcVN+IsuuAlqOPe3dTLXo7qp9mI0OgcO1uClvRc/7M5vq
+         o6GBrLXDivZtuUQncavf2Zqc4seASGaj+uogv7OCnIPfVr/wt3szpqkcGbTg1sFBlZVO
+         KfoZQGA0VvmNZzywtfbbN2+y9ihhM2MrMSpPy3pB/nqLVeehOzoHp6oAN2+uEFqE1Jwf
+         OCbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718984059; x=1719588859;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DA7SWPRLXcST+Xc+dDz/AkjKFIf/1VqV1Qjkx7u2MTI=;
+        b=UQrtQNc0eQSCBS1VJZUdECOuDK55a8ICJzHOgzHaFwA/cDtI+JxgpEbzDZviXD6oA3
+         /oSavM/9mJ1A0cvnrSPs3CRmWdFLl8WbwZKrM7TpLV5O+2lHMz7teZI3dNGtXNs3eqIJ
+         TznxFdPMDNbXELPMq7rNTnDHTj0jAEHgaxXvIl/X93enDM0CHB0Qo+Jl1sZJemfW+Aqd
+         qNVWabBE5z41KRKuj6DAD6OZJeZzLcz70wZvZ5jzOoWnBvpcsQgLG76wuGeTl2nIfLcH
+         Xt2o99FwtQMxKbbRUVJZLt1xmJgiLxEiGInJNgJLf9XNfwUx5722sBmVpDd8oeazWeHw
+         k5mg==
+X-Gm-Message-State: AOJu0YytbpH+YKiBM1cvbAABnPC8ofqC27wrbpw1DJHlTWQkUph0sWE7
+	EnZyjLin066wT64mYTPsNqFjfZl4qWvfaarpq6ANf2SUFJfegE9ffjkcyWqUlcsXfQVb4aym21c
+	JNiBLtSYUfUkK6N23ZDP/8jx0EQMsLQ70C4vmqw==
+X-Google-Smtp-Source: AGHT+IFelAbcXvIcTJONWEgNkYFPnbf9VtHPK2SF57Y6Pp8Jls6KOYI5Jfb52Fhrp461oy2MjvD2G93eYtYsdGMJHNY=
+X-Received: by 2002:a17:907:d043:b0:a6f:96ac:3436 with SMTP id
+ a640c23a62f3a-a6fab602e81mr540464366b.11.1718984059371; Fri, 21 Jun 2024
+ 08:34:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ac16e551-b8d6-4ca7-9e3c-f2e8de613947@habana.ai>
+References: <cover.1718919473.git.yan@cloudflare.com> <b8c183a24285c2ab30c51622f4f9eff8f7a4752f.1718919473.git.yan@cloudflare.com>
+ <66756ed3f2192_2e64f929491@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66756ed3f2192_2e64f929491@willemb.c.googlers.com.notmuch>
+From: Yan Zhai <yan@cloudflare.com>
+Date: Fri, 21 Jun 2024 10:34:08 -0500
+Message-ID: <CAO3-Pbp8frVM-i6NKkmyNOFrqqW=g58rK8m4vfdWbiSHHdQBsg@mail.gmail.com>
+Subject: Re: [RFC net-next 1/9] skb: introduce gro_disabled bit
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Willem de Bruijn <willemb@google.com>, Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, 
+	Mina Almasry <almasrymina@google.com>, Abhishek Chauhan <quic_abchauha@quicinc.com>, 
+	David Howells <dhowells@redhat.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	David Ahern <dsahern@kernel.org>, Richard Gobert <richardbgobert@gmail.com>, 
+	Antoine Tenart <atenart@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
+	Soheil Hassas Yeganeh <soheil@google.com>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-> I see other vendors have debugfs entries for debug configurations or
-> settings, not just for dumping debug info.
+> > -static inline bool netif_elide_gro(const struct net_device *dev)
+> > +static inline bool netif_elide_gro(const struct sk_buff *skb)
+> >  {
+> > -     if (!(dev->features & NETIF_F_GRO) || dev->xdp_prog)
+> > +     if (!(skb->dev->features & NETIF_F_GRO) || skb->dev->xdp_prog)
+> >               return true;
+> > +
+> > +#ifdef CONFIG_SKB_GRO_CONTROL
+> > +     return skb->gro_disabled;
+> > +#else
+> >       return false;
+> > +#endif
+>
+> Yet more branches in the hot path.
+>
+> Compile time configurability does not help, as that will be
+> enabled by distros.
+>
+> For a fairly niche use case. Where functionality of GRO already
+> works. So just a performance for a very rare case at the cost of a
+> regression in the common case. A small regression perhaps, but death
+> by a thousand cuts.
+>
 
-Did you see any added in the last few years? This is also something
-DaveM pushed back on. We want uniform APIs so that all devices look
-alike. Please consider what you are exporting here, how it should
-cleanly fit into ethtool, devlink, etc, and expand these APIs to cover
-your needs.
+I share your concern on operating on this hotpath. Will a
+static_branch + sysctl make it less aggressive? Speaking of
+performance, I'd hope this can give us more control so we can achieve
+the best of two worlds: for TCP and some UDP traffic, we can enable
+GRO, while for some other classes that we know GRO does no good or
+even harm, let's disable GRO to save more cycles. The key observation
+is that developers may already know which traffic is blessed by GRO,
+but lack a way to realize it.
 
-> 
-> >> +What:           /sys/kernel/debug/habanalabs_cn/hbl_cn<n>/nic_mac_loopback
-> > 
-> > Why not use ethtool ?
-> >
-> 
-> We have an ethtool option for that, but we have also internal NIC ports
-> that are not exposed as netdevices and for them the ethtool path is
-> irrelevant. Hence we need this debugfs option as well.
-
-If there is no netdev, what is the point of putting it into loopback?
-How do you send packets which are to be looped back? How do you
-receive them to see if they were actually looped back?
-
-	Andrew
+best
+Yan
 
