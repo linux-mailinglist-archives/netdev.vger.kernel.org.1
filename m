@@ -1,84 +1,77 @@
-Return-Path: <netdev+bounces-105712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AF37912659
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:08:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFDD391266A
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 15:11:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8735B20F17
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 13:06:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9971828943F
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 13:11:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE40F142620;
-	Fri, 21 Jun 2024 13:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="VJo2Zis7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3E3154C17;
+	Fri, 21 Jun 2024 13:11:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786A0376E4
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 13:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5701E491;
+	Fri, 21 Jun 2024 13:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718975154; cv=none; b=ChsoEr+y7PptG70AuILNWreMq2o1nle1tTgMPzWDLmwHbMVQBh6/Pj9sT5mcNtP5Lu+pR8IGEataiFiB6tSzkXp6VxZkPIC6bAE11GM3fuFKpkmhqhfFmyjy6r0VKvxyYTUx+jm5Lq3iDtMRaUUaUmrMhxu36vH+AgVbXeBVa00=
+	t=1718975478; cv=none; b=rFYXJ+W2RpabGO33AVclzrmV5w4mQLN8bFjaX+Dpo4fyL6enSTa4glJ2edLPvMAAGBett8BBdh/cEdrmYstwunHbqpfG9XryjPky4oMzAt9HyYEd5GWywW/CkK8W3gh5UIwoF9q5aCWmmFeftYZypNVVt0luP9Zykt4dITffRN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718975154; c=relaxed/simple;
-	bh=Yb7Yvj1YgzjQRwDXPO286zPR/Ef3eehL0+s0q76BX5g=;
+	s=arc-20240116; t=1718975478; c=relaxed/simple;
+	bh=bCX5FA1mPXa8/Yzf+pWQ5GaZmjrSlKFEQf1PbK0U1fc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K5sIAZv+skGV0D8oxgFjUnEXPgqNLRALznNaSTeabVmPXIleaVoTflnFZTwZQx9vcY0TAQX3ZFckOs2JZo+Csm9MHXZDP6Q9XhE9eO6IS/7ykRqEpMTgCoQa5y2Ylp2qnrvfq9csAvl+bBTqhewaKG3prbRxMkGYA1d/1wkT8jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=VJo2Zis7; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-797a7f9b52eso152247185a.2
-        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 06:05:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1718975144; x=1719579944; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VJK2yOT9FIqROi+Egt9eFviTEDPEGVADU23Q3cHDMEA=;
-        b=VJo2Zis7OHeDdQery+XSM6+89CsaIHOdoNWIoaXvacR/m/bpMrHYC2MhUkaTCADJV6
-         lUI6cShb+vlIAR1rJYjV8MgYMx8O8iqZvaMxyNZ2scBbTLzbhdXg8aZr9jtOBBB8dcTK
-         35MGvFkneuimZSa4sECZpUpaMdRIl+gO1g4y9NLcmjRsBLnfyWiAR91An/3+k+TfSNjl
-         s7h/eht5fvWH2Iy0CFQw2MIiEgX4DfTtnhyaaEE1NBKFdfhpj2DU7z4+Yn5GCMRKaLpR
-         qNf/O3FwNiKOQ+FuVtBs03AENdCSJf1FaZW39UpSpxGR+kQ5iYB6T1N1cAzlgDuyYoMO
-         AgsQ==
+	 Content-Type:Content-Disposition:In-Reply-To; b=BxEwggD6aYGOPW7HStC/DU2RIGhIS3khaCGsvaXZl+5ebe93gVwe0H0LAcgqNKIjQzj1wxynUeEU6otHdoM54LzWXRysk4lw3DJGqk/WReiChfxexAr+vYl3062wnSvMsIx+5dtmznZWGxZ7M6kvJDwbelmBY4XJWHYvjZBtjlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57d1679ee6eso4013513a12.1;
+        Fri, 21 Jun 2024 06:11:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718975144; x=1719579944;
+        d=1e100.net; s=20230601; t=1718975475; x=1719580275;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VJK2yOT9FIqROi+Egt9eFviTEDPEGVADU23Q3cHDMEA=;
-        b=jcfEAx/t4zISYHeRYMWrNDpiMQqWsr88XaCJ+26nAT2gQecnz2s/Ia4wPF9Zx2xb3w
-         yy48JED+pYYxgmhN9dpCKYL5Y3ERcVAIHGNMkceW/gR5eA1U8vPUSG8q62mNRcvFiKEy
-         oIVHwUXFvnuCXS6lQAiyLChFfjy8/V2hqp0pVCT/bc2uO/vzWidJf5mviC0FLowbHvtM
-         mVwJuzFu87Ctywbeght9FhZZHbPnsbJ/m4S2D2/DzN93t4dshD84U172qZLXvetB6w2M
-         SA1u1WPlh53Mztd8It26eJMeUBfpkJvgqEZovs6YumIop83oDR6+WizDOSDa/Na2MlqM
-         MRHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVH2e3A1OdAjF25RzqrCYa4CliMyaN4n3M9cKnWuQ+Cbbci0ahCdyCQuc9ihMZPrbY9zTVixVNQ+5Z/Yc0jgZarb5zbeTSh
-X-Gm-Message-State: AOJu0YxwKTbcXknIUP3EX3kIt/tM5oxjsu6sNRdGIfI+vglpoMmxaj+5
-	Hp1Qu0SJOw9f5Jt6dcwP7u2l8bLnZrA3fgN1FdxS5cbXibr9OHvUFcWiIhEn7uU=
-X-Google-Smtp-Source: AGHT+IGC6sZXSWKAGPHY/uyr89DZ9iZnRZxdRUjwa1W19Nf+VKCN9pvnvkoUjMCqTg/1PhtYsBAS3A==
-X-Received: by 2002:ad4:5508:0:b0:6b2:9e65:2246 with SMTP id 6a1803df08f44-6b501e0a68emr84339226d6.1.1718975144122;
-        Fri, 21 Jun 2024 06:05:44 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b51ef678ebsm8545166d6.132.2024.06.21.06.05.43
+        bh=17q6bj6JqpWDK7xKaClWKJXRzHgsaQIs8Jjq3F0zneQ=;
+        b=Y5/smHdKBDUgZm2u54o0Lok0RDgQr80gTbWfi8u1akB/o7V5Hp6kjluf/GYYVqesXy
+         d39ouTaunVs6evYw6vTJGcL0Htvz7xR1bYU5BMjz8SdNiQSaELhHJvKL4QiwvAtkw8I8
+         +FyN8pH1so3yP8A/tWyjiDlEmvrh0x2qUUsc0kLw8jxZZzMAIKPiy3eL5dCE4CYW3fBG
+         HXzCzCOsKvCKauTIXmPhWIy3nzUnZzQmUVAoAstTGVN1CcK9RGK9/eQncqoIrTWF8kAt
+         1UQ2Xw9m7dyCIhMyET9rXOQgyScfl3Kht2RG5mqJlF+4Ghx1Mi60YUvBVipAjPJ75Uuw
+         AI+g==
+X-Forwarded-Encrypted: i=1; AJvYcCXEMUCrZjOH7Xv5HJ3jVR1zCdrKtlWgTtox2Ohq0fKn06DbZ3jhcOcUEKktwryqIVrtLmdYse7iQwKV11dogpJIW1vHZI4/VgPYQNM6GL4DC2VmihWIZjzszPNZWniv9P2XQ3dAzEfvbM2j/Idd17pQTHaurJmwzDXqa/prgvN1GQkjOeJ1
+X-Gm-Message-State: AOJu0YwZnEZ0hNj/nsowXi3G3ZGt1JVrRNsDHed8RPg6Ib8hOkaCM/q3
+	t+pk1T6Gm8b8Adno9iQsT7Pyu1pzRSpHd6xGp8bSMhhFXZMeMyvB
+X-Google-Smtp-Source: AGHT+IFBp42jeltqYdj2uOi4QCPJwDRLcY5GTJQ5xqBEL7/2bnNlJnZDbN7TrKvFm6D/xLcFf6FFJw==
+X-Received: by 2002:a17:906:1348:b0:a6f:b352:a74b with SMTP id a640c23a62f3a-a6fb352a781mr487658566b.38.1718975474028;
+        Fri, 21 Jun 2024 06:11:14 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6fd5f7b80csm40486666b.29.2024.06.21.06.11.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jun 2024 06:05:43 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1sKdxW-00HUFW-GK;
-	Fri, 21 Jun 2024 10:05:42 -0300
-Date: Fri, 21 Jun 2024 10:05:42 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: syzbot <syzbot+a35b4afb1f00c45977d0@syzkaller.appspotmail.com>
-Cc: leon@kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [rdma?] WARNING in gid_table_release_one
-Message-ID: <20240621130542.GQ791043@ziepe.ca>
-References: <0000000000000d0237061b4c6108@google.com>
+        Fri, 21 Jun 2024 06:11:13 -0700 (PDT)
+Date: Fri, 21 Jun 2024 06:11:08 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, kuba@kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Kees Cook <keescook@chromium.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	linux-hardening@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] netdevice: define and allocate &net_device
+ _properly_
+Message-ID: <ZnV77C66v+uS9AhR@gmail.com>
+References: <20240507123937.15364-1-aleksander.lobakin@intel.com>
+ <20240507111035.5fa9b1eb@kernel.org>
+ <3b08e1d0-62be-4fae-9dbb-9161992ee067@intel.com>
+ <Zmww9tS2eWt3mnj3@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,40 +80,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0000000000000d0237061b4c6108@google.com>
+In-Reply-To: <Zmww9tS2eWt3mnj3@gmail.com>
 
-On Wed, Jun 19, 2024 at 11:25:19PM -0700, syzbot wrote:
-> Hello,
+On Fri, Jun 14, 2024 at 05:00:54AM -0700, Breno Leitao wrote:
+> On Wed, May 08, 2024 at 11:13:21AM +0200, Alexander Lobakin wrote:
+> > From: Jakub Kicinski <kuba@kernel.org>
+> > Date: Tue, 7 May 2024 11:10:35 -0700
+> > 
+> > > On Tue,  7 May 2024 14:39:37 +0200 Alexander Lobakin wrote:
+> > >> There are several instances of the structure embedded into other
+> > >> structures, but also there's ongoing effort to remove them and we
+> > >> could in the meantime declare &net_device properly.
+> > > 
+> > > Is there a reason you're reposting this before that effort is completed?
+> > 
+> > To speed up the conversion probably :D
+> > 
+> > > The warnings this adds come from sparse and you think they should be
+> > > ignored?
+> > 
+> > For now...
+> > 
+> > > 
+> > > TBH since Breno is doing the heavy lifting of changing the embedders 
+> > > it'd seem more fair to me if he got to send this at the end. Or at
+> > > least, you know, got a mention or a CC.
+> > 
+> > I was lazy enough to add tags, sorry. The idea of him sending this at
+> > the end sounds reasonable.
 > 
-> syzbot found the following issue on:
+> I think we are almost at the time to get rid of the last user of
+> embedded netdev.
 > 
-> HEAD commit:    a957267fa7e9 Add linux-next specific files for 20240611
-> git tree:       linux-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=15a085de980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=9a880e96898e79f8
-> dashboard link: https://syzkaller.appspot.com/bug?extid=a35b4afb1f00c45977d0
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> 	https://lore.kernel.org/all/20240614115317.657700-1-leitao@debian.org/
 > 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/6451759a606b/disk-a957267f.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/7f635dbe5b8a/vmlinux-a957267f.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/33eafd1b8aec/bzImage-a957267f.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+a35b4afb1f00c45977d0@syzkaller.appspotmail.com
-> 
-> infiniband syz1: ib_query_port failed (-19)
-> infiniband syz1: Couldn't set up InfiniBand P_Key/GID cache
-> ------------[ cut here ]------------
-> GID entry ref leak for dev syz1 index 0 ref=1
-> WARNING: CPU: 1 PID: 12182 at drivers/infiniband/core/cache.c:809 release_gid_table drivers/infiniband/core/cache.c:806 [inline]
-> WARNING: CPU: 1 PID: 12182 at drivers/infiniband/core/cache.c:809 gid_table_release_one+0x33f/0x4d0 drivers/infiniband/core/cache.c:886
-> Modules linked in:
+> Once that patch lands, I will submit this patch on top of that final
+> fix.
 
-Oh look, we changed a dev_err to a WARN_ON and syzkaller immediately
-reports that there is some kind of memory leaking bug in rxe :\
+In fact, I jumped the gun, and reviewing the embedded users of
+netdevice, I found there are three more devices, that will need some
+care before we proceed
 
-Jason
+drivers/crypto/caam/caamalg_qi2.h:
+
+  struct dpaa2_caam_priv_per_cpu {
+	...
+	struct net_device net_dev;
+
+
+drivers/crypto/caam/qi.c:
+
+  struct caam_qi_pcpu_priv {
+	...
+        struct net_device net_dev;
+
+drivers/net/ethernet/cavium/thunder/thunder_bgx.c:
+
+  struct lmac {
+	...
+        struct net_device       netdev;
 
