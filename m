@@ -1,151 +1,84 @@
-Return-Path: <netdev+bounces-105812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D307912F86
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 23:27:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 903F0912FA5
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 23:37:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 536581F23E78
-	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 21:27:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB266B21828
+	for <lists+netdev@lfdr.de>; Fri, 21 Jun 2024 21:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D52D17BB1F;
-	Fri, 21 Jun 2024 21:27:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EE017C226;
+	Fri, 21 Jun 2024 21:37:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R1EKXX/q"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="znN+MfEU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72D24A3F
-	for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 21:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659D9208C4;
+	Fri, 21 Jun 2024 21:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719005260; cv=none; b=KiAVXIz2mWSYeODKjWhlouv7OAG6PMo332Mf+JbOOrq11y9bAT+/R31NQFEYlA6mru9Ly1mnXviVehYu3uDEuEoIHs1I2oMwm0cYfQeXFHC7AzuPTunZ5Nf1zFeFicd88S3cmoMnz3e1P1lnv88W/0/iYLAz2vTx6pzVfhUYmqY=
+	t=1719005832; cv=none; b=TuWpleDry3w1zsF+45J1PRJh2vODZ0jwus4GPfIv26zrdcMO+WFe92TvlpD1NgFEq59z9x+uzwVN7qDWLecfsQ4RHN/GK3We5S3iZYhHsXVKpjm4tn2LCMU1iW4eGHmvgCq3sBjowfBnSS9Nh3IfiC0APuu8YogpVSVzFdBJ6H0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719005260; c=relaxed/simple;
-	bh=uMNzYRIgleMfYnwYF+a0ZGkYj4KN0oRJZLd7rVFB5WU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=vE2l6NXlGbZSgVwbgHjCvwlcX5AQjiq0xbHLw7yvi2s4RGH3n7iI9kLG75PwXIzIebY0q+vtH/0LB9dTUMd3rH1TG75L68WP8SydECnnlS2P5p8qtSvj3m3+dH+SlINYjdJQwPo2d1rvk1rGMy5PY1BMiaad3jeYkbkTJDsggdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R1EKXX/q; arc=none smtp.client-ip=209.85.217.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-48f36f57a5aso335830137.0
-        for <netdev@vger.kernel.org>; Fri, 21 Jun 2024 14:27:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719005258; x=1719610058; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B9YYJN6gO8sKB5sQbYzsaO+MvxbhNg/Nzd2XouVD5g0=;
-        b=R1EKXX/qUnfHZeXz1indkAsJn+QxIR/qE+0LNhJX4SyafRv8wlD8Aa4GetPSAaNw6L
-         eJm4mrnkw3EG9niWz8pLAEjhPRgByHILE6cQXXephaugj6q16TzpsXGXSq4g/aOmiiHG
-         DAyzFEvz0dXKwlRg7pZgXqWX6w2GECeh/wNjcR1n/Otjghf/uVH1a65XSlJ0fOpn2yge
-         STDeWRC3g59k1MtP+wB0O7vTx7JvFHMFjRZUj/VlsXP2WnT0bymJBtN3PqKLXPb7yu9+
-         9NlFXNUcg37RWUMW6z2f+fB7v41nRHdMAzJKV0QhcahcmweJ601G6cG0KIs/0GDajq1G
-         7CtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719005258; x=1719610058;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B9YYJN6gO8sKB5sQbYzsaO+MvxbhNg/Nzd2XouVD5g0=;
-        b=wL++5jxbDkmnCxkWM3Mi5RWJJ3HwQFraxGqnpchnMSQoMTYN1blx8zNE1erHGoUpzu
-         4O9SJOitMYctVU39bMLp3tM8OpJZVYx9RUOppZ1BU0IKqidecuKgbc2iKAw1MNy5Wq/g
-         cAiTaDKZjZJIomK7rvJ6q2yXRk8Cgar/UddVWRmyy+nzaC96FHbeoTVWESPfrvBEFZ63
-         YhzYGf4E1zCvJv7swn+psc1wEXywUGys3N2Jnd49fJqiZAV7JJNCjwdZMgjFW4/M1L95
-         eQlwo/qpebipyD+tUDU93GZGyQIinntu7+GnsWKJJ4JD3U4MrT5M0TSI9lEFfmHCJNYY
-         GYrw==
-X-Forwarded-Encrypted: i=1; AJvYcCVhrrWEG9vsaV87uDk64vRSICE2wo3qOHaraJp9uU2qIAp5n91ju7PafcdL4cShnN0CnIhJvgXSDaOaqHjHJs29v4aqoaAv
-X-Gm-Message-State: AOJu0YxGg20Dsdt4fRdtyhJMGphNY4635TfVfq5cf4KHS/pyxVp0L5V1
-	PA5iXDqmKU+3WWyrYFW1YPtzztcJG2DtNpN7v5g73qhIugvVYHry0DuQJNhs4EW8LDLj9uT4wCm
-	a5MSzPu7g+Ms8YvGqYmSOgTnx1dHFt2dtr90N
-X-Google-Smtp-Source: AGHT+IFJsXHscUZN1ArxTSIV4VXg2gnQo9OEeHipRr4oFQUE6eYw6FyYq4qABzIJaAuPwBpxGEH9hruTNr2gkbg4xXw=
-X-Received: by 2002:a67:e20c:0:b0:48f:3fe2:1560 with SMTP id
- ada2fe7eead31-48f3fe21584mr2043664137.11.1719005257518; Fri, 21 Jun 2024
- 14:27:37 -0700 (PDT)
+	s=arc-20240116; t=1719005832; c=relaxed/simple;
+	bh=HqB7/AiiMRvyE1Jtm5iJcbfxhyhyihsPuCco+kkArsg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fkBhvflch6ocxljAR/zKSFeNBGD4kGo1zBQtn2sU9uSxLIsbDzfCHW7SYKN72Xyklji7HQOrqUQBKsAVLBoDxs3K0dRp88CJBS/cJ0eEyaUYMymFGs6bON5RWWejUlFcvKn0WiCJPuPOM5lmehq5L9aglhUk9bTto/B9Hsn/1S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=znN+MfEU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABBB3C2BBFC;
+	Fri, 21 Jun 2024 21:37:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1719005831;
+	bh=HqB7/AiiMRvyE1Jtm5iJcbfxhyhyihsPuCco+kkArsg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=znN+MfEU4yTVh3qkQUN8MlWRuNI/dIs1ZQ/kTFRfl0JsI1fsVJ/j//iDo29ZvPb5+
+	 J1J3fAxZurEhKzfuN2gssGCiefy5/5dFZrm8Va7B8A5ESC/I5pfLCg9sVgWPa2LXyF
+	 cNd0SArSL9CmDCfo9pO6lacTxqQEjHH6dn4iWTrk=
+Date: Fri, 21 Jun 2024 17:37:10 -0400
+From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+To: Kees Cook <kees@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, 
+	Carlos Bilbao <carlos.bilbao.osdev@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, workflows@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, ksummit@lists.linux.dev
+Subject: Re: [PATCH v2 2/2] Documentation: best practices for using Link
+ trailers
+Message-ID: <20240621-amorphous-topaz-cormorant-cc2ddb@lemur>
+References: <20240619-docs-patch-msgid-link-v2-0-72dd272bfe37@linuxfoundation.org>
+ <20240619-docs-patch-msgid-link-v2-2-72dd272bfe37@linuxfoundation.org>
+ <202406211355.4AF91C2@keescook>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240621211819.1690234-1-yabinc@google.com>
-In-Reply-To: <20240621211819.1690234-1-yabinc@google.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Fri, 21 Jun 2024 14:27:25 -0700
-Message-ID: <CAKwvOdmYWEp8SaksnereMRPBq1q614kWJAWtcSyAeTVZ=geQfg@mail.gmail.com>
-Subject: Re: [PATCH v2] Fix initializing a static union variable
-To: Yabin Cui <yabinc@google.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <202406211355.4AF91C2@keescook>
 
-On Fri, Jun 21, 2024 at 2:18=E2=80=AFPM Yabin Cui <yabinc@google.com> wrote=
-:
->
-> saddr_wildcard is a static union variable initialized with {}.
->
-> Empty brace initialization of union types is unspecified prior to C23,
-> and even in C23, it doesn't guarantee zero initialization of all fields
-> (see sections 4.5 and 6.2 in
-> https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2900.htm).
->
-> Clang currently only initializes the first field to zero, leaving other
-> fields undefined. This can lead to unexpected behavior and optimizations
-> that produce random values (with some optimization flags).
-> See https://godbolt.org/z/hxnT1PTWo.
->
-> The issue has been reported to Clang upstream (
-> https://github.com/llvm/llvm-project/issues/78034#issuecomment-2183233517=
-).
-> This commit mitigates the problem by avoiding empty brace initialization
-> in saddr_wildcard.
+On Fri, Jun 21, 2024 at 02:07:44PM GMT, Kees Cook wrote:
+> On Wed, Jun 19, 2024 at 02:24:07PM -0400, Konstantin Ryabitsev wrote:
+> > +   This URL should be used when referring to relevant mailing list
+> > +   topics, related patch sets, or other notable discussion threads.
+> > +   A convenient way to associate ``Link:`` trailers with the commit
+> > +   message is to use markdown-like bracketed notation, for example::
+> > ...
+> > +     Link: https://lore.kernel.org/some-msgid@here # [1]
+> > +     Link: https://bugzilla.example.org/bug/12345  # [2]
+> 
+> Why are we adding the extra "# " characters? The vast majority of
+> existing Link tags don't do this:
 
-Thanks for the patch. The links add a lot more context.
+That's just convention. In general, the hash separates the trailer from the
+comment:
 
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+    Trailer-name: actual-trailer-body # comment
 
->
-> Fixes: 08ec9af1c062 ("xfrm: Fix xfrm_state_find() wrt. wildcard source ad=
-dress.")
-> Signed-off-by: Yabin Cui <yabinc@google.com>
->
-> ---
->
-> Changes in v2:
-> - Update commit message to add/update links.
->
-> ---
->  net/xfrm/xfrm_state.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> index 649bb739df0d..9bc69d703e5c 100644
-> --- a/net/xfrm/xfrm_state.c
-> +++ b/net/xfrm/xfrm_state.c
-> @@ -1139,7 +1139,7 @@ xfrm_state_find(const xfrm_address_t *daddr, const =
-xfrm_address_t *saddr,
->                 struct xfrm_policy *pol, int *err,
->                 unsigned short family, u32 if_id)
->  {
-> -       static xfrm_address_t saddr_wildcard =3D { };
-> +       static const xfrm_address_t saddr_wildcard;
->         struct net *net =3D xp_net(pol);
->         unsigned int h, h_wildcard;
->         struct xfrm_state *x, *x0, *to_put;
-> --
-> 2.45.2.741.gdbec12cfda-goog
->
-
-
---=20
-Thanks,
-~Nick Desaulniers
+-K
 
