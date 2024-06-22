@@ -1,88 +1,112 @@
-Return-Path: <netdev+bounces-105860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED0EA9134B8
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 17:16:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CDBF913503
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 18:15:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A17A1C20FD1
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 15:16:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E46C1C21881
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 16:15:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ECC016F0E7;
-	Sat, 22 Jun 2024 15:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45D72170820;
+	Sat, 22 Jun 2024 16:15:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pGW0Kp8Q"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ZKeJjRAP"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618EB43156;
-	Sat, 22 Jun 2024 15:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713DF2566
+	for <netdev@vger.kernel.org>; Sat, 22 Jun 2024 16:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719069359; cv=none; b=C8APLuhQXE1EXOZWy+pYw4GhrnmUP7w7CIg7bfYJl9wookZUHTq9tCNhuGJTtOMdElObCmw9qa0wY2vMvKvUcLh0IEd540RlBG0iSdhjjgIehI3VomvH7cAd+HN31c0Bp6a9NTFLUBdC99iO8swdh1L9HLCuobaA2oSNq6q/xNk=
+	t=1719072902; cv=none; b=GpaOJvzOaxetKXOCWbsyDrHqHlMCriI7OBmZxv5BIL2SRGZBlK7vfNZRJAi7ehaGkKkz88IVEH4nRsFZ85b93w709+xIwHQtvCOCvLGJ9yt4ug+hXBl2eaoyqK0roqztmKN62r+0SKpIlpwh6MigRdj3rycF7C0aIjk55TXiz8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719069359; c=relaxed/simple;
-	bh=fKO6cKhLDetMCWuOqjJT5MrxvFKMPuKR9jg4oHo9kQQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KQ5H2WkZY98+Ihj/+7Va1SORsMAs8f4IXU7iIbG9i0jqAgUOYZnr+NPJaYD37/L5na0vbnnJSIK8zPzVehX1S304/Tlvc67PCv9T6FNDQFRh3qYRl64/U+yO1kcJfO2WENUJnNnMS0J+RbED98Do0GAmBxN7weX0emjzdh55Ngg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=pGW0Kp8Q; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=u/8MZvNVjE3HGccbfJVlLB0/ThMviFL2sbZ039sccRc=; b=pGW0Kp8QKF70FDXhq6o6d/UdIZ
-	ny3FJn78zlj0lviZOCPglkjj+nDeWzsJbnpLIKgweD4ecV0khNo2oSc3KuSw/Pqo8OShSIbIGZYcd
-	n1pZ5MCIHm9dDzP2uqg0kegjBG68PKQkPlhZnZoDYtkQSLIzd88nVYhXcZHdhctnZ0OvKjFUkj2oI
-	DWy5HdHcwcAQeQgxg0/eMQgJWnAz+Do9Z+ptN4iP6QIKjjMdONEMyguCMFL2+RNPZi1JogNBdyNW4
-	J6JnW3LbIaO/UvMRTWawu+H1iusbi9Fsq4BLxeKLT1E0DbqnTNqAGazJKUlmmcOBT+WwNc/LgWfS0
-	SZ4LN4Cg==;
-Received: from [50.53.4.147] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sL2Sz-0000000CJTH-3kI8;
-	Sat, 22 Jun 2024 15:15:49 +0000
-Message-ID: <ef3688fd-d1a5-4045-baa3-1d51c24045c9@infradead.org>
-Date: Sat, 22 Jun 2024 08:15:48 -0700
+	s=arc-20240116; t=1719072902; c=relaxed/simple;
+	bh=bZP+v/ejhsUnlO1AfFZ3rRUHYStZ+pj4sUGDFaIFe/8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=rZHv01H8aTZC9c+KtMXNP+3dUkfU0ZdkHfOqyH1L80NAPCYfzJCP+ff1xTteFPXPSIqQuKJkTg6gObb/iQaSGvP31eTrJnLIMz8o/ZFTf5LzAZWZwPwX0335gIIUKEQLV5J9Xc/4Y/HZkgpQ4U9krl2Y7IkHHX9WRyjah7Hf+ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=ZKeJjRAP; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a6fd513f18bso149440366b.3
+        for <netdev@vger.kernel.org>; Sat, 22 Jun 2024 09:15:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1719072899; x=1719677699; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZloWYbSldMWF5FXJGR1MP0ZWNhXZKG9jQC2IitEAxBI=;
+        b=ZKeJjRAPvwvlEpEkHJYBt8+vVSDT6plTVi1v147DMeEiVvIK0WCYaoSh9335PuwDKl
+         qWCMzg57s9hwJCksUtDMPH5Q8gczzFspp+ViW29dAqQ0mmFclM3pDh4YYyIbfdaHbeVi
+         /7A81s1ZkY7YRNvUBoZRSeiSQ/27yXNmn8JgylpccSjgVX+lKr/awh833ucjYpcPc8xu
+         FweE3KL12aF8lYM6eZbQ936qdHanWETSr9wv2PaA7aRt2PXccbiZsRucY1SBfCcMloD7
+         LusIfqXj7miYNnlxZQo5jXKsom4hF2qbYzYRYS6RpURbxP2JBY8nFoOYRA7d+bvJ463D
+         620w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719072899; x=1719677699;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZloWYbSldMWF5FXJGR1MP0ZWNhXZKG9jQC2IitEAxBI=;
+        b=Xio01VOpRHqDHpqNjPPBOZ79wMXJy8RxrSfbNTOno6l6cxfAfrhcehHemITpOiO7+p
+         CXOpc08nAQWeNqihnjkmstfmOTTz3UmXXF7WfRpqWcEKUzquIuUfncoZ6yQqeQFnmO4G
+         bqdupwC3jwpH7wZSML2/+GtPbew7L4jglXYThjT8SpTxQE2A8AK/tYFv5A8PFNPVDmmU
+         bZMAKl4Ss5F9HUucBiVkDDI+++4aNZoTs9/QdaddSDHLUZiotz/6JXNnNddUcNnui0wn
+         3DSDcbf0bwIy1vmpdSB3hm8t4p9oJLUkAcOPfM5raiH9dYoogv8rXFu0+NH8SWzbTnBZ
+         54Vg==
+X-Gm-Message-State: AOJu0YyBbqHmWz7twstR0AVgGBpCVwXsNKvoxpnyYR2m4BwgVobctxcB
+	gyRD/2J3z3lo/FH5irN8kz6++I1oDszQjQHEuzKjuQmzG9zWkOjMjHzRzVP3p2Y=
+X-Google-Smtp-Source: AGHT+IHujvFYLI4EDNLt40iwEimU+SLKzmEEtVO+BuCoFohhIqu7FJf1ZUBgRmiPtLS57P3FZGEctA==
+X-Received: by 2002:a17:906:ba84:b0:a6f:467d:19ec with SMTP id a640c23a62f3a-a7245b56620mr10609466b.18.1719072898784;
+        Sat, 22 Jun 2024 09:14:58 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:27])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6fcf428b36sm209850766b.45.2024.06.22.09.14.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Jun 2024 09:14:57 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+Subject: [PATCH net 0/2] Lift UDP_SEGMENT restriction for egress via device
+ w/o csum offload
+Date: Sat, 22 Jun 2024 18:14:42 +0200
+Message-Id: <20240622-linux-udpgso-v1-0-d2344157ab2a@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] Documentation: best practices for using Link
- trailers
-To: Kees Cook <kees@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
- Jonathan Corbet <corbet@lwn.net>,
- Carlos Bilbao <carlos.bilbao.osdev@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: workflows@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, ksummit@lists.linux.dev
-References: <20240619-docs-patch-msgid-link-v2-0-72dd272bfe37@linuxfoundation.org>
- <20240619-docs-patch-msgid-link-v2-2-72dd272bfe37@linuxfoundation.org>
- <87v821d2kp.fsf@mail.lhotse>
- <0BD32B85-22CF-45DF-A70E-FFE8E24469A4@kernel.org>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <0BD32B85-22CF-45DF-A70E-FFE8E24469A4@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHL4dmYC/x3MMQqAMAxA0auUzAZqkA5eRRzURg1IKq1KoXh3i
+ +Mb/i+QOAon6E2ByI8kCVrRNgaWfdKNUXw1kKXOOiI8RO+Mtz+3FLAlR55pdhNbqMkZeZX87wZ
+ QvmB83w+dWZPgYwAAAA==
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+ kernel-team@cloudflare.com
+X-Mailer: b4 0.13.0
 
+This is a follow-up to an earlier question [1] if we can make UDP GSO work with
+any egress device, even those with no checksum offload capability. That's the
+default setup for TUN/TAP.
 
+I leave it to the maintainers to decide if it qualifies as a fix. We plan to
+backport it to our v6.6 either way, hence the submission to -net.
 
-On 6/22/24 7:40 AM, Kees Cook wrote:
->> I see some existing usage of the above style, but equally there's lots
->> of examples of footnote-style links without the Link: tag, eg:
-> I moved from that to using Link: because checkpatch would complain about my long (URL) lines unless it had a Link tag :P
+[1] https://lore.kernel.org/netdev/87jzqsld6q.fsf@cloudflare.com/
 
-We know that checkpatch isn't perfect. It's safe to ignore such complaints.
+Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+---
+Jakub Sitnicki (2):
+      udp: Allow GSO transmit from devices with no checksum offload
+      selftests/net: Add test coverage for UDP GSO software fallback
 
--- 
-~Randy
+ net/ipv4/udp.c                        |  3 +--
+ net/ipv4/udp_offload.c                |  8 +++++++
+ net/ipv6/udp.c                        |  3 +--
+ tools/testing/selftests/net/udpgso.c  | 15 +++++++++---
+ tools/testing/selftests/net/udpgso.sh | 43 +++++++++++++++++++++++++++++++++++
+ 5 files changed, 65 insertions(+), 7 deletions(-)
+
 
