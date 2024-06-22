@@ -1,92 +1,117 @@
-Return-Path: <netdev+bounces-105824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48451913136
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 02:50:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0BCA91313B
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 03:01:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B796B23B95
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 00:50:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FED3B2436A
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 01:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016EBEC4;
-	Sat, 22 Jun 2024 00:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 752751392;
+	Sat, 22 Jun 2024 01:01:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eMCnuCl5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XkDGJsgz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15A0161
-	for <netdev@vger.kernel.org>; Sat, 22 Jun 2024 00:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45190652;
+	Sat, 22 Jun 2024 01:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719017428; cv=none; b=ScVOBdOOnSxDWjb6D5sVLeoM8ranePkLgfdczM0CSWPbyqNAlIeOznBbqRPSZh/e30Vy8H8lgGFH7wum53WeK5clUigIuoCBjGKRh5DqInN9CpDb+IslzPYI+oWVtiOHPx9W/SYEzYqdjXhsbquc4rypl4rKvH34f4Dcf/lEsjg=
+	t=1719018088; cv=none; b=fmA73rxOoLeQWCcZZI9iU5SpXKka44wXVIA9CncSbPYEHs/JJzv2X7aZcoG94K7o6SU4o3ysccLHvJaxgc+rpfWm0jgMFriLgwvK8x0S1zygVekHT9uHlCbiNEnHrHC8tr7Zfy+UWZ82v/Vk89x5M1y8TiM5m5D9ekHAI29Eg8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719017428; c=relaxed/simple;
-	bh=Bj9MOHfWtL+9fo3AEuHW9fOA1Rv75hDCB38YuHhmdHE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QxMLLDm05YLbMKoXvTs6YbRqznsQn4uGaHE2JiMYFrF8UW5ho+x9E7fR/hywYzdFQzbBoRzjf3bQMi/QYFgK8/LtjWUeGpVTnXbhBd5bi3cRja+uEUhZ15AJmIwsflMP9FqH3b3j4NqG/RJ6m5pVMsuZWQ/zRE/ZN4mnTvdztFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eMCnuCl5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 55B53C4AF07;
-	Sat, 22 Jun 2024 00:50:28 +0000 (UTC)
+	s=arc-20240116; t=1719018088; c=relaxed/simple;
+	bh=11CUG9L/N6it3dxAYIeTEEPvihpXZm9lMnBasoZMrwc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZwsC2r4qJp7cA1TXkfM9VJlPQjFJuoPVzmx+Tq1X4SvBoHFRERNGUHNYpG5LXZHxm286YiJjesm9Ccs3y97CUeTNiQREhIHgu3fa+jnrki/tvzAfmdzDX+caCulIMkHssHiHBxAHrl3+5yyoxOmNgHUnERcmav4ROs46ILAzn/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XkDGJsgz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E5C8C2BBFC;
+	Sat, 22 Jun 2024 01:01:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719017428;
-	bh=Bj9MOHfWtL+9fo3AEuHW9fOA1Rv75hDCB38YuHhmdHE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eMCnuCl5+IvT9r+qUZNSyGgatOZ0n8LDRCg/jDIkqTJnoX4B50gsxVBWtJtKLQ1CF
-	 qC/yhDpRj+LUGtv0K0Q8mU/ONps9O4la/+cDP22qQ3fIyh7X+optIWZXdbprZ0HeJQ
-	 x12XUZKbYWEZ15MSCxRUbebTasl9i3dBddhO2fNStpavRmIw221+NOZKfXMkGsQeTt
-	 mDGMosiAqGt+bs7ELc0L7WwdP2L8G5CJh44TSaxc9tgBxUXuRdExRLsfv9kNZZZWYv
-	 zFTDumsVLtRsksfjTgmsEtOCcfTBLE3x9zgwCu9X5ann///egj5oDlVszkk4hKD4wR
-	 3aMohP2xcywqQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 433C6C54BB3;
-	Sat, 22 Jun 2024 00:50:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1719018087;
+	bh=11CUG9L/N6it3dxAYIeTEEPvihpXZm9lMnBasoZMrwc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XkDGJsgzt4Yz/XcgF3c+cq432157LFDE5AEN6MPlqrO6b2isW/9I7/xQAiPCejueR
+	 CiGHQKzGJpsyQmbFbKo5QgnAcwW7rROLNmLlNgUfTad+tHpn6AjBte8KyL637JYise
+	 c/p1eFYmGKIKIAcYHr131YrGuniOfMYjB8wEsumNsijNdkEf9TBOr9zLdH8NzGaPLV
+	 WfXhHKdk1B1Q6TkZ57srrcl5MX5prDFGOC21ej48+ZMrgIIAur6z4/bFmvdLPcx2V7
+	 oTnnIvAJWpZbaEunXs0nOwZMQaF3awY9tmU0wXy0K7xRlbo9cwPdEQBFS9SJs+AXL5
+	 yd4ziuVWJY+lg==
+Date: Fri, 21 Jun 2024 18:01:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Aaron Conole <aconole@redhat.com>
+Cc: netdev@vger.kernel.org, dev@openvswitch.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, Pravin B
+ Shelar <pshelar@ovn.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, Stefano Brivio <sbrivio@redhat.com>, =?UTF-8?B?QWRy?=
+ =?UTF-8?B?acOhbg==?= Moreno <amorenoz@redhat.com>, Simon Horman
+ <horms@kernel.org>
+Subject: Re: [PATCH v2 net-next 0/7] selftests: net: Switch pmtu.sh to use
+ the internal ovs script.
+Message-ID: <20240621180126.3c40d245@kernel.org>
+In-Reply-To: <20240620125601.15755-1-aconole@redhat.com>
+References: <20240620125601.15755-1-aconole@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] vxlan: Pull inner IP header in vxlan_xmit_one().
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171901742827.19632.17309295113576533527.git-patchwork-notify@kernel.org>
-Date: Sat, 22 Jun 2024 00:50:28 +0000
-References: <2aa75f6fa62ac9dbe4f16ad5ba75dd04a51d4b99.1718804000.git.gnault@redhat.com>
-In-Reply-To: <2aa75f6fa62ac9dbe4f16ad5ba75dd04a51d4b99.1718804000.git.gnault@redhat.com>
-To: Guillaume Nault <gnault@redhat.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, stephen@networkplumber.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 20 Jun 2024 08:55:54 -0400 Aaron Conole wrote:
+> This series enhances the ovs-dpctl utility to provide support for set()
+> and tunnel() flow specifiers, better ipv6 handling support, and the
+> ability to add tunnel vports, and LWT interfaces.  Finally, it modifies
+> the pmtu.sh script to call the ovs-dpctl.py utility rather than the
+> typical OVS userspace utilities.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Thanks for the work! 
 
-On Wed, 19 Jun 2024 15:34:57 +0200 you wrote:
-> Ensure the inner IP header is part of the skb's linear data before
-> setting old_iph. Otherwise, on a non-linear skb, old_iph could point
-> outside of the packet data.
-> 
-> Unlike classical VXLAN, which always encapsulates Ethernet packets,
-> VXLAN-GPE can transport IP packets directly. In that case, we need to
-> look at skb->protocol to figure out if an Ethernet header is present.
-> 
-> [...]
+Looks like the series no longer applies because of other changes
+to the kernel config. Before it stopped applying we got some runs,
+here's what I see:
 
-Here is the summary with links:
-  - [net,v3] vxlan: Pull inner IP header in vxlan_xmit_one().
-    https://git.kernel.org/netdev/net/c/31392048f55f
+https://netdev-3.bots.linux.dev/vmksft-net/results/648440/3-pmtu-sh/stdout
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+# Cannot find device "ovs_br0"
+# TEST: IPv4, OVS vxlan4: PMTU exceptions                             [FAIL]
+# Cannot find device "ovs_br0"
+# TEST: IPv4, OVS vxlan4: PMTU exceptions - nexthop objects           [FAIL]
+# Cannot find device "ovs_br0"
+# TEST: IPv6, OVS vxlan4: PMTU exceptions                             [FAIL]
+# Cannot find device "ovs_br0"
+# TEST: IPv6, OVS vxlan4: PMTU exceptions - nexthop objects           [FAIL]
+# Cannot find device "ovs_br0"
+# TEST: IPv4, OVS vxlan6: PMTU exceptions                             [FAIL]
+# Cannot find device "ovs_br0"
+# TEST: IPv4, OVS vxlan6: PMTU exceptions - nexthop objects           [FAIL]
+# Cannot find device "ovs_br0"
+# TEST: IPv6, OVS vxlan6: PMTU exceptions                             [FAIL]
+# Cannot find device "ovs_br0"
+# TEST: IPv6, OVS vxlan6: PMTU exceptions - nexthop objects           [FAIL]
+# Cannot find device "ovs_br0"
+# TEST: IPv4, OVS geneve4: PMTU exceptions                            [FAIL]
+# Cannot find device "ovs_br0"
+# TEST: IPv4, OVS geneve4: PMTU exceptions - nexthop objects          [FAIL]
+# Cannot find device "ovs_br0"
+# TEST: IPv6, OVS geneve4: PMTU exceptions                            [FAIL]
+# Cannot find device "ovs_br0"
+# TEST: IPv6, OVS geneve4: PMTU exceptions - nexthop objects          [FAIL]
+# Cannot find device "ovs_br0"
+# TEST: IPv4, OVS geneve6: PMTU exceptions                            [FAIL]
+# Cannot find device "ovs_br0"
+# TEST: IPv4, OVS geneve6: PMTU exceptions - nexthop objects          [FAIL]
+# Cannot find device "ovs_br0"
+# TEST: IPv6, OVS geneve6: PMTU exceptions                            [FAIL]
+# Cannot find device "ovs_br0"
 
-
+Any idea why? Looks like kernel config did include OVS, perhaps we need
+explicit modprobe now? I don't see any more details in the logs.
 
