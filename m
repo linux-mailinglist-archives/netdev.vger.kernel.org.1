@@ -1,146 +1,91 @@
-Return-Path: <netdev+bounces-105852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 703889132C2
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 10:28:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFEA0913306
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 12:40:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F4013B232EB
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 08:28:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 669431F22C0B
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 10:40:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D2614C5A1;
-	Sat, 22 Jun 2024 08:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C77314D708;
+	Sat, 22 Jun 2024 10:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YosAV3lB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WCghPO1R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C35D335B5;
-	Sat, 22 Jun 2024 08:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36FA14D283;
+	Sat, 22 Jun 2024 10:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719044925; cv=none; b=AJ9Gz7FmyqEU8XCf6R+Q0oHPPgpkxNvFz7hsbmFOMgshaxoNzIBSykPeEbjg/NlAGpwJPwABmZTNwzelQYVn8PbFc9VqKA+a1oWjId+Ly5FvPQG48hbNv9cbYxPs26+nWIHI0Mr2ZimEP0xKD4zKFaGoc/sa7EEgWoFkDQmb62A=
+	t=1719052830; cv=none; b=onF4ppPOuAJQMIJSy+3rabOi36CXpw+GzfhNHOSxDlzH76LXxjPv9E/6AfqKOWe+GrHUISS+c5qYBsWsjyHiXjf++beQKfPXGeOObAtwLPCtAyv5BbjdNx3IQIFIctBzDL5qtgvaxm/ppw+Fge4WW1garQ3c1fncE8TuSVTntC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719044925; c=relaxed/simple;
-	bh=I36hrDGCl16z50N/hx++eF1frdHWfm/lr4cjAYqIPJw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XqLp2/xbCKiFOVXUX/aTDyskK3l7wWkAH/OGph0Yq3Pw/+4rLANrRBeozR5zICmOaz3ITBileA1MO1wkkMMtVfMMO07YYNlD7fyfty7DCDANX6GEXe9QosB9G3bQyPTQFyatuLdWEDeLi4EGZftYrg5F1K4UEUF9Kb3bvvjqqMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YosAV3lB; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719044924; x=1750580924;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=I36hrDGCl16z50N/hx++eF1frdHWfm/lr4cjAYqIPJw=;
-  b=YosAV3lB1rwWvzoC8QJs4jo62U2xGinlzx3Nj642LBMZBGLiHadgjWVD
-   8yr7z6JCzhtpuTNwTnEgqKWQrZyzE7AsCPO/CXFKiPe+grIeytW2jQdlY
-   BetZyyMjzJ4zQXbIS+XYBrLUowrphX9KGb4WhwBQiOorUDWOX0fQw336g
-   PD+cWCqeAC2J3VbVJyvYPfxjm0AiMEpiPcGbsgTb1lUiRUTMWsx8gtDrN
-   SrRKEJyYm3OYqyeOKvkXEdz4D/iYzcGVAdgZyqZWhny9zcMEVaJnTmRmi
-   SnFyU9BeHfD2C4eCy1xqIWrBaTz52DHSLA7H7Y3TKrmyFv7V148ywZSyN
-   A==;
-X-CSE-ConnectionGUID: 1ForCOQjTIazyQOjqEuY9A==
-X-CSE-MsgGUID: ex+r3gOKRJ+ZJ9OlZrJwyA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11110"; a="18988373"
-X-IronPort-AV: E=Sophos;i="6.08,257,1712646000"; 
-   d="scan'208";a="18988373"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2024 01:28:43 -0700
-X-CSE-ConnectionGUID: cmQVtE8pSWe4ihT/bVxuiQ==
-X-CSE-MsgGUID: juhYmWpiTe6FYYwhG2UfUA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,257,1712646000"; 
-   d="scan'208";a="47751938"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 22 Jun 2024 01:28:39 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sKw6v-0009SY-0R;
-	Sat, 22 Jun 2024 08:28:37 +0000
-Date: Sat, 22 Jun 2024 16:28:23 +0800
-From: kernel test robot <lkp@intel.com>
-To: Mark Brown <broonie@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>,
-	Networking <netdev@vger.kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Jiri Kosina <jikos@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, Kui-Feng Lee <thinker.li@gmail.com>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	linux-input@vger.kernel.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build failure after merge of the bpf-next tree
-Message-ID: <202406221626.JK0Nnkxy-lkp@intel.com>
-References: <ZnB9X1Jj6c04ufC0@sirena.org.uk>
+	s=arc-20240116; t=1719052830; c=relaxed/simple;
+	bh=mWJ94SzV2JikaOg+G2Vcy7tPZ0yWItKwK0O4bbaxP/E=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KZ4XKUH/3dv3aIewn1H3ypCn7xKLjVc3tvucq2qbvS1mnYwIx5W0ma8vQcHlsLnVEVVvjtkwdhjpTFMReK1JilrnNjYueTINhqkTroP18qu6Ivaou8BE6JtwaH4+jbMYWyuptIvmlWiDw09UQM4Wi0bmyuo7lIZyHrTTyi4hCxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WCghPO1R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 65192C4AF0C;
+	Sat, 22 Jun 2024 10:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719052829;
+	bh=mWJ94SzV2JikaOg+G2Vcy7tPZ0yWItKwK0O4bbaxP/E=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=WCghPO1RdIH2p/jgw6g1NkZ1PsatWklPtnQyAGrT9256GyjsuC0pIyYe3ZffTDNm/
+	 br+t1tfR5hu8j+ESZnUH2mQho9xCxJfC2sZEcd1IyDydkx4rc/CVnGomMOXFSkchBW
+	 XYYwZO3JBZ6FVrME5ad7RYZPaCWD8pW4zN3BYbJmPv1o+kgsWF4LiMHCZCMjYDx4+P
+	 sq9f/W+wPlFdg0hNl9WrFL+wcv+iGafatxCmYSzQS/tsv73T2K093fTWSHU8nNZcAW
+	 8UXxG8lzsZ9NAi+Ac0CK9HMX/bYwF4ZRckIFjGkfvmm1SCzMvo9uKHJWWaL9PEnuNI
+	 7IUeva/3wSbnw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5B88DCF3B94;
+	Sat, 22 Jun 2024 10:40:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZnB9X1Jj6c04ufC0@sirena.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: xilinx: axienet: Enable multicast by default
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171905282937.9713.8828756778690498046.git-patchwork-notify@kernel.org>
+Date: Sat, 22 Jun 2024 10:40:29 +0000
+References: <20240620203943.813864-1-sean.anderson@linux.dev>
+In-Reply-To: <20240620203943.813864-1-sean.anderson@linux.dev>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: radhey.shyam.pandey@amd.com, netdev@vger.kernel.org, michal.simek@amd.com,
+ kuba@kernel.org, linux-arm-kernel@lists.infradead.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org
 
-Hi Mark,
+Hello:
 
-kernel test robot noticed the following build errors:
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-[auto build test ERROR on hid/for-next]
-[cannot apply to linus/master v6.10-rc4 next-20240621]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+On Thu, 20 Jun 2024 16:39:43 -0400 you wrote:
+> We support multicast addresses, so enable it by default.
+> 
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+> ---
+> 
+>  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 1 -
+>  1 file changed, 1 deletion(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Mark-Brown/linux-next-build-failure-after-merge-of-the-bpf-next-tree/20240618-022240
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/hid/hid.git for-next
-patch link:    https://lore.kernel.org/r/ZnB9X1Jj6c04ufC0%40sirena.org.uk
-patch subject: linux-next: build failure after merge of the bpf-next tree
-config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20240622/202406221626.JK0Nnkxy-lkp@intel.com/config)
-compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240622/202406221626.JK0Nnkxy-lkp@intel.com/reproduce)
+Here is the summary with links:
+  - [net-next] net: xilinx: axienet: Enable multicast by default
+    https://git.kernel.org/netdev/net-next/c/185d72112b95
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202406221626.JK0Nnkxy-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/hid/bpf/hid_bpf_struct_ops.c:280:16: error: initialization of 'int (*)(void *)' from incompatible pointer type 'int (*)(void *, struct bpf_link *)' [-Werror=incompatible-pointer-types]
-     280 |         .reg = hid_bpf_reg,
-         |                ^~~~~~~~~~~
-   drivers/hid/bpf/hid_bpf_struct_ops.c:280:16: note: (near initialization for 'bpf_hid_bpf_ops.reg')
->> drivers/hid/bpf/hid_bpf_struct_ops.c:281:18: error: initialization of 'void (*)(void *)' from incompatible pointer type 'void (*)(void *, struct bpf_link *)' [-Werror=incompatible-pointer-types]
-     281 |         .unreg = hid_bpf_unreg,
-         |                  ^~~~~~~~~~~~~
-   drivers/hid/bpf/hid_bpf_struct_ops.c:281:18: note: (near initialization for 'bpf_hid_bpf_ops.unreg')
-   cc1: some warnings being treated as errors
-
-
-vim +280 drivers/hid/bpf/hid_bpf_struct_ops.c
-
-ebc0d8093e8c97 Benjamin Tissoires 2024-06-08  274  
-ebc0d8093e8c97 Benjamin Tissoires 2024-06-08  275  static struct bpf_struct_ops bpf_hid_bpf_ops = {
-ebc0d8093e8c97 Benjamin Tissoires 2024-06-08  276  	.verifier_ops = &hid_bpf_verifier_ops,
-ebc0d8093e8c97 Benjamin Tissoires 2024-06-08  277  	.init = hid_bpf_ops_init,
-ebc0d8093e8c97 Benjamin Tissoires 2024-06-08  278  	.check_member = hid_bpf_ops_check_member,
-ebc0d8093e8c97 Benjamin Tissoires 2024-06-08  279  	.init_member = hid_bpf_ops_init_member,
-ebc0d8093e8c97 Benjamin Tissoires 2024-06-08 @280  	.reg = hid_bpf_reg,
-ebc0d8093e8c97 Benjamin Tissoires 2024-06-08 @281  	.unreg = hid_bpf_unreg,
-ebc0d8093e8c97 Benjamin Tissoires 2024-06-08  282  	.name = "hid_bpf_ops",
-ebc0d8093e8c97 Benjamin Tissoires 2024-06-08  283  	.cfi_stubs = &__bpf_hid_bpf_ops,
-ebc0d8093e8c97 Benjamin Tissoires 2024-06-08  284  	.owner = THIS_MODULE,
-ebc0d8093e8c97 Benjamin Tissoires 2024-06-08  285  };
-ebc0d8093e8c97 Benjamin Tissoires 2024-06-08  286  
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
