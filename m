@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-105887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56C689135F2
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 22:10:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA3929135F5
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 22:11:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB1581F224D9
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 20:10:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9EFE1C20B18
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 20:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD9B357CBC;
-	Sat, 22 Jun 2024 20:10:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9708758ABC;
+	Sat, 22 Jun 2024 20:11:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h1GrBgMc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q0RPBgVK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230BE26AF0;
-	Sat, 22 Jun 2024 20:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D300126AF0;
+	Sat, 22 Jun 2024 20:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719087048; cv=none; b=FRYXJJDFQT/2Sec9MemlLI5HrJKyTd3sa5+2MClvoEyoawStyy2u5bjcogg099dqkqmTKLyL8sB8elY0nom5EMPVq9lSkOF9nBjJ5mNBtMrL5QtVqYMV5kWTVjmk93Y5lSltrpH5JNXlsUrLsMk0v52FVZqn3Q1EiYPCJPInM84=
+	t=1719087096; cv=none; b=FRuVnV16QtsqfU+66StwvMB07aCf6ipTQ/Tl2otallx98iAAPE9qrXoU+YbLsOwTzGUllC5luwtS4dGqwXH7/9BqkDTifsifg0MdoBWrJROEKXurlxArFhRj0pMxlArlHKAcH3iLU/uZvISjh7z+J8iJSYVTJ6+Y/Lz7dIxNQgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719087048; c=relaxed/simple;
-	bh=fwmdlWbIiXExgoJhGW10urHmbfOMiDt8yk/9TNg0xVA=;
+	s=arc-20240116; t=1719087096; c=relaxed/simple;
+	bh=+zXOwbMkBziGkH1T0R/5PmJNVe24xZpz4eiv1eSe3OQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MpvxoywEvQPygPV0WEFF9skNix5fczViPr5yKcvS51+yzTogpgXYcmxkwZmb3W20HhwpyfR6R+YQ3dfyna6qGSRlqZQeB0BdXSsh1y7GGeCONVlFXmXO3PX5eyZ9tIabLFYSkHQFfdCWQ0t0Ng8PXAojj6fTIAXE3EejJVLCwnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h1GrBgMc; arc=none smtp.client-ip=209.85.167.171
+	 In-Reply-To:Content-Type; b=fad4fa/AsYLRT9FlkG8ZNTFd74XLegLb0axQwSx9IjGjI9CVgTECXKFofq4yUbNBdcxdruygb9C1wI0TAFIosjky6ul4n6nKEFpv5853n7X2526GQXm6Z+k6re0BgvB4Sg+NKviwUXNeETZNcCKZnVokPEGi7ecJzyJAutm2Q54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q0RPBgVK; arc=none smtp.client-ip=209.85.161.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3d21b3da741so1657713b6e.2;
-        Sat, 22 Jun 2024 13:10:46 -0700 (PDT)
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5c1b734383cso1359586eaf.3;
+        Sat, 22 Jun 2024 13:11:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719087046; x=1719691846; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1719087094; x=1719691894; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=5Cp87DnzZ8ubh+P4vugkHALA0amyLWY1eDfV3e8BFDc=;
-        b=h1GrBgMc+b30DdktYUQTG6+C/06Ub/j/niK/tW/D30fsPlZJr3FkZQCnOxcV8CSeNL
-         xznr38vpoTalRG3uw3RyVEZ7iPvXMX1IAnXytniqgv6O+laczbhygFC9C5ugsCfuZkj6
-         w8GACrgvoW9HJ4LqYWtQCu+MeLiYtMXatqntKBuGGdCVSeba1Tf6AIkncRiMnB/ENN5i
-         WtdstDpfpoXqEAuMYbmVFl4eJ4rtsaz+S5xIOPTpqR/mAMyn0xmLOFev/MH7QC+uFV/H
-         LfxCP+D+29+RjyTtDvkg4xtVnyiBZUF+75rgYO88TN6OZEByTgEiV8eAQinAPIAOAHMm
-         hZWw==
+        bh=poMItkc0awxNCUZaVOb8H2ye3xNgX1XTsKLqSsFt9+I=;
+        b=Q0RPBgVKrGStSmTZIDPOGTNxQ9evDORX6ZGqQd0RRbjLM6I9pi2HVO8JPARVKj9qZa
+         Bewe/n0EneOjsndFNRV13JFB+T13L3mik8yNShXrF/ulzKtASPeexL5P6HKxTiFNBhkx
+         o0rgrg+gzJaijUwzoknveFMcE20U6IrvMUhja5LNksVpetNQjjydvi7fTSKBmOTN9MN/
+         SMTCFdccLmgrhNzmUpuLOK53B+qai6gBAYN2b3zcQvIE76RhVF10kd2O7alZz10eDHCN
+         IFIAKLD8hA0t6tTUcJMuMFFljgK69wbkpBcXFgZZNMrdvK3EQ8+9F6bBNMbYJpMff7yv
+         woLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719087046; x=1719691846;
+        d=1e100.net; s=20230601; t=1719087094; x=1719691894;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5Cp87DnzZ8ubh+P4vugkHALA0amyLWY1eDfV3e8BFDc=;
-        b=Vw/HCIl8LBUdxlJYQqlQKhx7OTr4AukPqY/nMCh/1LWkJuFeKftMJu6cvOSymNALld
-         xu7EhEGayDzF1J2CkfyjFWi4zcujL00ZMPocsGwngdItVRQFGzovw5z5Sc3QcKT7Lhak
-         F4Fdkdk8YrfGhXxvODpWYeqRgNU9FlqkLospj5VY97KVdosBFxbOwSYk2yfgO22IJJY6
-         GLgKuUDBKOMOuexh03ajZXv8aXTZEQ3yTafZDyGPYIZGIcRL8WgA2cwIfe1p1eekPUva
-         i6QbIMCXS2oTy7uRHdd402UNUMjIbM7Fon+0ZUiQCxD9CX6hrLRib44tVlzJsU74tNaz
-         gwKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW/89+yJGKY3zY3UIp11v5TcxNKYWIrYLHd3bDQALlvvKOYOSQ3YLG1M2Zd/gyPW5zvgNS3Dwj6O5GFFdilF2RoI0oOZeCYEM69/TzjWYpzVwJ2o49qvH3+/v2ju9eNUw318mktHoz42Pf/SBxr2aSDiDX5K/xaFzaq+NFnX7qF
-X-Gm-Message-State: AOJu0YzCpm7A/gZbx+YZjcTE5f0mlWQSTru1caaKX+pKXCDUfm7F8L0m
-	B7uKPOT3zz9AayLL5Md/AUYoOYffOm5KEa5i7mtzBySd1F0mOtEElAQptC8Z
-X-Google-Smtp-Source: AGHT+IE4IvNVJ2jnOFTUyi+tw9zD7x6mlnie3P5tbq7r4wwQymw1PqhvbVkDZd7gts09MtoxOns5cQ==
-X-Received: by 2002:a05:6808:1a1e:b0:3d5:1bd8:ab17 with SMTP id 5614622812f47-3d5459b4aa5mr1034519b6e.27.1719087045248;
-        Sat, 22 Jun 2024 13:10:45 -0700 (PDT)
+        bh=poMItkc0awxNCUZaVOb8H2ye3xNgX1XTsKLqSsFt9+I=;
+        b=Z61PAbsc3LuTG2iYfaNFv0HZT89Xz71tuauvC8MIT/wGengnmACaCosIfrTmSwCYYQ
+         FhZwFea59jc239oyNQubkOU4RFLLKanfqY67FjFMU61/0xOb9xd/oAZ9+zo7YYAR0InM
+         jekZlcD7ZJ51UK58/TwaV8CJTPB/z9DWdWdDSp3bcPqOaTLO3bKs8z4Zh4p4x/Oyqgjz
+         B7VYoQN+c2lV36KDev00wgfiymbopsvX8jUvOX6IxDAKHdI7aixw4x81dcIyXq3sC4dX
+         IaT934LfXFrIAqE3adYbnIlcjwQXzl/AaEdtPRl9mDZxeujQi89quqfb+ECnGkVU4Azi
+         pWBg==
+X-Forwarded-Encrypted: i=1; AJvYcCWlxJX4PouDzo9zEmHwoNsi9vdmX1J4elzadBKQy9wEX/O2c2mhgbEQyttEYF3nIJdEPv1llL8Id11U+VAp+oz/9zGe/KTIhR0+wy1cf3pk1dPa14JQUsmVoY8HakB7sDqonftZv9/zWq1gUF6ucWOhhL0taiva7Qo+vB+vE1LG
+X-Gm-Message-State: AOJu0YyL2wcSERaPOKw7G6AIFZK+KYF/jkk0Zr7WxbWYd27nroN5lQs/
+	UGTbY32uLf/IqCA3Tv4uxMQtd3FPCDnb0Mg4JY6I2YcMukmkF+Ad
+X-Google-Smtp-Source: AGHT+IEFb5N47Q3F+FnjSvLjyHe+WVPPRSLpJ7o2xocgsv5A52VALJxhlmBSkYq6FBiGkJYUqPw2mA==
+X-Received: by 2002:a05:6820:2210:b0:5c1:eef3:3971 with SMTP id 006d021491bc7-5c1eef339ccmr928586eaf.8.1719087093668;
+        Sat, 22 Jun 2024 13:11:33 -0700 (PDT)
 Received: from ?IPV6:2603:8080:2300:de:3d70:f8:6869:93de? ([2603:8080:2300:de:3d70:f8:6869:93de])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3d5344fa290sm810713b6e.14.2024.06.22.13.10.44
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-700a8037e37sm340635a34.78.2024.06.22.13.11.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 22 Jun 2024 13:10:44 -0700 (PDT)
-Message-ID: <28e229d9-253a-4c83-a0f8-09da8a9bf78d@gmail.com>
-Date: Sat, 22 Jun 2024 15:10:43 -0500
+        Sat, 22 Jun 2024 13:11:33 -0700 (PDT)
+Message-ID: <6d51478f-2311-4f33-88d4-ff20d89fe621@gmail.com>
+Date: Sat, 22 Jun 2024 15:11:32 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,82 +76,183 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] Documentation: best practices for using Link trailers
+Subject: Re: [PATCH 1/2] Documentation: fix links to mailing list services
 To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
  Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
  Paolo Abeni <pabeni@redhat.com>
 Cc: workflows@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, ksummit@lists.linux.dev
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 References: <20240618-docs-patch-msgid-link-v1-0-30555f3f5ad4@linuxfoundation.org>
- <20240618-docs-patch-msgid-link-v1-2-30555f3f5ad4@linuxfoundation.org>
+ <20240618-docs-patch-msgid-link-v1-1-30555f3f5ad4@linuxfoundation.org>
 Content-Language: en-US
 From: Carlos Bilbao <carlos.bilbao.osdev@gmail.com>
-In-Reply-To: <20240618-docs-patch-msgid-link-v1-2-30555f3f5ad4@linuxfoundation.org>
+In-Reply-To: <20240618-docs-patch-msgid-link-v1-1-30555f3f5ad4@linuxfoundation.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 On 6/18/24 11:42, Konstantin Ryabitsev wrote:
 
-> Based on multiple conversations, most recently on the ksummit mailing
-> list [1], add some best practices for using the Link trailer, such as:
+> There have been some changes to the way mailing lists are hosted at
+> kernel.org, so fix the links that are pointing at the outdated
+> resources.
 >
-> - how to use markdown-like bracketed numbers in the commit message to
-> indicate the corresponding link
-> - when to use lore.kernel.org vs patch.msgid.link domains
->
-> Cc: ksummit@lists.linux.dev
-> Link: https://lore.kernel.org/20240617-arboreal-industrious-hedgehog-5b84ae@meerkat # [1]
 > Signed-off-by: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-
-
-Nice! 
-
-Acked-by: Carlos Bilbao <carlos.bilbao.osdev@gmail.com>
-
-
 > ---
->  Documentation/process/maintainer-tip.rst | 24 ++++++++++++++++++------
->  1 file changed, 18 insertions(+), 6 deletions(-)
+>  Documentation/process/2.Process.rst          |  8 ++++----
+>  Documentation/process/howto.rst              | 10 +++++-----
+>  Documentation/process/kernel-docs.rst        |  5 ++---
+>  Documentation/process/maintainer-netdev.rst  |  5 ++---
+>  Documentation/process/submitting-patches.rst | 15 +++++----------
+>  5 files changed, 18 insertions(+), 25 deletions(-)
 >
-> diff --git a/Documentation/process/maintainer-tip.rst b/Documentation/process/maintainer-tip.rst
-> index 64739968afa6..57ffa553c21e 100644
-> --- a/Documentation/process/maintainer-tip.rst
-> +++ b/Documentation/process/maintainer-tip.rst
-> @@ -375,14 +375,26 @@ following tag ordering scheme:
->     For referring to an email on LKML or other kernel mailing lists,
->     please use the lore.kernel.org redirector URL::
+> diff --git a/Documentation/process/2.Process.rst b/Documentation/process/2.Process.rst
+> index 613a01da4717..ef3b116492df 100644
+> --- a/Documentation/process/2.Process.rst
+> +++ b/Documentation/process/2.Process.rst
+> @@ -392,13 +392,13 @@ represent a potential hazard to developers, who risk getting buried under a
+>  load of electronic mail, running afoul of the conventions used on the Linux
+>  lists, or both.
 >  
-> -     https://lore.kernel.org/r/email-message@id
-> +     Link: https://lore.kernel.org/email-message@id
+> -Most kernel mailing lists are run on vger.kernel.org; the master list can
+> +Most kernel mailing lists are hosted at kernel.org; the master list can
+>  be found at:
 >  
-> -   The kernel.org redirector is considered a stable URL, unlike other email
-> -   archives.
-> +   This URL should be used when referring to relevant mailing list
-> +   resources, related patch sets, or other notable discussion threads.
-> +   A convenient way to associate Link trailers with the accompanying
-> +   message is to use markdown-like bracketed notation, for example::
+> -	http://vger.kernel.org/vger-lists.html
+> +	https://subspace.kernel.org
 >  
-> -   Maintainers will add a Link tag referencing the email of the patch
-> -   submission when they apply a patch to the tip tree. This tag is useful
-> -   for later reference and is also used for commit notifications.
-> +     A similar approach was attempted before as part of a different
-> +     effort [1], but the initial implementation caused too many
-> +     regressions [2], so it was backed out and reimplemented.
-> +
-> +     Link: https://lore.kernel.org/some-msgid@here # [1]
-> +     Link: https://bugzilla.example.org/bug/12345  # [2]
-> +
-> +   When using the ``Link:`` trailer to indicate the provenance of the
-> +   patch, you should use the dedicated ``patch.msgid.link`` domain. This
-> +   makes it possible for automated tooling to establish which link leads
-> +   to the original patch submission. For example::
-> +
-> +     Link: https://patch.msgid.link/patch-source-msgid@here
+> -There are lists hosted elsewhere, though; a number of them are at
+> -redhat.com/mailman/listinfo.
+> +There are lists hosted elsewhere; please check the MAINTAINERS file for
+> +the list relevant for any particular subsystem.
 >  
->  Please do not use combined tags, e.g. ``Reported-and-tested-by``, as
->  they just complicate automated extraction of tags.
+>  The core mailing list for kernel development is, of course, linux-kernel.
+>  This list is an intimidating place to be; volume can reach 500 messages per
+> diff --git a/Documentation/process/howto.rst b/Documentation/process/howto.rst
+> index eebda4910a88..9438e03d6f50 100644
+> --- a/Documentation/process/howto.rst
+> +++ b/Documentation/process/howto.rst
+> @@ -331,7 +331,7 @@ they need to be integration-tested.  For this purpose, a special
+>  testing repository exists into which virtually all subsystem trees are
+>  pulled on an almost daily basis:
+>  
+> -	https://git.kernel.org/?p=linux/kernel/git/next/linux-next.git
+> +	https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
+>  
+>  This way, the linux-next gives a summary outlook onto what will be
+>  expected to go into the mainline kernel at the next merge period.
+> @@ -373,12 +373,12 @@ As some of the above documents describe, the majority of the core kernel
+>  developers participate on the Linux Kernel Mailing list.  Details on how
+>  to subscribe and unsubscribe from the list can be found at:
+>  
+> -	http://vger.kernel.org/vger-lists.html#linux-kernel
+> +	https://subspace.kernel.org/subscribing.html
+>  
+>  There are archives of the mailing list on the web in many different
+>  places.  Use a search engine to find these archives.  For example:
+>  
+> -	https://lore.kernel.org/lkml/
+> +	https://lore.kernel.org/linux-kernel/
+>  
+>  It is highly recommended that you search the archives about the topic
+>  you want to bring up, before you post it to the list. A lot of things
+> @@ -393,13 +393,13 @@ groups.
+>  Many of the lists are hosted on kernel.org. Information on them can be
+>  found at:
+>  
+> -	http://vger.kernel.org/vger-lists.html
+> +	https://subspace.kernel.org
+>  
+>  Please remember to follow good behavioral habits when using the lists.
+>  Though a bit cheesy, the following URL has some simple guidelines for
+>  interacting with the list (or any list):
+>  
+> -	http://www.albion.com/netiquette/
+> +	https://subspace.kernel.org/etiquette.html
+>  
+>  If multiple people respond to your mail, the CC: list of recipients may
+>  get pretty large. Don't remove anybody from the CC: list without a good
+> diff --git a/Documentation/process/kernel-docs.rst b/Documentation/process/kernel-docs.rst
+> index 8660493b91d0..3476fb854c7a 100644
+> --- a/Documentation/process/kernel-docs.rst
+> +++ b/Documentation/process/kernel-docs.rst
+> @@ -194,9 +194,8 @@ Miscellaneous
+>  
+>      * Name: **linux-kernel mailing list archives and search engines**
+>  
+> -      :URL: http://vger.kernel.org/vger-lists.html
+> -      :URL: http://www.uwsg.indiana.edu/hypermail/linux/kernel/index.html
+> -      :URL: http://groups.google.com/group/mlist.linux.kernel
+> +      :URL: https://subspace.kernel.org
+> +      :URL: https://lore.kernel.org
 
+
+Nice!
+Reviewed-by: Carlos Bilbao <carlos.bilbao.osdev@gmail.com>
+
+
+>        :Keywords: linux-kernel, archives, search.
+>        :Description: Some of the linux-kernel mailing list archivers. If
+>          you have a better/another one, please let me know.
+> diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
+> index 5e1fcfad1c4c..fe8616397d63 100644
+> --- a/Documentation/process/maintainer-netdev.rst
+> +++ b/Documentation/process/maintainer-netdev.rst
+> @@ -25,9 +25,8 @@ drivers/net (i.e. hardware specific drivers) in the Linux source tree.
+>  Note that some subsystems (e.g. wireless drivers) which have a high
+>  volume of traffic have their own specific mailing lists and trees.
+>  
+> -The netdev list is managed (like many other Linux mailing lists) through
+> -VGER (http://vger.kernel.org/) with archives available at
+> -https://lore.kernel.org/netdev/
+> +Like many other Linux mailing lists, the netdev list is hosted at
+> +kernel.org with archives available at https://lore.kernel.org/netdev/.
+>  
+>  Aside from subsystems like those mentioned above, all network-related
+>  Linux development (i.e. RFC, review, comments, etc.) takes place on
+> diff --git a/Documentation/process/submitting-patches.rst b/Documentation/process/submitting-patches.rst
+> index 66029999b587..f310f2f36666 100644
+> --- a/Documentation/process/submitting-patches.rst
+> +++ b/Documentation/process/submitting-patches.rst
+> @@ -119,10 +119,10 @@ web, point to it.
+>  
+>  When linking to mailing list archives, preferably use the lore.kernel.org
+>  message archiver service. To create the link URL, use the contents of the
+> -``Message-Id`` header of the message without the surrounding angle brackets.
+> +``Message-ID`` header of the message without the surrounding angle brackets.
+>  For example::
+>  
+> -    Link: https://lore.kernel.org/r/30th.anniversary.repost@klaava.Helsinki.FI/
+> +    Link: https://lore.kernel.org/30th.anniversary.repost@klaava.Helsinki.FI
+>  
+>  Please check the link to make sure that it is actually working and points
+>  to the relevant message.
+> @@ -243,11 +243,9 @@ linux-kernel@vger.kernel.org should be used by default for all patches, but the
+>  volume on that list has caused a number of developers to tune it out.  Please
+>  do not spam unrelated lists and unrelated people, though.
+>  
+> -Many kernel-related lists are hosted on vger.kernel.org; you can find a
+> -list of them at http://vger.kernel.org/vger-lists.html.  There are
+> -kernel-related lists hosted elsewhere as well, though.
+> -
+> -Do not send more than 15 patches at once to the vger mailing lists!!!
+> +Many kernel-related lists are hosted at kernel.org; you can find a list
+> +of them at https://subspace.kernel.org.  There are kernel-related lists
+> +hosted elsewhere as well, though.
+>  
+>  Linus Torvalds is the final arbiter of all changes accepted into the
+>  Linux kernel.  His e-mail address is <torvalds@linux-foundation.org>.
+> @@ -866,9 +864,6 @@ Greg Kroah-Hartman, "How to piss off a kernel subsystem maintainer".
+>  
+>    <http://www.kroah.com/log/linux/maintainer-06.html>
+>  
+> -NO!!!! No more huge patch bombs to linux-kernel@vger.kernel.org people!
+> -  <https://lore.kernel.org/r/20050711.125305.08322243.davem@davemloft.net>
+> -
+>  Kernel Documentation/process/coding-style.rst
+>  
+>  Linus Torvalds's mail on the canonical patch format:
+>
 
 Thanks,
 Carlos
