@@ -1,156 +1,119 @@
-Return-Path: <netdev+bounces-105841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FABA9131EE
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 06:27:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D03B9131F7
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 06:40:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEE77286511
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 04:27:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A23FD2867E7
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 04:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE831374C4;
-	Sat, 22 Jun 2024 04:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 347BC6AFAE;
+	Sat, 22 Jun 2024 04:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="gfuDyCNM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B9kPLP8e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A8A2D02E;
-	Sat, 22 Jun 2024 04:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2EB95E093;
+	Sat, 22 Jun 2024 04:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719030471; cv=none; b=dVp+/rN1wg582rt43v2xTMSeEPzTjVNDD8QSzy+s/oyFsNKsMSrQBZrEGniNrBSFSSYbbHZppWVl96CkAGOHs4KjLVBjeqqxldOJqqUxce4kAXjKbz0uB8zU4ywUX5vHcpDv55fYO6gsIk7N6xfvPd9lpscdfkkEs9FkF4rOfao=
+	t=1719031223; cv=none; b=an57czI7JtQ+53TmmYWTa8Pst9K4APrtEpY8boPoim5RJu8HlGT/oedmLNYlJgxsDnIzNYKEP8WLM7Rd4HPXQ0dVLkGmAw/jmqGa3L1jpXZYJ/JOX05af7oiNh6vxcWCXaIbDxYaJL1ZnSkj9S740Ix1+CHUTd7W/x26Te84LOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719030471; c=relaxed/simple;
-	bh=ItteozRxD9pZl0Vo/EkeGN+3dFzTCeY/ora39soN/1A=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Ko5Dysxl4I7n7GAHPawS0/H7gzILqOz6+GCJCjlTBBCX+jSuKOeAqyMPfOKH+QBday6pKblfClZKw+sTBeWgCntg5yZ+ohrG0/uFewYzaY4vVerh0JXfLJ+9vZNvG62BwBLilCx787lEa5QljGdTYzKCwmLEGKNvLoz0UvtxNkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=gfuDyCNM; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1719030460;
-	bh=/VVyoTFqBHv0DbfaJoIZVT/jCvwNcFS1WP6GyNkTAeg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=gfuDyCNMt/fwzbmPByYmLccOW0b2JS0DQfgb5a0Aw7JvniOtsRte9Jh6LTsQW1jjy
-	 L03nHizw9R55fA0ERzscVZ0Mumd4W+t2BSjAgm5xrPAartRiZ+7UtRp2NdQERSvgqf
-	 w9sVZrEw69YgjuOcyDaaEvY3ZGD8DOfeXNjCuaash2hvrV1i/L97UXqJvy2rzu8VMO
-	 8n76/lCsFKBOgWFFpbkREVf964cdgABz1erMsSgPBC6/nInWI1uCUHiYXxHMV3Yvxs
-	 OFLRIZsGDD7D/3xPnqGUAgqM7swfdsFMkKi1dQ2e2ftGDu0fqKVbYgohzMcfKOyKtu
-	 To9SlW6KAh4qg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4W5h6046pKz4w2S;
-	Sat, 22 Jun 2024 14:27:36 +1000 (AEST)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>, Jonathan Corbet
- <corbet@lwn.net>, Carlos Bilbao <carlos.bilbao.osdev@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: workflows@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Konstantin Ryabitsev
- <konstantin@linuxfoundation.org>, ksummit@lists.linux.dev
-Subject: Re: [PATCH v2 2/2] Documentation: best practices for using Link
- trailers
-In-Reply-To: <20240619-docs-patch-msgid-link-v2-2-72dd272bfe37@linuxfoundation.org>
-References: <20240619-docs-patch-msgid-link-v2-0-72dd272bfe37@linuxfoundation.org>
- <20240619-docs-patch-msgid-link-v2-2-72dd272bfe37@linuxfoundation.org>
-Date: Sat, 22 Jun 2024 14:27:34 +1000
-Message-ID: <87v821d2kp.fsf@mail.lhotse>
+	s=arc-20240116; t=1719031223; c=relaxed/simple;
+	bh=35lPIAcl+pcqfcof5ywz9pzbSIwwh/OcPd7wfAdsxkE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iahLxrhKyyFoh+JLfCYbvUoDDr7pB97ap4Yod3O8+KhkEXln3DoJCCleuDf8VGp59jb89OM6Fp/3jRVngghAe+JnQtQjyK++StNEidSt+zyNBLiZokoN96+u6P7LggOxAWDhiovBMnUaKO2kZAQlXlXYewfQhy7IxlV+XPXHjLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B9kPLP8e; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7066463c841so336983b3a.1;
+        Fri, 21 Jun 2024 21:40:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719031221; x=1719636021; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cukKdkt4tFd+Q1wgdPSxE43mgLW9ldcQfOcQcI9wtyc=;
+        b=B9kPLP8e+WE6GHIFSiHb4RkQuvEZ3uYkx0AZtRDp60R7jdMA62xPBBBBCI6orZurnK
+         +53agDpA0CrGFIedZ4USW1QTc5LoteME5eVbSnSFoHaMDcDWZday8p3iwNM07LXIrJ2E
+         3whsvpqqqLGjVnRki3RLywH34dXOj6Lzt6TJz+XNwXrSbphGPkpzbB5M6BSgLTriC3xZ
+         KtYoT/yLYDsswokb78o7Xt2GKZvwRS3ti5DY9e7lg9xMSymAU2mQd7j6wRrExwuHRz9Z
+         YLNswFIDFytZ9DjCOJlVVGBYRl5hGItkOY77ddOWTHNnbyN5Zmk5M2F0F94M3EWQqT4k
+         hY6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719031221; x=1719636021;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cukKdkt4tFd+Q1wgdPSxE43mgLW9ldcQfOcQcI9wtyc=;
+        b=kFZHQwznAdsr/BJ5+/cDilqBoJq9jx9BSXP2xAbyvTvkdGqJYQeQVjApFaqRPt39/I
+         r3htycWBSzqF2KXzc+xqmD6GYWgxnHuYmisxhbuPqfXmb7HxG74kp3unY/KVuvHs3tfr
+         C2Y1Ypjh9Uxu3+8NDWvVPYKlKCM+j1BdX3e4J+xK3dF+5ePaHxkXGtomC52r65yJWE6k
+         kPkaWZqx5xbfBGLV0m9kcurno0aQ6l14wTrxcJUJvQtQoEeaGRSInQlcrCEyvtzSIiA7
+         WTuAqJ70S+X47anDltdmOTm0MqwjZcYWtsCoOWOTgxj1Jv5GoqZQdCqITnqGjkAPzGQ/
+         zPOg==
+X-Forwarded-Encrypted: i=1; AJvYcCWB0fpZ08/NI5nncu2a4N0/c3d5hoeCqyH4d4G5nm3DFeiDyELL33hD1b1a3n2vULEeLr6OhtmKwGiTVAuvvaW9e2wW470TAzwh8tyNZ80/YXNwWRVzvspHU4trVPjK7RH5itDejfR7atABjVgpIEJjxoCy2aHaKy9q77WJIIf7cqi84orEhqPo
+X-Gm-Message-State: AOJu0YziaiZC78tMj4GgrDu7ktNUVnbFybFVS2X8VfcJuO+AQ2VQq6Fv
+	tHzy2jDcxxlShc47AHAAJ8GQ6btvyUHFOmpILhaXy4+BJoArCA0Y
+X-Google-Smtp-Source: AGHT+IEOkOmeZGXSMZ71jSHndSpMWPeuFbLksWoSe5WdzNoeJi3Oa4TP58fPUoCbu/PdHGBN+IADNQ==
+X-Received: by 2002:a62:6586:0:b0:706:29f3:1f03 with SMTP id d2e1a72fcca58-7064484f37cmr5938980b3a.20.1719031220892;
+        Fri, 21 Jun 2024 21:40:20 -0700 (PDT)
+Received: from [192.168.50.95] ([118.32.98.101])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7065e2c103bsm1235052b3a.92.2024.06.21.21.40.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jun 2024 21:40:20 -0700 (PDT)
+Message-ID: <d1889c3d-b910-4599-a666-ea9e1510e6cc@gmail.com>
+Date: Sat, 22 Jun 2024 13:40:14 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net/sched: Fixes: 51270d573a8d NULL ptr deref in
+ perf_trace_qdisc_reset()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Pedro Tammela <pctammela@mojatatu.com>, netdev@vger.kernel.org,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Takashi Iwai <tiwai@suse.de>, "David S. Miller" <davem@davemloft.net>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Taehee Yoo <ap420073@gmail.com>,
+ Austin Kim <austindh.kim@gmail.com>, shjy180909@gmail.com,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ ppbuk5246@gmail.com, Yeoreum Yun <yeoreum.yun@arm.com>
+References: <20240621162552.5078-4-yskelg@gmail.com>
+ <20240621170546.0588eec5@kernel.org>
+Content-Language: en-US
+From: Yunseong Kim <yskelg@gmail.com>
+In-Reply-To: <20240621170546.0588eec5@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Konstantin Ryabitsev <konstantin@linuxfoundation.org> writes:
-> Based on multiple conversations, most recently on the ksummit mailing
-> list [1], add some best practices for using the Link trailer, such as:
->
-> - how to use markdown-like bracketed numbers in the commit message to
-> indicate the corresponding link
-> - when to use lore.kernel.org vs patch.msgid.link domains
->
-> Cc: ksummit@lists.linux.dev
-> Link: https://lore.kernel.org/20240617-arboreal-industrious-hedgehog-5b84ae@meerkat # [1]
-> Signed-off-by: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-> ---
->  Documentation/process/maintainer-tip.rst | 30 ++++++++++++++++++++++--------
->  1 file changed, 22 insertions(+), 8 deletions(-)
->
-> diff --git a/Documentation/process/maintainer-tip.rst b/Documentation/process/maintainer-tip.rst
-> index 64739968afa6..ba312345d030 100644
-> --- a/Documentation/process/maintainer-tip.rst
-> +++ b/Documentation/process/maintainer-tip.rst
-> @@ -372,17 +372,31 @@ following tag ordering scheme:
->  
->   - Link: ``https://link/to/information``
->  
-> -   For referring to an email on LKML or other kernel mailing lists,
-> -   please use the lore.kernel.org redirector URL::
-> +   For referring to an email posted to the kernel mailing lists, please
-> +   use the lore.kernel.org redirector URL::
->  
-> -     https://lore.kernel.org/r/email-message@id
-> +     Link: https://lore.kernel.org/email-message-id@here
->  
-> -   The kernel.org redirector is considered a stable URL, unlike other email
-> -   archives.
-> +   This URL should be used when referring to relevant mailing list
-> +   topics, related patch sets, or other notable discussion threads.
-> +   A convenient way to associate ``Link:`` trailers with the commit
-> +   message is to use markdown-like bracketed notation, for example::
->  
-> -   Maintainers will add a Link tag referencing the email of the patch
-> -   submission when they apply a patch to the tip tree. This tag is useful
-> -   for later reference and is also used for commit notifications.
-> +     A similar approach was attempted before as part of a different
-> +     effort [1], but the initial implementation caused too many
-> +     regressions [2], so it was backed out and reimplemented.
-> +
-> +     Link: https://lore.kernel.org/some-msgid@here # [1]
-> +     Link: https://bugzilla.example.org/bug/12345  # [2]
+Hi Jakub,
 
-Does it actually make sense to use the Link: prefix here? These sort of
-links are part of the prose, they're not something a script can download
-and make any sense of.
+On 6/22/24 9:05 오전, Jakub Kicinski wrote:
+> On Sat, 22 Jun 2024 01:25:54 +0900 yskelg@gmail.com wrote:
+>> Subject: [PATCH net v2] net/sched: Fixes: 51270d573a8d NULL ptr deref in perf_trace_qdisc_reset()
+> 
+> the Fixes tag goes before your signoff, rather than as title.
+> try
+> 
+>   git log --grep=Fixes
 
-I see some existing usage of the above style, but equally there's lots
-of examples of footnote-style links without the Link: tag, eg:
+Oh, I'm sorry. I completely misunderstood. Thank you for kindly explaining!
 
-commit 40b561e501768ef24673d0e1d731a7b9b1bc6709
-Merge: d9f843fbd45e 31611cc8faa0
-Author: Arnd Bergmann <arnd@arndb.de>
-Date:   Mon Apr 29 22:29:44 2024 +0200
+I'll take your advice and send the next version of the patch!
 
-    Merge tag 'tee-ts-for-v6.10' of https://git.linaro.org/people/jens.wiklander/linux-tee into soc/drivers
-
-    TEE driver for Trusted Services
-
-    This introduces a TEE driver for Trusted Services [1].
-
-    Trusted Services is a TrustedFirmware.org project that provides a
-    framework for developing and deploying device Root of Trust services in
-    FF-A [2] Secure Partitions. The project hosts the reference
-    implementation of Arm Platform Security Architecture [3] for Arm
-    A-profile devices.
-
-    ...
-
-    [1] https://www.trustedfirmware.org/projects/trusted-services/
-    [2] https://developer.arm.com/documentation/den0077/
-    [3] https://www.arm.com/architecture/security-features/platform-security
-
-
-The above style is standard markdown style for reference links (or as
-standard as markdown gets).
-
-cheers
+Warm Regards,
+Yunseong Kim
 
