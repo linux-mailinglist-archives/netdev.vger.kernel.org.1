@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-105826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4C0691314E
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 03:20:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5462A913154
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 03:20:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73EAD1F233D9
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 01:20:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 687191C21062
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 01:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF374399;
-	Sat, 22 Jun 2024 01:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C291A32;
+	Sat, 22 Jun 2024 01:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q+NvcuHi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LTEzZ24g"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4356A32;
-	Sat, 22 Jun 2024 01:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533318BEE;
+	Sat, 22 Jun 2024 01:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719019231; cv=none; b=TXOzobuVAbp51Wh8sJ1E/FZvRVMxvIlwlz+JEOVE7F7ORbs38Dd3whJMQR92rdV/RIyLLyBZqRCc3dZj+tHaPsDHwthvGHc6rx52IfSC5PSG1ueGuaAq9BCDlwqrQa5uDzElwCitaJf0B0mHh+Cy1iDL4fhiuT4o3r5hskza4No=
+	t=1719019237; cv=none; b=LaT01XKhH5Ks+Te5kAHim2ixEgd24R6XGZpvBDEyt0mkUFeWYy0adatA68T8ovGNf3iE6tJ81EfUY37nNSLpdIM8GsTPEKHv6MLeHwsdsVt98X1fgDKOHCMo+WnzQLyK52DIxnu/9Gadvc91pBCI7eFmflATrTIsdK2bJnJNrKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719019231; c=relaxed/simple;
-	bh=myMQCTlzgeMQ6jiOQ7ZSjM+UrDbgE8T89P2Sms49IUY=;
+	s=arc-20240116; t=1719019237; c=relaxed/simple;
+	bh=SX03R1QAKqYMHT/7BDXtmiylpw+3IjqMhvoveNnBnDc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lIKLCjYAIG65p47ruquyXNHmX8tj7ZTvlqVOnLM0HIj1ZbR/0gn3mAMkxo/qa/6F7kfD2Qn1y2SGgXU+gf1wSabYEZG+7A+RQiwvdvarEV0tX3lzKJXpJhDaYA0KnNlXkN8uZZp7lzRgShMXS1QelSEpO8i+03o7OrNp0OnBBAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q+NvcuHi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D66CC4AF07;
-	Sat, 22 Jun 2024 01:20:31 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=DBvuVPyRgu+WVcbe+uwVxuSt50zj6zbFR3FXLA7CX0d/QI/gu/ghYljh3qPCiNnGmw26qXxpVDZkP45v7Q90cHvjqkT5KYSU4V8unrPMY9U1zChC62YyDCZJdp+BoK80T2TAxwPhgvyXB1tdLWoSBDhyVLwBNFXLY7UYRE/tNxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LTEzZ24g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DF2DAC4AF07;
+	Sat, 22 Jun 2024 01:20:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719019231;
-	bh=myMQCTlzgeMQ6jiOQ7ZSjM+UrDbgE8T89P2Sms49IUY=;
+	s=k20201202; t=1719019236;
+	bh=SX03R1QAKqYMHT/7BDXtmiylpw+3IjqMhvoveNnBnDc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=q+NvcuHi/76nQQ6q7HRiM+b+VaeJllq9GDTOonXUjA9m6SXpwqDjGGrRAIlaf9AAy
-	 hxbc9Wcj8U2p4Mkwuc4Kiv9PLXyiraXVkj/NAT1/uy2VOHt1bP4ag5XRyhn36y5Dol
-	 JqAeYwQHhFr1xC5cLrsaZj/xvXzxJSaCwQFVPJuy1FMwXt5nAW80cpdImBnYiCjwep
-	 uUIZjxhAfBSKculjFH/1hNaAaSZBN6TzISnlsx0slstFxPO+Ea66zy0gUi0HaP70GX
-	 XOHw6FLARvygW58y+h3+bbySCVzfOM0lXwPSeZgwU1oFZjlOPGisgA3i2KuHRdiSIs
-	 God6QpqYnIT/Q==
+	b=LTEzZ24g9RZL4d/K5PQ7aYbmfKknkNP5rQIAMYoYqQG7xSrl1N/zcYCP/w6Z5FyCt
+	 VjfTSkvTVOcIAw7N+gpfvdVTpiWsV0x0/ZMssgtlDY9j+PM5hiiRVwsmY2k9T9RVKE
+	 69pwisxBnW0FZ5hngvRqR8Ll2Z7cPqdhTZJCg5szblxW025kqbFr3iGRx/I28VdUv7
+	 k/5J0HIPQructEeISQENa8LUr7QqS9zO3RA+RLQE4GtdzPldRhPmXL8S1Uxmxb2aoE
+	 eiHXufBD5YiURaFd6Fu4O8fjfsaONMHHQ1lTj8+HzI1Weg/DtCf1E2ohtRHRSzAf5B
+	 t4y1qJXVKMn5g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0FC22C43140;
-	Sat, 22 Jun 2024 01:20:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D1D5CC54BB3;
+	Sat, 22 Jun 2024 01:20:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,83 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2] batman-adv: Don't accept TT entries for out-of-spec VIDs
+Subject: Re: [PATCH net-next 01/24] can: mcp251x: Fix up includes
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171901923106.1383.2164378801371432677.git-patchwork-notify@kernel.org>
-Date: Sat, 22 Jun 2024 01:20:31 +0000
-References: <20240621143915.49137-2-sw@simonwunderlich.de>
-In-Reply-To: <20240621143915.49137-2-sw@simonwunderlich.de>
-To: Simon Wunderlich <sw@simonwunderlich.de>
-Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
- b.a.t.m.a.n@lists.open-mesh.org, sven@narfation.org, stable@vger.kernel.org,
- linus.luessing@c0d3.blue
+ <171901923685.1383.11857515191105644144.git-patchwork-notify@kernel.org>
+Date: Sat, 22 Jun 2024 01:20:36 +0000
+References: <20240621080201.305471-2-mkl@pengutronix.de>
+In-Reply-To: <20240621080201.305471-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de,
+ andriy.shevchenko@linux.intel.com, mailhol.vincent@wanadoo.fr
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Simon Wunderlich <sw@simonwunderlich.de>:
+This series was applied to netdev/net-next.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-On Fri, 21 Jun 2024 16:39:14 +0200 you wrote:
-> From: Sven Eckelmann <sven@narfation.org>
+On Fri, 21 Jun 2024 09:48:21 +0200 you wrote:
+> From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 > 
-> The internal handling of VLAN IDs in batman-adv is only specified for
-> following encodings:
+> This driver is including the legacy GPIO header <linux/gpio.h>
+> but the only thing it is using from that header is the wrong
+> define for GPIOF_DIR_OUT.
 > 
-> * VLAN is used
->   - bit 15 is 1
->   - bit 11 - bit 0 is the VLAN ID (0-4095)
->   - remaining bits are 0
-> * No VLAN is used
->   - bit 15 is 0
->   - remaining bits are 0
+> Fix it up by using GPIO_LINE_DIRECTION_* macros respectively.
 > 
 > [...]
 
 Here is the summary with links:
-  - [1/2] batman-adv: Don't accept TT entries for out-of-spec VIDs
-    https://git.kernel.org/netdev/net/c/537a350d1432
-  - [2/2] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-    https://git.kernel.org/netdev/net/c/6bfff3582416
+  - [net-next,01/24] can: mcp251x: Fix up includes
+    https://git.kernel.org/netdev/net-next/c/b1dc3c68e977
+  - [net-next,02/24] can: sja1000: plx_pci: Reuse predefined CTI subvendor ID
+    https://git.kernel.org/netdev/net-next/c/5ca3801388f8
+  - [net-next,03/24] can: Kconfig: remove obsolete help text for slcan
+    https://git.kernel.org/netdev/net-next/c/58b34cd646b4
+  - [net-next,04/24] dt-bindings: can: xilinx_can: Modify the title to indicate CAN and CANFD controllers are supported
+    https://git.kernel.org/netdev/net-next/c/8416ac9c87bd
+  - [net-next,05/24] can: isotp: remove ISO 15675-2 specification version where possible
+    https://git.kernel.org/netdev/net-next/c/ba63a7e08523
+  - [net-next,06/24] can: xilinx_can: Document driver description to list all supported IPs
+    https://git.kernel.org/netdev/net-next/c/e562bad35fe3
+  - [net-next,07/24] Documentation: networking: document ISO 15765-2
+    https://git.kernel.org/netdev/net-next/c/67711e04254c
+  - [net-next,08/24] can: mscan: remove unused struct 'mscan_state'
+    https://git.kernel.org/netdev/net-next/c/f9f608e38b9c
+  - [net-next,09/24] can: kvaser_usb: Add support for Vining 800
+    https://git.kernel.org/netdev/net-next/c/2851d357a485
+  - [net-next,10/24] can: kvaser_usb: Add support for Kvaser USBcan Pro 5xCAN
+    https://git.kernel.org/netdev/net-next/c/96a669a1958f
+  - [net-next,11/24] can: kvaser_usb: Add support for Kvaser Mini PCIe 1xCAN
+    https://git.kernel.org/netdev/net-next/c/0135c4c6b84c
+  - [net-next,12/24] can: kvaser_pciefd: Group #defines together
+    https://git.kernel.org/netdev/net-next/c/cdbc9d055fc7
+  - [net-next,13/24] can: kvaser_pciefd: Skip redundant NULL pointer check in ISR
+    https://git.kernel.org/netdev/net-next/c/ac765219c2c4
+  - [net-next,14/24] can: kvaser_pciefd: Remove unnecessary comment
+    https://git.kernel.org/netdev/net-next/c/11d186697ceb
+  - [net-next,15/24] can: kvaser_pciefd: Add inline
+    https://git.kernel.org/netdev/net-next/c/0132a05df1e0
+  - [net-next,16/24] can: kvaser_pciefd: Add unlikely
+    https://git.kernel.org/netdev/net-next/c/cebfebefaa01
+  - [net-next,17/24] can: kvaser_pciefd: Rename board_irq to pci_irq
+    https://git.kernel.org/netdev/net-next/c/cbf88a6ba7bb
+  - [net-next,18/24] can: kvaser_pciefd: Change name of return code variable
+    https://git.kernel.org/netdev/net-next/c/26a1b0fe3f62
+  - [net-next,19/24] can: kvaser_pciefd: Move reset of DMA RX buffers to the end of the ISR
+    https://git.kernel.org/netdev/net-next/c/48f827d4f48f
+  - [net-next,20/24] can: kvaser_pciefd: Add MSI interrupts
+    https://git.kernel.org/netdev/net-next/c/dd1f05ba2a99
+  - [net-next,21/24] can: hi311x: simplify with spi_get_device_match_data()
+    https://git.kernel.org/netdev/net-next/c/1562a49d000c
+  - [net-next,22/24] can: mcp251x: simplify with spi_get_device_match_data()
+    https://git.kernel.org/netdev/net-next/c/d4383d67a25b
+  - [net-next,23/24] can: mcp251xfd: simplify with spi_get_device_match_data()
+    https://git.kernel.org/netdev/net-next/c/9cdae370c4ec
+  - [net-next,24/24] can: m_can: don't enable transceiver when probing
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
