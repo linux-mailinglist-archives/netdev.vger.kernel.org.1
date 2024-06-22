@@ -1,66 +1,61 @@
-Return-Path: <netdev+bounces-105820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1E1591310E
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 02:06:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16D18913121
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 02:20:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08002B21BB8
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 00:06:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6970D28521F
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 00:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D8728F1;
-	Sat, 22 Jun 2024 00:05:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 434F97E1;
+	Sat, 22 Jun 2024 00:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pKLcd54V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Syak/uAc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0702119;
-	Sat, 22 Jun 2024 00:05:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC76385
+	for <netdev@vger.kernel.org>; Sat, 22 Jun 2024 00:20:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719014749; cv=none; b=hYW1B00Nt8l7vSJuqQX0PoE74vmER7Hy8T9UAMQmiGBrPUe6LktFS5h8cbWQmIFbhhPeRkOjDCxPgWJ79s4scNOyls4pPIcJM1By7KM/AZ5zRUVAjIG5ApIsiVwvO/tHf1w7eQd7IMxu59BbCfQqMa1euz1MhAAJLIqxwZ6JENg=
+	t=1719015655; cv=none; b=eiXNOztNY5kMdjLpRIPVLHEiHONwmCDPbe+SC4AT3nf9UiCo60L0Ue8QeW+rhT7fPCeqCDgCoZyHdh04MTviggmMvu3oDEpIjBUt/dO9FIZwRjKd1KUUCxAjvdc4qPT998Nh7DyFZWUAoK2XuBTuE4PKOFX8TcJRDEvJAnHoGmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719014749; c=relaxed/simple;
-	bh=MhQOPNbcZW2UknZ5/E2o3DrYW4YHYA2kU1rWz3UmQX8=;
+	s=arc-20240116; t=1719015655; c=relaxed/simple;
+	bh=sLXI2LSA5tFtlAavmsdVVJLaBS1XBPLpZldW1UA9B0g=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZoKFad8H62fL9nVNy8hHNFptv3kHMREXSwAJlkJg/YES5YNfiKnukvQkIypQ3m5QbVHO1hxygzwdr4izEBBlmWQ5z09ZWcsi0F9GX2Et2ESlK4WnrMF4x/yCNpSd/JR/pKklMq5cVbOwXL0Oxf3V/cxANPIvlviYMDsXl2QBk4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pKLcd54V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF150C2BBFC;
-	Sat, 22 Jun 2024 00:05:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=tRichT5fxud6ifLE5rKq1fGNZieOR63TplSxz+oM3ZPjHRbwDzt58O8KCueMd/s7DQ9fWfjXSHp7pdoUgIBxGCTEhaIIBEStQzdQF+0Q/TWztSOVoc1kcBgfDY9RKrUamm6KUtlAOoPx/+NFyRcNm+g1sQpaWgMw9ZP5O5XXaxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Syak/uAc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C83BC2BBFC;
+	Sat, 22 Jun 2024 00:20:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719014748;
-	bh=MhQOPNbcZW2UknZ5/E2o3DrYW4YHYA2kU1rWz3UmQX8=;
+	s=k20201202; t=1719015654;
+	bh=sLXI2LSA5tFtlAavmsdVVJLaBS1XBPLpZldW1UA9B0g=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pKLcd54VCW3FOn3TnF6UrtmHqvO6D/ihPGRoTIufvYwCdmQAbRqQdphOg8N5Vma+e
-	 iGmk3TNTO2mqqIVFeHu06BfVhFgHdARNkwXpey+wFHA67FzxnvCHfmxHqGy7tMwzbl
-	 0KZsYfmCvtHy1dDGnyO7ZKeDJHucPm70mDb1feZlP9x9z7agumROtLeLjOCr4726ds
-	 oKk1hiOGAiKyuPlq+oSgT+cxWqo6y550Gkf8vB+9iEcz2RIP0R3bS6xJsA+UkEHHQb
-	 lNdfHSAjFCeCTk2Ldpm6+HAAnPQh1+6LpHESnM7HXze901mdjzjOxMCemMZ7OczJP7
-	 th6uMQe2oHFbg==
-Date: Fri, 21 Jun 2024 17:05:46 -0700
+	b=Syak/uAcFZomT/48NL/JQwzyJpYit595Kv5rcPjG4b7VKcob58VQI40bJoqCIHXPy
+	 w169cApLz1Lu9SRfWGfVL7KCIufhpV3E2LAubpSBzrgye2wITbE0/LHOFPMBBEUtET
+	 fICl+kesxSZ7JSzDo/rhX7kletx0bQ2v16xYTne3jAYeu7424a8eUy5eZVwCroVIh7
+	 WVonRTxycGvAZvGOGHLmwb0dnvfKXqB6kG2Kk7sVjMysm89NwFAMgPQyd7IdEmSkZh
+	 E2Cgd17xMP/T6WBggyK5eEIYeJ8topSE0+8nNbHlDRbJzW/HcTXXYWJwLcpML/g5j0
+	 xImlTDuPVsE2g==
+Date: Fri, 21 Jun 2024 17:20:53 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: yskelg@gmail.com
-Cc: Pedro Tammela <pctammela@mojatatu.com>, netdev@vger.kernel.org, Steven
- Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Takashi Iwai
- <tiwai@suse.de>, "David S. Miller" <davem@davemloft.net>, Thomas
- =?UTF-8?B?SGVsbHN0csO2bQ==?= <thomas.hellstrom@linux.intel.com>, "Rafael J.
- Wysocki" <rafael@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong
- Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Taehee Yoo
- <ap420073@gmail.com>, Austin Kim <austindh.kim@gmail.com>,
- shjy180909@gmail.com, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, ppbuk5246@gmail.com, Yeoreum Yun
- <yeoreum.yun@arm.com>
-Subject: Re: [PATCH net v2] net/sched: Fixes: 51270d573a8d NULL ptr deref in
- perf_trace_qdisc_reset()
-Message-ID: <20240621170546.0588eec5@kernel.org>
-In-Reply-To: <20240621162552.5078-4-yskelg@gmail.com>
-References: <20240621162552.5078-4-yskelg@gmail.com>
+To: David Wei <dw@davidwei.uk>
+Cc: Michael Chan <michael.chan@broadcom.com>, Andy Gospodarek
+ <andrew.gospodarek@broadcom.com>, Adrian Alvarado
+ <adrian.alvarado@broadcom.com>, Somnath Kotur <somnath.kotur@broadcom.com>,
+ netdev@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>, David
+ Ahern <dsahern@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v3 2/2] bnxt_en: implement
+ netdev_queue_mgmt_ops
+Message-ID: <20240621172053.258074e7@kernel.org>
+In-Reply-To: <20240619062931.19435-3-dw@davidwei.uk>
+References: <20240619062931.19435-1-dw@davidwei.uk>
+	<20240619062931.19435-3-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,13 +65,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 22 Jun 2024 01:25:54 +0900 yskelg@gmail.com wrote:
-> Subject: [PATCH net v2] net/sched: Fixes: 51270d573a8d NULL ptr deref in perf_trace_qdisc_reset()
+On Tue, 18 Jun 2024 23:29:31 -0700 David Wei wrote:
+> +	/* At this point, this NAPI instance has another page pool associated
+> +	 * with it. Disconnect here before freeing the old page pool to avoid
+> +	 * warnings.
+> +	 */
+> +	rxr->page_pool->p.napi = NULL;
+> +	page_pool_destroy(rxr->page_pool);
+> +	rxr->page_pool = NULL;
 
-the Fixes tag goes before your signoff, rather than as title.
-try
-
-  git log --grep=Fixes
--- 
-pw-bot: cr
+What's the warning you hit?
+We should probably bring back page_pool_unlink_napi(), 
+if this is really needed.
 
