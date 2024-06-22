@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-105894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FA479136A8
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 00:38:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 503CA9136B1
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 00:44:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18435B210A1
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 22:38:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D37DF281E8C
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 22:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689736F2F0;
-	Sat, 22 Jun 2024 22:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E08676F17;
+	Sat, 22 Jun 2024 22:43:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Ic6fG/jW"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="j+uVSS+w"
 X-Original-To: netdev@vger.kernel.org
 Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1903D4084E;
-	Sat, 22 Jun 2024 22:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441DB4CDEC
+	for <netdev@vger.kernel.org>; Sat, 22 Jun 2024 22:43:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719095933; cv=none; b=FNpUWzc3JEwUMCVI+vSuxhujeN/Q8UYI38FGc8kHWMJXOnMoPwKjHrLb0m6GDVBIcsskJG1U3Sr1PDT+09pYsdvyVurdRYzf+7+QxQD9FqtHUKDIyByZSRwwlS3M+zXcJfna/sCQQcjHOWmKjRv2SWjtui11NVJmuYc0UDUfeK0=
+	t=1719096238; cv=none; b=YetBt0sOP0j1MZym2zMSLj6SSj1vk3PcFaWrgqnb/WP2BeRNgp+ocSOTDI63lhwcSemLgynJ+doaQAd5bOJm1XIb/XQ47/+L7byITd0gtFzrcwpjp2YdPKPmwRe8x+OVSnmnJBBtYyhf8E9exEP9WdECpLBbGmrEJbZDgC+HXBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719095933; c=relaxed/simple;
-	bh=utn2ppJ9txOpHHSpjmfdAGRZovA0rUkWTLSy2Eqzuek=;
+	s=arc-20240116; t=1719096238; c=relaxed/simple;
+	bh=0IY38fb9q0I1ymWSOkdvW6KVWzlrwliDzvRMyRo7Q70=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hr3pT7kfokQADtd4WT42Lb8Fw9VTJTIrzzXMD0zwTcTXCEqODlEJpEFAhDiUiEHgG5WvYs8SmMkt+/EvE8WIuXGbRetVmst5vNxrh2GXNkY5eVZIJj0lw2xnUiWJEl/BpHKDxH58BH05TdBblU+yMqKnLfW+vNEQ9EIwqk5BQ5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Ic6fG/jW; arc=none smtp.client-ip=185.226.149.37
+	 In-Reply-To:Content-Type; b=gDPbLkF5hBMqyIK4JmfchUnFPXWae+JqtXY9HUZnLSDIo41SPo3TpfNIEKhLJtjVjv6y6Jr+La8w32t11bvA7Q3HhHg5qkcfS/zBEX0+Fv8/yO4MY58u6RWQWMg0QeAuer4QFo1rmeOPaLgJzNxvd7lP50Lt6pvvseUPZiAwwUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=j+uVSS+w; arc=none smtp.client-ip=185.226.149.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
 	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1sL9NY-00Akdl-5O; Sun, 23 Jun 2024 00:38:40 +0200
+	id 1sL9SV-00AlAH-2s; Sun, 23 Jun 2024 00:43:47 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
 	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
 	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=wD4i8ug9zL8PvMy94qhpbD+VPJZ/Z40xDdYrlAll9Ro=; b=Ic6fG/jWgrmNZ+4+IiBkEbZgWz
-	H+5x0yTuNHuUDfBhgb8jFHh2ttZovkc0lGz83BWp8ChLgeKFWoy+UUIvGEI84Jqv+xKTIpf1W6vfb
-	JZX+DpAJDOq5ckK36RAAaRwDgKNSr3laDT2nvxAfHdvlKh7eKyzGoMIh7rjxrm8N+dbri9yF3QTN9
-	Aty41LSwYdeff2dFqwOWdAVz4PwUuURWgp8/xMobFjrgqmH8AicjWRMqpOBNXvjI+8dn0iSiRwkPM
-	WdRDV46qm9rzS8MdQ6o/UTCfRBSEYziWps/c95FX94NeSU7c8uv5t/tWvekxfnHBGsdcBCLe8nyGR
-	e7qOAd8Q==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	bh=6Lrlt/hGP80NkVBf4DVXz1bLbyYw0OQ5aVlGkCdWWQ4=; b=j+uVSS+w+q9Zbf4nWQYlZcKji8
+	Qc7t3k28FwP7YuNAAvJCKju2l7nmA9iKEDs85khhjfR2i23mo3j4UuOOvdvzcn6WiLrofFU1Do6ql
+	1RYL64vfvabgOQ5zPJHA9Gk9H2rbkkgmDo7Ll+qJEoI21xDIPlsPg28A868qlNboJTzO+KwJ+yV2P
+	InDJIZ8GeFFrhgGljf6X3v8s/CV+N2iaBb2+tROxeHNhFkniomM6po5U7jqeyz0PCNHhnNghYXaZi
+	zNSMWvUrEnKyXVyWh7AkiQI7Jpu+LCIy6feHXNYTMFuzbEyBVy6+QOzJBItP7zYJRb8j0BlR+mv8x
+	93KOsvNA==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1sL9NX-0003zK-7f; Sun, 23 Jun 2024 00:38:39 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	id 1sL9SU-0002Qj-EK; Sun, 23 Jun 2024 00:43:46 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1sL9NH-0079be-Qe; Sun, 23 Jun 2024 00:38:23 +0200
-Message-ID: <fda335cd-3fb1-4024-bff7-aedeb1d8710a@rbox.co>
-Date: Sun, 23 Jun 2024 00:38:22 +0200
+	id 1sL9SD-007C7k-0z; Sun, 23 Jun 2024 00:43:29 +0200
+Message-ID: <2d34e8df-cbb0-486a-976b-c5c72554e184@rbox.co>
+Date: Sun, 23 Jun 2024 00:43:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,110 +61,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] af_unix: Disable MSG_OOB handling for sockets in
- sockmap/sockhash
+Subject: Re: [PATCH v2 net 01/15] af_unix: Set sk->sk_state under
+ unix_state_lock() for truly disconencted peer.
 To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- jakub@cloudflare.com, john.fastabend@gmail.com, kuba@kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com
-References: <20240620203009.2610301-1-mhal@rbox.co>
- <20240620221223.66096-1-kuniyu@amazon.com>
+Cc: cong.wang@bytedance.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
+ pabeni@redhat.com
+References: <b29d7ead-6e2c-4a52-9a0a-56892e0015b6@rbox.co>
+ <20240620215616.64048-1-kuniyu@amazon.com>
 Content-Language: pl-PL, en-GB
 From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <20240620221223.66096-1-kuniyu@amazon.com>
+In-Reply-To: <20240620215616.64048-1-kuniyu@amazon.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 6/21/24 00:12, Kuniyuki Iwashima wrote:
-> Sorry for not mentioning this before, but could you replace "net" with
-> "bpf" in Subject and rebase the patch on bpf.git so that we can trigger
-> the patchwork's CI ?
+On 6/20/24 23:56, Kuniyuki Iwashima wrote:
+> From: Michal Luczaj <mhal@rbox.co>
+> Date: Thu, 20 Jun 2024 22:35:55 +0200
+>> In fact, should I try to document those not-so-obvious OOB/sockmap
+>> interaction? And speaking of documentation, an astute reader noted that
+>> `man unix` is lying:
+> 
+> At least I wouldn't update man until we can say AF_UNIX MSG_OOB handling
+> is stable enough; the behaviour is not compliant with TCP now.
 
-No problem, will do.
+Sure, I get it.
 
->> ...
->>  static int unix_stream_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
->>  {
->> +	struct unix_sock *u = unix_sk(sk);
->> +	struct sk_buff *skb;
->> +	int err;
->> +
->>  	if (unlikely(READ_ONCE(sk->sk_state) != TCP_ESTABLISHED))
->>  		return -ENOTCONN;
->>  
->> -	return unix_read_skb(sk, recv_actor);
->> +	mutex_lock(&u->iolock);
->> +	skb = skb_recv_datagram(sk, MSG_DONTWAIT, &err);
+> (...)
+> And we need
 > 
-> 	mutex_unlock(&u->iolock);
-> 
-> I think we can drop mutex here as the skb is already unlinked
-> and no receiver can touch it.
+> ---8<---
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 5e695a9a609c..2875a7ce1887 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -2614,9 +2614,20 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
+>  	struct unix_sock *u = unix_sk(sk);
+>  
+>  	if (!unix_skb_len(skb) && !(flags & MSG_PEEK)) {
+> -		skb_unlink(skb, &sk->sk_receive_queue);
+> -		consume_skb(skb);
+> -		skb = NULL;
+> +		struct sk_buff *unlinked_skb = skb;
+> +
+> +		spin_lock(&sk->sk_receive_queue.lock);
+> +
+> +		__skb_unlink(skb, &sk->sk_receive_queue);
+> +
+> +		if (copied)
+> +			skb = NULL;
+> +		else
+> +			skb = skb_peek(&sk->sk_receive_queue);
+> +
+> +		spin_unlock(&sk->sk_receive_queue.lock);
+> +
+> +		consume_skb(unlinked_skb);
+>  	} else {
+>  		struct sk_buff *unlinked_skb = NULL;
+>  
+> ---8<---
 
-I guess you're right about the mutex. That said, double mea culpa, lack of
-state lock makes things racy:
-
-unix_stream_read_skb
-  mutex_lock
-  skb = skb_recv_datagram
-  mutex_unlock
-  spin_lock
-  if (oob_skb == skb) {
-				unix_release_sock
-				  if (u->oob_skb) {
-				    kfree_skb(u->oob_skb)
-				    u->oob_skb = NULL
-				  }
-    oob_skb = NULL
-    drop = true
-  }
-  spin_unlock
-  if (drop) {
-    skb_unref(skb)
-    kfree_skb(skb)
-  }
-
-In v2 I'll do what unix_stream_read_generic() does: take state lock and
-check for SOCK_DEAD.
-
-> and the below part can be like the following not to slow down
-> the common case:
-> 
-> 	if (!skb)
-> 		return err;
-> 
->> +
->> +#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
->> +	if (skb) {
-> 
-> 	if (unlikely(skb == READ_ONCE(u->oob_skb))) {
-> 
-> 
->> +		bool drop = false;
->> +
->> +		spin_lock(&sk->sk_receive_queue.lock);
->> +		if (skb == u->oob_skb) {
-> 
-> 		if (likely(skb == u->oob_skb)) {
-> 
->> +			WRITE_ONCE(u->oob_skb, NULL);
->> +			drop = true;
->> +		}
->> +		spin_unlock(&sk->sk_receive_queue.lock);
->> +
->> +		if (drop) {
->> +			WARN_ON_ONCE(skb_unref(skb));
->> +			kfree_skb(skb);
->> +			skb = NULL;
->> +			err = -EAGAIN;
-> 			return -EAGAIN;
-> 
->> +		}
->> +	}
->> +#endif
-> 
-> 	return recv_actor(sk, skb);
-
-All right, thanks. So here's v2:
-https://lore.kernel.org/netdev/20240622223324.3337956-1-mhal@rbox.co/
+I gotta ask, is there a reason for unlinking an already consumed
+('consumed' as in 'unix_skb_len(skb) == 0') skb so late, in manage_oob()?
+IOW, can't it be unlinked immediately once it's consumed in
+unix_stream_recv_urg()? I suppose that would simplify things.
 
