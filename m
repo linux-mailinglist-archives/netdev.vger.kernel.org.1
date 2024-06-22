@@ -1,197 +1,156 @@
-Return-Path: <netdev+bounces-105838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEDC79131B7
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 05:03:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FABA9131EE
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 06:27:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 429AF1F234C0
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 03:03:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEE77286511
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 04:27:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60EE08C11;
-	Sat, 22 Jun 2024 03:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE831374C4;
+	Sat, 22 Jun 2024 04:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="gfuDyCNM"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710D15664;
-	Sat, 22 Jun 2024 03:03:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A8A2D02E;
+	Sat, 22 Jun 2024 04:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719025388; cv=none; b=dHG9s//LBPou9B+g/EqjpSnSN1R4bQHmUzwN/QeDwBk6ktBnrbZb/1IUn/TuhX6RVHAgKWm9ElUt1fW4/+AlpMZOk42xIcsGQcjBN5YeSG5R3WOI1kPjZYDxS9bm3PIWxYEAH1A+tPlJ6AF8RIbjjXd24J0Y9C+Gsx7036kdGHo=
+	t=1719030471; cv=none; b=dVp+/rN1wg582rt43v2xTMSeEPzTjVNDD8QSzy+s/oyFsNKsMSrQBZrEGniNrBSFSSYbbHZppWVl96CkAGOHs4KjLVBjeqqxldOJqqUxce4kAXjKbz0uB8zU4ywUX5vHcpDv55fYO6gsIk7N6xfvPd9lpscdfkkEs9FkF4rOfao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719025388; c=relaxed/simple;
-	bh=x8o8ceYz0P/vWBGHnDfUNkQfqmpuu1K+l84RPHurqAo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UKchL2Dz1yX7rfV5Q+uFui3usA9+KePCpA2s6E1d+4Y7u0iuq0jWY3sZc71hTy1ldDpMU8fJvKEwEMc9fiCrOXok/bC+4QlyY+HBdCzYkdpK88q3PTMk+5OUQ7dsphZS6183RwAra0IplxjgcFymFYuGkZthjT8FBcxjAf3IoX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4W5fDC3QVdz4f3l1Q;
-	Sat, 22 Jun 2024 11:02:51 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 67AA11A016E;
-	Sat, 22 Jun 2024 11:03:03 +0800 (CST)
-Received: from ultra.huawei.com (unknown [10.90.53.71])
-	by APP1 (Coremail) with SMTP id cCh0CgDXa63kPnZmMh5lAg--.15052S5;
-	Sat, 22 Jun 2024 11:03:03 +0800 (CST)
-From: Pu Lehui <pulehui@huaweicloud.com>
-To: bpf@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org
-Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Puranjay Mohan <puranjay@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Pu Lehui <pulehui@huawei.com>
-Subject: [PATCH RESEND bpf-next v2 3/3] riscv, bpf: Use bpf_prog_pack for RV64 bpf trampoline
-Date: Sat, 22 Jun 2024 03:04:37 +0000
-Message-Id: <20240622030437.3973492-4-pulehui@huaweicloud.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240622030437.3973492-1-pulehui@huaweicloud.com>
-References: <20240622030437.3973492-1-pulehui@huaweicloud.com>
+	s=arc-20240116; t=1719030471; c=relaxed/simple;
+	bh=ItteozRxD9pZl0Vo/EkeGN+3dFzTCeY/ora39soN/1A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Ko5Dysxl4I7n7GAHPawS0/H7gzILqOz6+GCJCjlTBBCX+jSuKOeAqyMPfOKH+QBday6pKblfClZKw+sTBeWgCntg5yZ+ohrG0/uFewYzaY4vVerh0JXfLJ+9vZNvG62BwBLilCx787lEa5QljGdTYzKCwmLEGKNvLoz0UvtxNkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=gfuDyCNM; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1719030460;
+	bh=/VVyoTFqBHv0DbfaJoIZVT/jCvwNcFS1WP6GyNkTAeg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=gfuDyCNMt/fwzbmPByYmLccOW0b2JS0DQfgb5a0Aw7JvniOtsRte9Jh6LTsQW1jjy
+	 L03nHizw9R55fA0ERzscVZ0Mumd4W+t2BSjAgm5xrPAartRiZ+7UtRp2NdQERSvgqf
+	 w9sVZrEw69YgjuOcyDaaEvY3ZGD8DOfeXNjCuaash2hvrV1i/L97UXqJvy2rzu8VMO
+	 8n76/lCsFKBOgWFFpbkREVf964cdgABz1erMsSgPBC6/nInWI1uCUHiYXxHMV3Yvxs
+	 OFLRIZsGDD7D/3xPnqGUAgqM7swfdsFMkKi1dQ2e2ftGDu0fqKVbYgohzMcfKOyKtu
+	 To9SlW6KAh4qg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4W5h6046pKz4w2S;
+	Sat, 22 Jun 2024 14:27:36 +1000 (AEST)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>, Jonathan Corbet
+ <corbet@lwn.net>, Carlos Bilbao <carlos.bilbao.osdev@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: workflows@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Konstantin Ryabitsev
+ <konstantin@linuxfoundation.org>, ksummit@lists.linux.dev
+Subject: Re: [PATCH v2 2/2] Documentation: best practices for using Link
+ trailers
+In-Reply-To: <20240619-docs-patch-msgid-link-v2-2-72dd272bfe37@linuxfoundation.org>
+References: <20240619-docs-patch-msgid-link-v2-0-72dd272bfe37@linuxfoundation.org>
+ <20240619-docs-patch-msgid-link-v2-2-72dd272bfe37@linuxfoundation.org>
+Date: Sat, 22 Jun 2024 14:27:34 +1000
+Message-ID: <87v821d2kp.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgDXa63kPnZmMh5lAg--.15052S5
-X-Coremail-Antispam: 1UD129KBjvJXoWxZFy8ZryUZw4rXryrJrykuFg_yoWrJr13pa
-	n7Cw1akaykXr15ta4kJ3yUZF1ak3ykW343GF9xG3y8CFZ0vr98GryrK3yFvFWFkryFkr18
-	AF4qvrn8u3WUJaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWw
-	A2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WxJr0_GcWl84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx
-	0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWU
-	JVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0EwI
-	xGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
-	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7
-	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU1c4S7UUUUU==
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain
 
-From: Pu Lehui <pulehui@huawei.com>
+Konstantin Ryabitsev <konstantin@linuxfoundation.org> writes:
+> Based on multiple conversations, most recently on the ksummit mailing
+> list [1], add some best practices for using the Link trailer, such as:
+>
+> - how to use markdown-like bracketed numbers in the commit message to
+> indicate the corresponding link
+> - when to use lore.kernel.org vs patch.msgid.link domains
+>
+> Cc: ksummit@lists.linux.dev
+> Link: https://lore.kernel.org/20240617-arboreal-industrious-hedgehog-5b84ae@meerkat # [1]
+> Signed-off-by: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+> ---
+>  Documentation/process/maintainer-tip.rst | 30 ++++++++++++++++++++++--------
+>  1 file changed, 22 insertions(+), 8 deletions(-)
+>
+> diff --git a/Documentation/process/maintainer-tip.rst b/Documentation/process/maintainer-tip.rst
+> index 64739968afa6..ba312345d030 100644
+> --- a/Documentation/process/maintainer-tip.rst
+> +++ b/Documentation/process/maintainer-tip.rst
+> @@ -372,17 +372,31 @@ following tag ordering scheme:
+>  
+>   - Link: ``https://link/to/information``
+>  
+> -   For referring to an email on LKML or other kernel mailing lists,
+> -   please use the lore.kernel.org redirector URL::
+> +   For referring to an email posted to the kernel mailing lists, please
+> +   use the lore.kernel.org redirector URL::
+>  
+> -     https://lore.kernel.org/r/email-message@id
+> +     Link: https://lore.kernel.org/email-message-id@here
+>  
+> -   The kernel.org redirector is considered a stable URL, unlike other email
+> -   archives.
+> +   This URL should be used when referring to relevant mailing list
+> +   topics, related patch sets, or other notable discussion threads.
+> +   A convenient way to associate ``Link:`` trailers with the commit
+> +   message is to use markdown-like bracketed notation, for example::
+>  
+> -   Maintainers will add a Link tag referencing the email of the patch
+> -   submission when they apply a patch to the tip tree. This tag is useful
+> -   for later reference and is also used for commit notifications.
+> +     A similar approach was attempted before as part of a different
+> +     effort [1], but the initial implementation caused too many
+> +     regressions [2], so it was backed out and reimplemented.
+> +
+> +     Link: https://lore.kernel.org/some-msgid@here # [1]
+> +     Link: https://bugzilla.example.org/bug/12345  # [2]
 
-We used bpf_prog_pack to aggregate bpf programs into huge page to
-relieve the iTLB pressure on the system. We can apply it to bpf
-trampoline, as Song had been implemented it in core and x86 [0]. This
-patch is going to use bpf_prog_pack to RV64 bpf trampoline. Since Song
-and Puranjay have done a lot of work for bpf_prog_pack on RV64,
-implementing this function will be easy.
+Does it actually make sense to use the Link: prefix here? These sort of
+links are part of the prose, they're not something a script can download
+and make any sense of.
 
-Link: https://lore.kernel.org/all/20231206224054.492250-1-song@kernel.org [0]
-Signed-off-by: Pu Lehui <pulehui@huawei.com>
-Tested-by: Björn Töpel <bjorn@rivosinc.com> #riscv
----
- arch/riscv/net/bpf_jit_comp64.c | 43 ++++++++++++++++++++++-----------
- 1 file changed, 29 insertions(+), 14 deletions(-)
+I see some existing usage of the above style, but equally there's lots
+of examples of footnote-style links without the Link: tag, eg:
 
-diff --git a/arch/riscv/net/bpf_jit_comp64.c b/arch/riscv/net/bpf_jit_comp64.c
-index e6d690657f3e..351e1484205e 100644
---- a/arch/riscv/net/bpf_jit_comp64.c
-+++ b/arch/riscv/net/bpf_jit_comp64.c
-@@ -957,7 +957,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
- 			goto out;
- 		emit_sd(RV_REG_FP, -retval_off, RV_REG_A0, ctx);
- 		emit_sd(RV_REG_FP, -(retval_off - 8), regmap[BPF_REG_0], ctx);
--		im->ip_after_call = ctx->insns + ctx->ninsns;
-+		im->ip_after_call = ctx->ro_insns + ctx->ninsns;
- 		/* 2 nops reserved for auipc+jalr pair */
- 		emit(rv_nop(), ctx);
- 		emit(rv_nop(), ctx);
-@@ -978,7 +978,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
- 	}
- 
- 	if (flags & BPF_TRAMP_F_CALL_ORIG) {
--		im->ip_epilogue = ctx->insns + ctx->ninsns;
-+		im->ip_epilogue = ctx->ro_insns + ctx->ninsns;
- 		emit_imm(RV_REG_A0, ctx->insns ? (const s64)im : RV_MAX_COUNT_IMM, ctx);
- 		ret = emit_call((const u64)__bpf_tramp_exit, true, ctx);
- 		if (ret)
-@@ -1041,25 +1041,33 @@ int arch_bpf_trampoline_size(const struct btf_func_model *m, u32 flags,
- 	return ret < 0 ? ret : ninsns_rvoff(ctx.ninsns);
- }
- 
--int arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *image,
--				void *image_end, const struct btf_func_model *m,
-+void *arch_alloc_bpf_trampoline(unsigned int size)
-+{
-+	return bpf_prog_pack_alloc(size, bpf_fill_ill_insns);
-+}
-+
-+void arch_free_bpf_trampoline(void *image, unsigned int size)
-+{
-+	bpf_prog_pack_free(image, size);
-+}
-+
-+int arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *ro_image,
-+				void *ro_image_end, const struct btf_func_model *m,
- 				u32 flags, struct bpf_tramp_links *tlinks,
- 				void *func_addr)
- {
- 	int ret;
-+	void *image, *res;
- 	struct rv_jit_context ctx;
--	u32 size = image_end - image;
-+	u32 size = ro_image_end - ro_image;
-+
-+	image = kvmalloc(size, GFP_KERNEL);
-+	if (!image)
-+		return -ENOMEM;
- 
- 	ctx.ninsns = 0;
--	/*
--	 * The bpf_int_jit_compile() uses a RW buffer (ctx.insns) to write the
--	 * JITed instructions and later copies it to a RX region (ctx.ro_insns).
--	 * It also uses ctx.ro_insns to calculate offsets for jumps etc. As the
--	 * trampoline image uses the same memory area for writing and execution,
--	 * both ctx.insns and ctx.ro_insns can be set to image.
--	 */
- 	ctx.insns = image;
--	ctx.ro_insns = image;
-+	ctx.ro_insns = ro_image;
- 	ret = __arch_prepare_bpf_trampoline(im, m, tlinks, func_addr, flags, &ctx);
- 	if (ret < 0)
- 		goto out;
-@@ -1069,8 +1077,15 @@ int arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *image,
- 		goto out;
- 	}
- 
--	bpf_flush_icache(image, image_end);
-+	res = bpf_arch_text_copy(ro_image, image, size);
-+	if (IS_ERR(res)) {
-+		ret = PTR_ERR(res);
-+		goto out;
-+	}
-+
-+	bpf_flush_icache(ro_image, ro_image_end);
- out:
-+	kvfree(image);
- 	return ret < 0 ? ret : size;
- }
- 
--- 
-2.34.1
+commit 40b561e501768ef24673d0e1d731a7b9b1bc6709
+Merge: d9f843fbd45e 31611cc8faa0
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Mon Apr 29 22:29:44 2024 +0200
 
+    Merge tag 'tee-ts-for-v6.10' of https://git.linaro.org/people/jens.wiklander/linux-tee into soc/drivers
+
+    TEE driver for Trusted Services
+
+    This introduces a TEE driver for Trusted Services [1].
+
+    Trusted Services is a TrustedFirmware.org project that provides a
+    framework for developing and deploying device Root of Trust services in
+    FF-A [2] Secure Partitions. The project hosts the reference
+    implementation of Arm Platform Security Architecture [3] for Arm
+    A-profile devices.
+
+    ...
+
+    [1] https://www.trustedfirmware.org/projects/trusted-services/
+    [2] https://developer.arm.com/documentation/den0077/
+    [3] https://www.arm.com/architecture/security-features/platform-security
+
+
+The above style is standard markdown style for reference links (or as
+standard as markdown gets).
+
+cheers
 
