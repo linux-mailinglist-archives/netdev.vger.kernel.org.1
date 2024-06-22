@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-105877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4927091359B
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 20:31:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A630091359D
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 20:31:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E9AD1C20D78
-	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 18:31:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B8DB1F21888
+	for <lists+netdev@lfdr.de>; Sat, 22 Jun 2024 18:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E987B219E4;
-	Sat, 22 Jun 2024 18:31:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAECA273FC;
+	Sat, 22 Jun 2024 18:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2pEnDPoR"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ykFaPT4T"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08A89470;
-	Sat, 22 Jun 2024 18:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599861C294;
+	Sat, 22 Jun 2024 18:31:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719081076; cv=none; b=OhP9B+cqhmeLWR9fiFTBJlBtF7Nc/n4jmNwKbPqOCxnLcWcw4A97lXADOzk832lehJcNkdsTtLE5UB16S2euCpH7RufNT5ml0iGjfzgIOZyGLqA+mdg6PMjmZ95V6eKDlDnbMfpzUqjDUD6Bzh0g0Fvhd7DKzzHWvcy5yrcrqww=
+	t=1719081097; cv=none; b=mYID+ALTAb+HejthyykxxWjv+RSHVtCglBbwKC5WX9YpnS873QgNVOWVUEFmnHVKcVrRbMB/xFq91QFNgWBMtRr7ot2a/EhnFF9AT7E8uYxLRWTZRO0Lc+cwA5FrDNMjztATKe7POSKEfeo/UByrOsgKsvg/Qm0uQRzYl5LH4ZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719081076; c=relaxed/simple;
-	bh=Bu1c4TBD78MgTL/+Ueid/B5ectKfutMf9Op1U3dKYb4=;
+	s=arc-20240116; t=1719081097; c=relaxed/simple;
+	bh=mW+4vJ1tQI/8gjEcWUy/cZLaGCAzd8lV7SYw2zjiAfk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=itxV5JySgoZCrWQEanGInILFt63gOE8H8VmeF1T/cPKoVuJtj/YNF2JezaOYozkQG9d/ZEI9RLDysxRORDGQ5ds4WH6C2jHYb1++Yf1cvzdlMHCEt2OEFuj/SQ06swZblwmRUlAjowo7M/75tWttO706eyK330ECghjMp13ULFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2pEnDPoR; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=J6qItedg4DYqoko5/oEWM47pMPGOx4I/y8J+xpnojA2cjXXzof6w2zPatoTLNhp6CYgRxh0dp8FYAzfXfBuL/fR8+ZDKd9pQZMfL81ApzO3ZozaHhGjjD1XgYzo+eZAJtfYJK6k42m0Bf7PIUHmKKpQfa6LKJkuaHIUNwIz5A4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ykFaPT4T; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7fIMwbUzHN4iz5w0V7HIL86j5pwhlLZgaN9zrCy1ciM=; b=2pEnDPoR0Majl9M3HZM1qbMsw5
-	rgv3cLtbDjMrupC7vkdbgk2OII3A22nkK9G7dfDTZw3hLG0ucndqT9wMLpGdpy8YjAFXEjd2M3fxC
-	7Q5Q9gpmhq9++wk3Cxp3EOC8ew6ToCvshdgpUyKQGzCAlELqY/pFX+vyI7Kq4F52MGj8=;
+	bh=SP6B4EIRqrajIl5UW80inICDhMtctoSu23bR4HxC0R0=; b=ykFaPT4TLCF6op/yM+c5upAFJl
+	9zP1Jk9COu+k6QHLmEF446cQEFY3/5dMI7hskUtU8tsl/oePMjEJjU9mw7iHuuMW5M0k/78zwyOr4
+	ce4dgXrr0ho9WG2xk4Zs96tvvhh7X4kD4ee/vw5AhaXrtk5KzVkagbsWivT+xxGTt8N4=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sL5Vq-000kE5-HH; Sat, 22 Jun 2024 20:30:58 +0200
-Date: Sat, 22 Jun 2024 20:30:58 +0200
+	id 1sL5WJ-000kEr-2j; Sat, 22 Jun 2024 20:31:27 +0200
+Date: Sat, 22 Jun 2024 20:31:27 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Sky Huang <SkyLake.Huang@mediatek.com>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -58,11 +58,11 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org,
 	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next v8 12/13] net: phy: mediatek: Fix alignment in
- callback functions' hook
-Message-ID: <2a040d91-3514-4502-b6d6-7c147f91cf6b@lunn.ch>
+Subject: Re: [PATCH net-next v8 13/13] net: phy: mediatek: Remove unnecessary
+ outer parens of "supported_triggers" var
+Message-ID: <8ab10980-250f-475f-aacd-02510a3a03b7@lunn.ch>
 References: <20240621122045.30732-1-SkyLake.Huang@mediatek.com>
- <20240621122045.30732-13-SkyLake.Huang@mediatek.com>
+ <20240621122045.30732-14-SkyLake.Huang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,16 +71,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240621122045.30732-13-SkyLake.Huang@mediatek.com>
+In-Reply-To: <20240621122045.30732-14-SkyLake.Huang@mediatek.com>
 
-On Fri, Jun 21, 2024 at 08:20:44PM +0800, Sky Huang wrote:
+On Fri, Jun 21, 2024 at 08:20:45PM +0800, Sky Huang wrote:
 > From: "SkyLake.Huang" <skylake.huang@mediatek.com>
 > 
-> Align declarations in mtk_gephy_driver(mtk-ge.c) and
-> mtk_socphy_driver(mtk-ge-soc.c). At first, some of them are
-> ".foo<tab>= method_foo", and others are ".bar<space>= method_bar".
-> Use space instead for all of them here in case line is longer than
-> 80 chars.
+> This patch removes unnecessary outer parens of "supported_triggers" vars
+> in mtk-ge.c & mtk-ge-soc.c to improve readability.
 > 
 > Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
 
