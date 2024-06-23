@@ -1,150 +1,243 @@
-Return-Path: <netdev+bounces-105918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB4259138FF
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 10:23:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27BC4913902
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 10:23:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89CC5282BC4
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 08:23:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9439282BF9
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 08:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F253EA69;
-	Sun, 23 Jun 2024 08:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C2C5EE97;
+	Sun, 23 Jun 2024 08:23:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="NdiA2RVv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SQupYGTU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [217.72.192.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F9515E83;
-	Sun, 23 Jun 2024 08:23:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A0F15E83;
+	Sun, 23 Jun 2024 08:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719131004; cv=none; b=MqHLrOpOaweDA3YWzEtScH44X1tiBWjMbqXcCiuPFYYXBGwZbD0oWorofbY84TQpyf1a0so9uo19SqxzEnzmORNuuWlyNSKDfHEyy1IYk1vX+HxKpCv2rix2SSyBUj2grtWUJdPQTWiZYVaMabrOdEJujkQsOAh1BbyvHt1FDF8=
+	t=1719131023; cv=none; b=PY7LYlIFWvdC08gkx2XY+ZKYIwBtLwCmToHHZZ+18KGOVHgxpwGFx4eliJIH0zmzd9rGAtBi8PaiKTE515riFr/OnBt3oXg3WOCln6ob7t9hVv1O+9529uP3Q1Eerx82JTpGVLxFxZ1f8MY7poG+6/r2Zlz6tm8jd1wgCXhJ208=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719131004; c=relaxed/simple;
-	bh=x4e8XcpJNZymn97A0V+osWFBR8uTIfDjYcM2vgAnIeo=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=ACucUB34BifkxlCoBo2rTbQp1Z+73LUhFXXNt2jcQyf13AHiwPSyf2xl2pilwBH9YUh3RYoInvdFT7Hn71NujcZ87fv0B1IgsKLku49dbeOzcyIudbvtpuuu0cBrZhVqvi837uhPfAR8eNUH0eM1BoME4enfckqBLEzHGxNBmec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=NdiA2RVv; arc=none smtp.client-ip=217.72.192.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1719130963; x=1719735763; i=markus.elfring@web.de;
-	bh=3B2iF2h3ohW2JdPS8V2ghJL3k8HTmL/3Td3HOCrMzss=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=NdiA2RVvQGEA4DentX5eZomaqbxNfyu3SCPJV+JnEt6X0V5NNBN1Qk5EXVYhyDVs
-	 aiy26951PT2/GNhiFyC58q1L+eBcwrrMGi9cl3op1vwtmaptaGTuMpe4ZvqaYn4qd
-	 V7yQIt24ascbaOV45UfvLLlwm0tNLm72tKDjp8/iknnFw7GRgPikB4p/BjwnxovjR
-	 N66JjVFSPVXLBKq5lmoPSGNdnTQjH6h2nKZhZF2Ja1UbR8j03noyBKrkugrKM3Msx
-	 Egrec6ZdS1N/Cdn0dVR1rDmNvc0M6TXeBr0nFvTn8AaV9Gjo/g1XFmZm9mKp2kbMF
-	 oyU4Kvq0RdLj6bOe5A==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MdfCN-1su59G2BYf-00otqA; Sun, 23
- Jun 2024 10:22:43 +0200
-Message-ID: <b0f546d2-bb6a-4761-bbc0-69d785df5eef@web.de>
-Date: Sun, 23 Jun 2024 10:22:38 +0200
+	s=arc-20240116; t=1719131023; c=relaxed/simple;
+	bh=oaVrtpISLUXLLldD4lTqGinRJvKGvzbqV4Orc8IXIsU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=cVYKsbxZzauVYFBkWQUJUiVYj5DjJeZyFy4HYQVLQJDzoWwJZ9EmlqS7x0SK1UOBd+RXYVJPT3+PlKqdJTdB4l8EWYgsRyQXuzGmU69uITT4SukPStNbbiNjNw3cBJLs8a1YJ0Erxw3X+CLj2p7UAShAKj0558UdOXcmC3P4MWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SQupYGTU; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7955841fddaso292593685a.1;
+        Sun, 23 Jun 2024 01:23:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719131020; x=1719735820; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/qj6OX+9vOEaDgE253CKn3DTtuWduYa4ZO1Ed6FzmWo=;
+        b=SQupYGTUbqUlXIgEa7hckOtk+HKayKFuojSLA+2IoNW/5a+UG7PwAEU/6TAizFFP2C
+         BYvx/tyIXwGdK4br2L7jY2b0JODW6V3C62cVr6RUEusTTN6f94fg8J6hL0/6y3arfr0H
+         PS5uUhhic69TGl3+bXOvkMq/T6JMtgDA9gImlWA0ad9qtM3VcRIpbqdvKsoSXRZG1xPU
+         XYtxSRZzr9p/bRzOMh0WPHvwIlhKQT2qCdMT9KgXGN8qzFylRlY3BMeuD27yvPM6ekqT
+         Ds6iSw8GA9XMySS73v4PIkIHqOnO++zR/RT6SgGeqhfSiVYk2VlhK7ugHv3BxobshFgH
+         H3Zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719131020; x=1719735820;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=/qj6OX+9vOEaDgE253CKn3DTtuWduYa4ZO1Ed6FzmWo=;
+        b=NJZejeGCtvoCStmj1HlRhe0jHrWSUr97sWIp9Vs2PB4l+5BPsOTpZzrDLGChC8G+vN
+         f5Rfyf3fs8bgLesz3kDQNQT77+W3tBu4ULeESsUtQstqvJ8d4RV5JCWHtKk3EwGiTABB
+         WE2bAsxGNVeDAGm3F2xZUti3V80TqAq7+G9X7QriHByQZYWwePQt9nV0wUGjV96IcmZ7
+         vYRXvqgZM1UZEzdiuSEt+N4OEwLM0tw3rQMIQATcdeLHVBqWTgLw1jc150GMv5YX292q
+         Q0JdYYkfztLRzB3zS65LMWjEDLnW0CUONeuHIADJTIQiKtwgXdio2hd6U0XwkrFEyi5g
+         nDNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVepO2fD7fE0WPei8GymZAuru2NzbDFhyvrt2snKEZzanxTfMqvYhnwoaWvvHPW81mtXoy+w4R2fSK3HrVFOxz5hBA6agjWZ9JAafuE+IXe9MOaVkc7J403ympp0C3cfkIr
+X-Gm-Message-State: AOJu0Yxlpgd1aYXhVU85tR3KaOMjBoSUZ5sTfx9p0ebAVdQIXTCduoiJ
+	1BulK0bbOrMpiB/qtIchFbsDEgW5ip+mmal59F3nL4BNxHaplStKGoXaWw==
+X-Google-Smtp-Source: AGHT+IEPnHZgwRnFZw7obFPFu8jUqYIbs+JhSQHcLq8iHy+u9jUR71Vf3XfHdewzB/T8/FCUr7l5hw==
+X-Received: by 2002:a05:620a:2481:b0:795:609e:6633 with SMTP id af79cd13be357-79bded5055dmr422081185a.30.1719131020109;
+        Sun, 23 Jun 2024 01:23:40 -0700 (PDT)
+Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-444d25627a8sm13120421cf.3.2024.06.23.01.23.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Jun 2024 01:23:39 -0700 (PDT)
+Date: Sun, 23 Jun 2024 04:23:39 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Yan Zhai <yan@cloudflare.com>, 
+ Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ kernel-team <kernel-team@cloudflare.com>
+Message-ID: <6677db8b2ef78_33522729492@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAO3-PboYruuLrF7D_rMiuG-AnWdR4BhsgP+MhVmOm-f3MzJFyQ@mail.gmail.com>
+References: <cover.1718919473.git.yan@cloudflare.com>
+ <b8c183a24285c2ab30c51622f4f9eff8f7a4752f.1718919473.git.yan@cloudflare.com>
+ <66756ed3f2192_2e64f929491@willemb.c.googlers.com.notmuch>
+ <44ac34f6-c78e-16dd-14da-15d729fecb5b@iogearbox.net>
+ <CAO3-PbrhnvmdYmQubNsTX3gX917o=Q+MBWTBkxUd=YWt4dNGuA@mail.gmail.com>
+ <e6553be1-4eaa-e90a-17f8-dece2bb95e7b@iogearbox.net>
+ <CAO3-PboYruuLrF7D_rMiuG-AnWdR4BhsgP+MhVmOm-f3MzJFyQ@mail.gmail.com>
+Subject: Re: [RFC net-next 1/9] skb: introduce gro_disabled bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Wei Fang <wei.fang@nxp.com>, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, imx@lists.linux.dev,
- Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Clark Wang <xiaoning.wang@nxp.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Julia Lawall <julia.lawall@inria.fr>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Shenwei Wang <shenwei.wang@nxp.com>, Waiman Long <longman@redhat.com>
-References: <AM0PR0402MB38910DB23A6DABF1C074EF1D88E52@AM0PR0402MB3891.eurprd04.prod.outlook.com>
-Subject: RE: [PATCH net-next] net: fec: Convert fec driver to use lock guards
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <AM0PR0402MB38910DB23A6DABF1C074EF1D88E52@AM0PR0402MB3891.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:RhNAOB7zwVYK3MyZH/sACZ3FmkNf75gEXEW2BT7QSpSBf0753Rp
- qxqGiNuMFwtHShwF3HQF6FJuw2OOXNo9PcDQlx6D5bwxSaGScX8q/YohwGjYOVmXT3CT+Nk
- zudjRI8k1dTix64dpcyf4lml8eExuE1yKO2PvxawoYK4gp2JFwTT1r5AASxFBetnZoCi9P0
- aw2MkJbScBbF0GoCgHtsg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:jhXu7Ls7F4g=;6Ol0DqOJu0Cat9xBMdFBH/JNn7F
- 7uNpSp0hXWxU7rgj96/rMmcOM3lDx/DzvfFL0KOQHK2qnAmaPvIt2bzYcdYJDl64v58GZSRWz
- eBdf3AfspiAzL147WIde3OHc0IvRnPaNYPTAE1Tqe0pdChr0HeYEMUg7CUVxyoSFB2ZjUIHmu
- kyffBJ+YVO0rX/F8q02746kUyyrquueB+X+sDnNIT4sRm9efYOKNTQKhGak7IdUVBdaQ9l52F
- SH9qa1kQGiazmMamsGjVlD9yF9m6qzDerHJ9oB3C9a6ebzTkcCffquqeXVshRrt92iEZZjnFp
- TY1jdiwZ6/z87RrIeks5DHOM//G0d6WeEvmhmj2U1/H9ZxF2yVajcGLKod5mBCDWl4ijNFUqd
- M6PXREASPi1XnsjK7HQD+/edWkqNs07P+ncMAOirxzX7DFuOL3yzKb2DH6sjp1+23yFg687WF
- D/MpvIVjgOAUeUhnT40b7W0si00/8t2cIsRSJUZszbb4NUaElNsViGjFk+WSO9VR8uj0XbWQ0
- O83XbGlBgpv1qn2mJYjV5YmHSaPa/22c4WJISlpa69POdUZaRcCSxelkzo2Nmc+mMtFUp0rb3
- kmz3pnPgHM+HbDfdtXsdRsfzRDntin7jbh9zWo5Kr46+TuJpyCr3Bh4yRGI4bCfKGAFLP2JPc
- FG/uzSq0WYdNe0YJ8mrTXjQGC5PaPpbgQVDMfmwaJBZ4yQQJjeJDE1yQ19+pn7K3kOwS8V7l+
- 6j1n++fGvKdt2dFOYMZSX6z7T4mJrCEtZzmniQjtljsLRC3PhWD9JWppDh3bw7Z7f9eUE9Cl9
- QBZ94z4RHzqhenRQz+bpF79hPbK06jWI115QI9rozXjLU=
 
-=E2=80=A6
-> > > +++ b/drivers/net/ethernet/freescale/fec_ptp.c
-> > > @@ -99,18 +99,17 @@
-> > >   */
-> > >  static int fec_ptp_enable_pps(struct fec_enet_private *fep, uint en=
-able)
-> > >  {
-> > > -	unsigned long flags;
-> > >  	u32 val, tempval;
-> > >  	struct timespec64 ts;
-> > >  	u64 ns;
-> > >
-> > > -	if (fep->pps_enable =3D=3D enable)
-> > > -		return 0;
-> > > -
-> > >  	fep->pps_channel =3D DEFAULT_PPS_CHANNEL;
-> > >  	fep->reload_period =3D PPS_OUPUT_RELOAD_PERIOD;
-> > >
-> > > -	spin_lock_irqsave(&fep->tmreg_lock, flags);
-> > > +	guard(spinlock_irqsave)(&fep->tmreg_lock);
-> > > +
-> > > +	if (fep->pps_enable =3D=3D enable)
-> > > +		return 0;
+Yan Zhai wrote:
+> On Fri, Jun 21, 2024 at 11:41=E2=80=AFAM Daniel Borkmann <daniel@iogear=
+box.net> wrote:
 > >
-> > This is not obviously correct. Why has this condition moved?
+> > On 6/21/24 6:00 PM, Yan Zhai wrote:
+> > > On Fri, Jun 21, 2024 at 8:13=E2=80=AFAM Daniel Borkmann <daniel@iog=
+earbox.net> wrote:
+> > >> On 6/21/24 2:15 PM, Willem de Bruijn wrote:
+> > >>> Yan Zhai wrote:
+> > >>>> Software GRO is currently controlled by a single switch, i.e.
+> > >>>>
+> > >>>>     ethtool -K dev gro on|off
+> > >>>>
+> > >>>> However, this is not always desired. When GRO is enabled, even i=
+f the
+> > >>>> kernel cannot GRO certain traffic, it has to run through the GRO=
+ receive
+> > >>>> handlers with no benefit.
+> > >>>>
+> > >>>> There are also scenarios that turning off GRO is a requirement. =
+For
+> > >>>> example, our production environment has a scenario that a TC egr=
+ess hook
+> > >>>> may add multiple encapsulation headers to forwarded skbs for loa=
+d
+> > >>>> balancing and isolation purpose. The encapsulation is implemente=
+d via
+> > >>>> BPF. But the problem arises then: there is no way to properly of=
+fload a
+> > >>>> double-encapsulated packet, since skb only has network_header an=
+d
+> > >>>> inner_network_header to track one layer of encapsulation, but no=
+t two.
+> > >>>> On the other hand, not all the traffic through this device needs=
+ double
+> > >>>> encapsulation. But we have to turn off GRO completely for any in=
+gress
+> > >>>> device as a result.
+> > >>>>
+> > >>>> Introduce a bit on skb so that GRO engine can be notified to ski=
+p GRO on
+> > >>>> this skb, rather than having to be 0-or-1 for all traffic.
+> > >>>>
+> > >>>> Signed-off-by: Yan Zhai <yan@cloudflare.com>
+> > >>>> ---
+> > >>>>    include/linux/netdevice.h |  9 +++++++--
+> > >>>>    include/linux/skbuff.h    | 10 ++++++++++
+> > >>>>    net/Kconfig               | 10 ++++++++++
+> > >>>>    net/core/gro.c            |  2 +-
+> > >>>>    net/core/gro_cells.c      |  2 +-
+> > >>>>    net/core/skbuff.c         |  4 ++++
+> > >>>>    6 files changed, 33 insertions(+), 4 deletions(-)
+> > >>>>
+> > >>>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice=
+.h
+> > >>>> index c83b390191d4..2ca0870b1221 100644
+> > >>>> --- a/include/linux/netdevice.h
+> > >>>> +++ b/include/linux/netdevice.h
+> > >>>> @@ -2415,11 +2415,16 @@ struct net_device {
+> > >>>>       ((dev)->devlink_port =3D (port));                         =
+\
+> > >>>>    })
+> > >>>>
+> > >>>> -static inline bool netif_elide_gro(const struct net_device *dev=
+)
+> > >>>> +static inline bool netif_elide_gro(const struct sk_buff *skb)
+> > >>>>    {
+> > >>>> -    if (!(dev->features & NETIF_F_GRO) || dev->xdp_prog)
+> > >>>> +    if (!(skb->dev->features & NETIF_F_GRO) || skb->dev->xdp_pr=
+og)
+> > >>>>               return true;
+> > >>>> +
+> > >>>> +#ifdef CONFIG_SKB_GRO_CONTROL
+> > >>>> +    return skb->gro_disabled;
+> > >>>> +#else
+> > >>>>       return false;
+> > >>>> +#endif
+> > >>>
+> > >>> Yet more branches in the hot path.
+> > >>>
+> > >>> Compile time configurability does not help, as that will be
+> > >>> enabled by distros.
+> > >>>
+> > >>> For a fairly niche use case. Where functionality of GRO already
+> > >>> works. So just a performance for a very rare case at the cost of =
+a
+> > >>> regression in the common case. A small regression perhaps, but de=
+ath
+> > >>> by a thousand cuts.
+> > >>
+> > >> Mentioning it here b/c it perhaps fits in this context, longer tim=
+e ago
+> > >> there was the idea mentioned to have BPF operating as GRO engine w=
+hich
+> > >> might also help to reduce attack surface by only having to handle =
+packets
+> > >> of interest for the concrete production use case. Perhaps here met=
+a data
+> > >> buffer could be used to pass a notification from XDP to exit early=
+ w/o
+> > >> aggregation.
+> > >
+> > > Metadata is in fact one of our interests as well. We discussed usin=
+g
+> > > metadata instead of a skb bit to carry this information internally.=
+
+> > > Since metadata is opaque atm so it seems the only option is to have=
+ a
+> > > GRO control hook before napi_gro_receive, and let BPF decide
+> > > netif_receive_skb or napi_gro_receive (echo what Paolo said). With =
+BPF
+> > > it could indeed be more flexible, but the cons is that it could be
+> > > even more slower than taking a bit on skb. I am actually open to
+> > > either approach, as long as it gives us more control on when to ena=
+ble
+> > > GRO :)
 > >
-> As you see, the assignment of ' pps_enable ' is protected by the 'tmreg_=
-lock',
-> But the read operation of 'pps_enable' was not protected by the lock, so=
- the
-> Coverity tool will complain a LOCK EVASION warning which may cause data
-> race to occur when running in a multithreaded environment.
+> > Oh wait, one thing that just came to mind.. have you tried u64 per-CP=
+U
+> > counter map in XDP? For packets which should not be GRO-aggregated yo=
+u
+> > add count++ into the meta data area, and this forces GRO to not aggre=
+gate
+> > since meta data that needs to be transported to tc BPF layer mismatch=
+es
+> > (and therefore the contract/intent is that tc BPF needs to see the di=
+fferent
+> > meta data passed to it).
+> >
+> =
 
-Should such information trigger the addition of any corresponding tags
-(like =E2=80=9CFixes=E2=80=9D and =E2=80=9CCc=E2=80=9D)?
+> We did this before accidentally (we put a timestamp for debugging
+> purposes in metadata) and this actually caused about 20% of OoO for
+> TCP in production: all PSH packets are reordered. GRO does not fire
+> the packet to the upper layer when a diff in metadata is found for a
+> non-PSH packet, instead it is queued as a =E2=80=9Cnew flow=E2=80=9D on=
+ the GRO list
+> and waits for flushing. When a PSH packet arrives, its semantic is to
+> flush this packet immediately and thus precedes earlier packets of the
+> same flow.
 
+Is that a bug in XDP metadata handling for GRO?
 
->                                                            Of course, th=
-is
-> data race issue is almost impossible, so I modified it by the way. Becau=
-se I don't
-> really want to fix it through another patch, unless you insist on doing =
-so.
-
-Would you like to take the known advice =E2=80=9CSolve only one problem pe=
-r patch=E2=80=9D
-better into account?
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/submitting-patches.rst?h=3Dv6.10-rc4#n81
-
-Please take another look at further approaches for the presentation of
-similar =E2=80=9Cchange combinations=E2=80=9D.
-
-Regards,
-Markus
+Mismatching metadata should not be taken as separate flows, but as a
+flush condition.=
 
