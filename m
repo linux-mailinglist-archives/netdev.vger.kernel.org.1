@@ -1,50 +1,87 @@
-Return-Path: <netdev+bounces-105930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C414B913A47
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 14:00:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65A6B913AC3
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 15:13:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0342E1C20D61
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 12:00:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AF4B281670
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 13:13:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08BEA181320;
-	Sun, 23 Jun 2024 12:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6546B1802CC;
+	Sun, 23 Jun 2024 13:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bhIsF/aB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E8IjD30I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72B8181313
-	for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 12:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A1D13C3C0;
+	Sun, 23 Jun 2024 13:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719144031; cv=none; b=XSL3pJpeP9Ei4zkQDV9LZat6vCxlyhdIQvCCkBBwC8WjlPC1HZ85/9CaKNmZWUXna7sEb8M1aPQHJD+Vg7wgqIOJ3j0rHI/CcSQve938O9sKgCZWydQTd6yYDoKgmJojcpVahsJM/PvLu8croUFaGdNGopPwsKjCLMe/hpgs2ZU=
+	t=1719148379; cv=none; b=oTHoWd6RRcEjd5RtC2O7owYm4upUkrOCO7D2gx0peYshZHNQIfOlCN9oeAk+44VVQQS7oJO253cfzg3nzqlklkFg7B8IvBBCllsCagCFbWqYW+Y6y/Hv7xOGULdI5WBmUSS1C00FwJvIY5ycPJkEA+H+txNJy5bJ99KAzNA7NnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719144031; c=relaxed/simple;
-	bh=uPppIcBgS4MgM9L+L5Kka4k2NKl3iGWBbo1ELJ1BkEc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nFDV1pqXodwSfJaCy/gx1deMlFjEpIInRrpEOcF9hJJDBmQy8KxoRPKXzXd7ZIGIu0aADYoKinEQ/VDqS2ncgd+HkJ4W78MUPwaF6KIXPOTN785q0+VncUxmv/+RZtRDWYtaLP837RQSVkPHky91b9rNCxc0i4kSLgRkBawFxsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bhIsF/aB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6D98CC4AF0C;
-	Sun, 23 Jun 2024 12:00:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719144031;
-	bh=uPppIcBgS4MgM9L+L5Kka4k2NKl3iGWBbo1ELJ1BkEc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bhIsF/aBP7hXFZ+RUICjf9NhRO58RMdTad97Gh/XMsV0XkyoTU6l59EQjeV1I3w9T
-	 EOkLHurCFfRKsTA/UTyrqCqOlwyWQpdlJsBzCpOz4JrHzharJengRK9jU2CFOELdtD
-	 aUxXOZhYwjFTyAPKvm4mOBO1WYbBTAefRdKGWFsaxhDEI7H6sAzbCIgrS2FNh7YvGF
-	 /6HexN3n9aVWyeEkBfSrhTQYfDWKKRkY2W4XXwxW/5tWnD37breoFUWwBUOICNTp5n
-	 TIBESAFVCoRemK91bbjSM6uM28WJwBcDuNsoZQdjTODnVUkAd/iSIIBXIq7pMQQT4n
-	 swSXL0alHfMmg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 620CDE7C4CA;
-	Sun, 23 Jun 2024 12:00:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1719148379; c=relaxed/simple;
+	bh=Y8cgz0iN6TvpHLfS6UmqF3SdYCcIUBZR7OpNtRcoF9Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dJjNSZ5O43S5/Z9ooBAtrpXFrqWPAWgk/T/riI+/gG9y/IMN6P17hyy+G2QJcHJwLu4QA+NHklCdKtfah+Ot0iT8oMdqUIPmELGwWdl+AsXjUpJCR4R/A6nF69nvVb2zLkavr8K8cVnqZHD+MJYzTYJB70mT6D7lZaHLbKpRzDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E8IjD30I; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7066c799382so877866b3a.3;
+        Sun, 23 Jun 2024 06:12:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719148377; x=1719753177; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0eMRMkArlJlGkTZQ9yNJafa6QgbQK/SySA6cQAcMaZQ=;
+        b=E8IjD30IR2oVavooJapy3TLfAtIHA6gCZGffK7YNOqSm0B+PZl2/ZVn35uecUcMvQM
+         vpoXhyTvB8cCXX4T0uhnT7tDJKeKMeZMp4X6IM7KDMqyY7aB+cTUZjT921btZTahJmJu
+         IhqLdqBUuuIxhKsFq0jjCdn9W7viC5yYwzrlydYUslv87wlkq11aNyKelwGKQIRUYM3S
+         VK8iwDSdl5qMgSJmzc7CPjknX2B40wNT+WFo4ifTrOmMVi0NdYIPoJoOb352SNSVF6Ll
+         QrJw17PF7UU1CtOgqq9IlPe4O0mWx/d1eqFYgKErbGjj357Wtoj6Moo8o4z9BAv5UfZ+
+         lrPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719148377; x=1719753177;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0eMRMkArlJlGkTZQ9yNJafa6QgbQK/SySA6cQAcMaZQ=;
+        b=fr+FULXHauBAaq21Q09zXIw+6uU/XhVbEa/MYj8uPUbHV2su8GOEX4V73qndDo319B
+         AH4KowBCP6MQ47yAsrxAZWQq8qY0juCg7ikTVUepDiBOeC3SU5Vxsr9R+Xn1eyb/yYtZ
+         Mat4v2LP4dky4R0VH0qwegOGuxA8mDPrXpnncFyMsbTbpGgJ9qU4gIeEi++zE7Py5RZm
+         EuajGTp7qKQRXiLVR/8IVNW6Ba0PrIXA0hIc2ewJIzsC2AyEnMwqXrQcfzrpPQ6F+S4B
+         kWX5XQh4tBdv/Up7GzCHvJpbCWGgfTb9A9kED3H8A2LAcoQtejC5d3uUG8iXNqI8RFL2
+         Bsog==
+X-Forwarded-Encrypted: i=1; AJvYcCU3KgY5M9uBC5ZtgspOX0aEC7jucUVQ35B2zh6HSSUP7CIA3xSkxUP2MkxSA6TBwuYu3twZfAocVzGXnA5TSkuTdgTy1zyn8boPPYhWGPF0+8TJIKwuLwokjqeKTyS+4UJqXX5Nu9J74fZ6ao0aWZ8hbjlgwB0+U2ZZJMf0eM6PEA==
+X-Gm-Message-State: AOJu0YxkgWQyt/6Uw4HEfc2GWiQjM1LHNVacKn3Rkldjd3UN31rXVkPd
+	NmFoKhHMqy8g2olajaj3j9iTHInT6Y2YH+5jyoMU3NVU0TXNhsRe
+X-Google-Smtp-Source: AGHT+IHSMmq1tzJUepHXAuc62rJMWeMz54VK9TgPudVnnGsJXIylFYvN49avX8NpfQIDyz3pMCV1SQ==
+X-Received: by 2002:a05:6a20:92a2:b0:1af:96e8:7b9c with SMTP id adf61e73a8af0-1bcf7fd11famr1955172637.47.1719148377216;
+        Sun, 23 Jun 2024 06:12:57 -0700 (PDT)
+Received: from localhost.localdomain ([118.32.98.101])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7066ac98fc9sm2408207b3a.193.2024.06.23.06.12.54
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sun, 23 Jun 2024 06:12:56 -0700 (PDT)
+From: yskelg@gmail.com
+To: Alexandra Winter <wintera@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>
+Cc: shjy180909@gmail.com,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yunseong Kim <yskelg@gmail.com>
+Subject: [PATCH] s390/netiucv: handle memory allocation failure in conn_action_start()
+Date: Sun, 23 Jun 2024 22:11:55 +0900
+Message-ID: <20240623131154.36458-2-yskelg@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,49 +89,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/4][pull request] ice: prepare representor for SF
- support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171914403139.11613.1276505969407776187.git-patchwork-notify@kernel.org>
-Date: Sun, 23 Jun 2024 12:00:31 +0000
-References: <20240621160820.3394806-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20240621160820.3394806-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org,
- michal.swiatkowski@linux.intel.com
 
-Hello:
+From: Yunseong Kim <yskelg@gmail.com>
 
-This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+This patch handle potential null pointer dereference in
+iucv_path_connect(), When iucv_path_alloc() fails to allocate memory
+for 'rc'.
 
-On Fri, 21 Jun 2024 09:08:13 -0700 you wrote:
-> Michal Swiatkowski says:
-> 
-> This is a series to prepare port representor for supporting also
-> subfunctions. We need correct devlink locking and the possibility to
-> update parent VSI after port representor is created.
-> 
-> Refactor how devlink lock is taken to suite the subfunction use case.
-> 
-> [...]
+Signed-off-by: Yunseong Kim <yskelg@gmail.com>
+---
+ drivers/s390/net/netiucv.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Here is the summary with links:
-  - [net-next,1/4] ice: store representor ID in bridge port
-    https://git.kernel.org/netdev/net-next/c/639ac8ce8b65
-  - [net-next,2/4] ice: move devlink locking outside the port creation
-    https://git.kernel.org/netdev/net-next/c/8d2f518c0c9d
-  - [net-next,3/4] ice: move VSI configuration outside repr setup
-    https://git.kernel.org/netdev/net-next/c/4d364df2b5ed
-  - [net-next,4/4] ice: update representor when VSI is ready
-    https://git.kernel.org/netdev/net-next/c/fff5cca345a6
-
-You are awesome, thank you!
+diff --git a/drivers/s390/net/netiucv.c b/drivers/s390/net/netiucv.c
+index 039e18d46f76..c2df0c312d81 100644
+--- a/drivers/s390/net/netiucv.c
++++ b/drivers/s390/net/netiucv.c
+@@ -855,6 +855,10 @@ static void conn_action_start(fsm_instance *fi, int event, void *arg)
+ 
+ 	fsm_newstate(fi, CONN_STATE_SETUPWAIT);
+ 	conn->path = iucv_path_alloc(NETIUCV_QUEUELEN_DEFAULT, 0, GFP_KERNEL);
++	if (!conn->path) {
++		IUCV_DBF_TEXT_(setup, 2, "iucv_path_alloc: memory allocation failed.\n");
++		return;
++	}
+ 	IUCV_DBF_TEXT_(setup, 2, "%s: connecting to %s ...\n",
+ 		netdev->name, netiucv_printuser(conn));
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.45.2
 
 
