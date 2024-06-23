@@ -1,136 +1,96 @@
-Return-Path: <netdev+bounces-105951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3B4F913D71
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 19:56:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D0AA6913D89
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 20:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D66F1F20D46
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 17:56:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EC061F21E5C
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 18:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E671836E3;
-	Sun, 23 Jun 2024 17:56:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB5D01836E3;
+	Sun, 23 Jun 2024 18:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SBi8Ig5k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QwQnrRF4"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0444712E1D1;
-	Sun, 23 Jun 2024 17:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF9B2AD22;
+	Sun, 23 Jun 2024 18:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719165405; cv=none; b=CL8POoEYw5woExXpVJJgZBW/I6p4kranMdA00NTMO6GkQrjGVxJ+9VhS6vIGZ5nEMBjEZcZDucNR2PURGZdO833QNO4n8br5VyqJublxwGYbqm/GnjssGqQxwRmkozZ4JmMP2cordAr+9QYedcuS/yAuQkasVmlBAhx7qR+ciek=
+	t=1719166228; cv=none; b=tvge8J4kUPo1TuOrICtiilYBXErGn55dO3HD1v9E0G/rXT9okyT+q6TjJNWST44oeR146N9laKQ9L9IwTAbT5zqpLS745VtsWF/6gSTKTf8Um8FM59kZcVm/NWAIxZ0/rk+01LfrybvQmoaeivDHNh4+PwUV4kNyJzew3ks6L24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719165405; c=relaxed/simple;
-	bh=R9Ubzz/1Tw0aPlQUWNOfjVouf4hBa4yPYahG9GCS5I0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pJHdLpuay/J3TypXNvw1xVxPLkAK6M5UAzXG4mdhGhjzQ3vVW1toJBoLsBdTXw+viPTbLHq47O2bRnK2L2myXWntfocCQf1CmlRL+rHGkCT5IZEmP2oDV56aCMGy2YzgWyIeNXG2OWUYzuSj8ABtMzyCw4E0SSDZ5ytZX1KEGwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SBi8Ig5k; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6B2hSzN6wUZJiN2cPxvTxUJrgPEaM8Jvt0OMTSIbYFM=; b=SBi8Ig5kM9ywmlWWVx0DvoKUAo
-	yyRh60WddHqNpeE/FjsSi/ZryLQInZXbah8k/+I89/2eJfBdsIjvMtjMm8b05mPvAZ+qUCoGwhbvt
-	jZ/tokMkC1U0/CbtrK7E/T3nAZV16KPC37oMmxXzyxRG9Er14xy1J/aFqSNzw3EbImpw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sLRRv-000nIu-KM; Sun, 23 Jun 2024 19:56:23 +0200
-Date: Sun, 23 Jun 2024 19:56:23 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netdev@vger.kernel.org, nbd@nbd.name, lorenzo.bianconi83@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, conor@kernel.org,
-	linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, catalin.marinas@arm.com,
-	will@kernel.org, upstream@airoha.com,
-	angelogioacchino.delregno@collabora.com,
-	benjamin.larsson@genexis.eu, rkannoth@marvell.com,
-	sgoutham@marvell.com
-Subject: Re: [PATCH v3 net-next 2/2] net: airoha: Introduce ethernet support
- for EN7581 SoC
-Message-ID: <2752c453-cabd-4ca0-833f-262b221de240@lunn.ch>
-References: <cover.1719159076.git.lorenzo@kernel.org>
- <89c9c226ddb31d9ff3d31231e8f532a3e983363a.1719159076.git.lorenzo@kernel.org>
+	s=arc-20240116; t=1719166228; c=relaxed/simple;
+	bh=50ecyUID+IcgYhdJqxEnwEQsRz1NsA8uh3n7Nc5SddM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=H9zAgGFVg0R00Ko1+n58nR60WQKxJPtvLKsrR4ASoALrxtNlf+m8KSE/WMGqmdwsyyHHiarM+dn8Ww/is+8pbN/ZZ1WHPKD/f09EKPJckHGI9QS71vdcCe7P/p389DUYV4dr8dEE/hjVAEabYWnk9kBSiKjkDXrVbnBuc0j95Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QwQnrRF4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EAD50C32786;
+	Sun, 23 Jun 2024 18:10:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719166228;
+	bh=50ecyUID+IcgYhdJqxEnwEQsRz1NsA8uh3n7Nc5SddM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QwQnrRF4wsephOL6j9IXivwAzIfBKUQtLOUq29/uYquld9ij3nQ82DcXkJG2BYvqH
+	 5AP3eMxBLtxwhK0CW0D1HSgFYZNlRR899RHTVLGCdmiaChNbk1VlUrNjXDOnY9oe1n
+	 6vOZpIjmce67zBmTlIfHWB+fc78u37WtwBr6Q3eGAi1mXa6T3DV0OPQXSC7DfdzoKM
+	 i+u3fMa8vlYl2FkvwSvT4A1hWIzoCuqplmnu5L3AHAv4fvHT+s1UxuelbRopyIBZHZ
+	 LQYwdITWzvSdZxMGdZVMkmfhit1wqreUxhYsosCmz+cc677VGqLNr0vGaZhf1HscLG
+	 h1xCpULwKLHTQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D29A4CF3B80;
+	Sun, 23 Jun 2024 18:10:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <89c9c226ddb31d9ff3d31231e8f532a3e983363a.1719159076.git.lorenzo@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net PATCH] octeontx2-pf: Fix coverity and klockwork issues in octeon
+ PF driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171916622785.24104.1126101038206521333.git-patchwork-notify@kernel.org>
+Date: Sun, 23 Jun 2024 18:10:27 +0000
+References: <20240622064437.2919946-1-sumang@marvell.com>
+In-Reply-To: <20240622064437.2919946-1-sumang@marvell.com>
+To: Suman Ghosh <sumang@marvell.com>
+Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+ hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lcherian@marvell.com, jerinj@marvell.com,
+ rkannoth@marvell.com
 
-> +static int airoha_fe_set_pse_oq_rsv(struct airoha_eth *eth,
-> +				    u32 port, u32 queue, u32 val)
-> +{
-> +	u32 orig_val, tmp, all_rsv, fq_limit;
-> +	const u32 pse_port_oq_id[] = {
-> +		PSE_PORT0_QUEUE,
-> +		PSE_PORT1_QUEUE,
-> +		PSE_PORT2_QUEUE,
-> +		PSE_PORT3_QUEUE,
-> +		PSE_PORT4_QUEUE,
-> +		PSE_PORT5_QUEUE,
-> +		PSE_PORT6_QUEUE,
-> +		PSE_PORT7_QUEUE,
-> +		PSE_PORT8_QUEUE,
-> +		PSE_PORT9_QUEUE,
-> +		PSE_PORT10_QUEUE
-> +	};
+Hello:
 
-> +static void airoha_fe_oq_rsv_init(struct airoha_eth *eth)
-> +{
-> +	int i;
-> +
-> +	/* hw misses PPE2 oq rsv */
-> +	airoha_fe_set(eth, REG_FE_PSE_BUF_SET,
-> +		      PSE_DEF_RSV_PAGE * PSE_PORT8_QUEUE);
-> +
-> +	for (i = 0; i < PSE_PORT0_QUEUE; i++)
-> +		airoha_fe_set_pse_oq_rsv(eth, 0, i, 0x40);
-> +	for (i = 0; i < PSE_PORT1_QUEUE; i++)
-> +		airoha_fe_set_pse_oq_rsv(eth, 1, i, 0x40);
-> +
-> +	for (i = 6; i < PSE_PORT2_QUEUE; i++)
-> +		airoha_fe_set_pse_oq_rsv(eth, 2, i, 0);
-> +
-> +	for (i = 0; i < PSE_PORT3_QUEUE; i++)
-> +		airoha_fe_set_pse_oq_rsv(eth, 3, i, 0x40);
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Code like this is making me wounder about the split between MAC
-driver, DSA driver and DSA tag driver. Or if it should actually be a
-pure switchdev driver?
+On Sat, 22 Jun 2024 12:14:37 +0530 you wrote:
+> From: Ratheesh Kannoth <rkannoth@marvell.com>
+> 
+> Fix unintended sign extension and klockwork issues. These are not real
+> issue but for sanity checks.
+> 
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+> 
+> [...]
 
-If there some open architecture documentation for this device?
+Here is the summary with links:
+  - [net] octeontx2-pf: Fix coverity and klockwork issues in octeon PF driver
+    https://git.kernel.org/netdev/net/c/02ea312055da
 
-What are these ports about?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> +static void airoha_qdma_clenaup_rx_queue(struct airoha_queue *q)
 
-cleanup?
-
-> +static int airoha_dev_open(struct net_device *dev)
-> +{
-> +	struct airoha_eth *eth = netdev_priv(dev);
-> +	int err;
-> +
-> +	if (netdev_uses_dsa(dev))
-> +		airoha_fe_set(eth, REG_GDM1_INGRESS_CFG, GDM1_STAG_EN_MASK);
-> +	else
-> +		airoha_fe_clear(eth, REG_GDM1_INGRESS_CFG, GDM1_STAG_EN_MASK);
-
-Does that imply both instances of the GMAC are not connected to the
-switch? Can one be used with a PHY?
-
-	Andrew
 
