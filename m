@@ -1,140 +1,118 @@
-Return-Path: <netdev+bounces-105905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40BBA9137CC
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 07:19:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43E4A91383A
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 08:01:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F4691C20EB0
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 05:19:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED640281FE8
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 06:01:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67332D530;
-	Sun, 23 Jun 2024 05:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B8D41805E;
+	Sun, 23 Jun 2024 06:01:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="egUQHnbd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R993nS54"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E951DFE3
-	for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 05:19:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3458C11;
+	Sun, 23 Jun 2024 06:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719119964; cv=none; b=i7yvTV1x9kvAEUjJ8N1fG0Iblh6BEpQ+usezgVH2fa8uKYma6TBjEriWNyVEWIhlWfYm3HJISth12fKVdJlbm3tD6O2zS7TxpyZdEr8Ucbyg7QsZR5gjJeE/vJzsmIVgfRLYmFzaTZreWBhgJZ5BYqlgXv0Kvm79bDgEINURw3k=
+	t=1719122468; cv=none; b=PTUmBY1dmoLJkNH7hTLa1xsNk4SjKRW6WTh4luJOhglupT9Y5dXtDWj7Xkn5ID0Sw6296myI4wjOyEAcByhk8Lb9CT7ND/3Lu691qA49c2wYGnj2/h2QSe1P2AX91DLPMfxtFZCKDKZIKLSIvmgt/VmieXQ65eQ/rSgRoDdIeMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719119964; c=relaxed/simple;
-	bh=JKxe257slY2akgpfrgY3SogqhQAjUwyvG5Kn4fSXuc4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fvXjRSbUD6XbjmX7QXq/Q6VeivFDiyye+XtTcyO6tALJkcDUlJEZaGRGfOlqt1F7mkfYKFkazd/nfQwOt0G+DSrZP5y/MkGcvi5UQOyg2RqGqILWY7u7WKkw+V/LTv7/V7m9bFKAL32ssTI97ilidxz0u4+3KnUMrJRFzWhdggI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=egUQHnbd; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1719122468; c=relaxed/simple;
+	bh=7tBYjcPASrEA9EIwWbdTX/mLPmfYmGFhdjPrPv9CTiE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RQ1+YiKUYDt22Lm5MDnfhUOjUdDxsDQF6eh55HOL7G3Yojxq4svKd9adIrMLSdYjNTQ+L+CLHOLZaQwEaAQZ12nkH61i1AmuBGTxsV3HfvxoXD0daye5blAmYFKX+k/lZWwUWoz0qRvq5i3vI/21ybb2Fa6RqMjV5iebl0IohUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R993nS54; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-79baa4e8531so326304185a.2;
+        Sat, 22 Jun 2024 23:01:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1719119963; x=1750655963;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=vou7+OzLuYsbvKT5qMRhzOH39k9YAh9IGL9CPQ6tUaU=;
-  b=egUQHnbd4QgYBKpTOcsf1KB78wKZryGnaJQbpupP4T3Z2XCcK+3kOREQ
-   6VrUsYquVAMscKo41TiH89VhC2d8q8XMgMEOnoHBLeRFVTxL5rwjmLDMO
-   LsFzl9hjgtrsvLcIVzo83Inz/WT4EYPIDGuGg4vSJ7ZexwzfnbV7PaNDD
-   A=;
-X-IronPort-AV: E=Sophos;i="6.08,259,1712620800"; 
-   d="scan'208";a="734815548"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2024 05:19:17 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:10846]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.10.32:2525] with esmtp (Farcaster)
- id a638cf36-5dbb-4130-8ecb-b31fb7fa6624; Sun, 23 Jun 2024 05:19:16 +0000 (UTC)
-X-Farcaster-Flow-ID: a638cf36-5dbb-4130-8ecb-b31fb7fa6624
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Sun, 23 Jun 2024 05:19:16 +0000
-Received: from 88665a182662.ant.amazon.com (10.142.209.217) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Sun, 23 Jun 2024 05:19:13 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <mhal@rbox.co>
-CC: <cong.wang@bytedance.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v2 net 01/15] af_unix: Set sk->sk_state under unix_state_lock() for truly disconencted peer.
-Date: Sat, 22 Jun 2024 22:19:06 -0700
-Message-ID: <20240623051906.79744-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <2d34e8df-cbb0-486a-976b-c5c72554e184@rbox.co>
-References: <2d34e8df-cbb0-486a-976b-c5c72554e184@rbox.co>
+        d=gmail.com; s=20230601; t=1719122465; x=1719727265; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=639B1VhzkVRiQ3egX05fSRdoRLJZKUd3UI9/6wfJ8lw=;
+        b=R993nS54gBQpPnXksw45EdyenrtLPYB3PmH6lO7ye4DAWTstO2fNdwaDSKS50tzZMG
+         G2SRAG/e3ADXA7/Uw+En4WEJ66dhxJhNIQj/C4JFGQrSAOCyC7DuzK8jFHCvSxJNXG6B
+         hy7TfF/cBCwJorUHscfJETTmJufxf8caMyMvMZF2ywAWqKTcSRj0h6JDausIwcfrDElH
+         0jbik2TCCgi+eBaq4zVfXb4vbviX2AEWlrCriSPCj4jSeejjaDCweHM96sJ15UPln9M7
+         YNc5PUDAZ3RrdecTx7vsdqVzU/yIpirvYSExFO00Q5l8q6oiR5vCeiR/dXK0W35XcUln
+         txmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719122465; x=1719727265;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=639B1VhzkVRiQ3egX05fSRdoRLJZKUd3UI9/6wfJ8lw=;
+        b=R6r8PO9gl32YCX79nMEJ4J4RZYcyICnnjMd9X8xtXAZt+8gC+BrTUfQPg/RSZubuzm
+         77TSRNtq8DBd8p+a8aW7TrrjaB2lY+Y/WP9xbf4eSD995/uQSQMigMRpdH85AbevF6F+
+         B3gz6UbxmkkDzL8zRj8DDspihdEac6GCkBkSQRIUsw6R2cPByZRlRutf86ccIL1ncH9/
+         pnN322M9Dq2JLFSY5TKb4GIpg/VPrV+CPcZsZODs0BuATu/Glw1v1YumsFv1sCzCqU5m
+         FdOaKbDXukPSySg/aZ9fwDMewmzKSm5s/W5Te2fMF2Z+wve+iDof5FaczqaPX1uuqHFE
+         GsOA==
+X-Forwarded-Encrypted: i=1; AJvYcCVajQzy9Hbni0oxBpL2+OOM9ET+/fAjwYME5PfBc+rJF7nxjOuazS+nlkyWZXHMY4Kx0wsjDJoBysiuriAY+Z4GGPlf/T0Wbr6OP1PvJVa4JcdYEP8Kqz4fTP9jWmsSsjh8kxFBs+ZjdL71MwpcUEeFOCuRiyFTUxxNSzDeDsvhB2vqzwjKstF/UnkEPBnDA83PfMDq1tZVzcYwo3jGlFAqx5AI0hZYArDj7uEVFCmG84oGMYiqabRRc7scJoXm03f7w7XjjQKmY+s1rz3yZ+sxNWoLx61WR6fj/RUJ1ddX+oPW9plU8FPW8N6KoqP5e5VjuxvA5w==
+X-Gm-Message-State: AOJu0YyBC/us2QSiJofjJQ16RCW7Jk0Es7RtiShpUz1F5UZdlRFUhfhN
+	+lmnymsOwfAmr+0pqBhbPzXxambXIU6iILsCdC86bwcsoATc33cOarFvSQFnoF0IYrNmyaQ24AS
+	R9beyfGGncsFCOdoWeLOi5B3hlGE=
+X-Google-Smtp-Source: AGHT+IHcXR+ehU+k0C/NmM/DLF8W1FSfgc1FOoi+9SruG7tbvTjl8bMu8+dVhBmSjLDe3SkqoqwwTUGvFNLK0f3vidI=
+X-Received: by 2002:ad4:5228:0:b0:6b4:f644:9d87 with SMTP id
+ 6a1803df08f44-6b53debf738mr17899726d6.21.1719122465581; Sat, 22 Jun 2024
+ 23:01:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWB002.ant.amazon.com (10.13.138.79) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20240621022959.9124-1-laoar.shao@gmail.com> <20240621022959.9124-7-laoar.shao@gmail.com>
+ <ZnWGsw4d9aq5mY0S@casper.infradead.org> <CALOAHbC0ta-g2pcWqsL6sVVigthedN04y8_tH-cS9TuDGEBsEg@mail.gmail.com>
+ <ZneSWDgijj3r0MMC@casper.infradead.org>
+In-Reply-To: <ZneSWDgijj3r0MMC@casper.infradead.org>
+From: Yafang Shao <laoar.shao@gmail.com>
+Date: Sun, 23 Jun 2024 14:00:29 +0800
+Message-ID: <CALOAHbDvyBn=yUABT4G6Egne48cQqHDM7bvuBeKFmbSA5fhg4A@mail.gmail.com>
+Subject: Re: [PATCH v3 06/11] mm/util: Deduplicate code in {kstrdup,kstrndup,kmemdup_nul}
+To: Matthew Wilcox <willy@infradead.org>
+Cc: torvalds@linux-foundation.org, ebiederm@xmission.com, 
+	alexei.starovoitov@gmail.com, rostedt@goodmis.org, catalin.marinas@arm.com, 
+	akpm@linux-foundation.org, penguin-kernel@i-love.sakura.ne.jp, 
+	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, selinux@vger.kernel.org, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, dri-devel@lists.freedesktop.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Michal Luczaj <mhal@rbox.co>
-Date: Sun, 23 Jun 2024 00:43:27 +0200
-> On 6/20/24 23:56, Kuniyuki Iwashima wrote:
-> > From: Michal Luczaj <mhal@rbox.co>
-> > Date: Thu, 20 Jun 2024 22:35:55 +0200
-> >> In fact, should I try to document those not-so-obvious OOB/sockmap
-> >> interaction? And speaking of documentation, an astute reader noted that
-> >> `man unix` is lying:
-> > 
-> > At least I wouldn't update man until we can say AF_UNIX MSG_OOB handling
-> > is stable enough; the behaviour is not compliant with TCP now.
-> 
-> Sure, I get it.
-> 
-> > (...)
-> > And we need
-> > 
-> > ---8<---
-> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> > index 5e695a9a609c..2875a7ce1887 100644
-> > --- a/net/unix/af_unix.c
-> > +++ b/net/unix/af_unix.c
-> > @@ -2614,9 +2614,20 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
-> >  	struct unix_sock *u = unix_sk(sk);
-> >  
-> >  	if (!unix_skb_len(skb) && !(flags & MSG_PEEK)) {
-> > -		skb_unlink(skb, &sk->sk_receive_queue);
-> > -		consume_skb(skb);
-> > -		skb = NULL;
-> > +		struct sk_buff *unlinked_skb = skb;
-> > +
-> > +		spin_lock(&sk->sk_receive_queue.lock);
-> > +
-> > +		__skb_unlink(skb, &sk->sk_receive_queue);
-> > +
-> > +		if (copied)
-> > +			skb = NULL;
-> > +		else
-> > +			skb = skb_peek(&sk->sk_receive_queue);
-> > +
-> > +		spin_unlock(&sk->sk_receive_queue.lock);
-> > +
-> > +		consume_skb(unlinked_skb);
-> >  	} else {
-> >  		struct sk_buff *unlinked_skb = NULL;
-> >  
-> > ---8<---
-> 
-> I gotta ask, is there a reason for unlinking an already consumed
-> ('consumed' as in 'unix_skb_len(skb) == 0') skb so late, in manage_oob()?
-> IOW, can't it be unlinked immediately once it's consumed in
-> unix_stream_recv_urg()? I suppose that would simplify things.
+On Sun, Jun 23, 2024 at 11:11=E2=80=AFAM Matthew Wilcox <willy@infradead.or=
+g> wrote:
+>
+> On Sun, Jun 23, 2024 at 10:29:30AM +0800, Yafang Shao wrote:
+> > On Fri, Jun 21, 2024 at 9:57=E2=80=AFPM Matthew Wilcox <willy@infradead=
+.org> wrote:
+> > >
+> > > On Fri, Jun 21, 2024 at 10:29:54AM +0800, Yafang Shao wrote:
+> > > > +++ b/mm/internal.h
+> > >
+> > > Why are you putting __kstrndup in a header file when it's only used
+> > > in util.c?
+> >
+> > I want to make it always inlined. However, it is not recommended to
+> > define an inline function in a .c file, right ?
+>
+> I'm not aware of any such recommendation.  Better than putting it in
+> a .h file that everybody has to look at but nobody uses.
 
-I also thought that before, but we can't do that.
+Understood.
+Will change it.
 
-Even after reading OOB data, we need to remember the position
-and break recv() at that point.  That's why the skb is unlinked
-in manage_oob() rather than unix_stream_recv_urg().
+--=20
+Regards
+Yafang
 
