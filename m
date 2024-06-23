@@ -1,161 +1,157 @@
-Return-Path: <netdev+bounces-105942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 631F3913BEB
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 17:04:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEC23913C58
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 17:29:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B37D1F227EF
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 15:04:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37AEDB210CE
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 15:29:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7910181B8E;
-	Sun, 23 Jun 2024 15:04:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="WRqAdfMZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECDAE181311;
+	Sun, 23 Jun 2024 15:29:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04olkn2039.outbound.protection.outlook.com [40.92.75.39])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB4220E6;
-	Sun, 23 Jun 2024 15:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.75.39
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719155078; cv=fail; b=UR5Jfmml48/pH70s47J7g9Uemrac6Lln93+Zl2LwaIpR2J4iMYHLLLg2IapwFFwLdpwVIdGwHSItUqn/wRavzIXeHHAAD3TeQIb/9QCRyPpY5qZ1YRQbr6lx3BbZ7y0Bwz84l7TLfNi9i2lc57wpO6vowYlbnde383zdZPqEoyQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719155078; c=relaxed/simple;
-	bh=gCaEd+gaqqh80Co47KTty0GlzLQchxsvTTgCuIAV3Pc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WtUQWag/UycZPnDAAWN2WPF9Y0ZMuzQexJTVwgNw1u5WED1DhSY6M0jdjUHAJd6YZup7SCyAf4/dps/Uw5uuAwHTi/PLghHOAc3EMGLQbGEifBtqEAAyh8e9q60nuGiB/0EbRQ+BDR+6awvQHPmDuJVLPyQKOEtndLJxqqsqe00=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=WRqAdfMZ; arc=fail smtp.client-ip=40.92.75.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ByKG2+hSucB660Gn+3shEnG5eXTysMj1c3oyWEtjCPVTDt8d4S2lfvouHLeGhWo98HagGU45N6fvsNh+bYXhiF37+4iwN060qVJHRpb4JkG46jj1qxdB5HBbnDvg/jBjWq6MK9XXtQVcw/HgaxU03ZzTtUmEjse2r3EM9AJSz1JZlABJ1yABWFR9Ib89bFSngyNmj65GwaOcrRhdrr7CfUvsr5mWH2QecLMa9d3TbeaAH24sHxiKjJ7IoYH/5qMxEkjE73NM1HqZDFcUcLBP9640w2aTFGC6ag8ys24g4d3h4kwSV6jcitMZLrcEHaX1PMuTqRbcUjAyH5kAh9CLmQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gCaEd+gaqqh80Co47KTty0GlzLQchxsvTTgCuIAV3Pc=;
- b=U8RO6aP+wfhYxztVReD89F7gpyRoh9fH2V3f+qC1uH29sepoLBI7zyRbI066r/LfGQDna0yX7Da27Qp4F4RB6fOGodT5eI86iGbKeKT5XHpAgSnBchxyknIoyd4p2ptdPAC6IANPBAIito4l//RwN4Mt2k8XhkPxI1anI00o5S0uerKDHTQU/ThcfEaX6Tbx8BpsRR9Btff06NFVskEC8Hf2iO/wTYWKQFYx9wPk/hi5CsPmlk2z0b4V7qUEESyawmDgv8mVCXlLDWahSIR0vCUrIPksM+u/6iwVtbtsvq5ilnqFdqqZsQYB6gKUZMzknO00fKLFMNZMFqQvc0h83A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gCaEd+gaqqh80Co47KTty0GlzLQchxsvTTgCuIAV3Pc=;
- b=WRqAdfMZDLxdv0unXdTfKQdreF4ICzTJjz4uGjJjeUEx1vTbNXqkrNi63ZpFWg5A7uAXxjJwdw4hrqfu1k455H+L3K8snaU5xdc8UcxP8pWdmrCp8osxDAtOrm58Xj0y77P0bp1nm1UlXj2XIRaunNyxwNEmhadU01cn89iabuEI4/6xX/VMt/UMb+sWgTQ1Qmt6QFN37gtrN7M1fYCENfbGyGR0B5kXX7+94mLMax22jsywN5NhgyR9uwswVb9YYkd1JAa3SoK/bV+vK+81ziqRCbWj99nbT7Fq0rV1lgN/jdDv8jIIlyKog+37lebivCKcGbTHzCNlp87guh6mRw==
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
- by PR3P194MB0553.EURP194.PROD.OUTLOOK.COM (2603:10a6:102:3e::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.26; Sun, 23 Jun
- 2024 15:04:34 +0000
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::3d63:e123:2c2f:c930]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::3d63:e123:2c2f:c930%4]) with mapi id 15.20.7698.024; Sun, 23 Jun 2024
- 15:04:34 +0000
-From: Luigi Leonardi <luigi.leonardi@outlook.com>
-To: sgarzare@redhat.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	jasowang@redhat.com,
-	kuba@kernel.org,
-	kvm@vger.kernel.org,
-	luigi.leonardi@outlook.com,
-	mst@redhat.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	stefanha@redhat.com,
-	virtualization@lists.linux.dev,
-	xuanzhuo@linux.alibaba.com
-Subject: Re: [PATCH net-next v2 2/3] vsock/virtio: add SIOCOUTQ support for all virtio based transports
-Date: Sun, 23 Jun 2024 17:04:17 +0200
-Message-ID:
- <AS2P194MB2170A39251AC72302E8F6F459ACB2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <dlqbbypoowki556ag74zgnsiscsctjf2xfcw5e5lf4b4pg6f6g@af4lxbljrw7x>
-References: <dlqbbypoowki556ag74zgnsiscsctjf2xfcw5e5lf4b4pg6f6g@af4lxbljrw7x>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [AEhnebDCHYuCLeqIQH6Wb++oMX18JyG9]
-X-ClientProxiedBy: MI1P293CA0022.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:3::19) To AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:20b:642::8)
-X-Microsoft-Original-Message-ID:
- <20240623150417.8018-1-luigi.leonardi@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6925FBE6F
+	for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 15:29:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719156566; cv=none; b=qBWRZVs/QDkBOzn/ZUS3CoYxzPxrNPix5hohdOgu/D+RIgQx5H04WQmpPA52F7uJ5MGaqFaDnQzVtGwBLb2SsVBFL3YuuPBX0ounSM8RsO/TKhn2Yp2hqJ5ne8YXPAta/4oSR390eLzAG0ZUumSedes7tsami+tRrcloo0VaGag=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719156566; c=relaxed/simple;
+	bh=5GzQNXCfF8EdbfC3H4E9VS+tvgTWS1crHKs96+wLw5I=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ro0hnM4ptuPgCLMbcH2xYiAtmt9XCLGocKQu3wBX+UbR3EfVJi4HLk3jtC7jpyVdQTltqz5gxnsusNPu1ujB8YmcYJmF46v8gCpEtSIxk1mpE2Jx1laFuURIYyYtn+IcU67jE6Adq3h2K2Z1yh2HBX4rCSpBloiRVeaBDuYe6E4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-7eafdb25dbbso424955839f.3
+        for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 08:29:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719156564; x=1719761364;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EP0r5vjIqTOj5wt9p5RxoVOv4/EypeRrWumP8Iu8xTU=;
+        b=e2AD1n0d0WyOyMyTyRcIRCrARbHex6bNzMhZYPWplzwxSr6yFeXEJb72jMClqSj1nI
+         sVH0Pr2sjP/awHB4ZhAF9la6VIVm1CmpPfV5cNcwOb8YE/LF3m4wjsrd10afLhJe56XE
+         uDsXxoeXWY1XH81W72lH2w4RKtn1rHDvuyXhoPZpQOz/FN9gepIWJHlBPw0FSPW2VryE
+         H5zYqgomVDKVIEBAQlAisFNh1EK0W8dHvBldecPMrtMnMfz/DKuqHkWgnbByUfk78Tao
+         q/Ls26py8hx+4vsbdqWQX8e8IDylwggmYXM5pU+qM8MDpGzcY4yWCP+GqoWe2u5yKNMQ
+         g8yQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXmZOu8n78/EmCbxsL2c73K6uj859SlWqUWL+n3FScUrFG+EG+Ghbin2o4PZlvlFvsjn02yVcuDoMmZ3BZkTUW1KNHDzl5r
+X-Gm-Message-State: AOJu0Yxa1cVN5RQjoq7m7NW/g1HVEvq4Qx2q9pUzwzhPlGWhJW3/oSzy
+	Jlr79Uiumsqtn8hjscoZ18IurkNSS8BwPnBJ9c+JZNB055MlRw+j4pMjCwkqtiEgEQ1R1j8a7NZ
+	YbnjB+jhecWYCyhyfsMHeCTqWhk8HY3uFoalOWiJ+9qvq9T7izaMnwFI=
+X-Google-Smtp-Source: AGHT+IFqnPdpAhkaCMlzEMZuVA/C2S6JDfh8pY3BlYKXaqSV5TpYTSaMd5hwBP7t8YgYtHTf5gVQGwAtwWvzgO6DJ3GECpny+vp9
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|PR3P194MB0553:EE_
-X-MS-Office365-Filtering-Correlation-Id: 29a4e9ed-6065-43f9-d722-08dc9395ca7d
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|461199025|440099025|3412199022|1710799023;
-X-Microsoft-Antispam-Message-Info:
-	mWZMER+e2+qeTn2KT0UPpKVuFVZ7Ef91fEbNswm6Wvuo0WKPrChidKM2cOAGrhQGjb/PcJzrkLZR+qAQLRpG2JertHWJ3GXqOTOFG4yFKZRpR1qJolXgGy5nP5VqfywThSBmEfOT+QMhW8eqBeuTh785EW3RPCxGqRHtDiMQrVj07aFEyp0DebHke3oRTXc0CaHI1UuIKQpiVQ0gzC3xbS4XycjsU7ge3ZgfQBT6e6b5rG85UtnhP7V4BqzXBYTB+tpyoUiQhCH+12GPPfiJZgn0A1K/dmDN5Vrwqp9nV2xKpi7p412Fpk2w4TvBCX4hDrss92F197chDZxZ18kygSSJxVq6UisWVd5mN1JULvVnlhFHFZ1Lw9GBnTZ820eFYY65AYkmytDU0nL8k7YjfLPDPOjMo2pubBTWzEUT8tjrIMv8j7kA5PmnTCWpnU/mpq2VcThNjIL/hHfwsJssErwVkSNrQtS1mdvaqju3sTwx8cIUhxTm9QSTHpJIREj1zzdwEYfjeqHl+tQzayN9SwFNSYzAXh2ngSuzjoCeDkkaMYHHjsUESJGxKTQqkNMw2X7YA2CmanMldF55nvkB8Zc9a1HWhZDMa2BsAK3pJxD36SMHJOl77eRg1LrX75RZ
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?cERhLZaofF9Ye/WB7X7Rh21spmuBPJBHnWte5I9a95zxEEo51vxgmejJfegM?=
- =?us-ascii?Q?GPz4qbgVi4ji9hhkCg/NYdVQdOoS8NqYvbq7O1nef8aACE4sTnNdH8ZUTYWL?=
- =?us-ascii?Q?XGtH7YSk3tVxki2ScW+xtd1qNngA5HeS+gLQFpZwWtyi+RVCAGCOany1SmJ5?=
- =?us-ascii?Q?VUhnTNsRwEo4sC2hprwMXlYPsqeBdjsgNrQPGVwKN8kDpw72W7QffqAs0jtd?=
- =?us-ascii?Q?bFcdeFNCAOyRp0Dj4yKXhHG93OeYhMEBGzVyZQ9ccuLC3cbKELkrHixe1zb6?=
- =?us-ascii?Q?VCOyT3NeEq0MMRJdVlPXVC1Anz72PF1fFO3IEI64p4bByj8TfDHQSaH4MlnM?=
- =?us-ascii?Q?vHDCPsvQ6GncYttC31aZ/XeGsVS+hf9qZokYQ2mQkzi6tOi9NlhkC5+CwEtp?=
- =?us-ascii?Q?jVfv9TDJumpvS5sfqS6mRe4GmItgPeBmZdkDM9N7RL6qwg/I5RZrd5df1h7N?=
- =?us-ascii?Q?7pz+rC+knPJQY+sGr8C/YbMNn0SVl9U47T0jtPSLjNcIDDsqdlzfaTN0OqTi?=
- =?us-ascii?Q?J/SZT6qBEWNoG2SHDZmLTfDtSv7ViP56PW4Tlo8hzQ3MAf7MZSNgUpLpEliO?=
- =?us-ascii?Q?LeyuQMCxjjX0Ak6P1YgEi119gd9UmAZf8PweosoTsZwflOQr6BUrTdz9F0NE?=
- =?us-ascii?Q?Z8d98FL8ZXyRHkfxCB5OlAD81TA/v8GBJrRQtB+xxwfN3xTJqGVbnr2zumKI?=
- =?us-ascii?Q?dtWBn0Nj9dPvQPA3m5rss4DKsfLGdhRU5ZuOW4+lQbzvSjdO/mw9N8i5/Wo1?=
- =?us-ascii?Q?tybWfQeOwiMJmQEFTS8dE0U4k36HCt4uKCKwahmIWZjy61yDUNUazHZEEHSm?=
- =?us-ascii?Q?5c/zu2nJYgI03+kabH1J9wLB4fgsHirFOZGM8PGDCUFiX/XlOetS2DR1/mmq?=
- =?us-ascii?Q?8/QiiemGolKiwdGBMRcVmPAJhLRFe2USg+XSA0G5FnK6pNBme6yOYOxahqf7?=
- =?us-ascii?Q?fhsiP0/LhAwgj5ygCRqh+X9HfgGUbKaPOQS7ljMex2uLRy2kLrkqy1SuvzHC?=
- =?us-ascii?Q?ASo7odZaNyLZodCqnf4TN/pLBOCmJloBPo2ZTZKvn81x+6ovdfBh68t5yjZU?=
- =?us-ascii?Q?JKLy79Zy/b7FJb8fvqvfUlBdgn/mcFvqZOqtwIsfein2hD8R0vZwMWI48t9L?=
- =?us-ascii?Q?Wdpv9gC/T0oWG7oOr1uBfEsU78rqkr2oZXxZrbiIijaC6FLVLVfjSoww5pwc?=
- =?us-ascii?Q?ms72Ia3/C8YQs36jYg/TvytFWp5NwdaYR00IecnmXKa+RPSd5VtfWoJ70jbW?=
- =?us-ascii?Q?vhH5VLSjWJ/nUQ8LFlu6?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 29a4e9ed-6065-43f9-d722-08dc9395ca7d
-X-MS-Exchange-CrossTenant-AuthSource: AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2024 15:04:33.9495
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3P194MB0553
+X-Received: by 2002:a92:cd84:0:b0:36c:4b17:e05d with SMTP id
+ e9e14a558f8ab-3763e16d8a6mr3431835ab.4.1719156564589; Sun, 23 Jun 2024
+ 08:29:24 -0700 (PDT)
+Date: Sun, 23 Jun 2024 08:29:24 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000589156061b90544f@google.com>
+Subject: [syzbot] [can?] INFO: task hung in cangw_pernet_exit_batch (3)
+From: syzbot <syzbot+21ad8c05e3792b6ffd14@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, mkl@pengutronix.de, 
+	netdev@vger.kernel.org, pabeni@redhat.com, socketcan@hartkopp.net, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Paolo and Stefano,
+Hello,
 
-Sorry for the (super) late reply! I haven't had much time to work on
-it, I hope to send a v3 by the end of this month! Thanks both of you
-for your comments and reviews! :)
+syzbot found the following issue on:
 
-> > This will add 2 atomic operations per packet, possibly on contended
-> > cachelines. Have you considered leveraging the existing transport-level
-> > lock to protect the counter updates?
+HEAD commit:    2ccbdf43d5e7 Merge tag 'for-linus' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16dd1f2e980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fa0ce06dcc735711
+dashboard link: https://syzkaller.appspot.com/bug?extid=21ad8c05e3792b6ffd14
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-> Good point!
+Unfortunately, I don't have any reproducer for this issue yet.
 
-> Maybe we can handle it together with `tx_cnt` in
-> virtio_transport_get_credit()/virtio_transport_put_credit().
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/27e64d7472ce/disk-2ccbdf43.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e1c494bb5c9c/vmlinux-2ccbdf43.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/752498985a5e/bzImage-2ccbdf43.xz
 
-> WDYT?
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+21ad8c05e3792b6ffd14@syzkaller.appspotmail.com
 
-I'll take a look at it! That's a very good idea.
+INFO: task kworker/u8:1:12 blocked for more than 143 seconds.
+      Not tainted 6.10.0-rc3-syzkaller-00044-g2ccbdf43d5e7 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/u8:1    state:D stack:18160 pid:12    tgid:12    ppid:2      flags:0x00004000
+Workqueue: netns cleanup_net
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5408 [inline]
+ __schedule+0x17e8/0x4a20 kernel/sched/core.c:6745
+ __schedule_loop kernel/sched/core.c:6822 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6837
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
+ cangw_pernet_exit_batch+0x20/0x90 net/can/gw.c:1257
+ ops_exit_list net/core/net_namespace.c:178 [inline]
+ cleanup_net+0x89f/0xcc0 net/core/net_namespace.c:640
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2e/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3393
+ kthread+0x2f2/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+INFO: task kworker/1:6:5181 blocked for more than 143 seconds.
+      Not tainted 6.10.0-rc3-syzkaller-00044-g2ccbdf43d5e7 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/1:6     state:D stack:20976 pid:5181  tgid:5181  ppid:2      flags:0x00004000
+Workqueue: events_power_efficient crda_timeout_work
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5408 [inline]
+ __schedule+0x17e8/0x4a20 kernel/sched/core.c:6745
+ __schedule_loop kernel/sched/core.c:6822 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6837
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
+ crda_timeout_work+0x15/0x50 net/wireless/reg.c:540
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2e/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3393
+ kthread+0x2f2/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4
 
-> Should virtio_transport_bytes_unsent() returns size_t?
 
-Yes! int was because of atomic_int, size_t is more appropriate.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Thanks,
-Luigi
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
