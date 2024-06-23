@@ -1,73 +1,55 @@
-Return-Path: <netdev+bounces-105934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0B5E913BB5
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 16:27:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAF4F913BB7
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 16:27:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37A16B20F67
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 14:27:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68D59282174
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 14:27:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E27181332;
-	Sun, 23 Jun 2024 14:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1066181332;
+	Sun, 23 Jun 2024 14:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="RQq8ZIZl"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="mSTKb+MH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49CF17F4F7
-	for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 14:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C0F17F4F7;
+	Sun, 23 Jun 2024 14:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719152839; cv=none; b=fm0phnihTkiQNraLCYxhPnYfxe/VW1OUbljXWC4nIMoeLnchGedyNcAzo5PDN4eNo063lK0n3/Fmn6lutcagua5T6FiuWSJLr5Sq3cog+zn925qkLIhRzNKEPXGoY0AVnkGi+ZA94rFuklv08x8EAuIM6jM9haplJn8E5dIfyss=
+	t=1719152870; cv=none; b=dgoJbzMqUDLdjpnWYIkv+E1tUFLg5cKSPHgyi4rcDjucoo8WKI1QNexpfKEEF2UCY8ONrE+rd818FTyTUav+AwBFzg8vl0gxQGF7dE5euXlmDomh3/tI5tGfc49qvPUGcVZCaxb3aj8ciJK5ijdjRK92fYFyxgn6mcQ0VovFNww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719152839; c=relaxed/simple;
-	bh=ZZ44urR2FHiAsQK8bUberKk/p5/hSJmGjtcyA6AU7go=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YQmCmMRztwCGmh+VMD9RpFdCVRxBsdmChUlDq5tUqsDkF6dRegTLf/32TYtfeh6GsMQrFYy0PGlSvyl1Aoyat92yxEMfNoN53SNKPhKEvzSB70TrwIo5BsegBYaugIKeEp4rPBcV9/002SnRfygpVgpgTI6HMuBxsF7xoAOzmjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=RQq8ZIZl; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-42108856c33so26345325e9.1
-        for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 07:27:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1719152835; x=1719757635; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wUGNzKbqoRHYmtgg5tuG5fdtSZ4xQ9aNzIV2q90r3Iw=;
-        b=RQq8ZIZlvjNwk1gDWteW8w9D/9eWblZfpQqIh+U0ALRriWDpM+FcPiSJwFIP3zMmPL
-         fckLZbai/3bN7uU3g9rB6Xm+cRKUh0YpmmHel7YYLy0MUAHoIR/Dt3ySpn3zFE4ZVVBv
-         0aactjsuQbX4YCL4iANgpheyB4U67FZZRRnNdpKo/6kz61YSIjGWfMS0F5gz3cnFmEVo
-         CoOAJbx4LGtOZPxF9976cywqVLuKU3+LGcCt/0wPsGohc+Nj0wQLaOmgKRi2ekMBNvCE
-         uHBg4roF8sAzT8cUCptxL52umO0Vl7jTDdwEMgaodTe5+vpLt+e3R9yMovUzjQUlIsn/
-         NriQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719152835; x=1719757635;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wUGNzKbqoRHYmtgg5tuG5fdtSZ4xQ9aNzIV2q90r3Iw=;
-        b=oUSDJ1mIyxVAXTX0iAOuSZ2TV/7FGP+jY7iGj60kjjaB+E2ieLwdDxthHBZYuT6+RA
-         uhFA9sQEuyEWIqmDqN2b8puXWQ4A9UFWYBbmBUAmj05U4bDUy17D3mxU2rJ6Ci46KZyo
-         E6NjFMEbrJct9N9+7xrI6nd4lNV8mlIIfGHxymCXWF8Lhy9a6oM7UYLKOSvMjwMQiwjG
-         PWLD1fJYqs+jvKHumjh42CPj8UsRR/G7ZTV0aIb2G442cV0u16G6lC5O1pyDQ0d9+Ciq
-         mhdtLn1oGTGWPXPnGcmroexlNH9UfLBCnNr0oaJchICGjiZNA5YqOlBPfDMHVZx38cJI
-         sFcQ==
-X-Gm-Message-State: AOJu0YzfGNcQqYXXIsc/+9SEwPL1b2w5iiSLJx6VcxDILTpBdDZileQx
-	VvuEO04noKZZUPGzYrnUIycK6P2IGtdxYwv7wEmH2EOWfDgtfXzR6+3DPY9Wa1A=
-X-Google-Smtp-Source: AGHT+IFp7T3fUP126w4AWrA15yogPBJdGyb+8rFa+dr5eP9h4GYZKkyUybOllD6Y2CfQXQKkURxY3A==
-X-Received: by 2002:a05:6000:1a54:b0:362:b906:11f2 with SMTP id ffacd0b85a97d-366e3337f42mr2451380f8f.34.1719152835017;
-        Sun, 23 Jun 2024 07:27:15 -0700 (PDT)
-Received: from [192.168.50.4] ([82.78.167.70])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4247d0be9fasm142958035e9.16.2024.06.23.07.27.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 23 Jun 2024 07:27:14 -0700 (PDT)
-Message-ID: <8a4c36d5-3ed7-429f-9cde-d90f0029b16a@tuxon.dev>
-Date: Sun, 23 Jun 2024 17:27:12 +0300
+	s=arc-20240116; t=1719152870; c=relaxed/simple;
+	bh=YeXwThLSllGc3PU6caKWVc7OcUENpiNFcyTRBWNJgXc=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=WImPNkETMVqPgXnUT9QHs2WJudM6+st4MchSmMGUZpetiEeaVIugPq1EToe+qC915QimDCdAp4DSZWEz2ZywR0l+TnNVyAwC7SC8Pf2/izPDXxUzgBwzniTuDdLE/rIDBFOygapHwedfWeK2RdgFWMsy+BjxY37xOMedTMixd4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=mSTKb+MH; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1719152856; x=1719757656; i=markus.elfring@web.de;
+	bh=cm94aFfl6ydTCdGo4nF3Xy9c/4mLUzPAXR/+kb/WWqA=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=mSTKb+MHXcUBFwS0MPD0S7aM2ICVUGCrpUeqI6b7/KXkbH6Xu5s06pTJk1LucRn8
+	 GGyzZEKr/umxt2cVfcK+euytMn7NdfZfP+WgEjBaaHXSE1IFwoclajfkdeh5B9Ea+
+	 Pfjea/Fq6vcmnAppu/AbuKDnufNTGuCJ3aGZ3KdYs9hVyp2bQH7EVZFtT+IJbzNph
+	 mPJos0hlEZOEjozbeATNU/GVYfwFM6Zmc+Ro2F7pZ+wXhvuL31tZFZvJfW0YOkwy1
+	 CCVc/Hm4PoNSziF0FCdmDKN0m/jC2/KlsYpcCYsakIDMHkrsUiokSvcNNiPrFJh+Q
+	 34vTbkhXkpQmiyDFSQ==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mt8kX-1sbHJe48iX-010Hrl; Sun, 23
+ Jun 2024 16:27:36 +0200
+Message-ID: <bb03a384-b2c4-438f-b36b-a4af33a95b60@web.de>
+Date: Sun, 23 Jun 2024 16:27:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,203 +57,77 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 1/4] net: macb: queue tie-off or disable
- during WOL suspend
-Content-Language: en-US
-To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
- nicolas.ferre@microchip.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- linux@armlinux.org.uk, vadim.fedorenko@linux.dev, andrew@lunn.ch
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, git@amd.com
-References: <20240621045735.3031357-1-vineeth.karumanchi@amd.com>
- <20240621045735.3031357-2-vineeth.karumanchi@amd.com>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <20240621045735.3031357-2-vineeth.karumanchi@amd.com>
+To: Yunseong Kim <yskelg@gmail.com>, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
+ Alexandra Winter <wintera@linux.ibm.com>,
+ =?UTF-8?Q?Christian_Borntr=C3=A4ger?= <borntraeger@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>,
+ Thorsten Winkler <twinkler@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, MichelleJin <shjy180909@gmail.com>
+References: <20240623131154.36458-2-yskelg@gmail.com>
+Subject: Re: [PATCH] s390/netiucv: handle memory allocation failure in
+ conn_action_start()
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240623131154.36458-2-yskelg@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:+VjY2DO5h9FjK5IeIyij8JNfZW78RBmdvCjhBpUXuVWxj7oaKnd
+ Jw6H/wtUn7qcJ1ypGPZvqeSV7qX6RAZaaP46HWf2feUxcNce21nFXYAQPxX7UL309X0P4EF
+ gOarHVB8Y/40Nj0yu2Ggu8PzzC4MTXv4aBA+rccATtIbxmXuvNc+ZDFYnNdODeOCnrcMvSH
+ SgyE7MC03fKsHsEzq5Tkg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:aKfPx8XZ9Mo=;47wrpxXp4MiiAveMb0toGO2e73V
+ 77OLgdvnaNGPqpIDd2Gc/AY1/BPWm6Sg1qA1DQfWQDk5sRZ02MYIwnAjLE0d+bUgMke1/lOlT
+ ngOghpQdwuFOKD9IW/5jiLy9QSG7gKt/WFThcMa5BmuUsnNVpVrBovw/76FpIW4e0ajuIqm6I
+ w3Tov7dm5JGLQAKTez8aBSIR4vZlos6MiF5NlNZHrh9uY6x/BZFofLJ4WaNY3nMaVnOjAD46B
+ gZBrOkleBeoEfE/mMNdG0xWbkgtBklpg3FwoMnJ6CfuKoO3qL+Dqucu9Khi1qVQKma6vZmF1i
+ QkYCtN59A8hnGjxYJPzpmXfe0y2LOaJz/ppfdPL/4OWGzUtKQELcEr5FpyIv289wBwvZod6QQ
+ ooFRY9gZH0mqDmCNQk4tu03q7zArekYd+MTK1SddSZmpN3ACe8t1PhX1YZtpbnDKroRRWRsvJ
+ 7Qxs7X0gDFXUV5uCnySZ9dMee/im9Jh6AqXE97ZmJw2SmlNdb6YHFR6Rz1+6ZE20F+XnFKf5w
+ /tsbzKYPMrFZT9JYQu2UXvZP3+DYOOUjW2xT6NKjoN243A5r8YatGeo7LCJs3gm8czq/33TTB
+ nwyok5yUWKOtsoQbHtcL95q6yMl7nSQgVO8TtgWFE9Bq3K1WXEHY9BrDC5w8p3pL7myf/Eoh8
+ zrB8nboPcRgWxHMZsM3tacnKoNnGzoezhtAtmv0ImPCzWYqzD86Z78YPZEKVZxu8SmQxJKmNL
+ JW6+NsR5SqJcAUILQE//WiOiG3C5ZDvleeatwioA06foQ6dvLREuSphQe7bKwmZKzxQo8BT1D
+ OwXvVzgcwCNHR5p3OXVxke4d/Kr+mNskKIhp3HRSSUXWI=
+
+> This patch handle potential null pointer dereference in
+> iucv_path_connect(), When iucv_path_alloc() fails to allocate memory
+> for 'rc'.
+
+1. Can a wording approach (like the following) be a better change descript=
+ion?
+
+   A null pointer is stored in the data structure member =E2=80=9Cpath=E2=
+=80=9D after a call
+   of the function =E2=80=9Ciucv_path_alloc=E2=80=9D failed. This pointer =
+was passed to
+   a subsequent call of the function =E2=80=9Ciucv_path_connect=E2=80=9D w=
+here an undesirable
+   dereference will be performed then.
+   Thus add a corresponding return value check.
 
 
+2. May the proposed error message be omitted
+   (because a memory allocation failure might have been reported
+   by an other function call already)?
 
-On 21.06.2024 07:57, Vineeth Karumanchi wrote:
-> When GEM is used as a wake device, it is not mandatory for the RX DMA
-> to be active. The RX engine in IP only needs to receive and identify
-> a wake packet through an interrupt. The wake packet is of no further
-> significance; hence, it is not required to be copied into memory.
-> By disabling RX DMA during suspend, we can avoid unnecessary DMA
-> processing of any incoming traffic.
-> 
-> During suspend, perform either of the below operations:
-> 
-> - tie-off/dummy descriptor: Disable unused queues by connecting
->   them to a looped descriptor chain without free slots.
-> 
-> - queue disable: The newer IP version allows disabling individual queues.
-> 
-> Co-developed-by: Harini Katakam <harini.katakam@amd.com>
-> Signed-off-by: Harini Katakam <harini.katakam@amd.com>
-> Signed-off-by: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
 
-Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Tested-by: Claudiu Beznea <claudiu.beznea@tuxon.dev> # on SAMA7G5
+3. Is there a need to adjust the return type of the function =E2=80=9Cconn=
+_action_start=E2=80=9D?
 
-> ---
->  drivers/net/ethernet/cadence/macb.h      |  7 +++
->  drivers/net/ethernet/cadence/macb_main.c | 60 ++++++++++++++++++++++--
->  2 files changed, 64 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-> index aa5700ac9c00..50cd35ef21ad 100644
-> --- a/drivers/net/ethernet/cadence/macb.h
-> +++ b/drivers/net/ethernet/cadence/macb.h
-> @@ -645,6 +645,10 @@
->  #define GEM_T2OFST_OFFSET			0 /* offset value */
->  #define GEM_T2OFST_SIZE				7
->  
-> +/* Bitfields in queue pointer registers */
-> +#define MACB_QUEUE_DISABLE_OFFSET		0 /* disable queue */
-> +#define MACB_QUEUE_DISABLE_SIZE			1
-> +
->  /* Offset for screener type 2 compare values (T2CMPOFST).
->   * Note the offset is applied after the specified point,
->   * e.g. GEM_T2COMPOFST_ETYPE denotes the EtherType field, so an offset
-> @@ -733,6 +737,7 @@
->  #define MACB_CAPS_NEEDS_RSTONUBR		0x00000100
->  #define MACB_CAPS_MIIONRGMII			0x00000200
->  #define MACB_CAPS_NEED_TSUCLK			0x00000400
-> +#define MACB_CAPS_QUEUE_DISABLE			0x00000800
->  #define MACB_CAPS_PCS				0x01000000
->  #define MACB_CAPS_HIGH_SPEED			0x02000000
->  #define MACB_CAPS_CLK_HW_CHG			0x04000000
-> @@ -1254,6 +1259,8 @@ struct macb {
->  	u32	(*macb_reg_readl)(struct macb *bp, int offset);
->  	void	(*macb_reg_writel)(struct macb *bp, int offset, u32 value);
->  
-> +	struct macb_dma_desc	*rx_ring_tieoff;
-> +	dma_addr_t		rx_ring_tieoff_dma;
->  	size_t			rx_buffer_size;
->  
->  	unsigned int		rx_ring_size;
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index 241ce9a2fa99..9fc8c5a82bf8 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -2477,6 +2477,12 @@ static void macb_free_consistent(struct macb *bp)
->  	unsigned int q;
->  	int size;
->  
-> +	if (bp->rx_ring_tieoff) {
-> +		dma_free_coherent(&bp->pdev->dev, macb_dma_desc_get_size(bp),
-> +				  bp->rx_ring_tieoff, bp->rx_ring_tieoff_dma);
-> +		bp->rx_ring_tieoff = NULL;
-> +	}
-> +
->  	bp->macbgem_ops.mog_free_rx_buffers(bp);
->  
->  	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
-> @@ -2568,6 +2574,16 @@ static int macb_alloc_consistent(struct macb *bp)
->  	if (bp->macbgem_ops.mog_alloc_rx_buffers(bp))
->  		goto out_err;
->  
-> +	/* Required for tie off descriptor for PM cases */
-> +	if (!(bp->caps & MACB_CAPS_QUEUE_DISABLE)) {
-> +		bp->rx_ring_tieoff = dma_alloc_coherent(&bp->pdev->dev,
-> +							macb_dma_desc_get_size(bp),
-> +							&bp->rx_ring_tieoff_dma,
-> +							GFP_KERNEL);
-> +		if (!bp->rx_ring_tieoff)
-> +			goto out_err;
-> +	}
-> +
->  	return 0;
->  
->  out_err:
-> @@ -2575,6 +2591,19 @@ static int macb_alloc_consistent(struct macb *bp)
->  	return -ENOMEM;
->  }
->  
-> +static void macb_init_tieoff(struct macb *bp)
-> +{
-> +	struct macb_dma_desc *desc = bp->rx_ring_tieoff;
-> +
-> +	if (bp->caps & MACB_CAPS_QUEUE_DISABLE)
-> +		return;
-> +	/* Setup a wrapping descriptor with no free slots
-> +	 * (WRAP and USED) to tie off/disable unused RX queues.
-> +	 */
-> +	macb_set_addr(bp, desc, MACB_BIT(RX_WRAP) | MACB_BIT(RX_USED));
-> +	desc->ctrl = 0;
-> +}
-> +
->  static void gem_init_rings(struct macb *bp)
->  {
->  	struct macb_queue *queue;
-> @@ -2598,6 +2627,7 @@ static void gem_init_rings(struct macb *bp)
->  		gem_rx_refill(queue);
->  	}
->  
-> +	macb_init_tieoff(bp);
->  }
->  
->  static void macb_init_rings(struct macb *bp)
-> @@ -2615,6 +2645,8 @@ static void macb_init_rings(struct macb *bp)
->  	bp->queues[0].tx_head = 0;
->  	bp->queues[0].tx_tail = 0;
->  	desc->ctrl |= MACB_BIT(TX_WRAP);
-> +
-> +	macb_init_tieoff(bp);
->  }
->  
->  static void macb_reset_hw(struct macb *bp)
-> @@ -5215,6 +5247,7 @@ static int __maybe_unused macb_suspend(struct device *dev)
->  	unsigned long flags;
->  	unsigned int q;
->  	int err;
-> +	u32 tmp;
->  
->  	if (!device_may_wakeup(&bp->dev->dev))
->  		phy_exit(bp->sgmii_phy);
-> @@ -5224,17 +5257,38 @@ static int __maybe_unused macb_suspend(struct device *dev)
->  
->  	if (bp->wol & MACB_WOL_ENABLED) {
->  		spin_lock_irqsave(&bp->lock, flags);
-> -		/* Flush all status bits */
-> -		macb_writel(bp, TSR, -1);
-> -		macb_writel(bp, RSR, -1);
-> +
-> +		/* Disable Tx and Rx engines before  disabling the queues,
-> +		 * this is mandatory as per the IP spec sheet
-> +		 */
-> +		tmp = macb_readl(bp, NCR);
-> +		macb_writel(bp, NCR, tmp & ~(MACB_BIT(TE) | MACB_BIT(RE)));
->  		for (q = 0, queue = bp->queues; q < bp->num_queues;
->  		     ++q, ++queue) {
-> +			/* Disable RX queues */
-> +			if (bp->caps & MACB_CAPS_QUEUE_DISABLE) {
-> +				queue_writel(queue, RBQP, MACB_BIT(QUEUE_DISABLE));
-> +			} else {
-> +				/* Tie off RX queues */
-> +				queue_writel(queue, RBQP,
-> +					     lower_32_bits(bp->rx_ring_tieoff_dma));
-> +#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-> +				queue_writel(queue, RBQPH,
-> +					     upper_32_bits(bp->rx_ring_tieoff_dma));
-> +#endif
-> +			}
->  			/* Disable all interrupts */
->  			queue_writel(queue, IDR, -1);
->  			queue_readl(queue, ISR);
->  			if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
->  				queue_writel(queue, ISR, -1);
->  		}
-> +		/* Enable Receive engine */
-> +		macb_writel(bp, NCR, tmp | MACB_BIT(RE));
-> +		/* Flush all status bits */
-> +		macb_writel(bp, TSR, -1);
-> +		macb_writel(bp, RSR, -1);
-> +
->  		/* Change interrupt handler and
->  		 * Enable WoL IRQ on queue 0
->  		 */
+
+4. Would you like to add any tags (like =E2=80=9CFixes=E2=80=9D) according=
+ly?
+
+
+5. Under which circumstances will development interests grow for increasin=
+g
+   the application of scope-based resource management?
+   https://elixir.bootlin.com/linux/v6.10-rc4/source/include/linux/cleanup=
+.h#L8
+
+
+Regards,
+Markus
 
