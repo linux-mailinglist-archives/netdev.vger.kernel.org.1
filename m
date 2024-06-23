@@ -1,130 +1,122 @@
-Return-Path: <netdev+bounces-105915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C34D9138F3
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 10:11:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31CCD9138F6
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 10:12:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 738F0B20986
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 08:11:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB1931F219DC
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 08:12:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E744C5EE97;
-	Sun, 23 Jun 2024 08:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UMF/434e"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378BD5EE97;
+	Sun, 23 Jun 2024 08:12:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A5249633;
-	Sun, 23 Jun 2024 08:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13274CDEC
+	for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 08:12:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719130285; cv=none; b=rAeWxVqX/01JsyyT9oQxbwrYUUxWLLYTRRbcslQjLJAUdHrTnqzkNAoanmH5t6ixzagAnYBCaAqiLEYN9I3ENRWCQ6gj7AZWQosIBzm9r7QTIgCScci2m01piOYW6CBqMtwkcOPnu3mKE1qC0a5+uowrSRyAFPrHeXsz1MwOB/8=
+	t=1719130374; cv=none; b=CXTVT4JlfpOe7u9wSFbaMFPgcL3d2BHK5Zienb5OhcOGsXdVNfrDbrnpMh3bwQUkm01Gh0XTDvALUA1Q1aAC7hIfvV2VCOBkaXp8fxQWiId8yLJ/LsiNLT2FTAoFBccYK5MAVTLjPpaOWmmeWthP/laNRX3ZzU53CqTgxfRO8mk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719130285; c=relaxed/simple;
-	bh=CMYRryZFEx+lHsmaSAwggmsgSfJxW0d5r/9nGe0X6/c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WzSDjtQsjdDw0Gd52L/9RRRbYzFRLB3XQkwnFsOw/z1iATG92+D87K9FRpFtCywWuSzEEk0zX/Ns4+KaaHfDjVSq1x9YX+NJkk/9lTlBLHaSeHoVRJP563IdRQqvw/a1EjvXEjW5wwjHYWwPl/q7D3J/iMk46g2sOxR58g0h7Mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UMF/434e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2519C2BD10;
-	Sun, 23 Jun 2024 08:11:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719130285;
-	bh=CMYRryZFEx+lHsmaSAwggmsgSfJxW0d5r/9nGe0X6/c=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=UMF/434eoJ3N8G40EchpP4JF047+QtLeySAi4Rpw0y2D0flMIOjhoABeatgrucadi
-	 G0L6ZNXqbwqU2CO1c4XHaVW7kJiF3gN4f44I0yxgsmup8BW0lG+F7JBkAXNht0K5nU
-	 J2/No/MfSJExlbO69dSsY8i4xSisyl1nrMehyfckHjAvojGYyVAuJynT8h5jHgGyIq
-	 X2MvwFSgWhr5wlfcJ3rYrEBh7kQ4i8VGYdo7e6jTt+cyxDqE0ac/7Q7jjaWUcA8wuq
-	 /d0U3JMSYPfppXhIGAyUSLwZLbPpAcf4jld/qgVgLHy+fbyrgDlv8v9627VP8KcAfU
-	 jz+QztvzZaumQ==
-Message-ID: <c2cd4e38-edc4-46f3-bbeb-0a761104fce9@kernel.org>
-Date: Sun, 23 Jun 2024 10:11:19 +0200
+	s=arc-20240116; t=1719130374; c=relaxed/simple;
+	bh=SShJ3uH6p9oh3CuRy40Et0y7HlW3MUccUeFlQyGtuEY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Yx6TYcFJG80+iv/EfHijh1igYKs0XXTcH70hRSHjBMJNb8vGHT007w2TWqznszY3L7AeQP9CxOtDooRVxemgPBDDnfJp7OCYfpy0F6CSbal+o5p2u6xc9wHNgFFlCSyTj9odV0yo08254dVCaYsz7pOpGydOEPFmtotnnwejzyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-366dcd38e6fso102323f8f.3
+        for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 01:12:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719130370; x=1719735170;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FgWuD8t0YOcGlihl0zTrgPTa3Z62Zpr6wwNpXTuCSaM=;
+        b=hI7kSR3sy4sjnC04m6yo6zD3FqXkYPwDJEDROHOhS7s0YZ9NUg3IVHJJ/OXDNckKvm
+         kiWYfcBN0TNbvONvE9EgnodoFbJqHmsFFs9xmkH3AWdCQKzYHIky4jqVEyTyAXEBR1Zs
+         R/Tkfstz+nOKJQbJGUwOfqkw17+OIbIbIHWeyA5Wsct2sF57eFv0t7LwgyF5xee3absK
+         HNncsQ0z+UyAACRp6hP7h1PIJKrPSaOkiTxQ1UDFduZWy0DBb6YSaz/N3kWNwXd8qYtc
+         BGGrDGkLntdzusAxqhZwe5M8yxyQ5RVl/1Xjnvpa6rUYBn1AeXRtUij2+M7H8CN1MiVi
+         nMfg==
+X-Gm-Message-State: AOJu0YxJc75Zb5z60hz0U7RPsiFx9uH6loNcCDTlBLFlruysLHkJuR13
+	2cbyjR+HonRlqWqI7fcUc0nptiLM0eUcWLg8DometA5V1MAHdSib4eFFeA==
+X-Google-Smtp-Source: AGHT+IFO/tkzjbm359kC53j1ogt1SPWyWdlNsZbaeVdJjI5mCHK9TyE98KYCk5k3mHu144Bw6L3xFg==
+X-Received: by 2002:a5d:6d09:0:b0:35f:2a75:91fd with SMTP id ffacd0b85a97d-366e2a6e0e0mr1775811f8f.6.1719130370109;
+        Sun, 23 Jun 2024 01:12:50 -0700 (PDT)
+Received: from vastdata-ubuntu2.vastdata.com (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3663a8c83e9sm6689672f8f.94.2024.06.23.01.12.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Jun 2024 01:12:49 -0700 (PDT)
+From: Sagi Grimberg <sagi@grimberg.me>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>,
+	David Howells <dhowells@redhat.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>
+Subject: [PATCH v2] net: allow skb_datagram_iter to be called from any context
+Date: Sun, 23 Jun 2024 11:12:48 +0300
+Message-ID: <20240623081248.170613-1-sagi@grimberg.me>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] dt-bindings: net: fman: remove ptp-timer from
- required list
-To: Frank Li <Frank.Li@nxp.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
- Madalin Bucur <madalin.bucur@nxp.com>,
- "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
- "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
- <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Cc: imx@lists.linux.dev
-References: <20240621170000.2289596-1-Frank.Li@nxp.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240621170000.2289596-1-Frank.Li@nxp.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 21/06/2024 19:00, Frank Li wrote:
-> IEEE1588(ptp) is optional feature for network. Remove it from required
-> list to fix below CHECK_DTBS warning.
-> arch/arm64/boot/dts/freescale/fsl-ls1043a-qds.dtb: ethernet@f0000: 'ptp-timer' is a required property
-> 
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> ---
->  Documentation/devicetree/bindings/net/fsl,fman-dtsec.yaml | 1 -
+We only use the mapping in a single context, so kmap_local is sufficient
+and cheaper. Make sure to use skb_frag_foreach_page as skb frags may
+contain highmem compound pages and we need to map page by page.
 
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+---
+Changes from v2:
+- Fix usercopy BUG() due to copy from highmem pages across page boundary
+  by using skb_frag_foreach_page
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+ net/core/datagram.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-Best regards,
-Krzysztof
+diff --git a/net/core/datagram.c b/net/core/datagram.c
+index a8b625abe242..cb72923acc21 100644
+--- a/net/core/datagram.c
++++ b/net/core/datagram.c
+@@ -435,15 +435,22 @@ static int __skb_datagram_iter(const struct sk_buff *skb, int offset,
+ 
+ 		end = start + skb_frag_size(frag);
+ 		if ((copy = end - offset) > 0) {
+-			struct page *page = skb_frag_page(frag);
+-			u8 *vaddr = kmap(page);
++			u32 p_off, p_len, copied;
++			struct page *p;
++			u8 *vaddr;
+ 
+ 			if (copy > len)
+ 				copy = len;
+-			n = INDIRECT_CALL_1(cb, simple_copy_to_iter,
+-					vaddr + skb_frag_off(frag) + offset - start,
+-					copy, data, to);
+-			kunmap(page);
++
++			skb_frag_foreach_page(frag,
++					      skb_frag_off(frag) + offset - start,
++					      copy, p, p_off, p_len, copied) {
++				vaddr = kmap_local_page(p);
++				n = INDIRECT_CALL_1(cb, simple_copy_to_iter,
++					vaddr + p_off, p_len, data, to);
++				kunmap_local(vaddr);
++			}
++
+ 			offset += n;
+ 			if (n != copy)
+ 				goto short_copy;
+-- 
+2.43.0
 
 
