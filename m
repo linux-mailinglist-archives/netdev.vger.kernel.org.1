@@ -1,175 +1,184 @@
-Return-Path: <netdev+bounces-105912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BEA79138C9
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 09:37:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 368C59138D0
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 09:43:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 911AD1C20A4D
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 07:37:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1B94281CCD
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 07:43:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01995339B1;
-	Sun, 23 Jun 2024 07:37:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F9C39851;
+	Sun, 23 Jun 2024 07:43:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gDWhIzLQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UfBgBSNa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631BE20317
-	for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 07:37:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C62617C7C
+	for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 07:43:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719128242; cv=none; b=Ukofla+YySYyrrTAZy27xsogxLK55+ZW+xbT9PIh2234zZaszyqNVTU2cq7Z/bL0/O8PsYBE9VYWcFh+vpLD9MOpG+qsXa8GJ6sFUkSKm4sZGYF8zJd1Kcm7vRCBulxwkNJpOKC/bYFddrvkwfTPnOrwoZyLo5X+DceKFcWJJ9Y=
+	t=1719128583; cv=none; b=MNMbxFs6q6se/5uyx4sNMALY2Zj47mC47+tvKTCkR7alFGuUa9n/5rxT5Whqu633I6YpnfQGYGEIB07UumMAFXzwAvwerenM78k88kDWCpCFACSyqrOUypA+slywV7XCdtRQbwnD4jROJt9uAIqGKIcAMTi5j5LYTa8J1E7DMbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719128242; c=relaxed/simple;
-	bh=LKmj3S7VrU8WOui+L72d/J0+AlgTS3ouT4t0Yu1VyCk=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=cBQ78ZV2LUpXEWxCH615GDlHMV7ATjnowJzW95LIjVzb3SKHzqfpJigws8zHeMQkCTnRzXmWHxALby1O0o8Y6o4ncfO0egDFEZ8IehfezDfhW6mxqxbLfB+6OFgG4OIo/PAXUTigh0Sc/Nh/yhP8BSd/GLM89gQQR9998ldPO8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gDWhIzLQ; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6b4ff803ef2so15763226d6.0
-        for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 00:37:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719128240; x=1719733040; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g1ZuKu48uZHhUKm5DA/1vcFEqKS5a2b6qn9mmaWmy7c=;
-        b=gDWhIzLQ006pRTQ9gTuPPjDqz40szRmzT/hrkCDz28XQqo1KNpqxB762rBdPO6tPSR
-         TL8lLIiCvKcEJKzpq+9RcAiiOk3d57SD56ZAT1GIh9fGZlh646Y1E1AFcZENNEHRTwVh
-         j+60oryt1cWKb25cF2R9iX8JW2eSRMTbxKBi8fGz/SrtyB+w1U/3zNs4VTID3uEyISYA
-         Ib3d5huuGSOvZrriwsLslG+7SE0evwD2rnjBsVMXr2/VuGO5snmepLZbbJd9WbuQ4Vhw
-         YxfeDDY3/3h/JUY6eCgMCMnu+9BynvcrYox5cy7upjwifAu4Dt6VBqE4ctnR2n2YNUpC
-         nv3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719128240; x=1719733040;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=g1ZuKu48uZHhUKm5DA/1vcFEqKS5a2b6qn9mmaWmy7c=;
-        b=naieb85A8C5YuQOe1aZHIgl/PfjihPiSTDGVSE1nsk+bzpam3ccEcCtBqBw8hh/UPG
-         SPjowp7iVcrgAfC3B18UTY43Diq/b2TKGzcD/pjXl6Y3tPvxfXqDO+7VgUVqFW/HMuSP
-         r4Of33x1zdS075CHOYVb3Z1BGpn8NY+JNUNeOImWBJ9tMUOoL3ParjOEXpMde9Zl5dav
-         6I/QchIRpwPqIoY0+/1b8IeTkWA6Js13wNoFv9hv0v3ZuPkW6NO9NpHmU8XQ6Xj5hRhs
-         njB1UbgJsgPd/kr/GBSrJ1aiCmj7/9Ife9OoPdWoLOcrlMSRk9WxXg0rDpAnz8tUlXdS
-         AJrA==
-X-Gm-Message-State: AOJu0Yzpkq+CS28kzRtvKF0AyEhO4Up/PRtvJlDSYTSXzArMPxtffrCd
-	V28sSdSvWhuQ/rQvjXkQJqXMw/6rjUjNkUlBbIcS5GfOqRkWCoHb
-X-Google-Smtp-Source: AGHT+IEmA/8EV70xgnU2Xo2iBQlUMOGD9hnJp0Pvb35YWhhF8iV8xuRy9nCb+c0HMxCLKViRaV66rg==
-X-Received: by 2002:a05:6214:d2:b0:6b0:6965:511 with SMTP id 6a1803df08f44-6b5409a53d2mr17795316d6.7.1719128239872;
-        Sun, 23 Jun 2024 00:37:19 -0700 (PDT)
-Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b51ef5fbd6sm23469806d6.124.2024.06.23.00.37.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Jun 2024 00:37:19 -0700 (PDT)
-Date: Sun, 23 Jun 2024 03:37:19 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- willemdebruijn.kernel@gmail.com, 
- ecree.xilinx@gmail.com, 
- Jakub Kicinski <kuba@kernel.org>
-Message-ID: <6677d0af33d39_33363c294f8@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240620232902.1343834-3-kuba@kernel.org>
-References: <20240620232902.1343834-1-kuba@kernel.org>
- <20240620232902.1343834-3-kuba@kernel.org>
-Subject: Re: [PATCH net-next 2/4] selftests: drv-net: add helper to wait for
- HW stats to sync
+	s=arc-20240116; t=1719128583; c=relaxed/simple;
+	bh=vEPdkq96WIWo9yYnDl9dIYaRS7LoVPnQ83IY5GM9xi0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CKnKmIohJmdmy/AdByJ32bdr3tEC7OGyTFA5gFWpU8qY9uIICeu6K1FEyu2yF0ateOsoHWOH32E6nimI0j54uIZtpse06wi1gjCFn6Kpl2AlEvFPpJzIUW3uyS9d2SwvOZ7e8uJulUGzrJskkydP+Z+7qmsX9y+tGT7B27LmLCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UfBgBSNa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D435C2BD10;
+	Sun, 23 Jun 2024 07:43:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719128582;
+	bh=vEPdkq96WIWo9yYnDl9dIYaRS7LoVPnQ83IY5GM9xi0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UfBgBSNa3KslKKch0flmrdXc8oUX+TTzEBteYZegaGKliTKypvBHUFe8qajOTGiYA
+	 uz/IkzMAIYn8kZvpFVzF+P/wjX2YZHPm+TnDQu/nkJ+YsKoDmNT/MexEixCQuWaPyX
+	 b1ilY3WEt7FqBbvJ8Oas5c5R0PQux+P7BWdjI2+Fs4G2DpjVcDGsvMPTOs68jG7vdH
+	 GS8/TVEuSkEvJFOkzVsVJwHsGp2ipH28suGfDnWywLE/k4RNa2A1XO6yKkUAZ50Ek6
+	 r1IG7mh9iDZCgToGqkrIHdwUapG3tXU2djr9EO9+hlcAE4QbedVhdeNtzhXkRcieND
+	 DfP/xaAcJchsQ==
+Date: Sun, 23 Jun 2024 08:42:59 +0100
+From: Simon Horman <horms@kernel.org>
+To: James Chapman <jchapman@katalix.com>
+Cc: netdev@vger.kernel.org, gnault@redhat.com, samuel.thibault@ens-lyon.org,
+	ridge.kennedy@alliedtelesis.co.nz
+Subject: Re: [PATCH net-next 2/8] l2tp: store l2tpv3 sessions in per-net IDR
+Message-ID: <20240623074259.GJ1098275@kernel.org>
+References: <cover.1718877398.git.jchapman@katalix.com>
+ <22cdf8d419a6757be449cbeb5b69203d3bb3d2dd.1718877398.git.jchapman@katalix.com>
+ <20240621125940.GE1098275@kernel.org>
+ <e24ecc91-8fb4-fbd2-374a-2d1af2d8d3d7@katalix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e24ecc91-8fb4-fbd2-374a-2d1af2d8d3d7@katalix.com>
 
-Jakub Kicinski wrote:
-> Some devices DMA stats to the host periodically. Add a helper
-> which can wait for that to happen, based on frequency reported
-> by the driver in ethtool.
+On Fri, Jun 21, 2024 at 05:21:48PM +0100, James Chapman wrote:
+> On 21/06/2024 13:59, Simon Horman wrote:
+> > On Thu, Jun 20, 2024 at 12:22:38PM +0100, James Chapman wrote:
+> > > L2TPv3 sessions are currently held in one of two fixed-size hash
+> > > lists: either a per-net hashlist (IP-encap), or a per-tunnel hashlist
+> > > (UDP-encap), keyed by the L2TPv3 32-bit session_id.
+> > > 
+> > > In order to lookup L2TPv3 sessions in UDP-encap tunnels efficiently
+> > > without finding the tunnel first via sk_user_data, UDP sessions are
+> > > now kept in a per-net session list, keyed by session ID. Convert the
+> > > existing per-net hashlist to use an IDR for better performance when
+> > > there are many sessions and have L2TPv3 UDP sessions use the same IDR.
+> > > 
+> > > Although the L2TPv3 RFC states that the session ID alone identifies
+> > > the session, our implementation has allowed the same session ID to be
+> > > used in different L2TP UDP tunnels. To retain support for this, a new
+> > > per-net session hashtable is used, keyed by the sock and session
+> > > ID. If on creating a new session, a session already exists with that
+> > > ID in the IDR, the colliding sessions are added to the new hashtable
+> > > and the existing IDR entry is flagged. When looking up sessions, the
+> > > approach is to first check the IDR and if no unflagged match is found,
+> > > check the new hashtable. The sock is made available to session getters
+> > > where session ID collisions are to be considered. In this way, the new
+> > > hashtable is used only for session ID collisions so can be kept small.
+> > > 
+> > > For managing session removal, we need a list of colliding sessions
+> > > matching a given ID in order to update or remove the IDR entry of the
+> > > ID. This is necessary to detect session ID collisions when future
+> > > sessions are created. The list head is allocated on first collision
+> > > of a given ID and refcounted.
+> > > 
+> > > Signed-off-by: James Chapman <jchapman@katalix.com>
+> > > Reviewed-by: Tom Parkin <tparkin@katalix.com>
+> > 
+> > ...
+> > 
+> > > @@ -358,39 +460,45 @@ int l2tp_session_register(struct l2tp_session *session,
+> > >   		}
+> > >   	if (tunnel->version == L2TP_HDR_VER_3) {
+> > > -		pn = l2tp_pernet(tunnel->l2tp_net);
+> > > -		g_head = l2tp_session_id_hash_2(pn, session->session_id);
+> > > -
+> > > -		spin_lock_bh(&pn->l2tp_session_hlist_lock);
+> > > -
+> > > +		session_key = session->session_id;
+> > > +		spin_lock_bh(&pn->l2tp_session_idr_lock);
+> > > +		err = idr_alloc_u32(&pn->l2tp_v3_session_idr, NULL,
+> > > +				    &session_key, session_key, GFP_ATOMIC);
+> > >   		/* IP encap expects session IDs to be globally unique, while
+> > > -		 * UDP encap doesn't.
+> > > +		 * UDP encap doesn't. This isn't per the RFC, which says that
+> > > +		 * sessions are identified only by the session ID, but is to
+> > > +		 * support existing userspace which depends on it.
+> > >   		 */
+> > > -		hlist_for_each_entry(session_walk, g_head, global_hlist)
+> > > -			if (session_walk->session_id == session->session_id &&
+> > > -			    (session_walk->tunnel->encap == L2TP_ENCAPTYPE_IP ||
+> > > -			     tunnel->encap == L2TP_ENCAPTYPE_IP)) {
+> > > -				err = -EEXIST;
+> > > -				goto err_tlock_pnlock;
+> > > -			}
+> > > +		if (err == -ENOSPC && tunnel->encap == L2TP_ENCAPTYPE_UDP) {
+> > > +			struct l2tp_session *session2;
+> > > -		l2tp_tunnel_inc_refcount(tunnel);
+> > > -		hlist_add_head_rcu(&session->global_hlist, g_head);
+> > > -
+> > > -		spin_unlock_bh(&pn->l2tp_session_hlist_lock);
+> > > -	} else {
+> > > -		l2tp_tunnel_inc_refcount(tunnel);
+> > > +			session2 = idr_find(&pn->l2tp_v3_session_idr,
+> > > +					    session_key);
+> > > +			err = l2tp_session_collision_add(pn, session, session2);
+> > > +		}
+> > > +		spin_unlock_bh(&pn->l2tp_session_idr_lock);
+> > > +		if (err == -ENOSPC)
+> > > +			err = -EEXIST;
+> > >   	}
+> > 
+> > Hi James,
+> > 
+> > I believe that when the if condition above is false, then err will be
+> > uninitialised here.
+> > 
+> > If so, as this series seems to have been applied,
+> > could you provide a follow-up to address this?
+> > 
+> > > +	if (err)
+> > > +		goto err_tlock;
+> > > +
+> > > +	l2tp_tunnel_inc_refcount(tunnel);
+> > > +
+> > >   	hlist_add_head_rcu(&session->hlist, head);
+> > >   	spin_unlock_bh(&tunnel->hlist_lock);
+> > > +	if (tunnel->version == L2TP_HDR_VER_3) {
+> > > +		spin_lock_bh(&pn->l2tp_session_idr_lock);
+> > > +		idr_replace(&pn->l2tp_v3_session_idr, session, session_key);
+> > > +		spin_unlock_bh(&pn->l2tp_session_idr_lock);
+> > > +	}
+> > > +
+> > >   	trace_register_session(session);
+> > >   	return 0;
+> > > -err_tlock_pnlock:
+> > > -	spin_unlock_bh(&pn->l2tp_session_hlist_lock);
+> > >   err_tlock:
+> > >   	spin_unlock_bh(&tunnel->hlist_lock);
+> > 
+> > ...
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  .../selftests/drivers/net/lib/py/env.py       | 21 ++++++++++++++++++-
->  tools/testing/selftests/net/lib/py/utils.py   |  4 ++++
->  2 files changed, 24 insertions(+), 1 deletion(-)
+> Hi Simon,
 > 
-> diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
-> index edcedd7bffab..34f62002b741 100644
-> --- a/tools/testing/selftests/drivers/net/lib/py/env.py
-> +++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-> @@ -1,9 +1,10 @@
->  # SPDX-License-Identifier: GPL-2.0
->  
->  import os
-> +import time
->  from pathlib import Path
->  from lib.py import KsftSkipEx, KsftXfailEx
-> -from lib.py import cmd, ip
-> +from lib.py import cmd, ethtool, ip
->  from lib.py import NetNS, NetdevSimDev
->  from .remote import Remote
->  
-> @@ -82,6 +83,8 @@ from .remote import Remote
->  
->          self.env = _load_env_file(src_path)
->  
-> +        self._stats_settle_time = None
-> +
->          # Things we try to destroy
->          self.remote = None
->          # These are for local testing state
-> @@ -222,3 +225,19 @@ from .remote import Remote
->          if remote:
->              if not self._require_cmd(comm, "remote"):
->                  raise KsftSkipEx("Test requires (remote) command: " + comm)
-> +
-> +    def wait_hw_stats_settle(self):
-> +        """
-> +        Wait for HW stats to become consistent, some devices DMA HW stats
-> +        periodically so events won't be reflected until next sync.
-> +        Good drivers will tell us via ethtool what their sync period is.
-> +        """
-> +        if self._stats_settle_time is None:
-> +            data = ethtool("-c " + self.ifname, json=True)[0]
-> +            if 'stats-block-usecs' in data:
-> +                self._stats_settle_time = data['stats-block-usecs'] / 1000 / 1000
-> +            else:
-> +                # Assume sync not required, we may use a small (50ms?) sleep
-> +                # regardless if we see flakiness
-> +                self._stats_settle_time = 0
+> It's "fixed" by the next patch in the series: 2a3339f6c963 ("l2tp: store
+> l2tpv2 sessions in per-net IDR") which adds an else clause to the if
+> statement quoted above. Sorry I missed this when compile-testing the series!
+> Would you prefer a separate patch to initialise err?
 
-Intended to set _stats_settle_time to 0.05 here? Else I don't follow
-the comment
+Hi James,
 
-> +        time.sleep(self._stats_settle_time)
-> diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
-> index 9fa9ec720c89..bf8b5e4d9bac 100644
-> --- a/tools/testing/selftests/net/lib/py/utils.py
-> +++ b/tools/testing/selftests/net/lib/py/utils.py
-> @@ -78,6 +78,10 @@ import time
->      return tool('ip', args, json=json, host=host)
->  
->  
-> +def ethtool(args, json=None, ns=None, host=None):
-> +    return tool('ethtool', args,  json=json, ns=ns, host=host)
-> +
-> +
->  def rand_port():
->      """
->      Get unprivileged port, for now just random, one day we may decide to check if used.
-> -- 
-> 2.45.2
-> 
-
-
+Thanks for your response and sorry for missing that.
+I see it now and I don't think any further action is required.
 
