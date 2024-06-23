@@ -1,86 +1,156 @@
-Return-Path: <netdev+bounces-105956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31F5F913DD7
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 22:00:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D44AE913EB2
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 00:00:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 250051C212A4
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 20:00:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58784B20BB8
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 22:00:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C095918412E;
-	Sun, 23 Jun 2024 20:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 091DA1850A4;
+	Sun, 23 Jun 2024 21:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="V/CfHjz/"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="UBh1C89c"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from msa.smtpout.orange.fr (msa-215.smtpout.orange.fr [193.252.23.215])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14314144D27;
-	Sun, 23 Jun 2024 20:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B22184106;
+	Sun, 23 Jun 2024 21:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.23.215
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719172831; cv=none; b=ci8KDFxvJx1Ea5glsy4p5k9yFXLSPrvNiW3Ikda8lOdgouvl/UvkgahUyxYgYjRLBdOYVPuL6GbYQ2KjuCIbfMBT0Wx3vMvEaVnMesGUyMqMtR/Ge/1nolCfpmokmmibwYBka0cfGLdzhCXPKy9RqViu8m3vh3mtwQfQrVtl6MA=
+	t=1719179993; cv=none; b=iJAEjY1n6zYjgEd9KzN02kNyT9F3boIMWWOgzesBpoD/RAU1USskyceYBZYtkSxPi0aXeIOLNdA76h/NmTBcS5pU0oRCIl4a6Qxo2UOxBC59lHVS1ODcAjiqTZxi985fZMVl3SGY21eI4w/rl7simD52xyYR+vMCEet3BHVbAmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719172831; c=relaxed/simple;
-	bh=tdEngc11sD2vPlLzre5yWLpZAhAAfCXQ59fzkTEFaGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LaAcGVkmRMG4XHdoQ+E13Qf216Llsu36K55XhtoHh2Ezced+FtfwjWX5dDyV4MZTEqABX+8VlByFtiztcFaHx8Vo3g1Ys5n4K3VCB4XocntVGutO1wHlEQpEmmQKP15kW5KRM5xmtqsjTCYSJsUR2z1HtAMhbS2N8PAvXeRKKMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=V/CfHjz/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=DJ2B6QWuaoTdFrjJuq0ql4wztJP+AWuUKJujEGMnyPM=; b=V/CfHjz/D3X8W+dd377+H49JBo
-	nlub23k5sgAUZyRyq8jDXjzfhYfLwtqgpLOUM/+ZJISczwc9lczG/6qpi9ebD27JvwaTUcwtIRIpR
-	Tfxv3f4JOq3Q/5BF/ZWTPAfiH6uICO/3LMoDcQowr8YiCmg/z0dn2RVLhARQNn/r6+5U=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sLTNp-000nbM-TE; Sun, 23 Jun 2024 22:00:17 +0200
-Date: Sun, 23 Jun 2024 22:00:17 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Marek Vasut <marex@denx.de>
-Cc: netdev@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1719179993; c=relaxed/simple;
+	bh=v5DO2TAftI73ww3uvdwE1NNig1frErR46ykjHVHR9AA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kNHnBpH3STogmmA9TW+MJFn+oBuwKCVfjjBSdqOemNscGb4fScI62DNAfbC+r2IWKVidltkxyc1Q4rc3796Kc5r6rqBvnRboAJ/Ix4fwRkbzmrpotHyMGx6+ypPe3RJWXNwMndotPnVJwNlWA9AtDl1wbWmLplpGaLdjnMobmLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=UBh1C89c; arc=none smtp.client-ip=193.252.23.215
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from fedora.home ([86.243.222.230])
+	by smtp.orange.fr with ESMTPA
+	id LTPSshmixRlahLTPSsC1Ba; Sun, 23 Jun 2024 22:02:02 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1719172922;
+	bh=ynHaVTacZiZSj/BhHnX4o1QTUyOa26DsYCafYGhsZE4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=UBh1C89cSr13phxYPzXWS+0Ot+tiBxc+1D//5F9pDWUKU2erMXrOPuko/W6Qql2p3
+	 NOEoiOx5NdJ+mbGA6/42sOApPf+zKqcDN0K7NQ39kxvDPl7K7l4PGvijUqZbOfVyFC
+	 KKaRz9AeelJuqJsy6aNMo8hhly+Cr9lUDv0sOKO8HZ/DO1ekbTEs5zFKU9AB8FgxrB
+	 QGZ1Pj6p42rme96nG/H/b5LnRBwpfK7dZBGonlmU4/uICqSQMtMXME71fuI4ZUlaCM
+	 LqKcZm1AWPxFcqsIEX7iAYoyXqwzCnz/s6iQ6DofijotncrfiMrOqhhCTy6J76jQs2
+	 4U1wjig3mvGfg==
+X-ME-Helo: fedora.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sun, 23 Jun 2024 22:02:02 +0200
+X-ME-IP: 86.243.222.230
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Joakim Zhang <qiangqing.zhang@nxp.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-	devicetree@vger.kernel.org, kernel@dh-electronics.com
-Subject: Re: [net-next,PATCH] dt-bindings: net: realtek,rtl82xx: Document
- known PHY IDs as compatible strings
-Message-ID: <cc539292-0b76-46b8-99b3-508b7bc7d94d@lunn.ch>
-References: <20240623194225.76667-1-marex@denx.de>
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next] can: m_can: Constify struct m_can_ops
+Date: Sun, 23 Jun 2024 22:01:50 +0200
+Message-ID: <a17b96d1be5341c11f263e1e45c9de1cb754e416.1719172843.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240623194225.76667-1-marex@denx.de>
+Content-Transfer-Encoding: 8bit
 
->    - $ref: ethernet-phy.yaml#
->  
->  properties:
-> +  compatible:
-> +    enum:
-> +      - ethernet-phy-id0000.8201
+'struct m_can_ops' is not modified in these drivers.
 
-I'm not sure that one should be listed. It is not an official ID,
-since it does not have an OUI. In fact, this is one of the rare cases
-where actually listing a compatible in DT makes sense, because you can
-override the broken hardware and give a correct ID in realtek address
-space.
+Constifying this structure moves some data to a read-only section, so
+increase overall security.
 
-	Andrew
+On a x86_64, with allmodconfig, as an example:
+Before:
+======
+   text	   data	    bss	    dec	    hex	filename
+   4806	    520	      0	   5326	   14ce	drivers/net/can/m_can/m_can_pci.o
+
+After:
+=====
+   text	   data	    bss	    dec	    hex	filename
+   4862	    464	      0	   5326	   14ce	drivers/net/can/m_can/m_can_pci.o
+
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+Compile tested-only
+---
+ drivers/net/can/m_can/m_can.h          | 2 +-
+ drivers/net/can/m_can/m_can_pci.c      | 2 +-
+ drivers/net/can/m_can/m_can_platform.c | 2 +-
+ drivers/net/can/m_can/tcan4x5x-core.c  | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_can.h
+index 3a9edc292593..92b2bd8628e6 100644
+--- a/drivers/net/can/m_can/m_can.h
++++ b/drivers/net/can/m_can/m_can.h
+@@ -91,7 +91,7 @@ struct m_can_classdev {
+ 
+ 	ktime_t irq_timer_wait;
+ 
+-	struct m_can_ops *ops;
++	const struct m_can_ops *ops;
+ 
+ 	int version;
+ 	u32 irqstatus;
+diff --git a/drivers/net/can/m_can/m_can_pci.c b/drivers/net/can/m_can/m_can_pci.c
+index 45400de4163d..d72fe771dfc7 100644
+--- a/drivers/net/can/m_can/m_can_pci.c
++++ b/drivers/net/can/m_can/m_can_pci.c
+@@ -77,7 +77,7 @@ static int iomap_write_fifo(struct m_can_classdev *cdev, int offset,
+ 	return 0;
+ }
+ 
+-static struct m_can_ops m_can_pci_ops = {
++static const struct m_can_ops m_can_pci_ops = {
+ 	.read_reg = iomap_read_reg,
+ 	.write_reg = iomap_write_reg,
+ 	.write_fifo = iomap_write_fifo,
+diff --git a/drivers/net/can/m_can/m_can_platform.c b/drivers/net/can/m_can/m_can_platform.c
+index df0367124b4c..983ab80260dd 100644
+--- a/drivers/net/can/m_can/m_can_platform.c
++++ b/drivers/net/can/m_can/m_can_platform.c
+@@ -68,7 +68,7 @@ static int iomap_write_fifo(struct m_can_classdev *cdev, int offset,
+ 	return 0;
+ }
+ 
+-static struct m_can_ops m_can_plat_ops = {
++static const struct m_can_ops m_can_plat_ops = {
+ 	.read_reg = iomap_read_reg,
+ 	.write_reg = iomap_write_reg,
+ 	.write_fifo = iomap_write_fifo,
+diff --git a/drivers/net/can/m_can/tcan4x5x-core.c b/drivers/net/can/m_can/tcan4x5x-core.c
+index a42600dac70d..f15619d31065 100644
+--- a/drivers/net/can/m_can/tcan4x5x-core.c
++++ b/drivers/net/can/m_can/tcan4x5x-core.c
+@@ -357,7 +357,7 @@ static int tcan4x5x_get_gpios(struct m_can_classdev *cdev,
+ 	return 0;
+ }
+ 
+-static struct m_can_ops tcan4x5x_ops = {
++static const struct m_can_ops tcan4x5x_ops = {
+ 	.init = tcan4x5x_init,
+ 	.read_reg = tcan4x5x_read_reg,
+ 	.write_reg = tcan4x5x_write_reg,
+-- 
+2.45.2
+
 
