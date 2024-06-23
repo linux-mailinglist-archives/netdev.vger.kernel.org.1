@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-105967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F75F913F4E
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 01:57:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58196913F4F
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 01:57:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8200F1F21BC5
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 23:57:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EA43280DCD
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 23:57:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7DFD186E27;
-	Sun, 23 Jun 2024 23:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 124B0186E31;
+	Sun, 23 Jun 2024 23:57:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EeZK+AqM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LaiiuBEV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3EEA1850A7
-	for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 23:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E8C186E43
+	for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 23:56:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719187018; cv=none; b=W7VUEOjkZJeejX9hgZe1AfqSd3RXyFxEt+4/jweRFSmKkHrV0n7HlA8W8HmTKSLQVwtYrN+vqwdl+b0LqyJRicLiy2eMvC/XED15ifcjR1W/p5DKxr7bnOaJDclHjXFhpxy8Fd82uVeWO+U/EEw2v/PUp4N16tjlsrDSraO3IxQ=
+	t=1719187021; cv=none; b=LaiD+bBp/6GYHwDTyUI2N5gISMr8CFg0bisz27QKAI7UQPzQgulDbreqAzn/D4KM6BxNsSB8dEDTUQfBwmoiA7F9mlJVbtwAfkETysf4yp2u4JEQ8H9MChYEMNFPVgUfrX7G9R71672j83qkPXVE9mhMggoFt5z4v8t6PSkJcVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719187018; c=relaxed/simple;
-	bh=yJcuW7RE2m3Je/WuBEDBUN4duMM6nZsL/a2fEQtSunY=;
+	s=arc-20240116; t=1719187021; c=relaxed/simple;
+	bh=o6Rz07PBGenkAtAATpn/N0/JLT0K7ky0ZKjypW3tgDY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QKNRHexqf1YXkuYz9FK/oNAJSLeMmFikVW+1ZTTrlvzzAEimke1rx18hkGUkcI9vXsVGVFvGh+FdvktZM3NtsPwYQUS12OZvEtNuVDsSm6W/mNXg+Kx3ul0nDpkhlR8RcCJS+s4M6Fi1WNHAq58R22FdaZUH1PwLkt9/DvsyAKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EeZK+AqM; arc=none smtp.client-ip=209.85.216.50
+	 MIME-Version; b=atZ6r7Qgj+kQiFobf+lTsrT30qIiie+rkpss8gvyYgm8VVqkRdJK4hYuD/+l0C55P8TxpReyuydPDlZXHHtlS5Z+lE8KTebzbcaxsr6Y2gwDob3gx2dXqmWuhbJ4DT9d5YmtAQJ54ReIaY096Mu4YtEEjjRdY827SW7gLlj5wiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LaiiuBEV; arc=none smtp.client-ip=209.85.216.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2c86869685aso149264a91.1
-        for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 16:56:56 -0700 (PDT)
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2c7af3116aaso689050a91.2
+        for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 16:56:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719187016; x=1719791816; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1719187018; x=1719791818; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CJ8+EwolYUW+ryttes+aRelB19ZuOV5b18upMIU2p+Q=;
-        b=EeZK+AqMazHBo9HaEtZt5lwvL8x6L75UWG1nrsvU5JwBoHUilagTkA9MVW2UcxLh31
-         6rDD/zAeViLDHdeQbYqg+bCtcdysjD7zAHBWIC9tPyNnUthCZ93UXmj/NbvN7Mnw6Itr
-         07p71+xHlbwMfWO6UAWB+lDvTE1fAJPnC3HP8eWGXyIUaRcsjyfD565DpdhgR5/aUCeu
-         d8w3cXIbh3qmXo+3XyLG0lkvAHOOVkkQcOSEgMYyQDB5gnagi1HktDolptL6J6IBp9eh
-         aIb8AhzwgvPoQgqr/7qTFyd1btGdxzKB3Cl46cI5SUrkUN1jSe1628InN77jzp3Xl8Ei
-         atqg==
+        bh=OGK7LofLPpbrPjOJdlzE5/ZbJveooJBnW+He9jnucMI=;
+        b=LaiiuBEVc/chKcrAgc2WHiniWDvCyQi9Vsjv/ilXiU/rpiqVJ1CgS+OislZ2nIYYR1
+         HWGMwQ1IACxQoh2dB+OX0AxjBvrtfG/0pfcUTxUhT7ZYBAu2FDSID0w6HIEWZncvlO6R
+         aEGbfy+xiE2Zu8Ch8wdeJ16tQ5jcHuOVJs4AwrYauY2yt1gDeWNIA/OYejaLqEAk3BAc
+         KC4Zx8Q6MQ/nxFg2h843KPnu6XA0UO3g62lK9ijt/5VkFSkU5rDzhObT5IPqRXtizvmc
+         1kmoHqippb4Pp2D2cuDcG/OHnctpmOoR/7+uP5VBTA+IfVPLAEXhVv2ff9Mx6v+s93MG
+         2qzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719187016; x=1719791816;
+        d=1e100.net; s=20230601; t=1719187018; x=1719791818;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CJ8+EwolYUW+ryttes+aRelB19ZuOV5b18upMIU2p+Q=;
-        b=XemM09tSsz25REeL2D57Kc8OaHCaq1oCkclCS6nJS2O/r3b1N+YVzLMMOY/+vOI3yy
-         s8tbR8YAOAJ1C0bz9A8EXUv4DR+yDXLSBV5/Pq2jqDvTESa+2hKglvte+p2aSmnFGUqc
-         l6JUIHqOVKCiNFQq9f5yJX0ZccmhvWeDnyq6tRgjUmVAeaNtBAL1b4dPMXPXXZbDGJkr
-         KszcKmJtYAstvvudR/0auU4YDAi+te0Efz5RpmCC5s0A9KgTiCpo5/1fZWCnhHQtAIpe
-         kTZV6D+bn80/tCD5ZarZUlQbilwAxt6HXtLEZEEzsTOnpaXbag7LCvPvbO7aw9r/eRsI
-         6tsA==
-X-Gm-Message-State: AOJu0Yz+l94N6ZsriLe1HOHjB3uv+nXvEaUDOMne+hYr9dSD6daHAU/c
-	tdkhF7Pff3pI0UPiFI52NFHzra79opCTg8GtAkTySNGJdOG1p2Vf0ZVVMjzB
-X-Google-Smtp-Source: AGHT+IEux4O5qmH3B5CsraWiwuLNYfqxFNh4EIP/TqhkKMAE2saopamMnlSiKlc2h0gicQFPF9qhcA==
-X-Received: by 2002:a17:902:ce81:b0:1f9:b4eb:ce6f with SMTP id d9443c01a7336-1fa09e60feamr57815805ad.3.1719187015600;
-        Sun, 23 Jun 2024 16:56:55 -0700 (PDT)
+        bh=OGK7LofLPpbrPjOJdlzE5/ZbJveooJBnW+He9jnucMI=;
+        b=CCafNLPjFsbt+M8jpY8TqaNzKB36TuZdB20Ma9LYRA+wANkBAG2EVZSP0yaqGo5TBc
+         m1n7bPnqX6SidWvr+stE8f/y0wBngdEe1CcxecdksDFwP09pFb8OXn6u9adZEyLULFVt
+         5aWcHPshhNqG1nyfvd1OiXAcS6oI6XXXYH9nhUbfcS8BJykqInz9YBQ+de9RbGgrWyL2
+         McLQW7QQDXY2FfmSbcjzDcCy68qEs2fe7lUKsMAFkhGC8Ed3Ayt5U4kPRZeot1IyZ9ae
+         6ZjgJvBMSkIPxDfjfiCSXdK+kfzW2ereCJkcOVxknf/oh9LgnwJ30p6tuw7mszle3Z6Y
+         /Xsw==
+X-Gm-Message-State: AOJu0YwtsKAmu/sAgCXark1PQZ/EECHNFgP9xbOsnF1Qs4mk30qIvR6j
+	QZcmQcDB+ZXIa3h7xDB6Cq34gPWMyhA7/ZB8wv+4ApnlBIwvQ3P+uH96Z5yo
+X-Google-Smtp-Source: AGHT+IFEZVw9NBV2kD6zFIpU76egZCx8wv5gtaAvvU82J45v73JRJwc5Ho/BrtogfuuiQeUqJ3I3eg==
+X-Received: by 2002:a05:6a20:3d86:b0:1b5:ae2c:c730 with SMTP id adf61e73a8af0-1bcea5b2a1fmr5658203637.3.1719187018365;
+        Sun, 23 Jun 2024 16:56:58 -0700 (PDT)
 Received: from rpi.. (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb1d448dsm50501985ad.0.2024.06.23.16.56.52
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb1d448dsm50501985ad.0.2024.06.23.16.56.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Jun 2024 16:56:55 -0700 (PDT)
+        Sun, 23 Jun 2024 16:56:58 -0700 (PDT)
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -77,9 +77,9 @@ Cc: andrew@lunn.ch,
 	hfdevel@gmx.net,
 	naveenm@marvell.com,
 	jdamato@fastly.com
-Subject: [PATCH net-next v12 5/7] net: tn40xx: add basic Rx handling
-Date: Mon, 24 Jun 2024 08:55:05 +0900
-Message-Id: <20240623235507.108147-6-fujita.tomonori@gmail.com>
+Subject: [PATCH net-next v12 6/7] net: tn40xx: add mdio bus support
+Date: Mon, 24 Jun 2024 08:55:06 +0900
+Message-Id: <20240623235507.108147-7-fujita.tomonori@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240623235507.108147-1-fujita.tomonori@gmail.com>
 References: <20240623235507.108147-1-fujita.tomonori@gmail.com>
@@ -91,662 +91,196 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch adds basic Rx handling. The Rx logic uses three major data
-structures; two ring buffers with NIC and one database. One ring
-buffer is used to send information to NIC about memory to be stored
-packets to be received. The other is used to get information from NIC
-about received packets. The database is used to keep the information
-about DMA mapping. After a packet arrived, the db is used to pass the
-packet to the network stack.
+This patch adds supports for mdio bus. A later path adds PHYLIB
+support on the top of this.
 
 Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Reviewed-by: Hans-Frieder Vogt <hfdevel@gmx.net>
 ---
- drivers/net/ethernet/tehuti/Kconfig |   1 +
- drivers/net/ethernet/tehuti/tn40.c  | 456 +++++++++++++++++++++++++++-
- drivers/net/ethernet/tehuti/tn40.h  |  52 ++++
- 3 files changed, 508 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/tehuti/Makefile    |   2 +-
+ drivers/net/ethernet/tehuti/tn40.h      |   4 +
+ drivers/net/ethernet/tehuti/tn40_mdio.c | 142 ++++++++++++++++++++++++
+ 3 files changed, 147 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/tehuti/tn40_mdio.c
 
-diff --git a/drivers/net/ethernet/tehuti/Kconfig b/drivers/net/ethernet/tehuti/Kconfig
-index 4198fd59e42e..2b3b5a8c7fbf 100644
---- a/drivers/net/ethernet/tehuti/Kconfig
-+++ b/drivers/net/ethernet/tehuti/Kconfig
-@@ -26,6 +26,7 @@ config TEHUTI
- config TEHUTI_TN40
- 	tristate "Tehuti Networks TN40xx 10G Ethernet adapters"
- 	depends on PCI
-+	select PAGE_POOL
- 	select FW_LOADER
- 	help
- 	  This driver supports 10G Ethernet adapters using Tehuti Networks
-diff --git a/drivers/net/ethernet/tehuti/tn40.c b/drivers/net/ethernet/tehuti/tn40.c
-index ce3c323aa073..0b51a1d63aad 100644
---- a/drivers/net/ethernet/tehuti/tn40.c
-+++ b/drivers/net/ethernet/tehuti/tn40.c
-@@ -9,6 +9,7 @@
- #include <linux/netdevice.h>
- #include <linux/pci.h>
- #include <linux/vmalloc.h>
-+#include <net/page_pool/helpers.h>
+diff --git a/drivers/net/ethernet/tehuti/Makefile b/drivers/net/ethernet/tehuti/Makefile
+index 1c468d99e476..7a0fe586a243 100644
+--- a/drivers/net/ethernet/tehuti/Makefile
++++ b/drivers/net/ethernet/tehuti/Makefile
+@@ -5,5 +5,5 @@
  
- #include "tn40.h"
+ obj-$(CONFIG_TEHUTI) += tehuti.o
  
-@@ -63,6 +64,353 @@ static void tn40_fifo_free(struct tn40_priv *priv, struct tn40_fifo *f)
- 			  f->memsz + TN40_FIFO_EXTRA_SPACE, f->va, f->da);
+-tn40xx-y := tn40.o
++tn40xx-y := tn40.o tn40_mdio.o
+ obj-$(CONFIG_TEHUTI_TN40) += tn40xx.o
+diff --git a/drivers/net/ethernet/tehuti/tn40.h b/drivers/net/ethernet/tehuti/tn40.h
+index 20b400e58ef9..4cbe0c3883c7 100644
+--- a/drivers/net/ethernet/tehuti/tn40.h
++++ b/drivers/net/ethernet/tehuti/tn40.h
+@@ -140,6 +140,8 @@ struct tn40_priv {
+ 	u32 b0_len;
+ 	dma_addr_t b0_dma; /* Physical address of buffer */
+ 	char *b0_va; /* Virtual address of buffer */
++
++	struct mii_bus *mdio;
+ };
+ 
+ /* RX FREE descriptor - 64bit */
+@@ -217,4 +219,6 @@ static inline void tn40_write_reg(struct tn40_priv *priv, u32 reg, u32 val)
+ 	writel(val, priv->regs + reg);
  }
  
-+static struct tn40_rxdb *tn40_rxdb_alloc(int nelem)
-+{
-+	size_t size = sizeof(struct tn40_rxdb) + (nelem * sizeof(int)) +
-+	    (nelem * sizeof(struct tn40_rx_map));
-+	struct tn40_rxdb *db;
-+	int i;
++int tn40_mdiobus_init(struct tn40_priv *priv);
 +
-+	db = vzalloc(size);
-+	if (db) {
-+		db->stack = (int *)(db + 1);
-+		db->elems = (void *)(db->stack + nelem);
-+		db->nelem = nelem;
-+		db->top = nelem;
-+		/* make the first alloc close to db struct */
-+		for (i = 0; i < nelem; i++)
-+			db->stack[i] = nelem - i - 1;
-+	}
-+	return db;
+ #endif /* _TN40XX_H */
+diff --git a/drivers/net/ethernet/tehuti/tn40_mdio.c b/drivers/net/ethernet/tehuti/tn40_mdio.c
+new file mode 100644
+index 000000000000..af18615d64a8
+--- /dev/null
++++ b/drivers/net/ethernet/tehuti/tn40_mdio.c
+@@ -0,0 +1,142 @@
++// SPDX-License-Identifier: GPL-2.0+
++/* Copyright (c) Tehuti Networks Ltd. */
++
++#include <linux/netdevice.h>
++#include <linux/pci.h>
++#include <linux/phylink.h>
++
++#include "tn40.h"
++
++#define TN40_MDIO_DEVAD_MASK GENMASK(4, 0)
++#define TN40_MDIO_PRTAD_MASK GENMASK(9, 5)
++#define TN40_MDIO_CMD_VAL(device, port)			\
++	(FIELD_PREP(TN40_MDIO_DEVAD_MASK, (device)) |	\
++	 (FIELD_PREP(TN40_MDIO_PRTAD_MASK, (port))))
++#define TN40_MDIO_CMD_READ BIT(15)
++
++static void tn40_mdio_set_speed(struct tn40_priv *priv, u32 speed)
++{
++	void __iomem *regs = priv->regs;
++	int mdio_cfg;
++
++	if (speed == TN40_MDIO_SPEED_1MHZ)
++		mdio_cfg = (0x7d << 7) | 0x08;	/* 1MHz */
++	else
++		mdio_cfg = 0xA08;	/* 6MHz */
++	mdio_cfg |= (1 << 6);
++	writel(mdio_cfg, regs + TN40_REG_MDIO_CMD_STAT);
++	msleep(100);
 +}
 +
-+static void tn40_rxdb_free(struct tn40_rxdb *db)
++static u32 tn40_mdio_stat(struct tn40_priv *priv)
 +{
-+	vfree(db);
++	void __iomem *regs = priv->regs;
++
++	return readl(regs + TN40_REG_MDIO_CMD_STAT);
 +}
 +
-+static int tn40_rxdb_alloc_elem(struct tn40_rxdb *db)
++static int tn40_mdio_wait_nobusy(struct tn40_priv *priv, u32 *val)
 +{
-+	return db->stack[--db->top];
-+}
++	u32 stat;
++	int ret;
 +
-+static void *tn40_rxdb_addr_elem(struct tn40_rxdb *db, unsigned int n)
-+{
-+	return db->elems + n;
-+}
-+
-+static int tn40_rxdb_available(struct tn40_rxdb *db)
-+{
-+	return db->top;
-+}
-+
-+static void tn40_rxdb_free_elem(struct tn40_rxdb *db, unsigned int n)
-+{
-+	db->stack[db->top++] = n;
-+}
-+
-+/**
-+ * tn40_create_rx_ring - Initialize RX all related HW and SW resources
-+ * @priv: NIC private structure
-+ *
-+ * create_rx_ring creates rxf and rxd fifos, updates the relevant HW registers,
-+ * preallocates skbs for rx. It assumes that Rx is disabled in HW funcs are
-+ * grouped for better cache usage
-+ *
-+ * RxD fifo is smaller then RxF fifo by design. Upon high load, RxD will be
-+ * filled and packets will be dropped by the NIC without getting into the host
-+ * or generating interrupts. In this situation the host has no chance of
-+ * processing all the packets. Dropping packets by the NIC is cheaper, since it
-+ * takes 0 CPU cycles.
-+ *
-+ * Return: 0 on success and negative value on error.
-+ */
-+static int tn40_create_rx_ring(struct tn40_priv *priv)
-+{
-+	struct page_pool_params pp = {
-+		.dev = &priv->pdev->dev,
-+		.napi = &priv->napi,
-+		.dma_dir = DMA_FROM_DEVICE,
-+		.netdev = priv->ndev,
-+		.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
-+		.max_len = PAGE_SIZE,
-+	};
-+	int ret, pkt_size, nr;
-+
-+	priv->page_pool = page_pool_create(&pp);
-+	if (IS_ERR(priv->page_pool))
-+		return PTR_ERR(priv->page_pool);
-+
-+	ret = tn40_fifo_alloc(priv, &priv->rxd_fifo0.m, priv->rxd_size,
-+			      TN40_REG_RXD_CFG0_0, TN40_REG_RXD_CFG1_0,
-+			      TN40_REG_RXD_RPTR_0, TN40_REG_RXD_WPTR_0);
-+	if (ret)
-+		goto err_destroy_page_pool;
-+
-+	ret = tn40_fifo_alloc(priv, &priv->rxf_fifo0.m, priv->rxf_size,
-+			      TN40_REG_RXF_CFG0_0, TN40_REG_RXF_CFG1_0,
-+			      TN40_REG_RXF_RPTR_0, TN40_REG_RXF_WPTR_0);
-+	if (ret)
-+		goto err_free_rxd;
-+
-+	pkt_size = priv->ndev->mtu + VLAN_ETH_HLEN;
-+	priv->rxf_fifo0.m.pktsz = pkt_size;
-+	nr = priv->rxf_fifo0.m.memsz / sizeof(struct tn40_rxf_desc);
-+	priv->rxdb0 = tn40_rxdb_alloc(nr);
-+	if (!priv->rxdb0) {
-+		ret = -ENOMEM;
-+		goto err_free_rxf;
-+	}
-+	return 0;
-+err_free_rxf:
-+	tn40_fifo_free(priv, &priv->rxf_fifo0.m);
-+err_free_rxd:
-+	tn40_fifo_free(priv, &priv->rxd_fifo0.m);
-+err_destroy_page_pool:
-+	page_pool_destroy(priv->page_pool);
++	ret = readx_poll_timeout_atomic(tn40_mdio_stat, priv, stat,
++					TN40_GET_MDIO_BUSY(stat) == 0, 10,
++					10000);
++	if (val)
++		*val = stat;
 +	return ret;
 +}
 +
-+static void tn40_rx_free_buffers(struct tn40_priv *priv)
++static int tn40_mdio_read(struct tn40_priv *priv, int port, int device,
++			  u16 regnum)
 +{
-+	struct tn40_rxdb *db = priv->rxdb0;
-+	struct tn40_rx_map *dm;
-+	u16 i;
++	void __iomem *regs = priv->regs;
++	u32 i;
 +
-+	netdev_dbg(priv->ndev, "total =%d free =%d busy =%d\n", db->nelem,
-+		   tn40_rxdb_available(db),
-+		   db->nelem - tn40_rxdb_available(db));
++	/* wait until MDIO is not busy */
++	if (tn40_mdio_wait_nobusy(priv, NULL))
++		return -EIO;
 +
-+	for (i = 0; i < db->nelem; i++) {
-+		dm = tn40_rxdb_addr_elem(db, i);
-+		if (dm->page)
-+			page_pool_put_full_page(priv->page_pool, dm->page,
-+						false);
-+	}
++	i = TN40_MDIO_CMD_VAL(device, port);
++	writel(i, regs + TN40_REG_MDIO_CMD);
++	writel((u32)regnum, regs + TN40_REG_MDIO_ADDR);
++	if (tn40_mdio_wait_nobusy(priv, NULL))
++		return -EIO;
++
++	writel(TN40_MDIO_CMD_READ | i, regs + TN40_REG_MDIO_CMD);
++	/* read CMD_STAT until not busy */
++	if (tn40_mdio_wait_nobusy(priv, NULL))
++		return -EIO;
++
++	return lower_16_bits(readl(regs + TN40_REG_MDIO_DATA));
 +}
 +
-+static void tn40_destroy_rx_ring(struct tn40_priv *priv)
++static int tn40_mdio_write(struct tn40_priv *priv, int port, int device,
++			   u16 regnum, u16 data)
 +{
-+	if (priv->rxdb0) {
-+		tn40_rx_free_buffers(priv);
-+		tn40_rxdb_free(priv->rxdb0);
-+		priv->rxdb0 = NULL;
++	void __iomem *regs = priv->regs;
++	u32 tmp_reg = 0;
++	int ret;
++
++	/* wait until MDIO is not busy */
++	if (tn40_mdio_wait_nobusy(priv, NULL))
++		return -EIO;
++	writel(TN40_MDIO_CMD_VAL(device, port), regs + TN40_REG_MDIO_CMD);
++	writel((u32)regnum, regs + TN40_REG_MDIO_ADDR);
++	if (tn40_mdio_wait_nobusy(priv, NULL))
++		return -EIO;
++	writel((u32)data, regs + TN40_REG_MDIO_DATA);
++	/* read CMD_STAT until not busy */
++	ret = tn40_mdio_wait_nobusy(priv, &tmp_reg);
++	if (ret)
++		return -EIO;
++
++	if (TN40_GET_MDIO_RD_ERR(tmp_reg)) {
++		dev_err(&priv->pdev->dev, "MDIO error after write command\n");
++		return -EIO;
 +	}
-+	tn40_fifo_free(priv, &priv->rxf_fifo0.m);
-+	tn40_fifo_free(priv, &priv->rxd_fifo0.m);
-+	page_pool_destroy(priv->page_pool);
++	return 0;
 +}
 +
-+static void tn40_set_rx_desc(struct tn40_priv *priv, int idx, u64 dma)
++static int tn40_mdio_read_c45(struct mii_bus *mii_bus, int addr, int devnum,
++			      int regnum)
 +{
-+	struct tn40_rxf_fifo *f = &priv->rxf_fifo0;
-+	struct tn40_rxf_desc *rxfd;
-+	int delta;
-+
-+	rxfd = (struct tn40_rxf_desc *)(f->m.va + f->m.wptr);
-+	rxfd->info = cpu_to_le32(0x10003);	/* INFO =1 BC =3 */
-+	rxfd->va_lo = cpu_to_le32(idx);
-+	rxfd->pa_lo = cpu_to_le32(lower_32_bits(dma));
-+	rxfd->pa_hi = cpu_to_le32(upper_32_bits(dma));
-+	rxfd->len = cpu_to_le32(f->m.pktsz);
-+	f->m.wptr += sizeof(struct tn40_rxf_desc);
-+	delta = f->m.wptr - f->m.memsz;
-+	if (unlikely(delta >= 0)) {
-+		f->m.wptr = delta;
-+		if (delta > 0) {
-+			memcpy(f->m.va, f->m.va + f->m.memsz, delta);
-+			netdev_dbg(priv->ndev,
-+				   "wrapped rxd descriptor\n");
-+		}
-+	}
++	return tn40_mdio_read(mii_bus->priv, addr, devnum, regnum);
 +}
 +
-+/**
-+ * tn40_rx_alloc_buffers - Fill rxf fifo with buffers.
-+ *
-+ * @priv: NIC's private structure
-+ *
-+ * rx_alloc_buffers allocates buffers via the page pool API, builds rxf descs
-+ * and pushes them (rxf descr) into the rxf fifo. The pages are stored in rxdb.
-+ * To calculate the free space, we uses the cached values of RPTR and WPTR
-+ * when needed. This function also updates RPTR and WPTR.
-+ */
-+static void tn40_rx_alloc_buffers(struct tn40_priv *priv)
++static int tn40_mdio_write_c45(struct mii_bus *mii_bus, int addr, int devnum,
++			       int regnum, u16 val)
 +{
-+	struct tn40_rxf_fifo *f = &priv->rxf_fifo0;
-+	struct tn40_rxdb *db = priv->rxdb0;
-+	struct tn40_rx_map *dm;
-+	struct page *page;
-+	int dno, i, idx;
-+
-+	dno = tn40_rxdb_available(db) - 1;
-+	for (i = dno; i > 0; i--) {
-+		page = page_pool_dev_alloc_pages(priv->page_pool);
-+		if (!page)
-+			break;
-+
-+		idx = tn40_rxdb_alloc_elem(db);
-+		tn40_set_rx_desc(priv, idx, page_pool_get_dma_addr(page));
-+		dm = tn40_rxdb_addr_elem(db, idx);
-+		dm->page = page;
-+	}
-+	if (i != dno)
-+		tn40_write_reg(priv, f->m.reg_wptr,
-+			       f->m.wptr & TN40_TXF_WPTR_WR_PTR);
-+	netdev_dbg(priv->ndev, "write_reg 0x%04x f->m.reg_wptr 0x%x\n",
-+		   f->m.reg_wptr, f->m.wptr & TN40_TXF_WPTR_WR_PTR);
-+	netdev_dbg(priv->ndev, "read_reg  0x%04x f->m.reg_rptr=0x%x\n",
-+		   f->m.reg_rptr, tn40_read_reg(priv, f->m.reg_rptr));
-+	netdev_dbg(priv->ndev, "write_reg 0x%04x f->m.reg_wptr=0x%x\n",
-+		   f->m.reg_wptr, tn40_read_reg(priv, f->m.reg_wptr));
++	return  tn40_mdio_write(mii_bus->priv, addr, devnum, regnum, val);
 +}
 +
-+static void tn40_recycle_rx_buffer(struct tn40_priv *priv,
-+				   struct tn40_rxd_desc *rxdd)
++int tn40_mdiobus_init(struct tn40_priv *priv)
 +{
-+	struct tn40_rxf_fifo *f = &priv->rxf_fifo0;
-+	struct tn40_rx_map *dm;
-+	int idx;
++	struct pci_dev *pdev = priv->pdev;
++	struct mii_bus *bus;
++	int ret;
 +
-+	idx = le32_to_cpu(rxdd->va_lo);
-+	dm = tn40_rxdb_addr_elem(priv->rxdb0, idx);
-+	tn40_set_rx_desc(priv, idx, page_pool_get_dma_addr(dm->page));
++	bus = devm_mdiobus_alloc(&pdev->dev);
++	if (!bus)
++		return -ENOMEM;
 +
-+	tn40_write_reg(priv, f->m.reg_wptr, f->m.wptr & TN40_TXF_WPTR_WR_PTR);
-+}
++	bus->name = TN40_DRV_NAME;
++	bus->parent = &pdev->dev;
++	snprintf(bus->id, MII_BUS_ID_SIZE, "tn40xx-%x-%x",
++		 pci_domain_nr(pdev->bus), pci_dev_id(pdev));
++	bus->priv = priv;
 +
-+static int tn40_rx_receive(struct tn40_priv *priv, int budget)
-+{
-+	struct tn40_rxd_fifo *f = &priv->rxd_fifo0;
-+	u32 rxd_val1, rxd_err, pkt_id;
-+	int tmp_len, size, done = 0;
-+	struct tn40_rxdb *db = NULL;
-+	struct tn40_rxd_desc *rxdd;
-+	struct tn40_rx_map *dm;
-+	struct sk_buff *skb;
-+	u16 len, rxd_vlan;
-+	int idx;
++	bus->read_c45 = tn40_mdio_read_c45;
++	bus->write_c45 = tn40_mdio_write_c45;
 +
-+	f->m.wptr = tn40_read_reg(priv, f->m.reg_wptr) & TN40_TXF_WPTR_WR_PTR;
-+	size = f->m.wptr - f->m.rptr;
-+	if (size < 0)
-+		size += f->m.memsz;	/* Size is negative :-) */
-+
-+	while (size > 0) {
-+		rxdd = (struct tn40_rxd_desc *)(f->m.va + f->m.rptr);
-+		db = priv->rxdb0;
-+
-+		/* We have a chicken and egg problem here. If the
-+		 * descriptor is wrapped we first need to copy the tail
-+		 * of the descriptor to the end of the buffer before
-+		 * extracting values from the descriptor. However in
-+		 * order to know if the descriptor is wrapped we need to
-+		 * obtain the length of the descriptor from (the
-+		 * wrapped) descriptor. Luckily the length is the first
-+		 * word of the descriptor. Descriptor lengths are
-+		 * multiples of 8 bytes so in case of a wrapped
-+		 * descriptor the first 8 bytes guaranteed to appear
-+		 * before the end of the buffer. We first obtain the
-+		 * length, we then copy the rest of the descriptor if
-+		 * needed and then extract the rest of the values from
-+		 * the descriptor.
-+		 *
-+		 * Do not change the order of operations as it will
-+		 * break the code!!!
-+		 */
-+		rxd_val1 = le32_to_cpu(rxdd->rxd_val1);
-+		tmp_len = TN40_GET_RXD_BC(rxd_val1) << 3;
-+		pkt_id = TN40_GET_RXD_PKT_ID(rxd_val1);
-+		size -= tmp_len;
-+		/* CHECK FOR A PARTIALLY ARRIVED DESCRIPTOR */
-+		if (size < 0) {
-+			netdev_dbg(priv->ndev,
-+				   "%s partially arrived desc tmp_len %d\n",
-+				   __func__, tmp_len);
-+			break;
-+		}
-+		/* make sure that the descriptor fully is arrived
-+		 * before reading the rest of the descriptor.
-+		 */
-+		rmb();
-+
-+		/* A special treatment is given to non-contiguous
-+		 * descriptors that start near the end, wraps around
-+		 * and continue at the beginning. The second part is
-+		 * copied right after the first, and then descriptor
-+		 * is interpreted as normal. The fifo has an extra
-+		 * space to allow such operations.
-+		 */
-+
-+		/* HAVE WE REACHED THE END OF THE QUEUE? */
-+		f->m.rptr += tmp_len;
-+		tmp_len = f->m.rptr - f->m.memsz;
-+		if (unlikely(tmp_len >= 0)) {
-+			f->m.rptr = tmp_len;
-+			if (tmp_len > 0) {
-+				/* COPY PARTIAL DESCRIPTOR
-+				 * TO THE END OF THE QUEUE
-+				 */
-+				netdev_dbg(priv->ndev,
-+					   "wrapped desc rptr=%d tmp_len=%d\n",
-+					   f->m.rptr, tmp_len);
-+				memcpy(f->m.va + f->m.memsz, f->m.va, tmp_len);
-+			}
-+		}
-+		idx = le32_to_cpu(rxdd->va_lo);
-+		dm = tn40_rxdb_addr_elem(db, idx);
-+		prefetch(dm);
-+
-+		len = le16_to_cpu(rxdd->len);
-+		rxd_vlan = le16_to_cpu(rxdd->rxd_vlan);
-+		/* CHECK FOR ERRORS */
-+		rxd_err = TN40_GET_RXD_ERR(rxd_val1);
-+		if (unlikely(rxd_err)) {
-+			u64_stats_update_begin(&priv->syncp);
-+			priv->stats.rx_errors++;
-+			u64_stats_update_end(&priv->syncp);
-+			tn40_recycle_rx_buffer(priv, rxdd);
-+			continue;
-+		}
-+
-+		skb = napi_build_skb(page_address(dm->page), PAGE_SIZE);
-+		if (!skb) {
-+			u64_stats_update_begin(&priv->syncp);
-+			priv->stats.rx_dropped++;
-+			u64_stats_update_end(&priv->syncp);
-+			tn40_recycle_rx_buffer(priv, rxdd);
-+			break;
-+		}
-+		skb_mark_for_recycle(skb);
-+		skb_put(skb, len);
-+		skb->protocol = eth_type_trans(skb, priv->ndev);
-+		skb->ip_summed =
-+		    (pkt_id == 0) ? CHECKSUM_NONE : CHECKSUM_UNNECESSARY;
-+		if (TN40_GET_RXD_VTAG(rxd_val1))
-+			__vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q),
-+					       TN40_GET_RXD_VLAN_TCI(rxd_vlan));
-+
-+		dm->page = NULL;
-+		tn40_rxdb_free_elem(db, idx);
-+
-+		napi_gro_receive(&priv->napi, skb);
-+
-+		u64_stats_update_begin(&priv->syncp);
-+		priv->stats.rx_bytes += len;
-+		u64_stats_update_end(&priv->syncp);
-+
-+		if (unlikely(++done >= budget))
-+			break;
-+	}
-+	u64_stats_update_begin(&priv->syncp);
-+	priv->stats.rx_packets += done;
-+	u64_stats_update_end(&priv->syncp);
-+	/* FIXME: Do something to minimize pci accesses */
-+	tn40_write_reg(priv, f->m.reg_rptr, f->m.rptr & TN40_TXF_WPTR_WR_PTR);
-+	tn40_rx_alloc_buffers(priv);
-+	return done;
-+}
-+
- /* TX HW/SW interaction overview
-  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  * There are 2 types of TX communication channels between driver and NIC.
-@@ -464,6 +812,61 @@ static netdev_tx_t tn40_start_xmit(struct sk_buff *skb, struct net_device *ndev)
- 	return NETDEV_TX_OK;
- }
- 
-+static void tn40_tx_cleanup(struct tn40_priv *priv)
-+{
-+	struct tn40_txf_fifo *f = &priv->txf_fifo0;
-+	struct tn40_txdb *db = &priv->txdb;
-+	int tx_level = 0;
-+
-+	f->m.wptr = tn40_read_reg(priv, f->m.reg_wptr) & TN40_TXF_WPTR_MASK;
-+
-+	netif_tx_lock(priv->ndev);
-+	while (f->m.wptr != f->m.rptr) {
-+		f->m.rptr += TN40_TXF_DESC_SZ;
-+		f->m.rptr &= f->m.size_mask;
-+		/* Unmap all fragments */
-+		/* First has to come tx_maps containing DMA */
-+		do {
-+			dma_addr_t addr = db->rptr->addr.dma;
-+			size_t size =  db->rptr->len;
-+
-+			netif_tx_unlock(priv->ndev);
-+			dma_unmap_page(&priv->pdev->dev, addr,
-+				       size, DMA_TO_DEVICE);
-+			netif_tx_lock(priv->ndev);
-+			tn40_tx_db_inc_rptr(db);
-+		} while (db->rptr->len > 0);
-+		tx_level -= db->rptr->len; /* '-' Because the len is negative */
-+
-+		/* Now should come skb pointer - free it */
-+		dev_kfree_skb_any(db->rptr->addr.skb);
-+		netdev_dbg(priv->ndev, "dev_kfree_skb_any %p %d\n",
-+			   db->rptr->addr.skb, -db->rptr->len);
-+		tn40_tx_db_inc_rptr(db);
-+	}
-+
-+	/* Let the HW know which TXF descriptors were cleaned */
-+	tn40_write_reg(priv, f->m.reg_rptr, f->m.rptr & TN40_TXF_WPTR_WR_PTR);
-+
-+	/* We reclaimed resources, so in case the Q is stopped by xmit
-+	 * callback, we resume the transmission and use tx_lock to
-+	 * synchronize with xmit.
-+	 */
-+	priv->tx_level += tx_level;
-+	if (priv->tx_noupd) {
-+		priv->tx_noupd = 0;
-+		tn40_write_reg(priv, priv->txd_fifo0.m.reg_wptr,
-+			       priv->txd_fifo0.m.wptr & TN40_TXF_WPTR_WR_PTR);
-+	}
-+	if (unlikely(netif_queue_stopped(priv->ndev) &&
-+		     netif_carrier_ok(priv->ndev) &&
-+		     (priv->tx_level >= TN40_MAX_TX_LEVEL / 2))) {
-+		netdev_dbg(priv->ndev, "TX Q WAKE level %d\n", priv->tx_level);
-+		netif_wake_queue(priv->ndev);
-+	}
-+	netif_tx_unlock(priv->ndev);
-+}
-+
- static void tn40_tx_free_skbs(struct tn40_priv *priv)
- {
- 	struct tn40_txdb *db = &priv->txdb;
-@@ -725,6 +1128,10 @@ static irqreturn_t tn40_isr_napi(int irq, void *dev)
- 		tn40_isr_extra(priv, isr);
- 
- 	if (isr & (TN40_IR_RX_DESC_0 | TN40_IR_TX_FREE_0 | TN40_IR_TMR1)) {
-+		if (likely(napi_schedule_prep(&priv->napi))) {
-+			__napi_schedule(&priv->napi);
-+			return IRQ_HANDLED;
-+		}
- 		/* We get here if an interrupt has slept into the
- 		 * small time window between these lines in
- 		 * tn40_poll: tn40_enable_interrupts(priv); return 0;
-@@ -742,6 +1149,25 @@ static irqreturn_t tn40_isr_napi(int irq, void *dev)
- 	return IRQ_HANDLED;
- }
- 
-+static int tn40_poll(struct napi_struct *napi, int budget)
-+{
-+	struct tn40_priv *priv = container_of(napi, struct tn40_priv, napi);
-+	int work_done;
-+
-+	tn40_tx_cleanup(priv);
-+
-+	if (!budget)
-+		return 0;
-+
-+	work_done = tn40_rx_receive(priv, budget);
-+	if (work_done == budget)
-+		return budget;
-+
-+	if (napi_complete_done(napi, work_done))
-+		tn40_enable_interrupts(priv);
-+	return work_done;
-+}
-+
- static int tn40_fw_load(struct tn40_priv *priv)
- {
- 	const struct firmware *fw = NULL;
-@@ -822,6 +1248,8 @@ static void tn40_hw_start(struct tn40_priv *priv)
- 	tn40_write_reg(priv, TN40_REG_TX_FULLNESS, 0);
- 
- 	tn40_write_reg(priv, TN40_REG_VGLB, 0);
-+	tn40_write_reg(priv, TN40_REG_MAX_FRAME_A,
-+		       priv->rxf_fifo0.m.pktsz & TN40_MAX_FRAME_AB_VAL);
- 	tn40_write_reg(priv, TN40_REG_RDINTCM0, priv->rdintcm);
- 	tn40_write_reg(priv, TN40_REG_RDINTCM2, 0);
- 
-@@ -921,15 +1349,30 @@ static int tn40_start(struct tn40_priv *priv)
- 		return ret;
- 	}
- 
-+	ret = tn40_create_rx_ring(priv);
++	ret = devm_mdiobus_register(&pdev->dev, bus);
 +	if (ret) {
-+		netdev_err(priv->ndev, "failed to rx init %d\n", ret);
-+		goto err_tx_ring;
++		dev_err(&pdev->dev, "failed to register mdiobus %d %u %u\n",
++			ret, bus->state, MDIOBUS_UNREGISTERED);
++		return ret;
 +	}
-+
-+	tn40_rx_alloc_buffers(priv);
-+	if (tn40_rxdb_available(priv->rxdb0) != 1) {
-+		ret = -ENOMEM;
-+		netdev_err(priv->ndev, "failed to allocate rx buffers\n");
-+		goto err_rx_ring;
-+	}
-+
- 	ret = request_irq(priv->pdev->irq, &tn40_isr_napi, IRQF_SHARED,
- 			  priv->ndev->name, priv->ndev);
- 	if (ret) {
- 		netdev_err(priv->ndev, "failed to request irq %d\n", ret);
--		goto err_tx_ring;
-+		goto err_rx_ring;
- 	}
- 
- 	tn40_hw_start(priv);
- 	return 0;
-+err_rx_ring:
-+	tn40_destroy_rx_ring(priv);
- err_tx_ring:
- 	tn40_destroy_tx_ring(priv);
- 	return ret;
-@@ -941,12 +1384,15 @@ static void tn40_stop(struct tn40_priv *priv)
- 	free_irq(priv->pdev->irq, priv->ndev);
- 	tn40_sw_reset(priv);
- 	tn40_destroy_tx_ring(priv);
-+	tn40_destroy_rx_ring(priv);
- }
- 
- static int tn40_close(struct net_device *ndev)
- {
- 	struct tn40_priv *priv = netdev_priv(ndev);
- 
-+	napi_disable(&priv->napi);
-+	netif_napi_del(&priv->napi);
- 	tn40_stop(priv);
- 	return 0;
- }
-@@ -962,6 +1408,8 @@ static int tn40_open(struct net_device *dev)
- 		netdev_err(dev, "failed to start %d\n", ret);
- 		return ret;
- 	}
-+	napi_enable(&priv->napi);
-+	netif_start_queue(priv->ndev);
- 	return 0;
- }
- 
-@@ -1092,6 +1540,11 @@ static void tn40_get_stats(struct net_device *ndev,
- 		stats->tx_packets = priv->stats.tx_packets;
- 		stats->tx_bytes = priv->stats.tx_bytes;
- 		stats->tx_dropped = priv->stats.tx_dropped;
-+
-+		stats->rx_packets = priv->stats.rx_packets;
-+		stats->rx_bytes = priv->stats.rx_bytes;
-+		stats->rx_dropped = priv->stats.rx_dropped;
-+		stats->rx_errors = priv->stats.rx_errors;
- 	} while (u64_stats_fetch_retry(&priv->syncp, start));
- }
- 
-@@ -1206,6 +1659,7 @@ static int tn40_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	priv = netdev_priv(ndev);
- 	pci_set_drvdata(pdev, priv);
-+	netif_napi_add(ndev, &priv->napi, tn40_poll);
- 
- 	priv->regs = regs;
- 	priv->pdev = pdev;
-diff --git a/drivers/net/ethernet/tehuti/tn40.h b/drivers/net/ethernet/tehuti/tn40.h
-index 381257416d76..20b400e58ef9 100644
---- a/drivers/net/ethernet/tehuti/tn40.h
-+++ b/drivers/net/ethernet/tehuti/tn40.h
-@@ -60,6 +60,25 @@ struct tn40_txd_fifo {
- 	struct tn40_fifo m; /* The minimal set of variables used by all fifos */
- };
- 
-+struct tn40_rxf_fifo {
-+	struct tn40_fifo m; /* The minimal set of variables used by all fifos */
-+};
-+
-+struct tn40_rxd_fifo {
-+	struct tn40_fifo m; /* The minimal set of variables used by all fifos */
-+};
-+
-+struct tn40_rx_map {
-+	struct page *page;
-+};
-+
-+struct tn40_rxdb {
-+	unsigned int *stack;
-+	struct tn40_rx_map *elems;
-+	unsigned int nelem;
-+	unsigned int top;
-+};
-+
- union tn40_tx_dma_addr {
- 	dma_addr_t dma;
- 	struct sk_buff *skb;
-@@ -87,6 +106,13 @@ struct tn40_priv {
- 	struct net_device *ndev;
- 	struct pci_dev *pdev;
- 
-+	struct napi_struct napi;
-+	/* RX FIFOs: 1 for data (full) descs, and 2 for free descs */
-+	struct tn40_rxd_fifo rxd_fifo0;
-+	struct tn40_rxf_fifo rxf_fifo0;
-+	struct tn40_rxdb *rxdb0; /* Rx dbs to store skb pointers */
-+	struct page_pool *page_pool;
-+
- 	/* Tx FIFOs: 1 for data desc, 1 for empty (acks) desc */
- 	struct tn40_txd_fifo txd_fifo0;
- 	struct tn40_txf_fifo txf_fifo0;
-@@ -116,6 +142,32 @@ struct tn40_priv {
- 	char *b0_va; /* Virtual address of buffer */
- };
- 
-+/* RX FREE descriptor - 64bit */
-+struct tn40_rxf_desc {
-+	__le32 info; /* Buffer Count + Info - described below */
-+	__le32 va_lo; /* VAdr[31:0] */
-+	__le32 va_hi; /* VAdr[63:32] */
-+	__le32 pa_lo; /* PAdr[31:0] */
-+	__le32 pa_hi; /* PAdr[63:32] */
-+	__le32 len; /* Buffer Length */
-+};
-+
-+#define TN40_GET_RXD_BC(x) FIELD_GET(GENMASK(4, 0), (x))
-+#define TN40_GET_RXD_ERR(x) FIELD_GET(GENMASK(26, 21), (x))
-+#define TN40_GET_RXD_PKT_ID(x) FIELD_GET(GENMASK(30, 28), (x))
-+#define TN40_GET_RXD_VTAG(x) FIELD_GET(BIT(31), (x))
-+#define TN40_GET_RXD_VLAN_TCI(x) FIELD_GET(GENMASK(15, 0), (x))
-+
-+struct tn40_rxd_desc {
-+	__le32 rxd_val1;
-+	__le16 len;
-+	__le16 rxd_vlan;
-+	__le32 va_lo;
-+	__le32 va_hi;
-+	__le32 rss_lo;
-+	__le32 rss_hash;
-+};
-+
- #define TN40_MAX_PBL (19)
- /* PBL describes each virtual buffer to be transmitted from the host. */
- struct tn40_pbl {
++	tn40_mdio_set_speed(priv, TN40_MDIO_SPEED_6MHZ);
++	priv->mdio = bus;
++	return 0;
++}
 -- 
 2.34.1
 
