@@ -1,157 +1,118 @@
-Return-Path: <netdev+bounces-105943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEC23913C58
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 17:29:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6623F913CB0
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 18:20:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37AEDB210CE
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 15:29:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED97B283086
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 16:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECDAE181311;
-	Sun, 23 Jun 2024 15:29:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 436561822F2;
+	Sun, 23 Jun 2024 16:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fa1ZVjra"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6925FBE6F
-	for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 15:29:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17765F9F0;
+	Sun, 23 Jun 2024 16:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719156566; cv=none; b=qBWRZVs/QDkBOzn/ZUS3CoYxzPxrNPix5hohdOgu/D+RIgQx5H04WQmpPA52F7uJ5MGaqFaDnQzVtGwBLb2SsVBFL3YuuPBX0ounSM8RsO/TKhn2Yp2hqJ5ne8YXPAta/4oSR390eLzAG0ZUumSedes7tsami+tRrcloo0VaGag=
+	t=1719159629; cv=none; b=i7sXoSc4FfhQ9mDy7gQCRLSHrbp7kJjmAaEbYUJOwOIMuNvWPRg6sKD8U4WdqXtyVtBrqeXcIdIRnHMNfJ4LGPA/EaTuq+m8XPVNm3zUvqt/7JHd3K0sicMqSanA//7zRcGfAz249Y2G8ddHlivrd10N8YyArn1NfdwBIkjaaPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719156566; c=relaxed/simple;
-	bh=5GzQNXCfF8EdbfC3H4E9VS+tvgTWS1crHKs96+wLw5I=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ro0hnM4ptuPgCLMbcH2xYiAtmt9XCLGocKQu3wBX+UbR3EfVJi4HLk3jtC7jpyVdQTltqz5gxnsusNPu1ujB8YmcYJmF46v8gCpEtSIxk1mpE2Jx1laFuURIYyYtn+IcU67jE6Adq3h2K2Z1yh2HBX4rCSpBloiRVeaBDuYe6E4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-7eafdb25dbbso424955839f.3
-        for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 08:29:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719156564; x=1719761364;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EP0r5vjIqTOj5wt9p5RxoVOv4/EypeRrWumP8Iu8xTU=;
-        b=e2AD1n0d0WyOyMyTyRcIRCrARbHex6bNzMhZYPWplzwxSr6yFeXEJb72jMClqSj1nI
-         sVH0Pr2sjP/awHB4ZhAF9la6VIVm1CmpPfV5cNcwOb8YE/LF3m4wjsrd10afLhJe56XE
-         uDsXxoeXWY1XH81W72lH2w4RKtn1rHDvuyXhoPZpQOz/FN9gepIWJHlBPw0FSPW2VryE
-         H5zYqgomVDKVIEBAQlAisFNh1EK0W8dHvBldecPMrtMnMfz/DKuqHkWgnbByUfk78Tao
-         q/Ls26py8hx+4vsbdqWQX8e8IDylwggmYXM5pU+qM8MDpGzcY4yWCP+GqoWe2u5yKNMQ
-         g8yQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXmZOu8n78/EmCbxsL2c73K6uj859SlWqUWL+n3FScUrFG+EG+Ghbin2o4PZlvlFvsjn02yVcuDoMmZ3BZkTUW1KNHDzl5r
-X-Gm-Message-State: AOJu0Yxa1cVN5RQjoq7m7NW/g1HVEvq4Qx2q9pUzwzhPlGWhJW3/oSzy
-	Jlr79Uiumsqtn8hjscoZ18IurkNSS8BwPnBJ9c+JZNB055MlRw+j4pMjCwkqtiEgEQ1R1j8a7NZ
-	YbnjB+jhecWYCyhyfsMHeCTqWhk8HY3uFoalOWiJ+9qvq9T7izaMnwFI=
-X-Google-Smtp-Source: AGHT+IFqnPdpAhkaCMlzEMZuVA/C2S6JDfh8pY3BlYKXaqSV5TpYTSaMd5hwBP7t8YgYtHTf5gVQGwAtwWvzgO6DJ3GECpny+vp9
+	s=arc-20240116; t=1719159629; c=relaxed/simple;
+	bh=2W3n7QEpgfPvKDfZlzj4iobwCUXzXN/FvDR+WAOxruc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GZDu5S7+/AzAOrDPwRY0sPUu5fxeyl6GrH2ULQEhezPH7uvTtsOCMYGnLrkkd8WkarenhTnkG5NQV6yXJ9o5RFPuAawUov1MYXPrheoZSo0kUErWB+2hgf0w2LNIUkOyDD43ZyR+DtocMIdZwLHQ7L71z95wLVlAMouipCQB9l4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fa1ZVjra; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 063A7C2BD10;
+	Sun, 23 Jun 2024 16:20:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719159628;
+	bh=2W3n7QEpgfPvKDfZlzj4iobwCUXzXN/FvDR+WAOxruc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Fa1ZVjraLovOEBQLOeN7wXzUeRRksZgqiKFwqR5dqpSppb+AhheE0hgDArkwbmK23
+	 tIU44xm6k62ri2JLxLhce8NfCYu2uWHSnX0ibokica9LNg58AzF1xEm0qylVoNfwGG
+	 /Yb3GK4t+DytrDXmWL2fLl6Mcc/ydNu31EYbo8221kvLHcigX1e1YWTWmxMhTwR/vS
+	 VPlWXWoKjKJLzI5Ep3rFUoTEp0wCS9sOvJJqUyvStHnFPxG7uIyiW5Qgdktr/ru8Vu
+	 SzDDrs96TLSsx3WJv58zocL66c1igs5MdkLQ87WqnsdllHSaBnHPF1xXWNOqB8XuOn
+	 JfMfolHsel3kw==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: netdev@vger.kernel.org
+Cc: nbd@nbd.name,
+	lorenzo.bianconi83@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	conor@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	devicetree@vger.kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	upstream@airoha.com,
+	angelogioacchino.delregno@collabora.com,
+	benjamin.larsson@genexis.eu,
+	rkannoth@marvell.com,
+	sgoutham@marvell.com,
+	andrew@lunn.ch
+Subject: [PATCH v3 net-next 0/2] Introduce EN7581 ethernet support
+Date: Sun, 23 Jun 2024 18:19:55 +0200
+Message-ID: <cover.1719159076.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cd84:0:b0:36c:4b17:e05d with SMTP id
- e9e14a558f8ab-3763e16d8a6mr3431835ab.4.1719156564589; Sun, 23 Jun 2024
- 08:29:24 -0700 (PDT)
-Date: Sun, 23 Jun 2024 08:29:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000589156061b90544f@google.com>
-Subject: [syzbot] [can?] INFO: task hung in cangw_pernet_exit_batch (3)
-From: syzbot <syzbot+21ad8c05e3792b6ffd14@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, mkl@pengutronix.de, 
-	netdev@vger.kernel.org, pabeni@redhat.com, socketcan@hartkopp.net, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Add airoha_eth driver in order to introduce ethernet support for
+Airoha EN7581 SoC available on EN7581 development board.
+EN7581 mac controller is mainly composed by Frame Engine (FE) and
+QoS-DMA (QDMA) modules. FE is used for traffic offloading (just basic
+functionalities are supported now) while QDMA is used for DMA operation
+and QOS functionalities between mac layer and the dsa switch (hw QoS is
+not available yet and it will be added in the future).
+Currently only hw lan features are available, hw wan will be added with
+subsequent patches.
 
-syzbot found the following issue on:
+Changes since v2:
+- rename airoha,en7581.yaml in airoha,en7581-eth.yaml
+- remove reset dependency in airoha,en7581-eth.yaml
+- remove airoha_dev_change_mtu() callback
+Changes since v1:
+- drop patch 2/3
+- remove queue lock for rx queues
+- add bql support
+- add ethtool stats support
+- fix possible infinite loop in airoha_qdma_rx_process routine
+- always destroy page_pool in case of error during initialization
+- cosmetics
 
-HEAD commit:    2ccbdf43d5e7 Merge tag 'for-linus' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16dd1f2e980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fa0ce06dcc735711
-dashboard link: https://syzkaller.appspot.com/bug?extid=21ad8c05e3792b6ffd14
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Lorenzo Bianconi (2):
+  dt-bindings: net: airoha: Add EN7581 ethernet controller
+  net: airoha: Introduce ethernet support for EN7581 SoC
 
-Unfortunately, I don't have any reproducer for this issue yet.
+ .../bindings/net/airoha,en7581-eth.yaml       |  108 +
+ MAINTAINERS                                   |   10 +
+ drivers/net/ethernet/mediatek/Kconfig         |   11 +-
+ drivers/net/ethernet/mediatek/Makefile        |    1 +
+ drivers/net/ethernet/mediatek/airoha_eth.c    | 1783 +++++++++++++++++
+ drivers/net/ethernet/mediatek/airoha_eth.h    |  793 ++++++++
+ 6 files changed, 2705 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+ create mode 100644 drivers/net/ethernet/mediatek/airoha_eth.c
+ create mode 100644 drivers/net/ethernet/mediatek/airoha_eth.h
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/27e64d7472ce/disk-2ccbdf43.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e1c494bb5c9c/vmlinux-2ccbdf43.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/752498985a5e/bzImage-2ccbdf43.xz
+-- 
+2.45.2
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+21ad8c05e3792b6ffd14@syzkaller.appspotmail.com
-
-INFO: task kworker/u8:1:12 blocked for more than 143 seconds.
-      Not tainted 6.10.0-rc3-syzkaller-00044-g2ccbdf43d5e7 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u8:1    state:D stack:18160 pid:12    tgid:12    ppid:2      flags:0x00004000
-Workqueue: netns cleanup_net
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0x17e8/0x4a20 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6837
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
- cangw_pernet_exit_batch+0x20/0x90 net/can/gw.c:1257
- ops_exit_list net/core/net_namespace.c:178 [inline]
- cleanup_net+0x89f/0xcc0 net/core/net_namespace.c:640
- process_one_work kernel/workqueue.c:3231 [inline]
- process_scheduled_works+0xa2e/0x1830 kernel/workqueue.c:3312
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3393
- kthread+0x2f2/0x390 kernel/kthread.c:389
- ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-INFO: task kworker/1:6:5181 blocked for more than 143 seconds.
-      Not tainted 6.10.0-rc3-syzkaller-00044-g2ccbdf43d5e7 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/1:6     state:D stack:20976 pid:5181  tgid:5181  ppid:2      flags:0x00004000
-Workqueue: events_power_efficient crda_timeout_work
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0x17e8/0x4a20 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6837
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
- crda_timeout_work+0x15/0x50 net/wireless/reg.c:540
- process_one_work kernel/workqueue.c:3231 [inline]
- process_scheduled_works+0xa2e/0x1830 kernel/workqueue.c:3312
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3393
- kthread+0x2f2/0x390 kernel/kthread.c:389
- ret_from_fork+0x4
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
