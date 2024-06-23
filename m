@@ -1,141 +1,111 @@
-Return-Path: <netdev+bounces-105954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF0FC913DC2
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 21:42:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69CFB913DD2
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 21:59:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C6ED1F21AE2
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 19:42:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCFF6B21392
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 19:59:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D2531836C3;
-	Sun, 23 Jun 2024 19:42:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BF9018412F;
+	Sun, 23 Jun 2024 19:58:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="BmR84q8J"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="OJrysQXD"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6E244C86;
-	Sun, 23 Jun 2024 19:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154563BBE2
+	for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 19:58:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719171760; cv=none; b=aVufSlRvJrMtyUlPJ9KHiq3fz1DWKRjjVNpziXigGV8ErJPcOpe9ploqkMCNMLIHHLbA/rjGBRCukbMe/aYk/+4zuBk4t1dk7BujMsj3D4T2sK/y1uC4jUHZy/EzCozyMWOuX1bB5t7HiyCbd0yumblF0HYObdx7ItNCtpDooVo=
+	t=1719172739; cv=none; b=ByZo0n/vlnbLZaz0+os5UUU9jcLSlnFcHpKAqeR2i1eKl7+hJfr2bY3SjCgYyyzY3KNlXSSdJjoVmkTxQ/r9ZX6XdcldmHgWI1o2Uz0BvVsxCBlWUmqc+AloKVzhXPJ6yLwzKmk27TdACrJfkXSqq5hLPioqGBxIK1AchBS60O0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719171760; c=relaxed/simple;
-	bh=qBy6E0Lt5lm0+EGGL1s5KUxPNyFltjn6X4AitXHZDp0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cDV5fI0YFQQ2tiDnAJGHUAPpnlzh80pSF8pjZjOw7vyBeeRYfQzops2Cb9VneCsw/ZSjcJet/YJKlf82IEZ1elXs8vOZP7GZbd9aKQW8VQgEzqbaDzGdKgYrBU158b0Df0McucCUHW6nGbQkdLq54t9XCysjygyqsraj+kgc8EA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=BmR84q8J; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id F0A11866F6;
-	Sun, 23 Jun 2024 21:42:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1719171756;
-	bh=tF4ZX0gxmH3srM1ImeZD/IcaP1acA+OK16igdhxP9jo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BmR84q8JHI3yiyz6aQrqOuQggZzAdp+2pU+4FXWVPJZ1KEX892oKfwWLWjUFuNbpE
-	 5Dg+Qx7OOiXqQzZtnAieW0Qvy8py8ezhOPmFgZ7P/6Yz1XN47BE9H+8IbS3x4Rs4H9
-	 mHDD15jWKvCdPKGsqnBOCnSW6nvtY+KOx9dsDXEN5H0vYjGccwbsltVMameqEOQQ0/
-	 bCPcOsI/0DbsiMazjgpSkI3YfkSr4vAMzLfLA1BD0td61ebSWJ8OBZ3APamJd2k+/7
-	 5B2f8+6pdKcy06qfxEzQ8qU+y0VWNsV5/avtiYc5O26p2sGuYbazYkhU7cPskSB6te
-	 kgxtkbZ321WGQ==
-From: Marek Vasut <marex@denx.de>
-To: netdev@vger.kernel.org
-Cc: Marek Vasut <marex@denx.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Joakim Zhang <qiangqing.zhang@nxp.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	devicetree@vger.kernel.org,
-	kernel@dh-electronics.com
-Subject: [net-next,PATCH] dt-bindings: net: realtek,rtl82xx: Document known PHY IDs as compatible strings
-Date: Sun, 23 Jun 2024 21:41:37 +0200
-Message-ID: <20240623194225.76667-1-marex@denx.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1719172739; c=relaxed/simple;
+	bh=jR9bgBA7NYYo6tH/Nt97A1fciIqhK8E1S3zhe9dCOrw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FEdGcVghsvYCNyjv4JtuspTVt3bgfKQIk2FQJxconelnKIrs3eN1An9EB6BXyV0tC1VRF8NSvopUo7QIVrPg4PEKdlyYwlC8Vs+zzx8CpMVgIQh/7eT/tj3Tw4TnUttoQ9qstYVWAGoBtUAxhQHerCIa20791WAm+uZuYhSw3y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=OJrysQXD; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-643603b1feaso7509707b3.0
+        for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 12:58:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1719172737; x=1719777537; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MPeK97CxUc4C62ykOIb01hARJTE5foK9XL9OL/S8HEM=;
+        b=OJrysQXDMr8Q+TpDKYbyoLWzL6ZaTUyztnkfLBcDIvZfIMxfu3ZwNKU9I6+ooQESqc
+         sVlcA4C/9ftIq+nj1YJsF2L/tJ4HWHdEkAF0cE5ueoUzTho+B7FT/K++tiHE1SPLBRMW
+         XfnDOnQYUmQDP/9CjBxgddaqoZHxva323KvI/QCJVblsnGsEvcamvq3SokFkWP0vYbnz
+         0wZXf03W6rVJk3Fg/L5TLkoW4zClP22SD8m2Ma4rdzOrCnqYcNX6szgXaET4oZzhBYFd
+         qJmS+GR044F4AGl3ZKoaYCmfIT4ACSGt2pnfC1R+1b0VJ4vjX+KbhAxhLMnvNutAftqn
+         N2bQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719172737; x=1719777537;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MPeK97CxUc4C62ykOIb01hARJTE5foK9XL9OL/S8HEM=;
+        b=My0Q1pBxziMqFYdZ3T3AyMCjObqvq/wNDA+WxhIXRcxFPjwk3azfMarlMPQNdne/gt
+         jomZwbHOxHJzPKS+ShkIMF9z0whyPohiocqRPctIa6TY1hp/NjD/TAIHh6gabFW1S4a3
+         HUu++l5MqPHEzNrNwJedQCysKvqifeG2D/nARROUT21yMT4vrblOpvtd/R9/uWckvpgM
+         3CALF14/L/fMVIrA6uJILIgKQOCgceC5fiIxqOT6vkIAuwR3bfwM2Sq5Qazc+z2Eit1Y
+         16MLoCHECVLsBLUCtnfJq65qtoQyxam8pPxkmddCS0S+Fm6Ia0/aezw3EoxCm4MHsNU6
+         jZrA==
+X-Forwarded-Encrypted: i=1; AJvYcCXAEADkEN5c3K5NH390d/s5YuG6kWkHvWoK+YtEMo35fgJmdNa0VAbLQJtzUQ0sqyqNzVgiyCfaG3GZR14PZSdK3oVo/t5v
+X-Gm-Message-State: AOJu0YxDWg3DYWTyGAna2MyJdq/fcJym39lMe8IprrJCvQPpBaqAUXpw
+	TKD/gg2hEyjhg42BBwMRbDvtiI8sYu4L+yf7fCpelkqvNZdvUnuCMwHPaxbGoU1rUla/VCWj4o5
+	/HnOcEVK4q3/Br/rlqUc0oqrl5PrzeMoiIuZb
+X-Google-Smtp-Source: AGHT+IGFA9lUJJmnMkAwMpephtbkytW9x1soWCtoiPBgCKUXz3TwA1C4YtW6H+7qK1ib8R0VW+G7w12KOnlD5u81s9Y=
+X-Received: by 2002:a81:92d7:0:b0:61a:b199:9313 with SMTP id
+ 00721157ae682-6433f0e52a0mr20470467b3.16.1719172737018; Sun, 23 Jun 2024
+ 12:58:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+References: <763db426-6f60-4d36-b3f9-b316008889f7@schaufler-ca.com>
+ <83ef6981a29c441b58b525e9292c866a@paul-moore.com> <c59a4954-913b-4672-b502-21aa683d7cdb@schaufler-ca.com>
+ <CAHC9VhRjbWuFeprjNP3r7tU27cW6bEZytWq-3XTjzoN7Ki-zzQ@mail.gmail.com> <2cddc480-f911-44e3-b415-33e0cec2964c@schaufler-ca.com>
+In-Reply-To: <2cddc480-f911-44e3-b415-33e0cec2964c@schaufler-ca.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Sun, 23 Jun 2024 15:58:46 -0400
+Message-ID: <CAHC9VhQBrTo5oXSc=85+ACLF044cDWUbzEt9-b89tHUzK-b8xA@mail.gmail.com>
+Subject: Re: [PATCH RFC] LSM, net: Add SO_PEERCONTEXT for peer LSM data
+To: Casey Schaufler <casey@schaufler-ca.com>
+Cc: LSM List <linux-security-module@vger.kernel.org>, netdev@vger.kernel.org, 
+	linux-api@vger.kernel.org, 
+	Linux kernel mailing list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Extract known PHY IDs from Linux kernel realtek PHY driver
-and convert them into supported compatible string list for
-this DT binding document.
+On Fri, Jun 21, 2024 at 6:00=E2=80=AFPM Casey Schaufler <casey@schaufler-ca=
+.com> wrote:
+> On 6/21/2024 12:41 PM, Paul Moore wrote:
+> > On Fri, Jun 21, 2024 at 12:06=E2=80=AFPM Casey Schaufler <casey@schaufl=
+er-ca.com> wrote:
+> >> On 6/20/2024 2:05 PM, Paul Moore wrote:
+> >>> On May 13, 2024 Casey Schaufler <casey@schaufler-ca.com> wrote:
 
-Signed-off-by: Marek Vasut <marex@denx.de>
----
-Cc: Andrew Lunn <andrew@lunn.ch>
-Cc: Conor Dooley <conor+dt@kernel.org>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Joakim Zhang <qiangqing.zhang@nxp.com>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Rob Herring <robh@kernel.org>
-Cc: devicetree@vger.kernel.org
-Cc: kernel@dh-electronics.com
-Cc: netdev@vger.kernel.org
----
- .../bindings/net/realtek,rtl82xx.yaml         | 24 +++++++++++++++++++
- 1 file changed, 24 insertions(+)
+...
 
-diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
-index bb94a2388520b..8db4d66f1a961 100644
---- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
-+++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
-@@ -18,6 +18,30 @@ allOf:
-   - $ref: ethernet-phy.yaml#
- 
- properties:
-+  compatible:
-+    enum:
-+      - ethernet-phy-id0000.8201
-+      - ethernet-phy-id001c.c800
-+      - ethernet-phy-id001c.c816
-+      - ethernet-phy-id001c.c838
-+      - ethernet-phy-id001c.c840
-+      - ethernet-phy-id001c.c848
-+      - ethernet-phy-id001c.c849
-+      - ethernet-phy-id001c.c84a
-+      - ethernet-phy-id001c.c862
-+      - ethernet-phy-id001c.c878
-+      - ethernet-phy-id001c.c880
-+      - ethernet-phy-id001c.c910
-+      - ethernet-phy-id001c.c912
-+      - ethernet-phy-id001c.c913
-+      - ethernet-phy-id001c.c914
-+      - ethernet-phy-id001c.c915
-+      - ethernet-phy-id001c.c916
-+      - ethernet-phy-id001c.c942
-+      - ethernet-phy-id001c.c961
-+      - ethernet-phy-id001c.cad0
-+      - ethernet-phy-id001c.cb00
-+
-   realtek,clkout-disable:
-     type: boolean
-     description:
--- 
-2.43.0
+> > Unrelated to the above, it would also be good to datagram support as a
+> > patch 2/2 thing in a future version of this patchset.  Please be
+> > careful not to carry over the mistakes we made with SCM_SECURITY (see
+> > the GH discussion linked below).
+>
+> That's "in my queue". I didn't want to spend time on it until I got
+> feedback on this one.
 
+Fair enough, thanks.
+
+--=20
+paul-moore.com
 
