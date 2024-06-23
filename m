@@ -1,111 +1,86 @@
-Return-Path: <netdev+bounces-105955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69CFB913DD2
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 21:59:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31F5F913DD7
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 22:00:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCFF6B21392
-	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 19:59:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 250051C212A4
+	for <lists+netdev@lfdr.de>; Sun, 23 Jun 2024 20:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BF9018412F;
-	Sun, 23 Jun 2024 19:58:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C095918412E;
+	Sun, 23 Jun 2024 20:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="OJrysQXD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="V/CfHjz/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154563BBE2
-	for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 19:58:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14314144D27;
+	Sun, 23 Jun 2024 20:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719172739; cv=none; b=ByZo0n/vlnbLZaz0+os5UUU9jcLSlnFcHpKAqeR2i1eKl7+hJfr2bY3SjCgYyyzY3KNlXSSdJjoVmkTxQ/r9ZX6XdcldmHgWI1o2Uz0BvVsxCBlWUmqc+AloKVzhXPJ6yLwzKmk27TdACrJfkXSqq5hLPioqGBxIK1AchBS60O0=
+	t=1719172831; cv=none; b=ci8KDFxvJx1Ea5glsy4p5k9yFXLSPrvNiW3Ikda8lOdgouvl/UvkgahUyxYgYjRLBdOYVPuL6GbYQ2KjuCIbfMBT0Wx3vMvEaVnMesGUyMqMtR/Ge/1nolCfpmokmmibwYBka0cfGLdzhCXPKy9RqViu8m3vh3mtwQfQrVtl6MA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719172739; c=relaxed/simple;
-	bh=jR9bgBA7NYYo6tH/Nt97A1fciIqhK8E1S3zhe9dCOrw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FEdGcVghsvYCNyjv4JtuspTVt3bgfKQIk2FQJxconelnKIrs3eN1An9EB6BXyV0tC1VRF8NSvopUo7QIVrPg4PEKdlyYwlC8Vs+zzx8CpMVgIQh/7eT/tj3Tw4TnUttoQ9qstYVWAGoBtUAxhQHerCIa20791WAm+uZuYhSw3y4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=OJrysQXD; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-643603b1feaso7509707b3.0
-        for <netdev@vger.kernel.org>; Sun, 23 Jun 2024 12:58:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1719172737; x=1719777537; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MPeK97CxUc4C62ykOIb01hARJTE5foK9XL9OL/S8HEM=;
-        b=OJrysQXDMr8Q+TpDKYbyoLWzL6ZaTUyztnkfLBcDIvZfIMxfu3ZwNKU9I6+ooQESqc
-         sVlcA4C/9ftIq+nj1YJsF2L/tJ4HWHdEkAF0cE5ueoUzTho+B7FT/K++tiHE1SPLBRMW
-         XfnDOnQYUmQDP/9CjBxgddaqoZHxva323KvI/QCJVblsnGsEvcamvq3SokFkWP0vYbnz
-         0wZXf03W6rVJk3Fg/L5TLkoW4zClP22SD8m2Ma4rdzOrCnqYcNX6szgXaET4oZzhBYFd
-         qJmS+GR044F4AGl3ZKoaYCmfIT4ACSGt2pnfC1R+1b0VJ4vjX+KbhAxhLMnvNutAftqn
-         N2bQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719172737; x=1719777537;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MPeK97CxUc4C62ykOIb01hARJTE5foK9XL9OL/S8HEM=;
-        b=My0Q1pBxziMqFYdZ3T3AyMCjObqvq/wNDA+WxhIXRcxFPjwk3azfMarlMPQNdne/gt
-         jomZwbHOxHJzPKS+ShkIMF9z0whyPohiocqRPctIa6TY1hp/NjD/TAIHh6gabFW1S4a3
-         HUu++l5MqPHEzNrNwJedQCysKvqifeG2D/nARROUT21yMT4vrblOpvtd/R9/uWckvpgM
-         3CALF14/L/fMVIrA6uJILIgKQOCgceC5fiIxqOT6vkIAuwR3bfwM2Sq5Qazc+z2Eit1Y
-         16MLoCHECVLsBLUCtnfJq65qtoQyxam8pPxkmddCS0S+Fm6Ia0/aezw3EoxCm4MHsNU6
-         jZrA==
-X-Forwarded-Encrypted: i=1; AJvYcCXAEADkEN5c3K5NH390d/s5YuG6kWkHvWoK+YtEMo35fgJmdNa0VAbLQJtzUQ0sqyqNzVgiyCfaG3GZR14PZSdK3oVo/t5v
-X-Gm-Message-State: AOJu0YxDWg3DYWTyGAna2MyJdq/fcJym39lMe8IprrJCvQPpBaqAUXpw
-	TKD/gg2hEyjhg42BBwMRbDvtiI8sYu4L+yf7fCpelkqvNZdvUnuCMwHPaxbGoU1rUla/VCWj4o5
-	/HnOcEVK4q3/Br/rlqUc0oqrl5PrzeMoiIuZb
-X-Google-Smtp-Source: AGHT+IGFA9lUJJmnMkAwMpephtbkytW9x1soWCtoiPBgCKUXz3TwA1C4YtW6H+7qK1ib8R0VW+G7w12KOnlD5u81s9Y=
-X-Received: by 2002:a81:92d7:0:b0:61a:b199:9313 with SMTP id
- 00721157ae682-6433f0e52a0mr20470467b3.16.1719172737018; Sun, 23 Jun 2024
- 12:58:57 -0700 (PDT)
+	s=arc-20240116; t=1719172831; c=relaxed/simple;
+	bh=tdEngc11sD2vPlLzre5yWLpZAhAAfCXQ59fzkTEFaGE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LaAcGVkmRMG4XHdoQ+E13Qf216Llsu36K55XhtoHh2Ezced+FtfwjWX5dDyV4MZTEqABX+8VlByFtiztcFaHx8Vo3g1Ys5n4K3VCB4XocntVGutO1wHlEQpEmmQKP15kW5KRM5xmtqsjTCYSJsUR2z1HtAMhbS2N8PAvXeRKKMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=V/CfHjz/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=DJ2B6QWuaoTdFrjJuq0ql4wztJP+AWuUKJujEGMnyPM=; b=V/CfHjz/D3X8W+dd377+H49JBo
+	nlub23k5sgAUZyRyq8jDXjzfhYfLwtqgpLOUM/+ZJISczwc9lczG/6qpi9ebD27JvwaTUcwtIRIpR
+	Tfxv3f4JOq3Q/5BF/ZWTPAfiH6uICO/3LMoDcQowr8YiCmg/z0dn2RVLhARQNn/r6+5U=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sLTNp-000nbM-TE; Sun, 23 Jun 2024 22:00:17 +0200
+Date: Sun, 23 Jun 2024 22:00:17 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Marek Vasut <marex@denx.de>
+Cc: netdev@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Joakim Zhang <qiangqing.zhang@nxp.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+	devicetree@vger.kernel.org, kernel@dh-electronics.com
+Subject: Re: [net-next,PATCH] dt-bindings: net: realtek,rtl82xx: Document
+ known PHY IDs as compatible strings
+Message-ID: <cc539292-0b76-46b8-99b3-508b7bc7d94d@lunn.ch>
+References: <20240623194225.76667-1-marex@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <763db426-6f60-4d36-b3f9-b316008889f7@schaufler-ca.com>
- <83ef6981a29c441b58b525e9292c866a@paul-moore.com> <c59a4954-913b-4672-b502-21aa683d7cdb@schaufler-ca.com>
- <CAHC9VhRjbWuFeprjNP3r7tU27cW6bEZytWq-3XTjzoN7Ki-zzQ@mail.gmail.com> <2cddc480-f911-44e3-b415-33e0cec2964c@schaufler-ca.com>
-In-Reply-To: <2cddc480-f911-44e3-b415-33e0cec2964c@schaufler-ca.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Sun, 23 Jun 2024 15:58:46 -0400
-Message-ID: <CAHC9VhQBrTo5oXSc=85+ACLF044cDWUbzEt9-b89tHUzK-b8xA@mail.gmail.com>
-Subject: Re: [PATCH RFC] LSM, net: Add SO_PEERCONTEXT for peer LSM data
-To: Casey Schaufler <casey@schaufler-ca.com>
-Cc: LSM List <linux-security-module@vger.kernel.org>, netdev@vger.kernel.org, 
-	linux-api@vger.kernel.org, 
-	Linux kernel mailing list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240623194225.76667-1-marex@denx.de>
 
-On Fri, Jun 21, 2024 at 6:00=E2=80=AFPM Casey Schaufler <casey@schaufler-ca=
-.com> wrote:
-> On 6/21/2024 12:41 PM, Paul Moore wrote:
-> > On Fri, Jun 21, 2024 at 12:06=E2=80=AFPM Casey Schaufler <casey@schaufl=
-er-ca.com> wrote:
-> >> On 6/20/2024 2:05 PM, Paul Moore wrote:
-> >>> On May 13, 2024 Casey Schaufler <casey@schaufler-ca.com> wrote:
+>    - $ref: ethernet-phy.yaml#
+>  
+>  properties:
+> +  compatible:
+> +    enum:
+> +      - ethernet-phy-id0000.8201
 
-...
+I'm not sure that one should be listed. It is not an official ID,
+since it does not have an OUI. In fact, this is one of the rare cases
+where actually listing a compatible in DT makes sense, because you can
+override the broken hardware and give a correct ID in realtek address
+space.
 
-> > Unrelated to the above, it would also be good to datagram support as a
-> > patch 2/2 thing in a future version of this patchset.  Please be
-> > careful not to carry over the mistakes we made with SCM_SECURITY (see
-> > the GH discussion linked below).
->
-> That's "in my queue". I didn't want to spend time on it until I got
-> feedback on this one.
-
-Fair enough, thanks.
-
---=20
-paul-moore.com
+	Andrew
 
