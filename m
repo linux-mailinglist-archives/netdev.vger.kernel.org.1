@@ -1,114 +1,188 @@
-Return-Path: <netdev+bounces-106194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33B9B9152CB
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:45:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D80E09152CF
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:46:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1ACD1F230DA
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:45:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15C7E1C20ED7
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BFF5143C5C;
-	Mon, 24 Jun 2024 15:45:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dcQ8TEPx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E130219CCE0;
+	Mon, 24 Jun 2024 15:46:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F33D1D53C;
-	Mon, 24 Jun 2024 15:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D89319B59E
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 15:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719243934; cv=none; b=gBS5jQj+F4QoBduGBeWy9jE9sUGWSaoqBANBM5ZX1/vSPsHheEBs1QZ4c5mr5Vf0/k3HXPjprXkM4RQkKkfouS0QEk+oUT5ph46Hjj86au6sTolZqBuEVi+2Uc8GbZ83qPWDROcCnOfrtdEYzOmBXBq7Ou0Wro1L4G92eA6am9U=
+	t=1719243994; cv=none; b=ndOwaZ6O1v4V2GiFTYt3Oiyq618mNF1rGSGj9shftoy6KZ7bAQrilwTUQNTOYCRinscsc/UF1HLZVp9N2x/BXAJaqa/6wb2y5Ws+sLfXHyWzTBArjJyda5jpSfSChFXhMDQwdFX5e7YRCryDPGk3C1MdOvcO+d8xnsN6Lza+pGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719243934; c=relaxed/simple;
-	bh=799YMxd9vz4cMeKpJH6A+kUY4JEBuJNS62CFJsW+cE0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KFN0XJ29OGNMgArek536SeiV2v03bw22lAvDhY0REw+SNfZVsttZrEyg1FnQxRf00lGXpnmQuEPixtzdroOvk3hXkKBCPPl8Ls3pXJ0BY+xBQrDweqj5WnV31U/SrZhbxwErlo5uDuZL+z6ahPe691pGY3Hf8j+wQNoQabshKRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dcQ8TEPx; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MG4bQ1XP6apgYZwLIAFbYd1TLI/2JMcgF2WW1hKHj48=; b=dcQ8TEPxd5poTH/Oldi1Q3J6Db
-	9ZUYqPRncRD0Mxb8f7roUFt5ZbyazEa4Q07b0vi7v2FReTGlNEc+lQVUaet7Jk1RP9dctvwHMwE1r
-	xBqhFLyCHUJXqsrCMYDDNkNf085VkoRG8zNsgYIyv6yI1vaisIET8zyU0WsnKb0Aa+8I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sLlse-000rdp-68; Mon, 24 Jun 2024 17:45:20 +0200
-Date: Mon, 24 Jun 2024 17:45:20 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Benjamin Larsson <benjamin.larsson@genexis.eu>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
-	nbd@nbd.name, lorenzo.bianconi83@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	conor@kernel.org, linux-arm-kernel@lists.infradead.org,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, devicetree@vger.kernel.org,
-	catalin.marinas@arm.com, will@kernel.org, upstream@airoha.com,
-	angelogioacchino.delregno@collabora.com, rkannoth@marvell.com,
-	sgoutham@marvell.com
-Subject: Re: [PATCH v3 net-next 2/2] net: airoha: Introduce ethernet support
- for EN7581 SoC
-Message-ID: <4a39fa50-cffc-4f0c-a442-b666b024ba34@lunn.ch>
-References: <cover.1719159076.git.lorenzo@kernel.org>
- <89c9c226ddb31d9ff3d31231e8f532a3e983363a.1719159076.git.lorenzo@kernel.org>
- <2752c453-cabd-4ca0-833f-262b221de240@lunn.ch>
- <b023dfb3-ca8e-4045-b0b1-d6e498961e9c@genexis.eu>
+	s=arc-20240116; t=1719243994; c=relaxed/simple;
+	bh=10QMSY7zmCowpV9tDHUMKuWVGXfOXLfUQNwKd4JEltU=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=PgfV2hmEScmI9sXPdyr/hB/pN4z1tL7lgPgXWrnK1oLB2evgN6fgNLk+mxVZyAbdRNi0hnHOi3MSXYcLuoP4/fcAj4nlsdB0wFIJMKgEhSHzfR5rezSBX4MCGdoos1dNtRsPb/ZEdi3n7frykKSjAv07j2vAvSiSLlPLtDtne0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from smtpclient.apple (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id BF3F67D065;
+	Mon, 24 Jun 2024 15:46:25 +0000 (UTC)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b023dfb3-ca8e-4045-b0b1-d6e498961e9c@genexis.eu>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
+Subject: Re: [devel-ipsec] [PATCH ipsec-next v4 17/18] xfrm: iptfs: only send
+ the NL attrs that corr. to the SA dir
+From: Christian Hopps <chopps@chopps.org>
+In-Reply-To: <ZnmQeZVYDC8rKLEe@Antony2201.local>
+Date: Mon, 24 Jun 2024 11:46:14 -0400
+Cc: Christian Hopps <chopps@chopps.org>,
+ devel@linux-ipsec.org,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ netdev@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <58857781-E0AF-40D2-9808-CA02D4217C5B@chopps.org>
+References: <20240617205316.939774-1-chopps@chopps.org>
+ <20240617205316.939774-18-chopps@chopps.org>
+ <ZnmQeZVYDC8rKLEe@Antony2201.local>
+To: Antony Antony <antony@phenome.org>
+X-Mailer: Apple Mail (2.3774.600.62)
 
-On Mon, Jun 24, 2024 at 01:01:44AM +0200, Benjamin Larsson wrote:
-> Hi,
-> > Code like this is making me wounder about the split between MAC
-> > driver, DSA driver and DSA tag driver. Or if it should actually be a
-> > pure switchdev driver?
-> > 
-> > If there some open architecture documentation for this device?
-> > 
-> > What are these ports about?
-> > 
-> > > +static int airoha_dev_open(struct net_device *dev)
-> > > +{
-> > > +	struct airoha_eth *eth = netdev_priv(dev);
-> > > +	int err;
-> > > +
-> > > +	if (netdev_uses_dsa(dev))
-> > > +		airoha_fe_set(eth, REG_GDM1_INGRESS_CFG, GDM1_STAG_EN_MASK);
-> > > +	else
-> > > +		airoha_fe_clear(eth, REG_GDM1_INGRESS_CFG, GDM1_STAG_EN_MASK);
-> > Does that imply both instances of the GMAC are not connected to the
-> > switch? Can one be used with a PHY?
-> > 
-> > 	Andrew
-> 
-> https://mirror2.openwrt.org/docs/MT7981B_Wi-Fi6_Platform_Datasheet_Open_V1.0.pdf
-> 
-> page 107 (text for 9.1.1 is relevant but not a complete match). In the
-> EN7581 case there is a 5 port switch in the place of GMAC1 (one switch port
-> is connected to GDM1).
 
-The typical DSA architecture is that the SoC MAC is connected to a
-switch MAC port. You say here, the switch is directly connected to the
-GGM1. So there is no GMAC involved? If there is no MAC, you don't need
-a MAC driver.
 
-It seems more likely there is a GMAC, and the SGMII interface, or
-something similar is connected to the switch?
+> On Jun 24, 2024, at 11:27, Antony Antony <antony@phenome.org> wrote:
+>=20
+> On Mon, Jun 17, 2024 at 04:53:15PM -0400, Christian Hopps via Devel =
+wrote:
+>> From: Christian Hopps <chopps@labn.net>
+>>=20
+>> When sending the netlink attributes to the user for a given SA, only
+>> send those NL attributes which correspond to the SA's direction.
+>>=20
+>> Signed-off-by: Christian Hopps <chopps@labn.net>
+>> ---
+>> net/xfrm/xfrm_iptfs.c | 64 =
+++++++++++++++++++++++++-------------------
+>> 1 file changed, 36 insertions(+), 28 deletions(-)
+>>=20
+>> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+>> index 59fd8ee49cd4..049a94a5531b 100644
+>> --- a/net/xfrm/xfrm_iptfs.c
+>> +++ b/net/xfrm/xfrm_iptfs.c
+>> @@ -2498,13 +2498,16 @@ static unsigned int iptfs_sa_len(const struct =
+xfrm_state *x)
+>> struct xfrm_iptfs_config *xc =3D &xtfs->cfg;
+>> unsigned int l =3D 0;
+>>=20
+>> - if (xc->dont_frag)
+>> - l +=3D nla_total_size(0);
+>> - l +=3D nla_total_size(sizeof(xc->reorder_win_size));
+>> - l +=3D nla_total_size(sizeof(xc->pkt_size));
+>> - l +=3D nla_total_size(sizeof(xc->max_queue_size));
+>> - l +=3D nla_total_size(sizeof(u32)); /* drop time usec */
+>> - l +=3D nla_total_size(sizeof(u32)); /* init delay usec */
+>> + if (x->dir =3D=3D XFRM_SA_DIR_IN) {
+>> + l +=3D nla_total_size(sizeof(u32)); /* drop time usec */
+>> + l +=3D nla_total_size(sizeof(xc->reorder_win_size));
+>> + } else {
+>> + if (xc->dont_frag)
+>> + l +=3D nla_total_size(0);   /* dont-frag flag */
+>> + l +=3D nla_total_size(sizeof(u32)); /* init delay usec */
+>> + l +=3D nla_total_size(sizeof(xc->max_queue_size));
+>> + l +=3D nla_total_size(sizeof(xc->pkt_size));
+>> + }
+>>=20
+>> return l;
+>> }
+>> @@ -2516,30 +2519,35 @@ static int iptfs_copy_to_user(struct =
+xfrm_state *x, struct sk_buff *skb)
+>> int ret;
+>> u64 q;
+>>=20
+>> - if (xc->dont_frag) {
+>> - ret =3D nla_put_flag(skb, XFRMA_IPTFS_DONT_FRAG);
+>> + if (x->dir =3D=3D XFRM_SA_DIR_IN) {
+>> + q =3D xtfs->drop_time_ns;
+>> + (void)do_div(q, NSECS_IN_USEC);
+>> + ret =3D nla_put_u32(skb, XFRMA_IPTFS_DROP_TIME, q);
+>> + if (ret)
+>> + return ret;
+>> +
+>> + ret =3D nla_put_u16(skb, XFRMA_IPTFS_REORDER_WINDOW,
+>> +   xc->reorder_win_size);
+>> + } else {
+>> + if (xc->dont_frag) {
+>> + ret =3D nla_put_flag(skb, XFRMA_IPTFS_DONT_FRAG);
+>> + if (ret)
+>> + return ret;
+>> + }
+>> +
+>> + q =3D xtfs->init_delay_ns;
+>> + (void)do_div(q, NSECS_IN_USEC);
+>> + ret =3D nla_put_u32(skb, XFRMA_IPTFS_INIT_DELAY, q);
+>> + if (ret)
+>> + return ret;
+>> +
+>> + ret =3D nla_put_u32(skb, XFRMA_IPTFS_MAX_QSIZE,
+>> +   xc->max_queue_size);
+>> if (ret)
+>> return ret;
+>> +
+>> + ret =3D nla_put_u32(skb, XFRMA_IPTFS_PKT_SIZE, xc->pkt_size);
+>> }
+>> - ret =3D nla_put_u16(skb, XFRMA_IPTFS_REORDER_WINDOW, =
+xc->reorder_win_size);
+>> - if (ret)
+>> - return ret;
+>> - ret =3D nla_put_u32(skb, XFRMA_IPTFS_PKT_SIZE, xc->pkt_size);
+>> - if (ret)
+>> - return ret;
+>> - ret =3D nla_put_u32(skb, XFRMA_IPTFS_MAX_QSIZE, =
+xc->max_queue_size);
+>> - if (ret)
+>> - return ret;
+>> -
+>> - q =3D xtfs->drop_time_ns;
+>> - (void)do_div(q, NSECS_IN_USEC);
+>> - ret =3D nla_put_u32(skb, XFRMA_IPTFS_DROP_TIME, q);
+>> - if (ret)
+>> - return ret;
+>> -
+>> - q =3D xtfs->init_delay_ns;
+>> - (void)do_div(q, NSECS_IN_USEC);
+>> - ret =3D nla_put_u32(skb, XFRMA_IPTFS_INIT_DELAY, q);
+>>=20
+>> return ret;
+>> }
+>=20
+> looking at this patch, why this should be seperate patch? why not =
+squash=20
+> into [PATCH ipsec-next v4 08/18] xfrm: iptfs: add new iptfs xfrm mode =
+impl
 
-	Andrew
+The various attributes get modified by the layered functionality =
+commits, so it ends up needing to be worked into a bunch of commits. So =
+given it was a simple patch addressing a review comment I thought it =
+would be OK to just leave it a single simple patch. If it's important I =
+will do the work to incorporate the change into the N different commits =
+:)
+
+Thanks,
+Chris.
+
+>=20
+> I also think in the v3 it was squashed into some other patch.
+>=20
+> -antony
+
 
 
