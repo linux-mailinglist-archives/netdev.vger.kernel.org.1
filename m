@@ -1,78 +1,81 @@
-Return-Path: <netdev+bounces-106273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17D5F915A64
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 01:29:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CA52915A69
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 01:29:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6AEFEB2097C
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 23:29:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B66D71F213A9
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 23:29:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AFC31A2C1B;
-	Mon, 24 Jun 2024 23:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 829751A2FCF;
+	Mon, 24 Jun 2024 23:29:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lj2YUkz+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fFnZmnvw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE1C1A2C10
-	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 23:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC341A2FBF
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 23:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719271738; cv=none; b=mrdNIwpzdFwknqrwbAi48CIS1WoIFvsWWtrX5vNluGbj0YUqrqXtrmNnZCUJHKvafPEAbpfUEXMQ2xzyA6GxQLGNf6rQ+d6GtR4OIkVDO2//zqqF3qNhyyO3xsiYBwZRg/SZNhai8Wrcy1410CFdebox90o3K+qa6lmqMw5tYps=
+	t=1719271743; cv=none; b=BgEjGv2Y/1Xx9cd5YUsujkM3TaZhbBfEaE5kb6xXU32zlrddg5jtvJ31Nulg2a0H8bntRnUu4GBr7FN32ZaLhANo5SYMNoy+BlS/uOdpAzeVT6J9a5fPOFVkhIisVPNBU6d2uOjwqB6p+r25Vmq//pAyfv6MypyN6asf8GxkaEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719271738; c=relaxed/simple;
-	bh=PoyedOSrLslMpcZQkdr7wxw6LDAVWLOCZchvs+PQ4E0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=QFnsk7wz65IFLjKapB9DWJIsK548vdFTOrs4mU+mc0iX7DrYdlZchfUvLGi5zJB0M1fU9texBMuIaRQdIEA+sWIqZ+JzvMTBQtIhQUUGU6n8/uDp3RL0djzX+KI/pNEzwlOARYksLbo3vq0Winj839DMHP0AZmLfGeudIRmgr3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lj2YUkz+; arc=none smtp.client-ip=209.85.219.201
+	s=arc-20240116; t=1719271743; c=relaxed/simple;
+	bh=NqMqA7QWqr9/+mHOdPi0hG2A/sBfX5GGxqySZ84bEFo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=f45qU6+9zCWopIcTu6BNzFq2Hv2gMECBGg/5Mjv30eKySzA+xNTYs9PdIm071IRwNVLHzhvXhjYDoWkwN67YVg8vbWI2JjvnC6W8Jx8SLGB3EhwAzDurV/v927yMMy2VkqHT95WwdQG1HLVMLNup7BkXNYjxlEBNfAnnNia1SaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fFnZmnvw; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e0268d49b6dso9904912276.2
-        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 16:28:56 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-6c7e13b6a62so6217237a12.0
+        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 16:29:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719271735; x=1719876535; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FEnvDY+YQtOlDLldfWY9bO5cHBXotclBQZRJTAhLrGQ=;
-        b=lj2YUkz+6BbU3CtVtmDBgEn/AyEwck95YPAoY7NjZrq/xYTfkTkmUSoGhGaS39L6HQ
-         6xnPXupoE6sxrB7vMxI9E6p+gXHRhTrv47fHIKzit3szMOUo4yOkdxN5DMsV/DRtF+87
-         6dFNnCm/PF7O0/7vpf2NXoh/gBFsJVu38onMci+8YzlrSUIEX/QlOP8K/nLFldNVOEO3
-         Z6CIT/oLvxPWvPnGvoUVtLr7tdvsJn72XlqRkRxfuH/L/emchZ38ofpfk7cn5z0Ohmuy
-         TAZ64LV9oDbfL7XwyfODiEhplgU0JGnSj54K/vuIvRQk3JdW6pK5AM9OuA0AOzk7VFU9
-         V9Tw==
+        d=google.com; s=20230601; t=1719271741; x=1719876541; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3FvMNQZepmevKVYCWA5Mvt/tIAvZEAV28z8ZXGZ1r5A=;
+        b=fFnZmnvwS7MKFZpI2jZMbCpkc1fBRNSkoC0KwtyJ//fyUSbZ5X7qFRT22trNVHNbwH
+         7hKGXsTVw8DsxkPINXp4UyNONQ0xtStZnBMMB50Qz0DqWUW4UIMVG71me7g/KZzsf1p9
+         iLgKVe7bNnsQVW3vMyqwwum4CvlzWjxiFZ1HfNScTjY/HG4RO1YDuK0/fIJgQI0er74i
+         YQe5HcwABIwTtd60FVLPOwNe8zOvM6GlKnmAhSomrs0eDER+eGosM9jV0exbdhtsCTYg
+         fP2AaGSFbYc4PQEvAIRaVPD/220sTNF2RIhdRVfy5cFWDBz0R9+HThNNdPmt1AzPkhBU
+         1dGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719271735; x=1719876535;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FEnvDY+YQtOlDLldfWY9bO5cHBXotclBQZRJTAhLrGQ=;
-        b=FbBsPTfg/pSyHmF9XW9/sRToAxaT8NGOL8d5xJsxih9Cho2Vlrrz+qI7E8EmmEE7vU
-         GOj0Wv+cHx+wJKQ1e18npf1fHJC7rNNlqdaEikGJ8b6J+Clo6zU+KHi9dQFxVzzji+gK
-         PVn6yUrJUH4vgs1vtq67cscX4w9ZJGNd+SIUTXy5VQy+TtzP+qVNsQkm3i9bymhfegRn
-         wp7UBqsBnHM7gpbZFhZsCXYa8YoFF0GC4k7d4pHaYRMrDNLvEejAVhCrnxjv471erGGk
-         LB8UNeJxNJZNZbf/ypVuyqF7E7ekNaJdb0yhfQfd0mlBS/yU3EpG1cRnATrdYeTxEnhb
-         NRoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXUWL0H2HA191CYSNjhJZH7fOmRHs0yBIap0LQa9IM/nsD/mM27S/BAI4gBqf0h5Rxq+6/6hiPUq3BFKaEI0d8AXLdJWRkd
-X-Gm-Message-State: AOJu0YxJyyebZikfGVaGtjmmlxmQtB05fcrZHf4gcNTizdUMjCq0FtAj
-	ixtQQQJfs7cv/FHEC3RzK5sjDzoAfmH3e7RWz65RJnSrA9rBlBhug2UR8GHEJfTaP5lZRrm6iVX
-	+qg==
-X-Google-Smtp-Source: AGHT+IGo0nBr4OMWeDQdXO7gLmA8943vaa7AUjGpvpzDg1f7Z8BrI79oFtF9sCT7oXO1KDCB6pUDmCcxQng=
+        d=1e100.net; s=20230601; t=1719271741; x=1719876541;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3FvMNQZepmevKVYCWA5Mvt/tIAvZEAV28z8ZXGZ1r5A=;
+        b=OV90nRdWS+5RLjBaSWdEB9NGoNrMVypqzYZ4Q3N0cBbR+VcmPGSs5nXEcHSbQ3qfu6
+         ZTO0t/3Jg4pOu6E4Zk0k5NT4k+9tBXsbnYqi5uiKzU4QTLPX0PSfe+NNnqW59ymcyAiI
+         lFSgfQmn+gNDIqMR7lqd28dClCH5YHuB9urRaJDekwr9FnHkc5Inrj/tgIolCMktxLIn
+         6t/WivV1zyEAxe+yBAhGaheZq5iqOOlpysJn0qVgy9hsf3xGCTFcwoHtM0kUAwExwlYa
+         zTKU44RvRXqsHuv41xHR5kRqNqSfadg6uZnCzqnXRy52WMyeDUQmXoOjOWiHjxcNz23A
+         /48g==
+X-Forwarded-Encrypted: i=1; AJvYcCVJvi/+8Sj5U9Khb5I157fTxs2HkoElPYxzdLBzO503lwQ0XdwGOmMDGuU5JyIxaf8P7GIQkML17irOazLdqGCKQ7mGmdKE
+X-Gm-Message-State: AOJu0YxfT2wiz1qIuG20AIC2QHac5BfYyq0Z5+JhO01oVU1sYPF8tbvo
+	Mwwi4QWqiMmUeVcMd7auFeI/uj4ip5pTGNd+p0smwz6Xl6Fe5t6h+FPx1pPnQ56z9v/6BR06FNu
+	kqw==
+X-Google-Smtp-Source: AGHT+IEk+3lC5zdyxifyt4ii+6a16n1y8uZeO7DOAPkbXtiVBPE0qfgp7g0LpuESyv8BZuXBXF4M/RvaOF4=
 X-Received: from edliaw.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:305d])
- (user=edliaw job=sendgmr) by 2002:a05:6902:1081:b0:dff:4788:ea88 with SMTP id
- 3f1490d57ef6-e0303d692f7mr20462276.0.1719271735356; Mon, 24 Jun 2024 16:28:55
- -0700 (PDT)
-Date: Mon, 24 Jun 2024 23:26:09 +0000
+ (user=edliaw job=sendgmr) by 2002:a05:6a02:4a7:b0:655:199c:eb1b with SMTP id
+ 41be03b00d2f7-71b5fe10537mr20071a12.10.1719271741168; Mon, 24 Jun 2024
+ 16:29:01 -0700 (PDT)
+Date: Mon, 24 Jun 2024 23:26:10 +0000
+In-Reply-To: <20240624232718.1154427-1-edliaw@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240624232718.1154427-1-edliaw@google.com>
 X-Mailer: git-send-email 2.45.2.741.gdbec12cfda-goog
-Message-ID: <20240624232718.1154427-1-edliaw@google.com>
-Subject: [PATCH v6 00/13] Centralize _GNU_SOURCE definition into lib.mk
+Message-ID: <20240624232718.1154427-2-edliaw@google.com>
+Subject: [PATCH v6 01/13] selftests/mm: Define _GNU_SOURCE to an empty string
 From: Edward Liaw <edliaw@google.com>
 To: linux-kselftest@vger.kernel.org, Eric Biederman <ebiederm@xmission.com>, 
 	Kees Cook <kees@kernel.org>, Shuah Khan <shuah@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
@@ -92,79 +95,28 @@ Cc: linux-kernel@vger.kernel.org, usama.anjum@collabora.com, seanjc@google.com,
 	linux-sgx@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Centralizes the definition of _GNU_SOURCE into lib.mk and addresses all
-resulting macro redefinition warnings.
+Use the more common "#define _GNU_SOURCE" instead of defining it to 1.
+This will prevent redefinition warnings when -D_GNU_SOURCE= is set.
 
-These patches will need to be merged in one shot to avoid redefinition
-warnings.
+Signed-off-by: Edward Liaw <edliaw@google.com>
+---
+ tools/testing/selftests/mm/thuge-gen.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The initial attempt at this patch was abandoned because it affected
-lines in many source files and caused a large amount of churn. However,
-from earlier discussions, centralizing _GNU_SOURCE is still desireable.
-This attempt limits the changes to 1 source file and 12 Makefiles.
-
-v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-edliaw@google.com/
-v2: https://lore.kernel.org/linux-kselftest/20240507214254.2787305-1-edliaw@google.com/
- - Add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
-   location.
- - Remove #define _GNU_SOURCE from source code to resolve redefinition
-   warnings.
-v3: https://lore.kernel.org/linux-kselftest/20240509200022.253089-1-edliaw@google.com/
- - Rebase onto linux-next 20240508.
- - Split patches by directory.
- - Add -D_GNU_SOURCE directly to CFLAGS in lib.mk.
- - Delete additional _GNU_SOURCE definitions from source code in
-   linux-next.
- - Delete additional -D_GNU_SOURCE flags from Makefiles.
-v4: https://lore.kernel.org/linux-kselftest/20240510000842.410729-1-edliaw@google.com/
- - Rebase onto linux-next 20240509.
- - Remove Fixes tag from patches that drop _GNU_SOURCE definition.
- - Restore space between comment and includes for selftests/damon.
-v5: https://lore.kernel.org/linux-kselftest/20240522005913.3540131-1-edliaw@google.com/
- - Rebase onto linux-next 20240521
- - Drop initial patches that modify KHDR_INCLUDES.
- - Incorporate Mark Brown's patch to replace static_assert with warning.
- - Don't drop #define _GNU_SOURCE from nolibc and wireguard.
- - Change Makefiles for x86 and vDSO to append to CFLAGS.
-v6:
- - Rewrite patch to use -D_GNU_SOURCE= form in lib.mk.
- - Reduce the amount of churn significantly by allowing definition to
-   coexist with source code macro defines.
-
-
-Edward Liaw (13):
-  selftests/mm: Define _GNU_SOURCE to an empty string
-  selftests: Add -D_GNU_SOURCE= to CFLAGS in lib.mk
-  selftests/net: Append to lib.mk CFLAGS in Makefile
-  selftests/exec: Drop redundant -D_GNU_SOURCE CFLAGS in Makefile
-  selftests/futex: Drop redundant -D_GNU_SOURCE CFLAGS in Makefile
-  selftests/intel_pstate: Drop redundant -D_GNU_SOURCE CFLAGS in
-    Makefile
-  selftests/iommu: Drop redundant -D_GNU_SOURCE CFLAGS in Makefile
-  selftests/kvm: Drop redundant -D_GNU_SOURCE CFLAGS in Makefile
-  selftests/proc: Drop redundant -D_GNU_SOURCE CFLAGS in Makefile
-  selftests/resctrl: Drop redundant -D_GNU_SOURCE CFLAGS in Makefile
-  selftests/ring-buffer: Drop redundant -D_GNU_SOURCE CFLAGS in Makefile
-  selftests/riscv: Drop redundant -D_GNU_SOURCE CFLAGS in Makefile
-  selftests/sgx: Append CFLAGS from lib.mk to HOST_CFLAGS
-
- tools/testing/selftests/exec/Makefile             | 1 -
- tools/testing/selftests/futex/functional/Makefile | 2 +-
- tools/testing/selftests/intel_pstate/Makefile     | 2 +-
- tools/testing/selftests/iommu/Makefile            | 2 --
- tools/testing/selftests/kvm/Makefile              | 2 +-
- tools/testing/selftests/lib.mk                    | 3 +++
- tools/testing/selftests/mm/thuge-gen.c            | 2 +-
- tools/testing/selftests/net/Makefile              | 2 +-
- tools/testing/selftests/net/tcp_ao/Makefile       | 2 +-
- tools/testing/selftests/proc/Makefile             | 1 -
- tools/testing/selftests/resctrl/Makefile          | 2 +-
- tools/testing/selftests/ring-buffer/Makefile      | 1 -
- tools/testing/selftests/riscv/mm/Makefile         | 2 +-
- tools/testing/selftests/sgx/Makefile              | 2 +-
- 14 files changed, 12 insertions(+), 14 deletions(-)
-
---
+diff --git a/tools/testing/selftests/mm/thuge-gen.c b/tools/testing/selftests/mm/thuge-gen.c
+index d50dc71cac32..e4370b79b62f 100644
+--- a/tools/testing/selftests/mm/thuge-gen.c
++++ b/tools/testing/selftests/mm/thuge-gen.c
+@@ -13,7 +13,7 @@
+    sudo ipcs | awk '$1 == "0x00000000" {print $2}' | xargs -n1 sudo ipcrm -m
+    (warning this will remove all if someone else uses them) */
+ 
+-#define _GNU_SOURCE 1
++#define _GNU_SOURCE
+ #include <sys/mman.h>
+ #include <linux/mman.h>
+ #include <stdlib.h>
+-- 
 2.45.2.741.gdbec12cfda-goog
 
 
