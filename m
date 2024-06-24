@@ -1,174 +1,153 @@
-Return-Path: <netdev+bounces-106118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DF34914E5A
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:25:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C1F5914E7A
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:28:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA6F8B2160A
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:25:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4901D1F23019
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F243013D8B2;
-	Mon, 24 Jun 2024 13:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A1F213DDDB;
+	Mon, 24 Jun 2024 13:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZBqvaOJa"
 X-Original-To: netdev@vger.kernel.org
-Received: from xavier.telenet-ops.be (xavier.telenet-ops.be [195.130.132.52])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8B2136E3B
-	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 13:25:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.132.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA56C13DBB1;
+	Mon, 24 Jun 2024 13:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719235541; cv=none; b=fO6g+J9oZ3RufE28ikhcjGTmE0w60zYKpL2CXgjo5AC+CqpkWI53KO4I4SjlSfQ0TiQlUzbC9/JMdognTU/gs2iXt4s7xygtjIIiJSYkzgjgHm+jNSbCVVLBfdtS8AhBZ2zHxPNtZOnwbmtMS3+6aLtMVMdzu0sO4D2mnzxfE4k=
+	t=1719235714; cv=none; b=SWewAe9wq9OPaIradj9n2X4KBQwFnZk/Knw/IjmmeZdAcujjZIdUSsvdsVYAV9Y25fEFhsHDabgts8Frj/3X53Ti+XssU0LmRTnhSfGEHRfnB9xd9sop36CeJb37Y2GKDQbLr9bOqO1IjBRtdI5GGScDdjW7BUqyMeX1M/OFc3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719235541; c=relaxed/simple;
-	bh=A6DLatiCi/InAVisv0EQ+ZUL0qiw5alzKOdy6kn2SdE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uOvn9Db5iaJ/W6kQaxQhiMnaiX10+bZcDMjxVmjU1cnguaKWN33GEGK57iJXFDk/Zr/Qsu1KdnpzXk1oN9IlBGv6B3EzEk3DpwpcRUp2EIH7ppf8IniCPz5wHUFAhceqcQLlTLyBbscxgqjRnrLk1TEi3eQ77u1WKLjHRjmRis4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.132.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
-Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:d11f:2bfd:8d32:701a])
-	by xavier.telenet-ops.be with bizsmtp
-	id fRRT2C00R4jBKfC01RRTZQ; Mon, 24 Jun 2024 15:25:32 +0200
-Received: from rox.of.borg ([192.168.97.57])
-	by ramsan.of.borg with esmtp (Exim 4.95)
-	(envelope-from <geert@linux-m68k.org>)
-	id 1sLjhF-000HSW-7C;
-	Mon, 24 Jun 2024 15:25:27 +0200
-Received: from geert by rox.of.borg with local (Exim 4.95)
-	(envelope-from <geert@linux-m68k.org>)
-	id 1sLjhH-007u9D-Nl;
-	Mon, 24 Jun 2024 15:25:27 +0200
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Paul Barker <paul.barker.ct@bp.renesas.com>,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1719235714; c=relaxed/simple;
+	bh=Knw25hLKGn36AJuU2/rDQCCe9C1d6rjfmd8w0Kwrf9M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Ij8DXfiKXToFuDTVY01tS2zaDXOgFK/145lGw/7AK1/YTvys5gv0yLNOrAjkhpr2ddB9DLUUWe/TI54fe4hJz+OSo7d9R3ntMbHkOrzAGfMsW4XO4QTsxNsemsLzL2VFSyZnR+DhZs7o/gxS4HD/gJkVySpIiYUFGm5T5mxa3qI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZBqvaOJa; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-52ce6a9fd5cso873385e87.3;
+        Mon, 24 Jun 2024 06:28:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719235711; x=1719840511; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=weoB2927OHeQLkItSsl1+92aESa5A0VbbSHXdYNaCxU=;
+        b=ZBqvaOJaLpBvLvoDx4+DB36f8kUyelHn7dA4o5VH2fu5akGL1L2M/v7Re1FvqGErkF
+         mL1F5jvl4QWMYgYQZr3xx0ZRORv058uKBOq6DLNq72BmAEgtnLh3mam/TQH4MYdrn+X3
+         nulmPUr2Q5XfiZxrdEZf0ECMlwE3xQXJ0gHo7SChh+oc+TPkMBrZaqdMrVabH05uaE5B
+         Nh0lcQ6pveVRIbGhyWMvnpQH6mpvqSUapGMgx+t4AHgwJFq/wlDj2WpJBhnyM/iqlWXp
+         hR8Fd9WdK6ubpox/SmGHNNOsyTvxLLPFJxz3RaMsZKQqGjeC2DwiX9AG9VeGsRYer1tc
+         JMCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719235711; x=1719840511;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=weoB2927OHeQLkItSsl1+92aESa5A0VbbSHXdYNaCxU=;
+        b=fyvs2AGvpIUvOqgmcHFIFZhnu7kIV8W8EmYEZH/eCyDk25EKSqBq91i5L19Tq/bbPj
+         zWss7SJLYKo7PvUhOM0Cgtj2jtwFrJ4wBdIPXof94xmMGKPkRjR9aqV9ZuOCDghoIvmt
+         Hze1vnJlf84I53RfTDp9QlKhnVxeY8FXGvscPpxzuHfyZm0dxXAVtc+IGKpcK+b8v7OG
+         R5ZXB9jLvB9pi5YMZAcEh4rBcnkbLx6POZSaVdhkT9IQNkyCVyAFiGkD68oYF5t6mk+z
+         jd67Pi0xg4bbQav2mEvecgx5A831sZRK+/2ZG/d2+Ckx5juVdgzbOyX0KoQOClEDdRUs
+         OZqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUt8CSfWT4qrkq+0q/n3qmvCqQnGgicP+g4OCNefaeSFP3D/8xqjy1FPUhwKUWdiPIBuiIsrdO7FAmFxx9hIwSrHbWW/XMy86jKPNXsByQvewpenDSVsNr0d4hir4JG5syLkVvZCbUZHWtFYYAwhfljYH3OTXZX7+Pg
+X-Gm-Message-State: AOJu0Yz1/FD+xM4RPyEWifSDkAfday+9RUKDTLkuGQGIPank5SvnS0Ov
+	K4EyCiijSgJsKG2PnuRMGAfVZbimGVWf911QrvHFkMx0nMldC20E
+X-Google-Smtp-Source: AGHT+IFq8C6kBEtbmGEGitX4D9FUoJzf8LPqBHNhfBy21YGAueF442o3wAvxepev68ZGGljisU8J+g==
+X-Received: by 2002:a05:6512:ba1:b0:52c:dd38:f3a3 with SMTP id 2adb3069b0e04-52ce185cf4amr3356821e87.46.1719235710522;
+        Mon, 24 Jun 2024 06:28:30 -0700 (PDT)
+Received: from localhost ([213.79.110.82])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52cd6454a96sm968129e87.303.2024.06.24.06.28.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jun 2024 06:28:30 -0700 (PDT)
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Russell King <linux@armlinux.org.uk>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH net-next v2 2/2] ravb: Add MII support for R-Car V4M
-Date: Mon, 24 Jun 2024 15:25:25 +0200
-Message-Id: <3a21d1d6680864aa85afff9260234c2b8054020a.1719234830.git.geert+renesas@glider.be>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1719234830.git.geert+renesas@glider.be>
-References: <cover.1719234830.git.geert+renesas@glider.be>
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH RFC net-next v2 09/17] net: stmmac: Introduce mac_device_info::priv pointer
+Date: Mon, 24 Jun 2024 16:26:26 +0300
+Message-ID: <20240624132802.14238-1-fancer.lancer@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <Zlmzu7/ANyZxOOQL@shell.armlinux.org.uk>
+References: <Zlmzu7/ANyZxOOQL@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-All EtherAVB instances on R-Car Gen3/Gen4 SoCs support the RGMII
-interface.  In addition, the first two EtherAVB instances on R-Car V4M
-also support the MII interface, but this is not yet supported by the
-driver.
+There is going to be introduced an PCS-specific CSR space pointer defined
+in the stmmac_priv structure nearby the mmcaddr, estaddr and ptpaddr
+fields. In order to have that pointer accessible from the PCS-specific
+callback, let's introduce pointer to stmmac_priv defined in the
+mac_device_info structure.
 
-Add support for MII on R-Car Gen4 by adding an R-Car Gen4-specific EMAC
-initialization function that selects the MII clock instead of the RGMII
-clock when the PHY interface is MII.  Note that all implementations of
-EtherAVB on R-Car Gen4 SoCs have the APSR register, but only MII-capable
-instances are documented to have the MIISELECT bit, which has a
-documented value of zero when reserved.
+Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 ---
-v2:
-  - Add Reviewed-by,
-  - Rename ravb_emac_init_rcar_apsr() to ravb_emac_init_rcar_gen4(),
-  - Restrict MII support to R-Car Gen4 by adding a new ravb_hw_info
-    instance.
----
- drivers/net/ethernet/renesas/ravb.h      |  1 +
- drivers/net/ethernet/renesas/ravb_main.c | 37 +++++++++++++++++++++++-
- 2 files changed, 37 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
-index 6b2444d31fcc3093..9893c91af1050fa1 100644
---- a/drivers/net/ethernet/renesas/ravb.h
-+++ b/drivers/net/ethernet/renesas/ravb.h
-@@ -258,6 +258,7 @@ enum APSR_BIT {
- 	APSR_CMSW	= 0x00000010,
- 	APSR_RDM	= 0x00002000,
- 	APSR_TDM	= 0x00004000,
-+	APSR_MIISELECT	= 0x01000000,	/* R-Car V4M only */
+Note the better approach would be to convert the mac_device_info instance
+to being embedded into the stmmac_priv structure. It would have solved
+many driver problems like non-unified HW abstraction interface, duplicated
+fields (ioaddr and pcsr, etc) or too many non-runtime parameters passed to
+the callbacks, etc. But the change also would have been much-much more
+invasive than this one is. If despite of that you find the mac_device_info
+embedding into stmmac_priv more appropriate (as I do), then I'll provide
+the respective patch in place of this one.
+---
+ drivers/net/ethernet/stmicro/stmmac/common.h | 1 +
+ drivers/net/ethernet/stmicro/stmmac/hwif.c   | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+index a66b836996d6..f7661268518f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/common.h
++++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+@@ -580,6 +580,7 @@ struct mii_regs {
  };
  
- /* RCR */
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 974e0bb9da1947f2..6605e4f4af538106 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -579,6 +579,16 @@ static void ravb_emac_init_rcar(struct net_device *ndev)
- 	ravb_write(ndev, ECSIPR_ICDIP | ECSIPR_MPDIP | ECSIPR_LCHNGIP, ECSIPR);
- }
+ struct mac_device_info {
++	struct stmmac_priv *priv;
+ 	const struct stmmac_ops *mac;
+ 	const struct stmmac_desc_ops *desc;
+ 	const struct stmmac_dma_ops *dma;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+index 29367105df54..84fd57b76fad 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+@@ -351,6 +351,7 @@ int stmmac_hwif_init(struct stmmac_priv *priv)
+ 		mac->tc = mac->tc ? : entry->tc;
+ 		mac->mmc = mac->mmc ? : entry->mmc;
+ 		mac->est = mac->est ? : entry->est;
++		mac->priv = priv;
  
-+static void ravb_emac_init_rcar_gen4(struct net_device *ndev)
-+{
-+	struct ravb_private *priv = netdev_priv(ndev);
-+	bool mii = priv->phy_interface == PHY_INTERFACE_MODE_MII;
-+
-+	ravb_modify(ndev, APSR, APSR_MIISELECT, mii ? APSR_MIISELECT : 0);
-+
-+	ravb_emac_init_rcar(ndev);
-+}
-+
- /* E-MAC init function */
- static void ravb_emac_init(struct net_device *ndev)
- {
-@@ -2699,6 +2709,31 @@ static const struct ravb_hw_info ravb_gen3_hw_info = {
- 	.magic_pkt = 1,
- };
- 
-+static const struct ravb_hw_info ravb_gen4_hw_info = {
-+	.receive = ravb_rx_rcar,
-+	.set_rate = ravb_set_rate_rcar,
-+	.set_feature = ravb_set_features_rcar,
-+	.dmac_init = ravb_dmac_init_rcar,
-+	.emac_init = ravb_emac_init_rcar_gen4,
-+	.gstrings_stats = ravb_gstrings_stats,
-+	.gstrings_size = sizeof(ravb_gstrings_stats),
-+	.net_hw_features = NETIF_F_RXCSUM,
-+	.net_features = NETIF_F_RXCSUM,
-+	.stats_len = ARRAY_SIZE(ravb_gstrings_stats),
-+	.tccr_mask = TCCR_TSRQ0 | TCCR_TSRQ1 | TCCR_TSRQ2 | TCCR_TSRQ3,
-+	.rx_max_frame_size = SZ_2K,
-+	.rx_buffer_size = SZ_2K +
-+			  SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
-+	.rx_desc_size = sizeof(struct ravb_ex_rx_desc),
-+	.internal_delay = 1,
-+	.tx_counters = 1,
-+	.multi_irqs = 1,
-+	.irq_en_dis = 1,
-+	.ccc_gac = 1,
-+	.nc_queues = 1,
-+	.magic_pkt = 1,
-+};
-+
- static const struct ravb_hw_info ravb_rzv2m_hw_info = {
- 	.receive = ravb_rx_rcar,
- 	.set_rate = ravb_set_rate_rcar,
-@@ -2751,7 +2786,7 @@ static const struct of_device_id ravb_match_table[] = {
- 	{ .compatible = "renesas,etheravb-rcar-gen2", .data = &ravb_gen2_hw_info },
- 	{ .compatible = "renesas,etheravb-r8a7795", .data = &ravb_gen3_hw_info },
- 	{ .compatible = "renesas,etheravb-rcar-gen3", .data = &ravb_gen3_hw_info },
--	{ .compatible = "renesas,etheravb-rcar-gen4", .data = &ravb_gen3_hw_info },
-+	{ .compatible = "renesas,etheravb-rcar-gen4", .data = &ravb_gen4_hw_info },
- 	{ .compatible = "renesas,etheravb-rzv2m", .data = &ravb_rzv2m_hw_info },
- 	{ .compatible = "renesas,rzg2l-gbeth", .data = &gbeth_hw_info },
- 	{ }
+ 		priv->hw = mac;
+ 		priv->ptpaddr = priv->ioaddr + entry->regs.ptp_off;
 -- 
-2.34.1
+2.43.0
 
 
