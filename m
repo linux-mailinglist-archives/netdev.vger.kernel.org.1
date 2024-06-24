@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-106227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B432F9155F7
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 19:55:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC58E9155FA
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 19:56:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05560B222FA
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:55:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4ABE61F210C2
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02F41A01B5;
-	Mon, 24 Jun 2024 17:53:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B762E1A01CA;
+	Mon, 24 Jun 2024 17:53:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TX5zfbwC"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="csKX8wpm"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2062.outbound.protection.outlook.com [40.107.223.62])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2057.outbound.protection.outlook.com [40.107.243.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC041A0B1A;
-	Mon, 24 Jun 2024 17:53:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AAB81A08C3;
+	Mon, 24 Jun 2024 17:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.57
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719251614; cv=fail; b=UVuJh7VS8jeck9rd2UE87ylJc4licOC/qCl1oaHIDDJnrT8F3V/gkDdraTWoALyYAzms3bLW5DvpQ2T8au4Wt5WuKHeiZoMx/Ek8YK8wDPCaa0f/yYbuUD4RmXtvua/0NxUXTsYvl695jksSavF6RxoKuHKRsptmnbTf+56CRPg=
+	t=1719251625; cv=fail; b=R0K7oX5vgzkfRqjDDsALOt541RG9FQuau6XtgAnXsYiEyM+lKTGiUyDC99tXw3eHrmXDvMFFs/vnwNwRKSfhyl4QvoE57WThGfqniJwgOFYqjA/sie3sj3DHPC9YR9xAltZOpUWKrwlRlVbtIlxHJMsyZtFK4AYX1GasGLY9Y0U=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719251614; c=relaxed/simple;
-	bh=RqZrtF9hzPPydnCat2CKUJoLjAR3aJkQL8WArZqek3o=;
+	s=arc-20240116; t=1719251625; c=relaxed/simple;
+	bh=EbrTRw2QVpnZbECqTUp0JQ5mkBSP5fVoau0WvgbYGfM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZV6t1g9JTwIj/UfBzZ0K5di9sza7b/PlTJ5usRtGMbb67Tasm5DZUZHbl2cyWXhfKslECZOAnT1nvPCOk/Nho06cxWo/5knO/jPw5eEX0lycK2aZgcMzDAR2FUZhc/C1hAW5dpW8SxRUFP71y8A82JI1wac5W/vhhUsc6erZJ+s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TX5zfbwC; arc=fail smtp.client-ip=40.107.223.62
+	 MIME-Version:Content-Type; b=kaGpjOKisyY7rTRMEj3xIPyahG9GMG+ZMpQ0VGBWyj0BY8ocipKfdfOQjZlZYY/9fgjw0gcJ5u8zcL0h7guDzZbGI7soJ/b2J9ixFTj/H6EHkz7wa+h7i7K7+w1iwNy5caTn6m3Y9m1uCSLRGffrvpNCWXsA6J8KEoCSQ36CXIc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=csKX8wpm; arc=fail smtp.client-ip=40.107.243.57
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cyJiTVnXNiOtDyM63Q7cDHYZJZY5rW5FqPdquURYe0TKx+8LOO7pqUAE+XY2z6MqReeeeN6JQzWvqd3IAN/8Xl6wR/lF6JKJqjxVTJtscQJWe7j6MyaDux/1T4a6PIc3SQDnB/mktisFr0extdl1XqGEB5WU/C4KJ6KQO1A/MD1gwVC5tNBgiKlLXYXqkitRFEk7fzHNo/EK5cb4I29ERvuquNOaiVZFQPmKK9TEq4xzoZdKv2gyEWY6jC5WeteL57hordTCG0gR3ntRlY6oeha+dehphjPylvE7qvvy+FhwWJBaAXcFxmIIN6YljbyRaOrRSThzjjIXtrwPRayAPw==
+ b=PHo+aMdYKTt0o8P3cv0qx3fQ5IC6UFsiqo97An4WR3vtvDEY7XATeAZd465NyBmfWjGrOW3qaYuzEm4gsK2MoYR4Ct0Wm6awVJQ2CmlixgyVVW5xFQ8W2SNUIEgLfbcPkSjLu1uCn84uulDVU5bUwqHOzaZLWoyYvtYg0BMM8E8jI7jHhJFqPky66bLkhmyXCVjl+xFwn9lCmxtIx07r5KwXWsEuFdFGzMFYPLCQRnACaZ22K0CqeBeMWoJtmAhrm4y9DhEwAhzpTCthGFQNdDt/f9DjBlQjkY7LhuO1jQUyk4tJLijOpgxsfG4CRO3gMDF58U3wpVvb6plt5HKBBA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=q4khK5DkuVZdWTbZsjigRzdxqODND9aPqXhMDUBlsPI=;
- b=cob1b2+55dhOCbWE7Bewf0m1UWxrTtWhzwaWjRocwJdbaydandZ8gRQBc2P1vv3DbxlBH+7mHAvF6J7Qn9Qj10M/jrzegIFtfZkd252sWO9cToQjD3Ki9cgrHFLMK/YUthNVeV12MZgA2kntACZnju1amfknJCSJcDNC0RIRp/InIgbutsi4fONtShNvu0h93vZ8MBK7SZ6Y3UtZHGXpjyWM8Fxj4gWvk9B1JYYvt6WR53iEGUV/pKGeiJaiv+NQ1B8oyF7bG2P6xsL7GafMb2XbLXqYMm/Kp8NuWN7fo2zVZIDT/9fbJBKKL7WPxekqnBUfoEPGYTxJh4MuTvoyqA==
+ bh=rzchNaUmuyi+LzuK7zc08C0wU4TBOPk7rrAs3wfO+8E=;
+ b=I6oPuYLO6XK6LehrhQhkF1Y5U5ZUv2MUEdWhv2szRpYl+TR6a/8Cj7ygHmJrxGIdQJB6fiBjkcTQIrc7CUaLv0Y6LBxtN+FfaXJCU7Ugv6FUimxu6f03lrWXt9p+vQ8UZhmx5+C9xzbKCoRZ6h9mAd8Gsldiz59B5CdrbHGzBf38iRshsMT2HUCeEGNjVdwejMmtTAMcMLqcjb2HxtDbG6bAed3pOHu3Tjf8n5q592dhZWEzUIpCNOPNvXJKpslgaigc/2YIBdBy+Cg82tcCPp3oQntwWo+r8AcM1xY807+WfjWTsL7EfBiEoOraenqVyIKfjlMCWZrTpVyFyAWKkw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q4khK5DkuVZdWTbZsjigRzdxqODND9aPqXhMDUBlsPI=;
- b=TX5zfbwC8MecgQVDPjzP6uwDwLy60OFLKWfWQcy+erFbx4iIBPOkHByncLxyYDgr00aBmTKsFQg9P4bYSoPrc1PygUZpxN7pZpKc1V/PNogjK4rJA/5joo+qAiUgMr8SuTwUJ3fO1/LI2z6D6/gF9hqcRqpEeWezcwVNLjGxjk92Js78efKzEElrSygSz0ykrWvGoNf72lrJcJ1AT9tQtE01W5iyRS9/8iZ6L8m3A7EM72Qx2RuxzAX90T8nK6X3YIk6uNjjyzs20fuVEHRyA4kRg38Fpc8u2uUaYH+Cr4jefHXGiN0T5pxXhQCVETGT91AD0o4NPTB4WlaXkrzz3Q==
-Received: from PH7PR10CA0004.namprd10.prod.outlook.com (2603:10b6:510:23d::22)
- by SA1PR12MB8118.namprd12.prod.outlook.com (2603:10b6:806:333::9) with
+ bh=rzchNaUmuyi+LzuK7zc08C0wU4TBOPk7rrAs3wfO+8E=;
+ b=csKX8wpmEk5/dTUFXwl6ZdjEsrz7kSI1nUfvvm9UCXojLv4D2U9t27M7HGr8bWYsp4SpKQ5t8itpv//lebkvKubOF3+LxMgSA7m0H28sJYUaw1HjGZOr2PpfVP0j1/yjAR7lnvy16l+dX+whFrp/K8X4OQvq2biwKHMh77xX43PMSyyejGKVj6+YF87Xb9PkvXv8pKng9hxyvafU8fgFMy40QZ95GsBr7bD4UMXyQUBdLwaq4vjMsSu5JfJ/Zt8Rlay6LV/u4FOKd64yL4L5e4RhZ9+s1FKfoPbl+YxIVcMeDiWIOAIq3yVL+XcjwSBGkiJK3YMGGF5kRUOINF6fwQ==
+Received: from PH7PR10CA0010.namprd10.prod.outlook.com (2603:10b6:510:23d::19)
+ by CY8PR12MB7146.namprd12.prod.outlook.com (2603:10b6:930:5e::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.28; Mon, 24 Jun
- 2024 17:53:28 +0000
+ 2024 17:53:39 +0000
 Received: from MWH0EPF000A6731.namprd04.prod.outlook.com
- (2603:10b6:510:23d:cafe::54) by PH7PR10CA0004.outlook.office365.com
- (2603:10b6:510:23d::22) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:510:23d:cafe::c1) by PH7PR10CA0010.outlook.office365.com
+ (2603:10b6:510:23d::19) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.38 via Frontend
- Transport; Mon, 24 Jun 2024 17:53:28 +0000
+ Transport; Mon, 24 Jun 2024 17:53:38 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -66,15 +66,15 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
 Received: from mail.nvidia.com (216.228.117.161) by
  MWH0EPF000A6731.mail.protection.outlook.com (10.167.249.23) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7677.15 via Frontend Transport; Mon, 24 Jun 2024 17:53:28 +0000
+ 15.20.7677.15 via Frontend Transport; Mon, 24 Jun 2024 17:53:38 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 24 Jun
- 2024 10:53:09 -0700
+ 2024 10:53:15 -0700
 Received: from dev-r-vrt-156.mtr.labs.mlnx (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 24 Jun 2024 10:53:03 -0700
+ 15.2.1544.4; Mon, 24 Jun 2024 10:53:09 -0700
 From: Danielle Ratson <danieller@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
@@ -86,9 +86,9 @@ CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<jiri@resnulli.us>, <linux-doc@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <mlxsw@nvidia.com>, <idosch@nvidia.com>,
 	<petrm@nvidia.com>, Danielle Ratson <danieller@nvidia.com>
-Subject: [PATCH net-next v7 8/9] ethtool: cmis_fw_update: add a layer for supporting firmware update using CDB
-Date: Mon, 24 Jun 2024 20:51:58 +0300
-Message-ID: <20240624175201.130522-9-danieller@nvidia.com>
+Subject: [PATCH net-next v7 9/9] ethtool: Add ability to flash transceiver modules' firmware
+Date: Mon, 24 Jun 2024 20:51:59 +0300
+Message-ID: <20240624175201.130522-10-danieller@nvidia.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <20240624175201.130522-1-danieller@nvidia.com>
 References: <20240624175201.130522-1-danieller@nvidia.com>
@@ -104,581 +104,543 @@ X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000A6731:EE_|SA1PR12MB8118:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4d2f87e9-10d7-49ef-38b9-08dc94768dd1
+X-MS-TrafficTypeDiagnostic: MWH0EPF000A6731:EE_|CY8PR12MB7146:EE_
+X-MS-Office365-Filtering-Correlation-Id: 458cabc0-71ab-4985-5340-08dc947693e1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230037|36860700010|7416011|376011|82310400023|1800799021;
+	BCL:0;ARA:13230037|7416011|376011|82310400023|1800799021|36860700010;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?eF7mb2LStuNUpr91BMNvVQm4JEFSlEWSKfpbR6JiweMYX6AvTcCuWyEJE/A4?=
- =?us-ascii?Q?CYEh+IAoMxVmIostdXiMHWhUICs9ALpV3gHuBt+bNb86PGS1cVSecCvez3dF?=
- =?us-ascii?Q?8s6kS4ilQJBWgJQmzzRrmDFWnOz9fstCdKJEfvS+Sh99P2fce8pRMIFCrafl?=
- =?us-ascii?Q?2aiLcXx7xiC0GxuDrY/7tg7v33iuWOE+84ET2aZGCaJcjMpz0O+6UvflYN02?=
- =?us-ascii?Q?g3X1fSNtr/ZUESYa4tY3X2eSMxMoYhwohUQfjsVKHkePJPU93nVZ1jxg3dYr?=
- =?us-ascii?Q?JbQSHUqaHnOaLB7Ix5SFgFkOE4lwQvYowAvl5rvQt0JJQd551NFw0hzbiaM8?=
- =?us-ascii?Q?0Ax4JXjscLlcj3RvjH1HoE1V0m/HV//lSMqIrIDo7OheGHgFC2YoBJM2nyVo?=
- =?us-ascii?Q?Qs3KdZ5E0G8KclT2OICrmsQuYgwytYRxFn2WKb6bKVopFHzZat2jbWIbu1fh?=
- =?us-ascii?Q?v8+I3m0fTWQEI56fDNJSX+gEHbWCpQ2mXSLtra9udNvvBVH59vLWxS/FTGP/?=
- =?us-ascii?Q?Uc2fbMOXlQDEq9ocmg5gj6EQtmqpHLmfOxgPBMlD/Gwl+ySNcNV9KhPWc7Xb?=
- =?us-ascii?Q?6iXshEecrS/bXEdEYvmpSTJPHaXa+ht3jAgN0rDnunocR6yYUxgDci/QpS9B?=
- =?us-ascii?Q?pW87Q0VQy0iG02pwvyYqALR5Ze6Qs/1cninWNeBNcmbDYbi67V0oGqkoRdaa?=
- =?us-ascii?Q?7evzCbVgDPP2PvPpj3+xUTHIOKOCREyTHlSkSXJN9qMf9Rbnzth2O7rHZyhV?=
- =?us-ascii?Q?EqCQSjS4zQ+pMRMRJbuW0/BJXI7IREi0oiWYS8cviBHKfR3QqXtzEettzgqD?=
- =?us-ascii?Q?pSwEgQpVJaHzfQjm+xQAjpsp1Z4fPYQ7oHkvDxIbGojNebFGu/EF8EJi2M2Z?=
- =?us-ascii?Q?UrKKNhBzltik/bfbjHCuQj3lXX5gsOVXmuRMxFufl3p2SwPxeFqdgbqKqAh6?=
- =?us-ascii?Q?d8SFgd/kdovXE4hAM9SoDNX8HxB/844ldQNvFIPr6Ai82SGuzo+qRyhORd9e?=
- =?us-ascii?Q?O1REBkLRGnoaPfigNGR6QCB/nGbTQtMJGmweRAMwebE8dlVVCOgMwwqGvC8H?=
- =?us-ascii?Q?06i7gPuyq3a8wTQcJ2L0YGhhdevyfSpDs1aXbiy/dQ6OjqZEo1JJtD4blxcn?=
- =?us-ascii?Q?8yFOoY352wDfXiwotwpt4hzzeJla9AtCGsSDnDcTlAnVUIHQ2lbnqH3d5oxO?=
- =?us-ascii?Q?8RRYcnrAxu/WJClzTsdX00e2LZM/U34PHwip3em7wIa+l0WNH2VjTZnoGV8S?=
- =?us-ascii?Q?2bBXPVbHwg5G1G+K4nqfOPdXYwaW/KGqeRcG8lx2mTVai8CC1MovDf90J8d1?=
- =?us-ascii?Q?/vrhc2XAZLJN6nmcNddHEMqL4Vx+iHYKUSqNAI/g9Gx++6zaNrOrCQfMaiez?=
- =?us-ascii?Q?yQdc34vLjrwzg38NMdTpFTnQ4EvGzJQjfvqZC4rQYXB0tE5IZw=3D=3D?=
+	=?us-ascii?Q?tX5luvMqO79JRo9GhHK0C3UPBG3P39CBZzIpn2ItvIqOc7zz8O1XxsI9d2te?=
+ =?us-ascii?Q?uk8hCAi1yIKcvVQT5JYREdTnmGNmLmYQlC1JvtZbOKzUyOFPK0HugPXvSo2L?=
+ =?us-ascii?Q?NkCxz0n/h/a8py9NnhPOWRA6CRmrTRS/kuU1nPOstYn1NIOSs6Av3e6RTYct?=
+ =?us-ascii?Q?nOloyA/wPDyjl7Ly/92LGsvtqWqR9DIzjgtB7+JTqm7uOK7OIV/7p5uVRJio?=
+ =?us-ascii?Q?twu2ra5XQvn4U0MDglE3bYISoo5fVEkSUkUolm1p/IsCJoRKVvfU4pLvfAOX?=
+ =?us-ascii?Q?3CI+L0Zpidf3uPeR+V8EctYcqM2eCCi3G1i1MHKHlBD9uUKw/MfuzPwzGfpx?=
+ =?us-ascii?Q?W+ws3xSzAQoYyZDsY6GVOIQh59uNPePfim5yoSIopNGU8SRcyKgYDd37Zyi9?=
+ =?us-ascii?Q?BSTvhSesXIslZYI9U2r+85n/dV4nFL5neTbUAv14HQGnQya87vXf7JV/5Z85?=
+ =?us-ascii?Q?5ZuxQrgTjpHLDBgcaXfMshfWBvRVK4FHvvUdwRnT1JqCWpsqMph7e/9iZKKl?=
+ =?us-ascii?Q?lVaGyNU+rXjcnpu0jNPSlkc/9Oit+Ci63VKCq7j8IpdhNbsxakXHz0EWHs3l?=
+ =?us-ascii?Q?HUmSdyzt6cah0BrdKOBUw/6l08uSo/7H2AIJJGMibwFL+mL8U1nECCMvH9zx?=
+ =?us-ascii?Q?NdZTWPTyj2UfK69iq2P0pFLzdDn2p6ZnFbXRfCE+poZc6DZ/MO4aNxjHb4By?=
+ =?us-ascii?Q?sxWnVfabinb73qXlxFRYR+TUBStyq3jMBT0gj9UMXUjO4lKOtjewggEtI5H1?=
+ =?us-ascii?Q?vaMg4H4yEkSPeE7ZwPIdJS9aHOCJ3r3UsgBMGOvUsN7Velx3ibkrT7X7sujP?=
+ =?us-ascii?Q?cTCcxUOOtY8xkZeb5bFDqkjY9D6tNwmqfsw4/jJN44r8jOg0hX/fwYg5cwui?=
+ =?us-ascii?Q?fhUKkMAHQhHiefo7BBlKeyfYQ6VszuG/9h/jafB2mn6JiZfSdp5p2wXpOMt7?=
+ =?us-ascii?Q?dij02FeEviST7SXx8q92LCEwS79dwIN6fnpqcPotRAsQpjcjO6F5JwXHp/EN?=
+ =?us-ascii?Q?1pgjH9Wb3HFQnZKeb+NjZgU+cxlp6P8WFFSh77Kd63/Y0nL7RudJBYqV4T60?=
+ =?us-ascii?Q?6ng0xWgfJnz8YSTvKz26QK5B6pSu2FlYEmoavClL3rv66lwvHoJEv8sJmuEU?=
+ =?us-ascii?Q?4uczfPq2HMTrqBaFo6UfEZUw1f0DdkJymXMB4UUyxRr2jJOKJZ1/3iuxVe56?=
+ =?us-ascii?Q?BOn6xSPG7phPItJlHiygzYyRlLrDwzEkNVwCwiBtPuBHMHYR7fC1aK1juips?=
+ =?us-ascii?Q?5cHn8sNs7iJoSQK4me4DrShgAuHcB92ZwbIHYUVvO1mxfPX617qqydrYhyak?=
+ =?us-ascii?Q?cBj357aw+ST/yjwxHhQB/u/hu72WG99PT+k6OnneN9UaGkd+mP+I1n0M3rm5?=
+ =?us-ascii?Q?51eXEXCcpQ1DJ7N4lZPAKZvDIZf+5AavJzKa+/Y4fAh813fVsA=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230037)(36860700010)(7416011)(376011)(82310400023)(1800799021);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230037)(7416011)(376011)(82310400023)(1800799021)(36860700010);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2024 17:53:28.4556
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2024 17:53:38.6587
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4d2f87e9-10d7-49ef-38b9-08dc94768dd1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 458cabc0-71ab-4985-5340-08dc947693e1
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	MWH0EPF000A6731.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8118
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7146
 
-According to the CMIS standard, the firmware update process is done using
-a CDB commands sequence.
+Add the ability to flash the modules' firmware by implementing the
+interface between the user space and the kernel.
 
-Implement a work that will be triggered from the module layer in the
-next patch the will initiate and execute all the CDB commands in order, to
-eventually complete the firmware update process.
+Example from a succeeding implementation:
 
-This flashing process includes, writing the firmware image, running the new
-firmware image and committing it after testing, so that it will run upon
-reset.
+ # ethtool --flash-module-firmware swp40 file test.bin
 
-This work will also notify user space about the progress of the firmware
-update process.
+ Transceiver module firmware flashing started for device swp40
+ Transceiver module firmware flashing in progress for device swp40
+ Progress: 99%
+ Transceiver module firmware flashing completed for device swp40
+
+In addition, add infrastructure that allows modules to set socket-specific
+private data. This ensures that when a socket is closed from user space
+during the flashing process, the right socket halts sending notifications
+to user space until the work item is completed.
 
 Signed-off-by: Danielle Ratson <danieller@nvidia.com>
 Reviewed-by: Petr Machata <petrm@nvidia.com>
 ---
 
 Notes:
-    v6:
-    	* Add a list field to struct ethtool_module_fw_flash for
-    	  module_fw_flash_work_list that will be presented in the next
-    	  patch.
-    	* Move ethtool_cmis_fw_update() cleaning to a new function that
-    	  will be represented in the next patch.
-    	* Move some of the fields in struct ethtool_module_fw_flash to a
-    	  separate struct, so ethtool_cmis_fw_update() will get only the
-    	  relevant parameters for it.
-    	* Edit the relevant functions to get the relevant params for them.
-    	* s/CMIS_MODULE_READY_MAX_DURATION_USEC/CMIS_MODULE_READY_MAX_DURATION_MSEC.
+    v7:
+    	* Fix Warning for not unlocking the spin_lock in the error flow
+    	  on module_flash_fw_work_list_add().
+    	* Avoid the fall-through on ethnl_sock_priv_destroy().
     
-    v2:
-    	* Decrease msleep before querying completion flag in Write FW
-    	  Image command.
-    	* Change the condition for failing when LPL is not supported.
-    	* Re-write cmis_fw_update_write_image().
+    v6:
+    	* Add a paragraph in the commit message.
+    	* Rename labels in module_flash_fw_schedule().
+    	* Add info to genl_sk_priv_*() and implement the relevant
+    	  callbacks, in order to handle properly a scenario of closing the
+    	  socket from user space before the work item was ended.
+    	* Add a list the holds all the ethtool_module_fw_flash struct
+    	  that corresponds to the in progress work items.
+    	* Add a new enum for the socket types.
+    	* Use both above to identify a flashing socket, add it to the
+    	  list and when closing socket affect only the flashing type.
+    	* Create a new function that will get the work item instead of
+    	  ethtool_cmis_fw_update().
+    	* Edit the relevant functions to get the relevant params for them.
+    	* The new function will call the old ethtool_cmis_fw_update(), and do
+    	  the cleaning, so the existence of the list should be completely
+    	  isolated in module.c.
 
- net/ethtool/Makefile         |   2 +-
- net/ethtool/cmis.h           |   7 +
- net/ethtool/cmis_fw_update.c | 399 +++++++++++++++++++++++++++++++++++
- net/ethtool/module_fw.h      |  31 +++
- 4 files changed, 438 insertions(+), 1 deletion(-)
- create mode 100644 net/ethtool/cmis_fw_update.c
+ net/ethtool/module.c    | 277 ++++++++++++++++++++++++++++++++++++++++
+ net/ethtool/module_fw.h |   3 +
+ net/ethtool/netlink.c   |  39 ++++++
+ net/ethtool/netlink.h   |  15 +++
+ 4 files changed, 334 insertions(+)
 
-diff --git a/net/ethtool/Makefile b/net/ethtool/Makefile
-index 38806b3ecf83..9a190635fe95 100644
---- a/net/ethtool/Makefile
-+++ b/net/ethtool/Makefile
-@@ -8,4 +8,4 @@ ethtool_nl-y	:= netlink.o bitset.o strset.o linkinfo.o linkmodes.o rss.o \
- 		   linkstate.o debug.o wol.o features.o privflags.o rings.o \
- 		   channels.o coalesce.o pause.o eee.o tsinfo.o cabletest.o \
- 		   tunnels.o fec.o eeprom.o stats.o phc_vclocks.o mm.o \
--		   module.o cmis_cdb.o pse-pd.o plca.o mm.o
-+		   module.o cmis_fw_update.o cmis_cdb.o pse-pd.o plca.o mm.o
-diff --git a/net/ethtool/cmis.h b/net/ethtool/cmis.h
-index 295f5d0df915..e71cc3e1b7eb 100644
---- a/net/ethtool/cmis.h
-+++ b/net/ethtool/cmis.h
-@@ -20,6 +20,12 @@ struct ethtool_cmis_cdb {
- enum ethtool_cmis_cdb_cmd_id {
- 	ETHTOOL_CMIS_CDB_CMD_QUERY_STATUS		= 0x0000,
- 	ETHTOOL_CMIS_CDB_CMD_MODULE_FEATURES		= 0x0040,
-+	ETHTOOL_CMIS_CDB_CMD_FW_MANAGMENT_FEATURES	= 0x0041,
-+	ETHTOOL_CMIS_CDB_CMD_START_FW_DOWNLOAD		= 0x0101,
-+	ETHTOOL_CMIS_CDB_CMD_WRITE_FW_BLOCK_LPL		= 0x0103,
-+	ETHTOOL_CMIS_CDB_CMD_COMPLETE_FW_DOWNLOAD	= 0x0107,
-+	ETHTOOL_CMIS_CDB_CMD_RUN_FW_IMAGE		= 0x0109,
-+	ETHTOOL_CMIS_CDB_CMD_COMMIT_FW_IMAGE		= 0x010A,
+diff --git a/net/ethtool/module.c b/net/ethtool/module.c
+index ba728b4a38a1..6b7448df08d5 100644
+--- a/net/ethtool/module.c
++++ b/net/ethtool/module.c
+@@ -1,6 +1,9 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ 
+ #include <linux/ethtool.h>
++#include <linux/firmware.h>
++#include <linux/sfp.h>
++#include <net/devlink.h>
+ 
+ #include "netlink.h"
+ #include "common.h"
+@@ -34,6 +37,12 @@ static int module_get_power_mode(struct net_device *dev,
+ 	if (!ops->get_module_power_mode)
+ 		return 0;
+ 
++	if (dev->module_fw_flash_in_progress) {
++		NL_SET_ERR_MSG(extack,
++			       "Module firmware flashing is in progress");
++		return -EBUSY;
++	}
++
+ 	return ops->get_module_power_mode(dev, &data->power, extack);
+ }
+ 
+@@ -110,6 +119,12 @@ ethnl_set_module_validate(struct ethnl_req_info *req_info,
+ 	if (!tb[ETHTOOL_A_MODULE_POWER_MODE_POLICY])
+ 		return 0;
+ 
++	if (req_info->dev->module_fw_flash_in_progress) {
++		NL_SET_ERR_MSG(info->extack,
++			       "Module firmware flashing is in progress");
++		return -EBUSY;
++	}
++
+ 	if (!ops->get_module_power_mode || !ops->set_module_power_mode) {
+ 		NL_SET_ERR_MSG_ATTR(info->extack,
+ 				    tb[ETHTOOL_A_MODULE_POWER_MODE_POLICY],
+@@ -160,6 +175,268 @@ const struct ethnl_request_ops ethnl_module_request_ops = {
+ 	.set_ntf_cmd		= ETHTOOL_MSG_MODULE_NTF,
  };
  
- /**
-@@ -47,6 +53,7 @@ struct ethtool_cmis_cdb_request {
- 
- #define CDB_F_COMPLETION_VALID		BIT(0)
- #define CDB_F_STATUS_VALID		BIT(1)
-+#define CDB_F_MODULE_STATE_VALID	BIT(2)
- 
- /**
-  * struct ethtool_cmis_cdb_cmd_args - CDB commands execution arguments
-diff --git a/net/ethtool/cmis_fw_update.c b/net/ethtool/cmis_fw_update.c
-new file mode 100644
-index 000000000000..ae4b4b28a601
---- /dev/null
-+++ b/net/ethtool/cmis_fw_update.c
-@@ -0,0 +1,399 @@
-+// SPDX-License-Identifier: GPL-2.0-only
++/* MODULE_FW_FLASH_ACT */
 +
-+#include <linux/ethtool.h>
-+#include <linux/firmware.h>
-+
-+#include "common.h"
-+#include "module_fw.h"
-+#include "cmis.h"
-+
-+struct cmis_fw_update_fw_mng_features {
-+	u8	start_cmd_payload_size;
-+	u16	max_duration_start;
-+	u16	max_duration_write;
-+	u16	max_duration_complete;
++const struct nla_policy
++ethnl_module_fw_flash_act_policy[ETHTOOL_A_MODULE_FW_FLASH_PASSWORD + 1] = {
++	[ETHTOOL_A_MODULE_FW_FLASH_HEADER] =
++		NLA_POLICY_NESTED(ethnl_header_policy),
++	[ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME] = { .type = NLA_NUL_STRING },
++	[ETHTOOL_A_MODULE_FW_FLASH_PASSWORD] = { .type = NLA_U32 },
 +};
 +
-+/* See section 9.4.2 "CMD 0041h: Firmware Management Features" in CMIS standard
-+ * revision 5.2.
-+ * struct cmis_cdb_fw_mng_features_rpl is a structured layout of the flat
-+ * array, ethtool_cmis_cdb_rpl::payload.
-+ */
-+struct cmis_cdb_fw_mng_features_rpl {
-+	u8	resv1;
-+	u8	resv2;
-+	u8	start_cmd_payload_size;
-+	u8	resv3;
-+	u8	read_write_len_ext;
-+	u8	write_mechanism;
-+	u8	resv4;
-+	u8	resv5;
-+	__be16	max_duration_start;
-+	__be16	resv6;
-+	__be16	max_duration_write;
-+	__be16	max_duration_complete;
-+	__be16	resv7;
-+};
-+
-+#define CMIS_CDB_FW_WRITE_MECHANISM_LPL	0x01
++static LIST_HEAD(module_fw_flash_work_list);
++static DEFINE_SPINLOCK(module_fw_flash_work_list_lock);
 +
 +static int
-+cmis_fw_update_fw_mng_features_get(struct ethtool_cmis_cdb *cdb,
-+				   struct net_device *dev,
-+				   struct cmis_fw_update_fw_mng_features *fw_mng,
-+				   struct ethnl_module_fw_flash_ntf_params *ntf_params)
++module_flash_fw_work_list_add(struct ethtool_module_fw_flash *module_fw,
++			      struct genl_info *info)
 +{
-+	struct ethtool_cmis_cdb_cmd_args args = {};
-+	struct cmis_cdb_fw_mng_features_rpl *rpl;
-+	u8 flags = CDB_F_STATUS_VALID;
-+	int err;
++	struct ethtool_module_fw_flash *work;
 +
-+	ethtool_cmis_cdb_check_completion_flag(cdb->cmis_rev, &flags);
-+	ethtool_cmis_cdb_compose_args(&args,
-+				      ETHTOOL_CMIS_CDB_CMD_FW_MANAGMENT_FEATURES,
-+				      NULL, 0, cdb->max_completion_time,
-+				      cdb->read_write_len_ext, 1000,
-+				      sizeof(*rpl), flags);
-+
-+	err = ethtool_cmis_cdb_execute_cmd(dev, &args);
-+	if (err < 0) {
-+		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
-+					      "FW Management Features command failed",
-+					      args.err_msg);
-+		return err;
-+	}
-+
-+	rpl = (struct cmis_cdb_fw_mng_features_rpl *)args.req.payload;
-+	if (!(rpl->write_mechanism == CMIS_CDB_FW_WRITE_MECHANISM_LPL)) {
-+		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
-+					      "Write LPL is not supported",
-+					      NULL);
-+		return  -EOPNOTSUPP;
-+	}
-+
-+	/* Above, we used read_write_len_ext that we got from CDB
-+	 * advertisement. Update it with the value that we got from module
-+	 * features query, which is specific for Firmware Management Commands
-+	 * (IDs 0100h-01FFh).
-+	 */
-+	cdb->read_write_len_ext = rpl->read_write_len_ext;
-+	fw_mng->start_cmd_payload_size = rpl->start_cmd_payload_size;
-+	fw_mng->max_duration_start = be16_to_cpu(rpl->max_duration_start);
-+	fw_mng->max_duration_write = be16_to_cpu(rpl->max_duration_write);
-+	fw_mng->max_duration_complete = be16_to_cpu(rpl->max_duration_complete);
-+
-+	return 0;
-+}
-+
-+/* See section 9.7.2 "CMD 0101h: Start Firmware Download" in CMIS standard
-+ * revision 5.2.
-+ * struct cmis_cdb_start_fw_download_pl is a structured layout of the
-+ * flat array, ethtool_cmis_cdb_request::payload.
-+ */
-+struct cmis_cdb_start_fw_download_pl {
-+	__struct_group(cmis_cdb_start_fw_download_pl_h, head, /* no attrs */,
-+			__be32	image_size;
-+			__be32	resv1;
-+	);
-+	u8 vendor_data[ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH -
-+		sizeof(struct cmis_cdb_start_fw_download_pl_h)];
-+};
-+
-+static int
-+cmis_fw_update_start_download(struct ethtool_cmis_cdb *cdb,
-+			      struct ethtool_cmis_fw_update_params *fw_update,
-+			      struct cmis_fw_update_fw_mng_features *fw_mng)
-+{
-+	u8 vendor_data_size = fw_mng->start_cmd_payload_size;
-+	struct cmis_cdb_start_fw_download_pl pl = {};
-+	struct ethtool_cmis_cdb_cmd_args args = {};
-+	u8 lpl_len;
-+	int err;
-+
-+	pl.image_size = cpu_to_be32(fw_update->fw->size);
-+	memcpy(pl.vendor_data, fw_update->fw->data, vendor_data_size);
-+
-+	lpl_len = offsetof(struct cmis_cdb_start_fw_download_pl,
-+			   vendor_data[vendor_data_size]);
-+
-+	ethtool_cmis_cdb_compose_args(&args,
-+				      ETHTOOL_CMIS_CDB_CMD_START_FW_DOWNLOAD,
-+				      (u8 *)&pl, lpl_len,
-+				      fw_mng->max_duration_start,
-+				      cdb->read_write_len_ext, 1000, 0,
-+				      CDB_F_COMPLETION_VALID | CDB_F_STATUS_VALID);
-+
-+	err = ethtool_cmis_cdb_execute_cmd(fw_update->dev, &args);
-+	if (err < 0)
-+		ethnl_module_fw_flash_ntf_err(fw_update->dev,
-+					      &fw_update->ntf_params,
-+					      "Start FW download command failed",
-+					      args.err_msg);
-+
-+	return err;
-+}
-+
-+/* See section 9.7.4 "CMD 0103h: Write Firmware Block LPL" in CMIS standard
-+ * revision 5.2.
-+ * struct cmis_cdb_write_fw_block_lpl_pl is a structured layout of the
-+ * flat array, ethtool_cmis_cdb_request::payload.
-+ */
-+struct cmis_cdb_write_fw_block_lpl_pl {
-+	__be32	block_address;
-+	u8 fw_block[ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH - sizeof(__be32)];
-+};
-+
-+static int
-+cmis_fw_update_write_image(struct ethtool_cmis_cdb *cdb,
-+			   struct ethtool_cmis_fw_update_params *fw_update,
-+			   struct cmis_fw_update_fw_mng_features *fw_mng)
-+{
-+	u8 start = fw_mng->start_cmd_payload_size;
-+	u32 offset, max_block_size, max_lpl_len;
-+	u32 image_size = fw_update->fw->size;
-+	int err;
-+
-+	max_lpl_len = min_t(u32,
-+			    ethtool_cmis_get_max_payload_size(cdb->read_write_len_ext),
-+			    ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH);
-+	max_block_size =
-+		max_lpl_len - sizeof_field(struct cmis_cdb_write_fw_block_lpl_pl,
-+					   block_address);
-+
-+	for (offset = start; offset < image_size; offset += max_block_size) {
-+		struct cmis_cdb_write_fw_block_lpl_pl pl = {
-+			.block_address = cpu_to_be32(offset - start),
-+		};
-+		struct ethtool_cmis_cdb_cmd_args args = {};
-+		u32 block_size, lpl_len;
-+
-+		ethnl_module_fw_flash_ntf_in_progress(fw_update->dev,
-+						      &fw_update->ntf_params,
-+						      offset - start,
-+						      image_size);
-+		block_size = min_t(u32, max_block_size, image_size - offset);
-+		memcpy(pl.fw_block, &fw_update->fw->data[offset], block_size);
-+		lpl_len = block_size +
-+			sizeof_field(struct cmis_cdb_write_fw_block_lpl_pl,
-+				     block_address);
-+
-+		ethtool_cmis_cdb_compose_args(&args,
-+					      ETHTOOL_CMIS_CDB_CMD_WRITE_FW_BLOCK_LPL,
-+					      (u8 *)&pl, lpl_len,
-+					      fw_mng->max_duration_write,
-+					      cdb->read_write_len_ext, 1, 0,
-+					      CDB_F_COMPLETION_VALID | CDB_F_STATUS_VALID);
-+
-+		err = ethtool_cmis_cdb_execute_cmd(fw_update->dev, &args);
-+		if (err < 0) {
-+			ethnl_module_fw_flash_ntf_err(fw_update->dev,
-+						      &fw_update->ntf_params,
-+						      "Write FW block LPL command failed",
-+						      args.err_msg);
-+			return err;
++	/* First, check if already registered. */
++	spin_lock(&module_fw_flash_work_list_lock);
++	list_for_each_entry(work, &module_fw_flash_work_list, list) {
++		if (work->fw_update.ntf_params.portid == info->snd_portid &&
++		    work->fw_update.dev == module_fw->fw_update.dev) {
++			spin_unlock(&module_fw_flash_work_list_lock);
++			return -EALREADY;
 +		}
 +	}
 +
-+	return 0;
-+}
-+
-+static int
-+cmis_fw_update_complete_download(struct ethtool_cmis_cdb *cdb,
-+				 struct net_device *dev,
-+				 struct cmis_fw_update_fw_mng_features *fw_mng,
-+				 struct ethnl_module_fw_flash_ntf_params *ntf_params)
-+{
-+	struct ethtool_cmis_cdb_cmd_args args = {};
-+	int err;
-+
-+	ethtool_cmis_cdb_compose_args(&args,
-+				      ETHTOOL_CMIS_CDB_CMD_COMPLETE_FW_DOWNLOAD,
-+				      NULL, 0, fw_mng->max_duration_complete,
-+				      cdb->read_write_len_ext, 1000, 0,
-+				      CDB_F_COMPLETION_VALID | CDB_F_STATUS_VALID);
-+
-+	err = ethtool_cmis_cdb_execute_cmd(dev, &args);
-+	if (err < 0)
-+		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
-+					      "Complete FW download command failed",
-+					      args.err_msg);
-+
-+	return err;
-+}
-+
-+static int
-+cmis_fw_update_download_image(struct ethtool_cmis_cdb *cdb,
-+			      struct ethtool_cmis_fw_update_params *fw_update,
-+			      struct cmis_fw_update_fw_mng_features *fw_mng)
-+{
-+	int err;
-+
-+	err = cmis_fw_update_start_download(cdb, fw_update, fw_mng);
-+	if (err < 0)
-+		return err;
-+
-+	err = cmis_fw_update_write_image(cdb, fw_update, fw_mng);
-+	if (err < 0)
-+		return err;
-+
-+	err = cmis_fw_update_complete_download(cdb, fw_update->dev, fw_mng,
-+					       &fw_update->ntf_params);
-+	if (err < 0)
-+		return err;
++	list_add_tail(&module_fw->list, &module_fw_flash_work_list);
++	spin_unlock(&module_fw_flash_work_list_lock);
 +
 +	return 0;
 +}
 +
-+enum {
-+	CMIS_MODULE_LOW_PWR	= 1,
-+	CMIS_MODULE_READY	= 3,
-+};
-+
-+static bool module_is_ready(u8 data)
++static void module_flash_fw_work_list_del(struct list_head *list)
 +{
-+	u8 state = (data >> 1) & 7;
-+
-+	return state == CMIS_MODULE_READY || state == CMIS_MODULE_LOW_PWR;
++	spin_lock(&module_fw_flash_work_list_lock);
++	list_del(list);
++	spin_unlock(&module_fw_flash_work_list_lock);
 +}
 +
-+#define CMIS_MODULE_READY_MAX_DURATION_MSEC	1000
-+#define CMIS_MODULE_STATE_OFFSET		3
-+
-+static int
-+cmis_fw_update_wait_for_module_state(struct net_device *dev, u8 flags)
++static void module_flash_fw_work(struct work_struct *work)
 +{
-+	u8 state;
++	struct ethtool_module_fw_flash *module_fw;
 +
-+	return ethtool_cmis_wait_for_cond(dev, flags, CDB_F_MODULE_STATE_VALID,
-+					  CMIS_MODULE_READY_MAX_DURATION_MSEC,
-+					  CMIS_MODULE_STATE_OFFSET,
-+					  module_is_ready, NULL, &state);
++	module_fw = container_of(work, struct ethtool_module_fw_flash, work);
++
++	ethtool_cmis_fw_update(&module_fw->fw_update);
++
++	module_flash_fw_work_list_del(&module_fw->list);
++	module_fw->fw_update.dev->module_fw_flash_in_progress = false;
++	netdev_put(module_fw->fw_update.dev, &module_fw->dev_tracker);
++	release_firmware(module_fw->fw_update.fw);
++	kfree(module_fw);
 +}
 +
-+/* See section 9.7.10 "CMD 0109h: Run Firmware Image" in CMIS standard
-+ * revision 5.2.
-+ * struct cmis_cdb_run_fw_image_pl is a structured layout of the flat
-+ * array, ethtool_cmis_cdb_request::payload.
-+ */
-+struct cmis_cdb_run_fw_image_pl {
-+	u8 resv1;
-+	u8 image_to_run;
-+	u16 delay_to_reset;
-+};
++#define MODULE_EEPROM_PHYS_ID_PAGE	0
++#define MODULE_EEPROM_PHYS_ID_I2C_ADDR	0x50
 +
-+static int
-+cmis_fw_update_run_image(struct ethtool_cmis_cdb *cdb, struct net_device *dev,
-+			 struct ethnl_module_fw_flash_ntf_params *ntf_params)
++static int module_flash_fw_work_init(struct ethtool_module_fw_flash *module_fw,
++				     struct net_device *dev,
++				     struct netlink_ext_ack *extack)
 +{
-+	struct ethtool_cmis_cdb_cmd_args args = {};
-+	struct cmis_cdb_run_fw_image_pl pl = {0};
++	const struct ethtool_ops *ops = dev->ethtool_ops;
++	struct ethtool_module_eeprom page_data = {};
++	u8 phys_id;
 +	int err;
 +
-+	ethtool_cmis_cdb_compose_args(&args, ETHTOOL_CMIS_CDB_CMD_RUN_FW_IMAGE,
-+				      (u8 *)&pl, sizeof(pl),
-+				      cdb->max_completion_time,
-+				      cdb->read_write_len_ext, 1000, 0,
-+				      CDB_F_MODULE_STATE_VALID);
++	/* Fetch the SFF-8024 Identifier Value. For all supported standards, it
++	 * is located at I2C address 0x50, byte 0. See section 4.1 in SFF-8024,
++	 * revision 4.9.
++	 */
++	page_data.page = MODULE_EEPROM_PHYS_ID_PAGE;
++	page_data.offset = SFP_PHYS_ID;
++	page_data.length = sizeof(phys_id);
++	page_data.i2c_address = MODULE_EEPROM_PHYS_ID_I2C_ADDR;
++	page_data.data = &phys_id;
 +
-+	err = ethtool_cmis_cdb_execute_cmd(dev, &args);
-+	if (err < 0) {
-+		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
-+					      "Run image command failed",
-+					      args.err_msg);
++	err = ops->get_module_eeprom_by_page(dev, &page_data, extack);
++	if (err < 0)
 +		return err;
++
++	switch (phys_id) {
++	case SFF8024_ID_QSFP_DD:
++	case SFF8024_ID_OSFP:
++	case SFF8024_ID_DSFP:
++	case SFF8024_ID_QSFP_PLUS_CMIS:
++	case SFF8024_ID_SFP_DD_CMIS:
++	case SFF8024_ID_SFP_PLUS_CMIS:
++		INIT_WORK(&module_fw->work, module_flash_fw_work);
++		break;
++	default:
++		NL_SET_ERR_MSG(extack,
++			       "Module type does not support firmware flashing");
++		return -EOPNOTSUPP;
 +	}
 +
-+	err = cmis_fw_update_wait_for_module_state(dev, args.flags);
-+	if (err < 0)
-+		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
-+					      "Module is not ready on time after reset",
-+					      NULL);
++	return 0;
++}
 +
-+	return err;
++void ethnl_module_fw_flash_sock_destroy(struct ethnl_sock_priv *sk_priv)
++{
++	struct ethtool_module_fw_flash *work;
++
++	spin_lock(&module_fw_flash_work_list_lock);
++	list_for_each_entry(work, &module_fw_flash_work_list, list) {
++		if (work->fw_update.dev == sk_priv->dev &&
++		    work->fw_update.ntf_params.portid == sk_priv->portid) {
++			work->fw_update.ntf_params.closed_sock = true;
++			break;
++		}
++	}
++	spin_unlock(&module_fw_flash_work_list_lock);
 +}
 +
 +static int
-+cmis_fw_update_commit_image(struct ethtool_cmis_cdb *cdb,
-+			    struct net_device *dev,
-+			    struct ethnl_module_fw_flash_ntf_params *ntf_params)
++module_flash_fw_schedule(struct net_device *dev, const char *file_name,
++			 struct ethtool_module_fw_flash_params *params,
++			 struct sk_buff *skb, struct genl_info *info)
 +{
-+	struct ethtool_cmis_cdb_cmd_args args = {};
++	struct ethtool_cmis_fw_update_params *fw_update;
++	struct ethtool_module_fw_flash *module_fw;
 +	int err;
 +
-+	ethtool_cmis_cdb_compose_args(&args,
-+				      ETHTOOL_CMIS_CDB_CMD_COMMIT_FW_IMAGE,
-+				      NULL, 0, cdb->max_completion_time,
-+				      cdb->read_write_len_ext, 1000, 0,
-+				      CDB_F_COMPLETION_VALID | CDB_F_STATUS_VALID);
++	module_fw = kzalloc(sizeof(*module_fw), GFP_KERNEL);
++	if (!module_fw)
++		return -ENOMEM;
 +
-+	err = ethtool_cmis_cdb_execute_cmd(dev, &args);
++	fw_update = &module_fw->fw_update;
++	fw_update->params = *params;
++	err = request_firmware_direct(&fw_update->fw,
++				      file_name, &dev->dev);
++	if (err) {
++		NL_SET_ERR_MSG(info->extack,
++			       "Failed to request module firmware image");
++		goto err_free;
++	}
++
++	err = module_flash_fw_work_init(module_fw, dev, info->extack);
 +	if (err < 0)
-+		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
-+					      "Commit image command failed",
-+					      args.err_msg);
++		goto err_release_firmware;
 +
++	dev->module_fw_flash_in_progress = true;
++	netdev_hold(dev, &module_fw->dev_tracker, GFP_KERNEL);
++	fw_update->dev = dev;
++	fw_update->ntf_params.portid = info->snd_portid;
++	fw_update->ntf_params.seq = info->snd_seq;
++	fw_update->ntf_params.closed_sock = false;
++
++	err = ethnl_sock_priv_set(skb, dev, fw_update->ntf_params.portid,
++				  ETHTOOL_SOCK_TYPE_MODULE_FW_FLASH);
++	if (err < 0)
++		goto err_release_firmware;
++
++	err = module_flash_fw_work_list_add(module_fw, info);
++	if (err < 0)
++		goto err_release_firmware;
++
++	schedule_work(&module_fw->work);
++
++	return 0;
++
++err_release_firmware:
++	release_firmware(fw_update->fw);
++err_free:
++	kfree(module_fw);
 +	return err;
 +}
 +
-+static int cmis_fw_update_reset(struct net_device *dev)
++static int module_flash_fw(struct net_device *dev, struct nlattr **tb,
++			   struct sk_buff *skb, struct genl_info *info)
 +{
-+	__u32 reset_data = ETH_RESET_PHY;
++	struct ethtool_module_fw_flash_params params = {};
++	const char *file_name;
++	struct nlattr *attr;
 +
-+	return dev->ethtool_ops->reset(dev, &reset_data);
++	if (GENL_REQ_ATTR_CHECK(info, ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME))
++		return -EINVAL;
++
++	file_name = nla_data(tb[ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME]);
++
++	attr = tb[ETHTOOL_A_MODULE_FW_FLASH_PASSWORD];
++	if (attr) {
++		params.password = cpu_to_be32(nla_get_u32(attr));
++		params.password_valid = true;
++	}
++
++	return module_flash_fw_schedule(dev, file_name, &params, skb, info);
 +}
 +
-+void
-+ethtool_cmis_fw_update(struct ethtool_cmis_fw_update_params *fw_update)
++static int ethnl_module_fw_flash_validate(struct net_device *dev,
++					  struct netlink_ext_ack *extack)
 +{
-+	struct ethnl_module_fw_flash_ntf_params *ntf_params =
-+						&fw_update->ntf_params;
-+	struct cmis_fw_update_fw_mng_features fw_mng = {0};
-+	struct net_device *dev = fw_update->dev;
-+	struct ethtool_cmis_cdb *cdb;
-+	int err;
++	struct devlink_port *devlink_port = dev->devlink_port;
++	const struct ethtool_ops *ops = dev->ethtool_ops;
 +
-+	cdb = ethtool_cmis_cdb_init(dev, &fw_update->params, ntf_params);
-+	if (IS_ERR(cdb))
-+		goto err_send_ntf;
++	if (!ops->set_module_eeprom_by_page ||
++	    !ops->get_module_eeprom_by_page) {
++		NL_SET_ERR_MSG(extack,
++			       "Flashing module firmware is not supported by this device");
++		return -EOPNOTSUPP;
++	}
 +
-+	ethnl_module_fw_flash_ntf_start(dev, ntf_params);
++	if (!ops->reset) {
++		NL_SET_ERR_MSG(extack,
++			       "Reset module is not supported by this device, so flashing is not permitted");
++		return -EOPNOTSUPP;
++	}
 +
-+	err = cmis_fw_update_fw_mng_features_get(cdb, dev, &fw_mng, ntf_params);
-+	if (err < 0)
-+		goto err_cdb_fini;
++	if (dev->module_fw_flash_in_progress) {
++		NL_SET_ERR_MSG(extack, "Module firmware flashing already in progress");
++		return -EBUSY;
++	}
 +
-+	err = cmis_fw_update_download_image(cdb, fw_update, &fw_mng);
-+	if (err < 0)
-+		goto err_cdb_fini;
++	if (dev->flags & IFF_UP) {
++		NL_SET_ERR_MSG(extack, "Netdevice is up, so flashing is not permitted");
++		return -EBUSY;
++	}
 +
-+	err = cmis_fw_update_run_image(cdb, dev, ntf_params);
-+	if (err < 0)
-+		goto err_cdb_fini;
++	if (devlink_port && devlink_port->attrs.split) {
++		NL_SET_ERR_MSG(extack, "Can't perform firmware flashing on a split port");
++		return -EOPNOTSUPP;
++	}
 +
-+	/* The CDB command "Run Firmware Image" resets the firmware, so the new
-+	 * one might have different settings.
-+	 * Free the old CDB instance, and init a new one.
-+	 */
-+	ethtool_cmis_cdb_fini(cdb);
-+
-+	cdb = ethtool_cmis_cdb_init(dev, &fw_update->params, ntf_params);
-+	if (IS_ERR(cdb))
-+		goto err_send_ntf;
-+
-+	err = cmis_fw_update_commit_image(cdb, dev, ntf_params);
-+	if (err < 0)
-+		goto err_cdb_fini;
-+
-+	err = cmis_fw_update_reset(dev);
-+	if (err < 0)
-+		goto err_cdb_fini;
-+
-+	ethnl_module_fw_flash_ntf_complete(dev, ntf_params);
-+	ethtool_cmis_cdb_fini(cdb);
-+	return;
-+
-+err_cdb_fini:
-+	ethtool_cmis_cdb_fini(cdb);
-+err_send_ntf:
-+	ethnl_module_fw_flash_ntf_err(dev, ntf_params, NULL, NULL);
++	return 0;
 +}
++
++int ethnl_act_module_fw_flash(struct sk_buff *skb, struct genl_info *info)
++{
++	struct ethnl_req_info req_info = {};
++	struct nlattr **tb = info->attrs;
++	struct net_device *dev;
++	int ret;
++
++	ret = ethnl_parse_header_dev_get(&req_info,
++					 tb[ETHTOOL_A_MODULE_FW_FLASH_HEADER],
++					 genl_info_net(info), info->extack,
++					 true);
++	if (ret < 0)
++		return ret;
++	dev = req_info.dev;
++
++	rtnl_lock();
++	ret = ethnl_ops_begin(dev);
++	if (ret < 0)
++		goto out_rtnl;
++
++	ret = ethnl_module_fw_flash_validate(dev, info->extack);
++	if (ret < 0)
++		goto out_rtnl;
++
++	ret = module_flash_fw(dev, tb, skb, info);
++
++	ethnl_ops_complete(dev);
++
++out_rtnl:
++	rtnl_unlock();
++	ethnl_parse_header_dev_put(&req_info);
++	return ret;
++}
++
+ /* MODULE_FW_FLASH_NTF */
+ 
+ static int
 diff --git a/net/ethtool/module_fw.h b/net/ethtool/module_fw.h
-index 6c86d05ab6cf..d0fc2529b60e 100644
+index d0fc2529b60e..634543a12d0c 100644
 --- a/net/ethtool/module_fw.h
 +++ b/net/ethtool/module_fw.h
-@@ -25,6 +25,35 @@ struct ethtool_module_fw_flash_params {
- 	u8 password_valid:1;
+@@ -1,6 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0-only */
+ 
+ #include <uapi/linux/ethtool.h>
++#include "netlink.h"
+ 
+ /**
+  * struct ethnl_module_fw_flash_ntf_params - module firmware flashing
+@@ -54,6 +55,8 @@ struct ethtool_module_fw_flash {
+ 	struct ethtool_cmis_fw_update_params fw_update;
  };
  
-+/**
-+ * struct ethtool_cmis_fw_update_params - CMIS firmware update specific
-+ *						parameters
-+ * @dev: Pointer to the net_device to be flashed.
-+ * @params: Module firmware flashing parameters.
-+ * @ntf_params: Module firmware flashing notification parameters.
-+ * @fw: Firmware to flash.
-+ */
-+struct ethtool_cmis_fw_update_params {
-+	struct net_device *dev;
-+	struct ethtool_module_fw_flash_params params;
-+	struct ethnl_module_fw_flash_ntf_params ntf_params;
-+	const struct firmware *fw;
-+};
-+
-+/**
-+ * struct ethtool_module_fw_flash - module firmware flashing
-+ * @list: List node for &module_fw_flash_work_list.
-+ * @dev_tracker: Refcount tracker for @dev.
-+ * @work: The flashing firmware work.
-+ * @fw_update: CMIS firmware update specific parameters.
-+ */
-+struct ethtool_module_fw_flash {
-+	struct list_head list;
-+	netdevice_tracker dev_tracker;
-+	struct work_struct work;
-+	struct ethtool_cmis_fw_update_params fw_update;
-+};
++void ethnl_module_fw_flash_sock_destroy(struct ethnl_sock_priv *sk_priv);
 +
  void
  ethnl_module_fw_flash_ntf_err(struct net_device *dev,
  			      struct ethnl_module_fw_flash_ntf_params *params,
-@@ -39,3 +68,5 @@ void
- ethnl_module_fw_flash_ntf_in_progress(struct net_device *dev,
- 				      struct ethnl_module_fw_flash_ntf_params *params,
- 				      u64 done, u64 total);
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index a5907bbde427..81fe2e5b95f6 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -4,6 +4,7 @@
+ #include <linux/ethtool_netlink.h>
+ #include <linux/pm_runtime.h>
+ #include "netlink.h"
++#include "module_fw.h"
+ 
+ static struct genl_family ethtool_genl_family;
+ 
+@@ -30,6 +31,35 @@ const struct nla_policy ethnl_header_policy_stats[] = {
+ 							  ETHTOOL_FLAGS_STATS),
+ };
+ 
++int ethnl_sock_priv_set(struct sk_buff *skb, struct net_device *dev, u32 portid,
++			enum ethnl_sock_type type)
++{
++	struct ethnl_sock_priv *sk_priv;
 +
-+void ethtool_cmis_fw_update(struct ethtool_cmis_fw_update_params *params);
++	sk_priv = genl_sk_priv_get(&ethtool_genl_family, NETLINK_CB(skb).sk);
++	if (IS_ERR(sk_priv))
++		return PTR_ERR(sk_priv);
++
++	sk_priv->dev = dev;
++	sk_priv->portid = portid;
++	sk_priv->type = type;
++
++	return 0;
++}
++
++static void ethnl_sock_priv_destroy(void *priv)
++{
++	struct ethnl_sock_priv *sk_priv = priv;
++
++	switch (sk_priv->type) {
++	case ETHTOOL_SOCK_TYPE_MODULE_FW_FLASH:
++		ethnl_module_fw_flash_sock_destroy(sk_priv);
++		break;
++	default:
++		break;
++	}
++}
++
+ int ethnl_ops_begin(struct net_device *dev)
+ {
+ 	int ret;
+@@ -1142,6 +1172,13 @@ static const struct genl_ops ethtool_genl_ops[] = {
+ 		.policy = ethnl_mm_set_policy,
+ 		.maxattr = ARRAY_SIZE(ethnl_mm_set_policy) - 1,
+ 	},
++	{
++		.cmd	= ETHTOOL_MSG_MODULE_FW_FLASH_ACT,
++		.flags	= GENL_UNS_ADMIN_PERM,
++		.doit	= ethnl_act_module_fw_flash,
++		.policy	= ethnl_module_fw_flash_act_policy,
++		.maxattr = ARRAY_SIZE(ethnl_module_fw_flash_act_policy) - 1,
++	},
+ };
+ 
+ static const struct genl_multicast_group ethtool_nl_mcgrps[] = {
+@@ -1158,6 +1195,8 @@ static struct genl_family ethtool_genl_family __ro_after_init = {
+ 	.resv_start_op	= ETHTOOL_MSG_MODULE_GET + 1,
+ 	.mcgrps		= ethtool_nl_mcgrps,
+ 	.n_mcgrps	= ARRAY_SIZE(ethtool_nl_mcgrps),
++	.sock_priv_size		= sizeof(struct ethnl_sock_priv),
++	.sock_priv_destroy	= ethnl_sock_priv_destroy,
+ };
+ 
+ /* module setup */
+diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
+index 5e6c6a7b7adc..46ec273a87c5 100644
+--- a/net/ethtool/netlink.h
++++ b/net/ethtool/netlink.h
+@@ -284,6 +284,19 @@ struct ethnl_reply_data {
+ int ethnl_ops_begin(struct net_device *dev);
+ void ethnl_ops_complete(struct net_device *dev);
+ 
++enum ethnl_sock_type {
++	ETHTOOL_SOCK_TYPE_MODULE_FW_FLASH,
++};
++
++struct ethnl_sock_priv {
++	struct net_device *dev;
++	u32 portid;
++	enum ethnl_sock_type type;
++};
++
++int ethnl_sock_priv_set(struct sk_buff *skb, struct net_device *dev, u32 portid,
++			enum ethnl_sock_type type);
++
+ /**
+  * struct ethnl_request_ops - unified handling of GET and SET requests
+  * @request_cmd:      command id for request (GET)
+@@ -442,6 +455,7 @@ extern const struct nla_policy ethnl_plca_set_cfg_policy[ETHTOOL_A_PLCA_MAX + 1]
+ extern const struct nla_policy ethnl_plca_get_status_policy[ETHTOOL_A_PLCA_HEADER + 1];
+ extern const struct nla_policy ethnl_mm_get_policy[ETHTOOL_A_MM_HEADER + 1];
+ extern const struct nla_policy ethnl_mm_set_policy[ETHTOOL_A_MM_MAX + 1];
++extern const struct nla_policy ethnl_module_fw_flash_act_policy[ETHTOOL_A_MODULE_FW_FLASH_PASSWORD + 1];
+ 
+ int ethnl_set_features(struct sk_buff *skb, struct genl_info *info);
+ int ethnl_act_cable_test(struct sk_buff *skb, struct genl_info *info);
+@@ -449,6 +463,7 @@ int ethnl_act_cable_test_tdr(struct sk_buff *skb, struct genl_info *info);
+ int ethnl_tunnel_info_doit(struct sk_buff *skb, struct genl_info *info);
+ int ethnl_tunnel_info_start(struct netlink_callback *cb);
+ int ethnl_tunnel_info_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
++int ethnl_act_module_fw_flash(struct sk_buff *skb, struct genl_info *info);
+ 
+ extern const char stats_std_names[__ETHTOOL_STATS_CNT][ETH_GSTRING_LEN];
+ extern const char stats_eth_phy_names[__ETHTOOL_A_STATS_ETH_PHY_CNT][ETH_GSTRING_LEN];
 -- 
 2.45.0
 
