@@ -1,236 +1,122 @@
-Return-Path: <netdev+bounces-106177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B798A9150B9
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 16:48:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 204D391505F
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 16:44:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 331A21F24348
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 14:48:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C55A21F217D3
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 14:44:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A61819E7DE;
-	Mon, 24 Jun 2024 14:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A325D19AD9D;
+	Mon, 24 Jun 2024 14:43:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HcVdYVLo"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D8A19DF7B
-	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 14:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242F312FF84
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 14:43:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719240352; cv=none; b=VJVeSf4G6CYyUMldbyNuBdthmqc2HXR4mC5GW5iKiffZrVL+00uRyUg9TvStEGIUt7/ySD+E8akRI5Zumyhwc/5+b40a6OaL4kyXBz5CX6+xmHjmXVzaqULgoW1AI4pdKZGkz+xJeNeZu71kVnpoGyHuWzSEZtpn5rXPwnVSHWo=
+	t=1719240235; cv=none; b=l5U7JPtiJDbijOE7Z7m41zCLfk3Pe0/TozrHL5jpaIZ1c35OcVLTZd18yF8i5/dcLMT2/vzdw6mFy8IJcfiDPOM2019nKEiyJWl9k9IXIXtC8NMPO7zn8v9DgrL1aj5FauX5l5uSB0oMjkdRZBVxzbnNn0URN40xubzhzESIQk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719240352; c=relaxed/simple;
-	bh=xLCNUDu40aLCYUBXXMUH9tJ5hNEyfwbDsv7k7YO+29E=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qextbsjvtolLp8olGYR7I3kYgw3w6ssasii79vJowxKZLffPybvjZPZxKOF1TMxNNC5Ak0FbmDD2TvKnyLKArr/DTLhWPT6HyRXJJnBdMJRvK16acZApHUsT+dDR0DtpxS6GKKo9+R5ffi5zrrCDhMzW3J38cwr0O0BSfkVS2rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sLkx1-00030X-RJ
-	for netdev@vger.kernel.org; Mon, 24 Jun 2024 16:45:47 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sLkwy-004fqk-Th
-	for netdev@vger.kernel.org; Mon, 24 Jun 2024 16:45:44 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 8DFDE2F1A8F
-	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 14:45:44 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 7F4792F1A12;
-	Mon, 24 Jun 2024 14:45:38 +0000 (UTC)
-Received: from [192.168.178.131] (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id f1d79382;
-	Mon, 24 Jun 2024 14:45:37 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-Date: Mon, 24 Jun 2024 16:45:13 +0200
-Subject: [PATCH v3 9/9] can: mcp251xfd: tef: update workaround for erratum
- DS80000789E 6 of mcp2518fd
+	s=arc-20240116; t=1719240235; c=relaxed/simple;
+	bh=gckpsvZo1hpmuZZTaF5mdtc3rJrEAJ/Uaxexu9VVlQU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UrOFi6oMbqitNcy8elgDr+K3miQZbKrtzPrUe5kyjHOXTPqozmb4Jch9x0zrD7KNaJVIShK5I2/Ye0hXHMpt3KXiKIEfg1RN9PDQcKbSJSQq5epSFEYKcf1kTPgnurVXcdHapaGMY0exZ/USlozDPfB2CHNuOitl6k6ecFdojWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HcVdYVLo; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719240234; x=1750776234;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gckpsvZo1hpmuZZTaF5mdtc3rJrEAJ/Uaxexu9VVlQU=;
+  b=HcVdYVLokcqDnN5eayMotBU7f7sEHDRSUseAAxnUDrKZ+Ko9KJRRcvVN
+   OmvfjZ5RzALsJO43bMjd5oMpCxgTgwgdh9r8lvAGiLmEH9K5g9n2mh59e
+   FHU7t+lFqXMeVWAYk9sQ4DE3YUE5VWCDc9rMWb8HWSKV8Wvp3u+P21NK8
+   NLD94LpuzCvCkLG7hhTUGXHgsplq0pt4fQDKzRzKbQ7OwBLmyiEn8Lmr9
+   qIn1O6+hV/M4CSxrY9bdoKtJ7pdLSVL8cxXYGEqBtisXTxXK1fnqS1YY0
+   9fCCPnuW97RrrMasNB23lSU5eURIKN8NeHkHrkTcCRMgvfGVH7Apjrtjr
+   Q==;
+X-CSE-ConnectionGUID: eNEa1p7xSi2KMF6WxkSOLg==
+X-CSE-MsgGUID: dx4QnRp1RUKJqVG6pT9LPQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11113"; a="16040461"
+X-IronPort-AV: E=Sophos;i="6.08,262,1712646000"; 
+   d="scan'208";a="16040461"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2024 07:43:53 -0700
+X-CSE-ConnectionGUID: VTlOlLroTR6v1fCDzLg7Uw==
+X-CSE-MsgGUID: PDAMYMA2SNWP4X8C4XcaSQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,262,1712646000"; 
+   d="scan'208";a="44022036"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa008.jf.intel.com with ESMTP; 24 Jun 2024 07:43:52 -0700
+Received: from mystra-4.igk.intel.com (mystra-4.igk.intel.com [10.123.220.40])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 9DDDB27BB0;
+	Mon, 24 Jun 2024 15:43:39 +0100 (IST)
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	michal.swiatkowski@linux.intel.com,
+	przemyslaw.kitszel@intel.com,
+	aleksander.lobakin@intel.com,
+	Marcin Szycik <marcin.szycik@linux.intel.com>
+Subject: [PATCH iwl-next v2 0/7] Switch API optimizations
+Date: Mon, 24 Jun 2024 16:45:23 +0200
+Message-ID: <20240624144530.690545-1-marcin.szycik@linux.intel.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20240624-mcp251xfd-workaround-erratum-6-v3-9-caf7e5f27f60@pengutronix.de>
-References: <20240624-mcp251xfd-workaround-erratum-6-v3-0-caf7e5f27f60@pengutronix.de>
-In-Reply-To: <20240624-mcp251xfd-workaround-erratum-6-v3-0-caf7e5f27f60@pengutronix.de>
-To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Manivannan Sadhasivam <mani@kernel.org>, 
- Thomas Kopp <thomas.kopp@microchip.com>, 
- =?utf-8?q?Stefan_Alth=C3=B6fer?= <Stefan.Althoefer@janztec.com>, 
- kernel@pengutronix.de, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>
-X-Mailer: b4 0.15-dev-13183
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5274; i=mkl@pengutronix.de;
- h=from:subject:message-id; bh=xLCNUDu40aLCYUBXXMUH9tJ5hNEyfwbDsv7k7YO+29E=;
- b=owEBbQGS/pANAwAKASg4oj56LbxvAcsmYgBmeYaP3y5supn8zqp69efl0JrQmRQk/Fmc5LnL6
- N9UB9KAr3iJATMEAAEKAB0WIQRQQLqG4LYE3Sm8Pl8oOKI+ei28bwUCZnmGjwAKCRAoOKI+ei28
- b6xiB/wIYEL3bAcqMfubvzhFoJXKC6fsS4Phf2P1rVa7FaW/ETUdZ4xHk2llJet1UBnEFeweFGv
- Zt+4kJMTGspntzHnKPoeDwXJ1raqhRGNnKkdXVaWBPAmfY9MM+1rNsS8pw39qTVfAAmiGxNSDRU
- vq/qP6zQtGjzjci7asncxjdzsr19YTLWYSA1H8GGY5rKEzh6j0S7b9wX8XQWXxriQlThYyubEAL
- fbqRJD97LaaLymYvZN5h8PYZzXL29N8lZjN03svJjXUYkyV8Nu1km93fVM+aRV90fme6xuhZNoY
- JgJJD3t7ZF/eFWpTwcMUr005JiZrNCFXHAZrtDpqvWs8Tnzs
-X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
- fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-This patch updates the workaround for a problem similar to erratum
-DS80000789E 6 of the mcp2518fd, the other variants of the chip
-family (mcp2517fd and mcp251863) are probably also affected.
+Optimize the process of creating a recipe in the switch block by removing
+duplicate switch ID words and changing how result indexes are fitted into
+recipes. In many cases this can decrease the number of recipes required to
+add a certain set of rules, potentially allowing a more varied set of rules
+to be created. Total rule count will also increase, since less words will
+be left unused/wasted. There are only 64 rules available in total, so every
+one counts.
 
-Erratum DS80000789E 6 says "reading of the FIFOCI bits in the FIFOSTA
-register for an RX FIFO may be corrupted". However observation shows
-that this problem is not limited to RX FIFOs but also effects the TEF
-FIFO.
+After this modification, many fields and some structs became unused or were
+simplified, resulting in overall simpler implementation.
 
-In the bad case, the driver reads a too large head index. As the FIFO
-is implemented as a ring buffer, this results in re-handling old CAN
-transmit complete events.
+Marcin Szycik (4):
+  ice: Remove unused struct ice_prot_lkup_ext members
+  ice: Optimize switch recipe creation
+  ice: Remove unused members from switch API
+  ice: Add tracepoint for adding and removing switch rules
 
-Every transmit complete event contains with a sequence number that
-equals to the sequence number of the corresponding TX request. This
-way old TX complete events can be detected.
+Michal Swiatkowski (3):
+  ice: Remove reading all recipes before adding a new one
+  ice: Simplify bitmap setting in adding recipe
+  ice: remove unused recipe bookkeeping data
 
-If the original driver detects a non matching sequence number, it
-prints an info message and tries again later. As wrong sequence
-numbers can be explained by the erratum DS80000789E 6, demote the info
-message to debug level, streamline the code and update the comments.
+ drivers/net/ethernet/intel/ice/ice_common.c   |  11 +-
+ .../ethernet/intel/ice/ice_protocol_type.h    |  43 +-
+ drivers/net/ethernet/intel/ice/ice_switch.c   | 674 ++++++------------
+ drivers/net/ethernet/intel/ice/ice_switch.h   |  20 +-
+ drivers/net/ethernet/intel/ice/ice_trace.h    |  18 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   2 +
+ 6 files changed, 272 insertions(+), 496 deletions(-)
 
-Keep the behavior: If an old CAN TX complete event is detected, abort
-the iteration and mark the number of valid CAN TX complete events as
-processed in the chip by incrementing the FIFO's tail index.
-
-Cc: Stefan Althöfer <Stefan.Althoefer@janztec.com>
-Cc: Thomas Kopp <thomas.kopp@microchip.com>
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c | 71 ++++++++++-----------------
- 1 file changed, 27 insertions(+), 44 deletions(-)
+v2:
+* Nicify checking sizeof struct field
+* Add a tracepoint for tracking recipe/rule utilization (patch 7)
+v1: [1]
 
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c
-index f5f05e7baef2..2c92e127cef8 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c
-@@ -60,56 +60,39 @@ static int mcp251xfd_check_tef_tail(const struct mcp251xfd_priv *priv)
- 	return 0;
- }
- 
--static int
--mcp251xfd_handle_tefif_recover(const struct mcp251xfd_priv *priv, const u32 seq)
--{
--	const struct mcp251xfd_tx_ring *tx_ring = priv->tx;
--	u32 tef_sta;
--	int err;
--
--	err = regmap_read(priv->map_reg, MCP251XFD_REG_TEFSTA, &tef_sta);
--	if (err)
--		return err;
--
--	if (tef_sta & MCP251XFD_REG_TEFSTA_TEFOVIF) {
--		netdev_err(priv->ndev,
--			   "Transmit Event FIFO buffer overflow.\n");
--		return -ENOBUFS;
--	}
--
--	netdev_info(priv->ndev,
--		    "Transmit Event FIFO buffer %s. (seq=0x%08x, tef_tail=0x%08x, tef_head=0x%08x, tx_head=0x%08x).\n",
--		    tef_sta & MCP251XFD_REG_TEFSTA_TEFFIF ?
--		    "full" : tef_sta & MCP251XFD_REG_TEFSTA_TEFNEIF ?
--		    "not empty" : "empty",
--		    seq, priv->tef->tail, priv->tef->head, tx_ring->head);
--
--	/* The Sequence Number in the TEF doesn't match our tef_tail. */
--	return -EAGAIN;
--}
--
- static int
- mcp251xfd_handle_tefif_one(struct mcp251xfd_priv *priv,
- 			   const struct mcp251xfd_hw_tef_obj *hw_tef_obj,
- 			   unsigned int *frame_len_ptr)
- {
- 	struct net_device_stats *stats = &priv->ndev->stats;
-+	u32 seq, tef_tail_masked, tef_tail;
- 	struct sk_buff *skb;
--	u32 seq, seq_masked, tef_tail_masked, tef_tail;
- 
--	seq = FIELD_GET(MCP251XFD_OBJ_FLAGS_SEQ_MCP2518FD_MASK,
-+	 /* Use the MCP2517FD mask on the MCP2518FD, too. We only
-+	  * compare 7 bits, this is enough to detect old TEF objects.
-+	  */
-+	seq = FIELD_GET(MCP251XFD_OBJ_FLAGS_SEQ_MCP2517FD_MASK,
- 			hw_tef_obj->flags);
--
--	/* Use the MCP2517FD mask on the MCP2518FD, too. We only
--	 * compare 7 bits, this should be enough to detect
--	 * net-yet-completed, i.e. old TEF objects.
--	 */
--	seq_masked = seq &
--		field_mask(MCP251XFD_OBJ_FLAGS_SEQ_MCP2517FD_MASK);
- 	tef_tail_masked = priv->tef->tail &
- 		field_mask(MCP251XFD_OBJ_FLAGS_SEQ_MCP2517FD_MASK);
--	if (seq_masked != tef_tail_masked)
--		return mcp251xfd_handle_tefif_recover(priv, seq);
-+
-+	/* According to mcp2518fd erratum DS80000789E 6. the FIFOCI
-+	 * bits of a FIFOSTA register, here the TX FIFO tail index
-+	 * might be corrupted and we might process past the TEF FIFO's
-+	 * head into old CAN frames.
-+	 *
-+	 * Compare the sequence number of the currently processed CAN
-+	 * frame with the expected sequence number. Abort with
-+	 * -EBADMSG if an old CAN frame is detected.
-+	 */
-+	if (seq != tef_tail_masked) {
-+		netdev_dbg(priv->ndev, "%s: chip=0x%02x ring=0x%02x\n", __func__,
-+			   seq, tef_tail_masked);
-+		stats->tx_fifo_errors++;
-+
-+		return -EBADMSG;
-+	}
- 
- 	tef_tail = mcp251xfd_get_tef_tail(priv);
- 	skb = priv->can.echo_skb[tef_tail];
-@@ -219,12 +202,12 @@ int mcp251xfd_handle_tefif(struct mcp251xfd_priv *priv)
- 		unsigned int frame_len = 0;
- 
- 		err = mcp251xfd_handle_tefif_one(priv, &hw_tef_obj[i], &frame_len);
--		/* -EAGAIN means the Sequence Number in the TEF
--		 * doesn't match our tef_tail. This can happen if we
--		 * read the TEF objects too early. Leave loop let the
--		 * interrupt handler call us again.
-+		/* -EBADMSG means we're affected by mcp2518fd erratum
-+		 * DS80000789E 6., i.e. the Sequence Number in the TEF
-+		 * doesn't match our tef_tail. Don't process any
-+		 * further and mark processed frames as good.
- 		 */
--		if (err == -EAGAIN)
-+		if (err == -EBADMSG)
- 			goto out_netif_wake_queue;
- 		if (err)
- 			return err;
-
+[1] https://lore.kernel.org/intel-wired-lan/20240618141157.1881093-1-marcin.szycik@linux.intel.com/T/#t
 -- 
-2.43.0
-
+2.45.0
 
 
