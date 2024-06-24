@@ -1,196 +1,118 @@
-Return-Path: <netdev+bounces-106098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EBBE91491C
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:47:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FA78914917
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:46:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD5591F24C2F
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 11:47:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD4641F24542
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 11:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E300A13AA45;
-	Mon, 24 Jun 2024 11:47:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01623137C20;
+	Mon, 24 Jun 2024 11:46:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="UkKXE/DE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XF8W2srD"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381C3137764;
-	Mon, 24 Jun 2024 11:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816E413B294
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 11:46:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719229638; cv=none; b=AjpqP8jdl9UaKrX/Xl2BYp+TTGAiCdnCrLYq+/d3pTw7VEQnJs/FN+gIRTDLf3X7dtwZCcx09Vy1TzT5K2EvCyOIfqrdpOT+e6d08sPd8REJk5aUAhdMtP+0K7Ao2qfx8qiMefZU71UMKQPM30aYPb51u4DAf8uBEVsQNVdRkjA=
+	t=1719229600; cv=none; b=Du/5UoxqDdZ5MxNhWHF/nOGeZPnkgCnhKSVJBt3UtI/9oMOog5cifRBDR1rjE5GW4N7SLYjb9NtAV8QiOtAvhJgStFhCWBsGEYj91K99MA27YeOzLw8XmZo5OC1o2yYuJUud5mZSDTVUyhBi1FtjPUh70RJYwFW4i0oKp+b7gVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719229638; c=relaxed/simple;
-	bh=UXyhWmWqUF+A3EaGggTlBQHpsHmlB1hyBFiOougSmO4=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=d2GdVAN0KjcnFU8t17hQq6G2T2P7EoCUW8kif9kf1XRnEHS7bxxYc2FKyjp+2Jo5bGNAky4zoQHrl6YKbyTQgEr68i+EfAiWEitjL52t4Ehvcmxmj2ibQAaz8U22sid70G2buXMPYGHIRPeulrfUjBqARLtaBshUJChAYf9YWH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=UkKXE/DE; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1719229636; x=1750765636;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=UXyhWmWqUF+A3EaGggTlBQHpsHmlB1hyBFiOougSmO4=;
-  b=UkKXE/DE/crjlsLj0CZaj0K+GXnF3MZzHoCS/fBEdjVZAGOA/UEkfU9E
-   hUMoYh5pDxPFqklCjAnNGF8016fw3j7sKmCBWqsdhIkkbeHOONfy39KQs
-   MBPidYc+OVdqNGn0FC6CVARF70bQ4FaGYXuxuOwlzrkcwVC5cHQNcfNVn
-   W1XsKaAaTHHO260ylmjTLfEKp0RzIdzvthjQufPo63FHgr5UWMeipdI5C
-   TnvuSuPwomZpvFwn9zfjV3Uhl8A58WsAA0tC61dIEvSTvJ/Y8ZHlNWmmW
-   D0Kz3dL1kc3iOt0Y1uj+N/2VnxuoIFXcLbVpi9GL90xzk08d2h5tJte4o
-   Q==;
-X-CSE-ConnectionGUID: t0mypC8PTS6ZgrJ8E5DXQg==
-X-CSE-MsgGUID: RXLnRG+kTIWW+V7yloWFmg==
-X-IronPort-AV: E=Sophos;i="6.08,261,1712646000"; 
-   d="scan'208";a="28416866"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Jun 2024 04:47:14 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 24 Jun 2024 04:46:34 -0700
-Received: from DEN-DL-M31857.microsemi.net (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 24 Jun 2024 04:46:28 -0700
-Message-ID: <e85511af9db9de024b5065eeee77108be474f71e.camel@microchip.com>
-Subject: Re: [PATCH v2 18/19] mfd: Add support for LAN966x PCI device
-From: Steen Hegelund <steen.hegelund@microchip.com>
-To: Bjorn Helgaas <helgaas@kernel.org>, Andy Shevchenko
-	<andy.shevchenko@gmail.com>
-CC: Herve Codina <herve.codina@bootlin.com>, Simon Horman <horms@kernel.org>,
-	Sai Krishna Gajula <saikrishnag@marvell.com>, Thomas Gleixner
-	<tglx@linutronix.de>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lee Jones
-	<lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, <UNGLinuxDriver@microchip.com>, Andrew Lunn
-	<andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
-	<linux@armlinux.org.uk>, Saravana Kannan <saravanak@google.com>, "Bjorn
- Helgaas" <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>, "Lars
- Povlsen" <lars.povlsen@microchip.com>, Daniel Machon
-	<daniel.machon@microchip.com>, Alexandre Belloni
-	<alexandre.belloni@bootlin.com>, <linux-kernel@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-pci@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>, "Allan
- Nielsen" <allan.nielsen@microchip.com>, Luca Ceresoli
-	<luca.ceresoli@bootlin.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Date: Mon, 24 Jun 2024 13:46:32 +0200
-In-Reply-To: <20240621184923.GA1398370@bhelgaas>
-References: <20240621184923.GA1398370@bhelgaas>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1719229600; c=relaxed/simple;
+	bh=HTx8wnE3U2h8tlMymsm1WhTMmhSC4PbjI9XPYkCp9p4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Aa9ISTpo99r+lMlpcHZxAn+tsDjeU+ZMUB23ZnyfxpmnU9TWh3tNz82tMmhkvit/H4ydOjkTiqd5MEQcu/TrPgqFElVMq0G/Q9fj4Vnb756rVHJcH81UhCCQ7hSlViBQ3bucSJUR7jPAuUu7CqxjtKfXX26wawxcF+jeHlg41pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XF8W2srD; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719229598;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HTx8wnE3U2h8tlMymsm1WhTMmhSC4PbjI9XPYkCp9p4=;
+	b=XF8W2srDTYC70w+5AWT0JA8B08v7kYwqTjrngatBCyLrMpIg4WBH7HP+TgSv6IcpBjhblI
+	STHgbJQ4sx2uxmK5nZBGtPOoXb4RTCurI/ED526hOB0iXPAtGP1XWxYu65bQZ7PFjFPaFu
+	XSIpFeIauuQxibuhUIJ9icYNU9s0DEQ=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-695-KCAqWXKVPT2-hBIOeWsW7g-1; Mon, 24 Jun 2024 07:46:37 -0400
+X-MC-Unique: KCAqWXKVPT2-hBIOeWsW7g-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ec4efbbb7aso17336341fa.2
+        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 04:46:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719229595; x=1719834395;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HTx8wnE3U2h8tlMymsm1WhTMmhSC4PbjI9XPYkCp9p4=;
+        b=FRGKik0zBBFhBOCJCrJqbuo9wonJvE2cZ3lh0tit8bFIT/oM2WLMqyezHLCsYvwVVY
+         75fUVh+ECZs82YXGrCQK2j1gA4HoLRcLfJWkTbH540i+QJXkywCmmbr2uS+bhQWEJlpj
+         juQ/3MRR+/jhjH/a9nLL9oFnYVGSSVMrGrHrrq8ux2qSC6dOaZn+zad8hkPANdXTLpHQ
+         irjEKtKbv2jRHuotTcIrV4ylH+pzWDdOZok1RFby6P9fyUTs3lTsQ3qKbn6tmCt/+Q3q
+         tcBsp3qeA5HyLOROO8uz58fspS1doLZpmPil/BlMRnX/VwdRXa8XTWJidIRtCI40KSUd
+         5rSA==
+X-Forwarded-Encrypted: i=1; AJvYcCX6188QyQElXChhajky/Ipel2owovEd/agQl7FCXdQDzeGfdc8Dkvc67xU7uUYzOvV38ryngQiki+xZ9GyM6HWTefb+3fL2
+X-Gm-Message-State: AOJu0YwBY1YOkPWzPpMz5CDYc9BqTZWiszI2n4evdfK7eJL6xxodp/7h
+	k//Emv0Ly2EfW28mZcUsr+ZpJ0ZHacoCI0Sa+Dju5DHA7vMMBq8jytDKhTRbJuGr414eQ89oTIC
+	3BpUZJ5Hm4Pk2MfOTaQ9dQ03viPDfbOQ8pKrmkhJgOuqCdJBnFkkEqg==
+X-Received: by 2002:a2e:a17a:0:b0:2ec:4093:ec7 with SMTP id 38308e7fff4ca-2ec5b2e7238mr34003821fa.30.1719229595631;
+        Mon, 24 Jun 2024 04:46:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFJt/VG/AsIrl2IZ1SfnuzF+4i4QpAF4U0KYG5A/8dV/MMwb3a/AvJp8gx45wxoVrlyma0x1w==
+X-Received: by 2002:a2e:a17a:0:b0:2ec:4093:ec7 with SMTP id 38308e7fff4ca-2ec5b2e7238mr34003671fa.30.1719229595277;
+        Mon, 24 Jun 2024 04:46:35 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a725e9bd392sm40061266b.23.2024.06.24.04.46.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jun 2024 04:46:34 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id EC475138620D; Mon, 24 Jun 2024 13:46:33 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Samuel Dobron <sdobron@redhat.com>, Daniel Borkmann
+ <daniel@iogearbox.net>, hawk@kernel.org
+Cc: Sebastiano Miano <mianosebastiano@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: XDP Performance Regression in recent kernel versions
+In-Reply-To: <CA+h3auMq5vnoyRLvJainG-AFA6f=ivRmu6RjKU4cBv_go975tw@mail.gmail.com>
+References: <CAMENy5pb8ea+piKLg5q5yRTMZacQqYWAoVLE1FE9WhQPq92E0g@mail.gmail.com>
+ <5b64c89f-4127-4e8f-b795-3cec8e7350b4@kernel.org> <87wmmkn3mq.fsf@toke.dk>
+ <ff571dcf-0375-6684-b188-5c1278cd50ce@iogearbox.net>
+ <CA+h3auMq5vnoyRLvJainG-AFA6f=ivRmu6RjKU4cBv_go975tw@mail.gmail.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Mon, 24 Jun 2024 13:46:33 +0200
+Message-ID: <87ed8mftra.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
 
-Hi Bjorn,
+Samuel Dobron <sdobron@redhat.com> writes:
 
-I am not sure what went wrong here.
+>> It looks like this is known since March, was this ever reported to Nvidia back
+>> then? :/
+>
+> Not sure if that's a question for me, I was told, filling an issue in
+> Bugzilla/Jira is where
+> our competences end. Who is supposed to report it to them?
 
-I have seen that lspci lists 'Microchip / SMSC' for the 0x1055 Vendor
-ID value and as mentioned previously there has been a number of
-aquicisions over the years, so that the ID has been absorbed but not
-necessarily re-registered.
+I don't think we have a formal reporting procedure, but I was planning
+to send this to the list, referencing the Bugzilla entry. Seems I
+dropped the ball on that; sorry! :(
 
-Anyway I have started an investigation, so we can determine what
-up/down in this.
+Can we set up a better reporting procedure for this going forward? A
+mailing list, or just a name we can put in reports? Or something else?
+Tariq, any preferences?
 
-I agree that for now this will have to be PCI_VENDOR_ID_EFAR, and I
-will return with an update as soon as I know more.
-
-Best Regards
-Steen
-
-On Fri, 2024-06-21 at 13:49 -0500, Bjorn Helgaas wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you
-> know the content is safe
->=20
-> On Fri, Jun 21, 2024 at 05:45:05PM +0200, Andy Shevchenko wrote:
-> > On Thu, Jun 20, 2024 at 7:19=E2=80=AFPM Herve Codina
-> > <herve.codina@bootlin.com> wrote:
-> > > On Thu, 20 Jun 2024 18:43:09 +0200
-> > > Herve Codina <herve.codina@bootlin.com> wrote:
-> > > > On Thu, 20 Jun 2024 18:07:16 +0200
-> > > > Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
-> > > > > On Thu, Jun 20, 2024 at 5:56=E2=80=AFPM Herve Codina
-> > > > > <herve.codina@bootlin.com> wrote:
-> > > > > > On Wed, 5 Jun 2024 23:24:43 +0300
-> > > > > > Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
-> > > > > > > Mon, May 27, 2024 at 06:14:45PM +0200, Herve Codina
-> > > > > > > kirjoitti:
->=20
-> > > > > > > > +static struct pci_device_id lan966x_pci_ids[] =3D {
-> > > > > > > > +=C2=A0=C2=A0 { PCI_DEVICE(0x1055, 0x9660) },
-> > > > > > >=20
-> > > > > > > Don't you have VENDOR_ID defined somewhere?
-> > > > > >=20
-> > > > > > No and 0x1055 is taken by PCI_VENDOR_ID_EFAR in pci-ids.h
-> > > > > > but SMSC acquired EFAR late 1990's and MCHP acquired SMSC
-> > > > > > in 2012
-> > > > > > https://elixir.bootlin.com/linux/latest/source/drivers/net/ethe=
-rnet/microchip/lan743x_main.h#L851
-> > > > > >=20
-> > > > > > I will patch pci-ids.h to create:
-> > > > > > =C2=A0 #define PCI_VENDOR_ID_SMSC PCI_VENDOR_ID_EFAR
-> > > > > > =C2=A0 #define PCI_VENDOR_ID_MCHP PCI_VENDOR_ID_SMSC
-> > > > > > As part of this patch, I will update lan743x_main.h to
-> > > > > > remove its own #define
-> > > > > >=20
-> > > > > > And use PCI_VENDOR_ID_MCHP in this series.
-> > > > >=20
-> > > > > Okay, but I don't think (but I haven't checked) we have
-> > > > > something like
-> > > > > this ever done there. In any case it's up to Bjorn how to
-> > > > > implement
-> > > > > this.
-> > >=20
-> > > Right, I wait for Bjorn reply before changing anything.
-> >=20
-> > But we already have the vendor ID with the same value. Even if the
-> > company was acquired, the old ID still may be used. In that case an
-> > update on PCI IDs can go in a separate change justifying it. In any
-> > case, I would really want to hear from Bjorn on this and if nothing
-> > happens, to use the existing vendor ID for now to speed up the
-> > series
-> > to be reviewed/processed.
->=20
-> We have "#define PCI_VENDOR_ID_EFAR 0x1055" in pci_ids.h, but
-> https://pcisig.com/membership/member-companies?combine=3D1055=C2=A0shows =
-no
-> results, so it *looks* like EFAR/SMSC/MCHP are currently squatting on
-> that ID without it being officially assigned.
->=20
-> I think MCHP needs to register 0x1055 with the PCI-SIG
-> (administration@pcisig.com) if it wants to continue using it.
-> The vendor is responsible for managing the Device ID space, so this
-> registration includes the burden of tracking all the Device IDs that
-> were assigned by EFAR and SMSC and now MCHP so there are no
-> conflicts.
->=20
-> I don't want to change the existing PCI_VENDOR_ID_EFAR, and I also
-> don't want to add a PCI_VENDOR_ID_MCHP for 0x1055 until that ID has
-> been registered with the PCI-SIG.
->=20
-> So I propose that you use PCI_VENDOR_ID_EFAR for now, and if/when
-> MCHP
-> registers 0x1055 with PCI-SIG so it is unambiguously owned by MCHP,
-> we
-> can add "#define PCI_VENDOR_ID_MCHP PCI_VENDOR_ID_EFAR" or similar.
-> As Andy points out, this would be a separate logical change in its
-> own
-> patch.
->=20
-> Bjorn
+-Toke
 
 
