@@ -1,149 +1,104 @@
-Return-Path: <netdev+bounces-106256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE11F9158B7
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 23:19:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E220915921
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 23:37:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBFF41C22ABE
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 21:19:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 032AA1F24171
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 21:37:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1DAD1A08CC;
-	Mon, 24 Jun 2024 21:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 068911A0AE8;
+	Mon, 24 Jun 2024 21:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="neTbh1IP"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="hilBePT8"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDA513D633
-	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 21:19:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513171A0AE6
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 21:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719263952; cv=none; b=P6VTDzo7Jnqu2/GB8M5+1xHpUooJp6j++r9eNAiNI0YNfjPinnJlCKLrmqvElvZhitw5Fw1ZJmZa7L7/KlQV4z0oRKyF8P4tPF+BBLtucpGfpNZuZ2ApBq2LyqgjTsSniiF1KGidWBx5EN0f/SSq/2FA1P877RkJ4gstjLJ5i/k=
+	t=1719265061; cv=none; b=uNLMaeMqS7xQIMj6aoXq5jPG1YKyLZf87l12/gyiOE4C9XcSgipmwzfwozeO62iER5QGMATQJaZ0HnJv9q+ZrrurBuJXsZEg3UCQAYXUGzFQMzV6OV+7EfEdT8YCEQPi5Y+jGM4nYSLZGGPHsmsPBxEzV50cRzHH098sj4Fweyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719263952; c=relaxed/simple;
-	bh=xn5Qihs7t7zWujdcg40cseZpnq9TY7P4nerxneGcaHs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kphRXtywkom9p08WYN/pmGQ2Absbj0MP9xCAwiiqWPMbk7ZrfWQ5iIPvmSZwCPXUaxgg1ugkjcTIMD1hytF2msVxVD9SgKjv6vMYRu+QPBNk3JE6Lyig9uTH+C7sdzXX5Iuic9zklM2nBmMytFWmTXGPeubnSGQIGrg6PHY4AE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=neTbh1IP; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id D3BCC2C0372;
-	Tue, 25 Jun 2024 09:19:00 +1200 (NZST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1719263940;
-	bh=sAZ4MdXH+h/nieLep2o7unhilYOwx9E3ZFeLERPASYE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=neTbh1IPTgIvBOYmvWBxHw9DKrpSox4my7sJ0vmhDgvtdU5SvdH84kCR3gZS/+N/o
-	 H2d9NN+zpiTuaouCeDmqW/SKcQPbh6VJxypE3NoAJVmBkVOCSI7wXTXLhEqf+hCi89
-	 BoorX7IJOaV96yE2SkWbFBkRSusyR+YPUKefxRkEqh3dumJJh1qtzaprS5jVPN4ny5
-	 lPQiIJRwk4yf0LDdv4JlLS/qS4a48OE4/lds+dcB+rtlFvVrJtt1BEyAJ7kuwmGnAb
-	 xkRIUEFgu0m24Vq7v9v0kTQoWlmJRA8e3dPX/6n5XOOXfrb3aSH2nTBz5VHZHB0L1k
-	 khkcC5We3KAwA==
-Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B6679e2c40000>; Tue, 25 Jun 2024 09:19:00 +1200
-Received: from chrisp-dl.ws.atlnz.lc (chrisp-dl.ws.atlnz.lc [10.33.22.30])
-	by pat.atlnz.lc (Postfix) with ESMTP id 9634713ED5B;
-	Tue, 25 Jun 2024 09:19:00 +1200 (NZST)
-Received: by chrisp-dl.ws.atlnz.lc (Postfix, from userid 1030)
-	id 9027B280ADD; Tue, 25 Jun 2024 09:19:00 +1200 (NZST)
-From: Chris Packham <chris.packham@alliedtelesis.co.nz>
-To: andrew@lunn.ch,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Chris Packham <chris.packham@alliedtelesis.co.nz>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	=?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: [PATCH v2] dt-bindings: net: dsa: mediatek,mt7530: Minor wording fixes
-Date: Tue, 25 Jun 2024 09:18:57 +1200
-Message-ID: <20240624211858.1990601-1-chris.packham@alliedtelesis.co.nz>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1719265061; c=relaxed/simple;
+	bh=FW7T6PMFn4ywvR/rtVoyuYFWTcaMPvvtOmX4HG3VKrM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hlw+LNvE4Y7xnCrFGy7TF2VW8pT141H75YBY9zspcXiDPI3L4dbGXyUfNarmu8bFnyfoO2cbCKUpN5xBOWunUhyiaqHQl/7qnwfD+c0cOp+H7mA2Ty0IK7j8LaKxCBimAxDmHx1sW0yPgzg4cLENyGKHXdv9wwb5uhZpIzUf/iA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=hilBePT8; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-42108856c33so34505465e9.1
+        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 14:37:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1719265059; x=1719869859; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=fcCb9JJmvsk4sWgE3oZNXFPa6PXHyluDbi5m6og7FZA=;
+        b=hilBePT8kmi5ypetZ20zzx7C0m2DfFqyMkWa9n8jcQN1huy5HWq6Z1QJACNm5T5yGA
+         fp/r0TQR2aG7E60n4SfA0T2YQBgHtGND+CTJgcjecMjw5dyo399e40Z1971cEvQZwnxt
+         fuFfiutPXbAsihuX0uMcrqYqzpws2Hjd0ovx/1PwqCTiqb0UYKjDy7f22S5w/mw5dRvy
+         D7ijOR34+P6W36n/hIFZ4sJbS5oIeNTAEMwVLF8WSVlgoJgj9y9bv2lPHVUJCmNrK6r2
+         V8Ih/js04rAqK3yOUkfHQZ/He9NUHCgR0q/SMyhe665ZGJWen9tAjmAbFv3kuoW3ylF6
+         XW1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719265059; x=1719869859;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fcCb9JJmvsk4sWgE3oZNXFPa6PXHyluDbi5m6og7FZA=;
+        b=cCtG/I8XUopEoOnUm7R2KDaAIeYWhTk1jMBBtss7tZOdrmmjG3eUIjrYFk3iyZpFCH
+         6mMQuJLC+aGKpTs2ACRnN2cio9KvBOZwVhLtyYE9Zz7HW1XMdwiBXPAj7/mdnykO2uW8
+         0YRsyGG1PlSpMkA5xcY6biX9bA9Hu11LvEo9tEnyJdqpyms+M6DCHUUK3MWYfUUM0AM5
+         PhODzGj+EMHNGyEtUZwc7qbYmXoJNOlKLueVB08zZ8gJPKXzzCBRb8QouNn/tSGbDdkP
+         02yDgJFXY0dY0TzJVVJ8V+TIifjeDFBv6u3Mon6ONtm/5+oCi5aXwR8+d0QTlZkXI4Wt
+         aHLw==
+X-Forwarded-Encrypted: i=1; AJvYcCXGf7LPV3N+HHwmZk/LpgPiHxUMMuTkkvBzeRGJVYi+g8EhM9DLJWjgNqctlBBih+TJJOcakFT5EI3OeBbTPSZsxQQQd7E7
+X-Gm-Message-State: AOJu0YzQETQzCaUMgKL3GERWvz0yJrDe/+ScLZ4p3w7Ai2nIE9CBPU0Z
+	IR92sX5XRXrHNVLrdtuRYf554OElwg5uypPn803P6FXz3iYhI2TNMzQ0D9m3C9o=
+X-Google-Smtp-Source: AGHT+IGaZxbWTiVdlucmCc1Rm016TjkXIPZYNAujjXwc3ll8ZzaGl49Az5sMXirS8+gmDAlV+raPkg==
+X-Received: by 2002:a05:600c:35c6:b0:421:b65d:2235 with SMTP id 5b1f17b1804b1-424895707c9mr68401565e9.0.1719265058649;
+        Mon, 24 Jun 2024 14:37:38 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:7b60:57c1:c75e:3561? ([2a01:e0a:b41:c160:7b60:57c1:c75e:3561])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4249b557c42sm1785215e9.1.2024.06.24.14.37.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Jun 2024 14:37:38 -0700 (PDT)
+Message-ID: <d4a3ac6c-3a4e-47e3-95ee-ce01be88f13b@6wind.com>
+Date: Mon, 24 Jun 2024 23:37:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=CvQccW4D c=1 sm=1 tr=0 ts=6679e2c4 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=T1WGqf2p2xoA:10 a=Mc0CNVgLlbBwIVVfR90A:9 a=3ZKOabzyN94A:10
-X-SEG-SpamProfiler-Score: 0
-x-atlnz-ls: pat
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net 0/4] vrf: fix source address selection with route leak
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
+References: <20240624130859.953608-1-nicolas.dichtel@6wind.com>
+ <20240624133039.5b0eb17c@kernel.org>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <20240624133039.5b0eb17c@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Update the mt7530 binding with some minor updates that make the document
-easier to read.
-
-Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
----
-
-Notes:
-    I was referring to this dt binding and found a couple of places where
-    the wording could be improved. I'm not exactly a techical writer but
-    hopefully I've made things a bit better.
-   =20
-    Changes in v2:
-    - Update title, this is not just fixing grammar
-    - Add missing The instead of changing has to have
-
- .../devicetree/bindings/net/dsa/mediatek,mt7530.yaml        | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.ya=
-ml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-index 1c2444121e60..7e405ad96eb2 100644
---- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-@@ -22,16 +22,16 @@ description: |
-=20
-   The MT7988 SoC comes with a built-in switch similar to MT7531 as well =
-as four
-   Gigabit Ethernet PHYs. The switch registers are directly mapped into t=
-he SoC's
--  memory map rather than using MDIO. The switch got an internally connec=
-ted 10G
-+  memory map rather than using MDIO. The switch has an internally connec=
-ted 10G
-   CPU port and 4 user ports connected to the built-in Gigabit Ethernet P=
-HYs.
-=20
--  MT7530 in MT7620AN, MT7620DA, MT7620DAN and MT7620NN SoCs has got 10/1=
-00 PHYs
-+  The MT7530 in MT7620AN, MT7620DA, MT7620DAN and MT7620NN SoCs has 10/1=
-00 PHYs
-   and the switch registers are directly mapped into SoC's memory map rat=
-her than
-   using MDIO. The DSA driver currently doesn't support MT7620 variants.
-=20
-   There is only the standalone version of MT7531.
-=20
--  Port 5 on MT7530 has got various ways of configuration:
-+  Port 5 on MT7530 supports various configurations:
-=20
-     - Port 5 can be used as a CPU port.
-=20
---=20
-2.45.2
-
+Le 24/06/2024 à 22:30, Jakub Kicinski a écrit :
+> On Mon, 24 Jun 2024 15:07:52 +0200 Nicolas Dichtel wrote:
+>> For patch 1 and 2, I didn't find the exact commit that introduced this bug, but
+>> I suspect it has been here since the first version. I arbitrarily choose one.
+> 
+> I think this breaks fcnal:
+> 
+> https://netdev-3.bots.linux.dev/vmksft-net/results/654201/1-fcnal-test-sh/stdout
+Thanks, I will have a look.
 
