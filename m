@@ -1,194 +1,119 @@
-Return-Path: <netdev+bounces-106116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEDDC914E21
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:14:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 063D7914E59
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:25:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C1792810B8
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:14:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E38E1C2141F
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCCC813D61B;
-	Mon, 24 Jun 2024 13:14:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pBUDf713"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB3D13D893;
+	Mon, 24 Jun 2024 13:25:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from albert.telenet-ops.be (albert.telenet-ops.be [195.130.137.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95FA153389;
-	Mon, 24 Jun 2024 13:14:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BED13D889
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 13:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.137.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719234879; cv=none; b=QCCFILb1XHntt5Y3M2EnOPYM7GaSAjFkLmHi8C02j/I6sROOqM6Pk9oZWwB7cKz2Y3l6AzA4Bl4uBxehA1SN4HVPThDrzt0w+W64Xt1oCqoRsZn5bmbPTGAs11b3qhtdQLPQUWa/oO9IFV/+Wfm7UpYpVLuvDpMQqKAtIn18BkY=
+	t=1719235541; cv=none; b=gw+uppwkIhknrItsnlY7EIsYIYqRIFYWXJha3W6xL+rbq/hhrf4Yaia7zWqC7HAdud8EDaFVunh2oUK4QamRRtt2it9/lYywAvmj7TTrUfsMKtP0bxO+2j1KN3ShUfgei3oOvRhfaw1LW5zE3gTopkRR1s+ngLpeS5jOXYq1SZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719234879; c=relaxed/simple;
-	bh=hWNaWrPpdbV9TanGy2wQEruPknSvEpTLlJ+o+tyefZU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j5rxt2FTT9wN09b5FMYnnpXaQinYqWSLOohEH+yoCv++X1PGQFOVJ8KzO4C+fZsSOLzhtG7iGi7XLd9fgb1BPKMTrzFzwyei13/fLwRWEgXh3KVSy/DYmTE5TxNB3A5PKfnZbvrj57k7Qq+J7aB26sEWzK1EHvcmDY7wwjZ2ZLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pBUDf713; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 882F3C2BBFC;
-	Mon, 24 Jun 2024 13:14:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719234879;
-	bh=hWNaWrPpdbV9TanGy2wQEruPknSvEpTLlJ+o+tyefZU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pBUDf713NrvwXOjtaM1kIwLqyIwrjLr3idjpOqTi3xh6pwmgH8Oss50pyG56XMqog
-	 nR1UcHmfbWaW8WhQ00U1drIzbawhPKoPgLTbA738vKQMbiCH7SD7e6qM7v4VoD7mKl
-	 ObRWeh2MaKsjJik6XP96U8fkodlTOJ0s6LHMe5WDObkp2u1XXTRoe1FXUHbohUHzrT
-	 lbuu+DWSdW7t26DgJRtHctEnoKKCmHqGc6cCjuNiaikuFgyMzC2St5/m6mKG5fz1IA
-	 cvfuPGT2/pw4dSMqyxbgaG985erbiR3jsYhyKId3HS9AgCaM9escQhBbWLRBI4oWqu
-	 XhREMtwMEwJiw==
-Date: Mon, 24 Jun 2024 15:14:35 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, nbd@nbd.name, lorenzo.bianconi83@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, conor@kernel.org,
-	linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, catalin.marinas@arm.com,
-	will@kernel.org, upstream@airoha.com,
-	angelogioacchino.delregno@collabora.com,
-	benjamin.larsson@genexis.eu, rkannoth@marvell.com,
-	sgoutham@marvell.com
-Subject: Re: [PATCH v3 net-next 2/2] net: airoha: Introduce ethernet support
- for EN7581 SoC
-Message-ID: <ZnlxO2yAxkkkejU-@lore-desk>
-References: <cover.1719159076.git.lorenzo@kernel.org>
- <89c9c226ddb31d9ff3d31231e8f532a3e983363a.1719159076.git.lorenzo@kernel.org>
- <2752c453-cabd-4ca0-833f-262b221de240@lunn.ch>
- <Zni13uFslHz5R6Ns@lore-desk>
- <e9ae143c-e72f-419b-b4da-2f603a4ccec0@lunn.ch>
+	s=arc-20240116; t=1719235541; c=relaxed/simple;
+	bh=2HA87VcKDxd4qJxS5VjLpvA+r34etIBEyZvCeg6nLtw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Vqun0Zv62VJ9mBCata2XpLBTAWRzSgUiJDhw2Iikf/jJKk6RHss6oKVQKLRg7qQhu33aOc2iyTcV77VrV+/56uJgGE1Pt3uwMF/SB3fO4TMy7l1LtRLKLxRkxBrHMKv6dOHNwt/rlVNl5SMgKYXjm7uWjv2SQkKz/qg1m3EP7fI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.137.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:d11f:2bfd:8d32:701a])
+	by albert.telenet-ops.be with bizsmtp
+	id fRRT2C00R4jBKfC06RRTCl; Mon, 24 Jun 2024 15:25:32 +0200
+Received: from rox.of.borg ([192.168.97.57])
+	by ramsan.of.borg with esmtp (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1sLjhF-000HSV-6r;
+	Mon, 24 Jun 2024 15:25:27 +0200
+Received: from geert by rox.of.borg with local (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1sLjhH-007u97-MX;
+	Mon, 24 Jun 2024 15:25:27 +0200
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Paul Barker <paul.barker.ct@bp.renesas.com>,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH net-next v2 0/2] ravb: Add MII support for R-Car V4M
+Date: Mon, 24 Jun 2024 15:25:23 +0200
+Message-Id: <cover.1719234830.git.geert+renesas@glider.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="gaFNliSXRBvSyy0T"
-Content-Disposition: inline
-In-Reply-To: <e9ae143c-e72f-419b-b4da-2f603a4ccec0@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+	Hi all,
 
---gaFNliSXRBvSyy0T
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+All EtherAVB instances on R-Car Gen3/Gen4 SoCs support the RGMII
+interface.  In addition, the first two EtherAVB instances on R-Car V4M
+also support the MII interface, but this is not yet supported by the
+driver.  This patch series adds support for MII on R-Car Gen4, after the
+customary cleanup.
 
-> > > > +static void airoha_fe_oq_rsv_init(struct airoha_eth *eth)
-> > > > +{
-> > > > +	int i;
-> > > > +
-> > > > +	/* hw misses PPE2 oq rsv */
-> > > > +	airoha_fe_set(eth, REG_FE_PSE_BUF_SET,
-> > > > +		      PSE_DEF_RSV_PAGE * PSE_PORT8_QUEUE);
-> > > > +
-> > > > +	for (i =3D 0; i < PSE_PORT0_QUEUE; i++)
-> > > > +		airoha_fe_set_pse_oq_rsv(eth, 0, i, 0x40);
-> > > > +	for (i =3D 0; i < PSE_PORT1_QUEUE; i++)
-> > > > +		airoha_fe_set_pse_oq_rsv(eth, 1, i, 0x40);
-> > > > +
-> > > > +	for (i =3D 6; i < PSE_PORT2_QUEUE; i++)
-> > > > +		airoha_fe_set_pse_oq_rsv(eth, 2, i, 0);
-> > > > +
-> > > > +	for (i =3D 0; i < PSE_PORT3_QUEUE; i++)
-> > > > +		airoha_fe_set_pse_oq_rsv(eth, 3, i, 0x40);
-> > >=20
-> > > Code like this is making me wounder about the split between MAC
-> > > driver, DSA driver and DSA tag driver. Or if it should actually be a
-> > > pure switchdev driver?
-> >=20
-> > airoha_eth driver implements just MAC features (FE and QDMA). Currently=
- we only
-> > support the connection to the DSA switch (GDM1). EN7581 SoC relies on m=
-t7530 driver
-> > for DSA (I have not posted the patch for mt7530 yet, I will do after ai=
-roha_eth
-> > ones).
-> >=20
-> > >=20
-> > > If there some open architecture documentation for this device?
-> > >=20
-> > > What are these ports about?
-> >=20
-> > airoha_fe_oq_rsv_init() (we can improve naming here :) is supposed to c=
-onfigure
-> > hw pre-allocated memory for each queue available in Packet Switching En=
-gine
-> > (PSE) ports. PSE ports are not switch ports, but SoC internal ports use=
-d to
-> > connect PSE to different modules. In particular, we are currently imple=
-menting
-> > just the two connections below:
-> > - CDM1 (port0) connects PSE to QDMA1
-> > - GDM1 (port1) connects PSE to MT7530 DSA switch
-> >=20
-> > In the future we will post support for GDM2, GDM3 and GDM4 ports that a=
-re
-> > connecting PSE to exteranl PHY modules.
->=20
-> I've not looked at the datasheet yet, but maybe add some ASCII art
-> diagram of the architecture in the commit message, or even a .rst file
-> somewhere under Documentation. It is hard to get the big picture
-> looking at just the code, and only the MAC driver without all the
-> other parts.
+Changes compared to v1[1]:
+  - New patch "ravb: Improve ravb_hw_info instance order",
+  - Add Reviewed-by,
+  - Rename ravb_emac_init_rcar_apsr() to ravb_emac_init_rcar_gen4(),
+  - Restrict MII support to R-Car Gen4 by adding a new ravb_hw_info
+    instance.
 
-ack, I will do my best :)
+The corresponding pin control support is available in [2].
 
->=20
-> > > > +static int airoha_dev_open(struct net_device *dev)
-> > > > +{
-> > > > +	struct airoha_eth *eth =3D netdev_priv(dev);
-> > > > +	int err;
-> > > > +
-> > > > +	if (netdev_uses_dsa(dev))
-> > > > +		airoha_fe_set(eth, REG_GDM1_INGRESS_CFG, GDM1_STAG_EN_MASK);
-> > > > +	else
-> > > > +		airoha_fe_clear(eth, REG_GDM1_INGRESS_CFG, GDM1_STAG_EN_MASK);
-> > >=20
-> > > Does that imply both instances of the GMAC are not connected to the
-> > > switch? Can one be used with a PHY?
-> >=20
-> > The check above is used to support configuration where MT7530 DSA switc=
-h module
-> > is not loaded (I tested this configuration removing the MT7530 DSA swit=
-ch from
-> > board dts and resetting the switch). Since for the moment we just suppo=
-rt GDM1
-> > port (PSE port connected to the switch) we can probably assume it is al=
-ways the
-> > case and remove this check. In the future we will need this configurati=
-on to support
-> > GDM2 or GDM3 (PSE port connected to external phy modules). Do you prefe=
-r to
-> > always set GDM1_STAG_EN_MASK for the moment?
->=20
-> If it will be needed, then keep it. But it is the sort of thing which
-> raises questions, so its good to explain it, either in the commit
-> message, or in the code.
+Compile-tested only, as all AVB interfaces on the Gray Hawk Single
+development board are connected to RGMII PHYs.
+No regressions on R-Car V4H.
 
-ack, I will add it in v4
+Thanks for your comments!
 
-Regards,
-Lorenzo
+[1] "[PATCH/RFC] net: ravb: Add MII support for R-Car V4M"
+    https://lore.kernel.org/f0ef3e00aec461beb33869ab69ccb44a23d78f51.1718378166.git.geert+renesas@glider.be
 
->=20
-> 	Andrew
+[2] "[PATCH/RFC] pinctrl: renesas: r8a779h0: Add AVB MII pins and groups"
+    https://lore.kernel.org/4a0a12227f2145ef53b18bc08f45b19dcd745fc6.1718378739.git.geert+renesas@glider.be/
 
---gaFNliSXRBvSyy0T
-Content-Type: application/pgp-signature; name="signature.asc"
+Geert Uytterhoeven (2):
+  ravb: Improve ravb_hw_info instance order
+  ravb: Add MII support for R-Car V4M
 
------BEGIN PGP SIGNATURE-----
+ drivers/net/ethernet/renesas/ravb.h      |  1 +
+ drivers/net/ethernet/renesas/ravb_main.c | 45 +++++++++++++++++++++---
+ 2 files changed, 41 insertions(+), 5 deletions(-)
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZnlxOwAKCRA6cBh0uS2t
-rLAcAP0TZ4SmPSOYdAipm/w/6nxNNN3oeqZPkNWcEiN3sorJOQD/Z2gU/LcXKBFE
-trXO0WHHjTAgVPPBiyOn0KB0uGbUbQI=
-=saWx
------END PGP SIGNATURE-----
+-- 
+2.34.1
 
---gaFNliSXRBvSyy0T--
+Gr{oetje,eeting}s,
+
+						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
 
