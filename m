@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-106222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BFD19155E6
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 19:53:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E8029155E9
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 19:54:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2910D1F25308
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:53:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7DE7288185
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5931A01D3;
-	Mon, 24 Jun 2024 17:53:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ABE21A0717;
+	Mon, 24 Jun 2024 17:53:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hJQZX1xQ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FHEzGx8i"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2041.outbound.protection.outlook.com [40.107.212.41])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2065.outbound.protection.outlook.com [40.107.220.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9191A01C4;
-	Mon, 24 Jun 2024 17:53:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837A01A00DE;
+	Mon, 24 Jun 2024 17:53:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.65
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719251583; cv=fail; b=aYppBUf3Ph+BaPC5sfEiCtk1PeVq9gB73jQZweCZjHky2Y9v+v7DKlbFydtIx/nBy3SE8GuOsemMn/wKdXGUzeEuP1Mlr0GM8zMtPjgOVGiZSD3yRFOP5PdANvRoUKKVU5GNwi9EKMMwxDg/ZUn4oSJyyFbB3gYQwVPsltjLpJg=
+	t=1719251589; cv=fail; b=ZKTonBpM7Dap1z1O/11xgRYnHtv/Ps1w5HY81+WrU0zLR36tx3Tt0WuIAMfK6GHdRZvf/MkToMGFSEiXYCtpP8myLkaCt8n8aOatmTbFSJV1wQoMEAmZh3872VgBbCJYjn8xb0jA80tl5Xh0yXe8uTCJ7A4YREhQ7jNFqQNnzPU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719251583; c=relaxed/simple;
-	bh=/9auGPgHc348Aag4gLWWS9stNitcDk8YzaKsBPsVq8U=;
+	s=arc-20240116; t=1719251589; c=relaxed/simple;
+	bh=5nSKT1Qm2EUIs2NwZcmQuktqRoJNT+6dfV4ueHXYZhc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hEfA0qXvQ3LRu66Y2Li/TmKv1FsBB4SfPNmc38dWUln297jvSDh9OnUDSKUfQgxrlpT7D4IhtcbLddXCgajT96urfvZCPUFzlpqHfYxpNnE8qDrd+wNRMLbeuYi7AlDU1jYEgUOenOFvG+C4pFNaqGFXqt3QdvCXuQ+L03Z7844=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hJQZX1xQ; arc=fail smtp.client-ip=40.107.212.41
+	 MIME-Version:Content-Type; b=O2XP98bhsKYJpCj3aF0enYFvuGXoSb70pGlckwqRGnxbaq6ep+zN/V07JnGz6LfEAIHPsT4jZN0B9rUTRRzI27kIhN0hLWtUMeWl6AGUFhJ4E1RWDWlyJiB1s4yiLLHH9jPxkPDnOuMHMHypf3EKcoQsPzhPi6JL54lCSrq4Dz4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FHEzGx8i; arc=fail smtp.client-ip=40.107.220.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YhIQk8fVKuxDn34l03Y16L/1iDElsLd8TZrAygIg9hn4dAjylIlOkNFWrNmVvAGR2Q9Ua6uY53BenIE6Hl7TjNiqjAUyHXGjQTOxZRy+W7mWim7Dd6qAG/bP0hScbzKgFYRyi7ygbiJHk5x1fhRn1ssHnQb1i6ps0+HY9rKvYkKak04DQGLeY/hG6cI2wfaqrEGIRHyjc9rcE8nvO1G4YUQtY0Mp1IIL6MptMOPeBzm2PoKPKMBqRf7gRKikiymYmCgMkVM5h3E0RRIbnaPTC7tieE5k/6b7hTcNkUf0q2XJXZIjbQNKuRsAKRX5ZT0xQF/Oy3ZyMCCOQxCrnDvnaA==
+ b=iXFWwUXBXjJWGdKx29VbDUMbjVMGC7Vlvh017hizAQbAdb2WhI3kHMiD/dvXTQ1344/BzX1Pcj69Djtl33XJ3FVqgG10z7v64K+LjSZEn0aw6UPlsbyU8r4NczKOSGCjwAAqoXJbEFIM3UuqfXfdex3vVzycqKuhVi5/gA2ibvubf7hH0PblLF8iJ8WoAf+IncFeuga8u4vcUB8tOZycuDQHzGW50Eg0ETtAzY4qsQRZIhUteDM4SCpR4Ix5UKwRCcQ4t/lyBPRW5mVyLUgDKoibpCZtti7fXf1wfoIxbzeh68ezFUU8fHgMffqofYhlFYLxIpnwFCAE62xcn/zwQA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=50crNkk2tUbJ26WNWwrar1INxg6W3LhnEN5u5oLgdIE=;
- b=cGagshBxfoZW6FIz9GwB2+ezfrJtY44cRVUZHOc0JEHPnTPYMMc4uJ7GT1LzFs3Q8k2lGwdXZ//AVbNE5/38ki5ZG/+/4uGtE54ZTmJPF1Q0iPCNnl317AmzqHoQJ09S5duJ8tILll+qJ9/0+yiFO/bl/iFMRz+uXZ2Yq1VJnZdGeI1o1rgAXeyAOTWk7gNW5j2f32K7e+v7p+sgr7FWnIH6opw2AEpCdgmjGw9fAtmQtNMvqrv9ozdmwTbiuOccYtxT/Qh8pKPeavqV8OPrU9GfZZ4NiSvGwNesg1NGKXeiiyIoi94p5jbB+arRtiX5VFIGqBbWvaPVWEAD145OeA==
+ bh=qFjiLfMyhNW3bgd3vvg0ZVOs/BYoBQTYyFObF9zZL4s=;
+ b=mxoy6QtuXHDxSLpqDlcmv4UNbdlHGNbDh9Kga4uFPUicL7xLcQL9qI0tocCKEQsm3OU3LlSsGhyhBQWEUFRes6MrywIoqaG9VEmHdHXNkglsXJA/LzX8KSlx+OQVHm9ggZpagtIZhxWyFHyXWfpuTNBdP56Vg/QAO4o98uD7EFwfcxebZYsR62tl09Tuq1oEigmUoxVCQ3cV2B9ZnPPfnOzTqqeaaZ5Wplf9l5I6CIfgppaoYhp3MyDn702zKN5Bad2Arvqz2z/Ic/OI5on5PY/00l+DfvkDc4c8OT+NP4M/7ObzAHRZGRxvEURmvOcLeN1dbSIfA59ZFIBqCDqKYg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,17 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=50crNkk2tUbJ26WNWwrar1INxg6W3LhnEN5u5oLgdIE=;
- b=hJQZX1xQy9qAzCpmPNR7Ktk319oJTMgKk2cUIIuxkafqgiN1vra5+Utk713QGjrqqjotcReVvcoz5oTnuj9fV1cc3VqvSJHe/df3pAcqblOxNazdU7x5lw8pgfdqGhk8wLihOn5NsizXCD80pCPP+p7vEloDPj+VZLcn0neiAwrGOQnmAR6ZnwQ8ilZsqlr0JcLCCoaUAzn7phwqJhuzV6vT34ogaKCFBHqhSDiIqzHkzvdykY47pfnnDQlRcJi4Vi8QxNQdzyrldYGi83n5Z7mXzIir+cqmEHrHppg5S72ktmHFw6cbeWgEFOFUs6nt4oPGfdLP/oFKuHnFlN8bLw==
-Received: from SJ0PR03CA0134.namprd03.prod.outlook.com (2603:10b6:a03:33c::19)
- by DS0PR12MB8367.namprd12.prod.outlook.com (2603:10b6:8:fd::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.30; Mon, 24 Jun
- 2024 17:52:55 +0000
-Received: from SJ5PEPF000001ED.namprd05.prod.outlook.com
- (2603:10b6:a03:33c:cafe::69) by SJ0PR03CA0134.outlook.office365.com
- (2603:10b6:a03:33c::19) with Microsoft SMTP Server (version=TLS1_2,
+ bh=qFjiLfMyhNW3bgd3vvg0ZVOs/BYoBQTYyFObF9zZL4s=;
+ b=FHEzGx8iYYYImlrMe1eJPA9jCr0IKNRPef5UTNSlw9SZtum5ye6hjtdd08ZYq67Qa2Pyd9VX7BNY2Fwc3g7qOp5zgDXMtJeKW+RDo4eE4zro2mw5SRnh9E6Si3P/95eo+XKqBuXIjn+rVnbVmk4RLrINh7ocztFlIgpd3BtVO30OpVFzF/bZLCo3a366R4ztLLI2Sm2LpbKukcVb+W/oPdurQRHl4/LWcuySgttSV9yamKB7xFRaXXuMDf/DNv0HX0g0UCj+Sj55fsWAQv6V3ZsPDQjXiwroTqTfpk/6gC6Wy4X958LhVClEqrXCPIkySy4XAwhkkT8Oq9vPxMeJ3A==
+Received: from PH0PR07CA0031.namprd07.prod.outlook.com (2603:10b6:510:e::6) by
+ CY5PR12MB9053.namprd12.prod.outlook.com (2603:10b6:930:37::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7698.21; Mon, 24 Jun 2024 17:53:00 +0000
+Received: from SJ5PEPF000001EC.namprd05.prod.outlook.com
+ (2603:10b6:510:e:cafe::cf) by PH0PR07CA0031.outlook.office365.com
+ (2603:10b6:510:e::6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.38 via Frontend
- Transport; Mon, 24 Jun 2024 17:52:55 +0000
+ Transport; Mon, 24 Jun 2024 17:53:00 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,17 +63,17 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- SJ5PEPF000001ED.mail.protection.outlook.com (10.167.242.201) with Microsoft
+ SJ5PEPF000001EC.mail.protection.outlook.com (10.167.242.200) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7677.15 via Frontend Transport; Mon, 24 Jun 2024 17:52:55 +0000
+ 15.20.7677.15 via Frontend Transport; Mon, 24 Jun 2024 17:53:00 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 24 Jun
- 2024 10:52:39 -0700
+ 2024 10:52:45 -0700
 Received: from dev-r-vrt-156.mtr.labs.mlnx (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 24 Jun 2024 10:52:33 -0700
+ 15.2.1544.4; Mon, 24 Jun 2024 10:52:39 -0700
 From: Danielle Ratson <danieller@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
@@ -86,9 +85,9 @@ CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<jiri@resnulli.us>, <linux-doc@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <mlxsw@nvidia.com>, <idosch@nvidia.com>,
 	<petrm@nvidia.com>, Danielle Ratson <danieller@nvidia.com>
-Subject: [PATCH net-next v7 3/9] ethtool: Add an interface for flashing transceiver modules' firmware
-Date: Mon, 24 Jun 2024 20:51:53 +0300
-Message-ID: <20240624175201.130522-4-danieller@nvidia.com>
+Subject: [PATCH net-next v7 4/9] ethtool: Add flashing transceiver modules' firmware notifications ability
+Date: Mon, 24 Jun 2024 20:51:54 +0300
+Message-ID: <20240624175201.130522-5-danieller@nvidia.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <20240624175201.130522-1-danieller@nvidia.com>
 References: <20240624175201.130522-1-danieller@nvidia.com>
@@ -98,362 +97,312 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001ED:EE_|DS0PR12MB8367:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9f8d15e7-f54b-4837-2958-08dc947679dc
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001EC:EE_|CY5PR12MB9053:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8df83e5f-94a8-49ef-1c05-08dc94767d17
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230037|36860700010|82310400023|7416011|376011|1800799021;
+	BCL:0;ARA:13230037|36860700010|7416011|376011|1800799021|82310400023;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ZSPB1WkyuwVn/S3EjwFn8daB93hvYAAzrnt22FSQCvLPa8gObR4JI5qUhO01?=
- =?us-ascii?Q?ePyPZty5+Da2pHUsLf9FzjCC6QAgrg/UkNJnw4x8P2P2sO+zUpmgomPs4F0T?=
- =?us-ascii?Q?k+NKWGSwQhioPM7BcvgzkEAA+MumP9XbcveS13oKJDTUwT77AOSh9+b902vE?=
- =?us-ascii?Q?90lS0V2N9hSpakm2/gJGBd6SOTXc9PBgRLRCC6+Yx+alY2eN6M+8lPFO1uHM?=
- =?us-ascii?Q?28YwjtU84niY+UlcHyaz+D7xymLMEWdk6vuuBV1WruqaHNSxOhZnXT6/buqc?=
- =?us-ascii?Q?+9emuTE0hj+g81FEn75XkYhUn4o57HuErUM/nbKKqb6WibJgDF28Cd9Lqm47?=
- =?us-ascii?Q?JbsXoCYppDrsfD/LOWB+cCQW/ilRko9KswPwAYaSqKUHCsdd5wx9r+lvngUd?=
- =?us-ascii?Q?V2W9N+7XMlHwWLa3Tl6NN6Qn4vZ1U8MtwIDGfcDN7wNGEHoqq9dEHIY7oNj/?=
- =?us-ascii?Q?qNsIlSEYI0pC+zm8g+/UwXBhrPpkdfyTT72OlryIqMiDCOpEZbpKo+V0g6m9?=
- =?us-ascii?Q?0K8GgX2aAsLLn1Ch+vnwcXi9dFhwLxBKlcJWhDVGPBR8pnvmVQ5nI/s0hIUP?=
- =?us-ascii?Q?UQ3wid8P5JEP876bpVhm5qbaFjeKJrfy27YZPvP4PVfBtKFLOBLTTuliCFKR?=
- =?us-ascii?Q?wOggEqpkhSARghLvMozG98UHIf0flJQcqr17PkYCAUvp+xZtyApAdU+3Dr8L?=
- =?us-ascii?Q?i3v3cuJUqG0EFWCSXvceH83TMJEqBC5JcIB4KsiY+X/1CNldXMqfyFY0H7/Y?=
- =?us-ascii?Q?8ftfR7eYY7C9S5d6eDbEHhDPxXigAHb7SRVEiDktkaWjWNrn3br5ybbHCye2?=
- =?us-ascii?Q?8esdEABJf6QW+Qxtcezyc/hzVMGWQWYhTQmVK68mG1q3A+I+zyDs7tgJNX/+?=
- =?us-ascii?Q?H1ORoWEJnsFMzI6HMTMUtlIFuoen5EkQaUa9ChqKo4rcpEGPZB6TvftTgPnT?=
- =?us-ascii?Q?2G+lhSXfJkVWqRu2viYgCzSW+hd2AfSSkvskbxT2gPi3ikJueiL7kj6MvkDB?=
- =?us-ascii?Q?+5xqPz4np4VPW3VZuXh2bo2Fy2OTbqZEMM0i+f76HljWuLoJYgQDXMfe+GXl?=
- =?us-ascii?Q?o+tl4j+lMzi3HA/LCFaKvcMQSB0Q87hq6shXLlgLyGgIHETC95+VcYrAfTmq?=
- =?us-ascii?Q?VefzAEzsnA0uJTJsTeOIaHJdpzgBvCt51ywT5kccYynciuKMDa2ig6gW+qkt?=
- =?us-ascii?Q?2Zd2NKt7TkZv/lQfDK2l32XVykVWYFS2zpFgJVuW9G3HI3KmzPBLnbWONYKa?=
- =?us-ascii?Q?pGjZEYwZbp+Shn3bGh1eUQ7PWVzCzWt6TuanUVyqDYRibmdcDuqgQfaHBDge?=
- =?us-ascii?Q?Nm323KV32KFSdGeHML9snpXzRrmjmLN1D+F4iMSaNWFcq7XYqakVTd/kL2Hd?=
- =?us-ascii?Q?tdAYn+5tdhRJC2fl30iUCOS0Gk7bnRvf0UmkyjYEdO9sv23RNA=3D=3D?=
+	=?utf-8?B?cllpeTFSRENlWERYWWxCbjFOWWJNWjJDTk1sejh5ekVhcGxUSnJMR2pYUWdJ?=
+ =?utf-8?B?d29JOTNPbmVrdjVLQUJRTjJjUTJXZzFJUXE2TzkvUlJXRE5lNUMxaFFXNDFj?=
+ =?utf-8?B?dTdJUUl5QjgwN256TnE5eVJxdG5lUUI4d2xwNDMyREJpKy9HRE9xS1RMVDJ1?=
+ =?utf-8?B?U0cwcU5KcFEvQzVDTTdBRzZTdEllR1pSZy8rUnFsd2IrdHVkYVYvcll2bHlU?=
+ =?utf-8?B?bkhaQklOaXY2RWFMaTNnbmpPUi9yMGZjWXdGcVo3L243VUdPSGZJUHczL3Qx?=
+ =?utf-8?B?aGhCdU5IOHdTUlREazBSOHhLMEsxNTRHYU8yNHVxQ1g2dkxoQVV4TGo3TWRq?=
+ =?utf-8?B?VDFwSTgrSTVSS1Z5amd4MzREUndxeDR6Y2JUSkNPOVQ2ZFRYUGRySlB4M1lx?=
+ =?utf-8?B?ZGVOZFlRZWs5VnF2NFhwL2ZFNE93UGlsREpSS3RjMDQvSDR6Q1ltQWMyTjJW?=
+ =?utf-8?B?cTE4WEJya1dVWHlxV2NVeDJRaURHUnp3MXJWbXhUdUx1T0ZiOVBQQnNLM0Vk?=
+ =?utf-8?B?cVluSXAvMllqUzYxendvSlZOMFI2THVhcStXa2EzVHlXNUhLZUV4cllTWGQx?=
+ =?utf-8?B?NG1HbWFaQWkxa1RjQXloUStab1FES0hTSDVmYUVFMTNROExuSVErVXdKNENR?=
+ =?utf-8?B?ekhHZXpjUWZodXNZWnl4NlNWWDRVNlk4TEQ4ZjJsVHlkS3hFRGp6YWR1bENk?=
+ =?utf-8?B?dlR0YkZzZGpnU21jRFdCNStyaTZUcC8zbmc4NDFVRDFQcjQ3SnNOSnByZUJk?=
+ =?utf-8?B?b2lWTEVibzRUQ2R5bnloY2pJR2U1UDBDVXpQQWtZUnBpKzM5UE5CRUlnU3lo?=
+ =?utf-8?B?V0h1ZlM4b3FSSW9DaWZ3QW5TM3p6aklubjBmeUVsUWtJdnpsZU1GYjdCemtI?=
+ =?utf-8?B?TCtFc3V0cGFsVHZaQWdXdUZyNGx3R0liSW1BcUlORWhBK0xyN2cxUEZkQXJn?=
+ =?utf-8?B?VEt3TVJlVlJNTkREeWhibjVYdGdycWpUdzFjRXUxTWVJaStsOHJWRVdtS0xC?=
+ =?utf-8?B?QXpMSmd5RWFKa2dTalpTVmtDclVKTExib2dQMTV5YzV5WkNyWEc4VnVFRWdO?=
+ =?utf-8?B?ZDgyMG13Q0t3aWpWUXJLa09RcVpIa25xNmRCY0FwYThCbmh6UnVtekxiSVg1?=
+ =?utf-8?B?THprSFRDYUc2OHFZcEpwVTVqYXZCUFFxcnpGcU1WYnJOT2F5b25xWGJvUUZS?=
+ =?utf-8?B?TGw4TkU0R2p0b2J3UEVMczFTNVJWQVlEdC80VTdCb0ZqMmZWbkFJcWY2aHhh?=
+ =?utf-8?B?d0lLWGIyd0V3c0lhSWlOdEgyWVBTdkVYM0l3aHVhWFJHOVZLNHRsempLSmUx?=
+ =?utf-8?B?UU1CMmg0bnJ4N1dXZlVkMDA4TDI0Y1pBNUpCeEl0WjlES0JNalNGb0Q1OWJR?=
+ =?utf-8?B?VkovdTd1UnVlNGhOZjlneWEyd1l4cDh0eXdIT3VhRTVUcWpLOGVCK0hjeit6?=
+ =?utf-8?B?aDZoMzMvQ2ZjR2RrU2dLRUdNaFV4a0x0b1hCS2tpSVI5Q2hoVVc4M3BMY2J3?=
+ =?utf-8?B?TUpkL3dGYmxpY2Jpck9pT3dneHZDK3J4d2NkMFlIejFtSEd6UTYvUVhMVU8z?=
+ =?utf-8?B?RHk2dFVLa2VQdHVGUGxvbGN4SXNFaHR6R3pwNjlzS2Zldlc2NjJ2OWZ1RDAy?=
+ =?utf-8?B?M0ZBdm1ndmNFVGZBNkF0SDNMNGljc09UdHV3a1JXTHR5QU5WQXFnWXFPREdN?=
+ =?utf-8?B?R04vVkpWVmZkWHVWUWxhV1RUcW1JV2hNa2hhNXFFMGs5dDBZd2hwSTBDVit2?=
+ =?utf-8?B?aDlucTUzTVhnOHhrVkUvWXJTQzdYUUtOdWF0VFZHSXA2Z3BFSUtjdVdiUE5l?=
+ =?utf-8?B?Q1BFR0wvMTNKc09ZZ1ZPWWo5N0NtNklGVXZsOHNEU2NqS3pNVENpTUc5NFFU?=
+ =?utf-8?B?ODc1MmpkZ05MUFdNZUMyaU91OVlPc280SHg1Z3B1KzEzNkE9PQ==?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230037)(36860700010)(82310400023)(7416011)(376011)(1800799021);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230037)(36860700010)(7416011)(376011)(1800799021)(82310400023);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2024 17:52:55.0041
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2024 17:53:00.4236
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f8d15e7-f54b-4837-2958-08dc947679dc
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8df83e5f-94a8-49ef-1c05-08dc94767d17
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001ED.namprd05.prod.outlook.com
+	SJ5PEPF000001EC.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8367
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB9053
 
-CMIS compliant modules such as QSFP-DD might be running a firmware that
-can be updated in a vendor-neutral way by exchanging messages between
-the host and the module as described in section 7.3.1 of revision 5.2 of
-the CMIS standard.
-
-Add a pair of new ethtool messages that allow:
-
-* User space to trigger firmware update of transceiver modules
-
-* The kernel to notify user space about the progress of the process
-
-The user interface is designed to be asynchronous in order to avoid
-RTNL being held for too long and to allow several modules to be
-updated simultaneously. The interface is designed with CMIS compliant
-modules in mind, but kept generic enough to accommodate future use
-cases, if these arise.
+Add progress notifications ability to user space while flashing modules'
+firmware by implementing the interface between the user space and the
+kernel.
 
 Signed-off-by: Danielle Ratson <danieller@nvidia.com>
 Reviewed-by: Petr Machata <petrm@nvidia.com>
 ---
 
 Notes:
+    v7:
+    	* Return -ENOMEM instead of PTR_ERR(attr) on
+    	  ethnl_module_fw_flash_ntf_put_err()ץ
+    
     v6:
-    	* Add paragraph in .rst file.
+    	* Reserve '1' more place on SKB for NUL terminator in the error
+    	  message string.
+    	* Add more prints on error flow, re-write the printing function
+    	  and add ethnl_module_fw_flash_ntf_put_err().
+    	* Change the communication method so notification will be sent
+    	  in unicast instead of multicast.
+    	* Add new 'struct ethnl_module_fw_flash_ntf_params' that holds
+    	  the relevant info for unicast communication and use it to send
+    	  notification to the specific socket.
+    	* s/nla_put_u64_64bit/nla_put_uint/
     
-    v5:
-    	* Modify tools/net/ynl/Makefile.deps so the ynl file will
-    	  include the ethtool.h changes.
-    	* u64>uint for 'total' and 'done' attrs.
-    	* Translate the enum from ethtool_netlink.h to YAML.
+    v2:
+    	* Increase err_msg length.
     
-    v4:
-    	* s/is composed from/consists of/.
+    v6:
+    	* Reserve '1' more place on SKB for NUL terminator in the error
+    	  message string.
+    	* Add more prints on error flow, re-write the printing function
+    	  and add ethnl_module_fw_flash_ntf_put_err().
+    	* Change the communication method so notification will be sent
+    	  in unicast instead of multicast.
+    	* Add new 'struct ethnl_module_fw_flash_ntf_params' that holds
+    	  the relevant info for unicast communication and use it to send
+    	  notification to the specific socket.
+    	* s/nla_put_u64_64bit/nla_put_uint/
+    
+    v2:
+    	* Increase err_msg length.
 
- Documentation/netlink/specs/ethtool.yaml     | 55 +++++++++++++++
- Documentation/networking/ethtool-netlink.rst | 70 ++++++++++++++++++++
- include/uapi/linux/ethtool.h                 | 18 +++++
- include/uapi/linux/ethtool_netlink.h         | 19 ++++++
- tools/net/ynl/Makefile.deps                  |  3 +-
- 5 files changed, 164 insertions(+), 1 deletion(-)
+ net/ethtool/module.c    | 117 ++++++++++++++++++++++++++++++++++++++++
+ net/ethtool/module_fw.h |  31 +++++++++++
+ net/ethtool/netlink.c   |   5 ++
+ net/ethtool/netlink.h   |   1 +
+ 4 files changed, 154 insertions(+)
+ create mode 100644 net/ethtool/module_fw.h
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 00dc61358be8..43c5f21e6096 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -20,6 +20,10 @@ definitions:
-     name: header-flags
-     type: flags
-     entries: [ compact-bitsets, omit-reply, stats ]
-+  -
-+    name: module-fw-flash-status
-+    type: enum
-+    entries: [ started, in_progress, completed, error ]
+diff --git a/net/ethtool/module.c b/net/ethtool/module.c
+index ceb575efc290..ba728b4a38a1 100644
+--- a/net/ethtool/module.c
++++ b/net/ethtool/module.c
+@@ -5,6 +5,7 @@
+ #include "netlink.h"
+ #include "common.h"
+ #include "bitset.h"
++#include "module_fw.h"
  
- attribute-sets:
-   -
-@@ -975,6 +979,32 @@ attribute-sets:
-       -
-         name: burst-tmr
-         type: u32
-+  -
-+    name: module-fw-flash
-+    attributes:
-+      -
-+        name: header
-+        type: nest
-+        nested-attributes: header
-+      -
-+        name: file-name
-+        type: string
-+      -
-+        name: password
-+        type: u32
-+      -
-+        name: status
-+        type: u32
-+        enum: module-fw-flash-status
-+      -
-+        name: status-msg
-+        type: string
-+      -
-+        name: done
-+        type: uint
-+      -
-+        name: total
-+        type: uint
- 
- operations:
-   enum-model: directional
-@@ -1730,3 +1760,28 @@ operations:
-       name: mm-ntf
-       doc: Notification for change in MAC Merge configuration.
-       notify: mm-get
-+    -
-+      name: module-fw-flash-act
-+      doc: Flash transceiver module firmware.
-+
-+      attribute-set: module-fw-flash
-+
-+      do:
-+        request:
-+          attributes:
-+            - header
-+            - file-name
-+            - password
-+    -
-+      name: module-fw-flash-ntf
-+      doc: Notification for firmware flashing progress and status.
-+
-+      attribute-set: module-fw-flash
-+
-+      event:
-+        attributes:
-+          - header
-+          - status
-+          - status-msg
-+          - done
-+          - total
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index 160bfb0ae8ba..b73082d2bd52 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -228,6 +228,7 @@ Userspace to kernel:
-   ``ETHTOOL_MSG_PLCA_GET_STATUS``       get PLCA RS status
-   ``ETHTOOL_MSG_MM_GET``                get MAC merge layer state
-   ``ETHTOOL_MSG_MM_SET``                set MAC merge layer parameters
-+  ``ETHTOOL_MSG_MODULE_FW_FLASH_ACT``   flash transceiver module firmware
-   ===================================== =================================
- 
- Kernel to userspace:
-@@ -274,6 +275,7 @@ Kernel to userspace:
-   ``ETHTOOL_MSG_PLCA_GET_STATUS_REPLY``    PLCA RS status
-   ``ETHTOOL_MSG_PLCA_NTF``                 PLCA RS parameters
-   ``ETHTOOL_MSG_MM_GET_REPLY``             MAC merge layer status
-+  ``ETHTOOL_MSG_MODULE_FW_FLASH_NTF``      transceiver module flash updates
-   ======================================== =================================
- 
- ``GET`` requests are sent by userspace applications to retrieve device
-@@ -2033,6 +2035,73 @@ The attributes are propagated to the driver through the following structure:
- .. kernel-doc:: include/linux/ethtool.h
-     :identifiers: ethtool_mm_cfg
- 
-+MODULE_FW_FLASH_ACT
-+===================
-+
-+Flashes transceiver module firmware.
-+
-+Request contents:
-+
-+  =======================================  ======  ===========================
-+  ``ETHTOOL_A_MODULE_FW_FLASH_HEADER``     nested  request header
-+  ``ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME``  string  firmware image file name
-+  ``ETHTOOL_A_MODULE_FW_FLASH_PASSWORD``   u32     transceiver module password
-+  =======================================  ======  ===========================
-+
-+The firmware update process consists of three logical steps:
-+
-+1. Downloading a firmware image to the transceiver module and validating it.
-+2. Running the firmware image.
-+3. Committing the firmware image so that it is run upon reset.
-+
-+When flash command is given, those three steps are taken in that order.
-+
-+This message merely schedules the update process and returns immediately
-+without blocking. The process then runs asynchronously.
-+Since it can take several minutes to complete, during the update process
-+notifications are emitted from the kernel to user space updating it about
-+the status and progress.
-+
-+The ``ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME`` attribute encodes the firmware
-+image file name. The firmware image is downloaded to the transceiver module,
-+validated, run and committed.
-+
-+The optional ``ETHTOOL_A_MODULE_FW_FLASH_PASSWORD`` attribute encodes a password
-+that might be required as part of the transceiver module firmware update
-+process.
-+
-+The firmware update process can take several minutes to complete. Therefore,
-+during the update process notifications are emitted from the kernel to user
-+space updating it about the status and progress.
-+
-+
-+
-+Notification contents:
-+
-+ +---------------------------------------------------+--------+----------------+
-+ | ``ETHTOOL_A_MODULE_FW_FLASH_HEADER``              | nested | reply header   |
-+ +---------------------------------------------------+--------+----------------+
-+ | ``ETHTOOL_A_MODULE_FW_FLASH_STATUS``              | u32    | status         |
-+ +---------------------------------------------------+--------+----------------+
-+ | ``ETHTOOL_A_MODULE_FW_FLASH_STATUS_MSG``          | string | status message |
-+ +---------------------------------------------------+--------+----------------+
-+ | ``ETHTOOL_A_MODULE_FW_FLASH_DONE``                | uint   | progress       |
-+ +---------------------------------------------------+--------+----------------+
-+ | ``ETHTOOL_A_MODULE_FW_FLASH_TOTAL``               | uint   | total          |
-+ +---------------------------------------------------+--------+----------------+
-+
-+The ``ETHTOOL_A_MODULE_FW_FLASH_STATUS`` attribute encodes the current status
-+of the firmware update process. Possible values are:
-+
-+.. kernel-doc:: include/uapi/linux/ethtool.h
-+    :identifiers: ethtool_module_fw_flash_status
-+
-+The ``ETHTOOL_A_MODULE_FW_FLASH_STATUS_MSG`` attribute encodes a status message
-+string.
-+
-+The ``ETHTOOL_A_MODULE_FW_FLASH_DONE`` and ``ETHTOOL_A_MODULE_FW_FLASH_TOTAL``
-+attributes encode the completed and total amount of work, respectively.
-+
- Request translation
- ===================
- 
-@@ -2139,4 +2208,5 @@ are netlink only.
-   n/a                                 ``ETHTOOL_MSG_PLCA_GET_STATUS``
-   n/a                                 ``ETHTOOL_MSG_MM_GET``
-   n/a                                 ``ETHTOOL_MSG_MM_SET``
-+  n/a                                 ``ETHTOOL_MSG_MODULE_FW_FLASH_ACT``
-   =================================== =====================================
-diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-index 8733a3117902..e011384c915c 100644
---- a/include/uapi/linux/ethtool.h
-+++ b/include/uapi/linux/ethtool.h
-@@ -877,6 +877,24 @@ enum ethtool_mm_verify_status {
- 	ETHTOOL_MM_VERIFY_STATUS_DISABLED,
+ struct module_req_info {
+ 	struct ethnl_req_info base;
+@@ -158,3 +159,119 @@ const struct ethnl_request_ops ethnl_module_request_ops = {
+ 	.set			= ethnl_set_module,
+ 	.set_ntf_cmd		= ETHTOOL_MSG_MODULE_NTF,
  };
- 
++
++/* MODULE_FW_FLASH_NTF */
++
++static int
++ethnl_module_fw_flash_ntf_put_err(struct sk_buff *skb, char *err_msg,
++				  char *sub_err_msg)
++{
++	int err_msg_len, sub_err_msg_len, total_len;
++	struct nlattr *attr;
++
++	if (!err_msg)
++		return 0;
++
++	err_msg_len = strlen(err_msg);
++	total_len = err_msg_len + 2; /* For period and NUL. */
++
++	if (sub_err_msg) {
++		sub_err_msg_len = strlen(sub_err_msg);
++		total_len += sub_err_msg_len + 2; /* For ", ". */
++	}
++
++	attr = nla_reserve(skb, ETHTOOL_A_MODULE_FW_FLASH_STATUS_MSG,
++			   total_len);
++	if (!attr)
++		return -ENOMEM;
++
++	if (sub_err_msg)
++		sprintf(nla_data(attr), "%s, %s.", err_msg, sub_err_msg);
++	else
++		sprintf(nla_data(attr), "%s.", err_msg);
++
++	return 0;
++}
++
++static void
++ethnl_module_fw_flash_ntf(struct net_device *dev,
++			  enum ethtool_module_fw_flash_status status,
++			  struct ethnl_module_fw_flash_ntf_params *ntf_params,
++			  char *err_msg, char *sub_err_msg,
++			  u64 done, u64 total)
++{
++	struct sk_buff *skb;
++	void *hdr;
++	int ret;
++
++	if (ntf_params->closed_sock)
++		return;
++
++	skb = genlmsg_new(NLMSG_GOODSIZE, GFP_KERNEL);
++	if (!skb)
++		return;
++
++	hdr = ethnl_unicast_put(skb, ntf_params->portid, ntf_params->seq,
++				ETHTOOL_MSG_MODULE_FW_FLASH_NTF);
++	if (!hdr)
++		goto err_skb;
++
++	ret = ethnl_fill_reply_header(skb, dev,
++				      ETHTOOL_A_MODULE_FW_FLASH_HEADER);
++	if (ret < 0)
++		goto err_skb;
++
++	if (nla_put_u32(skb, ETHTOOL_A_MODULE_FW_FLASH_STATUS, status))
++		goto err_skb;
++
++	ret = ethnl_module_fw_flash_ntf_put_err(skb, err_msg, sub_err_msg);
++	if (ret < 0)
++		goto err_skb;
++
++	if (nla_put_uint(skb, ETHTOOL_A_MODULE_FW_FLASH_DONE, done))
++		goto err_skb;
++
++	if (nla_put_uint(skb, ETHTOOL_A_MODULE_FW_FLASH_TOTAL, total))
++		goto err_skb;
++
++	genlmsg_end(skb, hdr);
++	genlmsg_unicast(dev_net(dev), skb, ntf_params->portid);
++	return;
++
++err_skb:
++	nlmsg_free(skb);
++}
++
++void ethnl_module_fw_flash_ntf_err(struct net_device *dev,
++				   struct ethnl_module_fw_flash_ntf_params *params,
++				   char *err_msg, char *sub_err_msg)
++{
++	ethnl_module_fw_flash_ntf(dev, ETHTOOL_MODULE_FW_FLASH_STATUS_ERROR,
++				  params, err_msg, sub_err_msg, 0, 0);
++}
++
++void
++ethnl_module_fw_flash_ntf_start(struct net_device *dev,
++				struct ethnl_module_fw_flash_ntf_params *params)
++{
++	ethnl_module_fw_flash_ntf(dev, ETHTOOL_MODULE_FW_FLASH_STATUS_STARTED,
++				  params, NULL, NULL, 0, 0);
++}
++
++void
++ethnl_module_fw_flash_ntf_complete(struct net_device *dev,
++				   struct ethnl_module_fw_flash_ntf_params *params)
++{
++	ethnl_module_fw_flash_ntf(dev, ETHTOOL_MODULE_FW_FLASH_STATUS_COMPLETED,
++				  params, NULL, NULL, 0, 0);
++}
++
++void
++ethnl_module_fw_flash_ntf_in_progress(struct net_device *dev,
++				      struct ethnl_module_fw_flash_ntf_params *params,
++				      u64 done, u64 total)
++{
++	ethnl_module_fw_flash_ntf(dev,
++				  ETHTOOL_MODULE_FW_FLASH_STATUS_IN_PROGRESS,
++				  params, NULL, NULL, done, total);
++}
+diff --git a/net/ethtool/module_fw.h b/net/ethtool/module_fw.h
+new file mode 100644
+index 000000000000..ee4a291ac1d4
+--- /dev/null
++++ b/net/ethtool/module_fw.h
+@@ -0,0 +1,31 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++
++#include <uapi/linux/ethtool.h>
++
 +/**
-+ * enum ethtool_module_fw_flash_status - plug-in module firmware flashing status
-+ * @ETHTOOL_MODULE_FW_FLASH_STATUS_STARTED: The firmware flashing process has
-+ *	started.
-+ * @ETHTOOL_MODULE_FW_FLASH_STATUS_IN_PROGRESS: The firmware flashing process
-+ *	is in progress.
-+ * @ETHTOOL_MODULE_FW_FLASH_STATUS_COMPLETED: The firmware flashing process was
-+ *	completed successfully.
-+ * @ETHTOOL_MODULE_FW_FLASH_STATUS_ERROR: The firmware flashing process was
-+ *	stopped due to an error.
++ * struct ethnl_module_fw_flash_ntf_params - module firmware flashing
++ *						notifications parameters
++ * @portid: Netlink portid of sender.
++ * @seq: Sequence number of sender.
++ * @closed_sock: Indicates whether the socket was closed from user space.
 + */
-+enum ethtool_module_fw_flash_status {
-+	ETHTOOL_MODULE_FW_FLASH_STATUS_STARTED = 1,
-+	ETHTOOL_MODULE_FW_FLASH_STATUS_IN_PROGRESS,
-+	ETHTOOL_MODULE_FW_FLASH_STATUS_COMPLETED,
-+	ETHTOOL_MODULE_FW_FLASH_STATUS_ERROR,
++struct ethnl_module_fw_flash_ntf_params {
++	u32 portid;
++	u32 seq;
++	bool closed_sock;
 +};
 +
++void
++ethnl_module_fw_flash_ntf_err(struct net_device *dev,
++			      struct ethnl_module_fw_flash_ntf_params *params,
++			      char *err_msg, char *sub_err_msg);
++void
++ethnl_module_fw_flash_ntf_start(struct net_device *dev,
++				struct ethnl_module_fw_flash_ntf_params *params);
++void
++ethnl_module_fw_flash_ntf_complete(struct net_device *dev,
++				   struct ethnl_module_fw_flash_ntf_params *params);
++void
++ethnl_module_fw_flash_ntf_in_progress(struct net_device *dev,
++				      struct ethnl_module_fw_flash_ntf_params *params,
++				      u64 done, u64 total);
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index bd04f28d5cf4..393ce668fb04 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -239,6 +239,11 @@ void *ethnl_bcastmsg_put(struct sk_buff *skb, u8 cmd)
+ 			   cmd);
+ }
+ 
++void *ethnl_unicast_put(struct sk_buff *skb, u32 portid, u32 seq, u8 cmd)
++{
++	return genlmsg_put(skb, portid, seq, &ethtool_genl_family, 0, cmd);
++}
++
+ int ethnl_multicast(struct sk_buff *skb, struct net_device *dev)
+ {
+ 	return genlmsg_multicast_netns(&ethtool_genl_family, dev_net(dev), skb,
+diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
+index 9a333a8d04c1..5e6c6a7b7adc 100644
+--- a/net/ethtool/netlink.h
++++ b/net/ethtool/netlink.h
+@@ -21,6 +21,7 @@ struct sk_buff *ethnl_reply_init(size_t payload, struct net_device *dev, u8 cmd,
+ 				 void **ehdrp);
+ void *ethnl_dump_put(struct sk_buff *skb, struct netlink_callback *cb, u8 cmd);
+ void *ethnl_bcastmsg_put(struct sk_buff *skb, u8 cmd);
++void *ethnl_unicast_put(struct sk_buff *skb, u32 portid, u32 seq, u8 cmd);
+ int ethnl_multicast(struct sk_buff *skb, struct net_device *dev);
+ 
  /**
-  * struct ethtool_gstrings - string set for data tagging
-  * @cmd: Command number = %ETHTOOL_GSTRINGS
-diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
-index b49b804b9495..3748f018b985 100644
---- a/include/uapi/linux/ethtool_netlink.h
-+++ b/include/uapi/linux/ethtool_netlink.h
-@@ -57,6 +57,7 @@ enum {
- 	ETHTOOL_MSG_PLCA_GET_STATUS,
- 	ETHTOOL_MSG_MM_GET,
- 	ETHTOOL_MSG_MM_SET,
-+	ETHTOOL_MSG_MODULE_FW_FLASH_ACT,
- 
- 	/* add new constants above here */
- 	__ETHTOOL_MSG_USER_CNT,
-@@ -109,6 +110,7 @@ enum {
- 	ETHTOOL_MSG_PLCA_NTF,
- 	ETHTOOL_MSG_MM_GET_REPLY,
- 	ETHTOOL_MSG_MM_NTF,
-+	ETHTOOL_MSG_MODULE_FW_FLASH_NTF,
- 
- 	/* add new constants above here */
- 	__ETHTOOL_MSG_KERNEL_CNT,
-@@ -996,6 +998,23 @@ enum {
- 	ETHTOOL_A_MM_MAX = (__ETHTOOL_A_MM_CNT - 1)
- };
- 
-+/* MODULE_FW_FLASH */
-+
-+enum {
-+	ETHTOOL_A_MODULE_FW_FLASH_UNSPEC,
-+	ETHTOOL_A_MODULE_FW_FLASH_HEADER,		/* nest - _A_HEADER_* */
-+	ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME,		/* string */
-+	ETHTOOL_A_MODULE_FW_FLASH_PASSWORD,		/* u32 */
-+	ETHTOOL_A_MODULE_FW_FLASH_STATUS,		/* u32 */
-+	ETHTOOL_A_MODULE_FW_FLASH_STATUS_MSG,		/* string */
-+	ETHTOOL_A_MODULE_FW_FLASH_DONE,			/* uint */
-+	ETHTOOL_A_MODULE_FW_FLASH_TOTAL,		/* uint */
-+
-+	/* add new constants above here */
-+	__ETHTOOL_A_MODULE_FW_FLASH_CNT,
-+	ETHTOOL_A_MODULE_FW_FLASH_MAX = (__ETHTOOL_A_MODULE_FW_FLASH_CNT - 1)
-+};
-+
- /* generic netlink info */
- #define ETHTOOL_GENL_NAME "ethtool"
- #define ETHTOOL_GENL_VERSION 1
-diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
-index f4e8eb79c1b8..dbdca32a1c61 100644
---- a/tools/net/ynl/Makefile.deps
-+++ b/tools/net/ynl/Makefile.deps
-@@ -16,7 +16,8 @@ get_hdr_inc=-D$(1) -include $(UAPI_PATH)/linux/$(2)
- 
- CFLAGS_devlink:=$(call get_hdr_inc,_LINUX_DEVLINK_H_,devlink.h)
- CFLAGS_dpll:=$(call get_hdr_inc,_LINUX_DPLL_H,dpll.h)
--CFLAGS_ethtool:=$(call get_hdr_inc,_LINUX_ETHTOOL_NETLINK_H_,ethtool_netlink.h)
-+CFLAGS_ethtool:=$(call get_hdr_inc,_LINUX_ETHTOOL_H,ethtool.h) \
-+		$(call get_hdr_inc,_LINUX_ETHTOOL_NETLINK_H_,ethtool_netlink.h)
- CFLAGS_handshake:=$(call get_hdr_inc,_LINUX_HANDSHAKE_H,handshake.h)
- CFLAGS_mptcp_pm:=$(call get_hdr_inc,_LINUX_MPTCP_PM_H,mptcp_pm.h)
- CFLAGS_netdev:=$(call get_hdr_inc,_LINUX_NETDEV_H,netdev.h)
 -- 
 2.45.0
 
