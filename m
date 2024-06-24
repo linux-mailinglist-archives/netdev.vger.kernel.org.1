@@ -1,235 +1,178 @@
-Return-Path: <netdev+bounces-106187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46985915240
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:27:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDE0491525C
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:30:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69BF91C22156
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:27:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEC4B1C20A2B
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DB0919D07E;
-	Mon, 24 Jun 2024 15:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C2D19D08E;
+	Mon, 24 Jun 2024 15:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="sNR5+Buv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.168])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B97419D089
-	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 15:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CACB143743
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 15:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.168
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719242840; cv=none; b=Q5QUXMThP5FY1wvEXqLRJNptbqZMaiGZ/kOatsNQtD+LaBO7RCuVcmS4l+J+zDllygpOcq0PVRsngGnDXk5BkR88S4QG1vKiDBuU8K4agAzYeDKk/XP4dtV18NNDEWkDze+q404tP1tSZejDIKdJKVDYdu30RoL2A7wgvqdxoSk=
+	t=1719242948; cv=none; b=urjFjeBu3iCfQNzV0QQCcTnqy1JL+L9O+EuHDODK9gyazLbQAGQwbp1+1Bw2NLOF3X7be8qGu6a5+8/483R0OwIbNaJmfhzsn3vlpdpKOsiSzJF5fx33nEQYeuBg6OyeLLR0yZAJy6sP0xisXLxzQg5oRjJSKxepYrTx5pTJpQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719242840; c=relaxed/simple;
-	bh=tzhoTUjn/DIergVJmRXfSBnxf5kvQx64qSKgWfdacmM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=kruqBvNk0jbweznqFPOEuyBIbDLx6YfDNJ0RQT+AnIUdpxRGrxDSoCLdk9/hKeRvZkltFCE8rOXGwlHtoBJGWqgBSzpygCM3VVdf/EycBhkOxfUZP6P+DnW4QbwX3zMu501hjKv6lPW47b1FzLSPVgsPRsf9bF4ySjlF61v7+QY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3737ee417baso35638405ab.1
-        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 08:27:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719242838; x=1719847638;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uv9QZyvFNQpJEReELh0/Si6IkTCCXel7hEP3gP0lOkQ=;
-        b=vMkE7fTWxJWUNNdXhKexY4/tIC89WlmesDD28F9w6ZQXyT/wdGBKhEP8Rhx8uIV9Mi
-         yUiSUEwSQ7ETiuWhBGqlpimFbhSqj0DehbZuhS0J7AurzTYllclVwsOSJRKFj9NfHLcs
-         hfNEcWRM2kNMU1j6vzQNH6u84HhFgDi4zu+5lpQjJPpa1v2J+zxAbU0sj2cGSfytmxXk
-         /ay7bMKH7T1jloBGvk6Qrj3FgC1Dw4RuaYecycEU6fIkOFQHUC+v6CoO4a+7Ocodpzia
-         FwcOy2SMJ+OSqLJjUJjITsnjn5LIvshllD/wn9hKoh0OROa+X/5zMrdrBfuVjYzQamf2
-         K1WA==
-X-Forwarded-Encrypted: i=1; AJvYcCWEVYPEM724stpK+hELpkStLAh5Cp2ptwi/OMKzwhhuxsOypd47Fh8FgO8FLmVEIknMp57hPYTHCOG4cKGBwQIfxBPWi906
-X-Gm-Message-State: AOJu0Yz2jKqyTX42owpplNOOG3cHhW2pLbQDolyOSPI8SgdTHFS+Wx2b
-	XOhPREvRyf1kOCJtinLVh7WX5HkU6VnyiDNkEwNSlantTxbxtDB8ARDPmr5b2SuiMRp47MZrNYi
-	qSabRLclFDI4izL3GjGTbV38r5eVT5aV9id7WInR3ntaD1Gjp073ddeQ=
-X-Google-Smtp-Source: AGHT+IHEFj6JqrLDueAmnhIgvoBTRDCAK+g+ykmP/vctpJEyM0cQhmmCV5CRQCnajRFiwgRwjrYIAxdj3wGOMJKH4MaybYmYQQx1
+	s=arc-20240116; t=1719242948; c=relaxed/simple;
+	bh=EtEPfXihmnjNTaoDFa0DQ3qMcMUH9iQWmG8yqt8q7PE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rjpNBCgQAL5HMpyu+daO/O7PqiduZ5NipzFAtYCwW1gOst+cHq4WOhMcSz6DYO0fOcLYObETKalcc9vA49HqR8f94R6jT5t6QkyFlrxhQwfJmKx/OZdzY7dPQz+X1kl8NenpgT+IJu9ATqDp0Rp2XC5tO60EKJKGL1bRlfFbGw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org; spf=none smtp.mailfrom=phenome.org; dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b=sNR5+Buv; arc=none smtp.client-ip=195.121.94.168
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=phenome.org
+X-KPN-MessageId: 53862cf6-323e-11ef-836c-005056aba152
+Received: from smtp.kpnmail.nl (unknown [10.31.155.37])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 53862cf6-323e-11ef-836c-005056aba152;
+	Mon, 24 Jun 2024 17:27:54 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=kpnmail.nl; s=kpnmail01;
+	h=content-type:mime-version:message-id:subject:to:from:date;
+	bh=BvqYwY/FaSlrXXF68kEI95/y0gu1tYuFDSBsNXke4rM=;
+	b=sNR5+BuvA1oXZyxKd72lBgFfNYFpXFlKEYOX18A9I6/gh1ze28a7QUg1QNmhKnyzkhy1na1VpjKoE
+	 +W8HpyQqFisFYAQZxq6cRiZlWHL313KpC6jMormcVKajrnC37cb42vIHoEVul3UqRcLDLWf4n5Dpvx
+	 u9ZfX4dDCPSV0zko=
+X-KPN-MID: 33|Iro28UabrHI28KnT2R7zuf948ZxCw14OdqIEW9MS5stmSYTJ+YTxUyCGjmsOMQo
+ DtgzihyWeYhXGQdAGupR0mWX9KPa1ZxAHnX8LRlC1SV4=
+X-KPN-VerifiedSender: No
+X-CMASSUN: 33|CqV3Xyg8VWFlqkwtfhzizMQ4NtbRRygE4oKSRlvIeDJtyfHh4y6W3OQiHAj9/jH
+ kmMMGr0rWWQFNjcrdDXtBOA==
+Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id 5343b57a-323e-11ef-8146-005056ab1411;
+	Mon, 24 Jun 2024 17:27:55 +0200 (CEST)
+Date: Mon, 24 Jun 2024 17:27:53 +0200
+From: Antony Antony <antony@phenome.org>
+To: Christian Hopps <chopps@chopps.org>
+Cc: devel@linux-ipsec.org, Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, Christian Hopps <chopps@labn.net>
+Subject: Re: [devel-ipsec] [PATCH ipsec-next v4 17/18] xfrm: iptfs: only send
+ the NL attrs that corr. to the SA dir
+Message-ID: <ZnmQeZVYDC8rKLEe@Antony2201.local>
+References: <20240617205316.939774-1-chopps@chopps.org>
+ <20240617205316.939774-18-chopps@chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c54a:0:b0:375:cfd0:393d with SMTP id
- e9e14a558f8ab-3763a2510c6mr5302435ab.2.1719242838497; Mon, 24 Jun 2024
- 08:27:18 -0700 (PDT)
-Date: Mon, 24 Jun 2024 08:27:18 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000abf2f0061ba46a1a@google.com>
-Subject: [syzbot] [lvs?] possible deadlock in start_sync_thread
-From: syzbot <syzbot+e929093395ec65f969c7@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	horms@verge.net.au, ja@ssi.bg, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, lvs-devel@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
-	pablo@netfilter.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240617205316.939774-18-chopps@chopps.org>
 
-Hello,
+On Mon, Jun 17, 2024 at 04:53:15PM -0400, Christian Hopps via Devel wrote:
+> From: Christian Hopps <chopps@labn.net>
+> 
+> When sending the netlink attributes to the user for a given SA, only
+> send those NL attributes which correspond to the SA's direction.
+> 
+> Signed-off-by: Christian Hopps <chopps@labn.net>
+> ---
+>  net/xfrm/xfrm_iptfs.c | 64 ++++++++++++++++++++++++-------------------
+>  1 file changed, 36 insertions(+), 28 deletions(-)
+> 
+> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+> index 59fd8ee49cd4..049a94a5531b 100644
+> --- a/net/xfrm/xfrm_iptfs.c
+> +++ b/net/xfrm/xfrm_iptfs.c
+> @@ -2498,13 +2498,16 @@ static unsigned int iptfs_sa_len(const struct xfrm_state *x)
+>  	struct xfrm_iptfs_config *xc = &xtfs->cfg;
+>  	unsigned int l = 0;
+>  
+> -	if (xc->dont_frag)
+> -		l += nla_total_size(0);
+> -	l += nla_total_size(sizeof(xc->reorder_win_size));
+> -	l += nla_total_size(sizeof(xc->pkt_size));
+> -	l += nla_total_size(sizeof(xc->max_queue_size));
+> -	l += nla_total_size(sizeof(u32)); /* drop time usec */
+> -	l += nla_total_size(sizeof(u32)); /* init delay usec */
+> +	if (x->dir == XFRM_SA_DIR_IN) {
+> +		l += nla_total_size(sizeof(u32)); /* drop time usec */
+> +		l += nla_total_size(sizeof(xc->reorder_win_size));
+> +	} else {
+> +		if (xc->dont_frag)
+> +			l += nla_total_size(0);	  /* dont-frag flag */
+> +		l += nla_total_size(sizeof(u32)); /* init delay usec */
+> +		l += nla_total_size(sizeof(xc->max_queue_size));
+> +		l += nla_total_size(sizeof(xc->pkt_size));
+> +	}
+>  
+>  	return l;
+>  }
+> @@ -2516,30 +2519,35 @@ static int iptfs_copy_to_user(struct xfrm_state *x, struct sk_buff *skb)
+>  	int ret;
+>  	u64 q;
+>  
+> -	if (xc->dont_frag) {
+> -		ret = nla_put_flag(skb, XFRMA_IPTFS_DONT_FRAG);
+> +	if (x->dir == XFRM_SA_DIR_IN) {
+> +		q = xtfs->drop_time_ns;
+> +		(void)do_div(q, NSECS_IN_USEC);
+> +		ret = nla_put_u32(skb, XFRMA_IPTFS_DROP_TIME, q);
+> +		if (ret)
+> +			return ret;
+> +
+> +		ret = nla_put_u16(skb, XFRMA_IPTFS_REORDER_WINDOW,
+> +				  xc->reorder_win_size);
+> +	} else {
+> +		if (xc->dont_frag) {
+> +			ret = nla_put_flag(skb, XFRMA_IPTFS_DONT_FRAG);
+> +			if (ret)
+> +				return ret;
+> +		}
+> +
+> +		q = xtfs->init_delay_ns;
+> +		(void)do_div(q, NSECS_IN_USEC);
+> +		ret = nla_put_u32(skb, XFRMA_IPTFS_INIT_DELAY, q);
+> +		if (ret)
+> +			return ret;
+> +
+> +		ret = nla_put_u32(skb, XFRMA_IPTFS_MAX_QSIZE,
+> +				  xc->max_queue_size);
+>  		if (ret)
+>  			return ret;
+> +
+> +		ret = nla_put_u32(skb, XFRMA_IPTFS_PKT_SIZE, xc->pkt_size);
+>  	}
+> -	ret = nla_put_u16(skb, XFRMA_IPTFS_REORDER_WINDOW, xc->reorder_win_size);
+> -	if (ret)
+> -		return ret;
+> -	ret = nla_put_u32(skb, XFRMA_IPTFS_PKT_SIZE, xc->pkt_size);
+> -	if (ret)
+> -		return ret;
+> -	ret = nla_put_u32(skb, XFRMA_IPTFS_MAX_QSIZE, xc->max_queue_size);
+> -	if (ret)
+> -		return ret;
+> -
+> -	q = xtfs->drop_time_ns;
+> -	(void)do_div(q, NSECS_IN_USEC);
+> -	ret = nla_put_u32(skb, XFRMA_IPTFS_DROP_TIME, q);
+> -	if (ret)
+> -		return ret;
+> -
+> -	q = xtfs->init_delay_ns;
+> -	(void)do_div(q, NSECS_IN_USEC);
+> -	ret = nla_put_u32(skb, XFRMA_IPTFS_INIT_DELAY, q);
+>  
+>  	return ret;
+>  }
 
-syzbot found the following issue on:
+looking at this patch, why this should be seperate patch? why not squash 
+into [PATCH ipsec-next v4 08/18] xfrm: iptfs: add new iptfs xfrm mode impl
 
-HEAD commit:    3226607302ca selftests: net: change shebang to bash in amt..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=12a2683e980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e78fc116033e0ab7
-dashboard link: https://syzkaller.appspot.com/bug?extid=e929093395ec65f969c7
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+I also think in the v3 it was squashed into some other patch.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/125c85863435/disk-32266073.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4477ecab2e1f/vmlinux-32266073.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/43e28f6ce879/bzImage-32266073.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e929093395ec65f969c7@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.10.0-rc4-syzkaller-00837-g3226607302ca #0 Not tainted
-------------------------------------------------------
-syz-executor.4/10811 is trying to acquire lock:
-ffffffff8f5e6f48 (rtnl_mutex){+.+.}-{3:3}, at: start_sync_thread+0xdc/0x2dc0 net/netfilter/ipvs/ip_vs_sync.c:1761
-
-but task is already holding lock:
-ffff88805ba95750 (&smc->clcsock_release_lock){+.+.}-{3:3}, at: smc_setsockopt+0x1c3/0xe50 net/smc/af_smc.c:3064
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (&smc->clcsock_release_lock){+.+.}-{3:3}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
-       smc_switch_to_fallback+0x35/0xd00 net/smc/af_smc.c:902
-       smc_sendmsg+0x11f/0x530 net/smc/af_smc.c:2779
-       sock_sendmsg_nosec net/socket.c:730 [inline]
-       __sock_sendmsg+0x221/0x270 net/socket.c:745
-       __sys_sendto+0x3a4/0x4f0 net/socket.c:2192
-       __do_sys_sendto net/socket.c:2204 [inline]
-       __se_sys_sendto net/socket.c:2200 [inline]
-       __x64_sys_sendto+0xde/0x100 net/socket.c:2200
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (sk_lock-AF_INET){+.+.}-{0:0}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       lock_sock_nested+0x48/0x100 net/core/sock.c:3543
-       do_ip_setsockopt+0x1a2d/0x3cd0 net/ipv4/ip_sockglue.c:1078
-       ip_setsockopt+0x63/0x100 net/ipv4/ip_sockglue.c:1417
-       do_sock_setsockopt+0x3af/0x720 net/socket.c:2312
-       __sys_setsockopt+0x1ae/0x250 net/socket.c:2335
-       __do_sys_setsockopt net/socket.c:2344 [inline]
-       __se_sys_setsockopt net/socket.c:2341 [inline]
-       __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2341
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (rtnl_mutex){+.+.}-{3:3}:
-       check_prev_add kernel/locking/lockdep.c:3134 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-       validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3869
-       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
-       start_sync_thread+0xdc/0x2dc0 net/netfilter/ipvs/ip_vs_sync.c:1761
-       do_ip_vs_set_ctl+0x442/0x13d0 net/netfilter/ipvs/ip_vs_ctl.c:2732
-       nf_setsockopt+0x295/0x2c0 net/netfilter/nf_sockopt.c:101
-       smc_setsockopt+0x275/0xe50 net/smc/af_smc.c:3072
-       do_sock_setsockopt+0x3af/0x720 net/socket.c:2312
-       __sys_setsockopt+0x1ae/0x250 net/socket.c:2335
-       __do_sys_setsockopt net/socket.c:2344 [inline]
-       __se_sys_setsockopt net/socket.c:2341 [inline]
-       __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2341
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  rtnl_mutex --> sk_lock-AF_INET --> &smc->clcsock_release_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&smc->clcsock_release_lock);
-                               lock(sk_lock-AF_INET);
-                               lock(&smc->clcsock_release_lock);
-  lock(rtnl_mutex);
-
- *** DEADLOCK ***
-
-1 lock held by syz-executor.4/10811:
- #0: ffff88805ba95750 (&smc->clcsock_release_lock){+.+.}-{3:3}, at: smc_setsockopt+0x1c3/0xe50 net/smc/af_smc.c:3064
-
-stack backtrace:
-CPU: 0 PID: 10811 Comm: syz-executor.4 Not tainted 6.10.0-rc4-syzkaller-00837-g3226607302ca #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
- check_prev_add kernel/locking/lockdep.c:3134 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3869
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
- __mutex_lock_common kernel/locking/mutex.c:608 [inline]
- __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
- start_sync_thread+0xdc/0x2dc0 net/netfilter/ipvs/ip_vs_sync.c:1761
- do_ip_vs_set_ctl+0x442/0x13d0 net/netfilter/ipvs/ip_vs_ctl.c:2732
- nf_setsockopt+0x295/0x2c0 net/netfilter/nf_sockopt.c:101
- smc_setsockopt+0x275/0xe50 net/smc/af_smc.c:3072
- do_sock_setsockopt+0x3af/0x720 net/socket.c:2312
- __sys_setsockopt+0x1ae/0x250 net/socket.c:2335
- __do_sys_setsockopt net/socket.c:2344 [inline]
- __se_sys_setsockopt net/socket.c:2341 [inline]
- __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2341
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f42d8a7d0a9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f42d98870c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 00007f42d8bb3f80 RCX: 00007f42d8a7d0a9
-RDX: 000000000000048b RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 00007f42d8aec074 R08: 0000000000000018 R09: 0000000000000000
-R10: 0000000020000200 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f42d8bb3f80 R15: 00007ffde628d3a8
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-antony
 
