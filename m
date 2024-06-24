@@ -1,44 +1,48 @@
-Return-Path: <netdev+bounces-106117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 063D7914E59
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:25:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 932BE914EB1
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:34:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E38E1C2141F
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:25:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3F441C22C7B
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:34:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB3D13D893;
-	Mon, 24 Jun 2024 13:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10CE613E052;
+	Mon, 24 Jun 2024 13:31:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from albert.telenet-ops.be (albert.telenet-ops.be [195.130.137.90])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cantor.telenet-ops.be (cantor.telenet-ops.be [195.130.132.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BED13D889
-	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 13:25:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.137.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D3413DDBD
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 13:31:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.132.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719235541; cv=none; b=gw+uppwkIhknrItsnlY7EIsYIYqRIFYWXJha3W6xL+rbq/hhrf4Yaia7zWqC7HAdud8EDaFVunh2oUK4QamRRtt2it9/lYywAvmj7TTrUfsMKtP0bxO+2j1KN3ShUfgei3oOvRhfaw1LW5zE3gTopkRR1s+ngLpeS5jOXYq1SZo=
+	t=1719235887; cv=none; b=Yc16clXt3a+0+vfFbFAuG1AA/ZlC8yiG3nH+f+IY7j/yt7sCEA7jKVb3yI+BvlGDPo0RTPGM0sD/YL+8L+ktg94F2hbZjX60RG9vYpykosjdMDFCtcY+ipH4htnd3HYlQByN8OHsPsFmURNjc6tzSGwl252RAeSBt0Jj1DV71kI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719235541; c=relaxed/simple;
-	bh=2HA87VcKDxd4qJxS5VjLpvA+r34etIBEyZvCeg6nLtw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Vqun0Zv62VJ9mBCata2XpLBTAWRzSgUiJDhw2Iikf/jJKk6RHss6oKVQKLRg7qQhu33aOc2iyTcV77VrV+/56uJgGE1Pt3uwMF/SB3fO4TMy7l1LtRLKLxRkxBrHMKv6dOHNwt/rlVNl5SMgKYXjm7uWjv2SQkKz/qg1m3EP7fI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.137.90
+	s=arc-20240116; t=1719235887; c=relaxed/simple;
+	bh=H3LL2YSxXaLgsqNQRkKFKgHJh4jLqO69pPcbgow43B4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=NAW8aYxrxvuSgjAuq/JrVID4Z+jue3NmNj3WRzYZCjkGdCbdf3nhgR4SvduhYDIBSicoKMoEp8sOppoUDWwNpjJX8+BDDukYQUcMSgnu9joX2xV1ghLeN5VBc90yenZzSDhd7UZCeoTVlM1yrYZuMAzB6gRIvG3Ii8EBE2ZDVTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.132.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from laurent.telenet-ops.be (laurent.telenet-ops.be [IPv6:2a02:1800:110:4::f00:19])
+	by cantor.telenet-ops.be (Postfix) with ESMTPS id 4W77xv3738z4wxGk
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 15:25:39 +0200 (CEST)
 Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:d11f:2bfd:8d32:701a])
-	by albert.telenet-ops.be with bizsmtp
-	id fRRT2C00R4jBKfC06RRTCl; Mon, 24 Jun 2024 15:25:32 +0200
+	by laurent.telenet-ops.be with bizsmtp
+	id fRRT2C00U4jBKfC01RRTBf; Mon, 24 Jun 2024 15:25:32 +0200
 Received: from rox.of.borg ([192.168.97.57])
 	by ramsan.of.borg with esmtp (Exim 4.95)
 	(envelope-from <geert@linux-m68k.org>)
-	id 1sLjhF-000HSV-6r;
+	id 1sLjhF-000HSU-6r;
 	Mon, 24 Jun 2024 15:25:27 +0200
 Received: from geert by rox.of.borg with local (Exim 4.95)
 	(envelope-from <geert@linux-m68k.org>)
-	id 1sLjhH-007u97-MX;
+	id 1sLjhH-007u9A-N8;
 	Mon, 24 Jun 2024 15:25:27 +0200
 From: Geert Uytterhoeven <geert+renesas@glider.be>
 To: Sergey Shtylyov <s.shtylyov@omp.ru>,
@@ -53,67 +57,79 @@ To: Sergey Shtylyov <s.shtylyov@omp.ru>,
 Cc: netdev@vger.kernel.org,
 	linux-renesas-soc@vger.kernel.org,
 	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH net-next v2 0/2] ravb: Add MII support for R-Car V4M
-Date: Mon, 24 Jun 2024 15:25:23 +0200
-Message-Id: <cover.1719234830.git.geert+renesas@glider.be>
+Subject: [PATCH net-next v2 1/2] ravb: Improve ravb_hw_info instance order
+Date: Mon, 24 Jun 2024 15:25:24 +0200
+Message-Id: <a76febe3737e26365a784e9193da9363f22aa550.1719234830.git.geert+renesas@glider.be>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <cover.1719234830.git.geert+renesas@glider.be>
+References: <cover.1719234830.git.geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-	Hi all,
+Move ravb_gen2_hw_info before ravb_gen3_hw_info to match
+ravb_match_table[] order.
 
-All EtherAVB instances on R-Car Gen3/Gen4 SoCs support the RGMII
-interface.  In addition, the first two EtherAVB instances on R-Car V4M
-also support the MII interface, but this is not yet supported by the
-driver.  This patch series adds support for MII on R-Car Gen4, after the
-customary cleanup.
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+---
+v2:
+  - New.
+---
+ drivers/net/ethernet/renesas/ravb_main.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-Changes compared to v1[1]:
-  - New patch "ravb: Improve ravb_hw_info instance order",
-  - Add Reviewed-by,
-  - Rename ravb_emac_init_rcar_apsr() to ravb_emac_init_rcar_gen4(),
-  - Restrict MII support to R-Car Gen4 by adding a new ravb_hw_info
-    instance.
-
-The corresponding pin control support is available in [2].
-
-Compile-tested only, as all AVB interfaces on the Gray Hawk Single
-development board are connected to RGMII PHYs.
-No regressions on R-Car V4H.
-
-Thanks for your comments!
-
-[1] "[PATCH/RFC] net: ravb: Add MII support for R-Car V4M"
-    https://lore.kernel.org/f0ef3e00aec461beb33869ab69ccb44a23d78f51.1718378166.git.geert+renesas@glider.be
-
-[2] "[PATCH/RFC] pinctrl: renesas: r8a779h0: Add AVB MII pins and groups"
-    https://lore.kernel.org/4a0a12227f2145ef53b18bc08f45b19dcd745fc6.1718378739.git.geert+renesas@glider.be/
-
-Geert Uytterhoeven (2):
-  ravb: Improve ravb_hw_info instance order
-  ravb: Add MII support for R-Car V4M
-
- drivers/net/ethernet/renesas/ravb.h      |  1 +
- drivers/net/ethernet/renesas/ravb_main.c | 45 +++++++++++++++++++++---
- 2 files changed, 41 insertions(+), 5 deletions(-)
-
+diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+index c1546b916e4ef581..974e0bb9da1947f2 100644
+--- a/drivers/net/ethernet/renesas/ravb_main.c
++++ b/drivers/net/ethernet/renesas/ravb_main.c
+@@ -2652,7 +2652,7 @@ static int ravb_mdio_release(struct ravb_private *priv)
+ 	return 0;
+ }
+ 
+-static const struct ravb_hw_info ravb_gen3_hw_info = {
++static const struct ravb_hw_info ravb_gen2_hw_info = {
+ 	.receive = ravb_rx_rcar,
+ 	.set_rate = ravb_set_rate_rcar,
+ 	.set_feature = ravb_set_features_rcar,
+@@ -2668,16 +2668,13 @@ static const struct ravb_hw_info ravb_gen3_hw_info = {
+ 	.rx_buffer_size = SZ_2K +
+ 			  SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
+ 	.rx_desc_size = sizeof(struct ravb_ex_rx_desc),
+-	.internal_delay = 1,
+-	.tx_counters = 1,
+-	.multi_irqs = 1,
+-	.irq_en_dis = 1,
+-	.ccc_gac = 1,
++	.aligned_tx = 1,
++	.gptp = 1,
+ 	.nc_queues = 1,
+ 	.magic_pkt = 1,
+ };
+ 
+-static const struct ravb_hw_info ravb_gen2_hw_info = {
++static const struct ravb_hw_info ravb_gen3_hw_info = {
+ 	.receive = ravb_rx_rcar,
+ 	.set_rate = ravb_set_rate_rcar,
+ 	.set_feature = ravb_set_features_rcar,
+@@ -2693,8 +2690,11 @@ static const struct ravb_hw_info ravb_gen2_hw_info = {
+ 	.rx_buffer_size = SZ_2K +
+ 			  SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
+ 	.rx_desc_size = sizeof(struct ravb_ex_rx_desc),
+-	.aligned_tx = 1,
+-	.gptp = 1,
++	.internal_delay = 1,
++	.tx_counters = 1,
++	.multi_irqs = 1,
++	.irq_en_dis = 1,
++	.ccc_gac = 1,
+ 	.nc_queues = 1,
+ 	.magic_pkt = 1,
+ };
 -- 
 2.34.1
 
-Gr{oetje,eeting}s,
-
-						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-							    -- Linus Torvalds
 
