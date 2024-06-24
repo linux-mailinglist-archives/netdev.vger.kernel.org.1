@@ -1,176 +1,150 @@
-Return-Path: <netdev+bounces-105984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-105985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A42FB9140C3
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 05:07:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE3179140CC
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 05:21:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 154DFB21839
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 03:07:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79E3D283B75
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 03:21:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B552B53A7;
-	Mon, 24 Jun 2024 03:07:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="MCxluoEi";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="MW80LOAS";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HYjSw+8O";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="P3R3uk6X"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2F96FB0;
+	Mon, 24 Jun 2024 03:21:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98547FC08;
-	Mon, 24 Jun 2024 03:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33D04C97;
+	Mon, 24 Jun 2024 03:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719198462; cv=none; b=ZDXPc6b0DFePb/q06IWOvNkkSRG8llpeDEEWSLYjhdzo6W4oW8jOxcOJH5xIpIeN8RYrrd7PBG2ra4qQEFnLoIC+5SMCNzGTYUn7PQzTZJiRtYcJqgUINAu9cGbyz1jfKaEXeqBjWtsHNiN/rNGz/cy0/qWQnNdWQh6UoE+PafI=
+	t=1719199309; cv=none; b=HZWK0KrrpWHBfHB01tvwfez/NNLusZIFJvHPqjrvPfjRhVR2sIL7w/v2zGRsm+FKGkPfOJkDE+0g+iR/mpdf8dFgUwoyMRC9Np/z69vWn2Mp0Njvst7NMtFyTippXnGlPsBu+/7+hpFrOuaxZKwiPFCWMgJ4BaqsQZN/0j8hLoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719198462; c=relaxed/simple;
-	bh=iDeTlKAMZTGI/rcvTWmvET1oitZnGzPi11/Cywy/X7E=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=Bbosd9/+9OKLU5TjS6vj8k/S60GG8U53HxOZY4YOQ+clGIUlCyrjGbGNWlMSeyrDvjkDgB/EHDfSLSx/ig8TX6KmzOt7bgtcuTe/hoM0MJD5szqCKyECBMfXGa5jFYu2kj0Jbc+xCl0YRPkNhSsx1GnOZ/WuFygKApBhpWT6kAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=MCxluoEi; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MW80LOAS; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HYjSw+8O; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=P3R3uk6X; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D1E10219E1;
-	Mon, 24 Jun 2024 03:07:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1719198453; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Zhy82VCQc8NYnvf05ol+V2ksrLtovCjP3VgqR99bqBo=;
-	b=MCxluoEiDo3kRMcLY5wd0J+vjZBK9gL6AlCSKth6rLrNzydRNylmop/nq6VZHGGVHT+Ed5
-	2eRBGlasPPPXCt6TW/8Wtj7juEkzAH9ZP+4edWGqYYF7GQABkTc9eiczCDuU63KzQ9SWkQ
-	f+A4BTgOzLg82/8gvTlCVh6hF0WUfCE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1719198453;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Zhy82VCQc8NYnvf05ol+V2ksrLtovCjP3VgqR99bqBo=;
-	b=MW80LOASf/G8s/D9ifiBmsuTjC3QLa8pCAIhSE6Zs714oZ55eh+cCYDlEJY+7xr/xRWliq
-	5AltQiJmR8tkDgCw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1719198452; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Zhy82VCQc8NYnvf05ol+V2ksrLtovCjP3VgqR99bqBo=;
-	b=HYjSw+8Ogh0laWZGrCR4xzYY045DpfD6AYoVaHYXOjGPcuRYcF0l5yuNn5iX1pHsoCqlAI
-	MesFQuusZxQ2iXha/qeb3pg6o/JztClmBMOQl+/DHehlrTOtKkEGQWWZRJYqbpSMOLkzoV
-	r5Z5RVEOOT2s04/zl+i7b9V7KIwbvh0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1719198452;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Zhy82VCQc8NYnvf05ol+V2ksrLtovCjP3VgqR99bqBo=;
-	b=P3R3uk6X0WrlWbNlf5OI9HQ1WTJ3FNLIcNwLbMxsaEEba64nZt8a/I386pVBDt3nIP0L2F
-	Wim5x9SW2g0yWcAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A290C13ACD;
-	Mon, 24 Jun 2024 03:07:26 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id xxJPEe7ieGbILwAAD6G6ig
-	(envelope-from <neilb@suse.de>); Mon, 24 Jun 2024 03:07:26 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	s=arc-20240116; t=1719199309; c=relaxed/simple;
+	bh=TPlUmIidaURK649FmMFhIidH8ry2RADSBWmEC7zhf00=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kQ+rI4sttsWahOWwwkwfvG02KbjVZR+XrNDG9L12mrGvRu8zlst4KLBquWmgIG8uTV1Z7pxvU9g/YidE4vCYJhXLZCAXMrNnl3KyZnaA1lCDLfEEs20rbdqy6yxsJUzk0bOD1EbMdx23ryg3BhGKyDMFAqG3lL3jBD+OgIln6/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
+	by APP-05 (Coremail) with SMTP id zQCowACnr+cp5nhm1XhzEg--.23104S2;
+	Mon, 24 Jun 2024 11:21:21 +0800 (CST)
+From: Ma Ke <make24@iscas.ac.cn>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shradhagupta@linux.microsoft.com,
+	horms@kernel.org,
+	kotaranov@microsoft.com,
+	linyunsheng@huawei.com,
+	schakrabarti@linux.microsoft.com,
+	make24@iscas.ac.cn,
+	erick.archer@outlook.com
+Cc: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: mana: Fix possible double free in error handling path
+Date: Mon, 24 Jun 2024 11:21:12 +0800
+Message-Id: <20240624032112.2286526-1-make24@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neilb@suse.de>
-To: "Ma Ke" <make24@iscas.ac.cn>
-Cc: chuck.lever@oracle.com, jlayton@kernel.org, kolga@netapp.com,
- Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org, anna@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, "Ma Ke" <make24@iscas.ac.cn>
-Subject: Re: [PATCH] SUNRPC: check mlen in ip_map_parse()
-In-reply-to: <20240624023118.2268917-1-make24@iscas.ac.cn>
-References: <20240624023118.2268917-1-make24@iscas.ac.cn>
-Date: Mon, 24 Jun 2024 13:07:17 +1000
-Message-id: <171919843728.14261.13994470964681717916@noble.neil.brown.name>
-X-Spamd-Result: default: False [-4.26 / 50.00];
-	BAYES_HAM(-2.96)[99.81%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_DN_SOME(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Score: -4.26
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowACnr+cp5nhm1XhzEg--.23104S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr4UAF1fKFW3WF18Zr1rtFb_yoW8Xw4fpa
+	13Jay5KryxKw4S9a18Xrs5XFy5W397t3sxury7Cw1fCwn8tFs5ZF4SyFyUGryrXrWDtF1S
+	yF4Yv3W5CFn0g3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9214x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWUGVWUWwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26F
+	4UJVW0owAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
+	FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
+	0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8v
+	x2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
+	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
+	MI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
+	WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
+	6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
+	BIdaVFxhVjvjDU0xZFpf9x0JUPGYJUUUUU=
+X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
 
-On Mon, 24 Jun 2024, Ma Ke wrote:
-> We should check the parameter mlen before using 'mlen - 1'
-> expression for the 'mesg' array index.
+When auxiliary_device_add() returns error and then calls
+auxiliary_device_uninit(), callback function adev_release
+calls kfree(madev) to free memory. We shouldn't call kfree(padev)
+again in the error handling path.
 
-There is no need.  This function is only called from cache_do_downcall()
-and that function already checks for zero.
+Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 31 +++++++++----------
+ 1 file changed, 14 insertions(+), 17 deletions(-)
 
-That function is only called from cache_downcall() which checks the
-size_t count is not >= 32768 so the fact that it is cast to an int for
-the ->cache_parse function cannot cause and overflow.
-
-I wouldn't object to ->cache_parse() and qword_get() and maybe others
-having their len parameter changed from int to size_t.  
-But adding this extra test on mlen add no value.
-
-Thanks,
-NeilBrown
-
-
-> 
-> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
-> ---
->  net/sunrpc/svcauth_unix.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/sunrpc/svcauth_unix.c b/net/sunrpc/svcauth_unix.c
-> index 04b45588ae6f..816bf56597dd 100644
-> --- a/net/sunrpc/svcauth_unix.c
-> +++ b/net/sunrpc/svcauth_unix.c
-> @@ -196,7 +196,7 @@ static int ip_map_parse(struct cache_detail *cd,
->  	struct auth_domain *dom;
->  	time64_t expiry;
->  
-> -	if (mesg[mlen-1] != '\n')
-> +	if (mlen && mesg[mlen - 1] != '\n')
->  		return -EINVAL;
->  	mesg[mlen-1] = 0;
->  
-> -- 
-> 2.25.1
-> 
-> 
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index d087cf954f75..1754c92a6c15 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -2785,8 +2785,10 @@ static int add_adev(struct gdma_dev *gd)
+ 
+ 	adev = &madev->adev;
+ 	ret = mana_adev_idx_alloc();
+-	if (ret < 0)
+-		goto idx_fail;
++	if (ret < 0) {
++		kfree(madev);
++		return ret;
++	}
+ 	adev->id = ret;
+ 
+ 	adev->name = "rdma";
+@@ -2795,26 +2797,21 @@ static int add_adev(struct gdma_dev *gd)
+ 	madev->mdev = gd;
+ 
+ 	ret = auxiliary_device_init(adev);
+-	if (ret)
+-		goto init_fail;
++	if (ret) {
++		mana_adev_idx_free(adev->id);
++		kfree(madev);
++		return ret;
++	}
+ 
+ 	ret = auxiliary_device_add(adev);
+-	if (ret)
+-		goto add_fail;
++	if (ret) {
++		auxiliary_device_uninit(adev);
++		mana_adev_idx_free(adev->id);
++		return ret;
++	}
+ 
+ 	gd->adev = adev;
+ 	return 0;
+-
+-add_fail:
+-	auxiliary_device_uninit(adev);
+-
+-init_fail:
+-	mana_adev_idx_free(adev->id);
+-
+-idx_fail:
+-	kfree(madev);
+-
+-	return ret;
+ }
+ 
+ int mana_probe(struct gdma_dev *gd, bool resuming)
+-- 
+2.25.1
 
 
