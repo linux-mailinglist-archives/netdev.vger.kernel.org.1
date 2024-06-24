@@ -1,188 +1,135 @@
-Return-Path: <netdev+bounces-106211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7D3D9154D5
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 18:54:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DDCB9154E5
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 19:00:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9B2D1C210F6
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 16:54:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7CD31C211D4
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD7B19EEAF;
-	Mon, 24 Jun 2024 16:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE80F19E834;
+	Mon, 24 Jun 2024 17:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sk6FP6tx"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="WaByuFDk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0108A19B5A5
-	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 16:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E1019DF63;
+	Mon, 24 Jun 2024 17:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719248044; cv=none; b=Sqo2upg4a3c+dDAiX1LUsHSkxG9vu0EbBz/u0W8yXxlUw3/59TuLch0DZnTh3vVZgqiLsEUk07L4NM25UiKSzZQKaVTHXDysJ2chz9dPM+fW97CBTzo1gK1wat0h6XXrwilOn06yfGmXFpbMYkgMLPCMOuaWczFK7zUiGVtdpck=
+	t=1719248407; cv=none; b=dv9Ea6cWfcFWOYRBtRQSVVlWHHQTtNqf2t0tIxnx34Bi3/abVw1Ur3fmJfDvViQjugN5F8vi9brXWlB1hj1SfXVm2XIZ5RAM26IkhqQMGDZqSDn6AM7hXTXjes7z8SZ1zcMrGHC7vhFiJM60krWhZLuzr+Mi6ELTZBsOpCqZvcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719248044; c=relaxed/simple;
-	bh=5bohiIQjuFlZ3MC0ytH3G+PZ787pPsJS6tdm3PoEEOI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=kcnmTjWYfNxVKWBCpCJ58hkbxrX2oNpL16UfuosL2jfMBsUVK7DQvsA1zbU3gR5mBwFClWyEIy+BN3J3NIx6bKdpJcFO/C4WzrNKojsbwVNzxJUmlDBuMSNMicW8YOUPYcpeLjeQUmFl1Ye/7USv0VzSbs0iSXe1OiNj18MFIiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sk6FP6tx; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719248042;
+	s=arc-20240116; t=1719248407; c=relaxed/simple;
+	bh=Hmoar99WJgIcAtnd+WAt/THVlxlRjSv4TgbbqULAsV0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HWXnYSmvoogpErm20QM18qsaMOOdn5+H7rktnW267FUmZZo8vAHLc8hSIeIM6hC2SIsdZ06RtDO0cNOxi56pNcEKSzleSHAIufrlVY1/EBcmGAPhGfjzAXHmLiNJMY0cS1VITZgYbsZpFoeo1Dezi0FuJisfhLjWd+HDuCiooTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=WaByuFDk; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D95E0E0003;
+	Mon, 24 Jun 2024 16:59:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1719248397;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=FnHUA8KFPQfgKOFjau5SADjiwWEi99JYmDlhSDmtX0c=;
-	b=Sk6FP6txuTNB/usSrRSuH5savxbeFbOB10ieX+2Z2SBSOQMs+6JncwyCrGeR57coIUdsG8
-	rnrF3gNQUUJi41+yfRTNVdZA6thS+2KebSjUnKWPuFoXJzilcjN31VmZJfP+TN6Zikegrx
-	rlVWtm3pmZhgM28UVD5OkqZ0atVW/fE=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-638-fE7PfUYeN4qMpNTNcuGP-g-1; Mon,
- 24 Jun 2024 12:53:58 -0400
-X-MC-Unique: fE7PfUYeN4qMpNTNcuGP-g-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7F49019560A7;
-	Mon, 24 Jun 2024 16:53:52 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.9.58])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 74E201955D83;
-	Mon, 24 Jun 2024 16:53:48 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  dev@openvswitch.org,
-  linux-kselftest@vger.kernel.org,  linux-kernel@vger.kernel.org,  Pravin B
- Shelar <pshelar@ovn.org>,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Shuah
- Khan <shuah@kernel.org>,  Stefano Brivio <sbrivio@redhat.com>,
-  =?utf-8?Q?Adri=C3=A1n?=
- Moreno <amorenoz@redhat.com>,  Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH v2 net-next 0/7] selftests: net: Switch pmtu.sh to use
- the internal ovs script.
-In-Reply-To: <f7ttthjh33w.fsf@redhat.com> (Aaron Conole's message of "Sun, 23
-	Jun 2024 15:26:59 -0400")
-References: <20240620125601.15755-1-aconole@redhat.com>
-	<20240621180126.3c40d245@kernel.org> <f7ttthjh33w.fsf@redhat.com>
-Date: Mon, 24 Jun 2024 12:53:45 -0400
-Message-ID: <f7tpls6gu3q.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	bh=yQ4G9gHer+vGikuMMCqTObACnz6EiIwEffwORvVea34=;
+	b=WaByuFDkkhlrEUniTJL8/4WDvdgswAlaHd8tSxvOr2wDMPKTIA40qJExeDYTH24tp9b/n3
+	1sZtfv/v29UJVa4jLCbqZr1t/fjSQ70b7XMeZfWua+cU3Ompcsk7wNfzuXu/awfKgYhLS3
+	R/Bvd/okJC8y63AbOWE9oMHYoODqFDxqkOoCgeg9T5xjFbKy8iqlXiRk8n+/Om1Fg+bt2X
+	FAhPcorxp3rV9QZdpdQki3zHm4sKjMvfNqlGAmjTMH8oKz1M5DptG/LR8ufUxPLilBMVaU
+	8Bm28divy2PghoSiFXl3tV7nT27G4ou/ZF8v++BWdOF39p7BEn+HZ3H3IHyFEQ==
+Message-ID: <68961d4f-10d8-4769-94d3-92ce709aa00a@arinc9.com>
+Date: Mon, 24 Jun 2024 19:59:48 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] dt-bindings: net: dsa: mediatek,mt7530: Minor grammar
+ fixes
+To: Conor Dooley <conor@kernel.org>
+Cc: Chris Packham <chris.packham@alliedtelesis.co.nz>, andrew@lunn.ch,
+ f.fainelli@gmail.com, olteanv@gmail.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>
+References: <20240624025812.1729229-1-chris.packham@alliedtelesis.co.nz>
+ <704f4b95-2aed-4b76-87cb-83002698471c@arinc9.com>
+ <20240624-radiance-untracked-29369921c468@spud>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20240624-radiance-untracked-29369921c468@spud>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-Aaron Conole <aconole@redhat.com> writes:
-
-> Jakub Kicinski <kuba@kernel.org> writes:
->
->> On Thu, 20 Jun 2024 08:55:54 -0400 Aaron Conole wrote:
->>> This series enhances the ovs-dpctl utility to provide support for set()
->>> and tunnel() flow specifiers, better ipv6 handling support, and the
->>> ability to add tunnel vports, and LWT interfaces.  Finally, it modifies
->>> the pmtu.sh script to call the ovs-dpctl.py utility rather than the
->>> typical OVS userspace utilities.
+On 24/06/2024 19.29, Conor Dooley wrote:
+> On Mon, Jun 24, 2024 at 10:00:25AM +0300, Arınç ÜNAL wrote:
+>> On 24/06/2024 05.58, Chris Packham wrote:
+>>> Update the mt7530 binding with some minor updates that make the document
+>>> easier to read.
+>>>
+>>> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
+>>> ---
+>>>
+>>> Notes:
+>>>       I was referring to this dt binding and found a couple of places where
+>>>       the wording could be improved. I'm not exactly a techical writer but
+>>>       hopefully I've made things a bit better.
+>>>
+>>>    .../devicetree/bindings/net/dsa/mediatek,mt7530.yaml        | 6 +++---
+>>>    1 file changed, 3 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+>>> index 1c2444121e60..6c0abb020631 100644
+>>> --- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+>>> +++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+>>> @@ -22,16 +22,16 @@ description: |
+>>>      The MT7988 SoC comes with a built-in switch similar to MT7531 as well as four
+>>>      Gigabit Ethernet PHYs. The switch registers are directly mapped into the SoC's
+>>> -  memory map rather than using MDIO. The switch got an internally connected 10G
+>>> +  memory map rather than using MDIO. The switch has an internally connected 10G
+>>>      CPU port and 4 user ports connected to the built-in Gigabit Ethernet PHYs.
+>>> -  MT7530 in MT7620AN, MT7620DA, MT7620DAN and MT7620NN SoCs has got 10/100 PHYs
+>>> +  MT7530 in MT7620AN, MT7620DA, MT7620DAN and MT7620NN SoCs have 10/100 PHYs
 >>
->> Thanks for the work! 
+>> MT7530 is singular, the sentence is correct as it is.
+> 
+> Actually, the sentence is missing a definite article, so is not correct
+> as-is.
+
+The definite article is omitted for the sake of brevity. I don't believe
+omitting the definite article renders the sentence incorrect.
+
+> 
 >>
->> Looks like the series no longer applies because of other changes
->> to the kernel config. Before it stopped applying we got some runs,
->> here's what I see:
+>>>      and the switch registers are directly mapped into SoC's memory map rather than
+>>>      using MDIO. The DSA driver currently doesn't support MT7620 variants.
+>>>      There is only the standalone version of MT7531.
+>>> -  Port 5 on MT7530 has got various ways of configuration:
+>>> +  Port 5 on MT7530 supports various configurations:
 >>
->> https://netdev-3.bots.linux.dev/vmksft-net/results/648440/3-pmtu-sh/stdout
->>
->> # Cannot find device "ovs_br0"
->> # TEST: IPv4, OVS vxlan4: PMTU exceptions                             [FAIL]
->> # Cannot find device "ovs_br0"
->> # TEST: IPv4, OVS vxlan4: PMTU exceptions - nexthop objects           [FAIL]
->> # Cannot find device "ovs_br0"
->> # TEST: IPv6, OVS vxlan4: PMTU exceptions                             [FAIL]
->> # Cannot find device "ovs_br0"
->> # TEST: IPv6, OVS vxlan4: PMTU exceptions - nexthop objects           [FAIL]
->> # Cannot find device "ovs_br0"
->> # TEST: IPv4, OVS vxlan6: PMTU exceptions                             [FAIL]
->> # Cannot find device "ovs_br0"
->> # TEST: IPv4, OVS vxlan6: PMTU exceptions - nexthop objects           [FAIL]
->> # Cannot find device "ovs_br0"
->> # TEST: IPv6, OVS vxlan6: PMTU exceptions                             [FAIL]
->> # Cannot find device "ovs_br0"
->> # TEST: IPv6, OVS vxlan6: PMTU exceptions - nexthop objects           [FAIL]
->> # Cannot find device "ovs_br0"
->> # TEST: IPv4, OVS geneve4: PMTU exceptions                            [FAIL]
->> # Cannot find device "ovs_br0"
->> # TEST: IPv4, OVS geneve4: PMTU exceptions - nexthop objects          [FAIL]
->> # Cannot find device "ovs_br0"
->> # TEST: IPv6, OVS geneve4: PMTU exceptions                            [FAIL]
->> # Cannot find device "ovs_br0"
->> # TEST: IPv6, OVS geneve4: PMTU exceptions - nexthop objects          [FAIL]
->> # Cannot find device "ovs_br0"
->> # TEST: IPv4, OVS geneve6: PMTU exceptions                            [FAIL]
->> # Cannot find device "ovs_br0"
->> # TEST: IPv4, OVS geneve6: PMTU exceptions - nexthop objects          [FAIL]
->> # Cannot find device "ovs_br0"
->> # TEST: IPv6, OVS geneve6: PMTU exceptions                            [FAIL]
->> # Cannot find device "ovs_br0"
->>
->> Any idea why? Looks like kernel config did include OVS, perhaps we need
->> explicit modprobe now? I don't see any more details in the logs.
->
-> Strange.  I expected that the module should have automatically been
-> loaded when attempting to communicate with the OVS genetlink family
-> type.  At least, that is how it had been working previously.
->
-> I'll spend some time looking into it and resubmit a rebased version.
-> Thanks, Jakub!
+>> This is a rewrite, not a grammar fix.
+> 
+> In both cases "has got" is clumsy wording,
 
-If the ovs module isn't available, then I see:
+We don't use "have/has" on the other side of the Atlantic often.
 
-#   ovs_bridge not supported
-# TEST: IPv4, OVS vxlan4: PMTU exceptions                             [SKIP]
-
-But if it is available, I haven't been able to reproduce such ovs_br0
-setup failure - things work.
-
-My branch is rebased on 568ebdaba6370c03360860f1524f646ddd5ca523
-
-Additionally, the "Cannot find device ..." text comes from an iproute2
-utility output.  The only place we actually interact with that is via
-the call at pmtu.sh:973:
-
-	run_cmd ip link set ovs_br0 up
-
-Maybe it is possible that the link isn't up (could some port memory
-allocation or message be delaying it?) yet in the virtual environment.
-To confirm, is it possible to run in the constrained environment, but
-put a 5s sleep or something?  I will add the following either as a
-separate patch (ie 7/8), or I can fold it into 6/7 (and drop Stefano's
-ACK waiting for another review):
-
-
-wait_for_if() {
-   if ip link show "$2" >/dev/null 2>&1; then return 0; fi
-
-   for d in `seq 1 30`; do
-      sleep 1
-      if ip link show "$2" >/dev/null 2>&1; then return 0; fi
-   done
-   return 1
-}
-
-....
- 	setup_ovs_br_internal || setup_ovs_br_vswitchd || return $ksft_skip
-+	wait_for_if "ovs_br0"
- 	run_cmd ip link set ovs_br0 up
-....
-
-Does it make sense or does it seem like I am way off base?
-
+Arınç
 
