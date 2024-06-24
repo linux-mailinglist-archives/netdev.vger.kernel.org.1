@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-106110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 616BB914DF8
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:09:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19191914DFC
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:09:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA78C1F2369C
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:09:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C5871C20F13
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:09:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DBF813D62A;
-	Mon, 24 Jun 2024 13:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E9B13DDB5;
+	Mon, 24 Jun 2024 13:09:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="AQqvyf/W"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="Fu1ccmna"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f225.google.com (mail-lj1-f225.google.com [209.85.208.225])
+Received: from mail-ej1-f97.google.com (mail-ej1-f97.google.com [209.85.218.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A7B13D62F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6039213D62B
 	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 13:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.225
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719234546; cv=none; b=ZviG/AaQRH7mYte2JfR8rfeuQlhcNvEMv+R93+skIgNLQJwdx+j+WOFx+IcBpWssZQa4UPrjuNhP1PMYDriWp9AjNiPFg/Mgm71X8dsOEWS6ie7I3zD+t1Iogpue2/f2CK9/oHaGhN7/0tbYXW6xPXBETI3EEFAu4isivJ5J2E8=
+	t=1719234547; cv=none; b=mZJTLKqKijaq+rMEjYfyZ+ZcR/iv/LSwlPIGtYsiIuqbrJ0V5oF5E9/Cy+zS4AKOl6ut6Xve2GiQzMeq18rPzcf4ioNVJQDVVKB9vrAWaB6ymXMAJ8MNFP5h7DIqwzU1YON7FbL1oDVU8cYT5PGsnJobabYnDKOYzNzxvnR3us0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719234546; c=relaxed/simple;
-	bh=8oaIXIe0+bbffU+4+tyy8R/V/TlWyVTDw3J9fG4MGsU=;
+	s=arc-20240116; t=1719234547; c=relaxed/simple;
+	bh=YnwMFx7v27V6FYvekKLIctK4MfTa3mGutFv4M3UNWRA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fAIpFTcVS0YNpuog5ttTaBgeSfXfrqOk2AMAxONsUkNs+BLKQOFoPDcGEL2rzNspMuKoInGyzlJcJAWq+s8r6/F/UYN2FQuQUOKKJD0rChYugj+e14nPnKt1vy5LZYqQWZoR3oXY+2vfaohSKJzLdUlF0PL164eq0HeOwxgRj3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=AQqvyf/W; arc=none smtp.client-ip=209.85.208.225
+	 MIME-Version; b=XzkIMQD4FLe203+1v3wszzhe2+P0GphusrhiNkSQoWNwLTAgwG6MGf2K6JbtUrv00Hhe2tJgz96QntcNDgNPFu/bJoAbEnN6yo9FxEFK/MDnDFOPes2jMBaH16DO/rMPifFay/zbPKPjVA1bl4R00wSp5qvivXoc4dTjVUpicAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=Fu1ccmna; arc=none smtp.client-ip=209.85.218.97
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-lj1-f225.google.com with SMTP id 38308e7fff4ca-2ec1620a956so51598751fa.1
+Received: by mail-ej1-f97.google.com with SMTP id a640c23a62f3a-a7194ce90afso198427366b.2
         for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 06:09:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=6wind.com; s=google; t=1719234543; x=1719839343; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MeLUTTDqDBsmxH/CzCbI0wYe8vQnI0MozaiZWlhCOJE=;
-        b=AQqvyf/WSThIg1dcIPAZ41xmnbVrJWe5IW83frtm4/8PJqpRB3ei1n6tUgiF4i27n6
-         2fHHfXTLbZ8z0uyIR0jtitNmICVZ2QiAxRfTosXkpKjGbgHWYsxm3QlZ5n68FPkm4LnC
-         nE54t7LC6m/fYQxtbDCjVF+yxcrdrbMbebZmBw8i2QNo4yeQOg7AoAEHrLqsyLBXZLVK
-         HFKeuZSqJOOHWcGZ6Mxmlj//ZvHpZilz6f8ox4CWZOUmOujo4NgRzPgZ1JZtTBOdEZ5m
-         Q2/KWpqRFZC6gYHSZvHgr2jljWQ7D4ogoJVPxoj61/pcGeeS1+PYdFts9oicrBRY2Ok1
-         vIcw==
+        bh=LdqEoEJ0Pf4lgGIH6ji9Pz/3++dxBfiK/h/sDIFPHrE=;
+        b=Fu1ccmnantlWGJLI4dH6m5m9HQa+KJbOmeQZcRKp6A3hC+VyTuYWqmTpL9tdrhwTGW
+         tTmbQiIRdBTPOCaNw8DK2W/mijX9vRmQuX1qfitOgAYc5Yfjs3QdpDZlA+Wr+V6f8cOX
+         AOcgWy7U3kUnnIFa9gpgn0Ah5YL2FFLrwgXq0J9vjXPpK5tiUdzCzMtVCxN+OPaK2z39
+         OaqX1AqBVdsQC4jCP330o1xw6YcY0KMSQCnPzTdqvNtijjPm/yGI35iM31mx6lNndlPQ
+         6Q64JVzW5Ooaz8RGSnNMQUv0mz73tUvB6t8wiE0anMlsrpSNWJYcVjVOJXzyKZ7+8RCZ
+         2Qaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1719234543; x=1719839343;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MeLUTTDqDBsmxH/CzCbI0wYe8vQnI0MozaiZWlhCOJE=;
-        b=I0uQEXLVHxOcu9iQCGMzy6Qcs4I3blFyNOGtJq03PEN0Asxw7Mk92+Xq52oPACQW02
-         334lrer3rhyWfQUqE4cyhrj+HvWZHVR00jq5vFXMBtcG+vevjzWj3GkotJga/Rr32IFS
-         Ogk7pa58La0LLS5488CqmZReLG6XEyFLUd3zEotXku9a9BWZbTW5p4QkAfzWF1dRJ6u4
-         cAObON1KfWm/VpKjwoq/OcAAAsE3uTUJsVc6InMEPjg/mBlD1MzjWTAsO+7pkB5puyVV
-         jHwWsMfT5Fzr6hreEyX79SOlKqfV12fjIboXsjDsWANGoywfZwuPkX/bc02g8FFK5Pxy
-         p4yA==
-X-Forwarded-Encrypted: i=1; AJvYcCU9etEe6hD6YlvWC8Q1Xsd2U5Dsq7mMC69wFVPvYP3Vj86oabqi0lprIr4Co00d3hNOQL4WGvPR+jk+MPxy8T76T+ExjvEa
-X-Gm-Message-State: AOJu0YxXy5AhKYzA5Ff2I/GHP9odBPBvQ630fl6jYXf4HNHvtR3GpcCf
-	8p9kKQ+uRGGAkih8Z+zchloGQ0ttygurAHTSehWOL23eOcz/LkRj6K4Z7TOLwuUcIBmFa0Lzoob
-	IkzlT9ej6UQihyIOr+G9+g+8tqdQtO+G2
-X-Google-Smtp-Source: AGHT+IELmlE6/jT14ZDxmp+y2Ey92cZln6BwHTGXEgEmu0GwEmf4G62NZJLnWwhtXIIPSyY/YKkKI9ZTVudr
-X-Received: by 2002:a05:651c:22f:b0:2ec:5128:1851 with SMTP id 38308e7fff4ca-2ec5b3197e3mr24276381fa.3.1719234542627;
+        bh=LdqEoEJ0Pf4lgGIH6ji9Pz/3++dxBfiK/h/sDIFPHrE=;
+        b=m+wdRodheA9H9NA9g9cwGVdYeRf/dZ+I1yLAxNGub6Rn2O4hBFirFYjQAunnHB5VSf
+         cmrxhQIT/+zU8DFLVUoTb/O9i7gX3HA//Xy0LfpHKTmRUm4uJAXATqEYxL5jmmXNVFgY
+         pc2n5Uw3D3A2Gio2aR+Oc/j5zw5UGKTF+03fD3rYxenyWmC0vT1cSAyneqqd2if9c6qa
+         E5+2pm2HvLL58DC9MD+dxiRHooCQK2o7xxXy4bdY6RnTyLj2jP/EIxTnXyHnhi9aBvrL
+         hfGm6u+VK0o7gBmPUhs3PDH+4ykT345jP9GzIvQmPr3HyFNGIX390rcL2skIX9GvFi2/
+         L9gg==
+X-Forwarded-Encrypted: i=1; AJvYcCV72po4039gROY1IDC7Jrqos4sFUOYaMAJ6xFrtWzTC+P/1vOaTfMdl8vuxFgN7SRt3NF4bkXCVq2LuxqLAUx0VAd8dkVN9
+X-Gm-Message-State: AOJu0YxrzRW3TpnLWaNLTw7ps+bpIdiQ48mBrLSWZaYcc088IuYr5PXj
+	fr8RRCE10H6fYqVcYGSwUECNuk96zHmoZRN4KxF0aC2IxwajteyflwkWON/b4ltaDuqkWdURu28
+	DpDo2xEvwXv8yf5S2QieFGWxHSGCJk2Om
+X-Google-Smtp-Source: AGHT+IHCk7wynrIl8qJrDVl6mUMvyc5T0uLPZ9fOJVKL4yEifbZ4Dcx4XDbVA+6QE1V+fboohRVwC3ANdYMU
+X-Received: by 2002:a17:906:4713:b0:a70:6f2c:b308 with SMTP id a640c23a62f3a-a715f94a9d8mr372023966b.29.1719234542660;
         Mon, 24 Jun 2024 06:09:02 -0700 (PDT)
 Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id ffacd0b85a97d-366efb23ee2sm95047f8f.105.2024.06.24.06.09.02;
+        by smtp-relay.gmail.com with ESMTP id a640c23a62f3a-a6fcf560fc5sm12243966b.229.2024.06.24.06.09.02;
         Mon, 24 Jun 2024 06:09:02 -0700 (PDT)
 X-Relaying-Domain: 6wind.com
 Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
-	by smtpservice.6wind.com (Postfix) with ESMTPS id 5329D603A7;
+	by smtpservice.6wind.com (Postfix) with ESMTPS id 570A760490;
 	Mon, 24 Jun 2024 15:09:02 +0200 (CEST)
 Received: from dichtel by bretzel with local (Exim 4.94.2)
 	(envelope-from <nicolas.dichtel@6wind.com>)
-	id 1sLjRO-00406A-0g; Mon, 24 Jun 2024 15:09:02 +0200
+	id 1sLjRO-00406D-1I; Mon, 24 Jun 2024 15:09:02 +0200
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 To: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -83,9 +83,9 @@ Cc: David Ahern <dsahern@kernel.org>,
 	netdev@vger.kernel.org,
 	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
 	stable@vger.kernel.org
-Subject: [PATCH net 2/4] ipv6: fix source address selection with route leak
-Date: Mon, 24 Jun 2024 15:07:54 +0200
-Message-ID: <20240624130859.953608-3-nicolas.dichtel@6wind.com>
+Subject: [PATCH net 3/4] ipv6: take care of scope when choosing the src addr
+Date: Mon, 24 Jun 2024 15:07:55 +0200
+Message-ID: <20240624130859.953608-4-nicolas.dichtel@6wind.com>
 X-Mailer: git-send-email 2.43.1
 In-Reply-To: <20240624130859.953608-1-nicolas.dichtel@6wind.com>
 References: <20240624130859.953608-1-nicolas.dichtel@6wind.com>
@@ -97,83 +97,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-By default, an address assigned to the output interface is selected when
-the source address is not specified. This is problematic when a route,
-configured in a vrf, uses an interface from another vrf (aka route leak).
-The original vrf does not own the selected source address.
-
-Let's add a check against the output interface and call the appropriate
-function to select the source address.
+When the source address is selected, the scope must be checked. For
+example, if a loopback address is assigned to the vrf device, it must not
+be chosen for packets sent outside.
 
 CC: stable@vger.kernel.org
-Fixes: 0d240e7811c4 ("net: vrf: Implement get_saddr for IPv6")
+Fixes: afbac6010aec ("net: ipv6: Address selection needs to consider L3 domains")
 Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 ---
- include/net/ip6_route.h | 19 ++++++++++++-------
- net/ipv6/ip6_output.c   |  1 +
- net/ipv6/route.c        |  2 +-
- 3 files changed, 14 insertions(+), 8 deletions(-)
+ net/ipv6/addrconf.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
-index a18ed24fed94..62755fab1b52 100644
---- a/include/net/ip6_route.h
-+++ b/include/net/ip6_route.h
-@@ -127,18 +127,23 @@ void rt6_age_exceptions(struct fib6_info *f6i, struct fib6_gc_args *gc_args,
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 5c424a0e7232..4f2c5cc31015 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -1873,7 +1873,8 @@ int ipv6_dev_get_saddr(struct net *net, const struct net_device *dst_dev,
+ 							    master, &dst,
+ 							    scores, hiscore_idx);
  
- static inline int ip6_route_get_saddr(struct net *net, struct fib6_info *f6i,
- 				      const struct in6_addr *daddr,
--				      unsigned int prefs,
-+				      unsigned int prefs, int l3mdev_index,
- 				      struct in6_addr *saddr)
- {
-+	struct net_device *l3mdev;
-+	struct net_device *dev;
-+	bool same_vrf;
- 	int err = 0;
+-			if (scores[hiscore_idx].ifa)
++			if (scores[hiscore_idx].ifa &&
++			    scores[hiscore_idx].scopedist >= 0)
+ 				goto out;
+ 		}
  
--	if (f6i && f6i->fib6_prefsrc.plen) {
-+	rcu_read_lock();
-+	l3mdev = dev_get_by_index_rcu(net, l3mdev_index);
-+	dev = f6i ? fib6_info_nh_dev(f6i) : NULL;
-+	same_vrf = l3mdev && l3mdev_master_dev_rcu(dev) == l3mdev;
-+	if (f6i && f6i->fib6_prefsrc.plen && same_vrf)
- 		*saddr = f6i->fib6_prefsrc.addr;
--	} else {
--		struct net_device *dev = f6i ? fib6_info_nh_dev(f6i) : NULL;
--
--		err = ipv6_dev_get_saddr(net, dev, daddr, prefs, saddr);
--	}
-+	else
-+		err = ipv6_dev_get_saddr(net, same_vrf ? dev : l3mdev, daddr, prefs, saddr);
-+	rcu_read_unlock();
- 
- 	return err;
- }
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index 27d8725445e3..784424ac4147 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -1124,6 +1124,7 @@ static int ip6_dst_lookup_tail(struct net *net, const struct sock *sk,
- 		from = rt ? rcu_dereference(rt->from) : NULL;
- 		err = ip6_route_get_saddr(net, from, &fl6->daddr,
- 					  sk ? READ_ONCE(inet6_sk(sk)->srcprefs) : 0,
-+					  fl6->flowi6_l3mdev,
- 					  &fl6->saddr);
- 		rcu_read_unlock();
- 
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 8d72ca0b086d..c9a9506b714d 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -5689,7 +5689,7 @@ static int rt6_fill_node(struct net *net, struct sk_buff *skb,
- 				goto nla_put_failure;
- 	} else if (dest) {
- 		struct in6_addr saddr_buf;
--		if (ip6_route_get_saddr(net, rt, dest, 0, &saddr_buf) == 0 &&
-+		if (ip6_route_get_saddr(net, rt, dest, 0, 0, &saddr_buf) == 0 &&
- 		    nla_put_in6_addr(skb, RTA_PREFSRC, &saddr_buf))
- 			goto nla_put_failure;
- 	}
 -- 
 2.43.1
 
