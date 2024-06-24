@@ -1,224 +1,102 @@
-Return-Path: <netdev+bounces-106201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C48F491532B
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 18:10:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2083915364
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 18:22:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D1381F21B2C
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 16:10:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E22181C22EED
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 16:22:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 786E619DF58;
-	Mon, 24 Jun 2024 16:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IOh+5xXe"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB9119DF45;
+	Mon, 24 Jun 2024 16:21:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38F619DF47;
-	Mon, 24 Jun 2024 16:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D76819B590;
+	Mon, 24 Jun 2024 16:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719245423; cv=none; b=MPr94NQa6jGvM8rDTd4DWoEK0CJKhg79F9VeuNi0h1kemvxUIW5FV9Eue9I4/TpNiiZx/IrwKVGsc+qzK3fhshCtqqBqpJPyfgPBpsDqp4H6gaY1oZMiVpmR009D+JJEVHjadEzVY1HZVg93ITQwcASECw6PDPtpSasVFQJYihA=
+	t=1719246117; cv=none; b=bGI3OFXdGEhOs5vgnl1e5bIEUKIkZTa19HfkqjO/Zfi7RCN0e42MT2yMoqdMYbWawSRrezL/oAllOQ7ZCjAO9uBCLh/LBnv2uu3Dlmwe9yx4DU55KosKKKsELa1uDoBY3fPTlozc7jyJEXHOG8c4zW2Aj5TQUh5DB5o5vKY79mM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719245423; c=relaxed/simple;
-	bh=cl4MPGLdmcHEoORjY2x+DVBjrLjLbNFLHu4q6u73Y3k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LrWfxAxM5pvwPVQiAsmbdmp905+zZHfAtLqXx+r+/HgbM7SdClaTWoZPewqkpXKhCMrsseGGFZirdLCae2BmbAQ7IQlpgAc/sE8wCvFQqjPvKfonEdOWVDLyShbOYTiwqgjRYmpkTZlg30kigm1YtWXdS4bTM3UnKD9fMuJ0b0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IOh+5xXe; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1719246117; c=relaxed/simple;
+	bh=SlQR/YilwGyYw+GewS/RVjILB88L+FJD4Y6bw6oQsLQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BFkrg5+bjQ1nxq1QBW/yHNb5ubsjP8JOSG8VTShQ6gFcQrOrXQim/4CgdX2g2UR1b5l7aQUEvSk+stYVmkJwY6ubKGjhaU8SFhwe+J1A3SbNJXUOULBAsV/BVOyRy023OliUAIh1LJvKdi/7XsGltiox/4wlmR6/Qv3ff4Ssy6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1f47f07aceaso35086975ad.0;
-        Mon, 24 Jun 2024 09:10:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719245421; x=1719850221; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ttX0yp76l2xnXq8JSAtn3cUDBQPLpo3WhU7vnTaPql0=;
-        b=IOh+5xXeep6GqTt8+Bf8TYFebJn6KOwkpQ3T2OmjG83wZWPWQ2FF/mQzg/d3c7W9LJ
-         GWuAWDhSSgV5vhF0yhB18c0aU1JzRtfM3aQg0tiSqgwxaLCsMD/Dbs3hBdh0yjOjawsR
-         WM5Z35zoThIRxLmBT1LjozK5OQinD2VcNnxN5JaIMQBjsROerBglbQXhCXylmzOrPoXN
-         cwZHTa0Nj6bMK77xQMTEdc0lopxRm+eQJ70yZKhnNSRQw+l+ChpeHFfTBFUN1GBx3AnX
-         WF1JVPAYvmf9UlYQwjg9WwWGSgSpTi56Hy8npx/k6AC+marrhPnCR3B45IhrcAmS8rT+
-         JKKg==
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a689ad8d1f6so574128866b.2;
+        Mon, 24 Jun 2024 09:21:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719245421; x=1719850221;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ttX0yp76l2xnXq8JSAtn3cUDBQPLpo3WhU7vnTaPql0=;
-        b=oZiQIcfd/D6OWM7PTvJ+VrLp68W3MbwtQpruTzS5wJ6HDF/INNVP0JV2eRPenPx1Xr
-         x+7jwN5DuAOKRqc5MdaGPDlLrdumgHHt0KbgENPOieOVE2gPRktXgLYhZ5xxyGuhAcPO
-         1wgvDTt6JpYiWOknp05KV8LuPQ2w86zALo5gIHctXxWqyXvq+OhEVRStsSCxLiLCcjRr
-         HYYo3xtoFfmP0QLzsHz28fW0VGIk4gDpNF0Wxq1ObvWKcl5E7Poh460Xttplweb+S169
-         yQxtINiqyP0TA8e1jTNnE/xmLS4sw9WOhLVNvcL6fH0MU0O4a8iyhdd+rjiNb4nN6CTo
-         h+mA==
-X-Forwarded-Encrypted: i=1; AJvYcCUGa8y6sYcQYXvHz3u3Z1TrgPnQlROzBcHvhyvEGqfPdGKPcka4FQ21HWQu+E2ekegRUC6VeoiaofVOx1qs/C5vpPx6zIToZLtbF9q4KvPrDSQYiivLASWaTcIKQWGdklu9LtaZJ7UAaGWuNPf+/4ScbxR7GA1jeLVsnJGuNofghICpNs7hy3gf
-X-Gm-Message-State: AOJu0YynKu8mYJ5QmBVBpeke5cmPcdIiAc3qpPL4/H2K3gp4WcQ52E7C
-	Ocn14S0R2szQ/PrGBYxdlNsiAkT2C20YEz6p3cqSKGpUqahXMVQz
-X-Google-Smtp-Source: AGHT+IH/OtHRU1nurIROIfMExtRTyvwaJeKWPLDLQDTrv8mTAiL7uD5HR4vojTvfD+SDzijq49zP+w==
-X-Received: by 2002:a17:902:d4c7:b0:1fa:128c:4315 with SMTP id d9443c01a7336-1fa15937ac6mr57783425ad.44.1719245420780;
-        Mon, 24 Jun 2024 09:10:20 -0700 (PDT)
-Received: from [192.168.50.95] ([118.32.98.101])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9f6e36df3sm59690285ad.17.2024.06.24.09.10.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jun 2024 09:10:20 -0700 (PDT)
-Message-ID: <2a28004a-161f-4cde-9d1c-7b779333e666@gmail.com>
-Date: Tue, 25 Jun 2024 01:10:14 +0900
+        d=1e100.net; s=20230601; t=1719246114; x=1719850914;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=z5dYSmS+UlMvDH3osanHRgj0IFMR5noB3hmhQYLwPF0=;
+        b=s2f3/JXfvtISGVVjy4VjBqZVqpd9eggygmZM2bcwSXs1loR0XY7CzuEDcDsz1XqVvy
+         GA8CzV8vUYjpYyEVotSD88Jy+MfFUmjA14PT5nIijJa0WULQWU6Q6iVVfg/fhhoqTEzw
+         0NMHOgZhKlz9m+KLzMz9erQGvwsqhm/VK3/DzrYewyqtH7Hh15sWs3TgArerg1cdwTrw
+         vRKvmb2/bqQfiSY+MIgvFI/IaQHW9YqOIuULiO0ftRJt/hTB2Ql2iuA2vPe4u0fqlM1d
+         PqCJZ9QbO6huZeKhKlWaAudlZAshiuwFieHh4AdhKaz78u5fnk2YjoHdYZrED1dwsWYp
+         H8Kw==
+X-Forwarded-Encrypted: i=1; AJvYcCWdI/8jddqBEDUX4S8dG/aLdiiuefXznypN6Tew8chF8v9nrwZrGb5lHdG/KVx87Z14Bd+DgoNFeVFblMmQKFJ/+RvJsRfeHr5Ge0VCSdcvdBCvNbDOubJfxcYv4+6vdHyFUJGr
+X-Gm-Message-State: AOJu0YwxUHTBEpZcHIE4zqQAyZy/JH/FM3aqKnUiACjKDjtQgfNYqvMP
+	0krzO9LwtvYKy4p/JSJwuWTVNClmJptcWLNsiZpGFxZ7VhtR/wxb
+X-Google-Smtp-Source: AGHT+IGAirccbr9ebRQ4r1Bpr+wLTdNcrvrtLbrlxOOhudvRIZe2BWJOZZT0opPHnukDV9nHPaB2Zg==
+X-Received: by 2002:a17:907:8e93:b0:a6e:f62d:bd02 with SMTP id a640c23a62f3a-a7245c84f2emr309572466b.7.1719246113524;
+        Mon, 24 Jun 2024 09:21:53 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a724d8a362fsm173519666b.158.2024.06.24.09.21.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jun 2024 09:21:53 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	horms@kernel.org,
+	Roy.Pledge@nxp.com,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH 1/4] soc: fsl: qbman: FSL_DPAA depends on COMPILE_TEST
+Date: Mon, 24 Jun 2024 09:21:19 -0700
+Message-ID: <20240624162128.1665620-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] tracing/net_sched: NULL pointer dereference in
- perf_trace_qdisc_reset()
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Takashi Iwai <tiwai@suse.de>, "David S. Miller" <davem@davemloft.net>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Taehee Yoo <ap420073@gmail.com>,
- Austin Kim <austindh.kim@gmail.com>, shjy180909@gmail.com,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- ppbuk5246@gmail.com, Yeoreum Yun <yeoreum.yun@arm.com>
-References: <20240622045701.8152-2-yskelg@gmail.com>
- <fa8e452b-ad37-482b-8d9b-bc8b4cad0ff9@mojatatu.com>
- <d7b67e36-adee-4abc-b4c4-0548333ac90a@gmail.com>
- <06d0ea61-47ee-4e54-9dfa-a711c5bc07d0@mojatatu.com>
-Content-Language: en-US
-From: Yunseong Kim <yskelg@gmail.com>
-In-Reply-To: <06d0ea61-47ee-4e54-9dfa-a711c5bc07d0@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Pedro,
+As most of the drivers that depend on ARCH_LAYERSCAPE, make FSL_DPAA
+depend on COMPILE_TEST for compilation and testing.
 
-On 6/25/24 12:55 오전, Pedro Tammela wrote:
-> On 24/06/2024 12:43, Yunseong Kim wrote:
->> Hi Pedro,
->>
->> On 6/25/24 12:12 오전, Pedro Tammela wrote:
->>> On 22/06/2024 01:57, yskelg@gmail.com wrote:
->>>> From: Yunseong Kim <yskelg@gmail.com>
->>>>
->>>> In the TRACE_EVENT(qdisc_reset) NULL dereference occurred from
->>>>
->>>>    qdisc->dev_queue->dev <NULL> ->name
->>>>
->>>> [ 5301.595872] KASAN: null-ptr-deref in range
->>>> [0x0000000000000130-0x0000000000000137]
->>>> [ 5301.595877] Mem abort info:
->>>> [ 5301.595881]   ESR = 0x0000000096000006
->>>> [ 5301.595885]   EC = 0x25: DABT (current EL), IL = 32 bits
->>>> [ 5301.595889]   SET = 0, FnV = 0
->>>> [ 5301.595893]   EA = 0, S1PTW = 0
->>>> [ 5301.595896]   FSC = 0x06: level 2 translation fault
->>>> [ 5301.595900] Data abort info:
->>>> [ 5301.595903]   ISV = 0, ISS = 0x00000006, ISS2 = 0x00000000
->>>> [ 5301.595907]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
->>>> [ 5301.595911]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
->>>> [ 5301.595915] [dfff800000000026] address between user and kernel
->>>> address ranges
->>>> [ 5301.595971] Internal error: Oops: 0000000096000006 [#1] SMP
->>>> Link:
->>>> https://lore.kernel.org/lkml/20240229143432.273b4871@gandalf.local.home/t/
->>>> Fixes: 51270d573a8d ("tracing/net_sched: Fix tracepoints that save
->>>> qdisc_dev() as a string")
->>>> Cc: netdev@vger.kernel.org
->>>> Cc: stable@vger.kernel.org # +v6.7.10, +v6.8
->>>> Signed-off-by: Yunseong Kim <yskelg@gmail.com>
->>>> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
->>>> ---
->>>>    include/trace/events/qdisc.h | 2 +-
->>>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/include/trace/events/qdisc.h
->>>> b/include/trace/events/qdisc.h
->>>> index f1b5e816e7e5..170b51fbe47a 100644
->>>> --- a/include/trace/events/qdisc.h
->>>> +++ b/include/trace/events/qdisc.h
->>>> @@ -81,7 +81,7 @@ TRACE_EVENT(qdisc_reset,
->>>>        TP_ARGS(q),
->>>>          TP_STRUCT__entry(
->>>> -        __string(    dev,        qdisc_dev(q)->name    )
->>>> +        __string(dev, qdisc_dev(q) ? qdisc_dev(q)->name :
->>>> "noop_queue")
->>>>            __string(    kind,        q->ops->id        )
->>>>            __field(    u32,        parent            )
->>>>            __field(    u32,        handle            )
->>>
->>> You missed the __assign_str portion (see below). Also let's just say
->>> "(null)" as it's the correct device name. "noop_queue" could be
->>> misleading.
->>
->> Thanks for the code review Pedro, I agree your advice.
->>
->>> diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
->>> index 1f4258308b96..f54e0b4dbcf4 100644
->>> --- a/include/trace/events/qdisc.h
->>> +++ b/include/trace/events/qdisc.h
->>> @@ -81,14 +81,14 @@ TRACE_EVENT(qdisc_reset,
->>>          TP_ARGS(q),
->>>
->>>          TP_STRUCT__entry(
->>> -               __string(       dev,           
->>> qdisc_dev(q)->name      )
->>> +               __string(       dev,            qdisc_dev(q) ?
->>> qdisc_dev(q)->name : "(null)"    )
->>>                  __string(       kind,          
->>> q->ops->id              )
->>>                  __field(        u32,           
->>> parent                  )
->>>                  __field(        u32,           
->>> handle                  )
->>>          ),
->>
->> It looks better to align the name with the current convention.
->>
->> Link:
->> https://lore.kernel.org/linux-trace-kernel/20240222211442.634192653@goodmis.org/
->>
->>>          TP_fast_assign(
->>> -               __assign_str(dev, qdisc_dev(q)->name);
->>> +               __assign_str(dev, qdisc_dev(q) ? qdisc_dev(q)->name :
->>> "(null)");
->>>                  __assign_str(kind, q->ops->id);
->>>                  __entry->parent = q->parent;
->>>                  __entry->handle = q->handle;
->>>
->>>
->>
->> The second part you mentioned, Steve recently worked on it and changed
->> it.
->>
->> Link:
->> https://lore.kernel.org/linux-trace-kernel/20240516133454.681ba6a0@rorschach.local.home/
-> 
-> Oh!
+	# grep -r depends.\*ARCH_LAYERSCAPE.\*COMPILE_TEST | wc -l
+	29
 
-Thanks for the double check, Pedro.
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ drivers/soc/fsl/qbman/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->> If it hadn't, I don't think I would have been able to prevent the panic
->> by just applying my patch.
-> 
-> But you must be careful with the backports.
-> 
-> In any case, perhaps send another patch to net-next updating the new
-> conventions there and use the 'old convention' for the bug fix?
+diff --git a/drivers/soc/fsl/qbman/Kconfig b/drivers/soc/fsl/qbman/Kconfig
+index bdecb86bb656..27774ec6ff90 100644
+--- a/drivers/soc/fsl/qbman/Kconfig
++++ b/drivers/soc/fsl/qbman/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ menuconfig FSL_DPAA
+ 	bool "QorIQ DPAA1 framework support"
+-	depends on ((FSL_SOC_BOOKE || ARCH_LAYERSCAPE) && ARCH_DMA_ADDR_T_64BIT)
++	depends on ((FSL_SOC_BOOKE || ARCH_LAYERSCAPE || COMPILE_TEST) && ARCH_DMA_ADDR_T_64BIT)
+ 	select GENERIC_ALLOCATOR
+ 	help
+ 	  The Freescale Data Path Acceleration Architecture (DPAA) is a set of
+-- 
+2.43.0
 
-Right, I agree, I'll send a patch for the next version.
-
-Warm regards,
-Yunseong Kim
 
