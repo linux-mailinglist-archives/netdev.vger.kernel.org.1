@@ -1,213 +1,357 @@
-Return-Path: <netdev+bounces-106136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11696914EF0
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:42:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FAAA914EF4
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:43:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB3AA281C93
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:42:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92DCA1C2227B
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:42:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678C613DDBA;
-	Mon, 24 Jun 2024 13:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5646D13D2B8;
+	Mon, 24 Jun 2024 13:42:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TM81eL89"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kSkvqsSC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E3A13D8B4
-	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 13:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719236554; cv=none; b=mc+IjZiBHyII+LxO8I2jB3C2QHWNYGI7IXugnmz+LpSYomBnH0NhspIUzQ097fRvQogtrx3ObNLeRG71GZxnBU+fu+1F+JiHrqo0j7boepdKgeLgyw+MWYmbk0a7+cMd9JxBeyN9seD+zAjqzPA8aE6L2dszZL8/PPp4fyxOEWQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719236554; c=relaxed/simple;
-	bh=r6zTi3ntQnckhbaoCILig8THR0eF7H4OsBZ/tFJV2LY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oJRI4M5LokZY/fLKHOOsGQwNNmQZ5ntWmrLjIWe1wL2y5uHt6uOvZ4AGS6W85PgOoWqAY3WAkFyUVdSOHeO927IbijIz7mIBl2HjWgDFyZ1ws0YzbetsRZ8HyD1DONIrResH+hiufrT1WtqltcJAxXMLKGCCEV7nXk42Atm+P78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TM81eL89; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-57d00a51b71so23950a12.0
-        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 06:42:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719236551; x=1719841351; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VSokJ3EUSU5UEr3KWUTcjNsYeeU4+Z4afSCdW2hJwP4=;
-        b=TM81eL89PDoehmbBz7nYCZDTdVlBhJ6BvUgijnHI6BzcSnybBTGXXpOsm370oH588I
-         SCsw7Z+EckRjxFEvn0gI5DMJlh/LqyaudmP4A5ok7Tm6A0Lv86dNbDj5tG6SS7afu49n
-         RdWOjF7CeqRyfzJdFDxR3kb54SZOYbT1+gGMSGamycy/bV+a62KiRsb8OHmz01nLLH+F
-         MzClxSGWtnE0UbordwO0ztwQkzH0gO98O+43/fiEugYzgGLhH+JDpRTmifM6NJmvgjSN
-         4CnR4BRuhSSEw3AOxsAb70+77reX+FsyCcy3YEkj+fgqD1JkJgoK+aAjiEu0EsS2NVlC
-         tw2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719236551; x=1719841351;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VSokJ3EUSU5UEr3KWUTcjNsYeeU4+Z4afSCdW2hJwP4=;
-        b=cMKH6ltxHjQzoWpKCHUgk3n2IQmuEPPHR70nkLFyFnjEKkfOHIWM8KRavPbRV9NzDT
-         5cODv3wNxelMfN2xMU6i6T64v0x+qlbHCHC6U0VrS8RamiT9UOemaHE5YZ1wNrOYrqcd
-         mhfI1r6XhdLM6MrxmpFXR3nvYHVW/P41AVgT/pl16Sp0+T6XRK8v+kfGb+150YutztTE
-         j+uwtpZHCuwNGrhDMS8zEqs8FMVxuPKQ8Ml1zTIpQa3KXGnH++amfpecNQHzZIQPVb1q
-         NsuXUCyoLwpizQIGM+QVRNGNzTMdpwKYiT4FQ3OpfZPLSRgSuoLpF0ii/2Efe/vR6aOt
-         e9gg==
-X-Forwarded-Encrypted: i=1; AJvYcCWFYclpyeDhvifiP5xB6c7KOlXbEiyDZVD7oFlhjEa/tQsdQZsMyFScVW3/CNGDnyt9kxCvUGclXS2wD5q6tVgAHcLdXiWy
-X-Gm-Message-State: AOJu0Yw28eHt417NioX0J4urTUctiu5y37LnTTc9ZvLTQM9MuI7f85P9
-	3wfDrOWj/KhBPukhUDsJgRF9W6OoRM33G61i0pl1RM0DzOv9hQrjMG43tn3Eg2CWbtHgTdO4Qzg
-	NfJd9OPMA6AIYMhYrZ+vmeg8Km1GObtT1EYIZ
-X-Google-Smtp-Source: AGHT+IExMCduWBbykElPzIUGTue1yZGzK/o9rKdjuJtfSk9r8JrxqxGwDpUAl9nBslWuYssYO2GIZrZdfiaPnqfaNtg=
-X-Received: by 2002:a05:6402:524f:b0:57c:d1dd:e645 with SMTP id
- 4fb4d7f45d1cf-57d41af61aemr299210a12.5.1719236547427; Mon, 24 Jun 2024
- 06:42:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9187A13CFB7
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 13:42:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719236576; cv=fail; b=Wa4IhbkDu/ZetK087rFapJOHbBRNtp0GdW7lCVJO7+FQ+Nz2X1FC83NC+c1po2PH0nutZgIKMgbbpteMFlAeV4FV8JbjFtynCPBQG0Pf4G8nB0oFoKw41WDDA2v+pa0qPeA/1NsMJKlfxkoh/LHPXQr3/0poXxw/vgPahixQidQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719236576; c=relaxed/simple;
+	bh=u4kQTcL82w99OJQsWsX6vB5v2XEs0hliwgoGzo1RaRk=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Yy3cii5Xm8bG7NuZY78cpVH+Dev7a2/CGfjNbIU0CS+3pVm1Zi/FNYM8HtFqt/MKPWLntzbXXgizlYe7IeYQCwYSgjlPvakJHhNJm+4PNpA9R5g42VlaBJxDYinpuAPYjsZ8xK+hEbZFoVz3m4Fi08CMxjTCHNfWfzwr395tkCs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kSkvqsSC; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719236575; x=1750772575;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=u4kQTcL82w99OJQsWsX6vB5v2XEs0hliwgoGzo1RaRk=;
+  b=kSkvqsSC5eq6DdNTYyV9HEd8hxK8DHMjXKIguferNyVvu58HWK8ygMvQ
+   PHzq4hCYt9bCG/ftelL0gxaKz4fWJTbGxID/XthgCOW42tOHf0Z3wmCDs
+   SlxK2dUcJWQ/HCkvwK6sk7P0iioxfrZSHjayV8q3RP1YVu9WcuVDkIjvH
+   B/rkk8isLWIYHVGrUONR2COHh2YVQnMmeqgJGFbepHdXdkX5S5awUmNwu
+   WlMWTzCqzm7mISNo110qhxP7XBG5GJzkXs/T70gqN0gdHfp8p5c8ltBf3
+   vkVWwoyIx7kuDSl/ak1PYUwEEbA8S8jn2/Qt+ybLUKOizNATjSlVLWD9w
+   w==;
+X-CSE-ConnectionGUID: U0UP0tuRS0CunqGnTKxYDg==
+X-CSE-MsgGUID: SI1EoV7vQny8scxO//T7JA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11112"; a="16338329"
+X-IronPort-AV: E=Sophos;i="6.08,262,1712646000"; 
+   d="scan'208";a="16338329"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2024 06:42:54 -0700
+X-CSE-ConnectionGUID: MC/lNcYKTU+OVaYj/D7R8w==
+X-CSE-MsgGUID: pttoxe5NTcm5IyMSIMvn5Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,262,1712646000"; 
+   d="scan'208";a="47826223"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Jun 2024 06:42:53 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 24 Jun 2024 06:42:53 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 24 Jun 2024 06:42:52 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 24 Jun 2024 06:42:52 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 24 Jun 2024 06:42:52 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=G3mKaUwuJJqhAarhkMB8xL3ySITXhx2AEqyCstEuV3nyE2ZwCqpTpBPvGnsTnKNh6jUUH/RrQMc0x2gmMgywDEJ6rpehMOIOB0B7UIhwVrRFnWw8DJMhF38v96R8j0TFFtQXd/jmlNm2NXmwpn9sgEOIZhU/IKo1UFL5sdl/rpRbBpWoJQ4VZQJdNttswrZw3E+5F/9dRZHyCMoWpIFLJkNNvoIHdILKDjg7rlG2frTRppYNmR+iGnZHCd5F3Q0+8A35OjXp5wpjMDsd5em5tTxCHpp8e4VbVT4mdh9XUfLGFDvTRrx77HM0FRhZnW+nUhWS3OYzVGaIZyoLGBerZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jaHaoEP+ZZsBGmDyYrjPPPkFmgVkQxibMOUMxxQh+1s=;
+ b=g+FofbxIRLV9nh7hQszl0RLCONZLNwKW9CsntZy/MTnzuvhaasqKo6iCUf8j9X7XyNTnNpbpHecwGs/Qzm+HL8l1jLFwaWqErHrt+C2mzm6HzSEnFIFYH9ajLmqbAUup79mCYZGR7v7vdUkmB5XUkAWDjBA6m2redgUXUO+YhCh2Y9/nlzp12U2j14I1dNEthHVmWmG+1gxIoZQRNirKqxizczp3ifSC8ZeqP/WQITC9PKWsxSZcHLYrzJxVDlPp38H+Hfb+FV+UKysMx4hYR0KghR5fVduM+r6rOUqkPupipdaylcyNj4PVkCs4EmXRYaOSjQYrPY2/bHunbU2uZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by SA1PR11MB8489.namprd11.prod.outlook.com (2603:10b6:806:3a9::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.26; Mon, 24 Jun
+ 2024 13:42:50 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.7698.017; Mon, 24 Jun 2024
+ 13:42:50 +0000
+Message-ID: <26c1dfa1-0f3e-4873-a1d1-b228777336eb@intel.com>
+Date: Mon, 24 Jun 2024 15:42:44 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v4] i40e: fix hot issue NVM
+ content is corrupted after nvmupdate
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, "Nguyen, Anthony
+ L" <anthony.l.nguyen@intel.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kang, Kelvin"
+	<kelvin.kang@intel.com>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, Paul Menzel <pmenzel@molgen.mpg.de>
+References: <20240618132111.3193963-1-aleksandr.loktionov@intel.com>
+ <07519e33-23e8-48b1-a445-c128b40e1c36@intel.com>
+ <SJ0PR11MB5866A55691B58852B19FAC5CE5CE2@SJ0PR11MB5866.namprd11.prod.outlook.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <SJ0PR11MB5866A55691B58852B19FAC5CE5CE2@SJ0PR11MB5866.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MI0P293CA0001.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:44::16) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1719234744.git.tanggeliang@kylinos.cn> <7b0b49dff962845b26918fce56cbe4444175db4f.1719234744.git.tanggeliang@kylinos.cn>
-In-Reply-To: <7b0b49dff962845b26918fce56cbe4444175db4f.1719234744.git.tanggeliang@kylinos.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 24 Jun 2024 15:42:12 +0200
-Message-ID: <CANn89iKvKAq=tN029infHi2MtQ7GzdedHKB0arfYe3cBawqZLg@mail.gmail.com>
-Subject: Re: [PATCH net 2/3] inet: null check for close in inet_release
-To: Geliang Tang <geliang@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	David Ahern <dsahern@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Mykyta Yatsenko <yatsenko@meta.com>, Miao Xu <miaxu@meta.com>, 
-	Yuran Pereira <yuran.pereira@hotmail.com>, Geliang Tang <tanggeliang@kylinos.cn>, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SA1PR11MB8489:EE_
+X-MS-Office365-Filtering-Correlation-Id: 95cdaacb-4e09-415f-71c9-08dc94538a2a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230037|366013|376011|1800799021;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?czU1M0lPM3VrckRvTmR6Y3FjQnlGenBhcmpWSWs5SmR3OXphK2FLUEszOVdH?=
+ =?utf-8?B?aXVKTkI1dmpxd1dUTHpjKytmWjE4bDFWYWVGYW0rand5MGoza0Y4VjhHb2FW?=
+ =?utf-8?B?UFZrdzk0QWRxbDJqd1V0aVBmTHF0VXBLSlhZRmphVkhReXYxS0FzQWdxMkxJ?=
+ =?utf-8?B?SWU0T3R0R1k3Z3NzWlh6b3JJWG4rdEhOMGIwNkdFaWlzZW1raFpOekk5djBE?=
+ =?utf-8?B?TXAzSTVqZlVTVTg3UWpyajd6SGoraFgzM251Z0pvOXp4VGZnbk9YOXNPd1hG?=
+ =?utf-8?B?THpVSHJiNjc2c1Z1TGlMVlJ1MUVibkkvTDl6emVpRG8xdTFKMTVNOEdlVU5M?=
+ =?utf-8?B?R2lpS1RONFhGT2dET09LZmVxSDJkQ1VnejRuZDJxd01xaHVVTWltR1VxblE0?=
+ =?utf-8?B?UTJhMGJsTmlyanN4a3NubTVmdEpURTB2ZEVzb3ZjWG43bVJtdGpjTmtkamRG?=
+ =?utf-8?B?cEhkR3ZlKytFQUIxQ1RrbDE3Tnk1NkNabUpUdmxJMWRuT3NyNCtMZGxqcGYw?=
+ =?utf-8?B?NklWVE9NQVkrSm5SUTFBWTAwK0VqN2RwZThtc212TFpjZGYyTjhVbW5KNWJm?=
+ =?utf-8?B?WU9lc3RERjJSNE03WkxlcjVrVFowSWZDazQ4SmU5VjZOK2ZHWWw5L1lDcTI3?=
+ =?utf-8?B?UVAwWENyV09yTC9IdEpPaGN2YlpYeml1Zk9lbzVxbFdsYUw4YmhyUEszMFVl?=
+ =?utf-8?B?ejRVZktnSW9SY2lzMVh2Q2tRZ0hheWRMYnVGamFhSlBqbTRBZmVFeUF0dEdL?=
+ =?utf-8?B?SkZva1c0RFZkdUc3MzIrNXF3bnNSa0lpMlpSdnMvUDl3cW1NbmxLNlRrd1Vl?=
+ =?utf-8?B?T2ErckFvSHRxb01LTzd1MWFXbWxTRjZvc255NmxVR3dOTDYwVHZ0Y1NJb2Vi?=
+ =?utf-8?B?dEFoNVlsTkczS3pTaWRicWh4L25PcVM2TURlcUxOdXhqMXVzcWVJNlplOVBJ?=
+ =?utf-8?B?aHB4dTQ4dys5VG04NGdMZHNTZE9hNGFER3NZOEQrd1VFOTRZWlJIa1FEMm1u?=
+ =?utf-8?B?cE93dGtXcEwvNkdXeStidG5kWDNzRkF1LytNSGliMk83b1lQUktybHFMeFZP?=
+ =?utf-8?B?NjF1RDZWYVV4SnRQUXduZEhITEZoWWRTaGwrWnc1d2NmS2w3MTFSMU5Pd2Js?=
+ =?utf-8?B?S1JkQnFxK1BxTklGQzJzL2ZsaGVkK0hIUm53Wms0a1FYa3ZMK3lvWk45dlgv?=
+ =?utf-8?B?UkxCMVdEb3pueGF5OGtqTklFelBBVVlmbjRZQVZoRWZrenM5VWQxRGhhV3Zu?=
+ =?utf-8?B?aFF0WXpGTHI3cE9pZVRVeVk1OFBrMzBhYW9GUzNieGQyWlJvcy9oVEY0ZFBa?=
+ =?utf-8?B?a3g2RHJJbnNyNm0wWm9DSkdNUzFXcktLRWE1Umc2RWgyM3BxbVBabGIyS0dW?=
+ =?utf-8?B?L1ZNNEU0RGFxTTJJTmNPdVlEM2pOcEdtSzVST1poMjJBK3VxYWxPd0t4d0tK?=
+ =?utf-8?B?Z09URCt4akpTZ3l4WlY0R1N4M25jOWc0ejVGcGIwOW5QR2U1QVo5UU9EQjJ0?=
+ =?utf-8?B?VEEyV0RYaXFOdkVKN0pmeEcrcWxSTUlWeGFneW9VdGViMTBVbWRRT1pqWjZl?=
+ =?utf-8?B?K1B3ZlZrSnd6ZWpCUUJTcGZJeUoxNDNJVjB1azBQTUdxU1R4WmZBNDNZVUNi?=
+ =?utf-8?B?WlBxemk5OVFRVEFIZ3VreDlHbHNleU9KYWIvTDFMZTk4RHVqMkpibGRVOEE4?=
+ =?utf-8?Q?OnawyrtnChMc6Auq+4Ue?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(376011)(1800799021);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TkJEbnloRU1rcmo1cndXVm1veFRsOWZXeC9JM21ZYklGNWVPbFp4VUp3L2da?=
+ =?utf-8?B?K0NFZTNTT2pXc0dORVVlMkh2Skt3L2M4eG9OdU5YU3dGclZmOUJyMjVkSGZG?=
+ =?utf-8?B?Ly9PYVQ4aU16RUgvMVI1MFRmUzA3dVp2YU13cUphbGJhNU1XTkFrbXNyT2k5?=
+ =?utf-8?B?Qy9xOGRDaXlnb1gzd2NDeFI1NmhDeWhudmZLTkZtVUlOYjZPWjRHb3o0ZFFh?=
+ =?utf-8?B?c3ZWdXZ3ekRlNTlaRVZGd1pSdmx4REV4dXg2ZTdwUitvcENoSHZOVDF0WnJo?=
+ =?utf-8?B?UFlwUFI5Q3ZLY2JxYzJEVUUxNUdRRElEajBMU2VGOUZzSzlhU3hNTVlJbmhG?=
+ =?utf-8?B?MGdNcXJVS3NOL3FIbHpkRGhEWUoxTG5HUXFpRWRrQm15Qi9XendQWG85QUxP?=
+ =?utf-8?B?ekJUbFFpRU5Lak0xakJhc1ZJL29KYjgvamI5STZNM2J6MnVZZDU3QUNVR29P?=
+ =?utf-8?B?ZWplZ2cvL3JOL3dVOCtMQzhKNzdDMXk5TVU2a3NvSzJjWTU4Z2xQWUlIdy83?=
+ =?utf-8?B?MUZWMWhBbGVqb0FISjJKSURnM0NzSjVyTkxqY0pkVjJHZllSc2VHL29VQ1F4?=
+ =?utf-8?B?WWVVRU1LbTIveEUvaTdRa2xnelAzamlDY1hKaVdQQWxWb3dGNHk3NTIwNmw2?=
+ =?utf-8?B?N0pnM0lqWjNKZ2FUL3Voek4rWHE0VXpOYWY3UTZyTFZHTUtJZ3VCckdSaGs2?=
+ =?utf-8?B?aFZ0QVg4VWJCNlI3WERyaHVMQzJtUEpRaFhFdlk5S3VDRkd3Y0JRK1NjUHF0?=
+ =?utf-8?B?L0hFNW5lTWtyYmZCSkF4NDI5cVAxUGljK2RvS3R4bXlmbHZpY1pmQ2tMbUhP?=
+ =?utf-8?B?bE9iaUdNOVg0NkI5SVl1UzVobW5YeWJ1YzlhRWNJa2dqKzMyNFBMQUEySjlv?=
+ =?utf-8?B?eEluSjVjL2JWODBBWHZ6QWFuQ3JwL2JaN042SVpFTHJMSDBPVXRrNmZ3eW1K?=
+ =?utf-8?B?enFMOEJSc0l2WkQwNW9SeXNiWHp1azBVbk0wcUQ2RFJqb05rRTZsTmFUbWJp?=
+ =?utf-8?B?WEdNTVBZNk5Xbk43OVk3ZG5BRnhzclRWNDJaUWtzN1FzMjg3dnFFZ0k0YSta?=
+ =?utf-8?B?K25obmg4TWEwanZma0g2eVZ4cmcrVFV2RDJxY2ZjUGhJWXV5REsraEhLdmZ6?=
+ =?utf-8?B?RjM3aWZZUzNVc2R5b284YlN1MEsyWHRpUTdoVFFldDZMbDFaYXhyWFFNc1hv?=
+ =?utf-8?B?TG4wYXY3S1phbE1HNXEwZFlBZXpsb1JOTklqbDdjVDg5ZjhZb0UwMDFqSHhn?=
+ =?utf-8?B?Wk5mZys4dHRnWm15b1VXZXd5YWJGSFFhakwvcVpKOWxWUEJMU1o4OE5iZTV0?=
+ =?utf-8?B?OGMwRG8raFFaaFNxVTMxdURKejBBUFFra2t3dmIrcWUyZk1TSHZGUlRNcSs4?=
+ =?utf-8?B?WnF3dmFacXhZUXF3cDgvdzN5RldYS2s4UENvU0wyZmhoUGRBTFVrWkYvU0xs?=
+ =?utf-8?B?Y2taTnVFT1NzUXRqSFU2MWdRY2Nmb3NhYlgyekd5LzF4N2xiNFhiajFNUjd6?=
+ =?utf-8?B?c1kvT2dIZ3YrbGlvb0ZvbkhEeUNSYksyK0RIOTFsNnMrYlhwYjEwd3VmZk5t?=
+ =?utf-8?B?SkdRNGRoeUd0UnRTNmtvVk9vQ2ZJM2ZRbVZibWhuNHRMVUhZSnJJaDRaZ21P?=
+ =?utf-8?B?eE1MY0JTTktseTgrRVRqeWM5NytnaWFsVi9UVkkzeWQ0anBKcGltVTB6ZTd4?=
+ =?utf-8?B?Y0pGQUVONThlRjhWRXdWc0xOR3RxR0QxbHNFY3hXV0Z3V2RZdG50MXhVYlZX?=
+ =?utf-8?B?R1U3MHYyMjNZN2VuL0gyQzZOc0syTGlickVEckkxTTB4RDVtMU82enlHUWZG?=
+ =?utf-8?B?R3ovSVhFT2diNy9QYkZRc0QwbWI1eWpRZk1KdWtwRTBiV1Y2TDNQKzBHeU9h?=
+ =?utf-8?B?K3N2SmFvNmlwaG1hY21QZHdqMktpUW9Yd1o2OTlBeTljMVdoZitWbmhWR0VY?=
+ =?utf-8?B?bE5OR1R5UGI5eFc2V2EvWWgyWFVZSTgzQm0wbHluUUdCMEZsL29zZVVTMjYz?=
+ =?utf-8?B?RTdGNURPQng5bHRnL0xLOTZnV0VwSW0zb2ZyZ0hIV1lNWnhtbXh0RW5tQ2JQ?=
+ =?utf-8?B?TkxRN3c4ZUJKbWlzb0xXY0JBVTduOUVORHZWTDR4QkJrZm5EYVdzKzFDZXYx?=
+ =?utf-8?B?dXRxQ0V0UnFYcWM0dEp0TnJhTVdsdW91eGNWSlJ4QlA2cEdEMFZkdUc5TFpu?=
+ =?utf-8?B?TWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 95cdaacb-4e09-415f-71c9-08dc94538a2a
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2024 13:42:50.2759
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: keePoFyxuc9Pcpfk0R3SCaxRxSjfEVd3nKmE4zMiJnqXFsTiiO9kEEDGp1QQy9lSKPp9+sG3yMNMfLlgzVn8jhVOJbRshEr8b5GE92N7ho0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8489
+X-OriginatorOrg: intel.com
 
-On Mon, Jun 24, 2024 at 3:28=E2=80=AFPM Geliang Tang <geliang@kernel.org> w=
-rote:
->
-> From: Geliang Tang <tanggeliang@kylinos.cn>
->
-> Run the following BPF selftests on loongarch:
->
-> # ./test_progs -t sockmap_listen
->
-> A Kernel panic occurs:
->
-> '''
->  Oops[#1]:
->  CPU: 49 PID: 233429 Comm: new_name Tainted: G           OE      6.10.0-r=
-c2+ #20
->  Hardware name: LOONGSON Dabieshan/Loongson-TC542F0, BIOS Loongson-UDK201=
-8-V4.0.11
->  pc 0000000000000000 ra 90000000051ea4a0 tp 900030008549c000 sp 900030008=
-549fe00
->  a0 9000300152524a00 a1 0000000000000000 a2 900030008549fe38 a3 900030008=
-549fe30
->  a4 900030008549fe30 a5 90003000c58c8d80 a6 0000000000000000 a7 000000000=
-0000039
->  t0 0000000000000000 t1 90003000c58c8d80 t2 0000000000000001 t3 000000000=
-0000000
->  t4 0000000000000001 t5 900000011a1bf580 t6 900000011a3aff60 t7 000000000=
-000006b
->  t8 00000fffffffffff u0 0000000000000000 s9 00007fffbbe9e930 s0 900030015=
-2524a00
->  s1 90003000c58c8d00 s2 9000000006c81568 s3 0000000000000000 s4 90003000c=
-58c8d80
->  s5 00007ffff236a000 s6 00007ffffbc292b0 s7 00007ffffbc29998 s8 00007fffb=
-be9f180
->     ra: 90000000051ea4a0 inet_release+0x60/0xc0
->    ERA: 0000000000000000 0x0
->   CRMD: 000000b0 (PLV0 -IE -DA +PG DACF=3DCC DACM=3DCC -WE)
->   PRMD: 0000000c (PPLV0 +PIE +PWE)
->   EUEN: 00000000 (-FPE -SXE -ASXE -BTE)
->   ECFG: 00071c1d (LIE=3D0,2-4,10-12 VS=3D7)
->  ESTAT: 00030000 [PIF] (IS=3D ECode=3D3 EsubCode=3D0)
->   BADV: 0000000000000000
->   PRID: 0014c011 (Loongson-64bit, Loongson-3C5000)
->  Modules linked in: xt_CHECKSUM xt_MASQUERADE xt_conntrack ipt_REJECT nf_=
-nat_tftp
->  Process new_name (pid: 233429, threadinfo=3D00000000b9196405, task=3D000=
-00000c01df45b)
->  Stack : 0000000000000000 90003000c58c8e20 90003000c58c8d00 9000000005059=
-60c
->          0000000000000000 9000000101c6ad20 9000300086524540 00000000082e0=
-003
->          900030008bf57400 90000000050596bc 900030008bf57400 900000000434a=
-cac
->          0000000000000016 00007ffff224e060 00007fffbbe9f180 900030008bf57=
-400
->          0000000000000000 9000000004341ce0 00007fffbbe9f180 00007ffff2369=
-000
->          900030008549fec0 90000000054476ec 000000000000006b 9000000003f71=
-da4
->          000000000000003a 00007ffff22b8a44 00007fffbbe9f8e0 00007fffbbe9e=
-680
->          ffffffffffffffda 0000000000000000 0000000000000000 0000000000000=
-000
->          00007fffbbe9f288 0000000000000000 0000000000000000 0000000000000=
-039
->          84c2431493ceab6e 84c23ceb2827425e 0000000000000007 00007ffff2271=
-600
->          ...
->  Call Trace:
->  [<900000000505960c>] __sock_release+0x4c/0xe0
->  [<90000000050596bc>] sock_close+0x1c/0x40
->  [<900000000434acac>] __fput+0xec/0x2e0
->  [<9000000004341ce0>] sys_close+0x40/0xa0
->  [<90000000054476ec>] do_syscall+0x8c/0xc0
->  [<9000000003f71da4>] handle_syscall+0xc4/0x160
->
->  Code: (Bad address in era)
->
->  ---[ end trace 0000000000000000 ]---
->  Kernel panic - not syncing: Fatal exception
->  Kernel relocated by 0x3d50000
->   .text @ 0x9000000003f50000
->   .data @ 0x90000000055b0000
->   .bss  @ 0x9000000006ca9400
->  ---[ end Kernel panic - not syncing: Fatal exception ]---
-> '''
->
-> This is because "close" is NULL in that case. This patch adds null
-> check for it in inet_release() to fix this error.
->
+On 6/18/24 16:21, Loktionov, Aleksandr wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
+>> Sent: Tuesday, June 18, 2024 3:50 PM
+>> To: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>; Nguyen,
+>> Anthony L <anthony.l.nguyen@intel.com>
+>> Cc: netdev@vger.kernel.org; Kang, Kelvin <kelvin.kang@intel.com>;
+>> Kubalewski, Arkadiusz <arkadiusz.kubalewski@intel.com>; intel-wired-
+>> lan@lists.osuosl.org
+>> Subject: Re: [Intel-wired-lan] [PATCH iwl-net v4] i40e: fix hot issue
+>> NVM content is corrupted after nvmupdate
+>>
+>> On 6/18/24 15:21, Aleksandr Loktionov wrote:
+>>> The bug affects users only at the time when they try to update NVM,
+>>> and only F/W versions that generate errors while nvmupdate. For
+>>> example, X710DA2 with 0x8000ECB7 F/W is affected, but there are
+>> probably more...
+>>>
+>>> Command for reproduction is just NVM update:
+>>>    ./nvmupdate64
+>>
+>> nvmupdate64 is not an upstream tool, but it's fine to mention it here,
+>> as we don't have a better alternative for i40e as of now
+>>
+>>>
+>>> In the log instead of:
+>>>    i40e_nvmupd_exec_aq err I40E_ERR_ADMIN_QUEUE_ERROR aq_err
+>>> I40E_AQ_RC_ENOMEM)
+>>> appears:
+>>>    i40e_nvmupd_exec_aq err -EIO aq_err I40E_AQ_RC_ENOMEM
+>>>
+>>> But the problematic code did silently convert EIO into EAGAIN which
+>>> forced nvmupdate to ignore EAGAIN error and retry the same operation
+>> until timeout.
+>>> That's why NVM update takes 20+ minutes to finish with the fail in
+>> the end.
+>>
+>> this paragraph tells more about nvmupdate tool problems that the
+>> driver
+> What is your proposal for it exactly?
 
-Please add a Fixes: tag, so that we can fully understand what is going on.
+Perhaps this could be summarized as:
+This driver issue leads to nvmupdate needlessly retrying for over 20
+minutes to only fail at the end. It is even worse that NVM content
+could be broken after the broken update.
 
-> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-> ---
->  net/ipv4/af_inet.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-> index b24d74616637..8e926018d011 100644
-> --- a/net/ipv4/af_inet.c
-> +++ b/net/ipv4/af_inet.c
-> @@ -434,7 +434,8 @@ int inet_release(struct socket *sock)
->                 if (sock_flag(sk, SOCK_LINGER) &&
->                     !(current->flags & PF_EXITING))
->                         timeout =3D sk->sk_lingertime;
-> -               sk->sk_prot->close(sk, timeout);
-> +               if (sk->sk_prot && sk->sk_prot->close)
+But I'm fine with it as is too.
 
-Which one is NULL exactly ?  sk->sk_prot or the ->close pointer ?
+> 
+>>>
+>>> After commit 230f3d53a547 ("i40e: remove i40e_status"), which should
+>>> only replace F/W specific error codes with Linux kernel generic,
+>>
+>>> all EIO errors
+>>> suddenly started to be converted into EAGAIN
+>>
+>> all or just this one that you are fixing here?
+> All error codes from FW which exactly I'm fixing of course.
 
-Why add all these checks if only one is requested ?
+fine
 
-> +                       sk->sk_prot->close(sk, timeout);
->                 sock->sk =3D NULL;
->         }
->         return 0;
-> --
-> 2.43.0
->
+> 
+>>
+>>> which leads nvmupdate to retry
+>>> until it timeouts and sometimes fails after more than 20 minutes in
+>>> the middle of NVM update, so NVM becomes corrupted.
+>>>
+>>> Remove wrong EIO to EGAIN conversion and pass all errors as is.
+>>>
+>>> Fixes: 230f3d53a547 ("i40e: remove i40e_status")
+>>
+>> That is a proper tag, and the description makes it clear that we want
+>> the patch finally applied, thank you for the efforts to make it well
+>> described.
+>>
+>>> Co-developed-by: Kelvin Kang <kelvin.kang@intel.com>
+>>> Signed-off-by: Kelvin Kang <kelvin.kang@intel.com>
+>>
+>> this 2 line removal was indeed developed by two of you?
+> As written above, yes of course.
+
+fine
+
+> 
+>>> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>>> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+>>> ---
+>>> v3->v4 commit message update
+>>
+>> Please fix the subject line too, it's what will be the most frequently
+>> read part of your work, and with stay in git for decades. You could
+>> use:
+>> i40e: fix wrong error code replacement
+>>
+> This patch fixes urgent/hot issue with NVM update, which is stated in the
+> title. Wrong error conversion code could lead to different severity issues.
+>  From my point it's better to mention in the title the serious problem which
+> users meet/see, am I wrong?
+
+I believe so, please send v5 with a new title, like:
+i40e: prevent needless retries of NVM update
+(no "hot issue", this is as hot as the more severe half of i40e bugs).
+
+I know that you like to have "fix" in the title, but this is not
+required for the kernel, as the same info is assumed from Fixes: tag.
+If you insist, then:
+i40e: fix: prevent needless retries of NVM update
+
+By trying to start the sentence from "fix", you dragged yourself into
+this convoluted need for explaining yourself ;)
+
+> 
+>> and add link in changelog section:
+>> v4:
+>> https://lore.kernel.org/netdev/20240618132111.3193963-1-
+>> aleksandr.loktionov@intel.com/T/#u
+>>
+>>> v2->v3 commit messege typos
+>>> v1->v2 commit message update
+>>> ---
+>>>    drivers/net/ethernet/intel/i40e/i40e_adminq.h | 4 ----
+>>>    1 file changed, 4 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.h
+>>> b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
+>>> index ee86d2c..55b5bb8 100644
+>>> --- a/drivers/net/ethernet/intel/i40e/i40e_adminq.h
+>>> +++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
+>>> @@ -109,10 +109,6 @@ static inline int i40e_aq_rc_to_posix(int
+>> aq_ret, int aq_rc)
+>>>    		-EFBIG,      /* I40E_AQ_RC_EFBIG */
+>>>    	};
+>>>
+>>> -	/* aq_rc is invalid if AQ timed out */
+>>> -	if (aq_ret == -EIO)
+>>> -		return -EAGAIN;
+>>> -
+>>>    	if (!((u32)aq_rc < (sizeof(aq_to_posix) /
+>> sizeof((aq_to_posix)[0]))))
+>>>    		return -ERANGE;
+>>>
+> 
+
 
