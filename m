@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-106226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 776979155F2
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 19:55:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B432F9155F7
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 19:55:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BD56289BCD
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:55:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05560B222FA
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A8B31A08DD;
-	Mon, 24 Jun 2024 17:53:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02F41A01B5;
+	Mon, 24 Jun 2024 17:53:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UjmX2CkA"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TX5zfbwC"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2076.outbound.protection.outlook.com [40.107.101.76])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2062.outbound.protection.outlook.com [40.107.223.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 363031A08CD;
-	Mon, 24 Jun 2024 17:53:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC041A0B1A;
+	Mon, 24 Jun 2024 17:53:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.62
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719251604; cv=fail; b=bhWqnaRLBhsrmuW/Zp17K4BhfDl69upUycGeZCo+8sq/6SMQAo4wVwqDhSf8SyJwV7OE7cdnekRO54e5tl2FHOWG00P/1WcVWIzZKXUIBXF4X1Dy+kxKV6c+rb+mipPTHkFyZqrtlNkdoBtj2B1ey/16uzmF6/jcSHuXOD4yaJQ=
+	t=1719251614; cv=fail; b=UVuJh7VS8jeck9rd2UE87ylJc4licOC/qCl1oaHIDDJnrT8F3V/gkDdraTWoALyYAzms3bLW5DvpQ2T8au4Wt5WuKHeiZoMx/Ek8YK8wDPCaa0f/yYbuUD4RmXtvua/0NxUXTsYvl695jksSavF6RxoKuHKRsptmnbTf+56CRPg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719251604; c=relaxed/simple;
-	bh=MEZuAKmWVeQ852kQAkk9TfEnJoz/vR0YOBXHndHudZY=;
+	s=arc-20240116; t=1719251614; c=relaxed/simple;
+	bh=RqZrtF9hzPPydnCat2CKUJoLjAR3aJkQL8WArZqek3o=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PUllb2qjOsVucllwsDt8lfFC7R1ZIZc3uhPZAQgCmTT30mfnMbSnYjFTplIePi2UiNgd/kMLoFYBitZMmclNkRpt9Ha5MAd7k65/tPhwaqB0+ic7UufqQfRrQVVi3XLzbBQsmQ0El5vYSBLswQ+Qu+9PNyNCqT9DoT7vOr067ks=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UjmX2CkA; arc=fail smtp.client-ip=40.107.101.76
+	 MIME-Version:Content-Type; b=ZV6t1g9JTwIj/UfBzZ0K5di9sza7b/PlTJ5usRtGMbb67Tasm5DZUZHbl2cyWXhfKslECZOAnT1nvPCOk/Nho06cxWo/5knO/jPw5eEX0lycK2aZgcMzDAR2FUZhc/C1hAW5dpW8SxRUFP71y8A82JI1wac5W/vhhUsc6erZJ+s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TX5zfbwC; arc=fail smtp.client-ip=40.107.223.62
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gLufNwdL9MV4kT460RpvoSjnRPNhdAb411EZor8KzXMymwx/dMWgR09Ozo7KDckbYfvxzUUtdrfY/MCOu9pVeWnkG0Jj1v2RM2SGDCpjmjg0rx1bBlQaXKO9iFdL7GzZYgjMGWCFDlq32Lz91OzK0CkaTGwEze+Z9kknQljqF91+7hnJcBHSU7BEv2lFfwd6HziUyTyhI7LbXYX/h0Njq6m8q/3HbkfxeoyLG69M3Ckhv3IYC2qLrILD04gtlDPAUPbTMCihlj0hqNAHk6DeGgq0xaR8z86NnczHoKTNRbtSuMecYPltuCWcL4tvIvF/ylmFITZtLLHV3rATdV+qvA==
+ b=cyJiTVnXNiOtDyM63Q7cDHYZJZY5rW5FqPdquURYe0TKx+8LOO7pqUAE+XY2z6MqReeeeN6JQzWvqd3IAN/8Xl6wR/lF6JKJqjxVTJtscQJWe7j6MyaDux/1T4a6PIc3SQDnB/mktisFr0extdl1XqGEB5WU/C4KJ6KQO1A/MD1gwVC5tNBgiKlLXYXqkitRFEk7fzHNo/EK5cb4I29ERvuquNOaiVZFQPmKK9TEq4xzoZdKv2gyEWY6jC5WeteL57hordTCG0gR3ntRlY6oeha+dehphjPylvE7qvvy+FhwWJBaAXcFxmIIN6YljbyRaOrRSThzjjIXtrwPRayAPw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XKIskuL2+9kGuoxfvfJaPCZ2FUsgMCbNT4Bo51GYu/0=;
- b=fOcztTyt0DgQFRi+egyQd/GisPmVTbayatp3R+HnSkzEeiGM9gOWfyYcxULTBZNNP5a1m5S5M+e2b07TjrJMomG0rfwK1WQOWPYGjhMRzS8sdm6LTYOZ6f7SkBvbS8LgXYK8asIblnjQHKkXFr4HAGR7IFuFpZuwHR2wTuUHn0qy9bFTdv6+V6AAiEtiGLOWQd6ijoBA8WtcNlWME3XvOjUqPi4v8jF3Gu3JEP1YMOTtdd/K4DOx/F+fJ8k97C02fhJLmPVcXgDU82f5AEQuh7Ip9i/jrWBDJBtVjL56dWjJ1drcHjxXMk4+RvHh4dOR8FrZNe5sjPU8+EzwTO+sVQ==
+ bh=q4khK5DkuVZdWTbZsjigRzdxqODND9aPqXhMDUBlsPI=;
+ b=cob1b2+55dhOCbWE7Bewf0m1UWxrTtWhzwaWjRocwJdbaydandZ8gRQBc2P1vv3DbxlBH+7mHAvF6J7Qn9Qj10M/jrzegIFtfZkd252sWO9cToQjD3Ki9cgrHFLMK/YUthNVeV12MZgA2kntACZnju1amfknJCSJcDNC0RIRp/InIgbutsi4fONtShNvu0h93vZ8MBK7SZ6Y3UtZHGXpjyWM8Fxj4gWvk9B1JYYvt6WR53iEGUV/pKGeiJaiv+NQ1B8oyF7bG2P6xsL7GafMb2XbLXqYMm/Kp8NuWN7fo2zVZIDT/9fbJBKKL7WPxekqnBUfoEPGYTxJh4MuTvoyqA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XKIskuL2+9kGuoxfvfJaPCZ2FUsgMCbNT4Bo51GYu/0=;
- b=UjmX2CkAwPybDxwyXilPJhW0+VTWFZJwAns3KLvP2XEAb2bncaSPlIcOy2iNh81jz94PbMruaqzDqNdQceHgzFM6Hij2ZRTnJIDyfvrJGRReePPZGtOUjkqq2Dh5ljnzvEvzFuM2+PCPg+ESsN2oHdaIVt6/k9MdxGVF7eFcQS3wnSWyIpGYSsSXCur9aqbvf5EiPO5vXYIZOT6PZUt/p/gXuS7rzNAkDvoh/LFaKgxPxbCdZF3Y0nlFbzf2o+PbsZIz4FU/N8H33zv93G2YA97+1F1i0EgOeWdRs1/3HwjALCFM4uCYjVnCe6dpYX+xX/BvUiUgfQX1rB9YeG9ofQ==
-Received: from SJ0PR13CA0118.namprd13.prod.outlook.com (2603:10b6:a03:2c5::33)
- by CYYPR12MB8992.namprd12.prod.outlook.com (2603:10b6:930:bc::21) with
+ bh=q4khK5DkuVZdWTbZsjigRzdxqODND9aPqXhMDUBlsPI=;
+ b=TX5zfbwC8MecgQVDPjzP6uwDwLy60OFLKWfWQcy+erFbx4iIBPOkHByncLxyYDgr00aBmTKsFQg9P4bYSoPrc1PygUZpxN7pZpKc1V/PNogjK4rJA/5joo+qAiUgMr8SuTwUJ3fO1/LI2z6D6/gF9hqcRqpEeWezcwVNLjGxjk92Js78efKzEElrSygSz0ykrWvGoNf72lrJcJ1AT9tQtE01W5iyRS9/8iZ6L8m3A7EM72Qx2RuxzAX90T8nK6X3YIk6uNjjyzs20fuVEHRyA4kRg38Fpc8u2uUaYH+Cr4jefHXGiN0T5pxXhQCVETGT91AD0o4NPTB4WlaXkrzz3Q==
+Received: from PH7PR10CA0004.namprd10.prod.outlook.com (2603:10b6:510:23d::22)
+ by SA1PR12MB8118.namprd12.prod.outlook.com (2603:10b6:806:333::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.28; Mon, 24 Jun
- 2024 17:53:18 +0000
-Received: from SJ5PEPF000001EB.namprd05.prod.outlook.com
- (2603:10b6:a03:2c5:cafe::d9) by SJ0PR13CA0118.outlook.office365.com
- (2603:10b6:a03:2c5::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7719.16 via Frontend
- Transport; Mon, 24 Jun 2024 17:53:18 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ 2024 17:53:28 +0000
+Received: from MWH0EPF000A6731.namprd04.prod.outlook.com
+ (2603:10b6:510:23d:cafe::54) by PH7PR10CA0004.outlook.office365.com
+ (2603:10b6:510:23d::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.38 via Frontend
+ Transport; Mon, 24 Jun 2024 17:53:28 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ5PEPF000001EB.mail.protection.outlook.com (10.167.242.199) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MWH0EPF000A6731.mail.protection.outlook.com (10.167.249.23) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7677.15 via Frontend Transport; Mon, 24 Jun 2024 17:53:18 +0000
+ 15.20.7677.15 via Frontend Transport; Mon, 24 Jun 2024 17:53:28 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 24 Jun
- 2024 10:53:03 -0700
+ 2024 10:53:09 -0700
 Received: from dev-r-vrt-156.mtr.labs.mlnx (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 24 Jun 2024 10:52:57 -0700
+ 15.2.1544.4; Mon, 24 Jun 2024 10:53:03 -0700
 From: Danielle Ratson <danieller@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
@@ -86,9 +86,9 @@ CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<jiri@resnulli.us>, <linux-doc@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <mlxsw@nvidia.com>, <idosch@nvidia.com>,
 	<petrm@nvidia.com>, Danielle Ratson <danieller@nvidia.com>
-Subject: [PATCH net-next v7 7/9] ethtool: cmis_cdb: Add a layer for supporting CDB commands
-Date: Mon, 24 Jun 2024 20:51:57 +0300
-Message-ID: <20240624175201.130522-8-danieller@nvidia.com>
+Subject: [PATCH net-next v7 8/9] ethtool: cmis_fw_update: add a layer for supporting firmware update using CDB
+Date: Mon, 24 Jun 2024 20:51:58 +0300
+Message-ID: <20240624175201.130522-9-danieller@nvidia.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <20240624175201.130522-1-danieller@nvidia.com>
 References: <20240624175201.130522-1-danieller@nvidia.com>
@@ -104,94 +104,64 @@ X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001EB:EE_|CYYPR12MB8992:EE_
-X-MS-Office365-Filtering-Correlation-Id: a2a7812f-3db2-48d6-be4a-08dc947687cb
+X-MS-TrafficTypeDiagnostic: MWH0EPF000A6731:EE_|SA1PR12MB8118:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4d2f87e9-10d7-49ef-38b9-08dc94768dd1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230037|36860700010|7416011|376011|82310400023|1800799021;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?f5dOBNtAsWYuDEIWRpGwwjWXvFR4fy2OmXJbM7KNs1heWAJRBKDSHxZ7iq2x?=
- =?us-ascii?Q?5cGhAK6MQIsR3O14MhIqnPckZLHA0kwEkRh69w3SSx47z+B7PbpOR080YjHU?=
- =?us-ascii?Q?6uaB7I6ITWthZJfqvQtNTKGSKRPpgUl2q8mjnBLF8AApRjYoNsPCaq1jQzKO?=
- =?us-ascii?Q?Z588+3KhXNCStY3pMga5DbO0y/9N84iYypsjbmEkI2fhT2mQL5CbQUrvdYBz?=
- =?us-ascii?Q?vzitofOJiCg6T+uxStseG2Np5e8QdS060ayl9+GWte8OdzaGVd9METUfS9w/?=
- =?us-ascii?Q?3/6XFJYyhkZN7hacH3JqOScKypyY61wa2JTXq/4krylG1nVjM5qzp+6wEi4A?=
- =?us-ascii?Q?9bmtu7gfAaz3TfD+QX9lBlhtEYz9jU+9q2e3Be2Y57Bcf4ZzQup8TU+sfr2I?=
- =?us-ascii?Q?lQYda9XgdhVI+ZzJ9oOETYIq5fYYt4k4XXeRjV11caLyDggzXrMFC7T0fy1V?=
- =?us-ascii?Q?Zl7zIfU2Y/t7Eb2XVDpfLnrznJBnZCSfkaooUZ0lT+zq9Pd2u4Uf6shrAP4G?=
- =?us-ascii?Q?1N5pouznwUVoBO70+ljY2X/ZRat5MrS5U0zsPdLyNLfr8Uv288kr/34sGATw?=
- =?us-ascii?Q?iEsoVSrcjux7O6Sv69F+2SjsW0Jxim7p2SGzEY6snaJVBlxKLd1ayK5BFVag?=
- =?us-ascii?Q?tbvEkl4a59VN06RLYOhOS8YCaWEQ8yK7DELYyhMrYPjmAvPYvUK68kwWsgYf?=
- =?us-ascii?Q?K/7bC7gBFBrYbcPKhI+GSxtYAC8Bo2+xDKmyfRo4bSDJ+3clFOCX03u3/ZJ3?=
- =?us-ascii?Q?ATmbwldGlSl16ReDTBW6gg0lhCG6W/DmkapFSBW0f4arDbRuK99CEt1C1x9e?=
- =?us-ascii?Q?5bhxSZljqwa4HolwNh7/IUGFaSFdKpPNRRO8R1ggGYWureoVzHnwGO6U5d0O?=
- =?us-ascii?Q?Q2/O3hlWdCk9CMg48wlONqRiWnujkMDhwGXb9iAdUhZAStmt35rQisV9Gffc?=
- =?us-ascii?Q?39SRyVquIXpT+LMDAJL1zlgK7CBfua/R6TAwbY6K1keUSBiKfgk80sYljDJd?=
- =?us-ascii?Q?V6lZ3QJ/D1Yui14uIEMGeYVNOwVQYMhg60q4dqW01fhmj/a3y6ONAq5oGFrQ?=
- =?us-ascii?Q?ceAUg6MP8s7uUg2VsNC1Z0TOKDXllV96nEL1sxB9SUyaQCNrEeRbWwinfBA8?=
- =?us-ascii?Q?Umh1i7Gh0yUiboqzWXYD9DKcJjm1voNaRSeOQVYDfo3bLX2Kt7ain7cDCKYS?=
- =?us-ascii?Q?4WOToHiqMjUsLV0XUMirx4bYUQce0jOTPCWhyEHgDS0RaG9aUU0XUPvAg1xV?=
- =?us-ascii?Q?g0GqBXn0CI2nNK3jA7Lfcnch6PXggiv4OTwPkLGGNBwUUP9kcqStUOnjt7Lu?=
- =?us-ascii?Q?461OQ5ySIy702RDkaHfNxpFm7LVu3pyqLdyLMOjHJCObzC+iQacHmRmF6/nB?=
- =?us-ascii?Q?WT+qnlRoK4zDJjqiSwmAw+Z61voDhpzJHR4EKudFa8fbUm7AkQ=3D=3D?=
+	=?us-ascii?Q?eF7mb2LStuNUpr91BMNvVQm4JEFSlEWSKfpbR6JiweMYX6AvTcCuWyEJE/A4?=
+ =?us-ascii?Q?CYEh+IAoMxVmIostdXiMHWhUICs9ALpV3gHuBt+bNb86PGS1cVSecCvez3dF?=
+ =?us-ascii?Q?8s6kS4ilQJBWgJQmzzRrmDFWnOz9fstCdKJEfvS+Sh99P2fce8pRMIFCrafl?=
+ =?us-ascii?Q?2aiLcXx7xiC0GxuDrY/7tg7v33iuWOE+84ET2aZGCaJcjMpz0O+6UvflYN02?=
+ =?us-ascii?Q?g3X1fSNtr/ZUESYa4tY3X2eSMxMoYhwohUQfjsVKHkePJPU93nVZ1jxg3dYr?=
+ =?us-ascii?Q?JbQSHUqaHnOaLB7Ix5SFgFkOE4lwQvYowAvl5rvQt0JJQd551NFw0hzbiaM8?=
+ =?us-ascii?Q?0Ax4JXjscLlcj3RvjH1HoE1V0m/HV//lSMqIrIDo7OheGHgFC2YoBJM2nyVo?=
+ =?us-ascii?Q?Qs3KdZ5E0G8KclT2OICrmsQuYgwytYRxFn2WKb6bKVopFHzZat2jbWIbu1fh?=
+ =?us-ascii?Q?v8+I3m0fTWQEI56fDNJSX+gEHbWCpQ2mXSLtra9udNvvBVH59vLWxS/FTGP/?=
+ =?us-ascii?Q?Uc2fbMOXlQDEq9ocmg5gj6EQtmqpHLmfOxgPBMlD/Gwl+ySNcNV9KhPWc7Xb?=
+ =?us-ascii?Q?6iXshEecrS/bXEdEYvmpSTJPHaXa+ht3jAgN0rDnunocR6yYUxgDci/QpS9B?=
+ =?us-ascii?Q?pW87Q0VQy0iG02pwvyYqALR5Ze6Qs/1cninWNeBNcmbDYbi67V0oGqkoRdaa?=
+ =?us-ascii?Q?7evzCbVgDPP2PvPpj3+xUTHIOKOCREyTHlSkSXJN9qMf9Rbnzth2O7rHZyhV?=
+ =?us-ascii?Q?EqCQSjS4zQ+pMRMRJbuW0/BJXI7IREi0oiWYS8cviBHKfR3QqXtzEettzgqD?=
+ =?us-ascii?Q?pSwEgQpVJaHzfQjm+xQAjpsp1Z4fPYQ7oHkvDxIbGojNebFGu/EF8EJi2M2Z?=
+ =?us-ascii?Q?UrKKNhBzltik/bfbjHCuQj3lXX5gsOVXmuRMxFufl3p2SwPxeFqdgbqKqAh6?=
+ =?us-ascii?Q?d8SFgd/kdovXE4hAM9SoDNX8HxB/844ldQNvFIPr6Ai82SGuzo+qRyhORd9e?=
+ =?us-ascii?Q?O1REBkLRGnoaPfigNGR6QCB/nGbTQtMJGmweRAMwebE8dlVVCOgMwwqGvC8H?=
+ =?us-ascii?Q?06i7gPuyq3a8wTQcJ2L0YGhhdevyfSpDs1aXbiy/dQ6OjqZEo1JJtD4blxcn?=
+ =?us-ascii?Q?8yFOoY352wDfXiwotwpt4hzzeJla9AtCGsSDnDcTlAnVUIHQ2lbnqH3d5oxO?=
+ =?us-ascii?Q?8RRYcnrAxu/WJClzTsdX00e2LZM/U34PHwip3em7wIa+l0WNH2VjTZnoGV8S?=
+ =?us-ascii?Q?2bBXPVbHwg5G1G+K4nqfOPdXYwaW/KGqeRcG8lx2mTVai8CC1MovDf90J8d1?=
+ =?us-ascii?Q?/vrhc2XAZLJN6nmcNddHEMqL4Vx+iHYKUSqNAI/g9Gx++6zaNrOrCQfMaiez?=
+ =?us-ascii?Q?yQdc34vLjrwzg38NMdTpFTnQ4EvGzJQjfvqZC4rQYXB0tE5IZw=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230037)(36860700010)(7416011)(376011)(82310400023)(1800799021);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230037)(36860700010)(7416011)(376011)(82310400023)(1800799021);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2024 17:53:18.3846
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2024 17:53:28.4556
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a2a7812f-3db2-48d6-be4a-08dc947687cb
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d2f87e9-10d7-49ef-38b9-08dc94768dd1
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001EB.namprd05.prod.outlook.com
+	MWH0EPF000A6731.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8992
-
-CDB (Command Data Block Message Communication) reads and writes are
-performed on memory map pages 9Fh-AFh according to the CMIS standard,
-section 8.20 of revision 5.2.
-Page 9Fh is used to specify the CDB command to be executed and also
-provides an area for a local payload (LPL).
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8118
 
 According to the CMIS standard, the firmware update process is done using
-a CDB commands sequence that will be implemented in the next patch.
+a CDB commands sequence.
 
-The kernel interface that will implement the firmware update using CDB
-command will include 2 layers that will be added under ethtool:
+Implement a work that will be triggered from the module layer in the
+next patch the will initiate and execute all the CDB commands in order, to
+eventually complete the firmware update process.
 
-* The upper layer that will be triggered from the module layer, is
-  cmis_fw_update.
-* The lower one is cmis_cdb.
+This flashing process includes, writing the firmware image, running the new
+firmware image and committing it after testing, so that it will run upon
+reset.
 
-In the future there might be more operations to implement using CDB
-commands. Therefore, the idea is to keep the CDB interface clean and the
-cmis_fw_update specific to the CDB commands handling it.
-
-These two layers will communicate using the API the consists of three
-functions:
-
-- struct ethtool_cmis_cdb *
-  ethtool_cmis_cdb_init(struct net_device *dev,
-			struct ethtool_module_fw_flash_params *params);
-- void ethtool_cmis_cdb_fini(struct ethtool_cmis_cdb *cdb);
-- int ethtool_cmis_cdb_execute_cmd(struct net_device *dev,
-				   struct ethtool_cmis_cdb_cmd_args *args);
-
-Add the CDB layer to support initializing, finishing and executing CDB
-commands:
-
-* The initialization process will include creating of an ethtool_cmis_cdb
-  instance, querying the module CDB support, entering and validating the
-  password from user space (CMD 0x0000) and querying the module features
-  (CMD 0x0040).
-
-* The finishing API will simply free the ethtool_cmis_cdb instance.
-
-* The executing process will write the CDB command to EEPROM using
-  set_module_eeprom_by_page() that was presented earlier, and will
-  process the reply from EEPROM.
+This work will also notify user space about the progress of the firmware
+update process.
 
 Signed-off-by: Danielle Ratson <danieller@nvidia.com>
 Reviewed-by: Petr Machata <petrm@nvidia.com>
@@ -199,771 +169,516 @@ Reviewed-by: Petr Machata <petrm@nvidia.com>
 
 Notes:
     v6:
-    	* In ethtool_cmis_cdb_init(), Use 'const' for the params
-    	  parameter.
-    
-    v5:
-    	* Drop all the inline in cmis_cdb.c.
-    
-    v4:
-    	* Add kernel-doc for msleep_pre_rpl and err_msg.
-    
-    v3:
-    	* Use kmemdup() instead of kmalloc+memcpy.
+    	* Add a list field to struct ethtool_module_fw_flash for
+    	  module_fw_flash_work_list that will be presented in the next
+    	  patch.
+    	* Move ethtool_cmis_fw_update() cleaning to a new function that
+    	  will be represented in the next patch.
+    	* Move some of the fields in struct ethtool_module_fw_flash to a
+    	  separate struct, so ethtool_cmis_fw_update() will get only the
+    	  relevant parameters for it.
+    	* Edit the relevant functions to get the relevant params for them.
+    	* s/CMIS_MODULE_READY_MAX_DURATION_USEC/CMIS_MODULE_READY_MAX_DURATION_MSEC.
     
     v2:
-    	* Define ethtool_cmis_cdb_request::epl_len to be __be16 instead
-    	  of u16.
+    	* Decrease msleep before querying completion flag in Write FW
+    	  Image command.
+    	* Change the condition for failing when LPL is not supported.
+    	* Re-write cmis_fw_update_write_image().
 
- net/ethtool/Makefile    |   2 +-
- net/ethtool/cmis.h      | 117 ++++++++
- net/ethtool/cmis_cdb.c  | 581 ++++++++++++++++++++++++++++++++++++++++
- net/ethtool/module_fw.h |  10 +
- 4 files changed, 709 insertions(+), 1 deletion(-)
- create mode 100644 net/ethtool/cmis.h
- create mode 100644 net/ethtool/cmis_cdb.c
+ net/ethtool/Makefile         |   2 +-
+ net/ethtool/cmis.h           |   7 +
+ net/ethtool/cmis_fw_update.c | 399 +++++++++++++++++++++++++++++++++++
+ net/ethtool/module_fw.h      |  31 +++
+ 4 files changed, 438 insertions(+), 1 deletion(-)
+ create mode 100644 net/ethtool/cmis_fw_update.c
 
 diff --git a/net/ethtool/Makefile b/net/ethtool/Makefile
-index 504f954a1b28..38806b3ecf83 100644
+index 38806b3ecf83..9a190635fe95 100644
 --- a/net/ethtool/Makefile
 +++ b/net/ethtool/Makefile
 @@ -8,4 +8,4 @@ ethtool_nl-y	:= netlink.o bitset.o strset.o linkinfo.o linkmodes.o rss.o \
  		   linkstate.o debug.o wol.o features.o privflags.o rings.o \
  		   channels.o coalesce.o pause.o eee.o tsinfo.o cabletest.o \
  		   tunnels.o fec.o eeprom.o stats.o phc_vclocks.o mm.o \
--		   module.o pse-pd.o plca.o mm.o
-+		   module.o cmis_cdb.o pse-pd.o plca.o mm.o
+-		   module.o cmis_cdb.o pse-pd.o plca.o mm.o
++		   module.o cmis_fw_update.o cmis_cdb.o pse-pd.o plca.o mm.o
 diff --git a/net/ethtool/cmis.h b/net/ethtool/cmis.h
-new file mode 100644
-index 000000000000..295f5d0df915
---- /dev/null
+index 295f5d0df915..e71cc3e1b7eb 100644
+--- a/net/ethtool/cmis.h
 +++ b/net/ethtool/cmis.h
-@@ -0,0 +1,117 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+
-+#define ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH		120
-+#define ETHTOOL_CMIS_CDB_CMD_PAGE			0x9F
-+#define ETHTOOL_CMIS_CDB_PAGE_I2C_ADDR			0x50
-+
-+/**
-+ * struct ethtool_cmis_cdb - CDB commands parameters
-+ * @cmis_rev: CMIS revision major.
-+ * @read_write_len_ext: Allowable additional number of byte octets to the LPL
-+ *			in a READ or a WRITE CDB commands.
-+ * @max_completion_time:  Maximum CDB command completion time in msec.
-+ */
-+struct ethtool_cmis_cdb {
-+	u8	cmis_rev;
-+	u8      read_write_len_ext;
-+	u16     max_completion_time;
-+};
-+
-+enum ethtool_cmis_cdb_cmd_id {
-+	ETHTOOL_CMIS_CDB_CMD_QUERY_STATUS		= 0x0000,
-+	ETHTOOL_CMIS_CDB_CMD_MODULE_FEATURES		= 0x0040,
-+};
-+
-+/**
-+ * struct ethtool_cmis_cdb_request - CDB commands request fields as decribed in
-+ *				the CMIS standard
-+ * @id: Command ID.
-+ * @epl_len: EPL memory length.
-+ * @lpl_len: LPL memory length.
-+ * @chk_code: Check code for the previous field and the payload.
-+ * @resv1: Added to match the CMIS standard request continuity.
-+ * @resv2: Added to match the CMIS standard request continuity.
-+ * @payload: Payload for the CDB commands.
-+ */
-+struct ethtool_cmis_cdb_request {
-+	__be16 id;
-+	struct_group(body,
-+		__be16 epl_len;
-+		u8 lpl_len;
-+		u8 chk_code;
-+		u8 resv1;
-+		u8 resv2;
-+		u8 payload[ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH];
-+	);
-+};
-+
-+#define CDB_F_COMPLETION_VALID		BIT(0)
-+#define CDB_F_STATUS_VALID		BIT(1)
-+
-+/**
-+ * struct ethtool_cmis_cdb_cmd_args - CDB commands execution arguments
-+ * @req: CDB command fields as described in the CMIS standard.
-+ * @max_duration: Maximum duration time for command completion in msec.
-+ * @read_write_len_ext: Allowable additional number of byte octets to the LPL
-+ *			in a READ or a WRITE commands.
-+ * @msleep_pre_rpl: Waiting time before checking reply in msec.
-+ * @rpl_exp_len: Expected reply length in bytes.
-+ * @flags: Validation flags for CDB commands.
-+ * @err_msg: Error message to be sent to user space.
-+ */
-+struct ethtool_cmis_cdb_cmd_args {
-+	struct ethtool_cmis_cdb_request req;
-+	u16				max_duration;
-+	u8				read_write_len_ext;
-+	u8				msleep_pre_rpl;
-+	u8                              rpl_exp_len;
-+	u8				flags;
-+	char				*err_msg;
-+};
-+
-+/**
-+ * struct ethtool_cmis_cdb_rpl_hdr - CDB commands reply header arguments
-+ * @rpl_len: Reply length.
-+ * @rpl_chk_code: Reply check code.
-+ */
-+struct ethtool_cmis_cdb_rpl_hdr {
-+	u8 rpl_len;
-+	u8 rpl_chk_code;
-+};
-+
-+/**
-+ * struct ethtool_cmis_cdb_rpl - CDB commands reply arguments
-+ * @hdr: CDB commands reply header arguments.
-+ * @payload: Payload for the CDB commands reply.
-+ */
-+struct ethtool_cmis_cdb_rpl {
-+	struct ethtool_cmis_cdb_rpl_hdr hdr;
-+	u8 payload[ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH];
-+};
-+
-+u32 ethtool_cmis_get_max_payload_size(u8 num_of_byte_octs);
-+
-+void ethtool_cmis_cdb_compose_args(struct ethtool_cmis_cdb_cmd_args *args,
-+				   enum ethtool_cmis_cdb_cmd_id cmd, u8 *pl,
-+				   u8 lpl_len, u16 max_duration,
-+				   u8 read_write_len_ext, u16 msleep_pre_rpl,
-+				   u8 rpl_exp_len, u8 flags);
-+
-+void ethtool_cmis_cdb_check_completion_flag(u8 cmis_rev, u8 *flags);
-+
-+void ethtool_cmis_page_init(struct ethtool_module_eeprom *page_data,
-+			    u8 page, u32 offset, u32 length);
-+void ethtool_cmis_page_fini(struct ethtool_module_eeprom *page_data);
-+
-+struct ethtool_cmis_cdb *
-+ethtool_cmis_cdb_init(struct net_device *dev,
-+		      const struct ethtool_module_fw_flash_params *params,
-+		      struct ethnl_module_fw_flash_ntf_params *ntf_params);
-+void ethtool_cmis_cdb_fini(struct ethtool_cmis_cdb *cdb);
-+
-+int ethtool_cmis_wait_for_cond(struct net_device *dev, u8 flags, u8 flag,
-+			       u16 max_duration, u32 offset,
-+			       bool (*cond_success)(u8), bool (*cond_fail)(u8), u8 *state);
-+
-+int ethtool_cmis_cdb_execute_cmd(struct net_device *dev,
-+				 struct ethtool_cmis_cdb_cmd_args *args);
-diff --git a/net/ethtool/cmis_cdb.c b/net/ethtool/cmis_cdb.c
+@@ -20,6 +20,12 @@ struct ethtool_cmis_cdb {
+ enum ethtool_cmis_cdb_cmd_id {
+ 	ETHTOOL_CMIS_CDB_CMD_QUERY_STATUS		= 0x0000,
+ 	ETHTOOL_CMIS_CDB_CMD_MODULE_FEATURES		= 0x0040,
++	ETHTOOL_CMIS_CDB_CMD_FW_MANAGMENT_FEATURES	= 0x0041,
++	ETHTOOL_CMIS_CDB_CMD_START_FW_DOWNLOAD		= 0x0101,
++	ETHTOOL_CMIS_CDB_CMD_WRITE_FW_BLOCK_LPL		= 0x0103,
++	ETHTOOL_CMIS_CDB_CMD_COMPLETE_FW_DOWNLOAD	= 0x0107,
++	ETHTOOL_CMIS_CDB_CMD_RUN_FW_IMAGE		= 0x0109,
++	ETHTOOL_CMIS_CDB_CMD_COMMIT_FW_IMAGE		= 0x010A,
+ };
+ 
+ /**
+@@ -47,6 +53,7 @@ struct ethtool_cmis_cdb_request {
+ 
+ #define CDB_F_COMPLETION_VALID		BIT(0)
+ #define CDB_F_STATUS_VALID		BIT(1)
++#define CDB_F_MODULE_STATE_VALID	BIT(2)
+ 
+ /**
+  * struct ethtool_cmis_cdb_cmd_args - CDB commands execution arguments
+diff --git a/net/ethtool/cmis_fw_update.c b/net/ethtool/cmis_fw_update.c
 new file mode 100644
-index 000000000000..ad7ac41bf679
+index 000000000000..ae4b4b28a601
 --- /dev/null
-+++ b/net/ethtool/cmis_cdb.c
-@@ -0,0 +1,581 @@
++++ b/net/ethtool/cmis_fw_update.c
+@@ -0,0 +1,399 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +
 +#include <linux/ethtool.h>
-+#include <linux/jiffies.h>
++#include <linux/firmware.h>
 +
 +#include "common.h"
 +#include "module_fw.h"
 +#include "cmis.h"
 +
-+/* For accessing the LPL field on page 9Fh, the allowable length extension is
-+ * min(i, 15) byte octets where i specifies the allowable additional number of
-+ * byte octets in a READ or a WRITE.
-+ */
-+u32 ethtool_cmis_get_max_payload_size(u8 num_of_byte_octs)
-+{
-+	return 8 * (1 + min_t(u8, num_of_byte_octs, 15));
-+}
-+
-+void ethtool_cmis_cdb_compose_args(struct ethtool_cmis_cdb_cmd_args *args,
-+				   enum ethtool_cmis_cdb_cmd_id cmd, u8 *pl,
-+				   u8 lpl_len, u16 max_duration,
-+				   u8 read_write_len_ext, u16 msleep_pre_rpl,
-+				   u8 rpl_exp_len, u8 flags)
-+{
-+	args->req.id = cpu_to_be16(cmd);
-+	args->req.lpl_len = lpl_len;
-+	if (pl)
-+		memcpy(args->req.payload, pl, args->req.lpl_len);
-+
-+	args->max_duration = max_duration;
-+	args->read_write_len_ext =
-+		ethtool_cmis_get_max_payload_size(read_write_len_ext);
-+	args->msleep_pre_rpl = msleep_pre_rpl;
-+	args->rpl_exp_len = rpl_exp_len;
-+	args->flags = flags;
-+	args->err_msg = NULL;
-+}
-+
-+void ethtool_cmis_page_init(struct ethtool_module_eeprom *page_data,
-+			    u8 page, u32 offset, u32 length)
-+{
-+	page_data->page = page;
-+	page_data->offset = offset;
-+	page_data->length = length;
-+	page_data->i2c_address = ETHTOOL_CMIS_CDB_PAGE_I2C_ADDR;
-+}
-+
-+#define CMIS_REVISION_PAGE	0x00
-+#define CMIS_REVISION_OFFSET	0x01
-+
-+struct cmis_rev_rpl {
-+	u8 rev;
++struct cmis_fw_update_fw_mng_features {
++	u8	start_cmd_payload_size;
++	u16	max_duration_start;
++	u16	max_duration_write;
++	u16	max_duration_complete;
 +};
 +
-+static u8 cmis_rev_rpl_major(struct cmis_rev_rpl *rpl)
-+{
-+	return rpl->rev >> 4;
-+}
-+
-+static int cmis_rev_major_get(struct net_device *dev, u8 *rev_major)
-+{
-+	const struct ethtool_ops *ops = dev->ethtool_ops;
-+	struct ethtool_module_eeprom page_data = {0};
-+	struct netlink_ext_ack extack = {};
-+	struct cmis_rev_rpl rpl = {};
-+	int err;
-+
-+	ethtool_cmis_page_init(&page_data, CMIS_REVISION_PAGE,
-+			       CMIS_REVISION_OFFSET, sizeof(rpl));
-+	page_data.data = (u8 *)&rpl;
-+
-+	err = ops->get_module_eeprom_by_page(dev, &page_data, &extack);
-+	if (err < 0) {
-+		if (extack._msg)
-+			netdev_err(dev, "%s\n", extack._msg);
-+		return err;
-+	}
-+
-+	*rev_major = cmis_rev_rpl_major(&rpl);
-+
-+	return 0;
-+}
-+
-+#define CMIS_CDB_ADVERTISEMENT_PAGE	0x01
-+#define CMIS_CDB_ADVERTISEMENT_OFFSET	0xA3
-+
-+/* Based on section 8.4.11 "CDB Messaging Support Advertisement" in CMIS
-+ * standard revision 5.2.
-+ */
-+struct cmis_cdb_advert_rpl {
-+	u8	inst_supported;
-+	u8	read_write_len_ext;
-+	u8	resv1;
-+	u8	resv2;
-+};
-+
-+static u8 cmis_cdb_advert_rpl_inst_supported(struct cmis_cdb_advert_rpl *rpl)
-+{
-+	return rpl->inst_supported >> 6;
-+}
-+
-+static int cmis_cdb_advertisement_get(struct ethtool_cmis_cdb *cdb,
-+				      struct net_device *dev)
-+{
-+	const struct ethtool_ops *ops = dev->ethtool_ops;
-+	struct ethtool_module_eeprom page_data = {};
-+	struct cmis_cdb_advert_rpl rpl = {};
-+	struct netlink_ext_ack extack = {};
-+	int err;
-+
-+	ethtool_cmis_page_init(&page_data, CMIS_CDB_ADVERTISEMENT_PAGE,
-+			       CMIS_CDB_ADVERTISEMENT_OFFSET, sizeof(rpl));
-+	page_data.data = (u8 *)&rpl;
-+
-+	err = ops->get_module_eeprom_by_page(dev, &page_data, &extack);
-+	if (err < 0) {
-+		if (extack._msg)
-+			netdev_err(dev, "%s\n", extack._msg);
-+		return err;
-+	}
-+
-+	if (!cmis_cdb_advert_rpl_inst_supported(&rpl))
-+		return -EOPNOTSUPP;
-+
-+	cdb->read_write_len_ext = rpl.read_write_len_ext;
-+
-+	return 0;
-+}
-+
-+#define CMIS_PASSWORD_ENTRY_PAGE	0x00
-+#define CMIS_PASSWORD_ENTRY_OFFSET	0x7A
-+
-+struct cmis_password_entry_pl {
-+	__be32 password;
-+};
-+
-+/* See section 9.3.1 "CMD 0000h: Query Status" in CMIS standard revision 5.2.
-+ * struct cmis_cdb_query_status_pl and struct cmis_cdb_query_status_rpl are
-+ * structured layouts of the flat arrays,
-+ * struct ethtool_cmis_cdb_request::payload and
-+ * struct ethtool_cmis_cdb_rpl::payload respectively.
-+ */
-+struct cmis_cdb_query_status_pl {
-+	u16 response_delay;
-+};
-+
-+struct cmis_cdb_query_status_rpl {
-+	u8 length;
-+	u8 status;
-+};
-+
-+static int
-+cmis_cdb_validate_password(struct ethtool_cmis_cdb *cdb,
-+			   struct net_device *dev,
-+			   const struct ethtool_module_fw_flash_params *params,
-+			   struct ethnl_module_fw_flash_ntf_params *ntf_params)
-+{
-+	const struct ethtool_ops *ops = dev->ethtool_ops;
-+	struct cmis_cdb_query_status_pl qs_pl = {0};
-+	struct ethtool_module_eeprom page_data = {};
-+	struct ethtool_cmis_cdb_cmd_args args = {};
-+	struct cmis_password_entry_pl pe_pl = {};
-+	struct cmis_cdb_query_status_rpl *rpl;
-+	struct netlink_ext_ack extack = {};
-+	int err;
-+
-+	ethtool_cmis_page_init(&page_data, CMIS_PASSWORD_ENTRY_PAGE,
-+			       CMIS_PASSWORD_ENTRY_OFFSET, sizeof(pe_pl));
-+	page_data.data = (u8 *)&pe_pl;
-+
-+	pe_pl = *((struct cmis_password_entry_pl *)page_data.data);
-+	pe_pl.password = params->password;
-+	err = ops->set_module_eeprom_by_page(dev, &page_data, &extack);
-+	if (err < 0) {
-+		if (extack._msg)
-+			netdev_err(dev, "%s\n", extack._msg);
-+		return err;
-+	}
-+
-+	ethtool_cmis_cdb_compose_args(&args, ETHTOOL_CMIS_CDB_CMD_QUERY_STATUS,
-+				      (u8 *)&qs_pl, sizeof(qs_pl), 0,
-+				      cdb->read_write_len_ext, 1000,
-+				      sizeof(*rpl),
-+				      CDB_F_COMPLETION_VALID | CDB_F_STATUS_VALID);
-+
-+	err = ethtool_cmis_cdb_execute_cmd(dev, &args);
-+	if (err < 0) {
-+		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
-+					      "Query Status command failed",
-+					      args.err_msg);
-+		return err;
-+	}
-+
-+	rpl = (struct cmis_cdb_query_status_rpl *)args.req.payload;
-+	if (!rpl->length || !rpl->status) {
-+		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
-+					      "Password was not accepted",
-+					      NULL);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+/* Some CDB commands asserts the CDB completion flag only from CMIS
-+ * revision 5. Therefore, check the relevant validity flag only when
-+ * the revision supports it.
-+ */
-+void ethtool_cmis_cdb_check_completion_flag(u8 cmis_rev, u8 *flags)
-+{
-+	*flags |= cmis_rev >= 5 ? CDB_F_COMPLETION_VALID : 0;
-+}
-+
-+#define CMIS_CDB_MODULE_FEATURES_RESV_DATA	34
-+
-+/* See section 9.4.1 "CMD 0040h: Module Features" in CMIS standard revision 5.2.
-+ * struct cmis_cdb_module_features_rpl is structured layout of the flat
++/* See section 9.4.2 "CMD 0041h: Firmware Management Features" in CMIS standard
++ * revision 5.2.
++ * struct cmis_cdb_fw_mng_features_rpl is a structured layout of the flat
 + * array, ethtool_cmis_cdb_rpl::payload.
 + */
-+struct cmis_cdb_module_features_rpl {
-+	u8	resv1[CMIS_CDB_MODULE_FEATURES_RESV_DATA];
-+	__be16	max_completion_time;
++struct cmis_cdb_fw_mng_features_rpl {
++	u8	resv1;
++	u8	resv2;
++	u8	start_cmd_payload_size;
++	u8	resv3;
++	u8	read_write_len_ext;
++	u8	write_mechanism;
++	u8	resv4;
++	u8	resv5;
++	__be16	max_duration_start;
++	__be16	resv6;
++	__be16	max_duration_write;
++	__be16	max_duration_complete;
++	__be16	resv7;
 +};
 +
-+static u16
-+cmis_cdb_module_features_completion_time(struct cmis_cdb_module_features_rpl *rpl)
-+{
-+	return be16_to_cpu(rpl->max_completion_time);
-+}
++#define CMIS_CDB_FW_WRITE_MECHANISM_LPL	0x01
 +
-+static int cmis_cdb_module_features_get(struct ethtool_cmis_cdb *cdb,
-+					struct net_device *dev,
-+					struct ethnl_module_fw_flash_ntf_params *ntf_params)
++static int
++cmis_fw_update_fw_mng_features_get(struct ethtool_cmis_cdb *cdb,
++				   struct net_device *dev,
++				   struct cmis_fw_update_fw_mng_features *fw_mng,
++				   struct ethnl_module_fw_flash_ntf_params *ntf_params)
 +{
 +	struct ethtool_cmis_cdb_cmd_args args = {};
-+	struct cmis_cdb_module_features_rpl *rpl;
++	struct cmis_cdb_fw_mng_features_rpl *rpl;
 +	u8 flags = CDB_F_STATUS_VALID;
 +	int err;
 +
 +	ethtool_cmis_cdb_check_completion_flag(cdb->cmis_rev, &flags);
 +	ethtool_cmis_cdb_compose_args(&args,
-+				      ETHTOOL_CMIS_CDB_CMD_MODULE_FEATURES,
-+				      NULL, 0, 0, cdb->read_write_len_ext,
-+				      1000, sizeof(*rpl), flags);
++				      ETHTOOL_CMIS_CDB_CMD_FW_MANAGMENT_FEATURES,
++				      NULL, 0, cdb->max_completion_time,
++				      cdb->read_write_len_ext, 1000,
++				      sizeof(*rpl), flags);
 +
 +	err = ethtool_cmis_cdb_execute_cmd(dev, &args);
 +	if (err < 0) {
 +		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
-+					      "Module Features command failed",
++					      "FW Management Features command failed",
 +					      args.err_msg);
 +		return err;
 +	}
 +
-+	rpl = (struct cmis_cdb_module_features_rpl *)args.req.payload;
-+	cdb->max_completion_time =
-+		cmis_cdb_module_features_completion_time(rpl);
++	rpl = (struct cmis_cdb_fw_mng_features_rpl *)args.req.payload;
++	if (!(rpl->write_mechanism == CMIS_CDB_FW_WRITE_MECHANISM_LPL)) {
++		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
++					      "Write LPL is not supported",
++					      NULL);
++		return  -EOPNOTSUPP;
++	}
++
++	/* Above, we used read_write_len_ext that we got from CDB
++	 * advertisement. Update it with the value that we got from module
++	 * features query, which is specific for Firmware Management Commands
++	 * (IDs 0100h-01FFh).
++	 */
++	cdb->read_write_len_ext = rpl->read_write_len_ext;
++	fw_mng->start_cmd_payload_size = rpl->start_cmd_payload_size;
++	fw_mng->max_duration_start = be16_to_cpu(rpl->max_duration_start);
++	fw_mng->max_duration_write = be16_to_cpu(rpl->max_duration_write);
++	fw_mng->max_duration_complete = be16_to_cpu(rpl->max_duration_complete);
 +
 +	return 0;
 +}
 +
-+struct ethtool_cmis_cdb *
-+ethtool_cmis_cdb_init(struct net_device *dev,
-+		      const struct ethtool_module_fw_flash_params *params,
-+		      struct ethnl_module_fw_flash_ntf_params *ntf_params)
-+{
-+	struct ethtool_cmis_cdb *cdb;
-+	int err;
-+
-+	cdb = kzalloc(sizeof(*cdb), GFP_KERNEL);
-+	if (!cdb)
-+		return ERR_PTR(-ENOMEM);
-+
-+	err = cmis_rev_major_get(dev, &cdb->cmis_rev);
-+	if (err < 0)
-+		goto err;
-+
-+	if (cdb->cmis_rev < 4) {
-+		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
-+					      "CMIS revision doesn't support module firmware flashing",
-+					      NULL);
-+		err = -EOPNOTSUPP;
-+		goto err;
-+	}
-+
-+	err = cmis_cdb_advertisement_get(cdb, dev);
-+	if (err < 0)
-+		goto err;
-+
-+	if (params->password_valid) {
-+		err = cmis_cdb_validate_password(cdb, dev, params, ntf_params);
-+		if (err < 0)
-+			goto err;
-+	}
-+
-+	err = cmis_cdb_module_features_get(cdb, dev, ntf_params);
-+	if (err < 0)
-+		goto err;
-+
-+	return cdb;
-+
-+err:
-+	ethtool_cmis_cdb_fini(cdb);
-+	return ERR_PTR(err);
-+}
-+
-+void ethtool_cmis_cdb_fini(struct ethtool_cmis_cdb *cdb)
-+{
-+	kfree(cdb);
-+}
-+
-+static bool is_completed(u8 data)
-+{
-+	return !!(data & 0x40);
-+}
-+
-+#define CMIS_CDB_STATUS_SUCCESS	0x01
-+
-+static bool status_success(u8 data)
-+{
-+	return data == CMIS_CDB_STATUS_SUCCESS;
-+}
-+
-+#define CMIS_CDB_STATUS_FAIL	0x40
-+
-+static bool status_fail(u8 data)
-+{
-+	return data & CMIS_CDB_STATUS_FAIL;
-+}
-+
-+struct cmis_wait_for_cond_rpl {
-+	u8 state;
++/* See section 9.7.2 "CMD 0101h: Start Firmware Download" in CMIS standard
++ * revision 5.2.
++ * struct cmis_cdb_start_fw_download_pl is a structured layout of the
++ * flat array, ethtool_cmis_cdb_request::payload.
++ */
++struct cmis_cdb_start_fw_download_pl {
++	__struct_group(cmis_cdb_start_fw_download_pl_h, head, /* no attrs */,
++			__be32	image_size;
++			__be32	resv1;
++	);
++	u8 vendor_data[ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH -
++		sizeof(struct cmis_cdb_start_fw_download_pl_h)];
 +};
 +
-+int ethtool_cmis_wait_for_cond(struct net_device *dev, u8 flags, u8 flag,
-+			       u16 max_duration, u32 offset,
-+			       bool (*cond_success)(u8), bool (*cond_fail)(u8),
-+			       u8 *state)
++static int
++cmis_fw_update_start_download(struct ethtool_cmis_cdb *cdb,
++			      struct ethtool_cmis_fw_update_params *fw_update,
++			      struct cmis_fw_update_fw_mng_features *fw_mng)
 +{
-+	const struct ethtool_ops *ops = dev->ethtool_ops;
-+	struct ethtool_module_eeprom page_data = {0};
-+	struct cmis_wait_for_cond_rpl rpl = {};
-+	struct netlink_ext_ack extack = {};
-+	unsigned long end;
++	u8 vendor_data_size = fw_mng->start_cmd_payload_size;
++	struct cmis_cdb_start_fw_download_pl pl = {};
++	struct ethtool_cmis_cdb_cmd_args args = {};
++	u8 lpl_len;
 +	int err;
 +
-+	if (!(flags & flag))
-+		return 0;
++	pl.image_size = cpu_to_be32(fw_update->fw->size);
++	memcpy(pl.vendor_data, fw_update->fw->data, vendor_data_size);
 +
-+	if (max_duration == 0)
-+		max_duration = U16_MAX;
++	lpl_len = offsetof(struct cmis_cdb_start_fw_download_pl,
++			   vendor_data[vendor_data_size]);
 +
-+	end = jiffies + msecs_to_jiffies(max_duration);
-+	do {
-+		ethtool_cmis_page_init(&page_data, 0, offset, sizeof(rpl));
-+		page_data.data = (u8 *)&rpl;
++	ethtool_cmis_cdb_compose_args(&args,
++				      ETHTOOL_CMIS_CDB_CMD_START_FW_DOWNLOAD,
++				      (u8 *)&pl, lpl_len,
++				      fw_mng->max_duration_start,
++				      cdb->read_write_len_ext, 1000, 0,
++				      CDB_F_COMPLETION_VALID | CDB_F_STATUS_VALID);
 +
-+		err = ops->get_module_eeprom_by_page(dev, &page_data, &extack);
++	err = ethtool_cmis_cdb_execute_cmd(fw_update->dev, &args);
++	if (err < 0)
++		ethnl_module_fw_flash_ntf_err(fw_update->dev,
++					      &fw_update->ntf_params,
++					      "Start FW download command failed",
++					      args.err_msg);
++
++	return err;
++}
++
++/* See section 9.7.4 "CMD 0103h: Write Firmware Block LPL" in CMIS standard
++ * revision 5.2.
++ * struct cmis_cdb_write_fw_block_lpl_pl is a structured layout of the
++ * flat array, ethtool_cmis_cdb_request::payload.
++ */
++struct cmis_cdb_write_fw_block_lpl_pl {
++	__be32	block_address;
++	u8 fw_block[ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH - sizeof(__be32)];
++};
++
++static int
++cmis_fw_update_write_image(struct ethtool_cmis_cdb *cdb,
++			   struct ethtool_cmis_fw_update_params *fw_update,
++			   struct cmis_fw_update_fw_mng_features *fw_mng)
++{
++	u8 start = fw_mng->start_cmd_payload_size;
++	u32 offset, max_block_size, max_lpl_len;
++	u32 image_size = fw_update->fw->size;
++	int err;
++
++	max_lpl_len = min_t(u32,
++			    ethtool_cmis_get_max_payload_size(cdb->read_write_len_ext),
++			    ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH);
++	max_block_size =
++		max_lpl_len - sizeof_field(struct cmis_cdb_write_fw_block_lpl_pl,
++					   block_address);
++
++	for (offset = start; offset < image_size; offset += max_block_size) {
++		struct cmis_cdb_write_fw_block_lpl_pl pl = {
++			.block_address = cpu_to_be32(offset - start),
++		};
++		struct ethtool_cmis_cdb_cmd_args args = {};
++		u32 block_size, lpl_len;
++
++		ethnl_module_fw_flash_ntf_in_progress(fw_update->dev,
++						      &fw_update->ntf_params,
++						      offset - start,
++						      image_size);
++		block_size = min_t(u32, max_block_size, image_size - offset);
++		memcpy(pl.fw_block, &fw_update->fw->data[offset], block_size);
++		lpl_len = block_size +
++			sizeof_field(struct cmis_cdb_write_fw_block_lpl_pl,
++				     block_address);
++
++		ethtool_cmis_cdb_compose_args(&args,
++					      ETHTOOL_CMIS_CDB_CMD_WRITE_FW_BLOCK_LPL,
++					      (u8 *)&pl, lpl_len,
++					      fw_mng->max_duration_write,
++					      cdb->read_write_len_ext, 1, 0,
++					      CDB_F_COMPLETION_VALID | CDB_F_STATUS_VALID);
++
++		err = ethtool_cmis_cdb_execute_cmd(fw_update->dev, &args);
 +		if (err < 0) {
-+			if (extack._msg)
-+				netdev_err(dev, "%s\n", extack._msg);
-+			continue;
++			ethnl_module_fw_flash_ntf_err(fw_update->dev,
++						      &fw_update->ntf_params,
++						      "Write FW block LPL command failed",
++						      args.err_msg);
++			return err;
 +		}
++	}
 +
-+		if ((*cond_success)(rpl.state))
-+			return 0;
-+
-+		if (*cond_fail && (*cond_fail)(rpl.state))
-+			break;
-+
-+		msleep(20);
-+	} while (time_before(jiffies, end));
-+
-+	*state = rpl.state;
-+	return -EBUSY;
++	return 0;
 +}
 +
-+#define CMIS_CDB_COMPLETION_FLAG_OFFSET	0x08
-+
-+static int cmis_cdb_wait_for_completion(struct net_device *dev,
-+					struct ethtool_cmis_cdb_cmd_args *args)
++static int
++cmis_fw_update_complete_download(struct ethtool_cmis_cdb *cdb,
++				 struct net_device *dev,
++				 struct cmis_fw_update_fw_mng_features *fw_mng,
++				 struct ethnl_module_fw_flash_ntf_params *ntf_params)
 +{
-+	u8 flag;
++	struct ethtool_cmis_cdb_cmd_args args = {};
 +	int err;
 +
-+	/* Some vendors demand waiting time before checking completion flag
-+	 * in some CDB commands.
-+	 */
-+	msleep(args->msleep_pre_rpl);
++	ethtool_cmis_cdb_compose_args(&args,
++				      ETHTOOL_CMIS_CDB_CMD_COMPLETE_FW_DOWNLOAD,
++				      NULL, 0, fw_mng->max_duration_complete,
++				      cdb->read_write_len_ext, 1000, 0,
++				      CDB_F_COMPLETION_VALID | CDB_F_STATUS_VALID);
 +
-+	err = ethtool_cmis_wait_for_cond(dev, args->flags,
-+					 CDB_F_COMPLETION_VALID,
-+					 args->max_duration,
-+					 CMIS_CDB_COMPLETION_FLAG_OFFSET,
-+					 is_completed, NULL, &flag);
++	err = ethtool_cmis_cdb_execute_cmd(dev, &args);
 +	if (err < 0)
-+		args->err_msg = "Completion Flag did not set on time";
++		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
++					      "Complete FW download command failed",
++					      args.err_msg);
 +
-+	return err;
-+}
-+
-+#define CMIS_CDB_STATUS_OFFSET	0x25
-+
-+static void cmis_cdb_status_fail_msg_get(u8 status, char **err_msg)
-+{
-+	switch (status) {
-+	case 0b10000001:
-+		*err_msg = "CDB Status is in progress: Busy capturing command";
-+		break;
-+	case 0b10000010:
-+		*err_msg =
-+			"CDB Status is in progress: Busy checking/validating command";
-+		break;
-+	case 0b10000011:
-+		*err_msg = "CDB Status is in progress: Busy executing";
-+		break;
-+	case 0b01000000:
-+		*err_msg = "CDB status failed: no specific failure";
-+		break;
-+	case 0b01000010:
-+		*err_msg =
-+			"CDB status failed: Parameter range error or parameter not supported";
-+		break;
-+	case 0b01000101:
-+		*err_msg = "CDB status failed: CdbChkCode error";
-+		break;
-+	default:
-+		*err_msg = "Unknown failure reason";
-+	}
-+};
-+
-+static int cmis_cdb_wait_for_status(struct net_device *dev,
-+				    struct ethtool_cmis_cdb_cmd_args *args)
-+{
-+	u8 status;
-+	int err;
-+
-+	/* Some vendors demand waiting time before checking status in some
-+	 * CDB commands.
-+	 */
-+	msleep(args->msleep_pre_rpl);
-+
-+	err = ethtool_cmis_wait_for_cond(dev, args->flags, CDB_F_STATUS_VALID,
-+					 args->max_duration,
-+					 CMIS_CDB_STATUS_OFFSET,
-+					 status_success, status_fail, &status);
-+	if (err < 0 && !args->err_msg)
-+		cmis_cdb_status_fail_msg_get(status, &args->err_msg);
-+
-+	return err;
-+}
-+
-+#define CMIS_CDB_REPLY_OFFSET	0x86
-+
-+static int cmis_cdb_process_reply(struct net_device *dev,
-+				  struct ethtool_module_eeprom *page_data,
-+				  struct ethtool_cmis_cdb_cmd_args *args)
-+{
-+	u8 rpl_hdr_len = sizeof(struct ethtool_cmis_cdb_rpl_hdr);
-+	u8 rpl_exp_len = args->rpl_exp_len + rpl_hdr_len;
-+	const struct ethtool_ops *ops = dev->ethtool_ops;
-+	struct netlink_ext_ack extack = {};
-+	struct ethtool_cmis_cdb_rpl *rpl;
-+	int err;
-+
-+	if (!args->rpl_exp_len)
-+		return 0;
-+
-+	ethtool_cmis_page_init(page_data, ETHTOOL_CMIS_CDB_CMD_PAGE,
-+			       CMIS_CDB_REPLY_OFFSET, rpl_exp_len);
-+	page_data->data = kmalloc(page_data->length, GFP_KERNEL);
-+	if (!page_data->data)
-+		return -ENOMEM;
-+
-+	err = ops->get_module_eeprom_by_page(dev, page_data, &extack);
-+	if (err < 0) {
-+		if (extack._msg)
-+			netdev_err(dev, "%s\n", extack._msg);
-+		goto out;
-+	}
-+
-+	rpl = (struct ethtool_cmis_cdb_rpl *)page_data->data;
-+	if ((args->rpl_exp_len > rpl->hdr.rpl_len + rpl_hdr_len) ||
-+	    !rpl->hdr.rpl_chk_code) {
-+		err = -EIO;
-+		goto out;
-+	}
-+
-+	args->req.lpl_len = rpl->hdr.rpl_len;
-+	memcpy(args->req.payload, rpl->payload, args->req.lpl_len);
-+
-+out:
-+	kfree(page_data->data);
 +	return err;
 +}
 +
 +static int
-+__ethtool_cmis_cdb_execute_cmd(struct net_device *dev,
-+			       struct ethtool_module_eeprom *page_data,
-+			       u8 page, u32 offset, u32 length, void *data)
++cmis_fw_update_download_image(struct ethtool_cmis_cdb *cdb,
++			      struct ethtool_cmis_fw_update_params *fw_update,
++			      struct cmis_fw_update_fw_mng_features *fw_mng)
 +{
-+	const struct ethtool_ops *ops = dev->ethtool_ops;
-+	struct netlink_ext_ack extack = {};
 +	int err;
 +
-+	ethtool_cmis_page_init(page_data, page, offset, length);
-+	page_data->data = kmemdup(data, page_data->length, GFP_KERNEL);
-+	if (!page_data->data)
-+		return -ENOMEM;
++	err = cmis_fw_update_start_download(cdb, fw_update, fw_mng);
++	if (err < 0)
++		return err;
 +
-+	err = ops->set_module_eeprom_by_page(dev, page_data, &extack);
++	err = cmis_fw_update_write_image(cdb, fw_update, fw_mng);
++	if (err < 0)
++		return err;
++
++	err = cmis_fw_update_complete_download(cdb, fw_update->dev, fw_mng,
++					       &fw_update->ntf_params);
++	if (err < 0)
++		return err;
++
++	return 0;
++}
++
++enum {
++	CMIS_MODULE_LOW_PWR	= 1,
++	CMIS_MODULE_READY	= 3,
++};
++
++static bool module_is_ready(u8 data)
++{
++	u8 state = (data >> 1) & 7;
++
++	return state == CMIS_MODULE_READY || state == CMIS_MODULE_LOW_PWR;
++}
++
++#define CMIS_MODULE_READY_MAX_DURATION_MSEC	1000
++#define CMIS_MODULE_STATE_OFFSET		3
++
++static int
++cmis_fw_update_wait_for_module_state(struct net_device *dev, u8 flags)
++{
++	u8 state;
++
++	return ethtool_cmis_wait_for_cond(dev, flags, CDB_F_MODULE_STATE_VALID,
++					  CMIS_MODULE_READY_MAX_DURATION_MSEC,
++					  CMIS_MODULE_STATE_OFFSET,
++					  module_is_ready, NULL, &state);
++}
++
++/* See section 9.7.10 "CMD 0109h: Run Firmware Image" in CMIS standard
++ * revision 5.2.
++ * struct cmis_cdb_run_fw_image_pl is a structured layout of the flat
++ * array, ethtool_cmis_cdb_request::payload.
++ */
++struct cmis_cdb_run_fw_image_pl {
++	u8 resv1;
++	u8 image_to_run;
++	u16 delay_to_reset;
++};
++
++static int
++cmis_fw_update_run_image(struct ethtool_cmis_cdb *cdb, struct net_device *dev,
++			 struct ethnl_module_fw_flash_ntf_params *ntf_params)
++{
++	struct ethtool_cmis_cdb_cmd_args args = {};
++	struct cmis_cdb_run_fw_image_pl pl = {0};
++	int err;
++
++	ethtool_cmis_cdb_compose_args(&args, ETHTOOL_CMIS_CDB_CMD_RUN_FW_IMAGE,
++				      (u8 *)&pl, sizeof(pl),
++				      cdb->max_completion_time,
++				      cdb->read_write_len_ext, 1000, 0,
++				      CDB_F_MODULE_STATE_VALID);
++
++	err = ethtool_cmis_cdb_execute_cmd(dev, &args);
 +	if (err < 0) {
-+		if (extack._msg)
-+			netdev_err(dev, "%s\n", extack._msg);
++		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
++					      "Run image command failed",
++					      args.err_msg);
++		return err;
 +	}
 +
-+	kfree(page_data->data);
++	err = cmis_fw_update_wait_for_module_state(dev, args.flags);
++	if (err < 0)
++		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
++					      "Module is not ready on time after reset",
++					      NULL);
++
 +	return err;
 +}
 +
-+static u8 cmis_cdb_calc_checksum(const void *data, size_t size)
++static int
++cmis_fw_update_commit_image(struct ethtool_cmis_cdb *cdb,
++			    struct net_device *dev,
++			    struct ethnl_module_fw_flash_ntf_params *ntf_params)
 +{
-+	const u8 *bytes = (const u8 *)data;
-+	u8 checksum = 0;
-+
-+	for (size_t i = 0; i < size; i++)
-+		checksum += bytes[i];
-+
-+	return ~checksum;
-+}
-+
-+#define CMIS_CDB_CMD_ID_OFFSET	0x80
-+
-+int ethtool_cmis_cdb_execute_cmd(struct net_device *dev,
-+				 struct ethtool_cmis_cdb_cmd_args *args)
-+{
-+	struct ethtool_module_eeprom page_data = {};
-+	u32 offset;
++	struct ethtool_cmis_cdb_cmd_args args = {};
 +	int err;
 +
-+	args->req.chk_code =
-+		cmis_cdb_calc_checksum(&args->req, sizeof(args->req));
++	ethtool_cmis_cdb_compose_args(&args,
++				      ETHTOOL_CMIS_CDB_CMD_COMMIT_FW_IMAGE,
++				      NULL, 0, cdb->max_completion_time,
++				      cdb->read_write_len_ext, 1000, 0,
++				      CDB_F_COMPLETION_VALID | CDB_F_STATUS_VALID);
 +
-+	if (args->req.lpl_len > args->read_write_len_ext) {
-+		args->err_msg = "LPL length is longer than CDB read write length extension allows";
-+		return -EINVAL;
-+	}
++	err = ethtool_cmis_cdb_execute_cmd(dev, &args);
++	if (err < 0)
++		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
++					      "Commit image command failed",
++					      args.err_msg);
 +
-+	/* According to the CMIS standard, there are two options to trigger the
-+	 * CDB commands. The default option is triggering the command by writing
-+	 * the CMDID bytes. Therefore, the command will be split to 2 calls:
-+	 * First, with everything except the CMDID field and then the CMDID
-+	 * field.
++	return err;
++}
++
++static int cmis_fw_update_reset(struct net_device *dev)
++{
++	__u32 reset_data = ETH_RESET_PHY;
++
++	return dev->ethtool_ops->reset(dev, &reset_data);
++}
++
++void
++ethtool_cmis_fw_update(struct ethtool_cmis_fw_update_params *fw_update)
++{
++	struct ethnl_module_fw_flash_ntf_params *ntf_params =
++						&fw_update->ntf_params;
++	struct cmis_fw_update_fw_mng_features fw_mng = {0};
++	struct net_device *dev = fw_update->dev;
++	struct ethtool_cmis_cdb *cdb;
++	int err;
++
++	cdb = ethtool_cmis_cdb_init(dev, &fw_update->params, ntf_params);
++	if (IS_ERR(cdb))
++		goto err_send_ntf;
++
++	ethnl_module_fw_flash_ntf_start(dev, ntf_params);
++
++	err = cmis_fw_update_fw_mng_features_get(cdb, dev, &fw_mng, ntf_params);
++	if (err < 0)
++		goto err_cdb_fini;
++
++	err = cmis_fw_update_download_image(cdb, fw_update, &fw_mng);
++	if (err < 0)
++		goto err_cdb_fini;
++
++	err = cmis_fw_update_run_image(cdb, dev, ntf_params);
++	if (err < 0)
++		goto err_cdb_fini;
++
++	/* The CDB command "Run Firmware Image" resets the firmware, so the new
++	 * one might have different settings.
++	 * Free the old CDB instance, and init a new one.
 +	 */
-+	offset = CMIS_CDB_CMD_ID_OFFSET +
-+		offsetof(struct ethtool_cmis_cdb_request, body);
-+	err = __ethtool_cmis_cdb_execute_cmd(dev, &page_data,
-+					     ETHTOOL_CMIS_CDB_CMD_PAGE, offset,
-+					     sizeof(args->req.body),
-+					     &args->req.body);
-+	if (err < 0)
-+		return err;
++	ethtool_cmis_cdb_fini(cdb);
 +
-+	offset = CMIS_CDB_CMD_ID_OFFSET +
-+		offsetof(struct ethtool_cmis_cdb_request, id);
-+	err = __ethtool_cmis_cdb_execute_cmd(dev, &page_data,
-+					     ETHTOOL_CMIS_CDB_CMD_PAGE, offset,
-+					     sizeof(args->req.id),
-+					     &args->req.id);
-+	if (err < 0)
-+		return err;
++	cdb = ethtool_cmis_cdb_init(dev, &fw_update->params, ntf_params);
++	if (IS_ERR(cdb))
++		goto err_send_ntf;
 +
-+	err = cmis_cdb_wait_for_completion(dev, args);
++	err = cmis_fw_update_commit_image(cdb, dev, ntf_params);
 +	if (err < 0)
-+		return err;
++		goto err_cdb_fini;
 +
-+	err = cmis_cdb_wait_for_status(dev, args);
++	err = cmis_fw_update_reset(dev);
 +	if (err < 0)
-+		return err;
++		goto err_cdb_fini;
 +
-+	return cmis_cdb_process_reply(dev, &page_data, args);
++	ethnl_module_fw_flash_ntf_complete(dev, ntf_params);
++	ethtool_cmis_cdb_fini(cdb);
++	return;
++
++err_cdb_fini:
++	ethtool_cmis_cdb_fini(cdb);
++err_send_ntf:
++	ethnl_module_fw_flash_ntf_err(dev, ntf_params, NULL, NULL);
 +}
 diff --git a/net/ethtool/module_fw.h b/net/ethtool/module_fw.h
-index ee4a291ac1d4..6c86d05ab6cf 100644
+index 6c86d05ab6cf..d0fc2529b60e 100644
 --- a/net/ethtool/module_fw.h
 +++ b/net/ethtool/module_fw.h
-@@ -15,6 +15,16 @@ struct ethnl_module_fw_flash_ntf_params {
- 	bool closed_sock;
+@@ -25,6 +25,35 @@ struct ethtool_module_fw_flash_params {
+ 	u8 password_valid:1;
  };
  
 +/**
-+ * struct ethtool_module_fw_flash_params - module firmware flashing parameters
-+ * @password: Module password. Only valid when @pass_valid is set.
-+ * @password_valid: Whether the module password is valid or not.
++ * struct ethtool_cmis_fw_update_params - CMIS firmware update specific
++ *						parameters
++ * @dev: Pointer to the net_device to be flashed.
++ * @params: Module firmware flashing parameters.
++ * @ntf_params: Module firmware flashing notification parameters.
++ * @fw: Firmware to flash.
 + */
-+struct ethtool_module_fw_flash_params {
-+	__be32 password;
-+	u8 password_valid:1;
++struct ethtool_cmis_fw_update_params {
++	struct net_device *dev;
++	struct ethtool_module_fw_flash_params params;
++	struct ethnl_module_fw_flash_ntf_params ntf_params;
++	const struct firmware *fw;
++};
++
++/**
++ * struct ethtool_module_fw_flash - module firmware flashing
++ * @list: List node for &module_fw_flash_work_list.
++ * @dev_tracker: Refcount tracker for @dev.
++ * @work: The flashing firmware work.
++ * @fw_update: CMIS firmware update specific parameters.
++ */
++struct ethtool_module_fw_flash {
++	struct list_head list;
++	netdevice_tracker dev_tracker;
++	struct work_struct work;
++	struct ethtool_cmis_fw_update_params fw_update;
 +};
 +
  void
  ethnl_module_fw_flash_ntf_err(struct net_device *dev,
  			      struct ethnl_module_fw_flash_ntf_params *params,
+@@ -39,3 +68,5 @@ void
+ ethnl_module_fw_flash_ntf_in_progress(struct net_device *dev,
+ 				      struct ethnl_module_fw_flash_ntf_params *params,
+ 				      u64 done, u64 total);
++
++void ethtool_cmis_fw_update(struct ethtool_cmis_fw_update_params *params);
 -- 
 2.45.0
 
