@@ -1,114 +1,111 @@
-Return-Path: <netdev+bounces-106066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9563591481A
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:09:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11DD191483D
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:14:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DCFCB22AD2
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 11:09:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434541C2203D
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 11:14:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3E441384B1;
-	Mon, 24 Jun 2024 11:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8A0F13790F;
+	Mon, 24 Jun 2024 11:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lT+ImWE4"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="jIh/w1QV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.15.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD292135A7C;
-	Mon, 24 Jun 2024 11:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAA8130AC8;
+	Mon, 24 Jun 2024 11:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719227359; cv=none; b=Ai+XEi70oSXQm0+oBQQSSMKIYZNDJ2ocKPcDsiKesgfx4f0p5hQFcMBSiDeyCUz8RUdCQEly6W7pXshTdxSRruHlcm4jU69WXRwK5MauUOJtaF/Y4DIyw1ElPe6d3eQPkm+/NoOPBg4477FcKjSfagyBeZTiAM3Zd4jkWualT9o=
+	t=1719227639; cv=none; b=GsC9OLnx0O3fVXTiEpc18edU3kv7xo7MWCdanWHI0z7bzO0hYT2RnAa8Kr39RvLYrnaGghLLKn42wJZuDQYlSxyK777JI9JUgv/mNiMFpOHnLFuhwQ4L6AkD9Nqc/JPfjkZMYYFibpUPxKY6KD3yMp9dYc3JGtCOdig7ocMfzRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719227359; c=relaxed/simple;
-	bh=08rvZHO2896YvJZttlIJnpAfa2Xsoo2DZ2DhYhvn0t8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HrO/qOLPofwjMER0zt41KWFhgnCgKVU1tSq9NFPKHUhxaiV/VCmjmQLQ+Mwghrf6GdgZ2TvdRuVoie36ktr3k6Tck01Xb1m4dR4X9MJ+TATUUnMPGefwHZDCtyLxCYF+Zt0LSN2ky8d5b4XPYnQYwnT0CaE586BVPIGdISXLNXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lT+ImWE4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FA63C32781;
-	Mon, 24 Jun 2024 11:09:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719227359;
-	bh=08rvZHO2896YvJZttlIJnpAfa2Xsoo2DZ2DhYhvn0t8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lT+ImWE4ivi2iDe+eqjlEwCOiYhPGq5YO8wZS5OynWhqA2kd5DSja0NYHreRITWIT
-	 mCdJT397EXmisXUkTP71aqiNSFG7hkyitd1j3+IEuDZAS3jxRVEPCt37bgpzgSu7ut
-	 wNrtP+ZgHVIissIIRm/+0dneFkqlPSY7lMHIhnp3qhf6K1MqaF1ANWFrydS0OpCX9X
-	 NR+Rv8JOE4TVjomoSKtTFqu+Vxr0iZzEOtJxA7ExhI4/0U1bI0tnLPzkRCDKz24Y5s
-	 4tI+Ymdxu/ok+P+nFOeOVQ1ToojUVy0BsO1fl3OlXvICAYhJJOmuM4GJjkvExL1LzT
-	 +w4QIi9REhvlw==
-Date: Mon, 24 Jun 2024 14:09:15 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>,
-	Tariq Toukan <tariqt@nvidia.com>
-Cc: Vlad Buslov <vladbu@nvidia.com>, linux-rdma@vger.kernel.org,
-	linux-netdev <netdev@vger.kernel.org>,
-	Paul Blakey <paulb@nvidia.com>, Chris Mi <cmi@nvidia.com>
-Subject: Re: [bug report] net/mlx5e: Implement CT entry update
-Message-ID: <20240624110915.GF29266@unreal>
-References: <74076270-8658-4773-aeac-e99d11acea7b@moroto.mountain>
+	s=arc-20240116; t=1719227639; c=relaxed/simple;
+	bh=o3voOc2ZEL+GyoIX5pkUWkNiG8dPBwXxRD6wYAksTHM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
+	 In-Reply-To:Content-Type; b=DkCKkN9lyFD9n1PwYkhedDtuqUhzfd2eUhTuqreUcFKYypj8IaBCyfPcCaiRSZgZZZ8yneBttoyXGSTearyWcnDneRc9+TW9GOGoH24EiF+MVq+aG0bwNKF0ZVAy3ryu0o8vHmaMsicn+CypaywKfnEsV5wnRHrvWNaC8I544z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=jIh/w1QV; arc=none smtp.client-ip=212.227.15.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1719227616; x=1719832416; i=markus.elfring@web.de;
+	bh=o3voOc2ZEL+GyoIX5pkUWkNiG8dPBwXxRD6wYAksTHM=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:
+	 References:From:Cc:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=jIh/w1QVgkXZq7UDw5BZWSCJmhbrZ2G6WZow9cUvFnfj6xUcHffVLx85og3TCUlV
+	 SYX69R16st/6T/ISujQ9IYGH3wzbWuFqCt4lifBLUBo0FNegU83u/jvF1SnV5vpCp
+	 s8ef2rivMAf/sbmDGYqQupTN2h7ZPYS7Wo7mVbumnEHNGckA57AsokfG/fJu98vz5
+	 09JBkVJBE90l0P8p+TQSzI/E7C9ZPk6EwL9BPhABvA+IaxJFzNzZzwBsUq2rpWdmT
+	 zV+EM2WF8LGAE8rfdYGTLdD6AwVOTnmJTkzta5z2gWqmYoz3UtgEKDgou1juP3ntb
+	 xvWrEGRRJFJDHk5law==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MHEXc-1s8WLw1KzY-007YbV; Mon, 24
+ Jun 2024 13:13:36 +0200
+Message-ID: <6a70fb9a-fa15-4ee1-9a44-c727bd610469@web.de>
+Date: Mon, 24 Jun 2024 13:13:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <74076270-8658-4773-aeac-e99d11acea7b@moroto.mountain>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net PATCH 0/7] octeontx2-af: Fix klockwork issues in AF driver
+To: Suman Ghosh <sumang@marvell.com>, netdev@vger.kernel.org
+References: <20240624103638.2087821-1-sumang@marvell.com>
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jerin Jacob <jerinj@marvell.com>, Eric Dumazet <edumazet@google.com>,
+ Geethasowjanya Akula <gakula@marvell.com>,
+ Hariprasad Kelam <hkelam@marvell.com>, Linu Cherian <lcherian@marvell.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+ Sunil Goutham <sgoutham@marvell.com>
+In-Reply-To: <20240624103638.2087821-1-sumang@marvell.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:V+R6WXZ2lZrjghmpjNmWqnBP7H2DU1itTFGmqhrBHQdHhMc5x7k
+ x52YYp1mFgLzTnBTzGjXJ8vnj+Cbz8dV6lVc110pvPGnh+Lmy5EKTV0T0CAzHP+wbFhtCYV
+ wMQ1zQt92F0hnT9yvmj5/ON2wgz2/UCLCsNNhYldCBb3B41NEDzoOCgSGaoy1/DHABzA8Vg
+ Ql2QwJbTAOhv6qy08zhhQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:f9mxQdM7m8M=;HIAp20Swcn0Vrbf5owupbQdpw9F
+ 8Yza4InDaPlYAZjUAQ/yMlQ2Pgxl4YP4Yz2vWNgAnsuN4RJ1bRbhxefYQWC2XpVnKSZhvnzFE
+ YNaqaSiVv3NU1uC3vpny3cn6zH66d+3usyyAiNo3iOn3pfgn44gqwTNgH3FT+41A7VDUvdQ3o
+ abkDIzkQDKwwVgKsNatz/yVTyuNRR1sxy49cZRx1PqRJe2Gc70dl3Ls+4xJHegMOv7lw8tJnt
+ xSZtRMQeDo8rrq/yOejzsaLHOxPbRyfpK+At3yaAeFieYz/EHs9YV4yJTbD7O9AaonhMStMwW
+ PWFmuGv/80DHxR3nZ0YKWZhrn0LbB2yCbV2JsJV0Hm44OVIKRYPm5kpBDhQZE/gZvHGF090Xw
+ +Bo7LukVyZevv2e+GKCe8Eo5VAByarKcJpKutXG/zYfqlaIG4IFCg9T0O2/pMFFGoQyKjCt4h
+ 2sH6eC5yT4fa5TZ4uptJgUA3G0kyAjJS6BGs+Rq3N3/ddLFIglepSUy4WfaVGkwK3pVKzncLD
+ BWu7QJs83b5uhivAeUwz/m48ydQVzJRHdOlqfK2RTf2yhOB7hX73PQnO3dnjdnNU7Y5gx3EAr
+ 9GAnFDxkxwTsFbqUiKF4pgi/ckJ+ANTbd7i6KMKC22tooJ7Yvex9NFDwIgpUv+SBp8K7IRbJj
+ MM+y6s1k2ykupVec4M2MqWSqH7RvVc+bE407yz0IjPR8g1vA292Uwd4ZzY4MPX3uiOKbvlMhU
+ ldSRn6ktswAIvjthzbUC/AH6aRMoU/2UM530bovtliFzOj3ZIR4HvY/1q1VyKmt1jDul+jMO9
+ OSPWl3a/Y5jLgNKtRSG8MNebgTIMCf4us5zPZ5/yYbkhM=
 
-On Thu, Jun 20, 2024 at 11:50:33AM +0300, Dan Carpenter wrote:
-> Hello Vlad Buslov,
-> 
-> Commit 94ceffb48eac ("net/mlx5e: Implement CT entry update") from Dec
-> 1, 2022 (linux-next), leads to the following Smatch static checker
-> warning:
-> 
-> 	drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.c:1163 mlx5_tc_ct_entry_replace_rules()
-> 	error: uninitialized symbol 'err'.
+> This patchset fixes minor klockwork issues in multiple files in AF drive=
+r
+>
+> Patch #1: octeontx2-af: Fix klockwork issue in cgx.c
+=E2=80=A6
 
-This error was introduced by the patch 49d37d05f216 ("net/mlx5: CT: Separate CT and CT-NAT tuple entries")
-https://lore.kernel.org/all/20240613210036.1125203-3-tariqt@nvidia.com/
+Please improve your selection for summary phrases.
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/submitting-patches.rst?h=3Dv6.10-rc4#n646
 
-Thanks
+Which development concern categories did you pick up from the mentioned
+source code analysis tool?
 
-> 
-> drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.c
->     1142 static int
->     1143 mlx5_tc_ct_entry_replace_rules(struct mlx5_tc_ct_priv *ct_priv,
->     1144                                struct flow_rule *flow_rule,
->     1145                                struct mlx5_ct_entry *entry,
->     1146                                u8 zone_restore_id)
->     1147 {
->     1148         int err;
->     1149 
->     1150         if (mlx5_tc_ct_entry_in_ct_table(entry)) {
->     1151                 err = mlx5_tc_ct_entry_replace_rule(ct_priv, flow_rule, entry, false,
->     1152                                                     zone_restore_id);
->     1153                 if (err)
->     1154                         return err;
->     1155         }
->     1156 
->     1157         if (mlx5_tc_ct_entry_in_ct_nat_table(entry)) {
->     1158                 err = mlx5_tc_ct_entry_replace_rule(ct_priv, flow_rule, entry, true,
->     1159                                                     zone_restore_id);
->     1160                 if (err && mlx5_tc_ct_entry_in_ct_table(entry))
->     1161                         mlx5_tc_ct_entry_del_rule(ct_priv, entry, false);
->     1162         }
-> 
-> Can the entry not be in either table?
-> 
-> --> 1163         return err;
-> 
-> If so then err is uninitialized.
-> 
->     1164 }
-> 
-> regards,
-> dan carpenter
-> 
+Regards,
+Markus
 
