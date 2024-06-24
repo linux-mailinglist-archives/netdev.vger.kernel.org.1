@@ -1,162 +1,185 @@
-Return-Path: <netdev+bounces-106101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52662914AE7
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 14:44:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 473FD914DC8
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 14:55:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD74CB23C69
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 12:43:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C78FB2443F
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 12:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A893A13CAB0;
-	Mon, 24 Jun 2024 12:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067B113D283;
+	Mon, 24 Jun 2024 12:55:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="PUURHREi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YTS+9Usw"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533911E4AE;
-	Mon, 24 Jun 2024 12:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413972556F
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 12:55:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719233024; cv=none; b=PvlITHsQ0F9UsfslT4I5vauNtsSqMt+YHIbZTBPONW3IdTimvg+0U4Z+S/akDHUSI+5Z+diBHwHcr0bCIoGpBQLLXxiROPby8tm/e8bNGiloilSFWqEtxRghYlTVoTgtB9Watb14x4ejy+LbQ46KtAAAjipDpcE8UhKKp6kcLlU=
+	t=1719233739; cv=none; b=mJjiSTIp0y6ODw7nlJLY/W4L+dJgwod+tJ3DIr1b/mtqQpP6VYoT9PYZn+702HUXDPrYh3/Yf5X9dcLuW219gHaOV+/Gh3eB6aK8YV0w7e8ymrFrZ4E6euMXToYQRg2gpLjV5as/fur6jpuGdLpBeoDvbcBnyLzfNNmNuE8dcv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719233024; c=relaxed/simple;
-	bh=ibwVwKOALsKK92E8Whm3+DfnDFeae2zev5i+x3smQdo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aIcjae0Umfx6GFX3k2UrjTAp07h2i5ahGR2puyQLNxwvLqjk3wMblD0S2Bl78C9CpnlYDrAHZds3W/JCqIGo3TK0fzn8lHrAysp0VoRXS5rgbvNSwZSQP0AfIYqcKTvO080Z6mEvsYubGJVYKZpORaAI7VxCaXPd5piakZoeqv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=PUURHREi; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=q3Yp0BpC1JwAc5h1uplrrayDdiQnQvT3K7EBGl94OgY=; b=PUURHREirA1J+aDuJFCYs9pLAu
-	hhGO1meI2uveyJXl5XhDE6czSFuX0R3/6d8Gfk/9yUn6/xCNI6N3YRgRxa1TdOqpb1PGSkHLwKCi4
-	zdD/QPkxye/u16MMHyhtlT6qfxtKG/WvztMEnlCe9eBmuW/4f01iugliszFhkjjMmEyHQnAYblUOv
-	RJqQE52UjcATBvP30r2QjkNAPfFRDs/0j6tTn3u92i0EFq0q67Tmxtj7VpLDdjX0cFUunjRCGTnrX
-	AtDkd994tfZIky26HWujtWhyXZANyy3h/5TtAiEVS+dUF3hZeqDXWmI2re2XZS/cNCW7VncMU6l/y
-	zVOqzwRA==;
-Received: from 38.249.197.178.dynamic.cust.swisscom.net ([178.197.249.38] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sLj2h-000CII-D7; Mon, 24 Jun 2024 14:43:31 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf 2024-06-24
-Date: Mon, 24 Jun 2024 14:43:30 +0200
-Message-Id: <20240624124330.8401-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	s=arc-20240116; t=1719233739; c=relaxed/simple;
+	bh=XCtCRSpFThJ/lcGlkZS+6fzXrocU1uLYJ58+YjLVHyM=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=j+nAZfRadTeoScrziNQGJcYXpYsqiJmvSPK0r5Gld8PDNYn8GzWKw0kuMMRAY0LSFq2vftQ3/ADAuVPc9JrI7t2kskh0un+1Gq8bCuwNr12TkO60NX1CFqR53nWFve2lkgVSLFCWnS04xiXPF1tGQ8nxcyO4Pv06G3F3v7xtJaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YTS+9Usw; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-421eab59723so31974795e9.3
+        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 05:55:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719233736; x=1719838536; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EDZN4tvQANBOQzxW9bLFlIHRzrquK3mJ3a4duNtWKBQ=;
+        b=YTS+9Uswf2gPzFDK7vsFsoMVO5WVA7eN+pLRvdA9EI4ot7SwJ1v3pNJABoeP0ash8o
+         tH60buE1eI1ES6F8eNH3dNWGW0XIbB/UBVj1Th3X/x5fBQ1Z0PDkS0vIKQThadQU5rQi
+         1Gxzxt0W6Q6snXoGowHXk8/U4X5jnyH16aUMLLJcOGdywPHuFMojvATCQAw+BqjX68ql
+         PAaW9TdVdcydCTTDW1dCZ+HCuEBGoDOCAuf/eBdGRhKOb15GAepkhG/Xd8ak2pwjdms2
+         IQ8sKl0Kc/7rT9CopNYlDtKN0WgQBYlA81E+wVWWUC4S7JdiawuK32gr2kldg2wCovpz
+         A3KA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719233736; x=1719838536;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EDZN4tvQANBOQzxW9bLFlIHRzrquK3mJ3a4duNtWKBQ=;
+        b=A0CoPGnoftG5jFcZH35gpPL4fv9lfkTxE31a1Pabg1YmHLg566hR3P8qxNc6kU4WZX
+         xk9U2Bggqo2s2N3PpMF3wHiXtPLIZLdE+qXh3jzbp6Rq/xJbkeuB4xj5fI6iDANwKtWD
+         JWxaoCkIyfYuTFRBPT+Uc+1494PQcsKIAoL0ej4Yyqlevrt3ZA1mXMXVIE1DDXd3ixBt
+         s0iJkyC8PdAxu1rSyZJOC6IFjONUp8HeFJFTeiBDTOjtdv5IFWxY/jQd4gW2vh2ei/mY
+         bOzCazhS3HmaURpcbx5Ibj8RPxMNSmhYT8dKrFbRvtUzs9BsHZ7MdbXboBUABlA0w51z
+         qskA==
+X-Gm-Message-State: AOJu0YxJVv/c/jF74EyvSHIB/tk/EtP1LpzkQ/3lGw++ZFeUuOakttqX
+	y13vlAicEWFJeoQVRrrGIqFSXahUHVi1ycSnGedkE+pWtyht/GmO
+X-Google-Smtp-Source: AGHT+IFEZhjqXXgj9jV3sUMjszStwBGctT7cgk3sMJaVXVF1ZB485fxv8Uu27ojgVTMTRGup1tlm3g==
+X-Received: by 2002:a5d:522a:0:b0:364:a733:74de with SMTP id ffacd0b85a97d-366e4ed3e13mr3810748f8f.28.1719233736234;
+        Mon, 24 Jun 2024 05:55:36 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-424817ab01asm132159575e9.20.2024.06.24.05.55.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Jun 2024 05:55:35 -0700 (PDT)
+Subject: Re: [PATCH net-next 4/4] selftests: drv-net: rss_ctx: add tests for
+ RSS configuration and contexts
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ willemdebruijn.kernel@gmail.com
+References: <20240620232902.1343834-1-kuba@kernel.org>
+ <20240620232902.1343834-5-kuba@kernel.org>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <c085b55f-3b42-1655-ea88-3f6a1e03cf8e@gmail.com>
+Date: Mon, 24 Jun 2024 13:55:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27316/Mon Jun 24 10:26:29 2024)
+In-Reply-To: <20240620232902.1343834-5-kuba@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+On 21/06/2024 00:29, Jakub Kicinski wrote:
+> Add tests focusing on indirection table configuration and
+> creating extra RSS contexts in drivers which support it.
+> 
+>   $ ./drivers/net/hw/rss_ctx.py
+>   KTAP version 1
+>   1..6
+>   ok 1 rss_ctx.test_rss_key_indir
+>   ok 2 rss_ctx.test_rss_context
+>   ok 3 rss_ctx.test_rss_context4
+>   # Increasing queue count 44 -> 66
+>   # Failed to create context 32, trying to test what we got
+>   ok 4 rss_ctx.test_rss_context32 # SKIP Tested only 31 contexts, wanted 32
+>   ok 5 rss_ctx.test_rss_context_overlap
+>   ok 6 rss_ctx.test_rss_context_overlap2
+>   # Totals: pass:5 fail:0 xfail:0 xpass:0 skip:1 error:0
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+...
+> +def test_rss_context(cfg, ctx_cnt=1):
+> +    """
+> +    Test separating traffic into RSS contexts.
+> +    The queues will be allocated 2 for each context:
+> +     ctx0  ctx1  ctx2  ctx3
+> +    [0 1] [2 3] [4 5] [6 7] ...
+> +    """
+> +
+> +    requested_ctx_cnt = ctx_cnt
+> +
+> +    # Try to allocate more queues when necessary
+> +    qcnt = len(_get_rx_cnts(cfg))
+> +    if qcnt >= 2 + 2 * ctx_cnt:
+> +        qcnt = None
+> +    else:
+> +        try:
+> +            ksft_pr(f"Increasing queue count {qcnt} -> {2 + 2 * ctx_cnt}")
+> +            ethtool(f"-L {cfg.ifname} combined {2 + 2 * ctx_cnt}")
+> +        except:
+> +            raise KsftSkipEx("Not enough queues for the test")
+> +
+> +    ntuple = []
+> +    ctx_id = []
+> +    ports = []
+> +    try:
+> +        # Use queues 0 and 1 for normal traffic
+> +        ethtool(f"-X {cfg.ifname} equal 2")
+> +
+> +        for i in range(ctx_cnt):
+> +            try:
+> +                ctx_id.append(ethtool_create(cfg, "-X", "context new"))
+> +            except CmdExitFailure:
+> +                # try to carry on and skip at the end
+> +                if i == 0:
+> +                    raise
+> +                ksft_pr(f"Failed to create context {i + 1}, trying to test what we got")
+> +                ctx_cnt = i
+> +                break
+> +
+> +            ethtool(f"-X {cfg.ifname} context {ctx_id[i]} start {2 + i * 2} equal 2")
 
-The following pull-request contains BPF updates for your *net* tree.
+Is it worth also testing the single command
+    f"ethtool -X {cfg.ifname} context new start {2 + i * 2} equal 2"
+ as that will exercise the kernel & driver slightly differently to
+ first creating a context and then configuring it?
 
-We've added 12 non-merge commits during the last 10 day(s) which contain
-a total of 10 files changed, 412 insertions(+), 16 deletions(-).
+...
 
-The main changes are:
+> diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
+> index 4769b4eb1ea1..91648c5baf40 100644
+> --- a/tools/testing/selftests/net/lib/py/ksft.py
+> +++ b/tools/testing/selftests/net/lib/py/ksft.py
+> @@ -57,6 +57,11 @@ KSFT_RESULT_ALL = True
+>          _fail("Check failed", a, "<", b, comment)
+>  
+>  
+> +def ksft_lt(a, b, comment=""):
+> +    if a > b:
+> +        _fail("Check failed", a, ">", b, comment)
 
-1) Fix a BPF verifier issue validating may_goto with a negative offset,
-   from Alexei Starovoitov.
+AFAICT this implements 'le' (less-or-equal), not 'lt' (less than) as
+ the name implies.
 
-2) Fix a BPF verifier validation bug with may_goto combined with jump to
-   the first instruction, also from Alexei Starovoitov.
+Apart from that these tests LGTM as far as they go.  One thing that I
+ notice *isn't* tested here, that I generally make a point of testing,
+ is: add a bunch of contexts (and ntuple filters), remove some of
+ them, then run your traffic and make sure that the ones you left
+ intact still work (and that the deleted ones are actually gone).
+Also wonder if it's worth adding tests for 'ethtool -x ... context N'?
+ You have it for context 0 in test_rss_key_indir(), but on custom
+ contexts it can exercise different code in the kernel.
 
-3) Fix a bug with overrunning reservations in BPF ring buffer,
-   from Daniel Borkmann.
-
-4) Fix a bug in BPF verifier due to missing proper var_off setting related
-   to movsx instruction, from Yonghong Song.
-
-5) Silence unnecessary syzkaller-triggered warning in __xdp_reg_mem_model(),
-   from Daniil Dulov.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Barret Rhoden, Bing-Jhong Billy Jheng, Eduard Zingerman, Jesper Dangaard 
-Brouer, Muhammad Ramdhan, Pengfei Xu, Zac Ecob
-
-----------------------------------------------------------------
-
-The following changes since commit 143492fce36161402fa2f45a0756de7ff69c366a:
-
-  Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue (2024-06-14 19:05:38 -0700)
-
-are available in the Git repository at:
-
-  ssh://git@gitolite.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-for you to fetch changes up to 7e9f79428372c6eab92271390851be34ab26bfb4:
-
-  xdp: Remove WARN() from __xdp_reg_mem_model() (2024-06-24 13:44:02 +0200)
-
-----------------------------------------------------------------
-bpf-for-netdev
-
-----------------------------------------------------------------
-Alexei Starovoitov (6):
-      Merge branch 'bpf-fix-missed-var_off-related-to-movsx-in-verifier'
-      bpf: Fix remap of arena.
-      bpf: Fix the corner case with may_goto and jump to the 1st insn.
-      selftests/bpf: Tests with may_goto and jumps to the 1st insn
-      bpf: Fix may_goto with negative offset.
-      selftests/bpf: Add tests for may_goto with negative offset.
-
-Daniel Borkmann (2):
-      bpf: Fix overrunning reservations in ringbuf
-      selftests/bpf: Add more ring buffer test coverage
-
-Daniil Dulov (1):
-      xdp: Remove WARN() from __xdp_reg_mem_model()
-
-Matt Bobrowski (1):
-      bpf: Update BPF LSM maintainer list
-
-Yonghong Song (3):
-      bpf: Add missed var_off setting in set_sext32_default_val()
-      bpf: Add missed var_off setting in coerce_subreg_to_size_sx()
-      selftests/bpf: Add a few tests to cover
-
- MAINTAINERS                                        |   3 +-
- kernel/bpf/arena.c                                 |  16 ++-
- kernel/bpf/ringbuf.c                               |  31 ++++-
- kernel/bpf/verifier.c                              |  61 ++++++++-
- net/core/xdp.c                                     |   4 +-
- tools/testing/selftests/bpf/Makefile               |   2 +-
- tools/testing/selftests/bpf/prog_tests/ringbuf.c   |  56 ++++++++
- .../selftests/bpf/progs/test_ringbuf_write.c       |  46 +++++++
- .../bpf/progs/verifier_iterating_callbacks.c       | 146 +++++++++++++++++++++
- tools/testing/selftests/bpf/progs/verifier_movsx.c |  63 +++++++++
- 10 files changed, 412 insertions(+), 16 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/progs/test_ringbuf_write.c
+-ed
 
