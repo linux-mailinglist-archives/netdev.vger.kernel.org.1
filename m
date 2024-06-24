@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-106259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9784D91598F
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 00:03:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8160E9159E2
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 00:30:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5281B283A0A
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 22:03:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B369B1C21FAA
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 22:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A54831A0B0B;
-	Mon, 24 Jun 2024 22:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00534136678;
+	Mon, 24 Jun 2024 22:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r3qO2ehN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AeGCPk+n"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C6E135A46
-	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 22:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C674A45C1C;
+	Mon, 24 Jun 2024 22:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719266576; cv=none; b=TizDeDrc5vqkseEvm4Iy/cny0yyOqPsnVKOxmCiNkyKjFbnUUHrNg1P5tQcwG1hDpa59AtKYKRMhUpyrg7wKdMHo0bbBU2g71L4zJaN5kj46pAT04qQRtv2XfS4DemimSXXzoZNVU3C5lDmegfg0wH4UqbpHV//0SgjKRepI1WE=
+	t=1719268224; cv=none; b=g51kl5y9hji+GGpoafnJ1L4L5OIEoBNiCcGqti2jfdMagjNi/jZyVcrgpKOkdNjtbUre37WPTVgS6E5HGiQ3YVomzGXLquODe3RC+QoFSymAb8cqPMCcW0EqsBV3QtVDj5mL8C4OJ25m+g++cY5cXgOt4D9S+kVX0yIVa0x+dAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719266576; c=relaxed/simple;
-	bh=ro33OYcpWqwsLEX2VJTkf9im+2a0Snx3vxaWBm0KQG4=;
+	s=arc-20240116; t=1719268224; c=relaxed/simple;
+	bh=2arpIBMsaGBDFcWMlj/bcfBvS51IHtb8fwvNCwO1pLI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dujCzxJSmy/JE5W0wosWNVPPb14rz7hbvud2wXMFfdpW4+WZRCOHQ4O9bWXdJ55UE5lwD8UfdqMFEu4Gu/FztoP033ehz8y5zdRfPop3aRiBme5GUfja5v3JEj7bb9txHwR6TNY147FC0jeRIbkP9BBJfJuSKw8mAgEecR/lwwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r3qO2ehN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B05A9C2BBFC;
-	Mon, 24 Jun 2024 22:02:55 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ay1P4wTc4l9/ro3lg7W3xEr7KEf5pxynBVd0nGvHc8mVWzwNyfv8B4/fANnv5ivH9ytqm9AHOSQQDD7PuZ2HnTV/MQ0lxQaAN/BJmvipGm76Et3LS5pHSKVFSpK8kWVpDJvMNqewSpSVpNKRfAojC88KLSAFoYTb1X3LXpGFOmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AeGCPk+n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9F85C2BBFC;
+	Mon, 24 Jun 2024 22:30:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719266576;
-	bh=ro33OYcpWqwsLEX2VJTkf9im+2a0Snx3vxaWBm0KQG4=;
+	s=k20201202; t=1719268224;
+	bh=2arpIBMsaGBDFcWMlj/bcfBvS51IHtb8fwvNCwO1pLI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=r3qO2ehNmjqpLhPgIH11VldPjcm3MU6GIFOqCmpIaPDiXynPlMww04xvqH7zma9Pj
-	 kcACOA39oPPKQmCvO8Y5LLIGHltOr3NLrJKoE5INZ2d+lV5TWy8fDQSMCyRerlpT//
-	 KLMP3vFhj6lI5UCJlPCSRgb52PH/1BrHeouw3a89X29Lm7QfTOXTwzx3CuXL+nmXPk
-	 wn/Zo1aE/oLb4yxEkARGZTW9u4qpf+aNGA8mqcvLpy/kEt1yd3cw2ofV+YIiU3Dvci
-	 MGaANZV1zAVO5mJUGJ0I7fP0QYJts0nnfJ4WzkY/rXWptJk472Mk/drJ0WyB/g8Ywb
-	 mpPAZ4qMV9HHw==
-Date: Mon, 24 Jun 2024 15:02:54 -0700
+	b=AeGCPk+nxKe2Eopto8yw/oF7EqMFZvHj6ROeHju+povaRuDiNqp7QsISvqe0p/O51
+	 lbYgR/VjwF5cm/dDmr4CneG0k9tP98/RjX65Km38pAgOwSFuAGhiaeTDspPzaqxQZ0
+	 vSi8Xa2f/ICfMHYQPbJk9OaaHpfXAOCfKyUISYQ5azx5sZo4Owh8WePLKvg5HioWO1
+	 /G2FW/Erldp/NYcTdkpSP8KYpdb6EJBRlPnzUtFiSTBpBoPHD4yT+3P81Ox/qOukDm
+	 nn9e2o7yMJE7ofZJv7DZcoU9kfzH0PvCAcPeEq9/wA6czlQVsWsbx24z191JSqLY9O
+	 d9oogWl5UYoQA==
+Date: Mon, 24 Jun 2024 15:30:23 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: Michael Chan <michael.chan@broadcom.com>, Andy Gospodarek
- <andrew.gospodarek@broadcom.com>, Adrian Alvarado
- <adrian.alvarado@broadcom.com>, Somnath Kotur <somnath.kotur@broadcom.com>,
- netdev@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>, David
- Ahern <dsahern@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v3 2/2] bnxt_en: implement
- netdev_queue_mgmt_ops
-Message-ID: <20240624150254.053d0c00@kernel.org>
-In-Reply-To: <ba5bef44-c823-4ec3-bf2d-66f66821d043@davidwei.uk>
-References: <20240619062931.19435-1-dw@davidwei.uk>
-	<20240619062931.19435-3-dw@davidwei.uk>
-	<20240621172053.258074e7@kernel.org>
-	<ba5bef44-c823-4ec3-bf2d-66f66821d043@davidwei.uk>
+To: Aaron Conole <aconole@redhat.com>
+Cc: netdev@vger.kernel.org, dev@openvswitch.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, Pravin B
+ Shelar <pshelar@ovn.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, Stefano Brivio <sbrivio@redhat.com>, =?UTF-8?B?QWRy?=
+ =?UTF-8?B?acOhbg==?= Moreno <amorenoz@redhat.com>, Simon Horman
+ <horms@kernel.org>
+Subject: Re: [PATCH v2 net-next 0/7] selftests: net: Switch pmtu.sh to use
+ the internal ovs script.
+Message-ID: <20240624153023.6fabd9f1@kernel.org>
+In-Reply-To: <f7tpls6gu3q.fsf@redhat.com>
+References: <20240620125601.15755-1-aconole@redhat.com>
+	<20240621180126.3c40d245@kernel.org>
+	<f7ttthjh33w.fsf@redhat.com>
+	<f7tpls6gu3q.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,24 +68,48 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 24 Jun 2024 11:20:59 -0700 David Wei wrote:
-> > What's the warning you hit?
-> > We should probably bring back page_pool_unlink_napi(), 
-> > if this is really needed.  
+On Mon, 24 Jun 2024 12:53:45 -0400 Aaron Conole wrote:
+> Additionally, the "Cannot find device ..." text comes from an iproute2
+> utility output.  The only place we actually interact with that is via
+> the call at pmtu.sh:973:
 > 
-> This one:
+> 	run_cmd ip link set ovs_br0 up
 > 
-> https://elixir.bootlin.com/linux/v6.10-rc5/source/net/core/page_pool.c#L1030
-> 
-> The cause is having two different bnxt_rx_ring_info referring to the
-> same NAPI instance. One is the proper one in bp->rx_ring, the other is
-> the temporarily allocated one for holding the "replacement" during the
-> reset.
+> Maybe it is possible that the link isn't up (could some port memory
+> allocation or message be delaying it?) yet in the virtual environment.
 
-Makes sense, as I said please look thru the history - some form of
-page_pool_unlink_napi() used to be exported for this use case, but
-Olek(?) deleted it due to lack of in-tree users.
+Depends on how the creation is implemented, normally device creation
+over netlink is synchronous. Just to be sure have you tried to repro
+with vng:
 
-With that helper in place you can unlink the page pool while the NAPI
-is stopped, without poking into internals at the driver level.
+https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+
+? It could be the base OS difference, too, but that's harder to confirm.
+
+> To confirm, is it possible to run in the constrained environment, but
+> put a 5s sleep or something?  I will add the following either as a
+> separate patch (ie 7/8), or I can fold it into 6/7 (and drop Stefano's
+> ACK waiting for another review):
+> 
+> 
+> wait_for_if() {
+>    if ip link show "$2" >/dev/null 2>&1; then return 0; fi
+> 
+>    for d in `seq 1 30`; do
+>       sleep 1
+>       if ip link show "$2" >/dev/null 2>&1; then return 0; fi
+>    done
+>    return 1
+> }
+> 
+> ....
+>  	setup_ovs_br_internal || setup_ovs_br_vswitchd || return $ksft_skip
+> +	wait_for_if "ovs_br0"
+>  	run_cmd ip link set ovs_br0 up
+> ....
+> 
+> Does it make sense or does it seem like I am way off base?
+
+sleep 1 is a bit high (sleep does accept fractional numbers!)
+but otherwise worth trying, if you can't repro locally.
 
