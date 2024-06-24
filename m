@@ -1,197 +1,335 @@
-Return-Path: <netdev+bounces-106183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 227B99151B2
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:13:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B788F9151AD
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:13:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 445151C213C8
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:13:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EBABB27097
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E88019D063;
-	Mon, 24 Jun 2024 15:12:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8703519B5B8;
+	Mon, 24 Jun 2024 15:12:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nGlcO/r4"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ruIGpWZT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F111D19CCE4
-	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 15:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA73119B3FB
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 15:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719241961; cv=none; b=VQ7iuI7haTVpagre9n6KcZFi+oz1mHQk+0P0qpqCLWg5HmWCb/F3fu119s8imGZ5yxONJwkWALw8i1BINWYiWX8iUTllU5lx6PKi/lgVyyNx15+RO8BqM9In8eBKgkL4wwvdUYDlM1II8zKoRi18LAIl/FinED1Nt4nX/RmIb20=
+	t=1719241958; cv=none; b=VaZVt94fi8TvlUk3F5i2PqDLF+qF2RL19rGjBt85SeR7YnaIQKuuS6/U1l3DDfOs0UN9DdkPtalfUwrq+CdNSxIHjHhgXx3BFYqTAMxsL9GnMK9xH/2yRNEFBJjWLBClcsFAkfnzmvn0+V0++LJZaqk9rK0uPI91G/iIEdIsLvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719241961; c=relaxed/simple;
-	bh=1mLMLaeZ0PYMCPUk2gK+0icJF037jF4pg8hK765BLZs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UpqkE8Wyx35QT8Qi+sf/Jv7dfPv7l0EQRq68CIs5kHJ5/gnr0SixMPlO/OizpDtzXCWcaVEXl36L+BQClJFY0EgmJh06ON0QP9SIp5qLoN2bh0vzWLwdUFIlsosZyIQ8p08/D0QsXiQla0fQcAFNKIN9gpiBwPtm8+/cVuhSbCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nGlcO/r4; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719241959; x=1750777959;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=1mLMLaeZ0PYMCPUk2gK+0icJF037jF4pg8hK765BLZs=;
-  b=nGlcO/r4awV0oSg5oVoB1gfKK2LuZ9OAGrMmDN3HpDRyVMoh035t852s
-   dO1Y6lKHR7auLRbG6Pgx5H2JaxHH99pJqxLCnofFko7pUyzPWqumCobap
-   7+Sr3xtaMQBgCQLI9msX+YzAuJJwRsTm6gC6nRfz2/f2fmAbuWJi/Ft9l
-   /9JjZHSHXe1IJX5/XOX8TMK+SvpmzJfsXoQZpfzsECIuwXVs3vfsV8BQO
-   sYIbTS/fKQOh+IhkoPfff4Gfi8sS5PPRys9JZi64iffszWaH3EumvUhIs
-   5ts0dJTb2kQe//yCBNSbfAaTAu3UXAGnewGQP0KN4o5nHs5PVPxSIYAPS
-   Q==;
-X-CSE-ConnectionGUID: WPvXCT07SKSRdbIFHSJtpA==
-X-CSE-MsgGUID: WeyigX5XSBuHqZAIF1PyRg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11113"; a="27627073"
-X-IronPort-AV: E=Sophos;i="6.08,262,1712646000"; 
-   d="scan'208";a="27627073"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2024 08:12:38 -0700
-X-CSE-ConnectionGUID: u6ucoV8KSWik23QA/WYhaw==
-X-CSE-MsgGUID: 7vBZ7LMxSyKbDqOgcfvKZg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,262,1712646000"; 
-   d="scan'208";a="66556006"
-Received: from kkazimiedevpc.igk.intel.com (HELO localhost.igk.intel.com) ([10.102.102.224])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2024 08:12:36 -0700
-From: Michal Kubiak <michal.kubiak@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: maciej.fijalkowski@intel.com,
-	netdev@vger.kernel.org,
-	wojciech.drewek@intel.com,
-	george.kuruvinakunnel@intel.com,
-	jacob.e.keller@intel.com,
-	kuba@kernel.org,
-	Michal Kubiak <michal.kubiak@intel.com>
-Subject: [PATCH iwl-net v2] i40e: Fix XDP program unloading while removing the driver
-Date: Mon, 24 Jun 2024 17:12:13 +0200
-Message-Id: <20240624151213.1755714-1-michal.kubiak@intel.com>
-X-Mailer: git-send-email 2.33.1
+	s=arc-20240116; t=1719241958; c=relaxed/simple;
+	bh=ojuN/mc5k607ZrfKqTQBy1V/hHjJkk3A7P6CMg1iw/4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GYHo0PdZZuZEj8LbmCO57mgO8f9BaklSv9wgcgaY5/ZjPxJSwD6byg7T9wUN+qbiMNk0+8s/CyT0fvqQft4spOhbJc4d+ahAnTvXLJZxKSPJ1t0g1xhgjewpmTDO+ON1IJR4FYcK+p7LJssVoslJZZjQmH3owqgOZuBllSJKdkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=ruIGpWZT; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1f8395a530dso34283175ad.0
+        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 08:12:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1719241955; x=1719846755; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=peW8Z3S28CwGFuIpazhrzFeDoTUsFpCtaaEIifjimFQ=;
+        b=ruIGpWZTbUm+8KSzrQeE+pRiaZg0+NDCAUrWbgxEyi+WIZBvTS5sdGdHDSB39BhakO
+         /A6NKHQ5bX9okHcya0y2K5UUrw4tERU3iefT9FODPuMl+7so6jkO7A882ZoaqTawoSMB
+         k2RzYO0uaZa1ooYu4MvKL7frDglzj8/dSLG6czeWI6PcclysgBDQfRr5yrsOK6ICc6mQ
+         o5L+Ef3xsG5Wg+4FzRUSZJYWJB71n45nfpXP6e/OVCJVYkdGeOtUll8P5Vh7ii2u7lCb
+         MjNG6TL/JsaAcucX8LZ1Dp0V3kUzr+vbHXPKjISuVTyTBQJktOVb+ALCb7Sle0Fs+MZw
+         /POg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719241955; x=1719846755;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=peW8Z3S28CwGFuIpazhrzFeDoTUsFpCtaaEIifjimFQ=;
+        b=n3nEOJLuFG5053K/ZkEIRDKETyVSW5p2F/s2r68vraAgkmCiW9qYvjKV3WvjaXzjtW
+         FYCSJNKF7qAhNy1UMFTApsMt+S/ooaKBPlci9uU18t964TUCGSAFSXpW7odhQnG8a2z3
+         4VlrN1Zjaw4MjWAm4QzaOOPoAb0QFBLMGStP7RDk/uoLGpY72X2+tfABZ4JTnPnvr47O
+         rQfffhJvq0n1o5AGUf3KBoKBBPBIOsSS8QXd3XEP/VcCZLDYxSxWz2mKhN12D298owxb
+         NWQtD3llC9Q0NbUKp2VueKTDdgopazRsUcTkn+qF75sZwc1703zMTfYqlyHsmnSsZZZU
+         3l8A==
+X-Gm-Message-State: AOJu0YwmGyZOfW2HxScoJRbh3XQplvi1cXY8nTCPDdlHEEqrba8l7rS5
+	R+ecaDctdDouuQw+gXzgLQFukKGv0X488BqUG/90oCdtre/HNgoRyo32uprAQQ==
+X-Google-Smtp-Source: AGHT+IEN/zBRCtieICYKZDxLphZvn5UQQKpSrMS/syCqKx2ld79T7HXLa1NJ87s4p+b/SOjvvRGY+Q==
+X-Received: by 2002:a17:902:cecc:b0:1f9:f3a0:629b with SMTP id d9443c01a7336-1fa23f1d33bmr46473115ad.54.1719241954864;
+        Mon, 24 Jun 2024 08:12:34 -0700 (PDT)
+Received: from ?IPV6:2804:14d:5c5e:44fb:8ef6:cdff:1677:b083? ([2804:14d:5c5e:44fb:8ef6:cdff:1677:b083])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb2f058bsm63929855ad.13.2024.06.24.08.12.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Jun 2024 08:12:34 -0700 (PDT)
+Message-ID: <fa8e452b-ad37-482b-8d9b-bc8b4cad0ff9@mojatatu.com>
+Date: Mon, 24 Jun 2024 12:12:26 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] tracing/net_sched: NULL pointer dereference in
+ perf_trace_qdisc_reset()
+To: yskelg@gmail.com
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Takashi Iwai <tiwai@suse.de>, "David S. Miller" <davem@davemloft.net>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Taehee Yoo <ap420073@gmail.com>,
+ Austin Kim <austindh.kim@gmail.com>, shjy180909@gmail.com,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ ppbuk5246@gmail.com, Yeoreum Yun <yeoreum.yun@arm.com>
+References: <20240622045701.8152-2-yskelg@gmail.com>
+Content-Language: en-US
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <20240622045701.8152-2-yskelg@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-The commit 6533e558c650 ("i40e: Fix reset path while removing
-the driver") introduced a new PF state "__I40E_IN_REMOVE" to block
-modifying the XDP program while the driver is being removed.
-Unfortunately, such a change is useful only if the ".ndo_bpf()"
-callback was called out of the rmmod context because unloading the
-existing XDP program is also a part of driver removing procedure.
-In other words, from the rmmod context the driver is expected to
-unload the XDP program without reporting any errors. Otherwise,
-the kernel warning with callstack is printed out to dmesg.
+On 22/06/2024 01:57, yskelg@gmail.com wrote:
+> From: Yunseong Kim <yskelg@gmail.com>
+> 
+> In the TRACE_EVENT(qdisc_reset) NULL dereference occurred from
+> 
+>   qdisc->dev_queue->dev <NULL> ->name
+> 
+> This situation simulated from bunch of veths and Bluetooth dis/reconnection.
+> 
+> During qdisc initialization, qdisc was being set to noop_queue.
+> In veth_init_queue, the initial tx_num was reduced back to one,
+> causing the qdisc reset to be called with noop, which led to the kernel panic.
+> 
+> I've attached the GitHub gist link that C converted syz-execprogram
+> source code and 3 log of reproduced vmcore-dmesg.
+> 
+>   https://gist.github.com/yskelg/cc64562873ce249cdd0d5a358b77d740
+> 
+> Yeoreum and I use two fuzzing tool simultaneously.
+> 
+> One process with syz-executor : https://github.com/google/syzkaller
+> 
+>   $ ./syz-execprog -executor=./syz-executor -repeat=1 -sandbox=setuid \
+>      -enable=none -collide=false log1
+> 
+> The other process with perf fuzzer:
+>   https://github.com/deater/perf_event_tests/tree/master/fuzzer
+> 
+>   $ perf_event_tests/fuzzer/perf_fuzzer
+> 
+> I think this will happen on the kernel version.
+> 
+>   Linux kernel version +v6.7.10, +v6.8, +v6.9 and it could happen in v6.10.
+> 
+> This occurred from 51270d573a8d. I think this patch is absolutely
+> necessary. Previously, It was showing not intended string value of name.
+> 
+> I've reproduced 3 time from my fedora 40 Debug Kernel with any other module
+> or patched.
+> 
+>   version: 6.10.0-0.rc2.20240608gitdc772f8237f9.29.fc41.aarch64+debug
+> 
+> [ 5287.164555] veth0_vlan: left promiscuous mode
+> [ 5287.164929] veth1_macvtap: left promiscuous mode
+> [ 5287.164950] veth0_macvtap: left promiscuous mode
+> [ 5287.164983] veth1_vlan: left promiscuous mode
+> [ 5287.165008] veth0_vlan: left promiscuous mode
+> [ 5287.165450] veth1_macvtap: left promiscuous mode
+> [ 5287.165472] veth0_macvtap: left promiscuous mode
+> [ 5287.165502] veth1_vlan: left promiscuous mode
+> …
+> [ 5297.598240] bridge0: port 2(bridge_slave_1) entered blocking state
+> [ 5297.598262] bridge0: port 2(bridge_slave_1) entered forwarding state
+> [ 5297.598296] bridge0: port 1(bridge_slave_0) entered blocking state
+> [ 5297.598313] bridge0: port 1(bridge_slave_0) entered forwarding state
+> [ 5297.616090] 8021q: adding VLAN 0 to HW filter on device bond0
+> [ 5297.620405] bridge0: port 1(bridge_slave_0) entered disabled state
+> [ 5297.620730] bridge0: port 2(bridge_slave_1) entered disabled state
+> [ 5297.627247] 8021q: adding VLAN 0 to HW filter on device team0
+> [ 5297.629636] bridge0: port 1(bridge_slave_0) entered blocking state
+> …
+> [ 5298.002798] bridge_slave_0: left promiscuous mode
+> [ 5298.002869] bridge0: port 1(bridge_slave_0) entered disabled state
+> [ 5298.309444] bond0 (unregistering): (slave bond_slave_0): Releasing backup interface
+> [ 5298.315206] bond0 (unregistering): (slave bond_slave_1): Releasing backup interface
+> [ 5298.320207] bond0 (unregistering): Released all slaves
+> [ 5298.354296] hsr_slave_0: left promiscuous mode
+> [ 5298.360750] hsr_slave_1: left promiscuous mode
+> [ 5298.374889] veth1_macvtap: left promiscuous mode
+> [ 5298.374931] veth0_macvtap: left promiscuous mode
+> [ 5298.374988] veth1_vlan: left promiscuous mode
+> [ 5298.375024] veth0_vlan: left promiscuous mode
+> [ 5299.109741] team0 (unregistering): Port device team_slave_1 removed
+> [ 5299.185870] team0 (unregistering): Port device team_slave_0 removed
+> …
+> [ 5300.155443] Bluetooth: hci3: unexpected cc 0x0c03 length: 249 > 1
+> [ 5300.155724] Bluetooth: hci3: unexpected cc 0x1003 length: 249 > 9
+> [ 5300.155988] Bluetooth: hci3: unexpected cc 0x1001 length: 249 > 9
+> ….
+> [ 5301.075531] team0: Port device team_slave_1 added
+> [ 5301.085515] bridge0: port 1(bridge_slave_0) entered blocking state
+> [ 5301.085531] bridge0: port 1(bridge_slave_0) entered disabled state
+> [ 5301.085588] bridge_slave_0: entered allmulticast mode
+> [ 5301.085800] bridge_slave_0: entered promiscuous mode
+> [ 5301.095617] bridge0: port 1(bridge_slave_0) entered blocking state
+> [ 5301.095633] bridge0: port 1(bridge_slave_0) entered disabled state
+> …
+> [ 5301.149734] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+> [ 5301.173234] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+> [ 5301.180517] bond0: (slave bond_slave_1): Enslaving as an active interface with an up link
+> [ 5301.193481] hsr_slave_0: entered promiscuous mode
+> [ 5301.204425] hsr_slave_1: entered promiscuous mode
+> [ 5301.210172] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+> [ 5301.210185] Cannot create hsr debugfs directory
+> [ 5301.224061] bond0: (slave bond_slave_1): Enslaving as an active interface with an up link
+> [ 5301.246901] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+> [ 5301.255934] team0: Port device team_slave_0 added
+> [ 5301.256480] team0: Port device team_slave_1 added
+> [ 5301.256948] team0: Port device team_slave_0 added
+> …
+> [ 5301.435928] hsr_slave_0: entered promiscuous mode
+> [ 5301.446029] hsr_slave_1: entered promiscuous mode
+> [ 5301.455872] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+> [ 5301.455884] Cannot create hsr debugfs directory
+> [ 5301.502664] hsr_slave_0: entered promiscuous mode
+> [ 5301.513675] hsr_slave_1: entered promiscuous mode
+> [ 5301.526155] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+> [ 5301.526164] Cannot create hsr debugfs directory
+> [ 5301.563662] hsr_slave_0: entered promiscuous mode
+> [ 5301.576129] hsr_slave_1: entered promiscuous mode
+> [ 5301.580259] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+> [ 5301.580270] Cannot create hsr debugfs directory
+> [ 5301.590269] 8021q: adding VLAN 0 to HW filter on device bond0
+> 
+> [ 5301.595872] KASAN: null-ptr-deref in range [0x0000000000000130-0x0000000000000137]
+> [ 5301.595877] Mem abort info:
+> [ 5301.595881]   ESR = 0x0000000096000006
+> [ 5301.595885]   EC = 0x25: DABT (current EL), IL = 32 bits
+> [ 5301.595889]   SET = 0, FnV = 0
+> [ 5301.595893]   EA = 0, S1PTW = 0
+> [ 5301.595896]   FSC = 0x06: level 2 translation fault
+> [ 5301.595900] Data abort info:
+> [ 5301.595903]   ISV = 0, ISS = 0x00000006, ISS2 = 0x00000000
+> [ 5301.595907]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+> [ 5301.595911]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+> [ 5301.595915] [dfff800000000026] address between user and kernel address ranges
+> [ 5301.595971] Internal error: Oops: 0000000096000006 [#1] SMP
+> …
+> [ 5301.596076] CPU: 2 PID: 102769 Comm:
+> syz-executor.3 Kdump: loaded Tainted:
+>   G        W         -------  ---  6.10.0-0.rc2.20240608gitdc772f8237f9.29.fc41.aarch64+debug #1
+> [ 5301.596080] Hardware name: VMware, Inc. VMware20,1/VBSA,
+>   BIOS VMW201.00V.21805430.BA64.2305221830 05/22/2023
+> [ 5301.596082] pstate: 01400005 (nzcv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+> [ 5301.596085] pc : strnlen+0x40/0x88
+> [ 5301.596114] lr : trace_event_get_offsets_qdisc_reset+0x6c/0x2b0
+> [ 5301.596124] sp : ffff8000beef6b40
+> [ 5301.596126] x29: ffff8000beef6b40 x28: dfff800000000000 x27: 0000000000000001
+> [ 5301.596131] x26: 6de1800082c62bd0 x25: 1ffff000110aa9e0 x24: ffff800088554f00
+> [ 5301.596136] x23: ffff800088554ec0 x22: 0000000000000130 x21: 0000000000000140
+> [ 5301.596140] x20: dfff800000000000 x19: ffff8000beef6c60 x18: ffff7000115106d8
+> [ 5301.596143] x17: ffff800121bad000 x16: ffff800080020000 x15: 0000000000000006
+> [ 5301.596147] x14: 0000000000000002 x13: ffff0001f3ed8d14 x12: ffff700017ddeda5
+> [ 5301.596151] x11: 1ffff00017ddeda4 x10: ffff700017ddeda4 x9 : ffff800082cc5eec
+> [ 5301.596155] x8 : 0000000000000004 x7 : 00000000f1f1f1f1 x6 : 00000000f2f2f200
+> [ 5301.596158] x5 : 00000000f3f3f3f3 x4 : ffff700017dded80 x3 : 00000000f204f1f1
+> [ 5301.596162] x2 : 0000000000000026 x1 : 0000000000000000 x0 : 0000000000000130
+> [ 5301.596166] Call trace:
+> [ 5301.596175]  strnlen+0x40/0x88
+> [ 5301.596179]  trace_event_get_offsets_qdisc_reset+0x6c/0x2b0
+> [ 5301.596182]  perf_trace_qdisc_reset+0xb0/0x538
+> [ 5301.596184]  __traceiter_qdisc_reset+0x68/0xc0
+> [ 5301.596188]  qdisc_reset+0x43c/0x5e8
+> [ 5301.596190]  netif_set_real_num_tx_queues+0x288/0x770
+> [ 5301.596194]  veth_init_queues+0xfc/0x130 [veth]
+> [ 5301.596198]  veth_newlink+0x45c/0x850 [veth]
+> [ 5301.596202]  rtnl_newlink_create+0x2c8/0x798
+> [ 5301.596205]  __rtnl_newlink+0x92c/0xb60
+> [ 5301.596208]  rtnl_newlink+0xd8/0x130
+> [ 5301.596211]  rtnetlink_rcv_msg+0x2e0/0x890
+> [ 5301.596214]  netlink_rcv_skb+0x1c4/0x380
+> [ 5301.596225]  rtnetlink_rcv+0x20/0x38
+> [ 5301.596227]  netlink_unicast+0x3c8/0x640
+> [ 5301.596231]  netlink_sendmsg+0x658/0xa60
+> [ 5301.596234]  __sock_sendmsg+0xd0/0x180
+> [ 5301.596243]  __sys_sendto+0x1c0/0x280
+> [ 5301.596246]  __arm64_sys_sendto+0xc8/0x150
+> [ 5301.596249]  invoke_syscall+0xdc/0x268
+> [ 5301.596256]  el0_svc_common.constprop.0+0x16c/0x240
+> [ 5301.596259]  do_el0_svc+0x48/0x68
+> [ 5301.596261]  el0_svc+0x50/0x188
+> [ 5301.596265]  el0t_64_sync_handler+0x120/0x130
+> [ 5301.596268]  el0t_64_sync+0x194/0x198
+> [ 5301.596272] Code: eb15001f 54000120 d343fc02 12000801 (38f46842)
+> [ 5301.596285] SMP: stopping secondary CPUs
+> [ 5301.597053] Starting crashdump kernel...
+> [ 5301.597057] Bye!
+> 
+> Yeoreum and I don't know if the patch we wrote will fix the underlying cause,
+> but we think that priority is to prevent kernel panic happening.
+> So, we're sending this patch.
+> 
+> Link: https://lore.kernel.org/lkml/20240229143432.273b4871@gandalf.local.home/t/
+> Fixes: 51270d573a8d ("tracing/net_sched: Fix tracepoints that save qdisc_dev() as a string")
+> Cc: netdev@vger.kernel.org
+> Cc: stable@vger.kernel.org # +v6.7.10, +v6.8
+> Signed-off-by: Yunseong Kim <yskelg@gmail.com>
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> ---
+>   include/trace/events/qdisc.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
+> index f1b5e816e7e5..170b51fbe47a 100644
+> --- a/include/trace/events/qdisc.h
+> +++ b/include/trace/events/qdisc.h
+> @@ -81,7 +81,7 @@ TRACE_EVENT(qdisc_reset,
+>   	TP_ARGS(q),
+>   
+>   	TP_STRUCT__entry(
+> -		__string(	dev,		qdisc_dev(q)->name	)
+> +		__string(dev, qdisc_dev(q) ? qdisc_dev(q)->name : "noop_queue")
+>   		__string(	kind,		q->ops->id		)
+>   		__field(	u32,		parent			)
+>   		__field(	u32,		handle			)
 
-Example failing scenario:
- 1. Load the i40e driver.
- 2. Load the XDP program.
- 3. Unload the i40e driver (using "rmmod" command).
+You missed the __assign_str portion (see below). Also let's just say 
+"(null)" as it's the correct device name. "noop_queue" could be misleading.
 
-The example kernel warning log:
+diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
+index 1f4258308b96..f54e0b4dbcf4 100644
+--- a/include/trace/events/qdisc.h
++++ b/include/trace/events/qdisc.h
+@@ -81,14 +81,14 @@ TRACE_EVENT(qdisc_reset,
+         TP_ARGS(q),
 
-[  +0.004646] WARNING: CPU: 94 PID: 10395 at net/core/dev.c:9290 unregister_netdevice_many_notify+0x7a9/0x870
-[...]
-[  +0.010959] RIP: 0010:unregister_netdevice_many_notify+0x7a9/0x870
-[...]
-[  +0.002726] Call Trace:
-[  +0.002457]  <TASK>
-[  +0.002119]  ? __warn+0x80/0x120
-[  +0.003245]  ? unregister_netdevice_many_notify+0x7a9/0x870
-[  +0.005586]  ? report_bug+0x164/0x190
-[  +0.003678]  ? handle_bug+0x3c/0x80
-[  +0.003503]  ? exc_invalid_op+0x17/0x70
-[  +0.003846]  ? asm_exc_invalid_op+0x1a/0x20
-[  +0.004200]  ? unregister_netdevice_many_notify+0x7a9/0x870
-[  +0.005579]  ? unregister_netdevice_many_notify+0x3cc/0x870
-[  +0.005586]  unregister_netdevice_queue+0xf7/0x140
-[  +0.004806]  unregister_netdev+0x1c/0x30
-[  +0.003933]  i40e_vsi_release+0x87/0x2f0 [i40e]
-[  +0.004604]  i40e_remove+0x1a1/0x420 [i40e]
-[  +0.004220]  pci_device_remove+0x3f/0xb0
-[  +0.003943]  device_release_driver_internal+0x19f/0x200
-[  +0.005243]  driver_detach+0x48/0x90
-[  +0.003586]  bus_remove_driver+0x6d/0xf0
-[  +0.003939]  pci_unregister_driver+0x2e/0xb0
-[  +0.004278]  i40e_exit_module+0x10/0x5f0 [i40e]
-[  +0.004570]  __do_sys_delete_module.isra.0+0x197/0x310
-[  +0.005153]  do_syscall_64+0x85/0x170
-[  +0.003684]  ? syscall_exit_to_user_mode+0x69/0x220
-[  +0.004886]  ? do_syscall_64+0x95/0x170
-[  +0.003851]  ? exc_page_fault+0x7e/0x180
-[  +0.003932]  entry_SYSCALL_64_after_hwframe+0x71/0x79
-[  +0.005064] RIP: 0033:0x7f59dc9347cb
-[  +0.003648] Code: 73 01 c3 48 8b 0d 65 16 0c 00 f7 d8 64 89 01 48 83
-c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 b0 00 00 00 0f
-05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 35 16 0c 00 f7 d8 64 89 01 48
-[  +0.018753] RSP: 002b:00007ffffac99048 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
-[  +0.007577] RAX: ffffffffffffffda RBX: 0000559b9bb2f6e0 RCX: 00007f59dc9347cb
-[  +0.007140] RDX: 0000000000000000 RSI: 0000000000000800 RDI: 0000559b9bb2f748
-[  +0.007146] RBP: 00007ffffac99070 R08: 1999999999999999 R09: 0000000000000000
-[  +0.007133] R10: 00007f59dc9a5ac0 R11: 0000000000000206 R12: 0000000000000000
-[  +0.007141] R13: 00007ffffac992d8 R14: 0000559b9bb2f6e0 R15: 0000000000000000
-[  +0.007151]  </TASK>
-[  +0.002204] ---[ end trace 0000000000000000 ]---
+         TP_STRUCT__entry(
+-               __string(       dev,            qdisc_dev(q)->name      )
++               __string(       dev,            qdisc_dev(q) ? 
+qdisc_dev(q)->name : "(null)"    )
+                 __string(       kind,           q->ops->id              )
+                 __field(        u32,            parent                  )
+                 __field(        u32,            handle                  )
+         ),
 
-Fix this by checking if the XDP program is being loaded or unloaded.
-Then, block only loading a new program while "__I40E_IN_REMOVE" is set.
-Also, move testing "__I40E_IN_REMOVE" flag to the beginning of XDP_SETUP
-callback to avoid unnecessary operations and checks.
+         TP_fast_assign(
+-               __assign_str(dev, qdisc_dev(q)->name);
++               __assign_str(dev, qdisc_dev(q) ? qdisc_dev(q)->name : 
+"(null)");
+                 __assign_str(kind, q->ops->id);
+                 __entry->parent = q->parent;
+                 __entry->handle = q->handle;
 
-Fixes: 6533e558c650 ("i40e: Fix reset path while removing the driver")
-Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
-
----
-
-v1 -> v2 changes:
- - simplify the fix according to Kuba's suggestions, i.e. remove
-   checking 'NETREG_UNREGISTERING' flag directly from ndo_bpf
-   and remove a separate handling for 'unregister' context.
- - update the commit message accordingly
- - add an example of the kernel warning for the issue being fixed.
-
-See:
-v1: <https://lore.kernel.org/netdev/20240528-net-2024-05-28-intel-net-fixes-v1-4-dc8593d2bbc6@intel.com/>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 284c3fad5a6e..310513d9321b 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -13293,6 +13293,10 @@ static int i40e_xdp_setup(struct i40e_vsi *vsi, struct bpf_prog *prog,
- 	bool need_reset;
- 	int i;
- 
-+	/* VSI shall be deleted in a moment, block loading new programs */
-+	if (prog && test_bit(__I40E_IN_REMOVE, pf->state))
-+		return -EINVAL;
-+
- 	/* Don't allow frames that span over multiple buffers */
- 	if (vsi->netdev->mtu > frame_size - I40E_PACKET_HDR_PAD) {
- 		NL_SET_ERR_MSG_MOD(extack, "MTU too large for linear frames and XDP prog does not support frags");
-@@ -13301,14 +13305,9 @@ static int i40e_xdp_setup(struct i40e_vsi *vsi, struct bpf_prog *prog,
- 
- 	/* When turning XDP on->off/off->on we reset and rebuild the rings. */
- 	need_reset = (i40e_enabled_xdp_vsi(vsi) != !!prog);
--
- 	if (need_reset)
- 		i40e_prep_for_reset(pf);
- 
--	/* VSI shall be deleted in a moment, just return EINVAL */
--	if (test_bit(__I40E_IN_REMOVE, pf->state))
--		return -EINVAL;
--
- 	old_prog = xchg(&vsi->xdp_prog, prog);
- 
- 	if (need_reset) {
--- 
-2.33.1
 
 
