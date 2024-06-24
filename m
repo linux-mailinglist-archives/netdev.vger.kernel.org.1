@@ -1,146 +1,133 @@
-Return-Path: <netdev+bounces-106007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8862A914311
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 09:01:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD8C6914318
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 09:03:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41683284A7A
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 07:01:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5954A1F23DDE
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 07:03:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBFA038DE0;
-	Mon, 24 Jun 2024 07:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D75DA39851;
+	Mon, 24 Jun 2024 07:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="maGnPLBh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cfmm5rlX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B6D2EAE1;
-	Mon, 24 Jun 2024 07:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8F3446DC
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 07:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719212464; cv=none; b=ZSucAQGsrEhSZ5Dkre4wHWBn/ztIDgHg/+l65MWYGo9NC3B5gZmbzq6cAbyn9jOLi9yTNRi88SuDeLM+SyJIm2LC4InfzW3buxgo20pDcPIH9c6kSoXp8S0Y7+Ttxtp6aBUNd1TxzYBKOk/ufGM+Fqzb5UzZ9I0sgetQcOyzECo=
+	t=1719212620; cv=none; b=c5Stg1lKHQ0Ai8vjU5FujPgbiwid+cnwgeW6TOjM4e1eR0JwlAzphsfZqRRCOjiZwBAsoHb4AZ0w9P2xOLMOE6NngFLge9btQpQcJOQDCbIUaZwxORQTW+j82qPNLfIhXH/bmJ+0cZ+/9QAnI3JMf6vcXPv0nLZJ/QJS+IvQX5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719212464; c=relaxed/simple;
-	bh=t0PxgEC6IJB2/OC++qZP4aNCPyTZC6dwIhUnM/Z799s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gIMJ/AbCKh7snQl7Q13yKMAuAWw7DKMOVzVHVeJV+oPv3c9/5Xeau9uGFMQyBCpcBpX4OLfTzndSpXHZdYzr3NT6sk4ZrAPs+euSxuKbkt8pio6jqZhnlusVZe1JN6zrxeJxNYVe+e3S0wGMQ+GZECxI/gpo0J37bk2OqIM2eWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=maGnPLBh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02BA2C2BBFC;
-	Mon, 24 Jun 2024 07:00:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719212464;
-	bh=t0PxgEC6IJB2/OC++qZP4aNCPyTZC6dwIhUnM/Z799s=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=maGnPLBhS6GLTTrWPaNAsJcmvnSwbVahnrgqKGKE7uX12smJYBZbSZ6q9MZKomNlw
-	 X/DCuIumh4CNAP+l40NBOVcL1l7R9oxEhV5s4iOGYYwtA7HX1M+I1naSM7yy2fBn6C
-	 KZGHf1rBFhgNPggwwxM5bjgzSobTUudw1QoTWurfi7VeiPWFrNPsHg4D4JTWLaDLmR
-	 ZBYjVoWzwYkP4c/q0wSAfPFPueajHaoStGB3Yfvc9HCJNdmvx2rQIH4HnKLIRmP/MV
-	 fckx8yQeGqaUwY1z8SPWp9PV0RozD7DkXze1FQV2HbR8hy1+CrcQsCdIj3ShkGpOtk
-	 oeERESos6oqXQ==
-Message-ID: <4c3d4437-4c24-4db3-855d-f2ba7d0c6f8a@kernel.org>
-Date: Mon, 24 Jun 2024 09:00:56 +0200
+	s=arc-20240116; t=1719212620; c=relaxed/simple;
+	bh=xVuaAIGZNdS34n4S1r0wBBnctxLpzF2ka7fvSrTsfE4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HiUkRLZ+ivyr3+FqDJ4RJ4Tuyl9xOrI9Z72kVSwjC2+isJ0ZYTDtHdVJuXu8RFUsB3xpOnvRhhsGwygBR0clmV+BhzkQAO+of39SD2FxlhMCPCxZLnBBBGYz25zXjl8dmf0F0B/jvAhe6uY6OMb9V9SsR26swIavXO6x5sGaBPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cfmm5rlX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719212618;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=F2sqF8kaCPYuDxl9QKAydlnLMKrQEyE2S3UviwAcAdw=;
+	b=Cfmm5rlXClNapgoTcAwDZm1nK+dBZCBr8NEBFfu7j84AdS74Q1kVfUauldfkrVoSDEtZa0
+	BXaCo8IZdmyTtMepdRa+jfsqLX/MytlWDQ192b5jHq3E7/tBKjnOl4KrcsCcAoYpZ2zWUP
+	phabi2zaelASsFMJnyV4PkKvxdxCxEg=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-695-IQtLk4iqMdWpIzyWzyIWBQ-1; Mon, 24 Jun 2024 03:03:36 -0400
+X-MC-Unique: IQtLk4iqMdWpIzyWzyIWBQ-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a6fe837c066so151963966b.1
+        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 00:03:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719212615; x=1719817415;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=F2sqF8kaCPYuDxl9QKAydlnLMKrQEyE2S3UviwAcAdw=;
+        b=FnMChYCI5UpfNPBEikEZWEErwOC6QLFkNRkVXDAjJ6x0m4Gfc1jTZH0ICXB/2ylfTW
+         2K31oE1FOPj9NzN/EG0VZOMMsIHjaVZQLKPmgSafRcf3ibXidjZ0R0ro6edEyRp1tc0w
+         g1lCLPWDnbtL8ytHz94b9WhNrDg2eH8ZWvvovKXfZ/y3fGQemsD3vN5pXzXgf9j7wOG6
+         8Xuh0yEszZ3Z5EG3DBnlbDGgHkR/0TMD9ouXv+ZUfNeXCcP9gISNouqp5nCuJjXI1zYl
+         fwARkDfnop9YsAWDeSBVcxU62JbR3kcOBOhyUjryLASSeIDPc/T2sbTrIZx/+LX6fiGb
+         cb9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXe52EIYgB1D9YqMszU7ihSIyrsNhLPsjUgSjHWFXZa+vLihFcBlQFdLx9n3cUBTk+EM4kWv6bRlAnMfY6tvnErYo2zuivl
+X-Gm-Message-State: AOJu0YxkXQUGtb8GWi4Lrg6GCEAUJ0x0ds0u+iBNDNFkG5t51vuzmwgA
+	P/FGHhvjfSsxdC7X+RTvKDegsW+nR3EvSTiMT6iFu2yGc0IkZQDOPhe+zj87lH8pCssuw7yyKO5
+	et5fyvYYWaxIswN3XrCampfCKS5QQpEYbRw0kWA75knYojeXsv5mklg==
+X-Received: by 2002:a17:907:3ea2:b0:a72:5ca4:3ab0 with SMTP id a640c23a62f3a-a725ca441f0mr59763466b.10.1719212615073;
+        Mon, 24 Jun 2024 00:03:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFO0307iRfNltzgMm5kHBwyRy2sdwA7p7tSeSjAYNG5SuUBph2+kEMCjcxSt8DbmBKUed9JmA==
+X-Received: by 2002:a17:907:3ea2:b0:a72:5ca4:3ab0 with SMTP id a640c23a62f3a-a725ca441f0mr59760566b.10.1719212614552;
+        Mon, 24 Jun 2024 00:03:34 -0700 (PDT)
+Received: from lbulwahn-thinkpadx1carbongen9.rmtde.csb ([2a02:810d:7e40:14b0:4ce1:e394:7ac0:6905])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a724a6e4201sm142610566b.132.2024.06.24.00.03.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jun 2024 00:03:34 -0700 (PDT)
+From: Lukas Bulwahn <lbulwahn@redhat.com>
+X-Google-Original-From: Lukas Bulwahn <lukas.bulwahn@redhat.com>
+To: Frank Li <Frank.Li@nxp.com>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Sean Anderson <sean.anderson@seco.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>
+Subject: [PATCH] MAINTAINERS: adjust file entry in FREESCALE QORIQ DPAA FMAN DRIVER
+Date: Mon, 24 Jun 2024 09:03:26 +0200
+Message-ID: <20240624070326.130270-1-lukas.bulwahn@redhat.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 1/2] dt-bindings: net: wireless: qcom,ath11k: describe
- the ath11k on QCA6390
-To: Kalle Valo <kvalo@kernel.org>, Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Jeff Johnson <jjohnson@kernel.org>,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, ath11k@lists.infradead.org,
- linux-kernel@vger.kernel.org, ath12k@lists.infradead.org,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-References: <20240605122106.23818-2-brgl@bgdev.pl>
- <171862259099.4124983.18069958656274980613.kvalo@kernel.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <171862259099.4124983.18069958656274980613.kvalo@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 17/06/2024 13:09, Kalle Valo wrote:
-> Bartosz Golaszewski <brgl@bgdev.pl> wrote:
-> 
->> Add a PCI compatible for the ATH11K module on QCA6390 and describe the
->> power inputs from the PMU that it consumes.
->>
->> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->> Signed-off-by: Kalle Valo <quic_kvalo@quicinc.com>
-> 
-> 2 patches applied to ath-next branch of ath.git, thanks.
+From: Lukas Bulwahn <lukas.bulwahn@redhat.com>
 
-Hi Kalle,
+Commit 243996d172a6 ("dt-bindings: net: Convert fsl-fman to yaml") splits
+the previous dt text file into four yaml files. It adjusts a corresponding
+file entry in MAINTAINERS from txt to yaml, but this adjustment misses
+that the file was split and renamed.
 
-Are you sure your tree is properly fed to linux-next? I cannot find
-these patches in linux-next and above repo is not listed in Next/Trees.
+Hence, ./scripts/get_maintainer.pl --self-test=patterns complains about a
+broken reference.
 
-Every maintainer tree should (IMHO: *MUST*) be fed to linux-next.
+Adjust the file entry to match the four yaml files resulting from this
+commit above.
 
-You will also get LKP coverage for free, unless your tree is there due
-to scanning korg.
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@redhat.com>
+---
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Please look at slides here and implement at least linux-next (although I
-also encourage to opt-in to transparency log and LKP):
-https://lpc.events/event/17/contributions/1498/
-
-Best regards,
-Krzysztof
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 807feae089c4..6fe301179ed0 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -8874,7 +8874,7 @@ M:	Madalin Bucur <madalin.bucur@nxp.com>
+ R:	Sean Anderson <sean.anderson@seco.com>
+ L:	netdev@vger.kernel.org
+ S:	Maintained
+-F:	Documentation/devicetree/bindings/net/fsl-fman.yaml
++F:	Documentation/devicetree/bindings/net/fsl,fman*.yaml
+ F:	drivers/net/ethernet/freescale/fman
+ 
+ FREESCALE QORIQ PTP CLOCK DRIVER
+-- 
+2.45.2
 
 
