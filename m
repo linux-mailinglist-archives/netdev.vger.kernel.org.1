@@ -1,88 +1,94 @@
-Return-Path: <netdev+bounces-106111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57BF2914DFA
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:09:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BBDF914DF7
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:09:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 112341F2312A
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:09:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DF1B1C22794
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8AA913DBA4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1D313D8B1;
 	Mon, 24 Jun 2024 13:09:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="X/Lr8VjB"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="VQpIOSZ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f99.google.com (mail-ej1-f99.google.com [209.85.218.99])
+Received: from mail-lf1-f100.google.com (mail-lf1-f100.google.com [209.85.167.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D630A13D639
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918C613D51D
 	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 13:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.99
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719234546; cv=none; b=bQfyNFCkTxQYcRgyjgYsEd1EmkE25i8/4OL9OsChDNfm0fjWBb7CS25Hg0Ts7uwtyIV0VCLRHEU4rnBngJNaZ7SuXVNIgN1fktC1yDkN8P3AyyQgKC17z23ykmtI2hUjhLlmzfxaCadTsU891VHpY196+xVB4wntP2ylZwp/kUU=
+	t=1719234546; cv=none; b=sUAcqQNt/PztnKB8pQnR72T9uC1mbBUxrsDhjtDc3KSBy47VzIo2mT33tRVUBrw25U1MwcVNK92Im+TMddaJyp0Dwf+EO5OQYm3pgbEa7kErEXw1OnkK5Dz1vLJk8ABD/KuAYh8YBga7HkuEtKDQjaWUxJgAhIBhdQmypAnDhpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1719234546; c=relaxed/simple;
-	bh=+scdV5kPV77tUYywUxlKRVVYgvVP6R7eocuxKRTOoN0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E86DYxvq93ji6nZeJjZlNVjSiAi7ayyg48TgQ/ZoBlxR8SmIblPSmEaYe+82lgWyrH+pyhKXk5y/uwxYIh+R1/1JQ0r3yS4o8pY4ZrNLG3diBmDDIEVtcERgsd6tkujQEDrUNBq3F96T/38W1t3q0owxWNejUSSQdJljSvbXma8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=X/Lr8VjB; arc=none smtp.client-ip=209.85.218.99
+	bh=F18MNQqMgi2s1pXAA8VazUOW/a2/fCiXeYMprACDpHo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Ur2EEa1kC9orMNs9XsohodroW9WGo87AhQ6gyxty3IGT3RjU5p5WRBzSmtFR5I9cIbnUVdvtCqr1F6qXZvGpL50mp9sq6WXnkOtYTsxOputCT8HYfdxKTjbDFPz4fLq+jVHmXM5GaKq8k9C7H3AeW+8VmruKRcRIpWn6bafh8go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=VQpIOSZ5; arc=none smtp.client-ip=209.85.167.100
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-ej1-f99.google.com with SMTP id a640c23a62f3a-a724b3a32d2so141747966b.2
+Received: by mail-lf1-f100.google.com with SMTP id 2adb3069b0e04-52cd9f9505cso3166589e87.0
         for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 06:09:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=6wind.com; s=google; t=1719234543; x=1719839343; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PKys0/vh6T5QmnRI1fhrCHdf+nQHmL0vs6iM5TJwqkU=;
-        b=X/Lr8VjB2YFbadzr8LVCnNl9uPhMU23PXanLEdSAYMphs04tSNfTk/JKo5OBrnUxLb
-         7pZYsfMYZyCLu7+t4IQni4+i0Vaf/rzWeLCDz9hbEFqGLhRo8dajpYcu7ns6vn7vOA4n
-         hsmv42YDMxeVP4xK6aSs2opBv1wf/W2HUjNdMpGzqEqVXx2UsIevxXk+RLLy05miyZ98
-         nSWGgGSOF8oHfUR9GS61CUkJCrrPdkrnKSg9CAJtLK4p4qm9K2HqzNkCvbJoLAUpa3TP
-         muG8l9IsDKSUYi/G3YU5moTR6p55aP2isgfGH95MUV2AU5aBDO1zhY+19J4FxUHwSYiD
-         BGZQ==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Cua0A6GEdu0iOk0GUptHeWMm27awSaljV0LV/Qv+59A=;
+        b=VQpIOSZ5DnV8YzmSsUKwgl6J/svEeSgdfs33Vnl1dKAGSCpcDhvo0bbZcLpBt7ScEm
+         JgFpfEnJeDYRZKliXsOhYcloninrfxjy8D2KMGmI8ruu+E6O1LhJvDaeB7cNtllcxxD4
+         iQz13uY0TKPTYwxAPsK3ES1oKdli8TS9szqVMHzH3JO4jS6LG1TivJpcmjC3vOGJ8uXC
+         qY5YoYb0JNPV/ZxH6HPCMCezC3mkPu5PHXyAb/pGel6/bIyObKgATVx5WTBRkCNSmoDx
+         H8+JqPvMVBNoPvV6UC51QVvZ5XuiP5tBoGgaGN3zLrhVlu6cPinxy+EF5oORSHeyekmc
+         ZkgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1719234543; x=1719839343;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PKys0/vh6T5QmnRI1fhrCHdf+nQHmL0vs6iM5TJwqkU=;
-        b=qx+6z1oJg6xNoxbNxF2HgzGonHcVIp/OcXP3XkZ5PMJKCcSNC8CcyNibuYnJ+UBSnW
-         UgayRZOlXDMulZVZd/gl3IXThPwJsCrGMMK5sNO3t4CEvpw0vzSdXxHekVptpkFl2sdJ
-         w2A5oXOC8bAk5FOr/3R84QqlbzxOstrHMBrGpjTN5WT+e2tLXslv7R1E6efh7vbdS/4K
-         RE/Uhi/TKLp5v4pS7wc15QuR2fPH69NUPod2PlszifAwTAnaCaSVT+YzwD8JkYtw5QhY
-         +vRf79AxhtWwNHIKQtriA2+7ilwQE+CSS0I2qI4NqYC1iCnLRwSi7B3w49D+f5SkgkJF
-         hAEg==
-X-Forwarded-Encrypted: i=1; AJvYcCX/S9Pdq5ofcgXK7x8ts72FEXN/wUSirJGDeeyZqMjXgYbMGR+TMqhR7VA6yfXRO7CntoyhpITyyRlozh0X0G1rwymTqI4E
-X-Gm-Message-State: AOJu0Yxghbr5mtDSlvP9dRA6a9IukyngbUgvyC9/+f+r3GCw6ZuLiLv9
-	JMRp5z5Gqjubgpt38uaV0WAwP5TPnYk/M1sLwKC9bZj3PR0dgOhUPUAZ/0GzWc3PaFdwaZpVdqS
-	zpyHXiZuDf539jUibvohX0kUM7tkwZh9W
-X-Google-Smtp-Source: AGHT+IFee5H2uItC4HpBL/nkSjQqVI9s7XiwYATHxQdAM5BE1RcupnCYYW0nkJf0PzBSPhHKWwrN5zt1koJ6
-X-Received: by 2002:a17:906:2710:b0:a6f:d7a:d650 with SMTP id a640c23a62f3a-a7245c483c3mr292274866b.50.1719234543149;
-        Mon, 24 Jun 2024 06:09:03 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Cua0A6GEdu0iOk0GUptHeWMm27awSaljV0LV/Qv+59A=;
+        b=XDZHzw8zpzJfYRnrqey5PQWBgbx3wwTOGGrc5G8aMch3pXRn4f2ROrCIXAjxzuP7h8
+         JxG8MZxCEhthSToSLxFoF7TywAzHMruzYQyTL3HbHZnIkhfWjpVwc8ZqtdUFcRVTS8eX
+         xwSx480V9vZIg2O1+TJCNnC0TLM+158/XbnxPiW6iHOlvr9ec80aA9at/MJ2qi0JRbyw
+         WmlrKoNTvUCzgwy1GyaEf66KvmcPZV3LCDSbN8n/1RSduRA1+KsQqsixQMD27xUSZYZU
+         //Xmh3dk0cXBvmNk/IaPi5AEhrzP6S/mkJLF0OJxEtyko/uo6pqPjV+Aepz/lhFRyvkC
+         FwEw==
+X-Forwarded-Encrypted: i=1; AJvYcCXPHzxMFdArTjaK61L+B1948JAfMu8IK1YSJH7KNvQqDBzP8G1xC29JjqHVd25pDE3QD/e0jxV9SjamK0C1e1jktnvRbFFS
+X-Gm-Message-State: AOJu0YyN4cFJKPzMgw4WPNJ682EHkvwiKuNgY9Vv4IwgbuxmrnCoUev2
+	s3q5kNZM2RWgOW7QyVl2GLjv/vZhBb3ZbhdXTNkshdTNw20QbP37luzzqWIvMWXExXCFpD2kN6W
+	RTuVbbz/Iah4kNRNz2A//2c1mK2HagjpD
+X-Google-Smtp-Source: AGHT+IEBpaCODeI242sIP+AcMfTXd1Z+51gSpsbjgQUQQht0K2WifHxuQsjBq8JFYi/VigFtbtGnLlvQoPKX
+X-Received: by 2002:ac2:5f63:0:b0:52c:a002:1afc with SMTP id 2adb3069b0e04-52cdf7f66f2mr3244175e87.34.1719234542615;
+        Mon, 24 Jun 2024 06:09:02 -0700 (PDT)
 Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id a640c23a62f3a-a6fcf5493b5sm12292266b.164.2024.06.24.06.09.02;
-        Mon, 24 Jun 2024 06:09:03 -0700 (PDT)
+        by smtp-relay.gmail.com with ESMTP id 5b1f17b1804b1-424817fcc5esm3530725e9.41.2024.06.24.06.09.02;
+        Mon, 24 Jun 2024 06:09:02 -0700 (PDT)
 X-Relaying-Domain: 6wind.com
 Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
-	by smtpservice.6wind.com (Postfix) with ESMTPS id 4626760310;
+	by smtpservice.6wind.com (Postfix) with ESMTPS id 495B86036F;
 	Mon, 24 Jun 2024 15:09:02 +0200 (CEST)
 Received: from dichtel by bretzel with local (Exim 4.94.2)
 	(envelope-from <nicolas.dichtel@6wind.com>)
-	id 1sLjRN-004065-Va; Mon, 24 Jun 2024 15:09:01 +0200
+	id 1sLjRO-004067-03; Mon, 24 Jun 2024 15:09:02 +0200
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 To: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Eric Dumazet <edumazet@google.com>
 Cc: David Ahern <dsahern@kernel.org>,
-	netdev@vger.kernel.org
-Subject: [PATCH net 0/4] vrf: fix source address selection with route leak
-Date: Mon, 24 Jun 2024 15:07:52 +0200
-Message-ID: <20240624130859.953608-1-nicolas.dichtel@6wind.com>
+	netdev@vger.kernel.org,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net 1/4] ipv4: fix source address selection with route leak
+Date: Mon, 24 Jun 2024 15:07:53 +0200
+Message-ID: <20240624130859.953608-2-nicolas.dichtel@6wind.com>
 X-Mailer: git-send-email 2.43.1
+In-Reply-To: <20240624130859.953608-1-nicolas.dichtel@6wind.com>
+References: <20240624130859.953608-1-nicolas.dichtel@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,20 +97,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For patch 1 and 2, I didn't find the exact commit that introduced this bug, but
-I suspect it has been here since the first version. I arbitrarily choose one.
+By default, an address assigned to the output interface is selected when
+the source address is not specified. This is problematic when a route,
+configured in a vrf, uses an interface from another vrf (aka route leak).
+The original vrf does not own the selected source address.
 
- include/net/ip6_route.h                          | 19 +++++++-----
- net/ipv4/fib_semantics.c                         | 11 +++++--
- net/ipv6/addrconf.c                              |  3 +-
- net/ipv6/ip6_output.c                            |  1 +
- net/ipv6/route.c                                 |  2 +-
- tools/testing/selftests/net/vrf_route_leaking.sh | 38 ++++++++++++++++++++++--
- 6 files changed, 61 insertions(+), 13 deletions(-)
+Let's add a check against the output interface and call the appropriate
+function to select the source address.
 
-Comments are welcome.
+CC: stable@vger.kernel.org
+Fixes: 8cbb512c923d ("net: Add source address lookup op for VRF")
+Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+---
+ net/ipv4/fib_semantics.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-Regards,
-Nicolas
+diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+index f669da98d11d..459082f4936d 100644
+--- a/net/ipv4/fib_semantics.c
++++ b/net/ipv4/fib_semantics.c
+@@ -2270,6 +2270,13 @@ void fib_select_path(struct net *net, struct fib_result *res,
+ 		fib_select_default(fl4, res);
+ 
+ check_saddr:
+-	if (!fl4->saddr)
+-		fl4->saddr = fib_result_prefsrc(net, res);
++	if (!fl4->saddr) {
++		struct net_device *l3mdev = dev_get_by_index_rcu(net, fl4->flowi4_l3mdev);
++
++		if (!l3mdev ||
++		    l3mdev_master_dev_rcu(FIB_RES_DEV(*res)) == l3mdev)
++			fl4->saddr = fib_result_prefsrc(net, res);
++		else
++			fl4->saddr = inet_select_addr(l3mdev, 0, RT_SCOPE_LINK);
++	}
+ }
+-- 
+2.43.1
 
 
