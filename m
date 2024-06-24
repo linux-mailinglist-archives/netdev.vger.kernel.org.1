@@ -1,118 +1,320 @@
-Return-Path: <netdev+bounces-106097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FA78914917
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:46:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1049B914941
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 14:00:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD4641F24542
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 11:46:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 309BC1C236E6
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 12:00:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01623137C20;
-	Mon, 24 Jun 2024 11:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F98913B58C;
+	Mon, 24 Jun 2024 11:59:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XF8W2srD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EsQ3nAEs"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816E413B294
-	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 11:46:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A55132120;
+	Mon, 24 Jun 2024 11:59:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719229600; cv=none; b=Du/5UoxqDdZ5MxNhWHF/nOGeZPnkgCnhKSVJBt3UtI/9oMOog5cifRBDR1rjE5GW4N7SLYjb9NtAV8QiOtAvhJgStFhCWBsGEYj91K99MA27YeOzLw8XmZo5OC1o2yYuJUud5mZSDTVUyhBi1FtjPUh70RJYwFW4i0oKp+b7gVQ=
+	t=1719230397; cv=none; b=K0AzzyyatuL7Q5VWbCbUvdzD1T3W83FvyD4arqJfjiK3lgNK7t7K0jtVQG12XENozsv8evL+wtzEX8kSehmiocPXLt+Y4xB00LgDNoubKwkzLJ2GUK0J5CinL+DNmWtAFjbz5JGH2s5Agu7T0jn3axHHJbrnrTq1hEpJRzNKbQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719229600; c=relaxed/simple;
-	bh=HTx8wnE3U2h8tlMymsm1WhTMmhSC4PbjI9XPYkCp9p4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Aa9ISTpo99r+lMlpcHZxAn+tsDjeU+ZMUB23ZnyfxpmnU9TWh3tNz82tMmhkvit/H4ydOjkTiqd5MEQcu/TrPgqFElVMq0G/Q9fj4Vnb756rVHJcH81UhCCQ7hSlViBQ3bucSJUR7jPAuUu7CqxjtKfXX26wawxcF+jeHlg41pE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XF8W2srD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719229598;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HTx8wnE3U2h8tlMymsm1WhTMmhSC4PbjI9XPYkCp9p4=;
-	b=XF8W2srDTYC70w+5AWT0JA8B08v7kYwqTjrngatBCyLrMpIg4WBH7HP+TgSv6IcpBjhblI
-	STHgbJQ4sx2uxmK5nZBGtPOoXb4RTCurI/ED526hOB0iXPAtGP1XWxYu65bQZ7PFjFPaFu
-	XSIpFeIauuQxibuhUIJ9icYNU9s0DEQ=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-695-KCAqWXKVPT2-hBIOeWsW7g-1; Mon, 24 Jun 2024 07:46:37 -0400
-X-MC-Unique: KCAqWXKVPT2-hBIOeWsW7g-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ec4efbbb7aso17336341fa.2
-        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 04:46:36 -0700 (PDT)
+	s=arc-20240116; t=1719230397; c=relaxed/simple;
+	bh=mrw/F4Ya6RFfXo3J5jULK+03oRfHGgdK5t/Zq4Kh1Sw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tweQxnUNciLCZ+TA1BNYYn2crN++rT/rL/5wseO8MPACo1CJTZhELUKZs3Te7khPGxYb5RxBhpscvJmoka9wnY7iVbhb8EaBvrIR9k5KiMZT5nQMi/48J0MaTzR1U3rfpDYQ89dWtoiJYTsSj7bjySh6kGhkWfIbFWZTcayp7Fw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EsQ3nAEs; arc=none smtp.client-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-70b2421471aso2935512a12.0;
+        Mon, 24 Jun 2024 04:59:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719230395; x=1719835195; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Iwu8kUHGKGcTymQuxe9Xnw/0GaQZONNbqIunVMZstL8=;
+        b=EsQ3nAEsfqLXckj9hw3+adU+Ng333QxyTjiBrEgHqxGiq2aKW24apdJW9XM5Hzwwf6
+         /ifTNCI2smZYF+GndV/3cXAKdgakX+KZKdL3UAVBQfcih4T07u4igR/Qx+kax2U5cPIN
+         BQjPia9oryfcvAbMU6b7rqAEjk8lJI9lxg4DtXk49hTwatMtKurl09NTqEHW14n5eNsF
+         KbvyRX3iZuUJinQOf7ZqvZQ6xVWRmjT38pt8KTebVTT7rWlE0yX3boyFbzFJnYzEUGRw
+         JehO9sj1pVFIoaIPISMWJY1UPK13oJfiL4Nd2IzWC/GPXL4v4SRBFNPsfu5UCNuHoKTa
+         SQbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719229595; x=1719834395;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HTx8wnE3U2h8tlMymsm1WhTMmhSC4PbjI9XPYkCp9p4=;
-        b=FRGKik0zBBFhBOCJCrJqbuo9wonJvE2cZ3lh0tit8bFIT/oM2WLMqyezHLCsYvwVVY
-         75fUVh+ECZs82YXGrCQK2j1gA4HoLRcLfJWkTbH540i+QJXkywCmmbr2uS+bhQWEJlpj
-         juQ/3MRR+/jhjH/a9nLL9oFnYVGSSVMrGrHrrq8ux2qSC6dOaZn+zad8hkPANdXTLpHQ
-         irjEKtKbv2jRHuotTcIrV4ylH+pzWDdOZok1RFby6P9fyUTs3lTsQ3qKbn6tmCt/+Q3q
-         tcBsp3qeA5HyLOROO8uz58fspS1doLZpmPil/BlMRnX/VwdRXa8XTWJidIRtCI40KSUd
-         5rSA==
-X-Forwarded-Encrypted: i=1; AJvYcCX6188QyQElXChhajky/Ipel2owovEd/agQl7FCXdQDzeGfdc8Dkvc67xU7uUYzOvV38ryngQiki+xZ9GyM6HWTefb+3fL2
-X-Gm-Message-State: AOJu0YwBY1YOkPWzPpMz5CDYc9BqTZWiszI2n4evdfK7eJL6xxodp/7h
-	k//Emv0Ly2EfW28mZcUsr+ZpJ0ZHacoCI0Sa+Dju5DHA7vMMBq8jytDKhTRbJuGr414eQ89oTIC
-	3BpUZJ5Hm4Pk2MfOTaQ9dQ03viPDfbOQ8pKrmkhJgOuqCdJBnFkkEqg==
-X-Received: by 2002:a2e:a17a:0:b0:2ec:4093:ec7 with SMTP id 38308e7fff4ca-2ec5b2e7238mr34003821fa.30.1719229595631;
-        Mon, 24 Jun 2024 04:46:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFJt/VG/AsIrl2IZ1SfnuzF+4i4QpAF4U0KYG5A/8dV/MMwb3a/AvJp8gx45wxoVrlyma0x1w==
-X-Received: by 2002:a2e:a17a:0:b0:2ec:4093:ec7 with SMTP id 38308e7fff4ca-2ec5b2e7238mr34003671fa.30.1719229595277;
-        Mon, 24 Jun 2024 04:46:35 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a725e9bd392sm40061266b.23.2024.06.24.04.46.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jun 2024 04:46:34 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id EC475138620D; Mon, 24 Jun 2024 13:46:33 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Samuel Dobron <sdobron@redhat.com>, Daniel Borkmann
- <daniel@iogearbox.net>, hawk@kernel.org
-Cc: Sebastiano Miano <mianosebastiano@gmail.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: XDP Performance Regression in recent kernel versions
-In-Reply-To: <CA+h3auMq5vnoyRLvJainG-AFA6f=ivRmu6RjKU4cBv_go975tw@mail.gmail.com>
-References: <CAMENy5pb8ea+piKLg5q5yRTMZacQqYWAoVLE1FE9WhQPq92E0g@mail.gmail.com>
- <5b64c89f-4127-4e8f-b795-3cec8e7350b4@kernel.org> <87wmmkn3mq.fsf@toke.dk>
- <ff571dcf-0375-6684-b188-5c1278cd50ce@iogearbox.net>
- <CA+h3auMq5vnoyRLvJainG-AFA6f=ivRmu6RjKU4cBv_go975tw@mail.gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 24 Jun 2024 13:46:33 +0200
-Message-ID: <87ed8mftra.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1719230395; x=1719835195;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Iwu8kUHGKGcTymQuxe9Xnw/0GaQZONNbqIunVMZstL8=;
+        b=LlrWFVwFjd5jW14AdEGdBr2N87xIeuPgQ7eqtHoDist4bZviQ64kscVtjyjqDlioYz
+         WBFysJL3y4sycWbxZm/XgJxfc5rv7XwFqw8cIl0Ke0CuEsGenvhm0eJ2u7DMyJfQzsJQ
+         5cKyf32F9aEgJYIHxP2ddytsg+4gXXANiuZEnj5qFshKgVv9jz/3hNjgcWpfyQjvsVTn
+         cXLzbz/18cXOtzn75u63JYX+cyJ+qDLg0TA4TyyY2/h9IY8px/4UMu7/2OERvC1HANy1
+         /GK8iVFg67epnLEQoz6lUVAtNbfQB0Ap3KRRE5pOhGoHHv16LuCcon5P3tB6fcloJjdI
+         +Rsg==
+X-Forwarded-Encrypted: i=1; AJvYcCXPZVt2OYSCOXKYHcBLY7JHSXDlZqogSH6wijc35WXSz8Fb07AOQXL5RSnJ0LepCR/Cpu8EnSVhB/x8V+4GrGz8EmxnWESTay0g1QuhPoSUVAYId+rfdMdKpnruIytty5Z5m2JN
+X-Gm-Message-State: AOJu0Yyjss1+8HBom6xbwuAWaBM5Mex1rqQ9rmuOx2UrQM165C7gfC+z
+	klKok/9P1F+7ASHaN1G5gL/PAvQuaCQT07QK4c30pCMmBEDek8+PZdCoemyYn7jOmpsENGkSLYG
+	0ltaTB2igm8N3ocZ4VIhPpg1KOQA=
+X-Google-Smtp-Source: AGHT+IHB5YT5XqnR4lG46K5RH2swPEZn3XC4R+DJ+LKw1MjUenLgfADqv67Pq44U3Ej0iYW+3M14k/7z/ckqAY4N/XU=
+X-Received: by 2002:a17:90a:604e:b0:2bd:f1d5:8e3e with SMTP id
+ 98e67ed59e1d1-2c86146c80emr2850938a91.35.1719230394874; Mon, 24 Jun 2024
+ 04:59:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240623170933.63864-1-aford173@gmail.com> <3f970d67-5f14-428e-b8ea-02c62e1b5f82@kernel.org>
+In-Reply-To: <3f970d67-5f14-428e-b8ea-02c62e1b5f82@kernel.org>
+From: Adam Ford <aford173@gmail.com>
+Date: Mon, 24 Jun 2024 06:59:43 -0500
+Message-ID: <CAHCN7xKTnbDec2uJu0vJMY-NMTDvhb=C_FPM+5QeDNBwwRgZeA@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: net: davinci_emac: Convert to yaml version
+ from txt
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: devicetree@vger.kernel.org, woods.technical@gmail.com, 
+	aford@beaconembedded.com, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Adam Ford <aford@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Samuel Dobron <sdobron@redhat.com> writes:
-
->> It looks like this is known since March, was this ever reported to Nvidia back
->> then? :/
+On Mon, Jun 24, 2024 at 12:07=E2=80=AFAM Krzysztof Kozlowski <krzk@kernel.o=
+rg> wrote:
 >
-> Not sure if that's a question for me, I was told, filling an issue in
-> Bugzilla/Jira is where
-> our competences end. Who is supposed to report it to them?
+> On 23/06/2024 19:09, Adam Ford wrote:
+> > The davinci_emac is used by several devices which are still maintained,
+> > but to make some improvements, it's necessary to convert from txt to ya=
+ml.
+> >
+> > Signed-off-by: Adam Ford <aford173@gmail.com>
+> >
+> > diff --git a/Documentation/devicetree/bindings/net/davinci_emac.txt b/D=
+ocumentation/devicetree/bindings/net/davinci_emac.txt
+> > deleted file mode 100644
+> > index 5e3579e72e2d..000000000000
+> > --- a/Documentation/devicetree/bindings/net/davinci_emac.txt
+> > +++ /dev/null
+> > @@ -1,44 +0,0 @@
+> > -* Texas Instruments Davinci EMAC
+> > -
+> > -This file provides information, what the device node
+> > -for the davinci_emac interface contains.
+> > -
+> > -Required properties:
+> > -- compatible: "ti,davinci-dm6467-emac", "ti,am3517-emac" or
+> > -  "ti,dm816-emac"
+> > -- reg: Offset and length of the register set for the device
+> > -- ti,davinci-ctrl-reg-offset: offset to control register
+> > -- ti,davinci-ctrl-mod-reg-offset: offset to control module register
+> > -- ti,davinci-ctrl-ram-offset: offset to control module ram
+> > -- ti,davinci-ctrl-ram-size: size of control module ram
+> > -- interrupts: interrupt mapping for the davinci emac interrupts source=
+s:
+> > -              4 sources: <Receive Threshold Interrupt
+> > -                       Receive Interrupt
+> > -                       Transmit Interrupt
+> > -                       Miscellaneous Interrupt>
+> > -
+> > -Optional properties:
+> > -- phy-handle: See ethernet.txt file in the same directory.
+> > -              If absent, davinci_emac driver defaults to 100/FULL.
+> > -- ti,davinci-rmii-en: 1 byte, 1 means use RMII
+> > -- ti,davinci-no-bd-ram: boolean, does EMAC have BD RAM?
+> > -
+> > -The MAC address will be determined using the optional properties
+> > -defined in ethernet.txt.
+> > -
+> > -Example (enbw_cmc board):
+> > -     eth0: emac@1e20000 {
+> > -             compatible =3D "ti,davinci-dm6467-emac";
+> > -             reg =3D <0x220000 0x4000>;
+> > -             ti,davinci-ctrl-reg-offset =3D <0x3000>;
+> > -             ti,davinci-ctrl-mod-reg-offset =3D <0x2000>;
+> > -             ti,davinci-ctrl-ram-offset =3D <0>;
+> > -             ti,davinci-ctrl-ram-size =3D <0x2000>;
+> > -             local-mac-address =3D [ 00 00 00 00 00 00 ];
+> > -             interrupts =3D <33
+> > -                             34
+> > -                             35
+> > -                             36
+> > -                             >;
+> > -             interrupt-parent =3D <&intc>;
+> > -     };
+> > diff --git a/Documentation/devicetree/bindings/net/davinci_emac.yaml b/=
+Documentation/devicetree/bindings/net/davinci_emac.yaml
+> > new file mode 100644
+> > index 000000000000..4c2640aef8a1
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/davinci_emac.yaml
+>
+> Filename matching compatible format. Missing vendor prefix. Underscores
+> are not used in names or compatibles.
 
-I don't think we have a formal reporting procedure, but I was planning
-to send this to the list, referencing the Bugzilla entry. Seems I
-dropped the ball on that; sorry! :(
+Thank you for the review.
 
-Can we set up a better reporting procedure for this going forward? A
-mailing list, or just a name we can put in reports? Or something else?
-Tariq, any preferences?
+Would a proper name be ti,davinci-emac.yaml?
 
--Toke
+>
+>
+> > @@ -0,0 +1,111 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/davinci_emac.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Texas Instruments Davici EMAC
+> > +
+> > +maintainers:
+> > +  - Adam Ford <aford@gmail.com>
+> > +
+> > +description:
+> > +  Ethernet based on the Programmable Real-Time Unit and Industrial
+> > +  Communication Subsystem.
+> > +
+> > +allOf:
+> > +  - $ref: ethernet-controller.yaml#
+> > +
+> > +properties:
+> > +  compatible:
+> > +    items:
+>
+>
+> That's just enum, no need for items here.
+>
+> > +      - enum:
+> > +          - ti,davinci-dm6467-emac # da850
+> > +          - ti,dm816-emac
+> > +          - ti,am3517-emac
+> > +
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  interrupts:
+> > +    minItems: 4
+>
+> You need to list and describe the items.
+>
+> > +
+> > +  clocks:
+> > +    maxItems: 1
+> > +
+> > +  clock-names:
+> > +    items:
+> > +      - const: ick
+> > +
+> > +  power-domains:
+> > +    maxItems: 1
+> > +
+> > +  resets:
+> > +    maxItems: 1
+> > +
+> > +  local-mac-address: true
+>
+> Drop
+>
+> > +  mac-address: true
+>
+> Drop
+>
+> You miss top-level $ref to appropriate schema.
+>
+> > +
+> > +  syscon:
+> > +    $ref: /schemas/types.yaml#/definitions/phandle
+> > +    description: a phandle to the global system controller on
+> > +      to enable/disable interrupts
+>
+> Drop entire property. There was no such property in old binding and
+> nothing explains why it was added.
 
+The am3517.dtsi emac node has a syscon, so I didn't want to break it.
+I'll take a look to see what the syscon node on the am3517 does.  I
+struggle with if statements in yaml, but if it's necessary for the
+am3517, can we keep it if I elaborate on it in the commit message?
+>
+> > +
+> > +  ti,davinci-ctrl-reg-offset:
+> > +    $ref: /schemas/types.yaml#/definitions/uint32
+> > +    description:
+> > +      Offset to control register
+> > +
+> > +  ti,davinci-ctrl-mod-reg-offset:
+> > +    $ref: /schemas/types.yaml#/definitions/uint32
+> > +    description:
+> > +      Offset to control module register
+> > +
+> > +  ti,davinci-ctrl-ram-offset:
+> > +    $ref: /schemas/types.yaml#/definitions/uint32
+> > +    description:
+> > +      Offset to control module ram
+> > +
+> > +  ti,davinci-ctrl-ram-size:
+> > +    $ref: /schemas/types.yaml#/definitions/uint32
+> > +    description:
+> > +      Size of control module ram
+> > +
+> > +  ti,davinci-rmii-en:
+> > +    $ref: /schemas/types.yaml#/definitions/uint8
+> > +    description:
+> > +      RMII enable means use RMII
+> > +
+> > +  ti,davinci-no-bd-ram:
+> > +    type: boolean
+> > +    description:
+> > +      Enable if EMAC have BD RAM
+> > +
+> > +additionalProperties: false
+>
+> Look at example-schema. This goes after required, although anyway should
+> be unevaluatedProperties after adding proper $ref.
+>
+> > +
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +  - interrupts
+> > +  - clocks
+> > +  - ti,davinci-ctrl-reg-offset
+> > +  - ti,davinci-ctrl-mod-reg-offset
+> > +  - ti,davinci-ctrl-ram-offset
+> > +  - ti,davinci-ctrl-ram-size
+> > +
+> > +examples:
+> > +  - |
+> > +    eth0: ethernet@220000 {
+>
+> Drop label.
+>
+> > +      compatible =3D "ti,davinci-dm6467-emac";
+> > +      reg =3D <0x220000 0x4000>;
+> > +      ti,davinci-ctrl-reg-offset =3D <0x3000>;
+> > +      ti,davinci-ctrl-mod-reg-offset =3D <0x2000>;
+> > +      ti,davinci-ctrl-ram-offset =3D <0>;
+> > +      ti,davinci-ctrl-ram-size =3D <0x2000>;
+> > +      local-mac-address =3D [ 00 00 00 00 00 00 ];
+> > +      interrupts =3D <33>, <34>, <35>,<36>;
+> > +      clocks =3D <&psc1 5>;
+> > +      power-domains =3D <&psc1 5>;
+> > +      status =3D "disabled";
+>
+> Drop. It cannot be disabled, otherwise what would be the point of this
+> example?
+
+Sorry, I copy-pasted this from the da850.dtsi node.  I'll remove the
+label and the status line.
+>
+>
+> Best regards,
+> Krzysztof
+>
 
