@@ -1,146 +1,143 @@
-Return-Path: <netdev+bounces-106230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74C48915624
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 20:00:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BFDF91562F
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 20:05:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27A1228D465
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 18:00:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B3E61C20B10
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 18:05:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AB319ADA1;
-	Mon, 24 Jun 2024 18:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4BB19DF94;
+	Mon, 24 Jun 2024 18:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iM8gTWf2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1jKz14bU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19831182B2;
-	Mon, 24 Jun 2024 18:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C277C182B2
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 18:05:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719252054; cv=none; b=di9/Vfpg1YR5XuzA09uXtmDx9xeBD+W17zG59qG6AS8QnqoADhu/CzSU8kFu1n59NneSgY2tBHaTZi1096a2dOukjbwzFtsTazOgcua/WP1rA6Am16+4SSTbq6d/yBFJUx40OM6Qioj8iHYpEd4uPxQQHuZt3zf/2xLHLX7KY+Y=
+	t=1719252308; cv=none; b=L2dktYlopQzJBwgb1RDahVVbcLWupxNcKMzEtE+Ou8RZ7FNeKbe5HzINGSjpuAwx0mimeYOv3dfJmCVVHZH6O0hv8LCxolqoGwMZBv8vWftkwZKrRzmysZIBt2QIqhdFcmmpA0J31iUO10mmsoSWPU/ja0WDcRcGfkrLuQaF0sQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719252054; c=relaxed/simple;
-	bh=2+rWco3zjx9eoYZtRJyYjuTVifGdlskumaDhQmygHso=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K28iwvkIUetw0Ddjjh41wEp8KOrV4iCjkX8lF1OCpv9LWZClUDwVB4RXRene2H7RskHX6YSwtRcEjsdohaH5G69lsPkp4DjPdP3aqUEMk9t/2CJb3Mw3bPv+TtAlrRe6c7YCS7S67tSUphYwwDsvI36B+PUTYY/1ly0gkVxymhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iM8gTWf2; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7066463c841so1625348b3a.1;
-        Mon, 24 Jun 2024 11:00:52 -0700 (PDT)
+	s=arc-20240116; t=1719252308; c=relaxed/simple;
+	bh=25Dq88jBB2CkOkDL/JBMijQofHLFLsFy3IjegoNUwPs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KDMTJGfRpBo1VQUO5V5tlkJ49zCIV2m3JBcQRfEEUqbrtpma7xwpEujFTfRJPduRpQMJJ8M9bHPsos2vS5mMHRTvbADLgnLGbijwwDYQ0jbjVfuZVUMlsyS+1kyoZ1/thvjMWX+WAr5HGveMWTAetaJiEC1j52YTsm6sSqUlFCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1jKz14bU; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-57a16f4b8bfso1530a12.0
+        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 11:05:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719252052; x=1719856852; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Sya32zh6rlTi+rX0XJSzUKROEQWEvMEkDKstbuTkhuk=;
-        b=iM8gTWf2B6okSNRaLN05K5iMIJujmh++WJfmPfmq4SCUIFx3ET1ICi9TXScm6/tfw9
-         UsLXI+nVmXeF7xGpe/2uBQEirDKkOWjnIIJ6N6yxHMJ39WRVMoYAanUaGmz8JYhA1Que
-         JJlBe9R5aieMQ2U/PuL8sc8fjFv1uT808Tu0rzk3pjja7Eoj2toqZdoJTn7pjQhufAb8
-         9dd/if9WxR7W/nGT1dnKBg8tQ9EB8hU4rvl6U6BSZ3mfR9tEq3GUMEq6z3WXWtf05qCO
-         dHSAwVYUUhJMFjmFSotSYqQBdQXDWv/wFBfEUi/2wsbMUqmCgdf7mAW/qPidGTRgwGHU
-         mJqQ==
+        d=google.com; s=20230601; t=1719252305; x=1719857105; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=iU6twMwsLTVUU1XIizoid6hKLyQKsxMvfVST/Ybsw4I=;
+        b=1jKz14bUJhRtI/R7TboUJ13JcAA3zEIU0O88a/SDoKF9Q22WQeXAIsSODATi2MKDFu
+         2iKvFbsRt2PI2MZj4sMwJ7Cwy7jlMVnm03ruzHC0ngiLtpew4oa/m9pzGOZpbdyymk3j
+         Mu0tTLMqQXtR3RdfC6ibkXtQaPDapkZ7nmurLk/91PRLFsoBQRhmcKbNnhXxtA7Huqu8
+         1n79wKefGNYHxvAoJRPDypBWu7iXMdsO1M7Ms/ZivcQUmshpO/6ifHvaqdFeD+nzOjqe
+         thFuv7AIASgOFJzhdyHoxMJ7HlaV/wWnOoPJWIzdQP7lZsAFKDwmNpZMJ6LIUOq2mvQ8
+         Yr5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719252052; x=1719856852;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Sya32zh6rlTi+rX0XJSzUKROEQWEvMEkDKstbuTkhuk=;
-        b=ohdQCAUzcfld5OP2oujuSp0K3Zitcisbh7rmxAD+oeFDSTvKz4s/Pl4LwFeG2zJx51
-         G0eiFMKdkNfXqAl22Ao1LbizV15ovfPOxnkVG/FJaxwn7yUonPVzZqNFqQgYeKZSAu6l
-         HN+Gcm7FnYddouNc44kDAGyHp6CXTj8U32vTIwIwfASao5i4kF6xIKidOeYaYGxmgDfW
-         bCRYALGZfa9NXo9JLKjI0a9005ql3ZEa1L/MvAnRZ92CJswTE/zgk2xW06OfmsXc88bq
-         7WvJ1K170AD4Cp29fdDIoo+t7BTki1riaJNVK0Ejk1if2mgR5v+Rncu+XeXOxQJrI74U
-         pPWg==
-X-Forwarded-Encrypted: i=1; AJvYcCVx96Q7IbiEfz+Fa9kTVlE1PVoyZGk5Z1CN1SAxVXL0YeR4nZTs3b3Ib3GGGsllYbQbB7CGdxrfGWn0gQ4r8Fj9ScOAyX0kUE7JU6xl4X6alcxKHojIRKtlUdRj6Wxamy3JBQ==
-X-Gm-Message-State: AOJu0YxTBMBSzqiDf7Hh1rmmXq7DUveFbvhu6w6aVAap7HL5TXnTOic+
-	SRu2SUYkvE4bVOHCqrio+jjlJklH3WrJV7U17rK8T82H69VulOOq
-X-Google-Smtp-Source: AGHT+IE+K1phdY5GT30UHXgU3WZqrmc5gCxbnU2koonmdTNPFJlh5LHz8q1SXDPLzxEatxjM4VVX2g==
-X-Received: by 2002:aa7:908f:0:b0:705:bc32:5357 with SMTP id d2e1a72fcca58-7067459c765mr5040693b3a.1.1719252052132;
-        Mon, 24 Jun 2024 11:00:52 -0700 (PDT)
-Received: from [192.168.50.95] ([118.32.98.101])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-717e1cdf921sm5241071a12.43.2024.06.24.11.00.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jun 2024 11:00:51 -0700 (PDT)
-Message-ID: <880a70f0-89d6-4094-8a71-a9c331bab1ee@gmail.com>
-Date: Tue, 25 Jun 2024 03:00:47 +0900
+        d=1e100.net; s=20230601; t=1719252305; x=1719857105;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iU6twMwsLTVUU1XIizoid6hKLyQKsxMvfVST/Ybsw4I=;
+        b=hmb3QSj6KtxBShvwZJrmRghiP8WLtZoCjuaQH/jNlctR3NCheK3gUBMJ5F2WC4sHo9
+         D84/4F8cVYHa1mUGFTKYIoiCjiTvQYo+BpVeEBB6ygG7Q2MRimy57iFbGyAqda45A8pd
+         RH+KbUF2Pyd5TIjUnAt0niE/P2WeXMqxjDLZGNmDB1CeW4a8TVTXHh9JeVzanfuiI+Fv
+         7VszoTW7uFr49X9vx/73Xwjw8x8oeIWS6ABM5eMQfv8KbOmeG02XvzeqkZjJHYT+9urI
+         Q5mwqT2MZvo1Tc+JvicTRDPuJZ9p5ye57+GF/gEkqApDSIPIExFnxsx3h8E9eRUU3/jw
+         5PyA==
+X-Forwarded-Encrypted: i=1; AJvYcCWcrqzW4yiQqJKFyou3AyNuq7sTbu5mupTMcachZz6wsBrPr38qd+oL0ePE16ByUB+6z0sL+agfZyFV8D5dTxxeudT5MaaB
+X-Gm-Message-State: AOJu0YzIt6d4zzHlSuvK4oNRD0WEcn93PpwiI2Ll+jPZSndxx4vnUIgy
+	DTYI4cEtaqDli7EwngHMoFJs/vc9tKipkl9qay7ky7UpbqbNrcaGGf6p30Y9Gl4DuzZpmQFNMfS
+	MipuqMbdAB6dAnxbY+Owqi57kGYXkawfnbNo=
+X-Google-Smtp-Source: AGHT+IH5Y7rUe3HGR92ggNIqhjJ6oN6APNDpcnfWRdAWF9v82nPgkswGoUuk1iuaf6Hb2+YP+rxpC7Z0nldf36iS1/E=
+X-Received: by 2002:a05:6402:348d:b0:57d:6e52:fff6 with SMTP id
+ 4fb4d7f45d1cf-57de4b68f0bmr4244a12.5.1719252304903; Mon, 24 Jun 2024 11:05:04
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] s390/netiucv: handle memory allocation failure in
- conn_action_start()
-To: Markus Elfring <Markus.Elfring@web.de>, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
- Alexandra Winter <wintera@linux.ibm.com>,
- =?UTF-8?Q?Christian_Borntr=C3=A4ger?= <borntraeger@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>,
- Thorsten Winkler <twinkler@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, MichelleJin <shjy180909@gmail.com>
-References: <20240623131154.36458-2-yskelg@gmail.com>
- <bb03a384-b2c4-438f-b36b-a4af33a95b60@web.de>
-Content-Language: en-US
-From: Yunseong Kim <yskelg@gmail.com>
-In-Reply-To: <bb03a384-b2c4-438f-b36b-a4af33a95b60@web.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240620181736.1270455-1-yabinc@google.com> <CAKwvOd=ZKS9LbJExCp8vrV9kLDE_Ew+mRcFH5-sYRW_2=sBiig@mail.gmail.com>
+ <ZnVe5JBIBGoOrk5w@gondor.apana.org.au> <CAHk-=wgubtUrE=YcvHvRkUX7ii8QHPNCJ_0Gc+3tQOw+rL1DSg@mail.gmail.com>
+ <CAHk-=wiBbJLWOJxoz7srMPtKcN7+9cEh79fzf8GKXTJyRdk=tw@mail.gmail.com>
+In-Reply-To: <CAHk-=wiBbJLWOJxoz7srMPtKcN7+9cEh79fzf8GKXTJyRdk=tw@mail.gmail.com>
+From: Yabin Cui <yabinc@google.com>
+Date: Mon, 24 Jun 2024 11:04:51 -0700
+Message-ID: <CALJ9ZPMHCPt-6kf-9McdKYTqs8Vrj9GLhkxObdhjyorgtZQOSg@mail.gmail.com>
+Subject: Re: [PATCH] Fix initializing a static union variable
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Steffen Klassert <steffen.klassert@secunet.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Markus,
+> In other words, in the kernel we simply depend on initializers working
+> reliably and fully. Partly because we've literally been told by
+> compiler people that that is what we should do.
+>
+> So no, this is not about empty initializers. And this is not about
+> some C standard verbiage.
+>
+> This is literally about "the linux kernel expects initializers to
+> FULLY initialize variables". Padding, other union members, you name
+> it.
+>
+> If clang doesn't do that, then clang is buggy as far as the kernel is
+> concerned, and no amount of standards reading is relevant.
+>
+> And in particular, no amount of "but empty initializer" is relevant.
+>
 
-On 6/23/24 11:27 오후, Markus Elfring wrote:
->> This patch handle potential null pointer dereference in
->> iucv_path_connect(), When iucv_path_alloc() fails to allocate memory
->> for 'rc'.
-> 
-> 1. Can a wording approach (like the following) be a better change description?
-> 
->    A null pointer is stored in the data structure member “path” after a call
->    of the function “iucv_path_alloc” failed. This pointer was passed to
->    a subsequent call of the function “iucv_path_connect” where an undesirable
->    dereference will be performed then.
->    Thus add a corresponding return value check.
+Thanks for the detailed explanation!
+Sorry for limiting the problem to the empty initializer. I didn't
+realize the linux
+kernel also depends on zero initializing extra bytes when explicitly
+initializing
+one field of a union type.
 
-Thank you very much for your detailed code review. I will thoughtfully
-incorporate your advices into the next patch.
+> And when the union is embedded in a struct, the struct initialization
+> seems to be ok from a quick test, but I might have screwed that test
+> up.
 
-> 2. May the proposed error message be omitted
->    (because a memory allocation failure might have been reported
->    by an other function call already)?
+I also think so. But probably we need to add tests in clang to make sure
+it continues to work.
 
-I agree.
+> Hmm. Strange. godbolt says that it happens with clang 17.0.1 (and
+> earlier) with a plain -O2.
+>
+> It just doesn't happen for me. Either this got fixed already and my
+> 17.0.6 has the fix, or there's some subtle flag that my test-case uses
+> (some config file - I just use "-O2" for local testing like the
+> godbolt page did).
+>
+> But clearly godbolt does  think this happens with released clang versions too.
+>
 
-> 3. Is there a need to adjust the return type of the function “conn_action_start”?
+Yes, I also think it happens in both clang trunk and past releases, as tested in
+https://godbolt.org/z/vnGqKK43z.
+Gladly in the clang bug in
+https://github.com/llvm/llvm-project/issues/78034, no one
+is against zero initializing the whole union type.
+I feel now it's no longer important to have this patch in the kernel.
+But we need to
+fix this problem in clang and backport the fix to releases we care about.
 
-I had the same thoughts while writing the code. Thank you!
-
-> 4. Would you like to add any tags (like “Fixes”) accordingly?
-
-Yes, I will refer to the mailing list and include the fix tag.
-
-> 5. Under which circumstances will development interests grow for increasing
->    the application of scope-based resource management?
->    https://elixir.bootlin.com/linux/v6.10-rc4/source/include/linux/cleanup.h#L8
-
-I am considering the environment in which the micro Virtual Machine
-operates and testing the s390 architecture with QEMU on my Mac M2 PC.
-I have been reviewing the code under the assumption of using a lot of
-memory and having many micro Virtual Machines loaded simultaneously.
-
-> Regards,
-> Markus
-
-I really appreciate code review Markus!
-
-
-Best regards,
-
-Yunseong Kim
+Thanks,
+Yabin
 
