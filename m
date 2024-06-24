@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-106242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC8D991572B
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 21:31:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BED2915730
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 21:32:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D3A6280A60
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 19:31:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFFC21F228BE
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 19:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DEFB19FA6F;
-	Mon, 24 Jun 2024 19:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40091A00FE;
+	Mon, 24 Jun 2024 19:32:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OqmovMIF"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tKEtzaNQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D4F13DDBD;
-	Mon, 24 Jun 2024 19:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437F51A00E2;
+	Mon, 24 Jun 2024 19:32:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719257501; cv=none; b=dBQXijrMKRQalZhFqu52UNMHWuR78UmzF+CypRgLyzmC/k6mkJ3Bk9MA1RTxSWv56QUIoo6pWD3YDBzhTeREBOCWdgy/CYWpOZUjXdB/ZgTRZk8Dp6DHhCu7TYfdyRv+jTC2ySO5GwN7Z11CA5orcpnkoAsc6kzvTjytRgd3pdY=
+	t=1719257527; cv=none; b=SzBZudYxfI58eZ3v70AxIscC7zLMzK99XEifQ0163YKi6XFX7nO4iyZcHP/jmHOO3pwNvUue2zF/26Q/0dX0DjNK3FCk7wjpDuj7U7819cUtRekQKtYL/E0Q+UB3zNAZ1ezHgcqWP3Oe6CI9tH40zJN1TbX7670N49ZA0wVj+Bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719257501; c=relaxed/simple;
-	bh=cXN+GuMgEVN9IcB4PxYeGhIe6K1JFjF9b2Z/ztihZu4=;
+	s=arc-20240116; t=1719257527; c=relaxed/simple;
+	bh=hQCiqJqyxAPMCoZUq7GJ8SLJIJrJydrlj58IGzH4M44=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BQdBkHGeSFw94mbAc6IkmRGyR9pgj/X9y0x2a0eCwXRePJXUFPKNZfckcnNZ6XC06CA5Fevnjlee55ANBXSpE/U58ZigfI7++VQip09Oj4VKT/ePryaWRsPaVliZ+8M786StdqxXCLw4B6N9jZiGb7ET8PIsA3FtxM7bQn6+Jpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OqmovMIF; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=C2fSrK38aCdwIDjyvyfn8YGMU7K3eq483iO+MP/vYVthGkQs9Att3RabrbQbeqhQDgdhEsA0Ys9dEjxWp/Y8V5akTWpPsJpBcARZyWaO/ccJnpLf8I0LXQXPdvH9RtU2Aa6Q0BZMFyGq7yLRiGnAHzVfyC7nO2XTmplrx8eSUwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tKEtzaNQ; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=g/+v11P2r0m2kK4R9zWkvWcc24KCTNtHeFrpNJIg8kk=; b=OqmovMIFeWzFk5ZhlRK4Fx6eJb
-	+a8uCF0nYnY/Gyy2HwJyCtl8XQETS/Gv3Q0xGGOxuglHZtdK1KqhPmtnzIamUIOabhHRMkMPwfedR
-	pZJnE4OIhGW34+qYlJGF9BbDudLnyxZfpa+ZiiDkQhUYeimFZYzOpMowME2eiKVX9aCw=;
+	bh=NYNKCmMuGnIqNRPKZ//fm4hSeGjYx5/U1LJRTZRk87k=; b=tKEtzaNQ2MetrNPIfPIEOtrTKr
+	30W+nUqJC8JNmPj+hnU01RpwXTHDejoANYQk84uDo0yUDxs+WuVOHAqMwx639QPvsHz278hs/5vvJ
+	BeFGfxzBQfsX93fheSSif0+RuzbcPTLe+ZBYOAPs3ozoifC9dck8Jh/HF6G9au2YMXyc=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sLpPM-000scx-OH; Mon, 24 Jun 2024 21:31:20 +0200
-Date: Mon, 24 Jun 2024 21:31:20 +0200
+	id 1sLpPt-000sds-RS; Mon, 24 Jun 2024 21:31:53 +0200
+Date: Mon, 24 Jun 2024 21:31:53 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Danielle Ratson <danieller@nvidia.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
@@ -54,11 +54,11 @@ Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
 	paul.greenwalt@intel.com, jiri@resnulli.us,
 	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
 	mlxsw@nvidia.com, idosch@nvidia.com, petrm@nvidia.com
-Subject: Re: [PATCH net-next v7 5/9] ethtool: Veto some operations during
- firmware flashing process
-Message-ID: <ba8a1fac-ad41-4ac3-a3e3-8d177b78355f@lunn.ch>
+Subject: Re: [PATCH net-next v7 6/9] net: sfp: Add more extended compliance
+ codes
+Message-ID: <cf3c0c90-45d8-44c9-b730-c6e364fb4a84@lunn.ch>
 References: <20240624175201.130522-1-danieller@nvidia.com>
- <20240624175201.130522-6-danieller@nvidia.com>
+ <20240624175201.130522-7-danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,28 +67,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240624175201.130522-6-danieller@nvidia.com>
+In-Reply-To: <20240624175201.130522-7-danieller@nvidia.com>
 
-On Mon, Jun 24, 2024 at 08:51:55PM +0300, Danielle Ratson wrote:
-> Some operations cannot be performed during the firmware flashing
-> process.
+On Mon, Jun 24, 2024 at 08:51:56PM +0300, Danielle Ratson wrote:
+> SFF-8024 is used to define various constants re-used in several SFF
+> SFP-related specifications.
 > 
-> For example:
-> 
-> - Port must be down during the whole flashing process to avoid packet loss
->   while committing reset for example.
-> 
-> - Writing to EEPROM interrupts the flashing process, so operations like
->   ethtool dump, module reset, get and set power mode should be vetoed.
-> 
-> - Split port firmware flashing should be vetoed.
-> 
-> In order to veto those scenarios, add a flag in 'struct net_device' that
-> indicates when a firmware flash is taking place on the module and use it
-> to prevent interruptions during the process.
+> Add SFF-8024 extended compliance code definitions for CMIS compliant
+> modules and use them in the next patch to determine the firmware flashing
+> work.
 > 
 > Signed-off-by: Danielle Ratson <danieller@nvidia.com>
 > Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
