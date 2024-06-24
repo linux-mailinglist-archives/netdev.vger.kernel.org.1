@@ -1,162 +1,184 @@
-Return-Path: <netdev+bounces-106191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 573E991528C
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:34:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 305EA9152BB
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:42:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B88071F21B14
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:34:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52CC0B24771
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:42:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1F1419D894;
-	Mon, 24 Jun 2024 15:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B544A19CD02;
+	Mon, 24 Jun 2024 15:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="BSIL4hQE"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="qfpsI0Km";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WfTEuxU3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from fhigh1-smtp.messagingengine.com (fhigh1-smtp.messagingengine.com [103.168.172.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01E819CD0B;
-	Mon, 24 Jun 2024 15:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D789313E024;
+	Mon, 24 Jun 2024 15:42:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719243233; cv=none; b=Gqs5Dg9sQOEx2LJ0F9jJrI07JC03qvCtZ4/3Okv8ZlsFf7tpoHt0wpS8z5O5bMVHicVosFh489cywsqrWQRUntY8xDVmZ7CSG43GZ63EmaVWbu5zee2xrSdUDUNHXSO2YVbilSObhhrRLQSAKMIM8FNET0wME6bW7Pm8iWiuqfY=
+	t=1719243750; cv=none; b=pyr0pcyHe9yT0aWhFdg1rSB0VB2zELlOfasWQkgl9ktR0jycBiKKs3314nmOZq3lTOrIKE7FQmsDJqRTiB7i+WhfHzyqVzRDNFsyW7ouS2f3Y5b/oStMeKPWhzJOnMYkQKPkGENECjDFqv+F6AQgnM7oInzDDJf5TW7BDK3+QVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719243233; c=relaxed/simple;
-	bh=UTq25U8EovFIHY7zUXQYzBJ2OaikaCJHOw7txbFc8ak=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rFX3+PluhGh+dMARjz/g0O55j8QKSnZv7fYHkse9V4VgXWW+iHjTu4nfwC1mDOo7Vm4mwtYHn9C/tR5dwVSNd3RBjLqGS2zucSqYv80y0x2z/VRaU3fTYuJ3EXzWebjG9QtyrHoaLfysmnILGPlZi/6pEche2E2S0mhYt1BbRlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=BSIL4hQE; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45OEtPKj014510;
-	Mon, 24 Jun 2024 15:33:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type
-	:content-transfer-encoding; s=corp-2023-11-20; bh=LjwTv1x14K+YU+
-	i4bv9l/35xuqtm0L02zqCA66eU4EE=; b=BSIL4hQE0BFqR1g9372u8H9iMKdxix
-	/8gMrqJAC1Hjo7Mq+DaqP5UHUefb0Q+5ZkzLnrRODHu9es1YlzUmbZzMR5an9J0w
-	jgPT9IlSBFcqwVeZKlQWTl9ubBv7eq2xlDpq1TMyry/I+oHAYDC1vCqsTuRlVnTh
-	EVgB6sYiqN1gqYl4TQ5B6AeUEf4YJrp0w4SyWp7hsxI9b3Q4XOwaQNOICxFEM6/q
-	uDlsFkPz/Dd94R+VkQgcQvFKKv8lOscjnrtuWwoUqF2IyJhVOkMQGeG31+M/U5i4
-	5oQn9DLIot5KSlBiN+ca2t/9Z8byx4CKTiZdo57l7sXhWg6Cs+9ZbKfg==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3ywp7saw6p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 24 Jun 2024 15:33:40 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 45OF61wk010772;
-	Mon, 24 Jun 2024 15:33:40 GMT
-Received: from aakhoje-ol.in.oracle.com (dhcp-10-76-47-230.vpn.oracle.com [10.76.47.230])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3ywn2ckr8e-1;
-	Mon, 24 Jun 2024 15:33:39 +0000
-From: Anand Khoje <anand.a.khoje@oracle.com>
-To: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Cc: saeedm@mellanox.com, leon@kernel.org, tariqt@nvidia.com,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        davem@davemloft.net
-Subject: [PATCH v5] net/mlx5: Reclaim max 50K pages at once
-Date: Mon, 24 Jun 2024 21:03:21 +0530
-Message-ID: <20240624153321.29834-1-anand.a.khoje@oracle.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1719243750; c=relaxed/simple;
+	bh=5JMeSmLDsLkgsIaTR6mhIXS+mNgEMglyV3WnKwkjeOE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BsQ0569+28Wqe766dvC2uw+hmIMhaVX0SRpr5knOztoQ9FvASZFKZD+OhCz9f2LItTR6ufXIvhP66DtXxVurapMIXYTKVVPVgt0q12ch/ppGSEkm9rguNccJrlR3a+Mq8BvmHzUp30fcx6/+GMGDODHV/poZIs42rTKJMFZAv38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=qfpsI0Km; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WfTEuxU3; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id B5D2A11401AE;
+	Mon, 24 Jun 2024 11:42:26 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Mon, 24 Jun 2024 11:42:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1719243746;
+	 x=1719330146; bh=UuK+dPrRUuBD9ku4mDUSLtpeCuo0xD0S3t8rztLcRiI=; b=
+	qfpsI0KmRAUZlwbCn+1R9+oP78vDyzDnPuZtpCQ4Z1muGGEq7B0qivDpjQ4/6G9H
+	dONRq6/N+wMZeZcwSVCcjOVH2SkGaFuP9DP4xtzyldTg38eJearW16QQ3YTfdnB7
+	WVbDWenLa61tphHvgs/YZs3Z2NU3oEP8t/OoUDclWj4uPpvp/Oz9mXPKLN1lNb0z
+	fZ72I/fSeWPNvwx4BlNhwilvRbGof+na1JKNZqNa/7BYbTro2+W7krVFedTNyoZt
+	a+FmnhZWjh2IWipIn8jOSvz3BZOrH8cAt0d4OQB14anTXHCet7I4+tzC9azYY8P+
+	9z6MjaNsqWcTKijvFayukg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1719243746; x=
+	1719330146; bh=UuK+dPrRUuBD9ku4mDUSLtpeCuo0xD0S3t8rztLcRiI=; b=W
+	fTEuxU3x7Fsa4F2fgMvu9yAu6d+5H/6MxxObV+nvZ5Gryg/TTM4yEkD9hj4G4A68
+	KS/pgRfkUs7TMmrImNsDlPCW5JDR0/t0pf4sft3inRAYMGATqKChsOhyQ/P2fm10
+	BCE617Y0RN+nmLtUjRbumDqs/hz9lu/sIzb/LgtG2rShhixcYX0K0IHsWQcwTAoZ
+	cyU5PMHdMctKSE/Sx7XgYsVrKjMDWreE1by/SCyI6bWBg9UIqB4NBsEGPPOYfRe0
+	qscsLUFtuua7bdzFTRTxbkzyKoshCPXVn4TJvl6gBHt1/aRFDLxQDFIJyZQ1qvpC
+	Fc3yqfNGXQQY1JuImHoIw==
+X-ME-Sender: <xms:4pN5ZkwS-5I370YnVd8O5oWKMS3iwM-6Lx7mKtpja7FfRtdDoZVH1g>
+    <xme:4pN5ZoQuXTUv4RxFHFsz7MI-3bkUeK5m-BsvQfqjo0Q0NwIE1G4AgHbKRQNJO6PdP
+    NdRZOhiBEqLX7SsFIo>
+X-ME-Received: <xmr:4pN5ZmW-h8FJs_wBxHpAVdRs8Ng1c_TbdODbBQynHffiI2EeK7SIgKdICGV_a9Odx7KK4DuWe6hBqw9T_m4HDbaUUnvP_v8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrfeeguddgleefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhk
+    lhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnh
+    gvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeefhfellefh
+    ffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvdelieenucevlhhushhtvg
+    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggv
+    rhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgv
+X-ME-Proxy: <xmx:4pN5Zig72rsHdXEg-fSaBFUwbEsRreM9Ux-h_E_8MDmHYqVPccpaJg>
+    <xmx:4pN5ZmDkNIL3jlNBdCgrx3MsYhvM7O32f2VWWNoPJCipK7TzuGZ8Lw>
+    <xmx:4pN5ZjIZGj8eEZwQPnMpF7u66XWoDI2M8mQgjf2vSniRp07dn8aKTw>
+    <xmx:4pN5ZtA3dVkNoqT54-lJOBxjoO9DStlxWnG61POixPYQ7F3oOioUDA>
+    <xmx:4pN5ZnLcEKMmVtY_PHGypXIZqbyww67Yx1ZP65yBaBbNINQeQL76v9VZ>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 24 Jun 2024 11:42:25 -0400 (EDT)
+Date: Mon, 24 Jun 2024 17:42:23 +0200
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Paul Barker <paul.barker.ct@bp.renesas.com>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] ravb: Improve ravb_hw_info instance order
+Message-ID: <20240624154223.GE3655345@ragnatech.se>
+References: <cover.1719234830.git.geert+renesas@glider.be>
+ <a76febe3737e26365a784e9193da9363f22aa550.1719234830.git.geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-24_12,2024-06-24_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
- spamscore=0 suspectscore=0 adultscore=0 phishscore=0 bulkscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2406180000 definitions=main-2406240125
-X-Proofpoint-GUID: iF7jeR9rpyYUWUuIT3ZtspPVrNHaJmbH
-X-Proofpoint-ORIG-GUID: iF7jeR9rpyYUWUuIT3ZtspPVrNHaJmbH
+In-Reply-To: <a76febe3737e26365a784e9193da9363f22aa550.1719234830.git.geert+renesas@glider.be>
 
-In non FLR context, at times CX-5 requests release of ~8 million FW pages.
-This needs humongous number of cmd mailboxes, which to be released once
-the pages are reclaimed. Release of humongous number of cmd mailboxes is
-consuming cpu time running into many seconds. Which with non preemptible
-kernels is leading to critical process starving on that cpu’s RQ.
-To alleviate this, this change restricts the total number of pages
-a worker will try to reclaim maximum 50K pages in one go.
-The limit 50K is aligned with the current firmware capacity/limit of
-releasing 50K pages at once per MLX5_CMD_OP_MANAGE_PAGES + MLX5_PAGES_TAKE
-device command.
+Hi Geert,
 
-Our tests have shown significant benefit of this change in terms of
-time consumed by dma_pool_free().
-During a test where an event was raised by HCA
-to release 1.3 Million pages, following observations were made:
+Thanks for your work.
 
-- Without this change:
-Number of mailbox messages allocated was around 20K, to accommodate
-the DMA addresses of 1.3 million pages.
-The average time spent by dma_pool_free() to free the DMA pool is between
-16 usec to 32 usec.
-           value  ------------- Distribution ------------- count
-             256 |                                         0
-             512 |@                                        287
-            1024 |@@@                                      1332
-            2048 |@                                        656
-            4096 |@@@@@                                    2599
-            8192 |@@@@@@@@@@                               4755
-           16384 |@@@@@@@@@@@@@@@                          7545
-           32768 |@@@@@                                    2501
-           65536 |                                         0
+On 2024-06-24 15:25:24 +0200, Geert Uytterhoeven wrote:
+> Move ravb_gen2_hw_info before ravb_gen3_hw_info to match
+> ravb_match_table[] order.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-- With this change:
-Number of mailbox messages allocated was around 800; this was to
-accommodate DMA addresses of only 50K pages.
-The average time spent by dma_pool_free() to free the DMA pool in this case
-lies between 1 usec to 2 usec.
-           value  ------------- Distribution ------------- count
-             256 |                                         0
-             512 |@@@@@@@@@@@@@@@@@@                       346
-            1024 |@@@@@@@@@@@@@@@@@@@@@@                   435
-            2048 |                                         0
-            4096 |                                         0
-            8192 |                                         1
-           16384 |                                         0
+Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 
-Signed-off-by: Anand Khoje <anand.a.khoje@oracle.com>
----
-Changes in v5:
-  - Made changes as per a suggestion from Leon.
----
+> ---
+> v2:
+>   - New.
+> ---
+>  drivers/net/ethernet/renesas/ravb_main.c | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index c1546b916e4ef581..974e0bb9da1947f2 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -2652,7 +2652,7 @@ static int ravb_mdio_release(struct ravb_private *priv)
+>  	return 0;
+>  }
+>  
+> -static const struct ravb_hw_info ravb_gen3_hw_info = {
+> +static const struct ravb_hw_info ravb_gen2_hw_info = {
+>  	.receive = ravb_rx_rcar,
+>  	.set_rate = ravb_set_rate_rcar,
+>  	.set_feature = ravb_set_features_rcar,
+> @@ -2668,16 +2668,13 @@ static const struct ravb_hw_info ravb_gen3_hw_info = {
+>  	.rx_buffer_size = SZ_2K +
+>  			  SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
+>  	.rx_desc_size = sizeof(struct ravb_ex_rx_desc),
+> -	.internal_delay = 1,
+> -	.tx_counters = 1,
+> -	.multi_irqs = 1,
+> -	.irq_en_dis = 1,
+> -	.ccc_gac = 1,
+> +	.aligned_tx = 1,
+> +	.gptp = 1,
+>  	.nc_queues = 1,
+>  	.magic_pkt = 1,
+>  };
+>  
+> -static const struct ravb_hw_info ravb_gen2_hw_info = {
+> +static const struct ravb_hw_info ravb_gen3_hw_info = {
+>  	.receive = ravb_rx_rcar,
+>  	.set_rate = ravb_set_rate_rcar,
+>  	.set_feature = ravb_set_features_rcar,
+> @@ -2693,8 +2690,11 @@ static const struct ravb_hw_info ravb_gen2_hw_info = {
+>  	.rx_buffer_size = SZ_2K +
+>  			  SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
+>  	.rx_desc_size = sizeof(struct ravb_ex_rx_desc),
+> -	.aligned_tx = 1,
+> -	.gptp = 1,
+> +	.internal_delay = 1,
+> +	.tx_counters = 1,
+> +	.multi_irqs = 1,
+> +	.irq_en_dis = 1,
+> +	.ccc_gac = 1,
+>  	.nc_queues = 1,
+>  	.magic_pkt = 1,
+>  };
+> -- 
+> 2.34.1
+> 
 
- drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-index d894a88..1fc583b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-@@ -608,6 +608,7 @@ enum {
- 	RELEASE_ALL_PAGES_MASK = 0x4000,
- };
- 
-+#define MAX_RECLAIM_NPAGES -50000
- static int req_pages_handler(struct notifier_block *nb,
- 			     unsigned long type, void *data)
- {
-@@ -639,7 +640,7 @@ static int req_pages_handler(struct notifier_block *nb,
- 
- 	req->dev = dev;
- 	req->func_id = func_id;
--	req->npages = npages;
-+	req->npages = max_t(s32, npages, MAX_RECLAIM_NPAGES);
- 	req->ec_function = ec_function;
- 	req->release_all = release_all;
- 	INIT_WORK(&req->work, pages_work_handler);
 -- 
-1.8.3.1
-
+Kind Regards,
+Niklas Söderlund
 
