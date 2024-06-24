@@ -1,283 +1,181 @@
-Return-Path: <netdev+bounces-106050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6865A914778
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 12:28:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B099914780
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 12:29:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1235B22388
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 10:27:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0F151F20F63
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 10:29:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B24F13049E;
-	Mon, 24 Jun 2024 10:27:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oz4VjPee"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2301369A3;
+	Mon, 24 Jun 2024 10:29:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE6B40BF5
-	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 10:27:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8E073BBF2;
+	Mon, 24 Jun 2024 10:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719224875; cv=none; b=Xb90X9qHTaiczZ3IN6i1M7K2q5Vt/7B+Qidxmc5J44BQmqYnoWX2q6hVyf3zbp15JFONEEWwCoDS3xrHaCbr8a+UdMfYUE66QzO4zDxdSmJP9bH7od07Gie6qtChc0UsXK0gfgTGqhHBhihsLKR1f1rn1/ByJvieClmPwS9Rk9g=
+	t=1719224969; cv=none; b=l8/uk3HGKgUZIReZccM49WjzrOZ816HLRTB5D4pR9cEWEhZ6ibdYMmHu6e/GlAY9ssaGss8CkUcQ5nC9N/W/XWutF12s2IAyRFPPJykrPjUdIAdtiPNOayviOp7q6CiANdvj+bQo18pD/9w07hV2KUeX7DIrG/Xj0OGXnq8LkoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719224875; c=relaxed/simple;
-	bh=NWx14Ny1Soc9A6jsS6xyXOirDK9z1JLf9jWdnrkTqD0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ifm6d8tb3sSZwcJbIpWf/oJL/D3pULRJAHgezMnVikRc/eMRMzQeag+w/iHhP8x5TBAsZJEleCT9PJeQ8TOMzjJN5D7aaz6plcUi6eI+IBwesHdAKsqMueiCG2o+pZ+rm1T+PKVJDI8VM22r7MFkz8JWo1qwTgRU6iynLSdbT2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oz4VjPee; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8321C2BBFC;
-	Mon, 24 Jun 2024 10:27:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719224875;
-	bh=NWx14Ny1Soc9A6jsS6xyXOirDK9z1JLf9jWdnrkTqD0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Oz4VjPeeG1n6QYkJ7AMu02ou/qsR1O7Tr99fcy2fTRjGwvcbcd2ftEDJ1pGi/wQ/y
-	 vE2JypuROTpohbYTrS/Nt0nhpI4gpAbIXfIvMrf30WqHrkdkfWSsaLNjlDBJxUyrOO
-	 WVLkxF1rvOSMwvAMXx2FyQZiDRWYNxeUMWb5RPkzz7CWMkmvQ5R7KoeYJfQowX6tbi
-	 cWoHgL/2Y3RUEjU/S65BvjrC6NcK7zcb2bGU9C63rjBR46DbpAwU2pjFNDlVRBsd/6
-	 Lj5/kHyqx2DvvSATvoE17aqDFJRDkGXlBHWCaE51fTQ9yCGqv0iek0B6rhjyiF1gvg
-	 38HmzEALicQSA==
-Date: Mon, 24 Jun 2024 13:27:51 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Jianbo Liu <jianbol@nvidia.com>, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 ipsec] xfrm: Fix unregister netdevice hang on hardware
- offload.
-Message-ID: <20240624102751.GE29266@unreal>
-References: <ZnPQfG3qsSkAW2VM@gauss3.secunet.de>
+	s=arc-20240116; t=1719224969; c=relaxed/simple;
+	bh=ID6uC1394q/rVuz5Y38/BcmRBkkatT0DyixIDFXXCrM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GU7HyBAmfLGG/Hucmp8wx8NJZ1MPGVANyH5RO6+HAxJW3EjBDLUt3/G4fQ/QWVFnFYlZBzNLk+8uhPxV3lHlmQhRCrY+Ex4X0iPT8/cYIUXCwOTs4nlIgGB+abcJ3rpOL0bSt1vo3vHbOf7Dh9Z/eJk0opj5MkA1uPrECgExJeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a724b3a32d2so118432566b.2;
+        Mon, 24 Jun 2024 03:29:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719224966; x=1719829766;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nyY2ZZiHme00HbBe8pGYRA6yVdo7lRrAai+PoMjkalc=;
+        b=JF/bj3UVEIlMKPcPeDV3asOxxpJnGG2rCqzPNBkzhnA5GjJd4LqHhvJyejqrYKVkdA
+         1V/NKu2qVC41dKklSzlKwtiSItMc1DJW7/VnFwarvCAn4I0z2CI1rbr/KGJSn7OwfyX0
+         xa8emacVyVmm0J5M4cqE1qg0MJ7vgXtp6Qp/KjpFGLxY27f3ou3TkzXtgKeEWasXxLuL
+         EBi8u7lbrAl0W6gMUykvqFHYZSyNctQxy78KXRLUSFfSOZWqYE9Wy8SH1ADgPKTFaA5X
+         BEDNObeiUvgb3tLrahPqCz8IcBaXwUlK/DDzRnhPjCygu9OztBT+F4ChHWBCVYh9w3Dy
+         9GXA==
+X-Forwarded-Encrypted: i=1; AJvYcCUV9BxQUA1yGJCjyxKao9EvZZj59bQrSiCLcybcqO9EElE6+IHUPxiF0Z4gBp+4rZRHoPJqs/Uhvo7yOgtVyss/s8Nd6b2/bU6QZukH/m/PvBQeXmmpAeDHRR0QADQdOIkfsEdx
+X-Gm-Message-State: AOJu0Yw+fj0dmsUkS+15FiUeS3SBvmiRR7tSaqNQWhCQO1FoAn+cD9Qb
+	HOYCcQmpHlGCTD3RqqfWolKzXrWX3TXsHXRx0nWIW+WdstApakEf
+X-Google-Smtp-Source: AGHT+IFvaj7d8f/TKbBcTbx/Me9SR9bDVUuO5uBmoAvYJ1+v2T9aT/ellVN4L4y09upWMQDrgA+JeQ==
+X-Received: by 2002:a17:907:cb85:b0:a72:46f3:ffc8 with SMTP id a640c23a62f3a-a7246f40067mr281037066b.29.1719224965698;
+        Mon, 24 Jun 2024 03:29:25 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a71ddbd3479sm240836966b.189.2024.06.24.03.29.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jun 2024 03:29:25 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: Sunil Goutham <sgoutham@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: horms@kernel.org,
+	linux-arm-kernel@lists.infradead.org (moderated list:ARM/CAVIUM THUNDER NETWORK DRIVER),
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] net: thunderx: Unembed netdev structure
+Date: Mon, 24 Jun 2024 03:29:18 -0700
+Message-ID: <20240624102919.4016797-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZnPQfG3qsSkAW2VM@gauss3.secunet.de>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jun 20, 2024 at 08:47:24AM +0200, Steffen Klassert wrote:
-> When offloading xfrm states to hardware, the offloading
-> device is attached to the skbs secpath. If a skb is free
-> is deferred, an unregister netdevice hangs because the
-> netdevice is still refcounted.
-> 
-> Fix this by removing the netdevice from the xfrm states
-> when the netdevice is unregistered. To find all xfrm states
-> that need to be cleared we add another list where skbs
-> linked to that are unlinked from the lists (deleted)
-> but not yet freed.
-> 
-> Changes in v2:
-> 
-> - Fix build with CONFIG_XFRM_OFFLOAD disabled.
-> - Fix two typos in the commit message.
+Embedding net_device into structures prohibits the usage of flexible
+arrays in the net_device structure. For more details, see the discussion
+at [1].
 
-Changelog should be after "---" trailer marker.
+Un-embed the net_devices from struct lmac by converting them
+into pointers, and allocating them dynamically. Use the leverage
+alloc_netdev() to allocate the net_device object at
+bgx_lmac_enable().
 
-Thanks
+The free of the device occurs at bgx_lmac_disable().
 
-> 
-> Fixes: d77e38e612a0 ("xfrm: Add an IPsec hardware offloading API")
-> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
-> ---
->  include/net/xfrm.h    | 36 +++++++------------------
->  net/xfrm/xfrm_state.c | 61 +++++++++++++++++++++++++++++++++++++++++--
->  2 files changed, 69 insertions(+), 28 deletions(-)
-> 
-> diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-> index 77ebf5bcf0b9..7d4c2235252c 100644
-> --- a/include/net/xfrm.h
-> +++ b/include/net/xfrm.h
-> @@ -178,7 +178,10 @@ struct xfrm_state {
->  		struct hlist_node	gclist;
->  		struct hlist_node	bydst;
->  	};
-> -	struct hlist_node	bysrc;
-> +	union {
-> +		struct hlist_node	dev_gclist;
-> +		struct hlist_node	bysrc;
-> +	};
->  	struct hlist_node	byspi;
->  	struct hlist_node	byseq;
->  
-> @@ -1588,7 +1591,7 @@ void xfrm_state_update_stats(struct net *net);
->  static inline void xfrm_dev_state_update_stats(struct xfrm_state *x)
->  {
->  	struct xfrm_dev_offload *xdo = &x->xso;
-> -	struct net_device *dev = xdo->dev;
-> +	struct net_device *dev = READ_ONCE(xdo->dev);
->  
->  	if (dev && dev->xfrmdev_ops &&
->  	    dev->xfrmdev_ops->xdo_dev_state_update_stats)
-> @@ -1946,13 +1949,16 @@ int xfrm_dev_policy_add(struct net *net, struct xfrm_policy *xp,
->  			struct xfrm_user_offload *xuo, u8 dir,
->  			struct netlink_ext_ack *extack);
->  bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x);
-> +void xfrm_dev_state_delete(struct xfrm_state *x);
-> +void xfrm_dev_state_free(struct xfrm_state *x);
->  
->  static inline void xfrm_dev_state_advance_esn(struct xfrm_state *x)
->  {
->  	struct xfrm_dev_offload *xso = &x->xso;
-> +	struct net_device *dev = READ_ONCE(xso->dev);
->  
-> -	if (xso->dev && xso->dev->xfrmdev_ops->xdo_dev_state_advance_esn)
-> -		xso->dev->xfrmdev_ops->xdo_dev_state_advance_esn(x);
-> +	if (dev && dev->xfrmdev_ops->xdo_dev_state_advance_esn)
-> +		dev->xfrmdev_ops->xdo_dev_state_advance_esn(x);
->  }
->  
->  static inline bool xfrm_dst_offload_ok(struct dst_entry *dst)
-> @@ -1973,28 +1979,6 @@ static inline bool xfrm_dst_offload_ok(struct dst_entry *dst)
->  	return false;
->  }
->  
-> -static inline void xfrm_dev_state_delete(struct xfrm_state *x)
-> -{
-> -	struct xfrm_dev_offload *xso = &x->xso;
-> -
-> -	if (xso->dev)
-> -		xso->dev->xfrmdev_ops->xdo_dev_state_delete(x);
-> -}
-> -
-> -static inline void xfrm_dev_state_free(struct xfrm_state *x)
-> -{
-> -	struct xfrm_dev_offload *xso = &x->xso;
-> -	struct net_device *dev = xso->dev;
-> -
-> -	if (dev && dev->xfrmdev_ops) {
-> -		if (dev->xfrmdev_ops->xdo_dev_state_free)
-> -			dev->xfrmdev_ops->xdo_dev_state_free(x);
-> -		xso->dev = NULL;
-> -		xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
-> -		netdev_put(dev, &xso->dev_tracker);
-> -	}
-> -}
-> -
->  static inline void xfrm_dev_policy_delete(struct xfrm_policy *x)
->  {
->  	struct xfrm_dev_offload *xdo = &x->xdo;
-> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> index 649bb739df0d..d531d2a1fae2 100644
-> --- a/net/xfrm/xfrm_state.c
-> +++ b/net/xfrm/xfrm_state.c
-> @@ -49,6 +49,7 @@ static struct kmem_cache *xfrm_state_cache __ro_after_init;
->  
->  static DECLARE_WORK(xfrm_state_gc_work, xfrm_state_gc_task);
->  static HLIST_HEAD(xfrm_state_gc_list);
-> +static HLIST_HEAD(xfrm_state_dev_gc_list);
->  
->  static inline bool xfrm_state_hold_rcu(struct xfrm_state __rcu *x)
->  {
-> @@ -214,6 +215,7 @@ static DEFINE_SPINLOCK(xfrm_state_afinfo_lock);
->  static struct xfrm_state_afinfo __rcu *xfrm_state_afinfo[NPROTO];
->  
->  static DEFINE_SPINLOCK(xfrm_state_gc_lock);
-> +static DEFINE_SPINLOCK(xfrm_state_dev_gc_lock);
->  
->  int __xfrm_state_delete(struct xfrm_state *x);
->  
-> @@ -683,6 +685,40 @@ struct xfrm_state *xfrm_state_alloc(struct net *net)
->  }
->  EXPORT_SYMBOL(xfrm_state_alloc);
->  
-> +#ifdef CONFIG_XFRM_OFFLOAD
-> +void xfrm_dev_state_delete(struct xfrm_state *x)
-> +{
-> +	struct xfrm_dev_offload *xso = &x->xso;
-> +	struct net_device *dev = READ_ONCE(xso->dev);
-> +
-> +	if (dev) {
-> +		dev->xfrmdev_ops->xdo_dev_state_delete(x);
-> +		spin_lock_bh(&xfrm_state_dev_gc_lock);
-> +		hlist_add_head(&x->dev_gclist, &xfrm_state_dev_gc_list);
-> +		spin_unlock_bh(&xfrm_state_dev_gc_lock);
-> +	}
-> +}
-> +
-> +void xfrm_dev_state_free(struct xfrm_state *x)
-> +{
-> +	struct xfrm_dev_offload *xso = &x->xso;
-> +	struct net_device *dev = READ_ONCE(xso->dev);
-> +
-> +	if (dev && dev->xfrmdev_ops) {
-> +		spin_lock_bh(&xfrm_state_dev_gc_lock);
-> +		if (!hlist_unhashed(&x->dev_gclist))
-> +			hlist_del(&x->dev_gclist);
-> +		spin_unlock_bh(&xfrm_state_dev_gc_lock);
-> +
-> +		if (dev->xfrmdev_ops->xdo_dev_state_free)
-> +			dev->xfrmdev_ops->xdo_dev_state_free(x);
-> +		WRITE_ONCE(xso->dev, NULL);
-> +		xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
-> +		netdev_put(dev, &xso->dev_tracker);
-> +	}
-> +}
-> +#endif
-> +
->  void __xfrm_state_destroy(struct xfrm_state *x, bool sync)
->  {
->  	WARN_ON(x->km.state != XFRM_STATE_DEAD);
-> @@ -848,6 +884,9 @@ EXPORT_SYMBOL(xfrm_state_flush);
->  
->  int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_valid)
->  {
-> +	struct xfrm_state *x;
-> +	struct hlist_node *tmp;
-> +	struct xfrm_dev_offload *xso;
->  	int i, err = 0, cnt = 0;
->  
->  	spin_lock_bh(&net->xfrm.xfrm_state_lock);
-> @@ -857,8 +896,6 @@ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_vali
->  
->  	err = -ESRCH;
->  	for (i = 0; i <= net->xfrm.state_hmask; i++) {
-> -		struct xfrm_state *x;
-> -		struct xfrm_dev_offload *xso;
->  restart:
->  		hlist_for_each_entry(x, net->xfrm.state_bydst+i, bydst) {
->  			xso = &x->xso;
-> @@ -868,6 +905,8 @@ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_vali
->  				spin_unlock_bh(&net->xfrm.xfrm_state_lock);
->  
->  				err = xfrm_state_delete(x);
-> +				xfrm_dev_state_free(x);
-> +
->  				xfrm_audit_state_delete(x, err ? 0 : 1,
->  							task_valid);
->  				xfrm_state_put(x);
-> @@ -884,6 +923,24 @@ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_vali
->  
->  out:
->  	spin_unlock_bh(&net->xfrm.xfrm_state_lock);
-> +
-> +	spin_lock_bh(&xfrm_state_dev_gc_lock);
-> +restart_gc:
-> +	hlist_for_each_entry_safe(x, tmp, &xfrm_state_dev_gc_list, dev_gclist) {
-> +		xso = &x->xso;
-> +
-> +		if (xso->dev == dev) {
-> +			spin_unlock_bh(&xfrm_state_dev_gc_lock);
-> +			xfrm_dev_state_free(x);
-> +			spin_lock_bh(&xfrm_state_dev_gc_lock);
-> +			goto restart_gc;
-> +		}
-> +
-> +	}
-> +	spin_unlock_bh(&xfrm_state_dev_gc_lock);
-> +
-> +	xfrm_flush_gc();
-> +
->  	return err;
->  }
->  EXPORT_SYMBOL(xfrm_dev_state_flush);
-> -- 
-> 2.34.1
-> 
-> 
+ Do not free_netdevice() if bgx_lmac_enable() fails after lmac->netdev
+is allocated, since bgx_lmac_disable() is called if bgx_lmac_enable()
+fails, and lmac->netdev will be freed there (similarly to lmac->dmacs).
+
+Link: https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/ [1]
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+PS: Unfortunately due to lack of hardware, this patch is compiled-test
+only.
+
+ .../net/ethernet/cavium/thunder/thunder_bgx.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+index a317feb8decb..d097d606577b 100644
+--- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
++++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+@@ -54,7 +54,7 @@ struct lmac {
+ 	bool			link_up;
+ 	int			lmacid; /* ID within BGX */
+ 	int			lmacid_bd; /* ID on board */
+-	struct net_device       netdev;
++	struct net_device       *netdev;
+ 	struct phy_device       *phydev;
+ 	unsigned int            last_duplex;
+ 	unsigned int            last_link;
+@@ -590,7 +590,7 @@ static void bgx_sgmii_change_link_state(struct lmac *lmac)
+ 
+ static void bgx_lmac_handler(struct net_device *netdev)
+ {
+-	struct lmac *lmac = container_of(netdev, struct lmac, netdev);
++	struct lmac *lmac = netdev_priv(netdev);
+ 	struct phy_device *phydev;
+ 	int link_changed = 0;
+ 
+@@ -1052,12 +1052,18 @@ static int phy_interface_mode(u8 lmac_type)
+ 
+ static int bgx_lmac_enable(struct bgx *bgx, u8 lmacid)
+ {
+-	struct lmac *lmac;
++	struct lmac *lmac, **priv;
+ 	u64 cfg;
+ 
+ 	lmac = &bgx->lmac[lmacid];
+ 	lmac->bgx = bgx;
+ 
++	lmac->netdev = alloc_netdev_dummy(sizeof(struct lmac *));
++	if (!lmac->netdev)
++		return -ENOMEM;
++	priv = netdev_priv(lmac->netdev);
++	*priv = lmac;
++
+ 	if ((lmac->lmac_type == BGX_MODE_SGMII) ||
+ 	    (lmac->lmac_type == BGX_MODE_QSGMII) ||
+ 	    (lmac->lmac_type == BGX_MODE_RGMII)) {
+@@ -1116,7 +1122,7 @@ static int bgx_lmac_enable(struct bgx *bgx, u8 lmacid)
+ 		}
+ 		lmac->phydev->dev_flags = 0;
+ 
+-		if (phy_connect_direct(&lmac->netdev, lmac->phydev,
++		if (phy_connect_direct(lmac->netdev, lmac->phydev,
+ 				       bgx_lmac_handler,
+ 				       phy_interface_mode(lmac->lmac_type)))
+ 			return -ENODEV;
+@@ -1183,6 +1189,7 @@ static void bgx_lmac_disable(struct bgx *bgx, u8 lmacid)
+ 	    (lmac->lmac_type != BGX_MODE_10G_KR) && lmac->phydev)
+ 		phy_disconnect(lmac->phydev);
+ 
++	free_netdev(lmac->netdev);
+ 	lmac->phydev = NULL;
+ }
+ 
+@@ -1414,7 +1421,7 @@ static acpi_status bgx_acpi_register_phy(acpi_handle handle,
+ 
+ 	acpi_get_mac_address(dev, adev, bgx->lmac[bgx->acpi_lmac_idx].mac);
+ 
+-	SET_NETDEV_DEV(&bgx->lmac[bgx->acpi_lmac_idx].netdev, dev);
++	SET_NETDEV_DEV(bgx->lmac[bgx->acpi_lmac_idx].netdev, dev);
+ 
+ 	bgx->lmac[bgx->acpi_lmac_idx].lmacid = bgx->acpi_lmac_idx;
+ 	bgx->acpi_lmac_idx++; /* move to next LMAC */
+@@ -1483,7 +1490,7 @@ static int bgx_init_of_phy(struct bgx *bgx)
+ 
+ 		of_get_mac_address(node, bgx->lmac[lmac].mac);
+ 
+-		SET_NETDEV_DEV(&bgx->lmac[lmac].netdev, &bgx->pdev->dev);
++		SET_NETDEV_DEV(bgx->lmac[lmac].netdev, &bgx->pdev->dev);
+ 		bgx->lmac[lmac].lmacid = lmac;
+ 
+ 		phy_np = of_parse_phandle(node, "phy-handle", 0);
+-- 
+2.43.0
+
 
