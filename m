@@ -1,202 +1,114 @@
-Return-Path: <netdev+bounces-106193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B2B49152C6
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:44:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33B9B9152CB
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 17:45:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7BAAB256A5
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:44:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1ACD1F230DA
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:45:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B50D19CD0B;
-	Mon, 24 Jun 2024 15:44:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BFF5143C5C;
+	Mon, 24 Jun 2024 15:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yp1z7Mx2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dcQ8TEPx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91CE319B5B4;
-	Mon, 24 Jun 2024 15:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F33D1D53C;
+	Mon, 24 Jun 2024 15:45:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719243841; cv=none; b=ITA+3UjrLTFqr2CcDyid28rcLa2RI2Y+7eGup687xYBQhY0lwzwsuTFqR7hSdLnTfMLjKN3bZ4XH6ApSGLi/FjzHQCWSG5sdSwvUR6jzCwPXdBUnNHSe3u6NQIKGUlCD0S5g86Oo1voZzehj+QTQlm2HVhxN9UCfAiljUw5A9Xs=
+	t=1719243934; cv=none; b=gBS5jQj+F4QoBduGBeWy9jE9sUGWSaoqBANBM5ZX1/vSPsHheEBs1QZ4c5mr5Vf0/k3HXPjprXkM4RQkKkfouS0QEk+oUT5ph46Hjj86au6sTolZqBuEVi+2Uc8GbZ83qPWDROcCnOfrtdEYzOmBXBq7Ou0Wro1L4G92eA6am9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719243841; c=relaxed/simple;
-	bh=ODrD+Oe0LziuET37pFz1kRGyUqy38DH7QpRKKG7xZJc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uPHO52GPgX4hvOXCXdkmnmSugfBbM2EtoTpSyj+ognY0hmmBEioAogKlGzYViExADMAiDXKiH/iRNyvTTf1LvewP7obz0lriSK2bKvmjgG2jlIxDvFCMfsjDHHaqBsxWk45GBX/nWup1BY//ZzLpTl/wsA11sbP6BP+glIBG//I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yp1z7Mx2; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1f9a78c6c5dso35218315ad.1;
-        Mon, 24 Jun 2024 08:43:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719243839; x=1719848639; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wYH0p/HBth55j1ab+0Mqrrba8HhBEOCKxOxkc/mNC7o=;
-        b=Yp1z7Mx2EDz8IsIvIM54DbeE5RN6n0hpr7aZ1/bz67DGH+8MaRwkg1IZIHVLG7o4CW
-         ydotmqRd2+IMHjqAbxLXM0lC7prTOUz32JYGbqbcQwudZIDL+sLgZCchQLTC4HZfQ86z
-         w0PzccpnSHV9OcoHDKv1HyNXfUhe+ZSWto+D1gDNeF4RybIrrJsuIs05IsXMjFGg12ux
-         h3+o0Gvxsr8zUmWDKI8rr3W7bRWQ9CxeGfUm2+1CVl9xna7IBOcRNZ5kwmFNuDOdiZkA
-         IPLRr9UVLg7KCpkr5JyzFh3spRdmt8bdKRM1phF54v1QOT+t6julcHFeri4S+4q1yyuJ
-         Vhrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719243839; x=1719848639;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wYH0p/HBth55j1ab+0Mqrrba8HhBEOCKxOxkc/mNC7o=;
-        b=IwzsITxm4eQqVF6Y0SyCbN1bMSoCY8aPsOH0DWYKdJ43PRBcCYCq7po9LrJOh6DH2z
-         8YZELmqNOL8alfSfTKwvQqQS/nh1zBaLAWXsFV9lv5UIetL1QdmE3zFuPrE+ccbb7D7M
-         fB0oTI0q3w15Wph85Koo3w0ryfuJIA8LduOfGz/s+4KqLNvgewG1OMf5x8EC+8jWQHUd
-         QKbfkipgdBm9nnrqBPFdV+H6I7P0n83fdnh0/sMXGJ7yf6bhV9XbI3B6gLUXa1JQsuHQ
-         rMyGVQSMbzCJN1GDBd0mNSs71TJU9E7+TeYpAAFE3Qfl+ataJijYN6CXganUn2iXAzkz
-         aVMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXYXe2t4+v02+sVEFa9khiWhPkk99k1XE76CODag3v39SP14mosimp9REuW08Tk1yuJVt9hvzXDCRMtWwyh1B3m6QMkYlKKMTP5WBpxcpPQ2UXrpkyxbM0GRwhBjENmXbxlf5FEZa+lf4yaIvKeeEmG4R3pUaYAeclP5q4c1SjNQJwg+866/XGL
-X-Gm-Message-State: AOJu0YxGSIYjTZCtFZCy4+SplVocp1AIsHxlicH4DvvbB/x6qUXFwb7v
-	M3nSpMzckE9p2t2RzSB+aYA5AwE6U3cJpB7ThN6CpgQg11o+cKsh
-X-Google-Smtp-Source: AGHT+IHRwxhZhQGsXlnWT8Fr+3rZ+252/QQVYuuR/7aFxhEqMAkgvbPKarb9ijoNgOkuFJ0YY2eLZw==
-X-Received: by 2002:a17:902:d50f:b0:1f9:bece:4a51 with SMTP id d9443c01a7336-1fa23f15c64mr53866305ad.52.1719243838773;
-        Mon, 24 Jun 2024 08:43:58 -0700 (PDT)
-Received: from [192.168.50.95] ([118.32.98.101])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb7d1859sm64206225ad.228.2024.06.24.08.43.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jun 2024 08:43:58 -0700 (PDT)
-Message-ID: <d7b67e36-adee-4abc-b4c4-0548333ac90a@gmail.com>
-Date: Tue, 25 Jun 2024 00:43:51 +0900
+	s=arc-20240116; t=1719243934; c=relaxed/simple;
+	bh=799YMxd9vz4cMeKpJH6A+kUY4JEBuJNS62CFJsW+cE0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KFN0XJ29OGNMgArek536SeiV2v03bw22lAvDhY0REw+SNfZVsttZrEyg1FnQxRf00lGXpnmQuEPixtzdroOvk3hXkKBCPPl8Ls3pXJ0BY+xBQrDweqj5WnV31U/SrZhbxwErlo5uDuZL+z6ahPe691pGY3Hf8j+wQNoQabshKRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dcQ8TEPx; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MG4bQ1XP6apgYZwLIAFbYd1TLI/2JMcgF2WW1hKHj48=; b=dcQ8TEPxd5poTH/Oldi1Q3J6Db
+	9ZUYqPRncRD0Mxb8f7roUFt5ZbyazEa4Q07b0vi7v2FReTGlNEc+lQVUaet7Jk1RP9dctvwHMwE1r
+	xBqhFLyCHUJXqsrCMYDDNkNf085VkoRG8zNsgYIyv6yI1vaisIET8zyU0WsnKb0Aa+8I=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sLlse-000rdp-68; Mon, 24 Jun 2024 17:45:20 +0200
+Date: Mon, 24 Jun 2024 17:45:20 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Benjamin Larsson <benjamin.larsson@genexis.eu>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
+	nbd@nbd.name, lorenzo.bianconi83@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	conor@kernel.org, linux-arm-kernel@lists.infradead.org,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, devicetree@vger.kernel.org,
+	catalin.marinas@arm.com, will@kernel.org, upstream@airoha.com,
+	angelogioacchino.delregno@collabora.com, rkannoth@marvell.com,
+	sgoutham@marvell.com
+Subject: Re: [PATCH v3 net-next 2/2] net: airoha: Introduce ethernet support
+ for EN7581 SoC
+Message-ID: <4a39fa50-cffc-4f0c-a442-b666b024ba34@lunn.ch>
+References: <cover.1719159076.git.lorenzo@kernel.org>
+ <89c9c226ddb31d9ff3d31231e8f532a3e983363a.1719159076.git.lorenzo@kernel.org>
+ <2752c453-cabd-4ca0-833f-262b221de240@lunn.ch>
+ <b023dfb3-ca8e-4045-b0b1-d6e498961e9c@genexis.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] tracing/net_sched: NULL pointer dereference in
- perf_trace_qdisc_reset()
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Takashi Iwai <tiwai@suse.de>, "David S. Miller" <davem@davemloft.net>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Taehee Yoo <ap420073@gmail.com>,
- Austin Kim <austindh.kim@gmail.com>, shjy180909@gmail.com,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- ppbuk5246@gmail.com, Yeoreum Yun <yeoreum.yun@arm.com>
-References: <20240622045701.8152-2-yskelg@gmail.com>
- <fa8e452b-ad37-482b-8d9b-bc8b4cad0ff9@mojatatu.com>
-Content-Language: en-US
-From: Yunseong Kim <yskelg@gmail.com>
-In-Reply-To: <fa8e452b-ad37-482b-8d9b-bc8b4cad0ff9@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b023dfb3-ca8e-4045-b0b1-d6e498961e9c@genexis.eu>
 
-Hi Pedro,
-
-On 6/25/24 12:12 오전, Pedro Tammela wrote:
-> On 22/06/2024 01:57, yskelg@gmail.com wrote:
->> From: Yunseong Kim <yskelg@gmail.com>
->>
->> In the TRACE_EVENT(qdisc_reset) NULL dereference occurred from
->>
->>   qdisc->dev_queue->dev <NULL> ->name
->>
->> [ 5301.595872] KASAN: null-ptr-deref in range
->> [0x0000000000000130-0x0000000000000137]
->> [ 5301.595877] Mem abort info:
->> [ 5301.595881]   ESR = 0x0000000096000006
->> [ 5301.595885]   EC = 0x25: DABT (current EL), IL = 32 bits
->> [ 5301.595889]   SET = 0, FnV = 0
->> [ 5301.595893]   EA = 0, S1PTW = 0
->> [ 5301.595896]   FSC = 0x06: level 2 translation fault
->> [ 5301.595900] Data abort info:
->> [ 5301.595903]   ISV = 0, ISS = 0x00000006, ISS2 = 0x00000000
->> [ 5301.595907]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
->> [ 5301.595911]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
->> [ 5301.595915] [dfff800000000026] address between user and kernel
->> address ranges
->> [ 5301.595971] Internal error: Oops: 0000000096000006 [#1] SMP
->> Link:
->> https://lore.kernel.org/lkml/20240229143432.273b4871@gandalf.local.home/t/
->> Fixes: 51270d573a8d ("tracing/net_sched: Fix tracepoints that save
->> qdisc_dev() as a string")
->> Cc: netdev@vger.kernel.org
->> Cc: stable@vger.kernel.org # +v6.7.10, +v6.8
->> Signed-off-by: Yunseong Kim <yskelg@gmail.com>
->> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
->> ---
->>   include/trace/events/qdisc.h | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
->> index f1b5e816e7e5..170b51fbe47a 100644
->> --- a/include/trace/events/qdisc.h
->> +++ b/include/trace/events/qdisc.h
->> @@ -81,7 +81,7 @@ TRACE_EVENT(qdisc_reset,
->>       TP_ARGS(q),
->>         TP_STRUCT__entry(
->> -        __string(    dev,        qdisc_dev(q)->name    )
->> +        __string(dev, qdisc_dev(q) ? qdisc_dev(q)->name : "noop_queue")
->>           __string(    kind,        q->ops->id        )
->>           __field(    u32,        parent            )
->>           __field(    u32,        handle            )
+On Mon, Jun 24, 2024 at 01:01:44AM +0200, Benjamin Larsson wrote:
+> Hi,
+> > Code like this is making me wounder about the split between MAC
+> > driver, DSA driver and DSA tag driver. Or if it should actually be a
+> > pure switchdev driver?
+> > 
+> > If there some open architecture documentation for this device?
+> > 
+> > What are these ports about?
+> > 
+> > > +static int airoha_dev_open(struct net_device *dev)
+> > > +{
+> > > +	struct airoha_eth *eth = netdev_priv(dev);
+> > > +	int err;
+> > > +
+> > > +	if (netdev_uses_dsa(dev))
+> > > +		airoha_fe_set(eth, REG_GDM1_INGRESS_CFG, GDM1_STAG_EN_MASK);
+> > > +	else
+> > > +		airoha_fe_clear(eth, REG_GDM1_INGRESS_CFG, GDM1_STAG_EN_MASK);
+> > Does that imply both instances of the GMAC are not connected to the
+> > switch? Can one be used with a PHY?
+> > 
+> > 	Andrew
 > 
-> You missed the __assign_str portion (see below). Also let's just say
-> "(null)" as it's the correct device name. "noop_queue" could be misleading.
-
-Thanks for the code review Pedro, I agree your advice.
-
-> diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
-> index 1f4258308b96..f54e0b4dbcf4 100644
-> --- a/include/trace/events/qdisc.h
-> +++ b/include/trace/events/qdisc.h
-> @@ -81,14 +81,14 @@ TRACE_EVENT(qdisc_reset,
->         TP_ARGS(q),
+> https://mirror2.openwrt.org/docs/MT7981B_Wi-Fi6_Platform_Datasheet_Open_V1.0.pdf
 > 
->         TP_STRUCT__entry(
-> -               __string(       dev,            qdisc_dev(q)->name      )
-> +               __string(       dev,            qdisc_dev(q) ?
-> qdisc_dev(q)->name : "(null)"    )
->                 __string(       kind,           q->ops->id              )
->                 __field(        u32,            parent                  )
->                 __field(        u32,            handle                  )
->         ),
+> page 107 (text for 9.1.1 is relevant but not a complete match). In the
+> EN7581 case there is a 5 port switch in the place of GMAC1 (one switch port
+> is connected to GDM1).
 
-It looks better to align the name with the current convention.
+The typical DSA architecture is that the SoC MAC is connected to a
+switch MAC port. You say here, the switch is directly connected to the
+GGM1. So there is no GMAC involved? If there is no MAC, you don't need
+a MAC driver.
 
-Link:
-https://lore.kernel.org/linux-trace-kernel/20240222211442.634192653@goodmis.org/
+It seems more likely there is a GMAC, and the SGMII interface, or
+something similar is connected to the switch?
 
->         TP_fast_assign(
-> -               __assign_str(dev, qdisc_dev(q)->name);
-> +               __assign_str(dev, qdisc_dev(q) ? qdisc_dev(q)->name :
-> "(null)");
->                 __assign_str(kind, q->ops->id);
->                 __entry->parent = q->parent;
->                 __entry->handle = q->handle;
-> 
-> 
+	Andrew
 
-The second part you mentioned, Steve recently worked on it and changed it.
-
-Link:
-https://lore.kernel.org/linux-trace-kernel/20240516133454.681ba6a0@rorschach.local.home/
-
-If it hadn't, I don't think I would have been able to prevent the panic
-by just applying my patch.
-
-Link:
-https://lore.kernel.org/all/e2f9da4e-919d-4a98-919d-167726ef6bc7@gmail.com/
-
-Warm Regards,
-Yunseong Kim
 
