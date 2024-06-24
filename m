@@ -1,192 +1,195 @@
-Return-Path: <netdev+bounces-106205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29E15915371
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 18:22:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C2C7915384
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 18:24:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D3AA1C22535
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 16:22:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36B3E286377
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 16:24:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C7719E7FD;
-	Mon, 24 Jun 2024 16:22:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FBED19F492;
+	Mon, 24 Jun 2024 16:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FIzhx9HX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFE619D89D;
-	Mon, 24 Jun 2024 16:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F9A19D8B3;
+	Mon, 24 Jun 2024 16:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719246125; cv=none; b=KU7RvCUDXWmOTD0Fl8Y5CQCarFwf2MmacBHAyqWhVrW+Yzv/beEWYZfpfPrHlvsfcmOlQD4b+ZZoSPsSKUD5SNnz4AlLax9k1V5JfnhSPnrHpuys4wQg8Ge9dNbpNLZYL29NV9efjS4TnAgX1dQj5VLTwJNFlyT4GFYKBGB6VPc=
+	t=1719246153; cv=none; b=kOBdMpl8i1KJ4OvstCcQlTKd8OE9I6VVcDLq6mrDkoLCjfDmEa3YIhQJ4glOCdalnt5fQkQ7bx42lCKjvrgo0ROamCVLpB+3vWV35dmKbQXSImcj6w4m+IztcALlCYfZAADYwkib56q0orjKKZlhypmkbzuJ3TIhuuIR9gOfj1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719246125; c=relaxed/simple;
-	bh=MHuZnCBbfRRzSWLLQ/7VVJKbRN/VS3rhtDIjKYgN3p0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GdsU4cZ6+2jRqie2BhV3tmoF6g08x5jObpfYNdtam2hixKt3bIMxFDPMJ9Uvk5R08KMEebywlpvd/buT48ySxDS8bxPeMu2t0lPw9smLLPSgqj+ksHYadZsXYuQGGT6DL4Q0ff2U+pI4dG7F5EBW/QWrycNaLuyJ3MDMmX+qHJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57d26a4ee65so4243648a12.2;
-        Mon, 24 Jun 2024 09:22:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719246122; x=1719850922;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lI0lpN6kx7yRxic2Ty5k5Kh7yOrOrpZPNGmNxWXyvto=;
-        b=eU1OJTSS8Pn3sQpc1zUu0+81ua8ukqDUN4GJSomxuTDh0aiA03ygg0h8JyvfD4EQkX
-         Zs4rMy6GDiSaAr8rYjXpd2jABgnnxGOmKwP/kiUkBDg/z0ttrLYd1jvseZmqsQu7zHTh
-         EjbfIYcEM6BW9bXIeNJO+uqqRtVvZYhzJzRvX5qS/8rGYPaV3J9OxSsr4EaIk1+K9Pvu
-         ad+rHC9iRh70ekhmgKQdljQgHvhdfpmInQVhzEkD2UkRAvH+YcTrf4MbaQEeH8BxeIA7
-         urBe0vRLbxVEp3Ed6aKnLNiCJzswS69oOsdCyqb+EVW749qZ0D8NW+CNfUq67ASr/KVH
-         x0aw==
-X-Forwarded-Encrypted: i=1; AJvYcCXOg4VgFLpUHIyKI+hF6guAwTVmc73bH2LI8C4nOtUZCgBs+/uWfCprw849pedPj8IatOab8alfKOd+Bo3FwezYqA5kQdWvflaUgyouUEg9HQ/hWIN7NfoNSvRRznmyriUS5Pl0LKebwj0kqbQ+cd8DZxeCcrTyJwfNDNEdT3QBkBh4
-X-Gm-Message-State: AOJu0Ywa76OSGP2gfu7osoySOyWamh4/LO+L+PYUcg3quyfOthgPNKpd
-	6phXK6h/vbnFoMQiTW+zj1SgLmZ6Zxu4DjRccrom8dLz2gWykLAi
-X-Google-Smtp-Source: AGHT+IEwMy3K4qn6NThj+xHIEW9HQLoF5ZMgOFTPxFANNhr7dKPUd+SfBDJ7IMkyk+RxYL401G7l8g==
-X-Received: by 2002:a50:cc85:0:b0:57c:8027:534d with SMTP id 4fb4d7f45d1cf-57d4a01f393mr3282346a12.27.1719246121917;
-        Mon, 24 Jun 2024 09:22:01 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-114.fbsv.net. [2a03:2880:30ff:72::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57d303d7aecsm4854506a12.20.2024.06.24.09.22.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jun 2024 09:22:01 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	=?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: kuba@kernel.org,
-	horms@kernel.org,
-	Roy.Pledge@nxp.com,
-	linux-crypto@vger.kernel.org (open list:FREESCALE CAAM (Cryptographic Acceleration and...),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH 4/4] crypto: caam: Unembed net_dev structure in dpaa2
-Date: Mon, 24 Jun 2024 09:21:22 -0700
-Message-ID: <20240624162128.1665620-4-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240624162128.1665620-1-leitao@debian.org>
-References: <20240624162128.1665620-1-leitao@debian.org>
+	s=arc-20240116; t=1719246153; c=relaxed/simple;
+	bh=4ZpMxaS5rdfRlRw6hjeOyoKnW3JWpq9baxrtUfKgVS8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rV6Z06h/elzopM+76aefMrBiXmG81xvHxS7VW0fAb8AHgB7nKra15gX5SzF+J+tX9OpGvf6ECHQC9vvXtvko1ISM3HnZ4MNXajHRf5HnWMOcmeAfXkSSxrkXkxoICNWuB7VcjdQDMNpfUzuCyXkwB+fmNaSZ2Dh+6bA1EOhvJG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FIzhx9HX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26A6EC2BBFC;
+	Mon, 24 Jun 2024 16:22:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719246152;
+	bh=4ZpMxaS5rdfRlRw6hjeOyoKnW3JWpq9baxrtUfKgVS8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FIzhx9HXY95Sq2hWDaUrCNwGyoj8pJglygTG3nl5gwJqJ/pS5mY6cPjhSeaKiEKNl
+	 baGQrKCVsZ/ZooIt3jMgaiRZc4DjgDlIzgshHfNcxE1SAS4vtLzO8Bd1HMrGOupcrc
+	 dWW90SK3VeDPtD+wYKSMpHaY3SWGwzD5C6+Nhb4iGPbFINPprCf7M2vSunXYzqpvbH
+	 ZTLnyYX3N0PK+QHdT0+i6R4n7rtgPNlMOOUP33DprtiOcR+ugZMVxPbL53zG43evrB
+	 i7c3F0TGtsBUavzAKrgpqmrpAGbJc47Qjq7tpUDZfZ968OslI1/pK6+XdefVb0fDsR
+	 oq5uRpo3L4HYw==
+Date: Mon, 24 Jun 2024 18:22:28 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, nbd@nbd.name, lorenzo.bianconi83@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, conor@kernel.org,
+	linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, catalin.marinas@arm.com,
+	will@kernel.org, upstream@airoha.com,
+	angelogioacchino.delregno@collabora.com,
+	benjamin.larsson@genexis.eu, rkannoth@marvell.com,
+	sgoutham@marvell.com
+Subject: Re: [PATCH v3 net-next 2/2] net: airoha: Introduce ethernet support
+ for EN7581 SoC
+Message-ID: <ZnmdRIXoZ_Unt8sg@lore-desk>
+References: <cover.1719159076.git.lorenzo@kernel.org>
+ <89c9c226ddb31d9ff3d31231e8f532a3e983363a.1719159076.git.lorenzo@kernel.org>
+ <2752c453-cabd-4ca0-833f-262b221de240@lunn.ch>
+ <Zni13uFslHz5R6Ns@lore-desk>
+ <e203100f-7bdd-4512-8a05-9a33476db488@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ZDUgRKanLZnz6KNf"
+Content-Disposition: inline
+In-Reply-To: <e203100f-7bdd-4512-8a05-9a33476db488@lunn.ch>
 
-Embedding net_device into structures prohibits the usage of flexible
-arrays in the net_device structure. For more details, see the discussion
-at [1].
 
-Un-embed the net_devices from struct dpaa2_caam_priv_per_cpu by
-converting them into pointers, and allocating them dynamically. Use the
-leverage alloc_netdev_dummy() to allocate the net_device object at
-dpaa2_dpseci_setup().
+--ZDUgRKanLZnz6KNf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The free of the device occurs at dpaa2_dpseci_disable().
+> On Mon, Jun 24, 2024 at 01:55:10AM +0200, Lorenzo Bianconi wrote:
+> > > > +static int airoha_fe_set_pse_oq_rsv(struct airoha_eth *eth,
+> > > > +				    u32 port, u32 queue, u32 val)
+> > > > +{
+> > > > +	u32 orig_val, tmp, all_rsv, fq_limit;
+> > > > +	const u32 pse_port_oq_id[] =3D {
+> > > > +		PSE_PORT0_QUEUE,
+> > > > +		PSE_PORT1_QUEUE,
+> > > > +		PSE_PORT2_QUEUE,
+> > > > +		PSE_PORT3_QUEUE,
+> > > > +		PSE_PORT4_QUEUE,
+> > > > +		PSE_PORT5_QUEUE,
+> > > > +		PSE_PORT6_QUEUE,
+> > > > +		PSE_PORT7_QUEUE,
+> > > > +		PSE_PORT8_QUEUE,
+> > > > +		PSE_PORT9_QUEUE,
+> > > > +		PSE_PORT10_QUEUE
+> > > > +	};
+> > >=20
+> > > > +static void airoha_fe_oq_rsv_init(struct airoha_eth *eth)
+> > > > +{
+> > > > +	int i;
+> > > > +
+> > > > +	/* hw misses PPE2 oq rsv */
+> > > > +	airoha_fe_set(eth, REG_FE_PSE_BUF_SET,
+> > > > +		      PSE_DEF_RSV_PAGE * PSE_PORT8_QUEUE);
+> > > > +
+> > > > +	for (i =3D 0; i < PSE_PORT0_QUEUE; i++)
+> > > > +		airoha_fe_set_pse_oq_rsv(eth, 0, i, 0x40);
+> > > > +	for (i =3D 0; i < PSE_PORT1_QUEUE; i++)
+> > > > +		airoha_fe_set_pse_oq_rsv(eth, 1, i, 0x40);
+> > > > +
+> > > > +	for (i =3D 6; i < PSE_PORT2_QUEUE; i++)
+> > > > +		airoha_fe_set_pse_oq_rsv(eth, 2, i, 0);
+> > > > +
+> > > > +	for (i =3D 0; i < PSE_PORT3_QUEUE; i++)
+> > > > +		airoha_fe_set_pse_oq_rsv(eth, 3, i, 0x40);
+> > >=20
+> > > Code like this is making me wounder about the split between MAC
+> > > driver, DSA driver and DSA tag driver. Or if it should actually be a
+> > > pure switchdev driver?
+> >=20
+> > airoha_eth driver implements just MAC features (FE and QDMA). Currently=
+ we only
+> > support the connection to the DSA switch (GDM1). EN7581 SoC relies on m=
+t7530 driver
+> > for DSA (I have not posted the patch for mt7530 yet, I will do after ai=
+roha_eth
+> > ones).
+> =20
+> > airoha_fe_oq_rsv_init() (we can improve naming here :) is supposed to c=
+onfigure
+> > hw pre-allocated memory for each queue available in Packet Switching En=
+gine
+> > (PSE) ports. PSE ports are not switch ports, but SoC internal ports use=
+d to
+> > connect PSE to different modules. In particular, we are currently imple=
+menting
+> > just the two connections below:
+> > - CDM1 (port0) connects PSE to QDMA1
+> > - GDM1 (port1) connects PSE to MT7530 DSA switch
+> >=20
+> > In the future we will post support for GDM2, GDM3 and GDM4 ports that a=
+re
+> > connecting PSE to exteranl PHY modules.
+>=20
+> Is the PSE involved in WiFi? When you come to implement NAT offload,
+> etc, will that depend on the PSE?
+>=20
 
-Link: https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/ [1]
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-PS: Unfortunately due to lack of hardware, this was not tested in real
-hardware.
+Frame Engine architecture (Packet Switching Engine - PSE + Packet Processing
+Engine - PPE) is similar to mtk_eth_soc driver (but register map and QDMA l=
+ayer
+are different). FE is used to define offload traffic rules (e.g. forwarding
+between GDM interfaces or NAT rules).  Even in mtk_eth_soc frame engine cod=
+ebase
+is part of MAC driver. So far we do not support offloading rules, but we wi=
+ll
+do in the future. In order to support WiFI offload rules, FE requires a dif=
+ferent
+module/driver (NPU) similar to WED for mtk_eth_soc.
+The mac - switch architecture is the same to the one used for MT7988a [0].
+So far we support we support just gmac0 (that is connected to the switch).
+In the future I will add support for gmac1 as well.
 
- drivers/crypto/caam/caamalg_qi2.c | 28 +++++++++++++++++++++++++---
- drivers/crypto/caam/caamalg_qi2.h |  2 +-
- 2 files changed, 26 insertions(+), 4 deletions(-)
+Regards,
+Lorenzo
 
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index a4f6884416a0..207dc422785a 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -4990,11 +4990,23 @@ static int dpaa2_dpseci_congestion_setup(struct dpaa2_caam_priv *priv,
- 	return err;
- }
- 
-+static void free_dpaa2_pcpu_netdev(struct dpaa2_caam_priv *priv, const cpumask_t *cpus)
-+{
-+	struct dpaa2_caam_priv_per_cpu *ppriv;
-+	int i;
-+
-+	for_each_cpu(i, cpus) {
-+		ppriv = per_cpu_ptr(priv->ppriv, i);
-+		free_netdev(ppriv->net_dev);
-+	}
-+}
-+
- static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
- {
- 	struct device *dev = &ls_dev->dev;
- 	struct dpaa2_caam_priv *priv;
- 	struct dpaa2_caam_priv_per_cpu *ppriv;
-+	cpumask_t clean_mask;
- 	int err, cpu;
- 	u8 i;
- 
-@@ -5073,6 +5085,7 @@ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
- 		}
- 	}
- 
-+	cpumask_clear(&clean_mask);
- 	i = 0;
- 	for_each_online_cpu(cpu) {
- 		u8 j;
-@@ -5096,15 +5109,23 @@ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
- 			priv->rx_queue_attr[j].fqid,
- 			priv->tx_queue_attr[j].fqid);
- 
--		ppriv->net_dev.dev = *dev;
--		INIT_LIST_HEAD(&ppriv->net_dev.napi_list);
--		netif_napi_add_tx_weight(&ppriv->net_dev, &ppriv->napi,
-+		ppriv->net_dev = alloc_netdev_dummy(0);
-+		if (!ppriv->net_dev) {
-+			err = -ENOMEM;
-+			goto err_alloc_netdev;
-+		}
-+		cpumask_set_cpu(cpu, &clean_mask);
-+		ppriv->net_dev->dev = *dev;
-+
-+		netif_napi_add_tx_weight(ppriv->net_dev, &ppriv->napi,
- 					 dpaa2_dpseci_poll,
- 					 DPAA2_CAAM_NAPI_WEIGHT);
- 	}
- 
- 	return 0;
- 
-+err_alloc_netdev:
-+	free_dpaa2_pcpu_netdev(priv, &clean_mask);
- err_get_rx_queue:
- 	dpaa2_dpseci_congestion_free(priv);
- err_get_vers:
-@@ -5153,6 +5174,7 @@ static int __cold dpaa2_dpseci_disable(struct dpaa2_caam_priv *priv)
- 		ppriv = per_cpu_ptr(priv->ppriv, i);
- 		napi_disable(&ppriv->napi);
- 		netif_napi_del(&ppriv->napi);
-+		free_netdev(ppriv->net_dev);
- 	}
- 
- 	return 0;
-diff --git a/drivers/crypto/caam/caamalg_qi2.h b/drivers/crypto/caam/caamalg_qi2.h
-index abb502bb675c..61d1219a202f 100644
---- a/drivers/crypto/caam/caamalg_qi2.h
-+++ b/drivers/crypto/caam/caamalg_qi2.h
-@@ -81,7 +81,7 @@ struct dpaa2_caam_priv {
-  */
- struct dpaa2_caam_priv_per_cpu {
- 	struct napi_struct napi;
--	struct net_device net_dev;
-+	struct net_device *net_dev;
- 	int req_fqid;
- 	int rsp_fqid;
- 	int prio;
--- 
-2.43.0
+[0] https://git.openwrt.org/?p=3Dopenwrt/openwrt.git;a=3Dblob;f=3Dtarget/li=
+nux/mediatek/files-6.6/arch/arm64/boot/dts/mediatek/mt7988a.dtsi;h=3D9ad068=
+fe05fc52bf1edc28d7dba4e162f30a0eb8;hb=3DHEAD
 
+> Figure 9-1 of MT7981B_Wi-Fi6_Platform_Datasheet_Open_V1.0.pdf clearly
+> shows the PSE outside of the GMAC. I'm just wondering if the PSE
+> should be a driver, or library, of its own, which is then shared by
+> users, rather than being embedded in the MAC driver?
+
+
+>=20
+>        Andrew
+
+--ZDUgRKanLZnz6KNf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZnmdRAAKCRA6cBh0uS2t
+rMlmAP47F4WR3g5V41OqUkOJCurFJ6mLtMJb3XqtcyEd7WyTtQD/cig/9RMqs2pV
+Yvf98MUzi5MT5vlmlw/zATKLgR8PyAk=
+=xY2O
+-----END PGP SIGNATURE-----
+
+--ZDUgRKanLZnz6KNf--
 
