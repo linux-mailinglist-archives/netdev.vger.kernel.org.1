@@ -1,100 +1,162 @@
-Return-Path: <netdev+bounces-106140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45814914F29
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 15:52:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52662914AE7
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 14:44:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3F7A282A63
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 13:51:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD74CB23C69
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 12:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01005140E2E;
-	Mon, 24 Jun 2024 13:51:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A893A13CAB0;
+	Mon, 24 Jun 2024 12:43:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="oqJj2A2l"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="PUURHREi"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E76E140373;
-	Mon, 24 Jun 2024 13:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533911E4AE;
+	Mon, 24 Jun 2024 12:43:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719237113; cv=none; b=gN0pn3UUU4QOtAHGsxNNWFkgX4teVeICYgdnpHaveqx3r8AAJvdb4KW912Z58gKCZdbeEGSSgyzt/oS4ZZaBvkf4hVsALFKVd0hPZRbfMww1nP+SXoI4pP/ZQ8IdgYLVhqrMEnuUqseVXWjhGMNDTwOPLSAa4akqLdHxNeA0RSg=
+	t=1719233024; cv=none; b=PvlITHsQ0F9UsfslT4I5vauNtsSqMt+YHIbZTBPONW3IdTimvg+0U4Z+S/akDHUSI+5Z+diBHwHcr0bCIoGpBQLLXxiROPby8tm/e8bNGiloilSFWqEtxRghYlTVoTgtB9Watb14x4ejy+LbQ46KtAAAjipDpcE8UhKKp6kcLlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719237113; c=relaxed/simple;
-	bh=gzyqOvHJXSOAcQSP/iCtAmnzm40usfAzhKwXvGEBZwI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G0EZtWn2PQrT49Dy1OYCocUsjKbblsTwvLuXh+lLovc7hQ6njm3xQxA5PGBDqQFwZFB07z2OBvj99AkXvJdQ7oSBD9lhACvytZPg069qm/ZEWVlSnz4zZG9Mcz9a/urWZeV6cANOobDnO9x5OD1zDmk/TdrXXwSK0AYwja/WMaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=oqJj2A2l; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id A927C88137;
-	Mon, 24 Jun 2024 15:51:43 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1719237104;
-	bh=sqgSKvUDUPjj1EuuHc/BmohVKbxV/GhorsLMOrnqXTg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=oqJj2A2lvo8HWch5yLQPLiyYA1vsFBnPT09Yh3RwTx2IrIGNviVJjUqbG1A+YKJXW
-	 iIIG0d7FJEAiKiqFYSWgGEIi4x2DsUD3Y0JXHIbHvNwNHNQQ2S4AQK2d2nLkrpHMK/
-	 jTvPWgzzz8rGAq7LyongBZNpWNnhdxyBFnHwEMoCeaH9zulCQXF2mP1LGD7YWUCkLj
-	 QnuiYHIAXKTf+Sw6qhz3M70ELtW/JsExrwp+j580JBg3DOaEtGg1ud/hu7w8a2RRRm
-	 z+jRGZSVPki17yGIKVBJwJaYu+D5mi31Hq92/fw1QrZnq9qWCOFwSHQUXDSRWIbv6H
-	 L0v0HNXKIrOpQ==
-Message-ID: <447ed9cd-3f0a-4519-a932-6f8377daa44a@denx.de>
-Date: Mon, 24 Jun 2024 14:22:57 +0200
+	s=arc-20240116; t=1719233024; c=relaxed/simple;
+	bh=ibwVwKOALsKK92E8Whm3+DfnDFeae2zev5i+x3smQdo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aIcjae0Umfx6GFX3k2UrjTAp07h2i5ahGR2puyQLNxwvLqjk3wMblD0S2Bl78C9CpnlYDrAHZds3W/JCqIGo3TK0fzn8lHrAysp0VoRXS5rgbvNSwZSQP0AfIYqcKTvO080Z6mEvsYubGJVYKZpORaAI7VxCaXPd5piakZoeqv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=PUURHREi; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=q3Yp0BpC1JwAc5h1uplrrayDdiQnQvT3K7EBGl94OgY=; b=PUURHREirA1J+aDuJFCYs9pLAu
+	hhGO1meI2uveyJXl5XhDE6czSFuX0R3/6d8Gfk/9yUn6/xCNI6N3YRgRxa1TdOqpb1PGSkHLwKCi4
+	zdD/QPkxye/u16MMHyhtlT6qfxtKG/WvztMEnlCe9eBmuW/4f01iugliszFhkjjMmEyHQnAYblUOv
+	RJqQE52UjcATBvP30r2QjkNAPfFRDs/0j6tTn3u92i0EFq0q67Tmxtj7VpLDdjX0cFUunjRCGTnrX
+	AtDkd994tfZIky26HWujtWhyXZANyy3h/5TtAiEVS+dUF3hZeqDXWmI2re2XZS/cNCW7VncMU6l/y
+	zVOqzwRA==;
+Received: from 38.249.197.178.dynamic.cust.swisscom.net ([178.197.249.38] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sLj2h-000CII-D7; Mon, 24 Jun 2024 14:43:31 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf 2024-06-24
+Date: Mon, 24 Jun 2024 14:43:30 +0200
+Message-Id: <20240624124330.8401-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,PATCH v3 2/2] net: stmmac: dwmac-stm32: stm32: add
- management of stm32mp25 for stm32
-To: Christophe Roullier <christophe.roullier@foss.st.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Richard Cochran <richardcochran@gmail.com>, Jose Abreu
- <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20240624071052.118042-1-christophe.roullier@foss.st.com>
- <20240624071052.118042-3-christophe.roullier@foss.st.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <20240624071052.118042-3-christophe.roullier@foss.st.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27316/Mon Jun 24 10:26:29 2024)
 
-On 6/24/24 9:10 AM, Christophe Roullier wrote:
-> Add Ethernet support for STM32MP25.
-> STM32MP25 is STM32 SOC with 2 GMACs instances.
-> GMAC IP version is SNPS 5.3x.
-> GMAC IP configure with 2 RX and 4 TX queue.
-> DMA HW capability register supported
-> RX Checksum Offload Engine supported
-> TX Checksum insertion supported
-> Wake-Up On Lan supported
-> TSO supported
-> 
-> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-Reviewed-by: Marek Vasut <marex@denx.de>
+The following pull-request contains BPF updates for your *net* tree.
+
+We've added 12 non-merge commits during the last 10 day(s) which contain
+a total of 10 files changed, 412 insertions(+), 16 deletions(-).
+
+The main changes are:
+
+1) Fix a BPF verifier issue validating may_goto with a negative offset,
+   from Alexei Starovoitov.
+
+2) Fix a BPF verifier validation bug with may_goto combined with jump to
+   the first instruction, also from Alexei Starovoitov.
+
+3) Fix a bug with overrunning reservations in BPF ring buffer,
+   from Daniel Borkmann.
+
+4) Fix a bug in BPF verifier due to missing proper var_off setting related
+   to movsx instruction, from Yonghong Song.
+
+5) Silence unnecessary syzkaller-triggered warning in __xdp_reg_mem_model(),
+   from Daniil Dulov.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Barret Rhoden, Bing-Jhong Billy Jheng, Eduard Zingerman, Jesper Dangaard 
+Brouer, Muhammad Ramdhan, Pengfei Xu, Zac Ecob
+
+----------------------------------------------------------------
+
+The following changes since commit 143492fce36161402fa2f45a0756de7ff69c366a:
+
+  Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue (2024-06-14 19:05:38 -0700)
+
+are available in the Git repository at:
+
+  ssh://git@gitolite.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+for you to fetch changes up to 7e9f79428372c6eab92271390851be34ab26bfb4:
+
+  xdp: Remove WARN() from __xdp_reg_mem_model() (2024-06-24 13:44:02 +0200)
+
+----------------------------------------------------------------
+bpf-for-netdev
+
+----------------------------------------------------------------
+Alexei Starovoitov (6):
+      Merge branch 'bpf-fix-missed-var_off-related-to-movsx-in-verifier'
+      bpf: Fix remap of arena.
+      bpf: Fix the corner case with may_goto and jump to the 1st insn.
+      selftests/bpf: Tests with may_goto and jumps to the 1st insn
+      bpf: Fix may_goto with negative offset.
+      selftests/bpf: Add tests for may_goto with negative offset.
+
+Daniel Borkmann (2):
+      bpf: Fix overrunning reservations in ringbuf
+      selftests/bpf: Add more ring buffer test coverage
+
+Daniil Dulov (1):
+      xdp: Remove WARN() from __xdp_reg_mem_model()
+
+Matt Bobrowski (1):
+      bpf: Update BPF LSM maintainer list
+
+Yonghong Song (3):
+      bpf: Add missed var_off setting in set_sext32_default_val()
+      bpf: Add missed var_off setting in coerce_subreg_to_size_sx()
+      selftests/bpf: Add a few tests to cover
+
+ MAINTAINERS                                        |   3 +-
+ kernel/bpf/arena.c                                 |  16 ++-
+ kernel/bpf/ringbuf.c                               |  31 ++++-
+ kernel/bpf/verifier.c                              |  61 ++++++++-
+ net/core/xdp.c                                     |   4 +-
+ tools/testing/selftests/bpf/Makefile               |   2 +-
+ tools/testing/selftests/bpf/prog_tests/ringbuf.c   |  56 ++++++++
+ .../selftests/bpf/progs/test_ringbuf_write.c       |  46 +++++++
+ .../bpf/progs/verifier_iterating_callbacks.c       | 146 +++++++++++++++++++++
+ tools/testing/selftests/bpf/progs/verifier_movsx.c |  63 +++++++++
+ 10 files changed, 412 insertions(+), 16 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/test_ringbuf_write.c
 
