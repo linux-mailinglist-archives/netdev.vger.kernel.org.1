@@ -1,121 +1,180 @@
-Return-Path: <netdev+bounces-106026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F67C91443C
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 10:08:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7032914487
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 10:20:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41AAF283CF3
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 08:08:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18F5BB2084A
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 08:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5D1C49625;
-	Mon, 24 Jun 2024 08:08:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 483A14965C;
+	Mon, 24 Jun 2024 08:20:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="cxujiqvb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-out.aladdin-rd.ru (mail-out.aladdin-rd.ru [91.199.251.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C3447F6C;
-	Mon, 24 Jun 2024 08:08:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.199.251.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9AF49645;
+	Mon, 24 Jun 2024 08:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719216518; cv=none; b=WgDbHyOTYBu62lV0FBwENghT9dA4p56zL184I5wlJSiQiMdMGaY62Sb7LBqixNF5KpOX3Ox50OvnAuPcDRgiDPObq0SNSGbC79qwZKen8Fgfy5DwAfNVQayvxtc0kwRPhyucFhmE7k2FCwsEGSRO0PRXkarSj2TCh2amAnK6RbQ=
+	t=1719217212; cv=none; b=asA2WTtPnwn1wiWhnULlHEbCbWcflnXL8Y4CcJL4Hhnh9AmAdIETGTnj1gqFPXxknFsm2ijqRFmyBXDXCvrW/mZBG/sh1VO52g0mB7Tgdu5kTepQocutRSkuC9VabqUD49554x274Bd34uvGzcSQYtJzjKci1II6Rx+Fmnxdb9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719216518; c=relaxed/simple;
-	bh=1EfVWLN8EujHeW9ugE6PQVP6G/uH1aYrSaJvrCJ+/xA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=S6yYMyNuHseliQeJG95Q0HXBEJ+3D7sDtfv6lhkj0HB6k1+CEeSN49p9NivdLmqxqKZRJlQ5IQ5OnFomyuF87ZJmf6LFA/augfkhkcRQcyB7eaCrjn9CiONA4dTw/4MJtfQQvL7vkZaGhfd9LZyRgAB8yfR0pM1qla0vG6BTs5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aladdin.ru; spf=pass smtp.mailfrom=aladdin.ru; arc=none smtp.client-ip=91.199.251.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aladdin.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aladdin.ru
-From: Daniil Dulov <d.dulov@aladdin.ru>
-To: Alexei Starovoitov <ast@kernel.org>
-CC: Daniil Dulov <d.dulov@aladdin.ru>, Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
-	<john.fastabend@gmail.com>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: [PATCH v2] xdp: remove WARN() from __xdp_reg_mem_model()
-Date: Mon, 24 Jun 2024 11:07:47 +0300
-Message-ID: <20240624080747.36858-1-d.dulov@aladdin.ru>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1719217212; c=relaxed/simple;
+	bh=pq0cmcBY/X2RNBjl7vh86+Fi/2499fm8ZPDUFHIfztc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tn6tgIRmhvGMdUH8cgc8jacrL8kkwWObN/ESYqshQ2X6Oy4TbiM03fwoqEu5v3cRpbc17uh0ao4cKEC6Zctiym8gzDPLBtth6pzZbPPJRpwDXEan4KbSCkYmtBcV24yruG/FIMo9zqIzvHXY12SvG9xg6Va+kLdCcr8tsfb0a8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cxujiqvb; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 5563FC0009;
+	Mon, 24 Jun 2024 08:20:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1719217207;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Vpj1bjYXlBzUfYOefDTjh4xiC9L+rWuuQmo0xQfNisQ=;
+	b=cxujiqvbjQcjSYkwhcOwJAczyZeKLHaVrwYHhoxhQTlS84njHLtQU7WqYt0TVoLRyIsj/L
+	7b9nOKN5UR7d/5EIQAZ7hEEcyhn0Cq+6hJ3IfkQniOqC7/JJyuIgqQamKLH2mhQ7NOQuh9
+	Bwd3PaIEVlv/8MPvj+C2QLY6hLlABB1P+K4ceJxNEy59dzQIB8t9FyVXIKmlA3YikrJZmh
+	MtHsGb/kZflAGcFqL0O13KM/Hnm0pJ5l2xFN212IJL1m373ToUZfXE1Xq7oNN1cRC82Djb
+	9KGd+YUl4ms/PHS4Zds9ogBeUkZsyvcmGDX34hHAE1a5rk4uYg2iAebmKSH0qw==
+Date: Mon, 24 Jun 2024 10:20:03 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Simon Horman <horms@kernel.org>, Sai Krishna Gajula
+ <saikrishnag@marvell.com>, Thomas Gleixner <tglx@linutronix.de>, Rob
+ Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
+ Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Lee Jones <lee@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Saravana
+ Kannan <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Philipp
+ Zabel <p.zabel@pengutronix.de>, Lars Povlsen <lars.povlsen@microchip.com>,
+ Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
+ <daniel.machon@microchip.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Allan
+ Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli
+ <luca.ceresoli@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 18/19] mfd: Add support for LAN966x PCI device
+Message-ID: <20240624102003.3b11a8cc@bootlin.com>
+In-Reply-To: <CAHp75VdeoNXRTmMoK-S6qecU1nOQWDZVONeHU+imFiwcTxe8xg@mail.gmail.com>
+References: <20240527161450.326615-1-herve.codina@bootlin.com>
+ <20240527161450.326615-19-herve.codina@bootlin.com>
+ <ZmDJi__Ilp7zd-yJ@surfacebook.localdomain>
+ <20240620175646.24455efb@bootlin.com>
+ <CAHp75VdDkv-dxWa60=OLfXAQ8T5CkFiKALbDHaVVKQOK3gJehA@mail.gmail.com>
+ <20240620184309.6d1a29a1@bootlin.com>
+ <20240620191923.3d62c128@bootlin.com>
+ <CAHp75VdeoNXRTmMoK-S6qecU1nOQWDZVONeHU+imFiwcTxe8xg@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EXCH-2016-01.aladdin.ru (192.168.1.101) To
- EXCH-2016-01.aladdin.ru (192.168.1.101)
+X-GND-Sasl: herve.codina@bootlin.com
 
-Syzkaller reports a warning in __xdp_reg_mem_model().
+On Fri, 21 Jun 2024 17:45:05 +0200
+Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
 
-The warning occurs only if __mem_id_init_hash_table() returns
-an error. It returns the error in two cases:
+> On Thu, Jun 20, 2024 at 7:19 PM Herve Codina <herve.codina@bootlin.com> wrote:
+> > On Thu, 20 Jun 2024 18:43:09 +0200
+> > Herve Codina <herve.codina@bootlin.com> wrote:  
+> > > On Thu, 20 Jun 2024 18:07:16 +0200
+> > > Andy Shevchenko <andy.shevchenko@gmail.com> wrote:  
+> > > > On Thu, Jun 20, 2024 at 5:56 PM Herve Codina <herve.codina@bootlin.com> wrote:  
+> > > > > On Wed, 5 Jun 2024 23:24:43 +0300
+> > > > > Andy Shevchenko <andy.shevchenko@gmail.com> wrote:  
+> > > > > > Mon, May 27, 2024 at 06:14:45PM +0200, Herve Codina kirjoitti:  
+> 
+> ...
+> 
+> > > > > > > +   if (!dev->of_node) {
+> > > > > > > +           dev_err(dev, "Missing of_node for device\n");
+> > > > > > > +           return -EINVAL;
+> > > > > > > +   }  
+> > > > > >
+> > > > > > Why do you need this? The code you have in _create_intr_ctrl() will take care
+> > > > > > already for this case.  
+> > > > >
+> > > > > The code in _create_intr_ctrl checks for fwnode and not an of_node.
+> > > > >
+> > > > > The check here is to ensure that an of_node is available as it will be use
+> > > > > for DT overlay loading.  
+> > > >
+> > > > So, what exactly do you want to check? fwnode check covers this.
+> > > >  
+> > > > > I will keep the check here and use dev_of_node() instead of dev->of_node.  
+> > > >
+> > > > It needs to be well justified as from a coding point of view this is a
+> > > > duplication.  
+> >
+> > On DT based system, if a fwnode is set it is an of_node.
+> > On ACPI, if a fwnode is set is is an acpi_node.
+> >
+> > The core PCI, when it successfully creates the DT node for a device
+> > (CONFIG_PCI_DYNAMIC_OF_NODES) set the of_node of this device.
+> > So we can have a device with:
+> >  - fwnode from ACPI
+> >  - of_node from core PCI creation  
+> 
+> Does PCI device creation not set fwnode?
 
-  1. memory allocation fails;
-  2. rhashtable_init() fails when some fields of rhashtable_params
-     struct are not initialized properly.
+No and IMHO it is correct.
+This device has the fwnode that point to an ACPI node: The description used
+for device creation.
 
-The second case cannot happen since there is a static const
-rhashtable_params struct with valid fields. So, warning is only triggered
-when there is a problem with memory allocation.
+The of_node set is created based on PCI known information.
+This of_node, at PCI level is not used to create the PCI device but is created
+based on an already existing PCI device.
 
-Thus, there is no sense in using WARN() to handle this error and it can be
-safely removed.
+> 
+> > This driver needs the of_node to load the overlay.
+> > Even if the core PCI cannot create a DT node for the PCI device right
+> > now, I don't expect this LAN855x PCI driver updated when the core PCI
+> > is able to create this PCI device DT node.  
+> 
+> If it's really needed, I think the correct call here is is_of_node()
+> to show exactly why it's not a duplication. It also needs a comment on
+> top of this call.
 
-WARNING: CPU: 0 PID: 5065 at net/core/xdp.c:299 __xdp_reg_mem_model+0x2d9/0x650 net/core/xdp.c:299
+is_of_node() will not returns the expected result.
+It will return false as the fwnode->ops of the device is not related to 
+of_node ops but ACPI node ops :(
 
-CPU: 0 PID: 5065 Comm: syz-executor883 Not tainted 6.8.0-syzkaller-05271-gf99c5f563c17 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-RIP: 0010:__xdp_reg_mem_model+0x2d9/0x650 net/core/xdp.c:299
+What do you thing it I keep the of_node test using dev_of_node() and add the
+following comment:
+	--- 8< ---
+	/*
+	 * On ACPI system, fwnode can point to the ACPI node.
+	 * This driver needs an of_node to be used as the device-tree overlay
+	 * target. This of_node should be set by the PCI core if it succeeds in
+	 * creating it (CONFIG_PCI_DYNAMIC_OF_NODES feature).
+	 * Check here for the validity of the of_node.
+	 */
+	if (!dev_of_node(dev)) {
+		dev_err(dev, "Missing of_node for device\n");
+		return -EINVAL;
+	}
+	--- 8< ---
 
-Call Trace:
- xdp_reg_mem_model+0x22/0x40 net/core/xdp.c:344
- xdp_test_run_setup net/bpf/test_run.c:188 [inline]
- bpf_test_run_xdp_live+0x365/0x1e90 net/bpf/test_run.c:377
- bpf_prog_test_run_xdp+0x813/0x11b0 net/bpf/test_run.c:1267
- bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4240
- __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5649
- __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
+Let me know if this can be ok.
 
-Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
-
-Fixes: 8d5d88527587 ("xdp: rhashtable with allocator ID to pointer mapping")
-Signed-off-by: Daniil Dulov <d.dulov@aladdin.ru>
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
----
-v2: Removed unnecessary brackets as Jakub Kicinski <kuba@kernel.org>
-suggested, also added Acked-by Jesper Dangaard Brouer <hawk@kernel.org>
-Link: https://lore.kernel.org/all/20240617162708.492159-1-d.dulov@aladdin.ru/
-
- net/core/xdp.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index 41693154e426..022c12059cf2 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -295,10 +295,8 @@ static struct xdp_mem_allocator *__xdp_reg_mem_model(struct xdp_mem_info *mem,
- 		mutex_lock(&mem_id_lock);
- 		ret = __mem_id_init_hash_table();
- 		mutex_unlock(&mem_id_lock);
--		if (ret < 0) {
--			WARN_ON(1);
-+		if (ret < 0)
- 			return ERR_PTR(ret);
--		}
- 	}
- 
- 	xdp_alloc = kzalloc(sizeof(*xdp_alloc), gfp);
--- 
-2.25.1
-
+Hervé
 
