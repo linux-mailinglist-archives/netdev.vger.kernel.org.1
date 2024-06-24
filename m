@@ -1,228 +1,108 @@
-Return-Path: <netdev+bounces-106047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5E1F914747
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 12:20:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C46391474D
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 12:21:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 560FB1F251F3
-	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 10:20:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD01C1C208DF
+	for <lists+netdev@lfdr.de>; Mon, 24 Jun 2024 10:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6257E59A;
-	Mon, 24 Jun 2024 10:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E237E59A;
+	Mon, 24 Jun 2024 10:20:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="aqpVnVbM";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="bbCOtxhr"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="DCDMabIv"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B68134415;
-	Mon, 24 Jun 2024 10:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ACFD4595B
+	for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 10:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719224427; cv=none; b=kHUXMNCz5lmm2k/7x3G3Oa2L14PYG9c33EvmekD2z2rOBjl3PosBfO/WMp7QeOoiFuN/GtUn7zibUPuMBuFd2Ypk8veYX3Y4HcuRW9b4bUBDw/vktWyE7+AnbyV0pXu9yyE5g8spLWtZm6SNblX/Jk46VjaVlXzGW+GeoE2Jlfk=
+	t=1719224459; cv=none; b=hX7NORkcQ9nA/W/H6CrbUyxdhDEiWdAqFu5m0WGHqpP77XoxUo46t4uz8hOX81NG6nUcPKV8g+iDhpzo1hACYi07QD2eC2S7Qq3I+3SDsIZvDCU5rng0vWJb/Q5K7inlO1ADsulBnBkFmM4WF7doE9fyY2f8rtwtXIoxg9IFHac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719224427; c=relaxed/simple;
-	bh=49GetJzS1/9DXisEmwEIB+lxlkHR80nPRwzdeujz5/c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dzOe95qkMUqT60muRbUrYBsteCOwxK6b8xwNdy3LaIUT2G4cyP78ibi1j0l/u7EwjytccCiSZdgXBlzlDkicZctDTzyxNMreWAvUCcYAZE6hE3p9CuSNMASPkgRLF9PrIb5+ndTrXkNhlZoxtDeplecU1jhNi8201feKf9zVqTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=aqpVnVbM; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=bbCOtxhr; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Mon, 24 Jun 2024 12:20:18 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1719224420;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5Gb/W/MoapK223ZiKbDY+hfRqUcVWLe2F8ysbzCzywg=;
-	b=aqpVnVbMT2FCMErnSL8VEo4Lww2axUso6Rpq8Q5kSsfZOtGe0fDWAVO0mvLFL9Ujj/49qR
-	1HiWbx0IpKudpKmt2a5idRv2VKdayGMJv5niQSjcDqKogtAhj1Jq1amBF8lbappTIBmHBI
-	5Tp9DT0DRg2ah2xhPFVc19vpO25jGJ74+gUYx1YE6UctyYKdz7q2lYJUuWwHSlHQBoYy4c
-	judML0a1fS8VrCszjNtLleG0WCaIiSf0FklBvy5df3e064ZyE9Mh29Av4ZXzbiiLgn2K5G
-	CD/T7Rn3/xnzZc0K5iW7beHAqSCpVamtxAzCEPZjlsH82BvXGIY7fxwGeTdoow==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1719224420;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5Gb/W/MoapK223ZiKbDY+hfRqUcVWLe2F8ysbzCzywg=;
-	b=bbCOtxhr4fiyowF7SY+VwHXBM4829IoSDbIT0H93vkkAg3IkNubMPovAkcJjKp4J+LGnhB
-	oFn8Gl8OKmpdNQDQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+	s=arc-20240116; t=1719224459; c=relaxed/simple;
+	bh=bk7hhY2/QnkoNAc7S1gg4nmxH8h9zebqWMFC8obuO0o=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=XAv10w0KrPjIIHT6gnFl3lh/GlpA+2/EDzj5RbT2UV4CS00vfcqkVyDxeame87NsbRMZlSBGnnp5mNIbIiXlDD6XYiIiGK0psQn2V+BPRzFGzZR8TDo1XMy4TjugAjcFa98Pxx/RoDVcm3dvHY20Qc9IAS2bON3Nmrcow3hM9tI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=DCDMabIv; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-57d1679ee6eso7304622a12.1
+        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 03:20:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1719224456; x=1719829256; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GsLqpJ1xgH3tAmDotBaZMLlGvU0XzqphqYCZfE3egaY=;
+        b=DCDMabIvWUqgRtyjaT/h3GRFJFe7LnoXPawL87KGIpA9cnBMIgP3hI7mSw5oP6xHG8
+         d4lYyFRvxPd2YbjsswVqfZxxY632/R1KRmyRHX+WpDmKQ1hEfBnZy2GuXkEpwYjJvAEI
+         UCRXjjfJgR66OSqVRAU4pt/SvUK+tiN1jfteKKioHX2zHf7YI7viL5dSF0/KtI73497I
+         VggroYT4Jrzf38SBErWAC8m47Ma6mZjeoekJE4QPCqJSCpEjAb/zAAxvGUeq/G0NYYm6
+         OoN6BqJHIAxVo99fx6fw7TPIudjLQp4VS6LKiuMsRZxMDLkmgk6dH6nIFdKKd+fEOOqx
+         7wDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719224456; x=1719829256;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GsLqpJ1xgH3tAmDotBaZMLlGvU0XzqphqYCZfE3egaY=;
+        b=EOSBREpSDspBHuHYGn1V6vzYGzucu91FUyGu92/VCWd1zJYmETFBGyFo229RUL8FC6
+         HDij7Pc+n5s4YTVsnGyUFtKS6bwdjnd7nK2+gQHQ3pWoyC5K7aPb/I6px74jhkz1dCW4
+         ZFWGW+fg+2/CoqQnchJ0sze8BfAzfICxoXuh8QVcXvcv+UlxxfRm+loP5BN2OlkKU21k
+         oJazmZJJoJYcg+7oXfnayJscADSr98iXYNtm8S6O9C82qdfLrPkNtJ2Z4K5O9B3VWpuW
+         NdU/5e7obecpDuraAhudCzFJGt02YmhblwaBTem5ZyU2M5ZZV5c+W9A6dp6i9Hywn9xr
+         v4Ig==
+X-Gm-Message-State: AOJu0YxJD5CjRYcbuzEN3OLy6rDTpFK5lLVswqCEcengt4K3LC1jfPwJ
+	QlIIULkeE+5NqweRkXhucfuOG4B4fm9xOxfom9+SzAJYXfiHTAoDYQPcUo4TUtM=
+X-Google-Smtp-Source: AGHT+IFUeIb+nQ+i2oL/00vzZCNRSLyn5VbT8DnHYWAuq/PgIBgygx0aV6pc7GppU1eqnN0Th7YDnw==
+X-Received: by 2002:a17:906:f909:b0:a6f:62c5:87be with SMTP id a640c23a62f3a-a6ffe270a03mr375422166b.4.1719224455646;
+        Mon, 24 Jun 2024 03:20:55 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:27])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6fcf549385sm394118566b.105.2024.06.24.03.20.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jun 2024 03:20:55 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Daniel Bristot de Oliveira <bristot@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
-	Ben Segall <bsegall@google.com>,
-	Daniel Bristot de Oliveira <bristot@redhat.com>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>
-Subject: Re: [PATCH v9 net-next 08/15] net: softnet_data: Make xmit per task.
-Message-ID: <20240624102018.WYAKspD9@linutronix.de>
-References: <20240620132727.660738-1-bigeasy@linutronix.de>
- <20240620132727.660738-9-bigeasy@linutronix.de>
- <20240621191245.1016a5d6@kernel.org>
+Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Willem
+ de Bruijn <willemb@google.com>,  kernel-team@cloudflare.com
+Subject: Re: [PATCH net 2/2] selftests/net: Add test coverage for UDP GSO
+ software fallback
+In-Reply-To: <20240622192722.689abc7d@kernel.org> (Jakub Kicinski's message of
+	"Sat, 22 Jun 2024 19:27:22 -0700")
+References: <20240622-linux-udpgso-v1-0-d2344157ab2a@cloudflare.com>
+	<20240622-linux-udpgso-v1-2-d2344157ab2a@cloudflare.com>
+	<20240622192722.689abc7d@kernel.org>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Mon, 24 Jun 2024 12:20:53 +0200
+Message-ID: <87v81ywsje.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240621191245.1016a5d6@kernel.org>
+Content-Type: text/plain
 
-On 2024-06-21 19:12:45 [-0700], Jakub Kicinski wrote:
-> On Thu, 20 Jun 2024 15:21:58 +0200 Sebastian Andrzej Siewior wrote:
-> > +static inline void netdev_xmit_set_more(bool more)
-> > +{
-> > +	current->net_xmit.more = more;
-> > +}
-> > +
-> > +static inline bool netdev_xmit_more(void)
-> > +{
-> > +	return current->net_xmit.more;
-> > +}
-> > +#endif
-> > +
-> > +static inline netdev_tx_t __netdev_start_xmit(const struct net_device_ops *ops,
-> > +					      struct sk_buff *skb, struct net_device *dev,
-> > +					      bool more)
-> > +{
-> > +	netdev_xmit_set_more(more);
-> > +	return ops->ndo_start_xmit(skb, dev);
-> > +}
-> 
-> The series looks clean, I'm happy for it to be applied as is.
-> 
-> But I'm curious whether similar helper organization as with the BPF
-> code would work. By which I mean - instead of read / write helpers
-> for each member can we not have one helper which returns the struct?
-> It would be a per-CPU struct on !RT and pointer from current on RT.
-> Does it change the generated code? Or stripping the __percpu annotation
-> is a PITA?
+On Sat, Jun 22, 2024 at 07:27 PM -07, Jakub Kicinski wrote:
+> On Sat, 22 Jun 2024 18:14:44 +0200 Jakub Sitnicki wrote:
+>> +	ip link add name sink type dummy mtu 1500
+>
+> Looks like this doesn't make CI happy:
+>
+> https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/651680/59-udpgso-sh/stdout
+>
+> I'm guessing "mtu 1500" needs to go before "type dummy"?
+> iproute2 hands over arguments after type to type specific handler.
 
-You are asking for
+"ip link" got stricter, I see. Been testing against an old one :/
 
-| #ifndef CONFIG_PREEMPT_RT
-| static inline struct netdev_xmit *netdev_get_xmit(void)
-| {
-|        return this_cpu_ptr(&softnet_data.xmit);
-| }
-| #else
-| static inline int netdev_get_xmit(void)
-| {
-|        return &current->net_xmit;
-| }
-| #endif
+  # ip -V
+  ip utility, iproute2-6.1.0, libbpf 1.2.2
 
-on one side so that we can have then
-
-| static inline void dev_xmit_recursion_inc(void)
-| {
-|	netdev_get_xmit()->recursion++;
-| }
-|
-| static inline void dev_xmit_recursion_dec(void)
-| {
-|	netdev_get_xmit()->recursion--;
-| }
-
-This changes the generated code slightly. The inc increases from one to
-two opcodes, __dev_direct_xmit() snippet:
-
-|         addl $512, %gs:pcpu_hot+8(%rip) #, *_45
-local_bh_disable();
-|         incw %gs:softnet_data+120(%rip)         # *_44
-dev_xmit_recursion_inc();
-
-|         testb   $16, 185(%rbx)  #, dev_24->features
-|         je      .L3310  #,
-|         movl    $16, %r13d      #, <retval>
-|         testb   $5, 208(%r12)   #, MEM[(const struct netdev_queue *)_54].state
-|         je      .L3290  #,
-|         movl    $512, %esi      #,
-^ part of local_bh_enable();
-|         decw %gs:softnet_data+120(%rip)         # *_44
-dev_xmit_recursion_dec();
-
-|         lea 0(%rip), %rdi       # __here
-|         call    __local_bh_enable_ip    #
-
-
-With the change mentioned above we get:
-|         addl $512, %gs:pcpu_hot+8(%rip) #, *_51
-local_bh_disable();
-
-|         movq    %gs:this_cpu_off(%rip), %rax    # *_44, tcp_ptr__
-|         addw    $1, softnet_data+120(%rax)      #, _48->recursion
-two opcodes for dev_xmit_recursion_inc()
-
-|         testb   $16, 185(%rbx)  #, dev_24->features
-|         je      .L3310  #,
-|         movl    $16, %r13d      #, <retval>
-|         testb   $5, 208(%r12)   #, MEM[(const struct netdev_queue *)_60].state
-|         je      .L3290  #,
-|         movq    %gs:this_cpu_off(%rip), %rax    # *_44, tcp_ptr__
-one opcode from dev_xmit_recursion_dec()
-
-|         movl    $512, %esi      #,
-part of local_bh_enable()
-
-|         lea 0(%rip), %rdi       # __here
-|         subw    $1, softnet_data+120(%rax)      #, _68->recursion
-second opcode from dev_xmit_recursion_dec()
-
-|         call    __local_bh_enable_ip    #
-
-So we end up with one additional opcode per usage and I can't tell how
-bad it is. The second invocation (dec) was interleaved so it might use
-idle cycles. Instead of one optimized operation we get two and the
-pointer can't be cached.
-
-And in case you ask, the task version looks like this:
-
-|         addl $512, %gs:pcpu_hot+8(%rip) #, *_47
-local_bh_disable()
-
-|         movq    %gs:const_pcpu_hot(%rip), %r14  # const_pcpu_hot.D.2663.D.2661.current_task, _44
-|         movzwl  2426(%r14), %eax        # MEM[(struct netdev_xmit *)_44 + 2426B].recursion, _45
-|         leal    1(%rax), %edx   #, tmp140
-|         movw    %dx, 2426(%r14) # tmp140, MEM[(struct netdev_xmit *)_44 + 2426B].recursion
-
-four opcodes for the inc.
-
-|         testb   $16, 185(%rbx)  #, dev_24->features
-|         je      .L3311  #,
-|         movl    $16, %r13d      #, <retval>
-|         testb   $5, 208(%r12)   #, MEM[(const struct netdev_queue *)_56].state
-|         je      .L3291  #,
-|         movw    %ax, 2426(%r14) # _45, MEM[(struct netdev_xmit *)_44 + 2426B].recursion
-
-but then gcc recycles the initial value. It reloads the value and
-decrements it in case it calls the function.
-
-|         movl    $512, %esi      #,
-|         lea 0(%rip), %rdi       # __here
-|         call    __local_bh_enable_ip    #
-| 
-
-Any update request?
-
-Sebastian
+Will rearrange. Thanks for the heads-up.
 
