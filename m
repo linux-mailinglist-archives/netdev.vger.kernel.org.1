@@ -1,189 +1,97 @@
-Return-Path: <netdev+bounces-106412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D3C9916201
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 11:10:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DFA2916210
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 11:11:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 522871C23A22
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:10:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE537288261
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2DAC14900E;
-	Tue, 25 Jun 2024 09:09:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD43149E17;
+	Tue, 25 Jun 2024 09:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ocyt5oyU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fv0l8iF6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA611148FF9;
-	Tue, 25 Jun 2024 09:09:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD90149C7D
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 09:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719306571; cv=none; b=RGTylgKwlLsuoUlB4rCzh2osXDw8W4aL/R7LXO6FigHuxWHm/a2GLI9Onj+lKYK9TIenhrEeZkF+xpJSBW8RsTo8iKdzry/GWuEP93AadlT8HrTKWDbuGKRWw96dlkdETN0cGcRg03/FQaGN5qgQitLcaUNXz2uyit4MpdRIkNE=
+	t=1719306630; cv=none; b=ksWPESm7ddrjQraoL+UindHtDqTw1vndTtRYQWkL2/GWqUMEDmubBfESZjvnwZ7FA6zDPWhiC5Tu9JA9dz25So3hurR6BwRxr2lVIUKqcGDzztWk07xmUOR4vMFi0hSr0EsbAXeATR9SSONcTxM9w3zq3VXtlxoPh8W+RRsNpeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719306571; c=relaxed/simple;
-	bh=+B9dTFZIaW4cQW42WV0VccjrhsA/xnVkExPPQav3t2A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FFuHtBSCyH29xj77RTFjfV1O9V5zD6Gp2o6VaOfCsoLZGYx5okd3TbEncE9dq8/QrSCysRjWFWZ0u/1ksybFpgDC1I3QdAG2BBXEE2SZzlxC9r3oMdpMcW/0EJNFRT4RIgLF13KH0jxA4+9fL81oMVRcfie3N2z0V0ytVouaJ4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ocyt5oyU; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45P8uuSV005270;
-	Tue, 25 Jun 2024 09:09:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=x
-	gTJcC1NoV0QP1ImKxECWxCuCu3EOkToc4qJdOQGxjc=; b=ocyt5oyUF0rqU+Q8R
-	x+zroPfvPPput0xLTZvW7kl5/5HuaLoaEwx+neApb3ex2laQy+4dArkcFpj3vLKX
-	fSw/EmaY1XAy6bZvlK9V2C4FbGEnm+4vDIW/PS/RPuDoUD1ypOa4sz5aLHUKbJaA
-	H7SQRqJfKP+HsUBUQSWYYbPlKQORplFKkMSq0zs+FCmR4Fp7NdvwjdvrpSQTc4C3
-	ZIXpJpc1iJystFxlAohVDwSF2URAwOn8zVHrJD9sv4/q/ZdL1D1IhdyeWhDeGX4D
-	7rlYUYRASWutCy4GKWLUlqZHcB7W3ckmOct/LGwC1xMFSU4JNVquW5LgGt9ybpxC
-	xrymQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yytdm035h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Jun 2024 09:09:28 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45P99SJ2026727;
-	Tue, 25 Jun 2024 09:09:28 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yytdm035f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Jun 2024 09:09:28 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45P7lBYn000564;
-	Tue, 25 Jun 2024 09:09:27 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yxaemweyr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Jun 2024 09:09:26 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45P99LKY50201076
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 25 Jun 2024 09:09:23 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6428E2004D;
-	Tue, 25 Jun 2024 09:09:21 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 218B320043;
-	Tue, 25 Jun 2024 09:09:21 +0000 (GMT)
-Received: from [9.152.224.141] (unknown [9.152.224.141])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 25 Jun 2024 09:09:21 +0000 (GMT)
-Message-ID: <beac131a-6c8c-4ed7-8714-416c57ea0fbb@linux.ibm.com>
-Date: Tue, 25 Jun 2024 11:09:20 +0200
+	s=arc-20240116; t=1719306630; c=relaxed/simple;
+	bh=HRkFdZLzGCiBSxhFTdNYnPv42CNDsCy0vI99jCckptI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=d23c5hIz8wjvdN3rRPMf1n5Jc34BoLFfKtrQIoq8d75odSEVwGPH3lEi5gff5J0x4rT5A09sSGC1eyHkbg4QU2Ha4iuy0CAlCrR3Fet1HNXWmRFdtgRDll1YN0k7CQlJI3klkqpSfh7ywaOTwJPEQ9pNoaQ4hZmknPyr54FNvw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fv0l8iF6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 88970C32789;
+	Tue, 25 Jun 2024 09:10:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719306629;
+	bh=HRkFdZLzGCiBSxhFTdNYnPv42CNDsCy0vI99jCckptI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fv0l8iF65H/5u/9dxeg6n/XOtn5/Q0cNew2fuXKBq6AapfflhOQvcjMZ5lglciKLJ
+	 y94OzjwwwVFkZcsg1hjo8Jkh7sQ0AjgivfFnEewx+wkNN4iWfELK+rJ+HjBdJKRgz3
+	 mpu+53EOdRuP+MXBFyqeW9v7PbiWk1AcJu87G1O0Sgu6QGiTcDh8NqDVmf8lPSuRV1
+	 PcGSJFAID6vF+WC3YGnSsIhY3O28vf9579anqTQiMKUBut9upuOPU/Qz0ewsoXvsnL
+	 bez1pM3xLX+HL56T6CqDH0n3L55Gl8PA2uJLZ5mu9R666R81J/YO6QbzKb81E5n81T
+	 1XDepzYPCTuHQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7499DC32767;
+	Tue, 25 Jun 2024 09:10:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] s390/netiucv: handle memory allocation failure in
- conn_action_start()
-To: yskelg@gmail.com, Thorsten Winkler <twinkler@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Markus Elfring <Markus.Elfring@web.de>
-Cc: MichelleJin <shjy180909@gmail.com>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240625024819.26299-2-yskelg@gmail.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20240625024819.26299-2-yskelg@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: hN4so40EoBdfJmWpzv3LNbD5J88xwPs8
-X-Proofpoint-ORIG-GUID: 5GTyUk6TyUfGCh_iUl8LLOm46BM_EQsn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-25_04,2024-06-24_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- bulkscore=0 impostorscore=0 adultscore=0 malwarescore=0 suspectscore=0
- priorityscore=1501 mlxlogscore=686 spamscore=0 lowpriorityscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2406250064
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] ibmvnic: Fix TX skb leak after device reset
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171930662947.3966.10907113087456004516.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Jun 2024 09:10:29 +0000
+References: <20240620152312.1032323-1-nnac123@linux.ibm.com>
+In-Reply-To: <20240620152312.1032323-1-nnac123@linux.ibm.com>
+To: Nick Child <nnac123@linux.ibm.com>
+Cc: netdev@vger.kernel.org, nick.child@ibm.com, haren@linux.ibm.com,
+ ricklind@us.ibm.com
 
+Hello:
 
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On 25.06.24 04:48, yskelg@gmail.com wrote:
-> From: Yunseong Kim <yskelg@gmail.com>
-
-Thank you very much Yunseong, for finding and reporting this potential 
-null-pointer dereference.
-And thank you Markus Elfring for your valuable comments.
-
+On Thu, 20 Jun 2024 10:23:10 -0500 you wrote:
+> These 2 patches focus on resolving a possible skb leak after
+> a subset of the ibmvnic reset processes.
 > 
-> A null pointer is stored in the data structure member "path" after a call
-> of the function "iucv_path_alloc" failed. This pointer was passed to
-> a subsequent call of the function "iucv_path_connect" where an undesirable
-> dereference will be performed then. Thus add a corresponding return value
-> check. This prevent null pointer dereferenced kernel panic when memory
-> exhausted situation with the netiucv driver operating as an FSM state
-> in "conn_action_start".
-
-I would prefer an even shorter commit message. Allocating memory
-without checking for failure is a common error pattern, I think.
-
+> Essentially, the driver maintains a free_map which contains indexes to a
+> list of tracked skb's addresses on xmit. Due to a mistake during reset,
+> the free_map did not accurately map to free indexes in the skb list.
+> This resulted in a leak in skb because the index in free_map was blindly
+> trusted to contain a NULL pointer. So this patchset addresses 2 issues:
+>   1. We shouldn't blindly trust our free_map (lets not do this again)
+>   2. We need to ensure that our free_map is accurate in the first place
 > 
-> Fixes: eebce3856737 ("[S390]: Adapt netiucv driver to new IUCV API")
-> Cc: linux-s390@vger.kernel.org
-> Signed-off-by: Yunseong Kim <yskelg@gmail.com>
-> ---
->  drivers/s390/net/netiucv.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/s390/net/netiucv.c b/drivers/s390/net/netiucv.c
-> index 039e18d46f76..d3ae78c0240f 100644
-> --- a/drivers/s390/net/netiucv.c
-> +++ b/drivers/s390/net/netiucv.c
-> @@ -855,6 +855,9 @@ static void conn_action_start(fsm_instance *fi, int event, void *arg)
->  
->  	fsm_newstate(fi, CONN_STATE_SETUPWAIT);
->  	conn->path = iucv_path_alloc(NETIUCV_QUEUELEN_DEFAULT, 0, GFP_KERNEL);
-> +	if (!conn->path)
-> +		return;
-> +
+> [...]
 
+Here is the summary with links:
+  - [net,1/2] ibmvnic: Add tx check to prevent skb leak
+    https://git.kernel.org/netdev/net/c/0983d288caf9
+  - [net,2/2] ibmvnic: Free any outstanding tx skbs during scrq reset
+    (no matching commit)
 
-On 25.06.24 09:24, Markus Elfring wrote:
-> 
-> Would the following statement variant become more appropriate here?
-> 
-> +		return -ENOMEM;
-
-conn_action_start(), like the other fsm functions, does not have a return value.
-But simply returning will not prevent the next fsm function from trying to use
-conn->path.
-
-So I think you need to do
-fsm_newstate(fi, CONN_STATE_CONNERR);
-before you return.
-
-You could use rc = -ENOMEM and a goto to the IUCV_DBF_TEXT_ debug message,
-if you want to. But I am not too concerned about the details of error handling:
-If your memory is so scarce that you cannot even allocate a handful of bytes,
-then you should be seeing warnings all over the place.
-
-
-
-
-
-
-
-
-
-
-
-
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
