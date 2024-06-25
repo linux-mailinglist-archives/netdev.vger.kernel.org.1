@@ -1,116 +1,142 @@
-Return-Path: <netdev+bounces-106623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21A7791705F
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 20:37:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A66191707E
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 20:46:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDDE52844D1
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 18:37:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAA451C24EC7
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 18:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A8A817C22A;
-	Tue, 25 Jun 2024 18:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1B217D8A1;
+	Tue, 25 Jun 2024 18:44:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="EEwzxnfX"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="sGPoYBh8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6913417BB2C;
-	Tue, 25 Jun 2024 18:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84C617C7BB;
+	Tue, 25 Jun 2024 18:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719340657; cv=none; b=H6sRSqPwa5N3ZDJyyUW/jv8nz00Bv/AwgEol2X8u2DVYXp9ks3qsCRf3+VaGAw77+D5MWQSBvLsP0uMSLei1+6huVcXgoKxlIqR0AsfAg7CCq9hRtVShcksvtDgwjO5iaCkSKZx7Q7s7i/7E3q/xOfY5WE/OOptHGvG/PI2qrS0=
+	t=1719341061; cv=none; b=rKCGEag23j0EQdwzzbF5q96jCjiKxD+bdAmndYUVelpbzKpQRLDruVf9rp6JjHNa5tjHa0+BuIxq+9KoQ2TYQTYD7EtCLO7et9L7r6OYufSoMn+FkoXxWFP3dP7i2KejMbDcjrULrCWJoi83kbgqi3LHxIGLeoKg2HuXMJVz68U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719340657; c=relaxed/simple;
-	bh=BcNPqhdX1Jezx47Nm2DHVvZlt4TXAklF0cVVOknZOAE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=AXopq2akhrMMw/zrfLu87mo9nCvUVLxDeEi4lUEZFxq6pjvIcPiercUxg/N3uthAwPWkTxldlzqTncajTyLNUSTfeSiAtPGMl80fV+tt3L3TzYgH3SFUMXK0rkPdNCncSGnQCsV1wneXjPRXHZOdfOnO4rehMKRbcIzeJp0UdUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=EEwzxnfX; arc=none smtp.client-ip=212.227.17.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1719340631; x=1719945431; i=markus.elfring@web.de;
-	bh=4FeUMM41rBgZTT/36ibhfoknQQkhU5GwynYwSWPeRUU=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:
-	 References:From:Cc:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=EEwzxnfXFB9eRWf5Y7/oJ6mX4Sh9+1zSm69ip3KnNTJ5aua1HTfO6tCFLvIps9Gb
-	 iSzBaaFqdetVvULFS8vd+CQ7X+7K8SXc5teDStoy6j+YYYVOuHcUTNmLb/SjieA/2
-	 Mkdvv7I8XIvqEcPV7Nq0vnjjInIxUhDzMoIE9OZlY4C5xq9AJA0i97V/w132ebFXi
-	 XqCzkGFOpRcvZupYP6TBs+U2v00//5liJLfiDKK5m+cUYME8CNL0dsZqfi5sQEhGC
-	 nns8tJY7CI45XmzOOGKrajI0y88IqEU+aV9cka8YyeIjnq297R1EvozU7BHKPEELT
-	 jozLfqne81XFzO8wuw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1M1aDp-1sJ8u41eQd-009WO3; Tue, 25
- Jun 2024 20:37:11 +0200
-Message-ID: <1bee6344-cc98-4746-921f-31454a9c3008@web.de>
-Date: Tue, 25 Jun 2024 20:37:09 +0200
+	s=arc-20240116; t=1719341061; c=relaxed/simple;
+	bh=OFnL8+6rFqHfVb45JjyyjMy/lYgmP++CSsZKPWX8lIs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aQ4Ae1XVEV3YLa3ZION8wsxdPWi/kq/RVV0cYXb0Dd9G34OW2ALx7Jqu5ZJMVbat16/EpdCXxhZ1s4+x6tOX8615b/ZgcRJdm5qrUemMg2/NZZk5MpDVAsPm9T5ucl5+AVDyJoCbpbrtb2J9sqnyJojGZtgCmyO6VrWtTZ9lAuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=sGPoYBh8; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 2E26187B1A;
+	Tue, 25 Jun 2024 20:44:11 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1719341052;
+	bh=GzliCsk6Gh2LlTif0QMixDMv4RHi+mVAjTNOi48YBMY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=sGPoYBh8NIdfB0jcLqOPPOAQD2US1vHN27q1NT8dXerHmhJeqV4HZ7atl+i0Cqb4D
+	 vHVUR+CQL6lq8NAr50ocLdNLoVsIpY4YNxuf32WFSh1GQ2AvmZn2LvMSCDUzU9nzOY
+	 G8ULuHq5QSRuzU1oabatp2H6S1LS8BBEQmXOrPenWZoDZfjkKSD7QGy0CP3aS/bZLi
+	 l4g2IANVU20XSPxvoNeCxtWdDmnQbzjhL+Y0ROCiMaUCydGtXOmSqniKk6dx8+d27T
+	 V3FP0InPL8FFDSghUGemYIj08YTGW2tar0S4+klDkLKLQMqFHvWRdycOg7W6nVcMyH
+	 jZYIKJazFFfHA==
+From: Marek Vasut <marex@denx.de>
+To: netdev@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Joakim Zhang <qiangqing.zhang@nxp.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	devicetree@vger.kernel.org,
+	kernel@dh-electronics.com
+Subject: [net-next,PATCH v2] dt-bindings: net: realtek,rtl82xx: Document known PHY IDs as compatible strings
+Date: Tue, 25 Jun 2024 20:42:28 +0200
+Message-ID: <20240625184359.153423-1-marex@denx.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net PATCH 2/7] octeontx2-af: Fix klockwork issues in
- mcs_rvu_if.c
-To: Suman Ghosh <sumang@marvell.com>, netdev@vger.kernel.org
-References: <20240625173350.1181194-1-sumang@marvell.com>
- <20240625173350.1181194-4-sumang@marvell.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jerin Jacob <jerinj@marvell.com>, Eric Dumazet <edumazet@google.com>,
- Geethasowjanya Akula <gakula@marvell.com>,
- Hariprasad Kelam <hkelam@marvell.com>, Linu Cherian <lcherian@marvell.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
- Sunil Goutham <sgoutham@marvell.com>
-In-Reply-To: <20240625173350.1181194-4-sumang@marvell.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:gjsARz0OXTzGo09X+uY9zbdeX+i9ULc5X99l7Y26zZmPNTkqT9X
- ounZnHSvO/ZJ8BFJ/y8p+fV0tFzsA4npi6M71NXHrmuXaFviMZnCQf70rYhYMje6jDl4FYC
- troS5BHz0JYtaFu7EkrZxJKCauK08ZZ7/O5N7fzzVLmnc9edLZjG72lWrqiJau0Ge4PNGx6
- uE/VpS4YP85Aoh6oZoG9g==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:G4ISI3yF0CQ=;HVZzIVT24a58uqzOjvHPMI7ckAs
- leN1ngfHBbKVFuWv9Ce3UgCzW/F9VCVTHfMKvSjYI2lM41nSJe5RgjIhvUpZLXde9COtwHnCM
- v/vwOA0PQra2aNkRxATwyTw4LDYH9zay27VSz773nMQEBK2Src9nXACg+NqfVkLQQ7veFUoMk
- f+uwfpcpvLlmWqiB3LvcvyVmyGTsKm/r2/iO/1N0AElSGS/SAIUiwsF0o2Co5fwfNLDn5S4Cj
- Ew36PWr9gZz7fhhnqVPZw45OSpHC75+fnYlEAnNQNx3QhLu1+Vgb4yBGim096jIj41VUPPCQn
- j4QROYkxMn3TVgcieMgX50uFygDPybRamb3ckXC4MsPeOR7aiD7K9X4RPQEmYnnMgSC9DUojm
- x2Nki7kPlzPrgAXax2TcMDEVgn9yBT4ukUMWGzq+X36lBVen++grnutp3gvzBOJIi+NqPqKzp
- pkbPiMcbfpO4rWpHEkew9qEmBSZwRXedxTmobCmtleiPHTvwNAXal91c7/yNooIzZEjOVtoNv
- VzDi27Bkz0feSWPhOPa5t+3ZdNEFJcpPQj3S5pEaZXV6JLzJ9SyhYk4zcLlG+c83uWxl1p9fj
- VUio6bDEqZnsZBXYiFzsoTIpiloEWhhqTQm5HTQNnTF/2I3GLX4JA91HF8P5RwMgU+DDO0PBS
- 5BmY6Uy60RuibJfnqyoErCJUvPTRCPVbjaaao/os1krJlqLMnXhjFmb+lECZAefepzuXSg5cF
- c5gOKvPDRZTI/XlxjclTBPhRMzwml0WICnMk53Te59v40nlt3z1yT/N5s7VMt87HoqiNGntpS
- VzpW15iBXirGJSq8wxC2jvtPhSPlzD1q/PUYqDnIxcI3E=
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-> These are not real issues but sanity checks.
-=E2=80=A6
+Extract known PHY IDs from Linux kernel realtek PHY driver
+and convert them into supported compatible string list for
+this DT binding document.
 
-* Did the mentioned source code analysis tool present more detailed report=
-s
-  and special development views?
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/=
-Documentation/process/submitting-patches.rst?h=3Dv6.10-rc5#n45
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+Cc: Andrew Lunn <andrew@lunn.ch>
+Cc: Conor Dooley <conor+dt@kernel.org>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Joakim Zhang <qiangqing.zhang@nxp.com>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Rob Herring <robh@kernel.org>
+Cc: devicetree@vger.kernel.org
+Cc: kernel@dh-electronics.com
+Cc: netdev@vger.kernel.org
+---
+V2: Drop ethernet-phy-id0000.8201 entry
+---
+ .../bindings/net/realtek,rtl82xx.yaml         | 23 +++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-* You accidentally overlooked to specify a corresponding version identific=
-ation
-  in the message subject, didn't you?
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/=
-Documentation/process/submitting-patches.rst?h=3Dv6.10-rc5#n668
+diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+index bb94a2388520b..18ee72f5c74a8 100644
+--- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
++++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+@@ -18,6 +18,29 @@ allOf:
+   - $ref: ethernet-phy.yaml#
+ 
+ properties:
++  compatible:
++    enum:
++      - ethernet-phy-id001c.c800
++      - ethernet-phy-id001c.c816
++      - ethernet-phy-id001c.c838
++      - ethernet-phy-id001c.c840
++      - ethernet-phy-id001c.c848
++      - ethernet-phy-id001c.c849
++      - ethernet-phy-id001c.c84a
++      - ethernet-phy-id001c.c862
++      - ethernet-phy-id001c.c878
++      - ethernet-phy-id001c.c880
++      - ethernet-phy-id001c.c910
++      - ethernet-phy-id001c.c912
++      - ethernet-phy-id001c.c913
++      - ethernet-phy-id001c.c914
++      - ethernet-phy-id001c.c915
++      - ethernet-phy-id001c.c916
++      - ethernet-phy-id001c.c942
++      - ethernet-phy-id001c.c961
++      - ethernet-phy-id001c.cad0
++      - ethernet-phy-id001c.cb00
++
+   realtek,clkout-disable:
+     type: boolean
+     description:
+-- 
+2.43.0
 
-
-Regards,
-Markus
 
