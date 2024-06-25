@@ -1,216 +1,112 @@
-Return-Path: <netdev+bounces-106400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47F9E916168
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 10:35:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E17C916177
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 10:38:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A618DB25905
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 08:35:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35E051F21626
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 08:38:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 217A414A4C9;
-	Tue, 25 Jun 2024 08:33:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c0D8PQP7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 277971487D8;
+	Tue, 25 Jun 2024 08:38:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9595F14A4C6
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 08:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08E118E1F;
+	Tue, 25 Jun 2024 08:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719304439; cv=none; b=bcdum2AqVoWWOfcaT54r19sUKtRGIveUeMtBp8rtfi9RaO8xqdUn6az2sMzq95KgAPQWoAsigYyLOfsF7OiV/bSYPTk7bsM+gXEJZLxOFO+NtrhUkk+2dRrqAIMpKgQkvAtjnu0b2t7PwnBtGELon9SH/aVh02EG7g2S8oS40oI=
+	t=1719304730; cv=none; b=ORUvl1grSTDz27gXRpIE1Hj8QAoLsRChDEt52yN7GyR4KHagRfM1q1Acp/7IPPQri5l3Ec2bL07XuvpnCNVqy5/8C8UxlmkWNEdSnXDINg7hzUK6zhgv4WV6Ps4Bob1ug1B7Sfegv5l0bSo0IG/bNgr/YG+UMqycirT3TLb5oKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719304439; c=relaxed/simple;
-	bh=3wSIv4dG+zqD1/sWH1bOTpHCf/y+0gM7r2AidH9sipM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y44nG4RZtdmy/SL2aWKd+/ZF4yvCOLx9Tbv39Pz7wvpC2TFKhx9a9ag4qnXYwN7A9E89oCtQLK4c8+FJAq415BDrIKazYvajZnLRGRqGeNeo3F5QHqG/ilX27vT9WoEMHrRK+/+zcE8HKMPLH2y7l2OLhcgQaYBncT6GQd1NGPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c0D8PQP7; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-57a16f4b8bfso8136a12.0
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 01:33:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719304435; x=1719909235; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XeUYiJnNAb5D0IWuiFx68WloAZOBvRMUqn5S2VhB/V8=;
-        b=c0D8PQP7h9bEYpEFjZ4XWKNpxspOyZqGP/5nOUmA9OUv7gIK47wHQB5YQdxwINE/g+
-         P9h0ghqnwO1/hmMGEguTjGEM5XZaP12gQjGe4O1zgO/IAp3WtI6jBm6sUE9nYPQ8Kl24
-         rn3BD2bNIbPikaSXf6t/bXnQTq5Yw3MttmfB4ZmzIBxeXJSEcee9wHeti7qbanZ87mG1
-         QFZvHVZbK/pZqqN+8hno+NfqaclvxaFjEkBk5IhxrzRR9EOfyJ+vdO63MRmMDKMLvEK8
-         EdMHXC3nC1kNb4J5reI+LXablWljxe63YhB9sIo+mfzMbZebVj/zJezRvyOIBgfOH76t
-         ZbtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719304435; x=1719909235;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XeUYiJnNAb5D0IWuiFx68WloAZOBvRMUqn5S2VhB/V8=;
-        b=UYnGsAR9KedQT2GWzZDK+vCPh/lv1g/T7+jY1HNrx827TtOV0KDeNozzREBqY1IsX2
-         jrZX4lXXNz07KS5Hz+mComURCWm1j9o0qxakYXbUXFKOpeDNR/DkZcMNMYMts/dzLW2s
-         ezjmEJMdBZQaK/Dmb6PR7NvwUUeMAzKR1bC1JVtxvVKmerUv462RmPVA48hFMl2IWp/n
-         kiUMElHl4lhFXbdwdMeddQgmZX95JaJpmPH79Rwhg5vIE8b8xEyjn/2r5RJL/qk62YTo
-         rU1i5BdmfCei7dd7quRQZhn78Vm859PAzz0B1qVgrBQggp8SvksZEGJlifxewKJp2shx
-         1Hng==
-X-Forwarded-Encrypted: i=1; AJvYcCXze415Ux9r6/WvAvUL09oi1QKK8E9ypaf+WC4oU0wMsgxDhQiRVAvR0f8B4msHswKnXXE9cyOU5P2KEt822Z2ohRhlE3dW
-X-Gm-Message-State: AOJu0Yx4iIK5fJG62sveTtACvQ4jPfB69Ka7BX/OBWtATeCe5eDiUsGF
-	Y5i3DmPwpjCLGSJKplRx34ZIyTa91yxUxS0/wr5SxmFRckZdnWhDgIU2X1K1iRvm5lHwsJNOboT
-	kMpPFksgWV5AoxNJZK5loj04dbh23jtfAUxiK
-X-Google-Smtp-Source: AGHT+IHbazm8B2Z5muQ/cD5z0DMPkbB5xirFSbtDRpOriuTTZtfF0pXe1CteCRp7NvtfoyI08ExXFytZrzrl2bf9o0Y=
-X-Received: by 2002:a05:6402:2682:b0:57c:d45d:7571 with SMTP id
- 4fb4d7f45d1cf-57dcde35b18mr159588a12.6.1719304433406; Tue, 25 Jun 2024
- 01:33:53 -0700 (PDT)
+	s=arc-20240116; t=1719304730; c=relaxed/simple;
+	bh=HHYyyCwOqTRvQoRZ0xSQ2/wl+Sm1u4EXKzPTkMqM9EI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a47kmpX8/qUPMaiSatL+RUX+l0+cwKd6GLrQWflo/3vQ+GN03MUV21vSUNKGB+r+fGXPwFKoVK10sT/T9QRtQT7hEvcLLDlhjiOlWRQK/WtEfbY5u4c9syb+hh6CKDN+vo9JEbR7kKMxjY66xIwPxWSZmsqdkgQps/h22OdZ1i4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
+	by APP-01 (Coremail) with SMTP id qwCowAAXCJn5gXpmc5SiDA--.29808S2;
+	Tue, 25 Jun 2024 16:38:25 +0800 (CST)
+From: Ma Ke <make24@iscas.ac.cn>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shradhagupta@linux.microsoft.com,
+	horms@kernel.org,
+	kotaranov@microsoft.com,
+	schakrabarti@linux.microsoft.com,
+	erick.archer@outlook.com
+Cc: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ma Ke <make24@iscas.ac.cn>
+Subject: [PATCH v2] net: mana: Fix possible double free in error handling path
+Date: Tue, 25 Jun 2024 16:38:16 +0800
+Message-Id: <20240625083816.2623936-1-make24@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1719302367.git.tanggeliang@kylinos.cn> <072709ce77b04dc77523d4e8763c1fb47bf0913d.1719302367.git.tanggeliang@kylinos.cn>
-In-Reply-To: <072709ce77b04dc77523d4e8763c1fb47bf0913d.1719302367.git.tanggeliang@kylinos.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 25 Jun 2024 10:33:42 +0200
-Message-ID: <CANn89i+ET4U+4viDPq2vZhxeUT90kZz5mdh3XVqQhaAXnbs=rw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 1/4] skmsg: null check for sg_page in sk_msg_recvmsg
-To: Geliang Tang <geliang@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	David Ahern <dsahern@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Mykyta Yatsenko <yatsenko@meta.com>, Miao Xu <miaxu@meta.com>, 
-	Yuran Pereira <yuran.pereira@hotmail.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	Tiezhu Yang <yangtiezhu@loongson.cn>, Geliang Tang <tanggeliang@kylinos.cn>, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowAAXCJn5gXpmc5SiDA--.29808S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7JF4rAFyrCF45uFy7GF15Jwb_yoWDGrX_AF
+	yj9rn5Jr4vkF1Skr13KrWrZry0k3yqq3s5Xr1xtFyfK34Uuay5WrZrur48XrWkWrW8Aanr
+	u3sIkr17A3s7KjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3AFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6r1F6r1fM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfUOrcfUUUUU
+X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
 
-On Tue, Jun 25, 2024 at 10:25=E2=80=AFAM Geliang Tang <geliang@kernel.org> =
-wrote:
->
-> From: Geliang Tang <tanggeliang@kylinos.cn>
->
-> Run the following BPF selftests on Loongarch:
->
-> ./test_progs -t sockmap_basic
->
-> A Kernel panic occurs:
->
-> '''
->  Oops[#1]:
->  CPU: 22 PID: 2824 Comm: test_progs Tainted: G           OE      6.10.0-r=
-c2+ #18
->  Hardware name: LOONGSON Dabieshan/Loongson-TC542F0, BIOS Loongson-UDK201=
-8-V4.0.11
->  pc 9000000004162774 ra 90000000048bf6c0 tp 90001000aa16c000 sp 90001000a=
-a16fb90
->  a0 0000000000000000 a1 0000000000000000 a2 0000000000000000 a3 90001000a=
-a16fd70
->  a4 0000000000000800 a5 0000000000000000 a6 000055557b63aae8 a7 000000000=
-00000cf
->  t0 0000000000000000 t1 0000000000004000 t2 0000000000000048 t3 000000000=
-0000000
->  t4 0000000000000001 t5 0000000000000002 t6 0000000000000001 t7 000000000=
-0000002
->  t8 0000000000000018 u0 9000000004856150 s9 0000000000000000 s0 000000000=
-0000000
->  s1 0000000000000000 s2 90001000aa16fd70 s3 0000000000000000 s4 000000000=
-0000000
->  s5 0000000000004000 s6 900010009284dc00 s7 0000000000000001 s8 900010009=
-284dc00
->     ra: 90000000048bf6c0 sk_msg_recvmsg+0x120/0x560
->    ERA: 9000000004162774 copy_page_to_iter+0x74/0x1c0
->   CRMD: 000000b0 (PLV0 -IE -DA +PG DACF=3DCC DACM=3DCC -WE)
->   PRMD: 0000000c (PPLV0 +PIE +PWE)
->   EUEN: 00000007 (+FPE +SXE +ASXE -BTE)
->   ECFG: 00071c1d (LIE=3D0,2-4,10-12 VS=3D7)
->  ESTAT: 00010000 [PIL] (IS=3D ECode=3D1 EsubCode=3D0)
->   BADV: 0000000000000040
->   PRID: 0014c011 (Loongson-64bit, Loongson-3C5000)
->  Modules linked in: bpf_testmod(OE) xt_CHECKSUM xt_MASQUERADE xt_conntrac=
-k
->  Process test_progs (pid: 2824, threadinfo=3D0000000000863a31, task=3D000=
-000001cba0874)
->  Stack : 0000000000000001 fffffffffffffffc 0000000000000000 0000000000000=
-000
->          0000000000000018 0000000000000000 0000000000000000 90000000048bf=
-6c0
->          90000000052cd638 90001000aa16fd70 900010008bf51580 900010009284f=
-000
->          90000000049f2b90 900010009284f188 900010009284f178 90001000861d4=
-780
->          9000100084dccd00 0000000000000800 0000000000000007 fffffffffffff=
-ff2
->          000000000453e92f 90000000049aae34 90001000aa16fd60 900010009284f=
-000
->          0000000000000000 0000000000000000 900010008bf51580 90000000049f2=
-b90
->          0000000000000001 0000000000000000 9000100084dc3a10 900010009284f=
-1ac
->          90001000aa16fd40 0000555559953278 0000000000000001 0000000000000=
-000
->          90001000aa16fdc8 9000000005a5a000 90001000861d4780 0000000000000=
-800
->          ...
->  Call Trace:
->  [<9000000004162774>] copy_page_to_iter+0x74/0x1c0
->  [<90000000048bf6c0>] sk_msg_recvmsg+0x120/0x560
->  [<90000000049f2b90>] tcp_bpf_recvmsg_parser+0x170/0x4e0
->  [<90000000049aae34>] inet_recvmsg+0x54/0x100
->  [<900000000481ad5c>] sock_recvmsg+0x7c/0xe0
->  [<900000000481e1a8>] __sys_recvfrom+0x108/0x1c0
->  [<900000000481e27c>] sys_recvfrom+0x1c/0x40
->  [<9000000004c076ec>] do_syscall+0x8c/0xc0
->  [<9000000003731da4>] handle_syscall+0xc4/0x160
->
->  Code: 0010b09b  440125a0  0011df8d <28c10364> 0012b70c  00133305  0013b1=
-ac  0010dc84  00151585
->
->  ---[ end trace 0000000000000000 ]---
->  Kernel panic - not syncing: Fatal exception
->  Kernel relocated by 0x3510000
->   .text @ 0x9000000003710000
->   .data @ 0x9000000004d70000
->   .bss  @ 0x9000000006469400
->  ---[ end Kernel panic - not syncing: Fatal exception ]---
-> '''
->
-> This is because "sg_page(sge)" is NULL in that case. This patch adds null
-> check for it in sk_msg_recvmsg() to fix this error.
->
-> Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
-> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-> ---
->  net/core/skmsg.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> index fd20aae30be2..bafcc1e2eadf 100644
-> --- a/net/core/skmsg.c
-> +++ b/net/core/skmsg.c
-> @@ -432,6 +432,8 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *=
-psock, struct msghdr *msg,
->                         sge =3D sk_msg_elem(msg_rx, i);
->                         copy =3D sge->length;
->                         page =3D sg_page(sge);
-> +                       if (!page)
-> +                               goto out;
->                         if (copied + copy > len)
->                                 copy =3D len - copied;
->                         copy =3D copy_page_to_iter(page, sge->offset, cop=
-y, iter);
-> --
-> 2.43.0
->
+When auxiliary_device_add() returns error and then calls
+auxiliary_device_uninit(), callback function adev_release
+calls kfree(madev). We shouldn't call kfree(madev) again
+in the error handling path. Set 'madev' to NULL.
 
-This looks pretty much random to me.
+Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+---
+Changes in v2:
+- streamlined the patch according suggestions;
+- revised the description.
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Please find the root cause, instead of desperately trying to fix 'tests'.
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index d087cf954f75..608ad31a9702 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -2798,6 +2798,8 @@ static int add_adev(struct gdma_dev *gd)
+ 	if (ret)
+ 		goto init_fail;
+ 
++	/* madev is owned by the auxiliary device */
++	madev = NULL;
+ 	ret = auxiliary_device_add(adev);
+ 	if (ret)
+ 		goto add_fail;
+-- 
+2.25.1
+
 
