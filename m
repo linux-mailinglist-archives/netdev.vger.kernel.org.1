@@ -1,128 +1,94 @@
-Return-Path: <netdev+bounces-106557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BB71916CFA
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 17:26:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C5B9916CFE
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 17:27:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4DAB1F2A522
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 15:26:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED9D42829C7
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 15:27:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2482D173325;
-	Tue, 25 Jun 2024 15:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48A96168C33;
+	Tue, 25 Jun 2024 15:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FiAwZzw6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eb4+N3l/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7319416DEB3
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 15:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14DB549629;
+	Tue, 25 Jun 2024 15:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719329127; cv=none; b=HOIRxdE1HCO/OD/uvHH8NUfOwoMpL6zKsVdmpjrBngWuPFCDH2Hn21p4YecxreDxvLRYVsFVSSvJbRtAgFaKGTtqaWCo8/AqZeQaX7yNr1ffSZqtZAFSMqiV7qkSCRpOTTtYynQSZQX4zpj6bqtYXQqNQ69vIAiyM8AP+DeSqrs=
+	t=1719329206; cv=none; b=gv/O7BYn3TFe6+Ic7ZdzParsF8q3DukecgHhLFEKTzGTL4yzNMdrP4MF8F6tAAWNYMbfQI6zMNNqHxY13pm69EFlGAEcdou8UMVWfEZOBbQt/Y4uUM17oHeK9r5NKOFhHNLIsierEjY0eWXNiaujZcYW8K6kIEdrQ0ycLYrxCpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719329127; c=relaxed/simple;
-	bh=S1ZN2YsmhMIHBODx8GUBJZUTMGcylwKsaX5J/TwATv8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BalnFC8AiCgMSfwxD8sgNhQz5X5OAI7KIlRU66o8djz/MqZ632rCGvpVedZ+Lb7JwOGJe+vsVBh1gMmdikB00QknsZeQ+SYTSajbNv4UH0vZjlwGK4X7mPsFmX25f2scpb+HF9+7NWFkqDZb7mUG2IrpKhQnAwUcWfFdVgL+r0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FiAwZzw6; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1UQg/EmuREzP7C5y+v27cZZm4G+gXLLXTFClnv+eXBo=; b=FiAwZzw6f6FlQHmmCG+iXQWAK6
-	AlrRaMfmgSXTOG8FEuuNhcCoTyqNNj70LIF03LYYf2T/bomRKzbfkCKRSENlpKlN9eql+xuwa4QuD
-	h49OY4e01N8nEAeSNL16s7cza1EBVRn5CfRs4F/Do/rlx0cGvg3SihrLiy/Uz7WqasFQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sM82m-000xMa-JR; Tue, 25 Jun 2024 17:25:16 +0200
-Date: Tue, 25 Jun 2024 17:25:16 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
-	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com
-Subject: Re: [net-next PATCH v2 11/15] eth: fbnic: Add link detection
-Message-ID: <6971f7ce-8514-4da5-afc9-764c0da289c0@lunn.ch>
-References: <171932574765.3072535.12103787411698322191.stgit@ahduyck-xeon-server.home.arpa>
- <171932617837.3072535.9872136934270317593.stgit@ahduyck-xeon-server.home.arpa>
+	s=arc-20240116; t=1719329206; c=relaxed/simple;
+	bh=i21U0kKDJmZcg+9RnGOSZEPcabKWNuu9gG+cDI+RMG4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iaee0OYAySr3VfGpiuzjMTeWdMuRjWpYxYrgts7bRpOYfgdWtJmbGXpfVplF7A7NxszCWV9H5XdOWgKQ+UBBKCGwxZruHja9ujPvcMamoK555JV0lIUKD8C+O4T3kIKOYEmP3MZK73wyAP7txBRJ/N9Ma9rNTtiOJpTfh4sb/eM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eb4+N3l/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1F16C32781;
+	Tue, 25 Jun 2024 15:26:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719329205;
+	bh=i21U0kKDJmZcg+9RnGOSZEPcabKWNuu9gG+cDI+RMG4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eb4+N3l/QJ0r6w2kZA6JrQlLnsCesvhVsul01ikKYK4tZnXcbnJ6a+EcbSswuB3Hn
+	 CQuGouLcLTiYtqCjFmz8RmIJu4Y+hrRptVk4ZipCfXndQGoFqGmhn2gXWNc6tb2rgP
+	 xZ8dg7uA/MKWymW0st4Y8+HxMORsjIAhm40sX5JjWtLptpQdO4n4swCJgwbtesM38U
+	 txB6K5Jw5o967OBiauv+wfAAO87/x8ysWALqRPi8XjFR7Dj0qsEhrd4XN/aylcozBK
+	 tvo2MyN/U9n/V6w+FRxuuJuclRGlCOJEylAQTo90mOSHOjeEyDzg94l9YnTMDYAv/S
+	 P4D+/apjpIZRw==
+Date: Tue, 25 Jun 2024 08:26:44 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: netdev@vger.kernel.org, conor+dt@kernel.org, davem@davemloft.net,
+ devicetree@vger.kernel.org, edumazet@google.com, imx@lists.linux.dev,
+ krzk+dt@kernel.org, linux-kernel@vger.kernel.org, madalin.bucur@nxp.com,
+ pabeni@redhat.com, richardcochran@gmail.com, robh@kernel.org,
+ sean.anderson@seco.com, yangbo.lu@nxp.com
+Subject: Re: [PATCH 1/1] MAINTAINERS: Change fsl-fman.yaml to fsl,fman.yaml
+Message-ID: <20240625082644.52fdbdd9@kernel.org>
+In-Reply-To: <20240624144655.801607-1-Frank.Li@nxp.com>
+References: <20240624144655.801607-1-Frank.Li@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <171932617837.3072535.9872136934270317593.stgit@ahduyck-xeon-server.home.arpa>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> +	/* Tri-state value indicating state of link.
-> +	 *  0 - Up
-> +	 *  1 - Down
-> +	 *  2 - Event - Requires checking as link state may have changed
-> +	 */
-> +	s8 link_state;
+On Mon, 24 Jun 2024 10:46:55 -0400 Frank Li wrote:
+> fsl-fman.yaml is typo. "-" should be ",". Fix below warning.
+> 
+> Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/net/fsl-fman.yaml
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202406211320.diuZ3XYk-lkp@intel.com/
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
+> ---
+>  MAINTAINERS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 807feae089c4d..7da4c469c14d4 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -8874,7 +8874,7 @@ M:	Madalin Bucur <madalin.bucur@nxp.com>
+>  R:	Sean Anderson <sean.anderson@seco.com>
+>  L:	netdev@vger.kernel.org
+>  S:	Maintained
+> -F:	Documentation/devicetree/bindings/net/fsl-fman.yaml
+> +F:	Documentation/devicetree/bindings/net/fsl,fman.yaml
+>  F:	drivers/net/ethernet/freescale/fman
+>  
+>  FREESCALE QORIQ PTP CLOCK DRIVER
 
-Maybe add an enum?
-
-> +static irqreturn_t fbnic_mac_msix_intr(int __always_unused irq, void *data)
-> +{
-> +	struct fbnic_dev *fbd = data;
-> +	struct fbnic_net *fbn;
-> +
-> +	if (!fbd->mac->get_link_event(fbd)) {
-> +		fbnic_wr32(fbd, FBNIC_INTR_MASK_CLEAR(0),
-> +			   1u << FBNIC_MAC_MSIX_ENTRY);
-> +		return IRQ_HANDLED;
-> +	}
-> +
-> +	fbd->link_state = FBNIC_LINK_EVENT;
-> +	fbn = netdev_priv(fbd->netdev);
-> +
-> +	phylink_mac_change(fbn->phylink, fbd->link_state == FBNIC_LINK_UP);
-
-Can fbd->link_state == FBNIC_LINK_UP given that you have just done:
-    fbd->link_state = FBNIC_LINK_EVENT ? 
-
-> +static u32 __fbnic_mac_config_asic(struct fbnic_dev *fbd)
-> +{
-> +	/* Enable MAC Promiscuous mode and Tx padding */
-> +	u32 command_config = FBNIC_MAC_COMMAND_CONFIG_TX_PAD_EN |
-> +			     FBNIC_MAC_COMMAND_CONFIG_PROMISC_EN;
-> +	struct fbnic_net *fbn = netdev_priv(fbd->netdev);
-> +	u32 rxb_pause_ctrl;
-> +
-> +	/* Set class 0 Quanta and refresh */
-> +	wr32(fbd, FBNIC_MAC_CL01_PAUSE_QUANTA, 0xffff);
-> +	wr32(fbd, FBNIC_MAC_CL01_QUANTA_THRESH, 0x7fff);
-> +
-> +	/* Enable generation of pause frames if enabled */
-> +	rxb_pause_ctrl = rd32(fbd, FBNIC_RXB_PAUSE_DROP_CTRL);
-> +	rxb_pause_ctrl &= ~FBNIC_RXB_PAUSE_DROP_CTRL_PAUSE_ENABLE;
-> +	if (!fbn->tx_pause)
-> +		command_config |= FBNIC_MAC_COMMAND_CONFIG_TX_PAUSE_DIS;
-> +	else
-> +		rxb_pause_ctrl |=
-> +			FIELD_PREP(FBNIC_RXB_PAUSE_DROP_CTRL_PAUSE_ENABLE,
-> +				   FBNIC_PAUSE_EN_MASK);
-> +	wr32(fbd, FBNIC_RXB_PAUSE_DROP_CTRL, rxb_pause_ctrl);
-> +
-> +	if (!fbn->rx_pause)
-> +		command_config |= FBNIC_MAC_COMMAND_CONFIG_RX_PAUSE_DIS;
-
-Everybody gets pause wrong. To try to combat that it has mostly been
-moved into phylink. When phylink calls your mac_config() callback it
-passes const struct phylink_link_state *state. Within state is the
-pause member. That tells you how to configure the hardware. phylink
-will then deal with the differences between forced pause configuration
-and negotiated pause configuration, etc. Your current mac_config() is
-empty...
-
-	Andrew
-
+Already fixed by commit 568ebdaba6370, thanks!
+-- 
+pw-bot: nap
 
