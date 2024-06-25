@@ -1,113 +1,96 @@
-Return-Path: <netdev+bounces-106601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F167916F23
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 19:25:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82456916F26
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 19:25:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 050C61F22B75
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 17:25:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 512F41C229E9
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 17:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AF9317D882;
-	Tue, 25 Jun 2024 17:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82369176AD0;
+	Tue, 25 Jun 2024 17:25:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="czhoYDA6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Evts+dwQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C877017D370
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 17:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221A3176AC0
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 17:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719336194; cv=none; b=GFOVQ/oqAF/AeTY2ekCbGXGGc7uwPud56+PIowXoiO2qyxhN30l2AJaXmRt9bfKgmRMz36HNWLdBMqqufF+LCWNiRG/+c57CKHigHVrxY/xG3lbM5Oh4NgzpVwAB/M0Rj7Cn5Npb7hhgSCNtgRN87sMMEOjLtOOHvboidWiwB9E=
+	t=1719336302; cv=none; b=sUreTQZL/tx1uZK8RvSsEY9JMyD81gLtQm5XF5LgYwaIqWyqQEEpcweYXsL5GK3loB43Gx0sUCPLRKjJSpIHU4l/p+PZKjgugY1+kpamnHTJsaRW+OWP43DOTLGr0r3E10IMQ52yHi/2aTNoV3+bXIqFt23QQaY2tuqW8vXpztQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719336194; c=relaxed/simple;
-	bh=J3wiOr92FQ3z0v5kwwjtS5iIfbHdoFjlBJ88j6xKFvQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O42d3m3dny62cYL5WznkvBmN4f9c600vgeh2Jt+pMCckmj58xkC/zsvrIWxB8ztOxnU+ODpYl/TIyY5GcZw3ql5hsihUxPE2A/qC4ok7lA0Q+GRDzpk+Uq/Dk0M7DRvFPA3f8iP6qgC5WdD/RxAFHUAdp9scHWIuRhxQDBEGlB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=czhoYDA6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719336191;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AMxQkVMeeqCp/fm83KpE8+aeQ32h+4CbBVsVdrK3ckA=;
-	b=czhoYDA6ah5xIs64p13fiI5yy1N1PwLUChgNE/zrtXJU4hjqzJwTaUp2R0FQ0GghgPIbiM
-	PtftLckm2pZLzEdpFh4HKjuGsNOIaykDg1o9YjFo83Woe/NwmCvSDoq8HVhRuaiG8U4j73
-	4JMydkxcvo600pTz1pgal+YmasrksNQ=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-627-nU-LX5inPOaTUfE4fgZSBA-1; Tue,
- 25 Jun 2024 13:23:07 -0400
-X-MC-Unique: nU-LX5inPOaTUfE4fgZSBA-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ED54819560B4;
-	Tue, 25 Jun 2024 17:23:05 +0000 (UTC)
-Received: from RHTRH0061144.bos.redhat.com (dhcp-17-72.bos.redhat.com [10.18.17.72])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C84C619560BF;
-	Tue, 25 Jun 2024 17:23:03 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: netdev@vger.kernel.org
-Cc: dev@openvswitch.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Pravin B Shelar <pshelar@ovn.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Stefano Brivio <sbrivio@redhat.com>,
-	=?UTF-8?q?Adri=C3=A1n=20Moreno?= <amorenoz@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next v3 7/7] selftests: net: add config for openvswitch
-Date: Tue, 25 Jun 2024 13:22:45 -0400
-Message-ID: <20240625172245.233874-8-aconole@redhat.com>
-In-Reply-To: <20240625172245.233874-1-aconole@redhat.com>
-References: <20240625172245.233874-1-aconole@redhat.com>
+	s=arc-20240116; t=1719336302; c=relaxed/simple;
+	bh=K+1KMq3hsVQMJkShpR2cXlDyfTtxSLNMBwn4drbtfy4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TTxpVTlY4bq16x3zP4Z8kCn5bkJrxvElzL8+Ap2h080/cUPGx4mIAvzYv7ixZtxwv8kD233PtsiuP3+hcpt4yKnw6CuAHi2HoCssBJW02PxEPpDWZ7Grx1nUiwGlYELWIpoom7AaT+7gDyAcv5aqVv3iSRO/IqpjBHeaZVyOgJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Evts+dwQ; arc=none smtp.client-ip=209.85.160.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-25ce35c52e7so554060fac.2
+        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 10:25:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719336300; x=1719941100; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=K+1KMq3hsVQMJkShpR2cXlDyfTtxSLNMBwn4drbtfy4=;
+        b=Evts+dwQaOhPG6xX0opFRjU7oJoz70QpcH6BCB9CBfTMBKvImAUXtAK0U803AekpjF
+         1QAKqAZuQHyFhmiov3t3eL0FFGvkKQbli2kmDRnJSjP16MgoLQBrThJKGPgG+afGftyt
+         dxmOSOLUr1h4FbAbrE4rD9VAt0hvOygXhYev1DM5pbgaDEqvmtlTB/HUQmj9vmgUZ8O7
+         ioY00B6EzvVnWom+KapsBNSJCHi9YJ9L2ZAS+5AOCLl4HvqgsdZY+eTOAPrMjpNwTGIW
+         l6z8k5bPr8uCH2j1wppeOF4YLkfzApyuGyBnjXqtunZaKf9RgjAO9me4V9MUrfNhyulL
+         yPJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719336300; x=1719941100;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K+1KMq3hsVQMJkShpR2cXlDyfTtxSLNMBwn4drbtfy4=;
+        b=a0xNsbrhgdnB/ybhnXVczfZ9CBt5m6qPoOtXGcdx/xhtrab2m7HsLnYt089hGfiJfr
+         XPcHNxT7AV2e82ZpAsxkjYOffx1ooEBDWdBxamySWaffXqnKrA0zIHUXPhIx0sgKN9hR
+         Ol+tlJVVrOiCy+MrCtvraeb1X3IestQrovSCW90RB7ox3/TnOzFng61R5DbWobJKEyMt
+         nLLbLyysVzDyhxmmSoL7TZdw/cOW7qmJWRXaVf+cJ7pTVHP0qHthGRGQ8FXmAUphZgLd
+         K/XY8FBhkzwzei4baJiowNOZvpvup+TrtgBgcAwHF0C34ACczcCgZRXzEW/5iEkTTF/H
+         dvxg==
+X-Gm-Message-State: AOJu0YxPLvaVm4oapVLVjfDjOIW/zTJRMjFcnCsJuG4KcDee6x9kyy/B
+	V2o5bazDFNO9lv9d0N+iizW9ANv6Zca6ISsmS/ck+GGK/N6+MGYas80NU1uo0+9F/f9TH7IGjqt
+	sGy0kLgpIoihhcMfUykv9ECWztBShHAC/
+X-Google-Smtp-Source: AGHT+IE28I51vxw0khfEBghQWeM3cUmAu+A+/rgZ0kJdSiFJN/L4D42fz2JktGTX2KYS19yXBm/GtyOjK6BlTqIkEnY=
+X-Received: by 2002:a05:6870:8a24:b0:254:cae6:a812 with SMTP id
+ 586e51a60fabf-25cf3f17d37mr10776213fac.3.1719336300126; Tue, 25 Jun 2024
+ 10:25:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+References: <CA+Sc9E2oKba+C2EhBvmyJQ5wVS5=S=ZVzP+Gt_-xsRNtMCm4tQ@mail.gmail.com>
+ <20240625075715.3f61ab48@kernel.org>
+In-Reply-To: <20240625075715.3f61ab48@kernel.org>
+From: Michio Honda <micchie.gml@gmail.com>
+Date: Tue, 25 Jun 2024 18:24:48 +0100
+Message-ID: <CA+Sc9E2-1S3_b0zFsgmicYOj8FrCMiJWenJbBuE+EkxAjZV4ag@mail.gmail.com>
+Subject: Re: [PATCH net-next] tls: support send/recv queue read in the repair mode
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-The pmtu testing will require that the OVS module is installed,
-so do that.
+Sorry, I didn't follow. This patch makes ktls repair (serializing and
+restoring the kTLS/TCP socket) work together with TLS_RX and TLS_TX
+get/setsockopts. Am I missing something?
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Aaron Conole <aconole@redhat.com>
----
- tools/testing/selftests/net/config | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
-index d4891f7a2bfa..cf43a1d07046 100644
---- a/tools/testing/selftests/net/config
-+++ b/tools/testing/selftests/net/config
-@@ -103,3 +103,8 @@ CONFIG_XFRM_INTERFACE=m
- CONFIG_XFRM_USER=m
- CONFIG_IP_NF_MATCH_RPFILTER=m
- CONFIG_IP6_NF_MATCH_RPFILTER=m
-+CONFIG_OPENVSWITCH=m
-+CONFIG_OPENVSWITCH_GRE=m
-+CONFIG_OPENVSWITCH_VXLAN=m
-+CONFIG_OPENVSWITCH_GENEVE=m
-+CONFIG_NF_CONNTRACK_OVS=y
--- 
-2.45.1
-
+On Tue, 25 Jun 2024 at 15:57, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Fri, 21 Jun 2024 12:05:45 +0100 Michio Honda wrote:
+> > TCP REPAIR needs to read the data in the send or receive queue.
+> > This patch forwards those to TCP.
+>
+> TLS doesn't support repair mode. Life is hard enough.
+> --
+> pw-bot: reject
 
