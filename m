@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-106608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCB9B916F5C
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 19:35:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B1A4916F56
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 19:34:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 923E82819EC
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 17:35:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 884811C24E4E
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 17:34:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E231B17C7BC;
-	Tue, 25 Jun 2024 17:34:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC2216C866;
+	Tue, 25 Jun 2024 17:34:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="lOdJ5v3e"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="DgY0uBRP"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F7517C22E;
-	Tue, 25 Jun 2024 17:34:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB415178399;
+	Tue, 25 Jun 2024 17:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719336875; cv=none; b=abb+P9/TZq7fZeI2Rf4cdqUyxf9UE8TUyDGp1srP/PLQM5RxpCwNnwjE5BurswGy7izXPRnNC8XZCI3hvkOaTLoOKy9PHBGwGzC9LyNHD64rF4kp7B0LqNAmEbdVt2Emd73IbysgbCDtMzFyFKyX13XqyTywk9ObdfcTGJIlDf4=
+	t=1719336863; cv=none; b=NyuVsTfvRCJ7Fuu3rcG33RNgCAQx8GPT/yIZ9HpTcv3TGSO621Q3DGLl8/WiOUqEonv3+ZIVWZYtWKRzID25EpRrT8VDejY9GxWg+jc21h+gvTu6zYEUVHMZ5Ix5EONX2PvYgqCA+2dRKZtsZN/c0zAqanb5TyZgwnf70RAea+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719336875; c=relaxed/simple;
-	bh=hvGT5beqd6zcscaM+wWtmLJHdZpsSAaD+im5Cy6EvUU=;
+	s=arc-20240116; t=1719336863; c=relaxed/simple;
+	bh=MwR2+x33tL23zCDtW1vXkjUKW66d5cZi7iJ5mbn+RTc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QfiWe2f6giUxzoHqvGK2jg5wGqKudmr/QonoG7U0IqZK/edYaTduOTJUxv1Xp3BbOAa0VHAkxbsNvDprOisjk3oIlhlmPbn+Bs2VhQHY58WUN61VKLzsOpnIRuG1l02fCmVGudXWU58XM4/3DaooYpsHMiNtgzWR74iMNSrJ/KI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=lOdJ5v3e; arc=none smtp.client-ip=67.231.156.173
+	 MIME-Version:Content-Type; b=jKtjED/QIXSJzP40mEPwhAkGQS/c/SVTbo5szJxxR8DSytOEUHjdQO7DyJw1jfjpTUibsbOmjwEJ+x1d6jzcZZlO6vzxqFhFvJMRHaL0tpphTpu8ePyyzZFOc1y8vH+2FEFhNAwVMND1RJYP/DOfzapx/knTXKT9OzpAn7Z1ZIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=DgY0uBRP; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45PBtVrx001297;
-	Tue, 25 Jun 2024 10:34:10 -0700
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45PBtIf4000832;
+	Tue, 25 Jun 2024 10:34:15 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=F
-	bJ56PEwoRp+pBAkCSxAOW4s80RXzc1NpktITW1IilU=; b=lOdJ5v3eJUEY4SVfy
-	CK7/MFPlPvGtVp8wOGrsog/+aVt1r8q6OLQcPMZdah/kTERe2qG7XgXYHeJOv33t
-	N7clVNVWZj0Ud9pGD2o4tbTHJRzcneIc9KvXWrhQjraD/Y4TCQj8KvoMbDTe7Mzj
-	w1VKMc5YIM+vvk+NWmsOVB+aRjEjAnlKFx9MoQuNi5aQk3KWRGmYoHzwaFvjXBLs
-	X/6GiWX7ub3XtDJctx5tVe214gnesQ40Sm1QgSmAIF6rfuBetf7kcazCdKjOQMzL
-	lkVjijZKt4kf/pV1Zs+Be6VwxRlUvAnzmU4TKvw+EooGYs9yBFN9skF9sA9p2n3T
-	uzixA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3yywec9kgy-1
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=s
+	3jdL6UcGGq24YBU3TnKztOmwHWjNtaB4Og6RDixtc4=; b=DgY0uBRPUIfGQiK7Q
+	ImQ1ZABotrYDzVls9PVQUIEbpKo0ETk/EdVnQzAFaDgrOPt+INheMPgaCPIdt2AT
+	L1EoqQEGPBp7awWY28TcVP4fFCM1jWrE3iW1MNwc/0K7IeUqKv89aVrDR3f/T1pV
+	3ESnISF3R+6AoIthyDoQvm8zErDRqNv8gkUo9OGnKr8g+I1ycmwo0L2HoZWHktht
+	rjeL7ZAL7YQvoXHGetMA38rEXybL0Ucu6A2bnDkowNgMWASECsUHWMZHWpAHVZqZ
+	VKBKexYRSxJhsNQh7lJdpp7BBSGQdXQI+MugDcHZY2N983Z22fVqon791s0jmuD0
+	UPO8A==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3yywec9khc-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Jun 2024 10:34:09 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+	Tue, 25 Jun 2024 10:34:15 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 25 Jun 2024 10:34:08 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 25 Jun 2024 10:34:08 -0700
+ 15.2.1544.4; Tue, 25 Jun 2024 10:34:14 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 25 Jun 2024 10:34:14 -0700
 Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id 929A23F7063;
-	Tue, 25 Jun 2024 10:34:04 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id 2FE1C3F706B;
+	Tue, 25 Jun 2024 10:34:09 -0700 (PDT)
 From: Suman Ghosh <sumang@marvell.com>
 To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
         <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
@@ -65,9 +65,9 @@ To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
         <linux-kernel@vger.kernel.org>, <lcherian@marvell.com>,
         <jerinj@marvell.com>, <markus.elfring@web.de>
 CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net PATCH v2 2/7] octeontx2-af: Fix klockwork issue in mcs_rvu_if.c
-Date: Tue, 25 Jun 2024 23:03:44 +0530
-Message-ID: <20240625173350.1181194-3-sumang@marvell.com>
+Subject: [net PATCH 2/7] octeontx2-af: Fix klockwork issues in mcs_rvu_if.c
+Date: Tue, 25 Jun 2024 23:03:45 +0530
+Message-ID: <20240625173350.1181194-4-sumang@marvell.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240625173350.1181194-1-sumang@marvell.com>
 References: <20240625173350.1181194-1-sumang@marvell.com>
@@ -79,15 +79,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: m5Uap0-xixyQCkWmF6vtghljrJIZPnGS
-X-Proofpoint-GUID: m5Uap0-xixyQCkWmF6vtghljrJIZPnGS
+X-Proofpoint-ORIG-GUID: 4-xcnGtU8O9JCrCWuow3GhmRvP2SH1ew
+X-Proofpoint-GUID: 4-xcnGtU8O9JCrCWuow3GhmRvP2SH1ew
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
  definitions=2024-06-25_12,2024-06-25_01,2024-05-17_01
 
-There was a missing "default" condtion in a mailbox switch case, which
-can lead to wrong response message to the caller. This patch fixes the
-same by adding gracefull exit for a "default" switch case scenario.
+These are not real issues but sanity checks.
 
 Fixes: cfc14181d497 ("octeontx2-af: cn10k: mcs: Manage the MCS block hardware resources")
 Signed-off-by: Suman Ghosh <sumang@marvell.com>
