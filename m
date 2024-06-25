@@ -1,106 +1,96 @@
-Return-Path: <netdev+bounces-106503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C83A9169C3
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:02:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AE8C9169D1
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:07:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A89531F274A5
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 14:02:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 472C0285318
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 14:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52AFB167D80;
-	Tue, 25 Jun 2024 14:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6695815A84D;
+	Tue, 25 Jun 2024 14:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IfjzqcA1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FkHBIoSF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8E614A60D
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 14:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37CB31B7F7;
+	Tue, 25 Jun 2024 14:06:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719324069; cv=none; b=mx4nHblhXcVGw6jp0J8QsJogSJLOggd57COiWBOwJ/sMFlZV2IADaNmRITsgBXmrLTe2C5rvtXdoEDChxkoNGpJhvPfwPVSNPpVj/uinMwT9Lnywp20OPulzE4RNwdjH7h88U4ZULCztmdnjCxzOTCPnW1d8oAkh+9OOBXksf6E=
+	t=1719324416; cv=none; b=FW1O0yTFrVB5x7Bc7YXKuWHw6UHTjMnSprtu8lRaeDB/+j2YZ9orlhyg627JBZ/C86OX9Yclcj7efSVNk4mfohT4S7ixcrlMbchRybqLlzNAfYN4KqwNntTYTcMk0ZEGFHArbJMhKa7HqCP2kUn7lGjbNTnNFpWYY8AHRqMhTfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719324069; c=relaxed/simple;
-	bh=0iUji4YU7CTd2c7VFZO5weBB3zZUqKVzHmxQ/+nux9M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KWGkOyuVaXWRwC8ecsX6Hhujq/MwJO1mG3M+CHXSNc1zByghlnuAJ8Y1INxZ6gsBk4fBVkThwV+Tq03tmHrDtO+r+bbWyvZ62o/6flH8LB487q1EgUQdzEmL9STj/K3+oDj89Z8tBf89NuGZZJh+qIb+FbzQELRIbY7R38+jqKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IfjzqcA1; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-424786e4056so58915e9.0
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 07:01:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719324066; x=1719928866; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0iUji4YU7CTd2c7VFZO5weBB3zZUqKVzHmxQ/+nux9M=;
-        b=IfjzqcA1V4xagt3sAQMZABEuucS2GkKWuerRzPAENhx1teT98KJiqZwySRrjeIuP0+
-         LAWDq7/FckcFvpDQ4bWuURkRw+3EnWdloen8VTrItJq1E6SxRI/IMTzZnvxidYWk8kW3
-         QeC/xVJIWoah2ryBRrYcN7OlcrrPMw5a2I16VLDb6rZ/eyVsRetnN48r9+zcUce6Pg13
-         f8rO80B0KQwsP/rg1TP7STaxWhBhOsH1YSLyy5a95nLwYiL+5gQQp4c4/UsdAN8tEb6P
-         FZAWINe1U5GB4yV26Kls3svnMU1mX1vJBeBvxFTmD8gYQHxuAN7gwWHJmSqerRcrOenE
-         A8dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719324066; x=1719928866;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0iUji4YU7CTd2c7VFZO5weBB3zZUqKVzHmxQ/+nux9M=;
-        b=MQJekM3epz+H02XPaP7/eUepyevBmL7qdVb1o4ToMPwaJmmfJbQKAixR5+L8ZCfloH
-         D8J0uEz+7MvKTH28pgqbz0Dl1nb68xcMNo451aodSYxNBwyyzVzXS3hNjEvzTXkFbXfQ
-         QKSzSP+h/0VepcctRc3GKfjObYtt6Mpj9RVIn53KRAaCi/HUWzbap2/eQOvWjVnAzxtV
-         6czCmq/GHEWTn35VvhWKXIDt78yeFRKl9ivo3yqQPPftrzRFaOzYdnW90DhYLiluu853
-         tslFlZimlGDhtzES5+47zzmJwIwr9y+YS0zgDKhuvKGKlhyuw+axYGgS5GMJN3QmaXxm
-         Eb2w==
-X-Forwarded-Encrypted: i=1; AJvYcCVvvHk7WHJloD+eAXTu446s4wJXOx1RA7FbI/WZXZb2n322hxTMxDjZfHVUcCMFJ3v/nbwBEuJ7rzVRPArATnF2HdS2VwdY
-X-Gm-Message-State: AOJu0YxDYDkb6RjWEm4wVbBVM2cvju92SmqKzxj8BlxSTX0Yb3b2usXX
-	u+0kaAYUC0hOVGD6FRUj0VmIdWEVBlTz5tDJiFS8Bs7XRoV6NZE6JYxj7SjLvPFpdBic+j7QZwJ
-	tLob+Nau9x3W0iCryksYF/LJIPqyzc59ZuyvZ
-X-Google-Smtp-Source: AGHT+IFi60pqCTZ2PhmbScpfvVHSlP79Je6RZxTBeRVQa0tDIwHRTiXhex5MNwjEqX/qp24vK7+wKOEsa9glLbD7D54=
-X-Received: by 2002:a05:600c:4e0d:b0:424:898b:522b with SMTP id
- 5b1f17b1804b1-4249b65604emr1549465e9.1.1719324065471; Tue, 25 Jun 2024
- 07:01:05 -0700 (PDT)
+	s=arc-20240116; t=1719324416; c=relaxed/simple;
+	bh=7J8V+A2m4KYY9Ousnw3i3fJCgNrKZAjhDaETttSPm0c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Z9U+2aVAwjoCCdGQJa0lkoD3MFgcqWCnDu2jv1Welfzdanzb1jseiKNTuNy+qrJ+1n1PGoWL5RUfNuLcaEtQdoYxxLIBzmV99gD7w/eellt4J5e7JLEv4ePYgN8foc4qCx2tTasErA4vtLNqPM5glOB04fQdK6uj5Hg5lSVCujk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FkHBIoSF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42DF7C32781;
+	Tue, 25 Jun 2024 14:06:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719324415;
+	bh=7J8V+A2m4KYY9Ousnw3i3fJCgNrKZAjhDaETttSPm0c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FkHBIoSFBTopDeTKT/XI/obwtTFmXbucUL0Iu8XhW1Hh/aHREi75sUiaICLONLA4v
+	 VV5lyqmmZMmhPCcUvuctzn0VxJ36EkxN45CGmVg3yFXcFDmPCf9vNE6HU0c13hb7Ha
+	 DzyYVA3cSOJqLGOTWSVDgUeee6ZzY9fss+4GOZn6XrTeU7X9ckCXO/0lJdbp0yPMrU
+	 53DN+2G82EQ6Bkgq6mbGI/wP08QT3TSvMOzkXjSQZLm0i+YhfdX5qB+x2oyR47NoSE
+	 8BKvWhPcg6xeqn8Mxjd1Rn8lUNsGtW0Jx9UjQg3ukp5b6NA1LsZh275De8C7f/IdAP
+	 ga5ghxOaAIz5Q==
+Date: Tue, 25 Jun 2024 07:06:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Aaron Conole <aconole@redhat.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ dev@openvswitch.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Pravin B Shelar <pshelar@ovn.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Shuah
+ Khan <shuah@kernel.org>, Stefano Brivio <sbrivio@redhat.com>,
+ =?UTF-8?B?QWRyacOhbg==?= Moreno <amorenoz@redhat.com>, Simon Horman
+ <horms@kernel.org>
+Subject: Re: [PATCH v2 net-next 0/7] selftests: net: Switch pmtu.sh to use
+ the internal ovs script.
+Message-ID: <20240625070654.6a00efef@kernel.org>
+In-Reply-To: <f7th6dhgnvm.fsf@redhat.com>
+References: <20240620125601.15755-1-aconole@redhat.com>
+	<20240621180126.3c40d245@kernel.org>
+	<f7ttthjh33w.fsf@redhat.com>
+	<f7tpls6gu3q.fsf@redhat.com>
+	<e4f69335f90aae3f1daa47ba8f69b24ea15ed3b7.camel@redhat.com>
+	<f7th6dhgnvm.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240625114432.1398320-1-aleksander.lobakin@intel.com> <20240625114432.1398320-4-aleksander.lobakin@intel.com>
-In-Reply-To: <20240625114432.1398320-4-aleksander.lobakin@intel.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 25 Jun 2024 16:00:51 +0200
-Message-ID: <CANn89iK-=36NV2xmTqY3Zge1+oHnrOfTXGY0yrH=jiRWvKAzkg@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/5] netdev_features: convert NETIF_F_LLTX to dev->lltx
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn <andrew@lunn.ch>, 
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 25, 2024 at 1:50=E2=80=AFPM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> NETIF_F_LLTX can't be changed via Ethtool and is not a feature,
-> rather an attribute, very similar to IFF_NO_QUEUE (and hot).
-> Free one netdev_features_t bit and make it a private flag.
+On Tue, 25 Jun 2024 09:20:29 -0400 Aaron Conole wrote:
+> > I'm still wondering if the issue is Kconfig-related (plus possibly bad
+> > interaction with vng). I don't see the OVS knob enabled in the self-
+> > tests config. If it's implied by some other knob, and ends-up being
+> > selected as a module, vng could stumble upon loading the module at
+> > runtime, especially on incremental build (at least I experience that
+> > problem locally). I'm not even sure if the KCI is building
+> > incrementally or not, so all the above could is quite a wild guess.
+> >
+> > In any case I think adding the explicit CONFIG_OPENVSWITCH=y the
+> > selftest config would make the scenario more well defined.  
+> 
+> That is in 7/7 - but there was a collision with a netfilter knob getting
+> turned on.  I can repost it as-is (just after rebasing) if you think
+> that is the only issue.
 
-> Now the LLTX bit sits in the first ("Tx read-mostly") cacheline
-> next to netdev_ops, so that the start_xmit locking code will
-> potentially read 1 cacheline less, nice.
+Sorry for not checking it earlier, looks like the runner was missing
+pyroute:
 
-Are you sure ?
+# python3 ./tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+Need to install the python pyroute2 package >= 0.6.
 
-I certainly appreciate the data locality effort but
-dev->features is read anyway in TX fast path from netif_skb_features()
-
-Thanks.
+I guess run_cmd counter-productively eats the stderr output ? :(
 
