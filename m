@@ -1,134 +1,173 @@
-Return-Path: <netdev+bounces-106575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AC1D916DDA
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 18:16:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DABB1916E27
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 18:29:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2545B1F20F2F
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:16:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C1941F21C5B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:29:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875AF16F913;
-	Tue, 25 Jun 2024 16:16:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6EC4172BB5;
+	Tue, 25 Jun 2024 16:29:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MH4ljJVj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bm3mfkmh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5956814A0B8;
-	Tue, 25 Jun 2024 16:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E190816FF59
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 16:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719332180; cv=none; b=fr1F+mU22GMQDdiiHYYWvhGw/OaygRNHoO/j61ilCA5sJxDdc90DvlnLDottiR71nhVkZdo71rOmlV2hmh+V/8I56f8LeLpUOK56rnad9QbvFCbCPuwvwGPgbYJisSmcfi3L2I5u/JOr1jf3+ExhCGdIsaKgFKNdLeuQ16/Ra4A=
+	t=1719332981; cv=none; b=Yy6QpFGMzISr0jbm2OQJNiy5JiN5ykxoAOdodFO9dSz7Mp0qUgaWyzqlx2ZHY0a9CXBgOUbrjVaeXXv8HAtiqqm0fIenuMkGBedJGCZw72vjghwGvUEsamNeMhexSWm2Pa5oKqlKHO3yVC5kGBCMNx0quIlbI2z8rUnRQVaG46Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719332180; c=relaxed/simple;
-	bh=1WVXoygUO2k28Qdke15vXqnojvrYTkH/M/tMYcvDbZM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wv4E639V/hR3N+VxmSzy2RIPqWC9STYdttDtYEbuYmQFbzQNJzD8wfhe1C2ORYQO5Qr9EOXX0RlcvIwggG0zRZVFGVQ1RcjHrHWaGX4XyS7bY491TuXju5mbfOrX5hgV5ObdcmbvCaxe/9jAC3I7AzthMV+bek9tremSvcHv+Vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MH4ljJVj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 925F2C32781;
-	Tue, 25 Jun 2024 16:16:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719332179;
-	bh=1WVXoygUO2k28Qdke15vXqnojvrYTkH/M/tMYcvDbZM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MH4ljJVjO0hDppiYoO3Ajxdamtx2V5hR0j6h9kP7L3ZMFiT1oIAja7uu0eZknV8Xm
-	 +nAg0KCl6DYiUKh//lTYuYyWjNGl1FKgtvL5fUlY1ALJ5hubRWHFekGQVwfV6O8zIC
-	 MVt9kpIVL158Zf8Y8Q1f9gOYpKd98WSnSZAddFeeEr8byc5xDBzfITEbRO14dmWQOI
-	 Gl1g86L4S0bsaMIwi5jrUkQVp4JP+2CLOkBt/yUrh0ne9tfrgzbS0N5ePb4MtO+M+q
-	 k4CSz2yrqD0wm8U8h9ibgRHOCiqDitKrLFu3M+A6/f3XAmIXluMXZRcAssybE5bJ7L
-	 slsk8fUTAApEA==
-Date: Tue, 25 Jun 2024 17:16:13 +0100
-From: Conor Dooley <conor@kernel.org>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Chris Packham <chris.packham@alliedtelesis.co.nz>, andrew@lunn.ch,
-	f.fainelli@gmail.com, olteanv@gmail.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: Re: [PATCH] dt-bindings: net: dsa: mediatek,mt7530: Minor grammar
- fixes
-Message-ID: <20240625-surfboard-massive-65f7f1f61f0d@spud>
-References: <20240624025812.1729229-1-chris.packham@alliedtelesis.co.nz>
- <704f4b95-2aed-4b76-87cb-83002698471c@arinc9.com>
- <20240624-radiance-untracked-29369921c468@spud>
- <68961d4f-10d8-4769-94d3-92ce709aa00a@arinc9.com>
- <20240624-supernova-obedient-3a2ba2a42188@spud>
- <a17f35ae-5376-458a-b7b5-9dbefd843b40@arinc9.com>
+	s=arc-20240116; t=1719332981; c=relaxed/simple;
+	bh=voLilfGiSwPwQ0lsD/Gbu80QhEeOvi7XOzqXovcyFjk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Tx0Tn8ZOc/SWWf7BwxZTnGaQIzYYpJ6iDiwH2KxEmOG/Ud19Z/L95RIzHy032MhQbcHuP6pMfNWprXyPGFQ2wkodltYZ5jb818tLMf9Mwvxh2p2b1j+mIscX8hNTB5PH4zWQTln4PNjhK3U3SJKbtpVOiiNRPVNtn44HMqfXYrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bm3mfkmh; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-424a2ad06f1so6564855e9.1
+        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 09:29:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719332978; x=1719937778; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SJ3Zxl7/u9c9tYtNwxgLaSlLEpQytxXDrQTT6SFRVB8=;
+        b=Bm3mfkmhq5CZXDPlb+6TWzgPdJS8rYM2xXXBfBLhj1OuzxvPWWj/QZ+S7TBtnEeHrD
+         TwShOf2U5OjELgU8h4dwMbI0R5KRvTFwtrPvbtWVjWm6+BRRQx4ZkLYvpLCM1fKFXBJY
+         KBgODenOQNuzxwNk7nm+Df4AzAzXOss6pwVJdeaPP4ItQh2Nkb2KWDFPmLb4OTDJJJzW
+         yGd/0EVz4IVLdRVtU/fpI844blrMFdqJy8cdvyVY2T0ok88jdicqgGrKKo4CeRNCaowk
+         mmXwUvhK9UpQ2donEmMHVfONgFW3x1TqIABlZzS7ztjO070xN8VY1tdwYSEUbvNLXuYT
+         nCHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719332978; x=1719937778;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SJ3Zxl7/u9c9tYtNwxgLaSlLEpQytxXDrQTT6SFRVB8=;
+        b=PLLnCyc+wiXU3M3qLvQLO2CNNei08sZQ23cMWnD3EOhS6PBvdQ8Wi8RrWjsJbLcylQ
+         pxvz/OyvHEB1W0uTdbvzFlpvj1D6GIKRRFzl3q4aocAiyALD5LHku7usdmz7EHj7YGz+
+         t48Cb2RMfJgSXC/0iC9WzbIvz2qkNfAcwVV9q8VPJAqcASIVn9JH5mUXhiZ+15YPNvSX
+         X6IU9SyknBxC90SeIV2CzWLcUDMYOubHRkHVZ1ozErusfXrWOdr1It5dlEX+fHZ3gmRB
+         UQzkcyb9+RqXgi+S2RM6FdiPX/76qEdnYdw+dyRigEtjtWW5C64PDXg8a7tKI6261Gts
+         b5KQ==
+X-Gm-Message-State: AOJu0YxBpr7YVo9dsPN/s2RlSnlnVpk4Aq3G1A/yvCEy8P6sKhkBJrqQ
+	/S+t8DiJp/9clFbYNG8LP6NlG6IVq5XoaKynRjJ2KQUMxqLiqM+m9MFVL6WIBlS388/EuityQaF
+	v/MLpLrAkTk4i5FRlXpJQVz2YBDY=
+X-Google-Smtp-Source: AGHT+IGblRxb+zHjY9NPu6h/Nyz2PK/nCzxpxud5UvNf72SEZp1h9mhu28fHV4gUpRw3AZgFR+eZU7Jtu8p50S/kNys=
+X-Received: by 2002:a5d:59a4:0:b0:366:f6bd:a544 with SMTP id
+ ffacd0b85a97d-366f6bda67cmr4827924f8f.71.1719332977884; Tue, 25 Jun 2024
+ 09:29:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="eBPkurhNpOKh5uH9"
-Content-Disposition: inline
-In-Reply-To: <a17f35ae-5376-458a-b7b5-9dbefd843b40@arinc9.com>
-
-
---eBPkurhNpOKh5uH9
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <171932574765.3072535.12103787411698322191.stgit@ahduyck-xeon-server.home.arpa>
+ <171932617837.3072535.9872136934270317593.stgit@ahduyck-xeon-server.home.arpa>
+ <6971f7ce-8514-4da5-afc9-764c0da289c0@lunn.ch>
+In-Reply-To: <6971f7ce-8514-4da5-afc9-764c0da289c0@lunn.ch>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 25 Jun 2024 09:29:01 -0700
+Message-ID: <CAKgT0UfTAk=tNejVLSFth6aSeUhHYSmAErc84mQojXtT9n2GDg@mail.gmail.com>
+Subject: Re: [net-next PATCH v2 11/15] eth: fbnic: Add link detection
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org, 
+	davem@davemloft.net, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 24, 2024 at 08:11:10PM +0300, Ar=C4=B1n=C3=A7 =C3=9CNAL wrote:
-> On 24/06/2024 20.02, Conor Dooley wrote:
-> > On Mon, Jun 24, 2024 at 07:59:48PM +0300, Ar=C4=B1n=C3=A7 =C3=9CNAL wro=
-te:
-> > > On 24/06/2024 19.29, Conor Dooley wrote:
-> > > > On Mon, Jun 24, 2024 at 10:00:25AM +0300, Ar=C4=B1n=C3=A7 =C3=9CNAL=
- wrote:
-> > > > > On 24/06/2024 05.58, Chris Packham wrote:
-> >=20
-> > > > > >       and the switch registers are directly mapped into SoC's m=
-emory map rather than
-> > > > > >       using MDIO. The DSA driver currently doesn't support MT76=
-20 variants.
-> > > > > >       There is only the standalone version of MT7531.
-> > > > > > -  Port 5 on MT7530 has got various ways of configuration:
-> > > > > > +  Port 5 on MT7530 supports various configurations:
-> > > > >=20
-> > > > > This is a rewrite, not a grammar fix.
-> > > >=20
-> > > > In both cases "has got" is clumsy wording,
-> > >=20
-> > > We don't use "have/has" on the other side of the Atlantic often.
-> >=20
-> > Uh, which side do you think I am from?
->=20
-> Who would call it clumsy to use "have" and "got" together for possession.=
-=2E.
-> Must be an Irishman! :D
+On Tue, Jun 25, 2024 at 8:25=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > +     /* Tri-state value indicating state of link.
+> > +      *  0 - Up
+> > +      *  1 - Down
+> > +      *  2 - Event - Requires checking as link state may have changed
+> > +      */
+> > +     s8 link_state;
+>
+> Maybe add an enum?
 
-Okay, I was just making sure you weren't accusing me of being
-American...
+Doesn't that default to a 32b size? The general thought was to just
+keep this small since it only needs to be a few bits.
 
---eBPkurhNpOKh5uH9
-Content-Type: application/pgp-signature; name="signature.asc"
+> > +static irqreturn_t fbnic_mac_msix_intr(int __always_unused irq, void *=
+data)
+> > +{
+> > +     struct fbnic_dev *fbd =3D data;
+> > +     struct fbnic_net *fbn;
+> > +
+> > +     if (!fbd->mac->get_link_event(fbd)) {
+> > +             fbnic_wr32(fbd, FBNIC_INTR_MASK_CLEAR(0),
+> > +                        1u << FBNIC_MAC_MSIX_ENTRY);
+> > +             return IRQ_HANDLED;
+> > +     }
+> > +
+> > +     fbd->link_state =3D FBNIC_LINK_EVENT;
+> > +     fbn =3D netdev_priv(fbd->netdev);
+> > +
+> > +     phylink_mac_change(fbn->phylink, fbd->link_state =3D=3D FBNIC_LIN=
+K_UP);
+>
+> Can fbd->link_state =3D=3D FBNIC_LINK_UP given that you have just done:
+>     fbd->link_state =3D FBNIC_LINK_EVENT ?
 
------BEGIN PGP SIGNATURE-----
+My bad. I will need to fix that. I think that was some fallout from an
+earlier refactor.
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZnrtTQAKCRB4tDGHoIJi
-0ogdAPsGgI16OjIEcRoR3/W3g7mWhBrsC6mYOu/EK0bHwPMgaAEA1ed2WNJBKEvH
-EIhgp/sU0bgFgyUSln6h4c1Gh70zUA4=
-=xwkj
------END PGP SIGNATURE-----
+> > +static u32 __fbnic_mac_config_asic(struct fbnic_dev *fbd)
+> > +{
+> > +     /* Enable MAC Promiscuous mode and Tx padding */
+> > +     u32 command_config =3D FBNIC_MAC_COMMAND_CONFIG_TX_PAD_EN |
+> > +                          FBNIC_MAC_COMMAND_CONFIG_PROMISC_EN;
+> > +     struct fbnic_net *fbn =3D netdev_priv(fbd->netdev);
+> > +     u32 rxb_pause_ctrl;
+> > +
+> > +     /* Set class 0 Quanta and refresh */
+> > +     wr32(fbd, FBNIC_MAC_CL01_PAUSE_QUANTA, 0xffff);
+> > +     wr32(fbd, FBNIC_MAC_CL01_QUANTA_THRESH, 0x7fff);
+> > +
+> > +     /* Enable generation of pause frames if enabled */
+> > +     rxb_pause_ctrl =3D rd32(fbd, FBNIC_RXB_PAUSE_DROP_CTRL);
+> > +     rxb_pause_ctrl &=3D ~FBNIC_RXB_PAUSE_DROP_CTRL_PAUSE_ENABLE;
+> > +     if (!fbn->tx_pause)
+> > +             command_config |=3D FBNIC_MAC_COMMAND_CONFIG_TX_PAUSE_DIS=
+;
+> > +     else
+> > +             rxb_pause_ctrl |=3D
+> > +                     FIELD_PREP(FBNIC_RXB_PAUSE_DROP_CTRL_PAUSE_ENABLE=
+,
+> > +                                FBNIC_PAUSE_EN_MASK);
+> > +     wr32(fbd, FBNIC_RXB_PAUSE_DROP_CTRL, rxb_pause_ctrl);
+> > +
+> > +     if (!fbn->rx_pause)
+> > +             command_config |=3D FBNIC_MAC_COMMAND_CONFIG_RX_PAUSE_DIS=
+;
+>
+> Everybody gets pause wrong. To try to combat that it has mostly been
+> moved into phylink. When phylink calls your mac_config() callback it
+> passes const struct phylink_link_state *state. Within state is the
+> pause member. That tells you how to configure the hardware. phylink
+> will then deal with the differences between forced pause configuration
+> and negotiated pause configuration, etc. Your current mac_config() is
+> empty...
+>
+>         Andrew
 
---eBPkurhNpOKh5uH9--
+So the pause setup for now is stored in fbn->[tr]x_pause. So if we
+were to configure it via the mac_config call and then likely call into
+this function. We end up having to reuse it in a few spots to avoid
+having to read/modify the MAC register and instead just set the data
+based on our stored config. Although I think we might be able to pare
+this down as the command_config is the only piece we really need to
+carry. The rest of this setup is essentially just a pause config which
+could be done once instead of on every link up/down transition. I will
+look at splitting this up.
 
