@@ -1,172 +1,217 @@
-Return-Path: <netdev+bounces-106396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 878FF916155
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 10:33:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D866F91615B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 10:34:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D3FB1F2158F
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 08:33:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37A3EB22A6F
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 08:34:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E3614A4D9;
-	Tue, 25 Jun 2024 08:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nmf94YCq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDD81494AF;
+	Tue, 25 Jun 2024 08:32:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E9914A09C
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 08:31:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A6514900E
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 08:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719304320; cv=none; b=bG+yFx8Va6QUYU01R/Xtc5P2jv1c7/DkGiN4jSHoN2EY8DVYaoIrhwoutRY1h9MMVvsFmO4xbL/GfgtGN8gI/c7geA2XAE9yfDkAykmDGSyMlDehRrTkUFAUCKiqgYcn0n0Qfd6MxfPnRls3JiHFWJYse+/Bdk9lpzowjLy5RQ0=
+	t=1719304362; cv=none; b=Xsd2Hp4hsQYvXNvk4p/PqeBCu0+g33xUpxlCc8DI9dIC4VG/apnq118oXcnXrdzR0nQIZ7Lvi3iT2Z6DCFuCDq2INoBS3ZQg2JeFqYrmcmCCLU2nRMn6dv0g8Ll2mFtGF3HBLmk+8psdIOdCzFWsgqy51nvRH7VpZ3R2KLWwz7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719304320; c=relaxed/simple;
-	bh=4GQMcGauM1sM2qcIuTQSJ5+jNSGplBUnYe9YXxdjt0A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=naJ0eQe8HbCBnMF2DLXowbmZ/UkxIewwTK2aZH+9l4M0gAEqEfI0Exuf5vbGDWPK4v1daIVXGNfAwtIeXMw8h7psbvEaXoioLyqy8CvDCiumsrtVLTgtx+zHOtsUsL6rlIXW6Yxun+kqrntrXZ2tXf3ewPvA9dZFNFLMMUYVgWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nmf94YCq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719304317;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FtBka9f6WX8BkCVj0JZCuT7A8nh0ozt1KTXqJ+SkZZk=;
-	b=Nmf94YCq/rqCBhy4y5Jan93rXaw5rjFeNvU2P/xh28FmL3g25JuON6tp8f+Vn/wYu5gchE
-	onCEs72Lnjlc8SdhCZiKml3wqOYax7F27ktaKZfGt6KepaOFXNW9HbDxKx4jYuTklDAlZy
-	n5sk2bFo3iSiIe1AnmkCOU4WCqX8krQ=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-120-6rbVt3tsO16raE46k6D9BA-1; Tue, 25 Jun 2024 04:31:49 -0400
-X-MC-Unique: 6rbVt3tsO16raE46k6D9BA-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-57d0f3455ceso954688a12.3
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 01:31:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719304308; x=1719909108;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FtBka9f6WX8BkCVj0JZCuT7A8nh0ozt1KTXqJ+SkZZk=;
-        b=a7hBEvTdKy8EcKyItZRH4NphqCaPdbFFQAz1Lw+68GobFJKFYmWUDhNOk7V/SiQzYz
-         tRgM5lzMs/IbhuBcGSELS/DNfzYWLpGyjsY4ZkRiIjYhNbYqzMZY55C5f8xivu1ESdXH
-         BsN4CbzlSyRq63y4CYLsKWJORCYMGLMpSiDJKURmiiM5TZMpyKytXTFvay+xXWRYKQk1
-         PeHxJMEB0xHN70K8mecgYUaXsjwy+00nycytLuPJ7Rilym7B2aalZSXVsa+dBYtsdEOU
-         9+bSK+x5gLbT5nOhifyUGkgTxf+L3OKHQYm8jmOe2amBzHQSpUTVGs6yyNXAh8cTs6h9
-         2vbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWct2+jnhTl3jHeFQ+yQ0F1VbohnZ8eQx99DD0xiY0qqe1Jk3DnW3fBh/X9oyfh9IXqoJvymDrr58xjwkNv5Two2lLR+LDX
-X-Gm-Message-State: AOJu0YzS3MsGvnkunhX+8OsPvsxubWZwu8ZFmziurUZfSld8F4LmXeph
-	Vd36brR+6whIVzYs3esvYoDyMGi9qlCFPGqP+1Zo7gWSXw/nM/MHRhHqT07Ml1quuioLOZu2Ol3
-	B+nOPj5A2CtxBY3S2wQHiiB+oR3FIRai32A8RAX7oWBOQ5YO8mAF29jC2UMItEA==
-X-Received: by 2002:a50:baa5:0:b0:57c:a7fe:b155 with SMTP id 4fb4d7f45d1cf-57d4bd74074mr5403370a12.15.1719304308211;
-        Tue, 25 Jun 2024 01:31:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGxhsR1+izX70xNnvyhK6UwUVonlEeFQMV9kch7eEfTNcHpuqfZ/z/U8gcxRPMmp8lA3q60mQ==
-X-Received: by 2002:a50:baa5:0:b0:57c:a7fe:b155 with SMTP id 4fb4d7f45d1cf-57d4bd74074mr5403333a12.15.1719304307535;
-        Tue, 25 Jun 2024 01:31:47 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc7:342:f1b5:a48c:a59a:c1d6:8d0a])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57d30535232sm5638857a12.72.2024.06.25.01.31.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jun 2024 01:31:47 -0700 (PDT)
-Date: Tue, 25 Jun 2024 04:31:42 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: xuanzhuo@linux.alibaba.com, eperezma@redhat.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, venkat.x.venkatsubra@oracle.com,
-	gia-khanh.nguyen@oracle.com
-Subject: Re: [PATCH V2 1/3] virtio: allow nested disabling of the configure
- interrupt
-Message-ID: <20240625043120-mutt-send-email-mst@kernel.org>
-References: <20240624024523.34272-1-jasowang@redhat.com>
- <20240624024523.34272-2-jasowang@redhat.com>
- <20240624054403-mutt-send-email-mst@kernel.org>
- <CACGkMEv1U7N-RRgQ=jbhBK1SWJ3EJz84qYaxC2kk6keM6J6MaQ@mail.gmail.com>
- <20240625030259-mutt-send-email-mst@kernel.org>
- <CACGkMEuP5GJTwcSoG6UP0xO6V7zeJynYyTDVRtF8R=PJ5z8aLg@mail.gmail.com>
- <20240625035746-mutt-send-email-mst@kernel.org>
- <CACGkMEtA8_StbzicRA6aEST8e4SNHFutLmtPu-8zaOZH2zO3cA@mail.gmail.com>
+	s=arc-20240116; t=1719304362; c=relaxed/simple;
+	bh=uSiwdthnipsjsLIzND7m8LfU0ji8K2EDgkBv2zAAijQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FY690ManN4Z/FDN4j2QMH797eEmxswPUVNsi+3BLjquvPeKaY9GvKO2o7aux/omQ6CRxMG/iv3wCFh+WZ3EGcFMCt26DCIoli9tJDnl5F0ojS/SDNFJD/TnUBNCiDVNj7JPT8va4ZhIKTi5/3zGXB71GN9LObIqoqOslKqg3TLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [10.193.113.5] (ewla129.WLAN.Uni-Marburg.DE [137.248.70.129])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id B05D561E5FE05;
+	Tue, 25 Jun 2024 10:31:50 +0200 (CEST)
+Message-ID: <e7769bd7-e4fa-412a-8ad1-c0e5b8655a52@molgen.mpg.de>
+Date: Tue, 25 Jun 2024 10:31:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACGkMEtA8_StbzicRA6aEST8e4SNHFutLmtPu-8zaOZH2zO3cA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2 7/7] ice: Add tracepoint for
+ adding and removing switch rules
+To: Marcin Szycik <marcin.szycik@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ aleksander.lobakin@intel.com, przemyslaw.kitszel@intel.com,
+ michal.swiatkowski@linux.intel.com
+References: <20240624144530.690545-1-marcin.szycik@linux.intel.com>
+ <20240624144530.690545-8-marcin.szycik@linux.intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240624144530.690545-8-marcin.szycik@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 25, 2024 at 04:18:00PM +0800, Jason Wang wrote:
-> > > >
-> > > >
-> > > >
-> > > > But in conclusion ;) if you don't like my suggestion do something else
-> > > > but make the APIs make sense,
-> > >
-> > > I don't say I don't like it:)
-> > >
-> > > Limiting it to virtio-net seems to be the most easy way. And if we
-> > > want to do it in the core, I just want to make nesting to be supported
-> > > which might not be necessary now.
-> >
-> > I feel limiting it to a single driver strikes the right balance ATM.
+Dear Marcin,
+
+
+Thank you for your patch.
+
+Am 24.06.24 um 16:45 schrieb Marcin Szycik:
+> Track the number of rules and recipes added to switch. Add a tracepoint to
+> ice_aq_sw_rules(), which shows both rule and recipe count. This information
+> can be helpful when designing a set of rules to program to the hardware, as
+> it shows where the practical limit is. Actual limits are known (64 recipes,
+> 32k rules), but it's hard to translate these values to how many rules the
+> *user* can actually create, because of extra metadata being implicitly
+> added, and recipe/rule chaining. Chaining combines several recipes/rules to
+> create a larger recipe/rule, so one large rule added by the user might
+> actually consume multiple rules from hardware perspective.
 > 
-> Just to make sure I understand here, should we go back to v1 or go
-> with the config_driver_disabled?
+> Rule counter is simply incremented/decremented in ice_aq_sw_rules(), since
+> all rules are added or removed via it.
 > 
-> Thanks
+> Counting recipes is harder, as recipes can't be removed (only overwritten).
+> Recipes added via ice_aq_add_recipe() could end up being unused, when
+> there is an error in later stages of rule creation. Instead, track the
+> allocation and freeing of recipes, which should reflect the actual usage of
+> recipes (if something fails after recipe(s) were created, caller should
+> free them). Also, a number of recipes are loaded from NVM by default -
+> initialize the recipe counter with the number of these recipes on switch
+> initialization.
+
+Can you please add an example how to use the tracepoint?
+
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> ---
+>   drivers/net/ethernet/intel/ice/ice_common.c |  3 +++
+>   drivers/net/ethernet/intel/ice/ice_switch.c | 22 +++++++++++++++++++--
+>   drivers/net/ethernet/intel/ice/ice_trace.h  | 18 +++++++++++++++++
+>   drivers/net/ethernet/intel/ice/ice_type.h   |  2 ++
+>   4 files changed, 43 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+> index 6abd1b3796ab..009716a12a26 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_common.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
+> @@ -934,6 +934,9 @@ static int ice_init_fltr_mgmt_struct(struct ice_hw *hw)
+>   	INIT_LIST_HEAD(&sw->vsi_list_map_head);
+>   	sw->prof_res_bm_init = 0;
+>   
+> +	/* Initialize recipe count with default recipes read from NVM */
+> +	sw->recp_cnt = ICE_SW_LKUP_LAST;
+> +
+>   	status = ice_init_def_sw_recp(hw);
+>   	if (status) {
+>   		devm_kfree(ice_hw_to_dev(hw), hw->switch_info);
+> diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
+> index 27828cdfe085..3caafcdc301f 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_switch.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+> @@ -3,6 +3,7 @@
+>   
+>   #include "ice_lib.h"
+>   #include "ice_switch.h"
+> +#include "ice_trace.h"
+>   
+>   #define ICE_ETH_DA_OFFSET		0
+>   #define ICE_ETH_ETHTYPE_OFFSET		12
+> @@ -1961,6 +1962,15 @@ ice_aq_sw_rules(struct ice_hw *hw, void *rule_list, u16 rule_list_sz,
+>   	    hw->adminq.sq_last_status == ICE_AQ_RC_ENOENT)
+>   		status = -ENOENT;
+>   
+> +	if (!status) {
+> +		if (opc == ice_aqc_opc_add_sw_rules)
+> +			hw->switch_info->rule_cnt += num_rules;
+> +		else if (opc == ice_aqc_opc_remove_sw_rules)
+> +			hw->switch_info->rule_cnt -= num_rules;
+> +	}
+> +
+> +	trace_ice_aq_sw_rules(hw->switch_info);
+> +
+>   	return status;
+>   }
+>   
+> @@ -2181,8 +2191,10 @@ int ice_alloc_recipe(struct ice_hw *hw, u16 *rid)
+>   	sw_buf->res_type = cpu_to_le16(res_type);
+>   	status = ice_aq_alloc_free_res(hw, sw_buf, buf_len,
+>   				       ice_aqc_opc_alloc_res);
+> -	if (!status)
+> +	if (!status) {
+>   		*rid = le16_to_cpu(sw_buf->elem[0].e.sw_resp);
+> +		hw->switch_info->recp_cnt++;
+> +	}
+>   
+>   	return status;
+>   }
+> @@ -2196,7 +2208,13 @@ int ice_alloc_recipe(struct ice_hw *hw, u16 *rid)
+>    */
+>   static int ice_free_recipe_res(struct ice_hw *hw, u16 rid)
+>   {
+> -	return ice_free_hw_res(hw, ICE_AQC_RES_TYPE_RECIPE, 1, &rid);
+> +	int status;
+> +
+> +	status = ice_free_hw_res(hw, ICE_AQC_RES_TYPE_RECIPE, 1, &rid);
+> +	if (!status)
+> +		hw->switch_info->recp_cnt--;
+> +
+> +	return status;
+>   }
+>   
+>   /**
+> diff --git a/drivers/net/ethernet/intel/ice/ice_trace.h b/drivers/net/ethernet/intel/ice/ice_trace.h
+> index 244cddd2a9ea..07aab6e130cd 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_trace.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_trace.h
+> @@ -330,6 +330,24 @@ DEFINE_EVENT(ice_esw_br_port_template,
+>   	     TP_ARGS(port)
+>   );
+>   
+> +DECLARE_EVENT_CLASS(ice_switch_stats_template,
+> +		    TP_PROTO(struct ice_switch_info *sw_info),
+> +		    TP_ARGS(sw_info),
+> +		    TP_STRUCT__entry(__field(u16, rule_cnt)
+> +				     __field(u8, recp_cnt)),
+> +		    TP_fast_assign(__entry->rule_cnt = sw_info->rule_cnt;
+> +				   __entry->recp_cnt = sw_info->recp_cnt;),
+> +		    TP_printk("rules=%u recipes=%u",
+> +			      __entry->rule_cnt,
+> +			      __entry->recp_cnt)
+> +);
+> +
+> +DEFINE_EVENT(ice_switch_stats_template,
+> +	     ice_aq_sw_rules,
+> +	     TP_PROTO(struct ice_switch_info *sw_info),
+> +	     TP_ARGS(sw_info)
+> +);
+> +
+>   /* End tracepoints */
+>   
+>   #endif /* _ICE_TRACE_H_ */
+> diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+> index c330a436d11a..b6bc2de53b0a 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_type.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_type.h
+> @@ -764,6 +764,8 @@ struct ice_switch_info {
+>   	struct ice_sw_recipe *recp_list;
+>   	u16 prof_res_bm_init;
+>   	u16 max_used_prof_index;
+> +	u16 rule_cnt;
+> +	u8 recp_cnt;
+>   
+>   	DECLARE_BITMAP(prof_res_bm[ICE_MAX_NUM_PROFILES], ICE_MAX_FV_WORDS);
+>   };
 
 
-I still like config_driver_disabled.
+Kind regards,
 
-
-> >
-> > >
-> > > > at least do better than +5
-> > > > on Rusty's interface design scale.
-> > > >
-> > > > >
-> > >
-> > > Thanks
-> > >
-> > >
-> > > > >
-> > > > >
-> > > > > >
-> > > > > >
-> > > > > >
-> > > > > >
-> > > > > > > @@ -455,7 +461,7 @@ int register_virtio_device(struct virtio_device *dev)
-> > > > > > >               goto out_ida_remove;
-> > > > > > >
-> > > > > > >       spin_lock_init(&dev->config_lock);
-> > > > > > > -     dev->config_enabled = false;
-> > > > > > > +     dev->config_enabled = 0;
-> > > > > > >       dev->config_change_pending = false;
-> > > > > > >
-> > > > > > >       INIT_LIST_HEAD(&dev->vqs);
-> > > > > > > diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> > > > > > > index 96fea920873b..4496f9ba5d82 100644
-> > > > > > > --- a/include/linux/virtio.h
-> > > > > > > +++ b/include/linux/virtio.h
-> > > > > > > @@ -132,7 +132,7 @@ struct virtio_admin_cmd {
-> > > > > > >  struct virtio_device {
-> > > > > > >       int index;
-> > > > > > >       bool failed;
-> > > > > > > -     bool config_enabled;
-> > > > > > > +     int config_enabled;
-> > > > > > >       bool config_change_pending;
-> > > > > > >       spinlock_t config_lock;
-> > > > > > >       spinlock_t vqs_list_lock;
-> > > > > > > --
-> > > > > > > 2.31.1
-> > > > > >
-> > > >
-> >
-
+Paul
 
