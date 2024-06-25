@@ -1,128 +1,221 @@
-Return-Path: <netdev+bounces-106363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11D91915FB9
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:14:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C52A8915FC7
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:15:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42F5B1C21863
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 07:14:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AF3E280DD8
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 07:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC3BE146A81;
-	Tue, 25 Jun 2024 07:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78938146A99;
+	Tue, 25 Jun 2024 07:14:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="yeQG+5Sz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ev2rrk9s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2125A33C0
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 07:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB03F146D41
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 07:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719299518; cv=none; b=YNONkNuDh5QfKfQXQIaSbQwkFT5DRymzgT09mSXlYB3lbQv/RssGj+bfAeceQJlbA9ZMSXSCJtzZsQmK8+VKjMcv88thaavUcONCi+lN5MlhMkLKXF3+HKCZfjWs2AEXJtQgxsh5qBYuBPPD8hh2h8AOR0RIeehLVe5UZcKwJXc=
+	t=1719299685; cv=none; b=U3BzibO9WqS1dRwuME8hnoGmqhJC9JO6id/u1yOvMZNn4tIbr73teP/4kJj2BNFKaos5sePTx7FV/Spdb1BnzyPuITUJV25QQAUWPUlt6BvAgLJlLlarQNqhhQqPZ4vRx8Byr1GjLG3+7FN1mcoASf8nBeJ9yejTJnAbEbjpzrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719299518; c=relaxed/simple;
-	bh=xUw0PyFaegpLdfysmtaepy0KOXgwtz4Ug3bKQffQE1k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qf9WuMx0yLiRZ0ZOKKiGAfQInfOv8YdxORYvXE5W4w8GLRXJ6BsR7exkymTt3p2lW1c3OfKbo/KFaM1wL3OTO5lrzbzHFoDzfl1Ga0naya08flSrReTL1dS9emrXHoPOqDZNmFKEDsFOTqiaRzsf+4DijcnIK30C4waJ6tae4UE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=yeQG+5Sz; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-57d1782679fso6022674a12.0
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 00:11:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1719299515; x=1719904315; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BPS6ZFhFZOaUKT+6ZjzQ9R3YHRx6uh52cKqLSt3uvww=;
-        b=yeQG+5SzyEnJV0y/TltV3ABpgJ+pdY2LsMo/ed49OR1eMB7NT005LQmzOI3yjqj15m
-         YuYFbi2JKub/eOBn0qSWJuUlFaTM/WTSiYZldmtvu/cDWTwcRmcjJ2KRyxOaHUskTnhm
-         YXzTy7HKevHtMDQEbFWM1SUs67sk6BPgsnUv98Pt6ELdQwdGAyd2PUjMXtMwm6fxLotP
-         zZov+r63qUD7qVLTbsxVDh5YQHqfMLTapu7P0f3hTxdZJ2I2fxD0lzpsL3u6XSn+KO62
-         d1NXVxyte7lub1DJGv55w9XxVYZ667svCmOejP8wyWivcruOdDsCE0azUZuMYtus7T78
-         lu9A==
+	s=arc-20240116; t=1719299685; c=relaxed/simple;
+	bh=MWlI6gqiKW7AFxrW0jW8foQWqr6Sk9txhhHrr4oyi4I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YEPJ6QWGio/q5mMqcDWdz7Es7x+0Jire8C2QQjpcYVAQLbO6WxmEnxcehVYVl4kp1CjlqSUC/I2iZ2YESFslbOknmqBEpHzaXcm5uNchfGfkngX9fiOgi7I3VKC6hqIgqEFR8QJT6eyWP9fzualdA0mFdtndCarluuG4qh/q5Jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ev2rrk9s; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719299682;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LebRXIKKc2SwfP9sV4lCluk07RoQVB0AjJsteCADcZk=;
+	b=ev2rrk9sfh2Vd1Z56ha60EjKNKhmM8/SBTTQdU5z70Q69iJEu4gaUx3hJ9FNfp36cEvMDm
+	zUngHVU5T+xekiJ1vPayOTzaTTHpSimUA4SHGnG1rXwZbtJD2Zq+zuXLPCo8PKt0FNbuGG
+	Aw1olMx+DsAiGAzDX3z3QDdWeFf0Q+g=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-220-42sdXHtaMnW7Ksa2UevioA-1; Tue, 25 Jun 2024 03:14:40 -0400
+X-MC-Unique: 42sdXHtaMnW7Ksa2UevioA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-363e84940b2so2213097f8f.3
+        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 00:14:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719299515; x=1719904315;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1719299679; x=1719904479;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BPS6ZFhFZOaUKT+6ZjzQ9R3YHRx6uh52cKqLSt3uvww=;
-        b=H4jD4gAoHXlIDrGMSJb+OMMYNBEFBJDW2hY+wh1jcWhpRF6YLkHmnV1lUR35AxUu9x
-         yVxQQ29NKgc2HqkKoIAfoMpJTud0+Xg2gyAaP/nZ+wCdkuPusp8FuubQN02XLarlH/VQ
-         CKm9q0yYf5qwJmASm/3sIPh94CMUms7oT2ar0YrOU4URxZCK74XZbxb3HtdCLJe44zrg
-         9/RAfmJl/lD71B0XYMtq36pEajXkXyRs1z8YT4+ttixPRzxgtrb8pLrMvzL4eKli9PbY
-         qqd9R7eppwOl5MwAfe9+vpfjQ9L6A2AucSmJXwcjV4Aoi87wElfCHze3ivRDpnE4kRg0
-         pKAA==
-X-Forwarded-Encrypted: i=1; AJvYcCXxmQIeShOC7SJ3WCTYkI7d6/lw49t/GguVkBkgkN3ssDunSJFNgjzpObVUAhoGP7AhAROKD3b/+eOuFvmozsh+PGIcOibJ
-X-Gm-Message-State: AOJu0YyFEs6OIwlr43JyELGF+yfUZinfBzcZuWaUgPPJ4/QQze89W96G
-	WpBCQy+NaL5d9/FZ2rsSWiCt2zICuBsbA9mBYgsMcE056QZ90ktxCBdeSAfm4w4=
-X-Google-Smtp-Source: AGHT+IHmchx0S/+aZIzPgdQcHEc8EzqEjlraEknHtVVG1hf79tQOxbPnLMFkx/ATXCjgSdMDHzD1Gw==
-X-Received: by 2002:a50:f604:0:b0:57c:aac9:cd8 with SMTP id 4fb4d7f45d1cf-57d4bd5648amr4484491a12.8.1719299515196;
-        Tue, 25 Jun 2024 00:11:55 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57d3042fd72sm5653628a12.48.2024.06.25.00.11.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jun 2024 00:11:54 -0700 (PDT)
-Message-ID: <13131adc-1e61-46ae-a48e-ab2b51037a98@blackwall.org>
-Date: Tue, 25 Jun 2024 10:11:53 +0300
+        bh=LebRXIKKc2SwfP9sV4lCluk07RoQVB0AjJsteCADcZk=;
+        b=v1R7kkKXnN3q5w1aeTjlieUAm2KIrn0QKB6GPdL1+fCfkcpPRfYdmgvKp/0ewkMbfn
+         rr51BApZLoL+tEDZvvAXn+CTT0goY2q5x+hGR4JGPPOaK0ZZDi3yzwXDP1wbdgGjZ2hw
+         SySlcXuS4ZuWS9DzQTuj9kiwyGXJf/4ViFOBy4TKGZDpC+kyUp9KagHacmyHrfVSRj+w
+         dOvb2gxzULT/zqIcr6/95WOCnMuf7T0Dj0jCw4dDbQSvacvNgQ4RzESdwvctNIsPNMbJ
+         rme8uakEgXN1Z+TyIOGYoDDlUw8KrdZY9TphlEtAAFqiFB01f9AceIndaQr7kk3Reb/q
+         I1EA==
+X-Forwarded-Encrypted: i=1; AJvYcCV/GxefMv11SjyD5y64U0Z1FObaOPIY1MVGD/4RToSCKd62VLqpKxUla7mntjqTuhw35AwVS+tME1NMOO+bXHfeEvKxu2wb
+X-Gm-Message-State: AOJu0YzQXnzKS3f0d4GZO4bs3F2KCRuBwnEx28aJjDzl5DYBMbwtCyus
+	vhFHaHwq/rIAfSCZK30Upo/lf1P/NntiN8QbgBtYPVqfB6BQd2GgS66TqnBQ3D43vSqKqlIuwPX
+	a+aDnSRfuXXBDbdh6Jj0Q2xIemvACjgwXlK3oUIAdfxnI8B5KXcEopw8DFxIQhA==
+X-Received: by 2002:adf:fa8e:0:b0:362:8749:9639 with SMTP id ffacd0b85a97d-366e7a373f4mr4713217f8f.35.1719299679069;
+        Tue, 25 Jun 2024 00:14:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF+RQabaVT0BHWxAQBLc5MihkozylBrOdUtM3UiHMV0ATZoGWoxlVaHU25AglTEOaxNsvlKQw==
+X-Received: by 2002:adf:fa8e:0:b0:362:8749:9639 with SMTP id ffacd0b85a97d-366e7a373f4mr4713186f8f.35.1719299678279;
+        Tue, 25 Jun 2024 00:14:38 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:1f6:f72:b8c7:9fc2:4c8b:feb3])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-366389b861bsm11976184f8f.29.2024.06.25.00.14.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jun 2024 00:14:37 -0700 (PDT)
+Date: Tue, 25 Jun 2024 03:14:32 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Heng Qi <hengqi@linux.alibaba.com>, netdev@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v4 2/5] virtio_net: enable irq for the control vq
+Message-ID: <20240625031153-mutt-send-email-mst@kernel.org>
+References: <20240619161908.82348-1-hengqi@linux.alibaba.com>
+ <20240619161908.82348-3-hengqi@linux.alibaba.com>
+ <20240619171708-mutt-send-email-mst@kernel.org>
+ <1718868555.2701075-5-hengqi@linux.alibaba.com>
+ <CACGkMEv8jnnO=S3LYW00ypwHfM3Tzt42iuASG_d4FAAk60zoLg@mail.gmail.com>
+ <CACGkMEtryWEbe-07-7GWyntGN+f-sL+uS0ozN0Oc6aMemmsYEw@mail.gmail.com>
+ <1718877195.0503237-9-hengqi@linux.alibaba.com>
+ <20240620060816-mutt-send-email-mst@kernel.org>
+ <20240620061109-mutt-send-email-mst@kernel.org>
+ <CACGkMEtacpgHvD7GLysXWm7_CybhgyJYx=AMAX+jk6+G4wqW8Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net-next] bonding: 3ad: send ifinfo notify when mux
- state changed
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek
- <andy@greyhouse.net>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20240625070057.2004129-1-liuhangbin@gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20240625070057.2004129-1-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEtacpgHvD7GLysXWm7_CybhgyJYx=AMAX+jk6+G4wqW8Q@mail.gmail.com>
 
-On 25/06/2024 10:00, Hangbin Liu wrote:
-> Currently, administrators need to retrieve LACP mux state changes from
-> the kernel DEBUG log using netdev_dbg and slave_dbg macros. To simplify
-> this process, let's send the ifinfo notification whenever the mux state
-> changes. This will enable users to directly access and monitor this
-> information using the ip monitor command.
+On Tue, Jun 25, 2024 at 09:27:24AM +0800, Jason Wang wrote:
+> On Thu, Jun 20, 2024 at 6:12 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Thu, Jun 20, 2024 at 06:10:51AM -0400, Michael S. Tsirkin wrote:
+> > > On Thu, Jun 20, 2024 at 05:53:15PM +0800, Heng Qi wrote:
+> > > > On Thu, 20 Jun 2024 16:26:05 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> > > > > On Thu, Jun 20, 2024 at 4:21 PM Jason Wang <jasowang@redhat.com> wrote:
+> > > > > >
+> > > > > > On Thu, Jun 20, 2024 at 3:35 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
+> > > > > > >
+> > > > > > > On Wed, 19 Jun 2024 17:19:12 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > > > > > On Thu, Jun 20, 2024 at 12:19:05AM +0800, Heng Qi wrote:
+> > > > > > > > > @@ -5312,7 +5315,7 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+> > > > > > > > >
+> > > > > > > > >     /* Parameters for control virtqueue, if any */
+> > > > > > > > >     if (vi->has_cvq) {
+> > > > > > > > > -           callbacks[total_vqs - 1] = NULL;
+> > > > > > > > > +           callbacks[total_vqs - 1] = virtnet_cvq_done;
+> > > > > > > > >             names[total_vqs - 1] = "control";
+> > > > > > > > >     }
+> > > > > > > > >
+> > > > > > > >
+> > > > > > > > If the # of MSIX vectors is exactly for data path VQs,
+> > > > > > > > this will cause irq sharing between VQs which will degrade
+> > > > > > > > performance significantly.
+> > > > > > > >
+> > > > > >
+> > > > > > Why do we need to care about buggy management? I think libvirt has
+> > > > > > been teached to use 2N+2 since the introduction of the multiqueue[1].
+> > > > >
+> > > > > And Qemu can calculate it correctly automatically since:
+> > > > >
+> > > > > commit 51a81a2118df0c70988f00d61647da9e298483a4
+> > > > > Author: Jason Wang <jasowang@redhat.com>
+> > > > > Date:   Mon Mar 8 12:49:19 2021 +0800
+> > > > >
+> > > > >     virtio-net: calculating proper msix vectors on init
+> > > > >
+> > > > >     Currently, the default msix vectors for virtio-net-pci is 3 which is
+> > > > >     obvious not suitable for multiqueue guest, so we depends on the user
+> > > > >     or management tools to pass a correct vectors parameter. In fact, we
+> > > > >     can simplifying this by calculating the number of vectors on realize.
+> > > > >
+> > > > >     Consider we have N queues, the number of vectors needed is 2*N + 2
+> > > > >     (#queue pairs + plus one config interrupt and control vq). We didn't
+> > > > >     check whether or not host support control vq because it was added
+> > > > >     unconditionally by qemu to avoid breaking legacy guests such as Minix.
+> > > > >
+> > > > >     Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com
+> > > > >     Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > > >     Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > > >     Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > > >
+> > > > Yes, devices designed according to the spec need to reserve an interrupt
+> > > > vector for ctrlq. So, Michael, do we want to be compatible with buggy devices?
+> > > >
+> > > > Thanks.
+> > >
+> > > These aren't buggy, the spec allows this.
 > 
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
-> v2: don't use call_netdevice_notifiers as it will case sleeping in atomic
->     context (Nikolay Aleksandrov)
-> ---
->  drivers/net/bonding/bond_3ad.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-> index c6807e473ab7..7a7224bf1894 100644
-> --- a/drivers/net/bonding/bond_3ad.c
-> +++ b/drivers/net/bonding/bond_3ad.c
-> @@ -1185,6 +1185,8 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
->  		default:
->  			break;
->  		}
-> +
-> +		rtmsg_ifinfo(RTM_NEWLINK, port->slave->dev, 0, GFP_KERNEL, 0, NULL);
->  	}
->  }
->  
+> So it doesn't differ from the case when we are lacking sufficient msix
+> vectors in the case of multiqueue. In that case we just fallback to
+> share one msix for all queues and another for config and we don't
+> bother at that time.
 
-GFP_KERNEL still allows to sleep, this is where I meant use GFP_ATOMIC if
-under the locks in my previous comment.
-Also how does an administrator undestand that the mux state changed by
-using the above msg? Could you show the iproute2 part and how it looks for
-anyone monitoring?
+sharing queues is exactly "bothering".
+
+> Any reason to bother now?
+> 
+> Thanks
+
+This patch can make datapath slower for such configs by switching to
+sharing msix for a control path benefit. Not a tradeoff many users want
+to make.
+
+
+> > >  So don't fail, but
+> > > I'm fine with using polling if not enough vectors.
+> >
+> > sharing with config interrupt is easier code-wise though, FWIW -
+> > we don't need to maintain two code-paths.
+> >
+> > > > >
+> > > > > Thanks
+> > > > >
+> > > > > >
+> > > > > > > > So no, you can not just do it unconditionally.
+> > > > > > > >
+> > > > > > > > The correct fix probably requires virtio core/API extensions.
+> > > > > > >
+> > > > > > > If the introduction of cvq irq causes interrupts to become shared, then
+> > > > > > > ctrlq need to fall back to polling mode and keep the status quo.
+> > > > > >
+> > > > > > Having to path sounds a burden.
+> > > > > >
+> > > > > > >
+> > > > > > > Thanks.
+> > > > > > >
+> > > > > >
+> > > > > >
+> > > > > > Thanks
+> > > > > >
+> > > > > > [1] https://www.linux-kvm.org/page/Multiqueue
+> > > > > >
+> > > > > > > >
+> > > > > > > > --
+> > > > > > > > MST
+> > > > > > > >
+> > > > > > >
+> > > > >
+> >
 
 
