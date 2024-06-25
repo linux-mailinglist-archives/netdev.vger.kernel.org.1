@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-106349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 033BA915F37
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:01:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE9AB915F7E
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:08:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25CCD1C22C6D
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 07:01:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A890428499C
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 07:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF2C145FEE;
-	Tue, 25 Jun 2024 07:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F2441494AF;
+	Tue, 25 Jun 2024 07:06:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B2y77FA5"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="nOSLUaVI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5894A146593
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 07:01:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11C21494A5;
+	Tue, 25 Jun 2024 07:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719298873; cv=none; b=PR3vaTbjKHZI3qoqLocwGklScRd+53JWdJcgfVm1x1Ar6KNERFvE6ki27qFJQ1sw2vo3N0TE+wVjrPDISDJhfMSUHvtN0JBLbffQ+YdytFJjKimOOoMOMtTIqSKgS7OUa7XDio6rzV0d6BFEkvslHKOG3GGHx5z/gaUU2d/Y8V4=
+	t=1719299186; cv=none; b=kL+AHRUqpi/9ciWp8qo++o6uYss0O/zBbu6lGnFY1REwhS1QN3n2VKA/uvvoMw/dSeGIHFYrSYD8nDjmB0HB1ufS9sWnfUgOJxwDaAowefe0+AM2GkuOovh8m+EuXKumvcPDZy+09tPRwpkRI1RUAx1wk9YMc2XzfZ2rbY5aiME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719298873; c=relaxed/simple;
-	bh=pe+EdMJcKrRKcDduDb+Lb1e+v0jcDmBEJDFtfW0q3/c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i1sezUcRxK+D8RqQ88Brgo4f+BbkfRY7rhIBjGpM3gLVMX6WgR9JdnDsnEKg7xf/7IqhlmxdT5PJ+0qMGykZ6yZe3JnxCRmxr3mhUpbp8oOOxxk2lntP4l2uMlBXQJLPWHMdNQ9OPUVc2mL/iuIBE++MuX1WBV4CjUa2EIIwHz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B2y77FA5; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-706683e5249so2084993b3a.2
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 00:01:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719298871; x=1719903671; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iJ93mRWYn1qF6Xrp9j0c9K1NAmfefo/xDrXsvMyKmVE=;
-        b=B2y77FA5MkxvnH9tM75CcXd38UbzN7NJdPe+CB3ztXL5YXawI3Oz3z7X7rn7Itpg4w
-         tVkzHU5SRmkTag6wdDlpzCjbdIkaNg3tU98jjgayj1jNApp8j/vZyTBjhzG272P93aj1
-         n7hGLaaU8Ku+CjppVpdXnEAdgPnWpYHKkn8UTo52GlvYo4/AmbrK/ti0jhzY/ya2cnwA
-         wiClnVOTG8RBA7OCoVd6Y9/HgE6e/N2BlwJ+xOY/fTsNzfW77bWW/orv+6AEk8RrBYbH
-         +42goEg4lYchQFEc5sPuHvfGMhVrrKRSNUlZyCT3H8PrOTTfKgxDd5Z2GvZMaTPhDcJD
-         mhoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719298871; x=1719903671;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iJ93mRWYn1qF6Xrp9j0c9K1NAmfefo/xDrXsvMyKmVE=;
-        b=mdXCIQJPnPew7c+YARIo2VCgki7QufKJCwu6py/BHklYInx8K64JoCahs8/NFYW4nI
-         uFccIlr7fcfi3ZueV3FN2labcBWY+AejIAED5Wj2U4muCwGUv8/sd7+k3bbZlLEKGUeG
-         w5hKFKGvEaTY/q/906rM111ejoqIS8bQJiffk+x9JZ4QeN4iRPWNA9AHqZLM91gtXnJj
-         XMzsmV6FfTFt6mmT6hzPw2e2NbFHzYCAiNPm7FYa+lPHjSizXKnPu6173Qqj/jx9XilV
-         JnEIv50im7IkwkkqobMdq41LTcIaL8C6SIE/fWjQNa0uPX6oV7hS/xMVVlHwSlEjkYk2
-         uxxA==
-X-Gm-Message-State: AOJu0YzPI7LY2utyS7434l/Rq53ODEXDQAR9/5efrpY/ESTy9CAuEWPt
-	PJ6/gtoN88QfMKb/V9nZj2ZssDSo9f6rMZkyet+6rxTYRtaKr5l8/+folWeCzZo=
-X-Google-Smtp-Source: AGHT+IGnPIDMEM8T5arGLOBrP6MYIrDcOYgJIMSdElLYGBhFbSwhSYHxg2IA/MmiYqQpDFytk7Y5KQ==
-X-Received: by 2002:a05:6a20:3d8a:b0:1bc:ec05:1d61 with SMTP id adf61e73a8af0-1bcf7e6bb69mr7478293637.1.1719298871007;
-        Tue, 25 Jun 2024 00:01:11 -0700 (PDT)
-Received: from Laptop-X1.redhat.com ([2409:8a02:7825:fd0:4f66:6e77:859a:643d])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7065107ae7esm7308864b3a.42.2024.06.25.00.01.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jun 2024 00:01:10 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv2 net-next] bonding: 3ad: send ifinfo notify when mux state changed
-Date: Tue, 25 Jun 2024 15:00:57 +0800
-Message-ID: <20240625070057.2004129-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.45.0
+	s=arc-20240116; t=1719299186; c=relaxed/simple;
+	bh=D3T1Ju1uox+OtXxYZj55RKLp9LVaFjcpEGHNMfKx49o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jGVD42EzEaeDQk5nTLE003iRU/p7oMJL4WyWBAZ566TuvaUK9GWHs+wO0a/D15p6rV1rdDFSpE01dzqgIzLBFijxNbnr36R53eM+dzgEEPkU7xXvaYV5icD0JPRqpeI+Q2F8NpOc0hHbGu4+q2hMma01UEvnV/w70pIFGHQvaXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=nOSLUaVI; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45OIfjVT023768;
+	Tue, 25 Jun 2024 07:05:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=CatA/4J9f8ryCj6cYRp+TW409iRIo+6ke1I
+	zXJbJBzw=; b=nOSLUaVIUr6mVcJy/hUdQQyFuUMM7FViYavEo5CBHeB50opQqur
+	/mGBmXKuVwApExIlel+LhUo9e+gATuBv3fxOMDSvkuW/ALEZVwAC6nswgIyeRIab
+	Py7VqciabRtIPlxad2pkD1RbESgV1180rRld5EIwECifBMoCV5f4bujliTDmXocr
+	Yxx1yfPlvvBvI7a4TyNporIsN1/objtdo1oDDWxqg94nQzW95a2o1dG/RnhKhbxL
+	9VScimWsEVaBH0LlCCpcpTezIMFg9YzCs2KT8UQx6U+6ikUBIEpfXRYA2INsfKry
+	24dvOEMmSUR6vbTweGFx4ZfdgLlABSphRuw==
+Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ywqshnqct-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Jun 2024 07:05:57 +0000 (GMT)
+Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTP id 45P75cps013324;
+	Tue, 25 Jun 2024 07:05:38 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTPS id 3ywqpky2uf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Jun 2024 07:05:38 +0000
+Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 45P75cuw013297;
+	Tue, 25 Jun 2024 07:05:38 GMT
+Received: from hu-devc-blr-u22-a.qualcomm.com (hu-devipriy-blr.qualcomm.com [10.131.37.37])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTPS id 45P75cRu013295
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Jun 2024 07:05:38 +0000
+Received: by hu-devc-blr-u22-a.qualcomm.com (Postfix, from userid 4059087)
+	id D1C5341060; Tue, 25 Jun 2024 12:35:36 +0530 (+0530)
+From: Devi Priya <quic_devipriy@quicinc.com>
+To: andersson@kernel.org, mturquette@baylibre.com, sboyd@kernel.org,
+        robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+        konrad.dybcio@linaro.org, catalin.marinas@arm.com, will@kernel.org,
+        p.zabel@pengutronix.de, richardcochran@gmail.com,
+        geert+renesas@glider.be, dmitry.baryshkov@linaro.org,
+        neil.armstrong@linaro.org, arnd@arndb.de, m.szyprowski@samsung.com,
+        nfraprado@collabora.com, u-kumar1@ti.com,
+        linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
+Cc: quic_devipriy@quicinc.com
+Subject: [PATCH V4 0/7] Add NSS clock controller support for IPQ9574
+Date: Tue, 25 Jun 2024 12:35:29 +0530
+Message-Id: <20240625070536.3043630-1-quic_devipriy@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,35 +85,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: bpbKYdGfdpDRFMrM4VKkj8sDjUJXP3fc
+X-Proofpoint-GUID: bpbKYdGfdpDRFMrM4VKkj8sDjUJXP3fc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-25_04,2024-06-24_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ bulkscore=0 phishscore=0 suspectscore=0 lowpriorityscore=0 malwarescore=0
+ mlxscore=0 impostorscore=0 mlxlogscore=917 priorityscore=1501 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
+ definitions=main-2406250053
 
-Currently, administrators need to retrieve LACP mux state changes from
-the kernel DEBUG log using netdev_dbg and slave_dbg macros. To simplify
-this process, let's send the ifinfo notification whenever the mux state
-changes. This will enable users to directly access and monitor this
-information using the ip monitor command.
+Add bindings, driver and devicetree node for networking sub system clock 
+controller on IPQ9574. Also add support for NSS Huayra type alpha PLL and
+add support for gpll0_out_aux clock which serves as the parent for 
+some nss clocks.
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
-v2: don't use call_netdevice_notifiers as it will case sleeping in atomic
-    context (Nikolay Aleksandrov)
----
- drivers/net/bonding/bond_3ad.c | 2 ++
- 1 file changed, 2 insertions(+)
+This series depends on the below patch series which adds support for
+Interconnect driver
+https://lore.kernel.org/linux-arm-msm/20240430064214.2030013-1-quic_varada@quicinc.com/
 
-diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-index c6807e473ab7..7a7224bf1894 100644
---- a/drivers/net/bonding/bond_3ad.c
-+++ b/drivers/net/bonding/bond_3ad.c
-@@ -1185,6 +1185,8 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
- 		default:
- 			break;
- 		}
-+
-+		rtmsg_ifinfo(RTM_NEWLINK, port->slave->dev, 0, GFP_KERNEL, 0, NULL);
- 	}
- }
- 
+Changes in V4:
+	- Detailed change logs are added to the respective patches.
+
+V3 can be found at:
+https://lore.kernel.org/linux-arm-msm/20240129051104.1855487-1-quic_devipriy@quicinc.com/
+
+V2 can be found at:
+https://lore.kernel.org/linux-arm-msm/20230825091234.32713-1-quic_devipriy@quicinc.com/
+
+Devi Priya (7):
+  clk: qcom: clk-alpha-pll: Add NSS HUAYRA ALPHA PLL support for ipq9574
+  dt-bindings: clock: gcc-ipq9574: Add definition for GPLL0_OUT_AUX
+  clk: qcom: gcc-ipq9574: Add support for gpll0_out_aux clock
+  dt-bindings: clock: Add ipq9574 NSSCC clock and reset definitions
+  clk: qcom: Add NSS clock Controller driver for IPQ9574
+  arm64: dts: qcom: ipq9574: Add support for nsscc node
+  arm64: defconfig: Build NSS Clock Controller driver for IPQ9574
+
+ .../bindings/clock/qcom,ipq9574-nsscc.yaml    |   75 +
+ arch/arm64/boot/dts/qcom/ipq9574.dtsi         |   44 +
+ arch/arm64/configs/defconfig                  |    1 +
+ drivers/clk/qcom/Kconfig                      |    7 +
+ drivers/clk/qcom/Makefile                     |    1 +
+ drivers/clk/qcom/clk-alpha-pll.c              |   11 +
+ drivers/clk/qcom/clk-alpha-pll.h              |    1 +
+ drivers/clk/qcom/gcc-ipq9574.c                |   15 +
+ drivers/clk/qcom/nsscc-ipq9574.c              | 3082 +++++++++++++++++
+ include/dt-bindings/clock/qcom,ipq9574-gcc.h  |    1 +
+ .../dt-bindings/clock/qcom,ipq9574-nsscc.h    |  152 +
+ .../dt-bindings/reset/qcom,ipq9574-nsscc.h    |  134 +
+ 12 files changed, 3524 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+ create mode 100644 drivers/clk/qcom/nsscc-ipq9574.c
+ create mode 100644 include/dt-bindings/clock/qcom,ipq9574-nsscc.h
+ create mode 100644 include/dt-bindings/reset/qcom,ipq9574-nsscc.h
+
+
+base-commit: 62c97045b8f720c2eac807a5f38e26c9ed512371
+prerequisite-patch-id: 513cb089a74b49996b46345595d1aacf60dcda64
+prerequisite-patch-id: 480a3d98ed862604edd8b6375b96f3b452471668
+prerequisite-patch-id: c26478e61e583eb879385598f26b42b8271036f5
+prerequisite-patch-id: 0f009298418d78a45a208f043f86c4ce500f2390
+prerequisite-patch-id: 353eb53cd192489d5b0c4654a0b922f23e1f7217
+prerequisite-patch-id: 8c6142689c760536e3dd8fb569545cf751cb714c
 -- 
-2.45.0
+2.34.1
 
 
