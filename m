@@ -1,117 +1,89 @@
-Return-Path: <netdev+bounces-106472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40B5D916890
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 15:04:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72B009168AC
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 15:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DF881C20D68
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 13:04:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A10A51C20ED1
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 13:17:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1386814AD2C;
-	Tue, 25 Jun 2024 13:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6161509A2;
+	Tue, 25 Jun 2024 13:17:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="svdNGmah"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 192F51DFC5;
-	Tue, 25 Jun 2024 13:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49EC4944F;
+	Tue, 25 Jun 2024 13:17:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719320643; cv=none; b=LqvP6Fxwi20XvS9q6AmuJVnyNbkHm0nGolDUYHYs0/CLB+t++YhTzJuTuywdz4HV0ns8k4FigbPw1Tv1CaRWLGM6TGxAKkrgVqNX1TtaixsQ4HgxloLQJCQv7LOzWXUVT5AbPfUQb6eWjwWEjbDhtE9f44IRLuzH//5v8hf4xtM=
+	t=1719321464; cv=none; b=ka4g6sClljN5/gpMMHIzQ6C2mX3SddxnQBnUcUYd6vA8UUeQiXXOA8qafEg9f3J3s8g1QviV0xfEafpDQ1eh6zgFC60yz0B1BPbNtNrqU8do8m9GOd6/PnbiMUI/ARCge810Yk+rZl7y1dG+cTXqkDbliyVhhqKMs4b0hZoQEC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719320643; c=relaxed/simple;
-	bh=vKrctSsMK/Svt99yXvAHe3Wr9BUtj8x6GJqVNkNMQWg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BTCfrwTXkaMjrq77/aQKoHxYk4afhObONz68PjsnjI+6cz12tr227Kt9UDy91kYuB4ZHTnOZOy7i37F+vnsdb9uP5+RSYE8P/mDAp9W/Tx4+Nj7ao1oZTykso/iHBtyElz+ctKLGrdnjeDidePw8p5xebrruKXSOTi+y4dquO28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
-	by APP-03 (Coremail) with SMTP id rQCowABHTZETwHpmyQZnEg--.1722S2;
-	Tue, 25 Jun 2024 21:03:25 +0800 (CST)
-From: Ma Ke <make24@iscas.ac.cn>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shradhagupta@linux.microsoft.com,
-	horms@kernel.org,
-	kotaranov@microsoft.com,
-	longli@microsoft.com,
-	schakrabarti@linux.microsoft.com,
-	erick.archer@outlook.com,
-	leon@kernel.org
-Cc: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ma Ke <make24@iscas.ac.cn>
-Subject: [PATCH v3] net: mana: Fix possible double free in error handling path
-Date: Tue, 25 Jun 2024 21:03:14 +0800
-Message-Id: <20240625130314.2661257-1-make24@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1719321464; c=relaxed/simple;
+	bh=Km2O/8LEvjsKIhT+KosloJovi64FFNemp1kSS0ub1Fo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WB3+7uMei/ATWqU5i67+kt9hSQEd5r5PKOwJi6K61jzle9/fB9xwZuOaQI8PqCBHBLfwCMGU72I6wrAYxmKp8SeNbQXWpixeoMc82+HnwGAWN7BbL/FIeGn/EtXMvDzGhLEH8NtlJZiUBMgg5jvjZnbzw/fcuLjFhOjQoarn8Qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=svdNGmah; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=O20xE0qt6orNwM9/ylWMLJ/0tfLwysXXVys/n8Q5dH4=; b=svdNGmahuVQH037pNuX8Wh6w1U
+	nOJ7Zkt2yjJ7LgNVXHBxZEGdwFUpYhdjMIyh8bQg86VgWp1/sTlbTIiCrBb21DyJq/NSP3W4y2i4B
+	Z3nTufFV53GTmu9F+RTUEAvVHlKDKhl5Y+b7z425wI2E0kpCKp1kWNNrdINYMfPF8FHg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sM639-000wQl-MT; Tue, 25 Jun 2024 15:17:31 +0200
+Date: Tue, 25 Jun 2024 15:17:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Marek Vasut <marex@denx.de>
+Cc: netdev@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Joakim Zhang <qiangqing.zhang@nxp.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+	devicetree@vger.kernel.org, kernel@dh-electronics.com
+Subject: Re: [net-next,PATCH] dt-bindings: net: realtek,rtl82xx: Document
+ known PHY IDs as compatible strings
+Message-ID: <de304f76-d697-4c35-858d-fdd747b1bea3@lunn.ch>
+References: <20240623194225.76667-1-marex@denx.de>
+ <cc539292-0b76-46b8-99b3-508b7bc7d94d@lunn.ch>
+ <085b1167-ed94-4527-af0f-dc7df2f2c354@denx.de>
+ <bad5be97-d2fa-4bd4-9d89-ddf8d9c72ec0@lunn.ch>
+ <246afe9f-3021-4d59-904c-ae657c3be9b9@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowABHTZETwHpmyQZnEg--.1722S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7JF4rAFyrCF45uFyrurWxJFb_yoWkGFb_AF
-	y29rn5JryvkF1Skr43KrWrZry0k3yqq3s5XrWxtFyft347uay5WrZrur18XrWDWrWUAanr
-	u3sxK347Z3s7KjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb3xFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6r1F6r1fM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
-	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8Jw
-	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAG
-	YxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
-	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
-	C2KfnxnUUI43ZEXa7VUby8BUUUUUU==
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <246afe9f-3021-4d59-904c-ae657c3be9b9@denx.de>
 
-When auxiliary_device_add() returns error and then calls
-auxiliary_device_uninit(), callback function adev_release
-calls kfree(madev). We shouldn't call kfree(madev) again
-in the error handling path. Set 'madev' to NULL.
+> git grep ethernet-phy-id0000.8201 on current next-20240624 says no.
+> 
+> > We could add it, if it is
+> > needed to keep the DT validation tools are happy. But we should also
+> > be deprecating this compatible, replacing it with one allocated from
+> > realteks range.
+> 
+> I think we should drop from the bindings after all, I will prepare a V2 like
+> that, OK ?
 
-Fixes: a69839d4327d ("net: mana: Add support for auxiliary device")
-Signed-off-by: Ma Ke <make24@iscas.ac.cn>
----
-Changes in v3:
-- added a "Fixes" line as suggested.
-Changes in v2:
-- streamlined the patch according suggestions;
-- revised the description.
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 2 ++
- 1 file changed, 2 insertions(+)
+Yes, please drop it.
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index d087cf954f75..608ad31a9702 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -2798,6 +2798,8 @@ static int add_adev(struct gdma_dev *gd)
- 	if (ret)
- 		goto init_fail;
- 
-+	/* madev is owned by the auxiliary device */
-+	madev = NULL;
- 	ret = auxiliary_device_add(adev);
- 	if (ret)
- 		goto add_fail;
--- 
-2.25.1
-
+     Andrew
 
