@@ -1,111 +1,134 @@
-Return-Path: <netdev+bounces-106574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFF45916DC1
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 18:07:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AC1D916DDA
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 18:16:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F11BB1C20CEE
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:07:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2545B1F20F2F
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F74B170838;
-	Tue, 25 Jun 2024 16:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875AF16F913;
+	Tue, 25 Jun 2024 16:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HX1wl3Hi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MH4ljJVj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F5C73476
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 16:07:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5956814A0B8;
+	Tue, 25 Jun 2024 16:16:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719331666; cv=none; b=Cn0QXnDE1uFmvdmZCaySwPYfJjSBtgM0Egp72OFaaU3mdhx8vYm9WwBsu/yn2/ttG91Q0ycBThRpK7IcHJiMF8r/ksmz44bfPzRR216o23TqE5/1MJaNsv1P+PPZIMkZ4IdEAxLiFGuzyLH9SB9W219+uvzZZq6AgC+0AFyusKk=
+	t=1719332180; cv=none; b=fr1F+mU22GMQDdiiHYYWvhGw/OaygRNHoO/j61ilCA5sJxDdc90DvlnLDottiR71nhVkZdo71rOmlV2hmh+V/8I56f8LeLpUOK56rnad9QbvFCbCPuwvwGPgbYJisSmcfi3L2I5u/JOr1jf3+ExhCGdIsaKgFKNdLeuQ16/Ra4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719331666; c=relaxed/simple;
-	bh=kCm2deqiEf1p0hnoueOTW9f+7OXb2C+i4YbXlUuW128=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t7Ef1+3zA6YsU/gyAHdFAqSTOtoHVhNGcCQfiLlwqoD1u6I4PTcnFETeUIjFXiTWMcybSr/tBkhRj27ZawnU0oBhQuzN2WERYw61ArWr6ME6mJG5i6PVBU+zKT8ASGpL3K8rU95kLm97lGKgX7SJYq8cedF5k2VuUyY8c60UrSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HX1wl3Hi; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-52cdc4d221eso4100637e87.3
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 09:07:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719331663; x=1719936463; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yfBb/ipZJEfi6lU7mYeKdxi0zx3WSHEriZ72UwUp+QA=;
-        b=HX1wl3Hi9AC/onic0hf41kbDXCLAq1TusdC/ZqAbmjfOnI9y6G8r3D5ySvnkDKj27H
-         9/SLn4xUVgpK2Qbbv0pkVQ2UIhygF1TWRcChoqUYTFjpQGyfp9WU0aAUhgV6XQtjZkRW
-         OqVmYhPP2FLpTG1sLL5tQMAXX0IXT7jzVnxcTwF506z45bW0ak12DwUyefb+Lh3d6i1P
-         I65bn6t8PdGNayWste0P7vQx8PYLeiHr7052aXNrLnujN85OyjDHJzxtGqezxmPKTtgo
-         hD3bb8KSpVXLMXOMh1WrWUrG7sHN5r51VVuMtNxlJTDJZLurSqEbbPSWRk6SrYXv3znC
-         JDWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719331663; x=1719936463;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yfBb/ipZJEfi6lU7mYeKdxi0zx3WSHEriZ72UwUp+QA=;
-        b=uqQk7OgdQb8oXV8H5VyQ2Q0AaB47DgKlVwxY8K4WkclScQjTAZOI0o9yScJfP8/8CJ
-         IND60NYKkj6CDWqbXdHXvbfP5rgN7P25OMrrCpPihVwd0wbqBwvFxV6BS+4lSofdca8C
-         w3AuB0SloIBfBwND5fI9kb/jHYCLXz9/z+0g7SjtkE4sNlEZ1QLG2Qu5K5w0xk5rdkwg
-         gZIdCmBorAebyOIEWGP6yKd9aFN0Hf13mRR9OHYNDM2jv69GUIF8uNsYjvZH1fj0dTPA
-         RoZ267giK8N8utn/PeOJcbnZ+37DjgpQjYumK9hVhrBkQKPDgrR1waM19eeQ0vMxo49+
-         t/gA==
-X-Gm-Message-State: AOJu0Yz9GwAmCoJv1sPb64tBfXzNf5pDPshXpaNdEV+VeqEPqGe0NBXY
-	D9WWeUEqGMHMVqe5cAAOWJAeVYw03GvImcQmMip8clrgv7Z+UW0nFZCn0Bzs0SdNZMSMOxucUbs
-	LGfydA9kQFr1W9c9H2d2WMAGhj98=
-X-Google-Smtp-Source: AGHT+IHB12ookDPsPwLOOIIaNtdMJKi+q0Jf+x0POQ/6oJrQZEZOliK77BwBqQn7sRgE9tk94UWali5FCXzHEOfDZ6E=
-X-Received: by 2002:ac2:46c4:0:b0:52c:e312:249c with SMTP id
- 2adb3069b0e04-52ce3122574mr4712739e87.7.1719331662675; Tue, 25 Jun 2024
- 09:07:42 -0700 (PDT)
+	s=arc-20240116; t=1719332180; c=relaxed/simple;
+	bh=1WVXoygUO2k28Qdke15vXqnojvrYTkH/M/tMYcvDbZM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wv4E639V/hR3N+VxmSzy2RIPqWC9STYdttDtYEbuYmQFbzQNJzD8wfhe1C2ORYQO5Qr9EOXX0RlcvIwggG0zRZVFGVQ1RcjHrHWaGX4XyS7bY491TuXju5mbfOrX5hgV5ObdcmbvCaxe/9jAC3I7AzthMV+bek9tremSvcHv+Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MH4ljJVj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 925F2C32781;
+	Tue, 25 Jun 2024 16:16:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719332179;
+	bh=1WVXoygUO2k28Qdke15vXqnojvrYTkH/M/tMYcvDbZM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MH4ljJVjO0hDppiYoO3Ajxdamtx2V5hR0j6h9kP7L3ZMFiT1oIAja7uu0eZknV8Xm
+	 +nAg0KCl6DYiUKh//lTYuYyWjNGl1FKgtvL5fUlY1ALJ5hubRWHFekGQVwfV6O8zIC
+	 MVt9kpIVL158Zf8Y8Q1f9gOYpKd98WSnSZAddFeeEr8byc5xDBzfITEbRO14dmWQOI
+	 Gl1g86L4S0bsaMIwi5jrUkQVp4JP+2CLOkBt/yUrh0ne9tfrgzbS0N5ePb4MtO+M+q
+	 k4CSz2yrqD0wm8U8h9ibgRHOCiqDitKrLFu3M+A6/f3XAmIXluMXZRcAssybE5bJ7L
+	 slsk8fUTAApEA==
+Date: Tue, 25 Jun 2024 17:16:13 +0100
+From: Conor Dooley <conor@kernel.org>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Chris Packham <chris.packham@alliedtelesis.co.nz>, andrew@lunn.ch,
+	f.fainelli@gmail.com, olteanv@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Daniel Golle <daniel@makrotopia.org>
+Subject: Re: [PATCH] dt-bindings: net: dsa: mediatek,mt7530: Minor grammar
+ fixes
+Message-ID: <20240625-surfboard-massive-65f7f1f61f0d@spud>
+References: <20240624025812.1729229-1-chris.packham@alliedtelesis.co.nz>
+ <704f4b95-2aed-4b76-87cb-83002698471c@arinc9.com>
+ <20240624-radiance-untracked-29369921c468@spud>
+ <68961d4f-10d8-4769-94d3-92ce709aa00a@arinc9.com>
+ <20240624-supernova-obedient-3a2ba2a42188@spud>
+ <a17f35ae-5376-458a-b7b5-9dbefd843b40@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <171932574765.3072535.12103787411698322191.stgit@ahduyck-xeon-server.home.arpa>
- <171932615131.3072535.4897630886081399067.stgit@ahduyck-xeon-server.home.arpa>
- <4bf37ab8-2a2f-4692-959c-531519651949@lunn.ch>
-In-Reply-To: <4bf37ab8-2a2f-4692-959c-531519651949@lunn.ch>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 25 Jun 2024 09:07:06 -0700
-Message-ID: <CAKgT0UfZ5k6PrV=hpx_vr6K5fDcO-n2Kp7QeXdeX4N8k1vCb3w@mail.gmail.com>
-Subject: Re: [net-next PATCH v2 04/15] eth: fbnic: Add register init to set
- PCIe/Ethernet device config
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org, 
-	davem@davemloft.net, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="eBPkurhNpOKh5uH9"
+Content-Disposition: inline
+In-Reply-To: <a17f35ae-5376-458a-b7b5-9dbefd843b40@arinc9.com>
+
+
+--eBPkurhNpOKh5uH9
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 25, 2024 at 8:01=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> A nitpick:
->
-> > +#define CSR_BIT(nr)          (1u << (nr))
->
-> Isn't that just
->
-> #define CSR_BIT(nr)             BIT(nr)
->
-> which makes me wounder why bother? Why not just use BIT()?
->
->         Andrew
+On Mon, Jun 24, 2024 at 08:11:10PM +0300, Ar=C4=B1n=C3=A7 =C3=9CNAL wrote:
+> On 24/06/2024 20.02, Conor Dooley wrote:
+> > On Mon, Jun 24, 2024 at 07:59:48PM +0300, Ar=C4=B1n=C3=A7 =C3=9CNAL wro=
+te:
+> > > On 24/06/2024 19.29, Conor Dooley wrote:
+> > > > On Mon, Jun 24, 2024 at 10:00:25AM +0300, Ar=C4=B1n=C3=A7 =C3=9CNAL=
+ wrote:
+> > > > > On 24/06/2024 05.58, Chris Packham wrote:
+> >=20
+> > > > > >       and the switch registers are directly mapped into SoC's m=
+emory map rather than
+> > > > > >       using MDIO. The DSA driver currently doesn't support MT76=
+20 variants.
+> > > > > >       There is only the standalone version of MT7531.
+> > > > > > -  Port 5 on MT7530 has got various ways of configuration:
+> > > > > > +  Port 5 on MT7530 supports various configurations:
+> > > > >=20
+> > > > > This is a rewrite, not a grammar fix.
+> > > >=20
+> > > > In both cases "has got" is clumsy wording,
+> > >=20
+> > > We don't use "have/has" on the other side of the Atlantic often.
+> >=20
+> > Uh, which side do you think I am from?
+>=20
+> Who would call it clumsy to use "have" and "got" together for possession.=
+=2E.
+> Must be an Irishman! :D
 
-Actually BIT is an unsigned long, whereas this should be just a 32b
-unsigned int. The general idea is that CSR is a 32b value and
-shouldn't be extended to 64b. With this if we mess up somewhere and
-define an out of bounds bit it should generate an error about us
-shifting the value out of bounds.
+Okay, I was just making sure you weren't accusing me of being
+American...
 
-Thanks,
+--eBPkurhNpOKh5uH9
+Content-Type: application/pgp-signature; name="signature.asc"
 
-- Alex
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZnrtTQAKCRB4tDGHoIJi
+0ogdAPsGgI16OjIEcRoR3/W3g7mWhBrsC6mYOu/EK0bHwPMgaAEA1ed2WNJBKEvH
+EIhgp/sU0bgFgyUSln6h4c1Gh70zUA4=
+=xwkj
+-----END PGP SIGNATURE-----
+
+--eBPkurhNpOKh5uH9--
 
