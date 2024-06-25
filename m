@@ -1,186 +1,219 @@
-Return-Path: <netdev+bounces-106341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3430D915D69
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 05:42:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A200915D6B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 05:44:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD8A02817A9
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 03:42:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A58C9283C46
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 03:44:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFFFA5339E;
-	Tue, 25 Jun 2024 03:42:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1AD773448;
+	Tue, 25 Jun 2024 03:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="MOMvMLI+"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WVFGrptx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09342F56
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 03:42:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8C32F56;
+	Tue, 25 Jun 2024 03:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719286941; cv=none; b=IJTd1eJdfJth7yezFh5ao3k2S6udZKgJ6Gn5aVUK7XLTa5rIaCnCi85ViqFhn8OFz1fUGBWj4gaawlUnzFw/MkKK/4yPFVpUGVaMlwF0NHbqW4QtNDkoES+x8oQCkHDkAJA1QrUE68FXHgpEZUaJAa0yX9SicLJBgrWJb92t/jw=
+	t=1719287072; cv=none; b=Fsy3cPXnFx32/104XOFZA7qE9vcUDxxV6dd5OpRW923HbzHkD4VUdOj1gFIrgdTJbwP2HLtkEkHcolbB7gvhim3VkvLE66zeV/mM94inJkybZmHwwqTGpaEKVgntJNRGyy68FM+fYf59gqhI4AJxcAag/AOdLLiqt3iolRExH1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719286941; c=relaxed/simple;
-	bh=orT8r0qXfarH7zj54QTdeTKiJChgIR6UvQCLe60Kgm0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T6citczBn+E4GHiCTcC//7kLVjDGdt9dEpCuUCF+EfOF1YB/1CNbKunf3Fwt6LimyMi/IICj9DNJEG2393k3i6YY9cS4I81m/Ila7BdW0tFcZ9U0wKS5JCqn8seiHKw1W+egmychO9UEURQUTXnW0fpI2JVbl+wP9STKHZt5vbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=MOMvMLI+; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-57d06101d76so5251320a12.3
-        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 20:42:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1719286938; x=1719891738; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Af5vxhoqBzXAnH3UCiokv7SGws7lEpSquJ1C594KcF4=;
-        b=MOMvMLI+exUDl/cWgoipnu42mayJGY99N2LEhJywUkR3awazqYAoy/bv4HFotKyTzR
-         lwKVMbAUWQQayz8xZn4iQ/oMb/ScYBsaLwLSzb/CnagQoQ6IFHURpOl+trxqFThZ1WgG
-         8SifxSbYag8teOmAtoGisVpywMnZ5I03/VC3A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719286938; x=1719891738;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Af5vxhoqBzXAnH3UCiokv7SGws7lEpSquJ1C594KcF4=;
-        b=ie3KNwP2aA3IyPdHj1o0mv4eKaASAemCObMESOGuFaLdKB9crsS2DpCNsjdD7OvPhp
-         /VmlDReDSTuQSWZeZrwYP4epvMZIJG0Pt3l8Cl5oXd/oinl5AfJoWAjGjArtmGmFAWhA
-         6uD1distYdCJaTn+9GryU7zLoHg6czDsFiH3yEYbPmMc8jZBQ8Gywh86he0qj0gDlJA6
-         BntrqlqKLIbDMspouFla2mikQ6hBFpxpn7IQZwkndy76ZdDFl6bfk5yn+WJhqToY64Gx
-         KkBQxDG9hXb7L4htgQjecoacYM9FiWp1QwRM2v410J4/7FNMM3MnGTD8L/IYpE7gYUrM
-         dnCg==
-X-Forwarded-Encrypted: i=1; AJvYcCX2bQzMMhFyQ+8ueCupiIbxn/g+VzAglixukHUpCHj99PYji+hUPQ6B3zfW0JhFbAUxRcCY0JiPEgrV1HBdCPGKY/EoKzAO
-X-Gm-Message-State: AOJu0YwsHt9RxR94F9HIMoWIsTG2DP6TnVoXoAIni4J2T9MmHMocMhbx
-	ZR+1iOt+iN+m7skLFWO9YOw0LouDDwybL3KGqa9nIH3VzV+0yPSR7elDFrtAJJ417lHPby5DKqQ
-	A4VKWYGItEnBj3vdKUnAFo2KjEBZNej0TFLl9
-X-Google-Smtp-Source: AGHT+IFhh1VeB0Dt6dn6LSQX0wiIB+dVDPimqvHx7aUIM6KTq5nl821Fy3mB7+qztAtnImHFc0D1dWgfRKuhm9ikZoU=
-X-Received: by 2002:aa7:c88d:0:b0:57d:6699:6a5 with SMTP id
- 4fb4d7f45d1cf-57d6699073dmr1863448a12.4.1719286937731; Mon, 24 Jun 2024
- 20:42:17 -0700 (PDT)
+	s=arc-20240116; t=1719287072; c=relaxed/simple;
+	bh=6EMafBGH3lZGZh1R5u1ZykvmkKcRw2eLTZHoaWukykw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:CC:
+	 In-Reply-To:Content-Type; b=G8qfmQUIMDyxUshIneqKUnCBPzihivIOHzeO44RWk8IzsJ/UE0atCXGF4J/od7WOp7VrnSYweENgkBjBYAz6cPggshdp0StneNz5WLKPCLbuPOouWeKJ0+7Eq9QZMzkiU+KSx22/PK3o7EEZECbW8jTFv51d35TcjMzkoO5dx/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=WVFGrptx; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45OJM3FC018145;
+	Tue, 25 Jun 2024 03:44:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	FhE/XN7HbqOcNLinT/I0utbiZjY1u/vFS/ijB5Q+2UA=; b=WVFGrptxI06Augd0
+	cslLmg71MEroPFpn7FGkPfy30V9iYHx2LbNkVh6T7OOCXTeUAJqA9R08MopNRm3L
+	p+41fFnNePXRciSB5PmyMleaczDfrjGMAEwJ4j5FPpOrGoDXFZR+DUW7JLATJGaM
+	IjRdKbTjocXyvEgNwJ/JOB4G4QjPSmyYsOCZgYopPjMROzl/i86paKGeUJtiq9v9
+	VG0au69ClxwOiPz0Ol9cpzsfDBpuuW5odERHIUAOz3HL3mfEM25/z+5NizzSuI9x
+	FctFXHrzEFls+8Jm4gRjLB2krj3VcPAwFuO1tglnPL+kPp7SlbceuqYj2cwSTUtc
+	eMFv0g==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ywnm6n9eb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Jun 2024 03:44:15 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45P3iDNm012853
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Jun 2024 03:44:13 GMT
+Received: from [10.48.244.142] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 24 Jun
+ 2024 20:44:12 -0700
+Message-ID: <c470e4ff-3f70-40f6-844a-f9614286509f@quicinc.com>
+Date: Mon, 24 Jun 2024 20:44:11 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240625010210.2002310-1-kuba@kernel.org> <20240624184005.5725f01c@kernel.org>
-In-Reply-To: <20240624184005.5725f01c@kernel.org>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Mon, 24 Jun 2024 20:42:05 -0700
-Message-ID: <CACKFLikVTsGoAstHhbs-oyrUsgQShXV7s4tCicchr0-eRGpWzA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 0/4] selftests: drv-net: rss_ctx: add tests
- for RSS contexts
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, willemdebruijn.kernel@gmail.com, ecree.xilinx@gmail.com, 
-	dw@davidwei.uk, przemyslaw.kitszel@intel.com, andrew.gospodarek@broadcom.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000003d34d1061baeaf0c"
-
---0000000000003d34d1061baeaf0c
+User-Agent: Mozilla Thunderbird
+Subject: Re: ieee80211.h virtual_map splat
+Content-Language: en-US
+To: Koen Vandeputte <koen.vandeputte@citymesh.com>,
+        <ath10k@lists.infradead.org>,
+        linux-wireless
+	<linux-wireless@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>
+References: <CAPh3n83zb1PwFBFijJKChBqY95zzpYh=2iPf8tmh=YTS6e3xPw@mail.gmail.com>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+CC: <netdev@vger.kernel.org>, Johannes Berg <johannes@sipsolutions.net>,
+        Kees
+ Cook <keescook@chromium.org>
+In-Reply-To: <CAPh3n83zb1PwFBFijJKChBqY95zzpYh=2iPf8tmh=YTS6e3xPw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: UQjx-IszhvKKCdE0R4jfygcx3Ald-VBB
+X-Proofpoint-ORIG-GUID: UQjx-IszhvKKCdE0R4jfygcx3Ald-VBB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-24_22,2024-06-24_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ priorityscore=1501 suspectscore=0 phishscore=0 clxscore=1015 spamscore=0
+ mlxscore=0 malwarescore=0 mlxlogscore=561 lowpriorityscore=0
+ impostorscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2406140001 definitions=main-2406250027
 
-On Mon, Jun 24, 2024 at 6:40=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon, 24 Jun 2024 18:02:06 -0700 Jakub Kicinski wrote:
-> > v2 adds a test for removing contexts out of order. When testing
-> > bnxt - either the new test or running more tests after the overlap
-> > test makes the device act strangely. To the point where it may start
-> > giving out ntuple IDs of 0 for all rules :S
->
-> FWIW if I create the context with an indirection table, and then change
-> the key (without touching the indirection table) - it all works as
-> expected. So really seems like bnxt has a problem with setting the
-> indir table when context is created. That said I don't see anything
-> obviously wrong with the driver code.
+On 6/21/2024 1:04 AM, Koen Vandeputte wrote:
+> Hi all,
+> 
+> Within OpenWRT, we switched to kernel 6.6 some time ago.
+> 
+> During testing on a WiFi WDS setup (ath10k), I noticed an old standing
+> bug which now prints a lot more data due to the kernel upgrade:
+> 
+> - All WDS stations are connected
+> - The splat occurs
+> - All WDS station seem to go in timeout and disconnect
+> - The behavior is fixed after a reboot
+> 
+> Yes, we use ath10k-ct over here, but this part of the code is
+> identical to upstream ath10k.
+> 
+> The main issue:
+> 
+> memcpy: detected field-spanning write (size 64) of single field
+> "tim->virtual_map" at
+> ../ath10k-ct-smallbuffers/ath10k-ct-2024.03.02~eb3f488a/ath10k-6.7/wmi.c:4043
+> (size 1)
+> 
+> 
+> looks like virtual_map is defined as  "u8 virtual_map[1]", triggering
+> that error within "include/linux/ieee80211.h"
+> 
+> /**
+>  * struct ieee80211_tim_ie - Traffic Indication Map information element
+>  * @dtim_count: DTIM Count
+>  * @dtim_period: DTIM Period
+>  * @bitmap_ctrl: Bitmap Control
+>  * @virtual_map: Partial Virtual Bitmap
+>  *
+>  * This structure represents the payload of the "TIM element" as
+>  * described in IEEE Std 802.11-2020 section 9.4.2.5.
+>  */
+> struct ieee80211_tim_ie {
+>         u8 dtim_count;
+>         u8 dtim_period;
+>         u8 bitmap_ctrl;
+>         /* variable size: 1 - 251 bytes */
+>         u8 virtual_map[1];
+> } __packed;
+> 
+> 
+> According to this page, defining it this way is actually deprecated:
+> https://www.kernel.org/doc/html/latest/process/deprecated.html
+> 
+> What is the correct way to fix this?
+> Converting it to "u8 virtual_map[];"  ?
 
-We will look into it.  Thanks.
+Adding netdev to the initial message in the thread.
+https://lore.kernel.org/all/CAPh3n83zb1PwFBFijJKChBqY95zzpYh=2iPf8tmh=YTS6e3xPw@mail.gmail.com/
 
---0000000000003d34d1061baeaf0c
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+There was some discussion in the thread, with the observation that the splat 
+is fixed by:
+2ae5c9248e06 ("wifi: mac80211: Use flexible array in struct ieee80211_tim_ie")
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPr+q66bqoX8tE68/t0y28Mkbr/HDYDR
-XAAfSCgzE2YaMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDYy
-NTAzNDIxOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAK7lv63SH5r8Rq6+PtBN7ZEK70xMV8evLDefB+VK4YgGxx78En
-//4yJnLZszE50/smbvBVjY2TYqmftFhL3f+qGMVTMIs+UX3bSjgs/13+rQTMARx5TKzHV4tF6YJ3
-CxtfBcupLosdNeRF5KmgF6bLkQWRuiijgvz1D6F5KUgdseo6H/g7N82oC3UiyXoLrmKUxWvh2gZG
-2klfMu8pPbMFYPQoRunV8rTSi+6FIXAS57na7ycbc9n7zZeNDw2n2x7UQM6JdloEQDpSCGbpSyiI
-FWwUNCAU/Ft23UUrO3W3A5nHNO6K41ArMyL+3tvvPiHvXTJBO3VfMDGCMX1a8sGy
---0000000000003d34d1061baeaf0c--
+Followed by discussion if this should be backported.
+
+Kees said that "netdev [...] maintainers have asked that contributors not 
+include "Cc: stable" tags, as they want to evaluate for themselves whether 
+patches should go to stable or not"
+
+So the purpose of this message is to notify the netdev maintainers that this 
+issue has been observed on a LTS kernel with the popular OpenWrt package so 
+that the maintainers can make a backporting decision.
+
+/jeff
+
+
+> [29009.581820] ------------[ cut here ]------------
+> [29009.581898] WARNING: CPU: 0 PID: 0 at
+> ../ath10k-ct-smallbuffers/ath10k-ct-2024.03.02~eb3f488a/ath10k-6.7/wmi.c:4043
+> ath10k_wmi_event_host_swba+0x7c4/0x824 [ath10k_core]
+> [29009.585574] memcpy: detected field-spanning write (size 64) of
+> single field "tim->virtual_map" at
+> ../ath10k-ct-smallbuffers/ath10k-ct-2024.03.02~eb3f488a/ath10k-6.7/wmi.c:4043
+> (size 1)
+> [29009.712626]  unwind_backtrace from show_stack+0x10/0x14
+> [29009.717217]  show_stack from dump_stack_lvl+0x40/0x4c
+> [29009.722337]  dump_stack_lvl from __warn+0x94/0xbc
+> [29009.727546]  __warn from warn_slowpath_fmt+0xf8/0x15c
+> [29009.732233]  warn_slowpath_fmt from
+> ath10k_wmi_event_host_swba+0x7c4/0x824 [ath10k_core]
+> [29009.737309]  ath10k_wmi_event_host_swba [ath10k_core] from
+> ath10k_wmi_10_4_op_rx+0x444/0x6a4 [ath10k_core]
+> [29009.745437]  ath10k_wmi_10_4_op_rx [ath10k_core] from
+> ath10k_htc_rx_completion_handler+0xa8/0x210 [ath10k_core]
+> [29009.754899]  ath10k_htc_rx_completion_handler [ath10k_core] from
+> ath10k_pci_fw_dump_work+0xf28/0xf94 [ath10k_pci]
+> [29009.764894]  ath10k_pci_fw_dump_work [ath10k_pci] from
+> ath10k_ce_per_engine_service+0x64/0x84 [ath10k_core]
+> [29009.775299]  ath10k_ce_per_engine_service [ath10k_core] from
+> ath10k_ce_per_engine_service_any+0x74/0x194 [ath10k_core]
+> [29009.784848]  ath10k_ce_per_engine_service_any [ath10k_core] from
+> ath10k_pci_napi_poll+0x44/0x138 [ath10k_pci]
+> [29009.795611]  ath10k_pci_napi_poll [ath10k_pci] from
+> __napi_poll.constprop.0+0x2c/0x180
+> [29009.805589]  __napi_poll.constprop.0 from net_rx_action+0x140/0x2e8
+> [29009.813400]  net_rx_action from __do_softirq+0x100/0x270
+> [29009.819561]  __do_softirq from irq_exit+0x88/0xb4
+> [29009.825117]  irq_exit from call_with_stack+0x18/0x20
+> [29009.829715]  call_with_stack from __irq_svc+0x80/0x98
+> [29009.834751] Exception stack(0xc0d01f28 to 0xc0d01f70)
+> [29009.839706] 1f20:                   00000003 00000001 1d2e2e44
+> 40000000 00000000 c0d04f68
+> [29009.844745] 1f40: c0d084c0 c0d04fa0 00000000 00000000 c0d04f08
+> 00000000 0000001f c0d01f78
+> [29009.852898] 1f60: c09deaf8 c09df260 60000013 ffffffff
+> [29009.861055]  __irq_svc from default_idle_call+0x2c/0x30
+> [29009.866089]  default_idle_call from do_idle+0x1d8/0x228
+> [29009.871124]  do_idle from cpu_startup_entry+0x28/0x2c
+> [29009.876328]  cpu_startup_entry from kernel_init+0x0/0x12c
+> [29009.881537]  kernel_init from arch_post_acpi_subsys_init+0x0/0x8
+> [29009.886973] ---[ end trace 0000000000000000 ]---
+
 
