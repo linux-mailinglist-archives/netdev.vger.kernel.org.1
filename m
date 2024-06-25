@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-106310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12943915BBE
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 03:38:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67CD3915BBF
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 03:38:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCB5A1F2248B
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 01:38:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E2711C213A7
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 01:38:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA7A8175BF;
-	Tue, 25 Jun 2024 01:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEB171805A;
+	Tue, 25 Jun 2024 01:38:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="qxRoc9A1"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="BCVujZ17"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC43182D8
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 01:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352EB175BF
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 01:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719279499; cv=none; b=uRh18rWagPHQKl2TZFwjGlGk/iw2LwhvcXREM6JCVlT+ooxnIREbocGTEYxcdSW6E/CSg4PHc0+YJKv7StJnjhdInfqopuj6Os79+4u9jjpCkei21pNzrnWCXTilo0bLO5ymy3zDxTTfPPeRZWSRMcfKakBVul4DYQz3FWEYGJM=
+	t=1719279530; cv=none; b=ePAYSSLNqdUlXS38x42HTjw9ehVrpqQt0YI627ItboIqMiNXOmCWu9ELGMJt7mc7q3v8s6YyiZc+qoSrXgV8TDFdsGQAGLG3nvIjrtEzTuZLbwx8wCG66oJ0xKhNlS9f0tnP/HSkpG61C8CHG0q5/ODCNqR4cyk4gUpEBAAkZvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719279499; c=relaxed/simple;
-	bh=G/EktXldJUD4CFgzoh4X9s0E0sCXcTlDxU+CmgMam0E=;
+	s=arc-20240116; t=1719279530; c=relaxed/simple;
+	bh=R5GMoPncR6lKZfGMkonfKUC17Bb6YtFL/GPwPoIyDAM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r1C14DmTlKL8JaS18ukKnBFQO3rWMSgPsIySIVshXopji9lXA05J+4AzEUZSoB8/ixEMFTP+xBCMAKihfmLJ/ZkU5TywxMG1GWdHcX3QEBYCC1cfeBY378hmDXebi/uqAq9UuT7kRrLgRViEO2hhlg4KzDZJxZzmk70aiLJmqlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=qxRoc9A1; arc=none smtp.client-ip=52.119.213.150
+	 MIME-Version:Content-Type; b=W1p6sUSLYpkG6tFMZlvPDiupfWTiVRcGvGaC6lDE/tHxV2emYcsanAfbjHhuyEtlVJGu1tgTsZsoOWpYChTCOUyNqzuJvYwvXJlacZ3kzKGVaQwCxuqAY+KQKO57m5ZlIlLjPCra3ztzxG5NMDBmFQLju3f/RTZrpoYMtLR5474=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=BCVujZ17; arc=none smtp.client-ip=99.78.197.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1719279498; x=1750815498;
+  t=1719279529; x=1750815529;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=EQvf4wqy8TeLJNHL5uWUJYSWQischmfcuL073NzeqjQ=;
-  b=qxRoc9A1wUayDaSbH0azTM5zJWV6kK0ozwl8BG6naKC6MEPdBesSe/cz
-   BccwRAzh0HTfxjtT4aUXEVQWQ0IAZR5ucxFmN27ESziqlhls9CYANBbbf
-   Z9j82U0pLab6am0k4DtkeL8KdKkrZWBs9Xu3/sIvkIKeyi5owLKZ71b+I
-   o=;
+  bh=fYBZg8gbnhTObb3Gnz1KwhESbOkrpO+wAYqmjCM/46U=;
+  b=BCVujZ17t/kUcIEerWKNQ9nS4Bk42G7zC7P7xS0wHAEa6rWKd75bUwSm
+   9Hjd4HekrxbX2W9NYrM7TQLk0+PlsP9MA97Z/O6AiGiDfOMQMzsZBWFaX
+   erIlkAMsu4Ntgx0ZdwqigmMhsxqHSx9y3SyMnAnWGe1TYIuW0qOw+dJEZ
+   8=;
 X-IronPort-AV: E=Sophos;i="6.08,263,1712620800"; 
-   d="scan'208";a="641436961"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 01:38:16 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:40379]
+   d="scan'208";a="99255108"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 01:38:46 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:60277]
  by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.35.113:2525] with esmtp (Farcaster)
- id 2a07d43d-8d0c-4454-8d02-6c477d8ea94c; Tue, 25 Jun 2024 01:38:15 +0000 (UTC)
-X-Farcaster-Flow-ID: 2a07d43d-8d0c-4454-8d02-6c477d8ea94c
+ id 7bdb4383-c405-4ce3-b5bb-33a986cda024; Tue, 25 Jun 2024 01:38:45 +0000 (UTC)
+X-Farcaster-Flow-ID: 7bdb4383-c405-4ce3-b5bb-33a986cda024
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Tue, 25 Jun 2024 01:38:14 +0000
+ 15.2.1258.34; Tue, 25 Jun 2024 01:38:39 +0000
 Received: from 88665a182662.ant.amazon.com (10.106.101.42) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Tue, 25 Jun 2024 01:38:12 +0000
+ 15.2.1258.34; Tue, 25 Jun 2024 01:38:37 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Rao Shoaib <Rao.Shoaib@oracle.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net 03/11] af_unix: Stop recv(MSG_PEEK) at consumed OOB skb.
-Date: Mon, 24 Jun 2024 18:36:37 -0700
-Message-ID: <20240625013645.45034-4-kuniyu@amazon.com>
+Subject: [PATCH v1 net 04/11] af_unix: Don't stop recv(MSG_DONTWAIT) if consumed OOB skb is at the head.
+Date: Mon, 24 Jun 2024 18:36:38 -0700
+Message-ID: <20240625013645.45034-5-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240625013645.45034-1-kuniyu@amazon.com>
 References: <20240625013645.45034-1-kuniyu@amazon.com>
@@ -77,14 +77,10 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC002.ant.amazon.com (10.13.139.230) To
+X-ClientProxiedBy: EX19D041UWB002.ant.amazon.com (10.13.139.179) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-After consuming OOB data, recv() reading the preceding data must break at
-the OOB skb regardless of MSG_PEEK.
-
-Currently, MSG_PEEK does not stop recv() for AF_UNIX, and the behaviour is
-not compliant with TCP.
+Let's say a socket send()s "hello" with MSG_OOB and "world" without flags,
 
   >>> from socket import *
   >>> c1, c2 = socketpair(AF_UNIX)
@@ -92,102 +88,115 @@ not compliant with TCP.
   5
   >>> c1.send(b'world')
   5
+
+and its peer recv()s "hell" and "o".
+
+  >>> c2.recv(10)
+  b'hell'
   >>> c2.recv(1, MSG_OOB)
   b'o'
-  >>> c2.recv(9, MSG_PEEK)  # This should return b'hell'
-  b'hellworld'              # even with enough buffer.
 
-Let's fix it by returning NULL for consumed skb and unlinking it only if
-MSG_PEEK is not specified.
+Now the consumed OOB skb stays at the head of recvq to return a correct
+value for ioctl(SIOCATMARK), which is broken now and fixed by a later
+patch.
 
-This patch also adds test cases that add recv(MSG_PEEK) before each recv().
+Then, if peer issues recv() with MSG_DONTWAIT, manage_oob() returns NULL,
+so recv() ends up with -EAGAIN.
+
+  >>> c2.setblocking(False)  # This causes -EAGAIN even with available data
+  >>> c2.recv(5)
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  BlockingIOError: [Errno 11] Resource temporarily unavailable
+
+However, next recv() will return the following available data, "world".
+
+  >>> c2.recv(5)
+  b'world'
+
+When the consumed OOB skb is at the head of the queue, we need to fetch
+the next skb to fix the weird behaviour.
+
+Note that the issue does not happen without MSG_DONTWAIT because we can
+retry after manage_oob().
+
+This patch also adds a test case that covers the issue.
 
 Without fix:
 
-  #  RUN           msg_oob.peek.oob_ahead_break ...
-  # msg_oob.c:134:oob_ahead_break:AF_UNIX :hellworld
-  # msg_oob.c:135:oob_ahead_break:Expected:hell
-  # msg_oob.c:137:oob_ahead_break:Expected ret[0] (9) == expected_len (4)
-  # oob_ahead_break: Test terminated by assertion
-  #          FAIL  msg_oob.peek.oob_ahead_break
-  not ok 13 msg_oob.peek.oob_ahead_break
+  #  RUN           msg_oob.no_peek.ex_oob_break ...
+  # msg_oob.c:134:ex_oob_break:AF_UNIX :Resource temporarily unavailable
+  # msg_oob.c:135:ex_oob_break:Expected:ld
+  # msg_oob.c:137:ex_oob_break:Expected ret[0] (-1) == expected_len (2)
+  # ex_oob_break: Test terminated by assertion
+  #          FAIL  msg_oob.no_peek.ex_oob_break
+  not ok 8 msg_oob.no_peek.ex_oob_break
 
 With fix:
 
-  #  RUN           msg_oob.peek.oob_ahead_break ...
-  #            OK  msg_oob.peek.oob_ahead_break
-  ok 13 msg_oob.peek.oob_ahead_break
+  #  RUN           msg_oob.no_peek.ex_oob_break ...
+  #            OK  msg_oob.no_peek.ex_oob_break
+  ok 8 msg_oob.no_peek.ex_oob_break
 
 Fixes: 314001f0bf92 ("af_unix: Add OOB support")
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/unix/af_unix.c                            |  9 ++++---
- tools/testing/selftests/net/af_unix/msg_oob.c | 25 +++++++++++++++++--
- 2 files changed, 29 insertions(+), 5 deletions(-)
+ net/unix/af_unix.c                            | 19 +++++++++++++++----
+ tools/testing/selftests/net/af_unix/msg_oob.c | 11 +++++++++++
+ 2 files changed, 26 insertions(+), 4 deletions(-)
 
 diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 5e695a9a609c..2eaecf9d78a4 100644
+index 2eaecf9d78a4..b0b97f8d0d09 100644
 --- a/net/unix/af_unix.c
 +++ b/net/unix/af_unix.c
-@@ -2613,9 +2613,12 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
- {
+@@ -2614,12 +2614,23 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
  	struct unix_sock *u = unix_sk(sk);
  
--	if (!unix_skb_len(skb) && !(flags & MSG_PEEK)) {
--		skb_unlink(skb, &sk->sk_receive_queue);
--		consume_skb(skb);
-+	if (!unix_skb_len(skb)) {
-+		if (!(flags & MSG_PEEK)) {
-+			skb_unlink(skb, &sk->sk_receive_queue);
-+			consume_skb(skb);
-+		}
+ 	if (!unix_skb_len(skb)) {
+-		if (!(flags & MSG_PEEK)) {
+-			skb_unlink(skb, &sk->sk_receive_queue);
+-			consume_skb(skb);
++		struct sk_buff *unlinked_skb = NULL;
 +
- 		skb = NULL;
++		spin_lock(&sk->sk_receive_queue.lock);
++
++		if (copied) {
++			skb = NULL;
++		} else if (flags & MSG_PEEK) {
++			skb = skb_peek_next(skb, &sk->sk_receive_queue);
++		} else {
++			unlinked_skb = skb;
++			skb = skb_peek_next(skb, &sk->sk_receive_queue);
++			__skb_unlink(unlinked_skb, &sk->sk_receive_queue);
+ 		}
+ 
+-		skb = NULL;
++		spin_unlock(&sk->sk_receive_queue.lock);
++
++		consume_skb(unlinked_skb);
  	} else {
  		struct sk_buff *unlinked_skb = NULL;
+ 
 diff --git a/tools/testing/selftests/net/af_unix/msg_oob.c b/tools/testing/selftests/net/af_unix/msg_oob.c
-index d427d39d0806..de8d1fcde883 100644
+index de8d1fcde883..b5226ccec3ec 100644
 --- a/tools/testing/selftests/net/af_unix/msg_oob.c
 +++ b/tools/testing/selftests/net/af_unix/msg_oob.c
-@@ -21,6 +21,21 @@ FIXTURE(msg_oob)
- 				 */
- };
+@@ -238,4 +238,15 @@ TEST_F(msg_oob, oob_break_drop)
+ 	recvpair("", -EINVAL, 1, MSG_OOB);
+ }
  
-+FIXTURE_VARIANT(msg_oob)
++TEST_F(msg_oob, ex_oob_break)
 +{
-+	bool peek;
-+};
++	sendpair("hello", 5, MSG_OOB);
++	sendpair("wor", 3, MSG_OOB);
++	sendpair("ld", 2, 0);
 +
-+FIXTURE_VARIANT_ADD(msg_oob, no_peek)
-+{
-+	.peek = false,
-+};
++	recvpair("hellowo", 7, 10, 0);		/* Break at OOB but not at ex-OOB. */
++	recvpair("r", 1, 1, MSG_OOB);
++	recvpair("ld", 2, 2, 0);
++}
 +
-+FIXTURE_VARIANT_ADD(msg_oob, peek)
-+{
-+	.peek = true
-+};
-+
- static void create_unix_socketpair(struct __test_metadata *_metadata,
- 				   FIXTURE_DATA(msg_oob) *self)
- {
-@@ -156,8 +171,14 @@ static void __recvpair(struct __test_metadata *_metadata,
- 	__sendpair(_metadata, self, buf, len, flags)
- 
- #define recvpair(expected_buf, expected_len, buf_len, flags)		\
--	__recvpair(_metadata, self,					\
--		   expected_buf, expected_len, buf_len, flags)
-+	do {								\
-+		if (variant->peek)					\
-+			__recvpair(_metadata, self,			\
-+				   expected_buf, expected_len,		\
-+				   buf_len, (flags) | MSG_PEEK);	\
-+		__recvpair(_metadata, self,				\
-+			   expected_buf, expected_len, buf_len, flags);	\
-+	} while (0)
- 
- TEST_F(msg_oob, non_oob)
- {
+ TEST_HARNESS_MAIN
 -- 
 2.30.2
 
