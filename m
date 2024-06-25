@@ -1,61 +1,64 @@
-Return-Path: <netdev+bounces-106545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 061C1916BF8
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 17:08:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DBB1916C93
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 17:17:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C2EC1C24FC2
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 15:08:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C1D51F2D6D2
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 15:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD73517F4FD;
-	Tue, 25 Jun 2024 15:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD4F9176AB7;
+	Tue, 25 Jun 2024 15:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IEJ42l8g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VC0V27hb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C8A17F4F9;
-	Tue, 25 Jun 2024 15:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F8717625C;
+	Tue, 25 Jun 2024 15:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719327770; cv=none; b=TgIYWwRXjZ+6d2hrp4nDOU0708paviOOMAf38scLd5ih2f9utPU2ROki4dQMeH4LR+Z2h+JnPl1+SbPfmfOln/Wtofmc2B8CYGHSFzwNttfLxbl6nHJw0yxAtUTQsAIzX1dCAqSAX8A7liYY6vGNi4P4oBHnLYk4gbyNJJqwGGA=
+	t=1719328139; cv=none; b=HRgYETYiiJScRAVcnCqDxT1KbItM6MiQDUBGoWAMNv++Oja19qsOCG1dZPUN8AyT7c90pqRYhc0i3RXEIKDIA9KoO5zgIpr6EEmkwQkBIrlbUeZ90DDWgN0T6O9alFB0hbhqxZI/hsGdxWsBtfE5YYEzAJmCHzAe063c3+HhupI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719327770; c=relaxed/simple;
-	bh=gQp1PmCHyGQ77qf5D9jrz9q7coboBiVr0Zb41/eD03w=;
+	s=arc-20240116; t=1719328139; c=relaxed/simple;
+	bh=4BM+dW7bN2QAVhvQz8b/NJBQ+zu2K+L+6llL+5996MI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FZcNNLhUn6xVpq7CoyyevpXUv+j7de4NrzRmsBzOYTbREdejXlSqOVKpL4WTO+lySAJHsgD5Zg4HZv8XWXP9zLJ0rW7oKzbtkp634P9AS2GfEnwsSO/5p+91ngqP4mxndE1cyJIDFfRuMYKcSh8Bje5BbQ30ltzB9IoTmb0E5Qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IEJ42l8g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6396C32782;
-	Tue, 25 Jun 2024 15:02:49 +0000 (UTC)
+	 MIME-Version:Content-Type; b=kyNOrOgV9FQzsRWrlLIbb7eN3fO3T7YbrlUHr3p/0tioSirVHxn6hWfYC1NJx1z0qwSqQcIlp9gtRAyCVjxB7wA2Wdrb1b9xApJsnGKWw+xMTWCCOICxwUyGPAXE4ROkXDzkx6j8+wyhwHUER+BZkiVckqYogNH1eosGq1se3rE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VC0V27hb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1EEEC32782;
+	Tue, 25 Jun 2024 15:08:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719327770;
-	bh=gQp1PmCHyGQ77qf5D9jrz9q7coboBiVr0Zb41/eD03w=;
+	s=k20201202; t=1719328139;
+	bh=4BM+dW7bN2QAVhvQz8b/NJBQ+zu2K+L+6llL+5996MI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IEJ42l8gT3X8doXsnqHqTK8SMiUZG9cxuttYRdr72Jg+ZELp5cJ52er5K3gzhNkj8
-	 8PojVEtgqXtNAaymeCQVTYJMpl1/L4viulb3dfpLubcTAGqBiHLF++E3y9cMUO5mpA
-	 TSapdKD+XvhNE2fNPvIkTHEuUEAg1UXUvN+Lqurxo/YIXrZpo2WSgOIInAVHXIyjYR
-	 hcM9lCgRLgPSnyyF6sGmHmv2nd+6rWBztxRu7umRKPFik+wzPC4L7Q3kwqGaF10EKe
-	 aEJAAf14l6TlWwuPd+X7Xpb3GzIQmuQsn6ExkmdL5O//RogMJGQ0QeBlIoDLbgWp4V
-	 6vdeshDRSSMBQ==
-Date: Tue, 25 Jun 2024 08:02:48 -0700
+	b=VC0V27hba5xYtjw4FGzUNmoTcOR0ttg+ERozLjBI07fWZmH/j/lTelZCLvk0+8fo1
+	 wjLAoYyQwuXSqy5cfA90p8Wa6qGXT8Wj0TiHd1ToweuOB5FF6dmuvLij3BoTSk0UQj
+	 ERLGQZ9a5LFLj5xScESFzRn/NT4aSXxm6UQ7he/lGwcTm0ZLlVgpT4yPD1cWxoH9ij
+	 FeggCmJMMK0bfszESJvsD5VzBxo72sJaFZmfqzJfiJM8y4qMznAJq2RS7WvHynAdwu
+	 nbheXs6kl/W7fv4RxVigVVLosdIlFvBCIMSEzMBpzNFbn3hgpkQRJ5b2W6K+z6pLcS
+	 mKlBK9rS1wAdw==
+Date: Tue, 25 Jun 2024 08:08:57 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Kalle Valo <kvalo@kernel.org>
-Cc: Jeff Johnson <quic_jjohnson@quicinc.com>, Koen Vandeputte
- <koen.vandeputte@citymesh.com>, <ath10k@lists.infradead.org>,
- linux-wireless <linux-wireless@vger.kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, <netdev@vger.kernel.org>, Johannes Berg
- <johannes@sipsolutions.net>, Kees Cook <keescook@chromium.org>
-Subject: Re: ieee80211.h virtual_map splat
-Message-ID: <20240625080248.32c3e03d@kernel.org>
-In-Reply-To: <87o77pik7w.fsf@kernel.org>
-References: <CAPh3n83zb1PwFBFijJKChBqY95zzpYh=2iPf8tmh=YTS6e3xPw@mail.gmail.com>
-	<c470e4ff-3f70-40f6-844a-f9614286509f@quicinc.com>
-	<87o77pik7w.fsf@kernel.org>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: Yunseong Kim <yskelg@gmail.com>, Markus Elfring <Markus.Elfring@web.de>,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian =?UTF-8?B?Qm9ybnRyw6RnZXI=?=
+ <borntraeger@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, Sven
+ Schnelle <svens@linux.ibm.com>, Thorsten Winkler <twinkler@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, LKML <linux-kernel@vger.kernel.org>,
+ MichelleJin <shjy180909@gmail.com>
+Subject: Re: [PATCH] s390/netiucv: handle memory allocation failure in
+ conn_action_start()
+Message-ID: <20240625080857.46653437@kernel.org>
+In-Reply-To: <6a4b95aa-f3d1-4da1-9017-976420af988b@linux.ibm.com>
+References: <20240623131154.36458-2-yskelg@gmail.com>
+	<bb03a384-b2c4-438f-b36b-a4af33a95b60@web.de>
+	<880a70f0-89d6-4094-8a71-a9c331bab1ee@gmail.com>
+	<6a4b95aa-f3d1-4da1-9017-976420af988b@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,34 +68,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 25 Jun 2024 09:56:35 +0300 Kalle Valo wrote:
-> > Adding netdev to the initial message in the thread.
-> > https://lore.kernel.org/all/CAPh3n83zb1PwFBFijJKChBqY95zzpYh=2iPf8tmh=YTS6e3xPw@mail.gmail.com/
-> >
-> > There was some discussion in the thread, with the observation that the splat 
-> > is fixed by:
-> > 2ae5c9248e06 ("wifi: mac80211: Use flexible array in struct ieee80211_tim_ie")
-> >
-> > Followed by discussion if this should be backported.
-> >
-> > Kees said that "netdev [...] maintainers have asked that contributors not 
-> > include "Cc: stable" tags, as they want to evaluate for themselves whether 
-> > patches should go to stable or not"  
-> 
-> BTW this rule doesn't apply to wireless subsystem. For wireless patches
-> it's ok to "Cc: stable" in patches or anyone can send a request to
-> stable maintainers to pick a patch.
+On Tue, 25 Jun 2024 11:08:49 +0200 Alexandra Winter wrote:
+> s390/netiucv is more or less in maintenance mode and we are not aware of any users.
+> The enterprise distros do not provide this module. Other iucv modules are more popular.
+> But afaiu we cannot remove the source code, unless we can prove that nobody is using it.
+> (Community advice is welcome).
 
-It's an old rule. Quoting documentation:
-
-  Stable tree
-  ~~~~~~~~~~~
-  
-  While it used to be the case that netdev submissions were not supposed
-  to carry explicit ``CC: stable@vger.kernel.org`` tags that is no longer
-  the case today. Please follow the standard stable rules in
-  :ref:`Documentation/process/stable-kernel-rules.rst <stable_kernel_rules>`,
-  and make sure you include appropriate Fixes tags!
-  
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#stable-tree
+If you have strong reason to believe this driver is unused, and can't
+find any proof otherwise - let's remove it. We can always "revert it
+back in", if needed. We have done it in the past.
 
