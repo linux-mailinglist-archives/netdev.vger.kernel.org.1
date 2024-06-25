@@ -1,124 +1,152 @@
-Return-Path: <netdev+bounces-106507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 644679169F7
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:15:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07788916A04
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:16:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FCC41F217D2
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 14:15:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B469D2830CB
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 14:16:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B8F7149E05;
-	Tue, 25 Jun 2024 14:15:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1418116C840;
+	Tue, 25 Jun 2024 14:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F76G5rtT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cBDgz0Ir"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE97D38DDB
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 14:15:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B0039FD6
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 14:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719324949; cv=none; b=YHaM9yDHWPQ8JtjL9W0yPrtQ1romuNFTdD2vJO8LCcYJdVybc8gu8VPLpJ6xw655CRdQP4pYaU5JV0CClkyp44oSrgxjyE4HBDlmFc3rhhrMH1zPJoFxiJWfgT0wB6wYTb5wg9XqWG/XdGAnmwB5JI6n4+LOP7y+INFVy3Y001w=
+	t=1719324980; cv=none; b=EdiIFN/TolQF4r0eEG1C5EmXrE2xBWn+orpuvoj330C25XUIE8S4dyWPz7m0YHgc7Dou6e/jVEXzx9+VQN3JZquSq20hMJn/dDosjfcR3TvzA171zP0CGWL7n3XiYruLhdfbcZzh2yJW6xenXD5RSeucVz8QOPxNHdy9ntmtxLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719324949; c=relaxed/simple;
-	bh=8M2qHHwCjXkaeZROkxqCF62UlYq9qGHUVUS3TBwEOM8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=QIATX1iptYmUSdNd7SdSjTIgjeN0uT+3Ns1zKvK3kGv+Bu7VwzRch1+dPpIGazRoulH92fts6NyswxJoaAgPG5yn26l0E8X6dvEr9gpiQRUERf2f9Ll02frXIuXF7ZbV9P4fNW4Z8zQoXhbsFWqmsTGNDM6UqNbYl0+LdneRfYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F76G5rtT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719324946;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=W7ydIp+uRxv9vpeC5lM+Zdk/FaOMqbxesom5QUbL9cA=;
-	b=F76G5rtTa4uo7mzqeW1lLJeC5nyWWEgNMAgNXEa0yYvu5ET4H8aMZb59G1VzLZ3M+EGgds
-	zgknFWTC/87lYudoLs5a9x2oECfXpcdtSbYBpWTKo/Vohvx5yZ18GzzCQ0PUL8Is6YQaLh
-	I7ztbSlYGUkB8wCrTIGZuE3fPYR9YX0=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-568-OPeVeDlENNmCBT0iajHARA-1; Tue,
- 25 Jun 2024 10:15:41 -0400
-X-MC-Unique: OPeVeDlENNmCBT0iajHARA-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AE49D189BF8B;
-	Tue, 25 Jun 2024 14:14:43 +0000 (UTC)
-Received: from RHTRH0061144 (dhcp-17-72.bos.redhat.com [10.18.17.72])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C4B5C196C0D8;
-	Tue, 25 Jun 2024 14:14:30 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,  netdev@vger.kernel.org,
-  dev@openvswitch.org,  linux-kselftest@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  Pravin B Shelar <pshelar@ovn.org>,  "David
- S. Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,
-  Shuah Khan <shuah@kernel.org>,  Stefano Brivio <sbrivio@redhat.com>,
-  =?utf-8?Q?Adri=C3=A1n?= Moreno <amorenoz@redhat.com>,  Simon Horman
- <horms@kernel.org>
-Subject: Re: [PATCH v2 net-next 0/7] selftests: net: Switch pmtu.sh to use
- the internal ovs script.
-In-Reply-To: <20240625070654.6a00efef@kernel.org> (Jakub Kicinski's message of
-	"Tue, 25 Jun 2024 07:06:54 -0700")
-References: <20240620125601.15755-1-aconole@redhat.com>
-	<20240621180126.3c40d245@kernel.org> <f7ttthjh33w.fsf@redhat.com>
-	<f7tpls6gu3q.fsf@redhat.com>
-	<e4f69335f90aae3f1daa47ba8f69b24ea15ed3b7.camel@redhat.com>
-	<f7th6dhgnvm.fsf@redhat.com> <20240625070654.6a00efef@kernel.org>
-Date: Tue, 25 Jun 2024 10:14:24 -0400
-Message-ID: <f7t1q4lgldr.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1719324980; c=relaxed/simple;
+	bh=v5/BN7Hm8eXOX6GvRiGj1yPcrrgAcTj4SdgdQ8HMC7I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Iip3ducaz0lnRoEyLKzi6YyeGy0UxoK/rVVD+m06qXDXBm1u6O39e+hlPXZ2kZJ+1DvdS7Qq3udsOzoNqFCyRJSmDiAWlfYrcvBZDCEHry484WO3owSHpOM6W4yfSlHgUJkciDi94USHM2bqGtgrL0mxI8vol52Ny95qxU8ldgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cBDgz0Ir; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-57cd26347d3so6149369a12.1
+        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 07:16:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1719324976; x=1719929776; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=txMg1yBI3C5zZj9b3iG0sb1mrfRfqVzlgNpFi+lwATA=;
+        b=cBDgz0IrhdcnC5u6hsKi2f2IN5dG2AwSD8TmyZDMAREquSUz+kriac2F6yiZ568ao6
+         G1RPef5TOaushP9LQddVaVmc2e51YWdpgTPYaepx5xgt11/yLRwtQ+nA8LeAJvvhNeOQ
+         qcCjZid3nVf1/6jBj8KbcZJ+4JdLMjIedK3FOx8OnuBuLoZsdIF23HNrotNzf7427nwe
+         IeqkgaZF8WjM1Ze0DMoo1SMvfXjKIoCS/0mrA4EcUtW4GVx6vornhhrkfbE8sfic6hnV
+         jxDi1IkPm7UIhldLjcUJKUrEz77aSOjVn+zJ/T3G9SAMH3THXPYlh/mTCNbjuKU49h0S
+         cB8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719324976; x=1719929776;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=txMg1yBI3C5zZj9b3iG0sb1mrfRfqVzlgNpFi+lwATA=;
+        b=w6m/3KwXWLjuaVnrdeZiZgcYp6cVo6z59aN1yHMJNTX+LXZtYs98CfrUi8Sz2A1sPE
+         MzhE3KuzCc+c5r4XepM3bSozp6ToBRds6zSPiPCWjkl0lJcMkX8Ffhd0Xqv7t+hCwPD3
+         4Ghtos+s6Q2YcQ/Njgl8e+XjuQ14hDShhuzj2llHmO+/y3M7TjLPlLJKw1xp8M6e7ssh
+         QnMrKGZExKY6EAsAJRfQ5hTezu8QPJYqAo+/a5wp25TdfRca+lT8LJ5fKHhjaf+s524o
+         zfudqgwNmL3l2/F64fFx8vSyTwqPQY+TMa+YWVT6Gv8dPzTR4EpXIRFi++VJiuT7rvaM
+         eLtg==
+X-Gm-Message-State: AOJu0YzrrFirLdKaOZkCKfcsHGBnQtOiacsXbwg6wAb9YpzHg1UjIdYw
+	8N0Boe2e5ssc/gxLrbhRMlDzYEEcShaitELEHJrFpH42Ijs6+jgUdPKcciDtnRPIzvmQwnsgIGU
+	k80qeWNSROOWmBGE+qZ7tr1+aP3ienPFvYl+MaP9br1Q97mTddm74tRY=
+X-Google-Smtp-Source: AGHT+IFscpUDigK3sjiafRtyPgDq4I1SxTB/v4k5zCynhP82Entzul2Gkuvq6bg+VXWqgIpi6/XH2Nq4EJopbPxoaxU=
+X-Received: by 2002:a17:907:c301:b0:a6f:5f5d:e924 with SMTP id
+ a640c23a62f3a-a7245b4c9bcmr662856066b.6.1719324975303; Tue, 25 Jun 2024
+ 07:16:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+References: <20240625024721.2140656-1-almasrymina@google.com>
+In-Reply-To: <20240625024721.2140656-1-almasrymina@google.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 25 Jun 2024 07:16:00 -0700
+Message-ID: <CAHS8izO1g5vZodyvKBNyE-Fx7A4EoD70RuDLwXtzE3yvfRw_2g@mail.gmail.com>
+Subject: Re: [PATCH net-next v13 00/13] Device Memory TCP
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Jakub Kicinski <kuba@kernel.org> writes:
-
-> On Tue, 25 Jun 2024 09:20:29 -0400 Aaron Conole wrote:
->> > I'm still wondering if the issue is Kconfig-related (plus possibly bad
->> > interaction with vng). I don't see the OVS knob enabled in the self-
->> > tests config. If it's implied by some other knob, and ends-up being
->> > selected as a module, vng could stumble upon loading the module at
->> > runtime, especially on incremental build (at least I experience that
->> > problem locally). I'm not even sure if the KCI is building
->> > incrementally or not, so all the above could is quite a wild guess.
->> >
->> > In any case I think adding the explicit CONFIG_OPENVSWITCH=y the
->> > selftest config would make the scenario more well defined.  
->> 
->> That is in 7/7 - but there was a collision with a netfilter knob getting
->> turned on.  I can repost it as-is (just after rebasing) if you think
->> that is the only issue.
+On Mon, Jun 24, 2024 at 7:47=E2=80=AFPM Mina Almasry <almasrymina@google.co=
+m> wrote:
 >
-> Sorry for not checking it earlier, looks like the runner was missing
-> pyroute:
+> v13: https://patchwork.kernel.org/project/netdevbpf/list/?series=3D861406=
+&archive=3Dboth&state=3D*
+> =3D=3D=3D=3D
 >
-> # python3 ./tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> Need to install the python pyroute2 package >= 0.6.
+> Major changes:
+> --------------
 >
-> I guess run_cmd counter-productively eats the stderr output ? :(
+> This iteration addresses Pavel's review comments, applies his
+> reviewed-by's, and seeks to fix the patchwork build error (sorry!).
+>
 
-Awesome :)  I will add a patch to ovs-dpctl that will turn the
-sys.exit(0) into sys.exit(1) - that way it should do the skip.
+This series is showing a inapplicable to net-next error on patchwork:
 
-When I previously tested, I put an error in the `try` without reading
-the except being specifically for a ModuleNotFound error.
+https://patchwork.kernel.org/project/netdevbpf/list/?series=3D865135
 
-I'll make sure pyroute2 isn't installed when I run it again.
+What happened here is that I sync'd to net-next, ran all the tests
+including the allmodconfig build which took a few hours, then posted
+the series. In the meantime 34 patches got merged to net-next, and one
+of those patches seems to generate a git am failure when I try to use
+b4 to apply:
 
-Thanks for your help Jakub and Paolo!
+b4 am 20240625024721.2140656-2-almasrymina@google.com
+...
+git am ./v13_20240625_almasrymina_device_memory_tcp.mbx
+...
+Applying: tcp: RX path for devmem TCP
+Using index info to reconstruct a base tree...
+M       include/net/sock.h
+M       net/ipv4/tcp_ipv4.c
+Falling back to patching base and 3-way merge...
+Auto-merging net/ipv4/tcp_ipv4.c
+Auto-merging include/net/sock.h
 
+Not sure if I'm getting very unlucky or if this was something I can do
+to avoid this. I think I didn't tax NIPA too much since it's an apply
+error. I'll repost after the 24hr cooldown, sorry again.
 
