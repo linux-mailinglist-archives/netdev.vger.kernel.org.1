@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-106534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4297916A9F
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:37:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7E83916AA0
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:37:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 376F9B21130
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 14:37:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FC95287D54
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 14:37:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FD8116E863;
-	Tue, 25 Jun 2024 14:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 848793A8CB;
+	Tue, 25 Jun 2024 14:36:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jl9mgqRv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UMql6QQ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D56016B72D
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 14:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F3415E5B8
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 14:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719326189; cv=none; b=UTz5b/W/L2dam/0jT0FgT/Djpg6JvEyofWKxGLAt1Hg6+uKTHNUaHYpy7iIEooYC48ModDBeGKuSzL0HOP8Fl7qEkK2FJVkQIHGXD5gOXIlbCdlMyFhD7JQiFfl/wSLn4CV/mKmVlMZc8ZNguZtgqsb6rgbp46NlkdoW+dinKBM=
+	t=1719326194; cv=none; b=k8NfN7az/jdxV0koXMZCENnjD1AQavGFuLBFcHRaukc+PxJMhxOwIMfGWtk5tDbutZyuygzaR34wlK5G6vzun+iJ9nSHUop5xNg/i8pYoXNE5Whp2ifxUcdPomnxk/WzyihprRtKbki0f61HBwmdJ8d2IcX5RZzbBtHn409IUJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719326189; c=relaxed/simple;
-	bh=sHFTEQUXYC6SYxygJWLZtZXXGVag9Ck6v4mKM6/l13c=;
+	s=arc-20240116; t=1719326194; c=relaxed/simple;
+	bh=Xx6ZaR1/4fmeFTv7UPTGuJyNbXmSbXtXI2AzIIlZ5CY=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iDAH0rgl7Uz/3pZRpqH+/KP5Y8BgIsOPPPBZT14NMhu07E0CklzzZAn3iIFLf9GayXg5A4xSkKp/VlRir+8TuJtaR69LX2l7MdOTUB/rbLm3IWuY8iFMCZ57vciTs3NxOWSGmER1pHWQ5xrDz3WXVP2WiNObGf7jafppaCOizr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jl9mgqRv; arc=none smtp.client-ip=209.85.214.171
+	 MIME-Version:Content-Type; b=kzBNElKp8dN6Xi9TDNZkYmlxCbnaucmwTP4w7SWo4KHCxBLAwkydp8rw/ff5lznqgoPvJDkPU6AmKJtuppWcYe3BvBdFz0K0MKDcULJAfzXtZ+tnXWpnIhNTpBOfhPw22DBvxDm6v4OrHtJ3qvtpHci0YDtGbQ6/2/Neik8ATVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UMql6QQ1; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1fa55dbf2e7so14684105ad.2
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 07:36:27 -0700 (PDT)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-701b0b0be38so4683546b3a.0
+        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 07:36:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719326187; x=1719930987; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1719326191; x=1719930991; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=/+Z14QDcKBE5pt3Nvntp7errpd+MK4gz9H2SE751JF4=;
-        b=Jl9mgqRv0IQMn6otMPdB0iN6isDslom8YcyMxPmYQFKnJg3fx3gcU6ZbBoMC6xcPdQ
-         pnVfzF8aZyQXIkbOpXUwj2oJ3GXDPPKLTywkzbm5SuegPIYNYis40j7i6RdIL5/DaDOu
-         ao9lClChVVBw24nk1zLBKtK8YjApZhAyDfPrIGZZ6aedDtyCNh1ObvbS52YjbGH3165r
-         77SnAeb37slANebXblqQGEbtEz4oL20upiCTy/v8mTlMeHsZH//GPRqtQBYW1UajTzfx
-         bXKpwJPmOSFiGKhKkiATCdb6xnp7bdX1k1cEoB547vedNH/ZSD3MdBQFfXc8Ricgw9fY
-         JxaA==
+        bh=maZyUgQvAKQbe+rqZZenYVcalqbvNp8D5APXerIdNP0=;
+        b=UMql6QQ1PjhRvjuEPt031qLPdvkVlPOMf7Tz445iCsD+sBmU1R/o7UpOxuLgskbhsD
+         YwZA9vOeKduHa+LDW/qdpC9ohMbJ2cRiTtTX/mIVSwKDFnb+R/E/AvKkMkHBcMXq/pVj
+         dw9jluiaJpe18Sr0B0jx3NqdW3TpjhWn+bLFqCH9jWd3c4eheIuuz9vayZa6gr1n59+z
+         k2bhBmfcksZhb3UbusHzTMkWfxr/oD/1A8EPhcgrCsj3QCv/tlnzNE24Gul8B8teM/Rl
+         2zR3k80WP+/3CmQDxwvpQDHr0vlPZ+A0tOf/qxpnaLSLSeFAWS6w3TKjqldBphcufvZh
+         epCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719326187; x=1719930987;
+        d=1e100.net; s=20230601; t=1719326191; x=1719930991;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=/+Z14QDcKBE5pt3Nvntp7errpd+MK4gz9H2SE751JF4=;
-        b=oX1foDSdYEyyNOhi/Rs7W7nG4NEfMyIL3OkAG/NN1j1gVdFV7WJVw2oHTKndtg5laa
-         ngC6RthVZYmgBg/1RlWmZBQz/H5X4mcSSEx9NIdykV0Zm0oC0CXotjV7oU8VkRm90m0O
-         J0SPTwXUCofrrf4tim+kJbZ1BeS++m7dWvGbM2ijb/a9Sye5Q5I9rrxHI+ABvAzeQ04u
-         Mu1pJ8c+s4bw0QzhTBqt5t/mc2e5SaPcD5r/j4AVKAE8qDFiwmdDeoaDmF3alXnE9rBm
-         W7xaneOn9o3toT/tsU8Ma4/RZCVbk8utQsvq6d2hFVF29UBWMiljqbesSkhC3CYQjKVe
-         Bt5w==
-X-Gm-Message-State: AOJu0YwtGuqVjPujroWAB0prdxUSJIPNXgu9VNQVBdD8nBhCmAh1wEEH
-	5pburD9X5kwOY+X+KZDTsLq4NLfFCw9Uya1VjK0bSCmn38PjKnvM
-X-Google-Smtp-Source: AGHT+IGfLJfgqFdCxJJWxB1VFdsJxAabzBIzw/7pDuNrvdK+qXlJUAzSH4/S4leTFpMR8xpM3zUL7A==
-X-Received: by 2002:a17:903:32d2:b0:1f7:1931:7a8f with SMTP id d9443c01a7336-1fa15944201mr80168345ad.64.1719326186924;
-        Tue, 25 Jun 2024 07:36:26 -0700 (PDT)
+        bh=maZyUgQvAKQbe+rqZZenYVcalqbvNp8D5APXerIdNP0=;
+        b=EHgkn08GxeeioODJNOND1QIaFF3OM0wFrIBNFjyQgPxZXbZA4LfDBXsVoamcbQCbqc
+         9s2hlM5388q9Oie/RuvXu8DHwH4l0ob8Y0ULdFFNakIt4sg7wz583w3PzeuKMcj3k9Tv
+         XpkoRGVypL6ri+Oc5DyKBemlXictShbyJS1DVupg1Wx4N+Jsy6Qwqv+fj8pYqDnGjLuf
+         xp+NtQd5qtQHcGRxH6Ev+DntVH8DyvXD23p4Ox0JEWeS0A3gp5lS3NXnxYyFJtW4z1Oh
+         V2QPt6bIOVultJNDSk5NCzjuk0AeH1Y2kjrh6j32qYlp+zIHOLlDJ09QVHlPnGq4qMba
+         Fv9Q==
+X-Gm-Message-State: AOJu0YzjIGVG47ZUBH5l/dGmI/XFFKTw+OpbJmryPjjcZwTHytWw8ZSs
+	NDN6kjh4c1rM1fX4+gzpcCtmYsIL0l174TO4/hzSvqZqdPoHi0TWaX9eUw==
+X-Google-Smtp-Source: AGHT+IH1lksqJrXfwUg7rmBIJz+98b0d6RteARdQ24HeE3KL4KDDVV76z6xTeCOCilKnCYA6ehmufA==
+X-Received: by 2002:a05:6a00:b90:b0:706:8e4:56a1 with SMTP id d2e1a72fcca58-706745d41camr10344335b3a.18.1719326191049;
+        Tue, 25 Jun 2024 07:36:31 -0700 (PDT)
 Received: from ahduyck-xeon-server.home.arpa ([98.97.103.43])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9ebbb29e7sm81678785ad.261.2024.06.25.07.36.26
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7068998497esm3581799b3a.15.2024.06.25.07.36.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jun 2024 07:36:26 -0700 (PDT)
-Subject: [net-next PATCH v2 13/15] eth: fbnic: Add basic Rx handling
+        Tue, 25 Jun 2024 07:36:30 -0700 (PDT)
+Subject: [net-next PATCH v2 14/15] eth: fbnic: Add L2 address programming
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org,
  davem@davemloft.net, pabeni@redhat.com
-Date: Tue, 25 Jun 2024 07:36:25 -0700
+Date: Tue, 25 Jun 2024 07:36:29 -0700
 Message-ID: 
- <171932618549.3072535.13175899786992648336.stgit@ahduyck-xeon-server.home.arpa>
+ <171932618909.3072535.7601625522936236664.stgit@ahduyck-xeon-server.home.arpa>
 In-Reply-To: 
  <171932574765.3072535.12103787411698322191.stgit@ahduyck-xeon-server.home.arpa>
 References: 
@@ -90,535 +90,895 @@ Content-Transfer-Encoding: 7bit
 
 From: Alexander Duyck <alexanderduyck@fb.com>
 
-Handle Rx packets with basic csum and Rx hash offloads.
-
-NIC writes back to the completion ring a head buffer descriptor
-(data buffer allocated from header pages), variable number of payload
-descriptors (data buffers in payload pages), an optional metadata
-descriptor (type 2) and finally the primary metadata descriptor
-(type 3).
-
-This format makes scatter support fairly easy - start gathering
-the pages when we see head page, gather until we see the primary
-metadata descriptor, do the processing. Use XDP infra to collect
-the packet fragments as we traverse the descriptors. XDP itself
-is not supported yet, but it will be soon.
+Program the Rx TCAM to control L2 forwarding. Since we are in full
+control of the NIC we need to make sure we include BMC forwarding
+in the rules. When host is not present BMC will program the TCAM
+to get onto the network but once we take ownership it's up to
+Linux driver to make sure BMC L2 addresses are handled correctly.
 
 Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_csr.h    |   63 +++++
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.c |    4 
- drivers/net/ethernet/meta/fbnic/fbnic_pci.c    |    3 
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c   |  328 ++++++++++++++++++++++++
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.h   |    2 
- 5 files changed, 397 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/meta/fbnic/Makefile        |    1 
+ drivers/net/ethernet/meta/fbnic/fbnic.h         |   15 +
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h     |   14 +
+ drivers/net/ethernet/meta/fbnic/fbnic_devlink.c |    2 
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.c  |  230 ++++++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.h  |    3 
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c     |    3 
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c     |  338 +++++++++++++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.h     |  139 +++++++++
+ 9 files changed, 745 insertions(+)
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_rpc.h
 
+diff --git a/drivers/net/ethernet/meta/fbnic/Makefile b/drivers/net/ethernet/meta/fbnic/Makefile
+index a487ac5c4ec5..9373b558fdc9 100644
+--- a/drivers/net/ethernet/meta/fbnic/Makefile
++++ b/drivers/net/ethernet/meta/fbnic/Makefile
+@@ -14,5 +14,6 @@ fbnic-y := fbnic_devlink.o \
+ 	   fbnic_netdev.o \
+ 	   fbnic_pci.o \
+ 	   fbnic_phylink.o \
++	   fbnic_rpc.o \
+ 	   fbnic_tlv.o \
+ 	   fbnic_txrx.o
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
+index 2be7e5f8e6e2..bfc36bb203ae 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
+@@ -12,6 +12,7 @@
+ #include "fbnic_csr.h"
+ #include "fbnic_fw.h"
+ #include "fbnic_mac.h"
++#include "fbnic_rpc.h"
+ 
+ struct fbnic_dev {
+ 	struct device *dev;
+@@ -39,6 +40,10 @@ struct fbnic_dev {
+ 	u32 mps;
+ 	u32 readrq;
+ 
++	/* Local copy of the devices TCAM */
++	struct fbnic_mac_addr mac_addr[FBNIC_RPC_TCAM_MACDA_NUM_ENTRIES];
++	u8 mac_addr_boundary;
++
+ 	/* Tri-state value indicating state of link.
+ 	 *  0 - Up
+ 	 *  1 - Down
+@@ -104,6 +109,16 @@ void fbnic_fw_wr32(struct fbnic_dev *fbd, u32 reg, u32 val);
+ #define fw_wr32(_f, _r, _v)	fbnic_fw_wr32(_f, _r, _v)
+ #define fw_wrfl(_f)		fbnic_fw_rd32(_f, FBNIC_FW_ZERO_REG)
+ 
++static inline bool fbnic_bmc_present(struct fbnic_dev *fbd)
++{
++	return fbd->fw_cap.bmc_present;
++}
++
++static inline void fbnic_bmc_set_present(struct fbnic_dev *fbd, bool present)
++{
++	fbd->fw_cap.bmc_present = present;
++}
++
+ static inline bool fbnic_init_failure(struct fbnic_dev *fbd)
+ {
+ 	return !fbd->netdev;
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-index 3ebb392c3099..261e13edcb69 100644
+index 261e13edcb69..c98bd7eff4b5 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-@@ -121,6 +121,69 @@ enum {
- #define FBNIC_BD_PAGE_ID_MASK \
- 	(FBNIC_BD_DESC_ID_MASK & ~FBNIC_BD_FRAG_ID_MASK)
+@@ -537,8 +537,22 @@ enum {
+ #define FBNIC_RPC_RMI_CONFIG_FCS_PRESENT	CSR_BIT(8)
+ #define FBNIC_RPC_RMI_CONFIG_ENABLE		CSR_BIT(12)
+ #define FBNIC_RPC_RMI_CONFIG_MTU		CSR_GENMASK(31, 16)
++#define FBNIC_RPC_TCAM_MACDA_VALIDATE	0x0852d		/* 0x214b4 */
+ #define FBNIC_CSR_END_RPC		0x0856b	/* CSR section delimiter */
  
-+/* Rx Completion Queue Descriptors */
-+#define FBNIC_RCD_TYPE_MASK			DESC_GENMASK(62, 61)
-+enum {
-+	FBNIC_RCD_TYPE_HDR_AL	= 0,
-+	FBNIC_RCD_TYPE_PAY_AL	= 1,
-+	FBNIC_RCD_TYPE_OPT_META	= 2,
-+	FBNIC_RCD_TYPE_META	= 3,
-+};
++/* RPC RAM Registers */
 +
-+#define FBNIC_RCD_DONE				DESC_BIT(63)
++#define FBNIC_CSR_START_RPC_RAM		0x08800	/* CSR section delimiter */
++#define FBNIC_RPC_ACT_TBL_NUM_ENTRIES		64
 +
-+/* Address/Length Completion Descriptors */
-+#define FBNIC_RCD_AL_BUFF_ID_MASK		DESC_GENMASK(15, 0)
-+#define FBNIC_RCD_AL_BUFF_FRAG_MASK		(FBNIC_BD_FRAG_COUNT - 1)
-+#define FBNIC_RCD_AL_BUFF_PAGE_MASK \
-+	(FBNIC_RCD_AL_BUFF_ID_MASK & ~FBNIC_RCD_AL_BUFF_FRAG_MASK)
-+#define FBNIC_RCD_AL_BUFF_LEN_MASK		DESC_GENMASK(28, 16)
-+#define FBNIC_RCD_AL_BUFF_OFF_MASK		DESC_GENMASK(43, 32)
-+#define FBNIC_RCD_AL_PAGE_FIN			DESC_BIT(60)
++/* TCAM Tables */
++#define FBNIC_RPC_TCAM_VALIDATE			CSR_BIT(31)
++#define FBNIC_RPC_TCAM_MACDA(m, n) \
++	(0x08b80 + 0x20 * (n) + (m))		/* 0x022e00 + 128*n + 4*m */
++#define FBNIC_RPC_TCAM_MACDA_VALUE		CSR_GENMASK(15, 0)
++#define FBNIC_RPC_TCAM_MACDA_MASK		CSR_GENMASK(31, 16)
++#define FBNIC_CSR_END_RPC_RAM		0x08f1f	/* CSR section delimiter */
 +
-+/* Header AL specific values */
-+#define FBNIC_RCD_HDR_AL_OVERFLOW		DESC_BIT(53)
-+#define FBNIC_RCD_HDR_AL_DMA_HINT_MASK		DESC_GENMASK(59, 54)
-+enum {
-+	FBNIC_RCD_HDR_AL_DMA_HINT_NONE  = 0,
-+	FBNIC_RCD_HDR_AL_DMA_HINT_L2	= 1,
-+	FBNIC_RCD_HDR_AL_DMA_HINT_L3	= 2,
-+	FBNIC_RCD_HDR_AL_DMA_HINT_L4	= 4,
-+};
+ /* Fab Registers */
+ #define FBNIC_CSR_START_FAB		0x0C000 /* CSR section delimiter */
+ #define FBNIC_FAB_AXI4_AR_SPACER_2_CFG		0x0C005		/* 0x30014 */
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+index 91e8135410df..b007e7bddf81 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+@@ -66,6 +66,8 @@ struct fbnic_dev *fbnic_devlink_alloc(struct pci_dev *pdev)
+ 
+ 	fbd->dsn = pci_get_dsn(pdev);
+ 
++	fbd->mac_addr_boundary = FBNIC_RPC_TCAM_MACDA_DEFAULT_BOUNDARY;
 +
-+/* Optional Metadata Completion Descriptors */
-+#define FBNIC_RCD_OPT_META_TS_MASK		DESC_GENMASK(39, 0)
-+#define FBNIC_RCD_OPT_META_ACTION_MASK		DESC_GENMASK(45, 40)
-+#define FBNIC_RCD_OPT_META_ACTION		DESC_BIT(57)
-+#define FBNIC_RCD_OPT_META_TS			DESC_BIT(58)
-+#define FBNIC_RCD_OPT_META_TYPE_MASK		DESC_GENMASK(60, 59)
-+
-+/* Metadata Completion Descriptors */
-+#define FBNIC_RCD_META_RSS_HASH_MASK		DESC_GENMASK(31, 0)
-+#define FBNIC_RCD_META_L2_CSUM_MASK		DESC_GENMASK(47, 32)
-+#define FBNIC_RCD_META_L3_TYPE_MASK		DESC_GENMASK(49, 48)
-+enum {
-+	FBNIC_RCD_META_L3_TYPE_OTHER	= 0,
-+	FBNIC_RCD_META_L3_TYPE_IPV4	= 1,
-+	FBNIC_RCD_META_L3_TYPE_IPV6	= 2,
-+	FBNIC_RCD_META_L3_TYPE_V6V6	= 3,
-+};
-+
-+#define FBNIC_RCD_META_L4_TYPE_MASK		DESC_GENMASK(51, 50)
-+enum {
-+	FBNIC_RCD_META_L4_TYPE_OTHER	= 0,
-+	FBNIC_RCD_META_L4_TYPE_TCP	= 1,
-+	FBNIC_RCD_META_L4_TYPE_UDP	= 2,
-+};
-+
-+#define FBNIC_RCD_META_L4_CSUM_UNNECESSARY	DESC_BIT(52)
-+#define FBNIC_RCD_META_ERR_MAC_EOP		DESC_BIT(53)
-+#define FBNIC_RCD_META_ERR_TRUNCATED_FRAME	DESC_BIT(54)
-+#define FBNIC_RCD_META_ERR_PARSER		DESC_BIT(55)
-+#define FBNIC_RCD_META_UNCORRECTABLE_ERR_MASK	\
-+	(FBNIC_RCD_META_ERR_MAC_EOP | FBNIC_RCD_META_ERR_TRUNCATED_FRAME)
-+#define FBNIC_RCD_META_ECN			DESC_BIT(60)
-+
- /* Register Definitions
-  *
-  * The registers are laid as indexes into an le32 array. As such the actual
+ 	return fbd;
+ }
+ 
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index 8032f87e5351..cc7e2f38c7c2 100644
+index cc7e2f38c7c2..f58a0440c39e 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -169,8 +169,10 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
- 	fbnic_reset_queues(fbn, default_queues, default_queues);
- 
- 	netdev->features |=
-+		NETIF_F_RXHASH |
- 		NETIF_F_SG |
--		NETIF_F_HW_CSUM;
-+		NETIF_F_HW_CSUM |
-+		NETIF_F_RXCSUM;
- 
- 	netdev->hw_features |= netdev->features;
- 	netdev->vlan_features |= netdev->features;
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-index 1c0194ca8864..5bca1e83a608 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-@@ -195,6 +195,9 @@ static void fbnic_service_task(struct work_struct *work)
- 
- 	fbnic_health_check(fbd);
- 
-+	if (netif_carrier_ok(fbd->netdev))
-+		fbnic_napi_depletion_check(fbd->netdev);
-+
- 	if (netif_running(fbd->netdev))
- 		schedule_delayed_work(&fbd->service_task, HZ);
- 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index fce38429ccf0..d04b66bf10ca 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -8,6 +8,7 @@
- #include <net/page_pool/helpers.h>
- 
- #include "fbnic.h"
-+#include "fbnic_csr.h"
- #include "fbnic_netdev.h"
- #include "fbnic_txrx.h"
- 
-@@ -131,6 +132,24 @@ fbnic_tx_offloads(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
- 	return false;
- }
- 
-+static void
-+fbnic_rx_csum(u64 rcd, struct sk_buff *skb, struct fbnic_ring *rcq)
-+{
-+	skb_checksum_none_assert(skb);
-+
-+	if (unlikely(!(skb->dev->features & NETIF_F_RXCSUM)))
-+		return;
-+
-+	if (FIELD_GET(FBNIC_RCD_META_L4_CSUM_UNNECESSARY, rcd)) {
-+		skb->ip_summed = CHECKSUM_UNNECESSARY;
-+	} else {
-+		u16 csum = FIELD_GET(FBNIC_RCD_META_L2_CSUM_MASK, rcd);
-+
-+		skb->ip_summed = CHECKSUM_COMPLETE;
-+		skb->csum = (__force __wsum)csum;
-+	}
-+}
-+
- static bool
- fbnic_tx_map(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
- {
-@@ -364,6 +383,16 @@ static void fbnic_page_pool_init(struct fbnic_ring *ring, unsigned int idx,
- 	rx_buf->page = page;
- }
- 
-+static struct page *fbnic_page_pool_get(struct fbnic_ring *ring,
-+					unsigned int idx)
-+{
-+	struct fbnic_rx_buf *rx_buf = &ring->rx_buf[idx];
-+
-+	rx_buf->pagecnt_bias--;
-+
-+	return rx_buf->page;
-+}
-+
- static void fbnic_page_pool_drain(struct fbnic_ring *ring, unsigned int idx,
- 				  struct fbnic_napi_vector *nv, int budget)
- {
-@@ -508,6 +537,103 @@ static void fbnic_fill_bdq(struct fbnic_napi_vector *nv, struct fbnic_ring *bdq)
- 	}
- }
- 
-+static unsigned int fbnic_hdr_pg_start(unsigned int pg_off)
-+{
-+	/* The headroom of the first header may be larger than FBNIC_RX_HROOM
-+	 * due to alignment. So account for that by just making the page
-+	 * offset 0 if we are starting at the first header.
-+	 */
-+	if (ALIGN(FBNIC_RX_HROOM, 128) > FBNIC_RX_HROOM &&
-+	    pg_off == ALIGN(FBNIC_RX_HROOM, 128))
-+		return 0;
-+
-+	return pg_off - FBNIC_RX_HROOM;
-+}
-+
-+static unsigned int fbnic_hdr_pg_end(unsigned int pg_off, unsigned int len)
-+{
-+	/* Determine the end of the buffer by finding the start of the next
-+	 * and then subtracting the headroom from that frame.
-+	 */
-+	pg_off += len + FBNIC_RX_TROOM + FBNIC_RX_HROOM;
-+
-+	return ALIGN(pg_off, 128) - FBNIC_RX_HROOM;
-+}
-+
-+static void fbnic_pkt_prepare(struct fbnic_napi_vector *nv, u64 rcd,
-+			      struct fbnic_pkt_buff *pkt,
-+			      struct fbnic_q_triad *qt)
-+{
-+	unsigned int hdr_pg_idx = FIELD_GET(FBNIC_RCD_AL_BUFF_PAGE_MASK, rcd);
-+	unsigned int hdr_pg_off = FIELD_GET(FBNIC_RCD_AL_BUFF_OFF_MASK, rcd);
-+	struct page *page = fbnic_page_pool_get(&qt->sub0, hdr_pg_idx);
-+	unsigned int len = FIELD_GET(FBNIC_RCD_AL_BUFF_LEN_MASK, rcd);
-+	unsigned int frame_sz, hdr_pg_start, hdr_pg_end, headroom;
-+	unsigned char *hdr_start;
-+
-+	/* data_hard_start should always be NULL when this is called */
-+	WARN_ON_ONCE(pkt->buff.data_hard_start);
-+
-+	/* Short-cut the end calculation if we know page is fully consumed */
-+	hdr_pg_end = FIELD_GET(FBNIC_RCD_AL_PAGE_FIN, rcd) ?
-+		     FBNIC_BD_FRAG_SIZE : fbnic_hdr_pg_end(hdr_pg_off, len);
-+	hdr_pg_start = fbnic_hdr_pg_start(hdr_pg_off);
-+
-+	headroom = hdr_pg_off - hdr_pg_start + FBNIC_RX_PAD;
-+	frame_sz = hdr_pg_end - hdr_pg_start;
-+	xdp_init_buff(&pkt->buff, frame_sz, NULL);
-+	hdr_pg_start += (FBNIC_RCD_AL_BUFF_FRAG_MASK & rcd) *
-+			FBNIC_BD_FRAG_SIZE;
-+
-+	/* Sync DMA buffer */
-+	dma_sync_single_range_for_cpu(nv->dev, page_pool_get_dma_addr(page),
-+				      hdr_pg_start, frame_sz,
-+				      DMA_BIDIRECTIONAL);
-+
-+	/* Build frame around buffer */
-+	hdr_start = page_address(page) + hdr_pg_start;
-+
-+	xdp_prepare_buff(&pkt->buff, hdr_start, headroom,
-+			 len - FBNIC_RX_PAD, true);
-+
-+	pkt->data_truesize = 0;
-+	pkt->data_len = 0;
-+	pkt->nr_frags = 0;
-+}
-+
-+static void fbnic_add_rx_frag(struct fbnic_napi_vector *nv, u64 rcd,
-+			      struct fbnic_pkt_buff *pkt,
-+			      struct fbnic_q_triad *qt)
-+{
-+	unsigned int pg_idx = FIELD_GET(FBNIC_RCD_AL_BUFF_PAGE_MASK, rcd);
-+	unsigned int pg_off = FIELD_GET(FBNIC_RCD_AL_BUFF_OFF_MASK, rcd);
-+	unsigned int len = FIELD_GET(FBNIC_RCD_AL_BUFF_LEN_MASK, rcd);
-+	struct page *page = fbnic_page_pool_get(&qt->sub1, pg_idx);
-+	struct skb_shared_info *shinfo;
-+	unsigned int truesize;
-+
-+	truesize = FIELD_GET(FBNIC_RCD_AL_PAGE_FIN, rcd) ?
-+		   FBNIC_BD_FRAG_SIZE - pg_off : ALIGN(len, 128);
-+
-+	pg_off += (FBNIC_RCD_AL_BUFF_FRAG_MASK & rcd) *
-+		  FBNIC_BD_FRAG_SIZE;
-+
-+	/* Sync DMA buffer */
-+	dma_sync_single_range_for_cpu(nv->dev, page_pool_get_dma_addr(page),
-+				      pg_off, truesize, DMA_BIDIRECTIONAL);
-+
-+	/* Add page to xdp shared info */
-+	shinfo = xdp_get_shared_info_from_buff(&pkt->buff);
-+
-+	/* We use gso_segs to store truesize */
-+	pkt->data_truesize += truesize;
-+
-+	__skb_fill_page_desc_noacc(shinfo, pkt->nr_frags++, page, pg_off, len);
-+
-+	/* Store data_len in gso_size */
-+	pkt->data_len += len;
-+}
-+
- static void fbnic_put_pkt_buff(struct fbnic_napi_vector *nv,
- 			       struct fbnic_pkt_buff *pkt, int budget)
- {
-@@ -530,6 +656,168 @@ static void fbnic_put_pkt_buff(struct fbnic_napi_vector *nv,
- 	page_pool_put_full_page(nv->page_pool, page, !!budget);
- }
- 
-+static struct sk_buff *fbnic_build_skb(struct fbnic_napi_vector *nv,
-+				       struct fbnic_pkt_buff *pkt)
-+{
-+	unsigned int nr_frags = pkt->nr_frags;
-+	struct skb_shared_info *shinfo;
-+	unsigned int truesize;
-+	struct sk_buff *skb;
-+
-+	truesize = xdp_data_hard_end(&pkt->buff) + FBNIC_RX_TROOM -
-+		   pkt->buff.data_hard_start;
-+
-+	/* Build frame around buffer */
-+	skb = napi_build_skb(pkt->buff.data_hard_start, truesize);
-+	if (unlikely(!skb))
-+		return NULL;
-+
-+	/* Push data pointer to start of data, put tail to end of data */
-+	skb_reserve(skb, pkt->buff.data - pkt->buff.data_hard_start);
-+	__skb_put(skb, pkt->buff.data_end - pkt->buff.data);
-+
-+	/* Add tracking for metadata at the start of the frame */
-+	skb_metadata_set(skb, pkt->buff.data - pkt->buff.data_meta);
-+
-+	/* Add Rx frags */
-+	if (nr_frags) {
-+		/* Verify that shared info didn't move */
-+		shinfo = xdp_get_shared_info_from_buff(&pkt->buff);
-+		WARN_ON(skb_shinfo(skb) != shinfo);
-+
-+		skb->truesize += pkt->data_truesize;
-+		skb->data_len += pkt->data_len;
-+		shinfo->nr_frags = nr_frags;
-+		skb->len += pkt->data_len;
-+	}
-+
-+	skb_mark_for_recycle(skb);
-+
-+	/* Set MAC header specific fields */
-+	skb->protocol = eth_type_trans(skb, nv->napi.dev);
-+
-+	return skb;
-+}
-+
-+static enum pkt_hash_types fbnic_skb_hash_type(u64 rcd)
-+{
-+	return (FBNIC_RCD_META_L4_TYPE_MASK & rcd) ? PKT_HASH_TYPE_L4 :
-+	       (FBNIC_RCD_META_L3_TYPE_MASK & rcd) ? PKT_HASH_TYPE_L3 :
-+						     PKT_HASH_TYPE_L2;
-+}
-+
-+static void fbnic_populate_skb_fields(struct fbnic_napi_vector *nv,
-+				      u64 rcd, struct sk_buff *skb,
-+				      struct fbnic_q_triad *qt)
-+{
-+	struct net_device *netdev = nv->napi.dev;
-+	struct fbnic_ring *rcq = &qt->cmpl;
-+
-+	fbnic_rx_csum(rcd, skb, rcq);
-+
-+	if (netdev->features & NETIF_F_RXHASH)
-+		skb_set_hash(skb,
-+			     FIELD_GET(FBNIC_RCD_META_RSS_HASH_MASK, rcd),
-+			     fbnic_skb_hash_type(rcd));
-+
-+	skb_record_rx_queue(skb, rcq->q_idx);
-+}
-+
-+static bool fbnic_rcd_metadata_err(u64 rcd)
-+{
-+	return !!(FBNIC_RCD_META_UNCORRECTABLE_ERR_MASK & rcd);
-+}
-+
-+static int fbnic_clean_rcq(struct fbnic_napi_vector *nv,
-+			   struct fbnic_q_triad *qt, int budget)
-+{
-+	struct fbnic_ring *rcq = &qt->cmpl;
-+	struct fbnic_pkt_buff *pkt;
-+	s32 head0 = -1, head1 = -1;
-+	__le64 *raw_rcd, done;
-+	u32 head = rcq->head;
-+	u64 packets = 0;
-+
-+	done = (head & (rcq->size_mask + 1)) ? cpu_to_le64(FBNIC_RCD_DONE) : 0;
-+	raw_rcd = &rcq->desc[head & rcq->size_mask];
-+	pkt = rcq->pkt;
-+
-+	/* Walk the completion queue collecting the heads reported by NIC */
-+	while (likely(packets < budget)) {
-+		struct sk_buff *skb = ERR_PTR(-EINVAL);
-+		u64 rcd;
-+
-+		if ((*raw_rcd & cpu_to_le64(FBNIC_RCD_DONE)) == done)
-+			break;
-+
-+		dma_rmb();
-+
-+		rcd = le64_to_cpu(*raw_rcd);
-+
-+		switch (FIELD_GET(FBNIC_RCD_TYPE_MASK, rcd)) {
-+		case FBNIC_RCD_TYPE_HDR_AL:
-+			head0 = FIELD_GET(FBNIC_RCD_AL_BUFF_PAGE_MASK, rcd);
-+			fbnic_pkt_prepare(nv, rcd, pkt, qt);
-+
-+			break;
-+		case FBNIC_RCD_TYPE_PAY_AL:
-+			head1 = FIELD_GET(FBNIC_RCD_AL_BUFF_PAGE_MASK, rcd);
-+			fbnic_add_rx_frag(nv, rcd, pkt, qt);
-+
-+			break;
-+		case FBNIC_RCD_TYPE_OPT_META:
-+			/* Only type 0 is currently supported */
-+			if (FIELD_GET(FBNIC_RCD_OPT_META_TYPE_MASK, rcd))
-+				break;
-+
-+			/* We currently ignore the action table index */
-+			break;
-+		case FBNIC_RCD_TYPE_META:
-+			if (likely(!fbnic_rcd_metadata_err(rcd)))
-+				skb = fbnic_build_skb(nv, pkt);
-+
-+			/* Populate skb and invalidate XDP */
-+			if (!IS_ERR_OR_NULL(skb)) {
-+				fbnic_populate_skb_fields(nv, rcd, skb, qt);
-+
-+				packets++;
-+
-+				napi_gro_receive(&nv->napi, skb);
-+			} else {
-+				fbnic_put_pkt_buff(nv, pkt, 1);
-+			}
-+
-+			pkt->buff.data_hard_start = NULL;
-+
-+			break;
-+		}
-+
-+		raw_rcd++;
-+		head++;
-+		if (!(head & rcq->size_mask)) {
-+			done ^= cpu_to_le64(FBNIC_RCD_DONE);
-+			raw_rcd = &rcq->desc[0];
-+		}
-+	}
-+
-+	/* Unmap and free processed buffers */
-+	if (head0 >= 0)
-+		fbnic_clean_bdq(nv, budget, &qt->sub0, head0);
-+	fbnic_fill_bdq(nv, &qt->sub0);
-+
-+	if (head1 >= 0)
-+		fbnic_clean_bdq(nv, budget, &qt->sub1, head1);
-+	fbnic_fill_bdq(nv, &qt->sub1);
-+
-+	/* Record the current head/tail of the queue */
-+	if (rcq->head != head) {
-+		rcq->head = head;
-+		writel(head & rcq->size_mask, rcq->doorbell);
-+	}
-+
-+	return packets;
-+}
-+
- static void fbnic_nv_irq_disable(struct fbnic_napi_vector *nv)
- {
- 	struct fbnic_dev *fbd = nv->fbd;
-@@ -552,12 +840,18 @@ static int fbnic_poll(struct napi_struct *napi, int budget)
- 	struct fbnic_napi_vector *nv = container_of(napi,
- 						    struct fbnic_napi_vector,
- 						    napi);
--	int i;
-+	int i, j, work_done = 0;
- 
- 	for (i = 0; i < nv->txt_count; i++)
- 		fbnic_clean_tcq(nv, &nv->qt[i], budget);
- 
--	if (likely(napi_complete_done(napi, 0)))
-+	for (j = 0; j < nv->rxt_count; j++, i++)
-+		work_done += fbnic_clean_rcq(nv, &nv->qt[i], budget);
-+
-+	if (work_done >= budget)
-+		return budget;
-+
-+	if (likely(napi_complete_done(napi, work_done)))
- 		fbnic_nv_irq_rearm(nv);
+@@ -48,6 +48,8 @@ int __fbnic_open(struct fbnic_net *fbn)
+ 	err = fbnic_mac_enable(fbd);
+ 	if (err)
+ 		goto release_ownership;
++	/* Pull the BMC config and initialize the RPC */
++	fbnic_bmc_rpc_init(fbd);
  
  	return 0;
-@@ -1553,3 +1847,33 @@ void fbnic_napi_enable(struct fbnic_net *fbn)
- 
- 	fbnic_wrfl(fbd);
+ release_ownership:
+@@ -86,12 +88,240 @@ static int fbnic_stop(struct net_device *netdev)
+ 	return 0;
  }
-+
-+void fbnic_napi_depletion_check(struct net_device *netdev)
+ 
++static int fbnic_uc_sync(struct net_device *netdev, const unsigned char *addr)
 +{
 +	struct fbnic_net *fbn = netdev_priv(netdev);
-+	u32 irqs[FBNIC_MAX_MSIX_VECS / 32] = {};
-+	struct fbnic_dev *fbd = fbn->fbd;
-+	struct fbnic_napi_vector *nv;
-+	int i, j;
++	struct fbnic_mac_addr *avail_addr;
 +
-+	list_for_each_entry(nv, &fbn->napis, napis) {
-+		/* Find RQs which are completely out of pages */
-+		for (i = nv->txt_count, j = 0; j < nv->rxt_count; j++, i++) {
-+			/* Assume 4 pages is always enough to fit a packet
-+			 * and therefore generate a completion and an IRQ.
-+			 */
-+			if (fbnic_desc_used(&nv->qt[i].sub0) < 4 ||
-+			    fbnic_desc_used(&nv->qt[i].sub1) < 4)
-+				irqs[nv->v_idx / 32] |= BIT(nv->v_idx % 32);
++	if (WARN_ON(!is_valid_ether_addr(addr)))
++		return -EADDRNOTAVAIL;
++
++	avail_addr = __fbnic_uc_sync(fbn->fbd, addr);
++	if (!avail_addr)
++		return -ENOSPC;
++
++	/* Add type flag indicating this address is in use by the host */
++	set_bit(FBNIC_MAC_ADDR_T_UNICAST, avail_addr->act_tcam);
++
++	return 0;
++}
++
++static int fbnic_uc_unsync(struct net_device *netdev, const unsigned char *addr)
++{
++	struct fbnic_net *fbn = netdev_priv(netdev);
++	struct fbnic_dev *fbd = fbn->fbd;
++	int i, ret;
++
++	/* Scan from middle of list to bottom, filling bottom up.
++	 * Skip the first entry which is reserved for dev_addr and
++	 * leave the last entry to use for promiscuous filtering.
++	 */
++	for (i = fbd->mac_addr_boundary, ret = -ENOENT;
++	     i < FBNIC_RPC_TCAM_MACDA_HOST_ADDR_IDX && ret; i++) {
++		struct fbnic_mac_addr *mac_addr = &fbd->mac_addr[i];
++
++		if (!ether_addr_equal(mac_addr->value.addr8, addr))
++			continue;
++
++		ret = __fbnic_uc_unsync(mac_addr);
++	}
++
++	return ret;
++}
++
++static int fbnic_mc_sync(struct net_device *netdev, const unsigned char *addr)
++{
++	struct fbnic_net *fbn = netdev_priv(netdev);
++	struct fbnic_mac_addr *avail_addr;
++
++	if (WARN_ON(!is_multicast_ether_addr(addr)))
++		return -EADDRNOTAVAIL;
++
++	avail_addr = __fbnic_mc_sync(fbn->fbd, addr);
++	if (!avail_addr)
++		return -ENOSPC;
++
++	/* Add type flag indicating this address is in use by the host */
++	set_bit(FBNIC_MAC_ADDR_T_MULTICAST, avail_addr->act_tcam);
++
++	return 0;
++}
++
++static int fbnic_mc_unsync(struct net_device *netdev, const unsigned char *addr)
++{
++	struct fbnic_net *fbn = netdev_priv(netdev);
++	struct fbnic_dev *fbd = fbn->fbd;
++	int i, ret;
++
++	/* Scan from middle of list to top, filling top down.
++	 * Skip over the address reserved for the BMC MAC and
++	 * exclude index 0 as that belongs to the broadcast address
++	 */
++	for (i = fbd->mac_addr_boundary, ret = -ENOENT;
++	     --i > FBNIC_RPC_TCAM_MACDA_BROADCAST_IDX && ret;) {
++		struct fbnic_mac_addr *mac_addr = &fbd->mac_addr[i];
++
++		if (!ether_addr_equal(mac_addr->value.addr8, addr))
++			continue;
++
++		ret = __fbnic_mc_unsync(mac_addr);
++	}
++
++	return ret;
++}
++
++void __fbnic_set_rx_mode(struct net_device *netdev)
++{
++	struct fbnic_net *fbn = netdev_priv(netdev);
++	bool uc_promisc = false, mc_promisc = false;
++	struct fbnic_dev *fbd = fbn->fbd;
++	struct fbnic_mac_addr *mac_addr;
++	int err;
++
++	/* Populate host address from dev_addr */
++	mac_addr = &fbd->mac_addr[FBNIC_RPC_TCAM_MACDA_HOST_ADDR_IDX];
++	if (!ether_addr_equal(mac_addr->value.addr8, netdev->dev_addr) ||
++	    mac_addr->state != FBNIC_TCAM_S_VALID) {
++		ether_addr_copy(mac_addr->value.addr8, netdev->dev_addr);
++		mac_addr->state = FBNIC_TCAM_S_UPDATE;
++		set_bit(FBNIC_MAC_ADDR_T_UNICAST, mac_addr->act_tcam);
++	}
++
++	/* Populate broadcast address if broadcast is enabled */
++	mac_addr = &fbd->mac_addr[FBNIC_RPC_TCAM_MACDA_BROADCAST_IDX];
++	if (netdev->flags & IFF_BROADCAST) {
++		if (!is_broadcast_ether_addr(mac_addr->value.addr8) ||
++		    mac_addr->state != FBNIC_TCAM_S_VALID) {
++			eth_broadcast_addr(mac_addr->value.addr8);
++			mac_addr->state = FBNIC_TCAM_S_ADD;
++		}
++		set_bit(FBNIC_MAC_ADDR_T_BROADCAST, mac_addr->act_tcam);
++	} else if (mac_addr->state == FBNIC_TCAM_S_VALID) {
++		__fbnic_xc_unsync(mac_addr, FBNIC_MAC_ADDR_T_BROADCAST);
++	}
++
++	/* Synchronize unicast and multicast address lists */
++	err = __dev_uc_sync(netdev, fbnic_uc_sync, fbnic_uc_unsync);
++	if (err == -ENOSPC)
++		uc_promisc = true;
++	err = __dev_mc_sync(netdev, fbnic_mc_sync, fbnic_mc_unsync);
++	if (err == -ENOSPC)
++		mc_promisc = true;
++
++	uc_promisc |= !!(netdev->flags & IFF_PROMISC);
++	mc_promisc |= !!(netdev->flags & IFF_ALLMULTI) | uc_promisc;
++
++	/* Populate last TCAM entry with promiscuous entry and 0/1 bit mask */
++	mac_addr = &fbd->mac_addr[FBNIC_RPC_TCAM_MACDA_PROMISC_IDX];
++	if (uc_promisc) {
++		if (!is_zero_ether_addr(mac_addr->value.addr8) ||
++		    mac_addr->state != FBNIC_TCAM_S_VALID) {
++			eth_zero_addr(mac_addr->value.addr8);
++			eth_broadcast_addr(mac_addr->mask.addr8);
++			clear_bit(FBNIC_MAC_ADDR_T_ALLMULTI,
++				  mac_addr->act_tcam);
++			set_bit(FBNIC_MAC_ADDR_T_PROMISC,
++				mac_addr->act_tcam);
++			mac_addr->state = FBNIC_TCAM_S_ADD;
++		}
++	} else if (mc_promisc &&
++		   (!fbnic_bmc_present(fbd) || !fbd->fw_cap.all_multi)) {
++		/* We have to add a special handler for multicast as the
++		 * BMC may have an all-multi rule already in place. As such
++		 * adding a rule ourselves won't do any good so we will have
++		 * to modify the rules for the ALL MULTI below if the BMC
++		 * already has the rule in place.
++		 */
++		if (!is_multicast_ether_addr(mac_addr->value.addr8) ||
++		    mac_addr->state != FBNIC_TCAM_S_VALID) {
++			eth_zero_addr(mac_addr->value.addr8);
++			eth_broadcast_addr(mac_addr->mask.addr8);
++			mac_addr->value.addr8[0] ^= 1;
++			mac_addr->mask.addr8[0] ^= 1;
++			set_bit(FBNIC_MAC_ADDR_T_ALLMULTI,
++				mac_addr->act_tcam);
++			clear_bit(FBNIC_MAC_ADDR_T_PROMISC,
++				  mac_addr->act_tcam);
++			mac_addr->state = FBNIC_TCAM_S_ADD;
++		}
++	} else if (mac_addr->state == FBNIC_TCAM_S_VALID) {
++		if (test_bit(FBNIC_MAC_ADDR_T_BMC, mac_addr->act_tcam)) {
++			clear_bit(FBNIC_MAC_ADDR_T_ALLMULTI,
++				  mac_addr->act_tcam);
++			clear_bit(FBNIC_MAC_ADDR_T_PROMISC,
++				  mac_addr->act_tcam);
++		} else {
++			mac_addr->state = FBNIC_TCAM_S_DELETE;
 +		}
 +	}
 +
-+	for (i = 0; i < ARRAY_SIZE(irqs); i++) {
-+		if (!irqs[i])
++	/* Add rules for BMC all multicast if it is enabled */
++	fbnic_bmc_rpc_all_multi_config(fbd, mc_promisc);
++
++	/* Sift out any unshared BMC rules and place them in BMC only section */
++	fbnic_sift_macda(fbd);
++
++	/* Write updates to hardware */
++	fbnic_write_macda(fbd);
++}
++
++static void fbnic_set_rx_mode(struct net_device *netdev)
++{
++	/* No need to update the hardware if we are not running */
++	if (netif_running(netdev))
++		__fbnic_set_rx_mode(netdev);
++}
++
++static int fbnic_set_mac(struct net_device *netdev, void *p)
++{
++	struct sockaddr *addr = p;
++
++	if (!is_valid_ether_addr(addr->sa_data))
++		return -EADDRNOTAVAIL;
++
++	eth_hw_addr_set(netdev, addr->sa_data);
++
++	fbnic_set_rx_mode(netdev);
++
++	return 0;
++}
++
++void fbnic_clear_rx_mode(struct net_device *netdev)
++{
++	struct fbnic_net *fbn = netdev_priv(netdev);
++	struct fbnic_dev *fbd = fbn->fbd;
++	int idx;
++
++	for (idx = ARRAY_SIZE(fbd->mac_addr); idx--;) {
++		struct fbnic_mac_addr *mac_addr = &fbd->mac_addr[idx];
++
++		if (mac_addr->state != FBNIC_TCAM_S_VALID)
 +			continue;
-+		fbnic_wr32(fbd, FBNIC_INTR_MASK_CLEAR(i), irqs[i]);
-+		fbnic_wr32(fbd, FBNIC_INTR_SET(i), irqs[i]);
++
++		bitmap_clear(mac_addr->act_tcam,
++			     FBNIC_MAC_ADDR_T_HOST_START,
++			     FBNIC_MAC_ADDR_T_HOST_LEN);
++
++		if (bitmap_empty(mac_addr->act_tcam,
++				 FBNIC_RPC_TCAM_ACT_NUM_ENTRIES))
++			mac_addr->state = FBNIC_TCAM_S_DELETE;
 +	}
 +
-+	fbnic_wrfl(fbd);
++	/* Write updates to hardware */
++	fbnic_write_macda(fbd);
++
++	__dev_uc_unsync(netdev, NULL);
++	__dev_mc_unsync(netdev, NULL);
 +}
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-index ade502e391b7..4a206c0e7192 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-@@ -5,6 +5,7 @@
- #define _FBNIC_TXRX_H_
++
+ static const struct net_device_ops fbnic_netdev_ops = {
+ 	.ndo_open		= fbnic_open,
+ 	.ndo_stop		= fbnic_stop,
+ 	.ndo_validate_addr	= eth_validate_addr,
+ 	.ndo_start_xmit		= fbnic_xmit_frame,
+ 	.ndo_features_check	= fbnic_features_check,
++	.ndo_set_mac_address	= fbnic_set_mac,
++	.ndo_set_rx_mode	= fbnic_set_rx_mode,
+ };
  
- #include <linux/netdevice.h>
-+#include <linux/skbuff.h>
- #include <linux/types.h>
- #include <net/xdp.h>
+ void fbnic_reset_queues(struct fbnic_net *fbn,
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+index 5731197d1636..9466cf218b38 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+@@ -51,5 +51,8 @@ void fbnic_netdev_unregister(struct net_device *netdev);
+ void fbnic_reset_queues(struct fbnic_net *fbn,
+ 			unsigned int tx, unsigned int rx);
  
-@@ -120,6 +121,7 @@ void fbnic_disable(struct fbnic_net *fbn);
- void fbnic_flush(struct fbnic_net *fbn);
- void fbnic_fill(struct fbnic_net *fbn);
++void __fbnic_set_rx_mode(struct net_device *netdev);
++void fbnic_clear_rx_mode(struct net_device *netdev);
++
+ int fbnic_phylink_init(struct net_device *netdev);
+ #endif /* _FBNIC_NETDEV_H_ */
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+index 5bca1e83a608..1a88e21c8118 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+@@ -133,6 +133,8 @@ void fbnic_up(struct fbnic_net *fbn)
  
-+void fbnic_napi_depletion_check(struct net_device *netdev);
- int fbnic_wait_all_queues_idle(struct fbnic_dev *fbd, bool may_fail);
+ 	fbnic_fill(fbn);
  
- #endif /* _FBNIC_TXRX_H_ */
++	__fbnic_set_rx_mode(fbn->netdev);
++
+ 	/* Enable Tx/Rx processing */
+ 	fbnic_napi_enable(fbn);
+ 	netif_tx_start_all_queues(fbn->netdev);
+@@ -148,6 +150,7 @@ static void fbnic_down_noidle(struct fbnic_net *fbn)
+ 	fbnic_napi_disable(fbn);
+ 	netif_tx_disable(fbn->netdev);
+ 
++	fbnic_clear_rx_mode(fbn->netdev);
+ 	fbnic_disable(fbn);
+ }
+ 
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+new file mode 100644
+index 000000000000..d77a22a6e1f7
+--- /dev/null
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+@@ -0,0 +1,338 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) Meta Platforms, Inc. and affiliates. */
++
++#include <linux/etherdevice.h>
++
++#include "fbnic.h"
++#include "fbnic_netdev.h"
++#include "fbnic_rpc.h"
++
++static int fbnic_read_macda_entry(struct fbnic_dev *fbd, unsigned int idx,
++				  struct fbnic_mac_addr *mac_addr)
++{
++	__be16 *mask, *value;
++	int i;
++
++	mask = &mac_addr->mask.addr16[FBNIC_RPC_TCAM_MACDA_WORD_LEN - 1];
++	value = &mac_addr->value.addr16[FBNIC_RPC_TCAM_MACDA_WORD_LEN - 1];
++
++	for (i = 0; i < FBNIC_RPC_TCAM_MACDA_WORD_LEN; i++) {
++		u32 macda = rd32(fbd, FBNIC_RPC_TCAM_MACDA(idx, i));
++
++		*mask-- = htons(FIELD_GET(FBNIC_RPC_TCAM_MACDA_MASK, macda));
++		*value-- = htons(FIELD_GET(FBNIC_RPC_TCAM_MACDA_VALUE, macda));
++	}
++
++	return (rd32(fbd, FBNIC_RPC_TCAM_MACDA(idx, i)) &
++		FBNIC_RPC_TCAM_VALIDATE) ? 0 : -EINVAL;
++}
++
++void fbnic_bmc_rpc_all_multi_config(struct fbnic_dev *fbd,
++				    bool enable_host)
++{
++	struct fbnic_mac_addr *mac_addr;
++
++	/* We need to add the all multicast filter at the end of the
++	 * multicast address list. This way if there are any that are
++	 * shared between the host and the BMC they can be directed to
++	 * both. Otherwise the remainder just get sent directly to the
++	 * BMC.
++	 */
++	mac_addr = &fbd->mac_addr[fbd->mac_addr_boundary - 1];
++	if (fbnic_bmc_present(fbd) && fbd->fw_cap.all_multi) {
++		if (mac_addr->state != FBNIC_TCAM_S_VALID) {
++			eth_zero_addr(mac_addr->value.addr8);
++			eth_broadcast_addr(mac_addr->mask.addr8);
++			mac_addr->value.addr8[0] ^= 1;
++			mac_addr->mask.addr8[0] ^= 1;
++			set_bit(FBNIC_MAC_ADDR_T_BMC, mac_addr->act_tcam);
++			mac_addr->state = FBNIC_TCAM_S_ADD;
++		}
++		if (enable_host)
++			set_bit(FBNIC_MAC_ADDR_T_ALLMULTI,
++				mac_addr->act_tcam);
++		else
++			clear_bit(FBNIC_MAC_ADDR_T_ALLMULTI,
++				  mac_addr->act_tcam);
++	} else if (!test_bit(FBNIC_MAC_ADDR_T_BMC, mac_addr->act_tcam) &&
++		   !is_zero_ether_addr(mac_addr->mask.addr8) &&
++		   mac_addr->state == FBNIC_TCAM_S_VALID) {
++		clear_bit(FBNIC_MAC_ADDR_T_ALLMULTI, mac_addr->act_tcam);
++		clear_bit(FBNIC_MAC_ADDR_T_BMC, mac_addr->act_tcam);
++		mac_addr->state = FBNIC_TCAM_S_DELETE;
++	}
++}
++
++void fbnic_bmc_rpc_init(struct fbnic_dev *fbd)
++{
++	int i = FBNIC_RPC_TCAM_MACDA_BMC_ADDR_IDX;
++	struct fbnic_mac_addr *mac_addr;
++	u32 macda_validate;
++
++	/* Verify that RPC is already enabled, if not abort */
++	macda_validate = rd32(fbd, FBNIC_RPC_TCAM_MACDA_VALIDATE);
++	if (!(macda_validate & (1u << i)))
++		return;
++
++	/* Read BMC MACDA entry and validate it */
++	mac_addr = &fbd->mac_addr[i];
++	if (fbnic_read_macda_entry(fbd, i, mac_addr))
++		return;
++
++	/* If BMC MAC addr is valid then record it and flag it as valid */
++	if (!is_valid_ether_addr(mac_addr->value.addr8))
++		return;
++
++	set_bit(FBNIC_MAC_ADDR_T_BMC, mac_addr->act_tcam);
++	mac_addr->state = FBNIC_TCAM_S_VALID;
++
++	/* Record the BMC Multicast addresses */
++	for (i++; i < FBNIC_RPC_TCAM_MACDA_BROADCAST_IDX; i++) {
++		if (!(macda_validate & (1u << i)))
++			continue;
++
++		mac_addr = &fbd->mac_addr[i];
++		if (fbnic_read_macda_entry(fbd, i, mac_addr))
++			continue;
++
++		if (is_broadcast_ether_addr(mac_addr->value.addr8)) {
++			mac_addr->state = FBNIC_TCAM_S_DELETE;
++			continue;
++		}
++
++		if (!is_multicast_ether_addr(mac_addr->value.addr8))
++			continue;
++
++		set_bit(FBNIC_MAC_ADDR_T_BMC, mac_addr->act_tcam);
++		mac_addr->state = FBNIC_TCAM_S_VALID;
++	}
++
++	/* Validate Broadcast is also present, record it and tag it */
++	if (macda_validate & (1u << i)) {
++		mac_addr = &fbd->mac_addr[i];
++		eth_broadcast_addr(mac_addr->value.addr8);
++		set_bit(FBNIC_MAC_ADDR_T_BMC, mac_addr->act_tcam);
++		mac_addr->state = FBNIC_TCAM_S_ADD;
++	}
++
++	/* Record the shared BMC Multicast addresses */
++	for (i++; i <= FBNIC_RPC_TCAM_MACDA_PROMISC_IDX; i++) {
++		if (!(macda_validate & (1u << i)))
++			continue;
++
++		mac_addr = &fbd->mac_addr[i];
++		if (fbnic_read_macda_entry(fbd, i, mac_addr))
++			continue;
++
++		if (!is_multicast_ether_addr(mac_addr->value.addr8))
++			continue;
++
++		/* It isn't an exact match filter it must be an all-multi */
++		if (!is_zero_ether_addr(mac_addr->mask.addr8)) {
++			fbd->fw_cap.all_multi = 1;
++
++			/* If it isn't in the correct spot don't record it */
++			if (i != fbd->mac_addr_boundary - 1)
++				continue;
++		}
++
++		set_bit(FBNIC_MAC_ADDR_T_BMC, mac_addr->act_tcam);
++		mac_addr->state = FBNIC_TCAM_S_VALID;
++	}
++
++	fbnic_bmc_rpc_all_multi_config(fbd, false);
++
++	fbnic_bmc_set_present(fbd, true);
++}
++
++struct fbnic_mac_addr *__fbnic_uc_sync(struct fbnic_dev *fbd,
++				       const unsigned char *addr)
++{
++	struct fbnic_mac_addr *avail_addr = NULL;
++	unsigned int i;
++
++	/* Scan from middle of list to bottom, filling bottom up.
++	 * Skip the first entry which is reserved for dev_addr and
++	 * leave the last entry to use for promiscuous filtering.
++	 */
++	for (i = fbd->mac_addr_boundary - 1;
++	     i < FBNIC_RPC_TCAM_MACDA_HOST_ADDR_IDX; i++) {
++		struct fbnic_mac_addr *mac_addr = &fbd->mac_addr[i];
++
++		if (mac_addr->state == FBNIC_TCAM_S_DISABLED) {
++			avail_addr = mac_addr;
++		} else if (ether_addr_equal(mac_addr->value.addr8, addr)) {
++			avail_addr = mac_addr;
++			break;
++		}
++	}
++
++	if (avail_addr && avail_addr->state == FBNIC_TCAM_S_DISABLED) {
++		ether_addr_copy(avail_addr->value.addr8, addr);
++		eth_zero_addr(avail_addr->mask.addr8);
++		avail_addr->state = FBNIC_TCAM_S_ADD;
++	}
++
++	return avail_addr;
++}
++
++struct fbnic_mac_addr *__fbnic_mc_sync(struct fbnic_dev *fbd,
++				       const unsigned char *addr)
++{
++	struct fbnic_mac_addr *avail_addr = NULL;
++	unsigned int i;
++
++	/* Scan from middle of list to top, filling top down.
++	 * Skip over the address reserved for the BMC MAC and
++	 * exclude index 0 as that belongs to the broadcast address
++	 */
++	for (i = fbd->mac_addr_boundary;
++	     --i > FBNIC_RPC_TCAM_MACDA_BROADCAST_IDX;) {
++		struct fbnic_mac_addr *mac_addr = &fbd->mac_addr[i];
++
++		if (mac_addr->state == FBNIC_TCAM_S_DISABLED) {
++			avail_addr = mac_addr;
++		} else if (ether_addr_equal(mac_addr->value.addr8, addr)) {
++			avail_addr = mac_addr;
++			break;
++		}
++	}
++
++	/* Scan the BMC addresses to see if it may have already
++	 * reserved the address.
++	 */
++	while (--i) {
++		struct fbnic_mac_addr *mac_addr = &fbd->mac_addr[i];
++
++		if (!is_zero_ether_addr(mac_addr->mask.addr8))
++			continue;
++
++		/* Only move on if we find a match */
++		if (!ether_addr_equal(mac_addr->value.addr8, addr))
++			continue;
++
++		/* We need to pull this address to the shared area */
++		if (avail_addr) {
++			memcpy(avail_addr, mac_addr, sizeof(*mac_addr));
++			mac_addr->state = FBNIC_TCAM_S_DELETE;
++			avail_addr->state = FBNIC_TCAM_S_ADD;
++		}
++
++		break;
++	}
++
++	if (avail_addr && avail_addr->state == FBNIC_TCAM_S_DISABLED) {
++		ether_addr_copy(avail_addr->value.addr8, addr);
++		eth_zero_addr(avail_addr->mask.addr8);
++		avail_addr->state = FBNIC_TCAM_S_ADD;
++	}
++
++	return avail_addr;
++}
++
++int __fbnic_xc_unsync(struct fbnic_mac_addr *mac_addr, unsigned int tcam_idx)
++{
++	if (!test_and_clear_bit(tcam_idx, mac_addr->act_tcam))
++		return -ENOENT;
++
++	if (bitmap_empty(mac_addr->act_tcam, FBNIC_RPC_TCAM_ACT_NUM_ENTRIES))
++		mac_addr->state = FBNIC_TCAM_S_DELETE;
++
++	return 0;
++}
++
++void fbnic_sift_macda(struct fbnic_dev *fbd)
++{
++	int dest, src;
++
++	/* Move BMC only addresses back into BMC region */
++	for (dest = FBNIC_RPC_TCAM_MACDA_BMC_ADDR_IDX,
++	     src = FBNIC_RPC_TCAM_MACDA_MULTICAST_IDX;
++	     ++dest < FBNIC_RPC_TCAM_MACDA_BROADCAST_IDX &&
++	     src < fbd->mac_addr_boundary;) {
++		struct fbnic_mac_addr *dest_addr = &fbd->mac_addr[dest];
++
++		if (dest_addr->state != FBNIC_TCAM_S_DISABLED)
++			continue;
++
++		while (src < fbd->mac_addr_boundary) {
++			struct fbnic_mac_addr *src_addr = &fbd->mac_addr[src++];
++
++			/* Verify BMC bit is set */
++			if (!test_bit(FBNIC_MAC_ADDR_T_BMC, src_addr->act_tcam))
++				continue;
++
++			/* Verify filter isn't already disabled */
++			if (src_addr->state == FBNIC_TCAM_S_DISABLED ||
++			    src_addr->state == FBNIC_TCAM_S_DELETE)
++				continue;
++
++			/* Verify only BMC bit is set */
++			if (bitmap_weight(src_addr->act_tcam,
++					  FBNIC_RPC_TCAM_ACT_NUM_ENTRIES) != 1)
++				continue;
++
++			/* Verify we are not moving wildcard address */
++			if (!is_zero_ether_addr(src_addr->mask.addr8))
++				continue;
++
++			memcpy(dest_addr, src_addr, sizeof(*src_addr));
++			src_addr->state = FBNIC_TCAM_S_DELETE;
++			dest_addr->state = FBNIC_TCAM_S_ADD;
++		}
++	}
++}
++
++static void fbnic_clear_macda_entry(struct fbnic_dev *fbd, unsigned int idx)
++{
++	int i;
++
++	/* Invalidate entry and clear addr state info */
++	for (i = 0; i <= FBNIC_RPC_TCAM_MACDA_WORD_LEN; i++)
++		wr32(fbd, FBNIC_RPC_TCAM_MACDA(idx, i), 0);
++}
++
++static void fbnic_write_macda_entry(struct fbnic_dev *fbd, unsigned int idx,
++				    struct fbnic_mac_addr *mac_addr)
++{
++	__be16 *mask, *value;
++	int i;
++
++	mask = &mac_addr->mask.addr16[FBNIC_RPC_TCAM_MACDA_WORD_LEN - 1];
++	value = &mac_addr->value.addr16[FBNIC_RPC_TCAM_MACDA_WORD_LEN - 1];
++
++	for (i = 0; i < FBNIC_RPC_TCAM_MACDA_WORD_LEN; i++)
++		wr32(fbd, FBNIC_RPC_TCAM_MACDA(idx, i),
++		     FIELD_PREP(FBNIC_RPC_TCAM_MACDA_MASK, ntohs(*mask--)) |
++		     FIELD_PREP(FBNIC_RPC_TCAM_MACDA_VALUE, ntohs(*value--)));
++
++	wrfl(fbd);
++
++	wr32(fbd, FBNIC_RPC_TCAM_MACDA(idx, i), FBNIC_RPC_TCAM_VALIDATE);
++}
++
++void fbnic_write_macda(struct fbnic_dev *fbd)
++{
++	int idx;
++
++	for (idx = ARRAY_SIZE(fbd->mac_addr); idx--;) {
++		struct fbnic_mac_addr *mac_addr = &fbd->mac_addr[idx];
++
++		/* Check if update flag is set else exit. */
++		if (!(mac_addr->state & FBNIC_TCAM_S_UPDATE))
++			continue;
++
++		/* Clear by writing 0s. */
++		if (mac_addr->state == FBNIC_TCAM_S_DELETE) {
++			/* Invalidate entry and clear addr state info */
++			fbnic_clear_macda_entry(fbd, idx);
++			memset(mac_addr, 0, sizeof(*mac_addr));
++
++			continue;
++		}
++
++		fbnic_write_macda_entry(fbd, idx, mac_addr);
++
++		mac_addr->state = FBNIC_TCAM_S_VALID;
++	}
++}
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.h b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.h
+new file mode 100644
+index 000000000000..1b59b10ba677
+--- /dev/null
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.h
+@@ -0,0 +1,139 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (c) Meta Platforms, Inc. and affiliates. */
++
++#ifndef _FBNIC_RPC_H_
++#define _FBNIC_RPC_H_
++
++#include <uapi/linux/in6.h>
++#include <linux/bitfield.h>
++
++/*  The TCAM state definitions follow an expected ordering.
++ *  They start out disabled, then move through the following states:
++ *  Disabled  0	-> Add	      2
++ *  Add	      2	-> Valid      1
++ *
++ *  Valid     1	-> Add/Update 2
++ *  Add	      2	-> Valid      1
++ *
++ *  Valid     1	-> Delete     3
++ *  Delete    3	-> Disabled   0
++ */
++enum {
++	FBNIC_TCAM_S_DISABLED	= 0,
++	FBNIC_TCAM_S_VALID	= 1,
++	FBNIC_TCAM_S_ADD	= 2,
++	FBNIC_TCAM_S_UPDATE	= FBNIC_TCAM_S_ADD,
++	FBNIC_TCAM_S_DELETE	= 3,
++};
++
++/* 32 MAC Destination Address TCAM Entries
++ * 4 registers DA[1:0], DA[3:2], DA[5:4], Validate
++ */
++#define FBNIC_RPC_TCAM_MACDA_WORD_LEN		3
++#define FBNIC_RPC_TCAM_MACDA_NUM_ENTRIES	32
++
++#define FBNIC_RPC_TCAM_ACT_WORD_LEN		11
++#define FBNIC_RPC_TCAM_ACT_NUM_ENTRIES		64
++
++struct fbnic_mac_addr {
++	union {
++		unsigned char addr8[ETH_ALEN];
++		__be16 addr16[FBNIC_RPC_TCAM_MACDA_WORD_LEN];
++	} mask, value;
++	unsigned char state;
++	DECLARE_BITMAP(act_tcam, FBNIC_RPC_TCAM_ACT_NUM_ENTRIES);
++};
++
++struct fbnic_act_tcam {
++	struct {
++		u16 tcam[FBNIC_RPC_TCAM_ACT_WORD_LEN];
++	} mask, value;
++	unsigned char state;
++	u16 rss_en_mask;
++	u32 dest;
++};
++
++enum {
++	FBNIC_RSS_EN_HOST_ETHER,
++	FBNIC_RSS_EN_XCAST_ETHER,
++#define FBNIC_RSS_EN_NUM_UNICAST FBNIC_RSS_EN_XCAST_ETHER
++	FBNIC_RSS_EN_NUM_ENTRIES
++};
++
++/* Reserve the first 2 entries for the use by the BMC so that we can
++ * avoid allowing rules to get in the way of BMC unicast traffic.
++ */
++#define FBNIC_RPC_ACT_TBL_BMC_OFFSET		0
++#define FBNIC_RPC_ACT_TBL_BMC_ALL_MULTI_OFFSET	1
++
++/* We reserve the last 14 entries for RSS rules on the host. The BMC
++ * unicast rule will need to be populated above these and is expected to
++ * use MACDA TCAM entry 23 to store the BMC MAC address.
++ */
++#define FBNIC_RPC_ACT_TBL_RSS_OFFSET \
++	(FBNIC_RPC_ACT_TBL_NUM_ENTRIES - FBNIC_RSS_EN_NUM_ENTRIES)
++
++/* Flags used to identify the owner for this MAC filter. Note that any
++ * flags set for Broadcast thru Promisc indicate that the rule belongs
++ * to the RSS filters for the host.
++ */
++enum {
++	FBNIC_MAC_ADDR_T_BMC            = 0,
++	FBNIC_MAC_ADDR_T_BROADCAST	= FBNIC_RPC_ACT_TBL_RSS_OFFSET,
++#define FBNIC_MAC_ADDR_T_HOST_START	FBNIC_MAC_ADDR_T_BROADCAST
++	FBNIC_MAC_ADDR_T_MULTICAST,
++	FBNIC_MAC_ADDR_T_UNICAST,
++	FBNIC_MAC_ADDR_T_ALLMULTI,	/* BROADCAST ... MULTICAST*/
++	FBNIC_MAC_ADDR_T_PROMISC,	/* BROADCAST ... UNICAST */
++	FBNIC_MAC_ADDR_T_HOST_LAST
++};
++
++#define FBNIC_MAC_ADDR_T_HOST_LEN \
++	(FBNIC_MAC_ADDR_T_HOST_LAST - FBNIC_MAC_ADDR_T_HOST_START)
++
++#define FBNIC_RPC_TCAM_ACT1_L2_MACDA_IDX	CSR_GENMASK(9, 5)
++#define FBNIC_RPC_TCAM_ACT1_L2_MACDA_VALID	CSR_BIT(10)
++
++/* TCAM 0 - 3 reserved for BMC MAC addresses */
++#define FBNIC_RPC_TCAM_MACDA_BMC_ADDR_IDX	0
++/* TCAM 4 reserved for broadcast MAC address */
++#define FBNIC_RPC_TCAM_MACDA_BROADCAST_IDX	4
++/* TCAMs 5 - 30 will be used for multicast and unicast addresses. The
++ * boundary between the two can be variable it is currently set to 24
++ * on which the unicast addresses start. The general idea is that we will
++ * always go top-down with unicast, and bottom-up with multicast so that
++ * there should be free-space in the middle between the two.
++ *
++ * The entry at MADCA_DEFAULT_BOUNDARY is a special case as it can be used
++ * for the ALL MULTI address if the list is full, or the BMC has requested
++ * it.
++ */
++#define FBNIC_RPC_TCAM_MACDA_MULTICAST_IDX	5
++#define FBNIC_RPC_TCAM_MACDA_DEFAULT_BOUNDARY	24
++#define FBNIC_RPC_TCAM_MACDA_HOST_ADDR_IDX	30
++/* Reserved for use to record Multicast promisc, or Promiscuous */
++#define FBNIC_RPC_TCAM_MACDA_PROMISC_IDX	31
++
++struct fbnic_dev;
++
++void fbnic_bmc_rpc_init(struct fbnic_dev *fbd);
++void fbnic_bmc_rpc_all_multi_config(struct fbnic_dev *fbd, bool enable_host);
++
++int __fbnic_xc_unsync(struct fbnic_mac_addr *mac_addr, unsigned int tcam_idx);
++struct fbnic_mac_addr *__fbnic_uc_sync(struct fbnic_dev *fbd,
++				       const unsigned char *addr);
++struct fbnic_mac_addr *__fbnic_mc_sync(struct fbnic_dev *fbd,
++				       const unsigned char *addr);
++void fbnic_sift_macda(struct fbnic_dev *fbd);
++void fbnic_write_macda(struct fbnic_dev *fbd);
++
++static inline int __fbnic_uc_unsync(struct fbnic_mac_addr *mac_addr)
++{
++	return __fbnic_xc_unsync(mac_addr, FBNIC_MAC_ADDR_T_UNICAST);
++}
++
++static inline int __fbnic_mc_unsync(struct fbnic_mac_addr *mac_addr)
++{
++	return __fbnic_xc_unsync(mac_addr, FBNIC_MAC_ADDR_T_MULTICAST);
++}
++#endif /* _FBNIC_RPC_H_ */
 
 
 
