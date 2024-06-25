@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-106570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88940916DBD
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 18:07:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58006916DBE
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 18:07:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0D311C22C9E
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:07:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05D921F25205
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:07:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19E017082D;
-	Tue, 25 Jun 2024 16:07:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 978B8170841;
+	Tue, 25 Jun 2024 16:07:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b="L/sr8IJO"
+	dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b="Kq+jbluL"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.savoirfairelinux.com (mail.savoirfairelinux.com [208.88.110.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5712614C59C
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 16:06:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCE215382E
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 16:06:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.88.110.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719331620; cv=none; b=pBaOBmHInnuX0XZFjPlvYo7qQvmWyZv42jMhoPgCrPLaajyUJNoYpSTALwZTcvAZealzXFM6qzTilfetwwwjaKZ6yuZ3D9En6DlV2gfKi/RUJ5lT64pf49YPTpvkO/yNLEjK4xQi+n50c00iPXzlhXEme/vIcciBCix3SXFDDmc=
+	t=1719331621; cv=none; b=iNuqjzavkh+9VQajQTs9SjT/HxB40XThFMSPxj2R+o2WEgSCHsyA0BScJ5Xzv4Wn7ruLSvij23wjc9M9MRMSA1eH7LrbvfZ2pCzGpRMo0TE90lN6ziJgLaR0qPTyRyN2Zwvf78elBjEXz9Yx+KkqfgHNKK6Z+e6zBmh4z8rG/aI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719331620; c=relaxed/simple;
-	bh=dZ2uE05uHAVQOEUn8hGjYOZSVq30WDBnsYrUNfbPpR8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=b289y/0Um4/6LcSyJe1ToHUQIj8uAXtZRSF6vRh316gx1HFrQsvRptIPdjOMNPA/wFVLDV2icGLytqrcwPeJ2UsuVbEo04Dc9MHkVPpt6Ol7k01MOiu1hNDDVfmWBaDkwNg+fLHG5r060c2+WXPbLKyEkzKMEtRtpGwpOSl/D30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com; spf=pass smtp.mailfrom=savoirfairelinux.com; dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b=L/sr8IJO; arc=none smtp.client-ip=208.88.110.44
+	s=arc-20240116; t=1719331621; c=relaxed/simple;
+	bh=6GzaBJMDsOliriiMLi2upwAx/AQh0bkBiX/dP6PmIPo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=mp/K3IsulMMUxu4ibpWq7V6J4Zt/7Q5iRDTseU2t9pZ4y3v5M5OmCp9j4PnNdTo+yAopPhDpdettDuhX7qJhFexlYJXEU9UlCRbQAVR7Rxu6iPSp/P881IZFoIBMYHE3Vt+0Koq1epTCaif2DjMd5ALYDVFL0Vb3dP1w1/Kb2mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com; spf=pass smtp.mailfrom=savoirfairelinux.com; dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b=Kq+jbluL; arc=none smtp.client-ip=208.88.110.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=savoirfairelinux.com
 Received: from localhost (localhost [127.0.0.1])
-	by mail.savoirfairelinux.com (Postfix) with ESMTP id 430789C57BD;
-	Tue, 25 Jun 2024 12:06:51 -0400 (EDT)
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id 5FC849C5C1C;
+	Tue, 25 Jun 2024 12:06:52 -0400 (EDT)
 Received: from mail.savoirfairelinux.com ([127.0.0.1])
  by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10032)
- with ESMTP id MVKp1bS9hbx8; Tue, 25 Jun 2024 12:06:50 -0400 (EDT)
+ with ESMTP id 7eMM8_yoF4gf; Tue, 25 Jun 2024 12:06:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
-	by mail.savoirfairelinux.com (Postfix) with ESMTP id 81C219C59F2;
-	Tue, 25 Jun 2024 12:06:50 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.savoirfairelinux.com 81C219C59F2
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id CA3C89C59F2;
+	Tue, 25 Jun 2024 12:06:51 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.savoirfairelinux.com CA3C89C59F2
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=savoirfairelinux.com; s=DFC430D2-D198-11EC-948E-34200CB392D2;
-	t=1719331610; bh=dZ2uE05uHAVQOEUn8hGjYOZSVq30WDBnsYrUNfbPpR8=;
+	t=1719331611; bh=lqjnZGFiynUWTvexOpISDPPCpdHav5ZGL45gJr+nohg=;
 	h=From:To:Date:Message-Id:MIME-Version;
-	b=L/sr8IJOo6MkaHo3pCBWhwjOCXMkn2I+fjOpg7x7nuCbZyHgN/fuR0c49lZ5XtlUo
-	 lk6jd7C4QjJynBrfgNoILUaXEir+k6hcWWiS43bXtOhP31w4OTYpoeXQo+5aOlVjfK
-	 9gqksuiJsvuCB0En+M2zyvA6xz8zUAhPvO4HQ4s1NH2E5xuG21NuibPPGpXfkNC0ZD
-	 V9/EcSo3ozHjQZW7D5zrV3Ne9btdSlFM4B5NY59CrZPA8WDhgQqVH4BJr8ZRbMbhXP
-	 1m0g/AFNC0LiD+bbAZu/7Fiyb7LMkC2nFOkmFZvepILAams1fiRxWqu1ADr8lyyAz/
-	 beJ3JBotps2MQ==
+	b=Kq+jbluLo/FkdbLDXJbqNoNl0ozqByxmd0iNtfEbpIit5FFACfxO5K7ku7m9Xzaz5
+	 mVLis+VVtNTe9scoG9Frg3NqzHoBKYBvvRoa2o0uH/5y/NJva4xHwgCoKvp4SmnVwh
+	 JNrKmPG5BAOde5soMl9u4gsev3JW/xml9uY0TfkFsF3Ht58CKr+Z88gghjtiNwCqOS
+	 8B9moLYomarWHMHOarmArEUIw2BTRQX2cit+UyvDmJsdd/n13ol4D//XMcNJV3Wayv
+	 fue5LAEIxFFgj5zuU6uG2T++k2/G3EZ9blXIhmNJuLxFSEOKwjrJPdBR1ppFeVdhaH
+	 P7oc6sbKBFJjw==
 X-Virus-Scanned: amavis at mail.savoirfairelinux.com
 Received: from mail.savoirfairelinux.com ([127.0.0.1])
  by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10026)
- with ESMTP id EYM5afakkMP2; Tue, 25 Jun 2024 12:06:50 -0400 (EDT)
+ with ESMTP id 4KBK7w8zJtzj; Tue, 25 Jun 2024 12:06:51 -0400 (EDT)
 Received: from sfl-deribaucourt.rennes.sfl (80-15-101-118.ftth.fr.orangecustomers.net [80.15.101.118])
-	by mail.savoirfairelinux.com (Postfix) with ESMTPSA id 4BBC49C57BD;
-	Tue, 25 Jun 2024 12:06:49 -0400 (EDT)
+	by mail.savoirfairelinux.com (Postfix) with ESMTPSA id 94AEF9C5C1C;
+	Tue, 25 Jun 2024 12:06:50 -0400 (EDT)
 From: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -66,11 +67,14 @@ Cc: andrew@lunn.ch,
 	UNGLinuxDriver@microchip.com,
 	horms@kernel.org,
 	Tristram.Ha@microchip.com,
-	Arun.Ramadoss@microchip.com
-Subject: [PATCH net v8 0/3] Handle new Microchip KSZ 9897 Errata
-Date: Tue, 25 Jun 2024 16:05:17 +0000
-Message-Id: <20240625160520.358945-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+	Arun.Ramadoss@microchip.com,
+	Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+Subject: [PATCH net v8 1/3] net: phy: micrel: add Microchip KSZ 9477 to the device table
+Date: Tue, 25 Jun 2024 16:05:18 +0000
+Message-Id: <20240625160520.358945-2-enguerrand.de-ribaucourt@savoirfairelinux.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240625160520.358945-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+References: <20240625160520.358945-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,40 +83,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-These patches implement some suggested workarounds from the Microchip KSZ=
- 9897
-Errata [1].
+PHY_ID_KSZ9477 was supported but not added to the device table passed to
+MODULE_DEVICE_TABLE.
 
-[1] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Produc=
-tDocuments/Errata/KSZ9897R-Errata-DS80000758.pdf
-
+Fixes: fc3973a1fa09 ("phy: micrel: add Microchip KSZ 9477 Switch PHY supp=
+ort")
+Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirf=
+airelinux.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
-v8:
- - split monitoring function in two to fit into 80 columns
-v7: https://lore.kernel.org/netdev/20240621144322.545908-1-enguerrand.de-=
-ribaucourt@savoirfairelinux.com/
- - use dev_crit_once instead of dev_crit_ratelimited
- - add a comment to help users understand the consequences of half-duplex=
- errors
-v6: https://lore.kernel.org/netdev/20240614094642.122464-1-enguerrand.de-=
-ribaucourt@savoirfairelinux.com/
- - remove KSZ9897 phy_id workaround (was a configuration issue)
- - use macros for checking link down in monitoring function
- - check if VLAN is enabled before monitoring resources
-v5: https://lore.kernel.org/all/20240604092304.314636-1-enguerrand.de-rib=
+v4:
+ - rebase on net/main
+ - add Fixes tag
+v3: https://lore.kernel.org/all/20240530102436.226189-4-enguerrand.de-rib=
 aucourt@savoirfairelinux.com/
- - use macros for bitfields
- - rewrap comments
- - check ksz_pread* return values
- - fix spelling mistakes
- - remove KSZ9477 suspend/resume deletion patch
-v4: https://lore.kernel.org/all/20240531142430.678198-1-enguerrand.de-rib=
-aucourt@savoirfairelinux.com/
- - Rebase on net/main
- - Add Fixes: tags to the patches
- - reverse x-mas tree order
- - use pseudo phy_id instead of match_phy_device
-v3: https://lore.kernel.org/all/20240530102436.226189-1-enguerrand.de-rib=
-aucourt@savoirfairelinux.com/
+---
+ drivers/net/phy/micrel.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index 5aada7cf3da7..ebafedde0ab7 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -5607,6 +5607,7 @@ static struct mdio_device_id __maybe_unused micrel_=
+tbl[] =3D {
+ 	{ PHY_ID_KSZ8081, MICREL_PHY_ID_MASK },
+ 	{ PHY_ID_KSZ8873MLL, MICREL_PHY_ID_MASK },
+ 	{ PHY_ID_KSZ886X, MICREL_PHY_ID_MASK },
++	{ PHY_ID_KSZ9477, MICREL_PHY_ID_MASK },
+ 	{ PHY_ID_LAN8814, MICREL_PHY_ID_MASK },
+ 	{ PHY_ID_LAN8804, MICREL_PHY_ID_MASK },
+ 	{ PHY_ID_LAN8841, MICREL_PHY_ID_MASK },
+--=20
+2.34.1
 
 
