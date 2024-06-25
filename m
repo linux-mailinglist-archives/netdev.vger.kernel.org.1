@@ -1,259 +1,185 @@
-Return-Path: <netdev+bounces-106637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D36291712B
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 21:37:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68734917142
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 21:51:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 761A41C2274C
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 19:37:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A962287F83
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 19:51:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3515B17C9F7;
-	Tue, 25 Jun 2024 19:37:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D4D179206;
+	Tue, 25 Jun 2024 19:51:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HiUUEpbu"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="rKucC3el"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8373417C7CA;
-	Tue, 25 Jun 2024 19:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC92146A93;
+	Tue, 25 Jun 2024 19:50:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719344263; cv=none; b=ockiCg2Kq/xKgnH92l6eSg00YaR2zttvNBwt7vdcWa46xSUtOPDFpHV21zSa/XEzYX5uAYwM0ofJawBliOO0+1BFar1GZbQYJYjLjeKva0H8IkkBmNPCj7FtDGuDCVyf7Oa+aULvd41c6OJQCpFm012X+fyJUtCawG61f/4fP48=
+	t=1719345062; cv=none; b=qRJVUdFEp1gdr12wz7ovrDe5itmhh6l2YTIcmDFa5h3Yo6W9sZ9xkFOt4hxJk2zANXddU7eybDbEvcEQMoy/GRbtZzdRnKodAZ4bF2FWOoWIeMddqGRrA+jQslY6uVBQb6YFxeu/72ylep+aXCF614DV89zUyyqKcYZ5IQNJtmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719344263; c=relaxed/simple;
-	bh=Qd0vNLXHaY8M9RUSjAE8SM2AvwHfmAMJLOPNB2nH9y4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=btpQ/uIdnfjQ4Y6ldr9BOjCuuvBAz2dPxFjWenjPQGM8cyoTd2/4tI9hg7qlEWCBs8IqL9bhz1WUmXYtfGSJQ/YmE4V39NHyzSdJ6D6ueXfFvh7jHm3NQ7/UyiITioB2k8ZDCEqT2pxQ3F1UOXtDcVogty5UNjdtr+Sq7M+gnic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HiUUEpbu; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-706683e5249so2746820b3a.2;
-        Tue, 25 Jun 2024 12:37:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719344261; x=1719949061; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OCnr3FewRta5Yf5iM2Qg025VUaSqFbbQ41pNNx8ZWwI=;
-        b=HiUUEpbuZUeDMqdCn0pNK25ONvkbgwa6pMEEcML68nE8XOI0SrzZ+CA2vJIIz99J7e
-         8S0vHiO6YfQCz72I1lcd0qy0E+HITl2ObXfue0yOc9VSs9PHn5mEZEQAc+19PvbexyqX
-         9L7wJIVXssIHDhW9jo6NBM8F+2th4BDdmMmPHq++PQPp7hdtXviK7QEV6oNyUs3uERLz
-         dBfhztiiyiuwtm9r0Cygx7HCm/NzjXihNWW6cywYQ0WjWZRZeq336shTh44EYfGJMUeu
-         iOZmXnOjoCMlm++d4A301rw9LOrQWQlr2Bh0eyl02Z3Lj4YOXw6Boy+sn37ZE0Wjmuco
-         +yHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719344261; x=1719949061;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OCnr3FewRta5Yf5iM2Qg025VUaSqFbbQ41pNNx8ZWwI=;
-        b=mcf+SpmY8vsWf9dI+z3UfWv+zWOCAbe1+cK9fD4c9wUsVVlpy1Ir7biT0nxKZ8ziaq
-         q/gBI9U20Km1kj2CiSmQs4bc9fc+gS7jvg6xaUSZIqSWQEXM0noQJ+xAac6/3RB6n/io
-         UG3ImgT5eaH6s/vIdWXsEsVJhIgEMQaNaUnz5XFnRWrq/sykEHKQHq8u/1LTpI0CkJFd
-         ILhELKNdITYqKvbHJKuy+wHaZ3zXzKTwDwT3aHO9JA6AiIHl87ND7esrlPtKx11UouWd
-         97EUzOZwrWT+14GTujsetGkTdpbgoi39TwnAIAr7jI14YM5cU6LeuEvFcPRnaeS2hmwh
-         /m5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVPAW+GXlf1lK9S4tR4s92b3KcNLRCnJp/vcJ357MXqllAvbMlq2Y/vvKMrKtkhwttUyc2ZmIogVTI51onABayb49iy7bwAbkcPDss6wU3XlXg8MV6vDjEF7jb3Tv8F61HEYdG0tIMjYZjxxRJDNoaBa08SzoczVGtnVd/7
-X-Gm-Message-State: AOJu0YzqOBEHJ2UB32GjRIsQGxyYahDsHIrJp599ronKC6+qv0Gq1/SS
-	A5VA9fnBnVOclUOhtOLHt9E7JMyNYaOGt8Xfu3CJ3cM+b9Sdg0JN
-X-Google-Smtp-Source: AGHT+IG2zR1Tmm0AmkmJX2i38kKfmcO0ouIa2qMOuIAOByTtcpca9rRt/jIwPcBwjk7EBhkKXSdJQw==
-X-Received: by 2002:a05:6a21:99a2:b0:1b5:d10b:d1ac with SMTP id adf61e73a8af0-1bcf7eae249mr9409054637.19.1719344260723;
-        Tue, 25 Jun 2024 12:37:40 -0700 (PDT)
-Received: from localhost ([98.97.39.193])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c7e53e0b9asm11233978a91.23.2024.06.25.12.37.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jun 2024 12:37:39 -0700 (PDT)
-Date: Tue, 25 Jun 2024 12:37:39 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- Geliang Tang <geliang@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>, 
- Jakub Sitnicki <jakub@cloudflare.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- David Ahern <dsahern@kernel.org>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Eduard Zingerman <eddyz87@gmail.com>, 
- Mykola Lysenko <mykolal@fb.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@google.com>, 
- Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- Mykyta Yatsenko <yatsenko@meta.com>, 
- Miao Xu <miaxu@meta.com>, 
- Yuran Pereira <yuran.pereira@hotmail.com>, 
- Huacai Chen <chenhuacai@kernel.org>, 
- Tiezhu Yang <yangtiezhu@loongson.cn>, 
- Geliang Tang <tanggeliang@kylinos.cn>, 
- netdev@vger.kernel.org, 
- bpf@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Message-ID: <667b1c8325bf1_54242089e@john.notmuch>
-In-Reply-To: <CANn89i+ET4U+4viDPq2vZhxeUT90kZz5mdh3XVqQhaAXnbs=rw@mail.gmail.com>
-References: <cover.1719302367.git.tanggeliang@kylinos.cn>
- <072709ce77b04dc77523d4e8763c1fb47bf0913d.1719302367.git.tanggeliang@kylinos.cn>
- <CANn89i+ET4U+4viDPq2vZhxeUT90kZz5mdh3XVqQhaAXnbs=rw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 1/4] skmsg: null check for sg_page in
- sk_msg_recvmsg
+	s=arc-20240116; t=1719345062; c=relaxed/simple;
+	bh=q61SoAdox/WBBhi8gn9DCoq2ivzhK0IMMq8W3Jhug4k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ab/HnTOdElvx5r+6T0YsRURcScFApsmFKMC3H2BlW9syn4ncs/UYSr6TG8esLaJIwGwuZ9G15a06QfHE7bM774a8sCODmgHJQftXdefJ9ZP4CksRVsc7mpG/0ZgjMVQZpBGbFhMXr53LO+oUud16Nt2GgUOB5oLoyRXzw02AaC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=rKucC3el; arc=none smtp.client-ip=212.227.15.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1719345035; x=1719949835; i=markus.elfring@web.de;
+	bh=KcJwEYMmFuTXnPbYkFDyuXTVqSseTQFqloyrkEmiI6I=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=rKucC3elPTnFm33WhFmEvn77UdN2AdhtvKJ/QSTSf+OsE8BGiOexImvt3c22h6TI
+	 +c6frwvGTp3BYZQJAFQTy3vDIfl39aYcxzMRF6A06MblBeD660Jd8p7XCM338atco
+	 wCZF5ZCojaWfbKmpp05t1tO5qWSPf6TWS3V0zsQUhvQWTUIVnPstm1P5R8VqWE1KZ
+	 aJ7Z6hI5YfwBD40CFrwtzgT0dt5/6CEwvE89Px53rnF/T+ng0M6NCAx28VtZ5cbBY
+	 ayqKrNSLlDjmYRF3cNjZ7ZYV+uG6fy3wL6Nm3+dTLw+CwE2tC9FSvmEnCAsjzsskD
+	 hierygOKjsFwXKhSOw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mav6t-1ssUfA1PwZ-00iCyu; Tue, 25
+ Jun 2024 21:50:35 +0200
+Message-ID: <f3514471-9978-4aad-af40-e4970827a61b@web.de>
+Date: Tue, 25 Jun 2024 21:50:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net PATCH v2 0/7] octeontx2-af: Fix klockwork issues in AF
+ driver
+To: Suman Ghosh <sumang@marvell.com>, netdev@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jerin Jacob <jerinj@marvell.com>, Eric Dumazet <edumazet@google.com>,
+ Geethasowjanya Akula <gakula@marvell.com>,
+ Hariprasad Kelam <hkelam@marvell.com>, Linu Cherian <lcherian@marvell.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>
+References: <20240625173350.1181194-1-sumang@marvell.com>
+ <8fd713c2-5b85-4223-8a06-f2cedc2a1fb8@web.de>
+ <SJ0PR18MB52166806AA7FB13ED3DC3E39DBD52@SJ0PR18MB5216.namprd18.prod.outlook.com>
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <SJ0PR18MB52166806AA7FB13ED3DC3E39DBD52@SJ0PR18MB5216.namprd18.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:GE+CfSs9XOZOEKhKPKItjAxMU1YqSmDmV73dAO3WNcpIb+msumA
+ HB9eLZ1/qRE1GRMuB/2cb9/lkBTx21yVC9wJ0fubxaqpEEjx/rtCxNdteybelAeerQvaLZY
+ 0XQji1v+inv2MF6cDtI6vkK5ZyKj8S3aP36PKssc3StNPAofLP2L54YA27O2smLE1+IKbQj
+ QB71lTvUafbidldjaYsoQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:8K86JjzKEYA=;hjqg9zQBQB/0YIEKCocP9JVCGAb
+ a0Pmlxui+B44I+Fpmzx9+VWv4xUi34CThsb17ByT9II5ASayUBtJYSWGP0lakI/ASabcf1rvR
+ QBs/dOdXYmx/LuwywWf0pwe0+q0/uW8ZwLKmVBe3+hVWoxc2jr1yrOd7psir/bQSfA/0Xaqy+
+ 4xTyGfoB5vr7MVvi9wuFQ9NQmfMri+x8zdyhpglBh9/NpJIs/f6ruryqlDrYXmfw18t3RgXia
+ GxbbuaiCU9g7tUbFSy4M1F0qdwB+xz47qsZvbHsnerLazcD8dLnOulFGfChO42IN3qRu9v6DK
+ rLqX9IXRIY2cV+vI6P8JRCpFMAdDKS2KYaRba86BZKb8jBvO9utS2UsEeQJ1oAulyQcn8S4na
+ yXz6yHySadXT9gk9U8/iDXLMQZ2PfkdXbNbTGwWVbOiWn9xhYVNHwqxTFCH/Xqw8fm5LeFzkz
+ IbvUIMAX9IKZjA+E0qos4LY6uf4Rh3SHbplNAkSGlEn9Wol14PKSgEaEEM7X4r+hou+h6NxEv
+ jKzqFt3eNGDKIuHZ5CHiWV/FkwR/ox458WuLJ+iDbSDqaUg9CsuwSsICp4ZCTx/QYk6Pk88rg
+ PndbA5hTn53Dw2BPoJv9ohKJPV/AcG2qjiIExuAgf5b+wOtPjDd5O7s7+cnWSxaGEQookHxvX
+ 9xUy6fVqbMxXVQ/HENyf86NAqn6F4Iaga8lp9BET12x6IZSZnqOoeGELV2aAk7ytsqx0iclxH
+ mbteoDgW1XwyXryi07o/vuMRH241/pl6YFldMERXIKJze/x4GgEaDLTKama99sxRdIFsAqieh
+ AyE7fVuKKFpzDRmnl28SAfVkXOT1c4aAKf9hw0+qZfkEY=
 
-Eric Dumazet wrote:
-> On Tue, Jun 25, 2024 at 10:25=E2=80=AFAM Geliang Tang <geliang@kernel.o=
-rg> wrote:
-> >
-> > From: Geliang Tang <tanggeliang@kylinos.cn>
-> >
-> > Run the following BPF selftests on Loongarch:
-> >
-> > ./test_progs -t sockmap_basic
-> >
-> > A Kernel panic occurs:
-> >
-> > '''
-> >  Oops[#1]:
-> >  CPU: 22 PID: 2824 Comm: test_progs Tainted: G           OE      6.10=
-.0-rc2+ #18
-> >  Hardware name: LOONGSON Dabieshan/Loongson-TC542F0, BIOS Loongson-UD=
-K2018-V4.0.11
-> >  pc 9000000004162774 ra 90000000048bf6c0 tp 90001000aa16c000 sp 90001=
-000aa16fb90
-> >  a0 0000000000000000 a1 0000000000000000 a2 0000000000000000 a3 90001=
-000aa16fd70
-> >  a4 0000000000000800 a5 0000000000000000 a6 000055557b63aae8 a7 00000=
-000000000cf
-> >  t0 0000000000000000 t1 0000000000004000 t2 0000000000000048 t3 00000=
-00000000000
-> >  t4 0000000000000001 t5 0000000000000002 t6 0000000000000001 t7 00000=
-00000000002
-> >  t8 0000000000000018 u0 9000000004856150 s9 0000000000000000 s0 00000=
-00000000000
-> >  s1 0000000000000000 s2 90001000aa16fd70 s3 0000000000000000 s4 00000=
-00000000000
-> >  s5 0000000000004000 s6 900010009284dc00 s7 0000000000000001 s8 90001=
-0009284dc00
-> >     ra: 90000000048bf6c0 sk_msg_recvmsg+0x120/0x560
-> >    ERA: 9000000004162774 copy_page_to_iter+0x74/0x1c0
-> >   CRMD: 000000b0 (PLV0 -IE -DA +PG DACF=3DCC DACM=3DCC -WE)
-> >   PRMD: 0000000c (PPLV0 +PIE +PWE)
-> >   EUEN: 00000007 (+FPE +SXE +ASXE -BTE)
-> >   ECFG: 00071c1d (LIE=3D0,2-4,10-12 VS=3D7)
-> >  ESTAT: 00010000 [PIL] (IS=3D ECode=3D1 EsubCode=3D0)
-> >   BADV: 0000000000000040
-> >   PRID: 0014c011 (Loongson-64bit, Loongson-3C5000)
-> >  Modules linked in: bpf_testmod(OE) xt_CHECKSUM xt_MASQUERADE xt_conn=
-track
-> >  Process test_progs (pid: 2824, threadinfo=3D0000000000863a31, task=3D=
-000000001cba0874)
-> >  Stack : 0000000000000001 fffffffffffffffc 0000000000000000 000000000=
-0000000
-> >          0000000000000018 0000000000000000 0000000000000000 900000000=
-48bf6c0
-> >          90000000052cd638 90001000aa16fd70 900010008bf51580 900010009=
-284f000
-> >          90000000049f2b90 900010009284f188 900010009284f178 900010008=
-61d4780
-> >          9000100084dccd00 0000000000000800 0000000000000007 fffffffff=
-ffffff2
-> >          000000000453e92f 90000000049aae34 90001000aa16fd60 900010009=
-284f000
-> >          0000000000000000 0000000000000000 900010008bf51580 900000000=
-49f2b90
-> >          0000000000000001 0000000000000000 9000100084dc3a10 900010009=
-284f1ac
-> >          90001000aa16fd40 0000555559953278 0000000000000001 000000000=
-0000000
-> >          90001000aa16fdc8 9000000005a5a000 90001000861d4780 000000000=
-0000800
-> >          ...
-> >  Call Trace:
-> >  [<9000000004162774>] copy_page_to_iter+0x74/0x1c0
-> >  [<90000000048bf6c0>] sk_msg_recvmsg+0x120/0x560
-> >  [<90000000049f2b90>] tcp_bpf_recvmsg_parser+0x170/0x4e0
-> >  [<90000000049aae34>] inet_recvmsg+0x54/0x100
-> >  [<900000000481ad5c>] sock_recvmsg+0x7c/0xe0
-> >  [<900000000481e1a8>] __sys_recvfrom+0x108/0x1c0
-> >  [<900000000481e27c>] sys_recvfrom+0x1c/0x40
-> >  [<9000000004c076ec>] do_syscall+0x8c/0xc0
-> >  [<9000000003731da4>] handle_syscall+0xc4/0x160
-> >
-> >  Code: 0010b09b  440125a0  0011df8d <28c10364> 0012b70c  00133305  00=
-13b1ac  0010dc84  00151585
-> >
-> >  ---[ end trace 0000000000000000 ]---
-> >  Kernel panic - not syncing: Fatal exception
-> >  Kernel relocated by 0x3510000
-> >   .text @ 0x9000000003710000
-> >   .data @ 0x9000000004d70000
-> >   .bss  @ 0x9000000006469400
-> >  ---[ end Kernel panic - not syncing: Fatal exception ]---
-> > '''
-> >
-> > This is because "sg_page(sge)" is NULL in that case. This patch adds =
-null
-> > check for it in sk_msg_recvmsg() to fix this error.
-> >
-> > Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interfa=
-ce")
-> > Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-> > ---
-> >  net/core/skmsg.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> > index fd20aae30be2..bafcc1e2eadf 100644
-> > --- a/net/core/skmsg.c
-> > +++ b/net/core/skmsg.c
-> > @@ -432,6 +432,8 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_pso=
-ck *psock, struct msghdr *msg,
-> >                         sge =3D sk_msg_elem(msg_rx, i);
-> >                         copy =3D sge->length;
-> >                         page =3D sg_page(sge);
-> > +                       if (!page)
-> > +                               goto out;
-> >                         if (copied + copy > len)
-> >                                 copy =3D len - copied;
-> >                         copy =3D copy_page_to_iter(page, sge->offset,=
- copy, iter);
-> > --
-> > 2.43.0
-> >
-> =
+> > * Why did you not directly respond to the recurring patch review conce=
+rn
+> > =C2=A0 about better summary phrases (or message subjects)?
+=E2=80=A6
+> [Suman] I thought the =E2=80=9Csummery phrase=E2=80=9D is per patch.
 
-> This looks pretty much random to me.
-> =
+Summaries are obviously important parts for patch subjects.
 
-> Please find the root cause, instead of desperately trying to fix 'tests=
-'.
 
-If this happens then either we put a bad msg_rx on the queue see a few li=
-nes
-up and we need to sort out why that msg_rx was built. Or we walked off th=
-e
-end of a scatter gather list and need to see why this test isn't sufficie=
-nt?
+> The cover letter is mentioning the reason for the change
 
-  } while ((i !=3D msg_rx->sg.end) && !sg_is_last(sge))
+I would like to read an improved overview for your change approach.
 
-is this happening every time you run the command or did you run this for
-a long iteration and eventually hit this? I don't see why this would be
-specific to your arch though.=
+
+> and each patch set is adding the summery for the change.
+
+I have got understanding difficulties for such information somehow.
+
+
+> Since it is not some actual =E2=80=98fix=E2=80=99 I am not sure what mor=
+e to add other
+
+It seems that there is a temporary conflict according to expected explanat=
+ion quality.
+
+
+> than mentioning klockwork fixes.
+
+Source code analysis tools can provide more helpful information.
+Do I need to remind you for the published software documentation
+around =E2=80=9CC checkers=E2=80=9D?
+
+
+> I am not sure what more can be added for a variable initialization to ze=
+ro
+> or adding a NULL check.
+
+* Common vulnerability enumeration?
+
+* CERT reference?
+
+
+> Can you suggest some?
+
+* Please take another look at linked information sources.
+
+* Can you get sufficient inspirations from published patches?
+
+
+> > * Would you like to explain any more here which development concern ca=
+tegories
+> > =C2=A0 were picked up from the mentioned source code analysis tool?
+>
+> [Suman] =C2=A0Development concerns are mentioned in individual patch set=
+s.
+
+* Grouping?
+
+* Outlines?
+
+* Taxonomy?
+
+
+> > * How much do you care for the grouping of logical changes into
+> > =C2=A0 consistent patch series?
+>
+> [Suman] I thought about it but then I was not sure
+>         how to add fix tags for a unified patch set.
+
+Why did you not ask before sending another questionable patch series?
+
+
+> Hence went with per file approach.
+
+It can occasionally be helpful for change preparations.
+
+
+> Do you see any problem with the approach?
+
+Obviously, yes.
+
+I hope that you can take several patch review issues better into account f=
+inally.
+
+Regards,
+Markus
 
