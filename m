@@ -1,109 +1,114 @@
-Return-Path: <netdev+bounces-106420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B34591624E
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 11:28:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34F1F916255
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 11:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80E1CB2375E
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:27:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 714D41C20F93
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F16241487D4;
-	Tue, 25 Jun 2024 09:27:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3CC913C90B;
+	Tue, 25 Jun 2024 09:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m5scD+/i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pejh88eK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF3B49656
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 09:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755F3FBEF
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 09:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719307674; cv=none; b=a3qiTBapMQ3Oh16jxfNHwai6VqszGG/yUmkD4yvc8ehBv8iPG8m1W5sJuiI/BrnvcB1QCcxhb5b01Zy5Ao91YZlWqGpz549OSS5Ucu0194fx0cCrEHuCS5j1rOhR5+AyL34bqGqw4pfsJp/z0LGcUs4a0bGAZ5BlpN9aqHJod1w=
+	t=1719307833; cv=none; b=NC+Dy0doPo2qcuB26+WBA3N2qvhbR0YGwFJHqTcMyiAxsKfD1tsOV/Swow/JVtRDLouBDthx8BXaUQC+WBWAhEmYvF+s242tyYmSfVOWyzKD/rN6l/OclxsL5Pc5oQbg8oQ0YRqFkzhJ+W5tptpcVSXz5tbV7Bkt22P5ocP64A4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719307674; c=relaxed/simple;
-	bh=7ogrpwimxtHfwlPoLIeeXD0uDtKMEy+7ZiLeuEX1dg4=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=h0HCTKkfjUwuXzRW88qJM2MbmOlBXO9HLjYE2uTuEVzgN1xlDP6LXQ/33s42yTOyHkWrTGNwVjnRqqddKJFbZwpdWM7qZ59pDAv4rdQZw+bG8MAuLZq9SiRNXbjvfq6qfKU155WVozZT6rvSjo9ft9K2FW2oCRrGib4XniYWiXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m5scD+/i; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52cecba8d11so759273e87.1
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 02:27:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719307671; x=1719912471; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7ogrpwimxtHfwlPoLIeeXD0uDtKMEy+7ZiLeuEX1dg4=;
-        b=m5scD+/iw9BVnTJQbfsGSrzS57OtJJwL3H5ylT14FatU+ebQq51wH26viyJOMqLg4H
-         ut6fDIBCDsmRvvBtTnzehAOu9s1W/jZ7pm9Uvq6V4MlPjD3+ciXcIf1eo8tkGB/4d7tJ
-         Qtcws2hsMSpLa+bEOUEy9hdnBjUnoxIeh2X7Zave3zvI/ghUgJRk6Glm5ipnpXP03uGr
-         kKy0sxhZCRGQzdAzaUMvNhjOT7/2yGVfTtZms+0HNXghY946ukoX+c/guMZdb1hFQT1/
-         msX4KbqDVlEGsECTlTkX+fiiIwQY9CuPk5hbpyOUzye7ytXy51zs8+M4p6TTZ9hAyAgB
-         WhSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719307671; x=1719912471;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7ogrpwimxtHfwlPoLIeeXD0uDtKMEy+7ZiLeuEX1dg4=;
-        b=MdXJYWdCz2Lazky8Ds5Gh/F3cYS2G1W9G6SZ7T4L7eNgvl24XH1ve5C4B8Ny9X0pEb
-         6EFSlAMyq6OW4LYDJ0LYSfP1HGofuliXgpxPQZ88SVgwrFL3IU2RKsVyMn5yEnKcgglF
-         qaoE1ss9DO2Ds12hPwLfKSCwSUwalEovxEQq5R5k41/ULi6UUJFlQJpus7kgi/FWf48E
-         FUJnLuES9CEqvZEjo45oJC8nk47lYiHdwRwuMEF8nBMyZKCeh7A8/zIDlC+ZRq4AzaLI
-         roVkNVKMDuyY5dRE8kOrVsLhvKxSo8zt1XoNtit0jXaJNC3/L6E2LVGBy5RRBqlt+FCk
-         KxEw==
-X-Forwarded-Encrypted: i=1; AJvYcCUGfWhi5MxvNR/GHJWSIJPHOyjnxPK9/gZHwSCgud2g62TmOgROaIpSgLIvd9ITXsmVqVK6f6wAEnhkuY+jgm+vJECagglL
-X-Gm-Message-State: AOJu0Yyx9C4925MCcZR10eQsZXTg0b1ooIHrABhas84ys7FxbKA5HI2r
-	WTVsiSpDHENX1bjEV6KEjhVr4VK0njtWh0w3bgzv+a46UorWwxtn
-X-Google-Smtp-Source: AGHT+IGu+3UvCQ+z6DH5S5xbL+sSRR7FXHiU33k4g42NwGMLfHvKYYTSfIscmjxWbBUIT596MbwU3A==
-X-Received: by 2002:a05:6512:3a8b:b0:52c:e402:4dc1 with SMTP id 2adb3069b0e04-52ce4024e00mr4144649e87.55.1719307671188;
-        Tue, 25 Jun 2024 02:27:51 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-366388c40c3sm12397173f8f.30.2024.06.25.02.27.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jun 2024 02:27:50 -0700 (PDT)
-Subject: Re: [PATCH v6 net-next 3/9] net: ethtool: record custom RSS contexts
- in the XArray
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, edward.cree@amd.com
-Cc: linux-net-drivers@amd.com, netdev@vger.kernel.org,
- habetsm.xilinx@gmail.com, sudheer.mogilappagari@intel.com,
- jdamato@fastly.com, mw@semihalf.com, linux@armlinux.org.uk,
- sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
- hkelam@marvell.com, saeedm@nvidia.com, leon@kernel.org,
- jacob.e.keller@intel.com, andrew@lunn.ch, ahmed.zaki@intel.com,
- davem@davemloft.net, kuba@kernel.org, edumazet@google.com, pabeni@redhat.com
-References: <cover.1718862049.git.ecree.xilinx@gmail.com>
- <e5b4739cd6b2d3324b5c639fa9006f94fc03c255.1718862050.git.ecree.xilinx@gmail.com>
- <ca867437-1533-49d6-a25b-6058e2ee0635@intel.com>
- <08a85083-8c61-8ca5-e860-2b051c043229@gmail.com>
- <90e2bda8-5f5d-409f-8b4a-b2cd12747c95@intel.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <343b81aa-a717-0ff2-d13e-8d7a5249cc42@gmail.com>
-Date: Tue, 25 Jun 2024 10:27:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1719307833; c=relaxed/simple;
+	bh=rPjZPypixzE+9fgICv5dcdG8kPO1vKQG7Y9IpzGCqWk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nZaz9t55K3EghriI9hmh4xaAquomSr11GJGjSsJ9ofD7m80nhGtwmXHUAncElkMTQBMDCHlj6s4NX5GYq7SPNGF+ZRgXIo7rRCuxqD2YEMcw4w40tYCY5rWNNqAr0k3os7smNxlJaN6z/H62Aou04Dem9tyardguk68hdDRwYqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pejh88eK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E8E57C32786;
+	Tue, 25 Jun 2024 09:30:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719307833;
+	bh=rPjZPypixzE+9fgICv5dcdG8kPO1vKQG7Y9IpzGCqWk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pejh88eKmBS3LxHXY48m+0XuZ+lWgntiZVPNbf88fBZXhXLb/+enlNULtoIdS1jfk
+	 y8nZcQ38kBDY3PFKxl9sN19OYBO0kyYWOBNwqf7zNdD+Ys92zJ3T36ucMBYTqQhbkO
+	 gbDvwc344OmLvu2v5rljkQPGMdMOSTpmN6PL6cpL6D/cpO3gXwHB7ZW1XsZTjfr2ET
+	 dJcwADAQAZrAuWYjhOCoyhg9wUFch7NGpKddT/FtwpCq7LBZ8IJdoZCAcXVpCl6N6j
+	 dTxG6pNt1igVShYPZOZxbW9WwgNCnAjkYR2XtAJ/MASq26xOZAaUnJsbVGgJbvolwC
+	 jxOh2Vy2htUbQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DB271C32767;
+	Tue, 25 Jun 2024 09:30:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <90e2bda8-5f5d-409f-8b4a-b2cd12747c95@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4 net-next 00/11] af_unix: Remove spin_lock_nested() and
+ convert to lock_cmp_fn.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171930783289.15965.17351249975983635455.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Jun 2024 09:30:32 +0000
+References: <20240620205623.60139-1-kuniyu@amazon.com>
+In-Reply-To: <20240620205623.60139-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kent.overstreet@linux.dev, kuni1840@gmail.com,
+ netdev@vger.kernel.org
 
-On 25/06/2024 08:17, Przemek Kitszel wrote:
-> I know that there are is v7 already, but I don't know if you just missed
-> my other comments to this v6 patch, or they are not relevant after you
-> answering the first question? (Code is not removed in subsequent patch,
-> so I guess you just missed).
+Hello:
 
-Didn't spot them, sorry.
-Will look through and address.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Thu, 20 Jun 2024 13:56:12 -0700 you wrote:
+> This series removes spin_lock_nested() in AF_UNIX and instead
+> defines the locking orders as functions tied to each lock by
+> lockdep_set_lock_cmp_fn().
+> 
+> When the defined function returns a negative value, lockdep
+> considers it will not cause deadlock.  (See ->cmp_fn() in
+> check_deadlock() and check_prev_add().)
+> 
+> [...]
+
+Here is the summary with links:
+  - [v4,net-next,01/11] af_unix: Define locking order for unix_table_double_lock().
+    https://git.kernel.org/netdev/net-next/c/3955802f160b
+  - [v4,net-next,02/11] af_unix: Define locking order for U_LOCK_SECOND in unix_state_double_lock().
+    https://git.kernel.org/netdev/net-next/c/ed99822817cb
+  - [v4,net-next,03/11] af_unix: Don't retry after unix_state_lock_nested() in unix_stream_connect().
+    https://git.kernel.org/netdev/net-next/c/1ca27e0c8c13
+  - [v4,net-next,04/11] af_unix: Define locking order for U_LOCK_SECOND in unix_stream_connect().
+    https://git.kernel.org/netdev/net-next/c/98f706de445b
+  - [v4,net-next,05/11] af_unix: Don't acquire unix_state_lock() for sock_i_ino().
+    https://git.kernel.org/netdev/net-next/c/b380b18102a0
+  - [v4,net-next,06/11] af_unix: Remove U_LOCK_DIAG.
+    https://git.kernel.org/netdev/net-next/c/c4da4661d985
+  - [v4,net-next,07/11] af_unix: Remove U_LOCK_GC_LISTENER.
+    https://git.kernel.org/netdev/net-next/c/7202cb591624
+  - [v4,net-next,08/11] af_unix: Define locking order for U_RECVQ_LOCK_EMBRYO in unix_collect_skb().
+    https://git.kernel.org/netdev/net-next/c/8647ece4814f
+  - [v4,net-next,09/11] af_unix: Set sk_peer_pid/sk_peer_cred locklessly for new socket.
+    https://git.kernel.org/netdev/net-next/c/faf489e6896d
+  - [v4,net-next,10/11] af_unix: Remove put_pid()/put_cred() in copy_peercred().
+    https://git.kernel.org/netdev/net-next/c/e4bd881d9871
+  - [v4,net-next,11/11] af_unix: Don't use spin_lock_nested() in copy_peercred().
+    https://git.kernel.org/netdev/net-next/c/22e5751b0524
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
