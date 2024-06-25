@@ -1,145 +1,82 @@
-Return-Path: <netdev+bounces-106633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0171E9170D2
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 21:03:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 020779170D9
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 21:05:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC6C628532B
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 19:03:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB6BA1F22F5A
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 19:05:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A80B17C234;
-	Tue, 25 Jun 2024 19:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE32F17C7A6;
+	Tue, 25 Jun 2024 19:05:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ITKHN6zT"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IXcTWLBf"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C071DDF8;
-	Tue, 25 Jun 2024 19:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DA917A932;
+	Tue, 25 Jun 2024 19:05:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719342225; cv=none; b=kdI+xmzv/7YTah28rSH5h752UvSzpVh6R2MgYtrHlwpRJuCPjkEqj2LCWg4Ih1bBHw5k4JEIxEopA/Q8IGONOO9FRa5CkUhy8Aid4qGWHQ3H/pI1lAN6ofAKNwO/Qmt1r0Tq0nRsbCzPR+3HmrTj5qHZdYMmPngG9pGE1qKac4c=
+	t=1719342327; cv=none; b=LoiytmTUOIMOq2HHjf7Rl4jZcpGuxhZAK/D3J1In8/52fZAPZb41NQTeZlnUAwRtUEZH67MVlS4wWuhAyuu+iVGBPl9msKMlA3doDAlOfxdUKD0TwWsVoJzle9lmhfsoG1aUPW7qBr42Zh2W0UaSVVP5GN92Sl73zfU40iKu5Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719342225; c=relaxed/simple;
-	bh=JI9GDj3ulVpvf2zTRea2Df/zqs1xKQepL3nAf2RdH9I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kT6dr4WwFghh8DOwxLuebCGs7l3TL+UWtsTVNlPdSMG/XUET/3kaVep1Bmvv634A2YlTFWtus2ccBJJzLFVXx/aZXUjXM4i4woREFJGtebnsZxD8mlgLDKXcnG8ml0KU70tBxS3gPtGqVGDPyK9OnrT7IyO8dnkiCvYqdqn5wQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ITKHN6zT; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=del2IawhL2LDxT1v3/P46ZsGeJnPo7oM5A0i38LokGg=; b=ITKHN6zT66z8ErRMCTqE+jVNdm
-	aifAPFQ/TeaYHXcVhjDil4jV+s0oZ5UpLaOxBpRNT+cYkoXOIsy3jd61cwgPeY0VYGgt3NSd72fxm
-	c/rYxKsxctjYar4GbZzJWayRJkBHDb7+RQCAyPEclG9lr3QQ9/HiDETaBa6H7M3Ddspedc5EIPWDz
-	EgqGueUTMLj4QKShGJTfXUl/00UozYDKiBmIyiTe/pI+YlD24pDkJvl20cEDAyNTVSi/CYxnKo60h
-	t6sg2Epolbj3KXWz1SRq47WcLM2EAiH3h2TtjlTG/xRl08xv258cjuNwITZ8rX6NDmlEix0Gs11c+
-	I17vseCg==;
-Received: from [50.53.4.147] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sMBS7-00000004CWp-0nMl;
-	Tue, 25 Jun 2024 19:03:39 +0000
-Message-ID: <0120d73a-0d15-440f-99bd-4c3e0a925183@infradead.org>
-Date: Tue, 25 Jun 2024 12:03:35 -0700
+	s=arc-20240116; t=1719342327; c=relaxed/simple;
+	bh=uEIULLa7C4jAbNteG18uxhCYY34Z2XNs8GG2ucBUTWc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fIVgDcsw/oaG8ZE5orEdNLkSx3ZYQeGzDDeXwxq/0/gwpbS7c2d+5EnLgwkene0QWwfkqgtJijtC5aXZ1UHT6dqgQ/T027wQ0xLM8OQg7JhU1UCx3Bz7rQBr4V5Zjdj0x0u/HGd3wWADVXcWC7twrG97AX051YNjPnf2tuZRFhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IXcTWLBf; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/wU8xeN8cCgRtzKcradtGAKFSSpR6dXnlCFc+JkYQ4g=; b=IXcTWLBfw8CQVnTZqjI08EPuFw
+	oQHH7lUKnhk1B97/9pezLl1OZZX6RavVKFGOog01XJeVMwp+iqtadJe/FS2xzZsBfDBZLyNvNWR8h
+	enEwySad1Y9mZ0OZaqTlgxCqxVslVQLVLWYUuKt0aGLi1tfvRblpoThPl8IYifSFVIRk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sMBTg-000yHg-60; Tue, 25 Jun 2024 21:05:16 +0200
+Date: Tue, 25 Jun 2024 21:05:16 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Marek Vasut <marex@denx.de>
+Cc: netdev@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Joakim Zhang <qiangqing.zhang@nxp.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+	devicetree@vger.kernel.org, kernel@dh-electronics.com
+Subject: Re: [net-next,PATCH v2] dt-bindings: net: realtek,rtl82xx: Document
+ known PHY IDs as compatible strings
+Message-ID: <eeb1745d-6f80-44ef-8b77-daf2ac3cb109@lunn.ch>
+References: <20240625184359.153423-1-marex@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/8] taint: Add TAINT_FWCTL
-To: Jason Gunthorpe <jgg@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
- Itay Avraham <itayavr@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
- Leon Romanovsky <leon@kernel.org>, linux-doc@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>
-Cc: Andy Gospodarek <andrew.gospodarek@broadcom.com>,
- Aron Silverton <aron.silverton@oracle.com>,
- Dan Williams <dan.j.williams@intel.com>, David Ahern <dsahern@kernel.org>,
- Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
- Leonid Bloch <lbloch@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
- linux-cxl@vger.kernel.org, patches@lists.linux.dev
-References: <4-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <4-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240625184359.153423-1-marex@denx.de>
 
-
-
-On 6/24/24 3:47 PM, Jason Gunthorpe wrote:
-> Requesting a fwctl scope of access that includes mutating device debug
-> data will cause the kernel to be tainted. Changing the device operation
-> through things in the debug scope may cause the device to malfunction in
-> undefined ways. This should be reflected in the TAINT flags to help any
-> debuggers understand that something has been done.
+On Tue, Jun 25, 2024 at 08:42:28PM +0200, Marek Vasut wrote:
+> Extract known PHY IDs from Linux kernel realtek PHY driver
+> and convert them into supported compatible string list for
+> this DT binding document.
 > 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Marek Vasut <marex@denx.de>
 
-Please also update tools/debugging/kernel-chktaint.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-> ---
->  Documentation/admin-guide/tainted-kernels.rst | 5 +++++
->  include/linux/panic.h                         | 3 ++-
->  kernel/panic.c                                | 1 +
->  3 files changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/admin-guide/tainted-kernels.rst b/Documentation/admin-guide/tainted-kernels.rst
-> index f92551539e8a66..f91a54966a9719 100644
-> --- a/Documentation/admin-guide/tainted-kernels.rst
-> +++ b/Documentation/admin-guide/tainted-kernels.rst
-> @@ -101,6 +101,7 @@ Bit  Log  Number  Reason that got the kernel tainted
->   16  _/X   65536  auxiliary taint, defined for and used by distros
->   17  _/T  131072  kernel was built with the struct randomization plugin
->   18  _/N  262144  an in-kernel test has been run
-> + 19  _/J  524288  userspace used a mutating debug operation in fwctl
->  ===  ===  ======  ========================================================
->  
->  Note: The character ``_`` is representing a blank in this table to make reading
-> @@ -182,3 +183,7 @@ More detailed explanation for tainting
->       produce extremely unusual kernel structure layouts (even performance
->       pathological ones), which is important to know when debugging. Set at
->       build time.
-> +
-> + 18) ``J`` if userpace opened /dev/fwctl/* and performed a FWTCL_RPC_DEBUG_WRITE
-> +     to use the devices debugging features. Device debugging features could
-> +     cause the device to malfunction in undefined ways.
-> diff --git a/include/linux/panic.h b/include/linux/panic.h
-> index 6717b15e798c38..5dfd5295effd40 100644
-> --- a/include/linux/panic.h
-> +++ b/include/linux/panic.h
-> @@ -73,7 +73,8 @@ static inline void set_arch_panic_timeout(int timeout, int arch_default_timeout)
->  #define TAINT_AUX			16
->  #define TAINT_RANDSTRUCT		17
->  #define TAINT_TEST			18
-> -#define TAINT_FLAGS_COUNT		19
-> +#define TAINT_FWCTL			19
-> +#define TAINT_FLAGS_COUNT		20
->  #define TAINT_FLAGS_MAX			((1UL << TAINT_FLAGS_COUNT) - 1)
->  
->  struct taint_flag {
-> diff --git a/kernel/panic.c b/kernel/panic.c
-> index 8bff183d6180e7..b71f573ec7c5fc 100644
-> --- a/kernel/panic.c
-> +++ b/kernel/panic.c
-> @@ -494,6 +494,7 @@ const struct taint_flag taint_flags[TAINT_FLAGS_COUNT] = {
->  	[ TAINT_AUX ]			= { 'X', ' ', true },
->  	[ TAINT_RANDSTRUCT ]		= { 'T', ' ', true },
->  	[ TAINT_TEST ]			= { 'N', ' ', true },
-> +	[ TAINT_FWCTL ]			= { 'J', ' ', true },
->  };
->  
->  /**
-
--- 
-~Randy
+    Andrew
 
