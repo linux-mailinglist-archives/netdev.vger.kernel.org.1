@@ -1,156 +1,104 @@
-Return-Path: <netdev+bounces-106416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90FC591621D
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 11:15:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 956FC91622B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 11:18:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BF73281CBD
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:15:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C85191C20852
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:18:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B151494C8;
-	Tue, 25 Jun 2024 09:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A052014901B;
+	Tue, 25 Jun 2024 09:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vFogaGaW"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Jkcgxjnk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4795F1487EF;
-	Tue, 25 Jun 2024 09:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D100D1487D4;
+	Tue, 25 Jun 2024 09:18:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719306895; cv=none; b=B9DSyfDrQtccH2J5YBl9SmJxAW/rcH53zyJ45CO4tcQH+lZPy/7Kf5SEEenkjZ4NyntGkgKMS3r7YX/ZP0Dfqmg4WmCrvguR4rEyJr6VIPCYUEOmJYyP7LZAr4L9gH08/nUukCxhTpO8Jl8qEP4ooI6iHVWsPkTsQG+wLgZBMDs=
+	t=1719307121; cv=none; b=EnjTAcPQYTahj6eFm54YE0isgY+yHf/bUB63yC9wl9G+2VXmV6+l99C2cFQ7qtRoIqe139mx3thWcWo787co6yZlKGGiI99TdrgPkSHKRHKJd1AYdgk2+LId1liXbGpPPejUPf3DyLAl6docqZfIGHFODx1+1oUsFcY0iEV3PVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719306895; c=relaxed/simple;
-	bh=K+nlXl7dTQZO6kYcB7cvvUNPw1K7ggy0UaaAYt1aAVk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Mddn/0UUzQfLgTQqOS48khE2k2x7ehr7Xt9HnLE7ZCZ6WHIDycxSp3l75LamfN4B3eL+lhgJK+L0Bg483j2B34OgDzwXxwZxjwwd7JJvlbN9yFliYV8qkfJ8a5UgyU+h9Tg3IP9R/reAG+dxVhWPdC+1Vu9NrhNI4ZZa9pvrvkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vFogaGaW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC9CCC4AF0A;
-	Tue, 25 Jun 2024 09:14:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719306894;
-	bh=K+nlXl7dTQZO6kYcB7cvvUNPw1K7ggy0UaaAYt1aAVk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=vFogaGaWm2Mcuxf9jkaEPhc8mt3wnZNPTykrQk9aJRmLgW5BXEU9TJlCdOeNq/V8T
-	 H0fxseI8H40zrU9So/3SZoyGuAcC0OfqsaQJv2u18SjuN5UEPrwTw9ZOuV867uMgz2
-	 NEo+fJzUn/16e3ZOR1I3LMY2ob6iT8knUF2oukml+PS2/d3xlCLmej5KuabWCVmZUg
-	 3lnRU/qmx18/x7bIVlbK/fvWgG4EWpVJz6WF2Gv9Vax51C0uJyDaGx5kiVgXmTMmt8
-	 Mr7GNfG9NvqfRCi4YMeCfbD0Sy1lfnjecJOpj6W++8HWQiLIjfwGex6v+8UzzG74EG
-	 S5LH2v5z7HjHw==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a689ad8d1f6so671937766b.2;
-        Tue, 25 Jun 2024 02:14:54 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUlA1rxXFo0kEnMlNLUK8MP3WnHPiA80rpGN8X7i81GIQLA5whQhjRqQTdIcCdX+iB1N1kFrQ8e0XuTEXQl7E5G7F9B8iiDXvRLce2m2NZ87njPpvGraBwq2eTnVzJmGDmx+wvQXF3jnDk2CStQf/3tPXUB52zNwU7s9wRS
-X-Gm-Message-State: AOJu0YwFN2q+N931b9E2lMfwk+QWiTf1GcOqkJOVgpj2Z6vOrBePMdG5
-	Lq9exZlsa2GHiFQM21ylBYSOnpHvnMUhMG5nULtVcUICPhai2R3VRpBHSJGFQeDhL0bTlXymZDJ
-	0zZAxUKAaUmybEPtbxVb9vwPC73A=
-X-Google-Smtp-Source: AGHT+IHNqCtF5BzUsAKtHwK5+zo/ZybbxNHxbJjrvFe5SxKrdBham53XzGi/IpCBAJ2Qzpk6BV66r1+KQSKS+EtqlrU=
-X-Received: by 2002:a17:907:8e93:b0:a6e:f62d:bd02 with SMTP id
- a640c23a62f3a-a7245c84f2emr444738166b.7.1719306893342; Tue, 25 Jun 2024
- 02:14:53 -0700 (PDT)
+	s=arc-20240116; t=1719307121; c=relaxed/simple;
+	bh=1xqAQHWbzICfxgNx7YwCU+Aj1fsEs+QoGFjs4+S6ZSo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sovhVsp8dviM7oN83IbGzZ+qU4ENtlmDCXoiK11FC5B/BDRJ3YAACwHPoU9I9O6O28aVPgm2O/amgXc5DIf+cJpUYz6RNrpV/HEfgsxNYzNOxtEqKWM3J0frjkjfDvGXs+bDzVMXhnFZ/dYlCeVHfe7VUkIDGp3N8B8soexGP2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Jkcgxjnk; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2E18F60010;
+	Tue, 25 Jun 2024 09:18:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1719307117;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1xqAQHWbzICfxgNx7YwCU+Aj1fsEs+QoGFjs4+S6ZSo=;
+	b=Jkcgxjnk7MmbVkny6C4cpqPx3YuY6VrucIDcP64sDg0S6U60207gwPwCJd6AWD7toluPYf
+	azkURzKWCbDOiIIHYdBt3484d67+KJqcFqcTRu4iEGPeu8EZnsO6jYCYFqfvw2CIakm6Ex
+	UkuLe2clkkexMtP6ik7O5OJHzh5ec3W4lZZKQ4UqdLGOefyWbxef2iqv5Z/atWspnXOF4O
+	UIevRwNitYqgumXfupmAkZw8q2mkfU4KZlR3EF/t/J9EYTrPlkh5CaSXh3bFnWEFaESQlh
+	rkFzG2zdBKhSClaBzJylED/dCtBKcp9dZKPsI6n/8v+P8yo1nVaNMld7Dz8Jzw==
+Date: Tue, 25 Jun 2024 11:18:35 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Dent Project
+ <dentproject@linuxfoundation.org>, kernel@pengutronix.de,
+ UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v3 1/7] net: ethtool: pse-pd: Expand C33 PSE
+ status with class, power and extended state
+Message-ID: <20240625111835.5ed3dff2@kmaincent-XPS-13-7390>
+In-Reply-To: <ZnCUrUm69gmbGWQq@pengutronix.de>
+References: <20240614-feature_poe_power_cap-v3-0-a26784e78311@bootlin.com>
+	<20240614-feature_poe_power_cap-v3-1-a26784e78311@bootlin.com>
+	<Zm15fP1Sudot33H5@pengutronix.de>
+	<20240617154712.76fa490a@kmaincent-XPS-13-7390>
+	<ZnCUrUm69gmbGWQq@pengutronix.de>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1719302367.git.tanggeliang@kylinos.cn> <CAAhV-H6=xEKDFS4f5hiOqw-gx1nKiXkQq8Kmr8ZsgQe9A3gbtw@mail.gmail.com>
- <2319d0d58ccd879ebbc47f368475240bf06870ff.camel@kernel.org>
-In-Reply-To: <2319d0d58ccd879ebbc47f368475240bf06870ff.camel@kernel.org>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Tue, 25 Jun 2024 17:14:41 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H4Ceo9EYAXw=acPX-cfqTQnRb1ht46WWWeSwEsz7M5x9Q@mail.gmail.com>
-Message-ID: <CAAhV-H4Ceo9EYAXw=acPX-cfqTQnRb1ht46WWWeSwEsz7M5x9Q@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 0/4] Fixes for BPF selftests on Loongarch
-To: Geliang Tang <geliang@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Mykyta Yatsenko <yatsenko@meta.com>, Miao Xu <miaxu@meta.com>, 
-	Yuran Pereira <yuran.pereira@hotmail.com>, Tiezhu Yang <yangtiezhu@loongson.cn>, 
-	Geliang Tang <tanggeliang@kylinos.cn>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Tue, Jun 25, 2024 at 5:08=E2=80=AFPM Geliang Tang <geliang@kernel.org> w=
-rote:
->
-> On Tue, 2024-06-25 at 16:29 +0800, Huacai Chen wrote:
-> > On Tue, Jun 25, 2024 at 4:25=E2=80=AFPM Geliang Tang <geliang@kernel.or=
-g>
-> > wrote:
-> > >
-> > > From: Geliang Tang <tanggeliang@kylinos.cn>
-> > >
-> > > v2:
-> > >  - add patch 2, a new fix for sk_msg_memcopy_from_iter.
-> > >  - update patch 3, only test "sk->sk_prot->close" as Eric
-> > > suggested.
-> > >  - update patch 4, use "goto err" instead of "return" as Eduard
-> > >    suggested.
-> > >  - add "fixes" tag for patch 1-3.
-> > >  - change subject prefixes as "bpf-next" to trigger BPF CI.
-> > >  - cc Loongarch maintainers too.
-> > >
-> > > BPF selftests seem to have not been fully tested on Loongarch. When
-> > > I
-> > > ran these tests on Loongarch recently, some errors occur. This
-> > > patch set
-> > > contains some null-check related fixes for these errors.
-> > Is the root cause that LoongArch lacks bpf trampoline?
->
-> No. These errors don't seem to be directly related to the lack of BPF
-> trampoline. I have indeed got some errors since lacking BPF trampoline,
-> which is probably like this:
-If so, these errors seem not specific to LoongArch.
+Hello Oleksij,
 
-Huacai
+On Mon, 17 Jun 2024 21:55:25 +0200
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
->
->  test_dctcp:PASS:bpf_dctcp__open_and_load 0 nsec
->  test_dctcp:FAIL:bpf_map__attach_struct_ops unexpected error: -524
->  #29/1    bpf_tcp_ca/dctcp:FAIL
->  test_cubic:PASS:bpf_cubic__open_and_load 0 nsec
->  test_cubic:FAIL:bpf_map__attach_struct_ops unexpected error: -524
->  #29/2    bpf_tcp_ca/cubic:FAIL
->  test_dctcp_fallback:PASS:dctcp_skel 0 nsec
->  test_dctcp_fallback:PASS:bpf_dctcp__load 0 nsec
->  test_dctcp_fallback:FAIL:dctcp link unexpected error: -524
->  #29/4    bpf_tcp_ca/dctcp_fallback:FAIL
->  test_write_sk_pacing:PASS:open_and_load 0 nsec
->  test_write_sk_pacing:FAIL:attach_struct_ops unexpected error: -524
->  #29/6    bpf_tcp_ca/write_sk_pacing:FAIL
->
-> Thanks,
-> -Geliang
->
-> >
-> > Huacai
-> >
-> > >
-> > > Geliang Tang (4):
-> > >   skmsg: null check for sg_page in sk_msg_recvmsg
-> > >   skmsg: null check for sg_page in sk_msg_memcopy_from_iter
-> > >   inet: null check for close in inet_release
-> > >   selftests/bpf: Null checks for link in bpf_tcp_ca
-> > >
-> > >  net/core/skmsg.c                                 |  4 ++++
-> > >  net/ipv4/af_inet.c                               |  3 ++-
-> > >  .../selftests/bpf/prog_tests/bpf_tcp_ca.c        | 16
-> > > ++++++++++++----
-> > >  3 files changed, 18 insertions(+), 5 deletions(-)
-> > >
-> > > --
-> > > 2.43.0
-> > >
->
+>=20
+> > > The difference between open and underload is probably:
+> > > - open: Iport =3D 0, detection state
+> > > - underload: Iport < Imin (or Ihold?), Iport can be 0. related to
+> > > powered/MPS state. =20
+> >=20
+> > Should I put it under MPS substate then? =20
+>=20
+> If my understand is correct, then yes. Can you test it? Do you have PD
+> with adjustable load?
+
+In fact I can't test it, I have a splitter and an adjustable load, not a
+splitter that can adjust it's own load. So I can't decrease the load of the
+splitter itself and reach this error condition.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
