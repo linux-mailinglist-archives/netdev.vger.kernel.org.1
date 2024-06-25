@@ -1,108 +1,128 @@
-Return-Path: <netdev+bounces-106556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 698C5916CF8
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 17:26:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BB71916CFA
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 17:26:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B66C1C21C20
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 15:26:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4DAB1F2A522
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 15:26:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FDC216FF31;
-	Tue, 25 Jun 2024 15:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2482D173325;
+	Tue, 25 Jun 2024 15:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y0UWZ99e"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FiAwZzw6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A6016DEB3;
-	Tue, 25 Jun 2024 15:25:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7319416DEB3
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 15:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719329117; cv=none; b=BRVCv1K5/A6y0KwdgRCLFre2szcwNV4kGS20AyFMvOLbYxoHQakRRionAyyY8l6kWDqCVdo6Jbc4Cn7XNNGPdZwrYL4jdCbV02ZQXqWV1P/U6SC2fCeojzDfbcU7OG2ai4hmNywV051BR0bNt2ft5JplPMdh7h3tujB76G9sSfM=
+	t=1719329127; cv=none; b=HOIRxdE1HCO/OD/uvHH8NUfOwoMpL6zKsVdmpjrBngWuPFCDH2Hn21p4YecxreDxvLRYVsFVSSvJbRtAgFaKGTtqaWCo8/AqZeQaX7yNr1ffSZqtZAFSMqiV7qkSCRpOTTtYynQSZQX4zpj6bqtYXQqNQ69vIAiyM8AP+DeSqrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719329117; c=relaxed/simple;
-	bh=8pXLi0+NE2elKsEGz3Exeg1kDvY+fHABVyxjsl7HrNI=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=ODNvTAgKscX/o1EnIgH6VdqNReE2+4Hm11ZZSzxFWzwUF1PNe3mq+6VyCPbdH6oiZn9h2xWh4JgWezOzGnL2v2f/PVBNToqJSBDYaZwxC1zmUrVvm5J2edyK61s49OcfTxFXt837I5i2XE6dffpJQlaIWAlLyKjlcrqm5hKjSc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y0UWZ99e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A42CBC32781;
-	Tue, 25 Jun 2024 15:25:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719329117;
-	bh=8pXLi0+NE2elKsEGz3Exeg1kDvY+fHABVyxjsl7HrNI=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=Y0UWZ99e81f92pCKDy/ylcK54a2iCMmLSB3RltsaGQs72cjZYgVQ9wGF7SKhM1LRE
-	 6+jSqJQsQQASg4sy82IGvB8FlpAKrBeHjVaS/mnnHY6wu0AegRToWx4WD07pqBbKS3
-	 tXIT9L/oMTdRWeoJyGjg68VZ4vQ6NA4BL9ZDihNaXQUMliXQCVNpCVHgIkfFNCI60B
-	 26eja9WqGWkiQH67YTIAQwFvYfiKKfoiW4Xe6wafdM7zH1RBpayRmZ7jMI4TU6UT5y
-	 P9yVqxDa8mBURa5b8OVPxiuyYw5uuGQtjWx23p4czraCfdxdiPSKfMHsH5arFGaywM
-	 blOFXGQpi2lzw==
-From: Kalle Valo <kvalo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jeff Johnson <quic_jjohnson@quicinc.com>,  Koen Vandeputte
- <koen.vandeputte@citymesh.com>,  <ath10k@lists.infradead.org>,
-  linux-wireless <linux-wireless@vger.kernel.org>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo Abeni
- <pabeni@redhat.com>,  <netdev@vger.kernel.org>,  Johannes Berg
- <johannes@sipsolutions.net>,  Kees Cook <keescook@chromium.org>
-Subject: Re: ieee80211.h virtual_map splat
-References: <CAPh3n83zb1PwFBFijJKChBqY95zzpYh=2iPf8tmh=YTS6e3xPw@mail.gmail.com>
-	<c470e4ff-3f70-40f6-844a-f9614286509f@quicinc.com>
-	<87o77pik7w.fsf@kernel.org> <20240625080248.32c3e03d@kernel.org>
-Date: Tue, 25 Jun 2024 18:25:12 +0300
-In-Reply-To: <20240625080248.32c3e03d@kernel.org> (Jakub Kicinski's message of
-	"Tue, 25 Jun 2024 08:02:48 -0700")
-Message-ID: <87jzidhwo7.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1719329127; c=relaxed/simple;
+	bh=S1ZN2YsmhMIHBODx8GUBJZUTMGcylwKsaX5J/TwATv8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BalnFC8AiCgMSfwxD8sgNhQz5X5OAI7KIlRU66o8djz/MqZ632rCGvpVedZ+Lb7JwOGJe+vsVBh1gMmdikB00QknsZeQ+SYTSajbNv4UH0vZjlwGK4X7mPsFmX25f2scpb+HF9+7NWFkqDZb7mUG2IrpKhQnAwUcWfFdVgL+r0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FiAwZzw6; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=1UQg/EmuREzP7C5y+v27cZZm4G+gXLLXTFClnv+eXBo=; b=FiAwZzw6f6FlQHmmCG+iXQWAK6
+	AlrRaMfmgSXTOG8FEuuNhcCoTyqNNj70LIF03LYYf2T/bomRKzbfkCKRSENlpKlN9eql+xuwa4QuD
+	h49OY4e01N8nEAeSNL16s7cza1EBVRn5CfRs4F/Do/rlx0cGvg3SihrLiy/Uz7WqasFQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sM82m-000xMa-JR; Tue, 25 Jun 2024 17:25:16 +0200
+Date: Tue, 25 Jun 2024 17:25:16 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
+	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com
+Subject: Re: [net-next PATCH v2 11/15] eth: fbnic: Add link detection
+Message-ID: <6971f7ce-8514-4da5-afc9-764c0da289c0@lunn.ch>
+References: <171932574765.3072535.12103787411698322191.stgit@ahduyck-xeon-server.home.arpa>
+ <171932617837.3072535.9872136934270317593.stgit@ahduyck-xeon-server.home.arpa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <171932617837.3072535.9872136934270317593.stgit@ahduyck-xeon-server.home.arpa>
 
-Jakub Kicinski <kuba@kernel.org> writes:
+> +	/* Tri-state value indicating state of link.
+> +	 *  0 - Up
+> +	 *  1 - Down
+> +	 *  2 - Event - Requires checking as link state may have changed
+> +	 */
+> +	s8 link_state;
 
-> On Tue, 25 Jun 2024 09:56:35 +0300 Kalle Valo wrote:
->> > Adding netdev to the initial message in the thread.
->> > https://lore.kernel.org/all/CAPh3n83zb1PwFBFijJKChBqY95zzpYh=2iPf8tmh=YTS6e3xPw@mail.gmail.com/
->> >
->> > There was some discussion in the thread, with the observation that the splat 
->> > is fixed by:
->> > 2ae5c9248e06 ("wifi: mac80211: Use flexible array in struct ieee80211_tim_ie")
->> >
->> > Followed by discussion if this should be backported.
->> >
->> > Kees said that "netdev [...] maintainers have asked that contributors not 
->> > include "Cc: stable" tags, as they want to evaluate for themselves whether 
->> > patches should go to stable or not"  
->> 
->> BTW this rule doesn't apply to wireless subsystem. For wireless patches
->> it's ok to "Cc: stable" in patches or anyone can send a request to
->> stable maintainers to pick a patch.
->
-> It's an old rule. Quoting documentation:
->
->   Stable tree
->   ~~~~~~~~~~~
->   
->   While it used to be the case that netdev submissions were not supposed
->   to carry explicit ``CC: stable@vger.kernel.org`` tags that is no longer
->   the case today. Please follow the standard stable rules in
->   :ref:`Documentation/process/stable-kernel-rules.rst <stable_kernel_rules>`,
->   and make sure you include appropriate Fixes tags!
->   
-> See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#stable-tree
+Maybe add an enum?
 
-Oh, I haven't noticed the change. Thanks for correcting.
+> +static irqreturn_t fbnic_mac_msix_intr(int __always_unused irq, void *data)
+> +{
+> +	struct fbnic_dev *fbd = data;
+> +	struct fbnic_net *fbn;
+> +
+> +	if (!fbd->mac->get_link_event(fbd)) {
+> +		fbnic_wr32(fbd, FBNIC_INTR_MASK_CLEAR(0),
+> +			   1u << FBNIC_MAC_MSIX_ENTRY);
+> +		return IRQ_HANDLED;
+> +	}
+> +
+> +	fbd->link_state = FBNIC_LINK_EVENT;
+> +	fbn = netdev_priv(fbd->netdev);
+> +
+> +	phylink_mac_change(fbn->phylink, fbd->link_state == FBNIC_LINK_UP);
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+Can fbd->link_state == FBNIC_LINK_UP given that you have just done:
+    fbd->link_state = FBNIC_LINK_EVENT ? 
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+> +static u32 __fbnic_mac_config_asic(struct fbnic_dev *fbd)
+> +{
+> +	/* Enable MAC Promiscuous mode and Tx padding */
+> +	u32 command_config = FBNIC_MAC_COMMAND_CONFIG_TX_PAD_EN |
+> +			     FBNIC_MAC_COMMAND_CONFIG_PROMISC_EN;
+> +	struct fbnic_net *fbn = netdev_priv(fbd->netdev);
+> +	u32 rxb_pause_ctrl;
+> +
+> +	/* Set class 0 Quanta and refresh */
+> +	wr32(fbd, FBNIC_MAC_CL01_PAUSE_QUANTA, 0xffff);
+> +	wr32(fbd, FBNIC_MAC_CL01_QUANTA_THRESH, 0x7fff);
+> +
+> +	/* Enable generation of pause frames if enabled */
+> +	rxb_pause_ctrl = rd32(fbd, FBNIC_RXB_PAUSE_DROP_CTRL);
+> +	rxb_pause_ctrl &= ~FBNIC_RXB_PAUSE_DROP_CTRL_PAUSE_ENABLE;
+> +	if (!fbn->tx_pause)
+> +		command_config |= FBNIC_MAC_COMMAND_CONFIG_TX_PAUSE_DIS;
+> +	else
+> +		rxb_pause_ctrl |=
+> +			FIELD_PREP(FBNIC_RXB_PAUSE_DROP_CTRL_PAUSE_ENABLE,
+> +				   FBNIC_PAUSE_EN_MASK);
+> +	wr32(fbd, FBNIC_RXB_PAUSE_DROP_CTRL, rxb_pause_ctrl);
+> +
+> +	if (!fbn->rx_pause)
+> +		command_config |= FBNIC_MAC_COMMAND_CONFIG_RX_PAUSE_DIS;
+
+Everybody gets pause wrong. To try to combat that it has mostly been
+moved into phylink. When phylink calls your mac_config() callback it
+passes const struct phylink_link_state *state. Within state is the
+pause member. That tells you how to configure the hardware. phylink
+will then deal with the differences between forced pause configuration
+and negotiated pause configuration, etc. Your current mac_config() is
+empty...
+
+	Andrew
+
 
