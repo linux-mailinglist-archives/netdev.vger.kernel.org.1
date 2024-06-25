@@ -1,114 +1,116 @@
-Return-Path: <netdev+bounces-106322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66000915BF8
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 04:02:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD1DB915B72
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 03:03:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 194F32838E7
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 02:02:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B6201C216F3
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 01:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8320C1B950;
-	Tue, 25 Jun 2024 02:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63320125C0;
+	Tue, 25 Jun 2024 01:02:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="BpxykPKK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kNusdkMj"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1971870;
-	Tue, 25 Jun 2024 02:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D8A01095B
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 01:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719280929; cv=none; b=I0u/BAaZb3RA2lS/p4yfrdV2mL9HSf3wNlm0YJs9yRXTNyCNQMS14yhoDA3EWEkFrBJ4V538hsWKkEJgFEBrQHQln5JzToOCUitjCwMx7Fnn3muBEiJRRw58T+3N6llEaV+WALH3WtCZG9iuvrgiSD80a7CHWjB3Ojeg/PFl4wk=
+	t=1719277336; cv=none; b=UrbFdNGcLQeq0ux27rXQS57AsVdfTpcYIbwne3HzsGdMXETU2e7nJ2bv8nKZnL8kqsf2/t/UEV06ZDa+p3/k2Ah7MssVLJ8qDHuVR4g+d9slqKcFEkecwtP6FUvGFywCVNNKP+HAi9Y2VkwIC8JxPnmjyI40e3j41I6dwjVrc1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719280929; c=relaxed/simple;
-	bh=n7plnemK0bPcTgAriIg2nQvRQCKhZS1ICeIVNSUysl4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rWDZo4S9vfJ9bK53Jo/VBjVQQ4edn2+qE6HrGn/bO0qhil8gg7r5CEz4UO8ZMnRb1HHSUlY3eBrQ+1Xvmw0rlBmkKfGKDzx7xtHzJj5yMoX97DZqdRw3eihRdWABAuqG7IFrtqzdJco1ZUnBQpNzdE02icKNQx3dGjumnYEoTA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=BpxykPKK; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 0F58A8332E;
-	Tue, 25 Jun 2024 04:02:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1719280925;
-	bh=KGZYXNlFvRfvoevz2cvG9Yp3fnK+FiUyFAiZIqZQ258=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=BpxykPKK0qbJjW3S6YRh3GqBj6ggDjH3VYswjHKqi1zezoztWijKpQDW1wm9m1HEq
-	 tYHRLGxtQTM6yuF3/CU8N2kfusqReJ/aGfLkaY6VNMod65o2uSx2fRtozl9liTqY57
-	 Ajw+/pY0cfG4TOcM98vbaP3e2TuxJfg97QN9gqoUxdeNr1VBXDDdGSTE3HcZfpMSyE
-	 MHAo4tSNEDecpc+QUd6CD3Eb8pNvgWxLfoMzRKLhEIx9YXj6ioOj8is1ut2/lKe4vq
-	 GJxqIXpzuhazzDALdKtLMwCdqhuDW29SiGCBS8XCuG/NaWO5gVI/fbOMm3r8GXbiRU
-	 /+sCf32lfddpg==
-Message-ID: <246afe9f-3021-4d59-904c-ae657c3be9b9@denx.de>
-Date: Tue, 25 Jun 2024 02:32:03 +0200
+	s=arc-20240116; t=1719277336; c=relaxed/simple;
+	bh=VGJV5HnG9eJGfEry9+OBeY7UDiY3/8fCjm4sRzUqQ2g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VtolenrP4OuEU46F0S+g5HR3V8Z2iHem2Vj4qm1oI1HKcDh7SfCN6erjjW95y9b7QdzZ1IUEYxjX29qnxo75Jhk1sY5rvOTXPxb80NEu1OXZW7XDwQISz+G+QXwX981RxaVjan4H6PvjukWJWC3u6WdRUQ6Ab0hwFH90aGxrTC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kNusdkMj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65624C2BBFC;
+	Tue, 25 Jun 2024 01:02:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719277335;
+	bh=VGJV5HnG9eJGfEry9+OBeY7UDiY3/8fCjm4sRzUqQ2g=;
+	h=From:To:Cc:Subject:Date:From;
+	b=kNusdkMjFVMMgiWtmrOHu9dz36PSiGJosVj/yqt8LZjHPwxtaOFFcn7pun4pjP4l4
+	 y13vlN893Xd4OGZbmWTTf5dRVNHEwqqC54LfAmPi/4fCX8mzcf7CpPQ/zU97vTa7QF
+	 yG3iK9IKLbQNpZWqLr1rS3HMY83DJyl3CTVupRe7ZQe/PDK4lIkivxWcRk6x+O3zDa
+	 wLVUkjNAZuMH0ZS+gg9hlKwE/pAZMY979ZCwo3NH1A2UvCqwnkBhXUpfbsUsj2mWYR
+	 IOJj3447HgV0VJWXd6XPiLSEuVHZ1PF78IAMGVa7H7RyXHrHcQi/L/ThtPfWfSTaZh
+	 H4A8ds5ONL8yw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	willemdebruijn.kernel@gmail.com,
+	ecree.xilinx@gmail.com,
+	dw@davidwei.uk,
+	przemyslaw.kitszel@intel.com,
+	michael.chan@broadcom.com,
+	andrew.gospodarek@broadcom.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v2 0/4] selftests: drv-net: rss_ctx: add tests for RSS contexts
+Date: Mon, 24 Jun 2024 18:02:06 -0700
+Message-ID: <20240625010210.2002310-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,PATCH] dt-bindings: net: realtek,rtl82xx: Document
- known PHY IDs as compatible strings
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Joakim Zhang <qiangqing.zhang@nxp.com>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
- kernel@dh-electronics.com
-References: <20240623194225.76667-1-marex@denx.de>
- <cc539292-0b76-46b8-99b3-508b7bc7d94d@lunn.ch>
- <085b1167-ed94-4527-af0f-dc7df2f2c354@denx.de>
- <bad5be97-d2fa-4bd4-9d89-ddf8d9c72ec0@lunn.ch>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <bad5be97-d2fa-4bd4-9d89-ddf8d9c72ec0@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Transfer-Encoding: 8bit
 
-On 6/24/24 3:52 PM, Andrew Lunn wrote:
-> On Mon, Jun 24, 2024 at 01:52:49AM +0200, Marek Vasut wrote:
->> On 6/23/24 10:00 PM, Andrew Lunn wrote:
->>>>      - $ref: ethernet-phy.yaml#
->>>>    properties:
->>>> +  compatible:
->>>> +    enum:
->>>> +      - ethernet-phy-id0000.8201
->>>
->>> I'm not sure that one should be listed. It is not an official ID,
->>> since it does not have an OUI. In fact, this is one of the rare cases
->>> where actually listing a compatible in DT makes sense, because you can
->>> override the broken hardware and give a correct ID in realtek address
->>> space.
->>
->> Hmmm, so, shall I drop this ID or keep it ?
->>
->> I generally put the PHY IDs into DT so the PHY drivers can correctly handle
->> clock and reset sequencing for those PHYs, before the PHY ID registers can
->> be read out of the PHY.
-> 
-> Are there any in kernel .dts files using it?
+Add a few tests exercising RSS context API.
+In addition to basic sanity checks, tests add RSS contexts,
+n-tuple rule to direct traffic to them (based on dst port),
+and qstats to make sure traffic landed where we expected.
 
-git grep ethernet-phy-id0000.8201 on current next-20240624 says no.
+v2 adds a test for removing contexts out of order. When testing
+bnxt - either the new test or running more tests after the overlap
+test makes the device act strangely. To the point where it may start
+giving out ntuple IDs of 0 for all rules :S
 
-> We could add it, if it is
-> needed to keep the DT validation tools are happy. But we should also
-> be deprecating this compatible, replacing it with one allocated from
-> realteks range.
+Ed, could you try the tests with your device?
 
-I think we should drop from the bindings after all, I will prepare a V2 
-like that, OK ?
+  $ export NETIF=eth0 REMOTE_...
+  $ ./drivers/net/hw/rss_ctx.py
+  KTAP version 1
+  1..8
+  ok 1 rss_ctx.test_rss_key_indir
+  ok 2 rss_ctx.test_rss_context
+  ok 3 rss_ctx.test_rss_context4
+  # Increasing queue count 44 -> 66
+  # Failed to create context 32, trying to test what we got
+  ok 4 rss_ctx.test_rss_context32 # SKIP Tested only 31 contexts, wanted 32
+  ok 5 rss_ctx.test_rss_context_overlap
+  ok 6 rss_ctx.test_rss_context_overlap2
+  # .. sprays traffic like a headless chicken ..
+  not ok 7 rss_ctx.test_rss_context_out_of_order
+  ok 8 rss_ctx.test_rss_context4_create_with_cfg
+  # Totals: pass:6 fail:1 xfail:0 xpass:0 skip:1 error:0
+
+Jakub Kicinski (4):
+  selftests: drv-net: try to check if port is in use
+  selftests: drv-net: add helper to wait for HW stats to sync
+  selftests: drv-net: add ability to wait for at least N packets to load
+    gen
+  selftests: drv-net: rss_ctx: add tests for RSS configuration and
+    contexts
+
+ .../testing/selftests/drivers/net/hw/Makefile |   1 +
+ .../selftests/drivers/net/hw/rss_ctx.py       | 383 ++++++++++++++++++
+ .../selftests/drivers/net/lib/py/env.py       |  20 +-
+ .../selftests/drivers/net/lib/py/load.py      |  37 +-
+ tools/testing/selftests/net/lib/py/ksft.py    |   5 +
+ tools/testing/selftests/net/lib/py/utils.py   |  26 +-
+ 6 files changed, 457 insertions(+), 15 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/hw/rss_ctx.py
+
+-- 
+2.45.2
+
 
