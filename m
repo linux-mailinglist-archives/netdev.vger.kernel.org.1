@@ -1,136 +1,118 @@
-Return-Path: <netdev+bounces-106479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37A959168CB
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 15:28:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EE299168CA
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 15:27:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9031EB232E4
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 13:28:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 434C1285AB2
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 13:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 117AE15ADBB;
-	Tue, 25 Jun 2024 13:27:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0621A15A86D;
+	Tue, 25 Jun 2024 13:27:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DF2Z4mkj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eHRIEPt5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9C815A86D
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 13:27:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A97B158D92
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 13:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719322078; cv=none; b=LygIh4R5S0Xof2Zkx90XutoBqppREDhWQxO8ryJJ9gfNLmwRard8etEKbdjyxz6EMHOFhD3i82+20/30z34qgccS3kkH6nPkmK0uDotVzFrqGzAS1YowlXUcakn82V+5Z2zwoY24XZcZ5HIRECkuc9rOJKVNDDEbS3ljJ1d0sdc=
+	t=1719322068; cv=none; b=J0/cknbiLPysAa9/4XD+7LIy+8Hd5sQcWWHtyhZ4yWij/M1YMvOzrLQ+aNwMFMOXfanVOqn8IdMRYlfDTZ+F9IG6uiPRiHfwD3vbmwZXk7DDxH33Asp9ZX6Pcm26Yw8jxszRRdOr71cx1hx4aQZdNTAgmrb1wwiLGQaKV6Rt/4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719322078; c=relaxed/simple;
-	bh=VDhiq4KNiBoS2AQjFUE49v9WVdfGpN0CjOyhMLk+bHk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eIQJ0vuSHnJzotPNCT9gXUP88F1GsBi2Uluez4aLbnCzrzkcEXZA3CBJXnlAYB7Yt809WOaoVSZGpHOv1yncViacQ4SzDODthOlqFgOKnQiaEXKTUDa1OQR45CSbzdzQfUucgpoLQ+WKLUuGqEAHyh31C6uuMpgwwVzV2REbbUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DF2Z4mkj; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1719322068; c=relaxed/simple;
+	bh=hwBQI7pQBE1wSJFByj0cSx/pZxCfKLPgBSAhCjd14QY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OXPWx2ZuxlcK/4fBhpNC0nm91peM0DenLcF3+ZQ1Ka+N7zkStBwRd5v0apTj7Hg0i6OTpUf1W4l20e3TOZBBrLU6xHPWeBJ5RN/8LM6YwOcVPlFsTNUlKVQqYEasDsmFCCW04D/RjljYAXs7FPUZe3Orp4b1Py0lflJaB+swq1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eHRIEPt5; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719322075;
+	s=mimecast20190719; t=1719322065;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SWNaNJGyLYRUd32/YEMK6ZqcA1e4JEXghqX1Hdqp4S0=;
-	b=DF2Z4mkj3xliKScucktEIKbBB6EcG0hYyTmi/oZvFoVqDW+nS/jXQh2Z336TRStxEeW1ZA
-	mE0MUxbZPjyS3YMB3AtopeVPRrOXERBEFZvQ65M/F/9WoaodPnzUAz3WvdQIL7kPMP3fNz
-	6JkXPtisL+t6yaTyQTDbJUrEpjxOi2s=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=hwBQI7pQBE1wSJFByj0cSx/pZxCfKLPgBSAhCjd14QY=;
+	b=eHRIEPt5b59OchGPuPKJnUn+u5M92wOHohEFAQnOnXJf6OF4PbQoPIet6stJYDes2GV8Xx
+	abV1b59gmclTELeZJWDi6FABToNKsTQZoqIq8DBLcnFUJX+QGNhsH+3Vfeao7tjjs/0zXr
+	N6EYJi6Y5IWJlKRc6EOw60ltmmWwYI0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-600-MIs-B1kPO5CBy78EvPeIkQ-1; Tue, 25 Jun 2024 09:27:53 -0400
-X-MC-Unique: MIs-B1kPO5CBy78EvPeIkQ-1
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2c24109ad3fso7055881a91.0
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 06:27:53 -0700 (PDT)
+ us-mta-647-gTv8oJF-Mzu3y_GUd1shGw-1; Tue, 25 Jun 2024 09:27:44 -0400
+X-MC-Unique: gTv8oJF-Mzu3y_GUd1shGw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4218118d1efso7933565e9.2
+        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 06:27:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719322073; x=1719926873;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SWNaNJGyLYRUd32/YEMK6ZqcA1e4JEXghqX1Hdqp4S0=;
-        b=HVOVvS/7mEeyHnhyFf4l0Nw2LW6F2SC6lhDLcVx+q2A13ZG4+yqxoxXnlwRgW9m0oa
-         HQ4uluvWbOA+TdY5vwaJoBma71ypXSiQVVmiMWfNi23wLUfFMQyVJAkLm9NmF+nHjxC/
-         oGK0g+ZQAG6fWz/z6RBy7EVPB9hD+MMAiGOimjosIjpLrTHYT5j632UMjjWXsJYpzRdx
-         eDVpDWHMW4Ch3BCFFVtE5Q1WUov1WgByDt9GJNihmWEbQ7VLaCHy3w8u8hUkzTX9RICZ
-         y8aMv8Zm7N2XUupLmt777F/nIHyzABXFEI5VXwBdGFQfiAFhQKX/LVkz7CAkonXtTonl
-         ePZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXzGgZAoos/MF1j7tq1f68jXgdjWjDft4WD1fU2Jl1mxKJ8udyONYTfKrolY0efv9gE3Xr195yzFMpSQNepLPXbmSUITwWv
-X-Gm-Message-State: AOJu0YxOYZhRHQse2IIp7Lok11dY2wV6H+tkvT5j8+7Lni+etaZQQgnR
-	BC8BvuqDKEEgn8gExd54tJA5G0RMjkxPbCDd1/+JqB4bzwCZ2/hRSWwrMTRFrJrvkT4Lpea+F4m
-	rurpFF8/ee1og85+dgOlUWBXa3oVeOWQ+jrFrKNVoRN0croe9oj7MlmAiXLZu/uRQE4cQCrj0YF
-	xogqqNaagNeX8wvBlJpqLAAgRWdbXr
-X-Received: by 2002:a17:90a:fe13:b0:2c8:7b42:4c3a with SMTP id 98e67ed59e1d1-2c87b424cf9mr5965125a91.34.1719322072924;
-        Tue, 25 Jun 2024 06:27:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE8Dc/ROCgQk4Q/6LPYJ19zTIY2OkwKpkqgD4u5LeZNq04M+vS++O678uip5eULLnNMLJPBWn2X76xfXUVx10M=
-X-Received: by 2002:a17:90a:fe13:b0:2c8:7b42:4c3a with SMTP id
- 98e67ed59e1d1-2c87b424cf9mr5965106a91.34.1719322072568; Tue, 25 Jun 2024
- 06:27:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719322063; x=1719926863;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hwBQI7pQBE1wSJFByj0cSx/pZxCfKLPgBSAhCjd14QY=;
+        b=ttpCMaqw6Je055Mcigvo+eJ9OX940PeL6pgDEcQK5hQtH+Tg5PDmlfYSXNdt2UDoB8
+         R77ZkfENdOSPT/R1fTcbsYKJ+L3y4nTemzPRY/SKcKqixQnRkrWSCuJCh5vFR17r0UHE
+         VC66siLtqegfDH++QdPV19dX0v0bVIuXxNYddu+WRj5R5E6I73hMHWxYINXs1ILqj21J
+         PMsqWZSw8Gn/+cqZGmkbyTjjO8pec1MSaBMNFQAOLr2lZLDTd6s5J4Z2V9/DEhjnh0ZR
+         O6zEAMLwrIe4MgYzbJYC10tiMDqVyR8PTuI961N/aM1ABcLr5jhLYbKvskhULf4h3DhA
+         rMkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWPM3cn4AqyWX/UXqKX8IY+iRC4+UB33R+qsPGlgmrjbJPv2Jq0/oU2vFxcdcULbfpZhqRsKIhWh8/yj3Jz2rTmDMUwUTB4
+X-Gm-Message-State: AOJu0Yw0oWkioAs0X0153p9oLprG/eTzM3UFSzjmJLDu+J1IYDysbi7x
+	IXheTDrxKXpxFRx2dNSpGcKtFwj4T1ViMq+dPjtfP4TTjSVcybPbJ17/vNXDO2O6mtgOV1pr9hH
+	J4jAfaba8D60R+nbLckMle3VsemqlVsjCwOUssp1lAOup2DUMT31PgA==
+X-Received: by 2002:a05:600c:3b11:b0:424:8810:78b5 with SMTP id 5b1f17b1804b1-42488107bb0mr67563205e9.0.1719322062866;
+        Tue, 25 Jun 2024 06:27:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGWb6IADqsktf9braU+wpvVVnnK2atC9Hf2xNDLQqfeYysT1QQMrvoOzrLTa1uHZiRG7nSENQ==
+X-Received: by 2002:a05:600c:3b11:b0:424:8810:78b5 with SMTP id 5b1f17b1804b1-42488107bb0mr67563115e9.0.1719322062529;
+        Tue, 25 Jun 2024 06:27:42 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b0ae:da10::f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36647e7eb4fsm12969754f8f.18.2024.06.25.06.27.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jun 2024 06:27:42 -0700 (PDT)
+Message-ID: <1c5f5650ba2ffe99b068266ceb6e69f59661563f.camel@redhat.com>
+Subject: Re: [PATCH v2] net: allow skb_datagram_iter to be called from any
+ context
+From: Paolo Abeni <pabeni@redhat.com>
+To: Sagi Grimberg <sagi@grimberg.me>, netdev@vger.kernel.org, Jakub Kicinski
+	 <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, David Howells <dhowells@redhat.com>,
+  Matthew Wilcox <willy@infradead.org>
+Date: Tue, 25 Jun 2024 15:27:41 +0200
+In-Reply-To: <20240623081248.170613-1-sagi@grimberg.me>
+References: <20240623081248.170613-1-sagi@grimberg.me>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240625082924.775877-1-chengcheng.luo@smartx.com>
-In-Reply-To: <20240625082924.775877-1-chengcheng.luo@smartx.com>
-From: Mike Pattrick <mkp@redhat.com>
-Date: Tue, 25 Jun 2024 09:27:39 -0400
-Message-ID: <CAHcdBH4vM5hptpwNuwpan8t+g-nCekwnEeY-Emr4aPkZxR5DSw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Add GSO UDP Offloading feature to OVS Internal Port
-To: echken <chengcheng.luo@smartx.com>
-Cc: pshelar@ovn.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, dev@openvswitch.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 25, 2024 at 4:30=E2=80=AFAM echken <chengcheng.luo@smartx.com> =
-wrote:
->
-> The OVS internal port does not support UDP fragmentation offloading,
-> resulting in large packets sent through the OVS internal port to OVS
-> being prematurely fragmented. This increases the total number of packets
-> processed in the path from the vport to the OVS bridge output port,
-> affecting transmission efficiency.
->
-> Signed-off-by: echken <chengcheng.luo@smartx.com>
-> ---
->  net/openvswitch/vport-internal_dev.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/net/openvswitch/vport-internal_dev.c b/net/openvswitch/vport=
--internal_dev.c
-> index 74c88a6baa43..c5a72c4dc6fd 100644
-> --- a/net/openvswitch/vport-internal_dev.c
-> +++ b/net/openvswitch/vport-internal_dev.c
-> @@ -110,7 +110,8 @@ static void do_setup(struct net_device *netdev)
->
->         netdev->features =3D NETIF_F_LLTX | NETIF_F_SG | NETIF_F_FRAGLIST=
- |
->                            NETIF_F_HIGHDMA | NETIF_F_HW_CSUM |
-> -                          NETIF_F_GSO_SOFTWARE | NETIF_F_GSO_ENCAP_ALL;
-> +                          NETIF_F_GSO_SOFTWARE | NETIF_F_GSO_ENCAP_ALL |
-> +                          NETIF_F_GSO_UDP | NETIF_F_GSO_UDP_L4;
+On Sun, 2024-06-23 at 11:12 +0300, Sagi Grimberg wrote:
+> We only use the mapping in a single context, so kmap_local is sufficient
+> and cheaper. Make sure to use skb_frag_foreach_page as skb frags may
+> contain highmem compound pages and we need to map page by page.
+>=20
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 
-I'll try testing this out, but preliminarily, NETIF_F_GSO_SOFTWARE
-already contains NETIF_F_GSO_UDP_L4.
+V1 is already applied to net-next, you need to either send a revert
+first or share an incremental patch (that would be a fix, and will need
+a fixes tag).
 
+On next revision, please include the target tree in the subj prefix.
 
 Thanks,
-Mike
 
->
->         netdev->vlan_features =3D netdev->features;
->         netdev->hw_enc_features =3D netdev->features;
-> --
-> 2.34.1
->
->
+Paolo
 
 
