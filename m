@@ -1,186 +1,103 @@
-Return-Path: <netdev+bounces-106656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B722917216
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 22:02:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F19EB917219
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 22:03:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B30B1C26A51
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 20:02:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7965E1F2536D
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 20:03:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3075D17D8B3;
-	Tue, 25 Jun 2024 19:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 551E817DE24;
+	Tue, 25 Jun 2024 20:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="MIOkeoC9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jTvrtFik"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EAC417D37E;
-	Tue, 25 Jun 2024 19:59:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE3017D88A;
+	Tue, 25 Jun 2024 20:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719345556; cv=none; b=eYAC/rIsd5SGN75HEt3YlQ0kYwjAxB2d+uUKz85UbPyAOWQ4CcNtwiydUw6mnoXbaG9PIzh5hfjj7GTzm7cMFi/xj6+1jlKszD7auUuODo1cgjhuhRNu/365nSs9PJUmaxVyzz8hKmLOyFjbcIGuNK1C8jkEWq07hDvjNDqTm5g=
+	t=1719345682; cv=none; b=MB5d7Qac8Vx9gV6BGBGhMWqrdzAgppsxqK7aVkCCUlugUuvlkKvNkOjYtjyvms1173V0u5IS1hcyWtfUgcXZqzJflkrJsCRll6CyJOagu+x4NCCrSW1MCI2AcrX53Q5hZovhJUjnSlGrrbnEAUawWEmykIUdkPSlfE9QEJ7BETU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719345556; c=relaxed/simple;
-	bh=ZOz8lyWN2kgHyZJOCeL+C/MiTWY1XJbAbPRQYE6+Z3M=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y74ItxKhc28hLr6ZKbMlipv2thqONujTvbpLVLI/sGnQ/A5MMZTMRXn38HUN/nasGRSkpvtCIvVR6X2406yEyS/E1jtavn0oCpaSb8UZ5y/nYkPAF9135952JXW4Ot9nkjee/R244Fn+wmV9ppGl5Fl6+iYaeM8gc0jJHupSff0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=MIOkeoC9; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1719345682; c=relaxed/simple;
+	bh=9YN9fi+RGmQ61gc/Yy7uiRwXidehsBVMtZfuJKgiBPg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qDSejXmyj7THNp/Gm5f6FTaW/Jfq4d6nh6qAg5aP9GJDjuf9b0CXPY1rCsHfHDs+lkCqq85fQZ39tY2a85oagig6z9aisBF+dxP3d7rS+StbFOQbuII/XzMjM2bmieDAaH4E2nXm/SZzWW+w3Ktv5usDzJ6qlF85SQ9j0tSUdTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jTvrtFik; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-424ad289949so1401855e9.2;
+        Tue, 25 Jun 2024 13:01:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1719345554; x=1750881554;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=kishX8nABOvSFBWLgjMLQIC7J+lezddID4sm2eyUYT8=;
-  b=MIOkeoC9s64uk9I9T76vAnneNNmKOzOOu6kCISiu19Ti7ksMC4rzR3bU
-   szJdp0wQ/WMKb9Dk20RTPD371pOBfl5OektvBoxyNE83AlaNjcG0oF5UV
-   JKmsjo1M1V/kRdvrrPKajNjmD5AmR1zWs82XnIZJLgbaM6Q0lRrW1x+VA
-   4=;
-X-IronPort-AV: E=Sophos;i="6.08,264,1712620800"; 
-   d="scan'208";a="99511191"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 19:59:12 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:40898]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.20.169:2525] with esmtp (Farcaster)
- id 758f2c13-0468-40bf-998a-3e3f37ff1949; Tue, 25 Jun 2024 19:59:12 +0000 (UTC)
-X-Farcaster-Flow-ID: 758f2c13-0468-40bf-998a-3e3f37ff1949
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Tue, 25 Jun 2024 19:59:12 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.100.6) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Tue, 25 Jun 2024 19:59:09 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <syoshida@redhat.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <syzkaller@googlegroups.com>
-Subject: Re: [PATCH net] af_unix: Fix uninit-value in __unix_walk_scc()
-Date: Tue, 25 Jun 2024 12:58:48 -0700
-Message-ID: <20240625195849.55006-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240625152713.1147650-1-syoshida@redhat.com>
-References: <20240625152713.1147650-1-syoshida@redhat.com>
+        d=gmail.com; s=20230601; t=1719345679; x=1719950479; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OihNYLWToVLg3DrhxWkLSuZFKz7uS3h2BS33G1TLL6c=;
+        b=jTvrtFikJjLZogYrmOIDx7a+cSGLqDanMnBgMePuWqW8AU6VyqWRKMU7tgGQ1CV3Rw
+         FPkVuW4OuKPgMu4lnrPIrODFqmS+mBmX7SWmW0e+fdkteE7D3qaoWz4HeqcBjBRD7gSS
+         w/G463ydX0YP59fpW0M09t1wQrpEoROOP4IVQ0FixYy/F/ArWKJbFu+SaFj5x8lVCZg0
+         CJ8rCn5XxuH0kySUeUdm+Tnux8DdKv6r0ZDS6p5gIv29igWK4+51Dx2COdLH/VkXcOCX
+         fS/2tzseOwW8kk5h2r1uEGzYjkydOVhG9cjcaZHh/6lgDtKmHCD09kLRPSZRpVpzXs9q
+         0XwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719345679; x=1719950479;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OihNYLWToVLg3DrhxWkLSuZFKz7uS3h2BS33G1TLL6c=;
+        b=qSbi1ApJTXB31BO2T0AEOcxL16QCeDfG9zPGi5yjBzMcuv4GW8d4CedmrH2ykYZqCH
+         biChMXHLU566aSgWc8U4LMZWCc6TN9nVpqBMANWu+gb92rhSlWMJZm/oin3syw9lR5Iy
+         X3+pc1yUn7mdYaNpYKpfDzpA0MI/2lJlV0eaeb+XTinXdAed6yCkprxxKmJ+7tVCmwZC
+         0fB52rO6pTouy7eDpjW4oqvJo8WXfpQ0bgeVTuiSD8BPHAfJ4MIJMySU6wg+QkAOZALE
+         n/n4t1ITeklrnTm5ti4bJTQXFe+/E6V7e5qxr3tq9ugKXpzz1absKoD0rZNU1lOPkC+u
+         qovA==
+X-Forwarded-Encrypted: i=1; AJvYcCXhYyiLbESdjeZleqBC7DY7Ff1N+sXOEzD/rHZb/n99vy4CTNPcnDaIikr6e+4/u8nphtzBouMf/3ciOb7LGoWF6nr1eAHH
+X-Gm-Message-State: AOJu0YyhYhJ55FEjxW3YrN3rrYo8JIjrK85Fk4MGPT2mXKhxJubq1jkg
+	WajFYoFoYU2rWIwlCnYLTI4sIB1Ltwm0OXbv2x0ZmYpyfG+qBUf5
+X-Google-Smtp-Source: AGHT+IGzaRTpv9iWH0+7n8XA/0WsLNF83VWr6i/ycNt83bfgGKXMT8lLxxQNg4KLpKy/K2+iil/UpA==
+X-Received: by 2002:a5d:664e:0:b0:360:6faf:53f1 with SMTP id ffacd0b85a97d-366e7a51d25mr6156708f8f.62.1719345678322;
+        Tue, 25 Jun 2024 13:01:18 -0700 (PDT)
+Received: from [192.168.0.5] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-366f973b7e5sm5028044f8f.14.2024.06.25.13.01.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Jun 2024 13:01:17 -0700 (PDT)
+Message-ID: <724b82c2-48a2-4487-8298-47d4a781e897@gmail.com>
+Date: Tue, 25 Jun 2024 23:01:52 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D044UWB004.ant.amazon.com (10.13.139.134) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v2 1/2] wwan: core: Add WWAN ADB and MIPC port type
+To: Jinjian Song <songjinjian@hotmail.com>,
+ chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
+ haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com,
+ ricardo.martinez@linux.intel.com, loic.poulain@linaro.org,
+ johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Jinjian Song <jinjian.song@fibocom.com>
+References: <20240625084518.10041-1-songjinjian@hotmail.com>
+ <SYBP282MB35285A10C24927915FAB42CBBBD52@SYBP282MB3528.AUSP282.PROD.OUTLOOK.COM>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <SYBP282MB35285A10C24927915FAB42CBBBD52@SYBP282MB3528.AUSP282.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Shigeru Yoshida <syoshida@redhat.com>
-Date: Wed, 26 Jun 2024 00:27:13 +0900
-> KMSAN reported uninit-value access in __unix_walk_scc() [1].
+On 25.06.2024 11:45, Jinjian Song wrote:
+> Add new WWAN ports that connect to the device's ADB protocol interface and MTK
+> MIPC diagnostic interface.
 > 
-> In the list_for_each_entry_reverse() loop, when the vertex's index equals
-> it's scc_index, the loop uses the variable vertex as a temporary variable
-> that points to a vertex in scc. And when the loop is finished, the variable
-> vertex points to the list head, in this case scc, which is a local variable
-> on the stack.
+> Signed-off-by: Jinjian Song <jinjian.song@fibocom.com>
 
-Thanks for the fix !
-
-More precisely, it's not even scc and might underflow the call
-stack of __unix_walk_scc():
-
-  container_of(&scc, struct unix_vertex, scc_entry)
-
-
-> 
-> However, the variable vertex is used under the label prev_vertex. So if the
-> edge_stack is not empty and the function jumps to the prev_vertex label,
-> the function will access invalid data on the stack. This causes the
-> uninit-value access issue.
-> 
-> Fix this by introducing a new temporary variable for the loop.
-> 
-> [1]
-> BUG: KMSAN: uninit-value in __unix_walk_scc net/unix/garbage.c:478 [inline]
-> BUG: KMSAN: uninit-value in unix_walk_scc net/unix/garbage.c:526 [inline]
-> BUG: KMSAN: uninit-value in __unix_gc+0x2589/0x3c20 net/unix/garbage.c:584
->  __unix_walk_scc net/unix/garbage.c:478 [inline]
-
-Could you validate the test case below without/with your patch
-and post it within v2 with your SOB tag ?
-
-I ran the test below and confrimed the bug with a manual WARN_ON()
-but didn't see KMSAN splat, so what version of clang do you use ?
-
----8<---
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Tue, 25 Jun 2024 19:46:59 +0000
-Subject: [PATCH] selftest: af_unix: Add test case for backtrack after
- finalising SCC.
-
-syzkaller reported a KMSAN splat in __unix_walk_scc() while backtracking
-edge_stack after finalising SCC.
-
-Let's add a test case exercising the path.
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-diff --git a/tools/testing/selftests/net/af_unix/scm_rights.c b/tools/testing/selftests/net/af_unix/scm_rights.c
-index 2bfed46e0b19..d66336256580 100644
---- a/tools/testing/selftests/net/af_unix/scm_rights.c
-+++ b/tools/testing/selftests/net/af_unix/scm_rights.c
-@@ -14,12 +14,12 @@
- 
- FIXTURE(scm_rights)
- {
--	int fd[16];
-+	int fd[32];
- };
- 
- FIXTURE_VARIANT(scm_rights)
- {
--	char name[16];
-+	char name[32];
- 	int type;
- 	int flags;
- 	bool test_listener;
-@@ -172,6 +172,8 @@ static void __create_sockets(struct __test_metadata *_metadata,
- 			     const FIXTURE_VARIANT(scm_rights) *variant,
- 			     int n)
- {
-+	ASSERT_LE(n * 2, sizeof(self->fd) / sizeof(self->fd[0]));
-+
- 	if (variant->test_listener)
- 		create_listeners(_metadata, self, n);
- 	else
-@@ -283,4 +285,23 @@ TEST_F(scm_rights, cross_edge)
- 	close_sockets(8);
- }
- 
-+TEST_F(scm_rights, backtrack_from_scc)
-+{
-+	create_sockets(10);
-+
-+	send_fd(0, 1);
-+	send_fd(0, 4);
-+	send_fd(1, 2);
-+	send_fd(2, 3);
-+	send_fd(3, 1);
-+
-+	send_fd(5, 6);
-+	send_fd(5, 9);
-+	send_fd(6, 7);
-+	send_fd(7, 8);
-+	send_fd(8, 6);
-+
-+	close_sockets(10);
-+}
-+
- TEST_HARNESS_MAIN
----8<---
+Reviewed-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 
