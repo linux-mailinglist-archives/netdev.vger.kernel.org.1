@@ -1,137 +1,253 @@
-Return-Path: <netdev+bounces-106627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 637B8917090
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 20:50:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 21FF6917098
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 20:53:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0ED741F22CF6
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 18:50:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96FF71F222FA
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 18:53:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C1C1369B6;
-	Tue, 25 Jun 2024 18:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F37A1487C4;
+	Tue, 25 Jun 2024 18:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ForO7w/n"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="Ul9RtZ8Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2111.outbound.protection.outlook.com [40.107.93.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06DDE144306
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 18:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719341400; cv=none; b=pTJHj43t3wzFB2R2++h/VwwpUUxIk0ZuyiFJgIQfuz3lJQdiLK/Yd5uqvEeZBNzrJgUkf7VhEos8fiTK7l4MwBc9CD1PM1P2lvkFdvRog+QI+3n0uWIFE2rkc98b6N+hVMelVBqQ0DVsI3ZD83dBgJO8HD2ZuWez4wGG3YV80Ng=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719341400; c=relaxed/simple;
-	bh=I9+x5dwtD4RCBDpgMKxC/11FGcUFxcGqqLv62GSTPTY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AETCWM9VFw8GkBzdISSnm8qk+0djuCnsu6RQhG+hAV7qy9VkdT/5clT4d7wvCS6ZYv/axMLqsyuS9zsHBAr9SkqMrLqbGE3Xe/DiGG7qpT5ijD3MPKuA/f419jEFSFpFpGb2fmVWYLKlnWaOeCykDcLUvnonp1+Vc6Wt7MuHiY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ForO7w/n; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719341397; x=1750877397;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=I9+x5dwtD4RCBDpgMKxC/11FGcUFxcGqqLv62GSTPTY=;
-  b=ForO7w/nQ7ctS0r6SCJeLUGgo8t7SoNW9r4T976dUeBGAoEJzEXOdCL2
-   gYGNTCDvTuhI2/cXt4xLNGrsDQaL6LMfEDjD3fSAHHonVbNeRUAn6xD2g
-   vM2nbK2ihpaEqGHuOoWoD6B7ixnVy/MWL0nkgGtI6Ek66tW0LmMKvli3r
-   N/sdYYVUsV/xGMa7GI87Xz3taX3V1/iJQ+O2ZqdyEbkWiVBbl/ndaSs7N
-   WciyM0MmmO8/0Exo9UEF6ZKaYRPHwwJEhz2FbJ5Uy/VSYI5PcFg5r+MIm
-   uCZGhVXB0Z709o4amhgZRaRs09gN/sbACq3gdVgw4L49GH5QXXcdIrVVG
-   g==;
-X-CSE-ConnectionGUID: Jsd5eLFmSIqsZybCMxaWJw==
-X-CSE-MsgGUID: W3/hHp76S6CLn7gg3EzNwg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="26969771"
-X-IronPort-AV: E=Sophos;i="6.08,264,1712646000"; 
-   d="scan'208";a="26969771"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 11:49:56 -0700
-X-CSE-ConnectionGUID: CpKab/YiTq64pFtkTZ4gEQ==
-X-CSE-MsgGUID: sjZqw6orQU2SYiFkfvWxEw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,264,1712646000"; 
-   d="scan'208";a="48192336"
-Received: from unknown (HELO amlin-019-225.igk.intel.com) ([10.102.19.225])
-  by fmviesa005.fm.intel.com with ESMTP; 25 Jun 2024 11:49:56 -0700
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DF81369B6;
+	Tue, 25 Jun 2024 18:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.111
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719341627; cv=fail; b=sKEeMWsHHHsSz5Oy+cDF61AMxe1vOxH1PbSyVNdKqTzW31dN5a6/Cn4fKUF8TrX5rXwnk1M3geT4au5zJWReIRtUOgoivNargliiW/zcOncTWqHA6suHiRCBDEZIbQ3zPynhjzpDtIfsW4P215LrWv+hvMBn/JPetLkarZh7Dqg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719341627; c=relaxed/simple;
+	bh=E61rF2DHsYdZ8Cm3LQN+6hmd1qUjlWw1mAKxJwPp/Fk=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=ZsWetAyNguX58B6QnsHnKP3M+rf44MyLwkBbGF/9hiGQ5b61157E0Cs6W6UUPFTo4KYq4k1S5r0sNj43BxRKMQTJxGSjye5S5piSnUURkL/lu353b3AhlZLmg3Pn+AYDZF49DSfBNVRRovM/M1C5K5ByDicVme1kpkoDplbVJ0c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=Ul9RtZ8Z; arc=fail smtp.client-ip=40.107.93.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UlMrlh91F173AjBPd2d52IU3HhuQNyFavDFUlud9tz6e1ojVh9aLFT9TiqiEz7Wi2wkrOWmOhnprHNUHrlXai9NQW4gJtdlqbP/KW4bMy+XRyfQf+Sl0PxFymnUYUKpxoMm/qhVkBl6U4WgVIbzVwu5woeqwBJSEIimkmNoWJagRdFnEjEWjpzhF5fCsCRw7RxL7lthsMDGS6hjwYI77OwNK3JtZUEFGphiGaAOfSdxGp8KR4JWG5AVEfAzdrj7m4qix7HJCYOAolz1987wUrfSHu24kkQjy1Crj1/CKUeihAEc4NTdjLlNz5HbY7y1XDFAiziRPUgkZ7YSpdomkXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Y0TyFhP4oQOjkMaqQccmVS+P7J+h1bXacPZCSPNA1bM=;
+ b=mYB/iEKxEKaJzY8pLx86+MZvq7f5xnZkl4QqTHmsxYBFZcRbeVQR4zxvo5hsX4JBg4RyVhp7yeAYc31C7WxdY5OvT+6P80txhVtnOjTBO6vA2x8x3VyH8lF3+PRi3JHdw8D/EX1J6PVQKRl7PhXW2tnvB1G6TYzXfLinhQreB95kp0bK2TjqzqFKk1q6bOASIVWOHVuo2tcD9ettdOg4R4q30PN6tQ5yfmRAbbt5VqwB1foXFXH3EldGsUd+sQDu25R41p5/BI8k3V1UYSkWuLkN9YC7Qn15eMvkQFSlcqnJxZlLtvL9x7eTz2F5xUlb08ZC4UfVQw28aJJWXWIevA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Y0TyFhP4oQOjkMaqQccmVS+P7J+h1bXacPZCSPNA1bM=;
+ b=Ul9RtZ8Z4jNOFtbPwQMSCA1w4EuC0PQI99CUD+ZDXdqwK32hAR9MEetsy5nCmukpTB9PwHnYxbhTFHnPr1pL0R83ayxhtG+nG0+HbkUQbBOt2hhOkK4FkiTTAlN/TsTp+KsHOUI9ekmQCbHpqtuZ3vg75eANYUgpg/Pvx5HTsvA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SA0PR01MB6171.prod.exchangelabs.com (2603:10b6:806:e5::16) by
+ PH0PR01MB8070.prod.exchangelabs.com (2603:10b6:510:295::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7698.29; Tue, 25 Jun 2024 18:53:40 +0000
+Received: from SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d]) by SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d%7]) with mapi id 15.20.7698.025; Tue, 25 Jun 2024
+ 18:53:40 +0000
+From: admiyo@os.amperecomputing.com
+To:
 Cc: netdev@vger.kernel.org,
-	Kelvin Kang <kelvin.kang@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH iwl-net v5] i40e: fix: remove needless retries of NVM update 
-Date: Tue, 25 Jun 2024 20:49:53 +0200
-Message-Id: <20240625184953.621684-1-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.25.1
+	linux-kernel@vger.kernel.org,
+	Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH v3 0/3] MCTP over PCC
+Date: Tue, 25 Jun 2024 14:53:30 -0400
+Message-Id: <20240625185333.23211-1-admiyo@os.amperecomputing.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BY3PR03CA0008.namprd03.prod.outlook.com
+ (2603:10b6:a03:39a::13) To SA0PR01MB6171.prod.exchangelabs.com
+ (2603:10b6:806:e5::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA0PR01MB6171:EE_|PH0PR01MB8070:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3b548d25-48d5-46f3-5f12-08dc954820c2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230038|366014|52116012|376012|1800799022;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?cIfqOT5yiNok+r1Wd4c6ff2F1Rr7+OPuR7HXaEUYbAG2kKMd2JYQCcCQc63S?=
+ =?us-ascii?Q?JHnABugkVq0t5Ej90yNSuXhSP3PENolnhMHPSvyTCkGd5sn17Qk0ZXo8u2Xj?=
+ =?us-ascii?Q?65yj9d5/NF+QOUYurM9LqseNeCX9RLr3qr2IRuhoMpn0EI4xextNLEnwpc91?=
+ =?us-ascii?Q?8d2n/KuS+ItD6HzoZkz76uVd5J1O0omf1PK6JgsxEDQxos+jmDTyJ9yEw0Ei?=
+ =?us-ascii?Q?pOXiWbCVS4Mx2S+/zC9hJtPisBQRnrEqximT/X14nMWg0cq/2dhlT16GrEBk?=
+ =?us-ascii?Q?TfEJXxCfcZxUp6E6gPqtRHO1e/HWDPtRwRB/5Jv2XQvy0pP9QnuFocw1xoxc?=
+ =?us-ascii?Q?zekVm4Y1BmrgN8UsmOchJ85pd6VISoXEaTln0HNeNlLK6Xq4c2MzVBpmQNBb?=
+ =?us-ascii?Q?0OCpLrwHY6I3P7RK8Z4hJ8owjMsg2E5/2t5Azn3X2OdxhtniJI+AEpt8diVn?=
+ =?us-ascii?Q?fjeseJ4Dcis8zh27POve1GD6xLlAEAAOD8e/mIDTQptuWL5UNqjque67QdQX?=
+ =?us-ascii?Q?z3c3i+PP6CGDo5Bges4pBZmt05d4G0wmAbHoq4rxXT5y5fMXBNExnTd9Pyrn?=
+ =?us-ascii?Q?SWVVev+lZpdEek/G1mNSnNxc8lK+dWkvbTU5eqhOpgqXy/YUIJ3XFXP0cGQ6?=
+ =?us-ascii?Q?WK4neIyPO/isMwUZdNE+VKNiMQWvHMV7D75XKuSn0wkTtMZZ0TAnEP66h4Dp?=
+ =?us-ascii?Q?+UI2oPEgT+l8qDYWvQ8g8C4hha6nN45Afq7Lqrmc5ZewKABNE5RfHccDfJki?=
+ =?us-ascii?Q?n4JIspHKdkRVRHccFC3T0Ge6/pbFJ5lDI/RPyMOZs6YaYD6457eg2IxIOdBv?=
+ =?us-ascii?Q?7su7jYb2WUTMaRy911EI48YcrKGwMwO1CDBiaXgroD4cXHPR71D6EYzjeIYb?=
+ =?us-ascii?Q?z/VMwepLD9lf7vn8TAjYptYISMgBiSm8rlO4nV3NFatUxpG1mm6WRrRhwizR?=
+ =?us-ascii?Q?iKBfNGDaoFQEVhMiEQo8EYE//+jA9rEEAc4GCFDu1cEgx9EvJ6bZ6cVwDoWs?=
+ =?us-ascii?Q?9a5mjFbi77z6Rmp0eDM3J8YOJJg+L+MipGQgfuRKPqk9W1uNnFNN6bzBjvrJ?=
+ =?us-ascii?Q?EJcxVP7FRvoApBnrVpZKNCkb2Weq4/h2rjEg73OD9M+GMoL6/37MgCw7s3oR?=
+ =?us-ascii?Q?By4a+3Q7/WAwHN8zg+gRJ3yONO37YdBlfB7n17DfQdaG82UxpHq7TYW3QtTz?=
+ =?us-ascii?Q?9h2tqblGzuU3LfKxELJ5eNmUZD7bkGg50c84GQ2jneF8FdvUO0qBzFeASOVD?=
+ =?us-ascii?Q?WK7REPnXoVAwxzcEiMlr?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR01MB6171.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230038)(366014)(52116012)(376012)(1800799022);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?0iwwBTZAAkvKmohkUEMsSsT0UawwrkZBSvowaZtWo2ioBK2TUOpnpxNvnbui?=
+ =?us-ascii?Q?D1Ox0xwk3JFb/ZY49aWU6GeGcIjaZlKl52iy95V85CKAD5C3xZd6P2laEx9k?=
+ =?us-ascii?Q?y/rrvvGk/ujIyiT0E3TUFxE/IIaRIOfm303H9jJucIpsvG4Gia8ZxpdkOLpl?=
+ =?us-ascii?Q?zizasUNV9kl5qziL5R/AB1anIqBqNwl2aHwjMm18R8nJSsk7mW5jFOimarjG?=
+ =?us-ascii?Q?f8xv7WOu8WkrXLkuTCtgEqh6SDAb1CqTrOHMh0Spp9lvIju3Vm6JuXjxuYcx?=
+ =?us-ascii?Q?0Zn04yfGzQTI6LZHW0aLAEO8P300AU49OQgrjIeF0lTVY/NBzSKm/XS0ciBu?=
+ =?us-ascii?Q?Y4EopzgD7QrIbZ2ccgZ62iZWZUbKQJab7XkbpEytihGgjxXzCCe8GUzX5sJC?=
+ =?us-ascii?Q?frJDe2y7ER7gXX2tF1jqUgPokNpC0ULVGmJbmpJYosSGus+LFDNIAZrdhLXd?=
+ =?us-ascii?Q?bzINNvvilS1z0AMMPGPckgtiSmoc+ThqHIxAAqwjYN/5ENJgYaPfRSI3hASu?=
+ =?us-ascii?Q?0yTMq1uD2G+bXJPiaoOmHBvaj7C6Y0HEGzAx+NUGdtGGCuS59uP81Kg5bRLp?=
+ =?us-ascii?Q?SWS/YBHLFOzp96CW6PCcrVVVmBCBWohAMfnofcl7BJbJcNwOS8LDWo24lyDC?=
+ =?us-ascii?Q?14J6gPp4OXqf5/D7Q/WQ7FCwrxtYiM4mguewrb6fLNlXAdT5A0MNTnmm6ogK?=
+ =?us-ascii?Q?9WsK1BJ84v/nxsPB15bioIXm7qc/SsAsEiS0bN/1XhM/4nkPh3pMymSDD97m?=
+ =?us-ascii?Q?9Y3LFceMGHNO+fYYMNvkIvf6cVPsahwsTn/wfopu6ml0J8H0AjcbB3jEPhFW?=
+ =?us-ascii?Q?eOCgoWvPx7dChaZvBbRJ8TAnCA63pQfnpbu01vnJRrqAtRpCNnI50sLEtn9s?=
+ =?us-ascii?Q?rVvKLV5KD/7Lwz4SoO/Zzxh+x4was4B2Cy5yU+boLUuvauADTbshgpU2gW+J?=
+ =?us-ascii?Q?f0yVe/MU1lNkCDCflyY5/KOKT/jI4nIxQPhB73LEFB7idpqMie4dVU21SY3u?=
+ =?us-ascii?Q?TaWJLnazJgQmpgVwFXlKUA8QoigzmlBiUW883MJJkrWESa3cpaYI8NP5vOEJ?=
+ =?us-ascii?Q?/BY61hQIWx7+HIrOot5ZpEZktLVZElXf2bHqmwuPkTDKm9gacwGk/3lPuIyj?=
+ =?us-ascii?Q?vTc+cMYFRnLSs1zp5McT/BSW8yFMxUW5GaQ2stYdsMNI9yqTAwYPTvZtCK6T?=
+ =?us-ascii?Q?W5L2fikEs4rfaBGD91EZ+/D0N/rQmY4moqKF/lEXqBymJ9MbxDsie4qAVmQx?=
+ =?us-ascii?Q?YI7dITMFqp8+fhGY5T/GCymi0Nmgc7TV7KvaB3iUk1T87s1j6qEIq1CQ5rbH?=
+ =?us-ascii?Q?IaM0DTe3KzLx84VKFcP1YTZZ5kQYbHLr5WtkR7dhMGS2oOxMjJGNEkdxETW0?=
+ =?us-ascii?Q?XnUZfFQe0T4nNGr/5udwFwiqQ8Nt0jCtRwG5GnbaYcanXtwboVMPMPyz3Ww+?=
+ =?us-ascii?Q?dd5pkv1hwwYIpQKSsdCdPxUgKUxYCMlc5MoT0ivGoTZTZOcNwJokSvHOGcSI?=
+ =?us-ascii?Q?EcHy7RkLgJRSBmJU8tV5HM0jc3pIVrE4TfaApTlQS4QgI19J3gVUxZIO/zOu?=
+ =?us-ascii?Q?6bqyLe4qp+GIVOIIkxbiESOFMfREMqNcKGkju0kw9L6jXHhtodxef89vTmlq?=
+ =?us-ascii?Q?mCnPX0Qb5LedNahNWOcKp08QnRc6H0BljtOGjk/NgroOLNxSX5LC1yMds42D?=
+ =?us-ascii?Q?BjTaqQV0lDePTDwbKHqAdTnBEjc=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b548d25-48d5-46f3-5f12-08dc954820c2
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR01MB6171.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2024 18:53:40.1545
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TOVGVc8LAeQ7R6QjrvqFfsJabFA2knVyoYYNtNIjLnAyxzgtoKSVe5QT90iYzZIHUC34TNUdIGXMLHB2guBXR2lVRQWaWV0zBpEH+0x9OyWc9s8e+xxoKt20f+kyTYw7
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR01MB8070
 
-Remove wrong EIO to EGAIN conversion and pass all errors as is.
+From: Adam Young <admiyo@os.amperecomputing.com>
 
-After commit 230f3d53a547 ("i40e: remove i40e_status"), which should only
-replace F/W specific error codes with Linux kernel generic, all EIO errors
-suddenly started to be converted into EAGAIN which leads nvmupdate to retry
-until it timeouts and sometimes fails after more than 20 minutes in the
-middle of NVM update, so NVM becomes corrupted.
+This series adds support for the Management Control Transport Protocol (MCTP)
+over the Platform Communication Channel (PCC) mechanism.
 
-The bug affects users only at the time when they try to update NVM, and
-only F/W versions that generate errors while nvmupdate. For example, X710DA2
-with 0x8000ECB7 F/W is affected, but there are probably more...
+MCTP defines a communication model intended to
+facilitate communication between Management controllers
+and other management controllers, and between Management
+controllers and management devices
 
-Command for reproduction is just NVM update:
- ./nvmupdate64
+PCC is a mechanism for communication between components within
+the  Platform.  It is a composed of shared memory regions,
+interrupt registers, and status registers.
 
-In the log instead of:
- i40e_nvmupd_exec_aq err I40E_ERR_ADMIN_QUEUE_ERROR aq_err I40E_AQ_RC_ENOMEM)
-appears:
- i40e_nvmupd_exec_aq err -EIO aq_err I40E_AQ_RC_ENOMEM
- i40e: eeprom check failed (-5), Tx/Rx traffic disabled
+The MCTP over PCC driver makes use of two PCC channels. For
+sending messages, it uses a Type 3 channel, and for receiving
+messages it uses the paired Type 4 channel.  The device
+and corresponding channels are specified via ACPI.
 
-The problematic code did silently convert EIO into EAGAIN which forced
-nvmupdate to ignore EAGAIN error and retry the same operation until timeout.
-That's why NVM update takes 20+ minutes to finish with the fail in the end.
+The first patch in the series implements a mechanism to allow the driver
+to indicate whether an ACK should be sent back to the caller
+after processing the interrupt.  This is an optional feature in
+the PCC code, but has been made explicitly required in another driver.
+The implementation here maintains the backwards compatibility of that
+driver.
 
-Fixes: 230f3d53a547 ("i40e: remove i40e_status")
-Co-developed-by: Kelvin Kang <kelvin.kang@intel.com>
-Signed-off-by: Kelvin Kang <kelvin.kang@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
-v4->v5 commit message update
-https://lore.kernel.org/netdev/20240618132111.3193963-1-aleksandr.loktionov@intel.com/T/#u
-v3->v4 commit message update
-v2->v3 commit messege typos
-v1->v2 commit message update
----
- drivers/net/ethernet/intel/i40e/i40e_adminq.h | 4 ----
- 1 file changed, 4 deletions(-)
+The second patch in the series is the required change from ACPICA
+code that will be imported into the Linux kernel when synchronized
+with the ACPICA repository. It ahs already merged there and will
+be merged in as is.  It is included here so that the patch series
+can run and be tested prior to that merge.
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.h b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-index ee86d2c..55b5bb8 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-@@ -109,10 +109,6 @@ static inline int i40e_aq_rc_to_posix(int aq_ret, int aq_rc)
- 		-EFBIG,      /* I40E_AQ_RC_EFBIG */
- 	};
- 
--	/* aq_rc is invalid if AQ timed out */
--	if (aq_ret == -EIO)
--		return -EAGAIN;
--
- 	if (!((u32)aq_rc < (sizeof(aq_to_posix) / sizeof((aq_to_posix)[0]))))
- 		return -ERANGE;
- 
+Previous Version:
+https://lore.kernel.org/20240619200552.119080-1-admiyo@os.amperecomputing.com/
+
+Changes in V3
+- removed unused header
+- removed spurious space
+- removed spurious semis after functiomns
+- removed null assignment for init
+- remove redundant set of device on skb
+- tabify constant declarations
+- added  rtnl_link_stats64 function
+- set MTU to minimum to start
+- clean up logic on driver removal
+- remove cast on void * assignment
+- call cleanup function directly
+- check received length before allocating skb
+- introduce symbolic constatn for ACK FLAG MASK
+- symbolic constant for PCC header flag.
+- Add namespace ID to PCC magic
+- replaced readls with copy from io of PCC header
+- replaced custom modules init and cleanup with ACPI version
+
+Changes in V2
+
+- All Variable Declarations are in reverse Xmass Tree Format
+- All Checkpatch Warnings Are Fixed
+- Removed Dead code
+- Added packet tx/rx stats
+- Removed network physical address.  This is still in
+  disucssion in the spec, and will be added once there
+  is consensus. The protocol can be used with out it.
+  This also lead to the removal of the Big Endian
+  conversions.
+- Avoided using non volatile pointers in copy to and from io space
+- Reorderd the patches to put the ACK check for the PCC Mailbox
+  as a pre-requisite.  The corresponding change for the MCTP
+  driver has been inlined in the main patch.
+- Replaced magic numbers with constants, fixed typos, and other
+  minor changes from code review.
+
+Code Review Change not made
+
+- Did not change the module init unload function to use the
+  ACPI equivalent as they do not remove all devices prior
+  to unload, leading to dangling references and seg faults.
+
+Adam Young (3):
+  mctp pcc: Check before sending MCTP PCC response ACK
+  mctp pcc: Allow PCC Data Type in MCTP resource.
+  mctp pcc: Implement MCTP over PCC Transport
+
+ drivers/acpi/acpica/rsaddr.c |   2 +-
+ drivers/mailbox/pcc.c        |   6 +-
+ drivers/net/mctp/Kconfig     |  13 ++
+ drivers/net/mctp/Makefile    |   1 +
+ drivers/net/mctp/mctp-pcc.c  | 343 +++++++++++++++++++++++++++++++++++
+ include/acpi/pcc.h           |   1 +
+ 6 files changed, 364 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/net/mctp/mctp-pcc.c
+
 -- 
-2.25.1
+2.34.1
 
 
