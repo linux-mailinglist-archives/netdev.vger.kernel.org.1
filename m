@@ -1,321 +1,239 @@
-Return-Path: <netdev+bounces-106373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90EFE91605F
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:50:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9308916069
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:51:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8031B215CB
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 07:50:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EBD98B2160C
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 07:51:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE25146D68;
-	Tue, 25 Jun 2024 07:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36BA9147C96;
+	Tue, 25 Jun 2024 07:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BeyBD/Q3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BgT3N46G"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE20146A8D
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 07:50:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719301850; cv=none; b=sUCxuiEG75HQlLWv3PBh0+MvrYZFKwj1q9rU+7d2b3BreDYFnBY5r7r8CWKC07PwD+FI92PH+q0k5k56F0/i98pPL4RUF8JRPGh2z7fUV856vE4oKaXaufvkkOQ6AjLRoSXK+kVBARI5MlNNOcbvcNTc7fwuh+bQ7IWy0MJdF6U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719301850; c=relaxed/simple;
-	bh=JjdjWqURBMBCsWWwm+UL3g6cP0BmawROoiA0yuQm/Is=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EgEfHXNCF3ZLEodYEHma8sj/mposrYbrX5H75Hqc2x+0CHTKxVyvXFvvOoqWK25GQQbz2hbJPmCWv6lRfiB5v2aVOcGSYGe1AnX378qbgAP4a7uuhqBa20GPIZXE0aTqtMi2ONvWDWmR5axlgvHR307xSVTFLGtoCkGke/AA9Sk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BeyBD/Q3; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719301847;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HoV58GQTGopluOa7fyIGB0MekMiGHFN0FrVZ1SzK5K8=;
-	b=BeyBD/Q3+SW9p61oRQQSX36DJykndoGnQpMMGjDfy1kyX4HynMQSYY4eao/5gfn2wJJANg
-	nDgCXtl6wdZaMZUde3vZcribcXGi4fmXH/PGlnRCMpSpTa7nAGkUt5PWQR1GG5UEFsfhB/
-	S0SZ46VoCKHZFu2lAJ2y9tPjxQaOdVE=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-8-LA8zB_OQP0aAwocN7LORDw-1; Tue, 25 Jun 2024 03:50:45 -0400
-X-MC-Unique: LA8zB_OQP0aAwocN7LORDw-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2c7a8fa8013so6782382a91.2
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 00:50:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719301845; x=1719906645;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HoV58GQTGopluOa7fyIGB0MekMiGHFN0FrVZ1SzK5K8=;
-        b=sTMaVDb7aKebVess/SPBWs5oCaeBHU/VOmJWyJH/wpkEfyYbggUAos5qv+YB29oexO
-         NVHcGGZweqpjTo2ygZWqaBFywldCUhasSTc2kgxo70qcOFB3WAUeRM8FsAKC2KDPCUmu
-         GftdcgpJM54XkKlcey8Jigqt6qrvNTs0xIGyNzIM43nRh0TCvPbq6Xplj1Az/SDZZSdC
-         5BEeQgr2GVbXA/BbOOe5BkpqYwO643MwrE6Aoaic5W2KiV2jOCvBheHZemm54cjdsp14
-         jZxFTnrkhMKr+GWzwcq/1j8ADvp8uVizkZlGdutH/M7e/XQg4ar2vohJUQteGwgNjL7Z
-         HHZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX+Yp+2sGDduefoVyxjDVSn1vro15QTdM+UW0SsIe2XUlcUBMQMyPnuEf0m7pfnaXivaL9SkQ0pXBobj0CO3Cc6eWYydpPB
-X-Gm-Message-State: AOJu0Yz2RDaHH77sABD4tAUp6Q2f44I1/WajgxRR/xonjpNZjnP+Gbkd
-	0zvs56cLER6VoE+IBB9klmpQP59w+4CbaPE6OkU8GWqog4rUKgDhC6SGrXL93luwaWj6jleSSgp
-	CQhZ3yz+Bepe2n7niZP1CYx3Y4A4LiK5lPbjYgcjnXhkX73cV3+1zozITEWxMcAiuOrsCUv28Sg
-	vczZCmJyQ5EUF4kTuVI4dAh9Ga3YNw
-X-Received: by 2002:a17:90b:1b0f:b0:2c8:3f5:3937 with SMTP id 98e67ed59e1d1-2c858208ff4mr6160152a91.28.1719301844633;
-        Tue, 25 Jun 2024 00:50:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHQvK5qdA1FBZvQp+q0PyDx7LTJheMl0fDu9wT7HwKGADSTVmOhaGiqvO3JmLgFDN7M9IsUtfzcJiIp79OJvNg=
-X-Received: by 2002:a17:90b:1b0f:b0:2c8:3f5:3937 with SMTP id
- 98e67ed59e1d1-2c858208ff4mr6160134a91.28.1719301844061; Tue, 25 Jun 2024
- 00:50:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD27146D76
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 07:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719301892; cv=fail; b=HnAgECvw0/f9xiHUM2fmmynGdcw+ts1ypuslGpW1wwXazoIAzh7sX7kFlcrA+3gkp7ppdXaV9vzfvgepJHPwZTaqcb1p0uFjCv1BOvfM4cqPqvGytG9953U2zFb1DO2/pG4gNk1xUEKaxd0C1KMxRv/SRYVOzClnxt1ct7BvacM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719301892; c=relaxed/simple;
+	bh=JUcqECQTDwchHpRPA8sH2wHK8rEiD1cahWeCHMZspOw=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=tYMkyr8gWFqsip9ajcT03Zj4BGV12AfMHd57boZfls7EMdMH2tETrvIos+q3lzlC/GpM6aLzspvI9bJrV/R36g1ntkDrkXgS68S2fawt5ZYbkplO4vBKZMxxaHFdtJo8pRc7BHqDiCWVuEVQJwmX8HRxBPNHDXf862pK6S//hNY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BgT3N46G; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719301890; x=1750837890;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=JUcqECQTDwchHpRPA8sH2wHK8rEiD1cahWeCHMZspOw=;
+  b=BgT3N46GWd9mTqU3GIhNBdVy7bKVQp3gG9JLlDllqhJuj+0+VeKGgv3Z
+   nLpHdSAXHw435Sr4zWQDp5IkrCI9SCdn+lFyKP7gSANNO9MpSodWfBAPy
+   /AMYZYmrnbkIAH7TtkJK3/MtV5wP7UTFHbfmnmxFDeurkUxHF4unnBor3
+   V3GBI+7ujZ0Bi8BXwHokL0Az1NMhCwWKHmyPaGWY0QE1fvRwfIY3p0JmO
+   5ni02s8914UtTdOFe/m8PcPqSfGakCNc4zz4dR1vdZ48/YDnGIZG7yRyr
+   55OPr8llD42n8+mL8M0Wak1Ar0GoykPEQh5dWXIEPDFllLpxCSO6w7OH9
+   g==;
+X-CSE-ConnectionGUID: KXpm4j3rRDuBaP2x/s/xag==
+X-CSE-MsgGUID: rTKyZ+XDQE6uet7dr5/raw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11113"; a="27710547"
+X-IronPort-AV: E=Sophos;i="6.08,263,1712646000"; 
+   d="scan'208";a="27710547"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 00:51:28 -0700
+X-CSE-ConnectionGUID: TDdyx+/CSdWWysI+W+YY8w==
+X-CSE-MsgGUID: 7Pxjj399SfqrCPB7Qf5xZg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,263,1712646000"; 
+   d="scan'208";a="48476159"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Jun 2024 00:51:28 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 25 Jun 2024 00:51:27 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 25 Jun 2024 00:51:27 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.177)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 25 Jun 2024 00:51:27 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=P2wJB3vIo7SDMbA3C2WMVqdhSS2vi+48e4ZxKfgJA2rL7oTcL9pQQiLHZALeV28MmDQ8D4eZGUzYvHJ04IizoHgRayYfWlP7whYe5oXv7ALbUg3f4k10gIZELUBCtYYLTQrNyr5Yvbb6Qy3m07ypE+E/U24yzUhC+/eml/XJs9StbKNAqgjU6PPMdjv+2TcAuCwCn485WbxGZypZ7aj+kJ+jQ6E7gRWbwxKjhzmfG5c1Js7QCGVlfcTkA+iAjr3cxm1QxmtD3NziFl8ULoNCafw2WZ0ESuKa1WGuY2YzVJsqtgWyPNVgO8zazUpZuWfXfjskxLvYK2budWbcHY9aQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OMqJXuRsWqelLODdgEKktV2fhc8Z8cAxx3Wgm778B2s=;
+ b=Hnf9bGCFJTd2RsfKc0uE84jJCwtz4oxqmKyg2OFimdNx+rh8Inb07kHG1doyVbsx191vFtOHknQm0XfsnVmZZIjy3j/wzB6UQm5/n4VQPKXqNLRV8RR75Ga2qKqso/MaJiVf0TxQEYhzjzPAniQfaZ4xqyb8L0SovB8OAhVkMyzU3pDXI3AAzz6zBI+2InACaSf2x3Cq+ifxMd1yf+3r92Dh/p2nW70/ny5akvqwroqwZ8g1RZJvCdMCF0sOgY2O8hg/W+9v0W0IVhFarJMrV7x89+WzLByrjXZzLoyvF9xvp0BO58NjB4ymaViamwv7O8ODFnWwPTh01eazRBbtJg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by SA1PR11MB6917.namprd11.prod.outlook.com (2603:10b6:806:2bd::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.32; Tue, 25 Jun
+ 2024 07:51:25 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.7698.025; Tue, 25 Jun 2024
+ 07:51:24 +0000
+Message-ID: <e5a1c93d-243e-4c7f-8a61-aebf50b9e0bb@intel.com>
+Date: Tue, 25 Jun 2024 09:51:19 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v2 7/7] ice: Add tracepoint for adding and
+ removing switch rules
+To: Marcin Szycik <marcin.szycik@linux.intel.com>
+CC: <netdev@vger.kernel.org>, <michal.swiatkowski@linux.intel.com>,
+	<aleksander.lobakin@intel.com>, <intel-wired-lan@lists.osuosl.org>
+References: <20240624144530.690545-1-marcin.szycik@linux.intel.com>
+ <20240624144530.690545-8-marcin.szycik@linux.intel.com>
+Content-Language: en-US
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <20240624144530.690545-8-marcin.szycik@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZR0P278CA0103.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:23::18) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240624024523.34272-1-jasowang@redhat.com> <20240624024523.34272-2-jasowang@redhat.com>
- <20240624054403-mutt-send-email-mst@kernel.org> <CACGkMEv1U7N-RRgQ=jbhBK1SWJ3EJz84qYaxC2kk6keM6J6MaQ@mail.gmail.com>
- <20240625030259-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240625030259-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 25 Jun 2024 15:50:30 +0800
-Message-ID: <CACGkMEuP5GJTwcSoG6UP0xO6V7zeJynYyTDVRtF8R=PJ5z8aLg@mail.gmail.com>
-Subject: Re: [PATCH V2 1/3] virtio: allow nested disabling of the configure interrupt
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: xuanzhuo@linux.alibaba.com, eperezma@redhat.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, venkat.x.venkatsubra@oracle.com, 
-	gia-khanh.nguyen@oracle.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SA1PR11MB6917:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9963b52e-cd5b-4fbb-bfc1-08dc94eb9c91
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230037|376011|1800799021|366013;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?WlEvOEpuSEJBTEtqSHJVZmtjVFU0V2dnZUdGbUtpWUFCOXJuakxFbGNSZUd6?=
+ =?utf-8?B?TWFTdHg4WXpuQWsybXlpN0VBYXhzbTFFa2h0OG1qUTdlWVd0ZTV4QVlKQVM1?=
+ =?utf-8?B?WEZ3LzdEUmpUUG9FdzhGQkFDdXJQS01FN1FkTGhKblBzRmE2dlRZM1RjOFZo?=
+ =?utf-8?B?V0owZEw5QmhCQ0VSWjk0Y1lCTHhXUEh6cDg2dTFZSGwveFZDdXd6U0NjNEV0?=
+ =?utf-8?B?aEZlN05HOFFzSDNXZXZqeHFBRFRhRnZnOGVVWXZjcnA2ZWtjd0dYV2RIa2d4?=
+ =?utf-8?B?alhZMk5zR01rM2FUcWphWHlpbjBQQmd3NVVCc0QyYVoza1k1R0dUNzRWL2Z1?=
+ =?utf-8?B?TWR0ZXBHdWFWTW43bnUxY055bnpSWmJkQ1ZvcHhxTTRYL1hqUGFJbEpHM0c0?=
+ =?utf-8?B?a2cyeVYzTC95R28vcWFVR2ZRamZKTTdnU0VUbWV2dlpxbTA4U3BTaXM0UzdU?=
+ =?utf-8?B?bGF4cWlYU2R3MmswYmF2M0VvY2NmMlBNQ2NQaklQNWZobTZReDFVTm9kZHpn?=
+ =?utf-8?B?Q29Dc0xmdXpTL2ErRGZKNmdsaVpMUDZFSTlraFZVMTJ1dFFBcFZwdG8zaCtU?=
+ =?utf-8?B?K3V5QXBVZCs3eWxxWUNzc05qbjlBUHdlcmR2bE9RQWxmMmZwY0tyY3JhczdD?=
+ =?utf-8?B?ZFVFVlBoR1pxa24raExDUE8vcGdBYXBUb2xlZ0szbXBxbEFkYmUvSGFTSHFK?=
+ =?utf-8?B?UDBGVkFkc2RvZWlnTzVWWnJuU0psaXJ3UFExVXFlc2lPN0tabkFTTSszY2NM?=
+ =?utf-8?B?WkUzc3RhYjBlS0lvaTNNcUl0RGhaYkFzWmdTMW10R1daTWVKc1pLUERsRWpX?=
+ =?utf-8?B?VlJtZXJrU1V6emt5OU5xamQ1NFhNaEIvVkN2d3pYODZMQnFpdDZ0WHN4Vnph?=
+ =?utf-8?B?SXBOZ2ZjbmlJcFZkSXV0OENBYXlLVC9pQlM0M2hRUThpZVNmR2JKYXNvbzZY?=
+ =?utf-8?B?aXFDWnF1TU1VY3NhbzFXb0pTY003RnlPMEREaldnUWNEbVAxNks4Z3JYVlhG?=
+ =?utf-8?B?anRBZHpqYUtISmpNTjQ3WHZkS1dFblBOS1cvUGVaWGdodWtuQ3RwN1l3cG9N?=
+ =?utf-8?B?SkkyczZJVlhKR3VqejMxK2I5c1hscHAxaS9KVFlzQXdXckd3VWErTVAzNElS?=
+ =?utf-8?B?RTZuUFdsa1lBd1pCYWo2ZlowZ1RBVXpsZXo4WkdDd0F2RmNVSSsxMnRIaUx2?=
+ =?utf-8?B?cS9UOWRyTWYyY1Vzb0p6RmxyOUJEa2k1YWpBZTlRY2YyUlFNSm4vblcxODht?=
+ =?utf-8?B?TXNtb0dYMmFnbzRVV0tEaDJ5NldsT3kvMXRhS1h6RkdPeW1WckpaeUlxVCtK?=
+ =?utf-8?B?TFhNb0NFcitSRitlTEJlMk9SRjNSOXZSenFkS2xrY0oyNDFNMU9pZVFwT1Bw?=
+ =?utf-8?B?aEZEOUlKNUpkcHpOK3E4b1lPbXNteGU3V2NKRDlTTUdXNWhxcmFaYzNzUDRo?=
+ =?utf-8?B?SlczdTlHTnNqZzZUbVM2ekU4clMxeThNSXlhSm52a1JQZjlGQzNqYVA5djQ2?=
+ =?utf-8?B?UzhHMVNvUTUwbmM0YlBqQ3QzaTVPeHlleHQ0MUtTNjJyZG11c1FBM2xFYnRE?=
+ =?utf-8?B?UHFmNitBVFlPYVkrWEMwTUc3L2NrVWtFRUs0VnFRNy90SXFzUnhTYVJaYkJk?=
+ =?utf-8?B?M2N1SUNKZ05oRVVJME9xRGJNZ3RPdHNFdXNKVHBjU0p5bzc2MzAwNURsQUky?=
+ =?utf-8?B?R29xNzRwNmI0cFd2U0swa0ljN00zOWMwTDFnSlorTjF6TXdwZmxJL3hWVmlC?=
+ =?utf-8?Q?/sHTjv7OuhgV+4dhF3cyykc5J+7H3km1WLyd8WX?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(376011)(1800799021)(366013);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZFlKSGViNGF3U0RnUHRUL3lEcjc3VWlmQUlGSWM1TnAvZ3doVjREMWhJK2NS?=
+ =?utf-8?B?QWgzS29lY1M3aGc4UmZGdFRTMG1KUmNhWEhLZjhlbnRMOHNSQXJvWmlVak9K?=
+ =?utf-8?B?cncwWW5WL1RYVE1wS2taRVduZjhpVG1jcWFHMnYvc0dzdEJIM0lKSTNQdkFO?=
+ =?utf-8?B?S0pRcGpuZEx5MFJoUzA0aTVMdzlJT3p2Vk9pNzFCNnIzWENGd0EwUjZMYWNW?=
+ =?utf-8?B?UVVzMW5yVGd1bVJwUVlDOG1VUzc4YnB0U1JjVjk5SXVrcEJCbk9qOTFBakNT?=
+ =?utf-8?B?TWUwanBMYlB4TEZEUEtsVW1hVmRyTFJpWUwwam1PdmI1ZTlHbmcyZ1hpQkhN?=
+ =?utf-8?B?TnRYMDR0MzBuOFlJZWJ2S05vSklHZitBbTdrWE1hS2svbkVRVmVBaHZhMnly?=
+ =?utf-8?B?UHNqeVlYQ21uSUZYdE1CYlhwS3cxZlpITWhXV3Q4RnZhc0UrNnhEV2FLaUpj?=
+ =?utf-8?B?UUl2c0JqWjBLdlVTUnFWbllLb2FHYU9sR1JYNEhWNXZyaG5Vdmlpekh5d0xh?=
+ =?utf-8?B?RFkzUVpKS3ZxTkVpMDR5YnNTNWNVUGNka29MV05nTTFOZHI0a1JIV1pQMWVv?=
+ =?utf-8?B?dU9BTnh2UHlhMWtaRnJUQWhoMW9tYUZOMG5Cam9QSzZVbWc0OENHdGJ1VTZL?=
+ =?utf-8?B?Sk00UVhSQkNmcW5ab0dReEJ5MWxtajlZa2M5SEJPMlJUQUdkSW1WdU1MZVBa?=
+ =?utf-8?B?S3hKTWI4dXdvZXhqb3kvc3lRQnplUXFUWXpkVE9ZWUFDMVhmdE9DMGJvN25X?=
+ =?utf-8?B?MjEyamJFSGx5RUFUT3dONUhpMFVDNUdNNUs1T1pmZHdabmdieDcvaFV0Qy80?=
+ =?utf-8?B?ZmV0cXVxQ0E5ZFFwZVByZEt6NUxkeng2cXp1NlVWRVVCQTcrSFBCYldjMlN6?=
+ =?utf-8?B?WHZ4ekYwSDRGeENEREVzSVgwVmpjU0tjbkZQekZaSWh1NWp1US9lR0syVTNq?=
+ =?utf-8?B?d0RvbkhhdXQzV3B0ekw5dGo5cXduRHM3RXVsZG0yaW9pdG1FNmFLSU9qUUlq?=
+ =?utf-8?B?Z3V3M0pQVEVqcExXRGdvcWtjSjNKdEtRTjN2TFpya2lIQXJUMHZRY3Nha2dP?=
+ =?utf-8?B?blpJMjZIWjlDV3ppMG5oS0RkdzlycHVodWhLZnp3T0FqZFp3UlNSV3JmbDVs?=
+ =?utf-8?B?VkhEWHFzOVJsak45ODZ0TmlJaXpxUkhQT0xmZ3VzNGVIa0REMWUrTS8wT3lu?=
+ =?utf-8?B?TWtSSzVJZ0sySGlySGRvVVJnNE5wMUxsM3RYODJ6bEZvSXZCNjNkT3RFenNM?=
+ =?utf-8?B?eGNuNVdpVDZRODZBMkV1L1M3RXNzMndmL3ZPVVk5cDIwVERSc25NcUpzNUk3?=
+ =?utf-8?B?bGh5Rm5zYW1hUVpwbFZWTWozRTBtTVRnM05tQWt3aDhGaE5sVU5xVkd5bjdt?=
+ =?utf-8?B?U2kvTnRZSncxdkNENjlSRWdibjNvb3ZkN2JaYjFkNWNma1FkcFprSDg2czUv?=
+ =?utf-8?B?VUExbDA4MlplQmpSS1BHZ2NsbEkrc3BEaXJjOVJOQUMzVjhCQ2pJK1EvQkNV?=
+ =?utf-8?B?V0JpSi9QQjRVQVRQNnBEY1BGdUVjNG5Yb1cydEE1Ry96MWxNWFRmYytkR21W?=
+ =?utf-8?B?YU9TNWd4anY2UFBIZERVRHNBWHVieHF4NGJyOGsyWnV1aUQ1WWRKY1lVd1Rk?=
+ =?utf-8?B?WDhodjcyUHpjMzBGVExnekhyZlc3NlV1Qk1pTkdmd2x3UnljVkdDVmRGNkpi?=
+ =?utf-8?B?UGZyWWxrT09oQzhRQkNMSFFkQUxVTHBDYWY5RExzQW84T1RSc2lSS1hyUDRN?=
+ =?utf-8?B?OTArdXA2c2tvNGk4S2xWdm51clN2UDVsaWxoeEJ5SWlVazdRbGRoM29pWi9Y?=
+ =?utf-8?B?ekxUOGpOaDdPOHFnWDd6bjAzaVMzQlhIMDBtVW5VcjBZQW9DVHE1ZldtUzZM?=
+ =?utf-8?B?anBXV2hiOWpsb0lMVjQvclMrNHBBcEkyc3gzVnJrK3Q5TXN2MVhGSW1mdVkz?=
+ =?utf-8?B?dWlEZGpDNkZWMHhMRGl5Z0xuWXR3dmdjOWZYR2JTTmgxNW42QmI5UVlNNkJU?=
+ =?utf-8?B?eFJEdTc3eEdNNkdreStOcE1IT1Npb1NNT3lzRlBrc21LbktIYk1tajRGQmhq?=
+ =?utf-8?B?NUx1TXNlN1UwVm5QTXFaR2pJKy9wNHI4dVoxckMvR3EzVDBqRnhJNVBPN0V2?=
+ =?utf-8?B?Q1lkaHhiR3YzSHBxOXRZYy93Rk8zNnBlMXB1ZjZBNHN0aFRNYTZ2UXcxdUVN?=
+ =?utf-8?Q?P4NMxMt1CrRKNSRbhjO1gpg=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9963b52e-cd5b-4fbb-bfc1-08dc94eb9c91
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2024 07:51:24.6139
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ebfB6vS7sYe+YDdOkpEjNaT/XTgalhMJfFHLxXra7Kyx6Od0pJ7uPFSWP7odewty88hLJy911p07uXkQlb4aN3RFZReXuMgvlIsY7tn45sM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6917
+X-OriginatorOrg: intel.com
 
-On Tue, Jun 25, 2024 at 3:11=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> On Tue, Jun 25, 2024 at 09:27:04AM +0800, Jason Wang wrote:
-> > On Mon, Jun 24, 2024 at 5:59=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
-com> wrote:
-> > >
-> > > On Mon, Jun 24, 2024 at 10:45:21AM +0800, Jason Wang wrote:
-> > > > Somtime driver may want to enable or disable the config callback. T=
-his
-> > > > requires a synchronization with the core. So this patch change the
-> > > > config_enabled to be a integer counter. This allows the toggling of
-> > > > the config_enable to be synchronized between the virtio core and th=
-e
-> > > > virtio driver.
-> > > >
-> > > > The counter is not allowed to be increased greater than one, this
-> > > > simplifies the logic where the interrupt could be disabled immediat=
-ely
-> > > > without extra synchronization between driver and core.
-> > > >
-> > > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > > > ---
-> > > >  drivers/virtio/virtio.c | 20 +++++++++++++-------
-> > > >  include/linux/virtio.h  |  2 +-
-> > > >  2 files changed, 14 insertions(+), 8 deletions(-)
-> > > >
-> > > > diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
-> > > > index b968b2aa5f4d..d3aa74b8ae5d 100644
-> > > > --- a/drivers/virtio/virtio.c
-> > > > +++ b/drivers/virtio/virtio.c
-> > > > @@ -127,7 +127,7 @@ static void __virtio_config_changed(struct virt=
-io_device *dev)
-> > > >  {
-> > > >       struct virtio_driver *drv =3D drv_to_virtio(dev->dev.driver);
-> > > >
-> > > > -     if (!dev->config_enabled)
-> > > > +     if (dev->config_enabled < 1)
-> > > >               dev->config_change_pending =3D true;
-> > > >       else if (drv && drv->config_changed)
-> > > >               drv->config_changed(dev);
-> > > > @@ -146,17 +146,23 @@ EXPORT_SYMBOL_GPL(virtio_config_changed);
-> > > >  static void virtio_config_disable(struct virtio_device *dev)
-> > > >  {
-> > > >       spin_lock_irq(&dev->config_lock);
-> > > > -     dev->config_enabled =3D false;
-> > > > +     --dev->config_enabled;
-> > > >       spin_unlock_irq(&dev->config_lock);
-> > > >  }
-> > > >
-> > > >  static void virtio_config_enable(struct virtio_device *dev)
-> > > >  {
-> > > >       spin_lock_irq(&dev->config_lock);
-> > > > -     dev->config_enabled =3D true;
-> > > > -     if (dev->config_change_pending)
-> > > > -             __virtio_config_changed(dev);
-> > > > -     dev->config_change_pending =3D false;
-> > > > +
-> > > > +     if (dev->config_enabled < 1) {
-> > > > +             ++dev->config_enabled;
-> > > > +             if (dev->config_enabled =3D=3D 1 &&
-> > > > +                 dev->config_change_pending) {
-> > > > +                     __virtio_config_changed(dev);
-> > > > +                     dev->config_change_pending =3D false;
-> > > > +             }
-> > > > +     }
-> > > > +
-> > > >       spin_unlock_irq(&dev->config_lock);
-> > > >  }
-> > > >
-> > >
-> > > So every disable decrements the counter. Enable only increments it up=
- to 1.
-> > > You seem to be making some very specific assumptions
-> > > about how this API will be used. Any misuse will lead to under/overfl=
-ow
-> > > eventually ...
-> > >
-> >
-> > Well, a counter gives us more information than a boolean. With
-> > boolean, misuse is even harder to be noticed.
->
-> With boolean we can prevent misuse easily because previous state
-> is known exactly. E.g.:
->
-> static void virtio_config_driver_disable(struct virtio_device *dev)
-> {
->         BUG_ON(dev->config_driver_disabled);
->         dev->config_driver_disabled =3D true;
-> }
->
->
->
-> static void virtio_config_driver_enable(struct virtio_device *dev)
-> {
->         BUG_ON(!dev->config_driver_disabled);
->         dev->config_driver_disabled =3D false;
-> }
->
->
-> Does not work with integer you simply have no idea what the value
-> should be at point of call.
+On 6/24/24 16:45, Marcin Szycik wrote:
+> Track the number of rules and recipes added to switch. Add a tracepoint to
+> ice_aq_sw_rules(), which shows both rule and recipe count. This information
+> can be helpful when designing a set of rules to program to the hardware, as
+> it shows where the practical limit is. Actual limits are known (64 recipes,
+> 32k rules), but it's hard to translate these values to how many rules the
+> *user* can actually create, because of extra metadata being implicitly
+> added, and recipe/rule chaining. Chaining combines several recipes/rules to
+> create a larger recipe/rule, so one large rule added by the user might
+> actually consume multiple rules from hardware perspective.
+> 
+> Rule counter is simply incremented/decremented in ice_aq_sw_rules(), since
+> all rules are added or removed via it.
+> 
+> Counting recipes is harder, as recipes can't be removed (only overwritten).
+> Recipes added via ice_aq_add_recipe() could end up being unused, when
+> there is an error in later stages of rule creation. Instead, track the
+> allocation and freeing of recipes, which should reflect the actual usage of
+> recipes (if something fails after recipe(s) were created, caller should
+> free them). Also, a number of recipes are loaded from NVM by default -
+> initialize the recipe counter with the number of these recipes on switch
+> initialization.
+> 
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> ---
+>   drivers/net/ethernet/intel/ice/ice_common.c |  3 +++
+>   drivers/net/ethernet/intel/ice/ice_switch.c | 22 +++++++++++++++++++--
+>   drivers/net/ethernet/intel/ice/ice_trace.h  | 18 +++++++++++++++++
+>   drivers/net/ethernet/intel/ice/ice_type.h   |  2 ++
+>   4 files changed, 43 insertions(+), 2 deletions(-)
+> 
 
-Yes but I meant if we want the config could be disabled by different
-parties (core, driver and others)
-
->
->
-> > >
-> > >
-> > > My suggestion would be to
-> > > 1. rename config_enabled to config_core_enabled
-> > > 2. rename virtio_config_enable/disable to virtio_config_core_enable/d=
-isable
-> > > 3. add bool config_driver_disabled and make virtio_config_enable/disa=
-ble
-> > >    switch that.
-> > > 4. Change logic from dev->config_enabled to
-> > >    dev->config_core_enabled && !dev->config_driver_disabled
-> >
-> > If we make config_driver_disabled by default true,
->
-> No, we make it false by default.
->
-> > we need someone to
-> > enable it explicitly. If it's core, it breaks the semantic that it is
-> > under the control of the driver (or needs to synchronize with the
-> > driver). If it's a driver, each driver needs to enable it at some time
-> > which can be easily forgotten. And if we end up with workarounds like:
-> >
-> >         /* If probe didn't do it, mark device DRIVER_OK ourselves. */
-> >         if (!(dev->config->get_status(dev) & VIRTIO_CONFIG_S_DRIVER_OK)=
-)
-> >                 virtio_device_ready(dev);
-> >
-> > It's another break of the semantics. And actually the above is also rac=
-y.
-> >
-> > It seems the only choice is to make config_driver_disabled by default
-> > false. But the driver needs to be aware of this and take extra care
-> > when calling virtio_device_ready() which is also tricky.
->
->
-> No, false by default simply means no change to semantics.
-
-No change to current semantics, probably. But we need to document
-
-1) driver config is enabled by default
-2) no nested enabling and disabling
-
-If you think they are all fine, I can go with that way.
-
->
->
-> >
-> > So in conclusion, two booleans seems sut-optimal than a counter. For
-> > example we can use different bits for the counter as preempt_count
-> > did. With counter(s), core and driver don't need any implicit/explicit
-> > synchronization.
-> >
-> > Thanks
-> >
->
-> We have a simple problem, we can solve it simply. reference counting
-> is tricky to get right and hard to debug, if we don't need it let us
-> not go there.
-
-I fully agree, and that's why I limit the change to virtio-net driver
-in the first version.
-
->
->
->
-> But in conclusion ;) if you don't like my suggestion do something else
-> but make the APIs make sense,
-
-I don't say I don't like it:)
-
-Limiting it to virtio-net seems to be the most easy way. And if we
-want to do it in the core, I just want to make nesting to be supported
-which might not be necessary now.
-
-> at least do better than +5
-> on Rusty's interface design scale.
->
-> >
-
-Thanks
-
-
-> >
-> >
-> > >
-> > >
-> > >
-> > >
-> > > > @@ -455,7 +461,7 @@ int register_virtio_device(struct virtio_device=
- *dev)
-> > > >               goto out_ida_remove;
-> > > >
-> > > >       spin_lock_init(&dev->config_lock);
-> > > > -     dev->config_enabled =3D false;
-> > > > +     dev->config_enabled =3D 0;
-> > > >       dev->config_change_pending =3D false;
-> > > >
-> > > >       INIT_LIST_HEAD(&dev->vqs);
-> > > > diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> > > > index 96fea920873b..4496f9ba5d82 100644
-> > > > --- a/include/linux/virtio.h
-> > > > +++ b/include/linux/virtio.h
-> > > > @@ -132,7 +132,7 @@ struct virtio_admin_cmd {
-> > > >  struct virtio_device {
-> > > >       int index;
-> > > >       bool failed;
-> > > > -     bool config_enabled;
-> > > > +     int config_enabled;
-> > > >       bool config_change_pending;
-> > > >       spinlock_t config_lock;
-> > > >       spinlock_t vqs_list_lock;
-> > > > --
-> > > > 2.31.1
-> > >
->
-
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
