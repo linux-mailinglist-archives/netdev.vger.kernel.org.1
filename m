@@ -1,66 +1,58 @@
-Return-Path: <netdev+bounces-106504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AE8C9169D1
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:07:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AB129169E4
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:10:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 472C0285318
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 14:07:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E60F1F2111B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 14:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6695815A84D;
-	Tue, 25 Jun 2024 14:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4B61649C6;
+	Tue, 25 Jun 2024 14:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FkHBIoSF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OWiYkrq6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37CB31B7F7;
-	Tue, 25 Jun 2024 14:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFBE1161B43
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 14:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719324416; cv=none; b=FW1O0yTFrVB5x7Bc7YXKuWHw6UHTjMnSprtu8lRaeDB/+j2YZ9orlhyg627JBZ/C86OX9Yclcj7efSVNk4mfohT4S7ixcrlMbchRybqLlzNAfYN4KqwNntTYTcMk0ZEGFHArbJMhKa7HqCP2kUn7lGjbNTnNFpWYY8AHRqMhTfg=
+	t=1719324630; cv=none; b=aooJ0RiL6BH0N1KlncM37o1laYBvKe0u6viEYJd7DuOeV3QMQ119I8mvGws4Hx6ggbnAafTjQQvk0kjtOXb3U+01jUfTd81t3EWiEVEYOy1tbMhAzUgYz281q8le+/I6uUfpBG742HqvsTs5sWej9IgbOqfTitP0DbcVQGFwc9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719324416; c=relaxed/simple;
-	bh=7J8V+A2m4KYY9Ousnw3i3fJCgNrKZAjhDaETttSPm0c=;
+	s=arc-20240116; t=1719324630; c=relaxed/simple;
+	bh=jOfbBg/lCQFbE10cw5jyWPRQD/X2yqi6XFw6Q2CvZqc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z9U+2aVAwjoCCdGQJa0lkoD3MFgcqWCnDu2jv1Welfzdanzb1jseiKNTuNy+qrJ+1n1PGoWL5RUfNuLcaEtQdoYxxLIBzmV99gD7w/eellt4J5e7JLEv4ePYgN8foc4qCx2tTasErA4vtLNqPM5glOB04fQdK6uj5Hg5lSVCujk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FkHBIoSF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42DF7C32781;
-	Tue, 25 Jun 2024 14:06:55 +0000 (UTC)
+	 MIME-Version:Content-Type; b=fG27DDlKw35ufDZNMNq44MmqspBlfR584SE+xr/vgV6ObxhVpT0g7Wz8WN1WmQorGU0SbNjfz1HS8d5H1n6p+aek9bV3MfevebDQ4oy2l2J5mwjHX+JTWJX7uBZ0TDKG2QYQbBENqu/eFzie0fVwR/Jaod5SIWvXRTruVoZc6M4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OWiYkrq6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C97AC32781;
+	Tue, 25 Jun 2024 14:10:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719324415;
-	bh=7J8V+A2m4KYY9Ousnw3i3fJCgNrKZAjhDaETttSPm0c=;
+	s=k20201202; t=1719324629;
+	bh=jOfbBg/lCQFbE10cw5jyWPRQD/X2yqi6XFw6Q2CvZqc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FkHBIoSFBTopDeTKT/XI/obwtTFmXbucUL0Iu8XhW1Hh/aHREi75sUiaICLONLA4v
-	 VV5lyqmmZMmhPCcUvuctzn0VxJ36EkxN45CGmVg3yFXcFDmPCf9vNE6HU0c13hb7Ha
-	 DzyYVA3cSOJqLGOTWSVDgUeee6ZzY9fss+4GOZn6XrTeU7X9ckCXO/0lJdbp0yPMrU
-	 53DN+2G82EQ6Bkgq6mbGI/wP08QT3TSvMOzkXjSQZLm0i+YhfdX5qB+x2oyR47NoSE
-	 8BKvWhPcg6xeqn8Mxjd1Rn8lUNsGtW0Jx9UjQg3ukp5b6NA1LsZh275De8C7f/IdAP
-	 ga5ghxOaAIz5Q==
-Date: Tue, 25 Jun 2024 07:06:54 -0700
+	b=OWiYkrq6XlalABGQOhgIKVCrYqJ7cTJtnkECoDIPI4co4jHuFiGAaucBXL1ASCn9O
+	 eZby17DykwWwUm1WbZxm3CUrWiajvI4/d7jFMpiknYYAwZqckIQ4B4Su/JvmIzatGr
+	 b6eJf2BowrphYKxwfqdnEiYvYuc1G9SAbI1OoHBJzLWllbMFzNoFhI5GpELKovfmGk
+	 6d9XsRihzJJvQQnjwaeBJd4cWcyAJfhS0ZxhbhHe+pMuqY6fHxwoX59aVAknZnecHx
+	 tEpR2eFS1vEBPcgOzSUDpPuFEJPVjTZ2Efl+82KTdXaZ2zuQktX5vgrycUkEt//jlk
+	 RaZYogBtPc6Fg==
+Date: Tue, 25 Jun 2024 07:10:28 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Aaron Conole <aconole@redhat.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- dev@openvswitch.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, Pravin B Shelar <pshelar@ovn.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Shuah
- Khan <shuah@kernel.org>, Stefano Brivio <sbrivio@redhat.com>,
- =?UTF-8?B?QWRyacOhbg==?= Moreno <amorenoz@redhat.com>, Simon Horman
- <horms@kernel.org>
-Subject: Re: [PATCH v2 net-next 0/7] selftests: net: Switch pmtu.sh to use
- the internal ovs script.
-Message-ID: <20240625070654.6a00efef@kernel.org>
-In-Reply-To: <f7th6dhgnvm.fsf@redhat.com>
-References: <20240620125601.15755-1-aconole@redhat.com>
-	<20240621180126.3c40d245@kernel.org>
-	<f7ttthjh33w.fsf@redhat.com>
-	<f7tpls6gu3q.fsf@redhat.com>
-	<e4f69335f90aae3f1daa47ba8f69b24ea15ed3b7.camel@redhat.com>
-	<f7th6dhgnvm.fsf@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>, netdev@vger.kernel.org, Eric Dumazet
+ <edumazet@google.com>, David Howells <dhowells@redhat.com>, Matthew Wilcox
+ <willy@infradead.org>
+Subject: Re: [PATCH v2] net: allow skb_datagram_iter to be called from any
+ context
+Message-ID: <20240625071028.2324a9f5@kernel.org>
+In-Reply-To: <1c5f5650ba2ffe99b068266ceb6e69f59661563f.camel@redhat.com>
+References: <20240623081248.170613-1-sagi@grimberg.me>
+	<1c5f5650ba2ffe99b068266ceb6e69f59661563f.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,27 +62,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 25 Jun 2024 09:20:29 -0400 Aaron Conole wrote:
-> > I'm still wondering if the issue is Kconfig-related (plus possibly bad
-> > interaction with vng). I don't see the OVS knob enabled in the self-
-> > tests config. If it's implied by some other knob, and ends-up being
-> > selected as a module, vng could stumble upon loading the module at
-> > runtime, especially on incremental build (at least I experience that
-> > problem locally). I'm not even sure if the KCI is building
-> > incrementally or not, so all the above could is quite a wild guess.
-> >
-> > In any case I think adding the explicit CONFIG_OPENVSWITCH=y the
-> > selftest config would make the scenario more well defined.  
+On Tue, 25 Jun 2024 15:27:41 +0200 Paolo Abeni wrote:
+> On Sun, 2024-06-23 at 11:12 +0300, Sagi Grimberg wrote:
+> > We only use the mapping in a single context, so kmap_local is sufficient
+> > and cheaper. Make sure to use skb_frag_foreach_page as skb frags may
+> > contain highmem compound pages and we need to map page by page.
+> > 
+> > Signed-off-by: Sagi Grimberg <sagi@grimberg.me>  
 > 
-> That is in 7/7 - but there was a collision with a netfilter knob getting
-> turned on.  I can repost it as-is (just after rebasing) if you think
-> that is the only issue.
+> V1 is already applied to net-next, you need to either send a revert
+> first or share an incremental patch (that would be a fix, and will need
+> a fixes tag).
+> 
+> On next revision, please include the target tree in the subj prefix.
 
-Sorry for not checking it earlier, looks like the runner was missing
-pyroute:
-
-# python3 ./tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-Need to install the python pyroute2 package >= 0.6.
-
-I guess run_cmd counter-productively eats the stderr output ? :(
+I think the bug exists in net (it just requires an arch with HIGHMEM 
+to be hit). So send the fix based on net/master and we'll deal with 
+the net-next conflict? Or you can send a revert for net-next at the
+same time, but I think the fix should target net.
 
