@@ -1,58 +1,56 @@
-Return-Path: <netdev+bounces-106315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 302CE915BC7
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 03:40:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 09563915BCD
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 03:41:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 620451C21500
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 01:40:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A3B61C212DC
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 01:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA6C21862F;
-	Tue, 25 Jun 2024 01:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F26DF1AAD7;
+	Tue, 25 Jun 2024 01:41:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y+jUKneQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KpCzQxll"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862761B806
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 01:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CADC818637;
+	Tue, 25 Jun 2024 01:41:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719279607; cv=none; b=anyzM395OPSDUp8loyBzT8rFv9HVUuBr6HjBFz0AwRgihRGVsaercx9kmKs/I9WwfOmYmar4rcse71bBV+eCJkj1uxEJbQPF4ZaAEllPuGQquhi7Kv7fPft36stNLsehPPjajNTRqXGI2+v1HTPaWKgMPdI20C9meMyrGA1ukMs=
+	t=1719279687; cv=none; b=Q3daEtFMZP3eAjLmpR5SB124cBJafQvjjNJ3PSAORo3JU+Y7M2II5xE0/rHjJfdPXbGxrJGFBk/WPVoFfHj0PPac8LotUDgilK9H1qpv/aN3y1+jYvL7rYMetfw78qFUAFd8AsqvwRmd9JdVU1YUmkMWArxGtlpU2Gnsq4eY8I8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719279607; c=relaxed/simple;
-	bh=gEMk1n73Wb3oUO8qNzTRjivoXpQVt0yt6g8Ics0pzlo=;
+	s=arc-20240116; t=1719279687; c=relaxed/simple;
+	bh=WSDNSDfBvIc+eX+Ow2RXKGPqoaGprM+e7kambKcLM3Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C/kUE88klLCVBARH9WYeAXI9V7Da1Uf6cSneAuTVxSVNwGbazBEI4kbO5Au00c3VB3ncd2ZzviotN3IpeppCLo2pt+pH742rPBoqlcpevd6aNJYtwVHslJ5gx1+Px/ND+PIrI9oJZrKYOZAfiVdYuJDt5q4xRt5rt66xIxxoi+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y+jUKneQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2B90C2BBFC;
-	Tue, 25 Jun 2024 01:40:06 +0000 (UTC)
+	 MIME-Version:Content-Type; b=EtUhW/dFRnpCEfoi+c2O/6+ACEalnBIeQIBPTCBHkJfU53LaktWaESK1p7J3xtcresQ6scp21uFoOJwocDCLfSV7wsEfaHxuhYnoGiywK7pye4bd0OVVebdBhq3Puvd2FEiAYEzqwz6N2RErcRlT02lGdsLXlZNArLmT4VC0pvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KpCzQxll; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B477C2BBFC;
+	Tue, 25 Jun 2024 01:41:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719279607;
-	bh=gEMk1n73Wb3oUO8qNzTRjivoXpQVt0yt6g8Ics0pzlo=;
+	s=k20201202; t=1719279687;
+	bh=WSDNSDfBvIc+eX+Ow2RXKGPqoaGprM+e7kambKcLM3Y=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Y+jUKneQ+o9lWvKe8RwEp0PtThIRtKSgJQVYjikWPkxsEr5aoCKb/5Zu2YgiZ1uEH
-	 RzF5ElaBrbUW2qF0a06q3RTbj9ay1fFaNqZiVKHYRX0/sL33icWyoxgBzszzIgUYU8
-	 Z5mxKVBNulRkF2zHQFEczWtdcQ3BGNywvmVkQSh74vC0PK0XArwD7fF+uIoc+brVAK
-	 RtRGcETDDbZ8qv4700bjOFXsqG15/cKVD0s7j9fXQ1NR6LX0n5hK5LFZrhyhOrVXkd
-	 l29d/IXqFn6BGo7BMdVjWaqQiMtsAXdzRAp/mEgOqRwkAP0Vwnv0IYTCydlcg9Rv8B
-	 5AxO0hXZLC+hg==
-Date: Mon, 24 Jun 2024 18:40:05 -0700
+	b=KpCzQxllUjGOV3g+dUuf1zT+5Zj+oAFefYrt7+pzfhVGZ/XFkCDIRFHVgBEGN0yGV
+	 c4bmtXL0cfGmsTRxqRff83QRVsHwM0uqs2NmsxSBZrnb8LpYsomEpmPKFKI9f1OZ/h
+	 Oy2h1WosohuiwT2JRwcrmaM0LMHPsvqWT2owI1tbH0U/x7HuvyzxLOI/2BGjBcrE1g
+	 y+BOPrfr8LZetoDVFwDyI1nVmv2akCkL9CAayFU923b5+dkmtr9D1h2j0mRtpIi09T
+	 ME2r08qFxDCrs3rMMktOKDZDYVkdh98Glc6lzcDqGEcxEpmWNxtvvOxNHzvCRFV8/u
+	 xd2hPwWeDj2Bw==
+Date: Mon, 24 Jun 2024 18:41:26 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- willemdebruijn.kernel@gmail.com, ecree.xilinx@gmail.com, dw@davidwei.uk,
- przemyslaw.kitszel@intel.com, michael.chan@broadcom.com,
- andrew.gospodarek@broadcom.com
-Subject: Re: [PATCH net-next v2 0/4] selftests: drv-net: rss_ctx: add tests
- for RSS contexts
-Message-ID: <20240624184005.5725f01c@kernel.org>
-In-Reply-To: <20240625010210.2002310-1-kuba@kernel.org>
-References: <20240625010210.2002310-1-kuba@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: pull-request: bpf 2024-06-24
+Message-ID: <20240624184126.33322abe@kernel.org>
+In-Reply-To: <20240624124330.8401-1-daniel@iogearbox.net>
+References: <20240624124330.8401-1-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,15 +60,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 24 Jun 2024 18:02:06 -0700 Jakub Kicinski wrote:
-> v2 adds a test for removing contexts out of order. When testing
-> bnxt - either the new test or running more tests after the overlap
-> test makes the device act strangely. To the point where it may start
-> giving out ntuple IDs of 0 for all rules :S
+On Mon, 24 Jun 2024 14:43:30 +0200 Daniel Borkmann wrote:
+> The following changes since commit 143492fce36161402fa2f45a0756de7ff69c366a:
+> 
+>   Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue (2024-06-14 19:05:38 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   ssh://git@gitolite.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
 
-FWIW if I create the context with an indirection table, and then change
-the key (without touching the indirection table) - it all works as
-expected. So really seems like bnxt has a problem with setting the
-indir table when context is created. That said I don't see anything
-obviously wrong with the driver code.
+Bot seems to not be responding, so: pulled, thanks!
+
+BTW was the ssh link intentional?
 
