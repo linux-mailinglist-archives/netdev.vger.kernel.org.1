@@ -1,221 +1,165 @@
-Return-Path: <netdev+bounces-106567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4FED916D96
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 17:56:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3ABC916D91
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 17:55:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8288528C719
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 15:56:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE4121C246DC
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 15:55:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5EB216FF3D;
-	Tue, 25 Jun 2024 15:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882BB16FF5F;
+	Tue, 25 Jun 2024 15:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hYlGvi3+"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1FF16F91E;
-	Tue, 25 Jun 2024 15:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6B445978;
+	Tue, 25 Jun 2024 15:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719330985; cv=none; b=N2OSV7Hk0/iMlJURxQSrpzezxhAk9i3nSK5tTO9GETzAr17bTk7GoE3k3cAZtxa0o8FTFix0iTMNcrULCx59EBeDSw6gMECbWQzpGnlotTOtZrR8QB2zMeXRGzC30PaK+oAPQ3HlsB+I6RhoEmdDgaI3EQGeAMJQ4js3S1B4iy8=
+	t=1719330893; cv=none; b=ckaLBNLbDGiTz/NOrEYwMBMOdUoOpI+utcJDVthGM+nanTkhtXbA/E2pcs0k80tcxIJ/fyIevVSxrtPuhCkPZcFapr47Shfg6u7ZysQstyWgSCUGPwmRXZ6SbYQLp3NLem5A1NWJD6fJz+ANz8+3WS2cfoo7XLncqxHyakzu5a4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719330985; c=relaxed/simple;
-	bh=n1FFf5mujbNwYqKy/el2+g6OPIJw7BUE+uVESDPrvtQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NufbZy085AYElP870pFFsaQFffdQ7j74TYB2UPusL4HE8V96/3QfC+Ykvdbu0XtvOxjvco4kUOtUHCNJoWhrdTdjAPZisA8+bGkmMtI7AjawA7Yc795Uvf5ClfKjh9J3ZdiGwp9qIufb/kNzHlTO6SKfAmFRq3CeGy9fnrABu0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-X-IronPort-AV: E=Sophos;i="6.08,264,1712588400"; 
-   d="asc'?scan'208";a="209250203"
-Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
-  by relmlie5.idc.renesas.com with ESMTP; 26 Jun 2024 00:51:12 +0900
-Received: from [10.226.92.125] (unknown [10.226.92.125])
-	by relmlir5.idc.renesas.com (Postfix) with ESMTP id DC0BF400D0C1;
-	Wed, 26 Jun 2024 00:51:09 +0900 (JST)
-Message-ID: <796db874-b88e-4e7b-aebb-7b0a0361843c@bp.renesas.com>
-Date: Tue, 25 Jun 2024 16:51:08 +0100
+	s=arc-20240116; t=1719330893; c=relaxed/simple;
+	bh=MYCOtf0uRzHZ3eR6TN/Xx66bhkBDqHJ8W0YBKOxdBTc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KqaiUXMqNR1YBIhqQSeOvfWPPaz9zFCRJclbZSwpDkVf2osacn6KEUg/tR0U4r7Km0VOH1IyXglOF3x5cmCwH8EDVSary5Gti7MAce+YtLtU/JkLItAPCvErscSv3YKMzfYAiGQb5Ds1kSvQxA/duO5N8mAn0oAXg9SqSj9GR/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hYlGvi3+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59E2BC32781;
+	Tue, 25 Jun 2024 15:54:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719330893;
+	bh=MYCOtf0uRzHZ3eR6TN/Xx66bhkBDqHJ8W0YBKOxdBTc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hYlGvi3+HVNY5dkhVgWnsMZ2RaXcZjFPqtc5GahEsGart9KlpH78TBIzGplLjoLcM
+	 9WjCDQCqHb3lQ9o/ux+RsrxEQh0Rx67fURh4N/D33LPip/NsVBc8j1nGV1aodlnWHS
+	 z0pf4UIdM27bkrsRQag2IPB/9rvdsxeMiKNEurO5YKM1Uc9fZHjmWiEjvCc734R5OC
+	 EDg4mYZmJSiD7wrUsk0niueZ7dD9Vx48V0elwYVQBv4y1yT9HZB5ZzSoZCnWR0QhaP
+	 n7//VCl5yEIon5+DHX5Ps5+j4m5JVpXxGN3FAbPH03vAuk6y2Rn9MiAbmOwKJQ+KvC
+	 WnFoKnxfBIaSw==
+Date: Tue, 25 Jun 2024 17:54:47 +0200
+From: Benjamin Tissoires <bentiss@kernel.org>
+To: Thinker Li <thinker.li@gmail.com>
+Cc: Mark Brown <broonie@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, 
+	Jiri Kosina <jikos@kernel.org>, Martin KaFai Lau <martin.lau@kernel.org>, 
+	linux-input@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build failure after merge of the bpf-next tree
+Message-ID: <ud5j6hbozgg6em43volidpffykdtd2lpf32etmdiyksorl2cb4@whtseaibw2xw>
+References: <ZnB9X1Jj6c04ufC0@sirena.org.uk>
+ <CAFVMQ6R8ZZE+9jWM1vhEuz2PsLyCgKhpaVD377TKEu4AfGO_iA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,v9] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-To: Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-References: <20240618090824.553018-1-niklas.soderlund+renesas@ragnatech.se>
- <716088809af5c646b3f1342656dbb08969becaaa.camel@redhat.com>
- <20240620115051.GW382677@ragnatech.se>
- <4bc6795cb1b731f47d2c0b3f06f106f59abf0637.camel@redhat.com>
-Content-Language: en-GB
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-Organization: Renesas Electronics Corporation
-In-Reply-To: <4bc6795cb1b731f47d2c0b3f06f106f59abf0637.camel@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------nIhq4e2lwqrmhMK7LsjZX6S1"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFVMQ6R8ZZE+9jWM1vhEuz2PsLyCgKhpaVD377TKEu4AfGO_iA@mail.gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------nIhq4e2lwqrmhMK7LsjZX6S1
-Content-Type: multipart/mixed; boundary="------------jZ0SiwluMZy9D0NHvgRw5B1o";
- protected-headers="v1"
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-To: Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Message-ID: <796db874-b88e-4e7b-aebb-7b0a0361843c@bp.renesas.com>
-Subject: Re: [net-next,v9] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-References: <20240618090824.553018-1-niklas.soderlund+renesas@ragnatech.se>
- <716088809af5c646b3f1342656dbb08969becaaa.camel@redhat.com>
- <20240620115051.GW382677@ragnatech.se>
- <4bc6795cb1b731f47d2c0b3f06f106f59abf0637.camel@redhat.com>
-In-Reply-To: <4bc6795cb1b731f47d2c0b3f06f106f59abf0637.camel@redhat.com>
+On Jun 24 2024, Thinker Li wrote:
+> Hi Mark,
+> 
+> I'm sorry for not getting back to you sooner. I have been traveling
+> since my last message.
+> I guess this patch is for the HID tree. The changes in this patch are great.
 
---------------jZ0SiwluMZy9D0NHvgRw5B1o
-Content-Type: multipart/mixed; boundary="------------drz42KU1z0pbXahb33cpo4m0"
+Ok, thanks for the review. However, the need appears because there is a
+conflicting update in the bpf tree.
 
---------------drz42KU1z0pbXahb33cpo4m0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+May I ask the bpf maintainers (Daniel/Alexei/Andrii) for an immutable
+tag I could merge to so I can take this patch from Mark?
 
-Hi Paolo, Niklas,
+> 
+> However, I suggest you implement ".update" if you think it is
+> reasonable for HID,
+> although it is not a MUST-BE. ".update" provides a good feature that
+> user space programs
+> can update an implementation on the flight.
 
-On 20/06/2024 16:23, Paolo Abeni wrote:
-> On Thu, 2024-06-20 at 13:50 +0200, Niklas S=C3=B6derlund wrote:
->> On 2024-06-20 13:13:21 +0200, Paolo Abeni wrote:
->>>
->>> skb allocation is preferred at receive time, so that the sk_buff itse=
-lf
->>> is hot in the cache. Adapting to such style would likely require a
->>> larger refactor, so feel free to avoid it.
->>
->> This is good feedback. There are advanced features in TSN that I would=
-=20
->> like to work on in the future. One of them is to improve the Rx path t=
-o=20
->> support split descriptors allowing for larger MTU. That too would=20
->> require invasive changes in this code. I will make a note of it and tr=
-y=20
->> to do both.
->=20
-> In the context of a largish refactor, then I suggest additional
-> investigating replacing napi_gro_receive() with napi_gro_frags().
->=20
-> The latter should provide the best performances for GRO-ed traffic.
+FWIW, Mark handles linux-next, so not sure he has deep knowledge of
+HID-BPF, and not sure he wants too :)
 
-This prompted me to try converting ravb_rx_gbeth() in the ravb driver to
-use napi_get_frags()/napi_gro_frags(). The result of that change was no
-improvement in TCP RX performance and a roughly 10% loss in UDP RX
-performance on the RZ/G2UL. i.e. napi_gro_frags() is worse than
-napi_gro_receive() in this driver.
+Regarding .update, I'm not sure it's worth the effort for hid-bpf. Right
+now HID-BPF programs are just a one-shot: you load them, pin them and
+forget. This might be different when systemd starts implementing a HID
+firewall, but we can cross that bridge when we see fit.
 
-I guess using napi_gro_frags() removes the need to copy data if you need
-to add space to the first fragment for a struct skb_shared_info. For the
-GbEth IP, we reserve space for the shared info structure in every
-fragment buffer anyway. For <=3D1500 byte packets there is no benefit to
-changing this, but for larger packets perhaps we would see better
-efficiency if all of each 2kB fragment buffer could be used for packet
-data, with space for the shared info being allocated separately via
-napi_get_frags(). Some thoughts for the future I guess.
+Cheers,
+Benjamin
 
-Am I missing anything here about why napi_gro_frags() should be better?
-
-Thanks,
-
---=20
-Paul Barker
---------------drz42KU1z0pbXahb33cpo4m0
-Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
-Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-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3D
-=3DsIIN
------END PGP PUBLIC KEY BLOCK-----
-
---------------drz42KU1z0pbXahb33cpo4m0--
-
---------------jZ0SiwluMZy9D0NHvgRw5B1o--
-
---------------nIhq4e2lwqrmhMK7LsjZX6S1
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZnrnbAUDAAAAAAAKCRDbaV4Vf/JGvT27
-AQCjjCgn5mjoUHQValsWHrY++7tjBqDDboyxK0xoec/viAEAuP2PGSMi60t35bU/EHG8W2KXCtPy
-QX/nZ7N9ZXA2Mgo=
-=eb+y
------END PGP SIGNATURE-----
-
---------------nIhq4e2lwqrmhMK7LsjZX6S1--
+> 
+> On Mon, Jun 17, 2024 at 11:16 AM Mark Brown <broonie@kernel.org> wrote:
+> >
+> > Hi all,
+> >
+> > After merging the bpf-next tree, today's linux-next build (x86_64
+> > allmodconfig) failed like this:
+> >
+> > /tmp/next/build/drivers/hid/bpf/hid_bpf_struct_ops.c:280:16: error: initialization of 'int (*)(void *, struct bpf_link *)' from incompatible pointer type 'int (*)(void *)' [-Werror=incompatible-pointer-types]
+> >   280 |         .reg = hid_bpf_reg,
+> >       |                ^~~~~~~~~~~
+> > /tmp/next/build/drivers/hid/bpf/hid_bpf_struct_ops.c:280:16: note: (near initialization for 'bpf_hid_bpf_ops.reg')
+> > /tmp/next/build/drivers/hid/bpf/hid_bpf_struct_ops.c:281:18: error: initialization of 'void (*)(void *, struct bpf_link *)' from incompatible pointer type 'void (*)(void *)' [-Werror=incompatible-pointer-types]
+> >   281 |         .unreg = hid_bpf_unreg,
+> >       |                  ^~~~~~~~~~~~~
+> > /tmp/next/build/drivers/hid/bpf/hid_bpf_struct_ops.c:281:18: note: (near initialization for 'bpf_hid_bpf_ops.unreg')
+> >
+> > Caused by commit
+> >
+> >   73287fe228721b ("bpf: pass bpf_struct_ops_link to callbacks in bpf_struct_ops.")
+> >
+> > interacting with commit
+> >
+> >   ebc0d8093e8c97 ("HID: bpf: implement HID-BPF through bpf_struct_ops")
+> >
+> > from the HID tree.
+> >
+> > I've fixed it up as below:
+> >
+> > From e8aeaba00440845f9bd8d6183ca5d7383a678cd3 Mon Sep 17 00:00:00 2001
+> > From: Mark Brown <broonie@kernel.org>
+> > Date: Mon, 17 Jun 2024 19:02:27 +0100
+> > Subject: [PATCH] HID: bpf: Fix up build
+> >
+> > Fix up build error due to 73287fe228721b ("bpf: pass bpf_struct_ops_link to callbacks in bpf_struct_ops.")
+> >
+> > Signed-off-by: Mark Brown <broonie@kernel.org>
+> > ---
+> >  drivers/hid/bpf/hid_bpf_struct_ops.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/hid/bpf/hid_bpf_struct_ops.c b/drivers/hid/bpf/hid_bpf_struct_ops.c
+> > index 5f200557ff12b..744318e7d936b 100644
+> > --- a/drivers/hid/bpf/hid_bpf_struct_ops.c
+> > +++ b/drivers/hid/bpf/hid_bpf_struct_ops.c
+> > @@ -175,7 +175,7 @@ static int hid_bpf_ops_init_member(const struct btf_type *t,
+> >         return 0;
+> >  }
+> >
+> > -static int hid_bpf_reg(void *kdata)
+> > +static int hid_bpf_reg(void *kdata, struct bpf_link *link)
+> >  {
+> >         struct hid_bpf_ops *ops = kdata;
+> >         struct hid_device *hdev;
+> > @@ -229,7 +229,7 @@ static int hid_bpf_reg(void *kdata)
+> >         return err;
+> >  }
+> >
+> > -static void hid_bpf_unreg(void *kdata)
+> > +static void hid_bpf_unreg(void *kdata, struct bpf_link *link)
+> >  {
+> >         struct hid_bpf_ops *ops = kdata;
+> >         struct hid_device *hdev;
+> > --
+> > 2.39.2
+> >
 
