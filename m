@@ -1,125 +1,216 @@
-Return-Path: <netdev+bounces-106399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B050916162
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 10:34:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47F9E916168
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 10:35:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCF85B23A33
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 08:34:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A618DB25905
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 08:35:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3323C149E0B;
-	Tue, 25 Jun 2024 08:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 217A414A4C9;
+	Tue, 25 Jun 2024 08:33:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="J0h5vpYR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c0D8PQP7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF3C148832
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 08:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9595F14A4C6
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 08:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719304420; cv=none; b=Nn/LU+l9xnZ3AaqXhp0yK1xCwhyal4KesI39jwM4FnUQy9JekF7EKboyaoQP+cjoeodCVBj7ds72w20EW8rsWcqmdWtuocH583fKSLgoHdVtmqVd2UD+4sxKAfLnxGUTKPzpX6GDnHC/3lyOlc9eJ1a5lyu6z8TL06u7ZkIt+bE=
+	t=1719304439; cv=none; b=bcdum2AqVoWWOfcaT54r19sUKtRGIveUeMtBp8rtfi9RaO8xqdUn6az2sMzq95KgAPQWoAsigYyLOfsF7OiV/bSYPTk7bsM+gXEJZLxOFO+NtrhUkk+2dRrqAIMpKgQkvAtjnu0b2t7PwnBtGELon9SH/aVh02EG7g2S8oS40oI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719304420; c=relaxed/simple;
-	bh=6zLeUxGI/6eJmXDQirmzJApQvIPtWQsC1uEMVIgt2tU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ic1spMHILf7wiurJjFBg8r+I+gixoEwvSTHyoKM8qEbVJabXoBp3P7oNPAxpth8UhfZzuPwJe1KxzIn3bKCTHmvww6ysZQYN+8YyDPYvbAcbXLhyG5Y+BDumOHD7AHo5A7QAHE0FLligU1UcMG11r6YSjzbtD/B+shoJyTOR7ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=J0h5vpYR; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7067a2e9607so1877016b3a.3
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 01:33:38 -0700 (PDT)
+	s=arc-20240116; t=1719304439; c=relaxed/simple;
+	bh=3wSIv4dG+zqD1/sWH1bOTpHCf/y+0gM7r2AidH9sipM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y44nG4RZtdmy/SL2aWKd+/ZF4yvCOLx9Tbv39Pz7wvpC2TFKhx9a9ag4qnXYwN7A9E89oCtQLK4c8+FJAq415BDrIKazYvajZnLRGRqGeNeo3F5QHqG/ilX27vT9WoEMHrRK+/+zcE8HKMPLH2y7l2OLhcgQaYBncT6GQd1NGPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c0D8PQP7; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-57a16f4b8bfso8136a12.0
+        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 01:33:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1719304418; x=1719909218; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mm6ddIKDyA7yDOVacp77GbndxO6yjA2PPWGRWlNTN1Q=;
-        b=J0h5vpYRiqosRaYwTeDSWa7DdrN8EDN7B+B+WXEl5ZdQNBBj2dXfguSQ64usrxddoF
-         08W+b6rndt8CJIb4vwjNotO9W16+mwHfJkl1lo97bOxzzJ0hM1xdwy1xJHMkyEWEG1NS
-         QgU3cwpMweam3XpfM82MDJQUAqrSjQOTKUAglSz7JWG8AgPV6+RukprNwU5/49tFndDr
-         guVtEhi20WzM3JirI4GZxb1YHybwf7vCenGSqFZCj0ttpWQwRMXs7fEo6KfhWmukj1a8
-         Ibl1oIqwIuXyCjQMwTxWMCx/n7XfoDJYf8Vls/OOlqnPvQX86oIdo0JEiLBsePsoOFuy
-         Rhtw==
+        d=google.com; s=20230601; t=1719304435; x=1719909235; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XeUYiJnNAb5D0IWuiFx68WloAZOBvRMUqn5S2VhB/V8=;
+        b=c0D8PQP7h9bEYpEFjZ4XWKNpxspOyZqGP/5nOUmA9OUv7gIK47wHQB5YQdxwINE/g+
+         P9h0ghqnwO1/hmMGEguTjGEM5XZaP12gQjGe4O1zgO/IAp3WtI6jBm6sUE9nYPQ8Kl24
+         rn3BD2bNIbPikaSXf6t/bXnQTq5Yw3MttmfB4ZmzIBxeXJSEcee9wHeti7qbanZ87mG1
+         QFZvHVZbK/pZqqN+8hno+NfqaclvxaFjEkBk5IhxrzRR9EOfyJ+vdO63MRmMDKMLvEK8
+         EdMHXC3nC1kNb4J5reI+LXablWljxe63YhB9sIo+mfzMbZebVj/zJezRvyOIBgfOH76t
+         ZbtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719304418; x=1719909218;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Mm6ddIKDyA7yDOVacp77GbndxO6yjA2PPWGRWlNTN1Q=;
-        b=bL2V8jkaMiDUIzUd36uRbflgAeW1P4f33P1x1M5zmx5Z0c9sKOTjCQCMnFX5XHYRY5
-         iqR6SgZzdtZuUiuQqPKAFETzqUG8kprYhv/tfAqF2aVoMvsdlsvmmsC83jLpS11p44c5
-         jbhAWyLsUPwOnFRENKENUOEqDlp2MTANH3W7XaFL3VEb3AUAAYpqgQygFHwcKE9G5/dB
-         fOUPM2y+UISSAew9EiYl8f9pRpCuWUpeYUDn31CJWqVPmwAIP8g/mAWGUHgp+328P+Fk
-         5j2CladpUTgi/FrVEnoyF7FTfp6E2cOg8x+tMf1L6GoPRzHifYrZe6FghTKFcbJvOEqg
-         wm5g==
-X-Gm-Message-State: AOJu0YyaDnGesyCmHUHIxEIoronVAPY524DTXaN+jbyoXG4EHBh4KgGC
-	Y7ykl4v5vRovZAJMRPIlXdQWYKIjRoOPPcYB7+U2IHxbj0t3p19+AeP/q/pAo+0=
-X-Google-Smtp-Source: AGHT+IELm3Ttvtx5YR4G1Z8+z+DN1lPcg5UI0/UEjh9cx2tvPjDsjig+TPYlFTxJUKTZbgzOn8F1Kg==
-X-Received: by 2002:a05:6a20:6720:b0:1b4:b4af:6045 with SMTP id adf61e73a8af0-1bcf4479e5cmr7378240637.18.1719304417403;
-        Tue, 25 Jun 2024 01:33:37 -0700 (PDT)
-Received: from echken.smartx.com (vps-bd302c4a.vps.ovh.ca. [15.235.142.94])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-70662ee117asm6035587b3a.211.2024.06.25.01.33.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jun 2024 01:33:37 -0700 (PDT)
-From: echken <chengcheng.luo@smartx.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	echken <chengcheng.luo@smartx.com>
-Subject: [PATCH 2/2] Add UDP fragmentation features to Geneve devices
-Date: Tue, 25 Jun 2024 08:33:24 +0000
-Message-Id: <20240625083324.776057-1-chengcheng.luo@smartx.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1719304435; x=1719909235;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XeUYiJnNAb5D0IWuiFx68WloAZOBvRMUqn5S2VhB/V8=;
+        b=UYnGsAR9KedQT2GWzZDK+vCPh/lv1g/T7+jY1HNrx827TtOV0KDeNozzREBqY1IsX2
+         jrZX4lXXNz07KS5Hz+mComURCWm1j9o0qxakYXbUXFKOpeDNR/DkZcMNMYMts/dzLW2s
+         ezjmEJMdBZQaK/Dmb6PR7NvwUUeMAzKR1bC1JVtxvVKmerUv462RmPVA48hFMl2IWp/n
+         kiUMElHl4lhFXbdwdMeddQgmZX95JaJpmPH79Rwhg5vIE8b8xEyjn/2r5RJL/qk62YTo
+         rU1i5BdmfCei7dd7quRQZhn78Vm859PAzz0B1qVgrBQggp8SvksZEGJlifxewKJp2shx
+         1Hng==
+X-Forwarded-Encrypted: i=1; AJvYcCXze415Ux9r6/WvAvUL09oi1QKK8E9ypaf+WC4oU0wMsgxDhQiRVAvR0f8B4msHswKnXXE9cyOU5P2KEt822Z2ohRhlE3dW
+X-Gm-Message-State: AOJu0Yx4iIK5fJG62sveTtACvQ4jPfB69Ka7BX/OBWtATeCe5eDiUsGF
+	Y5i3DmPwpjCLGSJKplRx34ZIyTa91yxUxS0/wr5SxmFRckZdnWhDgIU2X1K1iRvm5lHwsJNOboT
+	kMpPFksgWV5AoxNJZK5loj04dbh23jtfAUxiK
+X-Google-Smtp-Source: AGHT+IHbazm8B2Z5muQ/cD5z0DMPkbB5xirFSbtDRpOriuTTZtfF0pXe1CteCRp7NvtfoyI08ExXFytZrzrl2bf9o0Y=
+X-Received: by 2002:a05:6402:2682:b0:57c:d45d:7571 with SMTP id
+ 4fb4d7f45d1cf-57dcde35b18mr159588a12.6.1719304433406; Tue, 25 Jun 2024
+ 01:33:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1719302367.git.tanggeliang@kylinos.cn> <072709ce77b04dc77523d4e8763c1fb47bf0913d.1719302367.git.tanggeliang@kylinos.cn>
+In-Reply-To: <072709ce77b04dc77523d4e8763c1fb47bf0913d.1719302367.git.tanggeliang@kylinos.cn>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 25 Jun 2024 10:33:42 +0200
+Message-ID: <CANn89i+ET4U+4viDPq2vZhxeUT90kZz5mdh3XVqQhaAXnbs=rw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 1/4] skmsg: null check for sg_page in sk_msg_recvmsg
+To: Geliang Tang <geliang@kernel.org>
+Cc: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	David Ahern <dsahern@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Shuah Khan <shuah@kernel.org>, Mykyta Yatsenko <yatsenko@meta.com>, Miao Xu <miaxu@meta.com>, 
+	Yuran Pereira <yuran.pereira@hotmail.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	Tiezhu Yang <yangtiezhu@loongson.cn>, Geliang Tang <tanggeliang@kylinos.cn>, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Since Geneve devices do not support any offloading features for UDP
-fragmentation, large UDP packets sent through Geneve devices to the
-kernel protocol stack are preemptively fragmented in the TX direction of
-the Geneve device. The more computationally intensive encapsulation and
-routing processes occur after fragmentation, which leads to a
-significant increase in performance overhead in this scenario. By adding
-GSO_UDP and GSO_UDP_L4 to Geneve devices, we can ensure a significant
-reduction in the number of packets that undergo the computationally
-expensive Geneve encapsulation and routing processes in this scenario,
-thereby improving throughput performance.
+On Tue, Jun 25, 2024 at 10:25=E2=80=AFAM Geliang Tang <geliang@kernel.org> =
+wrote:
+>
+> From: Geliang Tang <tanggeliang@kylinos.cn>
+>
+> Run the following BPF selftests on Loongarch:
+>
+> ./test_progs -t sockmap_basic
+>
+> A Kernel panic occurs:
+>
+> '''
+>  Oops[#1]:
+>  CPU: 22 PID: 2824 Comm: test_progs Tainted: G           OE      6.10.0-r=
+c2+ #18
+>  Hardware name: LOONGSON Dabieshan/Loongson-TC542F0, BIOS Loongson-UDK201=
+8-V4.0.11
+>  pc 9000000004162774 ra 90000000048bf6c0 tp 90001000aa16c000 sp 90001000a=
+a16fb90
+>  a0 0000000000000000 a1 0000000000000000 a2 0000000000000000 a3 90001000a=
+a16fd70
+>  a4 0000000000000800 a5 0000000000000000 a6 000055557b63aae8 a7 000000000=
+00000cf
+>  t0 0000000000000000 t1 0000000000004000 t2 0000000000000048 t3 000000000=
+0000000
+>  t4 0000000000000001 t5 0000000000000002 t6 0000000000000001 t7 000000000=
+0000002
+>  t8 0000000000000018 u0 9000000004856150 s9 0000000000000000 s0 000000000=
+0000000
+>  s1 0000000000000000 s2 90001000aa16fd70 s3 0000000000000000 s4 000000000=
+0000000
+>  s5 0000000000004000 s6 900010009284dc00 s7 0000000000000001 s8 900010009=
+284dc00
+>     ra: 90000000048bf6c0 sk_msg_recvmsg+0x120/0x560
+>    ERA: 9000000004162774 copy_page_to_iter+0x74/0x1c0
+>   CRMD: 000000b0 (PLV0 -IE -DA +PG DACF=3DCC DACM=3DCC -WE)
+>   PRMD: 0000000c (PPLV0 +PIE +PWE)
+>   EUEN: 00000007 (+FPE +SXE +ASXE -BTE)
+>   ECFG: 00071c1d (LIE=3D0,2-4,10-12 VS=3D7)
+>  ESTAT: 00010000 [PIL] (IS=3D ECode=3D1 EsubCode=3D0)
+>   BADV: 0000000000000040
+>   PRID: 0014c011 (Loongson-64bit, Loongson-3C5000)
+>  Modules linked in: bpf_testmod(OE) xt_CHECKSUM xt_MASQUERADE xt_conntrac=
+k
+>  Process test_progs (pid: 2824, threadinfo=3D0000000000863a31, task=3D000=
+000001cba0874)
+>  Stack : 0000000000000001 fffffffffffffffc 0000000000000000 0000000000000=
+000
+>          0000000000000018 0000000000000000 0000000000000000 90000000048bf=
+6c0
+>          90000000052cd638 90001000aa16fd70 900010008bf51580 900010009284f=
+000
+>          90000000049f2b90 900010009284f188 900010009284f178 90001000861d4=
+780
+>          9000100084dccd00 0000000000000800 0000000000000007 fffffffffffff=
+ff2
+>          000000000453e92f 90000000049aae34 90001000aa16fd60 900010009284f=
+000
+>          0000000000000000 0000000000000000 900010008bf51580 90000000049f2=
+b90
+>          0000000000000001 0000000000000000 9000100084dc3a10 900010009284f=
+1ac
+>          90001000aa16fd40 0000555559953278 0000000000000001 0000000000000=
+000
+>          90001000aa16fdc8 9000000005a5a000 90001000861d4780 0000000000000=
+800
+>          ...
+>  Call Trace:
+>  [<9000000004162774>] copy_page_to_iter+0x74/0x1c0
+>  [<90000000048bf6c0>] sk_msg_recvmsg+0x120/0x560
+>  [<90000000049f2b90>] tcp_bpf_recvmsg_parser+0x170/0x4e0
+>  [<90000000049aae34>] inet_recvmsg+0x54/0x100
+>  [<900000000481ad5c>] sock_recvmsg+0x7c/0xe0
+>  [<900000000481e1a8>] __sys_recvfrom+0x108/0x1c0
+>  [<900000000481e27c>] sys_recvfrom+0x1c/0x40
+>  [<9000000004c076ec>] do_syscall+0x8c/0xc0
+>  [<9000000003731da4>] handle_syscall+0xc4/0x160
+>
+>  Code: 0010b09b  440125a0  0011df8d <28c10364> 0012b70c  00133305  0013b1=
+ac  0010dc84  00151585
+>
+>  ---[ end trace 0000000000000000 ]---
+>  Kernel panic - not syncing: Fatal exception
+>  Kernel relocated by 0x3510000
+>   .text @ 0x9000000003710000
+>   .data @ 0x9000000004d70000
+>   .bss  @ 0x9000000006469400
+>  ---[ end Kernel panic - not syncing: Fatal exception ]---
+> '''
+>
+> This is because "sg_page(sge)" is NULL in that case. This patch adds null
+> check for it in sk_msg_recvmsg() to fix this error.
+>
+> Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
+> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
+> ---
+>  net/core/skmsg.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> index fd20aae30be2..bafcc1e2eadf 100644
+> --- a/net/core/skmsg.c
+> +++ b/net/core/skmsg.c
+> @@ -432,6 +432,8 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *=
+psock, struct msghdr *msg,
+>                         sge =3D sk_msg_elem(msg_rx, i);
+>                         copy =3D sge->length;
+>                         page =3D sg_page(sge);
+> +                       if (!page)
+> +                               goto out;
+>                         if (copied + copy > len)
+>                                 copy =3D len - copied;
+>                         copy =3D copy_page_to_iter(page, sge->offset, cop=
+y, iter);
+> --
+> 2.43.0
+>
 
-Signed-off-by: echken <chengcheng.luo@smartx.com>
----
- drivers/net/geneve.c | 4 ++++
- 1 file changed, 4 insertions(+)
+This looks pretty much random to me.
 
-diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index 838e85ddec67..dc0f5846b415 100644
---- a/drivers/net/geneve.c
-+++ b/drivers/net/geneve.c
-@@ -1198,10 +1198,14 @@ static void geneve_setup(struct net_device *dev)
- 	dev->features    |= NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_FRAGLIST;
- 	dev->features    |= NETIF_F_RXCSUM;
- 	dev->features    |= NETIF_F_GSO_SOFTWARE;
-+	dev->features    |= NETIF_F_GSO_UDP;
-+	dev->features    |= NETIF_F_GSO_UDP_L4;
- 
- 	dev->hw_features |= NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_FRAGLIST;
- 	dev->hw_features |= NETIF_F_RXCSUM;
- 	dev->hw_features |= NETIF_F_GSO_SOFTWARE;
-+	dev->features    |= NETIF_F_GSO_UDP;
-+	dev->features    |= NETIF_F_GSO_UDP_L4;
- 
- 	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
- 	/* MTU range: 68 - (something less than 65535) */
--- 
-2.34.1
-
+Please find the root cause, instead of desperately trying to fix 'tests'.
 
