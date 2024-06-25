@@ -1,117 +1,119 @@
-Return-Path: <netdev+bounces-106393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5122E916136
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 10:30:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A44E2916139
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 10:30:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1287D283864
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 08:30:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D49141C22F7E
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 08:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72313149018;
-	Tue, 25 Jun 2024 08:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 274A11494CB;
+	Tue, 25 Jun 2024 08:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="IjAIMraZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pxgOmLuj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42385148857
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 08:29:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F165A1494B4;
+	Tue, 25 Jun 2024 08:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719304183; cv=none; b=KwfTUDBF0uLGy2fKwwW0QeV//RUO/V6ReDDGVIvz/ls9a/8hY9ZdArQpZhr5/4Khx6O8H6mB3T4zhb/PsLn0IOuXQqgZBsoB8zTQRopV8K4CLwtAs+kfbwd3E2YmNJqsAjpJYOD7SJJfO7yillBrSVqe78ad7Uytx2zsAexB1Fc=
+	t=1719304184; cv=none; b=KPXeU/QwPEXPDk8czlDt7bwt7vt2CRckevqroCiZLd9oQquuRN0Op1nBixucwprJncOKYQsefjChpIGzJ/D/WqwQJm220zW7pbgUuOxztKph+5ieorxsFIAX1sOcXCOPu484mRuDiwMLIGKi0KbO1Osrj4HTJWrowGQMH/VEf84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719304183; c=relaxed/simple;
-	bh=AnmKil8+NfynUTaFHzWfLAaLMrrcYuTWsIEWkLL1vfI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qW/zq2yqW3ffyjBzOnE7lDZcIpGCY32OL82KhTJsnexjJJei4flfqbmSNogNqkOZSuChnl0FajA3noRSyUrwY7B+VBoProVBtlFktHc/cQ8AhJaF+jTH5Ck6vktGYSf+LCEsDkVmxQmEeagThswUB8FPFNvjXBscda+TGEudcUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=IjAIMraZ; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1fa2782a8ccso15532425ad.2
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 01:29:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1719304180; x=1719908980; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EHm6jSq3YRWEu2BqkiF85SjfiXnv03zfze5ShEkImQ8=;
-        b=IjAIMraZEV2mZ83rYmfj5XNXOgKcRoa/Yepk2YVAfrKjq35C0miTcUBO2eHRpXnimj
-         IIT4Wk6DrAio9Y+15WwC8o3sxaPgQr7JG12ZyIfS0X06E1GZavus5mzuXsBkiImLZ/tv
-         2XiAiQDnc6NgzyjvVkg/29jT1YLxcviMEWDcFyVTc36QGFOng83l1rkB4MwroRTj16sj
-         pffht+JRrZ/JNfH9JGTAbCl54O3FkZlkS37ht7lZxu8pv19PcDUWJpLcK17CyASG8gdN
-         8VpORHrrWtedqmFAoL98zSgkKLTL5U3mzHyQu/4z9PeiJ0tULR0l/I6gT70kWtve66xP
-         431g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719304180; x=1719908980;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EHm6jSq3YRWEu2BqkiF85SjfiXnv03zfze5ShEkImQ8=;
-        b=T0Q29LIFcGNivzE0YWCX3RHtJy+TFxCsP7VuJxPPlJlVtcVGP+yERCMLa+0uSvVqTm
-         jvm/5+ZPt59g2FFRTmXMOLB1Y6GYD73w2a81n4Ka7HlgNWd8/vyYA4MUrnC7rhroxW6a
-         Ad9PaITO8BNXkn+NpV5DPd4TSjmPPJwWOQI/ROei2djGFMYjhIs2kcC1KUBFGZdiWKzv
-         jsqQy4AukGqj8xAMCBDvocOEPcsGWkBAdeVNL31dHnT7d1iHQH+QYXgx2/pOWy33KcyS
-         uNHMBmmDyIrEJODCAS01LHr2hlnaf0o52WBu0F6qLh5yYT7h2n9YXpd8I9DcLE8rsTmK
-         AhEg==
-X-Gm-Message-State: AOJu0Ywo9j35qJqV9LwrFSZm4H14J/FIBQEygQyrPCwH3tN5EOywY9Sm
-	DKx4Dm6dkzlYqleexmElSOvPhLxBkZeL6CCqgHHUDzy7u65gwPLmXDKaje03eJ0=
-X-Google-Smtp-Source: AGHT+IEuUm/k18cKpsPHmSMA/4F5q07QPsr1++pGXwTWN6paEYO6DEUJj/D6ppjMr7SThqV4w9G47g==
-X-Received: by 2002:a17:902:f685:b0:1fa:12a5:a4f9 with SMTP id d9443c01a7336-1fa23f15c1dmr85226395ad.47.1719304179756;
-        Tue, 25 Jun 2024 01:29:39 -0700 (PDT)
-Received: from echken.smartx.com (vps-bd302c4a.vps.ovh.ca. [15.235.142.94])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-1fa2b011112sm41628545ad.121.2024.06.25.01.29.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jun 2024 01:29:39 -0700 (PDT)
-From: echken <chengcheng.luo@smartx.com>
-To: pshelar@ovn.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	dev@openvswitch.org,
-	linux-kernel@vger.kernel.org,
-	echken <chengcheng.luo@smartx.com>
-Subject: [PATCH 1/2] Add GSO UDP Offloading feature to OVS Internal Port
-Date: Tue, 25 Jun 2024 08:29:24 +0000
-Message-Id: <20240625082924.775877-1-chengcheng.luo@smartx.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1719304184; c=relaxed/simple;
+	bh=mKmmNq3ZO/ijyhP26QuFk8tmiEVK1nmmiemJh7SmQec=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AVx2ZL67LrJloU7utkbkOxHc4WgJT9hzrAu2ifC8524jVxt2K2WvC1qkRnfnV/LwvCKAoeL2yJarj4Sqq7ncggoaE8p3e5EOHZSL4LJMPoA69wMRQZWQbuB4QcFAJLXBVe2QLDPrmCsCVC9gELxvWhptZ9awveOgpDVS+XWocak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pxgOmLuj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85C7DC32786;
+	Tue, 25 Jun 2024 08:29:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719304183;
+	bh=mKmmNq3ZO/ijyhP26QuFk8tmiEVK1nmmiemJh7SmQec=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=pxgOmLujg1MmHoMkhATXUQRXtTZS84miHJsvZl+OItaDxGAafU4qyVO/2XMjuFdX/
+	 ZLvf583wZZQvnakoqq6feC6HZvV0PJzyGCYS5g2Ox8vfYHW9sGuT2RYvCOoC9XEewy
+	 TsaVObjZ1phg3UiuLBQZfPew0H1iUA/M3gf5lnG3VtFr2bTjBnhnMrG3f6dSSIduAH
+	 jZr7IwCdW3tVHhBQrCYZAHtcm675ih5vDXzTafoopl3gV5GGDr2DeFVpJx7W88Br7+
+	 M1v+xHWrmgqcQCu3UO6HOa1mijW3QjFKDwGE7i6MqI4n2yBlZdq0qETIT07WR4e40H
+	 RDg831mu7QgWg==
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a724b4f1218so287550366b.2;
+        Tue, 25 Jun 2024 01:29:43 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCW6dRYe16N8shlcnscZfBJ0EKSUXausfGhwzsMly1oWHVNEFC2VJOdNTDcH79zVpEaOAkCx11aV9RfrkRo+vNkDCeUfpxXoNEaoTMyPlv7bnsbwuU/bu+D44JbDWgG5P/XoQGNEs9+QNMoORkg1MrQyu21RK3JiVBsWC03U
+X-Gm-Message-State: AOJu0YxagXTvkFUmukU6vpqcYGws9ITGucygywmKVlO+bvdJf5GHE5yn
+	ltC7gW4gBy9alYw2/ud1Z1BlctFY+JfSz585ohVp0qP95wAZOAvG76lKb6FcGPdpf/3ZjbPiRNV
+	RhiHiSMe4uTDr0E9saTUXkijpNhs=
+X-Google-Smtp-Source: AGHT+IE9aNDiEGwi8jpig5AP06aUULAS82uewuRyRYeIo+yG1ElOUkJaw7gKuAFyWwqavI0X9kdSXzMEgwvKrtTV2ws=
+X-Received: by 2002:a17:906:a1b:b0:a6f:b58f:ae3c with SMTP id
+ a640c23a62f3a-a7242c9c261mr394471966b.26.1719304182050; Tue, 25 Jun 2024
+ 01:29:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1719302367.git.tanggeliang@kylinos.cn>
+In-Reply-To: <cover.1719302367.git.tanggeliang@kylinos.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Tue, 25 Jun 2024 16:29:30 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H6=xEKDFS4f5hiOqw-gx1nKiXkQq8Kmr8ZsgQe9A3gbtw@mail.gmail.com>
+Message-ID: <CAAhV-H6=xEKDFS4f5hiOqw-gx1nKiXkQq8Kmr8ZsgQe9A3gbtw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 0/4] Fixes for BPF selftests on Loongarch
+To: Geliang Tang <geliang@kernel.org>
+Cc: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Shuah Khan <shuah@kernel.org>, Mykyta Yatsenko <yatsenko@meta.com>, Miao Xu <miaxu@meta.com>, 
+	Yuran Pereira <yuran.pereira@hotmail.com>, Tiezhu Yang <yangtiezhu@loongson.cn>, 
+	Geliang Tang <tanggeliang@kylinos.cn>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The OVS internal port does not support UDP fragmentation offloading,
-resulting in large packets sent through the OVS internal port to OVS
-being prematurely fragmented. This increases the total number of packets
-processed in the path from the vport to the OVS bridge output port,
-affecting transmission efficiency.
+On Tue, Jun 25, 2024 at 4:25=E2=80=AFPM Geliang Tang <geliang@kernel.org> w=
+rote:
+>
+> From: Geliang Tang <tanggeliang@kylinos.cn>
+>
+> v2:
+>  - add patch 2, a new fix for sk_msg_memcopy_from_iter.
+>  - update patch 3, only test "sk->sk_prot->close" as Eric suggested.
+>  - update patch 4, use "goto err" instead of "return" as Eduard
+>    suggested.
+>  - add "fixes" tag for patch 1-3.
+>  - change subject prefixes as "bpf-next" to trigger BPF CI.
+>  - cc Loongarch maintainers too.
+>
+> BPF selftests seem to have not been fully tested on Loongarch. When I
+> ran these tests on Loongarch recently, some errors occur. This patch set
+> contains some null-check related fixes for these errors.
+Is the root cause that LoongArch lacks bpf trampoline?
 
-Signed-off-by: echken <chengcheng.luo@smartx.com>
----
- net/openvswitch/vport-internal_dev.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Huacai
 
-diff --git a/net/openvswitch/vport-internal_dev.c b/net/openvswitch/vport-internal_dev.c
-index 74c88a6baa43..c5a72c4dc6fd 100644
---- a/net/openvswitch/vport-internal_dev.c
-+++ b/net/openvswitch/vport-internal_dev.c
-@@ -110,7 +110,8 @@ static void do_setup(struct net_device *netdev)
- 
- 	netdev->features = NETIF_F_LLTX | NETIF_F_SG | NETIF_F_FRAGLIST |
- 			   NETIF_F_HIGHDMA | NETIF_F_HW_CSUM |
--			   NETIF_F_GSO_SOFTWARE | NETIF_F_GSO_ENCAP_ALL;
-+			   NETIF_F_GSO_SOFTWARE | NETIF_F_GSO_ENCAP_ALL |
-+			   NETIF_F_GSO_UDP | NETIF_F_GSO_UDP_L4;
- 
- 	netdev->vlan_features = netdev->features;
- 	netdev->hw_enc_features = netdev->features;
--- 
-2.34.1
-
+>
+> Geliang Tang (4):
+>   skmsg: null check for sg_page in sk_msg_recvmsg
+>   skmsg: null check for sg_page in sk_msg_memcopy_from_iter
+>   inet: null check for close in inet_release
+>   selftests/bpf: Null checks for link in bpf_tcp_ca
+>
+>  net/core/skmsg.c                                 |  4 ++++
+>  net/ipv4/af_inet.c                               |  3 ++-
+>  .../selftests/bpf/prog_tests/bpf_tcp_ca.c        | 16 ++++++++++++----
+>  3 files changed, 18 insertions(+), 5 deletions(-)
+>
+> --
+> 2.43.0
+>
 
