@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-106294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1348A915AE0
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 02:13:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A21B915AE2
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 02:14:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 716D228371E
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 00:13:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D6CDB21481
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 00:14:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A5981CABF;
-	Tue, 25 Jun 2024 00:12:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 153C8632;
+	Tue, 25 Jun 2024 00:12:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3AnVBiaJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J56psy8c"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57AD51B810
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 00:12:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017E4200A3
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 00:12:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719274369; cv=none; b=GlxqRBbvM1AUNUoI6vKjlU52UEwXlhfi1r8kVQSvN2m9jT7kcMEYt/qesAKrqYSsLSiPh3aijnQCVt4PesoO3VD69yU1p5NzqV2O5VZZIiEgv3sItSfEvepYTBy+Ep616QctfZy2w+/ZTfotbk4qdz02Fu5hnqkGELUwIPZPAmg=
+	t=1719274372; cv=none; b=rGpvmDAhdOI0tQSEtJJ8Vk1DnYMadbLkqmWIWKSWhKVwkf4STk7PhgH/oiGKW53Eui+agBPrkXWB5eHlrLHQ62W/zDtI4ERiglu225D5qC3nXyVYqUGgqPl3uoegUcoh2e8IbSYTB4QD2c5ktavsgIJTtVDXu1AQ05UPduaJUAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719274369; c=relaxed/simple;
-	bh=dBFYNm3aTpfSE70tpdSGiRHDYMDNY4AIIGsI5dhoMug=;
+	s=arc-20240116; t=1719274372; c=relaxed/simple;
+	bh=9t0h0OxQg9bTeZugwg1D6UGU3M55+U7I3KvRGIVeSSw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VjIey0LiaISv1dWYld9awITa56VaDo1XI4PooXgGV92akiRrPlpJlQoe7ILZXHAwnRYY3In/SLgy1B94HhPt1DbnxlM+B2iUTYw/UIVfkB0ZUYRb07RICzNY3aY+vY6juanSfLN71Xo7rCbqHGEKcsQNx3FxxV4TvyucXHdn0xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ziweixiao.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3AnVBiaJ; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=CyUoKzIT2VdHoLGwbX2R5CpUP7mNj9MszEuuGMlvRrn0ZOwNRC+Kev5woP8TnocZoc0kjcHlGzXhqBNo9gs31rqXn5Q5y7991c+UJXq3IwzW8d4MR9x7L/HUiVpGF6os+B45oAcfAHC8ROqGGZQt13yZFIE01bgdqJJZs635GA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ziweixiao.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J56psy8c; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ziweixiao.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-646f73e4354so300177b3.1
-        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 17:12:47 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62f3c5f5bf7so94416447b3.0
+        for <netdev@vger.kernel.org>; Mon, 24 Jun 2024 17:12:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719274366; x=1719879166; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1719274369; x=1719879169; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JcbUqcqSFTY8MiKwhftJynNGEQrcRkI83waCED0rT6w=;
-        b=3AnVBiaJvf5iJA8XY6RhI+8ovoRe+kinf/xxp7v0id2fVgQpos289grd/zALNZ5F4H
-         MXb51DqzrNdQN9tLxkAj7ydV4kgV0am5E85QroFaszypRJvz8t9RK7RhY5mZOFkhgHBf
-         v59fTmANS3EPezl8tIZgH/wBmviUrlebCPy43CwL++GRY1KoWhDnE1KVUI+tt7iw8y86
-         Ea0Nfw9C3Ozv/sDCiSwIDaRxNEuU3emHYld5/oxP4eM26HSq9426gwE8dXHYBAMx/YD+
-         0pxBqYnU4w1VTpVc6jZFBroD0E4MgO2yDwId3N+ld0Xm1YGgLTKjE+XOcEasxA7aNXhL
-         ocDg==
+        bh=wC7nbRF1HEl+YR6JNnJW8Q8vbxko8/k0ZxGQkZdpATY=;
+        b=J56psy8cdq/dOOaAgdj9khDc91QddJgV0+LPVUQj/+dxPmyJ4o/JBWgHSIJvym9SxE
+         3Kb4oqixxfZ/sI2+w+02PIkB98X2slivLxiB8t++7niLo5r9HtVKHaRendLqEukOGLRK
+         AntgEWRTGp41C8EYaprgHWzM270kxxIKkotGb+7kc9xdJUL4emt9vEIUVZ2GLk4E17pP
+         VWtnSPCq4UTdC2tG02e0tJd+0rDV0RTRCS0cnnZieWo7xcOKh60nqhZisvTawAvOP3o8
+         lIgOV+bpds8VAmc7qAMwyFOHWKngB1dZZLBjiWAjA6zESa8BcqAm85ilj9ov8INYBZPd
+         sboQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719274366; x=1719879166;
+        d=1e100.net; s=20230601; t=1719274369; x=1719879169;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JcbUqcqSFTY8MiKwhftJynNGEQrcRkI83waCED0rT6w=;
-        b=Rse6nExYeoX2VbEl30CE6EqdS3rRe3Mgo4DG+Q+Xl2LoNnVXU9lP2vLWvsveGEWIJn
-         G2bRfgW2ilNkR6jJQThOBxT/0eeKelq5d/q/H3ZeqtzDIN7vHv4HP70FYMQ2pW9+Sfi0
-         db3s4bNfJndR+u3h/RefLS9QUsft6eL1kNlC2CLkW5B3YZVL0NTdBDpp7yh/z1I7TA2b
-         r/H5mo6XzHs8hLwLkcip4D+rWYDagdpXmhkPHnghhwG6teEXACtUsR8EVjuQj8F5kfVf
-         WbgzzGMDzm+GE6IMJmrMBLYKCwUqnJhstGytlbbY8ThQqEptZh52QjksskB9Wr4M3Zod
-         quqA==
-X-Gm-Message-State: AOJu0YzhdY7gtl6r6AeFoKzm8SelosWKvY7S/z/hc+vWstSumSODXZs+
-	WmnBL+0Hjl1nksvib1guxaNMEr3NahSOWB6gBkXkOXvJPnqz3J+twUd7QLxz0OBmZOm2ikyiUQc
-	UIggzxFnzbSrH4Oa6n8NRpff1gW4AQS94ZU8KQ0uw/7Kr3/60JjVOqebiSzZH0nk1g7feCawUXu
-	88hXE3na95H2u2wg+udJ4fp6kLBumCObxk3gYc4qfnNVY/rd+p
-X-Google-Smtp-Source: AGHT+IGLGs+mndXJNNjfqgUsYFkifin+WSZeitoYiQtTyuKOmq5pGKfCSSKNwtTBkSKdhKpmnAm5g3ExzWi12bg=
+        bh=wC7nbRF1HEl+YR6JNnJW8Q8vbxko8/k0ZxGQkZdpATY=;
+        b=sPWlWU7l3UiqIQ2yxqBJKn5iOkfr3D+Zqoz5L8Edb2BCuPw1Gz1Uv/MeGt59EiJL5U
+         aMQzSSj1Ks5D+zqhDpKsAcwxnIfZ9LJ6DjuesczuyaJw6l035mgnaECCGzezmqF1TEjr
+         A5VPb574qjYHdgEsGpfcfJdqtii8J3fCk9zuv6zqLKRVkkiosmw07MU8ZJKmUyXWR40a
+         /vGdgcM1AZKIOKDR91MH5db7TOdXkAzXHP90R1LLZMr1E/eSURvOEdPvffvSY8nx5xqR
+         tF4U1rMcStTCW/ZTjgu04d+VuajtuEP/gbHH6d1hrnquyb0KjHIOd5fCxSZZWPWYFSoT
+         O0Iw==
+X-Gm-Message-State: AOJu0YxUIR4up96owDwD6XyIJKPFJ10xBP91nYiJuZyJKzTcTuitG0cy
+	GSwqRjNi71rKY63sDwBzL9cI+MYSIOYx+vfCKF4mLyOkGJi8Y61oT2zp1j/WzeuDltCjG6wSDZC
+	MSkSuoGVbBmkd3GiC6uHHdSFDx0Zb58jfk5KDokhyRL5GecCRB1OVGrw0BwtYwX64JmNwuGjpns
+	yU5rzo8i9WW33D18GspNDkrqXNn/n1Ov9kFsiJaZdYntcOZIe4
+X-Google-Smtp-Source: AGHT+IGGQYFCPYeeNyTaHLIldauXC+I98zwCyKDIAzlLJnlrKbR+jBaSzCruMDHzoEs6DiwBNoaq4UbOIDNF9e8=
 X-Received: from ziwei-gti.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:9b0])
- (user=ziweixiao job=sendgmr) by 2002:a05:6902:1146:b0:e02:c619:732 with SMTP
- id 3f1490d57ef6-e0301098e9emr16713276.8.1719274366091; Mon, 24 Jun 2024
- 17:12:46 -0700 (PDT)
-Date: Tue, 25 Jun 2024 00:12:30 +0000
+ (user=ziweixiao job=sendgmr) by 2002:a05:690c:f0b:b0:62c:f623:3a4e with SMTP
+ id 00721157ae682-642933ce65bmr267177b3.0.1719274368611; Mon, 24 Jun 2024
+ 17:12:48 -0700 (PDT)
+Date: Tue, 25 Jun 2024 00:12:31 +0000
 In-Reply-To: <20240625001232.1476315-1-ziweixiao@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240625001232.1476315-1-ziweixiao@google.com>
 X-Mailer: git-send-email 2.45.2.741.gdbec12cfda-goog
-Message-ID: <20240625001232.1476315-5-ziweixiao@google.com>
-Subject: [PATCH net-next v3 4/5] gve: Add flow steering adminq commands
+Message-ID: <20240625001232.1476315-6-ziweixiao@google.com>
+Subject: [PATCH net-next v3 5/5] gve: Add flow steering ethtool support
 From: Ziwei Xiao <ziweixiao@google.com>
 To: netdev@vger.kernel.org
 Cc: jeroendb@google.com, pkaligineedi@google.com, shailend@google.com, 
@@ -86,31 +86,20 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Jeroen de Borst <jeroendb@google.com>
 
-Add new adminq commands for the driver to configure and query flow rules
-that are stored in the device. Flow steering rules are assigned with a
-location that determines the relative order of the rules.
+Implement the ethtool commands that can be used to configure and query
+flow-steering rules.
 
-Flow rules can run up to an order of millions. In such cases, storing
-a full copy of the rules in the driver to prepare for the ethtool query
-is infeasible while querying them from the device is better. That needs
-to be optimized too so that we don't send a lot of adminq commands. The
-solution here is to store a limited number of rules/rule ids in the
-driver in a cache. Use dma_pool to allocate 4k bytes which lets device
-write at most 46 flow rules(4096/88) or 1024 rule ids(4096/4) at a time.
+A large part of this change consists of translating the ethtool
+representation of 'ntuples' to our internal gve_flow_rule and vice-versa
+in the new created gve_flow_rule.c
 
-For configuring flow rules, there are 3 sub-commands:
-- ADD which adds a rule at the location supplied
-- DEL which deletes the rule at the location supplied
-- RESET which clears all currently active rules in the device
-
-For querying flow rules, there are also 3 sub-commands:
-- QUERY_RULES corresponds to ETHTOOL_GRXCLSRULE. It fills the rules in
-  the allocated cache after querying the device
-- QUERY_RULES_IDS corresponds to ETHTOOL_GRXCLSRLALL. It fills the
-  rule_ids in the allocated cache after querying the device
-- QUERY_RULES_STATS corresponds to ETHTOOL_GRXCLSRLCNT. It queries the
-  device's current flow rule number and the supported max flow rule
-  limit
+Considering the possible large amount of flow rules, the driver doesn't
+store all the rules locally. When the user runs 'ethtool -n <nic>' to
+check the registered rules, the driver will send adminq command to
+query a limited amount of rules/rule ids(that filled in a 4096 bytes dma
+memory) at a time as a cache for the ethtool queries. The adminq query
+commands will be repeated for several times until the ethtool has
+queried all the needed rules.
 
 Signed-off-by: Jeroen de Borst <jeroendb@google.com>
 Co-developed-by: Ziwei Xiao <ziweixiao@google.com>
@@ -119,499 +108,539 @@ Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
 Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
+Changes in v3:
+	- Remove the codes which drop the rtnl lock for flow steering
+	  ethtool commands, and also remove the related commit message.
+
+	  Because the dropping rtnl lock part is used for improve the
+	  efficiency of adding rules for multiple nics at the same time,
+	  keeping the rtnl lock itself doesn't impact the functionality of
+	  flow steering feature. Also, since there is ongoing work for
+	  reducing the dependency of the rtnl lock for the dev_ethtool
+	  (https://lore.kernel.org/netdev/20240620114711.777046-1-edumazet@google.com/),
+	  it can add an ethtool ops to declare the intention of dropping the
+	  rtnl lock for flow steering ethtool operations once that change is
+	  ready in the future.
+
 Changes in v2:
-	- Update the commit message to use imperative mood 
-	- Remove the variable comments of num_flow_rules and struct
-	  gve_query_flow_rules_descriptor since their names are already
-	  self-describing
-	- Remove the __maybe_unused attribute for
-	  gve_adminq_execute_extended_cmd since it's no longer unused
-	  from this patch
-	- Add a new struct gve_adminq_queried_flow_rule to store the
-	  queried rule from the device instead of using gve_flow_rule
-	- Remove the unused variable of descriptor_end
-	- Remove the check for whether the total length is smaller than
-	  the allocated memory length. Instead, add the check for
-	  whether the queried results length match with the expected
-	  length
-	- Update the variable names of the struct
-	  gve_adminq_flow_rule_cfg_opcode to be more self-descriptive
+	- Fix the sparse warning of be16_to_cpu by switching to use the
+	  new added structure gve_adminq_queried_flow_rule from the
+	  previous patch to do the be16_to_cpu operations
+	- Use kvfree instead of kfree for the rule allocated by kvzalloc
+	- Delete the check that disallows rx queue count changing when
+	  there are rules alive because it already has a check in
+	  net/ethtool/channels.c that ensures rx queue count change to
+	  be failed if requested channel counts are too low for existing
+	  ntuple filter settings
 
- drivers/net/ethernet/google/gve/gve.h         |  43 ++++++
- drivers/net/ethernet/google/gve/gve_adminq.c  | 139 +++++++++++++++++-
- drivers/net/ethernet/google/gve/gve_adminq.h  |  80 ++++++++++
- drivers/net/ethernet/google/gve/gve_ethtool.c |   5 +-
- drivers/net/ethernet/google/gve/gve_main.c    |  51 ++++++-
- 5 files changed, 314 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/google/gve/Makefile      |   2 +-
+ drivers/net/ethernet/google/gve/gve.h         |   8 +-
+ drivers/net/ethernet/google/gve/gve_ethtool.c |  67 +++-
+ .../net/ethernet/google/gve/gve_flow_rule.c   | 298 ++++++++++++++++++
+ drivers/net/ethernet/google/gve/gve_main.c    |  32 +-
+ 5 files changed, 398 insertions(+), 9 deletions(-)
+ create mode 100644 drivers/net/ethernet/google/gve/gve_flow_rule.c
 
+diff --git a/drivers/net/ethernet/google/gve/Makefile b/drivers/net/ethernet/google/gve/Makefile
+index b9a6be76531b..9ed07080b38a 100644
+--- a/drivers/net/ethernet/google/gve/Makefile
++++ b/drivers/net/ethernet/google/gve/Makefile
+@@ -1,4 +1,4 @@
+ # Makefile for the Google virtual Ethernet (gve) driver
+ 
+ obj-$(CONFIG_GVE) += gve.o
+-gve-objs := gve_main.o gve_tx.o gve_tx_dqo.o gve_rx.o gve_rx_dqo.o gve_ethtool.o gve_adminq.o gve_utils.o
++gve-objs := gve_main.o gve_tx.o gve_tx_dqo.o gve_rx.o gve_rx_dqo.o gve_ethtool.o gve_adminq.o gve_utils.o gve_flow_rule.o
 diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index 58213c15e084..b9e9dd958f3c 100644
+index b9e9dd958f3c..84ac004d3953 100644
 --- a/drivers/net/ethernet/google/gve/gve.h
 +++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -60,6 +60,11 @@
+@@ -1,7 +1,7 @@
+ /* SPDX-License-Identifier: (GPL-2.0 OR MIT)
+  * Google virtual Ethernet (gve) driver
+  *
+- * Copyright (C) 2015-2021 Google, Inc.
++ * Copyright (C) 2015-2024 Google LLC
+  */
  
- #define GVE_DEFAULT_RX_BUFFER_OFFSET 2048
+ #ifndef _GVE_H_
+@@ -1170,6 +1170,12 @@ int gve_adjust_config(struct gve_priv *priv,
+ int gve_adjust_queues(struct gve_priv *priv,
+ 		      struct gve_queue_config new_rx_config,
+ 		      struct gve_queue_config new_tx_config);
++/* flow steering rule */
++int gve_get_flow_rule_entry(struct gve_priv *priv, struct ethtool_rxnfc *cmd);
++int gve_get_flow_rule_ids(struct gve_priv *priv, struct ethtool_rxnfc *cmd, u32 *rule_locs);
++int gve_add_flow_rule(struct gve_priv *priv, struct ethtool_rxnfc *cmd);
++int gve_del_flow_rule(struct gve_priv *priv, struct ethtool_rxnfc *cmd);
++int gve_flow_rules_reset(struct gve_priv *priv);
+ /* report stats handling */
+ void gve_handle_report_stats(struct gve_priv *priv);
+ /* exported by ethtool.c */
+diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
+index ffaa878d67bc..3480ff5c7ed6 100644
+--- a/drivers/net/ethernet/google/gve/gve_ethtool.c
++++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: (GPL-2.0 OR MIT)
+ /* Google virtual Ethernet (gve) driver
+  *
+- * Copyright (C) 2015-2021 Google, Inc.
++ * Copyright (C) 2015-2024 Google LLC
+  */
  
-+#define GVE_FLOW_RULES_CACHE_SIZE \
-+	(GVE_ADMINQ_BUFFER_SIZE / sizeof(struct gve_adminq_queried_flow_rule))
-+#define GVE_FLOW_RULE_IDS_CACHE_SIZE \
-+	(GVE_ADMINQ_BUFFER_SIZE / sizeof(((struct gve_adminq_queried_flow_rule *)0)->location))
-+
- #define GVE_XDP_ACTIONS 5
- 
- #define GVE_GQ_TX_MIN_PKT_DESC_BYTES 182
-@@ -678,6 +683,39 @@ enum gve_queue_format {
- 	GVE_DQO_QPL_FORMAT		= 0x4,
- };
- 
-+struct gve_flow_spec {
-+	__be32 src_ip[4];
-+	__be32 dst_ip[4];
-+	union {
-+		struct {
-+			__be16 src_port;
-+			__be16 dst_port;
-+		};
-+		__be32 spi;
-+	};
-+	union {
-+		u8 tos;
-+		u8 tclass;
-+	};
-+};
-+
-+struct gve_flow_rule {
-+	u32 location;
-+	u16 flow_type;
-+	u16 action;
-+	struct gve_flow_spec key;
-+	struct gve_flow_spec mask;
-+};
-+
-+struct gve_flow_rules_cache {
-+	bool rules_cache_synced; /* False if the driver's rules_cache is outdated */
-+	struct gve_adminq_queried_flow_rule *rules_cache;
-+	__be32 *rule_ids_cache;
-+	/* The total number of queried rules that stored in the caches */
-+	u32 rules_cache_num;
-+	u32 rule_ids_cache_num;
-+};
-+
- struct gve_priv {
- 	struct net_device *dev;
- 	struct gve_tx_ring *tx; /* array of tx_cfg.num_queues */
-@@ -744,6 +782,8 @@ struct gve_priv {
- 	u32 adminq_report_link_speed_cnt;
- 	u32 adminq_get_ptype_map_cnt;
- 	u32 adminq_verify_driver_compatibility_cnt;
-+	u32 adminq_query_flow_rules_cnt;
-+	u32 adminq_cfg_flow_rule_cnt;
- 
- 	/* Global stats */
- 	u32 interface_up_cnt; /* count of times interface turned up since last reset */
-@@ -788,6 +828,9 @@ struct gve_priv {
- 	bool header_split_enabled; /* True if the header split is enabled by the user */
- 
- 	u32 max_flow_rules;
-+	u32 num_flow_rules;
-+
-+	struct gve_flow_rules_cache flow_rules_cache;
- };
- 
- enum gve_service_task_flags_bit {
-diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
-index 088f543f0ba8..c5bbc1b7524e 100644
---- a/drivers/net/ethernet/google/gve/gve_adminq.c
-+++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-@@ -287,6 +287,8 @@ int gve_adminq_alloc(struct device *dev, struct gve_priv *priv)
- 	priv->adminq_report_stats_cnt = 0;
- 	priv->adminq_report_link_speed_cnt = 0;
- 	priv->adminq_get_ptype_map_cnt = 0;
-+	priv->adminq_query_flow_rules_cnt = 0;
-+	priv->adminq_cfg_flow_rule_cnt = 0;
- 
- 	/* Setup Admin queue with the device */
- 	if (priv->pdev->revision < 0x1) {
-@@ -526,6 +528,12 @@ static int gve_adminq_issue_cmd(struct gve_priv *priv,
- 	case GVE_ADMINQ_VERIFY_DRIVER_COMPATIBILITY:
- 		priv->adminq_verify_driver_compatibility_cnt++;
- 		break;
-+	case GVE_ADMINQ_QUERY_FLOW_RULES:
-+		priv->adminq_query_flow_rules_cnt++;
-+		break;
-+	case GVE_ADMINQ_CONFIGURE_FLOW_RULE:
-+		priv->adminq_cfg_flow_rule_cnt++;
-+		break;
- 	default:
- 		dev_err(&priv->pdev->dev, "unknown AQ command opcode %d\n", opcode);
- 	}
-@@ -558,8 +566,8 @@ static int gve_adminq_execute_cmd(struct gve_priv *priv,
- 	return err;
+ #include <linux/rtnetlink.h>
+@@ -775,6 +775,69 @@ static int gve_set_coalesce(struct net_device *netdev,
+ 	return 0;
  }
  
--static int __maybe_unused gve_adminq_execute_extended_cmd(struct gve_priv *priv, u32 opcode,
--							  size_t cmd_size, void *cmd_orig)
-+static int gve_adminq_execute_extended_cmd(struct gve_priv *priv, u32 opcode,
-+					   size_t cmd_size, void *cmd_orig)
- {
- 	union gve_adminq_command cmd;
- 	dma_addr_t inner_cmd_bus;
-@@ -1190,3 +1198,130 @@ int gve_adminq_get_ptype_map_dqo(struct gve_priv *priv,
- 			  ptype_map_bus);
- 	return err;
- }
-+
-+static int
-+gve_adminq_configure_flow_rule(struct gve_priv *priv,
-+			       struct gve_adminq_configure_flow_rule *flow_rule_cmd)
++static int gve_set_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd)
 +{
-+	int err = gve_adminq_execute_extended_cmd(priv,
-+			GVE_ADMINQ_CONFIGURE_FLOW_RULE,
-+			sizeof(struct gve_adminq_configure_flow_rule),
-+			flow_rule_cmd);
++	struct gve_priv *priv = netdev_priv(netdev);
++	int err = 0;
 +
-+	if (err) {
-+		dev_err(&priv->pdev->dev, "Timeout to configure the flow rule, trigger reset");
-+		gve_reset(priv, true);
-+	} else {
-+		priv->flow_rules_cache.rules_cache_synced = false;
++	if (!(netdev->features & NETIF_F_NTUPLE))
++		return -EOPNOTSUPP;
++
++	switch (cmd->cmd) {
++	case ETHTOOL_SRXCLSRLINS:
++		err = gve_add_flow_rule(priv, cmd);
++		break;
++	case ETHTOOL_SRXCLSRLDEL:
++		err = gve_del_flow_rule(priv, cmd);
++		break;
++	case ETHTOOL_SRXFH:
++		err = -EOPNOTSUPP;
++		break;
++	default:
++		err = -EOPNOTSUPP;
++		break;
 +	}
 +
 +	return err;
 +}
 +
-+int gve_adminq_add_flow_rule(struct gve_priv *priv, struct gve_adminq_flow_rule *rule, u32 loc)
++static int gve_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd, u32 *rule_locs)
 +{
-+	struct gve_adminq_configure_flow_rule flow_rule_cmd = {
-+		.opcode = cpu_to_be16(GVE_FLOW_RULE_CFG_ADD),
-+		.location = cpu_to_be32(loc),
-+		.rule = *rule,
-+	};
++	struct gve_priv *priv = netdev_priv(netdev);
++	int err = 0;
 +
-+	return gve_adminq_configure_flow_rule(priv, &flow_rule_cmd);
++	switch (cmd->cmd) {
++	case ETHTOOL_GRXRINGS:
++		cmd->data = priv->rx_cfg.num_queues;
++		break;
++	case ETHTOOL_GRXCLSRLCNT:
++		if (!priv->max_flow_rules)
++			return -EOPNOTSUPP;
++
++		err = gve_adminq_query_flow_rules(priv, GVE_FLOW_RULE_QUERY_STATS, 0);
++		if (err)
++			return err;
++
++		cmd->rule_cnt = priv->num_flow_rules;
++		cmd->data = priv->max_flow_rules;
++		break;
++	case ETHTOOL_GRXCLSRULE:
++		err = gve_get_flow_rule_entry(priv, cmd);
++		break;
++	case ETHTOOL_GRXCLSRLALL:
++		err = gve_get_flow_rule_ids(priv, cmd, (u32 *)rule_locs);
++		break;
++	case ETHTOOL_GRXFH:
++		err = -EOPNOTSUPP;
++		break;
++	default:
++		err = -EOPNOTSUPP;
++		break;
++	}
++
++	return err;
 +}
 +
-+int gve_adminq_del_flow_rule(struct gve_priv *priv, u32 loc)
-+{
-+	struct gve_adminq_configure_flow_rule flow_rule_cmd = {
-+		.opcode = cpu_to_be16(GVE_FLOW_RULE_CFG_DEL),
-+		.location = cpu_to_be32(loc),
-+	};
-+
-+	return gve_adminq_configure_flow_rule(priv, &flow_rule_cmd);
-+}
-+
-+int gve_adminq_reset_flow_rules(struct gve_priv *priv)
-+{
-+	struct gve_adminq_configure_flow_rule flow_rule_cmd = {
-+		.opcode = cpu_to_be16(GVE_FLOW_RULE_CFG_RESET),
-+	};
-+
-+	return gve_adminq_configure_flow_rule(priv, &flow_rule_cmd);
-+}
-+
-+/* In the dma memory that the driver allocated for the device to query the flow rules, the device
-+ * will first write it with a struct of gve_query_flow_rules_descriptor. Next to it, the device
-+ * will write an array of rules or rule ids with the count that specified in the descriptor.
-+ * For GVE_FLOW_RULE_QUERY_STATS, the device will only write the descriptor.
+ const struct ethtool_ops gve_ethtool_ops = {
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS,
+ 	.supported_ring_params = ETHTOOL_RING_USE_TCP_DATA_SPLIT,
+@@ -786,6 +849,8 @@ const struct ethtool_ops gve_ethtool_ops = {
+ 	.get_msglevel = gve_get_msglevel,
+ 	.set_channels = gve_set_channels,
+ 	.get_channels = gve_get_channels,
++	.set_rxnfc = gve_set_rxnfc,
++	.get_rxnfc = gve_get_rxnfc,
+ 	.get_link = ethtool_op_get_link,
+ 	.get_coalesce = gve_get_coalesce,
+ 	.set_coalesce = gve_set_coalesce,
+diff --git a/drivers/net/ethernet/google/gve/gve_flow_rule.c b/drivers/net/ethernet/google/gve/gve_flow_rule.c
+new file mode 100644
+index 000000000000..0bb8cd1876a3
+--- /dev/null
++++ b/drivers/net/ethernet/google/gve/gve_flow_rule.c
+@@ -0,0 +1,298 @@
++// SPDX-License-Identifier: (GPL-2.0 OR MIT)
++/* Google virtual Ethernet (gve) driver
++ *
++ * Copyright (C) 2015-2024 Google LLC
 + */
-+static int gve_adminq_process_flow_rules_query(struct gve_priv *priv, u16 query_opcode,
-+					       struct gve_query_flow_rules_descriptor *descriptor)
++
++#include "gve.h"
++#include "gve_adminq.h"
++
++static
++int gve_fill_ethtool_flow_spec(struct ethtool_rx_flow_spec *fsp,
++			       struct gve_adminq_queried_flow_rule *rule)
 +{
-+	struct gve_flow_rules_cache *flow_rules_cache = &priv->flow_rules_cache;
-+	u32 num_queried_rules, total_memory_len, rule_info_len;
-+	void *rule_info;
++	struct gve_adminq_flow_rule *flow_rule = &rule->flow_rule;
++	static const u16 flow_type_lut[] = {
++		[GVE_FLOW_TYPE_TCPV4]	= TCP_V4_FLOW,
++		[GVE_FLOW_TYPE_UDPV4]	= UDP_V4_FLOW,
++		[GVE_FLOW_TYPE_SCTPV4]	= SCTP_V4_FLOW,
++		[GVE_FLOW_TYPE_AHV4]	= AH_V4_FLOW,
++		[GVE_FLOW_TYPE_ESPV4]	= ESP_V4_FLOW,
++		[GVE_FLOW_TYPE_TCPV6]	= TCP_V6_FLOW,
++		[GVE_FLOW_TYPE_UDPV6]	= UDP_V6_FLOW,
++		[GVE_FLOW_TYPE_SCTPV6]	= SCTP_V6_FLOW,
++		[GVE_FLOW_TYPE_AHV6]	= AH_V6_FLOW,
++		[GVE_FLOW_TYPE_ESPV6]	= ESP_V6_FLOW,
++	};
 +
-+	total_memory_len = be32_to_cpu(descriptor->total_length);
-+	num_queried_rules = be32_to_cpu(descriptor->num_queried_rules);
-+	rule_info = (void *)(descriptor + 1);
++	if (be16_to_cpu(flow_rule->flow_type) >= ARRAY_SIZE(flow_type_lut))
++		return -EINVAL;
 +
-+	switch (query_opcode) {
-+	case GVE_FLOW_RULE_QUERY_RULES:
-+		rule_info_len = num_queried_rules * sizeof(*flow_rules_cache->rules_cache);
-+		if (sizeof(*descriptor) + rule_info_len != total_memory_len) {
-+			dev_err(&priv->dev->dev, "flow rules query is out of memory.\n");
-+			return -ENOMEM;
-+		}
++	fsp->flow_type = flow_type_lut[be16_to_cpu(flow_rule->flow_type)];
 +
-+		memcpy(flow_rules_cache->rules_cache, rule_info, rule_info_len);
-+		flow_rules_cache->rules_cache_num = num_queried_rules;
++	memset(&fsp->h_u, 0, sizeof(fsp->h_u));
++	memset(&fsp->h_ext, 0, sizeof(fsp->h_ext));
++	memset(&fsp->m_u, 0, sizeof(fsp->m_u));
++	memset(&fsp->m_ext, 0, sizeof(fsp->m_ext));
++
++	switch (fsp->flow_type) {
++	case TCP_V4_FLOW:
++	case UDP_V4_FLOW:
++	case SCTP_V4_FLOW:
++		fsp->h_u.tcp_ip4_spec.ip4src = flow_rule->key.src_ip[0];
++		fsp->h_u.tcp_ip4_spec.ip4dst = flow_rule->key.dst_ip[0];
++		fsp->h_u.tcp_ip4_spec.psrc = flow_rule->key.src_port;
++		fsp->h_u.tcp_ip4_spec.pdst = flow_rule->key.dst_port;
++		fsp->h_u.tcp_ip4_spec.tos = flow_rule->key.tos;
++		fsp->m_u.tcp_ip4_spec.ip4src = flow_rule->mask.src_ip[0];
++		fsp->m_u.tcp_ip4_spec.ip4dst = flow_rule->mask.dst_ip[0];
++		fsp->m_u.tcp_ip4_spec.psrc = flow_rule->mask.src_port;
++		fsp->m_u.tcp_ip4_spec.pdst = flow_rule->mask.dst_port;
++		fsp->m_u.tcp_ip4_spec.tos = flow_rule->mask.tos;
 +		break;
-+	case GVE_FLOW_RULE_QUERY_IDS:
-+		rule_info_len = num_queried_rules * sizeof(*flow_rules_cache->rule_ids_cache);
-+		if (sizeof(*descriptor) + rule_info_len != total_memory_len) {
-+			dev_err(&priv->dev->dev, "flow rule ids query is out of memory.\n");
-+			return -ENOMEM;
-+		}
-+
-+		memcpy(flow_rules_cache->rule_ids_cache, rule_info, rule_info_len);
-+		flow_rules_cache->rule_ids_cache_num = num_queried_rules;
++	case AH_V4_FLOW:
++	case ESP_V4_FLOW:
++		fsp->h_u.ah_ip4_spec.ip4src = flow_rule->key.src_ip[0];
++		fsp->h_u.ah_ip4_spec.ip4dst = flow_rule->key.dst_ip[0];
++		fsp->h_u.ah_ip4_spec.spi = flow_rule->key.spi;
++		fsp->h_u.ah_ip4_spec.tos = flow_rule->key.tos;
++		fsp->m_u.ah_ip4_spec.ip4src = flow_rule->mask.src_ip[0];
++		fsp->m_u.ah_ip4_spec.ip4dst = flow_rule->mask.dst_ip[0];
++		fsp->m_u.ah_ip4_spec.spi = flow_rule->mask.spi;
++		fsp->m_u.ah_ip4_spec.tos = flow_rule->mask.tos;
 +		break;
-+	case GVE_FLOW_RULE_QUERY_STATS:
-+		priv->num_flow_rules = be32_to_cpu(descriptor->num_flow_rules);
-+		priv->max_flow_rules = be32_to_cpu(descriptor->max_flow_rules);
-+		return 0;
++	case TCP_V6_FLOW:
++	case UDP_V6_FLOW:
++	case SCTP_V6_FLOW:
++		memcpy(fsp->h_u.tcp_ip6_spec.ip6src, &flow_rule->key.src_ip,
++		       sizeof(struct in6_addr));
++		memcpy(fsp->h_u.tcp_ip6_spec.ip6dst, &flow_rule->key.dst_ip,
++		       sizeof(struct in6_addr));
++		fsp->h_u.tcp_ip6_spec.psrc = flow_rule->key.src_port;
++		fsp->h_u.tcp_ip6_spec.pdst = flow_rule->key.dst_port;
++		fsp->h_u.tcp_ip6_spec.tclass = flow_rule->key.tclass;
++		memcpy(fsp->m_u.tcp_ip6_spec.ip6src, &flow_rule->mask.src_ip,
++		       sizeof(struct in6_addr));
++		memcpy(fsp->m_u.tcp_ip6_spec.ip6dst, &flow_rule->mask.dst_ip,
++		       sizeof(struct in6_addr));
++		fsp->m_u.tcp_ip6_spec.psrc = flow_rule->mask.src_port;
++		fsp->m_u.tcp_ip6_spec.pdst = flow_rule->mask.dst_port;
++		fsp->m_u.tcp_ip6_spec.tclass = flow_rule->mask.tclass;
++		break;
++	case AH_V6_FLOW:
++	case ESP_V6_FLOW:
++		memcpy(fsp->h_u.ah_ip6_spec.ip6src, &flow_rule->key.src_ip,
++		       sizeof(struct in6_addr));
++		memcpy(fsp->h_u.ah_ip6_spec.ip6dst, &flow_rule->key.dst_ip,
++		       sizeof(struct in6_addr));
++		fsp->h_u.ah_ip6_spec.spi = flow_rule->key.spi;
++		fsp->h_u.ah_ip6_spec.tclass = flow_rule->key.tclass;
++		memcpy(fsp->m_u.ah_ip6_spec.ip6src, &flow_rule->mask.src_ip,
++		       sizeof(struct in6_addr));
++		memcpy(fsp->m_u.ah_ip6_spec.ip6dst, &flow_rule->mask.dst_ip,
++		       sizeof(struct in6_addr));
++		fsp->m_u.ah_ip6_spec.spi = flow_rule->mask.spi;
++		fsp->m_u.ah_ip6_spec.tclass = flow_rule->mask.tclass;
++		break;
 +	default:
 +		return -EINVAL;
 +	}
 +
-+	return  0;
++	fsp->ring_cookie = be16_to_cpu(flow_rule->action);
++
++	return 0;
 +}
 +
-+int gve_adminq_query_flow_rules(struct gve_priv *priv, u16 query_opcode, u32 starting_loc)
++static int gve_generate_flow_rule(struct gve_priv *priv, struct ethtool_rx_flow_spec *fsp,
++				  struct gve_adminq_flow_rule *rule)
 +{
-+	struct gve_query_flow_rules_descriptor *descriptor;
-+	union gve_adminq_command cmd;
-+	dma_addr_t descriptor_bus;
-+	int err = 0;
-+
-+	memset(&cmd, 0, sizeof(cmd));
-+	descriptor = dma_pool_alloc(priv->adminq_pool, GFP_KERNEL, &descriptor_bus);
-+	if (!descriptor)
-+		return -ENOMEM;
-+
-+	cmd.opcode = cpu_to_be32(GVE_ADMINQ_QUERY_FLOW_RULES);
-+	cmd.query_flow_rules = (struct gve_adminq_query_flow_rules) {
-+		.opcode = cpu_to_be16(query_opcode),
-+		.starting_rule_id = cpu_to_be32(starting_loc),
-+		.available_length = cpu_to_be64(GVE_ADMINQ_BUFFER_SIZE),
-+		.rule_descriptor_addr = cpu_to_be64(descriptor_bus),
++	static const u16 flow_type_lut[] = {
++		[TCP_V4_FLOW]	= GVE_FLOW_TYPE_TCPV4,
++		[UDP_V4_FLOW]	= GVE_FLOW_TYPE_UDPV4,
++		[SCTP_V4_FLOW]	= GVE_FLOW_TYPE_SCTPV4,
++		[AH_V4_FLOW]	= GVE_FLOW_TYPE_AHV4,
++		[ESP_V4_FLOW]	= GVE_FLOW_TYPE_ESPV4,
++		[TCP_V6_FLOW]	= GVE_FLOW_TYPE_TCPV6,
++		[UDP_V6_FLOW]	= GVE_FLOW_TYPE_UDPV6,
++		[SCTP_V6_FLOW]	= GVE_FLOW_TYPE_SCTPV6,
++		[AH_V6_FLOW]	= GVE_FLOW_TYPE_AHV6,
++		[ESP_V6_FLOW]	= GVE_FLOW_TYPE_ESPV6,
 +	};
-+	err = gve_adminq_execute_cmd(priv, &cmd);
-+	if (err)
-+		goto out;
++	u32 flow_type;
 +
-+	err = gve_adminq_process_flow_rules_query(priv, query_opcode, descriptor);
++	if (fsp->ring_cookie == RX_CLS_FLOW_DISC)
++		return -EOPNOTSUPP;
 +
-+out:
-+	dma_pool_free(priv->adminq_pool, descriptor, descriptor_bus);
-+	return err;
-+}
-diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net/ethernet/google/gve/gve_adminq.h
-index e64a0e72e781..ed1370c9b197 100644
---- a/drivers/net/ethernet/google/gve/gve_adminq.h
-+++ b/drivers/net/ethernet/google/gve/gve_adminq.h
-@@ -25,11 +25,21 @@ enum gve_adminq_opcodes {
- 	GVE_ADMINQ_REPORT_LINK_SPEED		= 0xD,
- 	GVE_ADMINQ_GET_PTYPE_MAP		= 0xE,
- 	GVE_ADMINQ_VERIFY_DRIVER_COMPATIBILITY	= 0xF,
-+	GVE_ADMINQ_QUERY_FLOW_RULES		= 0x10,
- 
- 	/* For commands that are larger than 56 bytes */
- 	GVE_ADMINQ_EXTENDED_COMMAND		= 0xFF,
- };
- 
-+/* The normal adminq command is restricted to be 56 bytes at maximum. For the
-+ * longer adminq command, it is wrapped by GVE_ADMINQ_EXTENDED_COMMAND with
-+ * inner opcode of gve_adminq_extended_cmd_opcodes specified. The inner command
-+ * is written in the dma memory allocated by GVE_ADMINQ_EXTENDED_COMMAND.
-+ */
-+enum gve_adminq_extended_cmd_opcodes {
-+	GVE_ADMINQ_CONFIGURE_FLOW_RULE	= 0x101,
-+};
++	if (fsp->ring_cookie >= priv->rx_cfg.num_queues)
++		return -EINVAL;
 +
- /* Admin queue status codes */
- enum gve_adminq_statuses {
- 	GVE_ADMINQ_COMMAND_UNSET			= 0x0,
-@@ -434,6 +444,71 @@ struct gve_adminq_get_ptype_map {
- 	__be64 ptype_map_addr;
- };
- 
-+/* Flow-steering related definitions */
-+enum gve_adminq_flow_rule_cfg_opcode {
-+	GVE_FLOW_RULE_CFG_ADD	= 0,
-+	GVE_FLOW_RULE_CFG_DEL	= 1,
-+	GVE_FLOW_RULE_CFG_RESET	= 2,
-+};
++	rule->action = cpu_to_be16(fsp->ring_cookie);
 +
-+enum gve_adminq_flow_rule_query_opcode {
-+	GVE_FLOW_RULE_QUERY_RULES	= 0,
-+	GVE_FLOW_RULE_QUERY_IDS		= 1,
-+	GVE_FLOW_RULE_QUERY_STATS	= 2,
-+};
++	flow_type = fsp->flow_type & ~(FLOW_EXT | FLOW_MAC_EXT | FLOW_RSS);
++	if (!flow_type || flow_type >= ARRAY_SIZE(flow_type_lut))
++		return -EINVAL;
 +
-+enum gve_adminq_flow_type {
-+	GVE_FLOW_TYPE_TCPV4,
-+	GVE_FLOW_TYPE_UDPV4,
-+	GVE_FLOW_TYPE_SCTPV4,
-+	GVE_FLOW_TYPE_AHV4,
-+	GVE_FLOW_TYPE_ESPV4,
-+	GVE_FLOW_TYPE_TCPV6,
-+	GVE_FLOW_TYPE_UDPV6,
-+	GVE_FLOW_TYPE_SCTPV6,
-+	GVE_FLOW_TYPE_AHV6,
-+	GVE_FLOW_TYPE_ESPV6,
-+};
++	rule->flow_type = cpu_to_be16(flow_type_lut[flow_type]);
 +
-+/* Flow-steering command */
-+struct gve_adminq_flow_rule {
-+	__be16 flow_type;
-+	__be16 action; /* RX queue id */
-+	struct gve_flow_spec key;
-+	struct gve_flow_spec mask;
-+};
-+
-+struct gve_adminq_configure_flow_rule {
-+	__be16 opcode;
-+	u8 padding[2];
-+	struct gve_adminq_flow_rule rule;
-+	__be32 location;
-+};
-+
-+static_assert(sizeof(struct gve_adminq_configure_flow_rule) == 92);
-+
-+struct gve_query_flow_rules_descriptor {
-+	__be32 num_flow_rules;
-+	__be32 max_flow_rules;
-+	__be32 num_queried_rules;
-+	__be32 total_length;
-+};
-+
-+struct gve_adminq_queried_flow_rule {
-+	__be32 location;
-+	struct gve_adminq_flow_rule flow_rule;
-+};
-+
-+struct gve_adminq_query_flow_rules {
-+	__be16 opcode;
-+	u8 padding[2];
-+	__be32 starting_rule_id;
-+	__be64 available_length; /* The dma memory length that the driver allocated */
-+	__be64 rule_descriptor_addr; /* The dma memory address */
-+};
-+
-+static_assert(sizeof(struct gve_adminq_query_flow_rules) == 24);
-+
- union gve_adminq_command {
- 	struct {
- 		__be32 opcode;
-@@ -454,6 +529,7 @@ union gve_adminq_command {
- 			struct gve_adminq_get_ptype_map get_ptype_map;
- 			struct gve_adminq_verify_driver_compatibility
- 						verify_driver_compatibility;
-+			struct gve_adminq_query_flow_rules query_flow_rules;
- 			struct gve_adminq_extended_command extended_command;
- 		};
- 	};
-@@ -488,6 +564,10 @@ int gve_adminq_verify_driver_compatibility(struct gve_priv *priv,
- 					   u64 driver_info_len,
- 					   dma_addr_t driver_info_addr);
- int gve_adminq_report_link_speed(struct gve_priv *priv);
-+int gve_adminq_add_flow_rule(struct gve_priv *priv, struct gve_adminq_flow_rule *rule, u32 loc);
-+int gve_adminq_del_flow_rule(struct gve_priv *priv, u32 loc);
-+int gve_adminq_reset_flow_rules(struct gve_priv *priv);
-+int gve_adminq_query_flow_rules(struct gve_priv *priv, u16 query_opcode, u32 starting_loc);
- 
- struct gve_ptype_lut;
- int gve_adminq_get_ptype_map_dqo(struct gve_priv *priv,
-diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
-index fe1741d482b4..ffaa878d67bc 100644
---- a/drivers/net/ethernet/google/gve/gve_ethtool.c
-+++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-@@ -74,7 +74,8 @@ static const char gve_gstrings_adminq_stats[][ETH_GSTRING_LEN] = {
- 	"adminq_create_tx_queue_cnt", "adminq_create_rx_queue_cnt",
- 	"adminq_destroy_tx_queue_cnt", "adminq_destroy_rx_queue_cnt",
- 	"adminq_dcfg_device_resources_cnt", "adminq_set_driver_parameter_cnt",
--	"adminq_report_stats_cnt", "adminq_report_link_speed_cnt", "adminq_get_ptype_map_cnt"
-+	"adminq_report_stats_cnt", "adminq_report_link_speed_cnt", "adminq_get_ptype_map_cnt",
-+	"adminq_query_flow_rules", "adminq_cfg_flow_rule",
- };
- 
- static const char gve_gstrings_priv_flags[][ETH_GSTRING_LEN] = {
-@@ -450,6 +451,8 @@ gve_get_ethtool_stats(struct net_device *netdev,
- 	data[i++] = priv->adminq_report_stats_cnt;
- 	data[i++] = priv->adminq_report_link_speed_cnt;
- 	data[i++] = priv->adminq_get_ptype_map_cnt;
-+	data[i++] = priv->adminq_query_flow_rules_cnt;
-+	data[i++] = priv->adminq_cfg_flow_rule_cnt;
- }
- 
- static void gve_get_channels(struct net_device *netdev,
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index cabf7d4bcecb..fc142856e189 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -141,6 +141,49 @@ static void gve_get_stats(struct net_device *dev, struct rtnl_link_stats64 *s)
- 	}
- }
- 
-+static int gve_alloc_flow_rule_caches(struct gve_priv *priv)
-+{
-+	struct gve_flow_rules_cache *flow_rules_cache = &priv->flow_rules_cache;
-+	int err = 0;
-+
-+	if (!priv->max_flow_rules)
-+		return 0;
-+
-+	flow_rules_cache->rules_cache =
-+		kvcalloc(GVE_FLOW_RULES_CACHE_SIZE, sizeof(*flow_rules_cache->rules_cache),
-+			 GFP_KERNEL);
-+	if (!flow_rules_cache->rules_cache) {
-+		dev_err(&priv->pdev->dev, "Cannot alloc flow rules cache\n");
-+		return -ENOMEM;
-+	}
-+
-+	flow_rules_cache->rule_ids_cache =
-+		kvcalloc(GVE_FLOW_RULE_IDS_CACHE_SIZE, sizeof(*flow_rules_cache->rule_ids_cache),
-+			 GFP_KERNEL);
-+	if (!flow_rules_cache->rule_ids_cache) {
-+		dev_err(&priv->pdev->dev, "Cannot alloc flow rule ids cache\n");
-+		err = -ENOMEM;
-+		goto free_rules_cache;
++	switch (flow_type) {
++	case TCP_V4_FLOW:
++	case UDP_V4_FLOW:
++	case SCTP_V4_FLOW:
++		rule->key.src_ip[0] = fsp->h_u.tcp_ip4_spec.ip4src;
++		rule->key.dst_ip[0] = fsp->h_u.tcp_ip4_spec.ip4dst;
++		rule->key.src_port = fsp->h_u.tcp_ip4_spec.psrc;
++		rule->key.dst_port = fsp->h_u.tcp_ip4_spec.pdst;
++		rule->mask.src_ip[0] = fsp->m_u.tcp_ip4_spec.ip4src;
++		rule->mask.dst_ip[0] = fsp->m_u.tcp_ip4_spec.ip4dst;
++		rule->mask.src_port = fsp->m_u.tcp_ip4_spec.psrc;
++		rule->mask.dst_port = fsp->m_u.tcp_ip4_spec.pdst;
++		break;
++	case AH_V4_FLOW:
++	case ESP_V4_FLOW:
++		rule->key.src_ip[0] = fsp->h_u.tcp_ip4_spec.ip4src;
++		rule->key.dst_ip[0] = fsp->h_u.tcp_ip4_spec.ip4dst;
++		rule->key.spi = fsp->h_u.ah_ip4_spec.spi;
++		rule->mask.src_ip[0] = fsp->m_u.tcp_ip4_spec.ip4src;
++		rule->mask.dst_ip[0] = fsp->m_u.tcp_ip4_spec.ip4dst;
++		rule->mask.spi = fsp->m_u.ah_ip4_spec.spi;
++		break;
++	case TCP_V6_FLOW:
++	case UDP_V6_FLOW:
++	case SCTP_V6_FLOW:
++		memcpy(&rule->key.src_ip, fsp->h_u.tcp_ip6_spec.ip6src,
++		       sizeof(struct in6_addr));
++		memcpy(&rule->key.dst_ip, fsp->h_u.tcp_ip6_spec.ip6dst,
++		       sizeof(struct in6_addr));
++		rule->key.src_port = fsp->h_u.tcp_ip6_spec.psrc;
++		rule->key.dst_port = fsp->h_u.tcp_ip6_spec.pdst;
++		memcpy(&rule->mask.src_ip, fsp->m_u.tcp_ip6_spec.ip6src,
++		       sizeof(struct in6_addr));
++		memcpy(&rule->mask.dst_ip, fsp->m_u.tcp_ip6_spec.ip6dst,
++		       sizeof(struct in6_addr));
++		rule->mask.src_port = fsp->m_u.tcp_ip6_spec.psrc;
++		rule->mask.dst_port = fsp->m_u.tcp_ip6_spec.pdst;
++		break;
++	case AH_V6_FLOW:
++	case ESP_V6_FLOW:
++		memcpy(&rule->key.src_ip, fsp->h_u.usr_ip6_spec.ip6src,
++		       sizeof(struct in6_addr));
++		memcpy(&rule->key.dst_ip, fsp->h_u.usr_ip6_spec.ip6dst,
++		       sizeof(struct in6_addr));
++		rule->key.spi = fsp->h_u.ah_ip6_spec.spi;
++		memcpy(&rule->mask.src_ip, fsp->m_u.usr_ip6_spec.ip6src,
++		       sizeof(struct in6_addr));
++		memcpy(&rule->mask.dst_ip, fsp->m_u.usr_ip6_spec.ip6dst,
++		       sizeof(struct in6_addr));
++		rule->key.spi = fsp->h_u.ah_ip6_spec.spi;
++		break;
++	default:
++		/* not doing un-parsed flow types */
++		return -EINVAL;
 +	}
 +
 +	return 0;
++}
 +
-+free_rules_cache:
-+	kvfree(flow_rules_cache->rules_cache);
-+	flow_rules_cache->rules_cache = NULL;
++int gve_get_flow_rule_entry(struct gve_priv *priv, struct ethtool_rxnfc *cmd)
++{
++	struct gve_adminq_queried_flow_rule *rules_cache = priv->flow_rules_cache.rules_cache;
++	struct ethtool_rx_flow_spec *fsp = (struct ethtool_rx_flow_spec *)&cmd->fs;
++	u32 *cache_num = &priv->flow_rules_cache.rules_cache_num;
++	struct gve_adminq_queried_flow_rule *rule = NULL;
++	int err = 0;
++	u32 i;
++
++	if (!priv->max_flow_rules)
++		return -EOPNOTSUPP;
++
++	if (!priv->flow_rules_cache.rules_cache_synced ||
++	    fsp->location < be32_to_cpu(rules_cache[0].location) ||
++	    fsp->location > be32_to_cpu(rules_cache[*cache_num - 1].location)) {
++		err = gve_adminq_query_flow_rules(priv, GVE_FLOW_RULE_QUERY_RULES, fsp->location);
++		if (err)
++			return err;
++
++		priv->flow_rules_cache.rules_cache_synced = true;
++	}
++
++	for (i = 0; i < *cache_num; i++) {
++		if (fsp->location == be32_to_cpu(rules_cache[i].location)) {
++			rule = &rules_cache[i];
++			break;
++		}
++	}
++
++	if (!rule)
++		return -EINVAL;
++
++	err = gve_fill_ethtool_flow_spec(fsp, rule);
++
 +	return err;
 +}
 +
-+static void gve_free_flow_rule_caches(struct gve_priv *priv)
++int gve_get_flow_rule_ids(struct gve_priv *priv, struct ethtool_rxnfc *cmd, u32 *rule_locs)
 +{
-+	struct gve_flow_rules_cache *flow_rules_cache = &priv->flow_rules_cache;
++	__be32 *rule_ids_cache = priv->flow_rules_cache.rule_ids_cache;
++	u32 *cache_num = &priv->flow_rules_cache.rule_ids_cache_num;
++	u32 starting_rule_id = 0;
++	u32 i = 0, j = 0;
++	int err = 0;
 +
-+	kvfree(flow_rules_cache->rule_ids_cache);
-+	flow_rules_cache->rule_ids_cache = NULL;
-+	kvfree(flow_rules_cache->rules_cache);
-+	flow_rules_cache->rules_cache = NULL;
++	if (!priv->max_flow_rules)
++		return -EOPNOTSUPP;
++
++	do {
++		err = gve_adminq_query_flow_rules(priv, GVE_FLOW_RULE_QUERY_IDS,
++						  starting_rule_id);
++		if (err)
++			return err;
++
++		for (i = 0; i < *cache_num; i++) {
++			if (j >= cmd->rule_cnt)
++				return -EMSGSIZE;
++
++			rule_locs[j++] = be32_to_cpu(rule_ids_cache[i]);
++			starting_rule_id = be32_to_cpu(rule_ids_cache[i]) + 1;
++		}
++	} while (*cache_num != 0);
++	cmd->data = priv->max_flow_rules;
++
++	return err;
 +}
 +
- static int gve_alloc_counter_array(struct gve_priv *priv)
- {
- 	priv->counter_array =
-@@ -521,9 +564,12 @@ static int gve_setup_device_resources(struct gve_priv *priv)
- {
- 	int err;
- 
--	err = gve_alloc_counter_array(priv);
-+	err = gve_alloc_flow_rule_caches(priv);
- 	if (err)
- 		return err;
-+	err = gve_alloc_counter_array(priv);
++int gve_add_flow_rule(struct gve_priv *priv, struct ethtool_rxnfc *cmd)
++{
++	struct ethtool_rx_flow_spec *fsp = &cmd->fs;
++	struct gve_adminq_flow_rule *rule = NULL;
++	int err;
++
++	if (!priv->max_flow_rules)
++		return -EOPNOTSUPP;
++
++	rule = kvzalloc(sizeof(*rule), GFP_KERNEL);
++	if (!rule)
++		return -ENOMEM;
++
++	err = gve_generate_flow_rule(priv, fsp, rule);
 +	if (err)
-+		goto abort_with_flow_rule_caches;
- 	err = gve_alloc_notify_blocks(priv);
- 	if (err)
- 		goto abort_with_counter;
-@@ -575,6 +621,8 @@ static int gve_setup_device_resources(struct gve_priv *priv)
- 	gve_free_notify_blocks(priv);
- abort_with_counter:
- 	gve_free_counter_array(priv);
-+abort_with_flow_rule_caches:
-+	gve_free_flow_rule_caches(priv);
++		goto out;
++
++	err = gve_adminq_add_flow_rule(priv, rule, fsp->location);
++
++out:
++	kvfree(rule);
++	if (err)
++		dev_err(&priv->pdev->dev, "Failed to add the flow rule: %u", fsp->location);
++
++	return err;
++}
++
++int gve_del_flow_rule(struct gve_priv *priv, struct ethtool_rxnfc *cmd)
++{
++	struct ethtool_rx_flow_spec *fsp = (struct ethtool_rx_flow_spec *)&cmd->fs;
++
++	if (!priv->max_flow_rules)
++		return -EOPNOTSUPP;
++
++	return gve_adminq_del_flow_rule(priv, fsp->location);
++}
+diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+index fc142856e189..9744b426940e 100644
+--- a/drivers/net/ethernet/google/gve/gve_main.c
++++ b/drivers/net/ethernet/google/gve/gve_main.c
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: (GPL-2.0 OR MIT)
+ /* Google virtual Ethernet (gve) driver
+  *
+- * Copyright (C) 2015-2021 Google, Inc.
++ * Copyright (C) 2015-2024 Google LLC
+  */
  
- 	return err;
+ #include <linux/bpf.h>
+@@ -635,6 +635,12 @@ static void gve_teardown_device_resources(struct gve_priv *priv)
+ 
+ 	/* Tell device its resources are being freed */
+ 	if (gve_get_device_resources_ok(priv)) {
++		err = gve_flow_rules_reset(priv);
++		if (err) {
++			dev_err(&priv->pdev->dev,
++				"Failed to reset flow rules: err=%d\n", err);
++			gve_trigger_reset(priv);
++		}
+ 		/* detach the stats report */
+ 		err = gve_adminq_report_stats(priv, 0, 0x0, GVE_STATS_REPORT_TIMER_PERIOD);
+ 		if (err) {
+@@ -1779,6 +1785,14 @@ static int gve_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+ 	}
  }
-@@ -606,6 +654,7 @@ static void gve_teardown_device_resources(struct gve_priv *priv)
- 	kvfree(priv->ptype_lut_dqo);
- 	priv->ptype_lut_dqo = NULL;
  
-+	gve_free_flow_rule_caches(priv);
- 	gve_free_counter_array(priv);
- 	gve_free_notify_blocks(priv);
- 	gve_free_stats_report(priv);
++int gve_flow_rules_reset(struct gve_priv *priv)
++{
++	if (!priv->max_flow_rules)
++		return 0;
++
++	return gve_adminq_reset_flow_rules(priv);
++}
++
+ int gve_adjust_config(struct gve_priv *priv,
+ 		      struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
+ 		      struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
+@@ -2052,15 +2066,21 @@ static int gve_set_features(struct net_device *netdev,
+ 		netdev->features ^= NETIF_F_LRO;
+ 		if (netif_carrier_ok(netdev)) {
+ 			err = gve_adjust_config(priv, &tx_alloc_cfg, &rx_alloc_cfg);
+-			if (err) {
+-				/* Revert the change on error. */
+-				netdev->features = orig_features;
+-				return err;
+-			}
++			if (err)
++				goto revert_features;
+ 		}
+ 	}
++	if ((netdev->features & NETIF_F_NTUPLE) && !(features & NETIF_F_NTUPLE)) {
++		err = gve_flow_rules_reset(priv);
++		if (err)
++			goto revert_features;
++	}
+ 
+ 	return 0;
++
++revert_features:
++	netdev->features = orig_features;
++	return err;
+ }
+ 
+ static const struct net_device_ops gve_netdev_ops = {
 -- 
 2.45.2.741.gdbec12cfda-goog
 
