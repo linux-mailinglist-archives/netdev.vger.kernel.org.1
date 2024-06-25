@@ -1,95 +1,98 @@
-Return-Path: <netdev+bounces-106426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91E599163C9
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 11:50:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 761DB9163D8
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 11:51:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C50CD1C22649
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:50:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 328E828C3B1
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9B1149C4C;
-	Tue, 25 Jun 2024 09:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174D6149E0A;
+	Tue, 25 Jun 2024 09:51:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RwlHj7tp"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="OUpMHRfN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B882147C96;
-	Tue, 25 Jun 2024 09:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7283F1494DE
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 09:51:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719309035; cv=none; b=KF/yFfuMv/nk8tsjive0/gfQfFdJnd56rsL9EDAmm2252dHcvV9XJkRZ56bYD47LQd6z9G3M8D77DwiKtkGsia3+LBpzSl+jYxuOVqV/Yd+2uxkYasOn1cGRwmEm0y3jEVwo2z1dLLUq1ncUSaSfGUtg903nTPrGPgDFb1d65sI=
+	t=1719309064; cv=none; b=PhlY773xakNU3ubzPn7/OWk5gORwuN0w8VR6FdEaVqy4/4TQ/cSEwHMGd4Zk2hx22geUnXuEsBzIpKEspIhkjm6JG2QwZ2zhHfsaTXgg+302dQnrcIvGRT+RKHARU8YdPbn9fnQnr3Fur/9nbxL01VdNcLRlZMu+kwl/InuDisg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719309035; c=relaxed/simple;
-	bh=8piofPzlXAHJRtUvNGgITSoj/v8akSwtuEuQ9malAeY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CMPQ8v9qeVKTptzY6rLPrVipBT0wxY3pqSIjl/1EsO8urnQvSK1mushnQQ5XonDfYlnoPaJ4txG6nPq4bxaaK+j3LfTMA+hCCk1NAzYeBoSrYwR+/56phrmZVdb7JxDaQSlWO05B3F+4BcwHGtWnwhyfJ/FrcO50PAZrXFsDhJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RwlHj7tp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2A4A1C32789;
-	Tue, 25 Jun 2024 09:50:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719309035;
-	bh=8piofPzlXAHJRtUvNGgITSoj/v8akSwtuEuQ9malAeY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RwlHj7tpXNs1XZ0jUIJk9/7m0vfmEpCfhnrAabopbixJgIJpyEJ1tptD6owK+p5Lu
-	 X+cQ9RzmW2Kyns2G41lMqX51htFeHB82OP0k3BRmxqUtgyWrADp7mfROcnaRr+kswk
-	 migEwlF68k3Sw4JPby7hd0L493C0DErtRvWVvKpKdZqsLnMQChghCllLFgmfKvFrWJ
-	 ubfjh+yErowTp9rCPmXiwRcW+0QPIrOkRtCtdh9W7nn0KuLcokzcy6IzmVIEqKikVw
-	 uj42ibaruPJY3We95rEFg8n25drRVZX5WsjgBVqKMhntVhar6z7HEhQOsEnv4659yf
-	 xjO/ma+JipcYQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1B2BDC43638;
-	Tue, 25 Jun 2024 09:50:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1719309064; c=relaxed/simple;
+	bh=v26cHPRxU3qBhPDOpIAhaujLP4FvP96BZu1GEQS4JXU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ly78YamOBKVHBrfVTkXFtOBF2ym+c2kjgeHpYU9Yi3Yl3BEytlMcW8u5z3oYYuoF7gt0OF1IjLbPCOCFdxXWemxuAAsdMZXlmiaMM85+xn58Wd/rscZ85m+/E2yrL27Kla3z/yDc6P8Cs0GVEOedQY9PKPJZby+u0YieqQ2R64U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=OUpMHRfN; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 95F8B40011;
+	Tue, 25 Jun 2024 09:50:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1719309059;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=v26cHPRxU3qBhPDOpIAhaujLP4FvP96BZu1GEQS4JXU=;
+	b=OUpMHRfNQ1fI9K8Gk/ZqEvi57rbgsyjk7M3Ed0wkm7Li++kz8ChDAYRvhu5PNodMUYkC0K
+	pRtShVhcApkhh5WDfrmEvV/GNBprprxKMGsQA3mXrPu5lMcz4ZAURUM0RHC9fiTc+rFTYl
+	sHJs2tpWxZRnMtWTY9Rc4avvfODbxyC1yhMu+afejzapOG2EMsb7eDTSQH1fn986/+iGr2
+	OKD3wC0h4KDwk9WboYw2wOxfCJuNmj7QmSt+E2k+qIoIXfyAq3v3NspbmC0ikCDz8+gIY2
+	MhAVB4mfbsEf7H7jqVNWmkmMjqB4929SPxXiaeWVRyJOA/TaeTKm4ftmeUaP5g==
+Date: Tue, 25 Jun 2024 11:50:56 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@baylibre.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
+ <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, Woojung Huh
+ <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, George
+ McCollister <george.mccollister@gmail.com>, Ido Schimmel
+ <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, Jeremy Kerr
+ <jk@codeconstruct.com.au>, Matt Johnston <matt@codeconstruct.com.au>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: Drop explicit initialization of struct
+ i2c_device_id::driver_data to 0
+Message-ID: <20240625115056.2df47afe@kmaincent-XPS-13-7390>
+In-Reply-To: <20240625083853.2205977-2-u.kleine-koenig@baylibre.com>
+References: <20240625083853.2205977-2-u.kleine-koenig@baylibre.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4] Fix race for duplicate reqsk on identical SYN
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171930903510.26753.16745690029094137653.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Jun 2024 09:50:35 +0000
-References: <20240621013929.1386815-1-luoxuanqiang@kylinos.cn>
-In-Reply-To: <20240621013929.1386815-1-luoxuanqiang@kylinos.cn>
-To: luoxuanqiang <luoxuanqiang@kylinos.cn>
-Cc: kuniyu@amazon.com, edumazet@google.com, kuba@kernel.org,
- davem@davemloft.net, pabeni@redhat.com, dccp@vger.kernel.org,
- dsahern@kernel.org, fw@strlen.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, alexandre.ferrieux@orange.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Hello:
+On Tue, 25 Jun 2024 10:38:53 +0200
+Uwe Kleine-K=C3=B6nig <u.kleine-koenig@baylibre.com> wrote:
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+> These drivers don't use the driver_data member of struct i2c_device_id,
+> so don't explicitly initialize this member.
+>=20
+> This prepares putting driver_data in an anonymous union which requires
+> either no initialization or named designators. But it's also a nice
+> cleanup on its own.
+>=20
+> While add it, also remove commas after the sentinel entries.
+>=20
+> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@baylibre.com>
 
-On Fri, 21 Jun 2024 09:39:29 +0800 you wrote:
-> When bonding is configured in BOND_MODE_BROADCAST mode, if two identical
-> SYN packets are received at the same time and processed on different CPUs,
-> it can potentially create the same sk (sock) but two different reqsk
-> (request_sock) in tcp_conn_request().
-> 
-> These two different reqsk will respond with two SYNACK packets, and since
-> the generation of the seq (ISN) incorporates a timestamp, the final two
-> SYNACK packets will have different seq values.
-> 
-> [...]
+For PSE drivers:
+Reviewed-by: Kory Maincent <Kory.maincent@bootlin.com>
 
-Here is the summary with links:
-  - [net,v4] Fix race for duplicate reqsk on identical SYN
-    https://git.kernel.org/netdev/net/c/ff46e3b44219
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+---
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
