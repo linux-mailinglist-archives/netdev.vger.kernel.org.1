@@ -1,173 +1,94 @@
-Return-Path: <netdev+bounces-106577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DABB1916E27
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 18:29:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DC39916E28
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 18:30:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C1941F21C5B
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:29:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFC4A282331
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6EC4172BB5;
-	Tue, 25 Jun 2024 16:29:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDECD14A639;
+	Tue, 25 Jun 2024 16:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bm3mfkmh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D9vCHuYf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E190816FF59
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 16:29:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90EFF11185;
+	Tue, 25 Jun 2024 16:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719332981; cv=none; b=Yy6QpFGMzISr0jbm2OQJNiy5JiN5ykxoAOdodFO9dSz7Mp0qUgaWyzqlx2ZHY0a9CXBgOUbrjVaeXXv8HAtiqqm0fIenuMkGBedJGCZw72vjghwGvUEsamNeMhexSWm2Pa5oKqlKHO3yVC5kGBCMNx0quIlbI2z8rUnRQVaG46Q=
+	t=1719333024; cv=none; b=mOZJE3P2e1buvDN4J/Tz042f+vtT4UaGWyzqSAIXTC3SWelZb1qAenXA77DcqnicPSK8Bg+HWp649wWfeZ1QvNL/jcQyFPWaaVpZ2bCZbAPaborc4mJuof/V8H6ykK5Q1y8m6+vfr0rLT3WymmRDImJ3jZQ4m5IEDxnR0+COevM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719332981; c=relaxed/simple;
-	bh=voLilfGiSwPwQ0lsD/Gbu80QhEeOvi7XOzqXovcyFjk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Tx0Tn8ZOc/SWWf7BwxZTnGaQIzYYpJ6iDiwH2KxEmOG/Ud19Z/L95RIzHy032MhQbcHuP6pMfNWprXyPGFQ2wkodltYZ5jb818tLMf9Mwvxh2p2b1j+mIscX8hNTB5PH4zWQTln4PNjhK3U3SJKbtpVOiiNRPVNtn44HMqfXYrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bm3mfkmh; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-424a2ad06f1so6564855e9.1
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 09:29:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719332978; x=1719937778; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SJ3Zxl7/u9c9tYtNwxgLaSlLEpQytxXDrQTT6SFRVB8=;
-        b=Bm3mfkmhq5CZXDPlb+6TWzgPdJS8rYM2xXXBfBLhj1OuzxvPWWj/QZ+S7TBtnEeHrD
-         TwShOf2U5OjELgU8h4dwMbI0R5KRvTFwtrPvbtWVjWm6+BRRQx4ZkLYvpLCM1fKFXBJY
-         KBgODenOQNuzxwNk7nm+Df4AzAzXOss6pwVJdeaPP4ItQh2Nkb2KWDFPmLb4OTDJJJzW
-         yGd/0EVz4IVLdRVtU/fpI844blrMFdqJy8cdvyVY2T0ok88jdicqgGrKKo4CeRNCaowk
-         mmXwUvhK9UpQ2donEmMHVfONgFW3x1TqIABlZzS7ztjO070xN8VY1tdwYSEUbvNLXuYT
-         nCHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719332978; x=1719937778;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SJ3Zxl7/u9c9tYtNwxgLaSlLEpQytxXDrQTT6SFRVB8=;
-        b=PLLnCyc+wiXU3M3qLvQLO2CNNei08sZQ23cMWnD3EOhS6PBvdQ8Wi8RrWjsJbLcylQ
-         pxvz/OyvHEB1W0uTdbvzFlpvj1D6GIKRRFzl3q4aocAiyALD5LHku7usdmz7EHj7YGz+
-         t48Cb2RMfJgSXC/0iC9WzbIvz2qkNfAcwVV9q8VPJAqcASIVn9JH5mUXhiZ+15YPNvSX
-         X6IU9SyknBxC90SeIV2CzWLcUDMYOubHRkHVZ1ozErusfXrWOdr1It5dlEX+fHZ3gmRB
-         UQzkcyb9+RqXgi+S2RM6FdiPX/76qEdnYdw+dyRigEtjtWW5C64PDXg8a7tKI6261Gts
-         b5KQ==
-X-Gm-Message-State: AOJu0YxBpr7YVo9dsPN/s2RlSnlnVpk4Aq3G1A/yvCEy8P6sKhkBJrqQ
-	/S+t8DiJp/9clFbYNG8LP6NlG6IVq5XoaKynRjJ2KQUMxqLiqM+m9MFVL6WIBlS388/EuityQaF
-	v/MLpLrAkTk4i5FRlXpJQVz2YBDY=
-X-Google-Smtp-Source: AGHT+IGblRxb+zHjY9NPu6h/Nyz2PK/nCzxpxud5UvNf72SEZp1h9mhu28fHV4gUpRw3AZgFR+eZU7Jtu8p50S/kNys=
-X-Received: by 2002:a5d:59a4:0:b0:366:f6bd:a544 with SMTP id
- ffacd0b85a97d-366f6bda67cmr4827924f8f.71.1719332977884; Tue, 25 Jun 2024
- 09:29:37 -0700 (PDT)
+	s=arc-20240116; t=1719333024; c=relaxed/simple;
+	bh=GopYyPT2mgzQ4xpNM7JtEdBw2TI+wPIejxMM8r5q7dI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mMWfF/NO2+Sx7FDRuDCBhK3CradRi2DAiBVWEOgHr+4OCQUl3TqfQky087iwdQMcrXS5kAyC032wKfNm98R+1uVspKMdju1ir/G+Wfl3rO5FXQmjONg2AAfL7zs5fasALgpYK91qfKRcL8Az5bzHznFTT47bHbPNCbw/wCRsgP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D9vCHuYf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B5EDC32781;
+	Tue, 25 Jun 2024 16:30:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719333024;
+	bh=GopYyPT2mgzQ4xpNM7JtEdBw2TI+wPIejxMM8r5q7dI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=D9vCHuYfPxeJST3BSYVulRbqHkP2li0PFm/YanDRLgsfesFHqkUciqsn/rgcSAPo3
+	 YbAXGFpUa9d0qzwgjX1T2U2iSc4ZCa5Iel3sp1VeUE/alfGa2rdAVsLuF95x93EZ9j
+	 BrJeNVwxeEqaj7Ck+yqkxV41ssPiHv+oBkrYAqNVkqgihDG3ia/pLBPDKMjzE8QR81
+	 LQSUscQ+I+BvWis6e08ZEjJRTavadTuuZdqsbXrPEqoVVrgm04TZ8b03bNJXfwb1KQ
+	 cVLZDARP3Zb2O/eRGEnJz0qbpL8dfIZP9rMIm4aMQMR3Uc8Ltrm8UnJ9ehHuKrw2DH
+	 0cNBz+4FEj2iA==
+Date: Tue, 25 Jun 2024 09:30:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Aaron Conole <aconole@redhat.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ dev@openvswitch.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Pravin B Shelar <pshelar@ovn.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Shuah
+ Khan <shuah@kernel.org>, Stefano Brivio <sbrivio@redhat.com>,
+ =?UTF-8?B?QWRyacOhbg==?= Moreno <amorenoz@redhat.com>, Simon Horman
+ <horms@kernel.org>
+Subject: Re: [PATCH v2 net-next 0/7] selftests: net: Switch pmtu.sh to use
+ the internal ovs script.
+Message-ID: <20240625093022.6daf9ba0@kernel.org>
+In-Reply-To: <f7tsex1f3wl.fsf@redhat.com>
+References: <20240620125601.15755-1-aconole@redhat.com>
+	<20240621180126.3c40d245@kernel.org>
+	<f7ttthjh33w.fsf@redhat.com>
+	<f7tpls6gu3q.fsf@redhat.com>
+	<e4f69335f90aae3f1daa47ba8f69b24ea15ed3b7.camel@redhat.com>
+	<f7th6dhgnvm.fsf@redhat.com>
+	<20240625070654.6a00efef@kernel.org>
+	<f7t1q4lgldr.fsf@redhat.com>
+	<20240625074145.69fc9d9f@kernel.org>
+	<f7tsex1f3wl.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <171932574765.3072535.12103787411698322191.stgit@ahduyck-xeon-server.home.arpa>
- <171932617837.3072535.9872136934270317593.stgit@ahduyck-xeon-server.home.arpa>
- <6971f7ce-8514-4da5-afc9-764c0da289c0@lunn.ch>
-In-Reply-To: <6971f7ce-8514-4da5-afc9-764c0da289c0@lunn.ch>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 25 Jun 2024 09:29:01 -0700
-Message-ID: <CAKgT0UfTAk=tNejVLSFth6aSeUhHYSmAErc84mQojXtT9n2GDg@mail.gmail.com>
-Subject: Re: [net-next PATCH v2 11/15] eth: fbnic: Add link detection
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org, 
-	davem@davemloft.net, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 25, 2024 at 8:25=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > +     /* Tri-state value indicating state of link.
-> > +      *  0 - Up
-> > +      *  1 - Down
-> > +      *  2 - Event - Requires checking as link state may have changed
-> > +      */
-> > +     s8 link_state;
->
-> Maybe add an enum?
+On Tue, 25 Jun 2024 11:17:14 -0400 Aaron Conole wrote:
+> > BTW I popped the v2 back into the queue, so the next run (in 20min)
+> > will tell us if that's the only thing we were missing =F0=9F=A4=9E=EF=
+=B8=8F =20
+>=20
+> :)  I'll wait to post the v3 then.  So far, the only change I have is:
+>=20
+> --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> @@ -34,7 +34,7 @@ try:
+> =20
+>  except ModuleNotFoundError:
+>      print("Need to install the python pyroute2 package >=3D 0.6.")
+> -    sys.exit(0)
+> +    sys.exit(1)
 
-Doesn't that default to a 32b size? The general thought was to just
-keep this small since it only needs to be a few bits.
-
-> > +static irqreturn_t fbnic_mac_msix_intr(int __always_unused irq, void *=
-data)
-> > +{
-> > +     struct fbnic_dev *fbd =3D data;
-> > +     struct fbnic_net *fbn;
-> > +
-> > +     if (!fbd->mac->get_link_event(fbd)) {
-> > +             fbnic_wr32(fbd, FBNIC_INTR_MASK_CLEAR(0),
-> > +                        1u << FBNIC_MAC_MSIX_ENTRY);
-> > +             return IRQ_HANDLED;
-> > +     }
-> > +
-> > +     fbd->link_state =3D FBNIC_LINK_EVENT;
-> > +     fbn =3D netdev_priv(fbd->netdev);
-> > +
-> > +     phylink_mac_change(fbn->phylink, fbd->link_state =3D=3D FBNIC_LIN=
-K_UP);
->
-> Can fbd->link_state =3D=3D FBNIC_LINK_UP given that you have just done:
->     fbd->link_state =3D FBNIC_LINK_EVENT ?
-
-My bad. I will need to fix that. I think that was some fallout from an
-earlier refactor.
-
-> > +static u32 __fbnic_mac_config_asic(struct fbnic_dev *fbd)
-> > +{
-> > +     /* Enable MAC Promiscuous mode and Tx padding */
-> > +     u32 command_config =3D FBNIC_MAC_COMMAND_CONFIG_TX_PAD_EN |
-> > +                          FBNIC_MAC_COMMAND_CONFIG_PROMISC_EN;
-> > +     struct fbnic_net *fbn =3D netdev_priv(fbd->netdev);
-> > +     u32 rxb_pause_ctrl;
-> > +
-> > +     /* Set class 0 Quanta and refresh */
-> > +     wr32(fbd, FBNIC_MAC_CL01_PAUSE_QUANTA, 0xffff);
-> > +     wr32(fbd, FBNIC_MAC_CL01_QUANTA_THRESH, 0x7fff);
-> > +
-> > +     /* Enable generation of pause frames if enabled */
-> > +     rxb_pause_ctrl =3D rd32(fbd, FBNIC_RXB_PAUSE_DROP_CTRL);
-> > +     rxb_pause_ctrl &=3D ~FBNIC_RXB_PAUSE_DROP_CTRL_PAUSE_ENABLE;
-> > +     if (!fbn->tx_pause)
-> > +             command_config |=3D FBNIC_MAC_COMMAND_CONFIG_TX_PAUSE_DIS=
-;
-> > +     else
-> > +             rxb_pause_ctrl |=3D
-> > +                     FIELD_PREP(FBNIC_RXB_PAUSE_DROP_CTRL_PAUSE_ENABLE=
-,
-> > +                                FBNIC_PAUSE_EN_MASK);
-> > +     wr32(fbd, FBNIC_RXB_PAUSE_DROP_CTRL, rxb_pause_ctrl);
-> > +
-> > +     if (!fbn->rx_pause)
-> > +             command_config |=3D FBNIC_MAC_COMMAND_CONFIG_RX_PAUSE_DIS=
-;
->
-> Everybody gets pause wrong. To try to combat that it has mostly been
-> moved into phylink. When phylink calls your mac_config() callback it
-> passes const struct phylink_link_state *state. Within state is the
-> pause member. That tells you how to configure the hardware. phylink
-> will then deal with the differences between forced pause configuration
-> and negotiated pause configuration, etc. Your current mac_config() is
-> empty...
->
->         Andrew
-
-So the pause setup for now is stored in fbn->[tr]x_pause. So if we
-were to configure it via the mac_config call and then likely call into
-this function. We end up having to reuse it in a few spots to avoid
-having to read/modify the MAC register and instead just set the data
-based on our stored config. Although I think we might be able to pare
-this down as the command_config is the only piece we really need to
-carry. The rest of this setup is essentially just a pause config which
-could be done once instead of on every link up/down transition. I will
-look at splitting this up.
+Looks like it didn't get re-ingested :( please go ahead with the v3
 
