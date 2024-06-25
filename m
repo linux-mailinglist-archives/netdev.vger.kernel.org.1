@@ -1,79 +1,80 @@
-Return-Path: <netdev+bounces-106527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E58F7916A98
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:36:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FDE2916A99
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:36:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 203EAB2077A
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 14:36:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D9F0B22B29
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 14:36:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C8514900E;
-	Tue, 25 Jun 2024 14:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D57A16A945;
+	Tue, 25 Jun 2024 14:36:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y2E8Bkl6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nOGQcfGt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28CF92E403
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 14:36:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A6E16D31C
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 14:36:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719326164; cv=none; b=YedVL/FgMfEbluU7nlEXtJ3r1Fr0FuSCn7NbfzzlvPJHdCzELlScMKHaRz9uYEhSICNEgcXwp3OALmg0XAmeaHCipr0pTGkwPyqMiy+c1vOOvswAHHFlBcZHUYyfC/nw1q2axGudIVM2sLdrLupYIhJFCfQK8PmCzUf5wu355YU=
+	t=1719326168; cv=none; b=eFKUQULptTcEkdO8vmJVX37zkc2gL7KKsIJwMHHdPesPG7fuvKC4HNC/+D7pfPQRdBF4EkgE4viPqnF39GfWEVxDbm5QavPA0df2ZcqgHu6ov3eHnja9cCfGpC6zVP3McVjfu7Yhv+/1Oy2yat50yHjAcUBqEll66+6o3UmL2mk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719326164; c=relaxed/simple;
-	bh=aqW9vbVOEW8v2NIbiZ556AhNKwBPhnuDXIu47wdqfSc=;
+	s=arc-20240116; t=1719326168; c=relaxed/simple;
+	bh=8ArbgtY9Y/1F93ezYxG4YkzV4QVND748m5DUoaiVnOo=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b4XP7qsnCoTw4oNV4ElMnOCElkUnRe9lxIzWbdtFF06xTM8toHj/Nk0TNqa7E2xrywUS8NZLDVlE1cqgb/npzNQevMHjZ97U25fmZmXqZWD8kh1hl/d/FE8DgETQx4e5uMcvHtC+4tQ1WjOX3zpeU66a3z64BFaKGW0RAACuwxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y2E8Bkl6; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version:Content-Type; b=VR8yicKxyrbvAN7JaupnZ1cqwoRP3jdghr1mNkqtQxXEUaoVO+0vUBKJOqCy0OXYdu0MwLtAUtjKEOqQm43350+OAOL732fMfG0abFbJ00C0LHsXkdnX2GJWBNJPJ9JFzGeVs+eHgWY83AHqFRJyTiS93M9eFOVLVgPcE3Gb2F4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nOGQcfGt; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1f65a3abd01so45335495ad.3
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 07:36:01 -0700 (PDT)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1f4a5344ec7so38202345ad.1
+        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 07:36:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719326161; x=1719930961; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1719326165; x=1719930965; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=VgrwjgQJwWqq8gKPTdLGtQIQFGVvMOpDe3uNhH+ENps=;
-        b=Y2E8Bkl6B+HdZML0GoliVs6qKKTgG1+xmbhxTRMJAKtuMBZDjAj0SgTbR+GiT/rY6N
-         VMUbBit6MY0QBQog2gtTBXcI6KjDwUNJ5wRgjcY4YQ7vDzoc0PhNMtA74bAvDha7WuE5
-         K582dg9NpezUcY79903e/IoZy2KDbV5SPxo3+sLV+BaayG36kJbPYWZM7DIN9aCDV5ce
-         a1BTj7gl03i04Y1EzFB9cyJTdm/fo45+jf/XQP+92fkhJ1gJUOolN2tPfdVS0fl2lKXU
-         mUsCX2cHxMJ/Y9SarCoSyMCKkmyPFUP+aJXN21cWlIp/3kgcW8Jp3pLqE0lEfUh7kbWg
-         jJGg==
+        bh=J9jsw6S4pw4wkjZJhUCrZQBs78uqSAyhQdbgcU1oqPU=;
+        b=nOGQcfGtpz5+B/5ozsvZmh6GQj0k6gdGFbUngFTOuq94szK2F1bmfMv5clfZWvu+qm
+         Aua6CUjjfLZC2s8Yzf2NWwZWU1c85jAlzERrOsPz9gFFq99RvNdolBJ0XK8/AgZW2dfb
+         qdD0afzANp7dbfDT+oM4hJaglTQyAOfjkdkjARgFOntHurKZyWYn14hyhAUvudvv2BrT
+         TxHpx5CJzwQP01uHiX0N9605dmYJ8HQssmZf10SQodWyamgAGnG1pqcyae9/ownZeTCo
+         X6N6r3f0ubj5d8bFqfhZNPAZamrIRaupZQVXBIFGzBsZJHLWuwi9zUm4mjXHz/lAVmmG
+         BzLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719326161; x=1719930961;
+        d=1e100.net; s=20230601; t=1719326165; x=1719930965;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=VgrwjgQJwWqq8gKPTdLGtQIQFGVvMOpDe3uNhH+ENps=;
-        b=ceXaMMW46JPn7GrBFOuOerU06MTaMg7GD51Sf2ebu7X8RcnBi7PFRuVFBnTI2DvuRh
-         FH0pGxLV6ekLFnqp3FsoLX07aKdNIJqr2e0C9EwGN+e+8BFI8SjJm4hOSwkYXuPiXRnZ
-         opUuLO4DgRgQcq//ZXYyYVVPItaXT/hBAg/3NgX5+/vZfLqHVK4+1eq2tnFpAwDxITL3
-         44rnEaJYEk9l7srwtXDLjQOv0yyJ+Jp7hNmIEWiTRpTkAitvHq6IrektJADD8WGwdDpu
-         tuArxgbwaNo1mtHx8NfzH5Jpb7XglH0edyELbptxQvT/c60Pf32NtgJV0rDxotUhpHha
-         HjdA==
-X-Gm-Message-State: AOJu0YwbVDTkigCvCltHwQq59xcFbN9YfpgPanmzwkPt66qwi3xXyMDw
-	bL3PL4ZF1nd4V6nHBOt4kfDEtkbQws8k0FfxnjUnSfuOtOS+wZtR
-X-Google-Smtp-Source: AGHT+IHebwnkgQJUQ7aaBgw+zgiVgG/tL/o/DlPMc89FIYjux1EPvK/tarD8u3fZ4UztTyKf8DMXOA==
-X-Received: by 2002:a17:902:f542:b0:1fa:18c3:2791 with SMTP id d9443c01a7336-1fa23ee57bcmr110245645ad.36.1719326160179;
-        Tue, 25 Jun 2024 07:36:00 -0700 (PDT)
+        bh=J9jsw6S4pw4wkjZJhUCrZQBs78uqSAyhQdbgcU1oqPU=;
+        b=sDBdz4dRogGevV62h3kk6yc77HtLh+1YJnMSliAgMp59ZZGThWFrgR4NswAmzBBmck
+         oYtS4BOHBW+LK5SSMIuaVzNi68bbfRLsnkNkReMqQefGmZq6nHngoSXnJ3/ln6JafJeY
+         6heaYqYmpKvZTWibg9F782HQ/dwGP12+K7L6KmluITwVoINw4D1BK5lg7nVrVWG4fIFi
+         MNYvMS8uoEqU6y+gisFwE+n6nSiZ6tYfIxxZ+mCicKwfyWzMEVSvNSoL9sm9GM8LJkOz
+         OX/z7CPXbLnPo4JCEL0wyBYpW+0SdErc7Pfjm5cLGrpt+sdiK3xXM4J/wcoL/qFFoUkj
+         pEwQ==
+X-Gm-Message-State: AOJu0YyDM5EdPoqdWKzKPfJXFrKVzShOL1Lt0ZlSRNEAWXRibmJx4ifa
+	mkWnk40K5Qm4FnVfpjVeBa4ETSzKFglyXuIWtx3xIKaoTwjBRGNw
+X-Google-Smtp-Source: AGHT+IGUPvCzQHwmtJAR1N4qWL56oJPEO/sUUenuDrXBsIFwx+sDSmMIAvLKzyfgU6xBA9doBt+LBw==
+X-Received: by 2002:a17:902:f610:b0:1f9:e3fa:d932 with SMTP id d9443c01a7336-1fa5e671d85mr61706845ad.9.1719326164688;
+        Tue, 25 Jun 2024 07:36:04 -0700 (PDT)
 Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb2f03c8sm82264435ad.16.2024.06.25.07.35.59
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb3c5f66sm82121995ad.123.2024.06.25.07.36.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jun 2024 07:35:59 -0700 (PDT)
-Subject: [net-next PATCH v2 06/15] eth: fbnic: Add FW communication mechanism
+        Tue, 25 Jun 2024 07:36:04 -0700 (PDT)
+Subject: [net-next PATCH v2 07/15] eth: fbnic: Allocate a netdevice and napi
+ vectors with queues
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org,
  davem@davemloft.net, pabeni@redhat.com
-Date: Tue, 25 Jun 2024 07:35:58 -0700
+Date: Tue, 25 Jun 2024 07:36:03 -0700
 Message-ID: 
- <171932615876.3072535.13282276589053782427.stgit@ahduyck-xeon-server.home.arpa>
+ <171932616332.3072535.5928220031237925415.stgit@ahduyck-xeon-server.home.arpa>
 In-Reply-To: 
  <171932574765.3072535.12103787411698322191.stgit@ahduyck-xeon-server.home.arpa>
 References: 
@@ -90,816 +91,1056 @@ Content-Transfer-Encoding: 7bit
 
 From: Alexander Duyck <alexanderduyck@fb.com>
 
-Add a mechanism for sending messages to and receiving messages
-from the FW. The FW has fairly limited functionality, so the
-mechanism doesn't have to support high message rate.
+Allocate a netdev and figure out basics like how many queues
+we need, MAC address, MTU bounds. Kick off a service task
+to do various periodic things like health checking.
+The service task only runs when device is open.
 
-Use device mailbox registers to form two rings, one "to" and
-one "from" the device. The rings are just a convention between
-driver and FW, not a HW construct. We don't expect messages
-larger than 4k so use page-sized buffers.
+We have four levels of objects here:
+ - ring - A HW ring with head / tail pointers,
+ - triad - Two submission and one completion ring,
+ - NAPI - NAPI, with one IRQ and any number of Rx and Tx triads,
+ - Netdev - The ultimate container of the rings and napi vectors.
+
+The "triad" is the only less-than-usual construct. On Rx we have
+two "free buffer" submission rings, one for packet headers and
+one for packet data. On Tx we have separate rings for XDP Tx
+and normal Tx. So we ended up with ring triplets in both
+directions.
+
+We keep NAPIs on a local list, even though core already maintains a list.
+Later on having a separate list will matter for live reconfig.
+We introduce the list already, the churn would not be worth it.
 
 Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
- drivers/net/ethernet/meta/fbnic/Makefile    |    1 
- drivers/net/ethernet/meta/fbnic/fbnic.h     |   18 +
- drivers/net/ethernet/meta/fbnic/fbnic_csr.h |   79 ++++++
- drivers/net/ethernet/meta/fbnic/fbnic_fw.c  |  380 +++++++++++++++++++++++++++
- drivers/net/ethernet/meta/fbnic/fbnic_fw.h  |   26 ++
- drivers/net/ethernet/meta/fbnic/fbnic_irq.c |   80 ++++++
- drivers/net/ethernet/meta/fbnic/fbnic_pci.c |   59 ++++
- 7 files changed, 643 insertions(+)
- create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_fw.c
- create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+ drivers/net/ethernet/meta/fbnic/Makefile       |    4 
+ drivers/net/ethernet/meta/fbnic/fbnic.h        |   18 ++
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h    |   40 ++++
+ drivers/net/ethernet/meta/fbnic/fbnic_irq.c    |   26 ++
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.c |  185 +++++++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.h |   37 +++
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c    |  140 +++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c   |  266 ++++++++++++++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.h   |   55 +++++
+ 9 files changed, 769 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
 
 diff --git a/drivers/net/ethernet/meta/fbnic/Makefile b/drivers/net/ethernet/meta/fbnic/Makefile
-index 0434ee0b3069..7b63cd5b09d4 100644
+index 7b63cd5b09d4..f2ea90e0c14f 100644
 --- a/drivers/net/ethernet/meta/fbnic/Makefile
 +++ b/drivers/net/ethernet/meta/fbnic/Makefile
-@@ -8,6 +8,7 @@
- obj-$(CONFIG_FBNIC) += fbnic.o
- 
- fbnic-y := fbnic_devlink.o \
-+	   fbnic_fw.o \
+@@ -11,5 +11,7 @@ fbnic-y := fbnic_devlink.o \
+ 	   fbnic_fw.o \
  	   fbnic_irq.o \
  	   fbnic_mac.o \
++	   fbnic_netdev.o \
  	   fbnic_pci.o \
+-	   fbnic_tlv.o
++	   fbnic_tlv.o \
++	   fbnic_txrx.o
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
-index af863dfabd82..42e2744cfe10 100644
+index 42e2744cfe10..8abae3b8ef4d 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic.h
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
-@@ -7,6 +7,7 @@
+@@ -4,7 +4,10 @@
+ #ifndef _FBNIC_H_
+ #define _FBNIC_H_
+ 
++#include <linux/interrupt.h>
  #include <linux/io.h>
++#include <linux/types.h>
++#include <linux/workqueue.h>
  
  #include "fbnic_csr.h"
-+#include "fbnic_fw.h"
- #include "fbnic_mac.h"
+ #include "fbnic_fw.h"
+@@ -12,6 +15,7 @@
  
  struct fbnic_dev {
-@@ -15,8 +16,13 @@ struct fbnic_dev {
+ 	struct device *dev;
++	struct net_device *netdev;
+ 
  	u32 __iomem *uc_addr0;
  	u32 __iomem *uc_addr4;
- 	const struct fbnic_mac *mac;
-+	unsigned int fw_msix_vector;
+@@ -19,6 +23,8 @@ struct fbnic_dev {
+ 	unsigned int fw_msix_vector;
  	unsigned short num_irqs;
  
-+	struct fbnic_fw_mbx mbx[FBNIC_IPC_MBX_INDICES];
-+	/* Lock protecting Tx Mailbox queue to prevent possible races */
-+	spinlock_t fw_tx_lock;
++	struct delayed_work service_task;
 +
+ 	struct fbnic_fw_mbx mbx[FBNIC_IPC_MBX_INDICES];
+ 	/* Lock protecting Tx Mailbox queue to prevent possible races */
+ 	spinlock_t fw_tx_lock;
+@@ -26,6 +32,9 @@ struct fbnic_dev {
  	u64 dsn;
  	u32 mps;
  	u32 readrq;
-@@ -28,6 +34,7 @@ struct fbnic_dev {
-  * causes later.
-  */
- enum {
-+	FBNIC_FW_MSIX_ENTRY,
- 	FBNIC_NON_NAPI_VECTORS
++
++	/* Number of TCQs/RCQs available on hardware */
++	u16 max_num_queues;
  };
  
-@@ -66,6 +73,14 @@ fbnic_rmw32(struct fbnic_dev *fbd, u32 reg, u32 mask, u32 val)
- #define rd32(_f, _r)		fbnic_rd32(_f, _r)
- #define wrfl(_f)		fbnic_wrfl(_f)
+ /* Reserve entry 0 in the MSI-X "others" array until we have filled all
+@@ -81,6 +90,11 @@ void fbnic_fw_wr32(struct fbnic_dev *fbd, u32 reg, u32 val);
+ #define fw_wr32(_f, _r, _v)	fbnic_fw_wr32(_f, _r, _v)
+ #define fw_wrfl(_f)		fbnic_fw_rd32(_f, FBNIC_FW_ZERO_REG)
  
-+bool fbnic_fw_present(struct fbnic_dev *fbd);
-+u32 fbnic_fw_rd32(struct fbnic_dev *fbd, u32 reg);
-+void fbnic_fw_wr32(struct fbnic_dev *fbd, u32 reg, u32 val);
-+
-+#define fw_rd32(_f, _r)		fbnic_fw_rd32(_f, _r)
-+#define fw_wr32(_f, _r, _v)	fbnic_fw_wr32(_f, _r, _v)
-+#define fw_wrfl(_f)		fbnic_fw_rd32(_f, FBNIC_FW_ZERO_REG)
++static inline bool fbnic_init_failure(struct fbnic_dev *fbd)
++{
++	return !fbd->netdev;
++}
 +
  extern char fbnic_driver_name[];
  
  void fbnic_devlink_free(struct fbnic_dev *fbd);
-@@ -73,6 +88,9 @@ struct fbnic_dev *fbnic_devlink_alloc(struct pci_dev *pdev);
- void fbnic_devlink_register(struct fbnic_dev *fbd);
- void fbnic_devlink_unregister(struct fbnic_dev *fbd);
+@@ -91,6 +105,9 @@ void fbnic_devlink_unregister(struct fbnic_dev *fbd);
+ int fbnic_fw_enable_mbx(struct fbnic_dev *fbd);
+ void fbnic_fw_disable_mbx(struct fbnic_dev *fbd);
  
-+int fbnic_fw_enable_mbx(struct fbnic_dev *fbd);
-+void fbnic_fw_disable_mbx(struct fbnic_dev *fbd);
-+
++int fbnic_request_irq(struct fbnic_dev *dev, int nr, irq_handler_t handler,
++		      unsigned long flags, const char *name, void *data);
++void fbnic_free_irq(struct fbnic_dev *dev, int nr, void *data);
  void fbnic_free_irqs(struct fbnic_dev *fbd);
  int fbnic_alloc_irqs(struct fbnic_dev *fbd);
  
+@@ -99,6 +116,7 @@ enum fbnic_boards {
+ };
+ 
+ struct fbnic_info {
++	unsigned int max_num_queues;
+ 	unsigned int bar_mask;
+ };
+ 
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-index 56a8bbd8b720..47a5321b68a7 100644
+index 47a5321b68a7..da1333301d15 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-@@ -9,10 +9,60 @@
- #define CSR_BIT(nr)		(1u << (nr))
- #define CSR_GENMASK(h, l)	GENMASK(h, l)
+@@ -366,7 +366,47 @@ enum {
+ #define FBNIC_PUL_OB_TLP_HDR_AR_CFG_BME		CSR_BIT(18)
+ #define FBNIC_CSR_END_PUL_USER	0x31080	/* CSR section delimiter */
  
-+#define DESC_BIT(nr)		BIT_ULL(nr)
-+#define DESC_GENMASK(h, l)	GENMASK_ULL(h, l)
-+
- #define PCI_DEVICE_ID_META_FBNIC_ASIC		0x0013
- 
- #define FBNIC_CLOCK_FREQ	(600 * (1000 * 1000))
- 
-+/* Register Definitions
++/* Queue Registers
 + *
-+ * The registers are laid as indexes into an le32 array. As such the actual
-+ * address is 4 times the index value. Below each register is defined as 3
-+ * fields, name, index, and Address.
-+ *
-+ *      Name				Index		Address
-+ *************************************************************************/
-+/* Interrupt Registers */
-+#define FBNIC_CSR_START_INTR		0x00000	/* CSR section delimiter */
-+#define FBNIC_INTR_STATUS(n)		(0x00000 + (n))	/* 0x00000 + 4*n */
-+#define FBNIC_INTR_STATUS_CNT			8
-+#define FBNIC_INTR_MASK(n)		(0x00008 + (n)) /* 0x00020 + 4*n */
-+#define FBNIC_INTR_MASK_CNT			8
-+#define FBNIC_INTR_SET(n)		(0x00010 + (n))	/* 0x00040 + 4*n */
-+#define FBNIC_INTR_SET_CNT			8
-+#define FBNIC_INTR_CLEAR(n)		(0x00018 + (n))	/* 0x00060 + 4*n */
-+#define FBNIC_INTR_CLEAR_CNT			8
-+#define FBNIC_INTR_SW_STATUS(n)		(0x00020 + (n)) /* 0x00080 + 4*n */
-+#define FBNIC_INTR_SW_STATUS_CNT		8
-+#define FBNIC_INTR_SW_AC_MODE(n)	(0x00028 + (n)) /* 0x000a0 + 4*n */
-+#define FBNIC_INTR_SW_AC_MODE_CNT		8
-+#define FBNIC_INTR_MASK_SET(n)		(0x00030 + (n)) /* 0x000c0 + 4*n */
-+#define FBNIC_INTR_MASK_SET_CNT			8
-+#define FBNIC_INTR_MASK_CLEAR(n)	(0x00038 + (n)) /* 0x000e0 + 4*n */
-+#define FBNIC_INTR_MASK_CLEAR_CNT		8
-+#define FBNIC_MAX_MSIX_VECS		256U
-+#define FBNIC_INTR_MSIX_CTRL(n)		(0x00040 + (n)) /* 0x00100 + 4*n */
-+#define FBNIC_INTR_MSIX_CTRL_VECTOR_MASK	CSR_GENMASK(7, 0)
-+#define FBNIC_INTR_MSIX_CTRL_ENABLE		CSR_BIT(31)
-+
-+#define FBNIC_CSR_END_INTR		0x0005f	/* CSR section delimiter */
-+
-+/* Interrupt MSIX Registers */
-+#define FBNIC_CSR_START_INTR_CQ		0x00400	/* CSR section delimiter */
-+#define FBNIC_INTR_CQ_REARM(n) \
-+				(0x00400 + 4 * (n))	/* 0x01000 + 16*n */
-+#define FBNIC_INTR_CQ_REARM_CNT			256
-+#define FBNIC_INTR_CQ_REARM_RCQ_TIMEOUT		CSR_GENMASK(13, 0)
-+#define FBNIC_INTR_CQ_REARM_RCQ_TIMEOUT_UPD_EN	CSR_BIT(14)
-+#define FBNIC_INTR_CQ_REARM_TCQ_TIMEOUT		CSR_GENMASK(28, 15)
-+#define FBNIC_INTR_CQ_REARM_TCQ_TIMEOUT_UPD_EN	CSR_BIT(29)
-+#define FBNIC_INTR_CQ_REARM_INTR_RELOAD		CSR_BIT(30)
-+#define FBNIC_INTR_CQ_REARM_INTR_UNMASK		CSR_BIT(31)
-+
-+#define FBNIC_CSR_END_INTR_CQ		0x007fe	/* CSR section delimiter */
-+
- /* Global QM Tx registers */
- #define FBNIC_CSR_START_QM_TX		0x00800	/* CSR section delimiter */
- #define FBNIC_QM_TWQ_DEFAULT_META_L	0x00818		/* 0x02060 */
-@@ -318,4 +368,33 @@ enum {
- 
- #define FBNIC_MAX_QUEUES		128
- 
-+/* BAR 4 CSRs */
-+
-+/* The IPC mailbox consists of 32 mailboxes, with each mailbox consisting
-+ * of 32 4 byte registers. We will use 2 registers per descriptor so the
-+ * length of the mailbox is reduced to 16.
-+ *
-+ * Currently we use an offset of 0x6000 on BAR4 for the mailbox so we just
-+ * have to do the math and determine the offset based on the mailbox
-+ * direction and index inside that mailbox.
++ * The queue register offsets are specific for a given queue grouping. So to
++ * find the actual register offset it is necessary to combine FBNIC_QUEUE(n)
++ * with the register to get the actual register offset like so:
++ *   FBNIC_QUEUE_TWQ0_CTL(n) == FBNIC_QUEUE(n) + FBNIC_QUEUE_TWQ0_CTL
 + */
-+#define FBNIC_IPC_MBX_DESC_LEN	16
-+#define FBNIC_IPC_MBX(mbx_idx, desc_idx)	\
-+	((((mbx_idx) * FBNIC_IPC_MBX_DESC_LEN + (desc_idx)) * 2) + 0x6000)
++#define FBNIC_CSR_START_QUEUE		0x40000	/* CSR section delimiter */
++#define FBNIC_QUEUE_STRIDE		0x400		/* 0x1000 */
++#define FBNIC_QUEUE(n)\
++	(0x40000 + FBNIC_QUEUE_STRIDE * (n))	/* 0x100000 + 4096*n */
 +
-+/* Use first register in mailbox to flush writes */
-+#define FBNIC_FW_ZERO_REG	FBNIC_IPC_MBX(0, 0)
-+
++#define FBNIC_QUEUE_TWQ0_CTL		0x000		/* 0x000 */
++#define FBNIC_QUEUE_TWQ1_CTL		0x001		/* 0x004 */
++#define FBNIC_QUEUE_TWQ_CTL_RESET		CSR_BIT(0)
++#define FBNIC_QUEUE_TWQ_CTL_ENABLE		CSR_BIT(1)
++#define FBNIC_QUEUE_TWQ_CTL_PREFETCH_DISABLE	CSR_BIT(2)
++#define FBNIC_QUEUE_TWQ_CTL_TXB_FIFO_SEL_MASK	CSR_GENMASK(30, 29)
 +enum {
-+	FBNIC_IPC_MBX_RX_IDX,
-+	FBNIC_IPC_MBX_TX_IDX,
-+	FBNIC_IPC_MBX_INDICES,
++	FBNIC_QUEUE_TWQ_CTL_TXB_SHARED	= 0,
++	FBNIC_QUEUE_TWQ_CTL_TXB_EI_DATA	= 1,
++	FBNIC_QUEUE_TWQ_CTL_TXB_EI_CTL	= 2,
 +};
 +
-+#define FBNIC_IPC_MBX_DESC_LEN_MASK	DESC_GENMASK(63, 48)
-+#define FBNIC_IPC_MBX_DESC_EOM		DESC_BIT(46)
-+#define FBNIC_IPC_MBX_DESC_ADDR_MASK	DESC_GENMASK(45, 3)
-+#define FBNIC_IPC_MBX_DESC_FW_CMPL	DESC_BIT(1)
-+#define FBNIC_IPC_MBX_DESC_HOST_CMPL	DESC_BIT(0)
++#define FBNIC_QUEUE_TWQ_CTL_AGGR_MODE		CSR_BIT(31)
 +
- #endif /* _FBNIC_CSR_H_ */
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-new file mode 100644
-index 000000000000..feca833ee924
---- /dev/null
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-@@ -0,0 +1,380 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) Meta Platforms, Inc. and affiliates. */
++#define FBNIC_QUEUE_TWQ0_TAIL		0x002		/* 0x008 */
++#define FBNIC_QUEUE_TWQ1_TAIL		0x003		/* 0x00c */
 +
-+#include <linux/bitfield.h>
-+#include <linux/delay.h>
-+#include <linux/dev_printk.h>
-+#include <linux/dma-mapping.h>
-+#include <linux/gfp.h>
-+#include <linux/types.h>
++/* Tx Completion Queue Registers */
++#define FBNIC_QUEUE_TCQ_HEAD		0x081		/* 0x204 */
 +
-+#include "fbnic.h"
-+#include "fbnic_tlv.h"
++/* Rx Completion Queue Registers */
++#define FBNIC_QUEUE_RCQ_HEAD		0x201		/* 0x804 */
 +
-+static void __fbnic_mbx_wr_desc(struct fbnic_dev *fbd, int mbx_idx,
-+				int desc_idx, u64 desc)
-+{
-+	u32 desc_offset = FBNIC_IPC_MBX(mbx_idx, desc_idx);
++/* Rx Buffer Descriptor Queue Registers */
++#define FBNIC_QUEUE_BDQ_HPQ_TAIL	0x241		/* 0x904 */
++#define FBNIC_QUEUE_BDQ_PPQ_TAIL	0x242		/* 0x908 */
 +
-+	fw_wr32(fbd, desc_offset + 1, upper_32_bits(desc));
-+	fw_wrfl(fbd);
-+	fw_wr32(fbd, desc_offset, lower_32_bits(desc));
-+}
-+
-+static u64 __fbnic_mbx_rd_desc(struct fbnic_dev *fbd, int mbx_idx, int desc_idx)
-+{
-+	u32 desc_offset = FBNIC_IPC_MBX(mbx_idx, desc_idx);
-+	u64 desc;
-+
-+	desc = fw_rd32(fbd, desc_offset);
-+	desc |= (u64)fw_rd32(fbd, desc_offset + 1) << 32;
-+
-+	return desc;
-+}
-+
-+static void fbnic_mbx_init_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
-+{
-+	int desc_idx;
-+
-+	/* Initialize first descriptor to all 0s. Doing this gives us a
-+	 * solid stop for the firmware to hit when it is done looping
-+	 * through the ring.
-+	 */
-+	__fbnic_mbx_wr_desc(fbd, mbx_idx, 0, 0);
-+
-+	fw_wrfl(fbd);
-+
-+	/* We then fill the rest of the ring starting at the end and moving
-+	 * back toward descriptor 0 with skip descriptors that have no
-+	 * length nor address, and tell the firmware that they can skip
-+	 * them and just move past them to the one we initialized to 0.
-+	 */
-+	for (desc_idx = FBNIC_IPC_MBX_DESC_LEN; --desc_idx;) {
-+		__fbnic_mbx_wr_desc(fbd, mbx_idx, desc_idx,
-+				    FBNIC_IPC_MBX_DESC_FW_CMPL |
-+				    FBNIC_IPC_MBX_DESC_HOST_CMPL);
-+		fw_wrfl(fbd);
-+	}
-+}
-+
-+void fbnic_mbx_init(struct fbnic_dev *fbd)
-+{
-+	int i;
-+
-+	/* Initialize lock to protect Tx ring */
-+	spin_lock_init(&fbd->fw_tx_lock);
-+
-+	/* Reinitialize mailbox memory */
-+	for (i = 0; i < FBNIC_IPC_MBX_INDICES; i++)
-+		memset(&fbd->mbx[i], 0, sizeof(struct fbnic_fw_mbx));
-+
-+	/* Do not auto-clear the FW mailbox interrupt, let SW clear it */
-+	wr32(fbd, FBNIC_INTR_SW_AC_MODE(0), ~(1u << FBNIC_FW_MSIX_ENTRY));
-+
-+	/* Clear any stale causes in vector 0 as that is used for doorbell */
-+	wr32(fbd, FBNIC_INTR_CLEAR(0), 1u << FBNIC_FW_MSIX_ENTRY);
-+
-+	for (i = 0; i < FBNIC_IPC_MBX_INDICES; i++)
-+		fbnic_mbx_init_desc_ring(fbd, i);
-+}
-+
-+static int fbnic_mbx_map_msg(struct fbnic_dev *fbd, int mbx_idx,
-+			     struct fbnic_tlv_msg *msg, u16 length, u8 eom)
-+{
-+	struct fbnic_fw_mbx *mbx = &fbd->mbx[mbx_idx];
-+	u8 tail = mbx->tail;
-+	dma_addr_t addr;
-+	int direction;
-+
-+	if (!mbx->ready || !fbnic_fw_present(fbd))
-+		return -ENODEV;
-+
-+	direction = (mbx_idx == FBNIC_IPC_MBX_RX_IDX) ? DMA_FROM_DEVICE :
-+							DMA_TO_DEVICE;
-+
-+	if (mbx->head == ((tail + 1) % FBNIC_IPC_MBX_DESC_LEN))
-+		return -EBUSY;
-+
-+	addr = dma_map_single(fbd->dev, msg, PAGE_SIZE, direction);
-+	if (dma_mapping_error(fbd->dev, addr)) {
-+		free_page((unsigned long)msg);
-+
-+		return -ENOSPC;
-+	}
-+
-+	mbx->buf_info[tail].msg = msg;
-+	mbx->buf_info[tail].addr = addr;
-+
-+	mbx->tail = (tail + 1) % FBNIC_IPC_MBX_DESC_LEN;
-+
-+	fw_wr32(fbd, FBNIC_IPC_MBX(mbx_idx, mbx->tail), 0);
-+
-+	__fbnic_mbx_wr_desc(fbd, mbx_idx, tail,
-+			    FIELD_PREP(FBNIC_IPC_MBX_DESC_LEN_MASK, length) |
-+			    (addr & FBNIC_IPC_MBX_DESC_ADDR_MASK) |
-+			    (eom ? FBNIC_IPC_MBX_DESC_EOM : 0) |
-+			    FBNIC_IPC_MBX_DESC_HOST_CMPL);
-+
-+	return 0;
-+}
-+
-+static void fbnic_mbx_unmap_and_free_msg(struct fbnic_dev *fbd, int mbx_idx,
-+					 int desc_idx)
-+{
-+	struct fbnic_fw_mbx *mbx = &fbd->mbx[mbx_idx];
-+	int direction;
-+
-+	if (!mbx->buf_info[desc_idx].msg)
-+		return;
-+
-+	direction = (mbx_idx == FBNIC_IPC_MBX_RX_IDX) ? DMA_FROM_DEVICE :
-+							DMA_TO_DEVICE;
-+	dma_unmap_single(fbd->dev, mbx->buf_info[desc_idx].addr,
-+			 PAGE_SIZE, direction);
-+
-+	free_page((unsigned long)mbx->buf_info[desc_idx].msg);
-+	mbx->buf_info[desc_idx].msg = NULL;
-+}
-+
-+static void fbnic_mbx_clean_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
-+{
-+	int i;
-+
-+	fbnic_mbx_init_desc_ring(fbd, mbx_idx);
-+
-+	for (i = FBNIC_IPC_MBX_DESC_LEN; i--;)
-+		fbnic_mbx_unmap_and_free_msg(fbd, mbx_idx, i);
-+}
-+
-+void fbnic_mbx_clean(struct fbnic_dev *fbd)
-+{
-+	int i;
-+
-+	for (i = 0; i < FBNIC_IPC_MBX_INDICES; i++)
-+		fbnic_mbx_clean_desc_ring(fbd, i);
-+}
-+
-+#define FBNIC_MBX_MAX_PAGE_SIZE	FIELD_MAX(FBNIC_IPC_MBX_DESC_LEN_MASK)
-+#define FBNIC_RX_PAGE_SIZE	min_t(int, PAGE_SIZE, FBNIC_MBX_MAX_PAGE_SIZE)
-+
-+static int fbnic_mbx_alloc_rx_msgs(struct fbnic_dev *fbd)
-+{
-+	struct fbnic_fw_mbx *rx_mbx = &fbd->mbx[FBNIC_IPC_MBX_RX_IDX];
-+	u8 tail = rx_mbx->tail, head = rx_mbx->head, count;
-+	int err = 0;
-+
-+	/* Do nothing if mailbox is not ready, or we already have pages on
-+	 * the ring that can be used by the firmware
-+	 */
-+	if (!rx_mbx->ready)
-+		return -ENODEV;
-+
-+	/* Fill all but 1 unused descriptors in the Rx queue. */
-+	count = (head - tail - 1) % FBNIC_IPC_MBX_DESC_LEN;
-+	while (!err && count--) {
-+		struct fbnic_tlv_msg *msg;
-+
-+		msg = (struct fbnic_tlv_msg *)__get_free_page(GFP_ATOMIC |
-+							      __GFP_NOWARN);
-+		if (!msg) {
-+			err = -ENOMEM;
-+			break;
-+		}
-+
-+		err = fbnic_mbx_map_msg(fbd, FBNIC_IPC_MBX_RX_IDX, msg,
-+					FBNIC_RX_PAGE_SIZE, 0);
-+		if (err)
-+			free_page((unsigned long)msg);
-+	}
-+
-+	return err;
-+}
-+
-+static void fbnic_mbx_process_tx_msgs(struct fbnic_dev *fbd)
-+{
-+	struct fbnic_fw_mbx *tx_mbx = &fbd->mbx[FBNIC_IPC_MBX_TX_IDX];
-+	u8 head = tx_mbx->head;
-+	u64 desc;
-+
-+	while (head != tx_mbx->tail) {
-+		desc = __fbnic_mbx_rd_desc(fbd, FBNIC_IPC_MBX_TX_IDX, head);
-+		if (!(desc & FBNIC_IPC_MBX_DESC_FW_CMPL))
-+			break;
-+
-+		fbnic_mbx_unmap_and_free_msg(fbd, FBNIC_IPC_MBX_TX_IDX, head);
-+
-+		head++;
-+		head %= FBNIC_IPC_MBX_DESC_LEN;
-+	}
-+
-+	/* Record head for next interrupt */
-+	tx_mbx->head = head;
-+}
-+
-+static void fbnic_mbx_postinit_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
-+{
-+	struct fbnic_fw_mbx *mbx = &fbd->mbx[mbx_idx];
-+
-+	/* This is a one time init, so just exit if it is completed */
-+	if (mbx->ready)
-+		return;
-+
-+	mbx->ready = true;
-+
-+	switch (mbx_idx) {
-+	case FBNIC_IPC_MBX_RX_IDX:
-+		/* Make sure we have a page for the FW to write to */
-+		fbnic_mbx_alloc_rx_msgs(fbd);
-+		break;
-+	}
-+}
-+
-+static void fbnic_mbx_postinit(struct fbnic_dev *fbd)
-+{
-+	int i;
-+
-+	/* We only need to do this on the first interrupt following init.
-+	 * this primes the mailbox so that we will have cleared all the
-+	 * skip descriptors.
-+	 */
-+	if (!(rd32(fbd, FBNIC_INTR_STATUS(0)) & (1u << FBNIC_FW_MSIX_ENTRY)))
-+		return;
-+
-+	wr32(fbd, FBNIC_INTR_CLEAR(0), 1u << FBNIC_FW_MSIX_ENTRY);
-+
-+	for (i = 0; i < FBNIC_IPC_MBX_INDICES; i++)
-+		fbnic_mbx_postinit_desc_ring(fbd, i);
-+}
-+
-+static const struct fbnic_tlv_parser fbnic_fw_tlv_parser[] = {
-+	FBNIC_TLV_MSG_ERROR
-+};
-+
-+static void fbnic_mbx_process_rx_msgs(struct fbnic_dev *fbd)
-+{
-+	struct fbnic_fw_mbx *rx_mbx = &fbd->mbx[FBNIC_IPC_MBX_RX_IDX];
-+	u8 head = rx_mbx->head;
-+	u64 desc, length;
-+
-+	while (head != rx_mbx->tail) {
-+		struct fbnic_tlv_msg *msg;
-+		int err;
-+
-+		desc = __fbnic_mbx_rd_desc(fbd, FBNIC_IPC_MBX_RX_IDX, head);
-+		if (!(desc & FBNIC_IPC_MBX_DESC_FW_CMPL))
-+			break;
-+
-+		dma_unmap_single(fbd->dev, rx_mbx->buf_info[head].addr,
-+				 PAGE_SIZE, DMA_FROM_DEVICE);
-+
-+		msg = rx_mbx->buf_info[head].msg;
-+
-+		length = FIELD_GET(FBNIC_IPC_MBX_DESC_LEN_MASK, desc);
-+
-+		/* Ignore NULL mailbox descriptors */
-+		if (!length)
-+			goto next_page;
-+
-+		/* Report descriptors with length greater than page size */
-+		if (length > PAGE_SIZE) {
-+			dev_warn(fbd->dev,
-+				 "Invalid mailbox descriptor length: %lld\n",
-+				 length);
-+			goto next_page;
-+		}
-+
-+		if (le16_to_cpu(msg->hdr.len) * sizeof(u32) > length)
-+			dev_warn(fbd->dev, "Mailbox message length mismatch\n");
-+
-+		/* If parsing fails dump contents of message to dmesg */
-+		err = fbnic_tlv_msg_parse(fbd, msg, fbnic_fw_tlv_parser);
-+		if (err) {
-+			dev_warn(fbd->dev, "Unable to process message: %d\n",
-+				 err);
-+			print_hex_dump(KERN_WARNING, "fbnic:",
-+				       DUMP_PREFIX_OFFSET, 16, 2,
-+				       msg, length, true);
-+		}
-+
-+		dev_dbg(fbd->dev, "Parsed msg type %d\n", msg->hdr.type);
-+next_page:
-+
-+		free_page((unsigned long)rx_mbx->buf_info[head].msg);
-+		rx_mbx->buf_info[head].msg = NULL;
-+
-+		head++;
-+		head %= FBNIC_IPC_MBX_DESC_LEN;
-+	}
-+
-+	/* Record head for next interrupt */
-+	rx_mbx->head = head;
-+
-+	/* Make sure we have at least one page for the FW to write to */
-+	fbnic_mbx_alloc_rx_msgs(fbd);
-+}
-+
-+void fbnic_mbx_poll(struct fbnic_dev *fbd)
-+{
-+	fbnic_mbx_postinit(fbd);
-+
-+	fbnic_mbx_process_tx_msgs(fbd);
-+	fbnic_mbx_process_rx_msgs(fbd);
-+}
-+
-+int fbnic_mbx_poll_tx_ready(struct fbnic_dev *fbd)
-+{
-+	struct fbnic_fw_mbx *tx_mbx;
-+	int attempts = 50;
-+
-+	/* Immediate fail if BAR4 isn't there */
-+	if (!fbnic_fw_present(fbd))
-+		return -ENODEV;
-+
-+	tx_mbx = &fbd->mbx[FBNIC_IPC_MBX_TX_IDX];
-+	while (!tx_mbx->ready && --attempts) {
-+		/* Force the firmware to trigger an interrupt response to
-+		 * avoid the mailbox getting stuck closed if the interrupt
-+		 * is reset.
-+		 */
-+		fbnic_mbx_init_desc_ring(fbd, FBNIC_IPC_MBX_TX_IDX);
-+
-+		msleep(200);
-+
-+		fbnic_mbx_poll(fbd);
-+	}
-+
-+	return attempts ? 0 : -ETIMEDOUT;
-+}
-+
-+void fbnic_mbx_flush_tx(struct fbnic_dev *fbd)
-+{
-+	struct fbnic_fw_mbx *tx_mbx;
-+	int attempts = 50;
-+	u8 count = 0;
-+
-+	/* Nothing to do if there is no mailbox */
-+	if (!fbnic_fw_present(fbd))
-+		return;
-+
-+	/* Record current Rx stats */
-+	tx_mbx = &fbd->mbx[FBNIC_IPC_MBX_TX_IDX];
-+
-+	/* Nothing to do if mailbox never got to ready */
-+	if (!tx_mbx->ready)
-+		return;
-+
-+	/* Give firmware time to process packet,
-+	 * we will wait up to 10 seconds which is 50 waits of 200ms.
-+	 */
-+	do {
-+		u8 head = tx_mbx->head;
-+
-+		if (head == tx_mbx->tail)
-+			break;
-+
-+		msleep(200);
-+		fbnic_mbx_process_tx_msgs(fbd);
-+
-+		count += (tx_mbx->head - head) % FBNIC_IPC_MBX_DESC_LEN;
-+	} while (count < FBNIC_IPC_MBX_DESC_LEN && --attempts);
-+}
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-new file mode 100644
-index 000000000000..c143079f881c
---- /dev/null
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-@@ -0,0 +1,26 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (c) Meta Platforms, Inc. and affiliates. */
-+
-+#ifndef _FBNIC_FW_H_
-+#define _FBNIC_FW_H_
-+
-+#include <linux/types.h>
-+
-+struct fbnic_dev;
-+struct fbnic_tlv_msg;
-+
-+struct fbnic_fw_mbx {
-+	u8 ready, head, tail;
-+	struct {
-+		struct fbnic_tlv_msg	*msg;
-+		dma_addr_t		addr;
-+	} buf_info[FBNIC_IPC_MBX_DESC_LEN];
-+};
-+
-+void fbnic_mbx_init(struct fbnic_dev *fbd);
-+void fbnic_mbx_clean(struct fbnic_dev *fbd);
-+void fbnic_mbx_poll(struct fbnic_dev *fbd);
-+int fbnic_mbx_poll_tx_ready(struct fbnic_dev *fbd);
-+void fbnic_mbx_flush_tx(struct fbnic_dev *fbd);
-+
-+#endif /* _FBNIC_FW_H_ */
+ #define FBNIC_MAX_QUEUES		128
++#define FBNIC_CSR_END_QUEUE	(0x40000 + 0x400 * FBNIC_MAX_QUEUES - 1)
+ 
+ /* BAR 4 CSRs */
+ 
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-index 7d1475750b64..d8f668142135 100644
+index d8f668142135..10377a4a9719 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-@@ -6,10 +6,88 @@
+@@ -5,6 +5,7 @@
+ #include <linux/types.h>
  
  #include "fbnic.h"
++#include "fbnic_txrx.h"
  
-+static irqreturn_t fbnic_fw_msix_intr(int __always_unused irq, void *data)
+ static irqreturn_t fbnic_fw_msix_intr(int __always_unused irq, void *data)
+ {
+@@ -82,6 +83,29 @@ void fbnic_fw_disable_mbx(struct fbnic_dev *fbd)
+ 	fbnic_mbx_clean(fbd);
+ }
+ 
++int fbnic_request_irq(struct fbnic_dev *fbd, int nr, irq_handler_t handler,
++		      unsigned long flags, const char *name, void *data)
 +{
-+	struct fbnic_dev *fbd = (struct fbnic_dev *)data;
++	struct pci_dev *pdev = to_pci_dev(fbd->dev);
++	int irq = pci_irq_vector(pdev, nr);
 +
-+	fbnic_mbx_poll(fbd);
++	if (irq < 0)
++		return irq;
 +
-+	fbnic_wr32(fbd, FBNIC_INTR_MASK_CLEAR(0), 1u << FBNIC_FW_MSIX_ENTRY);
-+
-+	return IRQ_HANDLED;
++	return request_irq(irq, handler, flags, name, data);
 +}
 +
-+/**
-+ * fbnic_fw_enable_mbx - Configure and initialize Firmware Mailbox
-+ * @fbd: Pointer to device to initialize
-+ *
-+ * This function will initialize the firmware mailbox rings, enable the IRQ
-+ * and initialize the communication between the Firmware and the host. The
-+ * firmware is expected to respond to the initialization by sending an
-+ * interrupt essentially notifying the host that it has seen the
-+ * initialization and is now synced up.
-+ *
-+ * Return: non-zero on failure.
-+ **/
-+int fbnic_fw_enable_mbx(struct fbnic_dev *fbd)
++void fbnic_free_irq(struct fbnic_dev *fbd, int nr, void *data)
 +{
-+	u32 vector = fbd->fw_msix_vector;
-+	int err;
++	struct pci_dev *pdev = to_pci_dev(fbd->dev);
++	int irq = pci_irq_vector(pdev, nr);
 +
-+	/* Request the IRQ for MAC link vector.
-+	 * Map MAC cause to it, and unmask it
-+	 */
-+	err = request_threaded_irq(vector, NULL, &fbnic_fw_msix_intr, 0,
-+				   dev_name(fbd->dev), fbd);
-+	if (err)
-+		return err;
++	if (irq < 0)
++		return;
 +
-+	/* Initialize mailbox and attempt to poll it into ready state */
-+	fbnic_mbx_init(fbd);
-+	err = fbnic_mbx_poll_tx_ready(fbd);
-+	if (err) {
-+		dev_warn(fbd->dev, "FW mailbox did not enter ready state\n");
-+		free_irq(vector, fbd);
-+		return err;
-+	}
-+
-+	/* Enable interrupts */
-+	fbnic_wr32(fbd, FBNIC_INTR_MASK_CLEAR(0), 1u << FBNIC_FW_MSIX_ENTRY);
-+
-+	return 0;
-+}
-+
-+/**
-+ * fbnic_fw_disable_mbx - Disable mailbox and place it in standby state
-+ * @fbd: Pointer to device to disable
-+ *
-+ * This function will disable the mailbox interrupt, free any messages still
-+ * in the mailbox and place it into a standby state. The firmware is
-+ * expected to see the update and assume that the host is in the reset state.
-+ **/
-+void fbnic_fw_disable_mbx(struct fbnic_dev *fbd)
-+{
-+	/* Disable interrupt and free vector */
-+	fbnic_wr32(fbd, FBNIC_INTR_MASK_SET(0), 1u << FBNIC_FW_MSIX_ENTRY);
-+
-+	/* Free the vector */
-+	free_irq(fbd->fw_msix_vector, fbd);
-+
-+	/* Make sure disabling logs message is sent, must be done here to
-+	 * avoid risk of completing without a running interrupt.
-+	 */
-+	fbnic_mbx_flush_tx(fbd);
-+
-+	/* Reset the mailboxes to the initialized state */
-+	fbnic_mbx_clean(fbd);
++	free_irq(irq, data);
 +}
 +
  void fbnic_free_irqs(struct fbnic_dev *fbd)
  {
  	struct pci_dev *pdev = to_pci_dev(fbd->dev);
+@@ -99,7 +123,7 @@ int fbnic_alloc_irqs(struct fbnic_dev *fbd)
+ 	struct pci_dev *pdev = to_pci_dev(fbd->dev);
+ 	int num_irqs;
  
-+	fbd->fw_msix_vector = 0;
+-	wanted_irqs += 1;
++	wanted_irqs += min_t(unsigned int, num_online_cpus(), FBNIC_MAX_RXQS);
+ 	num_irqs = pci_alloc_irq_vectors(pdev, FBNIC_NON_NAPI_VECTORS + 1,
+ 					 wanted_irqs, PCI_IRQ_MSIX);
+ 	if (num_irqs < 0) {
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+new file mode 100644
+index 000000000000..73f46ede82fc
+--- /dev/null
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+@@ -0,0 +1,185 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) Meta Platforms, Inc. and affiliates. */
 +
- 	fbd->num_irqs = 0;
- 
- 	pci_free_irq_vectors(pdev);
-@@ -35,5 +113,7 @@ int fbnic_alloc_irqs(struct fbnic_dev *fbd)
- 
- 	fbd->num_irqs = num_irqs;
- 
-+	fbd->fw_msix_vector = pci_irq_vector(pdev, FBNIC_FW_MSIX_ENTRY);
++#include <linux/etherdevice.h>
++#include <linux/ipv6.h>
++#include <linux/types.h>
 +
- 	return 0;
- }
++#include "fbnic.h"
++#include "fbnic_netdev.h"
++#include "fbnic_txrx.h"
++
++int __fbnic_open(struct fbnic_net *fbn)
++{
++	int err;
++
++	err = fbnic_alloc_napi_vectors(fbn);
++	if (err)
++		return err;
++
++	err = netif_set_real_num_tx_queues(fbn->netdev,
++					   fbn->num_tx_queues);
++	if (err)
++		goto free_resources;
++
++	err = netif_set_real_num_rx_queues(fbn->netdev,
++					   fbn->num_rx_queues);
++	if (err)
++		goto free_resources;
++
++	return 0;
++free_resources:
++	fbnic_free_napi_vectors(fbn);
++	return err;
++}
++
++static int fbnic_open(struct net_device *netdev)
++{
++	struct fbnic_net *fbn = netdev_priv(netdev);
++	int err;
++
++	err = __fbnic_open(fbn);
++	if (!err)
++		fbnic_up(fbn);
++
++	return err;
++}
++
++static int fbnic_stop(struct net_device *netdev)
++{
++	struct fbnic_net *fbn = netdev_priv(netdev);
++
++	fbnic_down(fbn);
++
++	fbnic_free_napi_vectors(fbn);
++
++	return 0;
++}
++
++static const struct net_device_ops fbnic_netdev_ops = {
++	.ndo_open		= fbnic_open,
++	.ndo_stop		= fbnic_stop,
++	.ndo_validate_addr	= eth_validate_addr,
++	.ndo_start_xmit		= fbnic_xmit_frame,
++};
++
++void fbnic_reset_queues(struct fbnic_net *fbn,
++			unsigned int tx, unsigned int rx)
++{
++	struct fbnic_dev *fbd = fbn->fbd;
++	unsigned int max_napis;
++
++	max_napis = fbd->num_irqs - FBNIC_NON_NAPI_VECTORS;
++
++	tx = min(tx, max_napis);
++	fbn->num_tx_queues = tx;
++
++	rx = min(rx, max_napis);
++	fbn->num_rx_queues = rx;
++
++	fbn->num_napi = max(tx, rx);
++}
++
++/**
++ * fbnic_netdev_free - Free the netdev associate with fbnic
++ * @fbd: Driver specific structure to free netdev from
++ *
++ * Allocate and initialize the netdev and netdev private structure. Bind
++ * together the hardware, netdev, and pci data structures.
++ **/
++void fbnic_netdev_free(struct fbnic_dev *fbd)
++{
++	free_netdev(fbd->netdev);
++	fbd->netdev = NULL;
++}
++
++/**
++ * fbnic_netdev_alloc - Allocate a netdev and associate with fbnic
++ * @fbd: Driver specific structure to associate netdev with
++ *
++ * Allocate and initialize the netdev and netdev private structure. Bind
++ * together the hardware, netdev, and pci data structures.
++ **/
++struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
++{
++	struct net_device *netdev;
++	struct fbnic_net *fbn;
++	int default_queues;
++
++	netdev = alloc_etherdev_mq(sizeof(*fbn), FBNIC_MAX_RXQS);
++	if (!netdev)
++		return NULL;
++
++	SET_NETDEV_DEV(netdev, fbd->dev);
++	fbd->netdev = netdev;
++
++	netdev->netdev_ops = &fbnic_netdev_ops;
++
++	fbn = netdev_priv(netdev);
++
++	fbn->netdev = netdev;
++	fbn->fbd = fbd;
++	INIT_LIST_HEAD(&fbn->napis);
++
++	default_queues = netif_get_num_default_rss_queues();
++	if (default_queues > fbd->max_num_queues)
++		default_queues = fbd->max_num_queues;
++
++	fbnic_reset_queues(fbn, default_queues, default_queues);
++
++	netdev->min_mtu = IPV6_MIN_MTU;
++	netdev->max_mtu = FBNIC_MAX_JUMBO_FRAME_SIZE - ETH_HLEN;
++
++	netif_carrier_off(netdev);
++
++	netif_tx_stop_all_queues(netdev);
++
++	return netdev;
++}
++
++static int fbnic_dsn_to_mac_addr(u64 dsn, char *addr)
++{
++	addr[0] = (dsn >> 56) & 0xFF;
++	addr[1] = (dsn >> 48) & 0xFF;
++	addr[2] = (dsn >> 40) & 0xFF;
++	addr[3] = (dsn >> 16) & 0xFF;
++	addr[4] = (dsn >> 8) & 0xFF;
++	addr[5] = dsn & 0xFF;
++
++	return is_valid_ether_addr(addr) ? 0 : -EINVAL;
++}
++
++/**
++ * fbnic_netdev_register - Initialize general software structures
++ * @netdev: Netdev containing structure to initialize and register
++ *
++ * Initialize the MAC address for the netdev and register it.
++ **/
++int fbnic_netdev_register(struct net_device *netdev)
++{
++	struct fbnic_net *fbn = netdev_priv(netdev);
++	struct fbnic_dev *fbd = fbn->fbd;
++	u64 dsn = fbd->dsn;
++	u8 addr[ETH_ALEN];
++	int err;
++
++	err = fbnic_dsn_to_mac_addr(dsn, addr);
++	if (!err) {
++		ether_addr_copy(netdev->perm_addr, addr);
++		eth_hw_addr_set(netdev, addr);
++	} else {
++		/* A randomly assigned MAC address will cause provisioning
++		 * issues so instead just fail to spawn the netdev and
++		 * avoid any confusion.
++		 */
++		dev_err(fbd->dev, "MAC addr %pM invalid\n", addr);
++		return err;
++	}
++
++	return register_netdev(netdev);
++}
++
++void fbnic_netdev_unregister(struct net_device *netdev)
++{
++	unregister_netdev(netdev);
++}
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+new file mode 100644
+index 000000000000..8d12abe5fb57
+--- /dev/null
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+@@ -0,0 +1,37 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (c) Meta Platforms, Inc. and affiliates. */
++
++#ifndef _FBNIC_NETDEV_H_
++#define _FBNIC_NETDEV_H_
++
++#include <linux/types.h>
++
++#include "fbnic_txrx.h"
++
++struct fbnic_net {
++	struct fbnic_ring *tx[FBNIC_MAX_TXQS];
++	struct fbnic_ring *rx[FBNIC_MAX_RXQS];
++
++	struct net_device *netdev;
++	struct fbnic_dev *fbd;
++
++	u16 num_napi;
++
++	u16 num_tx_queues;
++	u16 num_rx_queues;
++
++	struct list_head napis;
++};
++
++int __fbnic_open(struct fbnic_net *fbn);
++void fbnic_up(struct fbnic_net *fbn);
++void fbnic_down(struct fbnic_net *fbn);
++
++struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd);
++void fbnic_netdev_free(struct fbnic_dev *fbd);
++int fbnic_netdev_register(struct net_device *netdev);
++void fbnic_netdev_unregister(struct net_device *netdev);
++void fbnic_reset_queues(struct fbnic_net *fbn,
++			unsigned int tx, unsigned int rx);
++
++#endif /* _FBNIC_NETDEV_H_ */
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-index dfe043200d2d..0c94b5bdc9b5 100644
+index 0c94b5bdc9b5..e08aa4edeec0 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-@@ -58,6 +58,48 @@ u32 fbnic_rd32(struct fbnic_dev *fbd, u32 reg)
+@@ -4,10 +4,12 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/pci.h>
++#include <linux/rtnetlink.h>
+ #include <linux/types.h>
+ 
+ #include "fbnic.h"
+ #include "fbnic_drvinfo.h"
++#include "fbnic_netdev.h"
+ 
+ char fbnic_driver_name[] = DRV_NAME;
+ 
+@@ -15,6 +17,7 @@ MODULE_DESCRIPTION(DRV_SUMMARY);
+ MODULE_LICENSE("GPL");
+ 
+ static const struct fbnic_info fbnic_asic_info = {
++	.max_num_queues = FBNIC_MAX_QUEUES,
+ 	.bar_mask = BIT(0) | BIT(4)
+ };
+ 
+@@ -55,6 +58,10 @@ u32 fbnic_rd32(struct fbnic_dev *fbd, u32 reg)
+ 		"Failed read (idx 0x%x AKA addr 0x%x), disabled CSR access, awaiting reset\n",
+ 		reg, reg << 2);
+ 
++	/* Notify stack that device has lost (PCIe) link */
++	if (!fbnic_init_failure(fbd))
++		netif_device_detach(fbd->netdev);
++
  	return ~0U;
  }
  
-+bool fbnic_fw_present(struct fbnic_dev *fbd)
+@@ -97,9 +104,56 @@ u32 fbnic_fw_rd32(struct fbnic_dev *fbd, u32 reg)
+ 		"Failed read (idx 0x%x AKA addr 0x%x), disabled CSR access, awaiting reset\n",
+ 		reg, reg << 2);
+ 
++	/* Notify stack that device has lost (PCIe) link */
++	if (!fbnic_init_failure(fbd))
++		netif_device_detach(fbd->netdev);
++
+ 	return ~0U;
+ }
+ 
++static void fbnic_service_task_start(struct fbnic_net *fbn)
 +{
-+	return !!READ_ONCE(fbd->uc_addr4);
++	struct fbnic_dev *fbd = fbn->fbd;
++
++	schedule_delayed_work(&fbd->service_task, HZ);
 +}
 +
-+void fbnic_fw_wr32(struct fbnic_dev *fbd, u32 reg, u32 val)
++static void fbnic_service_task_stop(struct fbnic_net *fbn)
 +{
-+	u32 __iomem *csr = READ_ONCE(fbd->uc_addr4);
++	struct net_device *netdev = fbn->netdev;
++	struct fbnic_dev *fbd = fbn->fbd;
 +
-+	if (csr)
-+		writel(val, csr + reg);
++	cancel_delayed_work(&fbd->service_task);
++	netif_carrier_off(netdev);
 +}
 +
-+u32 fbnic_fw_rd32(struct fbnic_dev *fbd, u32 reg)
++void fbnic_up(struct fbnic_net *fbn)
 +{
-+	u32 __iomem *csr = READ_ONCE(fbd->uc_addr4);
-+	u32 value;
++	netif_tx_start_all_queues(fbn->netdev);
 +
-+	if (!csr)
-+		return ~0U;
++	fbnic_service_task_start(fbn);
++}
 +
-+	value = readl(csr + reg);
++void fbnic_down(struct fbnic_net *fbn)
++{
++	fbnic_service_task_stop(fbn);
 +
-+	/* If any bits are 0 value should be valid */
-+	if (~value)
-+		return value;
++	netif_tx_disable(fbn->netdev);
++}
 +
-+	/* All 1's may be valid if ZEROs register still works */
-+	if (reg != FBNIC_FW_ZERO_REG && ~readl(csr + FBNIC_FW_ZERO_REG))
-+		return value;
++static void fbnic_service_task(struct work_struct *work)
++{
++	struct fbnic_dev *fbd = container_of(to_delayed_work(work),
++					     struct fbnic_dev, service_task);
 +
-+	/* Hardware is giving us all 1's reads, assume it is gone */
-+	WRITE_ONCE(fbd->uc_addr0, NULL);
-+	WRITE_ONCE(fbd->uc_addr4, NULL);
++	rtnl_lock();
 +
-+	dev_err(fbd->dev,
-+		"Failed read (idx 0x%x AKA addr 0x%x), disabled CSR access, awaiting reset\n",
-+		reg, reg << 2);
++	if (netif_running(fbd->netdev))
++		schedule_delayed_work(&fbd->service_task, HZ);
 +
-+	return ~0U;
++	rtnl_unlock();
 +}
 +
  /**
   *  fbnic_probe - Device Initialization Routine
   *  @pdev: PCI device information struct
-@@ -123,6 +165,13 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto free_irqs;
+@@ -114,6 +168,7 @@ u32 fbnic_fw_rd32(struct fbnic_dev *fbd, u32 reg)
+ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ {
+ 	const struct fbnic_info *info = fbnic_info_tbl[ent->driver_data];
++	struct net_device *netdev;
+ 	struct fbnic_dev *fbd;
+ 	int err;
+ 
+@@ -150,11 +205,16 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		return -ENOMEM;
  	}
  
-+	err = fbnic_fw_enable_mbx(fbd);
-+	if (err) {
-+		dev_err(&pdev->dev,
-+			"Firmware mailbox initialization failure\n");
-+		goto free_irqs;
++	/* Populate driver with hardware-specific info and handlers */
++	fbd->max_num_queues = info->max_num_queues;
++
+ 	pci_set_master(pdev);
+ 	pci_save_state(pdev);
+ 
+ 	fbnic_devlink_register(fbd);
+ 
++	INIT_DELAYED_WORK(&fbd->service_task, fbnic_service_task);
++
+ 	err = fbnic_alloc_irqs(fbd);
+ 	if (err)
+ 		goto free_fbd;
+@@ -177,8 +237,22 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto init_failure_mode;
+ 	}
+ 
++	netdev = fbnic_netdev_alloc(fbd);
++	if (!netdev) {
++		dev_err(&pdev->dev, "Netdev allocation failed\n");
++		goto init_failure_mode;
 +	}
 +
- 	if (!fbd->dsn) {
- 		dev_warn(&pdev->dev, "Reading serial number failed\n");
- 		goto init_failure_mode;
-@@ -159,6 +208,7 @@ static void fbnic_remove(struct pci_dev *pdev)
++	err = fbnic_netdev_register(netdev);
++	if (err) {
++		dev_err(&pdev->dev, "Netdev registration failed: %d\n", err);
++		goto ifm_free_netdev;
++	}
++
+ 	return 0;
+ 
++ifm_free_netdev:
++	fbnic_netdev_free(fbd);
+ init_failure_mode:
+ 	dev_warn(&pdev->dev, "Probe error encountered, entering init failure mode. Normal networking functionality will not be available.\n");
+ 	 /* Always return 0 even on error so devlink is registered to allow
+@@ -208,6 +282,14 @@ static void fbnic_remove(struct pci_dev *pdev)
  {
  	struct fbnic_dev *fbd = pci_get_drvdata(pdev);
  
-+	fbnic_fw_disable_mbx(fbd);
++	if (!fbnic_init_failure(fbd)) {
++		struct net_device *netdev = fbd->netdev;
++
++		fbnic_netdev_unregister(netdev);
++		cancel_delayed_work_sync(&fbd->service_task);
++		fbnic_netdev_free(fbd);
++	}
++
+ 	fbnic_fw_disable_mbx(fbd);
  	fbnic_free_irqs(fbd);
  
- 	fbnic_devlink_unregister(fbd);
-@@ -169,6 +219,8 @@ static int fbnic_pm_suspend(struct device *dev)
+@@ -218,7 +300,21 @@ static void fbnic_remove(struct pci_dev *pdev)
+ static int fbnic_pm_suspend(struct device *dev)
  {
  	struct fbnic_dev *fbd = dev_get_drvdata(dev);
++	struct net_device *netdev = fbd->netdev;
  
-+	fbnic_fw_disable_mbx(fbd);
++	if (fbnic_init_failure(fbd))
++		goto null_uc_addr;
 +
++	rtnl_lock();
++
++	netif_device_detach(netdev);
++
++	if (netif_running(netdev))
++		netdev->netdev_ops->ndo_stop(netdev);
++
++	rtnl_unlock();
++
++null_uc_addr:
+ 	fbnic_fw_disable_mbx(fbd);
+ 
  	/* Free the IRQs so they aren't trying to occupy sleeping CPUs */
- 	fbnic_free_irqs(fbd);
+@@ -234,7 +330,9 @@ static int fbnic_pm_suspend(struct device *dev)
+ static int __fbnic_pm_resume(struct device *dev)
+ {
+ 	struct fbnic_dev *fbd = dev_get_drvdata(dev);
++	struct net_device *netdev = fbd->netdev;
+ 	void __iomem * const *iomap_table;
++	struct fbnic_net *fbn;
+ 	int err;
  
-@@ -197,7 +249,14 @@ static int __fbnic_pm_resume(struct device *dev)
+ 	/* Restore MMIO access */
+@@ -254,7 +352,29 @@ static int __fbnic_pm_resume(struct device *dev)
+ 	if (err)
+ 		goto err_free_irqs;
  
- 	fbd->mac->init_regs(fbd);
- 
-+	/* Re-enable mailbox */
-+	err = fbnic_fw_enable_mbx(fbd);
-+	if (err)
-+		goto err_free_irqs;
++	/* No netdev means there isn't a network interface to bring up */
++	if (fbnic_init_failure(fbd))
++		return 0;
++
++	fbn = netdev_priv(netdev);
++
++	/* Reset the queues if needed */
++	fbnic_reset_queues(fbn, fbn->num_tx_queues, fbn->num_rx_queues);
++
++	rtnl_lock();
++
++	if (netif_running(netdev)) {
++		err = __fbnic_open(fbn);
++		if (err)
++			goto err_disable_mbx;
++	}
++
++	rtnl_unlock();
 +
  	return 0;
-+err_free_irqs:
-+	fbnic_free_irqs(fbd);
++err_disable_mbx:
++	rtnl_unlock();
++	fbnic_fw_disable_mbx(fbd);
+ err_free_irqs:
+ 	fbnic_free_irqs(fbd);
  err_invalidate_uc_addr:
- 	WRITE_ONCE(fbd->uc_addr0, NULL);
- 	WRITE_ONCE(fbd->uc_addr4, NULL);
+@@ -263,11 +383,30 @@ static int __fbnic_pm_resume(struct device *dev)
+ 	return err;
+ }
+ 
++static void __fbnic_pm_attach(struct device *dev)
++{
++	struct fbnic_dev *fbd = dev_get_drvdata(dev);
++	struct net_device *netdev = fbd->netdev;
++	struct fbnic_net *fbn;
++
++	if (fbnic_init_failure(fbd))
++		return;
++
++	fbn = netdev_priv(netdev);
++
++	if (netif_running(netdev))
++		fbnic_up(fbn);
++
++	netif_device_attach(netdev);
++}
++
+ static int __maybe_unused fbnic_pm_resume(struct device *dev)
+ {
+ 	int err;
+ 
+ 	err = __fbnic_pm_resume(dev);
++	if (!err)
++		__fbnic_pm_attach(dev);
+ 
+ 	return err;
+ }
+@@ -316,6 +455,7 @@ static pci_ers_result_t fbnic_err_slot_reset(struct pci_dev *pdev)
+ 
+ static void fbnic_err_resume(struct pci_dev *pdev)
+ {
++	__fbnic_pm_attach(&pdev->dev);
+ }
+ 
+ static const struct pci_error_handlers fbnic_err_handler = {
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+new file mode 100644
+index 000000000000..372ca95dceb4
+--- /dev/null
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+@@ -0,0 +1,266 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) Meta Platforms, Inc. and affiliates. */
++
++#include <linux/pci.h>
++
++#include "fbnic.h"
++#include "fbnic_netdev.h"
++#include "fbnic_txrx.h"
++
++netdev_tx_t fbnic_xmit_frame(struct sk_buff *skb, struct net_device *dev)
++{
++	dev_kfree_skb_any(skb);
++	return NETDEV_TX_OK;
++}
++
++static int fbnic_poll(struct napi_struct *napi, int budget)
++{
++	return 0;
++}
++
++static irqreturn_t fbnic_msix_clean_rings(int __always_unused irq, void *data)
++{
++	struct fbnic_napi_vector *nv = data;
++
++	napi_schedule_irqoff(&nv->napi);
++
++	return IRQ_HANDLED;
++}
++
++static void fbnic_remove_tx_ring(struct fbnic_net *fbn,
++				 struct fbnic_ring *txr)
++{
++	if (!(txr->flags & FBNIC_RING_F_STATS))
++		return;
++
++	/* Remove pointer to the Tx ring */
++	WARN_ON(fbn->tx[txr->q_idx] && fbn->tx[txr->q_idx] != txr);
++	fbn->tx[txr->q_idx] = NULL;
++}
++
++static void fbnic_remove_rx_ring(struct fbnic_net *fbn,
++				 struct fbnic_ring *rxr)
++{
++	if (!(rxr->flags & FBNIC_RING_F_STATS))
++		return;
++
++	/* Remove pointer to the Rx ring */
++	WARN_ON(fbn->rx[rxr->q_idx] && fbn->rx[rxr->q_idx] != rxr);
++	fbn->rx[rxr->q_idx] = NULL;
++}
++
++static void fbnic_free_napi_vector(struct fbnic_net *fbn,
++				   struct fbnic_napi_vector *nv)
++{
++	struct fbnic_dev *fbd = nv->fbd;
++	u32 v_idx = nv->v_idx;
++	int i, j;
++
++	for (i = 0; i < nv->txt_count; i++) {
++		fbnic_remove_tx_ring(fbn, &nv->qt[i].sub0);
++		fbnic_remove_tx_ring(fbn, &nv->qt[i].cmpl);
++	}
++
++	for (j = 0; j < nv->rxt_count; j++, i++) {
++		fbnic_remove_rx_ring(fbn, &nv->qt[i].sub0);
++		fbnic_remove_rx_ring(fbn, &nv->qt[i].sub1);
++		fbnic_remove_rx_ring(fbn, &nv->qt[i].cmpl);
++	}
++
++	fbnic_free_irq(fbd, v_idx, nv);
++	netif_napi_del(&nv->napi);
++	list_del(&nv->napis);
++	kfree(nv);
++}
++
++void fbnic_free_napi_vectors(struct fbnic_net *fbn)
++{
++	struct fbnic_napi_vector *nv, *temp;
++
++	list_for_each_entry_safe(nv, temp, &fbn->napis, napis)
++		fbnic_free_napi_vector(fbn, nv);
++}
++
++static void fbnic_name_napi_vector(struct fbnic_napi_vector *nv)
++{
++	unsigned char *dev_name = nv->napi.dev->name;
++
++	if (!nv->rxt_count)
++		snprintf(nv->name, sizeof(nv->name), "%s-Tx-%u", dev_name,
++			 nv->v_idx - FBNIC_NON_NAPI_VECTORS);
++	else
++		snprintf(nv->name, sizeof(nv->name), "%s-TxRx-%u", dev_name,
++			 nv->v_idx - FBNIC_NON_NAPI_VECTORS);
++}
++
++static void fbnic_ring_init(struct fbnic_ring *ring, u32 __iomem *doorbell,
++			    int q_idx, u8 flags)
++{
++	ring->doorbell = doorbell;
++	ring->q_idx = q_idx;
++	ring->flags = flags;
++}
++
++static int fbnic_alloc_napi_vector(struct fbnic_dev *fbd, struct fbnic_net *fbn,
++				   unsigned int v_count, unsigned int v_idx,
++				   unsigned int txq_count, unsigned int txq_idx,
++				   unsigned int rxq_count, unsigned int rxq_idx)
++{
++	int txt_count = txq_count, rxt_count = rxq_count;
++	u32 __iomem *uc_addr = fbd->uc_addr0;
++	struct fbnic_napi_vector *nv;
++	struct fbnic_q_triad *qt;
++	int qt_count, err;
++	u32 __iomem *db;
++
++	qt_count = txt_count + rxq_count;
++	if (!qt_count)
++		return -EINVAL;
++
++	/* If MMIO has already failed there are no rings to initialize */
++	if (!uc_addr)
++		return -EIO;
++
++	/* Allocate NAPI vector and queue triads */
++	nv = kzalloc(struct_size(nv, qt, qt_count), GFP_KERNEL);
++	if (!nv)
++		return -ENOMEM;
++
++	/* Record queue triad counts */
++	nv->txt_count = txt_count;
++	nv->rxt_count = rxt_count;
++
++	/* Provide pointer back to fbnic and MSI-X vectors */
++	nv->fbd = fbd;
++	nv->v_idx = v_idx;
++
++	/* Tie napi to netdev */
++	list_add(&nv->napis, &fbn->napis);
++	netif_napi_add(fbn->netdev, &nv->napi, fbnic_poll);
++
++	/* Tie nv back to PCIe dev */
++	nv->dev = fbd->dev;
++
++	/* Initialize vector name */
++	fbnic_name_napi_vector(nv);
++
++	/* Request the IRQ for napi vector */
++	err = fbnic_request_irq(fbd, v_idx, &fbnic_msix_clean_rings,
++				IRQF_SHARED, nv->name, nv);
++	if (err)
++		goto napi_del;
++
++	/* Initialize queue triads */
++	qt = nv->qt;
++
++	while (txt_count) {
++		/* Configure Tx queue */
++		db = &uc_addr[FBNIC_QUEUE(txq_idx) + FBNIC_QUEUE_TWQ0_TAIL];
++
++		/* Assign Tx queue to netdev if applicable */
++		if (txq_count > 0) {
++			u8 flags = FBNIC_RING_F_CTX | FBNIC_RING_F_STATS;
++
++			fbnic_ring_init(&qt->sub0, db, txq_idx, flags);
++			fbn->tx[txq_idx] = &qt->sub0;
++			txq_count--;
++		} else {
++			fbnic_ring_init(&qt->sub0, db, 0,
++					FBNIC_RING_F_DISABLED);
++		}
++
++		/* Configure Tx completion queue */
++		db = &uc_addr[FBNIC_QUEUE(txq_idx) + FBNIC_QUEUE_TCQ_HEAD];
++		fbnic_ring_init(&qt->cmpl, db, 0, 0);
++
++		/* Update Tx queue index */
++		txt_count--;
++		txq_idx += v_count;
++
++		/* Move to next queue triad */
++		qt++;
++	}
++
++	while (rxt_count) {
++		/* Configure header queue */
++		db = &uc_addr[FBNIC_QUEUE(rxq_idx) + FBNIC_QUEUE_BDQ_HPQ_TAIL];
++		fbnic_ring_init(&qt->sub0, db, 0, FBNIC_RING_F_CTX);
++
++		/* Configure payload queue */
++		db = &uc_addr[FBNIC_QUEUE(rxq_idx) + FBNIC_QUEUE_BDQ_PPQ_TAIL];
++		fbnic_ring_init(&qt->sub1, db, 0, FBNIC_RING_F_CTX);
++
++		/* Configure Rx completion queue */
++		db = &uc_addr[FBNIC_QUEUE(rxq_idx) + FBNIC_QUEUE_RCQ_HEAD];
++		fbnic_ring_init(&qt->cmpl, db, rxq_idx, FBNIC_RING_F_STATS);
++		fbn->rx[rxq_idx] = &qt->cmpl;
++
++		/* Update Rx queue index */
++		rxt_count--;
++		rxq_idx += v_count;
++
++		/* Move to next queue triad */
++		qt++;
++	}
++
++	return 0;
++
++napi_del:
++	netif_napi_del(&nv->napi);
++	list_del(&nv->napis);
++	kfree(nv);
++	return err;
++}
++
++int fbnic_alloc_napi_vectors(struct fbnic_net *fbn)
++{
++	unsigned int txq_idx = 0, rxq_idx = 0, v_idx = FBNIC_NON_NAPI_VECTORS;
++	unsigned int num_tx = fbn->num_tx_queues;
++	unsigned int num_rx = fbn->num_rx_queues;
++	unsigned int num_napi = fbn->num_napi;
++	struct fbnic_dev *fbd = fbn->fbd;
++	int err;
++
++	/* Allocate 1 Tx queue per napi vector */
++	if (num_napi < FBNIC_MAX_TXQS && num_napi == num_tx + num_rx) {
++		while (num_tx) {
++			err = fbnic_alloc_napi_vector(fbd, fbn,
++						      num_napi, v_idx,
++						      1, txq_idx, 0, 0);
++			if (err)
++				goto free_vectors;
++
++			/* Update counts and index */
++			num_tx--;
++			txq_idx++;
++
++			v_idx++;
++		}
++	}
++
++	/* Allocate Tx/Rx queue pairs per vector, or allocate remaining Rx */
++	while (num_rx | num_tx) {
++		int tqpv = DIV_ROUND_UP(num_tx, num_napi - txq_idx);
++		int rqpv = DIV_ROUND_UP(num_rx, num_napi - rxq_idx);
++
++		err = fbnic_alloc_napi_vector(fbd, fbn, num_napi, v_idx,
++					      tqpv, txq_idx, rqpv, rxq_idx);
++		if (err)
++			goto free_vectors;
++
++		/* Update counts and index */
++		num_tx -= tqpv;
++		txq_idx++;
++
++		num_rx -= rqpv;
++		rxq_idx++;
++
++		v_idx++;
++	}
++
++	return 0;
++
++free_vectors:
++	fbnic_free_napi_vectors(fbn);
++	return -ENOMEM;
++}
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+new file mode 100644
+index 000000000000..4b88f0f76137
+--- /dev/null
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+@@ -0,0 +1,55 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (c) Meta Platforms, Inc. and affiliates. */
++
++#ifndef _FBNIC_TXRX_H_
++#define _FBNIC_TXRX_H_
++
++#include <linux/netdevice.h>
++#include <linux/types.h>
++
++struct fbnic_net;
++
++#define FBNIC_MAX_TXQS			128u
++#define FBNIC_MAX_RXQS			128u
++
++#define FBNIC_RING_F_DISABLED		BIT(0)
++#define FBNIC_RING_F_CTX		BIT(1)
++#define FBNIC_RING_F_STATS		BIT(2)	/* Ring's stats may be used */
++
++struct fbnic_ring {
++	u32 __iomem *doorbell;		/* Pointer to CSR space for ring */
++	u16 size_mask;			/* Size of ring in descriptors - 1 */
++	u8 q_idx;			/* Logical netdev ring index */
++	u8 flags;			/* Ring flags (FBNIC_RING_F_*) */
++
++	u32 head, tail;			/* Head/Tail of ring */
++};
++
++struct fbnic_q_triad {
++	struct fbnic_ring sub0, sub1, cmpl;
++};
++
++struct fbnic_napi_vector {
++	struct napi_struct napi;
++	struct device *dev;		/* Device for DMA unmapping */
++	struct fbnic_dev *fbd;
++	char name[IFNAMSIZ + 9];
++
++	u16 v_idx;
++	u8 txt_count;
++	u8 rxt_count;
++
++	struct list_head napis;
++
++	struct fbnic_q_triad qt[];
++};
++
++#define FBNIC_MAX_TXQS			128u
++#define FBNIC_MAX_RXQS			128u
++
++netdev_tx_t fbnic_xmit_frame(struct sk_buff *skb, struct net_device *dev);
++
++int fbnic_alloc_napi_vectors(struct fbnic_net *fbn);
++void fbnic_free_napi_vectors(struct fbnic_net *fbn);
++
++#endif /* _FBNIC_TXRX_H_ */
 
 
 
