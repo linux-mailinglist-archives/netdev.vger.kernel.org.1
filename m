@@ -1,94 +1,117 @@
-Return-Path: <netdev+bounces-106578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DC39916E28
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 18:30:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A3C6916E2F
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 18:34:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFC4A282331
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:30:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F24D2B21801
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 16:34:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDECD14A639;
-	Tue, 25 Jun 2024 16:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB574172BD4;
+	Tue, 25 Jun 2024 16:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D9vCHuYf"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="l2EvxNj/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90EFF11185;
-	Tue, 25 Jun 2024 16:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEA514A0B8;
+	Tue, 25 Jun 2024 16:34:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719333024; cv=none; b=mOZJE3P2e1buvDN4J/Tz042f+vtT4UaGWyzqSAIXTC3SWelZb1qAenXA77DcqnicPSK8Bg+HWp649wWfeZ1QvNL/jcQyFPWaaVpZ2bCZbAPaborc4mJuof/V8H6ykK5Q1y8m6+vfr0rLT3WymmRDImJ3jZQ4m5IEDxnR0+COevM=
+	t=1719333274; cv=none; b=ZxQXrWFTM85bKb1RIQ3v7PKAGQlkY+PV2F1ofv1xJIyMWoqCgLYMwYuYkrr0nT2j/Q67CUwgl4Zoiuv62FtMJuAKWv+s8B13Xp6cO7irbgKjT2yFk2UNnal0eWcQ7JPpgKLVzqX52TcgTCOb8xF2uuZGW6ISgiqdkKHJsCg0dIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719333024; c=relaxed/simple;
-	bh=GopYyPT2mgzQ4xpNM7JtEdBw2TI+wPIejxMM8r5q7dI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mMWfF/NO2+Sx7FDRuDCBhK3CradRi2DAiBVWEOgHr+4OCQUl3TqfQky087iwdQMcrXS5kAyC032wKfNm98R+1uVspKMdju1ir/G+Wfl3rO5FXQmjONg2AAfL7zs5fasALgpYK91qfKRcL8Az5bzHznFTT47bHbPNCbw/wCRsgP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D9vCHuYf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B5EDC32781;
-	Tue, 25 Jun 2024 16:30:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719333024;
-	bh=GopYyPT2mgzQ4xpNM7JtEdBw2TI+wPIejxMM8r5q7dI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D9vCHuYfPxeJST3BSYVulRbqHkP2li0PFm/YanDRLgsfesFHqkUciqsn/rgcSAPo3
-	 YbAXGFpUa9d0qzwgjX1T2U2iSc4ZCa5Iel3sp1VeUE/alfGa2rdAVsLuF95x93EZ9j
-	 BrJeNVwxeEqaj7Ck+yqkxV41ssPiHv+oBkrYAqNVkqgihDG3ia/pLBPDKMjzE8QR81
-	 LQSUscQ+I+BvWis6e08ZEjJRTavadTuuZdqsbXrPEqoVVrgm04TZ8b03bNJXfwb1KQ
-	 cVLZDARP3Zb2O/eRGEnJz0qbpL8dfIZP9rMIm4aMQMR3Uc8Ltrm8UnJ9ehHuKrw2DH
-	 0cNBz+4FEj2iA==
-Date: Tue, 25 Jun 2024 09:30:22 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Aaron Conole <aconole@redhat.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- dev@openvswitch.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, Pravin B Shelar <pshelar@ovn.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Shuah
- Khan <shuah@kernel.org>, Stefano Brivio <sbrivio@redhat.com>,
- =?UTF-8?B?QWRyacOhbg==?= Moreno <amorenoz@redhat.com>, Simon Horman
- <horms@kernel.org>
-Subject: Re: [PATCH v2 net-next 0/7] selftests: net: Switch pmtu.sh to use
- the internal ovs script.
-Message-ID: <20240625093022.6daf9ba0@kernel.org>
-In-Reply-To: <f7tsex1f3wl.fsf@redhat.com>
-References: <20240620125601.15755-1-aconole@redhat.com>
-	<20240621180126.3c40d245@kernel.org>
-	<f7ttthjh33w.fsf@redhat.com>
-	<f7tpls6gu3q.fsf@redhat.com>
-	<e4f69335f90aae3f1daa47ba8f69b24ea15ed3b7.camel@redhat.com>
-	<f7th6dhgnvm.fsf@redhat.com>
-	<20240625070654.6a00efef@kernel.org>
-	<f7t1q4lgldr.fsf@redhat.com>
-	<20240625074145.69fc9d9f@kernel.org>
-	<f7tsex1f3wl.fsf@redhat.com>
+	s=arc-20240116; t=1719333274; c=relaxed/simple;
+	bh=yRbrl8pBo6hmUcs39DQUAtO1CFgz2Vf67wvVIsA4nh0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MTnZjV4i2eN1hkfM4N+NAJKyD9ukr18KEHmH9VX/WzUlB8V0nrQEfm1ODP1+UPewuHjCBsGN5XqnM+ZiGMaNp1/4YGIJmu+0GZqyeUinE8GadJdTH0xX9cWf/0SbwgYk1Z6Asqf3/fF2Jp6yGbAcOUjXMVB7tZNlMjf86ujQzaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=l2EvxNj/; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 396D8FF803;
+	Tue, 25 Jun 2024 16:34:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1719333270;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lQcRzQLnkaoL4wQYeJunaQ65bdPeTfuBgWQEOy5uOio=;
+	b=l2EvxNj/BT8ncbykHU91+LRRiUzl33lqWsvlnnM4JkFyhh55Iftxu8T539KpXS/vCTv8np
+	hLMSBio9L9ApDHU5iw9ud2Ly0lkOgG5yDaLKnwet7/1BHan6kIReJRIshUqymxxriU91fM
+	RCoA6AVahsPAPVX1m8tlGpNzhugGODLwdblnhchPqbVV851VrHTpzRCWq+5AX5Fuwdrkew
+	JYeeBIO7Fq+00JENHd5RrSlggUYOpK/keIpOrhfnsEYtahun4655uE5TXlggSlEcH7GdAB
+	FmUQi8dNMnlWoBGzgo1A4ZBmSb8HTAeHyfBLAvKLR/Sv3YIxXw5DXaOhLguzlQ==
+Message-ID: <12446d57-8a88-472d-845a-58ee603cedcc@arinc9.com>
+Date: Tue, 25 Jun 2024 19:34:23 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] dt-bindings: net: dsa: mediatek,mt7530: Minor grammar
+ fixes
+To: Conor Dooley <conor@kernel.org>
+Cc: Chris Packham <chris.packham@alliedtelesis.co.nz>, andrew@lunn.ch,
+ f.fainelli@gmail.com, olteanv@gmail.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>
+References: <20240624025812.1729229-1-chris.packham@alliedtelesis.co.nz>
+ <704f4b95-2aed-4b76-87cb-83002698471c@arinc9.com>
+ <20240624-radiance-untracked-29369921c468@spud>
+ <68961d4f-10d8-4769-94d3-92ce709aa00a@arinc9.com>
+ <20240624-supernova-obedient-3a2ba2a42188@spud>
+ <a17f35ae-5376-458a-b7b5-9dbefd843b40@arinc9.com>
+ <20240625-surfboard-massive-65f7f1f61f0d@spud>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20240625-surfboard-massive-65f7f1f61f0d@spud>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Tue, 25 Jun 2024 11:17:14 -0400 Aaron Conole wrote:
-> > BTW I popped the v2 back into the queue, so the next run (in 20min)
-> > will tell us if that's the only thing we were missing =F0=9F=A4=9E=EF=
-=B8=8F =20
->=20
-> :)  I'll wait to post the v3 then.  So far, the only change I have is:
->=20
-> --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> @@ -34,7 +34,7 @@ try:
-> =20
->  except ModuleNotFoundError:
->      print("Need to install the python pyroute2 package >=3D 0.6.")
-> -    sys.exit(0)
-> +    sys.exit(1)
+On 25/06/2024 19.16, Conor Dooley wrote:
+> On Mon, Jun 24, 2024 at 08:11:10PM +0300, Arınç ÜNAL wrote:
+>> On 24/06/2024 20.02, Conor Dooley wrote:
+>>> On Mon, Jun 24, 2024 at 07:59:48PM +0300, Arınç ÜNAL wrote:
+>>>> On 24/06/2024 19.29, Conor Dooley wrote:
+>>>>> On Mon, Jun 24, 2024 at 10:00:25AM +0300, Arınç ÜNAL wrote:
+>>>>>> On 24/06/2024 05.58, Chris Packham wrote:
+>>>
+>>>>>>>        and the switch registers are directly mapped into SoC's memory map rather than
+>>>>>>>        using MDIO. The DSA driver currently doesn't support MT7620 variants.
+>>>>>>>        There is only the standalone version of MT7531.
+>>>>>>> -  Port 5 on MT7530 has got various ways of configuration:
+>>>>>>> +  Port 5 on MT7530 supports various configurations:
+>>>>>>
+>>>>>> This is a rewrite, not a grammar fix.
+>>>>>
+>>>>> In both cases "has got" is clumsy wording,
+>>>>
+>>>> We don't use "have/has" on the other side of the Atlantic often.
+>>>
+>>> Uh, which side do you think I am from?
+>>
+>> Who would call it clumsy to use "have" and "got" together for possession...
+>> Must be an Irishman! :D
+> 
+> Okay, I was just making sure you weren't accusing me of being
+> American...
 
-Looks like it didn't get re-ingested :( please go ahead with the v3
+Wouldn't be a bigger insult than calling you British anyway. :D
+
+Arınç
 
