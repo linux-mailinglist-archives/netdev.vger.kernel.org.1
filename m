@@ -1,98 +1,164 @@
-Return-Path: <netdev+bounces-106428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 761DB9163D8
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 11:51:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78D7F916413
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 11:54:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 328E828C3B1
-	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:51:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35660287235
+	for <lists+netdev@lfdr.de>; Tue, 25 Jun 2024 09:54:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174D6149E0A;
-	Tue, 25 Jun 2024 09:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA0814A096;
+	Tue, 25 Jun 2024 09:53:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="OUpMHRfN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XUhW1xbt"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7283F1494DE
-	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 09:51:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472E21494CF
+	for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 09:53:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719309064; cv=none; b=PhlY773xakNU3ubzPn7/OWk5gORwuN0w8VR6FdEaVqy4/4TQ/cSEwHMGd4Zk2hx22geUnXuEsBzIpKEspIhkjm6JG2QwZ2zhHfsaTXgg+302dQnrcIvGRT+RKHARU8YdPbn9fnQnr3Fur/9nbxL01VdNcLRlZMu+kwl/InuDisg=
+	t=1719309208; cv=none; b=vFrC+R+UNnGi833n5NsU6Was2uj2TKYWPg3ZTRYWlS+tx4wbAjpt67a73CG9vjMAwH0CwEe41zNoZqsIq5Ntj6REDHg91zuwaAwqhRQArXMxAkGVh2Xu/CU0x60ibyOzTGoiimqPOiM4VPMOR50H7YjfjnBr4eH/elAmcEU1rJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719309064; c=relaxed/simple;
-	bh=v26cHPRxU3qBhPDOpIAhaujLP4FvP96BZu1GEQS4JXU=;
+	s=arc-20240116; t=1719309208; c=relaxed/simple;
+	bh=R3FCxbaMJtybn040DrjxA8NUBVBQpqRvUPiknZOt1TI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ly78YamOBKVHBrfVTkXFtOBF2ym+c2kjgeHpYU9Yi3Yl3BEytlMcW8u5z3oYYuoF7gt0OF1IjLbPCOCFdxXWemxuAAsdMZXlmiaMM85+xn58Wd/rscZ85m+/E2yrL27Kla3z/yDc6P8Cs0GVEOedQY9PKPJZby+u0YieqQ2R64U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=OUpMHRfN; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 95F8B40011;
-	Tue, 25 Jun 2024 09:50:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1719309059;
+	 MIME-Version:Content-Type; b=OUuwDO3o7f8SHytTFTMMp12pEswUBMq1Nha5VmMx/gB9ngLGlG0OMoVcOTeIE1A4oX1c82lg+ZGnx4UVFAxyXND9p7Xe8VtSJ47qNR6Ol2/BS7ItEMPnwTm7fYUsepRjYcG23FimIW2Lasw4MIvEqbPoUl2eoIgYTCkMv5chumM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XUhW1xbt; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719309206;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=v26cHPRxU3qBhPDOpIAhaujLP4FvP96BZu1GEQS4JXU=;
-	b=OUpMHRfNQ1fI9K8Gk/ZqEvi57rbgsyjk7M3Ed0wkm7Li++kz8ChDAYRvhu5PNodMUYkC0K
-	pRtShVhcApkhh5WDfrmEvV/GNBprprxKMGsQA3mXrPu5lMcz4ZAURUM0RHC9fiTc+rFTYl
-	sHJs2tpWxZRnMtWTY9Rc4avvfODbxyC1yhMu+afejzapOG2EMsb7eDTSQH1fn986/+iGr2
-	OKD3wC0h4KDwk9WboYw2wOxfCJuNmj7QmSt+E2k+qIoIXfyAq3v3NspbmC0ikCDz8+gIY2
-	MhAVB4mfbsEf7H7jqVNWmkmMjqB4929SPxXiaeWVRyJOA/TaeTKm4ftmeUaP5g==
-Date: Tue, 25 Jun 2024 11:50:56 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@baylibre.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
- <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, Woojung Huh
- <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, George
- McCollister <george.mccollister@gmail.com>, Ido Schimmel
- <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, Jeremy Kerr
- <jk@codeconstruct.com.au>, Matt Johnston <matt@codeconstruct.com.au>,
- Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: Drop explicit initialization of struct
- i2c_device_id::driver_data to 0
-Message-ID: <20240625115056.2df47afe@kmaincent-XPS-13-7390>
-In-Reply-To: <20240625083853.2205977-2-u.kleine-koenig@baylibre.com>
-References: <20240625083853.2205977-2-u.kleine-koenig@baylibre.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	bh=VCDVg82SvAc+NbfdoyAHMeVF+Y0QRccTMhp18TkLsuQ=;
+	b=XUhW1xbtgt9Fg7v344OXvOxL+uw007NmulTq+BYFywBeh4N7IsbTPTeZckqg90n+qyGDLa
+	A3q9mI9BcB6OwJvRwUw8NQSMsnSsh8jxrNtq9xyfJS46OgKe83xn1BJTsiiluzpUdUwAVx
+	grXJtMF6DzIMX8rjOo1HBv/MhGHmnc8=
+Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
+ [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-586-0ZpyM-qxNjSYnlVaX5h0HA-1; Tue, 25 Jun 2024 05:53:24 -0400
+X-MC-Unique: 0ZpyM-qxNjSYnlVaX5h0HA-1
+Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-48f6476949bso1708965137.0
+        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 02:53:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719309204; x=1719914004;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VCDVg82SvAc+NbfdoyAHMeVF+Y0QRccTMhp18TkLsuQ=;
+        b=KPnhm4liYPHs2caQeTQcUPD4lclB/ZEnw7GTbp5fi666welBX42033Ie4moCbahb9U
+         n5ww+nWYEA3z73XiiXXe7rZmDblNSrqTfsB7KM5Uuom4Py/spnRJwUIEXvNXea587flU
+         hL5pVgk3TKQaajJNGQ7EZRlgIM7jpfcP2NxHgPgfiMR8QXESXXXwEray9QiSy4aOdSwc
+         GwxJmZ2hbuwnBLM1jBM48I/Sa9BeFG6mT3gCs8A5APKIWyakNMoCW/2SYpP94a+6zG+Y
+         3DT5+fiZCkR6tY6IZQ5BSBrPDSeJLTPZhcjlzNLqlM4SG17WjAEYNWFtmSvFQC9esdyI
+         +j2g==
+X-Forwarded-Encrypted: i=1; AJvYcCV256LEtbRh0xVDxi/IIxrLgpYHiuDGFIgIwH+cx87uaL9og80Deak5idFM0qU8OoapAYKo8a7GlgfdnzeKkOSIQKXkGT1T
+X-Gm-Message-State: AOJu0Yw7o2RYU/EoCyHbfL35PElwVF3nGD03K5g3PDdlNuvPsrduOdyH
+	wYNP68RYR9KzhCjCo1KX2k+yXjZP6H3j7+Thx6VBHMNq7PPmzseHXviKS1TDbNIGy43O6xE7WvP
+	zIMEozB+g3Gu6hYy2cfUhO7DX7UDrjyK43nYFglER2wKSi67souPBlQ==
+X-Received: by 2002:a05:6102:34c2:b0:48f:2f28:833c with SMTP id ada2fe7eead31-48f529c9ab0mr6186855137.5.1719309203354;
+        Tue, 25 Jun 2024 02:53:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE7GVgIeXQfikh8im4fFadRGZfZMvzwXv5Lgjya/R6ZwlnSU1s7SQ/q+IhvLlQc4qI0cL2giQ==
+X-Received: by 2002:a05:6102:34c2:b0:48f:2f28:833c with SMTP id ada2fe7eead31-48f529c9ab0mr6186831137.5.1719309202782;
+        Tue, 25 Jun 2024 02:53:22 -0700 (PDT)
+Received: from maya.cloud.tilaa.com (maya.cloud.tilaa.com. [164.138.29.33])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-444c96b06a2sm45955701cf.15.2024.06.25.02.53.22
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 25 Jun 2024 02:53:22 -0700 (PDT)
+Date: Tue, 25 Jun 2024 11:52:17 +0200
+From: Stefano Brivio <sbrivio@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Aaron Conole <aconole@redhat.com>, netdev@vger.kernel.org,
+ dev@openvswitch.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Pravin B Shelar <pshelar@ovn.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, =?UTF-8?B?QWRy?=
+ =?UTF-8?B?acOhbg==?= Moreno <amorenoz@redhat.com>, Simon Horman
+ <horms@kernel.org>
+Subject: Re: [PATCH v2 net-next 0/7] selftests: net: Switch pmtu.sh to use
+ the internal ovs script.
+Message-ID: <20240625115217.07c820c9@elisabeth>
+In-Reply-To: <20240624153023.6fabd9f1@kernel.org>
+References: <20240620125601.15755-1-aconole@redhat.com>
+	<20240621180126.3c40d245@kernel.org>
+	<f7ttthjh33w.fsf@redhat.com>
+	<f7tpls6gu3q.fsf@redhat.com>
+	<20240624153023.6fabd9f1@kernel.org>
+Organization: Red Hat
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 25 Jun 2024 10:38:53 +0200
-Uwe Kleine-K=C3=B6nig <u.kleine-koenig@baylibre.com> wrote:
+On Mon, 24 Jun 2024 15:30:23 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-> These drivers don't use the driver_data member of struct i2c_device_id,
-> so don't explicitly initialize this member.
->=20
-> This prepares putting driver_data in an anonymous union which requires
-> either no initialization or named designators. But it's also a nice
-> cleanup on its own.
->=20
-> While add it, also remove commas after the sentinel entries.
->=20
-> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@baylibre.com>
+> On Mon, 24 Jun 2024 12:53:45 -0400 Aaron Conole wrote:
+> > Additionally, the "Cannot find device ..." text comes from an iproute2
+> > utility output.  The only place we actually interact with that is via
+> > the call at pmtu.sh:973:
+> > 
+> > 	run_cmd ip link set ovs_br0 up
+> > 
+> > Maybe it is possible that the link isn't up (could some port memory
+> > allocation or message be delaying it?) yet in the virtual environment.  
+> 
+> Depends on how the creation is implemented, normally device creation
+> over netlink is synchronous.
 
-For PSE drivers:
-Reviewed-by: Kory Maincent <Kory.maincent@bootlin.com>
+It also looks like pyroute2 would keep everything synchronous (unless
+you call NetlinkSocket.bind(async_cache=True))... weird.
 
----
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+> Just to be sure have you tried to repro with vng:
+> 
+> https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+> 
+> ? It could be the base OS difference, too, but that's harder to confirm.
+> 
+> > To confirm, is it possible to run in the constrained environment, but
+> > put a 5s sleep or something?  I will add the following either as a
+> > separate patch (ie 7/8), or I can fold it into 6/7 (and drop Stefano's
+> > ACK waiting for another review):
+> > 
+> > 
+> > wait_for_if() {
+> >    if ip link show "$2" >/dev/null 2>&1; then return 0; fi
+> > 
+> >    for d in `seq 1 30`; do
+> >       sleep 1
+> >       if ip link show "$2" >/dev/null 2>&1; then return 0; fi
+> >    done
+> >    return 1
+> > }
+> > 
+> > ....
+> >  	setup_ovs_br_internal || setup_ovs_br_vswitchd || return $ksft_skip
+> > +	wait_for_if "ovs_br0"
+> >  	run_cmd ip link set ovs_br0 up
+> > ....
+> > 
+> > Does it make sense or does it seem like I am way off base?  
+> 
+> sleep 1 is a bit high (sleep does accept fractional numbers!)
+
+This script was originally (and mostly is) all nice and POSIX (where
+sleep doesn't take fractional numbers), so, if you don't mind, I'd
+rather prefer "sleep 0.1 || sleep 1". :)
+
+-- 
+Stefano
+
 
