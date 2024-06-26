@@ -1,145 +1,203 @@
-Return-Path: <netdev+bounces-106771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97E27917952
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 09:06:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D3A7917966
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 09:12:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1BC38B22F6A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 07:06:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44582285FDF
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 07:12:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18D90158842;
-	Wed, 26 Jun 2024 07:06:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D371D15CD63;
+	Wed, 26 Jun 2024 07:12:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6960A1FBB
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 07:06:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34E315A856;
+	Wed, 26 Jun 2024 07:12:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719385586; cv=none; b=dFL0NLZ4SdBAPR8HDJfBkMavaRsbu2ToYuZN4mGzjI0OzlE04rPlot+/dhMR637CjdlFviWR8Jq1zD40vwBbdmXGnZBEnMKtwJmUel2Xnu+6P4GKtNG52EcPVb02qeDA3LTYLbK2ns9oLLEc2+29818O0cLDuS2ITKLhsGgYUKc=
+	t=1719385957; cv=none; b=mGUAXQGfS0/W7ujA1JpGhkhC24h9savn3sRb+qLQYWQC70kAcWj8hOIkilR5+e9QDKb4Jshefl+IMrYzeu6pt5akxY+1qaLcqRb8wgvOccY8b0t2cqg3N/og5ZC/A4Dcl8pche7bXRUzNeTG30BRRn0zD65U6ldQqJRvHsrsdHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719385586; c=relaxed/simple;
-	bh=K/sjZ0bsXnct0B50cerx4h07K2GOyv5awZbjTVtnqgQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dfd3hNSBJ7abvp/GPACHTZL8IrshWSg6wxFBKdBD25yHJsjGQqEjw9GK2mmm6j2Ohhzu+WGONEWG8Maz1F/t85ncABdu4pwzMmhx0qRnzMeW9z0FlxxUlCXIsiFXAh6Fs/dkFqzB9l6wbnQ97DHfA+tFY8HbkO4lqUC0t9PfoBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-7ebd11f77d8so951286539f.1
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 00:06:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719385583; x=1719990383;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4vkKthIaUSztvZd85keMWza9SGdaYFVhOD50Bc8I1kY=;
-        b=CR3VPMfIBZ/vwefLCU6aM5qinMbj1bJ9eksABt+JB42YGlFkCdQrURlHyCM29VHkiY
-         s8D5fYnyMFd00P0YFeVHsc5Kgz8qBsDKhKot51TJvG3U3Sz5vFSUpPkn2YReAIieLKSG
-         bXKxQ20EFI+o0iguMb56rYJzueJ5byw8HHLfs/YR57KNR6fjirUwE32Tqh72ABmyBLO6
-         SjWarMj2XgH8DQWvmYk0BWr0ixZ6nH6/AtJ57B0ZoRfgBXQ4IEIeovDrWRxyXMFjWxr/
-         6O7x5jz/VWB5FhJ0psPUU1fA3SSjpnusRBY8mT3cR7SH8gOG3liubWoJj2DXQmWf928D
-         /dmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXMTLF3H/sWBHuGduGQECivDxNp0v+BJG9OMXk0rzjM33Tz4SKmPF525UaRuABXwYiTwbs/oHuW7+16yQWMOM+wwz4e7Ktf
-X-Gm-Message-State: AOJu0YxPXEUPcli1rOqqLT+pAyBbKonNZpjfv/1XSGVYq4dLG35a35eo
-	UPjFS9HuCKN4Hd5tWt9aY8es2Eqs3O0XzHyIY0uRiKkAszSjluZrciP3jtjMU9Gsq3dckEFn5zP
-	1YBZSoLSFrJCLlmBeLEgMAhRG6OSA3y0adjvz0DQ7K7UoAdbFNUHP3uY=
-X-Google-Smtp-Source: AGHT+IHTuHPzxdzSZvKKq4zzo6UrPecfuVVV9bSpX+Sb0vpmECpQo6ODFwF7qRxi+Islf9MC6GHfMrbXeWN06pMq1EeECTXgLPJL
+	s=arc-20240116; t=1719385957; c=relaxed/simple;
+	bh=uvQNgV2jDCJ4VhyQQpkSfjrjwPjFCbXoN3isuczthlo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D3D3f4dqO0GB3c1gHvFIVqgkYSxI3qe9QR/V9zOnFqEGLN9xIeJuByHDkLQUzmCsmgPmyB/OUlk8NRcAYFHyM97z/mt+ewK2rpm4dV4VTdG12NoLwQmneHN9gfTZEtuJAsZxcixFS/MYZUFL3Rym6tk6oXTkqnv/C/CgGUP4SuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 6d3e4924338b11ef9305a59a3cc225df-20240626
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:1a41f925-4285-44e4-bd3e-c457bedf79f9,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:28,RULE:Release_Ham,ACT
+	ION:release,TS:23
+X-CID-INFO: VERSION:1.1.38,REQID:1a41f925-4285-44e4-bd3e-c457bedf79f9,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:28,RULE:Release_Ham,ACTIO
+	N:release,TS:23
+X-CID-META: VersionHash:82c5f88,CLOUDID:2b20dc882b6524ccfac790fa7b5a81d3,BulkI
+	D:240622064849KEF3CG9W,BulkQuantity:4,Recheck:0,SF:64|66|38|24|17|19|44|10
+	2,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:40|20,QS:nil,BE
+	C:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 1,FCT|NGT
+X-CID-BAS: 1,FCT|NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_FCD,TF_CID_SPAM_SNR,
+	TF_CID_SPAM_FAS
+X-UUID: 6d3e4924338b11ef9305a59a3cc225df-20240626
+Received: from node2.com.cn [(39.156.73.10)] by mailgw.kylinos.cn
+	(envelope-from <luoxuanqiang@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 432502532; Wed, 26 Jun 2024 15:12:19 +0800
+Received: from node2.com.cn (localhost [127.0.0.1])
+	by node2.com.cn (NSMail) with SMTP id 62A36B8075B2;
+	Wed, 26 Jun 2024 15:12:19 +0800 (CST)
+X-ns-mid: postfix-667BBF53-321303144
+Received: from [10.42.12.252] (unknown [10.42.12.252])
+	by node2.com.cn (NSMail) with ESMTPA id 0CB4EB8075B2;
+	Wed, 26 Jun 2024 07:12:15 +0000 (UTC)
+Message-ID: <dda6580f-636a-69da-60ef-cbdf0353d967@kylinos.cn>
+Date: Wed, 26 Jun 2024 15:12:15 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2504:b0:4b0:b123:d9d with SMTP id
- 8926c6da1cb9f-4b9efc75e9amr721991173.5.1719385583623; Wed, 26 Jun 2024
- 00:06:23 -0700 (PDT)
-Date: Wed, 26 Jun 2024 00:06:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f1b4a1061bc5a659@google.com>
-Subject: [syzbot] [wireless?] WARNING in ieee80211_rx_list (2)
-From: syzbot <syzbot+1d516edf1e74469ba5d3@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    626737a5791b Merge tag 'pinctrl-v6.10-2' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17fc4151980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7bd7d605618e43de
-dashboard link: https://syzkaller.appspot.com/bug?extid=1d516edf1e74469ba5d3
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/4d143806a3cf/disk-626737a5.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f234013cac68/vmlinux-626737a5.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/707d3018b571/bzImage-626737a5.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1d516edf1e74469ba5d3@syzkaller.appspotmail.com
-
-netlink: 4 bytes leftover after parsing attributes in process `syz.4.3539'.
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 17793 at net/mac80211/rx.c:5345 ieee80211_rx_list+0x14c7/0x2e90 net/mac80211/rx.c:5345
-Modules linked in:
-CPU: 1 PID: 17793 Comm: syz.4.3539 Not tainted 6.10.0-rc5-syzkaller-00012-g626737a5791b #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-RIP: 0010:ieee80211_rx_list+0x14c7/0x2e90 net/mac80211/rx.c:5345
-Code: 03 0f b6 04 02 84 c0 74 08 3c 03 0f 8e ca 19 00 00 8b 53 70 4c 89 ee 48 89 ef e8 a4 da fd ff e9 fa ef ff ff e8 fa 0d 30 f7 90 <0f> 0b 90 e9 15 ec ff ff e8 ec 0d 30 f7 90 0f 0b 90 e9 f3 ef ff ff
-RSP: 0018:ffffc9000313eba0 EFLAGS: 00010246
-RAX: 0000000000040000 RBX: 0000000000000000 RCX: ffffc9000e382000
-RDX: 0000000000040000 RSI: ffffffff8a5dd5e6 RDI: 0000000000000005
-RBP: ffff88806a8ec8c0 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000002 R12: ffff88806a8ec8c0
-R13: ffff88806a8ec998 R14: 0000000000000000 R15: 0000000000000001
-FS:  00007f8b5207c6c0(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f3a3a0f9d58 CR3: 000000006ff3c000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ieee80211_rx_napi+0xdd/0x400 net/mac80211/rx.c:5482
- ieee80211_rx include/net/mac80211.h:5093 [inline]
- ieee80211_handle_queued_frames+0xd5/0x130 net/mac80211/main.c:437
- ieee80211_stop_device+0x1e/0xe0 net/mac80211/util.c:1570
- ieee80211_do_stop+0x18bd/0x2200 net/mac80211/iface.c:706
- ieee80211_stop+0x11e/0x6b0 net/mac80211/iface.c:765
- __dev_close_many+0x1c5/0x310 net/core/dev.c:1556
- __dev_close net/core/dev.c:1568 [inline]
- __dev_change_flags+0x4dc/0x720 net/core/dev.c:8779
- dev_change_flags+0x8f/0x160 net/core/dev.c:8853
- do_setlink+0x1a42/0x3ff0 net/core/rtnetlink.c:2900
- ?
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH net v4] Fix race for duplicate reqsk on identical SYN
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, kuniyu@amazon.com, edumazet@google.com,
+ kuba@kernel.org, davem@davemloft.net
+Cc: dccp@vger.kernel.org, dsahern@kernel.org, fw@strlen.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ alexandre.ferrieux@orange.com
+References: <20240621013929.1386815-1-luoxuanqiang@kylinos.cn>
+ <35f497afd90fe16ba1408f25ea1ff62af6a73a90.camel@redhat.com>
+From: luoxuanqiang <luoxuanqiang@kylinos.cn>
+In-Reply-To: <35f497afd90fe16ba1408f25ea1ff62af6a73a90.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+=E5=9C=A8 2024/6/25 17:49, Paolo Abeni =E5=86=99=E9=81=93:
+> On Fri, 2024-06-21 at 09:39 +0800, luoxuanqiang wrote:
+>> When bonding is configured in BOND_MODE_BROADCAST mode, if two identic=
+al
+>> SYN packets are received at the same time and processed on different C=
+PUs,
+>> it can potentially create the same sk (sock) but two different reqsk
+>> (request_sock) in tcp_conn_request().
+>>
+>> These two different reqsk will respond with two SYNACK packets, and si=
+nce
+>> the generation of the seq (ISN) incorporates a timestamp, the final tw=
+o
+>> SYNACK packets will have different seq values.
+>>
+>> The consequence is that when the Client receives and replies with an A=
+CK
+>> to the earlier SYNACK packet, we will reset(RST) it.
+>>
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> This behavior is consistently reproducible in my local setup,
+>> which comprises:
+>>
+>>                    | NETA1 ------ NETB1 |
+>> PC_A --- bond --- |                    | --- bond --- PC_B
+>>                    | NETA2 ------ NETB2 |
+>>
+>> - PC_A is the Server and has two network cards, NETA1 and NETA2. I hav=
+e
+>>    bonded these two cards using BOND_MODE_BROADCAST mode and configure=
+d
+>>    them to be handled by different CPU.
+>>
+>> - PC_B is the Client, also equipped with two network cards, NETB1 and
+>>    NETB2, which are also bonded and configured in BOND_MODE_BROADCAST =
+mode.
+>>
+>> If the client attempts a TCP connection to the server, it might encoun=
+ter
+>> a failure. Capturing packets from the server side reveals:
+>>
+>> 10.10.10.10.45182 > localhost: Flags [S], seq 320236027,
+>> 10.10.10.10.45182 > localhost: Flags [S], seq 320236027,
+>> localhost > 10.10.10.10.45182: Flags [S.], seq 2967855116,
+>> localhost > 10.10.10.10.45182: Flags [S.], seq 2967855123, <=3D=3D
+>> 10.10.10.10.45182 > localhost: Flags [.], ack 4294967290,
+>> 10.10.10.10.45182 > localhost: Flags [.], ack 4294967290,
+>> localhost > 10.10.10.10.45182: Flags [R], seq 2967855117, <=3D=3D
+>> localhost > 10.10.10.10.45182: Flags [R], seq 2967855117,
+>>
+>> Two SYNACKs with different seq numbers are sent by localhost,
+>> resulting in an anomaly.
+>>
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> The attempted solution is as follows:
+>> Add a return value to inet_csk_reqsk_queue_hash_add() to confirm if th=
+e
+>> ehash insertion is successful (Up to now, the reason for unsuccessful
+>> insertion is that a reqsk for the same connection has already been
+>> inserted). If the insertion fails, release the reqsk.
+>>
+>> Due to the refcnt, Kuniyuki suggests also adding a return value check
+>> for the DCCP module; if ehash insertion fails, indicating a successful
+>> insertion of the same connection, simply release the reqsk as well.
+>>
+>> Simultaneously, In the reqsk_queue_hash_req(), the start of the
+>> req->rsk_timer is adjusted to be after successful insertion.
+>>
+>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Just after applying the patch I wondered if the issue addressed here
+> should be observable only after commit e994b2f0fb92 ("tcp: do not lock
+> listener to process SYN packets")?
+>
+> In practice it should not matter as the latter commit it's older than
+> the currently older LST, but I'm wondering if I read the things
+> correctly?
+>
+> Thanks!
+>
+> Paolo
+>
+Hi, Paolo, I conducted some experiments on your concern by reverting e994=
+b2f0fb92 on version 4.19 to observe how TCP handles this race condition.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Here are the observations:
+where SYN-A is processed on CPUA and SYN-B is processed on CPUB
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+CPUA & CPUB
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+In tcp_v4_rcv(), both SYN-A and SYN-B obtained the same sk from __inet_lo=
+okup_listener(), with the sk state being TCP_LISTEN.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+ =C2=A0=C2=A0 =C2=A0CPUA
 
-If you want to undo deduplication, reply with:
-#syz undup
+ =C2=A0=C2=A0=C2=A0 SYN-A acquired sk_lock and was processed in tcp_v4_do=
+_rcv(), where it created reqsk-A while in TCP_LISTEN state and sent a SYN=
+ACK packet.
+
+    =20
+
+ =C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
+=A0 CPUB
+
+ =C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
+=A0 After SYN-A was processed and sk_lock was released, SYN-B was process=
+ed. Since it was the same sk still in TCP_LISTEN state, it created reqsk-=
+B and sent a SYNACK packet with a different seq number.
+
+The issue remains reproducible.
+
+BRs!
+
 
