@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-106923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05355918183
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:56:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B404918184
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:56:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20F541C211F5
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:56:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE6561C217CA
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:56:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A83181CF2;
-	Wed, 26 Jun 2024 12:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40BAD181D0E;
+	Wed, 26 Jun 2024 12:56:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PceFRe+J"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vi++qiqI"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B011822C5
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 12:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CDFD1822EF
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 12:56:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719406588; cv=none; b=cwdXI2JltAuZ2LX3ep7PLSEhKF+gPlyobg4HsVHFdNxcV2Yri8TJWuWUGJdtl1vSY0VJBD5KJmQE+DYN30NV489jWSDF9bUAZo8Lz58cPMyvzLzsfafV2y+u8Xb2AoQlFLsZcGFZGFJ3FGaUjGsp3hiSsn3TPws7fonyVvKiUd0=
+	t=1719406591; cv=none; b=dfjtH8NepahMYxdbc74VOsjwTdK/xrclgD3qb6WSnP2k0m4mB48x6ZUNcw7pLqj48wrwJkaIKB+c3OSXqt78yno2BSSH/dgJOJ40XYEWR4nwG/t1PIM4DXahEMqDlKeybJWdZwP3W522yWp+yiwmTl51hx4Vc9kHM6jEJjsOYTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719406588; c=relaxed/simple;
-	bh=tM6VaeM/OqTG84MwMw8N20i7JseCMgnUabN+YTk2Oic=;
+	s=arc-20240116; t=1719406591; c=relaxed/simple;
+	bh=RFj/sljs8A7J1wwTCeufrl6q5EMho82lEUtRAGiiDCs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pkEaDnTl9fqF+VeGrqS/uO19RuZmTR78Jl76xDmK4HT1UZJiYasE+hkbPRmPeP3uZQhKk6ZOmFCp2OEu/Vt0Xf1dXpMOVdWpuze2p0Y+FyNATED5fQkBYGVkDTdkLii9ANBGK82+OnnhQxrkk1mz2jBQOxm6DKnWnz7CfbyFwwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PceFRe+J; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=baYzlwG9NCUr6Aokdns7it4RAvAQ37uSebkf8IPsRdeedBh6WsBt8wrVDbNpERAt9FbVfyvnpEKU/fao3GFyNylocYoS6QUWaWSnKBlRD/bV0mO1xpT/ScQzn3UfrL7R8p0tirIWjK1ckH9kGR8bkfZGdH4ebdVsSh+wtgewT0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vi++qiqI; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719406587; x=1750942587;
+  t=1719406589; x=1750942589;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=tM6VaeM/OqTG84MwMw8N20i7JseCMgnUabN+YTk2Oic=;
-  b=PceFRe+JzGXzQyrO59eOI1qBtTAwAKuz9splu45YArSxSW4js3tKXwwd
-   wpHqZ6OUMcDWClN0OuBpSdrtpYudLC7a0N65BUOLmM+6a69VD/yFmHzWr
-   rMmuoKuMiPiiLOQYRR9n1ZtFkroG68CulONWRsc1c2Y3vqxiLvqQRVLHy
-   hL7IKbLqM/zxrunETigXhKzwbgYA/22bqO8kIQ2b+/AyD37ToArTX/dns
-   IpA3Ortlbjd0ehc52PANPBto97H9kAgBXcupEftIfDhTmprIYG1oo4Dnm
-   89FqrLYh4zLHB8UWzyDj3tp0UyT+xv+cd5vTPLKg0iVEMbPhB8iCIVxfa
-   g==;
-X-CSE-ConnectionGUID: 0VmuLT89TjmLwYOyVTburw==
-X-CSE-MsgGUID: qGSVy0mUR6ilR93AXSCB5Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="16158111"
+  bh=RFj/sljs8A7J1wwTCeufrl6q5EMho82lEUtRAGiiDCs=;
+  b=Vi++qiqIKj4ffxT/AmGNd0JTkoZFiPETTM+KXsCAJtyK2onnee6odif/
+   pAq2PYaUKx8wJAzaftoAB1N7XNKoX3iZyQ/Lmex4noy2OWpDZD6tV4n0v
+   y9vUHN2QZvRT/O80Tu+gzbhSe8L8GWbZxSNUZWaZbix7oPE7dONoZGeKz
+   gBj2JELnY6Ybnox6ZNsLpJdcyiM5UJN8Dt4lL+Fs30gQoDxd2ruHjY6dW
+   aPxBtR23A2PD+NzUxdnwCFdcZyW6vHEHY8rcUUMRroioGF+rDxyRsOnuP
+   T9NCmdmUtgsm1l4NGkVT9c+SXqjcsDgmGaoTAko+I/TIUXl/vD2dtrJ5f
+   Q==;
+X-CSE-ConnectionGUID: vhF3KIHaTOq6qTHgY4N3WQ==
+X-CSE-MsgGUID: HoWOR8KPTtKPV+TV9/ANBA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="16158115"
 X-IronPort-AV: E=Sophos;i="6.08,267,1712646000"; 
-   d="scan'208";a="16158111"
+   d="scan'208";a="16158115"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 05:56:27 -0700
-X-CSE-ConnectionGUID: 1L3RrkvxRZi4QInF/by2ww==
-X-CSE-MsgGUID: RtSOUr5lQC+Dy9fM3WEv7g==
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 05:56:29 -0700
+X-CSE-ConnectionGUID: 5Y3kTx1xRwmv30qp74yksQ==
+X-CSE-MsgGUID: baEJ95qjSa2TL7QTqzTzLg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,267,1712646000"; 
-   d="scan'208";a="48594648"
+   d="scan'208";a="48594652"
 Received: from unknown (HELO localhost.igk.intel.com) ([10.211.13.141])
-  by fmviesa004.fm.intel.com with ESMTP; 26 Jun 2024 05:56:25 -0700
+  by fmviesa004.fm.intel.com with ESMTP; 26 Jun 2024 05:56:28 -0700
 From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-next v2 3/4] ice: Use ice_adapter for PTP shared data instead of auxdev
-Date: Wed, 26 Jun 2024 14:54:55 +0200
-Message-ID: <20240626125456.27667-4-sergey.temerkhanov@intel.com>
+Subject: [PATCH iwl-next v2 4/4] ice: Drop auxbus use for PTP to finalize ice_adapter move
+Date: Wed, 26 Jun 2024 14:54:56 +0200
+Message-ID: <20240626125456.27667-5-sergey.temerkhanov@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240626125456.27667-1-sergey.temerkhanov@intel.com>
 References: <20240626125456.27667-1-sergey.temerkhanov@intel.com>
@@ -78,382 +78,352 @@ MIME-Version: 1.0
 Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
 
-Use struct ice_adapter to hold shared PTP data and control PTP
-related actions instead of auxbus. This allows significant code
-simplification and faster access to the container fields used in
-the PTP support code.
-
-Move the PTP port list to the ice_adapter container to simplify
-the code and avoid race conditions which could occur due to the
-synchronous nature of the initialization/access and
-certain memory saving can be achieved by moving PTP data into
-the ice_adapter itself.
+Drop unused auxbus/auxdev support from the PTP code due to
+move to the ice_adapter.
 
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_adapter.c |   6 ++
- drivers/net/ethernet/intel/ice/ice_adapter.h |  18 +++-
- drivers/net/ethernet/intel/ice/ice_ptp.c     | 101 ++++++++++++-------
- drivers/net/ethernet/intel/ice/ice_ptp.h     |   3 +
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h  |   5 +
- 5 files changed, 95 insertions(+), 38 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 252 -----------------------
+ drivers/net/ethernet/intel/ice/ice_ptp.h |  23 ---
+ 2 files changed, 275 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
-index ad84d8ad49a6..f3e195974a8e 100644
---- a/drivers/net/ethernet/intel/ice/ice_adapter.c
-+++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
-@@ -40,11 +40,17 @@ static struct ice_adapter *ice_adapter_new(void)
- 	spin_lock_init(&adapter->ptp_gltsyn_time_lock);
- 	refcount_set(&adapter->refcount, 1);
- 
-+	mutex_init(&adapter->ports.lock);
-+	INIT_LIST_HEAD(&adapter->ports.ports);
-+
- 	return adapter;
- }
- 
- static void ice_adapter_free(struct ice_adapter *adapter)
- {
-+	WARN_ON(!list_empty(&adapter->ports.ports));
-+	mutex_destroy(&adapter->ports.lock);
-+
- 	kfree(adapter);
- }
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
-index c5ed6f56b36e..7f54167779b9 100644
---- a/drivers/net/ethernet/intel/ice/ice_adapter.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
-@@ -4,26 +4,42 @@
- #ifndef _ICE_ADAPTER_H_
- #define _ICE_ADAPTER_H_
- 
-+#include <linux/types.h>
- #include <linux/spinlock_types.h>
- #include <linux/refcount_types.h>
- 
- struct pci_dev;
- struct ice_pf;
- 
-+/**
-+ * struct ice_port_list - data used to store the list of adapter ports
-+ *
-+ * This structure contains data used to maintain a list of adapter ports
-+ *
-+ * @ports: list of ports
-+ * @lock: protect access to the ports list
-+ */
-+struct ice_port_list {
-+	struct list_head ports;
-+	/* To synchronize the ports list operations */
-+	struct mutex lock;
-+};
-+
- /**
-  * struct ice_adapter - PCI adapter resources shared across PFs
-  * @ptp_gltsyn_time_lock: Spinlock protecting access to the GLTSYN_TIME
-  *                        register of the PTP clock.
-  * @refcount: Reference count. struct ice_pf objects hold the references.
-  * @ctrl_pf: Control PF of the adapter
-+ * @ports: Ports list
-  */
- struct ice_adapter {
- 	/* For access to the GLTSYN_TIME register */
- 	spinlock_t ptp_gltsyn_time_lock;
--
- 	refcount_t refcount;
- 
- 	struct ice_pf *ctrl_pf;
-+	struct ice_port_list ports;
- };
- 
- struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev);
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 53a3b6fc9dec..1740c8f1fb61 100644
+index 1740c8f1fb61..c2dda9a8614f 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -21,7 +21,7 @@ static struct ice_pf *ice_get_ctrl_pf(struct ice_pf *pf)
- 	return !pf->adapter ? NULL : pf->adapter->ctrl_pf;
- }
- 
--static __maybe_unused struct ice_ptp *ice_get_ctrl_ptp(struct ice_pf *pf)
-+static struct ice_ptp *ice_get_ctrl_ptp(struct ice_pf *pf)
- {
- 	struct ice_pf *ctrl_pf = ice_get_ctrl_pf(pf);
- 
-@@ -821,8 +821,8 @@ static enum ice_tx_tstamp_work ice_ptp_tx_tstamp_owner(struct ice_pf *pf)
- 	struct ice_ptp_port *port;
- 	unsigned int i;
- 
--	mutex_lock(&pf->ptp.ports_owner.lock);
--	list_for_each_entry(port, &pf->ptp.ports_owner.ports, list_member) {
-+	mutex_lock(&pf->adapter->ports.lock);
-+	list_for_each_entry(port, &pf->adapter->ports.ports, list_node) {
- 		struct ice_ptp_tx *tx = &port->tx;
- 
- 		if (!tx || !tx->init)
-@@ -830,7 +830,7 @@ static enum ice_tx_tstamp_work ice_ptp_tx_tstamp_owner(struct ice_pf *pf)
- 
- 		ice_ptp_process_tx_tstamp(tx);
+@@ -2950,188 +2950,6 @@ static void ice_ptp_cleanup_pf(struct ice_pf *pf)
+ 		mutex_unlock(&pf->adapter->ports.lock);
  	}
--	mutex_unlock(&pf->ptp.ports_owner.lock);
-+	mutex_unlock(&pf->adapter->ports.lock);
- 
- 	for (i = 0; i < ICE_GET_QUAD_NUM(pf->hw.ptp.num_lports); i++) {
- 		u64 tstamp_ready;
-@@ -995,7 +995,7 @@ ice_ptp_flush_all_tx_tracker(struct ice_pf *pf)
- {
- 	struct ice_ptp_port *port;
- 
--	list_for_each_entry(port, &pf->ptp.ports_owner.ports, list_member)
-+	list_for_each_entry(port, &pf->adapter->ports.ports, list_node)
- 		ice_ptp_flush_tx_tracker(ptp_port_to_pf(port), &port->tx);
  }
- 
-@@ -1592,10 +1592,10 @@ static void ice_ptp_restart_all_phy(struct ice_pf *pf)
- {
- 	struct list_head *entry;
- 
--	list_for_each(entry, &pf->ptp.ports_owner.ports) {
-+	list_for_each(entry, &pf->adapter->ports.ports) {
- 		struct ice_ptp_port *port = list_entry(entry,
- 						       struct ice_ptp_port,
--						       list_member);
-+						       list_node);
- 
- 		if (port->link_up)
- 			ice_ptp_port_phy_restart(port);
-@@ -2912,6 +2912,44 @@ void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 	dev_err(ice_pf_to_dev(pf), "PTP reset failed %d\n", err);
- }
- 
-+static int ice_ptp_setup_adapter(struct ice_pf *pf)
-+{
-+	if (!ice_pf_src_tmr_owned(pf) || !ice_is_primary(&pf->hw))
-+		return -EPERM;
-+
-+	pf->adapter->ctrl_pf = pf;
-+
-+	return 0;
-+}
-+
-+static int ice_ptp_setup_pf(struct ice_pf *pf)
-+{
-+	struct ice_ptp *ctrl_ptp = ice_get_ctrl_ptp(pf);
-+	struct ice_ptp *ptp = &pf->ptp;
-+
-+	if (WARN_ON(!ctrl_ptp) || ice_get_phy_model(&pf->hw) == ICE_PHY_UNSUP)
-+		return -ENODEV;
-+
-+	INIT_LIST_HEAD(&ptp->port.list_node);
-+	mutex_lock(&pf->adapter->ports.lock);
-+
-+	list_add(&ptp->port.list_node,
-+		 &pf->adapter->ports.ports);
-+	mutex_unlock(&pf->adapter->ports.lock);
-+
-+	return 0;
-+}
-+
-+static void ice_ptp_cleanup_pf(struct ice_pf *pf)
-+{
-+	struct ice_ptp *ptp = &pf->ptp;
-+
-+	if (ice_get_phy_model(&pf->hw) != ICE_PHY_UNSUP) {
-+		mutex_lock(&pf->adapter->ports.lock);
-+		list_del(&ptp->port.list_node);
-+		mutex_unlock(&pf->adapter->ports.lock);
-+	}
-+}
- /**
-  * ice_ptp_aux_dev_to_aux_pf - Get auxiliary PF handle for the auxiliary device
-  * @aux_dev: auxiliary device to get the auxiliary PF for
-@@ -3042,7 +3080,7 @@ ice_ptp_auxbus_create_id_table(struct ice_pf *pf, const char *name)
-  * ice_ptp_register_auxbus_driver - Register PTP auxiliary bus driver
-  * @pf: Board private structure
-  */
--static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
-+static int __always_unused ice_ptp_register_auxbus_driver(struct ice_pf *pf)
- {
- 	struct auxiliary_driver *aux_driver;
- 	struct ice_ptp *ptp;
-@@ -3085,7 +3123,7 @@ static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
-  * ice_ptp_unregister_auxbus_driver - Unregister PTP auxiliary bus driver
-  * @pf: Board private structure
-  */
--static void ice_ptp_unregister_auxbus_driver(struct ice_pf *pf)
-+static void __always_unused ice_ptp_unregister_auxbus_driver(struct ice_pf *pf)
- {
- 	struct auxiliary_driver *aux_driver = &pf->ptp.ports_owner.aux_driver;
- 
-@@ -3104,15 +3142,12 @@ static void ice_ptp_unregister_auxbus_driver(struct ice_pf *pf)
-  */
- int ice_ptp_clock_index(struct ice_pf *pf)
- {
--	struct auxiliary_device *aux_dev;
--	struct ice_pf *owner_pf;
-+	struct ice_ptp *ctrl_ptp = ice_get_ctrl_ptp(pf);
- 	struct ptp_clock *clock;
- 
--	aux_dev = &pf->ptp.port.aux_dev;
--	owner_pf = ice_ptp_aux_dev_to_owner_pf(aux_dev);
--	if (!owner_pf)
-+	if (!ctrl_ptp)
- 		return -1;
--	clock = owner_pf->ptp.clock;
-+	clock = ctrl_ptp->clock;
- 
- 	return clock ? ptp_clock_index(clock) : -1;
- }
-@@ -3172,15 +3207,7 @@ static int ice_ptp_init_owner(struct ice_pf *pf)
- 	if (err)
- 		goto err_clk;
- 
--	err = ice_ptp_register_auxbus_driver(pf);
+-/**
+- * ice_ptp_aux_dev_to_aux_pf - Get auxiliary PF handle for the auxiliary device
+- * @aux_dev: auxiliary device to get the auxiliary PF for
+- */
+-static struct ice_pf *
+-ice_ptp_aux_dev_to_aux_pf(struct auxiliary_device *aux_dev)
+-{
+-	struct ice_ptp_port *aux_port;
+-	struct ice_ptp *aux_ptp;
+-
+-	aux_port = container_of(aux_dev, struct ice_ptp_port, aux_dev);
+-	aux_ptp = container_of(aux_port, struct ice_ptp, port);
+-
+-	return container_of(aux_ptp, struct ice_pf, ptp);
+-}
+-
+-/**
+- * ice_ptp_aux_dev_to_owner_pf - Get PF handle for the auxiliary device
+- * @aux_dev: auxiliary device to get the PF for
+- */
+-static struct ice_pf *
+-ice_ptp_aux_dev_to_owner_pf(struct auxiliary_device *aux_dev)
+-{
+-	struct ice_ptp_port_owner *ports_owner;
+-	struct auxiliary_driver *aux_drv;
+-	struct ice_ptp *owner_ptp;
+-
+-	if (!aux_dev->dev.driver)
+-		return NULL;
+-
+-	aux_drv = to_auxiliary_drv(aux_dev->dev.driver);
+-	ports_owner = container_of(aux_drv, struct ice_ptp_port_owner,
+-				   aux_driver);
+-	owner_ptp = container_of(ports_owner, struct ice_ptp, ports_owner);
+-	return container_of(owner_ptp, struct ice_pf, ptp);
+-}
+-
+-/**
+- * ice_ptp_auxbus_probe - Probe auxiliary devices
+- * @aux_dev: PF's auxiliary device
+- * @id: Auxiliary device ID
+- */
+-static int ice_ptp_auxbus_probe(struct auxiliary_device *aux_dev,
+-				const struct auxiliary_device_id *id)
+-{
+-	struct ice_pf *owner_pf = ice_ptp_aux_dev_to_owner_pf(aux_dev);
+-	struct ice_pf *aux_pf = ice_ptp_aux_dev_to_aux_pf(aux_dev);
+-
+-	if (WARN_ON(!owner_pf))
+-		return -ENODEV;
+-
+-	INIT_LIST_HEAD(&aux_pf->ptp.port.list_member);
+-	mutex_lock(&owner_pf->ptp.ports_owner.lock);
+-	list_add(&aux_pf->ptp.port.list_member,
+-		 &owner_pf->ptp.ports_owner.ports);
+-	mutex_unlock(&owner_pf->ptp.ports_owner.lock);
+-
+-	return 0;
+-}
+-
+-/**
+- * ice_ptp_auxbus_remove - Remove auxiliary devices from the bus
+- * @aux_dev: PF's auxiliary device
+- */
+-static void ice_ptp_auxbus_remove(struct auxiliary_device *aux_dev)
+-{
+-	struct ice_pf *owner_pf = ice_ptp_aux_dev_to_owner_pf(aux_dev);
+-	struct ice_pf *aux_pf = ice_ptp_aux_dev_to_aux_pf(aux_dev);
+-
+-	mutex_lock(&owner_pf->ptp.ports_owner.lock);
+-	list_del(&aux_pf->ptp.port.list_member);
+-	mutex_unlock(&owner_pf->ptp.ports_owner.lock);
+-}
+-
+-/**
+- * ice_ptp_auxbus_shutdown
+- * @aux_dev: PF's auxiliary device
+- */
+-static void ice_ptp_auxbus_shutdown(struct auxiliary_device *aux_dev)
+-{
+-	/* Doing nothing here, but handle to auxbus driver must be satisfied */
+-}
+-
+-/**
+- * ice_ptp_auxbus_suspend
+- * @aux_dev: PF's auxiliary device
+- * @state: power management state indicator
+- */
+-static int
+-ice_ptp_auxbus_suspend(struct auxiliary_device *aux_dev, pm_message_t state)
+-{
+-	/* Doing nothing here, but handle to auxbus driver must be satisfied */
+-	return 0;
+-}
+-
+-/**
+- * ice_ptp_auxbus_resume
+- * @aux_dev: PF's auxiliary device
+- */
+-static int ice_ptp_auxbus_resume(struct auxiliary_device *aux_dev)
+-{
+-	/* Doing nothing here, but handle to auxbus driver must be satisfied */
+-	return 0;
+-}
+-
+-/**
+- * ice_ptp_auxbus_create_id_table - Create auxiliary device ID table
+- * @pf: Board private structure
+- * @name: auxiliary bus driver name
+- */
+-static struct auxiliary_device_id *
+-ice_ptp_auxbus_create_id_table(struct ice_pf *pf, const char *name)
+-{
+-	struct auxiliary_device_id *ids;
+-
+-	/* Second id left empty to terminate the array */
+-	ids = devm_kcalloc(ice_pf_to_dev(pf), 2,
+-			   sizeof(struct auxiliary_device_id), GFP_KERNEL);
+-	if (!ids)
+-		return NULL;
+-
+-	snprintf(ids[0].name, sizeof(ids[0].name), "ice.%s", name);
+-
+-	return ids;
+-}
+-
+-/**
+- * ice_ptp_register_auxbus_driver - Register PTP auxiliary bus driver
+- * @pf: Board private structure
+- */
+-static int __always_unused ice_ptp_register_auxbus_driver(struct ice_pf *pf)
+-{
+-	struct auxiliary_driver *aux_driver;
+-	struct ice_ptp *ptp;
+-	struct device *dev;
+-	char *name;
+-	int err;
+-
+-	ptp = &pf->ptp;
+-	dev = ice_pf_to_dev(pf);
+-	aux_driver = &ptp->ports_owner.aux_driver;
+-	INIT_LIST_HEAD(&ptp->ports_owner.ports);
+-	mutex_init(&ptp->ports_owner.lock);
+-	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
+-			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
+-			      ice_get_ptp_src_clock_index(&pf->hw));
+-	if (!name)
+-		return -ENOMEM;
+-
+-	aux_driver->name = name;
+-	aux_driver->shutdown = ice_ptp_auxbus_shutdown;
+-	aux_driver->suspend = ice_ptp_auxbus_suspend;
+-	aux_driver->remove = ice_ptp_auxbus_remove;
+-	aux_driver->resume = ice_ptp_auxbus_resume;
+-	aux_driver->probe = ice_ptp_auxbus_probe;
+-	aux_driver->id_table = ice_ptp_auxbus_create_id_table(pf, name);
+-	if (!aux_driver->id_table)
+-		return -ENOMEM;
+-
+-	err = auxiliary_driver_register(aux_driver);
 -	if (err) {
--		dev_err(ice_pf_to_dev(pf), "Failed to register PTP auxbus driver");
--		goto err_aux;
+-		devm_kfree(dev, aux_driver->id_table);
+-		dev_err(dev, "Failed registering aux_driver, name <%s>\n",
+-			name);
 -	}
 -
- 	return 0;
--err_aux:
--	ptp_clock_unregister(pf->ptp.clock);
- err_clk:
- 	pf->ptp.clock = NULL;
- err_exit:
-@@ -3256,7 +3283,7 @@ static void ice_ptp_release_auxbus_device(struct device *dev)
-  * ice_ptp_create_auxbus_device - Create PTP auxiliary bus device
-  * @pf: Board private structure
-  */
--static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
-+static __always_unused int ice_ptp_create_auxbus_device(struct ice_pf *pf)
- {
- 	struct auxiliary_device *aux_dev;
- 	struct ice_ptp *ptp;
-@@ -3303,7 +3330,7 @@ static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
-  * ice_ptp_remove_auxbus_device - Remove PTP auxiliary bus device
-  * @pf: Board private structure
-  */
--static void ice_ptp_remove_auxbus_device(struct ice_pf *pf)
-+static __always_unused void ice_ptp_remove_auxbus_device(struct ice_pf *pf)
- {
- 	struct auxiliary_device *aux_dev = &pf->ptp.port.aux_dev;
- 
-@@ -3368,18 +3395,25 @@ void ice_ptp_init(struct ice_pf *pf)
- 	 * configure the PTP clock device to represent it.
- 	 */
- 	if (ice_pf_src_tmr_owned(pf)) {
-+		err = ice_ptp_setup_adapter(pf);
-+		if (err)
-+			goto err_exit;
- 		err = ice_ptp_init_owner(pf);
- 		if (err)
--			goto err;
-+			goto err_exit;
- 	}
- 
-+	err = ice_ptp_setup_pf(pf);
-+	if (err)
-+		goto err_exit;
-+
- 	ptp->port.port_num = hw->pf_id;
- 	if (ice_is_e825c(hw) && hw->ptp.is_2x50g_muxed_topo)
- 		ptp->port.port_num = hw->pf_id * 2;
- 
- 	err = ice_ptp_init_port(pf, &ptp->port);
- 	if (err)
--		goto err;
-+		goto err_exit;
- 
- 	/* Start the PHY timestamping block */
- 	ice_ptp_reset_phy_timestamping(pf);
-@@ -3387,20 +3421,16 @@ void ice_ptp_init(struct ice_pf *pf)
- 	/* Configure initial Tx interrupt settings */
- 	ice_ptp_cfg_tx_interrupt(pf);
- 
--	err = ice_ptp_create_auxbus_device(pf);
--	if (err)
--		goto err;
+-	return err;
+-}
 -
- 	ptp->state = ICE_PTP_READY;
- 
- 	err = ice_ptp_init_work(pf, ptp);
- 	if (err)
--		goto err;
-+		goto err_exit;
- 
- 	dev_info(ice_pf_to_dev(pf), "PTP init successful\n");
- 	return;
- 
--err:
-+err_exit:
- 	/* If we registered a PTP clock, release it */
- 	if (pf->ptp.clock) {
- 		ptp_clock_unregister(ptp->clock);
-@@ -3427,7 +3457,7 @@ void ice_ptp_release(struct ice_pf *pf)
- 	/* Disable timestamping for both Tx and Rx */
- 	ice_ptp_disable_timestamp_mode(pf);
- 
--	ice_ptp_remove_auxbus_device(pf);
-+	ice_ptp_cleanup_pf(pf);
- 
- 	ice_ptp_release_tx_tracker(pf, &pf->ptp.port.tx);
- 
-@@ -3442,9 +3472,6 @@ void ice_ptp_release(struct ice_pf *pf)
- 		pf->ptp.kworker = NULL;
- 	}
- 
--	if (ice_pf_src_tmr_owned(pf))
--		ice_ptp_unregister_auxbus_driver(pf);
+-/**
+- * ice_ptp_unregister_auxbus_driver - Unregister PTP auxiliary bus driver
+- * @pf: Board private structure
+- */
+-static void __always_unused ice_ptp_unregister_auxbus_driver(struct ice_pf *pf)
+-{
+-	struct auxiliary_driver *aux_driver = &pf->ptp.ports_owner.aux_driver;
 -
- 	if (!pf->ptp.clock)
- 		return;
+-	auxiliary_driver_unregister(aux_driver);
+-	devm_kfree(ice_pf_to_dev(pf), aux_driver->id_table);
+-
+-	mutex_destroy(&pf->ptp.ports_owner.lock);
+-}
  
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
-index 1d87dd67284d..de73762e6f27 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
-@@ -170,6 +170,7 @@ struct ice_ptp_tx {
-  * and determine when the port's PHY offset is valid.
-  *
-  * @list_member: list member structure of auxiliary device
-+ * @list_node: list member structure
-  * @tx: Tx timestamp tracking for this port
-  * @aux_dev: auxiliary device associated with this port
-  * @ov_work: delayed work task for tracking when PHY offset is valid
-@@ -180,6 +181,7 @@ struct ice_ptp_tx {
-  */
- struct ice_ptp_port {
- 	struct list_head list_member;
-+	struct list_head list_node;
- 	struct ice_ptp_tx tx;
- 	struct auxiliary_device aux_dev;
- 	struct kthread_delayed_work ov_work;
-@@ -205,6 +207,7 @@ enum ice_ptp_tx_interrupt {
-  * @ports: list of porst handled by this port owner
-  * @lock: protect access to ports list
-  */
-+
- struct ice_ptp_port_owner {
- 	struct auxiliary_driver aux_driver;
- 	struct list_head ports;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 0852a34ade91..eceec2919159 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -451,6 +451,11 @@ static inline u64 ice_get_base_incval(struct ice_hw *hw)
+ /**
+  * ice_ptp_clock_index - Get the PTP clock index for this device
+@@ -3270,76 +3088,6 @@ static int ice_ptp_init_port(struct ice_pf *pf, struct ice_ptp_port *ptp_port)
  	}
  }
  
-+static inline bool ice_is_primary(struct ice_hw *hw)
-+{
-+	return !!(hw->dev_caps.nac_topo.mode & ICE_NAC_TOPO_PRIMARY_M);
-+}
-+
- #define PFTSYN_SEM_BYTES	4
+-/**
+- * ice_ptp_release_auxbus_device
+- * @dev: device that utilizes the auxbus
+- */
+-static void ice_ptp_release_auxbus_device(struct device *dev)
+-{
+-	/* Doing nothing here, but handle to auxbux device must be satisfied */
+-}
+-
+-/**
+- * ice_ptp_create_auxbus_device - Create PTP auxiliary bus device
+- * @pf: Board private structure
+- */
+-static __always_unused int ice_ptp_create_auxbus_device(struct ice_pf *pf)
+-{
+-	struct auxiliary_device *aux_dev;
+-	struct ice_ptp *ptp;
+-	struct device *dev;
+-	char *name;
+-	int err;
+-	u32 id;
+-
+-	ptp = &pf->ptp;
+-	id = ptp->port.port_num;
+-	dev = ice_pf_to_dev(pf);
+-
+-	aux_dev = &ptp->port.aux_dev;
+-
+-	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
+-			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
+-			      ice_get_ptp_src_clock_index(&pf->hw));
+-	if (!name)
+-		return -ENOMEM;
+-
+-	aux_dev->name = name;
+-	aux_dev->id = id;
+-	aux_dev->dev.release = ice_ptp_release_auxbus_device;
+-	aux_dev->dev.parent = dev;
+-
+-	err = auxiliary_device_init(aux_dev);
+-	if (err)
+-		goto aux_err;
+-
+-	err = auxiliary_device_add(aux_dev);
+-	if (err) {
+-		auxiliary_device_uninit(aux_dev);
+-		goto aux_err;
+-	}
+-
+-	return 0;
+-aux_err:
+-	dev_err(dev, "Failed to create PTP auxiliary bus device <%s>\n", name);
+-	devm_kfree(dev, name);
+-	return err;
+-}
+-
+-/**
+- * ice_ptp_remove_auxbus_device - Remove PTP auxiliary bus device
+- * @pf: Board private structure
+- */
+-static __always_unused void ice_ptp_remove_auxbus_device(struct ice_pf *pf)
+-{
+-	struct auxiliary_device *aux_dev = &pf->ptp.port.aux_dev;
+-
+-	auxiliary_device_delete(aux_dev);
+-	auxiliary_device_uninit(aux_dev);
+-
+-	memset(aux_dev, 0, sizeof(*aux_dev));
+-}
+-
+ /**
+  * ice_ptp_init_tx_interrupt_mode - Initialize device Tx interrupt mode
+  * @pf: Board private structure
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
+index de73762e6f27..71c09acb5558 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
+@@ -169,10 +169,8 @@ struct ice_ptp_tx {
+  * ready for PTP functionality. It is used to track the port initialization
+  * and determine when the port's PHY offset is valid.
+  *
+- * @list_member: list member structure of auxiliary device
+  * @list_node: list member structure
+  * @tx: Tx timestamp tracking for this port
+- * @aux_dev: auxiliary device associated with this port
+  * @ov_work: delayed work task for tracking when PHY offset is valid
+  * @ps_lock: mutex used to protect the overall PTP PHY start procedure
+  * @link_up: indicates whether the link is up
+@@ -180,10 +178,8 @@ struct ice_ptp_tx {
+  * @port_num: the port number this structure represents
+  */
+ struct ice_ptp_port {
+-	struct list_head list_member;
+ 	struct list_head list_node;
+ 	struct ice_ptp_tx tx;
+-	struct auxiliary_device aux_dev;
+ 	struct kthread_delayed_work ov_work;
+ 	struct mutex ps_lock; /* protects overall PTP PHY start procedure */
+ 	bool link_up;
+@@ -197,23 +193,6 @@ enum ice_ptp_tx_interrupt {
+ 	ICE_PTP_TX_INTERRUPT_ALL,
+ };
  
- #define ICE_PTP_CLOCK_INDEX_0	0x00
+-/**
+- * struct ice_ptp_port_owner - data used to handle the PTP clock owner info
+- *
+- * This structure contains data necessary for the PTP clock owner to correctly
+- * handle the timestamping feature for all attached ports.
+- *
+- * @aux_driver: the structure carring the auxiliary driver information
+- * @ports: list of porst handled by this port owner
+- * @lock: protect access to ports list
+- */
+-
+-struct ice_ptp_port_owner {
+-	struct auxiliary_driver aux_driver;
+-	struct list_head ports;
+-	struct mutex lock;
+-};
+-
+ #define GLTSYN_TGT_H_IDX_MAX		4
+ 
+ enum ice_ptp_state {
+@@ -229,7 +208,6 @@ enum ice_ptp_state {
+  * @state: current state of PTP state machine
+  * @tx_interrupt_mode: the TX interrupt mode for the PTP clock
+  * @port: data for the PHY port initialization procedure
+- * @ports_owner: data for the auxiliary driver owner
+  * @work: delayed work function for periodic tasks
+  * @cached_phc_time: a cached copy of the PHC time for timestamp extension
+  * @cached_phc_jiffies: jiffies when cached_phc_time was last updated
+@@ -253,7 +231,6 @@ struct ice_ptp {
+ 	enum ice_ptp_state state;
+ 	enum ice_ptp_tx_interrupt tx_interrupt_mode;
+ 	struct ice_ptp_port port;
+-	struct ice_ptp_port_owner ports_owner;
+ 	struct kthread_delayed_work work;
+ 	u64 cached_phc_time;
+ 	unsigned long cached_phc_jiffies;
 -- 
 2.43.0
 
