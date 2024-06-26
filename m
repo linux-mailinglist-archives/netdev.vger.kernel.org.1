@@ -1,107 +1,95 @@
-Return-Path: <netdev+bounces-107052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AA6E91985B
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 21:43:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D73E7919883
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 21:48:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44ECD284B13
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 19:43:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EA3C286643
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 19:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11EB1922E1;
-	Wed, 26 Jun 2024 19:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD28D183083;
+	Wed, 26 Jun 2024 19:47:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZH+ZJd8w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YZIcwYDn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB8C33C5
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 19:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A903F13C833
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 19:47:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719430983; cv=none; b=cyG622iJTlJfO3axLYvBg//e/+OqzDy4UmDS1Fo8zvg44Jh82pzx5W1CCvTJGjbTWTF0yvHuBAlfhOh9dQaAbU7/N/l/kY5mcpWaos29mwmETjj3CbVPnJ3WJxSSZ6+HOaiSs+yxfGI3FF4WGWKXzz4VSkrC/4unfOpznpE9BUA=
+	t=1719431272; cv=none; b=rGtPo4K6+n/CwDaCJW28D9vMRZxPqfOJ5qXPV+geEOmPpm/GCbTN5tPjCjzzhAnz6/51FzuABdtfCaQDJBq9V+EImPZvKjC6YKSOK7WuK1g5sp6Cqj9htvmWevSVFFGr+szQhV5xkFCsDeHuaw1N/n1NXgklB3qnEI03E5EqWPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719430983; c=relaxed/simple;
-	bh=P/nl1ipyrOE5lH7R9h9GlnF1puud6X3wdyGqW2EOewg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oEJvO22NfH6WZZvGkyViHUdQzdcX0nGsJjhmefncoAsqM+gWUTD4y+ViBcp2O0O9RRM2x2FfLNIghQzMZG5ujv54Is8CwF3y3d4gpkp1lOKQ2Ik5sDqB6iShVFUg3dsdtuqLSMzz7/dDwRDyAKOvH6wE2/HnVldkbqOIRUbj5RQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZH+ZJd8w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EB36C116B1;
-	Wed, 26 Jun 2024 19:43:02 +0000 (UTC)
+	s=arc-20240116; t=1719431272; c=relaxed/simple;
+	bh=MCN291EWeRARLGuhM17ahE5XoUnmbem2yrdU60EwJJI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gyo+TDbaJe+5fQI0WJUhKN/lJiObFsK63JG7TJzPZeTNlg0qLdUOvxqu0RKa3sQ/63fnsSCUDx5BlA5C8BaXdqgyd5/LjobllIhkS62Iym9zVk/Qgxv50PPpvbitBLtPdV2/Qf+P9ltAxTh39jZSVCkd2KXkKpsA+uI58umz4rY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YZIcwYDn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAC74C116B1;
+	Wed, 26 Jun 2024 19:47:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719430983;
-	bh=P/nl1ipyrOE5lH7R9h9GlnF1puud6X3wdyGqW2EOewg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZH+ZJd8wQB++hXvGdO0w6CYIG0rGIjDr8iCS+6p8F1+nJz9Mg1Ykb8g0GEYvwz+r1
-	 nwNyHL4twDmz7Ar4z6WjBkWkHOghTzXevefyNypzJOGFOcJ1WXSwmqWCDcSdEk3T7b
-	 +88xo2frLrTAGSniK0VHG31wiUAc20haYprrkfWG1f9SGusrehTtx251SKsG2/ygNN
-	 ejI7nyt/7U5c9+G4L2vacSkHjkxuYULX5VKuhWvnCTRf8SlmcR59KobbIthQxTbo+A
-	 YWKn3B60/RXPyngJHJPwGNSS6Y0TfI8RboC4d33DbM454Yba0yfADaZiTUGykyLT25
-	 0V9JVjURkc9fA==
-Date: Wed, 26 Jun 2024 12:43:01 -0700
+	s=k20201202; t=1719431272;
+	bh=MCN291EWeRARLGuhM17ahE5XoUnmbem2yrdU60EwJJI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=YZIcwYDnrpE0l6afSfuV1pJbfaCxyN51Uw2sFxJax8wha1riG9VTvKjZ39cJi51Y5
+	 EqsgARDl50QjvOCxizAsVBi47vIm3VDgyPeUmwXm/TkKzfXRFNXKvg4pLnrAMQYfJm
+	 y9BJPzEGQQP47t/IOCWIuUeD1BnfSKzBJnPscYI/wt/vyR4svTkRMp/EWS3ASdCwBv
+	 K/5RMdwYGycyYQAgH/U5jbkjjvWegee2YIXtuB4lxY4E95kGF/hk6lQLmeEUaCGGaV
+	 XcOgqiBYghqBNkCignWJm7TETsw1VFI4W7i9MCZO2b5ZaU0m8dEKVWPu2EJcEdZ1jZ
+	 Cfw5nKjrM4yJQ==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>, "linux-nvme@lists.infradead.org"
- <linux-nvme@lists.infradead.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "hch@lst.de" <hch@lst.de>, "kbusch@kernel.org"
- <kbusch@kernel.org>, "axboe@fb.com" <axboe@fb.com>, "davem@davemloft.net"
- <davem@davemloft.net>, Shai Malin <smalin@nvidia.com>,
- "malin1024@gmail.com" <malin1024@gmail.com>, Yoray Zack
- <yorayz@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Tariq Toukan
- <tariqt@nvidia.com>, Max Gurtovoy <mgurtovoy@nvidia.com>, Gal Shalom
- <galshalom@nvidia.com>, Boris Pismenny <borisp@nvidia.com>, Or Gerlitz
- <ogerlitz@nvidia.com>, Aurelien Aptel <aaptel@nvidia.com>
-Subject: Re: [PATCH v25 00/20] nvme-tcp receive offloads
-Message-ID: <20240626124301.38bfa047@kernel.org>
-In-Reply-To: <d23e80c9-1109-4c1a-b013-552986892d40@nvidia.com>
-References: <20240529160053.111531-1-aaptel@nvidia.com>
-	<20240530183906.4534c029@kernel.org>
-	<9ed2275c-7887-4ce1-9b1d-3b51e9f47174@grimberg.me>
-	<SJ1PR12MB60759C892F32A1E4F3A36CCEA5C62@SJ1PR12MB6075.namprd12.prod.outlook.com>
-	<253v81vpw4t.fsf@nvidia.com>
-	<20240626085017.553f793f@kernel.org>
-	<d23e80c9-1109-4c1a-b013-552986892d40@nvidia.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	dsahern@kernel.org,
+	christoph.paasch@uclouvain.be
+Subject: [PATCH net] tcp_metrics: validate source addr length
+Date: Wed, 26 Jun 2024 12:47:47 -0700
+Message-ID: <20240626194747.2561617-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, 26 Jun 2024 19:34:50 +0000 Chaitanya Kulkarni wrote:
-> > I'm not sure we're on the same page. The ask is to run the tests on
-> > the netdev testing branch, at 12h cadence, and generate a simple JSON
-> > file with results we can ingest into our reporting. Extra points to
-> > reporting it to KCIDB. You mention "framework that is focused on
-> > netdev", IDK what you mean. =20
->=20
-> just to clarify are you saying that you are want us to :-
->=20
-> 1. Pull the latest changes from netdev current development branch
->  =C2=A0=C2=A0 every 12 hours.
+I don't see anything checking that TCP_METRICS_ATTR_SADDR_IPV4
+is at least 4 bytes long, and the policy doesn't have an entry
+for this attribute at all (neither does it for IPv6 but v6 is
+manually validated).
 
-Small but important difference - testing branch, not development branch.
-There may be malicious code in that branch, since its not fully
-reviewed.
+Fixes: 8a59359cb80f ("tcp: metrics: New netlink attribute for src IP and dumped in netlink reply")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+In net-next we can make v6 use policy for validation, too.
+But it will conflict, so I'll send that on Thu.
+---
+CC: dsahern@kernel.org
+CC: christoph.paasch@uclouvain.be
+---
+ net/ipv4/tcp_metrics.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> 2. Run blktests on the HEAD of that branch.
+diff --git a/net/ipv4/tcp_metrics.c b/net/ipv4/tcp_metrics.c
+index e93df98de3f4..b01eb6d94413 100644
+--- a/net/ipv4/tcp_metrics.c
++++ b/net/ipv4/tcp_metrics.c
+@@ -619,6 +619,7 @@ static const struct nla_policy tcp_metrics_nl_policy[TCP_METRICS_ATTR_MAX + 1] =
+ 	[TCP_METRICS_ATTR_ADDR_IPV4]	= { .type = NLA_U32, },
+ 	[TCP_METRICS_ATTR_ADDR_IPV6]	= { .type = NLA_BINARY,
+ 					    .len = sizeof(struct in6_addr), },
++	[TCP_METRICS_ATTR_SADDR_IPV4]	= { .type = NLA_U32, },
+ 	/* Following attributes are not received for GET/DEL,
+ 	 * we keep them for reference
+ 	 */
+-- 
+2.45.2
 
-Or some subset of blktest, if the whole run takes too long.
-
-> 3. Gather those results into JASON file.
-> 4. Post it publicly accessible to you.
-
-Yes.
-
-> I didn't understand the "ingest into our reporting part", can you
-> please clarify ?
-
-You just need to publish the JSON files with results, periodically
-(publish =3D expose somewhere we can fetch from over HTTP).
-The ingestion part is on our end.
 
