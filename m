@@ -1,123 +1,142 @@
-Return-Path: <netdev+bounces-107033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31D4F918DC8
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 20:01:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69AD2918DA0
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 19:56:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2A4AB2521E
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 18:01:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 235E7283184
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 17:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE5C19046C;
-	Wed, 26 Jun 2024 18:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72120190469;
+	Wed, 26 Jun 2024 17:55:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="HP2bgXQf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fd95CG1f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D37318F2F0;
-	Wed, 26 Jun 2024 18:01:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA5D190461;
+	Wed, 26 Jun 2024 17:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719424875; cv=none; b=uUqtOOPmekskXKSBtKEbpOoQW8RmZBgkxhzfstLjPP2ba1YcdMQYyOgetHOOsXX3XJt94QK6ySj+dYguBz2zTTS+rDUfwCNiZplMmFuYGORERRKG9izluGlnRbHCA44Q9nuMNCvjOivXWz6x0DlqUxyD1oSeKupWTiLjbM0w/5w=
+	t=1719424559; cv=none; b=QslqlSdGUGFtuI7Z/W20XG6AS2WYEdzhzsTwoyYSX46B/APRpJQXP7g1Y2RXNAIRMS2K5KwJPxZiR28nvYIGHb7vGWqCvB4t7ncDkcagVvnTq5mx+oKgGdogPelduH/Pr6O5FGeayT8fevkd6UUQiHuRj7Cf+nvpKuBoeKt2BSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719424875; c=relaxed/simple;
-	bh=8nOGA/lGYq2Bgz7KD7dOJ21ukJ+JyTrXrRLfbT32HE8=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=ZesEmrz/T1lQWMyvyhAD/wucNJ1dFpUKYKwrNo5rr5N2YDAXuwOLkLPRdjd+GDXgaO5vcDiYZw6/QTjxSy95Jm6ePz85ezGGt00yGSqKWkJlULv5WzAz4XcZkSlZ30HabBNVwpe2m0dWgVN7IJgg3yuw+1BjJxJa1gOyhVDWD14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=HP2bgXQf; arc=none smtp.client-ip=193.238.174.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mg.ssi.bg (localhost [127.0.0.1])
-	by mg.ssi.bg (Proxmox) with ESMTP id CEEB4D32C;
-	Wed, 26 Jun 2024 20:54:12 +0300 (EEST)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.ssi.bg (Proxmox) with ESMTPS;
-	Wed, 26 Jun 2024 20:54:12 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id F4145900697;
-	Wed, 26 Jun 2024 20:54:07 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1719424449; bh=8nOGA/lGYq2Bgz7KD7dOJ21ukJ+JyTrXrRLfbT32HE8=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=HP2bgXQfn69q2qygNWf6w6xqBih2NOSuthDkWX885mlA9bvIvWb4IR51NUuJayz07
-	 jtGil2WRdsHSlCfgq3W1qa+V1XqukuAL5XYpNiCXTCDK7uK4HGFbHIC9r6q4suTuBQ
-	 EP0VIy5gPSYfxhfxtMD1EmWfAVW843Qa8Y5p5IBM=
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 45QHrx9D056385;
-	Wed, 26 Jun 2024 20:53:59 +0300
-Date: Wed, 26 Jun 2024 20:53:59 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Chen Hanxiao <chenhx.fnst@fujitsu.com>
-cc: Simon Horman <horms@verge.net.au>, Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org
-Subject: Re: [PATCH net-next] ipvs: properly dereference pe in
- ip_vs_add_service
-In-Reply-To: <20240626081159.1405-1-chenhx.fnst@fujitsu.com>
-Message-ID: <721791d7-4070-a680-2dff-f56d10467494@ssi.bg>
-References: <20240626081159.1405-1-chenhx.fnst@fujitsu.com>
+	s=arc-20240116; t=1719424559; c=relaxed/simple;
+	bh=/nn9cXzOLqdpmvpMkRXeiT4dOqNiKFz+DhAQVxCofeA=;
+	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
+	 Message-Id:Subject; b=fJvZC4R0TZk0OGAky/jN+ljabcNowOcM7hjvexRr+qx98fmc9+Gaoc6s0qVySmLmREGpauO2TFONTYJuxq6S0FkA+neqFWTtZ7UOtxfBzIItmkYFh89EPZGSPzwEzs27J2pNlxAzfPdOHrZMzH8tVfJLG7wlhLxSYkjuRwOZoyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fd95CG1f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98507C116B1;
+	Wed, 26 Jun 2024 17:55:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719424558;
+	bh=/nn9cXzOLqdpmvpMkRXeiT4dOqNiKFz+DhAQVxCofeA=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=fd95CG1fxVYNa+qAXFNsD6e8Nr9YO9Tqe/f5xGi4hvJIBewDKCPFbpZzID5W4p0qQ
+	 vgT3iR2c16aU7u+6e9p7eA9tUj9T3/osuDUTewfXw8BQr8Ci5NdT6baVbzknnKNRKk
+	 4xsKCHWxcF01jIw9NIJ70jSne1fdXHIsEiNHRnOLdfABvrE2At9FcrxAu/hLzs8Zr+
+	 uimtaFqGIcVFzwKTBuUW6uBZr1fdHvotEtV2/xf6zlgrDgS7kyRPgtKrlc99hjz05N
+	 6yM9dQZRtnRDoIZKzVFPZX8fJdPY/9znKVkOj2/QpvJzdnWVM4aQyWLPlcIau9XRtw
+	 V89A5qUWYfHHA==
+Date: Wed, 26 Jun 2024 11:55:57 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: imx@lists.linux.dev, pabeni@redhat.com, krzk@kernel.org, 
+ krzk+dt@kernel.org, kuba@kernel.org, edumazet@google.com, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, conor+dt@kernel.org, 
+ devicetree@vger.kernel.org, davem@davemloft.net
+In-Reply-To: <20240626162307.1748759-1-Frank.Li@nxp.com>
+References: <20240626162307.1748759-1-Frank.Li@nxp.com>
+Message-Id: <171942455738.3889614.10016713539480187733.robh@kernel.org>
+Subject: Re: [PATCH v2 1/1] dt-bindings: net: convert enetc to yaml
 
 
-	Hello,
-
-On Wed, 26 Jun 2024, Chen Hanxiao wrote:
-
-> Use rcu_dereference_protected to resolve sparse warning:
+On Wed, 26 Jun 2024 12:23:07 -0400, Frank Li wrote:
+> Convert enetc device binding file to yaml. Split to 3 yaml files,
+> 'fsl,enetc.yaml', 'fsl,enetc-mdio.yaml', 'fsl,enetc-ierb.yaml'.
 > 
->   net/netfilter/ipvs/ip_vs_ctl.c:1471:27: warning: dereference of noderef expression
+> Additional Changes:
+> - Add pci<vendor id>,<production id> in compatible string.
+> - Ref to common ethernet-controller.yaml and mdio.yaml.
+> - Remove fixed-link part.
 > 
-> Fixes: 39b972231536 ("ipvs: handle connections started by real-servers")
-> Signed-off-by: Chen Hanxiao <chenhx.fnst@fujitsu.com>
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
 > ---
->  net/netfilter/ipvs/ip_vs_ctl.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+> Change from v1 to v2
+> - renamee file as fsl,enetc-mdio.yaml, fsl,enetc-ierb.yaml, fsl,enetc.yaml
+> - example include pcie node
+> ---
+>  .../bindings/net/fsl,enetc-ierb.yaml          |  35 ++++++
+>  .../bindings/net/fsl,enetc-mdio.yaml          |  53 ++++++++
+>  .../devicetree/bindings/net/fsl,enetc.yaml    |  50 ++++++++
+>  .../devicetree/bindings/net/fsl-enetc.txt     | 119 ------------------
+>  4 files changed, 138 insertions(+), 119 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/fsl,enetc-ierb.yaml
+>  create mode 100644 Documentation/devicetree/bindings/net/fsl,enetc-mdio.yaml
+>  create mode 100644 Documentation/devicetree/bindings/net/fsl,enetc.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/net/fsl-enetc.txt
 > 
-> diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-> index b6d0dcf3a5c3..925e2143ba15 100644
-> --- a/net/netfilter/ipvs/ip_vs_ctl.c
-> +++ b/net/netfilter/ipvs/ip_vs_ctl.c
-> @@ -1369,7 +1369,7 @@ ip_vs_add_service(struct netns_ipvs *ipvs, struct ip_vs_service_user_kern *u,
->  {
->  	int ret = 0;
->  	struct ip_vs_scheduler *sched = NULL;
-> -	struct ip_vs_pe *pe = NULL;
-> +	struct ip_vs_pe *pe = NULL, *tmp_pe = NULL;
 
-	NULL init is not needed
+My bot found errors running 'make dt_binding_check' on your patch:
 
->  	struct ip_vs_service *svc = NULL;
->  	int ret_hooks = -1;
->  
-> @@ -1468,7 +1468,8 @@ ip_vs_add_service(struct netns_ipvs *ipvs, struct ip_vs_service_user_kern *u,
->  		atomic_inc(&ipvs->ftpsvc_counter);
->  	else if (svc->port == 0)
->  		atomic_inc(&ipvs->nullsvc_counter);
-> -	if (svc->pe && svc->pe->conn_out)
-> +	tmp_pe = rcu_dereference_protected(svc->pe, 1);
-> +	if (tmp_pe && tmp_pe->conn_out)
->  		atomic_inc(&ipvs->conn_out_counter);
+yamllint warnings/errors:
 
-	Alternative option would be to use 'pe' above and to move
-the RCU_INIT_POINTER and pe = NULL with their comment here.
-It is up to you to decide which option is better...
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,enetc-mdio.example.dtb: pcie@1f0000000: 'ranges' is a required property
+	from schema $id: http://devicetree.org/schemas/pci/host-generic-pci.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,enetc-mdio.example.dtb: pcie@1f0000000: 'device_type' is a required property
+	from schema $id: http://devicetree.org/schemas/pci/host-generic-pci.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,enetc-mdio.example.dtb: pcie@1f0000000: 'ranges' is a required property
+	from schema $id: http://devicetree.org/schemas/pci/host-generic-pci.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,enetc-mdio.example.dtb: pcie@1f0000000: reg: [[1, 4026531840], [0, 1048576]] is too long
+	from schema $id: http://devicetree.org/schemas/pci/host-generic-pci.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,enetc-mdio.example.dtb: pcie@1f0000000: Unevaluated properties are not allowed ('#address-cells', '#size-cells', 'mdio@0,3' were unexpected)
+	from schema $id: http://devicetree.org/schemas/pci/host-generic-pci.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,enetc-mdio.example.dtb: pcie@1f0000000: 'device_type' is a required property
+	from schema $id: http://devicetree.org/schemas/pci/pci-bus-common.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,enetc-mdio.example.dtb: pcie@1f0000000: 'ranges' is a required property
+	from schema $id: http://devicetree.org/schemas/pci/pci-bus-common.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,enetc.example.dtb: pcie@1f0000000: 'ranges' is a required property
+	from schema $id: http://devicetree.org/schemas/pci/host-generic-pci.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,enetc.example.dtb: pcie@1f0000000: 'device_type' is a required property
+	from schema $id: http://devicetree.org/schemas/pci/host-generic-pci.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,enetc.example.dtb: pcie@1f0000000: 'ranges' is a required property
+	from schema $id: http://devicetree.org/schemas/pci/host-generic-pci.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,enetc.example.dtb: pcie@1f0000000: reg: [[1, 4026531840], [0, 1048576]] is too long
+	from schema $id: http://devicetree.org/schemas/pci/host-generic-pci.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,enetc.example.dtb: pcie@1f0000000: Unevaluated properties are not allowed ('#address-cells', '#size-cells', 'ethernet@0,0' were unexpected)
+	from schema $id: http://devicetree.org/schemas/pci/host-generic-pci.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,enetc.example.dtb: pcie@1f0000000: 'device_type' is a required property
+	from schema $id: http://devicetree.org/schemas/pci/pci-bus-common.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,enetc.example.dtb: pcie@1f0000000: 'ranges' is a required property
+	from schema $id: http://devicetree.org/schemas/pci/pci-bus-common.yaml#
 
-Regards
+doc reference errors (make refcheckdocs):
 
---
-Julian Anastasov <ja@ssi.bg>
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240626162307.1748759-1-Frank.Li@nxp.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
 
