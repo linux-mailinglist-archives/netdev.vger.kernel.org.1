@@ -1,136 +1,97 @@
-Return-Path: <netdev+bounces-106943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 843369183B8
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:14:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E5279183BB
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:16:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B88F21C21449
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:14:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6B3A28257D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:16:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B8B1849DB;
-	Wed, 26 Jun 2024 14:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1FEE1684BE;
+	Wed, 26 Jun 2024 14:16:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BJFmmQyQ"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="coJ/Nk5R"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2047918411D;
-	Wed, 26 Jun 2024 14:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9F28495;
+	Wed, 26 Jun 2024 14:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719411243; cv=none; b=DpEdOrkSH5qzjuIx0Zpo01yhOUbOS0Wu6QoW1RcY3XdKl5bUYssDai6v6VLkyZec+9TdA2S438zv9kMbzhTBIziiBqD0YmM24XxTVbXrD4giTGywbkF4VRRv0D9JpvkU9vrJpbz25xzsXT7R3/otODC66/nryMEaJXAC9ixvSdE=
+	t=1719411401; cv=none; b=uh+wu/gMA6i0tgj9isvXdnQvAjNoQeta/4Vig74zr8bvU+fmG+uIOJcTEKqcm6uhiMZFfZoWJFEqj3FpfGQTXRxIdUwFWz7qIAIyApL3Ws0VEPWwJAuOH3dHvhJFULpDzuXe1xhy1ug74pk1eOEBh1VpqQOiREj6Fw+0cPo+UgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719411243; c=relaxed/simple;
-	bh=Jkbyb4fhO6hOpUAa+l/jASV89ZqxVCIKJ/L+aHwLj6s=;
+	s=arc-20240116; t=1719411401; c=relaxed/simple;
+	bh=BRs7yKKIEJjHjfCSav5qFX0qIBT++tHJPPAaw9tc/LI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eE5QWTpZ5UxuSx8EYKUV5FOCauTmlJ+dCauDp3AAk0jvpOyHdT0iAJ2mMsoX/ZqotdNP+Jnn+wJsWWSuNkPD1JVgDYgOkMgLr8yyzhBNB8e2evaYv4vZEASF3hkYA9rfJod19ykFaevmKw8GcyMCe76y8cHfMAGkFNDQpF40bxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BJFmmQyQ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=e/r3KxX+Z2Dmu1E71CISshUp48TvjeiI0ZOqnh1fVEk=; b=BJFmmQyQeuEmVErk5/QtUZe7Yh
-	VUEC0/D9H3JVtFJBThg+eXVMbbm523IfUDOHxbNi4TiM0TlV7a3x+NQOCeXerCOsDd7zLoPswX/Qn
-	atH0p7j8kL1fyzvhOSU3E9daj1yDFmc/MUn4ICdytOcinXApdpsLuiY01h94b1mItE6s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sMTPH-0012mx-QE; Wed, 26 Jun 2024 16:13:55 +0200
-Date: Wed, 26 Jun 2024 16:13:55 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Omer Shpigelman <oshpigelman@habana.ai>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"ogabbay@kernel.org" <ogabbay@kernel.org>,
-	Zvika Yehudai <zyehudai@habana.ai>
-Subject: Re: [PATCH 09/15] net: hbl_en: add habanalabs Ethernet driver
-Message-ID: <1baf52ff-d3ce-4d3f-9655-46a1a919119b@lunn.ch>
-References: <20240613082208.1439968-1-oshpigelman@habana.ai>
- <20240613082208.1439968-10-oshpigelman@habana.ai>
- <10902044-fb02-4328-bf88-0b386ee51c78@lunn.ch>
- <bddb69c3-511b-4385-a67d-903e910a8b51@habana.ai>
- <621d4891-36d7-48c6-bdd8-2f3ca06a23f6@lunn.ch>
- <45e35940-c8fc-4f6c-8429-e6681a48b889@habana.ai>
- <2c66dc75-b321-4980-955f-7fdcd902b578@lunn.ch>
- <8a534044-ab84-4722-b4e9-4390c2cc6471@habana.ai>
- <f45a71f9-640e-473a-9b80-90a50b087474@lunn.ch>
- <96677540-c288-43f6-9a47-1db79a0880eb@habana.ai>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ErzEGAw8O6Bdo8/oX9Sdietta75/KMElt9hiHy3sJxJSU+EV4SUwKKUld7Uj3CAWb0B24cWxtB7df5g6gI1WVzEME8CY3e1fSjB4fHL+70txJlOi3sAqeLEreZs81km45sIRyYgs5GPi5Tdq8xTNxiVb2OW8E6K0XPf8k0DnTBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=coJ/Nk5R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D34DFC116B1;
+	Wed, 26 Jun 2024 14:16:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1719411401;
+	bh=BRs7yKKIEJjHjfCSav5qFX0qIBT++tHJPPAaw9tc/LI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=coJ/Nk5RY2qbkjfAXZwmuX9TK89cjfAqNFDK4rpjgud7kc+brMZC8LwCyJEoBDfQU
+	 idKQ6ohoAlMZAs1bLZXU9VlyZ3wk/3aIsNgI+gM+2Y+0Wbr9azLEml1W3MZL+wAjST
+	 U1hHBszv9S5K8v8SQMbJAWl5devzH6+Tg8qQyT4g=
+Date: Wed, 26 Jun 2024 10:16:36 -0400
+From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Carlos Bilbao <carlos.bilbao.osdev@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, workflows@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, ksummit@lists.linux.dev
+Subject: Re: [PATCH 2/2] Documentation: best practices for using Link trailers
+Message-ID: <20240626-olivine-spaniel-of-gallantry-9c904a@meerkat>
+References: <20240618-docs-patch-msgid-link-v1-0-30555f3f5ad4@linuxfoundation.org>
+ <20240618-docs-patch-msgid-link-v1-2-30555f3f5ad4@linuxfoundation.org>
+ <20240625172727.3dd2ad67@rorschach.local.home>
+ <CAMuHMdXHa52RBjzA4eF4ERNuJjRHyq=FfyPz-yOsjOA7ZQfouQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <96677540-c288-43f6-9a47-1db79a0880eb@habana.ai>
+In-Reply-To: <CAMuHMdXHa52RBjzA4eF4ERNuJjRHyq=FfyPz-yOsjOA7ZQfouQ@mail.gmail.com>
 
-> Here is the output:
-> $ ethtool eth0
-> Settings for eth0:
-> 	Supported ports: [ FIBRE	 Backplane ]
-> 	Supported link modes:   100000baseKR4/Full
-> 	                        100000baseSR4/Full
-> 	                        100000baseCR4/Full
-> 	                        100000baseLR4_ER4/Full
-> 	Supported pause frame use: Symmetric
-> 	Supports auto-negotiation: Yes
-> 	Supported FEC modes: Not reported
-> 	Advertised link modes:  100000baseKR4/Full
-> 	                        100000baseSR4/Full
-> 	                        100000baseCR4/Full
-> 	                        100000baseLR4_ER4/Full
-> 	Advertised pause frame use: Symmetric
-> 	Advertised auto-negotiation: Yes
-> 	Advertised FEC modes: Not reported
-> 	Link partner advertised link modes:  Not reported
-> 	Link partner advertised pause frame use: No
-> 	Link partner advertised auto-negotiation: Yes
-> 	Link partner advertised FEC modes: Not reported
-> 	Speed: 100000Mb/s
-> 	Duplex: Full
-> 	Auto-negotiation: on
+On Wed, Jun 26, 2024 at 10:12:35AM GMT, Geert Uytterhoeven wrote:
+> > > +     Link: https://patch.msgid.link/patch-source-msgid@here
+> >
+> > Hmm, I mentioned this in the other thread, but I also like the fact
+> > that my automated script uses the list that it was Cc'd to. That is, if
+> > it Cc'd linux-trace-kernel, if not, if it Cc'd linux-trace-devel, it
+> > adds that, otherwise it uses lkml. Now, I could just make the lkml use
+> > the patch-source-msgid instead.
+> >
+> > This does give me some information about what the focus of the patch
+> > was. Hmm, maybe I could just make it:
+> >
+> >   Link: https://patch.msgid.link/patch-source-msgid@here # linux-trace-devel
+> >
+> > Would anyone have an issue with that?
 > 
-> There are few points to mention:
-> 1. We don't allow to modify the advertised link modes so by definition the
->    advertised ones are a copy of the supported ones.
+> Or, just like with lore links:
+> 
+>     https://patch.msgid.link/linux-trace-devel/patch-source-msgid@here
 
-So there is no way to ask it use to use 100000baseCR4/Full, for
-example? You would normally change the advertised modes to just that
-one link mode, and then it has no choice. It either uses
-100000baseCR4/Full, or it does not establish a link.
+I don't recommend this because it is not always a reliable mechanism to just
+take the local part of the list address and assume that it will match the list
+directory on lore.kernel.org. We've had lists that moved around or got
+renamed, or disambiguated for clarity.
 
-Also, my experience with slower modules is that one supporting
-2500BaseX can also support 1000BaseX. However, there is no auto-neg
-defined for speeds, just pause. So if the link peer only supports
-1000BaseX, you don't get link. What you typically see is:
+Overall, we're generally moving away from "where was this sent?" having any
+importance -- we already support lei queries and should soon have bridges
+exposing patches submitted via forge interfaces. If you want to indicate the
+focus of the patch, then going by the list to which it was sent is going to
+increasingly lose importance.
 
-$ ethtool eth0
-Settings for eth0:
- 	Supported ports: [ FIBRE	 Backplane ]
- 	Supported link modes:   1000baseX
- 	                        2500baseX
- 	Supported pause frame use: Symmetric
- 	Supports auto-negotiation: Yes
- 	Supported FEC modes: Not reported
- 	Advertised link modes:  2500baseX
- 	Advertised pause frame use: Symmetric
-
-and then you use ethtool to change advertising to 1000baseX and then
-you get link. Can these modules support slower speeds?
-
-> 2. Reading the peer advertised link modes is not supported so we don't
->    report them (similarly to some other vendors).
-
-Not supported by your firmware? Or not supported by the modules?
-
-    Andrew
+-K
 
