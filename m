@@ -1,145 +1,110 @@
-Return-Path: <netdev+bounces-106975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCF8691850D
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:58:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55133918568
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 17:11:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A6FF1F22EDF
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:58:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5347AB2B25A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0E7D186E2A;
-	Wed, 26 Jun 2024 14:58:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FBC7187575;
+	Wed, 26 Jun 2024 15:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hqVCury/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kE1RajlH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0947186285
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 14:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA50018756E;
+	Wed, 26 Jun 2024 15:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719413913; cv=none; b=kz5O/jaoj4MWP9IXkv+OWja0u2jZkFiKT7ufezpTxXJaKvUtdSnels7D4WXNQBI4JpRoILpY3yut1VTXIOCMa1d7EKiTN+7jIZZc2Z63tcPCXpznxLHLE/5dJljWSwZxyZJZdQlC8LzuF713nhI8toLsS9IW3qsjnE/tYXH2FLk=
+	t=1719414031; cv=none; b=S8H143sgeBWpAjlv7CIE6LMb4tRbTM1JPU53E2/RyDOmhjTqafw2Z9y0425sUE3+Fo+DSWO3QrgeYerx36LPotNTxyEUU9qpr+A7irq/x2IZ3z/uoiFZSSdXvENF+1ECII7VuHKOZyGF2+pLyy6a1AaHucoy0eYGfq8wXoQq1Dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719413913; c=relaxed/simple;
-	bh=I0D6e6Fg9mEuPCvMsSlvOuOX5/XCzgzm4K0nMEj8N7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MCJ58LiCkgkbp0EdD3ut8Mov4/jL5poGfFopNfcRVsHaiSovtWeM1VIEkDpQcDIw+pzEWNayWOxAM/Bw3b0pwRtUjbpFB1Exz9EBv/QZZVpYpVnZ0Txr5whSXg0S6V7M+dR9o6PXZMfa37IRT9tk6l9hwnrlhC/kQ7VNU64KXgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hqVCury/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719413910;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Aya9QIUU1dceOpRSHwLiYWRs5fBhpIvpFHsqd9ObPGw=;
-	b=hqVCury/LQW1aL/8KmtaUXBsFDVQnQ8vlQQhQzgF8hcEE2clW4InEuFa5NsEvwaZc+FcNq
-	FPpJ1VXIc+0IMqMBeXX1tfgyFMnT6E3RAJZRjv1Kr5RNCQZD1R0ydvnENKypYMWgb7HE+n
-	w75JcN7Okr4H9IIXB4U0ndLI4OBZ8DU=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-571-2ySlNk9NPBO6zg8vxDP7TQ-1; Wed, 26 Jun 2024 10:58:28 -0400
-X-MC-Unique: 2ySlNk9NPBO6zg8vxDP7TQ-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6ab80cb23beso97891536d6.2
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 07:58:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719413908; x=1720018708;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Aya9QIUU1dceOpRSHwLiYWRs5fBhpIvpFHsqd9ObPGw=;
-        b=sV3BkxJ24osWOynhlTcPHI+br9B8f4inHnYEuyvLnwqTuYw17lvffXsuZrlEUVi/Eq
-         KLhx2/J/llrfhODytEDbCS4WizDmfuSOvs7gz6d7xmoYFs4zfFrd4NiUw5Ka94GkRDPU
-         caZUJPV7762Mo/i0ZiEtcn6txumFkG9GTBGPJIKquvbiFykoAonGmKgV79MQUSr/Cpua
-         /3cvSBF7pTZmyMH0R4Kcpausqb69R82Yx00msm2tNkNZSnhF6ARmFteQFm73rgebBvol
-         Dm27eVjwOvim+/yrKXrEQWrVUbxbdA3FJpp68Bz48LIuJa1WalDfxOhUACDgSk2MaWD5
-         j6NQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUN0tw/pnX3R2Fmwv87MHDWkEIwW/EIGuIUHwEXsmsYOdG8/LJb941xz9somfexJY77MSZvKxEYi1CfgaoYPYTlCAtxGzso
-X-Gm-Message-State: AOJu0YyT9soTX0kc2FU8GSn1v5+IppuTnJ49RRaomGo28pkt7QFcsFLF
-	sGsN+yGX44XMRD4zeuRZrFYlN3AD47Nl8w2h0okAYTO1986nYPCUgoH74z8z5wgVuykbJQUL1TZ
-	ZDw1mx+2umqq/4D4fJVMLiWeQzioIB0my15hrnNWWl32hA70PG4/gLQ==
-X-Received: by 2002:ad4:424e:0:b0:6b4:fe0c:1a92 with SMTP id 6a1803df08f44-6b53bff41abmr121545736d6.43.1719413908142;
-        Wed, 26 Jun 2024 07:58:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6nPLCGa2C50EKUtysGXYh0LMEa5egqmh4lDlG99IlgJl3jje0UqDxnnZntsdaxpPxTw2dxA==
-X-Received: by 2002:ad4:424e:0:b0:6b4:fe0c:1a92 with SMTP id 6a1803df08f44-6b53bff41abmr121545616d6.43.1719413907762;
-        Wed, 26 Jun 2024 07:58:27 -0700 (PDT)
-Received: from x1gen2nano ([2600:1700:1ff0:d0e0::f])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b531673e6esm42461056d6.85.2024.06.26.07.58.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 07:58:27 -0700 (PDT)
-Date: Wed, 26 Jun 2024 09:58:24 -0500
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>, kernel@quicinc.com, 
-	Andrew Lunn <andrew@lunn.ch>, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] net: stmmac: Bring down the clocks to lower
- frequencies when mac link goes down
-Message-ID: <qf4zl7qupkzbrb6ik4v4nkjct7tsh34cmoufy23zozcht5gch6@kvymsd2ue6cd>
-References: <20240625-icc_bw_voting_from_ethqos-v2-0-eaa7cf9060f0@quicinc.com>
- <20240625-icc_bw_voting_from_ethqos-v2-3-eaa7cf9060f0@quicinc.com>
+	s=arc-20240116; t=1719414031; c=relaxed/simple;
+	bh=9WRrbIy9JlyjG2ZzkBX/7adK5Uag7KwzEA5ZPUTJGpQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FU2Vd4FFs4BtIkNGOArsSbJXx9cl8ZQq3omoE3tY6mR7IZGQVjSDLgAEMQwW0aWp1rUrLcBaZJs/zg+cXC1llsW43b7L5CBOZeRL2X0/483hZyFr0r/nXUkH03I4pUKpXFe5P4c1sDvZQM7GLa6inVw4W+ZGDv/YGZF+2PTbI/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kE1RajlH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7DDF8C32782;
+	Wed, 26 Jun 2024 15:00:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719414030;
+	bh=9WRrbIy9JlyjG2ZzkBX/7adK5Uag7KwzEA5ZPUTJGpQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kE1RajlHjN7Z6iNQmDboi0vOTYhBVkQ83DNrJdbjAciaJp3KldgEdJdFNFDni2oib
+	 KyrJlutyzJIRv/p6Xp9IWTj12lPg+wcGwYR3CiV1BOjejIvZwiuP5UM+pbthVR8oiI
+	 9//CJQfCW5TLHWINjM+MThNuWQnyEgWkkd6aWUc7R8JmSoe6Yvmgu5RGvYwWDjLOhN
+	 4XdNLpsk+tuBtjr7IT793rY8LeSljQiOtnZdhlO/nIVhBZAhqXa2HLgWQqO7GxT20C
+	 GOgAuz0Fd0c0Ynbn4Cq35aE8FuF/hWp5r3cr+4drCil/SAzKYu3ncqduFyhbr/7c2g
+	 j9G4y0JvWA6XQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6CFD8DE8DF4;
+	Wed, 26 Jun 2024 15:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240625-icc_bw_voting_from_ethqos-v2-3-eaa7cf9060f0@quicinc.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/1] net: usb: qmi_wwan: add Telit FN912 compositions
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171941403044.22170.12755733092861289820.git-patchwork-notify@kernel.org>
+Date: Wed, 26 Jun 2024 15:00:30 +0000
+References: <20240625102236.69539-1-dnlplm@gmail.com>
+In-Reply-To: <20240625102236.69539-1-dnlplm@gmail.com>
+To: Daniele Palmas <dnlplm@gmail.com>
+Cc: bjorn@mork.no, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, linux-usb@vger.kernel.org
 
-On Tue, Jun 25, 2024 at 04:49:30PM GMT, Sagar Cheluvegowda wrote:
-> When mac link goes down we don't need to mainitain the clocks to operate
-> at higher frequencies, as an optimized solution to save power when
-> the link goes down we are trying to bring down the clocks to the
-> frequencies corresponding to the lowest speed possible.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 25 Jun 2024 12:22:36 +0200 you wrote:
+> Add the following Telit FN912 compositions:
 > 
-> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+> 0x3000: rmnet + tty (AT/NMEA) + tty (AT) + tty (diag)
+> T:  Bus=03 Lev=01 Prnt=03 Port=07 Cnt=01 Dev#=  8 Spd=480  MxCh= 0
+> D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+> P:  Vendor=1bc7 ProdID=3000 Rev=05.15
+> S:  Manufacturer=Telit Cinterion
+> S:  Product=FN912
+> S:  SerialNumber=92c4c4d8
+> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=500mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+> E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+> I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=60 Driver=option
+> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+> I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+> E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=86(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+> I:  If#= 3 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+> E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index ec7c61ee44d4..f0166f0bc25f 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -996,6 +996,9 @@ static void stmmac_mac_link_down(struct phylink_config *config,
->  {
->  	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
->  
-> +	if (priv->plat->fix_mac_speed)
-> +		priv->plat->fix_mac_speed(priv->plat->bsp_priv, SPEED_10, mode);
-> +
->  	stmmac_mac_set(priv, priv->ioaddr, false);
->  	priv->eee_active = false;
->  	priv->tx_lpi_enabled = false;
-> @@ -1004,6 +1007,11 @@ static void stmmac_mac_link_down(struct phylink_config *config,
->  
->  	if (priv->dma_cap.fpesel)
->  		stmmac_fpe_link_state_handle(priv, false);
-> +
-> +	stmmac_set_icc_bw(priv, SPEED_10);
-> +
-> +	if (priv->plat->fix_mac_speed)
-> +		priv->plat->fix_mac_speed(priv->plat->bsp_priv, SPEED_10, mode);
+> [...]
 
+Here is the summary with links:
+  - [net,1/1] net: usb: qmi_wwan: add Telit FN912 compositions
+    https://git.kernel.org/netdev/net/c/77453e2b015b
 
-I think you're doing this at the beginning and end of
-stmmac_mac_link_down(), is that intentional?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I'm still curious if any of the netdev folks have any opinion on scaling
-things down like this on link down.
 
 
