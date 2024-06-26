@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-106781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00E159179DA
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 09:38:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1753F9179E5
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 09:40:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB284281296
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 07:38:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C8F1B2470E
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 07:39:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 597BA15AD90;
-	Wed, 26 Jun 2024 07:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C0A15B968;
+	Wed, 26 Jun 2024 07:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rZwfq4xZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nBXdfdV+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6861FBB;
-	Wed, 26 Jun 2024 07:38:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DD215B0FC;
+	Wed, 26 Jun 2024 07:39:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719387513; cv=none; b=rDw6KECsMcbB6+geau8KGHR4qgnXN2dTQZBCO5OJOCNqF6P76yfbE45s/9n5qHU2dq2az1ww78gijtYyBvtxa+rUozurfGQwZ9p+Y0fSYUNIHiD+b+eWjnW0UIKoonhW7hdMWOMf4HIWJwPzeqJByR7wbjGIwVP0g7UA6M4Z4LQ=
+	t=1719387591; cv=none; b=oY9sJce5Bh1NvXpVRyHaQvfb+GmwwWJa2o2vpV4y8wYi554b6pHdVLTQEy4dN3Wr9RgLqaGiRUqQfQGWEkFilOp+ORpCuuvwKbLgV4HGPAO5E7jX698jE89CJLSQavaYX3sNgnc+1sbU5F7nb8wXk/gu/uNY+yiolpYkWvL5rb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719387513; c=relaxed/simple;
-	bh=JNBOnj4uAS3UltBRLVJm4v/SvBP7W6Kd+PdEmIgMzTg=;
+	s=arc-20240116; t=1719387591; c=relaxed/simple;
+	bh=iAg2eaZvvzocnXsbLcE9/bhy7AJch+m0PDLw8JxMHIk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SvNGIlvM1gGVfLiUwfoLzVr/anfWKkG+6E7WFY9N4kX3mIYNoopH5cEvAjp2ylIsjcU+aDSqE2Yn6bawY/AV5XuTaQ4WqyHgrwCV4l4+042Ta2ceeKSVMU2sacslJ0BEGia8182hdu+WxhR7iTll8g8sOfBOD2105fEvm9YQUFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rZwfq4xZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28679C2BD10;
-	Wed, 26 Jun 2024 07:38:24 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=nW7Tov4cGNhyGT/AmcyBOx0loR9FEmB5lIJ7D4c61ubVnICjj5ss20ChiSb1ZUTznO4iRtdMbsmnLiPcPHzp1IURDOEeEr8PLlJp5k7tbkpXDURL/GfRaRu99I0ziTdpzFblIZ0bMx1NgC11rllgIUxRoWVufZa/3e/i0+Dw5e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nBXdfdV+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A6C7C2BD10;
+	Wed, 26 Jun 2024 07:39:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719387512;
-	bh=JNBOnj4uAS3UltBRLVJm4v/SvBP7W6Kd+PdEmIgMzTg=;
+	s=k20201202; t=1719387590;
+	bh=iAg2eaZvvzocnXsbLcE9/bhy7AJch+m0PDLw8JxMHIk=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rZwfq4xZKu/euAceNj9yiiH+cbZ366dRCK2LSpBeZllYSzwZRt+8CukhY+AswUh19
-	 2648grrAetJiizJtEN0lOtOSxYrgq90jufJJFXCzR4/c+xQC74FAd6iMSoC+xtVKij
-	 rnMZn4ckTsFkhHg9nuHu1vUDEs0NVPRzMbuf89l2JoJSAm0C8M78Yid41gTUhXvysV
-	 e9eCaTvwGutiExrnCHHJyEZq6f7+2RqPH0+ef4KdB2l6nqREdt6uDt6s05h8Yo3SdT
-	 y/191RIzQQNOv8erYKP/TcycjVQjUji0YC7Jr55hz0zXnzF3pNDo38ISYxaF2OnzmP
-	 xAGxCF0tddlWw==
-Message-ID: <13e294dd-27e9-4464-b9ed-2b319e757849@kernel.org>
-Date: Wed, 26 Jun 2024 09:38:22 +0200
+	b=nBXdfdV+hmFQp/rqxLLNj6/26Pf7In7EUmeAPFPfNMbf8ocf6HXZ4EW/mAesjSXp/
+	 YceLIJYlkHwYqoeCTGLrl2iCmpZjKi4Lmj2uj3X1IiZf+8o+PyMkU/cmIyNfA4MTxI
+	 LzR5mrOehIBLs5dZYlh1XGECDxN9Mq32iLjZ8z/FcVMUAz+MtloIFUK+1jHw0o0uD8
+	 /bNvk07MOyenavU07Plc2yvt3noWwXp8+cGm9cH5k4zZeVDx2ycFFgaIjuQ03pHiFi
+	 uiweIO1+s5vwnXXhuxymoJidnZvArq9GUgjzyew2vKRFoEALJoi5MrAMXH5izFzN1C
+	 PGrXygjLWz1wA==
+Message-ID: <452df1d7-434d-4dda-87b8-e5eb4573c651@kernel.org>
+Date: Wed, 26 Jun 2024 09:39:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,24 +50,25 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] dt-bindings: net: dsa: mediatek,mt7530: Minor wording
- fixes
-To: Conor Dooley <conor@kernel.org>,
- Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, "David S. Miller" <davem@davemloft.net>,
+Subject: Re: [PATCH v2 1/3] dt-bindings: net: qcom: ethernet: Add interconnect
+ properties
+To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
+ Vinod Koul <vkoul@kernel.org>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
- Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>
-References: <20240624211858.1990601-1-chris.packham@alliedtelesis.co.nz>
- <20240625-battle-easiness-7ac3e81c2d6a@spud>
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc: kernel@quicinc.com, Andrew Halaney <ahalaney@redhat.com>,
+ Andrew Lunn <andrew@lunn.ch>, linux-arm-msm@vger.kernel.org,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org
+References: <20240625-icc_bw_voting_from_ethqos-v2-0-eaa7cf9060f0@quicinc.com>
+ <20240625-icc_bw_voting_from_ethqos-v2-1-eaa7cf9060f0@quicinc.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -113,37 +114,19 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240625-battle-easiness-7ac3e81c2d6a@spud>
+In-Reply-To: <20240625-icc_bw_voting_from_ethqos-v2-1-eaa7cf9060f0@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 25/06/2024 18:00, Conor Dooley wrote:
-> On Tue, Jun 25, 2024 at 09:18:57AM +1200, Chris Packham wrote:
->> Update the mt7530 binding with some minor updates that make the document
->> easier to read.
->>
->> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
->> ---
->>
->> Notes:
->>     I was referring to this dt binding and found a couple of places where
->>     the wording could be improved. I'm not exactly a techical writer but
->>     hopefully I've made things a bit better.
->>     
->>     Changes in v2:
->>     - Update title, this is not just fixing grammar
->>     - Add missing The instead of changing has to have
->>
+On 26/06/2024 01:49, Sagar Cheluvegowda wrote:
+> Add documentation for the interconnect and interconnect-names
+> properties required when voting for AHB and AXI buses.
 > 
-> I don't really want to ack this, a 4th ack for some wording that has
-> no impact on the binding itself just seems so utterly silly to me...
-> Instead I've spent more time writing how silly I think it is than
-> hitting the ack macro would take :)
+> Suggested-by: Andrew Halaney <ahalaney@redhat.com>
+> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+> ---
 
-But look how many reviews/acks it got :). If you acked this, the patch
-would have like 4 tags!
-
-If only complex patches get so much attention... :)
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
