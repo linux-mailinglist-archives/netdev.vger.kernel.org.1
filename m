@@ -1,100 +1,89 @@
-Return-Path: <netdev+bounces-106992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4059991863B
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 17:50:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F270B9186FE
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 18:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE57C1F21E87
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:50:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE44CB2A5FF
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:08:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB5B186E38;
-	Wed, 26 Jun 2024 15:50:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NGKZdkB9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE6D5190076;
+	Wed, 26 Jun 2024 16:04:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698961836DD
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 15:50:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB0618EFCF;
+	Wed, 26 Jun 2024 16:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719417019; cv=none; b=k8IrTIQnsWtWwdzpRg26kXnKRnugfepWQeG2eWpWuZ6JocQ7ZDGH3BRoPx5ci0CB2oMa1BALVHjjMd8G7UsFz9EfVFYbzjrGkKgWcTjFJtGFebt/3pfgvuINgO+zys+8Krr3mg/zavvLzeRWQbMzoWzmMIFUTC8MeGexXygOej0=
+	t=1719417854; cv=none; b=CVTKtA3O/nb6sI+/5+l2/DQWayBkHY76J3qb+b5Zc/enpqt9WdyuXqZ+QngI/rYKkoJwa1b+TPUv3IU1ngcNzl6IZMNkiJZveldAZO3C+64eoCWJzEtP6b5sSRE9W4uD6tuUIkd7YKa2yHNUaU7uhhaMIynJeAj5BegLbbcUvrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719417019; c=relaxed/simple;
-	bh=udilUP9QJArcgyMP6AgqugC0tzaFDqpIwZeV/EYoOjw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oT0InhT4K+kb/SdBlCdmI7G08dgpTNUbnWtyd25Oh5UnLrbWxtLjje10q3eOxKr5XJWVOldONEg7cxy21ViVNJz5G8C/SbYnevoF8lbAz64SKOwrHDVmnjC5S+dQ9sIG0WiX14/qZ/fLu6+6FN6Z7blbUFLZ9I0xdoSa/JktUJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NGKZdkB9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 707C4C116B1;
-	Wed, 26 Jun 2024 15:50:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719417019;
-	bh=udilUP9QJArcgyMP6AgqugC0tzaFDqpIwZeV/EYoOjw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NGKZdkB9wmHhzG1udefXK8CwYhsvgWTSxQF4so9tYeWPv2xt2NFJKOeCh84sEDUAe
-	 MAQIF9W5vjTpp7MMCzDd3iVWR2y2SI6cTu+QH4wDVaA9qZhsNYnjBHiMcs1dgm3gYp
-	 TOaIlj27JITIV/4mMXTOhwcqMgnsd+ovaNRaYKw6SLrsCoWYleP/WsgdO4vzNUhPf5
-	 xdEumhD4xXpkBFqBj5o9H1sO1NHt+NFCNi08mLsSijrAomVDTgn5R8YP4FU1L40Mqm
-	 C7Yr/W1hKYdK0q6tRq9eTr8XvdsdITf5eMsImtCSCBOEwLn4qVVrx386TzS62oWpFb
-	 J3vXLCn+g/HVg==
-Date: Wed, 26 Jun 2024 08:50:17 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Aurelien Aptel <aaptel@nvidia.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>, "linux-nvme@lists.infradead.org"
- <linux-nvme@lists.infradead.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "hch@lst.de" <hch@lst.de>, "kbusch@kernel.org"
- <kbusch@kernel.org>, "axboe@fb.com" <axboe@fb.com>, Chaitanya Kulkarni
- <chaitanyak@nvidia.com>, "davem@davemloft.net" <davem@davemloft.net>, Shai
- Malin <smalin@nvidia.com>, "malin1024@gmail.com" <malin1024@gmail.com>,
- Yoray Zack <yorayz@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Tariq
- Toukan <tariqt@nvidia.com>, mgurtovoy@nvidia.com, galshalom@nvidia.com,
- borisp@nvidia.com, ogerlitz@nvidia.com
-Subject: Re: [PATCH v25 00/20] nvme-tcp receive offloads
-Message-ID: <20240626085017.553f793f@kernel.org>
-In-Reply-To: <253v81vpw4t.fsf@nvidia.com>
-References: <20240529160053.111531-1-aaptel@nvidia.com>
-	<20240530183906.4534c029@kernel.org>
-	<9ed2275c-7887-4ce1-9b1d-3b51e9f47174@grimberg.me>
-	<SJ1PR12MB60759C892F32A1E4F3A36CCEA5C62@SJ1PR12MB6075.namprd12.prod.outlook.com>
-	<253v81vpw4t.fsf@nvidia.com>
+	s=arc-20240116; t=1719417854; c=relaxed/simple;
+	bh=4O4CAULsJeXynfjY6mPTGWkKb6XikVyaPfbpdlls0Fc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XLZtVlD/S5JzhDqZFNd3d4ShHHz3bTz1a2LXcsN8RqVKsQZBagKDTmhF5uvDBfekffo+0K+w+amEx/W4/pKjppeU2IytICYJmLt9PCgWbO8gJAriQW1BW4F6Nij09Vs/A1kzawTZfZT9Um0Q81gEWJsNgEkHkjsmGEKkJ+EhJN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=40636 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1sMV7p-008D6r-J6; Wed, 26 Jun 2024 18:04:03 +0200
+Date: Wed, 26 Jun 2024 18:04:00 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Mirsad Todorovac <mtodorovac69@gmail.com>
+Cc: Linux Kernel Build System <linux-kbuild@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org
+Subject: Re: [PROBLEM] make randconfig: net/netfilter/core.c:830: undefined
+ reference to `netfilter_lwtunnel_fini'
+Message-ID: <Znw78PpYwAgFZiaB@calendula>
+References: <7a472130-d9c4-4fda-840b-093308f73d3d@gmail.com>
+ <Znc4931wlIgvqrfP@calendula>
+ <6cdb1346-75ca-472e-8d96-d58a1eaab172@gmail.com>
+ <b50bb0bf-4d35-4334-a721-2a092210aecc@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <b50bb0bf-4d35-4334-a721-2a092210aecc@gmail.com>
+X-Spam-Score: -1.9 (-)
 
-On Wed, 26 Jun 2024 18:21:54 +0300 Aurelien Aptel wrote:
-> We have taken some time to review your documents and code and have had
-> several internal discussions regarding the CI topic. We truly appreciate
-> the benefits that a CI setup could bring. However, we believe that since
-> this feature primarily relies on nvme-tcp, it might achieve better
-> coverage and testing if integrated with blktest. Your design focuses on
-> the netdev layer, which we don't think is sufficient.
+On Sun, Jun 23, 2024 at 12:51:49AM +0200, Mirsad Todorovac wrote:
+> On 6/23/24 00:48, Mirsad Todorovac wrote:
+> > On 6/22/24 22:49, Pablo Neira Ayuso wrote:
+> >> Hi,
+> >>
+> >> There is a fix on the table address this, I will submit is in the next
+> >> pull request.
+> > 
+> > Thank you very much.
+> > 
+> > Please consider adding Reported-by: Mirsad Todorovac <mtodorovac69@gmail.com>
+> >  
+> >> Thanks for reporting
+> > 
+> > No big deal. Anytime :-)
 > 
-> blktests/nvme is designed to test the entire nvme upstream
-> infrastructure including nvme-tcp that targets corner cases and bugs in
-> on-going development.  Chaitanya, Shinichiro, Daniel and other
-> developers are actively developing blktests and running these tests in
-> timely manner on latest branch in linux-nvme repo and for-next branch in
-> linux-block repo.
+> P.S.
 > 
-> Again, we are open to provide NIC so that others can also test this
-> feature on upstream kernel on our NIC to facilitate easier testing
-> including distros, as long as they are testing this feature on upstream
-> kernel. In this way we don't have to replicate the nvme-block storage
-> stack infra/tools/tests in the framework that is focused on netdev
-> development and yet achieve good coverage, what do you think?
+> Please notify when I could test the same .config with your fix.
 
-I'm not sure we're on the same page. The ask is to run the tests on 
-the netdev testing branch, at 12h cadence, and generate a simple JSON
-file with results we can ingest into our reporting. Extra points to
-reporting it to KCIDB. You mention "framework that is focused on
-netdev", IDK what you mean.
+Patch is here:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git/commit/?id=aef5daa2c49d510436b733827d4f0bab79fcc4a0
 
