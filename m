@@ -1,143 +1,154 @@
-Return-Path: <netdev+bounces-106762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7A13917926
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:47:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA7A791792F
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0573A1C22B8A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 06:47:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39B50B21FCB
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 06:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83CCB153BEE;
-	Wed, 26 Jun 2024 06:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2F1155A25;
+	Wed, 26 Jun 2024 06:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UK8Ga2lk"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="K6rtYLmz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D821FBB
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 06:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953BA1FBB
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 06:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719384449; cv=none; b=fJF2UyXPtaeWykVv3LFyjEE9rFkXZPKSsTVr/bJ1u/KUN2bVLpiuYRx18xQNZ4NGfX5a1c0UB/352/TSirGoCMgPkEmb316RUR2PJelVRksUx6wAUD69G6+tMb2F4Oh9b602GkM+UOKMhjYGKD0U+tnOunPacQUtgLmtH7F7GYY=
+	t=1719384610; cv=none; b=UCdmuG8k71D5cZ1ppZCsQ+R6EcN6vIrzKB+TuYkPsSE+Kvh5cExlhjMN3cXVGHk3z1DsdkTC6Y8LDuE+TZVyt2Rq23jItTBAuQhKdRC3kIo2BTxAyGnsHO256Jy24NdD8gT7A4r/EGT3MiZ8coEpXy1y+jO4hkKlM+U/37rVjMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719384449; c=relaxed/simple;
-	bh=W5aS9cpjHDT5HY8kQt9EzD46BHSuxJTLftd73GrGc6I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VD8De/IwI5Ve6yTpif6FSCEJO6N97bO1MCpeuWeEIeCje4/w11vmHnTGL/5ZMIJH8e28q3G6a5MPz0waB9csKwfTXmsKKtYezD5Vmb8U3+RbjnkGhw9WXEphOL81ICP5mtZo2V5DXc14NTaLhrVV8bJp4x1BJ8/Ti7uhxoGu3rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UK8Ga2lk; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-70346ae2c43so171055a12.1
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 23:47:27 -0700 (PDT)
+	s=arc-20240116; t=1719384610; c=relaxed/simple;
+	bh=eQUdNs2rIrX7qqGigt2hfzC7FSnA47UlmMvb1I6gqFc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uqMGqQd4vSuWE2y6Kxr7hdBZo81PzpYsL22pK1ioIKpjpU92mfi+OFHQxyVw7BCmnIClW7YGPEc7sgjbRfuCHuwwq7PHh1zyv/I4l9ZEQzX44Jro39VGoNGlHlBBFvyF7tsw6xcCdy4LraliW3lNaRQdL9dmrr9vMQhP+MID7zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=K6rtYLmz; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52cdf2c7454so7037773e87.1
+        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 23:50:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719384447; x=1719989247; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lggvHFrMrNzkUZV8dfcDUoNWtzYxzEYtQhehPZ/FhuI=;
-        b=UK8Ga2lkTnWwRLeja9mkDLB3BwZ9vseZITMtnHpT8Cmb32krfYxx/qmBIhuddxdtRd
-         4EqVQavcDZa/N3K8wt/iAGZO6kZHXwTTdGz91CojUS4PgS2ucNbAr0FJdyW368cyNvrT
-         ZI1h/4F5kVqsDDTmwJ6cZgtM9dIn/WoZbEYpOnovRYkG9wchsOqQC9DEb/6cMvMoh58c
-         khVZyS80924FeEr0L8ftBPAXnprOKHGkXCGajpocXPCnI5hVP+48pxyIE6Eey5CFJFgx
-         rr7+IJsvuuREwwtkmuuHCVkv5adiEN1VUe7YOrBUvMb6v+sfMSlPtlB7PpmnJA0DpfLB
-         PSPw==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1719384607; x=1719989407; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aYfugkFKdXF5OXKJphEPoOGEPgE4e7C0WTCNJr7v2Lk=;
+        b=K6rtYLmzK+9Ozrwrm4vIUoKNbgYgbd2UKropN7X0rzATrvoHQW7xEk2nlFQrHnPoaL
+         9ZuGAYLPRZ24Ac6Uqg7++C13koQZMD/XHTz30xcH1s26EFpstE+97xmxY/aLcoOe3A8m
+         EB4/E95YPiIJuEqJHqrns6vlm3Gc1NnqcLNh+k8tMJPjnfCCsP3prF7TzkPtua0MtAer
+         LpIYHalFHZgzUmTirE1CT7jzuK6kpHHpBGWW7yk9Y5YkhURVTPJSMqs/hgZP86FMU18d
+         E7YF7Sb96O+f8ZZy+RuJ0+iuun6AhaUMpRDfJRH32W6x0XNMEMZNkD4zvtNBpRnXUyt+
+         iB1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719384447; x=1719989247;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lggvHFrMrNzkUZV8dfcDUoNWtzYxzEYtQhehPZ/FhuI=;
-        b=XT75ZH/ZqAuMrMXIjMvrCfBPDuU1DyLcSVzfuxWP1zgZiL4b6Bv6/pvrT7o684H+QZ
-         MEMxKibBS/jS7JB+Nk6k6Sw49kz0+MQ6o86pZxKP5Yzdxlw7EHUFaHNRibh3xSSLlhb0
-         59DziL/kvAMMXZImayzOCLBiDNye4Jwg+TPfflUvHw10iWlV3bhkiVhvEYU3Ya+cBBfY
-         b2nWpUE0AVZwGhh2VsSBU5NAzCSBV8x2K9RgVcH3aKLvxRjqWdsdc+EahPoIlpo8UF+K
-         1fKSKt5hLz6veM2aEBEoZm/B2dxIXeruU3b4U2HRWPVJDT4T0kW3w10zqPzrbsaHmOlo
-         ydEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWuzJiKKtynsek+d5wQ9YnW1yGmV3gAC7/v1cT0YJ6OGdCLg4CxO+lgSB96GYdYs58cSyFmPjqVcUVqsZKPbj9uyjj/iGCY
-X-Gm-Message-State: AOJu0YzX12HXixzTERYT6W3LDjnD2xJCX4k/lndbONOzNJEDxpjILZMz
-	EY4JAOK/PPip+kCqtsY9NzKqiurXmoHThaSbz6HQc+E0w/RAYCTj
-X-Google-Smtp-Source: AGHT+IHBtU9uufzZWYYFAinEM+gl6wf4uwnOIurFxtq4BYrhzpOwhamrWnan7Kt2EO0pYqg9wm34aw==
-X-Received: by 2002:a17:90a:c28f:b0:2c8:dc37:6258 with SMTP id 98e67ed59e1d1-2c8dc3766bemr888773a91.35.1719384447167;
-        Tue, 25 Jun 2024 23:47:27 -0700 (PDT)
-Received: from Laptop-X1 ([2409:8a02:7825:fd0:4f66:6e77:859a:643d])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c8d8061497sm830091a91.34.2024.06.25.23.47.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jun 2024 23:47:26 -0700 (PDT)
-Date: Wed, 26 Jun 2024 14:47:20 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: stephen@networkplumber.org, dsahern@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 iproute2 0/3] Multiple Spanning Tree (MST) Support
-Message-ID: <Znu5eEoN3lRJxX5v@Laptop-X1>
-References: <20240624130035.3689606-1-tobias@waldekranz.com>
+        d=1e100.net; s=20230601; t=1719384607; x=1719989407;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aYfugkFKdXF5OXKJphEPoOGEPgE4e7C0WTCNJr7v2Lk=;
+        b=SUNNi8CA7PEnYxjoJ8E1Qekvcve5uE/+6WXhBjjHw3U93/onkbds3Q7n+mnBuRo7o7
+         sWM8Y/DCGaUqE0blkaik8ZTE+RhUe0tCytYmx3QxMOa4VAYcujfSqg6MN1+H/AIuVla4
+         o6rA2kbNqKDVRnQEt1kvCXTzlK/9fVEI2atQVU7dhjEFYMwFF2CzEsGIJgWnVAcdZClc
+         Nq+jKgoGWiU5sPXOzxiyYK0p7e3ynqiZjmQfbKIh88JD6KfUeXXrk1fjgCKd0Mt5hNg+
+         sDQ8ykQxkZAq8EfKA8f0O8n68Rhh/ZOyAfXWuOLEkhTQd3RQBa9KvhPgR9gXolX/7jeA
+         vyrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWT174nD2lSC1P0f/RkBdLDqhUraZnQH/iDbDILL4BCN5bX3TcI28uEPdNyQOrdK8ZcYYVss7NuF0KFITLa0+Avos1tVS/l
+X-Gm-Message-State: AOJu0YxJHCiqhE1HFw6/E714PPZ7ZpCt63bnnPRRbmWzygzPRSAs5NM8
+	rRY7cQhpMR2yAw7l9Qrap/WmQ3JRQcEF+mACD62+gIqof376CQeGEk7Oy/cPBIU=
+X-Google-Smtp-Source: AGHT+IHSj+NeSiBiocSmOkSNZcFlifenhzRJ6+JsxsR636NiAxa4i0Hy3RAl1l1Fy4kOUeCNgGccfQ==
+X-Received: by 2002:a05:6512:32a5:b0:52c:dfaa:def6 with SMTP id 2adb3069b0e04-52ce18356f4mr7555945e87.33.1719384606722;
+        Tue, 25 Jun 2024 23:50:06 -0700 (PDT)
+Received: from [192.168.0.245] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a727900d2f1sm119638366b.180.2024.06.25.23.50.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Jun 2024 23:50:06 -0700 (PDT)
+Message-ID: <c84b6dab-b86b-49ad-b78f-b4dcae1d4e76@blackwall.org>
+Date: Wed, 26 Jun 2024 09:50:05 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240624130035.3689606-1-tobias@waldekranz.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 iproute2 0/3] Multiple Spanning Tree (MST) Support
+To: Hangbin Liu <liuhangbin@gmail.com>,
+ Tobias Waldekranz <tobias@waldekranz.com>
+Cc: stephen@networkplumber.org, dsahern@kernel.org, netdev@vger.kernel.org
+References: <20240624130035.3689606-1-tobias@waldekranz.com>
+ <Znu5eEoN3lRJxX5v@Laptop-X1>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <Znu5eEoN3lRJxX5v@Laptop-X1>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 24, 2024 at 03:00:32PM +0200, Tobias Waldekranz wrote:
-> This series adds support for:
+On 26/06/2024 09:47, Hangbin Liu wrote:
+> On Mon, Jun 24, 2024 at 03:00:32PM +0200, Tobias Waldekranz wrote:
+>> This series adds support for:
+>>
+>> - Enabling MST on a bridge:
+>>
+>>       ip link set dev <BR> type bridge mst_enable 1
+>>
+>> - (Re)associating VLANs with an MSTI:
+>>
+>>       bridge vlan global set dev <BR> vid <X> msti <Y>
+>>
+>> - Setting the port state in a given MSTI:
+>>
+>>       bridge mst set dev <PORT> msti <Y> state <Z>
+>>
+>> - Listing the current port MST states:
+>>
+>>       bridge mst show
 > 
-> - Enabling MST on a bridge:
+> Tested-by: Hangbin Liu <liuhangbin@gmail.com>
 > 
->       ip link set dev <BR> type bridge mst_enable 1
+> With following steps:
+> + /home/iproute2/ip/ip link add br0 type bridge
+> + /home/iproute2/ip/ip link set br0 type bridge mst_enabled 1
+> + /home/iproute2/ip/ip link add type veth
+> + /home/iproute2/ip/ip link set veth0 master br0
+> + /home/iproute2/bridge/bridge vlan add dev br0 vid 1-3 self
+> + /home/iproute2/bridge/bridge vlan global set dev br0 vid 2 msti 3
+> + /home/iproute2/bridge/bridge vlan add dev veth0 vid 1-3
+> + /home/iproute2/bridge/bridge mst set dev veth0 msti 3 state 1
+> + /home/iproute2/bridge/bridge mst show
+> port              msti
+> veth0             0
+>                     state disabled
+>                   3
+>                     state listening
 > 
-> - (Re)associating VLANs with an MSTI:
 > 
->       bridge vlan global set dev <BR> vid <X> msti <Y>
+> There is one issue I got (should be kernel issue):
 > 
-> - Setting the port state in a given MSTI:
+> + /home/iproute2/ip/ip link set br0 type bridge mst_enabled 0
+> Error: MST mode can't be changed while VLANs exist.
 > 
->       bridge mst set dev <PORT> msti <Y> state <Z>
+>   If I want disable mst, I got failed as there is VLAN info, which is expected
 > 
-> - Listing the current port MST states:
+> + /home/iproute2/ip/ip link set veth0 nomaster
+> + /home/iproute2/ip/ip link set veth0 master br0
+> + /home/iproute2/ip/ip link set br0 type bridge mst_enabled 0
+> Error: MST mode can't be changed while VLANs exist.
 > 
->       bridge mst show
+>   But I got failed again after remove and re-add veth0, is this expected?
+>   I thought the VLAN info should be cleared after removing.
+> 
 
-Tested-by: Hangbin Liu <liuhangbin@gmail.com>
+Probably default vlan 1 got added to the port when it was enslaved.
 
-With following steps:
-+ /home/iproute2/ip/ip link add br0 type bridge
-+ /home/iproute2/ip/ip link set br0 type bridge mst_enabled 1
-+ /home/iproute2/ip/ip link add type veth
-+ /home/iproute2/ip/ip link set veth0 master br0
-+ /home/iproute2/bridge/bridge vlan add dev br0 vid 1-3 self
-+ /home/iproute2/bridge/bridge vlan global set dev br0 vid 2 msti 3
-+ /home/iproute2/bridge/bridge vlan add dev veth0 vid 1-3
-+ /home/iproute2/bridge/bridge mst set dev veth0 msti 3 state 1
-+ /home/iproute2/bridge/bridge mst show
-port              msti
-veth0             0
-                    state disabled
-                  3
-                    state listening
+> + /home/iproute2/ip/ip link set veth0 nomaster
+> + /home/iproute2/ip/ip link set br0 type bridge mst_enabled 0
+> 
+>   It works after I remove veth0.
+> 
 
-
-There is one issue I got (should be kernel issue):
-
-+ /home/iproute2/ip/ip link set br0 type bridge mst_enabled 0
-Error: MST mode can't be changed while VLANs exist.
-
-  If I want disable mst, I got failed as there is VLAN info, which is expected
-
-+ /home/iproute2/ip/ip link set veth0 nomaster
-+ /home/iproute2/ip/ip link set veth0 master br0
-+ /home/iproute2/ip/ip link set br0 type bridge mst_enabled 0
-Error: MST mode can't be changed while VLANs exist.
-
-  But I got failed again after remove and re-add veth0, is this expected?
-  I thought the VLAN info should be cleared after removing.
-
-+ /home/iproute2/ip/ip link set veth0 nomaster
-+ /home/iproute2/ip/ip link set br0 type bridge mst_enabled 0
-
-  It works after I remove veth0.
 
