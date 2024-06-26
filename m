@@ -1,167 +1,99 @@
-Return-Path: <netdev+bounces-106885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7230D917EF4
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:54:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BDB0917ED5
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:50:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 952401C236FA
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:54:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DA391C20ABC
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D691802A1;
-	Wed, 26 Jun 2024 10:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7AF417C22E;
+	Wed, 26 Jun 2024 10:49:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="tO8Miky4"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="cRIEn1au"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B28017F397;
-	Wed, 26 Jun 2024 10:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C11B17B50B
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 10:49:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719399168; cv=none; b=mXZ9LU7JoEQty4XCHfbadO5QfibBOES0a6MKLDfnHS54ajVtrYRYEGAaINLJGzmYHZeRClrntkxywDSjQ8ciUzgTuXiPNj3fAcxazQciGTmfgU42E4veZVXc4YESQjfqcVLQxZnO7xmqlmAZyc69POqG/hsRZKyPMBMnwHCfD8c=
+	t=1719398949; cv=none; b=lBdJ+9kEELOFe5lOTWGOyTQ0Kd2cTN6mOqjmow3jCFD1LfoWGx4mSZd6aawfMT6blky78qWGIe64bkUOaaFFxX7kqHXszO/jMBKQkYOsiTNuV030QQdgoCkmtxGnYzQG5hRJGvzn1fQCptl8rfviFOfoz5eaY2NTeB1Gm6NTZtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719399168; c=relaxed/simple;
-	bh=nQwajZYy8XJCa7tJ3Rjisd87KIIHBRFjPNXN4odLpcA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bwzLueES7pdpmFMMWK17WyaDeipyQpJlVO+2ZSG5TZOwUYyNWgLhr6QFby7OOqHv4i9sfGLkreywg47PKumJg+J3nZljb2KkhjPZMQXn7TPnyN9P/5NEIAl6XP3UxnW6Zzxts3/zAnRxPzD8GSFgLecU16ZYNFR1kgCGux2TOJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=tO8Miky4; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 3612249c33aa11ef99dc3f8fac2c3230-20240626
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=YDAYvV/XFqqbwzkucvvhD6M3ybBfweUzERktggMsxRA=;
-	b=tO8Miky4uAoQOdRPNs+hAFjDJ1+DOOSK1C4lsKqYywqERT8D0i9OY18npkc2Nr+jM4YTtZV3r5xajNkeZBK5Kp6pXHV+Jf2ZY83LoPXaKl0n3wcxgnp2m8gjr1yuHu2geMVUZtB2+tPsD94St3TEjpPU5hRand0//DOKhccb8jA=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.39,REQID:1fdabd5f-60e4-4196-8c19-b05d609a9ff8,IP:0,U
-	RL:0,TC:0,Content:-20,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-20
-X-CID-META: VersionHash:393d96e,CLOUDID:60510c45-4544-4d06-b2b2-d7e12813c598,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:1,EDM:-3,IP:nil,U
-	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
-	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: 3612249c33aa11ef99dc3f8fac2c3230-20240626
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw02.mediatek.com
-	(envelope-from <skylake.huang@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 864593642; Wed, 26 Jun 2024 18:52:41 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 26 Jun 2024 18:52:39 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Wed, 26 Jun 2024 18:52:39 +0800
-From: Sky Huang <SkyLake.Huang@mediatek.com>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Daniel Golle
-	<daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>, SkyLake Huang
-	<SkyLake.Huang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
-CC: Steven Liu <Steven.Liu@mediatek.com>, SkyLake.Huang
-	<skylake.huang@mediatek.com>
-Subject: [PATCH net-next v9 13/13] net: phy: mediatek: Remove unnecessary outer parens of "supported_triggers" var
-Date: Wed, 26 Jun 2024 18:43:29 +0800
-Message-ID: <20240626104329.11426-14-SkyLake.Huang@mediatek.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20240626104329.11426-1-SkyLake.Huang@mediatek.com>
-References: <20240626104329.11426-1-SkyLake.Huang@mediatek.com>
+	s=arc-20240116; t=1719398949; c=relaxed/simple;
+	bh=s80ccFh24RTi0NFrkbQBnZRyBYDTkV5PszrdrACiOEk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O+kyGggVzFVrNWwjaSUdxHjhUnjPrEWWTAUDBx6RHo3JR1dO8enacheQmS/gcI6THD9wmX3E2pvQvGm138iZhSyQZZ7Fcon2TVvySkyg1flHbrImP2LwfmjKRF1jPsd0G2D6mlFZUR8FsDokTUgO6dxHr/NZO/kosgjk3QoKD0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=cRIEn1au; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1sMQCq-001C4Q-Ii; Wed, 26 Jun 2024 12:48:52 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=K9tSH4kUxI6gI0hHetHcegtKDhrXdFy25jrZNgtW1zE=; b=cRIEn1au20jc2VYLURXP7Ruj8z
+	n4vve4W+gGO34k3IUxDjbdshbxbojCyGqlKbKjqxlAg4y3dwrNs/NzMC+PhYpP7PuKaMLZF9dcaMA
+	d7cbUA9Qk4mdyyYpjPJQvlogqLXZCmYH4jpXf0CerUVW2E4wTxZ/zck24WasgRllONfrMiYXGBYLo
+	bU1W+6ZAbDj40NaPqhXbtlkyzez5LJT2VHADaKzSYBMrVD382mWK0oJZBDxKAqVgSxt+3fcRfflqx
+	r0lpwHHZIuaQCoSSJiC5niXyxj5xxzP24AXrG05j0kpb81jqSxjPzEvCdOgpSz7gVCuNJskxI52FD
+	OuYmWxzw==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1sMQCp-0000w7-B3; Wed, 26 Jun 2024 12:48:51 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1sMQCS-007QQ8-Ta; Wed, 26 Jun 2024 12:48:28 +0200
+Message-ID: <c550e27c-6a45-4219-98d8-f6d237c0674e@rbox.co>
+Date: Wed, 26 Jun 2024 12:48:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-AS-Result: No-10--3.009600-8.000000
-X-TMASE-MatchedRID: BIV06Js6OJN00I3rWKbGqx+WEMjoO9WWTJDl9FKHbrkKogmGusPLbx8+
-	XHETeZCzky2SP4enkne5cURAloITPh8TzIzimOwPC24oEZ6SpSmb4wHqRpnaDic8CJM0GmQ5RHg
-	qdyMQoaGMdMDWzIU2SbY/pOXB9c6UPJCjmiSVfxvh8KGVTfNHVHPx3vy+AFy6CufKYQ8uaEouT9
-	8QLmnDW0ma3zYT97IFAYfQIAUhBayZvmCbKVb49sZL6x5U/HridGByp+zdaDg=
-X-TM-AS-User-Approved-Sender: No
-X-TM-AS-User-Blocked-Sender: No
-X-TMASE-Result: 10--3.009600-8.000000
-X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-SNTS-SMTP: 0BDA4BC6CCBC2266010878D2C0ACC8CA026B3F044D6E861DD73D69AB949564242000:8
-X-MTK: N
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net 01/15] af_unix: Set sk->sk_state under
+ unix_state_lock() for truly disconencted peer.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: cong.wang@bytedance.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
+ pabeni@redhat.com
+References: <2d34e8df-cbb0-486a-976b-c5c72554e184@rbox.co>
+ <20240623051906.79744-1-kuniyu@amazon.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20240623051906.79744-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: "SkyLake.Huang" <skylake.huang@mediatek.com>
+On 6/23/24 07:19, Kuniyuki Iwashima wrote:
+> From: Michal Luczaj <mhal@rbox.co>
+> Date: Sun, 23 Jun 2024 00:43:27 +0200
+>> I gotta ask, is there a reason for unlinking an already consumed
+>> ('consumed' as in 'unix_skb_len(skb) == 0') skb so late, in manage_oob()?
+>> IOW, can't it be unlinked immediately once it's consumed in
+>> unix_stream_recv_urg()? I suppose that would simplify things.
+> 
+> I also thought that before, but we can't do that.
+> 
+> Even after reading OOB data, we need to remember the position
+> and break recv() at that point.  That's why the skb is unlinked
+> in manage_oob() rather than unix_stream_recv_urg().
 
-This patch removes unnecessary outer parens of "supported_triggers" vars
-in mtk-ge.c & mtk-ge-soc.c to improve readability.
+Ahh, I see. Thanks for explaining.
 
-Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
----
- drivers/net/phy/mediatek/mtk-ge-soc.c | 16 ++++++++--------
- drivers/net/phy/mediatek/mtk-ge.c     | 16 ++++++++--------
- 2 files changed, 16 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/net/phy/mediatek/mtk-ge-soc.c b/drivers/net/phy/mediatek/mtk-ge-soc.c
-index 6d95e7d..6fc989d 100644
---- a/drivers/net/phy/mediatek/mtk-ge-soc.c
-+++ b/drivers/net/phy/mediatek/mtk-ge-soc.c
-@@ -1224,14 +1224,14 @@ static int mt798x_phy_led_brightness_set(struct phy_device *phydev,
- }
- 
- static const unsigned long supported_triggers =
--	(BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
--	 BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
--	 BIT(TRIGGER_NETDEV_LINK)        |
--	 BIT(TRIGGER_NETDEV_LINK_10)     |
--	 BIT(TRIGGER_NETDEV_LINK_100)    |
--	 BIT(TRIGGER_NETDEV_LINK_1000)   |
--	 BIT(TRIGGER_NETDEV_RX)          |
--	 BIT(TRIGGER_NETDEV_TX));
-+	BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
-+	BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
-+	BIT(TRIGGER_NETDEV_LINK)        |
-+	BIT(TRIGGER_NETDEV_LINK_10)     |
-+	BIT(TRIGGER_NETDEV_LINK_100)    |
-+	BIT(TRIGGER_NETDEV_LINK_1000)   |
-+	BIT(TRIGGER_NETDEV_RX)          |
-+	BIT(TRIGGER_NETDEV_TX);
- 
- static int mt798x_phy_led_hw_is_supported(struct phy_device *phydev, u8 index,
- 					  unsigned long rules)
-diff --git a/drivers/net/phy/mediatek/mtk-ge.c b/drivers/net/phy/mediatek/mtk-ge.c
-index 90f3990..050a4f7 100644
---- a/drivers/net/phy/mediatek/mtk-ge.c
-+++ b/drivers/net/phy/mediatek/mtk-ge.c
-@@ -152,14 +152,14 @@ static int mt753x_phy_led_brightness_set(struct phy_device *phydev,
- }
- 
- static const unsigned long supported_triggers =
--	(BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
--	 BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
--	 BIT(TRIGGER_NETDEV_LINK)        |
--	 BIT(TRIGGER_NETDEV_LINK_10)     |
--	 BIT(TRIGGER_NETDEV_LINK_100)    |
--	 BIT(TRIGGER_NETDEV_LINK_1000)   |
--	 BIT(TRIGGER_NETDEV_RX)          |
--	 BIT(TRIGGER_NETDEV_TX));
-+	BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
-+	BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
-+	BIT(TRIGGER_NETDEV_LINK)        |
-+	BIT(TRIGGER_NETDEV_LINK_10)     |
-+	BIT(TRIGGER_NETDEV_LINK_100)    |
-+	BIT(TRIGGER_NETDEV_LINK_1000)   |
-+	BIT(TRIGGER_NETDEV_RX)          |
-+	BIT(TRIGGER_NETDEV_TX);
- 
- static int mt753x_phy_led_hw_is_supported(struct phy_device *phydev, u8 index,
- 					  unsigned long rules)
--- 
-2.18.0
+One more thing about unix sockmap. AF_UNIX SOCK_DGRAM supports 0-length
+packets. But sockmap doesn't handle that; once a 0-length skb/msg is in the
+psock queue, unix_bpf_recvmsg() starts throwing -EFAULT. Sockmap'ed AF_INET
+SOCK_DGRAM does the same, so is this a bug or a feature?
 
 
