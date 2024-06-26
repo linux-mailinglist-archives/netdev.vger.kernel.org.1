@@ -1,134 +1,115 @@
-Return-Path: <netdev+bounces-107076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18A3F919B3A
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 01:39:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8E8A919B66
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 01:49:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AE971C215E5
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 23:39:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 736BE283A59
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 23:49:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A1F194151;
-	Wed, 26 Jun 2024 23:39:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD2AD17E917;
+	Wed, 26 Jun 2024 23:49:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACDDB194141;
-	Wed, 26 Jun 2024 23:38:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A447015E5B9
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 23:49:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719445140; cv=none; b=gnjPyIFZtdoSue4/lExq7oSno+154OdGVZgiuQxZ2ffAO88Gq/OUQ1EiyTL62hSWWzdgYbnksYml1AvcgpacHYgLJ2/i360B8fKJ2EzLJ5RrbWUbCKik2Cv8b17dz+KdB7vi639ySlHrneUBz5R0yAK1OcUMsvUIxi6dvpGf7fE=
+	t=1719445780; cv=none; b=AhpbWYobVRxF0p8GAZKpPXdyRTVmQ2bZGt5JbUaVeQDWftY+EW5laEHS0kex95extEOs0zXzpcitzDBULKC00MLDHWp00M4O++yHGsq/YqArNKKURmVgE1X5LfQM2LaXOyGiy3ih5hlkATVTeSpuzSEIYi6zymnRPH3tuEZeMjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719445140; c=relaxed/simple;
-	bh=Ai2WoGSkZmZxVZLmj1Z/CgnlYz0b2ZYj+heCCrJG43o=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pNjWBTUrewsbPzKbwnEw18DroAa8MuoUgP2yPZv0zQ8U1oJYADFv1CZOEkDJBaNw+ToLk9Iki4bj7FAyLAhABkGslrEypjChq7TSGt4Pf8MOPpqLXZ79BgIg44J9M84aDIw7f2iEw+pZwPL+2U3Wyj+kas/wgDy+wu8ZjDmWrE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+	s=arc-20240116; t=1719445780; c=relaxed/simple;
+	bh=8SW+GxZo5Q4/2zIuMR8732zGeW2vwfctVU/bsTrW/xE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mAJLEeZxfXLx5tGOw68BdlqL5E3UtbN8ZdEYd3ta0gb98Kh7KXNiOVCnTWFCsCnUl98uIG1/QtUi0b3LmZkqjwzqvOr1X4OinPHpEU12JUAP/eL0NmgavQe64B1V9HerAZ6YDuvNxqvgNkAxK7YWh7aImabQxDx7371Z6B1Bm9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=49806 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1sMcOK-008kc4-Pw; Thu, 27 Jun 2024 01:49:35 +0200
+Date: Thu, 27 Jun 2024 01:49:31 +0200
 From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	torvalds@linuxfoundation.org
-Subject: [PATCH net 2/2] netfilter: nf_tables: fully validate NFT_DATA_VALUE on store to data registers
-Date: Thu, 27 Jun 2024 01:38:45 +0200
-Message-Id: <20240626233845.151197-3-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240626233845.151197-1-pablo@netfilter.org>
-References: <20240626233845.151197-1-pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, willemb@google.com
+Subject: Re: [PATCH net-next v2 0/2] net: flow dissector: allow explicit
+ passing of netns
+Message-ID: <ZnypC7iOx_qtUH37@calendula>
+References: <20240608221057.16070-1-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240608221057.16070-1-fw@strlen.de>
+X-Spam-Score: -1.8 (-)
 
-register store validation for NFT_DATA_VALUE is conditional, however,
-the datatype is always either NFT_DATA_VALUE or NFT_DATA_VERDICT. This
-only requires a new helper function to infer the register type from the
-set datatype so this conditional check can be removed. Otherwise,
-pointer to chain object can be leaked through the registers.
+Hi,
 
-Fixes: 96518518cc41 ("netfilter: add nftables")
-Reported-by: Linus Torvalds <torvalds@linuxfoundation.org>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- include/net/netfilter/nf_tables.h | 5 +++++
- net/netfilter/nf_tables_api.c     | 8 ++++----
- net/netfilter/nft_lookup.c        | 3 ++-
- 3 files changed, 11 insertions(+), 5 deletions(-)
+This series got applied to net-next.
 
-diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
-index 2796153b03da..188d41da1a40 100644
---- a/include/net/netfilter/nf_tables.h
-+++ b/include/net/netfilter/nf_tables.h
-@@ -619,6 +619,11 @@ static inline void *nft_set_priv(const struct nft_set *set)
- 	return (void *)set->data;
- }
- 
-+static inline enum nft_data_types nft_set_datatype(const struct nft_set *set)
-+{
-+	return set->dtype == NFT_DATA_VERDICT ? NFT_DATA_VERDICT : NFT_DATA_VALUE;
-+}
-+
- static inline bool nft_set_gc_is_pending(const struct nft_set *s)
- {
- 	return refcount_read(&s->refs) != 1;
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index be3b4c90d2ed..e8dcf41d360d 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -5740,8 +5740,7 @@ static int nf_tables_fill_setelem(struct sk_buff *skb,
- 
- 	if (nft_set_ext_exists(ext, NFT_SET_EXT_DATA) &&
- 	    nft_data_dump(skb, NFTA_SET_ELEM_DATA, nft_set_ext_data(ext),
--			  set->dtype == NFT_DATA_VERDICT ? NFT_DATA_VERDICT : NFT_DATA_VALUE,
--			  set->dlen) < 0)
-+			  nft_set_datatype(set), set->dlen) < 0)
- 		goto nla_put_failure;
- 
- 	if (nft_set_ext_exists(ext, NFT_SET_EXT_EXPRESSIONS) &&
-@@ -11073,6 +11072,9 @@ static int nft_validate_register_store(const struct nft_ctx *ctx,
- 
- 		return 0;
- 	default:
-+		if (type != NFT_DATA_VALUE)
-+			return -EINVAL;
-+
- 		if (reg < NFT_REG_1 * NFT_REG_SIZE / NFT_REG32_SIZE)
- 			return -EINVAL;
- 		if (len == 0)
-@@ -11081,8 +11083,6 @@ static int nft_validate_register_store(const struct nft_ctx *ctx,
- 		    sizeof_field(struct nft_regs, data))
- 			return -ERANGE;
- 
--		if (data != NULL && type != NFT_DATA_VALUE)
--			return -EINVAL;
- 		return 0;
- 	}
- }
-diff --git a/net/netfilter/nft_lookup.c b/net/netfilter/nft_lookup.c
-index b314ca728a29..f3080fa1b226 100644
---- a/net/netfilter/nft_lookup.c
-+++ b/net/netfilter/nft_lookup.c
-@@ -132,7 +132,8 @@ static int nft_lookup_init(const struct nft_ctx *ctx,
- 			return -EINVAL;
- 
- 		err = nft_parse_register_store(ctx, tb[NFTA_LOOKUP_DREG],
--					       &priv->dreg, NULL, set->dtype,
-+					       &priv->dreg, NULL,
-+					       nft_set_datatype(set),
- 					       set->dlen);
- 		if (err < 0)
- 			return err;
--- 
-2.30.2
+But I can trigger this splat via nftables/tests/shell in net.git (6.10-rc).
 
+As well as in -stable 6.1.x:
+
+Jun 26 02:19:26 curiosity kernel: [ 1211.840595] ------------[ cut here ]------------
+Jun 26 02:19:26 curiosity kernel: [ 1211.840605] WARNING: CPU: 0 PID: 70274 at net/core/flow_dissector.c:1016 __skb_flow_dissect+0x107e/0x2860
+[...]
+Jun 26 02:19:26 curiosity kernel: [ 1211.841240] CPU: 0 PID: 70274 Comm: socat Not tainted 6.1.93+ #18
+
+I think that turning this into DEBUG_NET_WARN_ON_ONCE as Willem
+suggested provides a workaround for net.git until Florian's fixes in
+net-next hit -stable.
+
+Would you accept such a patch?
+
+Thanks.
+
+On Sun, Jun 09, 2024 at 12:10:38AM +0200, Florian Westphal wrote:
+> Change since last version:
+>  fix kdoc comment warning reported by kbuild robot, no other changes,
+>  thus retaining RvB tags from Eric and Willem.
+>  v1: https://lore.kernel.org/netdev/20240607083205.3000-1-fw@strlen.de/
+> 
+> Years ago flow dissector gained ability to delegate flow dissection
+> to a bpf program, scoped per netns.
+> 
+> The netns is derived from skb->dev, and if that is not available, from
+> skb->sk.  If neither is set, we hit a (benign) WARN_ON_ONCE().
+> 
+> This WARN_ON_ONCE can be triggered from netfilter.
+> Known skb origins are nf_send_reset and ipv4 stack generated IGMP
+> messages.
+> 
+> Lets allow callers to pass the current netns explicitly and make
+> nf_tables use those instead.
+> 
+> This targets net-next instead of net because the WARN is benign and this
+> is not a regression.
+> 
+> Florian Westphal (2):
+>   net: add and use skb_get_hash_net
+>   net: add and use __skb_get_hash_symmetric_net
+> 
+>  include/linux/skbuff.h          | 20 +++++++++++++++++---
+>  net/core/flow_dissector.c       | 21 ++++++++++++++-------
+>  net/netfilter/nf_tables_trace.c |  2 +-
+>  net/netfilter/nft_hash.c        |  3 ++-
+>  4 files changed, 34 insertions(+), 12 deletions(-)
+> 
+> -- 
+> 2.44.2
+> 
 
