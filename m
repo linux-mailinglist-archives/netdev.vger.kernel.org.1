@@ -1,59 +1,62 @@
-Return-Path: <netdev+bounces-106927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E2E691824F
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:26:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55548918257
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:27:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 558A21F23AAC
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 13:26:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 883A51C23381
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 13:27:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77A58181B8F;
-	Wed, 26 Jun 2024 13:25:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C0FB181B8F;
+	Wed, 26 Jun 2024 13:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LA4Wowjf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oUSL149r"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540648825
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 13:25:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4FED17CA1A;
+	Wed, 26 Jun 2024 13:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719408355; cv=none; b=jFwHdXcJb2arBfsKpjKQLpEGsWMDraRlcmYEvad6MS6atTU8IfL9fh7tR1n6/MUEb1vGYDb26iM3JYFWtPpVrzhtgAFPrs33K8uKOccWYLpuhCcm3P5TSoxyWS3Nf9z5x+PYouzq7PJO7LZkfVtUDWx2Z5iBxNlqsY0CxVTs54c=
+	t=1719408433; cv=none; b=TJg76KvMtkc1YwoX5XQ9KrSh3I3pbT2kIANq6QSklxsZ0jXZsp/Hnlad20HHQvqFY+oWPewB3pQ0NNC910BH6LUSTzwSZcBodL5QZpoeb1naH5ZVlaaBUh1bfgnzOIHyo83mfbCUbg7Ocqevu4cCEbY3H/VAKA0uV8E0+uMVW7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719408355; c=relaxed/simple;
-	bh=dYC/NauUX0HrUmRVOwBe+JsQLEOm5qmaoDPIA6Arr1A=;
+	s=arc-20240116; t=1719408433; c=relaxed/simple;
+	bh=hc+hknp4pzhwRX+PVOXc8ZKBg3TtI/Lca03Al5/txgQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q5Js7u8TCZkwFma56Woiqj3WSxBoc+VMw/owatkQz/Rn3xoWAGkCgtQ9Ju1Dk/gzy3O0ERe6JuZzUkG6OybDBAYl6f34oY/gQZSONIYsp6Q4YFGf2RdSR2FJupqcPBOHmFhy3pMP0g3sKlthQMMyFluk/RICgi6BhVm6KqYuaM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LA4Wowjf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 630C6C32789;
-	Wed, 26 Jun 2024 13:25:54 +0000 (UTC)
+	 MIME-Version:Content-Type; b=OMv59/7H4LO1Z0Oi3a7id/5wp4fMtxLwOAD4ffHPQzY4+ts8K5qL0gBGWy5FC2RGVaa5rSMgJCmpmoInM4DOoJ99RdP6izaE4TXs2VhGzeNvLRAC9JQOyTwr2J4dcQP37WC1fYj5RR+4hQfL26xh/U2v7nVgr+2GCx91fRAmJpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oUSL149r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5924C2BD10;
+	Wed, 26 Jun 2024 13:27:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719408354;
-	bh=dYC/NauUX0HrUmRVOwBe+JsQLEOm5qmaoDPIA6Arr1A=;
+	s=k20201202; t=1719408433;
+	bh=hc+hknp4pzhwRX+PVOXc8ZKBg3TtI/Lca03Al5/txgQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LA4Wowjf2P570LtEBfvJCBOGYr/EZrTLdYmcNZypirDgKu4x5o4f4lXNqahsGwGEA
-	 iazRG+KoTQ7gX+1wPx4RVHc6ZJ88H37JYO+F4TKR6YDwREyy9PmLFFQmDdustdDgef
-	 rv3dwTK8p35k5mEvax/hvZk6C4Qm9GvQrmAs4fBcrKtfcSjBvG58WHvZTyEodQM6c8
-	 RgiyyDM0bWddPf3kONkOHAY3huph0FZbB8yb0UzEDPxvq213Ny+OGGci3zkZjBpqoo
-	 UGG7UgIWdKruclN4etXJx9dcLkCXfCMj/xa3qJzydeC/bcLF7RJvjhqMkGC4TXSzh2
-	 etk6RILmTqmVw==
-Date: Wed, 26 Jun 2024 06:25:53 -0700
+	b=oUSL149r5mpZw0K6UIv8b2A033MGZ5xPscsZ3jfb+Ww5gi3ZpVNH0/0BG4wE3oRpQ
+	 +Y4QcFKIHQr+IDNSvhephJymUeGM0dWvgtw/fkdzEnemS79gU3dhbwU56rsVmvNINA
+	 7OgU7mq2eYeiTrhhWWUMTm628+3m6eYfqJPgHFYvbO67BRUA6WxrFngyA6NYs68w8s
+	 O8uvJ/S9XdaYbHyKTo/BqZpIFMX82wvyqxdtNFO0BLv5ACk96XPqFOWQ1Ss6HiAilI
+	 2S8SwV8eflzujwPbrtxao/R1pt+Cb14DoLjO+mkb7mD48s7nyw5txjgCgND358u+gB
+	 RgW4olWXj2Tkw==
+Date: Wed, 26 Jun 2024 06:27:11 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, woojung.huh@microchip.com,
- UNGLinuxDriver@microchip.com, horms@kernel.org, Tristram.Ha@microchip.com,
- Arun.Ramadoss@microchip.com
-Subject: Re: [PATCH net v8 0/3] Handle new Microchip KSZ 9897 Errata
-Message-ID: <20240626062553.2f7e5512@kernel.org>
-In-Reply-To: <df1d8095-93ad-4b79-a614-321df475b64c@savoirfairelinux.com>
-References: <20240625160520.358945-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
-	<20240625184712.710a4337@kernel.org>
-	<df1d8095-93ad-4b79-a614-321df475b64c@savoirfairelinux.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Donald Hunter
+ <donald.hunter@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Jonathan Corbet <corbet@lwn.net>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>,
+ kernel@pengutronix.de, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v4 0/7] net: pse-pd: Add new PSE c33 features
+Message-ID: <20240626062711.499695c5@kernel.org>
+In-Reply-To: <20240626095211.00956faa@kmaincent-XPS-13-7390>
+References: <20240625-feature_poe_power_cap-v4-0-b0813aad57d5@bootlin.com>
+	<20240625184144.49328de3@kernel.org>
+	<20240626095211.00956faa@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,9 +66,9 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 26 Jun 2024 09:28:16 +0200 Enguerrand de Ribaucourt wrote:
-> Ok, I can do an extra commit then?
+On Wed, 26 Jun 2024 09:52:11 +0200 Kory Maincent wrote:
+> Do you know when and how often net-next is rebased on top of net?
 
-Sure, but if it's cosmetic (no functional changes) please wait until
-Friday and target net-next.
+Every Thursday, usually around noon PST but exact timing depends on when
+Linus pulls and how quickly I notice that he did :)
 
