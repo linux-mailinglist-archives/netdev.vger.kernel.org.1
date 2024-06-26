@@ -1,107 +1,145 @@
-Return-Path: <netdev+bounces-106770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 944EB91794E
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 09:02:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97E27917952
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 09:06:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F5771F2423D
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 07:02:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1BC38B22F6A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 07:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE653158210;
-	Wed, 26 Jun 2024 07:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18D90158842;
+	Wed, 26 Jun 2024 07:06:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F69C1474CF
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 07:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6960A1FBB
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 07:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719385319; cv=none; b=Z3tU0pvQj0uH0jlkVpIZ+EiZel2lZZEd7k/GKVyBQAyCc0iO+bhVHmVLZFvFo0VzcExCLkwb/UU7W3WOZ2M5axsMsR9MOWCiQK9XsJbymkrqOQpLdHxinAytZEap7J0P6AmJ80BkZ25XGcbzltrSA98mP6JhJvEKthVtU++O1VQ=
+	t=1719385586; cv=none; b=dFL0NLZ4SdBAPR8HDJfBkMavaRsbu2ToYuZN4mGzjI0OzlE04rPlot+/dhMR637CjdlFviWR8Jq1zD40vwBbdmXGnZBEnMKtwJmUel2Xnu+6P4GKtNG52EcPVb02qeDA3LTYLbK2ns9oLLEc2+29818O0cLDuS2ITKLhsGgYUKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719385319; c=relaxed/simple;
-	bh=PIm68SNaeiGNrSumTkicE7cUXi5HkDF/nLGq+taI3nI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NTkYhP+DG3BX5afN3ZTOYjf2G1aXCWOSLU1LuTf5XkGRoDDNJDjrUcFKdhTcgZckkhmHz2L2jY6nF+6Gr8twmQyPOqMnaec4tVM+WX/lZjuLHeiqHtTceWR0ROBsqlPQ4CRL5F8E6/ZcdSM83AoSZFwxfQpxzntSWC3Jhm74+RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-424f2b7385bso458285e9.3
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 00:01:57 -0700 (PDT)
+	s=arc-20240116; t=1719385586; c=relaxed/simple;
+	bh=K/sjZ0bsXnct0B50cerx4h07K2GOyv5awZbjTVtnqgQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dfd3hNSBJ7abvp/GPACHTZL8IrshWSg6wxFBKdBD25yHJsjGQqEjw9GK2mmm6j2Ohhzu+WGONEWG8Maz1F/t85ncABdu4pwzMmhx0qRnzMeW9z0FlxxUlCXIsiFXAh6Fs/dkFqzB9l6wbnQ97DHfA+tFY8HbkO4lqUC0t9PfoBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-7ebd11f77d8so951286539f.1
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 00:06:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719385316; x=1719990116;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gOhUsvgsAX/B6UUgnLvZPaOmeZjPmrAP4TJS01whG0c=;
-        b=tGLsgldWgKxvF8iz4C7PiKDlivBEyOg1TFKUxzImoFDWLjRMTH0u08NJBgqoK2Jv/7
-         ss2M9o2ob16FyO2gM+GBISth6bjNnP4pJ0X1+MCSy23S5C5EPIvPrAugfcO4hCwI3jOv
-         bLHZRSLYBBostQdUWOPxPpsP88O7Vu0280McwXl/DDbnErw634GiBty7gGltFJ/NcA+Q
-         6YxukySz4T4Xi7B0fvGiDV9Kx3Ni2v3BqIxwCC+w1O2LWvH4cJDDpKfTXy6W/HUxvzX4
-         ppWMCLI11jTA9r1BgvGqEtjYsQ/BfLvYI7UvD6RLwU2Oy9NyKpxxU3sUN9n5OVIPpaum
-         Jbpg==
-X-Gm-Message-State: AOJu0Yw/J44FvKfJO+Voc++ZRn6wne4HYkGYUUq7mtt0km7B+jhSP5dX
-	xiBI1j4DRxvdSY6Ew50THuYQ4c55zlT2jqPj7kDegClmI7zNqeMjzzWtjw==
-X-Google-Smtp-Source: AGHT+IFG2FKrtXO8Pr90yH4CHz9Z4B93JzpB7oeKfT7qmF4QT1sEx59eB5Md/WDUSqLkCIh5O8P2PA==
-X-Received: by 2002:a5d:680f:0:b0:366:efc4:d424 with SMTP id ffacd0b85a97d-366efc4d8f4mr4871934f8f.4.1719385315731;
-        Wed, 26 Jun 2024 00:01:55 -0700 (PDT)
-Received: from vastdata-ubuntu2.vastdata.com (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-366388c4282sm14905219f8f.31.2024.06.26.00.01.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 00:01:55 -0700 (PDT)
-From: Sagi Grimberg <sagi@grimberg.me>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>
-Subject: [PATCH net-next v2] Revert "net: micro-optimize skb_datagram_iter"
-Date: Wed, 26 Jun 2024 10:01:53 +0300
-Message-ID: <20240626070153.759257-1-sagi@grimberg.me>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1719385583; x=1719990383;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4vkKthIaUSztvZd85keMWza9SGdaYFVhOD50Bc8I1kY=;
+        b=CR3VPMfIBZ/vwefLCU6aM5qinMbj1bJ9eksABt+JB42YGlFkCdQrURlHyCM29VHkiY
+         s8D5fYnyMFd00P0YFeVHsc5Kgz8qBsDKhKot51TJvG3U3Sz5vFSUpPkn2YReAIieLKSG
+         bXKxQ20EFI+o0iguMb56rYJzueJ5byw8HHLfs/YR57KNR6fjirUwE32Tqh72ABmyBLO6
+         SjWarMj2XgH8DQWvmYk0BWr0ixZ6nH6/AtJ57B0ZoRfgBXQ4IEIeovDrWRxyXMFjWxr/
+         6O7x5jz/VWB5FhJ0psPUU1fA3SSjpnusRBY8mT3cR7SH8gOG3liubWoJj2DXQmWf928D
+         /dmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXMTLF3H/sWBHuGduGQECivDxNp0v+BJG9OMXk0rzjM33Tz4SKmPF525UaRuABXwYiTwbs/oHuW7+16yQWMOM+wwz4e7Ktf
+X-Gm-Message-State: AOJu0YxPXEUPcli1rOqqLT+pAyBbKonNZpjfv/1XSGVYq4dLG35a35eo
+	UPjFS9HuCKN4Hd5tWt9aY8es2Eqs3O0XzHyIY0uRiKkAszSjluZrciP3jtjMU9Gsq3dckEFn5zP
+	1YBZSoLSFrJCLlmBeLEgMAhRG6OSA3y0adjvz0DQ7K7UoAdbFNUHP3uY=
+X-Google-Smtp-Source: AGHT+IHTuHPzxdzSZvKKq4zzo6UrPecfuVVV9bSpX+Sb0vpmECpQo6ODFwF7qRxi+Islf9MC6GHfMrbXeWN06pMq1EeECTXgLPJL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6638:2504:b0:4b0:b123:d9d with SMTP id
+ 8926c6da1cb9f-4b9efc75e9amr721991173.5.1719385583623; Wed, 26 Jun 2024
+ 00:06:23 -0700 (PDT)
+Date: Wed, 26 Jun 2024 00:06:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f1b4a1061bc5a659@google.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_rx_list (2)
+From: syzbot <syzbot+1d516edf1e74469ba5d3@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-This reverts commit 934c29999b57b835d65442da6f741d5e27f3b584.
-This triggered a usercopy BUG() in systems with HIGHMEM, reported
-by the test robot in:
- https://lore.kernel.org/oe-lkp/202406161539.b5ff7b20-oliver.sang@intel.com
+Hello,
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+syzbot found the following issue on:
+
+HEAD commit:    626737a5791b Merge tag 'pinctrl-v6.10-2' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17fc4151980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7bd7d605618e43de
+dashboard link: https://syzkaller.appspot.com/bug?extid=1d516edf1e74469ba5d3
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/4d143806a3cf/disk-626737a5.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f234013cac68/vmlinux-626737a5.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/707d3018b571/bzImage-626737a5.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1d516edf1e74469ba5d3@syzkaller.appspotmail.com
+
+netlink: 4 bytes leftover after parsing attributes in process `syz.4.3539'.
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 17793 at net/mac80211/rx.c:5345 ieee80211_rx_list+0x14c7/0x2e90 net/mac80211/rx.c:5345
+Modules linked in:
+CPU: 1 PID: 17793 Comm: syz.4.3539 Not tainted 6.10.0-rc5-syzkaller-00012-g626737a5791b #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+RIP: 0010:ieee80211_rx_list+0x14c7/0x2e90 net/mac80211/rx.c:5345
+Code: 03 0f b6 04 02 84 c0 74 08 3c 03 0f 8e ca 19 00 00 8b 53 70 4c 89 ee 48 89 ef e8 a4 da fd ff e9 fa ef ff ff e8 fa 0d 30 f7 90 <0f> 0b 90 e9 15 ec ff ff e8 ec 0d 30 f7 90 0f 0b 90 e9 f3 ef ff ff
+RSP: 0018:ffffc9000313eba0 EFLAGS: 00010246
+RAX: 0000000000040000 RBX: 0000000000000000 RCX: ffffc9000e382000
+RDX: 0000000000040000 RSI: ffffffff8a5dd5e6 RDI: 0000000000000005
+RBP: ffff88806a8ec8c0 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000002 R12: ffff88806a8ec8c0
+R13: ffff88806a8ec998 R14: 0000000000000000 R15: 0000000000000001
+FS:  00007f8b5207c6c0(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f3a3a0f9d58 CR3: 000000006ff3c000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ieee80211_rx_napi+0xdd/0x400 net/mac80211/rx.c:5482
+ ieee80211_rx include/net/mac80211.h:5093 [inline]
+ ieee80211_handle_queued_frames+0xd5/0x130 net/mac80211/main.c:437
+ ieee80211_stop_device+0x1e/0xe0 net/mac80211/util.c:1570
+ ieee80211_do_stop+0x18bd/0x2200 net/mac80211/iface.c:706
+ ieee80211_stop+0x11e/0x6b0 net/mac80211/iface.c:765
+ __dev_close_many+0x1c5/0x310 net/core/dev.c:1556
+ __dev_close net/core/dev.c:1568 [inline]
+ __dev_change_flags+0x4dc/0x720 net/core/dev.c:8779
+ dev_change_flags+0x8f/0x160 net/core/dev.c:8853
+ do_setlink+0x1a42/0x3ff0 net/core/rtnetlink.c:2900
+ ?
+
+
 ---
-Changes from v1:
-- added target tree
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
- net/core/datagram.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-diff --git a/net/core/datagram.c b/net/core/datagram.c
-index 95f242591fd2..e614cfd8e14a 100644
---- a/net/core/datagram.c
-+++ b/net/core/datagram.c
-@@ -417,14 +417,14 @@ static int __skb_datagram_iter(const struct sk_buff *skb, int offset,
- 		end = start + skb_frag_size(frag);
- 		if ((copy = end - offset) > 0) {
- 			struct page *page = skb_frag_page(frag);
--			u8 *vaddr = kmap_local_page(page);
-+			u8 *vaddr = kmap(page);
- 
- 			if (copy > len)
- 				copy = len;
- 			n = INDIRECT_CALL_1(cb, simple_copy_to_iter,
- 					vaddr + skb_frag_off(frag) + offset - start,
- 					copy, data, to);
--			kunmap_local(vaddr);
-+			kunmap(page);
- 			offset += n;
- 			if (n != copy)
- 				goto short_copy;
--- 
-2.43.0
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
