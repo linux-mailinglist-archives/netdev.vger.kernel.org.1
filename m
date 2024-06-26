@@ -1,91 +1,126 @@
-Return-Path: <netdev+bounces-106745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 814899176AB
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 05:12:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21CD79177CC
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 07:00:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14636B2183D
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:12:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5336D1C22213
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 05:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D199F433B3;
-	Wed, 26 Jun 2024 03:12:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF61C13C810;
+	Wed, 26 Jun 2024 05:00:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71405175BE
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 03:12:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E8313AD31
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 05:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719371543; cv=none; b=Vojyuc4+ofWylfqkaXj75zWiIQoetrVJYQGxaBLqN5cGzz4NqccZZEAB62kmQP/4abXMGoK+EV8ISik8K5BuaokLtmk/g9uY6WTAidGZbweuPjqeJZwrb8qk27UHMeSX5Smf0XncmM6wyqYvSmlNFHNB8hJvgJFoXNYSQ7Wd13A=
+	t=1719378042; cv=none; b=cPSQ5tL61HeuYvl/adINLhvYrdm+hrFmJ4/3tK5sRayuaDIARBqtDgyJW29+mK+dbljvIxJm38W9/LhCFkU534Buf/o5Cl/wz3G2NfRee7g4lfK5ymarGqrnvJY7AZhMjXdJlIM7hiG9HsUiGNsGn+2ITNUjT403j9unQDXJ7fU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719371543; c=relaxed/simple;
-	bh=cpPnnI+catnFAfNV8DhO6MfPwyZP1Z5LpUqVbE4Muo8=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=rRpeSqH+fzFX/6UQe6TdTXxVWEP5FLFxX0ElmFQrOusryxKRAAZp8K3s3Rr4ng6gdgT78GA7lLZuLZa8hZIgJfjI/oDO2dnfyDuQ4XgOBFOKTvEKcnjqUbRASOgU21IutKlorvmAL391cihX0WF6GPQz72X/K1yOcjvKkXcpyoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas9t1719371465t586t32737
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [220.184.148.68])
-X-QQ-SSF:00400000000000F0FVF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 9742978470815302854
-To: "'Przemek Kitszel'" <przemyslaw.kitszel@intel.com>
-Cc: <mengyuanlou@net-swift.com>,
-	<duanqiangwen@net-swift.com>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<horms@kernel.org>,
-	<andrew@lunn.ch>,
-	<netdev@vger.kernel.org>
-References: <20240621080951.14368-1-jiawenwu@trustnetic.com> <08f3db6b-6781-435c-bddb-04a594a2e617@intel.com>
-In-Reply-To: <08f3db6b-6781-435c-bddb-04a594a2e617@intel.com>
-Subject: RE: [PATCH net] net: txgbe: fix MSI and INTx interrupts
-Date: Wed, 26 Jun 2024 11:11:04 +0800
-Message-ID: <03db01dac776$7b317c80$71947580$@trustnetic.com>
+	s=arc-20240116; t=1719378042; c=relaxed/simple;
+	bh=zo8r24JgeSRv0jIkMxYfscMZuXhJOrZk+3LzRRcnW/U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g+EcvUKWsX2rZpz7MjpyscJmluVrS1PVupWsT8vcT2A3vcdp69Mm9AnDIlCjrAugtrca2ihs9MVzzpDB/zo11Z7BhU5+bwOJeyX9cD5+9T/QSWp0PxgHClHlwHuHkQsZlv3CcpJ8dml60pkpJNR1DqGuyNcrXmNdeqqHTApQU8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sMKlQ-0007WN-UN; Wed, 26 Jun 2024 07:00:12 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sMKlM-0053DI-Np; Wed, 26 Jun 2024 07:00:08 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sMKlM-00FywX-20;
+	Wed, 26 Jun 2024 07:00:08 +0200
+Date: Wed, 26 Jun 2024 07:00:08 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	George McCollister <george.mccollister@gmail.com>,
+	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	Kory Maincent <kory.maincent@bootlin.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: Drop explicit initialization of struct
+ i2c_device_id::driver_data to 0
+Message-ID: <ZnugWNWu35eIy00M@pengutronix.de>
+References: <20240625083853.2205977-2-u.kleine-koenig@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQFQOtvRrCK+3Si7PSZ2z0gdwySpSQIT8U0yst3AeqA=
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240625083853.2205977-2-u.kleine-koenig@baylibre.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, June 25, 2024 7:41 PM, Przemek Kitszel wrote:
-> On 6/21/24 10:09, Jiawen Wu wrote:
-> > When using MSI or INTx interrupts, request_irq() for pdev->irq will
-> > conflict with request_threaded_irq() for txgbe->misc.irq, to cause
-> > system crash.
-> >
-> > Fixes: aefd013624a1 ("net: txgbe: use irq_domain for interrupt controller")
-> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> > ---
-> >   drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  13 +-
-> >   .../net/ethernet/wangxun/txgbe/txgbe_irq.c    | 122 +++++++-----------
-> >   .../net/ethernet/wangxun/txgbe/txgbe_irq.h    |   2 +-
-> >   .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   3 +-
-> >   4 files changed, 59 insertions(+), 81 deletions(-)
-> >
+Hi Uwe,
+
+On Tue, Jun 25, 2024 at 10:38:53AM +0200, Uwe Kleine-König wrote:
+> These drivers don't use the driver_data member of struct i2c_device_id,
+> so don't explicitly initialize this member.
 > 
-> Please split into two commits (by prepending one commit that will just
-> move/rename function/s) to avoid inflating the diff of the actual fix.
-> This will ease the review process.
+> This prepares putting driver_data in an anonymous union which requires
+> either no initialization or named designators. But it's also a nice
+> cleanup on its own.
+> 
+> While add it, also remove commas after the sentinel entries.
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
+> ---
+> Hello,
+> 
+> I'm unsure if I should have split this patch further; per subdir of
+> drivers/net or even per driver. If you want it split, please tell me. 
+> 
+> Best regards
+> Uwe
+> 
+>  drivers/net/dsa/lan9303_i2c.c                 | 2 +-
+>  drivers/net/dsa/microchip/ksz9477_i2c.c       | 4 ++--
 
-I will split it into two commits to make it easier to review, but it may not
-be just renaming the function in one commit.
- 
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
+>  drivers/net/pse-pd/pd692x0.c                  | 4 ++--
+>  drivers/net/pse-pd/tps23881.c                 | 4 ++--
+
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+
+Thank you!
+
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
