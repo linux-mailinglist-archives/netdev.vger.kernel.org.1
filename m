@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-106733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B232E9175B1
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:36:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C12C59175AF
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:36:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D40CC1C21BB2
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:36:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 403421F21C5C
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B07911BC44;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B93175BE;
 	Wed, 26 Jun 2024 01:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="coDdlr4q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ShSm7AMK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D89D18C0B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D574C11CAB
 	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 01:36:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719365781; cv=none; b=t+T7moxiVfMPCcRrGxp+XnH3KvYKLCie0jQqb6760ApncxR6h0pCH3VERJYjdL7YpcRO38Bq3C8+dPMdsIKJ3GdMec4D07gDgjMynPer0sgH2AOntquhZWmEgAuJuenxwCTzhgGX42fuPVww9BHAhq9SbcbeV39zDBKzkNjTIHs=
+	t=1719365780; cv=none; b=EfAtiGu3B82a2gdh6KfRKqX7RIXcDFmfwNIsRWhcC1z8wnD0MilNQJiwEgGc7GNkUEi5Fa3IqFM5t7uxaXsC6oat6cKnEKneXDKR7K39MSbLZdUrYNensB/XHp6RTO8Zxlzt0nVzs40Ylgir88wDIa+k5eF0VUfLP4kNgWDz+pI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719365781; c=relaxed/simple;
-	bh=Z6L93fsW2dGGCOC3vONfH6Gyh08hVAZHiKBF1eU8yOs=;
+	s=arc-20240116; t=1719365780; c=relaxed/simple;
+	bh=g4MHVTRfL4kEKCKjyJ0E1c6YV6rrwNGfKCclkilHL1o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A0AwYAZAMpTrQuB5kOz/XR/KlI+Y5SuYxO7I850q5AQqhoHDnXSp5jwQngO0RXebg6AXbQbxM+vabw7OmdqrmfK+fxbwKNO8BvqgRpeWejeqXR3nwTTdG2NmqWvWjU6BSyc1Xxl8E+NWnYNWblz/yWK7Z1iYj0aZRJtplPSQgjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=coDdlr4q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F327C32786;
-	Wed, 26 Jun 2024 01:36:19 +0000 (UTC)
+	 MIME-Version; b=eSn3jxWRRYGFfRaWkmRYUKum1s4kXLAZTbja1v1XTGXlDZQO//KfDsi+VUFYkkkwpSdkbROHvTUyf0OfMQSdPPJGHmFnvC7rThnYLJB12lJRjycpQHNHjrAI5rAL5uVBjdPx5khjVnYeYCUfKTIhqILD8ltD/wZg4IEXy3I/TBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ShSm7AMK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 418D3C4AF0A;
+	Wed, 26 Jun 2024 01:36:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1719365780;
-	bh=Z6L93fsW2dGGCOC3vONfH6Gyh08hVAZHiKBF1eU8yOs=;
+	bh=g4MHVTRfL4kEKCKjyJ0E1c6YV6rrwNGfKCclkilHL1o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=coDdlr4q6loRbSqTaK66AQxaqxyi5S4x0SNOhgKkEaRyzq27ioAihZTfsv4RmCIb4
-	 OH+59+mHf0kSxix1HkQ4xcsCyKFvLM64Ub/eNhNzBJi+yKogQsAw+4OHHiZ35UiXrW
-	 or8T7ZUbLVPQxCxhpMUvAGx53UolwHp4RMZAMt/9JurypjsjvR+DYv7a+vTuykd/uo
-	 aXnD6zyURsLxQkEM1IxeuCowdkqJ2J4ogdsOPTN8mmKEu3Aif2uFRNUaxUzM98ty/o
-	 Zj9ZBw5ht9MTucKQdrDCd0UWcB0j26/FIUwJxFtEHwx9CSOhpJWo2eNOs99EKltncw
-	 eSy765IhubN+g==
+	b=ShSm7AMKZ8rTfAndKZDAgjz+CotJVHFPraYAXJfvG+C+L+83A9ywMAcYijXcJfqM3
+	 9DCkyn27ltqdcnGBaP7NAnhFQEdZ6DRenbTuYZvM8skh0mO8N1LMstor842+HkR5c6
+	 yIM44b62pkLr1TGx0KDW0eBvOlEGg6ndT4T05GVx4TA43hmWw5LH7FLXFKoOZdyIWB
+	 9hXZ8RezZpkkPJjLAKncKxxbS0YU8c2BueQhOS3PkhgzRjXlSnrdqy7dORb5kLW0up
+	 r7bQW75yFwlfq6s6DYCpm5S0KOGL/Sa7ku7nawvx8w9eBKvuvbrpkkYMXXjhXsIfcz
+	 IOpsG6P+yRWRw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: netdev@vger.kernel.org,
 	leitao@debian.org,
 	petrm@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [RFC net-next 1/2] selftests: drv-net: add ability to schedule cleanup with defer()
-Date: Tue, 25 Jun 2024 18:36:10 -0700
-Message-ID: <20240626013611.2330979-2-kuba@kernel.org>
+Subject: [RFC net-next 2/2] selftests: drv-net: rss_ctx: convert to defer()
+Date: Tue, 25 Jun 2024 18:36:11 -0700
+Message-ID: <20240626013611.2330979-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240626013611.2330979-1-kuba@kernel.org>
 References: <20240626013611.2330979-1-kuba@kernel.org>
@@ -65,172 +65,332 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This implements what I was describing in [1]. When writing a test
-author can schedule cleanup / undo actions right after the creation
-completes, eg:
+Use just added defer().
 
-  cmd("touch /tmp/file")
-  defer(cmd, "rm /tmp/file")
-
-defer() takes the function name as first argument, and the rest are
-arguments for that function. defer()red functions are called in
-inverse order after test exits. It's also possible to capture them
-and execute earlier (in which case they get automatically de-queued).
-
-  undo = defer(cmd, "rm /tmp/file")
-  # ... some unsafe code ...
-  undo.exec()
-
-As a nice safety all exceptions from defer()ed calls are captured,
-printed, and ignored (they do make the test fail, however).
-This addresses the common problem of exceptions in cleanup paths
-often being unhandled, leading to potential leaks.
-
-There is a global action queue, flushed by ksft_run(). We could support
-function level defers too, I guess, but there's no immediate need..
-
-Link: https://lore.kernel.org/all/877cedb2ki.fsf@nvidia.com/ # [1]
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/testing/selftests/net/lib/py/ksft.py  | 49 +++++++++++++++------
- tools/testing/selftests/net/lib/py/utils.py | 41 +++++++++++++++++
- 2 files changed, 76 insertions(+), 14 deletions(-)
+ .../selftests/drivers/net/hw/rss_ctx.py       | 225 ++++++++----------
+ 1 file changed, 97 insertions(+), 128 deletions(-)
 
-diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
-index 45ffe277d94a..4a72b9cbb27d 100644
---- a/tools/testing/selftests/net/lib/py/ksft.py
-+++ b/tools/testing/selftests/net/lib/py/ksft.py
-@@ -6,6 +6,7 @@ import sys
- import time
- import traceback
- from .consts import KSFT_MAIN_NAME
-+from .utils import global_defer_queue
- 
- KSFT_RESULT = None
- KSFT_RESULT_ALL = True
-@@ -108,6 +109,24 @@ KSFT_RESULT_ALL = True
-     print(res)
+diff --git a/tools/testing/selftests/drivers/net/hw/rss_ctx.py b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
+index 68c7d40214eb..6f55a3b49698 100755
+--- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
++++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
+@@ -8,7 +8,7 @@ from lib.py import NetDrvEpEnv
+ from lib.py import NetdevFamily
+ from lib.py import KsftSkipEx
+ from lib.py import rand_port
+-from lib.py import ethtool, ip, GenerateTraffic, CmdExitFailure
++from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
  
  
-+def ksft_flush_defer():
-+    global KSFT_RESULT
-+
-+    while global_defer_queue:
-+        entry = global_defer_queue[-1]
-+        try:
-+            entry.exec()
-+        except Exception:
-+            if global_defer_queue and global_defer_queue[-1] == entry:
-+                global_defer_queue.pop()
-+
-+            ksft_pr("Exception while handling defer / cleanup!")
-+            tb = traceback.format_exc()
-+            for line in tb.strip().split('\n'):
-+                ksft_pr("Defer Exception|", line)
-+            KSFT_RESULT = False
-+
-+
- def ksft_run(cases=None, globs=None, case_pfx=None, args=()):
-     cases = cases or []
+ def _rss_key_str(key):
+@@ -127,64 +127,56 @@ from lib.py import ethtool, ip, GenerateTraffic, CmdExitFailure
  
-@@ -130,29 +149,31 @@ KSFT_RESULT_ALL = True
-     for case in cases:
-         KSFT_RESULT = True
-         cnt += 1
-+        comment = ""
-+        cnt_key = ""
-+
+     # Try to allocate more queues when necessary
+     qcnt = len(_get_rx_cnts(cfg))
+-    if qcnt >= 2 + 2 * ctx_cnt:
+-        qcnt = None
+-    else:
++    if qcnt < 2 + 2 * ctx_cnt:
          try:
-             case(*args)
-         except KsftSkipEx as e:
--            ktap_result(True, cnt, case, comment="SKIP " + str(e))
--            totals['skip'] += 1
--            continue
-+            comment = "SKIP " + str(e)
-+            cnt_key = 'skip'
-         except KsftXfailEx as e:
--            ktap_result(True, cnt, case, comment="XFAIL " + str(e))
--            totals['xfail'] += 1
--            continue
-+            comment = "XFAIL " + str(e)
-+            cnt_key = 'xfail'
-         except Exception as e:
-             tb = traceback.format_exc()
-             for line in tb.strip().split('\n'):
-                 ksft_pr("Exception|", line)
--            ktap_result(False, cnt, case)
--            totals['fail'] += 1
--            continue
-+            KSFT_RESULT = False
-+            cnt_key = 'fail'
+             ksft_pr(f"Increasing queue count {qcnt} -> {2 + 2 * ctx_cnt}")
+             ethtool(f"-L {cfg.ifname} combined {2 + 2 * ctx_cnt}")
++            defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
+         except:
+             raise KsftSkipEx("Not enough queues for the test")
  
--        ktap_result(KSFT_RESULT, cnt, case)
--        if KSFT_RESULT:
--            totals['pass'] += 1
+-    ntuple = []
+-    ctx_id = []
+     ports = []
+-    try:
+-        # Use queues 0 and 1 for normal traffic
+-        ethtool(f"-X {cfg.ifname} equal 2")
+ 
+-        for i in range(ctx_cnt):
+-            want_cfg = f"start {2 + i * 2} equal 2"
+-            create_cfg = want_cfg if create_with_cfg else ""
++    # Use queues 0 and 1 for normal traffic
++    ethtool(f"-X {cfg.ifname} equal 2")
++    defer(ethtool, f"-X {cfg.ifname} default")
+ 
+-            try:
+-                ctx_id.append(ethtool_create(cfg, "-X", f"context new {create_cfg}"))
+-            except CmdExitFailure:
+-                # try to carry on and skip at the end
+-                if i == 0:
+-                    raise
+-                ksft_pr(f"Failed to create context {i + 1}, trying to test what we got")
+-                ctx_cnt = i
+-                break
++    for i in range(ctx_cnt):
++        want_cfg = f"start {2 + i * 2} equal 2"
++        create_cfg = want_cfg if create_with_cfg else ""
+ 
+-            if not create_with_cfg:
+-                ethtool(f"-X {cfg.ifname} context {ctx_id[i]} {want_cfg}")
++        try:
++            ctx_id = ethtool_create(cfg, "-X", f"context new {create_cfg}")
++            defer(ethtool, f"-X {cfg.ifname} context {ctx_id} delete")
++        except CmdExitFailure:
++            # try to carry on and skip at the end
++            if i == 0:
++                raise
++            ksft_pr(f"Failed to create context {i + 1}, trying to test what we got")
++            ctx_cnt = i
++            break
+ 
+-            # Sanity check the context we just created
+-            data = get_rss(cfg, ctx_id[i])
+-            ksft_eq(min(data['rss-indirection-table']), 2 + i * 2, "Unexpected context cfg: " + str(data))
+-            ksft_eq(max(data['rss-indirection-table']), 2 + i * 2 + 1, "Unexpected context cfg: " + str(data))
++        if not create_with_cfg:
++            ethtool(f"-X {cfg.ifname} context {ctx_id} {want_cfg}")
+ 
+-            ports.append(rand_port())
+-            flow = f"flow-type tcp{cfg.addr_ipver} dst-port {ports[i]} context {ctx_id[i]}"
+-            ntuple.append(ethtool_create(cfg, "-N", flow))
++        # Sanity check the context we just created
++        data = get_rss(cfg, ctx_id)
++        ksft_eq(min(data['rss-indirection-table']), 2 + i * 2, "Unexpected context cfg: " + str(data))
++        ksft_eq(max(data['rss-indirection-table']), 2 + i * 2 + 1, "Unexpected context cfg: " + str(data))
+ 
+-        for i in range(ctx_cnt):
+-            cnts = _get_rx_cnts(cfg)
+-            GenerateTraffic(cfg, port=ports[i]).wait_pkts_and_stop(20000)
+-            cnts = _get_rx_cnts(cfg, prev=cnts)
++        ports.append(rand_port())
++        flow = f"flow-type tcp{cfg.addr_ipver} dst-port {ports[i]} context {ctx_id}"
++        ntuple = ethtool_create(cfg, "-N", flow)
++        defer(ethtool, f"-N {cfg.ifname} delete {ntuple}")
+ 
+-            ksft_lt(sum(cnts[ :2]), 10000, "traffic on main context:" + str(cnts))
+-            ksft_ge(sum(cnts[2+i*2:4+i*2]), 20000, f"traffic on context {i}: " + str(cnts))
+-            ksft_eq(sum(cnts[2:2+i*2] + cnts[4+i*2:]), 0, "traffic on other contexts: " + str(cnts))
+-    finally:
+-        for nid in ntuple:
+-            ethtool(f"-N {cfg.ifname} delete {nid}")
+-        for cid in ctx_id:
+-            ethtool(f"-X {cfg.ifname} context {cid} delete")
+-        ethtool(f"-X {cfg.ifname} default")
+-        if qcnt:
+-            ethtool(f"-L {cfg.ifname} combined {qcnt}")
++    for i in range(ctx_cnt):
++        cnts = _get_rx_cnts(cfg)
++        GenerateTraffic(cfg, port=ports[i]).wait_pkts_and_stop(20000)
++        cnts = _get_rx_cnts(cfg, prev=cnts)
++
++        ksft_lt(sum(cnts[ :2]), 10000, "traffic on main context:" + str(cnts))
++        ksft_ge(sum(cnts[2+i*2:4+i*2]), 20000, f"traffic on context {i}: " + str(cnts))
++        ksft_eq(sum(cnts[2:2+i*2] + cnts[4+i*2:]), 0, "traffic on other contexts: " + str(cnts))
+ 
+     if requested_ctx_cnt != ctx_cnt:
+         raise KsftSkipEx(f"Tested only {ctx_cnt} contexts, wanted {requested_ctx_cnt}")
+@@ -216,24 +208,21 @@ from lib.py import ethtool, ip, GenerateTraffic, CmdExitFailure
+ 
+     # Try to allocate more queues when necessary
+     qcnt = len(_get_rx_cnts(cfg))
+-    if qcnt >= 2 + 2 * ctx_cnt:
+-        qcnt = None
+-    else:
++    if qcnt < 2 + 2 * ctx_cnt:
+         try:
+             ksft_pr(f"Increasing queue count {qcnt} -> {2 + 2 * ctx_cnt}")
+             ethtool(f"-L {cfg.ifname} combined {2 + 2 * ctx_cnt}")
++            defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
+         except:
+             raise KsftSkipEx("Not enough queues for the test")
+ 
+     ntuple = []
+-    ctx_id = []
++    ctx = []
+     ports = []
+ 
+     def remove_ctx(idx):
+-        ethtool(f"-N {cfg.ifname} delete {ntuple[idx]}")
+-        ntuple[idx] = None
+-        ethtool(f"-X {cfg.ifname} context {ctx_id[idx]} delete")
+-        ctx_id[idx] = None
++        ntuple[idx].exec()
++        ctx[idx].exec()
+ 
+     def check_traffic():
+         for i in range(ctx_cnt):
+@@ -241,7 +230,7 @@ from lib.py import ethtool, ip, GenerateTraffic, CmdExitFailure
+             GenerateTraffic(cfg, port=ports[i]).wait_pkts_and_stop(20000)
+             cnts = _get_rx_cnts(cfg, prev=cnts)
+ 
+-            if ctx_id[i] is None:
++            if ctx[i].queued:
+                 ksft_lt(sum(cnts[ :2]), 10000, "traffic on main context:" + str(cnts))
+                 ksft_ge(sum(cnts[2+i*2:4+i*2]), 20000, f"traffic on context {i}: " + str(cnts))
+                 ksft_eq(sum(cnts[2:2+i*2] + cnts[4+i*2:]), 0, "traffic on other contexts: " + str(cnts))
+@@ -249,41 +238,32 @@ from lib.py import ethtool, ip, GenerateTraffic, CmdExitFailure
+                 ksft_ge(sum(cnts[ :2]), 20000, "traffic on main context:" + str(cnts))
+                 ksft_eq(sum(cnts[2: ]),     0, "traffic on other contexts: " + str(cnts))
+ 
+-    try:
+-        # Use queues 0 and 1 for normal traffic
+-        ethtool(f"-X {cfg.ifname} equal 2")
++    # Use queues 0 and 1 for normal traffic
++    ethtool(f"-X {cfg.ifname} equal 2")
++    defer(ethtool, f"-X {cfg.ifname} default")
+ 
+-        for i in range(ctx_cnt):
+-            ctx_id.append(ethtool_create(cfg, "-X", f"context new start {2 + i * 2} equal 2"))
++    for i in range(ctx_cnt):
++        ctx_id = ethtool_create(cfg, "-X", f"context new start {2 + i * 2} equal 2")
++        ctx.append(defer(ethtool, f"-X {cfg.ifname} context {ctx_id} delete"))
+ 
+-            ports.append(rand_port())
+-            flow = f"flow-type tcp{cfg.addr_ipver} dst-port {ports[i]} context {ctx_id[i]}"
+-            ntuple.append(ethtool_create(cfg, "-N", flow))
++        ports.append(rand_port())
++        flow = f"flow-type tcp{cfg.addr_ipver} dst-port {ports[i]} context {ctx_id}"
++        ntuple_id = ethtool_create(cfg, "-N", flow)
++        ntuple.append(defer(ethtool, f"-N {cfg.ifname} delete {ntuple_id}"))
+ 
+-        check_traffic()
++    check_traffic()
+ 
+-        # Remove middle context
+-        remove_ctx(ctx_cnt // 2)
+-        check_traffic()
++    # Remove middle context
++    remove_ctx(ctx_cnt // 2)
++    check_traffic()
+ 
+-        # Remove first context
+-        remove_ctx(0)
+-        check_traffic()
++    # Remove first context
++    remove_ctx(0)
++    check_traffic()
+ 
+-        # Remove last context
+-        remove_ctx(-1)
+-        check_traffic()
+-
+-    finally:
+-        for nid in ntuple:
+-            if nid is not None:
+-                ethtool(f"-N {cfg.ifname} delete {nid}")
+-        for cid in ctx_id:
+-            if cid is not None:
+-                ethtool(f"-X {cfg.ifname} context {cid} delete")
+-        ethtool(f"-X {cfg.ifname} default")
+-        if qcnt:
+-            ethtool(f"-L {cfg.ifname} combined {qcnt}")
++    # Remove last context
++    remove_ctx(-1)
++    check_traffic()
+ 
+     if requested_ctx_cnt != ctx_cnt:
+         raise KsftSkipEx(f"Tested only {ctx_cnt} contexts, wanted {requested_ctx_cnt}")
+@@ -298,69 +278,58 @@ from lib.py import ethtool, ip, GenerateTraffic, CmdExitFailure
+     require_ntuple(cfg)
+ 
+     queue_cnt = len(_get_rx_cnts(cfg))
+-    if queue_cnt >= 4:
+-        queue_cnt = None
+-    else:
++    if queue_cnt < 4:
+         try:
+             ksft_pr(f"Increasing queue count {queue_cnt} -> 4")
+             ethtool(f"-L {cfg.ifname} combined 4")
++            defer(ethtool, f"-L {cfg.ifname} combined {queue_cnt}")
+         except:
+             raise KsftSkipEx("Not enough queues for the test")
+ 
+-    ctx_id = None
+-    ntuple = None
+     if other_ctx == 0:
+         ethtool(f"-X {cfg.ifname} equal 4")
++        defer(ethtool, f"-X {cfg.ifname} default")
+     else:
+         other_ctx = ethtool_create(cfg, "-X", "context new")
+         ethtool(f"-X {cfg.ifname} context {other_ctx} equal 4")
++        defer(ethtool, f"-X {cfg.ifname} context {other_ctx} delete")
+ 
+-    try:
+-        ctx_id = ethtool_create(cfg, "-X", "context new")
+-        ethtool(f"-X {cfg.ifname} context {ctx_id} start 2 equal 2")
++    ctx_id = ethtool_create(cfg, "-X", "context new")
++    ethtool(f"-X {cfg.ifname} context {ctx_id} start 2 equal 2")
++    defer(ethtool, f"-X {cfg.ifname} context {ctx_id} delete")
+ 
+-        port = rand_port()
+-        if other_ctx:
+-            flow = f"flow-type tcp{cfg.addr_ipver} dst-port {port} context {other_ctx}"
+-            ntuple = ethtool_create(cfg, "-N", flow)
++    port = rand_port()
++    if other_ctx:
++        flow = f"flow-type tcp{cfg.addr_ipver} dst-port {port} context {other_ctx}"
++        ntuple_id = ethtool_create(cfg, "-N", flow)
++        ntuple = defer(ethtool, f"-N {cfg.ifname} delete {ntuple_id}")
+ 
+-        # Test the main context
+-        cnts = _get_rx_cnts(cfg)
+-        GenerateTraffic(cfg, port=port).wait_pkts_and_stop(20000)
+-        cnts = _get_rx_cnts(cfg, prev=cnts)
++    # Test the main context
++    cnts = _get_rx_cnts(cfg)
++    GenerateTraffic(cfg, port=port).wait_pkts_and_stop(20000)
++    cnts = _get_rx_cnts(cfg, prev=cnts)
+ 
+-        ksft_ge(sum(cnts[ :4]), 20000, "traffic on main context: " + str(cnts))
+-        ksft_ge(sum(cnts[ :2]),  7000, "traffic on main context (1/2): " + str(cnts))
+-        ksft_ge(sum(cnts[2:4]),  7000, "traffic on main context (2/2): " + str(cnts))
+-        if other_ctx == 0:
+-            ksft_eq(sum(cnts[4: ]),     0, "traffic on other queues: " + str(cnts))
++    ksft_ge(sum(cnts[ :4]), 20000, "traffic on main context: " + str(cnts))
++    ksft_ge(sum(cnts[ :2]),  7000, "traffic on main context (1/2): " + str(cnts))
++    ksft_ge(sum(cnts[2:4]),  7000, "traffic on main context (2/2): " + str(cnts))
++    if other_ctx == 0:
++        ksft_eq(sum(cnts[4: ]),     0, "traffic on other queues: " + str(cnts))
+ 
+-        # Now create a rule for context 1 and make sure traffic goes to a subset
+-        if other_ctx:
+-            ethtool(f"-N {cfg.ifname} delete {ntuple}")
+-            ntuple = None
+-        flow = f"flow-type tcp{cfg.addr_ipver} dst-port {port} context {ctx_id}"
+-        ntuple = ethtool_create(cfg, "-N", flow)
++    # Now create a rule for context 1 and make sure traffic goes to a subset
++    if other_ctx:
++        ntuple.exec()
++    flow = f"flow-type tcp{cfg.addr_ipver} dst-port {port} context {ctx_id}"
++    ntuple_id = ethtool_create(cfg, "-N", flow)
++    defer(ethtool, f"-N {cfg.ifname} delete {ntuple_id}")
+ 
+-        cnts = _get_rx_cnts(cfg)
+-        GenerateTraffic(cfg, port=port).wait_pkts_and_stop(20000)
+-        cnts = _get_rx_cnts(cfg, prev=cnts)
++    cnts = _get_rx_cnts(cfg)
++    GenerateTraffic(cfg, port=port).wait_pkts_and_stop(20000)
++    cnts = _get_rx_cnts(cfg, prev=cnts)
+ 
+-        ksft_lt(sum(cnts[ :2]),  7000, "traffic on main context: " + str(cnts))
+-        ksft_ge(sum(cnts[2:4]), 20000, "traffic on extra context: " + str(cnts))
+-        if other_ctx == 0:
+-            ksft_eq(sum(cnts[4: ]),     0, "traffic on other queues: " + str(cnts))
+-    finally:
+-        if ntuple is not None:
+-            ethtool(f"-N {cfg.ifname} delete {ntuple}")
+-        if ctx_id:
+-            ethtool(f"-X {cfg.ifname} context {ctx_id} delete")
+-        if other_ctx == 0:
+-            ethtool(f"-X {cfg.ifname} default")
 -        else:
--            totals['fail'] += 1
-+        ksft_flush_defer()
-+
-+        if not cnt_key:
-+            cnt_key = 'pass' if KSFT_RESULT else 'fail'
-+
-+        ktap_result(KSFT_RESULT, cnt, case, comment=comment)
-+        totals[cnt_key] += 1
- 
-     print(
-         f"# Totals: pass:{totals['pass']} fail:{totals['fail']} xfail:{totals['xfail']} xpass:0 skip:{totals['skip']} error:0"
-diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
-index 405aa510aaf2..1ef6ebaa369e 100644
---- a/tools/testing/selftests/net/lib/py/utils.py
-+++ b/tools/testing/selftests/net/lib/py/utils.py
-@@ -66,6 +66,47 @@ import time
-         return self.process(terminate=self.terminate, fail=self.check_fail)
+-            ethtool(f"-X {cfg.ifname} context {other_ctx} delete")
+-        if queue_cnt:
+-            ethtool(f"-L {cfg.ifname} combined {queue_cnt}")
++    ksft_lt(sum(cnts[ :2]),  7000, "traffic on main context: " + str(cnts))
++    ksft_ge(sum(cnts[2:4]), 20000, "traffic on extra context: " + str(cnts))
++    if other_ctx == 0:
++        ksft_eq(sum(cnts[4: ]),     0, "traffic on other queues: " + str(cnts))
  
  
-+global_defer_queue = []
-+
-+
-+class defer:
-+    def __init__(self, func, *args, **kwargs):
-+        global global_defer_queue
-+        if global_defer_queue is None:
-+            raise Exception("defer environment has not been set up")
-+
-+        if not callable(func):
-+            raise Exception("defer created with un-callable object, did you call the function instead of passing its name?")
-+
-+        self.func = func
-+        self.args = args
-+        self.kwargs = kwargs
-+
-+        self.queued = True
-+        self.executed = False
-+
-+        self._queue =  global_defer_queue
-+        self._queue.append(self)
-+
-+    def __enter__(self):
-+        return self
-+
-+    def __exit__(self, ex_type, ex_value, ex_tb):
-+        return self.exec()
-+
-+    def _exec(self):
-+        self.func(*self.args, **self.kwargs)
-+
-+    def cancel(self):
-+        self._queue.remove(self)
-+        self.queued = False
-+
-+    def exec(self):
-+        self._exec()
-+        self.cancel()
-+        self.executed = True
-+
-+
- def tool(name, args, json=None, ns=None, host=None):
-     cmd_str = name + ' '
-     if json:
+ def test_rss_context_overlap2(cfg):
 -- 
 2.45.2
 
