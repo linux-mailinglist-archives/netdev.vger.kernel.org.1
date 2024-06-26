@@ -1,260 +1,504 @@
-Return-Path: <netdev+bounces-106758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EE409178B4
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:14:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91E829178D2
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:21:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61CBF1C22DBB
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 06:14:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A9B21F23AE7
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 06:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C204A14A61B;
-	Wed, 26 Jun 2024 06:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68214148FF7;
+	Wed, 26 Jun 2024 06:21:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Qpwo/++X"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="Ln0dAYqj"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2079.outbound.protection.outlook.com [40.107.243.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E84B38D;
-	Wed, 26 Jun 2024 06:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.79
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719382472; cv=fail; b=m+9RR8q1XOvX9+W3PQ2W5geIjFW4orHpZZ4Qj7kA6SNbr2ArSvcIpXNPS7uEJrotYeIKSGQpyk2IIi7OohPZN2H37g8TEymawJuX+ISsA6E+vkqaPN65IxGKjgdobsl3KkVXDpIr2M7kJ1Kyv5WAWhk/gp5pzyyvTftnwOMGhzc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719382472; c=relaxed/simple;
-	bh=v9JONqeDCoC+CcGEf6jN4Yl+e4GVUPW0p6SCXBifJK0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=JgC5ct57yXOEpBVPhnGA6TWW5WOD6WVBrk2bUSM9CpSJSgt3WfggF4JGM3qxoLm/G7dkdW19kRyc2s830Ww8tKnKAQ7xqkCc1tr4JwFMtazGir8pPuOJtU0bedRtEUlr1zBRWmyGYA4m1Wy8CJ9j/4Knn9DzY0UMwEV8TriZOQs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Qpwo/++X; arc=fail smtp.client-ip=40.107.243.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a0PLAm6F2ypWRu4n5yBlnzeMtSDsCrxCX77pEe/9Wqrw1VhbsiAoEcILtSDpAIH6LBfy5ILnJIdOyeOsXJUQ/cz0J1vtRbqrvE+Xs0ehqYlhvRi+P7U9bZ17U/pVPKRpEpVzwimPUdOn8dV+oikbiQ809o6jubM4RdmgjWVH8M/qOSLWXLPGWsCdYYFLBq8hDtE4dOL7AHPQeREvzDoWVFlq8Fap/gNvzBpMNo8WANBthMohKXbjQCPHW4sqE4IRw+G0WyaK11uollahNNQBWHVF1LSZlTtyA6z/As1650LaDYKRD/6iewR9YEnydrhWJDir8EJ39pxGeVBZQfp9cg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=v9JONqeDCoC+CcGEf6jN4Yl+e4GVUPW0p6SCXBifJK0=;
- b=MJbnbKmqiKsz8lUerumYMR3O9Irzw9/HCTw5+FevY7OoQ01IWTMrerDeXxrtFp0KkzX6BKSVzsSYFyCkfqLpxbYYWXWbuE+rMYUsQunORkXYUi8zuwJCUeyniEkpK7B5oqUaIuywtZai0RS2WSpwgGr+5S3nycS6fhSsKdu0cH5paZJElJwnJxK4ng2bf7ghoW1kz5ItG2oPUPbk2RZBEPhrXsFPg7eqmzkgCi9SuqiEzk8l9lnXejKY/q00NhzNSKZmVJJyOcGMMaQ4zMgwtqPswimp9zvTsA7H7y9MFaH6EWN/wYp24mou6Lcp6EnC4REbZgm5I1VRLyMfachDEg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v9JONqeDCoC+CcGEf6jN4Yl+e4GVUPW0p6SCXBifJK0=;
- b=Qpwo/++X793NEl7xC5Q8hsHi1Ittm3ZaulGidaXCPq9fpQ43E2YBNRy6Se4FtHgun/SViR1xQ7+nu79hWTBN2A4hfgzXL+ujS0azPxPZ/izKFjGAdnFwpaRzj9HDBukPqu/2ua5VgP7HwYeY9+1paGqboEWPcfCED/tmsEA60te9U262+DZ9aWp6UbLYDm1NZbBBx13pDU9asp1h1b3NEZPAr6z3iqckdcDkFTmmhi2dwVQEnGY4bqvbFBNszj23AIlzIRcIY8e7AsoF+j7RVebGndrlbYyPhGzFCGC5qzGIg41bxIvuKg53iQWWjaO4L9oQ53MitHi9+0c+hHWD0w==
-Received: from DM6PR12MB4516.namprd12.prod.outlook.com (2603:10b6:5:2ac::20)
- by CH3PR12MB9342.namprd12.prod.outlook.com (2603:10b6:610:1cb::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.32; Wed, 26 Jun
- 2024 06:14:22 +0000
-Received: from DM6PR12MB4516.namprd12.prod.outlook.com
- ([fe80::43e9:7b19:9e11:d6bd]) by DM6PR12MB4516.namprd12.prod.outlook.com
- ([fe80::43e9:7b19:9e11:d6bd%4]) with mapi id 15.20.7698.025; Wed, 26 Jun 2024
- 06:14:22 +0000
-From: Danielle Ratson <danieller@nvidia.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>, "linux@armlinux.org.uk"
-	<linux@armlinux.org.uk>, "sdf@google.com" <sdf@google.com>,
-	"kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
-	"maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
-	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
-	"przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
-	"ahmed.zaki@intel.com" <ahmed.zaki@intel.com>, "richardcochran@gmail.com"
-	<richardcochran@gmail.com>, "shayagr@amazon.com" <shayagr@amazon.com>,
-	"paul.greenwalt@intel.com" <paul.greenwalt@intel.com>, "jiri@resnulli.us"
-	<jiri@resnulli.us>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, mlxsw
-	<mlxsw@nvidia.com>, Ido Schimmel <idosch@nvidia.com>, Petr Machata
-	<petrm@nvidia.com>
-Subject: RE: [PATCH net-next v7 7/9] ethtool: cmis_cdb: Add a layer for
- supporting CDB commands
-Thread-Topic: [PATCH net-next v7 7/9] ethtool: cmis_cdb: Add a layer for
- supporting CDB commands
-Thread-Index: AQHaxl9qSClTcs0l902JzHpAxldWxrHXUtgAgADOufA=
-Date: Wed, 26 Jun 2024 06:14:22 +0000
-Message-ID:
- <DM6PR12MB4516DD74CA5F4D52D5290E26D8D62@DM6PR12MB4516.namprd12.prod.outlook.com>
-References: <20240624175201.130522-1-danieller@nvidia.com>
- <20240624175201.130522-8-danieller@nvidia.com>
- <003ca0dd-ea1c-4721-8c3f-d4a578662057@lunn.ch>
-In-Reply-To: <003ca0dd-ea1c-4721-8c3f-d4a578662057@lunn.ch>
-Accept-Language: he-IL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR12MB4516:EE_|CH3PR12MB9342:EE_
-x-ms-office365-filtering-correlation-id: 4aa37719-5880-45a8-9e5b-08dc95a738b4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230038|366014|376012|7416012|1800799022|38070700016;
-x-microsoft-antispam-message-info:
- =?utf-8?B?VGtJeXpINTVKNkR0U2FVTGp2WW5YN1dkODNLUjBMUjM0SGk2dTZlKzFEWW1C?=
- =?utf-8?B?YlUwajZENC9IaEl2WU8zQnZMWjRPS3JrWjVMdDNYd080UDNwZEZoc0xyd0JU?=
- =?utf-8?B?cldEMWFVVldTNHRIWDhNWXhsMk5uc0F1V2ZzSldrZ3FKdlk5MzVqOGM1Vnhn?=
- =?utf-8?B?SElEak1oeWRRVU5yaERRNEJtdmNvcHFkVE5USHdvUnJPekl1KzRrM2xLNGxm?=
- =?utf-8?B?Y1U5WmNLUXVCVVptR3cxbUJFL2E0WTF6VDJVQ1NBeFJMWDJOdjN1UkJqQ1M5?=
- =?utf-8?B?RHovRWVjbWxYRnBRMWZkQlBtNDhGd285NTVJYkhYTEM3ZG9BSDJ4V1l6VFZo?=
- =?utf-8?B?eGx3b0k1MnZWNVhjaFlueE1iTEcyUmdqZ0NIRXpuOHI4L2ZTMTNZWm1CdDg4?=
- =?utf-8?B?NGI0YVJDdkhONTBmWDRQdDVWUDREWjNPdDg5MXROTmU3T2Vha2djZ09RbVYx?=
- =?utf-8?B?SXNsMGtSaHdLRWc0MWNQaFRFcUo1aE1YYUJYdi9aSUp0V2gxM3JUN3BLS1Bh?=
- =?utf-8?B?N1I0NVBQdWlrSjBYOVhCaSt2SUMvN3puM3J5YUJCVWwvZlpzMXo3VEUzLzR0?=
- =?utf-8?B?WXhUWExab1Z6UGtRNDM4ZmFVeHhKM3dhYXVENm1mWWpqcS8zTTV3d2o5WVFT?=
- =?utf-8?B?R05yTWZDVDNFZHY4WVpRUGRmL05PZlU3YmU5SjJRRGtKMHdiYUVmVWd2S0FI?=
- =?utf-8?B?Y2NWQld2Qm02bFVTdU9ac2Y5bkxQd1BRTUdKOSsvczJuYlk2dko1Z3V6U1cw?=
- =?utf-8?B?eEFFWlQ2dDk3bFNTaWpueFB4T1lhQlZ1elMwUytUdElaempTcUc3VHF4SVBs?=
- =?utf-8?B?Wnl4Z216UnZHV2tSTnkxaVVNNWRkKzRPZHUxNmpzeEpNd3ZVUWlBYkcxVVRO?=
- =?utf-8?B?OUJiT3o5N29iSkozOTUyU29SYXpvcnVkYkcrL2RTNDRydzZjb0JXQXJGUmFK?=
- =?utf-8?B?c2ZJZTI4aHFEVFA1Z1ZVTWUvTUhUVFpIZXRSRW5aMzA2SGUzS2pJOEtZbURP?=
- =?utf-8?B?VTZ1U0xKTHFBK0VDUjFsUzV5bmV0U2NtNG9haDc3L0FRSCtpZmYxdkRZUm1S?=
- =?utf-8?B?RTBkcTBpbE9mNkp3VC9ncUNaU1VyS09PUjM3UDVKamdQZjhPaVlma29rU2RP?=
- =?utf-8?B?MkRVZHZTallVNXRnQS9jTElJVVFqMkFvVjJFZm8zYjhBQXQ0YS84VXBoOENJ?=
- =?utf-8?B?R3Q4dXdyOUFCaFlhbTl0c0JhY3liajBnZnF2aHJrOVBOeXRlbTJDK0Z3ZEZV?=
- =?utf-8?B?M2JiNXVvdVVZajcxbzVWYmlueE55Tml6bU1pekJaVnhkVkhmOWF4dnpXWXpq?=
- =?utf-8?B?a1VET1ZGUFFGSVhhRDNnVWVtQXNTdnVTWllyK1hRQ3lKdENmSktpRmF0QUpX?=
- =?utf-8?B?VncyUG1rOGNXV0hPWkZ1ZmNaM2xVNHBOcmNTMDdvZlBMVldYNlJSTDBFRUZq?=
- =?utf-8?B?OHEvYmRRcXFBbk1LUzZJS2N3WlZZbkwrTzF0dmlhTTRtUEpLT0VPTnRIek4z?=
- =?utf-8?B?Y09YWTJybGVaZkUweFhCU1VHRUtjY3ZONk5lTzFNUzBrS3YzUjFIZDZiSXI4?=
- =?utf-8?B?VzVVWlJuZTJtcXZhUnZka0taTnM1VEU1Yk1DZWVwUEgveGhGQ0M4R0I4aEF0?=
- =?utf-8?B?RnlVRFd0RHp0OFo5aGgybFROMHdLNWJpd0ZraTJSN25Uc2t2OFZPbG40QU80?=
- =?utf-8?B?RWQ2UlRxdjRzaEVHc1pmYzZLdXpUdUxKWSszN0srenh5WEszZHloSnFCNkdv?=
- =?utf-8?B?TENNVG94K0FUd2lXbEVrTnVuSmR5Rmk2bGNRL2VyYlVleXJGSUR0bVVUQm5O?=
- =?utf-8?Q?u3Ti1sKY7EQd/sNdhCzx3HPRbsRtqApNa/B4E=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4516.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230038)(366014)(376012)(7416012)(1800799022)(38070700016);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?Zzk4ZUFxV21hdjJwbG9pejI1bTZMVmE5MmRqeFVYaWNOWEVaSzNTZGFUbTFK?=
- =?utf-8?B?cUZGYUdkTzdVL2xXcjUyakl0azhZeTBDYUhlT2hQa2lrOW9wVE1YMnRzMnZR?=
- =?utf-8?B?cDZNemtoZ1hieXRieGlhUEQ4REcvU2VySjc5SjdUK204cGtlMS9nQml0cW41?=
- =?utf-8?B?cElxckwrczhkQmlKRnZwV2VFd1pYNTRMc2FVWitYYW1GSW9uQzlaOTRXMDdw?=
- =?utf-8?B?VHBRTkxaaUU1U1R4ejNZcWZOdTRaR2cwVEZBU0FQd2NrOHVmQXR2cW9KaXl6?=
- =?utf-8?B?TDE0MEdIYWRSVngvRWcwYzZwbHY4ZEFnZzhXY2l0WGtNTzJOcXNGZ0wwd0tv?=
- =?utf-8?B?RG1yN1UrS3lDQjlJOFNUMzU5azJkUkFSYi95MFRma2FleEgyQ3dBa1p5NG5n?=
- =?utf-8?B?M2c5L0lYUkpoKy9pZ1FtNFlvZmszYmh3M0k4RjBlcUd0Qm1KVmVWQzNUajBQ?=
- =?utf-8?B?YjcvTXVXa2V3dXZoRTNpbUNpeFdiOTV2VlVPZnpRRUZ1bWVBZ1RRZHFLSzVu?=
- =?utf-8?B?cllIcDU2R1ZPM1E5MlFZQ2FzTk00dnQ4OHVtSWRGenZ0RzV1RnB3aHFlUFdE?=
- =?utf-8?B?TTNoTmFKNnA0OUVJanlBdlV0emhacElSb2dHZnBpMU9xMWRiRkU0b25VNTdE?=
- =?utf-8?B?bGlRK0ZsRndoOWtsSzJrNElUZE9QV1NicXQ1Z3hNclJLWDdWMWtLWENkWkpN?=
- =?utf-8?B?MHFheFMzb2tsQTJrSzMrQ2kvbzBoWlE0U2V2MzRuNUxZTE9PRlZ4RXRLdVAv?=
- =?utf-8?B?WVVIdFF6REx6ZWxOQmw3eEdBNnMxZFo4a09rUVR3dUkxK3Z2V1Roc2Z5dUJJ?=
- =?utf-8?B?d1hWMlVTMFlLRG5SaTE5TzZDOVVOV1FSVHpUbVJSS2F4S3hTUjcyeHBVdC8w?=
- =?utf-8?B?QWFESXlybU1VL052ajQ0dW96NFNSdlBUZzBtcWtyY3lZQnFwS3JuVmxXeDBW?=
- =?utf-8?B?K0toZkJvbmhwTjl2VlNaWmhPOFpqYzhxK2xIWmR2dWs4TTU3WU1hTURscmxR?=
- =?utf-8?B?RjhLRjBrajZXV3F6RUx5cjJyQkJmY3gwbW9FbE4zeWEySE93Z0lDbHBQdHJp?=
- =?utf-8?B?TlJESExRNGd0RGZ6dHpSMGFYeE5jYUJPdHRtTGdzdGNsbWowenNrdFZGdDE3?=
- =?utf-8?B?a1F4bkJBNXhlZ0xkSFpyYUNMTlVtckhXdkd1UzF5c1A0UFNER0x1eUhoUHJU?=
- =?utf-8?B?Z2hPR3J5R0JWejIyODlURVVTd1BObFN3ZGVuUXEvV20vSks2NnBIQ282UjE4?=
- =?utf-8?B?QksxWXRDdVFwL0ovS0ZFMFZLSGpQSDBDcU5BTE11M1VMTEJMeElqcW51TG9p?=
- =?utf-8?B?d09RSkVob0UyaUxSTksxQVp4OWxnRHdrN3k2MGpLMjdDQU5NbTlHQWJwZWdt?=
- =?utf-8?B?VHZuRXRnTGQ0RHkzY2JmRy8rS2d1dUYvY3VvT0tCb1g0eURXU21lYU5hVGkz?=
- =?utf-8?B?YmFTTW1JcFFQR3ptQ3FHTGlqWS94ZDlrT21ucm1ZQ3pMemlGWTJzR2tDWTlS?=
- =?utf-8?B?d1k0VkovbW1DeDVzck9abURVdEJMcFZwc1RTTXc4ZGxjS01aWThqWnJzRkRU?=
- =?utf-8?B?eE9hNHNONWRhY2UzejdDVXdYd25wK1JHYk5mc2pyczNsODBTeEhjTGFJV1ZI?=
- =?utf-8?B?dlNHMTEzcFluTDhxUStvUGdSRHIvZlRYZTAzMlpCMFM3eFM3ZVVQVy8wNFJZ?=
- =?utf-8?B?UnEvcm9idkR1TDNXWXJSYkdDckxkdWNXbEV2c1FxL3JDOGpzelVSbStYdGhF?=
- =?utf-8?B?Rm1MNUtGS2paQlhDS1hnTURXenRnYXJJYTUwNzltUFRFYk9pbVFVZTBDemVq?=
- =?utf-8?B?UkFFZzBxTEdpUGo3RDU2UENHYnRnWVN4VThZbzFQRXlHaVdCYUNuNEtGLzZ3?=
- =?utf-8?B?WEhaa0RBYTM4YWZqUVpTcm9uWjgxYWI2a2xhMzl3RHhBdVdacHp0SGlqVG1a?=
- =?utf-8?B?Sk9uSUV6bzEwK0ZDaTd6WG8vWitDczM5c0xIM0lNZDl6ZXhqR2RxdktNSERH?=
- =?utf-8?B?byt5bGVjeWl5dFBEZEZHZWx5UWdPSGNhWjFLV1ZPdUNPa3FHZmk5eGk5RzdP?=
- =?utf-8?B?YWFyVmpQZUdFcjF6TEp3YWJhK04vUlNicDdvSlorb3UvNUlZdkRCajBsUjJF?=
- =?utf-8?Q?vbC/mzkIYgLl0WhK0ev852pJJ?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623F033C5
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 06:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719382880; cv=none; b=eCVyn/Ft+XP4UEvboxmIrmrwsxyVS84EA27j54VscdbFHoltV/iVj3m3dyYRN7C1Ou3TToZ3oRAiwzSxN0nmW2Vq6on4UFtYDlaOMRniZ7ekz9Saa/Hkwf+Ex4hxAgul0R7Ul+kfh+e5ySN/s5cCpp8ZOtP75c4bYtEZRAcifNA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719382880; c=relaxed/simple;
+	bh=pc969qtArpisEvMbAheRvf80yiX+sMx3X4qb+iuOqsM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=db0emRUTd6PJKFj1PU1bgASvEVpniy9fNeC+lno7tUA3i+wCDTEaiBC5aoLM8VVoxgybTF/bOXKYSpdNpJMwO8MhDtlXuxbS+uwhwia8s8it22QMljJlP5uKBk4AA1lPx6WcKJcq7CWzd4mwckGbNijNu3RoR+BKk4T1LP3oYE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=Ln0dAYqj; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a72585032f1so364262066b.3
+        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 23:21:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1719382876; x=1719987676; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dOsv815OH/DbrBVoBzQtWtxW5QtPbNqZnE4TuVPm71c=;
+        b=Ln0dAYqjArqduucffI2fQWuEGdTAwXlTdPYTZgcs/Xvp6nDIOjv1FAPEU4xD4m51iJ
+         1MiXTLJoCllM76Ts87Tq49tup3LAhvasld8dvfpkYuWTAssUeixDiOzkUqy24Q+CZ/AD
+         CIZl1coaHcQHwli3DHm7bzeOB3D1bvIzdzhcZdMjste7kbGs/sm2OtovWRiIuW26vt+R
+         WC35hk5ZDQA44qtNSs1iK7xti7P44NF8BhB2fJCSpARI2fpdOSi4mP4wbBhY+vJM9j53
+         YXkbc2jERIZVobqo+3tjsApSJCH7gHYDapD8imUvGFrwHwHUS+nq9gHmI/xA8nb4QPod
+         KJAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719382876; x=1719987676;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dOsv815OH/DbrBVoBzQtWtxW5QtPbNqZnE4TuVPm71c=;
+        b=RFHjAebzuz9PUiwwLgCU7HVQdD4ESAHwMsxkCHdWRdi4Er4Wx+rydCbVJLbn1z30kD
+         lWzCoOUFpeF7apyZOvbSAlliSlxe0aapn528vr2ES71/ExtZJQT4U0T1UwAp20aOxnZK
+         g+s8jBR5NcPb9/uhUxRlyurzzMo5MCQLbVr4Ys18Q7nxjjydCNIi7VApjNCLv+/qFO1r
+         uDE0sXRPLZQpLwlZqiQfTGG0f3v4MeqPFvcrSQQ/hAY4i8FHSPLTZa0gFlXUDbJxROaZ
+         Gj983rzUSZsyf2B219baylulTBTpkRjDM5nR5m/BRr2+IWneiCqpcMeD1RFI7kLIZtl3
+         6Wuw==
+X-Forwarded-Encrypted: i=1; AJvYcCXwvyJNIaEGbVVu0OSOzUNnfjaJHQL9owReLmZzhKxWj/Uptu36ih66wp0X3q33sr2WiUYoPrVkopWhDN4xZz7OhP0wgamD
+X-Gm-Message-State: AOJu0YzcLKj6QjOM4ZeKkVIhrPXle8mR4buwQPPF7rt21YSe5lpd62yy
+	z/9QQKL+B5eiu3jqiTsnHJgh1eZin15n48R3WhxV3+sqqJgm3ZiFFoI9Alda4lY=
+X-Google-Smtp-Source: AGHT+IHuY3K1k+PVEFjDoBZE72XUI9ylKeeTRnnIAUyEGDex6INJ29+6UMSyuPI9vw7Ktq5JxxGtrw==
+X-Received: by 2002:a17:906:230d:b0:a6f:50ae:e0a with SMTP id a640c23a62f3a-a715f978a7amr588463966b.37.1719382876335;
+        Tue, 25 Jun 2024 23:21:16 -0700 (PDT)
+Received: from [192.168.0.245] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7169b12999sm432061866b.95.2024.06.25.23.21.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Jun 2024 23:21:15 -0700 (PDT)
+Message-ID: <386fc09b-d0ec-4757-b910-d3d5c7947f9c@blackwall.org>
+Date: Wed, 26 Jun 2024 09:21:15 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4516.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4aa37719-5880-45a8-9e5b-08dc95a738b4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jun 2024 06:14:22.3154
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cqaduWgTGc/yH7n7FAdP+ke01yu7tnt248cE6B58pQFdNiHDkt6NbHiiDbFW7d4BzZYxY3+79mccxUi2qFKhpw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9342
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 iproute2 3/3] bridge: mst: Add get/set support for MST
+ states
+To: Tobias Waldekranz <tobias@waldekranz.com>, stephen@networkplumber.org,
+ dsahern@kernel.org
+Cc: liuhangbin@gmail.com, netdev@vger.kernel.org
+References: <20240624130035.3689606-1-tobias@waldekranz.com>
+ <20240624130035.3689606-4-tobias@waldekranz.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20240624130035.3689606-4-tobias@waldekranz.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-SGkgQW5kcmV3LA0KDQpUaGFua3MgZm9yIHJldmlld2luZyB0aGUgcGF0Y2hlcy4NCg0KPiBGcm9t
-OiBBbmRyZXcgTHVubiA8YW5kcmV3QGx1bm4uY2g+DQo+IFNlbnQ6IE1vbmRheSwgMjQgSnVuZSAy
-MDI0IDIyOjUxDQo+IFRvOiBEYW5pZWxsZSBSYXRzb24gPGRhbmllbGxlckBudmlkaWEuY29tPg0K
-PiBDYzogbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsgZWR1bWF6
-ZXRAZ29vZ2xlLmNvbTsNCj4ga3ViYUBrZXJuZWwub3JnOyBwYWJlbmlAcmVkaGF0LmNvbTsgY29y
-YmV0QGx3bi5uZXQ7DQo+IGxpbnV4QGFybWxpbnV4Lm9yZy51azsgc2RmQGdvb2dsZS5jb207IGtv
-cnkubWFpbmNlbnRAYm9vdGxpbi5jb207DQo+IG1heGltZS5jaGV2YWxsaWVyQGJvb3RsaW4uY29t
-OyB2bGFkaW1pci5vbHRlYW5AbnhwLmNvbTsNCj4gcHJ6ZW15c2xhdy5raXRzemVsQGludGVsLmNv
-bTsgYWhtZWQuemFraUBpbnRlbC5jb207DQo+IHJpY2hhcmRjb2NocmFuQGdtYWlsLmNvbTsgc2hh
-eWFnckBhbWF6b24uY29tOw0KPiBwYXVsLmdyZWVud2FsdEBpbnRlbC5jb207IGppcmlAcmVzbnVs
-bGkudXM7IGxpbnV4LWRvY0B2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LQ0KPiBrZXJuZWxAdmdlci5r
-ZXJuZWwub3JnOyBtbHhzdyA8bWx4c3dAbnZpZGlhLmNvbT47IElkbyBTY2hpbW1lbA0KPiA8aWRv
-c2NoQG52aWRpYS5jb20+OyBQZXRyIE1hY2hhdGEgPHBldHJtQG52aWRpYS5jb20+DQo+IFN1Ympl
-Y3Q6IFJlOiBbUEFUQ0ggbmV0LW5leHQgdjcgNy85XSBldGh0b29sOiBjbWlzX2NkYjogQWRkIGEg
-bGF5ZXIgZm9yDQo+IHN1cHBvcnRpbmcgQ0RCIGNvbW1hbmRzDQo+IA0KPiA+ICtpbnQgZXRodG9v
-bF9jbWlzX3dhaXRfZm9yX2NvbmQoc3RydWN0IG5ldF9kZXZpY2UgKmRldiwgdTggZmxhZ3MsIHU4
-IGZsYWcsDQo+ID4gKwkJCSAgICAgICB1MTYgbWF4X2R1cmF0aW9uLCB1MzIgb2Zmc2V0LA0KPiA+
-ICsJCQkgICAgICAgYm9vbCAoKmNvbmRfc3VjY2VzcykodTgpLCBib29sICgqY29uZF9mYWlsKSh1
-OCksDQo+ID4gKwkJCSAgICAgICB1OCAqc3RhdGUpDQo+ID4gK3sNCj4gPiArCWNvbnN0IHN0cnVj
-dCBldGh0b29sX29wcyAqb3BzID0gZGV2LT5ldGh0b29sX29wczsNCj4gPiArCXN0cnVjdCBldGh0
-b29sX21vZHVsZV9lZXByb20gcGFnZV9kYXRhID0gezB9Ow0KPiA+ICsJc3RydWN0IGNtaXNfd2Fp
-dF9mb3JfY29uZF9ycGwgcnBsID0ge307DQo+ID4gKwlzdHJ1Y3QgbmV0bGlua19leHRfYWNrIGV4
-dGFjayA9IHt9Ow0KPiA+ICsJdW5zaWduZWQgbG9uZyBlbmQ7DQo+ID4gKwlpbnQgZXJyOw0KPiA+
-ICsNCj4gPiArCWlmICghKGZsYWdzICYgZmxhZykpDQo+ID4gKwkJcmV0dXJuIDA7DQo+ID4gKw0K
-PiA+ICsJaWYgKG1heF9kdXJhdGlvbiA9PSAwKQ0KPiA+ICsJCW1heF9kdXJhdGlvbiA9IFUxNl9N
-QVg7DQo+ID4gKw0KPiA+ICsJZW5kID0gamlmZmllcyArIG1zZWNzX3RvX2ppZmZpZXMobWF4X2R1
-cmF0aW9uKTsNCj4gPiArCWRvIHsNCj4gPiArCQlldGh0b29sX2NtaXNfcGFnZV9pbml0KCZwYWdl
-X2RhdGEsIDAsIG9mZnNldCwgc2l6ZW9mKHJwbCkpOw0KPiA+ICsJCXBhZ2VfZGF0YS5kYXRhID0g
-KHU4ICopJnJwbDsNCj4gPiArDQo+ID4gKwkJZXJyID0gb3BzLT5nZXRfbW9kdWxlX2VlcHJvbV9i
-eV9wYWdlKGRldiwgJnBhZ2VfZGF0YSwNCj4gJmV4dGFjayk7DQo+ID4gKwkJaWYgKGVyciA8IDAp
-IHsNCj4gPiArCQkJaWYgKGV4dGFjay5fbXNnKQ0KPiA+ICsJCQkJbmV0ZGV2X2VycihkZXYsICIl
-c1xuIiwgZXh0YWNrLl9tc2cpOw0KPiA+ICsJCQljb250aW51ZTsNCj4gDQo+IGNvbnRpbnVlIGhl
-cmUgaXMgaW50ZXJlc3RlZC4gU2F5IHlvdSBnZXQgLUVJTyBiZWNhdXNlIHRoZSBtb2R1bGUgaGFz
-IGJlZW4NCj4gZWplY3RlZC4gSSB3b3VsZCBzYXkgdGhhdCBpcyBmYXRhbC4gV29uJ3QgdGhpcyBz
-cGFtIHRoZSBsb2dzLCBhcyBmYXN0IGFzIHRoZSBJMkMNCj4gYnVzIGNhbiBmYWlsLCB3aXRob3V0
-IHRoZSAyMG1zIHNsZWVwLCBmb3IgNjU1MzUgamlmZmllcz8NCg0KSWYgdGhlIG1vZHVsZSBpcyBl
-amVjdGVkIGZyb20gc29tZSByZWFzb24sIGl0IG1pZ2h0IHNwYW4gdGhlIGxvZ3MgSSBndWVzcy4N
-CkJ1dCBpdCBpcyBsZXNzIGxpa2VseSB0aGFuIHRoZSBzY2VuYXJpbyBJIHdhbnRlZCB0byBjb3Zl
-ci4NCkFjY29yZGluZyB0byBTUEVDIDUuMjoNCg0KIg0KNy4yLjUuMSBGb3JlZ3JvdW5kIE1vZGUg
-Q0RCIE1lc3NhZ2luZw0KWy4uLl0NCkluIGZvcmVncm91bmQgbW9kZSB0aGUgbW9kdWxlIHJlamVj
-dHMgYW55IHJlZ2lzdGVyIEFDQ0VTUyB1bnRpbCBhIGN1cnJlbnRseSBleGVjdXRpbmcgQ0RCIGNv
-bW1hbmQgZXhlY3V0aW9uIGhhcyBjb21wbGV0ZWQuDQpOb3RlOiBSRUFEcyBvZiB0aGUgQ2RiU3Rh
-dHVzIHJlZ2lzdGVycyAwMGg6Mzcgb3IgMDBoOjM4IChzZWUgVGFibGUgOC0xMykgd2lsbCBhbHNv
-IGJlIHJlamVjdGVkIGJ5IHRoZSBtb2R1bGUuDQoiDQoNClNvIGluIHRoYXQgY2FzZSB0aGUgbW9k
-dWxlIHdvbid0IGJlIGFibGUgdG8gcmVzcG9uZCBhbmQgd2UgbmVlZCB0byB3YWl0IGZvciBpdCB0
-byBiZSByZXNwb25zaXZlIGFuZCB0aGUgc3RhdHVzIHRvIGJlIHZhbGlkLiANCg0KPiANCj4gPiAr
-CQl9DQo+ID4gKw0KPiA+ICsJCWlmICgoKmNvbmRfc3VjY2VzcykocnBsLnN0YXRlKSkNCj4gPiAr
-CQkJcmV0dXJuIDA7DQo+ID4gKw0KPiA+ICsJCWlmICgqY29uZF9mYWlsICYmICgqY29uZF9mYWls
-KShycGwuc3RhdGUpKQ0KPiA+ICsJCQlicmVhazsNCj4gPiArDQo+ID4gKwkJbXNsZWVwKDIwKTsN
-Cj4gPiArCX0gd2hpbGUgKHRpbWVfYmVmb3JlKGppZmZpZXMsIGVuZCkpOw0KPiANCj4gUGxlYXNl
-IGNvdWxkIHlvdSBpbXBsZW1lbnQgdGhpcyB1c2luZyBpb3BvbGwuaC4gVGhpcyBhcHBlYXJzIHRv
-IGhhdmUgdGhlIHVzdWFsDQo+IHByb2JsZW0uIFNheSBtc2xlZXAoMjApIGFjdHVhbGx5IHNsZWVw
-cyBhIGxvdCBsb25nZXIsIGJlY2F1c2UgdGhlIHN5c3RlbSBpcw0KPiBidXN5IGRvaW5nIG90aGVy
-IHRoaW5ncy4gdGltZV9iZWZvcmUoamlmZmllcywNCj4gZW5kKSkgaXMgZmFsc2UsIGJlY2F1c2Ug
-b2YgdGhlIGxvbmcgZGVsYXksIGJ1dCBpbiBmYWN0IHRoZSBvcGVyYXRpb24gaGFzDQo+IGNvbXBs
-ZXRlZCB3aXRob3V0IGVycm9yLiBZZXQgeW91IHJldHVybiBFQlVTWS4gaW9wb2xsLmggZ2V0cyB0
-aGlzIGNvcnJlY3QsIGl0DQo+IGRvZXMgb25lIG1vcmUgZXZhbHVhdGlvbiBvZiB0aGUgY29uZGl0
-aW9uIGFmdGVyIGV4aXRpbmcgdGhlIGxvb3AgdG8gaGFuZGxlIHRoaXMNCj4gaXNzdWUuDQoNCk9L
-Lg0KDQo+IA0KPiA+ICtzdGF0aWMgdTggY21pc19jZGJfY2FsY19jaGVja3N1bShjb25zdCB2b2lk
-ICpkYXRhLCBzaXplX3Qgc2l6ZSkgew0KPiA+ICsJY29uc3QgdTggKmJ5dGVzID0gKGNvbnN0IHU4
-ICopZGF0YTsNCj4gPiArCXU4IGNoZWNrc3VtID0gMDsNCj4gPiArDQo+ID4gKwlmb3IgKHNpemVf
-dCBpID0gMDsgaSA8IHNpemU7IGkrKykNCj4gPiArCQljaGVja3N1bSArPSBieXRlc1tpXTsNCj4g
-PiArDQo+ID4gKwlyZXR1cm4gfmNoZWNrc3VtOw0KPiA+ICt9DQo+IA0KPiBJIGV4cGVjdCB0aGVy
-ZSBpcyBhbHJlYWR5IGEgaGVscGVyIGRvIHRoYXQgc29tZXdoZXJlLg0KPiANCj4gICAgIEFuZHJl
-dw0KDQpZZXMgaXQgZG9lcywgYnV0IGFjdHVhbGx5IGl0IGlzIGFuIGhlbHBlciB0aGF0IG9jY3Vy
-cyBpbiBzcGVjaWZpYyBwbGFjZXMgKGZvciBleGFtcGxlIHBjaV92cGRfY2hlY2tfY3N1bSgpKSwg
-dGhhdCBpIGNhbiB1c2UgZnJvbSBoZXJlLg0KDQo+IA0KPiAtLS0NCj4gcHctYm90OiBjcg0K
+On 24/06/2024 16:00, Tobias Waldekranz wrote:
+> Allow a port's spanning tree state to be modified on a per-MSTI basis,
+> and support dumping the current MST states for every port and MSTI.
+> 
+> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+> ---
+>  bridge/Makefile    |   2 +-
+>  bridge/br_common.h |   1 +
+>  bridge/bridge.c    |   3 +-
+>  bridge/mst.c       | 262 +++++++++++++++++++++++++++++++++++++++++++++
+>  man/man8/bridge.8  |  57 ++++++++++
+>  5 files changed, 323 insertions(+), 2 deletions(-)
+>  create mode 100644 bridge/mst.c
+> 
+> diff --git a/bridge/Makefile b/bridge/Makefile
+> index 01f8a455..4c57df43 100644
+> --- a/bridge/Makefile
+> +++ b/bridge/Makefile
+> @@ -1,5 +1,5 @@
+>  # SPDX-License-Identifier: GPL-2.0
+> -BROBJ = bridge.o fdb.o monitor.o link.o mdb.o vlan.o vni.o
+> +BROBJ = bridge.o fdb.o monitor.o link.o mdb.o mst.o vlan.o vni.o
+>  
+>  include ../config.mk
+>  
+> diff --git a/bridge/br_common.h b/bridge/br_common.h
+> index 704e76b0..3a0cf882 100644
+> --- a/bridge/br_common.h
+> +++ b/bridge/br_common.h
+> @@ -20,6 +20,7 @@ void print_headers(FILE *fp, const char *label);
+>  int do_fdb(int argc, char **argv);
+>  int do_mdb(int argc, char **argv);
+>  int do_monitor(int argc, char **argv);
+> +int do_mst(int argc, char **argv);
+>  int do_vlan(int argc, char **argv);
+>  int do_link(int argc, char **argv);
+>  int do_vni(int argc, char **argv);
+> diff --git a/bridge/bridge.c b/bridge/bridge.c
+> index ef592815..f8b5646a 100644
+> --- a/bridge/bridge.c
+> +++ b/bridge/bridge.c
+> @@ -36,7 +36,7 @@ static void usage(void)
+>  	fprintf(stderr,
+>  "Usage: bridge [ OPTIONS ] OBJECT { COMMAND | help }\n"
+>  "       bridge [ -force ] -batch filename\n"
+> -"where  OBJECT := { link | fdb | mdb | vlan | vni | monitor }\n"
+> +"where  OBJECT := { link | fdb | mdb | mst | vlan | vni | monitor }\n"
+>  "       OPTIONS := { -V[ersion] | -s[tatistics] | -d[etails] |\n"
+>  "                    -o[neline] | -t[imestamp] | -n[etns] name |\n"
+>  "                    -com[pressvlans] -c[olor] -p[retty] -j[son] }\n");
+> @@ -56,6 +56,7 @@ static const struct cmd {
+>  	{ "link",	do_link },
+>  	{ "fdb",	do_fdb },
+>  	{ "mdb",	do_mdb },
+> +	{ "mst",	do_mst },
+>  	{ "vlan",	do_vlan },
+>  	{ "vni",	do_vni },
+>  	{ "monitor",	do_monitor },
+> diff --git a/bridge/mst.c b/bridge/mst.c
+> new file mode 100644
+> index 00000000..873ca536
+> --- /dev/null
+> +++ b/bridge/mst.c
+> @@ -0,0 +1,262 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Get/set Multiple Spanning Tree (MST) states
+> + */
+> +
+> +#include <stdio.h>
+> +#include <linux/if_bridge.h>
+> +#include <net/if.h>
+> +
+> +#include "libnetlink.h"
+> +#include "json_print.h"
+> +#include "utils.h"
+> +
+> +#include "br_common.h"
+> +
+> +#define MST_ID_LEN 9
+> +
+> +#define __stringify_1(x...) #x
+> +#define __stringify(x...) __stringify_1(x)
+
+This part seems to be defined in multiple places for the bridge tool,
+perhaps pull it in br_common.h?
+
+> +
+> +static unsigned int filter_index;
+> +
+> +static void usage(void)
+> +{
+> +	fprintf(stderr,
+> +		"Usage: bridge mst set dev DEV msti MSTI state STATE\n"
+> +		"       bridge mst {show} [ dev DEV ]\n");
+> +	exit(-1);
+> +}
+> +
+> +static void print_mst_entry(struct rtattr *a, FILE *fp)
+> +{
+> +	struct rtattr *tb[IFLA_BRIDGE_MST_ENTRY_MAX + 1];
+> +	__u16 msti = 0;
+> +	__u8 state = 0;
+> +
+> +	parse_rtattr_flags(tb, IFLA_BRIDGE_MST_ENTRY_MAX, RTA_DATA(a),
+> +			   RTA_PAYLOAD(a), NLA_F_NESTED);
+> +
+> +
+> +	if (!(tb[IFLA_BRIDGE_MST_ENTRY_MSTI] &&
+> +	      tb[IFLA_BRIDGE_MST_ENTRY_STATE])) {
+> +		fprintf(stderr, "BUG: broken MST entry");
+> +		return;
+> +	}
+> +
+> +	msti = rta_getattr_u16(tb[IFLA_BRIDGE_MST_ENTRY_MSTI]);
+> +	state = rta_getattr_u8(tb[IFLA_BRIDGE_MST_ENTRY_STATE]);
+> +
+> +	open_json_object(NULL);
+> +	print_uint(PRINT_ANY, "msti", "%u", msti);
+> +	print_nl();
+> +	print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s    ", "");
+> +	print_stp_state(state);
+> +	print_nl();
+> +	close_json_object();
+> +}
+> +
+> +static int print_msts(struct nlmsghdr *n, void *arg)
+> +{
+> +	struct ifinfomsg *ifi = NLMSG_DATA(n);
+> +	struct rtattr *af_spec, *mst, *a;
+> +	int rem = n->nlmsg_len;
+> +	bool opened = false;
+> +
+> +	rem -= NLMSG_LENGTH(sizeof(*ifi));
+> +	if (rem < 0) {
+> +		fprintf(stderr, "BUG: wrong nlmsg len %d\n", rem);
+> +		return -1;
+> +	}
+> +
+> +	af_spec = parse_rtattr_one(IFLA_AF_SPEC, IFLA_RTA(ifi), rem);
+> +	if (!af_spec)
+> +		return -1;
+> +
+> +	if (filter_index && filter_index != ifi->ifi_index)
+> +		return 0;
+> +
+> +	mst = parse_rtattr_one_nested(NLA_F_NESTED | IFLA_BRIDGE_MST, af_spec);
+> +	if (!mst)
+> +		return 0;
+> +
+> +	rem = RTA_PAYLOAD(mst);
+> +	for (a = RTA_DATA(mst); RTA_OK(a, rem); a = RTA_NEXT(a, rem)) {
+> +		unsigned short rta_type = a->rta_type & NLA_TYPE_MASK;
+> +
+> +		if (rta_type > IFLA_BRIDGE_MST_MAX)
+> +			continue;
+> +
+
+You can just use the switch below to continue in the default case.
+
+> +		switch (rta_type) {
+> +		case IFLA_BRIDGE_MST_ENTRY:
+> +			if (!opened) {
+> +				open_json_object(NULL);
+> +				print_color_string(PRINT_ANY, COLOR_IFNAME,
+> +						   "ifname",
+> +						   "%-" __stringify(IFNAMSIZ) "s  ",
+> +						   ll_index_to_name(ifi->ifi_index));
+> +				open_json_array(PRINT_JSON, "mst");
+> +				opened = true;
+> +			} else {
+> +				print_string(PRINT_FP, NULL, "%-"
+> +					     __stringify(IFNAMSIZ) "s  ", "");
+> +			}
+> +
+> +			print_mst_entry(a, arg);
+> +			break;
+> +		}
+> +	}
+> +
+> +	if (opened) {
+> +		close_json_array(PRINT_JSON, NULL);
+> +		close_json_object();
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int mst_show(int argc, char **argv)
+> +{
+> +	char *filter_dev = NULL;
+> +
+> +	while (argc > 0) {
+> +		if (strcmp(*argv, "dev") == 0) {
+> +			NEXT_ARG();
+> +			if (filter_dev)
+> +				duparg("dev", *argv);
+> +			filter_dev = *argv;
+> +		}
+> +		argc--; argv++;
+> +	}
+> +
+> +	if (filter_dev) {
+> +		filter_index = ll_name_to_index(filter_dev);
+> +		if (!filter_index)
+> +			return nodev(filter_dev);
+> +	}
+> +
+> +	if (rtnl_linkdump_req_filter(&rth, PF_BRIDGE, RTEXT_FILTER_MST) < 0) {
+> +		perror("Cannon send dump request");
+> +		exit(1);
+> +	}
+> +
+> +	new_json_obj(json);
+> +
+> +	if (!is_json_context()) {
+> +		printf("%-" __stringify(IFNAMSIZ) "s  "
+> +		       "%-" __stringify(MST_ID_LEN) "s",
+> +		       "port", "msti");
+> +		printf("\n");
+> +	}
+> +
+> +	if (rtnl_dump_filter(&rth, print_msts, stdout) < 0) {
+> +		fprintf(stderr, "Dump terminated\n");
+> +		return -1;
+> +	}
+> +
+> +	delete_json_obj();
+> +	fflush(stdout);
+> +	return 0;
+> +}
+> +
+> +static int mst_set(int argc, char **argv)
+> +{
+> +	struct {
+> +		struct nlmsghdr		n;
+> +		struct ifinfomsg	ifi;
+> +		char			buf[512];
+> +	} req = {
+> +		.n.nlmsg_len = NLMSG_LENGTH(sizeof(struct ifinfomsg)),
+> +		.n.nlmsg_flags = NLM_F_REQUEST,
+> +		.n.nlmsg_type = RTM_SETLINK,
+> +		.ifi.ifi_family = PF_BRIDGE,
+> +	};
+> +	char *d = NULL, *m = NULL, *s = NULL, *endptr;
+> +	struct rtattr *af_spec, *mst, *entry;
+> +	__u16 msti;
+> +	__u8 state;
+> +
+> +	while (argc > 0) {
+> +		if (strcmp(*argv, "dev") == 0) {
+> +			NEXT_ARG();
+> +			d = *argv;
+> +		} else if (strcmp(*argv, "msti") == 0) {
+> +			NEXT_ARG();
+> +			m = *argv;
+> +		} else if (strcmp(*argv, "state") == 0) {
+> +			NEXT_ARG();
+> +			s = *argv;
+> +		} else {
+> +			if (matches(*argv, "help") == 0)
+> +				usage();
+> +		}
+> +		argc--; argv++;
+> +	}
+> +
+> +	if (d == NULL || m == NULL || s == NULL) {
+> +		fprintf(stderr, "Device, MSTI and state are required arguments.\n");
+> +		return -1;
+> +	}
+> +
+> +	req.ifi.ifi_index = ll_name_to_index(d);
+> +	if (!req.ifi.ifi_index)
+> +		return nodev(d);
+> +
+> +	msti = strtol(m, &endptr, 10);
+> +	if (!(*s != '\0' && *endptr == '\0')) {
+> +		fprintf(stderr,
+> +			"Error: invalid MSTI\n");
+> +		return -1;
+> +	}
+> +
+> +	state = strtol(s, &endptr, 10);
+> +	if (!(*s != '\0' && *endptr == '\0')) {
+> +		state = parse_stp_state(s);
+> +		if (state == -1) {
+> +			fprintf(stderr,
+> +				"Error: invalid STP port state\n");
+> +			return -1;
+> +		}
+> +	}
+> +
+> +	af_spec = addattr_nest(&req.n, sizeof(req), IFLA_AF_SPEC);
+> +	mst = addattr_nest(&req.n, sizeof(req), IFLA_BRIDGE_MST);
+> +
+> +	entry = addattr_nest(&req.n, sizeof(req), IFLA_BRIDGE_MST_ENTRY);
+> +	entry->rta_type |= NLA_F_NESTED;
+> +
+> +	addattr16(&req.n, sizeof(req), IFLA_BRIDGE_MST_ENTRY_MSTI, msti);
+> +	addattr8(&req.n, sizeof(req), IFLA_BRIDGE_MST_ENTRY_STATE, state);
+> +
+> +	addattr_nest_end(&req.n, entry);
+> +
+> +	addattr_nest_end(&req.n, mst);
+> +	addattr_nest_end(&req.n, af_spec);
+> +
+> +
+> +	if (rtnl_talk(&rth, &req.n, NULL) < 0)
+> +		return -1;
+> +
+> +	return 0;
+> +}
+> +
+> +int do_mst(int argc, char **argv)
+> +{
+> +	ll_init_map(&rth);
+> +
+> +	if (argc > 0) {
+> +		if (matches(*argv, "set") == 0)
+> +			return mst_set(argc-1, argv+1);
+> +
+> +		if (matches(*argv, "show") == 0 ||
+> +		    matches(*argv, "lst") == 0 ||
+> +		    matches(*argv, "list") == 0)
+> +			return mst_show(argc-1, argv+1);
+> +		if (matches(*argv, "help") == 0)
+> +			usage();
+> +	} else
+> +		return mst_show(0, NULL);
+> +
+> +	fprintf(stderr, "Command \"%s\" is unknown, try \"bridge mst help\".\n", *argv);
+> +	exit(-1);
+> +}
+> diff --git a/man/man8/bridge.8 b/man/man8/bridge.8
+> index b4699801..08f329c6 100644
+> --- a/man/man8/bridge.8
+> +++ b/man/man8/bridge.8
+> @@ -207,6 +207,15 @@ bridge \- show / manipulate bridge addresses and devices
+>  .RB "[ " vni
+>  .IR VNI " ]"
+>  
+> +.ti -8
+> +.B "bridge mst set"
+> +.IR dev " DEV " msti " MSTI " state " STP_STATE "
+> +
+> +.ti -8
+> +.BR "bridge mst" " [ [ " show " ] [ "
+> +.B dev
+> +.IR DEV " ] ]"
+> +
+>  .ti -8
+>  .BR "bridge vlan" " { " add " | " del " } "
+>  .B dev
+> @@ -1247,6 +1256,54 @@ endpoint. Match entries only with the specified destination port number.
+>  the VXLAN VNI Network Identifier to use to connect to the remote VXLAN tunnel
+>  endpoint. Match entries only with the specified destination VNI.
+>  
+> +.SH bridge mst - multiple spanning tree port states
+> +
+> +In the multiple spanning tree (MST) model, the active paths through a
+> +network can be different for different VLANs.  In other words, a
+> +bridge port can simultaneously forward one subset of VLANs, while
+> +blocking another.
+> +
+> +Provided that the
+> +.B mst_enable
+> +bridge option is enabled, a group of VLANs can be forwarded along the
+> +same spanning tree by associating them with the same instance (MSTI)
+> +using
+> +.BR "bridge vlan global set" .
+
+Give a complete command example?
+
+> +
+> +.SS bridge mst set - set multiple spanning tree state
+> +
+> +Set the spanning tree state for
+> +.IR DEV ,
+> +in the multiple spanning tree instance
+> +.IR MSTI ,
+> +to
+> +.IR STP_STATE .
+> +
+> +.TP
+> +.BI dev " DEV"
+> +Interface name of the bridge port.
+> +
+> +.TP
+> +.BI msti " MSTI"
+> +The multiple spanning tree instance.
+> +
+> +.TP
+> +.BI state " STP_STATE"
+> +The spanning tree state, see the
+> +.B state
+> +option of
+> +.B "bridge link set"
+> +for supported states.
+> +
+> +.SS bridge mst show - list MST states
+> +
+> +List current MST port states in every MSTI.
+> +
+> +.TP
+> +.BI dev " DEV"
+> +If specified, only display states of the bridge port with this
+> +interface name.
+> +
+>  .SH bridge vlan - VLAN filter list
+>  
+>  .B vlan
+
 
