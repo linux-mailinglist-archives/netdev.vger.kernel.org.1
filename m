@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-106980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E479918563
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 17:11:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70625918571
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 17:13:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B61E41F28E4C
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:11:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1F151C221AF
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FA361891DA;
-	Wed, 26 Jun 2024 15:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="x5uAcgRS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3B7A1891DF;
+	Wed, 26 Jun 2024 15:12:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70FDA186283;
-	Wed, 26 Jun 2024 15:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6513E18A922;
+	Wed, 26 Jun 2024 15:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719414659; cv=none; b=kz2jnqWBagmcJRBjI4y1LMLVFYUAou4p46rlDmACDtDdhnaczwgXByd7Fu8IOfA93wGpOZiN/a0Bi/++hauDekAPu23ah82RClpB6/3iwgcemXfzyvvN8AbwVjIPU6o4pbYkiMgq5W9D4c35DKi015pxlJXOklnRHxUzbQNc+Qw=
+	t=1719414777; cv=none; b=kU2RU+kmzobCZHRZnzt4Wp8EKmBpP7uG9X2xnejJbrySfLWBwJmpXwPvSn8DrgFuc8K8pxz0g4AUltYXIY4OfM3brjfA8VtfR6JnW6+MQH4jvdKjCX8lvM1ZbZTF2ju0/dpFji8iF2t+UqbQwx6Iu0GbkrvfWtAyjW3wOk+lJBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719414659; c=relaxed/simple;
-	bh=FSmDhvFUJs9NsQfwLU6nxFJxJmU5Amm6j4FF1hXKJhs=;
+	s=arc-20240116; t=1719414777; c=relaxed/simple;
+	bh=3aVsfSayzLgkpGdE7jOuKef/gUYNqPrEs9FdLQLWT4Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sRGKrhMIZ8x221YY2iTyqPsa2dmbN6trbj5y0R4fs1L+Q/TD6YsQpDpFQieSZjMGdcQwGVr62z7EblThjdRtO0ggnmuyylr49d+RIThHpadJKUjVb292qcfjar0yUMKDGIVU6WReuXR7N07imb/QY0iDrgsSgn1Sh62Rb2sFfMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=x5uAcgRS; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5m14rGTG9LmbrjjJ/l2NwU7Y0IP12ob5tulLHsA6h8Y=; b=x5uAcgRSuDey6PsbTz4RgEk3QC
-	drc99olvsjw4sho1UzY7/RgPeU+6fqMXABv4CCYbvOHKAIvSvbybYg3tum5gjF2jlknX8p6SVbSQi
-	9aaPjlimypP6O7gE7ewL7dQEICSVKlTqAqjToRvGJSov3kD/jukiN1oByp9Y0KBMx+iE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sMUI7-0013Aj-CP; Wed, 26 Jun 2024 17:10:35 +0200
-Date: Wed, 26 Jun 2024 17:10:35 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Andrew Halaney <ahalaney@redhat.com>
-Cc: Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=nuQbrNTudAlY8r3NzvXVws2EorYav9IDIV9GDPp+Zz1Jy/5iHgk/mKI80kRKvYELFNFhH7kwLMXnHB+2I2MD3PIcEde7EQQ8ufHM6nKt/4FwThbMClWwsCFR27ik41JLz06wsJWxCYHS89lquNZSmyPpYYd/aWcTO16FMSZL87E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a72585032f1so453206066b.3;
+        Wed, 26 Jun 2024 08:12:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719414775; x=1720019575;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e1GHg0adTDcx7aelMd7sHYAvXl2IXilBtvZqQq6vi+0=;
+        b=jY1193NZKROoImXU3yUbKktXpX+v9fg1mRV8SOBKlfAeNTT4l1yqzMMdC0Cosqb6hs
+         c3T0SSCP9xAKNHN9xpwsqzgh7wfHIOpl9wPdaYI1CEYFjws3L/lu/2NaBxNDa0txUzHy
+         LRsIdMZ5n5bS3lHRACOVnlV2z5Tmdry/9VZ/6MGUFlFSabDuWrAKrlMv9FUtmGRgMnGn
+         dks9Cp2TLJqjjpS7nGkvhpGqi7xV5d3S1NmWdadJR6NcD+Ez8ewVYIGLFdRS5LK+m2DS
+         VTiAzayByPdpgNabDxzrYetajewhMgyjSvnmO/cgZJb0A6p/KIE7oKnFG4evpG2nAl7l
+         qK4A==
+X-Forwarded-Encrypted: i=1; AJvYcCVkBIzu1xgS2DFpiaZc9GNgkeQREH5nKETAgEcBqTxA9beqiiniY3R0cZgHZ96vtWrQwG6PSb75ZeO2NOMOH+tBJ9tC0ayJrQXDYzHOi8WRQOlI8XFUV2h8elk5m7Pj/l1EEuQG
+X-Gm-Message-State: AOJu0YxR5fd89G+q9uEACKvQn+E+61mKya3xvUYyMDtNiZDFoJfBf3qr
+	LPNnS0VC88sdJKy+vCj/Y3gf3iSOjVjFN8HundXIo02sPaYsrzXmiBdCkQ==
+X-Google-Smtp-Source: AGHT+IHlNljuWeKDcLWfXayPDJUHx5Lh29W+LGEbEWNZhl8VBElSvXc8Crp+UM6H/K7zRlBb/fSC5Q==
+X-Received: by 2002:a17:907:a096:b0:a72:65c5:315e with SMTP id a640c23a62f3a-a7265c53ea1mr511015666b.21.1719414774523;
+        Wed, 26 Jun 2024 08:12:54 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a725459233csm326571866b.96.2024.06.26.08.12.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jun 2024 08:12:54 -0700 (PDT)
+Date: Wed, 26 Jun 2024 08:12:51 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Sunil Goutham <sgoutham@marvell.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, kernel@quicinc.com,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] net: stmmac: Bring down the clocks to lower
- frequencies when mac link goes down
-Message-ID: <d2bb85e4-fab5-49fe-aaf0-9d1bf2279e3d@lunn.ch>
-References: <20240625-icc_bw_voting_from_ethqos-v2-0-eaa7cf9060f0@quicinc.com>
- <20240625-icc_bw_voting_from_ethqos-v2-3-eaa7cf9060f0@quicinc.com>
- <qf4zl7qupkzbrb6ik4v4nkjct7tsh34cmoufy23zozcht5gch6@kvymsd2ue6cd>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	horms@kernel.org,
+	"moderated list:ARM/CAVIUM THUNDER NETWORK DRIVER" <linux-arm-kernel@lists.infradead.org>,
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: thunderx: Unembed netdev structure
+Message-ID: <Znwv8y03Ftzu0LP8@gmail.com>
+References: <20240624102919.4016797-1-leitao@debian.org>
+ <20240625175434.53ccea3a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,25 +75,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <qf4zl7qupkzbrb6ik4v4nkjct7tsh34cmoufy23zozcht5gch6@kvymsd2ue6cd>
+In-Reply-To: <20240625175434.53ccea3a@kernel.org>
 
-> I'm still curious if any of the netdev folks have any opinion on scaling
-> things down like this on link down.
+On Tue, Jun 25, 2024 at 05:54:34PM -0700, Jakub Kicinski wrote:
+> On Mon, 24 Jun 2024 03:29:18 -0700 Breno Leitao wrote:
+> >  static void bgx_lmac_handler(struct net_device *netdev)
+> >  {
+> > -	struct lmac *lmac = container_of(netdev, struct lmac, netdev);
+> > +	struct lmac *lmac = netdev_priv(netdev);
+> 
+> I think you are storing a pointer to lmac, so:
+> 
+> 	struct lmac **priv = netdev_priv(netdev);
+> 	struct lmac *lmac = *priv;
 
-It does make sense, in that there are no frames to process, so the
-clock can be reduced. But i also think it is a bit of a workaround for
-poor hardware design. Often you can tell the MAC the link is down, and
-it can shut down a lot more, and even turn all the clocks off.
-
-I also wounder if there are going to be any side effects of this. Some
-Ethernet MACs export a clock to the PHY. Is that clock going to
-change? I don't think it will, because we are changing to a valid MAC
-speed, not 0. So the PHY has to work at this speed clock.
-
-But to make it easier to find issues like this, open() should probably
-set the clocks to a low speed until the link is up. That way, if there
-are going to be problems, the link should never come up, as opposed to
-the link never comes up after being lost the first time...
-
-     Andrew
+Good catch. you are absolutely correct. I will update.
 
