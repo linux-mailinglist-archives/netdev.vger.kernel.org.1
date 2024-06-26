@@ -1,180 +1,253 @@
-Return-Path: <netdev+bounces-106868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 559BC917E4E
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:39:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AC31917EA7
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:45:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01965286A55
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:39:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA79D1F2778F
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6339C176FD8;
-	Wed, 26 Jun 2024 10:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6DEC178387;
+	Wed, 26 Jun 2024 10:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bqXvXjUP"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="s/IosJKg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE1A15EFC8;
-	Wed, 26 Jun 2024 10:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A7716F0DC;
+	Wed, 26 Jun 2024 10:45:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719398345; cv=none; b=cxREeFvx682/dIgLE+RREeDJBq8vuAOrR7eDisimnmCnRJQ4KUEkqbx8vzQSacO00Bat47wdShK47fYqmY653DI197JhxVE4KBJU1TXs/OVWePZPr3c/apA6Mprfipd58HYAPJmkzwTsevG5Eg270Xlz4hEO8Fdsb1z5KssFeNI=
+	t=1719398739; cv=none; b=TZQseGSVhjnoKXkMDmPBeArdTd20yfDJ+Nw59TTzSuntzBagfXukTITvBwvi/MJpp6c2T3Rlc0qOOVlrUCcSUfa4ADiFhpSqkq7B/kR+szQUbMqst3oTE8GeHqgKv1TShctddrlDXxnBAElMSJqQ3b7WagJAQzJktkVPt7lpXHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719398345; c=relaxed/simple;
-	bh=uXUtR1lw1Q8bbbvkSe1QTPqgXYBuKxKOObcsywhWxbM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZF3mw+soytbQIzjEPCgBsjv9ZKDNvSBjHweqOOby0XN8qUlhj9uV2otPsoeVJR2qatCxE6wjZnzjHC1MSlHJsVVZvqOqIwgB1XvpRwaF3657CbXBu0BPhCKDZ3UHgipan0uo2qbCGQmV4AH9LrqpDmiALQ/esEA8py/ioXaN58c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bqXvXjUP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C369CC2BD10;
-	Wed, 26 Jun 2024 10:39:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719398344;
-	bh=uXUtR1lw1Q8bbbvkSe1QTPqgXYBuKxKOObcsywhWxbM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bqXvXjUPEBzqpnCDjC6Yo+nzbhkmLatElGz7oAEaXttTbf5TaPPaEemU8CkXTcyX1
-	 nT9lNVxKSvi8KQWC2eP68MEaSMHte0kPgE3+qgOQDPxKIYTq7y8eiiOP5NPBEzq7Lk
-	 ZbBoK+avtgIZKDCtiKp1oG6Si06OdQk++5X4/GO7JmG11Vsc5n0wNxkvbPjBuCRyV/
-	 LKyhfVaXPvuNtlovFzwoslfug5cMVvYQ6eTz/jAqkf+/iZjDRLh5jSDYx3AiJpt2Kd
-	 50G1ZdyEVfsajdIolwuIWXm75PNuUZiR7KTB5YCFmiAcJ/y4/FmpEHacAlGc8A4tJA
-	 tfa5rvdFOtoeg==
-Date: Wed, 26 Jun 2024 11:38:57 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Christophe Roullier <christophe.roullier@foss.st.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Liam Girdwood <lgirdwood@gmail.com>, Marek Vasut <marex@denx.de>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next,PATCH v7 2/8] net: stmmac: dwmac-stm32: Separate out
- external clock rate validation
-Message-ID: <755275e3-b95a-44c0-941e-beb5dde65982@sirena.org.uk>
-References: <20240611083606.733453-1-christophe.roullier@foss.st.com>
- <20240611083606.733453-3-christophe.roullier@foss.st.com>
+	s=arc-20240116; t=1719398739; c=relaxed/simple;
+	bh=PYQ7W4T9hsJ3XwsGzDz81M+MVdCqs4cwSpwsSJGVjK8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=abufPBhD4bTCpK7YXpzwmK1R8OsDxs4sbbaJrs/z1Sx3lrKUNjue7fSllK1vIVFS2W1+Za2+dK371sUgzUOQa0pIG6mGmWOsR1XNltBXk/K6b1B32vvKRqB0JpheACr2aF+TXmoDUogO0VL2dMDKgE0jEZDhuppCiDiJqE8JzcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=s/IosJKg; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 331a1c8233a911ef8da6557f11777fc4-20240626
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=U7wgL9k+NEbgMRRnOKduPVpJ0+5pGNok+aStXLGf6K0=;
+	b=s/IosJKgW169rMDOoDNKeYE8ZGSmCZsosX9NeP3Gv1jnbLgpJLNgshiaQUvk+h9Y7ruWt1tWYjiYbzmAYRMQp4QuiJ5OiN8fcH3iXjifSie169bkSsQe/hX00LVGtq/pUVs/oEaqEnQrAMuWnQ1itjpZfRg6EuLRK06G5Ow5Bqo=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.39,REQID:368aa46c-0b11-4067-9261-a7bcad7518a6,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:393d96e,CLOUDID:d10a8f85-4f93-4875-95e7-8c66ea833d57,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
+	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 331a1c8233a911ef8da6557f11777fc4-20240626
+Received: from mtkmbs14n1.mediatek.inc [(172.21.101.75)] by mailgw01.mediatek.com
+	(envelope-from <skylake.huang@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 496841549; Wed, 26 Jun 2024 18:45:27 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 26 Jun 2024 18:45:24 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Wed, 26 Jun 2024 18:45:24 +0800
+From: Sky Huang <SkyLake.Huang@mediatek.com>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Daniel Golle
+	<daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>, SkyLake Huang
+	<SkyLake.Huang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+CC: Steven Liu <Steven.Liu@mediatek.com>, SkyLake.Huang
+	<skylake.huang@mediatek.com>
+Subject: [PATCH net-next v9 00/13] net: phy: mediatek: Introduce mtk-phy-lib and add 2.5Gphy support
+Date: Wed, 26 Jun 2024 18:43:16 +0800
+Message-ID: <20240626104329.11426-1-SkyLake.Huang@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="5VPZsyVafG4kC2P8"
-Content-Disposition: inline
-In-Reply-To: <20240611083606.733453-3-christophe.roullier@foss.st.com>
-X-Cookie: Many a family tree needs trimming.
+Content-Type: text/plain
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--7.503700-8.000000
+X-TMASE-MatchedRID: 8a5GscZDmcmGeTbGWdRz1qUebN0FQAbYvtVce6w5+K9xUZeguPBDQcbK
+	+pu0ZYwR6NJ1g8TkaiY/4sXBdVnb/U2VnXMRzIBj4bl1FkKDELchotH7bEpEMmecrqZc3vabN1L
+	b3d91KD/symnxq9L1AixzufF6vmDubw8f/jlV5scdxBAG5/hkW1sChor7BLiN10wPNIuvyi/Akt
+	gDJtZ0AmMl2fVuI+54nGl+g77/qoc/REwOA9OGte7KTDtx8CggLE3mrqeLTCsOUs4CTUgKy0MHU
+	R1yMHZ62JwKrFIIzlEaMs2ZphvTvQRCoiooUu1OlGudLLtRO1uJR25cPm3I2yBQRBOQhaJiQyYn
+	p0aZIjKglrWLVUWNV6kAshsx79osHVikQ9YmLLMflhDI6DvVltw5uxG2+x0y0RLUQNQYFYGjxYy
+	RBa/qJft6/2HgfIgDVymkLM+r7VSyO81X3yak8zzH295euJK5gzG6FPkPkKEz9y1J1R1kLGhi9J
+	qYMiRJVER/uV3ZvYp+3BndfXUhXQ==
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--7.503700-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP: 96DAC8B96506A1F85AA3D0DC32C2A736D6938AF73E61E5C196FBCBC54C6F34122000:8
+X-MTK: N
 
+From: "SkyLake.Huang" <skylake.huang@mediatek.com>
 
---5VPZsyVafG4kC2P8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patch series integrate MediaTek's built-in Ethernet PHY helper functions
+into mtk-phy-lib and add more functions into it. Also, add support for 2.5Gphy
+on MT7988 SoC.
 
-On Tue, Jun 11, 2024 at 10:36:00AM +0200, Christophe Roullier wrote:
-> From: Marek Vasut <marex@denx.de>
->=20
-> Pull the external clock frequency validation into a separate function,
-> to avoid conflating it with external clock DT property decoding and
-> clock mux register configuration. This should make the code easier to
-> read and understand.
+Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
+---
+Changes in v2:
+- Apply correct PATCH tag.
+- Break LED/Token ring/Extend-link-pulse-time features into 3 patches.
+- Fix contents according to v1 comments.
 
-For the past few days networking has been broken on the Avenger 96, a
-stm32mp157a based platform.  The stm32-dwmac driver fails to probe:
+Changes in v3:
+- Rebase code and now this patch series can apply to net-next tree.
+[PATCH 4/5]
+Refactor mtk_gphy_cl22_read_status() with genphy_read_status().
+[PATCH 5/5]
+1. Add range check for firmware.
+2. Fix c45_ids.mmds_present in probe function.
+3. Still use genphy_update_link() in read_status because
+genphy_c45_read_link() can't correct detect link on this phy.
 
-<6>[    1.894271] stm32-dwmac 5800a000.ethernet: IRQ eth_wake_irq not found
-<6>[    1.899694] stm32-dwmac 5800a000.ethernet: IRQ eth_lpi not found
-<6>[    1.905849] stm32-dwmac 5800a000.ethernet: IRQ sfty not found
-<3>[    1.912304] stm32-dwmac 5800a000.ethernet: Unable to parse OF data
-<3>[    1.918393] stm32-dwmac 5800a000.ethernet: probe with driver stm32-dw=
-mac failed with error -75
+Changes in v4:
+[PATCH 4/5]
+1. Change extend_an_new_lp_cnt_limit()'s return type and all return values
+2. Refactor comments in extend_an_new_lp_cnt_limit()
+[PATCH 5/5]
+1. Move firmware loading function to mt798x_2p5ge_phy_load_fw()
+2. Add AN disable warning in mt798x_2p5ge_phy_config_aneg()
+3. Clarify the HDX comments in mt798x_2p5ge_phy_get_features()
 
-which looks a bit odd given the commit contents but I didn't look at the
-driver code at all.
+Changes in v5:
+- Fix syntax errors of comments in drivers/net/phy/mediatek/*
+[PATCH 1/5]
+- Change MEDIATEK_GE_SOC_PHY from bool back to tristate.
+[PATCH 5/5]
+1. Move md32_en_cfg_base & pmb_addr to local variables to achieve
+symmetric code.
+2. Print out firmware date code & version.
+3. Don't return error if LED pinctrl switching fails. Also, add
+comments to this unusual operations.
+4. Return -EOPNOTSUPP for AN off case in config_aneg().
 
-Full boot log here:
+Changes in v6:
+- Re-arrange patch and changes description in cover letter.
+- Contraint code inside 80 columns wide.
+[PATCH 4/5]
+1. Add LP_DETECTED so extend_an_new_lp_cnt_limit() won't be called every
+time we poll the PHY for its status. It'll be called only when cable is
+plugged in and 1G training starts.
+2. Call phy_read_paged() instead of calling phy_select_page() &
+phy_restore_page() pair.
+[PATCH 5/5]
+1. Force casting (fw->data + MT7988_2P5GE_PMB_SIZE - 8) with __be16.
+2. Remove parens on RHS of "phydev->c45_ids.mmds_present |=".
+3. Add PHY_INTERFACE_MODE_INTERNAL check in
+mt798x_2p5ge_phy_get_rate_matching()
+4. Arrange local variables in reverse Xmas tree order.
 
-   https://lava.sirena.org.uk/scheduler/job/467150
+Changes in v7:
+[PATCH 5/5]
+1. Add phy mode check(PHY_INTERFACE_MODE_INTERNAL) in config_init().
+2. Always return RATE_MATCH_PAUSE in get_rate_matching().
 
-A working equivalent is here:
+Changes in v8:
+- Make sure that each variables in drivers/net/phy/mediatek/* follows reverse
+Xmas tree order.
+- Split v7 patches in this way:
+[PATCH net-next v7 1/5] net: phy: mediatek: Re-organize MediaTek ethernet phy drivers
+  -> [PATCH net-next v8 01/13] net: phy: mediatek: Re-organize MediaTek ethernet phy drivers
+  -> [PATCH net-next v8 02/13] net: phy: mediatek: Fix spelling errors and rearrange variables
+[PATCH net-next v7 2/5] net: phy: mediatek: Move LED and read/write page helper functions into mtk phy lib
+  -> [PATCH net-next v8 03/13] net: phy: mediatek: Move LED helper functions into mtk phy lib
+  -> [PATCH net-next v8 04/13] net: phy: mediatek: Improve readability of mtk-phy-lib.c's mtk_phy_led_hw_ctrl_set()
+  -> [PATCH net-next v8 05/13] net: phy: mediatek: Integrate read/write page helper functions
+  -> [PATCH net-next v8 06/13] net: phy: mediatek: Hook LED helper functions in mtk-ge.c
+  -> [PATCH net-next v8 07/13] net: phy: mediatek: add MT7530 & MT7531's PHY ID macros
+  -> [PATCH net-next v8 08/13] net: phy: mediatek: Change mtk-ge-soc.c line wrapping
+[PATCH net-next v7 3/5] net: phy: mediatek: Add token ring access helper functions in mtk-phy-lib
+  -> [PATCH net-next v8 09/13] net: phy: mediatek: Add token ring access helper functions in mtk-phy-lib
+[PATCH net-next v7 4/5] net: phy: mediatek: Extend 1G TX/RX link pulse time
+  -> [PATCH net-next v8 10/13] net: phy: mediatek: Extend 1G TX/RX link pulse time
+[PATCH net-next v7 5/5] net: phy: add driver for built-in 2.5G ethernet PHY on MT7988
+  -> [PATCH net-next v8 11/13] net: phy: add driver for built-in 2.5G ethernet PHY on MT7988
+- Create another 2 patches to:
+  - fix alignment in callback functions declarations in mtk-ge.c & mtk-ge-soc.c
+  - Remove unnecessary outer parens of "supported_triggers" var
+- Replace token ring API, tr* & __tr* with mtk_tr* & __mtk_tr* and fix
+alignment.
 
-   https://lava.sirena.org.uk/scheduler/job/466518
+Changes in v9:
+[PATCH 03/13][PATCH 06/13][PATCH 11/13]
+- Add mtk_phy_led_num_dly_cfg helper function to check led number & set
+  delay on/off time.
+[PATCH 07/13][PATCH 12/13]
+- Remove "mt753x_phy_led_hw_is_supported," callback function hook in MT7530
+  part of mtk-ge.c
+[PATCH 09/13]
+- Replace EEE1000_SELECT_SIGNEL_DETECTION_FROM_DFE with
+  EEE1000_SELECT_SIGNAL_DETECTION_FROM_DFE. (SIGNEL->SIGNAL.)
+[PATCH 11/13]
+- Add MODULE_FIRMARE()
+- Replace "MT7988_2P5GE_PMB" with "MT7988_2P5GE_PMB_FW" so we can recognize
+  it literally.
+- Remove unused macro names:
+  1. BASE100T_STATUS_EXTEND
+  2. BASE1000T_STATUS_EXTEND
+  3. EXTEND_CTRL_AND_STATUS
+  4. PHY_AUX_DPX_MASK
+---
+SkyLake.Huang (13):
+  net: phy: mediatek: Re-organize MediaTek ethernet phy drivers
+  net: phy: mediatek: Fix spelling errors and rearrange variables
+  net: phy: mediatek: Move LED helper functions into mtk phy lib
+  net: phy: mediatek: Improve readability of mtk-phy-lib.c's
+    mtk_phy_led_hw_ctrl_set()
+  net: phy: mediatek: Integrate read/write page helper functions
+  net: phy: mediatek: Hook LED helper functions in mtk-ge.c
+  net: phy: mediatek: add MT7530 & MT7531's PHY ID macros
+  net: phy: mediatek: Change mtk-ge-soc.c line wrapping
+  net: phy: mediatek: Add token ring access helper functions in
+    mtk-phy-lib
+  net: phy: mediatek: Extend 1G TX/RX link pulse time
+  net: phy: add driver for built-in 2.5G ethernet PHY on MT7988
+  net: phy: mediatek: Fix alignment in callback functions' hook
+  net: phy: mediatek: Remove unnecessary outer parens of
+    "supported_triggers" var
 
-A bisection identified this commit as being responsible, log below:
+ MAINTAINERS                                   |   7 +-
+ drivers/net/phy/Kconfig                       |  17 +-
+ drivers/net/phy/Makefile                      |   3 +-
+ drivers/net/phy/mediatek-ge.c                 | 111 ---
+ drivers/net/phy/mediatek/Kconfig              |  38 +
+ drivers/net/phy/mediatek/Makefile             |   5 +
+ drivers/net/phy/mediatek/mtk-2p5ge.c          | 431 +++++++++++
+ .../mtk-ge-soc.c}                             | 693 ++++++++----------
+ drivers/net/phy/mediatek/mtk-ge.c             | 243 ++++++
+ drivers/net/phy/mediatek/mtk-phy-lib.c        | 450 ++++++++++++
+ drivers/net/phy/mediatek/mtk.h                | 119 +++
+ 11 files changed, 1585 insertions(+), 532 deletions(-)
+ delete mode 100644 drivers/net/phy/mediatek-ge.c
+ create mode 100644 drivers/net/phy/mediatek/Kconfig
+ create mode 100644 drivers/net/phy/mediatek/Makefile
+ create mode 100644 drivers/net/phy/mediatek/mtk-2p5ge.c
+ rename drivers/net/phy/{mediatek-ge-soc.c => mediatek/mtk-ge-soc.c} (73%)
+ create mode 100644 drivers/net/phy/mediatek/mtk-ge.c
+ create mode 100644 drivers/net/phy/mediatek/mtk-phy-lib.c
+ create mode 100644 drivers/net/phy/mediatek/mtk.h
 
-git bisect start
-# status: waiting for both good and bad commits
-# bad: [0fc4bfab2cd45f9acb86c4f04b5191e114e901ed] Add linux-next specific f=
-iles for 20240625
-git bisect bad 0fc4bfab2cd45f9acb86c4f04b5191e114e901ed
-# status: waiting for good commit(s), bad commit known
-# good: [3d9217c41c07b72af3a5c147cb82c75f757f4200] Merge branch 'for-linux-=
-next-fixes' of https://gitlab.freedesktop.org/drm/misc/kernel.git
-git bisect good 3d9217c41c07b72af3a5c147cb82c75f757f4200
-# bad: [5699faecf4e2347f81eea62db0455feb4d794537] Merge branch 'master' of =
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
-git bisect bad 5699faecf4e2347f81eea62db0455feb4d794537
-# good: [ba73da675606373565868962ad8c615f175662ed] Merge branch 'fs-next' o=
-f linux-next
-git bisect good ba73da675606373565868962ad8c615f175662ed
-# bad: [7e7c714a36a5b10e391168e7e8145060e041ea12] Merge branch 'af_unix-rem=
-ove-spin_lock_nested-and-convert-to-lock_cmp_fn'
-git bisect bad 7e7c714a36a5b10e391168e7e8145060e041ea12
-# good: [93d4e8bb3f137e8037a65ea96f175f81c25c50e5] Merge tag 'wireless-next=
--2024-06-07' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wire=
-less-next
-git bisect good 93d4e8bb3f137e8037a65ea96f175f81c25c50e5
-# bad: [4314175af49668ab20c0d60d7d7657986e1d0c7c] Merge branch 'net-smc-IPP=
-ROTO_SMC'
-git bisect bad 4314175af49668ab20c0d60d7d7657986e1d0c7c
-# good: [811efc06e5f30a57030451b2d1998aa81273baf8] net/tcp: Move tcp_inboun=
-d_hash() from headers
-git bisect good 811efc06e5f30a57030451b2d1998aa81273baf8
-# good: [5f703ce5c981ee02c00e210d5b155bbbfbf11263] net: hsr: Send superviso=
-ry frames to HSR network with ProxyNodeTable data
-git bisect good 5f703ce5c981ee02c00e210d5b155bbbfbf11263
-# bad: [6c3282a6b296385bee2c383442c39f507b0d51dd] net: stmmac: add select_p=
-cs() platform method
-git bisect bad 6c3282a6b296385bee2c383442c39f507b0d51dd
-# bad: [404dbd26322f50c8123bf5bff9a409356889035f] net: qrtr: ns: Ignore ENO=
-DEV failures in ns
-git bisect bad 404dbd26322f50c8123bf5bff9a409356889035f
-# bad: [c60a54b52026bd2c9a88ae00f2aac7a67fed8e38] net: stmmac: dwmac-stm32:=
- Clean up the debug prints
-git bisect bad c60a54b52026bd2c9a88ae00f2aac7a67fed8e38
-# bad: [582ac134963e2d5cf6c45db027e156fcfb7f7678] net: stmmac: dwmac-stm32:=
- Separate out external clock rate validation
-git bisect bad 582ac134963e2d5cf6c45db027e156fcfb7f7678
-# good: [8a9044e5169bab7a8edadb4ceb748391657f0d7f] dt-bindings: net: add ST=
-M32MP13 compatible in documentation for stm32
-git bisect good 8a9044e5169bab7a8edadb4ceb748391657f0d7f
-# first bad commit: [582ac134963e2d5cf6c45db027e156fcfb7f7678] net: stmmac:=
- dwmac-stm32: Separate out external clock rate validation
+-- 
+2.18.0
 
---5VPZsyVafG4kC2P8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZ778EACgkQJNaLcl1U
-h9ApQgf/eYGmuq6nGIDNbNykExuz3/YU9CjXnBZJCLyUoHxI/mxSZPa584xjxF0z
-+0lz32f4hLSUwSrA3K/zdI1JkJLrExE1l2JrvqFWojtpIF29Trxdf4wgYQVqGvEs
-b4bf9vn4DoxvboLXQzVJtr5OJHPYJfWbZOGXqblBmQYiCTKHT+P+dI8Wn4dmiQH5
-7OH9jJ37JKuyOOTJQNtY8mZCSze+Po+sHCXKoOnwONT8PhoyXC5solI8/OxTlPYV
-LXwbpIsSu9jc3siubqUvW3LmzPn1TrCT8hD79IIye3g3aLaCYAqVfZgdsH/ahziU
-fAViHxwJVN/1dK25wZ9rERUrutFHxg==
-=B+gE
------END PGP SIGNATURE-----
-
---5VPZsyVafG4kC2P8--
 
