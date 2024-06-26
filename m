@@ -1,82 +1,108 @@
-Return-Path: <netdev+bounces-106710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 368D2917550
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 02:44:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89471917557
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 02:50:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E37A11F2216A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 00:44:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC91A1C2171F
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 00:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EEB579EF;
-	Wed, 26 Jun 2024 00:44:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 780D54C6F;
+	Wed, 26 Jun 2024 00:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dIJdSj1D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YOs+gR3F"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294646125
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 00:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C6E15B7;
+	Wed, 26 Jun 2024 00:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719362691; cv=none; b=Slhzu4hhEY/LioEWx/Asnspq3GlJtTYvYreif5oV1jQQ3NU9NhHKqU4NRG141zvBUjYzLEtVVkDMj5ztBkO0lq32m6+yM5TIKrfJCnq8LEZR09eS89CSbhaRih0AlwLV5thCZYHj+FZIzg3URj0Nd09DQfwpP+J94HJzYFKs7us=
+	t=1719363031; cv=none; b=Pn6csD7mZbVfjRGOYRk3VRa2Td9+k2q3LRo5VQFN2Q9FY69qiqLixZdw66E80VswlUQ0LYWgqIcxtgo+f8S1Gy0omkpm2+W8hTrruZFoD2H4roBwnWUAtC3E+N+ehe+fXZN7HJld1godKupxLMFU2H5lNWCzpsBioFr6TKdFkqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719362691; c=relaxed/simple;
-	bh=meM/glDigaFBA8kcG9mlFtFMxqzImr3i3eWuQXvJJvw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IbD/Lm50cOSTQogg4nCchV7L4rcCEGE7XoNT8CluXU5sjayyhlOg7Nrs5YvOijAiZ1tOCt2VKGc/VnxBV+u2m1Tl8rmXcGzOUoR+QS6U0DGJnP1LtBu/UBiEVjMdhbN0cKCsW5wjnf5+kyQ5Ot8/b0YTvnE2dWEnneo3Sy3GE8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dIJdSj1D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EB87C32781;
-	Wed, 26 Jun 2024 00:44:50 +0000 (UTC)
+	s=arc-20240116; t=1719363031; c=relaxed/simple;
+	bh=NMqBdW6cHN2yp/PLmHLJNE+UdpAsHxZYtmRCzGlkuLw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DcyuFW8LU4sNFK5wszssQ/WMzI7GJcKH7JzwYWxLJ40kHOmnA6BGSkePXlJAzJuzlYauuzjvuySsQ2MCYpuJ0iKfxgcThFYJ/tzjWdiF6MhlqoVnbLvG/no3b4GhL/nimJOpaZExqdaL+vabRYu8Z/AARf1Hdj3Kg8S9yCbZCA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YOs+gR3F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A6FFDC32786;
+	Wed, 26 Jun 2024 00:50:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719362690;
-	bh=meM/glDigaFBA8kcG9mlFtFMxqzImr3i3eWuQXvJJvw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dIJdSj1Dn6mhLa22l1zPE+Up5sR8weABMcdYdp+zf6LCXdcG83CzGZPafffBhwDPw
-	 rrKjbTXS7CPoF2A0cEhBRoHuPTomsQA4KMf6/2ZiiAInleNlbWXoCoSp8udYek5gtC
-	 1Phwbb+i/34rIfHLoPDkr/pj+3Da4jpXW12ncbclSdTu6UDsOuZvy3gnNocKFHFkku
-	 zYn0zTsDywhFWu7zmdVexnVjzmuXBwrX6YDxY1lFpfgHOVDUgy8NYcC2OtCRB1dIdd
-	 EPXRXsANfM3WCDWljKZ3DVNNB0kK3Rler91vTERsdR1mj+ZU/sDfA9lsa8QergBII7
-	 atOSDP3xcLytg==
-Date: Tue, 25 Jun 2024 17:44:49 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rao Shoaib
- <Rao.Shoaib@oracle.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- <netdev@vger.kernel.org>
-Subject: Re: [PATCH v1 net 02/11] selftest: af_unix: Add msg_oob.c.
-Message-ID: <20240625174449.796bc9a0@kernel.org>
-In-Reply-To: <20240625013645.45034-3-kuniyu@amazon.com>
-References: <20240625013645.45034-1-kuniyu@amazon.com>
-	<20240625013645.45034-3-kuniyu@amazon.com>
+	s=k20201202; t=1719363030;
+	bh=NMqBdW6cHN2yp/PLmHLJNE+UdpAsHxZYtmRCzGlkuLw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YOs+gR3FU/mMhtz6RVBgnLzHyIi7OG43lvEh4tOW122AiyCt7bY/0oxLTPDqHtpbj
+	 QKum6hG8GFs4VnHPPG5x5EIAVdvWlVHOSsz9Wa1bGV40lSGecjoGxET3dy6JNiTpkg
+	 3MBeMa1YHxIASwfdvrIu+VhvfaSrAWgY+/l+tOgOtusTmjObP84Ii32I/ML9PMnd0g
+	 CcIRTRss5dhjVKh2Vokuv4r0HSYJQPxVAkWw5JJJUxQsiJ56hPjX6PGEIxur3CkKwc
+	 qDsX16kHDh1Ip4KuHoTYVDefR78U0zNY4eBL6yJBRXi9R83lv3qCp2sMtTerAQrIUL
+	 ALTzTwPgdc/9w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8FAF9DE8DF3;
+	Wed, 26 Jun 2024 00:50:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v15 0/5] ethtool: provide the dim profile fine-tuning
+ channel
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171936303058.27591.15292953150310890485.git-patchwork-notify@kernel.org>
+Date: Wed, 26 Jun 2024 00:50:30 +0000
+References: <20240621101353.107425-1-hengqi@linux.alibaba.com>
+In-Reply-To: <20240621101353.107425-1-hengqi@linux.alibaba.com>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, kuba@kernel.org,
+ davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ jasowang@redhat.com, mst@redhat.com, bcreeley@amd.com, rkannoth@marvell.com,
+ aleksander.lobakin@intel.com, xuanzhuo@linux.alibaba.com, talgi@nvidia.com,
+ corbet@lwn.net, linux-doc@vger.kernel.org, maxime.chevallier@bootlin.com,
+ jiri@resnulli.us, paul.greenwalt@intel.com, ahmed.zaki@intel.com,
+ vladimir.oltean@nxp.com, kory.maincent@bootlin.com, andrew@lunn.ch,
+ justinstitt@google.com, donald.hunter@gmail.com, eperezma@redhat.com,
+ akpm@linux-foundation.org, dtatulea@nvidia.com, rrameshbabu@nvidia.com,
+ hkallweit1@gmail.com, przemyslaw.kitszel@intel.com, paweldembicki@gmail.com
 
-On Mon, 24 Jun 2024 18:36:36 -0700 Kuniyuki Iwashima wrote:
-> +	if (ret[0] != expected_len || recv_errno[0] != expected_errno) {
-> +		TH_LOG("AF_UNIX :%s", ret[0] < 0 ? strerror(recv_errno[0]) : recv_buf[0]);
-> +		TH_LOG("Expected:%s", expected_errno ? strerror(expected_errno) : expected_buf);
-> +
-> +		ASSERT_EQ(ret[0], expected_len);
-> +		ASSERT_EQ(recv_errno[0], expected_errno);
-> +	}
+Hello:
 
-repeating the conditions feels slightly imperfect.
-Would it be possible to modify EXPECT_* to return the condition?
-Then we could:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-	if (EXPECT(...)) {
-		TH_LOG(...
-		TH_LOG(...
-	}
+On Fri, 21 Jun 2024 18:13:48 +0800 you wrote:
+> The NetDIM library provides excellent acceleration for many modern
+> network cards. However, the default profiles of DIM limits its maximum
+> capabilities for different NICs, so providing a way which the NIC can
+> be custom configured is necessary.
+> 
+> Currently, the way is based on the commonly used "ethtool -C".
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v15,1/5] linux/dim: move useful macros to .h file
+    https://git.kernel.org/netdev/net-next/c/0e942053e4dc
+  - [net-next,v15,2/5] dim: make DIMLIB dependent on NET
+    https://git.kernel.org/netdev/net-next/c/b65e697a7c9e
+  - [net-next,v15,3/5] ethtool: provide customized dim profile management
+    https://git.kernel.org/netdev/net-next/c/f750dfe825b9
+  - [net-next,v15,4/5] dim: add new interfaces for initialization and getting results
+    https://git.kernel.org/netdev/net-next/c/13ba28c5cd04
+  - [net-next,v15,5/5] virtio-net: support dim profile fine-tuning
+    https://git.kernel.org/netdev/net-next/c/dcb67f6a9ead
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
