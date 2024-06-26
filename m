@@ -1,122 +1,113 @@
-Return-Path: <netdev+bounces-107014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 657569187E9
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 18:50:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B7649187F7
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 18:55:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20860288867
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:50:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 053B22810FD
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13BD18FC69;
-	Wed, 26 Jun 2024 16:50:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DAAD18F2EA;
+	Wed, 26 Jun 2024 16:55:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SWR6b8Vj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F6WTeWn0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1AF18F2C9
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 16:50:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518F71F94C;
+	Wed, 26 Jun 2024 16:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719420625; cv=none; b=rowyE55YvUwwtqqM8bQ+TvQkN4e+14gf7d/DGuiMtAo93qA6mbH5yciXz6xpoHKMNBEzj58EV0EM2Qg/QIuoOkv2Qg2udo+u2DFUuJ5iZjNgIWb5Qdobc0+VtmdbO8cRkRG1bU7s9xxzy+AT0N95FD1xVe0Pt9hxWqMSJhz2IYs=
+	t=1719420901; cv=none; b=JIqRYPVRTcu9od4QJEI0eSQkxPlat43EgKUIOX14+XXdi1o5Pzyy1SSP3fjg1rJpPBAuL0KEEIZcU8IB7luzDj94pU3lrSL3zp9SL1/2ZQHnfwPpQ7WLSrgG1bIuBLKc2CqH5vQHZ2R1GNisNlOfkA9/39VtvRyfjUMczgilNU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719420625; c=relaxed/simple;
-	bh=ABXkIOrOZiFOhYaEthrDJmymD5XURc+Sd2GLzHVrxSw=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=mp8gTCZSkqsB8JfCZLMbvEHaMPRyhOMSn3ZtnGVXL6sEs/aS2l7ngEMN9yz3ApdPVtJ5MngCxRepaSlSZMj0ExDXLDw6kCL9jHBJvK6YeWoy/K0Gqadd8ixv+UlboFNJAKLab7zRCuPigqtBWx4ixLl48q264v7WJWDJijSPR3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SWR6b8Vj; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-364b2f92388so4837096f8f.2
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 09:50:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719420622; x=1720025422; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xfEBOPdIux/DCtIWKciINeh0dROuUwqsdwzNZbyCkRc=;
-        b=SWR6b8VjTripfQ6nOz3StpJDFmBWrIwsTdZFZSyi8QIaCjX8k9qmq6lMPVYNCZI6bf
-         iNUMgOD7pAOKNCXCENSvp42lRcsFyc2bY1520tfdAMyzRjJxetYXPQEB7NQv6a1FgEpf
-         hRX5kCH5HIaeTnM+62Z9xfjaSv7cO49sMBPPwjF0MSS5ORR3Z1LZmyGGpX4adyDwiYZH
-         sHJPTpTQuGJbgkMBfrMr3vgWRF5beIqiOsGFc9bxU9YbefEgW6+kNRiT7epOdAscleaS
-         lFHUEXJ3VpkSpcKY/ObhtQXxiuMVH7DSMXrHoaeHQSR/rJGBWCqQXvMFGOofvTT4oUvA
-         EKzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719420622; x=1720025422;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xfEBOPdIux/DCtIWKciINeh0dROuUwqsdwzNZbyCkRc=;
-        b=G7z5kf9OJprFLD2bACBnYwdttuiXcA5EBZTx23jXd4xzrsASEoSsNpFjSq74TU9dw3
-         HaCiaGvx+GeJYWbnEqAN3jD6FTutRPE5tqbJ3oAkgyZDeJOXn2DTeaIz7uDV7zOt+xHe
-         t31xGCTUOvTLVmi1Wd8rHwtFQEepg8KERtn9xqFCHTctb7+f7lpgVrQt4TntY0h8KvuN
-         S8qVxPNS7xuED7MVf+1rTyBX9Ci/fqWAsBb469tDXfBscOJam2mTAbE2f5VZBl749wCI
-         1XItJ3FUbQOAr45OpGVb5gSWFWHyS8Kin64ne94jBucHtxD1daIdstmCo1V08srCX5Fb
-         mGAg==
-X-Gm-Message-State: AOJu0YxUWrF+fWeqq91U+gq7r4M4ZTV4y48ws8oq+HH1GJHJ8R9LJ1tk
-	QadjxLT0faRV6VMuIcdauPjJZLxs6xTcdAR9hxyGf53mLo2NuTJ3
-X-Google-Smtp-Source: AGHT+IEkVVvDKGc9kW47BTl4OtIcGedEsPzA2EZRN/Bwk0Y1BY6/qUGDbhwch8YJQV3qD9pMn/g14g==
-X-Received: by 2002:adf:a3c6:0:b0:363:1b67:9e0f with SMTP id ffacd0b85a97d-366e94dab0dmr7100977f8f.41.1719420622334;
-        Wed, 26 Jun 2024 09:50:22 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3663a8c7c79sm16282925f8f.96.2024.06.26.09.50.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jun 2024 09:50:21 -0700 (PDT)
-Subject: Re: [PATCH net-next v3 0/4] selftests: drv-net: rss_ctx: add tests
- for RSS contexts
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- willemdebruijn.kernel@gmail.com, dw@davidwei.uk,
- przemyslaw.kitszel@intel.com, michael.chan@broadcom.com,
- andrew.gospodarek@broadcom.com, leitao@debian.org, petrm@nvidia.com
-References: <20240626012456.2326192-1-kuba@kernel.org>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <f81bd29b-7f5e-781d-df05-da34fd539888@gmail.com>
-Date: Wed, 26 Jun 2024 17:50:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1719420901; c=relaxed/simple;
+	bh=guTEOVrfyugyFbl4bTnst/wvSCcXeILGp5gqdzHoRbI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dukXDHjSzQESqPN3Lw2SGXfP2mLpxeU3E+Kve9bDx0VNxfx6ueN9N0uU9yOJ+h9k4XUdKBBpN2SA74ugIaszVQ5Fzl3qftp/RuBWCAaWJgfZWs614qJs0/FRyMPoFpANcVjir6AS95Rv7ABmyFqdx5TyYy5GVw5QedhQubDJ/UE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F6WTeWn0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69285C116B1;
+	Wed, 26 Jun 2024 16:54:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719420900;
+	bh=guTEOVrfyugyFbl4bTnst/wvSCcXeILGp5gqdzHoRbI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=F6WTeWn0h/Zrswno15KKNmdcaNuoMu516iIBTN3mNiUj/aQj6CrCoE47x3nQ43tN6
+	 SOOV5owGQZoh6/xyw3Bf2ikI9VBkRPKSIRRzu+FLbtsSuuzLiRqCBxop3eN0yQHvEn
+	 LufDBsHf+zAvDFVmYbf1hiwXW8F93FjtAHSCxZVevshIKmB+MUn2ucWp9IBA9yQD9K
+	 rWp8cfKJIPuhgBw4tSbJCuXJ4ezPgBp05JjsmdibLvy04Yo4Ihm6hf3veRYG98KGst
+	 fbT8oHEFIH822B8PRX5xTXMRHpRZ85KYu6Qrk8tTie0zaQcNQwJqO5lZYmJMnZbluu
+	 iodm2HMIqepyQ==
+Date: Wed, 26 Jun 2024 17:54:55 +0100
+From: Simon Horman <horms@kernel.org>
+To: Aaron Conole <aconole@redhat.com>
+Cc: netdev@vger.kernel.org, dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Pravin B Shelar <pshelar@ovn.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Stefano Brivio <sbrivio@redhat.com>,
+	=?utf-8?Q?Adri=C3=A1n?= Moreno <amorenoz@redhat.com>
+Subject: Re: [PATCH net-next v3 6/7] selftests: net: Use the provided dpctl
+ rather than the vswitchd for tests.
+Message-ID: <20240626165455.GA3104@kernel.org>
+References: <20240625172245.233874-1-aconole@redhat.com>
+ <20240625172245.233874-7-aconole@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240626012456.2326192-1-kuba@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240625172245.233874-7-aconole@redhat.com>
 
-On 26/06/2024 02:24, Jakub Kicinski wrote:
-> Ed, could you try the tests with your device?
+On Tue, Jun 25, 2024 at 01:22:44PM -0400, Aaron Conole wrote:
+> The current pmtu test infrastucture requires an installed copy of the
+> ovs-vswitchd userspace.  This means that any automated or constrained
+> environments may not have the requisite tools to run the tests.  However,
+> the pmtu tests don't require any special classifier processing.  Indeed
+> they are only using the vswitchd in the most basic mode - as a NORMAL
+> switch.
+> 
+> However, the ovs-dpctl kernel utility can now program all the needed basic
+> flows to allow traffic to traverse the tunnels and provide support for at
+> least testing some basic pmtu scenarios.  More complicated flow pipelines
+> can be added to the internal ovs test infrastructure, but that is work for
+> the future.  For now, enable the most common cases - wide mega flows with
+> no other prerequisites.
+> 
+> Enhance the pmtu testing to try testing using the internal utility, first.
+> As a fallback, if the internal utility isn't running, then try with the
+> ovs-vswitchd userspace tools.
+> 
+> Additionally, make sure that when the pyroute2 package is not available
+> the ovs-dpctl utility will error out to properly signal an error has
+> occurred and skip using the internal utility.
 
-Don't seem to be able to get them to run:
+Hi Aaron,
 
-# Exception| Traceback (most recent call last):
-# Exception|   File "/home/ecree/kern/linux/tools/testing/selftests/net/lib/py/ksft.py", line 134, in ksft_run
-# Exception|     case(*args)
-# Exception|   File "./drivers/net/hw/rss_ctx.py", line 70, in test_rss_key_indir
-# Exception|     if len(_get_rx_cnts(cfg)) < 2:
-# Exception|   File "./drivers/net/hw/rss_ctx.py", line 55, in _get_rx_cnts
-# Exception|     data = cfg.netdevnl.qstats_get({"ifindex": cfg.ifindex, "scope": ["queue"]}, dump=True)
-# Exception|   File "/home/ecree/kern/linux/tools/net/ynl/lib/ynl.py", line 1029, in _op
-# Exception|     return self._ops(ops)[0]
-# Exception|   File "/home/ecree/kern/linux/tools/net/ynl/lib/ynl.py", line 985, in _ops
-# Exception|     raise NlError(nl_msg)
-# Exception| net.ynl.lib.ynl.NlError: Netlink error: Operation not supported
-# Exception| nl_len = 28 (12) nl_flags = 0x202 nl_type = 3
-# Exception| 	error: -95
-# Exception| 	extack: {'bad-attr': '.ifindex'}
-not ok 1 rss_ctx.test_rss_key_indir
+I don't feel strongly about this, but it does feel like the
+change to ovs-dpctl.py could live in a separate patch.
 
-Cursory investigation suggests this is because sfc doesn't
- support netdev_stat_ops, we're still living in the bad old
- days of ethtool -S for our per-queue stats :(
-Much as I'd like to fix that, I don't see a prospect of the
- folks upstairs carving out time for it any time soon...
+> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
+> Signed-off-by: Aaron Conole <aconole@redhat.com>
 
--ed
+The above not withstanding,
+
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+I have tested pmtu.sh with this change on Fedora 40 both
+with python3-pyroute2 installed, which uses ovs-dpctl,
+and without, which uses ovs-vswitchd userspace tools.
+
+Tested-by: Simon Horman <horms@kernel.org>
+
+...
 
