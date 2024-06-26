@@ -1,137 +1,86 @@
-Return-Path: <netdev+bounces-106751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ECA7917849
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 07:47:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C110917888
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:09:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6DC21F22DF2
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 05:47:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83DB0B21919
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 06:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981F2146585;
-	Wed, 26 Jun 2024 05:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N5E4Bgse"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5B514D29B;
+	Wed, 26 Jun 2024 06:08:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F514146A64;
-	Wed, 26 Jun 2024 05:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B05A14D28F
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 06:08:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719380873; cv=none; b=R93bLIt+iiFFvaiZQPAB0+I7Q2Fh/nSAlmbxYKBRpted7GXi3naaNsLPBdsruYn0j+kL8WWep7CEL0ORlExHi0eBfEfMCQnqmxOAJWFcskpZ/5dYtKHfJeB+tcKAZPh30tUTgs3XBqEWfVEgk+LM4LW34UaWmEOHGbsj7oqEvs0=
+	t=1719382116; cv=none; b=dgfVP/CQRp9tmlmsxo6gW4q2X6VPdNuBF9X7H2wcflxM/ylRCPZA1pH9viaVab8UWSJONQEZPAvAE4oe1Z/cSFXz/v61F2P1ktRy18egUNhAox/66UmfCv51cE6xJsfUsthI9C4NKVG37kyv7cRHj66F8LScF5DSwUrLAhiFYuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719380873; c=relaxed/simple;
-	bh=7hdMr15z96txrxYuo49EkPDqmnH+yLqNedUNybqtN1s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eHnhJPQRfmAsXDlh3j3zp45YbuI4bFP5xvZvpuq/chaJNXK/st2ZB4Hh4gyMYABrn7MF2pDOy8vbedh79vx/mGIrNRDfJrJBj2A12eM9pZdVBHEXNP1NA8V9ZYUBkFs02uN/2fRS9zaw4hWO3SKwJD3F05yZwUAK2AAdeVsZe/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N5E4Bgse; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 777C8C2BD10;
-	Wed, 26 Jun 2024 05:47:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719380873;
-	bh=7hdMr15z96txrxYuo49EkPDqmnH+yLqNedUNybqtN1s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N5E4BgseIOhci9v98Gw+VJm3TCwN3z59M5Y6n8kCGHu6jndlDxUgHdbi04FWVvH6s
-	 BoSwhqImhZ9AIp0ZbiwI5/iiIpIfZsbkxGcSi+3f6V5HSZh/SLhm1r5E9mlHoOWLVM
-	 xYO8J2qKxWRPxA5VSFMTKL7sMI1+UH1P36hw2myyf/vE2wzLJ/BJqh43yBvCGQFeTR
-	 xkIxxvXOfRj3IYDUvBcL2armWqC9Br1JewNNKFALtH0P/rz/3vnBk9Qw8pqlDul1V0
-	 qH6CZKK583M25/v8jYGm8xWoxlfigPScj3fNaGje4IeeUteVoBe+J404DV1rp3SDSN
-	 4QSHS1BcGPs4A==
-Date: Wed, 26 Jun 2024 08:47:48 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Konstantin Taranov <kotaranov@linux.microsoft.com>
-Cc: kotaranov@microsoft.com, weh@microsoft.com, sharmaajay@microsoft.com,
-	longli@microsoft.com, jgg@ziepe.ca, linux-rdma@vger.kernel.org,
-	linux-netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH rdma-next 1/1] RDMA/mana_ib: Set correct device into ib
-Message-ID: <20240626054748.GN29266@unreal>
-References: <1719311307-7920-1-git-send-email-kotaranov@linux.microsoft.com>
+	s=arc-20240116; t=1719382116; c=relaxed/simple;
+	bh=Fq7/OUef+ZJHXJf8zC44cxCgg0D5SR541aqpDZmjk2U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rKWaSLPBWY03iqUWbUBuIc0FnxIxo30sEAJAEeCgKmvI8NQcWRAGM43Fq1pXKPvv26OR7OkraMbjyZtKNEbFXWXZPPljOy6pX8/t8pDlANv97TNRuwIz2qbCEszzQio3gM4ytAipCiaSKW26Ca/8+LG4CwF1LtI9lg19Je+BQLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: bizesmtp84t1719382030toi8vmn7
+X-QQ-Originating-IP: PJpckioFo2WOPURKSHqRODw+uXhrj+fTw/4dsXyLhm8=
+Received: from lap-jiawenwu.trustnetic.com ( [220.184.148.68])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 26 Jun 2024 14:07:07 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 664126805949557273
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	andrew@lunn.ch,
+	netdev@vger.kernel.org,
+	przemyslaw.kitszel@intel.com
+Cc: mengyuanlou@net-swift.com,
+	duanqiangwen@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net v2 0/2] net: txgbe: fix MSI and INTx interrupts
+Date: Wed, 26 Jun 2024 14:07:01 +0800
+Message-Id: <20240626060703.31652-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1719311307-7920-1-git-send-email-kotaranov@linux.microsoft.com>
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-On Tue, Jun 25, 2024 at 03:28:27AM -0700, Konstantin Taranov wrote:
-> From: Konstantin Taranov <kotaranov@microsoft.com>
-> 
-> When mc->ports[0] is not slave, use it in the set_netdev.
-> When mana is used in netvsc, the stored net devices in mana
-> are slaves and GIDs should be taken from their master devices.
-> In the baremetal case, the mc->ports devices will not be slaves.
+Fix MSI and INTx interrupts for txgbe driver.
 
-I wonder, why do you have "... | IFF_SLAVE" in __netvsc_vf_setup() in a
-first place? Isn't IFF_SLAVE is supposed to be set by bond driver?
+changes in v2:
+- Split into two commits.
+- Detail commit description.
 
-> 
-> Fixes: 8b184e4f1c32 ("RDMA/mana_ib: Enable RoCE on port 1")
-> Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
-> ---
->  drivers/infiniband/hw/mana/device.c | 19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/infiniband/hw/mana/device.c b/drivers/infiniband/hw/mana/device.c
-> index b07a8e2e838f..5395306a86e8 100644
-> --- a/drivers/infiniband/hw/mana/device.c
-> +++ b/drivers/infiniband/hw/mana/device.c
-> @@ -11,6 +11,8 @@ MODULE_DESCRIPTION("Microsoft Azure Network Adapter IB driver");
->  MODULE_LICENSE("GPL");
->  MODULE_IMPORT_NS(NET_MANA);
->  
-> +#define mana_ndev_is_slave(dev)   (((dev)->flags & IFF_SLAVE) == IFF_SLAVE)
+v1: https://lore.kernel.org/all/20240621080951.14368-1-jiawenwu@trustnetic.com
 
-There is no need in macro for one line of code and there is no need in "==",
-as the result will be boolean.
+Jiawen Wu (2):
+  net: txgbe: remove separate irq request for MSI and INTx
+  net/txgbe: add extra handle for MSI/INTx into thread irq handle
 
-> +
->  static const struct ib_device_ops mana_ib_dev_ops = {
->  	.owner = THIS_MODULE,
->  	.driver_id = RDMA_DRIVER_MANA,
-> @@ -56,7 +58,7 @@ static int mana_ib_probe(struct auxiliary_device *adev,
->  {
->  	struct mana_adev *madev = container_of(adev, struct mana_adev, adev);
->  	struct gdma_dev *mdev = madev->mdev;
-> -	struct net_device *upper_ndev;
-> +	struct net_device *ndev;
->  	struct mana_context *mc;
->  	struct mana_ib_dev *dev;
->  	u8 mac_addr[ETH_ALEN];
-> @@ -85,16 +87,19 @@ static int mana_ib_probe(struct auxiliary_device *adev,
->  	dev->ib_dev.dev.parent = mdev->gdma_context->dev;
->  
->  	rcu_read_lock(); /* required to get upper dev */
-> -	upper_ndev = netdev_master_upper_dev_get_rcu(mc->ports[0]);
-> -	if (!upper_ndev) {
-> +	if (mana_ndev_is_slave(mc->ports[0]))
-> +		ndev = netdev_master_upper_dev_get_rcu(mc->ports[0]);
-> +	else
-> +		ndev = mc->ports[0];
-> +	if (!ndev) {
->  		rcu_read_unlock();
->  		ret = -ENODEV;
-> -		ibdev_err(&dev->ib_dev, "Failed to get master netdev");
-> +		ibdev_err(&dev->ib_dev, "Failed to get netdev for port 1");
->  		goto free_ib_device;
->  	}
-> -	ether_addr_copy(mac_addr, upper_ndev->dev_addr);
-> -	addrconf_addr_eui48((u8 *)&dev->ib_dev.node_guid, upper_ndev->dev_addr);
-> -	ret = ib_device_set_netdev(&dev->ib_dev, upper_ndev, 1);
-> +	ether_addr_copy(mac_addr, ndev->dev_addr);
-> +	addrconf_addr_eui48((u8 *)&dev->ib_dev.node_guid, ndev->dev_addr);
-> +	ret = ib_device_set_netdev(&dev->ib_dev, ndev, 1);
->  	rcu_read_unlock();
->  	if (ret) {
->  		ibdev_err(&dev->ib_dev, "Failed to set ib netdev, ret %d", ret);
-> -- 
-> 2.43.0
-> 
-> 
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  13 +-
+ .../net/ethernet/wangxun/txgbe/txgbe_irq.c    | 122 +++++++-----------
+ .../net/ethernet/wangxun/txgbe/txgbe_irq.h    |   2 +-
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   3 +-
+ 4 files changed, 59 insertions(+), 81 deletions(-)
+
+-- 
+2.27.0
+
 
