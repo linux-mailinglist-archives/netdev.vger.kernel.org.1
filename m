@@ -1,80 +1,117 @@
-Return-Path: <netdev+bounces-107065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 485AB919A23
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 23:54:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EE17919A26
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 23:57:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02AF5280ABD
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 21:54:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29AAB1C21706
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 21:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 173CF19308E;
-	Wed, 26 Jun 2024 21:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422A818509A;
+	Wed, 26 Jun 2024 21:57:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T0dlHBcX"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="m4n7OPXK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6EC3180A7C
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 21:53:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4F8433B3
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 21:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719438837; cv=none; b=OkTHHXO0Q/Gu7hRHeObUkGBkMtraTHtPFdr0sMTxqzo0G5lLJF5g8blJvld6IZGZhPcxvJ/nUmOheGnNLyCNcF2ZcVXIe93fN0/GxYeWJq5xcCeT574iKELb9WFl4hcm5by2m6uXBw0+VQBvGT798uqhJoAiSwByNX8niFiv+U8=
+	t=1719439031; cv=none; b=fTRQFLqrTpmcoWYNC+mtyXIucIcED+EsRcSY+5VoXgON4DSdbsfe4RbRBsWXzbCXH3KtVPcG79yOagP1It4KSsn/ngJ/pSn49f6WSSZnrMTxhNA5fOjL90ZyHoqGaUB960nzwKZxJPTe1VGVLXLgjc+vghsiG/+fp2MDihagE24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719438837; c=relaxed/simple;
-	bh=h+AeWvKwAryXrkyxyRsbMX1Hn/MhwmeaRrQlbtumom0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SBmWcX4vP8rTn4PrIFen0hgMJzz2vqvRqmZ0IKx/U1uMn0oxlsoV242Vmgv82RlZu3Ny6Mn3DbEFRGodjF11KiJ5SqTfC+eae7hwIv+fGC/pMlBc+Uiqienv/kCRUAHhwGxZC3ohONNFu0iHNVd8NvglLAVpB7QeSoBiZjZ2T34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T0dlHBcX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FFDDC116B1;
-	Wed, 26 Jun 2024 21:53:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719438836;
-	bh=h+AeWvKwAryXrkyxyRsbMX1Hn/MhwmeaRrQlbtumom0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=T0dlHBcXvNrFf4+yrmreq9ozOehv9AVVOGUtn9abqU8gfpXi9R44TJcBDHofuCzN7
-	 +CgBYqXe8kCkvKkYpO9mrPcawoCDAn4MLKVdQV5zYfb2ndEktSb25YZfKe0QXuwmCY
-	 /KQ13W57z2SrB17nAi6Rfq/ISFMuoi8RGOQyAK3DNJ08T8yp4zW4f3LtpyT9mGKaAq
-	 5YKb+f5qkf9WoMsZ7az4pkpmnnKlqCaJd0pD+TUXtTk6Ryw2F/a+y383z2opvPGqzM
-	 rCx7JMbBECsyz1jeGOB1DJekoj9NNPsn/tU1ZTpeZJQIZiMGT7OxPkxisjpQNviG8p
-	 ob2TPNoexcEgA==
-Date: Wed, 26 Jun 2024 14:53:55 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ido
- Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@resnulli.us>, Amit Cohen
- <amcohen@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>
-Subject: Re: [PATCHv3 net-next] bonding: 3ad: send ifinfo notify when mux
- state changed
-Message-ID: <20240626145355.5db060ad@kernel.org>
-In-Reply-To: <20240626075156.2565966-1-liuhangbin@gmail.com>
-References: <20240626075156.2565966-1-liuhangbin@gmail.com>
+	s=arc-20240116; t=1719439031; c=relaxed/simple;
+	bh=WGkvkJ6efkLUW3mhH8PW9wQnhzsVmXML/DU0Mkg3z/c=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A768Hl75z76xxBG4QwF2Zf9BX2kTN6EsA9gX39ql5brouxqQByGW8b8xhJJXkR05L+fgzNZE1m4l44IZk4F+ZJ7gGpPIpMWKsQ16fTvc0nt2x54pZh7p2MFltvEzQGzkBgfmd+pxVYrcH89M5OHAzc5/E9wpSEAxSZ6eRxp5sog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=m4n7OPXK; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1719439030; x=1750975030;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=le9mNK2H74pEO5C5p74eYUCOzmcErorJ8F7HzxXzWfY=;
+  b=m4n7OPXKLVpuEp2bHr85mnBgiJFjxoC7SjeLIlT0iA2yTz4PVLthz+yA
+   6oBu1DpPZ0ndjdn4LFMe7jYkREygWYVv8IDfpb6CGxIRL3o4e1kHhGfXV
+   LMv2LasuKgygCrR9cwR8Zjht4fv4JI8JgRn3YdRBCUjL8JZMvB8f+2lhB
+   M=;
+X-IronPort-AV: E=Sophos;i="6.08,268,1712620800"; 
+   d="scan'208";a="410374494"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 21:57:07 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:32633]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.187:2525] with esmtp (Farcaster)
+ id eda9c4fe-9a96-4df4-a423-3ceafa2a1d0f; Wed, 26 Jun 2024 21:57:05 +0000 (UTC)
+X-Farcaster-Flow-ID: eda9c4fe-9a96-4df4-a423-3ceafa2a1d0f
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Wed, 26 Jun 2024 21:57:05 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.11) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 26 Jun 2024 21:57:02 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <mhal@rbox.co>
+CC: <cong.wang@bytedance.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v2 net 01/15] af_unix: Set sk->sk_state under unix_state_lock() for truly disconencted peer.
+Date: Wed, 26 Jun 2024 14:56:55 -0700
+Message-ID: <20240626215655.6414-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <c550e27c-6a45-4219-98d8-f6d237c0674e@rbox.co>
+References: <c550e27c-6a45-4219-98d8-f6d237c0674e@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWB001.ant.amazon.com (10.13.139.132) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Wed, 26 Jun 2024 15:51:56 +0800 Hangbin Liu wrote:
-> Currently, administrators need to retrieve LACP mux state changes from
-> the kernel DEBUG log using netdev_dbg and slave_dbg macros. To simplify
-> this process, let's send the ifinfo notification whenever the mux state
-> changes. This will enable users to directly access and monitor this
-> information using the ip monitor command.
+From: Michal Luczaj <mhal@rbox.co>
+Date: Wed, 26 Jun 2024 12:48:27 +0200
+> On 6/23/24 07:19, Kuniyuki Iwashima wrote:
+> > From: Michal Luczaj <mhal@rbox.co>
+> > Date: Sun, 23 Jun 2024 00:43:27 +0200
+> >> I gotta ask, is there a reason for unlinking an already consumed
+> >> ('consumed' as in 'unix_skb_len(skb) == 0') skb so late, in manage_oob()?
+> >> IOW, can't it be unlinked immediately once it's consumed in
+> >> unix_stream_recv_urg()? I suppose that would simplify things.
+> > 
+> > I also thought that before, but we can't do that.
+> > 
+> > Even after reading OOB data, we need to remember the position
+> > and break recv() at that point.  That's why the skb is unlinked
+> > in manage_oob() rather than unix_stream_recv_urg().
+> 
+> Ahh, I see. Thanks for explaining.
+> 
+> One more thing about unix sockmap. AF_UNIX SOCK_DGRAM supports 0-length
+> packets. But sockmap doesn't handle that; once a 0-length skb/msg is in the
+> psock queue, unix_bpf_recvmsg() starts throwing -EFAULT. Sockmap'ed AF_INET
+> SOCK_DGRAM does the same, so is this a bug or a feature?
 
-Hits:
+I guess it's kind of safeguard.
 
-RTNL: assertion failed at net/core/rtnetlink.c (1823)
+The retval 0 has special meaning for SOCK_STREAM as EOF/shutdown().
+If we bypass 0-byte dgram to SOCK_STREAM sk, the application will be
+confused as if the original peer has disconnected.
 
-On two selftests. Please run the selftests on a debug kernel..
--- 
-pw-bot: cr
+At least, -EFAULT avoids such confusion so that can only the true
+peer trigger 0-byte via the saved ->recvmsg().
+
+So, the requirement would be similar to scm handling, we need to
+recognize the sockmap verdict and destination to support full
+features.
 
