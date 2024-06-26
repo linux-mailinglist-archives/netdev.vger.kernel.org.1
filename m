@@ -1,93 +1,107 @@
-Return-Path: <netdev+bounces-106981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70625918571
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 17:13:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A3EF918598
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 17:21:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1F151C221AF
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:13:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DE5A1F279EF
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3B7A1891DF;
-	Wed, 26 Jun 2024 15:12:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B041D18A932;
+	Wed, 26 Jun 2024 15:21:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KI0Roogo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6513E18A922;
-	Wed, 26 Jun 2024 15:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B74418A92E
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 15:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719414777; cv=none; b=kU2RU+kmzobCZHRZnzt4Wp8EKmBpP7uG9X2xnejJbrySfLWBwJmpXwPvSn8DrgFuc8K8pxz0g4AUltYXIY4OfM3brjfA8VtfR6JnW6+MQH4jvdKjCX8lvM1ZbZTF2ju0/dpFji8iF2t+UqbQwx6Iu0GbkrvfWtAyjW3wOk+lJBA=
+	t=1719415275; cv=none; b=JeF9691W+4vUW7ELjRR/umBHwfrqadLGiYquyf9wEoR2vdiNUf5+B7QTtchNCEulHai5A/qhzBdi5tUMiUUqaRurIJXGnPr1tzjQO6bDWihXMCKXnFM5MFerdWC6iBgQj1GlGZo0qPzrmHwH+JzZHNpFrugbE/C7mdp1a3V5rGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719414777; c=relaxed/simple;
-	bh=3aVsfSayzLgkpGdE7jOuKef/gUYNqPrEs9FdLQLWT4Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nuQbrNTudAlY8r3NzvXVws2EorYav9IDIV9GDPp+Zz1Jy/5iHgk/mKI80kRKvYELFNFhH7kwLMXnHB+2I2MD3PIcEde7EQQ8ufHM6nKt/4FwThbMClWwsCFR27ik41JLz06wsJWxCYHS89lquNZSmyPpYYd/aWcTO16FMSZL87E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1719415275; c=relaxed/simple;
+	bh=bOe5eXS2hRPANp8cq/qQCaW5Z6zjM83IxAKafC5gv3o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=as0A4eFO49l5w8kGygr0FbS3lj2C23jaSpeHn5LrGCn7riOVDTnya3wd1f54JJc4lfhCroCfCdBH1ZK6WZ+xrLH/hqE6QRACUfukSiFRavcykPl0Lw5iDJImCMq8SzH61sIPR4rx0i9VZzEr2lZEVBycZ9FA1zZYqMIET7QII0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KI0Roogo; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a72585032f1so453206066b.3;
-        Wed, 26 Jun 2024 08:12:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719414775; x=1720019575;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-424a2dabfefso20414065e9.3
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 08:21:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719415272; x=1720020072; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e1GHg0adTDcx7aelMd7sHYAvXl2IXilBtvZqQq6vi+0=;
-        b=jY1193NZKROoImXU3yUbKktXpX+v9fg1mRV8SOBKlfAeNTT4l1yqzMMdC0Cosqb6hs
-         c3T0SSCP9xAKNHN9xpwsqzgh7wfHIOpl9wPdaYI1CEYFjws3L/lu/2NaBxNDa0txUzHy
-         LRsIdMZ5n5bS3lHRACOVnlV2z5Tmdry/9VZ/6MGUFlFSabDuWrAKrlMv9FUtmGRgMnGn
-         dks9Cp2TLJqjjpS7nGkvhpGqi7xV5d3S1NmWdadJR6NcD+Ez8ewVYIGLFdRS5LK+m2DS
-         VTiAzayByPdpgNabDxzrYetajewhMgyjSvnmO/cgZJb0A6p/KIE7oKnFG4evpG2nAl7l
-         qK4A==
-X-Forwarded-Encrypted: i=1; AJvYcCVkBIzu1xgS2DFpiaZc9GNgkeQREH5nKETAgEcBqTxA9beqiiniY3R0cZgHZ96vtWrQwG6PSb75ZeO2NOMOH+tBJ9tC0ayJrQXDYzHOi8WRQOlI8XFUV2h8elk5m7Pj/l1EEuQG
-X-Gm-Message-State: AOJu0YxR5fd89G+q9uEACKvQn+E+61mKya3xvUYyMDtNiZDFoJfBf3qr
-	LPNnS0VC88sdJKy+vCj/Y3gf3iSOjVjFN8HundXIo02sPaYsrzXmiBdCkQ==
-X-Google-Smtp-Source: AGHT+IHlNljuWeKDcLWfXayPDJUHx5Lh29W+LGEbEWNZhl8VBElSvXc8Crp+UM6H/K7zRlBb/fSC5Q==
-X-Received: by 2002:a17:907:a096:b0:a72:65c5:315e with SMTP id a640c23a62f3a-a7265c53ea1mr511015666b.21.1719414774523;
-        Wed, 26 Jun 2024 08:12:54 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a725459233csm326571866b.96.2024.06.26.08.12.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 08:12:54 -0700 (PDT)
-Date: Wed, 26 Jun 2024 08:12:51 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Sunil Goutham <sgoutham@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	horms@kernel.org,
-	"moderated list:ARM/CAVIUM THUNDER NETWORK DRIVER" <linux-arm-kernel@lists.infradead.org>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: thunderx: Unembed netdev structure
-Message-ID: <Znwv8y03Ftzu0LP8@gmail.com>
-References: <20240624102919.4016797-1-leitao@debian.org>
- <20240625175434.53ccea3a@kernel.org>
+        bh=pP7OA/00XqQylaVO0Mk/sBlWFkRyliYL5xcYn1Y2Zsc=;
+        b=KI0RoogodgZG8Mn64hWPofLnQIHR5mfWx1T5cqYNjjddmm5Oi5MPntZcbQ+1obW3p1
+         MlO71Si/OeiXExvJPJ8Cw9DLX2Xqt3rTI/w1g5eyF4CtCQRS8lkOmZawGiXdKTILIKwA
+         LdtzH0gBI+aN4MR3Z2mb+MOWq3/VOYxB5L8sVpbHIupUmgvAPqrTAgvLhr8cpN1axvcL
+         J1c6IXFz+VXuznflRF9t7BdH3CS4TxzcQG6gYeCBHQ5UNG8xk5RWK1riJQVPWwCezLD0
+         sAulKpDyQ1inOhSN30SR1ywsfC82jF2zSMcOmEIaWEM4DaFxZjBKlPTWAY3H4wp6qlEs
+         nTsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719415272; x=1720020072;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pP7OA/00XqQylaVO0Mk/sBlWFkRyliYL5xcYn1Y2Zsc=;
+        b=pOH2JdAMWoR3f3JwTEyOnwGq/crdG+8b/eyLyNOreavAf0/IUkNkwFdCATZsvIFx+4
+         fyzKD5kDowhOouaio34a3RyQNkt+tQP1QY0r8SvfsGj1VMW8EcI5G454LRiDRQwBcbAW
+         n8jiYjKlFIYCOP66N96XWBv9nKq7+eTj/bRarIuN81K0W77q6eLx7TGjnm5sRnJQ5Lwj
+         toIYo86e/C8BEhO3Mbmd2/gLoEynTrDWgfyzXJ2dz+nQUv7z5+/RwldcvSUsBwGGAzfr
+         SmAWghggnc+FvtuCg0H/I0dwxqct4P9LtaFfl7oXifL2yasRpu72eBe5ZikA+rth2VER
+         OR8w==
+X-Gm-Message-State: AOJu0YxYQOcMHw2QqvzYXXdQO+KZ2fXT7VN0vwNI88wcZvwBzCVm2BFX
+	tZsaFmq3DIQvds3XywSBbNBbL/pEcPhabmc1EPrrJ1GTXQawP03i6EOhwdWavFrbZQz3ZnGjt82
+	4xZU2oVHURI98Ea7ItmNU8bFazoI=
+X-Google-Smtp-Source: AGHT+IEbss9swjCajx7+2t4+LjygzEAmC7BPB+dWUNmodq1daUjyb/fEPFfgEn9rEIA9XHiGtt+DtIb4daoSU55wK/0=
+X-Received: by 2002:a05:6000:1863:b0:366:ec30:adcd with SMTP id
+ ffacd0b85a97d-366ec30ae93mr10299769f8f.7.1719415272135; Wed, 26 Jun 2024
+ 08:21:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240625175434.53ccea3a@kernel.org>
+References: <171932574765.3072535.12103787411698322191.stgit@ahduyck-xeon-server.home.arpa>
+ <171932614407.3072535.16320831117421799545.stgit@ahduyck-xeon-server.home.arpa>
+ <20240626071648.1fe1983d@kernel.org>
+In-Reply-To: <20240626071648.1fe1983d@kernel.org>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Wed, 26 Jun 2024 08:20:35 -0700
+Message-ID: <CAKgT0Ue0dA394E=2Lg9Y74DQkfEjV==SoxmngHdEGjBX0-qi+A@mail.gmail.com>
+Subject: Re: [net-next PATCH v2 02/15] eth: fbnic: Add scaffolding for Meta's
+ NIC driver
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net, 
+	pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 25, 2024 at 05:54:34PM -0700, Jakub Kicinski wrote:
-> On Mon, 24 Jun 2024 03:29:18 -0700 Breno Leitao wrote:
-> >  static void bgx_lmac_handler(struct net_device *netdev)
-> >  {
-> > -	struct lmac *lmac = container_of(netdev, struct lmac, netdev);
-> > +	struct lmac *lmac = netdev_priv(netdev);
-> 
-> I think you are storing a pointer to lmac, so:
-> 
-> 	struct lmac **priv = netdev_priv(netdev);
-> 	struct lmac *lmac = *priv;
+On Wed, Jun 26, 2024 at 7:16=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 25 Jun 2024 07:35:44 -0700 Alexander Duyck wrote:
+> > +/**
+> > + * fbnic_init_module - Driver Registration Routine
+> > + *
+> > + * The first routine called when the driver is loaded.  All it does is
+> > + * register with the PCI subsystem.
+> > + **/
+> > +static int __init fbnic_init_module(void)
+>
+> kdoc got more nit picky in the meantime, we need a Return: annotation
+> here.. or maybe make it a non-kdoc comment?
 
-Good catch. you are absolutely correct. I will update.
+Thanks. I will try to follow up. I see these are reported in the
+patchwork so I will make sure to address them before v3 is submitted.
+
+- Alex
 
