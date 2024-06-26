@@ -1,391 +1,256 @@
-Return-Path: <netdev+bounces-106830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD8E8917D38
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:04:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3723F917E3B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:37:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B7891F237BE
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:04:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A9F31C224F7
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:37:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7661741E2;
-	Wed, 26 Jun 2024 10:04:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB1C17CA0B;
+	Wed, 26 Jun 2024 10:32:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dRi992cc"
+	dkim=pass (2048-bit key) header.d=silabs.com header.i=@silabs.com header.b="AN3Ua0fH";
+	dkim=pass (1024-bit key) header.d=silabs.com header.i=@silabs.com header.b="SxtpaRPp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mx0b-0024c301.pphosted.com (mx0b-0024c301.pphosted.com [148.163.153.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D106D177982
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 10:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719396273; cv=none; b=OYzF8tFg8oh7zwF1mzD8U4qmH2zUzFonwTWkar+bEOkeQYjkS1FUPQKsIKC9Nya+l15XSanhECL8Wdm+Eqch/jj9JqEz0eOtv2EwaQx38MEnh3wyuLaW6DwSTMfYFpwnjlqQJBtzTnxcYwjNhXxZvHbkbAqsfNYoyU3yTrZJ/hc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719396273; c=relaxed/simple;
-	bh=NfWYeUsJ8eXvzDp264cwsqIM9/uFZCBB3EXQ0K+40X4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GIEh0Z0CXm05DTj7CKBXmpdbvfBX/7/v6iLUH8r4KAPcFxhs1iWAHr1cyfYZkoV0q+BUlXOX+PP3/HUvqEm5MDWZpxPi5Fxf7gzpRT0lrsMy7b6OmQAPGcgumI+kCRZDBBqm33ksdGv2ATW7oh2VS6Sgy6/9pWjaw76s4TtG7Pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dRi992cc; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719396272; x=1750932272;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=NfWYeUsJ8eXvzDp264cwsqIM9/uFZCBB3EXQ0K+40X4=;
-  b=dRi992ccLUNxnVM6qQraLomnEV5NkVgpOxyb8M0w3njJaTINHHBIuOqE
-   4QbRhGsZiHNtlJCnjJeb7l+FQ73zF4JtniiiedOBm5tWRKQw/5IbVKtSo
-   PgNFGUAHTV5ZuAhPoEwPUQw/iBui+TC/hy5Il+9ft8vEZh11GMe3GlfEq
-   OCvN4UwLWBEs/ZCh00OLO5uzIM5V28nmd8SNexopqHdTZvi2tAM/nNj+s
-   USKVh+5WU+U2Z0CM6n/wHTEcD5BeGwdenTc4+GbzIYR5eNUOfPs32FxJ6
-   /JH+MqvP6e7TgVSgfLEGGohq3WLRQ5xbkyMDE3PK9fG1jv2lKPD1zeMxK
-   g==;
-X-CSE-ConnectionGUID: Wv851EuYQOamWO1SplN66g==
-X-CSE-MsgGUID: Ys2dhVzVRB+C/fEjq7E7Ew==
-X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="27145101"
-X-IronPort-AV: E=Sophos;i="6.08,266,1712646000"; 
-   d="scan'208";a="27145101"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 03:04:32 -0700
-X-CSE-ConnectionGUID: cHezr6qoSbKxTaNe6unH4Q==
-X-CSE-MsgGUID: ro8PZVHXRy6mq5a5KaPloQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,266,1712646000"; 
-   d="scan'208";a="67162106"
-Received: from unknown (HELO localhost.igk.intel.com) ([10.211.13.141])
-  by fmviesa002.fm.intel.com with ESMTP; 26 Jun 2024 03:04:30 -0700
-From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-next v1 4/4] ice: Drop auxbus use for PTP to finalize ice_adapter move
-Date: Wed, 26 Jun 2024 12:03:07 +0200
-Message-ID: <20240626100307.64365-5-sergey.temerkhanov@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240626100307.64365-1-sergey.temerkhanov@intel.com>
-References: <20240626100307.64365-1-sergey.temerkhanov@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C86315EFC8;
+	Wed, 26 Jun 2024 10:32:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.153.153
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719397949; cv=fail; b=PJ9ihwwk+X2IEo7cP/U3acy1aEmAcyRXVm0qE9k3bo3ZMDORRK5SUnUDLac1Rh54Wx4Oh5T5+Anpdci0dwx5HZfhGZtp83gTePcy8f3sTxgyevLvB4ZWOWj4MHVN+HqSDiBduFN6MVBfuuux9bZ/OGhnXX4oIKG3j29TPAOoPXg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719397949; c=relaxed/simple;
+	bh=gw1QoqDjMjGGH9KbxCAtz74SRAo8UsR4IbONgulayYM=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=STUZ081ayU56Jdw4q/aAQPLff06mTnrxX8RYvOjIRLtrommHMffG9A07n4UcCKtglRGVcpfMoEL0Sx0rRnNQIWM2Y1IAVqjWgKtWus63z+iBKkHU2a6OJvSEMyZ8O+Tx3qauXYnUO5lB5lLVG7m7Ll+tifJCljeFqXpgpmgW13A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=silabs.com; spf=pass smtp.mailfrom=silabs.com; dkim=pass (2048-bit key) header.d=silabs.com header.i=@silabs.com header.b=AN3Ua0fH; dkim=pass (1024-bit key) header.d=silabs.com header.i=@silabs.com header.b=SxtpaRPp; arc=fail smtp.client-ip=148.163.153.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=silabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=silabs.com
+Received: from pps.filterd (m0101742.ppops.net [127.0.0.1])
+	by mx0a-0024c301.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45Q8cXa5032099;
+	Wed, 26 Jun 2024 05:10:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=silabs.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pps12202023;
+	 bh=Xq+stB4HdrZl8cMwx/YiGZCqP4Sx+RthBtfb349fqlA=; b=AN3Ua0fH5hIY
+	tJWBdI86zZipvL5stEVzr8qEdji2APmDnrSuRoJ5laGr+lQbVOpiTxuH4ocW39WS
+	zgYiIJKoskz1C9x3epFvhuQlQ/HRjPjEpxfhs6wcMcDg3UOB8uGmlXO7lz5j5oy3
+	lA0EgJ3y7yO90oghRB/h2/nG8sDTGyKsD03/d2MPPNMUvrTvJtpIPckmATupHMH2
+	gNHYnbOsVYwVm4bO8QgwOGPLeN+w9YthUiY1DJ2PHHxKvIee4uNqM896h+rTbp6Q
+	yA5k2s4Q264hn4LR8afcFtCgzpqTSJhTPiQ9ZJKUU5hdQ8DCsoo1VNFo9Wqj3ZMU
+	aFOgUbnVeg==
+Received: from nam04-mw2-obe.outbound.protection.outlook.com (mail-mw2nam04lp2174.outbound.protection.outlook.com [104.47.73.174])
+	by mx0a-0024c301.pphosted.com (PPS) with ESMTPS id 3yygr8aw1u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Jun 2024 05:10:24 -0500 (CDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Q4w/AfVb/PuXDa0Yq9I9s+ahE9TpFyA/2LiEWbn/Senec6RVBdgx/pY1XpiIeTqBlBrfK2nB2mREBuGFk4VCtm4St6V7C9xjIhufPXxNOkB4sIicNNFXfoBx6VXbM28mKbB9haqC1/CwjxldfZDFg3zTPQiDCS5xY33kFRvwfyLyt5+1iV5XL4Qd1dre8Y1YKvVLLahgtlYgOsl7jzlex1saifF9JIdrWWaQZXy18gxMCVYl+mfg7tJpQFOkC+HndobI7y0KuDxy3VyhXNDVYB4Hzn7OiLGA3AbI1ZZL2O9Rv3IBe2KXPlvtqf7fAWynAPe/2GxsOukpB0ZLHGqjvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Xq+stB4HdrZl8cMwx/YiGZCqP4Sx+RthBtfb349fqlA=;
+ b=D2Fzstg7EPnqflx4hHQPyHMKdaJ5zHHj6IaMUpQNyNUeSaF9/9pCt9Y5RBLVG3h/o9rIOusIRhezA3Mkq4giAxCHgg31JaD5zRXU0PXuffhDMSfgVqvJa7nhjQ3Zju/zT1MHxpARFxSn8PVHGNtUZMFT9QqDsZSnlIjQuAGGENle1gMlGHr4wq7A53F8W2M/1YXCLNDMWINTKb2fc+ptcS/m2Y4HRGEO3obt4gQ4uO8/3+xOzAfl6zsMBXboMNPUqK3ac8UmiVDXxrXEbFuKvjUM8zd8EdXkWUB+3x2q/6LMiOx1KnqtTw8Mk38RXoyAMbCJnmrprPYsftfgPWH3Jw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=silabs.com; dmarc=pass action=none header.from=silabs.com;
+ dkim=pass header.d=silabs.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=silabs.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xq+stB4HdrZl8cMwx/YiGZCqP4Sx+RthBtfb349fqlA=;
+ b=SxtpaRPps2+s7WMDnRfptCOwjHrs4DjCBotdnCyLLnzDhC2WrSX/z51viE2IiaTb6uFpZQY6ByO0bopW9CVYWSBtQnxgda5jN2sT331THVEapFQIwT4I2bpSdRxjel70zAFucQbowHMBtQnHZ7p++3UKG2acZQ7ztTZD3/KTIIo=
+Received: from MW3PR11MB4714.namprd11.prod.outlook.com (2603:10b6:303:5d::15)
+ by CO1PR11MB5153.namprd11.prod.outlook.com (2603:10b6:303:95::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.30; Wed, 26 Jun
+ 2024 10:10:18 +0000
+Received: from MW3PR11MB4714.namprd11.prod.outlook.com
+ ([fe80::9b77:8d77:3800:f0fd]) by MW3PR11MB4714.namprd11.prod.outlook.com
+ ([fe80::9b77:8d77:3800:f0fd%6]) with mapi id 15.20.7698.025; Wed, 26 Jun 2024
+ 10:10:18 +0000
+Message-ID: <0fc38c1b-1a28-4818-b2cc-a661f037999d@silabs.com>
+Date: Wed, 26 Jun 2024 12:10:00 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 2/2] ipv6: always accept routing headers with 0
+ segments left
+To: Alexander Aring <aahringo@redhat.com>,
+        Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alex.aring@gmail.com, davem@davemloft.net, dsahern@kernel.org,
+        edumazet@google.com, jerome.pouiller@silabs.com, kuba@kernel.org,
+        kylian.balan@silabs.com, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, pabeni@redhat.com,
+        Michael Richardson <mcr@sandelman.ca>
+References: <20240624141602.206398-3-Mathis.Marion@silabs.com>
+ <20240625213859.65542-1-kuniyu@amazon.com>
+ <CAK-6q+gsx15xnA5bEsj3i9hUbN_cqjFDHD0-MtZiaET6tESWmw@mail.gmail.com>
+Content-Language: en-US
+From: Mathis Marion <mathis.marion@silabs.com>
+In-Reply-To: <CAK-6q+gsx15xnA5bEsj3i9hUbN_cqjFDHD0-MtZiaET6tESWmw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO4P265CA0139.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:2c4::14) To MN2PR11MB4711.namprd11.prod.outlook.com
+ (2603:10b6:208:24e::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW3PR11MB4714:EE_|CO1PR11MB5153:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4e323937-9fb2-45a2-3d44-08dc95c82642
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230038|366014|376012|7416012|1800799022;
+X-Microsoft-Antispam-Message-Info: 
+	=?utf-8?B?dmJqZ2JCd1BMZWI3bFk5dkUwVVNzanBwOHdNTjBZeXJkOCs0eWg1MWlYblFH?=
+ =?utf-8?B?ZG5yTnIxSk11WnlUM0JHV3JmbmcvL1IzVEJjNWVpamk1TVI5MW92U2lGQ2tP?=
+ =?utf-8?B?a2FHcGxZMXhkV1hhdElWbUgvT0JtR0ZmY3Y3Mk85VlR3cEV5VlNabUNSSDRi?=
+ =?utf-8?B?QytYRktTMWhDRVFwdUxuMU8wQ0NDNkhJdUNRd1ZtRjREdDVkSzNlQ0JjS0Vu?=
+ =?utf-8?B?cmNyTmRyd2pYUzBVMFZVclM5d21KY3NXV2RJQnNJcDIwRWJBNEpVUFkzVXRB?=
+ =?utf-8?B?d05jVFlsaE9LVEdvV2UydXN6cUNDUXY5WU1jdlZsQWVobCszcFFkTWxFSlYy?=
+ =?utf-8?B?aEVuRVRZYVpja1lrL3g5QzRNVjFBMkhpK1BVdjM1amlqZk0rMnkrWnFFajBL?=
+ =?utf-8?B?SEJ6bk83c0xTS1lsdUZRQ3JvVGNNb2FZdGZ4NjVWclFpY1hjdGhvMEpHTkw4?=
+ =?utf-8?B?S0Z6M2VSZHhKUDdZaHlqUEUxWUZ3ZERUdUQvejhNODNxYlArSlppRlBRSG9q?=
+ =?utf-8?B?Y1I0SnNWUkcyOWtvanNVenorblRDNXA4a2JqTXhIQkRQcXB2VXhablpkVDk0?=
+ =?utf-8?B?djZ5L3MzdC9Cb2dOa3VoVzdCK3JQcEdGREwrU1VQV1Q5bkFzNjRhMjF1a0VH?=
+ =?utf-8?B?UEVEZ09HYldSUHNUcVR1Unc4aDRmME12V3l5aG0wM1lEYzYrTlhkZFFHTXNm?=
+ =?utf-8?B?ZVlQdCtWeGJNb3NXbEprWDJackltczdKbFgxSnkvYzNqQWFpTlhHaTNwT0hl?=
+ =?utf-8?B?bEVvT3d6dHVSS0F6bGs4OFdsajRxc2wrL1ZYQVpibGtkd3VHMGRTRkdUZG1F?=
+ =?utf-8?B?M21LMkJZMGpESUlLK1k2QStNTVJMRUZyVHpNQjMwTThZcmp0MkcyTXlvQzNB?=
+ =?utf-8?B?RDdpb1NmcE9CYUExd0dVdnloaDZONUZrTzVnS3dic3c2M2JBT1FuenIxMS9P?=
+ =?utf-8?B?UGNKanZwZHFGYk9iOEpXT3FYUEJUcVJzR1hlU0dBVnQ0MmlkdHhNU1hnRkpm?=
+ =?utf-8?B?SmtNcjhCRG45Z2NjU1NabVE2Ym5BUkNBUU02dkF0ZEFUa2V6NHlHaWwvQWdB?=
+ =?utf-8?B?WHZrS2U4Z1IwaHdRZTN2bXdyeTBWc0N5WUNWVnJ6M3VITWVKQ1NCWXRqem40?=
+ =?utf-8?B?a2NKVkgvVjQyTnRKMUNLWU9OencvL3c3eWtLZFJ1bHZPY1AycG9rb1ZBZDRs?=
+ =?utf-8?B?eDRqcWEzYkZ4UjhVZVJaMDQxZHNCQjdZZ1dCRWQ5RUNyQWZhb3NOODdWcDcw?=
+ =?utf-8?B?NVdWa212UW0wMUJsd1RZcms1YktSSEw4b0N6UTJQK0FhRDlIUlNQVTVaRlhN?=
+ =?utf-8?B?UUxUN3ZaTDY3VVZLZENNWXpYUlRndTFBVkhTQ0hNNmxMaDdaV2xBaUdmUUtR?=
+ =?utf-8?B?SnRXeUNjU1Z0STJzYVluajlDN2N6dXExSUFGYnhaMUVPUmlDOUFFV2FmOCtU?=
+ =?utf-8?B?VHhrVjBpR0FiMFphM21aWFF1dm96UlgzU25nUGF1UzJvRWo2NDA0ZDhWOWU1?=
+ =?utf-8?B?cGIxbjZNL3M0a2pRd1VIbzdUVHNUS0o2WEdhZ3VMRm1yeis1L3pOdnJia1Rp?=
+ =?utf-8?B?WjRVY0hOcm1VQWZjVHkvUTAzUkYvQkMxdmt3b05aVnBCVGR5NjJEdWZPWTEw?=
+ =?utf-8?B?Y2g3Vzg2OStCL29MSXM3eVd4MFZWSVdReDV5NmVKdUpNTUVXeDVTcWpqM2lI?=
+ =?utf-8?B?ZklHNlk1N2NMK3l0Mnl2Rlo4L1BnYVphS2Q0U0tyWFU5SWZUUDZ4Z25Qa0Qv?=
+ =?utf-8?Q?lyOpDS9TxcvfoACFeA=3D?=
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4714.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230038)(366014)(376012)(7416012)(1800799022);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?dUhqOFdyYTNVVHNSMGhZY0lMSEc2czBmWUtOYW1Ic2lFVnJ2dnZraXprVE1t?=
+ =?utf-8?B?TTllMXdHQ09JbXBMeDBkSU9rNDN5SzB1blN5L2dvK2dzdnF3WXdVWWVUdzAv?=
+ =?utf-8?B?T0o5NnhuVXh6bFFWbXFUeHdNdUpSTXoyMmxtYUdNbVRNRnJ4bENBTCtLdk55?=
+ =?utf-8?B?eEhDSEFpNDJEWGdpbXhCRGM1OHdpTGV0TzV4SXk0TGNlZ0g0SGJueEN4QVR1?=
+ =?utf-8?B?d3dsVzh4Y2MyU2QzQnkrRWwyVUVoMTBySUt1VldONllSZC9iWElzbjc0RXE4?=
+ =?utf-8?B?Y0R6VlQwdFVDbXJhOUVaOW81cWtLeE5RR2duU0VmL2V6Rnc1dFFwTjhjaU8z?=
+ =?utf-8?B?MWN4SndyakVQbEVDWEI3d1Q5WUNHOEN1TTl0UzhLNFpWZ05vakRwRldDUmZu?=
+ =?utf-8?B?TWVGRVJ2ZERVQ29JazFNdGswM1dSTk5UOXpINHFsN1IyZkNZZHFzYjhGTWti?=
+ =?utf-8?B?cFRjT0hGKyswMVJ4cjcvY3JaSkV4dENYMVJXbGk2V0dSZ2lSNmZWditQbXF4?=
+ =?utf-8?B?QjdWelk0bkxVUmkrblR6YUZiWkZLcXFtR3JyNHQ1Yk5ZL0UyaVMzRTNOV3E3?=
+ =?utf-8?B?cVZ5SmpEWWgxamN4c3NjcHhOVGZYTWVSZC8yNitpbGFzWTF3a3VpR3lVY3Ew?=
+ =?utf-8?B?VjNVS0FCczl2OWlNT2N1dFA0TmxmMVBGKzlBVTRBVG4yR1NHMGFQRWhqampy?=
+ =?utf-8?B?cW84U3VYUVArYzBOQS9PN292QkNGY0h6d3RITW9qYm4vNkUvQnlNT0QwdkVS?=
+ =?utf-8?B?TVhrN3BKTUdzYXFXeFZTa2dnc1lrNVBXNVFUSW1pUW56VWh1clpEUnZ2VkFh?=
+ =?utf-8?B?SVc0RTkrNGc3S3FhYTFXZ3MyVndWMnV3MzhybVpOU3BDODVZVGVCUUovaVMv?=
+ =?utf-8?B?QTRvdzFzeVhHb2lOVmdUcGpueFNES1VqNHhVTFlNWGdWNnlmTFczR3ZXL1lV?=
+ =?utf-8?B?M3FHV0Z1MmVnaEtFc2RRNjF2TDIwUHZ5YUNaeXdyS0NpNkkvUUgwN1g3M3VF?=
+ =?utf-8?B?MEJyYnhoOCtXN1ZodFV6ZmhmMkVqUEpYYTdBd0R1V0txaDFmU2g5ZExEbEw5?=
+ =?utf-8?B?Z0FPV09MbTA1NXFSeTVSMjc4enhCVzEwQXp5VkRLZWxESGZhN1hxN1g3bVRE?=
+ =?utf-8?B?Qkprbjk2eXRXT1Q0eEJtcVhpOEVrakRjRnhxeFhqTXVFMUVHalhXWXlCSWhz?=
+ =?utf-8?B?UzVEcHZiNFhZN3VQRzQ0c0VlclcwYmM2dXU5UThZMmNKRFVnbzJDam94OGxW?=
+ =?utf-8?B?bHJOOVNyTUtWVmhpcnlxbjVMMmhhZTRzcTYyaTdaVFNWdTIrK0MxYzArZEZn?=
+ =?utf-8?B?bUlaOTRkNENKNzQ0MlJQSlNzRTlKQWh6bWF1aC9saUR6ODJjbzI3eDl5ZGtm?=
+ =?utf-8?B?Ri9aRCtHVC9va0V3TzFBbVlxYWJPcFRQYzMrZUJQZWhpaUJVaHh5Z3htdWRX?=
+ =?utf-8?B?TzR6UWVYQ0UvKysxNGZzeUhHZEtaT3lQRzVuMG5FS0E3YlByd2lWenRFMHNt?=
+ =?utf-8?B?ZU9mamVycjZqY2pVY003REV5WkoxY1ExVzdBZ1kyNW8zQXhBemVhWEJ4bEVT?=
+ =?utf-8?B?Vm1JODlEdUZoRi9tK3FWZjdEU2NzWnB5SHhWOGE0KzdSSFRvbHBWdGlUQm5W?=
+ =?utf-8?B?eW1rbXlxRmwxZUQ2STlsdEdaWkpXbUFCbVRUZ0dyQUZYOXBYTVRQR0V2RmRG?=
+ =?utf-8?B?Qkk3bERpK1FCUFgvMkZ4aUdXcUV6WktTMkJFMEhkWGdMQUZydUNtTW1vam41?=
+ =?utf-8?B?dnJhd1NrOXlOclg1SHR6SXlLZ3RWUHYzdGZIWXJKM1VGRzNvcjkwVkx2Ny9F?=
+ =?utf-8?B?alhOWUo0U1FOTEV2NXVKdUhnVHZEZlFvN2lhWlBxQ1M0MWpaRXdPV0RkY3Iy?=
+ =?utf-8?B?MEdBcWVaaStpRXZZUE1aY095VzcvRzBQc0dLdWhNU0tBVUEvMzZyWmdsNW5a?=
+ =?utf-8?B?N1Iweitmc0FvWVRLWmszZ2FVMWlLbkhUZDBXekFRL1dmaUc1dzlldVRZWHQ2?=
+ =?utf-8?B?bkFEdkxTS3p1dkFPa050UG9palZneTV4MnVVNlU1TmFudmlheURvaDN1b29i?=
+ =?utf-8?B?ejdrS2NzNnFMdzNSMWoyVndWbEVyREhWM1FLR2xGV3lFcVY2VVFuSmdaYTNJ?=
+ =?utf-8?Q?qSQihrVxkSfHZnVxhUk/RA4lg?=
+X-OriginatorOrg: silabs.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4e323937-9fb2-45a2-3d44-08dc95c82642
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR11MB4711.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2024 10:10:18.1242
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 54dbd822-5231-4b20-944d-6f4abcd541fb
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 69JZ5SI8XTys3H0oQycVRrOXbi5rUdFd1wgvQ8ftGHuN3/ijc03X5Hle6nKJgy4OOav3jUquCeahG23zDZm/pQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5153
+X-Proofpoint-ORIG-GUID: xN3RwDd7M2iX-GKzzz_9KCKPUiooOQck
+X-Proofpoint-GUID: xN3RwDd7M2iX-GKzzz_9KCKPUiooOQck
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-26_04,2024-06-25_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ priorityscore=1501 mlxlogscore=999 bulkscore=0 mlxscore=0 phishscore=0
+ suspectscore=0 lowpriorityscore=0 clxscore=1011 malwarescore=0 spamscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2406260077
 
-Drop unused auxbus/auxdev support from the PTP code due to
-move to the ice_adapter.
+On 26/06/2024 3:45 AM, Alexander Aring wrote:
+> Hi,
+> 
+> On Tue, Jun 25, 2024 at 5:39 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+>>
+>> From: Mathis Marion <Mathis.Marion@silabs.com>
+>> Date: Mon, 24 Jun 2024 16:15:33 +0200
+>>> From: Mathis Marion <mathis.marion@silabs.com>
+>>>
+>>> Routing headers of type 3 and 4 would be rejected even if segments left
+>>> was 0, in the case that they were disabled through system configuration.
+>>>
+>>> RFC 8200 section 4.4 specifies:
+>>>
+>>>        If Segments Left is zero, the node must ignore the Routing header
+>>>        and proceed to process the next header in the packet, whose type
+>>>        is identified by the Next Header field in the Routing header.
+>>
+>> I think this part is only applied to an unrecognized Routing Type,
+>> so only applied when the network stack does not know the type.
+>>
+>>     https://www.rfc-editor.org/rfc/rfc8200.html#section-4.4
+>>
+>>     If, while processing a received packet, a node encounters a Routing
+>>     header with an unrecognized Routing Type value, the required behavior
+>>     of the node depends on the value of the Segments Left field, as
+>>     follows:
+>>
+>>        If Segments Left is zero, the node must ignore the Routing header
+>>        and proceed to process the next header in the packet, whose type
+>>        is identified by the Next Header field in the Routing header.
+>>
+>> That's why RPL with segment length 0 was accepted before 8610c7c6e3bd.
+>>
+>> But now the kernel recognizes RPL and it's intentionally disabled
+>> by default with net.ipv6.conf.$DEV.rpl_seg_enabled since introduced.
+>>
+>> And SRv6 has been rejected since 1ababeba4a21f for the same reason.
+> 
+> so there might be a need to have an opt-in knob to actually tell the
+> kernel ipv6 stack to recognize or not recognize a next header field
+> for users wanting to bypass certain next header fields to the user
+> space?
+> 
+> - Alex
+> 
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ptp.c | 265 -----------------------
- 1 file changed, 265 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 806dc666a43d..9c3e5e801fdb 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -2950,189 +2950,6 @@ static void ice_ptp_cleanup_pf(struct ice_pf *pf)
- 		mutex_unlock(&pf->adapter->ports.lock);
- 	}
- }
--/**
-- * ice_ptp_aux_dev_to_aux_pf - Get auxiliary PF handle for the auxiliary device
-- * @aux_dev: auxiliary device to get the auxiliary PF for
-- */
--static struct ice_pf *
--ice_ptp_aux_dev_to_aux_pf(struct auxiliary_device *aux_dev)
--{
--	struct ice_ptp_port *aux_port;
--	struct ice_ptp *aux_ptp;
--
--	aux_port = container_of(aux_dev, struct ice_ptp_port, aux_dev);
--	aux_ptp = container_of(aux_port, struct ice_ptp, port);
--
--	return container_of(aux_ptp, struct ice_pf, ptp);
--}
--
--/**
-- * ice_ptp_aux_dev_to_owner_pf - Get PF handle for the auxiliary device
-- * @aux_dev: auxiliary device to get the PF for
-- */
--static struct ice_pf *
--ice_ptp_aux_dev_to_owner_pf(struct auxiliary_device *aux_dev)
--{
--	struct ice_ptp_port_owner *ports_owner;
--	struct auxiliary_driver *aux_drv;
--	struct ice_ptp *owner_ptp;
--
--	if (!aux_dev->dev.driver)
--		return NULL;
--
--	aux_drv = to_auxiliary_drv(aux_dev->dev.driver);
--	ports_owner = container_of(aux_drv, struct ice_ptp_port_owner,
--				   aux_driver);
--	owner_ptp = container_of(ports_owner, struct ice_ptp, ports_owner);
--	return container_of(owner_ptp, struct ice_pf, ptp);
--}
--
--/**
-- * ice_ptp_auxbus_probe - Probe auxiliary devices
-- * @aux_dev: PF's auxiliary device
-- * @id: Auxiliary device ID
-- */
--static int ice_ptp_auxbus_probe(struct auxiliary_device *aux_dev,
--				const struct auxiliary_device_id *id)
--{
--	struct ice_pf *owner_pf = ice_ptp_aux_dev_to_owner_pf(aux_dev);
--	struct ice_pf *aux_pf = ice_ptp_aux_dev_to_aux_pf(aux_dev);
--
--	if (WARN_ON(!owner_pf))
--		return -ENODEV;
--
--	INIT_LIST_HEAD(&aux_pf->ptp.port.list_member);
--	mutex_lock(&owner_pf->ptp.ports_owner.lock);
--	list_add(&aux_pf->ptp.port.list_member,
--		 &owner_pf->ptp.ports_owner.ports);
--	mutex_unlock(&owner_pf->ptp.ports_owner.lock);
--
--	return 0;
--}
--
--/**
-- * ice_ptp_auxbus_remove - Remove auxiliary devices from the bus
-- * @aux_dev: PF's auxiliary device
-- */
--static void ice_ptp_auxbus_remove(struct auxiliary_device *aux_dev)
--{
--	struct ice_pf *owner_pf = ice_ptp_aux_dev_to_owner_pf(aux_dev);
--	struct ice_pf *aux_pf = ice_ptp_aux_dev_to_aux_pf(aux_dev);
--
--	mutex_lock(&owner_pf->ptp.ports_owner.lock);
--	list_del(&aux_pf->ptp.port.list_member);
--	mutex_unlock(&owner_pf->ptp.ports_owner.lock);
--}
--
--/**
-- * ice_ptp_auxbus_shutdown
-- * @aux_dev: PF's auxiliary device
-- */
--static void ice_ptp_auxbus_shutdown(struct auxiliary_device *aux_dev)
--{
--	/* Doing nothing here, but handle to auxbus driver must be satisfied */
--}
--
--/**
-- * ice_ptp_auxbus_suspend
-- * @aux_dev: PF's auxiliary device
-- * @state: power management state indicator
-- */
--static int
--ice_ptp_auxbus_suspend(struct auxiliary_device *aux_dev, pm_message_t state)
--{
--	/* Doing nothing here, but handle to auxbus driver must be satisfied */
--	return 0;
--}
--
--/**
-- * ice_ptp_auxbus_resume
-- * @aux_dev: PF's auxiliary device
-- */
--static int ice_ptp_auxbus_resume(struct auxiliary_device *aux_dev)
--{
--	/* Doing nothing here, but handle to auxbus driver must be satisfied */
--	return 0;
--}
--
--/**
-- * ice_ptp_auxbus_create_id_table - Create auxiliary device ID table
-- * @pf: Board private structure
-- * @name: auxiliary bus driver name
-- */
--static struct auxiliary_device_id *
--ice_ptp_auxbus_create_id_table(struct ice_pf *pf, const char *name)
--{
--	struct auxiliary_device_id *ids;
--
--	/* Second id left empty to terminate the array */
--	ids = devm_kcalloc(ice_pf_to_dev(pf), 2,
--			   sizeof(struct auxiliary_device_id), GFP_KERNEL);
--	if (!ids)
--		return NULL;
--
--	snprintf(ids[0].name, sizeof(ids[0].name), "ice.%s", name);
--
--	return ids;
--}
--
--/**
-- * ice_ptp_register_auxbus_driver - Register PTP auxiliary bus driver
-- * @pf: Board private structure
-- */
--static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
--{
--	struct auxiliary_driver *aux_driver;
--	struct ice_ptp *ptp;
--	struct device *dev;
--	char *name;
--	int err;
--
--	ptp = &pf->ptp;
--	dev = ice_pf_to_dev(pf);
--	aux_driver = &ptp->ports_owner.aux_driver;
--	INIT_LIST_HEAD(&ptp->ports_owner.ports);
--	mutex_init(&ptp->ports_owner.lock);
--	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
--			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
--			      ice_get_ptp_src_clock_index(&pf->hw));
--	if (!name)
--		return -ENOMEM;
--
--	aux_driver->name = name;
--	aux_driver->shutdown = ice_ptp_auxbus_shutdown;
--	aux_driver->suspend = ice_ptp_auxbus_suspend;
--	aux_driver->remove = ice_ptp_auxbus_remove;
--	aux_driver->resume = ice_ptp_auxbus_resume;
--	aux_driver->probe = ice_ptp_auxbus_probe;
--	aux_driver->id_table = ice_ptp_auxbus_create_id_table(pf, name);
--	if (!aux_driver->id_table)
--		return -ENOMEM;
--
--	err = auxiliary_driver_register(aux_driver);
--	if (err) {
--		devm_kfree(dev, aux_driver->id_table);
--		dev_err(dev, "Failed registering aux_driver, name <%s>\n",
--			name);
--	}
--
--	return err;
--}
--
--/**
-- * ice_ptp_unregister_auxbus_driver - Unregister PTP auxiliary bus driver
-- * @pf: Board private structure
-- */
--static void ice_ptp_unregister_auxbus_driver(struct ice_pf *pf)
--{
--	struct auxiliary_driver *aux_driver = &pf->ptp.ports_owner.aux_driver;
--
--	auxiliary_driver_unregister(aux_driver);
--	devm_kfree(ice_pf_to_dev(pf), aux_driver->id_table);
--
--	mutex_destroy(&pf->ptp.ports_owner.lock);
--}
--
- /**
-  * ice_ptp_clock_index - Get the PTP clock index for this device
-  * @pf: Board private structure
-@@ -3207,15 +3024,7 @@ static int ice_ptp_init_owner(struct ice_pf *pf)
- 	if (err)
- 		goto err_clk;
- 
--	err = ice_ptp_register_auxbus_driver(pf);
--	if (err) {
--		dev_err(ice_pf_to_dev(pf), "Failed to register PTP auxbus driver");
--		goto err_aux;
--	}
--
- 	return 0;
--err_aux:
--	ptp_clock_unregister(pf->ptp.clock);
- err_clk:
- 	pf->ptp.clock = NULL;
- err_exit:
-@@ -3278,76 +3087,6 @@ static int ice_ptp_init_port(struct ice_pf *pf, struct ice_ptp_port *ptp_port)
- 	}
- }
- 
--/**
-- * ice_ptp_release_auxbus_device
-- * @dev: device that utilizes the auxbus
-- */
--static void ice_ptp_release_auxbus_device(struct device *dev)
--{
--	/* Doing nothing here, but handle to auxbux device must be satisfied */
--}
--
--/**
-- * ice_ptp_create_auxbus_device - Create PTP auxiliary bus device
-- * @pf: Board private structure
-- */
--static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
--{
--	struct auxiliary_device *aux_dev;
--	struct ice_ptp *ptp;
--	struct device *dev;
--	char *name;
--	int err;
--	u32 id;
--
--	ptp = &pf->ptp;
--	id = ptp->port.port_num;
--	dev = ice_pf_to_dev(pf);
--
--	aux_dev = &ptp->port.aux_dev;
--
--	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
--			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
--			      ice_get_ptp_src_clock_index(&pf->hw));
--	if (!name)
--		return -ENOMEM;
--
--	aux_dev->name = name;
--	aux_dev->id = id;
--	aux_dev->dev.release = ice_ptp_release_auxbus_device;
--	aux_dev->dev.parent = dev;
--
--	err = auxiliary_device_init(aux_dev);
--	if (err)
--		goto aux_err;
--
--	err = auxiliary_device_add(aux_dev);
--	if (err) {
--		auxiliary_device_uninit(aux_dev);
--		goto aux_err;
--	}
--
--	return 0;
--aux_err:
--	dev_err(dev, "Failed to create PTP auxiliary bus device <%s>\n", name);
--	devm_kfree(dev, name);
--	return err;
--}
--
--/**
-- * ice_ptp_remove_auxbus_device - Remove PTP auxiliary bus device
-- * @pf: Board private structure
-- */
--static void ice_ptp_remove_auxbus_device(struct ice_pf *pf)
--{
--	struct auxiliary_device *aux_dev = &pf->ptp.port.aux_dev;
--
--	auxiliary_device_delete(aux_dev);
--	auxiliary_device_uninit(aux_dev);
--
--	memset(aux_dev, 0, sizeof(*aux_dev));
--}
--
- /**
-  * ice_ptp_init_tx_interrupt_mode - Initialize device Tx interrupt mode
-  * @pf: Board private structure
-@@ -3429,10 +3168,6 @@ void ice_ptp_init(struct ice_pf *pf)
- 	/* Configure initial Tx interrupt settings */
- 	ice_ptp_cfg_tx_interrupt(pf);
- 
--	err = ice_ptp_create_auxbus_device(pf);
--	if (err)
--		goto err;
--
- 	ptp->state = ICE_PTP_READY;
- 
- 	err = ice_ptp_init_work(pf, ptp);
--- 
-2.43.0
+My point is that if a particular routing header support is disabled
+through system configuration, it should be treated as any unrecognized
+header. From my perspective, doing otherwise causes a regression every
+time a new routing header is supported.
 
 
