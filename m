@@ -1,79 +1,80 @@
-Return-Path: <netdev+bounces-106742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 378509175FC
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 04:04:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F913917600
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 04:08:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 571931C217DC
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 02:04:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DC921F21B86
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 02:08:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDCD717BBA;
-	Wed, 26 Jun 2024 02:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF80E1BDDC;
+	Wed, 26 Jun 2024 02:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jL2vWHez"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NO9sHyci"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E6BBE6C
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 02:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80714FBFC
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 02:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719367459; cv=none; b=C1b7V5KixBEAKRujrtkJYMnHav/GYwRhVbwqRTtDJWmRZ0lOzHw+whMYecHxhDY6l0IkrBy9CSJGSCLIm2Ebbzf9drzZFEL8tMOvFj+d3D1/QAMFJ0IguLNuwEjjpvk1LfEI+dZDGjgnnVyJJ5Y4VXb/V8C7pfgD/kSFmTEKY9E=
+	t=1719367687; cv=none; b=jfiKCFX1JKRA4Koh9lmHXNiVJu2H4tRCE0gQrM2unzBch6h87d3RnEpLDVehPOrqYJvWNO1aLszesgwBQyfzJ2K70VLxILf0h8JwdFagPDb4kg4P0FRZPux5Q4bOE40yzCgLGjBDQVetqj3TBMZb96cEu+dVi5h9n1CNXgILGeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719367459; c=relaxed/simple;
-	bh=aN3og5AzY+B1LhNsYiHc045+QRwl7FQA47UgNpDyXqs=;
+	s=arc-20240116; t=1719367687; c=relaxed/simple;
+	bh=Ys01ZVuy0Jw6SobqHoxvN/Kkb1hjB5Lu+XNQA2bxyWI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WiVo5sbCVKB2bk8rlG6mCsV5yeNrw5sf3zmlYSegc87t/ppEshh+/0vvESjECVHj+F6DqjM3rKJxi/a/GYyANEEUcD0+EI8RoJye6qKbN49BqzBjGjw8EAPcXoh0/Q81UF3pTVcYHyLHWfgYyfNUFWruV+kYXYbNa7VlfpKPdb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jL2vWHez; arc=none smtp.client-ip=209.85.216.51
+	 Content-Type:Content-Disposition:In-Reply-To; b=WxwB5iG2Xb52yTbyGlXHcF4jQNYiKQs7qwAYJKyuzpnvH2iLneqSzFK+zbXg7CVEs+a+FQCJIOuMq8XDgk0w7HsyaarHjh4IMmw5hPdVMg3W3j9OaHVwSig52qZTjzBM25ujCXm3xj+6X7NkgJpZe14SkfcaITsdhUJ++Kkc5q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NO9sHyci; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2c72becd4fdso4837614a91.0
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 19:04:18 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7067435d376so68974b3a.0
+        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 19:08:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719367457; x=1719972257; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1719367686; x=1719972486; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TqiKIjXRWpI2yH4Orhmj1cH94DD9CfoTw7Hr86cXKPQ=;
-        b=jL2vWHez9FMYjgMKFlMFSSC3fbMjym2T4h1uvrRvEa/CKMl2zm9sxrboQlwm9NGCFJ
-         FfgQvtgTCxJBIW5AfTHwxSFWgHeLMTGSLeCKyup7RRSyRgOTcMkkBls6avobsALfLe4D
-         BpFi9+xd4DzNh2BcMgHwxGXpt2pAWPAsf357Dopa8j4NJZCQdjUxwDY6R/xLd9URYjci
-         DiVkpkuspBPVRZQArMIV0pu+kAdl2xZ4aKJoYoo56lut96TlLe9L7pexE4i5wCf6Eg8s
-         hZSOxiGgpUcpbhDrS2YmBesJVhzD3VMtMmBVQ2Tfi3dd4IgvJ3FGwFonfgdX0qdK72SD
-         2Svg==
+        bh=Snn/BCHYrJ3+Uxt7ENO5jx5Ae3+sahv85UiMD85+ip8=;
+        b=NO9sHycishjUAxNVXbNChWqhRHT3/zUOGw12Syt4YXAjwSRJfWB1PQJmMVnKaeJku0
+         BHQxfzDFmud1gIwwgEZ8eSHDtIPpEk94nDnUTICBQZTutVv/yYdwXFmRVBAXo6waxTaQ
+         ysfcVV2CiZGPDnkKyRenthonDKnKCvHZRvOGL+AQwF5P1BMt1Fth68OJAyN3X9I8aJ4d
+         mEMwSO9jViFNPiUoflYL8wHMHZWvJny89CksvI2JwViov50Lo4TEios6dsSCKPrdGjTX
+         y+Roz3hu2YipQ3zumtq7tIzW9GuCVkvYV3KehKkabWpAqW9k4u7zCsLPrWe+HGrUjWrE
+         fXYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719367457; x=1719972257;
+        d=1e100.net; s=20230601; t=1719367686; x=1719972486;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TqiKIjXRWpI2yH4Orhmj1cH94DD9CfoTw7Hr86cXKPQ=;
-        b=qZhavETqZBA3vn438W6WKvZGnyE241c7dXXiitf6IUYdYot9DfPzR+y0D8IXhjCdDe
-         eX+Wy/ytslSG15WLEzul7iRPzxgiVwZTO9TitQZmMlMb5QZMI1C1p34t+LhpMEnCYvvg
-         GEKLSR/Z+QnQPQGyq98yM6UJtRQkxmLx8V+2mv+G8ySOVYDSq/SROpM8vAwmUfT2tYh3
-         rorZTkRPpS1LHFX7oek4oIiUZTr7S5Hr+8aZC+mMdJcJswn18HAJfovuek54jyNBMm6M
-         NRJ5a7n898af56moBLxyyIZ1s3XmmeHvpY5bgSX96R/QDInruUvvroqlr5GHw+j7LwjT
-         69pw==
-X-Forwarded-Encrypted: i=1; AJvYcCXsQ/8erg1PdnBiCMz4HSLfQaETqZ9+7OYl3B0VtpyXurX9WXZ0DqHpO2v6KFjEw0Qvw6F9ZTbMT0FOwmhDHJ2nXaTR/9AA
-X-Gm-Message-State: AOJu0YzzUwJNbsUOevWCyTFwE0JmwoGZhlLdhij1ymdZdfVLawV+rMCa
-	To/APPjLWVSp81s/KSnmmmLMjRIsrZe5Jxh5grneqTXI24YuwJvw
-X-Google-Smtp-Source: AGHT+IHHnSlCBBRX8/L4dQY5OopRdDp6aBmpsUlVcTc3KIcp2iwc8j7uJdOpWNtCbUBB0OYewRwx6g==
-X-Received: by 2002:a17:90a:f009:b0:2c5:3dbd:58bc with SMTP id 98e67ed59e1d1-2c8613d5b39mr6810484a91.25.1719367457411;
-        Tue, 25 Jun 2024 19:04:17 -0700 (PDT)
+        bh=Snn/BCHYrJ3+Uxt7ENO5jx5Ae3+sahv85UiMD85+ip8=;
+        b=tbxOs/tyannvHo5y4rJdrcS0wwgbZ097UfAGnlByBVzO/nLUSTJOqze5+/09JLRH/5
+         dDW0ud/h6RikqQsZfRynD1imm+h0RzC4U165cLaudefngDO+Zi88wkqAudUCj549ltcq
+         PnP11d+X6vSzm/IB66uRJpY8S5xk/4OriOiGErQ7936VuaLyYVMvF2yEV7An3gh4ADf2
+         TwVzSGrKQIMtWOqGIZMle1E/R6I7PM52poXXSD5vF+Q62Hq/+QkhcuB7RZTXCnpt+/n8
+         R8BXnVugvAIA9zfoX9od/0C27e8tZ3U5Nbuyyg9/X4ZEY5IrpPGYrZHw8fbQieFaw0S9
+         /33w==
+X-Forwarded-Encrypted: i=1; AJvYcCV6RXJnVe4CBmNaVVJI3vNjnjqyXR4P4ZTEZcSY8JNtgvdvgph27svUXB5feMB+UaUCxeRBb0PQiQhA8IPXMNGJIJbEHVoL
+X-Gm-Message-State: AOJu0YwoVvrPhi7m6CF18HU1+fGXbvI5WP876fOPvVB62fGFiFxxethE
+	xPzGSTXR13A0qbS922wWl1eMprXcHgrH27x0dEHW23XInt2HNMe5803r5f7ZMKg=
+X-Google-Smtp-Source: AGHT+IEokwBJgMOz6ORbotLRGD0TviWllVMJFBMkwq8/gavQpVszQYbRQtvs7eECbC3/Hy7DRZgxvQ==
+X-Received: by 2002:aa7:8882:0:b0:706:a8e8:65a5 with SMTP id d2e1a72fcca58-706a8e8667cmr368096b3a.23.1719367685632;
+        Tue, 25 Jun 2024 19:08:05 -0700 (PDT)
 Received: from Laptop-X1 ([2409:8a02:7825:fd0:4f66:6e77:859a:643d])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c8d81d2ae1sm327176a91.50.2024.06.25.19.04.15
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7067a3759e8sm5288865b3a.206.2024.06.25.19.08.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jun 2024 19:04:16 -0700 (PDT)
-Date: Wed, 26 Jun 2024 10:04:13 +0800
+        Tue, 25 Jun 2024 19:08:05 -0700 (PDT)
+Date: Wed, 26 Jun 2024 10:08:02 +0800
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: Tobias Waldekranz <tobias@waldekranz.com>
 Cc: stephen@networkplumber.org, dsahern@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 iproute2 1/3] ip: bridge: add support for mst_enabled
-Message-ID: <Znt3HVpvOk8Ocpjg@Laptop-X1>
+Subject: Re: [PATCH v2 iproute2 2/3] bridge: vlan: Add support for setting a
+ VLANs MSTI
+Message-ID: <Znt4Aqa2Kbsa3odW@Laptop-X1>
 References: <20240624130035.3689606-1-tobias@waldekranz.com>
- <20240624130035.3689606-2-tobias@waldekranz.com>
+ <20240624130035.3689606-3-tobias@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,101 +83,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240624130035.3689606-2-tobias@waldekranz.com>
+In-Reply-To: <20240624130035.3689606-3-tobias@waldekranz.com>
 
-On Mon, Jun 24, 2024 at 03:00:33PM +0200, Tobias Waldekranz wrote:
-> When enabled, the bridge's legacy per-VLAN STP facility is replaced
-> with the Multiple Spanning Tree Protocol (MSTP) compatible version.
+On Mon, Jun 24, 2024 at 03:00:34PM +0200, Tobias Waldekranz wrote:
+> Allow the user to associate one or more VLANs with a multiple spanning
+> tree instance (MSTI), when MST is enabled on the bridge.
 > 
 > Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
 > ---
->  ip/iplink_bridge.c    | 19 +++++++++++++++++++
->  man/man8/ip-link.8.in | 14 ++++++++++++++
->  2 files changed, 33 insertions(+)
+>  bridge/vlan.c     | 13 +++++++++++++
+>  man/man8/bridge.8 |  9 ++++++++-
+>  2 files changed, 21 insertions(+), 1 deletion(-)
 > 
-> diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
-> index 6b70ffbb..f01ffe15 100644
-> --- a/ip/iplink_bridge.c
-> +++ b/ip/iplink_bridge.c
-> @@ -30,6 +30,7 @@ static void print_explain(FILE *f)
->  		"		  [ max_age MAX_AGE ]\n"
->  		"		  [ ageing_time AGEING_TIME ]\n"
->  		"		  [ stp_state STP_STATE ]\n"
-> +		"		  [ mst_enabled MST_ENABLED ]\n"
->  		"		  [ priority PRIORITY ]\n"
->  		"		  [ group_fwd_mask MASK ]\n"
->  		"		  [ group_address ADDRESS ]\n"
-> @@ -169,6 +170,18 @@ static int bridge_parse_opt(struct link_util *lu, int argc, char **argv,
->  				bm.optval |= no_ll_learn_bit;
->  			else
->  				bm.optval &= ~no_ll_learn_bit;
-> +		} else if (strcmp(*argv, "mst_enabled") == 0) {
-> +			__u32 mst_bit = 1 << BR_BOOLOPT_MST_ENABLE;
-> +			__u8 mst_enabled;
-> +
+> diff --git a/bridge/vlan.c b/bridge/vlan.c
+> index 0a7e6c45..34d7f767 100644
+> --- a/bridge/vlan.c
+> +++ b/bridge/vlan.c
+> @@ -56,6 +56,7 @@ static void usage(void)
+>  		"                      [ mcast_querier_interval QUERIER_INTERVAL ]\n"
+>  		"                      [ mcast_query_interval QUERY_INTERVAL ]\n"
+>  		"                      [ mcast_query_response_interval QUERY_RESPONSE_INTERVAL ]\n"
+> +		"                      [ msti MSTI ]\n"
+>  		"       bridge vlan global { show } [ dev DEV ] [ vid VLAN_ID ]\n");
+>  	exit(-1);
+>  }
+> @@ -406,6 +407,7 @@ static int vlan_global_option_set(int argc, char **argv)
+>  	short vid = -1;
+>  	__u64 val64;
+>  	__u32 val32;
+> +	__u16 val16;
+>  	__u8 val8;
+>  
+>  	afspec = addattr_nest(&req.n, sizeof(req),
+> @@ -536,6 +538,12 @@ static int vlan_global_option_set(int argc, char **argv)
+>  			addattr64(&req.n, 1024,
+>  				  BRIDGE_VLANDB_GOPTS_MCAST_STARTUP_QUERY_INTVL,
+>  				  val64);
+> +		} else if (strcmp(*argv, "msti") == 0) {
 > +			NEXT_ARG();
-> +			if (get_u8(&mst_enabled, *argv, 0))
-> +				invarg("invalid mst_enabled", *argv);
-> +			bm.optmask |= mst_bit;
-> +			if (mst_enabled)
-> +				bm.optval |= mst_bit;
-> +			else
-> +				bm.optval &= ~mst_bit;
->  		} else if (strcmp(*argv, "fdb_max_learned") == 0) {
->  			__u32 fdb_max_learned;
->  
-> @@ -609,6 +622,7 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
->  	if (tb[IFLA_BR_MULTI_BOOLOPT]) {
->  		__u32 mcvl_bit = 1 << BR_BOOLOPT_MCAST_VLAN_SNOOPING;
->  		__u32 no_ll_learn_bit = 1 << BR_BOOLOPT_NO_LL_LEARN;
-> +		__u32 mst_bit = 1 << BR_BOOLOPT_MST_ENABLE;
->  		struct br_boolopt_multi *bm;
->  
->  		bm = RTA_DATA(tb[IFLA_BR_MULTI_BOOLOPT]);
-> @@ -622,6 +636,11 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
->  				   "mcast_vlan_snooping",
->  				   "mcast_vlan_snooping %u ",
->  				    !!(bm->optval & mcvl_bit));
-> +		if (bm->optmask & mst_bit)
-> +			print_uint(PRINT_ANY,
-> +				   "mst_enabled",
-> +				   "mst_enabled %u ",
-> +				   !!(bm->optval & mst_bit));
+> +			if (get_u16(&val16, *argv, 0))
+> +				invarg("invalid msti", *argv);
+> +			addattr16(&req.n, 1024,
+> +				 BRIDGE_VLANDB_GOPTS_MSTI, val16);
+>  		} else {
+>  			if (strcmp(*argv, "help") == 0)
+>  				NEXT_ARG();
+> @@ -945,6 +953,11 @@ static void print_vlan_global_opts(struct rtattr *a, int ifindex)
+>  			     "mcast_query_response_interval %llu ",
+>  			     rta_getattr_u64(vattr));
 >  	}
+> +	if (vtb[BRIDGE_VLANDB_GOPTS_MSTI]) {
+> +		vattr = vtb[BRIDGE_VLANDB_GOPTS_MSTI];
+> +		print_uint(PRINT_ANY, "msti", "msti %u ",
+> +			   rta_getattr_u16(vattr));
+> +	}
+>  	print_nl();
+>  	if (vtb[BRIDGE_VLANDB_GOPTS_MCAST_ROUTER_PORTS]) {
+>  		vattr = RTA_DATA(vtb[BRIDGE_VLANDB_GOPTS_MCAST_ROUTER_PORTS]);
+> diff --git a/man/man8/bridge.8 b/man/man8/bridge.8
+> index bb02bd27..b4699801 100644
+> --- a/man/man8/bridge.8
+> +++ b/man/man8/bridge.8
+> @@ -266,7 +266,9 @@ bridge \- show / manipulate bridge addresses and devices
+>  .B mcast_query_interval
+>  .IR QUERY_INTERVAL " ] [ "
+>  .B mcast_query_response_interval
+> -.IR QUERY_RESPONSE_INTERVAL " ]"
+> +.IR QUERY_RESPONSE_INTERVAL " ] [ "
+> +.B msti
+> +.IR MSTI " ]"
 >  
->  	if (tb[IFLA_BR_MCAST_ROUTER])
-> diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-> index c1984158..eabca490 100644
-> --- a/man/man8/ip-link.8.in
-> +++ b/man/man8/ip-link.8.in
-> @@ -1685,6 +1685,8 @@ the following additional arguments are supported:
->  ] [
->  .BI stp_state " STP_STATE "
->  ] [
-> +.BI mst_enabled " MST_ENABLED "
-> +] [
->  .BI priority " PRIORITY "
->  ] [
->  .BI no_linklocal_learn " NO_LINKLOCAL_LEARN "
-> @@ -1788,6 +1790,18 @@ or off
->  .RI ( STP_STATE " == 0). "
->  for this bridge.
+>  .ti -8
+>  .BR "bridge vlan global" " [ " show " ] [ "
+> @@ -1493,6 +1495,11 @@ startup phase.
+>  set the Max Response Time/Maximum Response Delay for IGMP/MLD
+>  queries sent by the bridge.
 >  
-> +.BI mst_enabled " MST_ENABLED "
-> +- turn multiple spanning tree (MST) support on
-> +.RI ( MST_ENABLED " > 0) "
-> +or off
-> +.RI ( MST_ENABLED " == 0). "
-> +When enabled, sets of VLANs can be associated with multiple spanning
-> +tree instances (MSTIs), and STP states for each port can be controlled
-> +on a per-MSTI basis. Note: no implementation of the MSTP protocol is
-> +provided, only the primitives needed to implement it. To avoid
-> +interfering with the legacy per-VLAN STP states, this setting can only
-> +be changed when no bridge VLANs are configured.
+> +.TP
+> +.BI msti " MSTI "
+> +associate the VLAN with the specified multiple spanning tree instance
+> +(MSTI).
 > +
->  .BI priority " PRIORITY "
->  - set this bridge's spanning tree priority, used during STP root
->  bridge election.
+>  .SS bridge vlan global show - list global vlan options.
+>  
+>  This command displays the global VLAN options for each VLAN entry.
 > -- 
 > 2.34.1
 > 
