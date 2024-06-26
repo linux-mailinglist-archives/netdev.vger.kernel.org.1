@@ -1,110 +1,121 @@
-Return-Path: <netdev+bounces-106988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D87E49185E9
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 17:34:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B2A59185EE
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 17:35:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 815001F213B8
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:34:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC2EB1C21395
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A392718C358;
-	Wed, 26 Jun 2024 15:34:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF0218C324;
+	Wed, 26 Jun 2024 15:35:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="spa45wpe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EhCUvS4w"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E225F18C347
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 15:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D46CA92F;
+	Wed, 26 Jun 2024 15:35:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719416072; cv=none; b=nDW8VLny3zYUV8i6ae5ur3vGrG3ueFQNCXOqtaJPPtPFC41Ce76+TVtFL6Fdw1dnIl2SkCM05q8eIJyth3iZTNb1dCfIoolRTxEbg4nlQnJ8MaFNmKA/kf6eliZTE2kZsJRPpkafGmuMuzgpNQIb1r2Qk0YlgafkxoNZYQXtmFE=
+	t=1719416122; cv=none; b=IpYZIdnrO4F/lMJCF8ur62wXnrTCiRweqX61PqNJKJiHw7xfk1rizH1OkSZJo4p84pDSmuayEeViU87K8O8A+A/CkiFVTUsukUlr5X02gmE2gPMJ8baGE94xjUrt/JGLkqA9t18sBwrPLX/D88eho8qzXrO3D42Vhn2u2w0Wbgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719416072; c=relaxed/simple;
-	bh=Sds+/XRrUC3rCdFDUi5xk8kzT1KcsK6N8NjteQozq7Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FKPPsrzYlbbQ9ZqurSGLpdZYTvLcD8EYIWdmjU7HABtUjSmsMfrfiUTtrNYAFP/mu29lix61MDNYsuoyD/rrvXZQVhqh0jcEYUBAXYl9/VuBgrJkCc5LKpVC2NO0MvdbwM2w6VgFuYWvNAJqkxjZ3+Md8rgOnm90nI5BbwHF34U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=spa45wpe; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1719416062; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=llyO7GfseVLUfiq9yN0ifl2rjGE5OqqC1qNWNAoUGmE=;
-	b=spa45wpehHdyccWa8jyKZYDfUOM+rQPZIUvVR1dUgt8c6n88PG6zE1Pi9ITKcWjW0RG47QVzkIt9ywVjf1FrBlbxKJEn/9upMtiXn81w3ugRqSITIZHUuQkHyD7VPAgoDNFX7+xXcnH2+4jlElgG38n5cVXj2QPqYQW0E2KyAOc=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R581e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067109;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W9Jv-AE_1719416061;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W9Jv-AE_1719416061)
-          by smtp.aliyun-inc.com;
-          Wed, 26 Jun 2024 23:34:22 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Simon Horman <horms@kernel.org>,
-	syzbot+e77327e34cdc8c36b7d3@syzkaller.appspotmail.com
-Subject: [PATCH net] net: ethtool: Fix the panic caused by dev being null when dumping coalesce
-Date: Wed, 26 Jun 2024 23:34:21 +0800
-Message-Id: <20240626153421.102107-1-hengqi@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	s=arc-20240116; t=1719416122; c=relaxed/simple;
+	bh=1Kcr3jofdArjh6InWFIdRnfWmP3d7iP++Ac3f1l/fwQ=;
+	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
+	 Message-Id:Subject; b=mgQPq54HdBDiZfIN/odhdPoKD59Ae5IYlxUwljDUmThxIZq5GVSteUr1SNaTmXHknAHu3oHX+duJ9XhAfiQy8BI9rieWc1C6YH/m9AUuS0muJ3wd59kl9zhPu7CeI2Ax19Te/Qt4Cz6XJjeacksjoJynVel+CpFFkpe6AWvod7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EhCUvS4w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CE8FC116B1;
+	Wed, 26 Jun 2024 15:35:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719416121;
+	bh=1Kcr3jofdArjh6InWFIdRnfWmP3d7iP++Ac3f1l/fwQ=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=EhCUvS4wltsz2P5ZyUiB69APAxgoqAtE/IcvwXQdxdEpETk8H013mdfGKcvFUiLdB
+	 giiSdPkNiHIAESerlBkaXWCvQnFBJ9lvZQ9wLkxyPGldmIWeAGLDhA2OiL9ZuwSAHg
+	 c0ezz8n3h1PWIHJQHiPfPA8sJX0lB0B/JXR0LFcTXueub69S9wW/gVrd8az1NrmNgL
+	 XR0AOkUsuBpuPnxlbxi/LWKLD2m3fLp7aVe6Prqhjc8kAYxmjns3zBsnIUTE034xxN
+	 HVx61Vq+ACCaSQ2eMH3Sy076jJVVIvZ/EI2jT0Etk5dJwT/TJFqYwQKpol66llpCGM
+	 vlMxR++QCO5AQ==
+Date: Wed, 26 Jun 2024 09:35:20 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Devi Priya <quic_devipriy@quicinc.com>
+Cc: catalin.marinas@arm.com, u-kumar1@ti.com, 
+ linux-arm-kernel@lists.infradead.org, krzk+dt@kernel.org, 
+ geert+renesas@glider.be, neil.armstrong@linaro.org, nfraprado@collabora.com, 
+ mturquette@baylibre.com, linux-kernel@vger.kernel.org, 
+ dmitry.baryshkov@linaro.org, netdev@vger.kernel.org, 
+ konrad.dybcio@linaro.org, m.szyprowski@samsung.com, arnd@arndb.de, 
+ richardcochran@gmail.com, will@kernel.org, sboyd@kernel.org, 
+ andersson@kernel.org, p.zabel@pengutronix.de, linux-clk@vger.kernel.org, 
+ devicetree@vger.kernel.org, conor+dt@kernel.org, 
+ linux-arm-msm@vger.kernel.org
+In-Reply-To: <20240626143302.810632-5-quic_devipriy@quicinc.com>
+References: <20240626143302.810632-1-quic_devipriy@quicinc.com>
+ <20240626143302.810632-5-quic_devipriy@quicinc.com>
+Message-Id: <171941612020.3280624.794530163562164163.robh@kernel.org>
+Subject: Re: [PATCH V5 4/7] dt-bindings: clock: Add ipq9574 NSSCC clock and
+ reset definitions
 
-syzbot reported a general protection fault caused by a null pointer
-dereference in coalesce_fill_reply(). The issue occurs when req_base->dev
-is null, leading to an invalid memory access.
 
-This panic occurs if dumping coalesce when no device name is specified.
+On Wed, 26 Jun 2024 20:02:59 +0530, Devi Priya wrote:
+> Add NSSCC clock and reset definitions for ipq9574.
+> 
+> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>  Changes in V5:
+> 	- Dropped interconnects and added interconnect-cells to NSS
+> 	  clock provider so that it can be  used as icc provider.
+> 
+>  .../bindings/clock/qcom,ipq9574-nsscc.yaml    |  74 +++++++++
+>  .../dt-bindings/clock/qcom,ipq9574-nsscc.h    | 152 ++++++++++++++++++
+>  .../dt-bindings/reset/qcom,ipq9574-nsscc.h    | 134 +++++++++++++++
+>  3 files changed, 360 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+>  create mode 100644 include/dt-bindings/clock/qcom,ipq9574-nsscc.h
+>  create mode 100644 include/dt-bindings/reset/qcom,ipq9574-nsscc.h
+> 
 
-Fixes: f750dfe825b9 ("ethtool: provide customized dim profile management")
-Reported-by: syzbot+e77327e34cdc8c36b7d3@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=e77327e34cdc8c36b7d3
-Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
----
-The problematic commit targeted by this fix may still be in the next branch.
+My bot found errors running 'make dt_binding_check' on your patch:
 
- net/ethtool/coalesce.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+yamllint warnings/errors:
 
-diff --git a/net/ethtool/coalesce.c b/net/ethtool/coalesce.c
-index 759b16e3d134..3e18ca1ccc5e 100644
---- a/net/ethtool/coalesce.c
-+++ b/net/ethtool/coalesce.c
-@@ -211,9 +211,9 @@ static int coalesce_fill_reply(struct sk_buff *skb,
- {
- 	const struct coalesce_reply_data *data = COALESCE_REPDATA(reply_base);
- 	const struct kernel_ethtool_coalesce *kcoal = &data->kernel_coalesce;
--	struct dim_irq_moder *moder = req_base->dev->irq_moder;
- 	const struct ethtool_coalesce *coal = &data->coalesce;
- 	u32 supported = data->supported_params;
-+	struct dim_irq_moder *moder;
- 	int ret = 0;
- 
- 	if (coalesce_put_u32(skb, ETHTOOL_A_COALESCE_RX_USECS,
-@@ -272,9 +272,10 @@ static int coalesce_fill_reply(struct sk_buff *skb,
- 			     kcoal->tx_aggr_time_usecs, supported))
- 		return -EMSGSIZE;
- 
--	if (!moder)
-+	if (!req_base->dev || !req_base->dev->irq_moder)
- 		return 0;
- 
-+	moder = req_base->dev->irq_moder;
- 	rcu_read_lock();
- 	if (moder->profile_flags & DIM_PROFILE_RX) {
- 		ret = coalesce_put_profile(skb, ETHTOOL_A_COALESCE_RX_PROFILE,
--- 
-2.32.0.3.g01195cf9f
+dtschema/dtc warnings/errors:
+Error: Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.example.dts:26.26-27 syntax error
+FATAL ERROR: Unable to parse input tree
+make[2]: *** [scripts/Makefile.lib:427: Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.example.dtb] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1430: dt_binding_check] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240626143302.810632-5-quic_devipriy@quicinc.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
 
