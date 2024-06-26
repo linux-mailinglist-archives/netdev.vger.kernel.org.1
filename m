@@ -1,113 +1,105 @@
-Return-Path: <netdev+bounces-106919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE79E918172
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:54:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0633591817B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:56:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BB8E1C22FAA
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:54:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7308DB20B2F
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:56:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53726180A61;
-	Wed, 26 Jun 2024 12:54:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED5A181BBF;
+	Wed, 26 Jun 2024 12:56:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l7Cdk4B3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HgKPni5B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D110916CD35
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 12:54:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D37180A61
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 12:56:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719406478; cv=none; b=pJLGGVw/kTJvwYuBd5KYliRPSnWrUfxurowfIwxe8qItEXbadl6q27yoObT22VFg9VplcgJiIK+YK061oswBWsST4sAD45SkmjKU41H5mPvSId9t6adidjYOmkBpnt8FehxXNaxXxqwdIuRUEki/ZDKEDDaMC+I/+1TH4gXeLU4=
+	t=1719406578; cv=none; b=evgTauokAEzzGs+YC6hHByAACseTEKLGKEhl/H/ENpUCkXz8sCuMx8Luoq69oLdQ0Bf1Q83/CGJxQc1Y3AxHLOWdyuNunlVtvmzCc9ymcUNQsRjPIP2jKb1S6dhGrpHTUfLPlzi3e7QvItRUarel6ujUZC6qo25AnaVlVAYTZNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719406478; c=relaxed/simple;
-	bh=m5sBYB3LehhgAj0AoT7awV45VRjYTbpWE4VxN/R7Tjc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NrR1DzqzUQVzCmafiybeu5kkui10MG7fhgBydFTVp9WehGxFrAqFSIjtxQThL2PptpGrmvjAcL2h4leA0PN16HGpZ6jLLwBG9NkO/7NrAcVBy6a62O4hyK75d9neiU2uOgyfeHIBAaEXKyYLqlrCpWgvQIn47NfdR+Bo1TOrTAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l7Cdk4B3; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-366edce6493so2505297f8f.3
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 05:54:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719406475; x=1720011275; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XVZa8s7TfW9M4YMz2W8iw4oXxkdoC8VEOuz1elTAeOA=;
-        b=l7Cdk4B3OURL8rqiV3RaEeqHxXROvbVQH4w9/H+J3ekX1yLBk0hBtYuBRKOyDji64K
-         JsrpXEW7idV5UjkXZPO+V1SGnIwu1K/Ebm5295CZx5zig+NgrcofbOUb2fd6D+78p/ur
-         8N4cPlahGz1uCR81jlomaOeomNDQioACaJE5CDUZjPb5bAyuqCc7mPhFl1dyZQADHhUi
-         +xu9gwYOuGRoQQAUhOdG9GovaHwZKnYBL/KjAClglPZOYOPcbR/izoi435e9DpZ38r3P
-         PAo55Nxr9iGJn+y4Oo2irw4CtCsDeMeIoW9fa2BGSL/XRbqdaBrJZ7ixZupWoacoRjhg
-         cuTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719406475; x=1720011275;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XVZa8s7TfW9M4YMz2W8iw4oXxkdoC8VEOuz1elTAeOA=;
-        b=rmmUffIIFw/wPefVNkCP3GOWKrFYr6AF9tXizVylJP2G5KD3mfYJlWhJFi1cZOFlbG
-         BDHGd7vuehDMtOEo1dHDYzBnCH1mrt9ry8RXOsCFexRQj8CKRQtRwuWmeCQayGaiCUlp
-         pNEo9loq/pqyoNn87rPfv4eFB34DG413H1FxfVL5fTFo5XV55U4BwP3WS8aMECYOg/SP
-         ckvmhM/9WssXhPhH8yKf6K733rhtTDciGfCxdhNhAMNBT4vmof1ssDkjb9I25pWiI9EC
-         RP9W2qG/htT5fEYIOWoaQ4ckWpDB2MvpfPd+uQJ9gmFgEfMhvnGlaG2TapGimJFvV1vp
-         jcuA==
-X-Forwarded-Encrypted: i=1; AJvYcCUMWGENau3lGz+W3wdUTU2/ey6Q8s5FYeZ54y4OvRInRiPzRZMlUWv1gvc2GPNg4U1HkYiyb99HfCImrPRqMzD+GTwBGF4K
-X-Gm-Message-State: AOJu0Ywec7Ped7e0Hh5YRr2+HhJPELBUZcSWhSMufRlBIjPhry7vaD4v
-	AXnwIOQ14ye7EC1UkOz+ql8OLLfUbeu4r1jbl6cymSoWkIlec+Bw
-X-Google-Smtp-Source: AGHT+IHhghrgXVGwLJscxl8VPw3qIl2CQ5VS6xPflbXzLdPIN0RbFlSoW3He5PbytvA9MSrKjcPeSg==
-X-Received: by 2002:a5d:538f:0:b0:365:ebb6:35df with SMTP id ffacd0b85a97d-366e962df3bmr6164255f8f.58.1719406474686;
-        Wed, 26 Jun 2024 05:54:34 -0700 (PDT)
-Received: from [10.158.37.53] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-366ed18dfeesm9668547f8f.93.2024.06.26.05.54.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jun 2024 05:54:34 -0700 (PDT)
-Message-ID: <25bae4ee-f333-45ea-8c61-d9d520df08ae@gmail.com>
-Date: Wed, 26 Jun 2024 15:54:32 +0300
+	s=arc-20240116; t=1719406578; c=relaxed/simple;
+	bh=4dDZAtv/P+cz8g4CQVaX7gFO4RWR7K7m4WW1uqJlRBk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Hn36jaoC4r44ghPvNAx3BAJuNGDhXBaGuqE4OkAosywCYEWzos1yjNGMTF/P2LyDvewYpyfP3MjjnWEXwj9qxfjbHRJgXrhOxuJs/mH+9txQTkCZrnOanTmKfXAwQz3bSL2/9byFjTNYQ+FrbCAKbzy/GYlLqqVuRe4sPkM6nrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HgKPni5B; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719406577; x=1750942577;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4dDZAtv/P+cz8g4CQVaX7gFO4RWR7K7m4WW1uqJlRBk=;
+  b=HgKPni5B8nIDethzVlY2z5b2ZBMcDWDlBZnVUz0Yyh6vrvWe33K8YHRm
+   IuKOi4295vwofZOEGoNXD9S3X/NLM4vr54FZi07eXDWegp3y1PNIqKbO0
+   mvCLib3Zf3a3nafUIKBrk8MgT4L/rmp4sawqvS2wztcpEPQeBJlz4f7nG
+   BQ+56rQBsWooNGtjCqot6KEJ+FlKL1nZjUTDOJKMnDyR9Ptppjl84EkTI
+   kQ6te8vuJZVaPA5K8u1N+0QgCo4lfaeZ8kCYGZMgUXmfLZo40P5hGp6XM
+   Vs3uUX4SyeHHJZ3LPE+a4B1LBh1rT99w1gU1VorUkUbvf5y8H8PT6Rmua
+   Q==;
+X-CSE-ConnectionGUID: EaJaMHtnStaP0rgpL2EOfg==
+X-CSE-MsgGUID: GwGWMyy6Qmylb2snQf7hww==
+X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="16158097"
+X-IronPort-AV: E=Sophos;i="6.08,267,1712646000"; 
+   d="scan'208";a="16158097"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 05:56:16 -0700
+X-CSE-ConnectionGUID: opfgUuZ/RZCfUsj+V/yywA==
+X-CSE-MsgGUID: xc1pVhtoThqISx/PVGX9uw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,267,1712646000"; 
+   d="scan'208";a="48594629"
+Received: from unknown (HELO localhost.igk.intel.com) ([10.211.13.141])
+  by fmviesa004.fm.intel.com with ESMTP; 26 Jun 2024 05:56:15 -0700
+From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+Subject: [PATCH iwl-next v2 0/4] Replace auxbus with ice_adapter in the PTP support code
+Date: Wed, 26 Jun 2024 14:54:52 +0200
+Message-ID: <20240626125456.27667-1-sergey.temerkhanov@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 6/7] net/mlx5e: Present succeeded IPsec SA bytes and
- packet
-To: Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
- Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
- Leon Romanovsky <leonro@nvidia.com>
-References: <20240624073001.1204974-1-tariqt@nvidia.com>
- <20240624073001.1204974-7-tariqt@nvidia.com>
- <20240625172141.51d5af12@kernel.org>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20240625172141.51d5af12@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+This series replaces multiple aux buses and devices used in the PTP support
+code with struct ice_adapter holding the necessary shared data
 
+Patches 1,2 add convenience wrappers
+Patch 3 does the main refactoring
+Patch 4 finalizes the refactoring
 
-On 26/06/2024 3:21, Jakub Kicinski wrote:
-> On Mon, 24 Jun 2024 10:30:00 +0300 Tariq Toukan wrote:
->> From: Leon Romanovsky <leonro@nvidia.com>
->>
->> IPsec SA statistics presents successfully decrypted and encrypted
->> packet and bytes, and not total handled by this SA. So update the
->> calculation logic to take into account failures.
->>
->> Fixes: c8dbbb89bfc0 ("net/mlx5e: Connect mlx5 IPsec statistics with XFRM core")
-> 
-> wrong commit ID, I think that it should be:
-> 
-> Fixes: 6fb7f9408779 ("net/mlx5e: Connect mlx5 IPsec statistics with XFRM core")
+Previous discussion: https://lists.osuosl.org/pipermail/intel-wired-lan/Week-of-Mon-20240624/042430.html
 
-Right!
-Should I respin? Or can be fixed while being merged?
+v1->v2: Code rearrangement between patches
+
+Sergey Temerkhanov (4):
+  ice: Introduce ice_get_phy_model() wrapper
+  ice: Add ice_get_ctrl_ptp() wrapper to simplify the code
+  ice: Use ice_adapter for PTP shared data instead of auxdev
+  ice: Drop auxbus use for PTP to finalize ice_adapter move
+
+ drivers/net/ethernet/intel/ice/ice.h         |   5 +
+ drivers/net/ethernet/intel/ice/ice_adapter.c |   6 +
+ drivers/net/ethernet/intel/ice/ice_adapter.h |  22 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c     | 337 ++++---------------
+ drivers/net/ethernet/intel/ice/ice_ptp.h     |  24 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c  |  22 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h  |   5 +
+ 7 files changed, 112 insertions(+), 309 deletions(-)
+
+-- 
+2.43.0
+
 
