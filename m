@@ -1,168 +1,138 @@
-Return-Path: <netdev+bounces-106719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0647D91757F
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:19:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFDD4917585
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:22:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31DEB1C2199C
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:19:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F158B21F12
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82017C142;
-	Wed, 26 Jun 2024 01:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD61F9F7;
+	Wed, 26 Jun 2024 01:22:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ed0SwHvu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z4yJyVlH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE906647;
-	Wed, 26 Jun 2024 01:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BDBC15B
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 01:21:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719364781; cv=none; b=F8Oxfkyk3V5/yG/XIEDH8X07cXHaUO+cC+r2/UQ/SDHTBs4y7DgKlhrhTBmMO7coj2stSOxNkkZsX9OFUPkjU8mzlMHsA5c9QE+n2h+odtiY2Tat7C6cbq73qpHbpx3UdJPaCm+e9WvKwA5bEBeUSPi3LSuNhltAW9pe9N7/RgQ=
+	t=1719364921; cv=none; b=lJjwutaM96ORnGec5wDYN/s4TSU2KvIT9tbtcgzsezz74LdBWPH/qzuT+jMbwrzPvijsIChv792dG/nvgQ36foRMDc7P54SeA0wE30M6Fy7LkVjemn1GvLS3TTpPEcbRUyxohdouIb2Ch6x9+yAYNrR5ZSuxSM/Jg7hDOHqcCX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719364781; c=relaxed/simple;
-	bh=/ZaYhtjBB6pfsj/x9la5o1sL1jgDGNz1LjDhyzmUjwQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n/MASa3aa1DXiXVBCyF+UMGJnOWQFwIcjT5duqGBojg5vVHOiF/WRNvARL+Oq7sTMP63z3/wrStdQveG3CV7xxm6/TFCMVNW5Vqq/S1DmA7/Q0otNJFd2KMASk5YA7FRQiEv0JOLQoSGRZwIfeWniAEJu05oUTD9Do2gwf9808A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ed0SwHvu; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719364780; x=1750900780;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=/ZaYhtjBB6pfsj/x9la5o1sL1jgDGNz1LjDhyzmUjwQ=;
-  b=ed0SwHvuctocHusyRE78QnFP9JEF61bhiSPtMoqRyTVa87802dxdYmAO
-   bCY/xagzFfHGhfo86r3x+hbHwDtbC8oxVt3tARrF4jTzUo+ZlXCSR+AIM
-   yk5o26WMTITSkWpjkcTsh7rSc5flhzMVf2/2MCbdYLDyRNgZ13S1PPDqA
-   Fd4REdavpHitDIJWJi93v2oJvnNhZMqQ3e4hyBO9giBPGp66B1oi3mcYe
-   8QR/pbDdMvPxcRvraHz0DhOqWdHMMt9s8MhiRYZ9obt6pSD70a8QRpURK
-   Xs/VUPP5F4Y2Eq8sfxKqidi0zcxIRRMZt4/sdhfOdvn2Q2r9OJsWS73/S
-   A==;
-X-CSE-ConnectionGUID: qAlesu3fSGm385LvTc0bhA==
-X-CSE-MsgGUID: VJ6uDGUmT6uoPda5b9YSpA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="20222699"
-X-IronPort-AV: E=Sophos;i="6.08,265,1712646000"; 
-   d="scan'208";a="20222699"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 18:19:39 -0700
-X-CSE-ConnectionGUID: Jvap4mEuRuiaOAexReNxjg==
-X-CSE-MsgGUID: lQ9+WCG/QFKlJVqQa1/JTA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,265,1712646000"; 
-   d="scan'208";a="48409095"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.120.43]) ([10.247.120.43])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 18:19:36 -0700
-Message-ID: <106e0d31-c520-4ef6-994e-df1a4c9a986e@linux.intel.com>
-Date: Wed, 26 Jun 2024 09:19:12 +0800
+	s=arc-20240116; t=1719364921; c=relaxed/simple;
+	bh=UFZ9PY+GDSA9BNrYdHIS8Xjr5b2tAoCZFEY+1AZ/7t0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IUOsjh40bklkprwFEFSy2NG6xrHQNfzmisCSY1K/eP7pltdTq9MVi7iW5qk5RkcBNWwfIFVMEDeYzDZmuTnZkjSMyL/iFxVP99uK7llQgL8cncn6uwOGpr4icT0bJ6ikYrco/bq/MEL74IC2R2TOInaFWMs/1jY4kcicN5YE1ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z4yJyVlH; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-57a16f4b8bfso4224a12.0
+        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 18:21:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1719364918; x=1719969718; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MDXzXy/x3VAMGE4telAkJ0AkS3Dvfn3YkfUIsKfqDwQ=;
+        b=Z4yJyVlHfzMxe/ddao59NTkIs2o5QUVqvZf9ZptaOHKqJYdaZBjUDCXNvNd1KgJhqq
+         ULJiS+zcFLsSxQ8czSy0OAYnZ9RwSk+1roN+1bG04dxjNWkS7THUkNquF8woe8i6L8pQ
+         jAwx7aPXlQBd1JKY9fNVOejmymfsfgbf/QYlquMoRqDqyr7X+u9+GOhEYbo5jyLIbab8
+         GflZ9PsVsaX4Syssapjp260tELPdmoFpvHDH+W2ERx0BlmFUfGKsCTs96a2YgDkF5KhY
+         gSjdzGHEd88nrkAQ/kCebRW6Fysj6yFTAR/EP89ylnjngoY8flJus4qxhMUunqef5miL
+         etEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719364918; x=1719969718;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MDXzXy/x3VAMGE4telAkJ0AkS3Dvfn3YkfUIsKfqDwQ=;
+        b=FT1czcZ24lUiowz/chRfbIiSjVszmarpg2OseFaREUl6BM7v4nV/k2nsn/s0DTDyTC
+         8GSfklYsw7lZWFqrGNULeGHAIqUqE19NVv5H4Aq5H2qGO+S9VGp0ErGAcWvjurg/eXv8
+         CzcISj978gHWyC/VxCH5nK7zCHOQr86qebCPg8R73qPQEEq0lPz2JJoxSd40sUW9Yyof
+         K8MDPEFzfQi2u6jxcW/ZaMNlNTnFe0on8FTuQma9+4IMRlmTji7p5oXFVSkntu1PkSiB
+         KEL3ElJUUFp/PIlWa4nRQEMnQgOghCFoJvelNamVM1cXc09JBfer69Yt0xIxcuwSsQPB
+         pFqw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/S7mTX8z/YK8X/dlqAJT3KEN1bsrFV3EYw4XmoxDsA/RVsiUU/mORzqzdJqSCGlRaduPRNPWq49rxBT7RRX/g0JimAGqI
+X-Gm-Message-State: AOJu0YySRUXNCxCi+2Dd5q+ZykU6Aj0AgZc+qZ91FGM7vUrIBL+Udbo7
+	T8CWHHnBSPw5LTdbRcISTQWHPRKfsHpgzULg0yiGXdzEDBzGzZ5DYc1QaV3Zogg3V0SrDHMSShJ
+	z/WIYun1nAcOg+UzPi/i/fx0zE1jCej5crhBK
+X-Google-Smtp-Source: AGHT+IHX6Dw13lvp9tA5r1Nr3EDVBrqZjzt46+AZrMqkD9VDrFcqyfsc9zQwLVqS3nH7c8fc7LBij/O5GqbVZ/GRwBU=
+X-Received: by 2002:a05:6402:350c:b0:582:f117:548e with SMTP id
+ 4fb4d7f45d1cf-5832c353bf0mr116598a12.0.1719364915083; Tue, 25 Jun 2024
+ 18:21:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/1] igc: Fix double reset adapter triggered from a
- single taprio cmd
-To: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- muhammad.husaini.zulkifli@intel.com
-References: <20240625082656.2702440-1-faizal.abdul.rahim@linux.intel.com>
-Content-Language: en-US
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-In-Reply-To: <20240625082656.2702440-1-faizal.abdul.rahim@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240624232718.1154427-1-edliaw@google.com> <20240625135234.d52ef77c0d84cb19d37dc44f@linux-foundation.org>
+ <f975fe76-92f4-4af0-a91d-0f3d8938f6b2@linuxfoundation.org> <CAG4es9V0XAqe-eqPgjU+sdRS00VOEr0Xda1Dv-gtfEvqsODjiw@mail.gmail.com>
+In-Reply-To: <CAG4es9V0XAqe-eqPgjU+sdRS00VOEr0Xda1Dv-gtfEvqsODjiw@mail.gmail.com>
+From: Edward Liaw <edliaw@google.com>
+Date: Tue, 25 Jun 2024 18:21:27 -0700
+Message-ID: <CAG4es9WHUSC7qm_6fJjQm5nM_iYEjXO75DWC8e5tzqc7fLEtfw@mail.gmail.com>
+Subject: Re: [PATCH v6 00/13] Centralize _GNU_SOURCE definition into lib.mk
+To: Shuah Khan <skhan@linuxfoundation.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kselftest@vger.kernel.org, 
+	Eric Biederman <ebiederm@xmission.com>, Kees Cook <kees@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, 
+	Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Fenghua Yu <fenghua.yu@intel.com>, 
+	Reinette Chatre <reinette.chatre@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	linux-kernel@vger.kernel.org, usama.anjum@collabora.com, seanjc@google.com, 
+	kernel-team@android.com, linux-mm@kvack.org, iommu@lists.linux.dev, 
+	kvm@vger.kernel.org, netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-sgx@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Added Vladimir and Husaini in CC.
+On Tue, Jun 25, 2024 at 5:41=E2=80=AFPM Edward Liaw <edliaw@google.com> wro=
+te:
+>
+> On Tue, Jun 25, 2024 at 4:34=E2=80=AFPM Shuah Khan <skhan@linuxfoundation=
+.org> wrote:
+> >
+> > On 6/25/24 14:52, Andrew Morton wrote:
+> > > On Mon, 24 Jun 2024 23:26:09 +0000 Edward Liaw <edliaw@google.com> wr=
+ote:
+> > >
+> > >> Centralizes the definition of _GNU_SOURCE into lib.mk and addresses =
+all
+> > >> resulting macro redefinition warnings.
+> > >>
+> > >> These patches will need to be merged in one shot to avoid redefiniti=
+on
+> > >> warnings.
+> > >
+> > > Yes, please do this as a single patch and resend?
+> >
+> > Since the change is limited to makefiles and one source file
+> > we can manage it with one patch.
+> >
+> > Please send single patch and I will apply to next and we can resolve
+> > conflicts if any before the merge window rolls around.
+>
+> Sounds good, I sent:
+> https://lore.kernel.org/linux-kselftest/20240625223454.1586259-1-edliaw@g=
+oogle.com
 
-On 25/6/2024 4:26 pm, Faizal Rahim wrote:
-> Following the implementation of "igc: Add TransmissionOverrun counter"
-> patch, when a taprio command is triggered by user, igc processes two
-> commands: TAPRIO_CMD_REPLACE followed by TAPRIO_CMD_STATS. However, both
-> commands unconditionally pass through igc_tsn_offload_apply() which
-> evaluates and triggers reset adapter. The double reset causes issues in
-> the calculation of adapter->qbv_count in igc.
-> 
-> TAPRIO_CMD_REPLACE command is expected to reset the adapter since it
-> activates qbv. It's unexpected for TAPRIO_CMD_STATS to do the same
-> because it doesn't configure any driver-specific TSN settings. So, the
-> evaluation in igc_tsn_offload_apply() isn't needed for TAPRIO_CMD_STATS.
-> 
-> To address this, commands parsing are relocated to
-> igc_tsn_enable_qbv_scheduling(). Commands that don't require an adapter
-> reset will exit after processing, thus avoiding igc_tsn_offload_apply().
-> 
-> Fixes: d3750076d464 ("igc: Add TransmissionOverrun counter")
-> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-> ---
->   drivers/net/ethernet/intel/igc/igc_main.c | 33 ++++++++++++-----------
->   1 file changed, 17 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-> index 87b655b839c1..33069880c86c 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> @@ -6310,21 +6310,6 @@ static int igc_save_qbv_schedule(struct igc_adapter *adapter,
->   	size_t n;
->   	int i;
-> 
-> -	switch (qopt->cmd) {
-> -	case TAPRIO_CMD_REPLACE:
-> -		break;
-> -	case TAPRIO_CMD_DESTROY:
-> -		return igc_tsn_clear_schedule(adapter);
-> -	case TAPRIO_CMD_STATS:
-> -		igc_taprio_stats(adapter->netdev, &qopt->stats);
-> -		return 0;
-> -	case TAPRIO_CMD_QUEUE_STATS:
-> -		igc_taprio_queue_stats(adapter->netdev, &qopt->queue_stats);
-> -		return 0;
-> -	default:
-> -		return -EOPNOTSUPP;
-> -	}
-> -
->   	if (qopt->base_time < 0)
->   		return -ERANGE;
-> 
-> @@ -6433,7 +6418,23 @@ static int igc_tsn_enable_qbv_scheduling(struct igc_adapter *adapter,
->   	if (hw->mac.type != igc_i225)
->   		return -EOPNOTSUPP;
-> 
-> -	err = igc_save_qbv_schedule(adapter, qopt);
-> +	switch (qopt->cmd) {
-> +	case TAPRIO_CMD_REPLACE:
-> +		err = igc_save_qbv_schedule(adapter, qopt);
-> +		break;
-> +	case TAPRIO_CMD_DESTROY:
-> +		err = igc_tsn_clear_schedule(adapter);
-> +		break;
-> +	case TAPRIO_CMD_STATS:
-> +		igc_taprio_stats(adapter->netdev, &qopt->stats);
-> +		return 0;
-> +	case TAPRIO_CMD_QUEUE_STATS:
-> +		igc_taprio_queue_stats(adapter->netdev, &qopt->queue_stats);
-> +		return 0;
-> +	default:
-> +		return -EOPNOTSUPP;
-> +	}
-> +
->   	if (err)
->   		return err;
-> 
-> --
-> 2.25.1
-> 
+I realized that in this v6 patch, I had accidentally sent it in the
+middle of a rebase, so it's missing the last change to
+selftests/tmpfs.  I've fixed it in v7.
+
+>
+> >
+> > thanks,
+> > -- Shuah
 
