@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-106713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D9DB917560
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:00:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC968917561
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:00:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4791E1C21861
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:00:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4168D28255C
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1587492;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE86B64E;
 	Wed, 26 Jun 2024 01:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SbzM/VUi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FdVaOVLn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1242428FA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1245C33DD;
 	Wed, 26 Jun 2024 01:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719363633; cv=none; b=m2PzjMVB92/V6cxApFGHOEvlx5Y1t+2TYKQePteIlR5Mz2VrWDF9U9ZWqr+9JCfM9nEopHvOynsy7/+4G4F3jJuFVfO4HVsUeFX9Wmw6+bWxYMrXa0cEDj5xOhhz6CQ66uk3Fh6lZwxJUEswqVOzSDMUsib1e7OSw2AjDgRcECY=
+	t=1719363633; cv=none; b=XkSPseTe4sOerNrx1OGd2A7pZ8PA9VHakkx6lIphUN93wRXuYHBLvleBXHFn9qRZ3XDh4zZ/AP8qUtVkFH9dOMEsCwrc1KaZqxeqNoA7x0xqEe48g0o/rf8KpfeTuBp2XdkI1fIRBviHmm2JnKGY9f00jZQPwoDOYyrVh2wW4jU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1719363633; c=relaxed/simple;
-	bh=hdgniYt3+54JkbIsj7pvD/P/4LuDUv7FqTd6GRkEshU=;
+	bh=gpUPtrAJh+6J5oR6dtl8bHUoF7ypTcfE6JUr36MyO3Q=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=drHloulGnoO5MT1cnhkaQ8EdHgaurldsL/jQ1I2sOfn9Xuysd/enOhMV53pzjYO08tH7Rze/tuEdVr0twKIXUvZPljKl6vTC0sVgE4X45ibf/n+8mLyFzKTpBfwS5WTVE/cBQ4yLTHrgKVY0AJ76Axjtk98MVIyQp0zCTE4hRrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SbzM/VUi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9AC80C4AF07;
+	 In-Reply-To:To:Cc; b=VoRn4I7LLqd/C0xmADvt57MwXtWkAXBsGHhmx3uPDyqaEN7hKKju994iyhoS+F10XJFQ6KIZN1dRb3M6pYd3UEP3j6ZtHIcnSXrThsI2loG/R6ix7nH7b2P2ley7tBOLN0lT9Od0/W63jfRbLPI8MW8yCzmqzFykUkeNVa80Unc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FdVaOVLn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A72C3C4AF0B;
 	Wed, 26 Jun 2024 01:00:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1719363632;
-	bh=hdgniYt3+54JkbIsj7pvD/P/4LuDUv7FqTd6GRkEshU=;
+	bh=gpUPtrAJh+6J5oR6dtl8bHUoF7ypTcfE6JUr36MyO3Q=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SbzM/VUiLXMOGJ9F2+N0jRLkkQTW0Ii4WgFtG3Y5K8HV4PyyObwPtxDZKZ5vn17aS
-	 YNBbN19qPL4+Pc2wC80eq2jx9RaP9t48pZzXStjiE2LKwV+qz3u2g8AWooCqlb0b7t
-	 pe344kZ9/+/CP1UenZ/XxH0/HYGrqHuVrLz9rJSNS6lPd/F2JmInv7Ix9oOI6uySwG
-	 5ThLc3ioO3uCnINGuG+98+J5u630MRu39Ufng9JI35xUeyxBThulmOYISghKL+MWQc
-	 f0gAasPnQM0+M3msOMhOdZxM4rkqWIvdHnkfDAYWYf+GbFF7/YeFHtg1Pgkeufx+HV
-	 3CmK/RQutXmaQ==
+	b=FdVaOVLnRk9qKF1Dpx1thAwkpJQ5tazsEM6CA8bCxBZhUT+ytBzcYGLM4v2xIfDmg
+	 Ygqat3nHrp9NgV67yNlx5PmSNu493Jx7VqlUXNNOQoSsDu8ax7GDvCxoyHT3KaHDEO
+	 XlkoJc3/2Tx6tDPN96wSCHtNGsDc7kfVsE6kvfXgAJ/wHROYefSSVrIhyp6OEVeGM0
+	 irvOMVXeiMwz2OgfeewduYPv2RFXjUc35HRMKC2hEW5YzC1LofhrPWjvaLvidwJbgN
+	 lQUX3IaErccsWJRg+ow2a6KhdZgwVWrKXowbimkWpTlqtP83OtBmgnpFJh9EL3bvgn
+	 ewMJoF78brFXQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 84EA6DE8DF3;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8DE4DDE8DF5;
 	Wed, 26 Jun 2024 01:00:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,49 +52,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/5] gve: Add flow steering support
+Subject: Re: [PATCH v2] dt-bindings: net: dsa: mediatek,mt7530: Minor wording
+ fixes
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171936363254.31895.5945372004965375509.git-patchwork-notify@kernel.org>
+ <171936363257.31895.7020799709212449758.git-patchwork-notify@kernel.org>
 Date: Wed, 26 Jun 2024 01:00:32 +0000
-References: <20240625001232.1476315-1-ziweixiao@google.com>
-In-Reply-To: <20240625001232.1476315-1-ziweixiao@google.com>
-To: Ziwei Xiao <ziweixiao@google.com>
-Cc: netdev@vger.kernel.org, jeroendb@google.com, pkaligineedi@google.com,
- shailend@google.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, willemb@google.com,
- hramamurthy@google.com, rushilg@google.com, horms@kernel.org,
- linux-kernel@vger.kernel.org
+References: <20240624211858.1990601-1-chris.packham@alliedtelesis.co.nz>
+In-Reply-To: <20240624211858.1990601-1-chris.packham@alliedtelesis.co.nz>
+To: Chris Packham <chris.packham@alliedtelesis.co.nz>
+Cc: andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, arinc.unal@arinc9.com,
+ Landen.Chao@mediatek.com, dqfext@gmail.com, sean.wang@mediatek.com,
+ daniel@makrotopia.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 25 Jun 2024 00:12:26 +0000 you wrote:
-> To support flow steering in GVE driver, there are two adminq changes
-> need to be made in advance.
+On Tue, 25 Jun 2024 09:18:57 +1200 you wrote:
+> Update the mt7530 binding with some minor updates that make the document
+> easier to read.
 > 
-> The first one is adding adminq mutex lock, which is to allow the
-> incoming flow steering operations to be able to temporarily drop the
-> rtnl_lock to reduce the latency for registering flow rules among
-> several NICs at the same time. This could be achieved by the future
-> changes to reduce the drivers' dependencies on the rtnl lock for
-> particular ethtool ops.
+> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
+> ---
+> 
+> Notes:
+>     I was referring to this dt binding and found a couple of places where
+>     the wording could be improved. I'm not exactly a techical writer but
+>     hopefully I've made things a bit better.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/5] gve: Add adminq mutex lock
-    https://git.kernel.org/netdev/net-next/c/1108566ca509
-  - [net-next,v3,2/5] gve: Add adminq extended command
-    https://git.kernel.org/netdev/net-next/c/fcfe6318dbac
-  - [net-next,v3,3/5] gve: Add flow steering device option
-    https://git.kernel.org/netdev/net-next/c/3519c00557e0
-  - [net-next,v3,4/5] gve: Add flow steering adminq commands
-    https://git.kernel.org/netdev/net-next/c/57718b60df9b
-  - [net-next,v3,5/5] gve: Add flow steering ethtool support
-    https://git.kernel.org/netdev/net-next/c/6f3bc487565d
+  - [v2] dt-bindings: net: dsa: mediatek,mt7530: Minor wording fixes
+    https://git.kernel.org/netdev/net-next/c/c0c68e4d52ed
 
 You are awesome, thank you!
 -- 
