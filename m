@@ -1,144 +1,132 @@
-Return-Path: <netdev+bounces-106970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7D679184E4
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:52:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F99F9184E6
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:53:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DD7728CA29
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:52:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 508DF1C22B81
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:53:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AADF41862A6;
-	Wed, 26 Jun 2024 14:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="cZZbmNnS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE88C185E7F;
+	Wed, 26 Jun 2024 14:52:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1302718629B;
-	Wed, 26 Jun 2024 14:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C6C5185E5F
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 14:52:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719413553; cv=none; b=L+4306ncJR1J60cvdcvYzpFZhQTEJVpj0+4aL6ou9LMMp7Aun7NuzoZgE0mc3FWfurWdKk7s5zUcgIcyoKsqU+87UwtYORW5KZ8znjLgLPXTKKY29ZaufhAcx6Niu2lYMNGSqhtrsJtB4iqxNPFYIs0Y9ZmoCTzuSwUJxh4cdrU=
+	t=1719413568; cv=none; b=UI4iV2T8V4g7xvrlgDXSLvDHuDCxvzI4BDCS+2+GvKKZic9kNvLxH9vnWNmIp54G7v/hlsKQriaKSP3oWRdcvJGovp+lfv/Y4y162lB1zY+8lBd3RyM9akqpq1/GNRBnbUIKi0Eqh4seAy183gUDkPFX2HJWW8XX6h5FGgx3qyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719413553; c=relaxed/simple;
-	bh=F0CnGji1wRDPkT1q0o6oYL7yDo0gD2uyVQ159WDkbWg=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=kuhDbWfhF+g+qbSKbqt2hpXEEjwRaUBO9+Gv4zuaUeNYCBubrpTXZ3uxr6MlhATG+0EmtoZioKBEOH/319HJoj9mbDk4usDn1GSgilMWrQJwKtOOZBZh2N52jBPJwCffRNQjib6EUPt6n56oD+3C4lZdPgl8XVAtjCgZ36khbOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=cZZbmNnS; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1719413531; x=1720018331; i=markus.elfring@web.de;
-	bh=FFE85tnMm6EJuo/UO7THJkkwDz/ISy4hRYIl0uSduj0=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=cZZbmNnSymc6AFYBLcGQ2pZu19jTUSr3eNwEiX5mGNkRqrg3SxszSoRRkCJbCNZy
-	 4gz5Bdk3Lw4r5ZU8wvtOvyKyfcrVsY5eD3qryMUBd3ETYASajWWcoDstrmqQwTrqf
-	 iYpq2n4iYhg0F0Zb2RPnIpYBmiC5xJSzCW5QWBW3+F0Py5SEsivI9tO8pFu+Nc3uH
-	 iNmD1CEqyQE2wo5zVsA3J0vUJ6qhtaYxebvTznaONmmfVxhnWBxgow3QbLFuUMnm7
-	 2SYHVqPGF37YxFxlVu+oGVQy7jHVLhg9ThQKgTg6Pq7RN7DVy8UWMp0kKh/zCPduL
-	 nR0mrWLYWvYlJT5K2Q==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1N7QQD-1sO2go0hgb-00x18V; Wed, 26
- Jun 2024 16:52:11 +0200
-Message-ID: <8a66afe4-5df8-4542-b74f-b050e71263fb@web.de>
-Date: Wed, 26 Jun 2024 16:52:09 +0200
+	s=arc-20240116; t=1719413568; c=relaxed/simple;
+	bh=pNLo9dXnp4p74SX2p9JJSQE44/XATiWG8qjJTFunBCo=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=HA1QL0Q0O/ChWEV84EwlHA7AX2yxogL9ZMXXQnApwdxqbiXOyLzkwiUWagZnaEjiJkF1jFQ6/8umJ2Dqk3g+sdBF1amkXDvdyiNlbuXNDY/GIkIsi+ZwtAbTYhPVXZ8sVgdkRzvqM0CKOB89y854VejsK8+uvfd+RZgx2zBHy5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from ja.int.chopps.org.chopps.org (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 2A0557D052;
+	Wed, 26 Jun 2024 14:52:44 +0000 (UTC)
+References: <20240617205316.939774-1-chopps@chopps.org>
+ <20240617205316.939774-9-chopps@chopps.org>
+ <2fa05695-faf9-45ce-95de-f49a6749b828@quicinc.com>
+User-agent: mu4e 1.8.14; emacs 28.3
+From: Christian Hopps <chopps@chopps.org>
+To: Jeff Johnson <quic_jjohnson@quicinc.com>
+Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org, Steffen
+ Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, Christian
+ Hopps <chopps@labn.net>
+Subject: Re: [PATCH ipsec-next v4 08/18] xfrm: iptfs: add new iptfs xfrm
+ mode impl
+Date: Wed, 26 Jun 2024 10:52:33 -0400
+In-reply-to: <2fa05695-faf9-45ce-95de-f49a6749b828@quicinc.com>
+Message-ID: <m2frszah8k.fsf@ja.int.chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Ma Ke <make24@iscas.ac.cn>, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
- Alexandra Winter <wintera@linux.ibm.com>,
- =?UTF-8?Q?Christian_Borntr=C3=A4ger?= <borntraeger@linux.ibm.com>,
- "David S. Miller" <davem@davemloft.net>, Gerd Bayer <gbayer@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Niklas Schnelle
- <schnelle@linux.ibm.com>, Stefan Raspl <raspl@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Thorsten Winkler <twinkler@linux.ibm.com>, Vasily Gorbik
- <gor@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: LKML <linux-kernel@vger.kernel.org>
-References: <20240626081215.2824627-1-make24@iscas.ac.cn>
-Subject: Re: [PATCH] s390/ism: Add check for dma_set_max_seg_size in
- ism_probe()
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240626081215.2824627-1-make24@iscas.ac.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:HRGw43YV7SkuT0Xt4fwMTX9TEURd7yMQTJtdVH/oHNrhfXeGUZW
- Jeb5W7VzO23BvEvq0PM6KzNqgZQctsQVgJ5w0xNM9y7KJusJVX8O2Npp4sZZek4VKJvjEHk
- Srvx1W261wPMz5LjIb8MLitoC4ElHTUPtKPSk5nW8byyTDfckZR0IObqbFu7AiM20u0SS7o
- XrfEOuMk0Qq5ndiwmHJNw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:WTlxYGB/qos=;9avwyHEogKHHx/HTwSuuZtAPQQ6
- Pam58lxvKlZC2/LcIYocQ2qyIzLZZdgdFdFwcfLQT0KV3dOn949EyFxmbljRJIMvD5FAV6fLg
- lyLNm5ka6fOMWujFeK9FA4gjoD2Qi6AlKHzb03i3+WGyX/+SAKrFWD+YAAzPqTdLQsxM5WYlU
- t0xiE7GmN7F8/QDRJU1VNVPhBOqdv/o+XMcYPrS0A0dGq4W5va8WczG4w1fg1kanZFsubf407
- gktOgN1ioS1EofbgWHBSOlfpj8NpQ4y9IvKIYk/pNhiuLZqCkb/saFb/6x7w8P4P9D7sVKJ2J
- Qb0apf2YZgTUZhKI9XKSBCxMmqsxRQEWZ0EdqKCzLjJcX6rWDhu7YKs4hAwsi+nrJ8v4x+KOi
- gFD/H04MF3CRQNVY87/wF8+6QIZKEu/3GqTXruUanWkLM3B3+48f6Vir3R6ZLiFp57SkkKjPc
- /2hLSedfgzLeMsVWxVTDdLNDPMkbzJR3LmLYCrSh0N3jCuWnIY7RCk4afj9ipq0KCW8uzrJx1
- anQGfGnDi3JrX6IECCG2lCD7eEXX1oaWjL/M3kT6+IYhsePBnKMzG5pRfkg15hq2bECJ6uYaW
- PD79VMYRG0Rum318AqZ1X09RJR0xz6e6zVmbMUo6+jFgp+XznUTP7Kiagmvv3qh8Q2wAHRoPW
- ykWUE6rVUVSZXHjsAkESMBUCIXes3hV5IWmXdYfOesBQTySpW8yVqgyWP9UIb9MIo7MGTu+th
- yChdVfF0YCdHyjoig9i0iMwUXCmHrgab3VqWuC+iP7UopeT9WP/1C+jVIq+vbglvdwOA5x1am
- CFAMCJ4qjOJ2XfK4sGcHeDn8EEiow/ne7dh0RmatLMznc=
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-> As the possible failure of the dma_set_max_seg_size(), we should better
-> check the return value of the dma_set_max_seg_size().
-
-Please avoid the repetition of a function name in such a change descriptio=
-n.
-Can it be improved with corresponding imperative wordings?
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/submitting-patches.rst?h=3Dv6.10-rc5#n94
+--=-=-=
+Content-Type: text/plain; format=flowed
 
 
-=E2=80=A6
-> +++ b/drivers/s390/net/ism_drv.c
-> @@ -620,7 +620,9 @@ static int ism_probe(struct pci_dev *pdev, const str=
-uct pci_device_id *id)
->  		goto err_resource;
+Jeff Johnson <quic_jjohnson@quicinc.com> writes:
+
+> On 6/17/24 13:53, Christian Hopps wrote:
+>> From: Christian Hopps <chopps@labn.net>
+>> Add a new xfrm mode implementing AggFrag/IP-TFS from RFC9347.
+>> This utilizes the new xfrm_mode_cbs to implement demand-driven IP-TFS
+>> functionality. This functionality can be used to increase bandwidth
+>> utilization through small packet aggregation, as well as help solve PMTU
+>> issues through it's efficient use of fragmentation.
+>>    Link: https://www.rfc-editor.org/rfc/rfc9347.txt
+>> Multiple commits follow to build the functionality into xfrm_iptfs.c
+>> Signed-off-by: Christian Hopps <chopps@labn.net>
+>> ---
+>>   net/xfrm/Makefile     |   1 +
+>>   net/xfrm/xfrm_iptfs.c | 225 ++++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 226 insertions(+)
+>>   create mode 100644 net/xfrm/xfrm_iptfs.c
+>> diff --git a/net/xfrm/Makefile b/net/xfrm/Makefile
+>> index 547cec77ba03..cd6520d4d777 100644
+>> --- a/net/xfrm/Makefile
+>> +++ b/net/xfrm/Makefile
+>> @@ -20,5 +20,6 @@ obj-$(CONFIG_XFRM_USER) += xfrm_user.o
+>>   obj-$(CONFIG_XFRM_USER_COMPAT) += xfrm_compat.o
+>>   obj-$(CONFIG_XFRM_IPCOMP) += xfrm_ipcomp.o
+>>   obj-$(CONFIG_XFRM_INTERFACE) += xfrm_interface.o
+>> +obj-$(CONFIG_XFRM_IPTFS) += xfrm_iptfs.o
+>>   obj-$(CONFIG_XFRM_ESPINTCP) += espintcp.o
+>>   obj-$(CONFIG_DEBUG_INFO_BTF) += xfrm_state_bpf.o
+>> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+>> new file mode 100644
+>> index 000000000000..e7b5546e1f6a
+>> --- /dev/null
+>> +++ b/net/xfrm/xfrm_iptfs.c
+>> @@ -0,0 +1,225 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+> ...
 >
->  	dma_set_seg_boundary(&pdev->dev, SZ_1M - 1);
-> -	dma_set_max_seg_size(&pdev->dev, SZ_1M);
-> +	ret =3D dma_set_max_seg_size(&pdev->dev, SZ_1M);
-> +	if (ret)
-> +		return ret;
->  	pci_set_master(pdev);
-=E2=80=A6
+>> +module_init(xfrm_iptfs_init);
+>> +module_exit(xfrm_iptfs_fini);
+>> +MODULE_LICENSE("GPL");
+>
+> missing MODULE_DESCRIPTION() which will cause a warning with make W=1
 
-1. Will the shown dma_set_seg_boundary() call trigger similar software dev=
-elopment concerns?
-   https://elixir.bootlin.com/linux/v6.10-rc5/source/include/linux/dma-map=
-ping.h#L562
+Added.
 
+Thanks,
+Chris.
 
-2. Would the following statement be more appropriate for the proposed comp=
-letion
-   of the exception handling?
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-+		goto err_resource;
+-----BEGIN PGP SIGNATURE-----
 
-
-3. Under which circumstances would you become interested to increase the a=
-pplication
-   of scope-based resource management here?
-   https://elixir.bootlin.com/linux/v6.10-rc5/source/include/linux/cleanup=
-.h#L8
-
-
-Regards,
-Markus
+iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmZ8KzsSHGNob3Bwc0Bj
+aG9wcHMub3JnAAoJEC4dgw7XuDAl+PwQAIs19u/CKDPGujHKfT8pW/dJ8wiObNF2
+X3ifXVlVszXC9RMES2HTVz3aEH6yP0CcFav/Cqxu6L1+yfasAZMz30j1sh95bG5W
+Lp4HZYDEpF128Y2XmxNvw97lCUhIsOQ5tq67g9xXMUfqthsCa9LkySYDWjLK0cmk
+bbqRnhncnOujT3Q8i03/BKYWaGZm3kIaS/TsECeRevrIKTvulT9FMVY/TOrHuyTH
+uYSCJbUH2QZkWvrIYzCkPSd7oKqz5BJl1y/rWw4JIHgGtZk8rx97Mpj/SGofiUYW
+B2nqHop0pMoek4eoiSvBSbv/PTuSejtrEyWvj590dvtEGNIH2G6DGHc91f/uRa+p
+g921Mh7lOUmhuP4JcR3vr4i9dzMebOdgEHjO1QW1Ylk+WpNLZ6vF7YVjVH4XxL2d
+hQTnCSn3NTr4CQ/1IQ7ymjxOck3Wh2zD6p5fXozdSbJDzecCTP5rYzu976vN+Mza
+fOYe9GPZt6Ud2v+IQYlD0iM90Zvujd09WYZCXweIBMDF7xF0HXsFxncTgsDoOf3n
+p5Eqf7EVcCUoIjjB3H7I+7jzuRmE6JlayJTDKOFabOBYVhO3zqdJsR+3pySn+iCk
+V8kAF/DQ6YP6M9UhQvdAM6ZUgvMwes3A2Ieh1KBG1FWk02xGIpw8zIY6EfDsGmyv
+UICw7Ooay2fR
+=t/Nq
+-----END PGP SIGNATURE-----
+--=-=-=--
 
