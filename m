@@ -1,94 +1,132 @@
-Return-Path: <netdev+bounces-106749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 092E391781B
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 07:29:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97A0091782F
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 07:34:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39F621C22832
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 05:29:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C97251C218D2
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 05:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD29143C49;
-	Wed, 26 Jun 2024 05:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E543143C70;
+	Wed, 26 Jun 2024 05:34:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tmMGT4Ct"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B04F14264A
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 05:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C4B2F5E;
+	Wed, 26 Jun 2024 05:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719379745; cv=none; b=Wpyx1p/N25GfSBEGdQmKlqCiVAgfvBd1NpvfcTam5wZEoosMS1nP5NYDx4VROn5QqdTyobAqp21hTy5NvK5T+FzvS/dpEg8FjKGHC74iZ0ligeVlQdwLFAQltjox7QdweLv9Jx2aHrYrVEkwhzg7t57YAc5BaVCv2zRpHPL0f8U=
+	t=1719380083; cv=none; b=uh9QQdycxDwosqVlMHTiNvQY9RnhHQMSm0hDH6/OGHbLVSoguNXp/qt1ee5oHKA2WCmc9KOCBOaJjvIjYAhmNLKroMvIy5PTFXdHN/N9wsbN+XJrBPiVNywUqJjY1I6rI4rlB9qiD3Bzq+oFJIfR8f5uUfaUS0bB26f1rMOXUDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719379745; c=relaxed/simple;
-	bh=z46Img2M9tES2OAFsmy0WpYkrZexbG4QVHz5Vc5X7Zk=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=SlSSFNeoq5+jzHyM1Orz2V/+l1RFdfbEJS4dRj9aIsWlWdDfB1gFG7x3YxZPACmxXf8HPLHjbM4KmFrSKdU0yU6zCgqQO9/At18Ye5xLqEmqf1W3YXCWCG/hZkLDxJLtUBqRi9z1WlsvZm208DwD85zC+zLuzclBGuHjWU9drbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-375df29cb12so78521605ab.2
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 22:29:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719379742; x=1719984542;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o7jLFVxsran+Hxnl2Rjm/F6ukvXu6ukvDYfTlI6b4gg=;
-        b=KflX0mQFoJUT4FeioA4OWntUwOvuxLxamJZahz8/F5yC1njkCXVkPVcI1VMqMpnGjf
-         q7duXYr8AtMjLCmxFbT8mxgJYa6YLi8h/p4XZizty54g0hydtlS+AQL/q6bFY9dUMTOS
-         0TFT/CkxVrWSc71TbOQVy0SQOs/tWFYOJn/MvjkFTIo11A+k/v5sJqoRoRFXhYwmtmT0
-         7PJdOIY1vBDatZvxP0WszWzEdnJGSXDQDT8DcNP5K9kwV89YB2IaFAWT5smVPHn56d1j
-         NMMQsns2Vccmv7HmJuCsiRyD28oY1OkcEz9T6qQXJS7D4auSMaHkqeOloBCIpM5KqlOk
-         mV6A==
-X-Forwarded-Encrypted: i=1; AJvYcCXAHnZDMrBgRN4FAMLNc+9YZZ6lYvhypbMbndrx7l6nUR7Rk9mpOd4Nsp1l6kxE/O4C/ZXad9njKgXOJwD8zvPXCkHk9fHW
-X-Gm-Message-State: AOJu0YyR2HNHs6zEGPXvuaG6PfHxdEck7Le4DmlPoCKUjao3Pxkty1qX
-	R7/YmlLl0I2XGfVBQoQn5IQ+t91PEq4Bk+VFAoFNzmBb7UYbH8WtyF9y6YXjkXZPYD7lReWme4Q
-	WjnSkrWl2hxagaT+IG0z8i6shQxPGE4d43faZUZhrkqOKD98ppthwJGc=
-X-Google-Smtp-Source: AGHT+IFlgf0qW4V2vp2uiO2LtpRA9jZ0J28yl5GlbXreZyyCGWbyKG3jnTZuA0un7Ca8uwcdDb/1n51YlQ8U33kMNYg94mF7vofE
+	s=arc-20240116; t=1719380083; c=relaxed/simple;
+	bh=SuWvqN8B1pUjcJ2bF1x2UYwmAnEJqRPmd+gWediLTaM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O9shdUFChJH5QHL2WqHHC2Z8VLSHHpHb2Bto5GvkoMazo7pBD+d3ARMxW+a4iQevYYYLtY3S8kGYTMLxUl76yrav9G714w/edT5XiKTb/iWDEv9LKbENDj42bLfor/XO6AIBQv4OUhIq1xcEXOxHZE9S2g/QrwOKvOwsok8R0ZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tmMGT4Ct; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0088C2BD10;
+	Wed, 26 Jun 2024 05:34:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719380082;
+	bh=SuWvqN8B1pUjcJ2bF1x2UYwmAnEJqRPmd+gWediLTaM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tmMGT4Ct4Jp2ZQIYj+5v9vlxHr9S2vHpVvRaTsCjW2Xp2UF/dgNyNSvmxXnm8++bz
+	 eCywY2BHWasTKjKo6OMG0N99Qh3KPpmjuFCcyPW+XRjDvXcAgS93cq2+C2pOlJUr5s
+	 Hy9AWT9Gjf5idqa1DWKJkbfY8EQBm78oVpICRfG7XjMrcQuxN5LOAWZ1/6QjSzehiB
+	 dE8UhRNhzwabvCaSXBSqdjuU6ItR9jmsiY5G3B+/3WR3oMK0mle187JPq8qwDwo4DV
+	 VSG5fs88ZG8xAkRrUUuYCEsz+uDNZu57RU0FagMGh5Tj1eCsaV9bQfLI5GHwTuM0gc
+	 U3AvfxlvTKTdw==
+Date: Wed, 26 Jun 2024 08:34:37 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Zhu Yanjun <yanjun.zhu@linux.dev>
+Cc: Anand Khoje <anand.a.khoje@oracle.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, saeedm@mellanox.com, tariqt@nvidia.com,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net
+Subject: Re: [PATCH v5] net/mlx5: Reclaim max 50K pages at once
+Message-ID: <20240626053437.GM29266@unreal>
+References: <20240624153321.29834-1-anand.a.khoje@oracle.com>
+ <0b926745-f2c9-4313-a874-4b7e059b8d64@intel.com>
+ <1f9868a7-a336-4a79-bc51-d29461295444@oracle.com>
+ <c5a8b1b0-ce6e-4c35-aa00-2a4a1469b3ce@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1fe7:b0:375:e698:d0f3 with SMTP id
- e9e14a558f8ab-3763f49d3dfmr7074855ab.0.1719379742684; Tue, 25 Jun 2024
- 22:29:02 -0700 (PDT)
-Date: Tue, 25 Jun 2024 22:29:02 -0700
-In-Reply-To: <0000000000009ce262061963e5e4@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000cc087d061bc44a72@google.com>
-Subject: Re: [syzbot] [hams?] WARNING: refcount bug in ax25_release (3)
-From: syzbot <syzbot+33841dc6aa3e1d86b78a@syzkaller.appspotmail.com>
-To: davem@davemloft.net, duoming@zju.edu.cn, edumazet@google.com, 
-	jreuter@yaina.de, kuba@kernel.org, linux-hams@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	ralf@linux-mips.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c5a8b1b0-ce6e-4c35-aa00-2a4a1469b3ce@linux.dev>
 
-syzbot has bisected this issue to:
+On Wed, Jun 26, 2024 at 04:19:17AM +0800, Zhu Yanjun wrote:
+> 在 2024/6/25 13:00, Anand Khoje 写道:
+> > 
+> > On 6/25/24 02:11, Jesse Brandeburg wrote:
+> > > On 6/24/2024 8:33 AM, Anand Khoje wrote:
+> > > 
+> > > > --- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
+> > > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
+> > > > @@ -608,6 +608,7 @@ enum {
+> > > >       RELEASE_ALL_PAGES_MASK = 0x4000,
+> > > >   };
+> > > > +#define MAX_RECLAIM_NPAGES -50000
+> > > Can you please explain why this is negative? There doesn't seem to be
+> > > any reason mentioned in the commit message or code.
+> > > 
+> > > At the very least it's super confusing to have a MAX be negative, and at
+> > > worst it's a bug. I don't have any other context on this code besides
+> > > this patch, so an explanation would be helpful.
+> > > 
+> > > 
+> > > 
+> > Hi Jesse,
+> > 
+> > The way Mellanox ConnectX5 driver handles 'release of allocated pages
+> > from HCA' or 'allocation of pages to HCA', is by sending an event to the
+> > host. This event will have number of pages in it. If the number is
+> > positive, that indicates HCA is requesting that number of pages to be
+> > allocated. And if that number is negative, it is the HCA indicating that
+> > that number of pages can be reclaimed by the host.
+> > 
+> > In this patch we are restricting the maximum number of pages that can be
+> > reclaimed to be 50000 (effectively this would be -50000 as it is
+> > reclaim). This limit is based on the capability of the firmware as it
+> > cannot release more than 50000 back to the host in one go.
+> > 
+> > I hope that explains.
+> 
+> To be honest, I am also obvious why this MACRO is defined as a negative
+> number. From the above, I can understand why. I think, perhaps many people
+> also wonder why it is defined as a negative. IMO, it is better that you put
+> the above explanations into the source code as comments.
+> When users check the source code, from the comments, users will know why it
+> is defined as a negative number.
 
-commit 9fd75b66b8f68498454d685dc4ba13192ae069b0
-Author: Duoming Zhou <duoming@zju.edu.cn>
-Date:   Fri Mar 18 00:54:04 2022 +0000
+I see no problem with adding a comment to the code, but I think that it
+won't help anyone. The whole reclaim/give page logic inside the mlx5
+driver is written with the assumption that the number of pages is
+negative for reclaim and positive for give.
 
-    ax25: Fix refcount leaks caused by ax25_cb_del()
+Thanks
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12f83301980000
-start commit:   568ebdaba637 MAINTAINERS: adjust file entry in FREESCALE Q..
-git tree:       net-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=11f83301980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16f83301980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e78fc116033e0ab7
-dashboard link: https://syzkaller.appspot.com/bug?extid=33841dc6aa3e1d86b78a
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=121324ae980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1607cdda980000
-
-Reported-by: syzbot+33841dc6aa3e1d86b78a@syzkaller.appspotmail.com
-Fixes: 9fd75b66b8f6 ("ax25: Fix refcount leaks caused by ax25_cb_del()")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> 
+> Thanks a lot.
+> Zhu Yanjun
+> 
+> > 
+> > Thanks,
+> > 
+> > Anand
+> > 
+> 
+> 
 
