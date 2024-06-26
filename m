@@ -1,81 +1,119 @@
-Return-Path: <netdev+bounces-107016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D7739187FA
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 18:55:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98CE9918805
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 18:57:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA34A2812E1
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:55:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBCEF1C21DEC
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:57:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CBA18FC63;
-	Wed, 26 Jun 2024 16:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E33B518FC63;
+	Wed, 26 Jun 2024 16:57:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KKoMqFPd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QALGuJPk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A70D13C3F9;
-	Wed, 26 Jun 2024 16:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C9918F2DE
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 16:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719420930; cv=none; b=RovM0h0rHAYTL0xEqDtK3g08tJbcLvvQedapHBSmv5SxF3UNayrqCVhR21frhcJZK3K03YMKQ4sV/yxA/FzoKkGPVhP094Fc5HU/4jLiHYaytPEcvGM2c1wLGEhrY2iLIWohTX081IJm/2bfrUGsq9xEoPtP9uVPzOvflJnZEO8=
+	t=1719421024; cv=none; b=mWlvDZeNsMmmwYZKVXW28OHVNXmbn/JWyIyMXgrhnjOZHYcKWMWAJICoIRP7eHPrI6F6nIYHv5joAT4WjcEDQNZifPhE2jsQ1rbDtRaZ18/+jXWZt81lPIvLdSBQpC7aVhEPFHhRmroaL31RTjzUbQBIPQNV0rUZt7N1+O4oAnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719420930; c=relaxed/simple;
-	bh=msgAYn/k5BpBOopJH8TWxMsYVHSlr+Iborc38B0DjHY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fq3x1iy+1C6i80+p1L7cDIwsllefonQlGaFKuxU37oOrXA4Cs7fPU1XYdWASJTY05GQuReJ+mtb/csu0STV1BE8XtavjBUm+2TjQPnp5YJxQPaMPoa15CgPtXN2KMqzFomyVtumQXrNB6YLUZB0htuemOmtW1OKrgQ+60oXVdU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KKoMqFPd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84326C116B1;
-	Wed, 26 Jun 2024 16:55:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719420930;
-	bh=msgAYn/k5BpBOopJH8TWxMsYVHSlr+Iborc38B0DjHY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KKoMqFPdJsBH/Y94bxZc8x0mHgH47BwJIxvgDtLYXDXaYMfXS81qwdtMr3LbkCFT3
-	 3d+RZF40UTcAow6RIIS8aNQ4cZjjzrjP6Fyc+ApcrHsc7QfAETD63mzdnXpQ/pTzQt
-	 IM5zwzIvcxMK4DEkPXVcXGiyBXMZMvBAJ4g1UpZcwqJVsVCwmmd7BP4zXYdgLmr178
-	 zXpw0X1TkrN3WX26ixHD7n60KIncI93IczzsWjrb/opg3uwsWaI7ZnkErpmx+0z39e
-	 juma3RngnjoCPrZR8WvYAdLKCJOzvZZRTvoGm65KgmqwTirVongd9TSOET9cQEo9Bd
-	 tXp0o5FehZkrQ==
-Date: Wed, 26 Jun 2024 17:55:25 +0100
-From: Simon Horman <horms@kernel.org>
-To: Aaron Conole <aconole@redhat.com>
-Cc: netdev@vger.kernel.org, dev@openvswitch.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Pravin B Shelar <pshelar@ovn.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Stefano Brivio <sbrivio@redhat.com>,
-	=?utf-8?Q?Adri=C3=A1n?= Moreno <amorenoz@redhat.com>
-Subject: Re: [PATCH net-next v3 4/7] selftests: openvswitch: Add support for
- tunnel() key.
-Message-ID: <20240626165525.GB3104@kernel.org>
-References: <20240625172245.233874-1-aconole@redhat.com>
- <20240625172245.233874-5-aconole@redhat.com>
+	s=arc-20240116; t=1719421024; c=relaxed/simple;
+	bh=X2olxI0xGBHPpoS7NGNt2MQhRyA4sHFnb/p5BnQ2Spc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=A9s7dZ5w9byxmAtu+oKjaQPzMaQPSydRc3IKeBm42dRlgEqwp3YWv19vbdfrOhkU0vAPjSYp6aNfYbd6dGXLofOBSCarYxtY+/t+Qm3v3qxwy661l7L4wPJWSZUJLB+7Fn5ybtnOjbCTPffi7/X2NHxVjSHHmVVvPPtAuLyp/Vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QALGuJPk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719421022;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=X2olxI0xGBHPpoS7NGNt2MQhRyA4sHFnb/p5BnQ2Spc=;
+	b=QALGuJPkmr35sHeqagdsumvd+NZwdsapPDxrAPZdHnjF4ZUsK1VvmqhdM3HurqghZzv13x
+	DYb1YFj4G9LyzUsQ4gxpHqe+o6hPNwiC1VuX+/SeGtwFH6edLWLNd9FLruZImJYXxgEXq8
+	kwTRaYEfzuyUIsN3jJJB5O3J7xgqEe8=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-537-JL4xYynSOViHzNN8sSJRvg-1; Wed, 26 Jun 2024 12:57:00 -0400
+X-MC-Unique: JL4xYynSOViHzNN8sSJRvg-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-57d180e729dso75387a12.1
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 09:57:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719421019; x=1720025819;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=X2olxI0xGBHPpoS7NGNt2MQhRyA4sHFnb/p5BnQ2Spc=;
+        b=J6u+LO6ARbjH6cJxu7x5LJS/9NvbR8FOGdzQZ+PG+Ru0mSPXUl0V0sLpAzMvOhAk5V
+         acFoLLZppHB0J3TbD+TiK7EBtcrIsA7gvrAfk9MmVRJQYtXegDLZuxf5QRrJMkG6QHSy
+         DPwx/MM8dVbA8Z8IELIeO7Ds40b0JzdT7bgE1rg1rVxh2SU5WpHpxm6hjVajUpawVa3N
+         JZqR9brsJAphsqDAWlLRtxFrQv2CggemGyNpd//Dl94m4lRiVwlq5s5V0ioFaK/HNSTb
+         0fub49y9JFd84ZJzs9Xw4f8JgBH0hbe53jRZVIc7ncvTBZeiUqMebd7p1/lIfKoEzI6l
+         3NXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVcfLvKgxtQ3iYSPWB8c/DXFzaH20BwcOoiQcpemEoO3MvpFxsI5wYepj0dxdQlDXLr6/qEHMcE+gq+K4tRlJK2Sff8DjDa
+X-Gm-Message-State: AOJu0YxVAfIZhNMjU+jebwrMbZkmoEoXfFDheGmDmMBGIzvBCNdUEDpa
+	6YLB6dqdXyky7XUuIkHKyopPhDUH6aWs9+yAnNAYVnq+k0dN4jOoV1T0r0QWGslsIvInhV7nHt5
+	DKILnIDrfhy+75m7FhFbzNi5a23p2kDKA/9PKG6p6LIR8MrM1CUjm0A==
+X-Received: by 2002:a17:906:4f0d:b0:a70:4217:5c8b with SMTP id a640c23a62f3a-a70421765b2mr834224966b.0.1719421019542;
+        Wed, 26 Jun 2024 09:56:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGuxksQh3qsaFlpt7FYXS8DSvRl/faJDpJsTr1+JHu9meAxQotsNDym4/gEbD5IhokjuU0DLw==
+X-Received: by 2002:a17:906:4f0d:b0:a70:4217:5c8b with SMTP id a640c23a62f3a-a70421765b2mr834223766b.0.1719421019185;
+        Wed, 26 Jun 2024 09:56:59 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-12-248.dyn.eolo.it. [146.241.12.248])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7263b3d60esm233804866b.113.2024.06.26.09.56.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jun 2024 09:56:58 -0700 (PDT)
+Message-ID: <014f053032241c56a0f76ea897caa6a08d3b3f7b.camel@redhat.com>
+Subject: Re: [PATCH v1 net 03/11] af_unix: Stop recv(MSG_PEEK) at consumed
+ OOB skb.
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, Rao Shoaib <Rao.Shoaib@oracle.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>
+Date: Wed, 26 Jun 2024 18:56:57 +0200
+In-Reply-To: <20240625013645.45034-4-kuniyu@amazon.com>
+References: <20240625013645.45034-1-kuniyu@amazon.com>
+	 <20240625013645.45034-4-kuniyu@amazon.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240625172245.233874-5-aconole@redhat.com>
 
-On Tue, Jun 25, 2024 at 01:22:42PM -0400, Aaron Conole wrote:
-> This will be used when setting details about the tunnel to use as
-> transport.  There is a difference between the ODP format between tunnel():
-> the 'key' flag is not actually a flag field, so we don't support it in the
-> same way that the vswitchd userspace supports displaying it.
-> 
-> Signed-off-by: Aaron Conole <aconole@redhat.com>
+On Mon, 2024-06-24 at 18:36 -0700, Kuniyuki Iwashima wrote:
+> After consuming OOB data, recv() reading the preceding data must break at
+> the OOB skb regardless of MSG_PEEK.
+>=20
+> Currently, MSG_PEEK does not stop recv() for AF_UNIX, and the behaviour i=
+s
+> not compliant with TCP.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Simon Horman <horms@kernel.org>
+I'm unsure we can change the MSG_PEEK behavior at this point: existing
+application(s?) could relay on that, regardless of how inconsistent
+such behavior is.
+
+I think we need at least an explicit ack from Rao, as the main known
+user.
+
+Paolo
 
 
