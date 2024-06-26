@@ -1,117 +1,114 @@
-Return-Path: <netdev+bounces-107066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EE17919A26
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 23:57:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D55BB919A64
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 00:08:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29AAB1C21706
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 21:57:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1244E1C21CBB
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 22:08:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422A818509A;
-	Wed, 26 Jun 2024 21:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3246219409E;
+	Wed, 26 Jun 2024 22:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="m4n7OPXK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Azand2s9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4F8433B3
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 21:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E9B18FC9D;
+	Wed, 26 Jun 2024 22:08:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719439031; cv=none; b=fTRQFLqrTpmcoWYNC+mtyXIucIcED+EsRcSY+5VoXgON4DSdbsfe4RbRBsWXzbCXH3KtVPcG79yOagP1It4KSsn/ngJ/pSn49f6WSSZnrMTxhNA5fOjL90ZyHoqGaUB960nzwKZxJPTe1VGVLXLgjc+vghsiG/+fp2MDihagE24=
+	t=1719439706; cv=none; b=on0tWNEyBQtEtz+DaP8sfJaqaDDuXUzSQatzn8eA+1DBZkVc2Qq+ateQd9Azv43SjM/OMlyBUVf2fgMJM7rnVbU8fl5xGrSOCp+T0bMS7hbwzeLot6kvqprEimfB3dtegpR+YUDVoHpu4PQCLBtCF8pSPM1qf5pAYueFcRXX1XA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719439031; c=relaxed/simple;
-	bh=WGkvkJ6efkLUW3mhH8PW9wQnhzsVmXML/DU0Mkg3z/c=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A768Hl75z76xxBG4QwF2Zf9BX2kTN6EsA9gX39ql5brouxqQByGW8b8xhJJXkR05L+fgzNZE1m4l44IZk4F+ZJ7gGpPIpMWKsQ16fTvc0nt2x54pZh7p2MFltvEzQGzkBgfmd+pxVYrcH89M5OHAzc5/E9wpSEAxSZ6eRxp5sog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=m4n7OPXK; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1719439030; x=1750975030;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=le9mNK2H74pEO5C5p74eYUCOzmcErorJ8F7HzxXzWfY=;
-  b=m4n7OPXKLVpuEp2bHr85mnBgiJFjxoC7SjeLIlT0iA2yTz4PVLthz+yA
-   6oBu1DpPZ0ndjdn4LFMe7jYkREygWYVv8IDfpb6CGxIRL3o4e1kHhGfXV
-   LMv2LasuKgygCrR9cwR8Zjht4fv4JI8JgRn3YdRBCUjL8JZMvB8f+2lhB
-   M=;
-X-IronPort-AV: E=Sophos;i="6.08,268,1712620800"; 
-   d="scan'208";a="410374494"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 21:57:07 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:32633]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.187:2525] with esmtp (Farcaster)
- id eda9c4fe-9a96-4df4-a423-3ceafa2a1d0f; Wed, 26 Jun 2024 21:57:05 +0000 (UTC)
-X-Farcaster-Flow-ID: eda9c4fe-9a96-4df4-a423-3ceafa2a1d0f
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Wed, 26 Jun 2024 21:57:05 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.11) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 26 Jun 2024 21:57:02 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <mhal@rbox.co>
-CC: <cong.wang@bytedance.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v2 net 01/15] af_unix: Set sk->sk_state under unix_state_lock() for truly disconencted peer.
-Date: Wed, 26 Jun 2024 14:56:55 -0700
-Message-ID: <20240626215655.6414-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <c550e27c-6a45-4219-98d8-f6d237c0674e@rbox.co>
-References: <c550e27c-6a45-4219-98d8-f6d237c0674e@rbox.co>
+	s=arc-20240116; t=1719439706; c=relaxed/simple;
+	bh=5d7H9/borh2oqA2du5mHYiDRGDELCSRd3Xk3e6IKGpk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RY8dfRrQK/38MpWf+P58rr1ijKJISkpc0xIzVZ2iMZGiWFQH6FJ1qvQshMJmH0jhKpblSEXphGzvsywsj9oSCw0CyunSxwIU1Ep9puVywXw8z79inzN1bsj91LuvG80M6IzIaCWq80fIKIqAvHhbktwEbmvi59V9c+v2KkndlXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Azand2s9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EFCDC116B1;
+	Wed, 26 Jun 2024 22:08:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719439705;
+	bh=5d7H9/borh2oqA2du5mHYiDRGDELCSRd3Xk3e6IKGpk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Azand2s9PJ5hpj1pJhfR2k36lgYX4q5EVbYEyRHHreykGtMrk+xW0MQHsApc0A76v
+	 R1ziYuRsJSA+U/KWvr5SnBpOp8/FKkRiM6PI0nOu1ho2WTtUmR6G5sIpL6x7taOS74
+	 BKU7UERaSnhVXfErVlfARVzsOmJFhRxiu5ZNmdcpweU0PcrGPzi9VXvWtjUYhKPfz4
+	 PU9tdlZOctUnOe/hbtETyla9PYMBK4jPfl5YaFALjxIDPqvgUbpKhQGLjYAm+LNu/A
+	 FcxJ5FSoDrgKEIR6AfIX7N+H0c4Zxj7PfzVnZeblZVvSM942WHMP2TU9Mpm39Qb57l
+	 1EyKxF3wvDs6w==
+Date: Wed, 26 Jun 2024 15:08:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, Ivan
+ Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>,
+ Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
+ <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan
+ <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, "Christian
+ =?UTF-8?B?S8O2bmln?=" <christian.koenig@amd.com>, Bagas Sanjaya
+ <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, Nikolay
+ Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>,
+ David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
+ <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
+ Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
+ <pkaligineedi@google.com>, Stanislav Fomichev <sdf@google.com>
+Subject: Re: [PATCH net-next v14 13/13] selftests: add ncdevmem, netcat for
+ devmem TCP
+Message-ID: <20240626150822.742eaf6a@kernel.org>
+In-Reply-To: <20240625195407.1922912-14-almasrymina@google.com>
+References: <20240625195407.1922912-1-almasrymina@google.com>
+	<20240625195407.1922912-14-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB001.ant.amazon.com (10.13.139.132) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Michal Luczaj <mhal@rbox.co>
-Date: Wed, 26 Jun 2024 12:48:27 +0200
-> On 6/23/24 07:19, Kuniyuki Iwashima wrote:
-> > From: Michal Luczaj <mhal@rbox.co>
-> > Date: Sun, 23 Jun 2024 00:43:27 +0200
-> >> I gotta ask, is there a reason for unlinking an already consumed
-> >> ('consumed' as in 'unix_skb_len(skb) == 0') skb so late, in manage_oob()?
-> >> IOW, can't it be unlinked immediately once it's consumed in
-> >> unix_stream_recv_urg()? I suppose that would simplify things.
-> > 
-> > I also thought that before, but we can't do that.
-> > 
-> > Even after reading OOB data, we need to remember the position
-> > and break recv() at that point.  That's why the skb is unlinked
-> > in manage_oob() rather than unix_stream_recv_urg().
-> 
-> Ahh, I see. Thanks for explaining.
-> 
-> One more thing about unix sockmap. AF_UNIX SOCK_DGRAM supports 0-length
-> packets. But sockmap doesn't handle that; once a 0-length skb/msg is in the
-> psock queue, unix_bpf_recvmsg() starts throwing -EFAULT. Sockmap'ed AF_INET
-> SOCK_DGRAM does the same, so is this a bug or a feature?
+On Tue, 25 Jun 2024 19:54:01 +0000 Mina Almasry wrote:
+> +CFLAGS += -I../../../net/ynl/generated/
+> +CFLAGS += -I../../../net/ynl/lib/
+> +
+> +LDLIBS += ../../../net/ynl/lib/ynl.a ../../../net/ynl/generated/protos.a
 
-I guess it's kind of safeguard.
+Not as easy as this.. Please add this commit to your series:
+https://github.com/kuba-moo/linux/commit/c130e8cc7208be544ec4f6f3627f1d36875d8c47
 
-The retval 0 has special meaning for SOCK_STREAM as EOF/shutdown().
-If we bypass 0-byte dgram to SOCK_STREAM sk, the application will be
-confused as if the original peer has disconnected.
+And here's an example of how you then use ynl.mk to code gen and build
+for desired families (note the ordering of variables vs includes,
+I remember that part was quite inflexible..):
+https://github.com/kuba-moo/linux/commit/5d357f97ccd0248ca6136c5e11ca3eadf5091bb3
 
-At least, -EFAULT avoids such confusion so that can only the true
-peer trigger 0-byte via the saved ->recvmsg().
-
-So, the requirement would be similar to scm handling, we need to
-recognize the sockmap verdict and destination to support full
-features.
+Feel free to repost as soon as you got it fixed.
+-- 
+pw-bot: cr
 
