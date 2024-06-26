@@ -1,218 +1,229 @@
-Return-Path: <netdev+bounces-107045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57CB4919754
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 21:15:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC7B491984A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 21:34:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB1351F21A36
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 19:15:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 813CC28648A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 19:34:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C94C146584;
-	Wed, 26 Jun 2024 19:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD4C191499;
+	Wed, 26 Jun 2024 19:34:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="EVx67zKm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2BA14D2BE
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 19:15:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F247191494
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 19:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719429328; cv=none; b=oF4kDEG53266S9DXBQmxlKKcknCMe0ltgt+TqvhHri9pShdSl0Ju47w5tIqGBjwwdNdH/sl/1lfkB16COt4LztUR2T6dAnbAvuQN2FeJgNce9L5xDFTcPX+ptBrPh9HkkCZIL4u5HBfnSZDqn++89Oo7vf18WkzqGMylFe6EjUs=
+	t=1719430450; cv=none; b=kE+f4TotjrFlsq0yWjCnLnOUHQZLMJz8K7HKuRvsvVejqP8f9dz2PSxh8h1ri5EvdHQ50D7y7FEdZy68WmsSL/8dfoCDjUGgqfqO1Frq6CXdkS4ALKqVurLqp8sNPlK7eXVtXoc1VZHR/0dneksZdMVZKDoAJjDLSP5z3HvHi58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719429328; c=relaxed/simple;
-	bh=LSm1xCieSMiIpu0qWWa37+RueD6pwC0mznN1HsrfFl0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Cx0T4jxlk39zOR18P8SGMvNNWRnfPj+LAj1HHXfXniSYZ3lZQ/o0B+V9k0AuwVrIYgULrdIwzl12eol6G7ogFeiBJ0PH3PcPIapHXG2+hi7tsAsSNfeHTqkAHqTOK9gXe5C9joongLMkLzfqrk7uqHC2gLCH+Q8pO3yfwy3oWlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-7f12ee1959cso1008721739f.1
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 12:15:26 -0700 (PDT)
+	s=arc-20240116; t=1719430450; c=relaxed/simple;
+	bh=xPfiMz07qWYnBiF58enTksfP0Erl71BxT+rRX73m+Ow=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iG3zwul3wH7qiFWj4HjcxujTxueyJFUAtmA+ypXEYzsFiUREvFskaKS0SsJ4z9PLst8RXqwa1X7S8rHZWnjYfBVosDVHXGt62EbEGRPT1ax1m/CpEiaPsLzynES0MwNWyP1QR6iSsaMEYtm7FbRPaH0nfN7K8Uo2PeUMcX/VcdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=EVx67zKm; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6b2c6291038so7611256d6.0
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 12:34:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1719430447; x=1720035247; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wqd0diP3KmDjnQ8ONVE7Ezzjj4gz8tYSpplCMRypKAw=;
+        b=EVx67zKmSzVs4OTAIMSBRj3NuMcG6iqg24PIaXh5LnsT4wYNljg5J5wJLJ/n89VjQt
+         XUsDFDjsFp+Axhv/zmpSPeAcDF1SeoWbj8tupr9XmTcYEgOQMKymzk1KA31l9sB3KgW9
+         WiSo2eUZyIECK+IkJ9V1eEQG+4r6wS4yVjBjbBdGrRMv5MXQjvt32b4R/hBKrR69Vmrx
+         OX0cA/4kVq2r5WreU9CM60PMCADGtZcH3hGMk6IoPbVxCvyhaiS/X3Ni6b9mzyAVyJf4
+         HDthxKh406VYQuZzNv77KrN6kkbL1NLM0HxvVfnrG3pkT/4A4XyK529xGDNQS0y32Tfu
+         nyuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719429326; x=1720034126;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7AYGNY2o7m6l6JhY1sXVIqDWW+rOk3/4SHLTa2tENMw=;
-        b=QnpP8eiRRCZ4+PvU8RhxmvfafDxis8c0QY4sxGztsehG/ZlL+nRpiZho5A8rXm4UYK
-         p+53yOQ/1x8MBSmiSQBuJoEv6lPUIpaQ0tDAFxsCVlRpkJ3hl6pY/VuiurlB9jnPmZzh
-         S7uhWGUoz17r4SZj2N7w23TNkxmKLbbrfpdtBCYaUjMJjyCjNiUDBF5Z4EiJwtXZse4c
-         sSwiY1YCbN7rU3a04oRODFuN8W4kSxtpoOD0zhN45JgWFXvLwbGumIz0M14WdgM4kBNz
-         rpda6o+xhmuQwrcH2JVbhTQtstsdLgJZAab1iMulD37O7Vv3vwjmE9e+mYfTMpEQ41N1
-         gMMw==
-X-Forwarded-Encrypted: i=1; AJvYcCVggX3AcqveiJPN65p+MCA8ACrumuMvShJhZl1z9UnCIHrzuXVcMLxhIjepe/1NEnfIYaBnwPzDDLtEaBEBMw2o7uIuyyqF
-X-Gm-Message-State: AOJu0Yzrxn3r83lUp4X9cXQ6DKnmQB/pZ1TEACH4k63Ez71su8OqOjs4
-	2oQTIabC4+oDGdq5t4XJGhZB/MeSdVJaCcoTtCs8MwNxafU3DqwrXIRa2Pug0SO7rcdnWhsgFgq
-	TteHlCL9TagAgo+WwaE0aFs8FidwuD+LpcZqMdyTWkSwTVNGLSp40QVo=
-X-Google-Smtp-Source: AGHT+IEy4fFZ3c38YV4ociSNyl0fCnmv7SIi92tjC0Fzsyes+Yn1LT+VsHt0eoZWIIHfDM9Qt1mkTNV28Z5QIIEVjZLRmyjgHf3H
+        d=1e100.net; s=20230601; t=1719430447; x=1720035247;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Wqd0diP3KmDjnQ8ONVE7Ezzjj4gz8tYSpplCMRypKAw=;
+        b=h/yO5GjeWb/aLjZ+j3A/iEal6ZGxnP9ksDPQQBXOEZBjREmEF8e5W0erKPm2wu7r/X
+         EFuSnDxzgg+tS36AUUV28c+fsuIW/6jAlaK02x7rWeXo14GEsY5LSEwKfMGcYAI/gLzD
+         Z+Aw6plGw3Sc1aNB8CONXMYAa7g5DIOEjjO/tAnL+qRc+DSUtdTCXSkMIiiGNinAzLIo
+         dOCubs0uUUa+PgfjYMP57m92CZSHJaTZ+XpeSjP1hBDbuMz/MsdCJk/jJjkouBCnCIP1
+         ntE1je8qtFyJyDHBYLBukJgY1pvTi9Pg04uRSJ0aBZ2dfWU+HNmN+lr5IBlWwEQLFP6m
+         47Tw==
+X-Gm-Message-State: AOJu0YxTu2Qr9gAzWovOtAQ7bXtFTrZRvGSLCal5hQwzZvEoOX0bWhIw
+	ucPPkKPVxUoGhK6HYZQ4/oEWpscuLnqUozw8J3raUjV7UhMXTCSlyRQAK/SQv+GS3cpNmMrEDOx
+	9
+X-Google-Smtp-Source: AGHT+IEhB3diDotFgCQcCDpmg+wArUDVdGO81YMMfGfRv7pRoA9SM9b/3Oet4FF8HM2V8dAM9yRCTA==
+X-Received: by 2002:ad4:4ee7:0:b0:6b5:2aa3:3a7f with SMTP id 6a1803df08f44-6b53223157dmr189506986d6.20.1719430446653;
+        Wed, 26 Jun 2024 12:34:06 -0700 (PDT)
+Received: from n191-036-066.byted.org ([130.44.212.94])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b53df48dedsm40112286d6.67.2024.06.26.12.34.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jun 2024 12:34:06 -0700 (PDT)
+From: zijianzhang@bytedance.com
+To: netdev@vger.kernel.org
+Cc: edumazet@google.com,
+	willemdebruijn.kernel@gmail.com,
+	cong.wang@bytedance.com,
+	xiaochun.lu@bytedance.com,
+	Zijian Zhang <zijianzhang@bytedance.com>
+Subject: [PATCH net-next v6 0/4] net: A lightweight zero-copy notification
+Date: Wed, 26 Jun 2024 19:33:59 +0000
+Message-Id: <20240626193403.3854451-1-zijianzhang@bytedance.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2710:b0:4b9:7607:f7f8 with SMTP id
- 8926c6da1cb9f-4b9efd7de6fmr244817173.3.1719429325815; Wed, 26 Jun 2024
- 12:15:25 -0700 (PDT)
-Date: Wed, 26 Jun 2024 12:15:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000002e944b061bcfd65f@google.com>
-Subject: [syzbot] [net?] [s390?] possible deadlock in smc_vlan_by_tcpsk
-From: syzbot <syzbot+c75d1de73d3b8b76272f@syzkaller.appspotmail.com>
-To: agordeev@linux.ibm.com, alibuda@linux.alibaba.com, davem@davemloft.net, 
-	edumazet@google.com, guwen@linux.alibaba.com, jaka@linux.ibm.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+From: Zijian Zhang <zijianzhang@bytedance.com>
 
-syzbot found the following issue on:
+Original title is "net: socket sendmsg MSG_ZEROCOPY_UARG".
 
-HEAD commit:    185d72112b95 net: xilinx: axienet: Enable multicast by def..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=13e0ec8e980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e78fc116033e0ab7
-dashboard link: https://syzkaller.appspot.com/bug?extid=c75d1de73d3b8b76272f
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Original notification mechanism needs poll + recvmmsg which is not
+easy for applcations to accommodate. And, it also incurs unignorable
+overhead including extra system calls and usage of socket optmem.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+While making maximum reuse of the existing MSG_ZEROCOPY related code,
+this patch set introduces a new zerocopy socket notification mechanism.
+Users of sendmsg pass a control message as a placeholder for the incoming
+notifications. Upon returning, kernel embeds notifications directly into
+user arguments passed in. By doing so, we can significantly reduce the
+complexity and overhead for managing notifications. In an ideal pattern,
+the user will keep calling sendmsg with SCM_ZC_NOTIFICATION msg_control,
+and the notification will be delivered as soon as possible.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e84f50e44254/disk-185d7211.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/df64b575cc01/vmlinux-185d7211.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/16ad5d1d433b/bzImage-185d7211.xz
+Users need to pass in a user space address pointing to an array of struct
+zc_info_elem, and the cmsg_len should be the memory size of the array
+instead of the size of the pointer itself.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c75d1de73d3b8b76272f@syzkaller.appspotmail.com
+As Willem commented,
 
-syz-executor.2[7759] is installing a program with bpf_probe_write_user helper that may corrupt user memory!
-syz-executor.2[7759] is installing a program with bpf_probe_write_user helper that may corrupt user memory!
-======================================================
-WARNING: possible circular locking dependency detected
-6.10.0-rc4-syzkaller-00869-g185d72112b95 #0 Not tainted
-------------------------------------------------------
-syz-executor.2/7759 is trying to acquire lock:
-ffffffff8f5e6f48 (rtnl_mutex){+.+.}-{3:3}, at: smc_vlan_by_tcpsk+0x399/0x4e0 net/smc/smc_core.c:1853
+> The main design issue with this series is this indirection, rather
+> than passing the array of notifications as cmsg.
 
-but task is already holding lock:
-ffff88801bed0258 (sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1602 [inline]
-ffff88801bed0258 (sk_lock-AF_INET6){+.+.}-{0:0}, at: smc_connect+0xb7/0xde0 net/smc/af_smc.c:1650
+> This trick circumvents having to deal with compat issues and having to
+> figure out copy_to_user in ____sys_sendmsg (as msg_control is an
+> in-kernel copy).
 
-which lock already depends on the new lock.
+> This is quite hacky, from an API design PoV.
 
+> As is passing a pointer, but expecting msg_controllen to hold the
+> length not of the pointer, but of the pointed to user buffer.
 
-the existing dependency chain (in reverse order) is:
+> I had also hoped for more significant savings. Especially with the
+> higher syscall overhead due to meltdown and spectre mitigations vs
+> when MSG_ZEROCOPY was introduced and I last tried this optimization.
 
--> #1 (sk_lock-AF_INET6){+.+.}-{0:0}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       lock_sock_nested+0x48/0x100 net/core/sock.c:3543
-       do_ipv6_setsockopt+0xbf3/0x3630 net/ipv6/ipv6_sockglue.c:567
-       ipv6_setsockopt+0x5c/0x1a0 net/ipv6/ipv6_sockglue.c:993
-       do_sock_setsockopt+0x3af/0x720 net/socket.c:2312
-       __sys_setsockopt+0x1ae/0x250 net/socket.c:2335
-       __do_sys_setsockopt net/socket.c:2344 [inline]
-       __se_sys_setsockopt net/socket.c:2341 [inline]
-       __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2341
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+We solve it by supporting put_cmsg to userspace in TX path in v5.
 
--> #0 (rtnl_mutex){+.+.}-{3:3}:
-       check_prev_add kernel/locking/lockdep.c:3134 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-       validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3869
-       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
-       smc_vlan_by_tcpsk+0x399/0x4e0 net/smc/smc_core.c:1853
-       __smc_connect+0x2a4/0x1890 net/smc/af_smc.c:1522
-       smc_connect+0x868/0xde0 net/smc/af_smc.c:1702
-       __sys_connect_file net/socket.c:2049 [inline]
-       __sys_connect+0x2df/0x310 net/socket.c:2066
-       __do_sys_connect net/socket.c:2076 [inline]
-       __se_sys_connect net/socket.c:2073 [inline]
-       __x64_sys_connect+0x7a/0x90 net/socket.c:2073
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Changelog:
+  v1 -> v2:
+    - Reuse errormsg queue in the new notification mechanism,
+      users can actually use these two mechanisms in hybrid way
+      if they want to do so.
+    - Update case SCM_ZC_NOTIFICATION in __sock_cmsg_send
+      1. Regardless of 32-bit, 64-bit program, we will always handle
+      u64 type user address.
+      2. The size of data to copy_to_user is precisely calculated
+      in case of kernel stack leak.
+    - fix (kbuild-bot)
+      1. Add SCM_ZC_NOTIFICATION to arch-specific header files.
+      2. header file types.h in include/uapi/linux/socket.h
 
-other info that might help us debug this:
+  v2 -> v3:
+    - 1. Users can now pass in the address of the zc_info_elem directly
+      with appropriate cmsg_len instead of the ugly user interface. Plus,
+      the handler is now compatible with MSG_CMSG_COMPAT and 32-bit
+      pointer.
+    - 2. Suggested by Willem, another strategy of getting zc info is
+      briefly taking the lock of sk_error_queue and move to a private
+      list, like net_rx_action. I thought sk_error_queue is protected by
+      sock_lock, so that it's impossible for the handling of zc info and
+      users recvmsg from the sk_error_queue at the same time.
+      However, sk_error_queue is protected by its own lock. I am afraid
+      that during the time it is handling the private list, users may
+      fail to get other error messages in the queue via recvmsg. Thus,
+      I don't implement the splice logic in this version. Any comments?
 
- Possible unsafe locking scenario:
+  v3 -> v4:
+    - 1. Change SOCK_ZC_INFO_MAX to 64 to avoid large stack frame size.
+    - 2. Fix minor typos.
+    - 3. Change cfg_zerocopy from int to enum in msg_zerocopy.c
 
-       CPU0                    CPU1
-       ----                    ----
-  lock(sk_lock-AF_INET6);
-                               lock(rtnl_mutex);
-                               lock(sk_lock-AF_INET6);
-  lock(rtnl_mutex);
+  v4 -> v5:
+    - 1. Passing user address directly to kernel raises concerns about
+    ABI. In this version, we support put_cmsg to userspace in TX path
+    to solve this problem.
 
- *** DEADLOCK ***
+  v5 -> v6:
+    - 1. Cleanly copy cmsg to user upon returning of ___sys_sendmsg
 
-1 lock held by syz-executor.2/7759:
- #0: ffff88801bed0258 (sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1602 [inline]
- #0: ffff88801bed0258 (sk_lock-AF_INET6){+.+.}-{0:0}, at: smc_connect+0xb7/0xde0 net/smc/af_smc.c:1650
+* Performance
 
-stack backtrace:
-CPU: 1 PID: 7759 Comm: syz-executor.2 Not tainted 6.10.0-rc4-syzkaller-00869-g185d72112b95 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
- check_prev_add kernel/locking/lockdep.c:3134 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3869
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
- __mutex_lock_common kernel/locking/mutex.c:608 [inline]
- __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
- smc_vlan_by_tcpsk+0x399/0x4e0 net/smc/smc_core.c:1853
- __smc_connect+0x2a4/0x1890 net/smc/af_smc.c:1522
- smc_connect+0x868/0xde0 net/smc/af_smc.c:1702
- __sys_connect_file net/socket.c:2049 [inline]
- __sys_connect+0x2df/0x310 net/socket.c:2066
- __do_sys_connect net/socket.c:2076 [inline]
- __se_sys_connect net/socket.c:2073 [inline]
- __x64_sys_connect+0x7a/0x90 net/socket.c:2073
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f0b3687d0a9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f0b3764b0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 00007f0b369b3f80 RCX: 00007f0b3687d0a9
-RDX: 000000000000001c RSI: 00000000200000c0 RDI: 000000000000000a
-RBP: 00007f0b368ec074 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f0b369b3f80 R15: 00007fff165a7738
- </TASK>
+I extend the selftests/msg_zerocopy.c to accommodate the new mechanism,
+test result is as follows,
+
+cfg_notification_limit = 1, in this case the original method approximately
+aligns with the semantics of new one. In this case, the new flag has
+around 13% cpu savings in TCP and 18% cpu savings in UDP.
+
++---------------------+---------+---------+---------+---------+
+| Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
++---------------------+---------+---------+---------+---------+
+| ZCopy (MB)          | 5147    | 4885    | 7489    | 7854    |
++---------------------+---------+---------+---------+---------+
+| New ZCopy (MB)      | 5859    | 5505    | 9053    | 9236    |
++---------------------+---------+---------+---------+---------+
+| New ZCopy / ZCopy   | 113.83% | 112.69% | 120.88% | 117.59% |
++---------------------+---------+---------+---------+---------+
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+cfg_notification_limit = 32, the new mechanism performs 8% better in TCP.
+For UDP, no obvious performance gain is observed and sometimes may lead
+to degradation. Thus, if users don't need to retrieve the notification
+ASAP in UDP, the original mechanism is preferred.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
++---------------------+---------+---------+---------+---------+
+| Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
++---------------------+---------+---------+---------+---------+
+| ZCopy (MB)          | 6272    | 6138    | 12138   | 10055   |
++---------------------+---------+---------+---------+---------+
+| New ZCopy (MB)      | 6774    | 6620    | 11504   | 10355   |
++---------------------+---------+---------+---------+---------+
+| New ZCopy / ZCopy   | 108.00% | 107.85% | 94.78%  | 102.98% |
++---------------------+---------+---------+---------+---------+
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Zijian Zhang (4):
+  selftests: fix OOM problem in msg_zerocopy selftest
+  sock: support copy cmsg to userspace in TX path
+  sock: add MSG_ZEROCOPY notification mechanism based on msg_control
+  selftests: add MSG_ZEROCOPY msg_control notification test
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+ arch/alpha/include/uapi/asm/socket.h        |   2 +
+ arch/mips/include/uapi/asm/socket.h         |   2 +
+ arch/parisc/include/uapi/asm/socket.h       |   2 +
+ arch/sparc/include/uapi/asm/socket.h        |   2 +
+ include/linux/socket.h                      |   6 +
+ include/uapi/asm-generic/socket.h           |   2 +
+ include/uapi/linux/socket.h                 |  10 ++
+ net/core/sock.c                             |  44 ++++++++
+ net/ipv4/ip_sockglue.c                      |   2 +
+ net/ipv6/datagram.c                         |   3 +
+ net/socket.c                                |  45 ++++++++
+ tools/testing/selftests/net/msg_zerocopy.c  | 117 ++++++++++++++++++--
+ tools/testing/selftests/net/msg_zerocopy.sh |   1 +
+ 13 files changed, 231 insertions(+), 7 deletions(-)
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+-- 
+2.20.1
 
-If you want to undo deduplication, reply with:
-#syz undup
 
