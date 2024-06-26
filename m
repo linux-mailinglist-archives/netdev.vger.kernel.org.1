@@ -1,154 +1,113 @@
-Return-Path: <netdev+bounces-106763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA7A791792F
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:50:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0B5691793C
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:52:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39B50B21FCB
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 06:50:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B9762827AC
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 06:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2F1155A25;
-	Wed, 26 Jun 2024 06:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73C9D154458;
+	Wed, 26 Jun 2024 06:52:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="K6rtYLmz"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kkRAU5Ye"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953BA1FBB
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 06:50:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A9D175AA;
+	Wed, 26 Jun 2024 06:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719384610; cv=none; b=UCdmuG8k71D5cZ1ppZCsQ+R6EcN6vIrzKB+TuYkPsSE+Kvh5cExlhjMN3cXVGHk3z1DsdkTC6Y8LDuE+TZVyt2Rq23jItTBAuQhKdRC3kIo2BTxAyGnsHO256Jy24NdD8gT7A4r/EGT3MiZ8coEpXy1y+jO4hkKlM+U/37rVjMU=
+	t=1719384766; cv=none; b=Zwslq3bTl+x0gD56qkTkkyF6FRkwxPkAdvP4F+jcu2nQqdIOPOB8j7r+ua7Avld6KfTZf8IPB6aCoJSmOc6efPKGDuki70WYCkdpdHpO8TzMvI33Kz+dbGIOi61/xUzo09NYazR2IO7zwCL07lCUXPEnkJD+v08CFjMpJAnlclM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719384610; c=relaxed/simple;
-	bh=eQUdNs2rIrX7qqGigt2hfzC7FSnA47UlmMvb1I6gqFc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uqMGqQd4vSuWE2y6Kxr7hdBZo81PzpYsL22pK1ioIKpjpU92mfi+OFHQxyVw7BCmnIClW7YGPEc7sgjbRfuCHuwwq7PHh1zyv/I4l9ZEQzX44Jro39VGoNGlHlBBFvyF7tsw6xcCdy4LraliW3lNaRQdL9dmrr9vMQhP+MID7zg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=K6rtYLmz; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52cdf2c7454so7037773e87.1
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 23:50:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1719384607; x=1719989407; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aYfugkFKdXF5OXKJphEPoOGEPgE4e7C0WTCNJr7v2Lk=;
-        b=K6rtYLmzK+9Ozrwrm4vIUoKNbgYgbd2UKropN7X0rzATrvoHQW7xEk2nlFQrHnPoaL
-         9ZuGAYLPRZ24Ac6Uqg7++C13koQZMD/XHTz30xcH1s26EFpstE+97xmxY/aLcoOe3A8m
-         EB4/E95YPiIJuEqJHqrns6vlm3Gc1NnqcLNh+k8tMJPjnfCCsP3prF7TzkPtua0MtAer
-         LpIYHalFHZgzUmTirE1CT7jzuK6kpHHpBGWW7yk9Y5YkhURVTPJSMqs/hgZP86FMU18d
-         E7YF7Sb96O+f8ZZy+RuJ0+iuun6AhaUMpRDfJRH32W6x0XNMEMZNkD4zvtNBpRnXUyt+
-         iB1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719384607; x=1719989407;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aYfugkFKdXF5OXKJphEPoOGEPgE4e7C0WTCNJr7v2Lk=;
-        b=SUNNi8CA7PEnYxjoJ8E1Qekvcve5uE/+6WXhBjjHw3U93/onkbds3Q7n+mnBuRo7o7
-         sWM8Y/DCGaUqE0blkaik8ZTE+RhUe0tCytYmx3QxMOa4VAYcujfSqg6MN1+H/AIuVla4
-         o6rA2kbNqKDVRnQEt1kvCXTzlK/9fVEI2atQVU7dhjEFYMwFF2CzEsGIJgWnVAcdZClc
-         Nq+jKgoGWiU5sPXOzxiyYK0p7e3ynqiZjmQfbKIh88JD6KfUeXXrk1fjgCKd0Mt5hNg+
-         sDQ8ykQxkZAq8EfKA8f0O8n68Rhh/ZOyAfXWuOLEkhTQd3RQBa9KvhPgR9gXolX/7jeA
-         vyrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWT174nD2lSC1P0f/RkBdLDqhUraZnQH/iDbDILL4BCN5bX3TcI28uEPdNyQOrdK8ZcYYVss7NuF0KFITLa0+Avos1tVS/l
-X-Gm-Message-State: AOJu0YxJHCiqhE1HFw6/E714PPZ7ZpCt63bnnPRRbmWzygzPRSAs5NM8
-	rRY7cQhpMR2yAw7l9Qrap/WmQ3JRQcEF+mACD62+gIqof376CQeGEk7Oy/cPBIU=
-X-Google-Smtp-Source: AGHT+IHSj+NeSiBiocSmOkSNZcFlifenhzRJ6+JsxsR636NiAxa4i0Hy3RAl1l1Fy4kOUeCNgGccfQ==
-X-Received: by 2002:a05:6512:32a5:b0:52c:dfaa:def6 with SMTP id 2adb3069b0e04-52ce18356f4mr7555945e87.33.1719384606722;
-        Tue, 25 Jun 2024 23:50:06 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a727900d2f1sm119638366b.180.2024.06.25.23.50.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jun 2024 23:50:06 -0700 (PDT)
-Message-ID: <c84b6dab-b86b-49ad-b78f-b4dcae1d4e76@blackwall.org>
-Date: Wed, 26 Jun 2024 09:50:05 +0300
+	s=arc-20240116; t=1719384766; c=relaxed/simple;
+	bh=fRE5P6PE82Xq4+23ZFjntwgar6QxyjYP8r3Y+M4Da1s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UuqGsSX7iGeUlObV0wbMbkrKnreGxjLwCD4wFWukrINEtm9fZ1vgyHVc5i2m94/BJ9RI+wLGISdmYEyuhZWkoZzVvYW5DpsEXQhRgBGf9j1JDk+ntfjGWL/idcEgVqTXB5xItauj+VulxOFAUYOpgnIAxS2JV/yEnWA4Fua+x7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kkRAU5Ye; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0524D24000B;
+	Wed, 26 Jun 2024 06:52:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1719384761;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=X82V2P8TKJ6I8usLvjtNSyZFMJxGfnoq2XWLZLGMyXM=;
+	b=kkRAU5YeXHUASh1bGiT5FERp3Mx6h6xd8Tc4Mx4MSS7GL7twUqycQ10OUYsbXOI5iLVt2A
+	oUsne71Ia20lVvneuq9SgEBi3IBQvU7IWePE6zj9CMk4dCBtiQK4Wi38sSqQjRipBddKzG
+	JqFr/hWpMgWo+wxNU8LPTdvd1dro/7ifG2q2RuHbmAj6D1GvdAfqX0lSWd1RxR//WUmB6z
+	AZw0F1y+N3yYzZ79Sss3rr1Bnv4vrLQ9ygC9J9f6CAxWDIwuyuUtTWVKlBOVPkgBPNSBgO
+	XsarOwoOA/v6b6o0GHf/SOJx8GhrAVHHHhpvJU5glbWkJsLYhW0sqRnd3B5Bng==
+Date: Wed, 26 Jun 2024 08:52:36 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Steen Hegelund <steen.hegelund@microchip.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, Andy Shevchenko
+ <andy.shevchenko@gmail.com>, Simon Horman <horms@kernel.org>, Sai Krishna
+ Gajula <saikrishnag@marvell.com>, Thomas Gleixner <tglx@linutronix.de>, Rob
+ Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
+ Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Lee Jones <lee@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Saravana Kannan <saravanak@google.com>, "Bjorn Helgaas"
+ <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>, "Lars
+ Povlsen" <lars.povlsen@microchip.com>, Daniel Machon
+ <daniel.machon@microchip.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, <linux-kernel@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-pci@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>, "Allan
+ Nielsen" <allan.nielsen@microchip.com>, Luca Ceresoli
+ <luca.ceresoli@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 18/19] mfd: Add support for LAN966x PCI device
+Message-ID: <20240626085236.62e61723@bootlin.com>
+In-Reply-To: <e85511af9db9de024b5065eeee77108be474f71e.camel@microchip.com>
+References: <20240621184923.GA1398370@bhelgaas>
+	<e85511af9db9de024b5065eeee77108be474f71e.camel@microchip.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 iproute2 0/3] Multiple Spanning Tree (MST) Support
-To: Hangbin Liu <liuhangbin@gmail.com>,
- Tobias Waldekranz <tobias@waldekranz.com>
-Cc: stephen@networkplumber.org, dsahern@kernel.org, netdev@vger.kernel.org
-References: <20240624130035.3689606-1-tobias@waldekranz.com>
- <Znu5eEoN3lRJxX5v@Laptop-X1>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <Znu5eEoN3lRJxX5v@Laptop-X1>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-On 26/06/2024 09:47, Hangbin Liu wrote:
-> On Mon, Jun 24, 2024 at 03:00:32PM +0200, Tobias Waldekranz wrote:
->> This series adds support for:
->>
->> - Enabling MST on a bridge:
->>
->>       ip link set dev <BR> type bridge mst_enable 1
->>
->> - (Re)associating VLANs with an MSTI:
->>
->>       bridge vlan global set dev <BR> vid <X> msti <Y>
->>
->> - Setting the port state in a given MSTI:
->>
->>       bridge mst set dev <PORT> msti <Y> state <Z>
->>
->> - Listing the current port MST states:
->>
->>       bridge mst show
+Hi Steen, Bjorn, Andy,
+
+On Mon, 24 Jun 2024 13:46:32 +0200
+Steen Hegelund <steen.hegelund@microchip.com> wrote:
+
+> Hi Bjorn,
 > 
-> Tested-by: Hangbin Liu <liuhangbin@gmail.com>
+> I am not sure what went wrong here.
 > 
-> With following steps:
-> + /home/iproute2/ip/ip link add br0 type bridge
-> + /home/iproute2/ip/ip link set br0 type bridge mst_enabled 1
-> + /home/iproute2/ip/ip link add type veth
-> + /home/iproute2/ip/ip link set veth0 master br0
-> + /home/iproute2/bridge/bridge vlan add dev br0 vid 1-3 self
-> + /home/iproute2/bridge/bridge vlan global set dev br0 vid 2 msti 3
-> + /home/iproute2/bridge/bridge vlan add dev veth0 vid 1-3
-> + /home/iproute2/bridge/bridge mst set dev veth0 msti 3 state 1
-> + /home/iproute2/bridge/bridge mst show
-> port              msti
-> veth0             0
->                     state disabled
->                   3
->                     state listening
+> I have seen that lspci lists 'Microchip / SMSC' for the 0x1055 Vendor
+> ID value and as mentioned previously there has been a number of
+> aquicisions over the years, so that the ID has been absorbed but not
+> necessarily re-registered.
 > 
+> Anyway I have started an investigation, so we can determine what
+> up/down in this.
 > 
-> There is one issue I got (should be kernel issue):
-> 
-> + /home/iproute2/ip/ip link set br0 type bridge mst_enabled 0
-> Error: MST mode can't be changed while VLANs exist.
-> 
->   If I want disable mst, I got failed as there is VLAN info, which is expected
-> 
-> + /home/iproute2/ip/ip link set veth0 nomaster
-> + /home/iproute2/ip/ip link set veth0 master br0
-> + /home/iproute2/ip/ip link set br0 type bridge mst_enabled 0
-> Error: MST mode can't be changed while VLANs exist.
-> 
->   But I got failed again after remove and re-add veth0, is this expected?
->   I thought the VLAN info should be cleared after removing.
+> I agree that for now this will have to be PCI_VENDOR_ID_EFAR, and I
+> will return with an update as soon as I know more.
 > 
 
-Probably default vlan 1 got added to the port when it was enslaved.
+Right, PCI_VENDOR_ID_EFAR will be directly used in the next iteration.
 
-> + /home/iproute2/ip/ip link set veth0 nomaster
-> + /home/iproute2/ip/ip link set br0 type bridge mst_enabled 0
-> 
->   It works after I remove veth0.
-> 
-
+Best regards,
+Hervé
 
