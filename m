@@ -1,81 +1,55 @@
-Return-Path: <netdev+bounces-106794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F379917A99
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:13:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF152917A8F
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:12:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA249B21521
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:13:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA59328224C
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:12:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB3A15F33A;
-	Wed, 26 Jun 2024 08:13:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="Bxbi20Y3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438A515D5CF;
+	Wed, 26 Jun 2024 08:12:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa4.hc1455-7.c3s2.iphmx.com (esa4.hc1455-7.c3s2.iphmx.com [68.232.139.117])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 770FB29414;
-	Wed, 26 Jun 2024 08:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.139.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B5F13AA3C;
+	Wed, 26 Jun 2024 08:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719389625; cv=none; b=WAii/JOmlESSNJ4mGPMBfTNgcQzc4bR6zMXzo8XlKKqdWxPA4tnrrO7wwepWF3wLTBaGYU0w0oQHAbq5OCSejYImtejUVACfPOta22lJgkZrr4WDStnYaPSNikTJg68Eeo1PxKsO+j/NctFf/lyzpB4GkquZvDd+J02KXbqFvJQ=
+	t=1719389553; cv=none; b=emKf6so6U8AKKe0SSZ5wngeeDx789oAkHLjXQQXoZnZytSvzTF6UI8tawYdGSnhOiweRI7ExIdK4k5mR2kaovBNHmC7xRAPqOQdcOgzjOAQRDjIDHCL5mH74TTnOISqSvrl93ouBbU0Ac7l0cDFKpNyNcSTvCWpcUWA+jTXIsRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719389625; c=relaxed/simple;
-	bh=fB4wushNe6ZaqPL3frnj3MfEwo4IuC6tye15qy810ZY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WFcHjjkdjVh2wHhFYX7I0rirL/XFJ6n7fPW431wjo7kH9UZLBdWzkK/DBX/yb9UmtgotSVvSoYUFIV3x0cz+y6ody402eakRStmHe73zmg3QA3kg498fkhwrZ5Vasm0JMXj2Nxexf+DvK/MkeoCVxRWA91ETy06T//BswW6OhT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=Bxbi20Y3; arc=none smtp.client-ip=68.232.139.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1719389622; x=1750925622;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=fB4wushNe6ZaqPL3frnj3MfEwo4IuC6tye15qy810ZY=;
-  b=Bxbi20Y32L7mlIMPtIR3ds3esPKelBYDMTAdM4Yg2HtiMpvQcgxWd8yE
-   WYfFPCKeuupuq4ePhloKV3CT7zem8+LKBnEvj2WjqUWlaY0tvcTGLmXqU
-   V9vz1HaX0Ghz7/VIhqIPQeUjQq43ozCAN8aLwhv56d/mamFSjJJ8UoBJz
-   dnTCiS/QFdyY9/XOSlrFBiJUT50NkAXHyup2JpRXZ5VmxjippXS/8s8jP
-   2HTZmrVqKVj+l1DMToMvY80+3xhV7qrwPIdfFUUoEB+A0NSXsngNZQGP6
-   zeVKy2OPs2cR5H3OCwS6IOVVd+8PdDm7XgrtOyaCsm3fTdVP/JRUrsWXb
-   A==;
-X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="165088360"
-X-IronPort-AV: E=Sophos;i="6.08,266,1712588400"; 
-   d="scan'208";a="165088360"
-Received: from unknown (HELO oym-r4.gw.nic.fujitsu.com) ([210.162.30.92])
-  by esa4.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 17:12:28 +0900
-Received: from oym-m4.gw.nic.fujitsu.com (oym-nat-oym-m4.gw.nic.fujitsu.com [192.168.87.61])
-	by oym-r4.gw.nic.fujitsu.com (Postfix) with ESMTP id 7337AD8011;
-	Wed, 26 Jun 2024 17:12:26 +0900 (JST)
-Received: from kws-ab4.gw.nic.fujitsu.com (kws-ab4.gw.nic.fujitsu.com [192.51.206.22])
-	by oym-m4.gw.nic.fujitsu.com (Postfix) with ESMTP id 31CC4D52D0;
-	Wed, 26 Jun 2024 17:12:23 +0900 (JST)
-Received: from edo.cn.fujitsu.com (edo.cn.fujitsu.com [10.167.33.5])
-	by kws-ab4.gw.nic.fujitsu.com (Postfix) with ESMTP id A896A1EBD8C;
-	Wed, 26 Jun 2024 17:12:22 +0900 (JST)
-Received: from G08FNSTD200033.g08.fujitsu.local (unknown [10.167.225.189])
-	by edo.cn.fujitsu.com (Postfix) with ESMTP id 680CD1A0002;
-	Wed, 26 Jun 2024 16:12:21 +0800 (CST)
-From: Chen Hanxiao <chenhx.fnst@fujitsu.com>
-To: Simon Horman <horms@verge.net.au>,
-	Julian Anastasov <ja@ssi.bg>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org
-Subject: [PATCH net-next] ipvs: properly dereference pe in ip_vs_add_service
-Date: Wed, 26 Jun 2024 16:11:59 +0800
-Message-Id: <20240626081159.1405-1-chenhx.fnst@fujitsu.com>
-X-Mailer: git-send-email 2.37.1.windows.1
+	s=arc-20240116; t=1719389553; c=relaxed/simple;
+	bh=fy3iUdoNHtg+RLT6e+nTyMyJr9ANx2SWP3ueVJDFAI8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kNJ4IPWvEwsliSYrDNG47gucMt9KJFlcUHpPnHK+6dCJt//1qo/LJe2vvzF/JUDHBoVmFYPFDRTzIQIRlj1ywk9OPLE3Yu6D+G1x8GqdBeMHtXm1DdoLudsNR0hHQDDmH7yq9iJ0GFm8xxr+NcRfA11D1EZBC6N8Tqmj0/T7WyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
+	by APP-05 (Coremail) with SMTP id zQCowAB3fuZhzXtmDb7eEg--.5980S2;
+	Wed, 26 Jun 2024 16:12:24 +0800 (CST)
+From: Ma Ke <make24@iscas.ac.cn>
+To: wintera@linux.ibm.com,
+	twinkler@linux.ibm.com,
+	hca@linux.ibm.com,
+	gor@linux.ibm.com,
+	agordeev@linux.ibm.com,
+	borntraeger@linux.ibm.com,
+	svens@linux.ibm.com,
+	davem@davemloft.net,
+	ubraun@linux.ibm.com,
+	sebott@linux.ibm.com
+Cc: linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ma Ke <make24@iscas.ac.cn>
+Subject: [PATCH] s390/ism: Add check for dma_set_max_seg_size in ism_probe()
+Date: Wed, 26 Jun 2024 16:12:15 +0800
+Message-Id: <20240626081215.2824627-1-make24@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,52 +57,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-TM-AS-Product-Ver: IMSS-9.1.0.1417-9.0.0.1002-28482.006
-X-TM-AS-User-Approved-Sender: Yes
-X-TMASE-Version: IMSS-9.1.0.1417-9.0.1002-28482.006
-X-TMASE-Result: 10-1.419900-10.000000
-X-TMASE-MatchedRID: 4r2MyAYFTncx4g+7LKrJbJwzEulNiZLqStGAgmKqWuX5V4X/65Dwb+Rg
-	EMvCxuZnkLJauoXWknKkXqcpclKhdeBRuAss+FbmEXjPIvKd74BMkOX0UoduueTpBuL72LoPJcL
-	HRGvpYJ3GnUCcr382gRU6KGPlAba7lwV2iaAfSWcURSScn+QSXmVV1G+Ck2l7+gtHj7OwNO0HTT
-	+SR4FPANwYzzO5tA66zOpSNPQxGoMZ2uv99crag/8Ha6kHC3BZOp2SRaudtzkgyDNZSq3Dn94JA
-	OmVdEEOF82ierRtzFTLnV1O7xRVt4aT7FRqp0wPAcQrAfBh69vBRLFeH6OJSCTDD+DBjuEw
-X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
+X-CM-TRANSID:zQCowAB3fuZhzXtmDb7eEg--.5980S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Jw4rZFW8CrW8Wr45KFy5CFg_yoWfAwc_Kw
+	4xCF93JrnrKw4xtw4UKr4avrWq9r10qr18XFn7ta4ft34UGFnrX34DZF4rXr4Uua93AF47
+	Crn7JrZYkwn5ujkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3xFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6r1F6r1fM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8Jw
+	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAG
+	YxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
+	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
+	C2KfnxnUUI43ZEXa7VUbHa0DUUUUU==
+X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
 
-Use rcu_dereference_protected to resolve sparse warning:
+As the possible failure of the dma_set_max_seg_size(), we should better
+check the return value of the dma_set_max_seg_size().
 
-  net/netfilter/ipvs/ip_vs_ctl.c:1471:27: warning: dereference of noderef expression
-
-Fixes: 39b972231536 ("ipvs: handle connections started by real-servers")
-Signed-off-by: Chen Hanxiao <chenhx.fnst@fujitsu.com>
+Fixes: 684b89bc39ce ("s390/ism: add device driver for internal shared memory")
+Signed-off-by: Ma Ke <make24@iscas.ac.cn>
 ---
- net/netfilter/ipvs/ip_vs_ctl.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/s390/net/ism_drv.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-index b6d0dcf3a5c3..925e2143ba15 100644
---- a/net/netfilter/ipvs/ip_vs_ctl.c
-+++ b/net/netfilter/ipvs/ip_vs_ctl.c
-@@ -1369,7 +1369,7 @@ ip_vs_add_service(struct netns_ipvs *ipvs, struct ip_vs_service_user_kern *u,
- {
- 	int ret = 0;
- 	struct ip_vs_scheduler *sched = NULL;
--	struct ip_vs_pe *pe = NULL;
-+	struct ip_vs_pe *pe = NULL, *tmp_pe = NULL;
- 	struct ip_vs_service *svc = NULL;
- 	int ret_hooks = -1;
+diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+index e36e3ea165d3..9ddd093a0368 100644
+--- a/drivers/s390/net/ism_drv.c
++++ b/drivers/s390/net/ism_drv.c
+@@ -620,7 +620,9 @@ static int ism_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		goto err_resource;
  
-@@ -1468,7 +1468,8 @@ ip_vs_add_service(struct netns_ipvs *ipvs, struct ip_vs_service_user_kern *u,
- 		atomic_inc(&ipvs->ftpsvc_counter);
- 	else if (svc->port == 0)
- 		atomic_inc(&ipvs->nullsvc_counter);
--	if (svc->pe && svc->pe->conn_out)
-+	tmp_pe = rcu_dereference_protected(svc->pe, 1);
-+	if (tmp_pe && tmp_pe->conn_out)
- 		atomic_inc(&ipvs->conn_out_counter);
+ 	dma_set_seg_boundary(&pdev->dev, SZ_1M - 1);
+-	dma_set_max_seg_size(&pdev->dev, SZ_1M);
++	ret = dma_set_max_seg_size(&pdev->dev, SZ_1M);
++	if (ret)
++		return ret;
+ 	pci_set_master(pdev);
  
- 	/* Count only IPv4 services for old get/setsockopt interface */
+ 	ret = ism_dev_init(ism);
 -- 
-2.39.1
+2.25.1
 
 
