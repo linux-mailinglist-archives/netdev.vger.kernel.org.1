@@ -1,96 +1,154 @@
-Return-Path: <netdev+bounces-106958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF72A918448
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:34:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB58A91845A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:35:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B94A289144
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:34:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EECC41C21CFA
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:35:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE6D3186294;
-	Wed, 26 Jun 2024 14:32:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB17188CCF;
+	Wed, 26 Jun 2024 14:33:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bjLtrndE"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="oJTHQzoj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6461F1822D1
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 14:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA3B187323;
+	Wed, 26 Jun 2024 14:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719412349; cv=none; b=eOcC1JEGrH+X/65ON5/yoA/OQjP3Rmnoje4EJaXrr+Fni7EF8CyO3PIE4AzVNyEzIlITiC3uqNc0g2oTcnQhFR+fFSj2t5V/tPH7mZ9KyLKPQJMY2kayA065Nm0Ln1Oxyzl51vaGiSju/bpmKc8wuLO6Bj0xmymFjmIVmxG3Xkg=
+	t=1719412414; cv=none; b=HzVfsq5glpHEzI4xGTz7En7Ep4GkPxhR+bIBFB8+SCvWAv8ISGlnGC6D3JiB2POuWYVWoakLVBH0gdeiZKyY/CwyKJU4EgFqgJS/7OqzMMI8olcDoathYLHwZ3cTMM1dG5exNW5tgH8SZ5mv8bL8BUWluR+jN0Gr5f7u+whjkMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719412349; c=relaxed/simple;
-	bh=FRcskTMvxcn7d37tsgbcNOUWozKStoLxBLjLpC+8CY8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=NlEthUV7Hh+rKXnJy8r7evdOtClo07yUJ8aTdA/309fDPGygOXGNPO7dTntSz9f3X2tfgAK+p4caFI2fYRgCI8Op1jhgOUMtwN6edU0P2KioWErRkwLkZPX5N41k/fMMnzrGBsmwzUuRoN/CgnEnmAU0StcNH/Pct+QvZw8JPBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bjLtrndE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719412347;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FRcskTMvxcn7d37tsgbcNOUWozKStoLxBLjLpC+8CY8=;
-	b=bjLtrndE+1jdTZ5N7Fk8ISHVJjwEqargexbSlzw3jLep9r2r8BjMkGJ95WyB/7qv3qvlpy
-	UsapgfBVl1lM853EdDti1WK6wh3J16q3V0GdQsTdtDvCqVv8Cj0LnYqD0Cqq6DFYPFp3nk
-	ESByp8DBRt9iZ4ttTt1AUpRs1Yuzo0o=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-367-vmX9JsasPHewxY5U2CTFyQ-1; Wed,
- 26 Jun 2024 10:32:23 -0400
-X-MC-Unique: vmX9JsasPHewxY5U2CTFyQ-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CCD9D19560B3;
-	Wed, 26 Jun 2024 14:32:21 +0000 (UTC)
-Received: from RHTRH0061144 (dhcp-17-72.bos.redhat.com [10.18.17.72])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 606B33000601;
-	Wed, 26 Jun 2024 14:32:19 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org,  echaudro@redhat.com,  horms@kernel.org,
-  i.maximets@ovn.org,  dev@openvswitch.org,  Pravin B Shelar
- <pshelar@ovn.org>,  "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Shuah Khan <shuah@kernel.org>,
-  linux-kselftest@vger.kernel.org,  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 08/10] selftests: openvswitch: add userspace
- parsing
-In-Reply-To: <20240625205204.3199050-9-amorenoz@redhat.com> (Adrian Moreno's
-	message of "Tue, 25 Jun 2024 22:51:51 +0200")
-References: <20240625205204.3199050-1-amorenoz@redhat.com>
-	<20240625205204.3199050-9-amorenoz@redhat.com>
-Date: Wed, 26 Jun 2024 10:32:17 -0400
-Message-ID: <f7tbk3ng4ge.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1719412414; c=relaxed/simple;
+	bh=+53iBaNneJUrnJLXQopSACioG062JSDnqGOyOiIkLoA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JtKWHi3xWP/x0u4IvOKjwmHOkJi7JrGm66vqWOlIDPbLA5E6Mc8fCdgficnu9M+fWtLTWwZ1SGWwKuNzeHlClsS5OvN30BX4CNgr2gdpocR7X02wdtlRXShA4BtZWoQ4KJyjlVKINgXHQ25H0y62PBKaw2xpwTHPTTk1ZPksv7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=oJTHQzoj; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45QAfODj022641;
+	Wed, 26 Jun 2024 14:33:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=nQIsFrxbQIhS4BAJsQwJzwW+7/FvXlB51hL
+	xw1bN31o=; b=oJTHQzojjOYH4Zfzx126Ph1KVREOS7FdeMOgzUGWZb9+D/TfZrC
+	dtY6ThEda+TNkf06tmgD1jt/nFfqAQJx8KqGxuyIqMkAkARM+7PS5BZDHse8TrZy
+	dWyZUDa6pc/jVIpjD4uKPent5X0p/kLENvlyeoGj7hl4v3MnMPDBc0SyjWnBxjou
+	wKj2dXklTbv/31JxzRI6UrRYLxzzPP7lyv98eHNfvAECk4OOGe8vn/QxNl5Uu/Io
+	v83UrxDCHUqf4XVELVB7HuxOlwe2ZXEvDDY4sES4OKNJw43wnqFu0NVDBy71Nm33
+	kLUlj9yFG73c3vDypmC+75oAh/0gIipH68A==
+Received: from apblrppmta01.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ywqw9hcgg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Jun 2024 14:33:08 +0000 (GMT)
+Received: from pps.filterd (APBLRPPMTA01.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTP id 45QEUA8O023377;
+	Wed, 26 Jun 2024 14:33:04 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTPS id 3ywqpkv29c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Jun 2024 14:33:03 +0000
+Received: from APBLRPPMTA01.qualcomm.com (APBLRPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 45QEX3Qf025794;
+	Wed, 26 Jun 2024 14:33:03 GMT
+Received: from hu-devc-blr-u22-a.qualcomm.com (hu-devipriy-blr.qualcomm.com [10.131.37.37])
+	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTPS id 45QEX3fr025793
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Jun 2024 14:33:03 +0000
+Received: by hu-devc-blr-u22-a.qualcomm.com (Postfix, from userid 4059087)
+	id 8295340FB3; Wed, 26 Jun 2024 20:03:02 +0530 (+0530)
+From: Devi Priya <quic_devipriy@quicinc.com>
+To: andersson@kernel.org, mturquette@baylibre.com, sboyd@kernel.org,
+        robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+        konrad.dybcio@linaro.org, catalin.marinas@arm.com, will@kernel.org,
+        p.zabel@pengutronix.de, richardcochran@gmail.com,
+        geert+renesas@glider.be, dmitry.baryshkov@linaro.org,
+        neil.armstrong@linaro.org, arnd@arndb.de, m.szyprowski@samsung.com,
+        nfraprado@collabora.com, u-kumar1@ti.com,
+        linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
+Cc: quic_devipriy@quicinc.com
+Subject: [PATCH V5 0/7] Add NSS clock controller support for IPQ9574
+Date: Wed, 26 Jun 2024 20:02:55 +0530
+Message-Id: <20240626143302.810632-1-quic_devipriy@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: bfMj7uiVpEwpqRE50g9WKrvhGYSPU_r0
+X-Proofpoint-GUID: bfMj7uiVpEwpqRE50g9WKrvhGYSPU_r0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-26_07,2024-06-25_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 clxscore=1015 impostorscore=0 mlxscore=0
+ lowpriorityscore=0 malwarescore=0 mlxlogscore=896 phishscore=0 bulkscore=0
+ adultscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2406140001 definitions=main-2406260107
 
-Adrian Moreno <amorenoz@redhat.com> writes:
+Add bindings, driver and devicetree node for networking sub system clock 
+controller on IPQ9574. Also add support for NSS Huayra type alpha PLL and
+add support for gpll0_out_aux clock which serves as the parent for 
+some nss clocks.
 
-> The userspace action lacks parsing support plus it contains a bug in the
-> name of one of its attributes.
->
-> This patch makes userspace action work.
->
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
+This series depends on the below patch series which adds support for
+Interconnect driver
+https://lore.kernel.org/linux-arm-msm/20240430064214.2030013-1-quic_varada@quicinc.com/
 
-Reviewed-by: Aaron Conole <aconole@redhat.com>
+Changes in V5:
+	- Detailed change logs are added to the respective patches.
+
+V4 can be found at:
+https://lore.kernel.org/linux-arm-msm/20240625070536.3043630-1-quic_devipriy@quicinc.com/
+
+V3 can be found at:
+https://lore.kernel.org/linux-arm-msm/20240129051104.1855487-1-quic_devipriy@quicinc.com/
+
+V2 can be found at:
+https://lore.kernel.org/linux-arm-msm/20230825091234.32713-1-quic_devipriy@quicinc.com/
+
+Devi Priya (7):
+  clk: qcom: clk-alpha-pll: Add NSS HUAYRA ALPHA PLL support for ipq9574
+  dt-bindings: clock: gcc-ipq9574: Add definition for GPLL0_OUT_AUX
+  clk: qcom: gcc-ipq9574: Add support for gpll0_out_aux clock
+  dt-bindings: clock: Add ipq9574 NSSCC clock and reset definitions
+  clk: qcom: Add NSS clock Controller driver for IPQ9574
+  arm64: dts: qcom: ipq9574: Add support for nsscc node
+  arm64: defconfig: Build NSS Clock Controller driver for IPQ9574
+
+ .../bindings/clock/qcom,ipq9574-nsscc.yaml    |   74 +
+ arch/arm64/boot/dts/qcom/ipq9574.dtsi         |   41 +
+ arch/arm64/configs/defconfig                  |    1 +
+ drivers/clk/qcom/Kconfig                      |    7 +
+ drivers/clk/qcom/Makefile                     |    1 +
+ drivers/clk/qcom/clk-alpha-pll.c              |   11 +
+ drivers/clk/qcom/clk-alpha-pll.h              |    1 +
+ drivers/clk/qcom/gcc-ipq9574.c                |   15 +
+ drivers/clk/qcom/nsscc-ipq9574.c              | 3096 +++++++++++++++++
+ include/dt-bindings/clock/qcom,ipq9574-gcc.h  |    1 +
+ .../dt-bindings/clock/qcom,ipq9574-nsscc.h    |  152 +
+ .../dt-bindings/reset/qcom,ipq9574-nsscc.h    |  134 +
+ 12 files changed, 3534 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+ create mode 100644 drivers/clk/qcom/nsscc-ipq9574.c
+ create mode 100644 include/dt-bindings/clock/qcom,ipq9574-nsscc.h
+ create mode 100644 include/dt-bindings/reset/qcom,ipq9574-nsscc.h
+
+-- 
+2.34.1
 
 
