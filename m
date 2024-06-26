@@ -1,111 +1,83 @@
-Return-Path: <netdev+bounces-106716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A14B91756A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:04:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6865591756D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:08:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13D771F21FC1
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:04:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2736C2832B9
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D621FB64E;
-	Wed, 26 Jun 2024 01:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 772E6BA47;
+	Wed, 26 Jun 2024 01:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kvCoGavG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DRS2JEBo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9F5C13D;
-	Wed, 26 Jun 2024 01:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9B76125;
+	Wed, 26 Jun 2024 01:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719363891; cv=none; b=bhNkyKeEwDCyLH3LumOgLIdNAGyFwhb6wfQd6CveFLydUihw+C9JDMTsLWFxE2OGkbYkedoFxF/4XlyfAozIi1WamH2tUCNVYD9hXu8pTiio3AyUJSoN2VLsvMMI4YdydcV6yd3OP3TPMk6iAqqp+LjSu5IYIxSQ1Od6shJDa3U=
+	t=1719364080; cv=none; b=Yb28n2nXggpkxjAjII41ouIWptPADTypzAcoQvtL78Z1CxKrGVb0/0qcOvjMtW8BGS7IFZZMBpSVQXk+Z8ZvppyhA6riZ/6eqMc6qmcCgNOfO3VPyO3pWWLvxomsmQ4PpQtQv5DWvBNclQIIoWsC09geyw9UxL2ktGvltIc0QbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719363891; c=relaxed/simple;
-	bh=FHzW/DVKidcZT55HraJ3rhZSFrRW8mJxc3kQAWC95Gs=;
+	s=arc-20240116; t=1719364080; c=relaxed/simple;
+	bh=iLGdpkzyr7SI1aiVURjiW/LPzHYSNF0CwENLNEPe2/o=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nISufea3Q2oeAz2TjRQ/t7CNdA+luPqFuIV0D3j32Bgz/tsPrHr8hnIhs5Rt67JBvJMmvl54qh9OMa6cgmf6SR0lq0/j6YJGgYpK59pQyNp/HmFZtx6Sk3yCG0chFioV3n+4CDL9rmOZD9UWuRZErVCUtMR28Km90RsO3cQm7dY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kvCoGavG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BB38C32781;
-	Wed, 26 Jun 2024 01:04:50 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ShwdvHt/isYVwW1Cgux2NMGtuYZ3shdwW8Wjc899ieTPDbijTA0+OQcWPipgIWLeHutQV5qNX7ZIQfORn+uThjpZNSs2fNicxu7EPIstCohzhBmWUZO1qjIwRNpkFCp3DEQogXo3GzDPqx4cj5U6IFTJtOkrEmh2QpJ6CX2oMPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DRS2JEBo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45C03C32781;
+	Wed, 26 Jun 2024 01:07:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719363891;
-	bh=FHzW/DVKidcZT55HraJ3rhZSFrRW8mJxc3kQAWC95Gs=;
+	s=k20201202; t=1719364079;
+	bh=iLGdpkzyr7SI1aiVURjiW/LPzHYSNF0CwENLNEPe2/o=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kvCoGavGJy9+7Hj/x+hf/g88Vpgl+wkF25XLiOBfR2LiLhig/PGTtQpLPsT7oc5iP
-	 91T2DeilXrLwtJRPDzgz5suMh65zL2P4w4LHKza1BoMZyqlWloqny1YhDZXxlU3aGf
-	 YYVktBdbT26jkQD5uEoLEVGRyr0pGsYGV1J7nYR3eURpXjP7ZI38JIObBGAJd0neJU
-	 wbV9TJ4lq99L7bkhj8dWDgu3j7m4vB2sC9B0TKgxzTVfNGSLJDBsaVctdSDTfM3jqL
-	 LRQEqtKzaUQuCbMT0AcyQ19YVcr/TcUZ/7qXpQxDXA87g48I18kpYx1aYyR+ONAH4L
-	 5qpvpb6j0lLtw==
-Date: Tue, 25 Jun 2024 18:04:49 -0700
+	b=DRS2JEBolDJkVF2/Gw2Hm7Jl1Ehnjy94Snootr/3aq3HVprszQb3+zhbcN5r3Tnxn
+	 lECi4AU+FTe3nDyXF6c4S101/MpmxMXNCbIsP7Mm45g3G8FbPfaHK0O9PHvzdDbI13
+	 cgNjmHySfMFRWHDewb4hKWwV25TfZ87Em9EnvElsFj+mUuu+K4iMGHBlgCLxnAds/A
+	 MeRLJ1cb9zw2kc5mj63M9yDgrvknVk9XDcPGOuBLnL+xygBT6RFd6f5TD6434LAnjT
+	 fRJ1PYVrx248QnbNZDau0Ma+K0DFDw0LnvEojAYrwK4fvMdKxyejY3k8cTBocXWaD5
+	 8zjXnKuIuwRHQ==
+Date: Tue, 25 Jun 2024 18:07:58 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Suman Ghosh <sumang@marvell.com>
-Cc: Markus Elfring <Markus.Elfring@web.de>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Jerin Jacob <jerinj@marvell.com>, Eric
- Dumazet <edumazet@google.com>, Geethasowjanya Akula <gakula@marvell.com>,
- Hariprasad Kelam <hkelam@marvell.com>, Linu Cherian <lcherian@marvell.com>,
- Paolo Abeni <pabeni@redhat.com>, Subbaraya Sundeep Bhatta
- <sbhatta@marvell.com>, Sunil Kovvuri Goutham <sgoutham@marvell.com>
-Subject: Re: [EXTERNAL] Re: [net PATCH v2 0/7] octeontx2-af: Fix klockwork
- issues in AF driver
-Message-ID: <20240625180449.64e5feb1@kernel.org>
-In-Reply-To: <SJ0PR18MB52166806AA7FB13ED3DC3E39DBD52@SJ0PR18MB5216.namprd18.prod.outlook.com>
-References: <20240625173350.1181194-1-sumang@marvell.com>
-	<8fd713c2-5b85-4223-8a06-f2cedc2a1fb8@web.de>
-	<SJ0PR18MB52166806AA7FB13ED3DC3E39DBD52@SJ0PR18MB5216.namprd18.prod.outlook.com>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <andrew@lunn.ch>,
+ <jiri@resnulli.us>, <horms@kernel.org>, <rkannoth@marvell.com>,
+ <pkshih@realtek.com>, <larry.chiu@realtek.com>
+Subject: Re: [PATCH net-next v21 12/13] realtek: Update the Makefile and
+ Kconfig in the realtek folder
+Message-ID: <20240625180758.069a9d4f@kernel.org>
+In-Reply-To: <20240624062821.6840-13-justinlai0215@realtek.com>
+References: <20240624062821.6840-1-justinlai0215@realtek.com>
+	<20240624062821.6840-13-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 25 Jun 2024 18:34:55 +0000 Suman Ghosh wrote:
-> * Why did you not directly respond to the recurring patch review concern
->=20
->   about better summary phrases (or message subjects)?
->=20
->   https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__git.kernel.org_p=
-ub_scm_linux_kernel_git_torvalds_linux.git_tree_Documentation_process_submi=
-tting-2Dpatches.rst-3Fh-3Dv6.10-2Drc5-23n646&d=3DDwIFaQ&c=3DnKjWec2b6R0mOyP=
-az7xtfQ&r=3D7si3Xn9Ly-Se1a655kvEPIYU0nQ9HPeN280sEUv5ROU&m=3Dtyo7VgAvJ4PW3on=
-ftljYvIjrznQ9gYDoeBImOruW9-jUya4QuUMNK2qYOPd2dJK3&s=3DwYjJjR6jScQdlXWCRWzeG=
-3SidVq0MRYYjMlDPBGMJI8&e=3D
->=20
-> [Suman] I thought the =E2=80=9Csummery phrase=E2=80=9D is per patch. The =
-cover letter is mentioning the reason for the change and each patch set is =
-adding the summery for the change. Since it is not some actual =E2=80=98fix=
-=E2=80=99 I am not sure what more to add other than mentioning klockwork fi=
-xes. I am not sure what more can be added for a variable initialization to =
-zero or adding a NULL check. Can you suggest some?
->=20
->=20
->=20
-> * Would you like to explain any more here which development concern categ=
-ories
->=20
->   were picked up from the mentioned source code analysis tool?
->=20
-> [Suman]  Development concerns are mentioned in individual patch sets. Hav=
-ing junk value in the variable if not initialized or accessing a NULL point=
-er, etc.
->=20
->=20
->=20
-> * How much do you care for the grouping of logical changes into
->=20
->   consistent patch series?
->=20
-> [Suman] I thought about it but then I was not sure how to add fix tags fo=
-r a unified patch set. Hence went with per file approach. Do you see any pr=
-oblem with the approach?
+On Mon, 24 Jun 2024 14:28:20 +0800 Justin Lai wrote:
+> diff --git a/drivers/net/ethernet/realtek/Makefile b/drivers/net/ethernet/realtek/Makefile
+> index 635491d8826e..046adf503ff4 100644
+> --- a/drivers/net/ethernet/realtek/Makefile
+> +++ b/drivers/net/ethernet/realtek/Makefile
+> @@ -9,3 +9,4 @@ obj-$(CONFIG_ATP) += atp.o
+>  r8169-y += r8169_main.o r8169_firmware.o r8169_phy_config.o
+>  r8169-$(CONFIG_R8169_LEDS) += r8169_leds.o
+>  obj-$(CONFIG_R8169) += r8169.o
+> +obj-$(CONFIG_RTASE) += rtase/
 
-Please configure your MUA to quote correctly, with > characters.
+sparse points out:
+
+drivers/net/ethernet/realtek/rtase/rtase_main.c:1668:32: warning: cast to restricted __le64
+drivers/net/ethernet/realtek/rtase/rtase_main.c:1668:32: warning: cast from restricted __le32
+-- 
+pw-bot: cr
 
