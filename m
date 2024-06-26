@@ -1,181 +1,149 @@
-Return-Path: <netdev+bounces-106929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD021918265
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:29:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76081918275
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:31:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E3F01C20992
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 13:29:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21ABC1F25B3C
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 13:31:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB87A181BB8;
-	Wed, 26 Jun 2024 13:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5CE1836F0;
+	Wed, 26 Jun 2024 13:31:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KKqfU17f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5609A16190C
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 13:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865B6183098;
+	Wed, 26 Jun 2024 13:31:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719408563; cv=none; b=P74ldYk9jgmkKk1GmWzvGxyVj9riYLVMLKYdW52xYJWTDrwPeZ8Ks5BHee/GitjKKbjNsNZLKEe3/1j1wI4viDSVTJRmaR9Tp+NAfzcTCd4vvagu7ihgLVDcjTA0s1/A0Kpmm4dezNMTrvmyPhzxbBNh/ztOrGocgVNv4NVOG04=
+	t=1719408692; cv=none; b=U3K7Za04c5MBpiEC3Ta9KtGn7BoO3g8qHc7XMa0jyP7J+wZRyIr24pEkNWVzgCEz2dMGzeVj1LFmuVhAh/2NfIugrPGveIa1qf5adFx3L7FLixISoRdg+Z+VZjJnM8RXoka6edXyyqDszvAg0ETb8qNde+oEjYMkihprei6DHow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719408563; c=relaxed/simple;
-	bh=m3A54rNj/ABm02WsaHZTKTWcdo3Gge+5OqiRvEOav60=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=AuyRbLJPqtZF87rM3TE8l1SUAeTSclZZG0+U0+PVru4Vst8O2clkCo2CrkGx4zMj6IVBZGsW7voYC97lK9MMsE7RWIAZn70spbqpL+jw3/1M5JDPG0uxZclcuGPcye9YELkMzn4qUz4OdgupxfDC2t+mrceKiDyzaBLw5L65X9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-376282b0e2bso82024405ab.1
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 06:29:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719408561; x=1720013361;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=808FpBkpDsOyTMQG/Wc5jK3cn9vL1Kq3xpMCaflc4Wk=;
-        b=EeXOTFxaq+2o4ThZjD2X0uPc4mS1sWuMicNLvyKtAZALxjFzYA6cGzFCELRGC8QKZc
-         ansY8AY+2niyjUlBNvdywHnsAPcBRYs2gpdYjX9cP+RbMpea64wjjgMLFm2pRF4KDPsT
-         GnevCg59IrpfEjOe8ixcBB9L0sRkFQ5Q0BDHG4OetUcQbgXfgf+7mhwcgU+4bo+J3kN4
-         JXZCikHNHxJPEWoT+rJfbPXPUrrn5c7ovx5L9m+iK1eNu3sqIt/oJffqUSipg0CUPv2p
-         VDTyPaw955gBH9hy2SnxCyKKvfRpAka4b55XDII/5WQuLXsYJ1tfItIWshLc8q/8iHO9
-         qqmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWJqqQ14djlNFP9uFzFqfDKEYn4Bh9bsnuwZXq/91wFQiwcUjhNw//83GhOV4Ura3+qXJMifI0pO9dS3zN6jReczmTN7mF3
-X-Gm-Message-State: AOJu0YztZt53B8/FB5UMVh0Y39SDGnV4QPA7vZdRSZYsAXVE7xKrAe6V
-	il7tqZA8KZYu8hxs8xKgimD8KNqPnwzqnojDim+CDywgUIKyGG8ObCsnGeAn570u/2QrxTutumh
-	P9LcUgOtK1WXW420mA+iwWbTsHBkrW0+jZaVfNBLqJMs0vsHG6fQKklc=
-X-Google-Smtp-Source: AGHT+IG73d/Yo7Cev6LSACw0jNK9nc1EnrU//U4Z6S/kFpnUfXoRgWj9gHpp8rtt4pXtx7ysvdJp9VE+iJ92k6WDTeBnfuILXD8X
+	s=arc-20240116; t=1719408692; c=relaxed/simple;
+	bh=IooSaIwKO+iI7jZmr49oMzicKBnlZBk7V8h98yUmyXY=;
+	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
+	 Message-Id:Subject; b=Q7MStfv0AdOje2yQ3SofcT60LjxsAcIUxHfV08BdZdBfU63D67qc5u9p6gSc3hiQUd250x8gfCzylvu3vt62hXNM58u01Blou7FW5mbs9eDGds/ZQFRhUuUA3SVRvT9KwApjUP+NntZDtii18y6g52fz/MB5377wpPL5rRbtVz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KKqfU17f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1419C4AF0E;
+	Wed, 26 Jun 2024 13:31:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719408692;
+	bh=IooSaIwKO+iI7jZmr49oMzicKBnlZBk7V8h98yUmyXY=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=KKqfU17fsaqgBUMVf1eUssHRd9mD4xRECUuuMHga6n+hid24nUZwl8smcC64mRi7F
+	 KlxqYlqJXH8zxQ3ym+BZzUQVFJjnAflfH8qqaJfhbru8hbiCNsAVyTwKgTqiHtdUP+
+	 SNOUTacMQJk+uzfTgIz42ewuoqT+fdER0ItJvSMlk81TgIZZY/w9ZsmIRSbdZo6HQF
+	 LRc8/fB0Eye9y+ApMNosvwbpphNjiF49j75sX/q1KG0ZnU0ebis8T7bB+nwrWOCVeh
+	 djTjbx5U3TP6fooeAuwwxU004UwxeJTsZkMxC4Jey4n9NVl1SYJU2R0iLDG7io9jtx
+	 tH1xE1P4usN0g==
+Date: Wed, 26 Jun 2024 07:31:30 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a21:b0:376:4cc6:66bc with SMTP id
- e9e14a558f8ab-3764cc668edmr8010995ab.2.1719408561527; Wed, 26 Jun 2024
- 06:29:21 -0700 (PDT)
-Date: Wed, 26 Jun 2024 06:29:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000088b5bc061bcb0009@google.com>
-Subject: [syzbot] [tipc?] general protection fault in tipc_mon_reinit_self (2)
-From: syzbot <syzbot+c13de708dc9a3bb8e9aa@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, jmaloy@redhat.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tipc-discussion@lists.sourceforge.net, ying.xue@windriver.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    b947cc5bf6d7 Merge tag 'erofs-for-6.9-rc7-fixes' of git://..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=147780a7180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3310e643b6ef5d69
-dashboard link: https://syzkaller.appspot.com/bug?extid=c13de708dc9a3bb8e9aa
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e05b77341eca/disk-b947cc5b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ad295493d850/vmlinux-b947cc5b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e7c8f23427a9/bzImage-b947cc5b.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c13de708dc9a3bb8e9aa@syzkaller.appspotmail.com
-
-tipc: Node number set to 10005162
-general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 1 PID: 927 Comm: kworker/1:2 Not tainted 6.9.0-rc6-syzkaller-00005-gb947cc5bf6d7 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Workqueue: events tipc_net_finalize_work
-RIP: 0010:tipc_mon_reinit_self+0x112/0x1e0 net/tipc/monitor.c:719
-Code: e4 ba ff ff 48 8d 78 10 48 89 f9 48 c1 e9 03 0f b6 0c 29 84 c9 74 09 80 f9 03 0f 8e a9 00 00 00 8b 48 10 4c 89 f0 48 c1 e8 03 <0f> b6 04 28 84 c0 74 04 3c 03 7e 7e 41 89 0e 4c 89 ff e8 67 55 6e
-RSP: 0018:ffffc900045cfbd8 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000000000098aaaa
-RDX: 1ffff110041af159 RSI: ffffffff8b0cb100 RDI: ffff88801f92c010
-RBP: dffffc0000000000 R08: 0000000000000000 R09: fffffbfff1f3e922
-R10: ffffffff8f9f4917 R11: 0000000000000003 R12: 0000000000000007
-R13: fffffbfff1f4293b R14: 0000000000000000 R15: ffff88802dc05010
-FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b3133f000 CR3: 000000005e626000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- tipc_net_finalize+0x10c/0x180 net/tipc/net.c:140
- process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3254
- process_scheduled_works kernel/workqueue.c:3335 [inline]
- worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
- kthread+0x2c1/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:tipc_mon_reinit_self+0x112/0x1e0 net/tipc/monitor.c:719
-Code: e4 ba ff ff 48 8d 78 10 48 89 f9 48 c1 e9 03 0f b6 0c 29 84 c9 74 09 80 f9 03 0f 8e a9 00 00 00 8b 48 10 4c 89 f0 48 c1 e8 03 <0f> b6 04 28 84 c0 74 04 3c 03 7e 7e 41 89 0e 4c 89 ff e8 67 55 6e
-RSP: 0018:ffffc900045cfbd8 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000000000098aaaa
-RDX: 1ffff110041af159 RSI: ffffffff8b0cb100 RDI: ffff88801f92c010
-RBP: dffffc0000000000 R08: 0000000000000000 R09: fffffbfff1f3e922
-R10: ffffffff8f9f4917 R11: 0000000000000003 R12: 0000000000000007
-R13: fffffbfff1f4293b R14: 0000000000000000 R15: ffff88802dc05010
-FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b3133f000 CR3: 000000005e626000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess), 1 bytes skipped:
-   0:	ba ff ff 48 8d       	mov    $0x8d48ffff,%edx
-   5:	78 10                	js     0x17
-   7:	48 89 f9             	mov    %rdi,%rcx
-   a:	48 c1 e9 03          	shr    $0x3,%rcx
-   e:	0f b6 0c 29          	movzbl (%rcx,%rbp,1),%ecx
-  12:	84 c9                	test   %cl,%cl
-  14:	74 09                	je     0x1f
-  16:	80 f9 03             	cmp    $0x3,%cl
-  19:	0f 8e a9 00 00 00    	jle    0xc8
-  1f:	8b 48 10             	mov    0x10(%rax),%ecx
-  22:	4c 89 f0             	mov    %r14,%rax
-  25:	48 c1 e8 03          	shr    $0x3,%rax
-* 29:	0f b6 04 28          	movzbl (%rax,%rbp,1),%eax <-- trapping instruction
-  2d:	84 c0                	test   %al,%al
-  2f:	74 04                	je     0x35
-  31:	3c 03                	cmp    $0x3,%al
-  33:	7e 7e                	jle    0xb3
-  35:	41 89 0e             	mov    %ecx,(%r14)
-  38:	4c 89 ff             	mov    %r15,%rdi
-  3b:	e8                   	.byte 0xe8
-  3c:	67 55                	addr32 push %rbp
-  3e:	6e                   	outsb  %ds:(%rsi),(%dx)
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: netdev@vger.kernel.org, Bjorn Andersson <andersson@kernel.org>, 
+ linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Konrad Dybcio <konrad.dybcio@linaro.org>, 
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20240625151430.34024-1-brgl@bgdev.pl>
+References: <20240625151430.34024-1-brgl@bgdev.pl>
+Message-Id: <171940832800.2961357.8252372269434038796.robh@kernel.org>
+Subject: Re: [PATCH v2 0/3] arm64: dts: qcom: sa8775p-ride: support both
+ board variants
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+On Tue, 25 Jun 2024 17:14:27 +0200, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> Split the current .dts into two: the existing one keeps the name and
+> supports revision 2 of the board while patch 2 adds a .dts for revision 3.
+> 
+> Changes since v1:
+> - add a new compatible for Rev3
+> 
+> Bartosz Golaszewski (3):
+>   dt-bindings: arm: qcom: add sa8775p-ride Rev 3
+>   arm64: dts: qcom: move common parts for sa8775p-ride variants into a
+>     .dtsi
+>   arm64: dts: qcom: sa8775p-ride-r3: add new board file
+> 
+>  .../devicetree/bindings/arm/qcom.yaml         |   1 +
+>  arch/arm64/boot/dts/qcom/Makefile             |   1 +
+>  arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dts  |  47 +
+>  arch/arm64/boot/dts/qcom/sa8775p-ride.dts     | 836 +-----------------
+>  arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi    | 814 +++++++++++++++++
+>  5 files changed, 885 insertions(+), 814 deletions(-)
+>  create mode 100644 arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dts
+>  create mode 100644 arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi
+> 
+> --
+> 2.43.0
+> 
+> 
+> 
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+My bot found new DTB warnings on the .dts files added or changed in this
+series.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
+are fixed by another series. Ultimately, it is up to the platform
+maintainer whether these warnings are acceptable or not. No need to reply
+unless the platform maintainer has comments.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+If you already ran DT checks and didn't see these error(s), then
+make sure dt-schema is up to date:
 
-If you want to undo deduplication, reply with:
-#syz undup
+  pip3 install dtschema --upgrade
+
+
+New warnings running 'make CHECK_DTBS=y qcom/sa8775p-ride-r3.dtb qcom/sa8775p-ride.dtb' for 20240625151430.34024-1-brgl@bgdev.pl:
+
+arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dtb: usb@a4f8800: interrupt-names: ['pwr_event', 'hs_phy_irq', 'dp_hs_phy_irq', 'dm_hs_phy_irq'] is too short
+	from schema $id: http://devicetree.org/schemas/usb/qcom,dwc3.yaml#
+arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dtb: rsc@18200000: 'power-domains' is a required property
+	from schema $id: http://devicetree.org/schemas/soc/qcom/qcom,rpmh-rsc.yaml#
+arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dtb: ethernet@23000000: tx-queues-config: 'snps,tx-sched-sp' does not match any of the regexes: '^queue[0-9]$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
+arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dtb: ethernet@23000000: phy-mode:0: 'ocsgmii' is not one of ['internal', 'mii', 'gmii', 'sgmii', 'psgmii', 'qsgmii', 'qusgmii', 'tbi', 'rev-mii', 'rmii', 'rev-rmii', 'moca', 'rgmii', 'rgmii-id', 'rgmii-rxid', 'rgmii-txid', 'rtbi', 'smii', 'xgmii', 'trgmii', '1000base-x', '2500base-x', '5gbase-r', 'rxaui', 'xaui', '10gbase-kr', 'usxgmii', '10gbase-r', '25gbase-r', '10g-qxgmii']
+	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
+arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dtb: ethernet@23000000: snps,pbl: [32] is not of type 'integer'
+	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
+arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dtb: ethernet@23000000: snps,pbl: [32] is not one of [1, 2, 4, 8, 16, 32]
+	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
+arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dtb: ethernet@23000000: Unevaluated properties are not allowed ('phy-handle', 'phy-mode', 'power-domains', 'rx-fifo-depth', 'rx-queues-config', 'snps,mtl-rx-config', 'snps,mtl-tx-config', 'snps,pbl', 'snps,ps-speed', 'snps,tso', 'tx-fifo-depth', 'tx-queues-config' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
+arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dtb: ethernet@23000000: phy-mode:0: 'ocsgmii' is not one of ['internal', 'mii', 'gmii', 'sgmii', 'psgmii', 'qsgmii', 'qusgmii', 'tbi', 'rev-mii', 'rmii', 'rev-rmii', 'moca', 'rgmii', 'rgmii-id', 'rgmii-rxid', 'rgmii-txid', 'rtbi', 'smii', 'xgmii', 'trgmii', '1000base-x', '2500base-x', '5gbase-r', 'rxaui', 'xaui', '10gbase-kr', 'usxgmii', '10gbase-r', '25gbase-r', '10g-qxgmii']
+	from schema $id: http://devicetree.org/schemas/net/ethernet-controller.yaml#
+arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dtb: ethernet@23040000: tx-queues-config: 'snps,tx-sched-sp' does not match any of the regexes: '^queue[0-9]$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
+arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dtb: ethernet@23040000: phy-mode:0: 'ocsgmii' is not one of ['internal', 'mii', 'gmii', 'sgmii', 'psgmii', 'qsgmii', 'qusgmii', 'tbi', 'rev-mii', 'rmii', 'rev-rmii', 'moca', 'rgmii', 'rgmii-id', 'rgmii-rxid', 'rgmii-txid', 'rtbi', 'smii', 'xgmii', 'trgmii', '1000base-x', '2500base-x', '5gbase-r', 'rxaui', 'xaui', '10gbase-kr', 'usxgmii', '10gbase-r', '25gbase-r', '10g-qxgmii']
+	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
+arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dtb: ethernet@23040000: snps,pbl: [32] is not of type 'integer'
+	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
+arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dtb: ethernet@23040000: snps,pbl: [32] is not one of [1, 2, 4, 8, 16, 32]
+	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
+arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dtb: ethernet@23040000: Unevaluated properties are not allowed ('mdio', 'phy-handle', 'phy-mode', 'power-domains', 'rx-fifo-depth', 'rx-queues-config', 'snps,mtl-rx-config', 'snps,mtl-tx-config', 'snps,pbl', 'snps,ps-speed', 'snps,tso', 'tx-fifo-depth', 'tx-queues-config' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/qcom,ethqos.yaml#
+arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dtb: ethernet@23040000: phy-mode:0: 'ocsgmii' is not one of ['internal', 'mii', 'gmii', 'sgmii', 'psgmii', 'qsgmii', 'qusgmii', 'tbi', 'rev-mii', 'rmii', 'rev-rmii', 'moca', 'rgmii', 'rgmii-id', 'rgmii-rxid', 'rgmii-txid', 'rtbi', 'smii', 'xgmii', 'trgmii', '1000base-x', '2500base-x', '5gbase-r', 'rxaui', 'xaui', '10gbase-kr', 'usxgmii', '10gbase-r', '25gbase-r', '10g-qxgmii']
+	from schema $id: http://devicetree.org/schemas/net/ethernet-controller.yaml#
+
+
+
+
+
 
