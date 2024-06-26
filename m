@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-106756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AE4E9178A6
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:12:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46A4A9178A8
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:12:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFC50B2194F
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 06:12:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9007B21A82
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 06:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047F314B07E;
-	Wed, 26 Jun 2024 06:12:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C580614C599;
+	Wed, 26 Jun 2024 06:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="LwBQoF01"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="dqpkTktD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7029E14AD0A
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 06:12:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3576138D
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 06:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719382342; cv=none; b=Da65vg9vld0d5weHukO3Nu6YuhldGOlvmABb2nj4rMGYhOFxDTKlUeC3UB4y/JjycNA4TfjqQLSa2L+uctKbo7LgQL6B59DCPFpn1VubuJhoRl5ox335PVK202EedTeGM2RA9hF4dQYeYjrVDbnATVNW1dTVVFSK7+ZBEiORoto=
+	t=1719382371; cv=none; b=laBMOfMyfOAvfXMujW6FFyK7RPYSr0EUsZYmbuci6mAFK7henxVT8zC1ZSoFmQzLqL4Py1Bc38zNCIGRN0YnTpsh1wtle+CfEjxuuVhfokSDVw5xPPi6PmZgPCvAesIjj3WFaUCQkd5dQ2K/9d5FqHFWhbekycQUxZpffPRzmoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719382342; c=relaxed/simple;
-	bh=3IHUnMysPIrsBbbMOJVZA/aR5LfcvHnEMCNFSRo5/G8=;
+	s=arc-20240116; t=1719382371; c=relaxed/simple;
+	bh=QCwUaoSI7q4KByEGxUOBExDGV31+V3qfzBd4y5DE/3g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dPiZxz1sdxovbCvgeHYbRavYDclrCXG9BI3AAUUc7uLfIAPgQTNb2WfBRBDzZCLdQXmJ0awehf2rePtBqsPdv4rsv/YaIy/bmhyTEQ/UdJVc/6J32HOvTAnLsa2R64aVEShjYD8nYZl/WlsIdhUs0CGsB+amU5nSCZ5wWOG032o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=LwBQoF01; arc=none smtp.client-ip=209.85.208.52
+	 In-Reply-To:Content-Type; b=DddEvf1COjRapagNe3OsGa9JnSg+nvUIqDgCHtvx4+iDbm1DSHrFd7FitRCLvaBSmTcXL+aYmT+Ieiq/Hf8Rns0fUJzluK01xzphq4aDec/m7eJByp6AK7fGa95Jt83asf2rGjJMw1hOzRFyGD8t/GtRjFBJ5Maj5QzKuhboNMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=dqpkTktD; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-57cf8880f95so7399123a12.3
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 23:12:21 -0700 (PDT)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-57d26a4ee65so6260805a12.2
+        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 23:12:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1719382340; x=1719987140; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1719382368; x=1719987168; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=De4Qa64Vy0xiCCjx+ckyEn5vgf1jElvReJSCZCiMh6U=;
-        b=LwBQoF01mQNdMTyeISRddbZ3hy81A81rTV9UY3gmi0N0mbuF5LosfLay1H2mIMgWgN
-         dLkXqf8SIX7AUeAHSeXXp5xTZ3oJ014Fl8IZe+FQGnjSPrVThtbNRIwBQhjYsyD5NUuh
-         HucUyrw0GpemZuxJngfZNkWZiB16QJPW0/3gK4VLLT5RDHyN+0eF9pnZScTwsFys6UYO
-         nTw7GfQ+ApTQ/QWTGT3RJgo2rNbLvu/0EPgqOSjoHJ199WImkUZxX8EsOO8D+Rie1LP+
-         t4ZZN4OYZ6aHCthlS2gJ1uzHdXFhgY1PIxekhX/EuhiHmjtx4zCviGdsUJDQXBhF8IMy
-         /8bw==
+        bh=Jz5BvTRcYsROqH3oi5fHfEWYRIupy3OOSnElngCn8v4=;
+        b=dqpkTktDZIE97Ab2nvM6ozrRZk8JRFP2fME7YSwC3nhLMHEkNbhdyQ/5LiyrNxDj4B
+         /dwCl/HcQs5Y7Drt7PajTW/uYzCnJ43uCttZTQfJ39+AZPHGw1ejLHMHXjxdKFdvjfHV
+         LEXjgX/+p1QefYoxsrnciV9i2m3Mi9HMfx2aYqdBFvdCy0oN1K60KLIYmoK3fVMHw3Jw
+         nJz/vG5PlXAa2Wtl9fMD/NvyTXlNX4MbDE26ffDW1JTN/e0gCEYLhIUwKr9gK7Yy4TWk
+         0QEE+T3p7p5Z5ge77kkvuyqohEYzIZiH3KtOxE0L5VGbY2hBesMmpUUyuwx7tE4qvzdJ
+         SLNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719382340; x=1719987140;
+        d=1e100.net; s=20230601; t=1719382368; x=1719987168;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=De4Qa64Vy0xiCCjx+ckyEn5vgf1jElvReJSCZCiMh6U=;
-        b=BQXKqX4tXv0CSjxvnT/MwltVKBWoe3g9jpWUNefQOnxHVkElT/duXFsoYwgSFIC1P3
-         FndHauM+vqv8b9YK0kL/9yAb+7RWZvuJ91PhjO3cMCDYjMHHE0dnOuQRiz8+gwITIxBA
-         UzQQX+vYVz9ghONJH/tzCtRxi7gaRKck1Q977S7D8aIcGmyxBHQQ5qQYZErMD14f3onR
-         Qta3t/vcGS0/QWfOkwEHttIb1QBoWWLXIqrJxUrskxKaIIeBt/YSUC6PYZvmvOmK9amu
-         W//YVNJfxAoMAXSI6akeYDLNfLMekRvO6E+ikHQWOvauPiba1J+aBYZdFcYLBGg5H0d5
-         Wckw==
-X-Forwarded-Encrypted: i=1; AJvYcCXXVl7jx4v8JJvpDW2rjC0c0kFnIJHU1SxleL7DAyhX6n0YLBA4VnTM2Pu7EneQ/guxzHonXbKvGTWZJQ7i0Zl8MLP5gh8m
-X-Gm-Message-State: AOJu0YwnoX10zlKy1qp+etFvAqgZc7z3QUoqmZIohPuf/UUkwpmVIPZc
-	FqP9PRfPKHI31vUeSif6LvwsE/xdxp6cPudlBOblkzStu88i1W4m43oxy7QTGIY=
-X-Google-Smtp-Source: AGHT+IFNEIF2xAwZ81aI1JLG9NfFixSsNfH8n+rPoMP6WihUXDTh/CDDfYYTAoM+X7piloN6WZIMiw==
-X-Received: by 2002:a50:ab56:0:b0:57d:69d:e6f8 with SMTP id 4fb4d7f45d1cf-57d4bd63273mr8259384a12.18.1719382339802;
-        Tue, 25 Jun 2024 23:12:19 -0700 (PDT)
+        bh=Jz5BvTRcYsROqH3oi5fHfEWYRIupy3OOSnElngCn8v4=;
+        b=IaJxHq0VKaSKjL5yHCkLOxyxhMY3CXULltdwimzOeMm0EVHSSdz9uh9f0x31EUr6+e
+         K7GgMzTv50hWsLGye7YCUt8e2mwPKqEaVSbBvKyPe6ow184GmT5mH7tkEJBO9SUHqizE
+         7+My0zXDTMCdWe+MBXA1OvFJ2In6FPYTUIKzhCSl/3es+SfKKwX56g2ndz53y2N5a0vp
+         3NiXG5RqdamV4Py/xYpzMQiuDHuBId9BN/Ct6XF1USCLdE5Va1IJIz3IkS6XLrhE1UAk
+         MnTmNZ1u/UcZs+VE2Z+jCgKSTTXa3sHfA5efjGyZVDa4F5RtUWksVebUgRUkOCqsKuTT
+         E5KA==
+X-Forwarded-Encrypted: i=1; AJvYcCUwHT46hw2Z3M2hhHkiIRL7OqnCAg3+tru/SLRz6ycdjEDovzzvAhAcgDO6ASvWb36YEc13QedpHDzIAG0TVMlHNWWbfhL8
+X-Gm-Message-State: AOJu0YzdJI6ac1kMr+U4L9/AGYpUK33LBlRsbZLJaeewzi8S28+wi4/a
+	NFsRwUmWNkwMI0eAz2OCmm7mkjgJ5RquWFRE89Pb5jfEijWZiROwtGQR7Y+JeAo=
+X-Google-Smtp-Source: AGHT+IHQhfBiHMkTP0SXBskFPNCsTfOuJqqud4AlvseRjNChrX80vmRhrNT2ZXc1RZa0CVTFEH/EDw==
+X-Received: by 2002:a05:6402:270c:b0:57d:6079:3916 with SMTP id 4fb4d7f45d1cf-57d607939edmr6437777a12.26.1719382368470;
+        Tue, 25 Jun 2024 23:12:48 -0700 (PDT)
 Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5827db501d9sm1266419a12.7.2024.06.25.23.12.19
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-582c03ff362sm1046120a12.92.2024.06.25.23.12.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jun 2024 23:12:19 -0700 (PDT)
-Message-ID: <08be9f68-09a2-40c2-aec8-7d24cf4febcd@blackwall.org>
-Date: Wed, 26 Jun 2024 09:12:18 +0300
+        Tue, 25 Jun 2024 23:12:47 -0700 (PDT)
+Message-ID: <e47210c0-0c9e-4ed4-8885-957f39deb7f4@blackwall.org>
+Date: Wed, 26 Jun 2024 09:12:47 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,27 +76,29 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 iproute2 1/3] ip: bridge: add support for mst_enabled
+Subject: Re: [PATCH v2 iproute2 2/3] bridge: vlan: Add support for setting a
+ VLANs MSTI
 To: Tobias Waldekranz <tobias@waldekranz.com>, stephen@networkplumber.org,
  dsahern@kernel.org
 Cc: liuhangbin@gmail.com, netdev@vger.kernel.org
 References: <20240624130035.3689606-1-tobias@waldekranz.com>
- <20240624130035.3689606-2-tobias@waldekranz.com>
+ <20240624130035.3689606-3-tobias@waldekranz.com>
 Content-Language: en-US
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20240624130035.3689606-2-tobias@waldekranz.com>
+In-Reply-To: <20240624130035.3689606-3-tobias@waldekranz.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 24/06/2024 16:00, Tobias Waldekranz wrote:
-> When enabled, the bridge's legacy per-VLAN STP facility is replaced
-> with the Multiple Spanning Tree Protocol (MSTP) compatible version.
+> Allow the user to associate one or more VLANs with a multiple spanning
+> tree instance (MSTI), when MST is enabled on the bridge.
 > 
 > Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
 > ---
->  ip/iplink_bridge.c    | 19 +++++++++++++++++++
->  man/man8/ip-link.8.in | 14 ++++++++++++++
->  2 files changed, 33 insertions(+)
+>  bridge/vlan.c     | 13 +++++++++++++
+>  man/man8/bridge.8 |  9 ++++++++-
+>  2 files changed, 21 insertions(+), 1 deletion(-)
+> 
 
 Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
