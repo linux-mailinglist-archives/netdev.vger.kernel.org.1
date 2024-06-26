@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-106878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57A72917EDC
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:51:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61914917EE2
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:52:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D80631F29822
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:51:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1772228BBDD
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A147717F374;
-	Wed, 26 Jun 2024 10:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B33717C21B;
+	Wed, 26 Jun 2024 10:50:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="gxrbRWRu"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="K4nrGKOX"
 X-Original-To: netdev@vger.kernel.org
 Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77DFC17E917;
-	Wed, 26 Jun 2024 10:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD7BE1552F6;
+	Wed, 26 Jun 2024 10:50:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719398974; cv=none; b=HBNbgu8RLknDCN13oSUtULEPYxMXDA2ejKSYAbAZ2IO8vErg+WUNoEKkI2thSUV9fTim9bXsbs6xqcYqNGnhPe7jJSfrm1YtyG4+rxeqjMOFpC1w6nXRx2exf9PqqU1OAqe/g3AsqvjN0U553JW2ujd+JKbossZu7I4lLkgIpew=
+	t=1719399055; cv=none; b=fLIEnQT1bPDyU7CVLyqBBYmDQUWK7sDkLA4Uy3JcHkY6xtkufgWYyHxXUDYbkBJVSVAIdWSGTmuRqPXaptBvlr6cdw/DWuA3Nq05+/2MNQGNgPpdpiyiBgjdNKtuMH6m7qIDFt4JQ9CIs2t7sW7xN0zAXcuLpfzcpeE5XbRFhN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719398974; c=relaxed/simple;
-	bh=qLsaKtCYnUzq0nXL+azhAqq1n1fTZrIIiNimkfTTjm4=;
+	s=arc-20240116; t=1719399055; c=relaxed/simple;
+	bh=9GsEHlLKummb39BYPb2EmSZyqxrQP04qPkU+YXZfOv0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MHTBblf7cpzQNjz7KqtYiy94atdW0WXhWucnK9CewzepxeSheJK2znvrqg8Md2xwQ7rAneubvhReubjn5wniZaBRsMjWZ4Rp9RWlq7K1OAkYq7cDQ6QXqwaevAWCZ/09c48Rxd1caaM1WosGhCZ2ZpHQBV1X2COOK4gIPxe+Juw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=gxrbRWRu; arc=none smtp.client-ip=210.61.82.184
+	 MIME-Version:Content-Type; b=RLEs0MXLpxR7jl6LFGk2E5aS95kxyN+C5UDml8tA4CJbtJgAIVzTbchN3DcISgR+JskyDMzJbP5MYiXMCiuHa09aiugieCdbqdBZp0ye2JLG7J+ZPjAAfQbqEvuovA9tE8TSl9VjJXaxzS37/SrGeGtRvAg9AXHJyy9aNiH4gXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=K4nrGKOX; arc=none smtp.client-ip=210.61.82.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: c137a73c33a911ef99dc3f8fac2c3230-20240626
+X-UUID: ef71d71c33a911ef99dc3f8fac2c3230-20240626
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=jgdxjlgqPjA+N/a60WUCAtQK9GZWi4HYoDxh9IrR7fI=;
-	b=gxrbRWRu/7sWO4jJB0JM6fYJtYgbC98zv0m8zAB27pT94TyYIQmdctOLPppGof2JBAJJYeMUF9jO2Opypw8pSIy4Ath4XRjpyFpQoxTiIB5Za7w4A8pCTMDvR9B7CIaNOZiTevGbsLy/ebLeBF1boA4FHnt+0TUGs7E7IvgSm0k=;
+	h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=MnPZzZJ/bgXv9mUEPH5dqOHMlZ9UJhLWHlCiCxLI8Rk=;
+	b=K4nrGKOX3qp+AjZfRvyH30dFqC7de2U2EeKYMVZQRDD0mg9NU6PWTiMNciwS26G6PR6S+5+ZyJ/Y8WqZtqXzXOpERTgMyOfwhq9W9B1MX0pOz89/v+aF7UEuPA/Un3YsYXarOjJRv29NPjcX+bZUyjiHnMZvaJ3i4YIFtcbOHLs=;
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.39,REQID:a5381a1b-0385-465c-ba57-d75b4b683c11,IP:0,U
+X-CID-O-INFO: VERSION:1.1.39,REQID:7873f96e-dbba-4e8c-9888-73c025661db1,IP:0,U
 	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
 	release,TS:0
-X-CID-META: VersionHash:393d96e,CLOUDID:d74a0c45-4544-4d06-b2b2-d7e12813c598,B
+X-CID-META: VersionHash:393d96e,CLOUDID:c4ef7594-e2c0-40b0-a8fe-7c7e47299109,B
 	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:1,EDM:-3,IP:nil,U
 	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
 	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
 X-CID-BVR: 0
 X-CID-BAS: 0,_,0,_
 X-CID-FACTOR: TF_CID_SPAM_ULN,TF_CID_SPAM_SNR
-X-UUID: c137a73c33a911ef99dc3f8fac2c3230-20240626
-Received: from mtkmbs14n1.mediatek.inc [(172.21.101.75)] by mailgw02.mediatek.com
+X-UUID: ef71d71c33a911ef99dc3f8fac2c3230-20240626
+Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw02.mediatek.com
 	(envelope-from <skylake.huang@mediatek.com>)
 	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1852441585; Wed, 26 Jun 2024 18:49:25 +0800
+	with ESMTP id 446949273; Wed, 26 Jun 2024 18:50:43 +0800
 Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
+ mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 26 Jun 2024 18:49:23 +0800
+ 15.2.1118.26; Wed, 26 Jun 2024 18:50:41 +0800
 Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
  mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Wed, 26 Jun 2024 18:49:23 +0800
+ 15.2.1118.26 via Frontend Transport; Wed, 26 Jun 2024 18:50:41 +0800
 From: Sky Huang <SkyLake.Huang@mediatek.com>
 To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>, "David S. Miller"
@@ -70,9 +70,9 @@ To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
 CC: Steven Liu <Steven.Liu@mediatek.com>, SkyLake.Huang
 	<skylake.huang@mediatek.com>
-Subject: [PATCH net-next v9 08/13] net: phy: mediatek: Change mtk-ge-soc.c line wrapping
-Date: Wed, 26 Jun 2024 18:43:24 +0800
-Message-ID: <20240626104329.11426-9-SkyLake.Huang@mediatek.com>
+Subject: [PATCH net-next v9 09/13] net: phy: mediatek: Add token ring access helper functions in mtk-phy-lib
+Date: Wed, 26 Jun 2024 18:43:25 +0800
+Message-ID: <20240626104329.11426-10-SkyLake.Huang@mediatek.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20240626104329.11426-1-SkyLake.Huang@mediatek.com>
 References: <20240626104329.11426-1-SkyLake.Huang@mediatek.com>
@@ -83,202 +83,625 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-AS-Result: No-10--3.130700-8.000000
-X-TMASE-MatchedRID: ptJ0KTv/UXA9d1nHWxkekOKXavbHY/C1Ct59Uh3p/NWiXe5nNnUYtyAO
-	g9E37d4vvT6pHvydqvemGallF1XuaE6M27pFjx1L7spMO3HwKCAEa8g1x8eqFz6BH6zbVSRYW+v
-	0m5ycBq8e3c05NORFxx0BvcHhKs9ujNCnuZyJlEhH+PTjR9EWkvTcf8Av+QSAmyiLZetSf8mfop
-	0ytGwvXiq2rl3dzGQ1VZLvl77XgncBHu70Y56PL/xrHMwUkSRUrtjPkyE1bgMbqn+ZdF0SF+jCd
-	5IpKCDuW2XZLBse18l3EtoBQLXwIaN3P9GaabqVr9cWg8rSFn10BNB20+SxH7f8mJY57oZddJaB
-	DYald1mHO0tVYDV4T0MMprcbiest
-X-TM-AS-User-Approved-Sender: No
-X-TM-AS-User-Blocked-Sender: No
-X-TMASE-Result: 10--3.130700-8.000000
-X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-SNTS-SMTP: C94014AC9CBB8B543986B9CDA681B0E4E028D6C870BFCB3A1D38798EE6A89D242000:8
 X-MTK: N
 
 From: "SkyLake.Huang" <skylake.huang@mediatek.com>
 
-This patch shrinks mtk-ge-soc.c line wrapping to 80 characters.
+This patch adds TR(token ring) manipulations and adds correct
+macro names for those magic numbers. TR is a way to access
+proprietary registers on page 52b5. Use these helper functions
+so we can see which fields we're going to modify/set/clear.
+
+This patch doesn't really change registers' settings but just
+enhances readability and maintainability.
 
 Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
 ---
- drivers/net/phy/mediatek/mtk-ge-soc.c | 67 +++++++++++++++++----------
- 1 file changed, 42 insertions(+), 25 deletions(-)
+ drivers/net/phy/mediatek/mtk-ge-soc.c  | 297 ++++++++++++++++---------
+ drivers/net/phy/mediatek/mtk-ge.c      |  82 +++++--
+ drivers/net/phy/mediatek/mtk-phy-lib.c |  91 ++++++++
+ drivers/net/phy/mediatek/mtk.h         |  13 ++
+ 4 files changed, 358 insertions(+), 125 deletions(-)
 
 diff --git a/drivers/net/phy/mediatek/mtk-ge-soc.c b/drivers/net/phy/mediatek/mtk-ge-soc.c
-index 26c2183..cb6838b 100644
+index cb6838b..71d29de 100644
 --- a/drivers/net/phy/mediatek/mtk-ge-soc.c
 +++ b/drivers/net/phy/mediatek/mtk-ge-soc.c
-@@ -295,7 +295,8 @@ static int cal_cycle(struct phy_device *phydev, int devad,
- 	ret = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
- 					MTK_PHY_RG_AD_CAL_CLK, reg_val,
- 					reg_val & MTK_PHY_DA_CAL_CLK, 500,
--					ANALOG_INTERNAL_OPERATION_MAX_US, false);
-+					ANALOG_INTERNAL_OPERATION_MAX_US,
-+					false);
- 	if (ret) {
- 		phydev_err(phydev, "Calibration cycle timeout\n");
- 		return ret;
-@@ -304,7 +305,7 @@ static int cal_cycle(struct phy_device *phydev, int devad,
- 	phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_RG_AD_CALIN,
- 			   MTK_PHY_DA_CALIN_FLAG);
- 	ret = phy_read_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_RG_AD_CAL_COMP) >>
--			   MTK_PHY_AD_CAL_COMP_OUT_SHIFT;
-+	      MTK_PHY_AD_CAL_COMP_OUT_SHIFT;
- 	phydev_dbg(phydev, "cal_val: 0x%x, ret: %d\n", cal_val, ret);
+@@ -24,7 +24,108 @@
+ #define MTK_PHY_SMI_DET_ON_THRESH_MASK		GENMASK(13, 8)
  
- 	return ret;
-@@ -394,38 +395,46 @@ static int tx_amp_fill_result(struct phy_device *phydev, u16 *buf)
+ #define MTK_PHY_PAGE_EXTENDED_2A30		0x2a30
+-#define MTK_PHY_PAGE_EXTENDED_52B5		0x52b5
++
++/* Registers on Token Ring debug nodes */
++/* ch_addr = 0x0, node_addr = 0x7, data_addr = 0x15 */
++/* NormMseLoThresh */
++#define NORMAL_MSE_LO_THRESH_MASK		GENMASK(15, 8)
++
++/* ch_addr = 0x0, node_addr = 0xf, data_addr = 0x3c */
++/* RemAckCntLimitCtrl */
++#define REMOTE_ACK_COUNT_LIMIT_CTRL_MASK	GENMASK(2, 1)
++
++/* ch_addr = 0x1, node_addr = 0xd, data_addr = 0x20 */
++/* VcoSlicerThreshBitsHigh */
++#define VCO_SLICER_THRESH_HIGH_MASK		GENMASK(23, 0)
++
++/* ch_addr = 0x1, node_addr = 0xf, data_addr = 0x0 */
++/* DfeTailEnableVgaThresh1000 */
++#define DFE_TAIL_EANBLE_VGA_TRHESH_1000		GENMASK(5, 1)
++
++/* ch_addr = 0x1, node_addr = 0xf, data_addr = 0x1 */
++/* MrvlTrFix100Kp */
++#define MRVL_TR_FIX_100KP_MASK			GENMASK(22, 20)
++/* MrvlTrFix100Kf */
++#define MRVL_TR_FIX_100KF_MASK			GENMASK(19, 17)
++/* MrvlTrFix1000Kp */
++#define MRVL_TR_FIX_1000KP_MASK			GENMASK(16, 14)
++/* MrvlTrFix1000Kf */
++#define MRVL_TR_FIX_1000KF_MASK			GENMASK(13, 11)
++
++/* ch_addr = 0x1, node_addr = 0xf, data_addr = 0x12 */
++/* VgaDecRate */
++#define VGA_DECIMATION_RATE_MASK		GENMASK(8, 5)
++
++/* ch_addr = 0x1, node_addr = 0xf, data_addr = 0x17 */
++/* SlvDSPreadyTime */
++#define SLAVE_DSP_READY_TIME_MASK		GENMASK(22, 15)
++/* MasDSPreadyTime */
++#define MASTER_DSP_READY_TIME_MASK		GENMASK(14, 7)
++
++/* ch_addr = 0x1, node_addr = 0xf, data_addr = 0x18 */
++/* EnabRandUpdTrig */
++#define ENABLE_RANDOM_UPDOWN_COUNTER_TRIGGER	BIT(8)
++
++/* ch_addr = 0x1, node_addr = 0xf, data_addr = 0x20 */
++/* ResetSyncOffset */
++#define RESET_SYNC_OFFSET_MASK			GENMASK(11, 8)
++
++/* ch_addr = 0x2, node_addr = 0xd, data_addr = 0x0 */
++/* FfeUpdGainForceVal */
++#define FFE_UPDATE_GAIN_FORCE_VAL_MASK		GENMASK(9, 7)
++/* FfeUpdGainForce */
++#define FFE_UPDATE_GAIN_FORCE			BIT(6)
++
++/* ch_addr = 0x2, node_addr = 0xd, data_addr = 0x3 */
++/* TrFreeze */
++#define TR_FREEZE_MASK				GENMASK(11, 0)
++
++/* ch_addr = 0x2, node_addr = 0xd, data_addr = 0x6 */
++/* SS: Steady-state, KP: Proportional Gain */
++/* SSTrKp100 */
++#define SS_TR_KP100_MASK			GENMASK(21, 19)
++/* SSTrKf100 */
++#define SS_TR_KF100_MASK			GENMASK(18, 16)
++/* SSTrKp1000Mas */
++#define SS_TR_KP1000_MASTER_MASK		GENMASK(15, 13)
++/* SSTrKf1000Mas */
++#define SS_TR_KF1000_MASTER_MASK		GENMASK(12, 10)
++/* SSTrKp1000Slv */
++#define SS_TR_KP1000_SLAVE_MASK			GENMASK(9, 7)
++/* SSTrKf1000Slv */
++#define SS_TR_KF1000_SLAVE_MASK			GENMASK(6, 4)
++
++/* ch_addr = 0x2, node_addr = 0xd, data_addr = 0x8 */
++/* clear this bit if wanna select from AFE */
++/* Regsigdet_sel_1000 */
++#define EEE1000_SELECT_SIGNAL_DETECTION_FROM_DFE	BIT(4)
++
++/* ch_addr = 0x2, node_addr = 0xd, data_addr = 0xd */
++/* RegEEE_st2TrKf1000 */
++#define EEE1000_STAGE2_TR_KF_MASK		GENMASK(13, 11)
++
++/* ch_addr = 0x2, node_addr = 0xd, data_addr = 0xf */
++/* RegEEE_slv_waketr_timer_tar */
++#define SLAVE_WAKETR_TIMER_MASK			GENMASK(20, 11)
++/* RegEEE_slv_remtx_timer_tar */
++#define SLAVE_REMTX_TIMER_MASK			GENMASK(10, 1)
++
++/* ch_addr = 0x2, node_addr = 0xd, data_addr = 0x10 */
++/* RegEEE_slv_wake_int_timer_tar */
++#define SLAVE_WAKEINT_TIMER_MASK		GENMASK(10, 1)
++
++/* ch_addr = 0x2, node_addr = 0xd, data_addr = 0x14 */
++/* RegEEE_trfreeze_timer2 */
++#define TR_FREEZE_TIMER2_MASK			GENMASK(9, 0)
++
++/* ch_addr = 0x2, node_addr = 0xd, data_addr = 0x1c */
++/* RegEEE100Stg1_tar */
++#define EEE100_LPSYNC_STAGE1_UPDATE_TIMER_MASK	GENMASK(8, 0)
++
++/* ch_addr = 0x2, node_addr = 0xd, data_addr = 0x25 */
++/* REGEEE_wake_slv_tr_wait_dfesigdet_en */
++#define WAKE_SLAVE_TR_WAIT_DFE_DETECTION_EN	BIT(11)
++
+ 
+ #define ANALOG_INTERNAL_OPERATION_MAX_US	20
+ #define TXRESERVE_MIN				0
+@@ -679,40 +780,36 @@ static int tx_vcm_cal_sw(struct phy_device *phydev, u8 rg_txreserve_x)
+ static void mt798x_phy_common_finetune(struct phy_device *phydev)
+ {
+ 	phy_select_page(phydev, MTK_PHY_PAGE_EXTENDED_52B5);
+-	/* SlvDSPreadyTime = 24, MasDSPreadyTime = 24 */
+-	__phy_write(phydev, 0x11, 0xc71);
+-	__phy_write(phydev, 0x12, 0xc);
+-	__phy_write(phydev, 0x10, 0x8fae);
+-
+-	/* EnabRandUpdTrig = 1 */
+-	__phy_write(phydev, 0x11, 0x2f00);
+-	__phy_write(phydev, 0x12, 0xe);
+-	__phy_write(phydev, 0x10, 0x8fb0);
+-
+-	/* NormMseLoThresh = 85 */
+-	__phy_write(phydev, 0x11, 0x55a0);
+-	__phy_write(phydev, 0x12, 0x0);
+-	__phy_write(phydev, 0x10, 0x83aa);
+-
+-	/* FfeUpdGainForce = 1(Enable), FfeUpdGainForceVal = 4 */
+-	__phy_write(phydev, 0x11, 0x240);
+-	__phy_write(phydev, 0x12, 0x0);
+-	__phy_write(phydev, 0x10, 0x9680);
+-
+-	/* TrFreeze = 0 (mt7988 default) */
+-	__phy_write(phydev, 0x11, 0x0);
+-	__phy_write(phydev, 0x12, 0x0);
+-	__phy_write(phydev, 0x10, 0x9686);
+-
+-	/* SSTrKp100 = 5 */
+-	/* SSTrKf100 = 6 */
+-	/* SSTrKp1000Mas = 5 */
+-	/* SSTrKf1000Mas = 6 */
+-	/* SSTrKp1000Slv = 5 */
+-	/* SSTrKf1000Slv = 6 */
+-	__phy_write(phydev, 0x11, 0xbaef);
+-	__phy_write(phydev, 0x12, 0x2e);
+-	__phy_write(phydev, 0x10, 0x968c);
++	__mtk_tr_modify(phydev, 0x1, 0xf, 0x17,
++			SLAVE_DSP_READY_TIME_MASK | MASTER_DSP_READY_TIME_MASK,
++			FIELD_PREP(SLAVE_DSP_READY_TIME_MASK, 0x18) |
++			FIELD_PREP(MASTER_DSP_READY_TIME_MASK, 0x18));
++
++	__mtk_tr_set_bits(phydev, 0x1, 0xf, 0x18,
++			  ENABLE_RANDOM_UPDOWN_COUNTER_TRIGGER);
++
++	__mtk_tr_modify(phydev, 0x0, 0x7, 0x15,
++			NORMAL_MSE_LO_THRESH_MASK,
++			FIELD_PREP(NORMAL_MSE_LO_THRESH_MASK, 0x55));
++
++	__mtk_tr_modify(phydev, 0x2, 0xd, 0x0,
++			FFE_UPDATE_GAIN_FORCE_VAL_MASK,
++			FIELD_PREP(FFE_UPDATE_GAIN_FORCE_VAL_MASK, 0x4) |
++				   FFE_UPDATE_GAIN_FORCE);
++
++	__mtk_tr_clr_bits(phydev, 0x2, 0xd, 0x3, TR_FREEZE_MASK);
++
++	__mtk_tr_modify(phydev, 0x2, 0xd, 0x6,
++			SS_TR_KP100_MASK | SS_TR_KF100_MASK |
++			SS_TR_KP1000_MASTER_MASK | SS_TR_KF1000_MASTER_MASK |
++			SS_TR_KP1000_SLAVE_MASK | SS_TR_KF1000_SLAVE_MASK,
++			FIELD_PREP(SS_TR_KP100_MASK, 0x5) |
++			FIELD_PREP(SS_TR_KF100_MASK, 0x6) |
++			FIELD_PREP(SS_TR_KP1000_MASTER_MASK, 0x5) |
++			FIELD_PREP(SS_TR_KF1000_MASTER_MASK, 0x6) |
++			FIELD_PREP(SS_TR_KP1000_SLAVE_MASK, 0x5) |
++			FIELD_PREP(SS_TR_KF1000_SLAVE_MASK, 0x6));
++
+ 	phy_restore_page(phydev, MTK_PHY_PAGE_STANDARD, 0);
+ }
+ 
+@@ -735,27 +832,29 @@ static void mt7981_phy_finetune(struct phy_device *phydev)
  	}
  
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TXVLD_DA_RG,
--		       MTK_PHY_DA_TX_I2MPB_A_GBE_MASK, (buf[0] + bias[0]) << 10);
-+		       MTK_PHY_DA_TX_I2MPB_A_GBE_MASK,
-+		       (buf[0] + bias[0]) << 10);
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TXVLD_DA_RG,
- 		       MTK_PHY_DA_TX_I2MPB_A_TBT_MASK, buf[0] + bias[1]);
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TX_I2MPB_TEST_MODE_A2,
--		       MTK_PHY_DA_TX_I2MPB_A_HBT_MASK, (buf[0] + bias[2]) << 10);
-+		       MTK_PHY_DA_TX_I2MPB_A_HBT_MASK,
-+		       (buf[0] + bias[2]) << 10);
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TX_I2MPB_TEST_MODE_A2,
- 		       MTK_PHY_DA_TX_I2MPB_A_TST_MASK, buf[0] + bias[3]);
+ 	phy_select_page(phydev, MTK_PHY_PAGE_EXTENDED_52B5);
+-	/* ResetSyncOffset = 6 */
+-	__phy_write(phydev, 0x11, 0x600);
+-	__phy_write(phydev, 0x12, 0x0);
+-	__phy_write(phydev, 0x10, 0x8fc0);
++	__mtk_tr_modify(phydev, 0x1, 0xf, 0x20,
++			RESET_SYNC_OFFSET_MASK,
++			FIELD_PREP(RESET_SYNC_OFFSET_MASK, 0x6));
  
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TX_I2MPB_TEST_MODE_B1,
--		       MTK_PHY_DA_TX_I2MPB_B_GBE_MASK, (buf[1] + bias[4]) << 8);
-+		       MTK_PHY_DA_TX_I2MPB_B_GBE_MASK,
-+		       (buf[1] + bias[4]) << 8);
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TX_I2MPB_TEST_MODE_B1,
- 		       MTK_PHY_DA_TX_I2MPB_B_TBT_MASK, buf[1] + bias[5]);
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TX_I2MPB_TEST_MODE_B2,
--		       MTK_PHY_DA_TX_I2MPB_B_HBT_MASK, (buf[1] + bias[6]) << 8);
-+		       MTK_PHY_DA_TX_I2MPB_B_HBT_MASK,
-+		       (buf[1] + bias[6]) << 8);
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TX_I2MPB_TEST_MODE_B2,
- 		       MTK_PHY_DA_TX_I2MPB_B_TST_MASK, buf[1] + bias[7]);
+-	/* VgaDecRate = 1 */
+-	__phy_write(phydev, 0x11, 0x4c2a);
+-	__phy_write(phydev, 0x12, 0x3e);
+-	__phy_write(phydev, 0x10, 0x8fa4);
++	__mtk_tr_modify(phydev, 0x1, 0xf, 0x12,
++			VGA_DECIMATION_RATE_MASK,
++			FIELD_PREP(VGA_DECIMATION_RATE_MASK, 0x1));
  
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TX_I2MPB_TEST_MODE_C1,
--		       MTK_PHY_DA_TX_I2MPB_C_GBE_MASK, (buf[2] + bias[8]) << 8);
-+		       MTK_PHY_DA_TX_I2MPB_C_GBE_MASK,
-+		       (buf[2] + bias[8]) << 8);
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TX_I2MPB_TEST_MODE_C1,
- 		       MTK_PHY_DA_TX_I2MPB_C_TBT_MASK, buf[2] + bias[9]);
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TX_I2MPB_TEST_MODE_C2,
--		       MTK_PHY_DA_TX_I2MPB_C_HBT_MASK, (buf[2] + bias[10]) << 8);
-+		       MTK_PHY_DA_TX_I2MPB_C_HBT_MASK,
-+		       (buf[2] + bias[10]) << 8);
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TX_I2MPB_TEST_MODE_C2,
- 		       MTK_PHY_DA_TX_I2MPB_C_TST_MASK, buf[2] + bias[11]);
- 
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TX_I2MPB_TEST_MODE_D1,
--		       MTK_PHY_DA_TX_I2MPB_D_GBE_MASK, (buf[3] + bias[12]) << 8);
-+		       MTK_PHY_DA_TX_I2MPB_D_GBE_MASK,
-+		       (buf[3] + bias[12]) << 8);
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TX_I2MPB_TEST_MODE_D1,
- 		       MTK_PHY_DA_TX_I2MPB_D_TBT_MASK, buf[3] + bias[13]);
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TX_I2MPB_TEST_MODE_D2,
--		       MTK_PHY_DA_TX_I2MPB_D_HBT_MASK, (buf[3] + bias[14]) << 8);
-+		       MTK_PHY_DA_TX_I2MPB_D_HBT_MASK,
-+		       (buf[3] + bias[14]) << 8);
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TX_I2MPB_TEST_MODE_D2,
- 		       MTK_PHY_DA_TX_I2MPB_D_TST_MASK, buf[3] + bias[15]);
- 
-@@ -616,7 +625,8 @@ static int tx_vcm_cal_sw(struct phy_device *phydev, u8 rg_txreserve_x)
- 		goto restore;
- 
- 	/* We calibrate TX-VCM in different logic. Check upper index and then
--	 * lower index. If this calibration is valid, apply lower index's result.
-+	 * lower index. If this calibration is valid, apply lower index's
-+	 * result.
+ 	/* MrvlTrFix100Kp = 3, MrvlTrFix100Kf = 2,
+ 	 * MrvlTrFix1000Kp = 3, MrvlTrFix1000Kf = 2
  	 */
- 	ret = upper_ret - lower_ret;
- 	if (ret == 1) {
-@@ -645,7 +655,8 @@ static int tx_vcm_cal_sw(struct phy_device *phydev, u8 rg_txreserve_x)
- 	} else if (upper_idx == TXRESERVE_MAX && upper_ret == 0 &&
- 		   lower_ret == 0) {
- 		ret = 0;
--		phydev_warn(phydev, "TX-VCM SW cal result at high margin 0x%x\n",
-+		phydev_warn(phydev,
-+			    "TX-VCM SW cal result at high margin 0x%x\n",
- 			    upper_idx);
- 	} else {
- 		ret = -EINVAL;
-@@ -749,7 +760,8 @@ static void mt7981_phy_finetune(struct phy_device *phydev)
+-	__phy_write(phydev, 0x11, 0xd10a);
+-	__phy_write(phydev, 0x12, 0x34);
+-	__phy_write(phydev, 0x10, 0x8f82);
++	__mtk_tr_modify(phydev, 0x1, 0xf, 0x1,
++			MRVL_TR_FIX_100KP_MASK | MRVL_TR_FIX_100KF_MASK |
++			MRVL_TR_FIX_1000KP_MASK | MRVL_TR_FIX_1000KF_MASK,
++			FIELD_PREP(MRVL_TR_FIX_100KP_MASK, 0x3) |
++			FIELD_PREP(MRVL_TR_FIX_100KF_MASK, 0x2) |
++			FIELD_PREP(MRVL_TR_FIX_1000KP_MASK, 0x3) |
++			FIELD_PREP(MRVL_TR_FIX_1000KF_MASK, 0x2));
+ 
+ 	/* VcoSlicerThreshBitsHigh */
+-	__phy_write(phydev, 0x11, 0x5555);
+-	__phy_write(phydev, 0x12, 0x55);
+-	__phy_write(phydev, 0x10, 0x8ec0);
++	__mtk_tr_modify(phydev, 0x1, 0xd, 0x20,
++			VCO_SLICER_THRESH_HIGH_MASK,
++			FIELD_PREP(VCO_SLICER_THRESH_HIGH_MASK, 0x555555));
+ 	phy_restore_page(phydev, MTK_PHY_PAGE_STANDARD, 0);
  
  	/* TR_OPEN_LOOP_EN = 1, lpf_x_average = 9 */
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_RG_DEV1E_REG234,
--		       MTK_PHY_TR_OPEN_LOOP_EN_MASK | MTK_PHY_LPF_X_AVERAGE_MASK,
-+		       MTK_PHY_TR_OPEN_LOOP_EN_MASK |
-+		       MTK_PHY_LPF_X_AVERAGE_MASK,
- 		       BIT(0) | FIELD_PREP(MTK_PHY_LPF_X_AVERAGE_MASK, 0x9));
+@@ -807,25 +906,23 @@ static void mt7988_phy_finetune(struct phy_device *phydev)
+ 	phy_write_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_RG_TX_FILTER, 0x5);
  
- 	/* rg_tr_lpf_cnt_val = 512 */
-@@ -818,7 +830,8 @@ static void mt7988_phy_finetune(struct phy_device *phydev)
+ 	phy_select_page(phydev, MTK_PHY_PAGE_EXTENDED_52B5);
+-	/* ResetSyncOffset = 5 */
+-	__phy_write(phydev, 0x11, 0x500);
+-	__phy_write(phydev, 0x12, 0x0);
+-	__phy_write(phydev, 0x10, 0x8fc0);
++	__mtk_tr_modify(phydev, 0x1, 0xf, 0x20,
++			RESET_SYNC_OFFSET_MASK,
++			FIELD_PREP(RESET_SYNC_OFFSET_MASK, 0x5));
+ 
+ 	/* VgaDecRate is 1 at default on mt7988 */
+ 
+-	/* MrvlTrFix100Kp = 6, MrvlTrFix100Kf = 7,
+-	 * MrvlTrFix1000Kp = 6, MrvlTrFix1000Kf = 7
+-	 */
+-	__phy_write(phydev, 0x11, 0xb90a);
+-	__phy_write(phydev, 0x12, 0x6f);
+-	__phy_write(phydev, 0x10, 0x8f82);
+-
+-	/* RemAckCntLimitCtrl = 1 */
+-	__phy_write(phydev, 0x11, 0xfbba);
+-	__phy_write(phydev, 0x12, 0xc3);
+-	__phy_write(phydev, 0x10, 0x87f8);
+-
++	__mtk_tr_modify(phydev, 0x1, 0xf, 0x1,
++			MRVL_TR_FIX_100KP_MASK | MRVL_TR_FIX_100KF_MASK |
++			MRVL_TR_FIX_1000KP_MASK | MRVL_TR_FIX_1000KF_MASK,
++			FIELD_PREP(MRVL_TR_FIX_100KP_MASK, 0x6) |
++			FIELD_PREP(MRVL_TR_FIX_100KF_MASK, 0x7) |
++			FIELD_PREP(MRVL_TR_FIX_1000KP_MASK, 0x6) |
++			FIELD_PREP(MRVL_TR_FIX_1000KF_MASK, 0x7));
++
++	__mtk_tr_modify(phydev, 0x0, 0xf, 0x3c,
++			REMOTE_ACK_COUNT_LIMIT_CTRL_MASK,
++			FIELD_PREP(REMOTE_ACK_COUNT_LIMIT_CTRL_MASK, 0x1));
+ 	phy_restore_page(phydev, MTK_PHY_PAGE_STANDARD, 0);
  
  	/* TR_OPEN_LOOP_EN = 1, lpf_x_average = 10 */
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_RG_DEV1E_REG234,
--		       MTK_PHY_TR_OPEN_LOOP_EN_MASK | MTK_PHY_LPF_X_AVERAGE_MASK,
-+		       MTK_PHY_TR_OPEN_LOOP_EN_MASK |
-+		       MTK_PHY_LPF_X_AVERAGE_MASK,
- 		       BIT(0) | FIELD_PREP(MTK_PHY_LPF_X_AVERAGE_MASK, 0xa));
+@@ -901,45 +998,37 @@ static void mt798x_phy_eee(struct phy_device *phydev)
+ 			 MTK_PHY_TR_READY_SKIP_AFE_WAKEUP);
  
- 	/* rg_tr_lpf_cnt_val = 1023 */
-@@ -930,7 +943,8 @@ static void mt798x_phy_eee(struct phy_device *phydev)
+ 	phy_select_page(phydev, MTK_PHY_PAGE_EXTENDED_52B5);
+-	/* Regsigdet_sel_1000 = 0 */
+-	__phy_write(phydev, 0x11, 0xb);
+-	__phy_write(phydev, 0x12, 0x0);
+-	__phy_write(phydev, 0x10, 0x9690);
+-
+-	/* REG_EEE_st2TrKf1000 = 2 */
+-	__phy_write(phydev, 0x11, 0x114f);
+-	__phy_write(phydev, 0x12, 0x2);
+-	__phy_write(phydev, 0x10, 0x969a);
+-
+-	/* RegEEE_slv_wake_tr_timer_tar = 6, RegEEE_slv_remtx_timer_tar = 20 */
+-	__phy_write(phydev, 0x11, 0x3028);
+-	__phy_write(phydev, 0x12, 0x0);
+-	__phy_write(phydev, 0x10, 0x969e);
+-
+-	/* RegEEE_slv_wake_int_timer_tar = 8 */
+-	__phy_write(phydev, 0x11, 0x5010);
+-	__phy_write(phydev, 0x12, 0x0);
+-	__phy_write(phydev, 0x10, 0x96a0);
+-
+-	/* RegEEE_trfreeze_timer2 = 586 */
+-	__phy_write(phydev, 0x11, 0x24a);
+-	__phy_write(phydev, 0x12, 0x0);
+-	__phy_write(phydev, 0x10, 0x96a8);
+-
+-	/* RegEEE100Stg1_tar = 16 */
+-	__phy_write(phydev, 0x11, 0x3210);
+-	__phy_write(phydev, 0x12, 0x0);
+-	__phy_write(phydev, 0x10, 0x96b8);
+-
+-	/* REGEEE_wake_slv_tr_wait_dfesigdet_en = 0 */
+-	__phy_write(phydev, 0x11, 0x1463);
+-	__phy_write(phydev, 0x12, 0x0);
+-	__phy_write(phydev, 0x10, 0x96ca);
+-
+-	/* DfeTailEnableVgaThresh1000 = 27 */
+-	__phy_write(phydev, 0x11, 0x36);
+-	__phy_write(phydev, 0x12, 0x0);
+-	__phy_write(phydev, 0x10, 0x8f80);
++	__mtk_tr_clr_bits(phydev, 0x2, 0xd, 0x8,
++			  EEE1000_SELECT_SIGNAL_DETECTION_FROM_DFE);
++
++	__mtk_tr_modify(phydev, 0x2, 0xd, 0xd,
++			EEE1000_STAGE2_TR_KF_MASK,
++			FIELD_PREP(EEE1000_STAGE2_TR_KF_MASK, 0x2));
++
++	__mtk_tr_modify(phydev, 0x2, 0xd, 0xf,
++			SLAVE_WAKETR_TIMER_MASK | SLAVE_REMTX_TIMER_MASK,
++			FIELD_PREP(SLAVE_WAKETR_TIMER_MASK, 0x6) |
++			FIELD_PREP(SLAVE_REMTX_TIMER_MASK, 0x14));
++
++	__mtk_tr_modify(phydev, 0x2, 0xd, 0x10,
++			SLAVE_WAKEINT_TIMER_MASK,
++			FIELD_PREP(SLAVE_WAKEINT_TIMER_MASK, 0x8));
++
++	__mtk_tr_modify(phydev, 0x2, 0xd, 0x14,
++			TR_FREEZE_TIMER2_MASK,
++			FIELD_PREP(TR_FREEZE_TIMER2_MASK, 0x24a));
++
++	__mtk_tr_modify(phydev, 0x2, 0xd, 0x1c,
++			EEE100_LPSYNC_STAGE1_UPDATE_TIMER_MASK,
++			FIELD_PREP(EEE100_LPSYNC_STAGE1_UPDATE_TIMER_MASK,
++				   0x10));
++
++	__mtk_tr_clr_bits(phydev, 0x2, 0xd, 0x25,
++			  WAKE_SLAVE_TR_WAIT_DFE_DETECTION_EN);
++
++	__mtk_tr_modify(phydev, 0x1, 0xf, 0x0,
++			DFE_TAIL_EANBLE_VGA_TRHESH_1000,
++			FIELD_PREP(DFE_TAIL_EANBLE_VGA_TRHESH_1000, 0x1b));
  	phy_restore_page(phydev, MTK_PHY_PAGE_STANDARD, 0);
  
  	phy_select_page(phydev, MTK_PHY_PAGE_EXTENDED_3);
--	__phy_modify(phydev, MTK_PHY_LPI_REG_14, MTK_PHY_LPI_WAKE_TIMER_1000_MASK,
-+	__phy_modify(phydev, MTK_PHY_LPI_REG_14,
-+		     MTK_PHY_LPI_WAKE_TIMER_1000_MASK,
- 		     FIELD_PREP(MTK_PHY_LPI_WAKE_TIMER_1000_MASK, 0x19c));
+diff --git a/drivers/net/phy/mediatek/mtk-ge.c b/drivers/net/phy/mediatek/mtk-ge.c
+index b8a488c..8532f75 100644
+--- a/drivers/net/phy/mediatek/mtk-ge.c
++++ b/drivers/net/phy/mediatek/mtk-ge.c
+@@ -8,13 +8,35 @@
+ #define MTK_GPHY_ID_MT7530		0x03a29412
+ #define MTK_GPHY_ID_MT7531		0x03a29441
  
- 	__phy_modify(phydev, MTK_PHY_LPI_REG_1c, MTK_PHY_SMI_DET_ON_THRESH_MASK,
-@@ -940,7 +954,8 @@ static void mt798x_phy_eee(struct phy_device *phydev)
- 	phy_modify_mmd(phydev, MDIO_MMD_VEND1,
- 		       MTK_PHY_RG_LPI_PCS_DSP_CTRL_REG122,
- 		       MTK_PHY_LPI_NORM_MSE_HI_THRESH1000_MASK,
--		       FIELD_PREP(MTK_PHY_LPI_NORM_MSE_HI_THRESH1000_MASK, 0xff));
-+		       FIELD_PREP(MTK_PHY_LPI_NORM_MSE_HI_THRESH1000_MASK,
+-#define MTK_EXT_PAGE_ACCESS		0x1f
+-#define MTK_PHY_PAGE_STANDARD		0x0000
+-#define MTK_PHY_PAGE_EXTENDED		0x0001
+-#define MTK_PHY_PAGE_EXTENDED_2		0x0002
+-#define MTK_PHY_PAGE_EXTENDED_3		0x0003
+-#define MTK_PHY_PAGE_EXTENDED_2A30	0x2a30
+-#define MTK_PHY_PAGE_EXTENDED_52B5	0x52b5
++#define MTK_PHY_PAGE_EXTENDED_1			0x0001
++#define MTK_PHY_AUX_CTRL_AND_STATUS		0x14
++#define   MTK_PHY_ENABLE_DOWNSHIFT		BIT(4)
++
++#define MTK_PHY_PAGE_EXTENDED_2			0x0002
++#define MTK_PHY_PAGE_EXTENDED_3			0x0003
++#define MTK_PHY_RG_LPI_PCS_DSP_CTRL_REG11	0x11
++
++#define MTK_PHY_PAGE_EXTENDED_2A30		0x2a30
++
++/* Registers on Token Ring debug nodes */
++/* ch_addr = 0x1, node_addr = 0xf, data_addr = 0x17 */
++#define SLAVE_DSP_READY_TIME_MASK		GENMASK(22, 15)
++
++/* Registers on MDIO_MMD_VEND1 */
++#define MTK_PHY_GBE_MODE_TX_DELAY_SEL		0x13
++#define MTK_PHY_TEST_MODE_TX_DELAY_SEL		0x14
++#define   MTK_TX_DELAY_PAIR_B_MASK		GENMASK(10, 8)
++#define   MTK_TX_DELAY_PAIR_D_MASK		GENMASK(2, 0)
++
++#define MTK_PHY_MCC_CTRL_AND_TX_POWER_CTRL	0xa6
++#define   MTK_MCC_NEARECHO_OFFSET_MASK		GENMASK(15, 8)
++
++#define MTK_PHY_RXADC_CTRL_RG7			0xc6
++#define   MTK_PHY_DA_AD_BUF_BIAS_LP_MASK	GENMASK(9, 8)
++
++#define MTK_PHY_RG_LPI_PCS_DSP_CTRL_REG123	0x123
++#define   MTK_PHY_LPI_NORM_MSE_LO_THRESH100_MASK	GENMASK(15, 8)
++#define   MTK_PHY_LPI_NORM_MSE_HI_THRESH100_MASK	GENMASK(7, 0)
+ 
+ struct mtk_gephy_priv {
+ 	unsigned long		led_state;
+@@ -23,20 +45,29 @@ struct mtk_gephy_priv {
+ static void mtk_gephy_config_init(struct phy_device *phydev)
+ {
+ 	/* Enable HW auto downshift */
+-	phy_modify_paged(phydev, MTK_PHY_PAGE_EXTENDED, 0x14, 0, BIT(4));
++	phy_modify_paged(phydev, MTK_PHY_PAGE_EXTENDED_1,
++			 MTK_PHY_AUX_CTRL_AND_STATUS,
++			 0, MTK_PHY_ENABLE_DOWNSHIFT);
+ 
+ 	/* Increase SlvDPSready time */
+-	phy_select_page(phydev, MTK_PHY_PAGE_EXTENDED_52B5);
+-	__phy_write(phydev, 0x10, 0xafae);
+-	__phy_write(phydev, 0x12, 0x2f);
+-	__phy_write(phydev, 0x10, 0x8fae);
+-	phy_restore_page(phydev, MTK_PHY_PAGE_STANDARD, 0);
++	mtk_tr_modify(phydev, 0x1, 0xf, 0x17, SLAVE_DSP_READY_TIME_MASK,
++		      FIELD_PREP(SLAVE_DSP_READY_TIME_MASK, 0x5e));
+ 
+ 	/* Adjust 100_mse_threshold */
+-	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x123, 0xffff);
+-
+-	/* Disable mcc */
+-	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0xa6, 0x300);
++	phy_modify_mmd(phydev, MDIO_MMD_VEND1,
++		       MTK_PHY_RG_LPI_PCS_DSP_CTRL_REG123,
++		       MTK_PHY_LPI_NORM_MSE_LO_THRESH100_MASK |
++		       MTK_PHY_LPI_NORM_MSE_HI_THRESH100_MASK,
++		       FIELD_PREP(MTK_PHY_LPI_NORM_MSE_LO_THRESH100_MASK,
++				  0xff) |
++		       FIELD_PREP(MTK_PHY_LPI_NORM_MSE_HI_THRESH100_MASK,
 +				  0xff));
++
++	/* If echo time is narrower than 0x3, it will be regarded as noise */
++	phy_modify_mmd(phydev, MDIO_MMD_VEND1,
++		       MTK_PHY_MCC_CTRL_AND_TX_POWER_CTRL,
++		       MTK_MCC_NEARECHO_OFFSET_MASK,
++		       FIELD_PREP(MTK_MCC_NEARECHO_OFFSET_MASK, 0x3));
  }
  
- static int cal_sw(struct phy_device *phydev, enum CAL_ITEM cal_item,
-@@ -1119,14 +1134,15 @@ static int mt798x_phy_led_brightness_set(struct phy_device *phydev,
- 				     MTK_GPHY_LED_ON_MASK, (value != LED_OFF));
- }
+ static int mt7530_phy_config_init(struct phy_device *phydev)
+@@ -44,7 +75,8 @@ static int mt7530_phy_config_init(struct phy_device *phydev)
+ 	mtk_gephy_config_init(phydev);
  
--static const unsigned long supported_triggers = (BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
--						 BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
--						 BIT(TRIGGER_NETDEV_LINK)        |
--						 BIT(TRIGGER_NETDEV_LINK_10)     |
--						 BIT(TRIGGER_NETDEV_LINK_100)    |
--						 BIT(TRIGGER_NETDEV_LINK_1000)   |
--						 BIT(TRIGGER_NETDEV_RX)          |
--						 BIT(TRIGGER_NETDEV_TX));
-+static const unsigned long supported_triggers =
-+	(BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
-+	 BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
-+	 BIT(TRIGGER_NETDEV_LINK)        |
-+	 BIT(TRIGGER_NETDEV_LINK_10)     |
-+	 BIT(TRIGGER_NETDEV_LINK_100)    |
-+	 BIT(TRIGGER_NETDEV_LINK_1000)   |
-+	 BIT(TRIGGER_NETDEV_RX)          |
-+	 BIT(TRIGGER_NETDEV_TX));
- 
- static int mt798x_phy_led_hw_is_supported(struct phy_device *phydev, u8 index,
- 					  unsigned long rules)
-@@ -1189,7 +1205,8 @@ static int mt7988_phy_fix_leds_polarities(struct phy_device *phydev)
- 	/* Only now setup pinctrl to avoid bogus blinking */
- 	pinctrl = devm_pinctrl_get_select(&phydev->mdio.dev, "gbe-led");
- 	if (IS_ERR(pinctrl))
--		dev_err(&phydev->mdio.bus->dev, "Failed to setup PHY LED pinctrl\n");
-+		dev_err(&phydev->mdio.bus->dev,
-+			"Failed to setup PHY LED pinctrl\n");
+ 	/* Increase post_update_timer */
+-	phy_write_paged(phydev, MTK_PHY_PAGE_EXTENDED_3, 0x11, 0x4b);
++	phy_write_paged(phydev, MTK_PHY_PAGE_EXTENDED_3,
++			MTK_PHY_RG_LPI_PCS_DSP_CTRL_REG11, 0x4b);
  
  	return 0;
  }
+@@ -55,11 +87,19 @@ static int mt7531_phy_config_init(struct phy_device *phydev)
+ 
+ 	/* PHY link down power saving enable */
+ 	phy_set_bits(phydev, 0x17, BIT(4));
+-	phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1, 0xc6, 0x300);
++	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_RXADC_CTRL_RG7,
++		       MTK_PHY_DA_AD_BUF_BIAS_LP_MASK,
++		       FIELD_PREP(MTK_PHY_DA_AD_BUF_BIAS_LP_MASK, 0x3));
+ 
+ 	/* Set TX Pair delay selection */
+-	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x13, 0x404);
+-	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x14, 0x404);
++	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_GBE_MODE_TX_DELAY_SEL,
++		       MTK_TX_DELAY_PAIR_B_MASK | MTK_TX_DELAY_PAIR_D_MASK,
++		       FIELD_PREP(MTK_TX_DELAY_PAIR_B_MASK, 0x4) |
++		       FIELD_PREP(MTK_TX_DELAY_PAIR_D_MASK, 0x4));
++	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_TEST_MODE_TX_DELAY_SEL,
++		       MTK_TX_DELAY_PAIR_B_MASK | MTK_TX_DELAY_PAIR_D_MASK,
++		       FIELD_PREP(MTK_TX_DELAY_PAIR_B_MASK, 0x4) |
++		       FIELD_PREP(MTK_TX_DELAY_PAIR_D_MASK, 0x4));
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/phy/mediatek/mtk-phy-lib.c b/drivers/net/phy/mediatek/mtk-phy-lib.c
+index e55a432..32520af 100644
+--- a/drivers/net/phy/mediatek/mtk-phy-lib.c
++++ b/drivers/net/phy/mediatek/mtk-phy-lib.c
+@@ -6,6 +6,97 @@
+ 
+ #include "mtk.h"
+ 
++/* Difference between functions with mtk_tr* and __mtk_tr* prefixes is
++ * mtk_tr* functions: wrapped by page switching operations
++ * __mtk_tr* functions: no page switching operations
++ */
++
++static void __mtk_tr_access(struct phy_device *phydev, bool read, u8 ch_addr,
++			    u8 node_addr, u8 data_addr)
++{
++	u16 tr_cmd = BIT(15); /* bit 14 & 0 are reserved */
++
++	if (read)
++		tr_cmd |= BIT(13);
++
++	tr_cmd |= (((ch_addr & 0x3) << 11) |
++		   ((node_addr & 0xf) << 7) |
++		   ((data_addr & 0x3f) << 1));
++	dev_dbg(&phydev->mdio.dev, "tr_cmd: 0x%x\n", tr_cmd);
++	__phy_write(phydev, 0x10, tr_cmd);
++}
++
++static void __mtk_tr_read(struct phy_device *phydev, u8 ch_addr, u8 node_addr,
++			  u8 data_addr, u16 *tr_high, u16 *tr_low)
++{
++	__mtk_tr_access(phydev, true, ch_addr, node_addr, data_addr);
++	*tr_low = __phy_read(phydev, 0x11);
++	*tr_high = __phy_read(phydev, 0x12);
++	dev_dbg(&phydev->mdio.dev, "tr_high read: 0x%x, tr_low read: 0x%x\n",
++		*tr_high, *tr_low);
++}
++
++u32 mtk_tr_read(struct phy_device *phydev, u8 ch_addr, u8 node_addr,
++		u8 data_addr)
++{
++	u16 tr_high;
++	u16 tr_low;
++
++	phy_select_page(phydev, MTK_PHY_PAGE_EXTENDED_52B5);
++	__mtk_tr_read(phydev, ch_addr, node_addr, data_addr, &tr_high, &tr_low);
++	phy_restore_page(phydev, MTK_PHY_PAGE_STANDARD, 0);
++
++	return (tr_high << 16) | tr_low;
++}
++EXPORT_SYMBOL_GPL(mtk_tr_read);
++
++static void __mtk_tr_write(struct phy_device *phydev, u8 ch_addr, u8 node_addr,
++			   u8 data_addr, u32 tr_data)
++{
++	__phy_write(phydev, 0x11, tr_data & 0xffff);
++	__phy_write(phydev, 0x12, tr_data >> 16);
++	dev_dbg(&phydev->mdio.dev, "tr_high write: 0x%x, tr_low write: 0x%x\n",
++		tr_data >> 16, tr_data & 0xffff);
++	__mtk_tr_access(phydev, false, ch_addr, node_addr, data_addr);
++}
++
++void __mtk_tr_modify(struct phy_device *phydev, u8 ch_addr, u8 node_addr,
++		     u8 data_addr, u32 mask, u32 set)
++{
++	u32 tr_data;
++	u16 tr_high;
++	u16 tr_low;
++
++	__mtk_tr_read(phydev, ch_addr, node_addr, data_addr, &tr_high, &tr_low);
++	tr_data = (tr_high << 16) | tr_low;
++	tr_data = (tr_data & ~mask) | set;
++	__mtk_tr_write(phydev, ch_addr, node_addr, data_addr, tr_data);
++}
++EXPORT_SYMBOL_GPL(__mtk_tr_modify);
++
++void mtk_tr_modify(struct phy_device *phydev, u8 ch_addr, u8 node_addr,
++		   u8 data_addr, u32 mask, u32 set)
++{
++	phy_select_page(phydev, MTK_PHY_PAGE_EXTENDED_52B5);
++	__mtk_tr_modify(phydev, ch_addr, node_addr, data_addr, mask, set);
++	phy_restore_page(phydev, MTK_PHY_PAGE_STANDARD, 0);
++}
++EXPORT_SYMBOL_GPL(mtk_tr_modify);
++
++void __mtk_tr_set_bits(struct phy_device *phydev, u8 ch_addr, u8 node_addr,
++		       u8 data_addr, u32 set)
++{
++	__mtk_tr_modify(phydev, ch_addr, node_addr, data_addr, 0, set);
++}
++EXPORT_SYMBOL_GPL(__mtk_tr_set_bits);
++
++void __mtk_tr_clr_bits(struct phy_device *phydev, u8 ch_addr, u8 node_addr,
++		       u8 data_addr, u32 clr)
++{
++	__mtk_tr_modify(phydev, ch_addr, node_addr, data_addr, clr, 0);
++}
++EXPORT_SYMBOL_GPL(__mtk_tr_clr_bits);
++
+ int mtk_phy_read_page(struct phy_device *phydev)
+ {
+ 	return __phy_read(phydev, MTK_EXT_PAGE_ACCESS);
+diff --git a/drivers/net/phy/mediatek/mtk.h b/drivers/net/phy/mediatek/mtk.h
+index 5986aaa..8c0acea 100644
+--- a/drivers/net/phy/mediatek/mtk.h
++++ b/drivers/net/phy/mediatek/mtk.h
+@@ -9,6 +9,8 @@
+ #define _MTK_EPHY_H_
+ 
+ #define MTK_EXT_PAGE_ACCESS			0x1f
++#define MTK_PHY_PAGE_STANDARD			0x0000
++#define MTK_PHY_PAGE_EXTENDED_52B5		0x52b5
+ 
+ /* Registers on MDIO_MMD_VEND2 */
+ #define MTK_PHY_LED0_ON_CTRL			0x24
+@@ -62,6 +64,17 @@
+ #define MTK_PHY_LED_STATE_FORCE_BLINK	1
+ #define MTK_PHY_LED_STATE_NETDEV	2
+ 
++u32 mtk_tr_read(struct phy_device *phydev, u8 ch_addr, u8 node_addr,
++		u8 data_addr);
++void __mtk_tr_modify(struct phy_device *phydev, u8 ch_addr, u8 node_addr,
++		     u8 data_addr, u32 mask, u32 set);
++void mtk_tr_modify(struct phy_device *phydev, u8 ch_addr, u8 node_addr,
++		   u8 data_addr, u32 mask, u32 set);
++void __mtk_tr_set_bits(struct phy_device *phydev, u8 ch_addr, u8 node_addr,
++		       u8 data_addr, u32 set);
++void __mtk_tr_clr_bits(struct phy_device *phydev, u8 ch_addr, u8 node_addr,
++		       u8 data_addr, u32 clr);
++
+ int mtk_phy_read_page(struct phy_device *phydev);
+ int mtk_phy_write_page(struct phy_device *phydev, int page);
+ 
 -- 
 2.18.0
 
