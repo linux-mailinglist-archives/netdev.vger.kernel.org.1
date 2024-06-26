@@ -1,247 +1,128 @@
-Return-Path: <netdev+bounces-107028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36901918A43
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 19:43:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CC1E918B0B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 19:52:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6C9AB217F6
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 17:43:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CBAD1C231B6
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 17:52:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6904F190057;
-	Wed, 26 Jun 2024 17:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E8E9190473;
+	Wed, 26 Jun 2024 17:51:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XbKUr8Rn"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="AVo3ukSr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B6B190043;
-	Wed, 26 Jun 2024 17:43:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A0F190468
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 17:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719423821; cv=none; b=h4tzUyx++2OIFH+mZBLlZc2LYpXXXtI/SmxOJ5Tqa7Y1L1CK1jRZKprUh5D8XRC2NRhMB0z7EkOcIidr9NYnd07haEc/AtuSpfpn6IHl4P5CStvq/WxeCjL7rjeujdp3LRszsXMx4/WdsqRgCTq2RPKSGqO+YDNESJfcx7ymv18=
+	t=1719424313; cv=none; b=pXko1+owKzFcEfXpAV/Cv1lDdV8OlYT6K1KBzXUG3/oAEhnOHdF0JS4JhwuVArKNtD9C5TzXOA0dMlecvzR0EzCODd+7oBkCus1DZ7WYOcWC73BItxvsf3svsiJctqLEpjg5PfzG2QxsUhdhDznL2thjVlpzKWGBBU7uDdI6iEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719423821; c=relaxed/simple;
-	bh=zBhReINd0zPxFnkkL4Xv24dohlDbe1P3un1fY4tJdD4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RjWwVOVrOCWH17m48h2gjNAQxjs9YTcLdwNnQcxG3KZa+sGEF9mejPD89I7M2/jkjH77iXEVRoxKGy8d4kRoqDAteC1qQVTINIxvCx4ZhiEVFRGVGaRSsgmaNw1mMJnG9RAm0/zlz1n2fF9k3RaBeoLzWROY40U02Mp7SlFug+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XbKUr8Rn; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-52ccc40e72eso5086162e87.3;
-        Wed, 26 Jun 2024 10:43:39 -0700 (PDT)
+	s=arc-20240116; t=1719424313; c=relaxed/simple;
+	bh=GDlvt3XGGPoXvPc0HXeLhSECgoYrzvJXmylf8iosmH0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=De1nzDmL1PzmPhDPqchwyitAez0kC6+/dtsCJwPrTobTDNDrjOLFmcb5KFNuP528QeHRfFrdyRrbewDBL0R41LLgCegnVnjZ9imHbkkVBvAcZKJZ6JVZls2w+DTxvG8QVJlwoA8sHqMbCh+ls4lDdqre6THEpWTrXZFmbGveeBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=AVo3ukSr; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57cc1c00b97so694904a12.0
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 10:51:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719423818; x=1720028618; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=68Go+AztCSeGaELQM462j1U0ArOjXehNFQ7V4OM1BiU=;
-        b=XbKUr8Rnz3T8ozJ1fpHIRzx2r6ijiyGQBD1ytf6cn0YeaUoQoOpdEvNneuvFng7H+V
-         9YTzFikZOjPJkytE63Mt75pBR0CTCfn1J/2c4PTKQZoJb0+NobDgs5IBpWGuWKlqbc2T
-         F06xC7wyIvb/nwDsHT1McRzTbGixCQQ/QlbCnhznOuXqtR8sWWT+oJuBBVuISVgaUwbs
-         mq6hOhiigwOVOh4f+YTJPQEy2dZ8BD5cVpu5vVe99xOsItwvfuYmyqDScFDAOCNWvn0w
-         57xqpGaxur7zdlaAIC7vE86pD9zZtib5gTZ7GSVkCWxblSLn0N4wfIwC6tN17jWezPF4
-         UZRg==
+        d=cloudflare.com; s=google09082023; t=1719424309; x=1720029109; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=x8bcM+qz2h9oQBi32Vzgh0SCb1FZC6XKYjZp3fS9w/8=;
+        b=AVo3ukSrRPm9JVNlLruRPha+YcOhXz71MCc/cT/68NYffHnE+TYDbrC4d/INdGO7ui
+         0HN+3pRUFOWmrwX4AIlWZaRLmALKkXaHGNSFzZdfKcOWGrWXt+iq0eYt0bo5MuGvXhgO
+         4QnHnitvxM8dKZa2zytK7OZQXEPEqAHnaYA2NMXSSpWlBfgmjFpwQUjcwk8/lcYkvkTB
+         FSNlnMaV+4WrBWHWXQSEy5ArfI6OGfwo1zS6UtXDJqwHCGitfw4obl0OECXJfv0CbHNo
+         PzFtbQji/Huyvjlv3pXsqcjhlU5cjYy+1If6WgEvDK9qppLPZfHCcw5nq1SxuzopLsZA
+         UgTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719423818; x=1720028618;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=68Go+AztCSeGaELQM462j1U0ArOjXehNFQ7V4OM1BiU=;
-        b=E3574NGbvHtjmm7t/F/bAnFcsdQo3Nhr8jPZANrZyTCzyFtORsE7OtQ8lQcqhPSDSu
-         Q6PtmrutzmoaoMgscX1Ym46tg/sdJ+3wAiNhPYAM35zBpIanXjc7sDWoUVOindd1NVAs
-         /Kn/Kjm6VMDB6/W6DldDqR7gk3Se9MyKdx82AWTTq3q+NLuscezxc8O+XVmhxD3DRxXB
-         ygwuuYdtqzqVoi/wQ0ur1zq3loelUFmbjjbyeCrJqSBGjZPeI+V2kd4N4eK6HGG6wzb4
-         8W5GIu/0ag6fFws/GRv5JPB4fbycodLh9A2f2EfOT/C8A7dQ4LNRML7wT8nPsbkbjJnH
-         Y1ow==
-X-Forwarded-Encrypted: i=1; AJvYcCWpZ7BcXosFi8sPTgEy2gaJt9hmT0g11ouqTwwk1o9BLhD7FLBqPX6sV9NzP92T1cYk3P+MUthEdLRX0NJuR1kWMIs3VbUKrjrYF4lAFMixUK5VyUVVip1Usg1Z
-X-Gm-Message-State: AOJu0Yx0Iy2L4pGHudZjnu/JeqJG3AidITXZUFyC4aM+II7Bq1SWtQ5C
-	0t1fQJrZsYHlMgNmtSGxqjfTbr9Ka/OAkAD25oMsFVTSTi/ekV4QHQuE92F7PRkpckn5FLYjgrG
-	in4FTUwE7jIMh6BqX8WPYEM5w4tX6S9Hv
-X-Google-Smtp-Source: AGHT+IF9satTDRYLl9JbfwfqMs0I7XKZ/C3sQfyyPVsPfLOdo7gU6tnbN/vLDICS0OPH7+x0nGEQqaMcpmsNOwJ3VUo=
-X-Received: by 2002:ac2:4d97:0:b0:52c:e170:9d38 with SMTP id
- 2adb3069b0e04-52ce183ad20mr7801343e87.31.1719423817353; Wed, 26 Jun 2024
- 10:43:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719424309; x=1720029109;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=x8bcM+qz2h9oQBi32Vzgh0SCb1FZC6XKYjZp3fS9w/8=;
+        b=SGolhrU2uKnhpL1ky6KLUBh1rYf7IjB1OwvU2DqdceS79hIPSFKOlZF7qYGp/O5NaY
+         fb9HguZY3vH+0xR4cvKZGpExmTjoQSTbJwtcQSBdKYDsQtn8wLtgg1lCb588lBkyADUl
+         KjCFqHH/7GQTbsIOiiIamIbE+x9EdjrPA5XpJt5GH703uHpoU3QruNLQro+G/mlt3sSp
+         zeffZfzON0nkU2suWdPvNXnyZR6dmzW8s0CozQmPtGONEZOU/9wiK/Tn1Q3eWfBmiQcQ
+         H+k+pnbJxhtOxPUtCupNjk5/17eLOoCLqQ7qPfCYKzm2dN54yMVqekLUfCBLtYA9mbMm
+         58uA==
+X-Gm-Message-State: AOJu0Yw0b1gzaLz5wdNkdGhxFN0QaALHZvoEt+peFzrXLdND+WmkF+lu
+	vZlEfPa4VuSm0PNA5H7GEonSUDE59CxL0LNcoaPl0hFYxCQH3y38/fXXp3i40N66fdzkbJBxIzb
+	4
+X-Google-Smtp-Source: AGHT+IFygVpXSHI1tth3P/8qgOkaM9TbcrvEeDBYRB0yOXHQ6nZXrud/WgpJYJ+U8+PrM090Oargdw==
+X-Received: by 2002:a50:c04f:0:b0:57d:3791:e8e4 with SMTP id 4fb4d7f45d1cf-57d4bdcad8dmr7624787a12.32.1719424309319;
+        Wed, 26 Jun 2024 10:51:49 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:27])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57d30f3002dsm7288970a12.71.2024.06.26.10.51.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jun 2024 10:51:48 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+Subject: [PATCH net-next v2 0/2] Lift UDP_SEGMENT restriction for egress
+ via device w/o csum offload
+Date: Wed, 26 Jun 2024 19:51:25 +0200
+Message-Id: <20240626-linux-udpgso-v2-0-422dfcbd6b48@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <554ae947-f06e-4b69-b274-47e8a78ae962@amazon.com>
- <14e68dd8-b2fa-496f-8dfc-a883ad8434f5@redhat.com> <c5wziphzhyoqb2mwzd2rstpotjqr3zky6hrgysohwsum4wvgi7@qmboatooyddd>
- <CABgObfasyA7U5Fg5r0gGoFAw73nwGJnWBYmG8vqf0hC2E8SPFw@mail.gmail.com>
- <sejux5gvpakaopre6mk3fyudi2f56hiuxuevfzay3oohg773kd@5odm3x3fryuq>
- <CABgObfb-KrmJzr4YBtuN3+_HLm3S1hmjO7uEy0+AxSDeWE3uWg@mail.gmail.com>
- <l5oxnxkg7owmwuadknttnnl2an37wt3u5kgfjb5563f7llbgwj@bvwfv5d7wrq4>
- <3b6a1f23-bf0e-416d-8880-4556b87b5137@amazon.com> <hyrgztjkjmftnpra2o2skonfs6bwf2sqrncwtec3e4ckupe5ea@76whtcp3zapf>
- <CAFfO_h5_uAwdNJB=fjrxb_pPiwRDQxaZn=OvR3yrYd+c18tUdQ@mail.gmail.com> <xw2rhgn2s677t6cufp2ndpvvgpdlovej44o6ieo7nz2p6msvnw@zza7jzylpw76>
-In-Reply-To: <xw2rhgn2s677t6cufp2ndpvvgpdlovej44o6ieo7nz2p6msvnw@zza7jzylpw76>
-From: Dorjoy Chowdhury <dorjoychy111@gmail.com>
-Date: Wed, 26 Jun 2024 23:43:25 +0600
-Message-ID: <CAFfO_h4WnSkinX1faduAD68h=nQCWhPgpYKTPV+xfSqyfMmxEA@mail.gmail.com>
-Subject: Re: How to implement message forwarding from one CID to another in
- vhost driver
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Alexander Graf <graf@amazon.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Alexander Graf <agraf@csgraf.de>, virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	netdev@vger.kernel.org, stefanha@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAB1VfGYC/22NQQqDMBBFryKz7pRkai101XsUFzEZdcAmkqhYx
+ Ls3ZN3l4/HfPyBxFE7wrA6IvEmS4DPQpQI7Gj8wissMpKhWDRFO4tcdVzcPKaCmhhxT1xhWkCd
+ z5F72knuD5wU97wu02YySlhC/5WfTxf9PbhoVOrrVtb4/TEfmZaewun4yka82fKA9z/MH93OvR
+ LcAAAA=
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+ kernel-team@cloudflare.com
+X-Mailer: b4 0.13.0
 
-Hey Stefano,
-Thanks a lot for all the details. I will look into them and reach out
-if I need further input. Thanks! I have tried to summarize my
-understanding below. Let me know if that sounds correct.
+This is a follow-up to an earlier question [1] if we can make UDP GSO work with
+any egress device, even those with no checksum offload capability. That's the
+default setup for TUN/TAP.
 
-On Wed, Jun 26, 2024 at 2:37=E2=80=AFPM Stefano Garzarella <sgarzare@redhat=
-.com> wrote:
->
-> Hi Dorjoy,
->
-> On Tue, Jun 25, 2024 at 11:44:30PM GMT, Dorjoy Chowdhury wrote:
-> >Hey Stefano,
->
-> [...]
->
-> >> >
-> >> >So the immediate plan would be to:
-> >> >
-> >> >  1) Build a new vhost-vsock-forward object model that connects to
-> >> >vhost as CID 3 and then forwards every packet from CID 1 to the
-> >> >Enclave-CID and every packet that arrives on to CID 3 to CID 2.
-> >>
-> >> This though requires writing completely from scratch the virtio-vsock
-> >> emulation in QEMU. If you have time that would be great, otherwise if
-> >> you want to do a PoC, my advice is to start with vhost-user-vsock whic=
-h
-> >> is already there.
-> >>
-> >
-> >Can you give me some more details about how I can implement the
-> >daemon?
->
-> We already have a demon written in Rust, so I don't recommend you
-> rewrite one from scratch, just start with that. You can find the daemon
-> and instructions on how to use it with QEMU here [1].
->
-> >I would appreciate some pointers to code too.
->
-> I sent the pointer to it in my first reply [2].
->
-> >
-> >Right now, the "nitro-enclave" machine type (wip) in QEMU
-> >automatically spawns a VHOST_VSOCK device with the CID equal to the
-> >"guest-cid" machine option. I think this is equivalent to using the
-> >"-device vhost-vsock-device,guest-cid=3DN" option explicitly. Does that
-> >need any change? I guess instead of "vhost-vsock-device", the
-> >vhost-vsock device needs to be equivalent to "-device
-> >vhost-user-vsock-device,guest-cid=3DN"?
->
-> Nope, the vhost-user-vsock device requires just a `chardev` option.
-> The chardev points to the Unix socket used by QEMU to talk with the
-> daemon. The daemon has a parameter to set the CID. See [1] for the
-> examples.
->
-> >
-> >The applications inside the nitro-enclave VM will still connect and
-> >talk to CID 3. So on the daemon side, do we need to spawn a device
-> >that has CID 3 and then forward everything this device receives to CID
-> >1 (VMADDR_CID_LOCAL) same port and everything it receives from CID 1
-> >to the "guest-cid"?
->
-> Yep, I think this is right.
-> Note: to use VMADDR_CID_LOCAL, the host needs to load `vsock_loopback`
-> kernel module.
->
-> Before modifying the code, if you want to do some testing, perhaps you
-> can use socat (which supports both UNIX-* and VSOCK-*). The daemon for
-> now exposes two unix sockets, one is used to communicate with QEMU via
-> the vhost-user protocol, and the other is to be used by the application
-> to communicate with vsock sockets in the guest using the hybrid protocol
-> defined by firecracker. So you could initiate a socat between the latter
-> and VMADDR_CID_LOCAL, the only problem I see is that you have to send
-> the first string provided by the hybrid protocol (CONNECT 1234), but for
-> a PoC it should be ok.
->
-> I just tried the following and it works without touching any code:
->
-> shell1$ ./target/debug/vhost-device-vsock \
->      --vm guest-cid=3D3,socket=3D/tmp/vhost3.socket,uds-path=3D/tmp/vm3.v=
-sock
->
-> shell2$ sudo modprobe vsock_loopback
-> shell2$ socat VSOCK-LISTEN:1234 UNIX-CONNECT:/tmp/vm3.vsock
->
-> shell3$ qemu-system-x86_64 -smp 2 -M q35,accel=3Dkvm,memory-backend=3Dmem=
- \
->      -drive file=3Dfedora40.qcow2,format=3Dqcow2,if=3Dvirtio\
->      -chardev socket,id=3Dchar0,path=3D/tmp/vhost3.socket \
->      -device vhost-user-vsock-pci,chardev=3Dchar0 \
->      -object memory-backend-memfd,id=3Dmem,size=3D512M \
->      -nographic
->
->      guest$ nc --vsock -l 1234
->
-> shell4$ nc --vsock 1 1234
-> CONNECT 1234
->
->      Note: the `CONNECT 1234` is required by the hybrid vsock protocol
->      defined by firecracker, so if we extend the vhost-device-vsock
->      daemon to forward packet to VMADDR_CID_LOCAL, that would not be
->      needed (including running socat).
->
+Because there is a change in behavior - sendmsg() does no longer return EIO
+error - I'm submitting through net-next tree, rather than net, as per Willem's
+advice.
 
-Understood. Just trying to think out loud what the final UX will be
-from the user perspective to successfully run a nitro VM before I try
-to modify vhost-device-vsock to support forwarding to
-VMADDR_CID_LOCAL.
-I guess because the "vhost-user-vsock" device needs to be spawned
-implicitly (without any explicit option) inside nitro-enclave in QEMU,
-we now need to provide the "chardev" as a machine option, so the
-nitro-enclave command would look something like below:
-"./qemu-system-x86_64 -M nitro-enclave,chardev=3Dchar0 -kernel
-/path/to/eif -chardev socket,id=3Dchar0,path=3D/tmp/vhost5.socket -m 4G
---enable-kvm -cpu host"
-and then set the chardev id to the vhost-user-vsock device in the code
-from the machine option.
+[1] https://lore.kernel.org/netdev/87jzqsld6q.fsf@cloudflare.com/
 
-The modified "vhost-device-vsock" would need to be run with the new
-option that will forward everything to VMADDR_CID_LOCAL (below by the
-"-z" I mean the new option)
-"./target/debug/vhost-device-vsock -z --vm
-guest-cid=3D5,socket=3D/tmp/vhost5.socket,uds-path=3D/tmp/vm5.vsock"
-this means the guest-cid of the nitro VM is CID 5, right?
+To: netdev@vger.kernel.org
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>
+Cc: kernel-team@cloudflare.com
+Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 
-And the applications in the host would need to use VMADDR_CID_LOCAL
-for communication instead of "guest-cid" (5) (assuming vsock_loopback
-is modprobed). Let's say there are 2 applications inside the nitro VM
-that connect to CID 3 on port 9000 and 9001. And the applications on
-the host listen on 9000 and 9001 using VMADDR_CID_LOCAL. So, after the
-commands above (qemu VM and vhost-device-vsock) are run, the
-communication between the applications in the host and the
-applications in the nitro VM on port 9000 and 9001 should just work,
-right, without needing to run any extra socat commands or such? or
-will the user still need to run some socat commands for all the
-relevant ports (e.g.,9000 and 9001)?
+Changes in v2:
+- Fixup ip link arguments order (Jakub)
+- Describe performance impact compared to regular sendmsg (Willem)
+- Link to v1: https://lore.kernel.org/r/20240622-linux-udpgso-v1-0-d2344157ab2a@cloudflare.com
 
-I am just wondering what kind of changes are needed in
-vhost-device-vsock for forwarding packets to VMADDR_CID_LOCAL? Will
-that be something like this: the codepath that handles
-"/tmp/vm5.vsock", upon receiving a "connect" (from inside the nitro
-VM) for any port to "/tmp/vm5.vsock", vhost-device-vsock will just
-connect to the same port using AF_VSOCK using the socket system calls
-and messages received on that port in "/tmp/vm5.vsock" will be "send"
-to the AF_VSOCK socket? or am I not thinking right and the
-implementation would be something different entirely (change the CID
-from 3 to 2 (or 1?) on the packets before they are handled then socat
-will be needed probably)? Will this work if the applications in the
-host want to connect to applications inside the nitro VM (as opposed
-to applications inside the nitro VM connecting to CID 3)?
+---
+Jakub Sitnicki (2):
+      udp: Allow GSO transmit from devices with no checksum offload
+      selftests/net: Add test coverage for UDP GSO software fallback
 
-Thanks and Regards,
-Dorjoy
+ net/ipv4/udp.c                        |  3 +--
+ net/ipv4/udp_offload.c                |  8 +++++++
+ net/ipv6/udp.c                        |  3 +--
+ tools/testing/selftests/net/udpgso.c  | 15 +++++++++---
+ tools/testing/selftests/net/udpgso.sh | 43 +++++++++++++++++++++++++++++++++++
+ 5 files changed, 65 insertions(+), 7 deletions(-)
+
 
