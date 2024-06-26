@@ -1,77 +1,105 @@
-Return-Path: <netdev+bounces-106712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F20091755C
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 02:54:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D9DB917560
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:00:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E543E282F90
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 00:54:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4791E1C21861
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:00:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CCF38495;
-	Wed, 26 Jun 2024 00:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1587492;
+	Wed, 26 Jun 2024 01:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oO1sLZOG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SbzM/VUi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0471B4C6F;
-	Wed, 26 Jun 2024 00:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1242428FA;
+	Wed, 26 Jun 2024 01:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719363276; cv=none; b=YYVQKn3ZbppRvbPfKTQjA/n1esL4yt/nbp/I7LMhEU2S3qDV/rb9HUiSLeaq2hf/JSAzJJmE/rxdgZ1dxHeAfB9Vc2A8G83m2cdlNVc85ci1aq8wDv1fXBHon06cY2EVJRDf81WAnymo4F/R2vNM9y8C5ZpSnnoS6P5+5Pbtj+g=
+	t=1719363633; cv=none; b=m2PzjMVB92/V6cxApFGHOEvlx5Y1t+2TYKQePteIlR5Mz2VrWDF9U9ZWqr+9JCfM9nEopHvOynsy7/+4G4F3jJuFVfO4HVsUeFX9Wmw6+bWxYMrXa0cEDj5xOhhz6CQ66uk3Fh6lZwxJUEswqVOzSDMUsib1e7OSw2AjDgRcECY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719363276; c=relaxed/simple;
-	bh=xMiXrxWpqFvHwNreomzAVh6+pEq2p+w+8MNiSYQC9Qo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kc7y8niurBHfWepRibjQAanlH5evwXu3ciDCKcaSz8MzUuvGkjGI14e04ZUiNox3mBN0pSRx13+88tonG8MxSMLSqj1ZH9EwqQrsael7PulNpiXNvqljC42jxEh0/DF/0sbP2PCPWCS0454zKPjuj5X/TFWI9zjCKE7nBWnKZm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oO1sLZOG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19BC6C32781;
-	Wed, 26 Jun 2024 00:54:35 +0000 (UTC)
+	s=arc-20240116; t=1719363633; c=relaxed/simple;
+	bh=hdgniYt3+54JkbIsj7pvD/P/4LuDUv7FqTd6GRkEshU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=drHloulGnoO5MT1cnhkaQ8EdHgaurldsL/jQ1I2sOfn9Xuysd/enOhMV53pzjYO08tH7Rze/tuEdVr0twKIXUvZPljKl6vTC0sVgE4X45ibf/n+8mLyFzKTpBfwS5WTVE/cBQ4yLTHrgKVY0AJ76Axjtk98MVIyQp0zCTE4hRrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SbzM/VUi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9AC80C4AF07;
+	Wed, 26 Jun 2024 01:00:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719363275;
-	bh=xMiXrxWpqFvHwNreomzAVh6+pEq2p+w+8MNiSYQC9Qo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oO1sLZOGd4dn/1GJXV0GO6FkLkQleqtP2qYcRqaQn8B1V7Uo/0/fhQc9nl7XNuPxO
-	 sudgtwV/u3fPLA0ocKVD8hf0k0+iUozSZCy3LWl1st9PEGzb4vixYzDk930VPSPmfM
-	 p9+crUVwlZsilwstkFxG332R6/BsLJN7aHvHZq2+p5dV7ghe94dvONHOXvVOBKe+Fy
-	 nhuDYId/UDhtJrywcxQ+9n1ckEpknb0cOT5NFFHO99Lno+cRrW0qKx0EOmGbyKWrfC
-	 Wd92jaMcOlkS9juTlhltYYzQccPAOMgeOsB2Qu2xIyP7cV0cTawoSmIPBpnw42pH7M
-	 s7aLsxn2nohXw==
-Date: Tue, 25 Jun 2024 17:54:34 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Sunil Goutham <sgoutham@marvell.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, horms@kernel.org, linux-arm-kernel@lists.infradead.org
- (moderated list:ARM/CAVIUM THUNDER NETWORK DRIVER), netdev@vger.kernel.org
- (open list:NETWORKING DRIVERS), linux-kernel@vger.kernel.org (open list)
-Subject: Re: [PATCH net-next] net: thunderx: Unembed netdev structure
-Message-ID: <20240625175434.53ccea3a@kernel.org>
-In-Reply-To: <20240624102919.4016797-1-leitao@debian.org>
-References: <20240624102919.4016797-1-leitao@debian.org>
+	s=k20201202; t=1719363632;
+	bh=hdgniYt3+54JkbIsj7pvD/P/4LuDUv7FqTd6GRkEshU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SbzM/VUiLXMOGJ9F2+N0jRLkkQTW0Ii4WgFtG3Y5K8HV4PyyObwPtxDZKZ5vn17aS
+	 YNBbN19qPL4+Pc2wC80eq2jx9RaP9t48pZzXStjiE2LKwV+qz3u2g8AWooCqlb0b7t
+	 pe344kZ9/+/CP1UenZ/XxH0/HYGrqHuVrLz9rJSNS6lPd/F2JmInv7Ix9oOI6uySwG
+	 5ThLc3ioO3uCnINGuG+98+J5u630MRu39Ufng9JI35xUeyxBThulmOYISghKL+MWQc
+	 f0gAasPnQM0+M3msOMhOdZxM4rkqWIvdHnkfDAYWYf+GbFF7/YeFHtg1Pgkeufx+HV
+	 3CmK/RQutXmaQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 84EA6DE8DF3;
+	Wed, 26 Jun 2024 01:00:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/5] gve: Add flow steering support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171936363254.31895.5945372004965375509.git-patchwork-notify@kernel.org>
+Date: Wed, 26 Jun 2024 01:00:32 +0000
+References: <20240625001232.1476315-1-ziweixiao@google.com>
+In-Reply-To: <20240625001232.1476315-1-ziweixiao@google.com>
+To: Ziwei Xiao <ziweixiao@google.com>
+Cc: netdev@vger.kernel.org, jeroendb@google.com, pkaligineedi@google.com,
+ shailend@google.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, willemb@google.com,
+ hramamurthy@google.com, rushilg@google.com, horms@kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Mon, 24 Jun 2024 03:29:18 -0700 Breno Leitao wrote:
->  static void bgx_lmac_handler(struct net_device *netdev)
->  {
-> -	struct lmac *lmac = container_of(netdev, struct lmac, netdev);
-> +	struct lmac *lmac = netdev_priv(netdev);
+Hello:
 
-I think you are storing a pointer to lmac, so:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-	struct lmac **priv = netdev_priv(netdev);
-	struct lmac *lmac = *priv;
+On Tue, 25 Jun 2024 00:12:26 +0000 you wrote:
+> To support flow steering in GVE driver, there are two adminq changes
+> need to be made in advance.
+> 
+> The first one is adding adminq mutex lock, which is to allow the
+> incoming flow steering operations to be able to temporarily drop the
+> rtnl_lock to reduce the latency for registering flow rules among
+> several NICs at the same time. This could be achieved by the future
+> changes to reduce the drivers' dependencies on the rtnl lock for
+> particular ethtool ops.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3,1/5] gve: Add adminq mutex lock
+    https://git.kernel.org/netdev/net-next/c/1108566ca509
+  - [net-next,v3,2/5] gve: Add adminq extended command
+    https://git.kernel.org/netdev/net-next/c/fcfe6318dbac
+  - [net-next,v3,3/5] gve: Add flow steering device option
+    https://git.kernel.org/netdev/net-next/c/3519c00557e0
+  - [net-next,v3,4/5] gve: Add flow steering adminq commands
+    https://git.kernel.org/netdev/net-next/c/57718b60df9b
+  - [net-next,v3,5/5] gve: Add flow steering ethtool support
+    https://git.kernel.org/netdev/net-next/c/6f3bc487565d
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
