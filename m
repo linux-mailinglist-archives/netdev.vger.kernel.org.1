@@ -1,132 +1,141 @@
-Return-Path: <netdev+bounces-106971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F99F9184E6
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:53:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4EF79184EA
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:53:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 508DF1C22B81
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:53:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04DDF1C22D34
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE88C185E7F;
-	Wed, 26 Jun 2024 14:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C549186294;
+	Wed, 26 Jun 2024 14:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CS8pNosi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C6C5185E5F
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 14:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E8A186284
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 14:53:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719413568; cv=none; b=UI4iV2T8V4g7xvrlgDXSLvDHuDCxvzI4BDCS+2+GvKKZic9kNvLxH9vnWNmIp54G7v/hlsKQriaKSP3oWRdcvJGovp+lfv/Y4y162lB1zY+8lBd3RyM9akqpq1/GNRBnbUIKi0Eqh4seAy183gUDkPFX2HJWW8XX6h5FGgx3qyQ=
+	t=1719413607; cv=none; b=Uap3Y/VXsxd/X5O80eVACX/v3dy60KeaGn8EKB8n/sZMIrhyJ/sK0xKHp72sDfMaqzvzlq0LYdY0Ns/+aRgZLBBfCEyuJmQDgdWZEMfpXLGc5YTYRgopMIWfWvkiZc/6LCC9lfCn412aG7ddbBuITyu2LFcIbfIWDJIvZUWwqX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719413568; c=relaxed/simple;
-	bh=pNLo9dXnp4p74SX2p9JJSQE44/XATiWG8qjJTFunBCo=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=HA1QL0Q0O/ChWEV84EwlHA7AX2yxogL9ZMXXQnApwdxqbiXOyLzkwiUWagZnaEjiJkF1jFQ6/8umJ2Dqk3g+sdBF1amkXDvdyiNlbuXNDY/GIkIsi+ZwtAbTYhPVXZ8sVgdkRzvqM0CKOB89y854VejsK8+uvfd+RZgx2zBHy5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from ja.int.chopps.org.chopps.org (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 2A0557D052;
-	Wed, 26 Jun 2024 14:52:44 +0000 (UTC)
-References: <20240617205316.939774-1-chopps@chopps.org>
- <20240617205316.939774-9-chopps@chopps.org>
- <2fa05695-faf9-45ce-95de-f49a6749b828@quicinc.com>
-User-agent: mu4e 1.8.14; emacs 28.3
-From: Christian Hopps <chopps@chopps.org>
-To: Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org, Steffen
- Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, Christian
- Hopps <chopps@labn.net>
-Subject: Re: [PATCH ipsec-next v4 08/18] xfrm: iptfs: add new iptfs xfrm
- mode impl
-Date: Wed, 26 Jun 2024 10:52:33 -0400
-In-reply-to: <2fa05695-faf9-45ce-95de-f49a6749b828@quicinc.com>
-Message-ID: <m2frszah8k.fsf@ja.int.chopps.org>
+	s=arc-20240116; t=1719413607; c=relaxed/simple;
+	bh=hyNxaFzPXWFBRg+/6WUFhFSPBWdIIx4INvH/NCiLLHo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fXXoh0RSFCibVMX2iBpdw11J8SkifX0kJfPM95hmSUmxnhwJ3McmzRV7YnT3BWAQtTqfN1AQZwsDThLUvHiJnqE16V/3w3YG05DFujb6YXUl9C8l0lpsYrBoyFxL0zxloI+2C5XWHF9WpId8lDDlcgSegaKW/Eo/SC0lPKYeFiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CS8pNosi; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719413605;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YrKnBGUsXzxltAg01s3o4kyy9jXBJCa6pgwUhoUuJvY=;
+	b=CS8pNosi9HfpSuGDfzi6FQpH5mXveSzm2vc77oM+nT6tSg6ceZ/uQmcxCtsS/3MXMK15jT
+	xbYOSBaX8X8zkGy9c8pG3IyHsv5zJ6tpLY3t34n/AGLYI/uukiWHpi2TDIFQ3KMfgxjmWF
+	hwglgWMPphcwRbyewQtm7hRgD0pnX5U=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-265-ahusZ7wRNXeTMyZW5trFkw-1; Wed, 26 Jun 2024 10:53:24 -0400
+X-MC-Unique: ahusZ7wRNXeTMyZW5trFkw-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-79cca22db8aso127250985a.0
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 07:53:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719413600; x=1720018400;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YrKnBGUsXzxltAg01s3o4kyy9jXBJCa6pgwUhoUuJvY=;
+        b=ASxHVWaijS2eH8n8r/gBOFy66Ew53sAsx536GeWUPJrUlnRuxmbnGr+SOnIFtzuYkC
+         gX8IyzJO+Ifw4jC/0sLDEEFhuOF1QDk3kQ+r8sqRcgMHU2LNXlLU5r1V92Pny29rYzqD
+         vVvVa7exYcaoca1O0l2lqshhOxZ5t0leHSbxzKBuy3OvT14puW1xvRb2hP+1QBzSQ5L4
+         6cikLigsA6DrFvbInc1s7eibO6IpqQXfIKFEaA5Sp7hqI2hIyzqSdmvNYYQKJKNpsdE1
+         jncUkbWfkwHDjirVsAPKKTPdThehMaVeppCzh2++1w20fnyhD+keWyUkZ7zut3BF0qiH
+         bsLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXw1W1UGTBQc+oEQEeh2KMCcWs3IoapTKgFKos+7/EB8jwzdNU+S06hcJ9RhkcMZQ95Jn4WAonkeIVJqJ826w7RKIlMCAZ7
+X-Gm-Message-State: AOJu0Yyn+L9EEGG3ZK1dwS5k4ZKa2aTH7IT4ZiSKqlf3FOcuMDQFLjna
+	Nce1cvxfWRUijipGuinD+v6nuQiS3P+PrGO+y+u9vle1B3ueS5dELWVTLM9da4BXx3iIQQVYfXN
+	CiurSkwvQyeOATHbEM69j+xYUTF2kXUYt+hnPmcUM7bmXja/qsDhBHA==
+X-Received: by 2002:a05:620a:1998:b0:79d:5414:68d2 with SMTP id af79cd13be357-79d54146b12mr159311285a.44.1719413599687;
+        Wed, 26 Jun 2024 07:53:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE7rWL9/p+Lnv9AbO8zaoMmKP9NuiF/Sz5Kmi1mA7Vt5rgp/9627GpolyqUJFKWM3RKg3m/gg==
+X-Received: by 2002:a05:620a:1998:b0:79d:5414:68d2 with SMTP id af79cd13be357-79d54146b12mr159308585a.44.1719413599165;
+        Wed, 26 Jun 2024 07:53:19 -0700 (PDT)
+Received: from x1gen2nano ([2600:1700:1ff0:d0e0::f])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79bce89a5d5sm505133885a.19.2024.06.26.07.53.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jun 2024 07:53:18 -0700 (PDT)
+Date: Wed, 26 Jun 2024 09:53:16 -0500
+From: Andrew Halaney <ahalaney@redhat.com>
+To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+Cc: Vinod Koul <vkoul@kernel.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>, kernel@quicinc.com, 
+	Andrew Lunn <andrew@lunn.ch>, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] dt-bindings: net: qcom: ethernet: Add
+ interconnect properties
+Message-ID: <q2ou73goc2pgrmx7xul4z7zrqo4zylh3nd2ldxw5vnz2z4fnkf@axbse4awc6lf>
+References: <20240625-icc_bw_voting_from_ethqos-v2-0-eaa7cf9060f0@quicinc.com>
+ <20240625-icc_bw_voting_from_ethqos-v2-1-eaa7cf9060f0@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240625-icc_bw_voting_from_ethqos-v2-1-eaa7cf9060f0@quicinc.com>
 
---=-=-=
-Content-Type: text/plain; format=flowed
+On Tue, Jun 25, 2024 at 04:49:28PM GMT, Sagar Cheluvegowda wrote:
+> Add documentation for the interconnect and interconnect-names
+> properties required when voting for AHB and AXI buses.
+> 
+> Suggested-by: Andrew Halaney <ahalaney@redhat.com>
+> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+> ---
+>  Documentation/devicetree/bindings/net/qcom,ethqos.yaml | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
+> index 6672327358bc..b7e2644bfb18 100644
+> --- a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
+> +++ b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
+> @@ -63,6 +63,14 @@ properties:
+>  
 
+Does it make sense to make these changes in snps,dwmac.yaml since you're
+trying to do this generically for stmmac? I don't poke bindings super
+often so might be a silly question, the inheritance of snps,dwmac.yaml
+into the various platform specific bindings (qcom,ethqos.yaml) would
+then let you define it once in the snps,dwmac.yaml right?
 
-Jeff Johnson <quic_jjohnson@quicinc.com> writes:
+>    dma-coherent: true
+>  
+> +  interconnects:
+> +    maxItems: 2
+> +
+> +  interconnect-names:
+> +    items:
+> +      - const: axi
+> +      - const: ahb
 
-> On 6/17/24 13:53, Christian Hopps wrote:
->> From: Christian Hopps <chopps@labn.net>
->> Add a new xfrm mode implementing AggFrag/IP-TFS from RFC9347.
->> This utilizes the new xfrm_mode_cbs to implement demand-driven IP-TFS
->> functionality. This functionality can be used to increase bandwidth
->> utilization through small packet aggregation, as well as help solve PMTU
->> issues through it's efficient use of fragmentation.
->>    Link: https://www.rfc-editor.org/rfc/rfc9347.txt
->> Multiple commits follow to build the functionality into xfrm_iptfs.c
->> Signed-off-by: Christian Hopps <chopps@labn.net>
->> ---
->>   net/xfrm/Makefile     |   1 +
->>   net/xfrm/xfrm_iptfs.c | 225 ++++++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 226 insertions(+)
->>   create mode 100644 net/xfrm/xfrm_iptfs.c
->> diff --git a/net/xfrm/Makefile b/net/xfrm/Makefile
->> index 547cec77ba03..cd6520d4d777 100644
->> --- a/net/xfrm/Makefile
->> +++ b/net/xfrm/Makefile
->> @@ -20,5 +20,6 @@ obj-$(CONFIG_XFRM_USER) += xfrm_user.o
->>   obj-$(CONFIG_XFRM_USER_COMPAT) += xfrm_compat.o
->>   obj-$(CONFIG_XFRM_IPCOMP) += xfrm_ipcomp.o
->>   obj-$(CONFIG_XFRM_INTERFACE) += xfrm_interface.o
->> +obj-$(CONFIG_XFRM_IPTFS) += xfrm_iptfs.o
->>   obj-$(CONFIG_XFRM_ESPINTCP) += espintcp.o
->>   obj-$(CONFIG_DEBUG_INFO_BTF) += xfrm_state_bpf.o
->> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
->> new file mode 100644
->> index 000000000000..e7b5546e1f6a
->> --- /dev/null
->> +++ b/net/xfrm/xfrm_iptfs.c
->> @@ -0,0 +1,225 @@
->> +// SPDX-License-Identifier: GPL-2.0
-> ...
->
->> +module_init(xfrm_iptfs_init);
->> +module_exit(xfrm_iptfs_fini);
->> +MODULE_LICENSE("GPL");
->
-> missing MODULE_DESCRIPTION() which will cause a warning with make W=1
+Sorry to bikeshed, and with Krzysztof's review on this already its
+probably unnecessary, but would names like cpu-mac and mac-mem be
+more generic / appropriate? I see that sort of convention a lot in the
+other bindings, and to me those read really well and are understandable.
 
-Added.
-
-Thanks,
-Chris.
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmZ8KzsSHGNob3Bwc0Bj
-aG9wcHMub3JnAAoJEC4dgw7XuDAl+PwQAIs19u/CKDPGujHKfT8pW/dJ8wiObNF2
-X3ifXVlVszXC9RMES2HTVz3aEH6yP0CcFav/Cqxu6L1+yfasAZMz30j1sh95bG5W
-Lp4HZYDEpF128Y2XmxNvw97lCUhIsOQ5tq67g9xXMUfqthsCa9LkySYDWjLK0cmk
-bbqRnhncnOujT3Q8i03/BKYWaGZm3kIaS/TsECeRevrIKTvulT9FMVY/TOrHuyTH
-uYSCJbUH2QZkWvrIYzCkPSd7oKqz5BJl1y/rWw4JIHgGtZk8rx97Mpj/SGofiUYW
-B2nqHop0pMoek4eoiSvBSbv/PTuSejtrEyWvj590dvtEGNIH2G6DGHc91f/uRa+p
-g921Mh7lOUmhuP4JcR3vr4i9dzMebOdgEHjO1QW1Ylk+WpNLZ6vF7YVjVH4XxL2d
-hQTnCSn3NTr4CQ/1IQ7ymjxOck3Wh2zD6p5fXozdSbJDzecCTP5rYzu976vN+Mza
-fOYe9GPZt6Ud2v+IQYlD0iM90Zvujd09WYZCXweIBMDF7xF0HXsFxncTgsDoOf3n
-p5Eqf7EVcCUoIjjB3H7I+7jzuRmE6JlayJTDKOFabOBYVhO3zqdJsR+3pySn+iCk
-V8kAF/DQ6YP6M9UhQvdAM6ZUgvMwes3A2Ieh1KBG1FWk02xGIpw8zIY6EfDsGmyv
-UICw7Ooay2fR
-=t/Nq
------END PGP SIGNATURE-----
---=-=-=--
 
