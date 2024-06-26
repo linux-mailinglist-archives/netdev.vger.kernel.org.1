@@ -1,137 +1,76 @@
-Return-Path: <netdev+bounces-106737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 731579175D7
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:46:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F63C9175D9
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:47:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8E3FB20B1D
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:46:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAF111F219E1
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:47:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7109ABE6C;
-	Wed, 26 Jun 2024 01:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E11111184;
+	Wed, 26 Jun 2024 01:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="FIMnDukb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dl3UO4hK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF1C14F62
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 01:46:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3988DBE6C
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 01:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719366371; cv=none; b=fHHg7OySDgFooT2gkWErsWMxba4rqt9GXsKVkoIbkocPJRkCQih2OVlZvfXBOol38tko2A4s7nPp092MasDAL9VVoekOH8o07tfZizoCudqsH7maUeOl9Y3mHqAVpgCgDWC1VGSKcGtIGpU6VJlnGYPE4/pijdejNuM3DoHbtwk=
+	t=1719366435; cv=none; b=oDBl5P35yJvfObeMTUKwqye24T7Qkig1DzB/LEZO3kwq4UBcavLAanxQ67xKzj+90uf0TLTiRZnC0HVDa++7aQOgY7lnOrhCSccRQEvHtpWUSV+gbC8SUsyQyTUuI5NOH6hGZh2xPegXqv8eJyZovOy1Avz4eFh/t/P4iItuxtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719366371; c=relaxed/simple;
-	bh=d4XwO43a7NXBz7l7K86p3g4y4bJt0eJkkeoqoA177Kc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WjJoQBNz6Do+4AFU4A79So81WtAcnwBnRglwTZGgf+hrvlhliL6CwbOW8d90IuLI/3bMn/MJD7+a0qbhZtCH+3JO1cp+4AGZ/FtoINq4Vps/P2LezkZlvMgDhqc62+97HnpBv4SC2NOpH7Ivhb5M2xxWXn2HwIJhrPn8fa/O66g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=FIMnDukb; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1719366369; x=1750902369;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=9fFmKhlMCiV4AxFRhe15+3T6kbvPQWa4wtw05HRPSmM=;
-  b=FIMnDukbeYnakvkGVigE5dKFd/qyLBIQWELB+W1EYYRIabYvfzlInd/Q
-   jJSLVFlSLrWh8kNqUSwbJU4yjxlW5jx/bCLHYlSoOiSni/zv49H2Av1qm
-   gNIDcp9QvTRrKbQPT4bb7wB6fMAfgMyZoPDzMg8TYvaSlJa1ZbEj5ULhp
-   g=;
-X-IronPort-AV: E=Sophos;i="6.08,265,1712620800"; 
-   d="scan'208";a="415765498"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 01:46:07 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:9052]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.32.229:2525] with esmtp (Farcaster)
- id cab1c643-2aa4-4b37-988e-7d2e78d03a83; Wed, 26 Jun 2024 01:46:06 +0000 (UTC)
-X-Farcaster-Flow-ID: cab1c643-2aa4-4b37-988e-7d2e78d03a83
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Wed, 26 Jun 2024 01:46:06 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.100.6) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Wed, 26 Jun 2024 01:46:03 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuba@kernel.org>
-CC: <Rao.Shoaib@oracle.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH v1 net 02/11] selftest: af_unix: Add msg_oob.c.
-Date: Tue, 25 Jun 2024 18:45:55 -0700
-Message-ID: <20240626014555.86837-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240625174449.796bc9a0@kernel.org>
-References: <20240625174449.796bc9a0@kernel.org>
+	s=arc-20240116; t=1719366435; c=relaxed/simple;
+	bh=sXXT0xw4ebgnks4VkeSEqYzP2UJf89TvzByRr/DA4N8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aSJjApBmusRY920WpbB8M9PKFgmIMjjEfcRzqPpOZXh3EpbGRB/yK6jBrnTVHTTtf76ic1z1if5WVmLw1jhi+3jYfjSL1BfTmDOyS0oGVJnk/iRPLZhlku6a6leZ+SMQvDHURehX2veyPzWxE2w2VQoHYKDHpb4n7jq/f0Q1oIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dl3UO4hK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27FDEC32781;
+	Wed, 26 Jun 2024 01:47:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719366434;
+	bh=sXXT0xw4ebgnks4VkeSEqYzP2UJf89TvzByRr/DA4N8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dl3UO4hK43gkcC3ru7Wivxp2H1kZL+n3LnfeJp85GUnddd0YTTk3ZUAdUrr1x6blk
+	 6l41yeOe8fq7q9IA4aQrn93PqsuA+SduMQhpV9+TOfmfBJ5LogOs9vD1jEBANJdDgH
+	 n6b6CvanVafHmWkVIopp/AN0YptS6jq9o/KAvT2E6FfcLCoVciyisS8l8YPdpys9rk
+	 WHQSTA/+U9GcRVU9eEcERO5N+5XVfAvKYISsqcnwG57ghP3wskFeoKgtwleeNy32ym
+	 UZVwxEBe/nAO0cp9UDseOk81hf/L9LLsaDXcnrrNJocERGTLK5XXzYmR+56GzZ6oVe
+	 RszMBJwuttIvQ==
+Date: Tue, 25 Jun 2024 18:47:12 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, woojung.huh@microchip.com,
+ UNGLinuxDriver@microchip.com, horms@kernel.org, Tristram.Ha@microchip.com,
+ Arun.Ramadoss@microchip.com
+Subject: Re: [PATCH net v8 0/3] Handle new Microchip KSZ 9897 Errata
+Message-ID: <20240625184712.710a4337@kernel.org>
+In-Reply-To: <20240625160520.358945-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+References: <20240625160520.358945-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC002.ant.amazon.com (10.13.139.230) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Tue, 25 Jun 2024 17:44:49 -0700
-> On Mon, 24 Jun 2024 18:36:36 -0700 Kuniyuki Iwashima wrote:
-> > +	if (ret[0] != expected_len || recv_errno[0] != expected_errno) {
-> > +		TH_LOG("AF_UNIX :%s", ret[0] < 0 ? strerror(recv_errno[0]) : recv_buf[0]);
-> > +		TH_LOG("Expected:%s", expected_errno ? strerror(expected_errno) : expected_buf);
-> > +
-> > +		ASSERT_EQ(ret[0], expected_len);
-> > +		ASSERT_EQ(recv_errno[0], expected_errno);
-> > +	}
-> 
-> repeating the conditions feels slightly imperfect.
+On Tue, 25 Jun 2024 16:05:17 +0000 Enguerrand de Ribaucourt wrote:
+> v8:
+>  - split monitoring function in two to fit into 80 columns
+> v7: https://lore.kernel.org/netdev/20240621144322.545908-1-enguerrand.de-ribaucourt@savoirfairelinux.com/
 
-Yeah actually I don't like this...
+too late, v7 has been applied:
 
-> Would it be possible to modify EXPECT_* to return the condition?
-> Then we could:
-> 
-> 	if (EXPECT(...)) {
-> 		TH_LOG(...
-> 		TH_LOG(...
-> 	}
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=4ae2c67840a0a3c88cd71fc3013f958d60f7e50c
 
-We can use EXPECT_EQ() {} here, but for some test cases where TCP is
-buggy, I'd like to print the difference but let the test pass.
-
-For example, see patch 6.
-
-  #  RUN           msg_oob.no_peek.ex_oob_ahead_break ...
-  # msg_oob.c:146:ex_oob_ahead_break:AF_UNIX :hellowol
-  # msg_oob.c:147:ex_oob_ahead_break:TCP     :helloworl
-                                                     ^
-            TCP recv()s already recv()ed data, "r" --'
-
-  #            OK  msg_oob.no_peek.ex_oob_ahead_break
-  ok 11 msg_oob.no_peek.ex_oob_ahead_break
-
-In this case, this does not print the recv()ed data,
-
-  if (self->tcp_compliant) {
-      EXPECT_EQ(...) {
-          /* log retval, errno, buffer */
-      }
-  }
-
-and this fails the test even though AF_UNIX is doing correct.
-
-  EXPECT_EQ(...) {
-      if (self->tcp_compliant) {
-          /* log retval, errno, buffer */
-      }
-  }
-
-I think we can convert it to EXPECT_EQ() {} in all places after
-fixing TCP side and removing tcp_incompliant{} uses in the test.
+:(
+-- 
+pw-bot: nap
 
