@@ -1,231 +1,274 @@
-Return-Path: <netdev+bounces-106821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC2F3917CED
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 11:50:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E94BA917D15
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 11:58:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BE581C210A7
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 09:50:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EEB21F2251C
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 09:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B2516CD1F;
-	Wed, 26 Jun 2024 09:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CDD316EB73;
+	Wed, 26 Jun 2024 09:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CPJk8Pqu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C73316CD2D
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 09:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 671FBEEDD
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 09:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719395422; cv=none; b=G54BuEU9xZGy1mrSYEFN3bcumq6eiLTQB90QuflMFcUEqYd+gwIC5oFE9mf583zKdEvN8BNtMNBkODXWchoUvTdGRJZ1DAFHcu+/EHOtDMhxsNxpmx9YQkrTSLsSgyQWWOzVvunzS0P6NvCRS83bw5O2Z3Oa0F6unbv/UTcnuYY=
+	t=1719395899; cv=none; b=HcTZUwkzbVdoj0zkHwRRuOLETOYwIcDKFwttuPLCFRwPUZZzPtv+kRNo2viCydJTBYqjLZLwpaVVnIFnVmXWOarqaWXvnp27nGyWoGaCdT7O0RFqUbPa6D1XpSEBA3Fec7byDZlYQnpfevsH4BTaMJy9C9gFcBBtsUYpQTonYic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719395422; c=relaxed/simple;
-	bh=FdwIYfJMuRgpRF3HEdFn+ppVvG8cymDZxdWC8pVYh8U=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=nuYODlLCGlFmTcH4OFVxyfqsA7fKzX1TsOUzaZHWSujOVdJO0fdZu+wU49AoZWulK/WLdA7S6whAVrNFPTFIoqauNJARcFTvIutL28ykj4rg+irm0BdUQsmSZIitbhlL7sgfM5t0fB1LnaBb9sbqDsQ/fFW6+6M4vL+mSUWyd9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-7f3c81ae072so172638239f.3
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 02:50:20 -0700 (PDT)
+	s=arc-20240116; t=1719395899; c=relaxed/simple;
+	bh=x16jpfiapiMAOFClAby3zt13IuO15RnTDjRTyItCQcY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=buZ4mYz5dVzZVdoarmpTGDnIoPCrJ7/vM55sBiunyaFFYLIOLqsNSOZHMkFAwCqnnr2qpw3aZPu+Nznv8AUXtjR9qx/PKSSsOOJ47xZpoG4GKV/q6CeP6aTsMFluyq8c7QlQbPgDEKZCAnfe4T0BQ8w0YO8qODAht6udPHSsSI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CPJk8Pqu; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719395896;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GoXQutb3rkAKNU8JON+XNG0X1+QCCt1nv365VnOUFAw=;
+	b=CPJk8PquMC28BZ0Cc6+FHH5c1K4ek+GZn8OS7kNQd3k4e2TSpFR6UeI+oxwK8+okrbooOZ
+	xBqJSQtzdH+rXiRp8d5eqmWNGQUfDuJtFLRUbUKMHjBK/tb6pUykozrMnG/1KA5gV8VUim
+	kD3ecjycgcrK5vI8jq3h+klrVUxbeYw=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-179-4nY8qShZMrCMn6I0rRupMA-1; Wed, 26 Jun 2024 05:58:14 -0400
+X-MC-Unique: 4nY8qShZMrCMn6I0rRupMA-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-57c6979daf7so5098a12.1
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 02:58:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719395420; x=1720000220;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TTKE9mfMOdpWSVVFAZbkXWyMcJ107p9GYE63ltOmdxI=;
-        b=omC52KpSDu8rka39IPATK9/rxbjrcqw6lQXFsC9oNvj4mIf+rzmaz2l/oF6/to1RQj
-         tpOxRce1keGdQZR3Et7OjNAPEuNTfLkBelNHY79/xy2SUmxFCnYS30kRNjWcd10hfmvz
-         U6Qcgc3kWYA+Q/omJD+H7GsgNLCrUcPhIiiOsRP9o4yNrMHojY3ghbyIM51tJLfV+COb
-         iIQmjgcRMWJ96TGIMXxfQsi6eb/teu61KQFkAE+aFpvMIpFtEXOdNBEmXutm8G4jB7zP
-         8cLDLN0p6LiHtTvZeaw0HYJMnBvV3F71cI7ofQmvYfYZEJwwNY1obVcpB1gTSOtDVV90
-         mFaA==
-X-Forwarded-Encrypted: i=1; AJvYcCUxMpd+OBIyKNWf0soEaAi+RzF6FJNgSs8MjdZ1hLOxsfXbvbTFSX3Y8MUY40VkcXDT8+nWBesF5hu6bzgaGLKro9fcnfmX
-X-Gm-Message-State: AOJu0YzB0XqsS0K/c+ZcD33yyTdJ2+wl0gcovvMnaIiZjoQr8xPnNFqV
-	WqJu/fAR6NWW3lQO/2vl7gXfUP62kks3Y/4Gpl7CglFZgPrnyNUPAo60FAvPoSlMV27HRdg842W
-	WrAbuGBr1c3DXSzAB6jRmC/S9Q4xuMGnh6E4KT5I5frW3YsXKqmyX+Y0=
-X-Google-Smtp-Source: AGHT+IGfvDWqTDnsvKtr9DH6aYvG6H5PE5xEQXwTDbnt1dVe8eMVbHUjgpfbA+DJbH4nWwrGp6jZaF76p5vL7J3BmA+679mKVjug
+        d=1e100.net; s=20230601; t=1719395894; x=1720000694;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GoXQutb3rkAKNU8JON+XNG0X1+QCCt1nv365VnOUFAw=;
+        b=GPdv8KgWeuhPv6XMLF5aKL/RK63CJoGLiRFjMqfa5ZsQkuGGptmNyqicXbp+pf/Qb4
+         1b1/fmdsHLc9/hAc7ozI/VINM23uQmpWwnBq3R7FCO6N1J6NPwgraA2SsC/JdqPT4rqU
+         /kJmwgRAx93NKwEyH4dQWiqpa6T8O3gzASfJb+hp+0cpU0n1GeZ7+TG1B8I2golAfHKH
+         zAb+SSkQvRYo0a5nuOhxWnl/h9BRwiu64Cy7nxbFkdga5oMdT8Q1CKHF5Pu1jQxIzPfQ
+         bZAgAXvrxNDTvbfUy0F3omH9QFp9dS8PsP2ODqRn89IOj//NG5SzSXCHm8Ml0NI45Kty
+         UDcw==
+X-Forwarded-Encrypted: i=1; AJvYcCV0N+XsqQJ1PojUj6amsq9A5qbK2/zVt35/PwGAnVoUjH3e6bHnmuHStOYGskz6ZnPeSbd8t56oV7AN62u5Vfl9kMbbkgGi
+X-Gm-Message-State: AOJu0Yz7JU1OBIU8ukLxSZQMRHf4zJO1zLrmFplvk3L3pGQeINNYD8BM
+	QK+VBG4epSGmXJHXUbRQWG0KPjCY7vpTBsd//JRsQDh2lbWEvKJWAEpQssqXEfv1exLwftBuvPS
+	ztQmsibeRKdR4ku+4fwjE6CjZEGsmj2C3Tdqyw4C9KtTrxVnN59qTpw==
+X-Received: by 2002:a17:907:a602:b0:a72:84c9:cedc with SMTP id a640c23a62f3a-a7284c9d5a3mr166021166b.8.1719395893556;
+        Wed, 26 Jun 2024 02:58:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH9h0Wqhv5wIiLtdVLt5PHEEm3ReeN8olewjUx+l/KHU8JGw2sxnSWEzV2m/Mu/ti31gj/ISw==
+X-Received: by 2002:a17:907:a602:b0:a72:84c9:cedc with SMTP id a640c23a62f3a-a7284c9d5a3mr166017866b.8.1719395892700;
+        Wed, 26 Jun 2024 02:58:12 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc7:342:f1b5:a48c:a59a:c1d6:8d0a])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a726627e0dcsm187428066b.62.2024.06.26.02.58.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jun 2024 02:58:12 -0700 (PDT)
+Date: Wed, 26 Jun 2024 05:58:08 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Heng Qi <hengqi@linux.alibaba.com>, Jason Wang <jasowang@redhat.com>,
+	netdev@vger.kernel.org, virtualization@lists.linux.dev,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v4 2/5] virtio_net: enable irq for the control vq
+Message-ID: <20240626045313-mutt-send-email-mst@kernel.org>
+References: <1718868555.2701075-5-hengqi@linux.alibaba.com>
+ <CACGkMEv8jnnO=S3LYW00ypwHfM3Tzt42iuASG_d4FAAk60zoLg@mail.gmail.com>
+ <CACGkMEtryWEbe-07-7GWyntGN+f-sL+uS0ozN0Oc6aMemmsYEw@mail.gmail.com>
+ <1718877195.0503237-9-hengqi@linux.alibaba.com>
+ <20240620060816-mutt-send-email-mst@kernel.org>
+ <20240620061109-mutt-send-email-mst@kernel.org>
+ <1718879494.952194-11-hengqi@linux.alibaba.com>
+ <ZnvI2hJXPJZyveAv@nanopsycho.orion>
+ <20240626040730-mutt-send-email-mst@kernel.org>
+ <ZnvUn-Kq4Al0nMQZ@nanopsycho.orion>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:641f:b0:7eb:b22f:b7a8 with SMTP id
- ca18e2360f4ac-7f3a74be81emr39177339f.1.1719395419804; Wed, 26 Jun 2024
- 02:50:19 -0700 (PDT)
-Date: Wed, 26 Jun 2024 02:50:19 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000039e8e1061bc7f16f@google.com>
-Subject: [syzbot] [net?] possible deadlock in do_ip_setsockopt (4)
-From: syzbot <syzbot+e4c27043b9315839452d@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZnvUn-Kq4Al0nMQZ@nanopsycho.orion>
 
-Hello,
+On Wed, Jun 26, 2024 at 10:43:11AM +0200, Jiri Pirko wrote:
+> Wed, Jun 26, 2024 at 10:08:14AM CEST, mst@redhat.com wrote:
+> >On Wed, Jun 26, 2024 at 09:52:58AM +0200, Jiri Pirko wrote:
+> >> Thu, Jun 20, 2024 at 12:31:34PM CEST, hengqi@linux.alibaba.com wrote:
+> >> >On Thu, 20 Jun 2024 06:11:40 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >> >> On Thu, Jun 20, 2024 at 06:10:51AM -0400, Michael S. Tsirkin wrote:
+> >> >> > On Thu, Jun 20, 2024 at 05:53:15PM +0800, Heng Qi wrote:
+> >> >> > > On Thu, 20 Jun 2024 16:26:05 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> >> >> > > > On Thu, Jun 20, 2024 at 4:21 PM Jason Wang <jasowang@redhat.com> wrote:
+> >> >> > > > >
+> >> >> > > > > On Thu, Jun 20, 2024 at 3:35 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
+> >> >> > > > > >
+> >> >> > > > > > On Wed, 19 Jun 2024 17:19:12 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >> >> > > > > > > On Thu, Jun 20, 2024 at 12:19:05AM +0800, Heng Qi wrote:
+> >> >> > > > > > > > @@ -5312,7 +5315,7 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+> >> >> > > > > > > >
+> >> >> > > > > > > >     /* Parameters for control virtqueue, if any */
+> >> >> > > > > > > >     if (vi->has_cvq) {
+> >> >> > > > > > > > -           callbacks[total_vqs - 1] = NULL;
+> >> >> > > > > > > > +           callbacks[total_vqs - 1] = virtnet_cvq_done;
+> >> >> > > > > > > >             names[total_vqs - 1] = "control";
+> >> >> > > > > > > >     }
+> >> >> > > > > > > >
+> >> >> > > > > > >
+> >> >> > > > > > > If the # of MSIX vectors is exactly for data path VQs,
+> >> >> > > > > > > this will cause irq sharing between VQs which will degrade
+> >> >> > > > > > > performance significantly.
+> >> >> > > > > > >
+> >> >> > > > >
+> >> >> > > > > Why do we need to care about buggy management? I think libvirt has
+> >> >> > > > > been teached to use 2N+2 since the introduction of the multiqueue[1].
+> >> >> > > > 
+> >> >> > > > And Qemu can calculate it correctly automatically since:
+> >> >> > > > 
+> >> >> > > > commit 51a81a2118df0c70988f00d61647da9e298483a4
+> >> >> > > > Author: Jason Wang <jasowang@redhat.com>
+> >> >> > > > Date:   Mon Mar 8 12:49:19 2021 +0800
+> >> >> > > > 
+> >> >> > > >     virtio-net: calculating proper msix vectors on init
+> >> >> > > > 
+> >> >> > > >     Currently, the default msix vectors for virtio-net-pci is 3 which is
+> >> >> > > >     obvious not suitable for multiqueue guest, so we depends on the user
+> >> >> > > >     or management tools to pass a correct vectors parameter. In fact, we
+> >> >> > > >     can simplifying this by calculating the number of vectors on realize.
+> >> >> > > > 
+> >> >> > > >     Consider we have N queues, the number of vectors needed is 2*N + 2
+> >> >> > > >     (#queue pairs + plus one config interrupt and control vq). We didn't
+> >> >> > > >     check whether or not host support control vq because it was added
+> >> >> > > >     unconditionally by qemu to avoid breaking legacy guests such as Minix.
+> >> >> > > > 
+> >> >> > > >     Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com
+> >> >> > > >     Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> >> >> > > >     Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> >> >> > > >     Signed-off-by: Jason Wang <jasowang@redhat.com>
+> >> >> > > 
+> >> >> > > Yes, devices designed according to the spec need to reserve an interrupt
+> >> >> > > vector for ctrlq. So, Michael, do we want to be compatible with buggy devices?
+> >> >> > > 
+> >> >> > > Thanks.
+> >> >> > 
+> >> >> > These aren't buggy, the spec allows this. So don't fail, but
+> >> >> > I'm fine with using polling if not enough vectors.
+> >> >> 
+> >> >> sharing with config interrupt is easier code-wise though, FWIW -
+> >> >> we don't need to maintain two code-paths.
+> >> >
+> >> >Yes, it works well - config change irq is used less before - and will not fail.
+> >> 
+> >> Please note I'm working on such fallback for admin queue. I would Like
+> >> to send the patchset by the end of this week. You can then use it easily
+> >> for cvq.
+> >> 
+> >> Something like:
+> >> /* the config->find_vqs() implementation */
+> >> int vp_find_vqs(struct virtio_device *vdev, unsigned int nvqs,
+> >>                 struct virtqueue *vqs[], vq_callback_t *callbacks[],
+> >>                 const char * const names[], const bool *ctx,
+> >>                 struct irq_affinity *desc)
+> >> {
+> >>         int err;
+> >> 
+> >>         /* Try MSI-X with one vector per queue. */
+> >>         err = vp_find_vqs_msix(vdev, nvqs, vqs, callbacks, names,
+> >>                                VP_VQ_VECTOR_POLICY_EACH, ctx, desc);
+> >>         if (!err)
+> >>                 return 0;
+> >>         /* Fallback: MSI-X with one shared vector for config and
+> >>          * slow path queues, one vector per queue for the rest. */
+> >>         err = vp_find_vqs_msix(vdev, nvqs, vqs, callbacks, names,
+> >>                                VP_VQ_VECTOR_POLICY_SHARED_SLOW, ctx, desc);
+> >>         if (!err)
+> >>                 return 0;
+> >>         /* Fallback: MSI-X with one vector for config, one shared for queues. */
+> >>         err = vp_find_vqs_msix(vdev, nvqs, vqs, callbacks, names,
+> >>                                VP_VQ_VECTOR_POLICY_SHARED, ctx, desc);
+> >>         if (!err)
+> >>                 return 0;
+> >>         /* Is there an interrupt? If not give up. */
+> >>         if (!(to_vp_device(vdev)->pci_dev->irq))
+> >>                 return err;
+> >>         /* Finally fall back to regular interrupts. */
+> >>         return vp_find_vqs_intx(vdev, nvqs, vqs, callbacks, names, ctx);
+> >> }
+> >> 
+> >> 
+> >
+> >
+> >Well for cvq, we'll need to adjust the API so core
+> >knows cvq interrupts are be shared with config not
+> >datapath.
+> 
+> Agreed. I was thinking about introducing some info struct and pass array
+> of it instead of callbacks[] and names[]. Then the struct can contain
+> flag indication. Something like:
+> 
+> struct vq_info {
+> 	vq_callback_t *callback;
+> 	const char *name;
+> 	bool slow_path;
+> };
+> 
 
-syzbot found the following issue on:
-
-HEAD commit:    73cfd947dbdb net: ethernet: mtk_eth_soc: ppe: prevent ppe ..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=139ee301980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e78fc116033e0ab7
-dashboard link: https://syzkaller.appspot.com/bug?extid=e4c27043b9315839452d
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f7f95ead320b/disk-73cfd947.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2bb36264003f/vmlinux-73cfd947.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d854697a8694/bzImage-73cfd947.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e4c27043b9315839452d@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.10.0-rc4-syzkaller-00909-g73cfd947dbdb #0 Not tainted
-------------------------------------------------------
-syz.2.3207/15261 is trying to acquire lock:
-ffffffff8f5e7288 (rtnl_mutex){+.+.}-{3:3}, at: do_ip_setsockopt+0x127d/0x3cd0 net/ipv4/ip_sockglue.c:1077
-
-but task is already holding lock:
-ffff88804708c150 (&smc->clcsock_release_lock){+.+.}-{3:3}, at: smc_setsockopt+0x1c3/0xe50 net/smc/af_smc.c:3064
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (&smc->clcsock_release_lock){+.+.}-{3:3}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
-       smc_switch_to_fallback+0x35/0xd00 net/smc/af_smc.c:902
-       smc_sendmsg+0x11f/0x530 net/smc/af_smc.c:2779
-       sock_sendmsg_nosec net/socket.c:730 [inline]
-       __sock_sendmsg+0x221/0x270 net/socket.c:745
-       __sys_sendto+0x3a4/0x4f0 net/socket.c:2192
-       __do_sys_sendto net/socket.c:2204 [inline]
-       __se_sys_sendto net/socket.c:2200 [inline]
-       __x64_sys_sendto+0xde/0x100 net/socket.c:2200
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (sk_lock-AF_INET){+.+.}-{0:0}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       lock_sock_nested+0x48/0x100 net/core/sock.c:3543
-       do_ip_setsockopt+0x1a2d/0x3cd0 net/ipv4/ip_sockglue.c:1078
-       ip_setsockopt+0x63/0x100 net/ipv4/ip_sockglue.c:1417
-       do_sock_setsockopt+0x3af/0x720 net/socket.c:2312
-       __sys_setsockopt+0x1ae/0x250 net/socket.c:2335
-       __do_sys_setsockopt net/socket.c:2344 [inline]
-       __se_sys_setsockopt net/socket.c:2341 [inline]
-       __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2341
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (rtnl_mutex){+.+.}-{3:3}:
-       check_prev_add kernel/locking/lockdep.c:3134 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-       validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3869
-       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
-       do_ip_setsockopt+0x127d/0x3cd0 net/ipv4/ip_sockglue.c:1077
-       ip_setsockopt+0x63/0x100 net/ipv4/ip_sockglue.c:1417
-       smc_setsockopt+0x275/0xe50 net/smc/af_smc.c:3072
-       do_sock_setsockopt+0x3af/0x720 net/socket.c:2312
-       __sys_setsockopt+0x1ae/0x250 net/socket.c:2335
-       __do_sys_setsockopt net/socket.c:2344 [inline]
-       __se_sys_setsockopt net/socket.c:2341 [inline]
-       __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2341
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  rtnl_mutex --> sk_lock-AF_INET --> &smc->clcsock_release_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&smc->clcsock_release_lock);
-                               lock(sk_lock-AF_INET);
-                               lock(&smc->clcsock_release_lock);
-  lock(rtnl_mutex);
-
- *** DEADLOCK ***
-
-1 lock held by syz.2.3207/15261:
- #0: ffff88804708c150 (&smc->clcsock_release_lock){+.+.}-{3:3}, at: smc_setsockopt+0x1c3/0xe50 net/smc/af_smc.c:3064
-
-stack backtrace:
-CPU: 0 PID: 15261 Comm: syz.2.3207 Not tainted 6.10.0-rc4-syzkaller-00909-g73cfd947dbdb #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
- check_prev_add kernel/locking/lockdep.c:3134 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3869
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
- __mutex_lock_common kernel/locking/mutex.c:608 [inline]
- __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
- do_ip_setsockopt+0x127d/0x3cd0 net/ipv4/ip_sockglue.c:1077
- ip_setsockopt+0x63/0x100 net/ipv4/ip_sockglue.c:1417
- smc_setsockopt+0x275/0xe50 net/smc/af_smc.c:3072
- do_sock_setsockopt+0x3af/0x720 net/socket.c:2312
- __sys_setsockopt+0x1ae/0x250 net/socket.c:2335
- __do_sys_setsockopt net/socket.c:2344 [inline]
- __se_sys_setsockopt net/socket.c:2341 [inline]
- __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2341
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fec50775ae9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fec514fe048 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 00007fec50903fa0 RCX: 00007fec50775ae9
-RDX: 0000000000000023 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 00007fec507f6746 R08: 000000000000000c R09: 0000000000000000
-R10: 000000002000e040 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007fec50903fa0 R15: 00007fff4616c208
- </TASK>
+Yes. Add ctx too? There were attempts at it already btw.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> >
+> >
+> >
+> >> 
+> >> >
+> >> >Thanks.
+> >> >
+> >> >> 
+> >> >> > > > 
+> >> >> > > > Thanks
+> >> >> > > > 
+> >> >> > > > >
+> >> >> > > > > > > So no, you can not just do it unconditionally.
+> >> >> > > > > > >
+> >> >> > > > > > > The correct fix probably requires virtio core/API extensions.
+> >> >> > > > > >
+> >> >> > > > > > If the introduction of cvq irq causes interrupts to become shared, then
+> >> >> > > > > > ctrlq need to fall back to polling mode and keep the status quo.
+> >> >> > > > >
+> >> >> > > > > Having to path sounds a burden.
+> >> >> > > > >
+> >> >> > > > > >
+> >> >> > > > > > Thanks.
+> >> >> > > > > >
+> >> >> > > > >
+> >> >> > > > >
+> >> >> > > > > Thanks
+> >> >> > > > >
+> >> >> > > > > [1] https://www.linux-kvm.org/page/Multiqueue
+> >> >> > > > >
+> >> >> > > > > > >
+> >> >> > > > > > > --
+> >> >> > > > > > > MST
+> >> >> > > > > > >
+> >> >> > > > > >
+> >> >> > > > 
+> >> >> 
+> >> >
+> >
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
