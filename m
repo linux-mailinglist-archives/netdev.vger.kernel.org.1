@@ -1,128 +1,262 @@
-Return-Path: <netdev+bounces-106805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA519917B31
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:43:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D134917B63
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:51:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1BBA288DB0
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:43:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06C2A1F23629
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:51:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9301616131C;
-	Wed, 26 Jun 2024 08:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB3F16191A;
+	Wed, 26 Jun 2024 08:51:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wjjo6chC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V9Bj8EQz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10C815D5DE
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 08:43:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D291534F8;
+	Wed, 26 Jun 2024 08:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719391433; cv=none; b=UE6DBF9/CqPR8TAJq23CLHJdL+KE2m5OLVT4EUeppDG6VDDYgwvC7zEH/K4fMszPocU3GJG5CI5EWMyKoVP6ymmFGXzPhCObiBZYwGuFkAM5dc5ELaRuD2eWxr56QCejU+Y3URVzLwqdfy++UNXAr+gAvsrhUalBzmgYkne7SCk=
+	t=1719391900; cv=none; b=NuG9+FIC1hCgPhWVZ1B+2PaJEAb9yuyMt+eCl8fdpb/O/TfmXy+Tuc659EsLrk86atDPayfbPxKGce95w2YgdYMvnC+WyKsq3w0nWrzN0+rPS326pETVkCTBx9jDf6FUmasiodqQoaQ1P5q4J0MtB9Q6uX0KW0qZ3ue1cAtcdhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719391433; c=relaxed/simple;
-	bh=qyM/pBiUedyCLh7GYSGiX1g/z0dYDe9+wq98MwlZxZI=;
+	s=arc-20240116; t=1719391900; c=relaxed/simple;
+	bh=4MakcVKMpy+Kjbu8XIHYZwWbT/cX9l2eCq0rVqbDWhQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O2dGWt1II7nAD0ZfO/maukrZXlbzw6CRdwbvd2t9lJVZu8Fyf5X2pgugGD9WsUIOqyc5PkWHeNKLlN0O/CRpsT23vaW2YEmJ5n+g/81QfV1qmM+ojv17y8DeW5uKyltMhj5c5SWbVQrx6Hf56geZXjYrnrRtBBjOi2Slrz5PgJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wjjo6chC; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-57d119fddd9so7435a12.1
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 01:43:51 -0700 (PDT)
+	 To:Cc:Content-Type; b=uYokPbteGbVVqAsoeU6GaBnf586aPt6uK9ZkuclxzmYFzsHVG8AkPzd/E4w0c5SKpni4DmaQBsdoh/ZsHBitXJX0kNLGQuEVhIQWkBhquEXBqU6dryvD4m6/8VHhAWGLsX4HjU4D25wICusSHRLcSp63fbKZG7yb15K6FY/8vyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V9Bj8EQz; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6ad8265e889so7284746d6.3;
+        Wed, 26 Jun 2024 01:51:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719391430; x=1719996230; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qyM/pBiUedyCLh7GYSGiX1g/z0dYDe9+wq98MwlZxZI=;
-        b=wjjo6chC2Z+0vRhg1ejDSOLcDGgRzqcKtS1fD2w9T0PnY7d2mueoqrfa8t3K7kyrau
-         t1qiqSzUkOMHGorPjBE13+GH8RlI6tkd2dt7c6sUBG+edJEYIHmvCatY7jBKR67IRP63
-         TlwgRDztkSRZ20azg7oIo0eNiPd8FNf5wKv54gN/Rj7mfxBhzk2DWHjHdbrrF5xoo7j7
-         rOxNmGApLKb6iW9MExtBCKmbrWaPqwrPfGtMnxam1zY6b3DXRTiSKJuFn9LOWYFKowjK
-         Ou4xmZSPWj3Zpe890C4ybsMq/Ey0QRHoxN9R0LtGrJXFBeENeptbwhD2gIj1hV+vVwDZ
-         umAw==
+        d=gmail.com; s=20230601; t=1719391897; x=1719996697; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=xng73UHtuhzNM88NgVDcghWf0TbGG0cQtt8atLDW4vI=;
+        b=V9Bj8EQzutyULOwLli9mCP8EsAlECTPGu+BAkmYa/nmcemy3OBa1JhqAvg0h43sjAl
+         xP8X/RKhEb13WxYSeANibLIiW2FcNTf+lcFLxe8gQTnNu1uskSUMMA4O4mvCF2mJghcx
+         9Vcr/4OIRlojm61Y4UNLBLZWLkXTiLuN/gNcaUDmG2UueIZ6O7SOTXos28wjltJ5JYUf
+         JH8IXqkS21c7ecOrfLyj3cHRQavX0d6Ed/qzVinGo326KGfU7maOn81PRmZH2p/iy6T+
+         zJEwJ1cmX3k87ac0mQVLNZNn+ssrYMcmN3sq0yIaFjlQYk5fzKktc9fZkHNZJnHcTmBZ
+         jV3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719391430; x=1719996230;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qyM/pBiUedyCLh7GYSGiX1g/z0dYDe9+wq98MwlZxZI=;
-        b=Wltp8ZoPnTfFXArsMKy1aFlAKzAbhhuaGqf0zPmoo2oFdi+91kCnbwtYj90Q/oDqIO
-         jtVPP5CpcuGnKkkTMqOGaHyZCfGURR62ANOI/XRmmTZ9p+1a3HlqFYCVHrEfXL/3JW/3
-         kicWU7iR7VHBtsfdKjQyr1dFPqWm8pzDwaJo1kklpAY8bMtokEqrcM/DqIFHZyQF0O0Q
-         sQYyzcNlbhIL1gsUeH0gm9Go5hFk35P32500PHpUAkKsjbdSa0Mvi5HIEqDRkL7o/y0e
-         vJhtgxvsCIlCq8yv5RoysYFR6JOZ2rQ3qJ+ZsRJKIEC4K3Dj4oAuZCsdACbxJMbcCnVC
-         ikNQ==
-X-Gm-Message-State: AOJu0YxVHvJ0XpMKhPP93QvbF6AeRBon/UmVuWMvWHmWS4N73hr63GwI
-	35cAqhL7QYXCpEmYyFvnDh1AXYQbQIuh4ylMI9OQ+sKCGUzyKilpwaEP59oNw8l0g/XCJXbiVNW
-	+Pb75ixO2/SGSJknzLMrx6xzE3THoQ4GFBCzV
-X-Google-Smtp-Source: AGHT+IHS4XsQbrJXsxGKa86YDjCMrAN9c93K+qMBXYKVBto5NeIPFRsx8NZS2nCm7bZxoctzWMVygSGRTaelSEO5tA8=
-X-Received: by 2002:a05:6402:5203:b0:57c:b3c3:32bb with SMTP id
- 4fb4d7f45d1cf-58358b7509cmr118380a12.1.1719391429864; Wed, 26 Jun 2024
- 01:43:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719391897; x=1719996697;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xng73UHtuhzNM88NgVDcghWf0TbGG0cQtt8atLDW4vI=;
+        b=FICBhidafjxtw0nruYEvkMajUQfhUNLbivGxzvzhtbB690Z+lB2++9PFAVFGsrkEl6
+         cZiXvsFqFN1DswwF6rJr1MeVGjNJlauooHg3+G2NgiYWeiHSCpKSHndkGy79cVCowr+R
+         wb2gxp5Ryv/fqKBJESG3Cdnc+N1uM3UVvQykCPViEb3rupXMCd96a1Lgg30NaeNlVG7W
+         R7XQkc5SOVk8xwlkCMYt7Z9imp75i9xtSw5I1exxoACkPChWFoXAXSlg7v3linRqfbYx
+         G9m2GQWM9InI+S6Fm+tfWPf1IYRZJOIrcgqEaUIlPBL6Kp0dA6oMCZa6SRv3yDFA0AEn
+         5JSA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfyL04rS60TznMN8XS8JQL+jG9no4XwogNT7JzkokU3D/U8+GtjqOC1K8BgJ5wa08HyutwOZfsdYuZuIKDUSXRpN4msWwkAvoFG5Mzn81LBbp3HwL6rnV5vfx7
+X-Gm-Message-State: AOJu0YwyaQm6ICeYVoXID8xp7YPCidELlRLg6uqsilodSKmCrrFH054l
+	D0kWQaC9J9k4I7tPCweXfMNouZTs8BZ8rXFdAoIrlG3C1xVQJclEX0K7/TS2xDQjaSnS7xQW3o6
+	qtak5Dfgnj+Cv8ftZXgWwhTryuHg=
+X-Google-Smtp-Source: AGHT+IFemGOnuymNCTpu4VPWt8NdqRP9Mm9qHZma7/h8qIRhpPQ3qE2Dty2Jf6to1ms8qe5HKmOdJLB+VsrWXzkgv30=
+X-Received: by 2002:a0c:d6c5:0:b0:6b5:3c89:6d06 with SMTP id
+ 6a1803df08f44-6b53c896d70mr110892736d6.4.1719391897505; Wed, 26 Jun 2024
+ 01:51:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240626070037.758538-1-sagi@grimberg.me> <CANn89iLA-0Vo=9b4SSJP=9BhnLOTKz2khdq6TG+tJpey8DpKCg@mail.gmail.com>
- <a1b5edbd-29a4-493d-9aed-4bddfbf95c66@grimberg.me>
-In-Reply-To: <a1b5edbd-29a4-493d-9aed-4bddfbf95c66@grimberg.me>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 26 Jun 2024 10:43:38 +0200
-Message-ID: <CANn89iJ=Lvs3JR_nKhqD=-URfZBmLDchUysph6dAymb2+umoeA@mail.gmail.com>
-Subject: Re: [PATCH net v3] net: allow skb_datagram_iter to be called from any context
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Matthew Wilcox <willy@infradead.org>
+References: <20240619132048.152830-1-tushar.vyavahare@intel.com>
+ <20240619132048.152830-3-tushar.vyavahare@intel.com> <ZnsBF//QuXQ9Nyix@boxer> <IA1PR11MB6514E556BFDD10C0846D407A8FD62@IA1PR11MB6514.namprd11.prod.outlook.com>
+In-Reply-To: <IA1PR11MB6514E556BFDD10C0846D407A8FD62@IA1PR11MB6514.namprd11.prod.outlook.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Wed, 26 Jun 2024 10:51:26 +0200
+Message-ID: <CAJ8uoz2jknsnVZFvuH_D7kOuv7yEn3_miqdkBrzGA0zSdSdsyw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 2/2] selftests/xsk: Enhance batch size support
+ with dynamic configurations
+To: "Vyavahare, Tushar" <tushar.vyavahare@intel.com>
+Cc: "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, 
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"bjorn@kernel.org" <bjorn@kernel.org>, "Karlsson, Magnus" <magnus.karlsson@intel.com>, 
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "ast@kernel.org" <ast@kernel.org>, 
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "Sarkar, Tirthendu" <tirthendu.sarkar@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 26, 2024 at 10:23=E2=80=AFAM Sagi Grimberg <sagi@grimberg.me> w=
-rote:
+On Wed, 26 Jun 2024 at 10:36, Vyavahare, Tushar
+<tushar.vyavahare@intel.com> wrote:
 >
 >
 >
-> On 26/06/2024 10:40, Eric Dumazet wrote:
-> > On Wed, Jun 26, 2024 at 9:00=E2=80=AFAM Sagi Grimberg <sagi@grimberg.me=
-> wrote:
-> >> We only use the mapping in a single context, so kmap_local is sufficie=
-nt
-> >> and cheaper. Make sure to use skb_frag_foreach_page as skb frags may
-> >> contain highmem compound pages and we need to map page by page.
-> >>
-> >> Reported-by: kernel test robot <oliver.sang@intel.com>
-> >> Closes: https://lore.kernel.org/oe-lkp/202406161539.b5ff7b20-oliver.sa=
-ng@intel.com
-> >> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
-> > Thanks for working on this !
+> > -----Original Message-----
+> > From: Fijalkowski, Maciej <maciej.fijalkowski@intel.com>
+> > Sent: Tuesday, June 25, 2024 11:11 PM
+> > To: Vyavahare, Tushar <tushar.vyavahare@intel.com>
+> > Cc: bpf@vger.kernel.org; netdev@vger.kernel.org; bjorn@kernel.org;
+> > Karlsson, Magnus <magnus.karlsson@intel.com>;
+> > jonathan.lemon@gmail.com; davem@davemloft.net; kuba@kernel.org;
+> > pabeni@redhat.com; ast@kernel.org; daniel@iogearbox.net; Sarkar,
+> > Tirthendu <tirthendu.sarkar@intel.com>
+> > Subject: Re: [PATCH bpf-next 2/2] selftests/xsk: Enhance batch size support
+> > with dynamic configurations
 > >
-> > A patch targeting net tree would need a Fixes: tag, so that stable
-> > teams do not have
-> > to do archeological digging to find which trees need this fix.
+> > On Wed, Jun 19, 2024 at 01:20:48PM +0000, Tushar Vyavahare wrote:
+> > > Introduce dynamic adjustment capabilities for fill_size, comp_size,
+> > > tx_size, and rx_size parameters to support larger batch sizes beyond
+> > > the
+> >
+> > you are only introducing fill_size and comp_size to xsk_umem_info. The latter
+> > two seem to be in place.
+> >
 >
-> The BUG complaint was exposed by the reverted patch in net-next.
+> I will do it.
 >
-> TBH, its hard to tell when this actually was introduced, could skb_frags
-> always
-> have contained high-order pages? or was this introduced with the
-> introduction
-> of skb_copy_datagram_iter? or did it originate in the base implementation=
- it
-> was copied from skb_copy_datagram_const_iovec?
+> > > previous 2K limit.
+> > >
+> > > Update HW_SW_MAX_RING_SIZE test cases to evaluate AF_XDP's
+> > robustness
+> > > by pushing hardware and software ring sizes to their limits. This test
+> > > ensures AF_XDP's reliability amidst potential producer/consumer
+> > > throttling due to maximum ring utilization.
+> > >
+> > > Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
+> > > ---
+> > >  tools/testing/selftests/bpf/xskxceiver.c | 26
+> > > ++++++++++++++++++------  tools/testing/selftests/bpf/xskxceiver.h |
+> > > 2 ++
+> > >  2 files changed, 22 insertions(+), 6 deletions(-)
+> > >
+> > > diff --git a/tools/testing/selftests/bpf/xskxceiver.c
+> > > b/tools/testing/selftests/bpf/xskxceiver.c
+> > > index 088df53869e8..5b049f0296e6 100644
+> > > --- a/tools/testing/selftests/bpf/xskxceiver.c
+> > > +++ b/tools/testing/selftests/bpf/xskxceiver.c
+> > > @@ -196,6 +196,12 @@ static int xsk_configure_umem(struct ifobject
+> > *ifobj, struct xsk_umem_info *umem
+> > >     };
+> > >     int ret;
+> > >
+> > > +   if (umem->fill_size)
+> > > +           cfg.fill_size = umem->fill_size;
+> > > +
+> > > +   if (umem->comp_size)
+> > > +           cfg.comp_size = umem->comp_size;
+> > > +
+> > >     if (umem->unaligned_mode)
+> > >             cfg.flags |= XDP_UMEM_UNALIGNED_CHUNK_FLAG;
+> > >
+> > > @@ -265,6 +271,10 @@ static int __xsk_configure_socket(struct
+> > xsk_socket_info *xsk, struct xsk_umem_i
+> > >             cfg.bind_flags |= XDP_SHARED_UMEM;
+> > >     if (ifobject->mtu > MAX_ETH_PKT_SIZE)
+> > >             cfg.bind_flags |= XDP_USE_SG;
+> > > +   if (umem->fill_size)
+> > > +           cfg.tx_size = umem->fill_size;
+> > > +   if (umem->comp_size)
+> > > +           cfg.rx_size = umem->comp_size;
+> >
+> > how is the fq related to txq ? and cq to rxq? shouldn't this be fq-rxq and cq-
+> > txq. What is the intent here? In the end they are the same in your test.
+> >
+>
+> Yes, you are correct, updating code accordingly.
+>
+> > >
+> > >     txr = ifobject->tx_on ? &xsk->tx : NULL;
+> > >     rxr = ifobject->rx_on ? &xsk->rx : NULL; @@ -1616,7 +1626,7 @@
+> > > static void xsk_populate_fill_ring(struct xsk_umem_info *umem, struct
+> > pkt_stream
+> > >     if (umem->num_frames < XSK_RING_PROD__DEFAULT_NUM_DESCS)
+> > >             buffers_to_fill = umem->num_frames;
+> > >     else
+> > > -           buffers_to_fill = XSK_RING_PROD__DEFAULT_NUM_DESCS;
+> > > +           buffers_to_fill = umem->fill_size;
+> > >
+> > >     ret = xsk_ring_prod__reserve(&umem->fq, buffers_to_fill, &idx);
+> > >     if (ret != buffers_to_fill)
+> > > @@ -2445,7 +2455,7 @@ static int testapp_hw_sw_min_ring_size(struct
+> > > test_spec *test)
+> > >
+> > >  static int testapp_hw_sw_max_ring_size(struct test_spec *test)  {
+> > > -   u32 max_descs = XSK_RING_PROD__DEFAULT_NUM_DESCS * 2;
+> > > +   u32 max_descs = XSK_RING_PROD__DEFAULT_NUM_DESCS * 4;
+> > >     int ret;
+> > >
+> > >     test->set_ring = true;
+> > > @@ -2453,7 +2463,8 @@ static int testapp_hw_sw_max_ring_size(struct
+> > test_spec *test)
+> > >     test->ifobj_tx->ring.tx_pending = test->ifobj_tx-
+> > >ring.tx_max_pending;
+> > >     test->ifobj_tx->ring.rx_pending  = test->ifobj_tx-
+> > >ring.rx_max_pending;
+> > >     test->ifobj_rx->umem->num_frames = max_descs;
+> > > -   test->ifobj_rx->xsk->rxqsize = max_descs;
+> >
+> > rxqsize is only used for setting xsk_socket_config::rx_size ?
+> >
+>
+> Initially, we used the rxqsize field from the xsk_socket object, directly
+> assigning max_descs to it and then using this value to set cfg.rx_size.
+> However, we are now shifted to a different approach for test,  where we are
+> setting cfg.rx_size based on the comp_size from the umem object, provided
+> that umem->fill_size is true.
+>
+> > > +   test->ifobj_rx->umem->fill_size = max_descs;
+> > > +   test->ifobj_rx->umem->comp_size = max_descs;
+> > >     test->ifobj_tx->xsk->batch_size =
+> > XSK_RING_PROD__DEFAULT_NUM_DESCS;
+> > >     test->ifobj_rx->xsk->batch_size =
+> > XSK_RING_PROD__DEFAULT_NUM_DESCS;
+> > >
+> > > @@ -2461,9 +2472,12 @@ static int testapp_hw_sw_max_ring_size(struct
+> > test_spec *test)
+> > >     if (ret)
+> > >             return ret;
+> > >
+> > > -   /* Set batch_size to 4095 */
+> > > -   test->ifobj_tx->xsk->batch_size = max_descs - 1;
+> > > -   test->ifobj_rx->xsk->batch_size = max_descs - 1;
+> > > +   /* Set batch_size to 8152 for testing, as the ice HW ignores the 3
+> > lowest bits when updating
+> > > +    * the Rx HW tail register.
+> >
+> > i would wrap the comment to 80 chars but that's personal taste.
+> >
+>
+> I will do it.
 
-OK, I will therefore suggest something like this (even if the older
-bug might be exposed
-by a more recent patch), to cover all kernels after 5.0
+You can keep it at 100 chars since that is used in most of the file.
+That is allowed these days unless I mistake myself. Though the file
+started out at 80 chars.
 
-This was the commit adding __skb_datagram_iter(), not the bug.
-
-Fixes: 950fcaecd5cc ("datagram: consolidate datagram copy to iter helpers")
-
-I suspect high-order highmem pages were not used in older kernels anyway.
+> > > +    */
+> > > +   test->ifobj_tx->xsk->batch_size = test->ifobj_tx->ring.tx_max_pending
+> > - 8;
+> > > +   test->ifobj_rx->xsk->batch_size = test->ifobj_tx->ring.tx_max_pending
+> > - 8;
+> > > +   pkt_stream_replace(test, max_descs, MIN_PKT_SIZE);
+> > >     return testapp_validate_traffic(test);  }
+> > >
+> > > diff --git a/tools/testing/selftests/bpf/xskxceiver.h
+> > > b/tools/testing/selftests/bpf/xskxceiver.h
+> > > index 906de5fab7a3..885c948c5d83 100644
+> > > --- a/tools/testing/selftests/bpf/xskxceiver.h
+> > > +++ b/tools/testing/selftests/bpf/xskxceiver.h
+> > > @@ -80,6 +80,8 @@ struct xsk_umem_info {
+> > >     void *buffer;
+> > >     u32 frame_size;
+> > >     u32 base_addr;
+> > > +   u32 fill_size;
+> > > +   u32 comp_size;
+> > >     bool unaligned_mode;
+> > >  };
+> > >
+> > > --
+> > > 2.34.1
+> > >
+>
 
