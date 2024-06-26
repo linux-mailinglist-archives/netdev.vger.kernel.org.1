@@ -1,228 +1,151 @@
-Return-Path: <netdev+bounces-106948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D43B69183FB
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:27:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6F9691841C
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:28:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 043461C22756
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:27:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F4E01F2182D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A084418629C;
-	Wed, 26 Jun 2024 14:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD1D185E65;
+	Wed, 26 Jun 2024 14:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XliDJOUH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HeGqIaEV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0C71822C2;
-	Wed, 26 Jun 2024 14:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A571850A6
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 14:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719412011; cv=none; b=Smli2vNqTvx1Ysr4D14T54mbYvEwh539lCysUV0OEWv/RBra1IdWzwU12KbuVqWs7GjfD32XK5+m6kM7nuaApqQJaATX5M38hJAcRdr3Y4o4LB6vu7aKr589t+W48vZ7uGOuj/DpE6tdeZ0SyVIUwLIvHh/m0pRWuyP15xtlvEc=
+	t=1719412079; cv=none; b=CTh/ELkeWs0ljXU2AvRiXoUEmqmOP2caCTybEhxQxHvWKGAhF8cG7PREO+YVOAIDl9IgP5vU5qYOVu127L4QFMPho/FvOy0ZHc4KceH+xMFxdrMviKRmKuTXDwKB010muIEePaWEJQjcZSiWxoOXd3u1Z3yIER1zqdphguJOHRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719412011; c=relaxed/simple;
-	bh=vg5cri0PAiOZOwK+95etYDxO3VjAS4xHDI6mf4kbDVw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=QtrcWOCH2piuF84hj2hqh02u6vlnFLWqmZ4q/+EbpMjmsyOHpR8DEZLJTRZ4tSBzDIDu5/XMdHW6K42+t22b8tdQvIAChARLAL4+wsIWRl3DLJS9NGev2zvvj0+eZXyuMhx5YGo5Ly9Cj0GOyqy/FCajQ4VVOmETJTDlxWPzPh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XliDJOUH; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45QDQswG007153;
-	Wed, 26 Jun 2024 14:26:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:subject:from:to:cc:date:in-reply-to:references
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	NOyl7bvy3xn1R0AC5aOW2qZLf3TfADm+9Y/XroZ4e2k=; b=XliDJOUHJhEvrcDz
-	A1UuMz8RVuvb4Iyxq8FhdIdMOX1FTKU6BeZZ+/snQlVI1oH9OMQCYwMv1i2DZOnG
-	4GwdjsSNtx53VbWEs1Qom25316ammxbwbAj1jZnBSDLz2tIWRpKE3RbkjdcISUrA
-	PnC1kE58OBh0GYgy5DXtWIUuRRauw1YC6P057v6HvdnXMw0z7V0f+7wOfryEvUbz
-	1VubXy3UQsoXGSdXymS72si8sph4q7c58akn97l2s2feFXL5j4tF3ACDTO4k1V3Z
-	xvFScNTn3Fd1KQFFlPNCfvKs2gk04Q46WM71hYFclbYtFdx0HO2U7J4FKxUSkW2o
-	uZqLag==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 400k158b4h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Jun 2024 14:26:43 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45QBm5fY019533;
-	Wed, 26 Jun 2024 14:26:42 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yx9xq4v3y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Jun 2024 14:26:42 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45QEQcDA50331946
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 26 Jun 2024 14:26:41 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BE8F75805D;
-	Wed, 26 Jun 2024 14:26:38 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 54D0758057;
-	Wed, 26 Jun 2024 14:26:36 +0000 (GMT)
-Received: from [9.179.2.26] (unknown [9.179.2.26])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 26 Jun 2024 14:26:36 +0000 (GMT)
-Message-ID: <7493b7a289729ebdf20c50c181676e62780dff63.camel@linux.ibm.com>
-Subject: Re: [PATCH] s390/ism: Add check for dma_set_max_seg_size in
- ism_probe()
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Gerd Bayer <gbayer@linux.ibm.com>, Ma Ke <make24@iscas.ac.cn>,
-        wintera@linux.ibm.com, twinkler@linux.ibm.com,
-        Wenjia Zhang
- <wenjia@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com,
-        davem@davemloft.net, Stefan Raspl <raspl@linux.ibm.com>
-Date: Wed, 26 Jun 2024 16:26:35 +0200
-In-Reply-To: <4ab328297c12d1c286c56dbc01d611b77ea2da03.camel@linux.ibm.com>
-References: <20240626081215.2824627-1-make24@iscas.ac.cn>
-	 <4ab328297c12d1c286c56dbc01d611b77ea2da03.camel@linux.ibm.com>
-Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
- keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
+	s=arc-20240116; t=1719412079; c=relaxed/simple;
+	bh=uvJrspBU9bKcZunDCtqHx/7zul1bnfXgHggRAC+SCok=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ep2MCT8PfAcLxEUYE+0Rm5k2wv2r2HUsYTUn6kcEl70qfh4DHyyryuQ+u2f0hSNqKQrYw71zHVieGqq58YgL1txYiNmLR2ZSMqXq7BovpDwSfbiRWR13Sn9RSJIB+NcdUCmgv/U4d89+UHLClc87NdqNyldMPXG5HfGbcnwhatM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HeGqIaEV; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719412077;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uvJrspBU9bKcZunDCtqHx/7zul1bnfXgHggRAC+SCok=;
+	b=HeGqIaEVikMR2wCTICtTY9VQ47WimQmsB7RfrM0AQidaoEe6m7s9jt3zeKifjm/5OBLQdR
+	VDNzV2s/d2bHF9l1+gMBlERI0RE1YuPLQdvSoPQa80EKgFwWEyFk7JqOVt+hSQE7p6yyGL
+	b6SIHE+njHjycSnPP2GR5whnkIri6jc=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-189-Jn2HiGqGP-CD3tg1A3ib3w-1; Wed, 26 Jun 2024 10:27:55 -0400
+X-MC-Unique: Jn2HiGqGP-CD3tg1A3ib3w-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a7246c24b00so231826966b.0
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 07:27:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719412074; x=1720016874;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uvJrspBU9bKcZunDCtqHx/7zul1bnfXgHggRAC+SCok=;
+        b=LFufqeY8uJDqHWV+GKr2HwRZ5ZMzosIntCrutK+k1GnAgrx3+w/MV071q//qrv9jfb
+         8OwS1XWqN5ex+EQuXrGD7hFSa/dsc63gYtxbqUPRfVbf87um5wWpuS1F0ZmzEXU69jpU
+         r29RTxTa7g9q1DqfKX8PMiePqnOiqxSvVPBoPLhYdFLGgwLQQRNl6gu+KeWGxJlOcrDg
+         4en46rlIBH+mKkKQqhwC2Y0f0/1FccVeC15n2VRc20gMCZ2lplTQDGaQQf/27cCUczir
+         oryX2OWrflzURuNnuTrffzmGCKt+WjgctoEYuvlk4lnu21U1mwWUeYb1K7wMm1hT54zZ
+         Kn0g==
+X-Gm-Message-State: AOJu0YxG4x1EJhzVSfz/WrpwUrlWe5R5K72Rsj1/CyFotDrPuK3X2liO
+	fcm9Wn5F+CsrV/TrRzPxvsq1HEvCgSEKarhB9a6g16ZhWcXez7H3x+5mztv4ogssW8dDKIqNW2E
+	jIpB8eHnbmTVaV3TsbyOKsTtqAKJKIQ7CMQPdgjR3d3ApALBgRcIFpA==
+X-Received: by 2002:a17:907:270c:b0:a6f:b181:e3a0 with SMTP id a640c23a62f3a-a7242c9ca27mr660659566b.27.1719412074540;
+        Wed, 26 Jun 2024 07:27:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGITU0WM1nvWNIRcPvt+8mKmTQC+2o4+y19m9kOvk7XXOOdDyxmbEGYzgSiACONT2x5sY2Z3w==
+X-Received: by 2002:a17:907:270c:b0:a6f:b181:e3a0 with SMTP id a640c23a62f3a-a7242c9ca27mr660657566b.27.1719412074195;
+        Wed, 26 Jun 2024 07:27:54 -0700 (PDT)
+Received: from [10.39.194.16] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a724ae806dbsm383611766b.41.2024.06.26.07.27.53
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 26 Jun 2024 07:27:53 -0700 (PDT)
+From: Eelco Chaudron <echaudro@redhat.com>
+To: Adrian Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org, aconole@redhat.com, horms@kernel.org,
+ i.maximets@ovn.org, dev@openvswitch.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v5 00/10] net: openvswitch: Add sample
+ multicasting.
+Date: Wed, 26 Jun 2024 16:27:52 +0200
+X-Mailer: MailMate (1.14r6039)
+Message-ID: <256A6A9B-FAFA-4048-985E-7165B38760F8@redhat.com>
+In-Reply-To: <20240625205204.3199050-1-amorenoz@redhat.com>
+References: <20240625205204.3199050-1-amorenoz@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: EscOKJQhdCKtQEIwfM2S2jXCCry1_rMc
-X-Proofpoint-GUID: EscOKJQhdCKtQEIwfM2S2jXCCry1_rMc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-26_07,2024-06-25_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1011 suspectscore=0 spamscore=0 malwarescore=0 priorityscore=1501
- impostorscore=0 phishscore=0 adultscore=0 mlxscore=0 bulkscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2406260107
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2024-06-26 at 14:48 +0200, Gerd Bayer wrote:
-> Hi Ma Ke,
->=20
-> On Wed, 2024-06-26 at 16:12 +0800, Ma Ke wrote:
-> > As the possible failure of the dma_set_max_seg_size(), we should
-> > better check the return value of the dma_set_max_seg_size().
->=20
-> I think formally you're correct. dma_set_max_seg_size() could return an
-> error if dev->dma_parms was not present.
->=20
-> However, since ISM devices are PCI attached (and will remain PCI
-> attached I believe) we can take the existance of dev->dma_parms for
-> granted since pci_device_add() (in drivers/pci/probe.c) will make that
-> point to the pci_dev's dma_parms for every PCI device.
->=20
-> So I'm not sure how important this fix is.
 
-I agree this doesn't look like an issue we're likely to encounter. That
-said if for some reason dma_set_max_seg_size() or common PCI code is
-changed and it starts failing it's good to have it handled.
 
-This  line has also only been dma_set_max_seg_size() since commit
-b0da3498c587 ("PCI: Remove pci_set_dma_max_seg_size()"). Since this
-patch won't apply for anything older I would prefer to cite that as the
-fixed commit.
+On 25 Jun 2024, at 22:51, Adrian Moreno wrote:
 
->=20
-> > Fixes: 684b89bc39ce ("s390/ism: add device driver for internal shared
-> > memory")
-> > Signed-off-by: Ma Ke <make24@iscas.ac.cn>
-> > ---
-> > =C2=A0drivers/s390/net/ism_drv.c | 4 +++-
-> > =C2=A01 file changed, 3 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-> > index e36e3ea165d3..9ddd093a0368 100644
-> > --- a/drivers/s390/net/ism_drv.c
-> > +++ b/drivers/s390/net/ism_drv.c
-> > @@ -620,7 +620,9 @@ static int ism_probe(struct pci_dev *pdev, const
-> > struct pci_device_id *id)
-> > =C2=A0		goto err_resource;
-                ^ see here
+> ** Background **
+> Currently, OVS supports several packet sampling mechanisms (sFlow,
+> per-bridge IPFIX, per-flow IPFIX). These end up being translated into a=
 
-> > =C2=A0
-> > =C2=A0	dma_set_seg_boundary(&pdev->dev, SZ_1M - 1);
-> > -	dma_set_max_seg_size(&pdev->dev, SZ_1M);
-> > +	ret =3D dma_set_max_seg_size(&pdev->dev, SZ_1M);
-> > +	if (ret)
-> > +		return ret;
+> userspace action that needs to be handled by ovs-vswitchd's handler
+> threads only to be forwarded to some third party application that
+> will somehow process the sample and provide observability on the
+> datapath.
+>
+> A particularly interesting use-case is controller-driven
+> per-flow IPFIX sampling where the OpenFlow controller can add metadata
+> to samples (via two 32bit integers) and this metadata is then available=
 
-Simply returning here would leak the resources. Just like the error
-condition I marked above this would need to be goto err_resource.
+> to the sample-collecting system for correlation.
+>
+> ** Problem **
+> The fact that sampled traffic share netlink sockets and handler thread
+> time with upcalls, apart from being a performance bottleneck in the
+> sample extraction itself, can severely compromise the datapath,
+> yielding this solution unfit for highly loaded production systems.
+>
+> Users are left with little options other than guessing what sampling
+> rate will be OK for their traffic pattern and system load and dealing
+> with the lost accuracy.
+>
+> Looking at available infrastructure, an obvious candidated would be
+> to use psample. However, it's current state does not help with the
+> use-case at stake because sampled packets do not contain user-defined
+> metadata.
+>
+> ** Proposal **
+> This series is an attempt to fix this situation by extending the
+> existing psample infrastructure to carry a variable length
+> user-defined cookie.
+>
+> The main existing user of psample is tc's act_sample. It is also
+> extended to forward the action's cookie to psample.
+>
+> Finally, a new OVS action (OVS_SAMPLE_ATTR_EMIT_SAMPLE) is created.
+> It accepts a group and an optional cookie and uses psample to
+> multicast the packet and the metadata.
+Hi Adrian,
 
-> > =C2=A0	pci_set_master(pdev);
-> > =C2=A0
-> > =C2=A0	ret =3D ism_dev_init(ism);
->=20
-> BTW, I've dropped ubraun@linux.ibm.com and sebott@linux.ibm.com as
-> their emails won't work any longer, anyhow. Instead I've added Niklas
-> Schnelle, Wenjia Zhang and Stefan Raspl.
->=20
-> Thanks, Gerd
->=20
+I reviewed the first part of this series to ensure it aligns with the use=
+rspace integration. I skipped the selftest patches, assuming Aaron is han=
+dling/reviewing those.
 
+Thanks,
+
+Eelco
 
 
