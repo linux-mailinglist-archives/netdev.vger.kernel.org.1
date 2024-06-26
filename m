@@ -1,89 +1,122 @@
-Return-Path: <netdev+bounces-106940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB86D918374
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:58:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61CAB91838D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:01:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CFF3B245C2
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 13:58:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D74C1F21EA9
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FD81850A2;
-	Wed, 26 Jun 2024 13:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319DC18508A;
+	Wed, 26 Jun 2024 14:01:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GKHt/1Ll"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="EUnvvgGV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.15.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C437185090
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 13:57:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52A6C136;
+	Wed, 26 Jun 2024 14:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719410267; cv=none; b=aCyV0WWJ27ZHsKF0FuyqZ8/N+8ToywXmFicPX6xh3tgVAxSD0au6N9EiqpiShgKGXAqtj92Qpi7q71yQyMW9tsJDbxANfcAV64OXJJFl3W04beOShJSfWJ6RhWPxzSbE95sIW+3I4cyrkEbh5NsXN2qrGwZEj88kRhOuUDWjGwk=
+	t=1719410471; cv=none; b=Sg719MfNrfgoGtjgREyFVDeqR/2ubQulgNlqOoFCzn0J5ApcRiS/epblJBXOC7UnExL6wQe1N/yG6Xd4lA9nAu/uL5e2I1yzSIgUfmbZ3+ZaMJwrN6DPtECmxQD2lqVvAXV0B3OZTMuGAaxPYPEKPo6Av8MH02taGvp/8Nnp4N4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719410267; c=relaxed/simple;
-	bh=Fb9qnoPo3ZJGHdVTGQdBJ3r50yXEqchYRjz8cnEIP1E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AYB2jx5nx25BwnSi9TXQROHSXGvFjNz45+Nim0teiyZaofZHhWwiCnKSERgNMZxeqjjPwjQCwP09rhnQDAzBXTefGrqdDfQY96JKsA+8yL5S5bv6SHXSScwq52AEsodR8qVHzP9nIAnOuqwYWzScRAfau0xVbW22r7FYPX1jjzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GKHt/1Ll; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E955EC116B1;
-	Wed, 26 Jun 2024 13:57:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719410267;
-	bh=Fb9qnoPo3ZJGHdVTGQdBJ3r50yXEqchYRjz8cnEIP1E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GKHt/1Llcinr2JfjYRBiWtqjXu7Cqzwe6Cu+EnrfegNR3AZFBIQJwMULpAZyTcRH5
-	 qX+1IqdOUbx4nHy3FzPKWZiO4WnmzbpUl3IiUB4On1dA0w56cEuQWRhnDGlBsHuSYg
-	 l363KwiFQZmiRB2NdTxHRIu0rZO3L03hKkEqEUsiY/AlH7a8opOQcyldLsPkBsrBD7
-	 Z+vgoDJNOR776PfZp3aqWL3aGHnKlqjjQsFQ5ZpHQFxnDHHLR9PQqQJOE7RhN3jEG5
-	 iuIwdZYECu28/ZSdf2/zU7irm8sQlZeTWiQVUGwOKxnhgpDw92JB9bKIeKsGlbTXWe
-	 WSSBFu4DNnadw==
-Date: Wed, 26 Jun 2024 09:57:44 -0400
-From: Sasha Levin <sashal@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeed@kernel.org>, netdev@vger.kernel.org,
-	pabeni@redhat.com, willemdebruijn.kernel@gmail.com,
-	borisp@nvidia.com, gal@nvidia.com, cratiu@nvidia.com,
-	rrameshbabu@nvidia.com, steffen.klassert@secunet.com,
-	tariqt@nvidia.com, mingtao@meta.com, knekritz@meta.com
-Subject: Re: [RFC net-next 01/15] psp: add documentation
-Message-ID: <ZnweWKSNWu8On2xi@sashalap>
-References: <20240510030435.120935-1-kuba@kernel.org>
- <20240510030435.120935-2-kuba@kernel.org>
- <Zj6da1nANulG5cb5@x130.lan>
- <20240510171132.557ba47e@kernel.org>
+	s=arc-20240116; t=1719410471; c=relaxed/simple;
+	bh=hII3Q92Ova8i4hUPBYvI76xLncvZJuiw2a5GonhEhIU=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=WmZozminVkJ+nVpON0SFR5Rcpxf+P24xtOYHih6EYlJ6TGS45LIRpKzMkxTNPi8AoL3VPbM9+FTWOpq+aT/E+3YZOWpaw5e1++6RCaRNHzTruC/fy3zmrIt8nJvKoyqMsH+jwrnOw75OL8oV0nB0cjoRsMLH0Kpx9chsvZJuHt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=EUnvvgGV; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1719410447; x=1720015247; i=markus.elfring@web.de;
+	bh=hII3Q92Ova8i4hUPBYvI76xLncvZJuiw2a5GonhEhIU=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=EUnvvgGVHt8s666lwyG481E93VX8sXDxYOb5Zjx398BsDgn02UtYX/1KFYtgqdxD
+	 A31V3266VyuXemqpCMBaPm62y4vCaQjr/OPQ2PH3wy4iDK5HKw1AlAr0mFd25ffH4
+	 5Xd7ArChrbbw7kS/IWs/5I+KU+4fJLVaGjubMLjvdI/DKPit5jQ5wdejTB7ECe5qz
+	 kKgtBtM5zXJWGxPPP879g4xtpaTqTIBxB8YbQ8Uci2BsUHde2BJIyVNdG2M/ixEHf
+	 +j3ICIOTsvHvFXdFvTj+bf/SBqJoMV6lHlZoHXcHBojslnek6gLMtHxI6LA+eHwOc
+	 DRq9VU9WGPz71uLRvQ==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1N1uAv-1sTZnb44Wv-00rWRL; Wed, 26
+ Jun 2024 16:00:47 +0200
+Message-ID: <17b2f95a-b6ce-47d5-a826-9cfd1ff3f419@web.de>
+Date: Wed, 26 Jun 2024 16:00:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240510171132.557ba47e@kernel.org>
+User-Agent: Mozilla Thunderbird
+To: Gerd Bayer <gbayer@linux.ibm.com>, Ma Ke <make24@iscas.ac.cn>,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Alexandra Winter <wintera@linux.ibm.com>,
+ =?UTF-8?Q?Christian_Borntr=C3=A4ger?= <borntraeger@linux.ibm.com>,
+ "David S. Miller" <davem@davemloft.net>, Heiko Carstens <hca@linux.ibm.com>,
+ Niklas Schnelle <schnelle@linux.ibm.com>, Stefan Raspl
+ <raspl@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>,
+ Thorsten Winkler <twinkler@linux.ibm.com>,
+ Wenjia Zhang <wenjia@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org
+References: <4ab328297c12d1c286c56dbc01d611b77ea2da03.camel@linux.ibm.com>
+Subject: Re: [PATCH] s390/ism: Add check for dma_set_max_seg_size in
+ ism_probe()
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <4ab328297c12d1c286c56dbc01d611b77ea2da03.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:0DEVK3hEYZce4m2x0HcOm4kkmWuuBi11g0rGzGdPbe4Qpn87svX
+ 5XQ/MZieW0HABaYEKtAWwdpHqkAP18mCyF/gG4lKTvfy65YCTDuexqWaq+EE8RdwaO0/Jds
+ cV1hbtXBiXVClTpKNZX22cIEAuDQ/HXrquHnhSkGzAfcPjLwFZiUQ+kJLl7pJ/k8CF0eqv6
+ gzweJJL6vF5HCPxct+6GA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:UETjU5nTgts=;lV8DTmeBl0SijkeRl00bzdeTllM
+ 3cplHKVNgNZmEI1glocO11M0214gpAfGNRcyhNSDRtxzb3SjvtJyrPr08xF9B/lxFUQcg6HLy
+ f5IQSKFO3BqwCcKNs3AxyXSIHJ+unNyGqEowWKsuGOent9OYnzIb8/oC1uH9s7lwrGEqjjPU3
+ zUKEHv/3+XBFuSAgaviI5Pt5jv0qoAI6eXdCASAnSNxY4nVH34tJ0qNk0myTbubWIt8zcrUOW
+ H5M+xGbUG76+ZdRNSp74mOdjwZYX2LzhCmSwMt8GNtaESsApL8VmskQro751KLFUGA0s00Qg2
+ ZU40mBWi9MzpAVFdB3gZedU80NdnucbVNqerRSCCh6fceMiUAmCubDIMvHCUuHizG1rwochpA
+ l6SGCYZ6RjvOfCGcWv88zTmJS4Ju6MveZD5C9I26S1c8Xt6xzsbVZskIxSdc9uxgvtvQrgtmr
+ Nl0LYYMCa+WnXShvtp3IyqAjakhvst3068SQ7bFtl3bYOcIOTfDgknOI4iokUZx9pDGWBibad
+ SfesNl7CIxq2jpJjsXvwKxLqVzNNkvLjVYJXNaEaQ2zeXGqRKjlEZ3VlNHTbNhlZ+/92zkQ/B
+ y47KlYUMziiacqVQHWfdCZ2VrOGAfnoENhJYOKn8J9gYtjfcMoQed0vypiHvntO433aGYYBw+
+ CDSr9YhS3PW1dBO+En5PKgLZloI3KRJkZKQoey626F0WP0/EdBzXYScgJUHWZbBXsvzLf1W2m
+ L+8nF/aizMwkL8fE7nltxmBMLALuJuOsr9Lggno9gJfX7YkQBtEFSMwzyTxYxtJqI8NCEKLPh
+ WS8avs4PHSX6lJIUdgujAGhUi8GzGMazDd+seYdPMvVJU=
 
-On Fri, May 10, 2024 at 05:11:32PM -0700, Jakub Kicinski wrote:
->Yes, I should have CCed Meta's folks who work on TLS [1]. Adding them
->now. More than happy to facilitate the discussion, maybe Willem can
->CC the right Google folks, IDK who else...
+> > As the possible failure of the dma_set_max_seg_size(), we should
+> > better check the return value of the dma_set_max_seg_size().
 >
->We should start moving with the kernel support, IMO, until we do
->the user space implementation is stalled. I don't expect that the
->way we install keys in the kernel would be impacted by the handshake.
+> I think formally you're correct. dma_set_max_seg_size() could return an
+> error if dev->dma_parms was not present.
 >
->[1] https://github.com/facebookincubator/fizz
+> However, since ISM devices are PCI attached (and will remain PCI
+> attached I believe) we can take the existance of dev->dma_parms for
+> granted since pci_device_add() (in drivers/pci/probe.c) will make that
+> point to the pci_dev's dma_parms for every PCI device.
+>
+> So I'm not sure how important this fix is.
 
-Having worked on this in the past, I was curious about looking at the
-kernel/userspace implementation, and was surprised there's nothing at
-all on the userspace side of things.
+Another function call can fail eventually.
 
-What's the rush in merging this in prior to having a usable, open
-userspace? Can't they be developed side by side and merged in together?
+dma_set_seg_boundary()
+https://elixir.bootlin.com/linux/v6.10-rc5/source/include/linux/dma-mappin=
+g.h#L562
 
--- 
-Thanks,
-Sasha
+Will it become relevant to complete the error detection
+and corresponding exception handling any further?
+
+Regards,
+Markus
 
