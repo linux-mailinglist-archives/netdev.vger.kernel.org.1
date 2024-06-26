@@ -1,109 +1,71 @@
-Return-Path: <netdev+bounces-106740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 746159175F4
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 04:00:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7580D9175F6
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 04:01:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EFDE284C36
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 02:00:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30623284D06
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 02:01:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E29B614AAD;
-	Wed, 26 Jun 2024 02:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9106214AB2;
+	Wed, 26 Jun 2024 02:01:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fmBXz2dv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kHM527+k"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC22947E
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 02:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6DA12B87
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 02:01:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719367231; cv=none; b=WyEL+KS2FiD7yM4ofEk0gdb6mYE80xQHbvADr9EWRRb5driusBUpclGfbaYZX+JhqNjIyp8BBcrzotwXbFiWjaNhvoKnvQmD+r0t65HrwhVdV116zEtXvJ62F9aYebB3VEUo3eVZmJDmd1UK4bDW6Yo/oVFJb0Lvi7+8E9X5nBM=
+	t=1719367273; cv=none; b=TYAEa5sFtVOxT4OmIiUstYnVGxHD3DJ8AhGbuUuyplE/1Xz5gO4OjcMTIhyk5uJa5krf43EU+7BcR3P6Dx1KA5h2vf3iipb9KifIuR9FanVQzeQT4A5UnvuCbupov/tG29MtIalCyrJVzPCaIj20wquMZK1UEF89+6WbySy6nQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719367231; c=relaxed/simple;
-	bh=xSNj/USwXXhZl19nmEL5i/+3vQTAkaJNTpYEfZZdeFU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pqwO7L7TqvnjIqxQLmms6u5NSBk7iQJxITQDINFTb9QV6zqO32UJCimnDjAxxuOt1/Gn18MKyiWLF3b9fd9n4DA0vhqSWPAq62RjBmf+qWPIR0MAOWZUIhoT9SWY20hBq5RKOAN1YnM9z/gCZ6rEHUMwQ/6sp9G3bLPYeR9h1tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fmBXz2dv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 59A62C4AF07;
-	Wed, 26 Jun 2024 02:00:31 +0000 (UTC)
+	s=arc-20240116; t=1719367273; c=relaxed/simple;
+	bh=phVP7I0A19NUiHL7SBz7lb250X0mxzQdgqdZ8ccuUpQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=czzK/CTVpRXvkUI9W3cZJh6Wy+R9CYC3aLxNKQSQ1+NlGNNyyHD9+bEKW4IbvoTzB+T+EHIK7cPoV5CXXsJIbthv3T1zgwDEbLRc4KH3pWkWhgNs1c2uogISG0ViLxXmhx3RCvTOi1+0igMyP3URwSWSoGyJNHcfGim6sD2vyZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kHM527+k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FC67C32781;
+	Wed, 26 Jun 2024 02:01:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719367231;
-	bh=xSNj/USwXXhZl19nmEL5i/+3vQTAkaJNTpYEfZZdeFU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fmBXz2dv6k3EaZGD0zVNB1TqbWue+BmZYcH618izH/S2KZZj2tNo4cmpwBCRH6w3E
-	 6O1GuCwo+5PZZc2dPSj8q7UfthkP2Lvyw6NXfrWWlaaHsMqIZI+3l4SF06OddYELMG
-	 lZqv8knbzxXe9TFF0s0HFxSYRGxwmcU4VvPe5xGTzKjFZIDQ3TQoJUHynbI9GbcgMO
-	 ztPK13EtUwu/YUfDcmXfgQR4Nj7JeZWUbDUN0SukestirNY6mPLHMv+YSlmtQekCw5
-	 3+zpf1HmoRBtEBlcXOng4UGOhja1ucWftGV7YWRTzmHybC66METKZIQ+u2zNSYjXkc
-	 ZH8uxPZxWNCTQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 45135DE8DF3;
-	Wed, 26 Jun 2024 02:00:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1719367273;
+	bh=phVP7I0A19NUiHL7SBz7lb250X0mxzQdgqdZ8ccuUpQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kHM527+kFw/e6lCFIFslKtAN2kBPE+B6F+TLftII+spFmL+xpvSpnSySQ5iYxOKgv
+	 RvrZJCoZ8qlJzpuK8fK8HtWaimSLkWqi96KN2mzDjaPPEPrFFXuebYmqxVz5AUdIj4
+	 G+0HnDMc1v/2Cd0ih0X3GILa2pyaKAtOoFe4tsetedPyrAMRIpjKEfwk0NlmC71b8T
+	 9hhokH1MYeovEd/C7BPwYF+2+077o+bW2YLJaR9KWm6JjI5cumOKt/jB5hiGfDfly+
+	 3PVk5C8gmyCA6tK7bWfFohFPfFvt7XLiS3ZJ4aAUW1NJ753Q63l79EoDtLRGPxBnAT
+	 6kPtMgbo9BR3g==
+Date: Tue, 25 Jun 2024 19:01:11 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: <Rao.Shoaib@oracle.com>, <davem@davemloft.net>, <edumazet@google.com>,
+ <kuni1840@gmail.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v1 net 02/11] selftest: af_unix: Add msg_oob.c.
+Message-ID: <20240625190111.629f0be4@kernel.org>
+In-Reply-To: <20240626014555.86837-1-kuniyu@amazon.com>
+References: <20240625174449.796bc9a0@kernel.org>
+	<20240626014555.86837-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v12 0/7] add ethernet driver for Tehuti Networks
- TN40xx chips
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171936723127.29418.12595539339201439511.git-patchwork-notify@kernel.org>
-Date: Wed, 26 Jun 2024 02:00:31 +0000
-References: <20240623235507.108147-1-fujita.tomonori@gmail.com>
-In-Reply-To: <20240623235507.108147-1-fujita.tomonori@gmail.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, horms@kernel.org, kuba@kernel.org,
- jiri@resnulli.us, pabeni@redhat.com, linux@armlinux.org.uk, hfdevel@gmx.net,
- naveenm@marvell.com, jdamato@fastly.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 25 Jun 2024 18:45:55 -0700 Kuniyuki Iwashima wrote:
+> We can use EXPECT_EQ() {} here, but for some test cases where TCP is
+> buggy, I'd like to print the difference but let the test pass.
+...
+> I think we can convert it to EXPECT_EQ() {} in all places after
+> fixing TCP side and removing tcp_incompliant{} uses in the test.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 24 Jun 2024 08:55:00 +0900 you wrote:
-> This patchset adds a new 10G ethernet driver for Tehuti Networks
-> TN40xx chips. Note in mainline, there is a driver for Tehuti Networks
-> (drivers/net/ethernet/tehuti/tehuti.[hc]), which supports TN30xx
-> chips.
-> 
-> Multiple vendors (DLink, Asus, Edimax, QNAP, etc) developed adapters
-> based on TN40xx chips. Tehuti Networks went out of business but the
-> drivers are still distributed under GPL2 with some of the hardware
-> (and also available on some sites). With some changes, I try to
-> upstream this driver with a new PHY driver in Rust.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v12,1/7] PCI: Add Edimax Vendor ID to pci_ids.h
-    https://git.kernel.org/netdev/net-next/c/eee5528890d5
-  - [net-next,v12,2/7] net: tn40xx: add pci driver for Tehuti Networks TN40xx chips
-    https://git.kernel.org/netdev/net-next/c/ab61adc60001
-  - [net-next,v12,3/7] net: tn40xx: add register defines
-    https://git.kernel.org/netdev/net-next/c/ffa28c748b38
-  - [net-next,v12,4/7] net: tn40xx: add basic Tx handling
-    https://git.kernel.org/netdev/net-next/c/dd2a0ff55408
-  - [net-next,v12,5/7] net: tn40xx: add basic Rx handling
-    https://git.kernel.org/netdev/net-next/c/37c4947af44d
-  - [net-next,v12,6/7] net: tn40xx: add mdio bus support
-    https://git.kernel.org/netdev/net-next/c/7fdbd2f2bb5d
-  - [net-next,v12,7/7] net: tn40xx: add phylink support
-    https://git.kernel.org/netdev/net-next/c/308241224224
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I see, makes sense
 
