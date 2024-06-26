@@ -1,84 +1,71 @@
-Return-Path: <netdev+bounces-106926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86C2B9181F6
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:14:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E2E691824F
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 15:26:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43414286A54
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 13:14:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 558A21F23AAC
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 13:26:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EB52186E55;
-	Wed, 26 Jun 2024 13:08:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77A58181B8F;
+	Wed, 26 Jun 2024 13:25:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oWZAW8hE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LA4Wowjf"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF4E186E48;
-	Wed, 26 Jun 2024 13:08:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540648825
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 13:25:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719407307; cv=none; b=DNtxHd3TEZsQYeu2KK8WDZbN+neYLqLZSaeHUKTsX2XDLzNlMz4Soa3mhMnKX8V3QzoWU42sm8SmxoAiW44PFSC+AP/nRyt5aBsT47cJsUVhjKiw3YdofsTI/Xmgab6U0SznMf6KcSVUD7hEp+Te/HVH1W+KF6eUXD+tZBna11E=
+	t=1719408355; cv=none; b=jFwHdXcJb2arBfsKpjKQLpEGsWMDraRlcmYEvad6MS6atTU8IfL9fh7tR1n6/MUEb1vGYDb26iM3JYFWtPpVrzhtgAFPrs33K8uKOccWYLpuhCcm3P5TSoxyWS3Nf9z5x+PYouzq7PJO7LZkfVtUDWx2Z5iBxNlqsY0CxVTs54c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719407307; c=relaxed/simple;
-	bh=ZYR/kborAPnlCw+foHcgVQvWleQNqt2+b8F0F81dfu0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B7MkkgyqWdeWenzi/1fZykSD5CnbtPjYx88iakC37gBD/Bwtxe2W/SlYy6ay9mYReS0TDzji56jkdZJ/1EGoqfcwSlX2/2Mw5x8R0oOLU6mdc6p+u6kCZx2mHQBGv9WcT+eOuHD5vy3nVhI5TQCoe8fggf3+avTkVqFbKRm3EZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oWZAW8hE; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=352FPNtX7HzSmbr1mdGhKGS54CxUoJPDsIXwRcWoJrc=; b=oWZAW8hEEGTj7hus9FnV0qkyQN
-	EZaSORih+UvrCuEadrwmvzuZkJOsqfMAs71HfxUca8f/QhU0+zzh53DtNswVWeFoI+uTaLocjGcXp
-	HC3j/NSwumm8fiBfNpOEEiWNfzz8Js9Umr5SJ89GOfYVvGSE4A7vHKwU6JFUZiiPsvcY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sMSNO-0012Tt-MF; Wed, 26 Jun 2024 15:07:54 +0200
-Date: Wed, 26 Jun 2024 15:07:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, kernel@quicinc.com,
-	Andrew Halaney <ahalaney@redhat.com>, linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 2/3] net: stmmac: Add interconnect support
-Message-ID: <4123b96c-ae1e-4fdd-aab2-70478031c59a@lunn.ch>
-References: <20240625-icc_bw_voting_from_ethqos-v2-0-eaa7cf9060f0@quicinc.com>
- <20240625-icc_bw_voting_from_ethqos-v2-2-eaa7cf9060f0@quicinc.com>
+	s=arc-20240116; t=1719408355; c=relaxed/simple;
+	bh=dYC/NauUX0HrUmRVOwBe+JsQLEOm5qmaoDPIA6Arr1A=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q5Js7u8TCZkwFma56Woiqj3WSxBoc+VMw/owatkQz/Rn3xoWAGkCgtQ9Ju1Dk/gzy3O0ERe6JuZzUkG6OybDBAYl6f34oY/gQZSONIYsp6Q4YFGf2RdSR2FJupqcPBOHmFhy3pMP0g3sKlthQMMyFluk/RICgi6BhVm6KqYuaM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LA4Wowjf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 630C6C32789;
+	Wed, 26 Jun 2024 13:25:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719408354;
+	bh=dYC/NauUX0HrUmRVOwBe+JsQLEOm5qmaoDPIA6Arr1A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LA4Wowjf2P570LtEBfvJCBOGYr/EZrTLdYmcNZypirDgKu4x5o4f4lXNqahsGwGEA
+	 iazRG+KoTQ7gX+1wPx4RVHc6ZJ88H37JYO+F4TKR6YDwREyy9PmLFFQmDdustdDgef
+	 rv3dwTK8p35k5mEvax/hvZk6C4Qm9GvQrmAs4fBcrKtfcSjBvG58WHvZTyEodQM6c8
+	 RgiyyDM0bWddPf3kONkOHAY3huph0FZbB8yb0UzEDPxvq213Ny+OGGci3zkZjBpqoo
+	 UGG7UgIWdKruclN4etXJx9dcLkCXfCMj/xa3qJzydeC/bcLF7RJvjhqMkGC4TXSzh2
+	 etk6RILmTqmVw==
+Date: Wed, 26 Jun 2024 06:25:53 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, woojung.huh@microchip.com,
+ UNGLinuxDriver@microchip.com, horms@kernel.org, Tristram.Ha@microchip.com,
+ Arun.Ramadoss@microchip.com
+Subject: Re: [PATCH net v8 0/3] Handle new Microchip KSZ 9897 Errata
+Message-ID: <20240626062553.2f7e5512@kernel.org>
+In-Reply-To: <df1d8095-93ad-4b79-a614-321df475b64c@savoirfairelinux.com>
+References: <20240625160520.358945-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+	<20240625184712.710a4337@kernel.org>
+	<df1d8095-93ad-4b79-a614-321df475b64c@savoirfairelinux.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240625-icc_bw_voting_from_ethqos-v2-2-eaa7cf9060f0@quicinc.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> +	plat->axi_icc_path = devm_of_icc_get(&pdev->dev, "axi");
-> +	if (IS_ERR(plat->axi_icc_path)) {
-> +		ret = (void *)plat->axi_icc_path;
+On Wed, 26 Jun 2024 09:28:16 +0200 Enguerrand de Ribaucourt wrote:
+> Ok, I can do an extra commit then?
 
-Casting	to a void * seems odd. ERR_PTR()?
-
-	Andrew
+Sure, but if it's cosmetic (no functional changes) please wait until
+Friday and target net-next.
 
