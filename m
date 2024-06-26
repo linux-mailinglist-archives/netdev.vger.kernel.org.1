@@ -1,159 +1,427 @@
-Return-Path: <netdev+bounces-106832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3D59917D67
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:12:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E65E3917D37
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:04:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C74801C213FB
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:12:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2034284C4C
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:04:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA3017A918;
-	Wed, 26 Jun 2024 10:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B17D1741C1;
+	Wed, 26 Jun 2024 10:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="idDgcMvF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U7NV+M1o"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2062.outbound.protection.outlook.com [40.107.92.62])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213951741C1
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 10:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719396687; cv=fail; b=qAiJrQr+25mjgPtjWizXWSu0SbiN5YOcvIywcnlTCBQ2khJLdXUqlo7Ld3NuW1Q/u7y8v7jYISpvzOMsw2ytspzce+58E+ZSNf7yTTwIk4xqLSfCSGD17PM89+AWzradLTnElqTkRlGE/a/8vSolRspOu6G2GmCr1vbzGRzFAJ4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719396687; c=relaxed/simple;
-	bh=6hiOANRLeHd5HgVs/b65rb90hTq2lzoXdCXcmQpbdTE=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=uR22UPbx8LC3EN2ERQsxyvQtVuM0RCU9DpgnWvF7jGl5OmsgZwHxSSJqr80bLlDjy5nViStSoZ9uOcZQWpcFLDUfG3gXZki0zKt/EpnrZC8mbt2rUp/8VpSiE52lX29fXs7U1xahKZEO5h6lDhL9LfaZ+aSA6+JcyV7+6rh29n4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=idDgcMvF; arc=fail smtp.client-ip=40.107.92.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZQlSw47u35CDoMba7MF2A/bXRCS388ug28eNfYPMm+rQnXXi8dtPXux8KI2r2kGhuj+cE4i/mrVr9JH6EjmEoMvlZF3ehRH0Ql/7olR2IaM+sQM75+JrxaauLMbJJLAwa4LqGgoOFNdjodlgKFN4U6IISZWFLmkF1DeSWmG/OKCkaZcVXq6k/O45neMoGd0/n+k7JpQRw2KY8+cOMQ9fIpFMjEtKbkbGPWTqTFrHW+O//ymxObLTEXD+1Z1YY58wm9zkaZfxowDjVXYoFx0J3xGa0hrkf4RYY+WobFlxW5hyA0ECEO7Eh9D7X513D5bTGPJV07Ydte8ZIWFNPRbZzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6hiOANRLeHd5HgVs/b65rb90hTq2lzoXdCXcmQpbdTE=;
- b=K9BDidgc32gIZEQKLwWFMfH69QmEMcy+grtG5cXDyThpOIJ/Wc5r/U9gOV+fAUVxaHMJwvCKwtQkTwYZA5ftdxb28KSCSH1yg0mNcGYRe6XcAU3FMtkQYLgnxR3gNUWXN1x0LZLu2PDBM1Y1vhLU+eAXvonXlidwG1WZN5m6RZroNQKDenXdDkkSGQduh4ok3VMivh+crptBsLdnpzpwaGLlNG97EspxJMBoIdTPpNVLhMJwgImBbFKFTe25Ic7VdiGqUU0TerEht8GgfMRABz3gPOb/moKT7jx+mjWzhQ/t1NWmAQfl2rjM1RMcbgof+X4Jn3FOq+PSzGFKIhVR/Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=debian.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6hiOANRLeHd5HgVs/b65rb90hTq2lzoXdCXcmQpbdTE=;
- b=idDgcMvFVP6M3bPpjlwGnPn0UanPp3kneYXzaz3yo5DRvDAH97D5A3yaWwxrk3MCV0pQBpgeuKXcf/gyikkWvQ4cQMB3yZefgWRx9L1eXtXu1tAI6Ltwgamu6gBiD8wVjzlppUg3sy1G++Rn5jpf8xDrDG/J1tPxiY6IjbL9pu8qnYIOBDsbd87q0oztPd1bA09uJrTg+jtRfiaM/5BxZy69ygC/6IAlzKffwjrR/v25ElKMyQplqQRfjBdfnvTxJS5WMlwkb4NEdUl7RWzALgc3r5CMvi8ihut7vTLwyTDp+VxMWw99inuAJJ4A2HKjZhqxCkqq6YsUaPB4lfomCg==
-Received: from MW4P223CA0027.NAMP223.PROD.OUTLOOK.COM (2603:10b6:303:80::32)
- by LV3PR12MB9234.namprd12.prod.outlook.com (2603:10b6:408:1a0::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.29; Wed, 26 Jun
- 2024 10:11:22 +0000
-Received: from MWH0EPF000A6734.namprd04.prod.outlook.com
- (2603:10b6:303:80:cafe::6b) by MW4P223CA0027.outlook.office365.com
- (2603:10b6:303:80::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.38 via Frontend
- Transport; Wed, 26 Jun 2024 10:11:21 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- MWH0EPF000A6734.mail.protection.outlook.com (10.167.249.26) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7677.15 via Frontend Transport; Wed, 26 Jun 2024 10:11:21 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 26 Jun
- 2024 03:11:07 -0700
-Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 26 Jun
- 2024 03:11:01 -0700
-References: <20240626012456.2326192-1-kuba@kernel.org>
- <20240626012456.2326192-3-kuba@kernel.org>
-User-agent: mu4e 1.8.11; emacs 29.3
-From: Petr Machata <petrm@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <willemdebruijn.kernel@gmail.com>,
-	<ecree.xilinx@gmail.com>, <dw@davidwei.uk>, <przemyslaw.kitszel@intel.com>,
-	<michael.chan@broadcom.com>, <andrew.gospodarek@broadcom.com>,
-	<leitao@debian.org>, <petrm@nvidia.com>
-Subject: Re: [PATCH net-next v3 2/4] selftests: drv-net: add helper to wait
- for HW stats to sync
-Date: Wed, 26 Jun 2024 11:49:53 +0200
-In-Reply-To: <20240626012456.2326192-3-kuba@kernel.org>
-Message-ID: <87le2s9fpr.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813B6176AD1
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 10:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719396271; cv=none; b=P0RMtNjhidZeGvfUNTK7pqOj1GI/ggoDLZvSG4tC+2JlK8HsCTEorKq320+d0K8HSszPo/t+B5IMEP9vwBzpwvAw8scWW9iENeJKCa0nTLBLlB1VA0mFeORqk+JUlzv1QS8u0LIYTe/Za1qCT2IIcZmmCs+Q3/LA1z4RMhENUC4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719396271; c=relaxed/simple;
+	bh=OJMGntKl5KRQxI8fYBfWeblhAiI53uCQsT5F72yJvTQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=h0GUaUxfNpHEv8O6n96lqL7c1E3MGjSrimsCJNtlp2SG6VRRFR4Dfb6ZFGV74/liIqEZtUrGTYMSERakFuYK8IzNAknUx3UGBrtSI2Q4P4exszjvydKdEIFjrHfnKT9vabL/DDOiYqzC7JdMmbHs1uVMT+EeQh2F1xdnGsiJQaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U7NV+M1o; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719396269; x=1750932269;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=OJMGntKl5KRQxI8fYBfWeblhAiI53uCQsT5F72yJvTQ=;
+  b=U7NV+M1oDHm/KHX0NLDG317HBv0jlTd4U/VS1HCZ+iamS5P8nffi+Gc8
+   iGhQeKIS2SrBA/WHBj5RxSZ7Y5SW0NEDMV6oEddWg1l1weMrnPISnnwP+
+   BH4vu3xioR4FrlcdlkI6DuWQ9fOBKR8YJHNrI0FS8YGVIxPFoabg8YlFt
+   cTFQfAKW6fSFV86kXXccCQXzhDnsKmRUPSQ5IFbqhMuPluIjfFFTChv2+
+   b5Dn15vXMu469OcLJf0sc9ZzELLCu5f2A0pdQ7b+1ujmhK2c5CKm39V5Z
+   74DJme8mPyxxoNmNE/9pFLVYKq/IOR1qeKn/YTtVZ6eZl6j6F6VcKATes
+   g==;
+X-CSE-ConnectionGUID: 4soOUWuRSRuilpQrBsKjKQ==
+X-CSE-MsgGUID: LeyRTw7jT5yhyD6xC0KuTQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="27145098"
+X-IronPort-AV: E=Sophos;i="6.08,266,1712646000"; 
+   d="scan'208";a="27145098"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 03:04:29 -0700
+X-CSE-ConnectionGUID: mhdy4vsrR1yeufKp9sbErQ==
+X-CSE-MsgGUID: rcymY2ztQlC+myW7AqpQuQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,266,1712646000"; 
+   d="scan'208";a="67162102"
+Received: from unknown (HELO localhost.igk.intel.com) ([10.211.13.141])
+  by fmviesa002.fm.intel.com with ESMTP; 26 Jun 2024 03:04:28 -0700
+From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-next v1 3/4] ice: Use ice_adapter for PTP shared data instead of auxdev
+Date: Wed, 26 Jun 2024 12:03:06 +0200
+Message-ID: <20240626100307.64365-4-sergey.temerkhanov@intel.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240626100307.64365-1-sergey.temerkhanov@intel.com>
+References: <20240626100307.64365-1-sergey.temerkhanov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000A6734:EE_|LV3PR12MB9234:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6d989b03-14f9-47cf-b26c-08dc95c85402
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230038|7416012|376012|36860700011|1800799022|82310400024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?34xAouwnsyjxT2rWs9CB5UMbCGQagkhs6fUCUgiZcXzQUlFzXWon79IUmBok?=
- =?us-ascii?Q?vT4QgE3CffhQyqr8BptZnWcurDPnLaybJodK3rPGGb+QQy5+eu6oZEpFzawS?=
- =?us-ascii?Q?/iij4hLb7vZk7WXCOAgn9t03e8DJQzSySNtVluxeugd14aNxeX/NsQ0fWCWZ?=
- =?us-ascii?Q?3HrdMYDWo6LvqQLT/cOsmKjWWybZcJZd1d43PQG9KZqDTBiHlZO8m05ejkn7?=
- =?us-ascii?Q?TeiUB7Xa8KU3/nFdFsuy5pT4ENBkjfZNiMR+PJL532VRIMUZIlgJMiEmVK7L?=
- =?us-ascii?Q?FeUjmFm9PnlpBCeEqWqoXAMpNh+vZrtx8NUFubNcT74d8mx/byK5fdFKABeX?=
- =?us-ascii?Q?n5fx/FTZ9mWLNK9xhiuOyb8UwZBH59lJq11eM5nXSyUWp75ODtQxooZ3Gu32?=
- =?us-ascii?Q?RTsvqyGEuAfZ1HwsyvQhlSbcQch8BJ2ltOs5UaCDOEzyx7kp5lp6lU306oFD?=
- =?us-ascii?Q?xl0fRREtr+vpbkm52boTjLm0lCZTC2bxdVu57RjjX67FV9BYrJWXUqMFLl7G?=
- =?us-ascii?Q?Vn5o7fgb0QpdlDBnpEPs1JeNmidEOmofb2WR/zWM5IjXHY5wh6PB92m3Wo/f?=
- =?us-ascii?Q?+UJSVEC+UKy3EEpd7eUZ5NqeBgCEu9oCljGd8WgF60Bbhs1qBBE1UyGbvNfd?=
- =?us-ascii?Q?x1eg611EoWB36UxktnaM2j+rUxwBQpTxc1fd3V1Ju/nDOTXxPwKRMv0y0svl?=
- =?us-ascii?Q?ub5CZGvbu8O5hf+P4HxFa1QqP52CTc3KB4Xa2WPwGbkFQLX1FV/EDH/TENgQ?=
- =?us-ascii?Q?iVIZpmOAmAE82X06OKVfVQs/tDlhcvtnFNI9deelZAR63mYmiBC9RNXlkxh7?=
- =?us-ascii?Q?TlImTWkzMa0xrjabcnEQa5X+IrOhkwWNxq9aoxhJYg2Gheyms9eGUyIb6RMW?=
- =?us-ascii?Q?Vo88EUY/JeLo192kws7yeFgBkTIf+sH4sa+ndNPEGLXHDvDYHjXJGkDPWZmU?=
- =?us-ascii?Q?5F2jU6bdi+AwBNOv+Sv3VpVDR0Uf5vVrNjYLni360dxDjm6Ae9DpNSv3I0NY?=
- =?us-ascii?Q?wWGElVODqH2rsRR3RFQdQ5agA5pMPJwQf4LaLoeAjdcvl7qbDi/RVD3sR6WD?=
- =?us-ascii?Q?MLSaEPbVR9sWxhW73eIcqW7k9my0adMCYpOr9WcH75KqK9JaQiUay89fd2W6?=
- =?us-ascii?Q?O5P1MXv6UjPd8JwIBF+Ff5QH4MCvcehd9KXMF5ylh56aDwPz6Gt10xgCbMMm?=
- =?us-ascii?Q?iXGlC/Du4igwUDf6fnyyxTB03bz8ZGN3R3f1Qlkig89sm0ijjqp9/UywdJY6?=
- =?us-ascii?Q?4WHjmvlAxwHNzPhyXVtIZnSQZPlnnWVWN8Lv++rs3gN13Ob+o9jDo9AE0Yy0?=
- =?us-ascii?Q?TPe4npB4bPg5RmK6Qhbn9EvFZekpXIagXAs8r3GXQZ9Gc+RCp9J+tvK0WC36?=
- =?us-ascii?Q?yIBMsFqGlWXIRV6NoXIgnrYKEQ3WX+VY7DMpnk/CnamM4KaHKw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230038)(7416012)(376012)(36860700011)(1800799022)(82310400024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2024 10:11:21.4291
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6d989b03-14f9-47cf-b26c-08dc95c85402
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000A6734.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9234
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+Content-Transfer-Encoding: 8bit
 
+- Use struct ice_adapter to hold shared PTP data and control PTP
+related actions instead of auxbus. This allows significant code
+simplification and faster access to the container fields used in
+the PTP support code.
 
-Jakub Kicinski <kuba@kernel.org> writes:
+- Move the PTP port list to the ice_adapter container to simplify
+the code and avoid race conditions which could occur due to the
+synchronous nature of the initialization/access and
+certain memory saving can be achieved by moving PTP data into
+the ice_adapter itself.
 
-> Some devices DMA stats to the host periodically. Add a helper
-> which can wait for that to happen, based on frequency reported
-> by the driver in ethtool.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_adapter.c |  6 ++
+ drivers/net/ethernet/intel/ice/ice_adapter.h | 21 +++++-
+ drivers/net/ethernet/intel/ice/ice_ptp.c     | 79 +++++++++++++++-----
+ drivers/net/ethernet/intel/ice/ice_ptp.h     | 24 +-----
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h  |  5 ++
+ 5 files changed, 92 insertions(+), 43 deletions(-)
 
-Reviewed-by: Petr Machata <petrm@nvidia.com>
+diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
+index ad84d8ad49a6..f3e195974a8e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adapter.c
++++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
+@@ -40,11 +40,17 @@ static struct ice_adapter *ice_adapter_new(void)
+ 	spin_lock_init(&adapter->ptp_gltsyn_time_lock);
+ 	refcount_set(&adapter->refcount, 1);
+ 
++	mutex_init(&adapter->ports.lock);
++	INIT_LIST_HEAD(&adapter->ports.ports);
++
+ 	return adapter;
+ }
+ 
+ static void ice_adapter_free(struct ice_adapter *adapter)
+ {
++	WARN_ON(!list_empty(&adapter->ports.ports));
++	mutex_destroy(&adapter->ports.lock);
++
+ 	kfree(adapter);
+ }
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
+index 9d11014ec02f..45a42109ad3b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adapter.h
++++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
+@@ -4,22 +4,41 @@
+ #ifndef _ICE_ADAPTER_H_
+ #define _ICE_ADAPTER_H_
+ 
++#include <linux/types.h>
+ #include <linux/spinlock_types.h>
+ #include <linux/refcount_types.h>
+ 
+ struct pci_dev;
++struct ice_pf;
++
++/**
++ * struct ice_port_list - data used to store the list of adapter ports
++ *
++ * This structure contains data used to maintain a list of adapter ports
++ *
++ * @ports: list of ports
++ * @lock: protect access to the ports list
++ */
++struct ice_port_list {
++	struct list_head ports;
++	/* To synchronize the ports list operations */
++	struct mutex lock;
++};
+ 
+ /**
+  * struct ice_adapter - PCI adapter resources shared across PFs
+  * @ptp_gltsyn_time_lock: Spinlock protecting access to the GLTSYN_TIME
+  *                        register of the PTP clock.
+  * @refcount: Reference count. struct ice_pf objects hold the references.
++ * @ctrl_pf: Control PF of the adapter
+  */
+ struct ice_adapter {
+ 	/* For access to the GLTSYN_TIME register */
+ 	spinlock_t ptp_gltsyn_time_lock;
+-
+ 	refcount_t refcount;
++
++	struct ice_pf *ctrl_pf;
++	struct ice_port_list ports;
+ };
+ 
+ struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev);
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 8f9a449a851c..806dc666a43d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -821,8 +821,8 @@ static enum ice_tx_tstamp_work ice_ptp_tx_tstamp_owner(struct ice_pf *pf)
+ 	struct ice_ptp_port *port;
+ 	unsigned int i;
+ 
+-	mutex_lock(&pf->ptp.ports_owner.lock);
+-	list_for_each_entry(port, &pf->ptp.ports_owner.ports, list_member) {
++	mutex_lock(&pf->adapter->ports.lock);
++	list_for_each_entry(port, &pf->adapter->ports.ports, list_node) {
+ 		struct ice_ptp_tx *tx = &port->tx;
+ 
+ 		if (!tx || !tx->init)
+@@ -830,7 +830,7 @@ static enum ice_tx_tstamp_work ice_ptp_tx_tstamp_owner(struct ice_pf *pf)
+ 
+ 		ice_ptp_process_tx_tstamp(tx);
+ 	}
+-	mutex_unlock(&pf->ptp.ports_owner.lock);
++	mutex_unlock(&pf->adapter->ports.lock);
+ 
+ 	for (i = 0; i < ICE_GET_QUAD_NUM(pf->hw.ptp.num_lports); i++) {
+ 		u64 tstamp_ready;
+@@ -995,7 +995,7 @@ ice_ptp_flush_all_tx_tracker(struct ice_pf *pf)
+ {
+ 	struct ice_ptp_port *port;
+ 
+-	list_for_each_entry(port, &pf->ptp.ports_owner.ports, list_member)
++	list_for_each_entry(port, &pf->adapter->ports.ports, list_node)
+ 		ice_ptp_flush_tx_tracker(ptp_port_to_pf(port), &port->tx);
+ }
+ 
+@@ -1592,10 +1592,10 @@ static void ice_ptp_restart_all_phy(struct ice_pf *pf)
+ {
+ 	struct list_head *entry;
+ 
+-	list_for_each(entry, &pf->ptp.ports_owner.ports) {
++	list_for_each(entry, &pf->adapter->ports.ports) {
+ 		struct ice_ptp_port *port = list_entry(entry,
+ 						       struct ice_ptp_port,
+-						       list_member);
++						       list_node);
+ 
+ 		if (port->link_up)
+ 			ice_ptp_port_phy_restart(port);
+@@ -2912,6 +2912,44 @@ void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
+ 	dev_err(ice_pf_to_dev(pf), "PTP reset failed %d\n", err);
+ }
+ 
++static int ice_ptp_setup_adapter(struct ice_pf *pf)
++{
++	if (!ice_pf_src_tmr_owned(pf) || !ice_is_primary(&pf->hw))
++		return -EPERM;
++
++	pf->adapter->ctrl_pf = pf;
++
++	return 0;
++}
++
++static int ice_ptp_setup_pf(struct ice_pf *pf)
++{
++	struct ice_ptp *ctrl_ptp = ice_get_ctrl_ptp(pf);
++	struct ice_ptp *ptp = &pf->ptp;
++
++	if (WARN_ON(!ctrl_ptp) || ice_get_phy_model(&pf->hw) == ICE_PHY_UNSUP)
++		return -ENODEV;
++
++	INIT_LIST_HEAD(&ptp->port.list_node);
++	mutex_lock(&pf->adapter->ports.lock);
++
++	list_add(&ptp->port.list_node,
++		 &pf->adapter->ports.ports);
++	mutex_unlock(&pf->adapter->ports.lock);
++
++	return 0;
++}
++
++static void ice_ptp_cleanup_pf(struct ice_pf *pf)
++{
++	struct ice_ptp *ptp = &pf->ptp;
++
++	if (ice_get_phy_model(&pf->hw) != ICE_PHY_UNSUP) {
++		mutex_lock(&pf->adapter->ports.lock);
++		list_del(&ptp->port.list_node);
++		mutex_unlock(&pf->adapter->ports.lock);
++	}
++}
+ /**
+  * ice_ptp_aux_dev_to_aux_pf - Get auxiliary PF handle for the auxiliary device
+  * @aux_dev: auxiliary device to get the auxiliary PF for
+@@ -3104,15 +3142,12 @@ static void ice_ptp_unregister_auxbus_driver(struct ice_pf *pf)
+  */
+ int ice_ptp_clock_index(struct ice_pf *pf)
+ {
+-	struct auxiliary_device *aux_dev;
+-	struct ice_pf *owner_pf;
++	struct ice_ptp *ctrl_ptp = ice_get_ctrl_ptp(pf);
+ 	struct ptp_clock *clock;
+ 
+-	aux_dev = &pf->ptp.port.aux_dev;
+-	owner_pf = ice_ptp_aux_dev_to_owner_pf(aux_dev);
+-	if (!owner_pf)
++	if (!ctrl_ptp)
+ 		return -1;
+-	clock = owner_pf->ptp.clock;
++	clock = ctrl_ptp->clock;
+ 
+ 	return clock ? ptp_clock_index(clock) : -1;
+ }
+@@ -3368,18 +3403,25 @@ void ice_ptp_init(struct ice_pf *pf)
+ 	 * configure the PTP clock device to represent it.
+ 	 */
+ 	if (ice_pf_src_tmr_owned(pf)) {
++		err = ice_ptp_setup_adapter(pf);
++		if (err)
++			goto err_exit;
+ 		err = ice_ptp_init_owner(pf);
+ 		if (err)
+-			goto err;
++			goto err_exit;
+ 	}
+ 
++	err = ice_ptp_setup_pf(pf);
++	if (err)
++		goto err_exit;
++
+ 	ptp->port.port_num = hw->pf_id;
+ 	if (ice_is_e825c(hw) && hw->ptp.is_2x50g_muxed_topo)
+ 		ptp->port.port_num = hw->pf_id * 2;
+ 
+ 	err = ice_ptp_init_port(pf, &ptp->port);
+ 	if (err)
+-		goto err;
++		goto err_exit;
+ 
+ 	/* Start the PHY timestamping block */
+ 	ice_ptp_reset_phy_timestamping(pf);
+@@ -3395,12 +3437,12 @@ void ice_ptp_init(struct ice_pf *pf)
+ 
+ 	err = ice_ptp_init_work(pf, ptp);
+ 	if (err)
+-		goto err;
++		goto err_exit;
+ 
+ 	dev_info(ice_pf_to_dev(pf), "PTP init successful\n");
+ 	return;
+ 
+-err:
++err_exit:
+ 	/* If we registered a PTP clock, release it */
+ 	if (pf->ptp.clock) {
+ 		ptp_clock_unregister(ptp->clock);
+@@ -3427,7 +3469,7 @@ void ice_ptp_release(struct ice_pf *pf)
+ 	/* Disable timestamping for both Tx and Rx */
+ 	ice_ptp_disable_timestamp_mode(pf);
+ 
+-	ice_ptp_remove_auxbus_device(pf);
++	ice_ptp_cleanup_pf(pf);
+ 
+ 	ice_ptp_release_tx_tracker(pf, &pf->ptp.port.tx);
+ 
+@@ -3442,9 +3484,6 @@ void ice_ptp_release(struct ice_pf *pf)
+ 		pf->ptp.kworker = NULL;
+ 	}
+ 
+-	if (ice_pf_src_tmr_owned(pf))
+-		ice_ptp_unregister_auxbus_driver(pf);
+-
+ 	if (!pf->ptp.clock)
+ 		return;
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
+index 1d87dd67284d..71c09acb5558 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
+@@ -169,9 +169,8 @@ struct ice_ptp_tx {
+  * ready for PTP functionality. It is used to track the port initialization
+  * and determine when the port's PHY offset is valid.
+  *
+- * @list_member: list member structure of auxiliary device
++ * @list_node: list member structure
+  * @tx: Tx timestamp tracking for this port
+- * @aux_dev: auxiliary device associated with this port
+  * @ov_work: delayed work task for tracking when PHY offset is valid
+  * @ps_lock: mutex used to protect the overall PTP PHY start procedure
+  * @link_up: indicates whether the link is up
+@@ -179,9 +178,8 @@ struct ice_ptp_tx {
+  * @port_num: the port number this structure represents
+  */
+ struct ice_ptp_port {
+-	struct list_head list_member;
++	struct list_head list_node;
+ 	struct ice_ptp_tx tx;
+-	struct auxiliary_device aux_dev;
+ 	struct kthread_delayed_work ov_work;
+ 	struct mutex ps_lock; /* protects overall PTP PHY start procedure */
+ 	bool link_up;
+@@ -195,22 +193,6 @@ enum ice_ptp_tx_interrupt {
+ 	ICE_PTP_TX_INTERRUPT_ALL,
+ };
+ 
+-/**
+- * struct ice_ptp_port_owner - data used to handle the PTP clock owner info
+- *
+- * This structure contains data necessary for the PTP clock owner to correctly
+- * handle the timestamping feature for all attached ports.
+- *
+- * @aux_driver: the structure carring the auxiliary driver information
+- * @ports: list of porst handled by this port owner
+- * @lock: protect access to ports list
+- */
+-struct ice_ptp_port_owner {
+-	struct auxiliary_driver aux_driver;
+-	struct list_head ports;
+-	struct mutex lock;
+-};
+-
+ #define GLTSYN_TGT_H_IDX_MAX		4
+ 
+ enum ice_ptp_state {
+@@ -226,7 +208,6 @@ enum ice_ptp_state {
+  * @state: current state of PTP state machine
+  * @tx_interrupt_mode: the TX interrupt mode for the PTP clock
+  * @port: data for the PHY port initialization procedure
+- * @ports_owner: data for the auxiliary driver owner
+  * @work: delayed work function for periodic tasks
+  * @cached_phc_time: a cached copy of the PHC time for timestamp extension
+  * @cached_phc_jiffies: jiffies when cached_phc_time was last updated
+@@ -250,7 +231,6 @@ struct ice_ptp {
+ 	enum ice_ptp_state state;
+ 	enum ice_ptp_tx_interrupt tx_interrupt_mode;
+ 	struct ice_ptp_port port;
+-	struct ice_ptp_port_owner ports_owner;
+ 	struct kthread_delayed_work work;
+ 	u64 cached_phc_time;
+ 	unsigned long cached_phc_jiffies;
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+index 0852a34ade91..eceec2919159 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+@@ -451,6 +451,11 @@ static inline u64 ice_get_base_incval(struct ice_hw *hw)
+ 	}
+ }
+ 
++static inline bool ice_is_primary(struct ice_hw *hw)
++{
++	return !!(hw->dev_caps.nac_topo.mode & ICE_NAC_TOPO_PRIMARY_M);
++}
++
+ #define PFTSYN_SEM_BYTES	4
+ 
+ #define ICE_PTP_CLOCK_INDEX_0	0x00
+-- 
+2.43.0
+
 
