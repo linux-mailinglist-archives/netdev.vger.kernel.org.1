@@ -1,138 +1,121 @@
-Return-Path: <netdev+bounces-106720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFDD4917585
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:22:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B914B91758A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:25:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F158B21F12
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:22:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAD951C21A32
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:25:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD61F9F7;
-	Wed, 26 Jun 2024 01:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72CD8BEF;
+	Wed, 26 Jun 2024 01:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z4yJyVlH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jNIPQclA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BDBC15B
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 01:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833DDD51D
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 01:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719364921; cv=none; b=lJjwutaM96ORnGec5wDYN/s4TSU2KvIT9tbtcgzsezz74LdBWPH/qzuT+jMbwrzPvijsIChv792dG/nvgQ36foRMDc7P54SeA0wE30M6Fy7LkVjemn1GvLS3TTpPEcbRUyxohdouIb2Ch6x9+yAYNrR5ZSuxSM/Jg7hDOHqcCX0=
+	t=1719365100; cv=none; b=Jz/9wDnj64O4PS+umluZJD4bEEj+sQduNzl774T16+UZj+maWEIBbh6PPzfqgzk5Nd85Rz3X0H36NoSr5J8Q65tJ13yjxkHjs9PN4xocbjaJ8JE6NETNylZG187WI16D7m6tbtWYeZ4Y5RCprZES/9fOb4IFrNGziw3CxXYigvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719364921; c=relaxed/simple;
-	bh=UFZ9PY+GDSA9BNrYdHIS8Xjr5b2tAoCZFEY+1AZ/7t0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IUOsjh40bklkprwFEFSy2NG6xrHQNfzmisCSY1K/eP7pltdTq9MVi7iW5qk5RkcBNWwfIFVMEDeYzDZmuTnZkjSMyL/iFxVP99uK7llQgL8cncn6uwOGpr4icT0bJ6ikYrco/bq/MEL74IC2R2TOInaFWMs/1jY4kcicN5YE1ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z4yJyVlH; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-57a16f4b8bfso4224a12.0
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 18:21:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719364918; x=1719969718; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MDXzXy/x3VAMGE4telAkJ0AkS3Dvfn3YkfUIsKfqDwQ=;
-        b=Z4yJyVlHfzMxe/ddao59NTkIs2o5QUVqvZf9ZptaOHKqJYdaZBjUDCXNvNd1KgJhqq
-         ULJiS+zcFLsSxQ8czSy0OAYnZ9RwSk+1roN+1bG04dxjNWkS7THUkNquF8woe8i6L8pQ
-         jAwx7aPXlQBd1JKY9fNVOejmymfsfgbf/QYlquMoRqDqyr7X+u9+GOhEYbo5jyLIbab8
-         GflZ9PsVsaX4Syssapjp260tELPdmoFpvHDH+W2ERx0BlmFUfGKsCTs96a2YgDkF5KhY
-         gSjdzGHEd88nrkAQ/kCebRW6Fysj6yFTAR/EP89ylnjngoY8flJus4qxhMUunqef5miL
-         etEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719364918; x=1719969718;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MDXzXy/x3VAMGE4telAkJ0AkS3Dvfn3YkfUIsKfqDwQ=;
-        b=FT1czcZ24lUiowz/chRfbIiSjVszmarpg2OseFaREUl6BM7v4nV/k2nsn/s0DTDyTC
-         8GSfklYsw7lZWFqrGNULeGHAIqUqE19NVv5H4Aq5H2qGO+S9VGp0ErGAcWvjurg/eXv8
-         CzcISj978gHWyC/VxCH5nK7zCHOQr86qebCPg8R73qPQEEq0lPz2JJoxSd40sUW9Yyof
-         K8MDPEFzfQi2u6jxcW/ZaMNlNTnFe0on8FTuQma9+4IMRlmTji7p5oXFVSkntu1PkSiB
-         KEL3ElJUUFp/PIlWa4nRQEMnQgOghCFoJvelNamVM1cXc09JBfer69Yt0xIxcuwSsQPB
-         pFqw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/S7mTX8z/YK8X/dlqAJT3KEN1bsrFV3EYw4XmoxDsA/RVsiUU/mORzqzdJqSCGlRaduPRNPWq49rxBT7RRX/g0JimAGqI
-X-Gm-Message-State: AOJu0YySRUXNCxCi+2Dd5q+ZykU6Aj0AgZc+qZ91FGM7vUrIBL+Udbo7
-	T8CWHHnBSPw5LTdbRcISTQWHPRKfsHpgzULg0yiGXdzEDBzGzZ5DYc1QaV3Zogg3V0SrDHMSShJ
-	z/WIYun1nAcOg+UzPi/i/fx0zE1jCej5crhBK
-X-Google-Smtp-Source: AGHT+IHX6Dw13lvp9tA5r1Nr3EDVBrqZjzt46+AZrMqkD9VDrFcqyfsc9zQwLVqS3nH7c8fc7LBij/O5GqbVZ/GRwBU=
-X-Received: by 2002:a05:6402:350c:b0:582:f117:548e with SMTP id
- 4fb4d7f45d1cf-5832c353bf0mr116598a12.0.1719364915083; Tue, 25 Jun 2024
- 18:21:55 -0700 (PDT)
+	s=arc-20240116; t=1719365100; c=relaxed/simple;
+	bh=RW6Q3elRK4arljIJXZmd4bUFr78M/hdfKcjvXjh1YxI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FOwNlKO4VLBT0D29dyp+irVQFTmakxp79UZUaUoExJMSHcFZdFkwk0+hD/DJQns/dX6dLltUxuOQIGkvaC/HF2341iZSRCBP+J22NJocVQ4prdY0bDPf9g+ftkp/0VQX38obAS9d13BB7zud8q1SbXfwtsOqkiRBaDPQQOGgzso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jNIPQclA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6342C32781;
+	Wed, 26 Jun 2024 01:24:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719365100;
+	bh=RW6Q3elRK4arljIJXZmd4bUFr78M/hdfKcjvXjh1YxI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jNIPQclAg7kOKQ36iy780CnuaXLqPZ9QLZeQIUNnyacza8iKHoit0UKLtAjIapzOL
+	 Z923AHaj5N3DEJRShmALlYlqQbSswksJw5zt5wSA7GdUR8siAPLqtfFS9s+19R1qdu
+	 jjIc00QRYT+OMoz6Z/Jfle8c86vvIs7e/kN2Am3f827lsrQ53zoZvgDeQC9+EUKPM8
+	 vXDM0eDe+tau8v+td0Jtjy8LOvCCXXhwkCdNzXDdFEN/jaTghWS6F3crJKzA4ynEcK
+	 FqGOB1OAdGLG0OXvMgwZq04zCCx1hzqTSeiNy6U3PC0rnJgsdTsp47dd13lKr+Qpfh
+	 Z0CiG7m8KOyNA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	willemdebruijn.kernel@gmail.com,
+	ecree.xilinx@gmail.com,
+	dw@davidwei.uk,
+	przemyslaw.kitszel@intel.com,
+	michael.chan@broadcom.com,
+	andrew.gospodarek@broadcom.com,
+	leitao@debian.org,
+	petrm@nvidia.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v3 0/4] selftests: drv-net: rss_ctx: add tests for RSS contexts
+Date: Tue, 25 Jun 2024 18:24:52 -0700
+Message-ID: <20240626012456.2326192-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240624232718.1154427-1-edliaw@google.com> <20240625135234.d52ef77c0d84cb19d37dc44f@linux-foundation.org>
- <f975fe76-92f4-4af0-a91d-0f3d8938f6b2@linuxfoundation.org> <CAG4es9V0XAqe-eqPgjU+sdRS00VOEr0Xda1Dv-gtfEvqsODjiw@mail.gmail.com>
-In-Reply-To: <CAG4es9V0XAqe-eqPgjU+sdRS00VOEr0Xda1Dv-gtfEvqsODjiw@mail.gmail.com>
-From: Edward Liaw <edliaw@google.com>
-Date: Tue, 25 Jun 2024 18:21:27 -0700
-Message-ID: <CAG4es9WHUSC7qm_6fJjQm5nM_iYEjXO75DWC8e5tzqc7fLEtfw@mail.gmail.com>
-Subject: Re: [PATCH v6 00/13] Centralize _GNU_SOURCE definition into lib.mk
-To: Shuah Khan <skhan@linuxfoundation.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kselftest@vger.kernel.org, 
-	Eric Biederman <ebiederm@xmission.com>, Kees Cook <kees@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, 
-	Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Fenghua Yu <fenghua.yu@intel.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	linux-kernel@vger.kernel.org, usama.anjum@collabora.com, seanjc@google.com, 
-	kernel-team@android.com, linux-mm@kvack.org, iommu@lists.linux.dev, 
-	kvm@vger.kernel.org, netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-sgx@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 25, 2024 at 5:41=E2=80=AFPM Edward Liaw <edliaw@google.com> wro=
-te:
->
-> On Tue, Jun 25, 2024 at 4:34=E2=80=AFPM Shuah Khan <skhan@linuxfoundation=
-.org> wrote:
-> >
-> > On 6/25/24 14:52, Andrew Morton wrote:
-> > > On Mon, 24 Jun 2024 23:26:09 +0000 Edward Liaw <edliaw@google.com> wr=
-ote:
-> > >
-> > >> Centralizes the definition of _GNU_SOURCE into lib.mk and addresses =
-all
-> > >> resulting macro redefinition warnings.
-> > >>
-> > >> These patches will need to be merged in one shot to avoid redefiniti=
-on
-> > >> warnings.
-> > >
-> > > Yes, please do this as a single patch and resend?
-> >
-> > Since the change is limited to makefiles and one source file
-> > we can manage it with one patch.
-> >
-> > Please send single patch and I will apply to next and we can resolve
-> > conflicts if any before the merge window rolls around.
->
-> Sounds good, I sent:
-> https://lore.kernel.org/linux-kselftest/20240625223454.1586259-1-edliaw@g=
-oogle.com
+Add a few tests exercising RSS context API.
+In addition to basic sanity checks, tests add RSS contexts,
+n-tuple rule to direct traffic to them (based on dst port),
+and qstats to make sure traffic landed where we expected.
 
-I realized that in this v6 patch, I had accidentally sent it in the
-middle of a rebase, so it's missing the last change to
-selftests/tmpfs.  I've fixed it in v7.
+v2 adds a test for removing contexts out of order. When testing
+bnxt - either the new test or running more tests after the overlap
+test makes the device act strangely. To the point where it may start
+giving out ntuple IDs of 0 for all rules..
 
->
-> >
-> > thanks,
-> > -- Shuah
+Ed, could you try the tests with your device?
+
+  $ export NETIF=eth0 REMOTE_...
+  $ ./drivers/net/hw/rss_ctx.py
+  KTAP version 1
+  1..8
+  ok 1 rss_ctx.test_rss_key_indir
+  ok 2 rss_ctx.test_rss_context
+  ok 3 rss_ctx.test_rss_context4
+  # Increasing queue count 44 -> 66
+  # Failed to create context 32, trying to test what we got
+  ok 4 rss_ctx.test_rss_context32 # SKIP Tested only 31 contexts, wanted 32
+  ok 5 rss_ctx.test_rss_context_overlap
+  ok 6 rss_ctx.test_rss_context_overlap2
+  # .. sprays traffic like a headless chicken ..
+  not ok 7 rss_ctx.test_rss_context_out_of_order
+  ok 8 rss_ctx.test_rss_context4_create_with_cfg
+  # Totals: pass:6 fail:1 xfail:0 xpass:0 skip:1 error:0
+
+v2: https://lore.kernel.org/all/20240625010210.2002310-1-kuba@kernel.org
+v1: https://lore.kernel.org/all/20240620232902.1343834-1-kuba@kernel.org
+
+Jakub Kicinski (4):
+  selftests: drv-net: try to check if port is in use
+  selftests: drv-net: add helper to wait for HW stats to sync
+  selftests: drv-net: add ability to wait for at least N packets to load
+    gen
+  selftests: drv-net: rss_ctx: add tests for RSS configuration and
+    contexts
+
+ .../testing/selftests/drivers/net/hw/Makefile |   1 +
+ .../selftests/drivers/net/hw/rss_ctx.py       | 383 ++++++++++++++++++
+ .../selftests/drivers/net/lib/py/env.py       |  19 +-
+ .../selftests/drivers/net/lib/py/load.py      |  37 +-
+ tools/testing/selftests/net/lib/py/ksft.py    |   5 +
+ tools/testing/selftests/net/lib/py/utils.py   |  27 +-
+ 6 files changed, 457 insertions(+), 15 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/hw/rss_ctx.py
+
+-- 
+2.45.2
+
 
