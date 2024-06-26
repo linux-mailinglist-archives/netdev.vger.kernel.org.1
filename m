@@ -1,104 +1,66 @@
-Return-Path: <netdev+bounces-106767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0201F917947
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:56:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67D7F91794B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 09:00:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F3021F224ED
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 06:56:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98DD91C21D7D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 07:00:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E98159598;
-	Wed, 26 Jun 2024 06:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h77IsI6F"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5507E14A602;
+	Wed, 26 Jun 2024 07:00:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f193.google.com (mail-pf1-f193.google.com [209.85.210.193])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5947F156257;
-	Wed, 26 Jun 2024 06:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99B3A7F
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 07:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719384979; cv=none; b=i6ORaJ7Rh1xK8DFA/bt2NHRoSNm7/HVYjNO4ticg6sPpMG89MGJcF2UtGRDBT6ZBcuVIWHvpC0tlwV4F9R5dLFBzRdAGC5L9ingh83w0FFfklt5HqMYURUW4JPBhoawudi3j7bNBEROKsRGCDEPnuqFrjlrW7v1GTAKjGWSbF90=
+	t=1719385244; cv=none; b=mI0URSdOmcogDOwCoCo/LAZr7UjIFd6+MmLMv4VYzsmsUAubIYyqnl5ufVAqCE2ocDjfFSaksA5hPja7WZwS0ZILgR8w+FuTT18ddEDI87GJl+KLuMcbwCfGdmalkzR64JHuJ3eSIT7BKxFJyiIhEQVITG/Yi1ZfegCfdp4ztGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719384979; c=relaxed/simple;
-	bh=GjjBWFidcceN9FBBaeqyuuWfrJoBQOiSicFSBoajB3g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=W/DmZjGEpTJSFaE2pEsqXF6JXGnXHTUNFGudCfmRz6usj7K7aAR8YClBzrW6pRARTk9Rp0yQH3ct3CuuJ5jB6M9eFSUASQFfjMbWo4Mmox3c/qB0Rc8LsCARvCy2Vg5qurNfXnCtfSB3DkjR5Kp0vhXuCkimei1qOKFtKZC2OiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h77IsI6F; arc=none smtp.client-ip=209.85.210.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1719385244; c=relaxed/simple;
+	bh=FylXKTBnxotHRB1aKpnuj0kwhBQy7SJnDEQAvY2bydw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ok06O/kRkqnymeU/ILQfZCuewRUgXZWG/BL2OH0p5sVRuoR4uMOxgxmnnXRTOY9yUp0CKsr4lk25p1nPX5VfqrgQt9EUoLuK+Vhob7+WAsBZDdKE900AyrqVBGyOYHeNZWiUqXJ+5SIcLeD/MbSVGQrZ8vhnQ6uhpSpWcQptuaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f193.google.com with SMTP id d2e1a72fcca58-7066463c841so3013106b3a.1;
-        Tue, 25 Jun 2024 23:56:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719384978; x=1719989778; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8kGgfX9zbx+1ufGqfPAiaiIQ4v/W7KvDv5i8WuOE1po=;
-        b=h77IsI6Fq0/pvT3WUAkGClOXN/ZWXidVHlYukArbgwrOjGmfz6flbxCryBfR2CTn7W
-         0gOq9oXCL1IycJ1cUddqCyWLsmfHUgUBPosXIWNAD6gccng/rszwTqww9uIt3H2Bg8Ex
-         RDcuT+gfLbxvFhqPsaWPi+9gHUSHfX9tMtGryWNxQR35T0oBl4g0atPDqDtX/Onw0ZP+
-         MaGjN6usf4xVTjH75ldrWeUiVLbYRoJcTcwT94a+eOkqbJ9iexi61C+AC7sutwBZSRRm
-         7c+mLqICW0hMAdQLHvR58qhTg3xNoGad1vzTUsTtTt8LmfiG1TI+koUozn3AySyVb72g
-         zdjA==
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-422948b9140so5646995e9.1
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 00:00:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719384978; x=1719989778;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8kGgfX9zbx+1ufGqfPAiaiIQ4v/W7KvDv5i8WuOE1po=;
-        b=bVU78rafAeSKF3FxEGZII7kbQyYv6aQyHZCPS8mQa5iY6GjYGP8Ro4BZfluD/HMA/D
-         az7n6uvyxWPFgtezATYgPzo+xACFR3IP6M0Ub8fi4P9dTXogEHY5T6ttluDTYlpuqkaR
-         zsqAlAmo721j60qJpLdVNkPs+uCFQpB1XsUPzP+iDxJLisH5+rMoxB9aviWQXV3e25wY
-         PcLfhpe8CFBBy8ujnn62PLrm7gW7D/vkctlg9A1ih/LokQXaTPOtRRs208VLnWTunLuq
-         d1l3tRkhlM03Wdxc8dolbW8E/le8vnhZ4yNJEsoqrFfxtaiyzdvxmjo4ufhpY5Sy98aX
-         3mSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWkU/9KnRsrIabG2L1B+FaX4/qDWUwxt+ZoP3N12F0/eOlOGf4ShaTJV/kTlp9F31Rky0AHNKOQ1xikiI/6xiAsYtsTtWk4TyluHN6iUMPiQ8oMf26NVsvVc3qWPHUXTvnQ
-X-Gm-Message-State: AOJu0Yz9MGbFljo8VBhafGUoCF2ESfXo/O0+SccWg13cRKC34Uo85al+
-	yv7ia21lTDDe/tr5PdEP4Fw0Sf3oadasZctRz8kTTPVW6vL2derr
-X-Google-Smtp-Source: AGHT+IFY4KPK1bUejlzRgw+dr3lQn2+mBfVKb7mehlfySXyxN75tEfT9A8yHQZIYAIQw69nrTv6Ukw==
-X-Received: by 2002:a05:6a20:ba83:b0:1b0:2af5:f183 with SMTP id adf61e73a8af0-1bcf7e7ecd5mr8263244637.23.1719384977592;
-        Tue, 25 Jun 2024 23:56:17 -0700 (PDT)
-Received: from localhost.localdomain ([240e:604:203:6020:9d04:e74d:2a89:713])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb3c5f87sm92776495ad.166.2024.06.25.23.56.12
+        d=1e100.net; s=20230601; t=1719385240; x=1719990040;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yGZZfaMxgvaBQwBr+0fVvw7aqhz0LrK230wvycBWnKg=;
+        b=hXIrMsvrRBMkdMGJ/igYy96YY11xdVKbmj8s2IexVhXRHxI70p+dgacpGNNe8U+w2a
+         16+uH3GmciTmewwPNoyuvLjfjL65ivddDuthjed/fcFoNIRfARNI+GmqesvaYdpCWjw2
+         RBDvDdEsTyVrKhudmPCxq2+4alLxqv/VtFG7ADB1itthiDeb5ciJSB5Xl1t1Y72YC6ZG
+         fAgpVqWHxtmhPp7lfd+8KF3GMNeMjMFBnL6BvU7UCnPtuHcHtKME1zO8x/JoCi9fjTl8
+         ghKMkx3ZqfRaP/1eigACvstAqMWmCnki5hQ8rwi09QJ0umozUDmKtDY29xTeprIWCs1B
+         WQiw==
+X-Gm-Message-State: AOJu0YydHOPnrMAEZ361cI0/Y5pu9NjM/riXs9p3JkpV4r07QN98BNzf
+	uskYeoUNw3+l8haIQ1LbIY93+tqVJGcYtX+6hMqB7vpNm9rwgcPqiyuDZQ==
+X-Google-Smtp-Source: AGHT+IGJohaBt6+nMGwXLK+iamLibX8DBXc9Ds4FlA3h2aJOW76P/EmtT5M5fi5qS0WDBoF0DITgCQ==
+X-Received: by 2002:a05:600c:3b0d:b0:424:ac9f:5c61 with SMTP id 5b1f17b1804b1-424ac9f6029mr12113305e9.3.1719385239994;
+        Wed, 26 Jun 2024 00:00:39 -0700 (PDT)
+Received: from vastdata-ubuntu2.vastdata.com (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-424c823c28asm13728735e9.5.2024.06.26.00.00.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jun 2024 23:56:17 -0700 (PDT)
-From: Fred Li <dracodingfly@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	aleksander.lobakin@intel.com,
-	sashal@kernel.org,
-	linux@weissschuh.net,
-	hawk@kernel.org,
-	nbd@nbd.name,
-	mkhalfella@purestorage.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Fred Li <dracodingfly@gmail.com>
-Subject: [PATCH v2 0/2] net: Fix BUG_ON for segment frag_list with mangled gso_size and head_frag is true
-Date: Wed, 26 Jun 2024 14:55:55 +0800
-Message-Id: <20240626065555.35460-3-dracodingfly@gmail.com>
-X-Mailer: git-send-email 2.32.1 (Apple Git-133)
-In-Reply-To: <20240626065555.35460-1-dracodingfly@gmail.com>
-References: <20240626065555.35460-1-dracodingfly@gmail.com>
+        Wed, 26 Jun 2024 00:00:39 -0700 (PDT)
+From: Sagi Grimberg <sagi@grimberg.me>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>,
+	David Howells <dhowells@redhat.com>,
+	Matthew Wilcox <willy@infradead.org>
+Subject: [PATCH net v3] net: allow skb_datagram_iter to be called from any context
+Date: Wed, 26 Jun 2024 10:00:36 +0300
+Message-ID: <20240626070037.758538-1-sagi@grimberg.me>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,23 +69,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This serices fix the BUG_ON when segment frag_list with mangled gso_size
-and head_frag is true. This patch was tested on kernel 6.6.35.
+We only use the mapping in a single context, so kmap_local is sufficient
+and cheaper. Make sure to use skb_frag_foreach_page as skb frags may
+contain highmem compound pages and we need to map page by page.
 
-v2 changes:
-  Updated with remove the sg condition may be more make sense.
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Closes: https://lore.kernel.org/oe-lkp/202406161539.b5ff7b20-oliver.sang@intel.com
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+---
+Changes from v2:
+- added a target tree in subject prefix
+- added reported credits and closes annotation
 
-Fred Li (2):
-  net: Fix skb_segment when splitting gso_size mangled skb having
-    linear-headed frag_list whose head_frag=true
-  test_bpf: Introduce an skb_segment test for frag_list whose
-    head_frag=true and gso_size was mangled
+Changes from v1:
+- Fix usercopy BUG() due to copy from highmem pages across page boundary
+  by using skb_frag_foreach_page
 
- lib/test_bpf.c    | 64 +++++++++++++++++++++++++++++++++++++++++++++++
- net/core/skbuff.c |  2 +-
- 2 files changed, 65 insertions(+), 1 deletion(-)
+ net/core/datagram.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
+diff --git a/net/core/datagram.c b/net/core/datagram.c
+index e614cfd8e14a..e9ba4c7b449d 100644
+--- a/net/core/datagram.c
++++ b/net/core/datagram.c
+@@ -416,15 +416,22 @@ static int __skb_datagram_iter(const struct sk_buff *skb, int offset,
+ 
+ 		end = start + skb_frag_size(frag);
+ 		if ((copy = end - offset) > 0) {
+-			struct page *page = skb_frag_page(frag);
+-			u8 *vaddr = kmap(page);
++			u32 p_off, p_len, copied;
++			struct page *p;
++			u8 *vaddr;
+ 
+ 			if (copy > len)
+ 				copy = len;
+-			n = INDIRECT_CALL_1(cb, simple_copy_to_iter,
+-					vaddr + skb_frag_off(frag) + offset - start,
+-					copy, data, to);
+-			kunmap(page);
++
++			skb_frag_foreach_page(frag,
++					      skb_frag_off(frag) + offset - start,
++					      copy, p, p_off, p_len, copied) {
++				vaddr = kmap_local_page(p);
++				n = INDIRECT_CALL_1(cb, simple_copy_to_iter,
++					vaddr + p_off, p_len, data, to);
++				kunmap_local(vaddr);
++			}
++
+ 			offset += n;
+ 			if (n != copy)
+ 				goto short_copy;
 -- 
-2.33.0
+2.43.0
 
 
