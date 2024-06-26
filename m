@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-106795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 784F6917AA5
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:16:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0EEF917AC7
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:20:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40813B21893
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:16:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B1D72874F1
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF55F15F3FB;
-	Wed, 26 Jun 2024 08:16:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E5015FA75;
+	Wed, 26 Jun 2024 08:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O3I/Fu7x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MUS4sgYY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F5B15B0E1;
-	Wed, 26 Jun 2024 08:16:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50224149C4E;
+	Wed, 26 Jun 2024 08:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719389768; cv=none; b=alvLhEos6H1xwrVsa9gFSFXa/i6Fk0LdFMn8KeqZRdr1V8GgPWHoDLUVW183AFuBBndvUiLpEVqaPR/VDT+Jz2xo0P4TVw0VXglQ5S6824S+e3jOGEujrifDX3GVa0jId1Ag4USx6/fdiog5NeV7QNOkgSLqsnMPnS/59srQpRM=
+	t=1719390004; cv=none; b=teqjwoZRF7t9obGvi9n4FnhFfPeTalSDZf48i9ooFUk5C+X5vJRSxDteyupUQTrcNKXqwYI32A0NkIZUyBDNf5pDYlhhGAJe5Q1beg0Kf6EBVCBQkGgkULTpUiSEQiOmfB04JdF8pqEz6PJalh107BJc7UchgenJ+c5wXTCkSTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719389768; c=relaxed/simple;
-	bh=cGF5wdV2kEPa5Pug7huBjL8X8L/Pc1BUyOY1sXqQ7Co=;
+	s=arc-20240116; t=1719390004; c=relaxed/simple;
+	bh=j/ywYji9fCX+Xr7Rt0OjtBLx1A3Se9EU1/A/Czg1tgU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JWrffuJlir5exbhhYzhMT+IwkjWkfSEAlFqY5zVYt7Db8uvDhL/LZXi5lzROpJotB84hc1YzqpeAb9SkXnd/T8SW7LOtp9lV+ptmtWwzDK8PZ9kv2/WqbWJhyQG3707a9/x1+vby2zAjyO3d9ZztNz04nr9ZM2s8fjZZZR2A4XY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O3I/Fu7x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B261AC2BD10;
-	Wed, 26 Jun 2024 08:16:02 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=RLoXV27cIEwcDbq8SFtoKBcL7Djc7augLa2MoaDQviKQ8LToYPY3PSUw87NEcX84UhGAp7G+QHZWoHXSodbRIjUfTxt8ZkeZuEFpra4UiHisRGf5nXm0Z8NBnB7GdoFDUmZ+rLlCBP4Y3S2D59Td1L3ovQ4HPrtcTxalEZokK5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MUS4sgYY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5E53C32789;
+	Wed, 26 Jun 2024 08:19:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719389768;
-	bh=cGF5wdV2kEPa5Pug7huBjL8X8L/Pc1BUyOY1sXqQ7Co=;
+	s=k20201202; t=1719390003;
+	bh=j/ywYji9fCX+Xr7Rt0OjtBLx1A3Se9EU1/A/Czg1tgU=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=O3I/Fu7xsi1Yp2PL1gXjw/hciFI5MliPVtzHV1FP5wfmGPvfAH0xIy9+AGmLXXNh6
-	 9M9fW3tsWn2m0vt46IURbmBKMAg7llM/LlyjKyEpyi9EhCo50WdpODedO2FdBNyZOE
-	 7kKtiIK0o4IXd5SUQSRMjysrIpURF884tp8RQSKHcyepNunC7cqPK0cGsXM/K0gL5a
-	 TaV2FM05l4FXQ4AxYPMoI3+AgGHSf0YV/q/tT/YLd2nXBJ78dD2GR1JUWq2VBx0Rsd
-	 6Z3FWYqjizit4s+5SWACVTpc/MLJrpQyh6tNZPYQETmUR3s56akAn92LMGDeC5bWMy
-	 IU0KZcAQktlLA==
-Message-ID: <226a9e91-5082-4311-9fc7-63bd91c0e3a7@kernel.org>
-Date: Wed, 26 Jun 2024 10:16:00 +0200
+	b=MUS4sgYYHp8UscBOZXPT9JY4x5dSd/6GsIb6snpPIJL6tcBNpcYuf/1SS1VeKMQod
+	 72V6Q0yzNFJ2uBxHGkprxG/REtg+AqgOwdqrmF6EKBRf0zzGGImkwd/f2ayO+gip45
+	 BWqE4xDiEGxUoDVo5C0tD0ZoDt2DU2BQZXg4WZivh3IoSFz4OvLD6KiREQmfL4LyV3
+	 4bXjTdHzSHQV0b68C4Ly1EBHq98sXhpeKkp8wtHVuJ8BI2aeZu3/Ky8GYO/pEhhSYb
+	 Juv98fh6WSz9HgFM+GWWG/msYbqXMm2OAq4WmqPcQ6H0Es1Yq8ZHUoolgRdg54Yt8U
+	 pJV/AgPqAI9gA==
+Message-ID: <12853a72-190f-4aeb-9a2f-4fdc42c9e4df@kernel.org>
+Date: Wed, 26 Jun 2024 10:19:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,21 +50,20 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] dt-bindings: net: Define properties at top-level
-To: "Rob Herring (Arm)" <robh@kernel.org>,
+Subject: Re: [PATCH 1/1] dt-bindings: can: fsl,flexcan: add can-transceiver
+ for fsl,flexcan
+To: Frank Li <Frank.Li@nxp.com>, Marc Kleine-Budde <mkl@pengutronix.de>,
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240625215442.190557-2-robh@kernel.org>
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ "open list:CAN NETWORK DRIVERS" <linux-can@vger.kernel.org>,
+ "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Cc: imx@lists.linux.dev
+References: <20240625203145.3962165-1-Frank.Li@nxp.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -110,19 +109,18 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240625215442.190557-2-robh@kernel.org>
+In-Reply-To: <20240625203145.3962165-1-Frank.Li@nxp.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 25/06/2024 23:54, Rob Herring (Arm) wrote:
-> Convention is DT schemas should define all properties at the top-level
-> and not inside of if/then schemas. That minimizes the if/then schemas
-> and is more future proof.
-> 
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> ---
+On 25/06/2024 22:31, Frank Li wrote:
+> Add 'can-transceiver' children node for fsl,flexcan to allow update
+> can-transceiver property.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+I don't understand.  Who and how updates can-transceiver property? What
+is can-transceiver property (I assume you speak about something
+different than child node)?
+
 
 Best regards,
 Krzysztof
