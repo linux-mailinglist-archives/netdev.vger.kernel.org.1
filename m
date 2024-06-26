@@ -1,96 +1,80 @@
-Return-Path: <netdev+bounces-106968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 828229184B0
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:44:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A43329184D6
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:51:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB8D1B2B1AC
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:42:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F18E28B580
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:51:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C3BD187560;
-	Wed, 26 Jun 2024 14:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AEF31850A9;
+	Wed, 26 Jun 2024 14:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C+wHJTys"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LrMF3SoW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580B918754A
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 14:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23506185091;
+	Wed, 26 Jun 2024 14:51:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719412830; cv=none; b=PwJ7MREheLQGVxzXKM5/I/Rqu3ojlDell234XOxNOhvxu9htgdWDIPr90946MveRblKOOo/QsN7BmdAqZxNCEwNGkZFeiIjozYlXp7kgfd63cLA36sLajuafaigUvGHHlCyAPKvLiNNldtAZ17nxOkl1QGABsHOB3gMc/CT5OAc=
+	t=1719413479; cv=none; b=MU08EZ5ZkCYxqjqdzNE5q6HEX3HUvMUTUuTm/Pyye2zhxmVj5rw7M6RfrUxylphQVgDmLC3Geaz6+KWRpbD9KWIIukFSY+MzZBxhCHWzVH5cq/jwp2KIzRGCjDeeCbYNsSkT0aCTdtfh6V+U7uz4/OrrHCjrrfWOZpXdtZlTHh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719412830; c=relaxed/simple;
-	bh=jYjqnDqrAcshDV7e7md7gqDsBacMvaIMt5pNk9T4jBY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lDkFttJpcnH1l+kkbif1quqXDa50iKfVH7RQnIjNTcnKJgPJgXRpF1wbDByEyOD7LARiGZizn/ELcmNgx481FbmJmdTs/bFq8p8Gw3ncVexcOwzkF8aEs+cl4A9C/z1utjCzN/o7T1P2KNFY2LTuvLvlS7PIvO1+UmRY2PZdHXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C+wHJTys; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DE0A5C32782;
-	Wed, 26 Jun 2024 14:40:29 +0000 (UTC)
+	s=arc-20240116; t=1719413479; c=relaxed/simple;
+	bh=CSsJfVEUk0CEqbSZnNyO0CexjujJdQgyreLc/rlBhPU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=O/5d0v7ZJDOW/PgJArCmSDdv4rj1wLMH1uL19sfN7MvK9gcIw+sn36o4ant9jVFoWCqAUuAWsGzdwoPgZ0st5jUNy/tsSbAMMKUi7iYcdpQ0In4fRcd4Qw5d9f4rn+o9S3Lj0zO4T7uZ1bFmojmVc6rv2oz99rwysk2UrkTdJ7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LrMF3SoW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 597A2C2BD10;
+	Wed, 26 Jun 2024 14:51:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719412829;
-	bh=jYjqnDqrAcshDV7e7md7gqDsBacMvaIMt5pNk9T4jBY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=C+wHJTysx6jLrDir2ggAzJQltMOLLpqprz0bBWeBDWH6hzKYoMlwMr+pkxtoPP9nY
-	 tBdsu7RkJUsROXxn/9BzrkrJSBRtLxOJHcI0KmFleWQ/uzJwit7oBJ+AUCH4Al00n2
-	 DYzTLVc/cZPr4FjNe0BauQSm2TCBWCJg2x78eG/0yjxgexhVDXQ/oLNhGEktjGz/Sr
-	 9AAa0eEDUsp/aNp4wY1ujfB2ClQd+s03zwZmnPA9adSN7tehaz6sA9Ru2zLSIFRMOE
-	 3z0vSLJHLI56JE/ZxbxJ5uvKcMjNizRPDxvY+ZcZSOFCcJrivWgRWarpAEc8E7Qgp6
-	 qN4TvAiZv3yiQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C2512DE8DF2;
-	Wed, 26 Jun 2024 14:40:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1719413478;
+	bh=CSsJfVEUk0CEqbSZnNyO0CexjujJdQgyreLc/rlBhPU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LrMF3SoWx0sQGD78jCcw2pMfAlGqJYdpaA1GCtAbI9zVs165eeGQEahhTfe1U2LFj
+	 WJ26ubs2kRq5DCv+Gi3n5+71n40b4octIOsG+AN3+pXu7jBDCNHJ7B7IunHgwVm2ZZ
+	 j7pcmHcjUw90H+GpOecyqMOiRYUZ939pxkzqpcg9SsmtBx6NV89d9PwSgqqPNxY7LM
+	 kUCqCPClX1FFdONwQvpRblh4VMQWkyySGh1EHjv/98q5H7+BsUyaeOzbEKygGgNe7w
+	 zhOR9H5smRTzNOEXvHsKVnNgclJ2dFHTtvTLRt7cZGN3CK4HW5fmNmoGStHBkNfjHg
+	 jeJepKRfCEQWw==
+Date: Wed, 26 Jun 2024 07:51:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, David Ahern
+ <dsahern@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn
+ <andrew@lunn.ch>, nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/5] netdevice: convert private flags > BIT(31)
+ to bitfields
+Message-ID: <20240626075117.6a250653@kernel.org>
+In-Reply-To: <20240625114432.1398320-2-aleksander.lobakin@intel.com>
+References: <20240625114432.1398320-1-aleksander.lobakin@intel.com>
+	<20240625114432.1398320-2-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: Drop explicit initialization of struct
- i2c_device_id::driver_data to 0
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171941282978.9808.3649469008264341115.git-patchwork-notify@kernel.org>
-Date: Wed, 26 Jun 2024 14:40:29 +0000
-References: <20240625083853.2205977-2-u.kleine-koenig@baylibre.com>
-In-Reply-To: <20240625083853.2205977-2-u.kleine-koenig@baylibre.com>
-To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=3Cu=2Ekleine-koenig=40baylibre=2Ecom=3E?=@codeaurora.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
- woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
- george.mccollister@gmail.com, idosch@nvidia.com, petrm@nvidia.com,
- jk@codeconstruct.com.au, matt@codeconstruct.com.au, o.rempel@pengutronix.de,
- kory.maincent@bootlin.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 25 Jun 2024 13:44:28 +0200 Alexander Lobakin wrote:
+> +	struct_group(__priv_flags,
+> +		unsigned long		priv_flags:32;
+> +		unsigned long		see_all_hwtstamp_requests:1;
+> +		unsigned long		change_proto_down:1;
+> +	);
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+I don't think we should group them indiscriminately. Better to add the
+asserts flag by flag. Neither of the flags you're breaking out in this
+patch are used on the fast path.
 
-On Tue, 25 Jun 2024 10:38:53 +0200 you wrote:
-> These drivers don't use the driver_data member of struct i2c_device_id,
-> so don't explicitly initialize this member.
-> 
-> This prepares putting driver_data in an anonymous union which requires
-> either no initialization or named designators. But it's also a nice
-> cleanup on its own.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] net: Drop explicit initialization of struct i2c_device_id::driver_data to 0
-    https://git.kernel.org/netdev/net-next/c/a6a6a9809411
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Or is the problem that CACHELINE_ASSERT_GROUP_MEMBER doesn't work on
+bitfields?
 
