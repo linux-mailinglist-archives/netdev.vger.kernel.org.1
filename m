@@ -1,87 +1,62 @@
-Return-Path: <netdev+bounces-107035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14188918DFC
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 20:11:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FD53918E01
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 20:11:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4069C1C21321
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 18:11:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 366661F230C0
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 18:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975B0190471;
-	Wed, 26 Jun 2024 18:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 587DE190471;
+	Wed, 26 Jun 2024 18:11:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sCqKLKIw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r3hWBRzu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA89419046B
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 18:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F200190465;
+	Wed, 26 Jun 2024 18:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719425485; cv=none; b=p0d6tmbgJOmuNP2Vc1YljcfTz4QDaZORPM+NwkHpgkFFB+RhlxNEGUevuGQ0WqoE2r9icH3mQWe6vO4Id4yZ2SyaJcS4uTcVr/9xkgOFxpSnhC8ucNVc/NuHObDKLt5iXdcxGlQCvSQlRNxSR3tixjSkA7uetqaP2eLOtUm12Dk=
+	t=1719425504; cv=none; b=jUTfB6anunbZEjWMobbyEy7lCtGcTrQeRmFpturcTEWY+wi196ZMztS37TmcslmxW5bMMtOreeRO+b4XLDWzY07suLtFT8CkN2hbl5ZQf+SQfNs/G4fFyVyLai3U2IAmcqssyK5RAxiXn9fn70TUITc4Y0Zvl2BLutVI6UhBgsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719425485; c=relaxed/simple;
-	bh=H7/ec739+hu73Yci+SuVYmQL5gYpe3oSoD4ttritvGY=;
+	s=arc-20240116; t=1719425504; c=relaxed/simple;
+	bh=V7B++SJTszDbRNn3G1xfashn5MADZfh7Xs25Pyj+9SQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eX4IWoS5UHMnvo8AhUHcesbOyBsnWo1KPBfQlZwc//dF/cyGbFIZqcFtpZUBd32BBlKkut8sJcLk1XEW8sTzaG1Ean/ZFNgWmWL5rzVBdnru6zaEeCrwzT5e/6gl4wyrbgZyX1ZMSxBYiiIJ93a6q2AKw6LrU228Z4ar9DdTN/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sCqKLKIw; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52cdf2c7454so8591523e87.1
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 11:11:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1719425481; x=1720030281; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nDQ6BSgk4EuJqJOFP+ZJw6IbdRTjUCi/RgKB+9BTmiQ=;
-        b=sCqKLKIwoTmnpSolGB22A7BxqqZV/P6qvELBHwVLXnoVRTvwAt9Cnn/h1Rr44hpoHy
-         RjSOq7nyTnZwrgRtndEdM2A152W6I4R2wokJB6FA6Nbx7c+AP9Y9KXIc1p1nW15H1y8u
-         C4P8M9wQsWwhnkgHGdkmzRZrvc8py1M54tJ5ycvgfCmBuB/+hKofwEPHP6PqOAyYk8IQ
-         hMjj/4xLA6f0y9iBMqKMQBLQmTiA6I+iItY/FCnuYZPfydezl6zaeMooSVBXo1YFD8aC
-         aa+SeWz8qAn/je6XiC4foTCWlKwOR6+JhMMUUdGM6yWsZk3/Pujpv70B1+7JLHvc6DNk
-         4zhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719425481; x=1720030281;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nDQ6BSgk4EuJqJOFP+ZJw6IbdRTjUCi/RgKB+9BTmiQ=;
-        b=dmyMgnhWCXbdqCSOJxnK9w4mqV8P7sXMva6C9HH/TDvBNCzjsNwGt8rVnsTHRgnv57
-         Y7XHEvW8ta9fjAj35TkKty5hO1toMP9Ubr07anJdHzCaPSm8o91JpKcZsDX8injXG/St
-         L1YCmf55d7HTbDI6g5eg9db3huo0eDunxpAuRAJ1pSGbJIA+V49ll7aj9RNj3Q5OrzJA
-         raKJHNZNUKB5k0ZQmOIt0fj5NhVp4mkqzWhRvlb/1mXEUhjcZbsujF1vgxHLn7omKNkA
-         pMPjAsUBRy6LLD/xUeDjv7nkCjAOjC23ROPsh2E3clp7cPPlDe2WRh/glWa8OYsZ7s45
-         xp/g==
-X-Forwarded-Encrypted: i=1; AJvYcCVnDk//lzYprnwiAmK4SgkccpTTHGJ/BHNniazwyGcuGfytMVd+tBaf8VTrrdrWuuauhBEJ9omnS0YRU7E0qbQ3x87RB5kB
-X-Gm-Message-State: AOJu0Yw/H/zas+iocc0fEgMnSqKnplV4Emk1AAizkv7k9rzx0JT7PY5c
-	P7d1UCxh1HJ/3PRifohD3dCIlfrzTVP73Cv/Q4K/5k4+pEHE/yLcce9AruOz/ww=
-X-Google-Smtp-Source: AGHT+IH0WYXPdgWAwfB8r6Eu6OYUIW4epdYd2iRt+kvq5t9zs1qoKhBabD5jbHIsxoBf7I72tPmXQw==
-X-Received: by 2002:a05:6512:3caa:b0:52c:df74:1577 with SMTP id 2adb3069b0e04-52ce185250dmr12057912e87.45.1719425481087;
-        Wed, 26 Jun 2024 11:11:21 -0700 (PDT)
-Received: from eriador.lumag.spb.ru (dzdbxzyyyyyyyyyyybrhy-3.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::b8c])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52d9b245fa2sm388158e87.155.2024.06.26.11.11.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 11:11:19 -0700 (PDT)
-Date: Wed, 26 Jun 2024 21:11:18 +0300
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-To: Devi Priya <quic_devipriy@quicinc.com>
-Cc: andersson@kernel.org, mturquette@baylibre.com, sboyd@kernel.org, 
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	konrad.dybcio@linaro.org, catalin.marinas@arm.com, will@kernel.org, p.zabel@pengutronix.de, 
-	richardcochran@gmail.com, geert+renesas@glider.be, neil.armstrong@linaro.org, 
-	arnd@arndb.de, m.szyprowski@samsung.com, nfraprado@collabora.com, 
-	u-kumar1@ti.com, linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH V5 3/7] clk: qcom: gcc-ipq9574: Add support for
- gpll0_out_aux clock
-Message-ID: <n5flflug5fkxuxvlqe22o32xo2qp6jnv4xrwpv4wfbef5xzc2b@gjsw6mb6b6ux>
-References: <20240626143302.810632-1-quic_devipriy@quicinc.com>
- <20240626143302.810632-4-quic_devipriy@quicinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RGuTC/7AM232cWeBWw3QuEDSOGCn6maigRjwJr/5w5L9l18DapGmMu8cKi20hOiEopUuVyztU48VPA0oqkClkr2C3b+SO1c0rD9YMe7H+3ibwHosQwJie0BmUr0Jzmpo+NoUzNebelEsakCXOwP+6qViXIr0ZVjlqRdE6P0P2Wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r3hWBRzu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4F81C116B1;
+	Wed, 26 Jun 2024 18:11:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719425503;
+	bh=V7B++SJTszDbRNn3G1xfashn5MADZfh7Xs25Pyj+9SQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=r3hWBRzu57EVn5yNfPCrNA+FB/8psQr9gsgMuEAWq4Dp7czjE4E4kDcuRvBTjajDE
+	 XC12iG3k0bdxF47I24Yn9AoBm5WqwyPWn5dTKCSqPWymCGZ+ASL6ltaHwNGHCPfpcC
+	 URe7qvfCKRAInrvOPM7glooh4y1gMFkC6c47ICcrXHUyVjB3n4/byDMM1zos8WhhJm
+	 MOKzVJYwABlQejZZFBNkJ4D6u/pVCh6Xa671IXIxQNe494ov3Aoc0cqmoNA8wjQat0
+	 +vkcrpSVKpYbY84/IcLP54W9JUU1fIwSSguofMOsl3riOAQ5lKEIXxx8hbpWOJsV4c
+	 AIzq7MOur2QfA==
+Date: Wed, 26 Jun 2024 11:11:43 -0700
+From: Kees Cook <kees@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Kalle Valo <kvalo@kernel.org>, Jeff Johnson <quic_jjohnson@quicinc.com>,
+	Koen Vandeputte <koen.vandeputte@citymesh.com>,
+	ath10k@lists.infradead.org,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Johannes Berg <johannes@sipsolutions.net>
+Subject: Re: ieee80211.h virtual_map splat
+Message-ID: <202406261111.2D3237A731@keescook>
+References: <CAPh3n83zb1PwFBFijJKChBqY95zzpYh=2iPf8tmh=YTS6e3xPw@mail.gmail.com>
+ <c470e4ff-3f70-40f6-844a-f9614286509f@quicinc.com>
+ <87o77pik7w.fsf@kernel.org>
+ <20240625080248.32c3e03d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,25 +65,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240626143302.810632-4-quic_devipriy@quicinc.com>
+In-Reply-To: <20240625080248.32c3e03d@kernel.org>
 
-On Wed, Jun 26, 2024 at 08:02:58PM GMT, Devi Priya wrote:
-> Add support for gpll0_out_aux clock which acts as the parent for
-> certain networking subsystem (nss) clocks.
+On Tue, Jun 25, 2024 at 08:02:48AM -0700, Jakub Kicinski wrote:
+> On Tue, 25 Jun 2024 09:56:35 +0300 Kalle Valo wrote:
+> > > Adding netdev to the initial message in the thread.
+> > > https://lore.kernel.org/all/CAPh3n83zb1PwFBFijJKChBqY95zzpYh=2iPf8tmh=YTS6e3xPw@mail.gmail.com/
+> > >
+> > > There was some discussion in the thread, with the observation that the splat 
+> > > is fixed by:
+> > > 2ae5c9248e06 ("wifi: mac80211: Use flexible array in struct ieee80211_tim_ie")
+> > >
+> > > Followed by discussion if this should be backported.
+> > >
+> > > Kees said that "netdev [...] maintainers have asked that contributors not 
+> > > include "Cc: stable" tags, as they want to evaluate for themselves whether 
+> > > patches should go to stable or not"  
+> > 
+> > BTW this rule doesn't apply to wireless subsystem. For wireless patches
+> > it's ok to "Cc: stable" in patches or anyone can send a request to
+> > stable maintainers to pick a patch.
 > 
-> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
-> ---
->  Changes in V5:
-> 	- No change
+> It's an old rule. Quoting documentation:
 > 
->  drivers/clk/qcom/gcc-ipq9574.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
+>   Stable tree
+>   ~~~~~~~~~~~
+>   
+>   While it used to be the case that netdev submissions were not supposed
+>   to carry explicit ``CC: stable@vger.kernel.org`` tags that is no longer
+>   the case today. Please follow the standard stable rules in
+>   :ref:`Documentation/process/stable-kernel-rules.rst <stable_kernel_rules>`,
+>   and make sure you include appropriate Fixes tags!
+>   
+> See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#stable-tree
 
-
-Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Ah-ha! Thanks. I will fix my brain. :)
 
 -- 
-With best wishes
-Dmitry
+Kees Cook
 
