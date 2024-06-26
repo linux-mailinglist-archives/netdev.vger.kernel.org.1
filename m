@@ -1,155 +1,110 @@
-Return-Path: <netdev+bounces-106951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEF85918421
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:29:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 571CC918423
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 16:29:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BF062882CE
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:29:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1296D28880B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:29:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B9B9187345;
-	Wed, 26 Jun 2024 14:28:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E252818735C;
+	Wed, 26 Jun 2024 14:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qctz0S2B"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e8YL5tRn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37A318733F
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 14:28:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7BF186288
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 14:28:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719412088; cv=none; b=qvk5DFq/WqJdu7PuguIwVwU/KKcHNJSGytpB1S3X1CurIwvwzUniYsurU0EGvFtedWgfZ+hO7ZxmRmQhddpIOwbW8GOcVYYrYay8H5H4YtWqCbTn88kS+8RALwnxf58AepB0C8hXSHyEtI9VdxKHs2XcMEGD6QzQAeSCXPIXgqc=
+	t=1719412093; cv=none; b=Hqbb9h8N/LfR0uF6S1z9arAL4z+L9ZHVS+wg5dAxgh0Ghr85w+0Tx0ZLfysWs8BWtOHT0DWbcpNr+Ye21w5FhFm2e/we+9G4rQ6IJQXJxu7d+gf2ko/irC9d+dOPepxZ7PfBtfpjAVpa6NwrSJQuzfw8n+ygaeZn/srqP5tzC1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719412088; c=relaxed/simple;
-	bh=dF3nJbyec7aUYb31LCk5J9ZCr9e/ue/Sn4wrfJGLEL0=;
+	s=arc-20240116; t=1719412093; c=relaxed/simple;
+	bh=c6cuNR/ypZS9cGEPNgMyok0ts7gHixlzmHbjChBa//E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=usyk1qCcqHKVJnGP5dghiOjiVDJBS4xsbOZ5yhFgZZK8bamCBwvtKEYaVoGH6zOmYcP7karXOFRETiHO6v757sF3elc9H1ectv4TDTLPmxHxM9z6LMsMOwM51Q3npxV2ZnyvZRJ3rHnztr+533dplqNZFuUKajY2D3ZBrAwhJbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qctz0S2B; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=SrPIeK7O5+Nlfqdw9o/jPp1AdLF0CvoUw8UjeXbfoMNSCYQvim7GaO0BP3VXp6gDLna6ftwKHFG5/snsur+QtvmVbwho5Sya7OFwvLHMVmtrZXGN2eKedalJnF3xyS7IIW1BGoqJcyTmu4+chhJv4KD/GgG2Oj3mLHoiwgYxbXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e8YL5tRn; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719412085;
+	s=mimecast20190719; t=1719412091;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8jPj0J2+6kTJRu0AxJQgSeG+pEmf65j6Ho29vmPBJDU=;
-	b=Qctz0S2Bx34Zfnx9Uv+rEh5Es7kBcnvQCAMvysrg1dJGa+0Xdz2IuNLkvHef26uKXUva5S
-	njG9850vMWoQHw9jKW2dodWdqoCVT+lDL4QGRbhj85y0itD4QOBFZw4TmhcstpydI/6J8f
-	V72rsOK9KRBjGULJivr+CLGszOZ1IFI=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=c6cuNR/ypZS9cGEPNgMyok0ts7gHixlzmHbjChBa//E=;
+	b=e8YL5tRnubLRzRpz6RP1NzAog5cAOXAx91OoO3ChubLv6mjUm2wMQWA17gz23xgSuK3not
+	RZesmTD5IaJvkg9Ps2MyVhVRpyn6IQfyLHmdUMYguOD7KvlnGJmyLnMr3Zw/cRH1tfRilY
+	sA71Z0AFRsvx1Btk2Mxn4HJ4QP1DUdo=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-477-XgH3wPpXP4yxyN4miuLWkQ-1; Wed, 26 Jun 2024 10:28:04 -0400
-X-MC-Unique: XgH3wPpXP4yxyN4miuLWkQ-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a72423fa3dcso246971366b.3
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 07:28:03 -0700 (PDT)
+ us-mta-136-uuf18rHiPC61UCKQM4CB0w-1; Wed, 26 Jun 2024 10:28:09 -0400
+X-MC-Unique: uuf18rHiPC61UCKQM4CB0w-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a7169b4cfcfso190916766b.0
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 07:28:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719412083; x=1720016883;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8jPj0J2+6kTJRu0AxJQgSeG+pEmf65j6Ho29vmPBJDU=;
-        b=IRmCZydZoaDEN8y+ogJaxFj3t5fN+QFOSmbXd1Qq36boBxb9viB5JFEKcg9SgJXA42
-         OeTkGn5DWoEm9hQ19/7+z10FMxAx07qOPKVd8RNZnr33gSkZkHZKV+8a+Nu/L0Qv7L0/
-         vUTPEfeOryKPqw5hrb5gxl5XK/r4Er6xz2LOg0MrUz55V35XIsUH/XmOGfHqF1Xr19uT
-         ERcoZWn/4UuDssa0uGwJ8lYN89VTmdxDjRHU+4DMNV/XsQMOsdLOKUGJUx7xLQhsx9it
-         g6FUnRXflxbT7ZzUrS+0vIOeTW01O37wpRub2upnYPkyWe57IIS4Ie7gnxZMu2Om0b6L
-         SGXQ==
-X-Gm-Message-State: AOJu0YzQ61K6L8v0C23y1VIQk0qq9Vx/OVtuao9NvzMJNKP/0xjZDvWr
-	DWBoFWG6J6lVT6K42TCL4xRGtEfh10x0kwYNLHRfEmQmV3H20yni2LUzeZsuSqPAdBoWCgldpzE
-	ArU5xnv1AzOs6XIBTcPtkEqH0xIV7ZTCM7XNDgcwnOKCECb74E9rBYw==
-X-Received: by 2002:a17:906:c014:b0:a6f:af8e:b75d with SMTP id a640c23a62f3a-a7245b851d1mr961471766b.8.1719412083055;
-        Wed, 26 Jun 2024 07:28:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFRwKHSPitdNxRFuz2PdFIYEAZOxC++8wpkD/ze8BDJXhQooiarqlGFh2Bq7AH3sSiyJanfKw==
-X-Received: by 2002:a17:906:c014:b0:a6f:af8e:b75d with SMTP id a640c23a62f3a-a7245b851d1mr961470266b.8.1719412082642;
-        Wed, 26 Jun 2024 07:28:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719412089; x=1720016889;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c6cuNR/ypZS9cGEPNgMyok0ts7gHixlzmHbjChBa//E=;
+        b=JW7OZupN+v35mHJjdmC0S0jvqr5VGDpjH0opPyTGqpl1ZEhaJ/44lFxR8eadP2bHoS
+         22w8LkeBlNfrmtsuVIZAT6gkR2rkK65alnp3LiviBNJdXQeb0m7Vr2TN21ONH97RdWSu
+         tA2wuyskSBZy1Xf4MJ78lM+TByXZJ7JkXzhIcjJGvFT554Aw0c4FH8MZsXeiBHueYFdE
+         tuwdQICvzVUuEmQiWLWOSJEjDiXOTxGXG9g6dsV2g50uzDzmOAp4K8/wVxBq4phQwbRM
+         bfXjDHh6MaHtQNIrUz/+d7gYRMNNo7QUHYySf/6IY+UUCZNjEzvgYnLanjJW7Jey7pT/
+         z3DQ==
+X-Gm-Message-State: AOJu0Yw5sYEhO1Ao/o4+wjvbUZB0pl6Z3ReBvHTGyHse9fpp9rsiV9tc
+	dMU+8ynMJesRguxuBIvIEXUDLsdKAR8atwKoJppPwNckH5DNZqnp2yNJ6zOQw7J65cu1y5Agr7B
+	ubyUxVliMm6JO6LR4aNtLvfDAf083g9Zv6Kk9Gl9Y8VOZcIi9bBK1tg==
+X-Received: by 2002:a17:906:11c7:b0:a6f:4a42:1976 with SMTP id a640c23a62f3a-a7245bacda1mr597295266b.37.1719412088798;
+        Wed, 26 Jun 2024 07:28:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IErnyGXF92mNUgOBZBMQOObmC5OIulbtMrV/oeymqUlbkWGwntzFEOPkPZKKgzMJuOQUL7mTA==
+X-Received: by 2002:a17:906:11c7:b0:a6f:4a42:1976 with SMTP id a640c23a62f3a-a7245bacda1mr597293766b.37.1719412088405;
+        Wed, 26 Jun 2024 07:28:08 -0700 (PDT)
 Received: from [10.39.194.16] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a724ae806dbsm383611766b.41.2024.06.26.07.28.01
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a724ae806dbsm383611766b.41.2024.06.26.07.28.07
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 26 Jun 2024 07:28:02 -0700 (PDT)
+        Wed, 26 Jun 2024 07:28:08 -0700 (PDT)
 From: Eelco Chaudron <echaudro@redhat.com>
 To: Adrian Moreno <amorenoz@redhat.com>
 Cc: netdev@vger.kernel.org, aconole@redhat.com, horms@kernel.org,
- i.maximets@ovn.org, dev@openvswitch.org, Jamal Hadi Salim <jhs@mojatatu.com>,
- Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ i.maximets@ovn.org, dev@openvswitch.org, Yotam Gigi <yotam.gi@gmail.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 02/10] net: sched: act_sample: add action
- cookie to sample
-Date: Wed, 26 Jun 2024 16:28:01 +0200
+Subject: Re: [PATCH net-next v5 03/10] net: psample: skip packet copy if no
+ listeners
+Date: Wed, 26 Jun 2024 16:28:07 +0200
 X-Mailer: MailMate (1.14r6039)
-Message-ID: <73D32BC8-93A2-455A-AD9D-1FBB17553F8E@redhat.com>
-In-Reply-To: <20240625205204.3199050-3-amorenoz@redhat.com>
+Message-ID: <51493A9D-9E73-4BFA-95D9-79CE1356110A@redhat.com>
+In-Reply-To: <20240625205204.3199050-4-amorenoz@redhat.com>
 References: <20240625205204.3199050-1-amorenoz@redhat.com>
- <20240625205204.3199050-3-amorenoz@redhat.com>
+ <20240625205204.3199050-4-amorenoz@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
 
 
 On 25 Jun 2024, at 22:51, Adrian Moreno wrote:
 
-> If the action has a user_cookie, pass it along to the sample so it can
-> be easily identified.
+> If nobody is listening on the multicast group, generating the sample,
+> which involves copying packet data, seems completely unnecessary.
 >
+> Return fast in this case.
+>
+> Reviewed-by: Simon Horman <horms@kernel.org>
 > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
->  net/sched/act_sample.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->
-> diff --git a/net/sched/act_sample.c b/net/sched/act_sample.c
-> index a69b53d54039..2ceb4d141b71 100644
-> --- a/net/sched/act_sample.c
-> +++ b/net/sched/act_sample.c
-> @@ -167,7 +167,9 @@ TC_INDIRECT_SCOPE int tcf_sample_act(struct sk_buff=
- *skb,
->  {
->  	struct tcf_sample *s =3D to_sample(a);
->  	struct psample_group *psample_group;
-> +	u8 cookie_data[TC_COOKIE_MAX_SIZE];
->  	struct psample_metadata md =3D {};
-> +	struct tc_cookie *user_cookie;
->  	int retval;
->
->  	tcf_lastuse_update(&s->tcf_tm);
-> @@ -189,6 +191,16 @@ TC_INDIRECT_SCOPE int tcf_sample_act(struct sk_buf=
-f *skb,
->  		if (skb_at_tc_ingress(skb) && tcf_sample_dev_ok_push(skb->dev))
->  			skb_push(skb, skb->mac_len);
->
-> +		rcu_read_lock();
-> +		user_cookie =3D rcu_dereference(a->user_cookie);
-> +		if (user_cookie) {
-> +			memcpy(cookie_data, user_cookie->data,
-> +			       user_cookie->len);
 
-Maybe I=E2=80=99m over paranoid, but can we assume user_cookie->len, will=
- not be larger than TC_COOKIE_MAX_SIZE?
-Or should we do something like min(user_cookie->len, sizeof(cookie_data))=
-
-
-> +			md.user_cookie =3D cookie_data;
-> +			md.user_cookie_len =3D user_cookie->len;
-> +		}
-> +		rcu_read_unlock();
-> +
->  		md.trunc_size =3D s->truncate ? s->trunc_size : skb->len;
->  		psample_sample_packet(psample_group, skb, s->rate, &md);
->
-> -- =
-
-> 2.45.1
+Acked-by: Eelco Chaudron <echaudro@redhat.com>
 
 
