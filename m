@@ -1,69 +1,64 @@
-Return-Path: <netdev+bounces-106769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C0E991794C
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 09:00:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 944EB91794E
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 09:02:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBB521C227DE
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 07:00:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F5771F2423D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 07:02:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B63115885E;
-	Wed, 26 Jun 2024 07:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE653158210;
+	Wed, 26 Jun 2024 07:01:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1EACA31
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 07:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F69C1474CF
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 07:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719385245; cv=none; b=hFYMg++X277K6UUOcZs9LKY9XIbzHEngHPQdAcLeTOSbmTrACM+pnCryNcTlCdFiN+gZ/HiLpPAtfZuXsqAbeuES/mhyjPtYHr31bGhfKVK0yENMN3tBHaTrPMuB2T0ruW4QCGjLbmRpddiud2tnb6+jG0q/MC33r+GqkYcSupA=
+	t=1719385319; cv=none; b=Z3tU0pvQj0uH0jlkVpIZ+EiZel2lZZEd7k/GKVyBQAyCc0iO+bhVHmVLZFvFo0VzcExCLkwb/UU7W3WOZ2M5axsMsR9MOWCiQK9XsJbymkrqOQpLdHxinAytZEap7J0P6AmJ80BkZ25XGcbzltrSA98mP6JhJvEKthVtU++O1VQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719385245; c=relaxed/simple;
-	bh=4jCI1XAWVV5g/IyF/xJ9JdBM8duTxhA4eBl+ykHLqq8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AadNFrN2aYwYDGBsicJGR1QUzFkRZgsKwFfsvIWjUH3pFs+rsbs+CyFobISlKcjx0Vev0JNzTOe4gsdzDd4hySXL2gBFwbX9jGc2J5B2W9uwZMHIsVwIFeA6WtRvRndSHOlf+RrPOp6wCNrBDnG7AIjZkrsDDEiPghyXBr6cA8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1719385319; c=relaxed/simple;
+	bh=PIm68SNaeiGNrSumTkicE7cUXi5HkDF/nLGq+taI3nI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NTkYhP+DG3BX5afN3ZTOYjf2G1aXCWOSLU1LuTf5XkGRoDDNJDjrUcFKdhTcgZckkhmHz2L2jY6nF+6Gr8twmQyPOqMnaec4tVM+WX/lZjuLHeiqHtTceWR0ROBsqlPQ4CRL5F8E6/ZcdSM83AoSZFwxfQpxzntSWC3Jhm74+RE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4247ae93738so8492115e9.2
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 00:00:43 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-424f2b7385bso458285e9.3
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 00:01:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719385242; x=1719990042;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hvxzwc0F0lP3YHoMsjdIJ3CYk0YAjGbyueK/28nhFxg=;
-        b=DmN+tMap2fuA12H+xjrmGKNvOwCMfZQK5IGnKwLttQYIJOw1q2iMAQCObrDm5C+8Ap
-         PZE/Uf7zKb1jTv6xajiLRooTTNwJLVA8aPLCP56vIiWpkkfQp2HHEVX+bgJYaXcG7UlT
-         /jyMqrIOlX1P7lMWVGTdlnMUbg/5uh2bHGMHSH52aB9fMCavuWbmsMUkVhMyBDeu837B
-         auNJxwGmeC/TYwecA/M3JC/2BOAjESddJg1coeb99iIny4GMFecLWcd8/bYy7jx58E3s
-         5WpqWMfZZqs3atY4Tm7qh1RLdnPVFfYkW+M68Lw7P+D8Lun2AO0K9QjixQTu8iCOethk
-         k0KQ==
-X-Gm-Message-State: AOJu0YwyQ4JCfxbCFrLhAPf8EHSitpK1gnIttuh6Em75cDZl0DZhxBpp
-	W1IgV4A7hDxjonL8bCJgxrThLrShKIP8NqqMjI4C9K/aivJR4+R0CrrmUg==
-X-Google-Smtp-Source: AGHT+IGaGORJ0YRWo9TXzwpMeg9XDQpOJRqFZPKfQyKaJ28aKwy2fwVHMGWLGg48qoNvj08POWBCPw==
-X-Received: by 2002:a05:600c:3c9d:b0:424:8b08:26aa with SMTP id 5b1f17b1804b1-42491783f09mr54421865e9.3.1719385241699;
-        Wed, 26 Jun 2024 00:00:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719385316; x=1719990116;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gOhUsvgsAX/B6UUgnLvZPaOmeZjPmrAP4TJS01whG0c=;
+        b=tGLsgldWgKxvF8iz4C7PiKDlivBEyOg1TFKUxzImoFDWLjRMTH0u08NJBgqoK2Jv/7
+         ss2M9o2ob16FyO2gM+GBISth6bjNnP4pJ0X1+MCSy23S5C5EPIvPrAugfcO4hCwI3jOv
+         bLHZRSLYBBostQdUWOPxPpsP88O7Vu0280McwXl/DDbnErw634GiBty7gGltFJ/NcA+Q
+         6YxukySz4T4Xi7B0fvGiDV9Kx3Ni2v3BqIxwCC+w1O2LWvH4cJDDpKfTXy6W/HUxvzX4
+         ppWMCLI11jTA9r1BgvGqEtjYsQ/BfLvYI7UvD6RLwU2Oy9NyKpxxU3sUN9n5OVIPpaum
+         Jbpg==
+X-Gm-Message-State: AOJu0Yw/J44FvKfJO+Voc++ZRn6wne4HYkGYUUq7mtt0km7B+jhSP5dX
+	xiBI1j4DRxvdSY6Ew50THuYQ4c55zlT2jqPj7kDegClmI7zNqeMjzzWtjw==
+X-Google-Smtp-Source: AGHT+IFG2FKrtXO8Pr90yH4CHz9Z4B93JzpB7oeKfT7qmF4QT1sEx59eB5Md/WDUSqLkCIh5O8P2PA==
+X-Received: by 2002:a5d:680f:0:b0:366:efc4:d424 with SMTP id ffacd0b85a97d-366efc4d8f4mr4871934f8f.4.1719385315731;
+        Wed, 26 Jun 2024 00:01:55 -0700 (PDT)
 Received: from vastdata-ubuntu2.vastdata.com (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-424c823c28asm13728735e9.5.2024.06.26.00.00.40
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-366388c4282sm14905219f8f.31.2024.06.26.00.01.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 00:00:40 -0700 (PDT)
+        Wed, 26 Jun 2024 00:01:55 -0700 (PDT)
 From: Sagi Grimberg <sagi@grimberg.me>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>,
-	David Howells <dhowells@redhat.com>,
-	Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH] Revert "net: micro-optimize skb_datagram_iter"
-Date: Wed, 26 Jun 2024 10:00:37 +0300
-Message-ID: <20240626070037.758538-2-sagi@grimberg.me>
+Cc: Eric Dumazet <edumazet@google.com>
+Subject: [PATCH net-next v2] Revert "net: micro-optimize skb_datagram_iter"
+Date: Wed, 26 Jun 2024 10:01:53 +0300
+Message-ID: <20240626070153.759257-1-sagi@grimberg.me>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240626070037.758538-1-sagi@grimberg.me>
-References: <20240626070037.758538-1-sagi@grimberg.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,6 +74,9 @@ by the test robot in:
 
 Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 ---
+Changes from v1:
+- added target tree
+
  net/core/datagram.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
