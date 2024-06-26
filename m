@@ -1,106 +1,138 @@
-Return-Path: <netdev+bounces-106792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF152917A8F
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:12:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 79A46917A94
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:12:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA59328224C
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:12:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36138282ED3
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:12:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438A515D5CF;
-	Wed, 26 Jun 2024 08:12:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDB715F3FE;
+	Wed, 26 Jun 2024 08:12:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B5F13AA3C;
-	Wed, 26 Jun 2024 08:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B5CC13AA3C;
+	Wed, 26 Jun 2024 08:12:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719389553; cv=none; b=emKf6so6U8AKKe0SSZ5wngeeDx789oAkHLjXQQXoZnZytSvzTF6UI8tawYdGSnhOiweRI7ExIdK4k5mR2kaovBNHmC7xRAPqOQdcOgzjOAQRDjIDHCL5mH74TTnOISqSvrl93ouBbU0Ac7l0cDFKpNyNcSTvCWpcUWA+jTXIsRE=
+	t=1719389573; cv=none; b=Ow/ARoD9/hgAhsmog/j1tAS2zFdwGZM4nbEVtXTymD2ji2fOloxpQKt9uvNNd2cx1mxyrkQ3p+ZZ2RQIs1lsQV6qx1JsPPzlEoWdi6ongEwdb8IzL6UpCms1Tm+LLAOsRI/tNgkPkx2WDUEaPSqQ/dyEjyst4kUjGNG9nA6dHvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719389553; c=relaxed/simple;
-	bh=fy3iUdoNHtg+RLT6e+nTyMyJr9ANx2SWP3ueVJDFAI8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kNJ4IPWvEwsliSYrDNG47gucMt9KJFlcUHpPnHK+6dCJt//1qo/LJe2vvzF/JUDHBoVmFYPFDRTzIQIRlj1ywk9OPLE3Yu6D+G1x8GqdBeMHtXm1DdoLudsNR0hHQDDmH7yq9iJ0GFm8xxr+NcRfA11D1EZBC6N8Tqmj0/T7WyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
-	by APP-05 (Coremail) with SMTP id zQCowAB3fuZhzXtmDb7eEg--.5980S2;
-	Wed, 26 Jun 2024 16:12:24 +0800 (CST)
-From: Ma Ke <make24@iscas.ac.cn>
-To: wintera@linux.ibm.com,
-	twinkler@linux.ibm.com,
-	hca@linux.ibm.com,
-	gor@linux.ibm.com,
-	agordeev@linux.ibm.com,
-	borntraeger@linux.ibm.com,
-	svens@linux.ibm.com,
-	davem@davemloft.net,
-	ubraun@linux.ibm.com,
-	sebott@linux.ibm.com
-Cc: linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ma Ke <make24@iscas.ac.cn>
-Subject: [PATCH] s390/ism: Add check for dma_set_max_seg_size in ism_probe()
-Date: Wed, 26 Jun 2024 16:12:15 +0800
-Message-Id: <20240626081215.2824627-1-make24@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1719389573; c=relaxed/simple;
+	bh=D5Cbu+U1HZWDIHt0LpKSf7Cur/m6GJUgdd7v+AQOkfo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bJDNp9zAgor1LassfiZi39cLa4qVYaejj1eElt6qgoqM8ZL0Dw4cQxd3dQvNgezp+pynzD3L5FOmY5wCxxcalk2gnf/LPAMb5+zt+Tr5SPM7hpYUcQYH7+lOuOa8Ya5ktc+ErhRKXOuk7Dr7Byv92cGT5nI4IX8ERGknAn1UtnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.219.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-dfe1aa7cce2so6082997276.1;
+        Wed, 26 Jun 2024 01:12:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719389569; x=1719994369;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S6yFjbUBltT3UtsPx++KaysizwCAujSrK4XvFo3PCu0=;
+        b=qsx2/96nKQoKmzTk9WiEVnYY0JuqNHc6kwryyEkYgiXVaY2Bw7hnC/bspl7WjeOH9w
+         7lJ2NqNWebTmGt2QVQlTW3ct6TjAFmxL8w145ynODVIALUo1IRCyJhTvAe7/ME/5SEHa
+         KPPIfMFbgAzVGnsGDkIA+Vw4CqnNM6MwUkTXCaVxLkxwBUjqZA7rq8azQW3Yk+StcuBE
+         oA5rP8Yk/hGsKq6swcgu1acP7z8HqYAys/2zG4tC0jQkAE2MV/N04n0nf53E/pdDWcYe
+         ObAlDKSoad+arQcKUjuatE/UyVolWz1LA5LUQAFEzW3ejmVb2Z+9ePBCMBwbdNkaO0gQ
+         IVXw==
+X-Forwarded-Encrypted: i=1; AJvYcCUSp9m7n2p7fKt2nU5Lqy2jewR5/qnx3T3K7aca4f5KfPkxPzuZvFlqHkUsW+5LgwXtgj2SZ/gx7v0On1P5O745E1xT1SVJVlalDzaKsa3HiS+JYtRD1p6ffdytoQYXzHOwG8kc7Y4XxY/iH18EE+NRkQt/82XQCm+BrNkeB0BTE7jTV+Mzx4juh99jcKSnxz8eBvlo9tG76UPM
+X-Gm-Message-State: AOJu0YxdVDBU8/ov4KkpAVeZ8ej0AjF055Y/kMXANYnOjBDxafx6sKhf
+	MXRkN92zrTofXRHXCqWt7TmBwm4I1KKz7fQclKdQAYeIOCHgwHwbRc0SZpn6
+X-Google-Smtp-Source: AGHT+IGu9u4YTJN2HEf5VgvjxqVtuKUriKszqMboR/wEfByBUIu3DhgMYGmysKeryJpwWVIZeN1flA==
+X-Received: by 2002:a25:ae5d:0:b0:dee:8d62:8c10 with SMTP id 3f1490d57ef6-e0303ed450bmr10044937276.12.1719389569184;
+        Wed, 26 Jun 2024 01:12:49 -0700 (PDT)
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com. [209.85.128.169])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e02e623c597sm4349136276.14.2024.06.26.01.12.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jun 2024 01:12:48 -0700 (PDT)
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-646645f1387so20924417b3.1;
+        Wed, 26 Jun 2024 01:12:48 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWp29cvZ/azbcQW6mwk+n9Z1csuRY3Gz7DzeVh060rXUwSuuH8rbm3eYQ1TPsYMlT1MPgsrJCR02+MRbkvW58bzwq0tygbNrdFZogP5GD/Hz2nCGZ/FAbgblw+9IfR9/3JammHZSZQ9Ol6HV+r6YzYgSyBa0/1YnrT5lF2C/semZYNLUHXKSB95KBi3P/a219ijK8Dx530s//fr
+X-Received: by 2002:a05:690c:6e0c:b0:617:cbc7:26fe with SMTP id
+ 00721157ae682-643a9fcecb1mr105251747b3.16.1719389568194; Wed, 26 Jun 2024
+ 01:12:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAB3fuZhzXtmDb7eEg--.5980S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Jw4rZFW8CrW8Wr45KFy5CFg_yoWfAwc_Kw
-	4xCF93JrnrKw4xtw4UKr4avrWq9r10qr18XFn7ta4ft34UGFnrX34DZF4rXr4Uua93AF47
-	Crn7JrZYkwn5ujkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb3xFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6r1F6r1fM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
-	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8Jw
-	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAG
-	YxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
-	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
-	C2KfnxnUUI43ZEXa7VUbHa0DUUUUU==
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
+References: <20240618-docs-patch-msgid-link-v1-0-30555f3f5ad4@linuxfoundation.org>
+ <20240618-docs-patch-msgid-link-v1-2-30555f3f5ad4@linuxfoundation.org> <20240625172727.3dd2ad67@rorschach.local.home>
+In-Reply-To: <20240625172727.3dd2ad67@rorschach.local.home>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 26 Jun 2024 10:12:35 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdXHa52RBjzA4eF4ERNuJjRHyq=FfyPz-yOsjOA7ZQfouQ@mail.gmail.com>
+Message-ID: <CAMuHMdXHa52RBjzA4eF4ERNuJjRHyq=FfyPz-yOsjOA7ZQfouQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Documentation: best practices for using Link trailers
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Konstantin Ryabitsev <konstantin@linuxfoundation.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Carlos Bilbao <carlos.bilbao.osdev@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	workflows@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, ksummit@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-As the possible failure of the dma_set_max_seg_size(), we should better
-check the return value of the dma_set_max_seg_size().
+Hi Steven,
 
-Fixes: 684b89bc39ce ("s390/ism: add device driver for internal shared memory")
-Signed-off-by: Ma Ke <make24@iscas.ac.cn>
----
- drivers/s390/net/ism_drv.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+On Tue, Jun 25, 2024 at 11:27=E2=80=AFPM Steven Rostedt <rostedt@goodmis.or=
+g> wrote:
+> On Tue, 18 Jun 2024 12:42:11 -0400
+> Konstantin Ryabitsev <konstantin@linuxfoundation.org> wrote:
+> > +     A similar approach was attempted before as part of a different
+> > +     effort [1], but the initial implementation caused too many
+> > +     regressions [2], so it was backed out and reimplemented.
+> > +
+> > +     Link: https://lore.kernel.org/some-msgid@here # [1]
+> > +     Link: https://bugzilla.example.org/bug/12345  # [2]
+> > +
+> > +   When using the ``Link:`` trailer to indicate the provenance of the
+> > +   patch, you should use the dedicated ``patch.msgid.link`` domain. Th=
+is
+> > +   makes it possible for automated tooling to establish which link lea=
+ds
+> > +   to the original patch submission. For example::
+> > +
+> > +     Link: https://patch.msgid.link/patch-source-msgid@here
+>
+> Hmm, I mentioned this in the other thread, but I also like the fact
+> that my automated script uses the list that it was Cc'd to. That is, if
+> it Cc'd linux-trace-kernel, if not, if it Cc'd linux-trace-devel, it
+> adds that, otherwise it uses lkml. Now, I could just make the lkml use
+> the patch-source-msgid instead.
+>
+> This does give me some information about what the focus of the patch
+> was. Hmm, maybe I could just make it:
+>
+>   Link: https://patch.msgid.link/patch-source-msgid@here # linux-trace-de=
+vel
+>
+> Would anyone have an issue with that?
 
-diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-index e36e3ea165d3..9ddd093a0368 100644
---- a/drivers/s390/net/ism_drv.c
-+++ b/drivers/s390/net/ism_drv.c
-@@ -620,7 +620,9 @@ static int ism_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		goto err_resource;
- 
- 	dma_set_seg_boundary(&pdev->dev, SZ_1M - 1);
--	dma_set_max_seg_size(&pdev->dev, SZ_1M);
-+	ret = dma_set_max_seg_size(&pdev->dev, SZ_1M);
-+	if (ret)
-+		return ret;
- 	pci_set_master(pdev);
- 
- 	ret = ism_dev_init(ism);
--- 
-2.25.1
+Or, just like with lore links:
 
+    https://patch.msgid.link/linux-trace-devel/patch-source-msgid@here
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
