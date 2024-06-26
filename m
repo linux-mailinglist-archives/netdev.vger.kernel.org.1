@@ -1,121 +1,99 @@
-Return-Path: <netdev+bounces-106911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC4519180C3
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:16:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02EA49180C4
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:16:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 353B8B26CE3
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:16:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3023C1C213EB
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0BA181326;
-	Wed, 26 Jun 2024 12:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mKadWXRu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA56A181323;
+	Wed, 26 Jun 2024 12:16:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152D8181D11
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 12:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A3C180A9F;
+	Wed, 26 Jun 2024 12:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719404172; cv=none; b=MatgOd+cobdAyJiOLzryzZh0WmFlS3FSdeltzZP5Rv6lKUrakMElColjhB5oEoUctp8t1ujdzpLWZCnHB15X1P5IM+n1BcrkMuAvX+spL6A6IqaQRJ1N+vrsR6hHQakM/JwY+Td8F54/X7NFMYhqCKYZ9voR5VlMh3DIsk0p7NQ=
+	t=1719404203; cv=none; b=BsS+H0hJEpDyIGwc4T/2Mlx+XyAW8G9+1t48u9pW0NXse0112SSRIxI9xs6FrO5PPulOynd82U/0RfXpAFPtZVJOLpFv5vgZsGKgrdcAyQ5TBIJ8VC+KIttB/MZVU1Rk53pxUFjTwtKf497hXtXWuGhs3hAb7zXw52vnBemOVTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719404172; c=relaxed/simple;
-	bh=0MF4D4IoKYYW5zXgUIpt3WUaNZVZzVQaehQc9UIMvRc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gkpYYqmIlkPggWz9qxvrP+NEu1Yu+gf43xBnlS0AzuH3x5YNZIpnrSrnWbvzKIMsCBjxw7YcUTSuCvf6KFk7VpoXXKgq/8i9wrB3k3VaXW1ez4fK0w9N0f9RL+UhBcnpwk4Na/l7OYiuyKU3g/ouMiGDQkCkiiMTtkiv7gsIgPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mKadWXRu; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-424a3ccd0c0so13595705e9.1
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 05:16:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719404168; x=1720008968; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GxRfeBXcgl3CMa9atlsXWjYEAsD+1+oLRnTXXbXATgA=;
-        b=mKadWXRub4CYF53ZGtiAtp/Al0/+F/FuZ2uegKJVhgfZB/8oaUOr6lcUBcfrH80Stq
-         g/9csBpJMRy8UnRDuHqCEXFAUU/3775ayWOSOuZdr0pd/DJX9rlCWV7jWEVh6N05Tcm1
-         ErD456/+nh1kn9SknzhaAl+ssUvR9w/57vgb+MauFGvD2tKNwXBopIRtlMDrrI7HVoqg
-         91R2x0qB3RNX6orPXCYpLFS3KJteXzRPld9FL6j+q/RviBJhGdqGwxUhVfPdOG4TTzA3
-         +t32y22zumUCq326VVKE+5N8PYQlEFwf1nijob2DH8SMMYrhCRDEPdXAQjwgh9fBgDCC
-         fycg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719404168; x=1720008968;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GxRfeBXcgl3CMa9atlsXWjYEAsD+1+oLRnTXXbXATgA=;
-        b=WTOXVDud4utT+mQy6nFR4iQSNUTcfPxHT3ykn5Ty2+uxKN/2SW7OudQxn5q0A7umh2
-         IEUDgEJc/nSJs8MF6Kg8j3+zMBfZLCVnELQs92xzXUEkyPFHLBVGTNG556+JXNMfOFai
-         N/v8ssPz6UKCDLy67TvPswAXVOF0eooK+8gZvxYhXpRMsHGhHm5LtRpeES1XvcHI5dKl
-         8w73c3cSopc7s5h/ukCqfeSM/1Xek0vmE4vCRwMMVA+Shq6T4UAYmXZlQDh5Q/1RDJZT
-         v+4k7EGqtZyOOxoXOCSoADSg7pDqEI93K371DG8jXFztNk/+7AIxDtzVAy32xlEBYh4N
-         Sj8g==
-X-Forwarded-Encrypted: i=1; AJvYcCXxAbA8qU++1TijXALhFH8hsYUddC7oepI2Qou3/Ms5FnciAOticBmJTv8UJboGvLIh9Uosm4LBrVRlM1SJNKZ6bMhgYYh4
-X-Gm-Message-State: AOJu0Yx1ztTKbm2S/BNffQelZHl8pZzvmf7aOQ1fOX0lFajErp+YEOKm
-	5pXaXbz3dhO5alwFBiautZ06Lo3TWNjnxnvOtJsf1qNrghB1dKNY
-X-Google-Smtp-Source: AGHT+IEMyXfwq9vToWTvkpu/2EXbbA4WocFWVwJ4/u1coqB1ZPcDZ3g9jiBIjnTFApGA3+pmaOnJCg==
-X-Received: by 2002:a7b:cb17:0:b0:422:9c91:a26f with SMTP id 5b1f17b1804b1-4248cc3426bmr69652155e9.19.1719404167907;
-        Wed, 26 Jun 2024 05:16:07 -0700 (PDT)
-Received: from skbuf ([79.115.210.53])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-424c8475aacsm23867835e9.47.2024.06.26.05.16.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 05:16:07 -0700 (PDT)
-Date: Wed, 26 Jun 2024 15:16:04 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Gregory Clement <gregory.clement@bootlin.com>,
-	netdev@vger.kernel.org, Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net-next v4 0/8] net: Add generic support for netdev LEDs
-Message-ID: <20240626121604.ngzfumr7bom6ilwu@skbuf>
-References: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-0-eb97665e7f96@lunn.ch>
+	s=arc-20240116; t=1719404203; c=relaxed/simple;
+	bh=4DszoVEDIpfg/zVHuUM0BCgw6hDTH3itrr355aASaOY=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=f6rAYv/VgzpC7GzCH7Hh1eRWd2kt9xpLhayvILNeOmuTamDMwPr1V2AvNdRVjy6oBK2/KJJd7fnYpRxcuPu81hCO2lloF9DtNB6TDX/1QB1CH2R/ZbfnQgltlIT+ntVCTqdH+laBD3zL2maAiP+/nH4Rhn/jb2FQrGJsdhrGwyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4W8LDD4WfdzZcJ1;
+	Wed, 26 Jun 2024 20:12:12 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 03721180086;
+	Wed, 26 Jun 2024 20:16:37 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemf200006.china.huawei.com
+ (7.185.36.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 26 Jun
+ 2024 20:16:36 +0800
+Subject: Re: [PATCH net-next v9 00/13] First try to replace page_frag with
+ page_frag_cache
+To: Alexander Duyck <alexander.duyck@gmail.com>, Jakub Kicinski
+	<kuba@kernel.org>
+CC: <davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, Matthias Brugger
+	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, <bpf@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+References: <20240625135216.47007-1-linyunsheng@huawei.com>
+ <20240625162700.56587db3@kernel.org>
+ <CAKgT0Ud1g+KF4JA51n-wnxFNLW5nNkAx4s=Wm+kd+2og7Nx4MA@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <3101f982-f520-ec00-b0ef-d558f208d9a0@huawei.com>
+Date: Wed, 26 Jun 2024 20:16:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-0-eb97665e7f96@lunn.ch>
+In-Reply-To: <CAKgT0Ud1g+KF4JA51n-wnxFNLW5nNkAx4s=Wm+kd+2og7Nx4MA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-Hi Andrew,
+On 2024/6/26 7:41, Alexander Duyck wrote:
+> On Tue, Jun 25, 2024 at 4:27 PM Jakub Kicinski <kuba@kernel.org> wrote:
+>>
+>> On Tue, 25 Jun 2024 21:52:03 +0800 Yunsheng Lin wrote:
+>>> V9:
+>>>    1. Add check for test_alloc_len and change perm of module_param()
+>>>       to 0 as Wang Wei' comment.
+>>>    2. Rebased on latest net-next.
+>>
+>> Please do not post a new version until you get feedback from Alex
+>> on the previous one. This series consumes all our CI resources,
+>> we can't get important patches tested :|
+> 
+> Sorry, I didn't realize this patch set was waiting on feedback from
+> me. I will try to get to it as time permits. Maybe a day or two as I
+> have been swamped this week with various fbnic related items.
 
-On Sat, Apr 06, 2024 at 03:13:27PM -0500, Andrew Lunn wrote:
-> For some devices, the MAC controls the LEDs in the RJ45 connector, not
-> the PHY. This patchset provides generic support for such LEDs, and
-> adds the first user, mv88e6xxx.
-> 
-> The common code netdev_leds_setup() is passed a DT node containing the
-> LEDs and a structure of operations to act on the LEDs. The core will
-> then create an cdev LED for each LED found in the device tree node.
-> 
-> The callbacks are passed the netdev, and the index of the LED. In
-> order to make use of this within DSA, helpers are added to convert a
-> netdev to a ds and port.
-> 
-> The mv88e6xxx has been extended to add basic support for the 6352
-> LEDs. Only software control is added, but the API supports hardware
-> offload which can be added to the mv88e6xxx driver later.
-> 
-> For testing and demonstration, the Linksys Mamba aka. wrt1900ac has
-> the needed DT nodes added to describe its LEDs.
-> 
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> ---
+Ok, it would be good to have some feedback from you, thanks.
 
-I stumbled across a circumstance today where it would have been useful
-if the netdev on user ports was created at ds->ops->port_setup() time.
-It is something that this series accomplishes, but I think it got stuck
-here. Do you plan to resend it, or is there any blocking issue?
+> 
+> Thanks,
+> 
+> - Alex
+> .
+> 
 
