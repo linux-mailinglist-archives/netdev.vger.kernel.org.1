@@ -1,113 +1,102 @@
-Return-Path: <netdev+bounces-106825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12047917D1F
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:02:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F291917D2F
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:04:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEE3D28A67F
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:02:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 492021F2127E
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:04:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A62DF16D4EB;
-	Wed, 26 Jun 2024 10:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8DB58003B;
+	Wed, 26 Jun 2024 10:04:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fTslY9/C"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PgiE2cnH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE66423BF
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 10:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B56173342
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 10:04:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719396123; cv=none; b=L+i7+g8XHmnYF8Dibfpu0BoA3nCjhOTnkCrd+0Xvwz5QlWc8DaX6mZgYaNfRLFEnqr8HCPmS293IOy2V0Dx4lpYTccEEtj7OHzVNSNlKmEDvU0HrosSZJXM+b11K9YbtTfWTm8mk7HbA7wDKN9ej/US9USMAQbMnTr/SauGFs4A=
+	t=1719396264; cv=none; b=HtlInfsdgMwpXOXvWASoEKJTJ/sWZqWR/o/wW9sG3VdYIjCIqZuw1B1ZJN3hNbSiAoULtVaWK7c2nFQsBf/gf52vTSmSNPyaBEb2R5UHjJmh7/jHTSyRcvB49RITEDOApx29W5V+R0xd6Rj2fdK0yqoz4WcCjy52aJByp6xLpGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719396123; c=relaxed/simple;
-	bh=gdrItU7Ucw4I2XnC8bz1GVIEN51yJvk0w7JU+tNIQTY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ho9zepAeiOmXnaMrF/jBRUHoIaklNN+5/WF7DFiouu6t8HHm6hZ22ajlV1NCfm2d6ZbilfIngL4YjkqRXdWVU/+AJen9hUi3fIH4Fd/6pgYxMhrOnIqbqhfLkFFIi0qMqphlFpLpQQJrGOXXkC8KljQfGLhSCOWd4AJjpld/4Dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fTslY9/C; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719396120;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gdrItU7Ucw4I2XnC8bz1GVIEN51yJvk0w7JU+tNIQTY=;
-	b=fTslY9/C8EOb7KMZW8NgC5HYpZKif5hJTnyC0x2r8jBeY01TpDuoOAkbmFiJfTrYR0oGzK
-	4hA9hReaThqsedmYwj0lyLyAYlWnwJxdi36OP7RXgtF63gWCI537M/LZ8UC0fnley7+9kV
-	txchpoXN+antj744JzANDvutvuwmu/A=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-321-20h0WLOfOjalhUOQFjsVew-1; Wed, 26 Jun 2024 06:01:58 -0400
-X-MC-Unique: 20h0WLOfOjalhUOQFjsVew-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2c7a8fa8013so8251283a91.2
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 03:01:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719396117; x=1720000917;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gdrItU7Ucw4I2XnC8bz1GVIEN51yJvk0w7JU+tNIQTY=;
-        b=tsTG/qopzLbSvpTFd8gjylSqGYWYlp7G7S1QTATLywyd5RexVwzaQwcoPN0k0YJevl
-         g/tBLHQUjX6eQjtMB9nI86FTHuu9s6HS0Uqe2nU0F9KT/aHx4MH4GONkvm6prpCuzMy+
-         a0jt4K0XNXSNKbrYFmBNqUTvjxWm1WxBI7vtA+dV5XyVnKPeUX2emI5kvYgD6Aq3SFlN
-         0tS7h4bnhhp+TsgmqmfdNMAwGVXeKwOBYfZOoZZT5gRRzpToiH0uG9BvXWIL0uqAMcqe
-         7UzVVKdMWk8Lfvrin3qRwXgV4AWeHWcyMw7EVHEPybQVD9ku5yyhvyBqEEAVN7XbFm1I
-         D8ZA==
-X-Forwarded-Encrypted: i=1; AJvYcCXOiUpa1Qx27DLLSPmb8hqpQIUOZS+7awAFKNxI9V7/ZvsONROLQpid0p0lt3OYlG8FePJj/keStWRtBCp0RlQXPr34VUSc
-X-Gm-Message-State: AOJu0Yxrm//Do/FolxOsiNwaUlm1Kr64krgrh96G93xy45lS8HNuBIM0
-	IDdymMsKogT2xSiKgW9BbnQ1ZoYSAO4xgS0HgcWal4zo+aOO89Y6F5nU1ZKrocCGEKo0BysJFea
-	PzXHplLJO13Nw2GQqrRX5xLqTeu90zvMG2AKE5p//1omn9mJ1Y/mfKq7bpDo2ADXki79DDSX021
-	32BghPjAlWT+ObAh1Sx5bTOef7ndOr
-X-Received: by 2002:a17:90a:17a5:b0:2c2:41cf:b0f0 with SMTP id 98e67ed59e1d1-2c858297582mr9204895a91.43.1719396117073;
-        Wed, 26 Jun 2024 03:01:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHP5pWyEB+/l3J6qcO21zK7BoGGmi0UDpkfJ7f4rzYXNXczhdeTMPXJZJp+/qspBHnJ6tS4vqXrd+ILXABKKY4=
-X-Received: by 2002:a17:90a:17a5:b0:2c2:41cf:b0f0 with SMTP id
- 98e67ed59e1d1-2c858297582mr9204863a91.43.1719396116441; Wed, 26 Jun 2024
- 03:01:56 -0700 (PDT)
+	s=arc-20240116; t=1719396264; c=relaxed/simple;
+	bh=3HBoWOKl6SbY13vd0tm05QnlOYhyCgkxJmDDKHhVy5E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kp1Ic4c6oztnu/hwokVgEqvBEcWVbk1y1P9qg+GEQt4egVp2c807cYYmjJ975x/T3TZJnXq/n+cSipuCkM3bhbJV4CKCBUPjOs90ZOhAcfNHTNarVBpCcGoIEgNtAtzXgYNAxAtZkqKFDwBJ32HB0JG6sT7ZlHU6oA3ELiWVZ04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PgiE2cnH; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719396263; x=1750932263;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3HBoWOKl6SbY13vd0tm05QnlOYhyCgkxJmDDKHhVy5E=;
+  b=PgiE2cnHalRVSfzqw8wJeDeZ7oTRpUHsV8r/CBe9W5iufSlPeRLD6N7E
+   x4Dyqf7JTjwYQ31UuVgsvDNeAahU8BYC0NVybEK1vCFwE9FZfxAAkRj98
+   yHKIQwDLtziuaKWc0xbW4fjNztLHgcERE1ZMPEPotFhJ7DAP/10xJoMxH
+   jqceoZmGvk2DEKLrrS/QyQnvmF0vQE6LvRU8i0jICaoomrQ9opMshS3sP
+   8MO47HLf1AT1qho0zFJGVlOkzFyZ4Z0HAeG0/76FTmiG9fpDAEzB0w/lv
+   KEcAhNvaXpOpSy3ynqBZ/wfdD6FBSr3jLV/GhR7+SNxXz3WZQiZxJ0RL1
+   w==;
+X-CSE-ConnectionGUID: 73NbjjP/R3CAkgZ/0eKbaw==
+X-CSE-MsgGUID: 52jWM0kNRPidD8mISdqiiA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="27145085"
+X-IronPort-AV: E=Sophos;i="6.08,266,1712646000"; 
+   d="scan'208";a="27145085"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 03:04:22 -0700
+X-CSE-ConnectionGUID: DS3510ETSKOPSRupHyzOVA==
+X-CSE-MsgGUID: PsNyLdluQAmLNKnm9WKPsA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,266,1712646000"; 
+   d="scan'208";a="67162091"
+Received: from unknown (HELO localhost.igk.intel.com) ([10.211.13.141])
+  by fmviesa002.fm.intel.com with ESMTP; 26 Jun 2024 03:04:21 -0700
+From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+Subject: [PATCH iwl-next v1 0/4] Replace auxbus with ice_adapter in the PTP support code
+Date: Wed, 26 Jun 2024 12:03:03 +0200
+Message-ID: <20240626100307.64365-1-sergey.temerkhanov@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240611235355.177667-1-ast@fiberby.net> <20240611235355.177667-3-ast@fiberby.net>
- <ZnVR3LsBSvfRyTDD@dcaratti.users.ipa.redhat.com> <0fa312be-be5d-44a1-a113-f899844f13be@fiberby.net>
- <ZnvkIHCsqnDLlVa9@dcaratti.users.ipa.redhat.com>
-In-Reply-To: <ZnvkIHCsqnDLlVa9@dcaratti.users.ipa.redhat.com>
-From: Davide Caratti <dcaratti@redhat.com>
-Date: Wed, 26 Jun 2024 12:01:45 +0200
-Message-ID: <CAKa-r6uqO20RB-fEVRifAEE_hLA50Zch=wbKtX8vNt5m6kE5_Q@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next 2/9] net/sched: cls_flower: prepare
- fl_{set,dump}_key_flags() for ENC_FLAGS
-To: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <ast@fiberby.net>
-Cc: Ilya Maximets <i.maximets@ovn.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 26, 2024 at 11:49=E2=80=AFAM Davide Caratti <dcaratti@redhat.co=
-m> wrote:
->
-> So, we must htonl() the policy mask in the second hunk in patch 7,somethi=
-ng like:
->
+This series replaces multiple aux buses and devices used in
+the PTP support code with struct ice_adapter holding the necessary
+shared data
 
-or maybe better (but still untested), use NLA_BE32, like netfilter does in =
-[1]
+Patches 1,2 add convenience wrappers
+Patch 3 does the main refactoring
+Patch 4 finalizes the refactoring
 
-[1] https://elixir.bootlin.com/linux/latest/A/ident/NF_NAT_RANGE_MASK
+Sergey Temerkhanov (4):
+  ice: Introduce ice_get_phy_model() wrapper
+  ice: Add ice_get_ctrl_ptp() wrapper to simplify the code
+  ice: Use ice_adapter for PTP shared data instead of auxdev
+  ice: Drop auxbus use for PTP to finalize ice_adapter move
 
---=20
-davide
+ drivers/net/ethernet/intel/ice/ice.h         |   5 +
+ drivers/net/ethernet/intel/ice/ice_adapter.c |   6 +
+ drivers/net/ethernet/intel/ice/ice_adapter.h |  21 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c     | 338 ++++---------------
+ drivers/net/ethernet/intel/ice/ice_ptp.h     |  24 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c  |  22 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h  |   5 +
+ 7 files changed, 111 insertions(+), 310 deletions(-)
+
+-- 
+2.43.0
 
 
