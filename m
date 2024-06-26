@@ -1,60 +1,84 @@
-Return-Path: <netdev+bounces-106910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 832AF9180B3
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:11:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC4519180C3
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 14:16:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B781B268B1
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:11:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 353B8B26CE3
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 12:16:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79BBD180A8B;
-	Wed, 26 Jun 2024 12:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0BA181326;
+	Wed, 26 Jun 2024 12:16:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IpETkwFa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mKadWXRu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531AF17BB19;
-	Wed, 26 Jun 2024 12:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152D8181D11
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 12:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719403885; cv=none; b=IqwPviWXDahGTaLqOxdGd9segeO8mwCYrPYFiXsU9OqHEkpqS5IGfegeOcKVWSYWcb+9o3Rc6VZxaXw7X3J5suzTrFW8tQ5M7pJ61/AvscMGqtpKcIr3yuWE9FUxFIGA4N5OPQAyRQem+To6EiNPk8t4Ua9vmxtMqqvWp9PdZ3E=
+	t=1719404172; cv=none; b=MatgOd+cobdAyJiOLzryzZh0WmFlS3FSdeltzZP5Rv6lKUrakMElColjhB5oEoUctp8t1ujdzpLWZCnHB15X1P5IM+n1BcrkMuAvX+spL6A6IqaQRJ1N+vrsR6hHQakM/JwY+Td8F54/X7NFMYhqCKYZ9voR5VlMh3DIsk0p7NQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719403885; c=relaxed/simple;
-	bh=NaxH0blfUI2QdjaA7JXSydGnaLqL//LasxB2gq37NH0=;
+	s=arc-20240116; t=1719404172; c=relaxed/simple;
+	bh=0MF4D4IoKYYW5zXgUIpt3WUaNZVZzVQaehQc9UIMvRc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LT+eMRALwNvxHJFiaGRRDQ7CyEeW2G1bNuHk/23+3E598//kJOYnogrtqjVdleRPqvrIqyZGUE5ZGHcYtUY6ZvkxL7z+iDeaAO6p6XZMpvpYqI47TIPjqB3bsFoDro4oBttIYw4DgpJ0OWMqqRcH9EszfOuqWYzmZBkLumXfr5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IpETkwFa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68649C2BD10;
-	Wed, 26 Jun 2024 12:11:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719403883;
-	bh=NaxH0blfUI2QdjaA7JXSydGnaLqL//LasxB2gq37NH0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IpETkwFaNfSKFWcD+Ba4ZhItQLKB+qNlkPrz25d1w5QZGOJ1TbAvf+eOu+XfAufds
-	 k0PXetTR9rz+4w/EB0B5v8c0D6lKQJdi6h0wgOlNVwHRvmRv6Eiy53c4mTWc/PJpTz
-	 eEnMzE6AQQUci2gbAumgG3UDYBGhqZgjYtk83E2CBGfB2GZXdwHXgnEZ551TmqOa59
-	 jbPososf+6Hn2+UthW2pB6Rx96TVjo206pTUwZ1GQC6vZXPvXokAtSvTx5JnMA/RrN
-	 puXNh5P7zb9lCiKxe59g8wCeyJl5VniwS1SDzzLki+N1JtQNkW6AqIH7m+GfaZJUjT
-	 Inv1F7rNwthCQ==
-Date: Wed, 26 Jun 2024 15:11:18 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Konstantin Taranov <kotaranov@microsoft.com>
-Cc: Konstantin Taranov <kotaranov@linux.microsoft.com>,
-	Wei Hu <weh@microsoft.com>,
-	"sharmaajay@microsoft.com" <sharmaajay@microsoft.com>,
-	Long Li <longli@microsoft.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	linux-netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH rdma-next 1/1] RDMA/mana_ib: Set correct device into ib
-Message-ID: <20240626121118.GP29266@unreal>
-References: <1719311307-7920-1-git-send-email-kotaranov@linux.microsoft.com>
- <20240626054748.GN29266@unreal>
- <PAXPR83MB0559F4678E73B0091A8ADFBBB4D62@PAXPR83MB0559.EURPRD83.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gkpYYqmIlkPggWz9qxvrP+NEu1Yu+gf43xBnlS0AzuH3x5YNZIpnrSrnWbvzKIMsCBjxw7YcUTSuCvf6KFk7VpoXXKgq/8i9wrB3k3VaXW1ez4fK0w9N0f9RL+UhBcnpwk4Na/l7OYiuyKU3g/ouMiGDQkCkiiMTtkiv7gsIgPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mKadWXRu; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-424a3ccd0c0so13595705e9.1
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 05:16:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719404168; x=1720008968; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GxRfeBXcgl3CMa9atlsXWjYEAsD+1+oLRnTXXbXATgA=;
+        b=mKadWXRub4CYF53ZGtiAtp/Al0/+F/FuZ2uegKJVhgfZB/8oaUOr6lcUBcfrH80Stq
+         g/9csBpJMRy8UnRDuHqCEXFAUU/3775ayWOSOuZdr0pd/DJX9rlCWV7jWEVh6N05Tcm1
+         ErD456/+nh1kn9SknzhaAl+ssUvR9w/57vgb+MauFGvD2tKNwXBopIRtlMDrrI7HVoqg
+         91R2x0qB3RNX6orPXCYpLFS3KJteXzRPld9FL6j+q/RviBJhGdqGwxUhVfPdOG4TTzA3
+         +t32y22zumUCq326VVKE+5N8PYQlEFwf1nijob2DH8SMMYrhCRDEPdXAQjwgh9fBgDCC
+         fycg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719404168; x=1720008968;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GxRfeBXcgl3CMa9atlsXWjYEAsD+1+oLRnTXXbXATgA=;
+        b=WTOXVDud4utT+mQy6nFR4iQSNUTcfPxHT3ykn5Ty2+uxKN/2SW7OudQxn5q0A7umh2
+         IEUDgEJc/nSJs8MF6Kg8j3+zMBfZLCVnELQs92xzXUEkyPFHLBVGTNG556+JXNMfOFai
+         N/v8ssPz6UKCDLy67TvPswAXVOF0eooK+8gZvxYhXpRMsHGhHm5LtRpeES1XvcHI5dKl
+         8w73c3cSopc7s5h/ukCqfeSM/1Xek0vmE4vCRwMMVA+Shq6T4UAYmXZlQDh5Q/1RDJZT
+         v+4k7EGqtZyOOxoXOCSoADSg7pDqEI93K371DG8jXFztNk/+7AIxDtzVAy32xlEBYh4N
+         Sj8g==
+X-Forwarded-Encrypted: i=1; AJvYcCXxAbA8qU++1TijXALhFH8hsYUddC7oepI2Qou3/Ms5FnciAOticBmJTv8UJboGvLIh9Uosm4LBrVRlM1SJNKZ6bMhgYYh4
+X-Gm-Message-State: AOJu0Yx1ztTKbm2S/BNffQelZHl8pZzvmf7aOQ1fOX0lFajErp+YEOKm
+	5pXaXbz3dhO5alwFBiautZ06Lo3TWNjnxnvOtJsf1qNrghB1dKNY
+X-Google-Smtp-Source: AGHT+IEMyXfwq9vToWTvkpu/2EXbbA4WocFWVwJ4/u1coqB1ZPcDZ3g9jiBIjnTFApGA3+pmaOnJCg==
+X-Received: by 2002:a7b:cb17:0:b0:422:9c91:a26f with SMTP id 5b1f17b1804b1-4248cc3426bmr69652155e9.19.1719404167907;
+        Wed, 26 Jun 2024 05:16:07 -0700 (PDT)
+Received: from skbuf ([79.115.210.53])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-424c8475aacsm23867835e9.47.2024.06.26.05.16.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jun 2024 05:16:07 -0700 (PDT)
+Date: Wed, 26 Jun 2024 15:16:04 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	netdev@vger.kernel.org, Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net-next v4 0/8] net: Add generic support for netdev LEDs
+Message-ID: <20240626121604.ngzfumr7bom6ilwu@skbuf>
+References: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-0-eb97665e7f96@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,101 +87,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <PAXPR83MB0559F4678E73B0091A8ADFBBB4D62@PAXPR83MB0559.EURPRD83.prod.outlook.com>
+In-Reply-To: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-0-eb97665e7f96@lunn.ch>
 
-On Wed, Jun 26, 2024 at 09:05:05AM +0000, Konstantin Taranov wrote:
-> > > When mc->ports[0] is not slave, use it in the set_netdev.
-> > > When mana is used in netvsc, the stored net devices in mana are slaves
-> > > and GIDs should be taken from their master devices.
-> > > In the baremetal case, the mc->ports devices will not be slaves.
-> > 
-> > I wonder, why do you have "... | IFF_SLAVE" in __netvsc_vf_setup() in a first
-> > place? Isn't IFF_SLAVE is supposed to be set by bond driver?
-> > 
-> 
-> I guess it is just a valid use of the IFF_SLAVE bit. In the bond case it is also set
-> as a BOND netdev. The IFF_SLAVE helps to show users that another master
-> netdev should be used for networking. But I am not an expert in netvsc.
+Hi Andrew,
 
-The thing is that netvsc is virtual device like many others, but it is
-the only one who uses IFF_SLAVE bit. The comment around that bit says
-"slave of a load balancer.", which is not the case according to the
-Hyper-V documentation.
-https://learn.microsoft.com/en-us/windows-hardware/drivers/network/overview-of-hyper-v
+On Sat, Apr 06, 2024 at 03:13:27PM -0500, Andrew Lunn wrote:
+> For some devices, the MAC controls the LEDs in the RJ45 connector, not
+> the PHY. This patchset provides generic support for such LEDs, and
+> adds the first user, mv88e6xxx.
+> 
+> The common code netdev_leds_setup() is passed a DT node containing the
+> LEDs and a structure of operations to act on the LEDs. The core will
+> then create an cdev LED for each LED found in the device tree node.
+> 
+> The callbacks are passed the netdev, and the index of the LED. In
+> order to make use of this within DSA, helpers are added to convert a
+> netdev to a ds and port.
+> 
+> The mv88e6xxx has been extended to add basic support for the 6352
+> LEDs. Only software control is added, but the API supports hardware
+> offload which can be added to the mv88e6xxx driver later.
+> 
+> For testing and demonstration, the Linksys Mamba aka. wrt1900ac has
+> the needed DT nodes added to describe its LEDs.
+> 
+> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+> ---
 
-You will need to get Ack from netdev maintainers to rely on IFF_SLAVE
-bit in the way you are relying on it now.
-
-> 
-> Actually, another alternative solution for mana_ib is always set the slave device,
-> but in the GID mgmt code we need the following patch. The problem is that it may require 
-> testing/confirmation from other ib providers as in the worst case some GIDs will not be listed.
-
-is_eth_active_slave_of_bonding_rcu() is for bonding.
-
-> 
-> diff --git a/drivers/infiniband/core/roce_gid_mgmt.c b/drivers/infiniband/core/roce_gid_mgmt.c
-> index d5131b3ba8ab..0f20b4e2d1c2 100644
-> --- a/drivers/infiniband/core/roce_gid_mgmt.c
-> +++ b/drivers/infiniband/core/roce_gid_mgmt.c
-> @@ -141,6 +141,8 @@ static enum bonding_slave_state is_eth_active_slave_of_bonding_rcu(struct net_de
->         return BONDING_SLAVE_STATE_NA;
->  }
-> 
-> +#define netdev_is_slave(dev)   (((dev)->flags & IFF_SLAVE) == IFF_SLAVE)
-> +
->  #define REQUIRED_BOND_STATES           (BONDING_SLAVE_STATE_ACTIVE |   \
->                                          BONDING_SLAVE_STATE_NA)
->  static bool
-> @@ -157,11 +159,14 @@ is_eth_port_of_netdev_filter(struct ib_device *ib_dev, u32 port,
->         real_dev = rdma_vlan_dev_real_dev(cookie);
->         if (!real_dev)
->                 real_dev = cookie;
-> -
-> +       /*
-> +        * When rdma netdevice is used in netvsc, the master netdevice should
-> +        * be considered for GIDs. Therefore, ignore slave rdma netdevices.
-> +        */
->         res = ((rdma_is_upper_dev_rcu(rdma_ndev, cookie) &&
->                (is_eth_active_slave_of_bonding_rcu(rdma_ndev, real_dev) &
->                 REQUIRED_BOND_STATES)) ||
-> -              real_dev == rdma_ndev);
-> +              (real_dev == rdma_ndev && !netdev_is_slave(real_dev)));
-> 
->         rcu_read_unlock();
->         return res;
-> @@ -211,12 +216,14 @@ is_ndev_for_default_gid_filter(struct ib_device *ib_dev, u32 port,
-> 
->         /*
->          * When rdma netdevice is used in bonding, bonding master netdevice
-> -        * should be considered for default GIDs. Therefore, ignore slave rdma
-> -        * netdevices when bonding is considered.
-> +        * should be considered for default GIDs.
-> +        * When rdma netdevice is used in netvsc, the master netdevice should
-> +        * be considered for defauld GIDs. Therefore, ignore slave rdma
-> +        * netdevices.
->          * Additionally when event(cookie) netdevice is bond master device,
->          * make sure that it the upper netdevice of rdma netdevice.
->          */
-> -       res = ((cookie_ndev == rdma_ndev && !netif_is_bond_slave(rdma_ndev)) ||
-> +       res = ((cookie_ndev == rdma_ndev && !netdev_is_slave(rdma_ndev)) ||
->                (netif_is_bond_master(cookie_ndev) &&
->                 rdma_is_upper_dev_rcu(rdma_ndev, cookie_ndev)));
-> 
-> > > +#define mana_ndev_is_slave(dev)   (((dev)->flags & IFF_SLAVE) ==
-> > IFF_SLAVE)
-> > 
-> > There is no need in macro for one line of code and there is no need in "==",
-> > as the result will be boolean.
-> > 
-> 
-> Sure, can address in v2. I just saw a similar macro in another kernel file.
-
-I grepped too and this is why it caused me to wonder why it is not used
-except small number of places.
-
-Thanks
-
-> 
-> 
+I stumbled across a circumstance today where it would have been useful
+if the netdev on user ports was created at ds->ops->port_setup() time.
+It is something that this series accomplishes, but I think it got stuck
+here. Do you plan to resend it, or is there any blocking issue?
 
