@@ -1,143 +1,137 @@
-Return-Path: <netdev+bounces-106736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C12629175D3
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:45:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 731579175D7
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 03:46:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6992E1F2148A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:45:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8E3FB20B1D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 01:46:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B59A7171AD;
-	Wed, 26 Jun 2024 01:45:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7109ABE6C;
+	Wed, 26 Jun 2024 01:46:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gttAHoTN"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="FIMnDukb"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0664BBE6C
-	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 01:45:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF1C14F62
+	for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 01:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719366337; cv=none; b=SyHMSAsBg0HJac15oHpPdvCtsbhfY7krkH9h+65LdgM3+oEKBzmgzacrlohvl7lrCzntxaexwMQWGHuYVMoNOddcj+LPp37sn7Rak5UMj+ORgKKUnGuhVa1kcQT8Y10RahGxs8yDzRgESgN8zJzeOoH9c0JRyFfDn1NcpgNBCLY=
+	t=1719366371; cv=none; b=fHHg7OySDgFooT2gkWErsWMxba4rqt9GXsKVkoIbkocPJRkCQih2OVlZvfXBOol38tko2A4s7nPp092MasDAL9VVoekOH8o07tfZizoCudqsH7maUeOl9Y3mHqAVpgCgDWC1VGSKcGtIGpU6VJlnGYPE4/pijdejNuM3DoHbtwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719366337; c=relaxed/simple;
-	bh=3u9DchcBWqEg+EucW73spHNC6ivrtjkXb6CPutXzAv8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cBHsNzQb/Aj0oRcmPZBWdUh87iVENVQYIuRt6JuZyGTy+Q2YmSnzNk/VFssU/A/7W2d4YKbKh7kLeQSyO/E+00qtCd+FFV31joLDKctLcKiZA/tQI6d6tmAOhocW4An57I2N6Rjbm4cLRxqgKQ0kXeaF8epgKEg9WXPiEwywi0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gttAHoTN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719366335;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zm4ZGAMAEzALYJd1NNHLmIL7EFq9IvdfBHS2qeGf/kg=;
-	b=gttAHoTNbUxewVlZl99O6J67q1Vd2/B0DhFwd88i+W7iHMaU06k7bGHi+OPnUHE8R6uRIZ
-	yyTF7Hl7LUl23lMKj6TshBY4jmm29R8PrWliJ3xXrTrXMhjkDzWiQFennQFBZuA5W5/ti+
-	R0Z29/WRK/JhYGZaXDXn2XHE74ok2p4=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-493-g91mBMPtPgOIXRPzvvv8Bg-1; Tue, 25 Jun 2024 21:45:32 -0400
-X-MC-Unique: g91mBMPtPgOIXRPzvvv8Bg-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2ec4e579e76so35288151fa.1
-        for <netdev@vger.kernel.org>; Tue, 25 Jun 2024 18:45:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719366331; x=1719971131;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zm4ZGAMAEzALYJd1NNHLmIL7EFq9IvdfBHS2qeGf/kg=;
-        b=NtxVUZWzd/1dqMtc/Qeyo2SqK399RkvQDDeJmKg3tsJbjI3oZ2QkvnP20Ev1NIzVb1
-         xov6LXL+G7OTt7c1xqn3S/s1BYLuSR9wyf6uSj9Q3Rt6h2dOd97It66vdad6N15byfkt
-         B1SSqYWTM3iwcDA0lQ94xDuG/VcRWiWo8EXrq3mJ5Jc46bGyv4F9EicBEqxpwHH61j8A
-         uoWDFTMb0tJhFm2813fbHF4u9EOu8xc4MwbQPdy0BNdSY+bGcgwS98LTNrHn53X7VZVR
-         NviTB3ySaAt0rxGxWaqNAGzKu7lumKWdh/hBrvdjbxsBmYvoN7tpCiVb8YYF29386yx9
-         LwCA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfVy+Ze/IGxY00zBvuJuJimwh8LPtdCBEAmSdrQmbEQD1rzkQxhybIjN7X4++wnHFe83iDNxgXUBnd8BtYiZhLKAMb1ZJ+
-X-Gm-Message-State: AOJu0YyEvOvIJt9AK/DHdAybwp1pC1FZto6fjGEsPzAsRYVvvmQQByjN
-	jQVP182j30lKh1mnEbLZcRxSnqdxlbORev/uXh55fikifc2+v0HPb6LpTqZ8diS5q/bAgGx0aVA
-	kIVd5oPS5Po/d9rdud/QIwgpQni0hCZpbLx6JqT3Lpsqq7yfhpa8fH9ZZIfkYpLfFUqks8fSXK+
-	faWp6AsYE/zRpm03wTOYJAgG4Rf5JjkqxUky2/
-X-Received: by 2002:a2e:9684:0:b0:2ec:53a8:4b3e with SMTP id 38308e7fff4ca-2ec5b387fcamr51824771fa.38.1719366330845;
-        Tue, 25 Jun 2024 18:45:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGFyfsfHjbw/eAr9nRtuFgDufzjtUAZeIkXSWW65AHErjzSV1gBpTz2ywqRAEU9I8YB/eCLbLpDjY7IGg0HhVE=
-X-Received: by 2002:a2e:9684:0:b0:2ec:53a8:4b3e with SMTP id
- 38308e7fff4ca-2ec5b387fcamr51824661fa.38.1719366330480; Tue, 25 Jun 2024
- 18:45:30 -0700 (PDT)
+	s=arc-20240116; t=1719366371; c=relaxed/simple;
+	bh=d4XwO43a7NXBz7l7K86p3g4y4bJt0eJkkeoqoA177Kc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WjJoQBNz6Do+4AFU4A79So81WtAcnwBnRglwTZGgf+hrvlhliL6CwbOW8d90IuLI/3bMn/MJD7+a0qbhZtCH+3JO1cp+4AGZ/FtoINq4Vps/P2LezkZlvMgDhqc62+97HnpBv4SC2NOpH7Ivhb5M2xxWXn2HwIJhrPn8fa/O66g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=FIMnDukb; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1719366369; x=1750902369;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=9fFmKhlMCiV4AxFRhe15+3T6kbvPQWa4wtw05HRPSmM=;
+  b=FIMnDukbeYnakvkGVigE5dKFd/qyLBIQWELB+W1EYYRIabYvfzlInd/Q
+   jJSLVFlSLrWh8kNqUSwbJU4yjxlW5jx/bCLHYlSoOiSni/zv49H2Av1qm
+   gNIDcp9QvTRrKbQPT4bb7wB6fMAfgMyZoPDzMg8TYvaSlJa1ZbEj5ULhp
+   g=;
+X-IronPort-AV: E=Sophos;i="6.08,265,1712620800"; 
+   d="scan'208";a="415765498"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 01:46:07 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:9052]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.32.229:2525] with esmtp (Farcaster)
+ id cab1c643-2aa4-4b37-988e-7d2e78d03a83; Wed, 26 Jun 2024 01:46:06 +0000 (UTC)
+X-Farcaster-Flow-ID: cab1c643-2aa4-4b37-988e-7d2e78d03a83
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Wed, 26 Jun 2024 01:46:06 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.100.6) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Wed, 26 Jun 2024 01:46:03 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuba@kernel.org>
+CC: <Rao.Shoaib@oracle.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>
+Subject: Re: [PATCH v1 net 02/11] selftest: af_unix: Add msg_oob.c.
+Date: Tue, 25 Jun 2024 18:45:55 -0700
+Message-ID: <20240626014555.86837-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240625174449.796bc9a0@kernel.org>
+References: <20240625174449.796bc9a0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240624141602.206398-3-Mathis.Marion@silabs.com> <20240625213859.65542-1-kuniyu@amazon.com>
-In-Reply-To: <20240625213859.65542-1-kuniyu@amazon.com>
-From: Alexander Aring <aahringo@redhat.com>
-Date: Tue, 25 Jun 2024 21:45:18 -0400
-Message-ID: <CAK-6q+gsx15xnA5bEsj3i9hUbN_cqjFDHD0-MtZiaET6tESWmw@mail.gmail.com>
-Subject: Re: [PATCH v1 2/2] ipv6: always accept routing headers with 0
- segments left
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: mathis.marion@silabs.com, alex.aring@gmail.com, davem@davemloft.net, 
-	dsahern@kernel.org, edumazet@google.com, jerome.pouiller@silabs.com, 
-	kuba@kernel.org, kylian.balan@silabs.com, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, 
-	Michael Richardson <mcr@sandelman.ca>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWC002.ant.amazon.com (10.13.139.230) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hi,
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Tue, 25 Jun 2024 17:44:49 -0700
+> On Mon, 24 Jun 2024 18:36:36 -0700 Kuniyuki Iwashima wrote:
+> > +	if (ret[0] != expected_len || recv_errno[0] != expected_errno) {
+> > +		TH_LOG("AF_UNIX :%s", ret[0] < 0 ? strerror(recv_errno[0]) : recv_buf[0]);
+> > +		TH_LOG("Expected:%s", expected_errno ? strerror(expected_errno) : expected_buf);
+> > +
+> > +		ASSERT_EQ(ret[0], expected_len);
+> > +		ASSERT_EQ(recv_errno[0], expected_errno);
+> > +	}
+> 
+> repeating the conditions feels slightly imperfect.
 
-On Tue, Jun 25, 2024 at 5:39=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> From: Mathis Marion <Mathis.Marion@silabs.com>
-> Date: Mon, 24 Jun 2024 16:15:33 +0200
-> > From: Mathis Marion <mathis.marion@silabs.com>
-> >
-> > Routing headers of type 3 and 4 would be rejected even if segments left
-> > was 0, in the case that they were disabled through system configuration=
-.
-> >
-> > RFC 8200 section 4.4 specifies:
-> >
-> >       If Segments Left is zero, the node must ignore the Routing header
-> >       and proceed to process the next header in the packet, whose type
-> >       is identified by the Next Header field in the Routing header.
->
-> I think this part is only applied to an unrecognized Routing Type,
-> so only applied when the network stack does not know the type.
->
->    https://www.rfc-editor.org/rfc/rfc8200.html#section-4.4
->
->    If, while processing a received packet, a node encounters a Routing
->    header with an unrecognized Routing Type value, the required behavior
->    of the node depends on the value of the Segments Left field, as
->    follows:
->
->       If Segments Left is zero, the node must ignore the Routing header
->       and proceed to process the next header in the packet, whose type
->       is identified by the Next Header field in the Routing header.
->
-> That's why RPL with segment length 0 was accepted before 8610c7c6e3bd.
->
-> But now the kernel recognizes RPL and it's intentionally disabled
-> by default with net.ipv6.conf.$DEV.rpl_seg_enabled since introduced.
->
-> And SRv6 has been rejected since 1ababeba4a21f for the same reason.
+Yeah actually I don't like this...
 
-so there might be a need to have an opt-in knob to actually tell the
-kernel ipv6 stack to recognize or not recognize a next header field
-for users wanting to bypass certain next header fields to the user
-space?
+> Would it be possible to modify EXPECT_* to return the condition?
+> Then we could:
+> 
+> 	if (EXPECT(...)) {
+> 		TH_LOG(...
+> 		TH_LOG(...
+> 	}
 
-- Alex
+We can use EXPECT_EQ() {} here, but for some test cases where TCP is
+buggy, I'd like to print the difference but let the test pass.
 
+For example, see patch 6.
+
+  #  RUN           msg_oob.no_peek.ex_oob_ahead_break ...
+  # msg_oob.c:146:ex_oob_ahead_break:AF_UNIX :hellowol
+  # msg_oob.c:147:ex_oob_ahead_break:TCP     :helloworl
+                                                     ^
+            TCP recv()s already recv()ed data, "r" --'
+
+  #            OK  msg_oob.no_peek.ex_oob_ahead_break
+  ok 11 msg_oob.no_peek.ex_oob_ahead_break
+
+In this case, this does not print the recv()ed data,
+
+  if (self->tcp_compliant) {
+      EXPECT_EQ(...) {
+          /* log retval, errno, buffer */
+      }
+  }
+
+and this fails the test even though AF_UNIX is doing correct.
+
+  EXPECT_EQ(...) {
+      if (self->tcp_compliant) {
+          /* log retval, errno, buffer */
+      }
+  }
+
+I think we can convert it to EXPECT_EQ() {} in all places after
+fixing TCP side and removing tcp_incompliant{} uses in the test.
 
