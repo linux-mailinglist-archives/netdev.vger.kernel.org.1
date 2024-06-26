@@ -1,301 +1,369 @@
-Return-Path: <netdev+bounces-106801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-106802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26121917B06
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:32:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 381C9917B14
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 10:36:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFD8E282BEB
-	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:32:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C6DB1C23194
+	for <lists+netdev@lfdr.de>; Wed, 26 Jun 2024 08:36:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB87215F316;
-	Wed, 26 Jun 2024 08:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8EE4167DB7;
+	Wed, 26 Jun 2024 08:36:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EeW/c7ZQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jJusXzxw"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 202CF23BF;
-	Wed, 26 Jun 2024 08:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719390763; cv=none; b=YwcJlPnvKfLMOTQ5ilhm+rzW1u0KGv5+rAlgYOkSaz5ah18d/Fu7bsTLQh+8+1vB58YKD1pRTa5qYArlrA5Z8BbxW5dqFtlZLoDZlrshZnknuL7IRq8n8qZlw8HuObTlBw7T82hp0DYDoUKak+k9XZPp2t4eGnTOlFyLxTfnipk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719390763; c=relaxed/simple;
-	bh=JLfSucvEHpuuXpIlyWN46R9TVxkHIn8qeuwQJkf+gLA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=b1dBlddv5+u4cW94v/ZW+9dxo4zzRl32v/AqVk4Efnjdd0eUBSSgzifDR9t5EHdcSGyGjiI2BwxwOoV08Qf56XzQb4hFnwG1ceCbc0WCVzih/v9daVuopkhSsGrU1ZqsTWxFr0MaDCaIK9/Pc56yAIQLCv7Ak/84iRC4Ppq2t1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=EeW/c7ZQ; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=JLfSucvEHpuuXpIlyWN46R9TVxkHIn8qeuwQJkf+gLA=; b=EeW/c7ZQfLNgv86UYshqV0TG+/
-	47KuIwtAHTr3t1aJ5Gj4RfJqpHMsnMZPgob2Kqa26cewuTRTk3PfIxRZImqAFkmyZ2hqR8dSrhS5g
-	qLxi4cbWSJuhtl4jgqNN7B4KfrqMu/wm1oD6zM6Nznx/8HRtsugaQV0qBQkXdmbocUCxqX3VJX2s4
-	bTo0EFfaDoT7r830c3HXsNI5TFeWsNfbJ7pKxMhKzwhoEfbWqeUdA6i5PvFg/1B6e8sa7Hr+LPj4S
-	Yrc2teeOgjvH1SUiIdkQ91p+O0omvYsHRXIulRkEy3OnxCHALKpkSP9UGQNof+sUkkxdkMc1adLW3
-	B47P/EzQ==;
-Received: from [2001:8b0:10b:5:4085:75b2:1737:3c57] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sMO4q-0000000C4Mj-0JCI;
-	Wed, 26 Jun 2024 08:32:28 +0000
-Message-ID: <d74847bc28037737e1d470501752215905ec6f9e.camel@infradead.org>
-Subject: Re: [RFC PATCH v2] ptp: Add vDSO-style vmclock support
-From: David Woodhouse <dwmw2@infradead.org>
-To: John Stultz <jstultz@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Peter Hilber
- <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org, 
- virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
- linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>, 
- virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>, "Christopher S.
- Hall" <christopher.s.hall@intel.com>, Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, Richard
- Cochran <richardcochran@gmail.com>,  Stephen Boyd <sboyd@kernel.org>, Xuan
- Zhuo <xuanzhuo@linux.alibaba.com>, Marc Zyngier <maz@kernel.org>,  Mark
- Rutland <mark.rutland@arm.com>, Daniel Lezcano <daniel.lezcano@linaro.org>,
- Alessandro Zummo <a.zummo@towertech.it>, Alexandre Belloni
- <alexandre.belloni@bootlin.com>
-Date: Wed, 26 Jun 2024 09:32:27 +0100
-In-Reply-To: <CANDhNCpi_MyGWH2jZcSRB4RU28Ga08Cqm8cyY_6wkZhNMJsNSQ@mail.gmail.com>
-References: <87jzic4sgv.ffs@tglx>
-	 <ea7c5eda8180904a6caf476c56973a06bd4b5e78.camel@infradead.org>
-	 <CANDhNCpi_MyGWH2jZcSRB4RU28Ga08Cqm8cyY_6wkZhNMJsNSQ@mail.gmail.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-Otk1zO0DqMplnS4FZWSz"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6274166302;
+	Wed, 26 Jun 2024 08:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719391001; cv=fail; b=V24ijpePFph77EmZqXxnpjQRDfH3jIEu/6wegUpreiyyuJofSQaB39L51VhYhgO6Uoa+t09+Zm8oPo7AaJgrSPmEbiCX/L5y8JBT/KhcrHAkLovhVHoSFO2cpVYV1i0uKVutbYdHwxGuENvz48V6jfoPqeK22j65aJw8Wxrw1TI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719391001; c=relaxed/simple;
+	bh=uMWfte1HNEihYk6Fl81tEhGpPdkT/8x0/B+vF1JyYso=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=rLCWjrqqcyqhKxsB7/KyXMg9tuZzj3GD2V+mYgnz1CSoDxSF3LZ5ocBmg9U6VNXYpnU7SkLG7s+iEceiGOmLyYBlWLTmk3kzFkHdVZkLomTstfPnL5yRdZ1JOJKnJg5F9S1t+VZIJp6r9GCz5gC8JQOVa7XPMHlaSCoFw3ssrf8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jJusXzxw; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719390999; x=1750926999;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=uMWfte1HNEihYk6Fl81tEhGpPdkT/8x0/B+vF1JyYso=;
+  b=jJusXzxwaSpD3YZHHToAPJtyRy4W2NtrEWumXz2JWffWVNcQ4GOuW18K
+   DPYDZtSOuUNOoaZIsWfRimUeQSfIDwcj35DLQ8hVeeZdgWCoTsSErM7bh
+   YqcXvUvWd3cOLMXuw60dn/O6CMBl+g4Z5Leu5JWcCHGwNNFIA//3U5cIv
+   DnDlhJpSetTRCHsH9DjSXRH5u5DMtKx2qHmUdRJb0kJWRbjiooDsEkWX6
+   oOwYloy80ptQScYyYi4UXlznyEcLlgu7OGJ3DXlm8CyxWjtTtX9ZhY95p
+   2d7FRha+8EmkBmQcxxQwwTCI/b+d4+/tLYA8JBeHKo/Edfzhr8Y4B1Q5C
+   w==;
+X-CSE-ConnectionGUID: voaeYD1ZQEO0I0RlDmbZ4g==
+X-CSE-MsgGUID: /2SdJLLAQS+gZyXBcboteQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="16277699"
+X-IronPort-AV: E=Sophos;i="6.08,266,1712646000"; 
+   d="scan'208";a="16277699"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 01:36:39 -0700
+X-CSE-ConnectionGUID: cE4bgsBVToG5jNAYvfPKAA==
+X-CSE-MsgGUID: 6Jygj6pdTCqZ0bY/oXxBHA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,266,1712646000"; 
+   d="scan'208";a="75140778"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Jun 2024 01:36:39 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 26 Jun 2024 01:36:39 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 26 Jun 2024 01:36:38 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 26 Jun 2024 01:36:38 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.43) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 26 Jun 2024 01:36:38 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dyCK6HVBC+q8muvrcv80jnkx2qXBwxj36a4n9cm4/5IaZZeebqzpWGS7TMnuQ4elcIY7qg6nGusf1SiJQp9gyAeWL2gyKOd1QXjbfEqDPrDkPP0hX++NGF2b61RUSNF1+wtXO5k/L6fS3fg2zeznR1EBLZT9+HTGg+CCfldnN8rx+Dpta9xEVkkgGp+eg4XB2GYw+cOST1Y3Ke2bTYn4SBnHntzX6LxhmhPr9qbBR9XeouxwxT71g2+iaOedl2Cmf1cvFFKysomguQG7AydiURhCH8pk28xvJhLWm6nFujTZ8LYPZ5iomYhO1CGtQNBkN5xBJdTUraw1wxHmCWyktQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UgMHpNrNpGP91j5z4USpDYerXWUv6BNRAm0Lvzjl96I=;
+ b=eUoXL+EwW52EKPGQvv+qHFkUpAh4W5iuJMpgs07P/OKsEoPCszzJ0Dw0di72LO60lsavghK8vE26f6B/TqCHhEuM3eDB9B80SKKzi2d9OFwSp4+AE5sjFKuJTR908RR35LjK69PIL9/00h0gfyrcCsll8w20kuwyefbd7I4SQ9taUchhQyx8w9G/b1MRwi1ru9GmXmEgbSH0fnq/hwWR6qwhq1PcMoqeTXvUjMVkccCv/W1HrIHeewD0pSSXgDr5NBxdcdms6RrrLx0F1BOcFVUROXqJmJVy2VlXw1V/dciI9n2Wc51uqOs555zId/6Ac6LDbSo2HIO9JLHXpn2sSA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6514.namprd11.prod.outlook.com (2603:10b6:208:3a2::16)
+ by BN9PR11MB5274.namprd11.prod.outlook.com (2603:10b6:408:133::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.34; Wed, 26 Jun
+ 2024 08:36:36 +0000
+Received: from IA1PR11MB6514.namprd11.prod.outlook.com
+ ([fe80::c633:7053:e247:2bef]) by IA1PR11MB6514.namprd11.prod.outlook.com
+ ([fe80::c633:7053:e247:2bef%5]) with mapi id 15.20.7698.025; Wed, 26 Jun 2024
+ 08:36:36 +0000
+From: "Vyavahare, Tushar" <tushar.vyavahare@intel.com>
+To: "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>
+CC: "bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "bjorn@kernel.org" <bjorn@kernel.org>, "Karlsson,
+ Magnus" <magnus.karlsson@intel.com>, "jonathan.lemon@gmail.com"
+	<jonathan.lemon@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"ast@kernel.org" <ast@kernel.org>, "daniel@iogearbox.net"
+	<daniel@iogearbox.net>, "Sarkar, Tirthendu" <tirthendu.sarkar@intel.com>
+Subject: RE: [PATCH bpf-next 2/2] selftests/xsk: Enhance batch size support
+ with dynamic configurations
+Thread-Topic: [PATCH bpf-next 2/2] selftests/xsk: Enhance batch size support
+ with dynamic configurations
+Thread-Index: AQHawk46+lWNr8k3vku2lFqbrLR50LHYyPmAgAD56BA=
+Date: Wed, 26 Jun 2024 08:36:36 +0000
+Message-ID: <IA1PR11MB6514E556BFDD10C0846D407A8FD62@IA1PR11MB6514.namprd11.prod.outlook.com>
+References: <20240619132048.152830-1-tushar.vyavahare@intel.com>
+ <20240619132048.152830-3-tushar.vyavahare@intel.com> <ZnsBF//QuXQ9Nyix@boxer>
+In-Reply-To: <ZnsBF//QuXQ9Nyix@boxer>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6514:EE_|BN9PR11MB5274:EE_
+x-ms-office365-filtering-correlation-id: d982ac8b-4f39-460a-8845-08dc95bb1742
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230038|376012|1800799022|366014|38070700016;
+x-microsoft-antispam-message-info: =?us-ascii?Q?kwIFHO6J6b0OKkqa5lPHDccRzESkSP6ddeM3vy8iPORT7riwSFpzbY2syEIw?=
+ =?us-ascii?Q?tb6r5onEWL7O8FHS3rDy8KZoJNA1SoV1dqswDtNwlwDWTj9NiICsfvBhfTor?=
+ =?us-ascii?Q?xiiJKwHvKeg+9kwbwb6/LuOCImEWcytd20B/gxoInn0As49DFco8hIDeux7Z?=
+ =?us-ascii?Q?/MW1e3/0H58AmRzgD/Git/CjgbOhUzqigfYwzXZOEXXbVke931Q68twIHyhn?=
+ =?us-ascii?Q?BDkAAkU8Kf9I7go6nhrjnLitzIVnGACqDONKOuSM27XuRVuIC8+jwiVav36w?=
+ =?us-ascii?Q?WJkIZolzQhvswDGvqFp2A+8YmwtKPo6XWi0AihDKIFfapAytw3fZRf3+V8Rb?=
+ =?us-ascii?Q?cCWE/VispJ1qaeK5UJAR+hMgw/LNLJAxAGB/lq5Q9lWPNGzpG22y0HE+ybEs?=
+ =?us-ascii?Q?sCOzMLl7rGxjRoaGx7hFD9Iw8yuyJbrfN7szhcqCph5vBjKXh7qN/OYz2wdd?=
+ =?us-ascii?Q?IQ9ZGmXuTMSUhx9MTIiBGOElkzX1OkPa38ijf8mJikrXivp0gcGCEziRYN8b?=
+ =?us-ascii?Q?NVN2T534sYLT+aQ4E/lxdHE5sbysKMC0TWQLK8YELtsixULEmboXnT1iHwYZ?=
+ =?us-ascii?Q?5nY/Nbs+Drxgt+zXl78sC3Jg20Jq1a5Shho6sQ81adaRasQUMZpWfuKygR2b?=
+ =?us-ascii?Q?JRyIHFql+n/+kz0rYi0qEqB4G6D2Vh68T8xw0yESnMHbxFMZXQFV5NRwOSML?=
+ =?us-ascii?Q?S40MXPL/bHJXJiAivpyReot6PgtmPv5wbe4lqbeRwVNxD2UBsGAfmc4QvT2L?=
+ =?us-ascii?Q?c9NXzPIE+y6qHbzBXk/qVuyBKuo186BaWvwNpDyRwexmIyInvnsrpgTMYsiE?=
+ =?us-ascii?Q?cja2rAlt0q+9kO+uLHsTnmKcAuahYGmClq3tLiXZ/1bYF7wbargVVvt0xAiV?=
+ =?us-ascii?Q?laj0iAbohQsxnw6udingXGQBbGdbJCuSGM9yqCNC2oY2k55OJDL/psWeCV4e?=
+ =?us-ascii?Q?vWa1S+tw8uIlYtjej9pv7ZRfd/q4z6AKZB/pT9ViqC0oszyxJdimTJjcO3PC?=
+ =?us-ascii?Q?EQLQJrWjl0IoP7Iq7rvH+5ftwS2asSCfXbZj3Js1hKFOwAdVMf0dP1sd/y/k?=
+ =?us-ascii?Q?NNfPPgIDYQ5It+HlTtPxM2SAnhRQbDWe2RKKaeJsuNjxCtQaaADL2n7R83lH?=
+ =?us-ascii?Q?mjT/2UKZFAmiog61nxspQVmPgtNzEzAHsgU04upJAtF0oQwHfVPSUtbRWZM3?=
+ =?us-ascii?Q?WW5P8RY5d/BUIAc23U8BpOyQrbkG8MVUu9LRFj5lKW1PRrOOMjT1wh0MJCJv?=
+ =?us-ascii?Q?8mc82ss4hRtijm8pvFzJAMldzsU7nL1+pCh+5Z+MPjS2d0P2VZrGj/tefEBw?=
+ =?us-ascii?Q?G/yVbnO/1B0mDeYqPu7kd3qfMVdihW/3hN55rUGmtZFN2w+JZZOB1mK1G4gZ?=
+ =?us-ascii?Q?sURBAuw=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6514.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230038)(376012)(1800799022)(366014)(38070700016);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ZPUdwjIQJDtWioPHxaxrcfX0WOVIRzwuIQv+IpEwr+nD3q5GQsXv/ise7Ns6?=
+ =?us-ascii?Q?oE+qywzJBSwar3u57X4glrdJAE9MuXgiusUyBGTUYXjnQwjArHMhd9l7BZrJ?=
+ =?us-ascii?Q?S4sJVf1dIuR0xbq747o8V3l1XKrOwcVzKrUVzOSm1oOBJ5MdkfzD6UdfVzNq?=
+ =?us-ascii?Q?Oc5L0RFoyqxvLVxovbkvVgsnDw79eAx36YvVksDRfZYl3SG9AKgfeCKFfW33?=
+ =?us-ascii?Q?lqVFsSFPYD2ptvSgDxJlSGUAFBPWJy4YDOSruv5lZbI4xCKelJu0MM9+cKM1?=
+ =?us-ascii?Q?De/nabSWeV+DqJu5L3z/Hbwkx3AyiaiY/qYniBWr8fr+0frsAqRsXvbGBRnA?=
+ =?us-ascii?Q?tIR0y8VXJD8JB6cUB9Q+QxiLHt1EKtpDfoeA4xWi36GoEHKLXsSqJBUzhetk?=
+ =?us-ascii?Q?DpBOkCWvw/RbDd1f30iXy5Z86Yp94SjnKA8vLPuitLsI9hUnD3McLnyljAQk?=
+ =?us-ascii?Q?Uf7t4DeMnMQMHtqiRXG1DLqF0ZecgmsinNYQxt9QMPSvgKiJKqNbs77tzXzC?=
+ =?us-ascii?Q?ikuzA2ReF5EBvN75upLqfsMNT8ZpRR6Qw9VbM5G0rwOVGr0l59DTvFtlHv+M?=
+ =?us-ascii?Q?RzcELDWX4mI3lSWW95hThTI5Hp3tGaEGFNN9kpw1cun+JWfHLH0hcPprzkyo?=
+ =?us-ascii?Q?1V9UKCAqdtgkDvQOdvpbDHsOYDqb291fQEeCgxveBSg1s5Bzzz63uZ4Sk6Ly?=
+ =?us-ascii?Q?JL80SHd/B5LS7FhUSts8QPWjU9K+deOjBcMj4dGKjsrxHbPMiOhD2gQSl8M+?=
+ =?us-ascii?Q?m1BUmyXsLqi58DRkuviWxnfDXIbeyj9SPw4UKbn1fXORYqu4vZ6FySF60ERE?=
+ =?us-ascii?Q?4twNCAoxDRFSFQVXTxXz5AnAu39cHWCCAMEvQaVVN6DAit9yCbYXr7j53Vhw?=
+ =?us-ascii?Q?bcCVY6mUx3M4OfaQpmdmHo6FiASfjRUxHI3RKPa+yAd7LBE4lSF6epxcrChN?=
+ =?us-ascii?Q?jCVe+llnrazxwTAuTZvdGRB4hEW1x9hn0Jrs6XNBxbPj7XnCo/TC5xagOn9U?=
+ =?us-ascii?Q?yO1vOIkFpGr/HfRZG5IJBw/+LEjPNQNeFP+qnUr7AHzNdXj3qzviUKP86YRj?=
+ =?us-ascii?Q?SrgyX0ExPkAMWPbEHycg++pdzw6eHYVzd3dR8te6tPSk9GtOoldU2Ybm5O+c?=
+ =?us-ascii?Q?jc4mf6Jh2yyvf0Ci+cp5bTQLn/glT9Bkx8keyaTJ4sx5IOohcrog8uMZ8OlS?=
+ =?us-ascii?Q?iSg0FHEpFYxPuUPVIqTxLrmrMZOFBAcr/bu8pHa46mwZtqZiH07yt4rtvWTG?=
+ =?us-ascii?Q?y3yP+630TRC3TzSH3/dzEbCHEtd68d8qwnIWEBuwmS/1vWoJpQxhf8Rfx0G/?=
+ =?us-ascii?Q?KqbCzjBTcF60AUv2dSYqI7rROChXimOKhfmyF0NzXHjFBalmHBbfNDed9ft7?=
+ =?us-ascii?Q?I2SuFAvZsOIUKBh3b4ta9aGuTlPGD7hDeMfxGWK4Qeskh4gvWVMcnHogR2ZU?=
+ =?us-ascii?Q?XNt5RFpqZnO7G+4UEU8sBJKrFhykXLYzFP/TGZzTt/MmwTxQCdr9NfoWZ25U?=
+ =?us-ascii?Q?I+lIhzyThB4kwOH8lA7tm34nXg0JPej/73CuLbGUnRFIrAIRu8/9lfig2mT7?=
+ =?us-ascii?Q?8gR3L+i4nzMe4x8ao3nlIC/m+aFDWm1FSsrStgKp?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6514.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d982ac8b-4f39-460a-8845-08dc95bb1742
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jun 2024 08:36:36.0864
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: blN1QOqLWlrUiryiDfPnoTVpjEPTvtUOmABII7LF2y5hW9MGTjoZaIaw4B0ukOoofljPTuCCxnRS1zzvcyz1QWB+l2BAPPWyPqcKP2AXpq8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5274
+X-OriginatorOrg: intel.com
 
 
---=-Otk1zO0DqMplnS4FZWSz
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2024-06-25 at 15:22 -0700, John Stultz wrote:
-> On Tue, Jun 25, 2024 at 2:48=E2=80=AFPM David Woodhouse <dwmw2@infradead.=
-org> wrote:
-> > On Tue, 2024-06-25 at 23:34 +0200, Thomas Gleixner wrote:
-> > > On Tue, Jun 25 2024 at 20:01, David Woodhouse wrote:
-> > > > From: David Woodhouse <dwmw@amazon.co.uk>
-> > > >=20
-> > > > The vmclock "device" provides a shared memory region with precision=
- clock
-> > > > information. By using shared memory, it is safe across Live Migrati=
-on.
-> > > >=20
-> > > > Like the KVM PTP clock, this can convert TSC-based cross timestamps=
- into
-> > > > KVM clock values. Unlike the KVM PTP clock, it does so only when su=
-ch is
-> > > > actually helpful.
-> > > >=20
-> > > > The memory region of the device is also exposed to userspace so it =
-can be
-> > > > read or memory mapped by application which need reliable notificati=
-on of
-> > > > clock disruptions.
-> > >=20
-> > > There is effort underway to expose PTP clocks to user space via VDSO.
-> >=20
-> > Ooh, interesting. Got a reference to that please?
-> >=20
-> > > =C2=A0Can we please not expose an ad hoc interface for that?
-> >=20
-> > Absolutely. I'm explicitly trying to intercept the virtio-rtc
-> > specification here, to *avoid* having to do anything ad hoc.
-> >=20
-> > Note that this is a "vDSO-style" interface from hypervisor to guest via
-> > a shared memory region, not necessarily an actual vDSO.
-> >=20
-> > But yes, it *is* intended to be exposed to userspace, so that userspace
-> > can know the *accurate* time without a system call, and know that it
-> > hasn't been perturbed by live migration.
+> -----Original Message-----
+> From: Fijalkowski, Maciej <maciej.fijalkowski@intel.com>
+> Sent: Tuesday, June 25, 2024 11:11 PM
+> To: Vyavahare, Tushar <tushar.vyavahare@intel.com>
+> Cc: bpf@vger.kernel.org; netdev@vger.kernel.org; bjorn@kernel.org;
+> Karlsson, Magnus <magnus.karlsson@intel.com>;
+> jonathan.lemon@gmail.com; davem@davemloft.net; kuba@kernel.org;
+> pabeni@redhat.com; ast@kernel.org; daniel@iogearbox.net; Sarkar,
+> Tirthendu <tirthendu.sarkar@intel.com>
+> Subject: Re: [PATCH bpf-next 2/2] selftests/xsk: Enhance batch size suppo=
+rt
+> with dynamic configurations
 >=20
-> Yea, I was going to raise a concern that just defining an mmaped
-> structure means it has to trust the guest logic is as expected. It's
-> good that it's versioned! :)
+> On Wed, Jun 19, 2024 at 01:20:48PM +0000, Tushar Vyavahare wrote:
+> > Introduce dynamic adjustment capabilities for fill_size, comp_size,
+> > tx_size, and rx_size parameters to support larger batch sizes beyond
+> > the
+>=20
+> you are only introducing fill_size and comp_size to xsk_umem_info. The la=
+tter
+> two seem to be in place.
+>=20
 
-Right. Although it's basically a pvclock, and we've had those for ages.
+I will do it.
 
-The main difference here is that we add an indicator that tells the
-guest that it's been live migrated, so any additional NTP/PTP
-refinement that the *guest* has done of its oscillator, should now be
-discarded.
+> > previous 2K limit.
+> >
+> > Update HW_SW_MAX_RING_SIZE test cases to evaluate AF_XDP's
+> robustness
+> > by pushing hardware and software ring sizes to their limits. This test
+> > ensures AF_XDP's reliability amidst potential producer/consumer
+> > throttling due to maximum ring utilization.
+> >
+> > Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
+> > ---
+> >  tools/testing/selftests/bpf/xskxceiver.c | 26
+> > ++++++++++++++++++------  tools/testing/selftests/bpf/xskxceiver.h |
+> > 2 ++
+> >  2 files changed, 22 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/bpf/xskxceiver.c
+> > b/tools/testing/selftests/bpf/xskxceiver.c
+> > index 088df53869e8..5b049f0296e6 100644
+> > --- a/tools/testing/selftests/bpf/xskxceiver.c
+> > +++ b/tools/testing/selftests/bpf/xskxceiver.c
+> > @@ -196,6 +196,12 @@ static int xsk_configure_umem(struct ifobject
+> *ifobj, struct xsk_umem_info *umem
+> >  	};
+> >  	int ret;
+> >
+> > +	if (umem->fill_size)
+> > +		cfg.fill_size =3D umem->fill_size;
+> > +
+> > +	if (umem->comp_size)
+> > +		cfg.comp_size =3D umem->comp_size;
+> > +
+> >  	if (umem->unaligned_mode)
+> >  		cfg.flags |=3D XDP_UMEM_UNALIGNED_CHUNK_FLAG;
+> >
+> > @@ -265,6 +271,10 @@ static int __xsk_configure_socket(struct
+> xsk_socket_info *xsk, struct xsk_umem_i
+> >  		cfg.bind_flags |=3D XDP_SHARED_UMEM;
+> >  	if (ifobject->mtu > MAX_ETH_PKT_SIZE)
+> >  		cfg.bind_flags |=3D XDP_USE_SG;
+> > +	if (umem->fill_size)
+> > +		cfg.tx_size =3D umem->fill_size;
+> > +	if (umem->comp_size)
+> > +		cfg.rx_size =3D umem->comp_size;
+>=20
+> how is the fq related to txq ? and cq to rxq? shouldn't this be fq-rxq an=
+d cq-
+> txq. What is the intent here? In the end they are the same in your test.
+>=20
 
-It's also designed to be useful in "disruption-only" mode, where the
-pvclock information isn't actually populated, so *all* it does is tell
-guests that their clock is now hosed due to live migration.
+Yes, you are correct, updating code accordingly.
 
-That part is why it needs to be mappable directly to userspace, so that
-userspace can not only get a timestamp but *also* know that it's
-actually valid. All without a system call.
+> >
+> >  	txr =3D ifobject->tx_on ? &xsk->tx : NULL;
+> >  	rxr =3D ifobject->rx_on ? &xsk->rx : NULL; @@ -1616,7 +1626,7 @@
+> > static void xsk_populate_fill_ring(struct xsk_umem_info *umem, struct
+> pkt_stream
+> >  	if (umem->num_frames < XSK_RING_PROD__DEFAULT_NUM_DESCS)
+> >  		buffers_to_fill =3D umem->num_frames;
+> >  	else
+> > -		buffers_to_fill =3D XSK_RING_PROD__DEFAULT_NUM_DESCS;
+> > +		buffers_to_fill =3D umem->fill_size;
+> >
+> >  	ret =3D xsk_ring_prod__reserve(&umem->fq, buffers_to_fill, &idx);
+> >  	if (ret !=3D buffers_to_fill)
+> > @@ -2445,7 +2455,7 @@ static int testapp_hw_sw_min_ring_size(struct
+> > test_spec *test)
+> >
+> >  static int testapp_hw_sw_max_ring_size(struct test_spec *test)  {
+> > -	u32 max_descs =3D XSK_RING_PROD__DEFAULT_NUM_DESCS * 2;
+> > +	u32 max_descs =3D XSK_RING_PROD__DEFAULT_NUM_DESCS * 4;
+> >  	int ret;
+> >
+> >  	test->set_ring =3D true;
+> > @@ -2453,7 +2463,8 @@ static int testapp_hw_sw_max_ring_size(struct
+> test_spec *test)
+> >  	test->ifobj_tx->ring.tx_pending =3D test->ifobj_tx-
+> >ring.tx_max_pending;
+> >  	test->ifobj_tx->ring.rx_pending  =3D test->ifobj_tx-
+> >ring.rx_max_pending;
+> >  	test->ifobj_rx->umem->num_frames =3D max_descs;
+> > -	test->ifobj_rx->xsk->rxqsize =3D max_descs;
+>=20
+> rxqsize is only used for setting xsk_socket_config::rx_size ?
+>=20
 
-The critical use cases are financial systems where they incur massive
-fines if they submit mis-timestamped transactions, and distributed
-databases which rely on accurate timestamps (and error bounds) for
-eventual coherence. Live migration can screw those completely.
+Initially, we used the rxqsize field from the xsk_socket object, directly
+assigning max_descs to it and then using this value to set cfg.rx_size.
+However, we are now shifted to a different approach for test,  where we are
+setting cfg.rx_size based on the comp_size from the umem object, provided
+that umem->fill_size is true.
 
-I'm open to changing fairly much anything about the proposal as long as
-we can address those use cases (which the existing virtio-rtc and other
-KVM enlightenments do not).
+> > +	test->ifobj_rx->umem->fill_size =3D max_descs;
+> > +	test->ifobj_rx->umem->comp_size =3D max_descs;
+> >  	test->ifobj_tx->xsk->batch_size =3D
+> XSK_RING_PROD__DEFAULT_NUM_DESCS;
+> >  	test->ifobj_rx->xsk->batch_size =3D
+> XSK_RING_PROD__DEFAULT_NUM_DESCS;
+> >
+> > @@ -2461,9 +2472,12 @@ static int testapp_hw_sw_max_ring_size(struct
+> test_spec *test)
+> >  	if (ret)
+> >  		return ret;
+> >
+> > -	/* Set batch_size to 4095 */
+> > -	test->ifobj_tx->xsk->batch_size =3D max_descs - 1;
+> > -	test->ifobj_rx->xsk->batch_size =3D max_descs - 1;
+> > +	/* Set batch_size to 8152 for testing, as the ice HW ignores the 3
+> lowest bits when updating
+> > +	 * the Rx HW tail register.
+>=20
+> i would wrap the comment to 80 chars but that's personal taste.
+>=20
 
-> I'd fret a bit about exposing this to userland. It feels very similar
-> to the old powerpc systemcfg implementation that similarly mapped just
-> kernel data out to userland and was difficult to maintain as changes
-> were made. Would including a code page like a proper vdso make sense
-> to make this more flexible of an UABI to maintain?
+I will do it.
 
-I think the structure itself should be stable once we've bikeshedded it
-a bit. But there is certainly some potential for vDSO functions which
-help us expose it to the user...
-
-This structure exposes a 'disruption count' which is updated every time
-the TSC/counter is messed with by live migration. But what is userspace
-actually going to *compare* it with?
-
-It basically needs to compare it with the disruption count when the
-clock was last synchronized, so maybe the kernel could export *that* to
-vDSO too, then expose a simple vDSO function which reports whether the
-clock is valid?
-
-The 'invalid' code path could turn into an actual system call which
-makes the kernel (check for itself and) call ntp_clear() when the
-disruption occurs. Or maybe not just ntp_clear() but actually consume
-the pvclock rate information directly and apply the *new* calibration?
-
-That kind of thing would be great, and I've definitely tried to design
-the structure so that it *can* be made a first-class citizen within the
-kernel's timekeeping code and used like that.
-
-But I was going to start with a more modest proposal that it's "just a
-device", and applications which care about reliable time after LM would
-have to /dev/vmclock0 and mmap it and check for themselves. (Which
-would be assisted by things like the ClockBound library).
-
-
-
---=-Otk1zO0DqMplnS4FZWSz
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwNjI2MDgzMjI3WjAvBgkqhkiG9w0BCQQxIgQgZ/Nk13bH
-P4Q45gq19HJ//DAJbV7MnSoygUsJZjMC7UMwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCYM49vYhr1YjUs1p7K7xl8RE+CjO0/16RT
-h+EFYCyN2fRuE9m2AsDzyz59Bcg5TdxKliUZkg3cQFOZs7YCWBt4hkE6NqLVnS1qnMxFxI6rnU/S
-30VW30l1UfL/EmP7hfuR9IjZVj/75lSY8R0SOgv89117hRJHWdjbkiiV2LRB4jr7EevWmtknxTSi
-XZ2iejXkN18QiNU3A0Azz0OJZgFmqZKXEuMSWB6rFQ7tOoowpDl4aL06VfHyDE37Rdz78DASp7sM
-lyBE6fY3N3WVWtGYG8uwKqaOpd3IsC6KU1hxGsLXRKfpLHM2CTfvsQRhNvTvvgxs0g7t+cq/8FsQ
-V8TDEgBH5DdEdSk/QlyBV8txF5hRGe19ZTC2VZfLVA6XJqKKr9Ml7ZommT2TAYI3YRsQinsQuQt4
-6Gkd+c1KvK0QHys6o9QzXLVZ2Z8utFuGDv7JSBDxX+Qk1ix2y2SWRogwycEYcaMK8CwcFrZrEYCy
-GuC0KbG32SXT27NFIqco5o5VFy6ZhYQXCBFXbRPdIh9XW2qIlb8Qv1LLVGx730DQ+RaPe6iXD+nj
-pyuaVIafzypheJIlusmVKgwmqoDxy864vyilK+hd+w6i/xbMkLdrvi0HsW9Ql9pqcPHzbqQNzhJd
-Ezdj5ESdTlkBFW5Lw5UvY9Gw+kFkVlqoVv2tDhybhwAAAAAAAA==
-
-
---=-Otk1zO0DqMplnS4FZWSz--
+> > +	 */
+> > +	test->ifobj_tx->xsk->batch_size =3D test->ifobj_tx->ring.tx_max_pendi=
+ng
+> - 8;
+> > +	test->ifobj_rx->xsk->batch_size =3D test->ifobj_tx->ring.tx_max_pendi=
+ng
+> - 8;
+> > +	pkt_stream_replace(test, max_descs, MIN_PKT_SIZE);
+> >  	return testapp_validate_traffic(test);  }
+> >
+> > diff --git a/tools/testing/selftests/bpf/xskxceiver.h
+> > b/tools/testing/selftests/bpf/xskxceiver.h
+> > index 906de5fab7a3..885c948c5d83 100644
+> > --- a/tools/testing/selftests/bpf/xskxceiver.h
+> > +++ b/tools/testing/selftests/bpf/xskxceiver.h
+> > @@ -80,6 +80,8 @@ struct xsk_umem_info {
+> >  	void *buffer;
+> >  	u32 frame_size;
+> >  	u32 base_addr;
+> > +	u32 fill_size;
+> > +	u32 comp_size;
+> >  	bool unaligned_mode;
+> >  };
+> >
+> > --
+> > 2.34.1
+> >
 
