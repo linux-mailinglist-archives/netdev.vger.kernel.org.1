@@ -1,61 +1,57 @@
-Return-Path: <netdev+bounces-107470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F417091B1E8
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 00:01:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CA9091B1F0
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 00:04:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFE17284FB3
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 22:01:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C2EB1C21B5D
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 22:04:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55FA01A2FC8;
-	Thu, 27 Jun 2024 22:00:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043531A073B;
+	Thu, 27 Jun 2024 22:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ggioOR6Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7y4IMsZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3DF1A2FC5;
-	Thu, 27 Jun 2024 22:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F8519EEA9;
+	Thu, 27 Jun 2024 22:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719525634; cv=none; b=mEKP4enoLgHdnQb9kWLq7PjlWKMqwOnWHZMQV2s/WMNUOxNHkAlwM3SMZYpI4RP+liMvWRPHSmPVV/VHz5gahSrHXtenl8u11N+kWk5T5kSJfHSRf9cxZ3NSUekzuS8HZxSkl/VVfYn5VVKhwwpcXvo7I0Nq/YvJNP7VBgzRuAY=
+	t=1719525837; cv=none; b=cpT+r5MkzIeZ9JL9XQ7B9UG7Pw1kx+NugpFTY+1E1kI9NxxyQT1Rc2NSFJGoMjZ41VXqMgLxx/LpE6xc1+EBSqnbD/OUh+tkctuTbQydeJ4taa2LpOvsZUDqZnYRGu+BWypuaOdEhpUPzubsqQ6qwjikSJ2tVvTqrt0aR/bZy+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719525634; c=relaxed/simple;
-	bh=HyDAybxDassbOUInE5iWl69jAslSz8hAgZ+lH92GS3U=;
+	s=arc-20240116; t=1719525837; c=relaxed/simple;
+	bh=RiFKoqVaODr62ak+BrlloaLP2+NvVq9fXgjAQ/mLJBI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VsxlFEb1ejCMeZeVo00uxyY/4V0pB2UpnealERSxJ8NeG1FbR4E1qcLLmMz5GO9rk5c2eFYlGMGk4oQha8wuURh9pDsnDlp6KEu7AkS6XF9jFezrU+Kdkb73d+bVJhaC8dYShk7RJnwBglcgjV95rfPRkNoh4fGXhs8iaKbcFLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ggioOR6Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05A4FC4AF07;
-	Thu, 27 Jun 2024 22:00:32 +0000 (UTC)
+	 MIME-Version:Content-Type; b=XQenpgl6/fpOHBhc03ZNrWGdxLCqMo1KpZWeSJotn2H23ezu70iu3CHJ4JHeeGaDSd+cltY1VxGSDmqeTjBZtyHEDhMuovKiRGlpDKWa2Hqot9DVjsDRjqP78+ttpZVM7v9yTqyjox25zIlAWT1K8AfLPiq1ofaRgGdTm5ajvmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X7y4IMsZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED92DC2BBFC;
+	Thu, 27 Jun 2024 22:03:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719525633;
-	bh=HyDAybxDassbOUInE5iWl69jAslSz8hAgZ+lH92GS3U=;
+	s=k20201202; t=1719525837;
+	bh=RiFKoqVaODr62ak+BrlloaLP2+NvVq9fXgjAQ/mLJBI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ggioOR6ZQ+QGr+Uzh+1yak/9bFMPLOJE5yIylqEXQY6J772vAd6TQpygzJJmgxmm7
-	 peJL8WCxQtpjJjH7Pm8eV7IZnmBWMcKcSAGdpJcHLNusTOBbAGbGASRQbNw9HMM3+J
-	 1X8AmiFdKNQMEVUgnUfpo/HaP1NIGP1EHL/2gmgHCZHGsBYpeD/5blqsUvcZvzv+lP
-	 g7GdIJHR5QrvfoVZQb9rHcbql5zd1m3yAQugBtwtxmxydVYhqTUCqaF+efIQaHpWXO
-	 Omi52FxrJ6X2kXkps7hUTvD92u8RPrdeM5A/RC4PosJXEHvJ+CrxZ2Sx24dCkXEVBS
-	 hqEof0No5cOuQ==
-Date: Thu, 27 Jun 2024 15:00:32 -0700
+	b=X7y4IMsZJ4j8n65g/jptu+TXNl2QhY9PDj5zxAJinwgDrCae2TUFjXXKsJYYX1+9V
+	 VWSRJQ9/gx6w26QhDSGvtT3NkSRdBNskZOTA3Qk1AijrB/virWfwlok22VCAY/Nvmg
+	 pSroOmWzR31cv0Xu0HrE9J9xi+ABEQm24EsBrF4V2HTnJAzsbpLzd+3MHuqT/yYWdX
+	 qxEoW3ZRhOfaqe6UlVb/N6sYD9anJoUXXWjSJ4j+4rzxr5sKIlL+Y4q1iS9SkCec/2
+	 cCQmPIhXBotTPhLwI2niOQi+PmekjK/ynqDpUUtYLfnNKFuGGfYeX2LLQwwnySyjR7
+	 8BV46ZD27VsQA==
+Date: Thu, 27 Jun 2024 15:03:55 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Florian Fainelli
- <f.fainelli@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean
- <olteanv@gmail.com>, Woojung Huh <woojung.huh@microchip.com>, Arun Ramadoss
- <arun.ramadoss@microchip.com>, UNGLinuxDriver@microchip.com,
- linux-kernel@vger.kernel.org, kernel@pengutronix.de, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v1 1/1] net: dsa: microchip: add regmap_range
- for KSZ9563 chip
-Message-ID: <20240627150032.7b97fc84@kernel.org>
-In-Reply-To: <Zn1eeYwYgU2ocWHz@pengutronix.de>
-References: <20240627123911.227480-1-o.rempel@pengutronix.de>
-	<Zn1eeYwYgU2ocWHz@pengutronix.de>
+To: Yajun Deng <yajun.deng@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Jiri Pirko
+ <jiri@nvidia.com>
+Subject: Re: [PATCH net-next v2] net: core: Remove the dup_errno parameter
+ in dev_prep_valid_name()
+Message-ID: <20240627150355.023acba3@kernel.org>
+In-Reply-To: <20240627134131.3018-1-yajun.deng@linux.dev>
+References: <20240627134131.3018-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,10 +61,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 27 Jun 2024 14:43:37 +0200 Oleksij Rempel wrote:
-> Please ignore this patch, it was send by accident.
+On Thu, 27 Jun 2024 21:41:31 +0800 Yajun Deng wrote:
+> netdev_name_in_use() in dev_prep_valid_name() return -EEXIST makes
+> more sense if it's not NULL, but dev_alloc_name() should keep the
+> -ENFILE errno.
+> 
+> There are three callers to dev_prep_valid_name(), the dup_errno
+> parameter is only for dev_alloc_name, it's not necessary for the other
+> callers.
+> 
+> Remove the dup_errno parameter in dev_prep_valid_name() and add a
+> conditional operator to dev_alloc_name(), replace -EEXIST with
+> -ENFILE.
 
-It fooled patchwork tho :(
+Let me be more direct this time - I like this code the way I wrote it.
+Please leave it be.
 -- 
-pw-bot: cr
+pw-bot: reject
 
