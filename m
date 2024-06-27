@@ -1,138 +1,107 @@
-Return-Path: <netdev+bounces-107398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28C2991AD27
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 18:49:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C28E91AD50
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 18:58:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5DC8B23A93
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:49:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46F571F23DE8
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:58:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6CAD1991A9;
-	Thu, 27 Jun 2024 16:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A14B199EA9;
+	Thu, 27 Jun 2024 16:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="icXFnF0X"
+	dkim=pass (2048-bit key) header.d=woks-audio.com header.i=@woks-audio.com header.b="lt3HoQar"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0.woks-audio.com (mx0.woks-audio.com [88.99.2.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E375E56A
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 16:49:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FEC199E95;
+	Thu, 27 Jun 2024 16:58:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=88.99.2.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719506947; cv=none; b=msNeH6erd/6/iujB4vAiUeRVS0NpWksClBMwQzr1pD+JJW3JeqfqQQOadi+bRz37PJQ8hzShPH95ywrv6iKBMjBJ7f1cKy1IvNFL092eCwb5BT5wK1XRS2dcMWqhJNFp4dqOp2o6l9FgY5GcGNpxU7b5GLQi/DK4O7w+mtbRRLE=
+	t=1719507486; cv=none; b=hiIuyCM9qVR9QveTtO3NWn5gpmEnU+po959ZwboZ5eO9c2wheRQ2ZXPWRxz/mVzuOhlvNpwoHGJc6wUOUvB81PAbnP7QgE7J5EttT8js51j+rn5RNMZ8mLWCjAiOyWE4b3QeUFOXi95NGyTGZJZrFITo0EU9NztIBpYApdiIFKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719506947; c=relaxed/simple;
-	bh=c/4fRIUAemDzS10rHlCgLgOeocikZUevNTeZx2WBQIY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GDc5aH9gJvq0byHlc1Nc9zV3biomiHHmp9xW+ruZweRGjiJHjNlDESlKW7LcS869ANCV/Xc1NO71q6lkDYOkE+Be1CzOH7p+s9gVeSzvny3PqUefiwCJRP7i0HwYcYdmwTuB91llmTJWo+LIn+pUS5Korilsp9OvtO0Ol57fcno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=icXFnF0X; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7041053c0fdso4966160b3a.3
-        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 09:49:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1719506945; x=1720111745; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xxcFEOlgMZdT3jwSPBKvbM2Hel/+xTILb1M8DFKl18Y=;
-        b=icXFnF0XlfKUfiIZ/77bLs1A3mXy6ePVUmXg12nm7iyhegg3eaUYMQrRzMeNFYSCiV
-         cBFQT39vLeCEZ87AkDiE5osHoixilxUyya7iFfh0fRE+trmHKp3ZG5YpG/sOG7BGZxSS
-         K8FYkC3F+cPwOqYVvHyCTQ80NSK47YsND442ERHkNxEsNYdBxrE40o+cT5wZFGSxw/xo
-         KLUY6eEa1EJl3gJ4WmfgbsWoyt3F3AmocCwLdsQ3VISzaxZ76fSwYRWTObHmrnXhxkuW
-         3pu8yEm516lxU5V1HE7Z7b3nYO4k66kQMLICbuUdNxn7SSQZUQ0H8SnlzagkhhwQnbbL
-         Vrog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719506945; x=1720111745;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xxcFEOlgMZdT3jwSPBKvbM2Hel/+xTILb1M8DFKl18Y=;
-        b=bC4O2vimnBG5ekYwHE6u8pTrHKojRxYymr7mDHbJKrj5m+1idsGWUQfXliFk+1xSXW
-         atGyD/PtOnuQZ1TzRQz4zeLaJ9p235MHq6UMaf5/uAp2TIcWdC+sp3U7aBkrdIEmX/LZ
-         po43nElVgVgLK8+Mou/hA/8WHhoj2/9vNjYfdZaZoEnK96v913VeyzVSKz+TYeNw7tkV
-         Z0nERvLsxXTCIIKK/T6D0iDTPz0/krZpDZFnw/Qh/n+YK4ZKKWyjPp8lktQ7FS0ZajcB
-         9JTOW0c6WthIao3OAcRF3M5Vw9AVzD6GszujoSKHlAsI0hQJCqatswaF1pqBut18DbYn
-         jUNA==
-X-Forwarded-Encrypted: i=1; AJvYcCXPK1NJNPqfNZnuzGf3U9NF5W1wGtmSlJf1E3VXXQYaOueYFSZbARKL3ogCC7UAPUoVhqwSnt34Ww9xwDy9bcFZNxdHQh1u
-X-Gm-Message-State: AOJu0Yx0NudGNWkMwEFnRHTBCHPAJBlGR3gxzG0pbYrq3+HgJjGnZDMK
-	oyb2GijCU7xW/GSNRqRWxhV8aWW5vjb6Sv1jMDhs5y7FxHy/ZaRilNFSF7Hh/c1IVFZNJgZyjgo
-	1zudVRAi+ms5t/zSVw0T+KOyFIv8xg5wyAI+xkQ==
-X-Google-Smtp-Source: AGHT+IGuCIcGgabVY++a4Em4rrMpQkk20usuUoDxNeZRMIEMY4XnKjgZq6XSJV5vH34NogeLq+vOfcgAhpt92ibkLbw=
-X-Received: by 2002:a05:6a20:3d8b:b0:1be:c4e6:ed40 with SMTP id
- adf61e73a8af0-1bec4e6ee22mr5759856637.51.1719506945413; Thu, 27 Jun 2024
- 09:49:05 -0700 (PDT)
+	s=arc-20240116; t=1719507486; c=relaxed/simple;
+	bh=JUrDz0DUi7tTCIkG+LvEykVWxfjltHMCEk5nyXOxBE0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N5xBP1lkmZrM7nW6HtGWkAS5qA0pLLsXrV5cIejJW/tmYCh/dhKyozovvnTPkZtTETHyWYI3jwktzBckdCD3EbZJMWmQPoMdPRFTURPNXnkfj3h4FYC8Ke2LxNMmorUSFyl7vCT9txmETbixH7PS8TlwdAbPY8baPT6X9A3z80w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=woks-audio.com; spf=pass smtp.mailfrom=woks-audio.com; dkim=pass (2048-bit key) header.d=woks-audio.com header.i=@woks-audio.com header.b=lt3HoQar; arc=none smtp.client-ip=88.99.2.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=woks-audio.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=woks-audio.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=woks-audio.com;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:from:from:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=woks; bh=PenMp7vS8XlisAM41TFu
+	zVihkYFaLUEzYIJvh+AQm4M=; b=lt3HoQarHo9VA33X7Km44EYZTJn6MR3RS5ju
+	rGkivuCCAtTecsXv27sxu/+Ly0vBKd54+wsKHEPeoo/fdlVvYH/+9ZX/69bFcP8+
+	ID4IeSVKR04lRSgCMQMUrJ8gOMNpwEbnpJdy/PB1oG0vsbfs9b1XuDAEhsSQnvom
+	xIX1IbeUQbvJ0HgJaFImNkt4VQQYKfdyWzhaKGgyyfWOn0IjjmDGW/BulTFAEQA3
+	U+TjFRObSC55+3aiU3XOgEwHNeB6F3QuVXMpvQzstyUAqhQEc0YNwWuBMV2PUqnj
+	aiTMcl00EPJzsBoIeA0Ak1obnUSYo70cSa5myqjl6t+sWU1bUw==
+From: Benjamin Steinke <benjamin.steinke@woks-audio.com>
+To: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
+CC: <intel-wired-lan@osuosl.org>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>, <netdev@vger.kernel.org>, Jonathan
+ Lemon <jonathan.lemon@gmail.com>, John Fastabend <john.fastabend@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>, =?ISO-8859-1?Q?Bj=F6rn_T=F6pel?=
+	<bjorn@kernel.org>, Eric Dumazet <edumazet@google.com>, Sriram Yagnaraman
+	<sriram.yagnaraman@est.tech>, Tony Nguyen <anthony.l.nguyen@intel.com>, Jakub
+ Kicinski <kuba@kernel.org>, <bpf@vger.kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>, Magnus
+ Karlsson <magnus.karlsson@intel.com>, Kurt Kanzenbach <kurt@linutronix.de>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/4] igb: Add support for AF_XDP zero-copy
+Date: Thu, 27 Jun 2024 18:49:16 +0200
+Message-ID: <3253130.2gtjKKCVsX@desktop>
+In-Reply-To: <878qyq9838.fsf@kurt.kurt.home>
+References: <20230804084051.14194-1-sriram.yagnaraman@est.tech> <878qyq9838.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240627113018.25083-1-brgl@bgdev.pl> <20240627113018.25083-4-brgl@bgdev.pl>
- <ea452581-c903-4106-b912-d307f74f773d@lunn.ch>
-In-Reply-To: <ea452581-c903-4106-b912-d307f74f773d@lunn.ch>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 27 Jun 2024 18:48:51 +0200
-Message-ID: <CAMRc=Memf-fwY2iRXNDz7M4337PcH7quAZ7GHgjauj+Og8PwbQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 3/3] net: phy: aquantia: add support for aqr115c
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-ClientProxiedBy: EX1.jas.loc (10.100.2.20) To EX1.jas.loc (10.100.2.20)
 
-On Thu, Jun 27, 2024 at 6:22=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Thu, Jun 27, 2024 at 01:30:17PM +0200, Bartosz Golaszewski wrote:
-> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >
-> > Add support for a new model to the Aquantia driver. This PHY supports
-> > Overlocked SGMII mode with 2.5G speeds.
-> >
-> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > ---
-> >  drivers/net/phy/aquantia/aquantia_main.c | 39 +++++++++++++++++++++++-
-> >  1 file changed, 38 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy=
-/aquantia/aquantia_main.c
-> > index 974795bd0860..98ccefd355d5 100644
-> > --- a/drivers/net/phy/aquantia/aquantia_main.c
-> > +++ b/drivers/net/phy/aquantia/aquantia_main.c
-> > @@ -29,6 +29,7 @@
-> >  #define PHY_ID_AQR113        0x31c31c40
-> >  #define PHY_ID_AQR113C       0x31c31c12
-> >  #define PHY_ID_AQR114C       0x31c31c22
-> > +#define PHY_ID_AQR115C       0x31c31c33
-> >  #define PHY_ID_AQR813        0x31c31cb2
-> >
-> >  #define MDIO_PHYXS_VEND_IF_STATUS            0xe812
-> > @@ -111,7 +112,6 @@ static u64 aqr107_get_stat(struct phy_device *phyde=
-v, int index)
-> >       int len_h =3D stat->size - len_l;
-> >       u64 ret;
-> >       int val;
-> > -
-> >       val =3D phy_read_mmd(phydev, MDIO_MMD_C22EXT, stat->reg);
-> >       if (val < 0)
-> >               return U64_MAX;
->
-> White space change. And that blank line is actually wanted to separate
-> the variables from the code.
->
+On Thursday, 27 June 2024, 09:07:55 CEST, Kurt Kanzenbach wrote:
+> Hi Sriram,
+> 
+> On Fri Aug 04 2023, Sriram Yagnaraman wrote:
+> > The first couple of patches adds helper funcctions to prepare for AF_XDP
+> > zero-copy support which comes in the last couple of patches, one each
+> > for Rx and TX paths.
+> > 
+> > As mentioned in v1 patchset [0], I don't have access to an actual IGB
+> > device to provide correct performance numbers. I have used Intel 82576EB
+> > emulator in QEMU [1] to test the changes to IGB driver.
+> 
+> I gave this patch series a try on a recent kernel and silicon
+> (i210). There was one issue in igb_xmit_zc(). But other than that it
+> worked very nicely.
 
-Ah, this is accidental, thanks for catching it.
+Hi Kurt and Sriram,
 
-Bart
+I recently tried the patches on a 6.1 kernel. On two different devices i210 & 
+i211 I couldn't see any packets being transmitted on the wire. Perhaps caused 
+by the issue in igb_xmit_zc() you mentioned, Kurt? Can you share your findings, 
+please?
 
->     Andrew
->
-> ---
-> pw-bot: cr
+RX seemed to work on first sight.
+
+> It seems like it hasn't been merged yet. Do you have any plans for
+> continuing to work on this?
+
+I can offer to do testing and debugging on real hardware if this helps.
+
+Thanks,
+Benjamin
+
+
+
+
 
