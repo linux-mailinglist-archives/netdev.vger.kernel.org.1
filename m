@@ -1,50 +1,53 @@
-Return-Path: <netdev+bounces-107102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B86F919D29
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 04:10:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F315919D2C
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 04:13:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B624B2234E
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 02:10:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C8B11F2325B
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 02:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159517484;
-	Thu, 27 Jun 2024 02:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W5pKpMv/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2F779F0;
+	Thu, 27 Jun 2024 02:13:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A3B6FC6
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 02:10:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE574C79;
+	Thu, 27 Jun 2024 02:13:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719454231; cv=none; b=nUB0BO/iFclrkz2+NewWjWwVU2QUScb5Tnt5AJiU/Cpi9CCKrxIAzMO8a94AVajYow6wd7tS+ZigUFMSB4XwUI0tcphOwlP7v+sctfyx1r8m5ZuN8eFyGDDUp5vt9Dt7QTfXEt1FU8cloGhSaoORzzU3No8GnBLg35pcMkpfPIE=
+	t=1719454419; cv=none; b=gTPyx0lbohl8t0d30XsaioUTucTGy/B0OvbnZPqLtT1pLqkJJl4tTvayJy0wHPTXXQT/d4c+NPhOSiOr75wBZnmuO3I0OuRHH8v2GT+rydBuIIOHbvJSmwwYrJchNLsG8wFeS8/C/nnbaQgmsw6cz7A8Qn4xRBeXSTcujlt1Ma8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719454231; c=relaxed/simple;
-	bh=cv7BSQQHwO4+cPMR5b5tQUzrm8c49mXXzZPRLefSrNk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MRLUxp+ibt9PHPXsxiRmsDf9OiywllwFdsPAKvUQL3W8ujcl1kw1B5FVhtAiarXAwJiV+wPhXVrDYjdVaaJThWcPdtSwarK9H6+MfUQzdj0PA4dpUqpRVr6b3wFJhhwqkOWQATGpAuiAqClpDU2kvAupfTnbDt4jm2bhfz/Og+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W5pKpMv/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B62A7C4AF0A;
-	Thu, 27 Jun 2024 02:10:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719454230;
-	bh=cv7BSQQHwO4+cPMR5b5tQUzrm8c49mXXzZPRLefSrNk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=W5pKpMv/3jCWx6iPdRc4v65NRJGFqvJQEk2k2XEVh7OKOmYAK0yuV7PZBTnvjjcBY
-	 KCmGOXXFoyrZ4gpzBUSgAru3G1Oshk3X4J9JWz/MBHxOzFeE4zWWOPf+JWNz18cDVK
-	 B5Ni7CxFj7vMoq85+cF7I/Y70vuY+QTeSrVonZy1K7O8yxOXy/wdG5+2M6V+0hIuuG
-	 XZWPcdJYpIoOrGK01V/V/+15b+LqDGRPUKJ/Pf5enYaBkiBpcS0PoyvdJX/ZHwVZ15
-	 CLJ4njCBvoPz9CRBjQ67Pw3JecqdHmhPxExLXzHfP98eySnA2atEoYNMS91nk7xB0e
-	 lUHLMCSM2buGg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AA1E7C433A2;
-	Thu, 27 Jun 2024 02:10:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1719454419; c=relaxed/simple;
+	bh=iWdJfn2nx0iyS1FBdS9+rEwbsfUNJyZwHcmZgyS91mY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Du4mXWzxsPdUAXo8J+0tsFRMymlgS49YCGk5uNs7PC58i8LS4sQUnsVVTucaeUPihy4QdchirbsAk4onzSGA2+Lz/GExjuH+k8PyXtc1wkdsSBJnqdudf19Sty7GO+MjP/07NBexkDG4q1694/7o2sirgsKVUwqHsKPIiOlqQi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
+	by APP-05 (Coremail) with SMTP id zQCowADX3+e7ynxmC5MgAA--.8383S2;
+	Thu, 27 Jun 2024 10:13:26 +0800 (CST)
+From: Ma Ke <make24@iscas.ac.cn>
+To: wintera@linux.ibm.com,
+	twinkler@linux.ibm.com,
+	hca@linux.ibm.com,
+	gor@linux.ibm.com,
+	agordeev@linux.ibm.com,
+	borntraeger@linux.ibm.com,
+	svens@linux.ibm.com,
+	bhelgaas@google.com
+Cc: linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ma Ke <make24@iscas.ac.cn>
+Subject: [PATCH v2] s390/ism: Add check for dma_set_max_seg_size in ism_probe()
+Date: Thu, 27 Jun 2024 10:13:14 +0800
+Message-Id: <20240627021314.2976443-1-make24@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,52 +55,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/4] selftests: drv-net: rss_ctx: add tests for
- RSS contexts
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171945423069.12118.12803113471439449544.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Jun 2024 02:10:30 +0000
-References: <20240626012456.2326192-1-kuba@kernel.org>
-In-Reply-To: <20240626012456.2326192-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, willemdebruijn.kernel@gmail.com, ecree.xilinx@gmail.com,
- dw@davidwei.uk, przemyslaw.kitszel@intel.com, michael.chan@broadcom.com,
- andrew.gospodarek@broadcom.com, leitao@debian.org, petrm@nvidia.com
+X-CM-TRANSID:zQCowADX3+e7ynxmC5MgAA--.8383S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Jw4rKry8CryUXr4kAr17trb_yoWDAFbEgw
+	4xCF93tr47Kw4xKr4UGr4avrWq9r1vqr1rWFn7ta4ft34Uur1DX3srZF1rWr4Uua93AF47
+	Ar1xJrWYkwn8ujkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbaxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6r1F6r1fM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+	Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
+	1j6F4UJwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
+	FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
+	0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8v
+	x2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
+	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
+	MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
+	WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
+	6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
+	BIdaVFxhVjvjDU0xZFpf9x0JUQZ23UUUUU=
+X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
 
-Hello:
+As the possible failure of the dma_set_max_seg_size(), we should better
+check the return value of the dma_set_max_seg_size().
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Fixes: b0da3498c587 ("PCI: Remove pci_set_dma_max_seg_size()")
+Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+---
+Changes in v2:
+- modified the patch according to suggestions;
+- modified Fixes line according to suggestions.
+---
+ drivers/s390/net/ism_drv.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-On Tue, 25 Jun 2024 18:24:52 -0700 you wrote:
-> Add a few tests exercising RSS context API.
-> In addition to basic sanity checks, tests add RSS contexts,
-> n-tuple rule to direct traffic to them (based on dst port),
-> and qstats to make sure traffic landed where we expected.
-> 
-> v2 adds a test for removing contexts out of order. When testing
-> bnxt - either the new test or running more tests after the overlap
-> test makes the device act strangely. To the point where it may start
-> giving out ntuple IDs of 0 for all rules..
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v3,1/4] selftests: drv-net: try to check if port is in use
-    https://git.kernel.org/netdev/net-next/c/8b8fe280155d
-  - [net-next,v3,2/4] selftests: drv-net: add helper to wait for HW stats to sync
-    https://git.kernel.org/netdev/net-next/c/af8e51644a70
-  - [net-next,v3,3/4] selftests: drv-net: add ability to wait for at least N packets to load gen
-    https://git.kernel.org/netdev/net-next/c/94fecaa6dcd0
-  - [net-next,v3,4/4] selftests: drv-net: rss_ctx: add tests for RSS configuration and contexts
-    (no matching commit)
-
-You are awesome, thank you!
+diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+index e36e3ea165d3..54f6638e889c 100644
+--- a/drivers/s390/net/ism_drv.c
++++ b/drivers/s390/net/ism_drv.c
+@@ -620,7 +620,10 @@ static int ism_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		goto err_resource;
+ 
+ 	dma_set_seg_boundary(&pdev->dev, SZ_1M - 1);
+-	dma_set_max_seg_size(&pdev->dev, SZ_1M);
++	ret = dma_set_max_seg_size(&pdev->dev, SZ_1M);
++	if (ret)
++		goto err_resource;
++
+ 	pci_set_master(pdev);
+ 
+ 	ret = ism_dev_init(ism);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
