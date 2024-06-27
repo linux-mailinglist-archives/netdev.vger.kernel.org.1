@@ -1,118 +1,75 @@
-Return-Path: <netdev+bounces-107437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B7E491AFBF
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:37:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E07DA91AFC4
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:39:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7938B20DA3
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 19:37:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A8BF283345
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 19:39:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27346446D1;
-	Thu, 27 Jun 2024 19:37:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE329446D1;
+	Thu, 27 Jun 2024 19:39:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="M9/lb0bH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d9yMcj55"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C638360;
-	Thu, 27 Jun 2024 19:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8BBA33C9
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 19:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719517058; cv=none; b=Qp9p5DeUSBzuv+PepfGuIhBGUYJ5bLWKnGd0a8lASnPkJkNf7xZh2V5CIx9coE+4B+AvmDP14l7i8zuHH7NM6SmGPdkvykqnbCaSwyjXieeTvrwKv1/oTaylMu4NNo6lIQGVQjg1ODEuMNwVLFOs06DsUSz9MXB6UyvCdInI7Ns=
+	t=1719517174; cv=none; b=S7ak0/MhmaJ+9jtNi666537mLnjGKDHkwnQQ24Yo2KAqCF8OYfacug13QsPyjKe8HElJuS+5mwqjvD5EbMj8NoVxS3ARFioJQ4+V0PPIir1w7Nj1NzQY6QFwBvJvHI3uuiAKYJ2SxzBa8D7olgb20bz27RB+73ZoS821PQunZ2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719517058; c=relaxed/simple;
-	bh=0x5S0cUBNgYTh8sD2RmvuEbypBYiNLBr+bxK84fPwAU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CaLnGj9ARg6zgwa9I/HdymzXCzhf+otDQBczI5OkVmjuTvHxAKy81scnyQ9gUqMiLKyu2ZdDBElj3z2dSPSqKWrwR5GmV5tt5L646n3iHBy9283h1anP1JejR5f3FhWfTMYeRBcF9F82CN4ihpCzjMqD2A/KeZvYsQ0tfBre9Ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=M9/lb0bH; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=oYCCFUsdbLvFXZA3WkDkIuUbJppe2HN72PE2NIGZw5M=; b=M9/lb0bHeHkOSDmbEMEU84cAOp
-	lHtPAlQ6bgsfBtAWBS7ZNPF6jgnQfjCpWJbzeZC+2deBvYGVdlfqvb78D6IpQr5bMYw0MPjQzgI0m
-	8lHQl0NkzmykT2HHYFc623bPGYQnjXvjnJwyDtvHj9NL+7UvfJ3jfiMCSNp+Sr3IKDDY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sMuvl-001Cgs-9J; Thu, 27 Jun 2024 21:37:17 +0200
-Date: Thu, 27 Jun 2024 21:37:17 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Andrew Halaney <ahalaney@redhat.com>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>, Vinod Koul <vkoul@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v2 net-next 2/2] net: stmmac: qcom-ethqos: add a
- DMA-reset quirk for sa8775p-ride
-Message-ID: <f416e06e-e354-4628-883b-07850f05e276@lunn.ch>
-References: <20240627113948.25358-1-brgl@bgdev.pl>
- <20240627113948.25358-3-brgl@bgdev.pl>
- <td5jbseo7gtu6d4xai6q2zkfmxw4ijimyiromrf52he5hze3w3@fd3kayixf4lw>
+	s=arc-20240116; t=1719517174; c=relaxed/simple;
+	bh=hSBJk/HwR4pHg3H3e3bsWeKioFIfedfcF79GSgbv80A=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lcP5DQ7cDJwYBWNiTGcGHHDggEnbbO7XlEBoYrRQ1k+upwzHt0yeFM3vcW/CJ2iXcTypOTmN70c451itZTt4YbkbeIzdhMeHFS+MjUw8DVHJ+Owguwpv+1hY5DXULm+1ypXgjpYTj6L+Fi22Q/dZ5aEBCY1gf4RtSKrOwfL5jZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d9yMcj55; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9DA0C2BBFC;
+	Thu, 27 Jun 2024 19:39:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719517174;
+	bh=hSBJk/HwR4pHg3H3e3bsWeKioFIfedfcF79GSgbv80A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=d9yMcj55IM3xE4K1/8Wbo9XXTLNms+ZD03zmSq0zH1pVo88JWzfPDnaL2vu4D++bR
+	 +WgZPsWaKdilMKf3vP9Cmeu55LbbY5L7QtRHDhqzsughNfqsAqhRrscZCdRIjrivAy
+	 rsZkE9nMjq8X3upZpMhftal/zwgiV4dalcoB9h9vl91CVO6qAoFNhz3WKIE4AD3yQ6
+	 0hroDj/lgK1STr850fUhZcKKkQe4Cs8JJ1DiptBkRaCCqzWHg/Bcb192SkkS3z9cK9
+	 eSCLy9ySC2hi9u+y8tJCgsytWQc2lHfHUe4g6uTXG+m3/X6lOxW9jdBoaE0ZsEWoqI
+	 6/yiYGnrGUG1Q==
+Date: Thu, 27 Jun 2024 12:39:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, "David S.
+ Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Jiri Pirko <jiri@resnulli.us>, Simon
+ Horman <horms@kernel.org>,
+ syzbot+e77327e34cdc8c36b7d3@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] net: ethtool: Fix the panic caused by dev being
+ null when dumping coalesce
+Message-ID: <20240627123932.4c7e964a@kernel.org>
+In-Reply-To: <20240626153421.102107-1-hengqi@linux.alibaba.com>
+References: <20240626153421.102107-1-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <td5jbseo7gtu6d4xai6q2zkfmxw4ijimyiromrf52he5hze3w3@fd3kayixf4lw>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 27, 2024 at 12:07:22PM -0500, Andrew Halaney wrote:
-> On Thu, Jun 27, 2024 at 01:39:47PM GMT, Bartosz Golaszewski wrote:
-> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > 
-> > On sa8775p-ride the RX clocks from the AQR115C PHY are not available at
-> > the time of the DMA reset so we need to loop TX clocks to RX and then
-> > disable loopback after link-up. Use the existing callbacks to do it just
-> > for this board.
-> > 
-> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> Sorry, not being very helpful but trying to understand these changes
-> and the general cleanup of stmmac... so I'll point out that I'm still
-> confused by this based on Russell's last response:
-> https://lore.kernel.org/netdev/ZnQLED%2FC3Opeim5q@shell.armlinux.org.uk/
-> 
-> Quote:
-> 
->     If you're using true Cisco SGMII, there are _no_ clocks transferred
->     between the PHY and PCS/MAC. There are two balanced pairs of data
->     lines and that is all - one for transmit and one for receive. So this
->     explanation doesn't make sense to me.
-> 
+On Wed, 26 Jun 2024 23:34:21 +0800 Heng Qi wrote:
+> The problematic commit targeted by this fix may still be in the next branch.
 
-Agreed. We need a deeper understanding of the clocking to find an
-acceptable solution to this problem.
-
-Is the MAC extracting a clock from the SERDES lines?
-
-Is the PHY not driving the SERDES lines when there is no link?
-
-For RGMII PHYs, they often do have a clock output at 25 or 50MHz which
-the MAC uses. And some PHY drivers need asking to not turn this clock
-off.  Maybe we need the same here, by asking the PHY to keep the
-SERDES lines running when there is no link?
-
-https://elixir.bootlin.com/linux/v6.10-rc5/source/include/linux/phy.h#L781
-
-I also wounder why this is not an issue with plain SGMII, rather than
-overclocked SGMII? Maybe there is already a workaround for SGMII and
-it just needs extended to this not quiet 2500BaseX mode.
-
-      Andrew
+Could you resend with [PATCH net-next] in the subject instead, in this
+case? Our build bot trusts the designation in the subject so since this
+was submitted as "PATCH net" and patch doesn't apply to net - it
+rejected the patch.
+-- 
+pw-bot: cr
 
