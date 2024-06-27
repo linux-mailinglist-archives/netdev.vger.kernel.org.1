@@ -1,149 +1,144 @@
-Return-Path: <netdev+bounces-107302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6BC591A828
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 15:42:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EB9DC91A83E
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 15:46:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B45E281C13
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 13:42:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A23A1284EB6
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 13:46:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C119F1946BA;
-	Thu, 27 Jun 2024 13:41:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54C6194AF2;
+	Thu, 27 Jun 2024 13:46:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tlIWuaUk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JIZYK+j9"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6921946B0
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 13:41:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F680194AEA
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 13:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719495717; cv=none; b=jm1EWxOCpyAitSs0+qXK8WeC6di5yowLIAJpiGU3XeZwhGRdg+VoS/56oyZlp4v+lgmvJaTpPaLcCl2T8Iq+f7tkzpDSqZROpa36Ng+A8fYJ6sRxmhSceW/XXH/MMPWYOKuxFVrufDsbJHXz4AeGWkSRC0tE/ph+SxkdH9oZOfg=
+	t=1719495981; cv=none; b=EiQIHRlCebFnxHUTCo9HMxZ3sGJNXAbCCtA/XKPyaUmyn3K5D3Z6WE5aKMzbaRLb80EZ7KMbzIvcK5Yn8hLTH4XzjvTZzOy1qtTuJzdyJeXI60OrMRd5CoZ5a3n5Hyl6p/2bVz7RmfX/LNRdznvYDH8IWWB98Tq7xuduSgLY5/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719495717; c=relaxed/simple;
-	bh=LvnwTTVBC8Pm58VGJIqSPohg+jb8ST48pPrk5lkB638=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WIJyk1zK+Hs1YkyZQgr7r1HGgvasudyhwBxGnjegnZCtPk9D669G5Y7RV7XVAD61i/K0jFoRFeM1X3aEkOAuWDSbsC1ZNpHBMtRCSch7W0m+oorlR9SLYcOH/OCU9JlXMVp4PRUEPrl2fOc9hJG26rYtdZrL9949Omvnez0Koeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tlIWuaUk; arc=none smtp.client-ip=95.215.58.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: davem@davemloft.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1719495713;
+	s=arc-20240116; t=1719495981; c=relaxed/simple;
+	bh=CxN0i2o6jLJzZ1S+WrM3/09xy0WQOsRB0G06hcALGys=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=O9YsK7wWvkeXoA5AdZ8thpZDp8DSfCAkWgG/YE/FEaNVKgPiy38d4P2+cWnTp0wHStZTdcWMYbZ0wvTbdO7ZmOtb5Ch5OuAjC71BQOA9j7S1qOJacMoi5JJq63917oS6Kp/eLlUhC8rEJDfcCbWX0hw5yWJCEGAOcFkKRCtE9ek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JIZYK+j9; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719495979;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=OnzNShyOnYC0lhEHFrSf9wHqYEcOBjNwOI0BR7nekY0=;
-	b=tlIWuaUk1W/Cq/3WtLCpX5chO/ckgwGmFjqK16Q8P5kyczuuDkqvR1o1Q0b+eHDlhKtw9d
-	XR5/rREOhMf2987SBsUyjcZELDz7EoPNBqMEOU+bHvvKcJUoHucnvVMFvnkNcgR6bDxGkJ
-	DnD/CCc95Cx3Tc7wwRINmgBJfIvblnU=
-X-Envelope-To: edumazet@google.com
-X-Envelope-To: kuba@kernel.org
-X-Envelope-To: pabeni@redhat.com
-X-Envelope-To: netdev@vger.kernel.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-X-Envelope-To: yajun.deng@linux.dev
-X-Envelope-To: jiri@nvidia.com
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yajun Deng <yajun.deng@linux.dev>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yajun Deng <yajun.deng@linux.dev>,
-	Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net-next v2] net: core: Remove the dup_errno parameter in dev_prep_valid_name()
-Date: Thu, 27 Jun 2024 21:41:31 +0800
-Message-Id: <20240627134131.3018-1-yajun.deng@linux.dev>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2H2eOsk+IBvdW6vn90H4Ieju5WkyuY2eQ65TuxwaxSM=;
+	b=JIZYK+j93avH/LfD4Fa1r1u/aAlAgRdQob/mzP2/1s3nHUy+EqqmiKkq/I0O3TpU5tnp2E
+	/wbrfVW3ZtPzVPz9b/ivLjW3o6iFzKyM+f+U/omV3tMZxBz8H70CQz3JRJGQ7PohZZJEnz
+	MLmh7ddWa+YiH3+e9m3od39/XZNsmcw=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-342-Az17NnIyPkaoaB2ucf5FMg-1; Thu,
+ 27 Jun 2024 09:46:16 -0400
+X-MC-Unique: Az17NnIyPkaoaB2ucf5FMg-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 152BD1956080;
+	Thu, 27 Jun 2024 13:46:14 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.8.184])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 595BC300021A;
+	Thu, 27 Jun 2024 13:46:11 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,  dev@openvswitch.org,
+  linux-kselftest@vger.kernel.org,  linux-kernel@vger.kernel.org,  Pravin B
+ Shelar <pshelar@ovn.org>,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Shuah Khan <shuah@kernel.org>,  Stefano Brivio
+ <sbrivio@redhat.com>,  =?utf-8?Q?Adri=C3=A1n?= Moreno <amorenoz@redhat.com>
+Subject: Re: [PATCH net-next v3 6/7] selftests: net: Use the provided dpctl
+ rather than the vswitchd for tests.
+In-Reply-To: <20240626165455.GA3104@kernel.org> (Simon Horman's message of
+	"Wed, 26 Jun 2024 17:54:55 +0100")
+References: <20240625172245.233874-1-aconole@redhat.com>
+	<20240625172245.233874-7-aconole@redhat.com>
+	<20240626165455.GA3104@kernel.org>
+Date: Thu, 27 Jun 2024 09:46:09 -0400
+Message-ID: <f7t1q4izefy.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-netdev_name_in_use() in dev_prep_valid_name() return -EEXIST makes
-more sense if it's not NULL, but dev_alloc_name() should keep the
--ENFILE errno.
+Simon Horman <horms@kernel.org> writes:
 
-There are three callers to dev_prep_valid_name(), the dup_errno
-parameter is only for dev_alloc_name, it's not necessary for the other
-callers.
+> On Tue, Jun 25, 2024 at 01:22:44PM -0400, Aaron Conole wrote:
+>> The current pmtu test infrastucture requires an installed copy of the
+>> ovs-vswitchd userspace.  This means that any automated or constrained
+>> environments may not have the requisite tools to run the tests.  However,
+>> the pmtu tests don't require any special classifier processing.  Indeed
+>> they are only using the vswitchd in the most basic mode - as a NORMAL
+>> switch.
+>> 
+>> However, the ovs-dpctl kernel utility can now program all the needed basic
+>> flows to allow traffic to traverse the tunnels and provide support for at
+>> least testing some basic pmtu scenarios.  More complicated flow pipelines
+>> can be added to the internal ovs test infrastructure, but that is work for
+>> the future.  For now, enable the most common cases - wide mega flows with
+>> no other prerequisites.
+>> 
+>> Enhance the pmtu testing to try testing using the internal utility, first.
+>> As a fallback, if the internal utility isn't running, then try with the
+>> ovs-vswitchd userspace tools.
+>> 
+>> Additionally, make sure that when the pyroute2 package is not available
+>> the ovs-dpctl utility will error out to properly signal an error has
+>> occurred and skip using the internal utility.
+>
+> Hi Aaron,
+>
+> I don't feel strongly about this, but it does feel like the
+> change to ovs-dpctl.py could live in a separate patch.
 
-Remove the dup_errno parameter in dev_prep_valid_name() and add a
-conditional operator to dev_alloc_name(), replace -EEXIST with
--ENFILE.
+I can do it if others feel like it should be a separate change.  I
+debated it as a separate patch, but I felt that it wasn't really a bug
+fix, more like a behavior change that would be associated with this pmtu
+script.  I didn't (at the time, and still don't) see a reason to
+separately backport them, but it could also be considered as a separate
+orthogonal change, and I'm okay with it being a different patch.  Like
+you, I don't feel strongly either way.
 
-Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
----
-v2: Make the commit more detailed.
-v1: https://lore.kernel.org/all/20240618131743.2690-1-yajun.deng@linux.dev/
----
- net/core/dev.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+If I do separate it, I will also add your Reviewed and Tested tags to
+that patch.
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 0a23d7da7fbc..00e8c785e5ee 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -1153,8 +1153,7 @@ static int __dev_alloc_name(struct net *net, const char *name, char *res)
- 
- /* Returns negative errno or allocated unit id (see __dev_alloc_name()) */
- static int dev_prep_valid_name(struct net *net, struct net_device *dev,
--			       const char *want_name, char *out_name,
--			       int dup_errno)
-+			       const char *want_name, char *out_name)
- {
- 	if (!dev_valid_name(want_name))
- 		return -EINVAL;
-@@ -1163,7 +1162,7 @@ static int dev_prep_valid_name(struct net *net, struct net_device *dev,
- 		return __dev_alloc_name(net, want_name, out_name);
- 
- 	if (netdev_name_in_use(net, want_name))
--		return -dup_errno;
-+		return -EEXIST;
- 	if (out_name != want_name)
- 		strscpy(out_name, want_name, IFNAMSIZ);
- 	return 0;
-@@ -1185,7 +1184,10 @@ static int dev_prep_valid_name(struct net *net, struct net_device *dev,
- 
- int dev_alloc_name(struct net_device *dev, const char *name)
- {
--	return dev_prep_valid_name(dev_net(dev), dev, name, dev->name, ENFILE);
-+	int ret;
-+
-+	ret = dev_prep_valid_name(dev_net(dev), dev, name, dev->name);
-+	return ret == -EEXIST ? -ENFILE : ret;
- }
- EXPORT_SYMBOL(dev_alloc_name);
- 
-@@ -1194,7 +1196,7 @@ static int dev_get_valid_name(struct net *net, struct net_device *dev,
- {
- 	int ret;
- 
--	ret = dev_prep_valid_name(net, dev, name, dev->name, EEXIST);
-+	ret = dev_prep_valid_name(net, dev, name, dev->name);
- 	return ret < 0 ? ret : 0;
- }
- 
-@@ -11446,7 +11448,7 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
- 		/* We get here if we can't use the current device name */
- 		if (!pat)
- 			goto out;
--		err = dev_prep_valid_name(net, dev, pat, new_name, EEXIST);
-+		err = dev_prep_valid_name(net, dev, pat, new_name);
- 		if (err < 0)
- 			goto out;
- 	}
--- 
-2.25.1
+>> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
+>> Signed-off-by: Aaron Conole <aconole@redhat.com>
+>
+> The above not withstanding,
+>
+>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+>
+> I have tested pmtu.sh with this change on Fedora 40 both
+> with python3-pyroute2 installed, which uses ovs-dpctl,
+> and without, which uses ovs-vswitchd userspace tools.
+>
+> Tested-by: Simon Horman <horms@kernel.org>
+
+Thanks!
+
+> ...
 
 
