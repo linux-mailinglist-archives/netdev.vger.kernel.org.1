@@ -1,56 +1,68 @@
-Return-Path: <netdev+bounces-107433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45EF791AF67
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:03:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29ED991AF72
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:09:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76E0F1C22427
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 19:03:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D825C282E86
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 19:09:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7C4C19AD55;
-	Thu, 27 Jun 2024 19:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3494522EE4;
+	Thu, 27 Jun 2024 19:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kz3Gn79Y"
+	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="J7AUjKNe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F9919AA69
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 19:03:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FEFF19A294;
+	Thu, 27 Jun 2024 19:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719515029; cv=none; b=LHQR2/RGFuv9QXHO7VWlOWY2VSBiYTUnlkxy7jzcg2TFbd0kxrZwE9ki4qcZZbsvc/1m2l3Y2TUVaMrCNwroMaQfzuDmbBbCgQv29+Zp4HnxHlNAf3I3MfX7qQAMSplBgrV/regq4g7PUfj/tL0aH/FV1OwlN9HrfS6RDZUCc+s=
+	t=1719515368; cv=none; b=k7ZxPWBFTxn9nC3RlHjnPI7KnZe32YQApH3ZtfF0hU6w7THJ+02NawH9rj+0JTHifn83WRvWUR9aUck7ZlDi5tAbinauWIjbxxWqL2QIvLbBjG6N4LnT42r9ByDvF3z7RK9UDcqSZOFzGtk6onQXJusawqJh79zV3i1M51qxQME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719515029; c=relaxed/simple;
-	bh=It71+8zExw06AHJjm3k24hGVnxHu5iCR7annE0l98x8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WdMqFRm8BaDwSmWZ8R6VOy8ArWV0imUmEounJUyN/obn5LNV8qEBOo3k3arqTgwLII7e4VSohlqxL1pqoGcUuEWOYWQ1MVbtLMsH17aXlKcQet1IbdEF6zFvCbEb7KH6+b7d/jJoeFjoIQOE5XKskt2lrIJ48KgGHc5bzDu5uJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kz3Gn79Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF9A6C2BBFC;
-	Thu, 27 Jun 2024 19:03:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719515029;
-	bh=It71+8zExw06AHJjm3k24hGVnxHu5iCR7annE0l98x8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kz3Gn79Yo0NHyMtlDcDlVIlcos6I5WZP7MpxScJ3eACoafhSG25wL1yhJFVRHZ8wo
-	 q5cKEGqSPTZD60MLOBkuvsdmCSvP2uGT0zTYVt3G4vSYBPxBx7K6AmrflXT3jhGMEr
-	 FMW4IgwPeGRkragaN1E7MVYErxDM91rWEaVD/VGsl2nvEOxXDrC9FDVujhV6RHq7Rb
-	 HVJduGOLEVPKfsCY8GXXwRlzLECNLRzWk9NUvDg39mBeF/KWd9EWNpdp6gw3nsrSUK
-	 vKvM8eoBKEUhhgMRAxjOn+Mk0G3rjAcj7hWD+d4f4D6QJA6DTJiu8vlfbLumC8uCp2
-	 sr1+kWq/LI0Qw==
-Date: Thu, 27 Jun 2024 12:03:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com
-Subject: Re: [PATCH net-next] tcp_metrics: add netlink protocol spec in YAML
-Message-ID: <20240627120347.3864cb62@kernel.org>
-In-Reply-To: <m2o77md9o0.fsf@gmail.com>
-References: <20240626201133.2572487-1-kuba@kernel.org>
-	<m2o77md9o0.fsf@gmail.com>
+	s=arc-20240116; t=1719515368; c=relaxed/simple;
+	bh=xLMzz62KCg/+ORSjR85luR+L2JfDFo4OR3KMezt3O90=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=njbVnXBYx0ZGCLK00pADwYc/z5f3dVc2h3bLis8zMH/XL2qn47tmyGNF3qm5kt6Rqn35sdGQbV6t697TUKLumI5sNak1J8EPDRqo/s5CW+eA1T5aIgefgJyT2CxCvvrtxMj2BkBeqBvqdgcNNv7vUYTwyZycjLv2TuIb3URHSiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=J7AUjKNe; arc=none smtp.client-ip=193.238.174.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mg.ssi.bg (localhost [127.0.0.1])
+	by mg.ssi.bg (Proxmox) with ESMTP id AA5DB1C0B9;
+	Thu, 27 Jun 2024 22:09:16 +0300 (EEST)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.ssi.bg (Proxmox) with ESMTPS;
+	Thu, 27 Jun 2024 22:09:16 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id A34809004EF;
+	Thu, 27 Jun 2024 22:09:11 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1719515353; bh=xLMzz62KCg/+ORSjR85luR+L2JfDFo4OR3KMezt3O90=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=J7AUjKNehXrt6e315joPRqDdeRCWw8kUtIQGoFaKCnlDCMPG053D6GXu5iPZdqA2Z
+	 l7hA9IDzvlM1jEsc/5lK+bvuY7KcrtV8XAVepG9/aAFYe3lL+Xn4L1Uov0/Y7+jqHO
+	 pgwz/9f9uhKvU7eKRfdwg9b9snVFlAF8T15PPNx4=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 45RJ92YK078348;
+	Thu, 27 Jun 2024 22:09:03 +0300
+Date: Thu, 27 Jun 2024 22:09:02 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Chen Hanxiao <chenhx.fnst@fujitsu.com>
+cc: Simon Horman <horms@verge.net.au>, Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] ipvs: properly dereference pe in
+ ip_vs_add_service
+In-Reply-To: <20240627061515.1477-1-chenhx.fnst@fujitsu.com>
+Message-ID: <b6867456-a926-4d51-9000-fc7816788c17@ssi.bg>
+References: <20240627061515.1477-1-chenhx.fnst@fujitsu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,22 +70,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Thu, 27 Jun 2024 10:20:15 +0100 Donald Hunter wrote:
-> I had to add tcp_metrics.h to Makefile.deps to get the generated code to
-> complile.
+
+	Hello,
+
+On Thu, 27 Jun 2024, Chen Hanxiao wrote:
+
+> Use pe directly to resolve sparse warning:
 > 
-> diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
-> index f4e8eb79c1b8..2f05f8ec2324 100644
-> --- a/tools/net/ynl/Makefile.deps
-> +++ b/tools/net/ynl/Makefile.deps
-> @@ -25,3 +25,4 @@ CFLAGS_nfsd:=$(call get_hdr_inc,_LINUX_NFSD_NETLINK_H,nfsd_netlink.h)
->  CFLAGS_ovs_datapath:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
->  CFLAGS_ovs_flow:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
->  CFLAGS_ovs_vport:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
-> +CFLAGS_tcp_metrics:=$(call get_hdr_inc,__LINUX_TCP_METRICS_H,tcp_metrics.h)
+>   net/netfilter/ipvs/ip_vs_ctl.c:1471:27: warning: dereference of noderef expression
+> 
+> Fixes: 39b972231536 ("ipvs: handle connections started by real-servers")
+> Signed-off-by: Chen Hanxiao <chenhx.fnst@fujitsu.com>
 
-Indeed, and I think we need to add _UAPI to the guard. Or just include
-the file without calling get_hdr_inc. I'll send v2 as a (tiny) series.
+	Looks good to me, thanks!
+
+Acked-by: Julian Anastasov <ja@ssi.bg>
+
+> ---
+> v2:
+> 	use pe directly.
+> 
+>  net/netfilter/ipvs/ip_vs_ctl.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+> index b6d0dcf3a5c3..f4384e147ee1 100644
+> --- a/net/netfilter/ipvs/ip_vs_ctl.c
+> +++ b/net/netfilter/ipvs/ip_vs_ctl.c
+> @@ -1459,18 +1459,18 @@ ip_vs_add_service(struct netns_ipvs *ipvs, struct ip_vs_service_user_kern *u,
+>  	if (ret < 0)
+>  		goto out_err;
+>  
+> -	/* Bind the ct retriever */
+> -	RCU_INIT_POINTER(svc->pe, pe);
+> -	pe = NULL;
+> -
+>  	/* Update the virtual service counters */
+>  	if (svc->port == FTPPORT)
+>  		atomic_inc(&ipvs->ftpsvc_counter);
+>  	else if (svc->port == 0)
+>  		atomic_inc(&ipvs->nullsvc_counter);
+> -	if (svc->pe && svc->pe->conn_out)
+> +	if (pe && pe->conn_out)
+>  		atomic_inc(&ipvs->conn_out_counter);
+>  
+> +	/* Bind the ct retriever */
+> +	RCU_INIT_POINTER(svc->pe, pe);
+> +	pe = NULL;
+> +
+>  	/* Count only IPv4 services for old get/setsockopt interface */
+>  	if (svc->af == AF_INET)
+>  		ipvs->num_services++;
+> -- 
+> 2.39.1
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+
 
