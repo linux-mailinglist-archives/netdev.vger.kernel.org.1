@@ -1,160 +1,109 @@
-Return-Path: <netdev+bounces-107119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39A15919E97
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 07:26:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53DE2919EB1
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 07:34:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97E341F21C10
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 05:26:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B3481C2463F
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 05:34:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C6201CAAF;
-	Thu, 27 Jun 2024 05:26:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="kjPCOQyx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E70BD208CB;
+	Thu, 27 Jun 2024 05:34:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF8B1A702;
-	Thu, 27 Jun 2024 05:26:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DB5200CB
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 05:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719466001; cv=none; b=OZGG6IG2PKQMVbMReWANKNWMI+CjF4VA50doIfZ9mqlnndqT5Y8NxFKMbjf7VvWOIhPPV22QdM+LdSo5jj+EkybUmOMUbrZ4FCCEyR0ORCyXrn5wnPgN3BMVNctoi8WOkbJ1Q5fkYt/6ohoKkB6zqEMPXQCVT13pBg7ewMzOpxg=
+	t=1719466455; cv=none; b=iQXvcGnzgRazppzaX2I0iPEiq2j+ZNKOyLQSMVN0LTRaoXmcUKGoBf927AbGY6YMGEJl4zEIYDONcc9w94IT6MgHXmpPqgaFIcANvdrw5zeSOT8ySBIN7CdXlYGZhaY3JZe+4v/Eudrs0Z7h0wRIQjtz1PWnHzmuc+odenXA6jI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719466001; c=relaxed/simple;
-	bh=OuR9NleHXA3ZQdw1usDlCmtjq83kCMS29H9Cz2AqACs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=sgKC4nC+V5zhuLY/l/F4QkBDXmtMIA/33d9qIXGTu4a4Gote7FDZp7l8LlVsfxnIcYrWFATlIcKes0ZQlLxkMU2Wmcz6wM1KTihBlGYd8A5L4r2MdlqzJUX7E7B92637am2W24GA1NaDFl1j3H26YwEKDfbBKWohsEq8mPSYCKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=kjPCOQyx; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45R0DRtE003766;
-	Thu, 27 Jun 2024 05:26:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	wYpXKHV1kel9Zds03gh2BxHVDdcoNxDveVlVPuZhkgk=; b=kjPCOQyxGovZJTCj
-	OPnm8pGQek/O8oafBsRh3k4WrV0X0ZdJePu1qGoSJxyuzDYxsn/sFFK4DvUC5Y39
-	wocQkxzuwpnEoqKfx58Gu8u8w1+uJDRMVKTagInbE9e/JIDewRRWgLTspjlI4Tm+
-	c4Uhc4TzAWGJtBe78ZVvDYc63OjzgVOBdVoEKJ/sArKpsxqvPxu8p0YYBNGcZy6k
-	/3Wv1unh0AD+kH6yKGc82RNm2B8ErA3yNm8JBLl9Mu2OyCd5lODuSq4io9Fv7rhv
-	TnSZCSupDMquBvZc/nzROLeGAV0SgdzxkA1F69inG3IK8nG7HIHVzC+GRf0k0vVC
-	RJIs+w==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ywmaf3v70-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Jun 2024 05:26:12 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45R5QAV4032328
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Jun 2024 05:26:10 GMT
-Received: from [10.50.52.175] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 26 Jun
- 2024 22:25:53 -0700
-Message-ID: <4bf9dff9-3cb4-4276-8d21-697850e01170@quicinc.com>
-Date: Thu, 27 Jun 2024 10:55:49 +0530
+	s=arc-20240116; t=1719466455; c=relaxed/simple;
+	bh=LYJA4gHG3laUJKh3RirWz+ba19Ae9E87C/vzol79nZI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=E02TyGMOBJOkpMORrhvM9nc73tzsWuVci/Xm3HDpSdwzI2BhnfmmuSQECSXNztmJz+Wba7vOei556qrvmvV0aIkdyw8Ol3fGFoxRbs8Fa6Z8NFMkwoi43dy8VydjaNbOSRD2W4VFfztacJ0eHFKd/YO8snO/VyS3iNk4lLjsgqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sMhlc-0004LN-AL; Thu, 27 Jun 2024 07:33:56 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sMhla-005IHZ-CJ; Thu, 27 Jun 2024 07:33:54 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sMhla-005wRX-12;
+	Thu, 27 Jun 2024 07:33:54 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	stable@vger.kernel.org,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>,
+	netdev@vger.kernel.org,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [PATCH net v1 1/1] net: phy: micrel: ksz8081: disable broadcast only if PHY address is not 0
+Date: Thu, 27 Jun 2024 07:33:53 +0200
+Message-Id: <20240627053353.1416261-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V5 4/7] dt-bindings: clock: Add ipq9574 NSSCC clock and
- reset definitions
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <catalin.marinas@arm.com>, <u-kumar1@ti.com>,
-        <linux-arm-kernel@lists.infradead.org>, <krzk+dt@kernel.org>,
-        <geert+renesas@glider.be>, <neil.armstrong@linaro.org>,
-        <nfraprado@collabora.com>, <mturquette@baylibre.com>,
-        <linux-kernel@vger.kernel.org>, <dmitry.baryshkov@linaro.org>,
-        <netdev@vger.kernel.org>, <konrad.dybcio@linaro.org>,
-        <m.szyprowski@samsung.com>, <arnd@arndb.de>,
-        <richardcochran@gmail.com>, <will@kernel.org>, <sboyd@kernel.org>,
-        <andersson@kernel.org>, <p.zabel@pengutronix.de>,
-        <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <conor+dt@kernel.org>, <linux-arm-msm@vger.kernel.org>
-References: <20240626143302.810632-1-quic_devipriy@quicinc.com>
- <20240626143302.810632-5-quic_devipriy@quicinc.com>
- <171941612020.3280624.794530163562164163.robh@kernel.org>
- <eeea33c7-02bd-4ea4-a53f-fd6af839ca90@lunn.ch>
-Content-Language: en-US
-From: Devi Priya <quic_devipriy@quicinc.com>
-In-Reply-To: <eeea33c7-02bd-4ea4-a53f-fd6af839ca90@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 9NOepCBt7OGnFxvhr4ou74KtrvgMHq_q
-X-Proofpoint-GUID: 9NOepCBt7OGnFxvhr4ou74KtrvgMHq_q
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-27_02,2024-06-25_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 spamscore=0 bulkscore=0 phishscore=0 malwarescore=0
- clxscore=1015 mlxscore=0 lowpriorityscore=0 priorityscore=1501
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2406140001 definitions=main-2406270039
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+Do not disable broadcast if we are using address 0 (broadcast) to
+communicate with this device. Otherwise we will use proper driver but no
+communication will be possible and no link changes will be detected.
+There are two scenarios where we can run in to this situation:
+- PHY is bootstrapped for address 0
+- no PHY address is known and linux is scanning the MDIO bus, so first
+  respond and attached device will be on address 0.
 
+The fixes tag points to the latest refactoring, not to the initial point
+where kszphy_broadcast_disable() was introduced.
 
-On 6/26/2024 10:56 PM, Andrew Lunn wrote:
-> On Wed, Jun 26, 2024 at 09:35:20AM -0600, Rob Herring (Arm) wrote:
->>
->> On Wed, 26 Jun 2024 20:02:59 +0530, Devi Priya wrote:
->>> Add NSSCC clock and reset definitions for ipq9574.
->>>
->>> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
->>> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->>> ---
->>>   Changes in V5:
->>> 	- Dropped interconnects and added interconnect-cells to NSS
->>> 	  clock provider so that it can be  used as icc provider.
->>>
->>>   .../bindings/clock/qcom,ipq9574-nsscc.yaml    |  74 +++++++++
->>>   .../dt-bindings/clock/qcom,ipq9574-nsscc.h    | 152 ++++++++++++++++++
->>>   .../dt-bindings/reset/qcom,ipq9574-nsscc.h    | 134 +++++++++++++++
->>>   3 files changed, 360 insertions(+)
->>>   create mode 100644 Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
->>>   create mode 100644 include/dt-bindings/clock/qcom,ipq9574-nsscc.h
->>>   create mode 100644 include/dt-bindings/reset/qcom,ipq9574-nsscc.h
->>>
->>
->> My bot found errors running 'make dt_binding_check' on your patch:
->>
->> yamllint warnings/errors:
->>
->> dtschema/dtc warnings/errors:
->> Error: Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.example.dts:26.26-27 syntax error
->> FATAL ERROR: Unable to parse input tree
-> 
-> Hi Devi
-> 
-> Version 4 of these patches had the same exact problem. There was not
-> an email explaining it is a false positive etc, so i have to assume it
-> is a real error. So why has it not been fixed?
-> 
-> Qualcomm patches are under a microscope at the moment because of how
-> bad things went a couple of months ago with patches. You cannot ignore
-> things like this, because the damage to Qualcomm reputation is going
-> to make it impossible to get patches merged soon.
-> 
-Hi Andrew,
-Very sorry for the inconvenience.
-I had run dt_binding_check locally on V4 patches and did not face any
-errors. I somehow missed to notice the binding check error that was
-reported on V4. Thus I went ahead and posted the same in V5.
-Will ensure such things are not repeated henceforth.
+Fixes: 79e498a9c7da0 ("net: phy: micrel: Restore led_mode and clk_sel on resume")
+Cc: stable@vger.kernel.org
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ drivers/net/phy/micrel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
-Devi Priya
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index 81c20eb4b54b9..67c2e611150d2 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -590,7 +590,7 @@ static int kszphy_config_init(struct phy_device *phydev)
+ 
+ 	type = priv->type;
+ 
+-	if (type && type->has_broadcast_disable)
++	if (type && type->has_broadcast_disable && phydev->mdio.addr != 0)
+ 		kszphy_broadcast_disable(phydev);
+ 
+ 	if (type && type->has_nand_tree_disable)
+-- 
+2.39.2
 
-> 	Andrew
 
