@@ -1,132 +1,124 @@
-Return-Path: <netdev+bounces-107248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E42491A6B5
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 14:40:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6987591A6C8
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 14:44:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1098B21920
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 12:40:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25C8228596F
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 12:44:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0AC91684AF;
-	Thu, 27 Jun 2024 12:39:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA952161900;
+	Thu, 27 Jun 2024 12:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="GtnRWrDW"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A90C160795
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 12:39:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC41161314;
+	Thu, 27 Jun 2024 12:43:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719491977; cv=none; b=RBZBgIHCslXh3DEL2HJLKwqtjjqTyJUyKkV6pttoA4gCFoQ8xz1RCz7WcizyXJm1S7bLpNbgZEIccGHQRw6qZ+o8cw7LgTih0uUrbH8D0n8sjWYMFpWO2X6FgBL5PWZEnaQSna+8W9A0PRDPcgYh6mlzteOjOFuLkRcGw4w3c9o=
+	t=1719492237; cv=none; b=P7UlGjks6jwblu4kCMyTEJIhpRP4MCCA/WqwIgtjZunV3WxO02Ztpxzz8z50F7eEBD3aXEjbXl4ixd7tRhBvofaOLQNZFPk/n6J4HoCjreuSuh9qvMOQot3VqT7A61rdrEHLH+I+e7BJGXg//0E0b2LtyVHn799W4hsMIOLfbek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719491977; c=relaxed/simple;
-	bh=EqB6SmNdeXubFO++XFjnHXgMkng6+TrWjBXTPnVGYUI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WTgrkdTPoy5Myr2dr8ZhkQqvvu52Tjuyh4JqJmQB5MLP4msZj8pGb8FnnpvDYq/gq5dSi2chAkgW/ntkidtDvM11MC7T04rUHjttCfWHU1nYF6pcGRnkOMDQYUhRgiuSZ9AhjSqHe2Rmbc9T7e3fkycJ5XnJrFBIA+RtkOC3pp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sMoPC-00015D-7f; Thu, 27 Jun 2024 14:39:14 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sMoPA-005Mwu-QG; Thu, 27 Jun 2024 14:39:12 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sMoPA-000xBz-2M;
-	Thu, 27 Jun 2024 14:39:12 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>
-Cc: Lucas Stach <l.stach@pengutronix.de>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: [PATCH net-next v1 3/3] net: dsa: microchip: lan937x: disable VPHY output
-Date: Thu, 27 Jun 2024 14:39:11 +0200
-Message-Id: <20240627123911.227480-4-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240627123911.227480-1-o.rempel@pengutronix.de>
-References: <20240627123911.227480-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1719492237; c=relaxed/simple;
+	bh=ozMDR0fkbEQta+UOJZ1FFXQo1ZGGSn1y5K98kho/9pc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=trQ8JFkZzGWdIFCz08fQuZD3hr9BfmyZPjGomfVXgKf5UD7OPUi1hgsugZOBIkqB+mNYVsEqXuSwi79UxWp3r8WP3HALpl2A9VUlT6LpXNjk/o/8P63nYV1bWDZUbdn73wytdEMaP3QB05SomzUukd7PlenHWVG6IubuUFO5KZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=GtnRWrDW; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45R9ZMS3011277;
+	Thu, 27 Jun 2024 14:43:29 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	bvWJeEz7wgq1kb1F+RfxA0OnfFRUKW1rLsdX1vbv/18=; b=GtnRWrDW7l/RHIL3
+	DNyn7KxrcBxc+AE0eh8g9Tir7OKU7onm/JuFafJfnVWMSLZEEXPpi5viIs99qWxB
+	oLwrYWA8Xf1BrgOz9XgTjPoWC+VAkuEYjDv5RMt9Li5YsD6Oykr/vISr2F0gQlSD
+	Z4rdTmi+pMBlys61FRXBVeq63HcQRxNO5QrPONw4aLWLD6QnLQuempMZiplRSPUJ
+	rXKiMGO3wt5Q+9sf/HD3vFmkh5XBAuxSFvWwu3XjYz3owu4Nj3DCf1CnbrjrfHUJ
+	fAcK7mXSxCmyC0yGFiLFFRSerA9/9Ja3gjMkkVmQ3i8oYKrYwrjPAtKsn6zp9vI9
+	PSV+oA==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yx860uenb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 27 Jun 2024 14:43:29 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 5AD794002D;
+	Thu, 27 Jun 2024 14:43:24 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id A32C721A900;
+	Thu, 27 Jun 2024 14:42:12 +0200 (CEST)
+Received: from [10.48.86.79] (10.48.86.79) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 27 Jun
+ 2024 14:42:11 +0200
+Message-ID: <1a13b19b-cf16-4a49-8d80-21579dc1da94@foss.st.com>
+Date: Thu, 27 Jun 2024 14:42:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/1] Add MCP23S08 pinctrl support
+To: Christophe Roullier <christophe.roullier@foss.st.com>,
+        "David S . Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        Liam Girdwood
+	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+        Marek Vasut
+	<marex@denx.de>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20240611084206.734367-1-christophe.roullier@foss.st.com>
+Content-Language: en-US
+From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+In-Reply-To: <20240611084206.734367-1-christophe.roullier@foss.st.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-27_08,2024-06-27_03,2024-05-17_01
 
-From: Lucas Stach <l.stach@pengutronix.de>
 
-While the documented VPHY out-of-reset configuration should autonegotiate
-the maximum supported link speed on the CPU interface, that doesn't work
-on RGMII links, where the VPHY negotiates 100MBit speed. This causes the
-RGMII TX interface to run with a wrong clock rate.
 
-Disable the VPHY output altogether, so it doesn't interfere with the
-CPU interface configuration set via fixed-link. The VPHY is a compatibility
-functionality to be able to attach network drivers without fixed-link
-support to the switch, which generally should not be needed with linux
-network drivers.
+On 6/11/24 10:42, Christophe Roullier wrote:
+> Enable MCP23S08 pinctrl support
+> 
+> V2: - Remark from Krzysztof (Change built-in to module)
+> 
+> Christophe Roullier (1):
+>    ARM: multi_v7_defconfig: Add MCP23S08 pinctrl support
+> 
+>   arch/arm/configs/multi_v7_defconfig | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> 
+> base-commit: bb678f01804ccaa861b012b2b9426d69673d8a84
 
-Signed-off-by: Lucas Stach <l.stach@pengutronix.de>
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/dsa/microchip/lan937x_main.c | 3 +++
- drivers/net/dsa/microchip/lan937x_reg.h  | 4 ++++
- 2 files changed, 7 insertions(+)
+Applied on stm32-next.
 
-diff --git a/drivers/net/dsa/microchip/lan937x_main.c b/drivers/net/dsa/microchip/lan937x_main.c
-index b6ef48a655735..9cd3ff38ed66b 100644
---- a/drivers/net/dsa/microchip/lan937x_main.c
-+++ b/drivers/net/dsa/microchip/lan937x_main.c
-@@ -400,6 +400,9 @@ int lan937x_setup(struct dsa_switch *ds)
- 	lan937x_cfg(dev, REG_SW_GLOBAL_OUTPUT_CTRL__1,
- 		    (SW_CLK125_ENB | SW_CLK25_ENB), true);
- 
-+	/* disable VPHY output*/
-+	ksz_rmw32(dev, REG_SW_CFG_STRAP_OVR, SW_VPHY_DISABLE, SW_VPHY_DISABLE);
-+
- 	return 0;
- }
- 
-diff --git a/drivers/net/dsa/microchip/lan937x_reg.h b/drivers/net/dsa/microchip/lan937x_reg.h
-index e36bcb155f545..be553e23a964e 100644
---- a/drivers/net/dsa/microchip/lan937x_reg.h
-+++ b/drivers/net/dsa/microchip/lan937x_reg.h
-@@ -37,6 +37,10 @@
- #define SW_CLK125_ENB			BIT(1)
- #define SW_CLK25_ENB			BIT(0)
- 
-+/* 2 - PHY Control */
-+#define REG_SW_CFG_STRAP_OVR		0x214
-+#define SW_VPHY_DISABLE			BIT(31)
-+
- /* 3 - Operation Control */
- #define REG_SW_OPERATION		0x0300
- 
--- 
-2.39.2
-
+Thanks
+Alex
 
