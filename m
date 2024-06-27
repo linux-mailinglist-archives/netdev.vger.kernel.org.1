@@ -1,110 +1,110 @@
-Return-Path: <netdev+bounces-107456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A6FC91B0C9
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 22:47:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD5CA91B0D6
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 22:49:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36C61280A56
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 20:47:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 871381F26956
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 20:49:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2531A4F3A;
-	Thu, 27 Jun 2024 20:44:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC391A01DA;
+	Thu, 27 Jun 2024 20:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fm14q7G0"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B3C1A3BC6;
-	Thu, 27 Jun 2024 20:44:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4948219F49C;
+	Thu, 27 Jun 2024 20:47:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719521093; cv=none; b=RBpR9T8b/+1OirJxnHAZXJO/REE3KYYrAipdUUZJE9Ded9rfGnW4oQiXRUyaHql6p9WCiYn34cPdnltyZAkMfrbSROUvGB6SnhRgM+1plpvSWTRGRi1lBFKX+PniCUA5RwhV+ejD0xQxZYepLT13Nh8gCrv2KCjrHT0dSSTaj4w=
+	t=1719521263; cv=none; b=F6KYTp9qln4e2C9yZ7+Htv2tNwe9hdGzxMo7aMM0wlTAgOkhlp0XfTr/R7mfLUkhfYMZApKDeM9F4E/CHLkGYQGw59bEFH7mUfsQlHP0PWuND1xGupX3m6Iec0UjYkEYBK7B+ZP1DRdqqMrGKqVHYFqWdaw6EDTW8WSZnnuMIAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719521093; c=relaxed/simple;
-	bh=LLl79xyUmSxvDDQb0rFblZjzQKy3uOIjEbcE7GTPJ6c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RdXbpfZFHMftJcCMmyKLPCCtQhoz1g6hpQtthNgsCTkHidGVaTYbLoUDcvy79qtoUC/1XKMQPqAMBOOSI0hp9xvMkk9SM6+FnS5GQ8NStp8j0U5cNKvfTCEsWCLkyR+MdV7ReUzX2a5D3dusxC3z0vogmVA2XeBzk+1l1P9f33w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=54896 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1sMvyv-00ABVs-Ph; Thu, 27 Jun 2024 22:44:40 +0200
-Date: Thu, 27 Jun 2024 22:44:36 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Mirsad Todorovac <mtodorovac69@gmail.com>
-Cc: Linux Kernel Build System <linux-kbuild@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org
-Subject: Re: [PROBLEM] make randconfig: net/netfilter/core.c:830: undefined
- reference to `netfilter_lwtunnel_fini'
-Message-ID: <Zn3PNGFkg6jqU9wc@calendula>
-References: <7a472130-d9c4-4fda-840b-093308f73d3d@gmail.com>
- <Znc4931wlIgvqrfP@calendula>
- <6cdb1346-75ca-472e-8d96-d58a1eaab172@gmail.com>
- <b50bb0bf-4d35-4334-a721-2a092210aecc@gmail.com>
- <Znw78PpYwAgFZiaB@calendula>
- <3d7b5916-c462-49cb-af32-e43f6d6ebfec@gmail.com>
- <d3f8254f-0f53-47ee-a363-b14e9991a6e9@gmail.com>
+	s=arc-20240116; t=1719521263; c=relaxed/simple;
+	bh=A5AMW+ZLMpX4csf8vnGmP52U32Ex4ZiXhPpAfEuGJIM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ChNBTvjtJNeBD8/HgEQmU3kwoU/Jwu2TbQMoMIdL594Dpgz+E1Ov4gCElmWBbL/uD1i55IgkwXrq6viT+dYbvWuCbmNGVo+vYKYYLCJ+mPoZ3Is/in5kFwtRRgnXdcuce4BlfWkThbz0W0sxNYR4kjUsnhyPYk+1wtCnXeF1Bwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fm14q7G0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8520C2BBFC;
+	Thu, 27 Jun 2024 20:47:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719521262;
+	bh=A5AMW+ZLMpX4csf8vnGmP52U32Ex4ZiXhPpAfEuGJIM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fm14q7G0XfP2HRyb1ZONJ+pqWBWPdhH2d6IjA0ofu+ehRYg/250v2wrmD+hEAIzhy
+	 5caUG+fhduRYCsICV5ZrbBJAXKlcmtzxiOCz6jFU00UwMVMtD6dbVR0LU5kxOr3Vzi
+	 0cAbW2JKPpLqSba16PMnQX/dcfAOoGDpmPAXuSdllZi6nWn1C7I2SU1ch36qi0pxGU
+	 IihY3N5vgcgKBWatl6HEJmjhiMyCz8n3KjAwTl+PBG+9aUmYsI19ix1s++aG1UBGv+
+	 aAFQxni9Alv0KyIBRf2yCiEWUthS2Fyw4DdcUmhxlFEm6zWfMYW2ck/kevCRcJ1ha3
+	 waS1l0dqJcZJQ==
+Date: Thu, 27 Jun 2024 13:47:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, Ivan
+ Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+ <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>,
+ Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
+ <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan
+ <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, Christian
+ =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>, Bagas Sanjaya
+ <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, Nikolay
+ Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>,
+ David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
+ <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
+ Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
+ <pkaligineedi@google.com>, Stanislav Fomichev <sdf@google.com>
+Subject: Re: [PATCH net-next v14 13/13] selftests: add ncdevmem, netcat for
+ devmem TCP
+Message-ID: <20240627134738.163f97e3@kernel.org>
+In-Reply-To: <CAHS8izNBB3+axWFR6cQChAawu194UqzVZ+oZp=c+H5TD4Nd8Zw@mail.gmail.com>
+References: <20240625195407.1922912-1-almasrymina@google.com>
+	<20240625195407.1922912-14-almasrymina@google.com>
+	<20240626150822.742eaf6a@kernel.org>
+	<20240626174634.2adec19d@kernel.org>
+	<CAHS8izOd_yYNJ6+xv35XoCvF7MzqachPVrkQJbic8-h=T1Vg_A@mail.gmail.com>
+	<CAHS8izNBB3+axWFR6cQChAawu194UqzVZ+oZp=c+H5TD4Nd8Zw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d3f8254f-0f53-47ee-a363-b14e9991a6e9@gmail.com>
-X-Spam-Score: -1.9 (-)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 27, 2024 at 10:30:24PM +0200, Mirsad Todorovac wrote:
-> On 6/26/24 20:34, Mirsad Todorovac wrote:
-> > 
-> > 
-> > On 6/26/24 18:04, Pablo Neira Ayuso wrote:
-> >> On Sun, Jun 23, 2024 at 12:51:49AM +0200, Mirsad Todorovac wrote:
-> >>> On 6/23/24 00:48, Mirsad Todorovac wrote:
-> >>>> On 6/22/24 22:49, Pablo Neira Ayuso wrote:
-> >>>>> Hi,
-> >>>>>
-> >>>>> There is a fix on the table address this, I will submit is in the next
-> >>>>> pull request.
-> >>>>
-> >>>> Thank you very much.
-> >>>>
-> >>>> Please consider adding Reported-by: Mirsad Todorovac <mtodorovac69@gmail.com>
-> >>>>  
-> >>>>> Thanks for reporting
-> >>>>
-> >>>> No big deal. Anytime :-)
-> >>>
-> >>> P.S.
-> >>>
-> >>> Please notify when I could test the same .config with your fix.
-> >>
-> >> Patch is here:
-> >>
-> >> https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git/commit/?id=aef5daa2c49d510436b733827d4f0bab79fcc4a0
-> > 
-> > Build error has gone, tested in the same environment. Please find the build output attached.
-> > 
-> > Tested-by: Mirsad Todorovac <mtodorov@69@gmail.com>
-> 
-> Apology, please, the right email is this:
-> 
-> Tested-by: Mirsad Todorovac <mtodorovac69@gmail.com>
+On Thu, 27 Jun 2024 13:36:57 -0700 Mina Almasry wrote:
+> `make -C ./tools/testing/selftests/net TARGETS=ncdevmem`, which works.
 
-Thanks a lot for testing.
+AFAIU the most supported incantation would have to be something rather
+insane, like:
 
-Patch is already flying upstream, I missed adding this tag. But I
-could include your Reported-by: tag.
+make -C tools/testing/selftests TARGETS=net TEST_GEN_PROGS="$(pwd)/tools/testing/selftests/net/tls" TEST_GEN_FILES=""
+
+but yes, don't worry.
 
