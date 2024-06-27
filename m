@@ -1,136 +1,167 @@
-Return-Path: <netdev+bounces-107323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F4D891A8E8
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:15:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B48F991A901
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:18:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA4F7B26A3A
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 14:15:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D2B81F21132
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 14:18:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46248195FCE;
-	Thu, 27 Jun 2024 14:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2105195380;
+	Thu, 27 Jun 2024 14:17:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="lyIOkJ05"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KX9xtFGa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC1A195F1A
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 14:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA321946DC
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 14:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719497556; cv=none; b=D4GGL0fyHO7U+xphpNr5rB0yx7MkbT1enpzRMHjFZJ82Bf0y8inf19O6c1ASwHLXCbfMsH23HpcEFNB4DSMStRN/B7u4uTAOZoX34d+0nPxslMOf3filRQwpSCGbqrGUswPsn/VjuXcjVMPMq14j7H3lgG+DC87r75I+fcsmebY=
+	t=1719497879; cv=none; b=K0q8it4v+ghPPBC/ek0ejO14wonyXejIuNm6roVCKWujv52v4o1ODjkeFUYi51lvPgR1Fl0vsvGF42RWVtN88Usz5HoItMEisCeDP7v7I9PZCeg+aCIMVXyw2v2Lxk1xN2Eozfv6nuBYLGRN4a4hHfeLgAJwSSBrozMUy9ZuiW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719497556; c=relaxed/simple;
-	bh=gY4Q4/1PM/RDP+0xWn2eRTcG6CNIwP755Og3YUmyLW0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qxmx/1ivOPX3CzExmUbkhiwouHYjS/q3rX4Wkbv0Q+uMfd9yWLb/vd5z2Jgb6OoISu7uainz8cHQEsvl+2e9ES2E0Hs0Iyq4x9yBj8vC/YPt3U8cN14wyPBk603mWkwhTISaMFsj7bmFBcxgooBoiwC3jfz59RmxFKiPHd1CATg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=lyIOkJ05; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2ec5779b423so59324861fa.0
-        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 07:12:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1719497552; x=1720102352; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FTT90OGoRel9hOYp2EFf1nDcNSmQMtkxjpE0hZS59dE=;
-        b=lyIOkJ05HpWqkHilFHHWcCZq9LxZUF9ZYIPz3A2deRHccFVEwohIbD1Dw2Xxua/zQG
-         8+6zh9jERv4crY1Cx75Iqb0HCsox62t641sdE0DXDeKx5HvSZOO1pey//EXrFLeuIi2V
-         nYXxQBJwPYsLWqx25SDz5giEHnUquM6wkwiU5/vpP9/s37qXQ+72Jl/tvT9KpGZlgz1e
-         QpaazdssZAZm+zdYRQ0w44RSOp8dhgA09prK3DFKhE/YjVnvUXyRZtm2q1ZjNXN6lGSE
-         3CKpq0vVn7ZOgNE9KIrOX2JPhgEQLQSsQULXnzM3YBn0/zpSSjXkxH2rRDyNCmYSxTFE
-         mUSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719497552; x=1720102352;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FTT90OGoRel9hOYp2EFf1nDcNSmQMtkxjpE0hZS59dE=;
-        b=rRvHJwkpLhGyKAz8NZa1/iVHuthe+Gj6VhaIoIsDsYBZ3J4iQ3LPpXg6kZP4ifGr5T
-         Q39joM2fTIh49k3CkzlUkdVySEuxQ/wwd8XIT+h1sOpJBM2M6z5YI1TZWNn1Z6ihHGFz
-         SXkZ4tMnEQTyvIp53g0e2ZDHf0PUh7lIQRKqvQWvivo7/FttwDvhKs0Ta9oxOnB3/01m
-         687RECmWxej/2Qn9ut3qACpuGFKvwp95ygF9ITIwXrak6OyOEDjBvhJsrHzQ6osXCbDm
-         MIbLMuMgnbZn22ZHY550uLeTjXQpyiCoyqxa8VnWXsVEf2xPfkDicywvWNOB7NN6SoAR
-         mAiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUwiYvEWavyQSFzv5Z8XES3Qm5gulpV+NamSe+RkkNt2nwRPfUTfXKzkvkmLeX3nfB8SM6Wyw6NxUjKZJMa2ZW4bwMp8lmo
-X-Gm-Message-State: AOJu0YwSoFkC/Q2Kf5O3F6uHpv+7QvB6GUS90eUTQWjRk0oEULkfHbPx
-	CAz3dMmfAgsU+hqGETzf63uXmoxCSo7syh8zw1wgM+SPqkLQCsHXRGt8qs3LO9M=
-X-Google-Smtp-Source: AGHT+IHPBg2ombsm1Fu//cFjlqwhC2otnKH/tHQvSElvv3SrldkNfebTn9aQLa68ZDubk6Umw3eVag==
-X-Received: by 2002:a2e:9f10:0:b0:2eb:fc08:5d83 with SMTP id 38308e7fff4ca-2ec59389fffmr94063171fa.44.1719497552376;
-        Thu, 27 Jun 2024 07:12:32 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-584d278120esm920856a12.60.2024.06.27.07.12.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jun 2024 07:12:31 -0700 (PDT)
-Message-ID: <d459d0a7-750a-4cd2-9c68-8031a55f9e9f@blackwall.org>
-Date: Thu, 27 Jun 2024 17:12:30 +0300
+	s=arc-20240116; t=1719497879; c=relaxed/simple;
+	bh=/zLM4zGONvDlGfVwFRXxRQODmfBcy+xPhKfn+QOxD/Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bX1SxzPKGjsi+MxvHjc35UpLEcmQRYamtXkaaN4WKOOMEHCRmPbyTJVB3C1+0KYiL9rwH3ww0LBjt024MxHnNIaOZVrqUQ7AjO6Ax6smFOAR9CDs/4cPcyxS4sRhFLFe+gzKdK9MDhF2G2pbH1hCJGjFgWQW/F94ca2mUQJR4HQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KX9xtFGa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88E4BC32786;
+	Thu, 27 Jun 2024 14:17:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719497879;
+	bh=/zLM4zGONvDlGfVwFRXxRQODmfBcy+xPhKfn+QOxD/Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KX9xtFGavS/tfeI9Xf0TuU6XgqOgoprFz21MI4FO9q1Wx+o4mwFcAideh9Ic2kfrj
+	 6btv5Slji9cF+VexNI+SD02ZpHUu78DU2gq/sDVQpDB3+2WC/2C/0Cj4DP7IZrRzLz
+	 Nj9so3JpMH0TgVx87cvlU+sxto4B6AL85VNSVfTKaNLjzsRk5qb2SvbvcF/SRoNReE
+	 zvTtpeJY2ir0eY5JNFg/LxIlfk7D4iw6gUxZLLWpJ4E6WAhw/1UURk29vAXQOAelhh
+	 bElTySrghGD56VClDgRhHeSydKvJ4gMnLcJ7w/wfmOBQbI53ev+4EudcPFs0G6LDBS
+	 z+jQg9S2I8qIA==
+Date: Thu, 27 Jun 2024 15:17:55 +0100
+From: Simon Horman <horms@kernel.org>
+To: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
+Cc: netdev@vger.kernel.org, Rasesh Mody <rmody@marvell.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	GR-Linux-NIC-Dev@marvell.com, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] bna: adjust 'name' buf size of bna_tcb and bna_ccb
+ structures
+Message-ID: <20240627141755.GG3104@kernel.org>
+References: <20240625191433.452508-1-aleksei.kodanev@bell-sw.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 net-next] bonding: 3ad: send ifinfo notify when mux
- state changed
-To: Hangbin Liu <liuhangbin@gmail.com>,
- Jay Vosburgh <jay.vosburgh@canonical.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- Andy Gospodarek <andy@greyhouse.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
- Jiri Pirko <jiri@resnulli.us>, Amit Cohen <amcohen@nvidia.com>
-References: <20240626075156.2565966-1-liuhangbin@gmail.com>
- <20240626145355.5db060ad@kernel.org> <1429621.1719446760@famine>
- <Zn0iI3SPdRkmfnS1@Laptop-X1>
- <7e0a0866-8e3c-4abd-8e4f-ac61cc04a69e@blackwall.org>
- <Zn05dMVVlUmeypas@Laptop-X1>
- <89249184-41ac-42f6-b5af-4a46f9b28247@blackwall.org>
- <Zn1mXRRINDQDrIKw@Laptop-X1>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <Zn1mXRRINDQDrIKw@Laptop-X1>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240625191433.452508-1-aleksei.kodanev@bell-sw.com>
 
-On 27/06/2024 16:17, Hangbin Liu wrote:
-> On Thu, Jun 27, 2024 at 01:33:10PM +0300, Nikolay Aleksandrov wrote:
->>> Yes, but at least the admin could get the latest state. With the following
->>> code the admin may not get the latest update if lock rtnl failed.
->>>
->>>         if (should_notify_rtnl && rtnl_trylock()) {
->>>                 bond_slave_lacp_notify(bond);
->>>                 rtnl_unlock();
->>> 	}
->>>
->> Well, you mentioned administrators want to see the state changes, please
->> better clarify the exact end goal. Note that technically may even not be
->> the last state as the state change itself happens in parallel (different
->> locks) and any update could be delayed depending on rtnl availability
->> and workqueue re-scheduling. But sure, they will get some update at some point. :)
-> 
-> Ah.. Yes, that's a sad fact :(
->>
->> It all depends on what are the requirements.
->>
->> An uglier but lockless alternative would be to poll the slave's sysfs oper state,
->> that doesn't require any locks and would be up-to-date.
-> 
-> Hmm, that's a workaround, but the admin need to poll the state frequently as
-> they don't know when the state will change.
-> 
++ Eric Dumazet, Jakub Kicinski, Paolo Abeni
 
-Oh wait, that wasn't what I was proposing, I was thinking about the port's oper state
-which is already available via a sysfs attribute. Generally sysfs is getting deprecated.
-
-> Hi Jay, are you OK to add this sysfs in bonding?
+On Tue, Jun 25, 2024 at 07:14:33PM +0000, Alexey Kodanev wrote:
+> To have enough space to write all possible sprintf() args. Currently
+> 'name' size is 16, but the first '%s' specifier may already need at
+> least 16 characters, since 'bnad->netdev->name' is used there.
 > 
-> Thanks
-> Hangbin
+> For '%d' specifiers, assume that they require:
+>  * 1 char for 'tx_id + tx_info->tcb[i]->id' sum, BNAD_MAX_TXQ_PER_TX is 8
+>  * 2 chars for 'rx_id + rx_info->rx_ctrl[i].ccb->id', BNAD_MAX_RXP_PER_RX
+>    is 16
+> 
+> And replace sprintf with snprintf.
+> 
+> Detected using the static analysis tool - Svace.
+> 
+> Fixes: 8b230ed8ec96 ("bna: Brocade 10Gb Ethernet device driver")
+> Signed-off-by: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
 
+Thanks Alexey,
+
+I agree that this change is a nice improvement.  And I verified that gcc-13
+W=1 builds on x86_64 report warnings regarding the issues addressed by this
+patch: the warnings are resolved by this patch.
+
+But I do also wonder if we should consider removing this driver.
+I don't see any non-trivial updates to it since
+commit d667f78514c6 ("bna: Add synchronization for tx ring.")
+a bug fix from November 2016 which was included in v4.9.
+
+Although, perhaps your patch indicates this driver is being used :)
+
+On process:
+
+When posting patches for net or net-next, please generate a CC list using
+./scripts/get_maintainer.pl your.patch
+
+This does not seem to be a bug fix in the sense that it doesn't seem
+to resolve a problem that manifests itself. If so, it should be targeted
+at net-next rather than net.
+
+Link: https://docs.kernel.org/process/maintainer-netdev.html
+
+...
+
+> ---
+>  drivers/net/ethernet/brocade/bna/bna_types.h |  2 +-
+>  drivers/net/ethernet/brocade/bna/bnad.c      | 11 ++++++-----
+>  2 files changed, 7 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/brocade/bna/bna_types.h b/drivers/net/ethernet/brocade/bna/bna_types.h
+> index a5ebd7110e07..986f43d27711 100644
+> --- a/drivers/net/ethernet/brocade/bna/bna_types.h
+> +++ b/drivers/net/ethernet/brocade/bna/bna_types.h
+> @@ -416,7 +416,7 @@ struct bna_ib {
+>  /* Tx object */
+>  
+>  /* Tx datapath control structure */
+> -#define BNA_Q_NAME_SIZE		16
+> +#define BNA_Q_NAME_SIZE		(IFNAMSIZ + 6)
+>  struct bna_tcb {
+>  	/* Fast path */
+>  	void			**sw_qpt;
+> diff --git a/drivers/net/ethernet/brocade/bna/bnad.c b/drivers/net/ethernet/brocade/bna/bnad.c
+> index fe121d36112d..3313a0d84466 100644
+> --- a/drivers/net/ethernet/brocade/bna/bnad.c
+> +++ b/drivers/net/ethernet/brocade/bna/bnad.c
+> @@ -1534,8 +1534,9 @@ bnad_tx_msix_register(struct bnad *bnad, struct bnad_tx_info *tx_info,
+>  
+>  	for (i = 0; i < num_txqs; i++) {
+>  		vector_num = tx_info->tcb[i]->intr_vector;
+> -		sprintf(tx_info->tcb[i]->name, "%s TXQ %d", bnad->netdev->name,
+> -				tx_id + tx_info->tcb[i]->id);
+> +		snprintf(tx_info->tcb[i]->name, BNA_Q_NAME_SIZE, "%s TXQ %d",
+> +			 bnad->netdev->name,
+> +			 tx_id + tx_info->tcb[i]->id);
+>  		err = request_irq(bnad->msix_table[vector_num].vector,
+>  				  (irq_handler_t)bnad_msix_tx, 0,
+>  				  tx_info->tcb[i]->name,
+> @@ -1585,9 +1586,9 @@ bnad_rx_msix_register(struct bnad *bnad, struct bnad_rx_info *rx_info,
+>  
+>  	for (i = 0; i < num_rxps; i++) {
+>  		vector_num = rx_info->rx_ctrl[i].ccb->intr_vector;
+> -		sprintf(rx_info->rx_ctrl[i].ccb->name, "%s CQ %d",
+> -			bnad->netdev->name,
+> -			rx_id + rx_info->rx_ctrl[i].ccb->id);
+> +		snprintf(rx_info->rx_ctrl[i].ccb->name, BNA_Q_NAME_SIZE, "%s CQ %d",
+
+nit: This line could be trivially line wrapped so that it is less than 80
+     columns wide, which is still preferred for Networking code.
+
+     Flagged by /scripts/checkpatch.pl --max-line-length=80
+
+> +			 bnad->netdev->name,
+> +			 rx_id + rx_info->rx_ctrl[i].ccb->id);
+>  		err = request_irq(bnad->msix_table[vector_num].vector,
+>  				  (irq_handler_t)bnad_msix_rx, 0,
+>  				  rx_info->rx_ctrl[i].ccb->name,
+> -- 
+> 2.25.1
+> 
+> 
 
