@@ -1,53 +1,80 @@
-Return-Path: <netdev+bounces-107103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F315919D2C
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 04:13:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7575E919D5F
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 04:42:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C8B11F2325B
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 02:13:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A1351C22D6C
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 02:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2F779F0;
-	Thu, 27 Jun 2024 02:13:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 114AFDDA0;
+	Thu, 27 Jun 2024 02:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IlOWAVZu"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE574C79;
-	Thu, 27 Jun 2024 02:13:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7061C134BD
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 02:42:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719454419; cv=none; b=gTPyx0lbohl8t0d30XsaioUTucTGy/B0OvbnZPqLtT1pLqkJJl4tTvayJy0wHPTXXQT/d4c+NPhOSiOr75wBZnmuO3I0OuRHH8v2GT+rydBuIIOHbvJSmwwYrJchNLsG8wFeS8/C/nnbaQgmsw6cz7A8Qn4xRBeXSTcujlt1Ma8=
+	t=1719456154; cv=none; b=mublCwg+zxuzC04BjeRoIia/C2t8N+9Su5yIKV1tskoQ36WW9TDDStkZQ6+rAwbkmJ0PWBbYyfcx6gX8iLoCaVFsMINy01dH4PIQani+kRUqm3iBqFFBu/S0/k0YbTmxElNXkaBJl+1ssPLvWlqknegRrdwcR73MCZU584SyIDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719454419; c=relaxed/simple;
-	bh=iWdJfn2nx0iyS1FBdS9+rEwbsfUNJyZwHcmZgyS91mY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Du4mXWzxsPdUAXo8J+0tsFRMymlgS49YCGk5uNs7PC58i8LS4sQUnsVVTucaeUPihy4QdchirbsAk4onzSGA2+Lz/GExjuH+k8PyXtc1wkdsSBJnqdudf19Sty7GO+MjP/07NBexkDG4q1694/7o2sirgsKVUwqHsKPIiOlqQi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
-	by APP-05 (Coremail) with SMTP id zQCowADX3+e7ynxmC5MgAA--.8383S2;
-	Thu, 27 Jun 2024 10:13:26 +0800 (CST)
-From: Ma Ke <make24@iscas.ac.cn>
-To: wintera@linux.ibm.com,
-	twinkler@linux.ibm.com,
-	hca@linux.ibm.com,
-	gor@linux.ibm.com,
-	agordeev@linux.ibm.com,
-	borntraeger@linux.ibm.com,
-	svens@linux.ibm.com,
-	bhelgaas@google.com
-Cc: linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ma Ke <make24@iscas.ac.cn>
-Subject: [PATCH v2] s390/ism: Add check for dma_set_max_seg_size in ism_probe()
-Date: Thu, 27 Jun 2024 10:13:14 +0800
-Message-Id: <20240627021314.2976443-1-make24@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1719456154; c=relaxed/simple;
+	bh=0iPB9ylvKR+xYlK41Wmd7I7C+NFOxbthcEdEhtSO6EE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XC9428H6UYuYyCWws2cRWDtZSfkFB/lUGYiHjRx+/Wb3vgYqFTMKR2OKqn77HRaHcvud/wGms3DRyKFoKyPitNbNQpDHoGPoL4XZ12PLZBbxkJnqlqnw7fvvxk3n4tqmNxjjrzfWUnApv7JLfzCJatwqOCWII13HQbBE/k99gTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IlOWAVZu; arc=none smtp.client-ip=209.85.221.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-4ef66280cd7so1684191e0c.1
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 19:42:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719456151; x=1720060951; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vz4RerORXXu6NVYpMOSjN+rSUnkoXoV9tlFqowdFmKc=;
+        b=IlOWAVZu2DP/8zW+tl2QGDfKTAidLhsk4Y6HMN8sHQ/JZcdsu/8mSVZampHAGy4VEm
+         OcNFaL691GEUFNv/FmyNAOia/l5ekAbqVH8g2zsORFT5c61Xd3DuObeld1Rv6vxfmeOZ
+         vDpPfWU/Z4f5NMXlOHj4+l3ZPmq4HjjlZVycWuHRTqF9naPoDDEGAm/dIlB9LCPpP3tU
+         zp3W7E6MrnK2WbK9r/1AQt0/U3SyxbszZk9FgBczWDd+1BCPliILFgTJLf7iRN8oqMye
+         3CWsCMcmANOm/DDU5F4q/mSzSB1Z98UeciigO0g1gvj5Q8oGHv7WAWwVuS3nrpL1wikc
+         LkCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719456151; x=1720060951;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vz4RerORXXu6NVYpMOSjN+rSUnkoXoV9tlFqowdFmKc=;
+        b=hkuUy2zFmMEZGSPYsY3QmnmKeLF3TcZeEjDVZk23ypYvUhuEqDkf7IxoiEvZaHybnG
+         V1AZlmoeEIbb+QayTDaaWHAZI0SKymrPVYAzFfXnxfUhHxK6ynd7HNbqz1tflDrblVGZ
+         6fa9EF6aOqshuv59N1zRqmNFvBPPa+zRUhXeturYvzeICOUw96wIhBiiykJJUSFhP6SR
+         MRymTb5yt+JenI0zC5zVyhuw3qCh1EIBR+pTE8Fvs0855YOVpRftKOLPiHphgJuANG+z
+         CA5EKAdzqyO5j7NeM0wrtCwJ9T3WTVdBlITA/u4Vhrsdph/XWhR5Z3eRm8zXoIEQ+obX
+         7+VA==
+X-Gm-Message-State: AOJu0YxUhWKO4damIIshbA5F5Zmx+16se2WRcE4WbSz6H4iAF18alol+
+	Z5DZyDBJGJQrOuXOVLjXwMIUvD/BobPivXgb96woqi4ZLav5FutB
+X-Google-Smtp-Source: AGHT+IEUNsuUNhORzsY2/P6BKeeiYucWm0URSqs+uRBXhCCAgw/81PcaIKtehcTNyYNewuopnSRxTw==
+X-Received: by 2002:a05:6122:202a:b0:4ed:314:b3e3 with SMTP id 71dfb90a1353d-4ef6d7d0372mr10882530e0c.3.1719456151135;
+        Wed, 26 Jun 2024 19:42:31 -0700 (PDT)
+Received: from soy.nyc.corp.google.com ([2620:0:1003:416:598f:defd:fe4c:6089])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59253752fsm1428156d6.69.2024.06.26.19.42.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jun 2024 19:42:30 -0700 (PDT)
+From: Neal Cardwell <ncardwell.sw@gmail.com>
+To: David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org,
+	Neal Cardwell <ncardwell@google.com>,
+	Yuchung Cheng <ycheng@google.com>
+Subject: [PATCH net] UPSTREAM: tcp: fix DSACK undo in fast recovery to call tcp_try_to_open()
+Date: Wed, 26 Jun 2024 22:42:27 -0400
+Message-ID: <20240627024227.3040278-1-ncardwell.sw@gmail.com>
+X-Mailer: git-send-email 2.45.2.741.gdbec12cfda-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,55 +82,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowADX3+e7ynxmC5MgAA--.8383S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Jw4rKry8CryUXr4kAr17trb_yoWDAFbEgw
-	4xCF93tr47Kw4xKr4UGr4avrWq9r1vqr1rWFn7ta4ft34Uur1DX3srZF1rWr4Uua93AF47
-	Ar1xJrWYkwn8ujkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbaxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6r1F6r1fM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
-	1j6F4UJwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
-	FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
-	0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8v
-	x2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
-	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
-	MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
-	WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
-	6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
-	BIdaVFxhVjvjDU0xZFpf9x0JUQZ23UUUUU=
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
 
-As the possible failure of the dma_set_max_seg_size(), we should better
-check the return value of the dma_set_max_seg_size().
+From: Neal Cardwell <ncardwell@google.com>
 
-Fixes: b0da3498c587 ("PCI: Remove pci_set_dma_max_seg_size()")
-Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+In some production workloads we noticed that connections could
+sometimes close extremely prematurely with ETIMEDOUT after
+transmitting only 1 TLP and RTO retransmission (when we would normally
+expect roughly tcp_retries2 = TCP_RETR2 = 15 RTOs before a connection
+closes with ETIMEDOUT).
+
+From tracing we determined that these workloads can suffer from a
+scenario where in fast recovery, after some retransmits, a DSACK undo
+can happen at a point where the scoreboard is totally clear (we have
+retrans_out == sacked_out == lost_out == 0). In such cases, calling
+tcp_try_keep_open() means that we do not execute any code path that
+clears tp->retrans_stamp to 0. That means that tp->retrans_stamp can
+remain erroneously set to the start time of the undone fast recovery,
+even after the fast recovery is undone. If minutes or hours elapse,
+and then a TLP/RTO/RTO sequence occurs, then the start_ts value in
+retransmits_timed_out() (which is from tp->retrans_stamp) will be
+erroneously ancient (left over from the fast recovery undone via
+DSACKs). Thus this ancient tp->retrans_stamp value can cause the
+connection to die very prematurely with ETIMEDOUT via
+tcp_write_err().
+
+The fix: we change DSACK undo in fast recovery (TCP_CA_Recovery) to
+call tcp_try_to_open() instead of tcp_try_keep_open(). This ensures
+that if no retransmits are in flight at the time of DSACK undo in fast
+recovery then we properly zero retrans_stamp. Note that calling
+tcp_try_to_open() is more consistent with other loss recovery
+behavior, since normal fast recovery (CA_Recovery) and RTO recovery
+(CA_Loss) both normally end when tp->snd_una meets or exceeds
+tp->high_seq and then in tcp_fastretrans_alert() the "default" switch
+case executes tcp_try_to_open(). Also note that by inspection this
+change to call tcp_try_to_open() implies at least one other nice bug
+fix, where now an ECE-marked DSACK that causes an undo will properly
+invoke tcp_enter_cwr() rather than ignoring the ECE mark.
+
+Fixes: c7d9d6a185a7 ("tcp: undo on DSACK during recovery")
+Signed-off-by: Neal Cardwell <ncardwell@google.com>
+Signed-off-by: Yuchung Cheng <ycheng@google.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-Changes in v2:
-- modified the patch according to suggestions;
-- modified Fixes line according to suggestions.
----
- drivers/s390/net/ism_drv.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ net/ipv4/tcp_input.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-index e36e3ea165d3..54f6638e889c 100644
---- a/drivers/s390/net/ism_drv.c
-+++ b/drivers/s390/net/ism_drv.c
-@@ -620,7 +620,10 @@ static int ism_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		goto err_resource;
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 2e39cb881e209..e67cbeeeb95b4 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -3077,7 +3077,7 @@ static void tcp_fastretrans_alert(struct sock *sk, const u32 prior_snd_una,
+ 			return;
  
- 	dma_set_seg_boundary(&pdev->dev, SZ_1M - 1);
--	dma_set_max_seg_size(&pdev->dev, SZ_1M);
-+	ret = dma_set_max_seg_size(&pdev->dev, SZ_1M);
-+	if (ret)
-+		goto err_resource;
-+
- 	pci_set_master(pdev);
+ 		if (tcp_try_undo_dsack(sk))
+-			tcp_try_keep_open(sk);
++			tcp_try_to_open(sk, flag);
  
- 	ret = ism_dev_init(ism);
+ 		tcp_identify_packet_loss(sk, ack_flag);
+ 		if (icsk->icsk_ca_state != TCP_CA_Recovery) {
 -- 
-2.25.1
+2.45.2.741.gdbec12cfda-goog
 
 
