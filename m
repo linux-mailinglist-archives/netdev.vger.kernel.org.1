@@ -1,74 +1,65 @@
-Return-Path: <netdev+bounces-107127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1ED6919F81
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 08:45:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4604F919F87
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 08:47:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D56D285CF6
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 06:45:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF2B22855D3
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 06:47:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8E52E40D;
-	Thu, 27 Jun 2024 06:45:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3148538DE8;
+	Thu, 27 Jun 2024 06:47:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NFrO12MZ"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="LiVHopGC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7378C33C9;
-	Thu, 27 Jun 2024 06:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3171720323;
+	Thu, 27 Jun 2024 06:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719470739; cv=none; b=DnA0QttWWqN3hXLxBwOZ42Wt6KcD+ZVGTmop8NQ6oR9JbmllQmu6GGJhMuoz573p9ZMQz8dfaF3tQjrWn+dQiiTv5mXU0xK/xxO6+ZEJ39xwlGLtOMoUMtqbE9qVt79UMk38liHp5mudKzpZ59aSryVvWZa3hYFqTQiaT1ZW3Rs=
+	t=1719470860; cv=none; b=fba043KbeuFgeash/ZiacY7j5RqvoyIyjwEQgMWku52ePmePDNdVTbVFvnYO668XadOfbfuJS1IKsfMbq3H1LezksDt2pF9YIWBV0x4TuBMX/Hwm4UD5ahIkHF6NEhRwThM/hgtNjeBhK0pwDoNA0RBCgJlbPBy/SalDWwrbSrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719470739; c=relaxed/simple;
-	bh=QoIAkNrWrjC0y5N7eW7++/V0nwxt/I/u+sgkuqntuA8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=reAeyiCkgrai5SMvbOxusCibbDBHmqTcviUyq8auCU05igbPmUeF8GFa0NEzLlQJ3F+Ao9YHb8gbv3ZU2NmvQ2NWdxJnivf9BKuy5As1cgLd0fOMRbvLcKbiZUiDqFfjcND7paTmk0K/Mc44fOFaTTXj3yaeU9T8TbH29Py8z3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NFrO12MZ; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-57d2fc03740so1304865a12.0;
-        Wed, 26 Jun 2024 23:45:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719470736; x=1720075536; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZRSBuGbR3tCWt9CEqfnOKjBBpsnBpX9oljTxmtO9ZxI=;
-        b=NFrO12MZLB7YhNdizLwZzKpBIzP8l2v1OjGjmRUtb+VidO5skoRYbPYLCbJtDazKof
-         3zGc6L48VhLl9gQV0S9mVnhTugFrCCq6T67WJiQxAetI2yfV7VTa/lXd49EgGDyT1KzB
-         rqEduBnPVgHLEIyLyNucmLZ3X9fT6UzXdyr0pX2UN1iJvT6D102/SF65fdzixlUpxH99
-         Syo4YNO3tTTlmEfJeMKgogS2OCNiL874c3bgLkyRqo3k0KJZJRHcZUXumwbDtpAxFwD4
-         vC724ugVhf7DhZalkprOP/xPWBadt1QEHZonnjlMgjpMEqrbBtWGkgJPntQhr72OPPOW
-         drgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719470736; x=1720075536;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZRSBuGbR3tCWt9CEqfnOKjBBpsnBpX9oljTxmtO9ZxI=;
-        b=rzGzb6dfPl0Sat2b1fwDm5y/CKjUUGPstIAeKIG5jI8KVFuvXmYaRbxomxv1EXgNjc
-         LT9kqu46KUOxpwxBRXNZ0kjKDs/Y3mNfQCOJdOM/UGBKM35zgMkg/sje7OFrtzaffFgn
-         Fcuihv9Bj2ARSVmvzwQFKPVLGGUo6vtcK8XN2UfBSdB8+WgEaSDt7rgxiZEv2/UdcuAv
-         5iK2IW+byR3QsmHn+pHR8+yMg8rQgwwTSo+eD9uJcGRenPuhgxZFIbVqrPOHvFCLLf5b
-         bvcIztdviSYwYlu++Y8Ctwhq4FJH/bycHq30UEfU32nz/fyWtNShuY3tNvYMXtFR4AyS
-         4COA==
-X-Forwarded-Encrypted: i=1; AJvYcCXmLHjOVK45e44ffJk8X5nJiuCNkTgU8BkL/3DvWRaeR4liFxhZrqdoXsAsP2Umo9m2erKDgFyc7qY1bAxKKTNB3UwNL4nrsX6aVTZbCBYEs2SJCm8pY+eCfRH2blOkcnPfmVXpuIgGyfVAx5pF9MXY4LU0FD0gByb7y8MfL1M//b5QKQ==
-X-Gm-Message-State: AOJu0Yxq/hdv7qFYHTcoWzlCy5QPKfuHrUS78wyvBymf+eQmrPAEtytd
-	RbOo0gt9mYvh5ejg5yjmlJEzz0YohpYXutNTxoawyxAfB38IA4Pn
-X-Google-Smtp-Source: AGHT+IHWawN9Q/ebrV/rCy+L7r/1bBiUOSO5Hzzex0kjpOeNPpptFTHml7hK4YLJ70c6hSDfhL7MhA==
-X-Received: by 2002:a50:99dd:0:b0:57d:57c:ce99 with SMTP id 4fb4d7f45d1cf-57d4bd5650fmr9144410a12.2.1719470735646;
-        Wed, 26 Jun 2024 23:45:35 -0700 (PDT)
-Received: from [192.168.26.149] (031011218106.poznan.vectranet.pl. [31.11.218.106])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-584d17b03a3sm455922a12.53.2024.06.26.23.45.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jun 2024 23:45:35 -0700 (PDT)
-Message-ID: <5c6426cb-8381-49f1-b0c0-34850759134d@gmail.com>
-Date: Thu, 27 Jun 2024 08:45:32 +0200
+	s=arc-20240116; t=1719470860; c=relaxed/simple;
+	bh=B9O9jGT1Ussfkps7YXut5xQ+RhX3knK+hzENBGYoF18=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=OTxg6MdaVWyuTmF9up7V6cS3MvqEpsgf4aZ/oUM+5hf473hh3QnfRD9ah9kNl4qbQpKhy8dL2OW+OjWAj+/FQesvZSFRes7Ifysg4ptoKZ3q1j71XmuxkB2e9cqMcPr7Bg9ueGIQMJEWWYzxcCpFmKKlkFcrtmXszXpLhnqqawY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=LiVHopGC; arc=none smtp.client-ip=91.207.212.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45R0Wjnm010481;
+	Thu, 27 Jun 2024 08:47:01 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	MlmSx7OBvuKIe5Rtv99hWsLybZ5aGRu/rNbbqX9lBlQ=; b=LiVHopGCnWujb4kT
+	BXQclmlyCdbqzsUnR3LhPCkGE671CPgTqMAlKBA2vnm5IjytlPoVp35rxYz1Z43y
+	vp2YzNwkJsWybg1cOZIj7G6YMm6j/UwsxHpqbRwKA9vxLNKCPq8ZdoOTSTxEiHBS
+	yOSsizfYvZ9W9FIBTHS1c2Y8zMW/a9jDToLMVJ3dxAOiCqShQEjjH7zd2cYZdvAX
+	RauMI6xfLEBwYfWAvDuKzJcsvULumE5Acm7cqDfx9oIaXnaKBCumufx51cI9j902
+	SBRbGLlhoCrgabSHMCaTR4HTKCwNCPEJA9Dw7Hh181Hyb5Mx+taxGsPijRwOLX56
+	gedjuw==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yx9jjgsgw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 27 Jun 2024 08:47:00 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 8FF8C40045;
+	Thu, 27 Jun 2024 08:46:55 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id D0E10210F85;
+	Thu, 27 Jun 2024 08:45:40 +0200 (CEST)
+Received: from [10.48.86.164] (10.48.86.164) by SHFDAG1NODE2.st.com
+ (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 27 Jun
+ 2024 08:45:39 +0200
+Message-ID: <4d5cfb6b-0cf5-46f1-b725-acfe995d4482@foss.st.com>
+Date: Thu, 27 Jun 2024 08:45:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,59 +67,109 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dt-bindings: net: bluetooth: convert MT7622 Bluetooth to
- the json-schema
+Subject: Re: [net-next,PATCH v7 2/8] net: stmmac: dwmac-stm32: Separate out
+ external clock rate validation
+To: Mark Brown <broonie@kernel.org>
+CC: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+        Marek
+ Vasut <marex@denx.de>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20240611083606.733453-1-christophe.roullier@foss.st.com>
+ <20240611083606.733453-3-christophe.roullier@foss.st.com>
+ <755275e3-b95a-44c0-941e-beb5dde65982@sirena.org.uk>
 Content-Language: en-US
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: linux-mediatek@lists.infradead.org,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-arm-kernel@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Conor Dooley <conor+dt@kernel.org>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
- devicetree@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Eric Dumazet
- <edumazet@google.com>, linux-bluetooth@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>, netdev@vger.kernel.org
-References: <20240627054011.26621-1-zajec5@gmail.com>
- <171946908894.1855961.17183583790942661835.robh@kernel.org>
-From: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
-In-Reply-To: <171946908894.1855961.17183583790942661835.robh@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Christophe ROULLIER <christophe.roullier@foss.st.com>
+In-Reply-To: <755275e3-b95a-44c0-941e-beb5dde65982@sirena.org.uk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE2.st.com
+ (10.75.129.70)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-27_03,2024-06-25_01,2024-05-17_01
 
-On 27.06.2024 08:18, Rob Herring (Arm) wrote:> On Thu, 27 Jun 2024 07:40:11 +0200, Rafał Miłecki wrote:
- >> From: Rafał Miłecki <rafal@milecki.pl>
- >>
- >> This helps validating DTS files.
- >>
- >> Signed-off-by: Rafał Miłecki <rafal@milecki.pl>
- >> ---
- >>   .../bluetooth/mediatek,mt7622-bluetooth.yaml  | 61 +++++++++++++++++++
- >>   .../bindings/net/mediatek-bluetooth.txt       | 36 -----------
- >>   2 files changed, 61 insertions(+), 36 deletions(-)
- >>   create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.yaml
- >>
- >
- > My bot found errors running 'make dt_binding_check' on your patch:
- >
- > yamllint warnings/errors:
- >
- > dtschema/dtc warnings/errors:
- > /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.example.dtb: serial@1100c000: reg: [[0, 285261824], [0, 4096]] is too long
- > 	from schema $id: http://devicetree.org/schemas/serial/8250.yaml#
- > /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.example.dtb: serial@1100c000: Unevaluated properties are not allowed ('clock-names' was unexpected)
- > 	from schema $id: http://devicetree.org/schemas/serial/8250.yaml#
-Oops, I really need to fix my yamllint
+Hi Mark,
 
-$ make ARCH=arm64 dt_binding_check DT_SCHEMA_FILES=net/bluetooth/mediatek,mt7622-bluetooth.yaml
-   SCHEMA  Documentation/devicetree/bindings/processed-schema.json
-   CHKDT   Documentation/devicetree/bindings
-   DTEX    Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.example.dts
-   DTC_CHK Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.example.dtb
-   LINT    Documentation/devicetree/bindings
-invalid config: unknown option "extra-allowed" for rule "quoted-strings"
-xargs: /usr/bin/yamllint: exited with status 255; aborting
+Sorry, issue found, I will push fix this morning.
 
+Regards.
+
+Christophe.
+
+On 6/26/24 12:38, Mark Brown wrote:
+> On Tue, Jun 11, 2024 at 10:36:00AM +0200, Christophe Roullier wrote:
+>> From: Marek Vasut <marex@denx.de>
+>>
+>> Pull the external clock frequency validation into a separate function,
+>> to avoid conflating it with external clock DT property decoding and
+>> clock mux register configuration. This should make the code easier to
+>> read and understand.
+> For the past few days networking has been broken on the Avenger 96, a
+> stm32mp157a based platform.  The stm32-dwmac driver fails to probe:
+>
+> <6>[    1.894271] stm32-dwmac 5800a000.ethernet: IRQ eth_wake_irq not found
+> <6>[    1.899694] stm32-dwmac 5800a000.ethernet: IRQ eth_lpi not found
+> <6>[    1.905849] stm32-dwmac 5800a000.ethernet: IRQ sfty not found
+> <3>[    1.912304] stm32-dwmac 5800a000.ethernet: Unable to parse OF data
+> <3>[    1.918393] stm32-dwmac 5800a000.ethernet: probe with driver stm32-dwmac failed with error -75
+>
+> which looks a bit odd given the commit contents but I didn't look at the
+> driver code at all.
+>
+> Full boot log here:
+>
+>     https://lava.sirena.org.uk/scheduler/job/467150
+>
+> A working equivalent is here:
+>
+>     https://lava.sirena.org.uk/scheduler/job/466518
+>
+> A bisection identified this commit as being responsible, log below:
+>
+> git bisect start
+> # status: waiting for both good and bad commits
+> # bad: [0fc4bfab2cd45f9acb86c4f04b5191e114e901ed] Add linux-next specific files for 20240625
+> git bisect bad 0fc4bfab2cd45f9acb86c4f04b5191e114e901ed
+> # status: waiting for good commit(s), bad commit known
+> # good: [3d9217c41c07b72af3a5c147cb82c75f757f4200] Merge branch 'for-linux-next-fixes' of https://gitlab.freedesktop.org/drm/misc/kernel.git
+> git bisect good 3d9217c41c07b72af3a5c147cb82c75f757f4200
+> # bad: [5699faecf4e2347f81eea62db0455feb4d794537] Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+> git bisect bad 5699faecf4e2347f81eea62db0455feb4d794537
+> # good: [ba73da675606373565868962ad8c615f175662ed] Merge branch 'fs-next' of linux-next
+> git bisect good ba73da675606373565868962ad8c615f175662ed
+> # bad: [7e7c714a36a5b10e391168e7e8145060e041ea12] Merge branch 'af_unix-remove-spin_lock_nested-and-convert-to-lock_cmp_fn'
+> git bisect bad 7e7c714a36a5b10e391168e7e8145060e041ea12
+> # good: [93d4e8bb3f137e8037a65ea96f175f81c25c50e5] Merge tag 'wireless-next-2024-06-07' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next
+> git bisect good 93d4e8bb3f137e8037a65ea96f175f81c25c50e5
+> # bad: [4314175af49668ab20c0d60d7d7657986e1d0c7c] Merge branch 'net-smc-IPPROTO_SMC'
+> git bisect bad 4314175af49668ab20c0d60d7d7657986e1d0c7c
+> # good: [811efc06e5f30a57030451b2d1998aa81273baf8] net/tcp: Move tcp_inbound_hash() from headers
+> git bisect good 811efc06e5f30a57030451b2d1998aa81273baf8
+> # good: [5f703ce5c981ee02c00e210d5b155bbbfbf11263] net: hsr: Send supervisory frames to HSR network with ProxyNodeTable data
+> git bisect good 5f703ce5c981ee02c00e210d5b155bbbfbf11263
+> # bad: [6c3282a6b296385bee2c383442c39f507b0d51dd] net: stmmac: add select_pcs() platform method
+> git bisect bad 6c3282a6b296385bee2c383442c39f507b0d51dd
+> # bad: [404dbd26322f50c8123bf5bff9a409356889035f] net: qrtr: ns: Ignore ENODEV failures in ns
+> git bisect bad 404dbd26322f50c8123bf5bff9a409356889035f
+> # bad: [c60a54b52026bd2c9a88ae00f2aac7a67fed8e38] net: stmmac: dwmac-stm32: Clean up the debug prints
+> git bisect bad c60a54b52026bd2c9a88ae00f2aac7a67fed8e38
+> # bad: [582ac134963e2d5cf6c45db027e156fcfb7f7678] net: stmmac: dwmac-stm32: Separate out external clock rate validation
+> git bisect bad 582ac134963e2d5cf6c45db027e156fcfb7f7678
+> # good: [8a9044e5169bab7a8edadb4ceb748391657f0d7f] dt-bindings: net: add STM32MP13 compatible in documentation for stm32
+> git bisect good 8a9044e5169bab7a8edadb4ceb748391657f0d7f
+> # first bad commit: [582ac134963e2d5cf6c45db027e156fcfb7f7678] net: stmmac: dwmac-stm32: Separate out external clock rate validation
 
