@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-107490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 805D491B2CB
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 01:32:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1CC991B2EA
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 01:41:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B7F9B2470F
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 23:32:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADC2F283678
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 23:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1181A2FC0;
-	Thu, 27 Jun 2024 23:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E521A2FC3;
+	Thu, 27 Jun 2024 23:41:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PJL4YZlB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N4JdBBlr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFEC1199E93;
-	Thu, 27 Jun 2024 23:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD0B3199E93
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 23:41:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719531154; cv=none; b=m7BGpS4acHpBZBh+CHyZI1G2ee1XdQYrN9LgHn8F9lIfOFOsfvyjbBHf0RZh7iibHfBSltI72IX+Hf/X2WESkSMSRigxuwq2atodCXa7Jw1Ev+wgyqrwN3jCJmV8mWD4xXANeVdeFKASrE2e14zZmNPPQIFOFjmC7F/F0EUBy48=
+	t=1719531700; cv=none; b=rTA9waSiyGy506dtELoRg8bHKELv9C24r/+73avIISFn/HOQZhmZHDHk6LKLW5mTBCUz7RDBNWcAkF6QA+3XQbiAH/vaoY5HXd1NqhR0u8fGaQuY4YBbUbfM+TvsqYyhmacQFDu/NdwtQyCdXj5+CiOZju8ZiM5uZlc0ASUuU38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719531154; c=relaxed/simple;
-	bh=4kzXNwWo2EHiiSbt+rLI28KXowWz8U1l+u+WwoIRZjw=;
+	s=arc-20240116; t=1719531700; c=relaxed/simple;
+	bh=4tRXmhyeszPGRAUfgxoKvpDa3pBb7x6V/7Zznn0Egn0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PVfG6t7hJ3qH8hrO6i9hKX/TtCbe+017Co2Bz0C7QGEg/WuApYG5wvgHYPIFwGFsvjWKmGg7Oytn2hy1cvr/NZdjsj4yYMU/rsVLzz12HgcK0f7Ug9AbvlXX+hjjbHdeP/zmIM55Si6heXZ7YagtiODRXUBLgkV0BfMqgShNLAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PJL4YZlB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 254A9C2BBFC;
-	Thu, 27 Jun 2024 23:32:33 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ryLKzWto1vmjgQuZW822YV2lLWtoPYmBiFfe/cXjCf9WqJ8Bypm8u+Iw1SOyvtPzkfNrvcv1Dn1J7bntIhB3qcPmn4fkIDyAALBT66fjz+Vmevuw2YoCF+Pdthc39Wds5JjYf/qrtMtb+r1mjkj4R/LAvVlCuepob7TRDgDaeTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N4JdBBlr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95C49C2BBFC;
+	Thu, 27 Jun 2024 23:41:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719531153;
-	bh=4kzXNwWo2EHiiSbt+rLI28KXowWz8U1l+u+WwoIRZjw=;
+	s=k20201202; t=1719531700;
+	bh=4tRXmhyeszPGRAUfgxoKvpDa3pBb7x6V/7Zznn0Egn0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PJL4YZlB/EyVo/kD3oN81Xg9KTvXfFf4RrYwYtyFFM6jE7baV3gkoYTzTar71gy2J
-	 TIayh4gGeyyrmpDTn9dnB6k373E2sB+YKojDs9Uk22zMetAdG63I7Z9rfUVf2t4AMW
-	 8iqocCJznyKUA3r0sXRrmVS2aPUDw6E+3TtJ5CYuEfexBsUGD5fmxVMVKwey4tZtJZ
-	 9u8HYP8fSExbiuxYIR3IOWF+xcEqqQGWhtTvlfGZO4Wz/rRzf+cELFMRSqnUASzbns
-	 LhzB0nfIJ7o8APnEDTHoNwGP2BpZrU2bGR8MGC8NSFcu5JeVdvD0FuUO89D8RJgOJA
-	 0TEy+bBXgte6w==
-Date: Thu, 27 Jun 2024 16:32:32 -0700
+	b=N4JdBBlrD379qhiXWSRWgcPHvhIKEvwNbupbMebLkRcjMn/DKS9/ZpNWl/sMaQhUS
+	 XfYnYaLbIjC0cqCNtcG3itnMmOPXLwIuVRlF9c4W0TpW4wTo/yb2DV44880bzoprdT
+	 uySlzc0m9jZyLrCYdOQh0I3D3YNpH8qIiHKr4KwMvvINS21t6r/NnKF/aQpCXzUZZd
+	 pxNAPS0jnAHymbUqPndA5um4RmXe/j5SJ8+ZYqed2dUC3eedPNh5Qn+S4BtEXOuq/6
+	 iJqjz9rPNh/EEHL6HslJ24zsVVZz5UIMXN5A5Y9O/VzZfMiwTSa3xDslfql97ITY+w
+	 7YF+kDYjw6DAQ==
+Date: Thu, 27 Jun 2024 16:41:38 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: allison.henderson@oracle.com
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org,
- oberpar@linux.ibm.com, chuck.lever@oracle.com, vegard.nossum@oracle.com
-Subject: Re: [PATCH net-next v1 3/3] selftests: rds: add testing
- infrastructure
-Message-ID: <20240627163232.1c2b5e49@kernel.org>
-In-Reply-To: <20240626012834.5678-4-allison.henderson@oracle.com>
-References: <20240626012834.5678-1-allison.henderson@oracle.com>
-	<20240626012834.5678-4-allison.henderson@oracle.com>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, andrew@lunn.ch, netdev@vger.kernel.org,
+ przemyslaw.kitszel@intel.com, mengyuanlou@net-swift.com,
+ duanqiangwen@net-swift.com
+Subject: Re: [PATCH net v2 1/2] net: txgbe: remove separate irq request for
+ MSI and INTx
+Message-ID: <20240627164138.725aa957@kernel.org>
+In-Reply-To: <20240626060703.31652-2-jiawenwu@trustnetic.com>
+References: <20240626060703.31652-1-jiawenwu@trustnetic.com>
+	<20240626060703.31652-2-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,31 +63,37 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 25 Jun 2024 18:28:34 -0700 allison.henderson@oracle.com wrote:
-> From: Vegard Nossum <vegard.nossum@oracle.com>
-> 
-> This adds some basic self-testing infrastructure for RDS-TCP.
-> 
-> Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
-> Signed-off-by: Allison Henderson <allison.henderson@oracle.com>
+On Wed, 26 Jun 2024 14:07:02 +0800 Jiawen Wu wrote:
+> When using MSI or INTx interrupts, request_irq() for pdev->irq will
+> conflict with request_threaded_irq() for txgbe->misc.irq, to cause
+> system crash. So remove txgbe_request_irq() for MSI/INTx case, and
+> rename txgbe_request_msix_irqs() since it only request for queue irqs.
+
+Do you have any users who need INTx support? Maybe you could drop
+the support and simplify the code?
+
+> Fixes: aefd013624a1 ("net: txgbe: use irq_domain for interrupt controller")
+> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 > ---
->  Documentation/dev-tools/gcov.rst           |  11 +
->  MAINTAINERS                                |   1 +
->  tools/testing/selftests/Makefile           |   1 +
->  tools/testing/selftests/net/rds/Makefile   |  13 +
->  tools/testing/selftests/net/rds/README.txt |  41 ++++
->  tools/testing/selftests/net/rds/config.sh  |  56 +++++
->  tools/testing/selftests/net/rds/init.sh    |  69 ++++++
->  tools/testing/selftests/net/rds/run.sh     | 271 +++++++++++++++++++++
->  tools/testing/selftests/net/rds/test.py    | 251 +++++++++++++++++++
+>  drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  3 +-
+>  .../net/ethernet/wangxun/txgbe/txgbe_irq.c    | 78 ++-----------------
+>  .../net/ethernet/wangxun/txgbe/txgbe_irq.h    |  2 +-
+>  .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  2 +-
+>  4 files changed, 10 insertions(+), 75 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+> index 68bde91b67a0..99f55a3573c8 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+> @@ -1996,7 +1996,8 @@ void wx_free_irq(struct wx *wx)
+>  	int vector;
+>  
+>  	if (!(pdev->msix_enabled)) {
+> -		free_irq(pdev->irq, wx);
+> +		if (wx->mac.type == wx_mac_em)
+> +			free_irq(pdev->irq, wx);
 
-Let's start with adding selftests, well integrated with kselftest infra.
-This is how we execute the tests in networking:
-https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
-
-If you want to use python please use tools/testing/selftests/net/lib/py/
-instead adding another wrappers.
--- 
-pw-bot: cr
+It seems strange to match on type to decide whether to free an IRQ.
+Isn't there or shouldn't there be some IRQ related flag informing
+the library how to manage the IRQs?
 
