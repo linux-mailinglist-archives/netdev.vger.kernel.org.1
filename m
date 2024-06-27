@@ -1,48 +1,38 @@
-Return-Path: <netdev+bounces-107136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC47591A09F
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 09:42:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A173A91A0BA
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 09:45:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 482951F21E6A
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 07:42:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AF7F283945
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 07:45:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5081B6E61B;
-	Thu, 27 Jun 2024 07:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="opCS1+a2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FA366F30B;
+	Thu, 27 Jun 2024 07:45:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1898153364;
-	Thu, 27 Jun 2024 07:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D978473451;
+	Thu, 27 Jun 2024 07:45:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719474158; cv=none; b=WzhCDeHhjqCRVK4NysnYM3ElOkLXBXhWXJ8odeZDKEBII/BNCcLif5AZ1do/hG6TmS6lfenFLq/pCuldQMSH4dqOcexdRCwlQB19JqeISrJFMgL5sPyldSYldbkSdF++IOSaU8bRz1ZX/UBgBrdHcS4DHVk14AwihxbrSiFDIfk=
+	t=1719474306; cv=none; b=mvxVW+D5rjyRJNzHxfqL0IrI3rsO4TReJdDY+okz0VkV6PxpBLA9YoiiFmUgs8ghg0PdPUyZ6qqY0tn/knk5y2HTzF5rcYIoaJIw2drbCAPeV4bgcQtOzbcME2gb8ALoIgkgNWswhsPqO10R4CacAonCqWyKI2OJAqQI/68XxSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719474158; c=relaxed/simple;
-	bh=+6/2eiODOce3fiw5XiGEEaZr7L+CuCqnH8p7dDX7VA8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OM997M2ZAQNaIeHdIPn/16zvWzuvCEsl9rZaKy4wgmdQxJ0wKbhxjUfljIOZimotZVkK36QtwknBJ7Xbj2cZAGxtDGnkJD6OmvOf/IDx+Rrurt0u0uXXaZLMb/Fh0lZJa12wRkqPCUVhLRg1xNND56iyNmx1gmkLFk52k9qxbuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=opCS1+a2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65F42C4AF09;
-	Thu, 27 Jun 2024 07:42:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719474158;
-	bh=+6/2eiODOce3fiw5XiGEEaZr7L+CuCqnH8p7dDX7VA8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=opCS1+a2JVdpqvYfM7Z+r2tDEyViU982n3s9/OA+XP05WjM8GGP+ySvzgOwbG2/qS
-	 tKufkazc/J3RGw8hloKGATgasDNtTYkQ+d1BArS/J4GqKGTS1kjjxhpWbXv1CsYK6D
-	 H4D3gOhkTZrDSBQoYDdypyZ+nfgymi6BRBU/oAP/3xY9SqJ3r3eqxYHFPmQFC3CI0r
-	 wUMJCJM6TtOImjAxdjJSXGRreebOC1CImMeVAP35qu9afzesHPJsP3hWxSaQsngaN6
-	 UbUtJsSRO4GIX97ABaQzzuqE3Pxh4P4j07VU2S/Cy+HLN7a8p44xIx+oJ+gPJXT16k
-	 J0ReQOdEDb7FA==
-Message-ID: <bf87c34e-a4ff-4e03-9d6a-dc365fec06a5@kernel.org>
-Date: Thu, 27 Jun 2024 09:42:28 +0200
+	s=arc-20240116; t=1719474306; c=relaxed/simple;
+	bh=WGBUIcHN5qfrKcNJCDUcCejZX2LrCxsIOaj/7Ggttls=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=R8rypiYQo1RU6RetXKXi/nLZG319Fk2IqwlAdPY5p07Afv6FV7Cxq//FoPW4Dmvy0cT/7dJpzql6/psnmbswp06vUKQuOhvyAdBld8H+QSSFm/CsvDcWQOz6jo18KZYm+lnKrUSFQJCV7mtL1Y/anxZI4bz3GA0UfgG8R0hWorA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D1CDA1C0007;
+	Thu, 27 Jun 2024 07:44:58 +0000 (UTC)
+Message-ID: <bfae2a96-82f4-4aa4-865f-2619fccd286f@ovn.org>
+Date: Thu, 27 Jun 2024 09:44:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,131 +40,248 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V5 4/7] dt-bindings: clock: Add ipq9574 NSSCC clock and
- reset definitions
-To: Devi Priya <quic_devipriy@quicinc.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: catalin.marinas@arm.com, u-kumar1@ti.com,
- linux-arm-kernel@lists.infradead.org, krzk+dt@kernel.org,
- geert+renesas@glider.be, neil.armstrong@linaro.org, nfraprado@collabora.com,
- mturquette@baylibre.com, linux-kernel@vger.kernel.org,
- dmitry.baryshkov@linaro.org, netdev@vger.kernel.org,
- konrad.dybcio@linaro.org, m.szyprowski@samsung.com, arnd@arndb.de,
- richardcochran@gmail.com, will@kernel.org, sboyd@kernel.org,
- andersson@kernel.org, p.zabel@pengutronix.de, linux-clk@vger.kernel.org,
- devicetree@vger.kernel.org, conor+dt@kernel.org,
- linux-arm-msm@vger.kernel.org
-References: <20240626143302.810632-1-quic_devipriy@quicinc.com>
- <20240626143302.810632-5-quic_devipriy@quicinc.com>
- <171941612020.3280624.794530163562164163.robh@kernel.org>
- <eeea33c7-02bd-4ea4-a53f-fd6af839ca90@lunn.ch>
- <4bf9dff9-3cb4-4276-8d21-697850e01170@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: i.maximets@ovn.org, netdev@vger.kernel.org, aconole@redhat.com,
+ echaudro@redhat.com, horms@kernel.org, dev@openvswitch.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Pravin B Shelar <pshelar@ovn.org>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 05/10] net: openvswitch: add emit_sample
+ action
+To: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
+References: <20240625205204.3199050-1-amorenoz@redhat.com>
+ <20240625205204.3199050-6-amorenoz@redhat.com>
+ <f4e9f3db-d9bf-49a9-aa2d-db40b472c82f@ovn.org>
+ <CAG=2xmPcLgTFK+o-A9HL4sPcLFqD_DS=H+T2woVLTvoAzU8ajQ@mail.gmail.com>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <4bf9dff9-3cb4-4276-8d21-697850e01170@quicinc.com>
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <CAG=2xmPcLgTFK+o-A9HL4sPcLFqD_DS=H+T2woVLTvoAzU8ajQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: i.maximets@ovn.org
 
-On 27/06/2024 07:25, Devi Priya wrote:
+On 6/26/24 22:07, Adrián Moreno wrote:
+> On Wed, Jun 26, 2024 at 12:51:19PM GMT, Ilya Maximets wrote:
+>> On 6/25/24 22:51, Adrian Moreno wrote:
+>>> Add support for a new action: emit_sample.
+>>>
+>>> This action accepts a u32 group id and a variable-length cookie and uses
+>>> the psample multicast group to make the packet available for
+>>> observability.
+>>>
+>>> The maximum length of the user-defined cookie is set to 16, same as
+>>> tc_cookie, to discourage using cookies that will not be offloadable.
+>>>
+>>> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+>>> ---
+>>>  Documentation/netlink/specs/ovs_flow.yaml | 17 +++++++++
+>>>  include/uapi/linux/openvswitch.h          | 28 ++++++++++++++
+>>>  net/openvswitch/Kconfig                   |  1 +
+>>>  net/openvswitch/actions.c                 | 45 +++++++++++++++++++++++
+>>>  net/openvswitch/flow_netlink.c            | 33 ++++++++++++++++-
+>>>  5 files changed, 123 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/Documentation/netlink/specs/ovs_flow.yaml b/Documentation/netlink/specs/ovs_flow.yaml
+>>> index 4fdfc6b5cae9..a7ab5593a24f 100644
+>>> --- a/Documentation/netlink/specs/ovs_flow.yaml
+>>> +++ b/Documentation/netlink/specs/ovs_flow.yaml
+>>> @@ -727,6 +727,12 @@ attribute-sets:
+>>>          name: dec-ttl
+>>>          type: nest
+>>>          nested-attributes: dec-ttl-attrs
+>>> +      -
+>>> +        name: emit-sample
+>>> +        type: nest
+>>> +        nested-attributes: emit-sample-attrs
+>>> +        doc: |
+>>> +          Sends a packet sample to psample for external observation.
+>>>    -
+>>>      name: tunnel-key-attrs
+>>>      enum-name: ovs-tunnel-key-attr
+>>> @@ -938,6 +944,17 @@ attribute-sets:
+>>>        -
+>>>          name: gbp
+>>>          type: u32
+>>> +  -
+>>> +    name: emit-sample-attrs
+>>> +    enum-name: ovs-emit-sample-attr
+>>> +    name-prefix: ovs-emit-sample-attr-
+>>> +    attributes:
+>>> +      -
+>>> +        name: group
+>>> +        type: u32
+>>> +      -
+>>> +        name: cookie
+>>> +        type: binary
+>>>
+>>>  operations:
+>>>    name-prefix: ovs-flow-cmd-
+>>> diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
+>>> index efc82c318fa2..8cfa1b3f6b06 100644
+>>> --- a/include/uapi/linux/openvswitch.h
+>>> +++ b/include/uapi/linux/openvswitch.h
+>>> @@ -914,6 +914,31 @@ struct check_pkt_len_arg {
+>>>  };
+>>>  #endif
+>>>
+>>> +#define OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE 16
+>>> +/**
+>>> + * enum ovs_emit_sample_attr - Attributes for %OVS_ACTION_ATTR_EMIT_SAMPLE
+>>> + * action.
+>>> + *
+>>> + * @OVS_EMIT_SAMPLE_ATTR_GROUP: 32-bit number to identify the source of the
+>>> + * sample.
+>>> + * @OVS_EMIT_SAMPLE_ATTR_COOKIE: A variable-length binary cookie that contains
+>>> + * user-defined metadata. The maximum length is OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE
+>>> + * bytes.
+>>> + *
+>>> + * Sends the packet to the psample multicast group with the specified group and
+>>> + * cookie. It is possible to combine this action with the
+>>> + * %OVS_ACTION_ATTR_TRUNC action to limit the size of the packet being emitted.
+>>> + */
+>>> +enum ovs_emit_sample_attr {
+>>> +	OVS_EMIT_SAMPLE_ATTR_GROUP = 1,	/* u32 number. */
+>>> +	OVS_EMIT_SAMPLE_ATTR_COOKIE,	/* Optional, user specified cookie. */
+>>> +
+>>> +	/* private: */
+>>> +	__OVS_EMIT_SAMPLE_ATTR_MAX
+>>> +};
+>>> +
+>>> +#define OVS_EMIT_SAMPLE_ATTR_MAX (__OVS_EMIT_SAMPLE_ATTR_MAX - 1)
+>>> +
+>>>  /**
+>>>   * enum ovs_action_attr - Action types.
+>>>   *
+>>> @@ -966,6 +991,8 @@ struct check_pkt_len_arg {
+>>>   * of l3 tunnel flag in the tun_flags field of OVS_ACTION_ATTR_ADD_MPLS
+>>>   * argument.
+>>>   * @OVS_ACTION_ATTR_DROP: Explicit drop action.
+>>> + * @OVS_ACTION_ATTR_EMIT_SAMPLE: Send a sample of the packet to external
+>>> + * observers via psample.
+>>>   *
+>>>   * Only a single header can be set with a single %OVS_ACTION_ATTR_SET.  Not all
+>>>   * fields within a header are modifiable, e.g. the IPv4 protocol and fragment
+>>> @@ -1004,6 +1031,7 @@ enum ovs_action_attr {
+>>>  	OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
+>>>  	OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
+>>>  	OVS_ACTION_ATTR_DROP,         /* u32 error code. */
+>>> +	OVS_ACTION_ATTR_EMIT_SAMPLE,  /* Nested OVS_EMIT_SAMPLE_ATTR_*. */
+>>>
+>>>  	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
+>>>  				       * from userspace. */
+>>> diff --git a/net/openvswitch/Kconfig b/net/openvswitch/Kconfig
+>>> index 29a7081858cd..2535f3f9f462 100644
+>>> --- a/net/openvswitch/Kconfig
+>>> +++ b/net/openvswitch/Kconfig
+>>> @@ -10,6 +10,7 @@ config OPENVSWITCH
+>>>  		   (NF_CONNTRACK && ((!NF_DEFRAG_IPV6 || NF_DEFRAG_IPV6) && \
+>>>  				     (!NF_NAT || NF_NAT) && \
+>>>  				     (!NETFILTER_CONNCOUNT || NETFILTER_CONNCOUNT)))
+>>> +	depends on PSAMPLE || !PSAMPLE
+>>>  	select LIBCRC32C
+>>>  	select MPLS
+>>>  	select NET_MPLS_GSO
+>>> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+>>> index 964225580824..1f555cbba312 100644
+>>> --- a/net/openvswitch/actions.c
+>>> +++ b/net/openvswitch/actions.c
+>>> @@ -24,6 +24,11 @@
+>>>  #include <net/checksum.h>
+>>>  #include <net/dsfield.h>
+>>>  #include <net/mpls.h>
+>>> +
+>>> +#if IS_ENABLED(CONFIG_PSAMPLE)
+>>> +#include <net/psample.h>
+>>> +#endif
+>>> +
+>>>  #include <net/sctp/checksum.h>
+>>>
+>>>  #include "datapath.h"
+>>> @@ -1299,6 +1304,37 @@ static int execute_dec_ttl(struct sk_buff *skb, struct sw_flow_key *key)
+>>>  	return 0;
+>>>  }
+>>>
+>>> +static void execute_emit_sample(struct datapath *dp, struct sk_buff *skb,
+>>> +				const struct sw_flow_key *key,
+>>
+>> The 'key' is not used in the function.
+>>
+>>> +				const struct nlattr *attr)
+>>> +{
+>>> +#if IS_ENABLED(CONFIG_PSAMPLE)
+>>
+>> IIUC, the general coding style guideline is to compile out the whole
+>> function, instead of only the parts.  i.e. something like:
+>>
+>> #if IS_ENABLED(CONFIG_PSAMPLE)
+>> static void execute_emit_sample(...) {
+>>     <body>
+>> }
+>> #else
+>> #define execute_emit_sample(dp, skb, attr)
+>> #endif
+>>
+>>
+>> Otherwise, we'll also need to mark the arguments with __maybe_unused.
 > 
+> Thanks for the suggestion, will submit another version with this fix.
+
+It seems like current coding style document prefers static inline
+functions over macros in this case.  So, that might be a better
+choice.  So, up to you, unless maintainers have a strong opinion one
+way or another.
+
 > 
-> On 6/26/2024 10:56 PM, Andrew Lunn wrote:
->> On Wed, Jun 26, 2024 at 09:35:20AM -0600, Rob Herring (Arm) wrote:
->>>
->>> On Wed, 26 Jun 2024 20:02:59 +0530, Devi Priya wrote:
->>>> Add NSSCC clock and reset definitions for ipq9574.
->>>>
->>>> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
->>>> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->>>> ---
->>>>   Changes in V5:
->>>> 	- Dropped interconnects and added interconnect-cells to NSS
->>>> 	  clock provider so that it can be  used as icc provider.
->>>>
->>>>   .../bindings/clock/qcom,ipq9574-nsscc.yaml    |  74 +++++++++
->>>>   .../dt-bindings/clock/qcom,ipq9574-nsscc.h    | 152 ++++++++++++++++++
->>>>   .../dt-bindings/reset/qcom,ipq9574-nsscc.h    | 134 +++++++++++++++
->>>>   3 files changed, 360 insertions(+)
->>>>   create mode 100644 Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
->>>>   create mode 100644 include/dt-bindings/clock/qcom,ipq9574-nsscc.h
->>>>   create mode 100644 include/dt-bindings/reset/qcom,ipq9574-nsscc.h
->>>>
->>>
->>> My bot found errors running 'make dt_binding_check' on your patch:
->>>
->>> yamllint warnings/errors:
->>>
->>> dtschema/dtc warnings/errors:
->>> Error: Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.example.dts:26.26-27 syntax error
->>> FATAL ERROR: Unable to parse input tree
+> Adrián
+> 
 >>
->> Hi Devi
+>> The rest of the patch looks good to me.
 >>
->> Version 4 of these patches had the same exact problem. There was not
->> an email explaining it is a false positive etc, so i have to assume it
->> is a real error. So why has it not been fixed?
+>> Best regards, Ilya Maximets.
 >>
->> Qualcomm patches are under a microscope at the moment because of how
->> bad things went a couple of months ago with patches. You cannot ignore
->> things like this, because the damage to Qualcomm reputation is going
->> to make it impossible to get patches merged soon.
->>
-> Hi Andrew,
-> Very sorry for the inconvenience.
-> I had run dt_binding_check locally on V4 patches and did not face any
-> errors. I somehow missed to notice the binding check error that was
-> reported on V4. Thus I went ahead and posted the same in V5.
-> Will ensure such things are not repeated henceforth.
-
-If the warning is expected, e.g. due to missing patches, it's beneficial
-to mention this in the changelog (---). Otherwise all maintainers my
-ignore your patch because you have issues reported by automation.
-
-Anyway, up to you.
-
-Best regards,
-Krzysztof
+> 
 
 
