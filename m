@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-107107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C42E1919DAB
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 05:02:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21A09919DAC
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 05:02:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F1192852A0
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 03:02:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB508B2264A
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 03:02:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F94617550;
-	Thu, 27 Jun 2024 03:02:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE0E17BB4;
+	Thu, 27 Jun 2024 03:02:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Bx4X0UfJ"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="soTfrs9X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33ECA8814
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 03:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC0A134BD
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 03:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719457336; cv=none; b=o9tjoweNBpeZJ71Mwez9xZeGy4VrkQzZdGOzmWNIQgBNWVRSSzLfMmF2fnTsIJf9GAG93pezBcN7IWNQ6nthR/JE0bvbJ5bOF4YwRp/qn+xcvYtCKKua01IuUrtY333/QLtql/HC/b/LqMuzOuAliG0oFoyZ1d+RLsfNu8MmDOc=
+	t=1719457337; cv=none; b=Te/y+G3p2ny7fc7X+HSPUgJmEsMa+VIOHfzo3AcJno5cVnbejgRL7HJNAjxa/awhjk1/qBF6aD8FZ1a3CcDNQT+vXVJbiZCnUDCTSwWHpS6S/KHv8zM2NsZ1MuQOLJaDunOsje1FqRBsZAyTquGzGHlgt7874QFdhvmkJxgj+Pg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719457336; c=relaxed/simple;
-	bh=Ri3gwW84s9wVKaCLM3zQwwfrxSlC5ht8h/hZe/9T0Wc=;
+	s=arc-20240116; t=1719457337; c=relaxed/simple;
+	bh=ukiXBXPebzE7x/YVpirVjYpMkEmGIksawxjTpJ5lF9E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A2vmIe6/XGV3drnVlwHpCM3YeT/j0eqcubeXkHNkZrdIQZEjhioEAtiF4gRrzQM/pVrSySoHloabxEKD/VrlHDiI+zxY21t/ggtIt0gfVzSQ1xYnT39KagefJbRjUIZuX71LjqImmrAVkk8dsSWocCFLsqWbc++I7wdoMZum6FE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=Bx4X0UfJ; arc=none smtp.client-ip=209.85.210.171
+	 MIME-Version; b=L6VOF62/010AVi88tnBFX9G/og+iM8+MAWEYtUxbPZxZK689bzg0Q28wVLIZBrr8u+dBfDd4IMKuScIMoPsKWCxMKOxQKqPpODrfbsYm2nSZErbZYMnar3nvW9ZXqHfNZ/l9ysaFIdSvQwegx13sQ73PU2RKuqKws4rJxmrfNUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=soTfrs9X; arc=none smtp.client-ip=209.85.167.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7066a4a611dso3556448b3a.3
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 20:02:14 -0700 (PDT)
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3d5d7fa3485so84131b6e.1
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 20:02:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1719457334; x=1720062134; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1719457335; x=1720062135; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+Ds92XtLfVyAziOBJ6DrlOp7NWpu8h2BwGdkFjXNkYg=;
-        b=Bx4X0UfJOj7cEqeHjhgeRKnvivcuVT+4dekyhDiEGCwxgsgjftJJLoihkdfyYCZlgf
-         ydESGr1kEujhmG1yByuTcWKcA6Q0q76Z7+vHjkS5aBmiMuk4kJL9xsGLuM/B8Y6BQc/G
-         M1NKM53NivSDEpwELaESz3rZJ1r9up58LLgOPIPPjA6NaqetY0oZ0oCHGbaTWpbWzQA5
-         lGQnxp99hL7IUM2z11HkKRu0jz6RGsZXjIfjtoTlf4vhrl/4E+/U2gn/hLH8T0KAQzhJ
-         wMPg+T6UHt/ftRXzAKJCFGQFvK8ldKUCvcHr73urgM0EdGv4i8BZXbYNYnauHasLIO4b
-         J8bw==
+        bh=4IaNM1I4HWXrCUY0pwVSIP2cf06bnBq/uV3Ey6JNr98=;
+        b=soTfrs9XAk0NgvU4hqXeMgDiXawtHuBBu3+lWGkLRRhhZb+LMkM/0Su66SUBCOWibB
+         B9ncfOjE2VYOSzHCi3zgo8elx0dgouHMmOMoiO+UVDufQGqb5HkBJ84eCFiYUeIkKg7M
+         yNLu1HYWFT9FWKZ1Apr4sPXZPTgJ4QslgNamFzKX4xkbrSYqtFn6niNc038e82vuF99C
+         ZySYY/3EU2UOswRn/aP4fUSPnl7YNWN741NxOGsfrvRnHV9t2xUx7e7VHRLqmJs1BWjt
+         CPXcJ7v6WjpaLPDYEDecRFlqp66fW88Vj5MOqOhPaUquN0VfVkgW40kWvZ7L7rlIq21D
+         87MQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719457334; x=1720062134;
+        d=1e100.net; s=20230601; t=1719457335; x=1720062135;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+Ds92XtLfVyAziOBJ6DrlOp7NWpu8h2BwGdkFjXNkYg=;
-        b=b6mAPHlIagQJq+8AZ7VFY5Ui+aDg4so1QeGx02shRi2dSV8EZsGVKe9iGfq9gPgG+e
-         6eLANacnK7Qj9vq9w+fLU7PQiwknsSDQGq5gp1uIAxP/t6tNuq2eyFFHGs0+aE4gA1Bz
-         xaYX8FJtNHy8x6l8k7KngTXi1wG/NY+JJZpKW/eZqSdw5L8L1w4lZRGwEguXc06LZWZ9
-         karTWw3wEWsWoq1KN02bWEhccDSgaVY6PcbPv1NP6VK0y7/NgHoFn74i2GUhrFVpdKhe
-         hLCxPmE4ryilS7fFZaiSIrYjWAcR11LuQSPGUXxvtPFKFVt1nnvP/sLE6AEKI1C5B+aw
-         0EBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVpOPZwWa4SRQXNF6k7HSVUGyYAyUH18oxNbo/uvMcGw3qQ3zYU2yMMfBjWt2toaml7v1IyI6LOeA2xC4zLPbwEnRnKX+Ev
-X-Gm-Message-State: AOJu0YxQzzDDsvSyBmxIL7xDZmNPS+FPWby3huwRH+bO9fE59ZZSQik7
-	rGmBNDQZVJOcPD+szxK8ZAykMhLBZGixtzFSjzq/cWylTuHcjenL7dQCsbcw5WY=
-X-Google-Smtp-Source: AGHT+IGeFb6W1kU4rXCBb/534IFVieLQNt+6ZsIZcj7KQUVs4I26/oSHYtaXMOFml4QQe3AW7QnGdw==
-X-Received: by 2002:aa7:870e:0:b0:706:6f82:7e0c with SMTP id d2e1a72fcca58-706746b5896mr10379652b3a.32.1719457334492;
-        Wed, 26 Jun 2024 20:02:14 -0700 (PDT)
-Received: from localhost (fwdproxy-prn-036.fbsv.net. [2a03:2880:ff:24::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-72748e868e4sm206291a12.71.2024.06.26.20.02.14
+        bh=4IaNM1I4HWXrCUY0pwVSIP2cf06bnBq/uV3Ey6JNr98=;
+        b=Hczoz+9/11FQFd/PTQqvCnFDVXMuKwjXERBCLNt4gyAtxegm9fnD2GwcE+OjVdNI+u
+         UGQk/irrLzmV3yfIq92pzzxqd2qMr1p4Ac0av9X/aUYD5YygPsKwPhEyudc6zmj6KTuj
+         gB0A0MUUmrFscs+LFQmpSMTSr9iNNQBQ9ehRO1t+lewSpDlPUnx3xp7y9Z4QRj39QiDk
+         QdHS97t26iortM+2LkGzbnLK601Uac9pUoF1ipAgJXjbn0Eq4dYd+/3+2wgPJ6yfWQJZ
+         J8PvJLwrP6jTEVdjo17jWhkf3SRkOQFeTFWgH20q4X9PG9/p05nTau9OsULFWSjEsYfO
+         AseA==
+X-Forwarded-Encrypted: i=1; AJvYcCV4JKNdz2PRNDbzUC7j9mjHmHXgk7gb3Phnw9ZVcxNSJ2Hpat3rvq6YYyS5jLQyOqV7TTAPgFaqfn+8ueFQiE9ZE5WKpkau
+X-Gm-Message-State: AOJu0YyvPIk8VwMI7vghp2Z99TUj00g2912pUlh1SeeRsea8lt4XrZpU
+	jvzgRMWXc/liYj0vhf2FlHslHOLP4Wnq92MvjPIKEygMxCufrQBAP0AwpUODbyk=
+X-Google-Smtp-Source: AGHT+IGOccmshDY1oomeaabWin1q3IFJIcB+Lgb25MOFL1cmDmBrjZ4xXKxAm1zczIAraF3hwpTovA==
+X-Received: by 2002:a05:6808:1b23:b0:3d5:63a2:6030 with SMTP id 5614622812f47-3d563a262c9mr3827836b6e.46.1719457335388;
+        Wed, 26 Jun 2024 20:02:15 -0700 (PDT)
+Received: from localhost (fwdproxy-prn-002.fbsv.net. [2a03:2880:ff:2::face:b00c])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-706b4910258sm219644b3a.56.2024.06.26.20.02.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 20:02:14 -0700 (PDT)
+        Wed, 26 Jun 2024 20:02:15 -0700 (PDT)
 From: David Wei <dw@davidwei.uk>
 To: Michael Chan <michael.chan@broadcom.com>,
 	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
@@ -78,9 +78,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v2 1/2] page_pool: export page_pool_disable_direct_recycling()
-Date: Wed, 26 Jun 2024 20:01:59 -0700
-Message-ID: <20240627030200.3647145-2-dw@davidwei.uk>
+Subject: [PATCH net-next v2 2/2] bnxt_en: unlink page pool when stopping Rx queue
+Date: Wed, 26 Jun 2024 20:02:00 -0700
+Message-ID: <20240627030200.3647145-3-dw@davidwei.uk>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240627030200.3647145-1-dw@davidwei.uk>
 References: <20240627030200.3647145-1-dw@davidwei.uk>
@@ -92,63 +92,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-56ef27e3 unexported page_pool_unlink_napi() and renamed it to
-page_pool_disable_direct_recycling(). This is because there was no
-in-tree user of page_pool_unlink_napi().
+Have bnxt call page_pool_disable_direct_recycling() to unlink the old
+page pool when resetting a queue prior to destroying it, instead of
+touching a netdev core struct directly.
 
-Since then Rx queue API and an implementation in bnxt got merged. In the
-bnxt implementation, it broadly follows the following steps: allocate
-new queue memory + page pool, stop old rx queue, swap, then destroy old
-queue memory + page pool.
-
-The existing NAPI instance is re-used so when the old page pool that is
-no longer used but still linked to this shared NAPI instance is
-destroyed, it will trigger warnings.
-
-In my initial patches I unlinked a page pool from a NAPI instance
-directly. Instead, export page_pool_disable_direct_recycling() and call
-that instead to avoid having a driver touch a core struct.
-
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- include/net/page_pool/types.h | 1 +
- net/core/page_pool.c          | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-index 7e8477057f3d..9093a964fc33 100644
---- a/include/net/page_pool/types.h
-+++ b/include/net/page_pool/types.h
-@@ -229,6 +229,7 @@ struct page_pool *page_pool_create_percpu(const struct page_pool_params *params,
- struct xdp_mem_info;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 1bd0c5973252..18ff747a57fb 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -15049,11 +15049,6 @@ static void bnxt_queue_mem_free(struct net_device *dev, void *qmem)
+ 	bnxt_free_one_rx_ring(bp, rxr);
+ 	bnxt_free_one_rx_agg_ring(bp, rxr);
  
- #ifdef CONFIG_PAGE_POOL
-+void page_pool_disable_direct_recycling(struct page_pool *pool);
- void page_pool_destroy(struct page_pool *pool);
- void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect)(void *),
- 			   const struct xdp_mem_info *mem);
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 3927a0a7fa9a..5f1ed6f2ca8f 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -1014,7 +1014,7 @@ void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect)(void *),
- 	pool->xdp_mem_id = mem->id;
- }
+-	/* At this point, this NAPI instance has another page pool associated
+-	 * with it. Disconnect here before freeing the old page pool to avoid
+-	 * warnings.
+-	 */
+-	rxr->page_pool->p.napi = NULL;
+ 	page_pool_destroy(rxr->page_pool);
+ 	rxr->page_pool = NULL;
  
--static void page_pool_disable_direct_recycling(struct page_pool *pool)
-+void page_pool_disable_direct_recycling(struct page_pool *pool)
- {
- 	/* Disable direct recycling based on pool->cpuid.
- 	 * Paired with READ_ONCE() in page_pool_napi_local().
-@@ -1032,6 +1032,7 @@ static void page_pool_disable_direct_recycling(struct page_pool *pool)
+@@ -15173,6 +15168,7 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
+ 	bnxt_hwrm_rx_ring_free(bp, rxr, false);
+ 	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
+ 	rxr->rx_next_cons = 0;
++	page_pool_disable_direct_recycling(rxr->page_pool);
  
- 	WRITE_ONCE(pool->p.napi, NULL);
- }
-+EXPORT_SYMBOL(page_pool_disable_direct_recycling);
- 
- void page_pool_destroy(struct page_pool *pool)
- {
+ 	memcpy(qmem, rxr, sizeof(*rxr));
+ 	bnxt_init_rx_ring_struct(bp, qmem);
 -- 
 2.43.0
 
