@@ -1,235 +1,83 @@
-Return-Path: <netdev+bounces-107442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57E0F91AFEF
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:56:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4594B91AFE4
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:55:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5E4E1F24105
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 19:56:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E20A91F241B5
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 19:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D90719D8BD;
-	Thu, 27 Jun 2024 19:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603F919ADB3;
+	Thu, 27 Jun 2024 19:55:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pKZGc8sT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PGZgHYGc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B203219B3CC
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 19:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B47B33C9;
+	Thu, 27 Jun 2024 19:55:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719518158; cv=none; b=GRULYnX7n67QFuGZ6/CZVaFOIUStIoMzbX0NX2Zwo2ziiX2V1QtuuYTEKRb2l6IYEthiEewXBVwysD61jjAwrluEd+oPBfFO1TSMAJP4HCaz4lyVm2Sw317lDr/4sn7WPFOTcVHdHZB19HcBQk5gfVUW4EtzeeGQiGksKx9HWLI=
+	t=1719518143; cv=none; b=Ky82NXjRI6kokhVLKFSba4CHav0BWgDbbho8kKyHnY4ZnkYXs6N2jACogI0mpwUa0+tuZxis/FmQOzRxzlPxalxTbVErS3r/uz12t59pLDymhs/BvryiXqlnb8IqBx24M3x2cphZf9gqaVxEIniIEjrHRnopS/BrtXvKyHvCL5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719518158; c=relaxed/simple;
-	bh=36GxoZjliAZT52Uum3hkhku+z1zWUxDL4YWuJDbCmCU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MnoGMlATuxoi51E501IujEXhauAlYBoTlgQPRdkExtN5GSnN44onaW84inK8AFzylXMENujfEnvfzcVjBjq2DkOFd97qRHyhOSkCIGKTBT2y8sBoeWjNKMDxc0h2LjZJKKCMLe86Jl6QRQu1Xh2dYVDKI7+mXikuq7Wg00O5X3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pKZGc8sT; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-52cdea1387eso6106405e87.0
-        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 12:55:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719518153; x=1720122953; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HwbPl7/RVFpU7jHcXTQEjahrmwW8PQdQrA+IV3FhN4w=;
-        b=pKZGc8sTJiPK8evW+kyTJom27vWLLcaatgTP+pqNNLik3mw1pmxqfY8BC6C2Oa9+oI
-         o0sCCeMv+WZal6hDaWgzmHoncPuHmkHoAWo/Ck/6FuDrAQdLlfhkR9KmZsxGc443vkjr
-         5ujWzSTQNw9wjOOwbnW3XPU61Dca2ugh48ywLYRU+VcRpd7i3tp/cfEjewfSyXRILNvv
-         sJgKRnx3yzI5aWIHj3tc6qE6MNwWNocuDjwigxiw7d7HiOc30Xdd29sJqDUtaTNLWPyr
-         RN1F5aOe5ICn2RmnfOTaJ1d72Wl+yAJWGgOJhh7wOYjxwW+dPqi2218Mw9ed924jYzNQ
-         0M7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719518153; x=1720122953;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HwbPl7/RVFpU7jHcXTQEjahrmwW8PQdQrA+IV3FhN4w=;
-        b=Tx5vgqABscccwdoOz9X+Z3ciiwRqiQsAAqZbLV3+TRDhauCYrVAp4oSBbOjMub1tl1
-         tfJj2XDCAheFMj9wHgBhKBQQHC9GyhyQYJtKLRaRipLCnDF9cZhdYFCh+td/c9+T6zOa
-         YCDroabWOhHp4BbkXlPyc+ocbhRDg3/+aGE+mGpgUOpY4AONNd0eR68VUj7TcBq9czC1
-         oCgHkouh+BgFn+MYQZQT5GFPGyQVtsVfitHatJCPrBBdoB+vBCgZEOTnjcIgrd4tvcOd
-         623bSnK9814p/8vzb1Fpv1zOTuEuol++s6O3pXuJuUSnvm8l8CGHiSc25zT5zDdySw9i
-         vgnA==
-X-Gm-Message-State: AOJu0YxSKwu3rwd5qTJithY/MBZi1v1HntWKJ5FYJZQoEHzR2RBNR8VS
-	N0KAJ8RKubEVGTGOEC/WRvfrE0TjhKT/+Ec2YcQkRwK7G7lTR+zlNOI8gezuf0A1AF0EtQ8QuLA
-	bhWxT3WAFXKiEx7yimJgshCQR2CAQ3o9KpBXP
-X-Google-Smtp-Source: AGHT+IHrIkqcjhj0KSGiy7gblVxOce/ysoGeptTitOpdzuEly5ueVJ0/ZUmc2dX4a/lyh+Q8t0Uj2uTJuS+Tj9wzWDM=
-X-Received: by 2002:a05:6512:2004:b0:516:d692:5e0b with SMTP id
- 2adb3069b0e04-52ce185f9d6mr8027892e87.54.1719518152535; Thu, 27 Jun 2024
- 12:55:52 -0700 (PDT)
+	s=arc-20240116; t=1719518143; c=relaxed/simple;
+	bh=W6cqxra8+FO/up23yLnW1643ICKIZwNjxUraKipwBPc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hqsOa0BFadmuZH/MuDQ5LufdLUbiI9PwYsKZIg4F4zBJD0wkthjCGGXf9U5qULhVb+iWVMeWedOAdv9kZZspN8RSx1Qbs/Un0JfkstFW9wL4UHNo0VyHCq6/gWM8AquUSVpHHUqYBvcfiSLZCLTqRGk0JH65yuLtkl2xcMmYkSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PGZgHYGc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38169C2BBFC;
+	Thu, 27 Jun 2024 19:55:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719518142;
+	bh=W6cqxra8+FO/up23yLnW1643ICKIZwNjxUraKipwBPc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PGZgHYGciad64FjNtnvO48bagrr4ryGUZQ4xfqR2mLiX/sJxXF1M1w+zBVikB98vl
+	 JWjQqqcBMQPL8yUHdoxQcyzkPtILF+yOnqYxUcjI+jCqi7DV6Kl3UhLxKrO+k4FCy5
+	 u7yy56vRnAhXo/GV8JF8k3gNL7xZNGcea1ddJjie/GwSl5CToBqqtr+iylTChrIHDD
+	 pUX6ORyfEDZP2LaRcEHR1PLBSZ1i61Kja3cO9XFZQW5oFMcDBuc9hYieQLuCdInsQW
+	 EdINUkvMD95xRj2Ef86nKL4spKQFN7uHXFywfk/KMNz8ULyaTqYbG7ERyEfFx3WnN5
+	 PThfjwkd4vxWw==
+Date: Thu, 27 Jun 2024 12:55:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, David Ahern
+ <dsahern@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn
+ <andrew@lunn.ch>, <nex.sw.ncis.osdt.itp.upstreaming@intel.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/5] netdevice: convert private flags > BIT(31)
+ to bitfields
+Message-ID: <20240627125541.3de68e1f@kernel.org>
+In-Reply-To: <e0b66a74-b32b-4e77-a7f7-8fd9c28cb88b@intel.com>
+References: <20240625114432.1398320-1-aleksander.lobakin@intel.com>
+	<20240625114432.1398320-2-aleksander.lobakin@intel.com>
+	<20240626075117.6a250653@kernel.org>
+	<e0b66a74-b32b-4e77-a7f7-8fd9c28cb88b@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240625195407.1922912-1-almasrymina@google.com>
- <20240625195407.1922912-14-almasrymina@google.com> <20240626150822.742eaf6a@kernel.org>
- <20240626174634.2adec19d@kernel.org>
-In-Reply-To: <20240626174634.2adec19d@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 27 Jun 2024 12:55:38 -0700
-Message-ID: <CAHS8izOd_yYNJ6+xv35XoCvF7MzqachPVrkQJbic8-h=T1Vg_A@mail.gmail.com>
-Subject: Re: [PATCH net-next v14 13/13] selftests: add ncdevmem, netcat for
- devmem TCP
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Stanislav Fomichev <sdf@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 26, 2024 at 5:46=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 26 Jun 2024 15:08:22 -0700 Jakub Kicinski wrote:
-> > On Tue, 25 Jun 2024 19:54:01 +0000 Mina Almasry wrote:
-> > > +CFLAGS +=3D -I../../../net/ynl/generated/
-> > > +CFLAGS +=3D -I../../../net/ynl/lib/
-> > > +
-> > > +LDLIBS +=3D ../../../net/ynl/lib/ynl.a ../../../net/ynl/generated/pr=
-otos.a
-> >
-> > Not as easy as this.. Please add this commit to your series:
-> > https://github.com/kuba-moo/linux/commit/c130e8cc7208be544ec4f6f3627f1d=
-36875d8c47
-> >
-> > And here's an example of how you then use ynl.mk to code gen and build
-> > for desired families (note the ordering of variables vs includes,
-> > I remember that part was quite inflexible..):
-> > https://github.com/kuba-moo/linux/commit/5d357f97ccd0248ca6136c5e11ca3e=
-adf5091bb3
->
-> Investigating this further my patches will not work for O=3Dxyz builds
-> either. Please squash this into the relevant changes:
->
+On Thu, 27 Jun 2024 11:50:40 +0200 Alexander Lobakin wrote:
+> > I don't think we should group them indiscriminately. Better to add the
+> > asserts flag by flag. Neither of the flags you're breaking out in this
+> > patch are used on the fast path.
+> > 
+> > Or is the problem that CACHELINE_ASSERT_GROUP_MEMBER doesn't work on
+> > bitfields?  
+> 
+> It generates sizeof(bitfield) which the compilers don't like and don't
+> want to compile ._.
 
-Thanks! I cherry-picked commit 15dbefa97fb98 ("tools: net: package
-libynl for use in selftests"), and then applied the diff below to the
-series [1].
+Mm. Okay, I have no better ideas then.
 
-Now:
-
-`git clean -fdx && make  headers_install && make -C
-./tools/testing/selftests/net` works
-
-`git clean -fdx && make  headers_install && make -C
-./tools/testing/selftests/net ncdevmem` doesn't work with this error:
-
-make: Entering directory
-'/usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/net'
-gcc -Wall -Wl,--no-as-needed -O2 -g -I../../../../usr/include/
--isystem /usr/local/google/home/almasrymina/cos-kernel/tools/testing/selfte=
-sts/../../../usr/include
--I../     ncdevmem.c  -lmnl -o ncdevmem
-ncdevmem.c:34:10: fatal error: netdev-user.h: No such file or directory
-   34 | #include "netdev-user.h"
-      |          ^~~~~~~~~~~~~~~
-compilation terminated.
-make: *** [<builtin>: ncdevmem] Error 1
-
-It seems specifying the target doesn't trigger the libynl.a to be
-built. Isn't this a bug, or is that expected? I took a bit of a look
-into it but couldn't figure it out immediately. If it is a bug, any
-pointers would be appreciated (but I'm digging into it anyway).
-
-[1] The diff on top of the series-with-cherry-pick that I'm testing with:
-
-diff --git a/tools/testing/selftests/net/Makefile
-b/tools/testing/selftests/net/Makefile
-index 7ba1505dc2eb4..1d3b99e9c12e8 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -5,10 +5,6 @@ CFLAGS +=3D  -Wall -Wl,--no-as-needed -O2 -g
- CFLAGS +=3D -I../../../../usr/include/ $(KHDR_INCLUDES)
- # Additional include paths needed by kselftest.h
- CFLAGS +=3D -I../
--CFLAGS +=3D -I../../../net/ynl/generated/
--CFLAGS +=3D -I../../../net/ynl/lib/
--
--LDLIBS +=3D ../../../net/ynl/lib/ynl.a ../../../net/ynl/generated/protos.a
-
- LDLIBS +=3D -lmnl
-
-@@ -100,7 +96,11 @@ TEST_PROGS +=3D fdb_flush.sh
- TEST_PROGS +=3D fq_band_pktlimit.sh
- TEST_PROGS +=3D vlan_hw_filter.sh
- TEST_PROGS +=3D bpf_offload.py
--TEST_GEN_FILES +=3D ncdevmem
-+
-+# YNL files, must be before "include ..lib.mk"
-+EXTRA_CLEAN +=3D $(OUTPUT)/libynl.a
-+YNL_GEN_FILES :=3D ncdevmem
-+TEST_GEN_FILES +=3D $(YNL_GEN_FILES)
-
- TEST_FILES :=3D settings
- TEST_FILES +=3D in_netns.sh lib.sh net_helper.sh setup_loopback.sh setup_v=
-eth.sh
-@@ -111,6 +111,10 @@ TEST_INCLUDES :=3D forwarding/lib.sh
-
- include ../lib.mk
-
-+# YNL build
-+YNL_GENS :=3D netdev
-+include ynl.mk
-+
- $(OUTPUT)/epoll_busy_poll: LDLIBS +=3D -lcap
- $(OUTPUT)/reuseport_bpf_numa: LDLIBS +=3D -lnuma
- $(OUTPUT)/tcp_mmap: LDLIBS +=3D -lpthread -lcrypto
-diff --git a/tools/testing/selftests/net/ynl.mk
-b/tools/testing/selftests/net/ynl.mk
-index 0e01ad12b30ec..59cb26cf3f738 100644
---- a/tools/testing/selftests/net/ynl.mk
-+++ b/tools/testing/selftests/net/ynl.mk
-@@ -18,6 +18,4 @@ $(YNL_OUTPUTS): CFLAGS +=3D \
-
- $(OUTPUT)/libynl.a:
-        $(Q)$(MAKE) -C $(top_srcdir)/tools/net/ynl GENS=3D"$(YNL_GENS)" lib=
-ynl.a
--       $(Q)cp $(top_srcdir)/tools/net/ynl/libynl.a ./
--
--EXTRA_CLEAN +=3D libynl.a
-+       $(Q)cp $(top_srcdir)/tools/net/ynl/libynl.a $(OUTPUT)/libynl.a
-
-
-
-
-
---=20
-Thanks,
-Mina
+Do consider moving the cold flags next to wol_enabled, tho?
 
