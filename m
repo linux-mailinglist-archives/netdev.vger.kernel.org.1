@@ -1,143 +1,112 @@
-Return-Path: <netdev+bounces-107083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFAD6919B95
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 02:06:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FAFA919B9E
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 02:13:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C55DE1C2247B
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 00:06:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE270285431
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 00:13:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE45636B;
-	Thu, 27 Jun 2024 00:06:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F342436B;
+	Thu, 27 Jun 2024 00:13:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="op1qzA5c"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XZtqf9Ku"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD775360
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 00:06:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE36A2D;
+	Thu, 27 Jun 2024 00:13:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719446768; cv=none; b=OGGzg6HqCQ3S33VCouBfAJhTboD5QYE6qZ9HInlo3ApkLVXnM8KqMxq1cXHLFb3becIt89Mk9eXXYZkQssEmVu8YffpXu1pGs9up+AQrnel4DyEdL/vkHuKV43hJYZQWQKBFnixLgSaXQcevNZy3PmwYXBdQu6JyU3aMepfd8Zw=
+	t=1719447200; cv=none; b=Mpr87IzSIrOL6WA9mEvVUr0ECdxOf6UlZ4a8M4wnnQe0Kyz2ZmJJ3VsM5kg2VdkKmhyo/80jm7Djvh3LRwlHu2Ie2q2w60fQCE7Pt0pWpwcfZoNgPZ6rUsf6Jl+3AKIqZw+z4xco66lVEPfV9/AHaMc2UZZOnSI+8+v5PM7TFPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719446768; c=relaxed/simple;
-	bh=kNYFQmwGc//9Em9SBVQpW+X+BzfkEKJflUzBBxzuxv8=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=gULgkfrdcMFMfYa+xHC1ZV3EPU/zosX3BffhD+SaxDvG58suExQ+hfZZYgwXnePgzB8gfU927hcs1A/Tx0imQLZfOB/GnAxuMrxZ+yzN/gQ9tJS7oh+7IUPpKRRCYFGSzeNZgcst48b6AGlNpTqRVH+UtSrpmot6K2P8y3lF7Mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=op1qzA5c; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id DCD1C3F733
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 00:06:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1719446763;
-	bh=Kj/hmS3QIv8Ld1uuHQ/9CSyRNoTOR3BmhkQcZ8RyOvE=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=op1qzA5cjqZMGRtkTs3sbKBS1Vgu796OMrm7kt9oOnaA6f2/8l8V7nJjJN9EW6smE
-	 EZ2RGGkFl55FhBPNX/P33AOYg9NPvWXDOlc9b0BuuIXLi9Cv6k9WG7cniUvTJikFTx
-	 +eqhYXi1jwXIMGqSnmQklM1vQHhXXWxSzUoyNoitejx+qYFoqPnf/lTI/EhYVF97ah
-	 IXljZh80+Jha6oCHXgLIkDxaJu5F/ypRdZXCdzpjrzaEyP0cOoH+Wg0QE25g3Yg7KE
-	 jWIodz3sGlO/42poyIJMvqhnGjnoQjIQyxR0F4YA5sUxxDI3286/RoanTeAgXrvZug
-	 C6r3nbdm1j0pA==
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1f9e9aa8cf3so71673895ad.1
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 17:06:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719446762; x=1720051562;
-        h=message-id:date:content-id:mime-version:comments:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kj/hmS3QIv8Ld1uuHQ/9CSyRNoTOR3BmhkQcZ8RyOvE=;
-        b=fLpXgPp03MGifBQPtIyDl6/YNfeP2r6Tapi5dmrGdyQhwQlELhcQhc6ZkwXopHNBQN
-         5eVomiSzeFQL9nvdg/DcgpVotGmbGUb129SsNUiJ6Av0bhYmYyfbfSe4XXJAmL1nboxD
-         /qLNwPvWVtipsF2vnmzbhMZB+fQ2hbyZXo22hSuLY20oy+8nbs1Iu+0HVLFv+Q+lcY6j
-         OIPVjLoxTlPTBKoLdU0Io8mNlw24BkAyJwZlO6jMy3PHCvKQJIGebrqsfnckeYimY94B
-         yk8I23ey+e6W3DSxySeLIGPz91/RNsO//j3TIUllVlwzI484TJctAHslx4vQ0YVqL6c1
-         8soQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW3NKr9CJJPHw1DvGGjK9HPND5jJ7P1YRQtRZtQInnrUh0rjcDnWTB7CyD+cgff4yjf/QaZi0zwbJhSiI6Th1G5bsagwVIu
-X-Gm-Message-State: AOJu0YxgBFnOvra9whStxtxnDQdXkzO8Tjjo30tH/n608J941a890Tvl
-	WsFoF8jkDetEY7FVA6S0KxXzA77N96z/iBbn51Z7MLi8akqmcfXxyufFduf5KcaZRnQWL8XipbU
-	k3whZV9zm0o/AuSaHdmquD5oqSUtQH8aLKnY6D8AA/tmZnQFlNMNrWBQpRNLeNdm9HatgJQ==
-X-Received: by 2002:a17:902:eccf:b0:1fa:9149:4973 with SMTP id d9443c01a7336-1fa91494c44mr33261505ad.12.1719446762149;
-        Wed, 26 Jun 2024 17:06:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHBrY30KpzDNPN4HsgRYFw7DaePaXpoIKABX6eblzD3b5QOoMKP6wjhFXej+vcyF7qfphBaUg==
-X-Received: by 2002:a17:902:eccf:b0:1fa:9149:4973 with SMTP id d9443c01a7336-1fa91494c44mr33261295ad.12.1719446761626;
-        Wed, 26 Jun 2024 17:06:01 -0700 (PDT)
-Received: from famine.localdomain ([50.35.97.145])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1faac9a80f0sm684765ad.263.2024.06.26.17.06.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 17:06:01 -0700 (PDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id B88689FC97; Wed, 26 Jun 2024 17:06:00 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id B79E79FC01;
-	Wed, 26 Jun 2024 17:06:00 -0700 (PDT)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Jakub Kicinski <kuba@kernel.org>
-cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
-    Andy Gospodarek <andy@greyhouse.net>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-    Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@resnulli.us>,
-    Amit Cohen <amcohen@nvidia.com>,
-    Nikolay Aleksandrov <razor@blackwall.org>
-Subject: Re: [PATCHv3 net-next] bonding: 3ad: send ifinfo notify when mux
- state changed
-In-reply-to: <20240626145355.5db060ad@kernel.org>
-References: <20240626075156.2565966-1-liuhangbin@gmail.com>
- <20240626145355.5db060ad@kernel.org>
-Comments: In-reply-to Jakub Kicinski <kuba@kernel.org>
-   message dated "Wed, 26 Jun 2024 14:53:55 -0700."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1719447200; c=relaxed/simple;
+	bh=FsEmZL7mq/PHCSkhTNbOJqlrMaH7nibO5ZGG4gPoXAE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fS/AbGOlrA2MAe/s1HyivSBZ51BXlfft1KiB6yb4U9zapDefyrrIrgaaHGiHaFbJME9cJSoHMg1Lg61vPYbSV88keD5WNY9LEkYN0D2A4syTTnQR5mKJsbF/1uTh76343OJtU48MWsItgIrtVT+nEkrrQs9rwRLMrXcHprcB1gY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XZtqf9Ku; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=Y/oie4D7vMLSlRHkXYeX6gGQHuuqioTWp0KRoGukRbU=; b=XZ
+	tqf9Kuz/yKkf10DqErr96j4qpNaXrG6wfrswfQTKClOJWAOlEk+QMrUF8m1SvxvkatiHXALRcL0BZ
+	kPpvFe2dVK9sQswQ7K5ZossXeTx3U4ZaEYyMdru5FmZ5IWL6ENyIAS41oDK9ma92CDFn3Y3WtNYhG
+	KAEhQ/ya3+VOXFE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sMckv-0015iQ-V6; Thu, 27 Jun 2024 02:12:53 +0200
+Date: Thu, 27 Jun 2024 02:12:53 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+Cc: Vinod Koul <vkoul@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>, kernel@quicinc.com,
+	Andrew Halaney <ahalaney@redhat.com>, linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 2/3] net: stmmac: Add interconnect support
+Message-ID: <974114ca-98ed-44a7-a038-eb3f71bd03ef@lunn.ch>
+References: <20240625-icc_bw_voting_from_ethqos-v2-0-eaa7cf9060f0@quicinc.com>
+ <20240625-icc_bw_voting_from_ethqos-v2-2-eaa7cf9060f0@quicinc.com>
+ <4123b96c-ae1e-4fdd-aab2-70478031c59a@lunn.ch>
+ <81e97c36-e244-4e94-b752-b06334a06db0@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1429620.1719446760.1@famine>
-Date: Wed, 26 Jun 2024 17:06:00 -0700
-Message-ID: <1429621.1719446760@famine>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <81e97c36-e244-4e94-b752-b06334a06db0@quicinc.com>
 
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Wed, Jun 26, 2024 at 04:36:06PM -0700, Sagar Cheluvegowda wrote:
+> 
+> 
+> On 6/26/2024 6:07 AM, Andrew Lunn wrote:
+> >> +	plat->axi_icc_path = devm_of_icc_get(&pdev->dev, "axi");
+> >> +	if (IS_ERR(plat->axi_icc_path)) {
+> >> +		ret = (void *)plat->axi_icc_path;
+> > 
+> > Casting	to a void * seems odd. ERR_PTR()?
+> > 
+> > 	Andrew
+> 
+> The output of devm_of_icc_get is a pointer of type icc_path,
+> i am getting below warning when i try to ERR_PTR instead of Void*
+> as ERR_PTR will try to convert a long integer to a Void*.
+> 
+> "warning: passing argument 1 of ‘ERR_PTR’ makes integer from pointer without a cast"
+> 
 
->On Wed, 26 Jun 2024 15:51:56 +0800 Hangbin Liu wrote:
->> Currently, administrators need to retrieve LACP mux state changes from
->> the kernel DEBUG log using netdev_dbg and slave_dbg macros. To simplify
->> this process, let's send the ifinfo notification whenever the mux state
->> changes. This will enable users to directly access and monitor this
->> information using the ip monitor command.
->
->Hits:
->
->RTNL: assertion failed at net/core/rtnetlink.c (1823)
->
->On two selftests. Please run the selftests on a debug kernel..
+https://elixir.bootlin.com/linux/v6.10-rc5/source/drivers/crypto/qce/core.c#L224
+https://elixir.bootlin.com/linux/v6.10-rc5/source/drivers/gpu/drm/msm/adreno/a3xx_gpu.c#L591
+https://elixir.bootlin.com/linux/v6.10-rc5/source/drivers/gpu/drm/msm/adreno/a3xx_gpu.c#L597
+https://elixir.bootlin.com/linux/v6.10-rc5/source/drivers/spi/spi-qup.c#L1052
 
-	Oh, I forgot about needing RTNL.
+Sorry, PTR_ERR().
 
-	We cannot simply acquire RTNL in ad_mux_machine(), as the
-bond->mode_lock is already held, and the lock ordering must be RTNL
-first, then mode_lock, lest we deadlock.
+In general, a cast to a void * is a red flag and will get looked
+at. It is generally wrong. So you might want to fixup where ever you
+copied this from.
 
-	Hangbin, I'd suggest you look at how bond_netdev_notify_work()
-complies with the lock ordering (basically, doing the actual work out of
-line in a workqueue event), or how the "should_notify" flag is used in
-bond_3ad_state_machine_handler().  The first is more complicated, but
-won't skip events; the second may miss intermediate state transitions if
-it cannot acquire RTNL and has to delay the notification.
-
-	-J
-
----
-	-Jay Vosburgh, jay.vosburgh@canonical.com
+	Andrew
 
