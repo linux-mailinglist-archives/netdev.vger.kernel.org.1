@@ -1,69 +1,71 @@
-Return-Path: <netdev+bounces-107229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DAEF91A574
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 13:40:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 002EA91A575
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 13:40:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C16BDB25A50
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 11:40:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAE451F246EF
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 11:40:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BFC14AD0E;
-	Thu, 27 Jun 2024 11:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 708D414D28B;
+	Thu, 27 Jun 2024 11:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="Thtjle8C"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="KtcJVRIy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4BE1494A1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC8B213F441
 	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 11:39:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719488399; cv=none; b=OcrAP++zXC2xzZ1uB2NmoETJC9BiX59eH8s5LqlC+usTAga/VUg+ttJGrUOTk8AjzWCpZKtSYG+sjLdX2Yiym6yAWE2uJu+qpyuNbCyD7K2Cf5EqDBVHRdlFuPkbU+3HLuW/9wyHp/eVzwo2cmySFkRHUmftt3mq5/qnYRCjJdU=
+	t=1719488400; cv=none; b=SNWT95niqtb57E7N8udUTNR5w0/ye5khEoE/AU1w8Hds+KTixOtkRmo6AijFjcd/O6PFPdL+cNVqykq7U9zJkFePvinohv/8ovvoBJNcms00RnVT+KjFxfXne11M+rLLIXubSK3VI1VI2YzoKqjWRox6cXh5dUKpYBHHNj8ddXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719488399; c=relaxed/simple;
-	bh=H2oINYv1RisztMZ/1SAqTZYHs/1i3Urmq4+NkMvMiMc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UUFbP94Ys8PqlAvzc69M3aRxX4vCnrVLtqXip7TsB3pTGkm2xSnlVNOBJAs9ueGFTYT82okL6doCc8M9PqwNwVGzHo6k3SujzqA9IiiRGkXVL9UIeIIFTbcf4+FLtp8veMlvZuzxoSq8IWM7DLjs90RET25HSpKy1gO4W03Nw/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=Thtjle8C; arc=none smtp.client-ip=209.85.208.180
+	s=arc-20240116; t=1719488400; c=relaxed/simple;
+	bh=Nzm1nEbgG1D0fKsu4Slvc8dGgaXYua6EPR3wbZL6IJQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WbOUGe7olKkK/mbZJIxfw/fv8jbo410DL5+2YfeyQ9KmaplLCYLlAAZ5cau/sj3fHlWnzltukeoEWtITKOCYnHxZHGNazZzrkguo1epsN/QNC2fbK84ax2qROfm3Mkg75gQMzERHXJCrIUWhAQlob0ARdptOXZAaKRS9RjnyD3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=KtcJVRIy; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2ebe0a81dc8so104379311fa.2
-        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 04:39:57 -0700 (PDT)
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2ec0f3b9cfeso93453431fa.0
+        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 04:39:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1719488396; x=1720093196; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZbI7/sd74idfi/XMipln9/gNNA6hsJvdqtzVYepkGFg=;
-        b=Thtjle8CV8sAZ48bIIqpc7edKv32ptt4YMAdb8nLauRmRbVzyrF4rAd0bP9wXsv3QP
-         r0l9sY6A4LmbmYizqFVH3nvsSW8Q+K1GRV4RUhpwqP0WtaS1o15S3TfAceDGKJtFaKVR
-         i8vz41XhVaP+YR/484dkjsjVkHTg3jFijCNol1rQ8pRRLYquDEdYaiKPQyeOrxvzWk3Z
-         LX9G56MHG4E9AMq39rugx17tjoZsBurACY5DdWVSwvPO98apD72uvm+05eFk2wrSaJfn
-         SKn4LM/bm7P3alUpJF42+JTs3nEh++eX4yDgZna4IrdL4BN+6RsN+QA+Jjb3STxxoB74
-         lNzA==
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1719488397; x=1720093197; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sxu9SpdSTVz3ebvxMLh70e0y0HDyyRtIxZX5+1VZmbE=;
+        b=KtcJVRIyTDj3+PsuJ9LjDtUeoh7Ila/Kh3xkxhkonNMcc3R2+DtiKqj3Sid+mwOcF/
+         3FNAEzeCzN9a14vPtFf3nhd4uwV08pRuFy25g/mSFIqoBdBvoH4e89c8dD8s6cUG17EV
+         VNxXFSl/JaOPa3ZKuY6UTEjvn09CofREFvUIA7UtD3ZvQTM660cwWUXiZYByAbzpS/y7
+         Od/MJ9XpXgUQvh8e6IEDWZT5nncR5EojuWnheVBnHRIZskmF5000A7TQ1rpKz0eJjIzs
+         MzEG3uyiC8KvqDyNBd32Dj3i4GcLQp6j+ZRlM469CL25agbkSYw0RY394UnjVBC5hhOJ
+         /tbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719488396; x=1720093196;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZbI7/sd74idfi/XMipln9/gNNA6hsJvdqtzVYepkGFg=;
-        b=M5Tzs1i5fZ2EsZi1j8FrkGcIL0ziMqVk3EDD46Rc5YCqCRVAB0lFI0l7YBRW+0DBYV
-         Pxq85JDF65NQffzrxw3MRdEZvXN0DM4o3Bn8VJAE9cRxNxhgWf1gVtgoUFU52wpPHuFW
-         xcNK2EI7of5mXIplqGYfIBYHP/mmH+fpXpN3pRJFJWgVFvx1W3895x6PmqrkxaFlamEM
-         EH3RMoD5ARaxAcnw1u/mbjg8lHYLhjDZPN4qTezdNU9IeQ61JPP0YQ05ClEfbIJOxprG
-         iMP1Xp9ooyIz85eolvP2i1jmTKfbr5AJIAwUUSHEGwRwHoiiunIUCPv6k4WnDr7I4Ugu
-         oEvQ==
-X-Gm-Message-State: AOJu0YwJq/PiOTAKR+fpSl9uW827JuJ32nPwUctXthS3tcPTcTgv3x9U
-	geyQTT7DcXUSrpWm75OYHd0NNmPuFpmcq8l8AzWDsRTz5vhlho2q7HrPV0UfThk=
-X-Google-Smtp-Source: AGHT+IHFDzARAto2HLAI3TxjHyub50L0O0Jnjrz9yXwhDePCwserMcflGKVLOY5zTOX5jsXXhqzpcQ==
-X-Received: by 2002:a2e:a442:0:b0:2ec:5019:8fa4 with SMTP id 38308e7fff4ca-2ec7278a341mr44969421fa.49.1719488396147;
-        Thu, 27 Jun 2024 04:39:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719488397; x=1720093197;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sxu9SpdSTVz3ebvxMLh70e0y0HDyyRtIxZX5+1VZmbE=;
+        b=f3JgjM/zLd5bi86mxvFmOzbBQLqe5SZUWOHxSLoMuqjHywQRNFwXGK1x2+1LuhG8jN
+         slbSSPrsxjqzHcJyk+dc2PKOga0xxQu8g1IgbFkWeyH6JOxTyJ6pK2jLYvW7X7zaHc6m
+         jbsXjB52F9XUDvnDEw39Y8B8vwEuYZ+hKmv2RyEIg4D+rQyPRCMNP+cpWSzZgL453GWU
+         7DyzVgLBbOkHpTgt2SogY/iQc026X3n6bjXt4qIwtQnirF2XQDFnk37vTGKTuXASzC5a
+         LLF+DNHg0UgW44jBEL7YGnMcX0kf8pzbwI2Busf1MpNfdGvbRr9cjn3a6aRuBcw4NPX7
+         /fDw==
+X-Gm-Message-State: AOJu0Yw36+OP8HzVp1nBJtXE+mLw6QRqA2wu536wfkFLxatuxYgr93Sb
+	PGVlkTIjGjRm8oeG8ZMTtjzb353asB8ij8vzwhyhnRdZvErzd11xLRyOIj0Urdk=
+X-Google-Smtp-Source: AGHT+IEX942vNvyHTmy9tspQQQL/qKLX+sbQ4RkDTe+pTb3TOEUopxyuIw7WbECrr/t329Hui5TQGA==
+X-Received: by 2002:a2e:8047:0:b0:2eb:ed3a:9c65 with SMTP id 38308e7fff4ca-2ec593d93a0mr77254481fa.15.1719488397179;
+        Thu, 27 Jun 2024 04:39:57 -0700 (PDT)
 Received: from brgl-uxlite.home ([2a01:cb1d:dc:7e00:7fe5:47e9:28c5:7f25])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-424c8468613sm62081815e9.39.2024.06.27.04.39.55
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-424c8468613sm62081815e9.39.2024.06.27.04.39.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 04:39:55 -0700 (PDT)
+        Thu, 27 Jun 2024 04:39:56 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
 To: Vinod Koul <vkoul@kernel.org>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -79,10 +81,12 @@ Cc: netdev@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH v2 net-next 0/2] net: stmmac: qcom-ethqos: enable 2.5G ethernet on sa8775p-ride
-Date: Thu, 27 Jun 2024 13:39:45 +0200
-Message-ID: <20240627113948.25358-1-brgl@bgdev.pl>
+Subject: [PATCH v2 net-next 1/2] net: stmmac: qcom-ethqos: add support for 2.5G BASEX mode
+Date: Thu, 27 Jun 2024 13:39:46 +0200
+Message-ID: <20240627113948.25358-2-brgl@bgdev.pl>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240627113948.25358-1-brgl@bgdev.pl>
+References: <20240627113948.25358-1-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,26 +97,42 @@ Content-Transfer-Encoding: 8bit
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Here are the changes required to enable 2.5G ethernet on sa8775p-ride.
-As advised by Andrew Lunn and Russell King, I am reusing the existing
-stmmac infrastructure to enable the SGMII loopback and so I dropped the
-patches adding new callbacks to the driver core. This no longer has any
-build-time dependencies on the PHY changes so sending it out separately.
+Add support for 2.5G speed in 2500BASEX mode to the QCom ethqos driver.
 
-Changes since v1:
-- split out the stmmac patches into their own series
-- don't add new callbacks to the stmmac core, reuse existing
-  infrastructure instead
-- don't try to add a new PHY mode (OCSGMII) but reuse 2500BASEX instead
-Link to v1: https://lore.kernel.org/linux-arm-kernel/20240619184550.34524-1-brgl@bgdev.pl/T/
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+---
+ .../net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c   | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-Bartosz Golaszewski (2):
-  net: stmmac: qcom-ethqos: add support for 2.5G BASEX mode
-  net: stmmac: qcom-ethqos: add a DMA-reset quirk for sa8775p-ride
-
- .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 33 +++++++++++++++++++
- 1 file changed, 33 insertions(+)
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index 80eb72bc6311..91fe57a3e59e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -665,6 +665,14 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
+ 	return val;
+ }
+ 
++static void qcom_ethqos_speed_mode_2500(struct net_device *ndev, void *data)
++{
++	struct stmmac_priv *priv = netdev_priv(ndev);
++
++	priv->plat->max_speed = 2500;
++	priv->plat->phy_interface = PHY_INTERFACE_MODE_2500BASEX;
++}
++
+ static int ethqos_configure(struct qcom_ethqos *ethqos)
+ {
+ 	return ethqos->configure_func(ethqos);
+@@ -787,6 +795,9 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+ 	case PHY_INTERFACE_MODE_RGMII_TXID:
+ 		ethqos->configure_func = ethqos_configure_rgmii;
+ 		break;
++	case PHY_INTERFACE_MODE_2500BASEX:
++		plat_dat->speed_mode_2500 = qcom_ethqos_speed_mode_2500;
++		fallthrough;
+ 	case PHY_INTERFACE_MODE_SGMII:
+ 		ethqos->configure_func = ethqos_configure_sgmii;
+ 		break;
 -- 
 2.43.0
 
