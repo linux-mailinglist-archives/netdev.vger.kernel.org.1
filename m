@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-107258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2931791A73C
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 15:02:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D77FD91A746
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 15:07:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8C80283C8D
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 13:02:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 145071C211D0
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 13:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0BA916130C;
-	Thu, 27 Jun 2024 13:02:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95BAB186E54;
+	Thu, 27 Jun 2024 13:07:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WdW1jgAe"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QuP4ockh"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE0124B5B;
-	Thu, 27 Jun 2024 13:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DDB13F00A;
+	Thu, 27 Jun 2024 13:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719493327; cv=none; b=j4TMzYVNDJLlroktH++7UCLegQaXgFsIhAdeMCouNCH0qRUqJuwu3+nPba70bICBQzmePtkBP0nspJMau4as2FyqqkLsUd8yhvx5/LslX4M63TvqWr9u6VGbsiTLXYOzNj9AsYxMg0dKUDEwwMPFWjK26tYVM84EHy/j70BDn/k=
+	t=1719493649; cv=none; b=dFRu+dOmIEF7TF9lzalZqmG9JGj5pYCgzG6gRqGVcjfUEkc8NEaicjZxBlQ5+XU6Yy0OToVUY2r3Hhite4Oh/5xEQ7L4NhzJ6LXw4BqA4Lbmvt6JJdWwJQCwWsjiMMWuL72aeJz+MTxwBAW9w68fL2N/bCMhzZNSYQszyu5EZZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719493327; c=relaxed/simple;
-	bh=BnaFJ9PuibNsv2J22a8dMR+5lkY1U1oZBCLE1ZsP3Pc=;
+	s=arc-20240116; t=1719493649; c=relaxed/simple;
+	bh=4eqenzlDJJmiVegcLr50fZF1d8Jb+JeLIA2EruftpKU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sHowO/dr0gj2XCky0xfmkQIc+xCgzSncRYKvdH8m4HU1jgpf52ChvjKuKFZ+WU0b2gVK7cqfBOLzhuNP0PndakFE7kaVB1G6eFleaNzLUSv2HxmlGciwhe5H/B8vQAmWe+aJ9COvk/CJh+gUWH/tx2b6jAn4tFnjIjbfk3syBLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WdW1jgAe; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=t2JdyUqJXzMiHQdEu2v1/WepD/dcj/PmF8iNlJdhGgPU7+ifQQYyLe8wOzaI88nx0/i2WA3/Tm2bFJD6cElVWkODSiJGvJk1uKxqo6mS/FeWgjBwvctl5EofVUruYNr/nfG5rlce2ZYT1z21eYDeXicsMXDZZhrmr+hvfpzG6cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QuP4ockh; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=HfR/+79iWfSvV8+4azx6qv20sgn77zJaiv702nJ/PCQ=; b=WdW1jgAe29WrthBgh8pbrpm4Yk
-	vSu534aEDE8Akhbf0UJAX+eyWuSXWVsUHEiQbNcQFU7916L/HfiAyJny+6mba0earbTPabprR2tkk
-	C9Ynm21rcXch55cIh+HImF6UNspP5RMR4WUv64ZnnbvXDQRAoTPmFleTxVLmccKZMFXo=;
+	bh=XGLNCYj2BJRifwhxF86lhSp/yOk3DKS/Y+1DL0OAdQg=; b=QuP4ockh5YHBLYEwoZj5NEqkIO
+	QPRhs52wNmvvHeJEHgbxO64j9wBMvrt19XSNBvOz8cfXE+lF/iCh0oIBZhjaEPaE/KRv0u1iH416Y
+	S2oqly8fxynQd0MWSisU9i8Ptt73hMgEM+MFfAbzVi+0URiVktRSWCX+O0mPsKNz71Vk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sMokm-0019tY-RM; Thu, 27 Jun 2024 15:01:32 +0200
-Date: Thu, 27 Jun 2024 15:01:32 +0200
+	id 1sMoq5-0019vg-3G; Thu, 27 Jun 2024 15:07:01 +0200
+Date: Thu, 27 Jun 2024 15:07:01 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Serge Semin <fancer.lancer@gmail.com>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -67,11 +67,11 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	Tomer Maimon <tmaimon77@gmail.com>, openbmc@lists.ozlabs.org,
 	netdev@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 01/10] net: pcs: xpcs: Move native device ID
- macro to linux/pcs/pcs-xpcs.h
-Message-ID: <c1678560-08ea-430e-9558-0b9b84b4c823@lunn.ch>
+Subject: Re: [PATCH net-next v3 02/10] net: pcs: xpcs: Split up xpcs_create()
+ body to sub-functions
+Message-ID: <adfbc8c2-f39e-4aee-a879-1ae992689882@lunn.ch>
 References: <20240627004142.8106-1-fancer.lancer@gmail.com>
- <20240627004142.8106-2-fancer.lancer@gmail.com>
+ <20240627004142.8106-3-fancer.lancer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,18 +80,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240627004142.8106-2-fancer.lancer@gmail.com>
+In-Reply-To: <20240627004142.8106-3-fancer.lancer@gmail.com>
 
-On Thu, Jun 27, 2024 at 03:41:21AM +0300, Serge Semin wrote:
-> One of the next commits will alter the DW XPCS driver to support setting a
-> custom device ID for the particular MDIO-device detected on the platform.
-> The generic DW XPCS ID can be used as a custom ID as well in case if the
-> DW XPCS-device was erroneously synthesized with no or some undefined ID.
-> In addition to that having all supported DW XPCS device IDs defined in a
-> single place will improve the code maintainability and readability.
+On Thu, Jun 27, 2024 at 03:41:22AM +0300, Serge Semin wrote:
+> As an initial preparation before adding the fwnode-based DW XPCS device
+> support let's split the xpcs_create() function code up to a set of the
+> small sub-functions. Thus the xpcs_create() implementation will get to
+> look simpler and turn to be more coherent. Further updates will just touch
+> the new sub-functions a bit: add platform-specific device info, add the
+> reference clock getting and enabling.
 > 
-> Note while at it rename the macros to being shorter and looking alike to
-> the already defined NXP XPCS ID macro.
+> The xpcs_create() method will now contain the next static methods calls:
+> 
+> xpcs_create_data() - create the DW XPCS device descriptor, pre-initialize
+> it' fields and increase the mdio device refcount-er;
+> 
+> xpcs_init_id() - find XPCS ID instance and save it in the device
+> descriptor;
+> 
+> xpcs_init_iface() - find MAC/PCS interface descriptor and perform
+> basic initialization specific to it: soft-reset, disable polling.
+> 
+> The update doesn't imply any semantic change but merely makes the code
+> looking simpler and more ready for adding new features support.
+> 
+> Note the xpcs_destroy() has been moved to being defined below the
+> xpcs_create_mdiodev() function as the driver now implies having the
+> protagonist-then-antagonist functions definition order.
 > 
 > Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
 
