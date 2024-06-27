@@ -1,172 +1,142 @@
-Return-Path: <netdev+bounces-107097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0696A919BFE
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 02:44:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8F82919C0C
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 02:46:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B33AC2831B6
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 00:44:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D7011F21416
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 00:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34F063D3BD;
-	Thu, 27 Jun 2024 00:42:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57BC623CB;
+	Thu, 27 Jun 2024 00:46:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IsMTfT0Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mBlNUmVM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817E579F4;
-	Thu, 27 Jun 2024 00:42:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69A5A50;
+	Thu, 27 Jun 2024 00:46:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719448944; cv=none; b=mWzRZ9y8HtpTau7cxRz1B6KJGG4zdRYjP8jEzp6ur0eEf2KJ+cChMSBH64G1EB3hBXlV5QvYxfF9TCnN8Ni5uUjLP+aBCg7yBzCHICYrS/H4RFrDmZzHSxZkxK0LsyLwReomk4NBjhDJVR3JEVqJLFQ/5xb2Jptvlmh0iSOtQ+Q=
+	t=1719449198; cv=none; b=dffrzsLCroNS9h1WB8+Yu55SaT96NPALW5h/2VQC3peqhoUQ0TsJRAHHteGw+rESE3dbN9LNOUtCSajqxo84xnNnj7h/OWBurqNALw12isCUzqpyMzNNHzZVpRfqdxvfqRxdXnYMWpDCpvlsXI6hmw3f3OV3o8A24o3xoMk9+bA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719448944; c=relaxed/simple;
-	bh=xj2Cr4TyHsmmOYefzTQwzoHeqZD22q0utO2EV+/SVb4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XFlk9s9NSzK3pT8/pHKLbWM99mJjfXSmLQX7YDpDxuvxjrDDglLxx7Tz/k/1Xw6SOAkBIjtzxXwo1PMNqad4R872E72Mo+G7Tb5UNfmQ5m0ISD+hsuGz//F3t2lF2Nt/l0bpJDnSwwuK/0ZXzFpBGal2fJIjsT3KATd+oBOO77E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IsMTfT0Y; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52cdfb69724so5578417e87.1;
-        Wed, 26 Jun 2024 17:42:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719448941; x=1720053741; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wGa0V/+q1PY+8AtdQff4+HTCc2sbpBqj/v0lwdLsGCU=;
-        b=IsMTfT0YO5MieIYtUwcXQsxT6GQwGWoaPinqfloBtuF0rlmdtRBD8Vl8Kf8ifXxtkB
-         iz/bOJ+hVgBMeJ/Ns2q0Y2Qjprrz+thbDVBjnC9W+kcA1n5XV+q71m1mxEnAN+Z0/fdu
-         N7cT/IQWQoYCQlqqLmOhe13H2NuXQVMJgF+t04V05i2QIOKTtSHwUx2dUv/HwbzRrzSw
-         trghARWEcsK3Alw3M8qg2JJ4nMIrcWkx/vZgin5NlmODCHpZWssL+fkCBd3UMDGTCmom
-         2sZeMSWhdoUb+fpes7vchD3EKAHJHiwUS48yQBQBHeAbxUPVpWNoQsKSmjQWfvzUV2Eq
-         GRqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719448941; x=1720053741;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wGa0V/+q1PY+8AtdQff4+HTCc2sbpBqj/v0lwdLsGCU=;
-        b=J3NTDAzov3ew+ZjYMjL7rz3U9z0FDrUp/KZA7q5xPjI/a5sgdcXGOVQT5g5lZVaMHR
-         /OFg0Nn/XbY7Y+oCKdzhvWq2HHq8c9tMFgfuUlBewnyVUSQ7l4qIGel0iVEVw0dB6O2q
-         IYuwdG2oGTaPKmEs8FqkpgD4C6lnTNNqJnwubQpc8+VDT8TJll5uCvR4x4161FewWN/7
-         RO4p0HijIVDeJwF0alWwsvFnP+wq6QbfYlP5xWWztSpM7FhQB/VD3Xj+NNNtV4Fqb2c6
-         OJsQB9RPk+QbO0229G4QLNCbnIjaKLsKc1x56CP5FBUWvYfhSawzXIU1ViAfGv85uM0p
-         VE/A==
-X-Forwarded-Encrypted: i=1; AJvYcCXS2ds2hxTzPwX86J/UNPWnNJk0Mf0m1+s4DHXdGeBBSy13V4gkC4le4jcADZrMUdQjTR2/TMNfo+XMJ1ah2dmQdWuOve6pxxmqhLadradpKYKO3Frt1Zc1Uoh1icTM1ja214TUSmupzJ/HxoDPc2rGakXQuXPmYD3REygUaEFuuA==
-X-Gm-Message-State: AOJu0YxrqANLAcIrqsFGcSD2cLhyQhELnwi8i6OaKpjvYaFv4A5zw0po
-	LY0uusA6o0hVbfkPc7T/YCB+VTQhjJGrpOgxCKt4HmG7OEv1gmTs
-X-Google-Smtp-Source: AGHT+IHkActpZTtjsuzyiNyp+unFcBPGmpORKiX6h3v1xsvn9qGifn4FXEoGGX308UY64dnWHiAHzA==
-X-Received: by 2002:ac2:46ee:0:b0:52c:dc25:d706 with SMTP id 2adb3069b0e04-52ce185ec9emr6605174e87.52.1719448940728;
-        Wed, 26 Jun 2024 17:42:20 -0700 (PDT)
-Received: from localhost ([89.113.147.248])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7131ec55sm18792e87.231.2024.06.26.17.42.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 17:42:20 -0700 (PDT)
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: Serge Semin <fancer.lancer@gmail.com>,
-	Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
-	Abhishek Chauhan <quic_abchauha@quicinc.com>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Tomer Maimon <tmaimon77@gmail.com>,
-	openbmc@lists.ozlabs.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next v3 10/10] net: stmmac: Add DW XPCS specified via "pcs-handle" support
-Date: Thu, 27 Jun 2024 03:41:30 +0300
-Message-ID: <20240627004142.8106-11-fancer.lancer@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240627004142.8106-1-fancer.lancer@gmail.com>
-References: <20240627004142.8106-1-fancer.lancer@gmail.com>
+	s=arc-20240116; t=1719449198; c=relaxed/simple;
+	bh=0SG3laByZlaFUISZCHp29XT3JkoNZdaHE8iSnv9r4Ww=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=e29aBtSG5yk6cFLdUcnnEn6RFj9wDNBzdPp4zP4Jeksm16qg7avahlVDm3hjcfYB1tuokJ7m8F0h5j8sHtVSHbcpiJavSUIB+oANT8FQcdSqYLj8khQpxh5DFfPrNxtkiohAGM319MfYbv0dYgDPImW5PuOPgaAsYTCHYpKL3b0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mBlNUmVM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B63CC116B1;
+	Thu, 27 Jun 2024 00:46:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719449197;
+	bh=0SG3laByZlaFUISZCHp29XT3JkoNZdaHE8iSnv9r4Ww=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mBlNUmVMzPFiiYZI8a8E65frgk5k1lxp0RkrYfN3Nlf/2A5ch4UMQN/KRSpXjJb2O
+	 djBU41eFDkc5BhBiVK+bvijq7reE+WvVLOjI6abwchbipLi50MqkLBcE9HAZXML2ZB
+	 vcXNkl0oVc41ZWhheArOwYfFHV0uN/gdJSrWAvNZjaO4ES7wR4BNnUbOfdxD7g2qby
+	 10el+2M74ZCpdaxOCG4dY/gaD016jFvumOcdSt4+KsTBMcEqxEPu2v7WSj29kUUMx0
+	 pwpxnw8AxBcF47BxCRsv11U6w9kvZBBbsJL9xFpmJWoMiS8guNVpQsYJOkzW+Fd5BG
+	 bUJejdYs3QDaw==
+Date: Wed, 26 Jun 2024 17:46:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, Ivan
+ Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>,
+ Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
+ <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan
+ <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, "Christian
+ =?UTF-8?B?S8O2bmln?=" <christian.koenig@amd.com>, Bagas Sanjaya
+ <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, Nikolay
+ Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>,
+ David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
+ <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
+ Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
+ <pkaligineedi@google.com>, Stanislav Fomichev <sdf@google.com>
+Subject: Re: [PATCH net-next v14 13/13] selftests: add ncdevmem, netcat for
+ devmem TCP
+Message-ID: <20240626174634.2adec19d@kernel.org>
+In-Reply-To: <20240626150822.742eaf6a@kernel.org>
+References: <20240625195407.1922912-1-almasrymina@google.com>
+	<20240625195407.1922912-14-almasrymina@google.com>
+	<20240626150822.742eaf6a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Recently the DW XPCS DT-bindings have been introduced and the DW XPCS
-driver has been altered to support the DW XPCS registered as a platform
-device. In order to have the DW XPCS DT-device accessed from the STMMAC
-driver let's alter the STMMAC PCS-setup procedure to support the
-"pcs-handle" property containing the phandle reference to the DW XPCS
-device DT-node. The respective fwnode will be then passed to the
-xpcs_create_fwnode() function which in its turn will create the DW XPCS
-descriptor utilized in the main driver for the PCS-related setups.
+On Wed, 26 Jun 2024 15:08:22 -0700 Jakub Kicinski wrote:
+> On Tue, 25 Jun 2024 19:54:01 +0000 Mina Almasry wrote:
+> > +CFLAGS += -I../../../net/ynl/generated/
+> > +CFLAGS += -I../../../net/ynl/lib/
+> > +
+> > +LDLIBS += ../../../net/ynl/lib/ynl.a ../../../net/ynl/generated/protos.a  
+> 
+> Not as easy as this.. Please add this commit to your series:
+> https://github.com/kuba-moo/linux/commit/c130e8cc7208be544ec4f6f3627f1d36875d8c47
+> 
+> And here's an example of how you then use ynl.mk to code gen and build
+> for desired families (note the ordering of variables vs includes,
+> I remember that part was quite inflexible..):
+> https://github.com/kuba-moo/linux/commit/5d357f97ccd0248ca6136c5e11ca3eadf5091bb3
 
-Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+Investigating this further my patches will not work for O=xyz builds
+either. Please squash this into the relevant changes:
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-index 74de6ec00bbf..03f90676b3ad 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-@@ -497,15 +497,22 @@ int stmmac_mdio_reset(struct mii_bus *bus)
+diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
+index db60d2718b35..9966e5b7139b 100644
+--- a/tools/testing/selftests/drivers/net/Makefile
++++ b/tools/testing/selftests/drivers/net/Makefile
+@@ -9,7 +9,8 @@ TEST_PROGS := \
+ 	stats.py \
+ # end of TEST_PROGS
  
- int stmmac_pcs_setup(struct net_device *ndev)
- {
-+	struct fwnode_handle *devnode, *pcsnode;
- 	struct dw_xpcs *xpcs = NULL;
- 	struct stmmac_priv *priv;
- 	int addr, mode, ret;
+-# YNL files
++# YNL files, must be before "include ..lib.mk"
++EXTRA_CLEAN += $(OUTPUT)/libynl.a
+ YNL_GEN_FILES := psp_responder
+ TEST_GEN_FILES += $(YNL_GEN_FILES)
  
- 	priv = netdev_priv(ndev);
- 	mode = priv->plat->phy_interface;
-+	devnode = priv->plat->port_node;
+diff --git a/tools/testing/selftests/net/ynl.mk b/tools/testing/selftests/net/ynl.mk
+index 0e01ad12b30e..59cb26cf3f73 100644
+--- a/tools/testing/selftests/net/ynl.mk
++++ b/tools/testing/selftests/net/ynl.mk
+@@ -18,6 +18,4 @@ $(YNL_OUTPUTS): CFLAGS += \
  
- 	if (priv->plat->pcs_init) {
- 		ret = priv->plat->pcs_init(priv);
-+	} else if (fwnode_property_present(devnode, "pcs-handle")) {
-+		pcsnode = fwnode_find_reference(devnode, "pcs-handle", 0);
-+		xpcs = xpcs_create_fwnode(pcsnode, mode);
-+		fwnode_handle_put(pcsnode);
-+		ret = PTR_ERR_OR_ZERO(xpcs);
- 	} else if (priv->plat->mdio_bus_data &&
- 		   priv->plat->mdio_bus_data->pcs_mask) {
- 		addr = ffs(priv->plat->mdio_bus_data->pcs_mask) - 1;
-@@ -515,10 +522,8 @@ int stmmac_pcs_setup(struct net_device *ndev)
- 		return 0;
- 	}
- 
--	if (ret) {
--		dev_warn(priv->device, "No xPCS found\n");
--		return ret;
--	}
-+	if (ret)
-+		return dev_err_probe(priv->device, ret, "No xPCS found\n");
- 
- 	priv->hw->xpcs = xpcs;
- 
--- 
-2.43.0
-
+ $(OUTPUT)/libynl.a:
+ 	$(Q)$(MAKE) -C $(top_srcdir)/tools/net/ynl GENS="$(YNL_GENS)" libynl.a
+-	$(Q)cp $(top_srcdir)/tools/net/ynl/libynl.a ./
+-
+-EXTRA_CLEAN += libynl.a
++	$(Q)cp $(top_srcdir)/tools/net/ynl/libynl.a $(OUTPUT)/libynl.a
 
