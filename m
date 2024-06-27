@@ -1,94 +1,107 @@
-Return-Path: <netdev+bounces-107116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0292D919E71
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 06:59:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7710919E7E
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 07:08:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A73371F24ED1
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 04:59:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 948F82832F1
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 05:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D501BC58;
-	Thu, 27 Jun 2024 04:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613CD1BF24;
+	Thu, 27 Jun 2024 05:08:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="DKE8m8HR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADE517550
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 04:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B670E1A702;
+	Thu, 27 Jun 2024 05:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719464344; cv=none; b=r4x3mdWnhgnrlygtyh39WTTcygsIhp6x5+YY8uFPg9ey1SwM042A95EzMMoHX/g1kjtahg8l039IZp+WAXob5hozQKHosiCGorJs/Xf6jFvC9bxo4eefmKNXeeln39ZtVd9YVFgKaw2VZ+ND5reC/lg06VmsXskYlXF/EA/ISZ8=
+	t=1719464913; cv=none; b=ENIs6PZDgMYjsOVCY9Fb2tY7KC0cO0VStyMcGl1EdLMyTXXw4lMXCWFYJlglYz+vJtbGIHjmEFQJqQk39tyEdWnjjiyo/RnqDwQykfkDswHwHexYO1q+t2oud4nP62ACCQ2J5gKUcCWZZ3DS4fpfboKlm/VZvLd4nFT3ageBhd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719464344; c=relaxed/simple;
-	bh=IkQsrKKUn8XRTQXTllxQe4gYZgzHBsRviOw2r7w+Krc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=jLKeoCWX/8joDSysqKvQ/dg/RXugJVt9NxcYdXmce0hpl4wY9opM975DWdweSk4uWb2wPhHoic3dufJg5tm7gchI/jZRt5IJzR/eL/xGPJwQ6um9uHg2zEAJsEJZ75Utjfe41i+mG94AaM39CrcgGzJs1fJmV/1tRFy3OHH62ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-37715aeede6so36883735ab.2
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 21:59:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719464342; x=1720069142;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7VsPizNXofWfwb6ytZE6j9YZ3mxWUXsZqX+k1ZKLAz0=;
-        b=qAMlKAuqXupyoP9HYY0mluIQ05f4oyHKLEmoylPYAexmHup2bZ+sjfBHCI2JVzJi0b
-         DCrZyK4YNEAUaKMVbNYv729Djsxule32gSUJN6gI/y4qslucnOHdMFqBI2GXoa5N8zrI
-         zoDVxJ/J7WJQx0rt5TvUKEQajbaf7RA7uWk3gA+HsFtkffNMwgmRaI1ZleCYR3QXMGBx
-         tUsvrAsvWVDWNllpZey9KIFrSLDG7hK+I8kmZoDo3OCvkoSygamodRWzVzm/9JxWd87X
-         1covOr623qDFHSh7QDOL21Cp57qYd+mLImb65z15xso7c0OeHkZQJgOawbxljq/CIg76
-         1+ZA==
-X-Forwarded-Encrypted: i=1; AJvYcCXXJgMj0+BO3AN8kwH9yjLI28ZcdrdamvWUVrp5I30skMtHyz+CCEBu6yZ8dUt4gyfxqfBslRNeOhsvW7pwLZKgZeJTFdTT
-X-Gm-Message-State: AOJu0YyO1fgnQiLJPcdHnVWDo3XmO+vCXDpYe6AaPBFNkcFJhkmbNSRd
-	Mylw9XLf1aa11l/k65o4QTGgWen4qoL2i6AgMIAqac0Qpd1/40TMoXHPKCHK9AckD3bBu8QUfQ4
-	2Q7ypg8QED4Z6VP2L8ESy1Lk8SoHiDhoMsfFKS1ZwN4E0oDlLhHCmClU=
-X-Google-Smtp-Source: AGHT+IHTP9IvArud6LUgveR74LtuG4oMDICVLPPXWnHbW3sLJ/xx54WkI0jfqyPCq8oqZx96CD1XBK9MWwBFCOLfAWpwaE9vRkKL
+	s=arc-20240116; t=1719464913; c=relaxed/simple;
+	bh=MnxzPmERAtu+n6Ig3xdw80LnPjSGEE5nsAYiBqjVZYM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jul2eofvfL2ElmbcxeQThqo9VGRmwo8wIWdRzEZGP5nwWr/Tfh09cDq+okUbjDS51dWmPdN1J6xYUJSdSFwu9adJE992RMtdUmIrzT0cT6O00VU68Yr29D7XsxY9ofA0mmeifbJIrJEg0O9IYVeSSuIfpojpSW8UNS0xka0XI44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=DKE8m8HR; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45QImo8V002400;
+	Wed, 26 Jun 2024 22:07:55 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=Y2Zt/MQEYRuDjKW8UGc2Kvr4B
+	O3jU7bpmwKvqLDFRIU=; b=DKE8m8HRzs8hdvGUquTcVaPB1Ojr0dN+GybLTzNU4
+	kdEIkD/QROPSJLAqRiccWKZnWR/7hp09xIvkSlF29PN+ut1bOOGjJIp7Y1xl7LzU
+	vAznEVLeKioqImz5wrSMxYM4I1ZJ3eUO6dxV78OWnCJ/GBrhjpWrvi5LPsOD9eZ4
+	gponk0wAG2hGc0KLM5OxjRtOHwxiBC8rZDxyuD04iabrvRrfH2wpJi5FXpJijEqI
+	nhZ2BgSkdZAQrg1AESqUAO2VCMKESaLgsb8PDzxuXkR5PcQFlhm0oYO/eKvkJQQI
+	UNfh6ocouaeHeWaQXwCO/YMRCDMtOqxYFdZAHJ3bHNWDQ==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 400rkg1ge0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Jun 2024 22:07:55 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 26 Jun 2024 22:07:55 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 26 Jun 2024 22:07:55 -0700
+Received: from maili.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 3B0283F7071;
+	Wed, 26 Jun 2024 22:07:50 -0700 (PDT)
+Date: Thu, 27 Jun 2024 10:37:50 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: Chen Hanxiao <chenhx.fnst@fujitsu.com>
+CC: Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
+        Pablo
+ Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <lvs-devel@vger.kernel.org>, <netfilter-devel@vger.kernel.org>
+Subject: Re: [PATCH net-next] ipvs: properly dereference pe in
+ ip_vs_add_service
+Message-ID: <20240627050750.GA1743080@maili.marvell.com>
+References: <20240626081159.1405-1-chenhx.fnst@fujitsu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:15c5:b0:375:da97:f21a with SMTP id
- e9e14a558f8ab-3763f6e1665mr12436205ab.3.1719464342366; Wed, 26 Jun 2024
- 21:59:02 -0700 (PDT)
-Date: Wed, 26 Jun 2024 21:59:02 -0700
-In-Reply-To: <0000000000006293f0061bca5cea@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000054b7cc061bd7fdeb@google.com>
-Subject: Re: [syzbot] [net?] general protection fault in coalesce_fill_reply
-From: syzbot <syzbot+e77327e34cdc8c36b7d3@syzkaller.appspotmail.com>
-To: brett.creeley@amd.com, davem@davemloft.net, drivers@pensando.io, 
-	edumazet@google.com, hengqi@linux.alibaba.com, horms@kernel.org, 
-	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, shannon.nelson@amd.com, 
-	syzkaller-bugs@googlegroups.com, vladimir.oltean@nxp.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240626081159.1405-1-chenhx.fnst@fujitsu.com>
+X-Proofpoint-GUID: wSXmmk9mMDWUa9I_0MY3ReWkEoncJWSr
+X-Proofpoint-ORIG-GUID: wSXmmk9mMDWUa9I_0MY3ReWkEoncJWSr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-27_01,2024-06-25_01,2024-05-17_01
 
-syzbot has bisected this issue to:
-
-commit 55a3982ec721dabd5a4c2f16bfb03deb032e45c2
-Author: Shannon Nelson <shannon.nelson@amd.com>
-Date:   Wed Jun 19 00:32:55 2024 +0000
-
-    ionic: check for queue deadline in doorbell_napi_work
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11fc181a980000
-start commit:   50b70845fc5c Merge branch 'add-ethernet-driver-for-tehuti-..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=15fc181a980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e78fc116033e0ab7
-dashboard link: https://syzkaller.appspot.com/bug?extid=e77327e34cdc8c36b7d3
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1599901a980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1429e301980000
-
-Reported-by: syzbot+e77327e34cdc8c36b7d3@syzkaller.appspotmail.com
-Fixes: 55a3982ec721 ("ionic: check for queue deadline in doorbell_napi_work")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+On 2024-06-26 at 13:41:59, Chen Hanxiao (chenhx.fnst@fujitsu.com) wrote:
+>
+> diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+> index b6d0dcf3a5c3..925e2143ba15 100644
+> --- a/net/netfilter/ipvs/ip_vs_ctl.c
+> +++ b/net/netfilter/ipvs/ip_vs_ctl.c
+> @@ -1369,7 +1369,7 @@ ip_vs_add_service(struct netns_ipvs *ipvs, struct ip_vs_service_user_kern *u,
+>  {
+>  	int ret = 0;
+>  	struct ip_vs_scheduler *sched = NULL;
+> -	struct ip_vs_pe *pe = NULL;
+> +	struct ip_vs_pe *pe = NULL, *tmp_pe = NULL;
+Reverse xmas tree.
+>  	struct ip_vs_service *svc = NULL;
+>  	int ret_hooks = -1;
+>
+>
 
