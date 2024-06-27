@@ -1,60 +1,59 @@
-Return-Path: <netdev+bounces-107468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2126E91B1C2
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 23:57:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C75191B1C5
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 23:59:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0F22283909
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:57:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3235428430B
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:59:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D39651A071C;
-	Thu, 27 Jun 2024 21:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1143A1A071C;
+	Thu, 27 Jun 2024 21:59:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UnGf/csM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rmqL5kzq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5BC41864C;
-	Thu, 27 Jun 2024 21:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3AB45BF0;
+	Thu, 27 Jun 2024 21:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719525462; cv=none; b=TSGkEUHFEllYtzMWc7rF0I86vKxf1tshJ6iWolnoieo+4LJXpG5kFKi+5rtJHNq7wJuG207UXrjme5JXmaT+Wbxppasju1ZE+Uo4DiRlW7mO/d8OXuHPmC73oiAZAaNgpaAHw0LEAF7bsY38zZGvn5uZfz2Gk8m/+dbxPdNPt9w=
+	t=1719525573; cv=none; b=kHsWPvYicyY9riui7HjgOG7b3d1QVEjXizYoo9UMIX3vyrcvBBU2c7z0Icg1eRwZ0s+HyXfoW7XDwflT9VerriHq6vovJWHTkwAWjSJmXliDK58j5yqOLlsnszJe6b8fuZ/SJvWpEGtP8b1DlyUs/vKY3VJE4AmjfkeCG2BZRrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719525462; c=relaxed/simple;
-	bh=btUn2RTfx69GlQFcTNPIXCDVQg0YlIo0Eispfw6DYUc=;
+	s=arc-20240116; t=1719525573; c=relaxed/simple;
+	bh=DUtnwwsQweiesgdTDc4dixo2Pw3X2S4EnfQbGOuP09Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Fb+F/RQSFjxJuHezJjrQ1ql+naCTOwoEHR9hShC+4JYSpq6gxbw0l7V578LsHgskT9mnBOaeVYi4w7dkUqVfQA7Be3JHk1x1UMbAY0TSbrwyH8etUVkdBpxvMXPCBFWz9HzS0A+NVBKFYYsh4n3qeGFNj8UfMrKYXBYhx6Ck1gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UnGf/csM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8B12C2BBFC;
-	Thu, 27 Jun 2024 21:57:41 +0000 (UTC)
+	 MIME-Version:Content-Type; b=erFa79oDry1uf56LO7OxoN4GP1o4KSBBPqlNBaEsEg9xL3O+yETDomNfsMWqU+HY8EuaGDWUEEF5RViPhCcIgtjyclEY5SwwxJ8SQxnmXETeBsQpaXD5dza+9YIDchEstxw4934ahB2/rJdLiigDBJpoxRlXEs3bXBqqoB6YWjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rmqL5kzq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2537C2BBFC;
+	Thu, 27 Jun 2024 21:59:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719525462;
-	bh=btUn2RTfx69GlQFcTNPIXCDVQg0YlIo0Eispfw6DYUc=;
+	s=k20201202; t=1719525572;
+	bh=DUtnwwsQweiesgdTDc4dixo2Pw3X2S4EnfQbGOuP09Q=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UnGf/csMhppI+fPN7bpCdPj/EHjFvZ4zieA3RgXcHwgRwRnDgAPb/mZGTust+0bly
-	 26oeAXQZWiuN9Qxvn7P8cZYAuI7htqQFA3nw6TUGRuIsbqbnjVZ68aa8wsTBZ6omwR
-	 jtsTbfJGIdWYj+Dyv+d4xZhdUdIePdyJxWWKLCOz2ZHqKeI3LZTAQDnlmdybtvbIpV
-	 qLWLdoOldobGdidpgVMGbEqW8z0ivAUKa+85/KGSvf8jNy1n0j0WiAH41m31p22Ww0
-	 1hRT2b4CqcB3vky2YU9+vxcCwtUNwWY45cX72D5nianocwqDiAIRQjyVcGinBrTjBL
-	 XkiWBIRRFRLwA==
-Date: Thu, 27 Jun 2024 14:57:40 -0700
+	b=rmqL5kzqm8S3dhF71anxBg0KKi0Obuaqi4DZKptUdxaHyF8I/C+Eq3O/n4waqe14x
+	 uuc8bDOgTlsAz7mEbC0prblFwJhN+P35nKrCU+EcDlftJwr0VfciDCWTz2PwAKzw41
+	 t4rPVE4ox3EIooDJ1Yi7h6xDnDqXmZJiTTYlk4D25BLGr7bh+/SCwtqRzcFQQFOnAn
+	 iXII03bU8RHdmZHsnTS0PUR2c4Pvnj6BvyJ/Du5vCrkEpiyHVWWgMRAWvlQ/digF/N
+	 q8SYm380A1kD06LP4NHY8kr8miFglbo1WTm5+6fvscZEwZs4aFsp3gnlWHqpFuAhd7
+	 6rr+K/KCsSQqw==
+Date: Thu, 27 Jun 2024 14:59:31 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
 Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- stable@vger.kernel.org, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
- netdev@vger.kernel.org, Lukasz Majewski <lukma@denx.de>
-Subject: Re: [PATCH net v1 1/1] net: phy: micrel: ksz8081: disable broadcast
- only if PHY address is not 0
-Message-ID: <20240627145740.26df3456@kernel.org>
-In-Reply-To: <20240627053353.1416261-1-o.rempel@pengutronix.de>
-References: <20240627053353.1416261-1-o.rempel@pengutronix.de>
+ Russell King <linux@armlinux.org.uk>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [RESEND PATCH net] net: phy: aquantia: add missing include
+ guards
+Message-ID: <20240627145931.480ad134@kernel.org>
+In-Reply-To: <20240627105846.22951-1-brgl@bgdev.pl>
+References: <20240627105846.22951-1-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,19 +63,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 27 Jun 2024 07:33:53 +0200 Oleksij Rempel wrote:
-> Do not disable broadcast if we are using address 0 (broadcast) to
-> communicate with this device. Otherwise we will use proper driver but no
-> communication will be possible and no link changes will be detected.
-> There are two scenarios where we can run in to this situation:
-> - PHY is bootstrapped for address 0
-> - no PHY address is known and linux is scanning the MDIO bus, so first
->   respond and attached device will be on address 0.
+On Thu, 27 Jun 2024 12:58:45 +0200 Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> The fixes tag points to the latest refactoring, not to the initial point
-> where kszphy_broadcast_disable() was introduced.
+> The header is missing the include guards so add them.
 > 
-> Fixes: 79e498a9c7da0 ("net: phy: micrel: Restore led_mode and clk_sel on resume")
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Fixes: fb470f70fea7 ("net: phy: aquantia: add hwmon support")
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Is there a reason you're not CCing the author ?
+You say net but it doesn't apply:
+
+Applying: net: phy: aquantia: add missing include guards
+error: patch failed: drivers/net/phy/aquantia/aquantia.h:198
+error: drivers/net/phy/aquantia/aquantia.h: patch does not apply
+Patch failed at 0001 net: phy: aquantia: add missing include guards
+-- 
+pw-bot: cr
 
