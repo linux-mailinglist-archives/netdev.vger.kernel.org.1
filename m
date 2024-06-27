@@ -1,176 +1,123 @@
-Return-Path: <netdev+bounces-107175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D632D91A33A
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 11:57:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26FDD91A356
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 12:02:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13D0E1C21DF7
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 09:57:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C6A2B22C1D
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 10:02:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584CB13BAC5;
-	Thu, 27 Jun 2024 09:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB0813A400;
+	Thu, 27 Jun 2024 10:02:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U4/p8Alt"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="WInV4144"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D9913B285;
-	Thu, 27 Jun 2024 09:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F85B73451
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 10:02:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719482231; cv=none; b=eDLXeQj7WTnb34qU+B8pS7m3hFBAVW4jb0fHtVAaTTWTqqokRztUOTuOXnlN7P3wihGTdVTGCzZjPw6IFauc59WeWBbs3CW1qlpkGOyz5Xs3tqTeV09X1TqXr3rmQtl4vt7wR3YDqRIyuP2/HsO2dnuSG95bjQfVWXmeRfDuA+I=
+	t=1719482526; cv=none; b=SZN4BsKYL/2zD6Oy/Jm0sFFSIM5TS9cZWtn8J9dvOzw28awSotvoih4YZwX9h97KhmWuMDWRwj2Gelzs4yA7O+yNe6PHYXQ14T8OdEuKgkpjTeGHtDDK+BSeVHbYhPmQI9rfF8sbEHUGHG5KKLmVVNJaYc3abf4TSmOjsKrieMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719482231; c=relaxed/simple;
-	bh=klZF4oL5BFPuJFiCCyzgvkVr2598ZjJmTgNRxIRIx2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LIvaAyTCbgRbTg1YgYzBlvkIyTff+1NwLQjuVdo1wwjoA/UOiuBUs4GBs9wspWfBZhnDMwYNK/rtRmkQNjonNVNglpjs43OrnW0rh7Q6uZ6wTk9yHbu4RsHRyw+nV7xHr8XqVt8RG37mE/nGNZPys/XqVaRqT0BZ2Nc4J+dwrsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U4/p8Alt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33F17C2BBFC;
-	Thu, 27 Jun 2024 09:57:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719482230;
-	bh=klZF4oL5BFPuJFiCCyzgvkVr2598ZjJmTgNRxIRIx2o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U4/p8Altdrr29omLIwjLTn3DIAJ64IJw4ocLYHzkBppjVmyEaEjq/5+rCC852X4Yn
-	 YDl2DMUQoOUI7goHUYhXCIbftRMHgJEVjCNHfBkXzywtoSLdPNF5V5FJL5QbJ+bTYl
-	 of3iOdwlkrt48zoLExrff+7nT57dOQ5Z713aCqHo65ZEv+Z+SVxEdFkcjGp9ziMKhs
-	 RscETQgYMbW+78aVAWRNU3Esn57n1xYYBnIXNh62xs0ZDUilJdfvEMiGh63N5QdLjN
-	 nlUGnXDYoHig5RrahEqem/SJbf/JsUPnlXXqrbop631jzlPwmQRWpvFaI12TZTbmoi
-	 TS9j+YHzq07PA==
-Date: Thu, 27 Jun 2024 12:57:05 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	Konstantin Taranov <kotaranov@linux.microsoft.com>,
-	Wei Hu <weh@microsoft.com>,
-	"sharmaajay@microsoft.com" <sharmaajay@microsoft.com>,
-	Long Li <longli@microsoft.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	linux-netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH rdma-next 1/1] RDMA/mana_ib: Set correct device into ib
-Message-ID: <20240627095705.GS29266@unreal>
-References: <1719311307-7920-1-git-send-email-kotaranov@linux.microsoft.com>
- <20240626054748.GN29266@unreal>
- <PAXPR83MB0559F4678E73B0091A8ADFBBB4D62@PAXPR83MB0559.EURPRD83.prod.outlook.com>
- <20240626121118.GP29266@unreal>
- <20240626082731.70d064bb@hermes.local>
- <20240626153354.GQ29266@unreal>
- <20240626091028.1948b223@hermes.local>
- <PAXPR83MB05592AE537E11C9026E268F7B4D62@PAXPR83MB0559.EURPRD83.prod.outlook.com>
- <DM6PR21MB14819FB76960139B7027D1EECAD62@DM6PR21MB1481.namprd21.prod.outlook.com>
+	s=arc-20240116; t=1719482526; c=relaxed/simple;
+	bh=0+FD3x3PSX2o6aEk9iocb7v2Z/Fy88YPHVFv/U6vP88=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B9FiNVou3kl4E2VNQOaZF73qOaQIg7873iUQ3945CC3cgHDVmhKj59gso88RUPILeHDabECWpFtei7NFOF0lp9fWMiGLBbxsnLbdOVRHESmap1FZevl0DWVso08S6RmPjb39qmdqzDdKIOVdn0cZ8KPTR89M0O/yEjnGp2gSphc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=WInV4144; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 2E7102074B;
+	Thu, 27 Jun 2024 12:02:01 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 6TTxfVAE0rm7; Thu, 27 Jun 2024 12:01:57 +0200 (CEST)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 530D020185;
+	Thu, 27 Jun 2024 12:01:57 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 530D020185
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1719482517;
+	bh=TQBXdUhLbnoAx6uQGCoE3DveiTAvPLkHcDrenQws1Qg=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=WInV4144n+IlM8KueV0g+vcO6a0CBjViA0Hl/jksiorcrAijAQA7LXZI7X1eYSoyn
+	 tJnXmNuMWiQkr4Mq4wRmLkEfe93DRTfHUtEC2bg1cqbWP9VMSTg2dGkNlsW22y+fJZ
+	 maLbs1d7gwq/v1zoUlQK8RrpFpOsol95LA+VmcEc+25dsTJRewN/cphBhvVaInHBPk
+	 KE4rbyqE3yuOZqLAuW23LLssCJNY8CTFKAI3dp5ntQJbYk/HXlLZ4M5cvZOJs1YYT2
+	 slaXRXTv3Rvq3QGAg30lyMJ3hQjjpu0Tc4XMmd/1L39tm9NhbRcsdEaGMpWgSME9BU
+	 inerUP5/7qgoA==
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+	by mailout2.secunet.com (Postfix) with ESMTP id 446DD80004A;
+	Thu, 27 Jun 2024 12:01:57 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 27 Jun 2024 12:01:57 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 27 Jun
+ 2024 12:01:56 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 41ED731824EA; Thu, 27 Jun 2024 12:01:56 +0200 (CEST)
+Date: Thu, 27 Jun 2024 12:01:56 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Antony Antony <antony.antony@secunet.com>
+CC: Eyal Birger <eyal.birger@gmail.com>, <davem@davemloft.net>,
+	<dsahern@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <herbert@gondor.apana.org.au>, <pablo@netfilter.org>,
+	<paul.wouters@aiven.io>, <nharold@google.com>, <mcr@sandelman.ca>,
+	<devel@linux-ipsec.org>, <netdev@vger.kernel.org>
+Subject: Re: [devel-ipsec] [PATCH ipsec-next, v4] xfrm: support sending NAT
+ keepalives in ESP in UDP states
+Message-ID: <Zn04lL533UFXpvYZ@gauss3.secunet.de>
+References: <20240528032914.2551267-1-eyal.birger@gmail.com>
+ <ZnqaKO2Mz/ZR6sNT@moon.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <DM6PR21MB14819FB76960139B7027D1EECAD62@DM6PR21MB1481.namprd21.prod.outlook.com>
+In-Reply-To: <ZnqaKO2Mz/ZR6sNT@moon.secunet.de>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On Wed, Jun 26, 2024 at 06:29:02PM +0000, Haiyang Zhang wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Konstantin Taranov <kotaranov@microsoft.com>
-> > Sent: Wednesday, June 26, 2024 2:20 PM
-> > To: Stephen Hemminger <stephen@networkplumber.org>; Leon Romanovsky
-> > <leon@kernel.org>; Haiyang Zhang <haiyangz@microsoft.com>
-> > Cc: Konstantin Taranov <kotaranov@linux.microsoft.com>; Wei Hu
-> > <weh@microsoft.com>; sharmaajay@microsoft.com; Long Li
-> > <longli@microsoft.com>; jgg@ziepe.ca; linux-rdma@vger.kernel.org; linux-
-> > netdev <netdev@vger.kernel.org>
-> > Subject: Re: [PATCH rdma-next 1/1] RDMA/mana_ib: Set correct device into
-> > ib
+On Tue, Jun 25, 2024 at 12:21:28PM +0200, Antony Antony wrote:
+> On Mon, May 27, 2024 at 20:29:14 -0700, Eyal Birger via Devel wrote:
+> > Add the ability to send out RFC-3948 NAT keepalives from the xfrm stack.
 > > 
-> > > > > > On Wed, Jun 26, 2024 at 09:05:05AM +0000, Konstantin Taranov
-> > wrote:
-> > > > > > > > > When mc->ports[0] is not slave, use it in the set_netdev.
-> > > > > > > > > When mana is used in netvsc, the stored net devices in mana
-> > > > > > > > > are slaves and GIDs should be taken from their master
-> > devices.
-> > > > > > > > > In the baremetal case, the mc->ports devices will not be
-> > slaves.
-> > > > > > > >
-> > > > > > > > I wonder, why do you have "... | IFF_SLAVE" in
-> > > > > > > > __netvsc_vf_setup() in a first place? Isn't IFF_SLAVE is
-> > supposed to
-> > > be set by bond driver?
-> > > > > > > >
-> > > > > > >
-> > > > > > > I guess it is just a valid use of the IFF_SLAVE bit. In the
-> > bond
-> > > > > > > case it is also set as a BOND netdev. The IFF_SLAVE helps to
-> > show
-> > > users that another master
-> > > > > > > netdev should be used for networking. But I am not an expert in
-> > > netvsc.
-> > > > > >
-> > > > > > The thing is that netvsc is virtual device like many others, but
-> > > > > > it is the only one who uses IFF_SLAVE bit. The comment around
-> > that
-> > > > > > bit says "slave of a load balancer.", which is not the case
-> > > > > > according to the Hyper-V documentation.
-> > > > > >
-> > > > > > You will need to get Ack from netdev maintainers to rely on
-> > > > > > IFF_SLAVE bit in the way you are relying on it now.
-> > > > >
-> > > > > This is used to tell userspace tools to not interact directly with
-> > the device.
-> > > > > For example, it is used when VF is connected to netvsc device.
-> > > > > It prevents things like IPv6 local address, and Network Manager
-> > won't
-> > > modify device.
-> > > >
-> > > > You described how hyper-v uses it, but I'm interested to get
-> > > > acknowledgment that it is a valid use case for IFF_SLAVE, despite
-> > sentence
-> > > written in the comment.
-> > >
-> > > There is no documented semantics around any of the IF flags, only
-> > historical
-> > > precedent used by bond, team and bridge drivers. Initially Hyper-V VF
-> > used
-> > > bonding but it was impossibly difficult to make this work across all
-> > versions of
-> > > Linux, so transparent VF support was added instead. Ideally, the VF
-> > device
-> > > could be hidden from userspace but that required more kernel
-> > modifications
-> > > than would be accepted.
+> > To use, Userspace sets an XFRM_NAT_KEEPALIVE_INTERVAL integer property when
+> > creating XFRM outbound states which denotes the number of seconds between
+> > keepalive messages.
 > > 
-> > Thanks Stephen for the explanation!
+> > Keepalive messages are sent from a per net delayed work which iterates over
+> > the xfrm states. The logic is guarded by the xfrm state spinlock due to the
+> > xfrm state walk iterator.
 > > 
-> > I am also CCing Haiyang, who maintains Hyper-V netvsc.
+> > Possible future enhancements:
 > > 
+> > - Adding counters to keep track of sent keepalives.
+> > - deduplicate NAT keepalives between states sharing the same nat keepalive
+> >   parameters.
+> > - provisioning hardware offloads for devices capable of implementing this.
+> > - revise xfrm state list to use an rcu list in order to avoid running this
+> >   under spinlock.
+> > 
+> > Suggested-by: Paul Wouters <paul.wouters@aiven.io>
+> > Signed-off-by: Eyal Birger <eyal.birger@gmail.com>
 > 
-> Yes, netvsc sets the IFF_SLAVE on VF for the bonding.
-> 
-> Acked-by: Haiyang Zhang <haiyangz@microsoft.com>
+> Tested-by: Antony Antony <antony.antony@secunet.com>
 
-Konstantin.
-
-I don't want to be first and only one driver that uses this flag
-outside of netdev. So please add new function to netdev part of mana
-driver to return right ndev.
-
-Something like that:
-struct net_device *mana__get_netdev(struct mana_context *mc)
-{
-	struct net_device *ndev;
-
-	if (mana_ndev_is_slave(mc->ports[0]))
-		ndev = netdev_master_upper_dev_get_rcu(mc->ports[0]);
-	else
-		ndev = mc->ports[0];
-
-	return ndev;
-}
-
-And get Acks from netdev maintainers (Jakub, David, Eric, Paolo).
+Now applied to ipsec-next, thanks everyone!
 
