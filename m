@@ -1,131 +1,162 @@
-Return-Path: <netdev+bounces-107405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF81491AD64
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 19:07:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCF2791AC47
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 18:08:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B26B280EC2
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 17:07:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B73D9B21328
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:08:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0DE4199225;
-	Thu, 27 Jun 2024 17:07:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22141991C3;
+	Thu, 27 Jun 2024 16:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="M0qfVKXq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AfgjuZut"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F4619539F
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 17:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911AB1CF8B;
+	Thu, 27 Jun 2024 16:08:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719508042; cv=none; b=llbi2LdVeD6npMvgNL5t6YO4l2yauy1cUQzNAJ8gJy9dlHy47CNQazE4zv3ehA+VfOKX0RXDIO1E5/lMtNEBvU/jYy/ng/iZcS8utO2vuT/tBiFPeIfgSwxa6MXR/j/6q07Jh1YamEIg2g2ZEkq1v1i2odYb37B2LHqoDLnh2XQ=
+	t=1719504529; cv=none; b=hP00OR/RH2i6JD9WQxvUHb/O1QjsJB4wmT1bJctY8HZnMEfzAlsvb4hX3Kav37bHJnPQnu0LychL+91hWK2mDGOlkLMwSkjHREco3mX9Fvcfj+oVc03CJsPCi5p4Pieg2VilGVCfKLaPd9Qen/OUzfO78NUdoq2hR+EsveH/3bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719508042; c=relaxed/simple;
-	bh=MCcKh+Te3MluMt/hBoNCtQN0lNaNkAplmbKTwZRlgkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N8ta2O8x8XYVNCVJbwO+rLQnMRKNChP5WJYT6Bk9FotZ+xQver0nwiVKoJ5egOUgSP2eYqXNsgPvAYvtfAdx6OIDVG8fLzKnyZ9QjscDc8UQOEA1vvBISEQhv5SXJ6HgYs8dDdrTs0ZfWhsdrKwSxRJldqxztjhFTF4fpc01lzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=M0qfVKXq; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-70675977d0eso4326410b3a.0
-        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 10:07:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1719508041; x=1720112841; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9itoRg4hkzQHK7gOStndwazEBaHhxM4RVlJuAwijkSU=;
-        b=M0qfVKXq78IIZtTkV5/LaxC3UwRa9Kc8doK5uTZOsK+oKlX2ruNDJBSr2RITtzTSNM
-         gCD9tszHdzIvZtXXv2P9XTUc6aiTZL3I3CXWjb0PIk7XEP5sMt6tiGwjkd/CeGbVgfPQ
-         2RIIK9s9U0oSgLsaC05vsNTgpdV2n+36FJ/0ZAEelv7CXpTeeW7UjqwruFwLMr5jCQnV
-         k3DXGxo8ASy6X+oL5qkKOn38zLeFrdpS3jjOz8xSutwqgn5UX4sxfhrDBJb675rGn1XH
-         sqmcTnZ8JpFBp3UCytaCVRPHgPE1LLCSN1mQxCeOt+OrkDAFclxfCHGW7+GRpe/BpbFr
-         EUGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719508041; x=1720112841;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9itoRg4hkzQHK7gOStndwazEBaHhxM4RVlJuAwijkSU=;
-        b=Y13mZrDj38WGR9i3DKHRO9N56FDJAIzUma+qN74vwYe9X3kbRyQggG9pDLTExZ/bWr
-         nOmpvIAAT+4yt7E6zoTf/5rptrMGuThF0PqTJB8GeCq98xakpL5UVf/KPQaXprKDq2h3
-         JMFIIxDCy6PDiBohCbtChE3F8nMcxXakpXt5Bw+owKbL4ruKKt+PpcqKzdWZdgDYU5bw
-         3xkc6iNVm5w4u6XhBg9Jq9hMk86yRTj/h73gD3EkqCKlR7Q936JKig4s6tIY2zyJnnjN
-         RqWdMOjm7L2YpHz0NfCYImCcpS8XyrFfBEUlriAywtEny2FiQhy1jRmRJ1lH0AO7OmEv
-         Av4A==
-X-Forwarded-Encrypted: i=1; AJvYcCXqSOqZhVmhy6+RSMKs9CXALpPmc4p7R5VRzlD8vfij1PK5Zg9q961yNP8qrCyt1MCpkNKrciiUzphTvU3BiXkeWiI+VrPu
-X-Gm-Message-State: AOJu0YzxAm2xnbaXtBTHo+rCeicHvFrrbGTaNHAx+DM937pYy2E23aT6
-	356nTM6FQgJ9X14rvaeQOh/6jSi5PY0IzC6g8piAjUZHES41P+zrCcjp/6me2Ls=
-X-Google-Smtp-Source: AGHT+IFpNuiNgxpmzlSpuqFYbix4luPl2w3Bf0ulkgdIpoHogyqVFmqi8C1JTY0bqbYLbJEb+HBeUw==
-X-Received: by 2002:a05:6a20:6521:b0:1bd:2358:8c8d with SMTP id adf61e73a8af0-1bd23588dc9mr7330031637.29.1719508040452;
-        Thu, 27 Jun 2024 10:07:20 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1faac8f268bsm15650425ad.74.2024.06.27.10.07.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 10:07:20 -0700 (PDT)
-Date: Thu, 27 Jun 2024 08:27:36 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Konstantin Taranov <kotaranov@microsoft.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Haiyang Zhang
- <haiyangz@microsoft.com>, Konstantin Taranov
- <kotaranov@linux.microsoft.com>, Wei Hu <weh@microsoft.com>,
- "sharmaajay@microsoft.com" <sharmaajay@microsoft.com>, Long Li
- <longli@microsoft.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, linux-netdev
- <netdev@vger.kernel.org>
-Subject: Re: [PATCH rdma-next 1/1] RDMA/mana_ib: Set correct device into ib
-Message-ID: <20240627082736.34ded856@hermes.local>
-In-Reply-To: <PAXPR83MB05596705E21C2869A4FA6919B4D72@PAXPR83MB0559.EURPRD83.prod.outlook.com>
-References: <1719311307-7920-1-git-send-email-kotaranov@linux.microsoft.com>
-	<20240626054748.GN29266@unreal>
-	<PAXPR83MB0559F4678E73B0091A8ADFBBB4D62@PAXPR83MB0559.EURPRD83.prod.outlook.com>
-	<20240626121118.GP29266@unreal>
-	<20240626082731.70d064bb@hermes.local>
-	<20240626153354.GQ29266@unreal>
-	<20240626091028.1948b223@hermes.local>
-	<PAXPR83MB05592AE537E11C9026E268F7B4D62@PAXPR83MB0559.EURPRD83.prod.outlook.com>
-	<DM6PR21MB14819FB76960139B7027D1EECAD62@DM6PR21MB1481.namprd21.prod.outlook.com>
-	<20240627095705.GS29266@unreal>
-	<PAXPR83MB05596705E21C2869A4FA6919B4D72@PAXPR83MB0559.EURPRD83.prod.outlook.com>
+	s=arc-20240116; t=1719504529; c=relaxed/simple;
+	bh=UvvB9I+OgH/8xfj7J4ex+IlmHc9nIRL5By2AyR5g2VY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DShBxruoGHd6H50J5EI33QS9hH483+fn7HmcXcLnkehXXp/WoYWJGKGbHNkKrWZEYLBs/zREAAbPTCInjXYJTRbfB7TIKzxQGDHR368yjr29WGNr9buBcbaYN3ws7QaNMaaBNnlw6f6979pq/a0NReyQOkuc7az2vbg/Hwrs3iY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AfgjuZut; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCC65C2BBFC;
+	Thu, 27 Jun 2024 16:08:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719504529;
+	bh=UvvB9I+OgH/8xfj7J4ex+IlmHc9nIRL5By2AyR5g2VY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AfgjuZutP9Yi9KF01fUc7C9CHJgbKTj4/fWIOi34dC2+/URSxG4dJFccgjTM4KpaV
+	 8RHbnWodxabvZm7+PdCJ2PbuO9VG5DIVcfLxQYfDWU3w59BVv5onIwKs9ypB1Ib5iL
+	 Xerul6ojTt6wqbH4lURYwXNAq018hhTqB4/Tx4xH2D5d2/rt+J9/LnRebWAmR4Sil2
+	 Sy4aA7fGruCbDbhB3ZcxhV3JKbRi6aLhhKq8M+u1feh+JXnzDyQ26Of6RXsULOBMIT
+	 TJHQvi1dnWVn9sAsYeJ0kGlgif84MC1/oXcwFE/zc/1YGzsIdh67Cht5qay1GaBWFW
+	 md+ZzpwAbFHTQ==
+Date: Thu, 27 Jun 2024 10:08:47 -0600
+From: Rob Herring <robh@kernel.org>
+To: =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>
+Subject: Re: [PATCH] dt-bindings: net: bluetooth: convert MT7622 Bluetooth to
+ the json-schema
+Message-ID: <20240627160847.GA3506035-robh@kernel.org>
+References: <20240627054011.26621-1-zajec5@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240627054011.26621-1-zajec5@gmail.com>
 
-On Thu, 27 Jun 2024 10:44:02 +0000
-Konstantin Taranov <kotaranov@microsoft.com> wrote:
-
-> > 
-> > I don't want to be first and only one driver that uses this flag outside of
-> > netdev. So please add new function to netdev part of mana driver to return
-> > right ndev.
-> > 
-> > Something like that:
-> > struct net_device *mana__get_netdev(struct mana_context *mc) {
-> > 	struct net_device *ndev;
-> > 
-> > 	if (mana_ndev_is_slave(mc->ports[0]))
-> > 		ndev = netdev_master_upper_dev_get_rcu(mc->ports[0]);
-> > 	else
-> > 		ndev = mc->ports[0];
-> > 
-> > 	return ndev;
-> > }
-> > 
-> > And get Acks from netdev maintainers (Jakub, David, Eric, Paolo).  
+On Thu, Jun 27, 2024 at 07:40:11AM +0200, Rafał Miłecki wrote:
+> From: Rafał Miłecki <rafal@milecki.pl>
 > 
-> Ok. Makes sense.
-> I will just call it more exact:
-> mana_get_not_slave_netdev_rcu()
+> This helps validating DTS files.
+> 
+> Signed-off-by: Rafał Miłecki <rafal@milecki.pl>
+> ---
+>  .../bluetooth/mediatek,mt7622-bluetooth.yaml  | 61 +++++++++++++++++++
+>  .../bindings/net/mediatek-bluetooth.txt       | 36 -----------
+>  2 files changed, 61 insertions(+), 36 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.yaml
+> new file mode 100644
+> index 000000000000..cb8ff93c93eb
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.yaml
+> @@ -0,0 +1,61 @@
+> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7622-bluetooth.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: MediaTek SoC built-in Bluetooth
+> +
+> +description:
+> +  This device is a serial attached device to BTIF device and thus it must be a
+> +  child node of the serial node with BTIF. The dt-bindings details for BTIF
+> +  device can be known via Documentation/devicetree/bindings/serial/8250.yaml.
+> +
+> +maintainers:
+> +  - Sean Wang <sean.wang@mediatek.com>
+> +
+> +allOf:
+> +  - $ref: bluetooth-controller.yaml#
+> +
+> +properties:
+> +  compatible:
+> +    const: mediatek,mt7622-bluetooth
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +  clock-names:
+> +    const: ref
+> +
+> +  power-domains:
+> +    maxItems: 1
+> +
+> +required:
+> +  - clocks
+> +  - clock-names
+> +  - power-domains
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/clock/mt7622-clk.h>
+> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+> +    #include <dt-bindings/power/mt7622-power.h>
+> +
+> +    serial@1100c000 {
+> +        compatible = "mediatek,mt7622-btif", "mediatek,mtk-btif";
+> +        reg = <0 0x1100c000 0 0x1000>;
+> +        interrupts = <GIC_SPI 90 IRQ_TYPE_LEVEL_LOW>;
+> +        clocks = <&pericfg CLK_PERI_BTIF_PD>;
+> +        clock-names = "main";
+> +        reg-shift = <2>;
+> +        reg-io-width = <4>;
 
-Please don't introduce more usages of the term "slave".
-Better to stick to VF.
+Just drop all this. Not relevant to *this* example.
+
+You just need:
+
+serial {
+
+> +
+> +        bluetooth {
+> +            compatible = "mediatek,mt7622-bluetooth";
+> +            power-domains = <&scpsys MT7622_POWER_DOMAIN_WB>;
+> +            clocks = <&clk25m>;
+> +            clock-names = "ref";
+> +        };
+> +    };
 
