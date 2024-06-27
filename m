@@ -1,191 +1,94 @@
-Return-Path: <netdev+bounces-107115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8AD7919E6F
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 06:55:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0292D919E71
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 06:59:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F92D1F25119
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 04:55:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A73371F24ED1
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 04:59:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C071C6A1;
-	Thu, 27 Jun 2024 04:55:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WNn5A4n+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D501BC58;
+	Thu, 27 Jun 2024 04:59:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CD21C287;
-	Thu, 27 Jun 2024 04:55:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADE517550
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 04:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719464121; cv=none; b=uO9yz7+HGPOBILZze50o+wmu6uzlY/pXQNjQ9y+YCV81/0WjwG+bgPcg6DBRix5rKf55Kjx00f1BNoadsU5WBcBwI5pHEDkVdaBxb5McjMU4be663xOlna5/x5fR6Nsvez1sBVssy1zHVsDIk5TFfDmqiHBY0mp/Pivlz2Q1Dh8=
+	t=1719464344; cv=none; b=r4x3mdWnhgnrlygtyh39WTTcygsIhp6x5+YY8uFPg9ey1SwM042A95EzMMoHX/g1kjtahg8l039IZp+WAXob5hozQKHosiCGorJs/Xf6jFvC9bxo4eefmKNXeeln39ZtVd9YVFgKaw2VZ+ND5reC/lg06VmsXskYlXF/EA/ISZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719464121; c=relaxed/simple;
-	bh=vaI0hJkS3RTtwDY5WYiVCCW6rAB64mqC0Qxcc/84o84=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HbUS+dXXiTREWZ+aY5RqmD152fJbyU6204KzzKpqvb/Q2hWA121MyEj97DglWHG9hSwUTkNk/JUsKdcy8j7fEffW8YRDu0uBNIWjGILDzv6+PrL+WWWdXfEvHZTTgYvlyZf4fDP2AF8/+mhjV27Cj7DarP28O8RvN2IMid4Tzrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WNn5A4n+; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719464120; x=1751000120;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=vaI0hJkS3RTtwDY5WYiVCCW6rAB64mqC0Qxcc/84o84=;
-  b=WNn5A4n+UoovyKzRhiMMaIYTzcNlvr9jtbXAzbdnXfP7EReECHT2eYeW
-   A+fL1JpX8nK+ZUmaWFidSI/ZJPnShBlMfvoUElwFgx9S/pysjpXueV28M
-   HjvQPMq1udbahq6s3vzazSC76Z/FBzyqiHK/+i4H8ta8/yyNWjnBLPAd4
-   HPgBy3t8ywgzigZlEol+u/2h8jODlQ3L70+xn7HiEcRhFovpWhAAMmCEv
-   4UByQmHHiG/A3oWlg++sTQtYIJSqwBZiwLzdfJLRcW4pwE2SyjUkM9dWX
-   raNs7b3WzoWyWr9cAldU92L3YjY98JSVubmyTGq+zHQmtvxL790em1sGj
-   w==;
-X-CSE-ConnectionGUID: O1hhklP9SF+D20oGnZgXFw==
-X-CSE-MsgGUID: 8WXVyz74SbuB3DydH93B6Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11115"; a="27966819"
-X-IronPort-AV: E=Sophos;i="6.08,269,1712646000"; 
-   d="scan'208";a="27966819"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 21:55:16 -0700
-X-CSE-ConnectionGUID: h4p/wfIUTgitj4csrRjpEQ==
-X-CSE-MsgGUID: v2zhV3HIQdWl4KhndZMZ2g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,269,1712646000"; 
-   d="scan'208";a="49210024"
-Received: from intel.iind.intel.com (HELO brc5..) ([10.190.162.156])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 21:55:12 -0700
-From: Tushar Vyavahare <tushar.vyavahare@intel.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	tirthendu.sarkar@intel.com,
-	tushar.vyavahare@intel.com
-Subject: [PATCH bpf-next v2 2/2] selftests/xsk: Enhance batch size support with dynamic configurations
-Date: Thu, 27 Jun 2024 04:35:48 +0000
-Message-Id: <20240627043548.221724-3-tushar.vyavahare@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240627043548.221724-1-tushar.vyavahare@intel.com>
-References: <20240627043548.221724-1-tushar.vyavahare@intel.com>
+	s=arc-20240116; t=1719464344; c=relaxed/simple;
+	bh=IkQsrKKUn8XRTQXTllxQe4gYZgzHBsRviOw2r7w+Krc=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=jLKeoCWX/8joDSysqKvQ/dg/RXugJVt9NxcYdXmce0hpl4wY9opM975DWdweSk4uWb2wPhHoic3dufJg5tm7gchI/jZRt5IJzR/eL/xGPJwQ6um9uHg2zEAJsEJZ75Utjfe41i+mG94AaM39CrcgGzJs1fJmV/1tRFy3OHH62ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-37715aeede6so36883735ab.2
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 21:59:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719464342; x=1720069142;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7VsPizNXofWfwb6ytZE6j9YZ3mxWUXsZqX+k1ZKLAz0=;
+        b=qAMlKAuqXupyoP9HYY0mluIQ05f4oyHKLEmoylPYAexmHup2bZ+sjfBHCI2JVzJi0b
+         DCrZyK4YNEAUaKMVbNYv729Djsxule32gSUJN6gI/y4qslucnOHdMFqBI2GXoa5N8zrI
+         zoDVxJ/J7WJQx0rt5TvUKEQajbaf7RA7uWk3gA+HsFtkffNMwgmRaI1ZleCYR3QXMGBx
+         tUsvrAsvWVDWNllpZey9KIFrSLDG7hK+I8kmZoDo3OCvkoSygamodRWzVzm/9JxWd87X
+         1covOr623qDFHSh7QDOL21Cp57qYd+mLImb65z15xso7c0OeHkZQJgOawbxljq/CIg76
+         1+ZA==
+X-Forwarded-Encrypted: i=1; AJvYcCXXJgMj0+BO3AN8kwH9yjLI28ZcdrdamvWUVrp5I30skMtHyz+CCEBu6yZ8dUt4gyfxqfBslRNeOhsvW7pwLZKgZeJTFdTT
+X-Gm-Message-State: AOJu0YyO1fgnQiLJPcdHnVWDo3XmO+vCXDpYe6AaPBFNkcFJhkmbNSRd
+	Mylw9XLf1aa11l/k65o4QTGgWen4qoL2i6AgMIAqac0Qpd1/40TMoXHPKCHK9AckD3bBu8QUfQ4
+	2Q7ypg8QED4Z6VP2L8ESy1Lk8SoHiDhoMsfFKS1ZwN4E0oDlLhHCmClU=
+X-Google-Smtp-Source: AGHT+IHTP9IvArud6LUgveR74LtuG4oMDICVLPPXWnHbW3sLJ/xx54WkI0jfqyPCq8oqZx96CD1XBK9MWwBFCOLfAWpwaE9vRkKL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:15c5:b0:375:da97:f21a with SMTP id
+ e9e14a558f8ab-3763f6e1665mr12436205ab.3.1719464342366; Wed, 26 Jun 2024
+ 21:59:02 -0700 (PDT)
+Date: Wed, 26 Jun 2024 21:59:02 -0700
+In-Reply-To: <0000000000006293f0061bca5cea@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000054b7cc061bd7fdeb@google.com>
+Subject: Re: [syzbot] [net?] general protection fault in coalesce_fill_reply
+From: syzbot <syzbot+e77327e34cdc8c36b7d3@syzkaller.appspotmail.com>
+To: brett.creeley@amd.com, davem@davemloft.net, drivers@pensando.io, 
+	edumazet@google.com, hengqi@linux.alibaba.com, horms@kernel.org, 
+	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, shannon.nelson@amd.com, 
+	syzkaller-bugs@googlegroups.com, vladimir.oltean@nxp.com
+Content-Type: text/plain; charset="UTF-8"
 
-Introduce dynamic adjustment capabilities for fill_size and comp_size
-parameters to support larger batch sizes beyond the previous 2K limit.
+syzbot has bisected this issue to:
 
-Update HW_SW_MAX_RING_SIZE test cases to evaluate AF_XDP's robustness by
-pushing hardware and software ring sizes to their limits. This test
-ensures AF_XDP's reliability amidst potential producer/consumer throttling
-due to maximum ring utilization.
+commit 55a3982ec721dabd5a4c2f16bfb03deb032e45c2
+Author: Shannon Nelson <shannon.nelson@amd.com>
+Date:   Wed Jun 19 00:32:55 2024 +0000
 
-Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
----
- tools/testing/selftests/bpf/xskxceiver.c | 26 ++++++++++++++++++------
- tools/testing/selftests/bpf/xskxceiver.h |  2 ++
- 2 files changed, 22 insertions(+), 6 deletions(-)
+    ionic: check for queue deadline in doorbell_napi_work
 
-diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
-index 088df53869e8..8144fd145237 100644
---- a/tools/testing/selftests/bpf/xskxceiver.c
-+++ b/tools/testing/selftests/bpf/xskxceiver.c
-@@ -196,6 +196,12 @@ static int xsk_configure_umem(struct ifobject *ifobj, struct xsk_umem_info *umem
- 	};
- 	int ret;
- 
-+	if (umem->fill_size)
-+		cfg.fill_size = umem->fill_size;
-+
-+	if (umem->comp_size)
-+		cfg.comp_size = umem->comp_size;
-+
- 	if (umem->unaligned_mode)
- 		cfg.flags |= XDP_UMEM_UNALIGNED_CHUNK_FLAG;
- 
-@@ -265,6 +271,10 @@ static int __xsk_configure_socket(struct xsk_socket_info *xsk, struct xsk_umem_i
- 		cfg.bind_flags |= XDP_SHARED_UMEM;
- 	if (ifobject->mtu > MAX_ETH_PKT_SIZE)
- 		cfg.bind_flags |= XDP_USE_SG;
-+	if (umem->comp_size)
-+		cfg.tx_size = umem->comp_size;
-+	if (umem->fill_size)
-+		cfg.rx_size = umem->fill_size;
- 
- 	txr = ifobject->tx_on ? &xsk->tx : NULL;
- 	rxr = ifobject->rx_on ? &xsk->rx : NULL;
-@@ -1616,7 +1626,7 @@ static void xsk_populate_fill_ring(struct xsk_umem_info *umem, struct pkt_stream
- 	if (umem->num_frames < XSK_RING_PROD__DEFAULT_NUM_DESCS)
- 		buffers_to_fill = umem->num_frames;
- 	else
--		buffers_to_fill = XSK_RING_PROD__DEFAULT_NUM_DESCS;
-+		buffers_to_fill = umem->fill_size;
- 
- 	ret = xsk_ring_prod__reserve(&umem->fq, buffers_to_fill, &idx);
- 	if (ret != buffers_to_fill)
-@@ -2445,7 +2455,7 @@ static int testapp_hw_sw_min_ring_size(struct test_spec *test)
- 
- static int testapp_hw_sw_max_ring_size(struct test_spec *test)
- {
--	u32 max_descs = XSK_RING_PROD__DEFAULT_NUM_DESCS * 2;
-+	u32 max_descs = XSK_RING_PROD__DEFAULT_NUM_DESCS * 4;
- 	int ret;
- 
- 	test->set_ring = true;
-@@ -2453,7 +2463,8 @@ static int testapp_hw_sw_max_ring_size(struct test_spec *test)
- 	test->ifobj_tx->ring.tx_pending = test->ifobj_tx->ring.tx_max_pending;
- 	test->ifobj_tx->ring.rx_pending  = test->ifobj_tx->ring.rx_max_pending;
- 	test->ifobj_rx->umem->num_frames = max_descs;
--	test->ifobj_rx->xsk->rxqsize = max_descs;
-+	test->ifobj_rx->umem->fill_size = max_descs;
-+	test->ifobj_rx->umem->comp_size = max_descs;
- 	test->ifobj_tx->xsk->batch_size = XSK_RING_PROD__DEFAULT_NUM_DESCS;
- 	test->ifobj_rx->xsk->batch_size = XSK_RING_PROD__DEFAULT_NUM_DESCS;
- 
-@@ -2461,9 +2472,12 @@ static int testapp_hw_sw_max_ring_size(struct test_spec *test)
- 	if (ret)
- 		return ret;
- 
--	/* Set batch_size to 4095 */
--	test->ifobj_tx->xsk->batch_size = max_descs - 1;
--	test->ifobj_rx->xsk->batch_size = max_descs - 1;
-+	/* Set batch_size to 8152 for testing, as the ice HW ignores the 3 lowest bits when
-+	 * updating the Rx HW tail register.
-+	 */
-+	test->ifobj_tx->xsk->batch_size = test->ifobj_tx->ring.tx_max_pending - 8;
-+	test->ifobj_rx->xsk->batch_size = test->ifobj_tx->ring.tx_max_pending - 8;
-+	pkt_stream_replace(test, max_descs, MIN_PKT_SIZE);
- 	return testapp_validate_traffic(test);
- }
- 
-diff --git a/tools/testing/selftests/bpf/xskxceiver.h b/tools/testing/selftests/bpf/xskxceiver.h
-index 906de5fab7a3..885c948c5d83 100644
---- a/tools/testing/selftests/bpf/xskxceiver.h
-+++ b/tools/testing/selftests/bpf/xskxceiver.h
-@@ -80,6 +80,8 @@ struct xsk_umem_info {
- 	void *buffer;
- 	u32 frame_size;
- 	u32 base_addr;
-+	u32 fill_size;
-+	u32 comp_size;
- 	bool unaligned_mode;
- };
- 
--- 
-2.34.1
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11fc181a980000
+start commit:   50b70845fc5c Merge branch 'add-ethernet-driver-for-tehuti-..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=15fc181a980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e78fc116033e0ab7
+dashboard link: https://syzkaller.appspot.com/bug?extid=e77327e34cdc8c36b7d3
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1599901a980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1429e301980000
 
+Reported-by: syzbot+e77327e34cdc8c36b7d3@syzkaller.appspotmail.com
+Fixes: 55a3982ec721 ("ionic: check for queue deadline in doorbell_napi_work")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
