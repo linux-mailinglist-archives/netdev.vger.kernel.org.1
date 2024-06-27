@@ -1,88 +1,55 @@
-Return-Path: <netdev+bounces-107476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBA2C91B252
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 00:38:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4098B91B257
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 00:43:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76446283382
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 22:38:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9697BB21DCC
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 22:43:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC891A2579;
-	Thu, 27 Jun 2024 22:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m6FrE/mG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2CD1A2573;
+	Thu, 27 Jun 2024 22:43:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C052013B780;
-	Thu, 27 Jun 2024 22:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA88A811FE;
+	Thu, 27 Jun 2024 22:42:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719527905; cv=none; b=QR/wOODKR30rlyHIYVUHyZhLPldEYcKtEAIAc2o0JA1Gy256DNJEJpY2P4n+wTw8kmmrcMcTTk4UnO0INAz+u7hvemHtVB3SDzKHDA0ihcW5WH5hJFi93qfecxG/2uKbk9bVCpoQU2AaKM83Vk0vzmaWria49Bbej6rgHlZEbp0=
+	t=1719528180; cv=none; b=juqqwkpvyuanz4g5ZHyJGjIRXRy2FQSSZ0aKdSl8sy3l/ch5bmsCS1nG9YbNpvw9HGb3CQf+6F91/LaAurtPsjTICfAXxmWAmAC6wMjdcW8ILy705G4zH2rJG0TQUnk1WONKy71OpKNUlTyo9iW7Zay4UBmVx1NmWj56h2dA7CI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719527905; c=relaxed/simple;
-	bh=OVlHOjDi8IxYwlmSj6mY1k2g3Dy4cEx5R7hbNn46bvI=;
+	s=arc-20240116; t=1719528180; c=relaxed/simple;
+	bh=jegK8+qk0NkM0+R20Z2W1+OFc/xAx0R0zsz5OSf1N2U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C5mJgGjBWSkw78wvD8d3MMD1dBMn67LGZs3vlquDAvO77sOaC85EV+fx31Ego3xqM+In2yhxeZD9xS2PlqYb2FDRQtS3EC8zCkxzpyR5DZGtRnI2kAqyuQHEMgYdNsc8pfUEObk7TOPUBMrqCiOBF6Y2H+eRBPDAbxsKtGVpAWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m6FrE/mG; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-42562a984d3so14637515e9.3;
-        Thu, 27 Jun 2024 15:38:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719527902; x=1720132702; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OVlHOjDi8IxYwlmSj6mY1k2g3Dy4cEx5R7hbNn46bvI=;
-        b=m6FrE/mG9vr23nMzrQ+Z0m03QcG2uiht9J+6/dYOTLkEZjNeExhr2ANv/gH62JtrDF
-         WsVv/IdQ2+duT3mNf5mulvXSOzdf4IjJTSogisS8vxEXGgYDxePRYSmuviHNPgg1pH6s
-         aslnscWP15cLCeR3nWksRmB2E80OfNSWQahgXG/0sGPawgr188k5QyfCZSlDmEaiVGbU
-         bizjDAiEDQHeu2GG38bCwNyqfG13kUI3tK5aXtv3DfxuMg/WMC3hiU2whMh1V9KDBKZm
-         gwiIt+HZHL1LOWNgRVxwnAZmJYOPxyxCBxU2nZlOkrLEVUaAXdQlU3xdz7v9TEXXkbB6
-         JylA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719527902; x=1720132702;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OVlHOjDi8IxYwlmSj6mY1k2g3Dy4cEx5R7hbNn46bvI=;
-        b=IRWSMpOK2Jle87w/QFg6oU6SMl+VSbCxUgnvuLSc5lkoGxn9tECZ0vProHGGZMmNjh
-         sVA8D1vHmEOOblKQTkuDzkjJ6JlLkQVd/RLCqcCjoEdOoFHPaO2vZcqeydXXlDK98iLY
-         hEnYnUh13jyUyQxG5lDshq0FxtmycGijrJcwXJPGDcjuUIucLfWf79OZJOxLU7WO0tAY
-         WEMqnsuDkCGWxs/5vMiidpaaaKhD6PkeaOTwACvqHQS1Rc4ZwwaDzUitrHiyl/Y4X58o
-         n5wDwGmwHMSgugFGZTsmuy41NtoxH2QSfKJPTDDFZyvFdOdVxCNAINg8/7YeV8Ou4aO1
-         hX3w==
-X-Forwarded-Encrypted: i=1; AJvYcCU6X69m/T65R0mqLsvCBAMPVz2N4tXyq8Gz4wShkti5t9ki2OOBbn3kESBqdr7h0ouYY3Niq9itBukpFn9h3RT/Lf41Ms9u6NYH6Ezr4sRj8A1hGl0aSUFcPiPPtNkmDj8+16XF
-X-Gm-Message-State: AOJu0YyD4sN6gYCOz80pnPgJFCW27V03rKsjCYHdUepfes0Zm9x/r6Aa
-	FZwbSJCHX6mowINqIukxo1FvqpC6C1JxtSUSMOhYBq7A+DLc/jHy
-X-Google-Smtp-Source: AGHT+IFPTIYH9nTGg6vGR8CzP5K3MyKYcesOle5yeCgFIlRjpbu4WOIbxE07Gx7RM7blR5Q+rKXbxQ==
-X-Received: by 2002:a7b:c3d8:0:b0:424:a4ab:444f with SMTP id 5b1f17b1804b1-424a4ab464cmr59072855e9.33.1719527901950;
-        Thu, 27 Jun 2024 15:38:21 -0700 (PDT)
-Received: from skbuf ([79.115.210.53])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256af5b66csm9671115e9.18.2024.06.27.15.38.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 15:38:21 -0700 (PDT)
-Date: Fri, 28 Jun 2024 01:38:18 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Svy+TFSxL25YkHt/1IVyZYuYZjLFT08/rofXyFV1K338oJJwKSLfRLJgBOeNoNOc0sq0SlEX65w5mL2tz1ABy9oW2+kio4VUUQ2carosU2v+c3B7J0cUjZln2m7pDcZZHM3j5/0iXKm1Rp5xv+vJccOiwpwRb2l3eUcYdlf8veU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sMxpJ-0000000089v-2ETT;
+	Thu, 27 Jun 2024 22:42:49 +0000
+Date: Thu, 27 Jun 2024 23:42:45 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Lucas Stach <l.stach@pengutronix.de>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v1 3/3] net: dsa: microchip: lan937x: disable
- VPHY output
-Message-ID: <20240627223818.655p2c34dp6ynxnq@skbuf>
-References: <20240627123911.227480-1-o.rempel@pengutronix.de>
- <20240627123911.227480-4-o.rempel@pengutronix.de>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v2 net-next 3/3] net: phy: aquantia: add support for
+ aqr115c
+Message-ID: <Zn3q5f5yWznMjAXd@makrotopia.org>
+References: <20240627113018.25083-1-brgl@bgdev.pl>
+ <20240627113018.25083-4-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,17 +58,130 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240627123911.227480-4-o.rempel@pengutronix.de>
+In-Reply-To: <20240627113018.25083-4-brgl@bgdev.pl>
 
-On Thu, Jun 27, 2024 at 02:39:11PM +0200, Oleksij Rempel wrote:
-> The VPHY is a compatibility functionality to be able to attach network
-> drivers without fixed-link support to the switch, which generally
-> should not be needed with linux network drivers.
+Hi Bartosz,
 
-Sorry, I don't have much to base my judgement upon. I did search for the
-"VPHY" string and found it to be accessed in the dev_ops->r_phy() and
-dev_ops->w_phy() implementations, suggesting that it is more than just
-that? These methods are used for accessing the registers of the embedded
-PHYs for user ports. I don't see what is the connection with RGMII on
-the CPU port.
+On Thu, Jun 27, 2024 at 01:30:17PM +0200, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> Add support for a new model to the Aquantia driver. This PHY supports
+> Overlocked SGMII mode with 2.5G speeds.
+
+I don't think that there is such a thing as "Overclocked SGMII mode with
+2.5G speed".
+
+Lets take a short look at Cisco SGMII, which is defined as a serialzed
+version of the Gigabit Media-Independent Interface. As such, it supports
+10M, 100M and 1000M speed. There is negotiation for speed, duplex,
+flow-control and link status (up/down).
+
+The data signals always operate at 1.25 Gbaud and the clocks operate at
+625 MHz (a DDR interface), and there is a 10:8 FEC coding applied,
+resulting in 1 Gbit/s usable bandwidth.
+
+For lower speeds lower than 1 Gbit/s each symbol is repeated 10x for
+100M and 100x for 10M.
+
+Now, assuming SGMII running at 2.5x the clock speed of actual Cisco
+SGMII would exist, how would that look like for lower speeds like 1000M,
+100M or 10M? Obviously you cannot repeat a symbol 2.5 times, which would
+make it impossible to support 1000M links with the same strategy used
+for lower speeds in regular SGMII.
+
+Hence I assume that what you meant to say here is that the PHY uses
+2500Base-X as interface mode and performs rate-adaptation for speeds
+less than 2500M (or half-duplex) using pause frames.
+
+This is also what e.g. AQR112 is doing, which I would assume is fairly
+similar to the newer AQR115.
+
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+>  drivers/net/phy/aquantia/aquantia_main.c | 39 +++++++++++++++++++++++-
+>  1 file changed, 38 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
+> index 974795bd0860..98ccefd355d5 100644
+> --- a/drivers/net/phy/aquantia/aquantia_main.c
+> +++ b/drivers/net/phy/aquantia/aquantia_main.c
+> @@ -29,6 +29,7 @@
+>  #define PHY_ID_AQR113	0x31c31c40
+>  #define PHY_ID_AQR113C	0x31c31c12
+>  #define PHY_ID_AQR114C	0x31c31c22
+> +#define PHY_ID_AQR115C	0x31c31c33
+>  #define PHY_ID_AQR813	0x31c31cb2
+>  
+>  #define MDIO_PHYXS_VEND_IF_STATUS		0xe812
+> @@ -111,7 +112,6 @@ static u64 aqr107_get_stat(struct phy_device *phydev, int index)
+>  	int len_h = stat->size - len_l;
+>  	u64 ret;
+>  	int val;
+> -
+>  	val = phy_read_mmd(phydev, MDIO_MMD_C22EXT, stat->reg);
+>  	if (val < 0)
+>  		return U64_MAX;
+> @@ -721,6 +721,18 @@ static int aqr113c_config_init(struct phy_device *phydev)
+>  	return aqr107_fill_interface_modes(phydev);
+>  }
+>  
+> +static int aqr115c_config_init(struct phy_device *phydev)
+> +{
+> +	/* Check that the PHY interface type is compatible */
+> +	if (phydev->interface != PHY_INTERFACE_MODE_SGMII &&
+> +	    phydev->interface != PHY_INTERFACE_MODE_2500BASEX)
+> +		return -ENODEV;
+> +
+> +	phy_set_max_speed(phydev, SPEED_2500);
+> +
+> +	return 0;
+> +}
+> +
+>  static int aqr107_probe(struct phy_device *phydev)
+>  {
+>  	int ret;
+> @@ -999,6 +1011,30 @@ static struct phy_driver aqr_driver[] = {
+>  	.led_hw_control_get = aqr_phy_led_hw_control_get,
+>  	.led_polarity_set = aqr_phy_led_polarity_set,
+>  },
+> +{
+> +	PHY_ID_MATCH_MODEL(PHY_ID_AQR115C),
+> +	.name           = "Aquantia AQR115C",
+> +	.probe          = aqr107_probe,
+> +	.get_rate_matching = aqr107_get_rate_matching,
+> +	.config_init    = aqr115c_config_init,
+> +	.config_aneg    = aqr_config_aneg,
+> +	.config_intr    = aqr_config_intr,
+> +	.handle_interrupt = aqr_handle_interrupt,
+> +	.read_status    = aqr107_read_status,
+> +	.get_tunable    = aqr107_get_tunable,
+> +	.set_tunable    = aqr107_set_tunable,
+> +	.suspend        = aqr107_suspend,
+> +	.resume         = aqr107_resume,
+> +	.get_sset_count = aqr107_get_sset_count,
+> +	.get_strings    = aqr107_get_strings,
+> +	.get_stats      = aqr107_get_stats,
+> +	.link_change_notify = aqr107_link_change_notify,
+> +	.led_brightness_set = aqr_phy_led_brightness_set,
+> +	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
+> +	.led_hw_control_set = aqr_phy_led_hw_control_set,
+> +	.led_hw_control_get = aqr_phy_led_hw_control_get,
+> +	.led_polarity_set = aqr_phy_led_polarity_set,
+> +},
+>  {
+>  	PHY_ID_MATCH_MODEL(PHY_ID_AQR813),
+>  	.name		= "Aquantia AQR813",
+> @@ -1042,6 +1078,7 @@ static struct mdio_device_id __maybe_unused aqr_tbl[] = {
+>  	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR113) },
+>  	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR113C) },
+>  	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR114C) },
+> +	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR115C) },
+>  	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR813) },
+>  	{ }
+>  };
+> -- 
+> 2.43.0
+> 
+> 
 
