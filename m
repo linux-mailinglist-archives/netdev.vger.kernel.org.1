@@ -1,50 +1,57 @@
-Return-Path: <netdev+bounces-107458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7F2191B130
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 23:10:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CB3091B183
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 23:25:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CA39282024
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:10:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D4F02818A5
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B171319DFBF;
-	Thu, 27 Jun 2024 21:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD7671A01AE;
+	Thu, 27 Jun 2024 21:25:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wu9U4xZG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HDWD6DJn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85879A3D;
-	Thu, 27 Jun 2024 21:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92AC13FF9
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 21:25:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719522642; cv=none; b=Dy7Nrzj3vRKr9ZPf6uMOieHaeYP/4FkZA3qhqWJjwkFJFc1vAeeUFVftHgjrK11egbhK0543IXxkXdb7ULyB5f9PXHNQfLJwhj9YHuUmMs8fCC9L6sZtwowAEno6HUglTnDSnPT2kbDUpAxDslfzFpgTYUnwNFawMYShM/vdyO4=
+	t=1719523506; cv=none; b=rHhCmE6caBYes/LNetowVFqkylv4qbbjys5mJCkRE2TFWekG+fMxpAfwxw9LslPWgzkxsewwOjLZQi+QcpqX6F2QPi7UD9SbwqJNrjjv/SEdT375kT36p5/hHpXpQaDjac5hSrLPm9HBjvuAnVXJIeRtmuRKvcN6wFWFVk5mVjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719522642; c=relaxed/simple;
-	bh=gByuGdSlkxpg7/6g2jwjmnxkbuR7iaNGArP+X01skvE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tWRzPZZgY6UVx/eguBVHZukLqCIKcENa0rCjjQQJqde1QV1gkbd8Em4FADQE2V83ugcnmWtOEf/QERQikK+fzbssj6soOAOuBYamgOH2doFPNRM8loWK4kjm612a+Hv8wlKBd9H946QYEVCc+0JCKwRK7+pZoYYQ0qXn9jKwA+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wu9U4xZG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1930DC2BD10;
-	Thu, 27 Jun 2024 21:10:42 +0000 (UTC)
+	s=arc-20240116; t=1719523506; c=relaxed/simple;
+	bh=X9aiujd8kYp9QJTgMAMMkfSZrl4cOwhxz+r5UfkVEzg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UerZkgn1pxInvpVnyfnrR4CbMT/LKkmVn+LehzE+3QXv7QAxBLE5da+jjdFSqLNLF1A3WtbGIFE5BmL8UflYHsWtWz4KochpAfw60y8ZDsxWUieRgpciFLhVRH8gP3+mIQmazZK6bUFrdtR/4qLor3cWEzCkyHpFs/3cVragYmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HDWD6DJn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6D27C2BBFC;
+	Thu, 27 Jun 2024 21:25:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719522642;
-	bh=gByuGdSlkxpg7/6g2jwjmnxkbuR7iaNGArP+X01skvE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Wu9U4xZGJHIx+o8tKGqJVeV6mRhi9jDyXRz/NyJ6YRP06A+AFMsBU8FLdBaWGmw70
-	 gLE2OUca6RbhyRRLuS62cF3LgbcWGPfeSNxqMqZJJo5clsIW4zEAvtvhrP3wDo5IHs
-	 OkllPe54Oh2WdHQSb+yoUup2wpPV1sUs4sI76WL0z+2HjanGpF1rs6JYElDw6vvYS2
-	 H0TGH1cboZhQbe0n5iJj982f9En/X7F/6ryEesDSY/UMUud4TTvqnaIpm2vh2Cei0v
-	 HjI/X5EpqVVyzB7/Za2sMETK3C/oVtwSvdLqw/AZZZ1aXSQT+yT8q9g7P7zja9o4/M
-	 IruuxObxfBZQg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 075F5C43335;
-	Thu, 27 Jun 2024 21:10:42 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1719523506;
+	bh=X9aiujd8kYp9QJTgMAMMkfSZrl4cOwhxz+r5UfkVEzg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=HDWD6DJnxFgTuis16MkMsJZo6K0R7xtCaspmbZkqj1SjPLdxij4qPiQE9Bf8VLoZl
+	 fE16CKGL8iYXTnUVvVeBq3muPtKDpuqxEEpnT4FeWcqYtjy8X3ecbCwDJ6ETGgLlQW
+	 rmA4MGk5HTVE75S+LLaYbGdMZV6qu/dj5H0IuUOxCWE2bqD7paJKb5+uYbvujxlj7d
+	 K6y3wymo6nVtbK9Jv1v4jDFKOCYHDASDgzm8gnBuRulBLgddNAag8BSkcfpc7tJ/f0
+	 x0P0Ve7VJ99EimzoQXpz+UokeEg0cCcGQ2M34eKLlnxp8d9CY5k78rxTPsoFeW/wdf
+	 /wu/9rVrvdQyQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	dsahern@kernel.org,
+	christoph.paasch@uclouvain.be
+Subject: [PATCH net v2] tcp_metrics: validate source addr length
+Date: Thu, 27 Jun 2024 14:25:00 -0700
+Message-ID: <20240627212500.3142590-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,40 +59,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: wireless-next-2024-06-27
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171952264202.5075.14777248969126123309.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Jun 2024 21:10:42 +0000
-References: <20240627114135.28507-3-johannes@sipsolutions.net>
-In-Reply-To: <20240627114135.28507-3-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
-Hello:
+I don't see anything checking that TCP_METRICS_ATTR_SADDR_IPV4
+is at least 4 bytes long, and the policy doesn't have an entry
+for this attribute at all (neither does it for IPv6 but v6 is
+manually validated).
 
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Fixes: 3e7013ddf55a ("tcp: metrics: Allow selective get/del of tcp-metrics based on src IP")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+In net-next we can make v6 use policy for validation, too.
+But it will conflict, so I'll send that on Thu.
 
-On Thu, 27 Jun 2024 13:40:53 +0200 you wrote:
-> Hi,
-> 
-> For net-next we have quite a bit of contents, highlights
-> in the tag message below. No known merge conflicts at this
-> time.
-> 
-> Please pull and let us know if there's any problem.
-> 
-> [...]
+v2:
+ - fix the Fixes tag
+v1: https://lore.kernel.org/all/20240626194747.2561617-1-kuba@kernel.org/
+---
+CC: dsahern@kernel.org
+CC: christoph.paasch@uclouvain.be
+---
+ net/ipv4/tcp_metrics.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Here is the summary with links:
-  - pull-request: wireless-next-2024-06-27
-    https://git.kernel.org/netdev/net-next/c/56bf02c26a36
-
-You are awesome, thank you!
+diff --git a/net/ipv4/tcp_metrics.c b/net/ipv4/tcp_metrics.c
+index e93df98de3f4..b01eb6d94413 100644
+--- a/net/ipv4/tcp_metrics.c
++++ b/net/ipv4/tcp_metrics.c
+@@ -619,6 +619,7 @@ static const struct nla_policy tcp_metrics_nl_policy[TCP_METRICS_ATTR_MAX + 1] =
+ 	[TCP_METRICS_ATTR_ADDR_IPV4]	= { .type = NLA_U32, },
+ 	[TCP_METRICS_ATTR_ADDR_IPV6]	= { .type = NLA_BINARY,
+ 					    .len = sizeof(struct in6_addr), },
++	[TCP_METRICS_ATTR_SADDR_IPV4]	= { .type = NLA_U32, },
+ 	/* Following attributes are not received for GET/DEL,
+ 	 * we keep them for reference
+ 	 */
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.45.2
 
 
