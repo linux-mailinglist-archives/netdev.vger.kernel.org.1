@@ -1,102 +1,127 @@
-Return-Path: <netdev+bounces-107085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11E25919BA3
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 02:15:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7A87919BAC
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 02:16:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43C871C21F8B
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 00:15:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0516F1C2184B
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 00:16:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5FB17FE;
-	Thu, 27 Jun 2024 00:15:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CmIexwDU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E6E15B7;
+	Thu, 27 Jun 2024 00:16:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B907E15B7;
-	Thu, 27 Jun 2024 00:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFAFAD299
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 00:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719447314; cv=none; b=TenmkRQ+VEBh/OS7dKvig2S1f0xerqTRc+KHfe1ArkUZTx8lpWRtvSubImXpMas8HmwLuL4i8GTgBYYXkDXhCokzAEMUHqyXkVKp/U50OcGtw6SYZnxU4OEaEkXSlrn4oL82LdjjXL3xqZ+GgV7bq+FzHBSfOY4/kN0XHix7awE=
+	t=1719447387; cv=none; b=JjtrLBGYB2Dao9lCzdw91SeIo4pJz45vcJeBdnVVm20KVoNNYzVHnfloFv5vcT/XFpCNNo95oZRAC9Lvmxi8TCcBAq138Czse33j8iWw0BMAuZuReyBpspCUMGdZ0dall1oWPqK8+k5iIZGak1+gbgrd9GPQ/RHJeAY6D0V66+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719447314; c=relaxed/simple;
-	bh=2p5EG4TxmOiPEH+t9kn9Rb8d53/6YRQ7GrDUwYL7PuQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WLh2bBjQPJ+hXNNvMgN5FAdKfX4Mjxk/eLFp532tAoOB8AT6YPNFy2fabLx30RTGqyEoRjYl2SPrBX0mKi0rrxymCYSkcpUnbsNcBAOaOxL13u8ZcAs63vcSRFPMik432iWUn5ewlPlQXP4Rpb/zV/Jfu4WAIEcV18P5mk2fm8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CmIexwDU; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ggjfhvPJJwWye9h4/ZgqoG3NghwCXPnWkxN0KYeXeWg=; b=CmIexwDUID5YCYFoDDX84Ean0h
-	JVAehrX0J1l4PzAy8Zrkq+yawMLvUQZfhOmhfxW91bSoFzLuXMR+fmmMMeHYv6Sqoi+Pj17rOhKgk
-	uf1cLBXnzf+jWWdVQY5pVAGPt3AXtXkVsSES8MdO9S0E0dV0zuJU8z1jrAN0KhjBCCy8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sMcmr-0015jx-Bu; Thu, 27 Jun 2024 02:14:53 +0200
-Date: Thu, 27 Jun 2024 02:14:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Cc: Andrew Halaney <ahalaney@redhat.com>, Vinod Koul <vkoul@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, kernel@quicinc.com,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 2/3] net: stmmac: Add interconnect support
-Message-ID: <c7bcc2ae-eb27-4acc-b18c-8cb584b4d616@lunn.ch>
-References: <20240625-icc_bw_voting_from_ethqos-v2-0-eaa7cf9060f0@quicinc.com>
- <20240625-icc_bw_voting_from_ethqos-v2-2-eaa7cf9060f0@quicinc.com>
- <owkerbnbenzwtnu2kbbas5brhnak2e37azxtzezmw3hb6mficq@ffpqrqglmp4c>
- <cf6c2526-ba12-4627-b4e9-20ce5b4d175c@quicinc.com>
+	s=arc-20240116; t=1719447387; c=relaxed/simple;
+	bh=KisWr8ZwKIQIzsC+EMQgpl93fx5+oECFeinQOr9EJQk=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=cAq7WLyLW/erMyxPa/rYUJDHapDrQhQbEnZ0cqogX3YdGbm0YJIivr9zSBrPQiYGXgb2IvlPSZvi3TM8MKJ50pI7i3E/8xx5u8RlxM3XQSL0XbEmllCWZkDo9yNR41oSu8b/ze7HTHiOmHQs3a1AG83hudA/kESpRA7xV5W1kco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-7eb1d659c76so990665939f.0
+        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 17:16:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719447384; x=1720052184;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tiNPNmggVhWdOgNLeeJXmGjC1mkaLJHTFJoVbDoIc10=;
+        b=LcwhWsh4lf67EivTo7dvRv67iNOnnMjO6/dGWTaqZiIhIuilDTNeKbhp0s2oU7Fd2q
+         YrhzmNQVSgnyuWSPE/OdktPwsOVtOH3zaq/VSDUchG0AkuPX/JINWyHQlk8P9Evnx1Rw
+         fyMoKhp4dZsRpPtKnAzTrOqVGOuKcXWrbB6Yp79hNm5eU2rc+0u2YkpM98iRcgQ3kJ0L
+         nsQjSroRGpDvWgv9YksXFpahmVdXMNtVSH/nMTVdQv7Nb9abqljFUZKNLETzgObbndCX
+         7GWC9tBve5UEZUNBIJVxEM8sJg18nkumx+yQDEQl72SczeK2hHaII5D/FFANI1Z/hVTa
+         LigQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXg0QqhMKfe2pH9lz9/Id/IMSGNcVuF7oEfb6Cco1tDDKg70LitqMLdjdZ8ix3F/wrZ9X+joNEU9PDvSwGepyCe/emJMPTy
+X-Gm-Message-State: AOJu0Yx5Q4IGUY6tvADtA7nTwJzVtKiaxmWINzE+b3DjflrPO6aFM4Ds
+	zHDXpE4inGcoh2JC7zD5AWWDBLguPIQnSULQpCBtt0TygSf78nvbMQVGbUywKncEmjlxfxVKuwZ
+	/j+UtVVlSjU+WjG3YiUfEOU2fbGaSFzSdoB4YoWgxuYh8rj/N3I6Pxdo=
+X-Google-Smtp-Source: AGHT+IGNfEJk58H383ef6xFapUn2KfgFo+WSKveaahxas52XdtRcUm/V76BKMRS9AXEeMvOJIr+Rfjs3kyWWMPVqXqHQJ6IHAUSs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cf6c2526-ba12-4627-b4e9-20ce5b4d175c@quicinc.com>
+X-Received: by 2002:a05:6602:1503:b0:7eb:d640:263 with SMTP id
+ ca18e2360f4ac-7f3a4f758bfmr20961139f.3.1719447384080; Wed, 26 Jun 2024
+ 17:16:24 -0700 (PDT)
+Date: Wed, 26 Jun 2024 17:16:24 -0700
+In-Reply-To: <00000000000024894706196d697f@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000089dc24061bd40a25@google.com>
+Subject: Re: [syzbot] [wireless?] WARNING in __cfg80211_connect_result (2)
+From: syzbot <syzbot+d6eb9cee2885ec06f5e3@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Jun 26, 2024 at 04:38:34PM -0700, Sagar Cheluvegowda wrote:
-> 
-> 
-> On 6/26/2024 7:54 AM, Andrew Halaney wrote:
-> > On Tue, Jun 25, 2024 at 04:49:29PM GMT, Sagar Cheluvegowda wrote:
-> >> Add interconnect support to vote for bus bandwidth based
-> >> on the current speed of the driver.This change adds support
-> >> for two different paths - one from ethernet to DDR and the
-> >> other from Apps to ethernet.
-> > 
-> > "APPS" is a qualcomm term, since you're trying to go the generic route
-> > here maybe just say CPU to ethernet?
-> > 
-> I can update this in my next patch.
-> 
-> Sagar
+syzbot has found a reproducer for the following issue on:
 
-Please trim emails when replying to just the needed context.
+HEAD commit:    a6a6a9809411 net: Drop explicit initialization of struct i..
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1324ea82980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e78fc116033e0ab7
+dashboard link: https://syzkaller.appspot.com/bug?extid=d6eb9cee2885ec06f5e3
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12a8b81a980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13d426c1980000
 
-Also, i asked what Apps meant in response to an earlier version of
-this patch. I think you ignored me....
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/5fb6ec98e2e9/disk-a6a6a980.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f39f26a93081/vmlinux-a6a6a980.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5997cea80d62/bzImage-a6a6a980.xz
 
-       Andrew
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d6eb9cee2885ec06f5e3@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 35 at net/wireless/sme.c:846 __cfg80211_connect_result+0x19ea/0x21d0 net/wireless/sme.c:846
+Modules linked in:
+CPU: 0 PID: 35 Comm: kworker/u8:2 Not tainted 6.10.0-rc4-syzkaller-00937-ga6a6a9809411 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+Workqueue: cfg80211 cfg80211_event_work
+RIP: 0010:__cfg80211_connect_result+0x19ea/0x21d0 net/wireless/sme.c:846
+Code: a4 00 89 c3 31 ff 89 c6 e8 43 4f b2 f6 85 db 74 29 e8 0a 7b 98 f6 84 c0 74 27 e8 f1 4a b2 f6 e9 84 00 00 00 e8 e7 4a b2 f6 90 <0f> 0b 90 4c 89 ff 4c 89 f6 e8 68 23 00 00 eb 91 e8 d1 4a b2 f6 eb
+RSP: 0018:ffffc90000ab79e0 EFLAGS: 00010293
+RAX: ffffffff8ae3da39 RBX: 0000000000000000 RCX: ffff88801aefbc00
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc90000ab7b00 R08: ffffffff8ae3d609 R09: 1ffffffff25f6cbd
+R10: dffffc0000000000 R11: fffffbfff25f6cbe R12: ffff88802ac63098
+R13: dffffc0000000000 R14: ffff88802ac63018 R15: ffff888022eeb000
+FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000200029c0 CR3: 0000000078998000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ cfg80211_process_wdev_events+0x356/0x510 net/wireless/util.c:1105
+ cfg80211_process_rdev_events+0xac/0x110 net/wireless/util.c:1147
+ cfg80211_event_work+0x2f/0x40 net/wireless/core.c:335
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3393
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
