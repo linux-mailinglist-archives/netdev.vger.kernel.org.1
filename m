@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-107436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94BDD91AF97
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:24:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B7E491AFBF
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:37:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C63BD1C22392
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 19:24:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7938B20DA3
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 19:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08A2719ADA3;
-	Thu, 27 Jun 2024 19:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27346446D1;
+	Thu, 27 Jun 2024 19:37:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jqZY+usY"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="M9/lb0bH"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBEBF200DE;
-	Thu, 27 Jun 2024 19:24:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C638360;
+	Thu, 27 Jun 2024 19:37:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719516278; cv=none; b=Cfc9C6a+M70G4BBKVlv2c//+OvM+sEbxB2GB2DF9/9lEbxaNqJaYanEAB7Lb/sF48yBPg53wlaAiu9XW8LlYku/gQZOU9e2ZJRICHpxi3GFxuqB+NAGlxNXXs2rlNaN/SzRrFklIWQT8VNozcj4QRp3GrdVQ8QRM8tKlJkHGWa4=
+	t=1719517058; cv=none; b=Qp9p5DeUSBzuv+PepfGuIhBGUYJ5bLWKnGd0a8lASnPkJkNf7xZh2V5CIx9coE+4B+AvmDP14l7i8zuHH7NM6SmGPdkvykqnbCaSwyjXieeTvrwKv1/oTaylMu4NNo6lIQGVQjg1ODEuMNwVLFOs06DsUSz9MXB6UyvCdInI7Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719516278; c=relaxed/simple;
-	bh=ByWy07f9rUggWN9DLwEaBmr1GuYoIk8YDAPbU9bHcps=;
+	s=arc-20240116; t=1719517058; c=relaxed/simple;
+	bh=0x5S0cUBNgYTh8sD2RmvuEbypBYiNLBr+bxK84fPwAU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WzXdQCxF3Dphn0II1YU8VJOevIF9QtANQHG8TPQ5QEI9SssSOFMfEPJxhat87y+7SPDeW5ckLQmCMDwLUglZsZqp6AG6KdBRR5CtmDkK5waQoebjXrT0anfVJ9+JeVymBLQNX1LW/Da8w2VsgTTR1th7gQ52E34xW818Y+V1OQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jqZY+usY; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=CaLnGj9ARg6zgwa9I/HdymzXCzhf+otDQBczI5OkVmjuTvHxAKy81scnyQ9gUqMiLKyu2ZdDBElj3z2dSPSqKWrwR5GmV5tt5L646n3iHBy9283h1anP1JejR5f3FhWfTMYeRBcF9F82CN4ihpCzjMqD2A/KeZvYsQ0tfBre9Ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=M9/lb0bH; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MIJerN91KOAahfx//F9cleyCTP+2uS5vcbZ0p363Ojc=; b=jqZY+usY9iPuJpXu55zsW+kvaJ
-	ikF+PmQHCkXwNKbFueAJfrQ/SJ/gbKnlDTRECR6vCQevb2rChvhqfEJ3mUgspq5VOpBsPjCEJx0T2
-	jdin0vKrxJ5BxL1twXhIqC6OwVgALQbDDiE7ts5FUZa31S9yAx9bs+FM8B6VKp9GdKGk=;
+	bh=oYCCFUsdbLvFXZA3WkDkIuUbJppe2HN72PE2NIGZw5M=; b=M9/lb0bHeHkOSDmbEMEU84cAOp
+	lHtPAlQ6bgsfBtAWBS7ZNPF6jgnQfjCpWJbzeZC+2deBvYGVdlfqvb78D6IpQr5bMYw0MPjQzgI0m
+	8lHQl0NkzmykT2HHYFc623bPGYQnjXvjnJwyDtvHj9NL+7UvfJ3jfiMCSNp+Sr3IKDDY=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sMujE-001CdD-L2; Thu, 27 Jun 2024 21:24:20 +0200
-Date: Thu, 27 Jun 2024 21:24:20 +0200
+	id 1sMuvl-001Cgs-9J; Thu, 27 Jun 2024 21:37:17 +0200
+Date: Thu, 27 Jun 2024 21:37:17 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Andrew Halaney <ahalaney@redhat.com>
 Cc: Bartosz Golaszewski <brgl@bgdev.pl>, Vinod Koul <vkoul@kernel.org>,
@@ -58,7 +58,7 @@ Cc: Bartosz Golaszewski <brgl@bgdev.pl>, Vinod Koul <vkoul@kernel.org>,
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 Subject: Re: [PATCH v2 net-next 2/2] net: stmmac: qcom-ethqos: add a
  DMA-reset quirk for sa8775p-ride
-Message-ID: <4f642463-3a8c-4412-a007-42fb65c4276e@lunn.ch>
+Message-ID: <f416e06e-e354-4628-883b-07850f05e276@lunn.ch>
 References: <20240627113948.25358-1-brgl@bgdev.pl>
  <20240627113948.25358-3-brgl@bgdev.pl>
  <td5jbseo7gtu6d4xai6q2zkfmxw4ijimyiromrf52he5hze3w3@fd3kayixf4lw>
@@ -72,26 +72,47 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <td5jbseo7gtu6d4xai6q2zkfmxw4ijimyiromrf52he5hze3w3@fd3kayixf4lw>
 
-> Its not clear to me though if the "2500basex" mentioned here supports
-> any in-band signalling from a Qualcomm SoC POV (not just the Aquantia
-> phy its attached to, but in general). So maybe in that case its not a
-> concern?
+On Thu, Jun 27, 2024 at 12:07:22PM -0500, Andrew Halaney wrote:
+> On Thu, Jun 27, 2024 at 01:39:47PM GMT, Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > 
+> > On sa8775p-ride the RX clocks from the AQR115C PHY are not available at
+> > the time of the DMA reset so we need to loop TX clocks to RX and then
+> > disable loopback after link-up. Use the existing callbacks to do it just
+> > for this board.
+> > 
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> Sorry, not being very helpful but trying to understand these changes
+> and the general cleanup of stmmac... so I'll point out that I'm still
+> confused by this based on Russell's last response:
+> https://lore.kernel.org/netdev/ZnQLED%2FC3Opeim5q@shell.armlinux.org.uk/
+> 
+> Quote:
+> 
+>     If you're using true Cisco SGMII, there are _no_ clocks transferred
+>     between the PHY and PCS/MAC. There are two balanced pairs of data
+>     lines and that is all - one for transmit and one for receive. So this
+>     explanation doesn't make sense to me.
+> 
 
-True 2500BaseX does have inband signalling, for the results of pause
-negotiation.
+Agreed. We need a deeper understanding of the clocking to find an
+acceptable solution to this problem.
 
-However, in this case, this is not true 2500BaseX, but a hacked SGMII
-overclocked to 2.5GHz. There is no inband signalling, because SGMII
-signalling makes no sense when over clocked. So out of band signalling
-will be used.
+Is the MAC extracting a clock from the SERDES lines?
 
-My understanding is that both ends of this link are not using true
-2500BaseX, and this Qualcomm SoC is incapable of true 2500BaseX. So we
-don't need to worry about it in the Qualcomm glue code.
+Is the PHY not driving the SERDES lines when there is no link?
 
-However, what these patches should not block is some other vendors SoC
-with true 2500BaseX from working correctly.
+For RGMII PHYs, they often do have a clock output at 25 or 50MHz which
+the MAC uses. And some PHY drivers need asking to not turn this clock
+off.  Maybe we need the same here, by asking the PHY to keep the
+SERDES lines running when there is no link?
 
-     Andrew
+https://elixir.bootlin.com/linux/v6.10-rc5/source/include/linux/phy.h#L781
 
+I also wounder why this is not an issue with plain SGMII, rather than
+overclocked SGMII? Maybe there is already a workaround for SGMII and
+it just needs extended to this not quiet 2500BaseX mode.
+
+      Andrew
 
