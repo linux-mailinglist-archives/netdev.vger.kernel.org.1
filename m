@@ -1,131 +1,160 @@
-Return-Path: <netdev+bounces-107108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21A09919DAC
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 05:02:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35E08919DE6
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 05:37:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB508B2264A
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 03:02:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67D7B1C21910
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 03:37:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE0E17BB4;
-	Thu, 27 Jun 2024 03:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B402417753;
+	Thu, 27 Jun 2024 03:37:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="soTfrs9X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nlUiITei"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC0A134BD
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 03:02:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1C917758;
+	Thu, 27 Jun 2024 03:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719457337; cv=none; b=Te/y+G3p2ny7fc7X+HSPUgJmEsMa+VIOHfzo3AcJno5cVnbejgRL7HJNAjxa/awhjk1/qBF6aD8FZ1a3CcDNQT+vXVJbiZCnUDCTSwWHpS6S/KHv8zM2NsZ1MuQOLJaDunOsje1FqRBsZAyTquGzGHlgt7874QFdhvmkJxgj+Pg=
+	t=1719459461; cv=none; b=JB7foHW8B1bS74LT0xo8HayM0DknZNfa7agqtBsnXDTLbtAKEReA7LNHTM9GP3bRfhWkCNCEOgyTICFqIctQpqmC2NBcMIuuiQzkpfm4euVs0+Cz0BFfAwSwCfZlVp1bh3FaOEm2kvv2SOLXhCPT/4NUC9o3AZPPr03Fd7FRulQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719457337; c=relaxed/simple;
-	bh=ukiXBXPebzE7x/YVpirVjYpMkEmGIksawxjTpJ5lF9E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=L6VOF62/010AVi88tnBFX9G/og+iM8+MAWEYtUxbPZxZK689bzg0Q28wVLIZBrr8u+dBfDd4IMKuScIMoPsKWCxMKOxQKqPpODrfbsYm2nSZErbZYMnar3nvW9ZXqHfNZ/l9ysaFIdSvQwegx13sQ73PU2RKuqKws4rJxmrfNUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=soTfrs9X; arc=none smtp.client-ip=209.85.167.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3d5d7fa3485so84131b6e.1
-        for <netdev@vger.kernel.org>; Wed, 26 Jun 2024 20:02:16 -0700 (PDT)
+	s=arc-20240116; t=1719459461; c=relaxed/simple;
+	bh=wJ7aj6V02RGQPLH6KMM+51qFYpgYMN3gYv3bgJwF+FM=;
+	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
+	 Cc:In-Reply-To:To; b=ruuFZEP4h2986Zh5YSDN4cXgsjD8PCqKLz6srefKv2c1IWj6+EhmFafEAEiyOxT8JkrT6X2YBm8M3UxrMtx2iaz+4ynE8W0+ARTT3sg2C5sYHWl+y0DFqaFAP3240mr5bUH0wo7R5z3SziaKvNm331n59pD3VcJScNcEDmIrFBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nlUiITei; arc=none smtp.client-ip=209.85.167.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3d566d5eda9so190857b6e.0;
+        Wed, 26 Jun 2024 20:37:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1719457335; x=1720062135; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4IaNM1I4HWXrCUY0pwVSIP2cf06bnBq/uV3Ey6JNr98=;
-        b=soTfrs9XAk0NgvU4hqXeMgDiXawtHuBBu3+lWGkLRRhhZb+LMkM/0Su66SUBCOWibB
-         B9ncfOjE2VYOSzHCi3zgo8elx0dgouHMmOMoiO+UVDufQGqb5HkBJ84eCFiYUeIkKg7M
-         yNLu1HYWFT9FWKZ1Apr4sPXZPTgJ4QslgNamFzKX4xkbrSYqtFn6niNc038e82vuF99C
-         ZySYY/3EU2UOswRn/aP4fUSPnl7YNWN741NxOGsfrvRnHV9t2xUx7e7VHRLqmJs1BWjt
-         CPXcJ7v6WjpaLPDYEDecRFlqp66fW88Vj5MOqOhPaUquN0VfVkgW40kWvZ7L7rlIq21D
-         87MQ==
+        d=gmail.com; s=20230601; t=1719459458; x=1720064258; darn=vger.kernel.org;
+        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
+         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=btL9frXHn5bucfqfBQ8J86OleIxFKMIHqIH1Tkvc2+Y=;
+        b=nlUiITeimMEvjKNuFcVeDnY8pw51Ib27QCj/hsDT7W9TwOlCT9MWlRFqAggt7kyHUZ
+         dZMGF3CEVmbQ5a5aEUzO5PzawJT5uO1yaeEvclnGSKx9u9c4ALUqKU/RCEoCHClcRTgl
+         MNFxRUzvqUU1owHQVrdokHSZrBnUDTMiFxaKpHJam8mHd7nxPuy1seRSZ+TbKo2tWMTQ
+         CGxysnZUwynMRIEpGnN95Jy8YunwVoh7mYduOZZocE/XxdVzujd55ftwkBG0hFLe1Sg3
+         b6VZNQzwweZIDsrPosINiobQLNUMLELS0IHcL0VD4zJup1wfTglyfWGIp4Uh/tUs3PbU
+         sreQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719457335; x=1720062135;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1719459458; x=1720064258;
+        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
+         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4IaNM1I4HWXrCUY0pwVSIP2cf06bnBq/uV3Ey6JNr98=;
-        b=Hczoz+9/11FQFd/PTQqvCnFDVXMuKwjXERBCLNt4gyAtxegm9fnD2GwcE+OjVdNI+u
-         UGQk/irrLzmV3yfIq92pzzxqd2qMr1p4Ac0av9X/aUYD5YygPsKwPhEyudc6zmj6KTuj
-         gB0A0MUUmrFscs+LFQmpSMTSr9iNNQBQ9ehRO1t+lewSpDlPUnx3xp7y9Z4QRj39QiDk
-         QdHS97t26iortM+2LkGzbnLK601Uac9pUoF1ipAgJXjbn0Eq4dYd+/3+2wgPJ6yfWQJZ
-         J8PvJLwrP6jTEVdjo17jWhkf3SRkOQFeTFWgH20q4X9PG9/p05nTau9OsULFWSjEsYfO
-         AseA==
-X-Forwarded-Encrypted: i=1; AJvYcCV4JKNdz2PRNDbzUC7j9mjHmHXgk7gb3Phnw9ZVcxNSJ2Hpat3rvq6YYyS5jLQyOqV7TTAPgFaqfn+8ueFQiE9ZE5WKpkau
-X-Gm-Message-State: AOJu0YyvPIk8VwMI7vghp2Z99TUj00g2912pUlh1SeeRsea8lt4XrZpU
-	jvzgRMWXc/liYj0vhf2FlHslHOLP4Wnq92MvjPIKEygMxCufrQBAP0AwpUODbyk=
-X-Google-Smtp-Source: AGHT+IGOccmshDY1oomeaabWin1q3IFJIcB+Lgb25MOFL1cmDmBrjZ4xXKxAm1zczIAraF3hwpTovA==
-X-Received: by 2002:a05:6808:1b23:b0:3d5:63a2:6030 with SMTP id 5614622812f47-3d563a262c9mr3827836b6e.46.1719457335388;
-        Wed, 26 Jun 2024 20:02:15 -0700 (PDT)
-Received: from localhost (fwdproxy-prn-002.fbsv.net. [2a03:2880:ff:2::face:b00c])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-706b4910258sm219644b3a.56.2024.06.26.20.02.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 20:02:15 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: Michael Chan <michael.chan@broadcom.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v2 2/2] bnxt_en: unlink page pool when stopping Rx queue
-Date: Wed, 26 Jun 2024 20:02:00 -0700
-Message-ID: <20240627030200.3647145-3-dw@davidwei.uk>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240627030200.3647145-1-dw@davidwei.uk>
-References: <20240627030200.3647145-1-dw@davidwei.uk>
+        bh=btL9frXHn5bucfqfBQ8J86OleIxFKMIHqIH1Tkvc2+Y=;
+        b=Ws+4izpzFaObv+CYr2ISy/0y6Z8y6vUX9NgL7MXUyrz6DakCABxXYIIx4BbEXiRox8
+         ItLAeKtLm/4IH//E1lnVU5owT7rU1O2bK/JeTw2mggdiyTzZb9w7Na80MV+MqP0W4pZX
+         PWLkQ+g272vEw6LqmHRgKFWICnGH96SD0Q1A1E4LkZtgj9f6d+ZqVdcMlJbBW5g2BTZ6
+         G2BiiXbbqrephhNc1xpUZfV71uJLIcSLwT4WQXO8eh9ZvhFBDIAecQO87oadlWLcI7ZW
+         JeJJtJcZkwe2sNeyzSmg0G54RXK6XZcgKUldcMDPNHPbejA3YLU3UuBKmAH+zbiO9t3g
+         qYpA==
+X-Forwarded-Encrypted: i=1; AJvYcCWvQElgaEh9KORdWnQFsMeEzTIVisD3LZiLhW6l97rOldoHI9ABivDiCnCn+JK1s1q6yf+btX8DF2CKdLRuKN0f47UF7YxqD7BsjVQqMKX05XCBbH+O4m10wsKB
+X-Gm-Message-State: AOJu0YxyxDbnNhYyucW80d4KK+1xEUqBQ3cXWk4OBPEaPUZuFs7n4ExL
+	JcTjMuhpBLiO5KvFjyElAtl11LHySQw1VE/TwZ8NpB3bqQWUO5UhibYFy/jFM5Y=
+X-Google-Smtp-Source: AGHT+IGVDdwvf48/nQa5AnQqEU/GPUM5E0o40jNlS5HJEw1xlJF7yk1hxW3f5GLk6bzUTo1BS4p2uQ==
+X-Received: by 2002:a05:6808:170f:b0:3d5:1bd8:ab18 with SMTP id 5614622812f47-3d545979603mr13684952b6e.24.1719459457698;
+        Wed, 26 Jun 2024 20:37:37 -0700 (PDT)
+Received: from smtpclient.apple ([2001:e60:a809:eceb:bd02:cb72:6ee8:4792])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-706b4a07a30sm252681b3a.139.2024.06.26.20.37.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jun 2024 20:37:37 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From: =?utf-8?B?67CV7KCV7KSA?= <aha310510@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH] vhost/vsock: always initialize seqpacket_allow
+Date: Thu, 27 Jun 2024 12:37:24 +0900
+Message-Id: <4C39A362-74E3-4762-82AD-D8B15AA38B10@gmail.com>
+References: <bcc17a060d93b198d8a17a9b87b593f41337ee28.1715785488.git.mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org,
+ syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com,
+ Arseny Krasnov <arseny.krasnov@kaspersky.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ =?utf-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org
+In-Reply-To: <bcc17a060d93b198d8a17a9b87b593f41337ee28.1715785488.git.mst@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+X-Mailer: iPhone Mail (21F90)
 
-Have bnxt call page_pool_disable_direct_recycling() to unlink the old
-page pool when resetting a queue prior to destroying it, instead of
-touching a netdev core struct directly.
+nice patch
 
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 1bd0c5973252..18ff747a57fb 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -15049,11 +15049,6 @@ static void bnxt_queue_mem_free(struct net_device *dev, void *qmem)
- 	bnxt_free_one_rx_ring(bp, rxr);
- 	bnxt_free_one_rx_agg_ring(bp, rxr);
- 
--	/* At this point, this NAPI instance has another page pool associated
--	 * with it. Disconnect here before freeing the old page pool to avoid
--	 * warnings.
--	 */
--	rxr->page_pool->p.napi = NULL;
- 	page_pool_destroy(rxr->page_pool);
- 	rxr->page_pool = NULL;
- 
-@@ -15173,6 +15168,7 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
- 	bnxt_hwrm_rx_ring_free(bp, rxr, false);
- 	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
- 	rxr->rx_next_cons = 0;
-+	page_pool_disable_direct_recycling(rxr->page_pool);
- 
- 	memcpy(qmem, rxr, sizeof(*rxr));
- 	bnxt_init_rx_ring_struct(bp, qmem);
--- 
-2.43.0
-
+> 2024. 5. 16. =EC=98=A4=EC=A0=84 12:05, Michael S. Tsirkin <mst@redhat.com>=
+ =EC=9E=91=EC=84=B1:
+>=20
+> =EF=BB=BFThere are two issues around seqpacket_allow:
+> 1. seqpacket_allow is not initialized when socket is
+>   created. Thus if features are never set, it will be
+>   read uninitialized.
+> 2. if VIRTIO_VSOCK_F_SEQPACKET is set and then cleared,
+>   then seqpacket_allow will not be cleared appropriately
+>   (existing apps I know about don't usually do this but
+>    it's legal and there's no way to be sure no one relies
+>    on this).
+>=20
+> To fix:
+>    - initialize seqpacket_allow after allocation
+>    - set it unconditionally in set_features
+>=20
+> Reported-by: syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com
+> Reported-by: Jeongjun Park <aha310510@gmail.com>
+> Fixes: ced7b713711f ("vhost/vsock: support SEQPACKET for transport").
+> Cc: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Acked-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+> Tested-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>=20
+> ---
+>=20
+>=20
+> Reposting now it's been tested.
+>=20
+> drivers/vhost/vsock.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> index ec20ecff85c7..bf664ec9341b 100644
+> --- a/drivers/vhost/vsock.c
+> +++ b/drivers/vhost/vsock.c
+> @@ -667,6 +667,7 @@ static int vhost_vsock_dev_open(struct inode *inode, s=
+truct file *file)
+>    }
+>=20
+>    vsock->guest_cid =3D 0; /* no CID assigned yet */
+> +    vsock->seqpacket_allow =3D false;
+>=20
+>    atomic_set(&vsock->queued_replies, 0);
+>=20
+> @@ -810,8 +811,7 @@ static int vhost_vsock_set_features(struct vhost_vsock=
+ *vsock, u64 features)
+>            goto err;
+>    }
+>=20
+> -    if (features & (1ULL << VIRTIO_VSOCK_F_SEQPACKET))
+> -        vsock->seqpacket_allow =3D true;
+> +    vsock->seqpacket_allow =3D features & (1ULL << VIRTIO_VSOCK_F_SEQPACK=
+ET);
+>=20
+>    for (i =3D 0; i < ARRAY_SIZE(vsock->vqs); i++) {
+>        vq =3D &vsock->vqs[i];
+> --
+> MST
+>=20
 
