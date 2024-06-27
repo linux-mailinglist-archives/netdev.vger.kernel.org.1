@@ -1,361 +1,319 @@
-Return-Path: <netdev+bounces-107311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CADA91A8AC
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:09:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9F4C91A8B9
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:10:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C465BB23A55
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 14:09:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2777D1F273F9
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 14:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B1319598E;
-	Thu, 27 Jun 2024 14:09:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A39197558;
+	Thu, 27 Jun 2024 14:09:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WKfz4fhu"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hSw85+bB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2067.outbound.protection.outlook.com [40.107.236.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C3FA19581D
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 14:09:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719497347; cv=none; b=KrDbjtizOUzZj/4KCDY+wmEx26t+rUQev28KZOg3iRdCjJP1dBy0cas/f59xmlM/9/ZCku11d0ELc2WKY54eMgISZ/LjRhgOEmylxIFJIR9+9oxRfxetQd9KsQ9YmqayXn93YERHMTXXJiS65ORnjOz0ccKqGoaYadRlFskjDgU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719497347; c=relaxed/simple;
-	bh=n4HIkVyl2LxxKLdNc1L3vZhE8WXNvJbiOIbwjTU0EFM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PafjVHeDxeDX//amwmMIh1ojvohEQMlzXN8rwxO3xzB9GzdwoJSs3D8ROKJ78bsK/daune/7+wkRrYhdOZ/R/T2dP5W3sDP+WODgywHJcrGWumBiFzEldQZZmcxG3yEsqk7Cb4in/dDhWGEoXNf/m6s8T98OchPn/Tkd/P1v9iU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WKfz4fhu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719497344;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=m2MJw8DUeIzMnv5roWQI911cUTl2Nf3F1gSFyr8dYmc=;
-	b=WKfz4fhuqpBXRn81seqNkNUh3UZD+2oB4eX0jp5zImc0Iec6JyHvYoHi4SjZImDwBGyz9j
-	fHuLqrZYmaxCdWf6YQuB+MLBxit8qnCXQSer1rqnXBvPGWHz+E0em5uY2h9daB5LrKbqWQ
-	146ptZUlLKsFFeqDrCtGo2QFBeo+L+Y=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-339-mmKBDl6xNbCav_PzwwuN8A-1; Thu,
- 27 Jun 2024 10:09:01 -0400
-X-MC-Unique: mmKBDl6xNbCav_PzwwuN8A-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A6A1F19560B0;
-	Thu, 27 Jun 2024 14:08:59 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.225.168])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5DCBA19560A3;
-	Thu, 27 Jun 2024 14:08:57 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.10-rc6
-Date: Thu, 27 Jun 2024 16:08:37 +0200
-Message-ID: <20240627140837.42758-1-pabeni@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88064196D98;
+	Thu, 27 Jun 2024 14:09:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719497391; cv=fail; b=Vm5TV79NFUqANC6GWywhUNr2xLf93tOCWxFnLtdWqWgKxvch6m5/RcyTtA4Zq4UFdEBceJfm248Yeb6sPJgwx/ybjHAzBa2Axw62p9OUGKv8ulpVbvoDAihMeBsKZRq7ejAlPwqkbanfgRq6z2VQY3bdFtX6UnAjT2ZFlzRf6UU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719497391; c=relaxed/simple;
+	bh=tw/JyddXiOVBTrXCuWTn1nioac5ekXMPvE2he6BsqAM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Q2O+Gijp2xGHTi7i/Rji32OPiWMXJR4xUe/ZN0v03p3hhkoDf2OoWMXF0WGU1n482F/bij/pRYOvO2FSppgBeijyvHcHMcvnzt6t06OMxdY0Qxehisao8WJEFh4sCM7bDcDp4VWUQeRmkXh8y8TvpcIKI65LupGz+r2CjSYMzU4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hSw85+bB; arc=fail smtp.client-ip=40.107.236.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SrHAU/wg6tZZAoUqTHrPeJcPUCB4MdWi4m9L2suezo+uV4gFoOvpEJmJzBndskEHFS8t+frIWs/02AQNO54VK9JtvCxsvl/ka3T30xeOdMNHyJdQK0IcQlECM9BCvDbZWMH0/dfJKb6FYOobZQW3EOWYablYnH9FdvQZ8Mx0pHgo3FnsY/0chU9jxbgcsnKp5LYO5A6D1sBjU7RhVol3thKQzOgPKhCEJolkCfWj/DTLW+C9EjBitRYHMVGX4LCaFk67mpWPcg0gniIQOCB0Tn5EujjC+ZvNSB3wTWNhS2r8vlPf6DPIbYCChgnLAogzEaYPbQcFGgwxt7agdIVP2g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sF6KMX32w+b4jFmZRWAG+XLjVedrHmsYp3EVwddu2cY=;
+ b=TPBktEs81I9S9MfJEXTP/IKZ2Qdpg5AjiUrm82d8j2yAx/sHuFeNMrK3XDxt6Oy6A0uZ44q5hpNnCXVqQanW0ddlruBcsMnRqIb+UCzjQ7lbKSbpEcIKW/khAsYEek3tB1s0RRmnQe0HdIbEOYig9EkKTzGhZrvwnf1o57ZUbdUE6xv0WuXAtmuDc5Tjk0qbXqfLvdiwxH9MNmeOPaeVJcSX3xiI73/coSBRoo7C2TVSRcfvXEI9UfWmjWTwOfNP/T3KfghQyji1YjWGMtfTQC7U5DNmEAdiE9t7FcF0oX1mTZIE9VaWZl8u+JIwRLfUb1Jid640Gl0cJ3gdonnS+g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sF6KMX32w+b4jFmZRWAG+XLjVedrHmsYp3EVwddu2cY=;
+ b=hSw85+bBp9Kf+4MkU1z1oqMXftXW2wf43o7hkQbUdU0oiLc12VCifTQz03YFCo+hqYr5GWDoS8EBFjkSHUAXaqcpfC8hDXIBuCDjI9zu9A11LGmNtK23cxBRxVhmNSrwZTaH7IKFKo5qRKHn7X2t1kHmof3fmu0TPOFYCxKJ7hZU6WJJ3YBtjjaxR9KdmFjDqBC6VBI4NWSFcgGkoYYkbW5kpBcDm2z5vwCcT1nlduTlkD+rk88gkaco0yHe/fxGgIDYgkIKFmXuZ8+1SCONqiVLzDeOxApCo/kQPT6d5sbtN0NXzdBtrRwDz7Kd132Iw7Dq+NmibcWcje2yPt8VEA==
+Received: from BN9PR03CA0296.namprd03.prod.outlook.com (2603:10b6:408:f5::31)
+ by DM4PR12MB5721.namprd12.prod.outlook.com (2603:10b6:8:5c::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.22; Thu, 27 Jun
+ 2024 14:09:43 +0000
+Received: from BN3PEPF0000B06C.namprd21.prod.outlook.com
+ (2603:10b6:408:f5:cafe::e0) by BN9PR03CA0296.outlook.office365.com
+ (2603:10b6:408:f5::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7719.26 via Frontend
+ Transport; Thu, 27 Jun 2024 14:09:43 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN3PEPF0000B06C.mail.protection.outlook.com (10.167.243.71) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7741.0 via Frontend Transport; Thu, 27 Jun 2024 14:09:42 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 27 Jun
+ 2024 07:09:20 -0700
+Received: from dev-r-vrt-156.mtr.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 27 Jun 2024 07:09:14 -0700
+From: Danielle Ratson <danieller@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <corbet@lwn.net>, <linux@armlinux.org.uk>,
+	<sdf@google.com>, <kory.maincent@bootlin.com>,
+	<maxime.chevallier@bootlin.com>, <vladimir.oltean@nxp.com>,
+	<przemyslaw.kitszel@intel.com>, <ahmed.zaki@intel.com>,
+	<richardcochran@gmail.com>, <shayagr@amazon.com>, <paul.greenwalt@intel.com>,
+	<jiri@resnulli.us>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <mlxsw@nvidia.com>, <idosch@nvidia.com>,
+	<petrm@nvidia.com>, Danielle Ratson <danieller@nvidia.com>
+Subject: [PATCH net-next v8 0/9] Add ability to flash modules' firmware
+Date: Thu, 27 Jun 2024 17:08:47 +0300
+Message-ID: <20240627140857.1398100-1-danieller@nvidia.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B06C:EE_|DM4PR12MB5721:EE_
+X-MS-Office365-Filtering-Correlation-Id: ff45a5f2-d3af-4e5d-70fa-08dc96b2cad3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|7416014|376014|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?aC426+TjiygBWrt3A2oBbAV37Em29EguLzUxz0mk6L686MG3df5sJkB1j2iR?=
+ =?us-ascii?Q?t3HBigLHewxol63o6F5EMs4wLrISQeEmTY3N+pfKB4t1rzbEkc0NaRNlB/bI?=
+ =?us-ascii?Q?ekdH+JdPzurIcms4BVWGoPULVuT4hTkii5uo1/3TiwuN8BV+jnG+ZkGdJLF4?=
+ =?us-ascii?Q?7dmx0DvnvmdlywAdJ0yHoFwe6iRiURj5cDNaj29SV1t3A5eWj5L7IuyD+gQn?=
+ =?us-ascii?Q?NlbbbBv+/QJWkV7+qJ6cvl1InM2Z4HG2rp8f50Fz7MebG2agKs8B8ufcdNzQ?=
+ =?us-ascii?Q?v9BSVotRqLkQwbAXKdWHGwdla87Itk0SGcjkffH3lFR+ec33B4RK+QPlamgW?=
+ =?us-ascii?Q?5afBSPwKbindp5hTxwxHv6CIWwb0wU1XPDP0TCOpa6IJ7wY+7Nb/LUAkyRYf?=
+ =?us-ascii?Q?RM/Krbvbu7IOheCPjb0phV/LzMw/TSOHMQfvorTT+jp40AUaFBpaysxnzOWF?=
+ =?us-ascii?Q?rNKtAIkKaAbSvXzSRH7pA58dZkMz5p4LkV/3tNPE5q1waUcJA912gXN9NDD/?=
+ =?us-ascii?Q?XY5BXrubfPLJtGskv+fmcroz9ajcZ4I7UvSRjrmUeeUX0zZiqhGTzKcx9h+v?=
+ =?us-ascii?Q?eoBR13FXhweYbmN4Cckr72jkPHtWz2x0fVAZd81wRkch/i+sVRzK6OZhkly5?=
+ =?us-ascii?Q?WN4TmXflBmbaYqqg+n/aZ+Jn1uEZ1pmotbSi+0KH1DnM7+Mv6JN/cYYJ6Nvd?=
+ =?us-ascii?Q?ujJ5RuQD5jlwfUYY1AFSROzb9qPIlsCDjyUbAXI7ERLr/hOJ1NMxEpEUHXBW?=
+ =?us-ascii?Q?F0oiyePpOk1zZqz5EZiPZWmkFaaAbk2oGV2jPHojudb0wixmjAFaaKr8nH9t?=
+ =?us-ascii?Q?vL6WAUb5VdA5AMSZU+fMvm2ze9DM4UF/mM5LH4SALrM7r1uEFW20+FpVPT+y?=
+ =?us-ascii?Q?kuEEBA7DGJ3olieyPoBZCGcxKgmIGmfZi4NdddQdBkpx82hN925U/ila7/JQ?=
+ =?us-ascii?Q?kw1F8vkvsHSQBDeHS+02Y61RT1HL3+91SVyEtEJOuOpDYYSY3lrnYpAjOWrP?=
+ =?us-ascii?Q?COowd5+vL9dV/B/P05P7zqKkYI9KIEbgIdBJHU1RvUixdRYUc+rOtifLB9KX?=
+ =?us-ascii?Q?Xf3cx7Lf0wofh2Hy2wbXkek39kBWRnchnevkgACI+xDHG7hVyIHeeB4nijfH?=
+ =?us-ascii?Q?I9SE9W7LAVSivIzUlCPJ9IQOGuV6ruOx4Dg4ssiEvGdXhi7RLPv4rBoDk0V/?=
+ =?us-ascii?Q?gLy16ECHw8/MNCLB88eaFM4zi84wq0GWmHsGc5eWt83BkpXBmVBCE5a8SaOA?=
+ =?us-ascii?Q?MQdNOOzqlQtjTC6cv5poMMKFqane1ROF0CLZuCpKZqUqp52y5StzzIF7LYxq?=
+ =?us-ascii?Q?xm8I4u3eIGo5iwLmgkLnhPmN5TzMsZhsgbnARRsrEPn92AOMZnZh5XgkmOYD?=
+ =?us-ascii?Q?9MF1m8Mbcetmi731YaYx7qsjmO7m6MSAf5oH7SIO26dJThPayBiSiNGSISyf?=
+ =?us-ascii?Q?thk26pK/81hjjahWabhHo825TaHdn6GA?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(7416014)(376014)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2024 14:09:42.8780
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff45a5f2-d3af-4e5d-70fa-08dc96b2cad3
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN3PEPF0000B06C.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5721
 
-Hi Linus!
+CMIS compliant modules such as QSFP-DD might be running a firmware that
+can be updated in a vendor-neutral way by exchanging messages between
+the host and the module as described in section 7.2.2 of revision
+4.0 of the CMIS standard.
 
-There are a bunch of regressions addressed by this PR, but hopefully
-nothing spectacular. We are still waiting the driver fix from
-Intel, mentioned by Jakub in the previous net PR.
+According to the CMIS standard, the firmware update process is done
+using a CDB commands sequence.
 
-The following changes since commit d5a7fc58da039903b332041e8c67daae36f08b50:
+CDB (Command Data Block Message Communication) reads and writes are
+performed on memory map pages 9Fh-AFh according to the CMIS standard,
+section 8.12 of revision 4.0.
 
-  Merge tag 'net-6.10-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-06-20 10:49:50 -0700)
+Add a pair of new ethtool messages that allow:
 
-are available in the Git repository at:
+* User space to trigger firmware update of transceiver modules
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.10-rc6
+* The kernel to notify user space about the progress of the process
 
-for you to fetch changes up to b62cb6a7e83622783100182d9b70e9c70393cfbe:
+The user interface is designed to be asynchronous in order to avoid RTNL
+being held for too long and to allow several modules to be updated
+simultaneously. The interface is designed with CMIS compliant modules in
+mind, but kept generic enough to accommodate future use cases, if these
+arise.
 
-  Merge tag 'nf-24-06-27' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2024-06-27 13:00:50 +0200)
+The kernel interface that will implement the firmware update using CDB
+command will include 2 layers that will be added under ethtool:
 
-----------------------------------------------------------------
-Including fixes from can, bpf and netfilter.
+* The upper layer that will be triggered from the module layer, is
+ cmis_ fw_update.
+* The lower one is cmis_cdb.
 
-Current release - regressions:
+In the future there might be more operations to implement using CDB
+commands. Therefore, the idea is to keep the cmis_cdb interface clean and
+the cmis_fw_update specific to the cdb commands handling it.
 
-  - core: add softirq safety to netdev_rename_lock
+The communication between the kernel and the driver will be done using
+two ethtool operations that enable reading and writing the transceiver
+module EEPROM.
+The operation ethtool_ops::get_module_eeprom_by_page, that is already
+implemented, will be used for reading from the EEPROM the CDB reply,
+e.g. reading module setting, state, etc.
+The operation ethtool_ops::set_module_eeprom_by_page, that is added in
+the current patchset, will be used for writing to the EEPROM the CDB
+command such as start firmware image, run firmware image, etc.
 
-  - tcp: fix tcp_rcv_fastopen_synack() to enter TCP_CA_Loss for failed TFO
+Therefore in order for a driver to implement module flashing, that
+driver needs to implement the two functions mentioned above.
 
-  - batman-adv: fix RCU race at module unload time
+Patchset overview:
+Patch #1-#2: Implement the EEPROM writing in mlxsw.
+Patch #3: Define the interface between the kernel and user space.
+Patch #4: Add ability to notify the flashing firmware progress.
+Patch #5: Veto operations during flashing.
+Patch #6: Add extended compliance codes.
+Patch #7: Add the cdb layer.
+Patch #8: Add the fw_update layer.
+Patch #9: Add ability to flash transceiver modules' firmware.
 
-Current release - new code bugs:
+v8:
+	Patch #7:
+	* In the ethtool_cmis_wait_for_cond() evaluate the condition once more
+	  to decide if the error code should be -ETIMEDOUT or something else.
+	* s/netdev_err/netdev_err_once.
 
-Previous releases - regressions:
+v7:
+	Patch #4:
+		* Return -ENOMEM instead of PTR_ERR(attr) on
+		  ethnl_module_fw_flash_ntf_put_err().
+	Patch #9:
+		* Fix Warning for not unlocking the spin_lock in the error flow
+          	  on module_flash_fw_work_list_add().
+		* Avoid the fall-through on ethnl_sock_priv_destroy().
 
-  - openvswitch: get related ct labels from its master if it is not confirmed
+v6:
+	* Squash some of the last patch to patch #5 and patch #9.
+	Patch #3:
+		* Add paragraph in .rst file.
+	Patch #4:
+		* Reserve '1' more place on SKB for NUL terminator in
+		  the error message string.
+		* Add more prints on error flow, re-write the printing
+		  function and add ethnl_module_fw_flash_ntf_put_err().
+		* Change the communication method so notification will be
+		  sent in unicast instead of multicast.
+		* Add new 'struct ethnl_module_fw_flash_ntf_params' that holds
+		  the relevant info for unicast communication and use it to
+		  send notification to the specific socket.
+		* s/nla_put_u64_64bit/nla_put_uint/
+	Patch #7:
+		* In ethtool_cmis_cdb_init(), Use 'const' for the 'params'
+		  parameter.
+	Patch #8:
+		* Add a list field to struct ethtool_module_fw_flash for
+		  module_fw_flash_work_list that will be presented in the next
+		  patch.
+		* Move ethtool_cmis_fw_update() cleaning to a new function that
+		  will be represented in the next patch.
+		* Move some of the fields in struct ethtool_module_fw_flash to
+		  a separate struct, so ethtool_cmis_fw_update() will get only
+		  the relevant parameters for it.
+		* Edit the relevant functions to get the relevant params for
+		  them.
+		* s/CMIS_MODULE_READY_MAX_DURATION_USEC/CMIS_MODULE_READY_MAX_DURATION_MSEC
+	Patch #9:
+		* Add a paragraph in the commit message.
+		* Rename labels in module_flash_fw_schedule().
+		* Add info to genl_sk_priv_*() and implement the relevant
+		  callbacks, in order to handle properly a scenario of closing
+		  the socket from user space before the work item was ended.
+		* Add a list the holds all the ethtool_module_fw_flash struct
+		  that corresponds to the in progress work items.
+		* Add a new enum for the socket types.
+		* Use both above to identify a flashing socket, add it to the
+		  list and when closing socket affect only the flashing type.
+		* Create a new function that will get the work item instead of
+		  ethtool_cmis_fw_update().
+		* Edit the relevant functions to get the relevant params for
+		  them.
+		* The new function will call the old ethtool_cmis_fw_update(),
+		  and do the cleaning, so the existence of the list should be
+		  completely isolated in module.c.
 
-  - eth: bonding: fix incorrect software timestamping report
-
-  - eth: mlxsw: fix memory corruptions on spectrum-4 systems
-
-  - eth: ionic: use dev_consume_skb_any outside of napi
-
-Previous releases - always broken:
-
-  - netfilter: fully validate NFT_DATA_VALUE on store to data registers
-
-  - unix: several fixes for OoB data
-
-  - tcp: fix race for duplicate reqsk on identical SYN
-
-  - bpf:
-    - fix may_goto with negative offset.
-    - fix the corner case with may_goto and jump to the 1st insn.
-    - fix overrunning reservations in ringbuf
-
-  - can:
-    - j1939: recover socket queue on CAN bus error during BAM transmission
-    - mcp251xfd: fix infinite loop when xmit fails
-
-  - dsa: microchip: monitor potential faults in half-duplex mode
-
-  - eth: vxlan: pull inner IP header in vxlan_xmit_one()
-
-  - eth: ionic: fix kernel panic due to multi-buffer handling
-
-Misc:
-
-  - selftest: unix tests refactor and a lot of new cases added
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Alexei Starovoitov (6):
-      Merge branch 'bpf-fix-missed-var_off-related-to-movsx-in-verifier'
-      bpf: Fix remap of arena.
-      bpf: Fix the corner case with may_goto and jump to the 1st insn.
-      selftests/bpf: Tests with may_goto and jumps to the 1st insn
-      bpf: Fix may_goto with negative offset.
-      selftests/bpf: Add tests for may_goto with negative offset.
-
-Aryan Srivastava (1):
-      net: mvpp2: fill-in dev_port attribute
-
-Chen Ni (1):
-      can: kvaser_usb: fix return value for hif_usb_send_regout
-
-Daniel Borkmann (2):
-      bpf: Fix overrunning reservations in ringbuf
-      selftests/bpf: Add more ring buffer test coverage
-
-Daniele Palmas (1):
-      net: usb: qmi_wwan: add Telit FN912 compositions
-
-Daniil Dulov (1):
-      xdp: Remove WARN() from __xdp_reg_mem_model()
-
-David S. Miller (2):
-      Merge branch 'mlxsw-fixes'
-      Merge branch 'phy-microchip-ksz-9897-errata'
-
-Enguerrand de Ribaucourt (3):
-      net: phy: micrel: add Microchip KSZ 9477 to the device table
-      net: dsa: microchip: use collision based back pressure mode
-      net: dsa: microchip: monitor potential faults in half-duplex mode
-
-Eric Dumazet (1):
-      net: add softirq safety to netdev_rename_lock
-
-Frank Li (1):
-      dt-bindings: net: fman: remove ptp-timer from required list
-
-Guillaume Nault (1):
-      vxlan: Pull inner IP header in vxlan_xmit_one().
-
-Hangbin Liu (1):
-      bonding: fix incorrect software timestamping report
+Danielle Ratson (7):
+  ethtool: Add an interface for flashing transceiver modules' firmware
+  ethtool: Add flashing transceiver modules' firmware notifications
+    ability
+  ethtool: Veto some operations during firmware flashing process
+  net: sfp: Add more extended compliance codes
+  ethtool: cmis_cdb: Add a layer for supporting CDB commands
+  ethtool: cmis_fw_update: add a layer for supporting firmware update
+    using CDB
+  ethtool: Add ability to flash transceiver modules' firmware
 
 Ido Schimmel (2):
-      mlxsw: pci: Fix driver initialization with Spectrum-4
-      mlxsw: spectrum_buffers: Fix memory corruptions on Spectrum-4 systems
+  ethtool: Add ethtool operation to write to a transceiver module EEPROM
+  mlxsw: Implement ethtool operation to write to a transceiver module
+    EEPROM
 
-Jakub Kicinski (3):
-      Merge tag 'linux-can-fixes-for-6.10-20240621' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can
-      Merge tag 'batadv-net-pullrequest-20240621' of git://git.open-mesh.org/linux-merge
-      Merge tag 'for-netdev' of ssh://gitolite.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
+ Documentation/netlink/specs/ethtool.yaml      |  55 ++
+ Documentation/networking/ethtool-netlink.rst  |  70 ++
+ .../net/ethernet/mellanox/mlxsw/core_env.c    |  57 ++
+ .../net/ethernet/mellanox/mlxsw/core_env.h    |   6 +
+ drivers/net/ethernet/mellanox/mlxsw/minimal.c |  15 +
+ .../mellanox/mlxsw/spectrum_ethtool.c         |  15 +
+ include/linux/ethtool.h                       |  20 +-
+ include/linux/netdevice.h                     |   4 +-
+ include/linux/sfp.h                           |   6 +
+ include/uapi/linux/ethtool.h                  |  18 +
+ include/uapi/linux/ethtool_netlink.h          |  19 +
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/cmis.h                            | 124 ++++
+ net/ethtool/cmis_cdb.c                        | 602 ++++++++++++++++++
+ net/ethtool/cmis_fw_update.c                  | 399 ++++++++++++
+ net/ethtool/eeprom.c                          |   6 +
+ net/ethtool/ioctl.c                           |  12 +
+ net/ethtool/module.c                          | 394 ++++++++++++
+ net/ethtool/module_fw.h                       |  75 +++
+ net/ethtool/netlink.c                         |  56 ++
+ net/ethtool/netlink.h                         |  16 +
+ tools/net/ynl/Makefile.deps                   |   3 +-
+ 22 files changed, 1963 insertions(+), 11 deletions(-)
+ create mode 100644 net/ethtool/cmis.h
+ create mode 100644 net/ethtool/cmis_cdb.c
+ create mode 100644 net/ethtool/cmis_fw_update.c
+ create mode 100644 net/ethtool/module_fw.h
 
-Jan Sokolowski (1):
-      ice: Rebuild TC queues on VSI queue reconfiguration
-
-Jianguo Wu (1):
-      netfilter: fix undefined reference to 'netfilter_lwtunnel_*' when CONFIG_SYSCTL=n
-
-Jose Ignacio Tornos Martinez (1):
-      net: usb: ax88179_178a: improve link status logs
-
-Kory Maincent (2):
-      net: pse-pd: Kconfig: Fix missing firmware loader config select
-      netlink: specs: Fix pse-set command attributes
-
-Kuniyuki Iwashima (12):
-      selftest: af_unix: Add Kconfig file.
-      selftest: af_unix: Remove test_unix_oob.c.
-      selftest: af_unix: Add msg_oob.c.
-      af_unix: Stop recv(MSG_PEEK) at consumed OOB skb.
-      af_unix: Don't stop recv(MSG_DONTWAIT) if consumed OOB skb is at the head.
-      selftest: af_unix: Add non-TCP-compliant test cases in msg_oob.c.
-      af_unix: Don't stop recv() at consumed ex-OOB skb.
-      selftest: af_unix: Add SO_OOBINLINE test cases in msg_oob.c
-      selftest: af_unix: Check SIGURG after every send() in msg_oob.c
-      selftest: af_unix: Check EPOLLPRI after every send()/recv() in msg_oob.c
-      af_unix: Fix wrong ioctl(SIOCATMARK) when consumed OOB skb is at the head.
-      selftest: af_unix: Check SIOCATMARK after every send()/recv() in msg_oob.c.
-
-Linus Lüssing (1):
-      Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-
-Ma Ke (1):
-      net: mana: Fix possible double free in error handling path
-
-Matt Bobrowski (1):
-      bpf: Update BPF LSM maintainer list
-
-Neal Cardwell (1):
-      tcp: fix tcp_rcv_fastopen_synack() to enter TCP_CA_Loss for failed TFO
-
-Nick Child (2):
-      ibmvnic: Free any outstanding tx skbs during scrq reset
-      ibmvnic: Add tx check to prevent skb leak
-
-Oleksij Rempel (2):
-      net: can: j1939: enhanced error handling for tightly received RTS messages in xtp_rx_rts_session_new
-      net: can: j1939: recover socket queue on CAN bus error during BAM transmission
-
-Pablo Neira Ayuso (1):
-      netfilter: nf_tables: fully validate NFT_DATA_VALUE on store to data registers
-
-Paolo Abeni (2):
-      Merge branch 'af_unix-fix-bunch-of-msg_oob-bugs-and-add-new-tests'
-      Merge tag 'nf-24-06-27' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-
-Ratheesh Kannoth (1):
-      octeontx2-pf: Fix coverity and klockwork issues in octeon PF driver
-
-Shannon Nelson (2):
-      net: remove drivers@pensando.io from MAINTAINERS
-      ionic: use dev_consume_skb_any outside of napi
-
-Shigeru Yoshida (1):
-      net: can: j1939: Initialize unused data in j1939_send_one()
-
-Sven Eckelmann (1):
-      batman-adv: Don't accept TT entries for out-of-spec VIDs
-
-Taehee Yoo (1):
-      ionic: fix kernel panic due to multi-buffer handling
-
-Tristram Ha (2):
-      net: dsa: microchip: fix initial port flush problem
-      net: dsa: microchip: fix wrong register write when masking interrupt
-
-Vitor Soares (1):
-      can: mcp251xfd: fix infinite loop when xmit fails
-
-Xin Long (1):
-      openvswitch: get related ct labels from its master if it is not confirmed
-
-Yonghong Song (3):
-      bpf: Add missed var_off setting in set_sext32_default_val()
-      bpf: Add missed var_off setting in coerce_subreg_to_size_sx()
-      selftests/bpf: Add a few tests to cover
-
-Yunseong Kim (1):
-      tracing/net_sched: NULL pointer dereference in perf_trace_qdisc_reset()
-
-luoxuanqiang (1):
-      Fix race for duplicate reqsk on identical SYN
-
- .../devicetree/bindings/net/fsl,fman-dtsec.yaml    |   1 -
- Documentation/netlink/specs/ethtool.yaml           |   7 +-
- MAINTAINERS                                        |   4 +-
- drivers/net/bonding/bond_main.c                    |   3 +
- drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c     |  14 +-
- drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c       |  55 +-
- drivers/net/can/spi/mcp251xfd/mcp251xfd.h          |   5 +
- drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c   |   2 +-
- drivers/net/dsa/microchip/ksz9477.c                |  61 +-
- drivers/net/dsa/microchip/ksz9477.h                |   2 +
- drivers/net/dsa/microchip/ksz9477_reg.h            |  11 +-
- drivers/net/dsa/microchip/ksz_common.c             |  13 +-
- drivers/net/dsa/microchip/ksz_common.h             |   1 +
- drivers/net/ethernet/ibm/ibmvnic.c                 |  18 +
- drivers/net/ethernet/intel/ice/ice_main.c          |  10 +-
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c    |   1 +
- .../ethernet/marvell/octeontx2/nic/otx2_common.c   |  10 +-
- .../net/ethernet/marvell/octeontx2/nic/otx2_reg.h  |  55 +-
- .../net/ethernet/marvell/octeontx2/nic/otx2_txrx.c |   2 +-
- drivers/net/ethernet/marvell/octeontx2/nic/qos.c   |   3 +-
- drivers/net/ethernet/mellanox/mlxsw/pci.c          |  18 +-
- drivers/net/ethernet/mellanox/mlxsw/reg.h          |   2 +
- .../net/ethernet/mellanox/mlxsw/spectrum_buffers.c |  20 +-
- drivers/net/ethernet/microsoft/mana/mana_en.c      |   2 +
- drivers/net/ethernet/pensando/ionic/ionic_dev.h    |   4 +-
- drivers/net/ethernet/pensando/ionic/ionic_lif.c    |   2 +-
- drivers/net/ethernet/pensando/ionic/ionic_txrx.c   |  55 +-
- drivers/net/phy/micrel.c                           |   1 +
- drivers/net/pse-pd/Kconfig                         |   1 +
- drivers/net/usb/ax88179_178a.c                     |   6 +-
- drivers/net/usb/qmi_wwan.c                         |   2 +
- drivers/net/vxlan/vxlan_core.c                     |   9 +-
- include/net/inet_connection_sock.h                 |   2 +-
- include/net/netfilter/nf_tables.h                  |   5 +
- include/trace/events/qdisc.h                       |   2 +-
- kernel/bpf/arena.c                                 |  16 +-
- kernel/bpf/ringbuf.c                               |  31 +-
- kernel/bpf/verifier.c                              |  61 +-
- net/batman-adv/originator.c                        |  27 +
- net/batman-adv/translation-table.c                 |  47 +-
- net/can/j1939/main.c                               |   6 +-
- net/can/j1939/transport.c                          |  21 +-
- net/core/dev.c                                     |  12 +-
- net/core/xdp.c                                     |   4 +-
- net/dccp/ipv4.c                                    |   7 +-
- net/dccp/ipv6.c                                    |   7 +-
- net/ipv4/inet_connection_sock.c                    |  17 +-
- net/ipv4/tcp_input.c                               |  45 +-
- net/netfilter/nf_hooks_lwtunnel.c                  |   3 +
- net/netfilter/nf_tables_api.c                      |   8 +-
- net/netfilter/nft_lookup.c                         |   3 +-
- net/openvswitch/conntrack.c                        |   7 +-
- net/unix/af_unix.c                                 |  37 +-
- tools/testing/selftests/bpf/Makefile               |   2 +-
- tools/testing/selftests/bpf/prog_tests/ringbuf.c   |  56 ++
- .../selftests/bpf/progs/test_ringbuf_write.c       |  46 ++
- .../bpf/progs/verifier_iterating_callbacks.c       | 146 ++++
- tools/testing/selftests/bpf/progs/verifier_movsx.c |  63 ++
- tools/testing/selftests/net/.gitignore             |   1 -
- tools/testing/selftests/net/af_unix/Makefile       |   2 +-
- tools/testing/selftests/net/af_unix/config         |   3 +
- tools/testing/selftests/net/af_unix/msg_oob.c      | 734 +++++++++++++++++++++
- .../testing/selftests/net/af_unix/test_unix_oob.c  | 436 ------------
- 63 files changed, 1663 insertions(+), 594 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/progs/test_ringbuf_write.c
- create mode 100644 tools/testing/selftests/net/af_unix/config
- create mode 100644 tools/testing/selftests/net/af_unix/msg_oob.c
- delete mode 100644 tools/testing/selftests/net/af_unix/test_unix_oob.c
+-- 
+2.45.0
 
 
