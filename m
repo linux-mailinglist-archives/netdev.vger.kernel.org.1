@@ -1,137 +1,176 @@
-Return-Path: <netdev+bounces-107325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E99691A90E
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:21:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADA4B91A925
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:24:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF9791F26FDD
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 14:21:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68C9B284C88
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 14:24:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72EE19580A;
-	Thu, 27 Jun 2024 14:21:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210C3195F22;
+	Thu, 27 Jun 2024 14:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nHFXO7wB"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="l0C0JT3o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C0C14A636;
-	Thu, 27 Jun 2024 14:21:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03038195F1B
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 14:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719498083; cv=none; b=CwTzWBfgezO472iL22FqhtJAEnqQL1dYZBZDkuZNk6AQCUE7fe8WLkEK4nSmsTBQmm8NSvWeIk7t3Hb1RhLc7B1KlXKOfGAaADhgEp7rstQGw4SipE6osvcGeVWYC/EYaUQnhQ2gCMjaDiPxCFEitD38BbrxJMK6dN0oCq+uw4Q=
+	t=1719498261; cv=none; b=kHttM67L3WcAmH1q7IyEJR2Sfx6CLTuNzBwUpy08O0Nixg+7A/WjvjolnuNq5gK8iri8pjBxZVA/ISWKFDOJJi4y8kq4J+F1QIN3llbDg2nJwbm+tW2komz9zsPPfLj2vJogXzqmVPI64kY7R3FKmBHgx+m221dpE6PPF8H4OyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719498083; c=relaxed/simple;
-	bh=wFM5Kmk4PKgbdICFDwOvHvFB60JZ4ferC2yqrgNHkQY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pCqhBKAuJkMqrx1ZSNfZ/NJtGAZLSoSbdzrOLLJLiB7WoyxcedogpshyK4A0ISHwvDJS5ZU4lH6kdDA2909TjW71ifqKSmrQDCCaT7Hlfnc7HruMNUyBPT7AqY/uUkNRyvbF7/6/GlE94jG+yF+jSsVyf+lVf6PQtcHnOZ+3FPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nHFXO7wB; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2ec1620a956so94986901fa.1;
-        Thu, 27 Jun 2024 07:21:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719498080; x=1720102880; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BNKoH4rzJ344zkKbrOWrYDXvT+iIE/hfmaxUTk56nJM=;
-        b=nHFXO7wB3dq7QCCzmzkByek2umlrQGAnKj8VW5s78wnrFAQJJd46xZc3IqDtX8w5fw
-         INgj0ExpUpc2yqX/eqjOC4ZFH3a1kl3+tLn5p2TKoW+Ojlmoh+nc6UNiIWQ3HZG2OIFb
-         ijTUPM3R7Rg5gMUzOQlf/slBe6iVeE8kjtLSMxE4aOu/c5i/FtqBAwKnWCnvnMoa68GH
-         PXxjQs6zMOq9pzcDcp+tlubiweou/TFD5Qfpk8K0UbJTE6DdXFpExpEyzM5vTwLw2C5A
-         sk6H2OSdwTiSR/E6d/I42H7AmqixoQyOX7PDFoWMhwzL4TxS4jPX5MhJm0DEpXPIsUF6
-         4cng==
+	s=arc-20240116; t=1719498261; c=relaxed/simple;
+	bh=eP++XOCKo6V6FTwjNKZ7el6fjbOEpnWNQMSYvg5b5tY=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=e4Uxjx4fm+R5PsTUrcHItwoGctKG0Q5DqChOKCbJMMGFKPP/5B/kxUth+obFMP9JT88CFpmOpZruxsH6uVkX7VRXoTGaJjQJd7+4b7Bh3Re0fOCZ142d0nSj5567ZPXLR2ByFYSNX0hLZovHsxhcrBZrgkkd72UTQUhH9ulmkw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=l0C0JT3o; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 1FA1D3F73B
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 14:24:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1719498254;
+	bh=8uroOoCAtfmxQT5deF8n+fhiTw+i8ftXaHiQzj+Rsxw=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID;
+	b=l0C0JT3oT/MgzwvYAsz0gtfxZlicp1AtmquKHjzskmIZCCyvWpd9lysD1t8U4OAuY
+	 3om9jJ21wsATf3DmIDa/Qxdem6fWZg7wSCud6gI45WWm5zqUSZUEIoEdnSpGtpIY6m
+	 aiHSPDf04GCGO8CbpQxKOaEgeod/bI9hs96W2TsreWJeTjmBZONHTNZo2Nme7Fke+l
+	 ErspdGFkLbIEm9hHzJ8nr90isj22PUbIixadjLKlf1k2I7Q6gZpmD1vegL5098Ha8t
+	 siZeDDUh50OwMR8MwHfUdVCskehwspAvoA/FI01O6RbwnyxMLHGcv2cGX5Vy3RUjuS
+	 mCBcBdz8cGvwQ==
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-70662dfc495so6467742b3a.0
+        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 07:24:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719498080; x=1720102880;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BNKoH4rzJ344zkKbrOWrYDXvT+iIE/hfmaxUTk56nJM=;
-        b=Tkt7uoSfi3Q4Wrj/NXHFf1qf/yqxs5OS1kT/hkEC+QVat3cyvJ+9VCjhvUgBZzPRkz
-         LYNr8rWWssbWlaSWYWVWwYfLd1DOZlsfZK4gEIOYYTSWugOtkLxG43g/LxYZIhkN2a2d
-         voYuxq5d61H24z+MKleHIQ86a2VXQndSn+aEfVwtRyjDeKppx86DfCuVeWL2CJcYerXv
-         /OPiE3R/3RjYjEz8++VZP7TLkYaxXOhPa+OzjCA1a1C82yigjdIAc7qlirXi4IJao6ff
-         npDpJCrLedwbABdezzNQe0HD5Gsr1DPegEWx+7wRqdGgobing7L01XOdCbManP/5MMN9
-         ZkOg==
-X-Forwarded-Encrypted: i=1; AJvYcCXQMgyyiv9ux8wncnRsNNmhYEye8vKUtu9+PwaY5AO37iBJwaMaB8gc+qYMtc/UzqdSinumQt445NAVZ5BL5xUmNzRcJ7Nfu/7v3lLU4bLje7bwsIruRAylADmBWT/sh9gpFKZk0zthfsBc2xC97ARXHlADwr3UIT09M81c3xYFGg==
-X-Gm-Message-State: AOJu0Yw6hEtg+SzJzpBUARZl0QaCbel0+l9o5zMVbkD48oOJ1ELEo54F
-	fD7MCeQLkqEnF7P1XQe3ePMOZZ8hEZjoZ6BaHeVNGmkM+z8GfCXo
-X-Google-Smtp-Source: AGHT+IEHVOZ10FR3wZmTdwRxdIJLg1s0iN53vUF5fAbGXdSCMOMhDB4n8Z8vdnbYCxSJ4aGmRz1Ybw==
-X-Received: by 2002:ac2:5e79:0:b0:52c:dc0b:42cf with SMTP id 2adb3069b0e04-52ce18324e0mr7752453e87.9.1719498079833;
-        Thu, 27 Jun 2024 07:21:19 -0700 (PDT)
-Received: from mobilestation ([213.79.110.82])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7676dd0esm50342e87.87.2024.06.27.07.21.18
+        d=1e100.net; s=20230601; t=1719498252; x=1720103052;
+        h=message-id:date:content-transfer-encoding:content-id:mime-version
+         :comments:references:in-reply-to:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8uroOoCAtfmxQT5deF8n+fhiTw+i8ftXaHiQzj+Rsxw=;
+        b=pzBmFOX30gEwgSfFidLr6+QEKJSglPkF0r660jbcQPgNz6uX6TEMtoJEujWBhVjp+e
+         ayqRVYCr5xUmcQsjzYbEqsTY0q8uD5bTpnetzHhw6izUhBL87ua//x6aeKQbmhOIHVRe
+         WcF+crMpst0HEfatGhC3sNC/07F0IFmhfy15aa/WTCdKhbZnake/uE/RhDoKd1zlhDX7
+         0Kd1AABWUQsEmt0EgceeLftgMLK9/j80zl1VS0bu0uuNGNjVg8zG+oH5Fi98NLB6TZl7
+         myXKSRZEL3bXd0ZIadpylMxZAuXx+K8ZHG6lhiDKfxKuDxlOwPDzHAaHoSIRDx+TaTlX
+         0a4g==
+X-Forwarded-Encrypted: i=1; AJvYcCUbQf/t5gU9cxWxEtE2G6+5o3wcn0aCZvNmpy79nXaNziEp1YJvmm7PdS/uiAorXC/7ivAWRDxuFCK2t63XkbHMIQeBVUbk
+X-Gm-Message-State: AOJu0Yw3w+76W3jlPuIfyawcdBWdoKbnazt7VpE/MzheFyBWJWdWbWnc
+	eoq+Iv8D+XcTXgkugo/2StVnbJ+ul4ErfgLwmz3AH8YFPgZ0631bHnJrdsqbQuxxSydnfAFhRO5
+	dygpuBrFqNTLGSk9OhsOFafFikxie92xd3erHq5exebPg10muPy0yz3/AVSg7eiDUnLxyuw==
+X-Received: by 2002:aa7:9285:0:b0:704:209a:c59e with SMTP id d2e1a72fcca58-706745bc082mr12588828b3a.9.1719498252248;
+        Thu, 27 Jun 2024 07:24:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGiOyFsOOGRx9u+Kxb7M4p420zayOOdglD3iODiKtAPknXQ+j56nQL0TLrXYusjuYudwha5jQ==
+X-Received: by 2002:aa7:9285:0:b0:704:209a:c59e with SMTP id d2e1a72fcca58-706745bc082mr12588791b3a.9.1719498251644;
+        Thu, 27 Jun 2024 07:24:11 -0700 (PDT)
+Received: from famine.localdomain ([50.35.97.145])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-706b48ca829sm1405228b3a.43.2024.06.27.07.24.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 07:21:19 -0700 (PDT)
-Date: Thu, 27 Jun 2024 17:21:17 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Jose Abreu <Jose.Abreu@synopsys.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Sagar Cheluvegowda <quic_scheluve@quicinc.com>, Abhishek Chauhan <quic_abchauha@quicinc.com>, 
-	Andrew Halaney <ahalaney@redhat.com>, Jiawen Wu <jiawenwu@trustnetic.com>, 
-	Mengyuan Lou <mengyuanlou@net-swift.com>, Tomer Maimon <tmaimon77@gmail.com>, openbmc@lists.ozlabs.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 03/10] net: pcs: xpcs: Convert xpcs_id to
- dw_xpcs_desc
-Message-ID: <2iwe4r3lgx3peufwuzdjhpqdxlbupwant72smia3fir2u5va64@ofbylcmizolx>
-References: <20240627004142.8106-1-fancer.lancer@gmail.com>
- <20240627004142.8106-4-fancer.lancer@gmail.com>
- <15754e63-be47-4847-8b61-af7f8a818a3c@lunn.ch>
+        Thu, 27 Jun 2024 07:24:11 -0700 (PDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id CC1139FC98; Thu, 27 Jun 2024 07:24:10 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id CB2BC9FC97;
+	Thu, 27 Jun 2024 07:24:10 -0700 (PDT)
+From: Jay Vosburgh <jay.vosburgh@canonical.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+cc: Nikolay Aleksandrov <razor@blackwall.org>,
+    Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+    Andy Gospodarek <andy@greyhouse.net>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@resnulli.us>,
+    Amit Cohen <amcohen@nvidia.com>
+Subject: Re: [PATCHv3 net-next] bonding: 3ad: send ifinfo notify when mux
+ state changed
+In-reply-to: <Zn1mXRRINDQDrIKw@Laptop-X1>
+References: <20240626075156.2565966-1-liuhangbin@gmail.com>
+ <20240626145355.5db060ad@kernel.org> <1429621.1719446760@famine>
+ <Zn0iI3SPdRkmfnS1@Laptop-X1>
+ <7e0a0866-8e3c-4abd-8e4f-ac61cc04a69e@blackwall.org>
+ <Zn05dMVVlUmeypas@Laptop-X1>
+ <89249184-41ac-42f6-b5af-4a46f9b28247@blackwall.org>
+ <Zn1mXRRINDQDrIKw@Laptop-X1>
+Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
+   message dated "Thu, 27 Jun 2024 21:17:17 +0800."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <15754e63-be47-4847-8b61-af7f8a818a3c@lunn.ch>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1467747.1719498250.1@famine>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 27 Jun 2024 07:24:10 -0700
+Message-ID: <1467748.1719498250@famine>
 
-On Thu, Jun 27, 2024 at 03:10:18PM +0200, Andrew Lunn wrote:
-> > -	for (i = 0; i < ARRAY_SIZE(xpcs_id_list); i++) {
-> > -		const struct xpcs_id *entry = &xpcs_id_list[i];
-> > +	for (i = 0; i < ARRAY_SIZE(xpcs_desc_list); i++) {
-> > +		const struct dw_xpcs_desc *entry = &xpcs_desc_list[i];
-> >  
-> >  		if ((xpcs_id & entry->mask) != entry->id)
-> >  			continue;
-> >  
-> > -		xpcs->id = entry;
-> > +		xpcs->desc = entry;
-> 
-> Maybe rename entry to desc here?
+Hangbin Liu <liuhangbin@gmail.com> wrote:
 
-Curiously to note that originally I had the same idea in mind and even
-implemented it in the first v2 version. But then decided to preserve
-the original name to signify that the pointer is a temporary
-variable pointing to the desc list entry.
+>On Thu, Jun 27, 2024 at 01:33:10PM +0300, Nikolay Aleksandrov wrote:
+>> > Yes, but at least the admin could get the latest state. With the foll=
+owing
+>> > code the admin may not get the latest update if lock rtnl failed.
+>> > =
 
-Anyway I don't mind changing the name to desc especially seeing I need
-to resubmit the series anyway. Using the desc name here won't make
-thing less readable here, but will also provide a notion about the
-variable content.
+>> >         if (should_notify_rtnl && rtnl_trylock()) {
+>> >                 bond_slave_lacp_notify(bond);
+>> >                 rtnl_unlock();
+>> > 	}
+>> > =
 
-I'll change the name to "desc" in v4.
+>> Well, you mentioned administrators want to see the state changes, pleas=
+e
+>> better clarify the exact end goal. Note that technically may even not b=
+e
+>> the last state as the state change itself happens in parallel (differen=
+t
+>> locks) and any update could be delayed depending on rtnl availability
+>> and workqueue re-scheduling. But sure, they will get some update at som=
+e point. :)
+>
+>Ah.. Yes, that's a sad fact :(
 
-> 
-> Otherwise
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+	There are basically two paths that will change the LACP state
+that's passed up via netlink (the aggregator ID, and actor and partner
+oper port states): bond_3ad_state_machine_handler(), or incoming
+LACPDUs, which call into ad_rx_machine().  Administrative changes to the
+bond will do it too, like adding or removing interfaces, but those
+originate in user space and aren't happening asynchronously.
 
-Thanks.
+	If you want (almost) absolute reliability in communicating every
+state change for the state machine and LACPDU processing, I think you'd
+have to (a) create an object with the changed state, (b) queue it
+somewhere, then (c) call a workqueue event to process that queue out of
+line.
 
--Serge(y)
+>> It all depends on what are the requirements.
+>> =
 
-> 
->     Andrew
+>> An uglier but lockless alternative would be to poll the slave's sysfs o=
+per state,
+>> that doesn't require any locks and would be up-to-date.
+>
+>Hmm, that's a workaround, but the admin need to poll the state frequently=
+ as
+>they don't know when the state will change.
+>
+>Hi Jay, are you OK to add this sysfs in bonding?
+
+	I think what Nik is proposing is for your userspace to poll the
+/sys/class/net/${DEV}/operstate.
+
+	-J
+
+---
+	-Jay Vosburgh, jay.vosburgh@canonical.com
 
