@@ -1,149 +1,136 @@
-Return-Path: <netdev+bounces-107312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C3C891A8AF
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:09:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F4D891A8E8
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:15:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2439C286A97
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 14:09:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA4F7B26A3A
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 14:15:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B95195B18;
-	Thu, 27 Jun 2024 14:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46248195FCE;
+	Thu, 27 Jun 2024 14:12:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MlUyZpFP"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="lyIOkJ05"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A68195B04;
-	Thu, 27 Jun 2024 14:09:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC1A195F1A
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 14:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719497385; cv=none; b=lTZ/8LEoivk1bxpF5IFWx3piigc9gZTYGqeT5AJo/cQg37l1VFzYBhNpJwC7f+rsUVSMtzNjbErDw4+W8k25PwdPnjSUOmcoM1kGR7Z8oI4tN5HxNHXoG6GXp8s4i36j4TAUpKcOsFThDVTQHtihWmrZsWvlC3hE/pVUtc8X6Vg=
+	t=1719497556; cv=none; b=D4GGL0fyHO7U+xphpNr5rB0yx7MkbT1enpzRMHjFZJ82Bf0y8inf19O6c1ASwHLXCbfMsH23HpcEFNB4DSMStRN/B7u4uTAOZoX34d+0nPxslMOf3filRQwpSCGbqrGUswPsn/VjuXcjVMPMq14j7H3lgG+DC87r75I+fcsmebY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719497385; c=relaxed/simple;
-	bh=bf8xtcKWz2ekG6ZG9mxbefmEIFpXZW0+JgN9tcZmwwM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=paldOtX9qfZOLIWtnRqYF1pxI3azKILlUXN1Qa2RnHhb5pl7OYhVrzL5ZIfJ0w1ALDN6izjvSKolAypA8Bh/YZYI/4SJekBpWDKFZcxgN+1yREMcFd6aNU1Oa699NFG3/XNbS4VGeaCAxy5yR05pDJy0EcF/l2EXeDURn72Eb1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MlUyZpFP; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52cdc4d221eso6645674e87.3;
-        Thu, 27 Jun 2024 07:09:43 -0700 (PDT)
+	s=arc-20240116; t=1719497556; c=relaxed/simple;
+	bh=gY4Q4/1PM/RDP+0xWn2eRTcG6CNIwP755Og3YUmyLW0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qxmx/1ivOPX3CzExmUbkhiwouHYjS/q3rX4Wkbv0Q+uMfd9yWLb/vd5z2Jgb6OoISu7uainz8cHQEsvl+2e9ES2E0Hs0Iyq4x9yBj8vC/YPt3U8cN14wyPBk603mWkwhTISaMFsj7bmFBcxgooBoiwC3jfz59RmxFKiPHd1CATg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=lyIOkJ05; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2ec5779b423so59324861fa.0
+        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 07:12:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719497382; x=1720102182; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WxbdUF3igWgZnkX8ezz96rfrkEDeMV7VPqBBzmY6B/M=;
-        b=MlUyZpFPVTOVzHrDuvOjfnbg3cLmBRJ0gEkdM+MxN5zlD571JklivsGrRhBsjkDxIL
-         4UF+ihPs367R2yOTmUuRz+/f22NmfSUSlo8PZWEz7m00TIHUAfwLHw1nj40BCoxbs20N
-         OCotgGIzDMkRicXfo9YzL3SoqvTPaSerYTy3pqgMNDgF4awJWFRl4WLe73F4PbtxlNEZ
-         tMC/ifWbx2iPsyXfwllQovjwHIthorBD8rPkKIKaNztAz/jAA8GyIfvF2sWduXkLzA1w
-         aWS4EOGSMQIuVKJcxlfcKjO/9X3o1M6vT7z9VVpB9nL9DCs3p1xcTmy7zjAfG63c1D/A
-         GB/A==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1719497552; x=1720102352; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FTT90OGoRel9hOYp2EFf1nDcNSmQMtkxjpE0hZS59dE=;
+        b=lyIOkJ05HpWqkHilFHHWcCZq9LxZUF9ZYIPz3A2deRHccFVEwohIbD1Dw2Xxua/zQG
+         8+6zh9jERv4crY1Cx75Iqb0HCsox62t641sdE0DXDeKx5HvSZOO1pey//EXrFLeuIi2V
+         nYXxQBJwPYsLWqx25SDz5giEHnUquM6wkwiU5/vpP9/s37qXQ+72Jl/tvT9KpGZlgz1e
+         QpaazdssZAZm+zdYRQ0w44RSOp8dhgA09prK3DFKhE/YjVnvUXyRZtm2q1ZjNXN6lGSE
+         3CKpq0vVn7ZOgNE9KIrOX2JPhgEQLQSsQULXnzM3YBn0/zpSSjXkxH2rRDyNCmYSxTFE
+         mUSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719497382; x=1720102182;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WxbdUF3igWgZnkX8ezz96rfrkEDeMV7VPqBBzmY6B/M=;
-        b=SV67PJ08Ew+68I02f05I99qPTKnQM9cBQjbAyoYvcoBDOsTbqq9MbnVful0SzQ+6ll
-         ygspUiDGe8wT179h38Q834q7/jGQJdn4E6lMhEl5AY2KrvvqWyPfDodjH7bs22M2/xn2
-         hBNmyz204oKYk411TTY2Q9W+rq9ikIJ5d729kqJTRzjXWno38w8oX+gUD/iQB6B+hvwb
-         UxKN3x/UF3JIsgU4zxMAJcCPP3ISaGNwDrGD/sMC6FkwCOdPDtcnkPow1rqkM4s4R6VH
-         GhObRg2WKN6Num2M+XW0WW+rlWMHzyNR0dVcnB9/xwFxjQmOoDTOv01KbZpvnEKXsxRb
-         ovVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUrzzE/DZ66f0Z5DrI8NBg308AbgzZQ3pyq6KYsidcVtjfIReBtwlN/5RJqFUouGTQhOIkTEczfa1lAEkisF9a/7+XnVCNeNjSizTsYedHwBbc9FCSv5oUb/fWD8JIpwijVwc32Hh0QQkd81cIrHl5GUyvBdLA+O2PaEmYn8uGHkg==
-X-Gm-Message-State: AOJu0YzuXlB7KOkzrMPIkWDsGYmcMKOgUZbr2CaHCgvD93A/Rz17SdmV
-	IkXzMuhiKxEFHz5s2Nb11NWoHtz1Covc4lHsTP0GrBLXfY2jJ6Ra
-X-Google-Smtp-Source: AGHT+IGYnYpUx4D98KzvsoiC9IwR+Ky0CtunlggIok0VAdrIJJsUBpeuWypCrzdBCggYRccbsLhkLg==
-X-Received: by 2002:a05:6512:281:b0:52c:e10b:cb36 with SMTP id 2adb3069b0e04-52ce183add6mr8239966e87.33.1719497379045;
-        Thu, 27 Jun 2024 07:09:39 -0700 (PDT)
-Received: from mobilestation ([213.79.110.82])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e71329529sm215060e87.293.2024.06.27.07.09.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 07:09:38 -0700 (PDT)
-Date: Thu, 27 Jun 2024 17:09:36 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Jose Abreu <Jose.Abreu@synopsys.com>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Sagar Cheluvegowda <quic_scheluve@quicinc.com>, 
-	Abhishek Chauhan <quic_abchauha@quicinc.com>, Andrew Halaney <ahalaney@redhat.com>, 
-	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
-	Tomer Maimon <tmaimon77@gmail.com>, openbmc@lists.ozlabs.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 00/10] net: pcs: xpcs: Add memory-mapped
- device support
-Message-ID: <nct7rbh5w7nd4jneiqzwqpwv5gy6t7q2xobv74hqgilzpykzx5@v6l2aoh5fcaj>
-References: <20240627004142.8106-1-fancer.lancer@gmail.com>
- <20240627111034.nusgjux3lzf5s3bk@skbuf>
+        d=1e100.net; s=20230601; t=1719497552; x=1720102352;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FTT90OGoRel9hOYp2EFf1nDcNSmQMtkxjpE0hZS59dE=;
+        b=rRvHJwkpLhGyKAz8NZa1/iVHuthe+Gj6VhaIoIsDsYBZ3J4iQ3LPpXg6kZP4ifGr5T
+         Q39joM2fTIh49k3CkzlUkdVySEuxQ/wwd8XIT+h1sOpJBM2M6z5YI1TZWNn1Z6ihHGFz
+         SXkZ4tMnEQTyvIp53g0e2ZDHf0PUh7lIQRKqvQWvivo7/FttwDvhKs0Ta9oxOnB3/01m
+         687RECmWxej/2Qn9ut3qACpuGFKvwp95ygF9ITIwXrak6OyOEDjBvhJsrHzQ6osXCbDm
+         MIbLMuMgnbZn22ZHY550uLeTjXQpyiCoyqxa8VnWXsVEf2xPfkDicywvWNOB7NN6SoAR
+         mAiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUwiYvEWavyQSFzv5Z8XES3Qm5gulpV+NamSe+RkkNt2nwRPfUTfXKzkvkmLeX3nfB8SM6Wyw6NxUjKZJMa2ZW4bwMp8lmo
+X-Gm-Message-State: AOJu0YwSoFkC/Q2Kf5O3F6uHpv+7QvB6GUS90eUTQWjRk0oEULkfHbPx
+	CAz3dMmfAgsU+hqGETzf63uXmoxCSo7syh8zw1wgM+SPqkLQCsHXRGt8qs3LO9M=
+X-Google-Smtp-Source: AGHT+IHPBg2ombsm1Fu//cFjlqwhC2otnKH/tHQvSElvv3SrldkNfebTn9aQLa68ZDubk6Umw3eVag==
+X-Received: by 2002:a2e:9f10:0:b0:2eb:fc08:5d83 with SMTP id 38308e7fff4ca-2ec59389fffmr94063171fa.44.1719497552376;
+        Thu, 27 Jun 2024 07:12:32 -0700 (PDT)
+Received: from [192.168.0.245] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-584d278120esm920856a12.60.2024.06.27.07.12.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Jun 2024 07:12:31 -0700 (PDT)
+Message-ID: <d459d0a7-750a-4cd2-9c68-8031a55f9e9f@blackwall.org>
+Date: Thu, 27 Jun 2024 17:12:30 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240627111034.nusgjux3lzf5s3bk@skbuf>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv3 net-next] bonding: 3ad: send ifinfo notify when mux
+ state changed
+To: Hangbin Liu <liuhangbin@gmail.com>,
+ Jay Vosburgh <jay.vosburgh@canonical.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ Andy Gospodarek <andy@greyhouse.net>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
+ Jiri Pirko <jiri@resnulli.us>, Amit Cohen <amcohen@nvidia.com>
+References: <20240626075156.2565966-1-liuhangbin@gmail.com>
+ <20240626145355.5db060ad@kernel.org> <1429621.1719446760@famine>
+ <Zn0iI3SPdRkmfnS1@Laptop-X1>
+ <7e0a0866-8e3c-4abd-8e4f-ac61cc04a69e@blackwall.org>
+ <Zn05dMVVlUmeypas@Laptop-X1>
+ <89249184-41ac-42f6-b5af-4a46f9b28247@blackwall.org>
+ <Zn1mXRRINDQDrIKw@Laptop-X1>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <Zn1mXRRINDQDrIKw@Laptop-X1>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Vladimir
-
-On Thu, Jun 27, 2024 at 02:10:34PM +0300, Vladimir Oltean wrote:
-> Hi Sergey,
+On 27/06/2024 16:17, Hangbin Liu wrote:
+> On Thu, Jun 27, 2024 at 01:33:10PM +0300, Nikolay Aleksandrov wrote:
+>>> Yes, but at least the admin could get the latest state. With the following
+>>> code the admin may not get the latest update if lock rtnl failed.
+>>>
+>>>         if (should_notify_rtnl && rtnl_trylock()) {
+>>>                 bond_slave_lacp_notify(bond);
+>>>                 rtnl_unlock();
+>>> 	}
+>>>
+>> Well, you mentioned administrators want to see the state changes, please
+>> better clarify the exact end goal. Note that technically may even not be
+>> the last state as the state change itself happens in parallel (different
+>> locks) and any update could be delayed depending on rtnl availability
+>> and workqueue re-scheduling. But sure, they will get some update at some point. :)
 > 
-> This does not apply to net-next.
+> Ah.. Yes, that's a sad fact :(
+>>
+>> It all depends on what are the requirements.
+>>
+>> An uglier but lockless alternative would be to poll the slave's sysfs oper state,
+>> that doesn't require any locks and would be up-to-date.
 > 
-> Applying: net: pcs: xpcs: Move native device ID macro to linux/pcs/pcs-xpcs.h
-> Applying: net: pcs: xpcs: Split up xpcs_create() body to sub-functions
-> Applying: net: pcs: xpcs: Convert xpcs_id to dw_xpcs_desc
-> Applying: net: pcs: xpcs: Convert xpcs_compat to dw_xpcs_compat
-> Applying: net: pcs: xpcs: Introduce DW XPCS info structure
-> Applying: dt-bindings: net: Add Synopsys DW xPCS bindings
-> Applying: net: pcs: xpcs: Add Synopsys DW xPCS platform device driver
-> Applying: net: pcs: xpcs: Add fwnode-based descriptor creation method
-> Applying: net: stmmac: Create DW XPCS device with particular address
-> Using index info to reconstruct a base tree...
-> M       drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-> M       include/linux/stmmac.h
-> Checking patch drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c...
-> Checking patch drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c...
-> Checking patch include/linux/stmmac.h...
-> Applied patch drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c cleanly.
-> Applied patch drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c cleanly.
-> Applied patch include/linux/stmmac.h cleanly.
-> Falling back to patching base and 3-way merge...
-> error: Your local changes to the following files would be overwritten by merge:
->         drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
->         drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
->         include/linux/stmmac.h
-> Please commit your changes or stash them before you merge.
-> Aborting
-> error: Failed to merge in the changes.
-> Patch failed at 0009 net: stmmac: Create DW XPCS device with particular address
-> hint: Use 'git am --show-current-patch=diff' to see the failed patch
-
-Argg, right! I forgot to port the Russell' latest series introduced
-the select_pcs() callback. Sorry for the inconvenience.
-
-I'll get it merged in my repo (based on the kernel upstream tree with
-verious plat-specific fixes) and test it out again. Then I'll _make
-sure_ this time that the series is applicable onto the net-next tree
-before resubmitting.
-
-Thanks,
--Serge(y)
-
+> Hmm, that's a workaround, but the admin need to poll the state frequently as
+> they don't know when the state will change.
 > 
-> Thanks,
-> Vladimir
+
+Oh wait, that wasn't what I was proposing, I was thinking about the port's oper state
+which is already available via a sysfs attribute. Generally sysfs is getting deprecated.
+
+> Hi Jay, are you OK to add this sysfs in bonding?
+> 
+> Thanks
+> Hangbin
+
 
