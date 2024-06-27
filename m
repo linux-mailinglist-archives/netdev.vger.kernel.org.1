@@ -1,178 +1,143 @@
-Return-Path: <netdev+bounces-107123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10C1B919EEC
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 07:54:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4B3C919F1F
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 08:15:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1F87288944
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 05:53:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4434C1F22914
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 06:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948DE1CA80;
-	Thu, 27 Jun 2024 05:53:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F387C17E9;
+	Thu, 27 Jun 2024 06:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="PFw8359B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from esa4.hc1455-7.c3s2.iphmx.com (esa4.hc1455-7.c3s2.iphmx.com [68.232.139.117])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509A0DF6C;
-	Thu, 27 Jun 2024 05:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F61329CA;
+	Thu, 27 Jun 2024 06:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.139.117
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719467636; cv=none; b=km/qTYlVbWfYnS78sHFDnP1DJJFdy9xpxd96zrR4LBxJgLBdlYq9minXiAuvDD2Ho9wVDrEFj5HQF+k3Kg3FIPQX3dGYsgYGCwu2+V5Mj/iHA+bfY6UnHQi78hzX/k6icS3TozNLgFtrRJfl6V6K8RvmGkQnpGyTtATJQmxU/lQ=
+	t=1719468937; cv=none; b=u1qqMych1hpwVUm8axbmC8TxlQ0dEknqND23bchREhTnCXjIeEbaMy+wvAi/NCOUvqwTQyKmb8PNNwN0eWOk0U89vLcOGIrGBd9/+bXNEpL8izYQn6gr63mhg0eRRd0vOce5zd/i7+Njj7j/D+0Z2MDCC5QnSPxDCWjDFnZe66s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719467636; c=relaxed/simple;
-	bh=v/WfqwOYyq2ipsdhWA9LpnHqb7Jhjs1jMx/6Uf2sDMs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WDL49AIyzDwxG3X0vG9sa8g6miJ1JXjjojQPZZRXjlzvSpze3vkMaOd+lu83/1LgC8Sv6NtTXrJYlvhmAinZSnhffFJLF8Wi7i0xnyf92lz9A3fSce/QztmARANNqp65+LZhRhwSyzlz1NHb6xZaE5EcHOV43hKXrqCnqMYRjuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 9b58f78c344911ef9305a59a3cc225df-20240627
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.38,REQID:b6f8752e-fd46-4ff3-a961-6c2809699350,IP:10,
-	URL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACT
-	ION:release,TS:-10
-X-CID-INFO: VERSION:1.1.38,REQID:b6f8752e-fd46-4ff3-a961-6c2809699350,IP:10,UR
-	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-10
-X-CID-META: VersionHash:82c5f88,CLOUDID:e92dccc28fea7de07e513df65bb1b16e,BulkI
-	D:240627135344JB52DMCQ,BulkQuantity:0,Recheck:0,SF:38|24|17|19|44|66|102,T
-	C:nil,Content:0,EDM:-3,IP:-2,URL:1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil
-	,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 1,UOG
-X-CID-BAS: 1,UOG,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,
-	TF_CID_SPAM_ULS
-X-UUID: 9b58f78c344911ef9305a59a3cc225df-20240627
-Received: from node2.com.cn [(39.156.73.10)] by mailgw.kylinos.cn
-	(envelope-from <luyun@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 966187219; Thu, 27 Jun 2024 13:53:41 +0800
-Received: from node2.com.cn (localhost [127.0.0.1])
-	by node2.com.cn (NSMail) with SMTP id 4B45CB803C9B;
-	Thu, 27 Jun 2024 13:53:41 +0800 (CST)
-X-ns-mid: postfix-667CFE65-9822431
-Received: from localhost.localdomain (unknown [10.42.176.164])
-	by node2.com.cn (NSMail) with ESMTPA id 0203EB803C9B;
-	Thu, 27 Jun 2024 05:53:39 +0000 (UTC)
-From: Yun Lu <luyun@kylinos.cn>
-To: vinicius.gomes@intel.com,
-	jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us
+	s=arc-20240116; t=1719468937; c=relaxed/simple;
+	bh=GkpVVTFN0KHvpOhjp/AH8rx6djov7MXE27F7vwQ/2T0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=f4bItM9hdXDRz7eYswAMibyfEW0HbkK5+RwB7hbGlcVWbhlJVoa6OshB8yck8ofwkyGX2TGye+c9L0x/R1Pw++IHSS7WIAtXnX4YEvCtvAzLjWpL13+J/aVhNjFRSGyAMmSI+XPU6xxNrbmYvYgdmNbIoTKDzfN6/pt1TIMFO8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=PFw8359B; arc=none smtp.client-ip=68.232.139.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1719468935; x=1751004935;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GkpVVTFN0KHvpOhjp/AH8rx6djov7MXE27F7vwQ/2T0=;
+  b=PFw8359BjFVQva9MxDFMJZP3c6gUG7BUoia0GT2J0skuz6tUwzEjMLrt
+   rk3Gr02d/DdJWkFYiUmOelDIX4auilFXQX3LlmyBOSNnf0Mv4cTPslpdM
+   pig96wdtJNrGLbQY58b2IgXLLwQtVW7Wlvc5d4cS2PEu+QQXHr5WptVfz
+   a+d3760H4BaXNChbCZR1ol040HcuMRZf61UjPr5jp0z8CFN+cKGoLKN+4
+   aPDNOoZ+/OKUK+2rTMDDiBrS5aILvc2Ji0FPcVWBqkJlaVdbA86TCmOgP
+   K+RScqLEnbLveJDlfVxJYYkPEKfknNcGY3+IFqFqf9TFxufWnED+W3HH3
+   w==;
+X-IronPort-AV: E=McAfee;i="6700,10204,11115"; a="165205014"
+X-IronPort-AV: E=Sophos;i="6.08,269,1712588400"; 
+   d="scan'208";a="165205014"
+Received: from unknown (HELO yto-r4.gw.nic.fujitsu.com) ([218.44.52.220])
+  by esa4.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2024 15:15:30 +0900
+Received: from yto-m2.gw.nic.fujitsu.com (yto-nat-yto-m2.gw.nic.fujitsu.com [192.168.83.65])
+	by yto-r4.gw.nic.fujitsu.com (Postfix) with ESMTP id E510FC9442;
+	Thu, 27 Jun 2024 15:15:28 +0900 (JST)
+Received: from kws-ab3.gw.nic.fujitsu.com (kws-ab3.gw.nic.fujitsu.com [192.51.206.21])
+	by yto-m2.gw.nic.fujitsu.com (Postfix) with ESMTP id 2FC3AD5602;
+	Thu, 27 Jun 2024 15:15:28 +0900 (JST)
+Received: from edo.cn.fujitsu.com (edo.cn.fujitsu.com [10.167.33.5])
+	by kws-ab3.gw.nic.fujitsu.com (Postfix) with ESMTP id A8C802007FAEC;
+	Thu, 27 Jun 2024 15:15:27 +0900 (JST)
+Received: from G08FNSTD200033.g08.fujitsu.local (unknown [10.167.225.189])
+	by edo.cn.fujitsu.com (Postfix) with ESMTP id 5D87E1A0002;
+	Thu, 27 Jun 2024 14:15:26 +0800 (CST)
+From: Chen Hanxiao <chenhx.fnst@fujitsu.com>
+To: Simon Horman <horms@verge.net.au>,
+	Julian Anastasov <ja@ssi.bg>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: CPU stuck due to the taprio hrtimer
-Date: Thu, 27 Jun 2024 13:53:38 +0800
-Message-Id: <20240627055338.2186255-1-luyun@kylinos.cn>
-X-Mailer: git-send-email 2.34.1
+	lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org
+Subject: [PATCH net-next v2] ipvs: properly dereference pe in ip_vs_add_service
+Date: Thu, 27 Jun 2024 14:15:15 +0800
+Message-Id: <20240627061515.1477-1-chenhx.fnst@fujitsu.com>
+X-Mailer: git-send-email 2.37.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-TM-AS-Product-Ver: IMSS-9.1.0.1417-9.0.0.1002-28484.005
+X-TM-AS-User-Approved-Sender: Yes
+X-TMASE-Version: IMSS-9.1.0.1417-9.0.1002-28484.005
+X-TMASE-Result: 10--0.208100-10.000000
+X-TMASE-MatchedRID: 54gb2yeIOXRix5b+joOApO9kW9mxCQvtZUc2QJCkRg1YbPLopoBzQiqY
+	vVxU5zXACQeZdSWc34x8b0Yg8mgYgS/7QU2czuUNA9lly13c/gEXivwflisSrJB7/R12+PP70sE
+	wJ3QPiJrwiXCg8dzXRhU6KGPlAba7Ed0YyW6tLbmeAiCmPx4NwGmRqNBHmBveVDC1CbuJXmMqtq
+	5d3cxkNbh1ZUfF/lyHzTPTbrtCERSk2bGxMZx6asIEUg4xsgYsE5rIyKA4HUyM6tWPrlagCTIsc
+	l+iYsQoEbYpM9V5jAJwPsjIBEGzo/8jyjqYHnMRFcUQf3Yp/ridO0/GUi4gFb0fOPzpgdcEKeJ/
+	HkAZ8Is=
+X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
 
-Hello,
+Use pe directly to resolve sparse warning:
 
-When I run a taprio test program on the latest kernel(v6.10-rc4), CPU stu=
-ck
-is detected immediately, and the stack shows that CPU is stuck on taprio
-hrtimer.
+  net/netfilter/ipvs/ip_vs_ctl.c:1471:27: warning: dereference of noderef expression
 
-The reproducer program link:
-https://github.com/xyyluyun/taprio_test/blob/main/taprio_test.c
-gcc taprio_test.c -static -o taprio_test
-
-In this program, start the taprio hrtimer which clockid is set to REALTIM=
-E, and
-then adjust the system time by a significant value backwards. Thus, CPU w=
-ill enter
-an infinite loop in the__hrtimer_run_queues function, getting stuck and u=
-nable to
-exit or respond to any interrupts.
-
-I have tried to avoid this problem by apllying the following patch, and i=
-t does work.
-But I am not sure if this can be the final solution?
-
-Thanks.
-
-Signed-off-by: Yun Lu <luyun@kylinos.cn>
+Fixes: 39b972231536 ("ipvs: handle connections started by real-servers")
+Signed-off-by: Chen Hanxiao <chenhx.fnst@fujitsu.com>
 ---
- net/sched/sch_taprio.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+v2:
+	use pe directly.
 
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index a0d54b422186..2ff8d34bdbac 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -104,6 +104,7 @@ struct taprio_sched {
- 	u32 max_sdu[TC_MAX_QUEUE]; /* save info from the user */
- 	u32 fp[TC_QOPT_MAX_QUEUE]; /* only for dump and offloading */
- 	u32 txtime_delay;
-+	ktime_t offset;
- };
-=20
- struct __tc_taprio_qopt_offload {
-@@ -170,6 +171,19 @@ static ktime_t sched_base_time(const struct sched_ga=
-te_list *sched)
- 	return ns_to_ktime(sched->base_time);
- }
-=20
-+static ktime_t taprio_get_offset(const struct taprio_sched *q)
-+{
-+	enum tk_offsets tk_offset =3D READ_ONCE(q->tk_offset);
-+	ktime_t time =3D ktime_get();
+ net/netfilter/ipvs/ip_vs_ctl.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+index b6d0dcf3a5c3..f4384e147ee1 100644
+--- a/net/netfilter/ipvs/ip_vs_ctl.c
++++ b/net/netfilter/ipvs/ip_vs_ctl.c
+@@ -1459,18 +1459,18 @@ ip_vs_add_service(struct netns_ipvs *ipvs, struct ip_vs_service_user_kern *u,
+ 	if (ret < 0)
+ 		goto out_err;
+ 
+-	/* Bind the ct retriever */
+-	RCU_INIT_POINTER(svc->pe, pe);
+-	pe = NULL;
+-
+ 	/* Update the virtual service counters */
+ 	if (svc->port == FTPPORT)
+ 		atomic_inc(&ipvs->ftpsvc_counter);
+ 	else if (svc->port == 0)
+ 		atomic_inc(&ipvs->nullsvc_counter);
+-	if (svc->pe && svc->pe->conn_out)
++	if (pe && pe->conn_out)
+ 		atomic_inc(&ipvs->conn_out_counter);
+ 
++	/* Bind the ct retriever */
++	RCU_INIT_POINTER(svc->pe, pe);
++	pe = NULL;
 +
-+	switch (tk_offset) {
-+	case TK_OFFS_MAX:
-+		return 0;
-+	default:
-+		return ktime_sub_ns(ktime_mono_to_any(time, tk_offset), time);
-+	}
-+}
-+
- static ktime_t taprio_mono_to_any(const struct taprio_sched *q, ktime_t =
-mono)
- {
- 	/* This pairs with WRITE_ONCE() in taprio_parse_clockid() */
-@@ -918,6 +932,7 @@ static enum hrtimer_restart advance_sched(struct hrti=
-mer *timer)
- 	int num_tc =3D netdev_get_num_tc(dev);
- 	struct sched_entry *entry, *next;
- 	struct Qdisc *sch =3D q->root;
-+	ktime_t now_offset =3D taprio_get_offset(q);
- 	ktime_t end_time;
- 	int tc;
-=20
-@@ -957,6 +972,14 @@ static enum hrtimer_restart advance_sched(struct hrt=
-imer *timer)
- 	end_time =3D ktime_add_ns(entry->end_time, next->interval);
- 	end_time =3D min_t(ktime_t, end_time, oper->cycle_end_time);
-=20
-+	if (q->offset !=3D now_offset) {
-+		ktime_t diff =3D ktime_sub_ns(now_offset, q->offset);
-+
-+		end_time =3D ktime_add_ns(end_time, diff);
-+		oper->cycle_end_time =3D ktime_add_ns(oper->cycle_end_time, diff);
-+		q->offset =3D now_offset;
-+	}
-+
- 	for (tc =3D 0; tc < num_tc; tc++) {
- 		if (next->gate_duration[tc] =3D=3D oper->cycle_time)
- 			next->gate_close_time[tc] =3D KTIME_MAX;
-@@ -1210,6 +1233,7 @@ static int taprio_get_start_time(struct Qdisc *sch,
-=20
- 	base =3D sched_base_time(sched);
- 	now =3D taprio_get_time(q);
-+	q->offset =3D taprio_get_offset(q);
-=20
- 	if (ktime_after(base, now)) {
- 		*start =3D base;
---=20
-2.34.1
+ 	/* Count only IPv4 services for old get/setsockopt interface */
+ 	if (svc->af == AF_INET)
+ 		ipvs->num_services++;
+-- 
+2.39.1
 
 
