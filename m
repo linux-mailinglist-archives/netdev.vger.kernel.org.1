@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-107087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BCD7919BDA
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 02:42:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 823DB919BDE
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 02:42:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 486732858DD
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 00:42:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A70D91C21A8C
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 00:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A4717F3;
-	Thu, 27 Jun 2024 00:41:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7CE2139BC;
+	Thu, 27 Jun 2024 00:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mti3O/0Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NhayioMV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAAB617E9;
-	Thu, 27 Jun 2024 00:41:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019E85223;
+	Thu, 27 Jun 2024 00:41:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719448917; cv=none; b=bh1YQvqfXLEQvO+BGUhmfVaw8yLgIhdiM9gKBlkuOBRFkWOoz53IlPhEGZnc2IUcZrl2g1kIfBqvpxLMFmKG6511xBzAiw3jEVIv544lzdqgX3zBDpn6IlW9smopEGKyytboGDccTh0IynMLWRzZdD0LbQ/MC7xkQ5kGhthl5DU=
+	t=1719448920; cv=none; b=C6pEIGgFPtbVKiJ1yWvk9W6d4DpPeuslmn7nxQ4B+aiZx1+DBSmssEfVpC0JPnnxGI8nQqQvoL8/qjd6kgr7h/CH5YJxnc8UUzr2I5wws84wG6Fw/3Ff5enYJ5BsETuECidH9mQaT8bqWkoGmgzssjC/u/uVqtNCm1hHd7sl/vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719448917; c=relaxed/simple;
-	bh=UeoIv5cxMy9lZnYkcuTi017pQFkf0nu+pFv5sAP9gK0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ESyTJNqUoASlWwolzOYHGvDrnKWVN1zwqhXZdGVZ/zn5as0YBN4qJPvmqbp+lIbN5YCrh7q/dlmf72ofNyZ5HgGjqgDX9oQRT/WwivHy+uTKECle8TqJ1N2YGLIE5g3eWQPvHwcMAktgwjfbGVZGlocmzLyfBUkQO35XaT6UokA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mti3O/0Q; arc=none smtp.client-ip=209.85.167.47
+	s=arc-20240116; t=1719448920; c=relaxed/simple;
+	bh=HKd+U5CDCJq1sAkohvaBdQJfgDvEMWTiR6NKfKP+qm0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Kq+/L7/M/k2wZJaKbeELZ/NwJyV5GPynRrHRDkcvIYNxjIXGue3verN3MkUQHUY6kGBdv6XVh5G5rLkspEev3IPaBp1GMoHdPCVvdS1EbDMPKuYBistm9MUpePEtafbycV7FC3UXrePHvXNKKEoUVxLBiWjtU87/vXoOu3xMqKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NhayioMV; arc=none smtp.client-ip=209.85.167.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-52ce6c8db7bso5399267e87.1;
-        Wed, 26 Jun 2024 17:41:55 -0700 (PDT)
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-52ce9ba0cedso5078310e87.2;
+        Wed, 26 Jun 2024 17:41:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719448914; x=1720053714; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cydnFWaYJVUlpJ8yr8Y2k7ThI70ScRV7/WOcHm/pyg4=;
-        b=mti3O/0Q/LZ6hxKDVLPO8GputcWu9jg7ZTmgxvvRCpfBe7Oulm8HOSS0DnoxWfSpXk
-         kY2FzDIWqNSslQlU7Szz40QxfZWP4n6NoG/dhdbSoPbOuV46HXehQouRSltfV3L7dOCX
-         061W120k5l8hZW/f3B382XNwBc7NlvRXTxUgDqcaph81bbBjxjFvjdPgkwpzmafAFZOO
-         U3h/Zfc6eK+wMWhcf2OJB9C9EccmaZbULfV9gH/l6gyiLb6IGC5MRszwxC8e9rm7lxOQ
-         lZ34sQQkNBzxM5fXIhLr4TJzDxoLpEI+OeTSRig/Z3SL16lPvaPid8gS+GES5WFkympa
-         kYCQ==
+        d=gmail.com; s=20230601; t=1719448917; x=1720053717; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=riZO9gpWg+72DwRvoZciAprxyAK6Sq4iImVOkfuj2k8=;
+        b=NhayioMVp971nXJlU92dP6rTex0rYJnUQUQBKfKRI6juuI7bTQ0EWfedim41v9clmi
+         TBEomK8/qwEGORmphuz1AedLBX8xDYDCCk6iQItbxWCRbONYsdp3jhdXw4y8ZXdwsT+T
+         aNGMlmur3IFEIt9EsUOK00pqQZIKs0R0HHvVmmU7N3fwDxZCBK1PQfsZGtJBCDS+24sI
+         s5dKoD980oJrKdW27T7tZXVybugFHt99rV4Lx5bV+uesKXhDVXUmrhEXTgQN5orC+vRI
+         vW4yhcaRlGS1bF0qaZFU21SoP+GMubUnLASe/dDaoMYOyuAcrSmCZNSdoueRh0IBUTPY
+         WDaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719448914; x=1720053714;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cydnFWaYJVUlpJ8yr8Y2k7ThI70ScRV7/WOcHm/pyg4=;
-        b=TD36vy2nI3UpuD1tSfTkbKrKb6PuxzdamyoUS00rBFBXoFfhQN1+M3U+iuxNE/7c/Z
-         H/pRWfRhAbNLmOHQ78V/xmPJofB+ud0aDSNXm5oz9wOZa8X5jjQ94UyVl0Qd3CWZerxO
-         6HRYcLhIIPMfLA5LLN+YDfdAw+Z2BwpHNO5W6+3+W7NANrJhF2sHgJzYtkoOWBGOj0Ya
-         fPlh4NvQBt7QBYIsQvKIhsQxCX20pHBBNNiLqa4KQXU2UBMA3yvnVwF2Lzhxo+sAdeYF
-         xD533r6gm5NXX5Ez+TgkoFHmI/fUvr/9QZT9fYpHA2CuuC83xQKvZI0pOozxm1ljJ/eu
-         1Ung==
-X-Forwarded-Encrypted: i=1; AJvYcCU1AYFCfeBXdvPj8+uXZVgHBAr7TJM64htimAjlJO0qeRuaEpEAzjABvjUYcIaLnkcgMpy8Ot2UNRrHpm74VHMqKCoGzH+cnlzhZMyR6jNHu9j95xHdapIkr+nKrN3942uwAc0FuGoqNRcC1Qhg/JX7iA1tRydUinxESjZEqRzhpQ==
-X-Gm-Message-State: AOJu0Yz3W1maSEM863pHMXxEPP8zqc2oB2VtvMldTm234Lhz6eLr1zkz
-	e4/Qs8uJmeAcZzZo/ZAJDRJAqVYQ4Uaa9eo5vVIgP49w85WoNMtf
-X-Google-Smtp-Source: AGHT+IEFZ0bwY4iHo8MDnbVf3lRRljEk0x3nb0lemN/43jsWupl8gJ+Hu9176dWqSrktWngJzK/J2w==
-X-Received: by 2002:ac2:5e24:0:b0:52c:8aa6:4e9c with SMTP id 2adb3069b0e04-52ce1861509mr6701982e87.65.1719448911583;
-        Wed, 26 Jun 2024 17:41:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719448917; x=1720053717;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=riZO9gpWg+72DwRvoZciAprxyAK6Sq4iImVOkfuj2k8=;
+        b=pyqmwa2nmdtDC70GwT4647aFL9i34x+8rlnuNQJqm0BZvIp7RVZBJLPziqxxoS1nj0
+         JHAMzX42tTJYCiF+H8lU6fYSoKhdAhwMpRU7wMImdmvb+4FZiJix88XMLGmRjzs6QO56
+         wmWbPg39oe1X6nyDIrKUoL7hiVCClnkKYF6G/kX6vamYVAHPLbTa/zAcbCpMw2N2L/zI
+         z8q9FJj9JYBi5fmXNhODtutvL/sAfhxh1dbYbEtYTEbhztMqWupqX0hLgVi91Fl8rJaD
+         bYh6mE3bH/I0KhHiw4MYK3sJkBb/APzP7MgKoZ3fQE/7O8qaZvMrdFRFAy7aP2WHUCNq
+         yAPA==
+X-Forwarded-Encrypted: i=1; AJvYcCUPdm138sTiPqRunBHktRZZDUROxM9tNt/Ey7Zu2QNtcz2QJJY7gPgX0NlyRMYWnOpwU0aeuz0K000Un4KYRV0U+B57XLTuNvtdo8ExZ+/X+ExN8rUU03wzY6RPYGuHE98DivzRgtfNXMJE74+8/qyXVr1zCeCHZLsltbFuRqguLw==
+X-Gm-Message-State: AOJu0Yy6re1QGi3rnUMAheHPfnYVoS3My3YJDOI3O943f/2VavxWOfTr
+	eUbP1xL8tyk88Pune6OkctK9INHc/0mzzy4g3w/uWryTuIQ7GPXh
+X-Google-Smtp-Source: AGHT+IG9xWPw91sL+7geI8Yw5mhFbwzbfnCv10lu3eKdnkF87T5urspemd32cPB+C/RlkO+fzeL6Bw==
+X-Received: by 2002:a05:6512:39ca:b0:521:cc8a:46dd with SMTP id 2adb3069b0e04-52ce182bcd5mr11611361e87.11.1719448915879;
+        Wed, 26 Jun 2024 17:41:55 -0700 (PDT)
 Received: from localhost ([89.113.147.248])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7131c1f4sm18946e87.224.2024.06.26.17.41.50
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e712a7ba7sm20161e87.56.2024.06.26.17.41.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 17:41:51 -0700 (PDT)
+        Wed, 26 Jun 2024 17:41:55 -0700 (PDT)
 From: Serge Semin <fancer.lancer@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
@@ -77,12 +79,12 @@ To: Andrew Lunn <andrew@lunn.ch>,
 	Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Rob Herring <robh+dt@kernel.org>,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: Serge Semin <fancer.lancer@gmail.com>,
+	Conor Dooley <conor+dt@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Serge Semin <fancer.lancer@gmail.com>,
 	Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
 	Abhishek Chauhan <quic_abchauha@quicinc.com>,
 	Andrew Halaney <ahalaney@redhat.com>,
@@ -93,10 +95,12 @@ Cc: Serge Semin <fancer.lancer@gmail.com>,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 00/10] net: pcs: xpcs: Add memory-mapped device support
-Date: Thu, 27 Jun 2024 03:41:20 +0300
-Message-ID: <20240627004142.8106-1-fancer.lancer@gmail.com>
+Subject: [PATCH net-next v3 01/10] net: pcs: xpcs: Move native device ID macro to linux/pcs/pcs-xpcs.h
+Date: Thu, 27 Jun 2024 03:41:21 +0300
+Message-ID: <20240627004142.8106-2-fancer.lancer@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240627004142.8106-1-fancer.lancer@gmail.com>
+References: <20240627004142.8106-1-fancer.lancer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,144 +109,82 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The main goal of this series is to extend the DW XPCS device support in
-the kernel. Particularly the patchset adds a support of the DW XPCS
-device with the MCI/APB3 IO interface registered as a platform device. In
-order to have them utilized by the DW XPCS core the fwnode-based DW XPCS
-descriptor creation procedure has been introduced. Finally the STMMAC
-driver has been altered to support the DW XPCS passed via the 'pcs-handle'
-property.
+One of the next commits will alter the DW XPCS driver to support setting a
+custom device ID for the particular MDIO-device detected on the platform.
+The generic DW XPCS ID can be used as a custom ID as well in case if the
+DW XPCS-device was erroneously synthesized with no or some undefined ID.
+In addition to that having all supported DW XPCS device IDs defined in a
+single place will improve the code maintainability and readability.
 
-Note the series has been significantly re-developed since v1. So I even
-had to change the subject. Anyway I've done my best to take all the noted
-into account.
-
-The series traditionally starts with a set of the preparation patches.
-First one just moves the generic DW XPCS IDs macros from the internal
-header file to the external one where some other IDs also reside. Second
-patch splits up the xpcs_create() method to a set of the coherent
-sub-functions for the sake of the further easier updates and to have it
-looking less complicated. The goal of the next three patches is to extend
-the DW XPCS ID management code by defining a new dw_xpcs_info structure
-with both PCS and PMA IDs.
-
-The next two patches provide the DW XPCS device DT-bindings and the
-respective platform-device driver for the memory-mapped DW XPCS devices.
-Besides the later patch makes use of the introduced dw_xpcs_info structure
-to pre-define the DW XPCS IDs based on the platform-device compatible
-string. Thus if there is no way to auto-identify the XPCS device
-capabilities it can be done based on the custom device IDs passed via the
-MDIO-device platform data.
-
-Final DW XPCS driver change is about adding a new method of the DW XPCS
-descriptor creation. The xpcs_create_fwnode() function has been introduced
-with the same semantics as a similar method recently added to the Lynx PCS
-driver. It's supposed to be called with the fwnode pointing to the DW XPCS
-device node, for which the XPCS descriptor will be created.
-
-The series is terminated with two STMMAC driver patches. The former one
-simplifies the DW XPCS descriptor registration procedure by dropping the
-MDIO-bus scanning and creating the descriptor for the particular device
-address. The later patch alters the STMMAC PCS setup method so one would
-support the DW XPCS specified via the "pcs-handle" property.
-
-That's it for now. Thanks for review in advance. Any tests are very
-welcome. After this series is merged in, I'll submit another one which
-adds the generic 10GBase-R and 10GBase-X interfaces support to the STMMAC
-and DW XPCS driver with the proper CSRs re-initialization, PMA
-initialization and reference clock selection as it's described in the
-Synopsys DW XPCS HW manual.
-
-Link: https://lore.kernel.org/netdev/20231205103559.9605-1-fancer.lancer@gmail.com
-Changelog v2:
-- Drop the patches:
-  [PATCH net-next 01/16] net: pcs: xpcs: Drop sentinel entry from 2500basex ifaces list
-  [PATCH net-next 02/16] net: pcs: xpcs: Drop redundant workqueue.h include directive
-  [PATCH net-next 03/16] net: pcs: xpcs: Return EINVAL in the internal methods
-  [PATCH net-next 04/16] net: pcs: xpcs: Explicitly return error on caps validation
-  as ones have already been merged into the kernel repo:
-Link: https://lore.kernel.org/netdev/20240222175843.26919-1-fancer.lancer@gmail.com/
-- Drop the patches:
-  [PATCH net-next 14/16] net: stmmac: Pass netdev to XPCS setup function
-  [PATCH net-next 15/16] net: stmmac: Add dedicated XPCS cleanup method
-  as ones have already been merged into the kernel repo:
-Link: https://lore.kernel.org/netdev/20240513-rzn1-gmac1-v7-0-6acf58b5440d@bootlin.com/
-- Drop the patch:
-  [PATCH net-next 06/16] net: pcs: xpcs: Avoid creating dummy XPCS MDIO device
-  [PATCH net-next 09/16] net: mdio: Add Synopsys DW XPCS management interface support
-  [PATCH net-next 11/16] net: pcs: xpcs: Change xpcs_create_mdiodev() suffix to "byaddr"
-  [PATCH net-next 13/16] net: stmmac: intel: Register generic MDIO device
-  as no longer relevant.
-- Add new patches:
-  [PATCH net-next v2 03/10] net: pcs: xpcs: Convert xpcs_id to dw_xpcs_desc
-  [PATCH net-next v2 04/10] net: pcs: xpcs: Convert xpcs_compat to dw_xpcs_compat
-  [PATCH net-next v2 05/10] net: pcs: xpcs: Introduce DW XPCS info structure
-  [PATCH net-next v2 09/10] net: stmmac: Create DW XPCS device with particular address
-- Use the xpcs_create_fwnode() function name and semantics similar to the
-  Lynx PCS driver.
-- Add kdoc describing the DW XPCS registration functions.
-- Convert the memory-mapped DW XPCS device driver to being the
-  platform-device driver.
-- Convert the DW XPCS DT-bindings to defining both memory-mapped and MDIO
-  devices.
-- Drop inline'es from the methods statically defined in *.c. (@Maxime)
-- Preserve the strict refcount-ing pattern. (@Russell)
-
-Link: https://lore.kernel.org/netdev/20240602143636.5839-1-fancer.lancer@gmail.com/
-Changelov v3:
-- Implement the ordered clocks constraint. (@Rob)
-- Convert xpcs_plat_pm_ops to being defined as static. (@Simon)
-- Add the "@interface" argument kdoc to the xpcs_create_mdiodev()
-  function. (@Simon)
-- Fix the "@fwnode" argument name in the xpcs_create_fwnode() method kdoc.
-  (@Simon)
-- Move the return value descriptions to the "Return:" section of the
-  xpcs_create_mdiodev() and xpcs_create_fwnode() kdoc. (@Simon)
-- Drop stmmac_mdio_bus_data::has_xpcs flag and define the PCS-address
-  mask with particular XPCS address instead.
+Note while at it rename the macros to being shorter and looking alike to
+the already defined NXP XPCS ID macro.
 
 Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Cc: Abhishek Chauhan <quic_abchauha@quicinc.com>
-Cc: Andrew Halaney <ahalaney@redhat.com>
-Cc: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>
-Cc: Tomer Maimon <tmaimon77@gmail.com>
-Cc: openbmc@lists.ozlabs.org
-Cc: netdev@vger.kernel.org
-Cc: devicetree@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
 
-Serge Semin (10):
-  net: pcs: xpcs: Move native device ID macro to linux/pcs/pcs-xpcs.h
-  net: pcs: xpcs: Split up xpcs_create() body to sub-functions
-  net: pcs: xpcs: Convert xpcs_id to dw_xpcs_desc
-  net: pcs: xpcs: Convert xpcs_compat to dw_xpcs_compat
-  net: pcs: xpcs: Introduce DW XPCS info structure
-  dt-bindings: net: Add Synopsys DW xPCS bindings
-  net: pcs: xpcs: Add Synopsys DW xPCS platform device driver
-  net: pcs: xpcs: Add fwnode-based descriptor creation method
-  net: stmmac: Create DW XPCS device with particular address
-  net: stmmac: Add DW XPCS specified via "pcs-handle" support
+---
 
- .../bindings/net/pcs/snps,dw-xpcs.yaml        | 136 ++++++
- .../net/ethernet/stmicro/stmmac/dwmac-intel.c |   2 +-
- .../net/ethernet/stmicro/stmmac/stmmac_mdio.c |  32 +-
- drivers/net/pcs/Kconfig                       |   6 +-
- drivers/net/pcs/Makefile                      |   3 +-
- drivers/net/pcs/pcs-xpcs-plat.c               | 460 ++++++++++++++++++
- drivers/net/pcs/pcs-xpcs.c                    | 361 +++++++++-----
- drivers/net/pcs/pcs-xpcs.h                    |   7 +-
- include/linux/pcs/pcs-xpcs.h                  |  49 +-
- include/linux/stmmac.h                        |   2 +-
- 10 files changed, 910 insertions(+), 148 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/pcs/snps,dw-xpcs.yaml
- create mode 100644 drivers/net/pcs/pcs-xpcs-plat.c
+Changelog v2:
+- Alter the commit log so one would refer to the DW XPCS driver change and
+  would describe the change clearer. (@Russell)
+- s/sinle/single (@Vladimir)
+---
+ drivers/net/pcs/pcs-xpcs.c   | 8 ++++----
+ drivers/net/pcs/pcs-xpcs.h   | 3 ---
+ include/linux/pcs/pcs-xpcs.h | 2 ++
+ 3 files changed, 6 insertions(+), 7 deletions(-)
 
+diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+index 31525fe9c32e..99adbf15ab36 100644
+--- a/drivers/net/pcs/pcs-xpcs.c
++++ b/drivers/net/pcs/pcs-xpcs.c
+@@ -1343,16 +1343,16 @@ static const struct xpcs_compat nxp_sja1110_xpcs_compat[DW_XPCS_INTERFACE_MAX] =
+ 
+ static const struct xpcs_id xpcs_id_list[] = {
+ 	{
+-		.id = SYNOPSYS_XPCS_ID,
+-		.mask = SYNOPSYS_XPCS_MASK,
++		.id = DW_XPCS_ID,
++		.mask = DW_XPCS_ID_MASK,
+ 		.compat = synopsys_xpcs_compat,
+ 	}, {
+ 		.id = NXP_SJA1105_XPCS_ID,
+-		.mask = SYNOPSYS_XPCS_MASK,
++		.mask = DW_XPCS_ID_MASK,
+ 		.compat = nxp_sja1105_xpcs_compat,
+ 	}, {
+ 		.id = NXP_SJA1110_XPCS_ID,
+-		.mask = SYNOPSYS_XPCS_MASK,
++		.mask = DW_XPCS_ID_MASK,
+ 		.compat = nxp_sja1110_xpcs_compat,
+ 	},
+ };
+diff --git a/drivers/net/pcs/pcs-xpcs.h b/drivers/net/pcs/pcs-xpcs.h
+index 96c36b32ca99..369e9196f45a 100644
+--- a/drivers/net/pcs/pcs-xpcs.h
++++ b/drivers/net/pcs/pcs-xpcs.h
+@@ -6,9 +6,6 @@
+  * Author: Jose Abreu <Jose.Abreu@synopsys.com>
+  */
+ 
+-#define SYNOPSYS_XPCS_ID		0x7996ced0
+-#define SYNOPSYS_XPCS_MASK		0xffffffff
+-
+ /* Vendor regs access */
+ #define DW_VENDOR			BIT(15)
+ 
+diff --git a/include/linux/pcs/pcs-xpcs.h b/include/linux/pcs/pcs-xpcs.h
+index da3a6c30f6d2..8dfe90295f12 100644
+--- a/include/linux/pcs/pcs-xpcs.h
++++ b/include/linux/pcs/pcs-xpcs.h
+@@ -12,6 +12,8 @@
+ 
+ #define NXP_SJA1105_XPCS_ID		0x00000010
+ #define NXP_SJA1110_XPCS_ID		0x00000020
++#define DW_XPCS_ID			0x7996ced0
++#define DW_XPCS_ID_MASK			0xffffffff
+ 
+ /* AN mode */
+ #define DW_AN_C73			1
 -- 
 2.43.0
 
