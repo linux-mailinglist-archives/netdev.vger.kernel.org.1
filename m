@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-107275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1468591A759
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 15:09:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A53191A75A
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 15:09:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 949E21F212E2
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 13:09:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C419A281F5C
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 13:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F49C1891C9;
-	Thu, 27 Jun 2024 13:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D0218A935;
+	Thu, 27 Jun 2024 13:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="hNmGISyW"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="B1hWbh7v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BD01891DA
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 13:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6ED186E59
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 13:08:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719493694; cv=none; b=Ubjc59IKKM5z3xHftCu2b4bd8PVSGWCV4NuRrwIu4S7oe2QQ3IIZwyZf9C7crESpJdzrPBQvdaCLuXPR2UP/pbymYJPUh+vLFQqH8a4jxtaiZioq2EDn+iB45p6Hv7M+kTYdxb8SsH7hVE3WPo1nZbtP/APyAqJHHCxgekMzO3Q=
+	t=1719493695; cv=none; b=QHVDNK6b2Zy7FwD7/06haZYSZIT4F0uwzO+Fp0YUbjhy78mx+LnceVQMUycsfQVciRvC1MSsaRXPCWm1jaNItqKM+39djUwCwViSL/a+uDZ04y+7Iae3pIcFSd7gTgiUblhJDNVZOqHq5RxVTR3ZbyhuEWbTEtJqhsC6E1DzeoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719493694; c=relaxed/simple;
-	bh=GNiV/rPgh6Cwj8UFhF88bhyKF5Cj5+PqQupq3PajI6Q=;
+	s=arc-20240116; t=1719493695; c=relaxed/simple;
+	bh=dmJwUAiskJaEgrKTsduUNqhmmmSXjXa6w9WDtdlNohM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QAAkyk/h/8BeR48hrfOY50xmq7hAwFQfFn/fLyD6ImHm+eXCWDXJmbtJ+yK6ydyhhr2PrwvqbhAkwvjTSe93JaxQMGCL/rVQUKHciSXz5HRcrO7VxLa3AIkXA/fbiv43VAb5u8W516Q4lMoCfax8ORNi7W8/zV+ESpb6eUGa7X4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=hNmGISyW; arc=none smtp.client-ip=209.85.208.179
+	 MIME-Version; b=bB/p1wpLTugadvZDZd1Z5qdaysPUmaipqgdeJ8E0vEmWsE5UMuB5RAim9kiqbenSIBVh8ocSe5AikPYrzaMI521hJEMKIa5UkNmleQF0Zag++JDpF2VLyuUXi5doyEEDuCqJCWRQl6gYcBsj2Lbz0L1BE2A/RLZOzTXMrvEOfg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=B1hWbh7v; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2ebe0a81dc8so105605491fa.2
-        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 06:08:11 -0700 (PDT)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-362f62ae4c5so1085066f8f.1
+        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 06:08:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1719493690; x=1720098490; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1719493691; x=1720098491; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pd983Osk3B0nFZ6aKtZEUvwfSj9mgccJsi1JqruS6dM=;
-        b=hNmGISyWkThmxyfSgsUZqza3mGwTuK9DVJ7VNVtJEPUsypwmI44Jv1fZJPgn/ga9+U
-         dl3PFvwROPxOBwiaI2rM3wfHXJXYX6lw5zeUpVTilPrFySFMsIXG4gEPnvgKdGM+CgfM
-         k5VtXhyeQURZ99Is4giBl+RSYNtvaMthkX63D4iJ0mdcfs5JyMc9aYDgbTvy/XESORkO
-         +bI9FQ5nevo/Ngi+9K+yWbMG7sYyARsXoQp/tP/yKQRJHCcsQb83q9oNhLPUXByrBekW
-         r9PqGMRI+JR3SzhsbfnGyCnQe81VRRFzXV3BXTOs/wUuYFxHvJcEV19sX3QXQKcLHtor
-         QMAw==
+        bh=ZOvM5S3whYEL2igzp4f8omXKIS7wTl2TEf6lvFT6b2c=;
+        b=B1hWbh7vZxM+Pt0RKOWJiBVcmALCjuvUfiA97rvlP4fvpucyKUksB0MFwocINdQDfA
+         3XS+eAI1qiXi8vtiSCAagz6c6x52YDMrKSC+efWCkZ4xzokTulSFP4tjNVcyzQccuTgA
+         XZEX743P+zOBTuhtQuzaitUwvYAzWazUfzABL2z8kDenClGeajio2odcnSAuMYLnNbBm
+         cF3W7KvurcaEinn+oTrcwq4ZGlbEUDtiTfejUMkniVaMUgu5oOYTAd1x0MGlviUr/ENy
+         DvdRFJx9P+q+9E2VNv3ux5WV+dIkooBfrycwLhCo0Jt5EduUBfB6NGAfGeiqrBNeuu0C
+         GxPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719493690; x=1720098490;
+        d=1e100.net; s=20230601; t=1719493691; x=1720098491;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pd983Osk3B0nFZ6aKtZEUvwfSj9mgccJsi1JqruS6dM=;
-        b=IhaqL0Ndh+zuxd/j+PLWlfxj4f5eIhIjjZlAXXz1iI7gbOYIXiH/OlExtWt29LJYps
-         fH4mOQ3qxxBUVsl9lWTSHoHN7VI1M0nsV4QOpBLP2yv4zudOrrY7E35EbiN+LGg1vW5P
-         HtUIJvUqRxb/5jxEYdqmf3EdWH16AADe7M7p7F3Me6wA2haFTy4wwtcdriVOaDNIYnAJ
-         KPsG0tIizlwydjziyNtLhlfA9OzhwN/sfnK4Nocvwbzmbrg8Yk8HAQQvQPUYI6ByFYZx
-         p35ZWpxhyHvDelg7G4kFMDEgJyO3Ch0AzsJY2PjppsHFrlqNC5TPDnoStV8FDxCg8jT9
-         2SIg==
-X-Gm-Message-State: AOJu0YxMrcVQJ+rGeFORnJ5CKNT9060cplSekfuLunj8rRn8GtVw+mSF
-	Z56L8upLHg9T+AklEyP50arru3qKefSaI8g8SEhRHHcoN5cTV5DM9gc5ghAGPEIdIhcVrV9SPEh
-	P
-X-Google-Smtp-Source: AGHT+IFLFqQ2Aj+wFFzyaFHFPPUKFvBuNRD22Sps6+++1Ke963+q24V+Ei7nV7tCrVaFhLyLJzg6Nw==
-X-Received: by 2002:a05:651c:10c:b0:2ee:493f:d751 with SMTP id 38308e7fff4ca-2ee493fdd6dmr14869281fa.23.1719493687842;
-        Thu, 27 Jun 2024 06:08:07 -0700 (PDT)
+        bh=ZOvM5S3whYEL2igzp4f8omXKIS7wTl2TEf6lvFT6b2c=;
+        b=Ee0n8wJbp7Ok76DRNte50Z537/DmFpKkukiiqfbMRN+/GVViFasxfg+GhiQOLAblOw
+         CCfD1d925Xs0Y1BLytHABCPSTu50+FQoQ/5RZKDiPCaRGYXq/muDc91m9/U4U+BFhDiB
+         rdtywjmM2UNqAUGQja05RA3bGNqplvko39tbJB+zz6osABzO4oolvggdNdOpCuKtWToC
+         XJBnLDdDitHgJWt6xHDEWJMcT0TYydlRvM01VCgVC3hHUqYwxN7aZbqfOgeapCJMEepm
+         e9sgo53UJuNFk+nxnbOP/OSYSRmZWNJNx+ekr1PDt4CTQ09daL188dQgx6AZI/7fhgn8
+         GaBw==
+X-Gm-Message-State: AOJu0YwyOeW43SmsnVQfW96jnA2ipTL04YT5CPAUSXVbReF+HXobLbBJ
+	P/x2JpWXSGL/0wwJfWRPGbadixHUnV/338QM0GLrN5c5FQTxJXzYCUycnOb5I0p7TSbCl/0QDx+
+	M
+X-Google-Smtp-Source: AGHT+IEltD3b0PKacOCkD4RP6aIGihuXSG+HWZQBoXMJ1kWyhCb7NBPjwrTSH5gBs1Mvi0UsdEAepg==
+X-Received: by 2002:a5d:64e6:0:b0:366:ee84:6a77 with SMTP id ffacd0b85a97d-3674176ca43mr2320303f8f.3.1719493691186;
+        Thu, 27 Jun 2024 06:08:11 -0700 (PDT)
 Received: from serenity.mandelbit.com ([2001:67c:2fbc:0:2bde:13c8:7797:f38a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42564b6583asm26177475e9.15.2024.06.27.06.08.06
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42564b6583asm26177475e9.15.2024.06.27.06.08.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 06:08:07 -0700 (PDT)
+        Thu, 27 Jun 2024 06:08:10 -0700 (PDT)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -76,9 +76,9 @@ Cc: kuba@kernel.org,
 	andrew@lunn.ch,
 	sd@queasysnail.net,
 	Antonio Quartulli <antonio@openvpn.net>
-Subject: [PATCH net-next v5 15/25] ovpn: implement multi-peer support
-Date: Thu, 27 Jun 2024 15:08:33 +0200
-Message-ID: <20240627130843.21042-16-antonio@openvpn.net>
+Subject: [PATCH net-next v5 16/25] ovpn: implement peer lookup logic
+Date: Thu, 27 Jun 2024 15:08:34 +0200
+Message-ID: <20240627130843.21042-17-antonio@openvpn.net>
 X-Mailer: git-send-email 2.44.2
 In-Reply-To: <20240627130843.21042-1-antonio@openvpn.net>
 References: <20240627130843.21042-1-antonio@openvpn.net>
@@ -90,362 +90,431 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-With this change an ovpn instance will be able to stay connected to
-multiple remote endpoints.
+In a multi-peer scenario there are a number of situations when a
+specific peer needs to be looked up.
 
-This functionality is strictly required when running ovpn on an
-OpenVPN server.
+We may want to lookup a peer by:
+1. its ID
+2. its VPN destination IP
+3. its transport IP/port couple
+
+For each of the above, there is a specific routing table referencing all
+peers for fast look up.
+
+Case 2. is a bit special in the sense that an outgoing packet may not be
+sent to the peer VPN IP directly, but rather to a network behind it. For
+this reason we first perform a nexthop lookup in the system routing
+table and then we use the retrieved nexthop as peer search key.
 
 Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
 ---
- drivers/net/ovpn/main.c       |  41 ++++++++-
- drivers/net/ovpn/ovpnstruct.h |  16 ++++
- drivers/net/ovpn/peer.c       | 152 ++++++++++++++++++++++++++++++++++
- drivers/net/ovpn/peer.h       |   9 ++
- 4 files changed, 216 insertions(+), 2 deletions(-)
+ drivers/net/ovpn/peer.c | 299 ++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 274 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
-index 19f7c0ff679b..cefd7010ab37 100644
---- a/drivers/net/ovpn/main.c
-+++ b/drivers/net/ovpn/main.c
-@@ -46,6 +46,17 @@ static int ovpn_struct_init(struct net_device *dev, enum ovpn_mode mode)
- 	ovpn->mode = mode;
- 	spin_lock_init(&ovpn->lock);
- 
-+	if (mode == OVPN_MODE_MP) {
-+		/* the peer container is fairly large, therefore we dynamically
-+		 * allocate it only when needed
-+		 */
-+		ovpn->peers = kzalloc(sizeof(*ovpn->peers), GFP_KERNEL);
-+		if (!ovpn->peers)
-+			return -ENOMEM;
-+
-+		spin_lock_init(&ovpn->peers->lock);
-+	}
-+
- 	return 0;
- }
- 
-@@ -54,14 +65,34 @@ static void ovpn_struct_free(struct net_device *net)
- 	struct ovpn_struct *ovpn = netdev_priv(net);
- 
- 	gro_cells_destroy(&ovpn->gro_cells);
-+	kfree(ovpn->peers);
- 	rcu_barrier();
- }
- 
- static int ovpn_net_init(struct net_device *dev)
- {
- 	struct ovpn_struct *ovpn = netdev_priv(dev);
-+	int err = gro_cells_init(&ovpn->gro_cells, dev);
-+	struct in_device *dev_v4;
-+
-+	if (err)
-+		return err;
- 
--	return gro_cells_init(&ovpn->gro_cells, dev);
-+	if (ovpn->mode == OVPN_MODE_MP) {
-+		dev_v4 = __in_dev_get_rtnl(dev);
-+		if (dev_v4) {
-+			/* disable redirects as Linux gets confused by ovpn
-+			 * handling same-LAN routing.
-+			 * This happens because a multipeer interface is used as
-+			 * relay point between hosts in the same subnet, while
-+			 * in a classic LAN this would not be needed because the
-+			 * two hosts would be able to talk directly.
-+			 */
-+			IN_DEV_CONF_SET(dev_v4, SEND_REDIRECTS, false);
-+			IPV4_DEVCONF_ALL(dev_net(dev), SEND_REDIRECTS) = false;
-+		}
-+	}
-+	return 0;
- }
- 
- static int ovpn_net_open(struct net_device *dev)
-@@ -210,8 +241,14 @@ void ovpn_iface_destruct(struct ovpn_struct *ovpn)
- 
- 	ovpn->registered = false;
- 
--	if (ovpn->mode == OVPN_MODE_P2P)
-+	switch (ovpn->mode) {
-+	case OVPN_MODE_P2P:
- 		ovpn_peer_release_p2p(ovpn);
-+		break;
-+	default:
-+		ovpn_peers_free(ovpn);
-+		break;
-+	}
- }
- 
- static int ovpn_netdev_notifier_call(struct notifier_block *nb,
-diff --git a/drivers/net/ovpn/ovpnstruct.h b/drivers/net/ovpn/ovpnstruct.h
-index af39ee86f168..482e02b918e4 100644
---- a/drivers/net/ovpn/ovpnstruct.h
-+++ b/drivers/net/ovpn/ovpnstruct.h
-@@ -13,12 +13,27 @@
- #include <net/gro_cells.h>
- #include <uapi/linux/ovpn.h>
- 
-+/**
-+ * struct ovpn_peer_collection - container of peers for MultiPeer mode
-+ * @by_id: table of peers index by ID
-+ * @by_transp_addr: table of peers indexed by transport address
-+ * @by_vpn_addr: table of peers indexed by VPN IP address
-+ * @lock: protects writes to peers tables
-+ */
-+struct ovpn_peer_collection {
-+	DECLARE_HASHTABLE(by_id, 12);
-+	DECLARE_HASHTABLE(by_transp_addr, 12);
-+	DECLARE_HASHTABLE(by_vpn_addr, 12);
-+	spinlock_t lock; /* protects writes to peers tables */
-+};
-+
- /**
-  * struct ovpn_struct - per ovpn interface state
-  * @dev: the actual netdev representing the tunnel
-  * @registered: whether dev is still registered with netdev or not
-  * @mode: device operation mode (i.e. p2p, mp, ..)
-  * @lock: protect this object
-+ * @peers: data structures holding multi-peer references
-  * @peer: in P2P mode, this is the only remote peer
-  * @dev_list: entry for the module wide device list
-  * @gro_cells: pointer to the Generic Receive Offload cell
-@@ -28,6 +43,7 @@ struct ovpn_struct {
- 	bool registered;
- 	enum ovpn_mode mode;
- 	spinlock_t lock; /* protect writing to the ovpn_struct object */
-+	struct ovpn_peer_collection *peers;
- 	struct ovpn_peer __rcu *peer;
- 	struct list_head dev_list;
- 	struct gro_cells gro_cells;
 diff --git a/drivers/net/ovpn/peer.c b/drivers/net/ovpn/peer.c
-index f633b70bb140..2b5e2bbb2578 100644
+index 2b5e2bbb2578..8c23268db916 100644
 --- a/drivers/net/ovpn/peer.c
 +++ b/drivers/net/ovpn/peer.c
-@@ -9,6 +9,7 @@
- 
+@@ -10,6 +10,7 @@
  #include <linux/skbuff.h>
  #include <linux/list.h>
-+#include <linux/hashtable.h>
+ #include <linux/hashtable.h>
++#include <net/ip6_route.h>
  
  #include "ovpnstruct.h"
  #include "bind.h"
-@@ -311,6 +312,90 @@ bool ovpn_peer_check_by_src(struct ovpn_struct *ovpn, struct sk_buff *skb,
- 	return match;
+@@ -65,9 +66,6 @@ struct ovpn_peer *ovpn_peer_new(struct ovpn_struct *ovpn, u32 id)
+ 	return peer;
+ }
+ 
+-#define ovpn_peer_index(_tbl, _key, _key_len)		\
+-	(jhash(_key, _key_len, 0) % HASH_SIZE(_tbl))	\
+-
+ /**
+  * ovpn_peer_release - release peer private members
+  * @peer: the peer to release
+@@ -129,6 +127,91 @@ static bool ovpn_peer_skb_to_sockaddr(struct sk_buff *skb,
+ 	return true;
  }
  
 +/**
-+ * ovpn_peer_add_mp - add peer to related tables in a MP instance
-+ * @ovpn: the instance to add the peer to
-+ * @peer: the peer to add
++ * ovpn_nexthop_from_skb4 - retrieve IPv4 nexthop for outgoing skb
++ * @skb: the outgoing packet
 + *
-+ * Return: 0 on success or a negative error code otherwise
++ * Return: the IPv4 of the nexthop
 + */
-+static int ovpn_peer_add_mp(struct ovpn_struct *ovpn, struct ovpn_peer *peer)
++static __be32 ovpn_nexthop_from_skb4(struct sk_buff *skb)
 +{
-+	struct sockaddr_storage sa = { 0 };
-+	struct sockaddr_in6 *sa6;
-+	struct sockaddr_in *sa4;
-+	struct ovpn_bind *bind;
++	const struct rtable *rt = skb_rtable(skb);
++
++	if (rt && rt->rt_uses_gateway)
++		return rt->rt_gw4;
++
++	return ip_hdr(skb)->daddr;
++}
++
++/**
++ * ovpn_nexthop_from_skb6 - retrieve IPv6 nexthop for outgoing skb
++ * @skb: the outgoing packet
++ *
++ * Return: the IPv6 of the nexthop
++ */
++static struct in6_addr ovpn_nexthop_from_skb6(struct sk_buff *skb)
++{
++	const struct rt6_info *rt = skb_rt6_info(skb);
++
++	if (!rt || !(rt->rt6i_flags & RTF_GATEWAY))
++		return ipv6_hdr(skb)->daddr;
++
++	return rt->rt6i_gateway;
++}
++
++#define ovpn_get_hash_head(_tbl, _key, _key_len)		\
++	(&(_tbl)[jhash(_key, _key_len, 0) % HASH_SIZE(_tbl)])	\
++
++/**
++ * ovpn_peer_get_by_vpn_addr4 - retrieve peer by its VPN IPv4 address
++ * @ovpn: the openvpn instance to search
++ * @addr: VPN IPv4 to use as search key
++ *
++ * Refcounter is not increased for the returned peer.
++ *
++ * Return: the peer if found or NULL otherwise
++ */
++static struct ovpn_peer *ovpn_peer_get_by_vpn_addr4(struct ovpn_struct *ovpn,
++						    __be32 addr)
++{
++	struct hlist_head *head;
 +	struct ovpn_peer *tmp;
-+	size_t salen;
-+	int ret = 0;
-+	u32 index;
 +
-+	spin_lock_bh(&ovpn->peers->lock);
-+	/* do not add duplicates */
-+	tmp = ovpn_peer_get_by_id(ovpn, peer->id);
-+	if (tmp) {
-+		ovpn_peer_put(tmp);
-+		ret = -EEXIST;
-+		goto unlock;
-+	}
++	head = ovpn_get_hash_head(ovpn->peers->by_vpn_addr, &addr,
++				  sizeof(addr));
 +
-+	bind = rcu_dereference_protected(peer->bind, true);
-+	/* peers connected via TCP have bind == NULL */
-+	if (bind) {
-+		switch (bind->sa.in4.sin_family) {
-+		case AF_INET:
-+			sa4 = (struct sockaddr_in *)&sa;
++	hlist_for_each_entry_rcu(tmp, head, hash_entry_addr4)
++		if (addr == tmp->vpn_addrs.ipv4.s_addr)
++			return tmp;
 +
-+			sa4->sin_family = AF_INET;
-+			sa4->sin_addr.s_addr = bind->sa.in4.sin_addr.s_addr;
-+			sa4->sin_port = bind->sa.in4.sin_port;
-+			salen = sizeof(*sa4);
-+			break;
-+		case AF_INET6:
-+			sa6 = (struct sockaddr_in6 *)&sa;
++	return NULL;
++}
 +
-+			sa6->sin6_family = AF_INET6;
-+			sa6->sin6_addr = bind->sa.in6.sin6_addr;
-+			sa6->sin6_port = bind->sa.in6.sin6_port;
-+			salen = sizeof(*sa6);
-+			break;
-+		default:
-+			ret = -EPROTONOSUPPORT;
-+			goto unlock;
-+		}
++/**
++ * ovpn_peer_get_by_vpn_addr6 - retrieve peer by its VPN IPv6 address
++ * @ovpn: the openvpn instance to search
++ * @addr: VPN IPv6 to use as search key
++ *
++ * Refcounter is not increased for the returned peer.
++ *
++ * Return: the peer if found or NULL otherwise
++ */
++static struct ovpn_peer *ovpn_peer_get_by_vpn_addr6(struct ovpn_struct *ovpn,
++						    struct in6_addr *addr)
++{
++	struct hlist_head *head;
++	struct ovpn_peer *tmp;
 +
-+		index = ovpn_peer_index(ovpn->peers->by_transp_addr, &sa,
-+					salen);
-+		hlist_add_head_rcu(&peer->hash_entry_transp_addr,
-+				   &ovpn->peers->by_transp_addr[index]);
-+	}
++	head = ovpn_get_hash_head(ovpn->peers->by_vpn_addr, addr,
++				  sizeof(*addr));
 +
-+	index = ovpn_peer_index(ovpn->peers->by_id, &peer->id,
-+				sizeof(peer->id));
-+	hlist_add_head_rcu(&peer->hash_entry_id, &ovpn->peers->by_id[index]);
++	hlist_for_each_entry_rcu(tmp, head, hash_entry_addr6)
++		if (ipv6_addr_equal(addr, &tmp->vpn_addrs.ipv6))
++			return tmp;
 +
-+	if (peer->vpn_addrs.ipv4.s_addr != htonl(INADDR_ANY)) {
-+		index = ovpn_peer_index(ovpn->peers->by_vpn_addr,
-+					&peer->vpn_addrs.ipv4,
-+					sizeof(peer->vpn_addrs.ipv4));
-+		hlist_add_head_rcu(&peer->hash_entry_addr4,
-+				   &ovpn->peers->by_vpn_addr[index]);
-+	}
-+
-+	if (!ipv6_addr_any(&peer->vpn_addrs.ipv6)) {
-+		index = ovpn_peer_index(ovpn->peers->by_vpn_addr,
-+					&peer->vpn_addrs.ipv6,
-+					sizeof(peer->vpn_addrs.ipv6));
-+		hlist_add_head_rcu(&peer->hash_entry_addr6,
-+				   &ovpn->peers->by_vpn_addr[index]);
-+	}
-+
-+unlock:
-+	spin_unlock_bh(&ovpn->peers->lock);
-+
-+	return ret;
++	return NULL;
 +}
 +
  /**
-  * ovpn_peer_add_p2p - add peer to related tables in a P2P instance
-  * @ovpn: the instance to add the peer to
-@@ -351,6 +436,8 @@ static int ovpn_peer_add_p2p(struct ovpn_struct *ovpn, struct ovpn_peer *peer)
- int ovpn_peer_add(struct ovpn_struct *ovpn, struct ovpn_peer *peer)
- {
- 	switch (ovpn->mode) {
-+	case OVPN_MODE_MP:
-+		return ovpn_peer_add_mp(ovpn, peer);
- 	case OVPN_MODE_P2P:
- 		return ovpn_peer_add_p2p(ovpn, peer);
- 	default:
-@@ -358,6 +445,53 @@ int ovpn_peer_add(struct ovpn_struct *ovpn, struct ovpn_peer *peer)
- 	}
- }
- 
-+/**
-+ * ovpn_peer_unhash - remove peer reference from all hashtables
-+ * @peer: the peer to remove
-+ * @reason: the delete reason to attach to the peer
-+ */
-+static void ovpn_peer_unhash(struct ovpn_peer *peer,
-+			     enum ovpn_del_peer_reason reason)
-+{
-+	hlist_del_init_rcu(&peer->hash_entry_id);
-+	hlist_del_init_rcu(&peer->hash_entry_addr4);
-+	hlist_del_init_rcu(&peer->hash_entry_addr6);
-+	hlist_del_init_rcu(&peer->hash_entry_transp_addr);
-+
-+	ovpn_peer_put(peer);
-+	peer->delete_reason = reason;
-+}
-+
-+/**
-+ * ovpn_peer_del_mp - delete peer from related tables in a MP instance
-+ * @peer: the peer to delete
-+ * @reason: reason why the peer was deleted (sent to userspace)
-+ *
-+ * Return: 0 on success or a negative error code otherwise
-+ */
-+static int ovpn_peer_del_mp(struct ovpn_peer *peer,
-+			    enum ovpn_del_peer_reason reason)
-+{
-+	struct ovpn_peer *tmp;
-+	int ret = 0;
-+
-+	spin_lock_bh(&peer->ovpn->peers->lock);
-+	tmp = ovpn_peer_get_by_id(peer->ovpn, peer->id);
-+	if (tmp != peer) {
-+		ret = -ENOENT;
-+		goto unlock;
-+	}
-+	ovpn_peer_unhash(peer, reason);
-+
-+unlock:
-+	spin_unlock_bh(&peer->ovpn->peers->lock);
-+
-+	if (tmp)
-+		ovpn_peer_put(tmp);
-+
-+	return ret;
-+}
-+
- /**
-  * ovpn_peer_del_p2p - delete peer from related tables in a P2P instance
-  * @peer: the peer to delete
-@@ -415,9 +549,27 @@ void ovpn_peer_release_p2p(struct ovpn_struct *ovpn)
- int ovpn_peer_del(struct ovpn_peer *peer, enum ovpn_del_peer_reason reason)
- {
- 	switch (peer->ovpn->mode) {
-+	case OVPN_MODE_MP:
-+		return ovpn_peer_del_mp(peer, reason);
- 	case OVPN_MODE_P2P:
- 		return ovpn_peer_del_p2p(peer, reason);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
- }
-+
-+/**
-+ * ovpn_peers_free - free all peers in the instance
-+ * @ovpn: the instance whose peers should be released
-+ */
-+void ovpn_peers_free(struct ovpn_struct *ovpn)
-+{
-+	struct hlist_node *tmp;
-+	struct ovpn_peer *peer;
-+	int bkt;
-+
-+	spin_lock_bh(&ovpn->peers->lock);
-+	hash_for_each_safe(ovpn->peers->by_id, bkt, tmp, peer, hash_entry_id)
-+		ovpn_peer_unhash(peer, OVPN_DEL_PEER_REASON_TEARDOWN);
-+	spin_unlock_bh(&ovpn->peers->lock);
-+}
-diff --git a/drivers/net/ovpn/peer.h b/drivers/net/ovpn/peer.h
-index 86d4696b1529..6e92e09a3504 100644
---- a/drivers/net/ovpn/peer.h
-+++ b/drivers/net/ovpn/peer.h
-@@ -30,6 +30,10 @@
-  * @vpn_addrs: IP addresses assigned over the tunnel
-  * @vpn_addrs.ipv4: IPv4 assigned to peer on the tunnel
-  * @vpn_addrs.ipv6: IPv6 assigned to peer on the tunnel
-+ * @hash_entry_id: entry in the peer ID hashtable
-+ * @hash_entry_addr4: entry in the peer IPv4 hashtable
-+ * @hash_entry_addr6: entry in the peer IPv6 hashtable
-+ * @hash_entry_transp_addr: entry in the peer transport address hashtable
-  * @sock: the socket being used to talk to this peer
-  * @tcp: keeps track of TCP specific state
-  * @tcp.strp: stream parser context (TCP only)
-@@ -62,6 +66,10 @@ struct ovpn_peer {
- 		struct in_addr ipv4;
- 		struct in6_addr ipv6;
- 	} vpn_addrs;
-+	struct hlist_node hash_entry_id;
-+	struct hlist_node hash_entry_addr4;
-+	struct hlist_node hash_entry_addr6;
-+	struct hlist_node hash_entry_transp_addr;
- 	struct ovpn_socket *sock;
- 
- 	/* state of the TCP reading. Needed to keep track of how much of a
-@@ -126,6 +134,7 @@ struct ovpn_peer *ovpn_peer_new(struct ovpn_struct *ovpn, u32 id);
- int ovpn_peer_add(struct ovpn_struct *ovpn, struct ovpn_peer *peer);
- int ovpn_peer_del(struct ovpn_peer *peer, enum ovpn_del_peer_reason reason);
- void ovpn_peer_release_p2p(struct ovpn_struct *ovpn);
-+void ovpn_peers_free(struct ovpn_struct *ovpn);
- 
+  * ovpn_peer_transp_match - check if sockaddr and peer binding match
+  * @peer: the peer to get the binding from
+@@ -205,14 +288,42 @@ ovpn_peer_get_by_transp_addr_p2p(struct ovpn_struct *ovpn,
  struct ovpn_peer *ovpn_peer_get_by_transp_addr(struct ovpn_struct *ovpn,
- 					       struct sk_buff *skb);
+ 					       struct sk_buff *skb)
+ {
+-	struct ovpn_peer *peer = NULL;
++	struct ovpn_peer *tmp, *peer = NULL;
+ 	struct sockaddr_storage ss = { 0 };
++	struct hlist_head *head;
++	size_t sa_len;
+ 
+ 	if (unlikely(!ovpn_peer_skb_to_sockaddr(skb, &ss)))
+ 		return NULL;
+ 
+ 	if (ovpn->mode == OVPN_MODE_P2P)
+-		peer = ovpn_peer_get_by_transp_addr_p2p(ovpn, &ss);
++		return ovpn_peer_get_by_transp_addr_p2p(ovpn, &ss);
++
++	switch (ss.ss_family) {
++	case AF_INET:
++		sa_len = sizeof(struct sockaddr_in);
++		break;
++	case AF_INET6:
++		sa_len = sizeof(struct sockaddr_in6);
++		break;
++	default:
++		return NULL;
++	}
++
++	head = ovpn_get_hash_head(ovpn->peers->by_transp_addr, &ss, sa_len);
++
++	rcu_read_lock();
++	hlist_for_each_entry_rcu(tmp, head, hash_entry_transp_addr) {
++		if (!ovpn_peer_transp_match(tmp, &ss))
++			continue;
++
++		if (!ovpn_peer_hold(tmp))
++			continue;
++
++		peer = tmp;
++		break;
++	}
++	rcu_read_unlock();
+ 
+ 	return peer;
+ }
+@@ -247,10 +358,27 @@ static struct ovpn_peer *ovpn_peer_get_by_id_p2p(struct ovpn_struct *ovpn,
+  */
+ struct ovpn_peer *ovpn_peer_get_by_id(struct ovpn_struct *ovpn, u32 peer_id)
+ {
+-	struct ovpn_peer *peer = NULL;
++	struct ovpn_peer *tmp, *peer = NULL;
++	struct hlist_head *head;
+ 
+ 	if (ovpn->mode == OVPN_MODE_P2P)
+-		peer = ovpn_peer_get_by_id_p2p(ovpn, peer_id);
++		return ovpn_peer_get_by_id_p2p(ovpn, peer_id);
++
++	head = ovpn_get_hash_head(ovpn->peers->by_id, &peer_id,
++				  sizeof(peer_id));
++
++	rcu_read_lock();
++	hlist_for_each_entry_rcu(tmp, head, hash_entry_id) {
++		if (tmp->id != peer_id)
++			continue;
++
++		if (!ovpn_peer_hold(tmp))
++			continue;
++
++		peer = tmp;
++		break;
++	}
++	rcu_read_unlock();
+ 
+ 	return peer;
+ }
+@@ -272,6 +400,8 @@ struct ovpn_peer *ovpn_peer_get_by_dst(struct ovpn_struct *ovpn,
+ 				       struct sk_buff *skb)
+ {
+ 	struct ovpn_peer *peer = NULL;
++	struct in6_addr addr6;
++	__be32 addr4;
+ 
+ 	/* in P2P mode, no matter the destination, packets are always sent to
+ 	 * the single peer listening on the other side
+@@ -282,11 +412,109 @@ struct ovpn_peer *ovpn_peer_get_by_dst(struct ovpn_struct *ovpn,
+ 		if (unlikely(peer && !ovpn_peer_hold(peer)))
+ 			peer = NULL;
+ 		rcu_read_unlock();
++		return peer;
++	}
++
++	rcu_read_lock();
++	switch (skb_protocol_to_family(skb)) {
++	case AF_INET:
++		addr4 = ovpn_nexthop_from_skb4(skb);
++		peer = ovpn_peer_get_by_vpn_addr4(ovpn, addr4);
++		break;
++	case AF_INET6:
++		addr6 = ovpn_nexthop_from_skb6(skb);
++		peer = ovpn_peer_get_by_vpn_addr6(ovpn, &addr6);
++		break;
+ 	}
+ 
++	if (unlikely(peer && !ovpn_peer_hold(peer)))
++		peer = NULL;
++	rcu_read_unlock();
++
+ 	return peer;
+ }
+ 
++/**
++ * ovpn_nexthop_from_rt4 - look up the IPv4 nexthop for the given destination
++ * @ovpn: the private data representing the current VPN session
++ * @dest: the destination to be looked up
++ *
++ * Looks up in the IPv4 system routing table the IP of the nexthop to be used
++ * to reach the destination passed as argument. If no nexthop can be found, the
++ * destination itself is returned as it probably has to be used as nexthop.
++ *
++ * Return: the IP of the next hop if found or dest itself otherwise
++ */
++static __be32 ovpn_nexthop_from_rt4(struct ovpn_struct *ovpn, __be32 dest)
++{
++	struct rtable *rt;
++	struct flowi4 fl = {
++		.daddr = dest
++	};
++
++	rt = ip_route_output_flow(dev_net(ovpn->dev), &fl, NULL);
++	if (IS_ERR(rt)) {
++		net_dbg_ratelimited("%s: no route to host %pI4\n", __func__,
++				    &dest);
++		/* if we end up here this packet is probably going to be
++		 * thrown away later
++		 */
++		return dest;
++	}
++
++	if (!rt->rt_uses_gateway)
++		goto out;
++
++	dest = rt->rt_gw4;
++out:
++	ip_rt_put(rt);
++	return dest;
++}
++
++/**
++ * ovpn_nexthop_from_rt6 - look up the IPv6 nexthop for the given destination
++ * @ovpn: the private data representing the current VPN session
++ * @dest: the destination to be looked up
++ *
++ * Looks up in the IPv6 system routing table the IP of the nexthop to be used
++ * to reach the destination passed as argument. If no nexthop can be found, the
++ * destination itself is returned as it probably has to be used as nexthop.
++ *
++ * Return: the IP of the next hop if found or dest itself otherwise
++ */
++static struct in6_addr ovpn_nexthop_from_rt6(struct ovpn_struct *ovpn,
++					     struct in6_addr dest)
++{
++#if IS_ENABLED(CONFIG_IPV6)
++	struct dst_entry *entry;
++	struct rt6_info *rt;
++	struct flowi6 fl = {
++		.daddr = dest,
++	};
++
++	entry = ipv6_stub->ipv6_dst_lookup_flow(dev_net(ovpn->dev), NULL, &fl,
++						NULL);
++	if (IS_ERR(entry)) {
++		net_dbg_ratelimited("%s: no route to host %pI6c\n", __func__,
++				    &dest);
++		/* if we end up here this packet is probably going to be
++		 * thrown away later
++		 */
++		return dest;
++	}
++
++	rt = dst_rt6_info(entry);
++
++	if (!(rt->rt6i_flags & RTF_GATEWAY))
++		goto out;
++
++	dest = rt->rt6i_gateway;
++out:
++	dst_release((struct dst_entry *)rt);
++#endif
++	return dest;
++}
++
+ /**
+  * ovpn_peer_check_by_src - check that skb source is routed via peer
+  * @ovpn: the openvpn instance to search
+@@ -299,6 +527,8 @@ bool ovpn_peer_check_by_src(struct ovpn_struct *ovpn, struct sk_buff *skb,
+ 			    struct ovpn_peer *peer)
+ {
+ 	bool match = false;
++	struct in6_addr addr6;
++	__be32 addr4;
+ 
+ 	if (ovpn->mode == OVPN_MODE_P2P) {
+ 		/* in P2P mode, no matter the destination, packets are always
+@@ -307,6 +537,28 @@ bool ovpn_peer_check_by_src(struct ovpn_struct *ovpn, struct sk_buff *skb,
+ 		rcu_read_lock();
+ 		match = (peer == rcu_dereference(ovpn->peer));
+ 		rcu_read_unlock();
++		return match;
++	}
++
++	/* This function performs a reverse path check, therefore we now
++	 * lookup the nexthop we would use if we wanted to route a packet
++	 * to the source IP. If the nexthop matches the sender we know the
++	 * latter is valid and we allow the packet to come in
++	 */
++
++	switch (skb_protocol_to_family(skb)) {
++	case AF_INET:
++		addr4 = ovpn_nexthop_from_rt4(ovpn, ip_hdr(skb)->saddr);
++		rcu_read_lock();
++		match = (peer == ovpn_peer_get_by_vpn_addr4(ovpn, addr4));
++		rcu_read_unlock();
++		break;
++	case AF_INET6:
++		addr6 = ovpn_nexthop_from_rt6(ovpn, ipv6_hdr(skb)->saddr);
++		rcu_read_lock();
++		match = (peer == ovpn_peer_get_by_vpn_addr6(ovpn, &addr6));
++		rcu_read_unlock();
++		break;
+ 	}
+ 
+ 	return match;
+@@ -324,11 +576,11 @@ static int ovpn_peer_add_mp(struct ovpn_struct *ovpn, struct ovpn_peer *peer)
+ 	struct sockaddr_storage sa = { 0 };
+ 	struct sockaddr_in6 *sa6;
+ 	struct sockaddr_in *sa4;
++	struct hlist_head *head;
+ 	struct ovpn_bind *bind;
+ 	struct ovpn_peer *tmp;
+ 	size_t salen;
+ 	int ret = 0;
+-	u32 index;
+ 
+ 	spin_lock_bh(&ovpn->peers->lock);
+ 	/* do not add duplicates */
+@@ -364,30 +616,27 @@ static int ovpn_peer_add_mp(struct ovpn_struct *ovpn, struct ovpn_peer *peer)
+ 			goto unlock;
+ 		}
+ 
+-		index = ovpn_peer_index(ovpn->peers->by_transp_addr, &sa,
+-					salen);
+-		hlist_add_head_rcu(&peer->hash_entry_transp_addr,
+-				   &ovpn->peers->by_transp_addr[index]);
++		head = ovpn_get_hash_head(ovpn->peers->by_transp_addr, &sa,
++					  salen);
++		hlist_add_head_rcu(&peer->hash_entry_transp_addr, head);
+ 	}
+ 
+-	index = ovpn_peer_index(ovpn->peers->by_id, &peer->id,
+-				sizeof(peer->id));
+-	hlist_add_head_rcu(&peer->hash_entry_id, &ovpn->peers->by_id[index]);
++	hlist_add_head_rcu(&peer->hash_entry_id,
++			   ovpn_get_hash_head(ovpn->peers->by_id, &peer->id,
++					      sizeof(peer->id)));
+ 
+ 	if (peer->vpn_addrs.ipv4.s_addr != htonl(INADDR_ANY)) {
+-		index = ovpn_peer_index(ovpn->peers->by_vpn_addr,
+-					&peer->vpn_addrs.ipv4,
+-					sizeof(peer->vpn_addrs.ipv4));
+-		hlist_add_head_rcu(&peer->hash_entry_addr4,
+-				   &ovpn->peers->by_vpn_addr[index]);
++		head = ovpn_get_hash_head(ovpn->peers->by_vpn_addr,
++					  &peer->vpn_addrs.ipv4,
++					  sizeof(peer->vpn_addrs.ipv4));
++		hlist_add_head_rcu(&peer->hash_entry_addr4, head);
+ 	}
+ 
+ 	if (!ipv6_addr_any(&peer->vpn_addrs.ipv6)) {
+-		index = ovpn_peer_index(ovpn->peers->by_vpn_addr,
+-					&peer->vpn_addrs.ipv6,
+-					sizeof(peer->vpn_addrs.ipv6));
+-		hlist_add_head_rcu(&peer->hash_entry_addr6,
+-				   &ovpn->peers->by_vpn_addr[index]);
++		head = ovpn_get_hash_head(ovpn->peers->by_vpn_addr,
++					  &peer->vpn_addrs.ipv6,
++					  sizeof(peer->vpn_addrs.ipv6));
++		hlist_add_head_rcu(&peer->hash_entry_addr6, head);
+ 	}
+ 
+ unlock:
 -- 
 2.44.2
 
