@@ -1,187 +1,189 @@
-Return-Path: <netdev+bounces-107477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4098B91B257
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 00:43:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFCC891B25C
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 00:46:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9697BB21DCC
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 22:43:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E47A91F222F6
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 22:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2CD1A2573;
-	Thu, 27 Jun 2024 22:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEAB19B590;
+	Thu, 27 Jun 2024 22:46:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="m0Y14yge"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2086.outbound.protection.outlook.com [40.107.104.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA88A811FE;
-	Thu, 27 Jun 2024 22:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719528180; cv=none; b=juqqwkpvyuanz4g5ZHyJGjIRXRy2FQSSZ0aKdSl8sy3l/ch5bmsCS1nG9YbNpvw9HGb3CQf+6F91/LaAurtPsjTICfAXxmWAmAC6wMjdcW8ILy705G4zH2rJG0TQUnk1WONKy71OpKNUlTyo9iW7Zay4UBmVx1NmWj56h2dA7CI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719528180; c=relaxed/simple;
-	bh=jegK8+qk0NkM0+R20Z2W1+OFc/xAx0R0zsz5OSf1N2U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Svy+TFSxL25YkHt/1IVyZYuYZjLFT08/rofXyFV1K338oJJwKSLfRLJgBOeNoNOc0sq0SlEX65w5mL2tz1ABy9oW2+kio4VUUQ2carosU2v+c3B7J0cUjZln2m7pDcZZHM3j5/0iXKm1Rp5xv+vJccOiwpwRb2l3eUcYdlf8veU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sMxpJ-0000000089v-2ETT;
-	Thu, 27 Jun 2024 22:42:49 +0000
-Date: Thu, 27 Jun 2024 23:42:45 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362AF13FF9;
+	Thu, 27 Jun 2024 22:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.104.86
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719528388; cv=fail; b=GxJxKyuTPkg7YSBeIIWnpEj/HEFx/PrHAifM6JaiiJuY2dRa1qYJy5DJIdHcBf5Ajj5x5UMqtfKHC06GBFlJo7ALPyQZZy6sENv0iVLcoE/rzXYACX7s8ESfMYcs459StcdZhyNG4dcwo3lCj6ExO5RFv4ByJkRrlt4o/s1D4cQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719528388; c=relaxed/simple;
+	bh=XBK4Qm2bWpNLsHIoMAZhfmgodqIxhgQma2a0l/JfeTo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Cer2kl45NK8rrxxo1kR+oo0MqhrxYbTvicGKR6l1NNX7WxrK+S67kgwBh1XY7RQhlN2v5TB3ncyBRdQDpjHqIpMKACaVeoDF3H3hpPrpFtd7Ac4y2hvSWAkUui0p4r2/994Bt4WheulEGcqxymHb9ioMtsVmOSa/sBju5IRvOgU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=m0Y14yge; arc=fail smtp.client-ip=40.107.104.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ta7So362v0N3qJMSWJYWTVCuVM9zptiKbVTnVwOmM3k79oL6/HlVmqPBB4OYQllxVHl2KAqiaCxITDLND7tZsGDjB7LJ4puXrPAqEqvHPognFBarsO7dZEWsM4pXAIFPxBllpWG/3RKh9Kf3DDNt6Es88FSLPnknzyou860oAZlaSwSj2FeyW9S6wtS0DQ94GovV9ykVbCl8REKWJM0lMdIgdSHzQXU14MERFCO0TUlRov7Tqa1Y4kBCtfCwtUVNbriAWDhbrz8mJ6U98u0MuxiHEHqcPDriZJ1J3r2pHUaBBS0NM6Q3ve4knvzIngWZCvrsLuviD3UgriOMBeP+TA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OrdlN3pha+dh991iOk9EkAYGGZ1wNDxFTO4amcCrnVI=;
+ b=dl0GVrLGSwju3XMcBIGDq6WwqLT/IRLs94rk60a/Va7sq6oViZBpJjvtU3olKkq8RzSL0fKfpjfOHfy8wkqRH38wCuTeJNe15vmq9DPVASsty5WM5VxV5GhRLTZ11oRUK6WdQIaVVkSlETwDBCC/lHxf5bFtPhQkyyPFwVChbZLon73IXaWOO8L5UzB5e5hEjLViT22u8NusvQ0+B4SoTRh91Yo6pxCSmLxnz+/cdkct1kvIqAlSgSVp3wN2OCtjaR7U+f+ZEnDxWdB4cq+qMN1ocQ8znQNQ1637f45Egm8HNJHkIeAsPqO/YVWAGTjrvA4SC/pOxQgLgwsxlSsMew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OrdlN3pha+dh991iOk9EkAYGGZ1wNDxFTO4amcCrnVI=;
+ b=m0Y14yge1io5lFXsF8Nrgexk2sEee5dbAZvnB6iqg6oZR6IedwyPlmRiyvNicXn9Z4L4p4iJBClAtIcgCoHaeYqLp+3vAjMABpt4pyUV857LWs74++qI+STdfb3tKuarodRDPkX+erMfY+PCusTeB2GEpSeMoga1coCoUSBXwqc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DB7PR04MB4555.eurprd04.prod.outlook.com (2603:10a6:5:33::26) by
+ VI2PR04MB10145.eurprd04.prod.outlook.com (2603:10a6:800:22c::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.35; Thu, 27 Jun
+ 2024 22:46:24 +0000
+Received: from DB7PR04MB4555.eurprd04.prod.outlook.com
+ ([fe80::86ff:def:c14a:a72a]) by DB7PR04MB4555.eurprd04.prod.outlook.com
+ ([fe80::86ff:def:c14a:a72a%5]) with mapi id 15.20.7698.025; Thu, 27 Jun 2024
+ 22:46:23 +0000
+Date: Fri, 28 Jun 2024 01:46:20 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v2 net-next 3/3] net: phy: aquantia: add support for
- aqr115c
-Message-ID: <Zn3q5f5yWznMjAXd@makrotopia.org>
-References: <20240627113018.25083-1-brgl@bgdev.pl>
- <20240627113018.25083-4-brgl@bgdev.pl>
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	muhammad.husaini.zulkifli@intel.com
+Subject: Re: [PATCH net 1/1] igc: Fix double reset adapter triggered from a
+ single taprio cmd
+Message-ID: <20240627224620.brr6kivuotedzy65@skbuf>
+References: <20240625082656.2702440-1-faizal.abdul.rahim@linux.intel.com>
+ <106e0d31-c520-4ef6-994e-df1a4c9a986e@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <106e0d31-c520-4ef6-994e-df1a4c9a986e@linux.intel.com>
+X-ClientProxiedBy: BE1P281CA0058.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:23::14) To DB7PR04MB4555.eurprd04.prod.outlook.com
+ (2603:10a6:5:33::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240627113018.25083-4-brgl@bgdev.pl>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB7PR04MB4555:EE_|VI2PR04MB10145:EE_
+X-MS-Office365-Filtering-Correlation-Id: dc10800d-eeb0-4977-7f5b-08dc96faf88a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?KzTo6IOVUkJx8/h+ot+oAUb+/judWKyw9jRpbIekBYtApW4bXTclYX3RN8Z1?=
+ =?us-ascii?Q?GaV6eQycAvNxLUHI+p+C7aPcxQ5bZbH4AdbxFP+GfO0NCl2JjKqFnqiEPNxP?=
+ =?us-ascii?Q?x/0SCxODT+Bw5o95V0WstG/05vxr29aaBillDBcQopSgVocRfiVYLwJSqBYF?=
+ =?us-ascii?Q?idQ/ZjQWpn8JGJzFyNg0g+CXlJ9AQAMHq3wyKZmvGtgVT+zaLiYi6CkBf+SR?=
+ =?us-ascii?Q?W4TRmhAQfoiDqvTiyDpUSPxEHPVX8OLUHjIJsGgV5wuJbv4J7d5DvBvIfytE?=
+ =?us-ascii?Q?Qy0z8/KLDTi+bMLzlh5zLUIIpFvUZhi61GBWsQL/B51gYxLuLxM4JKRq9U3d?=
+ =?us-ascii?Q?If4zi/qtzPGyOhV9F2BZDK/HMFnK4sy1bNJARo1s4P2Mv5l1Al1PlQ606Yue?=
+ =?us-ascii?Q?BqXc/eOEpwRCX70AumKuqJ56x8wGsRDnxGNxQFiYrCa9dZ2SC0qEciSBBKrC?=
+ =?us-ascii?Q?JMpS9yXV6QfhoUq4cGidbygDyTwZGCCm/i/ANdAvG9gMgMgH+KCItpBmDJeV?=
+ =?us-ascii?Q?TZWVjqfchDc8ngbovj3W1xXy4h+4drVVXXHt/dLDWhz9Ua3PLRADqZl1mS6H?=
+ =?us-ascii?Q?HiG2T1nF7SbBCceDvwnwv1+U83hZRT5j++OJRPdhuaYekx8nRVSbpGIoe4XS?=
+ =?us-ascii?Q?agiM6iN43Wo/U44qQReetbByWifCIdlEoNx1GoulAbxzhLClFh9BRuPgB2eq?=
+ =?us-ascii?Q?D5duVqkRNF95Y0BXY4Eh3+NWi4JuqmtJNzqzCfE9CEgaTCdtkm+UzamECRqn?=
+ =?us-ascii?Q?8qw0G+L9Z7vq3U8FdgWzn7um85zFIqANroaTpd/hIDm+UN2UubJSVak6YauV?=
+ =?us-ascii?Q?4tSZAZyuHVR2+D18F97sGwLyfYQic6aMsygcmWcL25xHDD+RjlCFWXyzHBfL?=
+ =?us-ascii?Q?J8UxJt/dXSuAtkmRGat6Qx85F+sjLb0tA91htXRvyY3zNxpMvZdXH8WkcBh7?=
+ =?us-ascii?Q?mOnwn3w6H4+cetUgvHbLFi5MMxUr4JKQIGwpz5pnLL1pQaSQQW6RJ0Hj3h6d?=
+ =?us-ascii?Q?vFFu6BVzpT5ZoNjSwOrkAstpn6hSVUkwD3P3MQ3iLsf83hJuHE17WYTBRGIO?=
+ =?us-ascii?Q?NFlIpkGGmjn7NclEjk7zweOoF1BVLPfLgdG0K6n4IUsi2tINfGSVsDtArzFi?=
+ =?us-ascii?Q?EjsYgOYDX7bzpeG9b7QWqZRf8LN/hV1Izyd471bSk5SIeRZ72EzhtOKJx/KF?=
+ =?us-ascii?Q?2TFx1UPKpi93mYdV2nXycC3EW9zb+ei6sMLKVxx+AS3MHA4/bh2FiGmRruHm?=
+ =?us-ascii?Q?RZY4/slLiwqLTK7eUJ3YMPnLcIC3ikm3ag4y/BMqTnGbCdAFjQsK534C6vOf?=
+ =?us-ascii?Q?YzsKXoiCfMpu90OgkMcj+7gLxO9r/c7EIOYJX+WFkC8e0g=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR04MB4555.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?5iYW2uuG6aPBpK51FpT1GZYr3nVmF/y5NovX63zYNq3gaAt7+BsmYiJUvFbz?=
+ =?us-ascii?Q?g1hFv5mKv06nxpsKTB54rNw+APeBi7r2KkOzKyTQ6/fXqX/fM3/yEgKlj+sv?=
+ =?us-ascii?Q?o9APNYl5eDRK4vaDf/H3uBv6i8N2yuOPev6OUeDP7B16XX7T73NZ50oixR1o?=
+ =?us-ascii?Q?In92HHhnuxol6SQUyyivsGmV3F4SlmUK6m/fQS94si0Rl8wTu47qfcJJ9IPx?=
+ =?us-ascii?Q?s2icfDn2KYNAgq/hp/v7DoMgEQzKn9Bi3S3kZ0dyWcz4vWGYpAKEITDG/YJ8?=
+ =?us-ascii?Q?+KnX0f58xurYp9E5JVbpBbXOUA7GvY8MKVFGawKZDnG3xhff2/RDwUpezqm/?=
+ =?us-ascii?Q?gOoaFoVUnDIvgdAlKkewWYMc3UN8Y694aAeVMXG79LcRupnSnJVjJ40b7LTr?=
+ =?us-ascii?Q?Z4BbTsHfq/vIx/2+WJnmPa2zkMONoguF5hD6jcZOF9VCiqcm0ZScQwGTXF0p?=
+ =?us-ascii?Q?9NeBy8QdiOhu7B0s5ZwHxD7tFWY335kzNT8jMpx2j715tz3hCmjIamDWgC1s?=
+ =?us-ascii?Q?V/i/NIdEm36rUQC0+TJlQP1fHEX8XSZv664yaAp/TADuMniJW6hd2wAcMtYX?=
+ =?us-ascii?Q?LIzXfqhBarm3gGdUp6BakNfb/1S7P+ilL8z2URtSn9U8wWs7DLzQlrcrdOm8?=
+ =?us-ascii?Q?8GetfrzwwwnZw/ThhdQUsku/sYbB6ljFn+GFh65trahP5vdfAaaoweINVrbH?=
+ =?us-ascii?Q?IW0ZG8a6hxZn4QCMwhTQypHmbh7glxnYMnFtfE/UqmOo+tglmqBV6rrPJ0j+?=
+ =?us-ascii?Q?a2b4ogbdpA2HF6PZ7viOZqj/qHdmlAwZ4ioUAhrMNviNRqRM647oaWb7gY7Q?=
+ =?us-ascii?Q?wUyYF+WIa/YRN/tDyFPA5ew2qvukLeNW2uj13rySHJWgoXVVIV/JtHLFGxwr?=
+ =?us-ascii?Q?63QzRVL5n1qRmU906plUVlIh1sWRK2gnJco2IAvkqcFObkpgMlga/3Hf+L1B?=
+ =?us-ascii?Q?jCrRusPmh6X6V8a75V9bf12gHylINBbeaEOAeJnRH/wgV/m+brHINSNW+kmQ?=
+ =?us-ascii?Q?OBUjvFgEgqrXUkInXMZjI9oP0/9gtSkas6WCU7uXt5YlZAIdAi4gDjEKtzhe?=
+ =?us-ascii?Q?BMv9P1oiNmwiYyie+RYbJsbUwWgCBbWOZ4j2pqN6EvTSd9iWvNlVKyJ6jM6M?=
+ =?us-ascii?Q?3YVAhUF2WLO+3L4mOTcyKqe4HKUlbEBYKskbI6drUT3MWShVy4aLu/9dK2hY?=
+ =?us-ascii?Q?yh82EfyonUi7N0rjWOU9zhVkb+Dl3UjCKg4XU5osTmmr+U4X6DQXyBZg1jAV?=
+ =?us-ascii?Q?K0Dy4T5q7tLIfDnOAdBa0JvVPqtLT1uEvDBTjpSTrIjt0d45vyvs510fAvNZ?=
+ =?us-ascii?Q?PlL37ems+URvD6qu1zW8uIw9nTgo52aj8jOUGV/4DBI3jQb4E6i7dOvk/2zh?=
+ =?us-ascii?Q?W6sdKpmWwrhZV92//zOTD3INWmKLBOlZn3UWd/TuClj0ab2H4MGoaNnGN7wb?=
+ =?us-ascii?Q?dwr/wEJ0x+FOB9JhfOskh5ViTDSeBfQMBRlVoBbgWSO0xSVxJ7tsLPgcahvX?=
+ =?us-ascii?Q?W0jB3m3dgRXCLBfxqsqaZV3Bgd2cunyD0MuYu6t6AZ6xe6qaMY+2K6l/S1Hx?=
+ =?us-ascii?Q?r3rGAiFBfAwS5Ml3xRu9c0sc2V6Kwgp8spAcvmZSKvaa7NuKcaKw3tQ/i32T?=
+ =?us-ascii?Q?JA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dc10800d-eeb0-4977-7f5b-08dc96faf88a
+X-MS-Exchange-CrossTenant-AuthSource: DB7PR04MB4555.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2024 22:46:23.7122
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: y8B1y62eqW58vlrrjJ8dqJUTp5NsW9ZeAh4JSW7EOW4whkI3PNE3dD3sTACCnj9IfOQAm76iLxl8w46pcm+J9g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB10145
 
-Hi Bartosz,
-
-On Thu, Jun 27, 2024 at 01:30:17PM +0200, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Wed, Jun 26, 2024 at 09:19:12AM +0800, Abdul Rahim, Faizal wrote:
+> Added Vladimir and Husaini in CC.
 > 
-> Add support for a new model to the Aquantia driver. This PHY supports
-> Overlocked SGMII mode with 2.5G speeds.
+> On 25/6/2024 4:26 pm, Faizal Rahim wrote:
+> > Following the implementation of "igc: Add TransmissionOverrun counter"
+> > patch, when a taprio command is triggered by user, igc processes two
+> > commands: TAPRIO_CMD_REPLACE followed by TAPRIO_CMD_STATS. However, both
+> > commands unconditionally pass through igc_tsn_offload_apply() which
+> > evaluates and triggers reset adapter. The double reset causes issues in
+> > the calculation of adapter->qbv_count in igc.
+> > 
+> > TAPRIO_CMD_REPLACE command is expected to reset the adapter since it
+> > activates qbv. It's unexpected for TAPRIO_CMD_STATS to do the same
+> > because it doesn't configure any driver-specific TSN settings. So, the
+> > evaluation in igc_tsn_offload_apply() isn't needed for TAPRIO_CMD_STATS.
+> > 
+> > To address this, commands parsing are relocated to
+> > igc_tsn_enable_qbv_scheduling(). Commands that don't require an adapter
+> > reset will exit after processing, thus avoiding igc_tsn_offload_apply().
+> > 
+> > Fixes: d3750076d464 ("igc: Add TransmissionOverrun counter")
+> > Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+> > ---
 
-I don't think that there is such a thing as "Overclocked SGMII mode with
-2.5G speed".
+Thank you for the patch. The code organization is much more logical this way.
 
-Lets take a short look at Cisco SGMII, which is defined as a serialzed
-version of the Gigabit Media-Independent Interface. As such, it supports
-10M, 100M and 1000M speed. There is negotiation for speed, duplex,
-flow-control and link status (up/down).
-
-The data signals always operate at 1.25 Gbaud and the clocks operate at
-625 MHz (a DDR interface), and there is a 10:8 FEC coding applied,
-resulting in 1 Gbit/s usable bandwidth.
-
-For lower speeds lower than 1 Gbit/s each symbol is repeated 10x for
-100M and 100x for 10M.
-
-Now, assuming SGMII running at 2.5x the clock speed of actual Cisco
-SGMII would exist, how would that look like for lower speeds like 1000M,
-100M or 10M? Obviously you cannot repeat a symbol 2.5 times, which would
-make it impossible to support 1000M links with the same strategy used
-for lower speeds in regular SGMII.
-
-Hence I assume that what you meant to say here is that the PHY uses
-2500Base-X as interface mode and performs rate-adaptation for speeds
-less than 2500M (or half-duplex) using pause frames.
-
-This is also what e.g. AQR112 is doing, which I would assume is fairly
-similar to the newer AQR115.
-
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
->  drivers/net/phy/aquantia/aquantia_main.c | 39 +++++++++++++++++++++++-
->  1 file changed, 38 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
-> index 974795bd0860..98ccefd355d5 100644
-> --- a/drivers/net/phy/aquantia/aquantia_main.c
-> +++ b/drivers/net/phy/aquantia/aquantia_main.c
-> @@ -29,6 +29,7 @@
->  #define PHY_ID_AQR113	0x31c31c40
->  #define PHY_ID_AQR113C	0x31c31c12
->  #define PHY_ID_AQR114C	0x31c31c22
-> +#define PHY_ID_AQR115C	0x31c31c33
->  #define PHY_ID_AQR813	0x31c31cb2
->  
->  #define MDIO_PHYXS_VEND_IF_STATUS		0xe812
-> @@ -111,7 +112,6 @@ static u64 aqr107_get_stat(struct phy_device *phydev, int index)
->  	int len_h = stat->size - len_l;
->  	u64 ret;
->  	int val;
-> -
->  	val = phy_read_mmd(phydev, MDIO_MMD_C22EXT, stat->reg);
->  	if (val < 0)
->  		return U64_MAX;
-> @@ -721,6 +721,18 @@ static int aqr113c_config_init(struct phy_device *phydev)
->  	return aqr107_fill_interface_modes(phydev);
->  }
->  
-> +static int aqr115c_config_init(struct phy_device *phydev)
-> +{
-> +	/* Check that the PHY interface type is compatible */
-> +	if (phydev->interface != PHY_INTERFACE_MODE_SGMII &&
-> +	    phydev->interface != PHY_INTERFACE_MODE_2500BASEX)
-> +		return -ENODEV;
-> +
-> +	phy_set_max_speed(phydev, SPEED_2500);
-> +
-> +	return 0;
-> +}
-> +
->  static int aqr107_probe(struct phy_device *phydev)
->  {
->  	int ret;
-> @@ -999,6 +1011,30 @@ static struct phy_driver aqr_driver[] = {
->  	.led_hw_control_get = aqr_phy_led_hw_control_get,
->  	.led_polarity_set = aqr_phy_led_polarity_set,
->  },
-> +{
-> +	PHY_ID_MATCH_MODEL(PHY_ID_AQR115C),
-> +	.name           = "Aquantia AQR115C",
-> +	.probe          = aqr107_probe,
-> +	.get_rate_matching = aqr107_get_rate_matching,
-> +	.config_init    = aqr115c_config_init,
-> +	.config_aneg    = aqr_config_aneg,
-> +	.config_intr    = aqr_config_intr,
-> +	.handle_interrupt = aqr_handle_interrupt,
-> +	.read_status    = aqr107_read_status,
-> +	.get_tunable    = aqr107_get_tunable,
-> +	.set_tunable    = aqr107_set_tunable,
-> +	.suspend        = aqr107_suspend,
-> +	.resume         = aqr107_resume,
-> +	.get_sset_count = aqr107_get_sset_count,
-> +	.get_strings    = aqr107_get_strings,
-> +	.get_stats      = aqr107_get_stats,
-> +	.link_change_notify = aqr107_link_change_notify,
-> +	.led_brightness_set = aqr_phy_led_brightness_set,
-> +	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
-> +	.led_hw_control_set = aqr_phy_led_hw_control_set,
-> +	.led_hw_control_get = aqr_phy_led_hw_control_get,
-> +	.led_polarity_set = aqr_phy_led_polarity_set,
-> +},
->  {
->  	PHY_ID_MATCH_MODEL(PHY_ID_AQR813),
->  	.name		= "Aquantia AQR813",
-> @@ -1042,6 +1078,7 @@ static struct mdio_device_id __maybe_unused aqr_tbl[] = {
->  	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR113) },
->  	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR113C) },
->  	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR114C) },
-> +	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR115C) },
->  	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR813) },
->  	{ }
->  };
-> -- 
-> 2.43.0
-> 
-> 
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
