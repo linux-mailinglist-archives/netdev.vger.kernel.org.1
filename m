@@ -1,146 +1,180 @@
-Return-Path: <netdev+bounces-107135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A70A091A095
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 09:41:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC47591A09F
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 09:42:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E5B31F21BFB
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 07:41:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 482951F21E6A
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 07:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B12F656440;
-	Thu, 27 Jun 2024 07:40:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5081B6E61B;
+	Thu, 27 Jun 2024 07:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="BIC1aFC0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="opCS1+a2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820DA52F6F
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 07:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1898153364;
+	Thu, 27 Jun 2024 07:42:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719474055; cv=none; b=dJQi688ZImIE9QsJiuFzt26rtmQno9yMmSvs2fy/aS1Dj+NfoATa3bzOvFY0C62HYSMvyqj13/OoWb/sXELUYCiave2yedVDXsxQHxmAO5kkLbORRa+5LuNEEY/UNTOyNx0T86ssty5Iw+yr/iK6mi3dbGLMINOBtV9Nkifc1SQ=
+	t=1719474158; cv=none; b=WzhCDeHhjqCRVK4NysnYM3ElOkLXBXhWXJ8odeZDKEBII/BNCcLif5AZ1do/hG6TmS6lfenFLq/pCuldQMSH4dqOcexdRCwlQB19JqeISrJFMgL5sPyldSYldbkSdF++IOSaU8bRz1ZX/UBgBrdHcS4DHVk14AwihxbrSiFDIfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719474055; c=relaxed/simple;
-	bh=fWi95vLzhBSHmDDtMRbXtxf30DNoW53vGhyYuVrzqMo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=C+y8NIuleyoNkj4/Kjj8jeO9K7pdibA6Q1rTqbv/P0cAStiaJNs17yn7C7NmHJ8lljrENLkjr9itNpaewQatiXMMTOm8pxc51UcpEx/5ciVKmtFSYse7IP7wY1mOzJ+xfyLLCbAXp972+4urovuLHWFVFjo0fgc8lh0mjd6XmlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=BIC1aFC0; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a7252bfe773so517630766b.1
-        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 00:40:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1719474051; x=1720078851; darn=vger.kernel.org;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2hT4LmI/8tJjnOS+3rgKNA17YV3O1jshhzhEN4RaqWU=;
-        b=BIC1aFC0AnIN5qsjIpDg2zuK4+lzoTX0HAa/oJlbhHyVHwkH4IygbZdAHp9oQlirlK
-         j4ws2NO4uCg0BkRFCbGsS7X4BuijZ8uIzy2v0NPDTOZag/gV7JpPkld5L1GB8smksU4b
-         Xfq7zthesYjsO+yA08F8HECwfZWBbFm2t3ZBH5JT17f03Hxs2DKLEactzORjpjbTD4Zm
-         LhGuMVoEp7rV0fajtauAQqfRs83ca0vrUDdMhIDOQyV/IwYRD7CprBkG0YqN+BKR/N+L
-         rZIqHPQPBx9ZsGDbg3RV44tXvDY52ETI+5G09RKVFun1j7A+1/Fmz2AmmEkpR/SJENNR
-         Q2dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719474051; x=1720078851;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2hT4LmI/8tJjnOS+3rgKNA17YV3O1jshhzhEN4RaqWU=;
-        b=tOx3F4+eXntiAdjHLGNOk5FDhDRzMzsl88s5AjxIuybQtOhsWJ456pmSGZUG8rSqHx
-         LfTO8dV3ItKgkDrIvBIl4+o1ZMMJfM1zIUzGN5n7Jj4xuh9fqmS3ZnEvnpWEsJ/ivrsi
-         SAShzUpjae+gVNLU9qDL53vO5u7bCdluBVMtN5+EsbipUHNNgJgeJGXunjgVUa8JPkEF
-         miIg3IQRWnxnfAyIcShLRVDzEZLnOgOWQGylcrIggau12lar4BAogCHN5AGYe7wLoF8G
-         QpEfsBHYOOG3XbxDXwjjFVXBoICjSYKRR2oNld/IckFEDXEg5YVnO9GQE/GxvTeXf0is
-         2YlQ==
-X-Gm-Message-State: AOJu0Yyr8l/3Evje/L/JdU40Oull/lvBe01oI8MY0MbgeKNQVtThUoBn
-	XeOe4bcXjsoPwgYT7U+NpX6BBr5xHSDzHtXHYgTDeLGexw542t2gsYgRpYbYeJg=
-X-Google-Smtp-Source: AGHT+IGI8TG73XctrF2opGHfZrWfmfVMAAQxhW8CeCW7tqsWehdRASaQu23QBB/rR3HGrPERp08cxA==
-X-Received: by 2002:a17:906:9c93:b0:a72:6375:5fa7 with SMTP id a640c23a62f3a-a7263756132mr704259866b.64.1719474050883;
-        Thu, 27 Jun 2024 00:40:50 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:27])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a729d71f250sm33200066b.58.2024.06.27.00.40.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 00:40:50 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: netdev@vger.kernel.org,  bpf@vger.kernel.org,  davem@davemloft.net,
-  edumazet@google.com,  kuba@kernel.org,  pabeni@redhat.com,
-  john.fastabend@gmail.com,  kuniyu@amazon.com,  Rao.Shoaib@oracle.com,
-  Cong Wang <cong.wang@bytedance.com>
-Subject: Re: [PATCH bpf v2] af_unix: Disable MSG_OOB handling for sockets in
- sockmap/sockhash
-In-Reply-To: <2301f9fb-dab5-4db7-8e69-309e7c7186b7@rbox.co> (Michal Luczaj's
-	message of "Wed, 26 Jun 2024 12:19:01 +0200")
-References: <20240622223324.3337956-1-mhal@rbox.co>
-	<874j9ijuju.fsf@cloudflare.com>
-	<2301f9fb-dab5-4db7-8e69-309e7c7186b7@rbox.co>
-User-Agent: mu4e 1.12.4; emacs 29.1
-Date: Thu, 27 Jun 2024 09:40:48 +0200
-Message-ID: <87tthej0jj.fsf@cloudflare.com>
+	s=arc-20240116; t=1719474158; c=relaxed/simple;
+	bh=+6/2eiODOce3fiw5XiGEEaZr7L+CuCqnH8p7dDX7VA8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OM997M2ZAQNaIeHdIPn/16zvWzuvCEsl9rZaKy4wgmdQxJ0wKbhxjUfljIOZimotZVkK36QtwknBJ7Xbj2cZAGxtDGnkJD6OmvOf/IDx+Rrurt0u0uXXaZLMb/Fh0lZJa12wRkqPCUVhLRg1xNND56iyNmx1gmkLFk52k9qxbuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=opCS1+a2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65F42C4AF09;
+	Thu, 27 Jun 2024 07:42:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719474158;
+	bh=+6/2eiODOce3fiw5XiGEEaZr7L+CuCqnH8p7dDX7VA8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=opCS1+a2JVdpqvYfM7Z+r2tDEyViU982n3s9/OA+XP05WjM8GGP+ySvzgOwbG2/qS
+	 tKufkazc/J3RGw8hloKGATgasDNtTYkQ+d1BArS/J4GqKGTS1kjjxhpWbXv1CsYK6D
+	 H4D3gOhkTZrDSBQoYDdypyZ+nfgymi6BRBU/oAP/3xY9SqJ3r3eqxYHFPmQFC3CI0r
+	 wUMJCJM6TtOImjAxdjJSXGRreebOC1CImMeVAP35qu9afzesHPJsP3hWxSaQsngaN6
+	 UbUtJsSRO4GIX97ABaQzzuqE3Pxh4P4j07VU2S/Cy+HLN7a8p44xIx+oJ+gPJXT16k
+	 J0ReQOdEDb7FA==
+Message-ID: <bf87c34e-a4ff-4e03-9d6a-dc365fec06a5@kernel.org>
+Date: Thu, 27 Jun 2024 09:42:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V5 4/7] dt-bindings: clock: Add ipq9574 NSSCC clock and
+ reset definitions
+To: Devi Priya <quic_devipriy@quicinc.com>, Andrew Lunn <andrew@lunn.ch>
+Cc: catalin.marinas@arm.com, u-kumar1@ti.com,
+ linux-arm-kernel@lists.infradead.org, krzk+dt@kernel.org,
+ geert+renesas@glider.be, neil.armstrong@linaro.org, nfraprado@collabora.com,
+ mturquette@baylibre.com, linux-kernel@vger.kernel.org,
+ dmitry.baryshkov@linaro.org, netdev@vger.kernel.org,
+ konrad.dybcio@linaro.org, m.szyprowski@samsung.com, arnd@arndb.de,
+ richardcochran@gmail.com, will@kernel.org, sboyd@kernel.org,
+ andersson@kernel.org, p.zabel@pengutronix.de, linux-clk@vger.kernel.org,
+ devicetree@vger.kernel.org, conor+dt@kernel.org,
+ linux-arm-msm@vger.kernel.org
+References: <20240626143302.810632-1-quic_devipriy@quicinc.com>
+ <20240626143302.810632-5-quic_devipriy@quicinc.com>
+ <171941612020.3280624.794530163562164163.robh@kernel.org>
+ <eeea33c7-02bd-4ea4-a53f-fd6af839ca90@lunn.ch>
+ <4bf9dff9-3cb4-4276-8d21-697850e01170@quicinc.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <4bf9dff9-3cb4-4276-8d21-697850e01170@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 26, 2024 at 12:19 PM +02, Michal Luczaj wrote:
-> On 6/24/24 16:15, Jakub Sitnicki wrote:
->> On Sun, Jun 23, 2024 at 12:25 AM +02, Michal Luczaj wrote:
->>> AF_UNIX socket tracks the most recent OOB packet (in its receive queue)
->>> with an `oob_skb` pointer. BPF redirecting does not account for that: when
->>> an OOB packet is moved between sockets, `oob_skb` is left outdated. This
->>> results in a single skb that may be accessed from two different sockets.
+On 27/06/2024 07:25, Devi Priya wrote:
+> 
+> 
+> On 6/26/2024 10:56 PM, Andrew Lunn wrote:
+>> On Wed, Jun 26, 2024 at 09:35:20AM -0600, Rob Herring (Arm) wrote:
 >>>
->>> Take the easy way out: silently drop MSG_OOB data targeting any socket that
->>> is in a sockmap or a sockhash. Note that such silent drop is akin to the
->>> fate of redirected skb's scm_fp_list (SCM_RIGHTS, SCM_CREDENTIALS).
+>>> On Wed, 26 Jun 2024 20:02:59 +0530, Devi Priya wrote:
+>>>> Add NSSCC clock and reset definitions for ipq9574.
+>>>>
+>>>> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+>>>> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>>>> ---
+>>>>   Changes in V5:
+>>>> 	- Dropped interconnects and added interconnect-cells to NSS
+>>>> 	  clock provider so that it can be  used as icc provider.
+>>>>
+>>>>   .../bindings/clock/qcom,ipq9574-nsscc.yaml    |  74 +++++++++
+>>>>   .../dt-bindings/clock/qcom,ipq9574-nsscc.h    | 152 ++++++++++++++++++
+>>>>   .../dt-bindings/reset/qcom,ipq9574-nsscc.h    | 134 +++++++++++++++
+>>>>   3 files changed, 360 insertions(+)
+>>>>   create mode 100644 Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+>>>>   create mode 100644 include/dt-bindings/clock/qcom,ipq9574-nsscc.h
+>>>>   create mode 100644 include/dt-bindings/reset/qcom,ipq9574-nsscc.h
+>>>>
 >>>
->>> For symmetry, forbid MSG_OOB in unix_bpf_recvmsg().
+>>> My bot found errors running 'make dt_binding_check' on your patch:
 >>>
->>> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
->>> Fixes: 314001f0bf92 ("af_unix: Add OOB support")
->>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->>> ---
->> 
->> [+CC Cong who authored ->read_skb]
->> 
->> I'm guessing you have a test program that you're developing the fix
->> against. Would you like to extend the test case for sockmap redirect
->> from unix stream [1] to incorporate it?
->> 
->> Sadly unix_inet_redir_to_connected needs a fix first because it
->> hardcodes sotype to SOCK_DGRAM.
->
-> Ugh, my last two replies got silently dropped by vger. Is there any way to
-> tell what went wrong?
+>>> yamllint warnings/errors:
+>>>
+>>> dtschema/dtc warnings/errors:
+>>> Error: Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.example.dts:26.26-27 syntax error
+>>> FATAL ERROR: Unable to parse input tree
+>>
+>> Hi Devi
+>>
+>> Version 4 of these patches had the same exact problem. There was not
+>> an email explaining it is a false positive etc, so i have to assume it
+>> is a real error. So why has it not been fixed?
+>>
+>> Qualcomm patches are under a microscope at the moment because of how
+>> bad things went a couple of months ago with patches. You cannot ignore
+>> things like this, because the damage to Qualcomm reputation is going
+>> to make it impossible to get patches merged soon.
+>>
+> Hi Andrew,
+> Very sorry for the inconvenience.
+> I had run dt_binding_check locally on V4 patches and did not face any
+> errors. I somehow missed to notice the binding check error that was
+> reported on V4. Thus I went ahead and posted the same in V5.
+> Will ensure such things are not repeated henceforth.
 
-Not sure if it was vger or lore archive. Your reply hit my inbox but is
-nowhere to be found in the archive:
+If the warning is expected, e.g. due to missing patches, it's beneficial
+to mention this in the changelog (---). Otherwise all maintainers my
+ignore your patch because you have issues reported by automation.
 
-https://lore.kernel.org/r/4bac0a8a-eeaa-48ef-aeba-2a6e73c0b982@rbox.co
+Anyway, up to you.
 
-I think we can reach out to Konstantin Ryabitsev at
-konstantin@linuxfoundation.org. AFAIK he maintains the lore.kernel.org
-archive.
-
-> So, again, sure, I'll extend the sockmap redirect test.
-
-Appreciate the help with adding a regression test, if time allows.
-Fixes are of course very welcome even without them.
-
-> And regarding Rao's comment, I took a look and I think sockmap'ed TCP OOB
-> does indeed act the same way. I'll try to add that into selftest as well.n
-
-Right, it does sound like we're not clearing the offset kept in
-tcp_sock::urg_data when skb is redirected.
-
-
-
+Best regards,
+Krzysztof
 
 
