@@ -1,153 +1,138 @@
-Return-Path: <netdev+bounces-107397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 511BE91AD03
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 18:41:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28C2991AD27
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 18:49:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED9C31F2343B
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:41:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5DC8B23A93
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:49:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 465181993B1;
-	Thu, 27 Jun 2024 16:41:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6CAD1991A9;
+	Thu, 27 Jun 2024 16:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="B2pBpWEb"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="icXFnF0X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08071494A1
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 16:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E375E56A
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 16:49:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719506500; cv=none; b=P3b2FIPEsRvnooUvmIvD1gmZTLKoQtEImDczeEZfqDGXzSgFu9usb4r/F+8K0pj8UmZKwaSIdz3qcS5z5uL0//4VJZkGt82bmORbt5ESPcH30zka/nglPqDOOPYkrlBjYXmPsF0EKXoSd9q5VpBZVbh6XlZZXekf//vHmfJaR/Q=
+	t=1719506947; cv=none; b=msNeH6erd/6/iujB4vAiUeRVS0NpWksClBMwQzr1pD+JJW3JeqfqQQOadi+bRz37PJQ8hzShPH95ywrv6iKBMjBJ7f1cKy1IvNFL092eCwb5BT5wK1XRS2dcMWqhJNFp4dqOp2o6l9FgY5GcGNpxU7b5GLQi/DK4O7w+mtbRRLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719506500; c=relaxed/simple;
-	bh=u0CA2mnK5GIS2TbTnpjqwa5m9KRjDNpknWvMk92qW2k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nnLM1qhmie7buAEKVTKSWqANiiW9/9CV/KvaSDZjF8rOSpHN7hztUrzog6YxcgsOcBatV4FHmT21kLsHUhTIda/ehjIihuD1QNeACj1a6Q2+nFe0bz2o8KHRvwT7W+l/EWQSbHRZE5wM5SXHxrvG2NGoylVaNSvOmWKzJ7Y0xNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=B2pBpWEb; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-79c06a06a8eso184992385a.0
-        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 09:41:38 -0700 (PDT)
+	s=arc-20240116; t=1719506947; c=relaxed/simple;
+	bh=c/4fRIUAemDzS10rHlCgLgOeocikZUevNTeZx2WBQIY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GDc5aH9gJvq0byHlc1Nc9zV3biomiHHmp9xW+ruZweRGjiJHjNlDESlKW7LcS869ANCV/Xc1NO71q6lkDYOkE+Be1CzOH7p+s9gVeSzvny3PqUefiwCJRP7i0HwYcYdmwTuB91llmTJWo+LIn+pUS5Korilsp9OvtO0Ol57fcno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=icXFnF0X; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7041053c0fdso4966160b3a.3
+        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 09:49:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1719506497; x=1720111297; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6+1i7NWNKVTSjYDCvQQ69OikYKqZtAzAKVkT15CSvLQ=;
-        b=B2pBpWEbJ6HkRMvAQZPZ12Hd5pBa5jXYHw3MctRQFqxgEXHNuRTgq6axVAaxvKvdex
-         QvuVJYMWGx0Dw+X/8cQGeYO8v108O8Xq/3jm6g//Irz1DRQLaJj1vfEIBqeuRm6UHiHp
-         U5Odzvk27ti+Q10UJ1ymzB+MTauMHMaJbZfyE=
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1719506945; x=1720111745; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xxcFEOlgMZdT3jwSPBKvbM2Hel/+xTILb1M8DFKl18Y=;
+        b=icXFnF0XlfKUfiIZ/77bLs1A3mXy6ePVUmXg12nm7iyhegg3eaUYMQrRzMeNFYSCiV
+         cBFQT39vLeCEZ87AkDiE5osHoixilxUyya7iFfh0fRE+trmHKp3ZG5YpG/sOG7BGZxSS
+         K8FYkC3F+cPwOqYVvHyCTQ80NSK47YsND442ERHkNxEsNYdBxrE40o+cT5wZFGSxw/xo
+         KLUY6eEa1EJl3gJ4WmfgbsWoyt3F3AmocCwLdsQ3VISzaxZ76fSwYRWTObHmrnXhxkuW
+         3pu8yEm516lxU5V1HE7Z7b3nYO4k66kQMLICbuUdNxn7SSQZUQ0H8SnlzagkhhwQnbbL
+         Vrog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719506497; x=1720111297;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6+1i7NWNKVTSjYDCvQQ69OikYKqZtAzAKVkT15CSvLQ=;
-        b=WzAxHohh/IWog+xIX5APfcRylavUy0f52LOECo+ifuBn5Bc/lBgxlGsieuu62LqYYu
-         UtNYOMpDYeatfeMvnsvbzpNdn2I3l3y9s2unRt6a0QO9FbMd1IcLhOcVu1b8qFvWgMXd
-         vyIr0bleQ+UAC3cHYi9OgO5otFmftZlAVbV0EOy6OJHXGg8JPyHZ0yzoVaRsK4kSWrR/
-         FmunQm9sN67Igb4y88kGcm+SErUA17SIyxR7xOZioIDuC8qSMHzobYxaCU8FhWStqyqH
-         DVHZqMdqtd/wHBgNX2FTy9GX114/d/UIcwFwaehBTztowKp2of1VDxxntQC0cbNf2SdM
-         sP2A==
-X-Forwarded-Encrypted: i=1; AJvYcCW3S9G8SDNfaRNVn4TBe3oTH//1jw+OYKc8p3kAtgsUIKTzALcLYeu98Wtv8g+sif0ZklhJCHRaApVskOAJpI9/2dKja70M
-X-Gm-Message-State: AOJu0YzK6VCNIKo8slnOYT23nuhdpfYThIMGulDTErCSNmd3Mhx2bzh3
-	n0ITxWk9GJXPLnZNO5cCuf/nU2kup/lAbAIKzfufFr0yaqlmWOtdeK1jRyFGTTc=
-X-Google-Smtp-Source: AGHT+IEeTnN8ngM5bC7gmArgUEvjJbKIkAR2vmS7pI72qKpgM/ZQgCxZTMR+iGrWbz4yDAn+bW1Ldw==
-X-Received: by 2002:a05:620a:2984:b0:79b:e70f:3935 with SMTP id af79cd13be357-79be70f3b12mr1542535385a.62.1719506497610;
-        Thu, 27 Jun 2024 09:41:37 -0700 (PDT)
-Received: from LQ3V64L9R2 ([208.64.28.18])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d5c82e066sm69457585a.57.2024.06.27.09.41.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 09:41:36 -0700 (PDT)
-Date: Thu, 27 Jun 2024 12:41:34 -0400
-From: Joe Damato <jdamato@fastly.com>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, andrew@lunn.ch, jiri@resnulli.us,
-	horms@kernel.org, rkannoth@marvell.com, pkshih@realtek.com,
-	larry.chiu@realtek.com
-Subject: Re: [PATCH net-next v21 02/13] rtase: Implement the .ndo_open
- function
-Message-ID: <Zn2WPhHOgBZFEvPE@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Justin Lai <justinlai0215@realtek.com>, kuba@kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	andrew@lunn.ch, jiri@resnulli.us, horms@kernel.org,
-	rkannoth@marvell.com, pkshih@realtek.com, larry.chiu@realtek.com
-References: <20240624062821.6840-1-justinlai0215@realtek.com>
- <20240624062821.6840-3-justinlai0215@realtek.com>
+        d=1e100.net; s=20230601; t=1719506945; x=1720111745;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xxcFEOlgMZdT3jwSPBKvbM2Hel/+xTILb1M8DFKl18Y=;
+        b=bC4O2vimnBG5ekYwHE6u8pTrHKojRxYymr7mDHbJKrj5m+1idsGWUQfXliFk+1xSXW
+         atGyD/PtOnuQZ1TzRQz4zeLaJ9p235MHq6UMaf5/uAp2TIcWdC+sp3U7aBkrdIEmX/LZ
+         po43nElVgVgLK8+Mou/hA/8WHhoj2/9vNjYfdZaZoEnK96v913VeyzVSKz+TYeNw7tkV
+         Z0nERvLsxXTCIIKK/T6D0iDTPz0/krZpDZFnw/Qh/n+YK4ZKKWyjPp8lktQ7FS0ZajcB
+         9JTOW0c6WthIao3OAcRF3M5Vw9AVzD6GszujoSKHlAsI0hQJCqatswaF1pqBut18DbYn
+         jUNA==
+X-Forwarded-Encrypted: i=1; AJvYcCXPK1NJNPqfNZnuzGf3U9NF5W1wGtmSlJf1E3VXXQYaOueYFSZbARKL3ogCC7UAPUoVhqwSnt34Ww9xwDy9bcFZNxdHQh1u
+X-Gm-Message-State: AOJu0Yx0NudGNWkMwEFnRHTBCHPAJBlGR3gxzG0pbYrq3+HgJjGnZDMK
+	oyb2GijCU7xW/GSNRqRWxhV8aWW5vjb6Sv1jMDhs5y7FxHy/ZaRilNFSF7Hh/c1IVFZNJgZyjgo
+	1zudVRAi+ms5t/zSVw0T+KOyFIv8xg5wyAI+xkQ==
+X-Google-Smtp-Source: AGHT+IGuCIcGgabVY++a4Em4rrMpQkk20usuUoDxNeZRMIEMY4XnKjgZq6XSJV5vH34NogeLq+vOfcgAhpt92ibkLbw=
+X-Received: by 2002:a05:6a20:3d8b:b0:1be:c4e6:ed40 with SMTP id
+ adf61e73a8af0-1bec4e6ee22mr5759856637.51.1719506945413; Thu, 27 Jun 2024
+ 09:49:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240624062821.6840-3-justinlai0215@realtek.com>
+References: <20240627113018.25083-1-brgl@bgdev.pl> <20240627113018.25083-4-brgl@bgdev.pl>
+ <ea452581-c903-4106-b912-d307f74f773d@lunn.ch>
+In-Reply-To: <ea452581-c903-4106-b912-d307f74f773d@lunn.ch>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Thu, 27 Jun 2024 18:48:51 +0200
+Message-ID: <CAMRc=Memf-fwY2iRXNDz7M4337PcH7quAZ7GHgjauj+Og8PwbQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 3/3] net: phy: aquantia: add support for aqr115c
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 24, 2024 at 02:28:10PM +0800, Justin Lai wrote:
+On Thu, Jun 27, 2024 at 6:22=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Thu, Jun 27, 2024 at 01:30:17PM +0200, Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >
+> > Add support for a new model to the Aquantia driver. This PHY supports
+> > Overlocked SGMII mode with 2.5G speeds.
+> >
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > ---
+> >  drivers/net/phy/aquantia/aquantia_main.c | 39 +++++++++++++++++++++++-
+> >  1 file changed, 38 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy=
+/aquantia/aquantia_main.c
+> > index 974795bd0860..98ccefd355d5 100644
+> > --- a/drivers/net/phy/aquantia/aquantia_main.c
+> > +++ b/drivers/net/phy/aquantia/aquantia_main.c
+> > @@ -29,6 +29,7 @@
+> >  #define PHY_ID_AQR113        0x31c31c40
+> >  #define PHY_ID_AQR113C       0x31c31c12
+> >  #define PHY_ID_AQR114C       0x31c31c22
+> > +#define PHY_ID_AQR115C       0x31c31c33
+> >  #define PHY_ID_AQR813        0x31c31cb2
+> >
+> >  #define MDIO_PHYXS_VEND_IF_STATUS            0xe812
+> > @@ -111,7 +112,6 @@ static u64 aqr107_get_stat(struct phy_device *phyde=
+v, int index)
+> >       int len_h =3D stat->size - len_l;
+> >       u64 ret;
+> >       int val;
+> > -
+> >       val =3D phy_read_mmd(phydev, MDIO_MMD_C22EXT, stat->reg);
+> >       if (val < 0)
+> >               return U64_MAX;
+>
+> White space change. And that blank line is actually wanted to separate
+> the variables from the code.
+>
 
-[...]
+Ah, this is accidental, thanks for catching it.
 
-> +static int rtase_open(struct net_device *dev)
-> +{
-> +	struct rtase_private *tp = netdev_priv(dev);
-> +	const struct pci_dev *pdev = tp->pdev;
-> +	struct rtase_int_vector *ivec;
-> +	u16 i = 0, j;
-> +	int ret;
-> +
-> +	ivec = &tp->int_vector[0];
-> +	tp->rx_buf_sz = RTASE_RX_BUF_SIZE;
-> +
-> +	ret = rtase_alloc_desc(tp);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = rtase_init_ring(dev);
-> +	if (ret)
-> +		goto err_free_all_allocated_mem;
-> +
-> +	rtase_hw_config(dev);
-> +
-> +	if (tp->sw_flag & RTASE_SWF_MSIX_ENABLED) {
-> +		ret = request_irq(ivec->irq, rtase_interrupt, 0,
-> +				  dev->name, ivec);
-> +		if (ret)
-> +			goto err_free_all_allocated_irq;
-> +
-> +		/* request other interrupts to handle multiqueue */
-> +		for (i = 1; i < tp->int_nums; i++) {
-> +			ivec = &tp->int_vector[i];
-> +			snprintf(ivec->name, sizeof(ivec->name), "%s_int%i",
-> +				 tp->dev->name, i);
-> +			ret = request_irq(ivec->irq, rtase_q_interrupt, 0,
-> +					  ivec->name, ivec);
-> +			if (ret)
-> +				goto err_free_all_allocated_irq;
-> +		}
-> +	} else {
-> +		ret = request_irq(pdev->irq, rtase_interrupt, 0, dev->name,
-> +				  ivec);
-> +		if (ret)
-> +			goto err_free_all_allocated_mem;
-> +	}
-> +
-> +	rtase_hw_start(dev);
-> +
-> +	for (i = 0; i < tp->int_nums; i++) {
-> +		ivec = &tp->int_vector[i];
-> +		napi_enable(&ivec->napi);
+Bart
 
-nit / suggestion for the future (not to hold this back): it'd be
-nice to add support for netif_napi_set_irq and netif_queue_set_napi
-so that userland can use netdev-genl to get queue/irq/napi mappings.
+>     Andrew
+>
+> ---
+> pw-bot: cr
 
