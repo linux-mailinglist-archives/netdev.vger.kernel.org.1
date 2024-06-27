@@ -1,313 +1,178 @@
-Return-Path: <netdev+bounces-107463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECF8991B197
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 23:36:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6116B91B1A9
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 23:48:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A5CB283D5E
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:36:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82C381C22373
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 244221A08A1;
-	Thu, 27 Jun 2024 21:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F7FC1A070C;
+	Thu, 27 Jun 2024 21:48:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tIDj2jxI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YpueqDv6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38EE1A0724
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 21:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0942E22F1C
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 21:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719524156; cv=none; b=T8klYao7Mo6xCf4BcsvPwM8g72/GsIgY/YpTs+gisXgjBPQGSgvf3pcWYvZm0B59pjY8Ruztvj7LmUnVFWu3LBeYJo6LZF/lARvEqWElWz9dEeKWlzLK0ErnMNFSlAQe284ITXVfWTt/sMGqU7MS7Mfudw5t6IimwbNJvIEHo0o=
+	t=1719524922; cv=none; b=k7wTMOYyQ1sidZ+Ghg13+6c8ENkCmPWBUp9keNmklv3pR4y9dIinHyh0WizsCQQChE2llWafkGtBlWrIhO1Vez3zPZa0zafx+EPYl+vuhFDuGHHC0gJNt84FbVVhldvlo/lLBlvPobiftA8RqWsHysLcY6tY0Ff7l+XwnkmzQjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719524156; c=relaxed/simple;
-	bh=FmEb1IlmTgKbehtsCxQdhAC+WEPKFbwTEdWKNhnO1vY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bErZHOSzuL5rbyEwSIXAJqFvW636ucP66jlt7ekRFgd5iKjKeqs9sKLXmfRyek5RG5n0h2BWOEhCRcMoDaiyDkf1iUU/+5zrMYFfQGe3P4pCse2SlsA6e5DXrSHAclIUVpgCXEsSvZMcWnzadd7zIwA5Rq+FN82/GZBS8ib8DAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tIDj2jxI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 410A1C4AF07;
-	Thu, 27 Jun 2024 21:35:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719524155;
-	bh=FmEb1IlmTgKbehtsCxQdhAC+WEPKFbwTEdWKNhnO1vY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tIDj2jxIUdm8pOdpEOCbU11Tfig+gk72GzQ9FFhKuFivufKVE4DwnMdzT9mt4Ps03
-	 gcfYO/SzCHEwRzfi/7qCHYy9cWrS1Wclxt/ScDwBc2nxvtx1g2hTdcvBep4K+1AL2p
-	 3uRaHlS9E4cJYS8ER5Q3BnI8qGn92reUQrL7z6ljI4pDFuP9X6G62DsYJ1VkLn530g
-	 m8+CZco1+8KuT5/Lrlx+LJaD+m6vElmlOoIt6QpLR5MrXIEPJR3rf6Z+Im+bR8Xsj7
-	 /Z6B/KB0uA3gvKfilOWrsyv75V1fKZxesLArHh6SiU7DTfo4UBKGYYZalxUbRYvjPl
-	 BBFQkTMXZUWkg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	donald.hunter@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 2/2] tcp_metrics: add netlink protocol spec in YAML
-Date: Thu, 27 Jun 2024 14:35:51 -0700
-Message-ID: <20240627213551.3147327-3-kuba@kernel.org>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240627213551.3147327-1-kuba@kernel.org>
-References: <20240627213551.3147327-1-kuba@kernel.org>
+	s=arc-20240116; t=1719524922; c=relaxed/simple;
+	bh=MyhZhvzWKPeEDKyrQNxpUzLYBHtM1wRWMBIuxRlX6LQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i09EdwkV7e8reS6VR/5MNq7GigvKFvBfHC77BoBRKKwZij2HxZab7iNsKQUdNXKwP3MNWZ09tMfxEGPLdORwx8ZJ8WvXchz3SGyKvslH5pIrPDcSnELFv/PymiINSjILYvDfLBULDK2Mg3f5YiWzrL+Lt430nw2R/yXvZTvXlC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YpueqDv6; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719524919;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CHcfOWsEcITl9bu0E1Ymw7ooI8Hv1gK+grR8ONGP2Xs=;
+	b=YpueqDv6rj+hr40yDfZcuLHjfVV/cD5QxzotNWNaNXCdZqaDPSc8ZUp7DGJlLHRWMnEZGF
+	kipvZDKJsdUx0IPEuTHparqlHT8xrEtmKSEJtJphTnTJed1R/Xt01yQOQxZoiaWzZuQ9oo
+	s2ihdKv7HHjLMMmF29EXpp9NAQxi3bQ=
+Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
+ [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-186-ZD8-u1JgPQitlFW1XPsddA-1; Thu, 27 Jun 2024 17:48:37 -0400
+X-MC-Unique: ZD8-u1JgPQitlFW1XPsddA-1
+Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-48f792971cbso2046707137.3
+        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 14:48:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719524917; x=1720129717;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CHcfOWsEcITl9bu0E1Ymw7ooI8Hv1gK+grR8ONGP2Xs=;
+        b=dRUKqiSmXxgmMcqiag+6neha9e70kwzMlYgEBlAGdAZQ0Mp074uDUjywv6KDUibrHB
+         TQ6fRw/gn0N7gtFssYKp+M8b/M5gaclgx5LxAQWZ46/ic6+6desJj+Zk2gjX5YKbH3Vw
+         GMkkmw37vt3YgCaeLksJBAImO7PgiGDDLoorm+m56q5Xtv/4p+CohDSsPI1NJvE7vnBr
+         TtWmGehiKM30IEYn8AELO5yFdBBZiplR2EuS9VPkmFmzMu5sVn/jPwbdTtW6jnxULDsl
+         7ZRMcTwz6Vqe1qBWJUT6+hD8iZx0JeeRCqi3I284Yh7UV+PSA7xosjAKw/FFSd+dNuZv
+         MvmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWXjFdcqJ+s1/p5hOWkxAKlZeKzTlIM/ryuUY1IuE7b6vA0N9n1Art0KKPb3yBNHV/xyUmByvNLSmPGwn1MS51yhiOX39nH
+X-Gm-Message-State: AOJu0Yw+2Ao7kvI7kYVI2LmXxBoz4J5hiKwH4IwsKJXIxD1JnNZvYz/s
+	NSRfQnYndRgfCQFj7xftZrohGrs3xhG54gwt+HbJTi5ktzWH11qO5zUSmJspgpXPdbnZmd+7eO0
+	4Munqlvo/K36Fqv1wH3Cm7xM2zSRMiTNlzD3ziyCV3GaJZdtXkkTdGg==
+X-Received: by 2002:a05:6102:2acf:b0:48f:8e88:583d with SMTP id ada2fe7eead31-48f8e886086mr4055819137.26.1719524917137;
+        Thu, 27 Jun 2024 14:48:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH5z22EvNhwn2zPZtn6j+WLbwXAvrBCWXFpiuWOMgt/1osDgKWNuZFANeop8KLzzBv36NnwMw==
+X-Received: by 2002:a05:6102:2acf:b0:48f:8e88:583d with SMTP id ada2fe7eead31-48f8e886086mr4055788137.26.1719524916653;
+        Thu, 27 Jun 2024 14:48:36 -0700 (PDT)
+Received: from x1gen2nano ([2600:1700:1ff0:d0e0::f])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e5746f5sm2378616d6.52.2024.06.27.14.48.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jun 2024 14:48:36 -0700 (PDT)
+Date: Thu, 27 Jun 2024 16:48:33 -0500
+From: Andrew Halaney <ahalaney@redhat.com>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Russell King <linux@armlinux.org.uk>, Vinod Koul <vkoul@kernel.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v2 net-next 2/2] net: stmmac: qcom-ethqos: add a
+ DMA-reset quirk for sa8775p-ride
+Message-ID: <4zaewv4watlf7v3phu3qnjtutdnez6a2gqkymrfln5bsu2pq6x@sclwhdzmhu5p>
+References: <20240627113948.25358-1-brgl@bgdev.pl>
+ <20240627113948.25358-3-brgl@bgdev.pl>
+ <td5jbseo7gtu6d4xai6q2zkfmxw4ijimyiromrf52he5hze3w3@fd3kayixf4lw>
+ <CAMRc=MfznDaaNcfvRBg1wpiOkyTE=Ks-_nx=aCY1MR5-50Ka+A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMRc=MfznDaaNcfvRBg1wpiOkyTE=Ks-_nx=aCY1MR5-50Ka+A@mail.gmail.com>
 
-Add a protocol spec for tcp_metrics, so that it's accessible via YNL.
-Useful at the very least for testing fixes.
+On Thu, Jun 27, 2024 at 08:35:16PM GMT, Bartosz Golaszewski wrote:
+> On Thu, Jun 27, 2024 at 7:07 PM Andrew Halaney <ahalaney@redhat.com> wrote:
+> >
+> > Although, this isn't tied to _just_ 2500basex here. If I boot the
+> > sa8775p-ride (r2 version, with a marvell 88ea1512 phy attached via
+> > sgmii, not indicating 2500basex) wouldn't all this get exercised? Right
+> > now the devicetree doesn't indicate inband signalling, but I tried that
+> > over here with Russell's clean up a week or two ago and things at least
+> > came up ok (which made me think all the INTEGRATED_PCS stuff wasn't needed,
+> > and I'm not totally positive my test proved inband signalling worked,
+> > but I thought it did...):
+> >
+> 
+> Am I getting this right? You added `managed = "in-band-status"' to
+> Rev2 DTS and it still worked?
 
-In this episode of "10,000 ways to complicate netlink" the metric
-nest has defines which are off by 1. iproute2 does:
+> 
+> >     https://lore.kernel.org/netdev/zzevmhmwxrhs5yfv5srvcjxrue2d7wu7vjqmmoyd5mp6kgur54@jvmuv7bxxhqt/
+> >
+> > based on Russell's comments, I feel if I was to use his series over
+> > there, add 'managed = "in-band-status"' to the dts, and then apply this
+> > series, the link would not come up anymore.
+> >
 
-        struct rtattr *m[TCP_METRIC_MAX + 1 + 1];
+This works on rev2/rev1 (no way to tell which one it actually is, shouldn't matter),
+here's a branch I just whipped up to replicate the setup I had when
+making the comments in above link:
 
-        parse_rtattr_nested(m, TCP_METRIC_MAX + 1, a);
+    https://gitlab.com/ahalaney/kernel-automotive-9/-/commits/russell-cleanups-and-inband
 
-        for (i = 0; i < TCP_METRIC_MAX + 1; i++) {
-                // ...
-                attr = m[i + 1];
+The last commit has some dmesg/ethtool output etc to show things
+working. I reverted recent changes to stmmac just to apply cleanly.
 
-This is too weird to support in YNL, add a new set of defines
-with _correct_ values to the official kernel header.
+I tried the patches Serge added on top of that series, but that was causing
+the link to cycle up/down, so I dropped those and went back to just
+Russell's patches to recreate the setup I had when leaving the comment.
+I need to try with Serge's stuff again when I find a moment and see if I
+can work out why the link starts going up/down with those + some
+compiler fixups and removing INTEGRATED_PCS flags. For what its worth,
+here's the branch, logs are in the last commit:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: donald.hunter@gmail.com
+    https://gitlab.com/ahalaney/kernel-automotive-9/-/commits/russell-plus-serge-plus-inband-link-cycles
 
-v2:
- - remove unused unspec op and attr (TCP_METRICS_ATTR_UNSPEC and
-   TCP_METRICS_CMD_UNSPEC exist, but we can't generate uAPI, anyway)
- - fix typos
- - s/_/-/ on metric names
- - correct doc on rttvar-us (like rttvar there are 2 fractional bits)
----
- Documentation/netlink/specs/tcp_metrics.yaml | 169 +++++++++++++++++++
- include/uapi/linux/tcp_metrics.h             |  16 ++
- tools/net/ynl/Makefile.deps                  |   1 +
- 3 files changed, 186 insertions(+)
- create mode 100644 Documentation/netlink/specs/tcp_metrics.yaml
 
-diff --git a/Documentation/netlink/specs/tcp_metrics.yaml b/Documentation/netlink/specs/tcp_metrics.yaml
-new file mode 100644
-index 000000000000..1bd94f43e526
---- /dev/null
-+++ b/Documentation/netlink/specs/tcp_metrics.yaml
-@@ -0,0 +1,169 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+
-+name: tcp_metrics
-+
-+protocol: genetlink-legacy
-+
-+doc: |
-+  Management interface for TCP metrics.
-+
-+c-family-name: tcp-metrics-genl-name
-+c-version-name: tcp-metrics-genl-version
-+max-by-define: true
-+kernel-policy: global
-+
-+definitions:
-+  -
-+    name: tcp-fastopen-cookie-max
-+    type: const
-+    value: 16
-+
-+attribute-sets:
-+  -
-+    name: tcp-metrics
-+    name-prefix: tcp-metrics-attr-
-+    attributes:
-+      -
-+        name: addr-ipv4
-+        type: u32
-+        byte-order: big-endian
-+        display-hint: ipv4
-+      -
-+        name: addr-ipv6
-+        type: binary
-+        checks:
-+          min-len: 16
-+        byte-order: big-endian
-+        display-hint: ipv6
-+      -
-+        name: age
-+        type: u64
-+      -
-+        name: tw-tsval
-+        type: u32
-+        doc: unused
-+      -
-+        name: tw-ts-stamp
-+        type: s32
-+        doc: unused
-+      -
-+        name: vals
-+        type: nest
-+        nested-attributes: metrics
-+      -
-+        name: fopen-mss
-+        type: u16
-+      -
-+        name: fopen-syn-drops
-+        type: u16
-+      -
-+        name: fopen-syn-drop-ts
-+        type: u64
-+      -
-+        name: fopen-cookie
-+        type: binary
-+        checks:
-+          min-len: tcp-fastopen-cookie-max
-+      -
-+        name: saddr-ipv4
-+        type: u32
-+        byte-order: big-endian
-+        display-hint: ipv4
-+      -
-+        name: saddr-ipv6
-+        type: binary
-+        checks:
-+          min-len: 16
-+        byte-order: big-endian
-+        display-hint: ipv6
-+      -
-+        name: pad
-+        type: pad
-+
-+  -
-+    name: metrics
-+    # Intentionally don't define the name-prefix, see below.
-+    doc: |
-+      Attributes with metrics. Note that the values here do not match
-+      the TCP_METRIC_* defines in the kernel, because kernel defines
-+      are off-by one (e.g. rtt is defined as enum 0, while netlink carries
-+      attribute type 1).
-+    attributes:
-+      -
-+        name: rtt
-+        type: u32
-+        doc: |
-+          Round Trip Time (RTT), in msecs with 3 bits fractional
-+          (left-shift by 3 to get the msec value).
-+      -
-+        name: rttvar
-+        type: u32
-+        doc: |
-+          Round Trip Time VARiance (RTT), in msecs with 2 bits fractional
-+          (left-shift by 2 to get the msec value).
-+      -
-+        name: ssthresh
-+        type: u32
-+        doc: Slow Start THRESHold.
-+      -
-+        name: cwnd
-+        type: u32
-+        doc: Congestion Window.
-+      -
-+        name: reodering
-+        type: u32
-+        doc: Reodering metric.
-+      -
-+        name: rtt-us
-+        type: u32
-+        doc: |
-+          Round Trip Time (RTT), in usecs, with 3 bits fractional
-+          (left-shift by 3 to get the msec value).
-+      -
-+        name: rttvar-us
-+        type: u32
-+        doc: |
-+          Round Trip Time (RTT), in usecs, with 2 bits fractional
-+          (left-shift by 3 to get the msec value).
-+
-+operations:
-+  list:
-+    -
-+      name: get
-+      doc: Retrieve metrics.
-+      attribute-set: tcp-metrics
-+
-+      dont-validate: [ strict, dump ]
-+
-+      do:
-+        request: &sel_attrs
-+          attributes:
-+            - addr-ipv4
-+            - addr-ipv6
-+            - saddr-ipv4
-+            - saddr-ipv6
-+        reply: &all_attrs
-+          attributes:
-+            - addr-ipv4
-+            - addr-ipv6
-+            - saddr-ipv4
-+            - saddr-ipv6
-+            - age
-+            - vals
-+            - fopen-mss
-+            - fopen-syn-drops
-+            - fopen-syn-drop-ts
-+            - fopen-cookie
-+      dump:
-+        reply: *all_attrs
-+
-+    -
-+      name: del
-+      doc: Delete metrics.
-+      attribute-set: tcp-metrics
-+
-+      dont-validate: [ strict, dump ]
-+      flags: [ admin-perm ]
-+
-+      do:
-+        request: *sel_attrs
-diff --git a/include/uapi/linux/tcp_metrics.h b/include/uapi/linux/tcp_metrics.h
-index c48841076998..927c735a5b0e 100644
---- a/include/uapi/linux/tcp_metrics.h
-+++ b/include/uapi/linux/tcp_metrics.h
-@@ -27,6 +27,22 @@ enum tcp_metric_index {
- 
- #define TCP_METRIC_MAX	(__TCP_METRIC_MAX - 1)
- 
-+/* Re-define enum tcp_metric_index, again, using the values carried
-+ * as netlink attribute types.
-+ */
-+enum {
-+	TCP_METRICS_A_METRICS_RTT = 1,
-+	TCP_METRICS_A_METRICS_RTTVAR,
-+	TCP_METRICS_A_METRICS_SSTHRESH,
-+	TCP_METRICS_A_METRICS_CWND,
-+	TCP_METRICS_A_METRICS_REODERING,
-+	TCP_METRICS_A_METRICS_RTT_US,
-+	TCP_METRICS_A_METRICS_RTTVAR_US,
-+
-+	__TCP_METRICS_A_METRICS_MAX
-+};
-+#define TCP_METRICS_A_METRICS_MAX (__TCP_METRICS_A_METRICS_MAX - 1)
-+
- enum {
- 	TCP_METRICS_ATTR_UNSPEC,
- 	TCP_METRICS_ATTR_ADDR_IPV4,		/* u32 */
-diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
-index f4e8eb79c1b8..33399fbe9851 100644
---- a/tools/net/ynl/Makefile.deps
-+++ b/tools/net/ynl/Makefile.deps
-@@ -25,3 +25,4 @@ CFLAGS_nfsd:=$(call get_hdr_inc,_LINUX_NFSD_NETLINK_H,nfsd_netlink.h)
- CFLAGS_ovs_datapath:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
- CFLAGS_ovs_flow:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
- CFLAGS_ovs_vport:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
-+CFLAGS_tcp_metrics:=$(call get_hdr_inc,_LINUX_TCP_METRICS_H,tcp_metrics.h)
--- 
-2.45.2
+Without Russell's patches the link doesn't come up after switching to
+'managed = "in-band-status"' otherwise I'd look into switching the dts to
+inband signalling now instead of after those cleanups land.
+
+> 
+> Because I can confirm that it doesn't on Rev 3. :(
+> 
+> So to explain myself: I tried to follow Andrew Lunn's suggestion about
+> unifying this and the existing ethqos_set_func_clk_en() bits as they
+> seem to address a similar issue.
+> 
+> I'm working with limited information here as well regarding this issue
+> so I figured this could work but you're right - if we ever need
+> in-band signalling, then it won't work. It's late here so let me get
+> back to it tomorrow.
+
+No worries, I understand how this goes, stmmac is tricky and getting
+information/documentation and understanding it can be tough. I appreciate you trying
+to get this squared away.
+
+> 
+> > Total side note, but I'm wondering if the sa8775p-ride dts should
+> > specify 'managed = "in-band-status"'.
+> >
+> 
+> I'll check this at the source.
+> 
+
+Thanks!
 
 
